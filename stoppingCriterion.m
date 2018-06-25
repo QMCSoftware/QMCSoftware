@@ -1,8 +1,10 @@
 classdef (Abstract) stoppingCriterion
-%§\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$§
+% Decide when to stop a
 properties
    absTol = 1e-2 %absolute tolerance, §$\mcommentfont d$§
    relTol = 0 %absolute tolerance, §$\mcommentfont d$§
+   nInit = 1024 %initial sample size
+   nMax = 1e8 %maximum number of samples allowed
 end
 properties (Abstract)
    discDistAllowed %which discrete distributions are supported
@@ -10,8 +12,7 @@ properties (Abstract)
 end
 methods (Abstract)
 	stopYet(obj, distribObj)
-   % oldData = data or summary of data computed already
-   % newData = new (summary) data 
+   % distribObj = data or summary of data computed already
 end
 end
 

@@ -1,13 +1,11 @@
 classdef meanVarData < accumData
-%Accumulated data
+% Accumulated data for IID calculations, stores the sample mean and
+% variance of function values
 properties
    muhat %sample mean
    sighat %sample variance
-   lastN
-   nextN
-   nSigma
-   nMu
-   timeF
+   nSigma %number of samples used to compute the sample standard deviation
+   nMu %number of samples used to compute the sample mean
 end
 methods 
    function obj = updateData(obj, distribObj, funObj)
@@ -15,14 +13,14 @@ methods
       for ii = 1:nf
          tStart = tic; %time the function values
          y = f(funObj(ii), ...
-            genDistrib(distribObj, obj.lastN(ii)+1, obj.lastN(ii)+obj.nextN(ii), ...
+            genDistrib(distribObj, obj.prevN(ii)+1, obj.prevN(ii)+obj.nextN(ii), ...
             obj.nextN(ii), 1:funObj(ii).dimension, ii), 1:funObj(ii).dimension);
-         obj.timeF(ii) = toc(tStart); %to be used for multi-level methods
+         obj.costF(ii) = toc(tStart); %to be used for multi-level methods
          if strcmp(obj.stage,'sigma')
-            obj.sighat(ii) = std(y);
+            obj.sighat(ii) = std(y); %compute the sample standard deviation if required
          end
-         obj.muhat(ii) = mean(y);
-         obj.solution = sum(obj.muhat);
+         obj.muhat(ii) = mean(y); %compute the sample mean
+         obj.solution = sum(obj.muhat); %which also acts as our tentative solution
       end
    end
 end

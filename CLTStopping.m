@@ -1,9 +1,8 @@
 classdef CLTStopping < stoppingCriterion
-%§\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$§
+% Stopping criterion based on the Central Limit Theorem
 properties
-   discDistAllowed = "IID" %which discrete distributions are supported
-   decompTypeAllowed = "single" %which decomposition types are supported
-   nInit = 1000 %initial sample size
+   discDistAllowed = "IIDDistribution" %which discrete distributions are supported
+   decompTypeAllowed = ["single"; "multi"] %which decomposition types are supported
    inflate = 1.2 %inflation factor
    alpha = 0.01;
 end
@@ -22,32 +21,35 @@ methods
       switch dataObj.stage
          case 'begin' %initialize
             dataObj.timeStart = tic;
-            nf = numel(funObj);
-            distribObj = initStreams(distribObj,nf);
-            dataObj.lastN = zeros(1,nf); %initialize data object
+            if ~any(strcmp(obj.discDistAllowed,class(distribObj)))
+               error('Stoppoing criterion not compatible with sampling distribution')
+            end
+            nf = numel(funObj); %number of functions whose integrals add up to the solution
+            distribObj = initStreams(distribObj,nf); %need an IID stream for each function
+            dataObj.prevN = zeros(1,nf); %initialize data object
             dataObj.nextN = repmat(obj.nInit,1,nf);
             dataObj.muhat = Inf(1,nf);
             dataObj.sighat = Inf(1,nf);
-            dataObj.nSigma = obj.nInit;
-            dataObj.timeF = zeros(1,nf);
-            dataObj.stage = 'sigma';
+            dataObj.nSigma = obj.nInit; %use initial samples to estimate standard deviation
+            dataObj.costF = zeros(1,nf);
+            dataObj.stage = 'sigma'; %compute standard deviation next
          case 'sigma'
-            dataObj.lastN = dataObj.nextN; %update place in the sequence
-            tempA = sqrt(dataObj.timeF);
-            tempB = sum(tempA .* dataObj.sighat);
+            dataObj.prevN = dataObj.nextN; %update place in the sequence
+            tempA = sqrt(dataObj.costF); %use cost of function values to decide how to allocate
+            tempB = sum(tempA .* dataObj.sighat); %samples for computation of the mean
             nM = ceil((tempB*(obj.quantile*obj.inflate ...
                /max(obj.absTol,dataObj.solution*obj.relTol))^2) ...
-               * (dataObj.sighat./sqrt(dataObj.timeF)));
-            dataObj.nMu = max(dataObj.nextN,nM);
-            dataObj.nextN = dataObj.nMu + dataObj.lastN;
-            dataObj.stage = 'mu';
+               * (dataObj.sighat./sqrt(dataObj.costF)));
+            dataObj.nMu = min(max(dataObj.nextN,nM),obj.nMax);
+            dataObj.nextN = dataObj.nMu + dataObj.prevN;
+            dataObj.stage = 'mu'; %compute sample mean next
          case 'mu'
             dataObj.solution = sum(dataObj.muhat);
             dataObj.nSamplesUsed = dataObj.nextN;
             errBar = (obj.quantile * obj.inflate) * ...
                sqrt(sum(dataObj.sighat.^2/dataObj.nMu));
             dataObj.errorBound = dataObj.solution + errBar*[-1 1];
-            dataObj.stage = 'done';
+            dataObj.stage = 'done'; %finished with computation
       end
       dataObj.timeUsed = toc(dataObj.timeStart);
    end
