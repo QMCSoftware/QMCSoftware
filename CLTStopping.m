@@ -12,7 +12,6 @@ properties (Dependent)
 end
 
 methods
-   
    function [obj, dataObj, distribObj] = ...
          stopYet(obj, dataObj, funObj, distribObj)
       if ~numel(dataObj)
@@ -40,7 +39,7 @@ methods
             nM = ceil((tempB*(obj.quantile*obj.inflate ...
                /max(obj.absTol,dataObj.solution*obj.relTol))^2) ...
                * (dataObj.sighat./sqrt(dataObj.costF)));
-            dataObj.nMu = min(max(dataObj.nextN,nM),obj.nMax);
+            dataObj.nMu = min(max(dataObj.nextN,nM),obj.nMax - dataObj.prevN);
             dataObj.nextN = dataObj.nMu + dataObj.prevN;
             dataObj.stage = 'mu'; %compute sample mean next
          case 'mu'

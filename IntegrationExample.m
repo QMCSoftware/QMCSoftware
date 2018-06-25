@@ -1,14 +1,11 @@
 %% How to integrate a function using our community QMC framework
-
 % An example with Keister's function integrated with respect to the uniform
 % distribution over the unit cube
 stopObj = CLTStopping %stopping criterion for IID sampling using the Central Limit Theorem
 distribObj = IIDDistribution; %IID sampling with uniform distribution
 [sol, out] = integrate(KeisterFun, distribObj, stopObj)
-
-stopObj.absTol = 1e-3; %decrease tolerance
+stopObj.absTol = 1e-3 %decrease tolerance
 [sol, out] = integrate(KeisterFun, distribObj, stopObj)
-
 stopObj.absTol = 0; %impossible tolerance
 stopObj.nMax = 1e6; %calculation limited by sample budget
 [sol, out] = integrate(KeisterFun, distribObj, stopObj)

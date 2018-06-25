@@ -1,10 +1,12 @@
 classdef IIDDistribution < discreteDistribution
-%§\mcommentfont Specifies and generates the components of $\frac 1n \sum_{i=1}^n \delta_{\vx_i}(\cdot)$ where the $\vx_i$ are IID Uniform on $[0,1]^d$§
+%§\mcommentfont Specifies and generates the components of $\frac 1n \sum_{i=1}^n \delta_{\vx_i}(\cdot)$§
+%§\mcommentfont    where the $\vx_i$ are IID uniform on $[0,1]^d$ or IID standard Gaussian §
 properties
    distribData %stream data
    state = [] %not used
    nStreams = 1
 end
+
 methods   
    function obj = initStreams(obj,nStreams)
       obj.nStreams = nStreams;
@@ -16,9 +18,9 @@ methods
          streamIndex = 1;
       end
       nPts = nEnd - nStart + 1; %how many points to be generated
-      if strcmp(obj.trueDistribution, 'uniform')
+      if strcmp(obj.trueDistribution, 'uniform') %generate uniform points
          x = rand(obj.distribData.stream{streamIndex},nPts,numel(coordIndex)); %nodes
-      else
+      else %standard normal points
          x = randn(obj.distribData.stream{streamIndex},nPts,numel(coordIndex)); %nodes
       end
       w = 1;

@@ -6,12 +6,13 @@ properties (Abstract)
    nStreams
 end
 properties	
-   domain = "unit cube" %domain of the discrete distribution, §$\mcommentfont \cx$§
+   domain = [0 0; 1 1]; %domain of the discrete distribution, §$\mcommentfont \cx$§
+   domainType = 'box' %domain of the discrete distribution, §$\mcommentfont \cx$§
    dimension = 2 %dimension of the domain, §$\mcommentfont d$§
-   trueDistribution = "uniform" %name of the distribution that the discrete distribution attempts to emulate
+   trueDistribution = 'uniform' %name of the distribution that the discrete distribution attempts to emulate
 end
 methods (Abstract)
-   genDistrib(obj, nStart, nEnd, n)
+   genDistrib(obj, nStart, nEnd, n, coordIndex)
    % nStart = starting value of §$\mcommentfont i$§
    % nEnd = ending value of §$\mcommentfont i$§
    % n = value of §$\mcommentfont n$§ used to determine §$\mcommentfont a_n$§

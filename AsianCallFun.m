@@ -1,9 +1,6 @@
 classdef AsianCallFun < fun
-% §\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$§
+% §\mcommentfont Specify and generate payoff values of an Asian Call option$§
 properties
-	domain = "reals" %domain of the discrete distribution, §$\mcommentfont \cx$§
-	dimension = 2 %dimension of the domain, §$\mcommentfont d$§
-   nominalValue = 0 %a nominal number, §$\mcommentfont c$§, such that §$\mcommentfont (c, \ldots, c) \in \cx$§
    volatility = 0.5
    S0 = 30;
    K = 25;
