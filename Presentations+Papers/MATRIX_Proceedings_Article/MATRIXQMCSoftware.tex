@@ -14,16 +14,18 @@
 \makeindex             % used for the subject index
 % please use the style svind.ist with your makeindex program
 
+\input{macros} %held over from MCQMC volumes
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-\title*{Contribution Title}
+\title*{A Proposal for Quasi-Monte Carlo Community Software}
 % Use \titlerunning{Short Title} for an abbreviated version of
 % your contribution title if the original one is too long
-\author{Name of First Author and Name of Second Author}
+\author{Michael Giles, Fred J. Hickernell, Frances Kuo, and Dirk Nuyens}
 % Use \authorrunning{Short Title} for an abbreviated version of
 % your contribution title if the original one is too long
 \institute{Name of First Author \at Name, Address of Institute, \email{name@email.address}
-\and Name of Second Author \at Name, Address of Institute \email{name@email.address}}
+\and Fred J. Hickernell \at Center for Interdisciplinary Scientific Computation and Department of Applied Mathematics, Illinois Institute of Technology, RE 208, 10 W.\ 32$^{\text{nd}}$ Street, Chicago, IL 60616, USA \email{hickernell@iit.edu}}
 %
 % Use the package "url.sty" to avoid
 % problems with special characters
@@ -191,7 +193,7 @@ Proof text goes here.
 
 %
 \begin{acknowledgement}
-If you want to include acknowledgments please use the \verb|acknowledgement| environment -- it will automatically render Springer's preferred layout.
+
 \end{acknowledgement}
 %
 
@@ -200,39 +202,39 @@ Please do not use an appendix.
 \bigskip
 %
 % BibTeX users please use
-% \bibliographystyle{spmpsci}
-% \bibliography{}
+\bibliographystyle{spmpsci}
+\bibliography{FJHOwn23}
 %
-References should be cited in the text by number (rather than author/year). All references should be cited in the text. The reference list should be sorted in alphabetical order. If there are several works by the same author, the following order should be used: 
-\begin{enumerate}
-\item all works by the author alone, ordered chronologically by year of publication
-\item all works by the author with a coauthor, ordered alphabetically by coauthor
-\item all works by the author with several coauthors, ordered chronologically by year of publication.
-\end{enumerate}
-Use the BibTeX bibliography style file \texttt{spmpsci.bst}, or follow the examples below. Use the standard abbreviation of a journal's name according to the ISSN List of Title Word Abbreviations (\url{http://www.issn.org/}).
+% References should be cited in the text by number (rather than author/year). All references should be cited in the text. The reference list should be sorted in alphabetical order. If there are several works by the same author, the following order should be used: 
+% \begin{enumerate}
+% \item all works by the author alone, ordered chronologically by year of publication
+% \item all works by the author with a coauthor, ordered alphabetically by coauthor
+% \item all works by the author with several coauthors, ordered chronologically by year of publication.
+% \end{enumerate}
+% Use the BibTeX bibliography style file \texttt{spmpsci.bst}, or follow the examples below. Use the standard abbreviation of a journal's name according to the ISSN List of Title Word Abbreviations (\url{http://www.issn.org/}).
 
-\begin{thebibliography}{99.}%
-% and use \bibitem to create references.
-%
-% Use the following syntax and markup for your references if 
-% the subject of your book is from the field 
-% "Mathematics, Physics, Statistics, Computer Science"
-%
-% Contribution 
-\bibitem{science-contrib} Broy, M.: Software engineering --- from auxiliary to key technologies. In: Broy, M., Dener, E. (eds.) Software Pioneers, pp. 10-13. Springer, Heidelberg (2002)
-%
-% Online Document
-\bibitem{science-online} Dod, J.: Effective substances. In: The Dictionary of Substances and Their Effects. Royal Society of Chemistry (1999) Available via DIALOG. \\
-\url{http://www.rsc.org/dose/title of subordinate document. Cited 15 Jan 1999}
-%
-% Monograph
-\bibitem{science-mono} Geddes, K.O., Czapor, S.R., Labahn, G.: Algorithms for Computer Algebra. Kluwer, Boston (1992) 
-%
-% Journal article
-\bibitem{science-journal} Hamburger, C.: Quasimonotonicity, regularity and duality for nonlinear systems of partial differential equations. Ann. Mat. Pura. Appl. \textbf{169}, 321--354 (1995)
-%
-% Journal article by DOI
-\bibitem{science-DOI} Slifka, M.K., Whitton, J.L.: Clinical implications of dysregulated cytokine production. J. Mol. Med. (2000) doi: 10.1007/s001090000086 
-%
-\end{thebibliography}
+% \begin{thebibliography}{99.}%
+% % and use \bibitem to create references.
+% %
+% % Use the following syntax and markup for your references if 
+% % the subject of your book is from the field 
+% % "Mathematics, Physics, Statistics, Computer Science"
+% %
+% % Contribution 
+% \bibitem{science-contrib} Broy, M.: Software engineering --- from auxiliary to key technologies. In: Broy, M., Dener, E. (eds.) Software Pioneers, pp. 10-13. Springer, Heidelberg (2002)
+% %
+% % Online Document
+% \bibitem{science-online} Dod, J.: Effective substances. In: The Dictionary of Substances and Their Effects. Royal Society of Chemistry (1999) Available via DIALOG. \\
+% \url{http://www.rsc.org/dose/title of subordinate document. Cited 15 Jan 1999}
+% %
+% % Monograph
+% \bibitem{science-mono} Geddes, K.O., Czapor, S.R., Labahn, G.: Algorithms for Computer Algebra. Kluwer, Boston (1992) 
+% %
+% % Journal article
+% \bibitem{science-journal} Hamburger, C.: Quasimonotonicity, regularity and duality for nonlinear systems of partial differential equations. Ann. Mat. Pura. Appl. \textbf{169}, 321--354 (1995)
+% %
+% % Journal article by DOI
+% \bibitem{science-DOI} Slifka, M.K., Whitton, J.L.: Clinical implications of dysregulated cytokine production. J. Mol. Med. (2000) doi: 10.1007/s001090000086 
+% %
+% \end{thebibliography}
 \end{document}
