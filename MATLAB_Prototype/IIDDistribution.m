@@ -9,7 +9,7 @@ end
 
 methods   
    function obj = initStreams(obj,nStreams)
-      obj.nStreams = nStreams;
+      if nargin > 1, obj.nStreams = nStreams; end
       obj.distribData.stream = RandStream.create('mrg32k3a','NumStreams',nStreams,'CellOutput',true);
    end
       
