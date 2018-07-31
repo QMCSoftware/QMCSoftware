@@ -15,11 +15,11 @@ methods
    function [obj, dataObj, distribObj] = ...
          stopYet(obj, dataObj, funObj, distribObj)
       if ~numel(dataObj)
-         dataObj = meanVarData;
+         dataObj = meanVarData; %create a new accumulated data object
       end
       switch dataObj.stage
          case 'begin' %initialize
-            dataObj.timeStart = tic;
+            dataObj.timeStart = tic; %keep track of time
             if ~any(strcmp(obj.discDistAllowed,class(distribObj)))
                error('Stoppoing criterion not compatible with sampling distribution')
             end

@@ -3,7 +3,7 @@ classdef meanVarData < accumData
 % variance of function values
 properties
    muhat %sample mean
-   sighat %sample variance
+   sighat %sample standard deviation
    nSigma %number of samples used to compute the sample standard deviation
    nMu %number of samples used to compute the sample mean
 end

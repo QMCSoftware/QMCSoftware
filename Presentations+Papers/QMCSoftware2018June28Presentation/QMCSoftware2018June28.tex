@@ -27,6 +27,8 @@
 \setlength{\parskip}{2ex}
 \setlength{\arraycolsep}{0.5ex}
 
+\newcommand{\ProgDir}{../../MATLAB_Prototype}
+
 \renewcommand{\OffTitleLength}{-10ex}
 \setlength{\FJHThankYouMessageOffset}{-8ex}
 \title{A Proposal for Community (Quasi-) Monte Carlo Software}
@@ -299,87 +301,87 @@ Happier funding agencies \tabularnewline
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Discrete Distributions}
 \vspace{-5ex}
-\lstinputlisting[lastline = 13]{../MATLAB_Prototype/discreteDistribution.m}
+\lstinputlisting[lastline = 13]{\ProgDir/discreteDistribution.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Discrete Distributions}
 \vspace{-5ex}
-\lstinputlisting[linerange = {1-1,14-21}]{../MATLAB_Prototype/discreteDistribution.m}
+\lstinputlisting[linerange = {1-1,14-21}]{\ProgDir/discreteDistribution.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Discrete IID Uniform}
 \vspace{-5ex}
-\lstinputlisting[lastline = 14]{../MATLAB_Prototype/IIDDistribution.m}
+\lstinputlisting[lastline = 14]{\ProgDir/IIDDistribution.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Discrete IID Uniform}
 \vspace{-5ex}
-\lstinputlisting[linerange = {1-1,16-30}]{../MATLAB_Prototype/IIDDistribution.m}
+\lstinputlisting[linerange = {1-1,16-30}]{\ProgDir/IIDDistribution.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Functions}
 \vspace{-5ex}
-\lstinputlisting{../MATLAB_Prototype/fun.m}
+\lstinputlisting{\ProgDir/fun.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Keister's Function}
 \vspace{-5ex}
-\lstinputlisting{../MATLAB_Prototype/KeisterFun.m}
+\lstinputlisting{\ProgDir/KeisterFun.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---StoppingCriteria}
 \vspace{-5ex}
-\lstinputlisting{../MATLAB_Prototype/stoppingCriterion.m}
+\lstinputlisting{\ProgDir/stoppingCriterion.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---CLTStopping}
 \vspace{-5ex}
-\lstinputlisting[lastline=12]{../MATLAB_Prototype/CLTStopping.m}
+\lstinputlisting[lastline=12]{\ProgDir/CLTStopping.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---CLTStopping}
 \vspace{-5ex}
-\lstinputlisting[linerange={1-1,14-20}]{../MATLAB_Prototype/CLTStopping.m}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Elements of the Community Software---CLTStopping}
-\vspace{-5ex}
-\lstinputlisting[linerange={1-1,20-34}]{../MATLAB_Prototype/CLTStopping.m}
+\lstinputlisting[linerange={1-1,14-20}]{\ProgDir/CLTStopping.m}
 \end{frame}
 
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---CLTStopping}
 \vspace{-5ex}
-\lstinputlisting[linerange={1-1,35-44}]{../MATLAB_Prototype/CLTStopping.m}
+\lstinputlisting[linerange={1-1,20-34}]{\ProgDir/CLTStopping.m}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Elements of the Community Software---CLTStopping}
+\vspace{-5ex}
+\lstinputlisting[linerange={1-1,35-44}]{\ProgDir/CLTStopping.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---CLTStopping}
 \vspace{-5ex}
-\lstinputlisting[linerange={1-1,45-61}]{../MATLAB_Prototype/CLTStopping.m}
+\lstinputlisting[linerange={1-1,45-61}]{\ProgDir/CLTStopping.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Integration}
 \vspace{-5ex}
-\lstinputlisting{../MATLAB_Prototype/integrate.m}
+\lstinputlisting{\ProgDir/integrate.m}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Integration Example}
 \vspace{-5ex}
-\lstinputlisting[lastline=6]{../MATLAB_Prototype/IntegrationExample.m}
+\lstinputlisting[lastline=6]{\ProgDir/IntegrationExample.m}
 
 \begin{alltt}
 >> IntegrationExample
@@ -394,7 +396,7 @@ errorBound: [0.4210 0.4410]
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Integration Example}
 \vspace{-5ex}
-\lstinputlisting[linerange={7-8}]{../MATLAB_Prototype/IntegrationExample.m}
+\lstinputlisting[linerange={7-8}]{\ProgDir/IntegrationExample.m}
 
 \begin{alltt}
 sol = 0.4253
@@ -408,7 +410,7 @@ errorBound: [0.4243 0.4263]
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Integration Example}
 \vspace{-5ex}
-\lstinputlisting[linerange={9-11}]{../MATLAB_Prototype/IntegrationExample.m}
+\lstinputlisting[linerange={9-11}]{\ProgDir/IntegrationExample.m}
 
 \begin{alltt}
 sol = 0.4252
@@ -423,7 +425,7 @@ errorBound: [0.4244 0.4260]
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Asian Call, Low D}
 \vspace{-5ex}
-\lstinputlisting[linerange={13-18}]{../MATLAB_Prototype/IntegrationExample.m}
+\lstinputlisting[linerange={13-18}]{\ProgDir/IntegrationExample.m}
 
 \begin{alltt}
 OptionObj = 
@@ -440,7 +442,7 @@ errorBound: [6.1640 6.1840]
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Asian Call, High D}
 \vspace{-5ex}
-\lstinputlisting[linerange={20-21}]{../MATLAB_Prototype/IntegrationExample.m}
+\lstinputlisting[linerange={20-21}]{\ProgDir/IntegrationExample.m}
 
 \begin{alltt}
 OptionObj = 
@@ -459,7 +461,7 @@ errorBound: [6.1936 6.2136]
 \begin{frame}[fragile]
 \frametitle{Elements of the Community Software---Asian Call, Multi-Level}
 \vspace{-5ex}
-\lstinputlisting[linerange={23-24}]{../MATLAB_Prototype/IntegrationExample.m}
+\lstinputlisting[linerange={23-24}]{\ProgDir/IntegrationExample.m}
 
 \begin{alltt}
 OptionObj = 
