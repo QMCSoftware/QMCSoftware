@@ -1,8 +1,8 @@
 classdef CLTStopping < stoppingCriterion
 % Stopping criterion based on the Central Limit Theorem
 properties
-   discDistAllowed = "IIDDistribution" %which discrete distributions are supported
-   decompTypeAllowed = ["single"; "multi"] %which decomposition types are supported
+   discDistAllowed = 'IIDDistribution' %which discrete distributions are supported
+   decompTypeAllowed = {'single', 'multi'} %which decomposition types are supported
    inflate = 1.2 %inflation factor
    alpha = 0.01;
 end
