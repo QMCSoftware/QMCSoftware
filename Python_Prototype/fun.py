@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
+
 # Â§\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$Â§
 class fun(ABC):
 
@@ -14,10 +15,9 @@ class fun(ABC):
     # Abstract Method
     @abstractmethod
     def f(self, xu, coordIndex):
-
         '''
          xu = nodes, Â§\mcommentfont $\vx_{\fu,i} = i^{\text{th}}$ row of an $n \times |\fu|$ matrixÂ§
          coordIndex = set of those coordinates in sequence needed, Â§\mcommentfont $\fu$Â§
          y = Â§\mcommentfont$n \times p$ matrix with values $f(\vx_{\fu,i},\vc)$ where if $\vx_i' = (x_{i,\fu},\vc)_j$, then $x'_{ij} = x_{ij}$ for $j \in \fu$, and $x'_{ij} = c$ otherwiseÂ§
         '''
-    pass
+        pass
