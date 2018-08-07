@@ -12,12 +12,12 @@ class fun(ABC):
         self.distribType = 'uniform'  # e.g., 'uniform', 'Gaussian'
         self.nominalValue = 0  # a nominal number, Â§$\mcommentfont c$Â§, such that Â§$\mcommentfont (c, \ldots, c) \in \cx$Â§
 
-    # Abstract Method
     @abstractmethod
-    def f(self, xu, coordIndex):
+    def f(self, x, coordIndex):
         '''
-         xu = nodes, Â§\mcommentfont $\vx_{\fu,i} = i^{\text{th}}$ row of an $n \times |\fu|$ matrixÂ§
+         x = nodes, Â§\mcommentfont $\vx_{\fu,i} = i^{\text{th}}$ row of an $n \times |\fu|$ matrixÂ§
          coordIndex = set of those coordinates in sequence needed, Â§\mcommentfont $\fu$Â§
-         y = Â§\mcommentfont$n \times p$ matrix with values $f(\vx_{\fu,i},\vc)$ where if $\vx_i' = (x_{i,\fu},\vc)_j$, then $x'_{ij} = x_{ij}$ for $j \in \fu$, and $x'_{ij} = c$ otherwiseÂ§
+         y = Â§\mcommentfont$n \times p$ matrix with values $f(\vx_{\fu,i},\vc)$ where
+            if $\vx_i' = (x_{i,\fu},\vc)_j$, then $x'_{ij} = x_{ij}$ for $j \in \fu$, and $x'_{ij} = c$ otherwiseÂ§
         '''
         pass
