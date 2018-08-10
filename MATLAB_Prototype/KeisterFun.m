@@ -1,5 +1,21 @@
 classdef KeisterFun < fun
 % §\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$§
+%
+%  Examples
+%
+%  Example 1:
+%
+% >> kf = KeisterFun
+%
+%   kf =***
+%     
+%     domain: [2x2 double]
+%     domainType: 'box'
+%     dimension: 2
+%     distribType: 'uniform'
+%     nominalValue: 0    
+%
+%
 methods
    function y = f(obj, x, coordIndex)
       %if the nominalValue = 0, this is efficient
