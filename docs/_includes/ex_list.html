@@ -5,6 +5,8 @@
   {% endif %}
 {% endfor %}
 
+{% assign domain = site.url | append: site.baseurl %}
+
 <nav class="nav__list">
   {% if page.sidebar.title %}<h3 class="nav__title" style="padding-left: 0;">{{ page.sidebar.title }}</h3>{% endif %}
   <input id="ac-toc" name="accordion-toc" type="checkbox" />
@@ -14,7 +16,7 @@
     {% for category in site.categories %}
       {% if category[1].size == i %}
         <li>
-          <a href="/posts/#{{ category[0] | slugify }}">
+          <a href="{{ domain }}/categories/#{{ category[0] | slugify }}">
             <span class="nav__sub-title">{{ category[0] }} ({{ i }}) </span>
           </a>
         </li>
