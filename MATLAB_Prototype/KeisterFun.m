@@ -15,6 +15,13 @@ classdef KeisterFun < fun
 %     distribType: 'uniform'
 %     nominalValue: 0    
 %
+%  >> kf.f([1,2; 3 4], [1 2])
+% 
+%   ans =
+% 
+%    -0.0042
+%     0.0000
+%
 %
 methods
    function y = f(obj, x, coordIndex)
