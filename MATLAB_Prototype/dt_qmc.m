@@ -3,4 +3,5 @@
 format 
 doctest KeisterFun
 doctest dt_CLTStopping
+doctest dt_meanVarData
 
