@@ -1,3 +1,6 @@
+%% dt_CLTStopping
+% doctest for CLTStopping
+%
 %  Examples
 %
 %  Example 1:
