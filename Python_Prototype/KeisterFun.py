@@ -5,14 +5,14 @@ import numpy as np
 
 class KeisterFun(fun):
 
-    # Â§\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$Â§
+    # Specify and generate values $f(\vx)$ for $\vx \in \cx$
     def f(self, x, coordIndex):
         """
         >>> kf = KeisterFun()
         >>> kf.dimension
         2
         >>> kf.f(np.array([[1, 2], [3, 4]]), [1, 2])
-        array([ -4.15915193e-03,   3.93948451e-12])
+        array([-4.15915193e-03,  3.93948451e-12])
         """
         # if the nominalValue = 0, this is efficient
         normx2 = sum(square(x), axis=1)
