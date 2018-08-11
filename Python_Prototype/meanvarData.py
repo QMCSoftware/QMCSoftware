@@ -1,4 +1,4 @@
-import accumData
+from accumData import accumData
 import numpy as np
 from time import time
 
@@ -6,13 +6,19 @@ from time import time
 # Accumulated data for IID calculations, stores the sample mean and
 # variance of function values
 class meanVarData(accumData):
+    timeStart = time() # hidden property
 
     def __init__(self):
-        super(accumData, self).__init__()
-        self.muhat  # sample mean
-        self.sighat  # sample standard deviation
-        self.nSigma  # number of samples used to compute the sample standard deviation
-        self.nMu  # number of samples used to compute the sample mean
+        """
+        >>> mvd = meanVarData()
+        >>> print(mvd.__dict__)
+        {'muhat': [], 'sighat': [], 'nSigma': [], 'nMu': [], 'solution': nan, 'stage': 'begin', 'prevN': [], 'nextN': [], 'timeUsed': [], 'nSamplesUsed': [], 'errorBound': [-inf, inf], 'costF': []}
+        """
+        self.muhat = [] # sample mean
+        self.sighat = [] # sample standard deviation
+        self.nSigma = [] # number of samples used to compute the sample standard deviation
+        self.nMu = []  # number of samples used to compute the sample mean
+        super().__init__()
 
     def updateData(self, distribObj, funObj):
         nf = len(funObj)
