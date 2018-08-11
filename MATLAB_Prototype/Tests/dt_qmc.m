@@ -1,7 +1,7 @@
 %% dt_qmc
 % doctest for QMC Community Software
 format 
-doctest KeisterFun
+doctest dt_KeisterFun
 doctest dt_CLTStopping
 doctest dt_meanVarData
 
