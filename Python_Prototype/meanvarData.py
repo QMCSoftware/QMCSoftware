@@ -6,7 +6,7 @@ from time import time
 # Accumulated data for IID calculations, stores the sample mean and
 # variance of function values
 class meanVarData(accumData):
-    timeStart = time() # hidden property
+
 
     def __init__(self):
         """
@@ -19,6 +19,23 @@ class meanVarData(accumData):
         self.nSigma = [] # number of samples used to compute the sample standard deviation
         self.nMu = []  # number of samples used to compute the sample mean
         super().__init__()
+
+
+    def timeStart(self):  # starting time
+        """
+        >>> mvd = meanVarData()
+        >>> mvd.__timeStart # doctest:+ELLIPSIS
+        Traceback (most recent call last):
+          ...
+        AttributeError: 'meanVarData' object has no attribute '__timeStart'
+        >>> mvd.timeStart()  # doctest:+ELLIPSIS
+        >>> mvd._meanVarData__timeStart  # doctest:+ELLIPSIS
+        1...
+        """
+        self.__timeStart = time()
+        #print(self.__timeStart) # "hidden" property, but it can still be exposed somehow as the last doctest shows
+        return
+
 
     def updateData(self, distribObj, funObj):
         nf = len(funObj)
