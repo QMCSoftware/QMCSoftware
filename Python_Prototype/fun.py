@@ -11,6 +11,7 @@ class fun(ABC):
         self.dimension = 2  # dimension of the domain, $d$
         self.distribType = 'uniform'  # e.g., 'uniform', 'Gaussian'
         self.nominalValue = 0  # a nominal number, $c$, such that $(c, \ldots, c) \in \cx$
+        super().__init__()
 
     @abstractmethod
     def f(self, x, coordIndex):

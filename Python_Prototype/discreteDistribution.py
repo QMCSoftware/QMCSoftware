@@ -36,3 +36,4 @@ class discreteDistribution(ABC):
          coordIndex = which coordinates in sequence are needed
         """
         pass
+

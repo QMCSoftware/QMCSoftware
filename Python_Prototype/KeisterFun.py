@@ -4,6 +4,8 @@ import numpy as np
 
 
 class KeisterFun(fun):
+    def __init__(self):
+        super().__init__()
 
     # Specify and generate values $f(\vx)$ for $\vx \in \cx$
     def f(self, x, coordIndex):
@@ -24,5 +26,5 @@ class KeisterFun(fun):
 
 if __name__ == "__main__":
     import doctest
-
     doctest.testmod()
+

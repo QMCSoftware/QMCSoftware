@@ -7,19 +7,22 @@ An example with Keister's function integrated with respect to the uniform
 distribution over the unit cube
 '''
 
-import CLTStopping
-import IIDDistribution
-import KeisterFun
-import integrate
+from CLTStopping import CLTStopping
+from IIDDistribution import IIDDistribution
+from KeisterFun import KeisterFun
+from integrate import integrate
 
-stopObj = CLTStopping  # stopping criterion for IID sampling using the Central Limit Theorem
-distribObj = IIDDistribution  # IID sampling with uniform distribution
-sol, out = integrate(KeisterFun, distribObj, stopObj)
+stopObj = CLTStopping()  # stopping criterion for IID sampling using the Central Limit Theorem
+distribObj = IIDDistribution()  # IID sampling with uniform distribution
+
+k = KeisterFun()
+
+sol, out = integrate(k, distribObj, stopObj)
 stopObj.absTol = 1e-3  # decrease tolerance
-sol, out = integrate(KeisterFun, distribObj, stopObj)
+sol, out = integrate(k, distribObj, stopObj)
 stopObj.absTol = 0  # impossible tolerance
 stopObj.nMax = 1e6  # calculation limited by sample budget
-sol, out = integrate(KeisterFun, distribObj, stopObj)
+sol, out = integrate(k, distribObj, stopObj)
 
 # A multilevel example of Asian option pricing
 """

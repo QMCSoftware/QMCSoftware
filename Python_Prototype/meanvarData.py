@@ -38,15 +38,18 @@ class meanVarData(accumData):
 
 
     def updateData(self, distribObj, funObj):
-        nf = len(funObj)
+        nf = 1
+        if type(funObj) == list:
+            nf = len(funObj)
+        else:
+            funObj = [funObj]
         # preallocate vectors
         self.solution = np.zeros(nf)
         self.sighat = np.zeros(nf)
         self.costF = np.zeros(nf)
         for ii in range(0, nf):
             tStart = time()  # time the function values
-            y = funObj.f(funObj[ii],
-                         distribObj.genDistrib(self.prevN[ii] + 1, self.prevN[ii] + self.nextN[ii], self.nextN[ii],
+            y = funObj[ii].f(distribObj.genDistrib(self.prevN[ii] + 1, self.prevN[ii] + self.nextN[ii], self.nextN[ii],
                                                range(0, funObj[ii].dimension), ii),
                          range(0, funObj[ii].dimension))
             self.costF[ii] = time() - tStart  # to be used for multi-level methods
@@ -56,3 +59,7 @@ class meanVarData(accumData):
             self.solution = sum(self.muhat)  # which also acts as our tentative solution
 
         return self
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
