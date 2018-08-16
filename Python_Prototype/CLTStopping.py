@@ -3,22 +3,13 @@ from numpy import zeros, full, inf, sqrt, ones, kron, divide, square
 from math import ceil
 from stoppingCriterion import stoppingCriterion
 from scipy.stats import norm
-from meanvarData import meanVarData
+from meanVarData import meanVarData
 import IIDDistribution
 
 
 class CLTStopping(stoppingCriterion):
-
+    
     def __init__(self):
-        # Doctests
-        """
-        >>> clts = CLTStopping()
-        >>> print(clts.__dict__)
-        {'inflate': 1.2, 'alpha': 0.01, 'absTol': 0.01, 'relTol': 0, 'nInit': 1024, 'nMax': 100000000.0}
-
-
-        """
-
         #self.discDistAllowed = "IIDDistribution"  
         #self.decompTypeAllowed = ["single", "multi"]
         self.inflate = 1.2  # inflation factor
@@ -56,14 +47,17 @@ class CLTStopping(stoppingCriterion):
             dataObj.prevN = dataObj.nextN  # update place in the sequence
             tempA = sqrt(dataObj.costF)  # use cost of function values to decide how to allocate
             tempB = sum(tempA * dataObj.sighat)  # samples for computation of the mean            
-            nM = ceil((tempB * (self.getQuantile * self.inflate / max(self.absTol, dataObj.solution * self.relTol)) ^ 2) * divide(dataObj.sighat, sqrt(dataObj.costF)))
+            
+            nM = ceil((tempB * ((self.getQuantile() * self.inflate / max(self.absTol, dataObj.solution * self.relTol))** 2))
+            * divide(dataObj.sighat, sqrt(dataObj.costF)))
+
             dataObj.nMu = min(max(dataObj.nextN, nM), self.nMax - dataObj.prevN)
             dataObj.nextN = dataObj.nMu + dataObj.prevN
             dataObj.stage = 'mu'  # compute sample mean next
         elif dataObj.stage == 'mu':
             dataObj.solution = sum(dataObj.muhat)
             dataObj.nSamplesUsed = dataObj.nextN
-            errBar = (self.getQuantile * self.inflate) * sqrt(sum(square(dataObj.sighat) / dataObj.nMu))
+            errBar = (self.getQuantile() * self.inflate) * sqrt(sum(square(dataObj.sighat) / dataObj.nMu))
             dataObj.errorBound = dataObj.solution + errBar * [-1, 1]
             dataObj.stage = 'done'  # finished with computation
         dataObj.timeUsed = time() - dataObj.timeStart
@@ -74,5 +68,7 @@ class CLTStopping(stoppingCriterion):
         return value
 
 if __name__ == "__main__":
+    # Run Doctests
     import doctest
-    doctest.testmod()
+    x = doctest.testfile("dt_CLTStopping.py")
+    print("\n"+str(x))

@@ -20,6 +20,7 @@ if __name__ == "__main__":
     from IIDDistribution import IIDDistribution
     from KeisterFun import KeisterFun
     stopObj = CLTStopping()  # stopping criterion for IID sampling using the Central Limit Theorem
-    distribObj = IIDDistribution()  # IID sampling with uniform distribution
-    sol, out = integrate(KeisterFun, distribObj, stopObj)
+    distribObj = IIDDistribution()
+    k = KeisterFun()  # IID sampling with uniform distribution
+    sol, out = integrate(k, distribObj, stopObj)
     print(sol,"\n\n",out)

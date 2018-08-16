@@ -1,9 +1,2 @@
-
-"""
->>> import CLTStopping
->>> csc = CLTStopping()
->>> csc
-2
->>> csc.f(np.array([[1, 2], [3, 4]]), [1, 2])
-array([-4.15915193e-03,  3.93948451e-12])
-"""
+>>> from CLTStopping import CLTStopping; clts = CLTStopping();print(clts.__dict__)
+{'inflate': 1.2, 'alpha': 0.01, 'absTol': 0.01, 'relTol': 0, 'nInit': 1024, 'nMax': 100000000.0}

@@ -9,11 +9,7 @@ class meanVarData(accumData):
 
 
     def __init__(self):
-        """
-        >>> mvd = meanVarData()
-        >>> print(mvd.__dict__)
-        {'muhat': [], 'sighat': [], 'nSigma': [], 'nMu': [], 'solution': nan, 'stage': 'begin', 'prevN': [], 'nextN': [], 'timeUsed': [], 'nSamplesUsed': [], 'errorBound': [-inf, inf], 'costF': []}
-        """
+        
         self.muhat = [] # sample mean
         self.sighat = [] # sample standard deviation
         self.nSigma = [] # number of samples used to compute the sample standard deviation
@@ -22,16 +18,6 @@ class meanVarData(accumData):
 
 
     def timeStart(self):  # starting time
-        """
-        >>> mvd = meanVarData()
-        >>> mvd.__timeStart # doctest:+ELLIPSIS
-        Traceback (most recent call last):
-          ...
-        AttributeError: 'meanVarData' object has no attribute '__timeStart'
-        >>> mvd.timeStart()  # doctest:+ELLIPSIS
-        >>> mvd._meanVarData__timeStart  # doctest:+ELLIPSIS
-        1...
-        """
         self.__timeStart = time()
         #print(self.__timeStart) # "hidden" property, but it can still be exposed somehow as the last doctest shows
         return
@@ -50,7 +36,7 @@ class meanVarData(accumData):
         for ii in range(0, nf):
             tStart = time()  # time the function values
             y = funObj[ii].f(distribObj.genDistrib(self.prevN[ii] + 1, self.prevN[ii] + self.nextN[ii], self.nextN[ii],
-                                               range(0, funObj[ii].dimension), ii),
+                                               range(0, funObj[ii].dimension), ii)[0],
                          range(0, funObj[ii].dimension))
             self.costF[ii] = time() - tStart  # to be used for multi-level methods
             if self.stage == 'sigma':
@@ -61,5 +47,7 @@ class meanVarData(accumData):
         return self
 
 if __name__ == "__main__":
+    # Doctests
     import doctest
-    doctest.testmod()
+    x = doctest.testfile("dt_meanVarData.py")
+    print("\n"+str(x))
