@@ -1,13 +1,12 @@
 from time import time
 from numpy import zeros, full, inf, sqrt, ones, kron, divide, square
 from math import ceil
-from stoppingCriterion import stoppingCriterion
 from scipy.stats import norm
-from meanVarData import meanVarData
-import IIDDistribution
+
+from Stopping_Criterion import Stopping_Criterion
 
 
-class CLTStopping(stoppingCriterion):
+class CLT(Stopping_Criterion):
     
     def __init__(self):
         #self.discDistAllowed = "IIDDistribution"  
@@ -24,7 +23,7 @@ class CLTStopping(stoppingCriterion):
     def decompTypeAllowed(self): # which discrete distributions are supported
         return ["single", "multi"]
 
-    def stopYet(self, funObj, distribObj = IIDDistribution, dataObj = meanVarData()):
+    def stopYet(self,dataObj,distribObj,funObj):
         # defaults dataObj to meanVarData if not supplied by user
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
@@ -35,7 +34,7 @@ class CLTStopping(stoppingCriterion):
                 nf = len(funObj)  # number of functions whose integrals add up to the solution # NOT SURE HOW THIS WORKS!!!
             else:
                 funObj = [funObj]
-            distribObj = distribObj.initStreams(nf)  # need an IID stream for each function
+            distribObj.initStreams(nf)  # need an IID stream for each function
             dataObj.prevN = zeros(nf)  # initialize data object
             dataObj.nextN = kron(ones((1, nf)), self.nInit)  # repmat(self.nInit, 1, nf)
             dataObj.muhat = full((1, nf), inf)

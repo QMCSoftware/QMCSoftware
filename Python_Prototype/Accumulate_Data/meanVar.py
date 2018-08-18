@@ -1,15 +1,13 @@
-from accumData import accumData
 import numpy as np
 from time import time
-
+from Accumulate_Data import Accumulate_Data
 
 # Accumulated data for IID calculations, stores the sample mean and
 # variance of function values
-class meanVarData(accumData):
+class meanVar(Accumulate_Data):
 
 
     def __init__(self):
-        
         self.muhat = [] # sample mean
         self.sighat = [] # sample standard deviation
         self.nSigma = [] # number of samples used to compute the sample standard deviation
@@ -48,6 +46,9 @@ class meanVarData(accumData):
 
 if __name__ == "__main__":
     # Doctests
+    '''
     import doctest
     x = doctest.testfile("dt_meanVarData.py")
     print("\n"+str(x))
+    '''
+    print('blah')

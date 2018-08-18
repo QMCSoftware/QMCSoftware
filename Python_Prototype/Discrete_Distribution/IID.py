@@ -1,11 +1,8 @@
-from discreteDistribution import discreteDistribution
-import numpy as np
-import sys
-import randomstate.prng.mrg32k3a as rnd
+from Discrete_Distribution import Discrete_Distribution
 
 # Specifies and generates the components of $\frac 1n \sum_{i=1}^n \delta_{\vx_i}(\cdot)$
 # where the $\vx_i$ are IID uniform on $[0,1]^d$ or IID standard Gaussian
-class IIDDistribution(discreteDistribution):
+class IID(Discrete_Distribution):
 
     def __init__(self):
         self.distribData
@@ -24,11 +21,10 @@ class IIDDistribution(discreteDistribution):
         return 1
 
     def initStreams(self, nStreams = 1):
+        import randomstate.prng.mrg32k3a as rnd
         self.distribDataStream = list(range(nStreams))
         for x in range(nStreams):
             self.distribDataStream[x] = rnd.RandomState()
-
-        #self.distribData.stream = RandStream.create('mrg32k3a', 'NumStreams', nStreams, 'CellOutput', True)
         return self
 
     def genDistrib(self, nStart, nEnd, n, coordIndex, streamIndex=0):

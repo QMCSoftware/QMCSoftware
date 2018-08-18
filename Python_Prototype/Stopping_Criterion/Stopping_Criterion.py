@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 # Decide when to stop
-class stoppingCriterion(ABC):
+class Stopping_Criterion(ABC):
 
     def __init__(self): 
         self.absTol = 1e-2 # absolute tolerance 

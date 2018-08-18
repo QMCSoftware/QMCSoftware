@@ -1,9 +1,11 @@
-from fun import fun
+#from fun import fun
 from numpy import square, cos, exp, sqrt, multiply, sum
 import numpy as np
 
+from Function import Function
 
-class KeisterFun(fun):
+
+class Keister(Function):
     def __init__(self):
         super().__init__()
 

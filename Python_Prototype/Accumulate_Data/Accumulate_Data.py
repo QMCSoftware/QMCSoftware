@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from math import inf, nan
 
-
 # Accumulated data required in the computation of the integral
-class accumData(ABC):
+class Accumulate_Data(ABC):
 
     def __init__(self):
         super().__init__()
