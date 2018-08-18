@@ -5,7 +5,7 @@ function sol = integration(funObj, distribObj, stopCritObj)
 % stopcritObj = an object from class stopping_criterion
 
 stopYet(stopCritObj, funObj, distribObj);
-while ~strcmp(stopCritObj.nextStep,"stop")
+while ~strcmp(stopCritObj.nextStep,'stop')
    updateData(stopCritObj, distribObj, fun_obj, decompType)
    newData = getData(stopCritObj, distribObj, funObj, decompType, oldData);
    [stop, oldData, sol] = stopYet(stopCritObj, distribObj, decompType, oldData, newData);

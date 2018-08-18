@@ -5,4 +5,5 @@ doctest dt_KeisterFun
 doctest dt_CLTStopping
 doctest dt_meanVarData
 doctest dt_IIDDistribution
+doctest dt_integrate
 

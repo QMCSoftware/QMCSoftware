@@ -3,7 +3,7 @@
 %
 %  Examples
 %
-%  Example 1:
+%  Example 1: Instantiate an IIDDistribution object.
 %
 % >> iid = IIDDistribution
 % 
@@ -19,9 +19,12 @@
 %     trueDistribution: 'uniform'
 %
 %  
-% >> iid2 = iid.initStreams(1)
+%  Example 2: Initialize a RandStream instance using the generator,
+%  mrg32k3a, in the property distribData.
+%
+% >> iid = iid.initStreams(1)
 % 
-%   iid2 =*** 
+%   iid =*** 
 % 
 %   IIDDistribution with properties:
 % 
@@ -34,15 +37,18 @@
 %     trueDistribution: 'uniform'
 %
 %
-% >> iid2.distribData.stream{1,1}
+% >> iid.distribData.stream{1,1}
 % 
 %     mrg32k3a random stream
 %                  Seed: 0
 %       NormalTransform: Ziggurat
 %
 %   
+%  Example 3: Create a random number sequence using the method
+%  genDistrib().
+%
 % >> rng(100);
-% >> [x, w, a] = iid2.genDistrib(1, 2, 3, [1 2])
+% >> [x, w, a] = iid.genDistrib(1, 2, 3, [1 2])
 % 
 %     x =
 % 

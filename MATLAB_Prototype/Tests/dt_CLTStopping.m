@@ -3,7 +3,7 @@
 %
 %  Examples
 %
-%  Example 1:
+%  Example 1: Create a CLTStopping instance.
 %
 % >> csc = CLTStopping
 % 
