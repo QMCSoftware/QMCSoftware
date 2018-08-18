@@ -38,7 +38,7 @@ class QMC(object):
         self.dst = args[1]
         self.fun = args[2]
         self.stp = args[3]
-        print(self.dat, self.dst, self.fun, self.stp)
+        #print(self.dat, self.dst, self.fun, self.stp)
         return
 
     def integrate(self):
@@ -61,33 +61,48 @@ class QMC(object):
         pass
         
     def runDoctests(self):
+        import sys
+        print(sys.path)
+        print("\n\n")
         import doctest
-        print("CLTStopping Doctests:")
-        r1 = doctest.testfile("dt_CLTStopping.py")
-        print("\n"+str(r1))
+
+        print("meanVardata Doctests:")
+        r4 = doctest.testfile("Accumulate_Data/dt_meanVar.py")
+        print("\n"+str(r4))
         print("----------------------------------------------------------------------------------------------------------------\n\n")
         
         print("IIDDistribution Doctests:")
-        r2 = doctest.testfile("dt_IIDDistribution.py")
+        r2 = doctest.testfile("Discrete_Distribution/dt_IID.py")
         print("\n"+str(r2))
         print("----------------------------------------------------------------------------------------------------------------\n\n")
 
         print("KeisterFun Doctests:")
-        r3 = doctest.testfile("dt_KeisterFun.py")
+        r3 = doctest.testfile("Function/dt_Keister.py")
         print("\n"+str(r3))
         print("----------------------------------------------------------------------------------------------------------------\n\n")
 
-        print("meanVardata Doctests:")
-        r4 = doctest.testfile("dt_meanVardata.py")
-        print("\n"+str(r4))
+        print("CLTStopping Doctests:")
+        r1 = doctest.testfile("Stopping_Criterion/dt_CLT.py")
+        print("\n"+str(r1))
+
+        
+
         return
     
 
 
 if __name__ == "__main__":    
+    # Actual Code for this section
+    '''
     from Driver_QMC import userAssist
     userArgs = userAssist()
     qmc = QMC(userArgs[0], userArgs[1], userArgs[2], userArgs[3])
+    '''
+
+    # Practice
+    qmc_ags = QMC('meanVar', 'IID', 'Keister', 'CLT')
+    qmc_ags.runDoctests()
+
 
 
 
