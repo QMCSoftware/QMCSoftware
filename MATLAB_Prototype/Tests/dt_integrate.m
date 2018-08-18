@@ -3,7 +3,8 @@
 %
 %  Examples
 %
-%  Example 1: Create a CLTStopping instance.
+%  Example 1: integrate over given default instances of KeisterFun,
+%  IIDDistribution, and CLTStopping.
 %
 % >> funObj = KeisterFun; distribObj = IIDDistribution; stopObj = CLTStopping; 
 % >> [solution, dataObj] = integrate(funObj, distribObj, stopObj)
