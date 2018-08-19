@@ -11,14 +11,18 @@ from QMC import QMC
 
 test_qmc = QMC('meanVar','IID','Keister','CLT')
 sol, out = test_qmc.integrate()
+print(sol)
 
+test_qmc = QMC('meanVar','IID','Keister','CLT')
 test_qmc.stp.absTol = 1e-3  # decrease tolerance
 sol, out = test_qmc.integrate()
+print(sol)
 
+test_qmc = QMC('meanVar','IID','Keister','CLT')
 test_qmc.stp.absTol = 0  # impossible tolerance
 test_qmc.stp.nMax = 1e6  # calculation limited by sample budget
 sol, out = test_qmc.integrate()
-
+print(sol)
 
 # A multilevel example of Asian option pricing
 """

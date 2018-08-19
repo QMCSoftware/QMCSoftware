@@ -1,6 +1,8 @@
+
+
 class QMC(object):
     
-    def __init__(self,dat, dst, fun, stp):
+    def __init__(self, dat, dst, fun, stp):
         from Driver_QMC import currentObjs
         import os
         import sys
@@ -49,14 +51,15 @@ class QMC(object):
         # self.stp (Spopping Criterion) = an object from class stopping_criterion
 
         # Initialize the accumData object and other crucial objects
-        self.dat, self.dst = self.stp.stopYet(self.dat, self.dst, self.fun)
-        while self.dat.stage != 'done': #the dataObj.stage property tells us where we are in the process
-            self.dat = self.dat.updateData(self.dst, self.fun) # compute additional data
-            self.stp, self.dat = self.stp.stopYet(self.fun, self.dst, self.dat) # update the status of the computation
-        solution = self.dat.solution # assign outputs
-        self.dat.timeUsed = time.time() - self.dat.timeStart
-        return solution, self.dat 
-    
+        [self.dat, self.dst] = self.stp.stopYet(self.dat, self.fun, self.dst)
+        while not self.dat.stage == 'done':  # the datObj.stage property tells us where we are in the process
+            self.dat.updateData(self.dst, self.fun)  # compute additional data
+            [self.dat, self.dst] = self.stp.stopYet(self.dat, self.fun, self.dst)  # update the status of the computation
+        solution = self.dat.solution  # assign outputs
+        from time import time
+        self.dat.timeUsed = time() - self.dat.timeStart
+        return solution, self.dat
+
     def integreation(self):
         pass
         
