@@ -14,7 +14,9 @@ def list_files(dir):
 
 curr_sys_path = sys.path
 print(curr_sys_path)
-r = list_files(".")
+
+this_dir = os.path.dirname(os.path.abspath(__file__))
+r = list_files(this_dir)
 
 for s in r:
     if not s in curr_sys_path:
