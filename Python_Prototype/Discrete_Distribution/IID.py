@@ -32,9 +32,9 @@ class IID(Discrete_Distribution):
         nPts = nEnd - nStart + 1  # how many points to be generated
 
         if self.trueDistribution == 'uniform': # generate uniform points
-            x = self.distribDataStream[streamIndex].rand(nPts, len(coordIndex))  # nodes
+            x = self.distribDataStream[streamIndex].rand(int(nPts), len(coordIndex))  # nodes
         else:  # standard normal points
-            x = self.distribDataStream[streamIndex].randn(nPts, len(coordIndex))  # nodes
+            x = self.distribDataStream[streamIndex].randn(int(nPts), len(coordIndex))  # nodes
 
         # Code without streams
 

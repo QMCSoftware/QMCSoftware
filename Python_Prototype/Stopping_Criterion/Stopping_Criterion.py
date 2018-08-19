@@ -23,7 +23,7 @@ class Stopping_Criterion(ABC):
     
     # Abstract Method
     @abstractmethod
-    def stopYet(self,distribObj): # distribObj = data or summary of data computed already
+    def stopYet(self,dataObj,distribObj,funObj): # distribObj = data or summary of data computed already
         pass
 
 '''

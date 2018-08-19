@@ -1,10 +1,10 @@
 from time import time
-from numpy import zeros, full, inf, sqrt, ones, kron, divide, square
+from numpy import zeros, full, inf, sqrt, ones, kron, divide, square, array
 from math import ceil
 from scipy.stats import norm
 
 from Stopping_Criterion import Stopping_Criterion as Stopping_Criterion
-
+from meanVar import meanVar as meanvar
 
 class CLT(Stopping_Criterion):
     
@@ -23,8 +23,11 @@ class CLT(Stopping_Criterion):
     def decompTypeAllowed(self): # which discrete distributions are supported
         return ["single", "multi"]
 
-    def stopYet(self,dataObj,distribObj,funObj):
+    def stopYet(self, dataObj=None, funObj=None, distribObj=None):
         # defaults dataObj to meanVarData if not supplied by user
+        if dataObj == None:
+            dataObj = meanVar()
+        
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
             if distribObj.__class__.__name__ not in self.discDistAllowed:
@@ -36,7 +39,9 @@ class CLT(Stopping_Criterion):
                 funObj = [funObj]
             distribObj.initStreams(nf)  # need an IID stream for each function
             dataObj.prevN = zeros(nf)  # initialize data object
+            #if dataObj.prevN.shape == (1,): dataObj.prevN = dataObj.prevN[0]
             dataObj.nextN = kron(ones((1, nf)), self.nInit)  # repmat(self.nInit, 1, nf)
+            if dataObj.nextN.shape == (1,1): dataObj.nextN = dataObj.nextN[0,]
             dataObj.muhat = full((1, nf), inf)
             dataObj.sighat = full((1, nf), inf)
             dataObj.nSigma = self.nInit  # use initial samples to estimate standard deviation
@@ -54,13 +59,13 @@ class CLT(Stopping_Criterion):
             dataObj.nextN = dataObj.nMu + dataObj.prevN
             dataObj.stage = 'mu'  # compute sample mean next
         elif dataObj.stage == 'mu':
-            dataObj.solution = sum(dataObj.muhat)
+            dataObj.solution = float(sum(dataObj.muhat))
             dataObj.nSamplesUsed = dataObj.nextN
-            errBar = (self.getQuantile() * self.inflate) * sqrt(sum(square(dataObj.sighat) / dataObj.nMu))
-            dataObj.errorBound = dataObj.solution + errBar * [-1, 1]
+            errBar = self.getQuantile() * self.inflate * sqrt(sum(square(dataObj.sighat) / dataObj.nMu))
+            dataObj.errorBound = dataObj.solution + errBar * array([-1, 1])
             dataObj.stage = 'done'  # finished with computation
         dataObj.timeUsed = time() - dataObj.timeStart
-        return dataObj, distribObj
+        return self, dataObj, distribObj
 
     def getQuantile(self):
         value = -norm.pdf(self.alpha / 2)
