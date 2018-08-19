@@ -7,10 +7,10 @@ def integrate(funObj, distribObj, stopCritObj, datObj=[]):
      stopcritObj = an object from class stopping_criterion
     """
     # Initialize the accumData object and other crucial objects
-    [stopCritObj, datObj, distribObj] = stopCritObj.stopYet(datObj, funObj, distribObj)
+    [datObj, distribObj] = stopCritObj.stopYet(datObj, funObj, distribObj)
     while not datObj.stage == 'done': # the datObj.stage property tells us where we are in the process
         datObj.updateData(distribObj, funObj)  # compute additional data
-        [stopCritObj, datObj, distribObj] = stopCritObj.stopYet(datObj, funObj, distribObj)  # update the status of the computation
+        [datObj, distribObj] = stopCritObj.stopYet(datObj, funObj, distribObj)  # update the status of the computation
     solution = datObj.solution  # assign outputs
     datObj.timeUsed = time() - datObj.timeStart
     return solution, datObj

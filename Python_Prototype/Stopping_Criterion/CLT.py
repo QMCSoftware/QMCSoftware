@@ -67,7 +67,7 @@ class CLT(Stopping_Criterion):
             dataObj.errorBound = dataObj.solution + errBar * array([-1, 1])
             dataObj.stage = 'done'  # finished with computation
         dataObj.timeUsed = time() - dataObj.timeStart
-        return self, dataObj, distribObj
+        return dataObj, distribObj
 
     def getQuantile(self):
         value = -norm.ppf(self.alpha / 2)
