@@ -4,30 +4,31 @@ from math import ceil
 from scipy.stats import norm
 
 from Stopping_Criterion import Stopping_Criterion as Stopping_Criterion
-from meanVar import meanVar as meanvar
+from meanVar import meanVar as meanVar
+
 
 class CLT(Stopping_Criterion):
-    
+
     def __init__(self):
-        #self.discDistAllowed = "IIDDistribution"  
-        #self.decompTypeAllowed = ["single", "multi"]
+        # self.discDistAllowed = "IIDDistribution"
+        # self.decompTypeAllowed = ["single", "multi"]
         self.inflate = 1.2  # inflation factor
         self.alpha = 0.01
         super().__init__()
-    
+
     @property
-    def discDistAllowed(self): 
+    def discDistAllowed(self):
         return "IIDDistribution"
 
     @property
-    def decompTypeAllowed(self): # which discrete distributions are supported
+    def decompTypeAllowed(self):  # which discrete distributions are supported
         return ["single", "multi"]
 
     def stopYet(self, dataObj=None, funObj=None, distribObj=None):
         # defaults dataObj to meanVarData if not supplied by user
         if dataObj == None:
             dataObj = meanVar()
-        
+
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
             if distribObj.__class__.__name__ not in self.discDistAllowed:
@@ -39,9 +40,9 @@ class CLT(Stopping_Criterion):
                 funObj = [funObj]
             distribObj.initStreams(nf)  # need an IID stream for each function
             dataObj.prevN = zeros(nf)  # initialize data object
-            #if dataObj.prevN.shape == (1,): dataObj.prevN = dataObj.prevN[0]
+            # if dataObj.prevN.shape == (1,): dataObj.prevN = dataObj.prevN[0]
             dataObj.nextN = kron(ones((1, nf)), self.nInit)  # repmat(self.nInit, 1, nf)
-            if dataObj.nextN.shape == (1,1): dataObj.nextN = dataObj.nextN[0,]
+            if dataObj.nextN.shape == (1, 1): dataObj.nextN = dataObj.nextN[0,]
             dataObj.muhat = full((1, nf), inf)
             dataObj.sighat = full((1, nf), inf)
             dataObj.nSigma = self.nInit  # use initial samples to estimate standard deviation
@@ -51,10 +52,8 @@ class CLT(Stopping_Criterion):
             dataObj.prevN = dataObj.nextN  # update place in the sequence
             tempA = sqrt(dataObj.costF)  # use cost of function values to decide how to allocate
             tempB = sum(tempA * dataObj.sighat)  # samples for computation of the mean            
-            
             nM = ceil((tempB * ((self.getQuantile() * self.inflate / max(self.absTol, dataObj.solution * self.relTol))** 2))
             * divide(dataObj.sighat, sqrt(dataObj.costF)))
-
             dataObj.nMu = min(max(dataObj.nextN, nM), self.nMax - dataObj.prevN)
             dataObj.nextN = dataObj.nMu + dataObj.prevN
             dataObj.stage = 'mu'  # compute sample mean next
@@ -68,11 +67,12 @@ class CLT(Stopping_Criterion):
         return self, dataObj, distribObj
 
     def getQuantile(self):
-        value = -norm.pdf(self.alpha / 2)
+        value = -norm.ppf(self.alpha / 2)
         return value
+
 
 if __name__ == "__main__":
     # Run Doctests
     import doctest
     x = doctest.testfile("dt_CLT.py")
-    print("\n"+str(x))
+    print("\n" + str(x))
