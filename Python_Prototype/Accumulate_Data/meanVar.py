@@ -33,9 +33,14 @@ class meanVar(Accumulate_Data):
         self.costF = np.zeros(nf)
         for ii in range(0, nf):
             tStart = time()  # time the function values
-            y = funObj[ii].f(distribObj.genDistrib(self.prevN[ii] + 1, self.prevN[ii] + self.nextN[ii], self.nextN[ii],
-                                               range(0, funObj[ii].dimension), ii)[0],
-                         range(0, funObj[ii].dimension))
+            nStart = self.prevN[ii] + 1
+            nEnd = self.prevN[ii] + self.nextN[ii]
+            n = self.nextN[ii]
+            coordIndex = range(0, funObj[ii].dimension)
+            streamIndex = ii
+            x = distribObj.genDistrib(nStart, nEnd, n, coordIndex, streamIndex)[0]
+            coordIndex = range(0, funObj[ii].dimension)
+            y = funObj[ii].f(x, coordIndex)
             self.costF[ii] = time() - tStart  # to be used for multi-level methods
             if self.stage == 'sigma':
                 self.sighat[ii] = np.std(y)  # compute the sample standard deviation if required
