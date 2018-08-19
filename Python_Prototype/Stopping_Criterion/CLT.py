@@ -2,6 +2,7 @@ from time import time
 from numpy import zeros, full, inf, sqrt, ones, kron, divide, square, array
 from math import ceil
 from scipy.stats import norm
+import sys
 
 from Stopping_Criterion import Stopping_Criterion as Stopping_Criterion
 from meanVar import meanVar as meanVar
@@ -50,8 +51,12 @@ class CLT(Stopping_Criterion):
         elif dataObj.stage == 'sigma':
             dataObj.prevN = dataObj.nextN  # update place in the sequence
             tempA = sqrt(dataObj.costF)  # use cost of function values to decide how to allocate
-            tempB = sum(tempA * dataObj.sighat)  # samples for computation of the mean            
-            nM = ceil((tempB * ((self.getQuantile() * self.inflate / max(self.absTol, dataObj.solution * self.relTol))** 2)) * divide(dataObj.sighat, sqrt(dataObj.costF)))
+            tempB = sum(tempA * dataObj.sighat)  # samples for computation of the mean
+            gentol = max(self.absTol, dataObj.solution * self.relTol)
+            if gentol > 0:
+              nM = ceil((tempB * ((self.getQuantile() * self.inflate / gentol)** 2)) * divide(dataObj.sighat, sqrt(dataObj.costF)))
+            else:
+              nM = sys.maxsize
             dataObj.nMu = min(max(dataObj.nextN, nM), self.nMax - dataObj.prevN)
             dataObj.nextN = dataObj.nMu + dataObj.prevN
             dataObj.stage = 'mu'  # compute sample mean next
