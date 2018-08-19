@@ -1,6 +1,6 @@
 import numpy as np
 from time import time
-from Accumulate_Data import Accumulate_Data
+from Accumulate_Data import Accumulate_Data as Accumulate_Data
 
 # Accumulated data for IID calculations, stores the sample mean and
 # variance of function values
@@ -46,9 +46,6 @@ class meanVar(Accumulate_Data):
 
 if __name__ == "__main__":
     # Doctests
-    '''
     import doctest
-    x = doctest.testfile("dt_meanVarData.py")
+    x = doctest.testfile("dt_meanVar.py")
     print("\n"+str(x))
-    '''
-    print('blah')
