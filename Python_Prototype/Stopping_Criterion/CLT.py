@@ -53,7 +53,7 @@ class CLT(Stopping_Criterion):
             tempA = sqrt(dataObj.costF)  # use cost of function values to decide how to allocate
             tempB = sum(tempA * dataObj.sighat)  # samples for computation of the mean
             gentol = max(self.absTol, dataObj.solution * self.relTol)
-            if gentol > 0:
+            if (gentol > 0) and (dataObj.costF > 0):
               nM = ceil((tempB * ((self.getQuantile() * self.inflate / gentol)** 2)) * divide(dataObj.sighat, sqrt(dataObj.costF)))
             else:
               nM = sys.maxsize
