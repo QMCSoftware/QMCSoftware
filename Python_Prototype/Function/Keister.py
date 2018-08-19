@@ -1,8 +1,7 @@
-#from fun import fun
 from numpy import square, cos, exp, sqrt, multiply, sum
 import numpy as np
 
-from Function import Function
+from Function import Function as Function
 
 
 class Keister(Function):
@@ -21,5 +20,5 @@ class Keister(Function):
 if __name__ == "__main__":
     # Doctests
     import doctest
-    x = doctest.testfile("dt_KeisterFun.py")
+    x = doctest.testfile("dt_Keister.py")
     print("\n"+str(x))
