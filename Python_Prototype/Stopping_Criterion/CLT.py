@@ -3,7 +3,7 @@ from numpy import zeros, full, inf, sqrt, ones, kron, divide, square
 from math import ceil
 from scipy.stats import norm
 
-from Stopping_Criterion import Stopping_Criterion
+from Stopping_Criterion import Stopping_Criterion as Stopping_Criterion
 
 
 class CLT(Stopping_Criterion):
@@ -69,5 +69,5 @@ class CLT(Stopping_Criterion):
 if __name__ == "__main__":
     # Run Doctests
     import doctest
-    x = doctest.testfile("dt_CLTStopping.py")
+    x = doctest.testfile("dt_CLT.py")
     print("\n"+str(x))
