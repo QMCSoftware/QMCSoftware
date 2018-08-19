@@ -20,7 +20,7 @@ r = list_files(this_dir)
 
 for s in r:
     if not s in curr_sys_path:
-        print(s)
+        #print(s)
         sys.path.append(s)
 
-print(sys.path)
+print(list(set(sys.path)-set(curr_sys_path)))

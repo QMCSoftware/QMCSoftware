@@ -6,7 +6,6 @@ from scipy.stats import norm
 from Stopping_Criterion import Stopping_Criterion as Stopping_Criterion
 from meanVar import meanVar as meanVar
 
-
 class CLT(Stopping_Criterion):
 
     def __init__(self):
@@ -18,20 +17,20 @@ class CLT(Stopping_Criterion):
 
     @property
     def discDistAllowed(self):
-        return "IIDDistribution"
+        return "IID"
 
     @property
     def decompTypeAllowed(self):  # which discrete distributions are supported
         return ["single", "multi"]
 
-    def stopYet(self, dataObj=None, funObj=None, distribObj=None):
+    def stopYet(self, dataObj=[], funObj=[], distribObj=[]):
         # defaults dataObj to meanVarData if not supplied by user
-        if dataObj == None:
+        if (not isinstance(dataObj, meanVar)) or (dataObj == []):
             dataObj = meanVar()
 
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
-            if distribObj.__class__.__name__ not in self.discDistAllowed:
+            if not distribObj.__class__.__name__ in [self.discDistAllowed]:
                 raise Exception('Stoppoing criterion not compatible with sampling distribution')
             nf = 1
             if type(funObj) == list:
@@ -52,8 +51,7 @@ class CLT(Stopping_Criterion):
             dataObj.prevN = dataObj.nextN  # update place in the sequence
             tempA = sqrt(dataObj.costF)  # use cost of function values to decide how to allocate
             tempB = sum(tempA * dataObj.sighat)  # samples for computation of the mean            
-            nM = ceil((tempB * ((self.getQuantile() * self.inflate / max(self.absTol, dataObj.solution * self.relTol))** 2))
-            * divide(dataObj.sighat, sqrt(dataObj.costF)))
+            nM = ceil((tempB * ((self.getQuantile() * self.inflate / max(self.absTol, dataObj.solution * self.relTol))** 2)) * divide(dataObj.sighat, sqrt(dataObj.costF)))
             dataObj.nMu = min(max(dataObj.nextN, nM), self.nMax - dataObj.prevN)
             dataObj.nextN = dataObj.nMu + dataObj.prevN
             dataObj.stage = 'mu'  # compute sample mean next

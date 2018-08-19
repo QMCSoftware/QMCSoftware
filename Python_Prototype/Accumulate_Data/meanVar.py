@@ -47,7 +47,7 @@ class meanVar(Accumulate_Data):
             self.muhat[ii] = np.mean(y)  # compute the sample mean
             self.solution = sum(self.muhat)  # which also acts as our tentative solution
 
-        return self
+        return
 
 if __name__ == "__main__":
     # Doctests
