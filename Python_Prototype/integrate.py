@@ -21,26 +21,31 @@ addpath
 from Keister import Keister as Keister
 from IID import IID as IID
 from CLT import CLT as CLT
-from meanVar import meanVar as meanVar
+
+trueVal = 0.425184685650728
 funObj = Keister()
 distribObj = IID()
 stopObj = CLT()
-#datObj = meanVar()
 [solution, datObj] = integrate(funObj, distribObj, stopObj)
 print(solution)
 print(datObj.__dict__)
-
+error = abs(solution-trueVal)
+print(error)
+print(error < stopObj.absTol)
 
 stopObj.absTol = 1e-3
 [solution, datObj] = integrate(funObj, distribObj, stopObj)
 print(solution)
 print(datObj.__dict__)
-
+error = abs(solution-trueVal)
+print(error)
+print(error < stopObj.absTol)
 
 stopObj.absTol = 0
 stopObj.nMax = 1e6
 [solution, datObj] = integrate(funObj, distribObj, stopObj)
 print(solution)
 print(datObj.__dict__)
-
-
+error = abs(solution-trueVal)
+print(error)
+print(datObj.nSamplesUsed <= stopObj.nMax)
