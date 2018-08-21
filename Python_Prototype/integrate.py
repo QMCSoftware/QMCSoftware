@@ -12,9 +12,13 @@ def integrate(funObj, distribObj, stopCritObj, datObj=[]):
         datObj.updateData(distribObj, funObj)  # compute additional data
         [datObj, distribObj] = stopCritObj.stopYet(datObj, funObj, distribObj)  # update the status of the computation
     solution = datObj.solution  # assign outputs
-    datObj.timeUsed = time() - datObj.timeStart
+    datObj.timeUsed = time() - datObj.__timeStart__
     return solution, datObj
 
+
+def print_dict(dict):
+    for key, value in dict.items():
+        print("%s: %s" % (key, value))
 
 import addpath
 addpath
@@ -28,24 +32,22 @@ distribObj = IID()
 stopObj = CLT()
 [solution, datObj] = integrate(funObj, distribObj, stopObj)
 print(solution)
-print(datObj.__dict__)
+print_dict(datObj.__dict__)
 error = abs(solution-trueVal)
-print(error)
-print(error < stopObj.absTol)
+print("Error = %f, error < stop.absTol? %s\n" % (error, str(error < stopObj.absTol)))
 
 stopObj.absTol = 1e-3
 [solution, datObj] = integrate(funObj, distribObj, stopObj)
 print(solution)
-print(datObj.__dict__)
+print_dict(datObj.__dict__)
 error = abs(solution-trueVal)
-print(error)
-print(error < stopObj.absTol)
+print("Error = %f, error < stop.absTol? %s\n" % (error, str(error < stopObj.absTol)))
+
 
 stopObj.absTol = 0
 stopObj.nMax = 1e6
 [solution, datObj] = integrate(funObj, distribObj, stopObj)
 print(solution)
-print(datObj.__dict__)
+print_dict(datObj.__dict__)
 error = abs(solution-trueVal)
-print(error)
-print(datObj.nSamplesUsed <= stopObj.nMax)
+print("Error = %f, datObj.nSamplesUsed <= stopObj.nMax? %s\n" % (error, str(datObj.nSamplesUsed <= stopObj.nMax)))
