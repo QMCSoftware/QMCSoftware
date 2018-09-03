@@ -1,5 +1,5 @@
 """
->>> from IID import IID as IID; iid = IID();
+>>> from IIDDistribution import IIDDistribution as IIDDistribution; iid = IIDDistribution();
 >>> iid.domainType
 'box'
 >>> iid.trueDistribution
@@ -10,7 +10,7 @@
 array([[0, 0],
        [1, 1]])
 
->>> iid = iid.initStreams(1,seed=10);
+>>> iid = iid.initStreams(1,seed=10)
 >>> iid.domainType
 'box'
 >>> iid.trueDistribution

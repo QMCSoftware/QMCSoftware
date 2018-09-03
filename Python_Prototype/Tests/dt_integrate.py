@@ -6,17 +6,16 @@ Examples
 
 Example 1: integrate over given default instances of KeisterFun,
 IIDDistribution, and CLTStopping.
->>> import addpath # doctest:+ELLIPSIS
-['/Users/terrya/ProgramData/QMCSoftware/Python_Prototype/Tests', '/Users/terrya/ProgramData/QMCSoftware/Python_Prototype', '/Applications/PyCharm CE.app/Contents/helpers/pycharm', '/Users/terrya/anaconda2/envs/py36/lib/python36.zip', '/Users/terrya/anaconda2/envs/py36/lib/python3.6', '/Users/terrya/anaconda2/envs/py36/lib/python3.6/lib-dynload', '/Users/terrya/anaconda2/envs/py36/lib/python3.6/site-packages']
-['/Users/terrya/ProgramData/QMCSoftware/Python_Prototype/Tests', '/Users/terrya/ProgramData/QMCSoftware/Python_Prototype', '/Applications/PyCharm CE.app/Contents/helpers/pycharm', '/Users/terrya/anaconda2/envs/py36/lib/python36.zip', '/Users/terrya/anaconda2/envs/py36/lib/python3.6', '/Users/terrya/anaconda2/envs/py36/lib/python3.6/lib-dynload', '/Users/terrya/anaconda2/envs/py36/lib/python3.6/site-packages']
->>> from integrate import integrate
->>> from Keister import Keister
->> from IID import IID
->>> from CLT import CLT
->>> funObj = Keister()
->>> distribObj = IID()
->>> stopObj = CLT()
->>> [solution, dataObj] = integrate(funObj, distribObj, stopObj)
+>>> from integrate import integrate as integrate
+>>> from KeisterFun import KeisterFun as KeisterFun
+>>> from IIDDistribution import IIDDistribution as IID
+>>> from CLTStopping import CLTStopping as CLTStopping
+>>> from meanVarData import meanVarData as meanVar
+>>> funObj = KeisterFun()
+>>> distribObj = IIDDistribution()
+>>> stopObj = CLTStopping()
+>>> datObj = meanVarData()
+>>> [solution, dataObj] = integrate(funObj, distribObj, stopObj, datObj)
 
 solution =
 
