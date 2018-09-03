@@ -2,7 +2,7 @@
 >>> from AsianCallFun import AsianCallFun as AsianCallFun
 >>> acf = AsianCallFun() # doctest:+ELLIPSIS
 >>> acf.dimension
-2
+1
 >>> acf.distribType
 'uniform'
 >>> acf.domainType
