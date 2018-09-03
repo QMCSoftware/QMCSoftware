@@ -27,11 +27,13 @@ function match = doctest_compare(want, got)
 got = regexprep(got, '<a +href=".*?>', '');
 got = regexprep(got, '</a>', '');
 
+
 % WHY do they need backspaces?  huh.
 got = regexprep(got, '.\x08', '');
 
 want = strtrim(want);
 got = strtrim(got);
+got =  regexprep(got, '×', 'x');
 
 if isempty(want) && isempty(got)
     match = 1;

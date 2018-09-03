@@ -13,7 +13,9 @@
 % 
 %     0.4310
 % 
-% dataObj =*** 
+% dataObj = 
+%
+%  meanVarData with properties:
 % 
 %            muhat: 0.4310
 %           sighat: 0.2611
@@ -40,7 +42,9 @@
 % 
 %     0.4253
 % 
-% dataObj =*** 
+% dataObj =
+%
+%   meanVarData with properties:
 %
 %            muhat: 0.4253
 %           sighat: 0.2611

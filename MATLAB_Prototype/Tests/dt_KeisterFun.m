@@ -7,7 +7,9 @@
 %
 % >> kf = KeisterFun
 %
-%   kf =***
+%   kf = 
+%
+%    KeisterFun with properties:
 %     
 %     domain: [2x2 double]
 %     domainType: 'box'
