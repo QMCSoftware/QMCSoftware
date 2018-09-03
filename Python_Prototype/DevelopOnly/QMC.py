@@ -3,7 +3,7 @@
 class QMC(object):
     
     def __init__(self, dat, dst, fun, stp):
-        from Driver_QMC import currentObjs
+        from DevelopOnly.Driver_QMC import currentObjs
         import os
         import sys
         import warnings
@@ -32,9 +32,9 @@ class QMC(object):
                 print("\n\nERROR: Sublcass '" + args[0] + "' not found in " + currentObjs[i][0] + " folder")
                 args[i] = None
         if invalidInstance:  
-            print("\nWhen inputting your own subclass for Accumulate_Data, Discrete_Distribution, Function, or Stopping_Condition,")
+            print("\nWhen inputting your own subclass for accumData, discreteDistribution, fun, or Stopping_Condition,")
             print("please name your file the same name as you class. The program will look for search for your subclass in the cooresponding directory.")
-            print("\nYour Accumulate_Data, Discrete_Distributuion, Function, and Stopping Class objects have been set to None") 
+            print("\nYour accumData, Discrete_Distributuion, fun, and Stopping Class objects have been set to None")
             print("The QMC Object you created is invallid")
         self.dat = args[0]
         self.dst = args[1]
@@ -44,9 +44,8 @@ class QMC(object):
         return
 
     def integrate(self):
-        import time
         #Â§\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$Â§
-        # self.fun (Function)= an object from class fun
+        # self.fun (fun)= an object from class fun
         # self.dst (Discrete Distribution) = an object from class discrete_distribution
         # self.stp (Spopping Criterion) = an object from class stopping_criterion
 
@@ -70,22 +69,22 @@ class QMC(object):
         import doctest
 
         print("meanVardata Doctests:")
-        r4 = doctest.testfile("Accumulate_Data/dt_meanVar.py")
+        r4 = doctest.testfile("accumData/dt_meanVar.py")
         print("\n"+str(r4))
         print("----------------------------------------------------------------------------------------------------------------\n\n")
         
         print("IIDDistribution Doctests:")
-        r2 = doctest.testfile("Discrete_Distribution/dt_IID.py")
+        r2 = doctest.testfile("discreteDistribution/dt_IID.py")
         print("\n"+str(r2))
         print("----------------------------------------------------------------------------------------------------------------\n\n")
 
         print("KeisterFun Doctests:")
-        r3 = doctest.testfile("Function/dt_Keister.py")
+        r3 = doctest.testfile("fun/dt_Keister.py")
         print("\n"+str(r3))
         print("----------------------------------------------------------------------------------------------------------------\n\n")
 
         print("CLTStopping Doctests:")
-        r1 = doctest.testfile("Stopping_Criterion/dt_CLT.py")
+        r1 = doctest.testfile("stoppingCriterion/dt_CLT.py")
         print("\n"+str(r1))
 
         
@@ -103,7 +102,7 @@ if __name__ == "__main__":
     '''
 
     # Practice
-    qmc_ags = QMC('meanVar', 'IID', 'Keister', 'CLT')
+    qmc_ags = QMC('meanVarData', 'IIDDistribution', 'KeisterFun', 'CLTStopping')
     qmc_ags.runDoctests()
 
 

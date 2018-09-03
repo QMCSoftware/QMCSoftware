@@ -21,8 +21,8 @@ if __name__ == "__main__":
     sys.path.insert(0, new_cwd)
     print("\n",sys.path)
 
-    meanVar = __import__("meanVar")
-    meanVar = getattr(meanVar,"meanVar")
+    meanVar = __import__("meanVarData")
+    meanVar = getattr(meanVar,"meanVarData")
     a = meanVar()
     print(a)
     sys.path.remove(new_cwd)
