@@ -24,9 +24,19 @@ methods
             obj(ii).dimension = d;
             tvec = (1:d)*(obj(ii).T/d);
             obj(ii).tVec = tvec;
-            CovMat = min(tvec',tvec);
+            try
+                CovMat = min(tvec',tvec);
+            catch 
+                CovMat = min(tvec'*ones(1,length(tvec)), ones(length(tvec),1)*tvec);
+            end
             [eigVec,eigVal] = eig(CovMat,'vector');
-            obj(ii).A = sqrt(eigVal(end:-1:1)) .* eigVec(:,end:-1:1)';
+            try
+                obj(ii).A = sqrt(eigVal(end:-1:1)) .* eigVec(:,end:-1:1)';
+            catch
+                v = sqrt(eigVal(end:-1:1));
+                n = length(v);
+                obj(ii).A = spdiags([v], 0, n, n) .* eigVec(:,end:-1:1)';
+            end
          end
       end 
    end
@@ -34,7 +44,12 @@ methods
    function y = f(obj, x, coordIndex)
       %since the nominalValue = 0, this is efficient
       BM = x * obj.A;
-      SFine = obj.S0*exp((-obj.volatility^2/2)*obj.tVec + obj.volatility * BM);
+      try
+         SFine = obj.S0*exp((-obj.volatility^2/2)*obj.tVec + obj.volatility * BM);
+      catch
+         [n, ~] = size(BM);
+         SFine = obj.S0*exp((-obj.volatility^2/2)*ones(n,1)*obj.tVec + obj.volatility * BM);
+      end
       AvgFine = ((obj.S0/2) + sum(SFine(:,1:obj.dimension-1),2) + ...
          SFine(:,obj.dimension)/2)/obj.dimension;
       y = max(AvgFine - obj.K,0);
