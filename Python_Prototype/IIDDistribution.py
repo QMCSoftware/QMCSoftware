@@ -1,10 +1,9 @@
-from Discrete_Distribution import Discrete_Distribution as Discrete_Distribution
+from discreteDistribution import discreteDistribution as discreteDistribution
 import randomstate.prng.mrg32k3a as rnd
-import warnings
 
 # Specifies and generates the components of $\frac 1n \sum_{i=1}^n \delta_{\vx_i}(\cdot)$
-# where the $\vx_i$ are IID uniform on $[0,1]^d$ or IID standard Gaussian
-class IID(Discrete_Distribution):
+# where the $\vx_i$ are IIDDistribution uniform on $[0,1]^d$ or IIDDistribution standard Gaussian
+class IIDDistribution(discreteDistribution):
 
     def __init__(self):
         self.distribData
@@ -47,4 +46,3 @@ if __name__ == "__main__":
     import doctest
     x = doctest.testfile("dt_IID.py")
     print("\n"+str(x))
-    

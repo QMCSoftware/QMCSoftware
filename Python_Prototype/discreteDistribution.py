@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 # Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
-class Discrete_Distribution(ABC):
+class discreteDistribution(ABC):
 
     def __init__(self):
         self.domain = np.array([[0, 0], [1, 1]])  # domain of the discrete distribution, §$\mcommentfont \cx$§

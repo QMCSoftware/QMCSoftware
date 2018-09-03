@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 # Specify and generate values $f(\vx)$ for $\vx \in \cx$
-class Function(ABC):
+class fun(ABC):
 
     def __init__(self):
         self.domain = np.array([[0, 0], [1, 1]])  # domain of the function, $\cx$

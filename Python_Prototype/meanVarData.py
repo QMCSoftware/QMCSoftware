@@ -1,10 +1,10 @@
 import numpy as np
 from time import time
-from Accumulate_Data import Accumulate_Data as Accumulate_Data
+from accumData import accumData as accumData
 
-# Accumulated data for IID calculations, stores the sample mean and
+# Accumulated data for IIDDistribution calculations, stores the sample mean and
 # variance of function values
-class meanVar(Accumulate_Data):
+class meanVarData(accumData):
 
 
     def __init__(self):

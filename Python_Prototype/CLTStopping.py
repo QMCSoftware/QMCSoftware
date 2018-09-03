@@ -4,10 +4,10 @@ from math import ceil
 from scipy.stats import norm
 import sys
 
-from Stopping_Criterion import Stopping_Criterion as Stopping_Criterion
-from meanVar import meanVar as meanVar
+from stoppingCriterion import stoppingCriterion as stoppingCriterion
+from meanVarData import meanVarData as meanVarData
 
-class CLT(Stopping_Criterion):
+class CLTStopping(stoppingCriterion):
 
     def __init__(self):
         # self.discDistAllowed = "IIDDistribution"
@@ -18,7 +18,7 @@ class CLT(Stopping_Criterion):
 
     @property
     def discDistAllowed(self):
-        return "IID"
+        return "IIDDistribution"
 
     @property
     def decompTypeAllowed(self):  # which discrete distributions are supported
@@ -26,8 +26,8 @@ class CLT(Stopping_Criterion):
 
     def stopYet(self, dataObj=[], funObj=[], distribObj=[]):
         # defaults dataObj to meanVarData if not supplied by user
-        if (not isinstance(dataObj, meanVar)) or (dataObj == []):
-            dataObj = meanVar()
+        if (not isinstance(dataObj, meanVarData)) or (dataObj == []):
+            dataObj = meanVarData()
 
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
@@ -38,7 +38,7 @@ class CLT(Stopping_Criterion):
                 nf = len(funObj)  # number of functions whose integrals add up to the solution # NOT SURE HOW THIS WORKS!!!
             else:
                 funObj = [funObj]
-            distribObj.initStreams(nf)  # need an IID stream for each function
+            distribObj.initStreams(nf)  # need an IIDDistribution stream for each function
             dataObj.prevN = zeros(nf)  # initialize data object
             # if dataObj.prevN.shape == (1,): dataObj.prevN = dataObj.prevN[0]
             dataObj.nextN = kron(ones((1, nf)), self.nInit)  # repmat(self.nInit, 1, nf)
