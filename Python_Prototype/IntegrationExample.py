@@ -3,22 +3,22 @@
 
 '''
 How to integrate a function using our community QMC framework
-An example with Keister's function integrated with respect to the uniform
+An example with KeisterFun's function integrated with respect to the uniform
 distribution over the unit cube
 '''
 
-from QMC import QMC
+from DevelopOnly.QMC import QMC
 
-test_qmc = QMC('meanVar','IID','Keister','CLT')
+test_qmc = QMC('meanVarData','IIDDistribution','KeisterFun','CLTStopping')
 sol, out = test_qmc.integrate()
 print(sol)
 
-test_qmc = QMC('meanVar','IID','Keister','CLT')
+test_qmc = QMC('meanVarData','IIDDistribution','KeisterFun','CLTStopping')
 test_qmc.stp.absTol = 1e-3  # decrease tolerance
 sol, out = test_qmc.integrate()
 print(sol)
 
-test_qmc = QMC('meanVar','IID','Keister','CLT')
+test_qmc = QMC('meanVarData','IIDDistribution','KeisterFun','CLTStopping')
 test_qmc.stp.absTol = 0  # impossible tolerance
 test_qmc.stp.nMax = 1e6  # calculation limited by sample budget
 sol, out = test_qmc.integrate()

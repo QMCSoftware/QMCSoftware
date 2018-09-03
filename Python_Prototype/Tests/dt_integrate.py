@@ -8,9 +8,9 @@ Example 1: integrate over given default instances of KeisterFun,
 IIDDistribution, and CLTStopping.
 >>> from integrate import integrate as integrate
 >>> from KeisterFun import KeisterFun as KeisterFun
->>> from IIDDistribution import IIDDistribution as IID
+>>> from IIDDistribution import IIDDistribution as IIDDistribution
 >>> from CLTStopping import CLTStopping as CLTStopping
->>> from meanVarData import meanVarData as meanVar
+>>> from meanVarData import meanVarData as meanVarData
 >>> funObj = KeisterFun()
 >>> distribObj = IIDDistribution()
 >>> stopObj = CLTStopping()

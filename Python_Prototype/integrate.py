@@ -20,16 +20,19 @@ def print_dict(dict):
     for key, value in dict.items():
         print("%s: %s" % (key, value))
 
-import addpath
+
+from DevelopOnly import addpath
+
 addpath
-from Keister import Keister as Keister
-from IID import IID as IID
-from CLT import CLT as CLT
+
+from KeisterFun import KeisterFun as KeisterFun
+from IIDDistribution import IIDDistribution as IIDDistribution
+from CLTStopping import CLTStopping as CLTStopping
 
 trueVal = 0.425184685650728
-funObj = Keister()
-distribObj = IID()
-stopObj = CLT()
+funObj = KeisterFun()
+distribObj = IIDDistribution()
+stopObj = CLTStopping()
 [solution, datObj] = integrate(funObj, distribObj, stopObj)
 print(solution)
 print_dict(datObj.__dict__)
