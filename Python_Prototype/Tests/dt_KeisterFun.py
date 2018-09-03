@@ -1,5 +1,6 @@
 """
->>> from KeisterFun import KeisterFun as KeisterFun; kf = KeisterFun(); # doctest:+ELLIPSIS
+>>> from KeisterFun import KeisterFun as KeisterFun
+>>> kf = KeisterFun() # doctest:+ELLIPSIS
 >>> kf.dimension
 2
 >>> kf.distribType

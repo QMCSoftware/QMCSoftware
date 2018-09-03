@@ -31,7 +31,7 @@ class CLTStopping(stoppingCriterion):
 
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
-            if not distribObj.__class__.__name__ in [self.discDistAllowed]:
+            if not type(distribObj).__name__ in [self.discDistAllowed]:
                 raise Exception('Stoppoing criterion not compatible with sampling distribution')
             nf = 1
             if type(funObj) == list:

@@ -1,6 +1,4 @@
-from numpy import square, cos, exp, sqrt, multiply, sum
-import numpy as np
-
+from numpy import square, cos, exp, sqrt, multiply, sum, array
 from fun import fun as fun
 
 
@@ -9,11 +7,12 @@ class KeisterFun(fun):
         super().__init__()
 
     # Specify and generate values $f(\vx)$ for $\vx \in \cx$
-    def f(self, x, KeisterFun):
+    def f(self, x, coordIndex):
         # if the nominalValue = 0, this is efficient
         normx2 = sum(square(x), axis=1)
-        if (len(KeisterFun) != self.dimension) and (self.nominalValue != 0):
-            normx2 = normx2 + square(self.nominalValue) * (self.dimension - len(KeisterFun))
+        coordIndex = array(coordIndex)
+        if (coordIndex.size != self.dimension) and (self.nominalValue != 0):
+            normx2 = normx2 + square(self.nominalValue) * (self.dimension - coordIndex.size)
         y = multiply(exp(-normx2), cos(sqrt(normx2)))
         return y
     
