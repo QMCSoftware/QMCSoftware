@@ -1,5 +1,6 @@
 """
->>> from IIDDistribution import IIDDistribution as IIDDistribution; iid = IIDDistribution();
+>>> from IIDDistribution import IIDDistribution as IIDDistribution
+>>> iid = IIDDistribution();
 >>> iid.domainType
 'box'
 >>> iid.trueDistribution
@@ -23,7 +24,7 @@ array([[0, 0],
 >>> iid.distribDataStream # doctest:+ELLIPSIS
 [<randomstate.prng.mrg32k3a.mrg32k3a.RandomState object at ...
 
->>> x,w,a = iid.genDistrib(1, 2, 3, (1,2));
+>>> x,w,a = iid.genDistrib(1, 2, 3, (1,2))
 >>> w
 1
 >>> a
@@ -31,5 +32,4 @@ array([[0, 0],
 >>> x
 array([[0.18465602, 0.200767  ],
        [0.97176332, 0.84322271]])
-
 """

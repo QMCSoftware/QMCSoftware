@@ -23,10 +23,10 @@ sol, out = integrate(funObj, distribObj, stopObj)
 
 
 # A multilevel example of Asian option pricing
-
+from AsianCallFun import AsianCallFun as AsianCallFun
 distribObj.trueDistribution = 'normal' # Change to normal distribution
 stopObj.absTol = 0.01 # increase tolerance
-stopObj.nMax = 1e8; # pushing the sample budget back up
+stopObj.nMax = 1e8 # pushing the sample budget back up
 OptionObj = AsianCallFun(4) # 4 time steps
 sol,out = integrate(OptionObj, distribObj, stopObj)
 """

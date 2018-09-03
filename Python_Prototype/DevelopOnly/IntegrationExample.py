@@ -28,7 +28,7 @@ print(sol)
 """
 distribObj.trueDistribution = 'normal' # Change to normal distribution
 stopObj.absTol = 0.01 # increase tolerance
-stopObj.nMax = 1e8; # pushing the sample budget back up
+stopObj.nMax = 1e8 # pushing the sample budget back up
 OptionObj = AsianCallFun(4) # 4 time steps
 sol,out = integrate(OptionObj, distribObj, stopObj)
 
