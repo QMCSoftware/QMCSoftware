@@ -25,7 +25,7 @@
 %            stage: 'done'
 %            prevN: 1024
 %            nextN: 7540
-%         timeUsed: 0.00***
+%         timeUsed: 0.0***
 %     nSamplesUsed: 7540
 %       errorBound: [0.4210 0.4410]
 %            costF: ***e-04

@@ -35,7 +35,7 @@ methods
             catch
                 v = sqrt(eigVal(end:-1:1));
                 n = length(v);
-                obj(ii).A = spdiags([v], 0, n, n) .* eigVec(:,end:-1:1)';
+                obj(ii).A = (v * ones(1,n)) .* eigVec(:,end:-1:1)';
             end
          end
       end 
