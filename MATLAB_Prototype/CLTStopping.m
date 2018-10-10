@@ -21,7 +21,7 @@ methods
          case 'begin' %initialize
             dataObj.timeStart = tic; %keep track of time
             if ~any(strcmp(obj.discDistAllowed,class(distribObj)))
-               error('Stoppoing criterion not compatible with sampling distribution')
+               error('Stopping criterion not compatible with sampling distribution')
             end
             nf = numel(funObj); %number of functions whose integrals add up to the solution
             distribObj = initStreams(distribObj,nf); %need an IID stream for each function

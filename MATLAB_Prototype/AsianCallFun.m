@@ -17,6 +17,7 @@ methods
          obj(1,nf) = AsianCallFun;
          obj(1).dimFac = 0;      
          for ii = 1:nf
+            obj(ii).distrib = struct('name','stdGaussian');
             d = dimVec(ii);
             if ii > 1
                obj(ii).dimFac = dimFac(ii-1);
@@ -41,7 +42,7 @@ methods
       end 
    end
    
-   function y = f(obj, x, coordIndex)
+   function y = g(obj, x, coordIndex)
       %since the nominalValue = 0, this is efficient
       BM = x * obj.A;
       try

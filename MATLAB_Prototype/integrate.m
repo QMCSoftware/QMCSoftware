@@ -5,6 +5,7 @@ function [solution, dataObj] = integrate(funObj, distribObj, stopCritObj)
 % stopcritObj = an object from class stopping_criterion
 
 %Initialize the accumData object and other crucial objects
+funObj = transformVariable(funObj, distribObj); %align the distributions
 [stopCritObj, dataObj, distribObj] = stopYet(stopCritObj, [], funObj, distribObj);
 while ~strcmp(dataObj.stage, 'done') %the dataObj.stage property tells us where we are in the process
    dataObj = updateData(dataObj, distribObj, funObj); %compute additional data
