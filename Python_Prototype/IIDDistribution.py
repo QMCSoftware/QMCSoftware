@@ -21,6 +21,25 @@ class IIDDistribution(discreteDistribution):
     def nStreams(self):
         return 1
 
+    def __equal__(self,obj1): #automaticlly gets called for "IIDobj1 == IIDobj2"
+        c1 = self.domain = obj1.domain
+        c2 = self.domainType == obj1.domainType
+        c3 = self.dimension == obj1.dimension
+        c4 = self.trueDistribution == obj1.trueDistribution
+        if c1 and c2 and c3 and c4:
+            return True
+        return False
+
+    # May need to implement this differently as we currently cannot compare 2 obj's of this class without a seperate instance of this class
+    def compare2Objs(self,obj1,obj2): 
+        c1 = obj1.domain = obj1.domain
+        c2 = obj1.domainType == obj1.domainType
+        c3 = obj1.dimension == obj1.dimension
+        c4 = obj1.trueDistribution == obj1.trueDistribution
+        if c1 and c2 and c3 and c4:
+            return True
+        return False
+
     def initStreams(self, nStreams = 1, seed=None):
         self.distribDataStream = list(range(nStreams))
         for i in range(nStreams):
@@ -36,10 +55,8 @@ class IIDDistribution(discreteDistribution):
             x = self.distribDataStream[streamIndex].randn(int(nPts), len(coordIndex))  # nodes
 
         # Code without streams
-
         w = 1
         a = 1 / n
-
         return x, w, a
 
 if __name__ == "__main__":
