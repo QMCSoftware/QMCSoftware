@@ -22,7 +22,7 @@ class IIDDistribution(discreteDistribution):
         return 1
 
     def __eq__(self,obj1): #automaticlly gets called for "IIDobj1 == IIDobj2"
-        c1 = self.domain = obj1.domain
+        c1 = self.domain == obj1.domain
         c2 = self.domainType == obj1.domainType
         c3 = self.dimension == obj1.dimension
         c4 = self.trueDistribution == obj1.trueDistribution
