@@ -32,7 +32,7 @@ class IIDDistribution(discreteDistribution):
 
     # May need to implement this differently as we currently cannot compare 2 obj's of this class without a seperate instance of this class
     def compare2Objs(self,obj1,obj2): 
-        c1 = obj1.domain = obj1.domain
+        c1 = obj1.domain == obj1.domain
         c2 = obj1.domainType == obj1.domainType
         c3 = obj1.dimension == obj1.dimension
         c4 = obj1.trueDistribution == obj1.trueDistribution
