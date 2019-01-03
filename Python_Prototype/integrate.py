@@ -7,6 +7,7 @@ def integrate(funObj, distribObj, stopCritObj, datObj=[]):
      stopcritObj = an object from class stopping_criterion
     """
     # Initialize the accumData object and other crucial objects
+    funObj.transformVariable(distribObj)
     [datObj, distribObj] = stopCritObj.stopYet(datObj, funObj, distribObj)
     while not datObj.stage == 'done': # the datObj.stage property tells us where we are in the process
         datObj.updateData(distribObj, funObj)  # compute additional data
@@ -15,8 +16,10 @@ def integrate(funObj, distribObj, stopCritObj, datObj=[]):
     datObj.timeUsed = time() - datObj.timeStart
     return solution, datObj
 
+if __name__ == "__main__":
+    import doctest
+    x = doctest.testfile("Tests/dt_integrate.py")
+    print("\n"+str(x))
 
-def print_dict(dict):
-    for key, value in dict.items():
-        print("%s: %s" % (key, value))
+
 

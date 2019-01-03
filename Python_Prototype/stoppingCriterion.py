@@ -2,7 +2,11 @@ from abc import ABC, abstractmethod
 
 # Decide when to stop
 class stoppingCriterion(ABC):
-
+    '''
+    Any sublcass of stoppingCriterion must include:
+        Properties: discDistAllowed, decompTypeAllowed
+        Methods: stopYet(self,distribObj) 
+    '''
     def __init__(self): 
         self.absTol = 1e-2 # absolute tolerance 
         self.relTol = 0 # absolute tolerance
@@ -21,13 +25,7 @@ class stoppingCriterion(ABC):
     def decompTypeAllowed(self): # which decomposition types are supported
         pass
     
-    # Abstract Method
+    # Abstract Methods
     @abstractmethod
-    def stopYet(self,dataObj,distribObj,funObj): # distribObj = data or summary of data computed already
+    def stopYet(self,dataObj,funObj,distribObj): # distribObj = data or summary of data computed already
         pass
-
-'''
-Any sublcass of stoppingCriterion must include:
-    Methods: stopYet(self,distribObj)
-    Properties: discDistAllowed, decompTypeAllowed
-'''

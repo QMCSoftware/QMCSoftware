@@ -10,9 +10,12 @@ from CLTStopping import CLTStopping as CLTStopping
 from IIDDistribution import IIDDistribution as IIDDistribution
 from integrate import integrate as integrate
 from KeisterFun import KeisterFun as KeisterFun
+from util import new_qmc_problem
 
+new_qmc_problem() # empties the list of functions
 stopObj = CLTStopping() #stopping criterion for IID sampling using the Central Limit Theorem
-distribObj = IIDDistribution() #IID sampling with uniform distribution
+distribObj = IIDDistribution() #IID sampling
+distribObj.trueDistribution = 'stdGaussian' # with Gaussian distribution
 funObj = KeisterFun()
 sol, out = integrate(funObj, distribObj, stopObj)
 stopObj.absTol = 1e-3  # decrease tolerance
@@ -21,15 +24,15 @@ stopObj.absTol = 0  # impossible tolerance
 stopObj.nMax = 1e6  # calculation limited by sample budget
 sol, out = integrate(funObj, distribObj, stopObj)
 
-
 # A multilevel example of Asian option pricing
-from AsianCallFun import AsianCallFun as AsianCallFun
-distribObj.trueDistribution = 'normal' # Change to normal distribution
+from AsianCallFun import AsianCallFun
+"""
+new_qmc_problem() # empties the list of functions
 stopObj.absTol = 0.01 # increase tolerance
 stopObj.nMax = 1e8 # pushing the sample budget back up
 OptionObj = AsianCallFun(4) # 4 time steps
 sol,out = integrate(OptionObj, distribObj, stopObj)
-"""
+
 OptionObj = AsianCallFun(64) # single level, 64 time steps
 sol,out = integrate(OptionObj, distribObj, stopObj)
 

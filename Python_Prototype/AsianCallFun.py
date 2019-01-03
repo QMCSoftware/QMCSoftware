@@ -7,6 +7,7 @@ class AsianCallFun(fun):
 
     # Specify and generate payoff values of an Asian Call option
     def __init__(self, dimFac = []):
+        super().__init__()
         self.volatility = 0.5
         self.S0 = 30
         self.K = 25
@@ -21,6 +22,7 @@ class AsianCallFun(fun):
             acf_array = [AsianCallFun() for i in range(nf)]
             acf_array[0].dimFac = 0
             for ii in range(nf):
+                acf_array[ii].distrib['name'] = 'stdGaussian'
                 d = self.dimVec(ii)
                 if ii > 0:
                     acf_array[ii].dimFac = dimFac(ii - 1)
@@ -32,9 +34,9 @@ class AsianCallFun(fun):
                 acf_array[ii].A = multiply(sqrt(eigVal[-1:-1:1]), transpose(eigVec[:,-1:-1:1]))
 
             self = acf_array
-        super().__init__()
+        
 
-    def f(self, x, coordIndex):
+    def g(self, x, coordIndex):
         # since the nominalValue = 0, this is efficient
         BM = multiply(x, self.A)
         SFine = self.S0 * exp((-self.volatility ^ 2 / 2) * self.tVec + self.volatility * BM)
@@ -47,6 +49,8 @@ class AsianCallFun(fun):
             y = y - max(AvgCoarse - self.K, 0)
         return y
 
+# BREAK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Aleksei's Partial Translation is Below
 '''
 from fun import fun as fun
 import numpy as np
@@ -69,26 +73,26 @@ def min_m(a):
 class AsianCall(fun): # Translated up to the comment "Left off here"
     def __init__(self,dimFac=None): # Can pass in dimFac as float, int, list, or numpy.ndarray. Will convert to numpy array regardless
         super().__init__()
-        
         self.volatility = 0.5
         self.S0 = 30
         self.K = 25
         self.T = 1
         self.A = None
         self.tVec = None
-        self.dimFac = 1
         self.dimFac = dimFac
-        
-        if self.dimFac == None:
-            return
 
-        self.dimFac = dimFac
-        if type(dimFac) == list:
-            self.dimFac == np.asarray(dimFac).reshape(1,len(dimFac))
-        elif dimFac == float or dimFac == int:
-            self.dimFac = self.asArray([dimFac])
+        # Handles self.dimFac
+        if self.dimFac == None: # Not supplied by the user
+            return 
         else:
-            raise Exception("AsianCall is constructed with a float, int, list, or (preferably) numpy.ndarray")
+            # Transforms self.dimFac to the correct type
+            self.dimFac = np.array([1])
+            if type(dimFac) == list:
+                self.dimFac == np.asarray(dimFac).reshape(1,len(dimFac))
+            elif dimFac == float or dimFac == int:
+                self.dimFac = self.asArray([dimFac])
+            else:
+                raise Exception("AsianCall is constructed with a float, int, list, or (preferably) numpy.ndarray")
 
         self.dimVec = cumprod_m(self.dimFac)
         nf = len(dimVec)
@@ -99,10 +103,11 @@ class AsianCall(fun): # Translated up to the comment "Left off here"
         self.obj_list[0].dimFac = 0    
         
         for ii in range(nf):
-            d = self.dimVec[ii]
+            self.obj_list[ii].distrib = {'name':'stdGaussian'}
+            d = dimVec[ii]
             if ii > 0:
-                self.obj_list[ii].dimFac = self.dimFac[ii-1]
-            self.obj_list[ii].dimension = d
+                obj_list[ii].dimFac = dimFac[ii-1]
+            obj_list[ii].dimension = d
             tvec = np.arange(1,1+d)*(obj[ii].T/d)
             self.obj_list[ii].tVec = tvec
                      
@@ -151,5 +156,11 @@ class AsianCall(fun): # Translated up to the comment "Left off here"
             AvgCoarse = ((obj.S0/2) + sum(SCoarse(:,1:dCoarse-1),2) + SCoarse(:,dCoarse)/2)/dCoarse;
             y = y - max(AvgCoarse - obj.K,0);
         return y      
-            
-'''
+'''       
+
+if __name__ == "__main__":
+    # Run Doctests
+    import doctest
+    x = doctest.testfile("Tests/dt_AsianCallFun.py")
+    print("\n" + str(x))
+

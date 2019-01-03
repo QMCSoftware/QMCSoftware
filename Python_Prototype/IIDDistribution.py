@@ -6,8 +6,9 @@ import randomstate.prng.mrg32k3a as rnd
 class IIDDistribution(discreteDistribution):
 
     def __init__(self):
-        self.distribData
         super().__init__()
+        self.distribData
+        
 
     @property
     def distribData(self):
@@ -61,5 +62,5 @@ class IIDDistribution(discreteDistribution):
 
 if __name__ == "__main__":
     import doctest
-    x = doctest.testfile("dt_IID.py")
+    x = doctest.testfile("Tests/dt_IIDDistribution.py")
     print("\n"+str(x))

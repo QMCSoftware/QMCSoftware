@@ -5,29 +5,21 @@ from accumData import accumData as accumData
 # Accumulated data for IIDDistribution calculations, stores the sample mean and
 # variance of function values
 class meanVarData(accumData):
-
-
     def __init__(self):
+        super().__init__()
         self.muhat = [] # sample mean
         self.sighat = [] # sample standard deviation
         self.nSigma = [] # number of samples used to compute the sample standard deviation
         self.nMu = []  # number of samples used to compute the sample mean
-        super().__init__()
-
+        
 
     def timeStart(self):  # starting time
         self.__timeStart = time()
         #print(self.__timeStart) # "hidden" property, but it can still be exposed somehow as the last doctest shows
         return
 
-
     def updateData(self, distribObj, funObj):
-        nf = 1
-        if type(funObj) == list:
-            nf = len(funObj)
-        else:
-            funObj = [funObj]
-        # preallocate vectors
+        nf = len(funObj)
         self.solution = np.zeros(nf)
         self.sighat = np.zeros(nf)
         self.costF = np.zeros(nf)
@@ -46,11 +38,10 @@ class meanVarData(accumData):
                 self.sighat[ii] = np.std(y)  # compute the sample standard deviation if required
             self.muhat[ii] = np.mean(y)  # compute the sample mean
             self.solution = sum(self.muhat)  # which also acts as our tentative solution
-
         return
 
 if __name__ == "__main__":
     # Doctests
     import doctest
-    x = doctest.testfile("dt_meanVar.py")
+    x = doctest.testfile("Tests/dt_meanVarData.py")
     print("\n"+str(x))
