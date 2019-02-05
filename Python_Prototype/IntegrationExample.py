@@ -17,14 +17,21 @@ stopObj = CLTStopping() #stopping criterion for IID sampling using the Central L
 distribObj = IIDDistribution() #IID sampling
 distribObj.trueDistribution = 'stdGaussian' # with Gaussian distribution
 funObj = KeisterFun()
+
+print("~~~~~~~~ Beginning Integration Examples ~~~~~~~~~~")
 sol, out = integrate(funObj, distribObj, stopObj)
+print("Solution:",sol)
+
 stopObj.absTol = 1e-3  # decrease tolerance
 sol, out = integrate(funObj, distribObj, stopObj)
+print("Solution:",sol)
+
 stopObj.absTol = 0  # impossible tolerance
 stopObj.nMax = 1e6  # calculation limited by sample budget
 sol, out = integrate(funObj, distribObj, stopObj)
+print("Solution:",sol)
 
-# A multilevel example of Asian option pricing
+# A multilevel example of Asian option pricing (Not Yet Working)
 from AsianCallFun import AsianCallFun
 """
 new_qmc_problem() # empties the list of functions

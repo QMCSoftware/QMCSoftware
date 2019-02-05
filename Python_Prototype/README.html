@@ -1,0 +1,64 @@
+<html>
+<head>
+    <title>QMC Community Software</title>
+    <style type="text/css">
+        h1 {color:rgb(34, 133, 39);}
+        h2 {color:rgb(32, 8, 252);}
+        h3 {color:rgb(247, 103, 8);}
+        .tab1 { margin-left: 5%; }
+        .tab2 { margin-left: 10%; }
+        body {background-color: rgb(145, 233, 248);}
+        </style>
+</head>
+
+<body>
+<center><h1>Quasi-Monte Carlo Community Software</h1></center>
+<hr>
+<h2>Overview</h2>
+    <p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have fourmain components: an integrand, a discrete distribution, summary output data, and stoppingcriterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
+<hr>
+<h3>Integrand Class (fun.m/.py)</h3>
+    <b>Summary: </b>The function to integrate
+    <h4>Concrete Classes</h4>
+    <ul>
+        <li>Keister (KeisterFun.m/.py)</li>
+        <li>Asian Call (AsianCallFun.m/.py) ~ INCOMPLETE</li>
+    </ul>
+<hr>
+
+<h3>Discrete Distribution Class (discreteDistribution.m/.py)</h3> 
+    <b>Summary: </b>The distribution dictating sampling points of the function
+    <h4>Concrete Classes</h4>
+    <ul>
+        <li>Independent Identically Distributed (IIDDistribution.m/py)</li>
+    </ul>
+<hr>  
+
+<h3>Output Data Class (accumData.m/.py)</h3>
+    <b>Summary: </b>The data values to track throughout the integration
+    <h4>Concrete Classes</h4>
+    <ul>
+        <li>Mean Variance (meanVarData.m/.py)</li>
+    </ul>   
+<hr>
+
+<h3>Stopping Criterion Class (stoppingCriterion.m/.py)</h3>
+    <b>Summary: </b>The stopping criterion to determine sufficient approximation
+    <h4>Concrete Classes</h4>
+    <ul>
+        <li>Centeral Limint Theorem (CLTStopping.m/py)</li>
+    </ul>      
+<hr>
+
+<h3>Integration Method (integrate.py)</h3>
+    <b>Summary: </b>Preforms integration given Function's', Distribution, Data, and a Stopping Crition 
+<hr>
+<h2>Credit</h2>
+    This package was originally developed in MATLAB by Fred Hickernell<br>
+    Translated to Python by Sou-Cheng T. Choi and Aleksei Sorokin
+<hr>
+</body>
+
+</html>
+
+

@@ -29,3 +29,7 @@ class accumData(ABC):
     @abstractmethod
     def updateData(self, distribObj, fun_obj, decompType):  # update the accumulated data
         pass
+    
+    def __repr__(self):
+        s = "Solution: %.4f\nStage: %s\n"%(self.solution,self.stage)
+        return s

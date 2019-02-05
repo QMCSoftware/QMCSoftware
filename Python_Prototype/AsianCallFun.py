@@ -122,7 +122,7 @@ class AsianCall(fun): # Translated up to the comment "Left off here"
             # Left off here
             [eigVec,eigVal] = eig(CovMat,'vector') # np.linalg.eig is not the sae as Matlab's eig function
 
-            #Example of dissimilarity
+            # Example of dissimilarity
             #    Matlab:
             #        a = (1:4)
             #        b = min(a',a)
