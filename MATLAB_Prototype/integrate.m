@@ -1,11 +1,11 @@
-function [solution, dataObj] = integrate(funObj, distribObj, stopCritObj)
+function [solution, dataObj] = integrate(funObj, measureObj, distribObj, stopCritObj)
 %§\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$§
 % funObj = an object from class fun
 % distribObj = an object from class discrete_distribution
 % stopcritObj = an object from class stopping_criterion
 
 %Initialize the accumData object and other crucial objects
-funObj = transformVariable(funObj, distribObj); %align the distributions
+funObj = transformVariable(funObj, measureObj, distribObj); %align the distributions
 [stopCritObj, dataObj, distribObj] = stopYet(stopCritObj, [], funObj, distribObj);
 while ~strcmp(dataObj.stage, 'done') %the dataObj.stage property tells us where we are in the process
    dataObj = updateData(dataObj, distribObj, funObj); %compute additional data

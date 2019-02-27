@@ -24,7 +24,7 @@ methods
                error('Stopping criterion not compatible with sampling distribution')
             end
             nf = numel(funObj); %number of functions whose integrals add up to the solution
-            distribObj = initStreams(distribObj,nf); %need an IID stream for each function
+            distribObj = initStreams(distribObj); %need an IID stream for each function
             dataObj.prevN = zeros(1,nf); %initialize data object
             dataObj.nextN = repmat(obj.nInit,1,nf);
             dataObj.muhat = Inf(1,nf);
@@ -47,7 +47,7 @@ methods
             dataObj.nSamplesUsed = dataObj.nextN;
             errBar = (obj.quantile * obj.inflate) * ...
                sqrt(sum(dataObj.sighat.^2/dataObj.nMu));
-            dataObj.errorBound = dataObj.solution + errBar*[-1 1];
+            dataObj.confidInt = dataObj.solution + errBar*[-1 1];
             dataObj.stage = 'done'; %finished with computation
       end
       dataObj.timeUsed = toc(dataObj.timeStart);

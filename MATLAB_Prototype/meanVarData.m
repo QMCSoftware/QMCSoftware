@@ -12,9 +12,10 @@ methods
       nf = numel(funObj);
       for ii = 1:nf
          tStart = tic; %time the function values
+         dim = distribObj(ii).trueD.dimension;
          y = funObj(ii).f( ...
-            genDistrib(distribObj, obj.prevN(ii)+1, obj.prevN(ii)+obj.nextN(ii), ...
-            obj.nextN(ii), 1:funObj(ii).dimension, ii), 1:funObj(ii).dimension);
+            genDistrib(distribObj(ii), obj.prevN(ii)+1, obj.prevN(ii)+obj.nextN(ii), ...
+            obj.nextN(ii), 1:dim), 1:dim);
          obj.costF(ii) = toc(tStart); %to be used for multi-level methods
          if strcmp(obj.stage,'sigma')
             obj.sighat(ii) = std(y); %compute the sample standard deviation if required

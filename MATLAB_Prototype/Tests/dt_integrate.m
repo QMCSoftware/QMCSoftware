@@ -27,7 +27,7 @@
 %            nextN: 7540
 %         timeUsed: 0.0***
 %     nSamplesUsed: 7540
-%       errorBound: [0.4210 0.4410]
+%        confidInt: [0.4210 0.4410]
 %            costF: ***e-04
 %
 %
@@ -56,7 +56,7 @@
 %            nextN: 652546
 %         timeUsed: 0.0***
 %     nSamplesUsed: 652546
-%       errorBound: [0.4243 0.4263]
+%        confidInt: [0.4243 0.4263]
 %            costF: 0.0***
 %
 %
@@ -83,6 +83,6 @@
 %            nextN: 1000000
 %         timeUsed: 0.0***
 %     nSamplesUsed: 1000000
-%       errorBound: [0.4244 0.4260]
+%        confidInt: [0.4244 0.4260]
 %            costF: 0.0***
 

@@ -4,24 +4,39 @@ classdef IIDDistribution < discreteDistribution
 properties
    distribData %stream data
    state = [] %not used
-   nStreams = 1
 end
 
 methods   
-   function obj = initStreams(obj,nStreams)
-      if nargin > 1, obj.nStreams = nStreams; end
-      obj.distribData.stream = RandStream.create('mrg32k3a','NumStreams',nStreams,'CellOutput',true);
+   
+   function obj = IIDDistribution(varargin)
+      obj = obj@discreteDistribution(varargin{:});
+      nObj = numel(obj);
+      p = inputParser;
+      p.KeepUnmatched = true;
+      addParameter(p,'distribData',cell(1,nObj));
+      parse(p,varargin{:})
+      [obj.distribData] = p.Results.distribData{:};
    end
       
-   function [x, w, a] = genDistrib(obj, nStart, nEnd, n, coordIndex, streamIndex)
-      if nargin < 6
-         streamIndex = 1;
+   function obj = initStreams(obj)
+      nObj = numel(obj);
+      temp = RandStream.create('mrg32k3a','NumStreams',nObj,'CellOutput',true);
+      for ii = 1:nObj
+         obj(ii).distribData.stream = temp{ii};
+      end
+   end
+      
+   function [x, w, a] = genDistrib(obj, nStart, nEnd, n, coordIndex)
+      if nargin < 5
+         coordIndex = 1:obj.trueD.dimension;
       end
       nPts = nEnd - nStart + 1; %how many points to be generated
-      if strcmp(obj.trueDistribution, 'uniform') %generate uniform points
-         x = rand(obj.distribData.stream{streamIndex},nPts,numel(coordIndex)); %nodes
-      else %standard normal points
-         x = randn(obj.distribData.stream{streamIndex},nPts,numel(coordIndex)); %nodes
+      if strcmp(obj.trueD.measureName, 'stdUniform') %generate uniform points
+         x = rand(obj.distribData.stream,nPts,numel(coordIndex)); %nodes
+      elseif strcmp(obj.trueD.measureName, 'stdGaussian') %standard normal points
+         x = randn(obj.distribData.stream,nPts,numel(coordIndex)); %nodes
+      else
+         error('Distribution not recognized')
       end
       w = 1;
       a = 1/n;

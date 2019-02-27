@@ -7,7 +7,7 @@ properties
    nextN %prevN + 1 to nextN
    timeUsed %time used so far
    nSamplesUsed %number of samples used so far
-   errorBound = [-Inf Inf] %error bound on the solution
+   confidInt = [-Inf Inf] %confidence interval for the solution
    costF %time required to compute function values
 end
 

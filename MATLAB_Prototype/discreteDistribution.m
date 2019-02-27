@@ -3,13 +3,25 @@ classdef (Abstract) discreteDistribution
 properties (Abstract)	
    distribData %information required to generate the distribution
    state %state of the generator
-   nStreams
 end
 properties	
-   domain = [0 0; 1 1]; %domain of the discrete distribution, §$\mcommentfont \cx$§
-   domainType = 'box' %domain of the discrete distribution, §$\mcommentfont \cx$§
-   dimension = 2 %dimension of the domain, §$\mcommentfont d$§
-   trueDistribution = 'uniform' %name of the distribution that the discrete distribution attempts to emulate
+   trueD = stdUniform(measure) %the distribution that the discrete distribution attempts to emulate
+end
+methods
+   function obj = discreteDistribution(varargin) %construct the discrete distribution object
+      p = inputParser;
+      addParameter(p,'trueD',stdUniform(measure));
+      parse(p,varargin{:})
+      nObj = numel(p.Results.trueD);
+      if nObj == 1
+         obj.trueD = p.Results.trueD;
+      else
+         obj(nObj).trueD = p.Results.trueD(nObj);
+         for ii = 1:nObj
+            obj(ii).trueD = p.Results.trueD(ii);
+         end
+      end 
+   end
 end
 methods (Abstract)
    genDistrib(obj, nStart, nEnd, n, coordIndex)
