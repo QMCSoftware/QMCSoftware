@@ -10,11 +10,12 @@ from meanVarData import meanVarData as meanVarData
 class CLTStopping(stoppingCriterion):
 
     def __init__(self):
+        super().__init__()
         # self.discDistAllowed = "IIDDistribution"
         # self.decompTypeAllowed = ["single", "multi"]
         self.inflate = 1.2  # inflation factor
         self.alpha = 0.01
-        super().__init__()
+        
 
     @property
     def discDistAllowed(self):
@@ -32,7 +33,7 @@ class CLTStopping(stoppingCriterion):
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
             if not type(distribObj).__name__ in [self.discDistAllowed]:
-                raise Exception('Stoppoing criterion not compatible with sampling distribution')
+                raise Exception('Stopping criterion not compatible with sampling distribution')
             nf = 1
             if type(funObj) == list:
                 nf = len(funObj)  # number of functions whose integrals add up to the solution # NOT SURE HOW THIS WORKS!!!
@@ -77,5 +78,5 @@ class CLTStopping(stoppingCriterion):
 if __name__ == "__main__":
     # Run Doctests
     import doctest
-    x = doctest.testfile("dt_CLT.py")
+    x = doctest.testfile("Tests/dt_CLTStopping.py")
     print("\n" + str(x))

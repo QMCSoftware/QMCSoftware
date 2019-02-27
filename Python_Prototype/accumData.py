@@ -3,7 +3,11 @@ from math import inf, nan
 
 # Accumulated data required in the computation of the integral
 class accumData(ABC):
-
+    '''
+    Any sublcass of accumData must include:
+        Properties: timeStart
+        Methods: updateData(self, distribObj, fun_obj, decompType)
+    '''
     def __init__(self):
         super().__init__()
         self.solution = nan  # solution
@@ -15,11 +19,17 @@ class accumData(ABC):
         self.errorBound = [-inf, inf]  # error bound on the solution
         self.costF = []  # time required to compute function values
 
+    # Abstract Properties
     @property
     @abstractmethod
     def timeStart(self):  # starting time
         pass
 
+    # Abstract Methods
     @abstractmethod
     def updateData(self, distribObj, fun_obj, decompType):  # update the accumulated data
         pass
+    
+    def __repr__(self):
+        s = "Solution: %.4f\nStage: %s\n"%(self.solution,self.stage)
+        return s

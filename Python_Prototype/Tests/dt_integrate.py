@@ -15,6 +15,7 @@ IIDDistribution, and CLTStopping.
 >>> distribObj = IIDDistribution()
 >>> stopObj = CLTStopping()
 >>> datObj = meanVarData()
+>>> funObj.transformVariable(distribObj)
 >>> [solution, dataObj] = integrate(funObj, distribObj, stopObj, datObj)
 
 solution =

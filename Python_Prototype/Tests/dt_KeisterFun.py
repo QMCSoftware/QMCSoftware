@@ -3,16 +3,13 @@
 >>> kf = KeisterFun()
 >>> kf.dimension
 2
->>> kf.distribType
-'uniform'
 >>> kf.domainType
 'box'
+>>> kf.distrib['name']
+'IIDZGaussian'
 >>> kf.nominalValue
 0
->>> kf.domain
-array([[0, 0],
-       [1, 1]])
 >>> import numpy as np
->>> kf.f(np.array([[1, 2], [3, 4]]), [1, 2])
-array([-4.15915193e-03,  3.93948451e-12])
+>>> kf.g(np.array([[1, 2], [3, 4]]), [1, 2])
+array([-1.93921993,  0.89115104]) 
 """
