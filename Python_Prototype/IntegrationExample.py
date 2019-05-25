@@ -1,50 +1,47 @@
-# Originally developed by Doctor Fred Hickernell in MATLAB
-# Translation by Sou-Cheng Choi and Aleksei Sorokin
+# Integrating a function using our community QMC framework
 
-'''
-How to integrate a function using our community QMC framework
-An example with KeisterFun's function integrated with respect to the uniform
-distribution over the unit cube
-'''
+from numpy import arange
+
 from CLTStopping import CLTStopping as CLTStopping
 from IIDDistribution import IIDDistribution as IIDDistribution
 from integrate import integrate as integrate
 from KeisterFun import KeisterFun as KeisterFun
+from AsianCallFun import AsianCallFun
 from util import new_qmc_problem
 
-new_qmc_problem() # empties the list of functions
-stopObj = CLTStopping() #stopping criterion for IID sampling using the Central Limit Theorem
-distribObj = IIDDistribution() #IID sampling
-distribObj.trueDistribution = 'stdGaussian' # with Gaussian distribution
-funObj = KeisterFun()
+''' An example with Keister's function integrated with respect to the uniform distribution over the unit cube '''
+new_qmc_problem() # empties class lists
+dim=3 # dimension for the Keister Example
+measureObj = IIDZMeanGaussian(measure,dimension=dim,variance=1/2)
+distribObj = IIDDistribution(trueD=stdGaussian(measure,dimension=dim)) # IID sampling
+stopObj = CLTStopping() # stopping criterion for IID sampling using the Central Limit Theorem
+sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
+stopObj.absTol = 1e-3 # decrease tolerance
+sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
+stopObj.absTol = 0 # impossible tolerance
+stopObj.nMax = 1e6 # calculation limited by sample budget
+sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
 
-print("~~~~~~~~ Beginning Integration Examples ~~~~~~~~~~")
-sol, out = integrate(funObj, distribObj, stopObj)
-print("Solution:",sol)
-
-stopObj.absTol = 1e-3  # decrease tolerance
-sol, out = integrate(funObj, distribObj, stopObj)
-print("Solution:",sol)
-
-stopObj.absTol = 0  # impossible tolerance
-stopObj.nMax = 1e6  # calculation limited by sample budget
-sol, out = integrate(funObj, distribObj, stopObj)
-print("Solution:",sol)
-
-# A multilevel example of Asian option pricing (Not Yet Working)
-from AsianCallFun import AsianCallFun
-"""
-new_qmc_problem() # empties the list of functions
-stopObj.absTol = 0.01 # increase tolerance
+''' A multilevel example of Asian option pricing '''
+new_qmc_problem() # empties class lists
+stopObj.absTol = 0.01 # increase tolerence
 stopObj.nMax = 1e8 # pushing the sample budget back up
-OptionObj = AsianCallFun(4) # 4 time steps
-sol,out = integrate(OptionObj, distribObj, stopObj)
+measureObj = BrownianMotion(measure,timeVector=arange(1/4,5/4,1/4))
+OptionObj = AsianCallFun(measureObj) # 4 time steps
+distribObj = IIDDistribution(trueD=stdGaussian(measure,dimension=4)) # IID sampling
+sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 
-OptionObj = AsianCallFun(64) # single level, 64 time steps
-sol,out = integrate(OptionObj, distribObj, stopObj)
+measureObj = BrownianMotion(measure,timeVector=arange(1/64,65/64,1/64))
+OptionObj = AsianCallFun(measureObj) # 64 time steps
+distribObj = IIDDistribution(trueD=stdGaussian(measure,dimension=64)) # IID sampling
+sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 
-OptionObj = AsianCallFun([4 4 4]) # multilevel, 64 time steps, faster
-sol,out = integrate(OptionObj, distribObj, stopObj)
+measureObj = BrownianMotion(measure,timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
+OptionObj = AsianCallFun(measureObj) # multi-level
+distribObj = IIDDistribution(trueD=stdGaussian(measure,dimension=[4,16,64])) # IID sampling
+sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 
-"""
+
+
+
 

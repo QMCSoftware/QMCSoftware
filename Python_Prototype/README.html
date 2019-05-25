@@ -2,20 +2,16 @@
 <head>
     <title>QMC Community Software</title>
     <style type="text/css">
-        h1 {color:rgb(34, 133, 39);}
-        h2 {color:rgb(32, 8, 252);}
-        h3 {color:rgb(247, 103, 8);}
         .tab1 { margin-left: 5%; }
-        .tab2 { margin-left: 10%; }
-        body {background-color: rgb(145, 233, 248);}
-        </style>
+        .tab2 { margin-left: 10%; }}
+    </style>
 </head>
 
 <body>
 <center><h1>Quasi-Monte Carlo Community Software</h1></center>
 <hr>
 <h2>Overview</h2>
-    <p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have fourmain components: an integrand, a discrete distribution, summary output data, and stoppingcriterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
+    <p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stoppingcriterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
 <hr>
 <h3>Integrand Class (fun.m/.py)</h3>
     <b>Summary: </b>The function to integrate

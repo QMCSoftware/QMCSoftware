@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from math import inf, nan
+from numpy import array
 
 # Accumulated data required in the computation of the integral
 class accumData(ABC):
@@ -12,12 +13,12 @@ class accumData(ABC):
         super().__init__()
         self.solution = nan  # solution
         self.stage = 'begin'  # stage of the computation, becomes 'done' when finished
-        self.prevN = []  # new data will be based on (quasi-)random vectors indexed by
-        self.nextN = []  # prevN + 1 to nextN
-        self.timeUsed = []  # time used so far
-        self.nSamplesUsed = []  # number of samples used so far
-        self.errorBound = [-inf, inf]  # error bound on the solution
-        self.costF = []  # time required to compute function values
+        self.prevN = array([])  # new data will be based on (quasi-)random vectors indexed by
+        self.nextN = array([])  # prevN + 1 to nextN
+        self.timeUsed = array([])  # time used so far
+        self.nSamplesUsed = array([])  # number of samples used so far
+        self.confidInt = array([-inf, inf])  # error bound on the solution
+        self.costF = array([])  # time required to compute function values
 
     # Abstract Properties
     @property
@@ -31,5 +32,5 @@ class accumData(ABC):
         pass
     
     def __repr__(self):
-        s = "Solution: %.4f\nStage: %s\n"%(self.solution,self.stage)
-        return s
+        return str(self.__dict__)
+        

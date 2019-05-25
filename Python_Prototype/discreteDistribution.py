@@ -8,14 +8,11 @@ class discreteDistribution(ABC):
         Properties: distribData, state, nStreams
         Methods: genDistrib(self, nStart, nEnd, n, coordIndex)
     '''
-    def __init__(self):
+    distribObjs = []
+    def __init__(self,trueD):
         super().__init__()
-        self.domain = np.array([[0, 0], [1, 1]])  # domain of the discrete distribution, §$\mcommentfont \cx$§
-        self.domainType = 'box'  # domain of the discrete distribution, §$\mcommentfont \cx$§
-        self.dimension = 2  # dimension of the domain, §$\mcommentfont d$§
-        self.trueDistribution = 'uniform'  # name of the distribution that the discrete distribution attempts to emulate
-        
-
+        self.trueD = trueD # the distribution that the discrete distribution attempts to emulate
+        discreteDistribution.distribObjs.append(self)
     # Abstract Properties
     @property
     @abstractmethod
@@ -25,11 +22,6 @@ class discreteDistribution(ABC):
     @property
     @abstractmethod
     def state(self):  # state of the generator
-        pass
-
-    @property
-    @abstractmethod
-    def nStreams(self):
         pass
 
     # Abstract Methods
@@ -42,4 +34,13 @@ class discreteDistribution(ABC):
          coordIndex = which coordinates in sequence are needed
         """
         pass
+    
+    # Below methods allow the distribution class to be treated like a list of distributions
+    def __len__(self):
+        return len(discreteDistribution.distribObjs)
+    def __iter__(self):
+        for distribObj in discreteDistribution.distribObjs:
+            yield distribObj
+    def __getitem__(self,i):
+        return discreteDistribution.distribObjs[i]
 
