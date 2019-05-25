@@ -19,12 +19,7 @@ class accumData(ABC):
         self.nSamplesUsed = array([])  # number of samples used so far
         self.confidInt = array([-inf, inf])  # error bound on the solution
         self.costF = array([])  # time required to compute function values
-
-    # Abstract Properties
-    @property
-    @abstractmethod
-    def timeStart(self):  # starting time
-        pass
+        self._timeStart = None
 
     # Abstract Methods
     @abstractmethod

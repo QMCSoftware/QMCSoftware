@@ -11,14 +11,13 @@ class KeisterFun(fun):
         super().__init__()
         
     # Specify and generate values $f(\vx)$ for $\vx \in \cx$
-    def g(self, x, coordIndex):
+    def g(self,x,coordIndex):
         # if the nominalValue = 0, this is efficient
-        normx2 = sum(square(x), axis=1)
-        coordIndex = array(coordIndex)
+        normx2 = (x**2).sum(1)
         nCoordIndex = len(coordIndex)
         if nCoordIndex != self.dimension and self.nominalValue != 0:
-            normx2 = normx2 + square(self.nominalValue) * (self.dimension - nCoordIndex)
-        y = multiply(pi**(nCoordIndex/2), cos(sqrt(normx2)))
+            normx2 = normx2 + self.nominalValue**2 * (self.dimension - nCoordIndex)
+        y = pi**(nCoordIndex/2)*cos(normx2**.5)
         return y
 
 if __name__ == "__main__":

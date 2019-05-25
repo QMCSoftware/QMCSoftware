@@ -15,6 +15,14 @@ class CLTStopping(stoppingCriterion):
         self.decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
         self.inflate = 1.2  # inflation factor
         self.alpha = 0.01
+    
+    @property
+    def discDistAllowed(self):
+        return self.discDistAllowed
+    @property
+    @abstractmethod
+    def decompTypeAllowed(self):
+        return self.decompTypeAllowed
 
     def stopYet(self, dataObj=[meanVarData()], funObj=[], distribObj=[]):
         if dataObj.stage == 'begin':  # initialize
