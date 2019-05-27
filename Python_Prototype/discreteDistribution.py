@@ -1,28 +1,20 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
-# Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
+from measure import measure
+
 class discreteDistribution(ABC):
     '''
-    Any sublcass of discreteDistribution must include:
-        Properties: distribData, state, nStreams
-        Methods: genDistrib(self, nStart, nEnd, n, coordIndex)
+    Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
     '''
-    distribObjs = []
-    def __init__(self,trueD):
+    def __init__(self,distribData,state,trueD=measure('stdUniform')):
         super().__init__()
-        self.trueD = trueD # the distribution that the discrete distribution attempts to emulate
-        discreteDistribution.distribObjs.append(self)
-    # Abstract Properties
-    @property
-    @abstractmethod
-    def distribData(self):  # %information required to generate the distribution
-        pass
+        # Abstract Properties
+        self.distribData = distribData # information required to generate the distribution
+        self.state = state # state of the generator
 
-    @property
-    @abstractmethod
-    def state(self):  # state of the generator
-        pass
+        self.trueD = trueD      
+        self.distrib_list = []
 
     # Abstract Methods
     @abstractmethod
@@ -37,10 +29,16 @@ class discreteDistribution(ABC):
     
     # Below methods allow the distribution class to be treated like a list of distributions
     def __len__(self):
-        return len(discreteDistribution.distribObjs)
+        return len(self.distrib_list)
     def __iter__(self):
-        for distribObj in discreteDistribution.distribObjs:
+        for distribObj in self.distrib_lists:
             yield distribObj
     def __getitem__(self,i):
-        return discreteDistribution.distribObjs[i]
+        return self.distrib_list[i]
+    
+    def __repr__(self):
+        s = ''
+        for key,val in self.__dict__.items():
+            s += '    %s: %s\n'%(str(key),str(val))
+        return s[:-1]
 

@@ -10,7 +10,6 @@ class KeisterFun(fun):
     def __init__(self):
         super().__init__()
         
-    # Specify and generate values $f(\vx)$ for $\vx \in \cx$
     def g(self,x,coordIndex):
         # if the nominalValue = 0, this is efficient
         normx2 = (x**2).sum(1)

@@ -1,5 +1,5 @@
 from time import time
-from numpy import zeros, full, inf, sqrt, ones, kron, divide, square, array, matmul,maximum,minimum
+from numpy import zeros, full, inf, sqrt, ones, kron, divide, square, array, matmul,maximum,minimum,tile
 from math import ceil
 from scipy.stats import norm
 import sys
@@ -10,21 +10,13 @@ from meanVarData import meanVarData
 class CLTStopping(stoppingCriterion):
     ''' Stopping criterion based on the Centeral Limit Theorem. '''
     def __init__(self):
-        super().__init__()
-        self.discDistAllowed = ["IIDDistribution"] # which discrete distributions are supported
-        self.decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
+        discDistAllowed = ["IIDDistribution"]
+        decompTypeAllowed = ["single", "multi"]
+        super().__init__(discDistAllowed,decompTypeAllowed)
         self.inflate = 1.2  # inflation factor
         self.alpha = 0.01
-    
-    @property
-    def discDistAllowed(self):
-        return self.discDistAllowed
-    @property
-    @abstractmethod
-    def decompTypeAllowed(self):
-        return self.decompTypeAllowed
 
-    def stopYet(self, dataObj=[meanVarData()], funObj=[], distribObj=[]):
+    def stopYet(self, dataObj=meanVarData(), funObj=[], distribObj=[]):
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
             if not type(distribObj).__name__ in self.discDistAllowed:
@@ -32,8 +24,7 @@ class CLTStopping(stoppingCriterion):
             nf=len(funObj)
             distribObj.initStreams(nf)  # need an IIDDistribution stream for each function
             dataObj.prevN = zeros(nf)  # initialize data object
-            dataObj.nextN = kron(ones((1, nf)), self.nInit)  # repmat(self.nInit, 1, nf)
-            if dataObj.nextN.shape == (1, 1): dataObj.nextN = dataObj.nextN[0,]
+            dataObj.nextN = tile(self.nInit,nf)
             dataObj.muhat = full(nf,inf)
             dataObj.sighat = full(nf,inf)
             dataObj.nSigma = self.nInit  # use initial samples to estimate standard deviation
@@ -43,26 +34,23 @@ class CLTStopping(stoppingCriterion):
             dataObj.prevN = dataObj.nextN  # update place in the sequence
             tempA = (dataObj.costF)**.5  # use cost of function values to decide how to allocate
             tempB = (tempA * dataObj.sighat).sum(0)  # samples for computation of the mean
-            gentol = max(self.absTol, dataObj.solution * self.relTol)
-            if (gentol > 0) and (dataObj.costF > 0):
-              nM = ceil((tempB * ((self.getQuantile() * self.inflate / gentol)** 2)) * divide(dataObj.sighat, sqrt(dataObj.costF)))
-            else:
-              nM = sys.maxsize
-            dataObj.nMu = minimum(maximum(dataObj.nextN, nM), self.nMax - dataObj.prevN)
+            nM = ceil(tempB*(self.get_quantile()*self.inflate / max(self.absTol, dataObj.solution*self.relTol))**2
+                * (dataObj.sighat/dataObj.costF**.5))
+            dataObj.nMu = minimum(maximum(dataObj.nextN,nM),self.nMax-dataObj.prevN)
             dataObj.nextN = dataObj.nMu + dataObj.prevN
             dataObj.stage = 'mu'  # compute sample mean next
         elif dataObj.stage == 'mu':
             dataObj.solution = dataObj.muhat.sum(0)
             dataObj.nSamplesUsed = dataObj.nextN
-            errBar = self.get_quantile() * self.inflate * sqrt(sum(dataObj.sighat**2 / dataObj.nMu))
+            errBar = self.get_quantile() * self.inflate * (dataObj.sighat**2 / dataObj.nMu).sum(0)**.5
             dataObj.confidInt = dataObj.solution + errBar * array([-1, 1])
             dataObj.stage = 'done'  # finished with computation
         dataObj.timeUsed = time() - dataObj.timeStart
         return dataObj, distribObj
-
+    
     def get_quantile(self):
+        # dependent property
         return -norm.ppf(self.alpha / 2)
-
 
 if __name__ == "__main__":
     # Run Doctests

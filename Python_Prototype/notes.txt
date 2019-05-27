@@ -1,0 +1,48 @@
+General: 
+    Got rid of abstract properties and instead made them part of the abstract class constructor 
+    Why do some functions return objects?
+        Python doesn't copy object instance when passed into funciton, so we may be able to delete that in python version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Files:
+    accumData
+    AsianCallFun:
+    CLTStopping
+    discreteDistribution
+        - What is happening in the constructor?
+        - leave creating list of discreteDistributions to concrete classes? 
+    fun 
+        - Should this class be abstract? 
+    IIDDistribution
+        - Now handles the construction of self.distrib_list in a similar way to AsianCallFun
+        - In MATLAB, the list of objects is createded in the discreteDistribution constructor, but I was having trouble doing this in python
+        - TrueD is now an abstract property but is set for each distrib in the list in the IIDDistribution constructor
+    integrate
+    IntegrationExample
+        - Still needs to be tested
+    KeisterFun
+    meanVarData
+    measure
+        - very different than matlab. Same implementation? Needs to be Extensively tested
+    stoppingCriterion
+    util
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Test Files:
+    dt_AsianCallFun
+        - Needs test for f function
+        - constructor dt passing
+    dt_CLTStopping
+        - Needs test for stopYet function
+        - constructor dt passing
+    dt_IIDDistribution
+        - Needs tests for __init__, initStreams, and genDistrib functions
+        - None available
+    dt_integrate
+        - None available
+    dt_KeisterFun
+        - Needs test for g function
+        - constructor dt passing
+    dt_meanVarData
+        - Needs test for updateData function
+        - constructor dt passing
+    dt_qmc
+        - available

@@ -10,10 +10,10 @@ class meanVarData(accumData):
     '''
     def __init__(self):
         super().__init__()
-        self.muhat = None # sample mean
-        self.sighat = None # sample standard deviation
-        self.nSigma = None # number of samples used to compute the sample standard deviation
-        self.nMu = None  # number of samples used to compute the sample mean
+        self.muhat = array([]) # sample mean
+        self.sighat = array([]) # sample standard deviation
+        self.nSigma = array([]) # number of samples used to compute the sample standard deviation
+        self.nMu = array([])  # number of samples used to compute the sample mean
 
     def updateData(self, distribObj, funObj):
         nf = len(funObj)
@@ -24,17 +24,14 @@ class meanVarData(accumData):
         for ii in range(0, nf):
             tStart = time()  # time the function values
             dim = distribObj[ii].trueD.dimension
-            this_distrib = genDistrib(distribObj[ii],self.prevN[ii]+1,self.prevN[ii]+obj.nextN[ii],self.nextN[ii],arange(1,dim+1))
-            y = funObj[ii].f(this_distrib,arange(1,dim+1))
+            distribData,*ignore = distribObj[ii].genDistrib(self.prevN[ii]+1,self.prevN[ii]+obj.nextN[ii],self.nextN[ii],arange(1,dim+1))
+            y = funObj[ii].f(distribData,arange(1,dim+1))
             self.costF[ii] = time() - tStart  # to be used for multi-level methods
             if self.stage == 'sigma':
                 self.sighat[ii] = std(y)  # compute the sample standard deviation if required
             self.muhat[ii] = mean(y)  # compute the sample mean
             self.solution = self.muhat.sum(0) # which also acts as our tentative solution
         return self
-    
-    def __repr__(self):
-        return str(self.__dict__)
 
 if __name__ == "__main__":
     # Doctests

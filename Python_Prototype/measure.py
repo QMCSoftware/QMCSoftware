@@ -1,72 +1,103 @@
-from numpy import array
+from numpy import array,arange
 
-class measure:
+class measure():
     '''
     Specifies the components of a general measure used to define an
     integration problem or a sampling method
     '''
-    measureObjs = []
-    def __init__(self,dimension=2,domainCoord=array([]),domainShape='',measureName='stdUniform',measureData=array([])):  
-        # Argument Parsing
-        if type(dimension)!=int or dimension<=0:
-            raise Exception("measure.dimension must be a positive integer")
-        acceptedDomainShapes = ['','box','cube','unitCube']
-        if domainShape not in acceptedDomainShapes:
-            raise Exception("measure.domainShape must be one of:"+str(acceptedDomainShapes))
-        acceptedMeasureNames = ['stdUniform','uniform','stdGaussian','IIDZMeanGaussian','IIDGaussian','BrownianMotion','Gaussian','Lesbesgue']
-        if measureName not in acceptedMeasureNames:
-            raise Exception('self.measureName must be one of:'+str(acceptedMeasureNames))
+    def __init__(self,\
+        dimension=2,domainCoord=array([]),domainShape='',measureName='stdUniform',\
+        measureData=array([]),variance=1,timeVector=arange(1/4,5/4,1/4),_constructor=True):  
+        
+        self.measureName = measureName # name of the measure
         self.dimension = dimension # dimension of the domain, Â§$\mcommentfont d$Â§
         self.domainCoord = domainCoord # domain coordinates for the measure, Â§$\mcommentfont \cx$Â§
-        self.domainShape = domainShape # domain shape for the measure, Â§$\mcommentfont \cx$Â§
-        self.measureName = measureName # name of the measure
+        self.domainShape =domainShape # domain shape for the measure, Â§$\mcommentfont \cx$Â§
         self.measureData = measureData # information required to specify the measure
-    
-    def stdUniform(self,dimension=2):
+        self.variance = variance
+        self.timeVector = timeVector
+        self.measure_list = []
+
+        if _constructor and type(dimension)==int:
+            # Single Dimensional ==> Convert everything to lists so it appears multi-dimensional
+            self.dimension = [dimension]
+            self.domainCoord = [domainCoord]
+            self.measureData = [measureData]
+            self.variance = [variance]
+            self.timeVector = [timeVector]
+        
+        # Argument Parsing
+        acceptedMeasures = {
+            'stdUniform': self.stdUniform,
+            'uniform': None,
+            'stdGaussian': self.stdGaussian,
+            'IIDZMeanGaussian': self.IIDZMeanGaussian,
+            'IIDGaussian': None,
+            'BrownianMotion': self.BrownianMotion,
+            'Gaussian': None,
+            'Lesbesgue': None}
+        if self.measureName not in acceptedMeasures.keys():
+            raise Exception('self.measureName is the key for the function it will map to:'+str(acceptedMeasures))
+        if not _constructor and (type(dimension)!=int or dimension<=0):
+            raise Exception("measure.dimension be a list of positive integers")
+        acceptedDomainShapes = ['','box','cube','unitCube']
+        if self.domainShape not in acceptedDomainShapes:
+            raise Exception("measure.domainShape must be one of:"+str(acceptedDomainShapes))
+        if not _constructor and self.variance <=0:
+            raise Exception("measure.variance must be a positive number")
+        
+        # Construct list of measure objects
+        if _constructor:
+            acceptedMeasures[measureName]()
+        
+    def stdUniform(self):
         ''' create standard uniform measure '''
-        try: nObj = len(dimension)
-        except: nObj = 1
-        measure.measureObjs = [measure() for i in range(nObj)]
-        self.dimension = dimension
-        self.measureName = 'stdUniform'
+        nObj = len(self.dimension)
+        self.measure_list = list(range(nObj))
+        for i in range(nObj):
+            self.measure_list[i] = measure(dimension=self.dimension[i],domainCoord=self.domainCoord[i],domainShape=self.domainShape,
+                                        measureName=self.measureName,measureData=self.measureData,variance=self.variance,
+                                        timeVector=self.timeVector,_constructor=False)
         return self
     
     def stdGaussian(self,dimension=2):
         ''' create standard Gaussian measure '''
-        try: nObj = len(dimension)
-        except: nObj = 1
-        measure.measureObjs = [measure() for i in range(nObj)]
-        self.dimension = dimension
-        self.measureName = 'stdGaussian'
+        nObj = len(self.dimension)
+        self.measure_list = list(range(nObj))
+        for i in range(nObj):
+            self.measure_list[i] = measure(dimension=self.dimension[i],domainCoord=self.domainCoord[i],domainShape=self.domainShape,
+                                        measureName=self.measureName,measureData=self.measureData,variance=self.variance,
+                                        timeVector=self.timeVector,_constructor=False)
         return self
     
     def IIDZMeanGaussian(self,dimension=2,variance=1):
         ''' create standard Gaussian measure '''
-        try: nObj = len(dimension)
-        except: nObj = 1
-        measure.measureObjs = [measure() for i in range(nObj)]
-        self.dimension = dimension
-        self.measureData.variance = variance
-        self.measureName = 'IIDZMeanGaussian'
+        nObj = len(self.dimension)
+        self.measure_list = list(range(nObj))
+        for i in range(nObj):
+            self.measure_list[i] = measure(dimension=self.dimension[i],domainCoord=self.domainCoord[i],domainShape=self.domainShape,
+                                        measureName=self.measureName,measureData=self.measureData,variance=self.variance,
+                                        timeVector=self.timeVector,_constructor=False)
         return self
     
-    def BrownianMotion(self,timeVector=arange(1/4,5/4,1/4)):
+    def BrownianMotion(self,timeVector):
         ''' create a discretized Brownian Motion measure '''
         nObj = len(timeVector)
-        measure.measureObjs = [measure() for i in range(nObj)]
-        for ii in range(nObj):
-            self[ii].measureData.timeVector = timeVector[ii]
-            self[ii].dimension = len(self[ii].measureData.timeVector)
-        self.measureName = 'BrownianMotion'
+        self.measure_list = list(range(nObj))
+        for i in range(nObj):
+            self.measure_list[i] = measure(dimension=len(self.timeVector[i]),domainCoord=self.domainCoord[i],domainShape=self.domainShape,
+                                        measureName=self.measureName,measureData=self.measureData,variance=self.variance,
+                                        timeVector=self.timeVector,_constructor=False)
+        return self
         
     # Below methods allow the measure class to be treated like a list of measures
     def __len__(self):
-        return len(measure.measureObjs)
+        return len(self.measure_list)
     def __iter__(self):
-        for measureObj in measure.measureObjs:
+        for measureObj in self.measure_list:
             yield measureObj
     def __getitem__(self,i):
-        return measure.measureObjs[i]
+        return self.measure_list[i]
         
 
 

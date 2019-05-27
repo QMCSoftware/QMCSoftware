@@ -9,10 +9,10 @@ def integrate(funObj,measureObj,distribObj,stopCritObj):
     '''
     # Initialize the accumData object and other crucial objects
     funObj = funObj.transformVariable(measureObj, distribObj)
-    stopCritObj,dataObj,distribObj = stopCritObj.stopYet([],funObj,distribObj)
-    while dataObj.stage!='done': # the dataObj.stage property tells us where we are in the process
+    dataObj,distribObj = stopCritObj.stopYet(funObj=funObj,distribObj=distribObj)
+    while dataObj.stage != 'done': # the dataObj.stage property tells us where we are in the process
         dataObj = dataObj.updateData(dataObj,distribObj,funObj) # compute additional data
-        stopCritObj,dataObj = stopCritObj.stopYet(dataObj,funObj) # update the status of the computation
+        dataObj,distribObj = stopCritObj.stopYet(dataObj,funObj) # update the status of the computation
     solution = dataObj.solution  # assign outputs
     datObj.timeUsed = time() - dataObj.timeStart
     return solution, dataObj

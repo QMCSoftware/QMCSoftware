@@ -27,5 +27,8 @@ class accumData(ABC):
         pass
     
     def __repr__(self):
-        return str(self.__dict__)
+        s = ''
+        for key,val in self.__dict__.items():
+            s += '    %s: %s\n'%(str(key),str(val))
+        return s[:-1]
         
