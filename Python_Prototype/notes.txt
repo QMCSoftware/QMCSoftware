@@ -1,7 +1,9 @@
 General: 
-    Got rid of abstract properties and instead made them part of the abstract class constructor 
-    Why do some functions return objects?
-        Python doesn't copy object instance when passed into funciton, so we may be able to delete that in python version
+    - Got rid of abstract properties and instead made them part of the abstract class constructor 
+    - Why do some functions return objects?
+        - Python doesn't copy object instance when passed into funciton, so we may be able to delete that in python version
+    - Need to find better way to supress Deprication warning from RandomState.
+        - Or find better random generator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Files:
     accumData
@@ -14,7 +16,8 @@ Files:
         - Should this class be abstract? 
     IIDDistribution
         - Now handles the construction of self.distrib_list in a similar way to AsianCallFun
-        - In MATLAB, the list of objects is createded in the discreteDistribution constructor, but I was having trouble doing this in python
+        - In MATLAB, the list of objects is created in the discreteDistribution constructor, 
+        but I was having trouble doing this in python
         - TrueD is now an abstract property but is set for each distrib in the list in the IIDDistribution constructor
     integrate
     IntegrationExample
@@ -24,10 +27,10 @@ Files:
     measure
         - Need to find a better way to type-check like in MATLAB
         - "obj(ii).measureData.timeVector = p.Results.timeVector{ii};" Is measureData a measure object?
-            - Why not "obj(ii).timeVector = p.Results.timeVector{ii};" 
+            - Why not "obj(ii).timeVector = p.Results.timeVector{ii};"?
             - May need to change python implementation because measureData is currently just an np.ndarray [] 
     stoppingCriterion
-    util
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Test Files:
     dt_AsianCallFun

@@ -7,14 +7,14 @@ class discreteDistribution(ABC):
     '''
     Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
     '''
-    def __init__(self,distribData,state,trueD=measure('stdUniform')):
+    def __init__(self,distribData,state,trueD=measure(measureName='stdUniform')):
         super().__init__()
         # Abstract Properties
         self.distribData = distribData # information required to generate the distribution
         self.state = state # state of the generator
 
         self.trueD = trueD      
-        self.distrib_list = []
+        self.distrib_list = [self]
 
     # Abstract Methods
     @abstractmethod

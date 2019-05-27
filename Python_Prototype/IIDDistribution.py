@@ -11,25 +11,27 @@ class IIDDistribution(discreteDistribution):
     def __init__(self,distribData=None,trueD=None):
         state = []
         super().__init__(distribData,state,trueD=trueD)
-        if not trueD:
+        if trueD:
             self.distrib_list = [IIDDistribution() for i in range(len(trueD))]
             # self now refers to self.distrib_list
-            for i in len(self):
+            for i in range(len(self)):
                 self[i].trueD = self.trueD[i]
-                self[i].distribData = self.distribData[i]
+                self[i].distribData = self.distribData[i] if self.distribData else None
         
     def initStreams(self):
         nObj = len(self)
         for ii in range(nObj):
-            self[ii].distribData.stream = mrg32k3a.RandomState()
+            self[ii].stream = mrg32k3a.RandomState() # Throws warning
         return self
 
-    def genDistrib(self, nStart, nEnd, n, coordIndex=arange(1,self.trueD.dimension+1)):
+    def genDistrib(self,nStart,nEnd,n,coordIndex=None):
+        if not coordIndex:
+            coordIndex=arange(1,self.trueD.dimension+1)
         nPts = nEnd - nStart + 1  # how many points to be generated
         if self.trueDistribution=='stdUniform': # generate uniform points
-            x = self.distribData.stream.rand(nPts,len(coordIndex))  # nodes
+            x = self.stream.rand(nPts,len(coordIndex))  # nodes
         elif self.trueD.measureName=='stdGaussian': # standard normal points
-            x = self.distribData.stream.randn(nPts,len(coordIndex))  # nodes
+            x = self.stream.randn(nPts,len(coordIndex))  # nodes
         else:
             raise Exception('Distribution not recognized')
         return x,1,1/n

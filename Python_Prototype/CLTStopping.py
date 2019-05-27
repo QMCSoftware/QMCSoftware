@@ -22,7 +22,7 @@ class CLTStopping(stoppingCriterion):
             if not type(distribObj).__name__ in self.discDistAllowed:
                 raise Exception('Stopping criterion not compatible with sampling distribution')
             nf=len(funObj)
-            distribObj.initStreams(nf)  # need an IIDDistribution stream for each function
+            distribObj.initStreams()  # need an IIDDistribution stream for each function
             dataObj.prevN = zeros(nf)  # initialize data object
             dataObj.nextN = tile(self.nInit,nf)
             dataObj.muhat = full(nf,inf)

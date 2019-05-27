@@ -1,6 +1,11 @@
 # Integrating a function using our community QMC framework
 
 from numpy import arange
+import sys
+# Supress ALL warning from RandomState package
+import warnings
+warnings.simplefilter("ignore")#,category=RandomStateDeprecationWarning)
+
 
 from CLTStopping import CLTStopping
 from IIDDistribution import IIDDistribution
@@ -9,13 +14,16 @@ from KeisterFun import KeisterFun
 from AsianCallFun import AsianCallFun
 from measure import measure
 
+
+
 ''' An example with Keister's function integrated with respect to the uniform distribution over the unit cube '''
-dim=3 # dimension for the Keister Example
-measureObj = measure(measureName='IIDZMeanGaussian',dimension=dim,variance=1/2)
-distribObj = IIDDistribution(trueD=measure(measureName='stdGaussian',dimension=dim)) # IID sampling
+dim = 3 # dimension for the Keister Example
+measureObj = measure(measureName='IIDZMeanGaussian',dimension=[dim],variance=[1/2])
+distribObj = IIDDistribution(trueD=measure(measureName='stdGaussian',dimension=[dim])) # IID sampling
 stopObj = CLTStopping() # stopping criterion for IID sampling using the Central Limit Theorem
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
 print('sol =',sol,'\n',out)
+sys.exit()
 
 stopObj.absTol = 1e-3 # decrease tolerance
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)

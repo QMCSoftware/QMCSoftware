@@ -38,7 +38,7 @@ class measure():
                 self[i].domainCoord = self.domainCoord[i] if self.domainCoord else array([])
                 self[i].domainShape = self.domainShape[i] if self.domainShape else ''
                 self[i].measureData = self.measureData[i] if self.measureData else array([])
-            acceptedMeasures[measureName]()
+            acceptedMeasures[self.measureName]()
             # TypeCheck
             for measureObj in self: 
                 measureObj.typeCheck(acceptedMeasures)
@@ -79,9 +79,12 @@ class measure():
     
     def BrownianMotion(self):
         ''' create a discretized Brownian Motion measure '''
+        self.dimension = []
         for i in range(len(self)):
             self[i].timeVector = self.timeVector[i]
-            self[i].dimension = len(self[i].timeVector)
+            dim_i = len(self[i].timeVector)
+            self[i].dimension = dim_i
+            self.dimension.append(dim_i)
             self[i].measureName = 'BrownianMotion'
         return self
         

@@ -9,7 +9,7 @@ class fun(ABC):
         self.f = None # function handle of integrand after transformation
         self.dimension = 2  # dimension of the domain, $d$
         self.nominalValue = 0  # a nominal number, $c$, such that $(c, \ldots, c) \in \cx$
-        self.fun_list = []
+        self.fun_list = [self]
     
     # Abstract Methods
     @abstractmethod
@@ -41,10 +41,11 @@ class fun(ABC):
                 self[ii].f = lambda xu,coordIndex: self[ii].g(cumsum(xu*(timeDiff)**.5,0),coordIndex)
             else:
                 raise Exception("Variable transformation not performed")
+        return self
 
     # Allow this to be treated as a list of functions
     def __len__(self):
-        len(self.fun_list)   
+        return len(self.fun_list)   
     def __iter__(self):
         for fun in self.fun_list:
             yield fun
