@@ -2,6 +2,7 @@
 >>> from AsianCallFun import AsianCallFun
 >>> acf = AsianCallFun()
 >>> print(acf)
+AsianCallFun with properties:
     f: None
     dimension: 2
     nominalValue: 0

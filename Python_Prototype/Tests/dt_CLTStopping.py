@@ -2,6 +2,7 @@
 >>> from CLTStopping import CLTStopping as CLTStopping
 >>> clts = CLTStopping()
 >>> print(clts)
+CLTStopping with properties:
     absTol: 0.01
     relTol: 0
     nInit: 1024

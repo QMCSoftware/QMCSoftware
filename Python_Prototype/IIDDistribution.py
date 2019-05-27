@@ -1,4 +1,4 @@
-from discreteDistribution import discreteDistribution as discreteDistribution
+from discreteDistribution import discreteDistribution
 from randomstate.prng import mrg32k3a
 from numpy import arange
 

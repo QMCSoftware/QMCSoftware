@@ -22,7 +22,10 @@ Files:
     KeisterFun
     meanVarData
     measure
-        - very different than matlab. Same implementation? Needs to be Extensively tested
+        - Need to find a better way to type-check like in MATLAB
+        - "obj(ii).measureData.timeVector = p.Results.timeVector{ii};" Is measureData a measure object?
+            - Why not "obj(ii).timeVector = p.Results.timeVector{ii};" 
+            - May need to change python implementation because measureData is currently just an np.ndarray [] 
     stoppingCriterion
     util
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,5 +47,8 @@ Test Files:
     dt_meanVarData
         - Needs test for updateData function
         - constructor dt passing
-    dt_qmc
-        - available
+    dt_measure
+        - Is correct. Not sure why it won't pass. Expected and got are the same.
+        - Single and multi-dimensional constructors passing
+    run_dts:
+        runs all docTests
