@@ -24,14 +24,14 @@ class IIDDistribution(discreteDistribution):
             self[ii].stream = mrg32k3a.RandomState() # Throws warning
         return self
 
-    def genDistrib(self,nStart,nEnd,n,coordIndex=None):
-        if not coordIndex:
-            coordIndex=arange(1,self.trueD.dimension+1)
+    def genDistrib(self,nStart,nEnd,n,coordIndex=[None]):
+        if not any(coordIndex):
+            self.coordIndex = arange(1,self.trueD.dimension+1)
         nPts = nEnd - nStart + 1  # how many points to be generated
-        if self.trueDistribution=='stdUniform': # generate uniform points
-            x = self.stream.rand(nPts,len(coordIndex))  # nodes
+        if self.trueD.measureName=='stdUniform': # generate uniform points
+            x = self.stream.rand(int(nPts),len(coordIndex))  # nodes
         elif self.trueD.measureName=='stdGaussian': # standard normal points
-            x = self.stream.randn(nPts,len(coordIndex))  # nodes
+            x = self.stream.randn(int(nPts),len(coordIndex))  # nodes
         else:
             raise Exception('Distribution not recognized')
         return x,1,1/n

@@ -16,7 +16,6 @@ class AsianCallFun(fun):
         if self.BMmeasure:
             nBM = len(BMmeasure)
             self.fun_list = [AsianCallFun() for i in range(nBM)] 
-            # self.fun_list[i] is implicitly accessed with self[i]. Done using magic methods
             self[0].BMmeasure = self.BMmeasure[0]
             self[0].dimFac = 0
             self[0].dimension = self.BMmeasure[0].dimension

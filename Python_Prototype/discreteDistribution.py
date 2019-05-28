@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
+from util import univ_repr
 
 from measure import measure
 
@@ -7,7 +8,7 @@ class discreteDistribution(ABC):
     '''
     Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
     '''
-    def __init__(self,distribData,state,trueD=measure(measureName='stdUniform')):
+    def __init__(self,distribData,state,trueD=measure().stdUniform()):
         super().__init__()
         # Abstract Properties
         self.distribData = distribData # information required to generate the distribution
@@ -36,9 +37,5 @@ class discreteDistribution(ABC):
     def __getitem__(self,i):
         return self.distrib_list[i]
     
-    def __repr__(self):
-        s = str(type(self).__name__)+' with properties:\n'
-        for key,val in self.__dict__.items():
-            s += '    %s: %s\n'%(str(key),str(val))
-        return s[:-1]
+    def __repr__(self): return univ_repr(self)
 

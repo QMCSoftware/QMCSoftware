@@ -2,33 +2,32 @@ General:
     - Got rid of abstract properties and instead made them part of the abstract class constructor 
     - Why do some functions return objects?
         - Python doesn't copy object instance when passed into funciton, so we may be able to delete that in python version
-    - Need to find better way to supress Deprication warning from RandomState.
-        - Or find better random generator
+    - Need to find better way to supress Deprication warning from RandomState or find better random generator
+        - Currently supresses all warnings (see header of IntegrationExample.py)
+    - MATLAB version sometimes runs out of memory
+    - Python Keister's function example working (kinda) and Multilevel Asian Option example NOT working
+    (Need to walk through both again throuroughly)
+    - Improve function documentation (+ funciton parameter description)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Files:
     accumData
     AsianCallFun:
     CLTStopping
     discreteDistribution
-        - What is happening in the constructor?
-        - leave creating list of discreteDistributions to concrete classes? 
     fun 
         - Should this class be abstract? 
     IIDDistribution
         - Now handles the construction of self.distrib_list in a similar way to AsianCallFun
         - In MATLAB, the list of objects is created in the discreteDistribution constructor, 
         but I was having trouble doing this in python
-        - TrueD is now an abstract property but is set for each distrib in the list in the IIDDistribution constructor
+        - TrueD is now an abstract property that is set (for each distrib in the distrib_list) in the IIDDistribution constructor
     integrate
     IntegrationExample
-        - Still needs to be tested
+        - Still needs to be tested and walked through again completely
     KeisterFun
     meanVarData
     measure
-        - Need to find a better way to type-check like in MATLAB
-        - "obj(ii).measureData.timeVector = p.Results.timeVector{ii};" Is measureData a measure object?
-            - Why not "obj(ii).timeVector = p.Results.timeVector{ii};"?
-            - May need to change python implementation because measureData is currently just an np.ndarray [] 
+        - May need better type_checking and less parameters in constructing object
     stoppingCriterion
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,7 +50,6 @@ Test Files:
         - Needs test for updateData function
         - constructor dt passing
     dt_measure
-        - Is correct. Not sure why it won't pass. Expected and got are the same.
-        - Single and multi-dimensional constructors passing
+        - constructor dts 'Expected' matches 'Got' but still won't pass. Why?
     run_dts:
         runs all docTests

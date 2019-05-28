@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from numpy import sqrt,cumsum
+from util import univ_repr
 
 class fun(ABC):
     ''' Specify and generate values $f(\vx)$ for $\vx \in \cx$ '''
@@ -35,9 +36,10 @@ class fun(ABC):
             if msrObj[ii].measureName==dstrObj[ii].trueD.measureName:
                 self[ii].f = lambda xu,coordIdex: self[ii].g(xu,coordIdex)
             elif msrObj[ii].measureName=='IIDZMeanGaussian' and dstrObj[ii].trueD.measureName=='stdGaussian': # multiply by the likelihood ratio
-                self[ii].f = lambda xu,coordIndex: self[ii].g(xu*(msrObj.measureData.variance)**.5,coordIndex)
+                this_variance = msrObj[ii].measureData['variance']
+                self[ii].f = lambda xu,coordIndex: self[ii].g(xu*(this_variance)**.5,coordIndex)
             elif msrObj[ii].measureName=='BrownianMotion' and dstrObj[ii].trueD.measureName=='stdGaussian':
-                timeDiff = msrObj(ii).measureData.timeVector
+                timeDiff = msrObj[ii].measureData['timeVector']
                 self[ii].f = lambda xu,coordIndex: self[ii].g(cumsum(xu*(timeDiff)**.5,0),coordIndex)
             else:
                 raise Exception("Variable transformation not performed")
@@ -52,9 +54,4 @@ class fun(ABC):
     def __getitem__(self,i):
         return self.fun_list[i]
     
-    
-    def __repr__(self):
-        s = str(type(self).__name__)+' with properties:\n'
-        for key,val in self.__dict__.items():
-            s += '    %s: %s\n'%(str(key),str(val))
-        return s[:-1]
+    def __repr__(self): return univ_repr(self,'fun','fun_list')

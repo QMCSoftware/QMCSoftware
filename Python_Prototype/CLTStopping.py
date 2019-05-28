@@ -19,7 +19,7 @@ class CLTStopping(stoppingCriterion):
     def stopYet(self, dataObj=meanVarData(), funObj=[], distribObj=[]):
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
-            if not type(distribObj).__name__ in self.discDistAllowed:
+            if type(distribObj).__name__ not in self.discDistAllowed:
                 raise Exception('Stopping criterion not compatible with sampling distribution')
             nf=len(funObj)
             distribObj.initStreams()  # need an IIDDistribution stream for each function
@@ -33,7 +33,7 @@ class CLTStopping(stoppingCriterion):
         elif dataObj.stage == 'sigma':
             dataObj.prevN = dataObj.nextN  # update place in the sequence
             tempA = (dataObj.costF)**.5  # use cost of function values to decide how to allocate
-            tempB = (tempA * dataObj.sighat).sum(0)  # samples for computation of the mean
+            tempB = (tempA * dataObj.sighat).sum(0)  # samples for computation of the mean            
             nM = ceil(tempB*(self.get_quantile()*self.inflate / max(self.absTol, dataObj.solution*self.relTol))**2
                 * (dataObj.sighat/dataObj.costF**.5))
             dataObj.nMu = minimum(maximum(dataObj.nextN,nM),self.nMax-dataObj.prevN)

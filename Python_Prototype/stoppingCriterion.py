@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
+from util import univ_repr
 
-# Decide when to stop
 class stoppingCriterion(ABC):
     '''
     Decide when to stop
@@ -23,8 +23,4 @@ class stoppingCriterion(ABC):
     def stopYet(self,distribObj): # distribObj = data or summary of data computed already
         pass
 
-    def __repr__(self):
-        s = str(type(self).__name__)+' with properties:\n'
-        for key,val in self.__dict__.items():
-            s += '    %s: %s\n'%(str(key),str(val))
-        return s[:-1]
+    def __repr__(self): return univ_repr(self,'stoppingCriterion')

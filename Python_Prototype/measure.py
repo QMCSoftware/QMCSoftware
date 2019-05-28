@@ -1,93 +1,87 @@
 from numpy import array,arange
+from util import univ_repr
 
 class measure():
     '''
     Specifies the components of a general measure used to define an
     integration problem or a sampling method
     '''
-    def __init__(self,dimension=2,domainCoord=None,domainShape=None,measureName=None,
-                measureData=None,variance=None,timeVector=None,_constructor=True):  
-        
-        self.measureName = measureName # name of the measure
-        self.dimension = dimension if type(dimension)!=int else [dimension]# dimension of the domain, Â§$\mcommentfont d$Â§
-        self.domainCoord = domainCoord # domain coordinates for the measure, Â§$\mcommentfont \cx$Â§
-        self.domainShape = domainShape # domain shape for the measure, Â§$\mcommentfont \cx$Â§
-        self.measureName = measureName if measureName else 'stdUniform'
-        self.measureData = measureData # information required to specify the measure
-        self.variance = variance
-        self.timeVector = timeVector
-        self.measure_list = []
-        
+    
+    def __init__(self,domainShape='',domainCoord=array([]),measureData=array([])):  
         # Argument Parsing
-        acceptedMeasures = {
-            'stdUniform': self.stdUniform,
-            'uniform': None,
-            'stdGaussian': self.stdGaussian,
-            'IIDZMeanGaussian': self.IIDZMeanGaussian,
-            'IIDGaussian': None,
-            'BrownianMotion': self.BrownianMotion,
-            'Gaussian': None,
-            'Lesbesgue': None}
+        #    Shape of the domain
+        if domainShape in ['','box','cube','unitCube']: self.domainShape = domainShape
+        else: raise Exception("measure.domainShape must be one of: ['','box','cube','unitCube']")
+        #   TypeCast to numpy ndarray's
+        self.domainCoord = array(domainCoord)
+        self.measureData = {}
+        self.measure_list = []
 
-        # Construct list of measure objects
-        if _constructor:
-            nObj = len(self.dimension) if not self.timeVector else len(self.timeVector)
-            self.measure_list = [measure(_constructor=False) for i in range(nObj)] # implicitly referenced with self using magic methods
-            # Deal attributes/defaults to remaining objects
-            for i in range(len(self)):
-                self[i].domainCoord = self.domainCoord[i] if self.domainCoord else array([])
-                self[i].domainShape = self.domainShape[i] if self.domainShape else ''
-                self[i].measureData = self.measureData[i] if self.measureData else array([])
-            acceptedMeasures[self.measureName]()
-            # TypeCheck
-            for measureObj in self: 
-                measureObj.typeCheck(acceptedMeasures)
-    
-    def typeCheck(self,acceptedMeasures):
-        '''
-        Check DataTypes of measure objects in self.measure_list
-        Will only run all measures objects in self.measure_list are completely constructred
-        '''
-        if self.measureName not in acceptedMeasures.keys():
-            raise Exception('self.measureName must consist of: '+str(list(acceptedMeasures.keys())))
-        if type(self.dimension)!=int or self.dimension<=0:
-            raise Exception("measure.dimension be a list of positive integers")
-        if self.domainShape not in ['','box','cube','unitCube']:
-            raise Exception("measure.domainShape must consist of: ['','box','cube','unitCube']")
-        
-    def stdUniform(self):
+    ''' Methods to construct list of measures ''' 
+    def stdUniform(self,dimension=array([2])):
         ''' create standard uniform measure '''
-        for i in range(len(self)):
-            self[i].dimension = self.dimension[i]
-            self[i].measureName = 'stdUniform'
+        self.measureName = 'stdUniform'
+        #    Dimension of the domain, Â§$\mcommentfont d$Â§
+        if type(dimension)==int: self.dimension = array([dimension])
+        elif all(item>0 for item in dimension): self.dimension = array(dimension)
+        else: raise Exception("measure.dimension be a list of positive integers")
+        #    Construct list of measures
+        self.measure_list = list(range(len(dimension)))
+        for i in range(len(self.measure_list)):
+            self.measure_list[i] = measure()
+            self.measure_list[i].dimension = self.dimension[i]
+            self.measure_list[i].measureName = 'stdUniform'
         return self
 
-    def stdGaussian(self):
+    def stdGaussian(self,dimension=array([2])):
         ''' create standard Gaussian measure '''
-        for i in range(len(self)):
-            self[i].dimension = self.dimension[i]
-            self[i].measureName = 'stdGaussian'
+        self.measureName = 'stdGaussian'
+        #    Dimension of the domain, Â§$\mcommentfont d$Â§
+        if type(dimension)==int: self.dimension = array([dimension])
+        elif all(item>0 for item in dimension): self.dimension = array(dimension)
+        else: raise Exception("measure.dimension be a list of positive integers")
+        #    Construct list of measures
+        self.measure_list = list(range(len(dimension)))
+        for i in range(len(self.measure_list)):
+            self.measure_list[i] = measure()
+            self.measure_list[i].dimension = self.dimension[i]
+            self.measure_list[i].measureName = 'stdGaussian'
         return self
-    
-    def IIDZMeanGaussian(self):
+
+    def IIDZMeanGaussian(self,dimension=array([2]),variance=array([1])):
         ''' create standard Gaussian measure '''
-        for i in range(len(self)):
-            self[i].dimension = self.dimension[i]
-            self[i].variance = self.variance[i]
-            self[i].measureName = 'IIDZMeanGaussian'
+        self.measureName = 'IIDZMeanGaussian'
+         #    Dimension of the domain, Â§$\mcommentfont d$Â§
+        if type(dimension)==int: self.dimension = array([dimension])
+        elif all(item>0 for item in dimension): self.dimension = array(dimension)
+        else: raise Exception("measure.dimension be a list of positive integers")
+        #    Variance of Gaussian Measures
+        if type(variance)==int: variance = array([variance])
+        elif all(item>0 for item in variance): variance = array(variance)
+        else: raise Exception("measure.variance be a list of positive integers")
+        #    Construct list of measures
+        self.measure_list = list(range(len(dimension)))
+        for i in range(len(self.measure_list)):
+            self.measure_list[i] = measure()
+            self.measure_list[i].dimension = self.dimension[i]
+            self.measure_list[i].measureData['variance'] = variance[i]
+            self.measure_list[i].measureName = 'IIDZMeanGaussian'
         return self
-    
-    def BrownianMotion(self):
+
+    def BrownianMotion(self,timeVector=arange(1/4,5/4,1/4)):
         ''' create a discretized Brownian Motion measure '''
-        self.dimension = []
-        for i in range(len(self)):
-            self[i].timeVector = self.timeVector[i]
-            dim_i = len(self[i].timeVector)
-            self[i].dimension = dim_i
-            self.dimension.append(dim_i)
-            self[i].measureName = 'BrownianMotion'
+        self.measureName = 'BrownianMotion'
+        #    Dimension of domain, Â§$\mcommentfont d$Â§
+        self.dimension = array([len(tV) for tV in timeVector])
+        #    Construct list of measures
+        self.measure_list = list(range(len(timeVector)))
+        for i in range(len(self.measure_list)): 
+            self.measure_list[i] = measure()
+            self.measure_list[i].measureData['timeVector'] = array(timeVector[i])
+            self.measure_list[i].dimension = self.dimension[i]
+            self.measure_list[i].measureName = 'BrownianMotion'
         return self
-        
+
     # Below methods allow the measure class to be treated like a list of measures
     def __len__(self):
         return len(self.measure_list)
@@ -97,12 +91,8 @@ class measure():
     def __getitem__(self,i):
         return self.measure_list[i]
     
-    def __repr__(self):
-        s = str(type(self).__name__)+' with properties:\n'
-        for key,val in self.__dict__.items():
-                s += '    %s: %s\n'%(str(key),str(val))
-        return s[:-1]
-        
+    def __repr__(self): return univ_repr(self,'measure','measure_list')
+
 if __name__ == "__main__":
     # Doctests
     import doctest

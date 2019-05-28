@@ -1,8 +1,5 @@
-sol =
-    2.1729
-out = 
-  meanVarData with properties:
-
+sol = 2.1729
+out = meanVarData with properties:
            muhat: 2.1729
           sighat: 2.2013
           nSigma: 1024
@@ -16,10 +13,8 @@ out =
        confidInt: [2.1629 2.1829]
            costF: 0.0722
 
-sol =
-    2.1689
-out = 
-  meanVarData with properties:
+sol = 2.1689
+out = meanVarData with properties:
            muhat: 2.1689
           sighat: 2.2013
           nSigma: 1024
@@ -33,10 +28,8 @@ out =
        confidInt: [2.1679 2.1699]
            costF: 6.0493
 
-sol =
-    2.1717
-out = 
-  meanVarData with properties:
+sol = 2.1717
+out = meanVarData with properties:
 
            muhat: 2.1717
           sighat: 2.2013
@@ -52,10 +45,8 @@ out =
            costF: 0.1305
 
 
-sol =
-    6.1758
-out = 
-  meanVarData with properties:
+sol = 6.1758
+out = meanVarData with properties:
 
            muhat: 6.1758
           sighat: 7.8647
@@ -70,10 +61,8 @@ out =
        confidInt: [6.1658 6.1858]
            costF: 1.2155
 
-sol =
-    6.2101
-out = 
-  meanVarData with properties:
+sol = 6.2101
+out = meanVarData with properties:
            muhat: 6.2101
           sighat: 7.9724
           nSigma: 1024
@@ -87,10 +76,8 @@ out =
        confidInt: [6.2001 6.2201]
            costF: 98.6143
 
-sol =
-    6.2087
-out = 
-  meanVarData with properties:
+sol = 6.2087
+out = meanVarData with properties:
            muhat: [6.1787 0.0274 0.0026]
           sighat: [7.8647 1.0169 0.2603]
           nSigma: 1024

@@ -12,9 +12,9 @@ def integrate(funObj,measureObj,distribObj,stopCritObj):
     dataObj,distribObj = stopCritObj.stopYet(funObj=funObj,distribObj=distribObj)
     while dataObj.stage != 'done': # the dataObj.stage property tells us where we are in the process
         dataObj = dataObj.updateData(distribObj,funObj) # compute additional data
-        dataObj,distribObj = stopCritObj.stopYet(dataObj,funObj) # update the status of the computation
+        dataObj,distribObj = stopCritObj.stopYet(dataObj,funObj,distribObj) # update the status of the computation
     solution = dataObj.solution  # assign outputs
-    datObj.timeUsed = time() - dataObj.timeStart
+    dataObj.timeUsed = time() - dataObj.timeStart
     return solution, dataObj
 
 if __name__ == "__main__":

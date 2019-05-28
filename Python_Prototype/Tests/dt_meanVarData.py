@@ -2,7 +2,7 @@
 >>> from meanVarData import meanVarData
 >>> mvd = meanVarData()
 >>> print(mvd)
-meanVarData with properties:
+Constructing accumData with properties:
     solution: nan
     stage: begin
     prevN: []
