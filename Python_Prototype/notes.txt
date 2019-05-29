@@ -8,6 +8,7 @@ General:
     * Python Keister's function example working (kinda) and Multilevel Asian Option example NOT working
     (Need to walk through both again throuroughly)
     - Improve function documentation (+ funciton parameter description)
+    - Update both readme files (html+md)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Files:
     accumData
