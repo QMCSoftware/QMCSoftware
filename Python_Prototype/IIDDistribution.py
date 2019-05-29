@@ -37,6 +37,10 @@ class IIDDistribution(discreteDistribution):
         return x,1,1/n
 
 if __name__ == "__main__":
+    # Supress DepricationWarning from randomstate
+    import warnings
+    warnings.simplefilter("ignore")
+
     import doctest
     x = doctest.testfile("Tests/dt_IIDDistribution.py")
     print("\n"+str(x))

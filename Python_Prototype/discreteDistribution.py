@@ -28,14 +28,12 @@ class discreteDistribution(ABC):
         """
         pass
     
-    # Below methods allow the distribution class to be treated like a list of distributions
-    def __len__(self):
-        return len(self.distrib_list)
+    # Magic Methods. Makes self[i]==self.distrib_list[i]
+    def __len__(self): return len(self.distrib_list)
     def __iter__(self):
-        for distribObj in self.distrib_lists:
+        for distribObj in self.distrib_list:
             yield distribObj
-    def __getitem__(self,i):
-        return self.distrib_list[i]
-    
-    def __repr__(self): return univ_repr(self)
+    def __getitem__(self,i): return self.distrib_list[i]
+    def __setitem__(self,i,val): self.distrib_list[i]=val
+    def __repr__(self): return univ_repr(self,'discreteDistribution','distrib_list')
 

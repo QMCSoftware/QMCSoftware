@@ -1,102 +1,102 @@
-sol = 2.1703
-meanVarData with properties:
-    solution: 2.17034550377918
+sol = 2.1698
+Constructing accumData with properties:
+    solution: 2.1697501419048626
     stage: done
     prevN: [1024]
-    nextN: [522169.]
-    timeUsed: 0.115692138671875
-    nSamplesUsed: [522169.]
-    confidInt: [2.1703455 2.1703455]
-    costF: [0.11096615]
+    nextN: [496260.]
+    timeUsed: 0.13065195083618164
+    nSamplesUsed: [496260.]
+    confidInt: [2.16975014 2.16975014]
+    costF: [0.11853169]
     _timeStart: None
-    muhat: [2.1703455]
+    muhat: [2.16975014]
     sighat: [0.]
     nSigma: 1024
-    nMu: [521145.]
-    timeStart: 1559074316.3083997
+    nMu: [495236.]
+    timeStart: 1559157159.6046503
 
-sol = 2.1703
-meanVarData with properties:
-    solution: 2.17034550377918
+sol = 2.1698
+Constructing accumData with properties:
+    solution: 2.1697501419048626
     stage: done
     prevN: [1024]
-    nextN: [522169.]
-    timeUsed: 0.11668729782104492
-    nSamplesUsed: [522169.]
-    confidInt: [2.1703455 2.1703455]
-    costF: [0.11096615]
+    nextN: [496260.]
+    timeUsed: 0.13164710998535156
+    nSamplesUsed: [496260.]
+    confidInt: [2.16975014 2.16975014]
+    costF: [0.11853169]
     _timeStart: None
-    muhat: [2.1703455]
+    muhat: [2.16975014]
     sighat: [0.]
     nSigma: 1024
-    nMu: [521145.]
-    timeStart: 1559074316.3083997
+    nMu: [495236.]
+    timeStart: 1559157159.6046503
 
-sol = 2.1703
-meanVarData with properties:
-    solution: 2.17034550377918
+sol = 2.1698
+Constructing accumData with properties:
+    solution: 2.1697501419048626
     stage: done
     prevN: [1024]
-    nextN: [522169.]
-    timeUsed: 0.11771130561828613
-    nSamplesUsed: [522169.]
-    confidInt: [2.1703455 2.1703455]
-    costF: [0.11096615]
+    nextN: [496260.]
+    timeUsed: 0.1326448917388916
+    nSamplesUsed: [496260.]
+    confidInt: [2.16975014 2.16975014]
+    costF: [0.11853169]
     _timeStart: None
-    muhat: [2.1703455]
+    muhat: [2.16975014]
     sighat: [0.]
     nSigma: 1024
-    nMu: [521145.]
-    timeStart: 1559074316.3083997
+    nMu: [495236.]
+    timeStart: 1559157159.6046503
 
-sol = 2.1703
-meanVarData with properties:
-    solution: 2.17034550377918
+sol = 2.1698
+Constructing accumData with properties:
+    solution: 2.1697501419048626
     stage: done
     prevN: [1024]
-    nextN: [522169.]
-    timeUsed: 0.11967992782592773
-    nSamplesUsed: [522169.]
-    confidInt: [2.1703455 2.1703455]
-    costF: [0.11096615]
+    nextN: [496260.]
+    timeUsed: 0.13364219665527344
+    nSamplesUsed: [496260.]
+    confidInt: [2.16975014 2.16975014]
+    costF: [0.11853169]
     _timeStart: None
-    muhat: [2.1703455]
+    muhat: [2.16975014]
     sighat: [0.]
     nSigma: 1024
-    nMu: [521145.]
-    timeStart: 1559074316.3083997
+    nMu: [495236.]
+    timeStart: 1559157159.6046503
 
-sol = 2.1703
-meanVarData with properties:
-    solution: 2.17034550377918
+sol = 2.1698
+Constructing accumData with properties:
+    solution: 2.1697501419048626
     stage: done
     prevN: [1024]
-    nextN: [522169.]
-    timeUsed: 0.12067747116088867
-    nSamplesUsed: [522169.]
-    confidInt: [2.1703455 2.1703455]
-    costF: [0.11096615]
+    nextN: [496260.]
+    timeUsed: 0.13463950157165527
+    nSamplesUsed: [496260.]
+    confidInt: [2.16975014 2.16975014]
+    costF: [0.11853169]
     _timeStart: None
-    muhat: [2.1703455]
+    muhat: [2.16975014]
     sighat: [0.]
     nSigma: 1024
-    nMu: [521145.]
-    timeStart: 1559074316.3083997
+    nMu: [495236.]
+    timeStart: 1559157159.6046503
 
-sol = 2.1703
-meanVarData with properties:
-    solution: 2.17034550377918
+sol = 2.1698
+Constructing accumData with properties:
+    solution: 2.1697501419048626
     stage: done
     prevN: [1024]
-    nextN: [522169.]
-    timeUsed: 0.12170147895812988
-    nSamplesUsed: [522169.]
-    confidInt: [2.1703455 2.1703455]
-    costF: [0.11096615]
+    nextN: [496260.]
+    timeUsed: 0.1356368064880371
+    nSamplesUsed: [496260.]
+    confidInt: [2.16975014 2.16975014]
+    costF: [0.11853169]
     _timeStart: None
-    muhat: [2.1703455]
+    muhat: [2.16975014]
     sighat: [0.]
     nSigma: 1024
-    nMu: [521145.]
-    timeStart: 1559074316.3083997
+    nMu: [495236.]
+    timeStart: 1559157159.6046503
 

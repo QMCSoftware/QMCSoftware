@@ -82,15 +82,13 @@ class measure():
             self.measure_list[i].measureName = 'BrownianMotion'
         return self
 
-    # Below methods allow the measure class to be treated like a list of measures
-    def __len__(self):
-        return len(self.measure_list)
+    # Magic Methods. Makes self[i]==self.measure_list[i]
+    def __len__(self): return len(self.measure_list)
     def __iter__(self):
         for measureObj in self.measure_list:
             yield measureObj
-    def __getitem__(self,i):
-        return self.measure_list[i]
-    
+    def __getitem__(self,i): return self.measure_list[i]
+    def __setitem__(self,i,val): self.measure_list[i] = val
     def __repr__(self): return univ_repr(self,'measure','measure_list')
 
 if __name__ == "__main__":

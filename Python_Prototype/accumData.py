@@ -27,5 +27,6 @@ class accumData(ABC):
     def updateData(self, distribObj, fun_obj, decompType):  # update the accumulated data
         pass
     
+    # Magic Method
     def __repr__(self): return univ_repr(self,'accumData')
         
