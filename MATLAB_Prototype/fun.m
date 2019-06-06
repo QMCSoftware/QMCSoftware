@@ -1,4 +1,4 @@
-classdef fun
+classdef (Abstract) fun
 % §\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$§
 properties 
    f %function handle of integrand after transformation

@@ -1,102 +1,102 @@
-sol = 2.1698
+sol = 2.1679
 Constructing accumData with properties:
-    solution: 2.1697501419048626
+    solution: 2.16786718664357
     stage: done
     prevN: [1024]
-    nextN: [496260.]
-    timeUsed: 0.13065195083618164
-    nSamplesUsed: [496260.]
-    confidInt: [2.16975014 2.16975014]
-    costF: [0.11853169]
+    nextN: [478407.]
+    timeUsed: 0.1406233310699463
+    nSamplesUsed: [478407.]
+    confidInt: [2.16786719 2.16786719]
+    costF: [0.12498092]
     _timeStart: None
-    muhat: [2.16975014]
+    muhat: [2.16786719]
     sighat: [0.]
     nSigma: 1024
-    nMu: [495236.]
-    timeStart: 1559157159.6046503
+    nMu: [477383.]
+    timeStart: 1559857710.2411723
 
-sol = 2.1698
+sol = 2.1679
 Constructing accumData with properties:
-    solution: 2.1697501419048626
+    solution: 2.16786718664357
     stage: done
     prevN: [1024]
-    nextN: [496260.]
-    timeUsed: 0.13164710998535156
-    nSamplesUsed: [496260.]
-    confidInt: [2.16975014 2.16975014]
-    costF: [0.11853169]
+    nextN: [478407.]
+    timeUsed: 0.14261817932128906
+    nSamplesUsed: [478407.]
+    confidInt: [2.16786719 2.16786719]
+    costF: [0.12498092]
     _timeStart: None
-    muhat: [2.16975014]
+    muhat: [2.16786719]
     sighat: [0.]
     nSigma: 1024
-    nMu: [495236.]
-    timeStart: 1559157159.6046503
+    nMu: [477383.]
+    timeStart: 1559857710.2411723
 
-sol = 2.1698
+sol = 2.1679
 Constructing accumData with properties:
-    solution: 2.1697501419048626
+    solution: 2.16786718664357
     stage: done
     prevN: [1024]
-    nextN: [496260.]
-    timeUsed: 0.1326448917388916
-    nSamplesUsed: [496260.]
-    confidInt: [2.16975014 2.16975014]
-    costF: [0.11853169]
+    nextN: [478407.]
+    timeUsed: 0.1436154842376709
+    nSamplesUsed: [478407.]
+    confidInt: [2.16786719 2.16786719]
+    costF: [0.12498092]
     _timeStart: None
-    muhat: [2.16975014]
+    muhat: [2.16786719]
     sighat: [0.]
     nSigma: 1024
-    nMu: [495236.]
-    timeStart: 1559157159.6046503
+    nMu: [477383.]
+    timeStart: 1559857710.2411723
 
-sol = 2.1698
+sol = 2.1679
 Constructing accumData with properties:
-    solution: 2.1697501419048626
+    solution: 2.16786718664357
     stage: done
     prevN: [1024]
-    nextN: [496260.]
-    timeUsed: 0.13364219665527344
-    nSamplesUsed: [496260.]
-    confidInt: [2.16975014 2.16975014]
-    costF: [0.11853169]
+    nextN: [478407.]
+    timeUsed: 0.14561033248901367
+    nSamplesUsed: [478407.]
+    confidInt: [2.16786719 2.16786719]
+    costF: [0.12498092]
     _timeStart: None
-    muhat: [2.16975014]
+    muhat: [2.16786719]
     sighat: [0.]
     nSigma: 1024
-    nMu: [495236.]
-    timeStart: 1559157159.6046503
+    nMu: [477383.]
+    timeStart: 1559857710.2411723
 
-sol = 2.1698
+sol = 2.1679
 Constructing accumData with properties:
-    solution: 2.1697501419048626
+    solution: 2.16786718664357
     stage: done
     prevN: [1024]
-    nextN: [496260.]
-    timeUsed: 0.13463950157165527
-    nSamplesUsed: [496260.]
-    confidInt: [2.16975014 2.16975014]
-    costF: [0.11853169]
+    nextN: [478407.]
+    timeUsed: 0.1466066837310791
+    nSamplesUsed: [478407.]
+    confidInt: [2.16786719 2.16786719]
+    costF: [0.12498092]
     _timeStart: None
-    muhat: [2.16975014]
+    muhat: [2.16786719]
     sighat: [0.]
     nSigma: 1024
-    nMu: [495236.]
-    timeStart: 1559157159.6046503
+    nMu: [477383.]
+    timeStart: 1559857710.2411723
 
-sol = 2.1698
+sol = 2.1679
 Constructing accumData with properties:
-    solution: 2.1697501419048626
+    solution: 2.16786718664357
     stage: done
     prevN: [1024]
-    nextN: [496260.]
-    timeUsed: 0.1356368064880371
-    nSamplesUsed: [496260.]
-    confidInt: [2.16975014 2.16975014]
-    costF: [0.11853169]
+    nextN: [478407.]
+    timeUsed: 0.14760470390319824
+    nSamplesUsed: [478407.]
+    confidInt: [2.16786719 2.16786719]
+    costF: [0.12498092]
     _timeStart: None
-    muhat: [2.16975014]
+    muhat: [2.16786719]
     sighat: [0.]
     nSigma: 1024
-    nMu: [495236.]
-    timeStart: 1559157159.6046503
+    nMu: [477383.]
+    timeStart: 1559857710.2411723
 

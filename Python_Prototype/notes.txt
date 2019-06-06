@@ -9,6 +9,8 @@ General:
     (Need to walk through both again throuroughly)
     - Improve function documentation (+ funciton parameter description)
     - Update both readme files (html+md)
+
+    - Check random number generators in python vs MATLAB
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Files:
     accumData

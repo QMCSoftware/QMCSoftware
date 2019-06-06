@@ -19,7 +19,7 @@ def output(sol,dataObj):
     print('\n'+s)
     f.write(s+'\n\n')
 
-'''An example with Keister's function integrated with respect to the uniform distribution over the unit cube'''
+''' An example with Keister's function integrated with respect to the uniform distribution over the unit cube '''
 dim = 3 # dimension for the Keister Example
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim])) # IID sampling
