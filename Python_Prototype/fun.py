@@ -40,7 +40,7 @@ class fun(ABC):
                 self[ii].f = lambda xu,coordIndex: self[ii].g(xu*(this_variance)**.5,coordIndex)
             elif msrObj[ii].measureName=='BrownianMotion' and dstrObj[ii].trueD.measureName=='stdGaussian':
                 timeDiff = msrObj[ii].measureData['timeVector']
-                self[ii].f = lambda xu,coordIndex: self[ii].g(cumsum(xu*(timeDiff)**.5,0),coordIndex)
+                self[ii].f = lambda xu,coordIndex: self[ii].g(cumsum(xu* timeDiff**.5,1),coordIndex)
             else:
                 raise Exception("Variable transformation not performed")
         return self
