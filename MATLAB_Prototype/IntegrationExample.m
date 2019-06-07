@@ -11,7 +11,6 @@ stopObj.absTol = 1e-3; %decrease tolerance
 stopObj.absTol = 0; %impossible tolerance
 stopObj.nMax = 1e6; %calculation limited by sample budget
 [sol, out] = integrate(KeisterFun, measureObj, distribObj, stopObj)
-return 
 
 %A multilevel example of Asian option pricing
 stopObj.absTol = 0.01; %increase tolerance

@@ -1,102 +1,51 @@
-sol = 2.1679
+sol = 2.1697
 Constructing accumData with properties:
-    solution: 2.16786718664357
+    solution: 2.1696720089545134
     stage: done
     prevN: [1024]
-    nextN: [478407.]
-    timeUsed: 0.1406233310699463
-    nSamplesUsed: [478407.]
-    confidInt: [2.16786719 2.16786719]
-    costF: [0.12498092]
+    nextN: [497430.]
+    timeUsed: 0.10372209548950195
+    nSamplesUsed: [497430.]
+    confidInt: [2.15967201 2.179672  ]
+    costF: [0.09890626]
     _timeStart: None
-    muhat: [2.16786719]
-    sighat: [0.]
+    muhat: [2.16967201]
+    sighat: [2.27939719]
     nSigma: 1024
-    nMu: [477383.]
-    timeStart: 1559857710.2411723
+    nMu: [496406.]
+    timeStart: 1559871682.3431163
+
+sol = 2.1684
+Constructing accumData with properties:
+    solution: 2.1683684128541745
+    stage: done
+    prevN: [1024]
+    nextN: [51586132.]
+    timeUsed: 14.76673150062561
+    nSamplesUsed: [51586132.]
+    confidInt: [2.16736841 2.16936841]
+    costF: [14.48584]
+    _timeStart: None
+    muhat: [2.16836841]
+    sighat: [2.32361325]
+    nSigma: 1024
+    nMu: [51585108.]
+    timeStart: 1559871682.447835
 
 sol = 2.1679
 Constructing accumData with properties:
-    solution: 2.16786718664357
+    solution: 2.1678681274479983
     stage: done
     prevN: [1024]
-    nextN: [478407.]
-    timeUsed: 0.14261817932128906
-    nSamplesUsed: [478407.]
-    confidInt: [2.16786719 2.16786719]
-    costF: [0.12498092]
+    nextN: [1000000.]
+    timeUsed: 0.23636817932128906
+    nSamplesUsed: [1000000.]
+    confidInt: [2.16091382 2.17482243]
+    costF: [0.22097764]
     _timeStart: None
-    muhat: [2.16786719]
-    sighat: [0.]
+    muhat: [2.16786813]
+    sighat: [2.24870758]
     nSigma: 1024
-    nMu: [477383.]
-    timeStart: 1559857710.2411723
-
-sol = 2.1679
-Constructing accumData with properties:
-    solution: 2.16786718664357
-    stage: done
-    prevN: [1024]
-    nextN: [478407.]
-    timeUsed: 0.1436154842376709
-    nSamplesUsed: [478407.]
-    confidInt: [2.16786719 2.16786719]
-    costF: [0.12498092]
-    _timeStart: None
-    muhat: [2.16786719]
-    sighat: [0.]
-    nSigma: 1024
-    nMu: [477383.]
-    timeStart: 1559857710.2411723
-
-sol = 2.1679
-Constructing accumData with properties:
-    solution: 2.16786718664357
-    stage: done
-    prevN: [1024]
-    nextN: [478407.]
-    timeUsed: 0.14561033248901367
-    nSamplesUsed: [478407.]
-    confidInt: [2.16786719 2.16786719]
-    costF: [0.12498092]
-    _timeStart: None
-    muhat: [2.16786719]
-    sighat: [0.]
-    nSigma: 1024
-    nMu: [477383.]
-    timeStart: 1559857710.2411723
-
-sol = 2.1679
-Constructing accumData with properties:
-    solution: 2.16786718664357
-    stage: done
-    prevN: [1024]
-    nextN: [478407.]
-    timeUsed: 0.1466066837310791
-    nSamplesUsed: [478407.]
-    confidInt: [2.16786719 2.16786719]
-    costF: [0.12498092]
-    _timeStart: None
-    muhat: [2.16786719]
-    sighat: [0.]
-    nSigma: 1024
-    nMu: [477383.]
-    timeStart: 1559857710.2411723
-
-sol = 2.1679
-Constructing accumData with properties:
-    solution: 2.16786718664357
-    stage: done
-    prevN: [1024]
-    nextN: [478407.]
-    timeUsed: 0.14760470390319824
-    nSamplesUsed: [478407.]
-    confidInt: [2.16786719 2.16786719]
-    costF: [0.12498092]
-    _timeStart: None
-    muhat: [2.16786719]
-    sighat: [0.]
-    nSigma: 1024
-    nMu: [477383.]
-    timeStart: 1559857710.2411723
+    nMu: [998976.]
+    timeStart: 1559871697.219553
 

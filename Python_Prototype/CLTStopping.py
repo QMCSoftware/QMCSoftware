@@ -1,6 +1,5 @@
 from time import time
-from numpy import zeros, full, inf, sqrt, ones, kron, divide, square, array, matmul,maximum,minimum,tile
-from math import ceil
+from numpy import zeros, full, inf, sqrt, ones, kron, divide, square, array, matmul,maximum,minimum,tile,ceil
 from scipy.stats import norm
 import sys
 
@@ -16,7 +15,8 @@ class CLTStopping(stoppingCriterion):
         self.inflate = 1.2  # inflation factor
         self.alpha = 0.01
 
-    def stopYet(self, dataObj=meanVarData(), funObj=[], distribObj=[]):
+    def stopYet(self, dataObj=None, funObj=[], distribObj=[]):
+        if dataObj==None: dataObj=meanVarData()
         if dataObj.stage == 'begin':  # initialize
             dataObj.timeStart = time()  # keep track of time
             if type(distribObj).__name__ not in self.discDistAllowed:

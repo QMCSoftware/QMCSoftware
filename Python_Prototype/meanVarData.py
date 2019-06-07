@@ -10,17 +10,17 @@ class meanVarData(accumData):
     '''
     def __init__(self):
         super().__init__()
-        self.muhat = array([]) # sample mean
-        self.sighat = array([]) # sample standard deviation
-        self.nSigma = array([]) # number of samples used to compute the sample standard deviation
-        self.nMu = array([])  # number of samples used to compute the sample mean
+        self.muhat = None # sample mean
+        self.sighat = None # sample standard deviation
+        self.nSigma = None # number of samples used to compute the sample standard deviation
+        self.nMu = None  # number of samples used to compute the sample mean
 
     def updateData(self, distribObj, funObj):
         nf = len(funObj)
-        self.solution = zeros(nf)
-        self.muhat = zeros(nf)
-        self.sighat = zeros(nf)
-        self.costF = zeros(nf)
+        if not self.solution: self.solution = zeros(nf)
+        if not self.muhat: self.muhat = zeros(nf)
+        if not self.sighat: self.sighat = zeros(nf)
+        if not self.costF: self.costF = zeros(nf)
         for ii in range(nf):
             tStart = clock()  # time the function values
             dim = distribObj[ii].trueD.dimension

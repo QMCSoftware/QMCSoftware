@@ -27,14 +27,25 @@ stopObj = CLTStopping() # stopping criterion for IID sampling using the Central 
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
 output(sol,out)
 
+# Same example as above but with decreased tolerance
+dim = 3
+measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
+distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]))
+stopObj = CLTStopping()
 stopObj.absTol = 1e-3 # decrease tolerance
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
 output(sol,out)
 
+# Same example as above but with impossible tolerance and calculation limited by sample budget 
+dim = 3
+measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
+distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]))
+stopObj = CLTStopping()
 stopObj.absTol = 0 # impossible tolerance
 stopObj.nMax = 1e6 # calculation limited by sample budget
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
 output(sol,out)
+
 
 ''' A multilevel example of Asian option pricing '''
 stopObj.absTol = 0.01 # increase tolerence
