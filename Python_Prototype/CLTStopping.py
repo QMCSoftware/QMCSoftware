@@ -1,3 +1,4 @@
+''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import time
 from numpy import zeros, full, inf, sqrt, ones, kron, divide, square, array, matmul,maximum,minimum,tile,ceil
 from scipy.stats import norm

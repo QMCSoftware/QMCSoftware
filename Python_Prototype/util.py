@@ -1,3 +1,5 @@
+''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
+
 def univ_repr(self,obj_s,objList_s=None):
     '''
     clean way to represent object data

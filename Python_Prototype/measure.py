@@ -1,3 +1,4 @@
+''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from numpy import array,arange
 from util import univ_repr
 

@@ -1,3 +1,4 @@
+''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from abc import ABC, abstractmethod
 import numpy as np
 from util import univ_repr
