@@ -1,7 +1,10 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from discreteDistribution import discreteDistribution
-from randomstate.prng import mrg32k3a
 from numpy import arange
+# 2 possible RNGs
+from randomstate.prng import mrg32k3a
+from numpy.random import RandomState
+
 
 class IIDDistribution(discreteDistribution):
     '''
@@ -22,7 +25,8 @@ class IIDDistribution(discreteDistribution):
     def initStreams(self):
         nObj = len(self)
         for ii in range(nObj):
-            self[ii].stream = mrg32k3a.RandomState() # Throws warning
+            # self[ii].stream = mrg32k3a.RandomState() # Throws warning
+            self[ii].stream = RandomState()
         return self
 
     def genDistrib(self,nStart,nEnd,n,coordIndex=[None]):
@@ -30,9 +34,12 @@ class IIDDistribution(discreteDistribution):
             self.coordIndex = arange(1,self.trueD.dimension+1)
         nPts = nEnd - nStart + 1  # how many points to be generated
         if self.trueD.measureName=='stdUniform': # generate uniform points
-            x = self.stream.rand(int(nPts),len(coordIndex))  # nodes
+            # nodes
+            # x = self.stream.rand(int(nPts),len(coordIndex))  
+            x = self.stream.rand(int(nPts),len(coordIndex))
         elif self.trueD.measureName=='stdGaussian': # standard normal points
-            x = self.stream.randn(int(nPts),len(coordIndex))  # nodes
+            # x = self.stream.randn(int(nPts),len(coordIndex))  # nodes
+            x = self.stream.randn(int(nPts),len(coordIndex))
         else:
             raise Exception('Distribution not recognized')
         return x,1,1/n
