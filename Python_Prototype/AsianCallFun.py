@@ -5,7 +5,7 @@ from numpy.linalg import eig
 from scipy.sparse import spdiags
 
 class AsianCallFun(fun):
-    ''' Specify and generate payoff values of an Asian Call option. '''
+    ''' Specify and generate payoff values of an Asian Call option'''
     def __init__(self,BMmeasure=None):
         super().__init__()
         self.volatility = 0.5

@@ -12,7 +12,7 @@ def integrate(funObj, distribObj, stopCritObj, datObj=[]):
         datObj.updateData(distribObj, funObj)  # compute additional data
         [datObj, distribObj] = stopCritObj.stopYet(datObj, funObj, distribObj)  # update the status of the computation
     solution = datObj.solution  # assign outputs
-    datObj.timeUsed = time() - datObj.timeStart
+    datObj.timeUsed = time() - datObj._timeStart
     return solution, datObj
 
 

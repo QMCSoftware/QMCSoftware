@@ -10,8 +10,8 @@ from meanVarData import meanVarData
 class CLTStopping(stoppingCriterion):
     ''' Stopping criterion based on the Centeral Limit Theorem. '''
     def __init__(self):
-        discDistAllowed = ["IIDDistribution"]
-        decompTypeAllowed = ["single", "multi"]
+        discDistAllowed = ["IIDDistribution"] # which discrete distributions are supported
+        decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
         super().__init__(discDistAllowed,decompTypeAllowed)
         self.inflate = 1.2  # inflation factor
         self.alpha = 0.01
@@ -19,7 +19,7 @@ class CLTStopping(stoppingCriterion):
     def stopYet(self, dataObj=None, funObj=[], distribObj=[]):
         if dataObj==None: dataObj=meanVarData()
         if dataObj.stage == 'begin':  # initialize
-            dataObj.timeStart = time()  # keep track of time
+            dataObj._timeStart = time()  # keep track of time
             if type(distribObj).__name__ not in self.discDistAllowed:
                 raise Exception('Stopping criterion not compatible with sampling distribution')
             nf=len(funObj)
@@ -46,7 +46,7 @@ class CLTStopping(stoppingCriterion):
             errBar = self.get_quantile() * self.inflate * (dataObj.sighat**2 / dataObj.nMu).sum(0)**.5
             dataObj.confidInt = dataObj.solution + errBar * array([-1, 1])
             dataObj.stage = 'done'  # finished with computation
-        dataObj.timeUsed = time() - dataObj.timeStart
+        dataObj.timeUsed = time() - dataObj._timeStart
         return dataObj, distribObj
     
     def get_quantile(self):

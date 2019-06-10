@@ -8,6 +8,7 @@ class KeisterFun(fun):
     The standard example integrates the Keister function with respect to an IID Gaussian distribution with variance 1/2
     B. D. Keister, Multidimensional Quadrature Algorithms, Â§\mcommentfont \emph{Computers in Physics}, \textbf{10}, pp.\ 119-122, 1996.Â§
     '''
+    
     def __init__(self):
         super().__init__()
         

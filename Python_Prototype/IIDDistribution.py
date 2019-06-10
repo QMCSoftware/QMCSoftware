@@ -5,13 +5,12 @@ from numpy import arange
 from randomstate.prng import mrg32k3a
 from numpy.random import RandomState
 
-
 class IIDDistribution(discreteDistribution):
     '''
     Specifies and generates the components of $\frac 1n \sum_{i=1}^n \delta_{\vx_i}(\cdot)$
     where the $\vx_i$ are IIDDistribution uniform on $[0,1]^d$ or IIDDistribution standard Gaussian
     '''
-
+    
     def __init__(self,distribData=None,trueD=None):
         state = []
         super().__init__(distribData,state,trueD=trueD)

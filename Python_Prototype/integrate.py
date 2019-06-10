@@ -15,7 +15,7 @@ def integrate(funObj,measureObj,distribObj,stopCritObj):
         dataObj = dataObj.updateData(distribObj,funObj) # compute additional data
         dataObj,distribObj = stopCritObj.stopYet(dataObj,funObj,distribObj) # update the status of the computation
     solution = dataObj.solution  # assign outputs
-    dataObj.timeUsed = time() - dataObj.timeStart
+    dataObj.timeUsed = time() - dataObj._timeStart
     return solution, dataObj
 
 if __name__ == "__main__":

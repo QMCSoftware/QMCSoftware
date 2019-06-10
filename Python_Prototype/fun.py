@@ -4,7 +4,11 @@ from numpy import sqrt,cumsum
 from util import univ_repr
 
 class fun(ABC):
-    ''' Specify and generate values $f(\vx)$ for $\vx \in \cx$ '''
+    '''
+    Specify and generate values $f(\vx)$ for $\vx \in \cx$
+        Any sublcass of fun must include:
+            Methods: g(self,x,coordIndex)
+    '''
     
     def __init__(self):
         super().__init__()

@@ -8,6 +8,9 @@ from measure import measure
 class discreteDistribution(ABC):
     '''
     Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
+        Any sublcass of discreteDistribution must include:
+            Methods: genDistrib(self,nStart,nEnd,n,coordIndex)
+            Properties: distribData,state,trueD
     '''
     def __init__(self,distribData,state,trueD=measure().stdUniform()):
         super().__init__()

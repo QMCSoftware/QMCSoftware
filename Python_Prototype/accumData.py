@@ -4,12 +4,11 @@ from math import inf, nan
 from numpy import array
 from util import univ_repr
 
-# Accumulated data required in the computation of the integral
 class accumData(ABC):
     '''
-    Any sublcass of accumData must include:
-        Properties: timeStart
-        Methods: updateData(self, distribObj, fun_obj, decompType)
+    Accumulated data required in the computation of the integral
+        Any sublcass of accumData must include:
+            Methods: updateData(self, distribObj, fun_obj, decompType)
     '''
     def __init__(self):
         super().__init__()
@@ -21,7 +20,7 @@ class accumData(ABC):
         self.nSamplesUsed = array([])  # number of samples used so far
         self.confidInt = array([-inf, inf])  # error bound on the solution
         self.costF = array([])  # time required to compute function values
-        self._timeStart = None
+        self._timeStart = None # hidden/private
 
     # Abstract Methods
     @abstractmethod
