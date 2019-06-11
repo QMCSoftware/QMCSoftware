@@ -1,10 +1,7 @@
+''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 # Integrating a function using our community QMC framework
 
 from numpy import arange
-import sys
-# Supress ALL warning from RandomState package
-import warnings
-warnings.simplefilter("ignore")#,category=RandomStateDeprecationWarning)
 
 from CLTStopping import CLTStopping
 from IIDDistribution import IIDDistribution
@@ -48,6 +45,7 @@ output(sol,out)
 
 
 ''' A multilevel example of Asian option pricing '''
+stopObj = CLTStopping()
 stopObj.absTol = 0.01 # increase tolerence
 stopObj.nMax = 1e8 # pushing the sample budget back up
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4)])
@@ -56,12 +54,14 @@ distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4])) # IID s
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
+stopObj = CLTStopping()
 measureObj = measure().BrownianMotion(timeVector=[arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # 64 time steps
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[64])) # IID sampling
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
+stopObj = CLTStopping()
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # multi-level
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64])) # IID sampling

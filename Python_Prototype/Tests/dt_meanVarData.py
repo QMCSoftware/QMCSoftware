@@ -12,9 +12,9 @@ Constructing accumData with properties:
     confidInt: [-inf  inf]
     costF: []
     _timeStart: None
-    muhat: []
-    sighat: []
-    nSigma: []
-    nMu: []
+    muhat: None
+    sighat: None
+    nSigma: None
+    nMu: None
 
 """

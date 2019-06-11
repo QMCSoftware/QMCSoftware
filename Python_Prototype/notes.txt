@@ -1,4 +1,7 @@
 General: 
+    - lambda functions in transformations
+    - meanVarData __init__
+
     * Got rid of abstract properties and instead made them part of the abstract class constructor 
     - Why do some functions return objects?
         - Python doesn't copy object instance when passed into funciton, so we may be able to delete that in python version

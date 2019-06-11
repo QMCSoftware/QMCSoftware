@@ -1,23 +1,23 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
+from numpy import array,zeros,floor,log10,tile,full,inf
 from time import time
-from numpy import zeros, full, inf, sqrt, ones, kron, divide, square, array, matmul,maximum,minimum,tile,ceil
 from scipy.stats import norm
-import sys
 
-from stoppingCriterion import stoppingCriterion
 from meanVarData import meanVarData
+from stoppingCriterion import stoppingCriterion
 
-class CLTStopping(stoppingCriterion):
-    ''' Stopping criterion based on the Centeral Limit Theorem. '''
+class CompVarStopping(stoppingCriterion):
+    ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''
     def __init__(self):
-        discDistAllowed = ["IIDDistribution"] # which discrete distributions are supported
-        decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
+        discDistAllowed = ["IIDDistribution"]
+        decompTypeAllowed = ["single", "multi"]
         super().__init__(discDistAllowed,decompTypeAllowed)
-        self.inflate = 1.2  # inflation factor
+        self.nInit = 1000
+        self.inflate = 1.2
         self.alpha = 0.01
-
-    def stopYet(self, dataObj=None, funObj=[], distribObj=[]):
-        if dataObj==None: dataObj=meanVarData(len(funObj))
+        
+    def stopYet(self,dataObj=None,funObj=[],distribObj=[]):
+        if dataObj==None: dataObj=meanVarData()
         if dataObj.stage == 'begin':  # initialize
             dataObj._timeStart = time()  # keep track of time
             if type(distribObj).__name__ not in self.discDistAllowed:
@@ -33,13 +33,10 @@ class CLTStopping(stoppingCriterion):
             dataObj.stage = 'sigma'  # compute standard deviation next
         elif dataObj.stage == 'sigma':
             dataObj.prevN = dataObj.nextN  # update place in the sequence
-            tempA = (dataObj.costF)**.5  # use cost of function values to decide how to allocate
-            tempB = (tempA * dataObj.sighat).sum(0)  # samples for computation of the mean            
-            nM = ceil(tempB*(self.get_quantile()*self.inflate / max(self.absTol, dataObj.solution*self.relTol))**2
-                * (dataObj.sighat/dataObj.costF**.5))
-            dataObj.nMu = minimum(maximum(dataObj.nextN,nM),self.nMax-dataObj.prevN)
-            dataObj.nextN = dataObj.nMu + dataObj.prevN
-            dataObj.stage = 'mu'  # compute sample mean next
+            if any(dataObj.sighat) > self.absTol and dataObj.prevN*10 <= self.nMax: # try again with 10x more samples
+                dataObj.nextN = dataObj.prevN*10
+            else:
+                dataObj.stage = 'mu'
         elif dataObj.stage == 'mu':
             dataObj.solution = dataObj.muhat.sum(0)
             dataObj.nSamplesUsed = dataObj.nextN
@@ -48,7 +45,7 @@ class CLTStopping(stoppingCriterion):
             dataObj.stage = 'done'  # finished with computation
         dataObj.timeUsed = time() - dataObj._timeStart
         return dataObj, distribObj
-    
+
     def get_quantile(self):
         # dependent property
         return -norm.ppf(self.alpha / 2)
@@ -56,5 +53,4 @@ class CLTStopping(stoppingCriterion):
 if __name__ == "__main__":
     # Run Doctests
     import doctest
-    x = doctest.testfile("Tests/dt_CLTStopping.py")
-    print("\n" + str(x))
+    print('Still need to write doctest for this')

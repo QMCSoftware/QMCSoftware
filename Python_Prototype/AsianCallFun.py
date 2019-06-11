@@ -30,9 +30,9 @@ class AsianCallFun(fun):
         AvgFine = ((self.S0/2)+SFine[:,:self.dimension-1].sum(1)+SFine[:,self.dimension-1]/2)/self.dimension
         y = maximum(AvgFine-self.K,0)
         if self.dimFac > 0:
-            Scourse = SFine[:,self.dimFac-1::self.dimFac]
+            Scourse = SFine[:,int(self.dimFac-1)::int(self.dimFac)]
             dCourse = self.dimension/self.dimFac
-            AvgCourse = ((self.S0/2)+Scourse[:,:dCourse-1].sum(1)+Scourse[:,dCourse-1]/2)/dCourse
+            AvgCourse = ((self.S0/2)+Scourse[:,:int(dCourse)-1].sum(1)+Scourse[:,int(dCourse)-1]/2)/dCourse
             y = y-maximum(AvgCourse-self.K,0)
         return y
 

@@ -10,20 +10,16 @@ class meanVarData(accumData):
     stores the sample mean and variance of function values
     '''
     
-    def __init__(self):
+    def __init__(self,nf):
+        ''' nf = # functions '''
         super().__init__()
-        self.muhat = None # sample mean
-        self.sighat = None # sample standard deviation
-        self.nSigma = None # number of samples used to compute the sample standard deviation
-        self.nMu = None  # number of samples used to compute the sample mean
+        self.muhat = zeros(nf) # sample mean
+        self.sighat = zeros(nf) # sample standard deviation
+        self.nSigma = zeros(nf) # number of samples used to compute the sample standard deviation
+        self.nMu = zeros(nf)  # number of samples used to compute the sample mean
 
     def updateData(self, distribObj, funObj):
-        nf = len(funObj)
-        if not self.solution: self.solution = zeros(nf)
-        if not self.muhat: self.muhat = zeros(nf)
-        if not self.sighat: self.sighat = zeros(nf)
-        if not self.costF: self.costF = zeros(nf)
-        for ii in range(nf):
+        for ii in range(len(funObj)):
             tStart = clock()  # time the function values
             dim = distribObj[ii].trueD.dimension
             distribData,*ignore = distribObj[ii].genDistrib(self.prevN[ii]+1,self.prevN[ii]+self.nextN[ii],self.nextN[ii],arange(1,dim+1))

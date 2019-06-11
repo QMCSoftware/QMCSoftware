@@ -1,6 +1,6 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from abc import ABC, abstractmethod
-from numpy import sqrt,cumsum
+from numpy import sqrt,cumsum,diff,insert
 from util import univ_repr
 
 class fun(ABC):
@@ -39,13 +39,13 @@ class fun(ABC):
         for ii in range(len(self)):
             self[ii].dimension = dstrObj[ii].trueD.dimension # the function needs the dimension also
             if msrObj[ii].measureName==dstrObj[ii].trueD.measureName:
-                self[ii].f = lambda xu,coordIdex: self[ii].g(xu,coordIdex)
+                self[ii].f = lambda xu,coordIdex,i=ii: self[i].g(xu,coordIdex)
             elif msrObj[ii].measureName=='IIDZMeanGaussian' and dstrObj[ii].trueD.measureName=='stdGaussian': # multiply by the likelihood ratio
-                this_variance = msrObj[ii].measureData['variance']
-                self[ii].f = lambda xu,coordIndex: self[ii].g(xu*(this_variance)**.5,coordIndex)
+                this_var = msrObj[ii].measureData['variance']
+                self[ii].f = lambda xu,coordIndex,var=this_var,i=ii: self[i].g(xu*(var)**.5,coordIndex)
             elif msrObj[ii].measureName=='BrownianMotion' and dstrObj[ii].trueD.measureName=='stdGaussian':
-                timeDiff = msrObj[ii].measureData['timeVector']
-                self[ii].f = lambda xu,coordIndex: self[ii].g(cumsum(xu* timeDiff**.5,1),coordIndex)
+                timeDiff = diff(insert(msrObj[ii].measureData['timeVector'],0,0))
+                self[ii].f = lambda xu,coordIndex,timeDiff=timeDiff,i=ii: self[i].g(cumsum(xu* timeDiff **.5,1),coordIndex)
             else:
                 raise Exception("Variable transformation not performed")
         return self
