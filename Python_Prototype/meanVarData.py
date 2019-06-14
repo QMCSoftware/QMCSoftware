@@ -22,7 +22,7 @@ class meanVarData(accumData):
         for ii in range(len(funObj)):
             tStart = clock()  # time the function values
             dim = distribObj[ii].trueD.dimension
-            distribData,*ignore = distribObj[ii].genDistrib(self.prevN[ii]+1,self.prevN[ii]+self.nextN[ii],self.nextN[ii],arange(1,dim+1))
+            distribData = distribObj[ii].genDistrib(self.nextN[ii],dim)
             y = funObj[ii].f(distribData,arange(1,dim+1))
             self.costF[ii] = clock() - tStart  # to be used for multi-level methods
             if self.stage == 'sigma':

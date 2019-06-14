@@ -48,7 +48,9 @@ distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4])) # IID s
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
-stopObj = CLTStopping()
+# The following occasionally runs into memory errors
+
+stopObj = CLTStopping(absTol=.1)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # 64 time steps
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[64])) # IID sampling

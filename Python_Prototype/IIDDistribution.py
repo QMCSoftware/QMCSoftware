@@ -1,8 +1,8 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from discreteDistribution import discreteDistribution
-from numpy import arange
-# 2 possible RNGs
-from numpy.random import RandomState
+from numpy import arange,log
+from numpy.random import rand,randn
+from latticeseq_b2 import get_lattice_b2
 
 class IIDDistribution(discreteDistribution):
     '''
@@ -19,30 +19,19 @@ class IIDDistribution(discreteDistribution):
             for i in range(len(self)):
                 self[i].trueD = self.trueD[i]
                 self[i].distribData = self.distribData[i] if self.distribData else None
-        
-    def initStreams(self):
-        nObj = len(self)
-        for ii in range(nObj):
-            self[ii].stream = RandomState()
-        return self
 
-    def genDistrib(self,nStart,nEnd,n,coordIndex=[None]):
-        if not any(coordIndex):
-            self.coordIndex = arange(1,self.trueD.dimension+1)
-        nPts = nEnd - nStart + 1  # how many points to be generated
+    def genDistrib(self,n,m,j=1):
         if self.trueD.measureName=='stdUniform': # generate uniform points
-            x = self.stream.rand(int(nPts),len(coordIndex)) # nodes
+            return rand(int(n),int(m))
         elif self.trueD.measureName=='stdGaussian': # standard normal points
-            x = self.stream.randn(int(nPts),len(coordIndex)) # nodes
+            return randn(int(n),int(m))
+        elif self.trueD.measureName=='latticeseq_b2':
+            x = get_lattice_b2(int(log(n)/log(2)),int(m))
+            return [x+rand(m) for i in range(j)]
         else:
             raise Exception('Distribution not recognized')
-        return x,1,1/n
 
 if __name__ == "__main__":
-    # Supress DepricationWarning from randomstate
-    import warnings
-    #warnings.simplefilter("ignore")
-
     import doctest
     x = doctest.testfile("Tests/dt_IIDDistribution.py")
     print("\n"+str(x))

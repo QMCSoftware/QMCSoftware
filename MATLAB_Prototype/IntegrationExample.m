@@ -20,11 +20,13 @@ OptionObj = AsianCallFun(measureObj); %4 time steps
 distribObj = IIDDistribution('trueD',stdGaussian(measure,'dimension', {4})); %IID sampling
 [sol, out] = integrate(OptionObj, measureObj, distribObj, stopObj)
 
+stopObj.absTol = 0.1; %increase tolerance
 measureObj = BrownianMotion(measure,'timeVector', {1/64:1/64:1});
 OptionObj = AsianCallFun(measureObj); %64 time steps
 distribObj = IIDDistribution('trueD',stdGaussian(measure,'dimension', {64})); %IID sampling
 [sol, out] = integrate(OptionObj, measureObj, distribObj, stopObj)
 
+stopObj.absTol = 0.01; %increase tolerance
 measureObj = BrownianMotion(measure,'timeVector', {1/4:1/4:1, 1/16:1/16:1, 1/64:1/64:1});
 OptionObj = AsianCallFun(measureObj); %multi-level
 distribObj = IIDDistribution('trueD',stdGaussian(measure,'dimension', {4, 16, 64})); %IID sampling
