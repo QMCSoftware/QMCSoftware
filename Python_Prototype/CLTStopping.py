@@ -9,12 +9,12 @@ from meanVarData import meanVarData
 
 class CLTStopping(stoppingCriterion):
     ''' Stopping criterion based on the Centeral Limit Theorem. '''
-    def __init__(self):
+    def __init__(self,inflate=1.2,alpha=0.01,absTol=None,relTol=None,nInit=None,nMax=None):
         discDistAllowed = ["IIDDistribution"] # which discrete distributions are supported
         decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
-        super().__init__(discDistAllowed,decompTypeAllowed)
-        self.inflate = 1.2  # inflation factor
-        self.alpha = 0.01
+        super().__init__(discDistAllowed,decompTypeAllowed,absTol=absTol,relTol=relTol,nInit=nInit,nMax=nMax)
+        self.inflate = inflate  # inflation factor
+        self.alpha = alpha # uncertainty level
 
     def stopYet(self, dataObj=None, funObj=[], distribObj=[]):
         if dataObj==None: dataObj=meanVarData(len(funObj))

@@ -9,8 +9,8 @@ class KeisterFun(fun):
     B. D. Keister, Multidimensional Quadrature Algorithms, Â§\mcommentfont \emph{Computers in Physics}, \textbf{10}, pp.\ 119-122, 1996.Â§
     '''
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self,nominalValue=None):
+        super().__init__(nominalValue=nominalValue)
         
     def g(self,x,coordIndex):
         # if the nominalValue = 0, this is efficient

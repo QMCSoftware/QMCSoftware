@@ -8,14 +8,15 @@ class measure():
     integration problem or a sampling method
     '''
     
-    def __init__(self,domainShape='',domainCoord=array([]),measureData=array([])):  
+    def __init__(self,domainShape=None,domainCoord=None,measureData=None):  
         # Argument Parsing
         #    Shape of the domain
         if domainShape in ['','box','cube','unitCube']: self.domainShape = domainShape
+        elif not domainShape: self.domainShape=''
         else: raise Exception("measure.domainShape must be one of: ['','box','cube','unitCube']")
         #   TypeCast to numpy ndarray's
-        self.domainCoord = array(domainCoord)
-        self.measureData = {}
+        self.domainCoord = array(domainCoord) if domainCoord else array([])
+        self.measureData = measureData if measureData else {}
         self.measure_list = []
 
     ''' Methods to construct list of measures ''' 

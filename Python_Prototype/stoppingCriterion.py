@@ -10,12 +10,12 @@ class stoppingCriterion(ABC):
             Properties: discDistAllowed, decompTypeAllowed  
     '''
     
-    def __init__(self,discDistAllowed,decompTypeAllowed): 
+    def __init__(self,discDistAllowed,decompTypeAllowed,absTol=None,relTol=None,nInit=None,nMax=None): 
         super().__init__()
-        self.absTol = 1e-2 # absolute tolerance, Â§$\mcommentfont d$Â§
-        self.relTol = 0 # relative tolerance, Â§$\mcommentfont d$Â§
-        self.nInit = 1024 # initial sample size
-        self.nMax = 1e8 # maximum number of samples allowed
+        self.absTol = absTol if absTol else 1e-2 # absolute tolerance, Â§$\mcommentfont d$Â§
+        self.relTol = relTol if relTol else 0 # relative tolerance, Â§$\mcommentfont d$Â§
+        self.nInit = nInit if nInit else 1024 # initial sample size
+        self.nMax = nMax if nMax else 1e8 # maximum number of samples allowed
         # Abstract Properties
         self.discDistAllowed = discDistAllowed # which discrete distributions are supported
         self.decompTypeAllowed = decompTypeAllowed # which decomposition types are supported

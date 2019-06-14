@@ -12,13 +12,12 @@ class discreteDistribution(ABC):
             Methods: genDistrib(self,nStart,nEnd,n,coordIndex)
             Properties: distribData,state,trueD
     '''
-    def __init__(self,distribData,state,trueD=measure().stdUniform()):
+    def __init__(self,distribData,state,trueD=None):
         super().__init__()
         # Abstract Properties
         self.distribData = distribData # information required to generate the distribution
         self.state = state # state of the generator
-
-        self.trueD = trueD      
+        self.trueD = trueD if trueD else measure().stdUniform()   
         self.distrib_list = [self]
 
     # Abstract Methods

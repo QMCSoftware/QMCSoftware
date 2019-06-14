@@ -10,11 +10,11 @@ class fun(ABC):
             Methods: g(self,x,coordIndex)
     '''
     
-    def __init__(self):
+    def __init__(self,nominalValue=None):
         super().__init__()
+        self.nominalValue = nominalValue if nominalValue else 0  # a nominal number, $c$, such that $(c, \ldots, c) \in \cx$
         self.f = None # function handle of integrand after transformation
         self.dimension = 2  # dimension of the domain, $d$
-        self.nominalValue = 0  # a nominal number, $c$, such that $(c, \ldots, c) \in \cx$
         self.fun_list = [self]
     
     # Abstract Methods

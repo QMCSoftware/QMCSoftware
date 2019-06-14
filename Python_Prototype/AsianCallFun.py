@@ -6,14 +6,13 @@ from scipy.sparse import spdiags
 
 class AsianCallFun(fun):
     ''' Specify and generate payoff values of an Asian Call option'''
-    def __init__(self,BMmeasure=None):
-        super().__init__()
-        self.volatility = 0.5
-        self.S0 = 30
-        self.K = 25
+    def __init__(self,BMmeasure=None,volatility=.5,S0=30,K=25,nominalValue=None):
+        super().__init__(nominalValue=nominalValue)
         self.BMmeasure = BMmeasure
+        self.volatility = volatility
+        self.S0 = S0
+        self.K = K
         self.dimFac = 0
-
         if self.BMmeasure:
             nBM = len(BMmeasure)
             self.fun_list = [AsianCallFun() for i in range(nBM)] 
