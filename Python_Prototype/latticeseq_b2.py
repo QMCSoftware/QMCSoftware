@@ -117,22 +117,23 @@ class latticeseq_b2:
     def next(self):
         return self.__next__()
 
-if __name__ == "__main__":
-    '''
-    
-    if len(sys.argv) < 2: raise ValueError("Please specify the power of 2 as a command line argument: latticeseq_b2 m < z.txt")
-    try:
-        m = int(sys.argv[1])
-    except:
-        raise ValueError("Please specify the power of 2 as a command line argument: latticeseq_b2 m < z.txt")
-    if len(sys.argv) > 2: f = sys.argv[2]
-    else: f = sys.stdin
-    '''
+# Method for use by QMC package
+from numpy import array
+get_lattice_b2 = lambda n,m: array([row for row in latticeseq_b2(m=n,s=m)])
 
-    obs_num = 2 # obs = n^obs_num
-    obs_size = 10
+if __name__ == "__main__":
+    # Example Use
+    '''
+    obs_num = 3 # obs = 2^obs_num
+    obs_size = 3
     seq = latticeseq_b2(m=obs_num,s=obs_size)
     count = 0
-
+    
     for x in seq:
+        pass
         print(x)
+    '''
+
+    # Example use of lattice method for QMC
+    x = get_lattice_b2(3,4)
+    print('Single Randomly Shifted Lattice:\n',x)
