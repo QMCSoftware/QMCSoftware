@@ -83,6 +83,22 @@ class measure():
             self.measure_list[i].dimension = self.dimension[i]
             self.measure_list[i].measureName = 'BrownianMotion'
         return self
+    
+    def lattice_b2(self,dimension=array([2])):
+        ''' create a discretized lattice measure '''
+        self.measureName = 'lattice_b2'
+        #    Dimension of the domain, Â§$\mcommentfont d$Â§
+        if type(dimension)==int: self.dimension = array([dimension])
+        elif all(item>0 for item in dimension): self.dimension = array(dimension)
+        else: raise Exception("measure.dimension be a list of positive integers")
+        #    Construct list of measures
+        self.measure_list = list(range(len(dimension)))
+        for i in range(len(self.measure_list)):
+            self.measure_list[i] = measure()
+            self.measure_list[i].dimension = self.dimension[i]
+            self.measure_list[i].measureName = 'lattice_b2'
+        return self
+
 
     # Magic Methods. Makes self[i]==self.measure_list[i]
     def __len__(self): return len(self.measure_list)

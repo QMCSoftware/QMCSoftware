@@ -46,6 +46,11 @@ class fun(ABC):
             elif msrObj[ii].measureName=='BrownianMotion' and dstrObj[ii].trueD.measureName=='stdGaussian':
                 timeDiff = diff(insert(msrObj[ii].measureData['timeVector'],0,0))
                 self[ii].f = lambda xu,coordIndex,timeDiff=timeDiff,i=ii: self[i].g(cumsum(xu* timeDiff **.5,1),coordIndex)
+            # Not sure if the below transformations are correct...?
+            elif msrObj[ii].measureName=='IIDZMeanGaussian' and dstrObj[ii].trueD.measureName=='lattice_b2':
+                self[ii].f = lambda xu,coordIdex,i=ii: self[i].g(xu,coordIdex)
+            elif msrObj[ii].measureName=='BrownianMotion' and dstrObj[ii].trueD.measureName=='lattice_b2':
+                self[ii].f = lambda xu,coordIdex,i=ii: self[i].g(xu,coordIdex)
             else:
                 raise Exception("Variable transformation not performed")
         return self

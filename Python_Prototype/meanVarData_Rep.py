@@ -8,7 +8,7 @@ class meanVarData_Rep(accumData):
     Accumulated data for lattice calculations
     '''
     
-    def __init__(self,nf,J=16):
+    def __init__(self,nf,J):
         ''' nf = # functions '''
         super().__init__()
         self.J = J
@@ -31,7 +31,7 @@ class meanVarData_Rep(accumData):
             self.mu2hat[i] = self.muhat.mean(0)
             self.sig2hat[i] = self.muhat.std(0)
         self.solution = self.mu2hat.sum(0)
-        return
+        return self
 
 if __name__ == "__main__":
     # Doctests

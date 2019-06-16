@@ -3,27 +3,29 @@ from numpy import array,zeros,floor,log10,tile,full,inf,log,ones
 from time import time
 from scipy.stats import norm
 
-from meanVarData import meanVarData
+from meanVarData_Rep import meanVarData_Rep
 from stoppingCriterion import stoppingCriterion
 
 class CLT_Rep(stoppingCriterion):
     ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''
-    def __init__(self,inflate=1.2,alpha=0.01,absTol=None,relTol=None,nInit=None,nMax=None):
+    def __init__(self,inflate=1.2,alpha=0.01,J=16,absTol=None,relTol=None,nInit=None,nMax=None):
         discDistAllowed = ["IIDDistribution"] # which discrete distributions are supported
         decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
         super().__init__(discDistAllowed,decompTypeAllowed,absTol=absTol,relTol=relTol,nInit=nInit,nMax=nMax)
         self.inflate = inflate  # inflation factor
         self.alpha = alpha # uncertainty level
-        
+        self.J = J
+
     def stopYet(self,dataObj=None,funObj=[],distribObj=[]):
         nf=len(funObj)
-        if dataObj==None: dataObj=meanVarData(nf=nf)
+        if dataObj==None: dataObj=meanVarData_Rep(nf,self.J)
         if dataObj.stage == 'begin':  # initialize
             dataObj._timeStart = time()  # keep track of time
             if type(distribObj).__name__ not in self.discDistAllowed:
                 raise Exception('Stopping criterion not compatible with sampling distribution')
             dataObj.prevN = zeros(nf)
             dataObj.nextN = full(nf,self.nInit)
+            dataObj.costF = zeros(nf)
             dataObj.stage = 'sigma'
         elif dataObj.stage == 'sigma':
             if dataObj.prevN.max()*2 > self.nMax: # Do not need to calculate dataObj.nextN

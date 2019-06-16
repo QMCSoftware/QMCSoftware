@@ -25,7 +25,7 @@ class IIDDistribution(discreteDistribution):
             return rand(int(n),int(m))
         elif self.trueD.measureName=='stdGaussian': # standard normal points
             return randn(int(n),int(m))
-        elif self.trueD.measureName=='latticeseq_b2':
+        elif self.trueD.measureName=='lattice_b2':
             x = get_lattice_b2(int(log(n)/log(2)),int(m))
             return [x+rand(m) for i in range(j)]
         else:
