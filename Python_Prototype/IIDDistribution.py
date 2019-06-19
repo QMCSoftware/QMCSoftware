@@ -27,7 +27,7 @@ class IIDDistribution(discreteDistribution):
             return randn(int(n),int(m))
         elif self.trueD.measureName=='lattice_b2':
             x = get_lattice_b2(int(log(n)/log(2)),int(m))
-            return [x+rand(m) for i in range(j)]
+            return [(x+rand(m))%1 for i in range(j)]
         else:
             raise Exception('Distribution not recognized')
 

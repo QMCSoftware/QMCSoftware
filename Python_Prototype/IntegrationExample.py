@@ -67,7 +67,7 @@ output(sol,out)
 
 ''' Single and multilevel example of CLT_Rep (stopping_criterion) paired with meanvarData_Rep (accumData) '''
 dim=3
-stopObj = CLT_Rep(nMax=2**15)
+stopObj = CLT_Rep(nInit=4,nMax=2**15)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
 distribObj = IIDDistribution(trueD=measure().lattice_b2(dimension=[dim])) # IID sampling
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
