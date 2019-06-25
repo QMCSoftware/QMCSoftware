@@ -25,7 +25,7 @@ class meanVarData_Rep(accumData):
             dim = distribObj[i].trueD.dimension
             set_x = distribObj[i].genDistrib(self.nextN[i],dim,self.J) # set of j distribData_{nxm}
             for j in range(self.J):
-                y = funObj[i].f(set_x[j],arange(1,dim))
+                y = funObj[i].f(set_x[j],arange(1,dim+1))
                 self.muhat[j] = y.mean(0)
             self.costF[i] = clock() - tStart
             self.mu2hat[i] = self.muhat.mean(0)

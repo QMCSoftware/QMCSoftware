@@ -1,38 +1,115 @@
-sol = 1.7249
+sol = 2.1718
 Constructing accumData with properties:
-    solution: 1.7248558780149654
+    solution: 2.1717901056109308
     stage: done
-    prevN: [128]
-    nextN: [128]
-    timeUsed: 0.005984306335449219
-    nSamplesUsed: [128]
-    confidInt: [1.72326958 1.72644218]
-    costF: [0.00175754]
-    _timeStart: 1560977699.8768892
-    J: 16
-    muhat: [1.7345347  1.72478632 1.71768277 1.72420679 1.72535773 1.71339321
-                1.72251067 1.72897762 1.71722704 1.72443056 1.72383042 1.72427942
-                1.72309994 1.73049514 1.73684124 1.72604048]
-    mu2hat: [1.72485588]
-    sig2hat: [0.00580621]
-    flags: [0.]
+    prevN: [1024]
+    nextN: [479354.]
+    timeUsed: 0.0857703685760498
+    nSamplesUsed: [479354.]
+    confidInt: [2.16179011 2.18179011]
+    costF: [0.08315166]
+    _timeStart: 1561431148.7518477
+    muhat: [2.17179011]
+    sighat: [2.23751253]
+    nSigma: 1024
+    nMu: [478330.]
 
-sol = 11.5190
+sol = 2.1688
 Constructing accumData with properties:
-    solution: 11.518991898070654
+    solution: 2.1687782254470513
+    stage: done
+    prevN: [1024]
+    nextN: [42506255.]
+    timeUsed: 8.21848464012146
+    nSamplesUsed: [42506255.]
+    confidInt: [2.16777823 2.16977823]
+    costF: [8.00041026]
+    _timeStart: 1561431148.8406117
+    muhat: [2.16877823]
+    sighat: [2.10922476]
+    nSigma: 1024
+    nMu: [42505231.]
+
+sol = 2.1683
+Constructing accumData with properties:
+    solution: 2.1682555868502305
+    stage: done
+    prevN: [1024]
+    nextN: [537381.]
+    timeUsed: 0.11170125007629395
+    nSamplesUsed: [537381.]
+    confidInt: [2.15825559 2.17825558]
+    costF: [0.10330839]
+    _timeStart: 1561431157.0610917
+    muhat: [2.16825559]
+    sighat: [2.36934548]
+    nSigma: 1024
+    nMu: [536357.]
+
+sol = 6.1660
+Constructing accumData with properties:
+    solution: 6.1660432824218825
+    stage: done
+    prevN: [1024]
+    nextN: [5748526.]
+    timeUsed: 1.9088881015777588
+    nSamplesUsed: [5748526.]
+    confidInt: [6.15604328 6.17604328]
+    costF: [1.87291313]
+    _timeStart: 1561431157.1747978
+    muhat: [6.16604328]
+    sighat: [7.75606109]
+    nSigma: 1024
+    nMu: [5747502.]
+
+sol = 6.1370
+Constructing accumData with properties:
+    solution: 6.1370407393982545
+    stage: done
+    prevN: [1024]
+    nextN: [58132.]
+    timeUsed: 0.2593061923980713
+    nSamplesUsed: [58132.]
+    confidInt: [6.03704075 6.23704073]
+    costF: [0.25100123]
+    _timeStart: 1561431159.0856802
+    muhat: [6.13704074]
+    sighat: [7.73125695]
+    nSigma: 1024
+    nMu: [57108.]
+
+sol = 6.2027
+Constructing accumData with properties:
+    solution: 6.20265160392217
     stage: done
     prevN: [1024 1024 1024]
-    nextN: [1024 1024 1024]
-    timeUsed: 0.18748807907104492
-    nSamplesUsed: [1024 1024 1024]
-    confidInt: [11.51874461 11.51923918]
-    costF: [0.01506706 0.04124385 0.12863123]
-    _timeStart: 1560977699.8848836
+    nextN: [7101798.  641562.   81502.]
+    timeUsed: 3.4757354259490967
+    nSamplesUsed: [7101798.  641562.   81502.]
+    confidInt: [6.19265161 6.2126516 ]
+    costF: [2.31737503 0.76810484 0.36566758]
+    _timeStart: 1561431159.3469813
+    muhat: [6.17341726e+00 2.61347966e-02 3.09955040e-03]
+    sighat: [7.48829393 1.06884742 0.25151009]
+    nSigma: 1024
+    nMu: [7100774.  640538.   80478.]
+
+sol = 2.1689
+Constructing accumData with properties:
+    solution: 2.1688630357873384
+    stage: done
+    prevN: [128.]
+    nextN: [256]
+    timeUsed: 0.03390932083129883
+    nSamplesUsed: [256]
+    confidInt: [2.16699238 2.17073369]
+    costF: [0.00663918]
+    _timeStart: 1561431162.8246856
     J: 16
-    muhat: [0.20870977 0.21012926 0.21016736 0.21041651 0.20742176 0.20944522
-                0.21003624 0.20949814 0.20901713 0.20860385 0.20969348 0.20918765
-                0.20948051 0.20813846 0.20826373 0.2061979 ]
-    mu2hat: [10.47594742  0.83401905  0.20902544]
-    sig2hat: [0.00176905 0.00150042 0.0010831 ]
-    flags: [0. 0. 0.]
+    muhat: [2.18024935 2.18028002 2.16548058 2.17402375 2.15618773 2.17461842
+                2.18103696 2.15467591 2.15860493 2.16531886 2.16786039 2.15519687
+                2.16539328 2.18680121 2.16502868 2.17105166]
+    mu2hat: [2.16886304]
+    sig2hat: [0.00968312]
+    flags: [0.]
 

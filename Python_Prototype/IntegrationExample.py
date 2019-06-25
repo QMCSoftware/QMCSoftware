@@ -18,7 +18,6 @@ def output(sol,dataObj):
     print('\n'+s)
     f.write(s+'\n\n')
 
-"""
 ''' An example with Keister's function integrated with respect to the uniform distribution over the unit cube '''
 dim = 3 # dimension for the Keister Example
 stopObj = CLTStopping() # stopping criterion for IID sampling using the Central Limit Theorem
@@ -64,15 +63,15 @@ OptionObj = AsianCallFun(measureObj) # multi-level
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64])) # IID sampling
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
-"""
 
 ''' Single and multilevel example of CLT_Rep (stopping_criterion) paired with meanvarData_Rep (accumData) '''
-dim=3
-stopObj = CLT_Rep(nInit=4,nMax=2**15,absTol=1e-4)
+dim = 3
+stopObj = CLT_Rep(nInit=4,nMax=2**15,absTol=1e-2)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
 distribObj = Lattice(trueD=measure().lattice_b2(dimension=[dim])) # Uniform Sampling
-sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
+sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj) # KeisterFun()
 output(sol,out)
+
 
 '''
 dim = 3
