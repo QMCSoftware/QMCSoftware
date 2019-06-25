@@ -22,7 +22,7 @@ class discreteDistribution(ABC):
 
     # Abstract Methods
     @abstractmethod
-    def genDistrib(self, nStart, nEnd, n, coordIndex):
+    def genDistrib(self,n,m,j):
         """
          nStart = starting value of §$\mcommentfont i$§
          nEnd = ending value of §$\mcommentfont i$§

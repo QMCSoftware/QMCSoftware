@@ -8,11 +8,11 @@ class measure():
     integration problem or a sampling method
     '''
     
-    def __init__(self,domainShape=None,domainCoord=None,measureData=None):  
+    def __init__(self,domainShape='',domainCoord=None,measureData=None):  
         # Argument Parsing
         #    Shape of the domain
+
         if domainShape in ['','box','cube','unitCube']: self.domainShape = domainShape
-        elif not domainShape: self.domainShape=''
         else: raise Exception("measure.domainShape must be one of: ['','box','cube','unitCube']")
         #   TypeCast to numpy ndarray's
         self.domainCoord = array(domainCoord) if domainCoord else array([])
@@ -26,7 +26,7 @@ class measure():
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
-        else: raise Exception("measure.dimension be a list of positive integers")
+        else: raise Exception("measure.dimension must be a list of positive integers")
         #    Construct list of measures
         self.measure_list = list(range(len(dimension)))
         for i in range(len(self.measure_list)):
@@ -96,7 +96,7 @@ class measure():
         for i in range(len(self.measure_list)):
             self.measure_list[i] = measure()
             self.measure_list[i].dimension = self.dimension[i]
-            self.measure_list[i].measureName = 'lattice_b2'
+            self.measure_list[i].measureName = 'stdUniform'
         return self
 
 

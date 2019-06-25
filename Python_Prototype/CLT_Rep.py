@@ -9,7 +9,7 @@ from stoppingCriterion import stoppingCriterion
 class CLT_Rep(stoppingCriterion):
     ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''
     def __init__(self,inflate=1.2,alpha=0.01,J=16,absTol=None,relTol=None,nInit=None,nMax=None):
-        discDistAllowed = ["IIDDistribution"] # which discrete distributions are supported
+        discDistAllowed = ["Lattice"] # which discrete distributions are supported
         decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
         super().__init__(discDistAllowed,decompTypeAllowed,absTol=absTol,relTol=relTol,nInit=nInit,nMax=nMax)
         self.inflate = inflate  # inflation factor
@@ -28,17 +28,14 @@ class CLT_Rep(stoppingCriterion):
             dataObj.costF = zeros(nf)
             dataObj.stage = 'sigma'
         elif dataObj.stage == 'sigma':
-            if dataObj.prevN.max()*2 > self.nMax: # Do not need to calculate dataObj.nextN
+            for i in range(len(funObj)):
+                if dataObj.sig2hat[i] < self.absTol: # Sufficient estimate for mean of funObj[i]
+                    dataObj.flags[i] = 0
+                else:
+                    dataObj.prevN[i] = dataObj.nextN[i]
+                    dataObj.nextN[i] = dataObj.prevN[i]*2
+            if dataObj.flags.sum(0)==0 or dataObj.nextN.max() > self.nMax:
                 dataObj.stage = 'mu'
-            else: # update dataObj.nextN and flag functions whose means have been sufficiently estimated
-                dataObj.prevN = dataObj.nextN
-                for i in range(len(funObj)):
-                    if dataObj.sig2hat[i]<self.absTol: # Sufficient estimate for mean of funObj[i]
-                        dataObj.flags[i] = 0
-                    else:
-                        dataObj.nextN[i] = dataObj.prevN[i]*2
-                if dataObj.flags.sum(0)==0:
-                    dataObj.stage = 'mu'
         elif dataObj.stage == 'mu':
             dataObj.solution = dataObj.mu2hat.sum(0)
             dataObj.nSamplesUsed = dataObj.nextN

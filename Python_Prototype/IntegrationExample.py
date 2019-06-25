@@ -6,6 +6,7 @@ from numpy import arange
 from CLTStopping import CLTStopping
 from CLT_Rep import CLT_Rep
 from IIDDistribution import IIDDistribution
+from Lattice import Lattice
 from integrate import integrate
 from KeisterFun import KeisterFun 
 from AsianCallFun import AsianCallFun
@@ -67,12 +68,13 @@ output(sol,out)
 
 ''' Single and multilevel example of CLT_Rep (stopping_criterion) paired with meanvarData_Rep (accumData) '''
 dim=3
-stopObj = CLT_Rep(nInit=4,nMax=2**15)
+stopObj = CLT_Rep(nInit=4,nMax=2**15,absTol=1e-4)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=measure().lattice_b2(dimension=[dim])) # IID sampling
+distribObj = Lattice(trueD=measure().lattice_b2(dimension=[dim])) # Uniform Sampling
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
 output(sol,out)
 
+'''
 dim = 3
 stopObj = CLT_Rep(nMax=2**15)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
@@ -80,5 +82,6 @@ OptionObj = AsianCallFun(measureObj) # multi-level
 distribObj = IIDDistribution(trueD=measure().lattice_b2(dimension=[4,16,64])) # IID sampling
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
+'''
 
 f.close()

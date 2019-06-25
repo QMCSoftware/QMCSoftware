@@ -59,3 +59,7 @@ Test Files:
         * constructor dts 'Expected' matches 'Got' but still won't pass
     run_dts:
         runs all docTests
+
+
+Create Lattice Distribution object (like IIDDistribution)
+fix measure
