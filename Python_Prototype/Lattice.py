@@ -1,6 +1,6 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from discreteDistribution import discreteDistribution
-from numpy import arange,log
+from numpy import arange,log,array
 from numpy.random import rand,randn
 from latticeseq_b2 import get_lattice_b2
 
@@ -19,7 +19,7 @@ class Lattice(discreteDistribution):
     def genDistrib(self,n,m,j=1):
         if self.trueD.measureName=='stdUniform':
             x = get_lattice_b2(int(log(n)/log(2)),int(m))
-            return [(x+rand(m))%1 for i in range(j)]
+            return array([(x+rand(m))%1 for i in range(j)])
         else:
             raise Exception('Distribution not recognized')
 

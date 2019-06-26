@@ -22,9 +22,9 @@ class IIDDistribution(discreteDistribution):
 
     def genDistrib(self,n,m,j=1):
         if self.trueD.measureName=='stdUniform': # generate uniform points
-            return rand(int(n),int(m))
+            return rand(j,int(n),int(m)).squeeze()
         elif self.trueD.measureName=='stdGaussian': # standard normal points
-            return randn(int(n),int(m))
+            return randn(j,int(n),int(m)).squeeze()
         else:
             raise Exception('Distribution not recognized')
 

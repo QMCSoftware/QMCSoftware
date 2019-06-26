@@ -68,19 +68,23 @@ output(sol,out)
 dim = 3
 stopObj = CLT_Rep(nInit=4,nMax=2**15,absTol=1e-2)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = Lattice(trueD=measure().lattice_b2(dimension=[dim])) # Uniform Sampling
+distribObj = Lattice(trueD=measure().lattice_b2(dimension=[dim])) # Uniform Sampling from latticeseq_b2.py 
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj) # KeisterFun()
 output(sol,out)
 
-
-'''
 dim = 3
 stopObj = CLT_Rep(nMax=2**15)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # multi-level
-distribObj = IIDDistribution(trueD=measure().lattice_b2(dimension=[4,16,64])) # IID sampling
+distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64])) # IID Gaussian Sampling
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
-'''
 
+dim = 3
+stopObj = CLT_Rep(nMax=2**15)
+measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
+OptionObj = AsianCallFun(measureObj) # multi-level
+distribObj = Lattice(trueD=measure().lattice_b2(dimension=[4,16,64])) # Uniform Sampling from latticeseq_b2.py 
+sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
+output(sol,out)
 f.close()

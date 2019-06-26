@@ -9,7 +9,7 @@ from stoppingCriterion import stoppingCriterion
 class CLT_Rep(stoppingCriterion):
     ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''
     def __init__(self,inflate=1.2,alpha=0.01,J=16,absTol=None,relTol=None,nInit=None,nMax=None):
-        discDistAllowed = ["Lattice"] # which discrete distributions are supported
+        discDistAllowed = ["Lattice","IIDDistribution"] # which discrete distributions are supported
         decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
         super().__init__(discDistAllowed,decompTypeAllowed,absTol=absTol,relTol=relTol,nInit=nInit,nMax=nMax)
         self.inflate = inflate  # inflation factor

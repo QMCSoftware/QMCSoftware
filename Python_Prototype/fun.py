@@ -51,7 +51,8 @@ class fun(ABC):
                 this_var = msrObj[ii].measureData['variance']
                 self[ii].f = lambda xu,coordIdex,var=this_var,i=ii: self[i].g(sqrt(var)*norm.ppf(xu),coordIdex)
             elif msrObj[ii].measureName=='BrownianMotion' and dstrObj[ii].trueD.measureName=='stdUniform':
-                raise Exception("Not yet implemented")
+                timeDiff = diff(insert(msrObj[ii].measureData['timeVector'],0,0))
+                self[ii].f = lambda xu,coordIndex,timeDiff=timeDiff,i=ii: self[i].g(cumsum(norm.ppf(xu)*sqrt(timeDiff),1),coordIndex)
             else:
                 raise Exception("Variable transformation not performed")
         return self
