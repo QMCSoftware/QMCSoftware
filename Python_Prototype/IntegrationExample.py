@@ -50,14 +50,14 @@ distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4])) # IID s
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
-stopObj = CLTStopping(absTol=.1)
+stopObj = CLTStopping(absTol=.01)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # 64 time steps
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[64])) # IID sampling
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
-stopObj = CLTStopping()
+stopObj = CLTStopping(absTol=.01)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # multi-level
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64])) # IID sampling
@@ -66,25 +66,26 @@ output(sol,out)
 
 ''' Single and multilevel example of CLT_Rep (stopping_criterion) paired with meanvarData_Rep (accumData) '''
 dim = 3
-stopObj = CLT_Rep(nInit=4,nMax=2**15,absTol=1e-2)
+stopObj = CLT_Rep(nInit=4,nMax=2**15,absTol=.01)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = Lattice(trueD=measure().lattice_b2(dimension=[dim])) # Uniform Sampling from latticeseq_b2.py 
+distribObj = Lattice(trueD=measure().mesh(dimension=[dim],meshType='lattice')) # Uniform Sampling from latticeseq_b2.py 
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj) # KeisterFun()
 output(sol,out)
 
-dim = 3
-stopObj = CLT_Rep(nMax=2**15)
+# Lattice Mesh
+stopObj = CLT_Rep(nMax=2**20,absTol=.01)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # multi-level
-distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64])) # IID Gaussian Sampling
+distribObj = Lattice(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')) # Uniform Sampling from latticeseq_b2.py 
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
-dim = 3
-stopObj = CLT_Rep(nMax=2**15)
+# Sobol Mesh
+stopObj = CLT_Rep(nMax=2**20,absTol=.01)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # multi-level
-distribObj = Lattice(trueD=measure().lattice_b2(dimension=[4,16,64])) # Uniform Sampling from latticeseq_b2.py 
+distribObj = Lattice(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')) # Uniform Sampling from latticeseq_b2.py 
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
+
 f.close()

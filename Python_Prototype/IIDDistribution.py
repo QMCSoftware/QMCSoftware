@@ -2,7 +2,6 @@
 from discreteDistribution import discreteDistribution
 from numpy import arange,log
 from numpy.random import rand,randn
-from latticeseq_b2 import get_lattice_b2
 
 class IIDDistribution(discreteDistribution):
     '''

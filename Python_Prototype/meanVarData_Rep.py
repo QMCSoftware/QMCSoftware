@@ -4,12 +4,12 @@ from time import clock
 from accumData import accumData
 
 class meanVarData_Rep(accumData):
-    '''
-    Accumulated data for lattice calculations
-    '''
-    
+    ''' Accumulated data for lattice calculations '''
     def __init__(self,nf,J):
-        ''' nf = # functions '''
+        '''
+        nf = # functions
+        J = # streams
+        '''
         super().__init__()
         self.J = J
         self.muhat = zeros(self.J)

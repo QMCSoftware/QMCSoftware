@@ -1,6 +1,6 @@
 '''
 (C) Dirk Nuyens, KU Leuven, 2016,2017,...
-Retrieved python/latticeseq_b2.py from https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/  
+Retrieved python/latticeseq_b2.py from https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/ 
 '''
 
 # the following function is duplicated from poylat.py such that this file can be used stand alone
@@ -118,22 +118,14 @@ class latticeseq_b2:
         return self.__next__()
 
 # Method for use by QMC package
-from numpy import array
-get_lattice_b2 = lambda n,m: array([row for row in latticeseq_b2(m=n,s=m)])
+from numpy import array,log,random
+def get_RS_lattice_b2(n,m,j): # generates j shifted nxm lattices
+    x = array([row for row in latticeseq_b2(m=int(log(n)/log(2)),s=m)])
+    shifts = random.rand(j,m)
+    RS_x = array([(x+random.rand(m))%1 for shift in shifts])
+    return RS_x
 
 if __name__ == "__main__":
-    # Example Use
-    '''
-    obs_num = 3 # obs = 2^obs_num
-    obs_size = 3
-    seq = latticeseq_b2(m=obs_num,s=obs_size)
-    count = 0
-    
-    for x in seq:
-        pass
-        print(x)
-    '''
-
-    # Example use of lattice method for QMC
-    x = get_lattice_b2(3,4)
-    print('Single Randomly Shifted Lattice:\n',x)
+    n,m,j = 4,3,2 # We want to generate 2 randomly shifted 4x3 lattices
+    print('\nlattice_b2 without random shift:\n',array([row for row in latticeseq_b2(m=int(log(n)/log(2)),s=m)]))
+    print('\n2 randomly shifted lattices:\n',get_RS_lattice_b2(n,m,j))

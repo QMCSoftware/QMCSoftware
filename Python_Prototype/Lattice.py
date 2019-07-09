@@ -2,7 +2,9 @@
 from discreteDistribution import discreteDistribution
 from numpy import arange,log,array
 from numpy.random import rand,randn
-from latticeseq_b2 import get_lattice_b2
+# Import random shift functions
+from latticeseq_b2 import get_RS_lattice_b2
+from digitalsequence_b2g import get_RS_sobol_b2g
 
 class Lattice(discreteDistribution):
 
@@ -17,11 +19,14 @@ class Lattice(discreteDistribution):
                 self[i].distribData = self.distribData[i] if self.distribData else None
 
     def genDistrib(self,n,m,j=1):
-        if self.trueD.measureName=='stdUniform':
-            x = get_lattice_b2(int(log(n)/log(2)),int(m))
-            return array([(x+rand(m))%1 for i in range(j)])
-        else:
-            raise Exception('Distribution not recognized')
+        # get j randomly shifted nxm arrays 
+        mimicMeasure = self.trueD.measureName
+        if mimicMeasure=='stdUniform':
+            meshType = self.trueD.measureData['meshType']
+            if meshType=='lattice': return get_RS_lattice_b2(n,m,j)
+            elif meshType=='sobol': return get_RS_sobol_b2g(n,m,j)
+            else: raise Exception("%s mesh cannot mimic %s distribution"%(meshType,mimicMeasure))
+        else: raise Exception('Distribution not recognized')
 
 if __name__ == "__main__":
     import doctest
