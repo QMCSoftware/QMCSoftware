@@ -11,7 +11,6 @@ class measure():
     def __init__(self,domainShape='',domainCoord=None,measureData=None):  
         # Argument Parsing
         #    Shape of the domain
-
         if domainShape in ['','box','cube','unitCube']: self.domainShape = domainShape
         else: raise Exception("measure.domainShape must be one of: ['','box','cube','unitCube']")
         #   TypeCast to numpy ndarray's
