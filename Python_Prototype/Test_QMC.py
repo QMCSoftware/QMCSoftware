@@ -21,14 +21,12 @@ def plot(title,xlabel,ylabel,xdata,ydata):
     for name,(trend,color) in ydata.items():
         mpl_plot.plot(xdata,trend,color=color,label=name)
     mpl_plot.legend()
-    # if output: mpl_plot.savefig('output/Figures/%s.png'%(title),dpi=200)
+    mpl_plot.savefig('Outputs/AbsTol_Comparison.png',dpi=200)
     mpl_plot.show()
 
-def QMC_Wrapper(absTol,trueD):
-    stopObj = CLTStopping(absTol=absTol)
+def QMC_Wrapper(stopObj,distribObj):
     measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
     OptionObj = AsianCallFun(measureObj) # multi-level
-    distribObj = IIDDistribution(trueD=trueD)
     t0 = time()
     sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
     t_delta = time()-t0
@@ -44,19 +42,19 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
     for absTol in abstols:
         print('Absolute Tolerance:',absTol)
         # CLT_stdUniform
-        sol,tDelta = QMC_Wrapper(absTol,measure().stdUniform(dimension=[4,16,64]))
+        sol,tDelta = QMC_Wrapper(CLTStopping(absTol=absTol),IIDDistribution(trueD=measure().stdUniform(dimension=[4,16,64])))
         f.write('\n'+str(tDelta)+',')
         print('\tCLT_stdUniform:',sol,tDelta)
         # CLT_stdGaussian
-        sol,tDelta = QMC_Wrapper(absTol,measure().stdGaussian(dimension=[4,16,64]))
+        sol,tDelta = QMC_Wrapper(CLTStopping(absTol=absTol),IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64])))
         f.write(str(tDelta)+',')
         print('\tCLT_stdGaussian:',sol,tDelta)
         # CLT_Rep_lattice
-        sol,tDelta = QMC_Wrapper(absTol,measure().mesh(dimension=[4,16,64],meshType='lattice'))
+        sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Lattice(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')))
         f.write(str(tDelta)+',')
         print('\tCLT_Rep_lattice:',sol,tDelta)
         # CLT_Rep_sobol
-        sol,tDelta = QMC_Wrapper(absTol,measure().mesh(dimension=[4,16,64],meshType='sobol'))
+        sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Lattice(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')))
         f.write(str(tDelta))
         print('\tCLT_Rep_sobol:',sol,tDelta)
     f.close()  
@@ -64,11 +62,11 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
 if __name__ == '__main__':
     # Generate Times CSV
     fname = 'Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
-    absTols = arange(.004,.101,.002)
-    comp_Clt_vs_cltRep_runtimes(fname,absTols)
+    absTols = arange(.005,.031,.001)
+    #comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
-    plot(title = 'Multilevel AsianCallFun with Brownian Motion:  Integration Time by Absolute Tolerance',
+    plot(title = 'Multilevel AsianCallFun with Brownian Motion:\nIntegration Time by Absolute Tolerance',
         xlabel = 'Absolute Tolerance',
         ylabel = 'Runtime',
         xdata = absTols,
