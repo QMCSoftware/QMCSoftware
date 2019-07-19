@@ -8,7 +8,7 @@ import pandas as pd
 from CLTStopping import CLTStopping
 from CLT_Rep import CLT_Rep
 from IIDDistribution import IIDDistribution
-from Lattice import Lattice
+from Mesh import Mesh
 from integrate import integrate
 from KeisterFun import KeisterFun 
 from AsianCallFun import AsianCallFun
@@ -20,9 +20,9 @@ def plot(title,xlabel,ylabel,xdata,ydata):
     mpl_plot.ylabel(ylabel)
     for name,(trend,color) in ydata.items():
         mpl_plot.plot(xdata,trend,color=color,label=name)
-    mpl_plot.legend()
+    mpl_plot.legend(loc=1,prop={'size': 12})
     mpl_plot.savefig('DevelopOnly/Outputs/AbsTol_Runtime_LinePlot.png',
-        dpi=200,
+        dpi=500,
         bbox_inches = 'tight',
         pad_inches = .05)
     mpl_plot.show()
@@ -53,11 +53,11 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
         f.write(str(tDelta)+',')
         print('\tCLT_stdGaussian:',sol,tDelta)
         # CLT_Rep_lattice
-        sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Lattice(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')))
+        sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')))
         f.write(str(tDelta)+',')
         print('\tCLT_Rep_lattice:',sol,tDelta)
         # CLT_Rep_sobol
-        sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Lattice(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')))
+        sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')))
         f.write(str(tDelta))
         print('\tCLT_Rep_sobol:',sol,tDelta)
     f.close()  

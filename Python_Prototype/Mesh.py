@@ -6,13 +6,13 @@ from numpy.random import rand,randn
 from latticeseq_b2 import get_RS_lattice_b2
 from digitalsequence_b2g import get_RS_sobol_b2g
 
-class Lattice(discreteDistribution):
+class Mesh(discreteDistribution):
 
     def __init__(self,distribData=None,trueD=None):
         state = []
         super().__init__(distribData,state,trueD=trueD)
         if trueD:
-            self.distrib_list = [Lattice() for i in range(len(trueD))]
+            self.distrib_list = [Mesh() for i in range(len(trueD))]
             # self now refers to self.distrib_list
             for i in range(len(self)):
                 self[i].trueD = self.trueD[i]

@@ -1,12 +1,13 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 # Integrating a function using our community QMC framework
 
-from numpy import arange
+from numpy import arange,random
+random.seed(7)
 
 from CLTStopping import CLTStopping
 from CLT_Rep import CLT_Rep
 from IIDDistribution import IIDDistribution
-from Lattice import Lattice
+from Mesh import Mesh
 from integrate import integrate
 from KeisterFun import KeisterFun 
 from AsianCallFun import AsianCallFun
@@ -50,7 +51,7 @@ distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4])) # IID s
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
-stopObj = CLTStopping(absTol=.01)
+stopObj = CLTStopping(absTol=.05)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # 64 time steps
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[64])) # IID sampling
@@ -68,7 +69,7 @@ output(sol,out)
 dim = 3
 stopObj = CLT_Rep(nInit=4,nMax=2**15,absTol=.01)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = Lattice(trueD=measure().mesh(dimension=[dim],meshType='lattice')) # Uniform Sampling from latticeseq_b2.py 
+distribObj = Mesh(trueD=measure().mesh(dimension=[dim],meshType='lattice')) # Uniform Sampling from latticeseq_b2.py 
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj) # KeisterFun()
 output(sol,out)
 
@@ -76,7 +77,7 @@ output(sol,out)
 stopObj = CLT_Rep(nMax=2**20,absTol=.01)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # multi-level
-distribObj = Lattice(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')) # Uniform Sampling from latticeseq_b2.py 
+distribObj = Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')) # Uniform Sampling from latticeseq_b2.py 
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
@@ -84,7 +85,7 @@ output(sol,out)
 stopObj = CLT_Rep(nMax=2**20,absTol=.01)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # multi-level
-distribObj = Lattice(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')) # Uniform Sampling from latticeseq_b2.py 
+distribObj = Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')) # Uniform Sampling from latticeseq_b2.py 
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 

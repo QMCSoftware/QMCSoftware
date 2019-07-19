@@ -9,7 +9,7 @@ from stoppingCriterion import stoppingCriterion
 class CLT_Rep(stoppingCriterion):
     ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''
     def __init__(self,inflate=1.2,alpha=0.01,J=16,absTol=None,relTol=None,nInit=None,nMax=None):
-        discDistAllowed = ["Lattice","IIDDistribution"] # which discrete distributions are supported
+        discDistAllowed = ["Mesh","IIDDistribution"] # which discrete distributions are supported
         decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
         super().__init__(discDistAllowed,decompTypeAllowed,absTol=absTol,relTol=relTol,nInit=nInit,nMax=nMax)
         self.inflate = inflate  # inflation factor
@@ -35,13 +35,12 @@ class CLT_Rep(stoppingCriterion):
                     dataObj.prevN[i] = dataObj.nextN[i]
                     dataObj.nextN[i] = dataObj.prevN[i]*2
             if dataObj.flags.sum(0)==0 or dataObj.nextN.max() > self.nMax:
-                dataObj.stage = 'mu'
-        elif dataObj.stage == 'mu':
-            dataObj.solution = dataObj.mu2hat.sum(0)
-            dataObj.nSamplesUsed = dataObj.nextN
-            errBar = self.get_quantile() * self.inflate * (dataObj.sig2hat**2 / dataObj.nextN).sum(0)**.5 # Correct?
-            dataObj.confidInt = dataObj.solution + errBar * array([-1, 1])
-            dataObj.stage = 'done'  # finished with computation
+                # Stopping criterion met
+                dataObj.solution = dataObj.mu2hat.sum(0)
+                dataObj.nSamplesUsed = dataObj.nextN
+                errBar = self.get_quantile() * self.inflate * (dataObj.sig2hat**2 / dataObj.nextN).sum(0)**.5 # Correct?
+                dataObj.confidInt = dataObj.solution + errBar * array([-1, 1])
+                dataObj.stage = 'done'  # finished with computation
         dataObj.timeUsed = time() - dataObj._timeStart
         return dataObj, distribObj
 
@@ -53,15 +52,3 @@ if __name__ == "__main__":
     # Run Doctests
     import doctest
     print('Still need to write doctest for this')
-
-
-    # Need to encorporate (Delete later)
-    self.solution = nan  # solution
-    self.stage = 'begin'  # stage of the computation, becomes 'done' when finished
-    self.prevN = array([])  # new data will be based on (quasi-)random vectors indexed by
-    self.nextN = array([])  # prevN + 1 to nextN
-    self.timeUsed = array([])  # time used so far
-    self.nSamplesUsed = array([])  # number of samples used so far
-    self.confidInt = array([-inf, inf])  # error bound on the solution
-    self.costF = array([])  # time required to compute function values
-    self._timeStart = None # hidden/private
