@@ -15,13 +15,16 @@ from AsianCallFun import AsianCallFun
 from measure import measure
 
 def plot(title,xlabel,ylabel,xdata,ydata):
-    mpl_plot.title(title)
+    #mpl_plot.title(title)
     mpl_plot.xlabel(xlabel)
     mpl_plot.ylabel(ylabel)
     for name,(trend,color) in ydata.items():
         mpl_plot.plot(xdata,trend,color=color,label=name)
     mpl_plot.legend()
-    mpl_plot.savefig('Outputs/AbsTol_Comparison.png',dpi=200)
+    mpl_plot.savefig('DevelopOnly/Outputs/AbsTol_Runtime_LinePlot.png',
+        dpi=200,
+        bbox_inches = 'tight',
+        pad_inches = .05)
     mpl_plot.show()
 
 def QMC_Wrapper(stopObj,distribObj):
@@ -61,14 +64,14 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
     
 if __name__ == '__main__':
     # Generate Times CSV
-    fname = 'Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
+    fname = 'DevelopOnly/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
     absTols = arange(.005,.031,.001)
     #comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
-    plot(title = 'Multilevel AsianCallFun with Brownian Motion:\nIntegration Time by Absolute Tolerance',
+    plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
         xlabel = 'Absolute Tolerance',
-        ylabel = 'Runtime',
+        ylabel = 'Integration Runtime',
         xdata = absTols,
         ydata = {
             'CLT: Std Gaussian':(df.CLT_stdUniform,'r'),

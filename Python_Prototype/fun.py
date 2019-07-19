@@ -28,7 +28,7 @@ class fun(ABC):
         '''
         pass
     
-    def transformVariable(self,msrObj,dstrObj): # INCOMPLETE
+    def transformVariable(self,msrObj,dstrObj):
         '''
         This method performs the necessary variable transformationto put the 
         original function in the form required by the discreteDistributon
