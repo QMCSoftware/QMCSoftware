@@ -16,11 +16,13 @@ from measure import measure
 
 def plot(title,xlabel,ylabel,xdata,ydata):
     #mpl_plot.title(title)
-    mpl_plot.xlabel(xlabel)
-    mpl_plot.ylabel(ylabel)
+    mpl_plot.xlabel(xlabel,fontsize=14)
+    mpl_plot.ylabel(ylabel,fontsize=14)
+    mpl_plot.xticks([0,.01,.02,.03],fontsize=12)
+    mpl_plot.yticks([0,10,20,30],fontsize=12)
     for name,(trend,color) in ydata.items():
         mpl_plot.plot(xdata,trend,color=color,label=name)
-    mpl_plot.legend(loc=1,prop={'size': 12})
+    mpl_plot.legend(loc=1,prop={'size': 14})
     mpl_plot.savefig('DevelopOnly/Outputs/AbsTol_Runtime_LinePlot.png',
         dpi=500,
         bbox_inches = 'tight',
