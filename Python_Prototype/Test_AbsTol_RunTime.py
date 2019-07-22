@@ -1,5 +1,5 @@
 
-from numpy import arange
+from numpy import arange,log
 from matplotlib import pyplot as mpl_plot
 from time import time
 from copy import deepcopy
@@ -18,8 +18,8 @@ def plot(title,xlabel,ylabel,xdata,ydata):
     #mpl_plot.title(title)
     mpl_plot.xlabel(xlabel,fontsize=14)
     mpl_plot.ylabel(ylabel,fontsize=14)
-    mpl_plot.xticks([0,.01,.02,.03],fontsize=12)
-    mpl_plot.yticks([0,10,20,30],fontsize=12)
+    #mpl_plot.xticks([0,.01,.02,.03],fontsize=12)
+    #mpl_plot.yticks([0,10,20,30],fontsize=12)
     for name,(trend,color) in ydata.items():
         mpl_plot.plot(xdata,trend,color=color,label=name)
     mpl_plot.legend(loc=1,prop={'size': 14})
@@ -72,11 +72,11 @@ if __name__ == '__main__':
     
     df = pd.read_csv(fname)
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
-        xlabel = 'Absolute Tolerance',
-        ylabel = 'Integration Runtime',
-        xdata = absTols,
+        xlabel = 'log(Absolute Tolerance)',
+        ylabel = 'log(Integration Runtime)',
+        xdata = log(absTols),
         ydata = {
-            'CLT: Std Gaussian':(df.CLT_stdUniform,'r'),
-            'CLT: Std Uniform ':(df.CLT_stdGaussian,'y'),
-            'CLT Repeated: Lattice':(df.CLT_Rep_lattice,'b'),
-            'CLT Repeated: Sobol':(df.CLT_Rep_Sobol,'g')})
+            'CLT: Std Gaussian':(log(df.CLT_stdUniform),'r'),
+            'CLT: Std Uniform ':(log(df.CLT_stdGaussian),'y'),
+            'CLT Repeated: Lattice':(log(df.CLT_Rep_lattice),'b'),
+            'CLT Repeated: Sobol':(log(df.CLT_Rep_Sobol),'g')})
