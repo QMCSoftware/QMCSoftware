@@ -126,6 +126,12 @@ def get_RS_lattice_b2(n,m,j): # generates j shifted nxm lattices
     return RS_x
 
 if __name__ == "__main__":
-    n,m,j = 4,3,2 # We want to generate 2 randomly shifted 4x3 lattices
+    from time import time
+    t0 = time()
+
+    n,m,j = 1024,3,16 # We want to generate j randomly shifted nxm lattices
     print('\nlattice_b2 without random shift:\n',array([row for row in latticeseq_b2(m=int(log(n)/log(2)),s=m)]))
     print('\n2 randomly shifted lattices:\n',get_RS_lattice_b2(n,m,j))
+
+    t_delta = time()-t0
+    print('\n\nRuntime:',t_delta)

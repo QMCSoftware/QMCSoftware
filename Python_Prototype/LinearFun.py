@@ -7,5 +7,5 @@ class LinearFun(fun):
         super().__init__(nominalValue=nominalValue)
         
     def g(self,x,coordIndex):
-        y = x.sum(1)*5
+        y = x.sum(1)
         return y

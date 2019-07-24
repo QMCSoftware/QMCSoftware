@@ -225,6 +225,12 @@ def get_RS_sobol_b2g(n,m,j):
     return x_RS
 
 if __name__ == "__main__":
-    n,m,j = 4,3,2 # We want to generate 2 randomly shifted 4x3 sobol digital sequences
+    from time import time
+    t0 = time()
+    
+    n,m,j = 1024,3,16 # We want to generate j randomly shifted nxm sobol digital sequences
     print('\nsobol_b2g without random shift:\n',array([row for row in digitalseq_b2g(Cs='sobol_Cs.col',m=int(log(n)/log(2)),s=m)]))
     print('\n2 randomly shifted sobol_b2g:\n',get_RS_sobol_b2g(n,m,j))
+    
+    t_delta = time()-t0
+    print('\n\nRuntime:',t_delta)

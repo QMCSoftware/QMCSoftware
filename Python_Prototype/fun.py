@@ -60,8 +60,7 @@ class fun(ABC):
     # Magic Methods. Makes self[i]==self.fun_list[i]
     def __len__(self): return len(self.fun_list)   
     def __iter__(self):
-        for fun in self.fun_list:
-            yield fun
+        for fun in self.fun_list: yield fun
     def __getitem__(self,i): return self.fun_list[i]
     def __setitem__(self,i,val): self.fun_list[i] = val
     def __repr__(self): return univ_repr(self,'fun','fun_list')
