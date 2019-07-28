@@ -51,7 +51,7 @@ y_surf = points_fun[:,1].reshape((nx,ny))
 z_surf = points_fun[:,2].reshape((nx,ny))
 
 # 3D Plot
-fig = mpl_plt.figure(figsize=(15,6))
+fig = mpl_plt.figure(figsize=(15,5))
 ax1 = fig.add_subplot(131,projection='3d')
 ax2 = fig.add_subplot(132,projection='3d')
 ax3 = fig.add_subplot(133,projection='3d')

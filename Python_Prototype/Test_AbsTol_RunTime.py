@@ -18,11 +18,17 @@ def plot(title,xlabel,ylabel,xdata,ydata):
     #mpl_plot.title(title)
     mpl_plot.xlabel(xlabel,fontsize=14)
     mpl_plot.ylabel(ylabel,fontsize=14)
-    #mpl_plot.xticks([0,.01,.02,.03],fontsize=12)
-    #mpl_plot.yticks([0,10,20,30],fontsize=12)
     for name,(trend,color) in ydata.items():
-        mpl_plot.plot(xdata,trend,color=color,label=name)
-    mpl_plot.legend(loc=1,prop={'size': 14})
+        mpl_plot.loglog(xdata,trend,basex=10,basey=10,color=color,label=name)
+    #mpl_plot.xticks([5*10**-2,10**-1],fontsize=12)
+    #mpl_plot.yticks([0,10,20,30],fontsize=12)
+    mpl_plot.legend(
+        loc = 'lower left',
+        bbox_to_anchor = (0.0, 1.01),
+        ncol = 2, 
+        borderaxespad = 0,
+        frameon = False,
+        prop = {'size': 14})
     mpl_plot.savefig('DevelopOnly/Outputs/AbsTol_Runtime_LinePlot.png',
         dpi=500,
         bbox_inches = 'tight',
@@ -67,16 +73,16 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
 if __name__ == '__main__':
     # Generate Times CSV
     fname = 'DevelopOnly/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
-    absTols = arange(.005,.031,.001)
-    #comp_Clt_vs_cltRep_runtimes(fname,absTols)
+    absTols = arange(.01,.0305,.0001)#arange(.005,.031,.001)
+    comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
-        xlabel = 'log(Absolute Tolerance)',
-        ylabel = 'log(Integration Runtime)',
-        xdata = log(absTols),
+        xlabel = 'Absolute Tolerance',
+        ylabel = 'Integration Runtime',
+        xdata = absTols,
         ydata = {
-            'CLT: Std Gaussian':(log(df.CLT_stdUniform),'r'),
-            'CLT: Std Uniform ':(log(df.CLT_stdGaussian),'y'),
-            'CLT Repeated: Lattice':(log(df.CLT_Rep_lattice),'b'),
-            'CLT Repeated: Sobol':(log(df.CLT_Rep_Sobol),'g')})
+            'CLT: IID Gaussian':(df.CLT_stdUniform,'r'),
+            'CLT: IID Uniform ':(df.CLT_stdGaussian,'y'),
+            'CLT Repeated: Lattice':(df.CLT_Rep_lattice,'b'),
+            'CLT Repeated: Sobol':(df.CLT_Rep_Sobol,'g')})
