@@ -53,28 +53,34 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
     for absTol in abstols:
         print('Absolute Tolerance:',absTol)
         # CLT_stdUniform
-        sol,tDelta = QMC_Wrapper(CLTStopping(absTol=absTol),IIDDistribution(trueD=measure().stdUniform(dimension=[4,16,64])))
+        try: sol,tDelta = QMC_Wrapper(CLTStopping(absTol=absTol),IIDDistribution(trueD=measure().stdUniform(dimension=[4,16,64])))
+        except: sol,tDelta = '',''
         f.write('\n'+str(tDelta)+',')
         print('\tCLT_stdUniform:',sol,tDelta)
         # CLT_stdGaussian
-        sol,tDelta = QMC_Wrapper(CLTStopping(absTol=absTol),IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64])))
+        try: sol,tDelta = QMC_Wrapper(CLTStopping(absTol=absTol),IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64])))
+        except: sol,tDelta = '',''
         f.write(str(tDelta)+',')
         print('\tCLT_stdGaussian:',sol,tDelta)
         # CLT_Rep_lattice
-        sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')))
+        try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')))
+        except: sol,tDelta = '',''
         f.write(str(tDelta)+',')
         print('\tCLT_Rep_lattice:',sol,tDelta)
-        # CLT_Rep_sobol
-        sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')))
+        # CLT_Rep_sobol (Commented out until sobol is improved)
+        '''
+        try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')))
+        except: sol,tDelta = '',''
         f.write(str(tDelta))
         print('\tCLT_Rep_sobol:',sol,tDelta)
+        '''
     f.close()  
     
 if __name__ == '__main__':
     # Generate Times CSV
     fname = 'DevelopOnly/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
-    absTols = arange(.01,.0305,.0001)#arange(.005,.031,.001)
-    comp_Clt_vs_cltRep_runtimes(fname,absTols)
+    absTols = arange(.001,.011,.001)#arange(.001,.011,.001)
+    #comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
@@ -84,5 +90,5 @@ if __name__ == '__main__':
         ydata = {
             'CLT: IID Gaussian':(df.CLT_stdUniform,'r'),
             'CLT: IID Uniform ':(df.CLT_stdGaussian,'y'),
-            'CLT Repeated: Lattice':(df.CLT_Rep_lattice,'b'),
-            'CLT Repeated: Sobol':(df.CLT_Rep_Sobol,'g')})
+            'CLT Repeated: Lattice':(df.CLT_Rep_lattice,'b')})
+            #'CLT Repeated: Sobol':(df.CLT_Rep_Sobol,'g')})

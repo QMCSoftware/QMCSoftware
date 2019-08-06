@@ -31,11 +31,16 @@ sol,out = integrate(fun,measureObj,distribObj,stopObj)
 #print(sol,out)
 
 # CLT Example
-stopObj = CLTStopping(nInit=16,absTol=.5,alpha=.01,inflate=1.2)
+stopObj = CLTStopping(nInit=16,absTol=.3,alpha=.01,inflate=1.2)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim])) # IID sampling
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
 print(sol,out)
+
+# Based on running the above CLT Example
+eps_list = [.5,.4,.3]
+n_list = [58,81,131]
+muHat_list = [1.93,1.91,1.94]
 
 # Function Points
 nx, ny = (100, 100)
@@ -56,9 +61,9 @@ ax1 = fig.add_subplot(131,projection='3d')
 ax2 = fig.add_subplot(132,projection='3d')
 ax3 = fig.add_subplot(133,projection='3d')
 
-plotType = 'randn'
+plotType = 'pregen' #'randn' 'lattice'
 #plotType = 'lattice'
-for ax in [ax1,ax2,ax3]:
+for idx,ax in enumerate([ax1,ax2,ax3]):
     # Surface
     ax.plot_surface(x_surf,y_surf,z_surf,cmap='winter',alpha=.2)
     # Scatters
@@ -72,30 +77,38 @@ for ax in [ax1,ax2,ax3]:
             ax.scatter(points_distrib[:,0],points_distrib[:,1],points_distrib[:,2],color=colors[i],s=15)
             muhat[i] = points_distrib[:,2].mean()
         mu = muhat.mean()
-        std2 = muhat.std()
-        ax.set_title('\t$n$ = %-5d $\sigma$ = %-10.4f $\hat{\mu}$ = %-10.4f'%(n,std2,mu),fontdict={'fontsize': 14})
+        epsilon = muhat.std()
     if plotType == 'randn':
         xu = random.randn(n,dim)
         points_distrib[:,:2] = xu*sqrt(1/2) # transform
         points_distrib[:,2] = fun.g(points_distrib[:,:2],coordIdx)
-        ax.scatter(points_distrib[:,0],points_distrib[:,1],points_distrib[:,2],color='g',s=5)
+        ax.scatter(points_distrib[:,0],points_distrib[:,1],points_distrib[:,2],color='r',s=5)
         mu = points_distrib[:,2].mean()
         std2 = points_distrib[:,2].std()
         epsilon = -norm.ppf(.01/2) * 1.2 * (std2**2/n).sum(0)**.5
-        ax.set_title('\t$n$ = %-5d $\epsilon$ = %-10.4f $\hat{\mu}$ = %-10.4f'%(n,epsilon,mu),fontdict={'fontsize': 14})
+    if plotType == 'pregen':
+        xu = random.randn(n,dim)
+        points_distrib[:,:2] = xu*sqrt(1/2) # transform
+        points_distrib[:,2] = fun.g(points_distrib[:,:2],coordIdx)
+        ax.scatter(points_distrib[:,0],points_distrib[:,1],points_distrib[:,2],color='r',s=5)
+        n = n_list[idx]
+        epsilon = eps_list[idx]
+        mu = muHat_list[idx]
+        ax.scatter(points_distrib[:,0],points_distrib[:,1],points_distrib[:,2],color='r',s=5)
+    ax.set_title('\t$\epsilon$ = %-7.1f $n$ = %-7d $\hat{\mu}$ = %-7.2f '%(epsilon,n,mu),fontdict={'fontsize': 14})
     # axis metas
     n *= 2
     ax.grid(False)
     ax.xaxis.pane.set_edgecolor('black')
     ax.yaxis.pane.set_edgecolor('black')
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
+    ax.set_xlabel('$x_1$',fontdict={'fontsize': 14})
+    ax.set_ylabel('$x_2$',fontdict={'fontsize': 14})
+    ax.set_zlabel('$f\:(x_1,x_2)$',fontdict={'fontsize': 14})
     ax.view_init(20,45)
     
 # Output
 mpl_plt.savefig('DevelopOnly/Outputs/Three_3d_SurfaceScatters.png',
         dpi = 500,
         bbox_inches = 'tight',
-        pad_inches = .05)
+        pad_inches = .15)
 mpl_plt.show()
