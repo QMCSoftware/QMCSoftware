@@ -79,8 +79,8 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
 if __name__ == '__main__':
     # Generate Times CSV
     fname = 'DevelopOnly/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
-    absTols = arange(.001,.011,.001)#arange(.001,.011,.001)
-    #comp_Clt_vs_cltRep_runtimes(fname,absTols)
+    absTols = arange(.001,.021,.001)#arange(.001,.011,.001)
+    comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
