@@ -1,0 +1,238 @@
+\documentclass[final]{beamer}
+
+% Packages
+\usepackage[scale=1.24]{beamerposter}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage{amsmath}
+%\usepackage{minted}
+\usepackage{listings}
+\usepackage{xcolor}
+
+
+\definecolor{darkgreen}{rgb}{0,0.6,0}
+\lstdefinestyle{Python}{
+    language        = Python,
+    basicstyle      = \ttfamily,
+    keywordstyle    = \color{blue},
+    keywordstyle    = [2] \color{teal}, % just to check that it works
+    stringstyle     = \color{green},
+    commentstyle    = \color{darkgreen}\ttfamily
+}
+
+% Styling
+\newcommand{\agsNote}[1]{\textcolor{cyan}{#1}}
+\newcommand{\bfCenter}[1]{\centerline{\textbf{#1}}}
+\usetheme{confposter}
+\setbeamercolor{block title}{fg=blue,bg=white}
+\setbeamercolor{title}{fg=red,bg=white}
+\setbeamercolor{block body}{fg=black,bg=white}
+\setbeamercolor{block alerted title}{fg=white,bg=blue}
+\setbeamercolor{block alerted body}{fg=black,bg=white}
+
+% Formatting
+\newlength{\sepwid}
+\newlength{\onecolwid}
+\newlength{\twocolwid}
+\newlength{\threecolwid}
+\setlength{\paperwidth}{48in}
+\setlength{\paperheight}{36in}
+\setlength{\sepwid}{0.024\paperwidth}
+\setlength{\onecolwid}{0.22\paperwidth}
+\setlength{\twocolwid}{0.464\paperwidth}
+\setlength{\threecolwid}{0.708\paperwidth}
+\setlength{\topmargin}{-0.5in}
+
+\newcommand{\dif}{\mathrm{d}}
+
+% Meta Data
+\title{Community Supported Quasi-Monte Carlo (QMC) Software}
+\author{Fred Hickernell (hickernell@iit.edu), Sou-Cheng Choi (schoi32@iit.edu), Aleksei Sorokin (asorokin@hawk.iit.edu)}
+\institute{Illinois Instute of Technology}
+\logo
+
+\begin{document}
+% Setup Format and Styling
+\addtobeamertemplate{block end}{}{\vspace*{2ex}}
+\addtobeamertemplate{block alerted end}{}{\vspace*{2ex}}
+\setlength{\belowcaptionskip}{2ex}
+\setlength\belowdisplayshortskip{2ex}
+\begin{frame}[t]
+\begin{columns}[t]
+
+% Column 1
+\begin{column}{\sepwid}\end{column}
+\begin{column}{\threecolwid}
+\begin{columns}[t,totalwidth=\threecolwid]  
+
+%    Software Objectives
+\begin{column}{\onecolwid}\vspace{-1in}
+\begin{block}{Software Objectives}
+    To provide QMC software that is: 
+    \begin{itemize}
+        \item Comprised of free open source tools
+        \item Designed for development and support 
+        \item Easy to use for non-experts
+        \item The recognized standard
+    \end{itemize}
+\end{block}
+
+%    The QMC Problem
+\begin{block}{The QMC Problem}
+  %  \\~\
+    \bfCenter{Original Form} 
+        \begin{equation*}
+            \mu = \int_{T} g(t) \, \lambda(\dif t) 
+            \label{eq:ogProblem}
+        \end{equation*}
+        $ g:T \rightarrow \mathbb{R} = $ original integrand \\
+        $ \lambda = $ original measure
+       % \\~\ \\~\
+    \bfCenter{Convenient Form}
+        \begin{equation*}
+            \mu = \int_{X} f(x)\rho(x)dx = \int_{X} f(x) \, \nu( \dif x)
+            \label{convForm}
+        \end{equation*}
+        $\nu = $ well defined probability measure\\
+        $\phi: X \rightarrow T = $ change of variables\\
+        $f: X \rightarrow \mathbb{R} $ = integrand after change of variables
+       % \\~\ \\~\
+    \bfCenter{(quasi-)Monte Carlo Approximation}
+        \begin{equation*}
+            \hat{\mu}_n = a_n \sum_{i=1}^{n} f(x_i)w_i =  \int_{X} f(x) \, \hat{\nu}( \dif x)
+            \label{qmcApprox}
+        \end{equation*}
+        \begin{align*}
+            \nu \approx \hat{\nu}_n & = a_n \sum_{i=1}^n w_i \delta_{\hat{x_i}}(\cdot) \\
+            & = \text{discrete probability measure}
+        \end{align*}
+\end{block}
+\end{column}
+
+%    Integrate
+\begin{column}{\onecolwid}%\vspace{-1in}
+\setbeamercolor{block alerted title}{fg=black,bg=red!10}
+\begin{alertblock}{Integrate}
+    Find $\hat{\mu}_n$ such that $\left | \mu - \hat{\mu} \right  | \leq \epsilon$ \\~\
+    \textbf{Arguments}
+    \begin{itemize}
+        \item Funciton Instance
+        \item Measure Instance
+        \item Discrete Distribution Instance
+        \item Stopping Criterion Instance
+    \end{itemize}
+\end{alertblock}%\\~\
+
+%    Function
+\setbeamercolor{block alerted title}{fg=black,bg=green!10}
+\begin{alertblock}{Function}
+    Specify and generate values $f(\hat{x})$ for $\hat{x} \in \hat{\nu}$ \\~\
+    \textbf{Concrete Classes}
+    \begin{itemize}
+        \item Keister
+        \item Asian Call
+    \end{itemize}
+\end{alertblock}%\\~\
+
+%    Discrete Distribution
+\begin{alertblock}{Discrete Distribution}
+    Specify and generate $a_n \sum_{i=1}^n w_i \delta_{\hat{x_i}}(\cdot)$ \\~\
+    \textbf{Concrete Classes}
+    \begin{itemize}
+        \item IID
+        \item QMC
+    \end{itemize}
+\end{alertblock}
+\end{column} 
+
+%    Stopping Criterion
+\begin{column}{\onecolwid}%\vspace{-1in}
+\setbeamercolor{block alerted title}{fg=black,bg=green!10}
+\begin{alertblock}{Stopping Criterion}
+    Determine $n$ \\~\
+    \textbf{Concrete Classes}
+    \begin{itemize}
+        \item Central Limit Theorem (IID)
+        \item Mean Variance (Mesh)
+    \end{itemize}
+\end{alertblock}%\\~\
+
+%    Measure
+\begin{alertblock}{Measure}
+    Specify components of a general sampling method \\~\
+    \textbf{Implemented Functions}
+    \begin{itemize}
+        \item Standard Uniform
+        \item Standard Gaussian
+        \item IID Zero Mean Gaussian
+        \item Brownian Motion 
+        \item Lattice base 2
+        \item Sobol base 2
+    \end{itemize}
+\end{alertblock}%\\~\
+
+%    Accumulate Data
+\begin{alertblock}{Accumulate Data}
+    Accumulated data required in the computation of the integral
+\end{alertblock}
+\end{column}
+\end{columns}
+
+% Python Example
+\begin{column}{\threecolwid}\vspace{-.8in}
+\begin{block}{Python Example}
+    \begin{column}{\onecolwid}
+   % \\~\ \\
+        %\inputminted{python}{Keister.snip.py}
+        \lstinputlisting[style=Python]{Keister.snip.py}
+    \end{column}
+    \begin{column}{\twocolwid}
+        \begin{figure}
+            \includegraphics[width=0.99\textwidth]{Images/Three_3d_SurfaceScatters.png}
+        \end{figure}
+    \end{column}
+\end{block}
+\end{column}
+\end{column}
+
+% Results
+\vspace{-.5in}
+\begin{column}{\sepwid}\end{column}
+\begin{column}{\onecolwid}\vspace{-.3in}
+\begin{block}{Results}
+    \bfCenter{Integration Time Comparison}
+    \begin{figure}
+        \includegraphics[width=.8\textwidth]{Images/AbsTol_Runtime_LinePlot.png}
+        \caption{Multi-dimensional Asian Call Option integrated with respect to  Brownian Motion}
+    \end{figure}
+\end{block}
+
+%    Future Work 
+\begin{block}{Future Work}
+    \begin{itemize}
+        \item Enhance testing and examples library
+        \item Incorporate existing components
+        \item Expand community of contributors
+    \end{itemize}
+\end{block}
+
+% References
+\begin{block}{References}
+\begin{enumerate}
+    \item \textbf{github.com/QMCSoftware/QMCSoftware.git}
+    \item S.-C. T. Choi, Y. Ding, F. J. Hickernell, L. Jiang,\\
+    Ll. A. Jim\'enez Rugama, D. Li, R. Jagadeeswaran, X. Tong, K. Zhang,Y. Zhang, and X. Zhou,``GAIL: Guaranteed Automatic Integration Library (versions 1.0-2.2),"\\
+    \textbf{http://gailgithub.github.io/GAIL\_Dev/},\\
+    MATLAB software, 2013-2019.
+    \item F.Y. Kuo \& D. Nuyens. Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients - a survey of analysis and implementation, Foundations of Computational Mathematics, 16(6):1631-1696, 2016.
+\end{enumerate}
+\end{block}
+% Acknowledgements
+\begin{block}{Acknowledgements}
+    Thank you to Dirk Nuyens for providing the lattice and Sobol generators
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+\end{document}
