@@ -49,21 +49,21 @@
 % Meta Data
 \title{Community Supported Quasi-Monte Carlo (QMC) Software}
 \author{ Fred Hickernell (\texttt{hickernell@iit.edu}), Sou-Cheng Choi (\texttt{schoi32@iit.edu}), Aleksei Sorokin (\texttt{asorokin@hawk.iit.edu})}
-\institute{Illinois Instute of Technology}
+\institute{Department of Applied Mathematics, Illinois Instute of Technology\vspace{-2ex}}
 
 \begin{document}
 % logos
 \addtobeamertemplate{headline}{} 
 {
 	\begin{tikzpicture}[remember picture,overlay] 
-	\node [anchor=north west, inner sep=2cm] at (current page.north west) {\includegraphics[height=9cm]{images/MengerIITRedGray.eps}}; 
+	\node [anchor=north west, inner sep=1.5cm] at (current page.north west) {\includegraphics[height=9.5cm]{images/MengerIITRedGray.eps}}; 
 	\end{tikzpicture} 
 }
 
 \addtobeamertemplate{headline}{} 
 {
 	\begin{tikzpicture}[remember picture,overlay] 
-	\node [anchor=north east, inner sep=2cm] at (current page.north east) {\includegraphics[height=9cm]{images/iit_high_res.png}}; 
+	\node [anchor=north east, inner sep=1.5cm] at (current page.north east) {\includegraphics[height=9cm]{images/iit_high_res.png}}; 
 	\end{tikzpicture} 
 }
 
@@ -130,7 +130,7 @@
 
 
 %    Integrate
-\begin{column}{\onecolwid}%\vspace{-1in}
+\begin{column}{\onecolwid}
 \setbeamercolor{block alerted title}{fg=black,bg=red!10}
 \begin{alertblock}{Integrate}
     Find $\hat{\mu}_n$ such that $\left | \mu - \hat{\mu} \right  | \leq \epsilon$ \\[1ex]~\
@@ -141,7 +141,7 @@
         \item Discrete Distribution instance
         \item Stopping Criterion instance
     \end{itemize}
-\end{alertblock}%\\~\
+\end{alertblock}
 
 %    Function
 \setbeamercolor{block alerted title}{fg=black,bg=green!10}
@@ -152,7 +152,7 @@
         \item Keister
         \item Asian Call
     \end{itemize}
-\end{alertblock}%\\~\
+\end{alertblock}
 
 %    Discrete Distribution
 \begin{alertblock}{Discrete Distribution}
@@ -175,7 +175,7 @@
         \item Central Limit Theorem (IID)
         \item Mean Variance (Mesh)
     \end{itemize}
-\end{alertblock}%\\~\
+\end{alertblock}
 
 %    Measure
 \begin{alertblock}{Measure}
@@ -189,7 +189,7 @@
         \item Lattice base 2
         \item Sobol base 2
     \end{itemize}
-\end{alertblock}%\\~\
+\end{alertblock}
 
 %    Accumulate Data
 \begin{alertblock}{Accumulate Data}
@@ -200,15 +200,16 @@
 
 % Python Example
 \begin{column}{\threecolwid}\vspace{-.8in}
-\begin{block}{Python Example}
+\begin{block}{Python Examples}
     \begin{column}{\onecolwid}
-   % \\~\ \\
         %\inputminted{python}{Keister.snip.py}
         \lstinputlisting[style=Python]{Keister.snip.py}
     \end{column}
     \begin{column}{\twocolwid}
+    \vspace{-2ex}
         \begin{figure}
             \includegraphics[width=0.98\textwidth]{Images/Three_3d_SurfaceScatters.png}
+            \caption{Reducing tolerance resulting in mores samples and better approximations.}
         \end{figure}
     \end{column}
 \end{block}
