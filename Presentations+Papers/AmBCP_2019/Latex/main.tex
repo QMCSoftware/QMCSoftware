@@ -9,7 +9,7 @@
 %\usepackage{minted}
 \usepackage{listings}
 \usepackage{xcolor}
-
+\usepackage{tikz}
 
 \definecolor{darkgreen}{rgb}{0,0.6,0}
 \lstdefinestyle{Python}{
@@ -42,23 +42,38 @@
 \setlength{\onecolwid}{0.22\paperwidth}
 \setlength{\twocolwid}{0.464\paperwidth}
 \setlength{\threecolwid}{0.708\paperwidth}
-\setlength{\topmargin}{-0.5in}
+\setlength{\topmargin}{-1in}
 
 \newcommand{\dif}{\mathrm{d}}
 
 % Meta Data
 \title{Community Supported Quasi-Monte Carlo (QMC) Software}
-\author{Fred Hickernell (hickernell@iit.edu), Sou-Cheng Choi (schoi32@iit.edu), Aleksei Sorokin (asorokin@hawk.iit.edu)}
+\author{ Fred Hickernell (\texttt{hickernell@iit.edu}), Sou-Cheng Choi (\texttt{schoi32@iit.edu}), Aleksei Sorokin (\texttt{asorokin@hawk.iit.edu})}
 \institute{Illinois Instute of Technology}
-\logo
 
 \begin{document}
+% logos
+\addtobeamertemplate{headline}{} 
+{
+	\begin{tikzpicture}[remember picture,overlay] 
+	\node [anchor=north west, inner sep=2cm] at (current page.north west) {\includegraphics[height=9cm]{images/MengerIITRedGray.eps}}; 
+	\end{tikzpicture} 
+}
+
+\addtobeamertemplate{headline}{} 
+{
+	\begin{tikzpicture}[remember picture,overlay] 
+	\node [anchor=north east, inner sep=2cm] at (current page.north east) {\includegraphics[height=9cm]{images/iit_high_res.png}}; 
+	\end{tikzpicture} 
+}
+
 % Setup Format and Styling
 \addtobeamertemplate{block end}{}{\vspace*{2ex}}
 \addtobeamertemplate{block alerted end}{}{\vspace*{2ex}}
 \setlength{\belowcaptionskip}{2ex}
 \setlength\belowdisplayshortskip{2ex}
 \begin{frame}[t]
+\vspace{-2ex}
 \begin{columns}[t]
 
 % Column 1
@@ -71,16 +86,17 @@
 \begin{block}{Software Objectives}
     To provide QMC software that is: 
     \begin{itemize}
-        \item Comprised of free open source tools
-        \item Designed for development and support 
-        \item Easy to use for non-experts
-        \item The recognized standard
+        \item comprised of free open source tools
+        \item designed for development and support 
+        \item easy to use for non-experts
+        \item a recognized standard
     \end{itemize}
 \end{block}
 
 %    The QMC Problem
+\vspace{-2ex}
 \begin{block}{The QMC Problem}
-  %  \\~\
+
     \bfCenter{Original Form} 
         \begin{equation*}
             \mu = \int_{T} g(t) \, \lambda(\dif t) 
@@ -88,7 +104,8 @@
         \end{equation*}
         $ g:T \rightarrow \mathbb{R} = $ original integrand \\
         $ \lambda = $ original measure
-       % \\~\ \\~\
+
+    \vspace{2ex}
     \bfCenter{Convenient Form}
         \begin{equation*}
             \mu = \int_{X} f(x)\rho(x)dx = \int_{X} f(x) \, \nu( \dif x)
@@ -97,7 +114,8 @@
         $\nu = $ well defined probability measure\\
         $\phi: X \rightarrow T = $ change of variables\\
         $f: X \rightarrow \mathbb{R} $ = integrand after change of variables
-       % \\~\ \\~\
+        
+    \vspace{2ex}
     \bfCenter{(quasi-)Monte Carlo Approximation}
         \begin{equation*}
             \hat{\mu}_n = a_n \sum_{i=1}^{n} f(x_i)w_i =  \int_{X} f(x) \, \hat{\nu}( \dif x)
@@ -110,24 +128,25 @@
 \end{block}
 \end{column}
 
+
 %    Integrate
 \begin{column}{\onecolwid}%\vspace{-1in}
 \setbeamercolor{block alerted title}{fg=black,bg=red!10}
 \begin{alertblock}{Integrate}
-    Find $\hat{\mu}_n$ such that $\left | \mu - \hat{\mu} \right  | \leq \epsilon$ \\~\
+    Find $\hat{\mu}_n$ such that $\left | \mu - \hat{\mu} \right  | \leq \epsilon$ \\[1ex]~\
     \textbf{Arguments}
     \begin{itemize}
-        \item Funciton Instance
-        \item Measure Instance
-        \item Discrete Distribution Instance
-        \item Stopping Criterion Instance
+        \item Function instance
+        \item Measure instance
+        \item Discrete Distribution instance
+        \item Stopping Criterion instance
     \end{itemize}
 \end{alertblock}%\\~\
 
 %    Function
 \setbeamercolor{block alerted title}{fg=black,bg=green!10}
 \begin{alertblock}{Function}
-    Specify and generate values $f(\hat{x})$ for $\hat{x} \in \hat{\nu}$ \\~\
+    Specify and generate values $f(\hat{x})$ for $\hat{x} \in \hat{\nu}$ \\[1ex]~\
     \textbf{Concrete Classes}
     \begin{itemize}
         \item Keister
@@ -137,7 +156,7 @@
 
 %    Discrete Distribution
 \begin{alertblock}{Discrete Distribution}
-    Specify and generate $a_n \sum_{i=1}^n w_i \delta_{\hat{x_i}}(\cdot)$ \\~\
+    Specify and generate $a_n \sum_{i=1}^n w_i \delta_{\hat{x_i}}(\cdot)$ \\[1ex]~\
     \textbf{Concrete Classes}
     \begin{itemize}
         \item IID
@@ -150,7 +169,7 @@
 \begin{column}{\onecolwid}%\vspace{-1in}
 \setbeamercolor{block alerted title}{fg=black,bg=green!10}
 \begin{alertblock}{Stopping Criterion}
-    Determine $n$ \\~\
+    Determine $n$ \\[1ex]~\
     \textbf{Concrete Classes}
     \begin{itemize}
         \item Central Limit Theorem (IID)
@@ -160,7 +179,7 @@
 
 %    Measure
 \begin{alertblock}{Measure}
-    Specify components of a general sampling method \\~\
+    Specify components of a general sampling method \\[1ex]~\
     \textbf{Implemented Functions}
     \begin{itemize}
         \item Standard Uniform
@@ -189,7 +208,7 @@
     \end{column}
     \begin{column}{\twocolwid}
         \begin{figure}
-            \includegraphics[width=0.99\textwidth]{Images/Three_3d_SurfaceScatters.png}
+            \includegraphics[width=0.98\textwidth]{Images/Three_3d_SurfaceScatters.png}
         \end{figure}
     \end{column}
 \end{block}
@@ -197,7 +216,6 @@
 \end{column}
 
 % Results
-\vspace{-.5in}
 \begin{column}{\sepwid}\end{column}
 \begin{column}{\onecolwid}\vspace{-.3in}
 \begin{block}{Results}
@@ -209,10 +227,11 @@
 \end{block}
 
 %    Future Work 
+\vspace{-.5in}
 \begin{block}{Future Work}
     \begin{itemize}
-        \item Enhance testing and examples library
-        \item Incorporate existing components
+        \item Enhance tests and examples 
+        \item Refine existing components
         \item Expand community of contributors
     \end{itemize}
 \end{block}
@@ -220,17 +239,19 @@
 % References
 \begin{block}{References}
 \begin{enumerate}
-    \item \textbf{github.com/QMCSoftware/QMCSoftware.git}
-    \item S.-C. T. Choi, Y. Ding, F. J. Hickernell, L. Jiang,\\
-    Ll. A. Jim\'enez Rugama, D. Li, R. Jagadeeswaran, X. Tong, K. Zhang,Y. Zhang, and X. Zhou,``GAIL: Guaranteed Automatic Integration Library (versions 1.0-2.2),"\\
-    \textbf{http://gailgithub.github.io/GAIL\_Dev/},\\
-    MATLAB software, 2013-2019.
-    \item F.Y. Kuo \& D. Nuyens. Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients - a survey of analysis and implementation, Foundations of Computational Mathematics, 16(6):1631-1696, 2016.
+    
+    \item Hickernell, Choi, and Sorokin. \textit{QMC Community Software}, MATLAB and Python software, 2019. \textit{Working}. Available at \url{https://github.com/QMCSoftware/QMCSoftware}
+    
+    \item Choi,  Ding,  Hickernell,  et al., \textit{GAIL: Guaranteed Automatic Integration Library} (versions 1.0--2.3),
+    MATLAB software, 2013--2019. Available at \url{http://gailgithub.github.io/GAIL_Dev/}.
+    
+    \item Kuo and Nuyens. Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients: a survey of analysis and implementation, \textit{Foundations of Computational Mathematics}, 16(6):1631--1696, 2016.
+
 \end{enumerate}
 \end{block}
 % Acknowledgements
 \begin{block}{Acknowledgements}
-    Thank you to Dirk Nuyens for providing the lattice and Sobol generators
+    Thank you to Dirk Nuyens for providing the lattice and Sobol generators 
 \end{block}
 \end{column}
 \end{columns}
