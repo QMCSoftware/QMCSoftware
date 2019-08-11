@@ -181,7 +181,7 @@
 \begin{column}{\onecolwid}
 \setbeamercolor{block alerted title}{fg=black,bg=green!10}
 \begin{alertblock}{Stopping Criterion}
-    Determine sample size, $n$\\[1ex]~\
+    Determine sample size, $n$, given $\epsilon$\\[1ex]~\
     \textbf{Concrete Classes}
     \begin{itemize}
         \item Central limit theorem (IID)
@@ -221,19 +221,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{column}{\threecolwid}\vspace{-.8in}
 \begin{block}{Python Examples}
-
-    \begin{column}{\onecolwid}
-        %\inputminted{python}{Keister.snip.py}
-        \lstinputlisting[style=Python]{Keister.snip.py}
-    \end{column}
     \begin{column}{\twocolwid}
-    \vspace{-2ex}
-        \begin{figure}
+     % \vspace{-2ex}
+        \begin{figure} 
             \includegraphics[width=0.96\textwidth]{Images/Three_3d_SurfaceScatters.png}         
-            \caption{\ Reducing tolerance resulting in more samples and better approximations of the Keister integrand~\cite{keister1996multidimensional}, $f(\vx) = \pi^{d/2} \cos(\lVert \vx \rVert)$ for $\vx \in  \mathbb{R}^d$ with $d=2$. This figure is reproducible by \texttt{Test\_3D\_Point\_Distribution.py}~\cite{HicEtal19}.}
+            \caption{\ Reducing tolerance resulting in more samples and better approximations of the Keister function~\cite{keister1996multidimensional}, $f(\vx) = \pi^{d/2} \cos(\lVert \vx \rVert)$ for $\vx \in  \mathbb{R}^d$ with $d=2$ integrated over  the unit cube. This figure is reproducible by \texttt{Test\_3D\_Point\_Distribution.py}~\cite{HicEtal19}.}  \label{fig3d}
         \end{figure} 
     \end{column}
-    
+    \begin{column}{\onecolwid}
+        %\inputminted{python}{Keister.snip.py}
+        \lstinputlisting[style=Python,caption=Code for generating the first subplot in Figure~1.]{Keister.snip.py}
+    \end{column}
+
 \end{block}
 \end{column}
 
