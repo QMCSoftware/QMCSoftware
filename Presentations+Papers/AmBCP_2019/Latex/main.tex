@@ -81,10 +81,12 @@
 \begin{column}{\threecolwid}
 \begin{columns}[t,totalwidth=\threecolwid]  
 
-%    Software Objectives
 \begin{column}{\onecolwid}\vspace{-1in}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%    Software Objectives
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{block}{Software Objectives}
-    To provide QMC software that is: 
+    To provide QMC software \cite{HicEtal19} that is: 
     \begin{itemize}
         \item comprised of free open source tools
         \item designed for development and support 
@@ -93,10 +95,11 @@
     \end{itemize}
 \end{block}
 
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %    The QMC Problem
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \vspace{-2ex}
 \begin{block}{The QMC Problem}
-
     \bfCenter{Original Form} 
         \begin{equation*}
             \mu = \int_{T} g(t) \, \lambda(\dif t) 
@@ -117,12 +120,10 @@
         
     \vspace{2ex}
     \bfCenter{(quasi-)Monte Carlo Approximation}
-        \begin{equation*}
-            \hat{\mu}_n = a_n \sum_{i=1}^{n} f(x_i)w_i =  \int_{X} f(x) \, \hat{\nu}( \dif x)
-            \label{qmcApprox}
-        \end{equation*}
         \begin{align*}
-            \nu \approx \hat{\nu}_n & = a_n \sum_{i=1}^n w_i \delta_{\hat{x_i}}(\cdot) \\
+            \hat{\mu}_n &= a_n \sum_{i=1}^{n} f(x_i)w_i =  \int_{X} f(x) \, \hat{\nu}( \dif x)
+            \label{qmcApprox}
+	\\ \nu & \approx \hat{\nu}_n = a_n \sum_{i=1}^n w_i \delta_{\hat{x_i}}(\cdot) \\
             & = \text{discrete probability measure}
         \end{align*}
 \end{block}
@@ -184,10 +185,10 @@
     \begin{itemize}
         \item Standard Uniform
         \item Standard Gaussian
-        \item IID Zero Mean Gaussian
+        \item IID zero-mean Gaussian
         \item Brownian Motion 
-        \item Lattice base 2
-        \item Sobol base 2
+        \item Lattice base 2 \cite{kuo2016application}
+        \item Sobol base 2 \cite{kuo2016application}
     \end{itemize}
 \end{alertblock}
 
@@ -195,10 +196,13 @@
 \begin{alertblock}{Accumulate Data}
     Accumulated data required in the computation of the integral
 \end{alertblock}
+
 \end{column}
 \end{columns}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Python Example
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{column}{\threecolwid}\vspace{-.8in}
 \begin{block}{Python Examples}
     \begin{column}{\onecolwid}
@@ -209,7 +213,7 @@
     \vspace{-2ex}
         \begin{figure}
             \includegraphics[width=0.96\textwidth]{Images/Three_3d_SurfaceScatters.png}
-            \caption{\ Reducing tolerance resulting in more samples and better approximations of the Keister integrand.}
+            \caption{\ Reducing tolerance resulting in more samples and better approximations of the Keister integrand. This figure is reproducible by \texttt{Test\_3D\_Point\_Distribution.py}.}
         \end{figure}
     \end{column}
 \end{block}
@@ -223,7 +227,7 @@
     \bfCenter{Integration Time Comparison}
     \begin{figure}
         \includegraphics[width=1\textwidth]{Images/AbsTol_Runtime_LinePlot.png}
-        \caption{\ Multi-dimensional Asian Call Option integrated with respect to  Brownian Motion.}
+        \caption{\ Multi-dimensional Asian Call Option integrated with respect to  Brownian Motion. This figure is reproducible by \texttt{Test\_AbsTol\_RunTime.py}.}
     \end{figure}
 \end{block}
 
@@ -231,26 +235,28 @@
 \vspace{-.5in}
 \begin{block}{Future Work}
     \begin{itemize}
-        \item Enhance tests and examples 
+        \item Enhance tests, examples, and documentation
         \item Refine existing components
         \item Expand community of contributors
+        \item Bring in relevant algorithms from GAIL~\cite{ChoEtal19}
     \end{itemize}
 \end{block}
 
-% References
+%----------------------------------------------------------------------------------------
+%	REFERENCES
+%----------------------------------------------------------------------------------------
+\vspace{-.5in}
 \begin{block}{References}
-\begin{enumerate}
-    
-    \item Hickernell, Choi, and Sorokin. \textit{QMC Community Software}, MATLAB and Python software, 2019. \textit{Working}. Available at \url{https://github.com/QMCSoftware/QMCSoftware}.
-    
-    \item Choi,  Ding,  Hickernell,  et al., \textit{GAIL: Guaranteed Automatic Integration Library} (versions 1.0--2.3),
-    MATLAB software, 2013--2019. Available at \url{http://gailgithub.github.io/GAIL_Dev/}.
-    
-    \item Kuo and Nuyens. Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients: a survey of analysis and implementation, \textit{Foundations of Computational Mathematics}, 16(6):1631--1696, 2016.
 
-\end{enumerate}
+\nocite{*} % Insert publications even if they are not cited in the poster
+\small{\bibliographystyle{ieeetr}  %{abbrv}
+\bibliography{main}}
+
 \end{block}
-% Acknowledgements
+
+%----------------------------------------------------------------------------------------
+%	ACKNOWLEDGEMENTS
+%----------------------------------------------------------------------------------------
 \begin{block}{Acknowledgements}
     Thank you to Dirk Nuyens for providing the lattice and Sobol generators 
 \end{block}
