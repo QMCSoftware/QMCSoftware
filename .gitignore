@@ -4,3 +4,9 @@ Python_Prototype/.idea/Python_Prototype.iml
 docs/_site
 docs/Gemfile.lock
 __pycache__/
+*.blg
+*.idx
+*.bcf
+*.nav
+*.out
+*.vrb
