@@ -144,7 +144,7 @@
 \begin{column}{\onecolwid}
 \setbeamercolor{block alerted title}{fg=black,bg=red!10}
 \begin{alertblock}{Integrate}
-    Find $\hat{\mu}_n$ such that $\left | \mu - \hat{\mu}_n \right  | \leq \epsilon$ \\[1ex]~\
+    Given $\epsilon>0$, find $\hat{\mu}_n$ such that $\left | \mu - \hat{\mu}_n \right  | \leq \epsilon$ \\[1ex]~\
     \textbf{Arguments}
     \begin{itemize}
         \item Function instance
@@ -181,7 +181,7 @@
 \begin{column}{\onecolwid}
 \setbeamercolor{block alerted title}{fg=black,bg=green!10}
 \begin{alertblock}{Stopping Criterion}
-    Determine $n$ \\[1ex]~\
+    Determine sample size, $n$\\[1ex]~\
     \textbf{Concrete Classes}
     \begin{itemize}
         \item Central limit theorem (IID)
@@ -198,12 +198,13 @@
         \item Standard Gaussian
         \item IID zero-mean Gaussian
         \item Brownian motion 
-        \item Lattice base 2 \cite{kuo2016application}
-        \item Sobol base 2 \cite{kuo2016application}
+        \item Lattice base 2 \cite{kuo2016application,nuyensmagic}
+        \item Sobol base 2 \cite{kuo2016application,nuyensmagic}
     \end{itemize}
 \end{alertblock}
 
 %    Accumulate Data
+\vspace{-1ex}
 \begin{alertblock}{Accumulate Data}
     Accumulated data required in the computation of the integral
 \end{alertblock}
@@ -229,7 +230,7 @@
     \vspace{-2ex}
         \begin{figure}
             \includegraphics[width=0.96\textwidth]{Images/Three_3d_SurfaceScatters.png}         
-            \caption{\ Reducing tolerance resulting in more samples and better approximations of the Keister integrand~\cite{keister1996multidimensional}, $f(\vx) = \pi^{d/2} \cos(\lVert \vx \rVert)$ for $\vx \in  \mathbb{R}^d$ with $d=2$. This figure is reproducible by \texttt{Test\_3D\_Point\_Distribution.py~\cite{HicEtal19}}.}
+            \caption{\ Reducing tolerance resulting in more samples and better approximations of the Keister integrand~\cite{keister1996multidimensional}, $f(\vx) = \pi^{d/2} \cos(\lVert \vx \rVert)$ for $\vx \in  \mathbb{R}^d$ with $d=2$. This figure is reproducible by \texttt{Test\_3D\_Point\_Distribution.py}~\cite{HicEtal19}.}
         \end{figure} 
     \end{column}
     
@@ -246,9 +247,9 @@
 \begin{block}{Results}
     \bfCenter{Integration Time Comparison}
     \begin{figure}
-        \includegraphics[width=1\textwidth]{Images/AbsTol_Runtime_LinePlot.png}
+        \includegraphics[width=1.05\textwidth]{Images/AbsTol_Runtime_LinePlot.png}
         \vspace{-1ex}
-        \caption{\ Multi-dimensional Asian call option integrated with respect to  Brownian Motion. This figure is reproducible by \texttt{Test\_AbsTol\_RunTime.py}~\cite{HicEtal19}.}
+        \caption{\ Multi-dimensional Asian call option integrated with respect to  Brownian Motion. This figure can be easily reproduced by \texttt{Test\_AbsTol\_RunTime.py}~\cite{HicEtal19}.}
     \end{figure}
 \end{block}
 
@@ -280,10 +281,10 @@
 %----------------------------------------------------------------------------------------
 %	ACKNOWLEDGEMENTS
 %----------------------------------------------------------------------------------------
-\vspace{-.3in}
-\begin{block}{Acknowledgements}
-    Thank you to Dirk Nuyens for providing the lattice and Sobol generators 
-\end{block}
+%\vspace{-.3in}
+%\begin{block}{Acknowledgements}
+%    We thank Dirk Nuyens for providing the lattice and Sobol generators \cite{nuyensmagic}
+%\end{block}
 \end{column}
 \end{columns}
 \end{frame}
