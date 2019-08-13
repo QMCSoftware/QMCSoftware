@@ -42,7 +42,7 @@
 \setlength{\onecolwid}{0.2\paperwidth}
 \setlength{\twocolwid}{0.464\paperwidth}
 \setlength{\threecolwid}{0.706\paperwidth}
-\setlength{\topmargin}{-1in}
+\setlength{\topmargin}{-1.6in}
 
 \newcommand{\dif}{\mathrm{d}}
 \newcommand{\bvec}[1]{\boldsymbol{#1}}
@@ -59,14 +59,14 @@
 \addtobeamertemplate{headline}{} 
 {
 	\begin{tikzpicture}[remember picture,overlay] 
-	\node [anchor=north west, inner sep=1.5cm] at (current page.north west) {\includegraphics[height=9.5cm]{images/MengerIITRedGray.eps}}; 
+	\node [anchor=north west, inner sep=1.5cm] at (current page.north west) {\includegraphics[height=8cm]{images/MengerIITRedGray.eps}}; 
 	\end{tikzpicture} 
 }
 
 \addtobeamertemplate{headline}{} 
 {
 	\begin{tikzpicture}[remember picture,overlay] 
-	\node [anchor=north east, inner sep=1.5cm] at (current page.north east) {\includegraphics[height=9cm]{images/iit_high_res.png}}; 
+	\node [anchor=north east, inner sep=1.5cm] at (current page.north east) {\includegraphics[height=8cm]{images/iit_high_res.png}}; 
 	\end{tikzpicture} 
 }
 
@@ -226,7 +226,9 @@ original measure, discrete distribution associated with the sampling points, and
      % \vspace{-2ex}
         \begin{figure} 
             \includegraphics[width=0.96\textwidth]{Images/Three_3d_SurfaceScatters.png}         
-            \caption{\ Reducing tolerance resulting in more samples and better approximations of the Keister integral~\cite{keister1996multidimensional}, $\int_{\mathbb{R}^d} \cos(\lVert \vx \rVert_2) \exp(-\lVert \vx \rVert_2^2)d\vx$  with $d=2$. The true value is approximately 1.80819. This figure is reproducible by \texttt{Test\_3D\_Point\_Distribution.py}~\cite{HicEtal19}.}  \label{fig3d}
+            \caption{\ Reducing tolerance automatically results in more samples and better approximations of the Keister integral~\cite{keister1996multidimensional},  
+            $ \int_{\mathbb{R}^d} \cos(\lVert t \rVert_2) \exp(-\lVert t \rVert_2^2)dt =  \int_{[0,1]^d} \pi^{d/2} 
+\cos\left(\sqrt{ \frac 12 \sum_{j=1}^d\Phi^{-1}(x_j)}\right)  \, \dif \vx \approx 1.80819 $  with $d=2$ and where $\Phi$ is the  standard normal  cumulative distribution function. This figure is reproducible by \texttt{Test\_3D\_Point\_Distribution.py}~\cite{HicEtal19}.}  \label{fig3d}
         \end{figure} 
     \end{column}
     \begin{column}{\onecolwid}
