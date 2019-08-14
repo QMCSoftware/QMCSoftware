@@ -9,7 +9,7 @@ categories:
 ---
 
 
-{% include base_path %}
+[//]: # ({% include base_path %}) 
 
 $$
 {% include latex_preamble %}
