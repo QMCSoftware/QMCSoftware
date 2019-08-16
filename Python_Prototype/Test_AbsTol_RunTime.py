@@ -80,7 +80,7 @@ if __name__ == '__main__':
     # Generate Times CSV
     fname = 'DevelopOnly/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
     absTols = arange(.001,.021,.001)#arange(.001,.011,.001)
-    comp_Clt_vs_cltRep_runtimes(fname,absTols)
+    #comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
@@ -89,6 +89,6 @@ if __name__ == '__main__':
         xdata = absTols,
         ydata = {
             'CLT: IID Gaussian':(df.CLT_stdUniform,'r'),
-            'CLT: IID Uniform ':(df.CLT_stdGaussian,'y'),
-            'CLT Repeated: Lattice':(df.CLT_Rep_lattice,'b')})
-            #'CLT Repeated: Sobol':(df.CLT_Rep_Sobol,'g')})
+            'CLT: IID Uniform ':(df.CLT_stdGaussian,'b'),
+            'CLT Repeated: Lattice':(df.CLT_Rep_lattice,'g')})
+            #'CLT Repeated: Sobol':(df.CLT_Rep_Sobol,'y')})

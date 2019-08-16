@@ -47,10 +47,11 @@
 \newcommand{\dif}{\mathrm{d}}
 \newcommand{\bvec}[1]{\boldsymbol{#1}}
 \newcommand{\vx}{\bvec{x}}
+\newcommand{\vt}{\bvec{t}}
 
 % Meta Data
 \title{Community Supported Quasi-Monte Carlo (QMC) Software}
-\author{ Fred Hickernell (\texttt{hickernell@iit.edu}), Sou-Cheng Choi (\texttt{schoi32@iit.edu}), Aleksei Sorokin (\texttt{asorokin@hawk.iit.edu})}
+\author{ Aleksei Sorokin (\texttt{asorokin@hawk.iit.edu}), Sou-Cheng Choi (\texttt{schoi32@iit.edu}), Fred Hickernell (\texttt{hickernell@iit.edu}) }
 \institute{Department of Applied Mathematics, Illinois Institute of Technology\vspace{-2ex}}
 
  
@@ -92,7 +93,7 @@
     To provide QMC software \cite{HicEtal19} that is: 
     \begin{itemize}
         \item comprised of free open source tools
-        \item designed for development and support 
+        \item designed for continuous development
         \item easy to use for non-experts
         \item a recognized standard
     \end{itemize}
@@ -102,7 +103,7 @@
 %    The QMC Problem
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \vspace{-2ex}
-\begin{block}{The QMC Problem}
+\begin{block}{The Integration Problem}
     \bfCenter{Original Form}
         \begin{equation*}
             \mu = \int_{T} g(t) \, \lambda(\dif t) 
@@ -117,18 +118,19 @@
             \mu = \int_{X} f(x)\rho(x)\, dx = \int_{X} f(x) \, \nu( \dif x)
             \label{convForm}
         \end{equation*}
+	$f: X \rightarrow \mathbb{R} $ is integrand after change of variables\\
         $\nu  $ is some well defined probability measure\\
-        $\rho: X \rightarrow T $ is change of variables\\
-        $f: X \rightarrow \mathbb{R} $ is integrand after change of variables
+        $\rho: X \rightarrow T $ is the probability density
+       
         
     \vspace{2ex}
     \bfCenter{(Quasi-)Monte Carlo Approximation}
-        \begin{align*}
-            \hat{\mu}_n &= a_n \sum_{i=1}^{n} f(x_i)w_i =  \int_{X} f(x) \, \hat{\nu}( \dif x)
+        \begin{gather*}
+            \hat{\mu}_n = a_n \sum_{i=1}^{n} f(x_i)w_i =  \int_{X} f(x) \, \hat{\nu}( \dif x)
             \label{qmcApprox}
-	\\ \nu & \approx \hat{\nu}_n = a_n \sum_{i=1}^n w_i \delta_{\hat{x_i}}(\cdot) 
+	\\ \nu  \approx \hat{\nu}_n = a_n \sum_{i=1}^n w_i \delta_{x_i}(\cdot) 
             \text{ is discrete probability measure}
-        \end{align*}
+        \end{gather*}
 \end{block}
 \end{column}
 
@@ -139,12 +141,12 @@
 \begin{column}{\twocolwid}\vspace{-1in}
 \begin{block}{Main Object Classes}
 %--------------------------------------------------------------
-Our  numerical integration interface takes in instances of children of four abstract  classes that  represent the integrand,
-original measure, discrete distribution associated with the sampling points, and stopping criteria.
+The routine \texttt{integrate} accepts instances of concrete subclasses of four abstract  classes that  represent the integrand,
+original measure, discrete distribution associated with the sampling points, and stopping criterion.
 %    Integrate
 \begin{column}{\onecolwid}  \vspace{-2ex}
 \setbeamercolor{block alerted title}{fg=black,bg=red!10}
-\begin{alertblock}{Integrate}
+\begin{alertblock}{\texttt{integrate}}
     Given $\epsilon>0$, find $\hat{\mu}_n$ such that $\left | \mu - \hat{\mu}_n \right  | \leq \epsilon$ \\[1ex]~\
     \textbf{Arguments}
     \begin{itemize}
@@ -156,9 +158,10 @@ original measure, discrete distribution associated with the sampling points, and
 \end{alertblock}
 
 %    Function
+\vspace{-.1in}
 \setbeamercolor{block alerted title}{fg=black,bg=green!10}
 \begin{alertblock}{Function}
-    Specify and generate values $f(\hat{x})$ for $\hat{x} \in \hat{\nu}$ \\[1ex]~\
+    Specify and generate values $f(x_i)$ \\[1ex]~\
     \textbf{Concrete Classes}
     \begin{itemize}
         \item Keister functions \cite{keister1996multidimensional}
@@ -167,21 +170,22 @@ original measure, discrete distribution associated with the sampling points, and
 \end{alertblock}
 
 %    Discrete Distribution
-\begin{alertblock}{Discrete Distribution}
-    Specify and generate $a_n \sum_{i=1}^n w_i \delta_{\hat{x_i}}(\cdot)$ \\[1ex]~\
+\vspace{-.1in}
+\begin{alertblock}{Discrete Distribution, $\hat{\nu}$}
+    Specify and generate $a_n \sum_{i=1}^n w_i \delta_{x_i}(\cdot)$ \\[1ex]~\
     \textbf{Concrete Classes}
     \begin{itemize}
         \item IID
-        \item QMC
+        \item QMC (Lattice \& Sobol) \cite{kuo2016application,nuyensmagic}
     \end{itemize}
 \end{alertblock}
 \end{column} 
 %--------------------------------------------------------------
 %--------------------------------------------------------------
-%    Stopping Criteria
+%    Stopping Criterion
 \begin{column}{\onecolwid}   \vspace{-2ex}
 \setbeamercolor{block alerted title}{fg=black,bg=green!10}
-\begin{alertblock}{Stopping Criteria}
+\begin{alertblock}{Stopping Criterion}
     Determine sample size, $n$, given $\epsilon$\\[1ex]~\
     \textbf{Concrete Classes}
     \begin{itemize}
@@ -191,23 +195,22 @@ original measure, discrete distribution associated with the sampling points, and
 \end{alertblock}
 
 %    Measure
-\begin{alertblock}{Measure}
-    Specify components of a general sampling method \\[1ex]~\
+\vspace{.4in}
+\begin{alertblock}{Measure, $\lambda$ and $\nu$}
+    Specify the original measure and convienient probability measure \\[1ex]~\
     \textbf{Implemented Functions}
     \begin{itemize}
         \item Standard uniform
         \item Standard Gaussian
         \item IID zero-mean Gaussian
         \item Brownian motion 
-        \item Lattice sequence in base 2 \cite{kuo2016application,nuyensmagic}
-        \item Sobol' sequence in base 2 \cite{kuo2016application,nuyensmagic}
     \end{itemize}
 \end{alertblock}
 
 %    Accumulate Data
-\vspace{-1ex}
+\vspace{.4in}
 \begin{alertblock}{Accumulate Data}
-    Accumulated data required in the computation of the integral
+    Accumulate data required for the computation of the integral and the stopping criterion
 \end{alertblock}
 \end{column}
 
@@ -222,18 +225,21 @@ original measure, discrete distribution associated with the sampling points, and
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{column}{\threecolwid}\vspace{-0.8in}
 \begin{block}{Python Examples}
-    \begin{column}{\twocolwid}
+    \begin{column}{\onecolwid}
+	\vspace{.5in}
+        %\inputminted{python}{Keister.snip.py}
+        \lstinputlisting[style=Python,caption=Essential code for estimating the Keister integral in the first subplot of Figure~1.]{Keister.snip.py}
+    \end{column}
+	\begin{column}{\twocolwid}
      % \vspace{-2ex}
         \begin{figure} 
             \includegraphics[width=0.96\textwidth]{Images/Three_3d_SurfaceScatters.png}         
             \caption{\ Reducing tolerance automatically results in more samples and better approximations of the Keister integral~\cite{keister1996multidimensional},  
-            $ \int_{\mathbb{R}^d} \cos(\lVert t \rVert_2) \exp(-\lVert t \rVert_2^2)dt =  \int_{[0,1]^d} \pi^{d/2} 
-\cos\left(\sqrt{ \frac 12 \sum_{j=1}^d\Phi^{-1}(x_j)}\right)  \, \dif \vx \approx 1.80819 $  with $d=2$ and where $\Phi$ is the  standard normal  cumulative distribution function. This figure is reproducible by \texttt{Test\_3D\_Point\_Distribution.py}~\cite{HicEtal19}.}  \label{fig3d}
+$\displaystyle \int_{\mathbb{R}^d} \pi^{d/2} \cos(\lVert \vt \rVert) \, \frac{\exp(-\lVert \vt \rVert^2)}{\pi^{d/2}}\,\dif \vt = 
+ \int_{\mathbb{R}^d} \pi^{d/2} \cos(\lVert \vx \rVert /\sqrt{2}) \, \frac{\exp(-\lVert \vx \rVert^2/2)}{(2\pi)^{d/2}}\,\dif \vx
+%\int_{[0,1]^d} \pi^{d/2} \cos\left(\sqrt{ \frac 12 \sum_{j=1}^d[\Phi^{-1}(x_j)]^2}\right)  \, \dif \vx 
+\approx 1.80819 $  with $d=2$ and where $\Phi$ is the  standard normal  cumulative distribution function. This figure is reproducible by \texttt{Test\_3D\_Point\_Distribution.py}~\cite{HicEtal19}.}  \label{fig3d}
         \end{figure} 
-    \end{column}
-    \begin{column}{\onecolwid}
-        %\inputminted{python}{Keister.snip.py}
-        \lstinputlisting[style=Python,caption=Essential code for estimating the Keister integral in the first subplot of Figure~1.]{Keister.snip.py}
     \end{column}
 
 \end{block}
@@ -248,6 +254,7 @@ original measure, discrete distribution associated with the sampling points, and
 \begin{column}{\onecolwid}\vspace{-.3in}
 \begin{block}{Results}
     \bfCenter{Integration Time Comparison}
+    \vspace{-.7in}
     \begin{figure}
         \includegraphics[width=1.05\textwidth]{Images/AbsTol_Runtime_LinePlot.png}
         \vspace{-1ex}
@@ -258,11 +265,11 @@ original measure, discrete distribution associated with the sampling points, and
 %----------------------------------------------------------------------------------------
 %    Future Work
 %---------------------------------------------------------------------------------------- 
-\vspace{-.8in}
+\vspace{-.9in}
 \begin{block}{Future Work}
     \begin{itemize}
         \item Enhance tests, examples, and documentation
-        \item Refine existing components
+        \item Refine existing code. e.g. improve Sobol speed
         \item Bring in relevant algorithms from GAIL~\cite{ChoEtal19}
         \item Expand community of contributors
     \end{itemize}
