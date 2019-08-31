@@ -1,5 +1,5 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-from time import clock
+from time import process_time
 from numpy import zeros, std, arange
 
 from algorithms.accumData import accumData
@@ -21,11 +21,11 @@ class meanVarData(accumData):
 
     def updateData(self, distribObj, funObj):
         for ii in range(len(funObj)):
-            tStart = clock()  # time the function values
+            tStart = process_time()  # time the function values
             dim = distribObj[ii].trueD.dimension
             distribData = distribObj[ii].genDistrib(self.nextN[ii],dim)
             y = funObj[ii].f(distribData,arange(1,dim+1))
-            self.costF[ii] = clock() - tStart  # to be used for multi-level methods
+            self.costF[ii] = process_time() - tStart  # to be used for multi-level methods
             if self.stage == 'sigma':
                 self.sighat[ii] = std(y)  # compute the sample standard deviation if required
             self.muhat[ii] = y.mean(0)  # compute the sample mean
