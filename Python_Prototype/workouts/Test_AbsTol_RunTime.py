@@ -29,7 +29,7 @@ def plot(title,xlabel,ylabel,xdata,ydata):
         borderaxespad = 0,
         frameon = False,
         prop = {'size': 14})
-    mpl_plot.savefig('DevelopOnly/Outputs/AbsTol_Runtime_LinePlot.png',
+    mpl_plot.savefig('Outputs/AbsTol_Runtime_LinePlot.png',
         dpi=500,
         bbox_inches = 'tight',
         pad_inches = .05)
@@ -78,7 +78,7 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
     
 if __name__ == '__main__':
     # Generate Times CSV
-    fname = 'DevelopOnly/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
+    fname = 'Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
     absTols = arange(.001,.021,.001)#arange(.001,.011,.001)
     #comp_Clt_vs_cltRep_runtimes(fname,absTols)
     

@@ -106,7 +106,7 @@ for idx,ax in enumerate([ax1,ax2,ax3]):
     ax.view_init(20,45)
     
 # Output
-mpl_plt.savefig('DevelopOnly/Outputs/Three_3d_SurfaceScatters.png',
+mpl_plt.savefig('Outputs/Three_3d_SurfaceScatters.png',
         dpi = 500,
         bbox_inches = 'tight',
         pad_inches = .15)
