@@ -1,3 +1,4 @@
+from mpl_toolkits.mplot3d.axes3d import Axes3D
 import matplotlib.pyplot as mpl_plt
 from numpy import random,linspace,meshgrid, zeros,arange
 
