@@ -164,6 +164,7 @@ class digitalseq_b2g:
         self.n = 2**self.m
         self.returnDeepCopy = returnDeepCopy
         self.reset()
+        f.close()
 
     def reset(self):
         """Reset this digital sequence to its initial state: next index = kstart."""
