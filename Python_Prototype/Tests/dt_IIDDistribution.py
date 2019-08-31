@@ -1,6 +1,6 @@
 """
->>> from IIDDistribution import IIDDistribution
->>> from measure import measure
+>>> from algorithms.IIDDistribution import IIDDistribution
+>>> from algorithms.measure import measure
 >>> distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[3]))
 >>> print(distribObj)
 Constructing discreteDistribution with properties:

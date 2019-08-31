@@ -1,5 +1,5 @@
 """
->>> from KeisterFun import KeisterFun
+>>> from algorithms.KeisterFun import KeisterFun
 >>> kf = KeisterFun()
 >>> print(kf)
 Constructing fun with properties:
