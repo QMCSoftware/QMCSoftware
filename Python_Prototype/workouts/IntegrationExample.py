@@ -13,7 +13,7 @@ from algorithms.KeisterFun import KeisterFun
 from algorithms.AsianCallFun import AsianCallFun
 from algorithms.measure import measure
 
-f = open('Outputs/ie_python.txt','w')
+f = open('workouts/Outputs/ie_python.txt','w')
 def output(sol,dataObj):
     s = 'sol = %.4f\n%s'%(sol,dataObj)
     print('\n'+s)
