@@ -4,14 +4,14 @@
 from numpy import arange,random
 random.seed(7)
 
-from algorithms.CLTStopping import CLTStopping
-from algorithms.CLT_Rep import CLT_Rep
-from algorithms.IIDDistribution import IIDDistribution
-from algorithms.Mesh import Mesh
+from algorithms.stop.CLTStopping import CLTStopping
+from algorithms.stop.CLT_Rep import CLT_Rep
+from algorithms.distribution.IIDDistribution import IIDDistribution
+from algorithms.distribution.Mesh import Mesh
 from algorithms.integrate import integrate
-from algorithms.KeisterFun import KeisterFun
-from algorithms.AsianCallFun import AsianCallFun
-from algorithms.measure import measure
+from algorithms.function.KeisterFun import KeisterFun
+from algorithms.function.AsianCallFun import AsianCallFun
+from algorithms.measure.measure import measure
 
 f = open('workouts/Outputs/ie_python.txt','w')
 def output(sol,dataObj):

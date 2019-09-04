@@ -1,7 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from third_party.digitalsequence_b2g import get_RS_sobol_b2g
-from algorithms.discreteDistribution import discreteDistribution
-# Import random shift functions
+from algorithms.distribution.discreteDistribution import discreteDistribution
+# Import random shift function
 from third_party.latticeseq_b2 import get_RS_lattice_b2
 
 

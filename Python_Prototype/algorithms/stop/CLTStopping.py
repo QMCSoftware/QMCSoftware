@@ -4,8 +4,8 @@ from time import time
 from numpy import zeros, full, inf, array, maximum, minimum, tile, ceil
 from scipy.stats import norm
 
-from algorithms.meanVarData import meanVarData
-from algorithms.stoppingCriterion import stoppingCriterion
+from algorithms.accumData.meanVarData import meanVarData
+from algorithms.stop.stoppingCriterion import stoppingCriterion
 
 
 class CLTStopping(stoppingCriterion):

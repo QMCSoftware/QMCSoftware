@@ -2,13 +2,13 @@
 from time import process_time
 from numpy import zeros, ones, arange
 
-from algorithms.accumData import accumData
+from algorithms.accumData.accumData import accumData
 
 class meanVarData_Rep(accumData):
     ''' Accumulated data for lattice calculations '''
     def __init__(self,nf,J):
         '''
-        nf = # functions
+        nf = # function
         J = # streams
         '''
         super().__init__()

@@ -1,7 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from abc import ABC, abstractmethod
 
-from algorithms.measure import measure
+from algorithms.measure.measure import measure
 from algorithms.util import univ_repr
 
 

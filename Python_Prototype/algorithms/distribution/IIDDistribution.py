@@ -1,7 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from numpy.random import rand, randn
 
-from algorithms.discreteDistribution import discreteDistribution
+from algorithms.distribution.discreteDistribution import discreteDistribution
 
 
 class IIDDistribution(discreteDistribution):

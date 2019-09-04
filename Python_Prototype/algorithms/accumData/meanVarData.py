@@ -3,7 +3,7 @@ from time import process_time
 from numpy import zeros, std, arange,finfo,float32
 eps = finfo(float32).eps
 
-from algorithms.accumData import accumData
+from algorithms.accumData.accumData import accumData
 
 
 class meanVarData(accumData):
@@ -13,7 +13,7 @@ class meanVarData(accumData):
     '''
     
     def __init__(self,nf):
-        ''' nf = # functions '''
+        ''' nf = # function '''
         super().__init__()
         self.muhat = zeros(nf) # sample mean
         self.sighat = zeros(nf) # sample standard deviation

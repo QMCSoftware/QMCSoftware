@@ -2,11 +2,11 @@ import unittest
 
 from numpy import random
 
-from algorithms.CLTStopping import CLTStopping
-from algorithms.IIDDistribution import IIDDistribution
-from algorithms.KeisterFun import KeisterFun
+from algorithms.stop.CLTStopping import CLTStopping
+from algorithms.distribution.IIDDistribution import IIDDistribution
+from algorithms.function.KeisterFun import KeisterFun
 from algorithms.integrate import integrate
-from algorithms.measure import measure
+from algorithms.measure.measure import measure
 
 
 class IntegrationExampleTest(unittest.TestCase):

@@ -3,8 +3,8 @@ from time import time
 from numpy import array, zeros, full
 from scipy.stats import norm
 
-from algorithms.meanVarData_Rep import meanVarData_Rep
-from algorithms.stoppingCriterion import stoppingCriterion
+from algorithms.accumData.meanVarData_Rep import meanVarData_Rep
+from algorithms.stop.stoppingCriterion import stoppingCriterion
 
 
 class CLT_Rep(stoppingCriterion):

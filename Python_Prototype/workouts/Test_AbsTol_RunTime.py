@@ -5,13 +5,13 @@ import pandas as pd
 from matplotlib import pyplot as mpl_plot
 from numpy import arange
 
-from algorithms.AsianCallFun import AsianCallFun
-from algorithms.CLTStopping import CLTStopping
-from algorithms.CLT_Rep import CLT_Rep
-from algorithms.IIDDistribution import IIDDistribution
-from algorithms.Mesh import Mesh
+from algorithms.function.AsianCallFun import AsianCallFun
+from algorithms.stop.CLTStopping import CLTStopping
+from algorithms.stop.CLT_Rep import CLT_Rep
+from algorithms.distribution.IIDDistribution import IIDDistribution
+from algorithms.distribution.Mesh import Mesh
 from algorithms.integrate import integrate
-from algorithms.measure import measure
+from algorithms.measure.measure import measure
 
 
 def plot(title,xlabel,ylabel,xdata,ydata):
@@ -78,7 +78,7 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
     
 if __name__ == '__main__':
     # Generate Times CSV
-    fname = 'Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
+    fname = 'workouts/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
     absTols = arange(.001,.021,.001)#arange(.001,.011,.001)
     #comp_Clt_vs_cltRep_runtimes(fname,absTols)
     

@@ -1,7 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from numpy import cos, pi
 
-from algorithms.fun import fun
+from algorithms.function.fun import fun
 
 
 class KeisterFun(fun):

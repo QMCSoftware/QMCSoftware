@@ -1,5 +1,5 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-from algorithms.fun import fun as fun
+from algorithms.function.fun import fun as fun
 from numpy import exp, maximum
 
 class AsianCallFun(fun):
