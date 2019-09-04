@@ -1,6 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-from time import process_time
 from numpy import zeros, ones, arange
+from time import process_time
+eps = finfo(float32).eps
 
 from algorithms.accumData.accumData import accumData
 
@@ -28,7 +29,7 @@ class meanVarData_Rep(accumData):
             for j in range(self.J):
                 y = funObj[i].f(set_x[j],arange(1,dim+1))
                 self.muhat[j] = y.mean(0)
-            self.costF[i] = process_time() - tStart
+            self.costF[i] = max(process_time()-tStart,eps) 
             self.mu2hat[i] = self.muhat.mean(0)
             self.sig2hat[i] = self.muhat.std(0)
         self.solution = self.mu2hat.sum(0)

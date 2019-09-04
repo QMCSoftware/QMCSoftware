@@ -1,6 +1,6 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-from time import process_time
 from numpy import zeros, std, arange,finfo,float32
+from time import process_time
 eps = finfo(float32).eps
 
 from algorithms.accumData.accumData import accumData
@@ -24,7 +24,6 @@ class meanVarData(accumData):
         for ii in range(len(funObj)):
             tStart = process_time()  # time the function values
             dim = distribObj[ii].trueD.dimension
-            print(self)
             distribData = distribObj[ii].genDistrib(self.nextN[ii],dim)
             y = funObj[ii].f(distribData,arange(1,dim+1))
             self.costF[ii] = max(process_time()-tStart,eps)  # to be used for multi-level methods
