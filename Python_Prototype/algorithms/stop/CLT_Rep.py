@@ -3,9 +3,8 @@ from time import time
 from numpy import array, zeros, full
 from scipy.stats import norm
 
-from algorithms.accumData.meanVarData_Rep import meanVarData_Rep
-from algorithms.stop.stoppingCriterion import stoppingCriterion
-
+from . import stoppingCriterion
+from ..accumData.meanVarData_Rep import meanVarData_Rep
 
 class CLT_Rep(stoppingCriterion):
     ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''
@@ -48,7 +47,3 @@ class CLT_Rep(stoppingCriterion):
     def get_quantile(self):
         # dependent property
         return -norm.ppf(self.alpha / 2)
-
-if __name__ == "__main__":
-    # Run Doctests
-    print('Still need to write doctest for this')

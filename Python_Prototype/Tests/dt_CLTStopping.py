@@ -1,5 +1,5 @@
 """
->>> from algorithms.CLTStopping import CLTStopping as CLTStopping
+>>> from algorithms.stop.CLTStopping import CLTStopping
 >>> clts = CLTStopping()
 >>> print(clts)
 Constructing stoppingCriterion with properties:

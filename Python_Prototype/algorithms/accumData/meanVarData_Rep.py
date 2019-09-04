@@ -1,9 +1,9 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-from numpy import zeros, ones, arange
+from numpy import zeros, ones, arange, finfo, float32
 from time import process_time
 eps = finfo(float32).eps
 
-from algorithms.accumData.accumData import accumData
+from . import accumData
 
 class meanVarData_Rep(accumData):
     ''' Accumulated data for lattice calculations '''
@@ -34,7 +34,3 @@ class meanVarData_Rep(accumData):
             self.sig2hat[i] = self.muhat.std(0)
         self.solution = self.mu2hat.sum(0)
         return self
-
-if __name__ == "__main__":
-    # Doctests
-    print('Still need to write doctest for this')

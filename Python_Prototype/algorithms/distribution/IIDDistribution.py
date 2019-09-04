@@ -1,8 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from numpy.random import rand, randn
 
-from algorithms.distribution.discreteDistribution import discreteDistribution
-
+from . import discreteDistribution
 
 class IIDDistribution(discreteDistribution):
     '''
@@ -27,8 +26,3 @@ class IIDDistribution(discreteDistribution):
             return randn(j,int(n),int(m)).squeeze()
         else:
             raise Exception('Distribution not recognized')
-
-if __name__ == "__main__":
-    import doctest
-    x = doctest.testfile("Tests/dt_IIDDistribution.py")
-    print("\n"+str(x))

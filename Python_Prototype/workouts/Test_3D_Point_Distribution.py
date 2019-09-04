@@ -1,27 +1,25 @@
 import matplotlib.pyplot as mpl_plt
-from numpy import random,linspace,meshgrid, zeros,arange
 from mpl_toolkits.mplot3d.axes3d import Axes3D
-
-random.seed(7)
 from scipy.stats import norm
+from numpy import random,linspace,meshgrid, zeros,arange
+random.seed(7)
 
 from third_party.latticeseq_b2 import get_RS_lattice_b2
 from algorithms.distribution.IIDDistribution import IIDDistribution
-from algorithms.measure.measure import measure
+from algorithms.distribution import measure
 from algorithms.function.KeisterFun import KeisterFun
 
 dim = 2
-
-fun = KeisterFun()
-measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]))
-fun = fun.transformVariable(measureObj, distribObj)
-
 j = 3
 colors = ['r','b','g']
 n = 32
 var = 1/2
 coordIdx = arange(1,dim+1)
+
+fun = KeisterFun()
+measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
+distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]))
+fun = fun.transformVariable(measureObj, distribObj)
 
 # Examples
 '''
@@ -107,7 +105,7 @@ for idx,ax in enumerate([ax1,ax2,ax3]):
     ax.view_init(20,45)
     
 # Output
-mpl_plt.savefig('Outputs/Three_3d_SurfaceScatters.png',
+mpl_plt.savefig('workouts/Outputs/Three_3d_SurfaceScatters.png',
         dpi = 500,
         bbox_inches = 'tight',
         pad_inches = .15)

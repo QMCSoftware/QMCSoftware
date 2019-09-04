@@ -1,12 +1,10 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import time
-
 from numpy import zeros, full, inf, array, maximum, minimum, tile, ceil
 from scipy.stats import norm
 
-from algorithms.accumData.meanVarData import meanVarData
-from algorithms.stop.stoppingCriterion import stoppingCriterion
-
+from . import stoppingCriterion
+from ..accumData.meanVarData import meanVarData
 
 class CLTStopping(stoppingCriterion):
     ''' Stopping criterion based on the Centeral Limit Theorem. '''
@@ -52,9 +50,3 @@ class CLTStopping(stoppingCriterion):
     def get_quantile(self):
         # dependent property
         return -norm.ppf(self.alpha / 2)
-
-if __name__ == "__main__":
-    # Run Doctests
-    import doctest
-    x = doctest.testfile("Tests/dt_CLTStopping.py")
-    print("\n" + str(x))

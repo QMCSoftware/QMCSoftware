@@ -1,9 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
+from . import discreteDistribution
 from third_party.digitalsequence_b2g import get_RS_sobol_b2g
-from algorithms.distribution.discreteDistribution import discreteDistribution
-# Import random shift function
 from third_party.latticeseq_b2 import get_RS_lattice_b2
-
 
 class Mesh(discreteDistribution):
 
@@ -26,8 +24,3 @@ class Mesh(discreteDistribution):
             elif meshType=='sobol': return get_RS_sobol_b2g(n,m,j)
             else: raise Exception("%s mesh cannot mimic %s distribution"%(meshType,mimicMeasure))
         else: raise Exception('Distribution not recognized')
-
-if __name__ == "__main__":
-    import doctest
-    x = doctest.testfile("Tests/dt_IIDDistribution.py")
-    print("\n"+str(x))

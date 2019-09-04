@@ -1,6 +1,6 @@
 """
 >>> from numpy import arange
->>> from algorithms.measure import measure
+>>> from algorithms.distribution import measure
 >>> measure_1D = measure().stdGaussian()
 >>> print(measure_1D)
 Constructing measure with properties:

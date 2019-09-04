@@ -1,4 +1,4 @@
-from algorithms.function.fun import fun
+from . import fun
 
 class LinearFun(fun):
     

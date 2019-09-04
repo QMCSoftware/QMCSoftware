@@ -1,5 +1,5 @@
 """
->>> from algorithms.AsianCallFun import AsianCallFun
+>>> from algorithms.function.AsianCallFun import AsianCallFun
 >>> acf = AsianCallFun()
 >>> print(acf)
 Constructing fun with properties:

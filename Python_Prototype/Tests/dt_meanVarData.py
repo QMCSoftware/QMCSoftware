@@ -1,5 +1,5 @@
 """
->>> from algorithms.meanVarData import meanVarData
+>>> from algorithms.accumData.meanVarData import meanVarData
 >>> mvd = meanVarData()
 >>> print(mvd)
 Constructing accumData with properties:

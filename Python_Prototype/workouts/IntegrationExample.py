@@ -11,7 +11,7 @@ from algorithms.distribution.Mesh import Mesh
 from algorithms.integrate import integrate
 from algorithms.function.KeisterFun import KeisterFun
 from algorithms.function.AsianCallFun import AsianCallFun
-from algorithms.measure.measure import measure
+from algorithms.distribution import measure
 
 f = open('workouts/Outputs/ie_python.txt','w')
 def output(sol,dataObj):

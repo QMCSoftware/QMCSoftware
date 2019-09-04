@@ -1,6 +1,4 @@
-
 from time import time
-
 import pandas as pd
 from matplotlib import pyplot as mpl_plot
 from numpy import arange
@@ -11,8 +9,7 @@ from algorithms.stop.CLT_Rep import CLT_Rep
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.Mesh import Mesh
 from algorithms.integrate import integrate
-from algorithms.measure.measure import measure
-
+from algorithms.distribution import measure
 
 def plot(title,xlabel,ylabel,xdata,ydata):
     #mpl_plot.title(title)
@@ -29,7 +26,7 @@ def plot(title,xlabel,ylabel,xdata,ydata):
         borderaxespad = 0,
         frameon = False,
         prop = {'size': 14})
-    mpl_plot.savefig('Outputs/AbsTol_Runtime_LinePlot.png',
+    mpl_plot.savefig('workouts/Outputs/AbsTol_Runtime_LinePlot.png',
         dpi=500,
         bbox_inches = 'tight',
         pad_inches = .05)

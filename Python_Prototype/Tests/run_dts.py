@@ -3,4 +3,4 @@
 from doctest import testfile
 
 dt_objs = ['AsianCallFun','CLTStopping','IIDDistribution','integrate','KeisterFun','meanVarData','measure']
-[print('%s: %s'%(obj,testfile('dt_%s.py'%(obj),report=False))) for obj in dt_objs]
+[print('\n%s: %s\n'%(obj,testfile('./dt_%s.py'%(obj),report=False))) for obj in dt_objs]

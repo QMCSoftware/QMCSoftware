@@ -1,8 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from numpy import cos, pi
 
-from algorithms.function.fun import fun
-
+from . import fun
 
 class KeisterFun(fun):
     '''
@@ -22,9 +21,3 @@ class KeisterFun(fun):
             normx2 = normx2 + self.nominalValue**2 * (self.dimension - nCoordIndex)
         y = pi**(nCoordIndex/2)*cos(normx2**.5)
         return y
-
-if __name__ == "__main__":
-    # Doctests
-    import doctest
-    x = doctest.testfile("Tests/dt_KeisterFun.py")
-    print("\n"+str(x))

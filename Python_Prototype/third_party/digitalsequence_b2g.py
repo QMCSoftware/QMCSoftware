@@ -2,11 +2,8 @@
 (C) Dirk Nuyens, KU Leuven, 2016,...
 Retrieved python/latticeseq_b2.py from https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/ 
 '''
-
 from __future__ import print_function
-
 import mpmath
-
 
 # the following function is duplicated from poylat.py such that this file can be used stand alone
 def bitreverse(a, m=None):

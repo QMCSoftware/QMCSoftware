@@ -1,6 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-from algorithms.function.fun import fun as fun
 from numpy import exp, maximum
+
+from . import fun
 
 class AsianCallFun(fun):
     ''' Specify and generate payoff values of an Asian Call option'''
@@ -32,10 +33,3 @@ class AsianCallFun(fun):
             AvgCourse = ((self.S0/2)+Scourse[:,:int(dCourse)-1].sum(1)+Scourse[:,int(dCourse)-1]/2)/dCourse
             y = y-maximum(AvgCourse-self.K,0)
         return y
-
-if __name__ == "__main__":
-    # Run Doctests
-    import doctest
-    x = doctest.testfile("Tests/dt_AsianCallFun.py")
-    print("\n" + str(x))
-

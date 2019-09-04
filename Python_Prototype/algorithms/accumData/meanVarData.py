@@ -1,10 +1,9 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-from numpy import zeros, std, arange,finfo,float32
+from numpy import zeros, std, arange, finfo, float32
 from time import process_time
 eps = finfo(float32).eps
 
-from algorithms.accumData.accumData import accumData
-
+from . import accumData
 
 class meanVarData(accumData):
     '''
@@ -32,9 +31,3 @@ class meanVarData(accumData):
             self.muhat[ii] = y.mean(0)  # compute the sample mean
             self.solution = self.muhat.sum(0) # which also acts as our tentative solution
         return self
-
-if __name__ == "__main__":
-    # Doctests
-    import doctest
-    x = doctest.testfile("Tests/dt_meanVarData.py")
-    print("\n"+str(x))

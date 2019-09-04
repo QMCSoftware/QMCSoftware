@@ -17,8 +17,3 @@ def integrate(funObj,measureObj,distribObj,stopCritObj):
     solution = dataObj.solution  # assign outputs
     dataObj.timeUsed = time() - dataObj._timeStart
     return solution, dataObj
-
-if __name__ == "__main__":
-    import doctest
-    x = doctest.testfile("Tests/dt_integrate.py")
-    print("\n"+str(x))
