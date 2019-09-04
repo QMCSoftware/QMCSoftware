@@ -11,3 +11,4 @@ __pycache__/
 *.out
 *.vrb
 Python_Prototype/.vscode/
+Python_Prototype/workouts/Outputs/*.png
