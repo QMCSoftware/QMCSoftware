@@ -1,6 +1,7 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from abc import ABC, abstractmethod
-from numpy import sqrt, cumsum, diff, insert
+
+from numpy import cumsum, diff, insert, sqrt
 from scipy.stats import norm
 
 from .. import univ_repr

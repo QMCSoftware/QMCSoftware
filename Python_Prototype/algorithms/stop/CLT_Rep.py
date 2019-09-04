@@ -1,10 +1,12 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import time
-from numpy import array, zeros, full
+
+from numpy import array, full, zeros
 from scipy.stats import norm
 
 from . import stoppingCriterion
 from ..accumData.meanVarData_Rep import meanVarData_Rep
+
 
 class CLT_Rep(stoppingCriterion):
     ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''

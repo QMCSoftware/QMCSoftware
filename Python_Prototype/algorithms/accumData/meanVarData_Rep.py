@@ -1,6 +1,8 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-from numpy import zeros, ones, arange, finfo, float32
 from time import process_time
+
+from numpy import arange, finfo, float32, ones, zeros
+
 eps = finfo(float32).eps
 
 from . import accumData

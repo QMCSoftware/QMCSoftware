@@ -1,15 +1,17 @@
 from time import time
+
 import pandas as pd
 from matplotlib import pyplot as mpl_plot
 from numpy import arange
 
-from algorithms.function.AsianCallFun import AsianCallFun
-from algorithms.stop.CLTStopping import CLTStopping
-from algorithms.stop.CLT_Rep import CLT_Rep
+from algorithms.distribution import measure
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.Mesh import Mesh
+from algorithms.function.AsianCallFun import AsianCallFun
 from algorithms.integrate import integrate
-from algorithms.distribution import measure
+from algorithms.stop.CLTStopping import CLTStopping
+from algorithms.stop.CLT_Rep import CLT_Rep
+
 
 def plot(title,xlabel,ylabel,xdata,ydata):
     #mpl_plot.title(title)

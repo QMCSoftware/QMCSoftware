@@ -1,10 +1,12 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import time
-from numpy import zeros, full, inf, array, maximum, minimum, tile, ceil
+
+from numpy import array, ceil, full, inf, maximum, minimum, tile, zeros
 from scipy.stats import norm
 
 from . import stoppingCriterion
 from ..accumData.meanVarData import meanVarData
+
 
 class CLTStopping(stoppingCriterion):
     ''' Stopping criterion based on the Centeral Limit Theorem. '''
