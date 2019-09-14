@@ -1,5 +1,3 @@
-
-Python_Prototype/.idea/Python_Prototype.iml
 *.pyc
 docs/_site
 docs/Gemfile.lock
@@ -10,5 +8,5 @@ __pycache__/
 *.nav
 *.out
 *.vrb
-Python_Prototype/.vscode/
-Python_Prototype/workouts/Outputs/*.png
+qmcpy/.vscode/
+qmcpy/workouts/Outputs/*.png
