@@ -1,0 +1,89 @@
+sol = 2.1729
+out = meanVarData with properties:
+           muhat: 2.1729
+          sighat: 2.2013
+          nSigma: 1024
+             nMu: 462961
+        solution: 2.1729
+           stage: 'done'
+           prevN: 1024
+           nextN: 463985
+        timeUsed: 0.2335
+    nSamplesUsed: 463985
+       confidInt: [2.1629 2.1829]
+           costF: 0.0654
+
+sol = 2.1689
+out = meanVarData with properties:
+           muhat: 2.1689
+          sighat: 2.2013
+          nSigma: 1024
+             nMu: 46296020
+        solution: 2.1689
+           stage: 'done'
+           prevN: 1024
+           nextN: 46297044
+        timeUsed: 6.3522
+    nSamplesUsed: 46297044
+       confidInt: [2.1679 2.1699]
+           costF: 6.2766
+
+sol = 2.1717
+out = meanVarData with properties:
+           muhat: 2.1717
+          sighat: 2.2013
+          nSigma: 1024
+             nMu: 998976
+        solution: 2.1717
+           stage: 'done'
+           prevN: 1024
+           nextN: 1000000
+        timeUsed: 0.1590
+    nSamplesUsed: 1000000
+       confidInt: [2.1649 2.1785]
+           costF: 0.1330
+
+sol = 6.1758
+out = meanVarData with properties:
+           muhat: 6.1758
+          sighat: 7.8647
+          nSigma: 1024
+             nMu: 5909594
+        solution: 6.1758
+           stage: 'done'
+           prevN: 1024
+           nextN: 5910618
+        timeUsed: 1.2707
+    nSamplesUsed: 5910618
+       confidInt: [6.1658 6.1858]
+           costF: 1.2470
+
+sol = 6.2149
+out = meanVarData with properties:
+           muhat: 6.2149
+          sighat: 7.9724
+          nSigma: 1024
+             nMu: 60726
+        solution: 6.2149
+           stage: 'done'
+           prevN: 1024
+           nextN: 61750
+        timeUsed: 0.2282
+    nSamplesUsed: 61750
+       confidInt: [6.1149 6.3149]
+           costF: 0.2005
+
+sol = 6.2068
+out = meanVarData with properties:
+           muhat: [6.1784 0.0264 0.0021]
+          sighat: [7.8647 1.0169 0.2603]
+          nSigma: 1024
+             nMu: [6610944 1177448 291945]
+        solution: 6.2068
+           stage: 'done'
+           prevN: [1024 1024 1024]
+           nextN: [6611968 1178472 292969]
+        timeUsed: 3.4349
+    nSamplesUsed: [6611968 1178472 292969]
+       confidInt: [6.1975 6.2161]
+           costF: [1.3200 1.0387 0.9811]
