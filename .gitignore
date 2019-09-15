@@ -1,3 +1,4 @@
+qmcpy/.idea/qmcpy.iml
 *.pyc
 docs/_site
 docs/Gemfile.lock

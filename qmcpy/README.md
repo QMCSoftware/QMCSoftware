@@ -21,7 +21,7 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 <b>Concrete Classes:</b>
 - Independent Identically Distributed
 - Mesh
- 
+- 
 <hr>
 
 ## Accumulate Data Class
