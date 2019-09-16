@@ -8,11 +8,6 @@ categories:
   - MLMC
 ---
 
-
-[//]: # ({% include base_path %}) 
-
-[//]: # ({% include latex_preamble %})
-
 $$
 \def\oS{\overline S}
 $$
