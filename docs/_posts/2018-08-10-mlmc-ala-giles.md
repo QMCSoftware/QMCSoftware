@@ -11,7 +11,7 @@ categories:
 
 [//]: # ({% include base_path %}) 
 
-[//]: # ({% include latex_preamble %})
+{% include latex_preamble %}
 
 $$
 \def\oS{\overline S}
