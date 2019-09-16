@@ -1,6 +1,6 @@
 {% if page.author_profile or layout.author_profile or page.sidebar %}
 <div class="sidebar sticky">
-{% if page.author_profile or layout.author_profile %}{% include author-profile.html %}{% endif %}
+{% if page.author_profile or layout.author_profile %}{% endif %}
 {% if page.sidebar %}
 {% for s in page.sidebar %}
 {% if s.image %}
@@ -16,11 +16,9 @@ alt="{% if s.image_alt %}{{ s.image_alt }}{% endif %}">
 {% if s.text %}{{ s.text | markdownify }}{% endif %}
 {% endfor %}
 {% if page.sidebar.nav %}
-{% include nav_list nav=page.sidebar.nav %}
 {% endif %}
 
 {% if page.sidebar.custom %}
-{% include ex_list.html %}
 {% endif %}
 {% endif %}
 </div>
