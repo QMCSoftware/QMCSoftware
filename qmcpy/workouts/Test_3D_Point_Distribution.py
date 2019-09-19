@@ -1,12 +1,12 @@
-import matplotlib.pyplot as mpl_plt
+from algorithms.distribution import measure
+from algorithms.distribution.IIDDistribution import IIDDistribution
+from algorithms.function.KeisterFun import KeisterFun
 from mpl_toolkits.mplot3d.axes3d import Axes3D
+import matplotlib.pyplot as mpl_plt
 from numpy import arange, linspace, meshgrid, random, zeros
 from scipy.stats import norm
 
-from third_party.latticeseq_b2 import get_RS_lattice_b2
-from algorithms.distribution.IIDDistribution import IIDDistribution
-from algorithms.distribution import measure
-from algorithms.function.KeisterFun import KeisterFun
+
 
 random.seed(7)
 
