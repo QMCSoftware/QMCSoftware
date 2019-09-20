@@ -1,8 +1,7 @@
 from third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
-from third_party.magic_point_shop.digitalseq_b2g import bitreverse
+
 
 class digitalSeq(digitalseq_b2g):
-    class digitalseq_b2g:
         """
           Digital sequence point generator based on generating matrices.
           This sequence generator can take classical (m by m) generating matrices
@@ -127,12 +126,12 @@ class digitalSeq(digitalseq_b2g):
             basestr = str  # basestr for python2, str for python3
             if isinstance(Cs, basestr):
                 # filename passed in
-                f = open(Cs)
-                Cs = [list(map(int, line.split())) for line in f]
+                import pandas as pd
+                Cs = pd.read_csv(Cs, header=None, delimiter=" ").values.tolist()
+                #f = open(Cs)
+                #Cs = [list(map(int, line.split())) for line in f]
             elif hasattr(Cs, 'read'):
                 # assume z is a stream like sys.stdin
-                import pandas as pd
-                pd.read_csv()
                 f = Cs
                 Cs = [list(map(int, line.split())) for line in f]
             # otherwise Cs should be a list of generating matrices
@@ -147,12 +146,21 @@ class digitalSeq(digitalseq_b2g):
                 self.s = s
             self.t = max([int(a).bit_length() for a in Cs[0]])
             self.alpha = self.t / self.m
-            self.Csr = [[bitreverse(int(Csjc), self.t) for Csjc in Csj] for Csj
+            self.Csr = [[self.bitreverse(int(Csjc), self.t) for Csjc in Csj] for Csj
                         in Cs]
             self.n = 2 ** self.m
             self.recipd = 2 ** -self.t
             self.returnDeepCopy = returnDeepCopy
             self.reset()
+
+        def bitreverse(self, a, m=None):
+            # https://tinyurl.com/yybvsmqe
+            bin_number = bin(a)
+            reverse_number = bin_number[-1:1:-1]
+            reverse_number = reverse_number + (m - len(reverse_number)) * '0'
+            a_rev = int(reverse_number, 2)
+
+            return a_rev
 
 if __name__ == "__main__":
     import sys
