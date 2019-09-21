@@ -146,20 +146,20 @@ class digitalSeq(digitalseq_b2g):
                 self.s = s
             self.t = max([int(a).bit_length() for a in Cs[0]])
             self.alpha = self.t / self.m
-            self.Csr = [[self.bitreverse(int(Csjc), self.t) for Csjc in Csj] for Csj
-                        in Cs]
+            self.Csr = [[self.bitreverse(int(Csjc), self.t) for Csjc in Csj] for Csj in Cs]
             self.n = 2 ** self.m
             self.recipd = 2 ** -self.t
             self.returnDeepCopy = returnDeepCopy
             self.reset()
 
+
         def bitreverse(self, a, m=None):
             # https://tinyurl.com/yybvsmqe
             bin_number = bin(a)
+            if m == None: m = len(bin_number) - 2
             reverse_number = bin_number[-1:1:-1]
             reverse_number = reverse_number + (m - len(reverse_number)) * '0'
             a_rev = int(reverse_number, 2)
-
             return a_rev
 
 if __name__ == "__main__":
