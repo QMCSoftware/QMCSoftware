@@ -2,10 +2,10 @@
 
 from numpy import array, int64, log, random
 from numpy.core._multiarray_umath import zeros
-from third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
 from third_party.magic_point_shop.latticeseq_b2 import latticeseq_b2
 
 from . import discreteDistribution
+from .digitalSeq import digitalSeq
 
 
 class Mesh(discreteDistribution):
@@ -33,7 +33,7 @@ class Mesh(discreteDistribution):
 
     def get_RS_sobol_b2g(self,n,m,j):
         # generates j shifted nxm sobol digital sequences
-        gen = digitalseq_b2g(Cs='./third_party/magic_point_shop/sobol_Cs.col',m=int(log(n)/log(2)),s=m)
+        gen = digitalSeq(Cs='./third_party/magic_point_shop/sobol_Cs.col',m=int(log(n)/log(2)),s=m)
         t = max(32,gen.t) # we will guarantee at least a depth of 32 bits for the shift
         ct = max(0,t-gen.t) # this is the correction factor to scale the integers
         shifts = random.randint(2**t, size=(j,m), dtype=int64) # generate random shift
