@@ -76,7 +76,7 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
 if __name__ == '__main__':
     # Generate Times CSV
     fname = 'workouts/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
-    absTols = [10 ** (-i / 4) for i in range(12, 1, -1)]
+    absTols = [10 ** (-i / 5) for i in range(15, 7, -1)]
     comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
