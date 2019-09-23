@@ -1,16 +1,15 @@
 from time import time
 
-import pandas as pd
-from matplotlib import pyplot as mpl_plot
-from numpy import arange
-
 from algorithms.distribution import measure
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.Mesh import Mesh
 from algorithms.function.AsianCallFun import AsianCallFun
 from algorithms.integrate import integrate
-from algorithms.stop.CLTStopping import CLTStopping
 from algorithms.stop.CLT_Rep import CLT_Rep
+from algorithms.stop.CLTStopping import CLTStopping
+from matplotlib import pyplot as mpl_plot
+from numpy import arange
+import pandas as pd
 
 
 def plot(title,xlabel,ylabel,xdata,ydata):
@@ -67,19 +66,18 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
         f.write(str(tDelta)+',')
         print('\tCLT_Rep_lattice:',sol,tDelta)
         # CLT_Rep_sobol (Commented out until sobol is improved)
-        '''
         try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')))
         except: sol,tDelta = '',''
         f.write(str(tDelta))
         print('\tCLT_Rep_sobol:',sol,tDelta)
-        '''
+
     f.close()  
     
 if __name__ == '__main__':
     # Generate Times CSV
     fname = 'workouts/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
-    absTols = arange(.001,.021,.001)#arange(.001,.011,.001)
-    #comp_Clt_vs_cltRep_runtimes(fname,absTols)
+    absTols = [10 ** (-i / 4) for i in range(12, 1, -1)]
+    comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
@@ -89,5 +87,5 @@ if __name__ == '__main__':
         ydata = {
             'CLT: IID Gaussian':(df.CLT_stdUniform,'r'),
             'CLT: IID Uniform ':(df.CLT_stdGaussian,'b'),
-            'CLT Repeated: Lattice':(df.CLT_Rep_lattice,'g')})
-            #'CLT Repeated: Sobol':(df.CLT_Rep_Sobol,'y')})
+            'CLT Repeated: Lattice':(df.CLT_Rep_lattice,'g'),
+            'CLT Repeated: Sobol':(df.CLT_Rep_Sobol,'y')})
