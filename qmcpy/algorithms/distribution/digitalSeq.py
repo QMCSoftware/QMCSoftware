@@ -128,6 +128,7 @@ class digitalSeq(digitalseq_b2g):
                 # filename passed in
                 import pandas as pd
                 Cs = pd.read_csv(Cs, header=None, delimiter=" ").values.tolist()
+                Cs = Cs[0:(2 ** m)][0:s]
                 #f = open(Cs)
                 #Cs = [list(map(int, line.split())) for line in f]
             elif hasattr(Cs, 'read'):
