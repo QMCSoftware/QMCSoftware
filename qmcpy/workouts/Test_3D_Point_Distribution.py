@@ -1,5 +1,6 @@
 from algorithms.distribution import measure
 from algorithms.distribution.IIDDistribution import IIDDistribution
+from algorithms.distribution.QuasiRandom import QuasiRandom
 from algorithms.function.KeisterFun import KeisterFun
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import matplotlib.pyplot as mpl_plt
@@ -22,23 +23,28 @@ measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]))
 fun = fun.transformVariable(measureObj, distribObj)
 
-# Examples
+# Examples for generating 'pregen' figure's constants
 '''
-# CLT_Rep Example
+import sys
+from algorithms.stop.CLT_Rep import CLT_Rep
+from algorithms.stop.CLTStopping import CLTStopping
+from algorithms.integrate import integrate
+#     CLT_Rep Example
 stopObj = CLT_Rep(nInit=n,nMax=2**15,absTol=.01,J=j)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[var])
-distribObj = Mesh(trueD=measure().mesh(dimension=[dim],meshType='lattice'))
+distribObj = QuasiRandom(trueD=measure().lattice(dimension=[dim]))
 sol,out = integrate(fun,measureObj,distribObj,stopObj)
-#print(sol,out)
-
-# CLT Example
+print(sol,out)
+#     CLT Example
 stopObj = CLTStopping(nInit=16,absTol=.3,alpha=.01,inflate=1.2)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim])) # IID sampling
 sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
 print(sol,out)
+sys.exit(0)
 '''
-# Based on running the above CLT Example
+
+# 'pregen' constants based on running the above CLT Example
 eps_list = [.5,.4,.3]
 n_list = [58,81,131]
 muHat_list = [1.93,1.91,1.94]
@@ -71,7 +77,7 @@ for idx,ax in enumerate([ax1,ax2,ax3]):
     points_distrib = zeros((n,dim+1))
     if plotType == 'lattice':
         muhat = zeros(j)
-        set_x = get_RS_lattice_b2(n,dim,j) 
+        set_x = QuasiRandom().get_RS_lattice_b2(n,dim,j) 
         for i,xu in enumerate(set_x):
             points_distrib[:,:2] = xu
             points_distrib[:,2] = fun.f(points_distrib[:,:2],coordIdx)

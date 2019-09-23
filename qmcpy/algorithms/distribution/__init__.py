@@ -121,20 +121,32 @@ class measure():
             self.measure_list[i].measureName = 'BrownianMotion'
         return self
     
-    def mesh(self,dimension=array([2]),meshType='lattice'):
-        ''' create a discritized mesh/net  '''
-        self.measureName = 'lattice_b2'
+    def lattice(self,dimension=array([2])):
+        ''' low descrepancy lattice '''
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
         else: raise Exception("measure.dimension be a list of positive integers")
-        #    meshType
-        if meshType not in ['lattice','sobol']: raise Exception("'meshType must be 'lattice' or 'sobol'")
         #    Construct list of measures
         self.measure_list = list(range(len(dimension)))
         for i in range(len(self.measure_list)):
             self.measure_list[i] = measure()
-            self.measure_list[i].measureData['meshType'] = meshType
+            self.measure_list[i].measureData['lds_type'] = 'lattice'
+            self.measure_list[i].dimension = self.dimension[i]
+            self.measure_list[i].measureName = 'stdUniform'
+        return self
+
+    def Sobol(self,dimension=array([2])):
+        ''' low descrepancy Sobol '''
+        #    Dimension of the domain, Â§$\mcommentfont d$Â§
+        if type(dimension)==int: self.dimension = array([dimension])
+        elif all(item>0 for item in dimension): self.dimension = array(dimension)
+        else: raise Exception("measure.dimension be a list of positive integers")
+        #    Construct list of measures
+        self.measure_list = list(range(len(dimension)))
+        for i in range(len(self.measure_list)):
+            self.measure_list[i] = measure()
+            self.measure_list[i].measureData['lds_type'] = 'Sobol'
             self.measure_list[i].dimension = self.dimension[i]
             self.measure_list[i].measureName = 'stdUniform'
         return self

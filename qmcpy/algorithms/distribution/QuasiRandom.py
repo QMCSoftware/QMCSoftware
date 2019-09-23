@@ -8,13 +8,13 @@ from . import discreteDistribution
 from .digitalSeq import digitalSeq
 
 
-class Mesh(discreteDistribution):
+class QuasiRandom(discreteDistribution):
 
     def __init__(self,distribData=None,trueD=None):
         state = []
         super().__init__(distribData,state,trueD=trueD)
         if trueD:
-            self.distrib_list = [Mesh() for i in range(len(trueD))]
+            self.distrib_list = [QuasiRandom() for i in range(len(trueD))]
             # self now refers to self.distrib_list
             for i in range(len(self)):
                 self[i].trueD = self.trueD[i]
@@ -22,12 +22,8 @@ class Mesh(discreteDistribution):
 
     def genDistrib(self,n,m,j=1):
         # get j randomly shifted nxm arrays 
-        mimicMeasure = self.trueD.measureName
-        if mimicMeasure=='stdUniform':
-            meshType = self.trueD.measureData['meshType']
-            if meshType=='lattice': return self.get_RS_lattice_b2(n,m,j)
-            elif meshType=='sobol': return self.get_RS_sobol_b2g(n,m,j)
-            else: raise Exception("%s mesh cannot mimic %s distribution"%(meshType,mimicMeasure))
+        if self.trueD.measureData['lds_type']=='lattice': return self.get_RS_lattice_b2(n,m,j)
+        elif self.trueD.measureData['lds_type']=='Sobol': return self.get_RS_sobol_b2g(n,m,j)
         else: raise Exception('Distribution not recognized')
 
 

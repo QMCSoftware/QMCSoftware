@@ -7,7 +7,7 @@ random.seed(7)
 from algorithms.stop.CLTStopping import CLTStopping
 from algorithms.stop.CLT_Rep import CLT_Rep
 from algorithms.distribution.IIDDistribution import IIDDistribution
-from algorithms.distribution.Mesh import Mesh
+from algorithms.distribution.QuasiRandom import QuasiRandom
 from algorithms.integrate import integrate
 from algorithms.function.KeisterFun import KeisterFun
 from algorithms.function.AsianCallFun import AsianCallFun
@@ -66,26 +66,19 @@ sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
 ''' Single and multilevel example of CLT_Rep (stopping_criterion) paired with meanvarData_Rep (accumData) '''
-dim = 3
-stopObj = CLT_Rep(nInit=4,nMax=2**15,absTol=.01)
-measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = Mesh(trueD=measure().mesh(dimension=[dim],meshType='lattice')) # Uniform Sampling from latticeseq_b2.py 
-sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj) # KeisterFun()
-output(sol,out)
-
-# Lattice Mesh
+# QuasiRandom Lattice
 stopObj = CLT_Rep(nMax=2**20,absTol=.01)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # multi-level
-distribObj = Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')) # Uniform Sampling from latticeseq_b2.py 
+distribObj = QuasiRandom(trueD=measure().lattice(dimension=[4,16,64])) # quasi-random lattice
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
-# Sobol Mesh
+# QuasiRandom Sobol
 stopObj = CLT_Rep(nMax=2**20,absTol=.01)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj) # multi-level
-distribObj = Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')) # Uniform Sampling from latticeseq_b2.py 
+distribObj = QuasiRandom(trueD=measure().Sobol(dimension=[4,16,64])) # quasi-random sobol 
 sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
 output(sol,out)
 
