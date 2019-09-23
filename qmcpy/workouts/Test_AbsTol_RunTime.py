@@ -2,7 +2,7 @@ from time import time
 
 from algorithms.distribution import measure
 from algorithms.distribution.IIDDistribution import IIDDistribution
-from algorithms.distribution.Mesh import Mesh
+from algorithms.distribution.QuasiRandom import QuasiRandom
 from algorithms.function.AsianCallFun import AsianCallFun
 from algorithms.integrate import integrate
 from algorithms.stop.CLT_Rep import CLT_Rep
@@ -61,12 +61,12 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
         f.write(str(tDelta)+',')
         print('\tCLT_stdGaussian:',sol,tDelta)
         # CLT_Rep_lattice
-        try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='lattice')))
+        try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),QuasiRandom(trueD=measure().lattice(dimension=[4,16,64])))
         except: sol,tDelta = '',''
         f.write(str(tDelta)+',')
         print('\tCLT_Rep_lattice:',sol,tDelta)
-        # CLT_Rep_sobol (Commented out until sobol is improved)
-        try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),Mesh(trueD=measure().mesh(dimension=[4,16,64],meshType='sobol')))
+        # CLT_Rep_sobol
+        try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),QuasiRandom(trueD=measure().Sobol(dimension=[4,16,64])))
         except: sol,tDelta = '',''
         f.write(str(tDelta))
         print('\tCLT_Rep_sobol:',sol,tDelta)
