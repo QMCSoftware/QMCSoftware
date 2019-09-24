@@ -8,11 +8,10 @@ from algorithms.integrate import integrate
 from algorithms.stop.CLT_Rep import CLT_Rep
 from algorithms.stop.CLTStopping import CLTStopping
 from matplotlib import pyplot as mpl_plot
-from numpy import arange, array, random
+from numpy import arange, array
 import numpy as np
 import pandas as pd
 
-random.seed(1) # make numerical results reproducible
 
 def plot(title,xlabel,ylabel,xdata,ydata):
     #mpl_plot.title(title)
@@ -51,6 +50,7 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
         ('CLT_stdUniform','CLT_stdGaussian','CLT_Rep_lattice','CLT_Rep_Sobol'))
     
     for absTol in abstols:
+
         print('Absolute Tolerance:',absTol)
         # CLT_stdUniform
         try: sol,tDelta = QMC_Wrapper(CLTStopping(absTol=absTol),IIDDistribution(trueD=measure().stdUniform(dimension=[4,16,64])))
@@ -63,11 +63,13 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
         f.write(str(tDelta)+',')
         print('\tCLT_stdGaussian:',sol,tDelta)
         # CLT_Rep_lattice
+        np.random.seed(1)  # make numerical results reproducible
         try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),QuasiRandom(trueD=measure().lattice(dimension=[4,16,64])))
         except: sol,tDelta = '',''
         f.write(str(tDelta)+',')
         print('\tCLT_Rep_lattice:',sol,tDelta)
         # CLT_Rep_sobol
+        np.random.seed(1)  # make numerical results reproducible
         try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),QuasiRandom(trueD=measure().Sobol(dimension=[4,16,64])))
         except: sol,tDelta = '',''
         f.write(str(tDelta))
