@@ -29,5 +29,5 @@ class accumData(ABC):
         pass
     
     # Magic Method
-    def __repr__(self): return univ_repr(self,'accumData')
+    def __repr__(self): return univ_repr(self)
         

@@ -8,7 +8,7 @@ from algorithms.integrate import integrate
 from algorithms.stop.CLT_Rep import CLT_Rep
 from algorithms.stop.CLTStopping import CLTStopping
 from matplotlib import pyplot as mpl_plot
-from numpy import arange
+from numpy import arange,array
 import pandas as pd
 
 
@@ -76,14 +76,14 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
 if __name__ == '__main__':
     # Generate Times CSV
     fname = 'workouts/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
-    absTols = [10 ** (-i / 5) for i in range(15, 7, -1)]
+    absTols = arange(.001,.051,.002)
     comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
         xlabel = 'Absolute Tolerance',
         ylabel = 'Integration Runtime',
-        xdata = absTols,
+        xdata = array(absTols),
         ydata = {
             'CLT: IID Gaussian':(df.CLT_stdUniform,'r'),
             'CLT: IID Uniform ':(df.CLT_stdGaussian,'b'),

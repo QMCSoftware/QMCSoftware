@@ -37,7 +37,7 @@ class discreteDistribution(ABC):
             yield distribObj
     def __getitem__(self,i): return self.distrib_list[i]
     def __setitem__(self,i,val): self.distrib_list[i]=val
-    def __repr__(self): return univ_repr(self,'discreteDistribution','distrib_list')
+    def __repr__(self): return univ_repr(self,'distrib_list')
 
 
 class measure():
@@ -123,6 +123,7 @@ class measure():
     
     def lattice(self,dimension=array([2])):
         ''' low descrepancy lattice '''
+        self.measureName = 'lattice'
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
@@ -138,6 +139,7 @@ class measure():
 
     def Sobol(self,dimension=array([2])):
         ''' low descrepancy Sobol '''
+        self.measureName = 'Sobol'
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
@@ -158,5 +160,5 @@ class measure():
             yield measureObj
     def __getitem__(self,i): return self.measure_list[i]
     def __setitem__(self,i,val): self.measure_list[i] = val
-    def __repr__(self): return univ_repr(self,'measure','measure_list')
+    def __repr__(self): return univ_repr(self,'measure_list')
 

@@ -26,4 +26,4 @@ class stoppingCriterion(ABC):
     def stopYet(self,distribObj): # distribObj = data or summary of data computed already
         pass
 
-    def __repr__(self): return univ_repr(self,'stoppingCriterion')
+    def __repr__(self): return univ_repr(self)

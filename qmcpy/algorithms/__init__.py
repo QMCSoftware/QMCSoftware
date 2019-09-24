@@ -1,11 +1,11 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 
-def univ_repr(self,obj_s,objList_s=None):
+def univ_repr(self,objList_s=None):
     '''
     clean way to represent object data
     note: print(obj) == print(obj.__repr__())
     '''
-    s = 'Constructing %s with properties:\n'%(obj_s)
+    s = '%s object with properties:\n'%(type(self).__name__)
     for key,val in self.__dict__.items():
         if str(key) != objList_s:
             s += '%4s%s: %s\n'%('',str(key),str(val).replace('\n','\n%15s'%('')))
