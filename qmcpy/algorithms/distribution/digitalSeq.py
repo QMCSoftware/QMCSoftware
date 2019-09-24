@@ -1,3 +1,4 @@
+import pandas as pd
 from third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
 
 
@@ -122,15 +123,11 @@ class digitalSeq(digitalseq_b2g):
               the Csr field of this object, but note that they have been bit
               reversed.
             """
-            import sys
             basestr = str  # basestr for python2, str for python3
             if isinstance(Cs, basestr):
                 # filename passed in
-                import pandas as pd
-                Cs = pd.read_csv(Cs, header=None, delimiter=" ", nrows=2 ** m).values.tolist()
-                Cs = Cs[0:(2 ** m)][0:s]
-                #f = open(Cs)
-                #Cs = [list(map(int, line.split())) for line in f]
+                Cs = pd.read_csv(Cs, header=None, delimiter=" ", nrows=s).values.tolist()
+                Cs = Cs[0:2**m]
             elif hasattr(Cs, 'read'):
                 # assume z is a stream like sys.stdin
                 f = Cs
