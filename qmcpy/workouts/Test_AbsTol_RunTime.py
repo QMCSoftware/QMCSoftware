@@ -8,9 +8,11 @@ from algorithms.integrate import integrate
 from algorithms.stop.CLT_Rep import CLT_Rep
 from algorithms.stop.CLTStopping import CLTStopping
 from matplotlib import pyplot as mpl_plot
-from numpy import arange,array
+from numpy import arange, array, random
+import numpy as np
 import pandas as pd
 
+random.seed(1) # make numerical results reproducible
 
 def plot(title,xlabel,ylabel,xdata,ydata):
     #mpl_plot.title(title)
@@ -72,11 +74,12 @@ def comp_Clt_vs_cltRep_runtimes(fname,abstols):
         print('\tCLT_Rep_sobol:',sol,tDelta)
 
     f.close()  
-    
+
 if __name__ == '__main__':
     # Generate Times CSV
     fname = 'workouts/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
-    absTols = arange(.001,.051,.002)
+    absTols = arange(.001,.051,.002) # [10 ** (-i / 5) for i in range(15, 7, -1)]
+
     comp_Clt_vs_cltRep_runtimes(fname,absTols)
     
     df = pd.read_csv(fname)
