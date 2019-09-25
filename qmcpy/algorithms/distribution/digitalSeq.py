@@ -127,7 +127,6 @@ class digitalSeq(digitalseq_b2g):
             if isinstance(Cs, basestr):
                 # filename passed in
                 Cs = pd.read_csv(Cs, header=None, delimiter=" ", nrows=s).values.tolist()
-                Cs = Cs[0:2**m]
             elif hasattr(Cs, 'read'):
                 # assume z is a stream like sys.stdin
                 f = Cs
