@@ -1,5 +1,5 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-from numpy.random import rand, randn
+from numpy import random
 
 from . import discreteDistribution
 
@@ -9,7 +9,7 @@ class IIDDistribution(discreteDistribution):
     where the $\vx_i$ are IIDDistribution uniform on $[0,1]^d$ or IIDDistribution standard Gaussian
     '''
     
-    def __init__(self,distribData=None,trueD=None):
+    def __init__(self,distribData=None,trueD=None,rngSeed=None):
         state = []
         super().__init__(distribData,state,trueD=trueD)
         if trueD:
@@ -18,8 +18,9 @@ class IIDDistribution(discreteDistribution):
             for i in range(len(self)):
                 self[i].trueD = self.trueD[i]
                 self[i].distribData = self.distribData[i] if self.distribData else None
+        if rngSeed: random.seed(rngSeed)
 
     def genDistrib(self,n,m,j=1):
-        if self.trueD.measureName=='stdUniform': return rand(j,int(n),int(m)).squeeze()
-        elif self.trueD.measureName=='stdGaussian': return randn(j,int(n),int(m)).squeeze()
+        if self.trueD.measureName=='stdUniform': return random.rand(j,int(n),int(m)).squeeze()
+        elif self.trueD.measureName=='stdGaussian': return random.randn(j,int(n),int(m)).squeeze()
         else: raise Exception('Distribution not recognized')

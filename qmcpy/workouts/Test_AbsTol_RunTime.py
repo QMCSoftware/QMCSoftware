@@ -12,7 +12,6 @@ from numpy import arange, array
 import numpy as np
 import pandas as pd
 
-
 def plot(title,xlabel,ylabel,xdata,ydata):
     #mpl_plot.title(title)
     mpl_plot.xlabel(xlabel,fontsize=14)
@@ -35,62 +34,91 @@ def plot(title,xlabel,ylabel,xdata,ydata):
     mpl_plot.show()
 
 def QMC_Wrapper(stopObj,distribObj):
-    measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
-    OptionObj = AsianCallFun(measureObj) # multi-level
-    t0 = time()
-    sol,out = integrate(OptionObj,measureObj,distribObj,stopObj)
-    t_delta = time()-t0
-    return sol,t_delta
+    measureObj = measure().BrownianMotion(
+        timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
+    OptionObj = AsianCallFun(measureObj)
+    sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
+    return sol,dataObj.timeUsed
 
-def comp_Clt_vs_cltRep_runtimes(fname,abstols):
-    ''' Graph program-time by varying abstol '''
-    # Open File and print headers
-    f = open(fname,'w')
-    f.write('%s,%s,%s,%s'%\
-        ('CLT_stdUniform','CLT_stdGaussian','CLT_Rep_lattice','CLT_Rep_Sobol'))
-    
-    for absTol in abstols:
+def comp_Clt_vs_cltRep_runtimes(abstols):
+    item_f = '    %-25s %-10.3f %-10.3f'
+    item_s = '    %-25s %-10s %-10s'
+    df_metrics = pd.DataFrame({'absTol':[],
+        'CLT_stdUniform_sol':[],     'CLT_stdUniform_runTime':[],
+        'CLT_stdGaussian_sol':[],    'CLT_stdGaussian_runTime':[],
+        'CLT_Rep_lattice_sol':[],    'CLT_Rep_lattice_runTime':[],
+        'CLT_Rep_Sobol_sol':[],      'CLT_Rep_Sobol_runTime':[]})
+    for i,absTol in enumerate(abstols):        
+        print('absTol: %-10.3f'%absTol)
+        results = [] # hold row of DataFrame
+        results.append(absTol)
 
-        print('Absolute Tolerance:',absTol)
         # CLT_stdUniform
-        try: sol,tDelta = QMC_Wrapper(CLTStopping(absTol=absTol),IIDDistribution(trueD=measure().stdUniform(dimension=[4,16,64])))
-        except: sol,tDelta = '',''
-        f.write('\n'+str(tDelta)+',')
-        print('\tCLT_stdUniform:',sol,tDelta)
+        try:
+            mu,t =\
+            QMC_Wrapper(
+                CLTStopping(absTol=absTol),
+                IIDDistribution(trueD=measure().stdUniform(dimension=[4,16,64]),rngSeed=7))
+            print(item_f%('CLT_stdUniform',mu,t))
+        except:
+            mu,t= '',''
+            print(item_s%('CLT_stdUniform',mu,t))
+        results.extend([mu,t])
+        
         # CLT_stdGaussian
-        try: sol,tDelta = QMC_Wrapper(CLTStopping(absTol=absTol),IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64])))
-        except: sol,tDelta = '',''
-        f.write(str(tDelta)+',')
-        print('\tCLT_stdGaussian:',sol,tDelta)
-        # CLT_Rep_lattice
-        np.random.seed(1)  # make numerical results reproducible
-        try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),QuasiRandom(trueD=measure().lattice(dimension=[4,16,64])))
-        except: sol,tDelta = '',''
-        f.write(str(tDelta)+',')
-        print('\tCLT_Rep_lattice:',sol,tDelta)
-        # CLT_Rep_sobol
-        np.random.seed(1)  # make numerical results reproducible
-        try: sol,tDelta = QMC_Wrapper(CLT_Rep(nMax=2**20,absTol=absTol),QuasiRandom(trueD=measure().Sobol(dimension=[4,16,64])))
-        except: sol,tDelta = '',''
-        f.write(str(tDelta))
-        print('\tCLT_Rep_sobol:',sol,tDelta)
+        try:
+            mu,t =\
+            QMC_Wrapper(
+                 CLTStopping(absTol=absTol),
+                 IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64]),rngSeed=7))
+            print(item_f%('CLT_stdGaussian',mu,t))
+        except:
+            mu,t = '',''
+            print(item_s%('CLT_stdGaussian',mu,t))
+        results.extend([mu,t])
 
-    f.close()  
+        # CLT_Rep_lattice      
+        try:
+            mu,t =\
+            QMC_Wrapper(
+                CLT_Rep(nMax=2**20,absTol=absTol),
+                QuasiRandom(trueD=measure().lattice(dimension=[4,16,64]),rngSeed=7))
+            print(item_f%('CLT_Rep_lattice',mu,t))
+        except:
+            mu,t = '',''
+            print(item_s%('CLT_Rep_lattice',mu,t))
+        results.extend([mu,t])
+
+        # CLT_Rep_sobol
+        try:
+            mu,t =\
+            QMC_Wrapper(
+                CLT_Rep(nMax=2**20,absTol=absTol),
+                QuasiRandom(trueD=measure().Sobol(dimension=[4,16,64]),rngSeed=7))
+            print(item_f%('CLT_Rep_sobol',mu,t))
+        except:
+            mu,t = '',''
+            print(item_s%('CLT_Rep_lattice',mu,t))
+        results.extend([mu,t])
+
+        df_metrics.loc[i] = results # update metrics
+    return df_metrics
 
 if __name__ == '__main__':
-    # Generate Times CSV
-    fname = 'workouts/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
+    outF = 'workouts/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
+    # Run Test
     absTols = arange(.001,.051,.002) # [10 ** (-i / 5) for i in range(15, 7, -1)]
+    df_metrics = comp_Clt_vs_cltRep_runtimes(absTols)
+    df_metrics.to_csv(outF,index=False)
 
-    comp_Clt_vs_cltRep_runtimes(fname,absTols)
-    
-    df = pd.read_csv(fname)
+    # Gen Plot
+    df = pd.read_csv(outF)
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
         xlabel = 'Absolute Tolerance',
         ylabel = 'Integration Runtime',
-        xdata = array(absTols),
+        xdata = df['absTol'].values,
         ydata = {
-            'CLT: IID Gaussian':(df.CLT_stdUniform,'r'),
-            'CLT: IID Uniform ':(df.CLT_stdGaussian,'b'),
-            'CLT Repeated: Lattice':(df.CLT_Rep_lattice,'g'),
-            'CLT Repeated: Sobol':(df.CLT_Rep_Sobol,'y')})
+            'CLT: IID Gaussian':(df['CLT_stdUniform_runTime'],'r'),
+            'CLT: IID Uniform ':(df['CLT_stdGaussian_runTime'],'b'),
+            'CLT Repeated: Lattice':(df['CLT_Rep_lattice_runTime'],'g'),
+            'CLT Repeated: Sobol':(df['CLT_Rep_Sobol_runTime'],'y')})

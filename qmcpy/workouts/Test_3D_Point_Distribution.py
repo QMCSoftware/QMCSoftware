@@ -1,15 +1,14 @@
+from mpl_toolkits.mplot3d.axes3d import Axes3D
+import matplotlib.pyplot as mpl_plt
+from scipy.stats import norm
+from numpy import arange, linspace, meshgrid, random, zeros
+random.seed(7)
+
+from workouts import summary_qmc
 from algorithms.distribution import measure
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
 from algorithms.function.KeisterFun import KeisterFun
-from mpl_toolkits.mplot3d.axes3d import Axes3D
-import matplotlib.pyplot as mpl_plt
-from numpy import arange, linspace, meshgrid, random, zeros
-from scipy.stats import norm
-
-
-
-random.seed(7)
 
 dim = 2
 j = 3
@@ -20,7 +19,7 @@ coordIdx = arange(1,dim+1)
 
 fun = KeisterFun()
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]))
+distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]),rngSeed=7)
 fun = fun.transformVariable(measureObj, distribObj)
 
 # Examples for generating 'pregen' figure's constants
@@ -30,24 +29,26 @@ from algorithms.stop.CLT_Rep import CLT_Rep
 from algorithms.stop.CLTStopping import CLTStopping
 from algorithms.integrate import integrate
 #     CLT_Rep Example
+funObj = KeisterFun()
 stopObj = CLT_Rep(nInit=n,nMax=2**15,absTol=.01,J=j)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[var])
-distribObj = QuasiRandom(trueD=measure().lattice(dimension=[dim]))
-sol,out = integrate(fun,measureObj,distribObj,stopObj)
-print(sol,out)
+distribObj = QuasiRandom(trueD=measure().lattice(dimension=[dim]),rngSeed=7)
+sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
+summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 #     CLT Example
+funObj = KeisterFun()
 stopObj = CLTStopping(nInit=16,absTol=.3,alpha=.01,inflate=1.2)
 measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim])) # IID sampling
-sol,out = integrate(KeisterFun(),measureObj,distribObj,stopObj)
-print(sol,out)
+distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]),rngSeed=7)
+sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
+summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 sys.exit(0)
 '''
 
 # 'pregen' constants based on running the above CLT Example
 eps_list = [.5,.4,.3]
-n_list = [58,81,131]
-muHat_list = [1.93,1.91,1.94]
+n_list = [50,68,109]
+muHat_list = [1.876,1.806,1.883]
 
 # Function Points
 nx, ny = (100, 100)

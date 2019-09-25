@@ -7,10 +7,9 @@ from third_party.magic_point_shop.latticeseq_b2 import latticeseq_b2
 from . import discreteDistribution
 from .digitalSeq import digitalSeq
 
-
 class QuasiRandom(discreteDistribution):
 
-    def __init__(self,distribData=None,trueD=None):
+    def __init__(self,distribData=None,trueD=None,rngSeed=None):
         state = []
         super().__init__(distribData,state,trueD=trueD)
         if trueD:
@@ -19,6 +18,7 @@ class QuasiRandom(discreteDistribution):
             for i in range(len(self)):
                 self[i].trueD = self.trueD[i]
                 self[i].distribData = self.distribData[i] if self.distribData else None
+        if rngSeed: random.seed(rngSeed)
 
     def genDistrib(self,n,m,j=1):
         # get j randomly shifted nxm arrays 
