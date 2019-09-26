@@ -2,22 +2,31 @@
 from abc import ABC, abstractmethod
 from numpy import array, arange
 
-from .. import univ_repr
+from .. import univ_repr,DistributionCompatibilityError
 
 class discreteDistribution(ABC):
     '''
     Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
         Any sublcass of discreteDistribution must include:
             Methods: genDistrib(self,nStart,nEnd,n,coordIndex)
-            Properties: distribData,state,trueD
+            Properties: distribData,trueD
     '''
-    def __init__(self,distribData,state,trueD=None):
+    def __init__(self,accepted_measures,trueD=None,distribData=None):
         super().__init__()
         # Abstract Properties
-        self.distribData = distribData # information required to generate the distribution
-        self.state = state # state of the generator
-        self.trueD = trueD if trueD else measure().stdUniform()   
+        self.distribData = distribData
+        self.trueD = trueD   
         self.distrib_list = [self]
+        
+        # Create self.distrib_list (self) and distribute attributes
+        if trueD:
+            if trueD.measureName not in accepted_measures:
+                raise DistributionCompatibilityError(\
+                    type(self).__name__+' only accepts measures:'+str(accepted_measures))
+            self.distrib_list = [type(self)() for i in range(len(trueD))]
+            for i in range(len(self)):    
+                self[i].trueD = self.trueD[i]
+                self[i].distribData = self.distribData[i] if self.distribData else None          
 
     # Abstract Methods
     @abstractmethod
