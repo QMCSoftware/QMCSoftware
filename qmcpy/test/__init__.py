@@ -1,0 +1,1 @@
+# Run all unittests (from .../qmcpy/): python -m unittest 

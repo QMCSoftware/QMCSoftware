@@ -7,12 +7,13 @@ from algorithms.integrate import integrate
 from algorithms.stop.CLTStopping import CLTStopping
 
 
-class IntegrationExampleTest(unittest.TestCase):
 
+class IntegrationExampleTest(unittest.TestCase):
+    '''
     def test_qmcpy_version(self):
         import qmcpy
         self.assertEqual(qmcpy.__version__, 0.1)
-
+    '''
 
     def test_integral_values(self):
         dim = 2
