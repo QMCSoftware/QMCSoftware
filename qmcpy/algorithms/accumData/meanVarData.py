@@ -1,11 +1,13 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import process_time
 
+from algorithms.distribution import discreteDistribution
+from algorithms.function import fun
 from numpy import arange, finfo, float32, std, zeros
 
-eps = finfo(float32).eps
-
 from . import accumData
+
+eps = finfo(float32).eps
 
 class meanVarData(accumData):
     '''
@@ -13,7 +15,7 @@ class meanVarData(accumData):
     stores the sample mean and variance of function values
     '''
     
-    def __init__(self,nf):
+    def __init__(self, nf: int) -> None:
         ''' nf = # function '''
         super().__init__()
         self.muhat = zeros(nf) # sample mean
@@ -21,7 +23,7 @@ class meanVarData(accumData):
         self.nSigma = zeros(nf) # number of samples used to compute the sample standard deviation
         self.nMu = zeros(nf)  # number of samples used to compute the sample mean
 
-    def updateData(self, distribObj, funObj):
+    def updateData(self, distribObj: discreteDistribution, funObj: fun) -> None:
         for ii in range(len(funObj)):
             tStart = process_time()  # time the function values
             dim = distribObj[ii].trueD.dimension
