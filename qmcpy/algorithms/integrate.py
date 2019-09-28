@@ -3,10 +3,13 @@ from time import time
 
 def integrate(funObj,measureObj,distribObj,stopObj):
     '''
-    Â§\mcommentfont Specify and generate values $f(\vx)$ for $\vx \in \cx$Â§
-    funObj = an object from class fun
-    distribObj = an object from class discrete_distribution
-    stopObj = an object from class stopping_criterion
+    Specify and generate values $f(x)$ for $x \in \cx$
+
+    :param funObj: an object from class fun
+    :param measureObj: an object from class maeasure
+    :param distribObj: an object from class discrete_distribution
+    :param stopObj:  an object from class stopping_criterion
+    :return: None
     '''
     # Initialize the accumData object and other crucial objects
     funObj = funObj.transformVariable(measureObj, distribObj)

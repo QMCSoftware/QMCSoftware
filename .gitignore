@@ -16,3 +16,6 @@ qmcpy/.vscode/
 qmcpy.egg-info/
 qmcpy/workouts/Outputs/*.png
 qmcpy/__pycache__/
+qmcpy/sphinx/_build/
+qmcpy/sphinx/_static/
+qmcpy/sphinx/_templates/
