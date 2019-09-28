@@ -10,42 +10,35 @@ from ..accumData.meanVarData_Rep import meanVarData_Rep
 
 class CLT_Rep(stoppingCriterion):
     ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''
-    def __init__(self,inflate=1.2,alpha=0.01,J=16,absTol=None,relTol=None,nInit=None,nMax=None):
-        discDistAllowed = ["QuasiRandom","IIDDistribution"] # which discrete distributions are supported
-        decompTypeAllowed = ["single", "multi"] # which decomposition types are supported
-        super().__init__(discDistAllowed,decompTypeAllowed,absTol=absTol,relTol=relTol,nInit=nInit,nMax=nMax)
+    def __init__(self,distribObj,inflate=1.2,alpha=0.01,J=16,absTol=None,relTol=None,nInit=None,nMax=None):
+        discDistAllowed = ["QuasiRandom"] # which discrete distributions are supported
+        super().__init__(distribObj,discDistAllowed,absTol=absTol,relTol=relTol,nInit=nInit,nMax=nMax)
         self.inflate = inflate  # inflation factor
         self.alpha = alpha # uncertainty level
         self.J = J
+        self.nLevels = len(distribObj)
+        self.dataObj = meanVarData_Rep(self.nLevels,self.J)
 
-    def stopYet(self,dataObj=None,funObj=[],distribObj=[]):
-        nf=len(funObj)
-        if dataObj==None: dataObj=meanVarData_Rep(nf,self.J)
-        if dataObj.stage == 'begin':  # initialize
-            dataObj._timeStart = time()  # keep track of time
-            if type(distribObj).__name__ not in self.discDistAllowed:
-                raise Exception('Stopping criterion not compatible with sampling distribution')
-            dataObj.prevN = zeros(nf)
-            dataObj.nextN = full(nf,self.nInit)
-            dataObj.costF = zeros(nf)
-            dataObj.stage = 'sigma'
-        elif dataObj.stage == 'sigma':
+    def stopYet(self,funObj):
+        if self.dataObj.stage == 'begin':  # initialize
+            self.dataObj._timeStart = time()  # keep track of time
+            self.dataObj.prevN = zeros(self.nLevels)
+            self.dataObj.nextN = full(self.nLevels,self.nInit)
+            self.dataObj.costF = zeros(self.nLevels)
+            self.dataObj.stage = 'sigma'
+        elif self.dataObj.stage == 'sigma':
             for i in range(len(funObj)):
-                if dataObj.sig2hat[i] < self.absTol: # Sufficient estimate for mean of funObj[i]
-                    dataObj.flags[i] = 0
+                if self.dataObj.sig2hat[i] < self.absTol: # Sufficient estimate for mean of funObj[i]
+                    self.dataObj.flags[i] = 0
                 else:
-                    dataObj.prevN[i] = dataObj.nextN[i]
-                    dataObj.nextN[i] = dataObj.prevN[i]*2
-            if dataObj.flags.sum(0)==0 or dataObj.nextN.max() > self.nMax:
+                    self.dataObj.prevN[i] = self.dataObj.nextN[i]
+                    self.dataObj.nextN[i] = self.dataObj.prevN[i]*2
+            if self.dataObj.flags.sum(0)==0 or self.dataObj.nextN.max() > self.nMax:
                 # Stopping criterion met
-                dataObj.solution = dataObj.mu2hat.sum(0)
-                dataObj.nSamplesUsed = dataObj.nextN
-                errBar = self.get_quantile() * self.inflate * (dataObj.sig2hat**2 / dataObj.nextN).sum(0)**.5 # Correct?
-                dataObj.confidInt = dataObj.solution + errBar * array([-1, 1])
-                dataObj.stage = 'done'  # finished with computation
-        dataObj.timeUsed = time() - dataObj._timeStart
-        return dataObj, distribObj
-
-    def get_quantile(self):
-        # dependent property
-        return -norm.ppf(self.alpha / 2)
+                self.dataObj.solution = self.dataObj.mu2hat.sum(0)
+                self.dataObj.nSamplesUsed = self.dataObj.nextN
+                errBar = -norm.ppf(self.alpha / 2) * self.inflate * (self.dataObj.sig2hat**2 / self.dataObj.nextN).sum(0)**.5
+                self.dataObj.confidInt = self.dataObj.solution + errBar * array([-1, 1])
+                self.dataObj.stage = 'done'  # finished with computation
+        self.dataObj.timeUsed = time() - self.dataObj._timeStart
+        return

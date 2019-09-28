@@ -40,7 +40,7 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 
 <hr>   
 
-## Measure (SubClass of Distribution)
+## Measure
 <b>Summary:</b> Specifies the components of a general measure used to define an integration problem or a sampling method<br>
 <b>Available Measures:</b>
 - stdUniform

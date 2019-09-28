@@ -17,66 +17,66 @@ from algorithms.function.AsianCallFun import AsianCallFun
 from algorithms.distribution import measure
 
 # IID stdUniform
-stopObj = CLTStopping(absTol=.05)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj)
 distribObj = IIDDistribution(trueD=measure().stdUniform(dimension=[64]),rngSeed=7)
+stopObj = CLTStopping(distribObj,absTol=.05)
 sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,OptionObj,distribObj,dataObj)
 
 # IID stdGaussian
-stopObj = CLTStopping(absTol=.05)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj)
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[64]),rngSeed=7)
+stopObj = CLTStopping(distribObj,absTol=.05)
 sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,OptionObj,distribObj,dataObj)
 
 # QuasiRandom lattice
-stopObj = CLT_Rep(absTol=.05)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj)
 distribObj = QuasiRandom(trueD=measure().lattice(dimension=[64]),rngSeed=7)
+stopObj = CLT_Rep(distribObj,absTol=.05)
 sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,OptionObj,distribObj,dataObj)
 
 # QuasiRandom Sobol
-stopObj = CLT_Rep(absTol=.05)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj)
 distribObj = QuasiRandom(trueD=measure().Sobol(dimension=[64]),rngSeed=7)
+stopObj = CLT_Rep(distribObj,absTol=.05)
 sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,OptionObj,distribObj,dataObj)
 
 ''' Multi-Level Asian Option Pricing '''
 # IID stdUniform
-stopObj = CLTStopping(absTol=.05)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj)
 distribObj = IIDDistribution(trueD=measure().stdUniform(dimension=[4,16,64]),rngSeed=7)
+stopObj = CLTStopping(distribObj,nMax=2**20,absTol=.05)
 sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,OptionObj,distribObj,dataObj)
 
 # IID stdGaussian
-stopObj = CLTStopping(absTol=.05)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj)
 distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64]),rngSeed=7)
+stopObj = CLTStopping(distribObj,nMax=2**20,absTol=.05)
 sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,OptionObj,distribObj,dataObj)
 
 # QuasiRandom Lattice
-stopObj = CLT_Rep(nMax=2**20,absTol=.05)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj)
 distribObj = QuasiRandom(trueD=measure().lattice(dimension=[4,16,64]),rngSeed=7)
+stopObj = CLT_Rep(distribObj,nMax=2**20,absTol=.05)
 sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,OptionObj,distribObj,dataObj)
 
 # QuasiRandom Sobol
-stopObj = CLT_Rep(nMax=2**20,absTol=.05)
 measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
 OptionObj = AsianCallFun(measureObj)
-distribObj = QuasiRandom(trueD=measure().Sobol(dimension=[4,16,64]),rngSeed=7) 
+distribObj = QuasiRandom(trueD=measure().Sobol(dimension=[4,16,64]),rngSeed=7)
+stopObj = CLT_Rep(distribObj,nMax=2**20,absTol=.05)
 sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,OptionObj,distribObj,dataObj)

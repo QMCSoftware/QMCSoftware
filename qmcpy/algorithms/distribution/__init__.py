@@ -2,7 +2,9 @@
 from abc import ABC, abstractmethod
 from numpy import array, arange
 
-from .. import univ_repr,DistributionCompatibilityError
+from .. import univ_repr
+
+class MeasureCompatibilityError(Exception): pass
 
 class discreteDistribution(ABC):
     '''
@@ -21,8 +23,7 @@ class discreteDistribution(ABC):
         # Create self.distrib_list (self) and distribute attributes
         if trueD:
             if trueD.measureName not in accepted_measures:
-                raise DistributionCompatibilityError(\
-                    type(self).__name__+' only accepts measures:'+str(accepted_measures))
+                raise MeasureCompatibilityError(type(self).__name__+' only accepts measures:'+str(accepted_measures))
             self.distrib_list = [type(self)() for i in range(len(trueD))]
             for i in range(len(self)):    
                 self[i].trueD = self.trueD[i]

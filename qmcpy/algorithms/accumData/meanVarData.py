@@ -32,4 +32,4 @@ class meanVarData(accumData):
                 self.sighat[ii] = std(y)  # compute the sample standard deviation if required
             self.muhat[ii] = y.mean(0)  # compute the sample mean
             self.solution = self.muhat.sum(0) # which also acts as our tentative solution
-        return self
+        return

@@ -18,6 +18,3 @@ def univ_repr(self,objList_s=None):
             if str(key) != objList_s:
                 s += '%12s%s: %s\n'%('',str(key),str(val).replace('\n','\n%20s'%('')))
     return s[:-1]
-
-# Errors
-class DistributionCompatibilityError(Exception): pass # for discreteDistribution class
