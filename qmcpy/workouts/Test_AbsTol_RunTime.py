@@ -33,16 +33,22 @@ def plot(title,xlabel,ylabel,xdata,ydata):
         pad_inches = .05)
     mpl_plot.show()
 
-def QMC_Wrapper(stopObj,distribObj):
+def QMC_Wrapper(stopObj,distribObj,name):
+    item_f = '    %-25s %-10.3f %-10.3f'
+    item_s = '    %-25s %-10s %-10s'
+    #try:
     measureObj = measure().BrownianMotion(
         timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
     OptionObj = AsianCallFun(measureObj)
     sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
+    print(item_f%(name,sol,dataObj.timeUsed))
     return sol,dataObj.timeUsed
-
+    #except:
+    #    print(item_s%(name,'',''))
+    #    return '',''
+    
 def comp_Clt_vs_cltRep_runtimes(abstols):
-    item_f = '    %-25s %-10.3f %-10.3f'
-    item_s = '    %-25s %-10s %-10s'
+    
     df_metrics = pd.DataFrame({'absTol':[],
         'CLT_stdUniform_sol':[],     'CLT_stdUniform_runTime':[],
         'CLT_stdGaussian_sol':[],    'CLT_stdGaussian_runTime':[],
@@ -54,51 +60,27 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
         results.append(absTol)
 
         # CLT_stdUniform
-        try:
-            mu,t =\
-            QMC_Wrapper(
-                CLTStopping(absTol=absTol),
-                IIDDistribution(trueD=measure().stdUniform(dimension=[4,16,64]),rngSeed=7))
-            print(item_f%('CLT_stdUniform',mu,t))
-        except:
-            mu,t= '',''
-            print(item_s%('CLT_stdUniform',mu,t))
+        distribObj = IIDDistribution(trueD=measure().stdUniform(dimension=[4,16,64]),rngSeed=7)
+        stopObj = CLTStopping(distribObj,absTol=absTol)
+        mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdUniform')    
         results.extend([mu,t])
         
         # CLT_stdGaussian
-        try:
-            mu,t =\
-            QMC_Wrapper(
-                 CLTStopping(absTol=absTol),
-                 IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64]),rngSeed=7))
-            print(item_f%('CLT_stdGaussian',mu,t))
-        except:
-            mu,t = '',''
-            print(item_s%('CLT_stdGaussian',mu,t))
+        distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[4,16,64]),rngSeed=7)
+        stopObj = CLTStopping(distribObj,absTol=absTol)
+        mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdGaussian')    
         results.extend([mu,t])
 
         # CLT_Rep_lattice      
-        try:
-            mu,t =\
-            QMC_Wrapper(
-                CLT_Rep(nMax=2**20,absTol=absTol),
-                QuasiRandom(trueD=measure().lattice(dimension=[4,16,64]),rngSeed=7))
-            print(item_f%('CLT_Rep_lattice',mu,t))
-        except:
-            mu,t = '',''
-            print(item_s%('CLT_Rep_lattice',mu,t))
+        distribObj = QuasiRandom(trueD=measure().lattice(dimension=[4,16,64]),rngSeed=7)
+        stopObj = CLT_Rep(distribObj,nMax=2**20,absTol=absTol)
+        mu,t = QMC_Wrapper(stopObj,distribObj,'lattice')    
         results.extend([mu,t])
 
         # CLT_Rep_sobol
-        try:
-            mu,t =\
-            QMC_Wrapper(
-                CLT_Rep(nMax=2**20,absTol=absTol),
-                QuasiRandom(trueD=measure().Sobol(dimension=[4,16,64]),rngSeed=7))
-            print(item_f%('CLT_Rep_sobol',mu,t))
-        except:
-            mu,t = '',''
-            print(item_s%('CLT_Rep_lattice',mu,t))
+        distribObj = QuasiRandom(trueD=measure().Sobol(dimension=[4,16,64]),rngSeed=7)
+        stopObj = CLT_Rep(distribObj,nMax=2**20,absTol=absTol)
+        mu,t = QMC_Wrapper(stopObj,distribObj,'Sobol')    
         results.extend([mu,t])
 
         df_metrics.loc[i] = results # update metrics
@@ -107,10 +89,10 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
 if __name__ == '__main__':
     outF = 'workouts/Outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol.csv'
     # Run Test
-    absTols = arange(.001,.051,.002) # [10 ** (-i / 5) for i in range(15, 7, -1)]
+    absTols = arange(.001,.051,.002) # arange(.01,.06,.01)
     df_metrics = comp_Clt_vs_cltRep_runtimes(absTols)
     df_metrics.to_csv(outF,index=False)
-
+    
     # Gen Plot
     df = pd.read_csv(outF)
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',
