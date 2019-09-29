@@ -2,17 +2,31 @@
 Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import time
 
+from algorithms.distribution import discreteDistribution, measure
+from algorithms.function import fun
+from algorithms.stop import stoppingCriterion
 
-def integrate(fun_obj, measure_obj, distrib_obj, stop_obj):
-    '''
+
+def integrate(fun_obj: fun, measure_obj: measure,
+              distrib_obj: discreteDistribution,
+              stop_obj: stoppingCriterion) -> tuple:
+    """
     Specify and generate values $f(x)$ for $x \in \mathcal{X}$
 
-    :param fun_obj: an object from class fun
-    :param measure_obj: an object from class maeasure
-    :param distrib_obj: an object from class discrete_distribution
-    :param stop_obj:  an object from class stopping_criterion
-    :return: None
-    '''
+    Args:
+        fun_obj: an object from class fun
+        measure_obj: an object from class maeasure
+        distrib_obj: an object from class discrete_distribution
+        stop_obj: an object from class stopping_criterion
+
+    Returns:
+        (tuple): tuple containing:
+
+            solution (float): estimated value of the integral
+            data_obj (AccumData): other information such as number of
+            sampling points used to obtain the estimate
+
+    """
     # Initialize the AccumData object and other crucial objects
     fun_obj = fun_obj.transformVariable(measure_obj, distrib_obj)
     stop_obj.stopYet(fun_obj)

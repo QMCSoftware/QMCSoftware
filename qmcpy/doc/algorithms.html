@@ -38,7 +38,7 @@
 Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="function">
 <dt id="integrate.integrate">
-<code class="sig-prename descclassname">integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">fun_obj</em>, <em class="sig-param">measure_obj</em>, <em class="sig-param">distrib_obj</em>, <em class="sig-param">stop_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#integrate.integrate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">fun_obj: algorithms.function.fun</em>, <em class="sig-param">measure_obj: algorithms.distribution.measure</em>, <em class="sig-param">distrib_obj: algorithms.distribution.discreteDistribution</em>, <em class="sig-param">stop_obj: algorithms.stop.stoppingCriterion</em><span class="sig-paren">)</span> &#x2192; tuple<a class="headerlink" href="#integrate.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values $f(x)$ for $x in mathcal{X}$</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -50,7 +50,16 @@ Sou-Cheng T. Choi and Aleksei Sorokin</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None</p>
+<dd class="field-even"><p><p>tuple containing:</p>
+<blockquote>
+<div><p>solution (float): estimated value of the integral
+data_obj (AccumData): other information such as number of
+sampling points used to obtain the estimate</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(tuple)</p>
 </dd>
 </dl>
 </dd></dl>
