@@ -13,7 +13,7 @@ def integrate(fun_obj, measure_obj, distrib_obj, stop_obj):
     :param stop_obj:  an object from class stopping_criterion
     :return: None
     '''
-    # Initialize the accumData object and other crucial objects
+    # Initialize the AccumData object and other crucial objects
     fun_obj = fun_obj.transformVariable(measure_obj, distrib_obj)
     stop_obj.stopYet(fun_obj)
     while stop_obj.dataObj.stage != 'done':

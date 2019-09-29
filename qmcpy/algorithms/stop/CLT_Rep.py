@@ -5,7 +5,7 @@ from numpy import array, full, zeros
 from scipy.stats import norm
 
 from . import stoppingCriterion
-from ..accumData.meanVarData_Rep import meanVarData_Rep
+from ..accum_data.MeanVarDataRep import MeanVarDataRep
 
 
 class CLT_Rep(stoppingCriterion):
@@ -17,7 +17,7 @@ class CLT_Rep(stoppingCriterion):
         self.alpha = alpha # uncertainty level
         self.J = J
         self.nLevels = len(distribObj)
-        self.dataObj = meanVarData_Rep(self.nLevels,self.J)
+        self.dataObj = MeanVarDataRep(self.nLevels, self.J)
 
     def stopYet(self,funObj):
         if self.dataObj.stage == 'begin':  # initialize

@@ -11,7 +11,7 @@ CLTStopping (StoppingCriterion Object)
                      nMax: 100000000
                   inflate: 1.200          
                     alpha: 0.010          
-meanVarData (Data Object)
+MeanVarData (Data Object)
              nSamplesUsed: [208458.]      
                  timeUsed: 1.683          
                 confidInt: [6.15184807 6.25184807]
@@ -29,7 +29,7 @@ CLTStopping (StoppingCriterion Object)
                      nMax: 100000000
                   inflate: 1.200          
                     alpha: 0.010          
-meanVarData (Data Object)
+MeanVarData (Data Object)
              nSamplesUsed: [224390.]      
                  timeUsed: 1.042          
                 confidInt: [6.16450239 6.2645022 ]
@@ -47,7 +47,7 @@ CLT_Rep (StoppingCriterion Object)
                      nMax: 100000000
                   inflate: 1.200          
                     alpha: 0.010          
-meanVarData_Rep (Data Object)
+MeanVarDataRep (Data Object)
              nSamplesUsed: [2048]         
                  timeUsed: 0.611          
                 confidInt: [6.18828215 6.1946423 ]
@@ -65,7 +65,7 @@ CLT_Rep (StoppingCriterion Object)
                      nMax: 100000000
                   inflate: 1.200          
                     alpha: 0.010          
-meanVarData_Rep (Data Object)
+MeanVarDataRep (Data Object)
              nSamplesUsed: [1024]         
                  timeUsed: 0.186          
                 confidInt: [6.18647612 6.19230732]
@@ -83,7 +83,7 @@ CLTStopping (StoppingCriterion Object)
                      nMax: 100000000
                   inflate: 1.200          
                     alpha: 0.010          
-meanVarData (Data Object)
+MeanVarData (Data Object)
              nSamplesUsed: [288813.  26195.   4233.]
                  timeUsed: 0.246          
                 confidInt: [6.15093727 6.250936  ]
@@ -101,7 +101,7 @@ CLTStopping (StoppingCriterion Object)
                      nMax: 100000000
                   inflate: 1.200          
                     alpha: 0.010          
-meanVarData (Data Object)
+MeanVarData (Data Object)
              nSamplesUsed: [285160.  22871.   3979.]
                  timeUsed: 0.153          
                 confidInt: [6.15893613 6.25893461]
@@ -119,7 +119,7 @@ CLT_Rep (StoppingCriterion Object)
                      nMax: 1048576
                   inflate: 1.200          
                     alpha: 0.010          
-meanVarData_Rep (Data Object)
+MeanVarDataRep (Data Object)
              nSamplesUsed: [1024 1024 1024]
                  timeUsed: 0.358          
                 confidInt: [6.18912945 6.19692368]
@@ -137,7 +137,7 @@ CLT_Rep (StoppingCriterion Object)
                      nMax: 1048576
                   inflate: 1.200          
                     alpha: 0.010          
-meanVarData_Rep (Data Object)
+MeanVarDataRep (Data Object)
              nSamplesUsed: [1024 1024 1024]
                  timeUsed: 0.304          
                 confidInt: [6.20728938 6.21092125]

@@ -5,7 +5,7 @@ from numpy import array, ceil, full, inf, maximum, minimum, tile, zeros
 from scipy.stats import norm
 
 from . import stoppingCriterion
-from ..accumData.meanVarData import meanVarData
+from ..accum_data.MeanVarData import MeanVarData
 
 
 class CLTStopping(stoppingCriterion):
@@ -16,7 +16,7 @@ class CLTStopping(stoppingCriterion):
         self.inflate = inflate  # inflation factor
         self.alpha = alpha # uncertainty level
         self.nLevels = len(distribObj)
-        self.dataObj = self.dataObj=meanVarData(self.nLevels)
+        self.dataObj = self.dataObj=MeanVarData(self.nLevels)
 
     def stopYet(self,funObj):
         if self.dataObj.stage == 'begin':  # initialize

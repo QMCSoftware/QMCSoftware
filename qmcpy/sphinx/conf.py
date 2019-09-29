@@ -15,7 +15,6 @@ import sys
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../')) # qmcpy
 sys.path.insert(0, os.path.abspath('../algorithms/'))
-#sys.path.insert(0, os.path.abspath('../algorithms/accumData/'))
 print("root directory = %s " % os.getcwd())
 
 

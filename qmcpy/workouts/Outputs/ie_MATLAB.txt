@@ -1,5 +1,5 @@
 sol = 2.1729
-out = meanVarData with properties:
+out = MeanVarData with properties:
            muhat: 2.1729
           sighat: 2.2013
           nSigma: 1024
@@ -14,7 +14,7 @@ out = meanVarData with properties:
            costF: 0.0654
 
 sol = 2.1689
-out = meanVarData with properties:
+out = MeanVarData with properties:
            muhat: 2.1689
           sighat: 2.2013
           nSigma: 1024
@@ -29,7 +29,7 @@ out = meanVarData with properties:
            costF: 6.2766
 
 sol = 2.1717
-out = meanVarData with properties:
+out = MeanVarData with properties:
            muhat: 2.1717
           sighat: 2.2013
           nSigma: 1024
@@ -44,7 +44,7 @@ out = meanVarData with properties:
            costF: 0.1330
 
 sol = 6.1758
-out = meanVarData with properties:
+out = MeanVarData with properties:
            muhat: 6.1758
           sighat: 7.8647
           nSigma: 1024
@@ -59,7 +59,7 @@ out = meanVarData with properties:
            costF: 1.2470
 
 sol = 6.2149
-out = meanVarData with properties:
+out = MeanVarData with properties:
            muhat: 6.2149
           sighat: 7.9724
           nSigma: 1024
@@ -74,7 +74,7 @@ out = meanVarData with properties:
            costF: 0.2005
 
 sol = 6.2068
-out = meanVarData with properties:
+out = MeanVarData with properties:
            muhat: [6.1784 0.0264 0.0021]
           sighat: [7.8647 1.0169 0.2603]
           nSigma: 1024
