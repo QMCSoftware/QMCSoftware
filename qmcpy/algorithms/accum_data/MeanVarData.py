@@ -5,11 +5,11 @@ from algorithms.distribution import discreteDistribution
 from algorithms.function import fun
 from numpy import arange, finfo, float32, std, zeros
 
-from . import accumData
+from . import AccumData
 
 eps = finfo(float32).eps
 
-class meanVarData(accumData):
+class MeanVarData(AccumData):
     '''
     Accumulated data for IIDDistribution calculations,
     stores the sample mean and variance of function values
@@ -23,22 +23,22 @@ class meanVarData(accumData):
         self.nSigma = zeros(nf) # number of samples used to compute the sample standard deviation
         self.nMu = zeros(nf)  # number of samples used to compute the sample mean
 
-    def updateData(self, distribObj: discreteDistribution, funObj: fun) -> None:
+    def updateData(self, distrib_obj: discreteDistribution, fun_obj: fun) -> None:
         """
         Update data
 
         Args:
-            distribObj: an instance of discreteDistribution
-            funObj: an instance of function
+            distrib_obj: an instance of discreteDistribution
+            fun_obj: an instance of function
 
         Returns:
             None
         """
-        for ii in range(len(funObj)):
+        for ii in range(len(fun_obj)):
             tStart = process_time()  # time the function values
-            dim = distribObj[ii].trueD.dimension
-            distribData = distribObj[ii].genDistrib(self.nextN[ii],dim)
-            y = funObj[ii].f(distribData,arange(1,dim+1))
+            dim = distrib_obj[ii].trueD.dimension
+            distribData = distrib_obj[ii].genDistrib(self.nextN[ii], dim)
+            y = fun_obj[ii].f(distribData, arange(1, dim + 1))
             self.costF[ii] = max(process_time()-tStart,eps)  # to be used for multi-level methods
             if self.stage == 'sigma':
                 self.sighat[ii] = std(y)  # compute the sample standard deviation if required

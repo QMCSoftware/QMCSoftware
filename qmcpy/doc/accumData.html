@@ -32,30 +32,30 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="module-algorithms.accumData.__init__">
-<span id="data-class"></span><h1>Data Class<a class="headerlink" href="#module-algorithms.accumData.__init__" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-algorithms.accum_data.__init__">
+<span id="data-class"></span><h1>Data Class<a class="headerlink" href="#module-algorithms.accum_data.__init__" title="Permalink to this headline">¶</a></h1>
 <p>Originally developed in MATLAB by Fred Hickernell. Translated to python
 by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="class">
-<dt id="algorithms.accumData.__init__.accumData">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.accumData.__init__.</code><code class="sig-name descname">accumData</code><a class="headerlink" href="#algorithms.accumData.__init__.accumData" title="Permalink to this definition">¶</a></dt>
+<dt id="algorithms.accum_data.__init__.AccumData">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.__init__.</code><code class="sig-name descname">AccumData</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Accumulated data required in the computation of the integral</dt><dd><dl class="simple">
-<dt>Any sublcass of accumData must include:</dt><dd><p>Methods: updateData(self, distribObj, fun_obj, decompType)</p>
+<dt>Any sublcass of AccumData must include:</dt><dd><p>Methods: updateData(self, distribObj, fun_obj, decompType)</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <dl class="method">
-<dt id="algorithms.accumData.__init__.accumData.updateData">
-<em class="property">abstract </em><code class="sig-name descname">updateData</code><span class="sig-paren">(</span><em class="sig-param">distribObj: algorithms.distribution.discreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.fun</em>, <em class="sig-param">decompType</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accumData.__init__.accumData.updateData" title="Permalink to this definition">¶</a></dt>
+<dt id="algorithms.accum_data.__init__.AccumData.updateData">
+<em class="property">abstract </em><code class="sig-name descname">updateData</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.discreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.fun</em>, <em class="sig-param">decomp_type</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.updateData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the accumulated data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribObj</strong> – an instance of discreteDistribution</p></li>
+<li><p><strong>distrib_obj</strong> – an instance of discreteDistribution</p></li>
 <li><p><strong>fun_obj</strong> – an instance of function</p></li>
-<li><p><strong>decompType</strong> – </p></li>
+<li><p><strong>decomp_type</strong> – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -66,21 +66,21 @@ by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 
 </dd></dl>
 
-<span class="target" id="module-algorithms.accumData.meanVarData"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<span class="target" id="module-algorithms.accum_data.MeanVarData"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="class">
-<dt id="algorithms.accumData.meanVarData.meanVarData">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.accumData.meanVarData.</code><code class="sig-name descname">meanVarData</code><span class="sig-paren">(</span><em class="sig-param">nf: int</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accumData.meanVarData.meanVarData" title="Permalink to this definition">¶</a></dt>
+<dt id="algorithms.accum_data.MeanVarData.MeanVarData">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.MeanVarData.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">nf: int</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.MeanVarData.MeanVarData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data for IIDDistribution calculations,
 stores the sample mean and variance of function values</p>
 <dl class="method">
-<dt id="algorithms.accumData.meanVarData.meanVarData.updateData">
-<code class="sig-name descname">updateData</code><span class="sig-paren">(</span><em class="sig-param">distribObj: algorithms.distribution.discreteDistribution</em>, <em class="sig-param">funObj: algorithms.function.fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accumData.meanVarData.meanVarData.updateData" title="Permalink to this definition">¶</a></dt>
+<dt id="algorithms.accum_data.MeanVarData.MeanVarData.updateData">
+<code class="sig-name descname">updateData</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.discreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accum_data.MeanVarData.MeanVarData.updateData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribObj</strong> – an instance of discreteDistribution</p></li>
-<li><p><strong>funObj</strong> – an instance of function</p></li>
+<li><p><strong>distrib_obj</strong> – an instance of discreteDistribution</p></li>
+<li><p><strong>fun_obj</strong> – an instance of function</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -91,21 +91,21 @@ stores the sample mean and variance of function values</p>
 
 </dd></dl>
 
-<span class="target" id="module-algorithms.accumData.meanVarData_Rep"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python
+<span class="target" id="module-algorithms.accum_data.MeanVarDataRep"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python
 by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="class">
-<dt id="algorithms.accumData.meanVarData_Rep.meanVarData_Rep">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.accumData.meanVarData_Rep.</code><code class="sig-name descname">meanVarData_Rep</code><span class="sig-paren">(</span><em class="sig-param">nf</em>, <em class="sig-param">J</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accumData.meanVarData_Rep.meanVarData_Rep" title="Permalink to this definition">¶</a></dt>
+<dt id="algorithms.accum_data.MeanVarDataRep.MeanVarDataRep">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.MeanVarDataRep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">nf</em>, <em class="sig-param">J</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.MeanVarDataRep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data for lattice calculations</p>
 <dl class="method">
-<dt id="algorithms.accumData.meanVarData_Rep.meanVarData_Rep.updateData">
-<code class="sig-name descname">updateData</code><span class="sig-paren">(</span><em class="sig-param">distribObj: algorithms.distribution.discreteDistribution</em>, <em class="sig-param">funObj: algorithms.function.fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accumData.meanVarData_Rep.meanVarData_Rep.updateData" title="Permalink to this definition">¶</a></dt>
+<dt id="algorithms.accum_data.MeanVarDataRep.MeanVarDataRep.updateData">
+<code class="sig-name descname">updateData</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.discreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accum_data.MeanVarDataRep.MeanVarDataRep.updateData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribObj</strong> – an instance of discreteDistribution</p></li>
-<li><p><strong>funObj</strong> – an instance of function</p></li>
+<li><p><strong>distrib_obj</strong> – an instance of discreteDistribution</p></li>
+<li><p><strong>fun_obj</strong> – an instance of function</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -183,7 +183,7 @@ by Sou-Cheng T. Choi and Aleksei Sorokin</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="_sources/accumData.rst.txt"
+      <a href="_sources/AccumData.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

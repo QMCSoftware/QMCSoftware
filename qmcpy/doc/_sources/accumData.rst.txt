@@ -2,11 +2,11 @@ Data Class
 ==========
 
 
-.. automodule:: algorithms.accumData.__init__
+.. automodule:: algorithms.accum_data.__init__
     :members:
 
-.. automodule:: algorithms.accumData.meanVarData
+.. automodule:: algorithms.accum_data.MeanVarData
     :members:
 
-.. automodule:: algorithms.accumData.meanVarData_Rep
+.. automodule:: algorithms.accum_data.MeanVarDataRep
     :members:

@@ -1,8 +1,8 @@
 """
->>> from algorithms.accumData.meanVarData import meanVarData
->>> mvd = meanVarData()
+>>> from algorithms.AccumData.MeanVarData import MeanVarData
+>>> mvd = MeanVarData()
 >>> print(mvd)
-Constructing accumData with properties:
+Constructing AccumData with properties:
     solution: nan
     stage: begin
     prevN: []

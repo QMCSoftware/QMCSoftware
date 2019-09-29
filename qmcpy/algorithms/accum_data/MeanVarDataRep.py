@@ -6,12 +6,12 @@ from algorithms.distribution import discreteDistribution
 from algorithms.function import fun
 from numpy import arange, finfo, float32, ones, zeros
 
-from . import accumData
+from . import AccumData
 
 eps = finfo(float32).eps
 
 
-class meanVarData_Rep(accumData):
+class MeanVarDataRep(AccumData):
     ''' Accumulated data for lattice calculations '''
 
     def __init__(self, nf, J):
@@ -26,29 +26,29 @@ class meanVarData_Rep(accumData):
         self.sig2hat = zeros(nf)
         self.flags = ones(nf)
 
-    def updateData(self, distribObj: discreteDistribution, funObj: fun) -> None:
+    def updateData(self, distrib_obj: discreteDistribution, fun_obj: fun) -> None:
         """
         Update data
 
         Args:
-            distribObj: an instance of discreteDistribution
-            funObj: an instance of function
+            distrib_obj: an instance of discreteDistribution
+            fun_obj: an instance of function
 
         Returns:
             None
 
         """
-        for i in range(len(funObj)):
+        for i in range(len(fun_obj)):
             if self.flags[
-                i] == 0:  # mean of funObj[i] already sufficiently estimated
+                i] == 0:  # mean of fun_obj[i] already sufficiently estimated
                 continue
             tStart = process_time()  # time the function values
-            dim = distribObj[i].trueD.dimension
-            set_x = distribObj[i].genDistrib(self.nextN[i], dim,
-                                             self.J)  # set of j
+            dim = distrib_obj[i].trueD.dimension
+            set_x = distrib_obj[i].genDistrib(self.nextN[i], dim,
+                                              self.J)  # set of j
             # distribData_{nxm}
             for j in range(self.J):
-                y = funObj[i].f(set_x[j], arange(1, dim + 1))
+                y = fun_obj[i].f(set_x[j], arange(1, dim + 1))
                 self.muhat[j] = y.mean(0)
             self.costF[i] = max(process_time() - tStart, eps)
             self.mu2hat[i] = self.muhat.mean(0)

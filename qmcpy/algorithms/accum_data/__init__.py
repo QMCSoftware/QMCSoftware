@@ -10,10 +10,10 @@ from numpy import array
 from .. import univ_repr
 
 
-class accumData(ABC):
+class AccumData(ABC):
     '''
     Accumulated data required in the computation of the integral
-        Any sublcass of accumData must include:
+        Any sublcass of AccumData must include:
             Methods: updateData(self, distribObj, fun_obj, decompType)
     '''
 
@@ -32,15 +32,15 @@ class accumData(ABC):
 
     # Abstract Methods
     @abstractmethod
-    def updateData(self, distribObj: discreteDistribution, fun_obj: fun,
-                   decompType):
+    def updateData(self, distrib_obj: discreteDistribution, fun_obj: fun,
+                   decomp_type):
         """
         Update the accumulated data
 
         Args:
-            distribObj: an instance of discreteDistribution
+            distrib_obj: an instance of discreteDistribution
             fun_obj: an instance of function
-            decompType:
+            decomp_type:
 
         Returns:
             None

@@ -11,7 +11,7 @@ Qmcpy Documentation
    :caption: Contents:
 
    algorithms
-   accumData
+   AccumData
    distribution
    function
    stop
