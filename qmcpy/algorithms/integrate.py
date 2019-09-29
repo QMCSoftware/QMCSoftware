@@ -23,6 +23,7 @@ def integrate(fun_obj: Fun, measure_obj: Measure,
         (tuple): tuple containing:
 
             solution (float): estimated value of the integral
+
             data_obj (AccumData): other information such as number of
             sampling points used to obtain the estimate
 
