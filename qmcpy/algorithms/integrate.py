@@ -28,11 +28,11 @@ def integrate(fun_obj: Fun, measure_obj: Measure,
 
     """
     # Initialize the AccumData object and other crucial objects
-    fun_obj = fun_obj.transformVariable(measure_obj, distrib_obj)
+    fun_obj = fun_obj.transform_variable(measure_obj, distrib_obj)
     stop_obj.stopYet(fun_obj)
     while stop_obj.dataObj.stage != 'done':
         # the dataObj.stage property tells us where we are in the process
-        stop_obj.dataObj.updateData(distrib_obj, fun_obj)  # compute more data
+        stop_obj.dataObj.update_data(distrib_obj, fun_obj)  # compute more data
         stop_obj.stopYet(fun_obj)  # update the status of the computation
     solution = stop_obj.dataObj.solution  # assign outputs
     stop_obj.dataObj.timeUsed = time() - stop_obj.dataObj._timeStart

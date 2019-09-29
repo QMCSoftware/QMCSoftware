@@ -23,7 +23,7 @@ class MeanVarData(AccumData):
         self.nSigma = zeros(nf) # number of samples used to compute the sample standard deviation
         self.nMu = zeros(nf)  # number of samples used to compute the sample mean
 
-    def updateData(self, distrib_obj: DiscreteDistribution, fun_obj: Fun) -> None:
+    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Fun) -> None:
         """
         Update data
 
@@ -37,7 +37,7 @@ class MeanVarData(AccumData):
         for ii in range(len(fun_obj)):
             tStart = process_time()  # time the function values
             dim = distrib_obj[ii].trueD.dimension
-            distribData = distrib_obj[ii].genDistrib(self.nextN[ii], dim)
+            distribData = distrib_obj[ii].gen_distrib(self.nextN[ii], dim)
             y = fun_obj[ii].f(distribData, arange(1, dim + 1))
             self.costF[ii] = max(process_time()-tStart,eps)  # to be used for multi-level methods
             if self.stage == 'sigma':

@@ -10,13 +10,14 @@ class DiscreteDistribution(ABC):
     '''
     Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
         Any sublcass of DiscreteDistribution must include:
-            Methods: genDistrib(self,nStart,nEnd,n,coordIndex)
-            Properties: distribData,trueD
+            Methods: gen_distrib(self,nStart,nEnd,n,coordIndex)
+            Properties: distrib_data,trueD
     '''
-    def __init__(self,accepted_measures,trueD=None,distribData=None):
+
+    def __init__(self, accepted_measures, trueD=None, distrib_data=None):
         super().__init__()
         # Abstract Properties
-        self.distribData = distribData
+        self.distrib_data = distrib_data
         self.trueD = trueD   
         self.distrib_list = [self]
         
@@ -27,11 +28,11 @@ class DiscreteDistribution(ABC):
             self.distrib_list = [type(self)() for i in range(len(trueD))]
             for i in range(len(self)):    
                 self[i].trueD = self.trueD[i]
-                self[i].distribData = self.distribData[i] if self.distribData else None          
+                self[i].distrib_data = self.distrib_data[i] if self.distrib_data else None
 
     # Abstract Methods
     @abstractmethod
-    def genDistrib(self,n,m,j):
+    def gen_distrib(self, n, m, j):
         """
          nStart = starting value of §$\mcommentfont i$§
          nEnd = ending value of §$\mcommentfont i$§
@@ -67,9 +68,9 @@ class Measure():
         self.measure_list = []
 
     ''' Methods to construct list of measures ''' 
-    def stdUniform(self,dimension=array([2])):
+    def std_uniform(self, dimension=array([2])):
         ''' create standard uniform Measure '''
-        self.measureName = 'stdUniform'
+        self.measureName = 'std_uniform'
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
@@ -79,12 +80,12 @@ class Measure():
         for i in range(len(self.measure_list)):
             self.measure_list[i] = Measure()
             self.measure_list[i].dimension = self.dimension[i]
-            self.measure_list[i].measureName = 'stdUniform'
+            self.measure_list[i].measureName = 'std_uniform'
         return self
 
-    def stdGaussian(self,dimension=array([2])):
+    def std_gaussian(self, dimension=array([2])):
         ''' create standard Gaussian Measure '''
-        self.measureName = 'stdGaussian'
+        self.measureName = 'std_gaussian'
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
@@ -94,12 +95,12 @@ class Measure():
         for i in range(len(self.measure_list)):
             self.measure_list[i] = Measure()
             self.measure_list[i].dimension = self.dimension[i]
-            self.measure_list[i].measureName = 'stdGaussian'
+            self.measure_list[i].measureName = 'std_gaussian'
         return self
 
-    def IIDZMeanGaussian(self,dimension=array([2]),variance=array([1])):
+    def iid_zmean_gaussian(self, dimension=array([2]), variance=array([1])):
         ''' create standard Gaussian Measure '''
-        self.measureName = 'IIDZMeanGaussian'
+        self.measureName = 'iid_zmean_gaussian'
          #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
@@ -114,12 +115,12 @@ class Measure():
             self.measure_list[i] = Measure()
             self.measure_list[i].dimension = self.dimension[i]
             self.measure_list[i].measureData['variance'] = variance[i]
-            self.measure_list[i].measureName = 'IIDZMeanGaussian'
+            self.measure_list[i].measureName = 'iid_zmean_gaussian'
         return self
 
-    def BrownianMotion(self,timeVector=arange(1/4,5/4,1/4)):
+    def brownian_motion(self, timeVector=arange(1 / 4, 5 / 4, 1 / 4)):
         ''' create a discretized Brownian Motion Measure '''
-        self.measureName = 'BrownianMotion'
+        self.measureName = 'brownian_motion'
         #    Dimension of domain, Â§$\mcommentfont d$Â§
         self.dimension = array([len(tV) for tV in timeVector])
         #    Construct list of measures
@@ -128,10 +129,10 @@ class Measure():
             self.measure_list[i] = Measure()
             self.measure_list[i].measureData['timeVector'] = array(timeVector[i])
             self.measure_list[i].dimension = self.dimension[i]
-            self.measure_list[i].measureName = 'BrownianMotion'
+            self.measure_list[i].measureName = 'brownian_motion'
         return self
-    
-    def lattice(self,dimension=array([2])):
+
+    def lattice(self, dimension=array([2])):
         ''' low descrepancy lattice '''
         self.measureName = 'lattice'
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
@@ -144,12 +145,12 @@ class Measure():
             self.measure_list[i] = Measure()
             self.measure_list[i].measureData['lds_type'] = 'lattice'
             self.measure_list[i].dimension = self.dimension[i]
-            self.measure_list[i].measureName = 'stdUniform'
+            self.measure_list[i].measureName = 'std_uniform'
         return self
 
-    def Sobol(self,dimension=array([2])):
-        ''' low descrepancy Sobol '''
-        self.measureName = 'Sobol'
+    def sobol(self, dimension=array([2])):
+        ''' low descrepancy sobol '''
+        self.measureName = 'sobol'
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
@@ -158,9 +159,9 @@ class Measure():
         self.measure_list = list(range(len(dimension)))
         for i in range(len(self.measure_list)):
             self.measure_list[i] = Measure()
-            self.measure_list[i].measureData['lds_type'] = 'Sobol'
+            self.measure_list[i].measureData['lds_type'] = 'sobol'
             self.measure_list[i].dimension = self.dimension[i]
-            self.measure_list[i].measureName = 'stdUniform'
+            self.measure_list[i].measureName = 'std_uniform'
         return self
 
     # Magic Methods. Makes self[i]==self.measure_list[i]

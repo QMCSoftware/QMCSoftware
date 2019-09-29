@@ -18,9 +18,9 @@ var = 1/2
 coordIdx = arange(1,dim+1)
 
 fun = KeisterFun()
-measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=Measure().stdGaussian(dimension=[dim]),rngSeed=7)
-fun = fun.transformVariable(measureObj, distribObj)
+measureObj = Measure().iid_zmean_gaussian(dimension=[dim], variance=[1 / 2])
+distribObj = IIDDistribution(trueD=Measure().std_gaussian(dimension=[dim]), rngSeed=7)
+fun = fun.transform_variable(measureObj, distribObj)
 
 # Examples for generating 'pregen' figure's constants
 '''
@@ -31,15 +31,15 @@ from algorithms.integrate import integrate
 #     CLTRep Example
 funObj = KeisterFun()
 stopObj = CLTRep(nInit=n,nMax=2**15,absTol=.01,J=j)
-measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[var])
+measureObj = Measure().iid_zmean_gaussian(dimension=[dim],variance=[var])
 distribObj = QuasiRandom(trueD=Measure().lattice(dimension=[dim]),rngSeed=7)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 #     CLT Example
 funObj = KeisterFun()
 stopObj = CLTStopping(nInit=16,absTol=.3,alpha=.01,inflate=1.2)
-measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=Measure().stdGaussian(dimension=[dim]),rngSeed=7)
+measureObj = Measure().iid_zmean_gaussian(dimension=[dim],variance=[1/2])
+distribObj = IIDDistribution(trueD=Measure().std_gaussian(dimension=[dim]),rngSeed=7)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 sys.exit(0)

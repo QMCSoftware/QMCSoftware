@@ -60,11 +60,11 @@ class digitalseq_b2g:
           Example usage with a simply unit matrix and the powers of the polynomial
           (X+1) over Z_2[X]. The first dimension is then the van der Corput
           sequence. The second matrix is the choice of the second dimension of
-          the Sobol' and Niederreiter sequences.
+          the sobol' and Niederreiter sequences.
           >>> from __future__ import print_function
           >>> m = 5
           >>> C1 = [ 2**i for i in range(m) ]  # van der Corput sequence = identity matrix
-          >>> C2 = [ 1 for i in range(m) ]     # here we build the 2nd matrix of the Sobol' and Niederreiter seq
+          >>> C2 = [ 1 for i in range(m) ]     # here we build the 2nd matrix of the sobol' and Niederreiter seq
           >>> for i in range(1, m): C2[i] = (C2[i-1] << 1) ^ C2[i-1]
           >>> Cs = [ C1, C2 ]
           >>> seq = digitalseq_b2g(Cs)
@@ -107,7 +107,7 @@ class digitalseq_b2g:
           0.53125 0.03125
           0.03125 0.53125
 
-          These are the first 32 Sobol' or Niederreiter points in 2D.
+          These are the first 32 sobol' or Niederreiter points in 2D.
 
           Warning: please mind the deepcopy if you store the member variables
           in a list, you get returned a reference to the value. If you don't

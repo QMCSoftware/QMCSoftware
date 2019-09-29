@@ -31,30 +31,30 @@ class Fun(ABC):
         '''
         pass
     
-    def transformVariable(self,msrObj,dstrObj):
+    def transform_variable(self, msr_obj, dstr_obj):
         '''
         This method performs the necessary variable transformationto put the 
         original function in the form required by the discreteDistributon
         object starting from the original Measure object
 
-        msrObj = the Measure object that defines the integral
-        dstrObj = the discrete distribution object that is sampled from
+        msr_obj = the Measure object that defines the integral
+        dstr_obj = the discrete distribution object that is sampled from
         '''
         for ii in range(len(self)):
-            self[ii].dimension = dstrObj[ii].trueD.dimension # the function needs the dimension
-            if msrObj[ii].measureName==dstrObj[ii].trueD.measureName:
+            self[ii].dimension = dstr_obj[ii].trueD.dimension # the function needs the dimension
+            if msr_obj[ii].measureName==dstr_obj[ii].trueD.measureName:
                 self[ii].f = lambda xu,coordIdex,i=ii: self[i].g(xu,coordIdex)
-            elif msrObj[ii].measureName=='IIDZMeanGaussian' and dstrObj[ii].trueD.measureName=='stdGaussian': # multiply by the likelihood ratio
-                this_var = msrObj[ii].measureData['variance']
+            elif msr_obj[ii].measureName== 'iid_zmean_gaussian' and dstr_obj[ii].trueD.measureName== 'std_gaussian': # multiply by the likelihood ratio
+                this_var = msr_obj[ii].measureData['variance']
                 self[ii].f = lambda xu,coordIndex,var=this_var,i=ii: self[i].g(xu*sqrt(var),coordIndex)
-            elif msrObj[ii].measureName=='BrownianMotion' and dstrObj[ii].trueD.measureName=='stdGaussian':
-                timeDiff = diff(insert(msrObj[ii].measureData['timeVector'],0,0))
+            elif msr_obj[ii].measureName== 'brownian_motion' and dstr_obj[ii].trueD.measureName== 'std_gaussian':
+                timeDiff = diff(insert(msr_obj[ii].measureData['timeVector'], 0, 0))
                 self[ii].f = lambda xu,coordIndex,timeDiff=timeDiff,i=ii: self[i].g(cumsum(xu*sqrt(timeDiff),1),coordIndex)
-            elif msrObj[ii].measureName=='IIDZMeanGaussian' and dstrObj[ii].trueD.measureName=='stdUniform':
-                this_var = msrObj[ii].measureData['variance']
+            elif msr_obj[ii].measureName== 'iid_zmean_gaussian' and dstr_obj[ii].trueD.measureName== 'std_uniform':
+                this_var = msr_obj[ii].measureData['variance']
                 self[ii].f = lambda xu,coordIdex,var=this_var,i=ii: self[i].g(sqrt(var)*norm.ppf(xu),coordIdex)
-            elif msrObj[ii].measureName=='BrownianMotion' and dstrObj[ii].trueD.measureName=='stdUniform':
-                timeDiff = diff(insert(msrObj[ii].measureData['timeVector'],0,0))
+            elif msr_obj[ii].measureName== 'brownian_motion' and dstr_obj[ii].trueD.measureName== 'std_uniform':
+                timeDiff = diff(insert(msr_obj[ii].measureData['timeVector'], 0, 0))
                 self[ii].f = lambda xu,coordIndex,timeDiff=timeDiff,i=ii: self[i].g(cumsum(norm.ppf(xu)*sqrt(timeDiff),1),coordIndex)
             else:
                 raise Exception("Variable transformation not performed")

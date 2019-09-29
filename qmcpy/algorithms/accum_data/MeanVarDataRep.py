@@ -26,7 +26,7 @@ class MeanVarDataRep(AccumData):
         self.sig2hat = zeros(nf)
         self.flags = ones(nf)
 
-    def updateData(self, distrib_obj: DiscreteDistribution, fun_obj: Fun) -> None:
+    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Fun) -> None:
         """
         Update data
 
@@ -44,8 +44,8 @@ class MeanVarDataRep(AccumData):
                 continue
             tStart = process_time()  # time the function values
             dim = distrib_obj[i].trueD.dimension
-            set_x = distrib_obj[i].genDistrib(self.nextN[i], dim,
-                                              self.J)  # set of j
+            set_x = distrib_obj[i].gen_distrib(self.nextN[i], dim,
+                                               self.J)  # set of j
             # distribData_{nxm}
             for j in range(self.J):
                 y = fun_obj[i].f(set_x[j], arange(1, dim + 1))

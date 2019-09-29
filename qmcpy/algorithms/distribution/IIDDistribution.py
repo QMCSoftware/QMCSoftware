@@ -9,11 +9,11 @@ class IIDDistribution(DiscreteDistribution):
     where the $\vx_i$ are IIDDistribution uniform on $[0,1]^d$ or IIDDistribution standard Gaussian
     '''
     
-    def __init__(self,trueD=None,distribData=None,rngSeed=None):
-        accepted_measures = ['stdUniform','stdGaussian']
+    def __init__(self, trueD=None, distrib_data=None, rngSeed=None):
+        accepted_measures = ['std_uniform','std_gaussian']
         if rngSeed: random.seed(rngSeed)
-        super().__init__(accepted_measures,trueD,distribData)
+        super().__init__(accepted_measures, trueD, distrib_data)
 
-    def genDistrib(self,n,m,j=1):
-        if self.trueD.measureName=='stdUniform': return random.rand(j,int(n),int(m)).squeeze()
-        elif self.trueD.measureName=='stdGaussian': return random.randn(j,int(n),int(m)).squeeze()
+    def gen_distrib(self, n, m, j=1):
+        if self.trueD.measureName=='std_uniform': return random.rand(j,int(n),int(m)).squeeze()
+        elif self.trueD.measureName=='std_gaussian': return random.randn(j,int(n),int(m)).squeeze()

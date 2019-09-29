@@ -41,14 +41,14 @@ by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.__init__.</code><code class="sig-name descname">AccumData</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Accumulated data required in the computation of the integral</dt><dd><dl class="simple">
-<dt>Any sublcass of AccumData must include:</dt><dd><p>Methods: updateData(self, distribObj, fun_obj, decompType)</p>
+<dt>Any sublcass of AccumData must include:</dt><dd><p>Methods: update_data(self, distribObj, fun_obj, decompType)</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <dl class="method">
-<dt id="algorithms.accum_data.__init__.AccumData.updateData">
-<em class="property">abstract </em><code class="sig-name descname">updateData</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.Fun</em>, <em class="sig-param">decomp_type</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.updateData" title="Permalink to this definition">¶</a></dt>
+<dt id="algorithms.accum_data.__init__.AccumData.update_data">
+<em class="property">abstract </em><code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.Fun</em>, <em class="sig-param">decomp_type</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the accumulated data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -73,8 +73,8 @@ by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dd><p>Accumulated data for IIDDistribution calculations,
 stores the sample mean and variance of function values</p>
 <dl class="method">
-<dt id="algorithms.accum_data.MeanVarData.MeanVarData.updateData">
-<code class="sig-name descname">updateData</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.Fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accum_data.MeanVarData.MeanVarData.updateData" title="Permalink to this definition">¶</a></dt>
+<dt id="algorithms.accum_data.MeanVarData.MeanVarData.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.Fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accum_data.MeanVarData.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -98,8 +98,8 @@ by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.MeanVarDataRep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">nf</em>, <em class="sig-param">J</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.MeanVarDataRep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data for lattice calculations</p>
 <dl class="method">
-<dt id="algorithms.accum_data.MeanVarDataRep.MeanVarDataRep.updateData">
-<code class="sig-name descname">updateData</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.Fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accum_data.MeanVarDataRep.MeanVarDataRep.updateData" title="Permalink to this definition">¶</a></dt>
+<dt id="algorithms.accum_data.MeanVarDataRep.MeanVarDataRep.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.Fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accum_data.MeanVarDataRep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

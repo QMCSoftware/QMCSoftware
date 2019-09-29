@@ -14,7 +14,7 @@ class AccumData(ABC):
     '''
     Accumulated data required in the computation of the integral
         Any sublcass of AccumData must include:
-            Methods: updateData(self, distribObj, fun_obj, decompType)
+            Methods: update_data(self, distribObj, fun_obj, decompType)
     '''
 
     def __init__(self):
@@ -32,8 +32,8 @@ class AccumData(ABC):
 
     # Abstract Methods
     @abstractmethod
-    def updateData(self, distrib_obj: DiscreteDistribution, fun_obj: Fun,
-                   decomp_type):
+    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Fun,
+                    decomp_type):
         """
         Update the accumulated data
 

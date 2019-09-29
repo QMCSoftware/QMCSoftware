@@ -1,10 +1,10 @@
 Solution: 6.202          
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCallFun (Function Object)
-BrownianMotion (Measure Type)
+brownian_motion (Measure Type)
                 dimension: [64]           
 IIDDistribution (Distribution Object)
-        trueD.measureName: stdUniform     
+        trueD.measureName: std_uniform
 CLTStopping (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          
@@ -19,10 +19,10 @@ MeanVarData (Data Object)
 Solution: 6.215          
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCallFun (Function Object)
-BrownianMotion (Measure Type)
+brownian_motion (Measure Type)
                 dimension: [64]           
 IIDDistribution (Distribution Object)
-        trueD.measureName: stdGaussian    
+        trueD.measureName: std_gaussian
 CLTStopping (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          
@@ -37,7 +37,7 @@ MeanVarData (Data Object)
 Solution: 6.191          
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCallFun (Function Object)
-BrownianMotion (Measure Type)
+brownian_motion (Measure Type)
                 dimension: [64]           
 QuasiRandom (Distribution Object)
         trueD.measureName: lattice        
@@ -55,10 +55,10 @@ MeanVarDataRep (Data Object)
 Solution: 6.189          
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCallFun (Function Object)
-BrownianMotion (Measure Type)
+brownian_motion (Measure Type)
                 dimension: [64]           
 QuasiRandom (Distribution Object)
-        trueD.measureName: Sobol          
+        trueD.measureName: sobol
 CLTRep (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          
@@ -73,10 +73,10 @@ MeanVarDataRep (Data Object)
 Solution: 6.201          
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCallFun (Function Object)
-BrownianMotion (Measure Type)
+brownian_motion (Measure Type)
                 dimension: [ 4 16 64]     
 IIDDistribution (Distribution Object)
-        trueD.measureName: stdUniform     
+        trueD.measureName: std_uniform
 CLTStopping (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          
@@ -91,10 +91,10 @@ MeanVarData (Data Object)
 Solution: 6.209          
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCallFun (Function Object)
-BrownianMotion (Measure Type)
+brownian_motion (Measure Type)
                 dimension: [ 4 16 64]     
 IIDDistribution (Distribution Object)
-        trueD.measureName: stdGaussian    
+        trueD.measureName: std_gaussian
 CLTStopping (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          
@@ -109,7 +109,7 @@ MeanVarData (Data Object)
 Solution: 6.193          
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCallFun (Function Object)
-BrownianMotion (Measure Type)
+brownian_motion (Measure Type)
                 dimension: [ 4 16 64]     
 QuasiRandom (Distribution Object)
         trueD.measureName: lattice        
@@ -127,10 +127,10 @@ MeanVarDataRep (Data Object)
 Solution: 6.209          
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCallFun (Function Object)
-BrownianMotion (Measure Type)
+brownian_motion (Measure Type)
                 dimension: [ 4 16 64]     
 QuasiRandom (Distribution Object)
-        trueD.measureName: Sobol          
+        trueD.measureName: sobol
 CLTRep (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          

@@ -14,20 +14,20 @@ from algorithms.integrate import integrate
 from algorithms.function.KeisterFun import KeisterFun
 from algorithms.distribution import Measure
 
-# IID stdGaussian 
+# IID std_gaussian
 dim = 3
 funObj = KeisterFun()
-measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=Measure().stdGaussian(dimension=[dim]),rngSeed=7)
+measureObj = Measure().iid_zmean_gaussian(dimension=[dim], variance=[1 / 2])
+distribObj = IIDDistribution(trueD=Measure().std_gaussian(dimension=[dim]), rngSeed=7)
 stopObj = CLTStopping(distribObj)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 
-# IID stdUniform
+# IID std_uniform
 dim = 3
 funObj = KeisterFun()
-measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=Measure().stdUniform(dimension=[dim]),rngSeed=7)
+measureObj = Measure().iid_zmean_gaussian(dimension=[dim], variance=[1 / 2])
+distribObj = IIDDistribution(trueD=Measure().std_uniform(dimension=[dim]), rngSeed=7)
 stopObj = CLTStopping(distribObj,absTol=1.5e-3)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
@@ -35,17 +35,17 @@ summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 # QuasiRandom Lattice
 dim = 3
 funObj = KeisterFun()
-measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
+measureObj = Measure().iid_zmean_gaussian(dimension=[dim], variance=[1 / 2])
 distribObj = QuasiRandom(trueD=Measure().lattice(dimension=[dim]),rngSeed=7)
 stopObj = CLTRep(distribObj,absTol=1.5e-3,nMax=1e6)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 
-# QuasiRandom Sobol
+# QuasiRandom sobol
 dim = 3
 funObj = KeisterFun()
-measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = QuasiRandom(trueD=Measure().Sobol(dimension=[dim]),rngSeed=7)
+measureObj = Measure().iid_zmean_gaussian(dimension=[dim], variance=[1 / 2])
+distribObj = QuasiRandom(trueD=Measure().sobol(dimension=[dim]), rngSeed=7)
 stopObj = CLTRep(distribObj,absTol=0,nMax=1e6) # impossible tolerance so calculation is limited by sample budget
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)

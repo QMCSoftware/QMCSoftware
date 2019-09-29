@@ -37,7 +37,7 @@ def QMC_Wrapper(stopObj,distribObj,name):
     item_f = '    %-25s %-10.3f %-10.3f'
     item_s = '    %-25s %-10s %-10s'
     #try:
-    measureObj = Measure().BrownianMotion(
+    measureObj = Measure().brownian_motion(
         timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
     OptionObj = AsianCallFun(measureObj)
     sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
@@ -60,13 +60,13 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
         results.append(absTol)
 
         # CLT_stdUniform
-        distribObj = IIDDistribution(trueD=Measure().stdUniform(dimension=[4,16,64]),rngSeed=7)
+        distribObj = IIDDistribution(trueD=Measure().std_uniform(dimension=[4, 16, 64]), rngSeed=7)
         stopObj = CLTStopping(distribObj,absTol=absTol)
         mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdUniform')    
         results.extend([mu,t])
         
         # CLT_stdGaussian
-        distribObj = IIDDistribution(trueD=Measure().stdGaussian(dimension=[4,16,64]),rngSeed=7)
+        distribObj = IIDDistribution(trueD=Measure().std_gaussian(dimension=[4, 16, 64]), rngSeed=7)
         stopObj = CLTStopping(distribObj,absTol=absTol)
         mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdGaussian')    
         results.extend([mu,t])
@@ -78,9 +78,9 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
         results.extend([mu,t])
 
         # CLT_Rep_sobol
-        distribObj = QuasiRandom(trueD=Measure().Sobol(dimension=[4,16,64]),rngSeed=7)
+        distribObj = QuasiRandom(trueD=Measure().sobol(dimension=[4, 16, 64]), rngSeed=7)
         stopObj = CLTRep(distribObj,nMax=2**20,absTol=absTol)
-        mu,t = QMC_Wrapper(stopObj,distribObj,'Sobol')    
+        mu,t = QMC_Wrapper(stopObj,distribObj,'sobol')
         results.extend([mu,t])
 
         df_metrics.loc[i] = results # update metrics
@@ -103,4 +103,4 @@ if __name__ == '__main__':
             'CLT: IID Gaussian':(df['CLT_stdUniform_runTime'],'r'),
             'CLT: IID Uniform ':(df['CLT_stdGaussian_runTime'],'b'),
             'CLT Repeated: Lattice':(df['CLT_Rep_lattice_runTime'],'g'),
-            'CLT Repeated: Sobol':(df['CLT_Rep_Sobol_runTime'],'y')})
+            'CLT Repeated: sobol':(df['CLT_Rep_Sobol_runTime'],'y')})
