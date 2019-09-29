@@ -1,5 +1,5 @@
-Data Documentation
-========================
+Data Class
+==========
 
 
 .. automodule:: algorithms.accumData.__init__

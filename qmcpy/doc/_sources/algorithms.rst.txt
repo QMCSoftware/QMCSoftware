@@ -1,5 +1,5 @@
-Algorithms Documentation
-========================
+Algorithms
+==========
 
 .. automodule:: integrate
     :members:

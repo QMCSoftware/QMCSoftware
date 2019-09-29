@@ -4,6 +4,9 @@ To install qmcpy, open a terminal, in directory QMCSoftware/qmcpy, run:
 
     python setup.py install
 
+To uninstall, do the following:
+
+    pip uninstall qmcpy
 
 Reference:  Writing the Setup Script, https://docs.python.org/3/distutils/setupscript.html
 '''

@@ -12,7 +12,9 @@ Qmcpy Documentation
 
    algorithms
    accumData
-
+   distribution
+   function
+   stop
 
 
 Indices and tables
