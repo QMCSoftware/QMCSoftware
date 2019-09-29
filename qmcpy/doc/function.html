@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Function Class &#8212; qmcpy 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Stop Class" href="stop.html" />
+    <link rel="prev" title="Distribution Class" href="distribution.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-algorithms.function.__init__">
+<span id="function-class"></span><h1>Function Class<a class="headerlink" href="#module-algorithms.function.__init__" title="Permalink to this headline">¶</a></h1>
+<p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.function.__init__.Fun">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.__init__.</code><code class="sig-name descname">Fun</code><span class="sig-paren">(</span><em class="sig-param">nominalValue=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.__init__.Fun" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Specify and generate values $f(</p>
+</div></blockquote>
+<p>x)$ for $
+x in cx$</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Any sublcass of Fun must include:</dt><dd><p>Methods: g(self,x,coordIndex)</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="algorithms.function.__init__.Fun.g">
+<em class="property">abstract </em><code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coordIndex</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.__init__.Fun.g" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>xu = nodes, $</p>
+</div></blockquote>
+<p>x_{
+u,i} = i^{    ext{th}}$ row of an $n  imes |
+u|$ matrix</p>
+<blockquote>
+<div><p>coordIndex = set of those coordinates in sequence needed,  $</p>
+</div></blockquote>
+<dl class="simple">
+<dt>u$</dt><dd><p>y = $n  imes p$ matrix with values $f(</p>
+</dd>
+</dl>
+<p>x_{
+u,i},
+c)$ where if $
+x_i’ = (x_{i,
+u},
+c)_j$, then $x’_{ij} = x_{ij}$ for $j in
+u$, and $x’_{ij} = c$ otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.function.__init__.Fun.transform_variable">
+<code class="sig-name descname">transform_variable</code><span class="sig-paren">(</span><em class="sig-param">msr_obj</em>, <em class="sig-param">dstr_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.__init__.Fun.transform_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method performs the necessary variable transformationto put the
+original function in the form required by the discreteDistributon
+object starting from the original Measure object</p>
+<p>msr_obj = the Measure object that defines the integral
+dstr_obj = the discrete distribution object that is sampled from</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.function.AsianCallFun"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.function.AsianCallFun.AsianCallFun">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.AsianCallFun.</code><code class="sig-name descname">AsianCallFun</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">S0=30</em>, <em class="sig-param">K=25</em>, <em class="sig-param">nominalValue=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.AsianCallFun.AsianCallFun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and generate payoff values of an Asian Call option</p>
+<dl class="method">
+<dt id="algorithms.function.AsianCallFun.AsianCallFun.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">ignore</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.AsianCallFun.AsianCallFun.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>xu = nodes, $
+x_{
+u,i} = i^{    ext{th}}$ row of an $n  imes |
+u|$ matrix
+coordIndex = set of those coordinates in sequence needed,  $
+u$
+y = $n  imes p$ matrix with values $f(
+x_{
+u,i},
+c)$ where if $
+x_i’ = (x_{i,
+u},
+c)_j$, then $x’_{ij} = x_{ij}$ for $j in
+u$, and $x’_{ij} = c$ otherwise</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.function.KeisterFun"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by
+Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.function.KeisterFun.KeisterFun">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.KeisterFun.</code><code class="sig-name descname">KeisterFun</code><span class="sig-paren">(</span><em class="sig-param">nominalValue=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.KeisterFun.KeisterFun" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Specify and generate values $f(</p>
+</div></blockquote>
+<p>x) = pi^{d/2} cos(lVert
+x
+Vert)$ for $
+x in
+eals^d$</p>
+<blockquote>
+<div><p>The standard example integrates the Keister function with respect to an IID Gaussian distribution with variance 1/2
+B. D. Keister, Multidimensional Quadrature Algorithms,  emph{Computers in Physics},        extbf{10}, pp.119-122, 1996.</p>
+</div></blockquote>
+<dl class="method">
+<dt id="algorithms.function.KeisterFun.KeisterFun.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coordIndex</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.KeisterFun.KeisterFun.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>xu = nodes, $
+x_{
+u,i} = i^{    ext{th}}$ row of an $n  imes |
+u|$ matrix
+coordIndex = set of those coordinates in sequence needed,  $
+u$
+y = $n  imes p$ matrix with values $f(
+x_{
+u,i},
+c)$ where if $
+x_i’ = (x_{i,
+u},
+c)_j$, then $x’_{ij} = x_{ij}$ for $j in
+u$, and $x’_{ij} = c$ otherwise</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.function.LinearFun"></span><dl class="class">
+<dt id="algorithms.function.LinearFun.LinearFun">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.LinearFun.</code><code class="sig-name descname">LinearFun</code><span class="sig-paren">(</span><em class="sig-param">nominalValue=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.LinearFun.LinearFun" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="algorithms.function.LinearFun.LinearFun.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coordIndex</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.LinearFun.LinearFun.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>xu = nodes, $
+x_{
+u,i} = i^{    ext{th}}$ row of an $n  imes |
+u|$ matrix
+coordIndex = set of those coordinates in sequence needed,  $
+u$
+y = $n  imes p$ matrix with values $f(
+x_{
+u,i},
+c)$ where if $
+x_i’ = (x_{i,
+u},
+c)_j$, then $x’_{ij} = x_{ij}$ for $j in
+u$, and $x’_{ij} = c$ otherwise</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">qmcpy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AccumData.html">Data Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distribution.html">Distribution Class</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Function Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stop.html">Stop Class</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="distribution.html" title="previous chapter">Distribution Class</a></li>
+      <li>Next: <a href="stop.html" title="next chapter">Stop Class</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Illinois Institute of Technology.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/function.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

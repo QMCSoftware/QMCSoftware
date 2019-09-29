@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Data Class &#8212; qmcpy 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Distribution Class" href="distribution.html" />
+    <link rel="prev" title="Algorithms" href="algorithms.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-algorithms.accum_data.__init__">
+<span id="data-class"></span><h1>Data Class<a class="headerlink" href="#module-algorithms.accum_data.__init__" title="Permalink to this headline">¶</a></h1>
+<p>Originally developed in MATLAB by Fred Hickernell. Translated to python
+by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.accum_data.__init__.AccumData">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.__init__.</code><code class="sig-name descname">AccumData</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Accumulated data required in the computation of the integral</dt><dd><dl class="simple">
+<dt>Any sublcass of AccumData must include:</dt><dd><p>Methods: update_data(self, distribObj, fun_obj, decompType)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
+<dt id="algorithms.accum_data.__init__.AccumData.update_data">
+<em class="property">abstract </em><code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.Fun</em>, <em class="sig-param">decomp_type</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.update_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the accumulated data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distrib_obj</strong> – an instance of DiscreteDistribution</p></li>
+<li><p><strong>fun_obj</strong> – an instance of function</p></li>
+<li><p><strong>decomp_type</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.accum_data.MeanVarData"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.accum_data.MeanVarData.MeanVarData">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.MeanVarData.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">nf: int</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.MeanVarData.MeanVarData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accumulated data for IIDDistribution calculations,
+stores the sample mean and variance of function values</p>
+<dl class="method">
+<dt id="algorithms.accum_data.MeanVarData.MeanVarData.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.Fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accum_data.MeanVarData.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distrib_obj</strong> – an instance of DiscreteDistribution</p></li>
+<li><p><strong>fun_obj</strong> – an instance of function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.accum_data.MeanVarDataRep"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python
+by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.accum_data.MeanVarDataRep.MeanVarDataRep">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.MeanVarDataRep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">nf</em>, <em class="sig-param">J</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.MeanVarDataRep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accumulated data for lattice calculations</p>
+<dl class="method">
+<dt id="algorithms.accum_data.MeanVarDataRep.MeanVarDataRep.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">fun_obj: algorithms.function.Fun</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#algorithms.accum_data.MeanVarDataRep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distrib_obj</strong> – an instance of DiscreteDistribution</p></li>
+<li><p><strong>fun_obj</strong> – an instance of function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">qmcpy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distribution.html">Distribution Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function.html">Function Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stop.html">Stop Class</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="algorithms.html" title="previous chapter">Algorithms</a></li>
+      <li>Next: <a href="distribution.html" title="next chapter">Distribution Class</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Illinois Institute of Technology.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/AccumData.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

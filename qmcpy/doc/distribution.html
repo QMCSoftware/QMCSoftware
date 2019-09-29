@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Distribution Class &#8212; qmcpy 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Function Class" href="function.html" />
+    <link rel="prev" title="Data Class" href="AccumData.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-algorithms.distribution.__init__">
+<span id="distribution-class"></span><h1>Distribution Class<a class="headerlink" href="#module-algorithms.distribution.__init__" title="Permalink to this headline">¶</a></h1>
+<p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.distribution.__init__.DiscreteDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.__init__.</code><code class="sig-name descname">DiscreteDistribution</code><span class="sig-paren">(</span><em class="sig-param">accepted_measures</em>, <em class="sig-param">trueD=None</em>, <em class="sig-param">distrib_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Specifies and generates the components of $ a_n sum_{i=1}^n w_i delta_{</p>
+</div></blockquote>
+<dl class="simple">
+<dt>x_i}(cdot)$</dt><dd><dl class="simple">
+<dt>Any sublcass of DiscreteDistribution must include:</dt><dd><p>Methods: gen_distrib(self,nStart,nEnd,n,coordIndex)
+Properties: distrib_data,trueD</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
+<dt id="algorithms.distribution.__init__.DiscreteDistribution.gen_distrib">
+<em class="property">abstract </em><code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dd><p>nStart = starting value of $ i$
+nEnd = ending value of $ i$
+n = value of $ n$ used to determine $ a_n$
+coordIndex = which coordinates in sequence are needed</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="algorithms.distribution.__init__.Measure">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.__init__.</code><code class="sig-name descname">Measure</code><span class="sig-paren">(</span><em class="sig-param">domainShape=''</em>, <em class="sig-param">domainCoord=None</em>, <em class="sig-param">measureData=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.Measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the components of a general Measure used to define an
+integration problem or a sampling method</p>
+<dl class="method">
+<dt id="algorithms.distribution.__init__.Measure.brownian_motion">
+<code class="sig-name descname">brownian_motion</code><span class="sig-paren">(</span><em class="sig-param">timeVector=array([0.25</em>, <em class="sig-param">0.5</em>, <em class="sig-param">0.75</em>, <em class="sig-param">1.  ])</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.Measure.brownian_motion" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a discretized Brownian Motion Measure</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.__init__.Measure.iid_zmean_gaussian">
+<code class="sig-name descname">iid_zmean_gaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=array([2])</em>, <em class="sig-param">variance=array([1])</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.Measure.iid_zmean_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>create standard Gaussian Measure</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.__init__.Measure.lattice">
+<code class="sig-name descname">lattice</code><span class="sig-paren">(</span><em class="sig-param">dimension=array([2])</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.Measure.lattice" title="Permalink to this definition">¶</a></dt>
+<dd><p>low descrepancy lattice</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.__init__.Measure.sobol">
+<code class="sig-name descname">sobol</code><span class="sig-paren">(</span><em class="sig-param">dimension=array([2])</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.Measure.sobol" title="Permalink to this definition">¶</a></dt>
+<dd><p>low descrepancy sobol</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.__init__.Measure.std_gaussian">
+<code class="sig-name descname">std_gaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=array([2])</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.Measure.std_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>create standard Gaussian Measure</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.__init__.Measure.std_uniform">
+<code class="sig-name descname">std_uniform</code><span class="sig-paren">(</span><em class="sig-param">dimension=array([2])</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.Measure.std_uniform" title="Permalink to this definition">¶</a></dt>
+<dd><p>create standard uniform Measure</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="algorithms.distribution.__init__.MeasureCompatibilityError">
+<em class="property">exception </em><code class="sig-prename descclassname">algorithms.distribution.__init__.</code><code class="sig-name descname">MeasureCompatibilityError</code><a class="headerlink" href="#algorithms.distribution.__init__.MeasureCompatibilityError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-algorithms.distribution.DigitalSeq"></span><dl class="class">
+<dt id="algorithms.distribution.DigitalSeq.DigitalSeq">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.DigitalSeq.</code><code class="sig-name descname">DigitalSeq</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.DigitalSeq.DigitalSeq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Digital sequence point generator based on generating matrices.
+This sequence generator can take classical (m by m) generating matrices
+or higher-order (alpha m by m) generating matrices from interlaced
+digital nets, interlaced polynomial lattice rules or higher-order
+polynomial lattice rules.
+This code is specific for base 2 digital nets.</p>
+</dd></dl>
+
+<span class="target" id="module-algorithms.distribution.IIDDistribution"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.distribution.IIDDistribution.IIDDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.IIDDistribution.</code><code class="sig-name descname">IIDDistribution</code><span class="sig-paren">(</span><em class="sig-param">trueD=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">rngSeed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.IIDDistribution.IIDDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Specifies and generates the components of $</p>
+</div></blockquote>
+<p>rac 1n sum_{i=1}^n delta_{
+x_i}(cdot)$</p>
+<blockquote>
+<div><p>where the $</p>
+</div></blockquote>
+<p>x_i$ are IIDDistribution uniform on $[0,1]^d$ or IIDDistribution standard Gaussian</p>
+<dl class="method">
+<dt id="algorithms.distribution.IIDDistribution.IIDDistribution.gen_distrib">
+<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=1</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.IIDDistribution.IIDDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dd><p>nStart = starting value of $ i$
+nEnd = ending value of $ i$
+n = value of $ n$ used to determine $ a_n$
+coordIndex = which coordinates in sequence are needed</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.distribution.QuasiRandom"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.distribution.QuasiRandom.QuasiRandom">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.QuasiRandom.</code><code class="sig-name descname">QuasiRandom</code><span class="sig-paren">(</span><em class="sig-param">distrib_data=None</em>, <em class="sig-param">trueD=None</em>, <em class="sig-param">rngSeed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.QuasiRandom.QuasiRandom" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="algorithms.distribution.QuasiRandom.QuasiRandom.gen_distrib">
+<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=1</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.QuasiRandom.QuasiRandom.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dd><p>nStart = starting value of $ i$
+nEnd = ending value of $ i$
+n = value of $ n$ used to determine $ a_n$
+coordIndex = which coordinates in sequence are needed</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">qmcpy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AccumData.html">Data Class</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Distribution Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function.html">Function Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stop.html">Stop Class</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="AccumData.html" title="previous chapter">Data Class</a></li>
+      <li>Next: <a href="function.html" title="next chapter">Function Class</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Illinois Institute of Technology.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/distribution.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

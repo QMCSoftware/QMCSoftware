@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stop Class &#8212; qmcpy 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Function Class" href="function.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-algorithms.stop.__init__">
+<span id="stop-class"></span><h1>Stop Class<a class="headerlink" href="#module-algorithms.stop.__init__" title="Permalink to this headline">¶</a></h1>
+<p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="exception">
+<dt id="algorithms.stop.__init__.DistributionCompatibilityError">
+<em class="property">exception </em><code class="sig-prename descclassname">algorithms.stop.__init__.</code><code class="sig-name descname">DistributionCompatibilityError</code><a class="headerlink" href="#algorithms.stop.__init__.DistributionCompatibilityError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="algorithms.stop.__init__.StoppingCriterion">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.__init__.</code><code class="sig-name descname">StoppingCriterion</code><span class="sig-paren">(</span><em class="sig-param">distribObj</em>, <em class="sig-param">discDistAllowed</em>, <em class="sig-param">absTol</em>, <em class="sig-param">relTol</em>, <em class="sig-param">nInit</em>, <em class="sig-param">nMax</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Decide when to stop</dt><dd><dl class="simple">
+<dt>Any sublcass of StoppingCriterion must include:</dt><dd><p>Methods: stopYet(self,distribObj)
+Properties: discDistAllowed</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-algorithms.stop.CLTRep"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.stop.CLTRep.CLTRep">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.CLTRep.</code><code class="sig-name descname">CLTRep</code><span class="sig-paren">(</span><em class="sig-param">distribObj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">J=16</em>, <em class="sig-param">absTol=None</em>, <em class="sig-param">relTol=None</em>, <em class="sig-param">nInit=None</em>, <em class="sig-param">nMax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTRep.CLTRep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stopping criterion based on var(stream_1_estimate,stream_2_estimate,…,stream_16_estimate)&lt;errorTol</p>
+</dd></dl>
+
+<span class="target" id="module-algorithms.stop.CLTStopping"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
+<dl class="class">
+<dt id="algorithms.stop.CLTStopping.CLTStopping">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.CLTStopping.</code><code class="sig-name descname">CLTStopping</code><span class="sig-paren">(</span><em class="sig-param">distribObj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">absTol=None</em>, <em class="sig-param">relTol=None</em>, <em class="sig-param">nInit=None</em>, <em class="sig-param">nMax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTStopping.CLTStopping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stopping criterion based on the Centeral Limit Theorem.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">qmcpy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AccumData.html">Data Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distribution.html">Distribution Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function.html">Function Class</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Stop Class</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="function.html" title="previous chapter">Function Class</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Illinois Institute of Technology.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/stop.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
