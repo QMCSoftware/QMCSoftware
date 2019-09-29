@@ -1,6 +1,6 @@
-from . import fun
+from . import Fun
 
-class LinearFun(fun):
+class LinearFun(Fun):
     
     def __init__(self,nominalValue=None):
         super().__init__(nominalValue=nominalValue)

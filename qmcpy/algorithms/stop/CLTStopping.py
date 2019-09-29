@@ -4,11 +4,11 @@ from time import time
 from numpy import array, ceil, full, inf, maximum, minimum, tile, zeros
 from scipy.stats import norm
 
-from . import stoppingCriterion
+from . import StoppingCriterion
 from ..accum_data.MeanVarData import MeanVarData
 
 
-class CLTStopping(stoppingCriterion):
+class CLTStopping(StoppingCriterion):
     ''' Stopping criterion based on the Centeral Limit Theorem. '''
     def __init__(self,distribObj,inflate=1.2,alpha=0.01,absTol=None,relTol=None,nInit=None,nMax=None):
         discDistAllowed = ["IIDDistribution"] # which discrete distributions are supported

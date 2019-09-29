@@ -4,11 +4,11 @@ from time import time
 from numpy import array, full, zeros
 from scipy.stats import norm
 
-from . import stoppingCriterion
+from . import StoppingCriterion
 from ..accum_data.MeanVarDataRep import MeanVarDataRep
 
 
-class CLT_Rep(stoppingCriterion):
+class CLTRep(StoppingCriterion):
     ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''
     def __init__(self,distribObj,inflate=1.2,alpha=0.01,J=16,absTol=None,relTol=None,nInit=None,nMax=None):
         discDistAllowed = ["QuasiRandom"] # which discrete distributions are supported

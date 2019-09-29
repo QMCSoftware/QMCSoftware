@@ -1,9 +1,9 @@
 """
 >>> from numpy import arange
->>> from algorithms.distribution import measure
->>> measure_1D = measure().stdGaussian()
+>>> from algorithms.distribution import Measure
+>>> measure_1D = Measure().stdGaussian()
 >>> print(measure_1D)
-Constructing measure with properties:
+Constructing Measure with properties:
     domainShape:
     domainCoord: []
     measureData: {}
@@ -18,9 +18,9 @@ Constructing measure with properties:
             measureName: stdGaussian
 
 >>> timeVecs = [arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)]
->>> measure_3D = measure().BrownianMotion(timeVector=timeVecs)
+>>> measure_3D = Measure().BrownianMotion(timeVector=timeVecs)
 >>> print(measure_3D)
-Constructing measure with properties:
+Constructing Measure with properties:
     domainShape:
     domainCoord: []
     measureData: {}

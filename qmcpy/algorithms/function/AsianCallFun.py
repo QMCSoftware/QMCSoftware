@@ -1,9 +1,9 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from numpy import exp, maximum
 
-from . import fun
+from . import Fun
 
-class AsianCallFun(fun):
+class AsianCallFun(Fun):
     ''' Specify and generate payoff values of an Asian Call option'''
     def __init__(self,BMmeasure=None,volatility=.5,S0=30,K=25,nominalValue=None):
         super().__init__(nominalValue=nominalValue)

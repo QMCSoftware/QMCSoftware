@@ -1,8 +1,8 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import process_time
 
-from algorithms.distribution import discreteDistribution
-from algorithms.function import fun
+from algorithms.distribution import DiscreteDistribution
+from algorithms.function import Fun
 from numpy import arange, finfo, float32, std, zeros
 
 from . import AccumData
@@ -23,12 +23,12 @@ class MeanVarData(AccumData):
         self.nSigma = zeros(nf) # number of samples used to compute the sample standard deviation
         self.nMu = zeros(nf)  # number of samples used to compute the sample mean
 
-    def updateData(self, distrib_obj: discreteDistribution, fun_obj: fun) -> None:
+    def updateData(self, distrib_obj: DiscreteDistribution, fun_obj: Fun) -> None:
         """
         Update data
 
         Args:
-            distrib_obj: an instance of discreteDistribution
+            distrib_obj: an instance of DiscreteDistribution
             fun_obj: an instance of function
 
         Returns:

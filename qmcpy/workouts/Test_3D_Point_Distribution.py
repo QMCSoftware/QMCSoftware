@@ -5,7 +5,7 @@ from numpy import arange, linspace, meshgrid, random, zeros
 random.seed(7)
 
 from workouts import summary_qmc
-from algorithms.distribution import measure
+from algorithms.distribution import Measure
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
 from algorithms.function.KeisterFun import KeisterFun
@@ -18,28 +18,28 @@ var = 1/2
 coordIdx = arange(1,dim+1)
 
 fun = KeisterFun()
-measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]),rngSeed=7)
+measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
+distribObj = IIDDistribution(trueD=Measure().stdGaussian(dimension=[dim]),rngSeed=7)
 fun = fun.transformVariable(measureObj, distribObj)
 
 # Examples for generating 'pregen' figure's constants
 '''
 import sys
-from algorithms.stop.CLT_Rep import CLT_Rep
+from algorithms.stop.CLTRep import CLTRep
 from algorithms.stop.CLTStopping import CLTStopping
 from algorithms.integrate import integrate
-#     CLT_Rep Example
+#     CLTRep Example
 funObj = KeisterFun()
-stopObj = CLT_Rep(nInit=n,nMax=2**15,absTol=.01,J=j)
-measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[var])
-distribObj = QuasiRandom(trueD=measure().lattice(dimension=[dim]),rngSeed=7)
+stopObj = CLTRep(nInit=n,nMax=2**15,absTol=.01,J=j)
+measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[var])
+distribObj = QuasiRandom(trueD=Measure().lattice(dimension=[dim]),rngSeed=7)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 #     CLT Example
 funObj = KeisterFun()
 stopObj = CLTStopping(nInit=16,absTol=.3,alpha=.01,inflate=1.2)
-measureObj = measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=measure().stdGaussian(dimension=[dim]),rngSeed=7)
+measureObj = Measure().IIDZMeanGaussian(dimension=[dim],variance=[1/2])
+distribObj = IIDDistribution(trueD=Measure().stdGaussian(dimension=[dim]),rngSeed=7)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 sys.exit(0)

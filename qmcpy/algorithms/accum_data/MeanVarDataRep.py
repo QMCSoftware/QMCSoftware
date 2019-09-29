@@ -2,8 +2,8 @@
 by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import process_time
 
-from algorithms.distribution import discreteDistribution
-from algorithms.function import fun
+from algorithms.distribution import DiscreteDistribution
+from algorithms.function import Fun
 from numpy import arange, finfo, float32, ones, zeros
 
 from . import AccumData
@@ -26,12 +26,12 @@ class MeanVarDataRep(AccumData):
         self.sig2hat = zeros(nf)
         self.flags = ones(nf)
 
-    def updateData(self, distrib_obj: discreteDistribution, fun_obj: fun) -> None:
+    def updateData(self, distrib_obj: DiscreteDistribution, fun_obj: Fun) -> None:
         """
         Update data
 
         Args:
-            distrib_obj: an instance of discreteDistribution
+            distrib_obj: an instance of DiscreteDistribution
             fun_obj: an instance of function
 
         Returns:

@@ -41,7 +41,7 @@ IIDZMeanGaussian (Measure Type)
                 dimension: [3]            
 QuasiRandom (Distribution Object)
         trueD.measureName: lattice        
-CLT_Rep (StoppingCriterion Object)
+CLTRep (StoppingCriterion Object)
                    absTol: 0.002          
                    relTol: 0.000          
                      nMax: 1000000
@@ -59,7 +59,7 @@ IIDZMeanGaussian (Measure Type)
                 dimension: [3]            
 QuasiRandom (Distribution Object)
         trueD.measureName: Sobol          
-CLT_Rep (StoppingCriterion Object)
+CLTRep (StoppingCriterion Object)
                    absTol: 0.010          
                    relTol: 0.000          
                      nMax: 1000000

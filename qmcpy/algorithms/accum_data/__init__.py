@@ -3,8 +3,8 @@ by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from abc import ABC, abstractmethod
 from math import inf, nan
 
-from algorithms.distribution import discreteDistribution
-from algorithms.function import fun
+from algorithms.distribution import DiscreteDistribution
+from algorithms.function import Fun
 from numpy import array
 
 from .. import univ_repr
@@ -32,13 +32,13 @@ class AccumData(ABC):
 
     # Abstract Methods
     @abstractmethod
-    def updateData(self, distrib_obj: discreteDistribution, fun_obj: fun,
+    def updateData(self, distrib_obj: DiscreteDistribution, fun_obj: Fun,
                    decomp_type):
         """
         Update the accumulated data
 
         Args:
-            distrib_obj: an instance of discreteDistribution
+            distrib_obj: an instance of DiscreteDistribution
             fun_obj: an instance of function
             decomp_type:
 
