@@ -6,10 +6,10 @@ from .. import univ_repr
 
 class MeasureCompatibilityError(Exception): pass
 
-class discreteDistribution(ABC):
+class DiscreteDistribution(ABC):
     '''
     Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
-        Any sublcass of discreteDistribution must include:
+        Any sublcass of DiscreteDistribution must include:
             Methods: genDistrib(self,nStart,nEnd,n,coordIndex)
             Properties: distribData,trueD
     '''
@@ -50,9 +50,9 @@ class discreteDistribution(ABC):
     def __repr__(self): return univ_repr(self,'distrib_list')
 
 
-class measure():
+class Measure():
     '''
-    Specifies the components of a general measure used to define an
+    Specifies the components of a general Measure used to define an
     integration problem or a sampling method
     '''
     
@@ -60,7 +60,7 @@ class measure():
         # Argument Parsing
         #    Shape of the domain
         if domainShape in ['','box','cube','unitCube']: self.domainShape = domainShape
-        else: raise Exception("measure.domainShape must be one of: ['','box','cube','unitCube']")
+        else: raise Exception("Measure.domainShape must be one of: ['','box','cube','unitCube']")
         #   TypeCast to numpy ndarray's
         self.domainCoord = array(domainCoord) if domainCoord else array([])
         self.measureData = measureData if measureData else {}
@@ -68,64 +68,64 @@ class measure():
 
     ''' Methods to construct list of measures ''' 
     def stdUniform(self,dimension=array([2])):
-        ''' create standard uniform measure '''
+        ''' create standard uniform Measure '''
         self.measureName = 'stdUniform'
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
-        else: raise Exception("measure.dimension must be a list of positive integers")
+        else: raise Exception("Measure.dimension must be a list of positive integers")
         #    Construct list of measures
         self.measure_list = list(range(len(dimension)))
         for i in range(len(self.measure_list)):
-            self.measure_list[i] = measure()
+            self.measure_list[i] = Measure()
             self.measure_list[i].dimension = self.dimension[i]
             self.measure_list[i].measureName = 'stdUniform'
         return self
 
     def stdGaussian(self,dimension=array([2])):
-        ''' create standard Gaussian measure '''
+        ''' create standard Gaussian Measure '''
         self.measureName = 'stdGaussian'
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
-        else: raise Exception("measure.dimension be a list of positive integers")
+        else: raise Exception("Measure.dimension be a list of positive integers")
         #    Construct list of measures
         self.measure_list = list(range(len(dimension)))
         for i in range(len(self.measure_list)):
-            self.measure_list[i] = measure()
+            self.measure_list[i] = Measure()
             self.measure_list[i].dimension = self.dimension[i]
             self.measure_list[i].measureName = 'stdGaussian'
         return self
 
     def IIDZMeanGaussian(self,dimension=array([2]),variance=array([1])):
-        ''' create standard Gaussian measure '''
+        ''' create standard Gaussian Measure '''
         self.measureName = 'IIDZMeanGaussian'
          #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
-        else: raise Exception("measure.dimension be a list of positive integers")
+        else: raise Exception("Measure.dimension be a list of positive integers")
         #    Variance of Gaussian Measures
         if type(variance)==int: variance = array([variance])
         elif all(item>0 for item in variance): variance = array(variance)
-        else: raise Exception("measure.variance be a list of positive integers")
+        else: raise Exception("Measure.variance be a list of positive integers")
         #    Construct list of measures
         self.measure_list = list(range(len(dimension)))
         for i in range(len(self.measure_list)):
-            self.measure_list[i] = measure()
+            self.measure_list[i] = Measure()
             self.measure_list[i].dimension = self.dimension[i]
             self.measure_list[i].measureData['variance'] = variance[i]
             self.measure_list[i].measureName = 'IIDZMeanGaussian'
         return self
 
     def BrownianMotion(self,timeVector=arange(1/4,5/4,1/4)):
-        ''' create a discretized Brownian Motion measure '''
+        ''' create a discretized Brownian Motion Measure '''
         self.measureName = 'BrownianMotion'
         #    Dimension of domain, Â§$\mcommentfont d$Â§
         self.dimension = array([len(tV) for tV in timeVector])
         #    Construct list of measures
         self.measure_list = list(range(len(timeVector)))
         for i in range(len(self.measure_list)): 
-            self.measure_list[i] = measure()
+            self.measure_list[i] = Measure()
             self.measure_list[i].measureData['timeVector'] = array(timeVector[i])
             self.measure_list[i].dimension = self.dimension[i]
             self.measure_list[i].measureName = 'BrownianMotion'
@@ -137,11 +137,11 @@ class measure():
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
-        else: raise Exception("measure.dimension be a list of positive integers")
+        else: raise Exception("Measure.dimension be a list of positive integers")
         #    Construct list of measures
         self.measure_list = list(range(len(dimension)))
         for i in range(len(self.measure_list)):
-            self.measure_list[i] = measure()
+            self.measure_list[i] = Measure()
             self.measure_list[i].measureData['lds_type'] = 'lattice'
             self.measure_list[i].dimension = self.dimension[i]
             self.measure_list[i].measureName = 'stdUniform'
@@ -153,11 +153,11 @@ class measure():
         #    Dimension of the domain, Â§$\mcommentfont d$Â§
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
-        else: raise Exception("measure.dimension be a list of positive integers")
+        else: raise Exception("Measure.dimension be a list of positive integers")
         #    Construct list of measures
         self.measure_list = list(range(len(dimension)))
         for i in range(len(self.measure_list)):
-            self.measure_list[i] = measure()
+            self.measure_list[i] = Measure()
             self.measure_list[i].measureData['lds_type'] = 'Sobol'
             self.measure_list[i].dimension = self.dimension[i]
             self.measure_list[i].measureName = 'stdUniform'

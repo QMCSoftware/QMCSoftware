@@ -1,9 +1,9 @@
 ''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from numpy import random
 
-from . import discreteDistribution
+from . import DiscreteDistribution
 
-class IIDDistribution(discreteDistribution):
+class IIDDistribution(DiscreteDistribution):
     '''
     Specifies and generates the components of $\frac 1n \sum_{i=1}^n \delta_{\vx_i}(\cdot)$
     where the $\vx_i$ are IIDDistribution uniform on $[0,1]^d$ or IIDDistribution standard Gaussian

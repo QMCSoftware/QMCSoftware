@@ -5,10 +5,10 @@ from .. import univ_repr
 
 class DistributionCompatibilityError(Exception): pass
 
-class stoppingCriterion(ABC):
+class StoppingCriterion(ABC):
     '''
     Decide when to stop
-        Any sublcass of stoppingCriterion must include:
+        Any sublcass of StoppingCriterion must include:
             Methods: stopYet(self,distribObj) 
             Properties: discDistAllowed  
     '''

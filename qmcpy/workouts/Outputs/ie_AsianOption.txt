@@ -41,7 +41,7 @@ BrownianMotion (Measure Type)
                 dimension: [64]           
 QuasiRandom (Distribution Object)
         trueD.measureName: lattice        
-CLT_Rep (StoppingCriterion Object)
+CLTRep (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          
                      nMax: 100000000
@@ -59,7 +59,7 @@ BrownianMotion (Measure Type)
                 dimension: [64]           
 QuasiRandom (Distribution Object)
         trueD.measureName: Sobol          
-CLT_Rep (StoppingCriterion Object)
+CLTRep (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          
                      nMax: 100000000
@@ -113,7 +113,7 @@ BrownianMotion (Measure Type)
                 dimension: [ 4 16 64]     
 QuasiRandom (Distribution Object)
         trueD.measureName: lattice        
-CLT_Rep (StoppingCriterion Object)
+CLTRep (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          
                      nMax: 1048576
@@ -131,7 +131,7 @@ BrownianMotion (Measure Type)
                 dimension: [ 4 16 64]     
 QuasiRandom (Distribution Object)
         trueD.measureName: Sobol          
-CLT_Rep (StoppingCriterion Object)
+CLTRep (StoppingCriterion Object)
                    absTol: 0.050          
                    relTol: 0.000          
                      nMax: 1048576

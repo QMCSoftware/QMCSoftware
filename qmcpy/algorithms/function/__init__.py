@@ -7,10 +7,10 @@ from scipy.stats import norm
 from .. import univ_repr
 
 
-class fun(ABC):
+class Fun(ABC):
     '''
     Specify and generate values $f(\vx)$ for $\vx \in \cx$
-        Any sublcass of fun must include:
+        Any sublcass of Fun must include:
             Methods: g(self,x,coordIndex)
     '''
     
@@ -35,9 +35,9 @@ class fun(ABC):
         '''
         This method performs the necessary variable transformationto put the 
         original function in the form required by the discreteDistributon
-        object starting from the original measure object
+        object starting from the original Measure object
 
-        msrObj = the measure object that defines the integral
+        msrObj = the Measure object that defines the integral
         dstrObj = the discrete distribution object that is sampled from
         '''
         for ii in range(len(self)):
