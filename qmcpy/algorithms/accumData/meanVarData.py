@@ -24,11 +24,15 @@ class meanVarData(accumData):
         self.nMu = zeros(nf)  # number of samples used to compute the sample mean
 
     def updateData(self, distribObj: discreteDistribution, funObj: fun) -> None:
-        """ Update data
+        """
+        Update data
 
-        :param distribObj: an instance of discreteDistribution
-        :param funObj: a function instance
-        :return: None
+        Args:
+            distribObj: an instance of discreteDistribution
+            funObj: an instance of function
+
+        Returns:
+            None
         """
         for ii in range(len(funObj)):
             tStart = process_time()  # time the function values
