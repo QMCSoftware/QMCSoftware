@@ -25,9 +25,9 @@ class Fun(ABC):
     @abstractmethod
     def g(self, x, coordIndex): # original function to be integrated
         '''
-        xu = nodes, Â§\mcommentfont $\vx_{\fu,i} = i^{\text{th}}$ row of an $n \times |\fu|$ matrixÂ§
-        coordIndex = set of those coordinates in sequence needed, Â§\mcommentfont $\fu$Â§
-        y = Â§\mcommentfont$n \times p$ matrix with values $f(\vx_{\fu,i},\vc)$ where if $\vx_i' = (x_{i,\fu},\vc)_j$, then $x'_{ij} = x_{ij}$ for $j \in \fu$, and $x'_{ij} = c$ otherwiseÂ§
+        xu = nodes, $\vx_{\fu,i} = i^{\text{th}}$ row of an $n \times |\fu|$ matrix
+        coordIndex = set of those coordinates in sequence needed,  $\fu$
+        y = $n \times p$ matrix with values $f(\vx_{\fu,i},\vc)$ where if $\vx_i' = (x_{i,\fu},\vc)_j$, then $x'_{ij} = x_{ij}$ for $j \in \fu$, and $x'_{ij} = c$ otherwise
         '''
         pass
     

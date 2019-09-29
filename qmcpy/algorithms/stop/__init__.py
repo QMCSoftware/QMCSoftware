@@ -17,8 +17,8 @@ class StoppingCriterion(ABC):
         if type(distribObj).__name__ not in discDistAllowed:
                 raise DistributionCompatibilityError(type(self).__name__+' only accepts distributions:'+str(discDistAllowed))
         super().__init__()
-        self.absTol = absTol if absTol else 1e-2 # absolute tolerance, Â§$\mcommentfont d$Â§
-        self.relTol = relTol if relTol else 0 # relative tolerance, Â§$\mcommentfont d$Â§
+        self.absTol = absTol if absTol else 1e-2 # absolute tolerance, $ d$
+        self.relTol = relTol if relTol else 0 # relative tolerance, $ d$
         self.nInit = nInit if nInit else 1024 # initial sample size
         self.nMax = nMax if nMax else 1e8 # maximum number of samples allowed
         

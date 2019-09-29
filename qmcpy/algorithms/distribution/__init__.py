@@ -8,7 +8,7 @@ class MeasureCompatibilityError(Exception): pass
 
 class DiscreteDistribution(ABC):
     '''
-    Specifies and generates the components of §$\mcommentfont a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
+    Specifies and generates the components of $ a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
         Any sublcass of DiscreteDistribution must include:
             Methods: gen_distrib(self,nStart,nEnd,n,coordIndex)
             Properties: distrib_data,trueD
@@ -34,9 +34,9 @@ class DiscreteDistribution(ABC):
     @abstractmethod
     def gen_distrib(self, n, m, j):
         """
-         nStart = starting value of §$\mcommentfont i$§
-         nEnd = ending value of §$\mcommentfont i$§
-         n = value of §$\mcommentfont n$§ used to determine §$\mcommentfont a_n$§
+         nStart = starting value of $ i$
+         nEnd = ending value of $ i$
+         n = value of $ n$ used to determine $ a_n$
          coordIndex = which coordinates in sequence are needed
         """
         pass
@@ -71,7 +71,7 @@ class Measure():
     def std_uniform(self, dimension=array([2])):
         ''' create standard uniform Measure '''
         self.measureName = 'std_uniform'
-        #    Dimension of the domain, Â§$\mcommentfont d$Â§
+        #    Dimension of the domain, $ d$
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
         else: raise Exception("Measure.dimension must be a list of positive integers")
@@ -86,7 +86,7 @@ class Measure():
     def std_gaussian(self, dimension=array([2])):
         ''' create standard Gaussian Measure '''
         self.measureName = 'std_gaussian'
-        #    Dimension of the domain, Â§$\mcommentfont d$Â§
+        #    Dimension of the domain, $ d$
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
         else: raise Exception("Measure.dimension be a list of positive integers")
@@ -101,7 +101,7 @@ class Measure():
     def iid_zmean_gaussian(self, dimension=array([2]), variance=array([1])):
         ''' create standard Gaussian Measure '''
         self.measureName = 'iid_zmean_gaussian'
-         #    Dimension of the domain, Â§$\mcommentfont d$Â§
+         #    Dimension of the domain, $ d$
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
         else: raise Exception("Measure.dimension be a list of positive integers")
@@ -121,7 +121,7 @@ class Measure():
     def brownian_motion(self, timeVector=arange(1 / 4, 5 / 4, 1 / 4)):
         ''' create a discretized Brownian Motion Measure '''
         self.measureName = 'brownian_motion'
-        #    Dimension of domain, Â§$\mcommentfont d$Â§
+        #    Dimension of domain, $ d$
         self.dimension = array([len(tV) for tV in timeVector])
         #    Construct list of measures
         self.measure_list = list(range(len(timeVector)))
@@ -135,7 +135,7 @@ class Measure():
     def lattice(self, dimension=array([2])):
         ''' low descrepancy lattice '''
         self.measureName = 'lattice'
-        #    Dimension of the domain, Â§$\mcommentfont d$Â§
+        #    Dimension of the domain, $ d$
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
         else: raise Exception("Measure.dimension be a list of positive integers")
@@ -151,7 +151,7 @@ class Measure():
     def sobol(self, dimension=array([2])):
         ''' low descrepancy sobol '''
         self.measureName = 'sobol'
-        #    Dimension of the domain, Â§$\mcommentfont d$Â§
+        #    Dimension of the domain, $ d$
         if type(dimension)==int: self.dimension = array([dimension])
         elif all(item>0 for item in dimension): self.dimension = array(dimension)
         else: raise Exception("Measure.dimension be a list of positive integers")
