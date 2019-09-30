@@ -5,8 +5,8 @@ from . import Fun
 
 class AsianCallFun(Fun):
     ''' Specify and generate payoff values of an Asian Call option'''
-    def __init__(self,BMmeasure=None,volatility=.5,S0=30,K=25,nominalValue=None):
-        super().__init__(nominalValue=nominalValue)
+    def __init__(self, BMmeasure=None, volatility=.5, S0=30, K=25, nominal_value=None):
+        super().__init__(nominal_value=nominal_value)
         self.BMmeasure = BMmeasure
         self.volatility = volatility
         self.S0 = S0

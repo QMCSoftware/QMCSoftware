@@ -8,45 +8,51 @@ from .. import univ_repr
 
 
 class Fun(ABC):
-    '''
-    Specify and generate values :math:`f(\mathbf{x})` for :math:`\mathbf{x} \in \mathcal{X}`
-        Any sublcass of Fun must include:
-            Methods: g(self,x,coordIndex)
-    '''
-    
-    def __init__(self,nominalValue=None):
+    def __init__(self, nominal_value=None):
+        """
+        Specify and generate values :math:`f(\mathbf{x})` for :math:`\mathbf{x}
+        \in \mathcal{X}`. Any sublcass of Fun must include the method,
+        g(self, x, coordIndex)
+
+        Args:
+            nominal_value: math:`c` such that :math:`(c, \ldots, c) \in \mathcal{X}`
+
+        """
         super().__init__()
-        self.nominalValue = nominalValue if nominalValue else 0  # a nominal number, :math:`c`, such that :math:`(c, \ldots, c) \in \mathcal{X}`
-        self.f = None # function handle of integrand after transformation
+        self.nominalValue = nominal_value if nominal_value else 0
+        self.f = None  # function handle of integrand after transformation
         self.dimension = 2  # dimension of the domain, :math:`d`
         self.fun_list = [self]
-    
+
     # Abstract Methods
     @abstractmethod
-    def g(self, x, coordIndex):  # original function to be integrated
-        '''
-        xu = nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` row
-        of an :math:`n \times |\mathfrak{u}|` matrix
+    def g(self, x, coordIndex):
+        """
+        Original function to be integrated
 
-        coordIndex = set of those coordinates in sequence needed,
-        :math:`\mathfrak{u}`
+        Args:
+            x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` row of an :math:`n \cdot |\mathfrak{u}|` matrix
+            coordIndex: set of those coordinates in sequence needed, :math:`\mathfrak{u}`
 
-        y = :math:`n \times p` matrix with values :math:`f(\mathbf{x}_{
-        \mathfrak{u},i},\mathbf{c})` where if :math:`\mathbf{x}_i' = (x_{i,
-        \mathfrak{u}},\mathbf{c})_j`, then :math:`x'_{ij} = x_{ij}` for :math:`j \in
-        \mathfrak{u}`, and :math:`x'_{ij} = c` otherwise
-        '''
+        Returns:
+            :math:`n \cdot p` matrix with values  :math:`f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})` where if :math:`\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j`, then :math:`x'_{ij} = x_{ij}` for :math:`j \in \mathfrak{u}`, and :math:`x'_{ij} = c` otherwise
+
+        """
         pass
-    
+
     def transform_variable(self, msr_obj, dstr_obj):
-        '''
-        This method performs the necessary variable transformationto put the 
-        original function in the form required by the discreteDistributon
+        """
+        This method performs the necessary variable transformation to put the
+        original function in the form required by the DiscreteDistributon
         object starting from the original Measure object
 
-        msr_obj = the Measure object that defines the integral
-        dstr_obj = the discrete distribution object that is sampled from
-        '''
+        Args:
+            msr_obj: the Measure object that defines the integral
+            dstr_obj: the discrete distribution object that is sampled from
+
+        Returns: transformed function
+
+        """
         for i in range(len(self)):
             try: sample_from = dstr_obj[i].trueD.mimics # QuasiRandom sampling
             except: sample_from = type(dstr_obj[i].trueD).__name__ # IIDDistribution sampling

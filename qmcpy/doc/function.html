@@ -38,35 +38,39 @@
 <p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="class">
 <dt id="algorithms.function.__init__.Fun">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.__init__.</code><code class="sig-name descname">Fun</code><span class="sig-paren">(</span><em class="sig-param">nominalValue=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.__init__.Fun" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Specify and generate values <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/></dt><dd><dl class="simple">
-<dt>Any sublcass of Fun must include:</dt><dd><p>Methods: g(self,x,coordIndex)</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.__init__.</code><code class="sig-name descname">Fun</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.__init__.Fun" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
 <dt id="algorithms.function.__init__.Fun.g">
 <em class="property">abstract </em><code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coordIndex</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.__init__.Fun.g" title="Permalink to this definition">¶</a></dt>
-<dd><p>xu = nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row
-of an <img class="math" src="_images/math/812352dde9d8b3a989a92dc4f250050da423c6b6.png" alt="n  imes |\mathfrak{u}|"/> matrix</p>
-<p>coordIndex = set of those coordinates in sequence needed,
-<img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p>
-<p>y = <img class="math" src="_images/math/c6bc983093999f59167530d143f185edde562cd0.png" alt="n    imes p"/> matrix with values <img class="math" src="_images/math/d21bad381cbfc719f187ea5164ed1fb244d36f34.png" alt="f(\mathbf{x}_{
-\mathfrak{u},i},\mathbf{c})"/> where if <img class="math" src="_images/math/c2bb7ad3401948bfe055edb29c8e6634ee6ba59c.png" alt="\mathbf{x}_i' = (x_{i,
-\mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/45b0340544e458131f6db341dc58eeccb113a010.png" alt="j \in
-\mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd><p>Original function to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coordIndex</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values  <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/> where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="algorithms.function.__init__.Fun.transform_variable">
 <code class="sig-name descname">transform_variable</code><span class="sig-paren">(</span><em class="sig-param">msr_obj</em>, <em class="sig-param">dstr_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.__init__.Fun.transform_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method performs the necessary variable transformationto put the
-original function in the form required by the discreteDistributon
+<dd><p>This method performs the necessary variable transformation to put the
+original function in the form required by the DiscreteDistributon
 object starting from the original Measure object</p>
-<p>msr_obj = the Measure object that defines the integral
-dstr_obj = the discrete distribution object that is sampled from</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msr_obj</strong> – the Measure object that defines the integral</p></li>
+<li><p><strong>dstr_obj</strong> – the discrete distribution object that is sampled from</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: transformed function</p>
 </dd></dl>
 
 </dd></dl>
@@ -74,19 +78,23 @@ dstr_obj = the discrete distribution object that is sampled from</p>
 <span class="target" id="module-algorithms.function.AsianCallFun"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="class">
 <dt id="algorithms.function.AsianCallFun.AsianCallFun">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.AsianCallFun.</code><code class="sig-name descname">AsianCallFun</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">S0=30</em>, <em class="sig-param">K=25</em>, <em class="sig-param">nominalValue=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.AsianCallFun.AsianCallFun" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.AsianCallFun.</code><code class="sig-name descname">AsianCallFun</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">S0=30</em>, <em class="sig-param">K=25</em>, <em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.AsianCallFun.AsianCallFun" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate payoff values of an Asian Call option</p>
 <dl class="method">
 <dt id="algorithms.function.AsianCallFun.AsianCallFun.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">ignore</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.AsianCallFun.AsianCallFun.g" title="Permalink to this definition">¶</a></dt>
-<dd><p>xu = nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row
-of an <img class="math" src="_images/math/812352dde9d8b3a989a92dc4f250050da423c6b6.png" alt="n  imes |\mathfrak{u}|"/> matrix</p>
-<p>coordIndex = set of those coordinates in sequence needed,
-<img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p>
-<p>y = <img class="math" src="_images/math/c6bc983093999f59167530d143f185edde562cd0.png" alt="n    imes p"/> matrix with values <img class="math" src="_images/math/d21bad381cbfc719f187ea5164ed1fb244d36f34.png" alt="f(\mathbf{x}_{
-\mathfrak{u},i},\mathbf{c})"/> where if <img class="math" src="_images/math/c2bb7ad3401948bfe055edb29c8e6634ee6ba59c.png" alt="\mathbf{x}_i' = (x_{i,
-\mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/45b0340544e458131f6db341dc58eeccb113a010.png" alt="j \in
-\mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd><p>Original function to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coordIndex</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values  <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/> where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -95,7 +103,7 @@ of an <img class="math" src="_images/math/812352dde9d8b3a989a92dc4f250050da423c6
 Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="class">
 <dt id="algorithms.function.KeisterFun.KeisterFun">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.KeisterFun.</code><code class="sig-name descname">KeisterFun</code><span class="sig-paren">(</span><em class="sig-param">nominalValue=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.KeisterFun.KeisterFun" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.KeisterFun.</code><code class="sig-name descname">KeisterFun</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.KeisterFun.KeisterFun" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <img class="math" src="_images/math/d03f853393db6b7cf2c25523b4a9f78790436922.png" alt="f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)"/> for <img class="math" src="_images/math/27881af6ffb368e623dfe6dc8343f138920bdfa5.png" alt="\mathbf{x} \in \mathbb{R}^d"/></p>
 <p>The standard example integrates the Keister function with respect to an IID Gaussian distribution with variance 1/2</p>
 <ol class="upperalpha simple" start="2">
@@ -107,32 +115,40 @@ Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="method">
 <dt id="algorithms.function.KeisterFun.KeisterFun.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coordIndex</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.KeisterFun.KeisterFun.g" title="Permalink to this definition">¶</a></dt>
-<dd><p>xu = nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row
-of an <img class="math" src="_images/math/812352dde9d8b3a989a92dc4f250050da423c6b6.png" alt="n  imes |\mathfrak{u}|"/> matrix</p>
-<p>coordIndex = set of those coordinates in sequence needed,
-<img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p>
-<p>y = <img class="math" src="_images/math/c6bc983093999f59167530d143f185edde562cd0.png" alt="n    imes p"/> matrix with values <img class="math" src="_images/math/d21bad381cbfc719f187ea5164ed1fb244d36f34.png" alt="f(\mathbf{x}_{
-\mathfrak{u},i},\mathbf{c})"/> where if <img class="math" src="_images/math/c2bb7ad3401948bfe055edb29c8e6634ee6ba59c.png" alt="\mathbf{x}_i' = (x_{i,
-\mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/45b0340544e458131f6db341dc58eeccb113a010.png" alt="j \in
-\mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd><p>Original function to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coordIndex</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values  <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/> where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <span class="target" id="module-algorithms.function.LinearFun"></span><dl class="class">
 <dt id="algorithms.function.LinearFun.LinearFun">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.LinearFun.</code><code class="sig-name descname">LinearFun</code><span class="sig-paren">(</span><em class="sig-param">nominalValue=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.LinearFun.LinearFun" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.function.LinearFun.</code><code class="sig-name descname">LinearFun</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.LinearFun.LinearFun" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="algorithms.function.LinearFun.LinearFun.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coordIndex</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.function.LinearFun.LinearFun.g" title="Permalink to this definition">¶</a></dt>
-<dd><p>xu = nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row
-of an <img class="math" src="_images/math/812352dde9d8b3a989a92dc4f250050da423c6b6.png" alt="n  imes |\mathfrak{u}|"/> matrix</p>
-<p>coordIndex = set of those coordinates in sequence needed,
-<img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p>
-<p>y = <img class="math" src="_images/math/c6bc983093999f59167530d143f185edde562cd0.png" alt="n    imes p"/> matrix with values <img class="math" src="_images/math/d21bad381cbfc719f187ea5164ed1fb244d36f34.png" alt="f(\mathbf{x}_{
-\mathfrak{u},i},\mathbf{c})"/> where if <img class="math" src="_images/math/c2bb7ad3401948bfe055edb29c8e6634ee6ba59c.png" alt="\mathbf{x}_i' = (x_{i,
-\mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/45b0340544e458131f6db341dc58eeccb113a010.png" alt="j \in
-\mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd><p>Original function to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coordIndex</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values  <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/> where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

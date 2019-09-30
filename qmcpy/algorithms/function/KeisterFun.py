@@ -14,10 +14,10 @@ class KeisterFun(Fun):
     B. D. Keister, Multidimensional Quadrature Algorithms,  \emph{Computers in Physics}, \textbf{10}, pp.\ 119-122, 1996.
     '''
     
-    def __init__(self,nominalValue=None):
-        super().__init__(nominalValue=nominalValue)
-        
-    def g(self,x,coordIndex):
+    def __init__(self, nominal_value=None):
+        super().__init__(nominal_value=nominal_value)
+
+    def g(self, x, coordIndex):
         # if the nominalValue = 0, this is efficient
         normx2 = (x**2).sum(1)
         nCoordIndex = len(coordIndex)
