@@ -2,7 +2,7 @@
 from time import process_time
 
 from algorithms.distribution import DiscreteDistribution
-from algorithms.function import Fun
+from algorithms.function.integrand_base import IntegrandBase
 from numpy import arange, finfo, float32, std, zeros
 
 from . import AccumData
@@ -14,7 +14,7 @@ class MeanVarData(AccumData):
     Accumulated data for IIDDistribution calculations,
     stores the sample mean and variance of function values
     '''
-    
+
     def __init__(self, nf: int) -> None:
         ''' nf = # function '''
         super().__init__()
@@ -23,7 +23,7 @@ class MeanVarData(AccumData):
         self.nSigma = zeros(nf) # number of samples used to compute the sample standard deviation
         self.nMu = zeros(nf)  # number of samples used to compute the sample mean
 
-    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Fun) -> None:
+    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: IntegrandBase) -> None:
         """
         Update data
 

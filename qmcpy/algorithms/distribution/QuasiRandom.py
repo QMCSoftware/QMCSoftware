@@ -5,7 +5,7 @@ from numpy.core._multiarray_umath import zeros
 from third_party.magic_point_shop.latticeseq_b2 import latticeseq_b2
 
 from . import DiscreteDistribution
-from .DigitalSeq import DigitalSeq
+from .digitalSeq import DigitalSeq
 
 class QuasiRandom(DiscreteDistribution):
 
@@ -15,7 +15,7 @@ class QuasiRandom(DiscreteDistribution):
         super().__init__(accepted_measures, trueD, distrib_data)
 
     def gen_distrib(self, n, m, j=1):
-        # get j randomly shifted nxm arrays 
+        # get j randomly shifted nxm arrays
         if self.trueD.measureData['lds_type']=='lattice': return self.get_RS_lattice_b2(n,m,j)
         elif self.trueD.measureData['lds_type']=='sobol': return self.get_RS_sobol_b2g(n,m,j)
 

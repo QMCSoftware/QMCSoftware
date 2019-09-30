@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from math import inf, nan
 
 from algorithms.distribution import DiscreteDistribution
-from algorithms.function import Fun
+from algorithms.function.integrand_base import IntegrandBase
 from numpy import array
 
 from .. import univ_repr
@@ -32,7 +32,7 @@ class AccumData(ABC):
 
     # Abstract Methods
     @abstractmethod
-    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Fun,
+    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: IntegrandBase,
                     decomp_type):
         """
         Update the accumulated data

@@ -18,15 +18,15 @@ class DiscreteDistribution(ABC):
         super().__init__()
         # Abstract Properties
         self.distrib_data = distrib_data
-        self.trueD = trueD   
+        self.trueD = trueD
         self.distrib_list = [self]
-        
+
         # Create self.distrib_list (self) and distribute attributes
         if trueD:
             if trueD.measureName not in accepted_measures:
                 raise MeasureCompatibilityError(type(self).__name__+' only accepts measures:'+str(accepted_measures))
             self.distrib_list = [type(self)() for i in range(len(trueD))]
-            for i in range(len(self)):    
+            for i in range(len(self)):
                 self[i].trueD = self.trueD[i]
                 self[i].distrib_data = self.distrib_data[i] if self.distrib_data else None
 
@@ -40,7 +40,7 @@ class DiscreteDistribution(ABC):
          coordIndex = which coordinates in sequence are needed
         """
         pass
-    
+
     # Magic Methods. Makes self[i]==self.distrib_list[i]
     def __len__(self): return len(self.distrib_list)
     def __iter__(self):
@@ -51,13 +51,13 @@ class DiscreteDistribution(ABC):
     def __repr__(self): return univ_repr(self,'distrib_list')
 
 
-class Measure():
+class Measure(object):
     '''
     Specifies the components of a general Measure used to define an
     integration problem or a sampling method
     '''
-    
-    def __init__(self,domainShape='',domainCoord=None,measureData=None):  
+
+    def __init__(self,domainShape='',domainCoord=None,measureData=None):
         # Argument Parsing
         #    Shape of the domain
         if domainShape in ['','box','cube','unitCube']: self.domainShape = domainShape
@@ -67,7 +67,7 @@ class Measure():
         self.measureData = measureData if measureData else {}
         self.measure_list = []
 
-    ''' Methods to construct list of measures ''' 
+    ''' Methods to construct list of measures '''
     def std_uniform(self, dimension=array([2])):
         ''' create standard uniform Measure '''
         self.measureName = 'std_uniform'
@@ -125,7 +125,7 @@ class Measure():
         self.dimension = array([len(tV) for tV in timeVector])
         #    Construct list of measures
         self.measure_list = list(range(len(timeVector)))
-        for i in range(len(self.measure_list)): 
+        for i in range(len(self.measure_list)):
             self.measure_list[i] = Measure()
             self.measure_list[i].measureData['timeVector'] = array(timeVector[i])
             self.measure_list[i].dimension = self.dimension[i]

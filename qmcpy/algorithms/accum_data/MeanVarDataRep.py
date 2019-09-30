@@ -3,7 +3,7 @@ by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import process_time
 
 from algorithms.distribution import DiscreteDistribution
-from algorithms.function import Fun
+from algorithms.function.integrand_base import IntegrandBase
 from numpy import arange, finfo, float32, ones, zeros
 
 from . import AccumData
@@ -26,7 +26,7 @@ class MeanVarDataRep(AccumData):
         self.sig2hat = zeros(nf)
         self.flags = ones(nf)
 
-    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Fun) -> None:
+    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: IntegrandBase) -> None:
         """
         Update data
 

@@ -3,11 +3,11 @@ Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import time
 
 from algorithms.distribution import DiscreteDistribution, Measure
-from algorithms.function import Fun
+from algorithms.function.integrand_base import IntegrandBase
 from algorithms.stop import StoppingCriterion
 
 
-def integrate(fun_obj: Fun, measure_obj: Measure,
+def integrate(fun_obj: IntegrandBase, measure_obj: Measure,
               distrib_obj: DiscreteDistribution,
               stop_obj: StoppingCriterion) -> tuple:
     """
