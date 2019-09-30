@@ -24,7 +24,7 @@ class AsianCallFun(Fun):
                 self[ii].dimension = self.BMmeasure[ii].dimension  
 
     def g(self,x,ignore):
-        SFine = self.S0*exp((-self.volatility**2/2)*self.BMmeasure.measureData['timeVector']+self.volatility*x)
+        SFine = self.S0*exp((-self.volatility**2/2)*self.BMmeasure.timeVector+self.volatility*x)
         AvgFine = ((self.S0/2)+SFine[:,:self.dimension-1].sum(1)+SFine[:,self.dimension-1]/2)/self.dimension
         y = maximum(AvgFine-self.K,0)
         if self.dimFac > 0:

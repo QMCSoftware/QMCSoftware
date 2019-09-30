@@ -1,14 +1,14 @@
 import unittest
 
 from algorithms.stop import DistributionCompatibilityError
-from algorithms.stop.CLT_Rep import CLT_Rep
+from algorithms.stop.CLTRep import CLTRep
 from algorithms.distribution.IIDDistribution import IIDDistribution
-from algorithms.distribution import measure
+from algorithms.distribution.Measures import StdUniform
 
-class Test_CLT_Rep(unittest.TestCase):
+class Test_CLTRep(unittest.TestCase):
 
     def test_Incompatible_Distrib(self):
-        self.assertRaises(DistributionCompatibilityError,CLT_Rep,IIDDistribution(measure().stdUniform()))
+        self.assertRaises(DistributionCompatibilityError,CLTRep,IIDDistribution(StdUniform([2])))
 
 if __name__ == "__main__":
     unittest.main()

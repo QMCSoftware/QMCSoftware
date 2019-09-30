@@ -10,10 +10,10 @@ class IIDDistribution(DiscreteDistribution):
     '''
     
     def __init__(self, trueD=None, distrib_data=None, rngSeed=None):
-        accepted_measures = ['std_uniform','std_gaussian']
+        accepted_measures = ['StdUniform','StdGaussian']
         if rngSeed: random.seed(rngSeed)
         super().__init__(accepted_measures, trueD, distrib_data)
 
     def gen_distrib(self, n, m, j=1):
-        if self.trueD.measureName=='std_uniform': return random.rand(j,int(n),int(m)).squeeze()
-        elif self.trueD.measureName=='std_gaussian': return random.randn(j,int(n),int(m)).squeeze()
+        if type(self.trueD).__name__=='StdUniform': return random.rand(j,int(n),int(m)).squeeze()
+        elif type(self.trueD).__name__=='StdGaussian': return random.randn(j,int(n),int(m)).squeeze()

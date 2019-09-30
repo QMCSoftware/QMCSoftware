@@ -40,22 +40,25 @@ class Fun(ABC):
         msr_obj = the Measure object that defines the integral
         dstr_obj = the discrete distribution object that is sampled from
         '''
-        for ii in range(len(self)):
-            self[ii].dimension = dstr_obj[ii].trueD.dimension # the function needs the dimension
-            if msr_obj[ii].measureName==dstr_obj[ii].trueD.measureName:
-                self[ii].f = lambda xu,coordIdex,i=ii: self[i].g(xu,coordIdex)
-            elif msr_obj[ii].measureName== 'iid_zmean_gaussian' and dstr_obj[ii].trueD.measureName== 'std_gaussian': # multiply by the likelihood ratio
-                this_var = msr_obj[ii].measureData['variance']
-                self[ii].f = lambda xu,coordIndex,var=this_var,i=ii: self[i].g(xu*sqrt(var),coordIndex)
-            elif msr_obj[ii].measureName== 'brownian_motion' and dstr_obj[ii].trueD.measureName== 'std_gaussian':
-                timeDiff = diff(insert(msr_obj[ii].measureData['timeVector'], 0, 0))
-                self[ii].f = lambda xu,coordIndex,timeDiff=timeDiff,i=ii: self[i].g(cumsum(xu*sqrt(timeDiff),1),coordIndex)
-            elif msr_obj[ii].measureName== 'iid_zmean_gaussian' and dstr_obj[ii].trueD.measureName== 'std_uniform':
-                this_var = msr_obj[ii].measureData['variance']
-                self[ii].f = lambda xu,coordIdex,var=this_var,i=ii: self[i].g(sqrt(var)*norm.ppf(xu),coordIdex)
-            elif msr_obj[ii].measureName== 'brownian_motion' and dstr_obj[ii].trueD.measureName== 'std_uniform':
-                timeDiff = diff(insert(msr_obj[ii].measureData['timeVector'], 0, 0))
-                self[ii].f = lambda xu,coordIndex,timeDiff=timeDiff,i=ii: self[i].g(cumsum(norm.ppf(xu)*sqrt(timeDiff),1),coordIndex)
+        for i in range(len(self)):
+            try: sample_from = dstr_obj[i].trueD.mimics # QuasiRandom sampling
+            except: sample_from = type(dstr_obj[i].trueD).__name__ # IIDDistribution sampling
+            transform_to = type(msr_obj[i]).__name__ # distribution the sampling attempts to mimic
+            self[i].dimension = dstr_obj[i].trueD.dimension # the function needs the dimension
+            if transform_to==sample_from: # no need to transform
+                self[i].f = lambda xu,coordIdex,i=i: self[i].g(xu,coordIdex)
+            elif transform_to== 'IIDZeroMeanGaussian' and sample_from== 'StdGaussian': # multiply by the likelihood ratio
+                this_var = msr_obj[i].variance
+                self[i].f = lambda xu,coordIndex,var=this_var,i=i: self[i].g(xu*sqrt(var),coordIndex)
+            elif transform_to== 'IIDZeroMeanGaussian' and sample_from== 'StdUniform':
+                this_var = msr_obj[i].variance
+                self[i].f = lambda xu,coordIdex,var=this_var,i=i: self[i].g(sqrt(var)*norm.ppf(xu),coordIdex)
+            elif transform_to== 'BrownianMotion' and sample_from== 'StdUniform':
+                timeDiff = diff(insert(msr_obj[i].timeVector, 0, 0))
+                self[i].f = lambda xu,coordIndex,timeDiff=timeDiff,i=i: self[i].g(cumsum(norm.ppf(xu)*sqrt(timeDiff),1),coordIndex)
+            elif transform_to== 'BrownianMotion' and sample_from== 'StdGaussian':
+                timeDiff = diff(insert(msr_obj[i].timeVector, 0, 0))
+                self[i].f = lambda xu,coordIndex,timeDiff=timeDiff,i=i: self[i].g(cumsum(xu*sqrt(timeDiff),1),coordIndex)
             else:
                 raise Exception("Variable transformation not performed")
         return self
