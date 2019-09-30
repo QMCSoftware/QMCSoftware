@@ -1,12 +1,12 @@
 import unittest
 from numpy import arange
 from algorithms.function.AsianCallFun import AsianCallFun
-from algorithms.distribution import measure
+from algorithms.distribution import Measure
 
 class Test_AsianCallFun(unittest.TestCase):
 
     def test_AsianCallFun_Construction_multi_level(self):
-        measureObj = measure().BrownianMotion(timeVector=[arange(1/4,5/4,1/4),arange(1/64,65/64,1/64)])
+        measureObj = Measure().brownian_motion(timeVector=[arange(1/4,5/4,1/4),arange(1/64,65/64,1/64)])
         asf = AsianCallFun(BMmeasure=measureObj)
         with self.subTest(): self.assertEqual(len(asf),2)
         with self.subTest(): self.assertEqual(asf[0].dimension,4)
