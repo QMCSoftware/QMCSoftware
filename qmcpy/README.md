@@ -43,12 +43,12 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 ## Measure
 <b>Summary:</b> Specifies the components of a general measure used to define an integration problem or a sampling method<br>
 <b>Available Measures:</b>
-- std_uniform
-- std_gaussian
-- iid_zmean_gaussian
-- brownian_motion
+- STDUniform
+- STDGaussian
+- IIDZeroMeanGaussian
+- BrownianMotion
 - Lattice
-- sobol
+- Sobol
 
 <hr>
 

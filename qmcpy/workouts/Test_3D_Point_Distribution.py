@@ -5,7 +5,7 @@ from numpy import arange, linspace, meshgrid, random, zeros
 random.seed(7)
 
 from workouts import summary_qmc
-from algorithms.distribution import Measure
+from algorithms.distribution.Measures import IIDZeroMeanGaussian,StdGaussian,Lattice
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
 from algorithms.function.KeisterFun import KeisterFun
@@ -18,8 +18,8 @@ var = 1/2
 coordIdx = arange(1,dim+1)
 
 fun = KeisterFun()
-measureObj = Measure().iid_zmean_gaussian(dimension=[dim], variance=[1 / 2])
-distribObj = IIDDistribution(trueD=Measure().std_gaussian(dimension=[dim]), rngSeed=7)
+measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
+distribObj = IIDDistribution(trueD=StdGaussian(dimension=[dim]), rngSeed=7)
 fun = fun.transform_variable(measureObj, distribObj)
 
 # Examples for generating 'pregen' figure's constants
@@ -30,16 +30,16 @@ from algorithms.stop.CLTStopping import CLTStopping
 from algorithms.integrate import integrate
 #     CLTRep Example
 funObj = KeisterFun()
-stopObj = CLTRep(nInit=n,nMax=2**15,absTol=.01,J=j)
-measureObj = Measure().iid_zmean_gaussian(dimension=[dim],variance=[var])
-distribObj = QuasiRandom(trueD=Measure().lattice(dimension=[dim]),rngSeed=7)
+distribObj = QuasiRandom(trueD=Lattice(dimension=[dim]),rngSeed=7)
+stopObj = CLTRep(distribObj,nInit=n,nMax=2**15,absTol=.01,J=j)
+measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[var])
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 #     CLT Example
 funObj = KeisterFun()
-stopObj = CLTStopping(nInit=16,absTol=.3,alpha=.01,inflate=1.2)
-measureObj = Measure().iid_zmean_gaussian(dimension=[dim],variance=[1/2])
-distribObj = IIDDistribution(trueD=Measure().std_gaussian(dimension=[dim]),rngSeed=7)
+distribObj = IIDDistribution(trueD=StdGaussian(dimension=[dim]),rngSeed=7)
+stopObj = CLTStopping(distribObj,nInit=16,absTol=.3,alpha=.01,inflate=1.2)
+measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[1/2])
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 sys.exit(0)
@@ -113,7 +113,7 @@ for idx,ax in enumerate([ax1,ax2,ax3]):
     ax.view_init(20,45)
     
 # Output
-mpl_plt.savefig('workouts/Outputs/Three_3d_SurfaceScatters.png',
+mpl_plt.savefig('outputs/Three_3d_SurfaceScatters.png',
         dpi = 500,
         bbox_inches = 'tight',
         pad_inches = .15)

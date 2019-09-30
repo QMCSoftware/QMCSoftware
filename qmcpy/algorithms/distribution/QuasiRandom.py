@@ -10,14 +10,14 @@ from .DigitalSeq import DigitalSeq
 class QuasiRandom(DiscreteDistribution):
 
     def __init__(self, distrib_data=None, trueD=None, rngSeed=None):
-        accepted_measures = ['lattice','sobol']
+        accepted_measures = ['Lattice','Sobol']
         if rngSeed: random.seed(rngSeed)
         super().__init__(accepted_measures, trueD, distrib_data)
 
     def gen_distrib(self, n, m, j=1):
         # get j randomly shifted nxm arrays 
-        if self.trueD.measureData['lds_type']=='lattice': return self.get_RS_lattice_b2(n,m,j)
-        elif self.trueD.measureData['lds_type']=='sobol': return self.get_RS_sobol_b2g(n,m,j)
+        if type(self.trueD).__name__=='Lattice': return self.get_RS_lattice_b2(n,m,j)
+        elif type(self.trueD).__name__=='Sobol': return self.get_RS_sobol_b2g(n,m,j)
 
     def get_RS_sobol_b2g(self,n,m,j):
         # generates j shifted nxm sobol digital sequences

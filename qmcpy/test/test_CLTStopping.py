@@ -3,12 +3,12 @@ import unittest
 from algorithms.stop import DistributionCompatibilityError
 from algorithms.stop.CLTStopping import CLTStopping
 from algorithms.distribution.QuasiRandom import QuasiRandom
-from algorithms.distribution import Measure
+from algorithms.distribution.Measures import Lattice
 
 class Test_CLTStopping(unittest.TestCase):
 
     def test_Incompatible_Distrib(self):
-        self.assertRaises(DistributionCompatibilityError,CLTStopping,QuasiRandom(Measure().lattice()))
+        self.assertRaises(DistributionCompatibilityError,CLTStopping,QuasiRandom(Lattice([2])))
 
 if __name__ == "__main__":
     unittest.main()

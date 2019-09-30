@@ -2,7 +2,7 @@ import unittest
 
 from numpy import arange
 
-from algorithms.distribution import Measure
+from algorithms.distribution.Measures import IIDZeroMeanGaussian,StdGaussian,BrownianMotion,Lattice
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
 from algorithms.function.KeisterFun import KeisterFun
@@ -22,8 +22,8 @@ class IntegrationExampleTest(unittest.TestCase):
         absTol = .3
         dim = 2
         fun = KeisterFun()
-        measureObj = Measure().iid_zmean_gaussian(dimension=[dim],variance=[1 / 2])
-        distribObj = IIDDistribution(trueD=Measure().std_gaussian(dimension=[dim]))
+        measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[1 / 2])
+        distribObj = IIDDistribution(trueD=StdGaussian(dimension=[dim]))
         stopObj = CLTStopping(distribObj,nInit=16, absTol=absTol, alpha=.01, inflate=1.2)
         sol, out = integrate(fun, measureObj, distribObj, stopObj)
         true_value = 1.808186429263620
@@ -34,9 +34,9 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_AsianOption_MultiLevel(self):
         absTol = 0.1
         timeSeries_levels = [arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)]
-        measureObj = Measure().brownian_motion(timeVector=timeSeries_levels)
+        measureObj = BrownianMotion(timeVector=timeSeries_levels)
         OptionObj = AsianCallFun(measureObj)
-        distribObj = QuasiRandom(trueD=Measure().lattice(dimension=[4,16,64]))
+        distribObj = QuasiRandom(trueD=Lattice(dimension=[4,16,64]))
         stopObj = CLTRep(distribObj,absTol=absTol)
         sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
         true_value = 6.20
