@@ -72,8 +72,8 @@ class IntegrandBase(object):
     # And some of these references are unintelligible in current form -- \fu, \vc ??
     #
     # And this name "g" needs to be better
-    def g(self, x, coords_in_sequence): # original function to be integrated
-        """Elementwise evaluation of the integrand at
+    def g(self, x, coords_in_sequence):
+        """Original function to be integrated
 
         :param x: nodes, $\vx_{\fu,i} = i^{\text{th}}$ row of an $n \times |\fu|$ matrix
         :type x: array with shape(n, self.dim)
