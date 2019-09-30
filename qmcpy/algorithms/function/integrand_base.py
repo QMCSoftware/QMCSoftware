@@ -15,6 +15,9 @@ from scipy.stats import norm
 # Feel free to do this as you want
 from .. import univ_repr
 
+# Eventually, could consider congealing defaults into a constants file
+DEFAULT_NOMINAL_VALUE = 0
+
 
 class IntegrandBase(object):
     """
@@ -23,7 +26,7 @@ class IntegrandBase(object):
             Methods: g(self, x, coord_index)
     """
 
-    def __init__(self, nominal_value=0):
+    def __init__(self, nominal_value=None):
         # There are a lot of ways to format docstrings ... this is just one I'm familiar with
         # I actually, usually, try not to write them because I think they just make code look busy
         # Generally, I think the best goal is to write self-documenting code, with obvious variable names
@@ -35,7 +38,7 @@ class IntegrandBase(object):
 
         """
         # I copied the description of nominal_value, but I do not know what that means
-        self.nominal_value = nominal_value
+        self.nominal_value = DEFAULT_NOMINAL_VALUE if nominal_value is None else nominal_value
         self.integrand_handle_after_transformation = None
         self.dimension = None
 
@@ -126,7 +129,7 @@ class IntegrandBase(object):
             elif measure.measureName == 'iid_zmean_gaussian' and distribution.trueD.measureName == 'std_uniform':
                 v = measure.measureData['variance']
                 integrand.f = lambda x, ci, var=v, i=k: self.fun_list[i].g(np.sqrt(var) * norm.ppf(x), ci)
-            elif measure.measureName == 'brownian_motion' and distribution.trueD.measureName == 'std_gaussian':
+            elif measure.measureName == 'brownian_motion' and distribution.trueD.measureName == 'std_uniform':
                 td = np.diff(np.insert(measure.measureData['timeVector'], 0, 0))
 
                 def transformed_integrand(x, ci, timeDiff=td, i=k):
