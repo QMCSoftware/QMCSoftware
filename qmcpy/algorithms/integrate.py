@@ -1,4 +1,4 @@
-''' Originally developed in MATLAB by Fred Hickernell. Translated to python by
+''' Originally developed in MATLAB by Fred Hickernell. Translated to Python by
 Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import time
 
@@ -11,13 +11,13 @@ def integrate(fun_obj: Fun, measure_obj: Measure,
               distrib_obj: DiscreteDistribution,
               stop_obj: StoppingCriterion) -> tuple:
     """
-    Specify and generate values $f(x)$ for $x \in \mathcal{X}$
+    Specify and generate values :math:`f(\mathbf{x})` for :math:`\mathbf{x} \in \mathcal{X}`
 
     Args:
         fun_obj: an object from class Fun
-        measure_obj: an object from class maeasure
-        distrib_obj: an object from class discrete_distribution
-        stop_obj: an object from class stopping_criterion
+        measure_obj: an object from class Measure
+        distrib_obj: an object from class DiscreteDistribution
+        stop_obj: an object from class StoppingCriterion
 
     Returns:
         (tuple): tuple containing:

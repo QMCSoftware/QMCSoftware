@@ -36,7 +36,8 @@ release = u'0.1'
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.githubpages',
               'sphinx.ext.imgmath',
-              'sphinx.ext.napoleon']
+              'sphinx.ext.napoleon',
+              'sphinx.ext.graphviz']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -58,3 +59,24 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Fork me on GitHub banner
+html_theme_options = {
+    'font_size': '18px',
+    'github_user': 'QMCSoftware',
+    'github_repo': 'QMCSoftware',
+    'github_button': True,
+    'github_banner': True
+}
+
+
+# -- Options for LaTeX output ---------------------------------------------
+
+# Paths  on S.C. Choi's Mac machine for latex
+imgmath_latex=r"/Library/TeX/texbin/latex"
+imgmath_dvipng=r"/Library/TeX/texbin/dvipng"
+#imgmath_font_size = 10
+
+
+#templates_path = ['_templates']
+

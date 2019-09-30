@@ -7,8 +7,10 @@ from . import Fun
 
 class KeisterFun(Fun):
     '''
-    Specify and generate values $f(\vx) = \pi^{d/2} \cos(\lVert \vx \rVert)$ for $\vx \in \reals^d$
+    Specify and generate values :math:`f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)` for :math:`\mathbf{x} \in \mathbb{R}^d`
+
     The standard example integrates the Keister function with respect to an IID Gaussian distribution with variance 1/2
+
     B. D. Keister, Multidimensional Quadrature Algorithms,  \emph{Computers in Physics}, \textbf{10}, pp.\ 119-122, 1996.
     '''
     

@@ -5,8 +5,8 @@ from . import DiscreteDistribution
 
 class IIDDistribution(DiscreteDistribution):
     '''
-    Specifies and generates the components of $\frac 1n \sum_{i=1}^n \delta_{\vx_i}(\cdot)$
-    where the $\vx_i$ are IIDDistribution uniform on $[0,1]^d$ or IIDDistribution standard Gaussian
+    Specifies and generates the components of :math:`\dfrac{1}{n} \sum_{i=1}^n \delta_{\mathbf{x}_i}(\cdot)`
+    where the :math:`\mathbf{x}_i` are IIDDistribution uniform on :math:`[0,1]^d` or IIDDistribution standard Gaussian
     '''
     
     def __init__(self, trueD=None, distrib_data=None, rngSeed=None):

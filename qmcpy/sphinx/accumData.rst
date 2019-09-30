@@ -1,7 +1,6 @@
 Data Class
 ==========
 
-
 .. automodule:: algorithms.accum_data.__init__
     :members:
 

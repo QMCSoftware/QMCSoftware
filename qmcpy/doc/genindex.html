@@ -8,6 +8,7 @@
     <title>Index &#8212; qmcpy 0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
@@ -77,10 +78,12 @@
 </li>
       <li><a href="distribution.html#module-algorithms.distribution.IIDDistribution">algorithms.distribution.IIDDistribution (module)</a>
 </li>
-      <li><a href="distribution.html#module-algorithms.distribution.QuasiRandom">algorithms.distribution.QuasiRandom (module)</a>
+      <li><a href="distribution.html#module-algorithms.distribution.Measures">algorithms.distribution.Measures (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="distribution.html#module-algorithms.distribution.QuasiRandom">algorithms.distribution.QuasiRandom (module)</a>
+</li>
       <li><a href="function.html#module-algorithms.function.__init__">algorithms.function.__init__ (module)</a>
 </li>
       <li><a href="function.html#module-algorithms.function.AsianCallFun">algorithms.function.AsianCallFun (module)</a>
@@ -103,7 +106,7 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="distribution.html#algorithms.distribution.__init__.Measure.brownian_motion">brownian_motion() (algorithms.distribution.__init__.Measure method)</a>
+      <li><a href="distribution.html#algorithms.distribution.Measures.BrownianMotion">BrownianMotion (class in algorithms.distribution.Measures)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -171,9 +174,9 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="distribution.html#algorithms.distribution.__init__.Measure.iid_zmean_gaussian">iid_zmean_gaussian() (algorithms.distribution.__init__.Measure method)</a>
-</li>
       <li><a href="distribution.html#algorithms.distribution.IIDDistribution.IIDDistribution">IIDDistribution (class in algorithms.distribution.IIDDistribution)</a>
+</li>
+      <li><a href="distribution.html#algorithms.distribution.Measures.IIDZeroMeanGaussian">IIDZeroMeanGaussian (class in algorithms.distribution.Measures)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -195,7 +198,7 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="distribution.html#algorithms.distribution.__init__.Measure.lattice">lattice() (algorithms.distribution.__init__.Measure method)</a>
+      <li><a href="distribution.html#algorithms.distribution.Measures.Lattice">Lattice (class in algorithms.distribution.Measures)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -231,13 +234,13 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="distribution.html#algorithms.distribution.__init__.Measure.sobol">sobol() (algorithms.distribution.__init__.Measure method)</a>
+      <li><a href="distribution.html#algorithms.distribution.Measures.Sobol">Sobol (class in algorithms.distribution.Measures)</a>
 </li>
-      <li><a href="distribution.html#algorithms.distribution.__init__.Measure.std_gaussian">std_gaussian() (algorithms.distribution.__init__.Measure method)</a>
+      <li><a href="distribution.html#algorithms.distribution.Measures.StdGaussian">StdGaussian (class in algorithms.distribution.Measures)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="distribution.html#algorithms.distribution.__init__.Measure.std_uniform">std_uniform() (algorithms.distribution.__init__.Measure method)</a>
+      <li><a href="distribution.html#algorithms.distribution.Measures.StdUniform">StdUniform (class in algorithms.distribution.Measures)</a>
 </li>
       <li><a href="stop.html#algorithms.stop.__init__.StoppingCriterion">StoppingCriterion (class in algorithms.stop.__init__)</a>
 </li>
@@ -280,6 +283,13 @@
 
 
 
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=QMCSoftware&repo=QMCSoftware&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
 
 
 
@@ -333,6 +343,10 @@
       
     </div>
 
+    
+    <a href="https://github.com/QMCSoftware/QMCSoftware" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
     
 
     

@@ -9,7 +9,7 @@ class DimensionError: pass
 
 class DiscreteDistribution(ABC):
     '''
-    Specifies and generates the components of $ a_n \sum_{i=1}^n w_i \delta_{\vx_i}(\cdot)$
+    Specifies and generates the components of :math:`a_n \sum_{i=1}^n w_i \delta_{\mathbf{x}_i}(\cdot)`
         Any sublcass of DiscreteDistribution must include:
             Methods: gen_distrib(self,nStart,nEnd,n,coordIndex)
             Properties: distrib_data,trueD
@@ -30,9 +30,12 @@ class DiscreteDistribution(ABC):
     @abstractmethod
     def gen_distrib(self, n, m, j):
         """
-         nStart = starting value of $ i$
-         nEnd = ending value of $ i$
-         n = value of $ n$ used to determine $ a_n$
+         nStart = starting value of :math:`i`
+
+         nEnd = ending value of :math:`i`
+
+         n = value of :math:`n` used to determine :math:`a_n`
+
          coordIndex = which coordinates in sequence are needed
         """
         pass

@@ -7,6 +7,7 @@
     <title>Algorithms &#8212; qmcpy 0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
@@ -34,19 +35,19 @@
             
   <div class="section" id="module-integrate">
 <span id="algorithms"></span><h1>Algorithms<a class="headerlink" href="#module-integrate" title="Permalink to this headline">¶</a></h1>
-<p>Originally developed in MATLAB by Fred Hickernell. Translated to python by
+<p>Originally developed in MATLAB by Fred Hickernell. Translated to Python by
 Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="function">
 <dt id="integrate.integrate">
 <code class="sig-prename descclassname">integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">fun_obj: algorithms.function.Fun</em>, <em class="sig-param">measure_obj: algorithms.distribution.Measure</em>, <em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">stop_obj: algorithms.stop.StoppingCriterion</em><span class="sig-paren">)</span> &#x2192; tuple<a class="headerlink" href="#integrate.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values $f(x)$ for $x in mathcal{X}$</p>
+<dd><p>Specify and generate values <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fun_obj</strong> – an object from class Fun</p></li>
-<li><p><strong>measure_obj</strong> – an object from class maeasure</p></li>
-<li><p><strong>distrib_obj</strong> – an object from class discrete_distribution</p></li>
-<li><p><strong>stop_obj</strong> – an object from class stopping_criterion</p></li>
+<li><p><strong>measure_obj</strong> – an object from class Measure</p></li>
+<li><p><strong>distrib_obj</strong> – an object from class DiscreteDistribution</p></li>
+<li><p><strong>stop_obj</strong> – an object from class StoppingCriterion</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -64,13 +65,11 @@ sampling points used to obtain the estimate</p>
 </dl>
 </dd></dl>
 
-<span class="target" id="module-__init__"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by
-Sou-Cheng T. Choi and Aleksei Sorokin</p>
-<dl class="function">
+<span class="target" id="module-__init__"></span><dl class="function">
 <dt id="__init__.univ_repr">
 <code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">univ_repr</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">obj_list_s=None</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#__init__.univ_repr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clean way to represent object data.
-Note: print(obj) == print(obj.__repr__())</p>
+<dd><p>Clean way to represent object data.</p>
+<p>Note: print(obj) == print(obj.__repr__())</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -97,6 +96,13 @@ Note: print(obj) == print(obj.__repr__())</p>
 
 
 
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=QMCSoftware&repo=QMCSoftware&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
 
 
 
@@ -155,6 +161,10 @@ Note: print(obj) == print(obj.__repr__())</p>
           rel="nofollow">Page source</a>
     </div>
 
+    
+    <a href="https://github.com/QMCSoftware/QMCSoftware" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
     
 
     

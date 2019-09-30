@@ -9,25 +9,32 @@ from .. import univ_repr
 
 class Fun(ABC):
     '''
-    Specify and generate values $f(\vx)$ for $\vx \in \cx$
+    Specify and generate values :math:`f(\mathbf{x})` for :math:`\mathbf{x} \in \mathcal{X}`
         Any sublcass of Fun must include:
             Methods: g(self,x,coordIndex)
     '''
     
     def __init__(self,nominalValue=None):
         super().__init__()
-        self.nominalValue = nominalValue if nominalValue else 0  # a nominal number, $c$, such that $(c, \ldots, c) \in \cx$
+        self.nominalValue = nominalValue if nominalValue else 0  # a nominal number, :math:`c`, such that :math:`(c, \ldots, c) \in \mathcal{X}`
         self.f = None # function handle of integrand after transformation
-        self.dimension = 2  # dimension of the domain, $d$
+        self.dimension = 2  # dimension of the domain, :math:`d`
         self.fun_list = [self]
     
     # Abstract Methods
     @abstractmethod
-    def g(self, x, coordIndex): # original function to be integrated
+    def g(self, x, coordIndex):  # original function to be integrated
         '''
-        xu = nodes, $\vx_{\fu,i} = i^{\text{th}}$ row of an $n \times |\fu|$ matrix
-        coordIndex = set of those coordinates in sequence needed,  $\fu$
-        y = $n \times p$ matrix with values $f(\vx_{\fu,i},\vc)$ where if $\vx_i' = (x_{i,\fu},\vc)_j$, then $x'_{ij} = x_{ij}$ for $j \in \fu$, and $x'_{ij} = c$ otherwise
+        xu = nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` row
+        of an :math:`n \times |\mathfrak{u}|` matrix
+
+        coordIndex = set of those coordinates in sequence needed,
+        :math:`\mathfrak{u}`
+
+        y = :math:`n \times p` matrix with values :math:`f(\mathbf{x}_{
+        \mathfrak{u},i},\mathbf{c})` where if :math:`\mathbf{x}_i' = (x_{i,
+        \mathfrak{u}},\mathbf{c})_j`, then :math:`x'_{ij} = x_{ij}` for :math:`j \in
+        \mathfrak{u}`, and :math:`x'_{ij} = c` otherwise
         '''
         pass
     
