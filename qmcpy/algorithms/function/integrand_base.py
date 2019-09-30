@@ -43,6 +43,8 @@ class IntegrandBase(object):
         # People will have a very difficult time following this structure
         # When you're looking for collaborators, the last thing you want is code with unintuitive design
         # Also, if it makes sense, I would rather call this self.integrand_list
+        #
+        # It's also not obvious how to set items in this self.fun_list
         self.fun_list = [self]
 
     # Magic Methods. Makes self[i]==self.fun_list[i]
@@ -68,6 +70,8 @@ class IntegrandBase(object):
     #
     # Also, putting tex into comments is not good -- it's just hard to read.  Refer to variables by their names
     # And some of these references are unintelligible in current form -- \fu, \vc ??
+    #
+    # And this name "g" needs to be better
     def g(self, x, coords_in_sequence): # original function to be integrated
         """Elementwise evaluation of the integrand at
 
