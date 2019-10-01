@@ -1,19 +1,13 @@
 from abc import ABC, abstractmethod
 from math import inf, nan
+from numpy import array
 
 from algorithms.distribution import DiscreteDistribution
 from algorithms.integrand import Integrand
-from numpy import array
-
 from .. import univ_repr
 
-
 class AccumData(ABC):
-    '''
-    Accumulated data required in the computation of the integral
-        Any sublcass of AccumData must include:
-            Methods: update_data(self, distribObj, fun_obj, decompType)
-    '''
+    """ Accumulated data required in the computation of the integral """
 
     def __init__(self):
         super().__init__()
@@ -25,13 +19,11 @@ class AccumData(ABC):
         self.timeUsed = array([])  # time used so far
         self.nSamplesUsed = array([])  # number of samples used so far
         self.confidInt = array([-inf, inf])  # error bound on the solution
-        self.costF = array([])  # time required to compute integrand values
+        self.cost_eval = array([])  # time required to compute integrand values
         self._timeStart = None  # hidden/private
 
-    # Abstract Methods
     @abstractmethod
-    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Integrand,
-                    decomp_type):
+    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Integrand, decomp_type):
         """
         Update the accumulated data
 
@@ -46,5 +38,4 @@ class AccumData(ABC):
         """
         pass
 
-    # Magic Method
     def __repr__(self): return univ_repr(self)

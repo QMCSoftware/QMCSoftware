@@ -26,14 +26,14 @@ class CLTStopping(StoppingCriterion):
             self.dataObj.muhat = full(nf,inf)
             self.dataObj.sighat = full(nf,inf)
             self.dataObj.nSigma = self.nInit  # use initial samples to estimate standard deviation
-            self.dataObj.costF = zeros(nf)
+            self.dataObj.cost_eval = zeros(nf)
             self.dataObj.stage = 'sigma'  # compute standard deviation next
         elif self.dataObj.stage == 'sigma':
             self.dataObj.prevN = self.dataObj.nextN  # update place in the sequence
-            tempA = (self.dataObj.costF)**.5  # use cost of function values to decide how to allocate
+            tempA = (self.dataObj.cost_eval)**.5  # use cost of function values to decide how to allocate
             tempB = (tempA * self.dataObj.sighat).sum(0)  # samples for computation of the mean            
             nM = ceil(tempB*(-norm.ppf(self.alpha/2)*self.inflate / max(self.absTol, self.dataObj.solution*self.relTol))**2
-                * (self.dataObj.sighat/self.dataObj.costF**.5))
+                * (self.dataObj.sighat/self.dataObj.cost_eval**.5))
             self.dataObj.nMu = minimum(maximum(self.dataObj.nextN,nM),self.nMax-self.dataObj.prevN)
             self.dataObj.nextN = self.dataObj.nMu + self.dataObj.prevN
             self.dataObj.stage = 'mu'  # compute sample mean next

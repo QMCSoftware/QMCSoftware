@@ -9,30 +9,30 @@ from ..accum_data.MeanVarDataRep import MeanVarDataRep
 
 class CLTRep(StoppingCriterion):
     ''' Stopping criterion based on var(stream_1_estimate,stream_2_estimate,...,stream_16_estimate)<errorTol '''
-    def __init__(self,distribObj,inflate=1.2,alpha=0.01,J=16,absTol=None,relTol=None,nInit=None,nMax=None):
+    def __init__(self,distribObj,inflate=1.2,alpha=0.01,n_streams=16,absTol=None,relTol=None,nInit=None,nMax=None):
         discDistAllowed = ["QuasiRandom"] # which discrete distributions are supported
         super().__init__(distribObj,discDistAllowed,absTol=absTol,relTol=relTol,nInit=nInit,nMax=nMax)
         self.inflate = inflate  # inflation factor
         self.alpha = alpha # uncertainty level
-        self.J = J
+        self.n_streams = n_streams
         self.nLevels = len(distribObj)
-        self.dataObj = MeanVarDataRep(self.nLevels, self.J)
+        self.dataObj = MeanVarDataRep(self.nLevels, self.n_streams)
 
     def stopYet(self,funObj):
         if self.dataObj.stage == 'begin':  # initialize
             self.dataObj._timeStart = time()  # keep track of time
             self.dataObj.prevN = zeros(self.nLevels)
             self.dataObj.nextN = full(self.nLevels,self.nInit)
-            self.dataObj.costF = zeros(self.nLevels)
+            self.dataObj.cost_eval = zeros(self.nLevels)
             self.dataObj.stage = 'sigma'
         elif self.dataObj.stage == 'sigma':
             for i in range(len(funObj)):
                 if self.dataObj.sig2hat[i] < self.absTol: # Sufficient estimate for mean of funObj[i]
-                    self.dataObj.flags[i] = 0
+                    self.dataObj.flag[i] = 0
                 else:
                     self.dataObj.prevN[i] = self.dataObj.nextN[i]
                     self.dataObj.nextN[i] = self.dataObj.prevN[i]*2
-            if self.dataObj.flags.sum(0)==0 or self.dataObj.nextN.max() > self.nMax:
+            if self.dataObj.flag.sum(0)==0 or self.dataObj.nextN.max() > self.nMax:
                 # Stopping criterion met
                 self.dataObj.solution = self.dataObj.mu2hat.sum(0)
                 self.dataObj.nSamplesUsed = self.dataObj.nextN
