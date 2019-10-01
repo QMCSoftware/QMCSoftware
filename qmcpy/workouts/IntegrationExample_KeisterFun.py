@@ -18,7 +18,7 @@ dim = 3
 funObj = Keister()
 measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
 distribObj = IIDDistribution(trueD=StdUniform(dimension=[dim]), rngSeed=7)
-stopObj = CLTStopping(distribObj,absTol=.05)
+stopObj = CLTStopping(distribObj,abs_tol=.05)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 
@@ -27,7 +27,7 @@ dim = 3
 funObj = Keister()
 measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
 distribObj = IIDDistribution(trueD=StdGaussian(dimension=[dim]), rngSeed=7)
-stopObj = CLTStopping(distribObj,absTol=.05)
+stopObj = CLTStopping(distribObj,abs_tol=.05)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 
@@ -36,7 +36,7 @@ dim = 3
 funObj = Keister()
 measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
 distribObj = QuasiRandom(trueD=Lattice(dimension=[dim]),rngSeed=7)
-stopObj = CLTRep(distribObj,absTol=.05,nMax=1e6)
+stopObj = CLTRep(distribObj,abs_tol=.05,n_max=1e6)
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 
@@ -45,6 +45,6 @@ dim = 3
 funObj = Keister()
 measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
 distribObj = QuasiRandom(trueD=Sobol(dimension=[dim]), rngSeed=7)
-stopObj = CLTRep(distribObj,absTol=.05,nMax=1e6) # impossible tolerance so calculation is limited by sample budget
+stopObj = CLTRep(distribObj,abs_tol=.05,n_max=1e6) # impossible tolerance so calculation is limited by sample budget
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)

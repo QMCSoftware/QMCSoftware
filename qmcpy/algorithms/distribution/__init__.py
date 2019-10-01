@@ -1,18 +1,10 @@
 from abc import ABC, abstractmethod
 from numpy import array,ndarray
 
-from .. import univ_repr
-
-class MeasureCompatibilityError(Exception): pass
-class DimensionError: pass
+from .. import univ_repr,MeasureCompatibilityError,DimensionError
 
 class DiscreteDistribution(ABC):
-    '''
-    Specifies and generates the components of :math:`a_n \sum_{i=1}^n w_i \delta_{\mathbf{x}_i}(\cdot)`
-        Any sublcass of DiscreteDistribution must include:
-            Methods: gen_distrib(self,nStart,nEnd,n,coordIndex)
-            Properties: distrib_data,trueD
-    '''
+    """ Specifies and generates the components of :math:`a_n \sum_{i=1}^n w_i \delta_{\mathbf{x}_i}(\cdot)` """
 
     def __init__(self, accepted_measures, trueD=None, distrib_data=None):
         super().__init__()  

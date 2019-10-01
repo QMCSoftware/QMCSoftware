@@ -1,47 +1,64 @@
 from time import time
-
 from numpy import array, ceil, full, inf, maximum, minimum, tile, zeros
 from scipy.stats import norm
 
+from algorithms.distribution import DiscreteDistribution
+from algorithms.integrand import Integrand
 from . import StoppingCriterion
 from ..accum_data.MeanVarData import MeanVarData
 
-
 class CLTStopping(StoppingCriterion):
-    ''' Stopping criterion based on the Centeral Limit Theorem. '''
-    def __init__(self,distribObj,inflate=1.2,alpha=0.01,absTol=None,relTol=None,nInit=None,nMax=None):
-        discDistAllowed = ["IIDDistribution"] # which discrete distributions are supported
-        super().__init__(distribObj,discDistAllowed,absTol=absTol,relTol=relTol,nInit=nInit,nMax=nMax)
+    """ Stopping criterion based on the Centeral Limit Theorem """
+    def __init__(self, distrib_obj: DiscreteDistribution, inflate=1.2, alpha=0.01, abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e8):
+        """
+        Args:
+            distrib_obj: an instance of DiscreteDistribution
+            inflate: inflation factor when estimating variance
+            alpha: significance level for confidence interval
+            abs_tol: absolute error tolerance
+            rel_tol: relative error tolerance
+            n_init: initial number of samples
+            n_max: maximum number of samples
+        """
+        allowed_distribs = ["IIDDistribution"] # supported distributions
+        super().__init__(distrib_obj, allowed_distribs, abs_tol, rel_tol, n_init, n_max)
         self.inflate = inflate  # inflation factor
         self.alpha = alpha # uncertainty level
-        self.nLevels = len(distribObj)
-        self.dataObj = self.dataObj=MeanVarData(self.nLevels)
+        self.stage = 'sigma'  # compute standard deviation next
+        # Construct Data Object
+        n_integrands = len(distrib_obj)
+        self.data_obj = MeanVarData(n_integrands) # house integration data
+        self.data_obj.n_mu = zeros(n_integrands)  # number of samples used to compute the sample mean
+        self.data_obj.n_prev = zeros(n_integrands)  # initialize data object
+        self.data_obj.n_next = tile(self.n_init,n_integrands) # initialize as n_init
+        
+    def stopYet(self,funObj: Integrand):
+        """
+        Determine when to stop
 
-    def stopYet(self,funObj):
-        if self.dataObj.stage == 'begin':  # initialize
-            self.dataObj._timeStart = time()  # keep track of time
-            nf = len(funObj)
-            self.dataObj.prevN = zeros(nf)  # initialize data object
-            self.dataObj.nextN = tile(self.nInit,nf)
-            self.dataObj.muhat = full(nf,inf)
-            self.dataObj.sighat = full(nf,inf)
-            self.dataObj.nSigma = self.nInit  # use initial samples to estimate standard deviation
-            self.dataObj.cost_eval = zeros(nf)
-            self.dataObj.stage = 'sigma'  # compute standard deviation next
-        elif self.dataObj.stage == 'sigma':
-            self.dataObj.prevN = self.dataObj.nextN  # update place in the sequence
-            tempA = (self.dataObj.cost_eval)**.5  # use cost of function values to decide how to allocate
-            tempB = (tempA * self.dataObj.sighat).sum(0)  # samples for computation of the mean            
-            nM = ceil(tempB*(-norm.ppf(self.alpha/2)*self.inflate / max(self.absTol, self.dataObj.solution*self.relTol))**2
-                * (self.dataObj.sighat/self.dataObj.cost_eval**.5))
-            self.dataObj.nMu = minimum(maximum(self.dataObj.nextN,nM),self.nMax-self.dataObj.prevN)
-            self.dataObj.nextN = self.dataObj.nMu + self.dataObj.prevN
-            self.dataObj.stage = 'mu'  # compute sample mean next
-        elif self.dataObj.stage == 'mu':
-            self.dataObj.solution = self.dataObj.muhat.sum(0)
-            self.dataObj.nSamplesUsed = self.dataObj.nextN
-            errBar = -norm.ppf(self.alpha/2) * self.inflate * (self.dataObj.sighat**2 / self.dataObj.nMu).sum(0)**.5
-            self.dataObj.confidInt = self.dataObj.solution + errBar * array([-1, 1])
-            self.dataObj.stage = 'done'  # finished with computation
-        self.dataObj.timeUsed = time() - self.dataObj._timeStart
+        Args:
+            distrib_obj: an instance of DiscreteDistribution
+
+        Returns:
+            None
+
+        """       
+        if self.stage == 'sigma':
+            self.data_obj.n_prev = self.data_obj.n_next  # update place in the sequence
+            tempA = (self.data_obj.t_eval)**.5  # use cost of function values to decide how to allocate
+            tempB = (tempA * self.data_obj.sighat).sum(0)  # samples for computation of the mean            
+            # n_mu_temp := n such that confidence intervals width and conficence will be satisfied
+            n_mu_temp = ceil(tempB*(-norm.ppf(self.alpha/2)*self.inflate / 
+                            max(self.abs_tol, self.data_obj.solution*self.rel_tol))**2
+                            * (self.data_obj.sighat/self.data_obj.t_eval**.5))
+            # n_mu := n_mu_temp adjusted for n_prev
+            self.data_obj.n_mu = minimum(maximum(self.data_obj.n_next,n_mu_temp),self.n_max-self.data_obj.n_prev)
+            self.data_obj.n_next = self.data_obj.n_mu + self.data_obj.n_prev # set next_n to n_mu_temp
+            self.stage = 'mu'  # compute sample mean next
+        elif self.stage == 'mu':
+            self.data_obj.solution = self.data_obj.muhat.sum() # mean of integrand means
+            self.data_obj.n_samples_total = self.data_obj.n_next
+            errBar = -norm.ppf(self.alpha/2) * self.inflate * (self.data_obj.sighat**2 / self.data_obj.n_mu).sum(0)**.5
+            self.data_obj.confidInt = self.data_obj.solution + errBar * array([-1, 1]) # CLT confidence interval
+            self.stage = 'done'  # finished with computation
         return

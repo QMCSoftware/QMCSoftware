@@ -1,5 +1,5 @@
 from time import process_time
-from numpy import arange, finfo, float32, std, zeros
+from numpy import arange, finfo, float32, std, zeros, full, inf
 
 from algorithms.distribution import DiscreteDistribution
 from algorithms.integrand import Integrand
@@ -13,13 +13,13 @@ class MeanVarData(AccumData):
     stores the sample mean and variance of integrand values
     """
     
-    def __init__(self, num_integrands):
-        """ num_integrands = number of  integrands """
+    def __init__(self, n_integrands):
+        """ n_integrands = number of  integrands """
         super().__init__()
-        self.muhat = zeros(num_integrands) # sample mean
-        self.sighat = zeros(num_integrands) # sample standard deviation
-        self.nSigma = zeros(num_integrands) # number of samples used to compute the sample standard deviation
-        self.nMu = zeros(num_integrands)  # number of samples used to compute the sample mean
+        self.n_integrands = n_integrands
+        self.muhat = full(self.n_integrands,inf) # sample mean
+        self.sighat = full(self.n_integrands,inf) # sample standard deviation
+        self.t_eval = zeros(self.n_integrands) # time used to evaluate each integrand
 
     def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Integrand):
         """
@@ -32,14 +32,13 @@ class MeanVarData(AccumData):
         Returns:
             None
         """
-        for ii in range(len(fun_obj)):
+        for i in range(len(fun_obj)):
             tStart = process_time()  # time the integrand values
-            dim = distrib_obj[ii].trueD.dimension
-            distrib_data = distrib_obj[ii].gen_distrib(self.nextN[ii], dim)
-            y = fun_obj[ii].f(distrib_data, arange(1, dim + 1))
-            self.cost_eval[ii] = max(process_time()-tStart,eps)  # to be used for multi-level methods
-            if self.stage == 'sigma':
-                self.sighat[ii] = std(y)  # compute the sample standard deviation if required
-            self.muhat[ii] = y.mean(0)  # compute the sample mean
+            dim = distrib_obj[i].trueD.dimension
+            distrib_data = distrib_obj[i].gen_distrib(self.n_next[i], dim)
+            y = fun_obj[i].f(distrib_data, arange(1, dim + 1))
+            self.t_eval[i] = max(process_time()-tStart,eps)  # to be used for multi-level methods
+            self.sighat[i] = std(y)  # compute the sample standard deviation if required
+            self.muhat[i] = y.mean(0)  # compute the sample mean
             self.solution = self.muhat.sum(0) # which also acts as our tentative solution
         return

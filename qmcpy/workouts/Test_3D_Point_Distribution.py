@@ -31,14 +31,14 @@ from algorithms.integrate import integrate
 #     CLTRep Example
 funObj = Keister()
 distribObj = QuasiRandom(trueD=Lattice(dimension=[dim]),rngSeed=7)
-stopObj = CLTRep(distribObj,nInit=n,nMax=2**15,absTol=.01,J=j)
+stopObj = CLTRep(distribObj,n_init=n,n_max=2**15,abs_tol=.01,J=j)
 measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[var])
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 #     CLT Example
 funObj = Keister()
 distribObj = IIDDistribution(trueD=StdGaussian(dimension=[dim]),rngSeed=7)
-stopObj = CLTStopping(distribObj,nInit=16,absTol=.3,alpha=.01,inflate=1.2)
+stopObj = CLTStopping(distribObj,n_init=16,abs_tol=.3,alpha=.01,inflate=1.2)
 measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[1/2])
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)

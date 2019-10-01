@@ -14,15 +14,15 @@ def summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj):
     s += item_s%('trueD.measureName',type(distribObj.trueD).__name__)
 
     s += h1%(type(stopObj).__name__,'StoppingCriterion Object')
-    s += item_f%('absTol',stopObj.absTol)
-    s += item_f%('relTol',stopObj.relTol)
-    s += item_i%('nMax',stopObj.nMax)
+    s += item_f%('abs_tol',stopObj.abs_tol)
+    s += item_f%('rel_tol',stopObj.rel_tol)
+    s += item_i%('n_max',stopObj.n_max)
     s += item_f%('inflate',stopObj.inflate)
     s += item_f%('alpha',stopObj.alpha)
     
     s += h1%(type(dataObj).__name__,'Data Object')
-    s += item_s%('nSamplesUsed',str(dataObj.nSamplesUsed))
-    s += item_f%('timeUsed',dataObj.timeUsed)
+    s += item_s%('n_samples_total',str(dataObj.n_samples_total))
+    s += item_f%('t_total',dataObj.t_total)
     s += item_s%('confidInt',str(dataObj.confidInt))
     
     print(s)

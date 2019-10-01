@@ -26,13 +26,13 @@ def integrate(fun_obj: Integrand, measure_obj: Measure,
             sampling points used to obtain the estimate
 
     """
-    # Initialize the AccumData object and other crucial objects
+    t_start = time()
+    # Transform integrands to accept distribution values which can generate
     fun_obj = fun_obj.transform_variable(measure_obj, distrib_obj)
-    stop_obj.stopYet(fun_obj)
-    while stop_obj.dataObj.stage != 'done':
-        # the dataObj.stage property tells us where we are in the process
-        stop_obj.dataObj.update_data(distrib_obj, fun_obj)  # compute more data
+    while stop_obj.stage != 'done':
+        # the data_obj.stage property tells us where we are in the process
+        stop_obj.data_obj.update_data(distrib_obj, fun_obj)  # compute more data
         stop_obj.stopYet(fun_obj)  # update the status of the computation
-    solution = stop_obj.dataObj.solution  # assign outputs
-    stop_obj.dataObj.timeUsed = time() - stop_obj.dataObj._timeStart
-    return solution, stop_obj.dataObj
+    solution = stop_obj.data_obj.solution  # assign outputs
+    stop_obj.data_obj.t_total = time() - t_start
+    return solution, stop_obj.data_obj
