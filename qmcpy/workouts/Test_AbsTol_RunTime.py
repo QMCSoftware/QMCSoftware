@@ -90,7 +90,7 @@ if __name__ == '__main__':
     outF = 'outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol'
     # Run Test
     
-    absTols = arange(.01,.051,.002) # arange(.01,.06,.01)
+    absTols = arange(.001,.051,.002) # arange(.01,.06,.01)
     df_metrics = comp_Clt_vs_cltRep_runtimes(absTols)
     df_metrics.to_csv(outF+'.csv',index=False)
     
