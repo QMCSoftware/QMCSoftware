@@ -1,50 +1,188 @@
 
-<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8" />
-    <title>Stop Class &#8212; qmcpy 0.1 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>StoppingCriterion Class &mdash; qmcpy 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Function Class" href="integrand.html" />
+    <link rel="next" title="Utilities" href="util.html" />
+    <link rel="prev" title="Distribution Class" href="distribution.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
           
 
-          <div class="body" role="main">
+          
+            <a href="index.html" class="icon icon-home"> qmcpy
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrand.html">Integrand Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measure.html">Measure Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distribution.html">Distribution Class</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">StoppingCriterion Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">Utilities</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qmcpy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>StoppingCriterion Class</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
             
   <div class="section" id="module-algorithms.stop.__init__">
-<span id="stop-class"></span><h1>Stop Class<a class="headerlink" href="#module-algorithms.stop.__init__" title="Permalink to this headline">¶</a></h1>
+<span id="stoppingcriterion-class"></span><h1>StoppingCriterion Class<a class="headerlink" href="#module-algorithms.stop.__init__" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="algorithms.stop.__init__.StoppingCriterion">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.__init__.</code><code class="sig-name descname">StoppingCriterion</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.__init__.</code><code class="sig-name descname">StoppingCriterion</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decide when to stop</p>
 <dl class="method">
+<dt id="algorithms.stop.__init__.StoppingCriterion.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> (<a class="reference internal" href="distribution.html#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>allowed_distribs</strong> – distribution’s compatible with the StoppingCriterion</p></li>
+<li><p><strong>abs_tol</strong> – absolute error tolerance</p></li>
+<li><p><strong>rel_tol</strong> – relative error tolerance</p></li>
+<li><p><strong>n_init</strong> – initial number of samples</p></li>
+<li><p><strong>n_max</strong> – maximum number of samples</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="algorithms.stop.__init__.StoppingCriterion.stopYet">
-<em class="property">abstract </em><code class="sig-name descname">stopYet</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion.stopYet" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">stopYet</code><span class="sig-paren">(</span><em class="sig-param">distribution</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion.stopYet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine when to stop</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>distrib_obj</strong> – an instance of DiscreteDistribution</p>
+<dd class="field-odd"><p><strong>distribution</strong> – an instance of DiscreteDistribution</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None</p>
@@ -56,11 +194,30 @@
 
 <span class="target" id="module-algorithms.stop.CLTRep"></span><dl class="class">
 <dt id="algorithms.stop.CLTRep.CLTRep">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.CLTRep.</code><code class="sig-name descname">CLTRep</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">n_streams=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTRep.CLTRep" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.CLTRep.</code><code class="sig-name descname">CLTRep</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">n_streams=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTRep.CLTRep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stopping criterion based on var(stream_1_estimate,…,stream_16_estimate)&lt;errorTol</p>
 <dl class="method">
+<dt id="algorithms.stop.CLTRep.CLTRep.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">n_streams=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTRep.CLTRep.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> – an instance of DiscreteDistribution</p></li>
+<li><p><strong>n_streams</strong> – number of random nxm matricies to generate</p></li>
+<li><p><strong>inflate</strong> – inflation factor when estimating variance</p></li>
+<li><p><strong>alpha</strong> – significance level for confidence interval</p></li>
+<li><p><strong>abs_tol</strong> – absolute error tolerance</p></li>
+<li><p><strong>rel_tol</strong> – relative error tolerance</p></li>
+<li><p><strong>n_init</strong> – initial number of samples</p></li>
+<li><p><strong>n_max</strong> – maximum number of samples</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="algorithms.stop.CLTRep.CLTRep.stopYet">
-<code class="sig-name descname">stopYet</code><span class="sig-paren">(</span><em class="sig-param">funObj: algorithms.integrand.Integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTRep.CLTRep.stopYet" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stopYet</code><span class="sig-paren">(</span><em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTRep.CLTRep.stopYet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine when to stop</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -76,11 +233,29 @@
 
 <span class="target" id="module-algorithms.stop.CLTStopping"></span><dl class="class">
 <dt id="algorithms.stop.CLTStopping.CLTStopping">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.CLTStopping.</code><code class="sig-name descname">CLTStopping</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTStopping.CLTStopping" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.CLTStopping.</code><code class="sig-name descname">CLTStopping</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTStopping.CLTStopping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stopping criterion based on the Centeral Limit Theorem</p>
 <dl class="method">
+<dt id="algorithms.stop.CLTStopping.CLTStopping.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTStopping.CLTStopping.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distrib_obj</strong> – an instance of DiscreteDistribution</p></li>
+<li><p><strong>inflate</strong> – inflation factor when estimating variance</p></li>
+<li><p><strong>alpha</strong> – significance level for confidence interval</p></li>
+<li><p><strong>abs_tol</strong> – absolute error tolerance</p></li>
+<li><p><strong>rel_tol</strong> – relative error tolerance</p></li>
+<li><p><strong>n_init</strong> – initial number of samples</p></li>
+<li><p><strong>n_max</strong> – maximum number of samples</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="algorithms.stop.CLTStopping.CLTStopping.stopYet">
-<code class="sig-name descname">stopYet</code><span class="sig-paren">(</span><em class="sig-param">funObj: algorithms.integrand.Integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTStopping.CLTStopping.stopYet" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stopYet</code><span class="sig-paren">(</span><em class="sig-param">funObj</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.CLTStopping.CLTStopping.stopYet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine when to stop</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -97,86 +272,56 @@
 </div>
 
 
+           </div>
+           
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">qmcpy</a></h1>
-
-
-
-
-
-
-<p>
-<iframe src="https://ghbtns.com/github-btn.html?user=QMCSoftware&repo=QMCSoftware&type=watch&count=true&size=large&v=2"
-  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
-</p>
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data.html">Data Class</a></li>
-<li class="toctree-l1"><a class="reference internal" href="distribution.html">Distribution Class</a></li>
-<li class="toctree-l1"><a class="reference internal" href="integrand.html">Function Class</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Stop Class</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="integrand.html" title="previous chapter">Function Class</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2019, Illinois Institute of Technology.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/stop.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-    <a href="https://github.com/QMCSoftware/QMCSoftware" class="github">
-        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    <a href="https://github.com/QMCSoftware/QMCSoftware">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
     </a>
-    
 
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="util.html" class="btn btn-neutral float-right" title="Utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="distribution.html" class="btn btn-neutral float-left" title="Distribution Class" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Illinois Institute of Technology
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
     
-  </body>
+   
+
+</body>
 </html>

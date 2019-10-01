@@ -23,7 +23,7 @@ def summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj):
     s += h1%(type(dataObj).__name__,'Data Object')
     s += item_s%('n_samples_total',str(dataObj.n_samples_total))
     s += item_f%('t_total',dataObj.t_total)
-    s += item_s%('confidInt',str(dataObj.confidInt))
+    s += item_s%('confid_int',str(dataObj.confid_int))
     
     print(s)
     return 

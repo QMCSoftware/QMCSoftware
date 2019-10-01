@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Integrand Class &mdash; qmcpy 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Measure Class" href="measure.html" />
+    <link rel="prev" title="Data Class" href="data.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> qmcpy
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data Class</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Integrand Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measure.html">Measure Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distribution.html">Distribution Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stop.html">StoppingCriterion Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">Utilities</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qmcpy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Integrand Class</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-algorithms.integrand.__init__">
+<span id="integrand-class"></span><h1>Integrand Class<a class="headerlink" href="#module-algorithms.integrand.__init__" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="algorithms.integrand.__init__.Integrand">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.__init__.</code><code class="sig-name descname">Integrand</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="algorithms.integrand.__init__.Integrand.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and generate values <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for  <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
+<p>Any sublcass of Integrand must include the method, g(self, x, coordIndex)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nominal_value</strong> – <img class="math" src="_images/math/d520a12f1579170834c32ad5f656de081bbb36fe.png" alt="c"/> such that <img class="math" src="_images/math/4d6ee79634f7ec28b02c523bbb24bea9a167debe.png" alt="(c, \ldots, c) \in \mathcal{X}"/></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.integrand.__init__.Integrand.g">
+<em class="property">abstract </em><code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Original integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/>
+where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/>
+for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.integrand.__init__.Integrand.transform_variable">
+<code class="sig-name descname">transform_variable</code><span class="sig-paren">(</span><em class="sig-param">measure</em>, <em class="sig-param">distribution</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.transform_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method performs the necessary variable transformation to put the
+original integrand in the form required by the DiscreteDistributon
+object starting from the original Measure object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>measure</strong> (<a class="reference internal" href="distribution.html#algorithms.distribution.__init__.Measure" title="algorithms.distribution.__init__.Measure"><em>Measure</em></a>) – the Measure object that defines the integral</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="distribution.html#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete distribution object that is sampled from</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: transformed integrand</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.integrand.AsianCall"></span><dl class="class">
+<dt id="algorithms.integrand.AsianCall.AsianCall">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.AsianCall.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.AsianCall.AsianCall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and generate payoff values of an Asian Call option</p>
+<dl class="method">
+<dt id="algorithms.integrand.AsianCall.AsianCall.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">ignore</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.AsianCall.AsianCall.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Original integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/>
+where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/>
+for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.integrand.Keister"></span><dl class="class">
+<dt id="algorithms.integrand.Keister.Keister">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.Keister.</code><code class="sig-name descname">Keister</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.Keister.Keister" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and generate values <img class="math" src="_images/math/d03f853393db6b7cf2c25523b4a9f78790436922.png" alt="f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)"/> for <img class="math" src="_images/math/27881af6ffb368e623dfe6dc8343f138920bdfa5.png" alt="\mathbf{x} \in \mathbb{R}^d"/></p>
+<p>The standard example integrates the Keister integrand with respect to an IID Gaussian distribution with variance 1/2</p>
+<ol class="upperalpha simple" start="2">
+<li><ol class="upperalpha simple" start="4">
+<li><p>Keister, Multidimensional Quadrature Algorithms, <cite>Computers in Physics</cite>, <em>10</em>, pp.119-122, 1996.</p></li>
+</ol>
+</li>
+</ol>
+<dl class="method">
+<dt id="algorithms.integrand.Keister.Keister.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.Keister.Keister.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Original integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/>
+where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/>
+for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.integrand.Linear"></span><dl class="class">
+<dt id="algorithms.integrand.Linear.Linear">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.Linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.Linear.Linear" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="algorithms.integrand.Linear.Linear.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.Linear.Linear.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Original integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/>
+where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/>
+for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/QMCSoftware/QMCSoftware">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="measure.html" class="btn btn-neutral float-right" title="Measure Class" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="data.html" class="btn btn-neutral float-left" title="Data Class" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Illinois Institute of Technology
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

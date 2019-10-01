@@ -1,5 +1,5 @@
-Stop Class
-==========
+StoppingCriterion Class
+=======================
 
 .. automodule:: algorithms.stop.__init__
     :members:
