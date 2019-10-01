@@ -9,16 +9,16 @@ class Keister(Integrand):
 
     The standard example integrates the Keister integrand with respect to an IID Gaussian distribution with variance 1/2
 
-    B. D. Keister, Multidimensional Quadrature Algorithms,  \emph{Computers in Physics}, \textbf{10}, pp.\ 119-122, 1996.
+    B. D. Keister, Multidimensional Quadrature Algorithms, `Computers in Physics`, *10*, pp.\ 119-122, 1996.
     '''
-    
+
     def __init__(self, nominal_value=None):
         super().__init__(nominal_value=nominal_value)
 
-    def g(self, x, coordIndex):
+    def g(self, x, coord_index):
         # if the nominalValue = 0, this is efficient
         normx2 = (x**2).sum(1)
-        nCoordIndex = len(coordIndex)
+        nCoordIndex = len(coord_index)
         if nCoordIndex != self.dimension and self.nominalValue != 0:
             normx2 = normx2 + self.nominalValue**2 * (self.dimension - nCoordIndex)
         y = pi**(nCoordIndex/2)*cos(normx2**.5)

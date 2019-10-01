@@ -1,5 +1,5 @@
-Function Class
-==============
+Integrand Class
+===============
 
 .. automodule:: algorithms.integrand.__init__
     :members:

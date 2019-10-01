@@ -12,6 +12,10 @@
 #
 import os
 import sys
+import sphinx_rtd_theme
+from sphinx.ext.napoleon.docstring import GoogleDocstring
+# import sphinx_bootstrap_theme
+
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../')) # qmcpy
 sys.path.insert(0, os.path.abspath('../algorithms/'))
@@ -33,14 +37,37 @@ release = u'0.1'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.githubpages',
               'sphinx.ext.imgmath',
               'sphinx.ext.napoleon',
-              'sphinx.ext.graphviz']
+              'sphinx.ext.graphviz',
+              'sphinx.ext.intersphinx',
+              'sphinx_rtd_theme']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+napoleon_include_init_with_doc = True
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = False
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
+napoleon_use_keyword = True
+
+# intersphinx
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/', None),
+    'numpy': ('http://docs.scipy.org/doc/numpy/', None)
+}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -53,13 +80,11 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# Reference: Sphinx Themes, https://tinyurl.com/y3nwsml4
 
+"""
+# html_theme = 'alabaster'
 # Fork me on GitHub banner
 html_theme_options = {
     'font_size': '18px',
@@ -68,7 +93,20 @@ html_theme_options = {
     'github_button': True,
     'github_banner': True
 }
+"""
 
+html_theme = "sphinx_rtd_theme"
+html_show_sourcelink = False
+
+"""
+html_theme = 'bootstrap'
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+"""
+
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_static_path = ['_static']
 
 # -- Options for LaTeX output ---------------------------------------------
 

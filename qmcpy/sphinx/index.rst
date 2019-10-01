@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Qmcpy Documentation
-=================================
+====================
 
 .. toctree::
    :maxdepth: 2
@@ -12,9 +12,11 @@ Qmcpy Documentation
 
    algorithms
    data
-   distribution
    integrand
+   measure
+   distribution
    stop
+   util
 
 
 Indices and tables

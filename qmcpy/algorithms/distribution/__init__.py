@@ -7,13 +7,13 @@ class DiscreteDistribution(ABC):
     """ Specifies and generates the components of :math:`a_n \sum_{i=1}^n w_i \delta_{\mathbf{x}_i}(\cdot)` """
 
     def __init__(self, accepted_measures, trueD=None, distrib_data=None):
-        super().__init__()  
+        super().__init__()
         if trueD:
             self.trueD = trueD
             if type(self.trueD).__name__ not in accepted_measures:
                 raise MeasureCompatibilityError(type(self).__name__+' only accepts measures:'+str(accepted_measures))
             self.distrib_list = [type(self)() for i in range(len(self.trueD))]
-            for i in range(len(self)):    
+            for i in range(len(self)):
                 self[i].trueD = self.trueD[i]
                 self[i].distrib_data = distrib_data[i] if distrib_data else None
 
@@ -30,7 +30,7 @@ class DiscreteDistribution(ABC):
          coordIndex = which coordinates in sequence are needed
         """
         pass
-    
+
     # Magic Methods. Makes self[i]==self.distrib_list[i]
     def __len__(self): return len(self.distrib_list)
     def __iter__(self):
@@ -43,11 +43,11 @@ class DiscreteDistribution(ABC):
 
 class Measure(ABC):
     '''
-    Specifies the components of a general Measure used to define an
+    Specifies the components of a general measure used to define an
     integration problem or a sampling method
     '''
-    
-    def __init__(self,dimension=None,**kwargs):  
+
+    def __init__(self,dimension=None,**kwargs):
         self.dimension = dimension
         super().__init__()
         if dimension:
@@ -64,7 +64,7 @@ class Measure(ABC):
                 if len(kwargs[key]) != len(self.dimension):
                     raise MeasureDataError(key+" must be a numpy.ndarray (or list) of len(dimension)")
             self.measure_list = [type(self)() for i in range(len(self.dimension))]
-            for i in range(len(self)):    
+            for i in range(len(self)):
                 self[i].dimension = self.dimension[i]
                 for key,val in kwargs.items():
                     setattr(self[i],key,val[i])
