@@ -11,9 +11,9 @@ Qmcpy Documentation
    :caption: Contents:
 
    algorithms
-   AccumData
+   data
    distribution
-   function
+   integrand
    stop
 
 

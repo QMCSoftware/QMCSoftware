@@ -15,8 +15,8 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Function Class" href="function.html" />
-    <link rel="prev" title="Data Class" href="AccumData.html" />
+    <link rel="next" title="Function Class" href="integrand.html" />
+    <link rel="prev" title="Data Class" href="data.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -35,18 +35,10 @@
             
   <div class="section" id="module-algorithms.distribution.__init__">
 <span id="distribution-class"></span><h1>Distribution Class<a class="headerlink" href="#module-algorithms.distribution.__init__" title="Permalink to this headline">¶</a></h1>
-<p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
 <dl class="class">
 <dt id="algorithms.distribution.__init__.DiscreteDistribution">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.__init__.</code><code class="sig-name descname">DiscreteDistribution</code><span class="sig-paren">(</span><em class="sig-param">accepted_measures</em>, <em class="sig-param">trueD=None</em>, <em class="sig-param">distrib_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Specifies and generates the components of <img class="math" src="_images/math/05988151f920d05758ce7b4b9cdedb5aa88a2e9f.png" alt="a_n \sum_{i=1}^n w_i \delta_{\mathbf{x}_i}(\cdot)"/></dt><dd><dl class="simple">
-<dt>Any sublcass of DiscreteDistribution must include:</dt><dd><p>Methods: gen_distrib(self,nStart,nEnd,n,coordIndex)
-Properties: distrib_data,trueD</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<dd><p>Specifies and generates the components of <img class="math" src="_images/math/05988151f920d05758ce7b4b9cdedb5aa88a2e9f.png" alt="a_n \sum_{i=1}^n w_i \delta_{\mathbf{x}_i}(\cdot)"/></p>
 <dl class="method">
 <dt id="algorithms.distribution.__init__.DiscreteDistribution.gen_distrib">
 <em class="property">abstract </em><code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
@@ -65,13 +57,7 @@ Properties: distrib_data,trueD</p>
 integration problem or a sampling method</p>
 </dd></dl>
 
-<dl class="exception">
-<dt id="algorithms.distribution.__init__.MeasureCompatibilityError">
-<em class="property">exception </em><code class="sig-prename descclassname">algorithms.distribution.__init__.</code><code class="sig-name descname">MeasureCompatibilityError</code><a class="headerlink" href="#algorithms.distribution.__init__.MeasureCompatibilityError" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<span class="target" id="module-algorithms.distribution.Measures"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
-<dl class="class">
+<span class="target" id="module-algorithms.distribution.Measures"></span><dl class="class">
 <dt id="algorithms.distribution.Measures.BrownianMotion">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.Measures.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">timeVector=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.Measures.BrownianMotion" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -112,8 +98,7 @@ polynomial lattice rules.
 This code is specific for base 2 digital nets.</p>
 </dd></dl>
 
-<span class="target" id="module-algorithms.distribution.IIDDistribution"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
-<dl class="class">
+<span class="target" id="module-algorithms.distribution.IIDDistribution"></span><dl class="class">
 <dt id="algorithms.distribution.IIDDistribution.IIDDistribution">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.IIDDistribution.</code><code class="sig-name descname">IIDDistribution</code><span class="sig-paren">(</span><em class="sig-param">trueD=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">rngSeed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.IIDDistribution.IIDDistribution" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies and generates the components of <img class="math" src="_images/math/d59410904775e3c06b62ced7058f95f8e93c3029.png" alt="\dfrac{1}{n} \sum_{i=1}^n \delta_{\mathbf{x}_i}(\cdot)"/>
@@ -129,10 +114,9 @@ where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf4
 
 </dd></dl>
 
-<span class="target" id="module-algorithms.distribution.QuasiRandom"></span><p>Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin</p>
-<dl class="class">
+<span class="target" id="module-algorithms.distribution.QuasiRandom"></span><dl class="class">
 <dt id="algorithms.distribution.QuasiRandom.QuasiRandom">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.QuasiRandom.</code><code class="sig-name descname">QuasiRandom</code><span class="sig-paren">(</span><em class="sig-param">distrib_data=None</em>, <em class="sig-param">trueD=None</em>, <em class="sig-param">rngSeed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.QuasiRandom.QuasiRandom" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.QuasiRandom.</code><code class="sig-name descname">QuasiRandom</code><span class="sig-paren">(</span><em class="sig-param">trueD=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">rngSeed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.QuasiRandom.QuasiRandom" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="algorithms.distribution.QuasiRandom.QuasiRandom.gen_distrib">
 <code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=1</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.QuasiRandom.QuasiRandom.gen_distrib" title="Permalink to this definition">¶</a></dt>
@@ -173,9 +157,9 @@ where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf4
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AccumData.html">Data Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data Class</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Distribution Class</a></li>
-<li class="toctree-l1"><a class="reference internal" href="function.html">Function Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrand.html">Function Class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stop.html">Stop Class</a></li>
 </ul>
 
@@ -183,8 +167,8 @@ where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf4
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="AccumData.html" title="previous chapter">Data Class</a></li>
-      <li>Next: <a href="function.html" title="next chapter">Function Class</a></li>
+      <li>Previous: <a href="data.html" title="previous chapter">Data Class</a></li>
+      <li>Next: <a href="integrand.html" title="next chapter">Function Class</a></li>
   </ul></li>
 </ul>
 </div>
