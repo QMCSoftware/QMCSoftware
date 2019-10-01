@@ -1,5 +1,3 @@
-''' Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin '''
-
 from numpy import array, int64, log, random
 from numpy.core._multiarray_umath import zeros
 from third_party.magic_point_shop.latticeseq_b2 import latticeseq_b2
@@ -9,7 +7,7 @@ from .DigitalSeq import DigitalSeq
 
 class QuasiRandom(DiscreteDistribution):
 
-    def __init__(self, distrib_data=None, trueD=None, rngSeed=None):
+    def __init__(self, trueD=None, distrib_data=None, rngSeed=None):
         accepted_measures = ['Lattice','Sobol']
         if rngSeed: random.seed(rngSeed)
         super().__init__(accepted_measures, trueD, distrib_data)

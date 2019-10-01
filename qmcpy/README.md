@@ -57,9 +57,14 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 
 <hr>
 
-## Credit
+## Developers
 This package was originally developed in MATLAB by Fred Hickernell<br>
 Translated to Python by Sou-Cheng T. Choi and Aleksei Sorokin
+
+# Tips
+It may be helpful to create a virtual environment for this project<br>
+Packages and versions are compiled in requirements.txt<br>
+In order for the software to find packages, make sure .../qmcpy/ is in your path
 
 
 

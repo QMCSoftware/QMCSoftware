@@ -1,7 +1,6 @@
 import pandas as pd
 from third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
 
-
 class DigitalSeq(digitalseq_b2g):
     """
       Digital sequence point generator based on generating matrices.

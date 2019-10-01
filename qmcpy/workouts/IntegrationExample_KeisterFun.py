@@ -1,9 +1,8 @@
-'''
-Originally developed in MATLAB by Fred Hickernell. Translated to python by Sou-Cheng T. Choi and Aleksei Sorokin
+"""
 3 Dimensonal Keister Function
     Run: python workouts/IntegrationExample_KeisterFun.py
     Save Output: python workouts/IntegrationExample_KeisterFun.py  > outputs/ie_KeisterFun.txt
-'''
+"""
 
 from workouts import summary_qmc
 from algorithms.stop.CLTStopping import CLTStopping

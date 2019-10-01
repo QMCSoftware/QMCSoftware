@@ -1,7 +1,3 @@
-# Originally developed in MATLAB by Fred Hickernell. Translated to python by
-# Sou-Cheng T. Choi and Aleksei Sorokin
-
-
 def univ_repr(self, obj_list_s=None) -> str:
     """
     Clean way to represent object data.

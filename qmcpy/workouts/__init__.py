@@ -26,13 +26,4 @@ def summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj):
     s += item_s%('confidInt',str(dataObj.confidInt))
     
     print(s)
-    
-    '''
-    print()
-    print(stopObj)
-    print(measureObj)
-    print(funObj)
-    print(distribObj)
-    print(dataObj)
-    '''
     return 

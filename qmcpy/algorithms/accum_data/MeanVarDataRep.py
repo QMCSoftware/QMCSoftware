@@ -1,5 +1,3 @@
-''' Originally developed in MATLAB by Fred Hickernell. Translated to python
-by Sou-Cheng T. Choi and Aleksei Sorokin '''
 from time import process_time
 
 from algorithms.distribution import DiscreteDistribution
