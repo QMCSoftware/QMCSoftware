@@ -1,7 +1,7 @@
 from time import process_time
 
 from algorithms.distribution import DiscreteDistribution
-from algorithms.function import Fun
+from algorithms.integrand import Integrand
 from numpy import arange, finfo, float32, ones, zeros
 
 from . import AccumData
@@ -14,7 +14,7 @@ class MeanVarDataRep(AccumData):
 
     def __init__(self, nf, J):
         '''
-        nf = # function
+        nf = # integrands
         J = # streams
         '''
         super().__init__()
@@ -24,13 +24,13 @@ class MeanVarDataRep(AccumData):
         self.sig2hat = zeros(nf)
         self.flags = ones(nf)
 
-    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Fun) -> None:
+    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Integrand) -> None:
         """
         Update data
 
         Args:
             distrib_obj: an instance of DiscreteDistribution
-            fun_obj: an instance of function
+            fun_obj: an instance of Integrand
 
         Returns:
             None
@@ -40,7 +40,7 @@ class MeanVarDataRep(AccumData):
             if self.flags[
                 i] == 0:  # mean of fun_obj[i] already sufficiently estimated
                 continue
-            tStart = process_time()  # time the function values
+            tStart = process_time()  # time the integrand values
             dim = distrib_obj[i].trueD.dimension
             set_x = distrib_obj[i].gen_distrib(self.nextN[i], dim,
                                                self.J)  # set of j

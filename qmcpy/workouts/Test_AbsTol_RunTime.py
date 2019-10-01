@@ -3,7 +3,7 @@ from time import time
 from algorithms.distribution.Measures import *
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
-from algorithms.function.AsianCallFun import AsianCallFun
+from algorithms.integrand.AsianCallFun import AsianCallFun
 from algorithms.integrate import integrate
 from algorithms.stop.CLTRep import CLTRep
 from algorithms.stop.CLTStopping import CLTStopping

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from math import inf, nan
 
 from algorithms.distribution import DiscreteDistribution
-from algorithms.function import Fun
+from algorithms.integrand import Integrand
 from numpy import array
 
 from .. import univ_repr
@@ -25,19 +25,19 @@ class AccumData(ABC):
         self.timeUsed = array([])  # time used so far
         self.nSamplesUsed = array([])  # number of samples used so far
         self.confidInt = array([-inf, inf])  # error bound on the solution
-        self.costF = array([])  # time required to compute function values
+        self.costF = array([])  # time required to compute integrand values
         self._timeStart = None  # hidden/private
 
     # Abstract Methods
     @abstractmethod
-    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Fun,
+    def update_data(self, distrib_obj: DiscreteDistribution, fun_obj: Integrand,
                     decomp_type):
         """
         Update the accumulated data
 
         Args:
             distrib_obj: an instance of DiscreteDistribution
-            fun_obj: an instance of function
+            fun_obj: an instance of Integrand
             decomp_type:
 
         Returns:

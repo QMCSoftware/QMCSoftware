@@ -5,8 +5,8 @@ from numpy import arange
 from algorithms.distribution.Measures import IIDZeroMeanGaussian,StdGaussian,BrownianMotion,Lattice
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
-from algorithms.function.KeisterFun import KeisterFun
-from algorithms.function.AsianCallFun import AsianCallFun
+from algorithms.integrand.KeisterFun import KeisterFun
+from algorithms.integrand.AsianCallFun import AsianCallFun
 from algorithms.stop.CLTStopping import CLTStopping
 from algorithms.stop.CLTRep import CLTRep
 from algorithms.integrate import integrate

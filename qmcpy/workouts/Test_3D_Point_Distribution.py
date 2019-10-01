@@ -8,7 +8,7 @@ from workouts import summary_qmc
 from algorithms.distribution.Measures import IIDZeroMeanGaussian,StdGaussian,Lattice
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
-from algorithms.function.KeisterFun import KeisterFun
+from algorithms.integrand.KeisterFun import KeisterFun
 
 dim = 2
 j = 3

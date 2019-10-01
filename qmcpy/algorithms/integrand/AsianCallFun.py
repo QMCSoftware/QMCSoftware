@@ -1,8 +1,8 @@
 from numpy import exp, maximum
 
-from . import Fun
+from . import Integrand
 
-class AsianCallFun(Fun):
+class AsianCallFun(Integrand):
     ''' Specify and generate payoff values of an Asian Call option'''
     def __init__(self, BMmeasure=None, volatility=.5, S0=30, K=25, nominal_value=None):
         super().__init__(nominal_value=nominal_value)

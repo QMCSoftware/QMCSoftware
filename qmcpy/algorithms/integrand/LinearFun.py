@@ -1,6 +1,6 @@
-from . import Fun
+from . import Integrand
 
-class LinearFun(Fun):
+class LinearFun(Integrand):
     
     def __init__(self, nominal_value=None):
         super().__init__(nominal_value=nominal_value)

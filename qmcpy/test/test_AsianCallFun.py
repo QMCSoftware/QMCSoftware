@@ -1,6 +1,6 @@
 import unittest
 from numpy import arange
-from algorithms.function.AsianCallFun import AsianCallFun
+from algorithms.integrand.AsianCallFun import AsianCallFun
 from algorithms.distribution.Measures import BrownianMotion
 
 class Test_AsianCallFun(unittest.TestCase):

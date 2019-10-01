@@ -12,7 +12,7 @@ from algorithms.stop.CLTRep import CLTRep
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
 from algorithms.integrate import integrate
-from algorithms.function.AsianCallFun import AsianCallFun
+from algorithms.integrand.AsianCallFun import AsianCallFun
 from algorithms.distribution.Measures import *
 
 # IID std_uniform

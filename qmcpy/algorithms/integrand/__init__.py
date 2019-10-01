@@ -6,11 +6,11 @@ from scipy.stats import norm
 from .. import univ_repr
 
 
-class Fun(ABC):
+class Integrand(ABC):
     def __init__(self, nominal_value=None):
         """
         Specify and generate values :math:`f(\mathbf{x})` for :math:`\mathbf{x}
-        \in \mathcal{X}`. Any sublcass of Fun must include the method,
+        \in \mathcal{X}`. Any sublcass of Integrand must include the method,
         g(self, x, coordIndex)
 
         Args:
@@ -19,7 +19,7 @@ class Fun(ABC):
         """
         super().__init__()
         self.nominalValue = nominal_value if nominal_value else 0
-        self.f = None  # function handle of integrand after transformation
+        self.f = None  # integrand handle of integrand after transformation
         self.dimension = 2  # dimension of the domain, :math:`d`
         self.fun_list = [self]
 
@@ -27,7 +27,7 @@ class Fun(ABC):
     @abstractmethod
     def g(self, x, coordIndex):
         """
-        Original function to be integrated
+        Original integrand to be integrated
 
         Args:
             x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` row of an :math:`n \cdot |\mathfrak{u}|` matrix
@@ -42,21 +42,21 @@ class Fun(ABC):
     def transform_variable(self, msr_obj, dstr_obj):
         """
         This method performs the necessary variable transformation to put the
-        original function in the form required by the DiscreteDistributon
+        original integrand in the form required by the DiscreteDistributon
         object starting from the original Measure object
 
         Args:
             msr_obj: the Measure object that defines the integral
             dstr_obj: the discrete distribution object that is sampled from
 
-        Returns: transformed function
+        Returns: transformed integrand
 
         """
         for i in range(len(self)):
             try: sample_from = dstr_obj[i].trueD.mimics # QuasiRandom sampling
             except: sample_from = type(dstr_obj[i].trueD).__name__ # IIDDistribution sampling
             transform_to = type(msr_obj[i]).__name__ # distribution the sampling attempts to mimic
-            self[i].dimension = dstr_obj[i].trueD.dimension # the function needs the dimension
+            self[i].dimension = dstr_obj[i].trueD.dimension # the integrand needs the dimension
             if transform_to==sample_from: # no need to transform
                 self[i].f = lambda xu,coordIdex,i=i: self[i].g(xu,coordIdex)
             elif transform_to== 'IIDZeroMeanGaussian' and sample_from== 'StdGaussian': # multiply by the likelihood ratio
