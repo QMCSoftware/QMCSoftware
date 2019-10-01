@@ -2,18 +2,18 @@ from numpy import exp, maximum
 
 from . import Integrand
 
-class AsianCallFun(Integrand):
+class AsianCall(Integrand):
     ''' Specify and generate payoff values of an Asian Call option'''
-    def __init__(self, BMmeasure=None, volatility=.5, S0=30, K=25, nominal_value=None):
+    def __init__(self, BMmeasure=None, volatility=.5, start_price=30, strike_price=25, nominal_value=None):
         super().__init__(nominal_value=nominal_value)
         self.BMmeasure = BMmeasure
         self.volatility = volatility
-        self.S0 = S0
-        self.K = K
+        self.S0 = start_price
+        self.K = strike_price
         self.dimFac = 0
         if self.BMmeasure:
             nBM = len(BMmeasure)
-            self.fun_list = [AsianCallFun() for i in range(nBM)] 
+            self.fun_list = [AsianCall() for i in range(nBM)] 
             self[0].BMmeasure = self.BMmeasure[0]
             self[0].dimFac = 0
             self[0].dimension = self.BMmeasure[0].dimension

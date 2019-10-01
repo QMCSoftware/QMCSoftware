@@ -3,7 +3,7 @@ from time import time
 from algorithms.distribution.Measures import *
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
-from algorithms.integrand.AsianCallFun import AsianCallFun
+from algorithms.integrand.AsianCall import AsianCall
 from algorithms.integrate import integrate
 from algorithms.stop.CLTRep import CLTRep
 from algorithms.stop.CLTStopping import CLTStopping
@@ -39,7 +39,7 @@ def QMC_Wrapper(stopObj,distribObj,name):
     #try:
     measureObj = BrownianMotion(
         timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
-    OptionObj = AsianCallFun(measureObj)
+    OptionObj = AsianCall(measureObj)
     sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
     print(item_f%(name,sol,dataObj.timeUsed))
     return sol,dataObj.timeUsed

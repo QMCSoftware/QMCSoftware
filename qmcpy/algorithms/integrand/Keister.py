@@ -3,7 +3,7 @@ from numpy import cos, pi
 from . import Integrand
 
 
-class KeisterFun(Integrand):
+class Keister(Integrand):
     '''
     Specify and generate values :math:`f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)` for :math:`\mathbf{x} \in \mathbb{R}^d`
 

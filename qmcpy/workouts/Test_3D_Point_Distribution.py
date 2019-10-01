@@ -8,7 +8,7 @@ from workouts import summary_qmc
 from algorithms.distribution.Measures import IIDZeroMeanGaussian,StdGaussian,Lattice
 from algorithms.distribution.IIDDistribution import IIDDistribution
 from algorithms.distribution.QuasiRandom import QuasiRandom
-from algorithms.integrand.KeisterFun import KeisterFun
+from algorithms.integrand.Keister import Keister
 
 dim = 2
 j = 3
@@ -17,7 +17,7 @@ n = 32
 var = 1/2
 coordIdx = arange(1,dim+1)
 
-fun = KeisterFun()
+fun = Keister()
 measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
 distribObj = IIDDistribution(trueD=StdGaussian(dimension=[dim]), rngSeed=7)
 fun = fun.transform_variable(measureObj, distribObj)
@@ -29,14 +29,14 @@ from algorithms.stop.CLTRep import CLTRep
 from algorithms.stop.CLTStopping import CLTStopping
 from algorithms.integrate import integrate
 #     CLTRep Example
-funObj = KeisterFun()
+funObj = Keister()
 distribObj = QuasiRandom(trueD=Lattice(dimension=[dim]),rngSeed=7)
 stopObj = CLTRep(distribObj,nInit=n,nMax=2**15,absTol=.01,J=j)
 measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[var])
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 #     CLT Example
-funObj = KeisterFun()
+funObj = Keister()
 distribObj = IIDDistribution(trueD=StdGaussian(dimension=[dim]),rngSeed=7)
 stopObj = CLTStopping(distribObj,nInit=16,absTol=.3,alpha=.01,inflate=1.2)
 measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[1/2])
