@@ -1,18 +1,18 @@
 from time import time
 
 from algorithms.distribution import DiscreteDistribution, Measure
-from algorithms.function import Fun
+from algorithms.integrand import Integrand
 from algorithms.stop import StoppingCriterion
 
 
-def integrate(fun_obj: Fun, measure_obj: Measure,
+def integrate(fun_obj: Integrand, measure_obj: Measure,
               distrib_obj: DiscreteDistribution,
               stop_obj: StoppingCriterion) -> tuple:
     """
     Specify and generate values :math:`f(\mathbf{x})` for :math:`\mathbf{x} \in \mathcal{X}`
 
     Args:
-        fun_obj: an object from class Fun
+        fun_obj: an object from class Integrand
         measure_obj: an object from class Measure
         distrib_obj: an object from class DiscreteDistribution
         stop_obj: an object from class StoppingCriterion
