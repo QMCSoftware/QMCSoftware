@@ -21,6 +21,11 @@ class DistributionCompatibilityError(Exception):
     Class for raising error about incompatible distribution
     """
 
+class TransformError(Exception):
+    """
+    Class for raising error about transforming function to accomodate distributuion
+    """
+
 
 # Warnings
 class MaxSamplesWarning(Warning):
