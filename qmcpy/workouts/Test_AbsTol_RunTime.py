@@ -1,12 +1,12 @@
 from time import time
 
-from algorithms.distribution.Measures import *
-from algorithms.distribution.IIDDistribution import IIDDistribution
-from algorithms.distribution.QuasiRandom import QuasiRandom
-from algorithms.integrand.AsianCall import AsianCall
+from algorithms.measures.measures import *
+from algorithms.distribution.iid_distribution import IIDDistribution
+from algorithms.distribution.quasi_random import QuasiRandom
+from algorithms.integrand.asian_call import AsianCall
 from algorithms.integrate import integrate
-from algorithms.stop.CLTRep import CLTRep
-from algorithms.stop.CLTStopping import CLTStopping
+from algorithms.stop.clt_rep import CLTRep
+from algorithms.stop.clt_stopping import CLTStopping
 from matplotlib import pyplot as mpl_plot
 from numpy import arange, array
 import numpy as np
@@ -23,7 +23,7 @@ def plot(title,xlabel,ylabel,xdata,ydata,outF):
     mpl_plot.legend(
         loc = 'lower left',
         bbox_to_anchor = (0.0, 1.01),
-        ncol = 2, 
+        ncol = 2,
         borderaxespad = 0,
         frameon = False,
         prop = {'size': 14})
@@ -46,39 +46,39 @@ def QMC_Wrapper(stopObj,distribObj,name):
     #except:
     #    print(item_s%(name,'',''))
     #    return '',''
-    
+
 def comp_Clt_vs_cltRep_runtimes(abstols):
-    
+
     df_metrics = pd.DataFrame({'abs_tol':[],
         'CLT_stdUniform_sol':[],     'CLT_stdUniform_runTime':[],
         'CLT_stdGaussian_sol':[],    'CLT_stdGaussian_runTime':[],
         'CLT_Rep_lattice_sol':[],    'CLT_Rep_lattice_runTime':[],
         'CLT_Rep_Sobol_sol':[],      'CLT_Rep_Sobol_runTime':[]})
-    for i,abs_tol in enumerate(abstols):        
+    for i,abs_tol in enumerate(abstols):
         print('abs_tol: %-10.3f'%abs_tol)
         results = [] # hold row of DataFrame
         results.append(abs_tol)
 
         # CLT_stdUniform
-        distribObj = IIDDistribution(trueD=StdUniform(dimension=[4, 16, 64]), rngSeed=7)
+        distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[4, 16, 64]), rngSeed=7)
         stopObj = CLTStopping(distribObj,abs_tol=abs_tol)
-        mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdUniform')    
-        results.extend([mu,t])
-        
-        # CLT_stdGaussian
-        distribObj = IIDDistribution(trueD=StdGaussian(dimension=[4, 16, 64]), rngSeed=7)
-        stopObj = CLTStopping(distribObj,abs_tol=abs_tol)
-        mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdGaussian')    
+        mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdUniform')
         results.extend([mu,t])
 
-        # CLT_Rep_lattice      
-        distribObj = QuasiRandom(trueD=Lattice(dimension=[4,16,64]),rngSeed=7)
+        # CLT_stdGaussian
+        distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[4, 16, 64]), rngSeed=7)
+        stopObj = CLTStopping(distribObj,abs_tol=abs_tol)
+        mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdGaussian')
+        results.extend([mu,t])
+
+        # CLT_Rep_lattice
+        distribObj = QuasiRandom(true_distribution=Lattice(dimension=[4,16,64]),rngSeed=7)
         stopObj = CLTRep(distribObj,n_max=2**20,abs_tol=abs_tol)
-        mu,t = QMC_Wrapper(stopObj,distribObj,'lattice')    
+        mu,t = QMC_Wrapper(stopObj,distribObj,'lattice')
         results.extend([mu,t])
 
         # CLT_Rep_sobol
-        distribObj = QuasiRandom(trueD=Sobol(dimension=[4, 16, 64]), rngSeed=7)
+        distribObj = QuasiRandom(true_distribution=Sobol(dimension=[4, 16, 64]), rngSeed=7)
         stopObj = CLTRep(distribObj,n_max=2**20,abs_tol=abs_tol)
         mu,t = QMC_Wrapper(stopObj,distribObj,'sobol')
         results.extend([mu,t])
@@ -87,13 +87,13 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
     return df_metrics
 
 if __name__ == '__main__':
-    outF = 'outputs/Compare_TrueD_and_StoppingCriterion_vs_Abstol'
+    outF = 'outputs/Compare_true_distribution_and_StoppingCriterion_vs_Abstol'
     # Run Test
-    
-    absTols = arange(.001,.051,.002) # arange(.01,.06,.01)
+
+    absTols = arange(.01,.051,.002) # arange(.01,.06,.01)
     df_metrics = comp_Clt_vs_cltRep_runtimes(absTols)
     df_metrics.to_csv(outF+'.csv',index=False)
-    
+
     # Gen Plot
     df = pd.read_csv(outF+'.csv')
     plot(title = 'Integration Time by Absolute Tolerance \nfor Multi-level Asian Option Function',

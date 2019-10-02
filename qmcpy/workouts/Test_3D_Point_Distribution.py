@@ -5,10 +5,10 @@ from numpy import arange, linspace, meshgrid, random, zeros
 random.seed(7)
 
 from workouts import summary_qmc
-from algorithms.distribution.Measures import IIDZeroMeanGaussian,StdGaussian,Lattice
-from algorithms.distribution.IIDDistribution import IIDDistribution
-from algorithms.distribution.QuasiRandom import QuasiRandom
-from algorithms.integrand.Keister import Keister
+from algorithms.measures.measures import IIDZeroMeanGaussian,StdGaussian,Lattice
+from algorithms.distribution.iid_distribution import IIDDistribution
+from algorithms.distribution.quasi_random import QuasiRandom
+from algorithms.integrand.keister import Keister
 
 dim = 2
 j = 3
@@ -19,25 +19,25 @@ coordIdx = arange(1,dim+1)
 
 fun = Keister()
 measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
-distribObj = IIDDistribution(trueD=StdGaussian(dimension=[dim]), rngSeed=7)
+distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]), rngSeed=7)
 fun = fun.transform_variable(measureObj, distribObj)
 
 # Examples for generating 'pregen' figure's constants
 '''
 import sys
-from algorithms.stop.CLTRep import CLTRep
-from algorithms.stop.CLTStopping import CLTStopping
+from algorithms.stop.clt_rep import CLTRep
+from algorithms.stop.clt_stopping import CLTStopping
 from algorithms.integrate import integrate
 #     CLTRep Example
 funObj = Keister()
-distribObj = QuasiRandom(trueD=Lattice(dimension=[dim]),rngSeed=7)
+distribObj = QuasiRandom(true_distribution=Lattice(dimension=[dim]),rngSeed=7)
 stopObj = CLTRep(distribObj,n_init=n,n_max=2**15,abs_tol=.01,J=j)
 measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[var])
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
 summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj)
 #     CLT Example
 funObj = Keister()
-distribObj = IIDDistribution(trueD=StdGaussian(dimension=[dim]),rngSeed=7)
+distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]),rngSeed=7)
 stopObj = CLTStopping(distribObj,n_init=16,abs_tol=.3,alpha=.01,inflate=1.2)
 measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[1/2])
 sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
@@ -78,7 +78,7 @@ for idx,ax in enumerate([ax1,ax2,ax3]):
     points_distrib = zeros((n,dim+1))
     if plotType == 'lattice':
         muhat = zeros(j)
-        set_x = QuasiRandom().get_RS_lattice_b2(n,dim,j) 
+        set_x = QuasiRandom().get_RS_lattice_b2(n,dim,j)
         for i,xu in enumerate(set_x):
             points_distrib[:,:2] = xu
             points_distrib[:,2] = fun.f(points_distrib[:,:2],coordIdx)
@@ -111,7 +111,7 @@ for idx,ax in enumerate([ax1,ax2,ax3]):
     ax.set_ylabel('$x_2$',fontdict={'fontsize': 14})
     ax.set_zlabel('$f\:(x_1,x_2)$',fontdict={'fontsize': 14})
     ax.view_init(20,45)
-    
+
 # Output
 mpl_plt.savefig('outputs/Three_3d_SurfaceScatters.png',
         dpi = 500,

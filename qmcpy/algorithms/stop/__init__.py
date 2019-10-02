@@ -1,3 +1,6 @@
+"""
+Abstract class for defining stopping conditions for qmcpy algorithms
+"""
 from abc import ABC, abstractmethod
 
 from algorithms.distribution import DiscreteDistribution
@@ -13,31 +16,28 @@ class StoppingCriterion(ABC):
         Args:
             distribution (DiscreteDistribution): an instance of DiscreteDistribution
             allowed_distribs: distribution's compatible with the StoppingCriterion
-            abs_tol: absolute error tolerance
-            rel_tol: relative error tolerance
-            n_init: initial number of samples
-            n_max: maximum number of samples
+            abs_tol (float): absolute error tolerance
+            rel_tol (float): relative error tolerance
+            n_init (int): initial number of samples
+            n_max (int): maximum number of samples
         """
         if type(distribution).__name__ not in allowed_distribs:
-                raise DistributionCompatibilityError(type(self).__name__+' only accepts distributions:'+str(allowed_distribs))
+            error_message = type(self).__name__ + ' only accepts distributions:'\
+                            + str(allowed_distribs)
+            raise DistributionCompatibilityError(error_message)
         super().__init__()
-        self.abs_tol = abs_tol if abs_tol else 1e-2 # absolute tolerance, $ d$
-        self.rel_tol = rel_tol if rel_tol else 0 # relative tolerance, $ d$
-        self.n_init = n_init if n_init else 1024 # initial sample size
-        self.n_max = n_max if n_max else 1e8 # maximum number of samples allowed
+        self.abs_tol = abs_tol if abs_tol else 1e-2
+        self.rel_tol = rel_tol if rel_tol else 0
+        self.n_init = n_init if n_init else 1024
+        self.n_max = n_max if n_max else 1e8
 
     @abstractmethod
-    def stopYet(self, distribution): # distribution = data or summary of data computed already
+    def stop_yet(self): # distribution = data or summary of data computed already
         """
         Determine when to stop
 
-        Args:
-            distribution: an instance of DiscreteDistribution
-
-        Returns:
-            None
-
         """
-        pass
 
-    def __repr__(self): return univ_repr(self)
+
+    def __repr__(self):
+        return univ_repr(self)

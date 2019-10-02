@@ -3,10 +3,11 @@ Definition for abstract class, AccumData
 """
 from abc import ABC, abstractmethod
 from math import inf, nan
-from numpy import array
 
 from algorithms.distribution import DiscreteDistribution
 from algorithms.integrand import Integrand
+from numpy import array
+
 from .. import univ_repr
 
 

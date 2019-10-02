@@ -1,0 +1,962 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Algorithms &mdash; qmcpy 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Quasi-Monte Carlo Community Software" href="front_matter.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> qmcpy
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="front_matter.html">Quasi-Monte Carlo Community Software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="front_matter.html#license">License</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Algorithms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-integrate">Integrate Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.integrand.__init__">Integrand Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.measures.__init__">Measure Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.distribution.__init__">Distribution Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.accum_data.__init__">Data Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.stop.__init__">StoppingCriterion Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-__init__">Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qmcpy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Algorithms</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="algorithms">
+<h1>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-integrate">
+<span id="integrate-method"></span><h2>Integrate Method<a class="headerlink" href="#module-integrate" title="Permalink to this headline">¶</a></h2>
+<p>Main driver for qmcpy</p>
+<dl class="function">
+<dt id="integrate.integrate">
+<code class="sig-prename descclassname">integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">measure</em>, <em class="sig-param">distribution</em>, <em class="sig-param">stopping_criterion</em><span class="sig-paren">)</span><a class="headerlink" href="#integrate.integrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and compute integral of <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#algorithms.integrand.__init__.Integrand" title="algorithms.integrand.__init__.Integrand"><em>Integrand</em></a>) – an object from class Integrand</p></li>
+<li><p><strong>measure</strong> (<a class="reference internal" href="#algorithms.measures.__init__.Measure" title="algorithms.measures.__init__.Measure"><em>Measure</em></a>) – an object from class Measure</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class DiscreteDistribution</p></li>
+<li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#algorithms.stop.__init__.StoppingCriterion" title="algorithms.stop.__init__.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class StoppingCriterion</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>tuple containing:</p>
+<blockquote>
+<div><p><strong>solution</strong> (float): estimated value of the integral</p>
+<p><strong>data</strong> (AccumData): other information such as number of
+sampling points used to obtain the estimate</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.integrand.__init__">
+<span id="integrand-class"></span><h2>Integrand Class<a class="headerlink" href="#module-algorithms.integrand.__init__" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.integrand.__init__.Integrand">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.__init__.</code><code class="sig-name descname">Integrand</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="algorithms.integrand.__init__.Integrand.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and generate values <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for  <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
+<p>Any sublcass of Integrand must include the method, g(self, x, coordIndex)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nominal_value</strong> – <img class="math" src="_images/math/d520a12f1579170834c32ad5f656de081bbb36fe.png" alt="c"/> such that <img class="math" src="_images/math/4d6ee79634f7ec28b02c523bbb24bea9a167debe.png" alt="(c, \ldots, c) \in \mathcal{X}"/></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.integrand.__init__.Integrand.g">
+<em class="property">abstract </em><code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Original integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/>
+where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/>
+for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.integrand.__init__.Integrand.transform_variable">
+<code class="sig-name descname">transform_variable</code><span class="sig-paren">(</span><em class="sig-param">measure</em>, <em class="sig-param">distribution</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.transform_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method performs the necessary variable transformation to put the
+original integrand in the form required by the DiscreteDistributon
+object starting from the original Measure object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>measure</strong> (<a class="reference internal" href="#algorithms.measures.__init__.Measure" title="algorithms.measures.__init__.Measure"><em>Measure</em></a>) – the Measure object that defines the integral</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete distribution object that is sampled from</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: transformed integrand</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.integrand.asian_call"></span><dl class="class">
+<dt id="algorithms.integrand.asian_call.AsianCall">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.asian_call.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.asian_call.AsianCall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and generate payoff values of an Asian Call option</p>
+<dl class="method">
+<dt id="algorithms.integrand.asian_call.AsianCall.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">ignore</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.asian_call.AsianCall.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Original integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/>
+where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/>
+for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.integrand.keister"></span><dl class="class">
+<dt id="algorithms.integrand.keister.Keister">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.keister.</code><code class="sig-name descname">Keister</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and generate values <img class="math" src="_images/math/d03f853393db6b7cf2c25523b4a9f78790436922.png" alt="f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)"/> for <img class="math" src="_images/math/27881af6ffb368e623dfe6dc8343f138920bdfa5.png" alt="\mathbf{x} \in \mathbb{R}^d"/></p>
+<p>The standard example integrates the Keister integrand with respect to an IID Gaussian distribution with variance 1/2</p>
+<ol class="upperalpha simple" start="2">
+<li><ol class="upperalpha simple" start="4">
+<li><p>Keister, Multidimensional Quadrature Algorithms, <cite>Computers in Physics</cite>, <em>10</em>, pp.119-122, 1996.</p></li>
+</ol>
+</li>
+</ol>
+<dl class="method">
+<dt id="algorithms.integrand.keister.Keister.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.keister.Keister.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Original integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/>
+where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/>
+for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.integrand.linear"></span><dl class="class">
+<dt id="algorithms.integrand.linear.Linear">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="algorithms.integrand.linear.Linear.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.linear.Linear.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Original integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/>
+where if <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/>
+for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.measures.__init__">
+<span id="measure-class"></span><h2>Measure Class<a class="headerlink" href="#module-algorithms.measures.__init__" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.measures.__init__.Measure">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.__init__.</code><code class="sig-name descname">Measure</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.__init__.Measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the components of a general measure used to define an
+integration problem or a sampling method</p>
+</dd></dl>
+
+<span class="target" id="module-algorithms.measures.measures"></span><dl class="class">
+<dt id="algorithms.measures.measures.BrownianMotion">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">timeVector=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.BrownianMotion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="algorithms.measures.measures.IIDZeroMeanGaussian">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">IIDZeroMeanGaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">variance=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.IIDZeroMeanGaussian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="algorithms.measures.measures.Lattice">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Lattice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="algorithms.measures.measures.Sobol">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Sobol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="algorithms.measures.measures.StdGaussian">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">StdGaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdGaussian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="algorithms.measures.measures.StdUniform">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">StdUniform</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdUniform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.distribution.__init__">
+<span id="distribution-class"></span><h2>Distribution Class<a class="headerlink" href="#module-algorithms.distribution.__init__" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.distribution.__init__.DiscreteDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.__init__.</code><code class="sig-name descname">DiscreteDistribution</code><span class="sig-paren">(</span><em class="sig-param">accepted_measures</em>, <em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies and generates the components of <img class="math" src="_images/math/6b67c91efdaf7452973fdc14df173d5a08325cfa.png" alt="a_n \sum_{i=1}^n w_i
+\delta_{\mathbf{x}_i}(\cdot)"/></p>
+<dl class="attribute">
+<dt id="algorithms.distribution.__init__.DiscreteDistribution.distribution_list">
+<code class="sig-name descname">distribution_list</code><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.distribution_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of DiscreteDistribution instances</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="algorithms.distribution.__init__.DiscreteDistribution.true_distribution">
+<code class="sig-name descname">true_distribution</code><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.true_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>true distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution">DiscreteDistribution</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.__init__.DiscreteDistribution.gen_distrib">
+<em class="property">abstract </em><code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – value of <img class="math" src="_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/> used to determine <img class="math" src="_images/math/e9f4d366f1d155ec8c37d785708c0c47e20de43d.png" alt="a_n"/></p></li>
+<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
+<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.distribution.iid_distribution"></span><dl class="class">
+<dt id="algorithms.distribution.iid_distribution.IIDDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.iid_distribution.</code><code class="sig-name descname">IIDDistribution</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">rngSeed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.iid_distribution.IIDDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies and generates the components of <img class="math" src="_images/math/d59410904775e3c06b62ced7058f95f8e93c3029.png" alt="\dfrac{1}{n} \sum_{i=1}^n \delta_{\mathbf{x}_i}(\cdot)"/>
+where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf45517bb.png" alt="\mathbf{x}_i"/> are IIDDistribution uniform on <img class="math" src="_images/math/38fbdb5f0cd005023c1bb115f01c323f34f20446.png" alt="[0,1]^d"/> or IIDDistribution standard Gaussian</p>
+<dl class="method">
+<dt id="algorithms.distribution.iid_distribution.IIDDistribution.gen_distrib">
+<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=1</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.iid_distribution.IIDDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – value of <img class="math" src="_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/> used to determine <img class="math" src="_images/math/e9f4d366f1d155ec8c37d785708c0c47e20de43d.png" alt="a_n"/></p></li>
+<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
+<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.distribution.quasi_random"></span><dl class="class">
+<dt id="algorithms.distribution.quasi_random.QuasiRandom">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.quasi_random.</code><code class="sig-name descname">QuasiRandom</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">rngSeed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="algorithms.distribution.quasi_random.QuasiRandom.gen_distrib">
+<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=1</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – value of <img class="math" src="_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/> used to determine <img class="math" src="_images/math/e9f4d366f1d155ec8c37d785708c0c47e20de43d.png" alt="a_n"/></p></li>
+<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
+<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.distribution.digital_seq"></span><p>Sobol sequence generator</p>
+<dl class="class">
+<dt id="algorithms.distribution.digital_seq.DigitalSeq">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.digital_seq.</code><code class="sig-name descname">DigitalSeq</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.digital_seq.DigitalSeq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Digital sequence point generator based on generating matrices.</p>
+<p>This sequence generator can take classical (m by m) generating matrices
+or higher-order (alpha m by m) generating matrices from interlaced
+digital nets, interlaced polynomial lattice rules or higher-order
+polynomial lattice rules.  This code is specific for base 2 digital nets.</p>
+<dl class="method">
+<dt id="algorithms.distribution.digital_seq.DigitalSeq.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.digital_seq.DigitalSeq.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a digital sequence point generator given a list of
+generating matrices.</p>
+<p>Each generating matrix in the list is represented by a list of
+integer representation of its columns with the least significant
+bit at the top row.
+E.g., the upper triangular matrix with all ones is represented as
+[ 1, 3, 7, 15, … ]
+The number of columns (i.e., the length of the list above
+representation for a generator matrix) determines m and then the
+number of points one can generate is 2**m.
+Only the length of the first generating matrix Cs[0] is checked,
+the others need to be at least this length.</p>
+<p>The number of bits needed to represent all columns of all generating
+matrices is the precision “t” with which the points will be
+constructed.</p>
+<p>For a classical net t = m as we have square m by m generating matrices.
+For higher order (e.g., through interlacing) nets t = alpha m where
+alpha is the rate of convergence aimed for in approximating integrals
+(in the function space setting used to construct or analyse the
+generating matrices).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Cs</strong> – generating matrices as a list of lists, see description above;
+or, if Cs is a string it will be interpreted as a filename
+and the generating matrices will be load from this file</p></li>
+<li><p><strong>kstart</strong> – the index of the point from which you want this instance to
+start, the first point is 0</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Example usage with a simply unit matrix and the powers of the
+polynomial
+(X+1) over Z_2[X]. The first dimension is then the van der Corput
+sequence. The second matrix is the choice of the second dimension of
+the sobol’ and Niederreiter sequences.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C1</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="p">]</span>  <span class="c1"># van der Corput sequence = identity matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C2</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="p">]</span>  <span class="c1"># here we build the 2nd matrix of the sobol&#39; and Niederreiter seq</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span> <span class="n">C2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">C2</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="n">C2</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">C1</span><span class="p">,</span> <span class="n">C2</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">digitalseq_b2g</span><span class="p">(</span><span class="n">Cs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">cur</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">seq</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>[[0, 0], [16, 16], [24, 8], [8, 24], [12, 12], [28, 28], [20, 4],
+[4, 20], [6, 10], [22, 26], [30, 2], [14, 18], [10, 6], [26, 22],
+[18, 14], [2, 30], [3, 15], [19, 31], [27, 7], [11, 23], [15, 3],
+[31, 19], [23, 11], [7, 27], [5, 5], [21, 21], [29, 13], [13, 29],
+[9, 9], [25, 25], [17, 1], [1, 17]]</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">for</span> <span class="n">xj</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">xj</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>0 0
+0.5 0.5
+0.75 0.25
+0.25 0.75
+0.375 0.375
+0.875 0.875
+0.625 0.125
+0.125 0.625
+0.1875 0.3125
+0.6875 0.8125
+0.9375 0.0625
+0.4375 0.5625
+0.3125 0.1875
+0.8125 0.6875
+0.5625 0.4375
+0.0625 0.9375
+0.09375 0.46875
+0.59375 0.96875
+0.84375 0.21875
+0.34375 0.71875
+0.46875 0.09375
+0.96875 0.59375
+0.71875 0.34375
+0.21875 0.84375
+0.15625 0.15625
+0.65625 0.65625
+0.90625 0.40625
+0.40625 0.90625
+0.28125 0.28125
+0.78125 0.78125
+0.53125 0.03125
+0.03125 0.53125</p>
+<p>These are the first 32 sobol’ or Niederreiter points in 2D.</p>
+<p>Warning: please mind the deepcopy if you store the member variables
+in a list, you get returned a reference to the value. If you don’t
+use deepcopy all your list items will refer to the last value (and
+thus all be the same).</p>
+<p>Using numpy you can load a Bs.col (or Cs.col) file from the qmc4pde
+construction scripts by using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;Bs64.col&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="c1"># mind the int: read as integers!</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;Bs.col&#39;</span><span class="p">)</span>
+<span class="n">Bs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">]</span> <span class="c1"># arbitrary big integers here...</span>
+</pre></div>
+</div>
+<p>The easiest way is however to just provide the filename as the Cs
+argument (which will use method 2 above).</p>
+<p>Standard the points are generated as double precision numbers, however
+if one replaces seq.recipd by a multi precision variable with value
+2**-seq.t then the points will be delivered as such a type.
+Alternatively, the unscaled values are available as seq.cur and the
+points can then be generated as rationals with denominator 2**seq.t.</p>
+<p>Note: The generating matrices Cs which are passed in are available as
+the Csr field of this object, but note that they have been bit
+reversed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.distribution.digital_seq.bitreverse">
+<code class="sig-prename descclassname">algorithms.distribution.digital_seq.</code><code class="sig-name descname">bitreverse</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">m=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.digital_seq.bitreverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reverse bit string of an integer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – integer input</p></li>
+<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – length of bit string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>integer that corresponds to reversed bit string of a</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.accum_data.__init__">
+<span id="data-class"></span><h2>Data Class<a class="headerlink" href="#module-algorithms.accum_data.__init__" title="Permalink to this headline">¶</a></h2>
+<p>Definition for abstract class, AccumData</p>
+<dl class="class">
+<dt id="algorithms.accum_data.__init__.AccumData">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.__init__.</code><code class="sig-name descname">AccumData</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Accumulated data required in the computation of the integral,</dt><dd><p>stores the sample mean and variance of integrand values</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="algorithms.accum_data.__init__.AccumData.stage">
+<code class="sig-name descname">stage</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>stage of computation; ‘begin’, or ‘done’ when finished.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="algorithms.accum_data.__init__.AccumData.n_samples_total">
+<code class="sig-name descname">n_samples_total</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.n_samples_total" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of samples used so far.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="algorithms.accum_data.__init__.AccumData.confid_int">
+<code class="sig-name descname">confid_int</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.confid_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>error bound on the solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array-like (2, 1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="algorithms.accum_data.__init__.AccumData.t_total">
+<code class="sig-name descname">t_total</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.t_total" title="Permalink to this definition">¶</a></dt>
+<dd><p>total computation time. Set by integrate method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.accum_data.__init__.AccumData.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize data instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.accum_data.__init__.AccumData.update_data">
+<em class="property">abstract </em><code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.update_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the accumulated data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#algorithms.integrand.__init__.Integrand" title="algorithms.integrand.__init__.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.accum_data.mean_var_data"></span><p>Definition for class MeanVarData, a subclass of AccumData</p>
+<dl class="class">
+<dt id="algorithms.accum_data.mean_var_data.MeanVarData">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.mean_var_data.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data.MeanVarData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accumulated data for IIDDistribution calculations,
+stores the sample mean and variance of integrand values</p>
+<dl class="method">
+<dt id="algorithms.accum_data.mean_var_data.MeanVarData.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data.MeanVarData.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize data instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n_integrands</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of integrands</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.accum_data.mean_var_data.MeanVarData.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">integrand: algorithms.integrand.Integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#algorithms.integrand.__init__.Integrand" title="algorithms.integrand.__init__.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.accum_data.mean_var_data_rep"></span><p>Definition for MeanVarDataRep, subclass of AccumData</p>
+<dl class="class">
+<dt id="algorithms.accum_data.mean_var_data_rep.MeanVarDataRep">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.mean_var_data_rep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em>, <em class="sig-param">n_streams</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data_rep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accumulated data for lattice calculations</p>
+<dl class="method">
+<dt id="algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em>, <em class="sig-param">n_streams</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize data instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_integrands</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of integrands</p></li>
+<li><p><strong>n_streams</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of random nxm matricies to generate</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">integrand: algorithms.integrand.Integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#algorithms.integrand.__init__.Integrand" title="algorithms.integrand.__init__.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.stop.__init__">
+<span id="stoppingcriterion-class"></span><h2>StoppingCriterion Class<a class="headerlink" href="#module-algorithms.stop.__init__" title="Permalink to this headline">¶</a></h2>
+<p>Abstract class for defining stopping conditions for qmcpy algorithms</p>
+<dl class="class">
+<dt id="algorithms.stop.__init__.StoppingCriterion">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.__init__.</code><code class="sig-name descname">StoppingCriterion</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decide when to stop</p>
+<dl class="method">
+<dt id="algorithms.stop.__init__.StoppingCriterion.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>allowed_distribs</strong> – distribution’s compatible with the StoppingCriterion</p></li>
+<li><p><strong>abs_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – absolute error tolerance</p></li>
+<li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – relative error tolerance</p></li>
+<li><p><strong>n_init</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – initial number of samples</p></li>
+<li><p><strong>n_max</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – maximum number of samples</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.stop.__init__.StoppingCriterion.stop_yet">
+<em class="property">abstract </em><code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion.stop_yet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine when to stop</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.stop.clt_rep"></span><p>Stopping criterion based on var(stream_1_estimate, …, stream_16_estimate) &lt; errorTol</p>
+<dl class="class">
+<dt id="algorithms.stop.clt_rep.CLTRep">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.clt_rep.</code><code class="sig-name descname">CLTRep</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">n_streams=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_rep.CLTRep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stopping criterion based on var(stream_1_estimate, …, stream_16_estimate) &lt; errorTol</p>
+<dl class="method">
+<dt id="algorithms.stop.clt_rep.CLTRep.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">n_streams=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_rep.CLTRep.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>n_streams</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of random nxm matricies to generate</p></li>
+<li><p><strong>inflate</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – inflation factor when estimating variance</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – significance level for confidence interval</p></li>
+<li><p><strong>abs_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – absolute error tolerance</p></li>
+<li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – relative error tolerance</p></li>
+<li><p><strong>n_init</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – initial number of samples</p></li>
+<li><p><strong>n_max</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – maximum number of samples</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.stop.clt_rep.CLTRep.stop_yet">
+<code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_rep.CLTRep.stop_yet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine when to stop</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-algorithms.stop.clt_stopping"></span><p>Stopping criterion based on the Centeral Limit Theorem</p>
+<dl class="class">
+<dt id="algorithms.stop.clt_stopping.CLTStopping">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.clt_stopping.</code><code class="sig-name descname">CLTStopping</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_stopping.CLTStopping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stopping criterion based on the Centeral Limit Theorem (CLT)</p>
+<p>Attributes:</p>
+<dl class="method">
+<dt id="algorithms.stop.clt_stopping.CLTStopping.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_stopping.CLTStopping.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distrib_obj</strong> – an instance of DiscreteDistribution</p></li>
+<li><p><strong>inflate</strong> – inflation factor when estimating variance</p></li>
+<li><p><strong>alpha</strong> – significance level for confidence interval</p></li>
+<li><p><strong>abs_tol</strong> – absolute error tolerance</p></li>
+<li><p><strong>rel_tol</strong> – relative error tolerance</p></li>
+<li><p><strong>n_init</strong> – initial number of samples</p></li>
+<li><p><strong>n_max</strong> – maximum number of samples</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.stop.clt_stopping.CLTStopping.stop_yet">
+<code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_stopping.CLTStopping.stop_yet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine when to stop</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-__init__">
+<span id="utilities"></span><h2>Utilities<a class="headerlink" href="#module-__init__" title="Permalink to this headline">¶</a></h2>
+<p>Utilities for qmcpy</p>
+<dl class="exception">
+<dt id="__init__.DimensionError">
+<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">DimensionError</code><a class="headerlink" href="#__init__.DimensionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for raising error about dimension</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="__init__.DistributionCompatibilityError">
+<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">DistributionCompatibilityError</code><a class="headerlink" href="#__init__.DistributionCompatibilityError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for raising error about incompatible distribution</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="__init__.MaxSamplesWarning">
+<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">MaxSamplesWarning</code><a class="headerlink" href="#__init__.MaxSamplesWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for issuing warning about using maximum number of data samples</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="__init__.MeasureCompatibilityError">
+<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">MeasureCompatibilityError</code><a class="headerlink" href="#__init__.MeasureCompatibilityError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for raising error of incompatible measures</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="__init__.univ_repr">
+<code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">univ_repr</code><span class="sig-paren">(</span><em class="sig-param">object</em>, <em class="sig-param">attributes=None</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#__init__.univ_repr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean way to represent object data.</p>
+<p>Note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>is equivalent to</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>object</strong> – an object instance</p></li>
+<li><p><strong>attributes</strong> – list of object attribute names whose values are to be gathered</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/QMCSoftware/QMCSoftware">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="front_matter.html" class="btn btn-neutral float-left" title="Quasi-Monte Carlo Community Software" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Illinois Institute of Technology
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

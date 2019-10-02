@@ -44,7 +44,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
               'sphinx.ext.graphviz',
               'sphinx.ext.intersphinx',
-              'sphinx_rtd_theme']
+              'sphinx_rtd_theme',
+              'm2r']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -65,8 +66,8 @@ napoleon_use_keyword = True
 
 # intersphinx
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/', None),
-    'numpy': ('http://docs.scipy.org/doc/numpy/', None)
+    'python': ('https://docs.python.org/3.7/', None),
+    'numpy': ('https://docs.scipy.org/doc/numpy', None)
 }
 
 # List of patterns, relative to source directory, that match files and

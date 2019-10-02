@@ -8,15 +8,11 @@ Qmcpy Documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
+
+   front_matter
    algorithms
-   data
-   integrand
-   measure
-   distribution
-   stop
-   util
 
 
 Indices and tables

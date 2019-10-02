@@ -2,10 +2,11 @@
 Definition for MeanVarDataRep, subclass of AccumData
 """
 from time import process_time
-from numpy import arange, finfo, float32, ones, zeros
 
 from algorithms.distribution import DiscreteDistribution
 from algorithms.integrand import Integrand
+from numpy import arange, finfo, float32, ones, zeros
+
 from . import AccumData
 
 EPS = finfo(float32).eps
@@ -47,7 +48,7 @@ class MeanVarDataRep(AccumData):
             if self.flag[i] == 0:
                 continue # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation
-            dim = distribution[i].trueD.dimension # dimension of the integrand
+            dim = distribution[i].true_distribution.dimension # dimension of the integrand
             # set_x := n_streams matricies housing nxm integrand values
             set_x = distribution[i].gen_distrib(self.n_next[i], dim, self.n_streams)
             for j in range(self.n_streams):

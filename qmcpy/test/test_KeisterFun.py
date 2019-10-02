@@ -1,5 +1,5 @@
 import unittest
-from algorithms.integrand.Keister import Keister
+from algorithms.integrand.keister import Keister
 
 class Test_KeisterFun(unittest.TestCase):
 

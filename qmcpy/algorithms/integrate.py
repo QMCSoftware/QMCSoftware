@@ -29,7 +29,7 @@ def integrate(integrand, measure, distribution, stopping_criterion):
     while stopping_criterion.stage != 'done':
         # the data_obj.stage property tells us where we are in the process
         stopping_criterion.data_obj.update_data(distribution, integrand)  # compute more data
-        stopping_criterion.stopYet(integrand)  # update the status of the computation
+        stopping_criterion.stop_yet()  # update the status of the computation
     solution = stopping_criterion.data_obj.solution  # assign outputs
     stopping_criterion.data_obj.t_total = time() - t_start
     return solution, stopping_criterion.data_obj

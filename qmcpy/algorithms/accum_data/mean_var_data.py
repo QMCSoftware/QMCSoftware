@@ -2,10 +2,11 @@
 Definition for class MeanVarData, a subclass of AccumData
 """
 from time import process_time
-from numpy import arange, finfo, float32, std, zeros, full, inf
 
 from algorithms.distribution import DiscreteDistribution
 from algorithms.integrand import Integrand
+from numpy import arange, finfo, float32, full, inf, std, zeros
+
 from . import AccumData
 
 EPS = finfo(float32).eps
@@ -44,7 +45,7 @@ class MeanVarData(AccumData):
         """
         for i in range(len(integrand)):
             t_start = process_time()  # time the integrand values
-            dim = distribution[i].trueD.dimension
+            dim = distribution[i].true_distribution.dimension
             distrib_data = distribution[i].gen_distrib(self.n_next[i], dim)
             y = integrand[i].f(distrib_data, arange(1, dim + 1))
             self.t_eval[i] = max(process_time() - t_start, EPS) # for multi-level methods
