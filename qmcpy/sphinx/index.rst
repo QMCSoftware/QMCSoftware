@@ -11,7 +11,8 @@ Qmcpy Documentation
    :caption: Contents
 
 
-   front_matter
+   readme
+   license
    algorithms
 
 
