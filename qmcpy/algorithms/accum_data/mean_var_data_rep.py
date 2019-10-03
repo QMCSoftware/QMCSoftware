@@ -47,7 +47,7 @@ class MeanVarDataRep(AccumData):
             if self.flag[i] == 0:
                 continue # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation
-            dim = distribution[i].trueD.dimension # dimension of the integrand
+            dim = distribution[i].true_distrib.dimension # dimension of the integrand
             # set_x := n_streams matricies housing nxm integrand values
             set_x = distribution[i].gen_distrib(self.n_next[i], dim, self.n_streams)
             for j in range(self.n_streams):

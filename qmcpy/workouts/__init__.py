@@ -11,7 +11,7 @@ def summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj):
     s += item_s%('dimension',str(measureObj.dimension))
 
     s += h1%(type(distribObj).__name__,'Distribution Object')
-    s += item_s%('trueD.measureName',type(distribObj.trueD).__name__)
+    s += item_s%('true_distrib.measureName',type(distribObj.true_distrib).__name__)
 
     s += h1%(type(stopObj).__name__,'StoppingCriterion Object')
     s += item_f%('abs_tol',stopObj.abs_tol)

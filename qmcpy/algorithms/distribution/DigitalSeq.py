@@ -168,22 +168,3 @@ class DigitalSeq(digitalseq_b2g):
         reverse_number = reverse_number + (m - len(reverse_number)) * '0'
         a_rev = int(reverse_number, 2)
         return a_rev
-
-
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) > 1:
-        f = sys.argv[1]
-    else:
-        f = sys.stdin
-    seq = DigitalSeq(f)
-    if seq.t > 53:
-        import mpmath
-
-        mpmath.mp.prec = seq.t
-        seq.recipd = mpmath.mpf(1) / 2 ** seq.t
-    for x in seq:
-        for xj in x:
-            print(xj, end=' ')
-        print()

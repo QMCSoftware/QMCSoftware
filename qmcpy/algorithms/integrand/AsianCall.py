@@ -49,7 +49,7 @@ class AsianCall(Integrand):
             where if :math:`\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j`, then :math:`x'_{ij} = x_{ij}`
             for :math:`j \in \mathfrak{u}`, and :math:`x'_{ij} = c` otherwise
         """
-        SFine = self.S0*exp((-self.volatility**2/2)*self.BMmeasure.timeVector+self.volatility*x)
+        SFine = self.S0*exp((-self.volatility**2/2)*self.BMmeasure.time_vector+self.volatility*x)
         AvgFine = ((self.S0/2)+SFine[:,:self.dimension-1].sum(1)+SFine[:,self.dimension-1]/2)/self.dimension
         y = maximum(AvgFine-self.K,0)
         if self.dimFac > 0:

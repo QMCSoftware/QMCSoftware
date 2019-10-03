@@ -55,10 +55,10 @@ class Integrand(ABC):
         Returns: None
         """
         for i in range(len(self)):
-            try: sample_from = distribution[i].trueD.mimics # QuasiRandom sampling
-            except: sample_from = type(distribution[i].trueD).__name__ # IIDDistribution sampling
+            try: sample_from = distribution[i].true_distrib.mimics # QuasiRandom sampling
+            except: sample_from = type(distribution[i].true_distrib).__name__ # IIDDistribution sampling
             transform_to = type(measure[i]).__name__ # distribution the sampling attempts to mimic
-            self[i].dimension = distribution[i].trueD.dimension # the integrand needs the dimension
+            self[i].dimension = distribution[i].true_distrib.dimension # the integrand needs the dimension
             if transform_to==sample_from: # no need to transform
                 self[i].f = lambda xu,coordIdex,i=i: self[i].g(xu,coordIdex)
             elif transform_to=='IIDZeroMeanGaussian' and sample_from=='StdGaussian': # multiply by the likelihood ratio
@@ -68,10 +68,10 @@ class Integrand(ABC):
                 this_var = measure[i].variance
                 self[i].f = lambda xu,coordIdex,var=this_var,i=i: self[i].g(sqrt(var)*norm.ppf(xu),coordIdex)
             elif transform_to=='BrownianMotion' and sample_from=='StdUniform': # inverse cdf transform -> sum across time-series
-                timeDiff = diff(insert(measure[i].timeVector, 0, 0))
+                timeDiff = diff(insert(measure[i].time_vector, 0, 0))
                 self[i].f = lambda xu,coordIndex,timeDiff=timeDiff,i=i: self[i].g(cumsum(norm.ppf(xu)*sqrt(timeDiff),1),coordIndex)
             elif transform_to=='BrownianMotion' and sample_from=='StdGaussian': # sum across time-series
-                timeDiff = diff(insert(measure[i].timeVector, 0, 0))
+                timeDiff = diff(insert(measure[i].time_vector, 0, 0))
                 self[i].f = lambda xu,coordIndex,timeDiff=timeDiff,i=i: self[i].g(cumsum(xu*sqrt(timeDiff),1),coordIndex)
             else:
                 raise TransformError('Cannot transform %s distributuion to mimic Integrands true %s measure'%(sample_from,transform_to))
