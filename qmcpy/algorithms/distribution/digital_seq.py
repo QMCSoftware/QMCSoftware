@@ -6,14 +6,14 @@ from third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
 
 def bitreverse(a, m=None):
     """
-    Reverse bit string of an integer
+    Reverse bit string of an integer.
 
     Args:
-        a (int): integer input
-        m (int): length of bit string
+        a (int): Integer input.
+        m (int): Length of bit string.
 
     Returns:
-        int: integer that corresponds to reversed bit string of a
+        int: Integer that corresponds to reversed bit string of ``a``
 
     """
     # https://tinyurl.com/yybvsmqe
@@ -27,12 +27,20 @@ def bitreverse(a, m=None):
 
 
 class DigitalSeq(digitalseq_b2g):
-    """Digital sequence point generator based on generating matrices.
+    """A fast digital sequence point generator based on generating matrices.
 
     This sequence generator can take classical (m by m) generating matrices
     or higher-order (alpha m by m) generating matrices from interlaced
     digital nets, interlaced polynomial lattice rules or higher-order
     polynomial lattice rules.  This code is specific for base 2 digital nets.
+
+    This implementation is based upon, but faster than, ``digitalseq_b2g`` from:
+
+    D. Nuyens, `The magic point shop of QMC point generators and generating
+    vectors.` MATLAB and Python software, 2018. Available from
+    https://people.cs.kuleuven.be/~dirk.nuyens/
+
+qmc-generators.
     """
 
     def __init__(self, Cs, kstart=0, m=None, s=None, returnDeepCopy=True):

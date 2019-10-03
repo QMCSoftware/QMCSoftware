@@ -5,7 +5,7 @@ from . import DiscreteDistribution
 
 class IIDDistribution(DiscreteDistribution):
     '''
-    Specifies and generates the components of :math:`\dfrac{1}{n} \sum_{i=1}^n \delta_{\mathbf{x}_i}(\cdot)`
+    Specifies and generates the components of :math:`\\dfrac{1}{n} \\sum_{i=1}^n \\delta_{\\mathbf{x}_i}(\\cdot)`
     where the :math:`\mathbf{x}_i` are IIDDistribution uniform on :math:`[0,1]^d` or IIDDistribution standard Gaussian
     '''
 

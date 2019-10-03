@@ -29,7 +29,7 @@ class MaxSamplesWarning(Warning):
     """
 
 
-def univ_repr(object, attributes=None) -> str:
+def univ_repr(object, attributes=None):
     """
     Clean way to represent object data.
 

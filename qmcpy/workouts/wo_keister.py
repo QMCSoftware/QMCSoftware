@@ -1,7 +1,8 @@
+#!/usr/bin/python/
 """
 3 Dimensonal Keister Function
-    Run: python workouts/IntegrationExample_KeisterFun.py
-    Save Output: python workouts/IntegrationExample_KeisterFun.py  > outputs/ie_KeisterFun.txt
+    Run: python workouts/wo_keister.py
+    Save Output: python workouts/wo_keister.py  > outputs/ie_KeisterFun.txt
 """
 
 from workouts import summary_qmc

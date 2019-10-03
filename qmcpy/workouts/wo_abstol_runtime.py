@@ -1,3 +1,4 @@
+#!/usr/bin/python/
 from time import time
 
 from algorithms.measures.measures import *

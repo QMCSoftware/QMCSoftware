@@ -1,15 +1,14 @@
-from mpl_toolkits.mplot3d.axes3d import Axes3D
-import matplotlib.pyplot as mpl_plt
-from scipy.stats import norm
-from numpy import arange, linspace, meshgrid, random, zeros
-random.seed(7)
-
-from workouts import summary_qmc
-from algorithms.measures.measures import IIDZeroMeanGaussian,StdGaussian,Lattice
+#!/usr/bin/python
 from algorithms.distribution.iid_distribution import IIDDistribution
 from algorithms.distribution.quasi_random import QuasiRandom
 from algorithms.integrand.keister import Keister
+from algorithms.measures.measures import IIDZeroMeanGaussian, StdGaussian
+from mpl_toolkits.mplot3d.axes3d import Axes3D
+import matplotlib.pyplot as mpl_plt
+from numpy import arange, linspace, meshgrid, random, zeros
+from scipy.stats import norm
 
+random.seed(7)
 dim = 2
 j = 3
 colors = ['r','b','g']

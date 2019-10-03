@@ -34,8 +34,8 @@ class CLTRep(StoppingCriterion):
         # Construct Data Object
         n_integrands = len(distribution)
         self.data_obj = MeanVarDataRep(n_integrands, n_streams) # house integration data
-        self.data_obj.n_prev = zeros(n_integrands) # previous n used for each integrand
-        self.data_obj.n_next = full(n_integrands, self.n_init) # next n to be used for each integrand
+        self.data_obj.n_prev = zeros(n_integrands) # previous n used for each f
+        self.data_obj.n_next = full(n_integrands, self.n_init) # next n to be used for each f
 
     def stop_yet(self):
         """
@@ -43,8 +43,8 @@ class CLTRep(StoppingCriterion):
 
         """
         for i in range(self.data_obj.n_integrands):
-            if self.data_obj.sig2hat[i] < self.abs_tol: # Sufficient estimate for mean of integrand[i]
-                self.data_obj.flag[i] = 0 # Stop estimation of i_th integrand
+            if self.data_obj.sig2hat[i] < self.abs_tol: # Sufficient estimate for mean of f[i]
+                self.data_obj.flag[i] = 0 # Stop estimation of i_th f
             else: # Double n for next sample
                 self.data_obj.n_prev[i] = self.data_obj.n_next[i]
                 self.data_obj.n_next[i] = self.data_obj.n_prev[i]*2

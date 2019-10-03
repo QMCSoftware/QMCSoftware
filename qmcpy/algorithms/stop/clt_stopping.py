@@ -58,7 +58,7 @@ class CLTStopping(StoppingCriterion):
             self.data_obj.n_next = self.data_obj.n_mu + self.data_obj.n_prev # set next_n to n_mu_temp
             self.stage = 'mu'  # compute sample mean next
         elif self.stage == 'mu':
-            self.data_obj.solution = self.data_obj.muhat.sum() # mean of integrand means
+            self.data_obj.solution = self.data_obj.muhat.sum() # mean of f means
             self.data_obj.n_samples_total = self.data_obj.n_next
             err_bar = -norm.ppf(self.alpha/2) * self.inflate * (self.data_obj.sighat**2 / self.data_obj.n_mu).sum(0)**.5
             self.data_obj.confid_int = self.data_obj.solution + err_bar * array([-1, 1]) # CLT confidence interval

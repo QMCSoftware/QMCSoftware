@@ -5,9 +5,9 @@ from . import Integrand
 
 class Keister(Integrand):
     '''
-    Specify and generate values :math:`f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)` for :math:`\mathbf{x} \in \mathbb{R}^d`
+    Specify and generate values :math:`f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)` for :math:`\mathbf{x} \in \mathbb{R}^d`.
 
-    The standard example integrates the Keister integrand with respect to an IID Gaussian distribution with variance 1/2
+    The standard example integrates the Keister integrand with respect to an IID Gaussian distribution with variance 1/2.
 
     B. D. Keister, Multidimensional Quadrature Algorithms, `Computers in Physics`, *10*, pp.\ 119-122, 1996.
     '''
