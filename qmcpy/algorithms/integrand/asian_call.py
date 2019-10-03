@@ -4,7 +4,7 @@ from . import Integrand
 
 
 class AsianCall(Integrand):
-    ''' Specify and generate payoff values of an Asian Call option'''
+    '''Specify and generate payoff values of an Asian Call option'''
     def __init__(self, BMmeasure=None, volatility=.5, start_price=30, strike_price=25, nominal_value=None):
         super().__init__(nominal_value=nominal_value)
         self.BMmeasure = BMmeasure

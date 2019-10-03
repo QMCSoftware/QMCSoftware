@@ -84,8 +84,9 @@
               <p class="caption"><span class="caption-text">Contents</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quasi-Monte Carlo Community Software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#vision">Vision</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#function-class">Function Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integrand-class">Integrand Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#distribution-class">Distribution Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#accumulate-data-class">Accumulate Data Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stopping-criterion-class">Stopping Criterion Class</a></li>
@@ -164,12 +165,15 @@
             
   <div class="section" id="quasi-monte-carlo-community-software">
 <h1>Quasi-Monte Carlo Community Software<a class="headerlink" href="#quasi-monte-carlo-community-software" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="vision">
+<h2>Vision<a class="headerlink" href="#vision" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
 <hr></div>
-<div class="section" id="function-class">
-<h2>Function Class<a class="headerlink" href="#function-class" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="integrand-class">
+<h2>Integrand Class<a class="headerlink" href="#integrand-class" title="Permalink to this headline">¶</a></h2>
 <p><span class="raw-html-m2r"><b>Summary:</b></span> The function to integrate<span class="raw-html-m2r"><br></span>
 <span class="raw-html-m2r"><b>Concrete Classes:</b></span></p>
 <ul class="simple">
@@ -226,6 +230,10 @@
 <h2>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h2>
 <p>This package was originally developed in MATLAB by Fred J. Hickernell.<span class="raw-html-m2r"><br></span>
 Translated to Python by Sou-Cheng T. Choi and Aleksei Sorokin.</p>
+<p>If you find Qmcpy helpful in your work, please support us by citing the
+following work:</p>
+<p>Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community Software.” MATLAB and Python 3
+software, 2019. Work in progress. Available from <a class="reference external" href="https://github.com/QMCSoftware/QMCSoftware">https://github.com/QMCSoftware/QMCSoftware</a></p>
 <div class="section" id="tips">
 <h3>Tips<a class="headerlink" href="#tips" title="Permalink to this headline">¶</a></h3>
 <p>It may be helpful to create a virtual environment for this project.<span class="raw-html-m2r"><br></span>

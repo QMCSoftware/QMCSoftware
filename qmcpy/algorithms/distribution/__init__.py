@@ -4,12 +4,19 @@ from .. import MeasureCompatibilityError, univ_repr
 
 
 class DiscreteDistribution(ABC):
-    """Specifies and generates the components of :math:`a_n \sum_{i=1}^n w_i
-    \delta_{\mathbf{x}_i}(\cdot)`
+    """Specifies and generates the components of :math:`a_n \\sum_{i=1}^n w_i \\delta_{\\mathbf{x}_i}(\\cdot)`.
+
+    Args:
+        accepted_measures: list of valid measure names
+        true_distribution (DiscreteDistribution): True distribution.
+        distrib_data:
 
     Attributes:
-        distribution_list: list of DiscreteDistribution instances
-        true_distribution (DiscreteDistribution): true distribution
+        distribution_list: List of DiscreteDistribution instances.
+        true_distribution (DiscreteDistribution): True distribution.
+
+    Raises:
+        MeasureCompatibilityError: if ``true_distribution`` not in ``accepted_measures``
 
     """
 

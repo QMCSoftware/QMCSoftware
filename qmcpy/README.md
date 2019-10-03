@@ -1,12 +1,14 @@
 # Quasi-Monte Carlo Community Software
 
+## Vision
+
 
 ## Overview
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications. 
 
 <hr>
 
-## Function Class
+## Integrand Class
 <b>Summary:</b> The function to integrate<br>
 <b>Concrete Classes:</b>
 - Linear
@@ -59,6 +61,12 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 ## Developers
 This package was originally developed in MATLAB by Fred J. Hickernell.<br>
 Translated to Python by Sou-Cheng T. Choi and Aleksei Sorokin.
+
+If you find Qmcpy helpful in your work, please support us by citing the
+following work:
+
+Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community Software.” MATLAB and Python 3
+software, 2019. Work in progress. Available from https://github.com/QMCSoftware/QMCSoftware
 
 ### Tips
 It may be helpful to create a virtual environment for this project.<br>

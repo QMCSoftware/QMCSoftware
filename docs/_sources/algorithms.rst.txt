@@ -1,8 +1,8 @@
 Algorithms
 ==========
 
-Integrate Method
-----------------
+Integration Method
+------------------
 
 .. automodule:: integrate
     :members:
@@ -13,12 +13,20 @@ Integrand Class
 .. automodule:: algorithms.integrand.__init__
     :members:
 
+Asical Call Option Payoff
+.........................
+
 .. automodule:: algorithms.integrand.asian_call
     :members:
 
+Kesiter Function
+................
 
 .. automodule:: algorithms.integrand.keister
     :members:
+
+A Linear Function
+..................
 
 .. automodule:: algorithms.integrand.linear
     :members:
@@ -38,12 +46,20 @@ Distribution Class
 .. automodule:: algorithms.distribution.__init__
     :members:
 
+IID Distribution
+..................
+
 .. automodule:: algorithms.distribution.iid_distribution
     :members:
+
+Quasi Random Distribution
+.........................
 
 .. automodule:: algorithms.distribution.quasi_random
     :members:
 
+Sobol Sequence
+..............
 
 .. automodule:: algorithms.distribution.digital_seq
     :members:
