@@ -2,7 +2,7 @@
 Definitions for IIDDistribution, a DiscreteDistribution
 """
 from numpy import array, int64, log, random
-from numpy.core._multiarray_umath import zeros
+from numpy import zeros
 from third_party.magic_point_shop.latticeseq_b2 import latticeseq_b2
 
 from . import DiscreteDistribution
@@ -12,10 +12,12 @@ from .digital_seq import DigitalSeq
 class QuasiRandom(DiscreteDistribution):
 
     def __init__(self, true_distribution=None, seed_rng=None):
-        """        
+        """
         Args:
-            accepted_measures (list of strings): Measure objects compatible with the DiscreteDistribution
-            seed_rng (int): seed for random number generator to ensure reproduciblity            
+            accepted_measures (list of strings): Measure objects compatible \
+                with the DiscreteDistribution
+            seed_rng (int): seed for random number generator to ensure \
+                reproduciblity
         """
         accepted_measures = ['Lattice','Sobol'] # Implemented QuasiRandom generators
         if seed_rng: random.seed(seed_rng) # numpy.random for underlying generation
@@ -23,16 +25,16 @@ class QuasiRandom(DiscreteDistribution):
 
     def gen_distrib(self, n, m, j=16):
         """
-        Generate j nxm samples from the quasi-random distribution
-        Randomly shifts each of the j samples
-        
-        Args:       
+        Generate j nxm samples from the quasi-random distribution.
+        Randomly shifts each of the j samples.
+
+        Args:
             n (int): Number of observations (sample.size()[1])
             m (int): Number of dimensions (sample.size()[2])
             j (int): Number of nxm matricies to generate (sample.size()[0])
-        
+
         Returns:
-            jxnxm (numpy array) 
+            jxnxm (numpy array)
         """
         if type(self.true_distribution).__name__=='Lattice':
             x = array([row for row in latticeseq_b2(m=int(log(n) / log(2)), s=m)]) # generate jxnxm data
@@ -46,6 +48,6 @@ class QuasiRandom(DiscreteDistribution):
             shifts = random.randint(2**t, size=(j,m), dtype=int64) # generate random shift
             x = zeros((n,m),dtype=int64)
             for i,row in enumerate(gen):
-                x[i,:] = gen.cur # set each nxm 
+                x[i,:] = gen.cur # set each nxm
             x_RS = array([(shift ^ (x * 2**ct)) / 2.**t for shift in shifts]) # randomly shift each nxm sample
             return x_RS

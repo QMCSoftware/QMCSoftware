@@ -32,7 +32,7 @@ def plot(title,xlabel,ylabel,xdata,ydata,outF):
         dpi=500,
         bbox_inches = 'tight',
         pad_inches = .05)
-    mpl_plot.show()
+    mpl_plot.show(block=False)
 
 def QMC_Wrapper(stopObj,distribObj,name):
     item_f = '    %-25s %-10.3f %-10.3f'

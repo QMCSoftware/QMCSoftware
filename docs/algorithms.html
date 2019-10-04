@@ -175,22 +175,21 @@
 <dl class="function">
 <dt id="integrate.integrate">
 <code class="sig-prename descclassname">integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">measure</em>, <em class="sig-param">distribution</em>, <em class="sig-param">stopping_criterion</em><span class="sig-paren">)</span><a class="headerlink" href="#integrate.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and compute integral of <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
+<dd><p>Specify and compute integral of <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for     <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#algorithms.integrand.__init__.Integrand" title="algorithms.integrand.__init__.Integrand"><em>Integrand</em></a>) – an object from class Integrand</p></li>
 <li><p><strong>measure</strong> (<a class="reference internal" href="#algorithms.measures.__init__.Measure" title="algorithms.measures.__init__.Measure"><em>Measure</em></a>) – an object from class Measure</p></li>
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class DiscreteDistribution</p></li>
-<li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#algorithms.stop.__init__.StoppingCriterion" title="algorithms.stop.__init__.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class StoppingCriterion</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution</p></li>
+<li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#algorithms.stop.__init__.StoppingCriterion" title="algorithms.stop.__init__.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class             StoppingCriterion</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p>tuple containing:</p>
 <blockquote>
 <div><p><strong>solution</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>): estimated value of the integral</p>
-<p><strong>data</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">AccumData</span></code>): other information such as number of
-sampling points used to obtain the estimate</p>
+<p><strong>data</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">AccumData</span></code>): other information such as number of             sampling points used to obtain the estimate</p>
 </div></blockquote>
 </p>
 </dd>
@@ -203,19 +202,58 @@ sampling points used to obtain the estimate</p>
 </div>
 <div class="section" id="module-algorithms.integrand.__init__">
 <span id="integrand-class"></span><h2>Integrand Class<a class="headerlink" href="#module-algorithms.integrand.__init__" title="Permalink to this headline">¶</a></h2>
+<p>Definition for abstract class, AccumData</p>
 <dl class="class">
 <dt id="algorithms.integrand.__init__.Integrand">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.__init__.</code><code class="sig-name descname">Integrand</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.__init__.</code><code class="sig-name descname">Integrand</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="algorithms.integrand.__init__.Integrand.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for  <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
-<p>Any sublcass of Integrand must include the method, g(self, x, coordIndex)</p>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and generate values <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for         <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
+<dl class="attribute">
+<dt id="algorithms.integrand.__init__.Integrand.nominal_value">
+<code class="sig-name descname">nominal_value</code><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.nominal_value" title="Permalink to this definition">¶</a></dt>
+<dd><p><img class="math" src="_images/math/d520a12f1579170834c32ad5f656de081bbb36fe.png" alt="c"/> such that                 <img class="math" src="_images/math/4d6ee79634f7ec28b02c523bbb24bea9a167debe.png" alt="(c, \ldots, c) \in \mathcal{X}"/></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>nominal_value</strong> – <img class="math" src="_images/math/d520a12f1579170834c32ad5f656de081bbb36fe.png" alt="c"/> such that <img class="math" src="_images/math/4d6ee79634f7ec28b02c523bbb24bea9a167debe.png" alt="(c, \ldots, c) \in \mathcal{X}"/></p>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="algorithms.integrand.__init__.Integrand.f">
+<code class="sig-name descname">f</code><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.f" title="Permalink to this definition">¶</a></dt>
+<dd><p>function transformed to accept distribution                 values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>function handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="algorithms.integrand.__init__.Integrand.dimension">
+<code class="sig-name descname">dimension</code><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.dimension" title="Permalink to this definition">¶</a></dt>
+<dd><p>dimension of the domain, :math:’d’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>positive int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="algorithms.integrand.__init__.Integrand.fun_list">
+<code class="sig-name descname">fun_list</code><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.fun_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of Integrands, may be more than 1 for                 multi-dimensional problems</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="method">
@@ -225,8 +263,8 @@ sampling points used to obtain the estimate</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
-<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed,                 <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -247,21 +285,39 @@ object starting from the original Measure object</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>measure</strong> (<a class="reference internal" href="#algorithms.measures.__init__.Measure" title="algorithms.measures.__init__.Measure"><em>Measure</em></a>) – the Measure object that defines the integral</p></li>
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete distribution object that is sampled from</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete distribution                 object that is sampled from</p></li>
 </ul>
 </dd>
 </dl>
-<p>Returns: transformed integrand</p>
+<p>Returns: None</p>
 </dd></dl>
 
 </dd></dl>
 
 <div class="section" id="module-algorithms.integrand.asian_call">
 <span id="asical-call-option-payoff"></span><h3>Asical Call Option Payoff<a class="headerlink" href="#module-algorithms.integrand.asian_call" title="Permalink to this headline">¶</a></h3>
+<p>Definition for class AsianCall, a subclass of Integrand</p>
 <dl class="class">
 <dt id="algorithms.integrand.asian_call.AsianCall">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.asian_call.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.asian_call.AsianCall" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.asian_call.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.asian_call.AsianCall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate payoff values of an Asian Call option</p>
+<dl class="method">
+<dt id="algorithms.integrand.asian_call.AsianCall.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.asian_call.AsianCall.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize AsianCall Integrand’s’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BMmeasure</strong> (<a class="reference internal" href="#algorithms.measures.__init__.Measure" title="algorithms.measures.__init__.Measure"><em>Measure</em></a>) – A BrownianMotion Measure object</p></li>
+<li><p><strong>volatility</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sigma, the volatility of the asset</p></li>
+<li><p><strong>start_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – S(0), the asset value at t=0</p></li>
+<li><p><strong>strike_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – K, the call/put offer</p></li>
+<li><p><strong>nominal_value</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – <img class="math" src="_images/math/d520a12f1579170834c32ad5f656de081bbb36fe.png" alt="c"/> such that                 <img class="math" src="_images/math/4d6ee79634f7ec28b02c523bbb24bea9a167debe.png" alt="(c, \ldots, c) \in \mathcal{X}"/></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="algorithms.integrand.asian_call.AsianCall.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">ignore</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.asian_call.AsianCall.g" title="Permalink to this definition">¶</a></dt>
@@ -269,8 +325,8 @@ object starting from the original Measure object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/> row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
-<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed, <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
+<li><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p></li>
+<li><p><strong>coord_index</strong> – set of those coordinates in sequence needed,                 <img class="math" src="_images/math/7e88c38e87e7882b5ce32d7eb882ee123255a517.png" alt="\mathfrak{u}"/></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -286,21 +342,29 @@ for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873
 </div>
 <div class="section" id="module-algorithms.integrand.keister">
 <span id="kesiter-function"></span><h3>Kesiter Function<a class="headerlink" href="#module-algorithms.integrand.keister" title="Permalink to this headline">¶</a></h3>
+<p>Definition for class Keister, a subclass of Integrand</p>
 <dl class="class">
 <dt id="algorithms.integrand.keister.Keister">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.keister.</code><code class="sig-name descname">Keister</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values <img class="math" src="_images/math/d03f853393db6b7cf2c25523b4a9f78790436922.png" alt="f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)"/> for <img class="math" src="_images/math/27881af6ffb368e623dfe6dc8343f138920bdfa5.png" alt="\mathbf{x} \in \mathbb{R}^d"/>.</p>
-<p>The standard example integrates the Keister integrand with respect to an IID Gaussian distribution with variance 1/2.</p>
-<ol class="upperalpha simple" start="2">
-<li><ol class="upperalpha simple" start="4">
-<li><p>Keister, Multidimensional Quadrature Algorithms, <cite>Computers in Physics</cite>, <em>10</em>, pp.119-122, 1996.</p></li>
-</ol>
-</li>
-</ol>
+<dd><p>Specify and generate values <img class="math" src="_images/math/d03f853393db6b7cf2c25523b4a9f78790436922.png" alt="f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)"/> for <img class="math" src="_images/math/27881af6ffb368e623dfe6dc8343f138920bdfa5.png" alt="\mathbf{x} \in \mathbb{R}^d"/>
+The standard example integrates the Keister integrand with respect to an IID Gaussian distribution with variance 1/2
+B. D. Keister, Multidimensional Quadrature Algorithms, <cite>Computers in Physics</cite>, <em>10</em>, pp.119-122, 1996.</p>
+<dl class="method">
+<dt id="algorithms.integrand.keister.Keister.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.keister.Keister.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize Keister Integrand</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nominal_value</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – <img class="math" src="_images/math/d520a12f1579170834c32ad5f656de081bbb36fe.png" alt="c"/> such that <img class="math" src="_images/math/4d6ee79634f7ec28b02c523bbb24bea9a167debe.png" alt="(c, \ldots, c) \in \mathcal{X}"/></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="algorithms.integrand.keister.Keister.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.keister.Keister.g" title="Permalink to this definition">¶</a></dt>
-<dd><p>Original integrand to be integrated</p>
+<dd><p>Original integrand to be integrated
+if the nominalValue = 0, this is efficient</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -321,10 +385,22 @@ for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873
 </div>
 <div class="section" id="module-algorithms.integrand.linear">
 <span id="a-linear-function"></span><h3>A Linear Function<a class="headerlink" href="#module-algorithms.integrand.linear" title="Permalink to this headline">¶</a></h3>
+<p>Definition for class Linear, a subclass of Integrand</p>
 <dl class="class">
 <dt id="algorithms.integrand.linear.Linear">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <img class="math" src="_images/math/2ccb5bd520bcb15dc67920c80ab88f087d4912d9.png" alt="f(\mathbf{x}) = \sum_{i=1}^d x_i"/> for <img class="math" src="_images/math/7d4a5e61c2554400de7b0df8cb439d75b43f7e05.png" alt="\mathbf{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d"/>.</p>
+<dl class="method">
+<dt id="algorithms.integrand.linear.Linear.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.linear.Linear.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize Linear Integrand</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nominal_value</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – <img class="math" src="_images/math/d520a12f1579170834c32ad5f656de081bbb36fe.png" alt="c"/> such that <img class="math" src="_images/math/4d6ee79634f7ec28b02c523bbb24bea9a167debe.png" alt="(c, \ldots, c) \in \mathcal{X}"/></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="algorithms.integrand.linear.Linear.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.linear.Linear.g" title="Permalink to this definition">¶</a></dt>
@@ -355,45 +431,128 @@ for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.__init__.</code><code class="sig-name descname">Measure</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.__init__.Measure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies the components of a general measure used to define an
 integration problem or a sampling method</p>
+<dl class="method">
+<dt id="algorithms.measures.__init__.Measure.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.__init__.Measure.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a list of measures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimension</strong> (<em>list of ints</em>) – Dimensions to be dispersed among list of Measures.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dictionary</em>) – Accepts keyword arguments into dictionary.                 Disperses dictionary values among list of Measures</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
-<span class="target" id="module-algorithms.measures.measures"></span><dl class="class">
+</dd></dl>
+
+<span class="target" id="module-algorithms.measures.measures"></span><p>Definitions for concrete Measure classes</p>
+<dl class="class">
 <dt id="algorithms.measures.measures.BrownianMotion">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">timeVector=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.BrownianMotion" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">time_vector=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.BrownianMotion" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="algorithms.measures.measures.BrownianMotion.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">time_vector=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.BrownianMotion.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>time_vector</strong> (<em>array of floats</em>) – Monitoring times</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="class">
 <dt id="algorithms.measures.measures.IIDZeroMeanGaussian">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">IIDZeroMeanGaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">variance=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.IIDZeroMeanGaussian" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>IID Zero Mean Gausian Measure</p>
+<dl class="method">
+<dt id="algorithms.measures.measures.IIDZeroMeanGaussian.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">variance=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.IIDZeroMeanGaussian.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimension</strong> (<em>array of ints</em>) – dimensions of integrands</p></li>
+<li><p><strong>variance</strong> (<em>array of floats</em>) – variance of each gaussian distribution</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="class">
 <dt id="algorithms.measures.measures.Lattice">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Lattice" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="method">
+<dt id="algorithms.measures.measures.Lattice.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension</strong> (<em>array of ints</em>) – dimensions of integrands</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="class">
 <dt id="algorithms.measures.measures.Sobol">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Sobol" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="method">
+<dt id="algorithms.measures.measures.Sobol.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension</strong> (<em>array of ints</em>) – dimensions of integrands</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="class">
 <dt id="algorithms.measures.measures.StdGaussian">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">StdGaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdGaussian" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Standard Gaussian Measure</p>
+<dl class="method">
+<dt id="algorithms.measures.measures.StdGaussian.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdGaussian.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension</strong> (<em>array of ints</em>) – dimensions of integrands</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="class">
 <dt id="algorithms.measures.measures.StdUniform">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">StdUniform</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdUniform" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Standard Uniform Measure</p>
+<dl class="method">
+<dt id="algorithms.measures.measures.StdUniform.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdUniform.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension</strong> (<em>array of ints</em>) – dimensions of integrands</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="module-algorithms.distribution.__init__">
 <span id="distribution-class"></span><h2>Distribution Class<a class="headerlink" href="#module-algorithms.distribution.__init__" title="Permalink to this headline">¶</a></h2>
+<p>Definition for abstract classes: DiscreteDistribution, Measure</p>
 <dl class="class">
 <dt id="algorithms.distribution.__init__.DiscreteDistribution">
 <em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.__init__.</code><code class="sig-name descname">DiscreteDistribution</code><span class="sig-paren">(</span><em class="sig-param">accepted_measures</em>, <em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies and generates the components of <img class="math" src="_images/math/05988151f920d05758ce7b4b9cdedb5aa88a2e9f.png" alt="a_n \sum_{i=1}^n w_i \delta_{\mathbf{x}_i}(\cdot)"/>.</p>
+<dd><p>Specifies and generates the components of <img class="math" src="_images/math/6b67c91efdaf7452973fdc14df173d5a08325cfa.png" alt="a_n \sum_{i=1}^n w_i
+\delta_{\mathbf{x}_i}(\cdot)"/>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -422,12 +581,15 @@ integration problem or a sampling method</p>
 
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#__init__.MeasureCompatibilityError" title="__init__.MeasureCompatibilityError"><strong>MeasureCompatibilityError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">true_distribution</span></code> not in <code class="docutils literal notranslate"><span class="pre">accepted_measures</span></code></p>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#__init__.MeasureCompatibilityError" title="__init__.MeasureCompatibilityError"><strong>MeasureCompatibilityError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">true_distribution</span></code> not in</p></li>
+<li><p><strong>accepted_measures</strong> – </p></li>
+</ul>
 </dd>
 </dl>
 <dl class="method">
 <dt id="algorithms.distribution.__init__.DiscreteDistribution.gen_distrib">
-<em class="property">abstract </em><code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates distribution</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -444,22 +606,38 @@ integration problem or a sampling method</p>
 
 <div class="section" id="module-algorithms.distribution.iid_distribution">
 <span id="iid-distribution"></span><h3>IID Distribution<a class="headerlink" href="#module-algorithms.distribution.iid_distribution" title="Permalink to this headline">¶</a></h3>
+<p>Definitions for IIDDistribution, a DiscreteDistribution</p>
 <dl class="class">
 <dt id="algorithms.distribution.iid_distribution.IIDDistribution">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.iid_distribution.</code><code class="sig-name descname">IIDDistribution</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">rngSeed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.iid_distribution.IIDDistribution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies and generates the components of <img class="math" src="_images/math/d59410904775e3c06b62ced7058f95f8e93c3029.png" alt="\dfrac{1}{n} \sum_{i=1}^n \delta_{\mathbf{x}_i}(\cdot)"/>
-where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf45517bb.png" alt="\mathbf{x}_i"/> are IIDDistribution uniform on <img class="math" src="_images/math/38fbdb5f0cd005023c1bb115f01c323f34f20446.png" alt="[0,1]^d"/> or IIDDistribution standard Gaussian</p>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.iid_distribution.</code><code class="sig-name descname">IIDDistribution</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.iid_distribution.IIDDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies and generates the components of     <img class="math" src="_images/math/d59410904775e3c06b62ced7058f95f8e93c3029.png" alt="\dfrac{1}{n} \sum_{i=1}^n \delta_{\mathbf{x}_i}(\cdot)"/>,
+where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf45517bb.png" alt="\mathbf{x}_i"/> are IIDDistribution uniform on     <img class="math" src="_images/math/38fbdb5f0cd005023c1bb115f01c323f34f20446.png" alt="[0,1]^d"/> or IIDDistribution standard Gaussian</p>
+<dl class="method">
+<dt id="algorithms.distribution.iid_distribution.IIDDistribution.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.iid_distribution.IIDDistribution.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>accepted_measures</strong> (<em>list of strings</em>) – Measure objects compatible                 with the DiscreteDistribution</p></li>
+<li><p><strong>seed_rng</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed for random number generator to ensure                 reproduciblity</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="algorithms.distribution.iid_distribution.IIDDistribution.gen_distrib">
 <code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=1</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.iid_distribution.IIDDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates distribution</p>
+<dd><p>Generate j nxm samples from the true-distribution</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – value of <img class="math" src="_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/> used to determine <img class="math" src="_images/math/e9f4d366f1d155ec8c37d785708c0c47e20de43d.png" alt="a_n"/></p></li>
-<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
-<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
+<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>nxm (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -469,20 +647,38 @@ where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf4
 </div>
 <div class="section" id="module-algorithms.distribution.quasi_random">
 <span id="quasi-random-distribution"></span><h3>Quasi Random Distribution<a class="headerlink" href="#module-algorithms.distribution.quasi_random" title="Permalink to this headline">¶</a></h3>
+<p>Definitions for IIDDistribution, a DiscreteDistribution</p>
 <dl class="class">
 <dt id="algorithms.distribution.quasi_random.QuasiRandom">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.quasi_random.</code><code class="sig-name descname">QuasiRandom</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">rngSeed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.quasi_random.</code><code class="sig-name descname">QuasiRandom</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
+<dt id="algorithms.distribution.quasi_random.QuasiRandom.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>accepted_measures</strong> (<em>list of strings</em>) – Measure objects compatible                 with the DiscreteDistribution</p></li>
+<li><p><strong>seed_rng</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed for random number generator to ensure                 reproduciblity</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="algorithms.distribution.quasi_random.QuasiRandom.gen_distrib">
-<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=1</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom.gen_distrib" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates distribution</p>
+<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=16</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate j nxm samples from the quasi-random distribution.
+Randomly shifts each of the j samples.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – value of <img class="math" src="_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/> used to determine <img class="math" src="_images/math/e9f4d366f1d155ec8c37d785708c0c47e20de43d.png" alt="a_n"/></p></li>
-<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
-<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
+<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxm matricies to generate (sample.size()[0])</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>jxnxm (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -746,7 +942,7 @@ stores the sample mean and variance of integrand values</p>
 
 <dl class="method">
 <dt id="algorithms.accum_data.mean_var_data.MeanVarData.update_data">
-<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">integrand: algorithms.integrand.Integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -784,7 +980,7 @@ stores the sample mean and variance of integrand values</p>
 
 <dl class="method">
 <dt id="algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.update_data">
-<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution: algorithms.distribution.DiscreteDistribution</em>, <em class="sig-param">integrand: algorithms.integrand.Integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -924,6 +1120,12 @@ stores the sample mean and variance of integrand values</p>
 <dt id="__init__.MeasureCompatibilityError">
 <em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">MeasureCompatibilityError</code><a class="headerlink" href="#__init__.MeasureCompatibilityError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for raising error of incompatible measures</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="__init__.TransformError">
+<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">TransformError</code><a class="headerlink" href="#__init__.TransformError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for raising error about transforming function to accomodate     distributuion</p>
 </dd></dl>
 
 <dl class="function">

@@ -40,12 +40,10 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: IIT License",
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',
-    cmdclass={
-        'clean': CleanCommand,
-    }
+    cmdclass={'clean': CleanCommand}
 )
 

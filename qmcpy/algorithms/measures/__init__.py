@@ -2,6 +2,7 @@ from abc import ABC
 
 from numpy import array, ndarray
 
+from .. import DistributionCompatibilityError, univ_repr
 
 class Measure(ABC):
     '''Specifies the components of a general measure used to define an
@@ -10,11 +11,13 @@ class Measure(ABC):
 
     def __init__(self, dimension=None, **kwargs):
         """
-        Construct a list of measures
+        Construct a list of measures.
+
         Args:
-            dimension (list of ints): Dimensions to be dispersed among list of Measures
-            **kwargs (dictionary): Accepts keyword arguments into dictionary. 
-                                   Disperses dictionary values among list of Measures
+            dimension (list of ints): Dimensions to be dispersed among list of Measures.
+            **kwargs (dictionary): Accepts keyword arguments into dictionary. \
+                Disperses dictionary values among list of Measures
+
         """
         self.dimension = dimension
         super().__init__()
@@ -38,10 +41,20 @@ class Measure(ABC):
             for key,val in kwargs.items():
                 setattr(self[i],key,val[i])
 
-    def __len__(self): return len(self.measure_list)
+    def __len__(self):
+        return len(self.measure_list)
+
     def __iter__(self):
         for measureObj in self.measure_list:
             yield measureObj
-    def __getitem__(self,i): return self.measure_list[i]
-    def __setitem__(self,i,val): self.measure_list[i] = val
-    def __repr__(self): return univ_repr(self,'measure_list')
+
+    def __getitem__(self, i):
+        return self.measure_list[i]
+
+    def __setitem__(self, i, val):
+        self.measure_list[i] = val
+
+    def __repr__(self):
+        return univ_repr(self)
+
+

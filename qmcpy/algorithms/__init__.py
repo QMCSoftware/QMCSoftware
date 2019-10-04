@@ -23,7 +23,8 @@ class DistributionCompatibilityError(Exception):
 
 class TransformError(Exception):
     """
-    Class for raising error about transforming function to accomodate distributuion
+    Class for raising error about transforming function to accomodate \
+    distributuion
     """
 
 

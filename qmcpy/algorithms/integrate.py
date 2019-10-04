@@ -5,21 +5,24 @@ from time import time
 
 
 def integrate(integrand, measure, distribution, stopping_criterion):
-    """Specify and compute integral of :math:`f(\\mathbf{x})` for :math:`\\mathbf{x} \\in \\mathcal{X}`.
+    """Specify and compute integral of :math:`f(\\mathbf{x})` for \
+    :math:`\\mathbf{x} \\in \\mathcal{X}`.
 
     Args:
         integrand (Integrand): an object from class Integrand
         measure (Measure): an object from class Measure
-        distribution (DiscreteDistribution): an object from class DiscreteDistribution
-        stopping_criterion (StoppingCriterion): an object from class StoppingCriterion
+        distribution (DiscreteDistribution): an object from class \
+            DiscreteDistribution
+        stopping_criterion (StoppingCriterion): an object from class \
+            StoppingCriterion
 
     Returns:
         tuple: tuple containing:
 
             **solution** (:obj:`float`): estimated value of the integral
 
-            **data** (:obj:`AccumData`): other information such as number of
-            sampling points used to obtain the estimate
+            **data** (:obj:`AccumData`): other information such as number of \
+                sampling points used to obtain the estimate
 
     """
 

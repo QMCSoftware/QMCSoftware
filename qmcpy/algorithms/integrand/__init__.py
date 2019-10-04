@@ -11,13 +11,17 @@ from .. import univ_repr,TransformError
 class Integrand(ABC):
     def __init__(self, nominal_value=0):
         """
-        Specify and generate values :math:`f(\mathbf{x})` for  :math:`\mathbf{x} \in \mathcal{X}`.
+        Specify and generate values :math:`f(\mathbf{x})` for \
+        :math:`\mathbf{x} \in \mathcal{X}`.
 
         Attributes:
-            nominal_value (int): :math:`c` such that :math:`(c, \ldots, c) \in \mathcal{X}`
-            f (function handle): function transformed to accept distribution values
+            nominal_value (int): :math:`c` such that \
+                :math:`(c, \ldots, c) \in \mathcal{X}`
+            f (function handle): function transformed to accept distribution \
+                values
             dimension (positive int): dimension of the domain, :math:'d'
-            fun_list (list): list of Integrands, may be more than 1 for multi-dimensional problems
+            fun_list (list): list of Integrands, may be more than 1 for \
+                multi-dimensional problems
         """
         super().__init__()
         self.nominalValue = nominal_value
@@ -32,8 +36,10 @@ class Integrand(ABC):
         Original integrand to be integrated
 
         Args:
-            x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` row of an :math:`n \cdot |\mathfrak{u}|` matrix
-            coord_index: set of those coordinates in sequence needed, :math:`\mathfrak{u}`
+            x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` \
+                row of an :math:`n \cdot |\mathfrak{u}|` matrix
+            coord_index: set of those coordinates in sequence needed, \
+                :math:`\mathfrak{u}`
 
         Returns:
             :math:`n \cdot p` matrix with values :math:`f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})`
@@ -50,7 +56,8 @@ class Integrand(ABC):
 
         Args:
             measure (Measure): the Measure object that defines the integral
-            distribution (DiscreteDistribution): the discrete distribution object that is sampled from
+            distribution (DiscreteDistribution): the discrete distribution \
+                object that is sampled from
 
         Returns: None
         """
@@ -77,7 +84,8 @@ class Integrand(ABC):
                 raise TransformError('Cannot transform %s distributuion to mimic Integrands true %s measure'%(sample_from,transform_to))
         return
 
-    # Allow an Integrand instance to act as a list of Intgrands as required for multi-dimensional problems
+    # Allow an Integrand instance to act as a list of Intgrands as required
+    # for multi-dimensional problems
     def __len__(self): return len(self.fun_list)
     def __iter__(self):
         for fun in self.fun_list: yield fun

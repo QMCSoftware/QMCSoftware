@@ -41,7 +41,7 @@ class BrownianMotion(Measure):
         """
         if time_vector: dimension = [len(tV) for tV in time_vector] # dimensions of each integrand
         else: dimension = None
-        super().__init__(dimension,time_vector=time_vector)
+        super().__init__(dimension, time_vector=time_vector)
 
 class Lattice(Measure):
     def __init__(self,dimension=None):
@@ -49,7 +49,7 @@ class Lattice(Measure):
         Args:
             dimension (array of ints): dimensions of integrands
         """
-        super().__init__(dimension,mimics='StdUniform')
+        super().__init__(dimension, mimics='StdUniform')
 
 class Sobol(Measure):
     def __init__(self,dimension=None):
@@ -57,4 +57,7 @@ class Sobol(Measure):
         Args:
             dimension (array of ints): dimensions of integrands
         """
-        super().__init__(dimension,mimics='StdUniform')   
+        super().__init__(dimension, mimics='StdUniform')
+
+
+
