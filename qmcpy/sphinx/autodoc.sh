@@ -2,4 +2,4 @@
 
 make clean; make html
 
-rm -fr ../doc; mkdir ../doc; cp -a _build/html/ ../doc;
+rm -fr ../doc; mkdir ../doc; cp -a _build/html/ ../../docs;

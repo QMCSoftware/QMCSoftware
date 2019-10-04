@@ -3,24 +3,24 @@ Definition for abstract class, AccumData
 """
 from abc import ABC, abstractmethod
 from math import inf, nan
-from numpy import array
 
 from algorithms.distribution import DiscreteDistribution
 from algorithms.integrand import Integrand
+from numpy import array
+
 from .. import univ_repr
 
 
 class AccumData(ABC):
-    """Accumulated data required in the computation of the integral,
-        stores the sample mean and variance of integrand values
+    """Accumulated data required in the computation of the integral, stores the sample mean and variance of integrand values
 
-       Attributes:
-           stage (str): stage of computation; 'begin', or 'done' when finished.
-           n_samples_total (array-like): number of samples used so far.
-           confid_int (array-like (2, 1)): error bound on the solution.
-           t_total (float): total computation time. Set by integrate method.
+    Attributes:
+        stage (str): stage of computation; 'begin', or 'done' when finished.
+        n_samples_total (array-like): number of samples used so far.
+        confid_int (array-like (2, 1)): error bound on the solution.
+        t_total (float): total computation time. Set by integrate method.
 
-       """
+    """
 
     def __init__(self):
         """Initialize data instance

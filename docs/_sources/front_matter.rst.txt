@@ -1,0 +1,7 @@
+
+.. mdinclude:: ../README.md
+
+License
+=======
+
+.. include:: ../LICENSE

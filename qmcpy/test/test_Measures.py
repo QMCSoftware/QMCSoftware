@@ -1,7 +1,7 @@
 import unittest
 
 from numpy import arange
-from algorithms.distribution.Measures import BrownianMotion
+from algorithms.measures.measures import BrownianMotion
 
 class Test_Measure(unittest.TestCase):
 

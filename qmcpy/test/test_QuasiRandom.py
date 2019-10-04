@@ -2,8 +2,8 @@ import unittest
 from numpy import array,log,zeros,int64
 from third_party.magic_point_shop.latticeseq_b2 import latticeseq_b2
 
-from algorithms.distribution.Measures import StdGaussian
-from algorithms.distribution.QuasiRandom import QuasiRandom
+from algorithms.measures.measures import StdGaussian
+from algorithms.distribution.quasi_random import QuasiRandom
 from algorithms.distribution import MeasureCompatibilityError
 from algorithms.distribution.DigitalSeq import DigitalSeq
 
