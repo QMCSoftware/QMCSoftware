@@ -25,7 +25,7 @@ def integrate(integrand, measure, distribution, stopping_criterion):
 
     t_start = time()
     # Transform integrands to accept distribution values which can generate
-    integrand = integrand.transform_variable(measure, distribution)
+    integrand.transform_variable(measure, distribution)
     while stopping_criterion.stage != 'done':
         # the data_obj.stage property tells us where we are in the process
         stopping_criterion.data_obj.update_data(distribution, integrand)  # compute more data

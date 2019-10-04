@@ -32,7 +32,7 @@ class MeanVarData(AccumData):
         self.sighat = full(self.n_integrands, inf) # sample standard deviation
         self.t_eval = zeros(self.n_integrands) # time used to evaluate each integrand
 
-    def update_data(self, distribution: DiscreteDistribution, integrand: Integrand):
+    def update_data(self, distribution, integrand):
         """
         Update data
 

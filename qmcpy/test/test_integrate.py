@@ -34,7 +34,7 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_AsianOption_MultiLevel(self):
         abs_tol = 0.1
         timeSeries_levels = [arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)]
-        measureObj = BrownianMotion(timeVector=timeSeries_levels)
+        measureObj = BrownianMotion(time_vector=timeSeries_levels)
         OptionObj = AsianCall(measureObj)
         distribObj = QuasiRandom(true_distribution=Lattice(dimension=[4,16,64]))
         stopObj = CLTRep(distribObj,abs_tol=abs_tol)

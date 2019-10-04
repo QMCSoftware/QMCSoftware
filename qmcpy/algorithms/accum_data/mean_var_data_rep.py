@@ -32,7 +32,7 @@ class MeanVarDataRep(AccumData):
         self.flag = ones(self.n_integrands) # flag when an integrand has been sufficiently approximated
         self.t_eval = zeros(self.n_integrands) # time used to evaluate each integrand
 
-    def update_data(self, distribution: DiscreteDistribution, integrand: Integrand):
+    def update_data(self, distribution, integrand):
         """
         Update data
 

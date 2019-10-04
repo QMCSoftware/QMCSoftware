@@ -39,7 +39,7 @@ def QMC_Wrapper(stopObj,distribObj,name):
     item_s = '    %-25s %-10s %-10s'
     #try:
     measureObj = BrownianMotion(
-        timeVector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
+        time_vector=[arange(1/4,5/4,1/4),arange(1/16,17/16,1/16),arange(1/64,65/64,1/64)])
     OptionObj = AsianCall(measureObj)
     sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
     print(item_f%(name,sol,dataObj.t_total))
@@ -61,25 +61,25 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
         results.append(abs_tol)
 
         # CLT_stdUniform
-        distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[4, 16, 64]), rngSeed=7)
+        distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[4, 16, 64]), seed_rng=7)
         stopObj = CLTStopping(distribObj,abs_tol=abs_tol)
         mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdUniform')
         results.extend([mu,t])
 
         # CLT_stdGaussian
-        distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[4, 16, 64]), rngSeed=7)
+        distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[4, 16, 64]), seed_rng=7)
         stopObj = CLTStopping(distribObj,abs_tol=abs_tol)
         mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdGaussian')
         results.extend([mu,t])
 
         # CLT_Rep_lattice
-        distribObj = QuasiRandom(true_distribution=Lattice(dimension=[4,16,64]),rngSeed=7)
+        distribObj = QuasiRandom(true_distribution=Lattice(dimension=[4,16,64]),seed_rng=7)
         stopObj = CLTRep(distribObj,n_max=2**20,abs_tol=abs_tol)
         mu,t = QMC_Wrapper(stopObj,distribObj,'lattice')
         results.extend([mu,t])
 
         # CLT_Rep_sobol
-        distribObj = QuasiRandom(true_distribution=Sobol(dimension=[4, 16, 64]), rngSeed=7)
+        distribObj = QuasiRandom(true_distribution=Sobol(dimension=[4, 16, 64]), seed_rng=7)
         stopObj = CLTRep(distribObj,n_max=2**20,abs_tol=abs_tol)
         mu,t = QMC_Wrapper(stopObj,distribObj,'sobol')
         results.extend([mu,t])
