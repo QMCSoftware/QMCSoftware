@@ -67,11 +67,11 @@ class Integrand(ABC):
             elif transform_to=='IIDZeroMeanGaussian' and sample_from=='StdUniform': # inverse cdf transform
                 this_var = measure[i].variance
                 self[i].f = lambda xu,coordIdex,var=this_var,i=i: self[i].g(sqrt(var)*norm.ppf(xu),coordIdex)
-            elif transform_to== 'BrownianMotion' and sample_from== 'StdUniform':
-                timeDiff = diff(insert(measure[i].timeVector, 0, 0))
+            elif transform_to== 'BrownianMotion' and sample_from== 'StdUniform': # inverse cdf transform -> sum across time-series
+                timeDiff = diff(insert(measure[i].time_vector, 0, 0))
                 self[i].f = lambda xu, coordIndex,timeDiff=timeDiff,i=i: self[i].g(cumsum(norm.ppf(xu)*sqrt(timeDiff),1),coordIndex)
-            elif transform_to== 'BrownianMotion' and sample_from== 'StdGaussian':
-                timeDiff = diff(insert(measure[i].timeVector, 0, 0))
+            elif transform_to== 'BrownianMotion' and sample_from== 'StdGaussian': # sum across time-series
+                timeDiff = diff(insert(measure[i].time_vector, 0, 0))
                 self[i].f = lambda xu,coordIndex,timeDiff=timeDiff,i=i: self[i].g(cumsum(xu*sqrt(timeDiff),1),coordIndex)
             else:
                 raise TransformError('Cannot transform %s distributuion to mimic Integrands true %s measure'%(sample_from,transform_to))

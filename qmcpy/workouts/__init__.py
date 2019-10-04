@@ -1,4 +1,4 @@
-def summary_qmc(stopObj,measureObj,funObj,distribObj,dataObj):
+def seed_rng(stopObj,measureObj,funObj,distribObj,dataObj):
     h1 = '%s (%s)\n'
     item_i = '%25s: %d\n'
     item_f = '%25s: %-15.4f\n'

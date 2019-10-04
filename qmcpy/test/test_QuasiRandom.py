@@ -5,13 +5,13 @@ from third_party.magic_point_shop.latticeseq_b2 import latticeseq_b2
 from algorithms.measures.measures import StdGaussian
 from algorithms.distribution.quasi_random import QuasiRandom
 from algorithms.distribution import MeasureCompatibilityError
-from algorithms.distribution.DigitalSeq import DigitalSeq
+from algorithms.distribution.digital_seq import DigitalSeq
 
 
 class Test_IIDDistribution(unittest.TestCase):
 
     def test_IIDGen_in_QuasiClass(self):
-        self.assertRaises(MeasureCompatibilityError,QuasiRandom,true_distrib=StdGaussian([2]))
+        self.assertRaises(MeasureCompatibilityError,QuasiRandom,true_distribution=StdGaussian([2]))
 
     def test_backend_lattice(self):
         n,m = 4,4

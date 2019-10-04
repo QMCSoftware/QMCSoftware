@@ -11,7 +11,7 @@ from .digital_seq import DigitalSeq
 
 class QuasiRandom(DiscreteDistribution):
 
-    def __init__(self, true_distrib=None, seed_rng=None):
+    def __init__(self, true_distribution=None, seed_rng=None):
         """        
         Args:
             accepted_measures (list of strings): Measure objects compatible with the DiscreteDistribution
@@ -19,7 +19,7 @@ class QuasiRandom(DiscreteDistribution):
         """
         accepted_measures = ['Lattice','Sobol'] # Implemented QuasiRandom generators
         if seed_rng: random.seed(seed_rng) # numpy.random for underlying generation
-        super().__init__(accepted_measures, true_distrib)
+        super().__init__(accepted_measures, true_distribution)
 
     def gen_distrib(self, n, m, j=16):
         """
@@ -34,12 +34,12 @@ class QuasiRandom(DiscreteDistribution):
         Returns:
             jxnxm (numpy array) 
         """
-        if type(self.true_distrib).__name__=='Lattice':
+        if type(self.true_distribution).__name__=='Lattice':
             x = array([row for row in latticeseq_b2(m=int(log(n) / log(2)), s=m)]) # generate jxnxm data
             shifts = random.rand(j, m)
             RS_x = array([(x + random.rand(m)) % 1 for shift in shifts]) # randomly shift each nxm sample
             return RS_x
-        elif type(self.true_distrib).__name__=='Sobol':
+        elif type(self.true_distribution).__name__=='Sobol':
             gen = DigitalSeq(Cs='./third_party/magic_point_shop/sobol_Cs.col', m=int(log(n) / log(2)), s=m)
             t = max(32,gen.t) # we will guarantee at least a depth of 32 bits for the shift
             ct = max(0,t-gen.t) # this is the correction factor to scale the integers
