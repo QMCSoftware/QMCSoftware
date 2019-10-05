@@ -85,22 +85,22 @@
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Quasi-Monte Carlo Community Software</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Algorithms</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-integrate">Integration Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.integrand.__init__">Integrand Class</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-algorithms.integrand.asian_call">Asical Call Option Payoff</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-algorithms.integrand.keister">Kesiter Function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-algorithms.integrand.linear">A Linear Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.integrate">Integration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.integrand.__init__">Integrand Class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.asian_call">Asical Call Option Payoff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.keister">Kesiter Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.linear">A Linear Function</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.measures.__init__">Measure Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.distribution.__init__">Distribution Class</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-algorithms.distribution.iid_distribution">IID Distribution</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-algorithms.distribution.quasi_random">Quasi Random Distribution</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-algorithms.distribution.digital_seq">Sobol Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.measures.__init__">Measure Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.distribution.__init__">Distribution Class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.distribution.iid_distribution">IID Distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.distribution.quasi_random">Quasi Random Distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.distribution.digital_seq">Sobol Sequence</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.accum_data.__init__">Data Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-algorithms.stop.__init__">StoppingCriterion Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.accum_data.__init__">Data Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.stop.__init__">StoppingCriterion Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-__init__">Utilities</a></li>
 </ul>
 </li>
@@ -169,27 +169,27 @@
             
   <div class="section" id="algorithms">
 <h1>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-integrate">
-<span id="integration-method"></span><h2>Integration Method<a class="headerlink" href="#module-integrate" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-qmcpy.integrate">
+<span id="integration-method"></span><h2>Integration Method<a class="headerlink" href="#module-qmcpy.integrate" title="Permalink to this headline">¶</a></h2>
 <p>Main driver function for Qmcpy.</p>
 <dl class="function">
-<dt id="integrate.integrate">
-<code class="sig-prename descclassname">integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">measure</em>, <em class="sig-param">distribution</em>, <em class="sig-param">stopping_criterion</em><span class="sig-paren">)</span><a class="headerlink" href="#integrate.integrate" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrate.integrate">
+<code class="sig-prename descclassname">qmcpy.integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">measure</em>, <em class="sig-param">distribution</em>, <em class="sig-param">stopping_criterion</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrate.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and compute integral of <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for     <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>integrand</strong> (<a class="reference internal" href="#algorithms.integrand.__init__.Integrand" title="algorithms.integrand.__init__.Integrand"><em>Integrand</em></a>) – an object from class Integrand</p></li>
-<li><p><strong>measure</strong> (<a class="reference internal" href="#algorithms.measures.__init__.Measure" title="algorithms.measures.__init__.Measure"><em>Measure</em></a>) – an object from class Measure</p></li>
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution</p></li>
-<li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#algorithms.stop.__init__.StoppingCriterion" title="algorithms.stop.__init__.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class             StoppingCriterion</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.__init__.Integrand" title="qmcpy.integrand.__init__.Integrand"><em>Integrand</em></a>) – an object from class Integrand</p></li>
+<li><p><strong>measure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – an object from class Measure</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution</p></li>
+<li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#qmcpy.stop.__init__.StoppingCriterion" title="qmcpy.stop.__init__.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class             StoppingCriterion</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p>tuple containing:</p>
 <blockquote>
 <div><p><strong>solution</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>): estimated value of the integral</p>
-<p><strong>data</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">AccumData</span></code>): other information such as number of             sampling points used to obtain the estimate</p>
+<p><strong>data</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">AccumData</span></code>): other information such as number of                 sampling points used to obtain the estimate</p>
 </div></blockquote>
 </p>
 </dd>
@@ -200,19 +200,19 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-algorithms.integrand.__init__">
-<span id="integrand-class"></span><h2>Integrand Class<a class="headerlink" href="#module-algorithms.integrand.__init__" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-qmcpy.integrand.__init__">
+<span id="integrand-class"></span><h2>Integrand Class<a class="headerlink" href="#module-qmcpy.integrand.__init__" title="Permalink to this headline">¶</a></h2>
 <p>Definition for abstract class, AccumData</p>
 <dl class="class">
-<dt id="algorithms.integrand.__init__.Integrand">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.__init__.</code><code class="sig-name descname">Integrand</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.__init__.Integrand">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.__init__.</code><code class="sig-name descname">Integrand</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.__init__.Integrand" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="algorithms.integrand.__init__.Integrand.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.__init__.Integrand.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.__init__.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for         <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
 <dl class="attribute">
-<dt id="algorithms.integrand.__init__.Integrand.nominal_value">
-<code class="sig-name descname">nominal_value</code><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.nominal_value" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.__init__.Integrand.nominal_value">
+<code class="sig-name descname">nominal_value</code><a class="headerlink" href="#qmcpy.integrand.__init__.Integrand.nominal_value" title="Permalink to this definition">¶</a></dt>
 <dd><p><img class="math" src="_images/math/d520a12f1579170834c32ad5f656de081bbb36fe.png" alt="c"/> such that                 <img class="math" src="_images/math/4d6ee79634f7ec28b02c523bbb24bea9a167debe.png" alt="(c, \ldots, c) \in \mathcal{X}"/></p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -222,8 +222,8 @@
 </dd></dl>
 
 <dl class="attribute">
-<dt id="algorithms.integrand.__init__.Integrand.f">
-<code class="sig-name descname">f</code><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.f" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.__init__.Integrand.f">
+<code class="sig-name descname">f</code><a class="headerlink" href="#qmcpy.integrand.__init__.Integrand.f" title="Permalink to this definition">¶</a></dt>
 <dd><p>function transformed to accept distribution                 values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -233,8 +233,8 @@
 </dd></dl>
 
 <dl class="attribute">
-<dt id="algorithms.integrand.__init__.Integrand.dimension">
-<code class="sig-name descname">dimension</code><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.dimension" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.__init__.Integrand.dimension">
+<code class="sig-name descname">dimension</code><a class="headerlink" href="#qmcpy.integrand.__init__.Integrand.dimension" title="Permalink to this definition">¶</a></dt>
 <dd><p>dimension of the domain, :math:’d’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -244,8 +244,8 @@
 </dd></dl>
 
 <dl class="attribute">
-<dt id="algorithms.integrand.__init__.Integrand.fun_list">
-<code class="sig-name descname">fun_list</code><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.fun_list" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.__init__.Integrand.fun_list">
+<code class="sig-name descname">fun_list</code><a class="headerlink" href="#qmcpy.integrand.__init__.Integrand.fun_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of Integrands, may be more than 1 for                 multi-dimensional problems</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -257,8 +257,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.integrand.__init__.Integrand.g">
-<em class="property">abstract </em><code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.g" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.__init__.Integrand.g">
+<em class="property">abstract </em><code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.__init__.Integrand.g" title="Permalink to this definition">¶</a></dt>
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -276,16 +276,16 @@ for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.integrand.__init__.Integrand.transform_variable">
-<code class="sig-name descname">transform_variable</code><span class="sig-paren">(</span><em class="sig-param">measure</em>, <em class="sig-param">distribution</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.__init__.Integrand.transform_variable" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.__init__.Integrand.transform_variable">
+<code class="sig-name descname">transform_variable</code><span class="sig-paren">(</span><em class="sig-param">measure</em>, <em class="sig-param">distribution</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.__init__.Integrand.transform_variable" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method performs the necessary variable transformation to put the
 original integrand in the form required by the DiscreteDistributon
 object starting from the original Measure object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>measure</strong> (<a class="reference internal" href="#algorithms.measures.__init__.Measure" title="algorithms.measures.__init__.Measure"><em>Measure</em></a>) – the Measure object that defines the integral</p></li>
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete distribution                 object that is sampled from</p></li>
+<li><p><strong>measure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – the Measure object that defines the integral</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete distribution                 object that is sampled from</p></li>
 </ul>
 </dd>
 </dl>
@@ -294,21 +294,21 @@ object starting from the original Measure object</p>
 
 </dd></dl>
 
-<div class="section" id="module-algorithms.integrand.asian_call">
-<span id="asical-call-option-payoff"></span><h3>Asical Call Option Payoff<a class="headerlink" href="#module-algorithms.integrand.asian_call" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-qmcpy.integrand.asian_call">
+<span id="asical-call-option-payoff"></span><h3>Asical Call Option Payoff<a class="headerlink" href="#module-qmcpy.integrand.asian_call" title="Permalink to this headline">¶</a></h3>
 <p>Definition for class AsianCall, a subclass of Integrand</p>
 <dl class="class">
-<dt id="algorithms.integrand.asian_call.AsianCall">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.asian_call.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.asian_call.AsianCall" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.asian_call.AsianCall">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.asian_call.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate payoff values of an Asian Call option</p>
 <dl class="method">
-<dt id="algorithms.integrand.asian_call.AsianCall.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.asian_call.AsianCall.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.asian_call.AsianCall.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">BMmeasure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize AsianCall Integrand’s’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>BMmeasure</strong> (<a class="reference internal" href="#algorithms.measures.__init__.Measure" title="algorithms.measures.__init__.Measure"><em>Measure</em></a>) – A BrownianMotion Measure object</p></li>
+<li><p><strong>BMmeasure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – A BrownianMotion Measure object</p></li>
 <li><p><strong>volatility</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sigma, the volatility of the asset</p></li>
 <li><p><strong>start_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – S(0), the asset value at t=0</p></li>
 <li><p><strong>strike_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – K, the call/put offer</p></li>
@@ -319,8 +319,8 @@ object starting from the original Measure object</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.integrand.asian_call.AsianCall.g">
-<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">ignore</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.asian_call.AsianCall.g" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.asian_call.AsianCall.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">ignore</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall.g" title="Permalink to this definition">¶</a></dt>
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -340,18 +340,18 @@ for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873
 </dd></dl>
 
 </div>
-<div class="section" id="module-algorithms.integrand.keister">
-<span id="kesiter-function"></span><h3>Kesiter Function<a class="headerlink" href="#module-algorithms.integrand.keister" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-qmcpy.integrand.keister">
+<span id="kesiter-function"></span><h3>Kesiter Function<a class="headerlink" href="#module-qmcpy.integrand.keister" title="Permalink to this headline">¶</a></h3>
 <p>Definition for class Keister, a subclass of Integrand</p>
 <dl class="class">
-<dt id="algorithms.integrand.keister.Keister">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.keister.</code><code class="sig-name descname">Keister</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.keister.Keister">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <img class="math" src="_images/math/d03f853393db6b7cf2c25523b4a9f78790436922.png" alt="f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)"/> for <img class="math" src="_images/math/27881af6ffb368e623dfe6dc8343f138920bdfa5.png" alt="\mathbf{x} \in \mathbb{R}^d"/>
 The standard example integrates the Keister integrand with respect to an IID Gaussian distribution with variance 1/2
 B. D. Keister, Multidimensional Quadrature Algorithms, <cite>Computers in Physics</cite>, <em>10</em>, pp.119-122, 1996.</p>
 <dl class="method">
-<dt id="algorithms.integrand.keister.Keister.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.keister.Keister.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.keister.Keister.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize Keister Integrand</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -361,8 +361,8 @@ B. D. Keister, Multidimensional Quadrature Algorithms, <cite>Computers in Physic
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.integrand.keister.Keister.g">
-<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.keister.Keister.g" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.keister.Keister.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister.g" title="Permalink to this definition">¶</a></dt>
 <dd><p>Original integrand to be integrated
 if the nominalValue = 0, this is efficient</p>
 <dl class="field-list simple">
@@ -383,16 +383,16 @@ for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873
 </dd></dl>
 
 </div>
-<div class="section" id="module-algorithms.integrand.linear">
-<span id="a-linear-function"></span><h3>A Linear Function<a class="headerlink" href="#module-algorithms.integrand.linear" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-qmcpy.integrand.linear">
+<span id="a-linear-function"></span><h3>A Linear Function<a class="headerlink" href="#module-qmcpy.integrand.linear" title="Permalink to this headline">¶</a></h3>
 <p>Definition for class Linear, a subclass of Integrand</p>
 <dl class="class">
-<dt id="algorithms.integrand.linear.Linear">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.integrand.linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.linear.Linear">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <img class="math" src="_images/math/2ccb5bd520bcb15dc67920c80ab88f087d4912d9.png" alt="f(\mathbf{x}) = \sum_{i=1}^d x_i"/> for <img class="math" src="_images/math/7d4a5e61c2554400de7b0df8cb439d75b43f7e05.png" alt="\mathbf{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d"/>.</p>
 <dl class="method">
-<dt id="algorithms.integrand.linear.Linear.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.linear.Linear.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.linear.Linear.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">nominal_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize Linear Integrand</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -402,8 +402,8 @@ for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.integrand.linear.Linear.g">
-<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.integrand.linear.Linear.g" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.integrand.linear.Linear.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">coord_index</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.g" title="Permalink to this definition">¶</a></dt>
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -424,16 +424,16 @@ for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873
 
 </div>
 </div>
-<div class="section" id="module-algorithms.measures.__init__">
-<span id="measure-class"></span><h2>Measure Class<a class="headerlink" href="#module-algorithms.measures.__init__" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-qmcpy.measures.__init__">
+<span id="measure-class"></span><h2>Measure Class<a class="headerlink" href="#module-qmcpy.measures.__init__" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="algorithms.measures.__init__.Measure">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.__init__.</code><code class="sig-name descname">Measure</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.__init__.Measure" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.__init__.Measure">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.measures.__init__.</code><code class="sig-name descname">Measure</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.__init__.Measure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies the components of a general measure used to define an
 integration problem or a sampling method</p>
 <dl class="method">
-<dt id="algorithms.measures.__init__.Measure.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.__init__.Measure.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.__init__.Measure.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.__init__.Measure.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a list of measures.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -447,13 +447,13 @@ integration problem or a sampling method</p>
 
 </dd></dl>
 
-<span class="target" id="module-algorithms.measures.measures"></span><p>Definitions for concrete Measure classes</p>
+<span class="target" id="module-qmcpy.measures.measures"></span><p>Definitions for concrete Measure classes</p>
 <dl class="class">
-<dt id="algorithms.measures.measures.BrownianMotion">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">time_vector=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.BrownianMotion" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.BrownianMotion">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.measures.measures.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">time_vector=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.BrownianMotion" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="algorithms.measures.measures.BrownianMotion.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">time_vector=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.BrownianMotion.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.BrownianMotion.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">time_vector=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.BrownianMotion.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>time_vector</strong> (<em>array of floats</em>) – Monitoring times</p>
@@ -464,12 +464,12 @@ integration problem or a sampling method</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="algorithms.measures.measures.IIDZeroMeanGaussian">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">IIDZeroMeanGaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">variance=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.IIDZeroMeanGaussian" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.IIDZeroMeanGaussian">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.measures.measures.</code><code class="sig-name descname">IIDZeroMeanGaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">variance=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.IIDZeroMeanGaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>IID Zero Mean Gausian Measure</p>
 <dl class="method">
-<dt id="algorithms.measures.measures.IIDZeroMeanGaussian.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">variance=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.IIDZeroMeanGaussian.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.IIDZeroMeanGaussian.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">variance=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.IIDZeroMeanGaussian.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -483,11 +483,11 @@ integration problem or a sampling method</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="algorithms.measures.measures.Lattice">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Lattice" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.Lattice">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.measures.measures.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.Lattice" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="algorithms.measures.measures.Lattice.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.Lattice.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dimension</strong> (<em>array of ints</em>) – dimensions of integrands</p>
@@ -498,11 +498,11 @@ integration problem or a sampling method</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="algorithms.measures.measures.Sobol">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Sobol" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.Sobol">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.measures.measures.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.Sobol" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="algorithms.measures.measures.Sobol.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.Sobol.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dimension</strong> (<em>array of ints</em>) – dimensions of integrands</p>
@@ -513,12 +513,12 @@ integration problem or a sampling method</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="algorithms.measures.measures.StdGaussian">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">StdGaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdGaussian" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.StdGaussian">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.measures.measures.</code><code class="sig-name descname">StdGaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.StdGaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Standard Gaussian Measure</p>
 <dl class="method">
-<dt id="algorithms.measures.measures.StdGaussian.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdGaussian.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.StdGaussian.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.StdGaussian.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dimension</strong> (<em>array of ints</em>) – dimensions of integrands</p>
@@ -529,12 +529,12 @@ integration problem or a sampling method</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="algorithms.measures.measures.StdUniform">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.measures.measures.</code><code class="sig-name descname">StdUniform</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdUniform" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.StdUniform">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.measures.measures.</code><code class="sig-name descname">StdUniform</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.StdUniform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Standard Uniform Measure</p>
 <dl class="method">
-<dt id="algorithms.measures.measures.StdUniform.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.measures.measures.StdUniform.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.measures.measures.StdUniform.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.measures.StdUniform.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dimension</strong> (<em>array of ints</em>) – dimensions of integrands</p>
@@ -545,56 +545,53 @@ integration problem or a sampling method</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-algorithms.distribution.__init__">
-<span id="distribution-class"></span><h2>Distribution Class<a class="headerlink" href="#module-algorithms.distribution.__init__" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-qmcpy.distribution.__init__">
+<span id="distribution-class"></span><h2>Distribution Class<a class="headerlink" href="#module-qmcpy.distribution.__init__" title="Permalink to this headline">¶</a></h2>
 <p>Definition for abstract classes: DiscreteDistribution, Measure</p>
 <dl class="class">
-<dt id="algorithms.distribution.__init__.DiscreteDistribution">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.__init__.</code><code class="sig-name descname">DiscreteDistribution</code><span class="sig-paren">(</span><em class="sig-param">accepted_measures</em>, <em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.__init__.DiscreteDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.distribution.__init__.</code><code class="sig-name descname">DiscreteDistribution</code><span class="sig-paren">(</span><em class="sig-param">accepted_measures</em>, <em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies and generates the components of <img class="math" src="_images/math/6b67c91efdaf7452973fdc14df173d5a08325cfa.png" alt="a_n \sum_{i=1}^n w_i
 \delta_{\mathbf{x}_i}(\cdot)"/>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>accepted_measures</strong> – list of valid measure names</p></li>
-<li><p><strong>true_distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – True distribution.</p></li>
+<li><p><strong>true_distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – True distribution.</p></li>
 <li><p><strong>distrib_data</strong> – </p></li>
 </ul>
 </dd>
 </dl>
 <dl class="attribute">
-<dt id="algorithms.distribution.__init__.DiscreteDistribution.distribution_list">
-<code class="sig-name descname">distribution_list</code><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.distribution_list" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.__init__.DiscreteDistribution.distribution_list">
+<code class="sig-name descname">distribution_list</code><a class="headerlink" href="#qmcpy.distribution.__init__.DiscreteDistribution.distribution_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of DiscreteDistribution instances.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="algorithms.distribution.__init__.DiscreteDistribution.true_distribution">
-<code class="sig-name descname">true_distribution</code><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.true_distribution" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.__init__.DiscreteDistribution.true_distribution">
+<code class="sig-name descname">true_distribution</code><a class="headerlink" href="#qmcpy.distribution.__init__.DiscreteDistribution.true_distribution" title="Permalink to this definition">¶</a></dt>
 <dd><p>True distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution">DiscreteDistribution</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution">DiscreteDistribution</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><a class="reference internal" href="#__init__.MeasureCompatibilityError" title="__init__.MeasureCompatibilityError"><strong>MeasureCompatibilityError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">true_distribution</span></code> not in</p></li>
-<li><p><strong>accepted_measures</strong> – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>MeasureCompatibilityError</strong> – if <code class="docutils literal notranslate"><span class="pre">true_distribution</span></code> not in         <code class="docutils literal notranslate"><span class="pre">accepted_measures</span></code></p>
 </dd>
 </dl>
 <dl class="method">
-<dt id="algorithms.distribution.__init__.DiscreteDistribution.gen_distrib">
-<em class="property">abstract </em><code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.__init__.DiscreteDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates distribution</p>
+<dt id="qmcpy.distribution.__init__.DiscreteDistribution.gen_distrib">
+<em class="property">abstract </em><code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.__init__.DiscreteDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – value of <img class="math" src="_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/> used to determine <img class="math" src="_images/math/e9f4d366f1d155ec8c37d785708c0c47e20de43d.png" alt="a_n"/></p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Value of <img class="math" src="_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/> used to determine <img class="math" src="_images/math/e9f4d366f1d155ec8c37d785708c0c47e20de43d.png" alt="a_n"/>.</p></li>
 <li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
 <li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </p></li>
 </ul>
@@ -604,17 +601,17 @@ integration problem or a sampling method</p>
 
 </dd></dl>
 
-<div class="section" id="module-algorithms.distribution.iid_distribution">
-<span id="iid-distribution"></span><h3>IID Distribution<a class="headerlink" href="#module-algorithms.distribution.iid_distribution" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-qmcpy.distribution.iid_distribution">
+<span id="iid-distribution"></span><h3>IID Distribution<a class="headerlink" href="#module-qmcpy.distribution.iid_distribution" title="Permalink to this headline">¶</a></h3>
 <p>Definitions for IIDDistribution, a DiscreteDistribution</p>
 <dl class="class">
-<dt id="algorithms.distribution.iid_distribution.IIDDistribution">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.iid_distribution.</code><code class="sig-name descname">IIDDistribution</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.iid_distribution.IIDDistribution" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.iid_distribution.IIDDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.distribution.iid_distribution.</code><code class="sig-name descname">IIDDistribution</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.iid_distribution.IIDDistribution" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies and generates the components of     <img class="math" src="_images/math/d59410904775e3c06b62ced7058f95f8e93c3029.png" alt="\dfrac{1}{n} \sum_{i=1}^n \delta_{\mathbf{x}_i}(\cdot)"/>,
 where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf45517bb.png" alt="\mathbf{x}_i"/> are IIDDistribution uniform on     <img class="math" src="_images/math/38fbdb5f0cd005023c1bb115f01c323f34f20446.png" alt="[0,1]^d"/> or IIDDistribution standard Gaussian</p>
 <dl class="method">
-<dt id="algorithms.distribution.iid_distribution.IIDDistribution.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.iid_distribution.IIDDistribution.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.iid_distribution.IIDDistribution.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">distrib_data=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.iid_distribution.IIDDistribution.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -626,8 +623,8 @@ where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf4
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.distribution.iid_distribution.IIDDistribution.gen_distrib">
-<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=1</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.iid_distribution.IIDDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.iid_distribution.IIDDistribution.gen_distrib">
+<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.iid_distribution.IIDDistribution.gen_distrib" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate j nxm samples from the true-distribution</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -645,15 +642,15 @@ where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf4
 </dd></dl>
 
 </div>
-<div class="section" id="module-algorithms.distribution.quasi_random">
-<span id="quasi-random-distribution"></span><h3>Quasi Random Distribution<a class="headerlink" href="#module-algorithms.distribution.quasi_random" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-qmcpy.distribution.quasi_random">
+<span id="quasi-random-distribution"></span><h3>Quasi Random Distribution<a class="headerlink" href="#module-qmcpy.distribution.quasi_random" title="Permalink to this headline">¶</a></h3>
 <p>Definitions for IIDDistribution, a DiscreteDistribution</p>
 <dl class="class">
-<dt id="algorithms.distribution.quasi_random.QuasiRandom">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.quasi_random.</code><code class="sig-name descname">QuasiRandom</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.quasi_random.QuasiRandom">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.distribution.quasi_random.</code><code class="sig-name descname">QuasiRandom</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.quasi_random.QuasiRandom" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="algorithms.distribution.quasi_random.QuasiRandom.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.quasi_random.QuasiRandom.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">true_distribution=None</em>, <em class="sig-param">seed_rng=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.quasi_random.QuasiRandom.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -665,8 +662,8 @@ where the <img class="math" src="_images/math/ab6382a541ca484335ab18b551b772cbf4
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.distribution.quasi_random.QuasiRandom.gen_distrib">
-<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=16</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.quasi_random.QuasiRandom.gen_distrib" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.quasi_random.QuasiRandom.gen_distrib">
+<code class="sig-name descname">gen_distrib</code><span class="sig-paren">(</span><em class="sig-param">n</em>, <em class="sig-param">m</em>, <em class="sig-param">j=16</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.quasi_random.QuasiRandom.gen_distrib" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate j nxm samples from the quasi-random distribution.
 Randomly shifts each of the j samples.</p>
 <dl class="field-list simple">
@@ -686,12 +683,12 @@ Randomly shifts each of the j samples.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-algorithms.distribution.digital_seq">
-<span id="sobol-sequence"></span><h3>Sobol Sequence<a class="headerlink" href="#module-algorithms.distribution.digital_seq" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-qmcpy.distribution.digital_seq">
+<span id="sobol-sequence"></span><h3>Sobol Sequence<a class="headerlink" href="#module-qmcpy.distribution.digital_seq" title="Permalink to this headline">¶</a></h3>
 <p>Sobol sequence generator</p>
 <dl class="class">
-<dt id="algorithms.distribution.digital_seq.DigitalSeq">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.digital_seq.</code><code class="sig-name descname">DigitalSeq</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.digital_seq.DigitalSeq" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.digital_seq.DigitalSeq">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.distribution.digital_seq.</code><code class="sig-name descname">DigitalSeq</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.digital_seq.DigitalSeq" title="Permalink to this definition">¶</a></dt>
 <dd><p>A fast digital sequence point generator based on generating matrices.</p>
 <blockquote>
 <div><p>This sequence generator can take classical (m by m) generating matrices
@@ -705,8 +702,8 @@ vectors.</cite> MATLAB and Python software, 2018. Available from
 </div></blockquote>
 <p>qmc-generators.</p>
 <dl class="method">
-<dt id="algorithms.distribution.digital_seq.DigitalSeq.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.digital_seq.DigitalSeq.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.digital_seq.DigitalSeq.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.digital_seq.DigitalSeq.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a digital sequence point generator given a list of
 generating matrices.</p>
 <p>Each generating matrix in the list is represented by a list of
@@ -826,8 +823,8 @@ reversed.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="algorithms.distribution.digital_seq.bitreverse">
-<code class="sig-prename descclassname">algorithms.distribution.digital_seq.</code><code class="sig-name descname">bitreverse</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">m=None</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.distribution.digital_seq.bitreverse" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.digital_seq.bitreverse">
+<code class="sig-prename descclassname">qmcpy.distribution.digital_seq.</code><code class="sig-name descname">bitreverse</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">m=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.digital_seq.bitreverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reverse bit string of an integer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -847,16 +844,16 @@ reversed.</p>
 
 </div>
 </div>
-<div class="section" id="module-algorithms.accum_data.__init__">
-<span id="data-class"></span><h2>Data Class<a class="headerlink" href="#module-algorithms.accum_data.__init__" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-qmcpy.accum_data.__init__">
+<span id="data-class"></span><h2>Data Class<a class="headerlink" href="#module-qmcpy.accum_data.__init__" title="Permalink to this headline">¶</a></h2>
 <p>Definition for abstract class, AccumData</p>
 <dl class="class">
-<dt id="algorithms.accum_data.__init__.AccumData">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.__init__.</code><code class="sig-name descname">AccumData</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.__init__.AccumData">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.__init__.</code><code class="sig-name descname">AccumData</code><a class="headerlink" href="#qmcpy.accum_data.__init__.AccumData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data required in the computation of the integral, stores the sample mean and variance of integrand values</p>
 <dl class="attribute">
-<dt id="algorithms.accum_data.__init__.AccumData.stage">
-<code class="sig-name descname">stage</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.stage" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.__init__.AccumData.stage">
+<code class="sig-name descname">stage</code><a class="headerlink" href="#qmcpy.accum_data.__init__.AccumData.stage" title="Permalink to this definition">¶</a></dt>
 <dd><p>stage of computation; ‘begin’, or ‘done’ when finished.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -866,8 +863,8 @@ reversed.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="algorithms.accum_data.__init__.AccumData.n_samples_total">
-<code class="sig-name descname">n_samples_total</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.n_samples_total" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.__init__.AccumData.n_samples_total">
+<code class="sig-name descname">n_samples_total</code><a class="headerlink" href="#qmcpy.accum_data.__init__.AccumData.n_samples_total" title="Permalink to this definition">¶</a></dt>
 <dd><p>number of samples used so far.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -877,8 +874,8 @@ reversed.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="algorithms.accum_data.__init__.AccumData.confid_int">
-<code class="sig-name descname">confid_int</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.confid_int" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.__init__.AccumData.confid_int">
+<code class="sig-name descname">confid_int</code><a class="headerlink" href="#qmcpy.accum_data.__init__.AccumData.confid_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>error bound on the solution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -888,8 +885,8 @@ reversed.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="algorithms.accum_data.__init__.AccumData.t_total">
-<code class="sig-name descname">t_total</code><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.t_total" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.__init__.AccumData.t_total">
+<code class="sig-name descname">t_total</code><a class="headerlink" href="#qmcpy.accum_data.__init__.AccumData.t_total" title="Permalink to this definition">¶</a></dt>
 <dd><p>total computation time. Set by integrate method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -899,20 +896,20 @@ reversed.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.accum_data.__init__.AccumData.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.__init__.AccumData.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.__init__.AccumData.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize data instance</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.accum_data.__init__.AccumData.update_data">
-<em class="property">abstract </em><code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.__init__.AccumData.update_data" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.__init__.AccumData.update_data">
+<em class="property">abstract </em><code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.__init__.AccumData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the accumulated data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
-<li><p><strong>integrand</strong> (<a class="reference internal" href="#algorithms.integrand.__init__.Integrand" title="algorithms.integrand.__init__.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.__init__.Integrand" title="qmcpy.integrand.__init__.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -923,15 +920,15 @@ reversed.</p>
 
 </dd></dl>
 
-<span class="target" id="module-algorithms.accum_data.mean_var_data"></span><p>Definition for class MeanVarData, a subclass of AccumData</p>
+<span class="target" id="module-qmcpy.accum_data.mean_var_data"></span><p>Definition for class MeanVarData, a subclass of AccumData</p>
 <dl class="class">
-<dt id="algorithms.accum_data.mean_var_data.MeanVarData">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.mean_var_data.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data.MeanVarData" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.mean_var_data.MeanVarData">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.mean_var_data.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data for IIDDistribution calculations,
 stores the sample mean and variance of integrand values</p>
 <dl class="method">
-<dt id="algorithms.accum_data.mean_var_data.MeanVarData.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data.MeanVarData.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.mean_var_data.MeanVarData.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize data instance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -941,14 +938,14 @@ stores the sample mean and variance of integrand values</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.accum_data.mean_var_data.MeanVarData.update_data">
-<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.mean_var_data.MeanVarData.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
-<li><p><strong>integrand</strong> (<a class="reference internal" href="#algorithms.integrand.__init__.Integrand" title="algorithms.integrand.__init__.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.__init__.Integrand" title="qmcpy.integrand.__init__.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -959,14 +956,14 @@ stores the sample mean and variance of integrand values</p>
 
 </dd></dl>
 
-<span class="target" id="module-algorithms.accum_data.mean_var_data_rep"></span><p>Definition for MeanVarDataRep, subclass of AccumData</p>
+<span class="target" id="module-qmcpy.accum_data.mean_var_data_rep"></span><p>Definition for MeanVarDataRep, subclass of AccumData</p>
 <dl class="class">
-<dt id="algorithms.accum_data.mean_var_data_rep.MeanVarDataRep">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.accum_data.mean_var_data_rep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em>, <em class="sig-param">n_streams</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data_rep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.mean_var_data_rep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em>, <em class="sig-param">n_streams</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data for lattice calculations</p>
 <dl class="method">
-<dt id="algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em>, <em class="sig-param">n_streams</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em>, <em class="sig-param">n_streams</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize data instance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -979,14 +976,14 @@ stores the sample mean and variance of integrand values</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.update_data">
-<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.accum_data.mean_var_data_rep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
-<li><p><strong>integrand</strong> (<a class="reference internal" href="#algorithms.integrand.__init__.Integrand" title="algorithms.integrand.__init__.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.__init__.Integrand" title="qmcpy.integrand.__init__.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -998,20 +995,20 @@ stores the sample mean and variance of integrand values</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-algorithms.stop.__init__">
-<span id="stoppingcriterion-class"></span><h2>StoppingCriterion Class<a class="headerlink" href="#module-algorithms.stop.__init__" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-qmcpy.stop.__init__">
+<span id="stoppingcriterion-class"></span><h2>StoppingCriterion Class<a class="headerlink" href="#module-qmcpy.stop.__init__" title="Permalink to this headline">¶</a></h2>
 <p>Abstract class for defining stopping conditions for qmcpy algorithms</p>
 <dl class="class">
-<dt id="algorithms.stop.__init__.StoppingCriterion">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.__init__.</code><code class="sig-name descname">StoppingCriterion</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.stop.__init__.StoppingCriterion">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.stop.__init__.</code><code class="sig-name descname">StoppingCriterion</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.__init__.StoppingCriterion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decide when to stop</p>
 <dl class="method">
-<dt id="algorithms.stop.__init__.StoppingCriterion.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.stop.__init__.StoppingCriterion.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.__init__.StoppingCriterion.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
 <li><p><strong>allowed_distribs</strong> – distribution’s compatible with the StoppingCriterion</p></li>
 <li><p><strong>abs_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – absolute error tolerance</p></li>
 <li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – relative error tolerance</p></li>
@@ -1023,25 +1020,25 @@ stores the sample mean and variance of integrand values</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.stop.__init__.StoppingCriterion.stop_yet">
-<em class="property">abstract </em><code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.__init__.StoppingCriterion.stop_yet" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.stop.__init__.StoppingCriterion.stop_yet">
+<em class="property">abstract </em><code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.__init__.StoppingCriterion.stop_yet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine when to stop</p>
 </dd></dl>
 
 </dd></dl>
 
-<span class="target" id="module-algorithms.stop.clt_rep"></span><p>Stopping criterion based on var(stream_1_estimate, …, stream_16_estimate) &lt; errorTol</p>
+<span class="target" id="module-qmcpy.stop.clt_rep"></span><p>Stopping criterion based on var(stream_1_estimate, …, stream_16_estimate) &lt; errorTol</p>
 <dl class="class">
-<dt id="algorithms.stop.clt_rep.CLTRep">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.clt_rep.</code><code class="sig-name descname">CLTRep</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">n_streams=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_rep.CLTRep" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.stop.clt_rep.CLTRep">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.stop.clt_rep.</code><code class="sig-name descname">CLTRep</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">n_streams=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_rep.CLTRep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stopping criterion based on var(stream_1_estimate, …, stream_16_estimate) &lt; errorTol</p>
 <dl class="method">
-<dt id="algorithms.stop.clt_rep.CLTRep.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">n_streams=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_rep.CLTRep.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.stop.clt_rep.CLTRep.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">n_streams=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_rep.CLTRep.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#algorithms.distribution.__init__.DiscreteDistribution" title="algorithms.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
 <li><p><strong>n_streams</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of random nxm matricies to generate</p></li>
 <li><p><strong>inflate</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – inflation factor when estimating variance</p></li>
 <li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – significance level for confidence interval</p></li>
@@ -1055,22 +1052,22 @@ stores the sample mean and variance of integrand values</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.stop.clt_rep.CLTRep.stop_yet">
-<code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_rep.CLTRep.stop_yet" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.stop.clt_rep.CLTRep.stop_yet">
+<code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_rep.CLTRep.stop_yet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine when to stop</p>
 </dd></dl>
 
 </dd></dl>
 
-<span class="target" id="module-algorithms.stop.clt_stopping"></span><p>Stopping criterion based on the Centeral Limit Theorem</p>
+<span class="target" id="module-qmcpy.stop.clt_stopping"></span><p>Stopping criterion based on the Centeral Limit Theorem</p>
 <dl class="class">
-<dt id="algorithms.stop.clt_stopping.CLTStopping">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.stop.clt_stopping.</code><code class="sig-name descname">CLTStopping</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_stopping.CLTStopping" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stopping criterion based on the Centeral Limit Theorem (CLT)</p>
-<p>Attributes:</p>
+<dt id="qmcpy.stop.clt_stopping.CLTStopping">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.stop.clt_stopping.</code><code class="sig-name descname">CLTStopping</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_stopping.CLTStopping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stopping criterion based on the Centeral Limit Theorem (CLT)
+Attributes:</p>
 <dl class="method">
-<dt id="algorithms.stop.clt_stopping.CLTStopping.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_stopping.CLTStopping.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.stop.clt_stopping.CLTStopping.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_stopping.CLTStopping.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1087,8 +1084,8 @@ stores the sample mean and variance of integrand values</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="algorithms.stop.clt_stopping.CLTStopping.stop_yet">
-<code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.stop.clt_stopping.CLTStopping.stop_yet" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.stop.clt_stopping.CLTStopping.stop_yet">
+<code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_stopping.CLTStopping.stop_yet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine when to stop</p>
 </dd></dl>
 
@@ -1097,62 +1094,6 @@ stores the sample mean and variance of integrand values</p>
 </div>
 <div class="section" id="module-__init__">
 <span id="utilities"></span><h2>Utilities<a class="headerlink" href="#module-__init__" title="Permalink to this headline">¶</a></h2>
-<p>Utilities for qmcpy</p>
-<dl class="exception">
-<dt id="__init__.DimensionError">
-<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">DimensionError</code><a class="headerlink" href="#__init__.DimensionError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for raising error about dimension</p>
-</dd></dl>
-
-<dl class="exception">
-<dt id="__init__.DistributionCompatibilityError">
-<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">DistributionCompatibilityError</code><a class="headerlink" href="#__init__.DistributionCompatibilityError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for raising error about incompatible distribution</p>
-</dd></dl>
-
-<dl class="exception">
-<dt id="__init__.MaxSamplesWarning">
-<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">MaxSamplesWarning</code><a class="headerlink" href="#__init__.MaxSamplesWarning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for issuing warning about using maximum number of data samples</p>
-</dd></dl>
-
-<dl class="exception">
-<dt id="__init__.MeasureCompatibilityError">
-<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">MeasureCompatibilityError</code><a class="headerlink" href="#__init__.MeasureCompatibilityError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for raising error of incompatible measures</p>
-</dd></dl>
-
-<dl class="exception">
-<dt id="__init__.TransformError">
-<em class="property">exception </em><code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">TransformError</code><a class="headerlink" href="#__init__.TransformError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for raising error about transforming function to accomodate     distributuion</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="__init__.univ_repr">
-<code class="sig-prename descclassname">__init__.</code><code class="sig-name descname">univ_repr</code><span class="sig-paren">(</span><em class="sig-param">object</em>, <em class="sig-param">attributes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#__init__.univ_repr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clean way to represent object data.</p>
-<p>Note:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>is equivalent to</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>object</strong> – an object instance</p></li>
-<li><p><strong>attributes</strong> – list of object attribute names whose values are to be gathered</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
 </div>
 </div>
 
