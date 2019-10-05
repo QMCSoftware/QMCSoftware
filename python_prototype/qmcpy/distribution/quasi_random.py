@@ -5,8 +5,7 @@ from numpy import array, int64, log, random
 from numpy import zeros
 
 from . import DiscreteDistribution
-from .magic_point_shop.digital_seq import DigitalSeq
-from .magic_point_shop.latticeseq_b2 import latticeseq_b2
+from .magic_point_shop import DigitalSeq,LatticeSeq
 
 class QuasiRandom(DiscreteDistribution):
 
@@ -36,7 +35,7 @@ class QuasiRandom(DiscreteDistribution):
             jxnxm (numpy array)
         """
         if type(self.true_distribution).__name__=='Lattice':
-            x = array([row for row in latticeseq_b2(m=int(log(n) / log(2)), s=m)]) # generate jxnxm data
+            x = array([row for row in LatticeSeq(m=int(log(n) / log(2)), s=m)]) # generate jxnxm data
             shifts = random.rand(j, m)
             RS_x = array([(x + random.rand(m)) % 1 for shift in shifts]) # randomly shift each nxm sample
             return RS_x

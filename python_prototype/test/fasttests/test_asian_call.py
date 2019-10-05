@@ -1,8 +1,8 @@
 import unittest
 from numpy import arange
 
-from qmcpy.integrand.asian_call import AsianCall
-from qmcpy.measures.measures import BrownianMotion
+from qmcpy.integrand import AsianCall
+from qmcpy.measures import BrownianMotion
 
 class Test_AsianCallFun(unittest.TestCase):
 

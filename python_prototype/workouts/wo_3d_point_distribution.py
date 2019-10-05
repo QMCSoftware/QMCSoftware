@@ -4,11 +4,10 @@ import matplotlib.pyplot as mpl_plt
 from numpy import arange, linspace, meshgrid, random, zeros
 from scipy.stats import norm
 
-from qmcpy.distribution.iid_distribution import IIDDistribution
-from qmcpy.distribution.quasi_random import QuasiRandom
-from qmcpy.integrand.keister import Keister
-from qmcpy.measures.measures import IIDZeroMeanGaussian, StdGaussian,Lattice
 from qmcpy import print_summary
+from qmcpy.distribution import IIDDistribution,QuasiRandom
+from qmcpy.integrand import Keister
+from qmcpy.measures import StdGaussian,Lattice,IIDZeroMeanGaussian
 
 def plot3d(verbose=True):
     random.seed(7)
@@ -28,7 +27,7 @@ def plot3d(verbose=True):
     '''
     import sys
     from python_prototype.stop.clt_rep import CLTRep
-    from python_prototype.stop.clt_stopping import CLTStopping
+    from python_prototype.stop.clt_stopping import CLT
     from python_prototype.integrate import integrate
     #     CLTRep Example
     funObj = Keister()
@@ -40,7 +39,7 @@ def plot3d(verbose=True):
     #     CLT Example
     funObj = Keister()
     distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]),seed_rng=7)
-    stopObj = CLTStopping(distribObj,n_init=16,abs_tol=.3,alpha=.01,inflate=1.2)
+    stopObj = CLT(distribObj,n_init=16,abs_tol=.3,alpha=.01,inflate=1.2)
     measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[1/2])
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
     print_summary(stopObj,measureObj,funObj,distribObj,dataObj)

@@ -2,14 +2,11 @@ import unittest
 
 from numpy import arange
 
-from qmcpy.measures.measures import IIDZeroMeanGaussian,StdGaussian,BrownianMotion,Lattice
-from qmcpy.distribution.iid_distribution import IIDDistribution
-from qmcpy.distribution.quasi_random import QuasiRandom
-from qmcpy.integrand.keister import Keister
-from qmcpy.integrand.asian_call import AsianCall
-from qmcpy.stop.clt_stopping import CLTStopping
-from qmcpy.stop.clt_rep import CLTRep
-from qmcpy.integrate import integrate
+from qmcpy import integrate
+from qmcpy.measures import IIDZeroMeanGaussian,StdGaussian,BrownianMotion,Lattice
+from qmcpy.distribution import IIDDistribution,QuasiRandom
+from qmcpy.integrand import Keister,AsianCall
+from qmcpy.stop import CLT,CLTRep
 
 class IntegrationExampleTest(unittest.TestCase):
     '''
@@ -24,7 +21,7 @@ class IntegrationExampleTest(unittest.TestCase):
         fun = Keister()
         measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[1 / 2])
         distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]))
-        stopObj = CLTStopping(distribObj,n_init=16, abs_tol=abs_tol, alpha=.01, inflate=1.2)
+        stopObj = CLT(distribObj,n_init=16, abs_tol=abs_tol, alpha=.01, inflate=1.2)
         sol, out = integrate(fun, measureObj, distribObj, stopObj)
         true_value = 1.808186429263620
         # In Mathematica (or WolframAlpha):

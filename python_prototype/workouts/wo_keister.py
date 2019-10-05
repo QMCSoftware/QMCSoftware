@@ -5,14 +5,11 @@
     Save Output: python workouts/wo_keister.py  > outputs/ie_KeisterFun.txt
 """
 
-from qmcpy.stop.clt_stopping import CLTStopping
-from qmcpy.stop.clt_rep import CLTRep
-from qmcpy.distribution.iid_distribution import IIDDistribution
-from qmcpy.distribution.quasi_random import QuasiRandom
-from qmcpy.integrate import integrate
-from qmcpy.integrand.keister import Keister
-from qmcpy.measures.measures import *
-from qmcpy import print_summary
+from qmcpy import integrate,print_summary
+from qmcpy.stop import CLT,CLTRep
+from qmcpy.distribution import IIDDistribution,QuasiRandom
+from qmcpy.integrand import Keister
+from qmcpy.measures import StdUniform,StdGaussian,IIDZeroMeanGaussian,Lattice,Sobol
 
 def test_distributions():
     # IID std_uniform
@@ -20,7 +17,7 @@ def test_distributions():
     funObj = Keister()
     measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
     distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[dim]), seed_rng=7)
-    stopObj = CLTStopping(distribObj,abs_tol=.05)
+    stopObj = CLT(distribObj,abs_tol=.05)
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
     print_summary(stopObj,measureObj,funObj,distribObj,dataObj)
 
@@ -29,7 +26,7 @@ def test_distributions():
     funObj = Keister()
     measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
     distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]), seed_rng=7)
-    stopObj = CLTStopping(distribObj,abs_tol=.05)
+    stopObj = CLT(distribObj,abs_tol=.05)
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
     print_summary(stopObj,measureObj,funObj,distribObj,dataObj)
 

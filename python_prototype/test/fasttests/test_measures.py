@@ -1,7 +1,7 @@
 import unittest
-
 from numpy import arange
-from qmcpy.measures.measures import BrownianMotion
+
+from qmcpy.measures import BrownianMotion
 
 class Test_Measure(unittest.TestCase):
 

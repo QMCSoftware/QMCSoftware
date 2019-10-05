@@ -5,8 +5,8 @@ from numpy import array, full, zeros
 from scipy.stats import norm
 
 from . import StoppingCriterion
-from .. import MaxSamplesWarning
-from ..accum_data.mean_var_data_rep import MeanVarDataRep
+from ..accum_data import MeanVarDataRep
+from .._util import MaxSamplesWarning
 
 
 class CLTRep(StoppingCriterion):

@@ -3,8 +3,7 @@ Definition for abstract classes: DiscreteDistribution, Measure
 """
 from abc import ABC, abstractmethod
 
-from .. import MeasureCompatibilityError, univ_repr
-
+from .._util import MeasureCompatibilityError,univ_repr
 
 class DiscreteDistribution(ABC):
     """Specifies and generates the components of :math:`a_n \\sum_{i=1}^n w_i
@@ -67,3 +66,7 @@ class DiscreteDistribution(ABC):
 
     def __repr__(self):
         return univ_repr(self, 'distribution_list')
+
+# API
+from .iid_distribution import IIDDistribution
+from .quasi_random import QuasiRandom

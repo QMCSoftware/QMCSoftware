@@ -5,8 +5,7 @@ from abc import ABC, abstractmethod
 from numpy import cumsum, diff, insert, sqrt
 from scipy.stats import norm
 
-from .. import univ_repr,TransformError
-
+from .._util import univ_repr,TransformError
 
 class Integrand(ABC):
     def __init__(self, nominal_value=0):
@@ -92,3 +91,8 @@ class Integrand(ABC):
     def __getitem__(self,i): return self.fun_list[i]
     def __setitem__(self,i,val): self.fun_list[i] = val
     def __repr__(self): return univ_repr(self,'fun_list')
+
+# API
+from .asian_call import AsianCall
+from .keister import Keister
+from .linear import Linear

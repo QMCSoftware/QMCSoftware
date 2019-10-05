@@ -2,9 +2,6 @@
 Definition for class MeanVarData, a subclass of AccumData
 """
 from time import process_time
-
-from qmcpy.distribution import DiscreteDistribution
-from qmcpy.integrand import Integrand
 from numpy import arange, finfo, float32, full, inf, std, zeros
 
 from . import AccumData

@@ -3,12 +3,9 @@ Definition for abstract class, AccumData
 """
 from abc import ABC, abstractmethod
 from math import inf, nan
-
-from qmcpy.distribution import DiscreteDistribution
-from qmcpy.integrand import Integrand
 from numpy import array
 
-from .. import univ_repr
+from .._util import univ_repr
 
 
 class AccumData(ABC):
@@ -51,3 +48,7 @@ class AccumData(ABC):
 
     def __repr__(self):
         return univ_repr(self)
+
+# API
+from .mean_var_data import MeanVarData
+from .mean_var_data_rep import MeanVarDataRep

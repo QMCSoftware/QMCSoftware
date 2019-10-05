@@ -1,17 +1,15 @@
 #!/usr/bin/python_prototype/
 from time import time
-
-from qmcpy.measures.measures import *
-from qmcpy.distribution.iid_distribution import IIDDistribution
-from qmcpy.distribution.quasi_random import QuasiRandom
-from qmcpy.integrand.asian_call import AsianCall
-from qmcpy.integrate import integrate
-from qmcpy.stop.clt_rep import CLTRep
-from qmcpy.stop.clt_stopping import CLTStopping
 from matplotlib import pyplot as mpl_plot
 from numpy import arange, array
 import numpy as np
 import pandas as pd
+
+from qmcpy import integrate
+from qmcpy.measures import StdUniform,StdGaussian,BrownianMotion,Lattice,Sobol
+from qmcpy.distribution import IIDDistribution,QuasiRandom
+from qmcpy.integrand import AsianCall
+from qmcpy.stop import CLT,CLTRep
 
 def plot(title,xlabel,ylabel,xdata,ydata,outF):
     #mpl_plot.title(title)
@@ -62,13 +60,13 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
 
         # CLT_stdUniform
         distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[4, 16, 64]), seed_rng=7)
-        stopObj = CLTStopping(distribObj,abs_tol=abs_tol)
+        stopObj = CLT(distribObj,abs_tol=abs_tol)
         mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdUniform')
         results.extend([mu,t])
 
         # CLT_stdGaussian
         distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[4, 16, 64]), seed_rng=7)
-        stopObj = CLTStopping(distribObj,abs_tol=abs_tol)
+        stopObj = CLT(distribObj,abs_tol=abs_tol)
         mu,t = QMC_Wrapper(stopObj,distribObj,'CLT_stdGaussian')
         results.extend([mu,t])
 

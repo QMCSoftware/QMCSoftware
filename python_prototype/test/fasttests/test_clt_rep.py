@@ -1,9 +1,9 @@
 import unittest
 
-from qmcpy.stop import DistributionCompatibilityError
-from qmcpy.stop.clt_rep import CLTRep
-from qmcpy.distribution.iid_distribution import IIDDistribution
-from qmcpy.measures.measures import StdUniform
+from qmcpy.stop import CLTRep
+from qmcpy.distribution import IIDDistribution
+from qmcpy.measures import StdUniform
+from qmcpy._util import DistributionCompatibilityError
 
 class Test_CLTRep(unittest.TestCase):
 

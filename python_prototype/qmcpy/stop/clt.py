@@ -5,10 +5,10 @@ from numpy import array, ceil, maximum, minimum, tile, zeros
 from scipy.stats import norm
 
 from . import StoppingCriterion
-from ..accum_data.mean_var_data import MeanVarData
+from ..accum_data import MeanVarData
 
 
-class CLTStopping(StoppingCriterion):
+class CLT(StoppingCriterion):
     """ Stopping criterion based on the Centeral Limit Theorem (CLT)
     Attributes:
     """

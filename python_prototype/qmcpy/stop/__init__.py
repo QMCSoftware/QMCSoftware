@@ -3,10 +3,7 @@ Abstract class for defining stopping conditions for qmcpy algorithms
 """
 from abc import ABC, abstractmethod
 
-from qmcpy.distribution import DiscreteDistribution
-
-from .. import DistributionCompatibilityError, univ_repr
-
+from .._util import DistributionCompatibilityError, univ_repr
 
 class StoppingCriterion(ABC):
     """ Decide when to stop """
@@ -37,6 +34,9 @@ class StoppingCriterion(ABC):
         Determine when to stop
         """
 
-
     def __repr__(self):
         return univ_repr(self)
+
+# API
+from .clt import CLT
+from .clt_rep import CLTRep

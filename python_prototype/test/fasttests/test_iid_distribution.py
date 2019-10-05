@@ -1,8 +1,8 @@
 import unittest
 
-from qmcpy.measures.measures import Lattice
-from qmcpy.distribution.iid_distribution import IIDDistribution
-from qmcpy.distribution import MeasureCompatibilityError
+from qmcpy.measures import Lattice
+from qmcpy.distribution import IIDDistribution
+from qmcpy._util import MeasureCompatibilityError
 
 class Test_IIDDistribution(unittest.TestCase):
 

@@ -1,12 +1,10 @@
 import unittest
 from numpy import array,log,zeros,int64
 
-from qmcpy.distribution.magic_point_shop.latticeseq_b2 import latticeseq_b2
-from qmcpy.measures.measures import StdGaussian
-from qmcpy.distribution.quasi_random import QuasiRandom
-from qmcpy.distribution import MeasureCompatibilityError
-from qmcpy.distribution.magic_point_shop.digital_seq import DigitalSeq
-
+from qmcpy.measures import StdGaussian
+from qmcpy.distribution import QuasiRandom
+from qmcpy.distribution.magic_point_shop import LatticeSeq,DigitalSeq
+from qmcpy._util import MeasureCompatibilityError
 
 class Test_IIDDistribution(unittest.TestCase):
 
@@ -15,7 +13,7 @@ class Test_IIDDistribution(unittest.TestCase):
 
     def test_backend_lattice(self):
         n,m = 4,4
-        array_not_shifted = array([row for row in latticeseq_b2(m=int(log(n)/log(2)), s=m)])
+        array_not_shifted = array([row for row in LatticeSeq(m=int(log(n)/log(2)), s=m)])
         true_array = array([[0,   0,   0,   0  ],
                             [1/2, 1/2, 1/2, 1/2],
                             [1/4, 3/4, 3/4, 1/4],

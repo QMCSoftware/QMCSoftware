@@ -1,6 +1,6 @@
 import unittest
 
-from qmcpy import TransformError
+from qmcpy._util import TransformError
 
 class Test_Integrand(unittest.TestCase):
 

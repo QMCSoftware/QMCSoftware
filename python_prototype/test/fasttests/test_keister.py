@@ -1,6 +1,6 @@
 import unittest
 
-from qmcpy.integrand.keister import Keister
+from qmcpy.integrand import Keister
 
 
 class Test_KeisterFun(unittest.TestCase):

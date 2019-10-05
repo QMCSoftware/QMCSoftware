@@ -2,7 +2,7 @@ from abc import ABC
 
 from numpy import array, ndarray
 
-from .. import DistributionCompatibilityError, univ_repr
+from .._util import DistributionCompatibilityError, univ_repr
 
 class Measure(ABC):
     '''Specifies the components of a general measure used to define an
@@ -56,5 +56,8 @@ class Measure(ABC):
 
     def __repr__(self):
         return univ_repr(self)
+
+# API
+from .measures import StdUniform,StdGaussian,IIDZeroMeanGaussian,BrownianMotion,Lattice,Sobol
 
 
