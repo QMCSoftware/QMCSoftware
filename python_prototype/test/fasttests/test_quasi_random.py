@@ -1,11 +1,11 @@
 import unittest
 from numpy import array,log,zeros,int64
-from third_party.magic_point_shop.latticeseq_b2 import latticeseq_b2
 
+from qmcpy.distribution.magic_point_shop.latticeseq_b2 import latticeseq_b2
 from qmcpy.measures.measures import StdGaussian
 from qmcpy.distribution.quasi_random import QuasiRandom
 from qmcpy.distribution import MeasureCompatibilityError
-from qmcpy.distribution.digital_seq import DigitalSeq
+from qmcpy.distribution.magic_point_shop.digital_seq import DigitalSeq
 
 
 class Test_IIDDistribution(unittest.TestCase):
@@ -24,7 +24,7 @@ class Test_IIDDistribution(unittest.TestCase):
 
     def test_backend_sobol(self):
         n,m = 4,4
-        gen = DigitalSeq(Cs='./third_party/magic_point_shop/sobol_Cs.col', m=int(log(n)/log(2)),s=m)
+        gen = DigitalSeq(Cs='sobol_Cs.col', m=int(log(n)/log(2)),s=m)
         array_not_shifted = zeros((n,m),dtype=int64)
         for i,row in enumerate(gen):
             array_not_shifted[i,:] = gen.cur # set each nxm

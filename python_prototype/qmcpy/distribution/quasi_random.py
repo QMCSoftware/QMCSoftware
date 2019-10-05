@@ -4,11 +4,9 @@ Definitions for IIDDistribution, a DiscreteDistribution
 from numpy import array, int64, log, random
 from numpy import zeros
 
-from third_party.magic_point_shop.latticeseq_b2 import latticeseq_b2
-
 from . import DiscreteDistribution
-from .digital_seq import DigitalSeq
-
+from .magic_point_shop.digital_seq import DigitalSeq
+from .magic_point_shop.latticeseq_b2 import latticeseq_b2
 
 class QuasiRandom(DiscreteDistribution):
 
@@ -43,7 +41,7 @@ class QuasiRandom(DiscreteDistribution):
             RS_x = array([(x + random.rand(m)) % 1 for shift in shifts]) # randomly shift each nxm sample
             return RS_x
         elif type(self.true_distribution).__name__=='Sobol':
-            gen = DigitalSeq(Cs='./third_party/magic_point_shop/sobol_Cs.col', m=int(log(n) / log(2)), s=m)
+            gen = DigitalSeq(Cs='sobol_Cs.col', m=int(log(n) / log(2)), s=m)
             t = max(32,gen.t) # we will guarantee at least a depth of 32 bits for the shift
             ct = max(0,t-gen.t) # this is the correction factor to scale the integers
             shifts = random.randint(2**t, size=(j,m), dtype=int64) # generate random shift

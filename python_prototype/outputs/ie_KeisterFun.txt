@@ -1,0 +1,72 @@
+Solution: 2.1603         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Keister (Function Object)
+IIDZeroMeanGaussian (Measure Type)
+                dimension: [3]            
+IIDDistribution (Distribution Object)
+true_distribution.measureName: StdUniform     
+CLTStopping (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 100000000
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarData (Data Object)
+          n_samples_total: [19804.]       
+                  t_total: 0.0090         
+               confid_int: [2.10972506 2.21079432]
+
+Solution: 2.2038         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Keister (Function Object)
+IIDZeroMeanGaussian (Measure Type)
+                dimension: [3]            
+IIDDistribution (Distribution Object)
+true_distribution.measureName: StdGaussian    
+CLTStopping (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 100000000
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarData (Data Object)
+          n_samples_total: [20042.]       
+                  t_total: 0.0043         
+               confid_int: [2.15346944 2.25415318]
+
+Solution: 2.1686         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Keister (Function Object)
+IIDZeroMeanGaussian (Measure Type)
+                dimension: [3]            
+QuasiRandom (Distribution Object)
+true_distribution.measureName: Lattice        
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 1000000
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarDataRep (Data Object)
+          n_samples_total: [1024]         
+                  t_total: 0.0179         
+               confid_int: [2.16843788 2.16870398]
+
+Solution: 2.1688         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Keister (Function Object)
+IIDZeroMeanGaussian (Measure Type)
+                dimension: [3]            
+QuasiRandom (Distribution Object)
+true_distribution.measureName: Sobol          
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 1000000
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarDataRep (Data Object)
+          n_samples_total: [1024]         
+                  t_total: 0.0220         
+               confid_int: [2.16860274 2.16908152]
+

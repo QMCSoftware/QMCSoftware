@@ -68,9 +68,18 @@ If you find Qmcpy helpful in your work, please support us by citing the
 following work:
 
 Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community Software.” MATLAB and Python 3
-software, 2019. Work in progress. Available from https://github.com/QMCSoftware/QMCSoftware
+software, 2019. Work in progress. Available on [GitHub](https://github.com/QMCSoftware/QMCSoftware)
 
-### Tips
+<hr>
+
+## Contributors 
+Dirk Nuyens Magic Point Shop 
+- qmcpy/distribution/magic_point_shop
+- F.Y. Kuo & D. Nuyens. Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients - a survey of analysis and implementation, Foundations of Computational Mathematics, 16(6):1631-1696, 2016. ([springer link](https://link.springer.com/article/10.1007/s10208-016-9329-5), [arxiv link](https://arxiv.org/abs/1606.06613))
+
+<hr>
+
+## Tips
 It may be helpful to create a virtual environment for this project.<br>
 Packages and versions are compiled in requirements.txt.<br>
 In order for the software to find packages, make sure .../qmcpy/ is in your path.

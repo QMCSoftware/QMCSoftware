@@ -10,7 +10,7 @@ from qmcpy.integrand.keister import Keister
 from qmcpy.measures.measures import IIDZeroMeanGaussian, StdGaussian,Lattice
 from qmcpy import print_summary
 
-def plot3d():
+def plot3d(verbose=True):
     random.seed(7)
     dim = 2
     j = 3
@@ -118,9 +118,10 @@ def plot3d():
 
     # Output
     mpl_plt.savefig('outputs/Three_3d_SurfaceScatters.png',
-            dpi = 500,
-            bbox_inches = 'tight',
-            pad_inches = .15)
+        dpi = 500,
+        bbox_inches = 'tight',
+        pad_inches = .15)
     mpl_plt.show(block=False)
 
-plot3d()
+if __name__ == '__main__':
+    plot3d()

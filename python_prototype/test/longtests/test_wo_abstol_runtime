@@ -1,9 +1,0 @@
-import unittest
-
-import workouts.wo_abstol_runtime as wo_abstol_runtime
-
-
-class TestAbsTolRunTime(unittest.TestCase):
-
-    def test_output(self):
-        wo_abstol_runtime.__main__()

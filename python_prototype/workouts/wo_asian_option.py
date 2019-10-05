@@ -1,8 +1,8 @@
 #! /usr/bin/env python_prototype
 """
 Single Level Asian Option Pricing
-    Run: python_prototype workouts/wo_asian_option.py
-    Save Output: python_prototype workouts/wo_asian_option.py  > outputs/ie_AsianOption.txt
+    Run: python workouts/wo_asian_option.py
+    Save Output: python workouts/wo_asian_option.py  > outputs/ie_AsianOption.txt
 """
 
 from numpy import arange

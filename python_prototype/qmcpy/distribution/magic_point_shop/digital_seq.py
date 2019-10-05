@@ -2,7 +2,7 @@
 """
 
 import pandas as pd
-from third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
+from .digitalseq_b2g import digitalseq_b2g
 
 def bitreverse(a, m=None):
     """
@@ -174,8 +174,10 @@ qmc-generators.
         """
         basestr = str  # basestr for python2, str for python3
         if isinstance(Cs, basestr):
+            from os import path
+            abs_file_path = path.join(path.dirname(__file__),Cs)
             # filename passed in
-            Cs = pd.read_csv(Cs, header=None, delimiter=" ", nrows=s).values.tolist()
+            Cs = pd.read_csv(abs_file_path, header=None, delimiter=" ", nrows=s).values.tolist()
         elif hasattr(Cs, 'read'):
             # assume z is a stream like sys.stdin
             f = Cs

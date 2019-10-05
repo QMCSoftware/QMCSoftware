@@ -1,8 +1,8 @@
 #!/usr/bin/python_prototype/
 """
 3 Dimensonal Keister Function
-    Run: python_prototype workouts/wo_keister.py
-    Save Output: python_prototype workouts/wo_keister.py  > outputs/ie_KeisterFun.txt
+    Run: python workouts/wo_keister.py
+    Save Output: python workouts/wo_keister.py  > outputs/ie_KeisterFun.txt
 """
 
 from qmcpy.stop.clt_stopping import CLTStopping

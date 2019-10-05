@@ -1,0 +1,144 @@
+Solution: 6.2018         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Function Object)
+BrownianMotion (Measure Type)
+                dimension: [64]           
+IIDDistribution (Distribution Object)
+true_distribution.measureName: StdUniform     
+CLTStopping (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 100000000
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarData (Data Object)
+          n_samples_total: [208458.]      
+                  t_total: 2.0191         
+               confid_int: [6.14944883 6.25424732]
+
+Solution: 6.2145         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Function Object)
+BrownianMotion (Measure Type)
+                dimension: [64]           
+IIDDistribution (Distribution Object)
+true_distribution.measureName: StdGaussian    
+CLTStopping (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 100000000
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarData (Data Object)
+          n_samples_total: [224390.]      
+                  t_total: 0.9441         
+               confid_int: [6.16394395 6.26506064]
+
+Solution: 6.1915         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Function Object)
+BrownianMotion (Measure Type)
+                dimension: [64]           
+QuasiRandom (Distribution Object)
+true_distribution.measureName: Lattice        
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 100000000
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarDataRep (Data Object)
+          n_samples_total: [2048]         
+                  t_total: 0.6177         
+               confid_int: [6.18828215 6.1946423 ]
+
+Solution: 6.1894         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Function Object)
+BrownianMotion (Measure Type)
+                dimension: [64]           
+QuasiRandom (Distribution Object)
+true_distribution.measureName: Sobol          
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 100000000
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarDataRep (Data Object)
+          n_samples_total: [1024]         
+                  t_total: 0.1910         
+               confid_int: [6.18647612 6.19230732]
+
+Solution: 6.1965         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Function Object)
+BrownianMotion (Measure Type)
+                dimension: [ 4 16 64]     
+IIDDistribution (Distribution Object)
+true_distribution.measureName: StdUniform     
+CLTStopping (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 1048576
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarData (Data Object)
+          n_samples_total: [285616.  26795.   4399.]
+                  t_total: 0.2743         
+               confid_int: [6.14589197 6.24717739]
+
+Solution: 6.2172         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Function Object)
+BrownianMotion (Measure Type)
+                dimension: [ 4 16 64]     
+IIDDistribution (Distribution Object)
+true_distribution.measureName: StdGaussian    
+CLTStopping (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 1048576
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarData (Data Object)
+          n_samples_total: [288471.  22099.   3900.]
+                  t_total: 0.2247         
+               confid_int: [6.16549576 6.26882356]
+
+Solution: 6.1930         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Function Object)
+BrownianMotion (Measure Type)
+                dimension: [ 4 16 64]     
+QuasiRandom (Distribution Object)
+true_distribution.measureName: Lattice        
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 1048576
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarDataRep (Data Object)
+          n_samples_total: [1024 1024 1024]
+                  t_total: 0.2660         
+               confid_int: [6.18912945 6.19692368]
+
+Solution: 6.2091         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Function Object)
+BrownianMotion (Measure Type)
+                dimension: [ 4 16 64]     
+QuasiRandom (Distribution Object)
+true_distribution.measureName: Sobol          
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 1048576
+                  inflate: 1.2000         
+                    alpha: 0.0100         
+MeanVarDataRep (Data Object)
+          n_samples_total: [1024 1024 1024]
+                  t_total: 0.2300         
+               confid_int: [6.20728938 6.21092125]
+
