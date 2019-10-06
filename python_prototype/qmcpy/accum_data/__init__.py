@@ -49,6 +49,19 @@ class AccumData(ABC):
     def __repr__(self):
         return univ_repr(self)
 
+    def summarize(self):
+        h1 = '%s (%s)\n'
+        item_f = '%25s: %-15.4f\n'
+        item_s = '%25s: %-15s\n'
+
+        s = 'Solution: %-15.4f\n%s\n' % (self.solution, '~' * 50)
+        s += h1 % (type(self).__name__, 'Data Object')
+        s += item_s % ('n_samples_total', str(self.n_samples_total))
+        s += item_f % ('t_total', self.t_total)
+        s += item_s % ('confid_int', str(self.confid_int))
+        print(s)
+
+
 # API
 from .mean_var_data import MeanVarData
 from .mean_var_data_rep import MeanVarDataRep

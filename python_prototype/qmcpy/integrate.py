@@ -3,8 +3,15 @@ Main driver function for Qmcpy.
 """
 from time import time
 
+from .integrand.keister import Keister
+from .measures.measures import IIDZeroMeanGaussian, Sobol
+from .distribution.quasi_random import QuasiRandom
+from .stop.clt_rep import CLTRep
 
-def integrate(integrand, measure, distribution, stopping_criterion):
+def integrate(integrand=Keister(), \
+              measure=IIDZeroMeanGaussian(dimension=[3], variance=[1 / 2]), \
+              distribution=QuasiRandom(true_distribution=Sobol(dimension=[3])), \
+              stopping_criterion=None):
     """Specify and compute integral of :math:`f(\\mathbf{x})` for \
     :math:`\\mathbf{x} \\in \\mathcal{X}`.
 
@@ -25,7 +32,9 @@ def integrate(integrand, measure, distribution, stopping_criterion):
                 sampling points used to obtain the estimate
 
     """
-
+    
+    if stopping_criterion is None:
+        stopping_criterion = CLTRep(distribution)
     t_start = time()
     # Transform integrands to accept distribution values which can generate
     integrand.transform_variable(measure, distribution)
