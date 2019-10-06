@@ -96,7 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.distribution.__init__">Distribution Class</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.distribution.iid_distribution">IID Distribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.distribution.quasi_random">Quasi Random Distribution</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.distribution.digital_seq">Sobol Sequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.distribution.magic_point_shop.digital_seq">Sobol Sequence</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.accum_data.__init__">Data Class</a></li>
@@ -180,7 +180,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.__init__.Integrand" title="qmcpy.integrand.__init__.Integrand"><em>Integrand</em></a>) – an object from class Integrand</p></li>
-<li><p><strong>measure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – an object from class Measure</p></li>
+<li><p><strong>measure</strong> (<em>Measure</em>) – an object from class Measure</p></li>
 <li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution</p></li>
 <li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#qmcpy.stop.__init__.StoppingCriterion" title="qmcpy.stop.__init__.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class             StoppingCriterion</p></li>
 </ul>
@@ -284,7 +284,7 @@ object starting from the original Measure object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>measure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – the Measure object that defines the integral</p></li>
+<li><p><strong>measure</strong> (<em>Measure</em>) – the Measure object that defines the integral</p></li>
 <li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete distribution                 object that is sampled from</p></li>
 </ul>
 </dd>
@@ -308,7 +308,7 @@ object starting from the original Measure object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>BMmeasure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – A BrownianMotion Measure object</p></li>
+<li><p><strong>BMmeasure</strong> (<em>Measure</em>) – A BrownianMotion Measure object</p></li>
 <li><p><strong>volatility</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sigma, the volatility of the asset</p></li>
 <li><p><strong>start_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – S(0), the asset value at t=0</p></li>
 <li><p><strong>strike_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – K, the call/put offer</p></li>
@@ -426,27 +426,6 @@ for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873
 </div>
 <div class="section" id="module-qmcpy.measures.__init__">
 <span id="measure-class"></span><h2>Measure Class<a class="headerlink" href="#module-qmcpy.measures.__init__" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="qmcpy.measures.__init__.Measure">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.measures.__init__.</code><code class="sig-name descname">Measure</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.__init__.Measure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies the components of a general measure used to define an
-integration problem or a sampling method</p>
-<dl class="method">
-<dt id="qmcpy.measures.__init__.Measure.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.__init__.Measure.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a list of measures.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dimension</strong> (<em>list of ints</em>) – Dimensions to be dispersed among list of Measures.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dictionary</em>) – Accepts keyword arguments into dictionary.                 Disperses dictionary values among list of Measures</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <span class="target" id="module-qmcpy.measures.measures"></span><p>Definitions for concrete Measure classes</p>
 <dl class="class">
 <dt id="qmcpy.measures.measures.BrownianMotion">
@@ -683,12 +662,12 @@ Randomly shifts each of the j samples.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-qmcpy.distribution.digital_seq">
-<span id="sobol-sequence"></span><h3>Sobol Sequence<a class="headerlink" href="#module-qmcpy.distribution.digital_seq" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-qmcpy.distribution.magic_point_shop.digital_seq">
+<span id="sobol-sequence"></span><h3>Sobol Sequence<a class="headerlink" href="#module-qmcpy.distribution.magic_point_shop.digital_seq" title="Permalink to this headline">¶</a></h3>
 <p>Sobol sequence generator</p>
 <dl class="class">
-<dt id="qmcpy.distribution.digital_seq.DigitalSeq">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.distribution.digital_seq.</code><code class="sig-name descname">DigitalSeq</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.digital_seq.DigitalSeq" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.magic_point_shop.digital_seq.DigitalSeq">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.distribution.magic_point_shop.digital_seq.</code><code class="sig-name descname">DigitalSeq</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.magic_point_shop.digital_seq.DigitalSeq" title="Permalink to this definition">¶</a></dt>
 <dd><p>A fast digital sequence point generator based on generating matrices.</p>
 <blockquote>
 <div><p>This sequence generator can take classical (m by m) generating matrices
@@ -702,8 +681,8 @@ vectors.</cite> MATLAB and Python software, 2018. Available from
 </div></blockquote>
 <p>qmc-generators.</p>
 <dl class="method">
-<dt id="qmcpy.distribution.digital_seq.DigitalSeq.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.digital_seq.DigitalSeq.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.magic_point_shop.digital_seq.DigitalSeq.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">Cs</em>, <em class="sig-param">kstart=0</em>, <em class="sig-param">m=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">returnDeepCopy=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.magic_point_shop.digital_seq.DigitalSeq.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a digital sequence point generator given a list of
 generating matrices.</p>
 <p>Each generating matrix in the list is represented by a list of
@@ -823,8 +802,8 @@ reversed.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="qmcpy.distribution.digital_seq.bitreverse">
-<code class="sig-prename descclassname">qmcpy.distribution.digital_seq.</code><code class="sig-name descname">bitreverse</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">m=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.digital_seq.bitreverse" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.distribution.magic_point_shop.digital_seq.bitreverse">
+<code class="sig-prename descclassname">qmcpy.distribution.magic_point_shop.digital_seq.</code><code class="sig-name descname">bitreverse</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">m=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.distribution.magic_point_shop.digital_seq.bitreverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reverse bit string of an integer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1027,6 +1006,38 @@ stores the sample mean and variance of integrand values</p>
 
 </dd></dl>
 
+<span class="target" id="module-qmcpy.stop.clt"></span><p>Stopping criterion based on the Centeral Limit Theorem</p>
+<dl class="class">
+<dt id="qmcpy.stop.clt.CLT">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.stop.clt.</code><code class="sig-name descname">CLT</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt.CLT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stopping criterion based on the Centeral Limit Theorem (CLT)
+Attributes:</p>
+<dl class="method">
+<dt id="qmcpy.stop.clt.CLT.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt.CLT.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distrib_obj</strong> – an instance of DiscreteDistribution</p></li>
+<li><p><strong>inflate</strong> – inflation factor when estimating variance</p></li>
+<li><p><strong>alpha</strong> – significance level for confidence interval</p></li>
+<li><p><strong>abs_tol</strong> – absolute error tolerance</p></li>
+<li><p><strong>rel_tol</strong> – relative error tolerance</p></li>
+<li><p><strong>n_init</strong> – initial number of samples</p></li>
+<li><p><strong>n_max</strong> – maximum number of samples</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.stop.clt.CLT.stop_yet">
+<code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt.CLT.stop_yet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine when to stop</p>
+</dd></dl>
+
+</dd></dl>
+
 <span class="target" id="module-qmcpy.stop.clt_rep"></span><p>Stopping criterion based on var(stream_1_estimate, …, stream_16_estimate) &lt; errorTol</p>
 <dl class="class">
 <dt id="qmcpy.stop.clt_rep.CLTRep">
@@ -1054,38 +1065,6 @@ stores the sample mean and variance of integrand values</p>
 <dl class="method">
 <dt id="qmcpy.stop.clt_rep.CLTRep.stop_yet">
 <code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_rep.CLTRep.stop_yet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine when to stop</p>
-</dd></dl>
-
-</dd></dl>
-
-<span class="target" id="module-qmcpy.stop.clt_stopping"></span><p>Stopping criterion based on the Centeral Limit Theorem</p>
-<dl class="class">
-<dt id="qmcpy.stop.clt_stopping.CLTStopping">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.stop.clt_stopping.</code><code class="sig-name descname">CLTStopping</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_stopping.CLTStopping" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stopping criterion based on the Centeral Limit Theorem (CLT)
-Attributes:</p>
-<dl class="method">
-<dt id="qmcpy.stop.clt_stopping.CLTStopping.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distrib_obj</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_stopping.CLTStopping.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>distrib_obj</strong> – an instance of DiscreteDistribution</p></li>
-<li><p><strong>inflate</strong> – inflation factor when estimating variance</p></li>
-<li><p><strong>alpha</strong> – significance level for confidence interval</p></li>
-<li><p><strong>abs_tol</strong> – absolute error tolerance</p></li>
-<li><p><strong>rel_tol</strong> – relative error tolerance</p></li>
-<li><p><strong>n_init</strong> – initial number of samples</p></li>
-<li><p><strong>n_max</strong> – maximum number of samples</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="qmcpy.stop.clt_stopping.CLTStopping.stop_yet">
-<code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.clt_stopping.CLTStopping.stop_yet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine when to stop</p>
 </dd></dl>
 

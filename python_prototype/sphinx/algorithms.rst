@@ -61,7 +61,7 @@ Quasi Random Distribution
 Sobol Sequence
 ..............
 
-.. automodule:: qmcpy.distribution.digital_seq
+.. automodule:: qmcpy.distribution.magic_point_shop.digital_seq
     :members:
 
 Data Class
@@ -82,10 +82,11 @@ StoppingCriterion Class
 .. automodule:: qmcpy.stop.__init__
     :members:
 
-.. automodule:: qmcpy.stop.clt_rep
+
+.. automodule:: qmcpy.stop.clt
     :members:
 
-.. automodule:: qmcpy.stop.clt_stopping
+.. automodule:: qmcpy.stop.clt_rep
     :members:
 
 Utilities
