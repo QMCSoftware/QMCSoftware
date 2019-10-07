@@ -1,6 +1,5 @@
-"""
-Stopping criterion based on var(stream_1_estimate, ..., stream_16_estimate) < errorTol
-"""
+""" Definition for CLTRep, a concrete implementation of StoppingCriterion """
+
 from numpy import array, full, zeros
 from scipy.stats import norm
 
@@ -8,10 +7,8 @@ from . import StoppingCriterion
 from ..accum_data import MeanVarDataRep
 from .._util import MaxSamplesWarning
 
-
 class CLTRep(StoppingCriterion):
-    """ Stopping criterion based on var(stream_1_estimate, ..., stream_16_estimate) < errorTol
-    """
+    """ Stopping criterion based on var(stream_1_estimate, ..., stream_16_estimate) < errorTol """
 
     def __init__(self, distribution, n_streams=16, inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e8):
@@ -38,10 +35,7 @@ class CLTRep(StoppingCriterion):
         self.data_obj.n_next = full(n_integrands, self.n_init) # next n to be used for each f
 
     def stop_yet(self):
-        """
-        Determine when to stop
-
-        """
+        """ Determine when to stop """
         for i in range(self.data_obj.n_integrands):
             if self.data_obj.sig2hat[i] < self.abs_tol: # Sufficient estimate for mean of f[i]
                 self.data_obj.flag[i] = 0 # Stop estimation of i_th f

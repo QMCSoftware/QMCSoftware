@@ -1,17 +1,13 @@
-"""
-Stopping criterion based on the Centeral Limit Theorem
-"""
+""" Definition for CLT, a concrete implementation of StoppingCriterion """
+
 from numpy import array, ceil, maximum, minimum, tile, zeros
 from scipy.stats import norm
 
 from . import StoppingCriterion
 from ..accum_data import MeanVarData
 
-
 class CLT(StoppingCriterion):
-    """ Stopping criterion based on the Centeral Limit Theorem (CLT)
-    Attributes:
-    """
+    """ Stopping criterion based on the Centeral Limit Theorem (CLT) """
 
     def __init__(self, distrib_obj, inflate=1.2, alpha=0.01, abs_tol=1e-2,
                  rel_tol=0, n_init=1024, n_max=1e8):
@@ -38,9 +34,7 @@ class CLT(StoppingCriterion):
         self.data_obj.n_next = tile(self.n_init, n_integrands) # initialize as n_init
 
     def stop_yet(self):
-        """
-        Determine when to stop
-        """
+        """ Determine when to stop """
         if self.stage == 'sigma':
             self.data_obj.n_prev = self.data_obj.n_next  # update place in the sequence
             temp_a = (self.data_obj.t_eval)**.5  # use cost of function values to decide how to allocate

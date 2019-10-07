@@ -1,4 +1,5 @@
-# Exceptions
+""" Exceptions and Warnings thrown by qmcpy """
+
 class MeasureCompatibilityError(Exception):
     """
     Class for raising error of incompatible measures
@@ -20,7 +21,6 @@ class TransformError(Exception):
     distributuion
     """
 
-# Warnings
 class MaxSamplesWarning(Warning):
     """
     Class for issuing warning about using maximum number of data samples

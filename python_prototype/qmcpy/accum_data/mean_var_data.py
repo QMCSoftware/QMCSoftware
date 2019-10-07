@@ -1,6 +1,5 @@
-"""
-Definition for class MeanVarData, a subclass of AccumData
-"""
+""" Definition of MeanVarData, a concrete implementation of AccumData """
+
 from time import process_time
 from numpy import arange, finfo, float32, full, inf, std, zeros
 
@@ -8,11 +7,10 @@ from . import AccumData
 
 EPS = finfo(float32).eps
 
-
 class MeanVarData(AccumData):
     """
     Accumulated data for IIDDistribution calculations,
-    stores the sample mean and variance of integrand values
+    and store the sample mean and variance of integrand values
     """
 
     def __init__(self, n_integrands):
@@ -21,7 +19,6 @@ class MeanVarData(AccumData):
 
         Args:
             n_integrands (int): number of integrands
-
         """
         super().__init__()
         self.n_integrands = n_integrands
@@ -36,7 +33,6 @@ class MeanVarData(AccumData):
         Args:
             distribution (DiscreteDistribution): an instance of DiscreteDistribution
             integrand (Integrand): an instance of Integrand
-
         Returns:
             None
         """

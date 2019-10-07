@@ -1,6 +1,5 @@
-"""
-Definition for class AsianCall, a subclass of Integrand
-"""
+""" Definition for class AsianCall, a concrete implementation of Integrand """
+
 from numpy import exp, maximum
 
 from . import Integrand
@@ -8,6 +7,7 @@ from . import Integrand
 
 class AsianCall(Integrand):
     """ Specify and generate payoff values of an Asian Call option """
+
     def __init__(self, BMmeasure=None, volatility=.5, start_price=30, strike_price=25):
         """
         Initialize AsianCall Integrand's'
@@ -47,7 +47,6 @@ class AsianCall(Integrand):
                 row of an :math:`n \cdot |\mathfrak{u}|` matrix
             coord_index: set of those coordinates in sequence needed, \
                 :math:`\mathfrak{u}`
-
         Returns:
             :math:`n \cdot p` matrix with values :math:`f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})`
             where if :math:`\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j`, then :math:`x'_{ij} = x_{ij}`

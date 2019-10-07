@@ -1,6 +1,5 @@
-"""
-Definitions for IIDDistribution, a DiscreteDistribution
-"""
+""" Definition of IIDDistribution, a concrete implementation of DiscreteDistribution """
+
 from numpy import array, int64, log, random
 from numpy import zeros
 
@@ -8,7 +7,8 @@ from . import DiscreteDistribution
 from .magic_point_shop import DigitalSeq,LatticeSeq
 
 class QuasiRandom(DiscreteDistribution):
-
+    """ Specify and generate low discrepancy sequences """
+    
     def __init__(self, true_distribution=None, seed_rng=None):
         """
         Args:
@@ -30,7 +30,6 @@ class QuasiRandom(DiscreteDistribution):
             n (int): Number of observations (sample.size()[1])
             m (int): Number of dimensions (sample.size()[2])
             j (int): Number of nxm matricies to generate (sample.size()[0])
-
         Returns:
             jxnxm (numpy array)
         """

@@ -1,6 +1,5 @@
-"""
-Abstract class for defining stopping conditions for qmcpy algorithms
-"""
+""" Definition for abstract class StoppingCriterion """
+
 from abc import ABC, abstractmethod
 
 from .._util import DistributionCompatibilityError, univ_repr

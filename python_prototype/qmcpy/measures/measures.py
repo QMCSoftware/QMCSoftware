@@ -1,6 +1,5 @@
-"""
-Definitions for concrete Measure classes
-"""
+""" Definitions for concrete Measure Implementations """
+
 from numpy import arange
 
 from . import Measure
@@ -34,6 +33,7 @@ class IIDZeroMeanGaussian(Measure):
         super().__init__(dimension,variance=variance)
 
 class BrownianMotion(Measure):
+    """ Brownian Motion Measure """
     def __init__(self,time_vector=None):
         """
         Args:
@@ -44,6 +44,7 @@ class BrownianMotion(Measure):
         super().__init__(dimension, time_vector=time_vector)
 
 class Lattice(Measure):
+    """ Lattice (Base 2) Measure """
     def __init__(self,dimension=None):
         """
         Args:
@@ -52,6 +53,7 @@ class Lattice(Measure):
         super().__init__(dimension, mimics='StdUniform')
 
 class Sobol(Measure):
+    """ Sobol (Base 2) Measure """
     def __init__(self,dimension=None):
         """
         Args:

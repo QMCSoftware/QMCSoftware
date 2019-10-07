@@ -1,10 +1,8 @@
-"""
-Definitions for IIDDistribution, a DiscreteDistribution
-"""
+""" Definition of IIDDistribution, a concrete implementation of DiscreteDistribution """
+
 from numpy import random
 
 from . import DiscreteDistribution
-
 
 class IIDDistribution(DiscreteDistribution):
     """
@@ -33,7 +31,6 @@ class IIDDistribution(DiscreteDistribution):
         Args:
             n (int): Number of observations (sample.size()[1])
             m (int): Number of dimensions (sample.size()[2])
-
         Returns:
             nxm (numpy array)
         """

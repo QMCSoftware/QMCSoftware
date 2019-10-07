@@ -1,10 +1,18 @@
-"""
-Utilities for python_prototype
-"""
+""" Meta-data nd public utilites for qmcpy """
+
 name = "qmcpy"
 __version__ = 0.1
 
 def print_summary(stopObj, measureObj, funObj, distribObj, dataObj):
+    """
+    print a summary of the qmc problem after execution
+    
+    Args:
+        stopObj (StoppingCriterion): a Stopping Criterion object
+        measureObj (Measure): a Measure object
+        funObj (Integrand): an Integrand object
+        dataObj (dataObj): a AccumData object
+    """
     h1 = '%s (%s)\n'
     item_i = '%25s: %d\n'
     item_f = '%25s: %-15.4f\n'

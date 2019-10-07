@@ -1,3 +1,5 @@
+""" Utility methods. Not meant for public use """
+
 def univ_repr(object, attributes=None):
     """
     Clean way to represent object data.

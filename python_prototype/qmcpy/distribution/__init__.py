@@ -1,27 +1,24 @@
-"""
-Definition for abstract classes: DiscreteDistribution, Measure
-"""
+""" Definition for abstract class DiscreteDistribution """
+
 from abc import ABC, abstractmethod
 
 from .._util import MeasureCompatibilityError,univ_repr
 
 class DiscreteDistribution(ABC):
-    """Specifies and generates the components of :math:`a_n \\sum_{i=1}^n w_i
+    """
+    Specifies and generates the components of :math:`a_n \\sum_{i=1}^n w_i
     \\delta_{\\mathbf{x}_i}(\\cdot)`.
 
     Args:
         accepted_measures: list of valid measure names
         true_distribution (DiscreteDistribution): True distribution.
         distrib_data:
-
     Attributes:
         distribution_list: List of DiscreteDistribution instances.
         true_distribution (DiscreteDistribution): True distribution.
-
     Raises:
         MeasureCompatibilityError: if ``true_distribution`` not in \
         ``accepted_measures``
-
     """
 
     def __init__(self, accepted_measures, true_distribution=None,
@@ -51,21 +48,12 @@ class DiscreteDistribution(ABC):
             j (int):
         """
 
-    def __len__(self):
-        return len(self.distribution_list)
-
+    def __len__(self): return len(self.distribution_list)
     def __iter__(self):
-        for distribObj in self.distribution_list:
-            yield distribObj
-
-    def __getitem__(self, i):
-        return self.distribution_list[i]
-
-    def __setitem__(self, i, val):
-        self.distribution_list[i] = val
-
-    def __repr__(self):
-        return univ_repr(self, 'distribution_list')
+        for distribObj in self.distribution_list: yield distribObj
+    def __getitem__(self, i): return self.distribution_list[i]
+    def __setitem__(self, i, val): self.distribution_list[i] = val
+    def __repr__(self): return univ_repr(self, 'distribution_list')
 
 # API
 from .iid_distribution import IIDDistribution

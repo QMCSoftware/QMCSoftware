@@ -1,10 +1,8 @@
-"""
-Definition for class Keister, a subclass of Integrand
-"""
+""" Definition for class Keister, a concrete implementation of Integrand """
+
 from numpy import cos, pi
 
 from . import Integrand
-
 
 class Keister(Integrand):
     """
@@ -30,7 +28,6 @@ class Keister(Integrand):
         Args:
             x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` row of an :math:`n \cdot |\mathfrak{u}|` matrix
             coord_index: set of those coordinates in sequence needed, :math:`\mathfrak{u}`
-
         Returns:
             :math:`n \cdot p` matrix with values :math:`f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})`
             where if :math:`\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j`, then :math:`x'_{ij} = x_{ij}`

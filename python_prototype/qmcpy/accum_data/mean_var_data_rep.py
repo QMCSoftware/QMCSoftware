@@ -1,6 +1,5 @@
-"""
-Definition for MeanVarDataRep, subclass of AccumData
-"""
+""" Definition for MeanVarDataRep, a concrete implementation of AccumData """
+
 from time import process_time
 from numpy import arange, finfo, float32, ones, zeros
 
@@ -9,7 +8,7 @@ from . import AccumData
 EPS = finfo(float32).eps
 
 class MeanVarDataRep(AccumData):
-    """ Accumulated data for lattice calculations """
+    """ Accumulated data Repeated Centeral Limit Stopping Criterion (CLTRep) calculations """
 
     def __init__(self, n_integrands, n_streams):
         """
@@ -18,7 +17,6 @@ class MeanVarDataRep(AccumData):
         Args:
             n_integrands (int): number of integrands
             n_streams (int): number of random nxm matricies to generate
-
         """
         super().__init__()
         self.n_integrands = n_integrands
@@ -36,10 +34,8 @@ class MeanVarDataRep(AccumData):
         Args:
             distribution (DiscreteDistribution): an instance of DiscreteDistribution
             integrand (Integrand): an instance of Integrand
-
         Returns:
             None
-
         """
         for i in range(self.n_integrands):
             if self.flag[i] == 0:

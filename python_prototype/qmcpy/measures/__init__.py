@@ -1,13 +1,15 @@
-from abc import ABC
+""" Definition for abstract class Measure"""
 
+from abc import ABC
 from numpy import array, ndarray
 
 from .._util import DistributionCompatibilityError, univ_repr
 
 class Measure(ABC):
-    '''Specifies the components of a general measure used to define an
+    """
+    Specifies the components of a general measure used to define an
     integration problem or a sampling method
-    '''
+    """
 
     def __init__(self, dimension=None, **kwargs):
         """
@@ -17,7 +19,6 @@ class Measure(ABC):
             dimension (list of ints): Dimensions to be dispersed among list of Measures.
             **kwargs (dictionary): Accepts keyword arguments into dictionary. \
                 Disperses dictionary values among list of Measures
-
         """
         self.dimension = dimension
         super().__init__()
@@ -41,21 +42,12 @@ class Measure(ABC):
             for key,val in kwargs.items():
                 setattr(self[i],key,val[i])
 
-    def __len__(self):
-        return len(self.measure_list)
-
+    def __len__(self): return len(self.measure_list)
     def __iter__(self):
-        for measureObj in self.measure_list:
-            yield measureObj
-
-    def __getitem__(self, i):
-        return self.measure_list[i]
-
-    def __setitem__(self, i, val):
-        self.measure_list[i] = val
-
-    def __repr__(self):
-        return univ_repr(self)
+        for measureObj in self.measure_list: yield measureObj
+    def __getitem__(self, i): return self.measure_list[i]
+    def __setitem__(self, i, val): self.measure_list[i] = val
+    def __repr__(self): return univ_repr(self)
 
 # API
 from .measures import StdUniform,StdGaussian,IIDZeroMeanGaussian,BrownianMotion,Lattice,Sobol

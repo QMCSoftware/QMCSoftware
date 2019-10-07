@@ -1,6 +1,5 @@
-"""
-Definition for abstract class, AccumData
-"""
+""" Definition for abstract class, AccumData """
+
 from abc import ABC, abstractmethod
 from numpy import cumsum, diff, insert, sqrt
 from scipy.stats import norm
@@ -39,7 +38,6 @@ class Integrand(ABC):
                 row of an :math:`n \cdot |\mathfrak{u}|` matrix
             coord_index: set of those coordinates in sequence needed, \
                 :math:`\mathfrak{u}`
-
         Returns:
             :math:`n \cdot p` matrix with values :math:`f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})`
             where if :math:`\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j`, then :math:`x'_{ij} = x_{ij}`
@@ -57,7 +55,6 @@ class Integrand(ABC):
             measure (Measure): the Measure object that defines the integral
             distribution (DiscreteDistribution): the discrete distribution \
                 object that is sampled from
-
         Returns: None
         """
         for i in range(len(self)):
@@ -83,8 +80,6 @@ class Integrand(ABC):
                 raise TransformError('Cannot transform %s distributuion to mimic Integrands true %s measure'%(sample_from,transform_to))
         return
 
-    # Allow an Integrand instance to act as a list of Intgrands as required
-    # for multi-dimensional problems
     def __len__(self): return len(self.fun_list)
     def __iter__(self):
         for fun in self.fun_list: yield fun
