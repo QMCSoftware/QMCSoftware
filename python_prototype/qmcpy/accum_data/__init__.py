@@ -9,7 +9,7 @@ from .._util import univ_repr
 class AccumData(ABC):
     """
     Accumulated data required in the computation of the integral, stores the sample mean and variance of integrand values
-    
+
     Attributes:
         stage (str): stage of computation; 'begin', or 'done' when finished
         n_samples_total (array-like): number of samples used so far
@@ -48,12 +48,19 @@ class AccumData(ABC):
         item_f = '%25s: %-15.4f\n'
         item_s = '%25s: %-15s\n'
 
-        s = 'Solution: %-15.4f\n%s\n' % (self.solution, '~' * 50)
-        s += h1 % (type(self).__name__, 'Data Object')
+        s = 'Solution: %-15.4f\n%s' % (self.solution, '~' * 50)
+        print(s)
+
+        if not self.integrand is None: self.integrand.summarize()
+        if not self.measure is None: self.measure.summarize()
+        if not self.distribution is None: self.distribution.summarize()
+        if not self.stopping_criterion is None: self.stopping_criterion.summarize()
+
+        s = h1 % (type(self).__name__, 'Data Object')
         s += item_s % ('n_samples_total', str(self.n_samples_total))
         s += item_f % ('t_total', self.t_total)
         s += item_s % ('confid_int', str(self.confid_int))
-        print(s)
+        print(s[:-1])
 
 
 # API

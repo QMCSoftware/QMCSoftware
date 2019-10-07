@@ -28,28 +28,28 @@ class CLT(StoppingCriterion):
         self.stage = 'sigma'  # compute standard deviation next
         # Construct Data Object
         n_integrands = len(distrib_obj)
-        self.data_obj = MeanVarData(n_integrands) # house integration data
-        self.data_obj.n_mu = zeros(n_integrands)  # number of samples used to compute the sample mean
-        self.data_obj.n_prev = zeros(n_integrands)  # initialize data object
-        self.data_obj.n_next = tile(self.n_init, n_integrands) # initialize as n_init
+        self.data = MeanVarData(n_integrands) # house integration data
+        self.data.n_mu = zeros(n_integrands)  # number of samples used to compute the sample mean
+        self.data.n_prev = zeros(n_integrands)  # initialize data object
+        self.data.n_next = tile(self.n_init, n_integrands) # initialize as n_init
 
     def stop_yet(self):
         """ Determine when to stop """
         if self.stage == 'sigma':
-            self.data_obj.n_prev = self.data_obj.n_next  # update place in the sequence
-            temp_a = (self.data_obj.t_eval)**.5  # use cost of function values to decide how to allocate
-            temp_b = (temp_a * self.data_obj.sighat).sum(0)  # samples for computation of the mean
+            self.data.n_prev = self.data.n_next  # update place in the sequence
+            temp_a = (self.data.t_eval) ** .5  # use cost of function values to decide how to allocate
+            temp_b = (temp_a * self.data.sighat).sum(0)  # samples for computation of the mean
             # n_mu_temp := n such that confidence intervals width and conficence will be satisfied
-            n_mu_temp = ceil(temp_b*(-norm.ppf(self.alpha/2)*self.inflate /
-                             max(self.abs_tol, self.data_obj.solution*self.rel_tol))**2
-                             * (self.data_obj.sighat/self.data_obj.t_eval**.5))
+            n_mu_temp = ceil(temp_b * (-norm.ppf(self.alpha/2) * self.inflate /
+                                       max(self.abs_tol, self.data.solution * self.rel_tol)) ** 2
+                             * (self.data.sighat / self.data.t_eval ** .5))
             # n_mu := n_mu_temp adjusted for n_prev
-            self.data_obj.n_mu = minimum(maximum(self.data_obj.n_next, n_mu_temp), self.n_max-self.data_obj.n_prev)
-            self.data_obj.n_next = self.data_obj.n_mu + self.data_obj.n_prev # set next_n to n_mu_temp
+            self.data.n_mu = minimum(maximum(self.data.n_next, n_mu_temp), self.n_max - self.data.n_prev)
+            self.data.n_next = self.data.n_mu + self.data.n_prev # set next_n to n_mu_temp
             self.stage = 'mu'  # compute sample mean next
         elif self.stage == 'mu':
-            self.data_obj.solution = self.data_obj.muhat.sum() # mean of f means
-            self.data_obj.n_samples_total = self.data_obj.n_next
-            err_bar = -norm.ppf(self.alpha/2) * self.inflate * (self.data_obj.sighat**2 / self.data_obj.n_mu).sum(0)**.5
-            self.data_obj.confid_int = self.data_obj.solution + err_bar * array([-1, 1]) # CLT confidence interval
+            self.data.solution = self.data.muhat.sum() # mean of f means
+            self.data.n_samples_total = self.data.n_next
+            err_bar = -norm.ppf(self.alpha/2) * self.inflate * (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** .5
+            self.data.confid_int = self.data.solution + err_bar * array([-1, 1]) # CLT confidence interval
             self.stage = 'done'  # finished with computation

@@ -30,23 +30,23 @@ class CLTRep(StoppingCriterion):
         self.stage = 'begin'
         # Construct Data Object
         n_integrands = len(distribution)
-        self.data_obj = MeanVarDataRep(n_integrands, n_streams) # house integration data
-        self.data_obj.n_prev = zeros(n_integrands) # previous n used for each f
-        self.data_obj.n_next = full(n_integrands, self.n_init) # next n to be used for each f
+        self.data = MeanVarDataRep(n_integrands, n_streams) # house integration data
+        self.data.n_prev = zeros(n_integrands) # previous n used for each f
+        self.data.n_next = full(n_integrands, self.n_init) # next n to be used for each f
 
     def stop_yet(self):
         """ Determine when to stop """
-        for i in range(self.data_obj.n_integrands):
-            if self.data_obj.sig2hat[i] < self.abs_tol: # Sufficient estimate for mean of f[i]
-                self.data_obj.flag[i] = 0 # Stop estimation of i_th f
+        for i in range(self.data.n_integrands):
+            if self.data.sig2hat[i] < self.abs_tol: # Sufficient estimate for mean of f[i]
+                self.data.flag[i] = 0 # Stop estimation of i_th f
             else: # Double n for next sample
-                self.data_obj.n_prev[i] = self.data_obj.n_next[i]
-                self.data_obj.n_next[i] = self.data_obj.n_prev[i]*2
-        if self.data_obj.flag.sum() == 0 or self.data_obj.n_next.max() > self.n_max:
+                self.data.n_prev[i] = self.data.n_next[i]
+                self.data.n_next[i] = self.data.n_prev[i]*2
+        if self.data.flag.sum() == 0 or self.data.n_next.max() > self.n_max:
             # Stopping Criterion Met
-            if self.data_obj.n_next.max() > self.n_max:
+            if self.data.n_next.max() > self.n_max:
                 raise MaxSamplesWarning("Max number of samples used. Tolerance may not be met")
-            self.data_obj.n_samples_total = self.data_obj.n_next
-            err_bar = -norm.ppf(self.alpha / 2) * self.inflate * (self.data_obj.sig2hat**2 / self.data_obj.n_next).sum(0)**.5
-            self.data_obj.confid_int = self.data_obj.solution + err_bar * array([-1, 1]) # CLT confidence interval
+            self.data.n_samples_total = self.data.n_next
+            err_bar = -norm.ppf(self.alpha / 2) * self.inflate * (self.data.sig2hat**2 / self.data.n_next).sum(0)**.5
+            self.data.confid_int = self.data.solution + err_bar * array([-1, 1]) # CLT confidence interval
             self.stage = 'done'  # finished with computation
