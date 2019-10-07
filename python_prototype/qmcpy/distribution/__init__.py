@@ -55,6 +55,16 @@ class DiscreteDistribution(ABC):
     def __setitem__(self, i, val): self.distribution_list[i] = val
     def __repr__(self): return univ_repr(self, 'distribution_list')
 
+    def summarize(self):
+        h1 = '%s (%s)\n'
+        item_s = '%35s: %-15s'
+        s = ''
+
+        s += h1 % (type(self).__name__, 'Distribution Object')
+        s += item_s % ('true_distribution.measureName',
+                       type(self.true_distribution).__name__)
+        print(s)
+
 # API
 from .iid_distribution import IIDDistribution
 from .quasi_random import QuasiRandom

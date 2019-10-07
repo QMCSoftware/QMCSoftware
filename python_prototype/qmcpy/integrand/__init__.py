@@ -77,7 +77,7 @@ class Integrand(ABC):
                 timeDiff = diff(insert(measure[i].time_vector, 0, 0))
                 self[i].f = lambda xu,coordIndex,timeDiff=timeDiff,i=i: self[i].g(cumsum(xu*sqrt(timeDiff),1),coordIndex)
             else:
-                raise TransformError('Cannot transform %s distributuion to mimic Integrands true %s measure'%(sample_from,transform_to))
+                raise TransformError("Cannot transform %s distribution to mimic Integrand's true %s measure" % (sample_from,transform_to))
         return
 
     def __len__(self): return len(self.fun_list)
@@ -86,6 +86,13 @@ class Integrand(ABC):
     def __getitem__(self,i): return self.fun_list[i]
     def __setitem__(self,i,val): self.fun_list[i] = val
     def __repr__(self): return univ_repr(self,'fun_list')
+
+    def summarize(self):
+        h1 = '%s (%s)'
+        s = ""
+
+        s += h1 % (type(self).__name__, 'Integrand Object')
+        print(s)
 
 # API
 from .asian_call import AsianCall

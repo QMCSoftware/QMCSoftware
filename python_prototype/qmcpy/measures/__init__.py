@@ -16,9 +16,10 @@ class Measure(ABC):
         Construct a list of measures.
 
         Args:
-            dimension (list of ints): Dimensions to be dispersed among list of Measures.
+            dimension (list of ints): Dimensions to be dispersed among list \
+                of ``Measures``.
             **kwargs (dictionary): Accepts keyword arguments into dictionary. \
-                Disperses dictionary values among list of Measures
+                Disperses dictionary values among list of ``Measures``
         """
         self.dimension = dimension
         super().__init__()
@@ -48,6 +49,15 @@ class Measure(ABC):
     def __getitem__(self, i): return self.measure_list[i]
     def __setitem__(self, i, val): self.measure_list[i] = val
     def __repr__(self): return univ_repr(self)
+
+    def summarize(self):
+        h1 = '%s (%s)\n'
+        item_s = '%25s: %-15s'
+        s = ""
+
+        s += h1 % (type(self).__name__, 'Measure Object')
+        s += item_s % ('dimension', str(self.dimension))
+        print(s)
 
 # API
 from .measures import StdUniform,StdGaussian,IIDZeroMeanGaussian,BrownianMotion,Lattice,Sobol

@@ -36,6 +36,22 @@ class StoppingCriterion(ABC):
     def __repr__(self):
         return univ_repr(self)
 
+    def summarize(self):
+        h1 = '%s (%s)\n'
+        item_i = '%25s: %d\n'
+        item_f = '%25s: %-15.4f\n'
+
+        s = ""
+        s += h1 % (type(self).__name__, 'StoppingCriterion Object')
+        s += item_f % ('abs_tol', self.abs_tol)
+        s += item_f % ('rel_tol', self.rel_tol)
+        s += item_i % ('n_max', self.n_max)
+        s += item_f % ('inflate', self.inflate)
+        s += item_f % ('alpha', self.alpha)
+
+        print(s[:-1])
+
+
 # API
 from .clt import CLT
 from .clt_rep import CLTRep

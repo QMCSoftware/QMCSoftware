@@ -117,5 +117,3 @@ imgmath_dvipng=r"/Library/TeX/texbin/dvipng"
 #imgmath_font_size = 10
 
 
-#templates_path = ['_templates']
-

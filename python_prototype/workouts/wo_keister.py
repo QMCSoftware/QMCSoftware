@@ -5,7 +5,8 @@
     Save Output: python workouts/wo_keister.py  > outputs/ie_KeisterFun.txt
 """
 
-from qmcpy import integrate,print_summary
+from qmcpy import integrate
+from qmcpy._util import summarize
 from qmcpy.stop import CLT,CLTRep
 from qmcpy.distribution import IIDDistribution,QuasiRandom
 from qmcpy.integrand import Keister
@@ -19,7 +20,7 @@ def test_distributions():
     distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[dim]), seed_rng=7)
     stopObj = CLT(distribObj,abs_tol=.05)
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    print_summary(stopObj,measureObj,funObj,distribObj,dataObj)
+    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
 
     # IID std_gaussian
     dim = 3
@@ -28,7 +29,7 @@ def test_distributions():
     distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]), seed_rng=7)
     stopObj = CLT(distribObj,abs_tol=.05)
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    print_summary(stopObj,measureObj,funObj,distribObj,dataObj)
+    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
 
     # QuasiRandom Lattice
     dim = 3
@@ -37,7 +38,7 @@ def test_distributions():
     distribObj = QuasiRandom(true_distribution=Lattice(dimension=[dim]),seed_rng=7)
     stopObj = CLTRep(distribObj,abs_tol=.05,n_max=1e6)
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    print_summary(stopObj,measureObj,funObj,distribObj,dataObj)
+    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
 
     # QuasiRandom sobol
     dim = 3
@@ -46,7 +47,7 @@ def test_distributions():
     distribObj = QuasiRandom(true_distribution=Sobol(dimension=[dim]), seed_rng=7)
     stopObj = CLTRep(distribObj,abs_tol=.05,n_max=1e6) # impossible tolerance so calculation is limited by sample budget
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    print_summary(stopObj,measureObj,funObj,distribObj,dataObj)
+    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
 
 
 test_distributions()

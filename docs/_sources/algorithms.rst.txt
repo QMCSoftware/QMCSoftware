@@ -92,5 +92,5 @@ StoppingCriterion Class
 Utilities
 ---------
 
-.. automodule:: __init__
+.. automodule:: qmcpy._util.__init__
     :members:

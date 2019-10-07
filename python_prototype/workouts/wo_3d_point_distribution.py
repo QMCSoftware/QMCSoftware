@@ -4,10 +4,10 @@ import matplotlib.pyplot as mpl_plt
 from numpy import arange, linspace, meshgrid, random, zeros
 from scipy.stats import norm
 
-from qmcpy import print_summary
+from qmcpy._util import summarize
 from qmcpy.distribution import IIDDistribution,QuasiRandom
 from qmcpy.integrand import Keister
-from qmcpy.measures import StdGaussian,Lattice,IIDZeroMeanGaussian
+from qmcpy.measures import StdGaussian,Lattice, IIDZeroMeanGaussian
 
 def plot3d(verbose=True):
     random.seed(7)
@@ -35,14 +35,14 @@ def plot3d(verbose=True):
     stopObj = CLTRep(distribObj,n_init=n,n_max=2**15,abs_tol=.01)
     measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[var])
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    print_summary(stopObj,measureObj,funObj,distribObj,dataObj)
+    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
     #     CLT Example
     funObj = Keister()
     distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]),seed_rng=7)
     stopObj = CLT(distribObj,n_init=16,abs_tol=.3,alpha=.01,inflate=1.2)
     measureObj = IIDZeroMeanGaussian(dimension=[dim],variance=[1/2])
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    print_summary(stopObj,measureObj,funObj,distribObj,dataObj)
+    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
     sys.exit(0)
     '''
 
