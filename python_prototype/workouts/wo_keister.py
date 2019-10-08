@@ -20,7 +20,7 @@ def test_distributions():
     distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[dim]), seed_rng=7)
     stopObj = CLT(distribObj,abs_tol=.05)
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
+    dataObj.summarize()
 
     # IID std_gaussian
     dim = 3
@@ -29,7 +29,7 @@ def test_distributions():
     distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]), seed_rng=7)
     stopObj = CLT(distribObj,abs_tol=.05)
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
+    dataObj.summarize()
 
     # QuasiRandom Lattice
     dim = 3
@@ -38,7 +38,7 @@ def test_distributions():
     distribObj = QuasiRandom(true_distribution=Lattice(dimension=[dim]),seed_rng=7)
     stopObj = CLTRep(distribObj,abs_tol=.05,n_max=1e6)
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
+    dataObj.summarize()
 
     # QuasiRandom sobol
     dim = 3
@@ -47,7 +47,7 @@ def test_distributions():
     distribObj = QuasiRandom(true_distribution=Sobol(dimension=[dim]), seed_rng=7)
     stopObj = CLTRep(distribObj,abs_tol=.05,n_max=1e6) # impossible tolerance so calculation is limited by sample budget
     sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    summarize(stopObj,measureObj,funObj,distribObj,dataObj)
+    dataObj.summarize()
 
 
 test_distributions()

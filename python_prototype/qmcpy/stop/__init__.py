@@ -4,10 +4,12 @@ from abc import ABC, abstractmethod
 
 from .._util import DistributionCompatibilityError, univ_repr
 
+
 class StoppingCriterion(ABC):
     """ Decide when to stop """
 
-    def __init__(self, distribution, allowed_distribs, abs_tol, rel_tol, n_init, n_max):
+    def __init__(self, distribution, allowed_distribs, abs_tol, rel_tol, \
+                 n_init, n_max):
         """
         Args:
             distribution (DiscreteDistribution): an instance of DiscreteDistribution
@@ -18,7 +20,8 @@ class StoppingCriterion(ABC):
             n_max (int): maximum number of samples
         """
         if type(distribution).__name__ not in allowed_distribs:
-            error_message = type(self).__name__ + ' only accepts distributions:'\
+            error_message = type(self).__name__  \
+                            + " only accepts distributions:" \
                             + str(allowed_distribs)
             raise DistributionCompatibilityError(error_message)
         super().__init__()
@@ -28,7 +31,7 @@ class StoppingCriterion(ABC):
         self.n_max = n_max if n_max else 1e8
 
     @abstractmethod
-    def stop_yet(self): # distribution = data or summary of data computed already
+    def stop_yet(self):  # accum_data = summary of data computed already
         """
         Determine when to stop
         """
@@ -37,19 +40,19 @@ class StoppingCriterion(ABC):
         return univ_repr(self)
 
     def summarize(self):
-        h1 = '%s (%s)\n'
-        item_i = '%25s: %d\n'
-        item_f = '%25s: %-15.4f\n'
+        header_fmt = "%s (%s)\n"
+        item_i = "%25s: %d\n"
+        item_f = "%25s: %-15.4f\n"
 
-        s = ""
-        s += h1 % (type(self).__name__, 'StoppingCriterion Object')
-        s += item_f % ('abs_tol', self.abs_tol)
-        s += item_f % ('rel_tol', self.rel_tol)
-        s += item_i % ('n_max', self.n_max)
-        s += item_f % ('inflate', self.inflate)
-        s += item_f % ('alpha', self.alpha)
+        attrs_vals_str = ""
+        attrs_vals_str += header_fmt % (type(self).__name__, "StoppingCriterion Object")
+        attrs_vals_str += item_f % ("abs_tol", self.abs_tol)
+        attrs_vals_str += item_f % ("rel_tol", self.rel_tol)
+        attrs_vals_str += item_i % ("n_max", self.n_max)
+        attrs_vals_str += item_f % ("inflate", self.inflate)
+        attrs_vals_str += item_f % ("alpha", self.alpha)
 
-        print(s[:-1])
+        print(attrs_vals_str[:-1])
 
 
 # API

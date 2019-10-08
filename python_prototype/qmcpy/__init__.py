@@ -19,7 +19,7 @@ from .measures.measures import (
     IIDZeroMeanGaussian,
     BrownianMotion,
     Lattice,
-    Sobol,
+    Sobol
 )
 from .stop.clt import CLT
 from .stop.clt_rep import CLTRep

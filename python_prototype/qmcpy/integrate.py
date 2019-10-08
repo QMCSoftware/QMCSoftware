@@ -52,7 +52,7 @@ def integrate(integrand=None, measure=None, distribution=None, \
         )  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
     t_total = time() - t_start
-    solution = stopping_criterion.data.solution # assign outputs
+    solution = stopping_criterion.data.solution  # assign outputs
     data = copy.deepcopy(stopping_criterion.data)
     data.t_total = t_total
     data.integrand = integrand
