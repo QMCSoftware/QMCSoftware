@@ -180,7 +180,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.__init__.Integrand" title="qmcpy.integrand.__init__.Integrand"><em>Integrand</em></a>) – an object from class Integrand</p></li>
-<li><p><strong>measure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – an object from class Measure</p></li>
+<li><p><strong>measure</strong> (<em>Measure</em>) – an object from class Measure</p></li>
 <li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution</p></li>
 <li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#qmcpy.stop.__init__.StoppingCriterion" title="qmcpy.stop.__init__.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class             StoppingCriterion</p></li>
 </ul>
@@ -282,7 +282,7 @@ object starting from the original Measure object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>measure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – the Measure object that defines the integral</p></li>
+<li><p><strong>measure</strong> (<em>Measure</em>) – the Measure object that defines the integral</p></li>
 <li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.distribution.__init__.DiscreteDistribution" title="qmcpy.distribution.__init__.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete distribution                 object that is sampled from</p></li>
 </ul>
 </dd>
@@ -306,7 +306,7 @@ object starting from the original Measure object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>bm_measure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – A BrownianMotion Measure object</p></li>
+<li><p><strong>bm_measure</strong> (<em>Measure</em>) – A BrownianMotion Measure object</p></li>
 <li><p><strong>volatility</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sigma, the volatility of the asset</p></li>
 <li><p><strong>start_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – S(0), the asset value at t=0</p></li>
 <li><p><strong>strike_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – K, the call/put offer</p></li>
@@ -418,27 +418,6 @@ B. D. Keister, Multidimensional Quadrature Algorithms,     <cite>Computers in Ph
 <div class="section" id="module-qmcpy.measures.__init__">
 <span id="measure-class"></span><h2>Measure Class<a class="headerlink" href="#module-qmcpy.measures.__init__" title="Permalink to this headline">¶</a></h2>
 <p>Definition for abstract class Measure</p>
-<dl class="class">
-<dt id="qmcpy.measures.__init__.Measure">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.measures.__init__.</code><code class="sig-name descname">Measure</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.__init__.Measure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies the components of a general measure used to define an
-integration problem or a sampling method</p>
-<dl class="method">
-<dt id="qmcpy.measures.__init__.Measure.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.measures.__init__.Measure.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a list of measures.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dimension</strong> (<em>list of ints</em>) – Dimensions to be dispersed among list                 of <code class="docutils literal notranslate"><span class="pre">Measures</span></code>.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dictionary</em>) – Accepts keyword arguments into dictionary.                 Disperses dictionary values among list of <code class="docutils literal notranslate"><span class="pre">Measures</span></code></p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <span class="target" id="module-qmcpy.measures.measures"></span><p>Definitions for concrete Measure Implementations</p>
 <dl class="class">
 <dt id="qmcpy.measures.measures.BrownianMotion">
@@ -1113,7 +1092,7 @@ and store the sample mean and variance of integrand values</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stop</strong> (<a class="reference internal" href="#qmcpy.stop.__init__.StoppingCriterion" title="qmcpy.stop.__init__.StoppingCriterion"><em>StoppingCriterion</em></a>) – a Stopping Criterion object</p></li>
-<li><p><strong>measure</strong> (<a class="reference internal" href="#qmcpy.measures.__init__.Measure" title="qmcpy.measures.__init__.Measure"><em>Measure</em></a>) – a Measure object</p></li>
+<li><p><strong>measure</strong> (<em>Measure</em>) – a Measure object</p></li>
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.__init__.Integrand" title="qmcpy.integrand.__init__.Integrand"><em>Integrand</em></a>) – an Integrand object</p></li>
 <li><p><strong>data</strong> (<em>data</em>) – a AccumData object</p></li>
 </ul>

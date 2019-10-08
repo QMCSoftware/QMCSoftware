@@ -7,47 +7,52 @@
 
 from qmcpy import integrate
 from qmcpy._util import summarize
-from qmcpy.stop import CLT,CLTRep
-from qmcpy.distribution import IIDDistribution,QuasiRandom
+from qmcpy.stop import CLT, CLTRep
+from qmcpy.distribution import IIDDistribution, QuasiRandom
 from qmcpy.integrand import Keister
-from qmcpy.measures import StdUniform,StdGaussian,IIDZeroMeanGaussian,Lattice,Sobol
+from qmcpy.measures import *
 
-def test_distributions():
+def test_distributions_keister():
     # IID std_uniform
     dim = 3
-    funObj = Keister()
-    measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
-    distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[dim]), seed_rng=7)
-    stopObj = CLT(distribObj,abs_tol=.05)
-    sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    integrand = Keister()
+    measure = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
+    distribution = IIDDistribution(true_distribution=StdUniform(dimension=[dim]),
+                                 seed_rng=7)
+    stop = CLT(distribution, abs_tol=.05)
+    sol, data = integrate(integrand, measure, distribution, stop)
+    data.summarize()
 
     # IID std_gaussian
     dim = 3
-    funObj = Keister()
-    measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
-    distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]), seed_rng=7)
-    stopObj = CLT(distribObj,abs_tol=.05)
-    sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    integrand = Keister()
+    measure = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
+    distribution = IIDDistribution(true_distribution=StdGaussian(dimension=[dim]),
+                                 seed_rng=7)
+    stop = CLT(distribution, abs_tol=.05)
+    sol, data = integrate(integrand, measure, distribution, stop)
+    data.summarize()
 
     # QuasiRandom Lattice
     dim = 3
-    funObj = Keister()
-    measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
-    distribObj = QuasiRandom(true_distribution=Lattice(dimension=[dim]),seed_rng=7)
-    stopObj = CLTRep(distribObj,abs_tol=.05,n_max=1e6)
-    sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    integrand = Keister()
+    measure = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
+    distribution = QuasiRandom(true_distribution=Lattice(dimension=[dim]),
+                             seed_rng=7)
+    stop = CLTRep(distribution, abs_tol=.05, n_max=1e6)
+    sol, data = integrate(integrand, measure, distribution, stop)
+    data.summarize()
 
     # QuasiRandom sobol
     dim = 3
-    funObj = Keister()
-    measureObj = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
-    distribObj = QuasiRandom(true_distribution=Sobol(dimension=[dim]), seed_rng=7)
-    stopObj = CLTRep(distribObj,abs_tol=.05,n_max=1e6) # impossible tolerance so calculation is limited by sample budget
-    sol,dataObj = integrate(funObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    integrand = Keister()
+    measure = IIDZeroMeanGaussian(dimension=[dim], variance=[1 / 2])
+    distribution = QuasiRandom(true_distribution=Sobol(dimension=[dim]),
+                             seed_rng=7)
+    stop = CLTRep(distribution, abs_tol=.05, n_max=1e6)
+    # impossible tolerance so calculation is limited by sample budget
+    sol, data = integrate(integrand, measure, distribution, stop)
+    data.summarize()
 
 
-test_distributions()
+test_distributions_keister()
