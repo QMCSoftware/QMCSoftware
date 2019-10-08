@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 from numpy import cumsum, diff, insert, sqrt
 from scipy.stats import norm
 
-from .._util import univ_repr,TransformError
+from .._util import univ_repr, TransformError
+
 
 class Integrand(ABC):
     def __init__(self, nominal_value=0):
@@ -22,7 +23,7 @@ class Integrand(ABC):
                 multi-dimensional problems
         """
         super().__init__()
-        self.nominalValue = nominal_value
+        self.nominal_value = nominal_value
         self.f = None
         self.dimension = 2
         self.fun_list = [self]
@@ -38,10 +39,13 @@ class Integrand(ABC):
                 row of an :math:`n \cdot |\mathfrak{u}|` matrix
             coord_index: set of those coordinates in sequence needed, \
                 :math:`\mathfrak{u}`
+
         Returns:
-            :math:`n \cdot p` matrix with values :math:`f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})`
-            where if :math:`\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j`, then :math:`x'_{ij} = x_{ij}`
-            for :math:`j \in \mathfrak{u}`, and :math:`x'_{ij} = c` otherwise
+            :math:`n \cdot p` matrix with values \
+            :math:`f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})` where if \
+            :math:`\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j`, then \
+            :math:`x'_{ij} = x_{ij}` for :math:`j \in \mathfrak{u}`, and \
+            :math:`x'_{ij} = c` otherwise
         """
         pass
 
@@ -55,44 +59,70 @@ class Integrand(ABC):
             measure (Measure): the Measure object that defines the integral
             distribution (DiscreteDistribution): the discrete distribution \
                 object that is sampled from
+
         Returns: None
         """
         for i in range(len(self)):
-            try: sample_from = distribution[i].true_distribution.mimics # QuasiRandom sampling
-            except: sample_from = type(distribution[i].true_distribution).__name__ # IIDDistribution sampling
-            transform_to = type(measure[i]).__name__ # distribution the sampling attempts to mimic
-            self[i].dimension = distribution[i].true_distribution.dimension # the integrand needs the dimension
-            if transform_to==sample_from: # no need to transform
-                self[i].f = lambda xu,coordIdex,i=i: self[i].g(xu,coordIdex)
-            elif transform_to=='IIDZeroMeanGaussian' and sample_from=='StdGaussian': # multiply by the likelihood ratio
+            try:
+                sample_from = distribution[i].true_distribution.mimics
+                    # QuasiRandom sampling
+            except:
+                sample_from = type(distribution[i].true_distribution).__name__
+                # IIDDistribution sampling
+            transform_to = type(measure[i]).__name__
+            # distribution the sampling attempts to mimic
+            self[i].dimension = distribution[i].true_distribution.dimension
+            # the integrand needs the dimension
+            if transform_to == sample_from:  # no need to transform
+                self[i].f = lambda xu, coordIdex, i=i: self[i].g(xu, coordIdex)
+            elif transform_to == 'IIDZeroMeanGaussian' and \
+                sample_from == 'StdGaussian':  # multiply by likelihood ratio
                 this_var = measure[i].variance
-                self[i].f = lambda xu,coordIndex,var=this_var,i=i: self[i].g(xu*sqrt(var),coordIndex)
-            elif transform_to=='IIDZeroMeanGaussian' and sample_from=='StdUniform': # inverse cdf transform
+                self[i].f = lambda xu, coordIndex, var=this_var, i=i: \
+                    self[i].g(xu * sqrt(var), coordIndex)
+            elif transform_to == 'IIDZeroMeanGaussian' and \
+                sample_from == 'StdUniform':  # inverse cdf transform
                 this_var = measure[i].variance
-                self[i].f = lambda xu,coordIdex,var=this_var,i=i: self[i].g(sqrt(var)*norm.ppf(xu),coordIdex)
-            elif transform_to== 'BrownianMotion' and sample_from== 'StdUniform': # inverse cdf transform -> sum across time-series
-                timeDiff = diff(insert(measure[i].time_vector, 0, 0))
-                self[i].f = lambda xu, coordIndex,timeDiff=timeDiff,i=i: self[i].g(cumsum(norm.ppf(xu)*sqrt(timeDiff),1),coordIndex)
-            elif transform_to== 'BrownianMotion' and sample_from== 'StdGaussian': # sum across time-series
-                timeDiff = diff(insert(measure[i].time_vector, 0, 0))
-                self[i].f = lambda xu,coordIndex,timeDiff=timeDiff,i=i: self[i].g(cumsum(xu*sqrt(timeDiff),1),coordIndex)
+                self[i].f = lambda xu, coordIdex, var=this_var, i=i: \
+                    self[i].g(sqrt(var) * norm.ppf(xu), coordIdex)
+            elif transform_to == 'BrownianMotion' and \
+                sample_from == 'StdUniform':
+                # inverse cdf transform -> sum across time-series
+                time_diff = diff(insert(measure[i].time_vector, 0, 0))
+                self[i].f = lambda xu, coordIndex, timeDiff=time_diff, i=i: \
+                    self[i].g(cumsum(norm.ppf(xu) * sqrt(timeDiff), 1), coordIndex)
+            elif transform_to == 'BrownianMotion' and \
+                sample_from == 'StdGaussian':  # sum across time-series
+                time_diff = diff(insert(measure[i].time_vector, 0, 0))
+                self[i].f = lambda xu, coordIndex, timeDiff=time_diff, i=i: \
+                    self[i].g(cumsum(xu * sqrt(timeDiff), 1), coordIndex)
             else:
-                raise TransformError("Cannot transform %s distribution to mimic Integrand's true %s measure" % (sample_from,transform_to))
+                msg = "Cannot transform %s distribution to mimic Integrand's true %s measure"
+                raise TransformError(msg % (sample_from, transform_to))
+
         return
 
-    def __len__(self): return len(self.fun_list)
+    def __len__(self):
+        return len(self.fun_list)
+
     def __iter__(self):
-        for fun in self.fun_list: yield fun
-    def __getitem__(self,i): return self.fun_list[i]
-    def __setitem__(self,i,val): self.fun_list[i] = val
-    def __repr__(self): return univ_repr(self,'fun_list')
+        for fun in self.fun_list:
+            yield fun
+
+    def __getitem__(self, i):
+        return self.fun_list[i]
+
+    def __setitem__(self, i, val):
+        self.fun_list[i] = val
+
+    def __repr__(self):
+        return univ_repr(self, "fun_list")
 
     def summarize(self):
-        h1 = '%s (%s)'
-        s = ""
+        header_fmt = "%s (%s)"
+        attrs_vals_str = header_fmt % (type(self).__name__, "Integrand Object")
+        print(attrs_vals_str)
 
-        s += h1 % (type(self).__name__, 'Integrand Object')
-        print(s)
 
 # API
 from .asian_call import AsianCall
