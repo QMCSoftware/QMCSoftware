@@ -13,13 +13,6 @@ from .distribution.quasi_random import QuasiRandom
 from .integrand.asian_call import AsianCall
 from .integrand.keister import Keister
 from .integrand.linear import Linear
-from .measures.measures import (
-    StdUniform,
-    StdGaussian,
-    IIDZeroMeanGaussian,
-    BrownianMotion,
-    Lattice,
-    Sobol
-)
+from .measures.measures import *
 from .stop.clt import CLT
 from .stop.clt_rep import CLTRep

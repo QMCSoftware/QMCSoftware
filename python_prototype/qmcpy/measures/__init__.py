@@ -76,11 +76,4 @@ class Measure(ABC):
 
 
 # API
-from .measures import (
-    StdUniform,
-    StdGaussian,
-    IIDZeroMeanGaussian,
-    BrownianMotion,
-    Lattice,
-    Sobol,
-)
+from .measures import *

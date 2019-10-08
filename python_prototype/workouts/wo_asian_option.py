@@ -9,75 +9,84 @@ from numpy import arange
 
 from qmcpy import integrate
 from qmcpy._util import summarize
-from qmcpy.stop import CLT,CLTRep
-from qmcpy.distribution import IIDDistribution,QuasiRandom
+from qmcpy.stop import CLT, CLTRep
+from qmcpy.distribution import IIDDistribution, QuasiRandom
 from qmcpy.integrand import AsianCall
-from qmcpy.measures import StdUniform,StdGaussian,BrownianMotion,Lattice,Sobol
+from qmcpy.measures import *
 
-def test_distributions():
+def test_distributions_asian_option():
     # IID std_uniform
-    measureObj = BrownianMotion(time_vector=[arange(1 / 64, 65 / 64, 1 / 64)])
-    OptionObj = AsianCall(measureObj)
-    distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[64]), seed_rng=7)
-    stopObj = CLT(distribObj,abs_tol=.05)
-    sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    measure = BrownianMotion(time_vector=[arange(1 / 64, 65 / 64, 1 / 64)])
+    option = AsianCall(measure)
+    distribution = IIDDistribution(true_distribution=StdUniform(dimension=[64]),
+                                   seed_rng=7)
+    stop = CLT(distribution, abs_tol=.05)
+    sol, data = integrate(option, measure, distribution, stop)
+    data.summarize()
 
     # IID std_gaussian
-    measureObj = BrownianMotion(time_vector=[arange(1 / 64, 65 / 64, 1 / 64)])
-    OptionObj = AsianCall(measureObj)
-    distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[64]), seed_rng=7)
-    stopObj = CLT(distribObj,abs_tol=.05)
-    sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    measure = BrownianMotion(time_vector=[arange(1 / 64, 65 / 64, 1 / 64)])
+    option = AsianCall(measure)
+    distribution = IIDDistribution(true_distribution=StdGaussian(dimension=[64]), seed_rng=7)
+    stop = CLT(distribution, abs_tol=.05)
+    sol, data = integrate(option, measure, distribution, stop)
+    data.summarize()
 
     # QuasiRandom lattice
-    measureObj = BrownianMotion(time_vector=[arange(1 / 64, 65 / 64, 1 / 64)])
-    OptionObj = AsianCall(measureObj)
-    distribObj = QuasiRandom(true_distribution=Lattice(dimension=[64]),seed_rng=7)
-    stopObj = CLTRep(distribObj,abs_tol=.05)
-    sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    measure = BrownianMotion(time_vector=[arange(1 / 64, 65 / 64, 1 / 64)])
+    option = AsianCall(measure)
+    distribution = QuasiRandom(true_distribution=Lattice(dimension=[64]),
+                               seed_rng=7)
+    stop = CLTRep(distribution, abs_tol=.05)
+    sol, data = integrate(option, measure, distribution, stop)
+    data.summarize()
 
     # QuasiRandom sobol
-    measureObj = BrownianMotion(time_vector=[arange(1 / 64, 65 / 64, 1 / 64)])
-    OptionObj = AsianCall(measureObj)
-    distribObj = QuasiRandom(true_distribution=Sobol(dimension=[64]), seed_rng=7)
-    stopObj = CLTRep(distribObj,abs_tol=.05)
-    sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    measure = BrownianMotion(time_vector=[arange(1 / 64, 65 / 64, 1 / 64)])
+    option = AsianCall(measure)
+    distribution = QuasiRandom(true_distribution=Sobol(dimension=[64]),
+                               seed_rng=7)
+    stop = CLTRep(distribution, abs_tol=.05)
+    sol, data = integrate(option, measure, distribution, stop)
+    data.summarize()
 
     """ Multi-Level Asian Option Pricing """
     # IID std_uniform
-    measureObj = BrownianMotion(time_vector=[arange(1 / 4, 5 / 4, 1 / 4), arange(1 / 16, 17 / 16, 1 / 16), arange(1 / 64, 65 / 64, 1 / 64)])
-    OptionObj = AsianCall(measureObj)
-    distribObj = IIDDistribution(true_distribution=StdUniform(dimension=[4, 16, 64]), seed_rng=7)
-    stopObj = CLT(distribObj,n_max=2**20,abs_tol=.05)
-    sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    time_vector = [arange(1 / 4, 5 / 4, 1 / 4), arange(1 / 16, 17 / 16, 1 / 16),
+                   arange(1 / 64, 65 / 64, 1 / 64)]
+    measure = BrownianMotion(time_vector=time_vector)
+    option = AsianCall(measure)
+    distribution = IIDDistribution(
+        true_distribution=StdUniform(dimension=[4, 16, 64]), seed_rng=7)
+    stop = CLT(distribution, n_max=2 ** 20, abs_tol=.05)
+    sol, data = integrate(option, measure, distribution, stop)
+    data.summarize()
 
     # IID std_gaussian
-    measureObj = BrownianMotion(time_vector=[arange(1 / 4, 5 / 4, 1 / 4), arange(1 / 16, 17 / 16, 1 / 16), arange(1 / 64, 65 / 64, 1 / 64)])
-    OptionObj = AsianCall(measureObj)
-    distribObj = IIDDistribution(true_distribution=StdGaussian(dimension=[4, 16, 64]), seed_rng=7)
-    stopObj = CLT(distribObj,n_max=2**20,abs_tol=.05)
-    sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    measure = BrownianMotion(time_vector=time_vector)
+    option = AsianCall(measure)
+    distribution = IIDDistribution(
+        true_distribution=StdGaussian(dimension=[4, 16, 64]), seed_rng=7)
+    stop = CLT(distribution, n_max=2 ** 20, abs_tol=.05)
+    sol, data = integrate(option, measure, distribution, stop)
+    data.summarize()
 
     # QuasiRandom Lattice
-    measureObj = BrownianMotion(time_vector=[arange(1 / 4, 5 / 4, 1 / 4), arange(1 / 16, 17 / 16, 1 / 16), arange(1 / 64, 65 / 64, 1 / 64)])
-    OptionObj = AsianCall(measureObj)
-    distribObj = QuasiRandom(true_distribution=Lattice(dimension=[4,16,64]),seed_rng=7)
-    stopObj = CLTRep(distribObj,n_max=2**20,abs_tol=.05)
-    sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    measure = BrownianMotion(time_vector=time_vector)
+    option = AsianCall(measure)
+    distribution = QuasiRandom(true_distribution=Lattice(dimension=[4, 16, 64]),
+                               seed_rng=7)
+    stop = CLTRep(distribution, n_max=2 ** 20, abs_tol=.05)
+    sol, data = integrate(option, measure, distribution, stop)
+    data.summarize()
 
     # QuasiRandom sobol
-    measureObj = BrownianMotion(time_vector=[arange(1 / 4, 5 / 4, 1 / 4), arange(1 / 16, 17 / 16, 1 / 16), arange(1 / 64, 65 / 64, 1 / 64)])
-    OptionObj = AsianCall(measureObj)
-    distribObj = QuasiRandom(true_distribution=Sobol(dimension=[4, 16, 64]), seed_rng=7)
-    stopObj = CLTRep(distribObj,n_max=2**20,abs_tol=.05)
-    sol,dataObj = integrate(OptionObj,measureObj,distribObj,stopObj)
-    dataObj.summarize()
+    measure = BrownianMotion(time_vector=time_vector)
+    option = AsianCall(measure)
+    distribution = QuasiRandom(true_distribution=Sobol(dimension=[4, 16, 64]),
+                               seed_rng=7)
+    stop = CLTRep(distribution, n_max=2 ** 20, abs_tol=.05)
+    sol, data = integrate(option, measure, distribution, stop)
+    data.summarize()
 
-test_distributions()
+test_distributions_asian_option()
