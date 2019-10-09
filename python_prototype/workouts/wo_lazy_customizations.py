@@ -14,6 +14,7 @@ def custom_lazy_generator():
     # Create an appropriote Poisson generator
     numpy_gen = Generator(PCG64(7))  # seed is 7
     poisson_wrapper = lambda *size: numpy_gen.poisson(lam=lambda_, size=size)
+
     # Use qmcpy for integration
     integrand = Linear()
     measure = CustomIID(dimension=[dim], generator=poisson_wrapper)
@@ -40,3 +41,4 @@ if __name__ == "__main__":
     custom_lazy_generator()
     print()
     custom_lazy_integrand()
+

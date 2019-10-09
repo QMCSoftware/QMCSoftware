@@ -22,7 +22,7 @@ class IIDDistribution(DiscreteDistribution):
             seed_rng (int): seed for random number generator to ensure \
                 reproduciblity
         """
-        accepted_measures = ["StdUniform", "StdGaussian"]
+        accepted_measures = ["StdUniform", "StdGaussian","CustomIID"]
         if seed_rng:
             random.seed(seed_rng)
         super().__init__(accepted_measures, true_distribution, distrib_data)
@@ -34,12 +34,16 @@ class IIDDistribution(DiscreteDistribution):
         Args:
             n (int): Number of observations (sample.size()[1])
             m (int): Number of dimensions (sample.size()[2])
+            j (int): NOT USED. Number of nxm matricies to generate (sample.size()[0])
 
         Returns:
             nxm (numpy array)
         """
+        n,m = int(n),int(m) # ensure integer types
         if type(self.true_distribution).__name__ == "StdUniform":
-            samples = random.rand(j, int(n), int(m)).squeeze()
+            samples = random.rand(n, m)
         elif type(self.true_distribution).__name__ == "StdGaussian":
-            samples = random.randn(j, int(n), int(m)).squeeze()
+            samples = random.randn(n, m)
+        elif type(self.true_distribution).__name__ == "CustomIID":
+            samples = self.true_distribution.generator(n, m)
         return samples
