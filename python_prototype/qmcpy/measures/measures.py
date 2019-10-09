@@ -75,3 +75,17 @@ class Sobol(Measure):
             dimension (array of ints): dimensions of integrands
         """
         super().__init__(dimension, mimics="StdUniform")
+
+class CustomIID(Measure):
+    """ Custom Generator for IID sampling Measure  """
+
+    def __init__(self, dimension=None, generator=None):
+        """
+        Args:
+            dimension (array of ints): dimensions of integrands
+            generator (array of pointers): function that generates a numpy array of IID samples from the custom distribution
+                function must take in an arbitrary number of size arguments. i.e f = lambda *size: random.rand(*size)
+                Good starting point: https://docs.scipy.org/doc/numpy/reference/random/generator.html  
+        """
+        generator_name = generator.__name__ if generator else None
+        super().__init__(dimension, generator=generator, name=generator_name)

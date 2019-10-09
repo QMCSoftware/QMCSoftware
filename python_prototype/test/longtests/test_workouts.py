@@ -6,6 +6,7 @@ from workouts.wo_abstol_runtime import comp_Clt_vs_cltRep_runtimes
 from workouts.wo_asian_option import test_distributions_asian_option
 from workouts.wo_keister import test_distributions_keister
 from workouts.wo_integrate_default import integrate_default
+from workouts.wo_custom_generator import custom_poisson_generator_example
 
 
 class Test_Workouts(unittest.TestCase):
@@ -25,3 +26,13 @@ class Test_Workouts(unittest.TestCase):
         sol, data = integrate_default()
         tol = data.stopping_criterion.abs_tol
         self.assertTrue(abs(sol - 1.5) < tol)
+    
+    def test_custom_generator(self):
+        dim = 10
+        lambda_ = 3
+        qmc_sol,data_obj = custom_poisson_generator_example(dim,lambda_)
+        tol = data_obj.stopping_criterion.abs_tol
+        exact_sol = dim*lambda_
+        self.assertTrue(abs(exact_sol - qmc_sol) < tol)
+
+
