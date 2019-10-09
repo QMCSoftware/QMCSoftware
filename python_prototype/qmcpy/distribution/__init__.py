@@ -21,7 +21,7 @@ class DiscreteDistribution(ABC):
 
     Raises:
         MeasureCompatibilityError: if ``true_distribution`` not in \
-        ``accepted_measures``
+        ``accepted_measures``.
     """
 
     def __init__(self, accepted_measures, true_distribution=None, \

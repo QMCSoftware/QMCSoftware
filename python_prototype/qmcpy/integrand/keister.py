@@ -11,8 +11,8 @@ class Keister(Integrand):
     :math:`\mathbf{x} \in \mathbb{R}^d`.
     The standard example integrates the Keister integrand with respect to an \
     IID Gaussian distribution with variance 1/2.
-    B. D. Keister, Multidimensional Quadrature Algorithms, \
-    `Computers in Physics`, *10*, pp.\ 119-122, 1996.
+
+
     """
 
     def __init__(self, nominal_value=None):
@@ -21,6 +21,10 @@ class Keister(Integrand):
 
         Args:
             nominal_value (int): :math:`c` such that :math:`(c, \ldots, c) \in \mathcal{X}`
+
+        Referenece:
+            B. D. Keister, Multidimensional Quadrature Algorithms, \
+            `Computers in Physics`, *10*, pp.\ 119-122, 1996.
         """
         super().__init__(nominal_value=nominal_value)
 

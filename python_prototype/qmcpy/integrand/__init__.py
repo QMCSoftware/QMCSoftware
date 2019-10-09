@@ -1,4 +1,4 @@
-""" Definition for abstract class, AccumData """
+""" Definition for abstract class, ``Integrand`` """
 
 from abc import ABC, abstractmethod
 from numpy import cumsum, diff, insert, sqrt
@@ -16,17 +16,17 @@ class Integrand(ABC):
         Attributes:
             nominal_value (int): :math:`c` such that \
                 :math:`(c, \ldots, c) \in \mathcal{X}`
-            f (function handle): function transformed to accept distribution \
+            f (Integrand): function transformed to accept distribution \
                 values
-            dimension (positive int): dimension of the domain, :math:'d'
-            fun_list (list): list of Integrands, may be more than 1 for \
+            dimension (int): dimension of the domain, :math:`d > 0`
+            integrand_list (list): list of Integrands, may be more than 1 for \
                 multi-dimensional problems
         """
         super().__init__()
         self.nominal_value = nominal_value
         self.f = None
         self.dimension = 2
-        self.fun_list = [self]
+        self.integrand_list = [self]
 
     # Abstract Methods
     @abstractmethod
@@ -68,7 +68,7 @@ class Integrand(ABC):
                     # QuasiRandom sampling
             except:
                 sample_from = type(distribution[i].true_distribution).__name__
-                # IIDDistribution sampling
+                    # IIDDistribution sampling
             transform_to = type(measure[i]).__name__
             # distribution the sampling attempts to mimic
             self[i].dimension = distribution[i].true_distribution.dimension
@@ -90,33 +90,35 @@ class Integrand(ABC):
                 # inverse cdf transform -> sum across time-series
                 time_diff = diff(insert(measure[i].time_vector, 0, 0))
                 self[i].f = lambda xu, coordIndex, timeDiff=time_diff, i=i: \
-                    self[i].g(cumsum(norm.ppf(xu) * sqrt(timeDiff), 1), coordIndex)
+                    self[i].g(cumsum(norm.ppf(xu) * sqrt(timeDiff), 1),
+                              coordIndex)
             elif transform_to == 'BrownianMotion' and \
                 sample_from == 'StdGaussian':  # sum across time-series
                 time_diff = diff(insert(measure[i].time_vector, 0, 0))
                 self[i].f = lambda xu, coordIndex, timeDiff=time_diff, i=i: \
                     self[i].g(cumsum(xu * sqrt(timeDiff), 1), coordIndex)
             else:
-                msg = "Cannot transform %s distribution to mimic Integrand's true %s measure"
+                msg = "Cannot transform %s distribution to mimic Integrand's " \
+                      "true %s measure"
                 raise TransformError(msg % (sample_from, transform_to))
 
         return
 
     def __len__(self):
-        return len(self.fun_list)
+        return len(self.integrand_list)
 
     def __iter__(self):
-        for fun in self.fun_list:
+        for fun in self.integrand_list:
             yield fun
 
     def __getitem__(self, i):
-        return self.fun_list[i]
+        return self.integrand_list[i]
 
     def __setitem__(self, i, val):
-        self.fun_list[i] = val
+        self.integrand_list[i] = val
 
     def __repr__(self):
-        return univ_repr(self, "fun_list")
+        return univ_repr(self, "integrand_list")
 
     def summarize(self):
         header_fmt = "%s (%s)"

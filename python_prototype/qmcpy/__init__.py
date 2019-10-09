@@ -1,4 +1,4 @@
-""" Meta-data nd public utilites for qmcpy """
+""" Meta-data and public utilites for qmcpy """
 
 name = "qmcpy"
 __version__ = 0.1
@@ -16,3 +16,4 @@ from .integrand.linear import Linear
 from .measures.measures import *
 from .stop.clt import CLT
 from .stop.clt_rep import CLTRep
+

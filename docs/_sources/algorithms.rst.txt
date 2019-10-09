@@ -10,7 +10,8 @@ Integration Method
 Integrand Class
 ---------------
 
-.. automodule:: qmcpy.integrand.__init__
+.. The following extract documentation in qmcpy.integrand.__init__.py
+.. automodule:: qmcpy.integrand
     :members:
 
 Asical Call Option Payoff
@@ -34,7 +35,8 @@ A Linear Function
 Measure Class
 -------------
 
-.. automodule:: qmcpy.measures.__init__
+.. The following extract documentation in qmcpy.measures.__init__.py
+.. automodule:: qmcpy.measures
     :members:
 
 .. automodule:: qmcpy.measures.measures
@@ -43,7 +45,8 @@ Measure Class
 Distribution Class
 ------------------
 
-.. automodule:: qmcpy.distribution.__init__
+.. The following extract documentation in qmcpy.distribution.__init__.py
+.. automodule:: qmcpy.distribution
     :members:
 
 IID Distribution
@@ -61,13 +64,14 @@ Quasi Random Distribution
 Sobol Sequence
 ..............
 
-.. automodule:: qmcpy.distribution.magic_point_shop.digital_seq
+.. automodule:: qmcpy.distribution.digital_seq
     :members:
 
 Data Class
 ----------
 
-.. automodule:: qmcpy.accum_data.__init__
+.. The following extract documentation in qmcpy.accum_data.__init__.py
+.. automodule:: qmcpy.accum_data
     :members:
 
 .. automodule:: qmcpy.accum_data.mean_var_data
@@ -79,7 +83,8 @@ Data Class
 StoppingCriterion Class
 -----------------------
 
-.. automodule:: qmcpy.stop.__init__
+.. The following extract documentation in qmcpy.stop.__init__.py
+.. automodule:: qmcpy.stop
     :members:
 
 
@@ -92,5 +97,9 @@ StoppingCriterion Class
 Utilities
 ---------
 
-.. automodule:: qmcpy._util.__init__
+.. The following extract documentation in qmcpy.__init__.py
+.. automodule:: qmcpy
+    :members:
+
+.. automodule:: qmcpy._util.exceptions_warnings
     :members:

@@ -1,8 +1,12 @@
 """Sobol sequence generator
 """
 
+import sys
+from os import path
+#sys.path.append(os.path.abspath('../'))
+
 import pandas as pd
-from .digitalseq_b2g import digitalseq_b2g
+from ..third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
 
 def bitreverse(a, m=None):
     """
@@ -36,11 +40,11 @@ class DigitalSeq(digitalseq_b2g):
 
     This implementation is based upon, but faster than, ``digitalseq_b2g`` from:
 
-    D. Nuyens, `The magic point shop of QMC point generators and generating
-    vectors.` MATLAB and Python software, 2018. Available from
-    https://people.cs.kuleuven.be/~dirk.nuyens/
+    Reference:
+        D. Nuyens, `The Magic Point Shop of QMC point generators and generating
+        vectors.` MATLAB and Python software, 2018. Available from
+        https://people.cs.kuleuven.be/~dirk.nuyens/
 
-qmc-generators.
     """
 
     def __init__(self, Cs, kstart=0, m=None, s=None, returnDeepCopy=True):
@@ -174,10 +178,11 @@ qmc-generators.
         """
         basestr = str  # basestr for python2, str for python3
         if isinstance(Cs, basestr):
-            from os import path
-            abs_file_path = path.join(path.dirname(__file__),Cs)
+            abs_file_path = path.join(path.dirname(__file__), \
+                                      "../third_party/magic_point_shop", Cs)
             # filename passed in
-            Cs = pd.read_csv(abs_file_path, header=None, delimiter=" ", nrows=s).values.tolist()
+            Cs = pd.read_csv(abs_file_path, header=None, delimiter=" ", \
+                             nrows=s).values.tolist()
         elif hasattr(Cs, 'read'):
             # assume z is a stream like sys.stdin
             f = Cs

@@ -20,7 +20,11 @@ class Measure(ABC):
             dimension (list of ints): Dimensions to be dispersed among list \
                 of ``Measures``.
             **kwargs (dictionary): Accepts keyword arguments into dictionary. \
-                Disperses dictionary values among list of ``Measures``
+                Disperses dictionary values among list of ``Measures``.
+
+        Raises:
+            DimensionError: if ``dimension`` is not a list of positive integers.
+
         """
         self.dimension = dimension
         super().__init__()

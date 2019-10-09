@@ -6,7 +6,8 @@ from . import Integrand
 class LazyFunction(Integrand):
     """ Specify and generate values of custom user-function"""
 
-    def __init__(self, nominal_value=None,custom_fun=None):
+
+    def __init__(self, nominal_value=None, custom_fun=None):
         """
         Initialize custom Integrand
 
@@ -22,7 +23,7 @@ class LazyFunction(Integrand):
         """
         super().__init__(nominal_value=nominal_value)
         self.custom_fun = custom_fun
-    
+
     def g(self, x, coord_index):
-        return self.custom_fun(x,coord_index)
-        
+        return self.custom_fun(x, coord_index)
+

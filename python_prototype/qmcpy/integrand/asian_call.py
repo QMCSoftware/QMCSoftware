@@ -30,7 +30,7 @@ class AsianCall(Integrand):
             return
         # Create a list of Asian Call Options and distribute attributes
         nBM = len(bm_measure)
-        self.fun_list = [AsianCall() for i in range(nBM)]
+        self.integrand_list = [AsianCall() for i in range(nBM)]
         self[0].bm_measure = self.bm_measure[0]
         self[0].dimFac = 0
         self[0].dimension = self.bm_measure[0].dimension
