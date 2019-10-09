@@ -4,7 +4,8 @@ from numpy import array, int64, log, random
 from numpy import zeros
 
 from . import DiscreteDistribution
-from .magic_point_shop import DigitalSeq, LatticeSeq
+from .digital_seq import DigitalSeq
+from qmcpy.third_party.magic_point_shop import LatticeSeq
 
 
 class QuasiRandom(DiscreteDistribution):
@@ -16,7 +17,13 @@ class QuasiRandom(DiscreteDistribution):
             accepted_measures (list of strings): Measure objects compatible \
                 with the DiscreteDistribution
             seed_rng (int): seed for random number generator to ensure \
-                reproduciblity
+                reproduciblity.
+
+        Reference:
+            Nuyens, D., The Magic Point Shop of QMC point generators and \
+            generating vectors. URL:
+            https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators.
+
         """
         accepted_measures = ["Lattice", "Sobol"]
             # Implemented QuasiRandom generators
