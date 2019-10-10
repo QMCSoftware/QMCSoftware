@@ -25,7 +25,7 @@ class CLTRep(StoppingCriterion):
         """
         Args:
             distribution (DiscreteDistribution): an instance of DiscreteDistribution
-            n_streams (int): number of random nxm matricies to generate
+            n_streams (int): number of random nxm matrices to generate
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
             abs_tol (float): absolute error tolerance

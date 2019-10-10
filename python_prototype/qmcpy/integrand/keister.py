@@ -22,7 +22,7 @@ class Keister(Integrand):
         Args:
             nominal_value (int): :math:`c` such that :math:`(c, \ldots, c) \in \mathcal{X}`
 
-        Referenece:
+        Reference:
             B. D. Keister, Multidimensional Quadrature Algorithms, \
             `Computers in Physics`, *10*, pp.\ 119-122, 1996.
         """

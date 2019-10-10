@@ -13,7 +13,7 @@ class DiscreteDistribution(ABC):
     Args:
         accepted_measures: list of valid measure names
         true_distribution (DiscreteDistribution): True distribution.
-        distrib_data:
+        distribution_list: list of Distribution instances
 
     Attributes:
         distribution_list: List of DiscreteDistribution instances.
@@ -25,7 +25,7 @@ class DiscreteDistribution(ABC):
     """
 
     def __init__(self, accepted_measures, true_distribution=None, \
-                 distrib_data=None):
+                 distribution_list=None):
         super().__init__()
         if not true_distribution:
             return
@@ -40,7 +40,7 @@ class DiscreteDistribution(ABC):
                                   for i in range(len(self.true_distribution))]
         for i in range(len(self)):
             self[i].true_distribution = self.true_distribution[i]
-            self[i].distrib_data = distrib_data[i] if distrib_data else None
+            self[i].distribution_list = distribution_list[i] if distribution_list else None
 
     @abstractmethod
     def gen_distrib(self, n, m, j):
@@ -50,7 +50,7 @@ class DiscreteDistribution(ABC):
         Args:
             n (int): Number of observations (sample.size()[1])
             m (int): Number of dimensions (sample.size()[2])
-            j (int): Number of nxm matricies to generate (sample.size()[0])
+            j (int): Number of nxm matrices to generate (sample.size()[0])
 
         Returns:
             jxnxm (numpy array)

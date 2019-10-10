@@ -52,7 +52,7 @@ class Integrand(ABC):
     def transform_variable(self, measure, distribution):
         """
         This method performs the necessary variable transformation to put the
-        original integrand in the form required by the DiscreteDistributon
+        original integrand in the form required by the DiscreteDistribution
         object starting from the original Measure object
 
         Args:

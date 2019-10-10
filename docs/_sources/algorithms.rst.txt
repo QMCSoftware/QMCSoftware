@@ -14,13 +14,13 @@ Integrand Class
 .. automodule:: qmcpy.integrand
     :members:
 
-Asical Call Option Payoff
+Asican Call Option Payoff
 .........................
 
 .. automodule:: qmcpy.integrand.asian_call
     :members:
 
-Kesiter Function
+Keister Function
 ................
 
 .. automodule:: qmcpy.integrand.keister

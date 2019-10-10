@@ -42,8 +42,8 @@ class MeanVarData(AccumData):
         for i in range(len(integrand)):
             t_start = process_time()  # time the integrand values
             dim = distribution[i].true_distribution.dimension
-            distrib_data = distribution[i].gen_distrib(self.n_next[i], dim)
-            y = integrand[i].f(distrib_data, arange(1, dim + 1))
+            distribution_list = distribution[i].gen_distrib(self.n_next[i], dim)
+            y = integrand[i].f(distribution_list, arange(1, dim + 1))
             self.t_eval[i] = max(process_time() - t_start, EPS)
                 # for multi-level methods
             self.sighat[i] = std(y)  # compute the sample standard deviation

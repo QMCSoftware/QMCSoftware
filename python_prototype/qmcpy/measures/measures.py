@@ -11,7 +11,7 @@ class StdUniform(Measure):
     def __init__(self, dimension=None):
         """
         Args:
-            dimension (array of ints): dimensions of integrands
+            dimension (array of int): dimensions of integrands
         """
         super().__init__(dimension)
 
@@ -22,7 +22,7 @@ class StdGaussian(Measure):
     def __init__(self, dimension=None):
         """
         Args:
-            dimension (array of ints): dimensions of integrands
+            dimension (array of int): dimensions of integrands
         """
         super().__init__(dimension)
 
@@ -33,7 +33,7 @@ class IIDZeroMeanGaussian(Measure):
     def __init__(self, dimension=None, variance=None):
         """
         Args:
-            dimension (array of ints): dimensions of integrands
+            dimension (array of int): dimensions of integrands
             variance (array of floats): variance of each gaussian distribution
         """
         super().__init__(dimension, variance=variance)
@@ -61,7 +61,7 @@ class Lattice(Measure):
     def __init__(self, dimension=None):
         """
         Args:
-            dimension (array of ints): dimensions of integrands
+            dimension (array of int): dimensions of integrands
         """
         super().__init__(dimension, mimics="StdUniform")
 
@@ -72,7 +72,7 @@ class Sobol(Measure):
     def __init__(self, dimension=None):
         """
         Args:
-            dimension (array of ints): dimensions of integrands
+            dimension (array of int): dimensions of integrands
         """
         super().__init__(dimension, mimics="StdUniform")
 

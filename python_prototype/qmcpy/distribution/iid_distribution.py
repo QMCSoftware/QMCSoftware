@@ -13,19 +13,19 @@ class IIDDistribution(DiscreteDistribution):
     :math:`[0,1]^d` or IIDDistribution standard Gaussian
     """
 
-    def __init__(self, true_distribution=None, distrib_data=None, seed_rng=None
+    def __init__(self, true_distribution=None, distribution_list=None, seed_rng=None
                  ):
         """
         Args:
             accepted_measures (list of strings): Measure objects compatible \
                 with the DiscreteDistribution
             seed_rng (int): seed for random number generator to ensure \
-                reproduciblity
+                reproducibility
         """
         accepted_measures = ["StdUniform", "StdGaussian","CustomIID"]
         if seed_rng:
             random.seed(seed_rng)
-        super().__init__(accepted_measures, true_distribution, distrib_data)
+        super().__init__(accepted_measures, true_distribution, distribution_list)
 
     def gen_distrib(self, n, m, j=1):
         """

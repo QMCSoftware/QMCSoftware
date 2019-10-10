@@ -9,7 +9,7 @@ EPS = finfo(float32).eps
 
 
 class MeanVarDataRep(AccumData):
-    """Accumulated data Repeated Centeral Limit Stopping Criterion (CLTRep) \
+    """Accumulated data Repeated Central Limit Stopping Criterion (CLTRep) \
         calculations.
     """
 
@@ -19,11 +19,11 @@ class MeanVarDataRep(AccumData):
 
         Args:
             n_integrands (int): number of integrands
-            n_streams (int): number of random nxm matricies to generate
+            n_streams (int): number of random nxm matrices to generate
         """
         super().__init__()
         self.n_integrands = n_integrands
-        self.n_streams = n_streams  # Number of random nxm matricies to generate
+        self.n_streams = n_streams  # Number of random nxm matrices to generate
         self.muhat = zeros(self.n_streams)  # sample mean of each nxm matrix
         self.mu2hat = zeros(self.n_integrands)
             # mean of n_streams means for each integrand
@@ -52,7 +52,7 @@ class MeanVarDataRep(AccumData):
             t_start = process_time()  # time integrand evaluation
             dim = distribution[i].true_distribution.dimension
                 # dimension of the integrand
-            # set_x := n_streams matricies housing nxm integrand values
+            # set_x := n_streams matrices housing nxm integrand values
             set_x = distribution[i].gen_distrib(self.n_next[i], dim, \
                                                 self.n_streams)
             for j in range(self.n_streams):

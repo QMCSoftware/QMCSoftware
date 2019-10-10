@@ -1,4 +1,4 @@
-""" Meta-data and public utilites for qmcpy """
+""" Meta-data and public utilities for qmcpy """
 
 name = "qmcpy"
 __version__ = 0.1

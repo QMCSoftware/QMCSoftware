@@ -17,7 +17,7 @@ class QuasiRandom(DiscreteDistribution):
             accepted_measures (list of strings): Measure objects compatible \
                 with the DiscreteDistribution
             seed_rng (int): seed for random number generator to ensure \
-                reproduciblity.
+                reproducibility.
 
         Reference:
             Nuyens, D., The Magic Point Shop of QMC point generators and \
@@ -39,7 +39,7 @@ class QuasiRandom(DiscreteDistribution):
         Args:
             n (int): Number of observations (sample.size()[1])
             m (int): Number of dimensions (sample.size()[2])
-            j (int): Number of nxm matricies to generate (sample.size()[0])
+            j (int): Number of nxm matrices to generate (sample.size()[0])
 
         Returns:
             jxnxm (numpy array)
