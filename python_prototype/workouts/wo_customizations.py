@@ -2,7 +2,7 @@ from numpy.random import Generator, PCG64
 from copy import deepcopy
 
 from qmcpy import integrate
-from qmcpy.integrand import Linear, LazyFunction
+from qmcpy.integrand import Linear, QuickConstruct
 from qmcpy.measures import CustomIID, StdUniform
 from qmcpy.distribution import IIDDistribution
 from qmcpy.stop import CLT
@@ -27,7 +27,7 @@ def custom_lazy_generator():
 
 def custom_lazy_integrand():
     dim = 5
-    integrand = LazyFunction(custom_fun=lambda x, coordIdx: (5 * x).sum(1))
+    integrand = QuickConstruct(custom_fun=lambda x, coordIdx: (5 * x).sum(1))
     measure = StdUniform(dimension=[dim])
     distribution = IIDDistribution(
         true_distribution=StdUniform(dimension=[dim]), seed_rng=7)

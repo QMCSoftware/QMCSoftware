@@ -1,9 +1,9 @@
-""" Definition for class LazyFunction, a concrete implementation of Integrand """
+""" Definition for class QuickConstruct, a concrete implementation of Integrand """
 
 from . import Integrand
 
 
-class LazyFunction(Integrand):
+class QuickConstruct(Integrand):
     """ Specify and generate values of custom user-function"""
 
 

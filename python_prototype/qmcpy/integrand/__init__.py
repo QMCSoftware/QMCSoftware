@@ -130,4 +130,4 @@ class Integrand(ABC):
 from .asian_call import AsianCall
 from .keister import Keister
 from .linear import Linear
-from .lazy_function import LazyFunction
+from .quick_construct import QuickConstruct
