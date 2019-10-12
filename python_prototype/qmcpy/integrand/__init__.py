@@ -8,14 +8,12 @@ from .._util import univ_repr, TransformError
 
 
 class Integrand(ABC):
-    def __init__(self, nominal_value=0):
+    def __init__(self):
         """
         Specify and generate values :math:`f(\mathbf{x})` for \
         :math:`\mathbf{x} \in \mathcal{X}`.
 
         Attributes:
-            nominal_value (int): :math:`c` such that \
-                :math:`(c, \ldots, c) \in \mathcal{X}`
             f (Integrand): function transformed to accept distribution \
                 values
             dimension (int): dimension of the domain, :math:`d > 0`
@@ -23,7 +21,6 @@ class Integrand(ABC):
                 multi-dimensional problems
         """
         super().__init__()
-        self.nominal_value = nominal_value
         self.f = None
         self.dimension = 2
         self.integrand_list = [self]

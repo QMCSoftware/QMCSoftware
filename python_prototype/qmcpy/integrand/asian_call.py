@@ -17,10 +17,8 @@ class AsianCall(Integrand):
             volatility (float): sigma, the volatility of the asset
             start_price (float): S(0), the asset value at t=0
             strike_price (float): K, the call/put offer
-            nominal_value (int): :math:`c` such that \
-                :math:`(c, \ldots, c) \in \mathcal{X}`
         """
-        super().__init__(nominal_value=0)
+        super().__init__()
         self.bm_measure = bm_measure
         self.volatility = volatility
         self.S0 = start_price
