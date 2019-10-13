@@ -4,11 +4,13 @@ from matplotlib import pyplot as mpl_plot
 from numpy import arange, array
 import numpy as np
 import pandas as pd
+from copy import deepcopy
 
 from qmcpy import integrate
-from qmcpy.measures import *
-from qmcpy.discrete_distribution import IIDDistribution, QuasiRandom
+from qmcpy._util import summarize
 from qmcpy.integrand import AsianCall
+from qmcpy.discrete_distribution import IIDStdGaussian,IIDStdUniform,Lattice,Sobol
+from qmcpy.true_distribution import BrownianMotion
 from qmcpy.stop import CLT, CLTRep
 
 def plot(title,xlabel,ylabel,xdata,ydata,outF):
@@ -27,59 +29,58 @@ def plot(title,xlabel,ylabel,xdata,ydata,outF):
         pad_inches = .05)
     mpl_plot.show(block=False)
 
-def QMC_Wrapper(stop, distribution, name):
+# Constants
+time_vector=[
+    arange(1 / 4, 5 / 4, 1 / 4),
+    arange(1 / 16, 17 / 16, 1 / 16),
+    arange(1 / 64, 65 / 64, 1 / 64)]
+dims = [len(tv) for tv in time_vector]
+
+def QMC_Wrapper(discrete_distrib, true_distrib, stop, name):
     item_f = "    %-25s %-10.3f %-10.3f"
     item_s = "    %-25s %-10s %-10s"
-    #try:
-    measure = BrownianMotion(time_vector=[arange(1 / 4, 5 / 4, 1 / 4),
-                                             arange(1 / 16, 17 / 16, 1 / 16),
-                                             arange(1 / 64, 65 / 64, 1 / 64)])
-    option = AsianCall(measure)
-    sol, data = integrate(option, measure, distribution, stop)
+    option = AsianCall(true_distrib)
+    sol, data = integrate(option, discrete_distrib, true_distrib, stop)
     print(item_f % (name, sol, data.t_total))
     return sol, data.t_total
-    #except:
-    #    print(item_s%(name,'',''))
-    #    return '',''
 
 def comp_Clt_vs_cltRep_runtimes(abstols):
-
     df_metrics = pd.DataFrame({"abs_tol":[],
-        "CLT_stdUniform_sol":[],     "CLT_stdUniform_runTime":[],
-        "CLT_stdGaussian_sol":[],    "CLT_stdGaussian_runTime":[],
-        "CLT_Rep_lattice_sol":[],    "CLT_Rep_lattice_runTime":[],
+        "CLT_IIDStdUniform_sol":[],     "CLT_IIDStdUniform_runTime":[],
+        "CLT_IIDStdGaussian_sol":[],    "CLT_IIDStdGaussian_runTime":[],
+        "CLT_Rep_Lattice_sol":[],    "CLT_Rep_Lattice_runTime":[],
         "CLT_Rep_Sobol_sol":[],      "CLT_Rep_Sobol_runTime":[]})
     for i, abs_tol in enumerate(abstols):
         print("abs_tol: %-10.3f" % abs_tol)
         results = []  # hold row of DataFrame
         results.append(abs_tol)
 
-        # CLT_stdUniform
-        distribution = IIDDistribution(
-            true_distribution=StdUniform(dimension=[4, 16, 64]), seed_rng=7)
-        stop = CLT(distribution, abs_tol=abs_tol)
-        mu, t = QMC_Wrapper(stop, distribution, "CLT_stdUniform")
+        # CLT_IIDStdUniform
+        discrete_distrib = IIDStdUniform()
+        true_distrib = BrownianMotion(dims,time_vector=time_vector)
+        stop = CLT(discrete_distrib, true_distrib, abs_tol=abs_tol)
+        mu, t = QMC_Wrapper(discrete_distrib, true_distrib, stop, "CLT_IIDStdUniform")
         results.extend([mu, t])
 
-        # CLT_stdGaussian
-        distribution = IIDDistribution(
-            true_distribution=StdGaussian(dimension=[4, 16, 64]), seed_rng=7)
-        stop = CLT(distribution, abs_tol=abs_tol)
-        mu, t = QMC_Wrapper(stop, distribution, "CLT_stdGaussian")
+        # CLT_IIDStdGaussian
+        discrete_distrib = IIDStdGaussian()
+        true_distrib = BrownianMotion(dims,time_vector=time_vector)
+        stop = CLT(discrete_distrib, true_distrib, abs_tol=abs_tol)
+        mu, t = QMC_Wrapper(discrete_distrib, true_distrib, stop, "CLT_IIDStdGaussian")
         results.extend([mu, t])
 
-        # CLT_Rep_lattice
-        distribution = QuasiRandom(
-            true_distribution=Lattice(dimension=[4, 16, 64]), seed_rng=7)
-        stop = CLTRep(distribution, n_max=2 ** 20, abs_tol=abs_tol)
-        mu, t = QMC_Wrapper(stop, distribution, "lattice")
+        # CLT_Rep_Lattice
+        discrete_distrib = Lattice()
+        true_distrib = BrownianMotion(dims,time_vector=time_vector)
+        stop = CLTRep(discrete_distrib, true_distrib, abs_tol=abs_tol)
+        mu, t = QMC_Wrapper(discrete_distrib, true_distrib, stop,  "CLT_Rep_Lattice")
         results.extend([mu, t])
 
-        # CLT_Rep_sobol
-        distribution = QuasiRandom(true_distribution=Sobol(dimension=[4, 16, 64]),
-                                 seed_rng=7)
-        stop = CLTRep(distribution, n_max=2 ** 20, abs_tol=abs_tol)
-        mu, t = QMC_Wrapper(stop, distribution, "sobol")
+        # CLT_Rep_Sobol
+        discrete_distrib = Sobol()
+        true_distrib = BrownianMotion(dims,time_vector=time_vector)
+        stop = CLTRep(discrete_distrib, true_distrib, abs_tol=abs_tol)
+        mu, t = QMC_Wrapper(discrete_distrib, true_distrib, stop, "CLT_Rep_Sobol")
         results.extend([mu, t])
 
         df_metrics.loc[i] = results # update metrics
@@ -99,8 +100,8 @@ if __name__ == "__main__":
                + "\nfor Multi-level Asian Option Function",
          xlabel="Absolute Tolerance", ylabel="Integration Runtime",
          xdata=df["abs_tol"].values,
-         ydata={"CLT: IID Gaussian": (df["CLT_stdUniform_runTime"], "r"),
-                "CLT: IID Uniform ": (df["CLT_stdGaussian_runTime"], "b"),
-                "CLT Repeated: Lattice": (df["CLT_Rep_lattice_runTime"], "g"),
+         ydata={"CLT: IID Gaussian": (df["CLT_IIDStdUniform_runTime"], "r"),
+                "CLT: IID Uniform ": (df["CLT_IIDStdGaussian_runTime"], "b"),
+                "CLT Repeated: Lattice": (df["CLT_Rep_Lattice_runTime"], "g"),
                 "CLT Repeated: sobol": (df["CLT_Rep_Sobol_runTime"], "y")},
          outF=outF)

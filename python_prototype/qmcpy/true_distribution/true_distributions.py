@@ -11,7 +11,7 @@ class Uniform(TrueDistribution):
         transforms = {
             'StdUniform': lambda self,samples: samples*(self.b-self.a) + self.a,
             'StdGaussian':lambda self,samples: norm.cdf(samples)*(self.b-self.a) + self.a}
-        super().__init__(transforms, dimension, a=lower_bound, b=upper_bound)  
+        super().__init__(dimension, transforms, a=lower_bound, b=upper_bound)  
         
 class Gaussian(TrueDistribution):
     """ Standard Gaussian Measure """
