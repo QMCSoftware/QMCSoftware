@@ -27,7 +27,7 @@ def custom_lazy_generator():
 
 def custom_lazy_integrand():
     dim = 5
-    integrand = QuickConstruct(custom_fun=lambda x, coordIdx: (5 * x).sum(1))
+    integrand = QuickConstruct(custom_fun=lambda x: (5 * x).sum(1))
     measure = StdUniform(dimension=[dim])
     distribution = IIDDistribution(
         true_distribution=StdUniform(dimension=[dim]), seed_rng=7)

@@ -25,14 +25,12 @@ class Keister(Integrand):
         """
         super().__init__()
 
-    def g(self, x, coord_index):
+    def g(self, x):
         """Original integrand to be integrated 
 
         Args:
             x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` \
                 row of an :math:`n \cdot |\mathfrak{u}|` matrix
-            coord_index: set of those coordinates in sequence needed, \
-                :math:`\mathfrak{u}`
 
         Returns:
             :math:`n \cdot p` matrix with values \
@@ -43,6 +41,6 @@ class Keister(Integrand):
         """
 
         normx2 = (x ** 2).sum(1)  # ||x||^2
-        n_coord_index = len(coord_index)
+        n_coord_index = x.shape[-1]
         y = pi ** (n_coord_index / 2) * cos(normx2 ** 0.5)
         return y

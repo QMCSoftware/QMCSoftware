@@ -56,7 +56,7 @@ class MeanVarDataRep(AccumData):
             set_x = distribution[i].gen_distrib(self.n_next[i], dim, \
                                                 self.n_streams)
             for j in range(self.n_streams):
-                y = integrand[i].f(set_x[j], arange(1, dim + 1))
+                y = integrand[i].f(set_x[j])
                     # Evaluate transformed function
                 self.muhat[j] = y.mean()  # stream mean
             self.t_eval[i] = max(process_time() - t_start, EPS)

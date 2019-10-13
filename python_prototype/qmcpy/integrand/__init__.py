@@ -27,15 +27,13 @@ class Integrand(ABC):
 
     # Abstract Methods
     @abstractmethod
-    def g(self, x, coord_index):
+    def g(self, x):
         """
         Original integrand to be integrated
 
         Args:
             x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` \
                 row of an :math:`n \cdot |\mathfrak{u}|` matrix
-            coord_index: set of those coordinates in sequence needed, \
-                :math:`\mathfrak{u}`
 
         Returns:
             :math:`n \cdot p` matrix with values \
@@ -71,29 +69,28 @@ class Integrand(ABC):
             self[i].dimension = distribution[i].true_distribution.dimension
             # the integrand needs the dimension
             if transform_to == sample_from:  # no need to transform
-                self[i].f = lambda xu, coordIdex, i=i: self[i].g(xu, coordIdex)
+                self[i].f = lambda xu, i=i: self[i].g(xu)
             elif transform_to == 'IIDZeroMeanGaussian' and \
                 sample_from == 'StdGaussian':  # multiply by likelihood ratio
                 this_var = measure[i].variance
-                self[i].f = lambda xu, coordIndex, var=this_var, i=i: \
-                    self[i].g(xu * sqrt(var), coordIndex)
+                self[i].f = lambda xu, var=this_var, i=i: \
+                    self[i].g(xu * sqrt(var))
             elif transform_to == 'IIDZeroMeanGaussian' and \
                 sample_from == 'StdUniform':  # inverse cdf transform
                 this_var = measure[i].variance
-                self[i].f = lambda xu, coordIdex, var=this_var, i=i: \
-                    self[i].g(sqrt(var) * norm.ppf(xu), coordIdex)
+                self[i].f = lambda xu, var=this_var, i=i: \
+                    self[i].g(sqrt(var) * norm.ppf(xu))
             elif transform_to == 'BrownianMotion' and \
                 sample_from == 'StdUniform':
                 # inverse cdf transform -> sum across time-series
                 time_diff = diff(insert(measure[i].time_vector, 0, 0))
-                self[i].f = lambda xu, coordIndex, timeDiff=time_diff, i=i: \
-                    self[i].g(cumsum(norm.ppf(xu) * sqrt(timeDiff), 1),
-                              coordIndex)
+                self[i].f = lambda xu, timeDiff=time_diff, i=i: \
+                    self[i].g(cumsum(norm.ppf(xu) * sqrt(timeDiff), 1))
             elif transform_to == 'BrownianMotion' and \
                 sample_from == 'StdGaussian':  # sum across time-series
                 time_diff = diff(insert(measure[i].time_vector, 0, 0))
-                self[i].f = lambda xu, coordIndex, timeDiff=time_diff, i=i: \
-                    self[i].g(cumsum(xu * sqrt(timeDiff), 1), coordIndex)
+                self[i].f = lambda xu, timeDiff=time_diff, i=i: \
+                    self[i].g(cumsum(xu * sqrt(timeDiff), 1))
             else:
                 msg = "Cannot transform %s distribution to mimic Integrand's " \
                       "true %s measure"

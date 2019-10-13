@@ -20,6 +20,6 @@ class QuickConstruct(Integrand):
         super().__init__()
         self.custom_fun = custom_fun
 
-    def g(self, x, coord_index):
-        return self.custom_fun(x, coord_index)
+    def g(self, x):
+        return self.custom_fun(x)
 
