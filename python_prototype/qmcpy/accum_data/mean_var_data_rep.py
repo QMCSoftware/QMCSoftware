@@ -34,7 +34,7 @@ class MeanVarDataRep(AccumData):
         self.t_eval = zeros(self.n_integrands)
             # time used to evaluate each integrand
 
-    def update_data(self, distribution, integrand):
+    def update_data(self, true_distribution, integrand):
         """
         Update data
 
@@ -50,13 +50,9 @@ class MeanVarDataRep(AccumData):
             if self.flag[i] == 0:
                 continue  # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation
-            dim = distribution[i].true_distribution.dimension
-                # dimension of the integrand
-            # set_x := n_streams matrices housing nxm integrand values
-            set_x = distribution[i].gen_distrib(self.n_next[i], dim, \
-                                                self.n_streams)
+            set_x = true_distribution[i].gen_distribution(self.n_streams,self.n_next[i])
             for j in range(self.n_streams):
-                y = integrand[i].f(set_x[j])
+                y = integrand[i].g(set_x[j])
                     # Evaluate transformed function
                 self.muhat[j] = y.mean()  # stream mean
             self.t_eval[i] = max(process_time() - t_start, EPS)

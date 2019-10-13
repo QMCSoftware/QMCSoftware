@@ -6,15 +6,15 @@ from scipy.stats import norm
 from . import StoppingCriterion
 from ..accum_data import MeanVarData
 
-
 class CLT(StoppingCriterion):
     """ Stopping criterion based on the Central Limit Theorem (CLT) """
 
-    def __init__(self, distrib_obj, inflate=1.2, alpha=0.01, abs_tol=1e-2, \
+    def __init__(self, discrete_distrib, true_distrib, inflate=1.2, alpha=0.01, abs_tol=1e-2, \
                  rel_tol=0, n_init=1024, n_max=1e8):
         """
         Args:
-            distrib_obj: an instance of DiscreteDistribution
+            discrete_distrib
+            true_distribution: an instance of DiscreteDistribution
             inflate: inflation factor when estimating variance
             alpha: significance level for confidence interval
             abs_tol: absolute error tolerance
@@ -22,14 +22,14 @@ class CLT(StoppingCriterion):
             n_init: initial number of samples
             n_max: maximum number of samples
         """
-        allowed_distribs = ["IIDDistribution"]  # supported distributions
-        super().__init__(distrib_obj, allowed_distribs, abs_tol, rel_tol,\
+        allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]  # supported distributions
+        super().__init__(discrete_distrib, allowed_distribs, abs_tol, rel_tol,\
                          n_init, n_max)
         self.inflate = inflate  # inflation factor
         self.alpha = alpha  # uncertainty level
         self.stage = "sigma"  # compute standard deviation next
         # Construct Data Object
-        n_integrands = len(distrib_obj)
+        n_integrands = len(true_distrib)
         self.data = MeanVarData(n_integrands)  # house integration data
         self.data.n_mu = zeros(n_integrands)
             # number of samples used to compute the sample mean

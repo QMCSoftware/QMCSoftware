@@ -32,10 +32,10 @@ class AsianCall(Integrand):
         self[0].bm_measure = self.bm_measure[0]
         self[0].dimFac = 0
         self[0].dimension = self.bm_measure[0].dimension
-        for ii in range(1, nBM):  # distribute attr
-            self[ii].bm_measure = self.bm_measure[ii]
-            self[ii].dimFac = self.bm_measure[ii].dimension / self.bm_measure[ii - 1].dimension
-            self[ii].dimension = self.bm_measure[ii].dimension
+        for i in range(1, nBM):  # distribute attr
+            self[i].bm_measure = self.bm_measure[i]
+            self[i].dimFac = self.bm_measure[i].dimension / self.bm_measure[i - 1].dimension
+            self[i].dimension = self.bm_measure[i].dimension
 
     def g(self, x):
         """

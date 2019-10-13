@@ -13,7 +13,8 @@ class CLTRep(StoppingCriterion):
 
     def __init__(
         self,
-        distribution,
+        discrete_distrib,
+        true_distrib,
         n_streams=16,
         inflate=1.2,
         alpha=0.01,
@@ -24,7 +25,8 @@ class CLTRep(StoppingCriterion):
     ):
         """
         Args:
-            distribution (DiscreteDistribution): an instance of DiscreteDistribution
+            discrete_distrib
+            true_distribution (DiscreteDistribution): an instance of DiscreteDistribution
             n_streams (int): number of random nxm matrices to generate
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
@@ -33,15 +35,15 @@ class CLTRep(StoppingCriterion):
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
         """
-        allowed_distribs = ["QuasiRandom"]  # supported distributions
+        allowed_distribs = ["Lattice","Sobol"]  # supported distributions
         super().__init__(
-            distribution, allowed_distribs, abs_tol, rel_tol, n_init, n_max
+            discrete_distrib, allowed_distribs, abs_tol, rel_tol, n_init, n_max
         )
         self.inflate = inflate  # inflation factor
         self.alpha = alpha  # uncertainty level
         self.stage = "begin"
         # Construct Data Object
-        n_integrands = len(distribution)
+        n_integrands = len(true_distrib)
         self.data = MeanVarDataRep(
             n_integrands, n_streams
         )  # house integration data

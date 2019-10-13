@@ -44,60 +44,6 @@ class Integrand(ABC):
         """
         pass
 
-    def transform_variable(self, measure, distribution):
-        """
-        This method performs the necessary variable transformation to put the
-        original integrand in the form required by the DiscreteDistribution
-        object starting from the original Measure object
-
-        Args:
-            measure (Measure): the Measure object that defines the integral
-            distribution (DiscreteDistribution): the discrete distribution \
-                object that is sampled from
-
-        Returns: None
-        """
-        for i in range(len(self)):
-            try:
-                sample_from = distribution[i].true_distribution.mimics
-                    # QuasiRandom sampling
-            except:
-                sample_from = type(distribution[i].true_distribution).__name__
-                    # IIDDistribution sampling
-            transform_to = type(measure[i]).__name__
-            # distribution the sampling attempts to mimic
-            self[i].dimension = distribution[i].true_distribution.dimension
-            # the integrand needs the dimension
-            if transform_to == sample_from:  # no need to transform
-                self[i].f = lambda xu, i=i: self[i].g(xu)
-            elif transform_to == 'IIDZeroMeanGaussian' and \
-                sample_from == 'StdGaussian':  # multiply by likelihood ratio
-                this_var = measure[i].variance
-                self[i].f = lambda xu, var=this_var, i=i: \
-                    self[i].g(xu * sqrt(var))
-            elif transform_to == 'IIDZeroMeanGaussian' and \
-                sample_from == 'StdUniform':  # inverse cdf transform
-                this_var = measure[i].variance
-                self[i].f = lambda xu, var=this_var, i=i: \
-                    self[i].g(sqrt(var) * norm.ppf(xu))
-            elif transform_to == 'BrownianMotion' and \
-                sample_from == 'StdUniform':
-                # inverse cdf transform -> sum across time-series
-                time_diff = diff(insert(measure[i].time_vector, 0, 0))
-                self[i].f = lambda xu, timeDiff=time_diff, i=i: \
-                    self[i].g(cumsum(norm.ppf(xu) * sqrt(timeDiff), 1))
-            elif transform_to == 'BrownianMotion' and \
-                sample_from == 'StdGaussian':  # sum across time-series
-                time_diff = diff(insert(measure[i].time_vector, 0, 0))
-                self[i].f = lambda xu, timeDiff=time_diff, i=i: \
-                    self[i].g(cumsum(xu * sqrt(timeDiff), 1))
-            else:
-                msg = "Cannot transform %s distribution to mimic Integrand's " \
-                      "true %s measure"
-                raise TransformError(msg % (sample_from, transform_to))
-
-        return
-
     def __len__(self):
         return len(self.integrand_list)
 
