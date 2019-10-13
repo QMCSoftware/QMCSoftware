@@ -28,7 +28,6 @@ class Lattice(DiscreteDistribution):
     def __init__(self):
         super().__init__(mimics='StdUniform')
 
-    
     def gen_samples(self, j, n, m):
         x = array([row for row in LatticeSeq(m=int(log(n) / log(2)), s=m)])
             # generate jxnxm data
