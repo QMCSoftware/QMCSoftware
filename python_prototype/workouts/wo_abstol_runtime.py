@@ -7,7 +7,7 @@ import pandas as pd
 
 from qmcpy import integrate
 from qmcpy.measures import *
-from qmcpy.distribution import IIDDistribution, QuasiRandom
+from qmcpy.discrete_distribution import IIDDistribution, QuasiRandom
 from qmcpy.integrand import AsianCall
 from qmcpy.stop import CLT, CLTRep
 

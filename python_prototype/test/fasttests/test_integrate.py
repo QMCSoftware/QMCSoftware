@@ -9,7 +9,7 @@ from qmcpy.measures import (
     BrownianMotion,
     Lattice,
 )
-from qmcpy.distribution import IIDDistribution, QuasiRandom
+from qmcpy.discrete_distribution import IIDDistribution, QuasiRandom
 from qmcpy.integrand import Keister, AsianCall
 from qmcpy.stop import CLT, CLTRep
 

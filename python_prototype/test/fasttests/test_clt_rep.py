@@ -1,7 +1,7 @@
 import unittest
 
 from qmcpy.stop import CLTRep
-from qmcpy.distribution import IIDDistribution
+from qmcpy.discrete_distribution import IIDDistribution
 from qmcpy.measures import StdUniform
 from qmcpy._util import DistributionCompatibilityError
 

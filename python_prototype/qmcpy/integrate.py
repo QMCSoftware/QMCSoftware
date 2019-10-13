@@ -4,7 +4,7 @@ Main driver function for Qmcpy.
 import copy
 from time import time
 
-from .distribution.iid_distribution import IIDDistribution
+from .discrete_distribution.iid_distribution import IIDDistribution
 from .integrand.linear import Linear
 from .measures.measures import StdUniform
 from .stop.clt import CLT

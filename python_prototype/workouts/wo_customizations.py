@@ -4,7 +4,7 @@ from copy import deepcopy
 from qmcpy import integrate
 from qmcpy.integrand import Linear, QuickConstruct
 from qmcpy.measures import CustomIID, StdUniform
-from qmcpy.distribution import IIDDistribution
+from qmcpy.discrete_distribution import IIDDistribution
 from qmcpy.stop import CLT
 
 

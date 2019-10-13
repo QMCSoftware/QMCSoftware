@@ -1,7 +1,7 @@
 import unittest
 
 from qmcpy.stop import CLT
-from qmcpy.distribution import QuasiRandom
+from qmcpy.discrete_distribution import QuasiRandom
 from qmcpy.measures import Lattice
 from qmcpy._util import DistributionCompatibilityError
 

@@ -2,11 +2,11 @@ import unittest
 
 from numpy import array, int64, log, zeros
 from qmcpy._util import MeasureCompatibilityError
-from qmcpy.distribution import QuasiRandom
+from qmcpy.discrete_distribution import QuasiRandom
 from qmcpy.third_party.magic_point_shop import LatticeSeq
 from qmcpy.measures import StdGaussian
 
-from qmcpy.distribution.digital_seq import DigitalSeq
+from qmcpy.discrete_distribution.digital_seq import DigitalSeq
 
 
 class Test_IIDDistribution(unittest.TestCase):

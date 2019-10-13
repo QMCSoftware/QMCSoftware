@@ -5,7 +5,7 @@ from numpy import arange, linspace, meshgrid, random, zeros
 from scipy.stats import norm
 
 from qmcpy._util import summarize
-from qmcpy.distribution import IIDDistribution, QuasiRandom
+from qmcpy.discrete_distribution import IIDDistribution, QuasiRandom
 from qmcpy.integrand import Keister
 from qmcpy.measures import StdGaussian, Lattice, IIDZeroMeanGaussian
 

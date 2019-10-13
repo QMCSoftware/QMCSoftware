@@ -8,7 +8,7 @@
 from qmcpy import integrate
 from qmcpy._util import summarize
 from qmcpy.stop import CLT, CLTRep
-from qmcpy.distribution import IIDDistribution, QuasiRandom
+from qmcpy.discrete_distribution import IIDDistribution, QuasiRandom
 from qmcpy.integrand import Keister
 from qmcpy.measures import *
 

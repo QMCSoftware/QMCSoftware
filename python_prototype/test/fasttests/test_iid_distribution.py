@@ -1,7 +1,7 @@
 import unittest
 
 from qmcpy.measures import Lattice
-from qmcpy.distribution import IIDDistribution
+from qmcpy.discrete_distribution import IIDDistribution
 from qmcpy._util import MeasureCompatibilityError
 
 
