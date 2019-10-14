@@ -8,8 +8,8 @@ from .._util import univ_repr
 class Integrand(ABC):
     def __init__(self):
         """
-        Specify and generate values :math:`f(\mathbf{x})` for \
-        :math:`\mathbf{x} \in \mathcal{X}`.
+        Specify and generate values :math:`f(\\mathbf{x})` for \
+        :math:`\\mathbf{x} \\in \\mathcal{X}`.
 
         Attributes:
             f (Integrand): function transformed to accept distribution \
@@ -30,17 +30,16 @@ class Integrand(ABC):
         Original integrand to be integrated
 
         Args:
-            x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` \
-                row of an :math:`n \cdot |\mathfrak{u}|` matrix
+            x: nodes, :math:`\\mathbf{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
+                row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
 
         Returns:
-            :math:`n \cdot p` matrix with values \
-            :math:`f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})` where if \
-            :math:`\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j`, then \
-            :math:`x'_{ij} = x_{ij}` for :math:`j \in \mathfrak{u}`, and \
+            :math:`n \\cdot p` matrix with values \
+            :math:`f(\\mathbf{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
+            :math:`\\mathbf{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, then \
+            :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, and \
             :math:`x'_{ij} = c` otherwise
         """
-        pass
 
     def __len__(self):
         return len(self.integrand_list)
@@ -59,6 +58,8 @@ class Integrand(ABC):
         return univ_repr(self, "integrand_list")
 
     def summarize(self):
+        """Print important attribute values
+        """
         header_fmt = "%s (%s)"
         attrs_vals_str = header_fmt % (type(self).__name__, "Integrand Object")
         print(attrs_vals_str)

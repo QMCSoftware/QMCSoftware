@@ -254,6 +254,12 @@
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="qmcpy.integrand.Integrand.summarize">
+<code class="sig-name descname">summarize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.Integrand.summarize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print important attribute values</p>
+</dd></dl>
+
 </dd></dl>
 
 <div class="section" id="module-qmcpy.integrand.asian_call">
@@ -273,7 +279,7 @@
 <li><p><strong>bm_measure</strong> (<em>Measure</em>) – A BrownianMotion Measure object</p></li>
 <li><p><strong>volatility</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sigma, the volatility of the asset</p></li>
 <li><p><strong>start_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – S(0), the asset value at t=0</p></li>
-<li><p><strong>strike_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – K, the call/put offer</p></li>
+<li><p><strong>strike_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – strike_price, the call/put offer</p></li>
 </ul>
 </dd>
 </dl>
@@ -717,6 +723,12 @@ and store the sample mean and variance of integrand values</p>
 <dt id="qmcpy.stop.StoppingCriterion.stop_yet">
 <em class="property">abstract </em><code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.StoppingCriterion.stop_yet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine when to stop</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.stop.StoppingCriterion.summarize">
+<code class="sig-name descname">summarize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.StoppingCriterion.summarize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print important attribute values.</p>
 </dd></dl>
 
 </dd></dl>

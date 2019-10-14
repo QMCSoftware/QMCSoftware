@@ -44,9 +44,12 @@ class TrueMeasure(ABC):
                 raise TransformError('Cannot tranform %s to %s'
                                      % (type(discrete_distrib).__name__, type(self).__name__))
             # Try to wrap the distribution
-            self[i].gen_distribution = lambda n_streams, n_obs, self=self[i]:\
+            self[i].gen_distribution = lambda n_streams, n_obs, self=self[i]: \
                 self.transforms[discrete_distrib.mimics](self,
-                                                         discrete_distrib.gen_samples(int(n_streams), int(n_obs), int(self.dimension)))
+                                                         discrete_distrib.gen_samples(
+                                                             int(n_streams),
+                                                             int(n_obs),
+                                                             int(self.dimension)))
 
     def __len__(self):
         return len(self.distributions)
@@ -68,7 +71,6 @@ class TrueMeasure(ABC):
         """Print important attribute values
         """
         header_fmt = "%s (%s)"
-        item_s = "%35s: %-15s"
         attrs_vals_str = ""
 
         attrs_vals_str += header_fmt % (type(self).__name__,
