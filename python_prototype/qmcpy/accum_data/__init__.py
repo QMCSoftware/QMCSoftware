@@ -16,7 +16,7 @@ class AccumData(ABC):
         stage (str): stage of computation; 'begin', or 'done' when finished
         n_samples_total (array-like): number of samples used so far
         confid_int (array-like (2, 1)): error bound on the solution
-        t_total (float): total computation time. Set by integrate method.
+        time_total (float): total computation time. Set by integrate method.
     """
 
     def __init__(self):
@@ -29,7 +29,7 @@ class AccumData(ABC):
         self.n_next = array([])  # n_prev + 1 to n_next.
         self.n_samples_total = array([])
         self.confid_int = array([-inf, inf])
-        self.t_total = None
+        self.time_total = None
 
     @abstractmethod
     def update_data(self, distribution, integrand):
@@ -68,7 +68,7 @@ class AccumData(ABC):
         attrs_vals_str = header_fmt % (type(self).__name__, "Data Object")
         attrs_vals_str += item_s % ("n_samples_total",
                                     str(self.n_samples_total))
-        attrs_vals_str += item_f % ("t_total", self.t_total)
+        attrs_vals_str += item_f % ("time_total", self.time_total)
         attrs_vals_str += item_s % ("confid_int", str(self.confid_int))
         print(attrs_vals_str[:-1]+'\n')
 

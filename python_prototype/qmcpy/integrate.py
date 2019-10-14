@@ -35,10 +35,10 @@ def integrate(integrand, discrete_distrib, true_measure, stopping_criterion):
         stopping_criterion.data.update_data(
             true_measure, integrand)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
-    t_total = time() - t_start
+    time_total = time() - t_start
     solution = stopping_criterion.data.solution  # assign outputs
     data = copy.deepcopy(stopping_criterion.data)
-    data.t_total = t_total
+    data.time_total = time_total
     data.integrand = integrand
     data.discrete_distrib = discrete_distrib
     data.true_measure = true_measure

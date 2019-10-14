@@ -11,7 +11,7 @@ CLT (StoppingCriterion Object)
                     alpha: 0.0100        
 MeanVarData (Data Object)
           n_samples_total: [470869.]      
-                  t_total: 0.1411         
+               time_total: 0.1401         
                confid_int: [2.16427946 2.18461404]
 
 Solution: 2.1702         
@@ -27,7 +27,7 @@ CLT (StoppingCriterion Object)
                     alpha: 0.0100        
 MeanVarData (Data Object)
           n_samples_total: [476600.]      
-                  t_total: 0.0372         
+               time_total: 0.0393         
                confid_int: [2.16005152 2.18028263]
 
 Solution: 2.1683         
@@ -43,7 +43,7 @@ CLTRep (StoppingCriterion Object)
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
           n_samples_total: [1024]         
-                  t_total: 0.0129         
+               time_total: 0.0139         
                confid_int: [2.1681542  2.16838594]
 
 Solution: 2.1687         
@@ -59,6 +59,6 @@ CLTRep (StoppingCriterion Object)
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
           n_samples_total: [1024]         
-                  t_total: 0.0160         
+               time_total: 0.0167         
                confid_int: [2.16853269 2.16888595]
 
