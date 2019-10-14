@@ -1,12 +1,16 @@
 """Sobol sequence generator
 """
 
-import sys
 from os import path
-# sys.path.append(os.path.abspath('../'))
+import sys
 
+import mpmath
 import pandas as pd
+
 from ..third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
+
+
+# sys.path.append(os.path.abspath('../'))
 
 def bitreverse(a, m=None):
     """
@@ -90,8 +94,10 @@ class DigitalSeq(digitalseq_b2g):
 
             >>> from __future__ import print_function
             >>> m = 5
-            >>> C1 = [ 2**i for i in range(m) ]  # van der Corput sequence = identity matrix
-            >>> C2 = [ 1 for i in range(m) ]  # here we build the 2nd matrix of the sobol' and Niederreiter seq
+            >>> C1 = [ 2**i for i in range(m) ]
+                # van der Corput sequence = identity matrix
+            >>> C2 = [ 1 for i in range(m) ]
+               # here we build the 2nd matrix of the sobol' and Niederreiter seq
             >>> for i in range(1, m): C2[i] = (C2[i-1] << 1) ^ C2[i-1]
             >>> Cs = [ C1, C2 ]
             >>> seq = digitalseq_b2g(Cs)
@@ -209,16 +215,12 @@ class DigitalSeq(digitalseq_b2g):
 
 
 if __name__ == "__main__":
-    import sys
-
     if len(sys.argv) > 1:
         f = sys.argv[1]
     else:
         f = sys.stdin
     seq = DigitalSeq(f)
     if seq.t > 53:
-        import mpmath
-
         mpmath.mp.prec = seq.t
         seq.recipd = mpmath.mpf(1) / 2 ** seq.t
     for x in seq:

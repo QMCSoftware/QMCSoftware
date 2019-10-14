@@ -1,7 +1,8 @@
 """ Definition of MeanVarData, a concrete implementation of AccumData """
 
 from time import process_time
-from numpy import arange, finfo, float32, full, inf, std, zeros
+
+from numpy import finfo, float32, full, inf, std, zeros
 
 from . import AccumData
 
@@ -33,9 +34,9 @@ class MeanVarData(AccumData):
         Update data
 
         Args:
-            distribution (DiscreteDistribution): an instance of \
-                DiscreteDistribution
+            true_measure (TrueMeasure): an instance of TrueMeasure
             integrand (Integrand): an instance of Integrand
+
         Returns:
             None
         """
