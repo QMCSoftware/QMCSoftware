@@ -6,7 +6,6 @@ from . import Integrand
 class QuickConstruct(Integrand):
     """ Specify and generate values of custom user-function"""
 
-
     def __init__(self, custom_fun=None):
         """
         Initialize custom Integrand
@@ -22,4 +21,3 @@ class QuickConstruct(Integrand):
 
     def g(self, x):
         return self.custom_fun(x)
-

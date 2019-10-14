@@ -1,14 +1,13 @@
 from abc import ABC, abstractmethod
-from numpy import array
 
-from .._util import MeasureCompatibilityError, univ_repr
+from .._util import univ_repr
+
 
 class DiscreteDistribution(ABC):
     """ Discrete Distribution from which we can generate samples """
 
     def __init__(self, mimics):
         self.mimics = mimics
-    
 
     @abstractmethod
     def gen_samples(self, j, n, m):
@@ -24,7 +23,7 @@ class DiscreteDistribution(ABC):
             jxnxm (numpy array)
         """
         return
-    
+
     def summarize(self):
         """Print important attribute values
         """
@@ -32,12 +31,14 @@ class DiscreteDistribution(ABC):
         item_s = "%35s: %-15s"
         attrs_vals_str = ""
 
-        attrs_vals_str += header_fmt % (type(self).__name__, "Discrete Distribution Object")
+        attrs_vals_str += header_fmt % (type(self).__name__,
+                                        "Discrete Distribution Object")
         print(attrs_vals_str)
-    
+
     def __repr__(self):
-        return univ_repr(self,'Discrete Distribution')
+        return univ_repr(self, 'Discrete Distribution')
+
 
 # API
-from .discrete_distributions import *
 from .digital_seq import DigitalSeq
+from .discrete_distributions import *

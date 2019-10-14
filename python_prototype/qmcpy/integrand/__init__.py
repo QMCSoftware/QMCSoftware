@@ -1,10 +1,8 @@
 """ Definition for abstract class, ``Integrand`` """
 
 from abc import ABC, abstractmethod
-from numpy import cumsum, diff, insert, sqrt
-from scipy.stats import norm
 
-from .._util import univ_repr, TransformError
+from .._util import univ_repr
 
 
 class Integrand(ABC):

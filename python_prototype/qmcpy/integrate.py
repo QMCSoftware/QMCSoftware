@@ -32,7 +32,8 @@ def integrate(integrand, discrete_distrib, true_measure, stopping_criterion):
     true_measure.transform_generator(discrete_distrib)
     while stopping_criterion.stage != "done":
         # the data.stage property tells us where we are in the process
-        stopping_criterion.data.update_data(true_measure, integrand)  # compute more data
+        stopping_criterion.data.update_data(
+            true_measure, integrand)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
     t_total = time() - t_start
     solution = stopping_criterion.data.solution  # assign outputs

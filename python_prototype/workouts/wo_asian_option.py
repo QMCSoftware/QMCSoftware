@@ -6,13 +6,12 @@ Single Level Asian Option Pricing
 """
 
 from numpy import arange
-
 from qmcpy import integrate
-from qmcpy._util import summarize
+from qmcpy.discrete_distribution import *
 from qmcpy.integrand import AsianCall
-from qmcpy.discrete_distribution import IIDStdGaussian,IIDStdUniform,Lattice,Sobol
-from qmcpy.true_measure import BrownianMotion
 from qmcpy.stop import CLT, CLTRep
+from qmcpy.true_measure import BrownianMotion
+
 
 def test_distributions_asian_option():
     """ Singl-Level Asian Option Pricing """
@@ -21,33 +20,33 @@ def test_distributions_asian_option():
 
     # IID Standard Uniform
     discrete_distrib = IIDStdUniform()
-    true_measure = BrownianMotion(dim,time_vector=time_vec)
+    true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLT(discrete_distrib,true_measure, abs_tol=.05)
+    stop = CLT(discrete_distrib, true_measure, abs_tol=.05)
     sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
     data.summarize()
 
     # IID Standard Uniform
     discrete_distrib = IIDStdGaussian()
-    true_measure = BrownianMotion(dim,time_vector=time_vec)
+    true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLT(discrete_distrib,true_measure, abs_tol=.05)
+    stop = CLT(discrete_distrib, true_measure, abs_tol=.05)
     sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
     data.summarize()
 
     # Lattice
     discrete_distrib = Lattice()
-    true_measure = BrownianMotion(dim,time_vector=time_vec)
+    true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLTRep(discrete_distrib,true_measure, abs_tol=.05)
+    stop = CLTRep(discrete_distrib, true_measure, abs_tol=.05)
     sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
     data.summarize()
 
     # Sobol
     discrete_distrib = Sobol()
-    true_measure = BrownianMotion(dim,time_vector=time_vec)
+    true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLTRep(discrete_distrib,true_measure, abs_tol=.05)
+    stop = CLTRep(discrete_distrib, true_measure, abs_tol=.05)
     sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
     data.summarize()
 
@@ -61,34 +60,35 @@ def test_distributions_asian_option():
 
     # IID Standard Uniform
     discrete_distrib = IIDStdUniform()
-    true_measure = BrownianMotion(dim,time_vector=time_vec)
+    true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLT(discrete_distrib,true_measure, abs_tol=.05)
+    stop = CLT(discrete_distrib, true_measure, abs_tol=.05)
     sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
     data.summarize()
 
     # IID Standard Uniform
     discrete_distrib = IIDStdGaussian()
-    true_measure = BrownianMotion(dim,time_vector=time_vec)
+    true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLT(discrete_distrib,true_measure, abs_tol=.05)
+    stop = CLT(discrete_distrib, true_measure, abs_tol=.05)
     sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
     data.summarize()
 
     # Lattice
     discrete_distrib = Lattice()
-    true_measure = BrownianMotion(dim,time_vector=time_vec)
+    true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLTRep(discrete_distrib,true_measure, abs_tol=.05)
+    stop = CLTRep(discrete_distrib, true_measure, abs_tol=.05)
     sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
     data.summarize()
 
     # Sobol
     discrete_distrib = Sobol()
-    true_measure = BrownianMotion(dim,time_vector=time_vec)
+    true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLTRep(discrete_distrib,true_measure, abs_tol=.05)
+    stop = CLTRep(discrete_distrib, true_measure, abs_tol=.05)
     sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
     data.summarize()
+
 
 test_distributions_asian_option()

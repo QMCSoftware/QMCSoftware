@@ -2,8 +2,8 @@
 
 from abc import ABC, abstractmethod
 from math import inf, nan
-from numpy import array
 
+from numpy import array
 from .._util import univ_repr
 
 
@@ -66,11 +66,11 @@ class AccumData(ABC):
             self.stopping_criterion.summarize()
 
         attrs_vals_str = header_fmt % (type(self).__name__, "Data Object")
-        attrs_vals_str += item_s % ("n_samples_total", str(self.n_samples_total))
+        attrs_vals_str += item_s % ("n_samples_total",
+                                    str(self.n_samples_total))
         attrs_vals_str += item_f % ("t_total", self.t_total)
         attrs_vals_str += item_s % ("confid_int", str(self.confid_int))
-        print('\n'+attrs_vals_str[:-1]+'\n')
-
+        print(attrs_vals_str[:-1]+'\n')
 
 # API
 from .mean_var_data import MeanVarData

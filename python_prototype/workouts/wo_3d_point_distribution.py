@@ -1,15 +1,10 @@
 #!/usr/bin/python_prototype
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import matplotlib.pyplot as mpl_plt
-from numpy import arange, linspace, meshgrid, random, zeros,sqrt
-from scipy.stats import norm
-import sys
+from numpy import linspace, meshgrid, random, zeros, sqrt
 
-from qmcpy import integrate
 from qmcpy.integrand import Keister
-from qmcpy.discrete_distribution import IIDStdGaussian,Lattice
-from qmcpy.true_measure import Gaussian
-from qmcpy.stop import CLT, CLTRep
+
 
 def plot3d(verbose=True):
     # Compute n_total and mu_hat for each epsilon with a cooresponding plot
@@ -27,7 +22,7 @@ def plot3d(verbose=True):
     eps_list = [.5, .4, .3]
     n_list = [50, 68, 109]
     muHat_list = [1.876, 1.806, 1.883]
-    
+
     fun = Keister()
     colors = ["r", "b", "g"]
     n = 32
@@ -55,15 +50,15 @@ def plot3d(verbose=True):
         # Surface
         ax.plot_surface(x_surf, y_surf, z_surf, cmap="winter", alpha=.2)
         # Scatters
-        points = zeros((n,3))
-        points[:, :2] = random.randn(n,2)*sqrt(1/2)
+        points = zeros((n, 3))
+        points[:, :2] = random.randn(n, 2)*sqrt(1/2)
         points[:, 2] = fun.g(points[:, :2])
         ax.scatter(points[:, 0], points[:, 1], points[:, 2], color="r", s=5)
         n = n_list[idx]
         epsilon = eps_list[idx]
         mu = muHat_list[idx]
         ax.scatter(points[:, 0], points[:, 1], points[:, 2], color="r", s=5)
-        ax.set_title("\t$\epsilon$ = %-7.1f $n$ = %-7d $\hat{\mu}$ = %-7.2f " \
+        ax.set_title("\t$\epsilon$ = %-7.1f $n$ = %-7d $\hat{\mu}$ = %-7.2f "
                      % (epsilon, n, mu), fontdict={"fontsize": 14})
         # axis metas
         n *= 2
@@ -79,6 +74,7 @@ def plot3d(verbose=True):
     mpl_plt.savefig("outputs/Three_3d_SurfaceScatters.png",
                     dpi=500, bbox_inches="tight", pad_inches=.15)
     mpl_plt.show(block=False)
+
 
 if __name__ == "__main__":
     plot3d()

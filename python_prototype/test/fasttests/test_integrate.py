@@ -2,8 +2,8 @@ import unittest
 from numpy import arange
 
 from qmcpy import integrate
-from qmcpy.discrete_distribution import IIDStdGaussian,Lattice
-from qmcpy.true_measure import Gaussian,BrownianMotion
+from qmcpy.discrete_distribution import IIDStdGaussian, Lattice
+from qmcpy.true_measure import Gaussian, BrownianMotion
 from qmcpy.integrand import Keister, AsianCall
 from qmcpy.stop import CLT, CLTRep
 
@@ -30,12 +30,13 @@ class IntegrationExampleTest(unittest.TestCase):
             arange(1 / 64, 65 / 64, 1 / 64)]
         dims = [len(tv) for tv in time_vec]
         discrete_distrib = Lattice()
-        true_measure = BrownianMotion(dims,time_vector=time_vec)
+        true_measure = BrownianMotion(dims, time_vector=time_vec)
         integrand = AsianCall(true_measure)
-        stop = CLTRep(discrete_distrib,true_measure, abs_tol=abs_tol)
+        stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
         true_value = 6.20
         self.assertTrue(abs(sol - true_value) < abs_tol)
+
 
 if __name__ == "__main__":
     unittest.main()

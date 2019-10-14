@@ -8,7 +8,7 @@ from . import Integrand
 class AsianCall(Integrand):
     """ Specify and generate payoff values of an Asian Call option """
 
-    def __init__(self, bm_measure=None, volatility=0.5, start_price=30, \
+    def __init__(self, bm_measure=None, volatility=0.5, start_price=30,
                  strike_price=25):
         """Initialize AsianCall Integrand's'
 
@@ -34,7 +34,8 @@ class AsianCall(Integrand):
         self[0].dimension = self.bm_measure[0].dimension
         for i in range(1, nBM):  # distribute attr
             self[i].bm_measure = self.bm_measure[i]
-            self[i].dimFac = self.bm_measure[i].dimension / self.bm_measure[i - 1].dimension
+            self[i].dimFac = self.bm_measure[i].dimension / \
+                self.bm_measure[i - 1].dimension
             self[i].dimension = self.bm_measure[i].dimension
 
     def g(self, x):

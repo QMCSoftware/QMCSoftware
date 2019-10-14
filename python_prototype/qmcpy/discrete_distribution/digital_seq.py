@@ -3,7 +3,7 @@
 
 import sys
 from os import path
-#sys.path.append(os.path.abspath('../'))
+# sys.path.append(os.path.abspath('../'))
 
 import pandas as pd
 from ..third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
@@ -178,10 +178,10 @@ class DigitalSeq(digitalseq_b2g):
         """
         basestr = str  # basestr for python2, str for python3
         if isinstance(Cs, basestr):
-            abs_file_path = path.join(path.dirname(__file__), \
+            abs_file_path = path.join(path.dirname(__file__),
                                       "../third_party/magic_point_shop", Cs)
             # filename passed in
-            Cs = pd.read_csv(abs_file_path, header=None, delimiter=" ", \
+            Cs = pd.read_csv(abs_file_path, header=None, delimiter=" ",
                              nrows=s).values.tolist()
         elif hasattr(Cs, 'read'):
             # assume z is a stream like sys.stdin
@@ -206,6 +206,7 @@ class DigitalSeq(digitalseq_b2g):
         self.recipd = 2 ** -self.t
         self.returnDeepCopy = returnDeepCopy
         self.reset()
+
 
 if __name__ == "__main__":
     import sys
