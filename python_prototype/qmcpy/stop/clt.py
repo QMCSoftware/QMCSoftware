@@ -9,12 +9,12 @@ from ..accum_data import MeanVarData
 class CLT(StoppingCriterion):
     """ Stopping criterion based on the Central Limit Theorem (CLT) """
 
-    def __init__(self, discrete_distrib, true_distrib, inflate=1.2, alpha=0.01, abs_tol=1e-2, \
+    def __init__(self, discrete_distrib, true_measure, inflate=1.2, alpha=0.01, abs_tol=1e-2, \
                  rel_tol=0, n_init=1024, n_max=1e8):
         """
         Args:
             discrete_distrib
-            true_distribution: an instance of DiscreteDistribution
+            true_measure: an instance of DiscreteDistribution
             inflate: inflation factor when estimating variance
             alpha: significance level for confidence interval
             abs_tol: absolute error tolerance
@@ -29,7 +29,7 @@ class CLT(StoppingCriterion):
         self.alpha = alpha  # uncertainty level
         self.stage = "sigma"  # compute standard deviation next
         # Construct Data Object
-        n_integrands = len(true_distrib)
+        n_integrands = len(true_measure)
         self.data = MeanVarData(n_integrands)  # house integration data
         self.data.n_mu = zeros(n_integrands)
             # number of samples used to compute the sample mean

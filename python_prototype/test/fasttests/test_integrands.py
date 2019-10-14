@@ -2,7 +2,7 @@ import unittest
 from numpy import arange
 
 from qmcpy.integrand import AsianCall,Keister,Linear
-from qmcpy.true_distribution import BrownianMotion
+from qmcpy.true_measure import BrownianMotion
 
 class Test_AsianCall(unittest.TestCase):
     

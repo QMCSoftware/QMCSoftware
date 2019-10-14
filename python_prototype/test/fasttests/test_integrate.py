@@ -3,7 +3,7 @@ from numpy import arange
 
 from qmcpy import integrate
 from qmcpy.discrete_distribution import IIDStdGaussian,Lattice
-from qmcpy.true_distribution import Gaussian,BrownianMotion
+from qmcpy.true_measure import Gaussian,BrownianMotion
 from qmcpy.integrand import Keister, AsianCall
 from qmcpy.stop import CLT, CLTRep
 
@@ -14,9 +14,9 @@ class IntegrationExampleTest(unittest.TestCase):
         abs_tol = .1
         integrand = Keister()
         discrete_distrib = IIDStdGaussian()
-        true_distrib = Gaussian(dimension=2, variance=1/2)
-        stop = CLT(discrete_distrib, true_distrib, abs_tol=abs_tol)
-        sol, data = integrate(integrand, discrete_distrib, true_distrib, stop)
+        true_measure = Gaussian(dimension=2, variance=1/2)
+        stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
+        sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
         true_value = 1.808186429263620
         # In Mathematica (or WolframAlpha):
         # N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]]
@@ -30,10 +30,10 @@ class IntegrationExampleTest(unittest.TestCase):
             arange(1 / 64, 65 / 64, 1 / 64)]
         dims = [len(tv) for tv in time_vec]
         discrete_distrib = Lattice()
-        true_distrib = BrownianMotion(dims,time_vector=time_vec)
-        integrand = AsianCall(true_distrib)
-        stop = CLTRep(discrete_distrib,true_distrib, abs_tol=abs_tol)
-        sol, data = integrate(integrand, discrete_distrib, true_distrib, stop)
+        true_measure = BrownianMotion(dims,time_vector=time_vec)
+        integrand = AsianCall(true_measure)
+        stop = CLTRep(discrete_distrib,true_measure, abs_tol=abs_tol)
+        sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
         true_value = 6.20
         self.assertTrue(abs(sol - true_value) < abs_tol)
 

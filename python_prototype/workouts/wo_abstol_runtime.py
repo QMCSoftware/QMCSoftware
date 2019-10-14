@@ -10,7 +10,7 @@ from qmcpy import integrate
 from qmcpy._util import summarize
 from qmcpy.integrand import AsianCall
 from qmcpy.discrete_distribution import IIDStdGaussian,IIDStdUniform,Lattice,Sobol
-from qmcpy.true_distribution import BrownianMotion
+from qmcpy.true_measure import BrownianMotion
 from qmcpy.stop import CLT, CLTRep
 
 def plot(title,xlabel,ylabel,xdata,ydata,outF):
@@ -36,11 +36,11 @@ time_vector=[
     arange(1 / 64, 65 / 64, 1 / 64)]
 dims = [len(tv) for tv in time_vector]
 
-def QMC_Wrapper(discrete_distrib, true_distrib, stop, name):
+def QMC_Wrapper(discrete_distrib, true_measure, stop, name):
     item_f = "    %-25s %-10.3f %-10.3f"
     item_s = "    %-25s %-10s %-10s"
-    option = AsianCall(true_distrib)
-    sol, data = integrate(option, discrete_distrib, true_distrib, stop)
+    option = AsianCall(true_measure)
+    sol, data = integrate(option, discrete_distrib, true_measure, stop)
     print(item_f % (name, sol, data.t_total))
     return sol, data.t_total
 
@@ -57,30 +57,30 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
 
         # CLT_IIDStdUniform
         discrete_distrib = IIDStdUniform()
-        true_distrib = BrownianMotion(dims,time_vector=time_vector)
-        stop = CLT(discrete_distrib, true_distrib, abs_tol=abs_tol)
-        mu, t = QMC_Wrapper(discrete_distrib, true_distrib, stop, "CLT_IIDStdUniform")
+        true_measure = BrownianMotion(dims,time_vector=time_vector)
+        stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
+        mu, t = QMC_Wrapper(discrete_distrib, true_measure, stop, "CLT_IIDStdUniform")
         results.extend([mu, t])
 
         # CLT_IIDStdGaussian
         discrete_distrib = IIDStdGaussian()
-        true_distrib = BrownianMotion(dims,time_vector=time_vector)
-        stop = CLT(discrete_distrib, true_distrib, abs_tol=abs_tol)
-        mu, t = QMC_Wrapper(discrete_distrib, true_distrib, stop, "CLT_IIDStdGaussian")
+        true_measure = BrownianMotion(dims,time_vector=time_vector)
+        stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
+        mu, t = QMC_Wrapper(discrete_distrib, true_measure, stop, "CLT_IIDStdGaussian")
         results.extend([mu, t])
 
         # CLT_Rep_Lattice
         discrete_distrib = Lattice()
-        true_distrib = BrownianMotion(dims,time_vector=time_vector)
-        stop = CLTRep(discrete_distrib, true_distrib, abs_tol=abs_tol)
-        mu, t = QMC_Wrapper(discrete_distrib, true_distrib, stop,  "CLT_Rep_Lattice")
+        true_measure = BrownianMotion(dims,time_vector=time_vector)
+        stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+        mu, t = QMC_Wrapper(discrete_distrib, true_measure, stop,  "CLT_Rep_Lattice")
         results.extend([mu, t])
 
         # CLT_Rep_Sobol
         discrete_distrib = Sobol()
-        true_distrib = BrownianMotion(dims,time_vector=time_vector)
-        stop = CLTRep(discrete_distrib, true_distrib, abs_tol=abs_tol)
-        mu, t = QMC_Wrapper(discrete_distrib, true_distrib, stop, "CLT_Rep_Sobol")
+        true_measure = BrownianMotion(dims,time_vector=time_vector)
+        stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+        mu, t = QMC_Wrapper(discrete_distrib, true_measure, stop, "CLT_Rep_Sobol")
         results.extend([mu, t])
 
         df_metrics.loc[i] = results # update metrics

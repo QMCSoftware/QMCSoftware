@@ -2,7 +2,7 @@ import unittest
 
 from qmcpy.stop import CLT,CLTRep
 from qmcpy.discrete_distribution import IIDStdGaussian,Lattice
-from qmcpy.true_distribution import Gaussian
+from qmcpy.true_measure import Gaussian
 from qmcpy._util import DistributionCompatibilityError
 
 class Test_CLT(unittest.TestCase):

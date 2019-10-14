@@ -5,7 +5,7 @@ import copy
 from time import time
 
 
-def integrate(integrand, discrete_distrib, true_distrib, stopping_criterion):
+def integrate(integrand, discrete_distrib, true_measure, stopping_criterion):
     """Specify and compute integral of :math:`f(\\mathbf{x})` for \
     :math:`\\mathbf{x} \\in \\mathcal{X}`.
 
@@ -29,10 +29,10 @@ def integrate(integrand, discrete_distrib, true_distrib, stopping_criterion):
 
     t_start = time()
     # Transform integrands to accept distribution values which can generate
-    true_distrib.transform_generator(discrete_distrib)
+    true_measure.transform_generator(discrete_distrib)
     while stopping_criterion.stage != "done":
         # the data.stage property tells us where we are in the process
-        stopping_criterion.data.update_data(true_distrib, integrand)  # compute more data
+        stopping_criterion.data.update_data(true_measure, integrand)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
     t_total = time() - t_start
     solution = stopping_criterion.data.solution  # assign outputs
@@ -40,7 +40,7 @@ def integrate(integrand, discrete_distrib, true_distrib, stopping_criterion):
     data.t_total = t_total
     data.integrand = integrand
     data.discrete_distrib = discrete_distrib
-    data.true_distrib = true_distrib
+    data.true_measure = true_measure
     del stopping_criterion.data
     data.stopping_criterion = stopping_criterion
     return solution, data

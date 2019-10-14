@@ -60,8 +60,8 @@ class AccumData(ABC):
             self.integrand.summarize()
         if self.discrete_distrib:
             self.discrete_distrib.summarize()
-        if self.true_distrib:
-            self.true_distrib.summarize()
+        if self.true_measure:
+            self.true_measure.summarize()
         if self.stopping_criterion:
             self.stopping_criterion.summarize()
 

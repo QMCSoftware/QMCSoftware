@@ -3,9 +3,9 @@
 from numpy import arange,cumsum,diff,insert,sqrt
 from scipy.stats import norm 
 
-from . import TrueDistribution
+from . import TrueMeasure
 
-class Uniform(TrueDistribution):
+class Uniform(TrueMeasure):
     """ Standard Uniform Measure """
     def __init__(self, dimension, lower_bound=0, upper_bound=1):
         transforms = {
@@ -13,7 +13,7 @@ class Uniform(TrueDistribution):
             'StdGaussian':lambda self,samples: norm.cdf(samples)*(self.b-self.a) + self.a}
         super().__init__(dimension, transforms, a=lower_bound, b=upper_bound)  
         
-class Gaussian(TrueDistribution):
+class Gaussian(TrueMeasure):
     """ Standard Gaussian Measure """
     def __init__(self, dimension, mean=0, variance=1):
         transforms = {
@@ -21,7 +21,7 @@ class Gaussian(TrueDistribution):
             'StdUniform': lambda self,samples: norm.ppf(samples, loc=self.mu, scale=self.sigma)}
         super().__init__(dimension, transforms, mu=mean, sigma=sqrt(variance))
   
-class BrownianMotion(TrueDistribution):
+class BrownianMotion(TrueMeasure):
     """ Brownian Motion Measure """
     def __init__(self, dimension, time_vector=arange(1/4,5/4,1/4)):
         transforms = {

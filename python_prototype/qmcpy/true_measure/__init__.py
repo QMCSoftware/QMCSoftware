@@ -3,7 +3,7 @@ from abc import ABC
 
 from qmcpy._util import DimensionError,TransformError,univ_repr
 
-class TrueDistribution(ABC):
+class TrueMeasure(ABC):
     """ Samples from the Discrete Distribution will be transformed into the True Distribution"""
 
     def __init__(self, dimension, transforms, **kwargs):
@@ -73,4 +73,4 @@ class TrueDistribution(ABC):
     
 
 # API
-from .true_distributions import *
+from .measures import *
