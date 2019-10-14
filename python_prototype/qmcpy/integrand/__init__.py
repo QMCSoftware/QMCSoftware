@@ -1,21 +1,17 @@
 """ Definition for abstract class, ``Integrand`` """
 
 from abc import ABC, abstractmethod
-from numpy import cumsum, diff, insert, sqrt
-from scipy.stats import norm
 
-from .._util import univ_repr, TransformError
+from .._util import univ_repr
 
 
 class Integrand(ABC):
-    def __init__(self, nominal_value=0):
+    def __init__(self):
         """
         Specify and generate values :math:`f(\mathbf{x})` for \
         :math:`\mathbf{x} \in \mathcal{X}`.
 
         Attributes:
-            nominal_value (int): :math:`c` such that \
-                :math:`(c, \ldots, c) \in \mathcal{X}`
             f (Integrand): function transformed to accept distribution \
                 values
             dimension (int): dimension of the domain, :math:`d > 0`
@@ -23,22 +19,19 @@ class Integrand(ABC):
                 multi-dimensional problems
         """
         super().__init__()
-        self.nominal_value = nominal_value
         self.f = None
         self.dimension = 2
         self.integrand_list = [self]
 
     # Abstract Methods
     @abstractmethod
-    def g(self, x, coord_index):
+    def g(self, x):
         """
         Original integrand to be integrated
 
         Args:
             x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` \
                 row of an :math:`n \cdot |\mathfrak{u}|` matrix
-            coord_index: set of those coordinates in sequence needed, \
-                :math:`\mathfrak{u}`
 
         Returns:
             :math:`n \cdot p` matrix with values \
@@ -48,61 +41,6 @@ class Integrand(ABC):
             :math:`x'_{ij} = c` otherwise
         """
         pass
-
-    def transform_variable(self, measure, distribution):
-        """
-        This method performs the necessary variable transformation to put the
-        original integrand in the form required by the DiscreteDistribution
-        object starting from the original Measure object
-
-        Args:
-            measure (Measure): the Measure object that defines the integral
-            distribution (DiscreteDistribution): the discrete distribution \
-                object that is sampled from
-
-        Returns: None
-        """
-        for i in range(len(self)):
-            try:
-                sample_from = distribution[i].true_distribution.mimics
-                    # QuasiRandom sampling
-            except:
-                sample_from = type(distribution[i].true_distribution).__name__
-                    # IIDDistribution sampling
-            transform_to = type(measure[i]).__name__
-            # distribution the sampling attempts to mimic
-            self[i].dimension = distribution[i].true_distribution.dimension
-            # the integrand needs the dimension
-            if transform_to == sample_from:  # no need to transform
-                self[i].f = lambda xu, coordIdex, i=i: self[i].g(xu, coordIdex)
-            elif transform_to == 'IIDZeroMeanGaussian' and \
-                sample_from == 'StdGaussian':  # multiply by likelihood ratio
-                this_var = measure[i].variance
-                self[i].f = lambda xu, coordIndex, var=this_var, i=i: \
-                    self[i].g(xu * sqrt(var), coordIndex)
-            elif transform_to == 'IIDZeroMeanGaussian' and \
-                sample_from == 'StdUniform':  # inverse cdf transform
-                this_var = measure[i].variance
-                self[i].f = lambda xu, coordIdex, var=this_var, i=i: \
-                    self[i].g(sqrt(var) * norm.ppf(xu), coordIdex)
-            elif transform_to == 'BrownianMotion' and \
-                sample_from == 'StdUniform':
-                # inverse cdf transform -> sum across time-series
-                time_diff = diff(insert(measure[i].time_vector, 0, 0))
-                self[i].f = lambda xu, coordIndex, timeDiff=time_diff, i=i: \
-                    self[i].g(cumsum(norm.ppf(xu) * sqrt(timeDiff), 1),
-                              coordIndex)
-            elif transform_to == 'BrownianMotion' and \
-                sample_from == 'StdGaussian':  # sum across time-series
-                time_diff = diff(insert(measure[i].time_vector, 0, 0))
-                self[i].f = lambda xu, coordIndex, timeDiff=time_diff, i=i: \
-                    self[i].g(cumsum(xu * sqrt(timeDiff), 1), coordIndex)
-            else:
-                msg = "Cannot transform %s distribution to mimic Integrand's " \
-                      "true %s measure"
-                raise TransformError(msg % (sample_from, transform_to))
-
-        return
 
     def __len__(self):
         return len(self.integrand_list)

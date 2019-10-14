@@ -8,7 +8,7 @@ from . import Integrand
 class AsianCall(Integrand):
     """ Specify and generate payoff values of an Asian Call option """
 
-    def __init__(self, bm_measure=None, volatility=0.5, start_price=30, \
+    def __init__(self, bm_measure=None, volatility=0.5, start_price=30,
                  strike_price=25):
         """Initialize AsianCall Integrand's'
 
@@ -17,10 +17,8 @@ class AsianCall(Integrand):
             volatility (float): sigma, the volatility of the asset
             start_price (float): S(0), the asset value at t=0
             strike_price (float): K, the call/put offer
-            nominal_value (int): :math:`c` such that \
-                :math:`(c, \ldots, c) \in \mathcal{X}`
         """
-        super().__init__(nominal_value=0)
+        super().__init__()
         self.bm_measure = bm_measure
         self.volatility = volatility
         self.S0 = start_price
@@ -34,20 +32,19 @@ class AsianCall(Integrand):
         self[0].bm_measure = self.bm_measure[0]
         self[0].dimFac = 0
         self[0].dimension = self.bm_measure[0].dimension
-        for ii in range(1, nBM):  # distribute attr
-            self[ii].bm_measure = self.bm_measure[ii]
-            self[ii].dimFac = self.bm_measure[ii].dimension / self.bm_measure[ii - 1].dimension
-            self[ii].dimension = self.bm_measure[ii].dimension
+        for i in range(1, nBM):  # distribute attr
+            self[i].bm_measure = self.bm_measure[i]
+            self[i].dimFac = self.bm_measure[i].dimension / \
+                self.bm_measure[i - 1].dimension
+            self[i].dimension = self.bm_measure[i].dimension
 
-    def g(self, x, ignore):
+    def g(self, x):
         """
         Original integrand to be integrated
 
         Args:
             x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` \
                 row of an :math:`n \cdot |\mathfrak{u}|` matrix
-            coord_index: set of those coordinates in sequence needed, \
-                :math:`\mathfrak{u}`
 
         Returns:
             :math:`n \cdot p` matrix with values \

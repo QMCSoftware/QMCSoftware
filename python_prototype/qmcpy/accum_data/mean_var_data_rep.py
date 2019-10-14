@@ -26,15 +26,15 @@ class MeanVarDataRep(AccumData):
         self.n_streams = n_streams  # Number of random nxm matrices to generate
         self.muhat = zeros(self.n_streams)  # sample mean of each nxm matrix
         self.mu2hat = zeros(self.n_integrands)
-            # mean of n_streams means for each integrand
+        # mean of n_streams means for each integrand
         self.sig2hat = zeros(self.n_integrands)
-            # standard deviation of n_streams means for each integrand
+        # standard deviation of n_streams means for each integrand
         self.flag = ones(self.n_integrands)
-            # flag when an integrand has been sufficiently approximated
+        # flag when an integrand has been sufficiently approximated
         self.t_eval = zeros(self.n_integrands)
-            # time used to evaluate each integrand
+        # time used to evaluate each integrand
 
-    def update_data(self, distribution, integrand):
+    def update_data(self, true_measure, integrand):
         """
         Update data
 
@@ -50,17 +50,14 @@ class MeanVarDataRep(AccumData):
             if self.flag[i] == 0:
                 continue  # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation
-            dim = distribution[i].true_distribution.dimension
-                # dimension of the integrand
-            # set_x := n_streams matrices housing nxm integrand values
-            set_x = distribution[i].gen_distrib(self.n_next[i], dim, \
-                                                self.n_streams)
+            set_x = true_measure[i].gen_distribution(
+                self.n_streams, self.n_next[i])
             for j in range(self.n_streams):
-                y = integrand[i].f(set_x[j], arange(1, dim + 1))
-                    # Evaluate transformed function
+                y = integrand[i].g(set_x[j])
+                # Evaluate transformed function
                 self.muhat[j] = y.mean()  # stream mean
             self.t_eval[i] = max(process_time() - t_start, EPS)
             self.mu2hat[i] = self.muhat.mean()  # mean of stream means
             self.sig2hat[i] = self.muhat.std()
-                # standard deviation of stream means
+            # standard deviation of stream means
         self.solution = self.mu2hat.sum()  # mean of integrand approximations

@@ -36,36 +36,22 @@ Measure Class
 -------------
 
 .. The following extract documentation in qmcpy.measures.__init__.py
-.. automodule:: qmcpy.measures
+.. automodule:: qmcpy.true_measure
     :members:
 
-.. automodule:: qmcpy.measures.measures
+.. automodule:: qmcpy.true_measure.measures
     :members:
 
-Distribution Class
-------------------
+Discrete Distribution Class
+---------------------------
 
 .. The following extract documentation in qmcpy.distribution.__init__.py
-.. automodule:: qmcpy.distribution
+.. automodule:: qmcpy.discrete_distribution
     :members:
 
-IID Distribution
-..................
-
-.. automodule:: qmcpy.distribution.iid_distribution
+.. automodule:: qmcpy.discrete_distribution.discrete_distributions
     :members:
 
-Quasi Random Distribution
-.........................
-
-.. automodule:: qmcpy.distribution.quasi_random
-    :members:
-
-Sobol Sequence
-..............
-
-.. automodule:: qmcpy.distribution.digital_seq
-    :members:
 
 Data Class
 ----------

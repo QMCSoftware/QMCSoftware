@@ -8,7 +8,7 @@ from .._util import DistributionCompatibilityError, univ_repr
 class StoppingCriterion(ABC):
     """ Decide when to stop """
 
-    def __init__(self, distribution, allowed_distribs, abs_tol, rel_tol, \
+    def __init__(self, distribution, allowed_distribs, abs_tol, rel_tol,
                  n_init, n_max):
         """
         Args:
@@ -21,8 +21,8 @@ class StoppingCriterion(ABC):
         """
         if type(distribution).__name__ not in allowed_distribs:
             error_message = type(self).__name__  \
-                            + " only accepts distributions:" \
-                            + str(allowed_distribs)
+                + " only accepts distributions:" \
+                + str(allowed_distribs)
             raise DistributionCompatibilityError(error_message)
         super().__init__()
         self.abs_tol = abs_tol if abs_tol else 1e-2
@@ -45,16 +45,17 @@ class StoppingCriterion(ABC):
         item_f = "%25s: %-15.4f\n"
 
         attrs_vals_str = ""
-        attrs_vals_str += header_fmt % (type(self).__name__, "StoppingCriterion Object")
+        attrs_vals_str += header_fmt % (type(self).__name__,
+                                        "StoppingCriterion Object")
         attrs_vals_str += item_f % ("abs_tol", self.abs_tol)
         attrs_vals_str += item_f % ("rel_tol", self.rel_tol)
         attrs_vals_str += item_i % ("n_max", self.n_max)
         attrs_vals_str += item_f % ("inflate", self.inflate)
         attrs_vals_str += item_f % ("alpha", self.alpha)
 
-        print(attrs_vals_str[:-1])
+        print(attrs_vals_str[:-2])
 
 
 # API
-from .clt import CLT
 from .clt_rep import CLTRep
+from .clt import CLT

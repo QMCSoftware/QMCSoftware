@@ -7,25 +7,17 @@ class Linear(Integrand):
     """ Specify and generate values :math:`f(\mathbf{x}) = \sum_{i=1}^d x_i` \
     for :math:`\mathbf{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d`."""
 
-    def __init__(self, nominal_value=None):
-        """
-        Initialize Linear Integrand
+    def __init__(self):
+        """ Initialize Linear Integrand """
+        super().__init__()
 
-        Args:
-            nominal_value (int): :math:`c` such that\
-                :math:`(c, \ldots, c) \in \mathcal{X}`
-        """
-        super().__init__(nominal_value=nominal_value)
-
-    def g(self, x, coord_index):
+    def g(self, x):
         """
         Original integrand to be integrated
 
         Args:
             x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` \
                 row of an :math:`n \cdot |\mathfrak{u}|` matrix
-            coord_index: set of those coordinates in sequence needed, \
-                :math:`\mathfrak{u}`
 
         Returns:
             :math:`n \cdot p` matrix with values \

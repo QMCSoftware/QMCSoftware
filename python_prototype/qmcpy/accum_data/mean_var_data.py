@@ -26,9 +26,9 @@ class MeanVarData(AccumData):
         self.muhat = full(self.n_integrands, inf)  # sample mean
         self.sighat = full(self.n_integrands, inf)  # sample standard deviation
         self.t_eval = zeros(self.n_integrands)
-            # time used to evaluate each integrand
+        # time used to evaluate each integrand
 
-    def update_data(self, distribution, integrand):
+    def update_data(self, true_measure, integrand):
         """
         Update data
 
@@ -41,12 +41,12 @@ class MeanVarData(AccumData):
         """
         for i in range(len(integrand)):
             t_start = process_time()  # time the integrand values
-            dim = distribution[i].true_distribution.dimension
-            distribution_list = distribution[i].gen_distrib(self.n_next[i], dim)
-            y = integrand[i].f(distribution_list, arange(1, dim + 1))
+            set_x = true_measure[i].gen_distribution(
+                1, self.n_next[i]).squeeze()
+            y = integrand[i].g(set_x)
             self.t_eval[i] = max(process_time() - t_start, EPS)
-                # for multi-level methods
+            # for multi-level methods
             self.sighat[i] = std(y)  # compute the sample standard deviation
             self.muhat[i] = y.mean(0)  # compute the sample mean
             self.solution = self.muhat.sum()
-                # which also acts as our tentative solution
+            # which also acts as our tentative solution
