@@ -13,9 +13,10 @@ class TrueMeasure(ABC):
         if not dimension:
             return
         # Type check dimension
-        if type(self.dimension) == int:
+        if isinstance(self.dimension, int):
             self.dimension = array([self.dimension])
-        if all(type(i) == int or type(i) == int64 and i > 0 for i in self.dimension):
+        if all(isinstance(i, int) or isinstance(i, int64) and i > 0 for i in
+               self.dimension):
             self.dimension = array(self.dimension)
         else:
             raise DimensionError(
@@ -32,14 +33,14 @@ class TrueMeasure(ABC):
         self.distributions = [type(self)(None)
                               for i in range(len(self.dimension))]
         # Create list of measures with proper dimensions and keyword arguments
-        for i in range(len(self)):
+        for i, _ in enumerate(self):
             self[i].dimension = self.dimension[i]
             for key, val in kwargs.items():
                 setattr(self[i], key, val[i])
             self[i].transforms = transforms
 
     def transform_generator(self, discrete_distrib):
-        for i in range(len(self)):
+        for i, _ in enumerate(self):
             if discrete_distrib.mimics not in list(self[i].transforms.keys()):
                 raise TransformError('Cannot tranform %s to %s'
                                      % (type(discrete_distrib).__name__, type(self).__name__))
