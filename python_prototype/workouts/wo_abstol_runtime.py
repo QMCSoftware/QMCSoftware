@@ -52,7 +52,7 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
         results.append(abs_tol)
 
         # CLT_IIDStdUniform
-        discrete_distrib = IIDStdUniform()
+        discrete_distrib = IIDStdUniform(rng_seed=7)
         true_measure = BrownianMotion(dims, time_vector=time_vector)
         stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
         mu, t = QMC_Wrapper(discrete_distrib, true_measure,
@@ -60,7 +60,7 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
         results.extend([mu, t])
 
         # CLT_IIDStdGaussian
-        discrete_distrib = IIDStdGaussian()
+        discrete_distrib = IIDStdGaussian(rng_seed=7)
         true_measure = BrownianMotion(dims, time_vector=time_vector)
         stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
         mu, t = QMC_Wrapper(discrete_distrib, true_measure,
@@ -68,7 +68,7 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
         results.extend([mu, t])
 
         # CLT_Rep_Lattice
-        discrete_distrib = Lattice()
+        discrete_distrib = Lattice(rng_seed=7)
         true_measure = BrownianMotion(dims, time_vector=time_vector)
         stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         mu, t = QMC_Wrapper(discrete_distrib, true_measure,
@@ -76,7 +76,7 @@ def comp_Clt_vs_cltRep_runtimes(abstols):
         results.extend([mu, t])
 
         # CLT_Rep_Sobol
-        discrete_distrib = Sobol()
+        discrete_distrib = Sobol(rng_seed=7)
         true_measure = BrownianMotion(dims, time_vector=time_vector)
         stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         mu, t = QMC_Wrapper(discrete_distrib, true_measure,

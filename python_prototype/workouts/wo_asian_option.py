@@ -19,7 +19,7 @@ def test_distributions_asian_option():
     dim = [len(tv) for tv in time_vec]
 
     # IID Standard Uniform
-    discrete_distrib = IIDStdUniform()
+    discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLT(discrete_distrib, true_measure, abs_tol=.05)
@@ -27,7 +27,7 @@ def test_distributions_asian_option():
     data.summarize()
 
     # IID Standard Uniform
-    discrete_distrib = IIDStdGaussian()
+    discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLT(discrete_distrib, true_measure, abs_tol=.05)
@@ -35,7 +35,7 @@ def test_distributions_asian_option():
     data.summarize()
 
     # Lattice
-    discrete_distrib = Lattice()
+    discrete_distrib = Lattice(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLTRep(discrete_distrib, true_measure, abs_tol=.05)
@@ -43,7 +43,7 @@ def test_distributions_asian_option():
     data.summarize()
 
     # Sobol
-    discrete_distrib = Sobol()
+    discrete_distrib = Sobol(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLTRep(discrete_distrib, true_measure, abs_tol=.05)
@@ -59,7 +59,7 @@ def test_distributions_asian_option():
     dim = [len(tv) for tv in time_vec]
 
     # IID Standard Uniform
-    discrete_distrib = IIDStdUniform()
+    discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLT(discrete_distrib, true_measure, abs_tol=.05)
@@ -67,7 +67,7 @@ def test_distributions_asian_option():
     data.summarize()
 
     # IID Standard Uniform
-    discrete_distrib = IIDStdGaussian()
+    discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLT(discrete_distrib, true_measure, abs_tol=.05)
@@ -75,7 +75,7 @@ def test_distributions_asian_option():
     data.summarize()
 
     # Lattice
-    discrete_distrib = Lattice()
+    discrete_distrib = Lattice(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLTRep(discrete_distrib, true_measure, abs_tol=.05)
@@ -83,7 +83,7 @@ def test_distributions_asian_option():
     data.summarize()
 
     # Sobol
-    discrete_distrib = Sobol()
+    discrete_distrib = Sobol(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLTRep(discrete_distrib, true_measure, abs_tol=.05)

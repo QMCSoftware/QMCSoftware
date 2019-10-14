@@ -1,144 +1,128 @@
-Solution: 6.2018         
+Solution: 6.1833         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Function Object)
-BrownianMotion (Measure Type)
-                dimension: [64]           
-IIDDistribution (Distribution Object)
-true_distribution.measureName: StdUniform     
-CLTStopping (StoppingCriterion Object)
+AsianCall (Integrand Object)
+IIDStdUniform (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+CLT (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
                     n_max: 100000000
                   inflate: 1.2000         
-                    alpha: 0.0100         
+                    alpha: 0.0100        
 MeanVarData (Data Object)
-          n_samples_total: [208458.]      
-                  t_total: 2.0191         
-               confid_int: [6.14944883 6.25424732]
+          n_samples_total: [232678.]      
+                  t_total: 1.8517         
+               confid_int: [6.13384105 6.23281179]
 
-Solution: 6.2145         
+Solution: 6.1979         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Function Object)
-BrownianMotion (Measure Type)
-                dimension: [64]           
-IIDDistribution (Distribution Object)
-true_distribution.measureName: StdGaussian    
-CLTStopping (StoppingCriterion Object)
+AsianCall (Integrand Object)
+IIDStdGaussian (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+CLT (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
                     n_max: 100000000
                   inflate: 1.2000         
-                    alpha: 0.0100         
+                    alpha: 0.0100        
 MeanVarData (Data Object)
-          n_samples_total: [224390.]      
-                  t_total: 0.9441         
-               confid_int: [6.16394395 6.26506064]
+          n_samples_total: [230531.]      
+                  t_total: 0.5967         
+               confid_int: [6.14812315 6.24773347]
 
-Solution: 6.1915         
+Solution: 6.2002         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Function Object)
-BrownianMotion (Measure Type)
-                dimension: [64]           
-QuasiRandom (Distribution Object)
-true_distribution.measureName: Lattice        
+AsianCall (Integrand Object)
+Lattice (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
                     n_max: 100000000
                   inflate: 1.2000         
-                    alpha: 0.0100         
+                    alpha: 0.0100        
 MeanVarDataRep (Data Object)
           n_samples_total: [2048]         
-                  t_total: 0.6177         
-               confid_int: [6.18828215 6.1946423 ]
+                  t_total: 0.6356         
+               confid_int: [6.19902691 6.2014173 ]
 
-Solution: 6.1894         
+Solution: 6.1853         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Function Object)
-BrownianMotion (Measure Type)
-                dimension: [64]           
-QuasiRandom (Distribution Object)
-true_distribution.measureName: Sobol          
+AsianCall (Integrand Object)
+Sobol (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
                     n_max: 100000000
                   inflate: 1.2000         
-                    alpha: 0.0100         
+                    alpha: 0.0100        
 MeanVarDataRep (Data Object)
           n_samples_total: [1024]         
-                  t_total: 0.1910         
-               confid_int: [6.18647612 6.19230732]
+                  t_total: 0.2142         
+               confid_int: [6.18167892 6.18889987]
 
-Solution: 6.1965         
+Solution: 6.1893         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Function Object)
-BrownianMotion (Measure Type)
-                dimension: [ 4 16 64]     
-IIDDistribution (Distribution Object)
-true_distribution.measureName: StdUniform     
-CLTStopping (StoppingCriterion Object)
+AsianCall (Integrand Object)
+IIDStdUniform (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+CLT (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 1048576
+                    n_max: 100000000
                   inflate: 1.2000         
-                    alpha: 0.0100         
+                    alpha: 0.0100        
 MeanVarData (Data Object)
-          n_samples_total: [285616.  26795.   4399.]
-                  t_total: 0.2743         
-               confid_int: [6.14589197 6.24717739]
+          n_samples_total: [274347.  25211.   4240.]
+                  t_total: 0.2459         
+               confid_int: [6.13753868 6.24105102]
 
-Solution: 6.2172         
+Solution: 6.2012         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Function Object)
-BrownianMotion (Measure Type)
-                dimension: [ 4 16 64]     
-IIDDistribution (Distribution Object)
-true_distribution.measureName: StdGaussian    
-CLTStopping (StoppingCriterion Object)
+AsianCall (Integrand Object)
+IIDStdGaussian (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+CLT (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 1048576
+                    n_max: 100000000
                   inflate: 1.2000         
-                    alpha: 0.0100         
+                    alpha: 0.0100        
 MeanVarData (Data Object)
-          n_samples_total: [288471.  22099.   3900.]
-                  t_total: 0.2247         
-               confid_int: [6.16549576 6.26882356]
+          n_samples_total: [306765.  26923.   4696.]
+                  t_total: 0.0943         
+               confid_int: [6.15215664 6.25021827]
 
-Solution: 6.1930         
+Solution: 6.2080         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Function Object)
-BrownianMotion (Measure Type)
-                dimension: [ 4 16 64]     
-QuasiRandom (Distribution Object)
-true_distribution.measureName: Lattice        
+AsianCall (Integrand Object)
+Lattice (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 1048576
+                    n_max: 100000000
                   inflate: 1.2000         
-                    alpha: 0.0100         
+                    alpha: 0.0100        
 MeanVarDataRep (Data Object)
           n_samples_total: [1024 1024 1024]
-                  t_total: 0.2660         
-               confid_int: [6.18912945 6.19692368]
+                  t_total: 0.3028         
+               confid_int: [6.20353546 6.21254236]
 
-Solution: 6.2091         
+Solution: 6.2019         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Function Object)
-BrownianMotion (Measure Type)
-                dimension: [ 4 16 64]     
-QuasiRandom (Distribution Object)
-true_distribution.measureName: Sobol          
+AsianCall (Integrand Object)
+Sobol (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 1048576
+                    n_max: 100000000
                   inflate: 1.2000         
-                    alpha: 0.0100         
+                    alpha: 0.0100        
 MeanVarDataRep (Data Object)
           n_samples_total: [1024 1024 1024]
-                  t_total: 0.2300         
-               confid_int: [6.20728938 6.21092125]
+                  t_total: 0.2986         
+               confid_int: [6.1998289  6.20404331]
 

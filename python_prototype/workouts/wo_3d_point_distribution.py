@@ -2,6 +2,7 @@
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import matplotlib.pyplot as mpl_plt
 from numpy import linspace, meshgrid, random, zeros, sqrt
+random.seed(7)
 
 from qmcpy.integrand import Keister
 

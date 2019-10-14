@@ -8,7 +8,7 @@ from qmcpy.stop import CLT
 def quick_construct_integrand():
     dim = 5
     integrand = QuickConstruct(custom_fun=lambda x: (5 * x).sum(1))
-    discrete_distrib = IIDStdUniform()
+    discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Uniform(dim)
     stop = CLT(discrete_distrib, true_measure, abs_tol=0.01)
     sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
