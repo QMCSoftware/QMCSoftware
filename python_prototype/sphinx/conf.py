@@ -17,7 +17,7 @@ from sphinx.ext.napoleon.docstring import GoogleDocstring
 # import sphinx_bootstrap_theme
 
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../')) # python_prototype
+sys.path.insert(0, os.path.abspath('../'))  # python_prototype
 sys.path.insert(0, os.path.abspath('../python_prototype/'))
 print("root directory = %s " % os.getcwd())
 
@@ -112,8 +112,6 @@ html_static_path = ['_static']
 # -- Options for LaTeX output ---------------------------------------------
 
 # Paths  on S.C. Choi's Mac machine for latex
-imgmath_latex=r"/Library/TeX/texbin/latex"
-imgmath_dvipng=r"/Library/TeX/texbin/dvipng"
+imgmath_latex = r"/Library/TeX/texbin/latex"
+imgmath_dvipng = r"/Library/TeX/texbin/dvipng"
 #imgmath_font_size = 10
-
-

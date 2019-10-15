@@ -66,18 +66,18 @@ Data Class
 .. automodule:: qmcpy.accum_data.mean_var_data_rep
     :members:
 
-StoppingCriterion Class
------------------------
+Stopping Criterion Class
+-------------------------
 
 .. The following extract documentation in qmcpy.stop.__init__.py
 .. automodule:: qmcpy.stop
     :members:
 
 
-.. automodule:: qmcpy.stop.clt
+.. automodule:: qmcpy.stopping_criterion.clt
     :members:
 
-.. automodule:: qmcpy.stop.clt_rep
+.. automodule:: qmcpy.stopping_criterion.clt_rep
     :members:
 
 Utilities
