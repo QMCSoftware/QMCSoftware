@@ -45,11 +45,11 @@ def univ_repr(object, attributes=None):
     return key_val[:-1]
 
 
-def summarize(stop=None, measure=None, integrand=None, distribution=None, data=None):
+def summarize(stopping_criterion=None, measure=None, integrand=None, distribution=None, data=None):
     """Print a summary of inputs and outputs for the qmc problem after execution.
 
     Args:
-        stop (StoppingCriterion): a Stopping Criterion object
+        stopping_criterion (StoppingCriterion): a Stopping Criterion object
         measure (Measure): a Measure object
         integrand (Integrand): an Integrand object
         data (data): a AccumData object
@@ -60,8 +60,8 @@ def summarize(stop=None, measure=None, integrand=None, distribution=None, data=N
         measure.summarize()
     if not distribution is None:
         distribution.summarize()
-    if not stop is None:
-        stop.summarize()
+    if not stopping_criterion is None:
+        stopping_criterion.summarize()
     if not data is None:
         data.summarize()
     return

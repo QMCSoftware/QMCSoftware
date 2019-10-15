@@ -4,7 +4,7 @@ import copy
 from time import time
 
 from qmcpy.discrete_distribution import IIDStdUniform
-from qmcpy.stop import CLT
+from qmcpy.stopping_criterion import CLT
 
 
 def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion=None):

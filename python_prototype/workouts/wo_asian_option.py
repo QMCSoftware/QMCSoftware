@@ -8,7 +8,7 @@ from numpy import arange
 from qmcpy import integrate
 from qmcpy.discrete_distribution import IIDStdUniform, IIDStdGaussian, Lattice, Sobol
 from qmcpy.integrand import AsianCall
-from qmcpy.stop import CLT, CLTRep
+from qmcpy.stopping_criterion import CLT, CLTRep
 from qmcpy.true_measure import BrownianMotion
 
 def test_distributions_asian_option(time_vec, dim, abs_tol):
@@ -17,32 +17,32 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
+    stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
     # IID Standard Uniform
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
+    stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
     # Lattice
     discrete_distrib = Lattice(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
+    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
     # Sobol
     discrete_distrib = Sobol(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
-    stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
+    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
 if __name__ == '__main__':

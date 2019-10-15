@@ -9,8 +9,8 @@ from .integrand.asian_call import AsianCall
 from .integrand.keister import Keister
 from .integrand.linear import Linear
 from .integrate import integrate
-from .stop.clt import CLT
-from .stop.clt_rep import CLTRep
+from .stopping_criterion.clt import CLT
+from .stopping_criterion.clt_rep import CLTRep
 from .true_measure.measures import *
 
 name = "qmcpy"

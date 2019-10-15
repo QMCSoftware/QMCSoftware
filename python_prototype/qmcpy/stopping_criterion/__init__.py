@@ -6,7 +6,7 @@ from .._util import DistributionCompatibilityError, univ_repr
 
 
 class StoppingCriterion(ABC):
-    """ Decide when to stop """
+    """ Decide when to stopping_criterion """
 
     def __init__(self, distribution, allowed_distribs, abs_tol, rel_tol, n_init, n_max):
         """
@@ -33,7 +33,7 @@ class StoppingCriterion(ABC):
 
     @abstractmethod
     def stop_yet(self):
-        """ Determine when to stop """
+        """ Determine when to stopping_criterion """
 
     def summarize(self):
         """ Print important attribute values """

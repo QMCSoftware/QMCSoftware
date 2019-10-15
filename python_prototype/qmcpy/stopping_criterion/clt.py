@@ -41,7 +41,7 @@ class CLT(StoppingCriterion):
         # initialize as n_init
 
     def stop_yet(self):
-        """ Determine when to stop """
+        """ Determine when to stopping_criterion """
         if self.stage == "sigma":
             self.data.n_prev = self.data.n_next  # update place in the sequence
             temp_a = (self.data.t_eval) ** 0.5
