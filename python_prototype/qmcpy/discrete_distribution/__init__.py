@@ -1,11 +1,11 @@
+""" DiscreteDistribution is an abstract class. """
 from abc import ABC, abstractmethod
 
 from .._util import univ_repr
 
 
 class DiscreteDistribution(ABC):
-    """ Discrete Distribution from which we can generate samples """
-
+    """ Discrete Distribution from which we can generate samples. """
     def __init__(self, mimics):
         self.mimics = mimics
 
@@ -28,7 +28,6 @@ class DiscreteDistribution(ABC):
         """Print important attribute values
         """
         header_fmt = "%s (%s)"
-        item_s = "%35s: %-15s"
         attrs_vals_str = ""
 
         attrs_vals_str += header_fmt % (type(self).__name__,

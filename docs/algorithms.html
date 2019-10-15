@@ -254,6 +254,12 @@
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="qmcpy.integrand.Integrand.summarize">
+<code class="sig-name descname">summarize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.Integrand.summarize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print important attribute values</p>
+</dd></dl>
+
 </dd></dl>
 
 <div class="section" id="module-qmcpy.integrand.asian_call">
@@ -273,7 +279,7 @@
 <li><p><strong>bm_measure</strong> (<em>Measure</em>) – A BrownianMotion Measure object</p></li>
 <li><p><strong>volatility</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sigma, the volatility of the asset</p></li>
 <li><p><strong>start_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – S(0), the asset value at t=0</p></li>
-<li><p><strong>strike_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – K, the call/put offer</p></li>
+<li><p><strong>strike_price</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – strike_price, the call/put offer</p></li>
 </ul>
 </dd>
 </dl>
@@ -403,10 +409,11 @@ The standard example integrates the Keister integrand with respect to an     IID
 </div>
 <div class="section" id="discrete-distribution-class">
 <h2>Discrete Distribution Class<a class="headerlink" href="#discrete-distribution-class" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-qmcpy.discrete_distribution"></span><dl class="class">
+<span class="target" id="module-qmcpy.discrete_distribution"></span><p>DiscreteDistribution is an abstract class.</p>
+<dl class="class">
 <dt id="qmcpy.discrete_distribution.DiscreteDistribution">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.</code><code class="sig-name descname">DiscreteDistribution</code><span class="sig-paren">(</span><em class="sig-param">mimics</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Discrete Distribution from which we can generate samples</p>
+<dd><p>Discrete Distribution from which we can generate samples.</p>
 <dl class="method">
 <dt id="qmcpy.discrete_distribution.DiscreteDistribution.gen_samples">
 <em class="property">abstract </em><code class="sig-name descname">gen_samples</code><span class="sig-paren">(</span><em class="sig-param">j</em>, <em class="sig-param">n</em>, <em class="sig-param">m</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.DiscreteDistribution.gen_samples" title="Permalink to this definition">¶</a></dt>
@@ -433,7 +440,8 @@ The standard example integrates the Keister integrand with respect to an     IID
 
 </dd></dl>
 
-<span class="target" id="module-qmcpy.discrete_distribution.discrete_distributions"></span><dl class="class">
+<span class="target" id="module-qmcpy.discrete_distribution.discrete_distributions"></span><p>This module implements mutiple subclasses of DiscreteDistribution.</p>
+<dl class="class">
 <dt id="qmcpy.discrete_distribution.discrete_distributions.IIDStdGaussian">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.discrete_distributions.</code><code class="sig-name descname">IIDStdGaussian</code><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.IIDStdGaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Standard Gaussian Measure</p>
@@ -595,12 +603,12 @@ The standard example integrates the Keister integrand with respect to an     IID
 
 <dl class="method">
 <dt id="qmcpy.accum_data.AccumData.update_data">
-<em class="property">abstract </em><code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.AccumData.update_data" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">true_measure</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.AccumData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the accumulated data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an instance of TrueMeasure</p></li>
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
 </ul>
 </dd>
@@ -636,7 +644,7 @@ and store the sample mean and variance of integrand values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of                 DiscreteDistribution</p></li>
+<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an instance of TrueMeasure</p></li>
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
 </ul>
 </dd>
@@ -674,7 +682,7 @@ and store the sample mean and variance of integrand values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of                 DiscreteDistribution</p></li>
+<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an instance of TrueMeasure</p></li>
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
 </ul>
 </dd>
@@ -715,6 +723,12 @@ and store the sample mean and variance of integrand values</p>
 <dt id="qmcpy.stop.StoppingCriterion.stop_yet">
 <em class="property">abstract </em><code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.StoppingCriterion.stop_yet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine when to stop</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.stop.StoppingCriterion.summarize">
+<code class="sig-name descname">summarize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stop.StoppingCriterion.summarize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print important attribute values.</p>
 </dd></dl>
 
 </dd></dl>

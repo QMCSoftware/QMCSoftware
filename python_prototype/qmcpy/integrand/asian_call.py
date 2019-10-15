@@ -16,25 +16,25 @@ class AsianCall(Integrand):
             bm_measure (Measure): A BrownianMotion Measure object
             volatility (float): sigma, the volatility of the asset
             start_price (float): S(0), the asset value at t=0
-            strike_price (float): K, the call/put offer
+            strike_price (float): strike_price, the call/put offer
         """
         super().__init__()
         self.bm_measure = bm_measure
         self.volatility = volatility
-        self.S0 = start_price
-        self.K = strike_price
-        self.dimFac = 0
+        self.start_price = start_price
+        self.strike_price = strike_price
+        self.dim_fac = 0
         if not self.bm_measure:
             return
         # Create a list of Asian Call Options and distribute attributes
-        nBM = len(bm_measure)
-        self.integrand_list = [AsianCall() for i in range(nBM)]
+        n_bm = len(bm_measure)
+        self.integrand_list = [AsianCall() for i in range(n_bm)]
         self[0].bm_measure = self.bm_measure[0]
-        self[0].dimFac = 0
+        self[0].dim_fac = 0
         self[0].dimension = self.bm_measure[0].dimension
-        for i in range(1, nBM):  # distribute attr
+        for i in range(1, n_bm):  # distribute attr
             self[i].bm_measure = self.bm_measure[i]
-            self[i].dimFac = self.bm_measure[i].dimension / \
+            self[i].dim_fac = self.bm_measure[i].dimension / \
                 self.bm_measure[i - 1].dimension
             self[i].dimension = self.bm_measure[i].dimension
 
@@ -43,29 +43,29 @@ class AsianCall(Integrand):
         Original integrand to be integrated
 
         Args:
-            x: nodes, :math:`\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}` \
-                row of an :math:`n \cdot |\mathfrak{u}|` matrix
+            x: nodes, :math:`\\mathbf{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
+                row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
 
         Returns:
-            :math:`n \cdot p` matrix with values \
-            :math:`f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})` where if \
-            :math:`\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j`, then \
-            :math:`x'_{ij} = x_{ij}` for :math:`j \in \mathfrak{u}`, and \
+            :math:`n \\cdot p` matrix with values \
+            :math:`f(\\mathbf{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
+            :math:`\\mathbf{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, then \
+            :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, and \
             :math:`x'_{ij} = c` otherwise
         """
-        SFine = self.S0 * exp(
+        s_fine = self.start_price * exp(
             (-self.volatility ** 2 / 2) * self.bm_measure.time_vector
             + self.volatility * x)
-        AvgFine = ((self.S0 / 2)
-                   + SFine[:, : self.dimension - 1].sum(1)
-                   + SFine[:, self.dimension - 1] / 2
-                   ) / self.dimension
-        y = maximum(AvgFine - self.K, 0)
-        if self.dimFac > 0:
-            Scourse = SFine[:, int(self.dimFac - 1):: int(self.dimFac)]
-            dCourse = self.dimension / self.dimFac
-            AvgCourse = ((self.S0 / 2)
-                         + Scourse[:, : int(dCourse) - 1].sum(1)
-                         + Scourse[:, int(dCourse) - 1] / 2) / dCourse
-            y = y - maximum(AvgCourse - self.K, 0)
+        avg_fine = ((self.start_price / 2)
+                    + s_fine[:, : self.dimension - 1].sum(1)
+                    + s_fine[:, self.dimension - 1] / 2
+                    ) / self.dimension
+        y = maximum(avg_fine - self.strike_price, 0)
+        if self.dim_fac > 0:
+            scourse = s_fine[:, int(self.dim_fac - 1):: int(self.dim_fac)]
+            d_course = self.dimension / self.dim_fac
+            avg_course = ((self.start_price / 2)
+                          + scourse[:, : int(d_course) - 1].sum(1)
+                          + scourse[:, int(d_course) - 1] / 2) / d_course
+            y = y - maximum(avg_course - self.strike_price, 0)
         return y
