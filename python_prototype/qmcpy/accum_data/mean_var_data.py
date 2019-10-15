@@ -1,9 +1,7 @@
 """ Definition of MeanVarData, a concrete implementation of AccumData """
 
 from time import process_time
-
 from numpy import finfo, float32, full, inf, std, zeros
-
 from . import AccumData
 
 EPS = finfo(float32).eps
@@ -42,7 +40,7 @@ class MeanVarData(AccumData):
         """
         for i in range(len(integrand)):
             t_start = process_time()  # time the integrand values
-            set_x = true_measure[i].gen_distribution(
+            set_x = true_measure[i].gen_true_measure_samples(
                 1, self.n_next[i]).squeeze()
             y = integrand[i].g(set_x)
             self.t_eval[i] = max(process_time() - t_start, EPS)

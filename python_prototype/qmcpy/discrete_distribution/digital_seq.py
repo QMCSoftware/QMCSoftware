@@ -1,9 +1,7 @@
-"""Sobol sequence generator
-"""
+""" Sobol sequence generator """
 
 from os import path
 import sys
-
 import mpmath
 import pandas as pd
 

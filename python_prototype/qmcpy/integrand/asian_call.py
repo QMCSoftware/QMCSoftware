@@ -8,9 +8,9 @@ from . import Integrand
 class AsianCall(Integrand):
     """ Specify and generate payoff values of an Asian Call option """
 
-    def __init__(self, bm_measure=None, volatility=0.5, start_price=30,
-                 strike_price=25):
-        """Initialize AsianCall Integrand's'
+    def __init__(self, bm_measure=None, volatility=0.5, start_price=30, strike_price=25):
+        """
+        Initialize AsianCall Integrand's'
 
         Args:
             bm_measure (Measure): A BrownianMotion Measure object

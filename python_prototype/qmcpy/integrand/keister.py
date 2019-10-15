@@ -6,27 +6,26 @@ from . import Integrand
 
 
 class Keister(Integrand):
-    """Specify and generate values \
+    """
+    Specify and generate values \
     :math:`f(\\mathbf{x}) = \\pi^{d/2} \\cos(\| \\mathbf{x} \|)` for \
     :math:`\\mathbf{x} \\in \\mathbb{R}^d`.
+    
     The standard example integrates the Keister integrand with respect to an \
     IID Gaussian distribution with variance 1/2.
 
-
+    Reference:
+            B. D. Keister, Multidimensional Quadrature Algorithms, \
+            `Computers in Physics`, *10*, pp.\ 119-122, 1996.
     """
 
     def __init__(self):
-        """
-        Initialize Keister Integrand
-
-        Reference:
-            B. D. Keister, Multidimensional Quadrature Algorithms, \
-            `Computers in Physics`, *10*, pp.\ 119-122, 1996.
-        """
+        """ Initialize Keister Integrand """
         super().__init__()
 
     def g(self, x):
-        """Original integrand to be integrated
+        """
+        Original integrand to be integrated
 
         Args:
             x: nodes, :math:`\\mathbf{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
@@ -39,7 +38,6 @@ class Keister(Integrand):
             :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, and \
             :math:`x'_{ij} = c` otherwise
         """
-
         normx2 = (x ** 2).sum(1)  # ||x||^2
         n_coord_index = x.shape[-1]
         y = pi ** (n_coord_index / 2) * cos(normx2 ** 0.5)

@@ -6,11 +6,13 @@ from .._util import univ_repr
 
 
 class Integrand(ABC):
+    """
+    Specify and generate values :math:`f(\\mathbf{x})` for \
+    :math:`\\mathbf{x} \\in \\mathcal{X}`
+    """
+    
     def __init__(self):
         """
-        Specify and generate values :math:`f(\\mathbf{x})` for \
-        :math:`\\mathbf{x} \\in \\mathcal{X}`.
-
         Attributes:
             f (Integrand): function transformed to accept distribution \
                 values
@@ -23,7 +25,6 @@ class Integrand(ABC):
         self.dimension = 2
         self.integrand_list = [self]
 
-    # Abstract Methods
     @abstractmethod
     def g(self, x):
         """

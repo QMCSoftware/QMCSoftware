@@ -1,6 +1,5 @@
-"""
-Main driver function for Qmcpy.
-"""
+""" Main driver function for Qmcpy """
+
 import copy
 from time import time
 

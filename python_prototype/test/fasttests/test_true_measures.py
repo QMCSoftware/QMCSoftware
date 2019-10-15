@@ -37,12 +37,12 @@ class Test_Uniform(unittest.TestCase):
         true_measure = Uniform(3, lower_bound=a, upper_bound=b)
         true_measure.transform_generator(IIDStdUniform())
         # IIDStdUniform -> Uniform(1/4,1/2)
-        vals = true_measure[0].gen_distribution(5, 4)
+        vals = true_measure[0].gen_true_measure_samples(5, 4)
         self.assertTrue((vals <= b).all() and (vals >= a).all())
         true_measure = Uniform(3, lower_bound=a, upper_bound=b)
         true_measure.transform_generator(IIDStdGaussian())
         # IIDStdGaussian -> Uniform(1/4,1/2)
-        vals = true_measure[0].gen_distribution(5, 4)
+        vals = true_measure[0].gen_true_measure_samples(5, 4)
         self.assertTrue((vals <= b).all() and (vals >= a).all())
 
 

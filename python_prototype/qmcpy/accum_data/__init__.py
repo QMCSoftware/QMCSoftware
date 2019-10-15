@@ -1,9 +1,9 @@
 """ Definition for abstract class AccumData """
 
 from abc import ABC, abstractmethod
-from math import inf, nan
-
 from numpy import array
+from math import nan, inf
+
 from .._util import univ_repr
 
 
@@ -48,9 +48,6 @@ class AccumData(ABC):
             None
         """
 
-    def __repr__(self):
-        return univ_repr(self)
-
     def summarize(self):
         """Print important attribute values
         """
@@ -76,7 +73,11 @@ class AccumData(ABC):
         attrs_vals_str += item_f % ("time_total", self.time_total)
         attrs_vals_str += item_s % ("confid_int", str(self.confid_int))
         print(attrs_vals_str[:-1]+'\n')
+    
+    def __repr__(self):
+        return univ_repr(self)
 
+        
 # API
 from .mean_var_data import MeanVarData
 from .mean_var_data_rep import MeanVarDataRep

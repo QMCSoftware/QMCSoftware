@@ -9,8 +9,10 @@ from ..accum_data import MeanVarData
 class CLT(StoppingCriterion):
     """ Stopping criterion based on the Central Limit Theorem (CLT) """
 
-    def __init__(self, discrete_distrib, true_measure, inflate=1.2, alpha=0.01, abs_tol=1e-2,
-                 rel_tol=0, n_init=1024, n_max=1e8):
+    def __init__(self, discrete_distrib, true_measure, 
+                inflate=1.2, alpha=0.01,
+                abs_tol=1e-2, rel_tol=0,
+                n_init=1024, n_max=1e8):
         """
         Args:
             discrete_distrib
