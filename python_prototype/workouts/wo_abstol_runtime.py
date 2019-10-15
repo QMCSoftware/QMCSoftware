@@ -1,13 +1,12 @@
-#!/usr/bin/python_prototype/
 from matplotlib import pyplot as mpl_plot
 from numpy import arange
 import pandas as pd
+
 from qmcpy import integrate
 from qmcpy.discrete_distribution import *
 from qmcpy.integrand import AsianCall
 from qmcpy.stop import CLT, CLTRep
 from qmcpy.true_measure import BrownianMotion
-
 
 def plot(title, xlabel, ylabel, xdata, ydata, outF):
     # mpl_plot.title(title)

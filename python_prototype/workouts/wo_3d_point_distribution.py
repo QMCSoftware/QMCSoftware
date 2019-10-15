@@ -1,13 +1,12 @@
-#!/usr/bin/python_prototype
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import matplotlib.pyplot as mpl_plt
 from numpy import linspace, meshgrid, random, zeros, sqrt
-random.seed(7)
 
 from qmcpy.integrand import Keister
 
+random.seed(7)
 
-def plot3d(verbose=True):
+def plot3d():
     # Compute n_total and mu_hat for each epsilon with a cooresponding plot
     '''
     integrand = Keister()
@@ -75,7 +74,6 @@ def plot3d(verbose=True):
     mpl_plt.savefig("outputs/Three_3d_SurfaceScatters.png",
                     dpi=500, bbox_inches="tight", pad_inches=.15)
     mpl_plt.show(block=False)
-
 
 if __name__ == "__main__":
     plot3d()

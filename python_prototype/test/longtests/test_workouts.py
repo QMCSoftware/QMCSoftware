@@ -13,13 +13,18 @@ class Test_Workouts(unittest.TestCase):
         plot3d()
 
     def test_abstol_runtime(self):
-        comp_Clt_vs_cltRep_runtimes(arange(0.1, 0.6, 0.1))
+        comp_Clt_vs_cltRep_runtimes(abstols=arange(0.1, 0.3, 0.1))
 
     def test_asian_option(self):
-        test_distributions_asian_option()
+        time_vec = [
+            arange(1 / 4, 5 / 4, 1 / 4),
+            arange(1 / 16, 17 / 16, 1 / 16),
+            arange(1 / 64, 65 / 64, 1 / 64)]
+        dim = [len(tv) for tv in time_vec]
+        test_distributions_asian_option(time_vec, dim, abs_tol=.1)
 
     def test_keister(self):
-        test_distributions_keister()
+        test_distributions_keister(dim=3, abs_tol=.1)
 
     def test_custom_customs(self):
-        quick_construct_integrand()
+        quick_construct_integrand(abs_tol=.1)
