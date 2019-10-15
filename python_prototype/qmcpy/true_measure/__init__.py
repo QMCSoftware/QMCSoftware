@@ -58,16 +58,15 @@ class TrueMeasure(ABC):
             discrete_distrib (DiscreteDistribution): the discrete distribution samples will be drawn from
                 will use discrete_distrib.mimics to select transform from self[i].transforms (dict)
         """
-        for i, _ in enumerate(self):
-            if discrete_distrib.mimics not in list(self[i].transforms.keys()):
+        for measure_i in self:
+            if discrete_distrib.mimics not in list(measure_i.transforms.keys()):
                 raise TransformError(
-                    'Cannot tranform %s to %s' % (type(discrete_distrib).__name__, type(self).__name__))
-            self[i].gen_true_measure_samples = lambda n_streams, n_obs, self=self[i]: \
+                    'Cannot tranform %s to %s' % \
+                        (type(discrete_distrib).__name__, type(self).__name__))
+            measure_i.gen_true_measure_samples = lambda n_streams, n_obs, self=measure_i: \
                 self.transforms[discrete_distrib.mimics](self,
-                                                         discrete_distrib.gen_samples(
-                                                             int(n_streams),
-                                                             int(n_obs),
-                                                             int(self.dimension)))
+                    discrete_distrib.gen_samples(
+                        int(n_streams),int(n_obs),int(self.dimension)))
 
     def summarize(self):
         """ Print important attribute values """
