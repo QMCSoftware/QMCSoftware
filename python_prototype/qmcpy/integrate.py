@@ -4,8 +4,11 @@ Main driver function for Qmcpy.
 import copy
 from time import time
 
+from qmcpy.discrete_distribution import IIDStdUniform
+from qmcpy.stop import CLT
 
-def integrate(integrand, discrete_distrib, true_measure, stopping_criterion):
+
+def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion=None):
     """Specify and compute integral of :math:`f(\\mathbf{x})` for \
     :math:`\\mathbf{x} \\in \\mathcal{X}`.
 
@@ -26,6 +29,10 @@ def integrate(integrand, discrete_distrib, true_measure, stopping_criterion):
                 sampling points used to obtain the estimate
 
     """
+
+    # Default some arguments
+    if not discrete_distrib: discrete_distrib = IIDStdUniform()
+    if not stopping_criterion: stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.01)
 
     t_start = time()
     # Transform integrands to accept distribution values which can generate

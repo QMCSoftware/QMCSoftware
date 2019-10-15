@@ -6,7 +6,7 @@ Single-Level and Multi-Level Asian Option Pricing Examples
 
 from numpy import arange
 from qmcpy import integrate
-from qmcpy.discrete_distribution import *
+from qmcpy.discrete_distribution import IIDStdUniform, IIDStdGaussian, Lattice, Sobol
 from qmcpy.integrand import AsianCall
 from qmcpy.stop import CLT, CLTRep
 from qmcpy.true_measure import BrownianMotion
@@ -18,7 +18,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     data.summarize()
 
     # IID Standard Uniform
@@ -26,7 +26,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     data.summarize()
 
     # Lattice
@@ -34,7 +34,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     data.summarize()
 
     # Sobol
@@ -42,7 +42,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     data.summarize()
 
 if __name__ == '__main__':

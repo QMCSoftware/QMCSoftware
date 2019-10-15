@@ -16,7 +16,7 @@ class IntegrationExampleTest(unittest.TestCase):
         discrete_distrib = IIDStdGaussian()
         true_measure = Gaussian(dimension=2, variance=1/2)
         stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-        sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+        sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
         true_value = 1.808186429263620
         # In Mathematica (or WolframAlpha):
         # N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]]
@@ -33,7 +33,7 @@ class IntegrationExampleTest(unittest.TestCase):
         true_measure = BrownianMotion(dims, time_vector=time_vec)
         integrand = AsianCall(true_measure)
         stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-        sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+        sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
         true_value = 6.20
         self.assertTrue(abs(sol - true_value) < abs_tol)
 

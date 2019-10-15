@@ -5,7 +5,7 @@ Keister Function Example
 """
 
 from qmcpy import integrate
-from qmcpy.discrete_distribution import *
+from qmcpy.discrete_distribution import IIDStdUniform, IIDStdGaussian, Lattice, Sobol
 from qmcpy.integrand import Keister
 from qmcpy.stop import CLT, CLTRep
 from qmcpy.true_measure import Gaussian
@@ -17,7 +17,7 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1/2)
     stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     data.summarize()
 
     # IID Standard Gaussian
@@ -25,7 +25,7 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1/2)
     stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     data.summarize()
 
     # Lattice
@@ -33,7 +33,7 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = Lattice(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1/2)
     stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     data.summarize()
 
     # Sobol
@@ -41,7 +41,7 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = Sobol(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1/2)
     stop = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     data.summarize()
 
 if __name__ == '__main__':

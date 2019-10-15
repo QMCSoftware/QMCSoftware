@@ -13,7 +13,7 @@ def plot3d():
     discrete_distrib = IIDStdGaussian()
     true_measure = Gaussian(dimension=2,variance=1/2)
     stop = CLT(discrete_distrib,true_measure, abs_tol=.5, n_init=16, n_max=1e10)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     data.summarize()
     sys.exit(0)
     '''

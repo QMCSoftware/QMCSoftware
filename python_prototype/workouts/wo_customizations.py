@@ -10,7 +10,7 @@ def quick_construct_integrand(abs_tol):
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Uniform(dim)
     stop = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, discrete_distrib, true_measure, stop)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stop)
     # exact_solution = dim*(5/2)
     data.summarize()
 

@@ -35,7 +35,7 @@ def QMC_Wrapper(discrete_distrib, true_measure, stop, name):
     item_f = "    %-25s %-10.3f %-10.3f"
     item_s = "    %-25s %-10s %-10s"
     option = AsianCall(true_measure)
-    sol, data = integrate(option, discrete_distrib, true_measure, stop)
+    sol, data = integrate(option, true_measure, discrete_distrib, stop)
     print(item_f % (name, sol, data.time_total))
     return sol, data.time_total
 
