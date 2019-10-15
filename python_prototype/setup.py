@@ -20,10 +20,13 @@ from setuptools import Command
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
     user_options = []
+
     def initialize_options(self):
         pass
+
     def finalize_options(self):
         pass
+
     def run(self):
         os.system('rm -vrf ./build ./dist ./*.pyc ./qmcpy/qmcpy.egg-info')
 
@@ -40,7 +43,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/QMCSoftware/QMCSoftware",
-    package_dir={"":"qmcpy"},
+    package_dir={"": "qmcpy"},
     packages=setuptools.find_packages("qmcpy"),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -50,5 +53,3 @@ setuptools.setup(
     python_requires='>=3.7',
     cmdclass={'clean': CleanCommand}
 )
-
-

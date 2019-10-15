@@ -84,14 +84,13 @@
               <p class="caption"><span class="caption-text">Contents</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quasi-Monte Carlo Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#vision">Vision</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#integrand-class">Integrand Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#distribution-class">Distribution Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#accumulate-data-class">Accumulate Data Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#stopping-criterion-class">Stopping Criterion Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#measure">Measure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#integrate-method">Integrate Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qmcpy">qmcpy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#workouts">workouts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#outputs">outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#demos">demos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sphinx">sphinx</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#developers">Developers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contributors">Contributors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tips">Tips</a></li>
@@ -164,66 +163,56 @@
             
   <div class="section" id="quasi-monte-carlo-community-software">
 <h1>Quasi-Monte Carlo Community Software<a class="headerlink" href="#quasi-monte-carlo-community-software" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="vision">
-<h2>Vision<a class="headerlink" href="#vision" title="Permalink to this headline">¶</a></h2>
-<hr></div>
-<div class="section" id="overview">
+<hr><div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
 <hr></div>
-<div class="section" id="integrand-class">
-<h2>Integrand Class<a class="headerlink" href="#integrand-class" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Summary:</b></span> The function to integrate<span class="raw-html-m2r"><br></span>
-<span class="raw-html-m2r"><b>Concrete Classes:</b></span></p>
+<div class="section" id="qmcpy">
+<h2>qmcpy<a class="headerlink" href="#qmcpy" title="Permalink to this headline">¶</a></h2>
+<p><span class="raw-html-m2r"><b>Quasi-Monte Carlo software package with components in python 3</b></span><span class="raw-html-m2r"><br></span>
+<span class="raw-html-m2r"><b>Components:</b></span></p>
 <ul class="simple">
-<li><p>Linear</p></li>
-<li><p>Keister</p></li>
-<li><p>Asian Call</p></li>
+<li><p>Integrand classes</p></li>
+<li><p>True Measure classes</p></li>
+<li><p>Discrete Distribution classes</p></li>
+<li><p>Stopping Criterion classes</p></li>
+<li><p>Accumulate Data classes</p></li>
+<li><p>Third Party contributed classes</p></li>
+<li><p>integrate function</p></li>
 </ul>
 <hr></div>
-<div class="section" id="distribution-class">
-<h2>Distribution Class<a class="headerlink" href="#distribution-class" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Summary:</b></span> The distribution dictating sampling points of the function.<span class="raw-html-m2r"><br></span>
-<span class="raw-html-m2r"><b>Concrete Classes:</b></span></p>
+<div class="section" id="workouts">
+<h2>workouts<a class="headerlink" href="#workouts" title="Permalink to this headline">¶</a></h2>
+<p><span class="raw-html-m2r"><b>Example uses of qmcpy package</b></span><span class="raw-html-m2r"><br></span>
+<span class="raw-html-m2r"><b>Available workouts:</b></span></p>
 <ul class="simple">
-<li><p>Independent Identically Distributed</p></li>
-<li><p>QuasiRandom</p></li>
+<li><p>Generate 3d distribution sample visualization</p></li>
+<li><p>Vary absolute tolerance for multi-level Asian Option Pricing example</p></li>
+<li><p>Asian option pricing examples with single and multi-level examples with varying discrete distributions</p></li>
+<li><p>Keister integrand examples with varying discrete distributions</p></li>
 </ul>
 <hr></div>
-<div class="section" id="accumulate-data-class">
-<h2>Accumulate Data Class<a class="headerlink" href="#accumulate-data-class" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Summary:</b></span> The data values to track throughout the integration<span class="raw-html-m2r"><br></span>
-<span class="raw-html-m2r"><b>Concrete Classes:</b></span></p>
+<div class="section" id="test">
+<h2>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h2>
+<p><span class="raw-html-m2r"><b>Unittests</b></span><span class="raw-html-m2r"><br></span>
+<span class="raw-html-m2r"><b>Testing sets:</b></span></p>
 <ul class="simple">
-<li><p>Mean Variance</p></li>
-<li><p>Mean Variance Repeated</p></li>
+<li><p>fast-tests: Quick unittests. Run in &lt; 1 second</p></li>
+<li><p>long-tests: Unittest that call workouts. Runs in &lt; 10 seconds</p></li>
 </ul>
 <hr></div>
-<div class="section" id="stopping-criterion-class">
-<h2>Stopping Criterion Class<a class="headerlink" href="#stopping-criterion-class" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Summary:</b></span> The stopping criterion to determine sufficient approximation<span class="raw-html-m2r"><br></span>
-<span class="raw-html-m2r"><b>Concrete Classes:</b></span></p>
-<ul class="simple">
-<li><p>Central Limit Theorem</p></li>
-<li><p>Central Limit Theorem Repeated</p></li>
-</ul>
+<div class="section" id="outputs">
+<h2>outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h2>
+<p><span class="raw-html-m2r"><b>Logs and figures generated by workouts</b></span></p>
 <hr></div>
-<div class="section" id="measure">
-<h2>Measure<a class="headerlink" href="#measure" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Summary:</b></span> Specifies the components of a general measure used to define an integration problem or a sampling method<span class="raw-html-m2r"><br></span>
-<span class="raw-html-m2r"><b>Available Measures:</b></span></p>
-<ul class="simple">
-<li><p>STDUniform</p></li>
-<li><p>STDGaussian</p></li>
-<li><p>IIDZeroMeanGaussian</p></li>
-<li><p>BrownianMotion</p></li>
-<li><p>Lattice</p></li>
-<li><p>Sobol</p></li>
-</ul>
+<div class="section" id="demos">
+<h2>demos<a class="headerlink" href="#demos" title="Permalink to this headline">¶</a></h2>
+<p><span class="raw-html-m2r"><b>Example use of qmcpy as an independent package</b></span></p>
 <hr></div>
-<div class="section" id="integrate-method">
-<h2>Integrate Method<a class="headerlink" href="#integrate-method" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Summary:</b></span> Preforms integration given Function’s’, Distribution, Data, and a Stopping Criterion</p>
+<div class="section" id="sphinx">
+<h2>sphinx<a class="headerlink" href="#sphinx" title="Permalink to this headline">¶</a></h2>
+<p><span class="raw-html-m2r"><b>Automated project documentation</b></span></p>
+<p><span class="raw-html-m2r"><hr></span></p>
 <hr></div>
 <div class="section" id="developers">
 <h2>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h2>
@@ -245,8 +234,8 @@ software, 2019. Work in progress. Available on <a class="reference external" hre
 <div class="section" id="tips">
 <h2>Tips<a class="headerlink" href="#tips" title="Permalink to this headline">¶</a></h2>
 <p>It may be helpful to create a virtual environment for this project.<span class="raw-html-m2r"><br></span>
-Packages and versions are compiled in requirements.txt.<span class="raw-html-m2r"><br></span>
-In order for the software to find packages, make sure …/qmcpy/ is in your path.</p>
+Packages and versions are maintained in requirements.txt.<span class="raw-html-m2r"><br></span>
+In order for the software to find packages, make sure …/python_prototypes/ is in your path.</p>
 </div>
 </div>
 
