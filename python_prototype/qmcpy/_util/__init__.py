@@ -44,11 +44,6 @@ def univ_repr(object, attributes=None):
                 )
     return key_val[:-1]
 
-
-# API
-from .exceptions_warnings import *
-
-
 def summarize(stop=None, measure=None, integrand=None, distribution=None, data=None):
     """Print a summary of inputs and outputs for the qmc problem after execution.
 
@@ -69,3 +64,6 @@ def summarize(stop=None, measure=None, integrand=None, distribution=None, data=N
     if not data is None:
         data.summarize()
     return
+
+# API
+from .exceptions_warnings import *

@@ -29,6 +29,8 @@ class StoppingCriterion(ABC):
         self.rel_tol = rel_tol if rel_tol else 0
         self.n_init = n_init if n_init else 1024
         self.n_max = n_max if n_max else 1e8
+        self.alpha = None
+        self.inflate = None
 
     @abstractmethod
     def stop_yet(self):  # accum_data = summary of data computed already
@@ -40,6 +42,8 @@ class StoppingCriterion(ABC):
         return univ_repr(self)
 
     def summarize(self):
+        """Print important attribute values.
+        """
         header_fmt = "%s (%s)\n"
         item_i = "%25s: %d\n"
         item_f = "%25s: %-15.4f\n"

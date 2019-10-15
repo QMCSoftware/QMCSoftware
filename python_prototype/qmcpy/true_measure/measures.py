@@ -28,6 +28,8 @@ class BrownianMotion(TrueMeasure):
 
     def __init__(self, dimension, time_vector=arange(1/4, 5/4, 1/4)):
         transforms = {
-            'StdGaussian': lambda self, samples: cumsum(samples * sqrt(diff(insert(self.time_vector, 0, 0))), 2),
-            'StdUniform': lambda self, samples: cumsum(norm.ppf(samples) * sqrt(diff(insert(self.time_vector, 0, 0))), 2)}
+            'StdGaussian': lambda self, samples: cumsum(
+                samples * sqrt(diff(insert(self.time_vector, 0, 0))), 2),
+            'StdUniform': lambda self, samples: cumsum(norm.ppf(samples) \
+                * sqrt(diff(insert(self.time_vector, 0, 0))), 2)}
         super().__init__(dimension, transforms, time_vector=time_vector)

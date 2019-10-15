@@ -30,15 +30,20 @@ class AccumData(ABC):
         self.n_samples_total = array([])
         self.confid_int = array([-inf, inf])
         self.time_total = None
+        self.integrand = None
+        self.discrete_distrib = None
+        self.true_measure = None
+        self.stopping_criterion = None
 
     @abstractmethod
-    def update_data(self, distribution, integrand):
+    def update_data(self, true_measure, integrand):
         """
         Update the accumulated data
 
         Args:
-            distribution (DiscreteDistribution): an instance of DiscreteDistribution
+            true_measure (TrueMeasure): an instance of TrueMeasure
             integrand (Integrand): an instance of Integrand
+
         Returns:
             None
         """

@@ -1,9 +1,10 @@
+""" This module implements mutiple subclasses of DiscreteDistribution.
+"""
 from numpy import array, int64, log, random, arange, zeros
 from numpy.random import Generator,PCG64
 
-from . import DiscreteDistribution
-from .digital_seq import DigitalSeq
 from qmcpy.third_party.magic_point_shop import LatticeSeq
+from . import DiscreteDistribution
 
 class IIDStdUniform(DiscreteDistribution):
     """ IID Standard Uniform Measure """
@@ -54,8 +55,11 @@ class Sobol(DiscreteDistribution):
         shifts = self.rng.integers(0, 2 ** t, (j,m), dtype=int64)
         # generate random shift
         x = zeros((n, m), dtype=int64)
-        for i, row in enumerate(gen):
+        for i, _ in enumerate(gen):
             x[i, :] = gen.cur  # set each nxm
         x_rs = array([(shift ^ (x * 2 ** ct)) / 2. ** t for shift in
                       shifts])  # randomly shift each nxm sample
         return x_rs
+
+# API
+from .digital_seq import DigitalSeq
