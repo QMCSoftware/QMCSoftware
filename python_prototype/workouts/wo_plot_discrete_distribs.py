@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from qmcpy.discrete_distribution import IIDStdUniform,IIDStdGaussian,Lattice,Sobol
 
-n = 100
+n = 128
 
 def iid_scatters():
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(12, 5))
