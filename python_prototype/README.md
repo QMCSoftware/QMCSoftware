@@ -7,7 +7,7 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 
 <hr>
 
-## qmcpy
+## QMCPy
 <b>Quasi-Monte Carlo software package with components in python 3</b><br>
 <b>Components:</b>
 - Integrand classes
@@ -21,7 +21,7 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 <hr>
 
 ## workouts
-<b>Example uses of qmcpy package</b><br>
+<b>Example uses of QMCPy package</b><br>
 <b>Available workouts:</b>
 - Generate 3d distribution sample visualization
 - Vary absolute tolerance for multi-level Asian Option Pricing example
@@ -44,7 +44,7 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 <hr>
 
 ## demos
-<b>Example use of qmcpy as an independent package</b>
+<b>Example use of QMCPy as an independent package</b>
 
 <hr>
 
@@ -52,24 +52,43 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 <b>Automated project documentation</b>
 
 <hr>
+
+## Citation
+
+If you find QMCPy helpful in your work, please support us by citing the
+following work:
+
+Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, 
+“QMC  Community Software.” Python software, 2019. Work in progress. 
+Available on [GitHub](https://github.com/QMCSoftware/QMCSoftware)
+
 <hr>
 
 ## Developers
-This package was originally developed in MATLAB by Fred J. Hickernell.<br>
-Translated to Python by Sou-Cheng T. Choi and Aleksei Sorokin.
-
-If you find Qmcpy helpful in your work, please support us by citing the
-following work:
-
-Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community Software.” MATLAB and Python 3
-software, 2019. Work in progress. Available on [GitHub](https://github.com/QMCSoftware/QMCSoftware)
+ 
+- Sou-Cheng T. Choi
+- Fred J. Hickernell
+- Aleksei Sorokin
 
 <hr>
 
-## Contributors 
-Dirk Nuyens Magic Point Shop 
-- qmcpy/distribution/magic_point_shop
-- F.Y. Kuo & D. Nuyens. Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients - a survey of analysis and implementation, Foundations of Computational Mathematics, 16(6):1631-1696, 2016. ([springer link](https://link.springer.com/article/10.1007/s10208-016-9329-5), [arxiv link](https://arxiv.org/abs/1606.06613))
+## Contributors
+
+
+## Acknowledgment 
+
+We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.
+
+
+<hr>
+
+## References
+
+1. F.Y. Kuo & D. Nuyens. Application of quasi-Monte Carlo methods to elliptic 
+PDEs with random diffusion coefficients - a survey of analysis and 
+implementation, Foundations of Computational Mathematics, 16(6):1631-1696, 2016. 
+([springer link](https://link.springer.com/article/10.1007/s10208-016-9329-5), 
+[arxiv link](https://arxiv.org/abs/1606.06613))
 
 <hr>
 
