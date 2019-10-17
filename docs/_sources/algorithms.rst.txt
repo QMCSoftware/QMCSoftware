@@ -70,7 +70,7 @@ Stopping Criterion Class
 -------------------------
 
 .. The following extract documentation in qmcpy.stop.__init__.py
-.. automodule:: qmcpy.stop
+.. automodule:: qmcpy.stopping_criterion
     :members:
 
 

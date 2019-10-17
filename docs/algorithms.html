@@ -170,14 +170,14 @@
 <dl class="function">
 <dt id="qmcpy.integrate.integrate">
 <code class="sig-prename descclassname">qmcpy.integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">discrete_distrib=None</em>, <em class="sig-param">stopping_criterion=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrate.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and compute integral of <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for     <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/>.</p>
+<dd><p>Specify and compute integral of <img class="math" src="_images/math/62486ca5fbdbf5f4be95b099693f6e470aa583cc.png" alt="f(\boldsymbol{x})"/> for     <img class="math" src="_images/math/a2f00565c3dd53f5a194432607301ea5ed74565d.png" alt="\boldsymbol{x} \in \mathcal{X}"/>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an object from class Integrand</p></li>
 <li><p><strong>measure</strong> (<em>Measure</em>) – an object from class Measure</p></li>
 <li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution</p></li>
-<li><p><strong>stopping_criterion</strong> (<em>StoppingCriterion</em>) – an object from class             StoppingCriterion</p></li>
+<li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#qmcpy.stopping_criterion.StoppingCriterion" title="qmcpy.stopping_criterion.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class             StoppingCriterion</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -201,7 +201,7 @@
 <dl class="class">
 <dt id="qmcpy.integrand.Integrand">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.</code><code class="sig-name descname">Integrand</code><a class="headerlink" href="#qmcpy.integrand.Integrand" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values <img class="math" src="_images/math/7ece0f103226f3c7da68ac7741b8670c462bcc4b.png" alt="f(\mathbf{x})"/> for     <img class="math" src="_images/math/0c9f19e35ec5b350642320951cf0d831bdd0ace9.png" alt="\mathbf{x} \in \mathcal{X}"/></p>
+<dd><p>Specify and generate values <img class="math" src="_images/math/62486ca5fbdbf5f4be95b099693f6e470aa583cc.png" alt="f(\boldsymbol{x})"/> for     <img class="math" src="_images/math/a2f00565c3dd53f5a194432607301ea5ed74565d.png" alt="\boldsymbol{x} \in \mathcal{X}"/></p>
 <dl class="method">
 <dt id="qmcpy.integrand.Integrand.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
@@ -246,10 +246,10 @@
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -291,10 +291,10 @@
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -308,7 +308,7 @@
 <dl class="class">
 <dt id="qmcpy.integrand.keister.Keister">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values     <img class="math" src="_images/math/d03f853393db6b7cf2c25523b4a9f78790436922.png" alt="f(\mathbf{x}) = \pi^{d/2} \cos(\| \mathbf{x} \|)"/> for     <img class="math" src="_images/math/27881af6ffb368e623dfe6dc8343f138920bdfa5.png" alt="\mathbf{x} \in \mathbb{R}^d"/>.</p>
+<dd><p>Specify and generate values     <img class="math" src="_images/math/d5465e9b76ae73e435fa14d8f24ea0dd76b94289.png" alt="f(\boldsymbol{x}) = \pi^{d/2} \cos(\| \boldsymbol{x} \|)"/> for     <img class="math" src="_images/math/b4664e1714e17b329091f0f6f5e389a6ee307ea9.png" alt="\boldsymbol{x} \in \mathbb{R}^d"/>.</p>
 <p>The standard example integrates the Keister integrand with respect to an     IID Gaussian distribution with variance 1/2.</p>
 <dl class="simple">
 <dt>Reference:</dt><dd><ol class="upperalpha simple" start="2">
@@ -331,10 +331,10 @@
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -348,7 +348,7 @@
 <dl class="class">
 <dt id="qmcpy.integrand.linear.Linear">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values <img class="math" src="_images/math/2ccb5bd520bcb15dc67920c80ab88f087d4912d9.png" alt="f(\mathbf{x}) = \sum_{i=1}^d x_i"/>     for <img class="math" src="_images/math/7d4a5e61c2554400de7b0df8cb439d75b43f7e05.png" alt="\mathbf{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d"/></p>
+<dd><p>Specify and generate values <img class="math" src="_images/math/71c4ff5ba5f802e36b76f4bbff7b72ecdfcb04a9.png" alt="f(\boldsymbol{x}) = \sum_{i=1}^d x_i"/>     for <img class="math" src="_images/math/369a24cfb7e2da06df160fcd73f91a499af30423.png" alt="\boldsymbol{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d"/></p>
 <dl class="method">
 <dt id="qmcpy.integrand.linear.Linear.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.__init__" title="Permalink to this definition">¶</a></dt>
@@ -361,10 +361,10 @@
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/6f5119d07ef959bb29c050f36fe356c71fd03195.png" alt="\mathbf{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/62d43478049ff7f594afb1b053db9ffe77df7586.png" alt="f(\mathbf{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/cc769184bc0107d0cc5e29d319dbb9fb9bb12703.png" alt="\mathbf{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -819,7 +819,43 @@ and store the sample mean and variance of integrand values</p>
 </div>
 <div class="section" id="stopping-criterion-class">
 <h2>Stopping Criterion Class<a class="headerlink" href="#stopping-criterion-class" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-qmcpy.stop"></span><span class="target" id="module-qmcpy.stopping_criterion.clt"></span><p>Definition for CLT, a concrete implementation of StoppingCriterion</p>
+<span class="target" id="module-qmcpy.stopping_criterion"></span><p>Definition for abstract class StoppingCriterion</p>
+<dl class="class">
+<dt id="qmcpy.stopping_criterion.StoppingCriterion">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.stopping_criterion.</code><code class="sig-name descname">StoppingCriterion</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stopping_criterion.StoppingCriterion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decide when to stopping_criterion</p>
+<dl class="method">
+<dt id="qmcpy.stopping_criterion.StoppingCriterion.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">distribution</em>, <em class="sig-param">allowed_distribs</em>, <em class="sig-param">abs_tol</em>, <em class="sig-param">rel_tol</em>, <em class="sig-param">n_init</em>, <em class="sig-param">n_max</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stopping_criterion.StoppingCriterion.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an instance of DiscreteDistribution</p></li>
+<li><p><strong>allowed_distribs</strong> – distribution’s compatible with the StoppingCriterion</p></li>
+<li><p><strong>abs_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – absolute error tolerance</p></li>
+<li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – relative error tolerance</p></li>
+<li><p><strong>n_init</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – initial number of samples</p></li>
+<li><p><strong>n_max</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – maximum number of samples</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.stopping_criterion.StoppingCriterion.stop_yet">
+<em class="property">abstract </em><code class="sig-name descname">stop_yet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stopping_criterion.StoppingCriterion.stop_yet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine when to stopping_criterion</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.stopping_criterion.StoppingCriterion.summarize">
+<code class="sig-name descname">summarize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stopping_criterion.StoppingCriterion.summarize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print important attribute values</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-qmcpy.stopping_criterion.clt"></span><p>Definition for CLT, a concrete implementation of StoppingCriterion</p>
 <dl class="class">
 <dt id="qmcpy.stopping_criterion.clt.CLT">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.stopping_criterion.clt.</code><code class="sig-name descname">CLT</code><span class="sig-paren">(</span><em class="sig-param">discrete_distrib</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=1024</em>, <em class="sig-param">n_max=100000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stopping_criterion.clt.CLT" title="Permalink to this definition">¶</a></dt>

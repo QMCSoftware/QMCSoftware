@@ -1,3 +1,6 @@
+"""
+Generating QMCPy's HTML documentation.
+"""
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -12,8 +15,8 @@
 #
 import os
 import sys
-import sphinx_rtd_theme
-from sphinx.ext.napoleon.docstring import GoogleDocstring
+# import sphinx_rtd_theme
+# from sphinx.ext.napoleon.docstring import GoogleDocstring
 # import sphinx_bootstrap_theme
 
 sys.path.insert(0, os.path.abspath('.'))
@@ -23,10 +26,9 @@ print("root directory = %s " % os.getcwd())
 
 
 # -- Project information -----------------------------------------------------
-
 project = u'qmcpy'
 copyright = u'2019, Illinois Institute of Technology'
-author = 'uFred J. Hickernell, Aleksei Sorokin, Sou-Cheng T. Choi'
+author = u'Fred J. Hickernell, Aleksei Sorokin, Sou-Cheng T. Choi'
 
 # The full version, including alpha/beta/rc tags
 release = u'0.1'
@@ -107,7 +109,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # -- Options for LaTeX output ---------------------------------------------
 

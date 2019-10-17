@@ -1,7 +1,7 @@
 """ This module implements mutiple subclasses of DiscreteDistribution. """
 
 from numpy import array, int64, log, random, arange, zeros
-from numpy.random import Generator,PCG64
+from numpy.random import Generator, PCG64
 
 from . import DiscreteDistribution
 from qmcpy.third_party.magic_point_shop import LatticeSeq
@@ -15,7 +15,7 @@ class IIDStdUniform(DiscreteDistribution):
         """
         Args:
             rng_seed (int): seed the random number generator for reproducibility
-        """ 
+        """
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
     
@@ -40,7 +40,7 @@ class IIDStdGaussian(DiscreteDistribution):
         """
         Args:
             rng_seed (int): seed the random number generator for reproducibility
-        """ 
+        """
         super().__init__(mimics='StdGaussian')
         self.rng = Generator(PCG64(rng_seed))
 
@@ -65,7 +65,7 @@ class Lattice(DiscreteDistribution):
         """
         Args:
             rng_seed (int): seed the random number generator for reproducibility
-        """ 
+        """
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
 
@@ -88,6 +88,7 @@ class Lattice(DiscreteDistribution):
         # randomly shift each nxm sample
         return x_rs
 
+
 class Sobol(DiscreteDistribution):
     """ Quasi-Random Sobol low discrepancy sequence (Base 2) """
 
@@ -95,7 +96,7 @@ class Sobol(DiscreteDistribution):
         """
         Args:
             rng_seed (int): seed the random number generator for reproducibility
-        """ 
+        """
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
 

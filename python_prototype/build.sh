@@ -14,10 +14,11 @@ echo "Qmcpy build process starts..."
 echo "$(date)"
 
 # autopep8
-autopep8 . --in-place --recursive --ignore E402,E241 --global-config ./setup.cfg
+autopep8 . --in-place --recursive --ignore E402,E701 --exclude ./qmcpy/third_party/magic_point_shop --global-config ./setup.cfg
 
 # pylint
-pylint **/*.py
+pylint --variable-rgx="[a-z0-9_]{1,30}$" **/.py
+pylint --variable-rgx="[a-z0-9_]{1,30}$" **/**/*.py
 
 # Uninstall and Install Qmcpy
 pip uninstall --yes qmcpy
