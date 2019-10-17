@@ -2,18 +2,20 @@ import unittest
 
 from numpy import arange
 from workouts.wo_3d_point_distribution import plot3d
-from workouts.wo_abstol_runtime import comp_Clt_vs_cltRep_runtimes
+from workouts.wo_abstol_runtime import plot_abstol_runtime
 from workouts.wo_asian_option import test_distributions_asian_option
 from workouts.wo_customizations import quick_construct_integrand
 from workouts.wo_keister import test_distributions_keister
+from workouts.wo_plot_discrete_distribs import iid_scatters, lds_scatters
 
 
 class Test_Workouts(unittest.TestCase):
+
     def test_3d_point_distribution(self):
         plot3d()
 
     def test_abstol_runtime(self):
-        comp_Clt_vs_cltRep_runtimes(abstols=arange(0.1, 0.3, 0.1))
+        plot_abstol_runtime()
 
     def test_asian_option(self):
         time_vec = [
@@ -28,3 +30,6 @@ class Test_Workouts(unittest.TestCase):
 
     def test_custom_customs(self):
         quick_construct_integrand(abs_tol=.1)
+
+
+

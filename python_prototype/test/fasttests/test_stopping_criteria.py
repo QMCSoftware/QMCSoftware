@@ -6,16 +6,16 @@ from qmcpy.stopping_criterion import CLT, CLTRep
 from qmcpy.true_measure import Gaussian
 
 
-class Test_CLT(unittest.TestCase):
+class TestClt(unittest.TestCase):
 
-    def test_raise_DistributionCompatibilityError(self):
+    def test_raise_distribution_compatibility_error(self):
         self.assertRaises(DistributionCompatibilityError, CLT, Lattice(),
                           Gaussian(3))
 
 
-class Test_CLTRep(unittest.TestCase):
+class TestCltRep(unittest.TestCase):
 
-    def test_raise_DistributionCompatibilityError(self):
+    def test_raise_distribution_compatibility_error(self):
         self.assertRaises(DistributionCompatibilityError, CLTRep,
                           IIDStdGaussian(), Gaussian(3))
 

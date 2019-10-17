@@ -1,8 +1,9 @@
 """ Definition for abstract class AccumData """
 
 from abc import ABC, abstractmethod
+from math import inf, nan
+
 from numpy import array
-from math import nan, inf
 
 from .._util import univ_repr
 
@@ -24,9 +25,9 @@ class AccumData(ABC):
         super().__init__()
         self.solution = nan  # solution
         self.stage = "begin"
-        self.n_prev = array([])
+        self._n_prev = array([])
         # new data will be based on (quasi-)random vectors indexed by.
-        self.n_next = array([])  # n_prev + 1 to n_next.
+        self._n_next = array([])  # _n_prev + 1 to _n_next.
         self.n_samples_total = array([])
         self.confid_int = array([-inf, inf])
         self.time_total = None
@@ -72,12 +73,12 @@ class AccumData(ABC):
                                     str(self.n_samples_total))
         attrs_vals_str += item_f % ("time_total", self.time_total)
         attrs_vals_str += item_s % ("confid_int", str(self.confid_int))
-        print(attrs_vals_str[:-1]+'\n')
-    
+        print(attrs_vals_str[:-1] + '\n')
+
     def __repr__(self):
         return univ_repr(self)
 
-        
+
 # API
 from .mean_var_data import MeanVarData
 from .mean_var_data_rep import MeanVarDataRep

@@ -6,6 +6,7 @@ from qmcpy.integrand import Keister
 
 random.seed(7)
 
+
 def plot3d():
     # Compute n_total and mu_hat for each epsilon with a cooresponding plot
     '''
@@ -18,13 +19,16 @@ def plot3d():
     sys.exit(0)
     '''
 
+    mpl_plt.cla()  # Clear axis
+    mpl_plt.clf()  # Clear figure
+
     # Constants based on running the above CLT Example
     eps_list = [.5, .4, .3]
     n_list = [50, 68, 109]
-    muHat_list = [1.876, 1.806, 1.883]
+    mu_hat_list = [1.876, 1.806, 1.883]
 
     fun = Keister()
-    colors = ["r", "b", "g"]
+    #colors = ["r", "b", "g"]
     n = 32
 
     # Function Points
@@ -51,14 +55,14 @@ def plot3d():
         ax.plot_surface(x_surf, y_surf, z_surf, cmap="winter", alpha=.2)
         # Scatters
         points = zeros((n, 3))
-        points[:, :2] = random.randn(n, 2)*sqrt(1/2)
+        points[:, :2] = random.randn(n, 2) * sqrt(1 / 2)
         points[:, 2] = fun.g(points[:, :2])
         ax.scatter(points[:, 0], points[:, 1], points[:, 2], color="r", s=5)
         n = n_list[idx]
         epsilon = eps_list[idx]
-        mu = muHat_list[idx]
+        mu = mu_hat_list[idx]
         ax.scatter(points[:, 0], points[:, 1], points[:, 2], color="r", s=5)
-        ax.set_title("\t$\epsilon$ = %-7.1f $n$ = %-7d $\hat{\mu}$ = %-7.2f "
+        ax.set_title("\t$\\epsilon$ = %-7.1f $n$ = %-7d $\\hat{\\mu}$ = %-7.2f "
                      % (epsilon, n, mu), fontdict={"fontsize": 14})
         # axis metas
         n *= 2
@@ -74,6 +78,7 @@ def plot3d():
     mpl_plt.savefig("outputs/Three_3d_SurfaceScatters.png",
                     dpi=500, bbox_inches="tight", pad_inches=.15)
     mpl_plt.show(block=False)
+
 
 if __name__ == "__main__":
     plot3d()

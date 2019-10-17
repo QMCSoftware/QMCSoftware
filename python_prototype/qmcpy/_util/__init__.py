@@ -1,27 +1,28 @@
 """ Utility methods. Not meant for public use """
 
 
-def univ_repr(object, attributes=None):
-    """Clean way to represent object data.
+def univ_repr(qmc_object, attributes=None):
+    """Clean way to represent qmc_object data.
 
     Note: ::
 
-        print(object)
+        print(qmc_object)
 
     is equivalent to ::
 
-        print(object.__repr__())
+        print(qmc_object.__repr__())
 
     Args:
-        object: an object instance
-        attributes: list of object attribute names whose values are to be gathered
+        qmc_object: an qmc_object instance
+        attributes: list of qmc_object attribute names whose values are to be
+        gathered
 
     Returns:
         str
 
     """
-    key_val = "%s object with properties:\n" % (type(object).__name__)
-    for key, val in object.__dict__.items():
+    key_val = "%s qmc_object with properties:\n" % (type(qmc_object).__name__)
+    for key, val in qmc_object.__dict__.items():
         if str(key) != attributes:
             key_val += "%4s%s: %s\n" % (
                 "",
@@ -33,7 +34,7 @@ def univ_repr(object, attributes=None):
 
     # print list of subObject with properties
     key_val += "    %s:\n" % (attributes)
-    for i, sub_obj in enumerate(object):
+    for i, sub_obj in enumerate(qmc_object):
         key_val += "%8s%s[%d] with properties:\n" % ("", attributes, i)
         for key, val in sub_obj.__dict__.items():
             if str(key) != attributes:
@@ -64,7 +65,7 @@ def summarize(stopping_criterion=None, measure=None, integrand=None, distributio
         stopping_criterion.summarize()
     if not data is None:
         data.summarize()
-    return
+
 
 
 # API

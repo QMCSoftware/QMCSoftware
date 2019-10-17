@@ -32,6 +32,8 @@ def lds_scatters():
     """
     Plot shifted latice and scrambled Sobol sampling points in unit square.
     """
+    plt.cla()
+    plt.clf()
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(12, 5))
     for i, (distrib, color) in enumerate(
             zip([Lattice(rng_seed=7), Sobol(rng_seed=7)], ['g', 'c'])):
@@ -45,7 +47,6 @@ def lds_scatters():
     plt.tight_layout()
     plt.show(block=False)
     fig.savefig('outputs/scatters_lds.png', dpi=200)
-
 
 if __name__ == '__main__':
     iid_scatters()

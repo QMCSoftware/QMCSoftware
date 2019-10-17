@@ -85,14 +85,17 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quasi-Monte Carlo Community Software</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#qmcpy">qmcpy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qmcpy">QMCPy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#workouts">workouts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#test">test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#outputs">outputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#demos">demos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sphinx">sphinx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#citation">Citation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#developers">Developers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contributors">Contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#acknowledgment">Acknowledgment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tips">Tips</a></li>
 </ul>
 </li>
@@ -168,7 +171,7 @@
 <p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
 <hr></div>
 <div class="section" id="qmcpy">
-<h2>qmcpy<a class="headerlink" href="#qmcpy" title="Permalink to this headline">¶</a></h2>
+<h2>QMCPy<a class="headerlink" href="#qmcpy" title="Permalink to this headline">¶</a></h2>
 <p><span class="raw-html-m2r"><b>Quasi-Monte Carlo software package with components in python 3</b></span><span class="raw-html-m2r"><br></span>
 <span class="raw-html-m2r"><b>Components:</b></span></p>
 <ul class="simple">
@@ -183,7 +186,7 @@
 <hr></div>
 <div class="section" id="workouts">
 <h2>workouts<a class="headerlink" href="#workouts" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Example uses of qmcpy package</b></span><span class="raw-html-m2r"><br></span>
+<p><span class="raw-html-m2r"><b>Example uses of QMCPy package</b></span><span class="raw-html-m2r"><br></span>
 <span class="raw-html-m2r"><b>Available workouts:</b></span></p>
 <ul class="simple">
 <li><p>Generate 3d distribution sample visualization</p></li>
@@ -207,29 +210,44 @@
 <hr></div>
 <div class="section" id="demos">
 <h2>demos<a class="headerlink" href="#demos" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Example use of qmcpy as an independent package</b></span></p>
+<p><span class="raw-html-m2r"><b>Example use of QMCPy as an independent package</b></span></p>
 <hr></div>
 <div class="section" id="sphinx">
 <h2>sphinx<a class="headerlink" href="#sphinx" title="Permalink to this headline">¶</a></h2>
 <p><span class="raw-html-m2r"><b>Automated project documentation</b></span></p>
-<p><span class="raw-html-m2r"><hr></span></p>
+<hr></div>
+<div class="section" id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h2>
+<p>If you find QMCPy helpful in your work, please support us by citing the
+following work:</p>
+<p>Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin,
+“QMC  Community Software.” Python software, 2019. Work in progress.
+Available on <a class="reference external" href="https://github.com/QMCSoftware/QMCSoftware">GitHub</a></p>
 <hr></div>
 <div class="section" id="developers">
 <h2>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h2>
-<p>This package was originally developed in MATLAB by Fred J. Hickernell.<span class="raw-html-m2r"><br></span>
-Translated to Python by Sou-Cheng T. Choi and Aleksei Sorokin.</p>
-<p>If you find Qmcpy helpful in your work, please support us by citing the
-following work:</p>
-<p>Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community Software.” MATLAB and Python 3
-software, 2019. Work in progress. Available on <a class="reference external" href="https://github.com/QMCSoftware/QMCSoftware">GitHub</a></p>
+<ul class="simple">
+<li><p>Sou-Cheng T. Choi</p></li>
+<li><p>Fred J. Hickernell</p></li>
+<li><p>Aleksei Sorokin</p></li>
+</ul>
 <hr></div>
 <div class="section" id="contributors">
 <h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
-<p>Dirk Nuyens Magic Point Shop</p>
-<ul class="simple">
-<li><p>qmcpy/distribution/magic_point_shop</p></li>
-<li><p>F.Y. Kuo &amp; D. Nuyens. Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients - a survey of analysis and implementation, Foundations of Computational Mathematics, 16(6):1631-1696, 2016. (<a class="reference external" href="https://link.springer.com/article/10.1007/s10208-016-9329-5">springer link</a>, <a class="reference external" href="https://arxiv.org/abs/1606.06613">arxiv link</a>)</p></li>
-</ul>
+</div>
+<div class="section" id="acknowledgment">
+<h2>Acknowledgment<a class="headerlink" href="#acknowledgment" title="Permalink to this headline">¶</a></h2>
+<p>We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.</p>
+<hr></div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>F.Y. Kuo &amp; D. Nuyens. Application of quasi-Monte Carlo methods to elliptic
+PDEs with random diffusion coefficients - a survey of analysis and
+implementation, Foundations of Computational Mathematics, 16(6):1631-1696, 2016.
+(<a class="reference external" href="https://link.springer.com/article/10.1007/s10208-016-9329-5">springer link</a>,
+<a class="reference external" href="https://arxiv.org/abs/1606.06613">arxiv link</a>)</p></li>
+</ol>
 <hr></div>
 <div class="section" id="tips">
 <h2>Tips<a class="headerlink" href="#tips" title="Permalink to this headline">¶</a></h2>

@@ -47,7 +47,7 @@ class StoppingCriterion(ABC):
         attrs_vals_str += item_f % ("inflate", self.inflate)
         attrs_vals_str += item_f % ("alpha", self.alpha)
         print(attrs_vals_str[:-2])
-    
+
     def __repr__(self):
         return univ_repr(self)
 

@@ -8,8 +8,8 @@ from qmcpy.stopping_criterion import CLT
 
 
 def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion=None):
-    """Specify and compute integral of :math:`f(\\mathbf{x})` for \
-    :math:`\\mathbf{x} \\in \\mathcal{X}`.
+    """Specify and compute integral of :math:`f(\\boldsymbol{x})` for \
+    :math:`\\boldsymbol{x} \\in \\mathcal{X}`.
 
     Args:
         integrand (Integrand): an object from class Integrand
@@ -31,7 +31,8 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
 
     # Default some arguments
     if not discrete_distrib: discrete_distrib = IIDStdUniform()
-    if not stopping_criterion: stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.01)
+    if not stopping_criterion:
+        stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.01)
 
     t_start = time()
     # Transform integrands to accept distribution values which can generate

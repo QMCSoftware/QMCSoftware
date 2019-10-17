@@ -8,9 +8,9 @@ from . import Integrand
 class Keister(Integrand):
     """
     Specify and generate values \
-    :math:`f(\\mathbf{x}) = \\pi^{d/2} \\cos(\| \\mathbf{x} \|)` for \
-    :math:`\\mathbf{x} \\in \\mathbb{R}^d`.
-    
+    :math:`f(\\boldsymbol{x}) = \\pi^{d/2} \\cos(\| \\boldsymbol{x} \|)` for \
+    :math:`\\boldsymbol{x} \\in \\mathbb{R}^d`.
+
     The standard example integrates the Keister integrand with respect to an \
     IID Gaussian distribution with variance 1/2.
 
@@ -28,13 +28,13 @@ class Keister(Integrand):
         Original integrand to be integrated
 
         Args:
-            x: nodes, :math:`\\mathbf{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
+            x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
                 row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
 
         Returns:
             :math:`n \\cdot p` matrix with values \
-            :math:`f(\\mathbf{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
-            :math:`\\mathbf{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, then \
+            :math:`f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
+            :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, then \
             :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, and \
             :math:`x'_{ij} = c` otherwise
         """
