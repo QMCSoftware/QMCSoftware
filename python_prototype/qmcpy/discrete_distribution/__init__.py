@@ -17,17 +17,17 @@ class DiscreteDistribution(ABC):
         self.mimics = mimics
 
     @abstractmethod
-    def gen_samples(self, j, n, m):
+    def gen_samples(self, r, n, d):
         """
-        Generate j nxm samples from the true-distribution
+        Generate r nxd IID Standard Gaussian samples
 
         Args:
-            j (int): Number of nxm matrices to generate (sample.size()[0])
+            r (int): Number of nxd matrices to generate (sample.size()[0])
             n (int): Number of observations (sample.size()[1])
-            m (int): Number of dimensions (sample.size()[2])
+            d (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            jxnxm (numpy array)
+            rxnxd (numpy array)
         """
         return
 

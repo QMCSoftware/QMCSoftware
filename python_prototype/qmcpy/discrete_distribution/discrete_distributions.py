@@ -19,19 +19,19 @@ class IIDStdUniform(DiscreteDistribution):
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
     
-    def gen_samples(self, j, n, m):
+    def gen_samples(self, r, n, d):
         """
-        Generate j nxm IID Standard Uniform samples
+        Generate r nxd IID Standard Uniform samples
 
         Args:
-            j (int): Number of nxm matrices to generate (sample.size()[0])
+            r (int): Number of nxd matrices to generate (sample.size()[0])
             n (int): Number of observations (sample.size()[1])
-            m (int): Number of dimensions (sample.size()[2])
+            d (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            jxnxm (numpy array)
+            rxnxd (numpy array)
         """
-        return self.rng.uniform(0, 1, (j,n,m))
+        return self.rng.uniform(0, 1, (r,n,d))
 
 class IIDStdGaussian(DiscreteDistribution):
     """ Standard Gaussian """
@@ -44,19 +44,19 @@ class IIDStdGaussian(DiscreteDistribution):
         super().__init__(mimics='StdGaussian')
         self.rng = Generator(PCG64(rng_seed))
 
-    def gen_samples(self, j, n, m):
+    def gen_samples(self, r, n, d):
         """
-        Generate j nxm IID Standard Gaussian samples
+        Generate r nxd IID Standard Gaussian samples
 
         Args:
-            j (int): Number of nxm matrices to generate (sample.size()[0])
+            r (int): Number of nxd matrices to generate (sample.size()[0])
             n (int): Number of observations (sample.size()[1])
-            m (int): Number of dimensions (sample.size()[2])
+            d (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            jxnxm (numpy array)
+            rxnxd (numpy array)
         """
-        return self.rng.standard_normal((j,n,m))
+        return self.rng.standard_normal((r,n,d))
 
 class Lattice(DiscreteDistribution):
     """ Quasi-Random Lattice low discrepancy sequence (Base 2) """
@@ -69,22 +69,22 @@ class Lattice(DiscreteDistribution):
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
 
-    def gen_samples(self, j, n, m):
+    def gen_samples(self, r, n, d):
         """
-        Generate j nxm Lattice samples
+        Generate r nxd Lattice samples
 
         Args:
-            j (int): Number of nxm matrices to generate (sample.size()[0])
+            r (int): Number of nxd matrices to generate (sample.size()[0])
             n (int): Number of observations (sample.size()[1])
-            m (int): Number of dimensions (sample.size()[2])
+            d (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            jxnxm (numpy array)
+            rxnxd (numpy array)
         """
-        x = array([row for row in LatticeSeq(m=int(log(n) / log(2)), s=m)])
+        x = array([row for row in LatticeSeq(m=int(log(n) / log(2)), s=d)])
         # generate jxnxm data
-        shifts = random.rand(j, m)
-        x_rs = array([(x + self.rng.uniform(0,1,m)) % 1 for shift in shifts])
+        shifts = random.rand(r, d)
+        x_rs = array([(x + self.rng.uniform(0,1,d)) % 1 for shift in shifts])
         # randomly shift each nxm sample
         return x_rs
 
@@ -99,24 +99,24 @@ class Sobol(DiscreteDistribution):
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
 
-    def gen_samples(self, j, n, m):
+    def gen_samples(self, r, n, d):
         """
-        Generate j nxm Sobol samples
+        Generate r nxd Sobol samples
 
         Args:
-            j (int): Number of nxm matrices to generate (sample.size()[0])
+            r (int): Number of nxd matrices to generate (sample.size()[0])
             n (int): Number of observations (sample.size()[1])
-            m (int): Number of dimensions (sample.size()[2])
+            d (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            jxnxm (numpy array)
+            rxnxd (numpy array)
         """
-        gen = DigitalSeq(Cs='sobol_Cs.col', m=int(log(n) / log(2)), s=m)
+        gen = DigitalSeq(Cs='sobol_Cs.col', m=int(log(n) / log(2)), s=d)
         t = max(32, gen.t)  # we guarantee a depth of >=32 bits for shift
         ct = max(0, t - gen.t)  # correction factor to scale the integers
-        shifts = self.rng.integers(0, 2 ** t, (j,m), dtype=int64)
+        shifts = self.rng.integers(0, 2 ** t, (r,d), dtype=int64)
         # generate random shift
-        x = zeros((n, m), dtype=int64)
+        x = zeros((n, d), dtype=int64)
         for i, _ in enumerate(gen):
             x[i, :] = gen.cur  # set each nxm
         x_rs = array([(shift ^ (x * 2 ** ct)) / 2. ** t for shift in
