@@ -1,7 +1,7 @@
 """ This module implements mutiple subclasses of DiscreteDistribution. """
 
 from numpy import array, int64, log, random, arange, zeros
-from numpy.random import Generator,PCG64
+from numpy.random import Generator, PCG64
 
 from . import DiscreteDistribution
 from qmcpy.third_party.magic_point_shop import LatticeSeq
@@ -15,10 +15,10 @@ class IIDStdUniform(DiscreteDistribution):
         """
         Args:
             rng_seed (int): seed the random number generator for reproducibility
-        """ 
+        """
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
-    
+
     def gen_samples(self, j, n, m):
         """
         Generate j nxm IID Standard Uniform samples
@@ -31,7 +31,8 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             jxnxm (numpy array)
         """
-        return self.rng.uniform(0, 1, (j,n,m))
+        return self.rng.uniform(0, 1, (j, n, m))
+
 
 class IIDStdGaussian(DiscreteDistribution):
     """ Standard Gaussian """
@@ -40,7 +41,7 @@ class IIDStdGaussian(DiscreteDistribution):
         """
         Args:
             rng_seed (int): seed the random number generator for reproducibility
-        """ 
+        """
         super().__init__(mimics='StdGaussian')
         self.rng = Generator(PCG64(rng_seed))
 
@@ -56,7 +57,8 @@ class IIDStdGaussian(DiscreteDistribution):
         Returns:
             jxnxm (numpy array)
         """
-        return self.rng.standard_normal((j,n,m))
+        return self.rng.standard_normal((j, n, m))
+
 
 class Lattice(DiscreteDistribution):
     """ Quasi-Random Lattice low discrepancy sequence (Base 2) """
@@ -65,7 +67,7 @@ class Lattice(DiscreteDistribution):
         """
         Args:
             rng_seed (int): seed the random number generator for reproducibility
-        """ 
+        """
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
 
@@ -84,9 +86,10 @@ class Lattice(DiscreteDistribution):
         x = array([row for row in LatticeSeq(m=int(log(n) / log(2)), s=m)])
         # generate jxnxm data
         shifts = random.rand(j, m)
-        x_rs = array([(x + self.rng.uniform(0,1,m)) % 1 for shift in shifts])
+        x_rs = array([(x + self.rng.uniform(0, 1, m)) % 1 for shift in shifts])
         # randomly shift each nxm sample
         return x_rs
+
 
 class Sobol(DiscreteDistribution):
     """ Quasi-Random Sobol low discrepancy sequence (Base 2) """
@@ -95,7 +98,7 @@ class Sobol(DiscreteDistribution):
         """
         Args:
             rng_seed (int): seed the random number generator for reproducibility
-        """ 
+        """
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
 
@@ -114,7 +117,7 @@ class Sobol(DiscreteDistribution):
         gen = DigitalSeq(Cs='sobol_Cs.col', m=int(log(n) / log(2)), s=m)
         t = max(32, gen.t)  # we guarantee a depth of >=32 bits for shift
         ct = max(0, t - gen.t)  # correction factor to scale the integers
-        shifts = self.rng.integers(0, 2 ** t, (j,m), dtype=int64)
+        shifts = self.rng.integers(0, 2 ** t, (j, m), dtype=int64)
         # generate random shift
         x = zeros((n, m), dtype=int64)
         for i, _ in enumerate(gen):

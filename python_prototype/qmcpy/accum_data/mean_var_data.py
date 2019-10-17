@@ -38,11 +38,10 @@ class MeanVarData(AccumData):
         Returns:
             None
         """
-        for i in range(len(integrand)):
+        for i, func in enumerate(integrand):
             t_start = process_time()  # time the integrand values
-            set_x = true_measure[i].gen_true_measure_samples(
-                1, self.n_next[i]).squeeze()
-            y = integrand[i].g(set_x)
+            set_x = true_measure[i].gen_true_measure_samples(1, self._n_next[i]).squeeze()
+            y = func.g(set_x)
             self.t_eval[i] = max(process_time() - t_start, EPS)
             # for multi-level methods
             self.sighat[i] = std(y)  # compute the sample standard deviation

@@ -50,15 +50,16 @@ class Test_Lattice(unittest.TestCase):
         with self.subTest():
             self.assertEqual(samples.shape, (1, 2, 3))
 
-    def test_backend_Lattice(self):
+    def test_backend_lattice(self):
         n, m = 4, 4
         array_not_shifted = array(
-            [row for row in LatticeSeq(m=int(log(n)/log(2)), s=m)])
+            [row for row in LatticeSeq(m=int(log(n) / log(2)), s=m)])
         true_array = array([[0, 0, 0, 0],
-                            [1/2, 1/2, 1/2, 1/2],
-                            [1/4, 3/4, 3/4, 1/4],
-                            [3/4, 1/4, 1/4, 3/4]])
+                            [1 / 2, 1 / 2, 1 / 2, 1 / 2],
+                            [1 / 4, 3 / 4, 3 / 4, 1 / 4],
+                            [3 / 4, 1 / 4, 1 / 4, 3 / 4]])
         self.assertTrue((array_not_shifted.squeeze() == true_array).all())
+
 
 class Test_Sobol(unittest.TestCase):
 
@@ -74,7 +75,7 @@ class Test_Sobol(unittest.TestCase):
         with self.subTest():
             self.assertEqual(samples.shape, (1, 2, 3))
 
-    def test_backend_Sobol(self):
+    def test_backend_sobol(self):
         n, m = 4, 4
         gen = DigitalSeq(Cs="sobol_Cs.col", m=int(log(n) / log(2)), s=m)
         array_not_shifted = zeros((n, m), dtype=int64)

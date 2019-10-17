@@ -9,7 +9,7 @@ from qmcpy.stopping_criterion import CLT, CLTRep
 
 class IntegrationExampleTest(unittest.TestCase):
 
-    def test_Keister_2D(self):
+    def test_keister_2d(self):
         # IID Standard Uniform
         abs_tol = .1
         integrand = Keister()
@@ -22,7 +22,7 @@ class IntegrationExampleTest(unittest.TestCase):
         # N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]]
         self.assertTrue(abs(sol - true_value) < abs_tol)
 
-    def test_AsianOption_MultiLevel(self):
+    def test_asian_option_multiLevel(self):
         abs_tol = 0.1
         time_vec = [
             arange(1 / 4, 5 / 4, 1 / 4),

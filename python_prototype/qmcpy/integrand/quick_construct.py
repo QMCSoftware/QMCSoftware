@@ -13,7 +13,7 @@ class QuickConstruct(Integrand):
         Args:
             custom_fun (int): function pointer.
                 input to pointed to function:
-                    x: nodes, :math:`\\mathbf{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
+                    x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
                         row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
         """
         super().__init__()
