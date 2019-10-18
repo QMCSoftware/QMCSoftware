@@ -6,7 +6,7 @@ from qmcpy.discrete_distribution import IIDStdGaussian, IIDStdUniform
 from qmcpy.true_measure import Gaussian, Uniform
 
 
-class Test_TrueDistribution_construciton(unittest.TestCase):
+class TestTrueDistributionConstruciton(unittest.TestCase):
 
     def test_dimensions(self):
         true_measure = Gaussian(1)
@@ -29,12 +29,10 @@ class Test_TrueDistribution_construciton(unittest.TestCase):
         self.assertRaises(TransformError, true_measure.transform_generator,
                           discrete_distrib)
         true_measure.transform_generator(IIDStdGaussian())
-        self.assertRaises(TransformError,true_measure.gen_tm_samples,3,5)
-
-        
+        self.assertRaises(TransformError, true_measure.gen_tm_samples, 3, 5)
 
 
-class Test_Uniform(unittest.TestCase):
+class TestUniform(unittest.TestCase):
 
     def test_transforms(self):
         a, b = 1 / 4, 1 / 2
@@ -50,13 +48,13 @@ class Test_Uniform(unittest.TestCase):
         self.assertTrue((vals <= b).all() and (vals >= a).all())
 
 
-class Test_Gaussian(unittest.TestCase):
+class TestGaussian(unittest.TestCase):
 
     def test_transforms(self):
         pass
 
 
-class Test_BrownianMontion(unittest.TestCase):
+class TestBrownianMontion(unittest.TestCase):
 
     def test_transforms(self):
         pass

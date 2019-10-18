@@ -4,6 +4,7 @@ from qmcpy.discrete_distribution import IIDStdUniform
 from qmcpy.true_measure import Uniform
 from qmcpy.stopping_criterion import CLT
 
+
 def quick_construct_integrand(abs_tol):
     dim = 5
     integrand = QuickConstruct(custom_fun=lambda x: (5 * x).sum(1))
@@ -13,6 +14,7 @@ def quick_construct_integrand(abs_tol):
     sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     # exact_solution = dim*(5/2)
     data.summarize()
+
 
 if __name__ == "__main__":
     quick_construct_integrand(abs_tol=.01)

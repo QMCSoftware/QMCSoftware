@@ -8,7 +8,7 @@ from . import Integrand
 class Keister(Integrand):
     """
     Specify and generate values \
-    :math:`f(\\boldsymbol{x}) = \\pi^{d/2} \\cos(\| \\boldsymbol{x} \|)` for \
+    :math:`f(\\boldsymbol{x}) = \\pi^{d/2} \\cos(\\| \\boldsymbol{x} \\|)` for \
     :math:`\\boldsymbol{x} \\in \\mathbb{R}^d`.
 
     The standard example integrates the Keister integrand with respect to an \

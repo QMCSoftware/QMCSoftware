@@ -11,8 +11,9 @@ from qmcpy.integrand import AsianCall
 from qmcpy.stopping_criterion import CLT, CLTRep
 from qmcpy.true_measure import BrownianMotion
 
+
 def test_distributions_asian_option(time_vec, dim, abs_tol):
-    
+
     # IID Standard Uniform
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
@@ -45,6 +46,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
+
 if __name__ == '__main__':
     """ Singl-Level Asian Option Pricing """
     time_vec = [arange(1 / 64, 65 / 64, 1 / 64)]
@@ -58,4 +60,3 @@ if __name__ == '__main__':
         arange(1 / 64, 65 / 64, 1 / 64)]
     dim = [len(tv) for tv in time_vec]
     test_distributions_asian_option(time_vec, dim, abs_tol=.05)
-

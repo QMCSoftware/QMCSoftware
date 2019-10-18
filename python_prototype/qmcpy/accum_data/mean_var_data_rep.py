@@ -49,7 +49,7 @@ class MeanVarDataRep(AccumData):
                 continue  # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation
             set_x = true_measure[i].gen_tm_samples(
-                self.n_streams, self._n_next[i])
+                self.n_streams, self.n_next[i])
             for j in range(self.n_streams):
                 y = integrand[i].g(set_x[j])
                 # Evaluate transformed function

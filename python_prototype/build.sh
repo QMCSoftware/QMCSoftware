@@ -14,8 +14,7 @@ echo "Qmcpy build process starts..."
 echo "$(date)"
 
 # autopep8
-autopep8 . --in-place --recursive --ignore E402,E701 --exclude ./qmcpy/third_party/magic_point_shop --global-config ./setup.cfg
-
+autopep8 . --in-place --recursive --ignore E402,E701,E501,E123,E128,E121,E124,E711 --exclude ./qmcpy/third_party/magic_point_shop
 # pylint
 pylint --variable-rgx="[a-z0-9_]{1,30}$" **/.py
 pylint --variable-rgx="[a-z0-9_]{1,30}$" **/**/*.py

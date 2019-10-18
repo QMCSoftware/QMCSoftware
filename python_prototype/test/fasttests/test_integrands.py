@@ -5,20 +5,20 @@ from qmcpy.integrand import AsianCall, Keister, Linear
 from qmcpy.true_measure import BrownianMotion
 
 
-class Test_AsianCall(unittest.TestCase):
+class TestAsianCall(unittest.TestCase):
 
     def test_multi_level_construction(self):
         time_vector = [arange(1 / 4, 5 / 4, 1 / 4),
                        arange(1 / 64, 65 / 64, 1 / 64)]
         dims = [len(tv) for tv in time_vector]
-        measureObj = BrownianMotion(dims, time_vector=time_vector)
-        asf = AsianCall(bm_measure=measureObj)
+        measure_obj = BrownianMotion(dims, time_vector=time_vector)
+        asf = AsianCall(bm_measure=measure_obj)
         self.assertEqual(len(asf), 2)
         self.assertEqual(asf[0].dimension, 4)
         self.assertEqual(asf[1].dimension, 64)
 
 
-class Test_Keister(unittest.TestCase):
+class TestKeister(unittest.TestCase):
 
     def test_2d_construction(self):
         fun = Keister()
@@ -26,7 +26,7 @@ class Test_Keister(unittest.TestCase):
         self.assertEqual(fun[0].dimension, 2)
 
 
-class Test_Linear(unittest.TestCase):
+class TestLinear(unittest.TestCase):
 
     def test_2d_construction(self):
         fun = Linear()

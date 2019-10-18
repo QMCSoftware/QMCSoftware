@@ -84,23 +84,34 @@
               <p class="caption"><span class="caption-text">Contents</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quasi-Monte Carlo Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#citation">Citation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#developers">Developers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contributors">Contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#acknowledgment">Acknowledgment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#python-3-library-of-qmc-software">Python 3 Library of QMC Software</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#qmcpy">QMCPy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#workouts">workouts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#test">test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#outputs">outputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#demos">demos</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sphinx">sphinx</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#citation">Citation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#developers">Developers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#contributors">Contributors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#acknowledgment">Acknowledgment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tips">Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#qmcpy-overview">QMCPy Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#integrand">Integrand</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#true-measure">True Measure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discrete-distribution">Discrete Distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stopping-criterion">Stopping Criterion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#accumulate-data-class">Accumulate Data Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integrate-method">Integrate Method</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">QMCPy Documentation</a></li>
 </ul>
 
             
@@ -166,57 +177,8 @@
             
   <div class="section" id="quasi-monte-carlo-community-software">
 <h1>Quasi-Monte Carlo Community Software<a class="headerlink" href="#quasi-monte-carlo-community-software" title="Permalink to this headline">¶</a></h1>
-<hr><div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
-<hr></div>
-<div class="section" id="qmcpy">
-<h2>QMCPy<a class="headerlink" href="#qmcpy" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Quasi-Monte Carlo software package with components in python 3</b></span><span class="raw-html-m2r"><br></span>
-<span class="raw-html-m2r"><b>Components:</b></span></p>
-<ul class="simple">
-<li><p>Integrand classes</p></li>
-<li><p>True Measure classes</p></li>
-<li><p>Discrete Distribution classes</p></li>
-<li><p>Stopping Criterion classes</p></li>
-<li><p>Accumulate Data classes</p></li>
-<li><p>Third Party contributed classes</p></li>
-<li><p>integrate function</p></li>
-</ul>
-<hr></div>
-<div class="section" id="workouts">
-<h2>workouts<a class="headerlink" href="#workouts" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Example uses of QMCPy package</b></span><span class="raw-html-m2r"><br></span>
-<span class="raw-html-m2r"><b>Available workouts:</b></span></p>
-<ul class="simple">
-<li><p>Generate 3d distribution sample visualization</p></li>
-<li><p>Vary absolute tolerance for multi-level Asian Option Pricing example</p></li>
-<li><p>Asian option pricing examples with single and multi-level examples with varying discrete distributions</p></li>
-<li><p>Keister integrand examples with varying discrete distributions</p></li>
-</ul>
-<hr></div>
-<div class="section" id="test">
-<h2>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Unittests</b></span><span class="raw-html-m2r"><br></span>
-<span class="raw-html-m2r"><b>Testing sets:</b></span></p>
-<ul class="simple">
-<li><p>fast-tests: Quick unittests. Run in &lt; 1 second</p></li>
-<li><p>long-tests: Unittest that call workouts. Runs in &lt; 10 seconds</p></li>
-</ul>
-<hr></div>
-<div class="section" id="outputs">
-<h2>outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Logs and figures generated by workouts</b></span></p>
-<hr></div>
-<div class="section" id="demos">
-<h2>demos<a class="headerlink" href="#demos" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Example use of QMCPy as an independent package</b></span></p>
-<hr></div>
-<div class="section" id="sphinx">
-<h2>sphinx<a class="headerlink" href="#sphinx" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>Automated project documentation</b></span></p>
-<hr></div>
-<div class="section" id="citation">
+<hr><div class="section" id="citation">
 <h2>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h2>
 <p>If you find QMCPy helpful in your work, please support us by citing the
 following work:</p>
@@ -234,7 +196,8 @@ Available on <a class="reference external" href="https://github.com/QMCSoftware/
 <hr></div>
 <div class="section" id="contributors">
 <h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
-</div>
+<p>Michael McCourt</p>
+<hr></div>
 <div class="section" id="acknowledgment">
 <h2>Acknowledgment<a class="headerlink" href="#acknowledgment" title="Permalink to this headline">¶</a></h2>
 <p>We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.</p>
@@ -248,12 +211,126 @@ implementation, Foundations of Computational Mathematics, 16(6):1631-1696, 2016.
 (<a class="reference external" href="https://link.springer.com/article/10.1007/s10208-016-9329-5">springer link</a>,
 <a class="reference external" href="https://arxiv.org/abs/1606.06613">arxiv link</a>)</p></li>
 </ol>
+</div>
+</div>
+<div class="section" id="python-3-library-of-qmc-software">
+<h1>Python 3 Library of QMC Software<a class="headerlink" href="#python-3-library-of-qmc-software" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="qmcpy">
+<h2>QMCPy<a class="headerlink" href="#qmcpy" title="Permalink to this headline">¶</a></h2>
+<p>Package of main components<span class="raw-html-m2r"><br></span></p>
+<ul class="simple">
+<li><p>Integrand classes</p></li>
+<li><p>True Measure classes</p></li>
+<li><p>Discrete Distribution classes</p></li>
+<li><p>Stopping Criterion classes</p></li>
+<li><p>Accumulate Data classes</p></li>
+<li><p>Third Party contributed classes</p></li>
+<li><p>integrate function</p></li>
+</ul>
 <hr></div>
-<div class="section" id="tips">
-<h2>Tips<a class="headerlink" href="#tips" title="Permalink to this headline">¶</a></h2>
-<p>It may be helpful to create a virtual environment for this project.<span class="raw-html-m2r"><br></span>
-Packages and versions are maintained in requirements.txt.<span class="raw-html-m2r"><br></span>
-In order for the software to find packages, make sure …/python_prototypes/ is in your path.</p>
+<div class="section" id="workouts">
+<h2>workouts<a class="headerlink" href="#workouts" title="Permalink to this headline">¶</a></h2>
+<p>Example uses of QMCPy package<span class="raw-html-m2r"><br></span></p>
+<hr></div>
+<div class="section" id="test">
+<h2>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h2>
+<p>Sets of long and short unittests<span class="raw-html-m2r"><br></span></p>
+<hr></div>
+<div class="section" id="outputs">
+<h2>outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h2>
+<p>Logs and figures generated by workouts</p>
+<hr></div>
+<div class="section" id="demos">
+<h2>demos<a class="headerlink" href="#demos" title="Permalink to this headline">¶</a></h2>
+<p>Example use of QMCPy as an independent package</p>
+<hr></div>
+<div class="section" id="sphinx">
+<h2>sphinx<a class="headerlink" href="#sphinx" title="Permalink to this headline">¶</a></h2>
+<p>Automated project documentation</p>
+<hr></div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">qmcpy</span>
+</pre></div>
+</div>
+<p>A virtual environment is recommended for developers/contributors<span class="raw-html-m2r"><br></span>
+Ensure <em>…/python_prototypes/</em> is in your path<span class="raw-html-m2r"><br></span>
+Install dependencies with<span class="raw-html-m2r"><br></span></p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="qmcpy-overview">
+<h1>QMCPy Overview<a class="headerlink" href="#qmcpy-overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="integrand">
+<h2>Integrand<a class="headerlink" href="#integrand" title="Permalink to this headline">¶</a></h2>
+<p>The function to integrate<span class="raw-html-m2r"><br></span>
+<em>Abstract class with concrete implementations</em></p>
+<ul class="simple">
+<li><p>Linear: $:: y<em>i = sum</em>{j=0}^{d-1}(x_{ij})$</p></li>
+<li><p>Keister: $:: y_i = pi^{d/2} * cos(||x_i||_2)$</p></li>
+<li><p>Asian Call</p>
+<ul>
+<li><p>$S_i(t_j)=S(0)e^{(r-frac{sigma^2}{2})t_j+sigmamathcal{B}(t_j)}$</p></li>
+<li><p>discounted call payoff $= max(:frac{1}{d}sum_{j=0}^{d-1} S(jT/d)-K);,: 0)$</p></li>
+<li><p>discounted put payoff $= max(:K-frac{1}{d}sum_{j=0}^{d-1} S(jT/d));,: 0)$</p></li>
+</ul>
+</li>
+</ul>
+<hr></div>
+<div class="section" id="true-measure">
+<h2>True Measure<a class="headerlink" href="#true-measure" title="Permalink to this headline">¶</a></h2>
+<p>General measure used to define the integrand<span class="raw-html-m2r"><br></span>
+<em>Abstract class with concrete implementations</em></p>
+<ul class="simple">
+<li><p>Uniform:$:: mathcal{U}(a,b)$</p></li>
+<li><p>Gaussian: $:: mathcal{N}(mu,sigma^2)$</p></li>
+<li><p>Brownian Motion: $:: mathcal{B}(t<em>j)=B(t</em>{j-1})+Z_jsqrt{t<em>j-t</em>{j-1}} ;$ for $;Z_j sim mathcal{N}(0,1)$</p></li>
+</ul>
+<hr></div>
+<div class="section" id="discrete-distribution">
+<h2>Discrete Distribution<a class="headerlink" href="#discrete-distribution" title="Permalink to this headline">¶</a></h2>
+<p>Sampling nodes iid or lds (low-discrepancy sequence)<span class="raw-html-m2r"><br></span>
+<em>Abstract class with concrete implementations</em></p>
+<ul class="simple">
+<li><p>IID Standard Uniform: $:: x_j overset{iid}{sim}   mathcal{U}(0,1)$</p></li>
+<li><p>IID Standard Gaussian: $:: x_j overset{iid}{sim}   mathcal{N}(0,1)$</p></li>
+<li><p>Lattice (base 2): $:: x_j  overset{lds}{sim}    mathcal{U}(0,1)$</p></li>
+<li><p>Sobol (base 2): $:: x_j overset{lds}{sim}    mathcal{U}(0,1)$</p></li>
+</ul>
+<hr></div>
+<div class="section" id="stopping-criterion">
+<h2>Stopping Criterion<a class="headerlink" href="#stopping-criterion" title="Permalink to this headline">¶</a></h2>
+<p>The stopping criterion to determine sufficient approximation<span class="raw-html-m2r"><br></span>
+<em>Abstract class with concrete implementations</em>
+<span class="raw-html-m2r"><br></span><span class="raw-html-m2r"><b>Central Limit Theorem (CLT)</b></span><span class="raw-html-m2r"><br></span>
+$; hat{mu}_n = overline{Y}_n approxmathcal{N}(mu,frac{sigma^2}{n})$<span class="raw-html-m2r"><br></span>
+$; mathbb{P}[hat{mu}<em>n-frac{mathcal{Z}</em>{alpha/2}hat{sigma}_n}{sqrt{n}} leq mu leq hat{mu}<em>n+frac{mathcal{Z}</em>{alpha/2}hat{sigma}_n}{sqrt{n}}] approx 1-alpha$</p>
+<ul class="simple">
+<li><p>CLT for $x_isim$ iid</p></li>
+<li><p>CLT Repeated for ${x<em>{r,i}}</em>{r=1}^R sim$ lds</p></li>
+</ul>
+<hr></div>
+<div class="section" id="accumulate-data-class">
+<h2>Accumulate Data Class<a class="headerlink" href="#accumulate-data-class" title="Permalink to this headline">¶</a></h2>
+<p>Stores data values of corresponding  stopping criterion procedure<span class="raw-html-m2r"><br></span>
+<em>Abstract class with concrete implementations</em></p>
+<ul class="simple">
+<li><p>Mean Variance Data (Controlled by CLT)</p></li>
+<li><p>Mean Variance Repeated Data (Controlled by CLT Repeated)</p></li>
+</ul>
+<hr></div>
+<div class="section" id="integrate-method">
+<h2>Integrate Method<a class="headerlink" href="#integrate-method" title="Permalink to this headline">¶</a></h2>
+<p>Repeatedly samples the integrand at nodes generated by the discrete distribution and transformed to mimic the integrand’s true measure until the Stopping Criterion is met<span class="raw-html-m2r"><br></span>
+<em>Function with arguments:</em></p>
+<ul class="simple">
+<li><p>Integrand object</p></li>
+<li><p>True Measure object</p></li>
+<li><p>Discrete Distribution object</p></li>
+<li><p>Stopping Criterion object</p></li>
+</ul>
 </div>
 </div>
 

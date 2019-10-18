@@ -1,5 +1,5 @@
-Algorithms
-==========
+QMCPy Documentation
+===================
 
 Integration Method
 ------------------
@@ -49,7 +49,7 @@ Discrete Distribution Class
 .. automodule:: qmcpy.discrete_distribution
     :members:
 
-.. automodule:: qmcpy.discrete_distribution.discrete_distributions
+.. automodule:: qmcpy.discrete_distribution.distributions
     :members:
 
 

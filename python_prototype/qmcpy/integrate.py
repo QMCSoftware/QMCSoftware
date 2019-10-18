@@ -1,4 +1,4 @@
-""" Main driver function for Qmcpy """
+""" Main driver function for QMCPy. """
 
 import copy
 from time import time
@@ -13,8 +13,8 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
 
     Args:
         integrand (Integrand): an object from class Integrand
-        measure (Measure): an object from class Measure
-        distribution (DiscreteDistribution): an object from class \
+        true_measure (TrueMeasure): an object from class TrueMeasure
+        discrete_distrib (DiscreteDistribution): an object from class \
             DiscreteDistribution
         stopping_criterion (StoppingCriterion): an object from class \
             StoppingCriterion

@@ -1,12 +1,13 @@
 import unittest
 
 from numpy import array, int64, log, ndarray, zeros
-from qmcpy.discrete_distribution import *
+from qmcpy.discrete_distribution import IIDStdUniform, IIDStdGaussian, \
+    Lattice, Sobol
 from qmcpy.discrete_distribution.digital_seq import DigitalSeq
 from qmcpy.third_party.magic_point_shop import LatticeSeq
 
 
-class Test_IIDStdUniform(unittest.TestCase):
+class TestIIDStdUniform(unittest.TestCase):
 
     def test_mimics(self):
         discrete_distrib = IIDStdUniform()
@@ -21,7 +22,7 @@ class Test_IIDStdUniform(unittest.TestCase):
             self.assertEqual(samples.shape, (1, 2, 3))
 
 
-class Test_IIDGaussian(unittest.TestCase):
+class TestIIDGaussian(unittest.TestCase):
 
     def test_mimics(self):
         discrete_distrib = IIDStdGaussian()
@@ -36,7 +37,7 @@ class Test_IIDGaussian(unittest.TestCase):
             self.assertEqual(samples.shape, (1, 2, 3))
 
 
-class Test_Lattice(unittest.TestCase):
+class TestLattice(unittest.TestCase):
 
     def test_mimics(self):
         discrete_distrib = Lattice()
@@ -61,7 +62,7 @@ class Test_Lattice(unittest.TestCase):
         self.assertTrue((array_not_shifted.squeeze() == true_array).all())
 
 
-class Test_Sobol(unittest.TestCase):
+class TestSobol(unittest.TestCase):
 
     def test_mimics(self):
         discrete_distrib = Sobol()
@@ -79,7 +80,7 @@ class Test_Sobol(unittest.TestCase):
         n, m = 4, 4
         gen = DigitalSeq(Cs="sobol_Cs.col", m=int(log(n) / log(2)), s=m)
         array_not_shifted = zeros((n, m), dtype=int64)
-        for i, row in enumerate(gen):
+        for i, _ in enumerate(gen):
             array_not_shifted[i, :] = gen.cur  # set each nxm
         true_array = array([[0, 0, 0, 0],
                             [2147483648, 2147483648, 2147483648, 2147483648],
