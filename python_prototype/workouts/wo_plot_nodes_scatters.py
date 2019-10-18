@@ -15,7 +15,7 @@ def iid_scatters():
     
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(11,6))
     for i,(dd_obj,color,lim,dd_name) in enumerate(zip(discrete_distribs,colors,lims,dd_names)): 
-        samples = dd_obj.gen_samples(1,n,2).squeeze()
+        samples = dd_obj.gen_dd_samples(1,n,2).squeeze()
         ax[i].scatter(samples[:,0],samples[:,1],color=color)
         ax[i].set_xlabel('$x_1$')
         ax[i].set_ylabel('$x_2$')
@@ -34,7 +34,7 @@ def lds_scatters():
     colors = ['g','c']
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(11,6))
     for i,(dd_obj,color,dd_name) in enumerate(zip(discrete_distribs,colors,dd_names)): 
-        samples = dd_obj.gen_samples(1,n,2).squeeze()
+        samples = dd_obj.gen_dd_samples(1,n,2).squeeze()
         ax[i].scatter(samples[:,0],samples[:,1],color=color)
         ax[i].set_xlabel('$x_1$')
         ax[i].set_ylabel('$x_2$')
@@ -60,7 +60,7 @@ def grid_transform_scatters():
             tm_obj = deepcopy(true_measure)
             dd_obj = deepcopy(discrete_distrib)
             tm_obj.transform_generator(dd_obj)
-            tm_samples = tm_obj[0].gen_true_measure_samples(1,n).squeeze()
+            tm_samples = tm_obj[0].gen_tm_samples(1,n).squeeze()
             ax[j].scatter(tm_samples[:,0],tm_samples[:,1],color=color)
             ax[j].set_xlabel('$x_1$')
             ax[j].set_ylabel('$x_2$')
@@ -93,7 +93,7 @@ def shift_stretch_sobol_scatters():
         tm_obj = deepcopy(true_measure)
         dd_obj = deepcopy(discrete_distrib)
         tm_obj.transform_generator(dd_obj)
-        tm_samples = tm_obj[0].gen_true_measure_samples(1,n).squeeze()
+        tm_samples = tm_obj[0].gen_tm_samples(1,n).squeeze()
         ax[i].scatter(tm_samples[:,0],tm_samples[:,1],color=color)
         ax[i].set_xlabel('$x_1$')
         ax[i].set_ylabel('$x_2$')

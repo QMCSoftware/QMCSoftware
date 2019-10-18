@@ -48,7 +48,7 @@ class MeanVarDataRep(AccumData):
             if self.flag[i] == 0:
                 continue  # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation
-            set_x = true_measure[i].gen_true_measure_samples(
+            set_x = true_measure[i].gen_tm_samples(
                 self.n_streams, self._n_next[i])
             for j in range(self.n_streams):
                 y = integrand[i].g(set_x[j])

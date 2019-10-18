@@ -4,7 +4,7 @@
 from ._util import DistributionCompatibilityError, summarize, univ_repr
 from .accum_data.mean_var_data import MeanVarData
 from .accum_data.mean_var_data_rep import MeanVarDataRep
-from .discrete_distribution.discrete_distributions import *
+from .discrete_distribution.distributions import *
 from .integrand.asian_call import AsianCall
 from .integrand.keister import Keister
 from .integrand.linear import Linear

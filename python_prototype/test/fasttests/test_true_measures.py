@@ -21,13 +21,17 @@ class Test_TrueDistribution_construciton(unittest.TestCase):
         self.assertEqual(true_measure[2].mu, 2)
         self.assertRaises(DimensionError, Gaussian, [1, 2, 3], [-1, 0])
 
-    def test_transform(self):
+    def test_transform_errors(self):
         discrete_distrib = IIDStdGaussian()
         discrete_distrib.mimics = 'Poisson'
         # Transform from poisson to Gaussion not implemented yet
         true_measure = Gaussian(2)
         self.assertRaises(TransformError, true_measure.transform_generator,
                           discrete_distrib)
+        true_measure.transform_generator(IIDStdGaussian())
+        self.assertRaises(TransformError,true_measure.gen_tm_samples,3,5)
+
+        
 
 
 class Test_Uniform(unittest.TestCase):
@@ -37,12 +41,12 @@ class Test_Uniform(unittest.TestCase):
         true_measure = Uniform(3, lower_bound=a, upper_bound=b)
         true_measure.transform_generator(IIDStdUniform())
         # IIDStdUniform -> Uniform(1/4,1/2)
-        vals = true_measure[0].gen_true_measure_samples(5, 4)
+        vals = true_measure[0].gen_tm_samples(5, 4)
         self.assertTrue((vals <= b).all() and (vals >= a).all())
         true_measure = Uniform(3, lower_bound=a, upper_bound=b)
         true_measure.transform_generator(IIDStdGaussian())
         # IIDStdGaussian -> Uniform(1/4,1/2)
-        vals = true_measure[0].gen_true_measure_samples(5, 4)
+        vals = true_measure[0].gen_tm_samples(5, 4)
         self.assertTrue((vals <= b).all() and (vals >= a).all())
 
 

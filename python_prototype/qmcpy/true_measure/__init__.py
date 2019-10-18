@@ -52,7 +52,7 @@ class TrueMeasure(ABC):
 
     def transform_generator(self, discrete_distrib):
         """
-        Create gen_true_measure_samples method,
+        Create gen_tm_samples method,
         a method that samples from the discrete_distribution
         and transforms to discrete distribution
 
@@ -65,9 +65,37 @@ class TrueMeasure(ABC):
                 raise TransformError(
                     'Cannot tranform %s to %s' % \
                         (type(discrete_distrib).__name__, type(self).__name__))
-            measure_i.gen_true_measure_samples = lambda n_streams, n_obs, self=measure_i: \
+            measure_i.gen_tm_samples = lambda r, n, self=measure_i: \
                 self.transforms[discrete_distrib.mimics](self,
-                    discrete_distrib.gen_samples(int(n_streams), int(n_obs), int(self.dimension)))
+                    discrete_distrib.gen_dd_samples(int(r), int(n), int(self.dimension)))
+    
+    def gen_tm_samples(self, r, n):
+        """
+        Generate r nxd samples mimicing the TrueMeasure (d = self.dimension inferred)
+        This method is a wrapper around gen_dd_samples that applies a transform to the result
+
+        Args:
+            r (int): Number of nxd matrices to generate (sample.size()[0])
+            n (int): Number of observations (sample.size()[1])
+            Inferred: d (int): Number of dimensions (sample.size()[2])
+
+        Returns:
+            rxnxd (numpy array)
+        
+        Note:
+            To initilize this method for each integrand call
+                    true_measure_obj.transform_generator(discrete_distrib_obj)
+            This method is not to be called directly on the original constructing object
+            Calls to this method should be from the i^th integrand
+                Example call: true_measure_obj[i].gen_tm_samples(n,r)
+
+        Raises: 
+            TransformError if this method is called on the original construcing TrueMeasure object
+        """
+        raise TransformError('To initilize this method for each integrand call:\n\t\
+                            true_measure_obj.transform_generator(discrete_distrib_obj)\n\
+                        To call this method for the ith integrand call:\n\t\
+                            true_measure_obj[i].gen_tm_samples(n,r)')
 
     def summarize(self):
         """ Print important attribute values """

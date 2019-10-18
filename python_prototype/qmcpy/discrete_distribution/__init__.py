@@ -18,7 +18,7 @@ class DiscreteDistribution(ABC):
         self.mimics = mimics
 
     @abstractmethod
-    def gen_samples(self, r, n, d):
+    def gen_dd_samples(self, r, n, d):
         """
         Generate r nxd IID Standard Gaussian samples
 
@@ -44,4 +44,4 @@ class DiscreteDistribution(ABC):
 
 # API
 from .digital_seq import DigitalSeq
-from .discrete_distributions import *
+from .distributions import *

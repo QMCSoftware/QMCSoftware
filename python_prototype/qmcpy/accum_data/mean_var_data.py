@@ -40,7 +40,7 @@ class MeanVarData(AccumData):
         """
         for i, func in enumerate(integrand):
             t_start = process_time()  # time the integrand values
-            set_x = true_measure[i].gen_true_measure_samples(1, self._n_next[i]).squeeze()
+            set_x = true_measure[i].gen_tm_samples(1, self._n_next[i]).squeeze()
             y = func.g(set_x)
             self.t_eval[i] = max(process_time() - t_start, EPS)
             # for multi-level methods

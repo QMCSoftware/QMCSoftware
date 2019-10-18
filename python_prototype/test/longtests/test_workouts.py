@@ -6,8 +6,6 @@ from workouts.wo_abstol_runtime import plot_abstol_runtime
 from workouts.wo_asian_option import test_distributions_asian_option
 from workouts.wo_customizations import quick_construct_integrand
 from workouts.wo_keister import test_distributions_keister
-from workouts.wo_plot_discrete_distribs import iid_scatters, lds_scatters
-
 
 class Test_Workouts(unittest.TestCase):
 
@@ -15,7 +13,7 @@ class Test_Workouts(unittest.TestCase):
         plot3d()
 
     def test_abstol_runtime(self):
-        plot_abstol_runtime()
+        plot_abstol_runtime(abstols=arange(.1,.4,.1))
 
     def test_asian_option(self):
         time_vec = [

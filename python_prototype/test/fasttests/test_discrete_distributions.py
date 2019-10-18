@@ -14,7 +14,7 @@ class Test_IIDStdUniform(unittest.TestCase):
 
     def test_gen_samples(self):
         discrete_distrib = IIDStdUniform()
-        samples = discrete_distrib.gen_samples(1, 2, 3)
+        samples = discrete_distrib.gen_dd_samples(1, 2, 3)
         with self.subTest():
             self.assertEqual(type(samples), ndarray)
         with self.subTest():
@@ -29,7 +29,7 @@ class Test_IIDGaussian(unittest.TestCase):
 
     def test_gen_samples(self):
         discrete_distrib = IIDStdGaussian()
-        samples = discrete_distrib.gen_samples(1, 2, 3)
+        samples = discrete_distrib.gen_dd_samples(1, 2, 3)
         with self.subTest():
             self.assertEqual(type(samples), ndarray)
         with self.subTest():
@@ -44,7 +44,7 @@ class Test_Lattice(unittest.TestCase):
 
     def test_gen_samples(self):
         discrete_distrib = Lattice()
-        samples = discrete_distrib.gen_samples(1, 2, 3)
+        samples = discrete_distrib.gen_dd_samples(1, 2, 3)
         with self.subTest():
             self.assertEqual(type(samples), ndarray)
         with self.subTest():
@@ -69,7 +69,7 @@ class Test_Sobol(unittest.TestCase):
 
     def test_gen_samples(self):
         discrete_distrib = Sobol()
-        samples = discrete_distrib.gen_samples(1, 2, 3)
+        samples = discrete_distrib.gen_dd_samples(1, 2, 3)
         with self.subTest():
             self.assertEqual(type(samples), ndarray)
         with self.subTest():

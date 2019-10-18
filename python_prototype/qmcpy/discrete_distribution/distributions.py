@@ -19,7 +19,7 @@ class IIDStdUniform(DiscreteDistribution):
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
     
-    def gen_samples(self, r, n, d):
+    def gen_dd_samples(self, r, n, d):
         """
         Generate r nxd IID Standard Uniform samples
 
@@ -44,7 +44,7 @@ class IIDStdGaussian(DiscreteDistribution):
         super().__init__(mimics='StdGaussian')
         self.rng = Generator(PCG64(rng_seed))
 
-    def gen_samples(self, r, n, d):
+    def gen_dd_samples(self, r, n, d):
         """
         Generate r nxd IID Standard Gaussian samples
 
@@ -69,7 +69,7 @@ class Lattice(DiscreteDistribution):
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
 
-    def gen_samples(self, r, n, d):
+    def gen_dd_samples(self, r, n, d):
         """
         Generate r nxd Lattice samples
 
@@ -100,7 +100,7 @@ class Sobol(DiscreteDistribution):
         super().__init__(mimics='StdUniform')
         self.rng = Generator(PCG64(rng_seed))
 
-    def gen_samples(self, r, n, d):
+    def gen_dd_samples(self, r, n, d):
         """
         Generate r nxd Sobol samples
 

@@ -84,12 +84,10 @@ def comp_clt_vs_cltrep_runtimes(abstols):
 
     return df_metrics
 
-def plot_abstol_runtime():
+def plot_abstol_runtime(abstols=arange(.01, .051, .002)):
     outF = "outputs/Compare_true_distribution_and_StoppingCriterion_vs_Abstol"
     # Run Test
-
-    absTols = arange(.01, .051, .002)  # arange(.01,.06,.01)
-    df_metrics = comp_clt_vs_cltrep_runtimes(absTols)
+    df_metrics = comp_clt_vs_cltrep_runtimes(abstols)
     df_metrics.to_csv(outF + ".csv", index=False)
 
     # Gen Plot
