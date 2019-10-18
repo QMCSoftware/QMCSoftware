@@ -67,6 +67,5 @@ def summarize(stopping_criterion=None, measure=None, integrand=None, distributio
         data.summarize()
 
 
-
 # API
 from .exceptions_warnings import *

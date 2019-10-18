@@ -25,9 +25,9 @@ class AccumData(ABC):
         super().__init__()
         self.solution = nan  # solution
         self.stage = "begin"
-        self._n_prev = array([])
+        self.n_prev = array([])
         # new data will be based on (quasi-)random vectors indexed by.
-        self._n_next = array([])  # _n_prev + 1 to _n_next.
+        self.n_next = array([])  # n_prev + 1 to n_next.
         self.n_samples_total = array([])
         self.confid_int = array([-inf, inf])
         self.time_total = None

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Algorithms &mdash; qmcpy 0.1 documentation</title>
+  <title>QMCPy Documentation &mdash; qmcpy 0.1 documentation</title>
   
 
   
@@ -83,8 +83,10 @@
               <p class="caption"><span class="caption-text">Contents</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Quasi-Monte Carlo Community Software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#python-3-library-of-qmc-software">Python 3 Library of QMC Software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#qmcpy-overview">QMCPy Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Algorithms</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">QMCPy Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.integrate">Integration Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#integrand-class">Integrand Class</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.asian_call">Asican Call Option Payoff</a></li>
@@ -144,7 +146,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Algorithms</li>
+      <li>QMCPy Documentation</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -162,11 +164,11 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="algorithms">
-<h1>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="qmcpy-documentation">
+<h1>QMCPy Documentation<a class="headerlink" href="#qmcpy-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-qmcpy.integrate">
 <span id="integration-method"></span><h2>Integration Method<a class="headerlink" href="#module-qmcpy.integrate" title="Permalink to this headline">¶</a></h2>
-<p>Main driver function for Qmcpy</p>
+<p>Main driver function for QMCPy.</p>
 <dl class="function">
 <dt id="qmcpy.integrate.integrate">
 <code class="sig-prename descclassname">qmcpy.integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">discrete_distrib=None</em>, <em class="sig-param">stopping_criterion=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrate.integrate" title="Permalink to this definition">¶</a></dt>
@@ -175,8 +177,8 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an object from class Integrand</p></li>
-<li><p><strong>measure</strong> (<em>Measure</em>) – an object from class Measure</p></li>
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution</p></li>
+<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an object from class TrueMeasure</p></li>
+<li><p><strong>discrete_distrib</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution</p></li>
 <li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#qmcpy.stopping_criterion.StoppingCriterion" title="qmcpy.stopping_criterion.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class             StoppingCriterion</p></li>
 </ul>
 </dd>
@@ -387,10 +389,49 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p></li>
-<li><p><strong>transforms</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – functions that transform discrete distribution to true measure
-keys: string matching the measure mimiced by the discrete distribution
-values: functions to transform a sample by the mimiced measure into a sapmle by the true measure</p></li>
+<li><p><strong>transforms</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – functions that transform discrete distribution                 to true measure</p></li>
+<li><p><strong>keys</strong> – string matching the measure mimiced by the discrete                 distribution</p></li>
+<li><p><strong>values</strong> – functions to transform a sample by the mimiced                 measure into a sapmle by the true measure</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.true_measure.TrueMeasure.gen_tm_samples">
+<code class="sig-name descname">gen_tm_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.TrueMeasure.gen_tm_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate r nxd samples mimicing the TrueMeasure (d = self.dimension
+inferred). This method is a wrapper around gen_dd_samples that applies a
+transform to the result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>rxnxd (numpy array) with d being the dimension of the true
+measure space (sample.size()[2])</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To initilize this method for each integrand, call</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">true_measure_obj</span><span class="o">.</span><span class="n">transform_generator</span><span class="p">(</span><span class="n">discrete_distrib_obj</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This method is not to be called directly on the original
+constructing object.
+Calls to this method should be from the i^th integrand.
+Example call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">true_measure_obj</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">gen_tm_samples</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>TransformError if this method is called on the original             construcing TrueMeasure object.</strong> – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -404,13 +445,15 @@ values: functions to transform a sample by the mimiced measure into a sapmle by 
 <dl class="method">
 <dt id="qmcpy.true_measure.TrueMeasure.transform_generator">
 <code class="sig-name descname">transform_generator</code><span class="sig-paren">(</span><em class="sig-param">discrete_distrib</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.TrueMeasure.transform_generator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create gen_true_measure_samples method,
+<dd><p>Create gen_tm_samples method,
 a method that samples from the discrete_distribution
 and transforms to discrete distribution</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>discrete_distrib</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete distribution samples will be drawn from
-will use discrete_distrib.mimics to select transform from self[i].transforms (dict)</p>
+<dd class="field-odd"><p><strong>discrete_distrib</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete
+distribution samples will be drawn from will use
+discrete_distrib.mimics to select transform from
+self[i].transforms (dict)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -497,19 +540,19 @@ will use discrete_distrib.mimics to select transform from self[i].transforms (di
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.DiscreteDistribution.gen_samples">
-<em class="property">abstract </em><code class="sig-name descname">gen_samples</code><span class="sig-paren">(</span><em class="sig-param">j</em>, <em class="sig-param">n</em>, <em class="sig-param">m</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.DiscreteDistribution.gen_samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate j nxm samples from the true-distribution</p>
+<dt id="qmcpy.discrete_distribution.DiscreteDistribution.gen_dd_samples">
+<em class="property">abstract </em><code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.DiscreteDistribution.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate r nxd IID Standard Gaussian samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxm matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>jxnxm (numpy array)</p>
+<dd class="field-even"><p>rxnxd (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -522,14 +565,14 @@ will use discrete_distrib.mimics to select transform from self[i].transforms (di
 
 </dd></dl>
 
-<span class="target" id="module-qmcpy.discrete_distribution.discrete_distributions"></span><p>This module implements mutiple subclasses of DiscreteDistribution.</p>
+<span class="target" id="module-qmcpy.discrete_distribution.distributions"></span><p>This module implements mutiple subclasses of DiscreteDistribution.</p>
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.IIDStdGaussian">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.discrete_distributions.</code><code class="sig-name descname">IIDStdGaussian</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.IIDStdGaussian" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.distributions.IIDStdGaussian">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.distributions.</code><code class="sig-name descname">IIDStdGaussian</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdGaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Standard Gaussian</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.IIDStdGaussian.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.IIDStdGaussian.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.distributions.IIDStdGaussian.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdGaussian.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -538,19 +581,19 @@ will use discrete_distrib.mimics to select transform from self[i].transforms (di
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.IIDStdGaussian.gen_samples">
-<code class="sig-name descname">gen_samples</code><span class="sig-paren">(</span><em class="sig-param">j</em>, <em class="sig-param">n</em>, <em class="sig-param">m</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.IIDStdGaussian.gen_samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate j nxm IID Standard Gaussian samples</p>
+<dt id="qmcpy.discrete_distribution.distributions.IIDStdGaussian.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdGaussian.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate r nxd IID Standard Gaussian samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxm matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>jxnxm (numpy array)</p>
+<dd class="field-even"><p>rxnxd (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -558,12 +601,12 @@ will use discrete_distrib.mimics to select transform from self[i].transforms (di
 </dd></dl>
 
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.IIDStdUniform">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.discrete_distributions.</code><code class="sig-name descname">IIDStdUniform</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.IIDStdUniform" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.distributions.IIDStdUniform">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.distributions.</code><code class="sig-name descname">IIDStdUniform</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdUniform" title="Permalink to this definition">¶</a></dt>
 <dd><p>IID Standard Uniform</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.IIDStdUniform.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.IIDStdUniform.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.distributions.IIDStdUniform.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdUniform.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -572,19 +615,19 @@ will use discrete_distrib.mimics to select transform from self[i].transforms (di
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.IIDStdUniform.gen_samples">
-<code class="sig-name descname">gen_samples</code><span class="sig-paren">(</span><em class="sig-param">j</em>, <em class="sig-param">n</em>, <em class="sig-param">m</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.IIDStdUniform.gen_samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate j nxm IID Standard Uniform samples</p>
+<dt id="qmcpy.discrete_distribution.distributions.IIDStdUniform.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdUniform.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate r nxd IID Standard Uniform samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxm matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>jxnxm (numpy array)</p>
+<dd class="field-even"><p>rxnxd (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -592,12 +635,12 @@ will use discrete_distrib.mimics to select transform from self[i].transforms (di
 </dd></dl>
 
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.Lattice">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.discrete_distributions.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.Lattice" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.distributions.Lattice">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.distributions.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Lattice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quasi-Random Lattice low discrepancy sequence (Base 2)</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.Lattice.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.distributions.Lattice.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -606,19 +649,19 @@ will use discrete_distrib.mimics to select transform from self[i].transforms (di
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.Lattice.gen_samples">
-<code class="sig-name descname">gen_samples</code><span class="sig-paren">(</span><em class="sig-param">j</em>, <em class="sig-param">n</em>, <em class="sig-param">m</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.Lattice.gen_samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate j nxm Lattice samples</p>
+<dt id="qmcpy.discrete_distribution.distributions.Lattice.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Lattice.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate r nxd Lattice samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxm matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>jxnxm (numpy array)</p>
+<dd class="field-even"><p>rxnxd (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -626,12 +669,12 @@ will use discrete_distrib.mimics to select transform from self[i].transforms (di
 </dd></dl>
 
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.Sobol">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.discrete_distributions.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.Sobol" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.distributions.Sobol">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.distributions.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Sobol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quasi-Random Sobol low discrepancy sequence (Base 2)</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.Sobol.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.distributions.Sobol.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -640,19 +683,19 @@ will use discrete_distrib.mimics to select transform from self[i].transforms (di
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.discrete_distributions.Sobol.gen_samples">
-<code class="sig-name descname">gen_samples</code><span class="sig-paren">(</span><em class="sig-param">j</em>, <em class="sig-param">n</em>, <em class="sig-param">m</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.discrete_distributions.Sobol.gen_samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate j nxm Sobol samples</p>
+<dt id="qmcpy.discrete_distribution.distributions.Sobol.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Sobol.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate r nxd Sobol samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxm matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>jxnxm (numpy array)</p>
+<dd class="field-even"><p>rxnxd (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>

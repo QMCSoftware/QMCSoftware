@@ -6,14 +6,17 @@ from workouts.wo_abstol_runtime import plot_abstol_runtime
 from workouts.wo_asian_option import test_distributions_asian_option
 from workouts.wo_customizations import quick_construct_integrand
 from workouts.wo_keister import test_distributions_keister
+from workouts.wo_plot_nodes_scatters import iid_scatters, lds_scatters, \
+    grid_transform_scatters, shift_stretch_sobol_scatters
 
-class Test_Workouts(unittest.TestCase):
+
+class TestWorkouts(unittest.TestCase):
 
     def test_3d_point_distribution(self):
         plot3d()
 
     def test_abstol_runtime(self):
-        plot_abstol_runtime(abstols=arange(.1,.4,.1))
+        plot_abstol_runtime(abstols=arange(.1, .4, .1))
 
     def test_asian_option(self):
         time_vec = [
@@ -29,5 +32,8 @@ class Test_Workouts(unittest.TestCase):
     def test_custom_customs(self):
         quick_construct_integrand(abs_tol=.1)
 
-
-
+    def test_plot_nodes_scatters(self):
+        iid_scatters()
+        lds_scatters()
+        grid_transform_scatters()
+        shift_stretch_sobol_scatters()

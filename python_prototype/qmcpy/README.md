@@ -1,4 +1,4 @@
-# QMCPy 
+# QMCPy Overview
 
 ## Integrand
 The function to integrate<br>
