@@ -9,9 +9,9 @@ class Linear(Integrand):
     for :math:`\\boldsymbol{x} = (x_1,\\ldots,x_d) \\in \\mathbb{R}^d`
     """
 
-    def __init__(self):
-        """ Initialize Linear Integrand """
-        super().__init__()
+    # def __init__(self):     # useless super delegation
+    #     """ Initialize Linear Integrand """
+    #     super().__init__()
 
     def g(self, x):
         """

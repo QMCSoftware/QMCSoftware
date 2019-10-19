@@ -16,12 +16,13 @@ class Keister(Integrand):
 
     Reference:
             B. D. Keister, Multidimensional Quadrature Algorithms, \
-            `Computers in Physics`, *10*, pp.\ 119-122, 1996.
+            `Computers in Physics`, *10*, pp. 119-122, 1996.
     """
 
-    def __init__(self):
-        """ Initialize Keister Integrand """
-        super().__init__()
+
+    # def __init__(self):  # useless super delegation
+    #     """ Initialize Keister Integrand """
+    #     super().__init__()
 
     def g(self, x):
         """

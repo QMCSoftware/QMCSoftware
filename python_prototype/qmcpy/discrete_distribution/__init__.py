@@ -35,7 +35,8 @@ class DiscreteDistribution(ABC):
     def summarize(self):
         """ Print important attribute values """
         header_fmt = "%s (%s)"
-        attrs_vals_str = header_fmt % (type(self).__name__, "Discrete Distribution Object")
+        obj_name = "Discrete Distribution Object"
+        attrs_vals_str = header_fmt % (type(self).__name__, obj_name)
         print(attrs_vals_str)
 
     def __repr__(self):

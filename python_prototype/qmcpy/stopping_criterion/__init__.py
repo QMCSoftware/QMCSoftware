@@ -40,7 +40,8 @@ class StoppingCriterion(ABC):
         header_fmt = "%s (%s)\n"
         item_i = "%25s: %d\n"
         item_f = "%25s: %-15.4f\n"
-        attrs_vals_str = header_fmt % (type(self).__name__, "StoppingCriterion Object")
+        obj_name = "StoppingCriterion Object"
+        attrs_vals_str = header_fmt % (type(self).__name__, obj_name)
         attrs_vals_str += item_f % ("abs_tol", self.abs_tol)
         attrs_vals_str += item_f % ("rel_tol", self.rel_tol)
         attrs_vals_str += item_i % ("n_max", self.n_max)
