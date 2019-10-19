@@ -26,9 +26,9 @@ class TestTrueDistributionConstruciton(unittest.TestCase):
         discrete_distrib.mimics = 'Poisson'
         # Transform from poisson to Gaussion not implemented yet
         true_measure = Gaussian(2)
-        self.assertRaises(TransformError, true_measure.transform_generator,
+        self.assertRaises(TransformError, true_measure.set_tm_gen,
                           discrete_distrib)
-        true_measure.transform_generator(IIDStdGaussian())
+        true_measure.set_tm_gen(IIDStdGaussian())
         self.assertRaises(TransformError, true_measure.gen_tm_samples, 3, 5)
 
 
@@ -37,12 +37,12 @@ class TestUniform(unittest.TestCase):
     def test_transforms(self):
         a, b = 1 / 4, 1 / 2
         true_measure = Uniform(3, lower_bound=a, upper_bound=b)
-        true_measure.transform_generator(IIDStdUniform())
+        true_measure.set_tm_gen(IIDStdUniform())
         # IIDStdUniform -> Uniform(1/4,1/2)
         vals = true_measure[0].gen_tm_samples(5, 4)
         self.assertTrue((vals <= b).all() and (vals >= a).all())
         true_measure = Uniform(3, lower_bound=a, upper_bound=b)
-        true_measure.transform_generator(IIDStdGaussian())
+        true_measure.set_tm_gen(IIDStdGaussian())
         # IIDStdGaussian -> Uniform(1/4,1/2)
         vals = true_measure[0].gen_tm_samples(5, 4)
         self.assertTrue((vals <= b).all() and (vals >= a).all())

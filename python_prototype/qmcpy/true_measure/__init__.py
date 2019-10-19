@@ -52,7 +52,7 @@ class TrueMeasure(ABC):
                 setattr(self[i], key, val[i])
             self[i].transforms = transforms
 
-    def transform_generator(self, discrete_distrib):
+    def set_tm_gen(self, discrete_distrib):
         """
         Create gen_tm_samples method,
         a method that samples from the discrete_distribution
@@ -92,7 +92,7 @@ class TrueMeasure(ABC):
         Note:
             To initilize this method for each integrand, call ::
 
-                true_measure_obj.transform_generator(discrete_distrib_obj)
+                true_measure_obj.set_tm_gen(discrete_distrib_obj)
 
             This method is not to be called directly on the original
             constructing object.
@@ -107,7 +107,7 @@ class TrueMeasure(ABC):
         """
         raise TransformError(
             "To initilize this method for each integrand call:" +
-            "\n\t\true_measure_obj.transform_generator(discrete_distrib_obj)" +
+            "\n\t\true_measure_obj.set_tm_gen(discrete_distrib_obj)" +
             "\nTo call this method for the ith integrand call:" +
             "\n\t\true_measure_obj[i].gen_tm_samples(n,r)")
 

@@ -68,7 +68,7 @@ def grid_transform_scatters():
         for j, (discrete_distrib, dd_name) in enumerate(zip(discrete_distribs, dd_names)):
             tm_obj = deepcopy(true_measure)
             dd_obj = deepcopy(discrete_distrib)
-            tm_obj.transform_generator(dd_obj)
+            tm_obj.set_tm_gen(dd_obj)
             tm_samples = tm_obj[0].gen_tm_samples(1, n).squeeze()
             ax[j].scatter(tm_samples[:, 0], tm_samples[:, 1], color=color)
             ax[j].set_xlabel('$x_1$')
@@ -104,7 +104,7 @@ def shift_stretch_sobol_scatters():
     for i, (true_measure, color) in enumerate(zip([u_obj, n_obj], colors)):
         tm_obj = deepcopy(true_measure)
         dd_obj = deepcopy(discrete_distrib)
-        tm_obj.transform_generator(dd_obj)
+        tm_obj.set_tm_gen(dd_obj)
         tm_samples = tm_obj[0].gen_tm_samples(1, n).squeeze()
         ax[i].scatter(tm_samples[:, 0], tm_samples[:, 1], color=color)
         ax[i].set_xlabel('$x_1$')
