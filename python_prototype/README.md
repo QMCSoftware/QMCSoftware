@@ -1,7 +1,10 @@
 # Python 3 Library of QMC Software
 
+<hr>
+
 ## QMCPy
 Package of main components<br>
+
 - Integrand classes
 - True Measure classes
 - Discrete Distribution classes
@@ -40,12 +43,15 @@ Automated project documentation
 <hr>
 
 ## Installation
+
 ~~~
 pip install qmcpy
 ~~~
+
 A virtual environment is recommended for developers/contributors<br>
 Ensure *.../python_prototypes/* is in your path<br>
 Install dependencies with<br>
+
 ~~~
 pip install requirements.txt
 ~~~
