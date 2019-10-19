@@ -35,9 +35,9 @@ class Keister(Integrand):
         Returns:
             :math:`n \\cdot p` matrix with values \
             :math:`f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
-            :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, then \
-            :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, and \
-            :math:`x'_{ij} = c` otherwise
+            :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, \
+            then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
+            and :math:`x'_{ij} = c` otherwise
         """
         normx2 = (x ** 2).sum(1)  # ||x||^2
         n_coord_index = x.shape[-1]

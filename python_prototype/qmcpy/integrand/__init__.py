@@ -37,9 +37,9 @@ class Integrand(ABC):
         Returns:
             :math:`n \\cdot p` matrix with values \
             :math:`f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
-            :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, then \
-            :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, and \
-            :math:`x'_{ij} = c` otherwise
+            :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, \
+            then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
+            and :math:`x'_{ij} = c` otherwise
         """
 
     def __len__(self):
