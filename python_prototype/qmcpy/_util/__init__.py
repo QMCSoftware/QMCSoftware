@@ -51,7 +51,7 @@ def summarize(stopping_criterion=None, measure=None, integrand=None, distributio
 
     Args:
         stopping_criterion (StoppingCriterion): a Stopping Criterion object
-        measure (Measure): a Measure object
+        measure (TrueMeasure): a Measure object
         integrand (Integrand): an Integrand object
         data (data): a AccumData object
     """

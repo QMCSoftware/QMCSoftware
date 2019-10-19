@@ -90,7 +90,7 @@ class Lattice(DiscreteDistribution):
         Returns:
             rxnxd (numpy array)
         """
-        x = array(list(LatticeSeq(m=int(log(n) / log(2)), s=d)))
+        x = list(LatticeSeq(m=int(log(n) / log(2)), s=d))
         # generate jxnxm data
         shifts = random.rand(r, d)
         x_rs = array([(x + self.rng.uniform(0, 1, d)) % 1 for shift in shifts])
