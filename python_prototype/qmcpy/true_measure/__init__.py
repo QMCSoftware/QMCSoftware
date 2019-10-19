@@ -35,7 +35,7 @@ class TrueMeasure(ABC):
                 "dimension must be an numpy.ndarray/list of positive integers")
         # Type check measureData
         for key, val in kwargs.items():
-            if type(kwargs[key]) != list and type(kwargs[key]) != ndarray:
+            if not isinstance(kwargs[key], (list, ndarray)):
                 # put single value into ndarray
                 kwargs[key] = [kwargs[key]]
             if len(kwargs[key]) == 1 and len(self.dimension) != 1:
@@ -44,8 +44,7 @@ class TrueMeasure(ABC):
             if len(kwargs[key]) != len(self.dimension):
                 raise DimensionError(
                     key + " must be a numpy.ndarray (or list) of len(dimension)")
-        self.measures = [type(self)(None)
-                         for i in range(len(self.dimension))]
+        self.measures = [type(self)(None) for i in range(len(self.dimension))]
         # Create list of measures with proper dimensions and keyword arguments
         for i, _ in enumerate(self):
             self[i].dimension = self.dimension[i]
@@ -71,8 +70,9 @@ class TrueMeasure(ABC):
                     'Cannot tranform %s to %s' %
                     (type(discrete_distrib).__name__, type(self).__name__))
             measure_i.gen_tm_samples = lambda r, n, self=measure_i: \
-                self.transforms[discrete_distrib.mimics](self,
-                    discrete_distrib.gen_dd_samples(int(r), int(n), int(self.dimension)))
+            self.transforms[discrete_distrib.mimics](self,
+                                                     discrete_distrib.gen_dd_samples(
+                                                         r, n, self.dimension))
 
     def gen_tm_samples(self, r, n):
         """

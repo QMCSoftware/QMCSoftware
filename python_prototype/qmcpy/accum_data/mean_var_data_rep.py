@@ -30,7 +30,7 @@ class MeanVarDataRep(AccumData):
         # standard deviation of n_streams means for each integrand
         self.flag = ones(self.n_integrands)
         # flag when an integrand has been sufficiently approximated
-        self._t_eval = zeros(self.n_integrands)
+        self.t_eval = zeros(self.n_integrands)
         # time used to evaluate each integrand
 
     def update_data(self, true_measure, integrand):
@@ -54,7 +54,7 @@ class MeanVarDataRep(AccumData):
                 y = integrand[i].g(set_x[j])
                 # Evaluate transformed function
                 self.muhat[j] = y.mean()  # stream mean
-            self._t_eval[i] = max(process_time() - t_start, EPS)
+            self.t_eval[i] = max(process_time() - t_start, EPS)
             self.mu2hat[i] = self.muhat.mean()  # mean of stream means
             self.sig2hat[i] = self.muhat.std()
             # standard deviation of stream means

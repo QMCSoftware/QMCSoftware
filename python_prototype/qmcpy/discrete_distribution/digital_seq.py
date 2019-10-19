@@ -214,10 +214,10 @@ class DigitalSeq(digitalseq_b2g):
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        f = sys.argv[1]
+        filepath = sys.argv[1]
     else:
-        f = sys.stdin
-    seq = DigitalSeq(f)
+        filepath = sys.stdin
+    seq = DigitalSeq(filepath)
     if seq.t > 53:
         mpmath.mp.prec = seq.t
         seq.recipd = mpmath.mpf(1) / 2 ** seq.t
