@@ -2,5 +2,5 @@
 
 .. mdinclude:: ../README.md
 
-.. mdinclude:: ../qmcpy/README.md
-
+.. raw:: html
+   :file: ../../html_from_readme/qmcpy.html
