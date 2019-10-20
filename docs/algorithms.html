@@ -25,6 +25,8 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/HTML-CSS"]})</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -84,7 +86,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Quasi-Monte Carlo Community Software</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#python-3-library-of-qmc-software">Python 3 Library of QMC Software</a></li>
-<li class="toctree-l1"><a class="reference internal" href="readme.html#qmcpy-overview">QMCPy Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#id1">QMCPy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">QMCPy Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.integrate">Integration Method</a></li>
@@ -171,22 +173,23 @@
 <p>Main driver function for QMCPy.</p>
 <dl class="function">
 <dt id="qmcpy.integrate.integrate">
-<code class="sig-prename descclassname">qmcpy.integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">discrete_distrib=None</em>, <em class="sig-param">stopping_criterion=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrate.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and compute integral of <img class="math" src="_images/math/62486ca5fbdbf5f4be95b099693f6e470aa583cc.png" alt="f(\boldsymbol{x})"/> for     <img class="math" src="_images/math/a2f00565c3dd53f5a194432607301ea5ed74565d.png" alt="\boldsymbol{x} \in \mathcal{X}"/>.</p>
+<code class="sig-prename descclassname">qmcpy.integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand=None</em>, <em class="sig-param">true_measure=None</em>, <em class="sig-param">discrete_distrib=None</em>, <em class="sig-param">stopping_criterion=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrate.integrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and compute integral of <span class="math notranslate nohighlight">\(f(\boldsymbol{x})\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathcal{X}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an object from class Integrand</p></li>
-<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an object from class TrueMeasure</p></li>
-<li><p><strong>discrete_distrib</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution</p></li>
-<li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#qmcpy.stopping_criterion.StoppingCriterion" title="qmcpy.stopping_criterion.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class             StoppingCriterion</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an object from class Integrand. If None (default),
+sum of two variables defined on unit square is used.</p></li>
+<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an object from class TrueMeasure. If None         (default), standard uniform distribution is used.</p></li>
+<li><p><strong>discrete_distrib</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – an object from class             DiscreteDistribution. If None (default), IID standard uniform             distribution is used.</p></li>
+<li><p><strong>stopping_criterion</strong> (<a class="reference internal" href="#qmcpy.stopping_criterion.StoppingCriterion" title="qmcpy.stopping_criterion.StoppingCriterion"><em>StoppingCriterion</em></a>) – an object from class             StoppingCriterion.  If None (default), criterion based on central             limit theorem with absolute tolerance equal to 0.01 is used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p>tuple containing:</p>
 <blockquote>
 <div><p><strong>solution</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>): estimated value of the integral</p>
-<p><strong>data</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">AccumData</span></code>): other information such as number of                 sampling points used to obtain the estimate</p>
+<p><strong>data</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">AccumData</span></code>): input data and information such as                 number of sampling points and run time used to obtain solution</p>
 </div></blockquote>
 </p>
 </dd>
@@ -203,7 +206,7 @@
 <dl class="class">
 <dt id="qmcpy.integrand.Integrand">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.</code><code class="sig-name descname">Integrand</code><a class="headerlink" href="#qmcpy.integrand.Integrand" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values <img class="math" src="_images/math/62486ca5fbdbf5f4be95b099693f6e470aa583cc.png" alt="f(\boldsymbol{x})"/> for     <img class="math" src="_images/math/a2f00565c3dd53f5a194432607301ea5ed74565d.png" alt="\boldsymbol{x} \in \mathcal{X}"/></p>
+<dd><p>Specify and generate values <span class="math notranslate nohighlight">\(f(\boldsymbol{x})\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathcal{X}\)</span></p>
 <dl class="method">
 <dt id="qmcpy.integrand.Integrand.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
@@ -221,7 +224,7 @@
 <dl class="attribute">
 <dt id="qmcpy.integrand.Integrand.dimension">
 <code class="sig-name descname">dimension</code><a class="headerlink" href="#qmcpy.integrand.Integrand.dimension" title="Permalink to this definition">¶</a></dt>
-<dd><p>dimension of the domain, <img class="math" src="_images/math/d5c1e72da10daed4a4e6c87a7606beb4035e1647.png" alt="d &gt; 0"/></p>
+<dd><p>dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
@@ -243,15 +246,51 @@
 </dd></dl>
 
 <dl class="method">
+<dt>
+<code class="sig-name descname">f</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span></dt>
+<dd><p>Transformed integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To initilize this method for each integrand, call</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">true_measure_obj</span><span class="o">.</span><span class="n">set_f</span><span class="p">(</span><span class="n">discrete_distrib_obj</span><span class="p">,</span> <span class="n">integrand_obj</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This method is not to be called directly on the original
+constructing object.
+Calls to this method should be from the i^th integrand.
+Example call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">integrand_obj</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>IntegrandError if this method is called on the original             construcing TrueMeasure object</strong><strong> or </strong><strong>has not</strong> – </p></li>
+<li><p><strong>been initialized for each integrand yet</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="qmcpy.integrand.Integrand.g">
 <em class="property">abstract </em><code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.Integrand.g" title="Permalink to this definition">¶</a></dt>
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -293,10 +332,10 @@
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -310,7 +349,7 @@
 <dl class="class">
 <dt id="qmcpy.integrand.keister.Keister">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values     <img class="math" src="_images/math/d5465e9b76ae73e435fa14d8f24ea0dd76b94289.png" alt="f(\boldsymbol{x}) = \pi^{d/2} \cos(\| \boldsymbol{x} \|)"/> for     <img class="math" src="_images/math/b4664e1714e17b329091f0f6f5e389a6ee307ea9.png" alt="\boldsymbol{x} \in \mathbb{R}^d"/>.</p>
+<dd><p>Specify and generate values     <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \pi^{d/2} \cos(\| \boldsymbol{x} \|)\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathbb{R}^d\)</span>.</p>
 <p>The standard example integrates the Keister integrand with respect to an     IID Gaussian distribution with variance 1/2.</p>
 <dl class="simple">
 <dt>Reference:</dt><dd><ol class="upperalpha simple" start="2">
@@ -327,10 +366,10 @@
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -344,17 +383,17 @@
 <dl class="class">
 <dt id="qmcpy.integrand.linear.Linear">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values <img class="math" src="_images/math/71c4ff5ba5f802e36b76f4bbff7b72ecdfcb04a9.png" alt="f(\boldsymbol{x}) = \sum_{i=1}^d x_i"/>     for <img class="math" src="_images/math/369a24cfb7e2da06df160fcd73f91a499af30423.png" alt="\boldsymbol{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d"/></p>
+<dd><p>Specify and generate values <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \sum_{i=1}^d x_i\)</span>     for <span class="math notranslate nohighlight">\(\boldsymbol{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d\)</span></p>
 <dl class="method">
 <dt id="qmcpy.integrand.linear.Linear.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.g" title="Permalink to this definition">¶</a></dt>
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>, then             <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>, and             <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -406,7 +445,7 @@ measure space (sample.size()[2])</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To initilize this method for each integrand, call</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">true_measure_obj</span><span class="o">.</span><span class="n">transform_generator</span><span class="p">(</span><span class="n">discrete_distrib_obj</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">true_measure_obj</span><span class="o">.</span><span class="n">set_tm_gen</span><span class="p">(</span><span class="n">discrete_distrib_obj</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This method is not to be called directly on the original
@@ -419,7 +458,45 @@ Example call:</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>TransformError if this method is called on the original             construcing TrueMeasure object.</strong> – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TransformError if this method is called on the original             construcing TrueMeasure object</strong><strong> or </strong><strong>has not</strong> – </p></li>
+<li><p><strong>been initialized for each true measure yet</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.true_measure.TrueMeasure.set_f">
+<code class="sig-name descname">set_f</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">discrete_distrib</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.TrueMeasure.set_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize f method for each integrand:
+a method that takes in samples generated by gen_tm_samples
+and outputs the integrand samples values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>discrete_distrib</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete
+distribution samples will be drawn from.
+discrete_distrib.mimics is uesd as key to
+self[i].transforms (dict)</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – the constructing integrand object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.true_measure.TrueMeasure.set_tm_gen">
+<code class="sig-name descname">set_tm_gen</code><span class="sig-paren">(</span><em class="sig-param">discrete_distrib</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.TrueMeasure.set_tm_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize gen_tm_samples method,
+a method that samples from the discrete_distribution
+and transforms to discrete distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>discrete_distrib</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete
+distribution samples will be drawn from will use
+discrete_distrib.mimics to select transform from
+self[i].transforms (dict)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,17 +508,24 @@ Example call:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.true_measure.TrueMeasure.transform_generator">
-<code class="sig-name descname">transform_generator</code><span class="sig-paren">(</span><em class="sig-param">discrete_distrib</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.TrueMeasure.transform_generator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create gen_tm_samples method,
-a method that samples from the discrete_distribution
-and transforms to discrete distribution</p>
+<dt id="qmcpy.true_measure.TrueMeasure.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">discrete_distrib</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.TrueMeasure.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls self.set_tm_gen(discrete_distrib) then
+calls self.set_f(integrand, discrete_distrib)
+Respectively, these two methods nitialize
+true_measure_obj[i].gen_tm_samples(r,n)
+and integrand[i].f(x)
+for i=1,2,…,len(integrand_obj)
+Note: len(integrand_obj)=len(true_measure_obj)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>discrete_distrib</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete
-distribution samples will be drawn from will use
-discrete_distrib.mimics to select transform from
-self[i].transforms (dict)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>discrete_distrib</strong> (<a class="reference internal" href="#qmcpy.discrete_distribution.DiscreteDistribution" title="qmcpy.discrete_distribution.DiscreteDistribution"><em>DiscreteDistribution</em></a>) – the discrete
+distribution samples will be drawn from.
+discrete_distrib.mimics is uesd as key to
+self[i].transforms (dict)</p></li>
+<li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – the constructing integrand object</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -482,6 +566,22 @@ self[i].transforms (dict)</p>
 <li><p><strong>mean</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – mu for Normal(mu,sigma^2)</p></li>
 <li><p><strong>variance</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sigma^2 for Normal(mu,sigma^2)</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qmcpy.true_measure.measures.Lebesgue">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.measures.</code><code class="sig-name descname">Lebesgue</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">uniform_lower_bound=0.0</em>, <em class="sig-param">uniform_upper_bound=1.0</em>, <em class="sig-param">gaussian_mean=0</em>, <em class="sig-param">gaussian_variance=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Lebesgue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lebesgue Measure</p>
+<dl class="method">
+<dt id="qmcpy.true_measure.measures.Lebesgue.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">uniform_lower_bound=0.0</em>, <em class="sig-param">uniform_upper_bound=1.0</em>, <em class="sig-param">gaussian_mean=0</em>, <em class="sig-param">gaussian_variance=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Lebesgue.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p>
 </dd>
 </dl>
 </dd></dl>
@@ -792,7 +892,7 @@ and store the sample mean and variance of integrand values</p>
 
 <dl class="method">
 <dt id="qmcpy.accum_data.mean_var_data.MeanVarData.update_data">
-<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">true_measure</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">true_measure</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -830,7 +930,7 @@ and store the sample mean and variance of integrand values</p>
 
 <dl class="method">
 <dt id="qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.update_data">
-<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">true_measure</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">true_measure</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

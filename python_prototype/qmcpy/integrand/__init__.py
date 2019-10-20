@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from .._util import univ_repr,TransformError
+from .._util import univ_repr, TransformError
 
 
 class Integrand(ABC):
@@ -40,7 +40,7 @@ class Integrand(ABC):
             then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
             and :math:`x'_{ij} = c` otherwise
         """
-    
+
     def f(self, x):
         """
         Transformed integrand to be integrated

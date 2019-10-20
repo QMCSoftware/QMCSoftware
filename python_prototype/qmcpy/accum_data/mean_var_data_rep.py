@@ -44,7 +44,7 @@ class MeanVarDataRep(AccumData):
         Returns:
             None
         """
-        for i, (integrand_i,true_measure_i) in enumerate(zip(integrand,true_measure)):
+        for i, (integrand_i, true_measure_i) in enumerate(zip(integrand, true_measure)):
             if self.flag[i] == 0:
                 continue  # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation

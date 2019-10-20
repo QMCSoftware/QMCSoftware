@@ -31,7 +31,7 @@ class AsianCall(Integrand):
         self.integrand_list = [AsianCall() for i in range(n_bm)]
         for i in range(n_bm):  # distribute attr
             self[i].bm_measure = self.bm_measure[i]
-            self[i].dim_fac = 0 if i==0 else self.bm_measure[i].dimension / \
+            self[i].dim_fac = 0 if i == 0 else self.bm_measure[i].dimension / \
                 self.bm_measure[i - 1].dimension
             self[i].dimension = self.bm_measure[i].dimension
 
