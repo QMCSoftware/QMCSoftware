@@ -33,7 +33,7 @@ class MeanVarDataRep(AccumData):
         self.t_eval = zeros(self.n_integrands)
         # time used to evaluate each integrand
 
-    def update_data(self, true_measure, integrand):
+    def update_data(self, integrand, true_measure):
         """
         Update data
 
@@ -44,14 +44,14 @@ class MeanVarDataRep(AccumData):
         Returns:
             None
         """
-        for i in range(self.n_integrands):
+        for i, (integrand_i,true_measure_i) in enumerate(zip(integrand,true_measure)):
             if self.flag[i] == 0:
                 continue  # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation
-            set_x = true_measure[i].gen_tm_samples(
+            set_x = true_measure_i.gen_tm_samples(
                 self.n_streams, self.n_next[i])
             for j in range(self.n_streams):
-                y = integrand[i].g(set_x[j])
+                y = integrand_i.f(set_x[j])
                 # Evaluate transformed function
                 self.muhat[j] = y.mean()  # stream mean
             self.t_eval[i] = max(process_time() - t_start, EPS)

@@ -36,11 +36,11 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
 
     t_start = time()
     # Transform integrands to accept distribution values which can generate
-    true_measure.set_tm_gen(discrete_distrib)
+    true_measure.transform(integrand, discrete_distrib)
     while stopping_criterion.stage != "done":
         # the data.stage property tells us where we are in the process
         stopping_criterion.data.update_data(
-            true_measure, integrand)  # compute more data
+            integrand, true_measure)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
     time_total = time() - t_start
     solution = stopping_criterion.data.solution  # assign outputs

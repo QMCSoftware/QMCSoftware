@@ -1,13 +1,16 @@
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import matplotlib.pyplot as mpl_plt
-from numpy import linspace, meshgrid, random, zeros, sqrt
+from numpy import linspace, meshgrid, zeros, sqrt
 
 from qmcpy.integrand import Keister
-
-random.seed(7)
+from qmcpy.true_measure import Gaussian
+from qmcpy.discrete_distribution import IIDStdGaussian
 
 
 def plot3d():
+    mpl_plt.cla()  # Clear axis
+    mpl_plt.clf()  # Clear figure
+
     # Compute n_total and mu_hat for each epsilon with a cooresponding plot
     '''
     integrand = Keister()
@@ -19,16 +22,18 @@ def plot3d():
     sys.exit(0)
     '''
 
-    mpl_plt.cla()  # Clear axis
-    mpl_plt.clf()  # Clear figure
-
     # Constants based on running the above CLT Example
     eps_list = [.5, .4, .3]
     n_list = [50, 68, 109]
     mu_hat_list = [1.876, 1.806, 1.883]
 
-    fun = Keister()
-    #colors = ["r", "b", "g"]
+    # QMCPy objects
+    integrand = Keister()
+    true_measure = Gaussian(2)
+    discrete_distrib = IIDStdGaussian(rng_seed=7)
+    true_measure.transform(integrand,discrete_distrib)
+
+    # Other constants
     n = 32
 
     # Function Points
@@ -39,7 +44,7 @@ def plot3d():
     x_2d, y_2d = meshgrid(x, y)
     points_fun[:, 0] = x_2d.flatten()
     points_fun[:, 1] = y_2d.flatten()
-    points_fun[:, 2] = fun.g(points_fun[:, :2])
+    points_fun[:, 2] = integrand.f(points_fun[:, :2])
     x_surf = points_fun[:, 0].reshape((nx, ny))
     y_surf = points_fun[:, 1].reshape((nx, ny))
     z_surf = points_fun[:, 2].reshape((nx, ny))
@@ -55,8 +60,8 @@ def plot3d():
         ax.plot_surface(x_surf, y_surf, z_surf, cmap="winter", alpha=.2)
         # Scatters
         points = zeros((n, 3))
-        points[:, :2] = random.randn(n, 2) * sqrt(1 / 2)
-        points[:, 2] = fun.g(points[:, :2])
+        points[:, :2] = true_measure[0].gen_tm_samples(1,n).squeeze()
+        points[:, 2] = integrand[0].f(points[:, :2])
         ax.scatter(points[:, 0], points[:, 1], points[:, 2], color="r", s=5)
         n = n_list[idx]
         epsilon = eps_list[idx]

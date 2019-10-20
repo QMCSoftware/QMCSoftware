@@ -27,7 +27,7 @@ class MeanVarData(AccumData):
         self.t_eval = zeros(self.n_integrands)
         # time used to evaluate each integrand
 
-    def update_data(self, true_measure, integrand):
+    def update_data(self, integrand, true_measure):
         """
         Update data
 
@@ -38,10 +38,10 @@ class MeanVarData(AccumData):
         Returns:
             None
         """
-        for i, func in enumerate(integrand):
+        for i, (integrand_i,true_measure_i) in enumerate(zip(integrand,true_measure)):
             t_start = process_time()  # time the integrand values
-            set_x = true_measure[i].gen_tm_samples(1, self.n_next[i]).squeeze()
-            y = func.g(set_x)
+            set_x = true_measure_i.gen_tm_samples(1, self.n_next[i]).squeeze()
+            y = integrand_i.f(set_x)
             self.t_eval[i] = max(process_time() - t_start, EPS)
             # for multi-level methods
             self.sighat[i] = std(y)  # compute the sample standard deviation
