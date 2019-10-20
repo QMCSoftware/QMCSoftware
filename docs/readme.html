@@ -103,15 +103,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#id1">QMCPy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#integrand">Integrand</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#true-measure">True Measure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#discrete-distribution">Discrete Distribution</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#stopping-criterion">Stopping Criterion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#accumulate-data-class">Accumulate Data Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#integrate-method">Integrate Method</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="algorithms.html">QMCPy Documentation</a></li>
 </ul>
@@ -263,78 +254,86 @@ Install dependencies with<span class="raw-html-m2r"><br></span></p>
 <div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="id1">
-<h1>QMCPy<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
-<hr><div class="section" id="integrand">
-<h2>Integrand<a class="headerlink" href="#integrand" title="Permalink to this headline">¶</a></h2>
-<p>The function to integrate<span class="raw-html-m2r"><br></span>
-<em>Abstract class with concrete implementations</em></p>
-<ul class="simple">
-<li><p>Linear: <span class="math notranslate nohighlight">\(y_i = \sum_{j=0}^{d-1}(x_{ij})\)</span></p></li>
-<li><p>Keister: <span class="math notranslate nohighlight">\(y_i = \pi^{d/2} * \cos(||x_i||_2)\)</span></p></li>
-<li><p>Asian Call</p>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" type="text/css" />
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+</head>
+<body>
+<div id="TOC">
 <ul>
-<li><p><span class="math notranslate nohighlight">\(S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}\)</span></p></li>
-<li><p>discounted call payoff <span class="math notranslate nohighlight">\(= max(\:\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)\)</span></p></li>
-<li><p>discounted put payoff <span class="math notranslate nohighlight">\(= max(\:\ K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)\)</span></p></li>
+<li><a href="#qmcpy">QMCPy</a><ul>
+<li><a href="#integrand">Integrand</a></li>
+<li><a href="#true-measure">True Measure</a></li>
+<li><a href="#discrete-distribution">Discrete Distribution</a></li>
+<li><a href="#stopping-criterion">Stopping Criterion</a></li>
+<li><a href="#accumulate-data-class">Accumulate Data Class</a></li>
+<li><a href="#integrate-method">Integrate Method</a></li>
+</ul></li>
 </ul>
-</li>
+</div>
+<h1 id="qmcpy">QMCPy</h1>
+<hr>
+<h2 id="integrand">Integrand</h2>
+<p>The function to integrate<br> <em>Abstract class with concrete implementations</em></p>
+<ul>
+<li>Linear: <span class="math inline">\(\:\: y_i = \sum_{j=0}^{d-1}(x_{ij})\)</span></li>
+<li>Keister: <span class="math inline">\(\:\: y_i = \pi^{d/2} * \cos(||x_i||_2)\)</span></li>
+<li>Asian Call
+<ul>
+<li><span class="math inline">\(S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}\)</span></li>
+<li>discounted call payoff <span class="math inline">\(= max(\:\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)\)</span></li>
+<li>discounted put payoff <span class="math inline">\(= max(\:\ K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)\)</span></li>
+</ul></li>
 </ul>
-<hr></div>
-<div class="section" id="true-measure">
-<h2>True Measure<a class="headerlink" href="#true-measure" title="Permalink to this headline">¶</a></h2>
-<p>General measure used to define the integrand<span class="raw-html-m2r"><br></span>
-<em>Abstract class with concrete implementations</em></p>
-<ul class="simple">
-<li><p>Uniform: <span class="math notranslate nohighlight">\(\:\: \mathcal{U}(a,b)\)</span></p></li>
-<li><p>Gaussian: <span class="math notranslate nohighlight">\(\:\: \mathcal{N}(\mu,\sigma^2)\)</span></p></li>
-<li><p>Brownian Motion: <span class="math notranslate nohighlight">\(\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;\)</span> for <span class="math notranslate nohighlight">\(\;Z_j \sim \mathcal{N}(0,1)\)</span></p></li>
+<hr>
+<h2 id="true-measure">True Measure</h2>
+<p>General measure used to define the integrand<br> <em>Abstract class with concrete implementations</em></p>
+<ul>
+<li>Uniform: <span class="math inline">\(\:\: \mathcal{U}(a,b)\)</span></li>
+<li>Gaussian: <span class="math inline">\(\:\: \mathcal{N}(\mu,\sigma^2)\)</span></li>
+<li>Brownian Motion: <span class="math inline">\(\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;\)</span> for <span class="math inline">\(\;Z_j \sim \mathcal{N}(0,1)\)</span></li>
 </ul>
-<hr></div>
-<div class="section" id="discrete-distribution">
-<h2>Discrete Distribution<a class="headerlink" href="#discrete-distribution" title="Permalink to this headline">¶</a></h2>
-<p>Sampling nodes iid or lds (low-discrepancy sequence)<span class="raw-html-m2r"><br></span>
-<em>Abstract class with concrete implementations</em></p>
-<ul class="simple">
-<li><p>IID Standard Uniform: <span class="math notranslate nohighlight">\(\:\: x_j \overset{iid}{\sim}   \mathcal{U}(0,1)\)</span></p></li>
-<li><p>IID Standard Gaussian: <span class="math notranslate nohighlight">\(\:\: x_j \overset{iid}{\sim}   \mathcal{N}(0,1)\)</span></p></li>
-<li><p>Lattice (base 2): <span class="math notranslate nohighlight">\(\:\: x_j  \overset{lds}{\sim}    \mathcal{U}(0,1)\)</span></p></li>
-<li><p>Sobol (base 2): <span class="math notranslate nohighlight">\(\:\: x_j \overset{lds}{\sim}    \mathcal{U}(0,1)\)</span></p></li>
+<hr>
+<h2 id="discrete-distribution">Discrete Distribution</h2>
+<p>Sampling nodes iid or lds (low-discrepancy sequence)<br> <em>Abstract class with concrete implementations</em></p>
+<ul>
+<li>IID Standard Uniform: <span class="math inline">\(\:\: x_j \overset{iid}{\sim} \mathcal{U}(0,1)\)</span></li>
+<li>IID Standard Gaussian: <span class="math inline">\(\:\: x_j \overset{iid}{\sim} \mathcal{N}(0,1)\)</span></li>
+<li>Lattice (base 2): <span class="math inline">\(\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)\)</span></li>
+<li>Sobol (base 2): <span class="math inline">\(\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)\)</span></li>
 </ul>
-<hr></div>
-<div class="section" id="stopping-criterion">
-<h2>Stopping Criterion<a class="headerlink" href="#stopping-criterion" title="Permalink to this headline">¶</a></h2>
-<p>The stopping criterion to determine sufficient approximation<span class="raw-html-m2r"><br></span>
-<em>Abstract class with concrete implementations</em>
-<span class="raw-html-m2r"><br></span><span class="raw-html-m2r"><b>Central Limit Theorem (CLT)</b></span><span class="raw-html-m2r"><br></span>
-<span class="math notranslate nohighlight">\(\; \hat{\mu}_n = \overline{Y}_n \approx\mathcal{N}(\mu,\frac{\sigma^2}{n})\)</span><span class="raw-html-m2r"><br></span>
-<span class="math notranslate nohighlight">\(\; \mathbb{P}[\hat{\mu}_n-\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}} \leq \mu \leq \hat{\mu}_n+\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}}] \approx 1-\alpha\)</span></p>
-<ul class="simple">
-<li><p>CLT for <span class="math notranslate nohighlight">\(x_i\sim\)</span> iid</p></li>
-<li><p>CLT Repeated for <span class="math notranslate nohighlight">\(\{x_{r,i}\}_{r=1}^R \sim\)</span> lds</p></li>
+<hr>
+<h2 id="stopping-criterion">Stopping Criterion</h2>
+<p>The stopping criterion to determine sufficient approximation<br> <em>Abstract class with concrete implementations</em> <br><b>Central Limit Theorem (CLT)</b><br> <span class="math inline">\(\; \hat{\mu}_n = \overline{Y}_n \approx\mathcal{N}(\mu,\frac{\sigma^2}{n})\)</span><br> <span class="math inline">\(\; \mathbb{P}[\hat{\mu}_n-\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}} \leq \mu \leq \hat{\mu}_n+\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}}] \approx 1-\alpha\)</span></p>
+<ul>
+<li>CLT for <span class="math inline">\(x_i\sim\)</span> iid</li>
+<li>CLT Repeated for <span class="math inline">\(\{x_{r,i}\}_{r=1}^R \sim\)</span> lds</li>
 </ul>
-<hr></div>
-<div class="section" id="accumulate-data-class">
-<h2>Accumulate Data Class<a class="headerlink" href="#accumulate-data-class" title="Permalink to this headline">¶</a></h2>
-<p>Stores data values of corresponding  stopping criterion procedure<span class="raw-html-m2r"><br></span>
-<em>Abstract class with concrete implementations</em></p>
-<ul class="simple">
-<li><p>Mean Variance Data (Controlled by CLT)</p></li>
-<li><p>Mean Variance Repeated Data (Controlled by CLT Repeated)</p></li>
+<hr>
+<h2 id="accumulate-data-class">Accumulate Data Class</h2>
+<p>Stores data values of corresponding stopping criterion procedure<br> <em>Abstract class with concrete implementations</em></p>
+<ul>
+<li>Mean Variance Data (Controlled by CLT)</li>
+<li>Mean Variance Repeated Data (Controlled by CLT Repeated)</li>
 </ul>
-<hr></div>
-<div class="section" id="integrate-method">
-<h2>Integrate Method<a class="headerlink" href="#integrate-method" title="Permalink to this headline">¶</a></h2>
-<p>Repeatedly samples the integrand at nodes generated by the discrete distribution and transformed to mimic the integrand’s true measure until the Stopping Criterion is met<span class="raw-html-m2r"><br></span>
-<em>Function with arguments:</em></p>
-<ul class="simple">
-<li><p>Integrand object</p></li>
-<li><p>True Measure object</p></li>
-<li><p>Discrete Distribution object</p></li>
-<li><p>Stopping Criterion object</p></li>
+<hr>
+<h2 id="integrate-method">Integrate Method</h2>
+<p>Repeatedly samples the integrand at nodes generated by the discrete distribution and transformed to mimic the integrand's true measure until the Stopping Criterion is met<br> <em>Function with arguments:</em></p>
+<ul>
+<li>Integrand object</li>
+<li>True Measure object</li>
+<li>Discrete Distribution object</li>
+<li>Stopping Criterion object</li>
 </ul>
+</body>
+</html>
 </div>
 </div>
 

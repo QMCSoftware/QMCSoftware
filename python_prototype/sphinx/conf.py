@@ -15,6 +15,7 @@ Generating QMCPy's HTML documentation.
 #
 import os
 import sys
+from recommonmark.transform import AutoStructify
 # import sphinx_rtd_theme
 # from sphinx.ext.napoleon.docstring import GoogleDocstring
 # import sphinx_bootstrap_theme
@@ -23,13 +24,6 @@ sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))  # python_prototype
 sys.path.insert(0, os.path.abspath('../python_prototype/'))
 print("root directory = %s " % os.getcwd())
-
-# -- Sphinx with Markdown ----------------------------------------------------
-
-import recommonmark
-from recommonmark.transform import AutoStructify
-from recommonmark.parser import CommonMarkParser
-import sphinx_bootstrap_theme
 
 # -- Project information -----------------------------------------------------
 project = u'qmcpy'
@@ -124,13 +118,14 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # so a file named "default.css" will overwrite the builtin "default.css".
 #html_static_path = ['_static']
 
-# -- Options for LaTeX output ---------------------------------------------
+# -- Options for LaTeX output ------------------------------------------------
 
 # Paths  on S.C. Choi's Mac machine for latex
 #imgmath_latex = r"/Library/TeX/texbin/latex"
 #imgmath_dvipng = r"/Library/TeX/texbin/dvipng"
 #imgmath_font_size = 10
 
+# -- Options for Mathjax -----------------------------------------------
 
 mathjax_config = {
     'extensions': ['tex2jax.js'],
@@ -141,9 +136,18 @@ mathjax_config = {
 # -- Sphinx with Markdown ----------------------------------------------------
 
 def setup(app):
+    """
+    Options for recommonmark
+    Args:
+        app:
+
+    Returns:
+        None
+
+    """
     app.add_config_value('recommonmark_config', {
         'enable_math': True,
         'enable_eval_rst': True,
         'auto_code_block': True,
-        }, True)
+    }, True)
     app.add_transform(AutoStructify)
