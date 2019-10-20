@@ -38,6 +38,12 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = 6.20
         self.assertTrue(abs(sol - true_value) < abs_tol)
 
+    def test_integrate_default(self):
+        sol, data = integrate()
+        true_value = 1
+        abs_tol = data.stopping_criterion.abs_tol
+        self.assertTrue(abs(sol - true_value) < abs_tol)
+
 
 if __name__ == "__main__":
     unittest.main()

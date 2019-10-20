@@ -19,7 +19,6 @@ class Keister(Integrand):
             `Computers in Physics`, *10*, pp. 119-122, 1996.
     """
 
-
     # def __init__(self):  # useless super delegation
     #     """ Initialize Keister Integrand """
     #     super().__init__()

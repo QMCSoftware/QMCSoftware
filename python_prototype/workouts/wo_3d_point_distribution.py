@@ -31,7 +31,7 @@ def plot3d():
     integrand = Keister()
     true_measure = Gaussian(2)
     discrete_distrib = IIDStdGaussian(rng_seed=7)
-    true_measure.transform(integrand,discrete_distrib)
+    true_measure.transform(integrand, discrete_distrib)
 
     # Other constants
     n = 32
@@ -60,7 +60,7 @@ def plot3d():
         ax.plot_surface(x_surf, y_surf, z_surf, cmap="winter", alpha=.2)
         # Scatters
         points = zeros((n, 3))
-        points[:, :2] = true_measure[0].gen_tm_samples(1,n).squeeze()
+        points[:, :2] = true_measure[0].gen_tm_samples(1, n).squeeze()
         points[:, 2] = integrand[0].f(points[:, :2])
         ax.scatter(points[:, 0], points[:, 1], points[:, 2], color="r", s=5)
         n = n_list[idx]

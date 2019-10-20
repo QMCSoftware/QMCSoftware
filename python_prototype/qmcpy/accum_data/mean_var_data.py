@@ -38,7 +38,7 @@ class MeanVarData(AccumData):
         Returns:
             None
         """
-        for i, (integrand_i,true_measure_i) in enumerate(zip(integrand,true_measure)):
+        for i, (integrand_i, true_measure_i) in enumerate(zip(integrand, true_measure)):
             t_start = process_time()  # time the integrand values
             set_x = true_measure_i.gen_tm_samples(1, self.n_next[i]).squeeze()
             y = integrand_i.f(set_x)

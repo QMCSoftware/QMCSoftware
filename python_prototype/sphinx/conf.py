@@ -24,6 +24,12 @@ sys.path.insert(0, os.path.abspath('../'))  # python_prototype
 sys.path.insert(0, os.path.abspath('../python_prototype/'))
 print("root directory = %s " % os.getcwd())
 
+# -- Sphinx with Markdown ----------------------------------------------------
+
+import recommonmark
+from recommonmark.transform import AutoStructify
+from recommonmark.parser import CommonMarkParser
+import sphinx_bootstrap_theme
 
 # -- Project information -----------------------------------------------------
 project = u'qmcpy'
@@ -42,12 +48,18 @@ release = u'0.1'
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.githubpages',
-              'sphinx.ext.imgmath',
+              # 'sphinx.ext.imgmath',
               'sphinx.ext.napoleon',
               'sphinx.ext.graphviz',
               'sphinx.ext.intersphinx',
               'sphinx_rtd_theme',
-              'm2r']
+              'm2r',
+              'sphinx.ext.mathjax',
+              'sphinx.ext.doctest',
+              'sphinx.ext.coverage',
+              'sphinx.ext.ifconfig',
+              'sphinx.ext.githubpages',
+              'sphinx_markdown_tables']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -115,6 +127,23 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # -- Options for LaTeX output ---------------------------------------------
 
 # Paths  on S.C. Choi's Mac machine for latex
-imgmath_latex = r"/Library/TeX/texbin/latex"
-imgmath_dvipng = r"/Library/TeX/texbin/dvipng"
+#imgmath_latex = r"/Library/TeX/texbin/latex"
+#imgmath_dvipng = r"/Library/TeX/texbin/dvipng"
 #imgmath_font_size = 10
+
+
+mathjax_config = {
+    'extensions': ['tex2jax.js'],
+    'jax': ['input/TeX', 'output/HTML-CSS'],
+}
+
+
+# -- Sphinx with Markdown ----------------------------------------------------
+
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+        'enable_math': True,
+        'enable_eval_rst': True,
+        'auto_code_block': True,
+        }, True)
+    app.add_transform(AutoStructify)

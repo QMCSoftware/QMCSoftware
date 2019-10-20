@@ -25,6 +25,8 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/HTML-CSS"]})</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -101,7 +103,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#qmcpy-overview">QMCPy Overview</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="#id1">QMCPy</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#integrand">Integrand</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#true-measure">True Measure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#discrete-distribution">Discrete Distribution</a></li>
@@ -177,7 +179,7 @@
             
   <div class="section" id="quasi-monte-carlo-community-software">
 <h1>Quasi-Monte Carlo Community Software<a class="headerlink" href="#quasi-monte-carlo-community-software" title="Permalink to this headline">¶</a></h1>
-<p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
+<hr><p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
 <hr><div class="section" id="citation">
 <h2>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h2>
 <p>If you find QMCPy helpful in your work, please support us by citing the
@@ -196,7 +198,9 @@ Available on <a class="reference external" href="https://github.com/QMCSoftware/
 <hr></div>
 <div class="section" id="contributors">
 <h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
-<p>Michael McCourt</p>
+<ul class="simple">
+<li><p>Michael McCourt</p></li>
+</ul>
 <hr></div>
 <div class="section" id="acknowledgment">
 <h2>Acknowledgment<a class="headerlink" href="#acknowledgment" title="Permalink to this headline">¶</a></h2>
@@ -215,7 +219,7 @@ implementation, Foundations of Computational Mathematics, 16(6):1631-1696, 2016.
 </div>
 <div class="section" id="python-3-library-of-qmc-software">
 <h1>Python 3 Library of QMC Software<a class="headerlink" href="#python-3-library-of-qmc-software" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="qmcpy">
+<hr><div class="section" id="qmcpy">
 <h2>QMCPy<a class="headerlink" href="#qmcpy" title="Permalink to this headline">¶</a></h2>
 <p>Package of main components<span class="raw-html-m2r"><br></span></p>
 <ul class="simple">
@@ -261,20 +265,20 @@ Install dependencies with<span class="raw-html-m2r"><br></span></p>
 </div>
 </div>
 </div>
-<div class="section" id="qmcpy-overview">
-<h1>QMCPy Overview<a class="headerlink" href="#qmcpy-overview" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="integrand">
+<div class="section" id="id1">
+<h1>QMCPy<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<hr><div class="section" id="integrand">
 <h2>Integrand<a class="headerlink" href="#integrand" title="Permalink to this headline">¶</a></h2>
 <p>The function to integrate<span class="raw-html-m2r"><br></span>
 <em>Abstract class with concrete implementations</em></p>
 <ul class="simple">
-<li><p>Linear: $:: y<em>i = sum</em>{j=0}^{d-1}(x_{ij})$</p></li>
-<li><p>Keister: $:: y_i = pi^{d/2} * cos(||x_i||_2)$</p></li>
+<li><p>Linear: <span class="math notranslate nohighlight">\(y_i = \sum_{j=0}^{d-1}(x_{ij})\)</span></p></li>
+<li><p>Keister: <span class="math notranslate nohighlight">\(y_i = \pi^{d/2} * \cos(||x_i||_2)\)</span></p></li>
 <li><p>Asian Call</p>
 <ul>
-<li><p>$S_i(t_j)=S(0)e^{(r-frac{sigma^2}{2})t_j+sigmamathcal{B}(t_j)}$</p></li>
-<li><p>discounted call payoff $= max(:frac{1}{d}sum_{j=0}^{d-1} S(jT/d)-K);,: 0)$</p></li>
-<li><p>discounted put payoff $= max(:K-frac{1}{d}sum_{j=0}^{d-1} S(jT/d));,: 0)$</p></li>
+<li><p><span class="math notranslate nohighlight">\(S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}\)</span></p></li>
+<li><p>discounted call payoff <span class="math notranslate nohighlight">\(= max(\:\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)\)</span></p></li>
+<li><p>discounted put payoff <span class="math notranslate nohighlight">\(= max(\:\ K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)\)</span></p></li>
 </ul>
 </li>
 </ul>
@@ -284,9 +288,9 @@ Install dependencies with<span class="raw-html-m2r"><br></span></p>
 <p>General measure used to define the integrand<span class="raw-html-m2r"><br></span>
 <em>Abstract class with concrete implementations</em></p>
 <ul class="simple">
-<li><p>Uniform:$:: mathcal{U}(a,b)$</p></li>
-<li><p>Gaussian: $:: mathcal{N}(mu,sigma^2)$</p></li>
-<li><p>Brownian Motion: $:: mathcal{B}(t<em>j)=B(t</em>{j-1})+Z_jsqrt{t<em>j-t</em>{j-1}} ;$ for $;Z_j sim mathcal{N}(0,1)$</p></li>
+<li><p>Uniform: <span class="math notranslate nohighlight">\(\:\: \mathcal{U}(a,b)\)</span></p></li>
+<li><p>Gaussian: <span class="math notranslate nohighlight">\(\:\: \mathcal{N}(\mu,\sigma^2)\)</span></p></li>
+<li><p>Brownian Motion: <span class="math notranslate nohighlight">\(\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;\)</span> for <span class="math notranslate nohighlight">\(\;Z_j \sim \mathcal{N}(0,1)\)</span></p></li>
 </ul>
 <hr></div>
 <div class="section" id="discrete-distribution">
@@ -294,10 +298,10 @@ Install dependencies with<span class="raw-html-m2r"><br></span></p>
 <p>Sampling nodes iid or lds (low-discrepancy sequence)<span class="raw-html-m2r"><br></span>
 <em>Abstract class with concrete implementations</em></p>
 <ul class="simple">
-<li><p>IID Standard Uniform: $:: x_j overset{iid}{sim}   mathcal{U}(0,1)$</p></li>
-<li><p>IID Standard Gaussian: $:: x_j overset{iid}{sim}   mathcal{N}(0,1)$</p></li>
-<li><p>Lattice (base 2): $:: x_j  overset{lds}{sim}    mathcal{U}(0,1)$</p></li>
-<li><p>Sobol (base 2): $:: x_j overset{lds}{sim}    mathcal{U}(0,1)$</p></li>
+<li><p>IID Standard Uniform: <span class="math notranslate nohighlight">\(\:\: x_j \overset{iid}{\sim}   \mathcal{U}(0,1)\)</span></p></li>
+<li><p>IID Standard Gaussian: <span class="math notranslate nohighlight">\(\:\: x_j \overset{iid}{\sim}   \mathcal{N}(0,1)\)</span></p></li>
+<li><p>Lattice (base 2): <span class="math notranslate nohighlight">\(\:\: x_j  \overset{lds}{\sim}    \mathcal{U}(0,1)\)</span></p></li>
+<li><p>Sobol (base 2): <span class="math notranslate nohighlight">\(\:\: x_j \overset{lds}{\sim}    \mathcal{U}(0,1)\)</span></p></li>
 </ul>
 <hr></div>
 <div class="section" id="stopping-criterion">
@@ -305,11 +309,11 @@ Install dependencies with<span class="raw-html-m2r"><br></span></p>
 <p>The stopping criterion to determine sufficient approximation<span class="raw-html-m2r"><br></span>
 <em>Abstract class with concrete implementations</em>
 <span class="raw-html-m2r"><br></span><span class="raw-html-m2r"><b>Central Limit Theorem (CLT)</b></span><span class="raw-html-m2r"><br></span>
-$; hat{mu}_n = overline{Y}_n approxmathcal{N}(mu,frac{sigma^2}{n})$<span class="raw-html-m2r"><br></span>
-$; mathbb{P}[hat{mu}<em>n-frac{mathcal{Z}</em>{alpha/2}hat{sigma}_n}{sqrt{n}} leq mu leq hat{mu}<em>n+frac{mathcal{Z}</em>{alpha/2}hat{sigma}_n}{sqrt{n}}] approx 1-alpha$</p>
+<span class="math notranslate nohighlight">\(\; \hat{\mu}_n = \overline{Y}_n \approx\mathcal{N}(\mu,\frac{\sigma^2}{n})\)</span><span class="raw-html-m2r"><br></span>
+<span class="math notranslate nohighlight">\(\; \mathbb{P}[\hat{\mu}_n-\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}} \leq \mu \leq \hat{\mu}_n+\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}}] \approx 1-\alpha\)</span></p>
 <ul class="simple">
-<li><p>CLT for $x_isim$ iid</p></li>
-<li><p>CLT Repeated for ${x<em>{r,i}}</em>{r=1}^R sim$ lds</p></li>
+<li><p>CLT for <span class="math notranslate nohighlight">\(x_i\sim\)</span> iid</p></li>
+<li><p>CLT Repeated for <span class="math notranslate nohighlight">\(\{x_{r,i}\}_{r=1}^R \sim:math:\)</span> lds</p></li>
 </ul>
 <hr></div>
 <div class="section" id="accumulate-data-class">
