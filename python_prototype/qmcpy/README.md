@@ -45,7 +45,8 @@ The stopping criterion to determine sufficient approximation<br>
 :math:`\; \mathbb{P}[\hat{\mu}_n-\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}} \leq \mu \leq \hat{\mu}_n+\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}}] \approx 1-\alpha`
 
 - CLT for :math:`x_i\sim` iid
-- CLT Repeated for :math:`\{x_{r,i}\}_{r=1}^R \sim:math:` lds
+- CLT Repeated for :math:`\{x_{r,i}\}_{r=1}^R \sim` lds
+
 
 <hr>   
 
