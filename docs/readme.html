@@ -267,12 +267,25 @@ Install dependencies with<span class="raw-html-m2r"><br></span></p>
       span.underline{text-decoration: underline;}
       div.column{display: inline-block; vertical-align: top; width: 50%;}
   </style>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
 </head>
 <body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#qmcpy">QMCPy</a><ul>
+<li><a href="#integrand">Integrand</a></li>
+<li><a href="#true-measure">True Measure</a></li>
+<li><a href="#discrete-distribution">Discrete Distribution</a></li>
+<li><a href="#stopping-criterion">Stopping Criterion</a></li>
+<li><a href="#accumulate-data-class">Accumulate Data Class</a></li>
+<li><a href="#integrate-method">Integrate Method</a></li>
+</ul></li>
+</ul>
+</nav>
 <h1 id="qmcpy">QMCPy</h1>
 <hr>
 <h2 id="integrand">Integrand</h2>
@@ -283,7 +296,7 @@ Install dependencies with<span class="raw-html-m2r"><br></span></p>
 <li>Asian Call
 <ul>
 <li><span class="math inline">\(S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}\)</span></li>
-<li>discounted call payoff <span class="math inline">\(= max(\:\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)\)</span></li>
+<li>discounted call payoff <span class="math inline">\(= max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)\)</span></li>
 <li>discounted put payoff <span class="math inline">\(= max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)\)</span></li>
 </ul></li>
 </ul>
