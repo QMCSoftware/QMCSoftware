@@ -29,13 +29,11 @@ class TestWorkouts(unittest.TestCase):
     def test_custom_customs(self):
         quick_construct_integrand(abs_tol=.1)
 
-    '''
     def test_plot_nodes_scatters(self):
         iid_scatters()
         lds_scatters()
         grid_transform_scatters()
         shift_stretch_sobol_scatters()
-    
+
     def test_3d_point_distribution(self):
         plot3d()
-    '''

@@ -76,7 +76,8 @@ napoleon_use_keyword = True
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.7/', None),
     'numpy': ('https://docs.scipy.org/doc/numpy', None),
-    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None)
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None)
 }
 
 # List of patterns, relative to source directory, that match files and

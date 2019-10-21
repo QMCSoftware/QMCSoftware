@@ -1,3 +1,6 @@
+"""
+Plot run time vs. absolute tolerances for multi-level Asian option function.
+"""
 from matplotlib import pyplot as mpl_plot
 from numpy import arange
 import pandas as pd
@@ -10,16 +13,32 @@ from qmcpy.true_measure import BrownianMotion
 
 
 def plot(title, xlabel, ylabel, xdata, ydata, outF):
+    """
+    Plot run time against abolute tolerances.
+
+    Args:
+        title (str): plot title.
+        xlabel (str): label for x-axis.
+        ylabel (str): label for y-axis
+        xdata (list): list of absolute tolerances.
+        ydata (list): list of run time.
+        outF (str): location of image .png file.
+
+    Returns:
+        None
+
+    """
     mpl_plot.cla()  # Clear axis
     mpl_plot.clf()  # Clear figure
-    # mpl_plot.title(title)
+    mpl_plot.title(title)
     mpl_plot.xlabel(xlabel, fontsize=14)
     mpl_plot.ylabel(ylabel, fontsize=14)
     for name, (trend, color) in ydata.items():
         mpl_plot.loglog(xdata, trend, basex=10, basey=10, color=color, label=name)
     # mpl_plot.xticks([5*10**-2,10**-1],fontsize=12)
     # mpl_plot.yticks([0,10,20,30],fontsize=12)
-    mpl_plot.legend(loc="lower left", bbox_to_anchor=(0.0, 1.01), ncol=2, borderaxespad=0, frameon=False, prop={"size": 14})
+    mpl_plot.legend(loc="lower left", bbox_to_anchor=(0.0, 1.01), ncol=2,
+                    borderaxespad=0, frameon=False, prop={"size": 14})
     mpl_plot.savefig(outF + ".png", dpi=500, bbox_inches="tight", pad_inches=.05)
     mpl_plot.show(block=False)
 
@@ -33,6 +52,20 @@ dims = [len(tv) for tv in time_vector]
 
 
 def qmc_wrapper(discrete_distrib, true_measure, stopping_criterion, name):
+    """
+    Call QMCPy's integrate function given inputs
+
+    Args:
+        discrete_distrib: instance of discrete distribution.
+        true_measure: true measure for Asian pption.
+        stopping_criterion: stopping criterion for QMCPy's integrate algorithm.
+        name: label for stopping criterion.
+
+    Returns:
+        sol: solution estimate
+        time_total: total run time for obtaining solution estimate
+
+    """
     item_f = "    %-25s %-10.3f %-10.3f"
     option = AsianCall(true_measure)
     sol, data = integrate(option, true_measure, discrete_distrib, stopping_criterion)
@@ -41,6 +74,16 @@ def qmc_wrapper(discrete_distrib, true_measure, stopping_criterion, name):
 
 
 def comp_clt_vs_cltrep_runtimes(abstols):
+    """
+    Collect run time statistics, given absolute tolerances.
+
+    Args:
+        abstols: list of absolute tolerances
+
+    Returns:
+        df_metrics (pandas.DataFrame):
+
+    """
     df_metrics = pd.DataFrame({"abs_tol": [],
                                "CLT_IIDStdUniform_sol": [], "CLT_IIDStdUniform_runTime": [],
                                "CLT_IIDStdGaussian_sol": [], "CLT_IIDStdGaussian_runTime": [],
@@ -88,22 +131,31 @@ def comp_clt_vs_cltrep_runtimes(abstols):
     return df_metrics
 
 
-def plot_abstol_runtime(abstols=arange(.01, .051, .002)):
-    outF = "outputs/Compare_true_distribution_and_StoppingCriterion_vs_Abstol"
+def plot_abstol_runtime(abstols=arange(.01, .05, .001)):
+    """
+    Integration Time by Absolute Tolerance for Multi-level Asian Option Function.
+
+    Args:
+        abstols (list): abolute tolerances.
+
+    Returns:
+        None
+    """
+    out_file = "outputs/Compare_true_distribution_and_StoppingCriterion_vs_Abstol"
     # Run Test
     df_metrics = comp_clt_vs_cltrep_runtimes(abstols)
-    df_metrics.to_csv(outF + ".csv", index=False)
+    df_metrics.to_csv(out_file + ".csv", index=False)
 
     # Gen Plot
-    df = pd.read_csv(outF + ".csv")
-    plot(title="Integration Time by Absolute Tolerance\nfor Multi-level Asian Option Function",
+    df = pd.read_csv(out_file + ".csv")
+    plot(title="",
          xlabel="Absolute Tolerance", ylabel="Integration Runtime",
          xdata=df["abs_tol"].values,
          ydata={"CLT: IID Gaussian": (df["CLT_IIDStdUniform_runTime"], "r"),
                 "CLT: IID Uniform ": (df["CLT_IIDStdGaussian_runTime"], "b"),
                 "CLT Repeated: Lattice": (df["CLT_Rep_Lattice_runTime"], "g"),
                 "CLT Repeated: sobol": (df["CLT_Rep_Sobol_runTime"], "y")},
-         outF=outF)
+         outF=out_file)
 
 
 if __name__ == "__main__":
