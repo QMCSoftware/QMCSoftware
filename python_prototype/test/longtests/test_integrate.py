@@ -1,17 +1,17 @@
 import unittest
-from numpy import arange
+from numpy import array,arange
 
 from qmcpy import integrate
 from qmcpy.discrete_distribution import IIDStdGaussian, Lattice
-from qmcpy.true_measure import Gaussian, BrownianMotion
-from qmcpy.integrand import Keister, AsianCall
+from qmcpy.true_measure import Gaussian, BrownianMotion,Lebesgue
+from qmcpy.integrand import Keister, AsianCall,QuickConstruct
 from qmcpy.stopping_criterion import CLT, CLTRep
 
 
 class IntegrationExampleTest(unittest.TestCase):
-
+    
     def test_keister_2d(self):
-        # IID Standard Uniform
+        """ Mathematica: N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]] """
         abs_tol = .1
         integrand = Keister()
         discrete_distrib = IIDStdGaussian()
@@ -19,8 +19,7 @@ class IntegrationExampleTest(unittest.TestCase):
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
         sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         true_value = 1.808186429263620
-        # In Mathematica (or WolframAlpha):
-        # N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]]
+        
         self.assertTrue(abs(sol - true_value) < abs_tol)
 
     def test_asian_option_multi_level(self):
@@ -38,12 +37,21 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = 6.20
         self.assertTrue(abs(sol - true_value) < abs_tol)
 
-    def test_integrate_default(self):
-        sol, data = integrate()
-        true_value = 1
-        abs_tol = data.stopping_criterion.abs_tol
+    def test_Lebesgue_measure(self):
+        """ Mathematica: Integrate[5 x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
+        abs_tol = 1
+        integrand = QuickConstruct(custom_fun = lambda x: 5*(x.prod(1))**3)
+        true_measure = Lebesgue(
+            dimension=[2],\
+            uniform_lower_bound = [array([1,3])],
+            uniform_upper_bound = [array([3,6])])
+        discrete_distrib = Lattice(rng_seed=7)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+        sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        
+        print(sol)
+        true_value = 30375
         self.assertTrue(abs(sol - true_value) < abs_tol)
-
-
+    
 if __name__ == "__main__":
     unittest.main()

@@ -49,7 +49,7 @@ class TrueMeasure(ABC):
         for i, _ in enumerate(self):
             self[i].dimension = self.dimension[i]
             for key, val in kwargs.items():
-                setattr(self[i], key, val[i])
+                setattr(self[i], key, array(val[i]))
             self[i].transforms = transforms
 
     def set_tm_gen(self, discrete_distrib):
