@@ -28,10 +28,11 @@ python setup.py clean
 pythonw -m unittest discover -s test/fasttests
 pythonw -m unittest discover -s test/longtests
 
-# Generate HTML documentation
+# Use pandoc to generate HTML files from REAME.md that has LaTeX expressions
 # python ../render_readme_as_html.py
 pandoc -s --mathjax qmcpy/README.md -o ../html_from_readme/qmcpy.html
 
+# Use sphinx to generate HTML documentation from above and Python docstrings
 cd sphinx
 ./autodoc.sh
 cd ..
