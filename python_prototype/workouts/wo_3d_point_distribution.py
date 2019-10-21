@@ -1,18 +1,30 @@
+"""
+Three dimensional plots of IID normal sampling points for Keister function.
+"""
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import matplotlib.pyplot as mpl_plt
-from numpy import linspace, meshgrid, zeros, sqrt
-
+from numpy import linspace, meshgrid, zeros
+from qmcpy.discrete_distribution import IIDStdGaussian
 from qmcpy.integrand import Keister
 from qmcpy.true_measure import Gaussian
-from qmcpy.discrete_distribution import IIDStdGaussian
 
 
 def plot3d():
+    """
+    Given three increasing absolute tolerances, plot sampling points for a
+    Keister function.
+
+    Returns:
+        None
+
+    Note:
+        Figure is generated in outputs/Three_3d_SurfaceScatters.png.
+    """
     mpl_plt.cla()  # Clear axis
     mpl_plt.clf()  # Clear figure
 
     # Compute n_total and mu_hat for each epsilon with a cooresponding plot
-    '''
+    """
     integrand = Keister()
     discrete_distrib = IIDStdGaussian()
     true_measure = Gaussian(dimension=2,variance=1/2)
@@ -20,7 +32,7 @@ def plot3d():
     sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
     sys.exit(0)
-    '''
+    """
 
     # Constants based on running the above CLT Example
     eps_list = [.5, .4, .3]
@@ -76,7 +88,7 @@ def plot3d():
         ax.yaxis.pane.set_edgecolor("black")
         ax.set_xlabel("$x_1$", fontdict={"fontsize": 14})
         ax.set_ylabel("$x_2$", fontdict={"fontsize": 14})
-        ax.set_zlabel("$f\:(x_1,x_2)$", fontdict={"fontsize": 14})
+        ax.set_zlabel("$f\\:(x_1,x_2)$", fontdict={"fontsize": 14})
         ax.view_init(20, 45)
 
     # Output

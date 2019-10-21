@@ -48,12 +48,12 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
 
 
 if __name__ == '__main__':
-    """ Singl-Level Asian Option Pricing """
+    # Singl-Level Asian Option Pricing
     time_vec = [arange(1 / 64, 65 / 64, 1 / 64)]
     dim = [len(tv) for tv in time_vec]
     test_distributions_asian_option(time_vec, dim, abs_tol=.05)
 
-    """ Multi-Level Asian Option Pricing """
+    # Multi-Level Asian Option Pricing
     time_vec = [
         arange(1 / 4, 5 / 4, 1 / 4),
         arange(1 / 16, 17 / 16, 1 / 16),

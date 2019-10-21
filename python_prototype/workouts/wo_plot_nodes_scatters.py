@@ -9,6 +9,15 @@ n = 128
 
 
 def iid_scatters():
+    """
+    Visualize IID standard uniform and standard normal sampling points.
+
+    Returns:
+        None
+
+    Note:
+        Plot is generated in outputs/scatters/iid_dd.png.
+    """
     plt.cla()
     plt.clf()
     discrete_distribs = [IIDStdUniform(rng_seed=7), IIDStdGaussian(rng_seed=7)]
@@ -17,7 +26,8 @@ def iid_scatters():
     lims = [[0, 1], [-2.5, 2.5]]
 
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(11, 6))
-    for i, (dd_obj, color, lim, dd_name) in enumerate(zip(discrete_distribs, colors, lims, dd_names)):
+    for i, (dd_obj, color, lim, dd_name) in \
+            enumerate(zip(discrete_distribs, colors, lims, dd_names)):
         samples = dd_obj.gen_dd_samples(1, n, 2).squeeze()
         ax[i].scatter(samples[:, 0], samples[:, 1], color=color)
         ax[i].set_xlabel('$x_1$')
@@ -33,13 +43,23 @@ def iid_scatters():
 
 
 def lds_scatters():
+    """
+    Visualize shifted lattice and scrambled Sobol sampling points.
+
+    Returns:
+        None
+
+    Note:
+        Plot is generated in outputs/scatters/lds_dd.png.
+    """
     plt.cla()
     plt.clf()
     discrete_distribs = [Lattice(rng_seed=7), Sobol(rng_seed=7)]
     dd_names = ['Shifted Lattice', 'Scrambled Sobol']
     colors = ['g', 'c']
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(11, 6))
-    for i, (dd_obj, color, dd_name) in enumerate(zip(discrete_distribs, colors, dd_names)):
+    for i, (dd_obj, color, dd_name) in \
+            enumerate(zip(discrete_distribs, colors, dd_names)):
         samples = dd_obj.gen_dd_samples(1, n, 2).squeeze()
         ax[i].scatter(samples[:, 0], samples[:, 1], color=color)
         ax[i].set_xlabel('$x_1$')
@@ -57,15 +77,22 @@ def lds_scatters():
 def grid_transform_scatters():
     plt.cla()
     plt.clf()
-    true_measures = [Uniform(2), Gaussian(2), BrownianMotion(dimension=2, time_vector=[arange(1 / 2, 3 / 2, 1 / 2)])]
-    tm_names = ['$\\mathcal{U}_2\\,(0,1)$', '$\\mathcal{N}_2\\,(0,1)$', 'BrownianMotion with time_vector = [.5 , 1]']
-    discrete_distribs = [IIDStdUniform(rng_seed=7), IIDStdGaussian(rng_seed=7), Lattice(rng_seed=7), Sobol(rng_seed=7)]
-    dd_names = ['IID $\\mathcal{U}_2\\,(0,1)$', 'IID $\\mathcal{N}_2\\,(0,1)$', 'Shifted Lattice', 'Scrambled Sobol']
+    time_vector = [arange(1 / 2, 3 / 2, 1 / 2)]
+    true_measures = [Uniform(2), Gaussian(2),
+                     BrownianMotion(dimension=2, time_vector=time_vector)]
+    tm_names = ['$\\mathcal{U}_2\\,(0,1)$', '$\\mathcal{N}_2\\,(0,1)$',
+                'BrownianMotion with time_vector = [.5 , 1]']
+    discrete_distribs = [IIDStdUniform(rng_seed=7), IIDStdGaussian(rng_seed=7),
+                         Lattice(rng_seed=7), Sobol(rng_seed=7)]
+    dd_names = ['IID $\\mathcal{U}_2\\,(0,1)$', 'IID $\\mathcal{N}_2\\,(0,1)$',
+                'Shifted Lattice', 'Scrambled Sobol']
     colors = ['r', 'g', 'b']
     lims = [[0, 1], [-2.5, 2.5], [-2.5, 2.5]]
-    for true_measure, lim, color, tm_name in zip(true_measures, lims, colors, tm_names):
+    for true_measure, lim, color, tm_name \
+            in zip(true_measures, lims, colors, tm_names):
         fig, ax = plt.subplots(nrows=1, ncols=4, figsize=(16, 5))
-        for j, (discrete_distrib, dd_name) in enumerate(zip(discrete_distribs, dd_names)):
+        for j, (discrete_distrib, dd_name) in \
+                enumerate(zip(discrete_distribs, dd_names)):
             tm_obj = deepcopy(true_measure)
             dd_obj = deepcopy(discrete_distrib)
             tm_obj.set_tm_gen(dd_obj)
@@ -79,7 +106,8 @@ def grid_transform_scatters():
             ax[j].set_title(dd_name)
         fig.suptitle('True Measure: %s' % tm_name)
         plt.tight_layout()
-        fig.savefig('outputs/scatters/%s_tm_transform.png' % type(true_measure).__name__, dpi=200)
+        prefix = type(true_measure).__name__
+        fig.savefig('outputs/scatters/%s_tm_transform.png' % prefix, dpi=200)
         plt.show(block=False)
 
 
