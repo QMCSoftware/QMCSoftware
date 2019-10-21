@@ -6,12 +6,12 @@
 The function to integrate<br>
 *Abstract class with concrete implementations*
 
-- Linear: :math:`y_i = \sum_{j=0}^{d-1}(x_{ij})`
-- Keister: :math:`y_i = \pi^{d/2} * \cos(||x_i||_2)`
+- Linear: $\:\: y_i = \sum_{j=0}^{d-1}(x_{ij})$
+- Keister: $\:\: y_i = \pi^{d/2} * \cos(||x_i||_2)$
 - Asian Call
-    - :math:`S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}`
-    - discounted call payoff :math:`= max(\:\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)`
-    - discounted put payoff :math:`= max(\:\ K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)`
+    - $S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}$
+    - discounted call payoff $= max(\:\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)$
+    - discounted put payoff $= max(\:\ K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)$
 
 <hr>
 
@@ -19,9 +19,9 @@ The function to integrate<br>
 General measure used to define the integrand<br>
 *Abstract class with concrete implementations*
 
-- Uniform: :math:`\:\: \mathcal{U}(a,b)`
-- Gaussian: :math:`\:\: \mathcal{N}(\mu,\sigma^2)`
-- Brownian Motion: :math:`\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;` for :math:`\;Z_j \sim \mathcal{N}(0,1)`
+- Uniform: $\:\: \mathcal{U}(a,b)$
+- Gaussian: $\:\: \mathcal{N}(\mu,\sigma^2)$
+- Brownian Motion: $\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;$ for $\;Z_j \sim \mathcal{N}(0,1)$
 
 <hr>
 
@@ -29,10 +29,10 @@ General measure used to define the integrand<br>
 Sampling nodes iid or lds (low-discrepancy sequence)<br>
 *Abstract class with concrete implementations*
 
-- IID Standard Uniform: :math:`\:\: x_j \overset{iid}{\sim}   \mathcal{U}(0,1)`
-- IID Standard Gaussian: :math:`\:\: x_j \overset{iid}{\sim}   \mathcal{N}(0,1)`
-- Lattice (base 2): :math:`\:\: x_j  \overset{lds}{\sim}    \mathcal{U}(0,1)`
-- Sobol (base 2): :math:`\:\: x_j \overset{lds}{\sim}    \mathcal{U}(0,1)`
+- IID Standard Uniform: $\:\: x_j \overset{iid}{\sim}   \mathcal{U}(0,1)$
+- IID Standard Gaussian: $\:\: x_j \overset{iid}{\sim}   \mathcal{N}(0,1)$
+- Lattice (base 2): $\:\: x_j  \overset{lds}{\sim}    \mathcal{U}(0,1)$
+- Sobol (base 2): $\:\: x_j \overset{lds}{\sim}    \mathcal{U}(0,1)$
 
 
 <hr>
@@ -41,11 +41,11 @@ Sampling nodes iid or lds (low-discrepancy sequence)<br>
 The stopping criterion to determine sufficient approximation<br>
 *Abstract class with concrete implementations*
 <br><b>Central Limit Theorem (CLT)</b><br>
-:math:`\; \hat{\mu}_n = \overline{Y}_n \approx\mathcal{N}(\mu,\frac{\sigma^2}{n})`<br> 
-:math:`\; \mathbb{P}[\hat{\mu}_n-\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}} \leq \mu \leq \hat{\mu}_n+\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}}] \approx 1-\alpha`
+$\; \hat{\mu}_n = \overline{Y}_n \approx\mathcal{N}(\mu,\frac{\sigma^2}{n})$<br> 
+$\; \mathbb{P}[\hat{\mu}_n-\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}} \leq \mu \leq \hat{\mu}_n+\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}}] \approx 1-\alpha$
 
-- CLT for :math:`x_i\sim` iid
-- CLT Repeated for :math:`\{x_{r,i}\}_{r=1}^R \sim` lds
+- CLT for $x_i\sim$ iid
+- CLT Repeated for $\{x_{r,i}\}_{r=1}^R \sim$ lds
 
 
 <hr>   
