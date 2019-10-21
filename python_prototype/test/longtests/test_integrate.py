@@ -3,7 +3,7 @@ from numpy import array,arange
 
 from qmcpy import integrate
 from qmcpy.discrete_distribution import IIDStdGaussian, Lattice
-from qmcpy.true_measure import Gaussian, BrownianMotion,Lebesgue
+from qmcpy.true_measure import Uniform, Gaussian, BrownianMotion,Lebesgue
 from qmcpy.integrand import Keister, AsianCall,QuickConstruct
 from qmcpy.stopping_criterion import CLT, CLTRep
 
@@ -38,9 +38,9 @@ class IntegrationExampleTest(unittest.TestCase):
         self.assertTrue(abs(sol - true_value) < abs_tol)
 
     def test_Lebesgue_measure(self):
-        """ Mathematica: Integrate[5 x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
+        """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        integrand = QuickConstruct(custom_fun = lambda x: 5*(x.prod(1))**3)
+        integrand = QuickConstruct(custom_fun = lambda x: (x.prod(1))**3)
         true_measure = Lebesgue(
             dimension=[2],\
             uniform_lower_bound = [array([1,3])],
@@ -48,9 +48,21 @@ class IntegrationExampleTest(unittest.TestCase):
         discrete_distrib = Lattice(rng_seed=7)
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-        
-        print(sol)
-        true_value = 30375
+        true_value = 6075
+        self.assertTrue(abs(sol - true_value) < abs_tol)
+    
+    def test_Uniform_measure(self):
+        """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
+        abs_tol = 1
+        integrand = QuickConstruct(custom_fun = lambda x: (x.prod(1))**3)
+        true_measure = Uniform(
+            dimension=[2],\
+            lower_bound = [array([1,3])],
+            upper_bound = [array([3,6])])
+        discrete_distrib = Lattice(rng_seed=7)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+        sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        true_value = 6075/6
         self.assertTrue(abs(sol - true_value) < abs_tol)
     
 if __name__ == "__main__":
