@@ -90,20 +90,21 @@ def grid_transform_scatters():
     lims = [[0, 1], [-2.5, 2.5], [-2.5, 2.5]]
     for true_measure, lim, color, tm_name \
             in zip(true_measures, lims, colors, tm_names):
-        fig, ax = plt.subplots(nrows=1, ncols=4, figsize=(16, 5))
-        for j, (discrete_distrib, dd_name) in \
+        fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 11))
+        for k, (discrete_distrib, dd_name) in \
                 enumerate(zip(discrete_distribs, dd_names)):
+            i,j = k//2,k%2
             tm_obj = deepcopy(true_measure)
             dd_obj = deepcopy(discrete_distrib)
             tm_obj.set_tm_gen(dd_obj)
             tm_samples = tm_obj[0].gen_tm_samples(1, n).squeeze()
-            ax[j].scatter(tm_samples[:, 0], tm_samples[:, 1], color=color)
-            ax[j].set_xlabel('$x_1$')
-            ax[j].set_ylabel('$x_2$')
-            ax[j].set_xlim(lim)
-            ax[j].set_ylim(lim)
-            ax[j].set_aspect('equal')
-            ax[j].set_title(dd_name)
+            ax[i,j].scatter(tm_samples[:, 0], tm_samples[:, 1], color=color)
+            ax[i,j].set_xlabel('$x_1$')
+            ax[i,j].set_ylabel('$x_2$')
+            ax[i,j].set_xlim(lim)
+            ax[i,j].set_ylim(lim)
+            ax[i,j].set_aspect('equal')
+            ax[i,j].set_title(dd_name)
         fig.suptitle('True Measure: %s' % tm_name)
         plt.tight_layout()
         prefix = type(true_measure).__name__
