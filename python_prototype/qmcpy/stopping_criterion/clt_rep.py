@@ -41,7 +41,7 @@ class CLTRep(StoppingCriterion):
         self.data.n_next = full(n_integrands, self.n_init)  # next n for each integrand
 
     def stop_yet(self):
-        """ Determine when to stopping_criterion """
+        """ Determine when to stop """
         for i in range(self.data.n_integrands):
             if self.data.sig2hat[i] < self.abs_tol:
                 # Sufficient estimate for mean of f[i]
