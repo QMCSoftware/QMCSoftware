@@ -1,26 +1,34 @@
 import unittest
-from numpy import array, arange
 
+from numpy import arange, array
 from qmcpy import integrate
-from qmcpy.discrete_distribution import IIDStdGaussian, Lattice
-from qmcpy.true_measure import Uniform, Gaussian, BrownianMotion, Lebesgue
-from qmcpy.integrand import Keister, AsianCall, QuickConstruct
+from qmcpy.discrete_distribution import IIDStdGaussian, IIDStdUniform, Lattice
+from qmcpy.integrand import AsianCall, Keister, Linear, QuickConstruct
 from qmcpy.stopping_criterion import CLT, CLTRep
+from qmcpy.true_measure import BrownianMotion, Gaussian, Lebesgue, Uniform
 
 
 class IntegrationExampleTest(unittest.TestCase):
 
-    def test_keister_2d(self):
-        """ Mathematica: N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]] """
-        abs_tol = .1
-        integrand = Keister()
-        discrete_distrib = IIDStdGaussian()
-        true_measure = Gaussian(dimension=2, variance=1 / 2)
-        stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-        sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-        true_value = 1.808186429263620
-
-        self.assertTrue(abs(sol - true_value) < abs_tol)
+    def test_keister(self):
+        """
+        Mathematica:
+        3D:  N[Integrate[E^(-x1^2 - x2^2 - x3^2) Cos[Sqrt[x1^2 + x2^2 + x3^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}, {x3, -Infinity, Infinity}]]
+        2D:  N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]]
+        1D:  N[Integrate[E^(-x^2) Cos[Sqrt[x^2]], {x, -Infinity, Infinity}]]
+        """
+        abs_tol = 0.01
+        dimensions = [1, 2, 3]
+        true_values = [1.3803884470431430, 1.808186429263620, 2.168309102165481]
+        for d in dimensions:
+            integrand = Keister()
+            discrete_distrib = IIDStdGaussian()
+            true_measure = Gaussian(dimension=d, variance=1 / 2)
+            stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
+            sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+            true_value = true_values[d - 1]
+            self.assertTrue(abs(sol - true_value) < abs_tol)
+            self.assertTrue(integrand.dimension == d)
 
     def test_asian_option_multi_level(self):
         abs_tol = 0.1
@@ -37,7 +45,7 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = 6.20
         self.assertTrue(abs(sol - true_value) < abs_tol)
 
-    def test_Lebesgue_measure(self):
+    def test_lebesgue_measure(self):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         integrand = QuickConstruct(custom_fun=lambda x: (x.prod(1))**3)
@@ -51,7 +59,7 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = 6075
         self.assertTrue(abs(sol - true_value) < abs_tol)
 
-    def test_Uniform_measure(self):
+    def test_uniform_measure(self):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         integrand = QuickConstruct(custom_fun=lambda x: (x.prod(1))**3)
@@ -64,6 +72,26 @@ class IntegrationExampleTest(unittest.TestCase):
         sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         true_value = 6075 / 6
         self.assertTrue(abs(sol - true_value) < abs_tol)
+
+    def test_linear(self):
+        """ Mathematica:
+        1D: Integrate[x, {x, 0, 1}]
+        2D: Integrate[x+y, {x, 0, 1}, {y, 0, 1}]
+        3D: Integrate[x+y+z, {x, 0, 1}, {y, 0, 1}, {z, 0, 1}]
+        """
+        abs_tol = 0.01
+        dimensions = [1, 2, 3]
+        true_values = [0.5, 1, 1.5]
+        for d in dimensions:
+            integrand = Linear()
+            measure = Uniform(dimension=d)
+            discrete_distrib = IIDStdUniform(rng_seed=7)
+            stopping_criterion = CLT(discrete_distrib, measure, abs_tol=abs_tol)
+            sol, _ = integrate(integrand, measure, discrete_distrib,
+                               stopping_criterion)
+            true_value = true_values[d - 1]
+            self.assertTrue(abs(sol - true_value) < abs_tol)
+            self.assertTrue(integrand.dimension == d)
 
 
 if __name__ == "__main__":
