@@ -9,9 +9,9 @@ class Linear(Integrand):
     for :math:`\\boldsymbol{x} = (x_1,\\ldots,x_d) \\in \\mathbb{R}^d`
     """
 
-    # def __init__(self):     # useless super delegation
-    #     """ Initialize Linear Integrand """
-    #     super().__init__()
+    def __init__(self, dimension=2):
+        """ Initialize Linear Integrand """
+        super().__init__(dimension)
 
     def g(self, x):
         """
@@ -28,5 +28,6 @@ class Linear(Integrand):
             then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
             and :math:`x'_{ij} = c` otherwise
         """
+        if self.dimension != x.shape[1]: self.dimension = x.shape[1]
         y = x.sum(1)  # Linear sum
         return y

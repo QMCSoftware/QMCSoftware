@@ -1,6 +1,6 @@
 """ Definition for class Keister, a concrete implementation of Integrand """
 
-from numpy import cos, pi
+from numpy import absolute, cos, linalg as LA, pi
 
 from . import Integrand
 
@@ -19,9 +19,9 @@ class Keister(Integrand):
             `Computers in Physics`, *10*, pp. 119-122, 1996.
     """
 
-    # def __init__(self):  # useless super delegation
-    #     """ Initialize Keister Integrand """
-    #     super().__init__()
+    def __init__(self, dimension=2):
+        """ Initialize Keister Integrand """
+        super().__init__(dimension)
 
     def g(self, x):
         """
@@ -38,7 +38,7 @@ class Keister(Integrand):
             then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
             and :math:`x'_{ij} = c` otherwise
         """
-        normx2 = (x ** 2).sum(1)  # ||x||^2
-        n_coord_index = x.shape[-1]
-        y = pi ** (n_coord_index / 2) * cos(normx2 ** 0.5)
+        if self.dimension != x.shape[1]: self.dimension = x.shape[1]
+        normx = LA.norm(x, 2, axis=1)  # ||x||_2
+        y = pi ** (self.dimension / 2.0) * cos(normx)
         return y

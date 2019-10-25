@@ -11,17 +11,17 @@ class Integrand(ABC):
     :math:`\\boldsymbol{x} \\in \\mathcal{X}`
     """
 
-    def __init__(self):
+    def __init__(self, dimension=2):
         """
         Attributes:
             f (Integrand): function transformed to accept distribution \
                 values
-            dimension (int): dimension of the domain, :math:`d > 0`
+            dimension (int): dimension of the domain, :math:`d > 0`. Default to 2.
             integrand_list (list): list of Integrands, may be more than 1 for \
                 multi-dimensional problems
         """
         super().__init__()
-        self.dimension = 2
+        self.dimension = dimension
         self.integrand_list = [self]
 
     @abstractmethod

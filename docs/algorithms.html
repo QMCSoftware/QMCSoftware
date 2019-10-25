@@ -204,11 +204,11 @@ sum of two variables defined on unit square is used.</p></li>
 <span class="target" id="module-qmcpy.integrand"></span><p>Definition for abstract class, <code class="docutils literal notranslate"><span class="pre">Integrand</span></code></p>
 <dl class="class">
 <dt id="qmcpy.integrand.Integrand">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.</code><code class="sig-name descname">Integrand</code><a class="headerlink" href="#qmcpy.integrand.Integrand" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.</code><code class="sig-name descname">Integrand</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.Integrand" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <span class="math notranslate nohighlight">\(f(\boldsymbol{x})\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathcal{X}\)</span></p>
 <dl class="method">
 <dt id="qmcpy.integrand.Integrand.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.Integrand.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
 <dt id="qmcpy.integrand.Integrand.f">
 <code class="sig-name descname">f</code><a class="headerlink" href="#qmcpy.integrand.Integrand.f" title="Permalink to this definition">¶</a></dt>
@@ -223,7 +223,7 @@ sum of two variables defined on unit square is used.</p></li>
 <dl class="attribute">
 <dt id="qmcpy.integrand.Integrand.dimension">
 <code class="sig-name descname">dimension</code><a class="headerlink" href="#qmcpy.integrand.Integrand.dimension" title="Permalink to this definition">¶</a></dt>
-<dd><p>dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span></p>
+<dd><p>dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span>. Default to 2.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
@@ -347,7 +347,7 @@ Example call:</p>
 <p>Definition for class Keister, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.keister.Keister">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values     <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \pi^{d/2} \cos(\| \boldsymbol{x} \|)\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathbb{R}^d\)</span>.</p>
 <p>The standard example integrates the Keister integrand with respect to an     IID Gaussian distribution with variance 1/2.</p>
 <dl class="simple">
@@ -359,6 +359,12 @@ Example call:</p>
 </ol>
 </dd>
 </dl>
+<dl class="method">
+<dt id="qmcpy.integrand.keister.Keister.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize Keister Integrand</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="qmcpy.integrand.keister.Keister.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister.g" title="Permalink to this definition">¶</a></dt>
@@ -381,8 +387,14 @@ Example call:</p>
 <p>Definition for class Linear, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.linear.Linear">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \sum_{i=1}^d x_i\)</span>     for <span class="math notranslate nohighlight">\(\boldsymbol{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d\)</span></p>
+<dl class="method">
+<dt id="qmcpy.integrand.linear.Linear.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize Linear Integrand</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="qmcpy.integrand.linear.Linear.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.g" title="Permalink to this definition">¶</a></dt>
