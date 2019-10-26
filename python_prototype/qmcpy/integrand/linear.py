@@ -10,7 +10,12 @@ class Linear(Integrand):
     """
 
     def __init__(self, dimension=2):
-        """ Initialize Linear Integrand """
+        """ Initialize Linear Integrand
+
+        Attributes:
+            dimension (int): Dimension of the domain, :math:`d > 0`. Default to 2.
+
+        """
         super().__init__(dimension)
 
     def g(self, x):

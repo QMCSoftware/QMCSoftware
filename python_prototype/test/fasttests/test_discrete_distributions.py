@@ -11,7 +11,7 @@ class TestIIDStdUniform(unittest.TestCase):
 
     def test_mimics(self):
         discrete_distrib = IIDStdUniform()
-        self.assertEqual(discrete_distrib.mimics, 'StdUniform')
+        self.assertEqual(discrete_distrib.mimics, "StdUniform")
 
     def test_gen_samples(self):
         discrete_distrib = IIDStdUniform()
@@ -26,7 +26,7 @@ class TestIIDGaussian(unittest.TestCase):
 
     def test_mimics(self):
         discrete_distrib = IIDStdGaussian()
-        self.assertEqual(discrete_distrib.mimics, 'StdGaussian')
+        self.assertEqual(discrete_distrib.mimics, "StdGaussian")
 
     def test_gen_samples(self):
         discrete_distrib = IIDStdGaussian()
@@ -41,7 +41,7 @@ class TestLattice(unittest.TestCase):
 
     def test_mimics(self):
         discrete_distrib = Lattice()
-        self.assertEqual(discrete_distrib.mimics, 'StdUniform')
+        self.assertEqual(discrete_distrib.mimics, "StdUniform")
 
     def test_gen_samples(self):
         discrete_distrib = Lattice()
@@ -66,7 +66,7 @@ class TestSobol(unittest.TestCase):
 
     def test_mimics(self):
         discrete_distrib = Sobol()
-        self.assertEqual(discrete_distrib.mimics, 'StdUniform')
+        self.assertEqual(discrete_distrib.mimics, "StdUniform")
 
     def test_gen_samples(self):
         discrete_distrib = Sobol()

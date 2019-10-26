@@ -46,5 +46,5 @@ def test_distributions_keister(dim, abs_tol):
     data.summarize()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_distributions_keister(dim=3, abs_tol=.01)

@@ -17,7 +17,7 @@ class IIDStdUniform(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics='StdUniform')
+        super().__init__(mimics="StdUniform")
         self.rng = Generator(PCG64(rng_seed))
 
     def gen_dd_samples(self, r, n, d):
@@ -46,7 +46,7 @@ class IIDStdGaussian(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics='StdGaussian')
+        super().__init__(mimics="StdGaussian")
         self.rng = Generator(PCG64(rng_seed))
 
     def gen_dd_samples(self, r, n, d):
@@ -75,7 +75,7 @@ class Lattice(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics='StdUniform')
+        super().__init__(mimics="StdUniform")
         self.rng = Generator(PCG64(rng_seed))
 
     def gen_dd_samples(self, r, n, d):
@@ -106,7 +106,7 @@ class Sobol(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics='StdUniform')
+        super().__init__(mimics="StdUniform")
         self.rng = Generator(PCG64(rng_seed))
 
     def gen_dd_samples(self, r, n, d):
@@ -121,7 +121,7 @@ class Sobol(DiscreteDistribution):
         Returns:
             rxnxd (numpy array)
         """
-        gen = DigitalSeq(Cs='sobol_Cs.col', m=int(log(n) / log(2)), s=d)
+        gen = DigitalSeq(Cs="sobol_Cs.col", m=int(log(n) / log(2)), s=d)
         t = max(32, gen.t)  # we guarantee a depth of >=32 bits for shift
         ct = max(0, t - gen.t)  # correction factor to scale the integers
         shifts = self.rng.integers(0, 2 ** t, (r, d), dtype=int64)

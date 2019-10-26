@@ -8,7 +8,7 @@ import pandas as pd
 from ..third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
 
 
-# sys.path.append(os.path.abspath('../'))
+# sys.path.append(os.path.abspath("../"))
 
 def bitreverse(a, m=None):
     """
@@ -27,7 +27,7 @@ def bitreverse(a, m=None):
     if m is None:
         m = len(bin_number) - 2
     reverse_number = bin_number[-1:1:-1]
-    reverse_number = reverse_number + (m - len(reverse_number)) * '0'
+    reverse_number = reverse_number + (m - len(reverse_number)) * "0"
     a_rev = int(reverse_number, 2)
     return a_rev
 
@@ -159,11 +159,11 @@ class DigitalSeq(digitalseq_b2g):
 
         ::
 
-          numpy.loadtxt('Bs64.col', int) # mind the int: read as integers!
+          numpy.loadtxt("Bs64.col", int) # mind the int: read as integers!
 
         ::
 
-          f = open('Bs.col')
+          f = open("Bs.col")
           Bs = [map(int, line.split()) for line in f] # arbitrary big integers here...
 
         The easiest way is however to just provide the filename as the Cs
@@ -187,7 +187,7 @@ class DigitalSeq(digitalseq_b2g):
             # filename passed in
             Cs = pd.read_csv(abs_file_path, header=None, delimiter=" ",
                              nrows=s).values.tolist()
-        elif hasattr(Cs, 'read'):
+        elif hasattr(Cs, "read"):
             # assume z is a stream like sys.stdin
             f = Cs
             Cs = [list(map(int, line.split())) for line in f]
@@ -223,5 +223,5 @@ if __name__ == "__main__":
         seq.recipd = mpmath.mpf(1) / 2 ** seq.t
     for x in seq:
         for xj in x:
-            print(xj, end=' ')
+            print(xj, end=" ")
         print()

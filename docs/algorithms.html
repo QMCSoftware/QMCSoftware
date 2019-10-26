@@ -223,7 +223,7 @@ sum of two variables defined on unit square is used.</p></li>
 <dl class="attribute">
 <dt id="qmcpy.integrand.Integrand.dimension">
 <code class="sig-name descname">dimension</code><a class="headerlink" href="#qmcpy.integrand.Integrand.dimension" title="Permalink to this definition">¶</a></dt>
-<dd><p>dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span>. Default to 2.</p>
+<dd><p>Dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span>. Default to 2.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
@@ -234,7 +234,7 @@ sum of two variables defined on unit square is used.</p></li>
 <dl class="attribute">
 <dt id="qmcpy.integrand.Integrand.integrand_list">
 <code class="sig-name descname">integrand_list</code><a class="headerlink" href="#qmcpy.integrand.Integrand.integrand_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of Integrands, may be more than 1 for                 multi-dimensional problems</p>
+<dd><p>List of Integrands, may be more than 1 for                 multi-dimensional problems</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
@@ -272,10 +272,7 @@ Example call:</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>IntegrandError if this method is called on the original             construcing TrueMeasure object</strong><strong> or </strong><strong>has not</strong> – </p></li>
-<li><p><strong>been initialized for each integrand yet</strong> – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>IntegrandError if this method is called on the original             construcing TrueMeasure object</strong><strong> or </strong><strong>has not             been initialized for each integrand yet</strong> – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -363,6 +360,17 @@ Example call:</p>
 <dt id="qmcpy.integrand.keister.Keister.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize Keister Integrand</p>
+<dl class="attribute">
+<dt id="qmcpy.integrand.keister.Keister.dimension">
+<code class="sig-name descname">dimension</code><a class="headerlink" href="#qmcpy.integrand.keister.Keister.dimension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span>. Default to 2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="method">
@@ -393,6 +401,17 @@ Example call:</p>
 <dt id="qmcpy.integrand.linear.Linear.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize Linear Integrand</p>
+<dl class="attribute">
+<dt id="qmcpy.integrand.linear.Linear.dimension">
+<code class="sig-name descname">dimension</code><a class="headerlink" href="#qmcpy.integrand.linear.Linear.dimension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span>. Default to 2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="method">
@@ -469,10 +488,7 @@ Example call:</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>TransformError if this method is called on the original             construcing TrueMeasure object</strong><strong> or </strong><strong>has not</strong> – </p></li>
-<li><p><strong>been initialized for each true measure yet</strong> – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>TransformError if this method is called on the original             construcing TrueMeasure object</strong><strong> or </strong><strong>has not             been initialized for each true measure yet</strong> – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -523,7 +539,7 @@ self[i].transforms (dict)</p>
 <code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">discrete_distrib</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.TrueMeasure.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls self.set_tm_gen(discrete_distrib) then
 calls self.set_f(integrand, discrete_distrib)
-Respectively, these two methods nitialize
+Respectively, these two methods initialize
 true_measure_obj[i].gen_tm_samples(r,n)
 and integrand[i].f(x)
 for i=1,2,…,len(integrand_obj)
@@ -812,7 +828,7 @@ self[i].transforms (dict)</p></li>
 <dl class="attribute">
 <dt id="qmcpy.accum_data.AccumData.stage">
 <code class="sig-name descname">stage</code><a class="headerlink" href="#qmcpy.accum_data.AccumData.stage" title="Permalink to this definition">¶</a></dt>
-<dd><p>stage of computation; ‘begin’, or ‘done’ when finished</p>
+<dd><p>stage of computation; “begin”, or “done” when finished</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>

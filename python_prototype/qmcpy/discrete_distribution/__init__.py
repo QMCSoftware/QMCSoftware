@@ -40,7 +40,7 @@ class DiscreteDistribution(ABC):
         print(attrs_vals_str)
 
     def __repr__(self):
-        return univ_repr(self, 'Discrete Distribution')
+        return univ_repr(self, "Discrete Distribution")
 
 
 # API
