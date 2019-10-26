@@ -47,7 +47,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     data.summarize()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Singl-Level Asian Option Pricing
     time_vec = [arange(1 / 64, 65 / 64, 1 / 64)]
     dim = [len(tv) for tv in time_vec]

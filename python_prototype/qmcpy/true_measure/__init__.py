@@ -67,7 +67,7 @@ class TrueMeasure(ABC):
         for measure_i in self:
             if discrete_distrib.mimics not in list(measure_i.transforms.keys()):
                 raise TransformError(
-                    'Cannot tranform %s to %s' %
+                    "Cannot tranform %s to %s" %
                     (type(discrete_distrib).__name__, type(self).__name__))
             measure_i.gen_tm_samples = lambda r, n, self=measure_i: \
                 self.transforms[discrete_distrib.mimics][0](self,
@@ -102,11 +102,10 @@ class TrueMeasure(ABC):
 
         Raises:
             TransformError if this method is called on the original \
-            construcing TrueMeasure object or has not
+            construcing TrueMeasure object or has not \
             been initialized for each true measure yet
         """
-        raise TransformError(
-            '''
+        raise TransformError('''
             To initilize this method for each integrand call:
                 true_measure_obj.set_tm_gen(discrete_distrib_obj)
             To call this method for the ith integrand call:
@@ -127,11 +126,11 @@ class TrueMeasure(ABC):
             integrand (Integrand): the constructing integrand object
         """
         if len(integrand) != len(self):
-            raise TransformError('Number of distributions must match number of integrands')
+            raise TransformError("Number of distributions must match number of integrands")
         for integrand_i, measure_i in zip(integrand, self):
             if discrete_distrib.mimics not in list(measure_i.transforms.keys()):
                 raise TransformError(
-                    'Cannot tranform %s to %s' %
+                    "Cannot tranform %s to %s" %
                     (type(discrete_distrib).__name__, type(measure_i).__name__))
             integrand_i.f = lambda x, self=integrand_i, msr_obj=measure_i: \
                 msr_obj.transforms[discrete_distrib.mimics][1](msr_obj, self.g(x))
@@ -140,7 +139,7 @@ class TrueMeasure(ABC):
         """
         Calls self.set_tm_gen(discrete_distrib) then
         calls self.set_f(integrand, discrete_distrib)
-        Respectively, these two methods nitialize 
+        Respectively, these two methods initialize
         true_measure_obj[i].gen_tm_samples(r,n)
         and integrand[i].f(x)
         for i=1,2,...,len(integrand_obj)

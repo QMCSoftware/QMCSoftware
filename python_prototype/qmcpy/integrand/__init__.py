@@ -16,8 +16,8 @@ class Integrand(ABC):
         Attributes:
             f (Integrand): function transformed to accept distribution \
                 values
-            dimension (int): dimension of the domain, :math:`d > 0`. Default to 2.
-            integrand_list (list): list of Integrands, may be more than 1 for \
+            dimension (int): Dimension of the domain, :math:`d > 0`. Default to 2.
+            integrand_list (list): List of Integrands, may be more than 1 for \
                 multi-dimensional problems
         """
         super().__init__()
@@ -70,16 +70,14 @@ class Integrand(ABC):
 
         Raises:
             IntegrandError if this method is called on the original \
-            construcing TrueMeasure object or has not
+            construcing TrueMeasure object or has not \
             been initialized for each integrand yet
         """
-        raise TransformError(
-            '''
+        raise TransformError("""
             To initilize this method for each integrand call:
                 true_measure_obj.set_f(discrete_distrib_obj, integrand_obj)
             To call this method for the ith integrand call:
-                integrand_obj[i].f(x)
-            ''')
+                integrand_obj[i].f(x)""")
 
     def __len__(self):
         return len(self.integrand_list)

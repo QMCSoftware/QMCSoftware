@@ -14,7 +14,7 @@ class AccumData(ABC):
     sample mean and variance of integrand values
 
     Attributes:
-        stage (str): stage of computation; 'begin', or 'done' when finished
+        stage (str): stage of computation; "begin", or "done" when finished
         n_samples_total (array-like): number of samples used so far
         confid_int (array-like (2, 1)): error bound on the solution
         time_total (float): total computation time. Set by integrate method.
@@ -73,7 +73,7 @@ class AccumData(ABC):
                                     str(self.n_samples_total))
         attrs_vals_str += item_f % ("time_total", self.time_total)
         attrs_vals_str += item_s % ("confid_int", str(self.confid_int))
-        print(attrs_vals_str[:-1] + '\n')
+        print(attrs_vals_str[:-1] + "\n")
 
     def __repr__(self):
         return univ_repr(self)

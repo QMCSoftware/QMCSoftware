@@ -28,7 +28,7 @@ class CleanCommand(Command):
         pass
 
     def run(self):
-        os.system('rm -vrf ./build ./dist ./*.pyc ./qmcpy/qmcpy.egg-info')
+        os.system("rm -vrf ./build ./dist ./*.pyc ./qmcpy/qmcpy.egg-info")
 
 
 with open("README.md", "r") as fh:
@@ -50,6 +50,6 @@ setuptools.setup(
         "License :: OSI Approved :: IIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7',
-    cmdclass={'clean': CleanCommand}
+    python_requires=">=3.7",
+    cmdclass={"clean": CleanCommand}
 )

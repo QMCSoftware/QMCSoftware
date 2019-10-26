@@ -23,7 +23,7 @@ class TestTrueDistributionConstruciton(unittest.TestCase):
 
     def test_transform_errors(self):
         discrete_distrib = IIDStdGaussian()
-        discrete_distrib.mimics = 'Poisson'
+        discrete_distrib.mimics = "Poisson"
         # Transform from poisson to Gaussion not implemented yet
         true_measure = Gaussian(2)
         self.assertRaises(TransformError, true_measure.set_tm_gen,

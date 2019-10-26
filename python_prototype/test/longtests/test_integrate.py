@@ -32,10 +32,9 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_asian_option_multi_level(self):
         abs_tol = 0.1
-        time_vec = [
-            arange(1 / 4, 5 / 4, 1 / 4),
-            arange(1 / 16, 17 / 16, 1 / 16),
-            arange(1 / 64, 65 / 64, 1 / 64)]
+        time_vec = [arange(1 / 4, 5 / 4, 1 / 4),
+                    arange(1 / 16, 17 / 16, 1 / 16),
+                    arange(1 / 64, 65 / 64, 1 / 64)]
         dims = [len(tv) for tv in time_vec]
         discrete_distrib = Lattice()
         true_measure = BrownianMotion(dims, time_vector=time_vec)
@@ -49,10 +48,9 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         integrand = QuickConstruct(custom_fun=lambda x: (x.prod(1))**3)
-        true_measure = Lebesgue(
-            dimension=[2],
-            uniform_lower_bound=[array([1, 3])],
-            uniform_upper_bound=[array([3, 6])])
+        true_measure = Lebesgue(dimension=[2],
+                                uniform_lower_bound=[array([1, 3])],
+                                uniform_upper_bound=[array([3, 6])])
         discrete_distrib = Lattice(rng_seed=7)
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
@@ -63,10 +61,9 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         integrand = QuickConstruct(custom_fun=lambda x: (x.prod(1))**3)
-        true_measure = Uniform(
-            dimension=[2],
-            lower_bound=[array([1, 3])],
-            upper_bound=[array([3, 6])])
+        true_measure = Uniform(dimension=[2],
+                               lower_bound=[array([1, 3])],
+                               upper_bound=[array([3, 6])])
         discrete_distrib = Lattice(rng_seed=7)
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
