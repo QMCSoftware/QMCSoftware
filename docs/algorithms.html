@@ -84,8 +84,7 @@
             
               <p class="caption"><span class="caption-text">Contents</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="readme.html">Quasi-Monte Carlo Community Software</a></li>
-<li class="toctree-l1"><a class="reference internal" href="readme.html#python-3-library-of-qmc-software">Python 3 Library of QMC Software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">About Our QMC Software Community</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">QMCPy Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.integrate">Integration Method</a></li>
@@ -93,6 +92,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.asian_call">Asican Call Option Payoff</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.keister">Keister Function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.linear">A Linear Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.quick_construct">Quick Construct for Function</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#measure-class">Measure Class</a></li>
@@ -417,6 +417,46 @@ Example call:</p>
 <dl class="method">
 <dt id="qmcpy.integrand.linear.Linear.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Original integrand to be integrated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qmcpy.integrand.quick_construct">
+<span id="quick-construct-for-function"></span><h3>Quick Construct for Function<a class="headerlink" href="#module-qmcpy.integrand.quick_construct" title="Permalink to this headline">¶</a></h3>
+<p>Definition for class QuickConstruct, a concrete implementation of Integrand</p>
+<dl class="class">
+<dt id="qmcpy.integrand.quick_construct.QuickConstruct">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.quick_construct.</code><code class="sig-name descname">QuickConstruct</code><span class="sig-paren">(</span><em class="sig-param">custom_fun=None</em>, <em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify and generate values of a user-defined function</p>
+<dl class="method">
+<dt id="qmcpy.integrand.quick_construct.QuickConstruct.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">custom_fun=None</em>, <em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize custom Integrand</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>custom_fun</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – a callable univariable or multivariate Python              function that returns a real number.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Input of the function:</p>
+<p>x: nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                         row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.integrand.quick_construct.QuickConstruct.g">
+<code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct.g" title="Permalink to this definition">¶</a></dt>
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

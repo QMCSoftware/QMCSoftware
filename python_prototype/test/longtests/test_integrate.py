@@ -22,7 +22,7 @@ class IntegrationExampleTest(unittest.TestCase):
         true_values = [1.3803884470431430, 1.808186429263620, 2.168309102165481]
         for d in dimensions:
             integrand = Keister()
-            discrete_distrib = IIDStdGaussian()
+            discrete_distrib = IIDStdGaussian(rngseed=7)
             true_measure = Gaussian(dimension=d, variance=1 / 2)
             stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
             sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)

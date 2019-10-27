@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Quasi-Monte Carlo Community Software &mdash; qmcpy 0.1 documentation</title>
+  <title>About Our QMC Software Community &mdash; qmcpy 0.1 documentation</title>
   
 
   
@@ -85,22 +85,12 @@
             
               <p class="caption"><span class="caption-text">Contents</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Quasi-Monte Carlo Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#citation">Citation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#developers">Developers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#contributors">Contributors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#acknowledgment">Acknowledgment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">About Our QMC Software Community</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#about-our-python-qmc-software">About Our Python QMC Software</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#about-qmcpy">About QMCPy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#about-qmcpy-tests">About QMCPy Tests</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#python-3-library-of-qmc-software">Python 3 Library of QMC Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#qmcpy">QMCPy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#workouts">workouts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#test">test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#outputs">outputs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#demos">demos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sphinx">sphinx</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
@@ -150,7 +140,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Quasi-Monte Carlo Community Software</li>
+      <li>About Our QMC Software Community</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -168,93 +158,146 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="quasi-monte-carlo-community-software">
-<h1>Quasi-Monte Carlo Community Software<a class="headerlink" href="#quasi-monte-carlo-community-software" title="Permalink to this headline">¶</a></h1>
-<hr><p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
-<hr><div class="section" id="citation">
-<h2>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="about-our-qmc-software-community">
+<h1>About Our QMC Software Community<a class="headerlink" href="#about-our-qmc-software-community" title="Permalink to this headline">¶</a></h1>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#quasi-monte-carlo-community-software">Quasi-Monte Carlo Community Software</a><ul>
+<li><a href="#citation">Citation</a></li>
+<li><a href="#developers">Developers</a></li>
+<li><a href="#contributors">Contributors</a></li>
+<li><a href="#acknowledgment">Acknowledgment</a></li>
+<li><a href="#references">References</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="quasi-monte-carlo-community-software">Quasi-Monte Carlo Community Software</h1>
+<hr>
+<p>Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.</p>
+<hr>
+<h2 id="citation">Citation</h2>
 <p>If you find QMCPy helpful in your work, please support us by citing the following work:</p>
-<p>Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community Software.” Python software, 2019. Work in progress. Available from <a class="reference external" href="https://github.com/QMCSoftware/QMCSoftware">https://github.com/QMCSoftware/QMCSoftware</a></p>
-<hr></div>
-<div class="section" id="developers">
-<h2>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Sou-Cheng T. Choi</p></li>
-<li><p>Fred J. Hickernell</p></li>
-<li><p>Aleksei Sorokin</p></li>
+<p>Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC Community Software.” Python software, 2019. Work in progress. Available from https://github.com/QMCSoftware/QMCSoftware</p>
+<hr>
+<h2 id="developers">Developers</h2>
+<ul>
+<li>Sou-Cheng T. Choi</li>
+<li>Fred J. Hickernell</li>
+<li>Aleksei Sorokin</li>
 </ul>
-<hr></div>
-<div class="section" id="contributors">
-<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Michael McCourt</p></li>
+<hr>
+<h2 id="contributors">Contributors</h2>
+<ul>
+<li>Michael McCourt</li>
 </ul>
-<hr></div>
-<div class="section" id="acknowledgment">
-<h2>Acknowledgment<a class="headerlink" href="#acknowledgment" title="Permalink to this headline">¶</a></h2>
+<hr>
+<h2 id="acknowledgment">Acknowledgment</h2>
 <p>We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.</p>
-<hr></div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p><span class="raw-html-m2r"><b>[1]</b></span> F.Y. Kuo &amp; D. Nuyens. “Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients - a survey of analysis and implementation”,Foundations of Computational Mathematics, 16(6):1631-1696, 2016. (<a class="reference external" href="https://link.springer.com/article/10.1007/s10208-016-9329-5">springer link</a>, <a class="reference external" href="https://arxiv.org/abs/1606.06613">arxiv link</a>)</p>
-<p><span class="raw-html-m2r"><b>[2]</b></span> Fred J. Hickernell, Lan Jiang, Yuewei Liu, and Art B. Owen, “Guaranteed conservative fixed width confidence intervals via Monte Carlo sampling,” Monte Carlo and Quasi-Monte Carlo Methods 2012 (J. Dick, F.Y. Kuo, G. W. Peters, and I. H. Sloan, eds.), pp. 105-128, Springer-Verlag, Berlin, 2014. DOI: 10.1007/978-3-642-41095-6_5</p>
-<p><span class="raw-html-m2r"><b>[3]</b></span> Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. Available from <a class="reference external" href="http://gailgithub.github.io/GAIL_Dev/">http://gailgithub.github.io/GAIL_Dev/</a></p>
-<p><span class="raw-html-m2r"><b>[4]</b></span> Sou-Cheng T. Choi, “MINRES-QLP Pack and Reliable Reproducible Research via Supportable Scientific Software,” Journal of Open Research Software, Volume 2, Number 1, e22, pp. 1-7, 2014.</p>
-<p><span class="raw-html-m2r"><b>[5]</b></span> Sou-Cheng T. Choi and Fred J. Hickernell, “IIT MATH-573 Reliable Mathematical Software” [Course Slides], Illinois Institute of Technology, Chicago, IL, 2013. Available from <a class="reference external" href="http://gailgithub.github.io/GAIL_Dev/">http://gailgithub.github.io/GAIL_Dev/</a></p>
-<p><span class="raw-html-m2r"><b>[6]</b></span> Daniel S. Katz, Sou-Cheng T. Choi, Hilmar Lapp, Ketan Maheshwari, Frank Loffler, Matthew Turk, Marcus D. Hanwell, Nancy Wilkins-Diehr, James Hetherington, James Howison, Shel Swenson, Gabrielle D. Allen, Anne C. Elster, Bruce Berriman, Colin Venters, “Summary of the First Workshop On Sustainable Software for Science: Practice and Experiences (WSSSPE1),” Journal of Open Research Software, Volume 2, Number 1, e6, pp. 1-21, 2014.</p>
-<p><span class="raw-html-m2r"><b>[7]</b></span> Fang, K.-T., &amp; Wang, Y. (1994). Number-theoretic Methods in Statistics. London, UK: CHAPMAN &amp; HALL</p>
-<p><span class="raw-html-m2r"><b>[8]</b></span> Lan Jiang, Guaranteed Adaptive Monte Carlo Methods for Estimating Means of Random Variables, PhD Thesis, Illinois Institute of Technology, 2016.</p>
-<p><span class="raw-html-m2r"><b>[9]</b></span> Lluis Antoni Jimenez Rugama and Fred J. Hickernell, “Adaptive multidimensional integration based on rank-1 lattices,” Monte Carlo and Quasi-Monte Carlo  Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1411.1966, pp. 407-422.</p>
-<p><span class="raw-html-m2r"><b>[10]</b></span> Kai-Tai Fang and Yuan Wang, Number-theoretic Methods in Statistics, Chapman &amp; Hall, London, 1994.</p>
-<p><span class="raw-html-m2r"><b>[11]</b></span> Fred J. Hickernell and Lluis Antoni Jimenez Rugama, “Reliable adaptive cubature using digital sequences”, Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA], pp. 367-383.</p>
-</div>
-</div>
-<div class="section" id="python-3-library-of-qmc-software">
-<h1>Python 3 Library of QMC Software<a class="headerlink" href="#python-3-library-of-qmc-software" title="Permalink to this headline">¶</a></h1>
-<hr><div class="section" id="qmcpy">
-<h2>QMCPy<a class="headerlink" href="#qmcpy" title="Permalink to this headline">¶</a></h2>
-<p>Package of main components<span class="raw-html-m2r"><br></span></p>
-<ul class="simple">
-<li><p>Integrand classes</p></li>
-<li><p>True Measure classes</p></li>
-<li><p>Discrete Distribution classes</p></li>
-<li><p>Stopping Criterion classes</p></li>
-<li><p>Accumulate Data classes</p></li>
-<li><p>Third Party contributed classes</p></li>
-<li><p>integrate function</p></li>
+<hr>
+<h2 id="references">References</h2>
+<p><b>[1]</b> F.Y. Kuo &amp; D. Nuyens. “Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients - a survey of analysis and implementation”,Foundations of Computational Mathematics, 16(6):1631-1696, 2016. (<a href="https://link.springer.com/article/10.1007/s10208-016-9329-5">springer link</a>, <a href="https://arxiv.org/abs/1606.06613">arxiv link</a>)</p>
+<p><b>[2]</b> Fred J. Hickernell, Lan Jiang, Yuewei Liu, and Art B. Owen, “Guaranteed conservative fixed width confidence intervals via Monte Carlo sampling,” Monte Carlo and Quasi-Monte Carlo Methods 2012 (J. Dick, F.Y. Kuo, G. W. Peters, and I. H. Sloan, eds.), pp. 105-128, Springer-Verlag, Berlin, 2014. DOI: 10.1007/978-3-642-41095-6_5</p>
+<p><b>[3]</b> Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. Available from http://gailgithub.github.io/GAIL_Dev/</p>
+<p><b>[4]</b> Sou-Cheng T. Choi, “MINRES-QLP Pack and Reliable Reproducible Research via Supportable Scientific Software,” Journal of Open Research Software, Volume 2, Number 1, e22, pp. 1-7, 2014.</p>
+<p><b>[5]</b> Sou-Cheng T. Choi and Fred J. Hickernell, “IIT MATH-573 Reliable Mathematical Software” [Course Slides], Illinois Institute of Technology, Chicago, IL, 2013. Available from http://gailgithub.github.io/GAIL_Dev/</p>
+<p><b>[6]</b> Daniel S. Katz, Sou-Cheng T. Choi, Hilmar Lapp, Ketan Maheshwari, Frank Loffler, Matthew Turk, Marcus D. Hanwell, Nancy Wilkins-Diehr, James Hetherington, James Howison, Shel Swenson, Gabrielle D. Allen, Anne C. Elster, Bruce Berriman, Colin Venters, “Summary of the First Workshop On Sustainable Software for Science: Practice and Experiences (WSSSPE1),” Journal of Open Research Software, Volume 2, Number 1, e6, pp. 1-21, 2014.</p>
+<p><b>[7]</b> Fang, K.-T., &amp; Wang, Y. (1994). Number-theoretic Methods in Statistics. London, UK: CHAPMAN &amp; HALL</p>
+<p><b>[8]</b> Lan Jiang, Guaranteed Adaptive Monte Carlo Methods for Estimating Means of Random Variables, PhD Thesis, Illinois Institute of Technology, 2016.</p>
+<p><b>[9]</b> Lluis Antoni Jimenez Rugama and Fred J. Hickernell, “Adaptive multidimensional integration based on rank-1 lattices,” Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1411.1966, pp. 407-422.</p>
+<p><b>[10]</b> Kai-Tai Fang and Yuan Wang, Number-theoretic Methods in Statistics, Chapman &amp; Hall, London, 1994.</p>
+<p><b>[11]</b> Fred J. Hickernell and Lluis Antoni Jimenez Rugama, “Reliable adaptive cubature using digital sequences”, Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA], pp. 367-383.</p>
+</body>
+</html>
+<div class="section" id="about-our-python-qmc-software">
+<h2>About Our Python QMC Software<a class="headerlink" href="#about-our-python-qmc-software" title="Permalink to this headline">¶</a></h2>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#python-3-library-of-qmc-software">Python 3 Library of QMC Software</a><ul>
+<li><a href="#qmcpy">QMCPy</a></li>
+<li><a href="#workouts">workouts</a></li>
+<li><a href="#test">test</a></li>
+<li><a href="#outputs">outputs</a></li>
+<li><a href="#demos">demos</a></li>
+<li><a href="#sphinx">sphinx</a></li>
+<li><a href="#installation">Installation</a></li>
+</ul></li>
 </ul>
-<hr></div>
-<div class="section" id="workouts">
-<h2>workouts<a class="headerlink" href="#workouts" title="Permalink to this headline">¶</a></h2>
-<p>Example uses of QMCPy package<span class="raw-html-m2r"><br></span></p>
-<hr></div>
-<div class="section" id="test">
-<h2>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h2>
-<p>Sets of long and short unittests<span class="raw-html-m2r"><br></span></p>
-<hr></div>
-<div class="section" id="outputs">
-<h2>outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h2>
+</nav>
+<h1 id="python-3-library-of-qmc-software">Python 3 Library of QMC Software</h1>
+<hr>
+<h2 id="qmcpy">QMCPy</h2>
+<p>Package of main components<br></p>
+<ul>
+<li>Integrand classes</li>
+<li>True Measure classes</li>
+<li>Discrete Distribution classes</li>
+<li>Stopping Criterion classes</li>
+<li>Accumulate Data classes</li>
+<li>Third Party contributed classes</li>
+<li>integrate function</li>
+</ul>
+<hr>
+<h2 id="workouts">workouts</h2>
+<p>Example uses of QMCPy package<br></p>
+<hr>
+<h2 id="test">test</h2>
+<p>Sets of long and short unittests<br></p>
+<hr>
+<h2 id="outputs">outputs</h2>
 <p>Logs and figures generated by workouts</p>
-<hr></div>
-<div class="section" id="demos">
-<h2>demos<a class="headerlink" href="#demos" title="Permalink to this headline">¶</a></h2>
+<hr>
+<h2 id="demos">demos</h2>
 <p>Example use of QMCPy as an independent package</p>
-<hr></div>
-<div class="section" id="sphinx">
-<h2>sphinx<a class="headerlink" href="#sphinx" title="Permalink to this headline">¶</a></h2>
+<hr>
+<h2 id="sphinx">sphinx</h2>
 <p>Automated project documentation</p>
-<hr></div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">qmcpy</span>
-</pre></div>
-</div>
-<p>A virtual environment is recommended for developers/contributors<span class="raw-html-m2r"><br></span>
-Ensure <em>…/python_prototypes/</em> is in your path<span class="raw-html-m2r"><br></span>
-Install dependencies with<span class="raw-html-m2r"><br></span></p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
-</pre></div>
-</div>
+<hr>
+<h2 id="installation">Installation</h2>
+<pre><code>pip install qmcpy</code></pre>
+<p>A virtual environment is recommended for developers/contributors<br> Ensure <em>…/python_prototypes/</em> is in your path<br> Install dependencies with<br></p>
+<pre><code>pip install requirements.txt</code></pre>
+</body>
+</html>
+<div class="section" id="about-qmcpy">
+<h3>About QMCPy<a class="headerlink" href="#about-qmcpy" title="Permalink to this headline">¶</a></h3>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
@@ -343,6 +386,48 @@ Install dependencies with<span class="raw-html-m2r"><br></span></p>
 </ul>
 </body>
 </html>
+</div>
+<div class="section" id="about-qmcpy-tests">
+<h3>About QMCPy Tests<a class="headerlink" href="#about-qmcpy-tests" title="Permalink to this headline">¶</a></h3>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tests">Tests</a><ul>
+<li><a href="#fast-unittests">Fast unittests</a></li>
+<li><a href="#long-unittests">Long unittests</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="tests">Tests</h1>
+<hr>
+<h2 id="fast-unittests">Fast unittests</h2>
+<p>Quickly check functionality<br> Run all in &lt; 1 second</p>
+<pre><code>python -m unittest discover -s test/fasttests</code></pre>
+<hr>
+<h2 id="long-unittests">Long unittests</h2>
+<p>Call workout functions<br> Runs all in &lt; 10 seconds</p>
+<pre><code>python -m unittest discover -s test/longtests</code></pre>
+</body>
+</html>
+</div>
 </div>
 </div>
 
