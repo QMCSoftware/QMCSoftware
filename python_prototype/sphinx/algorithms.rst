@@ -32,6 +32,12 @@ A Linear Function
 .. automodule:: qmcpy.integrand.linear
     :members:
 
+Quick Construct for Function
+.............................
+
+.. automodule:: qmcpy.integrand.quick_construct
+    :members:
+
 Measure Class
 -------------
 
