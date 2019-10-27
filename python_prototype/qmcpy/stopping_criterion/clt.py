@@ -35,16 +35,12 @@ class CLT(StoppingCriterion):
         # Construct Data Object
         n_integrands = len(true_measure)
         self.data = MeanVarData(n_integrands)  # house integration data
-        self.data.n_mu = zeros(n_integrands)
-        # number of samples used to compute the sample mean
-        self.data.n_prev = zeros(n_integrands)  # initialize data object
-        self.data.n_next = tile(self.n_init, n_integrands)
-        # initialize as n_init
+        self.data.n = tile(self.n_init,n_integrands).astype(float)  # next n for each integrand
+        self.data.n_total = zeros(n_integrands)
 
     def stop_yet(self):
         """ Determine when to stop """
         if self.stage == "sigma":
-            self.data.n_prev = self.data.n_next  # update place in the sequence
             temp_a = (self.data.t_eval) ** 0.5
             # use cost of function values to decide how to allocate
             temp_b = (temp_a * self.data.sighat).sum(0)
@@ -54,14 +50,11 @@ class CLT(StoppingCriterion):
                                        max(self.abs_tol, self.data.solution * self.rel_tol)) ** 2
                              * (self.data.sighat / self.data.t_eval ** .5))
             # n_mu := n_mu_temp adjusted for n_prev
-            self.data.n_mu = minimum(maximum(self.data.n_next, n_mu_temp),
-                                     self.n_max - self.data.n_prev)
-            self.data.n_next = (self.data.n_mu + self.data.n_prev)
-            # set next_n to n_mu_temp
+            self.data.n_mu = minimum(maximum(self.data.n, n_mu_temp) , self.n_max)
+            self.data.n += self.data.n_mu
             self.stage = "mu"  # compute sample mean next
         elif self.stage == "mu":
-            self.data.solution = self.data.muhat.sum()  # mean of f means
-            self.data.n_samples_total = self.data.n_next
+            self.data.n_total = self.data.n.sum()
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \
                 * (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
             self.data.confid_int = self.data.solution + err_bar * array([-1, 1])

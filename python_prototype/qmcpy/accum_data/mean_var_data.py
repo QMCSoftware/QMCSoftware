@@ -38,13 +38,11 @@ class MeanVarData(AccumData):
         Returns:
             None
         """
-        for i, (integrand_i, true_measure_i) in enumerate(zip(integrand, true_measure)):
+        for i in range(len(true_measure)):
             t_start = process_time()  # time the integrand values
-            set_x = true_measure_i.gen_tm_samples(1, self.n_next[i]).squeeze(0)
-            y = integrand_i.f(set_x)
+            set_x = true_measure[i].gen_tm_samples(1, self.n[i]).squeeze(0)
+            y = integrand[i].f(set_x).squeeze()
             self.t_eval[i] = max(process_time() - t_start, EPS)
-            # for multi-level methods
-            self.sighat[i] = std(y)  # compute the sample standard deviation
-            self.muhat[i] = y.mean(0)  # compute the sample mean
-            self.solution = self.muhat.sum()
-            # which also acts as our tentative solution
+            self.sighat[i] = y.std()  # compute the sample standard deviation
+            self.muhat[i] = y.mean()  # compute the sample mean
+        self.solution = self.muhat.sum() # tentative solution
