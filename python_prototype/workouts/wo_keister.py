@@ -7,7 +7,7 @@ Keister Function Example
 from qmcpy import integrate
 from qmcpy.discrete_distribution import IIDStdUniform, IIDStdGaussian, Lattice, Sobol
 from qmcpy.integrand import Keister
-from qmcpy.stopping_criterion import CLT, CLTRep
+from qmcpy.stopping_criterion import CLT, CLTRep, MeanMC_g
 from qmcpy.true_measure import Gaussian
 
 
@@ -47,4 +47,14 @@ def test_distributions_keister(dim, abs_tol):
 
 
 if __name__ == "__main__":
-    test_distributions_keister(dim=3, abs_tol=.01)
+    #test_distributions_keister(dim=3, abs_tol=.01)
+    dim = 3
+    
+    # MeanMC_g
+    
+    integrand = Keister()
+    discrete_distrib = IIDStdGaussian(rng_seed=7)
+    true_measure = Gaussian(dimension=dim, variance=1 / 2)
+    stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=.01)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    data.summarize()

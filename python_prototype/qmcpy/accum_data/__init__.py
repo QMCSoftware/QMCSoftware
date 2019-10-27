@@ -27,8 +27,8 @@ class AccumData(ABC):
         self.stage = "begin"
         self.n_prev = array([])
         # new data will be based on (quasi-)random vectors indexed by.
-        self.n_next = array([])  # n_prev + 1 to n_next.
-        self.n_samples_total = array([])
+        self.n = array([])  # number of samples at this stage
+        self.n_total = array([])
         self.confid_int = array([-inf, inf])
         self.time_total = None
         self.integrand = None
@@ -69,8 +69,9 @@ class AccumData(ABC):
             self.stopping_criterion.summarize()
 
         attrs_vals_str = header_fmt % (type(self).__name__, "Data Object")
-        attrs_vals_str += item_s % ("n_samples_total",
-                                    str(self.n_samples_total))
+        attrs_vals_str += item_s % ("n",str(self.n))
+        attrs_vals_str += item_s % ("n_total",
+                                    str(self.n_total))
         attrs_vals_str += item_f % ("time_total", self.time_total)
         attrs_vals_str += item_s % ("confid_int", str(self.confid_int))
         print(attrs_vals_str[:-1] + "\n")

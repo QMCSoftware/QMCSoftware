@@ -1,7 +1,7 @@
 """ Definition for MeanMC_g, a concrete implementation of StoppingCriterion """
 
 from time import time
-from numpy import array, zeros, tile, min, exp, sqrt, ceil, log
+from numpy import array, zeros, tile, minimum, exp, sqrt, ceil, log
 from scipy.stats import norm
 from scipy.optimize import fsolve
 
@@ -47,69 +47,43 @@ class MeanMC_g(StoppingCriterion):
         self.data = MeanVarData(n_integrands)  # house integration data
         self.data.n = tile(self.n_init,n_integrands)  # next n for each integrand
         self.data.n_total = zeros(n_integrands)
-        self.stage = "sigma"  # use inital runtime
+        self.alpha_sigma = self.alpha/2 # the uncertainty for variance estimation
+        self.kurtmax = (self.n_init-3)/(self.n_init-1) + \
+                    (self.alpha_sigma*self.n_init)/(1-self.alpha_sigma) * \
+                    (1-1/self.inflate**2)**2
+        self.stage = "sigma"
     
     def stop_yet(self):
-        raise Exception("mean_mc_g INCOMPLETE. NOT IMPLEMENTED YET")
-        
-    def stop_yet_INCOMPLETE(self):
         """ Determine when to stop """
         if self.stage == "sigma":
-            sig0up = self.inflate*self.data.sighat # upper bound on the standard deviation
-            alpha_sig = self.alpha/2 # the uncertainty for variance estimation
-            kurtmax = (self.n_init-3)/(self.n_init-1) + \
-                        ((alpha_sig*self.n_init)/(1-alpha_sig)) * \
-                        (1-1/self.inflate**2)**2
-            #    the upper bound on the modified kurtosis
-            if self.reltol == 0:
-                alphai = 1-(1-self.alpha)/(1-alpha_sig)
-                toloversig = self.abs_tol/sig0up
+            self.sigma_up = self.inflate*self.data.sighat
+            self.alpha_mu = 1-(1-self.alpha)/(1-self.alpha_sigma)
+            if self.rel_tol == 0:
+                toloversig = self.abs_tol/self.sigma_up
                 # absolute error tolerance over sigma
-                n, self.bound_error = _nchebe(toloversig,alphai,kurtmax,sig0up)
+                n, self.err_bar = \
+                    self._nchebe(toloversig,self.alpha_mu,self.kurtmax,self.n_max,self.sigma_up)
                 self.data.n = tile(n,len(self.data.n))
                 self.stage = 'mu'
             else:
-                alphai = (self.alpha-alpha_sig)/(2*(1-alpha_sig))
-                #   uncertainty to do iteration
-                eps1 = _ncbinv(alphai,kurtmax)
-                #   tolerance for initial estimation
-                self.bound_err = array([sig0up*eps1])
-                #   the width of initial confidence interval for the mean
-                errtype = 'max' # see the function tolfun for more info
-                theta  = 0 # relative error case
-                temp_tol_1 = tolfun(self.abs_tol, self.rel_tol, theta, self.data.solution-self.bound_err, errtype)
-                temp_tol_2 = tolfun(self.abs_tol, self.rel_tol, theta, self.data.solution+self.bound_err, errtype)
-                deltaplus = (temp_tol_1+temp_tol_2)/2
-                #   a combination of tolfun, which used to decide stopping time
-                if deltaplus >= self.bound_err: # stopping criterion met
-                    self.stage = 'mu'
-                else:
-                    self.bound_err = min(self.bound_err/2,\
-                        max(self.abs_tol, 0.95*self.rel_tol*abs(self.data.solution)))
-                    toloversig = self.bound_err/sig0u # next tolerance over sigma
-                    alphai = (self.alpha-alpha_sig)/(1-alpha_sig)*2**(-i)
-                    # update the next uncertainty
-                    self.data.n,_ignore = _nchebe(toloversig,alphai,kurtmax,self.n_max,sig0up)
-                    #   get the next sample size needed
+                raise Exception("Not yet implemented for rel_tol != 0")
         elif self.stage == "mu":
-            deltaminus= (temp_tol_1-temp_tol_2)/2
-                    #   the other combination of tolfun, which adjusts the hmu a bit
-            self.solution = self.solution+deltaminus   
+            self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
+            self.stage = "done"  # finished with computation
 
     def _nchebe(self, toloversig, alpha, kurtmax, nbudget, sig0up):
         """
         This method uses Chebyshev and Berry-Esseen Inequality to calculate the
         sample size needed
         """
-        ncheb = ceil(1/(toloversig^2*alpha)) # sample size by Chebyshev's Inequality
+        ncheb = ceil(1/(alpha*toloversig**2)) # sample size by Chebyshev's Inequality
         A = 18.1139
         A1 = 0.3328
         A2 = 0.429 # three constants in Berry-Esseen inequality
         M3upper = kurtmax**(3/4)
         # the upper bound on the third moment by Jensen's inequality
-        BEfun2 = lambda logsqrtn: \
-            norm.cdf(-exp(logsqrtn)*toloversig) \
-            + exp(-logsqrtn) * min(A1*(M3upper+A2), \
+        BEfun2 = lambda logsqrtn: norm.cdf(-exp(logsqrtn)*toloversig) \
+            + exp(-logsqrtn) * minimum(A1*(M3upper+A2), \
             A*M3upper/(1+(exp(logsqrtn)*toloversig)**3)) \
             - alpha/2
         # Berry-Esseen function, whose solution is the sample size needed
@@ -118,14 +92,18 @@ class MeanMC_g(StoppingCriterion):
         # calculate Berry-Esseen n by fsolve function (scipy)
         ncb = min(min(ncheb,nbe),nbudget) # take the min of two sample sizes
         logsqrtn = log(sqrt(ncb))
-        BEfun3 = lambda toloversig: \
-            norm.cdf(-exp(logsqrtn)*toloversig) \
+        BEfun3 = lambda toloversig: norm.cdf(-exp(logsqrtn)*toloversig) \
             + exp(-logsqrtn)*min(A1*(M3upper+A2), \
             A*M3upper/(1+(exp(logsqrtn)*toloversig)**3)) \
             -alpha/2
         err = fsolve(BEfun3,toloversig) * sig0up
         return ncb, err
 
+
+
+
+# Will be used when rel_tol != 0
+'''
     def _ncbinv(self, alpha1, kurtmax, n1=2):
         """
         Calculate the reliable upper bound on error when given
@@ -152,7 +130,7 @@ class MeanMC_g(StoppingCriterion):
         return eps
 
 
-''' MAYBE PUT IN SEPERATE FILE??? '''
+""" MAYBE PUT IN SEPERATE FILE??? """
 from numpy import max,abs
 def tolfun(abstol, reltol, theta, mu, toltype):
     """
@@ -172,3 +150,4 @@ def tolfun(abstol, reltol, theta, mu, toltype):
     elif toltype == 'max': # the max case
         tol  = max(abstol,reltol*abs(mu))
     return tol
+'''
