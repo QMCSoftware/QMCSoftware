@@ -49,7 +49,6 @@ class CLTRep(StoppingCriterion):
                 continue
             self.data.n[i] *= 2 # Double n for next sample
         if self.data.flag.sum() == 0:
-            self.data.n_total = self.data.n.sum()
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \
                 * (self.data.sighat ** 2 / self.data.n).sum(0) ** 0.5
             self.data.confid_int = self.data.solution + err_bar * array([-1, 1])  # CLT confidence interval

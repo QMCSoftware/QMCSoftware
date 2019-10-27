@@ -45,123 +45,56 @@ class MeanMC_g(StoppingCriterion):
         # Construct Data Object
         n_integrands = len(true_measure)
         self.data = MeanVarData(n_integrands)  # house integration data
-        self.data.n_mu = zeros(n_integrands)
-        # number of samples used to compute the sample mean
-        self.data.n_prev = zeros(n_integrands)  # initialize data object
-        
-        ''' MODIFIED PARAMS FROM clt.py '''
-        self.stage = "get_time"  # use inital runtime
-        self.ntry = 10
-        self.data.n_next = tile(self.ntry, n_integrands)
-        # 2 for the warmup. Reset to n_init for pilot
-        ''' IGNORES n_init '''
+        self.data.n = tile(self.n_init,n_integrands)  # next n for each integrand
+        self.data.n_total = zeros(n_integrands)
+        self.stage = "sigma"  # use inital runtime
     
     def stop_yet(self):
         raise Exception("mean_mc_g INCOMPLETE. NOT IMPLEMENTED YET")
         
     def stop_yet_INCOMPLETE(self):
         """ Determine when to stop """
-        if self.stage == "get_time":
-            ttry = self.data.t_eval.sum()
-            tpern = ttry/self.ntry # calculate time per sample
-            self.nsofar = self.ntry #  update n so far
-            if tpern < 1e-7: # each sample uses very very little time
-                self.booster = 8
-            elif tpern>=1e-7 and tpern<1e-5: # each sample use very little time
-                self.booster = 6
-            elif tpern>=1e-5 and tpern<1e-3: # each sample use little time
-                self.booster = 4
-            elif  tpern>=1e-3 and tpern<1e-1: #each sample use moderate time
-                self.booster = 2
-            else: # each sample use lots of time, stop try
-                pass
-            self.stage = "pilot"
-        if self.stage == "pilot":
-            ttry2 = self.data.t_eval.sum()
-            self.ntry = self.ntry*array([1,self.booster])
-            ttry = array([ttry,ttry2])
-
-            ''' NOT TRANSLATED BEYOND THIS POINT '''
-            n_remain = self.n_max - nsofar
+        if self.stage == "sigma":
             sig0up = self.inflate*self.data.sighat # upper bound on the standard deviation
             alpha_sig = self.alpha/2 # the uncertainty for variance estimation
             kurtmax = (self.n_init-3)/(self.n_init-1) + \
                         ((alpha_sig*self.n_init)/(1-alpha_sig)) * \
                         (1-1/self.inflate**2)**2
-            # the upper bound on the modified kurtosis
-            npcmax = 1e6 # constant to do iteration and mean calculations
+            #    the upper bound on the modified kurtosis
             if self.reltol == 0:
-                tau = 1
                 alphai = 1-(1-self.alpha)/(1-alpha_sig)
                 toloversig = self.abs_tol/sig0up
                 # absolute error tolerance over sigma
-                n,bound_error = _nchebe(toloversig,alphai,kurtmax,sig0up)
-                if n > n_remain: # cannot sample this many points
-                    raise MaxSamplesWarning('''
-                        In order to achieve the guaranteed accuracy at step %d we
-                        need to evaluate %d samples, which is more than the remaining .  ...
-                        available samples. We will use all the remaining samples 
-                        to estimate the mean without guaranteed accuracy.
-                        '''%(tau,n))
-                    n = self.n_max # use max samples
-                    self.stage = 'mu'
+                n, self.bound_error = _nchebe(toloversig,alphai,kurtmax,sig0up)
+                self.data.n = tile(n,len(self.data.n))
+                self.stage = 'mu'
             else:
-                n1 = 2
                 alphai = (self.alpha-alpha_sig)/(2*(1-alpha_sig))
-                # uncertainty to do iteration
-                eps1 = _ncbinv(out_param.n1,alphai,kurtmax)
-                # tolerance for initial estimation
-                bound_err = array([sig0up*eps1])
-                # the width of initial confidence interval for the mean
-                i=0
-                n = array([n1]) # initial sample size to do iteration
-                while True:
-                    tau = i # step of the iteration
-                    if n[i] > n_remain:
-                        # cannot sample this many points
-                        raise MaxSamplesWarning('''
-                            In order to achieve the guaranteed accuracy at step %d we
-                            need to evaluate %d samples, which is more than the remaining .  ...
-                            available samples. We will use all the remaining samples 
-                            to estimate the mean without guaranteed accuracy.
-                            '''%(tau,n))
-                        n[i] = n_remain # update n
-                        ''' CALCULATE MU AND RETURN '''
-                        tmu = gail.evalmean(Yrand,out_param.n(i),npcmax) #evaluate the mean
-                        nsofar = nsofar+out_param.n(i) # total sample used
-                        
-                        break
-                    ''' CALCULATE MU '''
-                    hmu[i] = gail.evalmean(Yrand,out_param.n(i),npcmax)# evaluate mean
-                    nsofar += n[i]
-                    n_remain -= n[i] # update n so far and nremain
-                    errtype = 'max' # see the function tolfun for more info
-                    theta  = 0 # relative error case
-                    temp_tol_1 = tolfun(self.abs_tol, self.rel_tol, theta, hmu[i]-bound_err[i], errtype)
-                    temp_tol_2 = tolfun(self.abs_tol, self.rel_tol, theta, hmu[i]+bound_err[i], errtype)
-                    deltaplus = (temp_tol_1+temp_tol_2)/2
-                    # a combination of tolfun, which used to decide stopping time
-                    if deltaplus >= bound_err[i]: # stopping criterion
-                        deltaminus= (temp_tol_1-temp_tol_2)/2
-                        # the other combination of tolfun, which adjusts the hmu a bit
-                        tmu = hmu[i]+deltaminus
-                        break
-                    else:
-                        bound_err[i+1] = \
-                            min(bound_err[i]/2,max(self.abs_tol, \
-                            0.95*self.rel_tol*abs(hmu[i])))
-                        i += 1
-                    toloversig = bound_err(i)/sig0u # next tolerance over sigma
+                #   uncertainty to do iteration
+                eps1 = _ncbinv(alphai,kurtmax)
+                #   tolerance for initial estimation
+                self.bound_err = array([sig0up*eps1])
+                #   the width of initial confidence interval for the mean
+                errtype = 'max' # see the function tolfun for more info
+                theta  = 0 # relative error case
+                temp_tol_1 = tolfun(self.abs_tol, self.rel_tol, theta, self.data.solution-self.bound_err, errtype)
+                temp_tol_2 = tolfun(self.abs_tol, self.rel_tol, theta, self.data.solution+self.bound_err, errtype)
+                deltaplus = (temp_tol_1+temp_tol_2)/2
+                #   a combination of tolfun, which used to decide stopping time
+                if deltaplus >= self.bound_err: # stopping criterion met
+                    self.stage = 'mu'
+                else:
+                    self.bound_err = min(self.bound_err/2,\
+                        max(self.abs_tol, 0.95*self.rel_tol*abs(self.data.solution)))
+                    toloversig = self.bound_err/sig0u # next tolerance over sigma
                     alphai = (self.alpha-alpha_sig)/(1-alpha_sig)*2**(-i)
                     # update the next uncertainty
-                    n[i],_ignore = _nchebe(toloversig,alphai,kurtmax,self.n_max,sig0up)
-            # get the next sample size needed
-            ntot = nsofar # total sample size used   
-
-            if self.stage == "sigma":
-                pass
-            if self.stage == "mu":
-                pass   
+                    self.data.n,_ignore = _nchebe(toloversig,alphai,kurtmax,self.n_max,sig0up)
+                    #   get the next sample size needed
+        elif self.stage == "mu":
+            deltaminus= (temp_tol_1-temp_tol_2)/2
+                    #   the other combination of tolfun, which adjusts the hmu a bit
+            self.solution = self.solution+deltaminus   
 
     def _nchebe(self, toloversig, alpha, kurtmax, nbudget, sig0up):
         """
@@ -193,9 +126,9 @@ class MeanMC_g(StoppingCriterion):
         err = fsolve(BEfun3,toloversig) * sig0up
         return ncb, err
 
-    def _ncbinv(self, n1, alpha1, kurtmax):
+    def _ncbinv(self, alpha1, kurtmax, n1=2):
         """
-        This function calculate the reliable upper bound on error when given
+        Calculate the reliable upper bound on error when given
         Chebyshev and Berry-Esseen inequality and sample size n
         """
         NCheb_inv = 1/sqrt(n1*alpha1)
@@ -239,25 +172,3 @@ def tolfun(abstol, reltol, theta, mu, toltype):
     elif toltype == 'max': # the max case
         tol  = max(abstol,reltol*abs(mu))
     return tol
-
-def estimate_sample_budget(tbudget,nbudget,ntry,nsofar,tstart,ttry):
-    """
-    Estimate sample budget left from time budget by linear regression
-    
-    Args:
-        tbudget (float): time budget
-        nbudget (float): sample budget 
-        ntry (int): the sample size used 
-        nsofar (int): the total sample size used so far
-        tstart (float): time to start the clock
-        ttry (float): the time to get ntry samples
-    """
-    timeleft = tbudget-toc(tstart)
-    # update the time left by subtracting the time used from time budget
-    p = polyfit(ntry,ttry,1)
-    p[0] = max(p[0],1e-8)
-    nleft = floor((timeleft-p[1])/p[0])
-    # estimate sample left by linear regression          
-    nremain = max(min(nbudget-nsofar,nleft),1)
-    # update the sample left 
-    return nremain

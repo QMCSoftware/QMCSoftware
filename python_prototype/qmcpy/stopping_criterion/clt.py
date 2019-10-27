@@ -54,7 +54,6 @@ class CLT(StoppingCriterion):
             self.data.n += self.data.n_mu
             self.stage = "mu"  # compute sample mean next
         elif self.stage == "mu":
-            self.data.n_total = self.data.n.sum()
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \
                 * (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
             self.data.confid_int = self.data.solution + err_bar * array([-1, 1])
