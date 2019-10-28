@@ -34,9 +34,8 @@ class CubSobol_g(StoppingCriterion):
         n_integrands = len(true_measure)
         self.data = MeanVarDataRep(n_integrands, replications)
         # house integration data
-        self.data.n = tile(self.n_init,n_integrands)  # next n for each integrand
+        self.data.n = tile(self.n_init, n_integrands)  # next n for each integrand
 
     def stop_yet(self):
         """ Determine when to stop """
         raise Exception("Not yet implemented")
-        
