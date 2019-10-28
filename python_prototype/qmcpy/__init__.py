@@ -8,6 +8,7 @@ from .discrete_distribution.distributions import *
 from .integrand.asian_call import AsianCall
 from .integrand.keister import Keister
 from .integrand.linear import Linear
+from .integrand.quick_construct import QuickConstruct
 from .integrate import integrate
 from .stopping_criterion.clt import CLT
 from .stopping_criterion.clt_rep import CLTRep

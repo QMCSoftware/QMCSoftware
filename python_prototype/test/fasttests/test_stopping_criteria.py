@@ -1,6 +1,6 @@
 import unittest
 
-from qmcpy._util import DistributionCompatibilityError,MaxSamplesWarning
+from qmcpy._util import DistributionCompatibilityError, MaxSamplesWarning
 from qmcpy.discrete_distribution import IIDStdGaussian, Lattice
 from qmcpy.stopping_criterion import CLT, CLTRep
 from qmcpy.true_measure import Gaussian

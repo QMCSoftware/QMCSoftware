@@ -68,7 +68,7 @@ class AccumData(ABC):
             self.stopping_criterion.summarize()
 
         attrs_vals_str = header_fmt % (type(self).__name__, "Data Object")
-        attrs_vals_str += item_s % ("n",str(self.n))
+        attrs_vals_str += item_s % ("n", str(self.n))
         attrs_vals_str += item_s % ("n_total",
                                     str(int(self.n_total)))
         attrs_vals_str += item_f % ("time_total", self.time_total)

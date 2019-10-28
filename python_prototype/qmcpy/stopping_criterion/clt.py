@@ -37,7 +37,7 @@ class CLT(StoppingCriterion):
         # Construct Data Object
         n_integrands = len(true_measure)
         self.data = MeanVarData(n_integrands)  # house integration data
-        self.data.n = tile(self.n_init,n_integrands).astype(float)  # next n for each integrand
+        self.data.n = tile(self.n_init, n_integrands).astype(float)  # next n for each integrand
 
     def stop_yet(self):
         """ Determine when to stop """
@@ -60,12 +60,12 @@ class CLT(StoppingCriterion):
                 Trying to generate %s new samples, which exceeds n_max = %d.
                 The number of new samples will be decrease proportionally for each integrand.
                 Note that error tolerances may no longer be satisfied""" \
-                %(int(self.data.n_total),str(self.data.n),int(self.n_max))
-                warnings.warn(warning_s,MaxSamplesWarning)
+                % (int(self.data.n_total), str(self.data.n), int(self.n_max))
+                warnings.warn(warning_s, MaxSamplesWarning)
                 # decrease n proportionally for each integrand
                 n_decease = self.data.n_total + self.data.n.sum() - self.n_max
-                dec_prop = n_decease/self.data.n.sum()
-                self.data.n = floor(self.data.n-self.data.n*dec_prop)
+                dec_prop = n_decease / self.data.n.sum()
+                self.data.n = floor(self.data.n - self.data.n * dec_prop)
             self.stage = "mu"  # compute sample mean next
         elif self.stage == "mu":
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \
