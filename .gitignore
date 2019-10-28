@@ -20,3 +20,4 @@ python_prototype/sphinx/_build/
 python_prototype/sphinx/_static/
 *.vscode
 *ToDo
+*checkpoint.ipynb
