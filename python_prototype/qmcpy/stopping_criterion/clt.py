@@ -1,8 +1,10 @@
 """ Definition for CLT, a concrete implementation of StoppingCriterion """
 
-from numpy import array, ceil, maximum, minimum, tile, zeros
+from numpy import array, ceil, maximum, minimum, tile, zeros, floor
 from scipy.stats import norm
+import warnings
 
+from qmcpy._util import MaxSamplesWarning
 from . import StoppingCriterion
 from ..accum_data import MeanVarData
 
@@ -49,9 +51,21 @@ class CLT(StoppingCriterion):
                                        max(self.abs_tol, self.data.solution * self.rel_tol)) ** 2
                              * (self.data.sighat / self.data.t_eval ** .5))
             # n_mu := n_mu_temp adjusted for previous n
-            self.data.n_mu = minimum(maximum(self.data.n, n_mu_temp) , self.n_max)
+            self.data.n_mu = maximum(self.data.n, n_mu_temp)
             self.data.n += self.data.n_mu
-            flag, self.data.n = self.check_n(self.data.n) # check n > n_max. 
+            if self.data.n_total + self.data.n.sum() > self.n_max:
+                # cannot generate this many new samples
+                warning_s = """
+                Alread generated %d samples.
+                Trying to generate %s new samples, which exceeds n_max = %d.
+                The number of new samples will be decrease proportionally for each integrand.
+                Note that error tolerances may no longer be satisfied""" \
+                %(int(self.data.n_total),str(self.data.n),int(self.n_max))
+                warnings.warn(warning_s,MaxSamplesWarning)
+                # decrease n proportionally for each integrand
+                n_decease = self.data.n_total + self.data.n.sum() - self.n_max
+                dec_prop = n_decease/self.data.n.sum()
+                self.data.n = floor(self.data.n-self.data.n*dec_prop)
             self.stage = "mu"  # compute sample mean next
         elif self.stage == "mu":
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \

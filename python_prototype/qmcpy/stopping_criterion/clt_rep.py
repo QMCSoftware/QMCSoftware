@@ -2,7 +2,9 @@
 
 from numpy import array, tile, zeros,maximum
 from scipy.stats import norm
+import warnings
 
+from qmcpy._util import MaxSamplesWarning
 from . import StoppingCriterion
 from ..accum_data import MeanVarDataRep
 
@@ -47,13 +49,18 @@ class CLTRep(StoppingCriterion):
                 self.data.n_final[i] = self.data.n[i] # save sufficient n for ith integral
                 self.data.n[i] = 0 # done sampling from ith integral
             else:
+                self.data.n_final[i] = max(self.data.n[i],self.data.n_final[i])
                 self.data.n[i] *= 2 # double n for next sample
-        if self.data.n.sum() != 0: # need to generate more samples
-            flag_n, self.data.n = self.check_n(self.data.n) # check if new_samples put us over n_max
-            if flag_n == 1: # too many new samples
-                self.data.n_final = maximum(self.data.n, self.data.n_final)
-                self.data.n *= 0 # done with computation
-        else: # all integrals sufficiently estimated, finished with computation
+        over_n_max = (self.data.n_total + self.data.n.sum() > self.n_max)
+        if self.data.n.sum() == 0 or over_n_max: # finished
+            if over_n_max:
+                warning_s = """
+                Alread generated %d samples.
+                Trying to generate %s new samples, which exceeds n_max = %d.
+                No more samples will be generated.
+                Note that error tolerances may no longer be satisfied""" \
+                %(int(self.data.n_total),str(self.data.n),int(self.n_max))
+                warnings.warn(warning_s,MaxSamplesWarning)
             self.data.n = self.data.n_final
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \
             * (self.data.sighat ** 2 / self.data.n).sum(0) ** 0.5
