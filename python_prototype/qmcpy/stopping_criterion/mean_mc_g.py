@@ -46,7 +46,6 @@ class MeanMC_g(StoppingCriterion):
         n_integrands = len(true_measure)
         self.data = MeanVarData(n_integrands)  # house integration data
         self.data.n = tile(self.n_init,n_integrands)  # next n for each integrand
-        self.data.n_total = zeros(n_integrands)
         self.alpha_sigma = self.alpha/2 # the uncertainty for variance estimation
         self.kurtmax = (self.n_init-3)/(self.n_init-1) + \
                     (self.alpha_sigma*self.n_init)/(1-self.alpha_sigma) * \

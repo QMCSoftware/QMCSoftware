@@ -36,7 +36,6 @@ class CLT(StoppingCriterion):
         n_integrands = len(true_measure)
         self.data = MeanVarData(n_integrands)  # house integration data
         self.data.n = tile(self.n_init,n_integrands).astype(float)  # next n for each integrand
-        self.data.n_total = zeros(n_integrands)
 
     def stop_yet(self):
         """ Determine when to stop """
@@ -49,7 +48,7 @@ class CLT(StoppingCriterion):
             n_mu_temp = ceil(temp_b * (-norm.ppf(self.alpha / 2) * self.inflate /
                                        max(self.abs_tol, self.data.solution * self.rel_tol)) ** 2
                              * (self.data.sighat / self.data.t_eval ** .5))
-            # n_mu := n_mu_temp adjusted for n_prev
+            # n_mu := n_mu_temp adjusted for previous n
             self.data.n_mu = minimum(maximum(self.data.n, n_mu_temp) , self.n_max)
             self.data.n += self.data.n_mu
             self.stage = "mu"  # compute sample mean next

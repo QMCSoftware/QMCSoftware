@@ -38,7 +38,6 @@ class CLTRep(StoppingCriterion):
         self.data = MeanVarDataRep(n_integrands, replications)
         #   house integration data
         self.data.n = tile(self.n_init,n_integrands)  # next n for each integrand
-        self.data.n_total = zeros(n_integrands)
 
     def stop_yet(self):
         """ Determine when to stop """
