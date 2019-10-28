@@ -1,6 +1,7 @@
 """ Definition for abstract class StoppingCriterion """
 
 from abc import ABC, abstractmethod
+from numpy import floor
 
 from .._util import DistributionCompatibilityError, univ_repr
 
@@ -56,3 +57,4 @@ class StoppingCriterion(ABC):
 # API
 from .clt_rep import CLTRep
 from .clt import CLT
+from .mean_mc_g import MeanMC_g

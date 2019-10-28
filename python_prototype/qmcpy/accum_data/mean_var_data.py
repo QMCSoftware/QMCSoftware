@@ -24,9 +24,9 @@ class MeanVarData(AccumData):
         self.n_integrands = n_integrands
         self.muhat = full(self.n_integrands, inf)  # sample mean
         self.sighat = full(self.n_integrands, inf)  # sample standard deviation
-        self.t_eval = zeros(self.n_integrands)
-        # time used to evaluate each integrand
-
+        self.t_eval = zeros(self.n_integrands) # processing time for each integrand
+        self.n_total = 0
+        
     def update_data(self, integrand, true_measure):
         """
         Update data
@@ -38,13 +38,12 @@ class MeanVarData(AccumData):
         Returns:
             None
         """
-        for i, (integrand_i, true_measure_i) in enumerate(zip(integrand, true_measure)):
+        for i in range(len(true_measure)):
             t_start = process_time()  # time the integrand values
-            set_x = true_measure_i.gen_tm_samples(1, self.n_next[i]).squeeze(0)
-            y = integrand_i.f(set_x)
+            set_x = true_measure[i].gen_tm_samples(1, self.n[i]).squeeze(0)
+            y = integrand[i].f(set_x).squeeze()
             self.t_eval[i] = max(process_time() - t_start, EPS)
-            # for multi-level methods
-            self.sighat[i] = std(y)  # compute the sample standard deviation
-            self.muhat[i] = y.mean(0)  # compute the sample mean
-            self.solution = self.muhat.sum()
-            # which also acts as our tentative solution
+            self.sighat[i] = y.std()  # compute the sample standard deviation
+            self.muhat[i] = y.mean()  # compute the sample mean
+            self.n_total += self.n[i] # add to total samples
+        self.solution = self.muhat.sum() # tentative solution

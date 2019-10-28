@@ -12,26 +12,24 @@ class MeanVarDataRep(AccumData):
         calculations.
     """
 
-    def __init__(self, n_integrands, n_streams):
+    def __init__(self, n_integrands, replications):
         """
         Initialize data instance
 
         Args:
             n_integrands (int): number of integrands
-            n_streams (int): number of random nxm matrices to generate
+            replications (int): number of random nxm matrices to generate
         """
         super().__init__()
         self.n_integrands = n_integrands
-        self.n_streams = n_streams  # Number of random nxm matrices to generate
-        self.muhat = zeros(self.n_streams)  # sample mean of each nxm matrix
-        self.mu2hat = zeros(self.n_integrands)
-        # mean of n_streams means for each integrand
-        self.sig2hat = zeros(self.n_integrands)
-        # standard deviation of n_streams means for each integrand
-        self.flag = ones(self.n_integrands)
-        # flag when an integrand has been sufficiently approximated
+        self.r = replications  # Number of random nxm matrices to generate
+        self.muhat = zeros(self.n_integrands)
+        # mean of replications means for each integrand
+        self.sighat = zeros(self.n_integrands)
+        # standard deviation of replications means for each integrand
         self.t_eval = zeros(self.n_integrands)
         # time used to evaluate each integrand
+        self.n_total = 0
 
     def update_data(self, integrand, true_measure):
         """
@@ -44,18 +42,19 @@ class MeanVarDataRep(AccumData):
         Returns:
             None
         """
-        for i, (integrand_i, true_measure_i) in enumerate(zip(integrand, true_measure)):
-            if self.flag[i] == 0:
+        muhat_r = zeros(self.r)  # sample mean of each nxm matrix
+        for i in range(len(true_measure)):
+            if self.n[i] == 0:
                 continue  # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation
-            set_x = true_measure_i.gen_tm_samples(
-                self.n_streams, self.n_next[i])
-            for j in range(self.n_streams):
-                y = integrand_i.f(set_x[j])
+            set_x = true_measure[i].gen_tm_samples(self.r, self.n[i])
+            for r in range(self.r):
+                y = integrand[i].f(set_x[r])
                 # Evaluate transformed function
-                self.muhat[j] = y.mean()  # stream mean
+                muhat_r[r] = y.mean()  # stream mean
             self.t_eval[i] = max(process_time() - t_start, EPS)
-            self.mu2hat[i] = self.muhat.mean()  # mean of stream means
-            self.sig2hat[i] = self.muhat.std()
+            self.muhat[i] = muhat_r.mean()  # mean of stream means
+            self.sighat[i] = muhat_r.std()
+        self.n_total += self.n.sum()
             # standard deviation of stream means
-        self.solution = self.mu2hat.sum()  # mean of integrand approximations
+        self.solution = self.muhat.sum()  # mean of integrand approximations
