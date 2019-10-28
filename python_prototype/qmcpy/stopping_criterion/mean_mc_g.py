@@ -56,7 +56,7 @@ class MeanMC_g(StoppingCriterion):
     def stop_yet(self):
         """ Determine when to stop """
         if self.stage == "sigma":
-            self.sigma_up = self.inflate*self.data.sighat
+            self.sigma_up = self.inflate*sqrt((self.data.sighat**2).sum()) # CORRECT? 
             self.alpha_mu = 1-(1-self.alpha)/(1-self.alpha_sigma)
             if self.rel_tol == 0:
                 toloversig = self.abs_tol/self.sigma_up
