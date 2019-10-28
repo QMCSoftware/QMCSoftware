@@ -1,22 +1,24 @@
-Urgent:
+Before Release:
     Verify CLT/CLTRep Correctness
     Implement n_total,n_max checks for ALL stopping criterion algorithms
+    rel_tol case for mean_mc_g
 
 Asian Option:
     interest rate for Asian Option?
     Can implement call/put and arithmetic/geometric mean options?
     Start an Option class that inherits from Integrand? 
+
 Documentation:
-    github pages?
     documentation in both sphinx and docs/ ? 
     How are readme files linked to sphinx documentation? 
-    Still need html_from_readme/
+    Still need html_from_readme/?
+
 Stopping Criterion:
-    all(sighat[i]<abs_tol) sufficient? 
+    all(sighat[i]<abs_tol) sufficient for clt rep? 
     mean_mc_g: 
-        when relative tolerance != 0
-        how to extend to multi-level?
+        when relative tolerance != 0?
+        how to extend to multi-level? Tentative solution correct?
+
 Lebesgue transform from gaussian
 
-Practicum Credit
-MC Presentation + Computational Math Presetnation review
+MC Presentation + Computational Math Presentation review
