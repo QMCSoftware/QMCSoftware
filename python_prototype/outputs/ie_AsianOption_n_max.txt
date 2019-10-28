@@ -1,4 +1,4 @@
-Solution: 6.1833         
+Solution: 6.2966         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 IIDStdUniform (Discrete Distribution Object)
@@ -6,16 +6,16 @@ BrownianMotion (True Distribution Object)
 CLT (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 5000
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
-                        n: [232678.]      
-                  n_total: 233702         
-               time_total: 1.7217         
-               confid_int: [6.13384105 6.23281179]
+                        n: [4936.]        
+                  n_total: 5000           
+               time_total: 0.0506         
+               confid_int: [6.23857215 6.3547125 ]
 
-Solution: 6.1979         
+Solution: 6.2271         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 IIDStdGaussian (Discrete Distribution Object)
@@ -23,16 +23,16 @@ BrownianMotion (True Distribution Object)
 CLT (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 5000
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
-                        n: [230531.]      
-                  n_total: 231555         
-               time_total: 0.5287         
-               confid_int: [6.14812315 6.24773347]
+                        n: [4936.]        
+                  n_total: 5000           
+               time_total: 0.0165         
+               confid_int: [6.16970281 6.28453894]
 
-Solution: 6.2002         
+Solution: 6.1736         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 Lattice (Discrete Distribution Object)
@@ -40,16 +40,16 @@ BrownianMotion (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 500
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
-                        n: [2048]         
-                  n_total: 3072           
-               time_total: 0.6552         
-               confid_int: [6.19902691 6.2014173 ]
+                        n: [256]          
+                  n_total: 448            
+               time_total: 0.1147         
+               confid_int: [6.13091634 6.21631786]
 
-Solution: 6.1853         
+Solution: 6.1703         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 Sobol (Discrete Distribution Object)
@@ -57,16 +57,16 @@ BrownianMotion (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 500
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
-                        n: [1024]         
-                  n_total: 1024           
-               time_total: 0.1962         
-               confid_int: [6.18167892 6.18889987]
+                        n: [256]          
+                  n_total: 448            
+               time_total: 0.1225         
+               confid_int: [6.14196849 6.19858562]
 
-Solution: 6.1950         
+Solution: 6.4712         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 IIDStdUniform (Discrete Distribution Object)
@@ -74,16 +74,16 @@ BrownianMotion (True Distribution Object)
 CLT (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 5000
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
-                        n: [271746.  25743.   4398.]
-                  n_total: 304959         
-               time_total: 0.2307         
-               confid_int: [6.14319324 6.2467749 ]
+                        n: [4195.  523.   88.]
+                  n_total: 4998           
+               time_total: 0.0073         
+               confid_int: [6.42164701 6.52073136]
 
-Solution: 6.2024         
+Solution: 6.1037         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 IIDStdGaussian (Discrete Distribution Object)
@@ -91,16 +91,16 @@ BrownianMotion (True Distribution Object)
 CLT (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 5000
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
-                        n: [305363.  28474.   4438.]
-                  n_total: 341347         
-               time_total: 0.0862         
-               confid_int: [6.15344063 6.25141629]
+                        n: [4039.  624.  144.]
+                  n_total: 4999           
+               time_total: 0.0033         
+               confid_int: [6.02996088 6.17752244]
 
-Solution: 6.2080         
+Solution: 6.1381         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 Lattice (Discrete Distribution Object)
@@ -108,16 +108,16 @@ BrownianMotion (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 500
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
-                        n: [1024 1024 1024]
-                  n_total: 3072           
-               time_total: 0.3017         
-               confid_int: [6.20353546 6.21254236]
+                        n: [128 128  64]  
+                  n_total: 448            
+               time_total: 0.0420         
+               confid_int: [6.07966233 6.19649167]
 
-Solution: 6.2019         
+Solution: 6.2070         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 Sobol (Discrete Distribution Object)
@@ -125,12 +125,12 @@ BrownianMotion (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0500         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 500
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
-                        n: [1024 1024 1024]
-                  n_total: 3072           
-               time_total: 0.2544         
-               confid_int: [6.1998289  6.20404331]
+                        n: [128  64  64]  
+                  n_total: 320            
+               time_total: 0.0513         
+               confid_int: [6.16856162 6.24538446]
 
