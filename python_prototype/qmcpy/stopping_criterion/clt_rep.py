@@ -1,11 +1,10 @@
 """ Definition for CLTRep, a concrete implementation of StoppingCriterion """
 
-from numpy import array, tile, zeros
+from numpy import array, tile, zeros,maximum
 from scipy.stats import norm
 
 from . import StoppingCriterion
 from ..accum_data import MeanVarDataRep
-from .._util import MaxSamplesWarning
 
 
 class CLTRep(StoppingCriterion):
@@ -38,17 +37,26 @@ class CLTRep(StoppingCriterion):
         self.data = MeanVarDataRep(n_integrands, replications)
         #   house integration data
         self.data.n = tile(self.n_init,n_integrands)  # next n for each integrand
+        self.data.n_final = tile(0,n_integrands)
 
     def stop_yet(self):
         """ Determine when to stop """
         for i in range(self.data.n_integrands):
-            if self.data.sighat[i] < self.abs_tol:
-                # sufficient estimate for mean of f[i]
-                self.data.flag[i] = 0  # Stop estimation of i_th f
-                continue
-            self.data.n[i] *= 2 # Double n for next sample
-        if self.data.flag.sum() == 0:
+            if self.data.sighat[i] < self.abs_tol and self.data.n[i] != 0:
+                # sufficient estimate for mean of ith integrand
+                self.data.n_final[i] = self.data.n[i] # save sufficient n for ith integral
+                self.data.n[i] = 0 # done sampling from ith integral
+            else:
+                self.data.n[i] *= 2 # double n for next sample
+        if self.data.n.sum() != 0: # need to generate more samples
+            flag_n, self.data.n = self.check_n(self.data.n) # check if new_samples put us over n_max
+            if flag_n == 1: # too many new samples
+                self.data.n_final = maximum(self.data.n, self.data.n_final)
+                self.data.n *= 0 # done with computation
+        else: # all integrals sufficiently estimated, finished with computation
+            self.data.n = self.data.n_final
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \
-                * (self.data.sighat ** 2 / self.data.n).sum(0) ** 0.5
+            * (self.data.sighat ** 2 / self.data.n).sum(0) ** 0.5
             self.data.confid_int = self.data.solution + err_bar * array([-1, 1])  # CLT confidence interval
-            self.stage = "done"  # finished with computation
+            self.data.n
+            self.stage = "done"

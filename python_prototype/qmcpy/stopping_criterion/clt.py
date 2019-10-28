@@ -51,6 +51,7 @@ class CLT(StoppingCriterion):
             # n_mu := n_mu_temp adjusted for previous n
             self.data.n_mu = minimum(maximum(self.data.n, n_mu_temp) , self.n_max)
             self.data.n += self.data.n_mu
+            flag, self.data.n = self.check_n(self.data.n) # check n > n_max. 
             self.stage = "mu"  # compute sample mean next
         elif self.stage == "mu":
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \

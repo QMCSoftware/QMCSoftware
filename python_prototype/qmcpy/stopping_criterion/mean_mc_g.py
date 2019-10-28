@@ -5,7 +5,6 @@ from numpy import array, zeros, tile, minimum, exp, sqrt, ceil, log
 from scipy.stats import norm
 from scipy.optimize import fsolve
 
-from qmcpy._util import MaxSamplesWarning
 from . import StoppingCriterion
 from ..accum_data import MeanVarData
 

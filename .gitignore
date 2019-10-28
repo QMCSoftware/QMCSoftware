@@ -19,5 +19,5 @@ python_prototype/__pycache__/
 python_prototype/sphinx/_build/
 python_prototype/sphinx/_static/
 *.vscode
-*ToDo
+*ToDo.md
 *checkpoint.ipynb

@@ -1,7 +1,10 @@
 """ Definition for abstract class StoppingCriterion """
 
 from abc import ABC, abstractmethod
+import warnings
+from numpy import floor
 
+from qmcpy._util import MaxSamplesWarning
 from .._util import DistributionCompatibilityError, univ_repr
 
 
@@ -34,6 +37,23 @@ class StoppingCriterion(ABC):
     @abstractmethod
     def stop_yet(self):
         """ Determine when to stopping_criterion """
+
+    def check_n(self,n_next):
+        if self.data.n_total + n_next.sum() <= self.n_max: 
+            # new samples will not go over the max
+            return 0,n_next
+        # cannot generate this many new samples
+        warning_s = """
+        Alread generated %d samples.
+        Trying to generate %s new samples, which exceeds n_max = %d.
+        The number of new samples will be decrease proportionally for each integrand.
+        Note that error tolerances may no longer be satisfied""" \
+        %(int(self.data.n_total),str(n_next),int(self.n_max))
+        warnings.warn(warning_s,MaxSamplesWarning)
+        # decrease n proportionally for each integrand
+        n_decease = self.data.n_total + n_next.sum() - self.n_max
+        dec_prop = n_decease/n_next.sum()
+        return 1,floor(n_next-n_next*dec_prop)
 
     def summarize(self):
         """ Print important attribute values """

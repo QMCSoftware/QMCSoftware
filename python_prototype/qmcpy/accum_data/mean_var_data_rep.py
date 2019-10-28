@@ -27,8 +27,6 @@ class MeanVarDataRep(AccumData):
         # mean of replications means for each integrand
         self.sighat = zeros(self.n_integrands)
         # standard deviation of replications means for each integrand
-        self.flag = ones(self.n_integrands)
-        # flag when an integrand has been sufficiently approximated
         self.t_eval = zeros(self.n_integrands)
         # time used to evaluate each integrand
         self.n_total = 0
@@ -46,7 +44,7 @@ class MeanVarDataRep(AccumData):
         """
         muhat_r = zeros(self.r)  # sample mean of each nxm matrix
         for i in range(len(true_measure)):
-            if self.flag[i] == 0:
+            if self.n[i] == 0:
                 continue  # integrand already sufficiently approximated
             t_start = process_time()  # time integrand evaluation
             set_x = true_measure[i].gen_tm_samples(self.r, self.n[i])
@@ -57,6 +55,6 @@ class MeanVarDataRep(AccumData):
             self.t_eval[i] = max(process_time() - t_start, EPS)
             self.muhat[i] = muhat_r.mean()  # mean of stream means
             self.sighat[i] = muhat_r.std()
-            self.n_total += self.n[i]
+        self.n_total += self.n.sum()
             # standard deviation of stream means
         self.solution = self.muhat.sum()  # mean of integrand approximations
