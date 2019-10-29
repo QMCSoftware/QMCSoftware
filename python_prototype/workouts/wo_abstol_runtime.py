@@ -131,7 +131,7 @@ def comp_clt_vs_cltrep_runtimes(abstols):
     return df_metrics
 
 
-def plot_abstol_runtime(abstols=arange(.01, .05, .001)):
+def plot_abstol_runtime(abstols=arange(.001, .021, .001), is_plot=True):
     """
     Integration Time by Absolute Tolerance for Multi-level Asian Option Function.
 
@@ -148,14 +148,15 @@ def plot_abstol_runtime(abstols=arange(.01, .05, .001)):
 
     # Gen Plot
     df = pd.read_csv(out_file + ".csv")
-    plot(title="",
-         xlabel="Absolute Tolerance", ylabel="Integration Runtime",
-         xdata=df["abs_tol"].values,
-         ydata={"CLT: IID Gaussian": (df["CLT_IIDStdUniform_runTime"], "r"),
-                "CLT: IID Uniform ": (df["CLT_IIDStdGaussian_runTime"], "b"),
-                "CLT Repeated: Lattice": (df["CLT_Rep_Lattice_runTime"], "g"),
-                "CLT Repeated: sobol": (df["CLT_Rep_Sobol_runTime"], "y")},
-         outF=out_file)
+    if is_plot == True:
+        plot(title="",
+             xlabel="Absolute Tolerance", ylabel="Integration Runtime",
+             xdata=df["abs_tol"].values,
+             ydata={"CLT: IID Gaussian": (df["CLT_IIDStdUniform_runTime"], "r"),
+                    "CLT: IID Uniform ": (df["CLT_IIDStdGaussian_runTime"], "b"),
+                    "CLT Repeated: Lattice": (df["CLT_Rep_Lattice_runTime"], "g"),
+                    "CLT Repeated: sobol": (df["CLT_Rep_Sobol_runTime"], "y")},
+             outF=out_file)
 
 
 if __name__ == "__main__":

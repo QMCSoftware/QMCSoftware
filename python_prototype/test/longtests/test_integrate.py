@@ -87,8 +87,60 @@ class IntegrationExampleTest(unittest.TestCase):
             sol, _ = integrate(integrand, measure, discrete_distrib,
                                stopping_criterion)
             true_value = true_values[d - 1]
-            self.assertTrue(abs(sol - true_value) < abs_tol)
             self.assertTrue(integrand.dimension == d)
+            self.assertTrue(abs(sol - true_value) < abs_tol)
+
+    def test_quick_construct(self):
+        """
+        Infer true measure's dimension from integrand's
+
+        Mathematica:
+        1D: Integrate[5x, {x, 0, 1}]
+        2D: Integrate[5(x+y), {x, 0, 1}, {y, 0, 1}]
+        3D: Integrate[5(x+y+z), {x, 0, 1}, {y, 0, 1}, {z, 0, 1}]
+        """
+
+        def f(x): return (5 * x).sum(1)
+
+        dimensions = [1, 2, 3]
+        true_values = [2.5, 5, 7.5]
+        for d in dimensions:
+            integrand = QuickConstruct(custom_fun=f, dimension=d)
+            sol, data = integrate(integrand)
+            data.summarize()
+            abs_tol = data.stopping_criterion.abs_tol
+            true_value = true_values[d - 1]
+            self.assertTrue(integrand.dimension == d)
+            self.assertTrue(data.integrand.dimension == d)
+            self.assertTrue(data.true_measure.dimension == d)
+            self.assertTrue(abs(sol - true_value) < abs_tol)
+
+    def test_quick_construct2(self):
+        """
+        Infer integrand dimension from true measure's
+
+        Mathematica:
+        1D: Integrate[5x, {x, 0, 1}]
+        2D: Integrate[5(x+y), {x, 0, 1}, {y, 0, 1}]
+        3D: Integrate[5(x+y+z), {x, 0, 1}, {y, 0, 1}, {z, 0, 1}]
+        """
+
+        def f(x): return (5 * x).sum(1)
+
+        dimensions = [1, 2, 3]
+        true_values = [2.5, 5, 7.5]
+        for d in dimensions:
+            integrand = QuickConstruct(custom_fun=f)
+            measure = Uniform(dimension=d)
+            sol, data = integrate(integrand, measure)
+            data.summarize()
+            abs_tol = data.stopping_criterion.abs_tol
+            true_value = true_values[d - 1]
+            self.assertTrue(integrand.dimension == d)
+            self.assertTrue(data.integrand.dimension == d)
+            self.assertTrue(measure.dimension == d)
+            self.assertTrue(data.true_measure.dimension == d)
+            self.assertTrue(abs(sol - true_value) < abs_tol)
 
 
 if __name__ == "__main__":
