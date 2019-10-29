@@ -45,6 +45,6 @@ def test_distributions_keister(dim, abs_tol):
     sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
+
 if __name__ == "__main__":
     test_distributions_keister(dim=3, abs_tol=.01)
-    

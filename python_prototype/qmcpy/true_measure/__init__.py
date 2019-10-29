@@ -12,7 +12,7 @@ class TrueMeasure(ABC):
     def __init__(self, dimension, transforms, **kwargs):
         """
         Args:
-            dimension (ndarray): dimension's' of the integrand's'
+            dimension (ndarray): dimension(s) of the integrand(s)
             transforms (dict): functions that transform discrete distribution \
                 to true measure
             keys: string matching the measure mimiced by the discrete \
@@ -158,9 +158,18 @@ class TrueMeasure(ABC):
     def summarize(self):
         """ Print important attribute values """
         header_fmt = "%s (%s)"
+        item_h = "\n%25s:"
+        item_i = "\n%25s: %d"
+        item_i2 = " %d "
         attrs_vals_str = ""
         attrs_vals_str += header_fmt \
             % (type(self).__name__, "True Distribution Object")
+        if isinstance(self.dimension, int):
+            attrs_vals_str += item_i % ("dimension", self.dimension)
+        elif isinstance(self.dimension, ndarray):
+            attrs_vals_str += item_h % ("dimension")
+            for d in self.dimension:
+                attrs_vals_str += item_i2 % (d)
         print(attrs_vals_str)
 
     def __len__(self):

@@ -55,15 +55,15 @@ def summarize(stopping_criterion=None, measure=None, integrand=None, distributio
         integrand (Integrand): an Integrand object
         data (data): a AccumData object
     """
-    if not integrand is None:
+    if not integrand:
         integrand.summarize()
-    if not measure is None:
+    if not measure:
         measure.summarize()
-    if not distribution is None:
+    if not distribution:
         distribution.summarize()
-    if not stopping_criterion is None:
+    if not stopping_criterion:
         stopping_criterion.summarize()
-    if not data is None:
+    if not data:
         data.summarize()
 
 

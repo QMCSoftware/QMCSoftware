@@ -37,7 +37,7 @@ def integrate(integrand=None, true_measure=None, discrete_distrib=None, stopping
 
     # Default some arguments
     if not integrand: integrand = Linear()
-    if not true_measure: true_measure = Uniform(2)
+    if not true_measure: true_measure = Uniform(dimension=integrand.dimension)
     if not discrete_distrib: discrete_distrib = IIDStdUniform()
     if not stopping_criterion:
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=0.01)

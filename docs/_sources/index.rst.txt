@@ -14,6 +14,7 @@ Qmcpy Documentation
    readme
    license
    algorithms
+   demos
 
 
 Indices and tables

@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Demos" href="demos.html" />
     <link rel="prev" title="License" href="license.html" /> 
 </head>
 
@@ -102,6 +103,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="demos.html">Demos</a></li>
 </ul>
 
             
@@ -444,7 +446,10 @@ Example call:</p>
 <dd><p>Initialize custom Integrand</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>custom_fun</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – a callable univariable or multivariate Python              function that returns a real number.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>custom_fun</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – a callable univariable or multivariate Python              function that returns a real number.</p></li>
+<li><p><strong>dimension</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span>. Default to 2.</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition note">
@@ -491,7 +496,7 @@ Example call:</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p></li>
+<li><p><strong>dimension</strong> (<em>ndarray</em>) – dimension(s) of the integrand(s)</p></li>
 <li><p><strong>transforms</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – functions that transform discrete distribution                 to true measure</p></li>
 <li><p><strong>keys</strong> – string matching the measure mimiced by the discrete                 distribution</p></li>
 <li><p><strong>values</strong> – functions to transform a sample by the mimiced                 measure into a sapmle by the true measure</p></li>
@@ -1173,6 +1178,8 @@ and store the sample mean and variance of integrand values</p>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="demos.html" class="btn btn-neutral float-right" title="Demos" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="license.html" class="btn btn-neutral float-left" title="License" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
