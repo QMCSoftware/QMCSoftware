@@ -134,7 +134,7 @@ def comp_clt_vs_cltrep_runtimes(abstols):
     return df_metrics
 
 
-def plot_abstol_runtime(abstols=arange(.01, .05, .001)):
+def plot_abstol_runtime(abstols=arange(.001, .021, .001), is_plot=True):
     """
     Integration Time by Absolute Tolerance for Multi-level Asian Option Function.
 
