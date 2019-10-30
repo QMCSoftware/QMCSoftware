@@ -2,7 +2,7 @@
 Plot run time vs. absolute tolerances for multi-level Asian option function.
 """
 from matplotlib import pyplot as mpl_plot
-from numpy import arange
+from numpy import arange,nan
 import pandas as pd
 
 from qmcpy import integrate
@@ -68,9 +68,12 @@ def qmc_wrapper(discrete_distrib, true_measure, stopping_criterion, name):
     """
     item_f = "    %-25s %-10.3f %-10.3f"
     option = AsianCall(true_measure)
-    sol, data = integrate(option, true_measure, discrete_distrib, stopping_criterion)
-    print(item_f % (name, sol, data.time_total))
-    return sol, data.time_total
+    try:
+        sol, data = integrate(option, true_measure, discrete_distrib, stopping_criterion)
+        print(item_f % (name, sol, data.time_total))
+        return sol, data.time_total
+    except:
+        return nan,nan
 
 
 def comp_clt_vs_cltrep_runtimes(abstols):
@@ -97,7 +100,7 @@ def comp_clt_vs_cltrep_runtimes(abstols):
         # CLT_IIDStdUniform
         discrete_distrib = IIDStdUniform(rng_seed=7)
         true_measure = BrownianMotion(dims, time_vector=time_vector)
-        stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
+        stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol, n_max=10e15)
         mu, t = qmc_wrapper(discrete_distrib, true_measure,
                             stopping_criterion, "CLT_IIDStdUniform")
         results.extend([mu, t])
@@ -105,7 +108,7 @@ def comp_clt_vs_cltrep_runtimes(abstols):
         # CLT_IIDStdGaussian
         discrete_distrib = IIDStdGaussian(rng_seed=7)
         true_measure = BrownianMotion(dims, time_vector=time_vector)
-        stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
+        stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol, n_max=10e15)
         mu, t = qmc_wrapper(discrete_distrib, true_measure,
                             stopping_criterion, "CLT_IIDStdGaussian")
         results.extend([mu, t])
@@ -113,7 +116,7 @@ def comp_clt_vs_cltrep_runtimes(abstols):
         # CLT_Rep_Lattice
         discrete_distrib = Lattice(rng_seed=7)
         true_measure = BrownianMotion(dims, time_vector=time_vector)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol, n_max=10e15)
         mu, t = qmc_wrapper(discrete_distrib, true_measure,
                             stopping_criterion, "CLT_Rep_Lattice")
         results.extend([mu, t])
@@ -121,7 +124,7 @@ def comp_clt_vs_cltrep_runtimes(abstols):
         # CLT_Rep_Sobol
         discrete_distrib = Sobol(rng_seed=7)
         true_measure = BrownianMotion(dims, time_vector=time_vector)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol, n_max=10e15)
         mu, t = qmc_wrapper(discrete_distrib, true_measure,
                             stopping_criterion, "CLT_Rep_Sobol")
         results.extend([mu, t])
@@ -154,9 +157,9 @@ def plot_abstol_runtime(abstols=arange(.01, .05, .001)):
          ydata={"CLT: IID Gaussian": (df["CLT_IIDStdUniform_runTime"], "r"),
                 "CLT: IID Uniform ": (df["CLT_IIDStdGaussian_runTime"], "b"),
                 "CLT Repeated: Lattice": (df["CLT_Rep_Lattice_runTime"], "g"),
-                "CLT Repeated: sobol": (df["CLT_Rep_Sobol_runTime"], "y")},
+                "CLT Repeated: Sobol": (df["CLT_Rep_Sobol_runTime"], "y")},
          outF=out_file)
 
 
 if __name__ == "__main__":
-    plot_abstol_runtime()
+    plot_abstol_runtime(abstols=arange(.001, .1, .003))
