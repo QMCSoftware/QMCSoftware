@@ -12,7 +12,7 @@ from qmcpy.stopping_criterion import CLT, CLTRep
 from qmcpy.true_measure import BrownianMotion
 
 
-def plot(title, xlabel, ylabel, xdata, ydata, outF):
+def plot(title, xlabel, ylabel, xdata, ydata, outf):
     """
     Plot run time against abolute tolerances.
 
@@ -22,7 +22,7 @@ def plot(title, xlabel, ylabel, xdata, ydata, outF):
         ylabel (str): label for y-axis
         xdata (list): list of absolute tolerances.
         ydata (list): list of run time.
-        outF (str): location of image .png file.
+        outf (str): location of image .png file.
 
     Returns:
         None
@@ -39,7 +39,7 @@ def plot(title, xlabel, ylabel, xdata, ydata, outF):
     # mpl_plot.yticks([0,10,20,30],fontsize=12)
     mpl_plot.legend(loc="lower left", bbox_to_anchor=(0.0, 1.01), ncol=2,
                     borderaxespad=0, frameon=False, prop={"size": 14})
-    mpl_plot.savefig(outF + ".png", dpi=500, bbox_inches="tight", pad_inches=.05)
+    mpl_plot.savefig(outf + ".png", dpi=500, bbox_inches="tight", pad_inches=.05)
     mpl_plot.show(block=False)
 
 
@@ -134,7 +134,7 @@ def comp_clt_vs_cltrep_runtimes(abstols):
     return df_metrics
 
 
-def plot_abstol_runtime(abstols=arange(.001, .021, .001), is_plot=True):
+def plot_abstol_runtime(abstols=arange(.001, .021, .001)):
     """
     Integration Time by Absolute Tolerance for Multi-level Asian Option Function.
 
@@ -159,6 +159,7 @@ def plot_abstol_runtime(abstols=arange(.001, .021, .001), is_plot=True):
                 "CLT Repeated: Lattice": (df["CLT_Rep_Lattice_runTime"], "g"),
                 "CLT Repeated: Sobol": (df["CLT_Rep_Sobol_runTime"], "y")},
          outF=out_file)
+
 
 
 if __name__ == "__main__":

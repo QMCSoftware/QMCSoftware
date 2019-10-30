@@ -9,15 +9,6 @@ class Linear(Integrand):
     for :math:`\\boldsymbol{x} = (x_1,\\ldots,x_d) \\in \\mathbb{R}^d`
     """
 
-    def __init__(self, dimension=2):
-        """ Initialize Linear Integrand
-
-        Attributes:
-            dimension (int): Dimension of the domain, :math:`d > 0`. Default to 2.
-
-        """
-        super().__init__(dimension)
-
     def g(self, x):
         """
         Original integrand to be integrated

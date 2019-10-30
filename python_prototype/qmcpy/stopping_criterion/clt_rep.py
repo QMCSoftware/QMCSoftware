@@ -1,11 +1,12 @@
 """ Definition for CLTRep, a concrete implementation of StoppingCriterion """
 
-from numpy import array, tile, zeros, maximum
-from scipy.stats import norm
 import warnings
 
-from qmcpy._util import MaxSamplesWarning
+from numpy import array, tile
+from scipy.stats import norm
+
 from . import StoppingCriterion
+from .._util import MaxSamplesWarning
 from ..accum_data import MeanVarDataRep
 
 
@@ -65,5 +66,4 @@ class CLTRep(StoppingCriterion):
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \
                 * (self.data.sighat ** 2 / self.data.n).sum(0) ** 0.5
             self.data.confid_int = self.data.solution + err_bar * array([-1, 1])  # CLT confidence interval
-            self.data.n
             self.stage = "done"

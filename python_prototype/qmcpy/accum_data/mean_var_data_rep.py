@@ -1,7 +1,7 @@
 """ Definition for MeanVarDataRep, a concrete implementation of AccumData """
 
 from time import process_time
-from numpy import finfo, float32, ones, zeros
+from numpy import finfo, float32, zeros
 from . import AccumData
 
 EPS = finfo(float32).eps
@@ -36,8 +36,8 @@ class MeanVarDataRep(AccumData):
         Update data
 
         Args:
-            true_measure (TrueMeasure): an instance of TrueMeasure
             integrand (Integrand): an instance of Integrand
+            true_measure (TrueMeasure): an instance of TrueMeasure
 
         Returns:
             None

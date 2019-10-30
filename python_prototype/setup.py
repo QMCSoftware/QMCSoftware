@@ -5,11 +5,15 @@ To install python_prototype, open a terminal, in directory QMCSoftware/python_pr
     python setup.py install
     python setup.py clean
 
-To uninstall, do the following from ~/anaconda3/envs/pyqmc/lib/python3.7/site-packages/:
+This will put qmcpy in  ~/anaconda3/envs/pyqmc/lib/python3.7/site-packages/
+
+To uninstall, do the following:
 
     pip uninstall qmcpy
 
-Reference:  Writing the Setup Script, https://docs.python_prototype.org/3/distutils/setupscript.html
+Reference:
+
+    Writing the Setup Script, https://docs.python_prototype.org/3/distutils/setupscript.html
 '''
 import os
 

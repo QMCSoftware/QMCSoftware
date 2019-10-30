@@ -1,6 +1,6 @@
 """ Definition for class Keister, a concrete implementation of Integrand """
 
-from numpy import absolute, cos, linalg as LA, pi
+from numpy import cos, linalg as LA, pi
 
 from . import Integrand
 
@@ -18,15 +18,6 @@ class Keister(Integrand):
             B. D. Keister, Multidimensional Quadrature Algorithms, \
             `Computers in Physics`, *10*, pp. 119-122, 1996.
     """
-
-    def __init__(self, dimension=2):
-        """ Initialize Keister Integrand
-
-        Attributes:
-            dimension (int): Dimension of the domain, :math:`d > 0`. Default to 2.
-
-        """
-        super().__init__(dimension)
 
     def g(self, x):
         """

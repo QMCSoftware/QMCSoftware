@@ -1,5 +1,7 @@
 """ Utility methods. Not meant for public use """
 
+import numbers
+
 
 def univ_repr(qmc_object, attributes=None):
     """Clean way to represent qmc_object data.
@@ -65,6 +67,20 @@ def summarize(stopping_criterion=None, measure=None, integrand=None, distributio
         stopping_criterion.summarize()
     if not data:
         data.summarize()
+
+
+def cast_int(r):
+    """ Cast a float variable to integer.
+
+    Args:
+        r: a real or integer variable
+
+    Returns:
+        r (int): same value as input
+    """
+    if not isinstance(r, int) and isinstance(r, numbers.Real):
+        r = int(r)
+    return r
 
 
 # API

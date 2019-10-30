@@ -1,11 +1,12 @@
 """ Definition for CLT, a concrete implementation of StoppingCriterion """
 
-from numpy import array, ceil, maximum, minimum, tile, zeros, floor
-from scipy.stats import norm
 import warnings
 
-from qmcpy._util import MaxSamplesWarning
+from numpy import array, ceil, floor, maximum, tile
+from scipy.stats import norm
+
 from . import StoppingCriterion
+from .._util import MaxSamplesWarning
 from ..accum_data import MeanVarData
 
 

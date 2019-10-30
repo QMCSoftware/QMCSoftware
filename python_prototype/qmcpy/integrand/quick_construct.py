@@ -1,8 +1,8 @@
 """ Definition for class QuickConstruct, a concrete implementation of Integrand """
 
-from . import Integrand
-import numpy as np
 import inspect
+import numpy as np
+from . import Integrand
 
 
 class QuickConstruct(Integrand):
@@ -40,7 +40,8 @@ class QuickConstruct(Integrand):
                 "with each row being a sampling point in the integral domain.")
 
     def g(self, x):
-        if (not self.dimension) or (self.dimension != x.shape[1]): self.dimension = x.shape[1]  # infer domain dimension
+        if (not self.dimension) or (self.dimension != x.shape[1]):
+            self.dimension = x.shape[1]  # infer domain dimension
         return self.custom_fun(x)
 
     def summarize(self):

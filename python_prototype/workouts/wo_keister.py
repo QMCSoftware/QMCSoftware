@@ -12,13 +12,16 @@ from qmcpy.true_measure import Gaussian
 
 
 def test_distributions_keister(dim, abs_tol):
+    """
+    Estimate a Keister integral with different discrete sampling distributions.
+    """
 
     # IID Standard Uniform
     integrand = Keister()
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
     # IID Standard Gaussian
@@ -26,7 +29,7 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
     # Lattice
@@ -34,7 +37,7 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = Lattice(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
     # Sobol
@@ -42,7 +45,7 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = Sobol(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
 
