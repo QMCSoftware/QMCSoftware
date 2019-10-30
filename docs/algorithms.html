@@ -359,23 +359,6 @@ Example call:</p>
 </dd>
 </dl>
 <dl class="method">
-<dt id="qmcpy.integrand.keister.Keister.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize Keister Integrand</p>
-<dl class="attribute">
-<dt id="qmcpy.integrand.keister.Keister.dimension">
-<code class="sig-name descname">dimension</code><a class="headerlink" href="#qmcpy.integrand.keister.Keister.dimension" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span>. Default to 2.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="method">
 <dt id="qmcpy.integrand.keister.Keister.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister.g" title="Permalink to this definition">¶</a></dt>
 <dd><p>Original integrand to be integrated</p>
@@ -399,23 +382,6 @@ Example call:</p>
 <dt id="qmcpy.integrand.linear.Linear">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \sum_{i=1}^d x_i\)</span>     for <span class="math notranslate nohighlight">\(\boldsymbol{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d\)</span></p>
-<dl class="method">
-<dt id="qmcpy.integrand.linear.Linear.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize Linear Integrand</p>
-<dl class="attribute">
-<dt id="qmcpy.integrand.linear.Linear.dimension">
-<code class="sig-name descname">dimension</code><a class="headerlink" href="#qmcpy.integrand.linear.Linear.dimension" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span>. Default to 2.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="method">
 <dt id="qmcpy.integrand.linear.Linear.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.g" title="Permalink to this definition">¶</a></dt>
@@ -934,13 +900,13 @@ self[i].transforms (dict)</p></li>
 
 <dl class="method">
 <dt id="qmcpy.accum_data.AccumData.update_data">
-<em class="property">abstract </em><code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">true_measure</em>, <em class="sig-param">integrand</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.AccumData.update_data" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">true_measure</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.AccumData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the accumulated data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an instance of TrueMeasure</p></li>
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
+<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an instance of TrueMeasure</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -975,8 +941,8 @@ and store the sample mean and variance of integrand values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an instance of TrueMeasure</p></li>
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
+<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an instance of TrueMeasure</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1013,8 +979,8 @@ and store the sample mean and variance of integrand values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an instance of TrueMeasure</p></li>
 <li><p><strong>integrand</strong> (<a class="reference internal" href="#qmcpy.integrand.Integrand" title="qmcpy.integrand.Integrand"><em>Integrand</em></a>) – an instance of Integrand</p></li>
+<li><p><strong>true_measure</strong> (<a class="reference internal" href="#qmcpy.true_measure.TrueMeasure" title="qmcpy.true_measure.TrueMeasure"><em>TrueMeasure</em></a>) – an instance of TrueMeasure</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

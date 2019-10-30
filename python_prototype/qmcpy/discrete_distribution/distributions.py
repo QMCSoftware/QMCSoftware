@@ -1,9 +1,8 @@
 """ This module implements mutiple subclasses of DiscreteDistribution. """
 
-import numbers
-
 from numpy import array, int64, log, random, zeros
 from numpy.random import Generator, PCG64
+from qmcpy._util import cast_int
 from qmcpy.third_party.magic_point_shop import LatticeSeq
 
 from . import DigitalSeq, DiscreteDistribution
@@ -32,9 +31,9 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             rxnxd (numpy array)
         """
-        if not isinstance(r, int) and isinstance(r, numbers.Real): r = int(r)
-        if not isinstance(n, int) and isinstance(n, numbers.Real): n = int(n)
-        if not isinstance(d, int) and isinstance(d, numbers.Real): d = int(d)
+        r = cast_int(r)
+        n = cast_int(n)
+        d = cast_int(d)
         return self.rng.uniform(0, 1, (r, n, d))
 
 
@@ -61,9 +60,9 @@ class IIDStdGaussian(DiscreteDistribution):
         Returns:
             rxnxd (numpy array)
         """
-        if not isinstance(r, int) and isinstance(r, numbers.Real): r = int(r)
-        if not isinstance(n, int) and isinstance(n, numbers.Real): n = int(n)
-        if not isinstance(d, int) and isinstance(d, numbers.Real): d = int(d)
+        r = cast_int(r)
+        n = cast_int(n)
+        d = cast_int(d)
         return self.rng.standard_normal((r, n, d))
 
 

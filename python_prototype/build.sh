@@ -14,7 +14,7 @@ echo "QMCPy build process starts..."
 echo "$(date)"
 
 # autopep8
-autopep8 . --in-place --recursive --ignore E402,E701,E501,E128 --exclude ./qmcpy/third_party/magic_point_shop
+autopep8 . --in-place --recursive --ignore E402,E701,E501,E128,C0413 --exclude ./qmcpy/third_party/magic_point_shop
 # pylint
 pylint --variable-rgx="[a-z0-9_]{1,30}$" --disable W0622,C0103,C0321 **/*.py
 pylint --variable-rgx="[a-z0-9_]{1,30}$" --disable W0622,C0103 **/**/*.py
@@ -36,11 +36,6 @@ cd ..
 # git commands
 
 git add -f ../docs
-
-# run notebooks
-~/anaconda3/envs/pyqmc/bin/jupyter-nbconvert demos/qmcpy.ipynb #--stdout > ./qmcpy.html
-#~/anaconda3/envs/pyqmc/bin/jupyter-nbconvert demos/plotDemos.ipynb --stdout > ./plotDemos.html
-
 
 # Check time stamps
 ls -ltr .

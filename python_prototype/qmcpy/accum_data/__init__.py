@@ -36,13 +36,13 @@ class AccumData(ABC):
         self.stopping_criterion = None
 
     @abstractmethod
-    def update_data(self, true_measure, integrand):
+    def update_data(self, integrand, true_measure):
         """
         Update the accumulated data
 
         Args:
-            true_measure (TrueMeasure): an instance of TrueMeasure
             integrand (Integrand): an instance of Integrand
+            true_measure (TrueMeasure): an instance of TrueMeasure
 
         Returns:
             None
