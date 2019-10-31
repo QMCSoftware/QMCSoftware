@@ -1,3 +1,6 @@
+"""
+Unit tests for discrete distributions in QMCPy.
+"""
 import unittest
 
 from numpy import array, int64, log, ndarray, zeros
@@ -8,6 +11,9 @@ from qmcpy.third_party.magic_point_shop import LatticeSeq
 
 
 class TestIIDStdUniform(unittest.TestCase):
+    """
+    Unit tests for IIDStdUniform in QMCPy.
+    """
 
     def test_mimics(self):
         discrete_distrib = IIDStdUniform()
@@ -23,6 +29,9 @@ class TestIIDStdUniform(unittest.TestCase):
 
 
 class TestIIDGaussian(unittest.TestCase):
+    """
+    Unit tests for IIDStdGaussian in QMCPy.
+    """
 
     def test_mimics(self):
         discrete_distrib = IIDStdGaussian()
@@ -38,6 +47,9 @@ class TestIIDGaussian(unittest.TestCase):
 
 
 class TestLattice(unittest.TestCase):
+    """
+    Unit tests for Lattice sampling points in QMCPy.
+    """
 
     def test_mimics(self):
         discrete_distrib = Lattice()
@@ -53,8 +65,7 @@ class TestLattice(unittest.TestCase):
 
     def test_backend_lattice(self):
         n, m = 4, 4
-        array_not_shifted = array(
-            [row for row in LatticeSeq(m=int(log(n) / log(2)), s=m)])
+        array_not_shifted = array([list(LatticeSeq(m=int(log(n) / log(2)), s=m))])
         true_array = array([[0, 0, 0, 0],
                             [1 / 2, 1 / 2, 1 / 2, 1 / 2],
                             [1 / 4, 3 / 4, 3 / 4, 1 / 4],
@@ -63,6 +74,9 @@ class TestLattice(unittest.TestCase):
 
 
 class TestSobol(unittest.TestCase):
+    """
+    Unit tests for Sobol sampling points in QMCPy.
+    """
 
     def test_mimics(self):
         discrete_distrib = Sobol()

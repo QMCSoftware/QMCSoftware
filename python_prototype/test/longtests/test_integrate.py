@@ -1,6 +1,10 @@
+"""
+Unit tests for integrate method in QMCPy.
+"""
 import unittest
 
-from numpy import arange, array
+from numpy import arange, array, sqrt
+from numpy.linalg import norm
 from qmcpy import integrate
 from qmcpy.discrete_distribution import IIDStdGaussian, IIDStdUniform, Lattice
 from qmcpy.integrand import AsianCall, Keister, Linear, QuickConstruct

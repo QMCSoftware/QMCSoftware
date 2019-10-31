@@ -18,6 +18,7 @@ cd python_prototype
 
 jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=pyqmc demos/qmcpy.ipynb --stdout >  html_from_demos/qmcpy.html
 jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=pyqmc demos/plotDemos.ipynb --stdout > html_from_demos/plotDemos.html
+jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=pyqmc demos/integrands.ipynb --stdout > html_from_demos/integrands.html
 
 ## Use sphinx to generate HTML documentation with inputs from above and
 ## docstrings from Python code

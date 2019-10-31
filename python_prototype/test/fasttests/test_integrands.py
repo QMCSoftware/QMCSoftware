@@ -1,3 +1,6 @@
+"""
+Unit tests for subclasses of Integrands in QMCPy.
+"""
 import unittest
 from numpy import arange
 
@@ -6,6 +9,9 @@ from qmcpy.true_measure import BrownianMotion
 
 
 class TestAsianCall(unittest.TestCase):
+    """
+    Unit tests for AsianCall function in QMCPy.
+    """
 
     def test_multi_level_construction(self):
         time_vector = [arange(1 / 4, 5 / 4, 1 / 4),
@@ -19,6 +25,9 @@ class TestAsianCall(unittest.TestCase):
 
 
 class TestKeister(unittest.TestCase):
+    """
+    Unit tests for Keister function in QMCPy.
+    """
 
     def test_2d_construction(self):
         fun = Keister()
@@ -27,6 +36,9 @@ class TestKeister(unittest.TestCase):
 
 
 class TestLinear(unittest.TestCase):
+    """
+    Unit tests for Linear function in QMCPy.
+    """
 
     def test_2d_construction(self):
         fun = Linear()

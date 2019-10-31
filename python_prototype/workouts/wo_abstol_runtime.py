@@ -2,7 +2,7 @@
 Plot run time vs. absolute tolerances for multi-level Asian option function.
 """
 from matplotlib import pyplot as mpl_plot
-from numpy import arange,nan
+from numpy import arange, nan
 import pandas as pd
 
 from qmcpy import integrate
@@ -73,7 +73,7 @@ def qmc_wrapper(discrete_distrib, true_measure, stopping_criterion, name):
         print(item_f % (name, sol, data.time_total))
         return sol, data.time_total
     except:
-        return nan,nan
+        return nan, nan
 
 
 def comp_clt_vs_cltrep_runtimes(abstols):
@@ -159,7 +159,6 @@ def plot_abstol_runtime(abstols=arange(.001, .021, .001)):
                 "CLT Repeated: Lattice": (df["CLT_Rep_Lattice_runTime"], "g"),
                 "CLT Repeated: Sobol": (df["CLT_Rep_Sobol_runTime"], "y")},
          outF=out_file)
-
 
 
 if __name__ == "__main__":
