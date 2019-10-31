@@ -1,3 +1,6 @@
+"""
+Unit tests for subclasses of StoppingCriterion in QMCPy.
+"""
 import unittest
 
 from qmcpy._util import DistributionCompatibilityError, MaxSamplesWarning
@@ -7,6 +10,9 @@ from qmcpy.true_measure import Gaussian
 
 
 class TestClt(unittest.TestCase):
+    """
+    Unit tests for Clt in QMCPy.
+    """
 
     def test_raise_distribution_compatibility_error(self):
         self.assertRaises(DistributionCompatibilityError, CLT, Lattice(),
@@ -14,6 +20,9 @@ class TestClt(unittest.TestCase):
 
 
 class TestCltRep(unittest.TestCase):
+    """
+    Unit tests for CltRep in QMCPy.
+    """
 
     def test_raise_distribution_compatibility_error(self):
         self.assertRaises(DistributionCompatibilityError, CLTRep,

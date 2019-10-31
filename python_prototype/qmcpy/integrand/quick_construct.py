@@ -39,6 +39,10 @@ class QuickConstruct(Integrand):
                 "Input custom_fun should be able to process a numpy 2D array "
                 "with each row being a sampling point in the integral domain.")
 
+        if (not isinstance(y, np.ndarray)) or y.shape[0] != x.shape[0]:
+            raise Exception("Input custom_fun should be able to return a real "
+                            " value for each sampling point in input x.")
+
     def g(self, x):
         if (not self.dimension) or (self.dimension != x.shape[1]):
             self.dimension = x.shape[1]  # infer domain dimension

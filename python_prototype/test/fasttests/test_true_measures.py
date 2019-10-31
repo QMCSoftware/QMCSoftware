@@ -1,3 +1,6 @@
+"""
+Unit tests for subclasses of TrueMeasures in QMCPy.
+"""
 import unittest
 
 from numpy import array
@@ -6,7 +9,10 @@ from qmcpy.discrete_distribution import IIDStdGaussian, IIDStdUniform
 from qmcpy.true_measure import Gaussian, Uniform
 
 
-class TestTrueDistributionConstruciton(unittest.TestCase):
+class TestTrueDistributionConstruction(unittest.TestCase):
+    """
+    Unit tests for Gaussian distribution in QMCPy.
+    """
 
     def test_dimensions(self):
         true_measure = Gaussian(1)
@@ -33,6 +39,9 @@ class TestTrueDistributionConstruciton(unittest.TestCase):
 
 
 class TestUniform(unittest.TestCase):
+    """
+    Unit tests for Uniform distribution in QMCPy.
+    """
 
     def test_transforms(self):
         a, b = 1 / 4, 1 / 2
@@ -49,12 +58,18 @@ class TestUniform(unittest.TestCase):
 
 
 class TestGaussian(unittest.TestCase):
+    """
+    Unit tests for Gaussian distribution in QMCPy.
+    """
 
     def test_transforms(self):
         pass
 
 
 class TestBrownianMontion(unittest.TestCase):
+    """
+    Unit tests for Brownian Motion in QMCPy.
+    """
 
     def test_transforms(self):
         pass
