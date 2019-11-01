@@ -1,0 +1,144 @@
+Solution: 6.2966         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Integrand Object)
+IIDStdUniform (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+                dimension: 64 
+CLT (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 5000
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarData (Data Object)
+                        n: [4936.]        
+                  n_total: 5000           
+               time_total: 0.0562         
+               confid_int: [6.23857215 6.3547125 ]
+
+Solution: 6.2271         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Integrand Object)
+IIDStdGaussian (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+                dimension: 64 
+CLT (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 5000
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarData (Data Object)
+                        n: [4936.]        
+                  n_total: 5000           
+               time_total: 0.0175         
+               confid_int: [6.16970281 6.28453894]
+
+Solution: 6.1736         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Integrand Object)
+Lattice (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+                dimension: 64 
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 500
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarDataRep (Data Object)
+                        n: [256]          
+                  n_total: 448            
+               time_total: 0.1384         
+               confid_int: [6.13091634 6.21631786]
+
+Solution: 6.1703         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Integrand Object)
+Sobol (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+                dimension: 64 
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 500
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarDataRep (Data Object)
+                        n: [256]          
+                  n_total: 448            
+               time_total: 0.1471         
+               confid_int: [6.14196849 6.19858562]
+
+Solution: 6.4660         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Integrand Object)
+IIDStdUniform (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+                dimension: 4  16  64 
+CLT (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 5000
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarData (Data Object)
+                        n: [4215.  505.   87.]
+                  n_total: 4999           
+               time_total: 0.0087         
+               confid_int: [6.41698011 6.51502505]
+
+Solution: 6.0887         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Integrand Object)
+IIDStdGaussian (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+                dimension: 4  16  64 
+CLT (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 5000
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarData (Data Object)
+                        n: [4039.  621.  147.]
+                  n_total: 4999           
+               time_total: 0.0040         
+               confid_int: [6.0148378  6.16262991]
+
+Solution: 6.1381         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Integrand Object)
+Lattice (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+                dimension: 4  16  64 
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 500
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarDataRep (Data Object)
+                        n: [128 128  64]  
+                  n_total: 448            
+               time_total: 0.0497         
+               confid_int: [6.07966233 6.19649167]
+
+Solution: 6.2070         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AsianCall (Integrand Object)
+Sobol (Discrete Distribution Object)
+BrownianMotion (True Distribution Object)
+                dimension: 4  16  64 
+CLTRep (StoppingCriterion Object)
+                  abs_tol: 0.0500         
+                  rel_tol: 0.0000         
+                    n_max: 500
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarDataRep (Data Object)
+                        n: [128  64  64]  
+                  n_total: 320            
+               time_total: 0.0637         
+               confid_int: [6.16856162 6.24538446]
+
