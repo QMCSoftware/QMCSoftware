@@ -25,7 +25,7 @@ def quick_construct_integrand(abs_tol):
     true_measure = Uniform(dim)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-    # exact_solution = dim*(5/2)
+    # exact_solution = dim*(c/2)
     data.summarize()
 
 

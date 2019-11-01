@@ -1,7 +1,7 @@
 """
 Keister Function Example
     Run Example:    python workouts/wo_keister.py
-    Save Output:    python workouts/wo_keister.py  > outputs/ie_KeisterFun.txt
+    Save Output:    python workouts/wo_keister.py  > outputs/examples/ie_KeisterFun.txt
 """
 
 from qmcpy import integrate

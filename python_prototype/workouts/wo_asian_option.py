@@ -1,7 +1,7 @@
 """
 Single-Level and Multi-Level Asian Option Pricing Examples
     Run Workout:    python workouts/wo_asian_option.py
-    Save Output:    python workouts/wo_asian_option.py  > outputs/ie_AsianOption.txt
+    Save Output:    python workouts/wo_asian_option.py  > outputs/examples/ie_AsianOption.txt
 """
 
 from numpy import arange
