@@ -81,7 +81,7 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
     df.to_csv('outputs/comparison_tests/dimension.csv')
 
 if __name__ == '__main__':
-    abstols = arange(.001, .1, .003)
+    abstols = arange(.001, .1, .001)
     dimensions = arange(1,9)
 
     abstol_comparison(abstols)
