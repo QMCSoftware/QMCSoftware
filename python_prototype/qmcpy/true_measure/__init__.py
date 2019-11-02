@@ -2,6 +2,7 @@
 
 from abc import ABC
 from numpy import array, int64, ndarray
+from copy import deepcopy
 
 from qmcpy._util import DimensionError, TransformError, univ_repr
 
@@ -65,13 +66,14 @@ class TrueMeasure(ABC):
                 self[i].transforms (dict)
         """
         for measure_i in self:
-            if discrete_distrib.mimics not in list(measure_i.transforms.keys()):
+            discrete_distrib_i = deepcopy(discrete_distrib)
+            if discrete_distrib_i.mimics not in list(measure_i.transforms.keys()):
                 raise TransformError(
                     "Cannot tranform %s to %s" %
-                    (type(discrete_distrib).__name__, type(self).__name__))
+                    (type(discrete_distrib_i).__name__, type(self).__name__))
             measure_i.gen_tm_samples = lambda r, n, self=measure_i: \
-                self.transforms[discrete_distrib.mimics][0](self,
-                    discrete_distrib.gen_dd_samples(r, n, self.dimension))
+                self.transforms[discrete_distrib_i.mimics][0](self,
+                    discrete_distrib_i.gen_dd_samples(r, n, self.dimension))
 
     def gen_tm_samples(self, r, n):
         """

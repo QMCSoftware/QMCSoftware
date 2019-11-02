@@ -89,11 +89,11 @@ class Lattice(DiscreteDistribution):
         Returns:
             rxnxd (numpy array)
         """
-        x = list(LatticeSeq(m=int(log(n) / log(2)), s=d))
-        # generate jxnxm data
-        shifts = random.rand(r, d)
-        x_rs = array([(x + self.rng.uniform(0, 1, d)) % 1 for shift in shifts])
-        # randomly shift each nxm sample
+        if not hasattr(self,'lattice_rng'): # initialize lattice rng and shifts
+            self.lattice_rng = LatticeSeq(m=20, s=d)
+            self.shifts = self.rng.uniform(0,1,(r,d))
+        x = array([next(self.lattice_rng) for i in range(n)])
+        x_rs = array([(x + shift_r) % 1 for shift_r in self.shifts]) # random shift
         return x_rs
 
 
@@ -120,14 +120,15 @@ class Sobol(DiscreteDistribution):
         Returns:
             rxnxd (numpy array)
         """
-        gen = DigitalSeq(Cs="sobol_Cs.col", m=int(log(n) / log(2)), s=d)
-        t = max(32, gen.t)  # we guarantee a depth of >=32 bits for shift
-        ct = max(0, t - gen.t)  # correction factor to scale the integers
-        shifts = self.rng.integers(0, 2 ** t, (r, d), dtype=int64)
-        # generate random shift
+        if not hasattr(self,'sobol_rng'):
+            self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=20, s=d)
+            self.t = max(32 , self.sobol_rng.t) # we guarantee a depth of >=32 bits for shift
+            self.ct = max(0, self.t-self.sobol_rng.t)  # correction factor to scale the integers
+            self.shifts = self.rng.integers(0, 2 ** self.t, (r, d), dtype=int64)
         x = zeros((n, d), dtype=int64)
-        for i, _ in enumerate(gen):
-            x[i, :] = gen.cur  # set each nxm
-        x_rs = array([(shift ^ (x * 2 ** ct)) / 2. ** t for shift in
-                      shifts])  # randomly shift each nxm sample
+        for i in range(n):
+            next(self.sobol_rng)
+            x[i, :] = self.sobol_rng.cur  # set each nxm
+        x_rs = array([(shift_r ^ (x * 2 ** self.ct)) / 2. ** self.t for shift_r in self.shifts])
+        #   randomly scramble
         return x_rs
