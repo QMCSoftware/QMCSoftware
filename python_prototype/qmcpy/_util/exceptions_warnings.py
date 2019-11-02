@@ -17,14 +17,16 @@ class DistributionCompatibilityError(Exception):
     """
     Class for raising error about incompatible distribution.
     """
-
+class NotYetImplemented(Exception):
+    """
+    Class for raising error when a component has been implemented yet
+    """
 
 class TransformError(Exception):
     """
     Class for raising error about transforming function to accommodate \
     distribution.
     """
-
 
 class MaxSamplesWarning(Warning):
     """

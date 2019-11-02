@@ -6,7 +6,7 @@ from numpy import array, tile
 from scipy.stats import norm
 
 from . import StoppingCriterion
-from .._util import MaxSamplesWarning
+from .._util import MaxSamplesWarning, NotYetImplemented
 from ..accum_data import MeanVarDataRep
 
 
@@ -41,6 +41,10 @@ class CLTRep(StoppingCriterion):
         #   house integration data
         self.data.n = tile(self.n_init, n_integrands)  # next n for each integrand
         self.data.n_final = tile(0, n_integrands)
+
+        if n_integrands > 1:
+            raise NotYetImplemented('Not implemented for multi-level problems. \
+                Use CLT stopping criterion with an iid distribution for multi-level problems.')
 
     def stop_yet(self):
         """ Determine when to stop """

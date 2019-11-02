@@ -32,22 +32,24 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
+    
+    if len(dim) == 1: # CLTRep only implemented for single-level functions
+        
+        # Lattice
+        discrete_distrib = Lattice(rng_seed=7)
+        true_measure = BrownianMotion(dim, time_vector=time_vec)
+        integrand = AsianCall(true_measure)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+        _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        data.summarize()
 
-    # Lattice
-    discrete_distrib = Lattice(rng_seed=7)
-    true_measure = BrownianMotion(dim, time_vector=time_vec)
-    integrand = AsianCall(true_measure)
-    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-    data.summarize()
-
-    # Sobol
-    discrete_distrib = Sobol(rng_seed=7)
-    true_measure = BrownianMotion(dim, time_vector=time_vec)
-    integrand = AsianCall(true_measure)
-    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-    data.summarize()
+        # Sobol
+        discrete_distrib = Sobol(rng_seed=7)
+        true_measure = BrownianMotion(dim, time_vector=time_vec)
+        integrand = AsianCall(true_measure)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+        _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        data.summarize()
 
 
 if __name__ == "__main__":

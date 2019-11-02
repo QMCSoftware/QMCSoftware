@@ -5,6 +5,7 @@ from numpy import array, zeros, tile, minimum, exp, sqrt, ceil, log
 from scipy.stats import norm
 from scipy.optimize import fsolve
 
+from qmcpy._util import NotYetImplemented
 from . import StoppingCriterion
 from ..accum_data import MeanVarData
 
@@ -64,7 +65,7 @@ class MeanMC_g(StoppingCriterion):
                 self.data.n = tile(n,len(self.data.n))
                 self.stage = 'mu'
             else:
-                raise Exception("Not yet implemented for rel_tol != 0")
+                raise NotYetImplemented("Not implemented for rel_tol != 0")
         elif self.stage == "mu":
             self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
             self.stage = "done"  # finished with computation

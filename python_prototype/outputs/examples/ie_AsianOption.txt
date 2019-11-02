@@ -13,7 +13,7 @@ CLT (StoppingCriterion Object)
 MeanVarData (Data Object)
                         n: [232678.]      
                   n_total: 233702         
-               time_total: 2.0623         
+               time_total: 1.9547         
                confid_int: [6.13384105 6.23281179]
 
 Solution: 6.1979         
@@ -31,7 +31,7 @@ CLT (StoppingCriterion Object)
 MeanVarData (Data Object)
                         n: [230531.]      
                   n_total: 231555         
-               time_total: 0.6608         
+               time_total: 0.6670         
                confid_int: [6.14812315 6.24773347]
 
 Solution: 6.2002         
@@ -49,7 +49,7 @@ CLTRep (StoppingCriterion Object)
 MeanVarDataRep (Data Object)
                         n: [2048]         
                   n_total: 3072           
-               time_total: 0.8676         
+               time_total: 0.7186         
                confid_int: [6.19902691 6.2014173 ]
 
 Solution: 6.1853         
@@ -67,10 +67,10 @@ CLTRep (StoppingCriterion Object)
 MeanVarDataRep (Data Object)
                         n: [1024]         
                   n_total: 1024           
-               time_total: 0.2366         
+               time_total: 0.1980         
                confid_int: [6.18167892 6.18889987]
 
-Solution: 6.1971         
+Solution: 6.1935         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 IIDStdUniform (Discrete Distribution Object)
@@ -83,12 +83,12 @@ CLT (StoppingCriterion Object)
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
-                        n: [273996.  25084.   4317.]
-                  n_total: 306469         
-               time_total: 0.2721         
-               confid_int: [6.14526128 6.24896144]
+                        n: [273183.  25592.   4267.]
+                  n_total: 306114         
+               time_total: 0.2343         
+               confid_int: [6.1417742  6.24517576]
 
-Solution: 6.2030         
+Solution: 6.2006         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 IIDStdGaussian (Discrete Distribution Object)
@@ -101,44 +101,8 @@ CLT (StoppingCriterion Object)
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
-                        n: [306623.  26914.   4719.]
-                  n_total: 341328         
-               time_total: 0.1161         
-               confid_int: [6.15404539 6.25203503]
-
-Solution: 6.2080         
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Integrand Object)
-Lattice (Discrete Distribution Object)
-BrownianMotion (True Distribution Object)
-                dimension: 4  16  64 
-CLTRep (StoppingCriterion Object)
-                  abs_tol: 0.0500         
-                  rel_tol: 0.0000         
-                    n_max: 100000000
-                  inflate: 1.2000         
-                    alpha: 0.0100        
-MeanVarDataRep (Data Object)
-                        n: [1024 1024 1024]
-                  n_total: 3072           
-               time_total: 0.4721         
-               confid_int: [6.20353546 6.21254236]
-
-Solution: 6.2019         
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AsianCall (Integrand Object)
-Sobol (Discrete Distribution Object)
-BrownianMotion (True Distribution Object)
-                dimension: 4  16  64 
-CLTRep (StoppingCriterion Object)
-                  abs_tol: 0.0500         
-                  rel_tol: 0.0000         
-                    n_max: 100000000
-                  inflate: 1.2000         
-                    alpha: 0.0100        
-MeanVarDataRep (Data Object)
-                        n: [1024 1024 1024]
-                  n_total: 3072           
-               time_total: 0.4034         
-               confid_int: [6.1998289  6.20404331]
+                        n: [306352.  27193.   4667.]
+                  n_total: 341284         
+               time_total: 0.0889         
+               confid_int: [6.15155746 6.24968724]
 
