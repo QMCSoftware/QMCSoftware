@@ -2,7 +2,7 @@
 
 import warnings
 
-from numpy import array, tile
+from numpy import array, tile, sqrt
 from scipy.stats import norm
 
 from . import StoppingCriterion
@@ -16,7 +16,7 @@ class CLTRep(StoppingCriterion):
     def __init__(self, discrete_distrib, true_measure,
                  replications=16, inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0,
-                 n_init=1024, n_max=1e8):
+                 n_init=32, n_max=1e8):
         """
         Args:
             discrete_distrib
@@ -48,25 +48,22 @@ class CLTRep(StoppingCriterion):
 
     def stop_yet(self):
         """ Determine when to stop """
-        for i in range(self.data.n_integrands):
-            if self.data.sighat[i] < self.abs_tol and self.data.n[i] != 0:
-                # sufficient estimate for mean of ith integrand
-                self.data.n_final[i] = self.data.n[i]  # save sufficient n for ith integral
-                self.data.n[i] = 0  # done sampling from ith integral
-            else:
-                self.data.n_final[i] = max(self.data.n[i], self.data.n_final[i])
-                self.data.n[i] *= 2  # double n for next sample
-        over_n_max = (self.data.n_total + self.data.n.sum() > self.n_max)
-        if self.data.n.sum() == 0 or over_n_max:  # finished
-            if over_n_max:
+        if sqrt((self.data.sighat**2).sum()/len(self.data.sighat))*self.inflate > self.abs_tol:
+            # Not sufficiently estimated
+            if 2*self.data.n.sum() > self.n_max:
+                # doubling samples would go over n_max
                 warning_s = """
                 Alread generated %d samples.
                 Trying to generate %s new samples, which exceeds n_max = %d.
                 No more samples will be generated.
                 Note that error tolerances may no longer be satisfied""" \
-                % (int(self.data.n_total), str(self.data.n), int(self.n_max))
+                % (int(self.data.n_total.sum()), str(self.data.n), int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
-            self.data.n = self.data.n_final
+                self.stage = 'done'
+            else: self.data.n *= 2 # double n for next sample
+        else: self.stage = 'done' # sufficiently estimated    
+        if self.stage == 'done':
+            self.data.n_total = self.data.n_total.sum()
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \
                 * (self.data.sighat ** 2 / self.data.n).sum(0) ** 0.5
             self.data.confid_int = self.data.solution + err_bar * array([-1, 1])  # CLT confidence interval

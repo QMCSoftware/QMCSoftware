@@ -92,7 +92,7 @@ class Lattice(DiscreteDistribution):
         if not hasattr(self,'lattice_rng'): # initialize lattice rng and shifts
             self.lattice_rng = LatticeSeq(m=20, s=d)
             self.shifts = self.rng.uniform(0,1,(r,d))
-        x = array([next(self.lattice_rng) for i in range(n)])
+        x = array([next(self.lattice_rng) for i in range(int(n))])
         x_rs = array([(x + shift_r) % 1 for shift_r in self.shifts]) # random shift
         return x_rs
 
@@ -125,8 +125,8 @@ class Sobol(DiscreteDistribution):
             self.t = max(32 , self.sobol_rng.t) # we guarantee a depth of >=32 bits for shift
             self.ct = max(0, self.t-self.sobol_rng.t)  # correction factor to scale the integers
             self.shifts = self.rng.integers(0, 2 ** self.t, (r, d), dtype=int64)
-        x = zeros((n, d), dtype=int64)
-        for i in range(n):
+        x = zeros((int(n), int(d)), dtype=int64)
+        for i in range(int(n)):
             next(self.sobol_rng)
             x[i, :] = self.sobol_rng.cur  # set each nxm
         x_rs = array([(shift_r ^ (x * 2 ** self.ct)) / 2. ** self.t for shift_r in self.shifts])
