@@ -40,10 +40,10 @@ class IntegrationExampleTest(unittest.TestCase):
                     arange(1 / 16, 17 / 16, 1 / 16),
                     arange(1 / 64, 65 / 64, 1 / 64)]
         dims = [len(tv) for tv in time_vec]
-        discrete_distrib = Lattice()
+        discrete_distrib = IIDStdGaussian()
         true_measure = BrownianMotion(dims, time_vector=time_vec)
         integrand = AsianCall(true_measure)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
+        stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
         sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         true_value = 6.20
         self.assertTrue(abs(sol - true_value) < abs_tol)
