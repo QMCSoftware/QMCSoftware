@@ -42,7 +42,7 @@ def abstol_comparison(abstols=arange(.1, .4, .1)):
             row_i[distrib_name+'_n'] = n
         print(row_i)
         df.loc[i] = row_i
-    df.to_csv('outputs/comparison_tests/abs_tol.csv')
+    return df
     
 
 def dimension_comparison(dimensions=arange(1, 4, 1)):
@@ -78,11 +78,13 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
             row_i[distrib_name+'_n'] = n
         print(row_i)
         df.loc[i] = row_i
-    df.to_csv('outputs/comparison_tests/dimension.csv')
+    return df
 
 if __name__ == '__main__':
     abstols = arange(.0005, .1, .0005)
-    dimensions = arange(1,9)
+    df_abstols = abstol_comparison(abstols)
+    df_abstols.to_csv('outputs/comparison_tests/abs_tol.csv')
 
-    abstol_comparison(abstols)
-    dimension_comparison(dimensions)
+    dimensions = arange(1,9)
+    df_dimensions = dimension_comparison(dimensions)
+    df_dimensions.to_csv('outputs/comparison_tests/dimension.csv')

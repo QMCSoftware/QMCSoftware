@@ -13,7 +13,7 @@ CLT (StoppingCriterion Object)
 MeanVarData (Data Object)
                         n: [4936.]        
                   n_total: 5000           
-               time_total: 0.0546         
+               time_total: 0.0496         
                confid_int: [6.23857215 6.3547125 ]
 
 Solution: 6.2271         
@@ -31,10 +31,10 @@ CLT (StoppingCriterion Object)
 MeanVarData (Data Object)
                         n: [4936.]        
                   n_total: 5000           
-               time_total: 0.0160         
+               time_total: 0.0165         
                confid_int: [6.16970281 6.28453894]
 
-Solution: 6.1736         
+Solution: 6.1488         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 Lattice (Discrete Distribution Object)
@@ -48,11 +48,11 @@ CLTRep (StoppingCriterion Object)
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
                         n: [256]          
-                  n_total: 448            
-               time_total: 0.1112         
-               confid_int: [6.13091634 6.21631786]
+                  n_total: 256            
+               time_total: 0.0552         
+               confid_int: [6.12338779 6.1742409 ]
 
-Solution: 6.1703         
+Solution: 6.2304         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 Sobol (Discrete Distribution Object)
@@ -66,11 +66,11 @@ CLTRep (StoppingCriterion Object)
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
                         n: [256]          
-                  n_total: 448            
-               time_total: 0.1214         
-               confid_int: [6.14196849 6.19858562]
+                  n_total: 256            
+               time_total: 0.0664         
+               confid_int: [6.20850349 6.25229694]
 
-Solution: 6.3870         
+Solution: 6.4661         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 IIDStdUniform (Discrete Distribution Object)
@@ -83,12 +83,12 @@ CLT (StoppingCriterion Object)
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
-                        n: [4305.  414.   87.]
+                        n: [4191.  527.   88.]
                   n_total: 4998           
-               time_total: 0.0069         
-               confid_int: [6.33877066 6.43529977]
+               time_total: 0.0075         
+               confid_int: [6.41711492 6.51505949]
 
-Solution: 6.0727         
+Solution: 6.1060         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AsianCall (Integrand Object)
 IIDStdGaussian (Discrete Distribution Object)
@@ -101,8 +101,8 @@ CLT (StoppingCriterion Object)
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
-                        n: [3931.  710.  166.]
+                        n: [4032.  645.  130.]
                   n_total: 4999           
-               time_total: 0.0034         
-               confid_int: [5.99806682 6.14737946]
+               time_total: 0.0046         
+               confid_int: [6.03223606 6.17979092]
 
