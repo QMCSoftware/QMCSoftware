@@ -36,6 +36,11 @@ class MeanMC_g(StoppingCriterion):
             n_init: initial number of samples
             n_max: maximum number of samples
         """
+        if len(true_measure) > 1:
+            raise NotYetImplemented('''
+                MeanMC_g tot implemented for multi-level problems.
+                Use CLT stopping criterion with an iid distribution for multi-level problems
+            ''')
         allowed_distribs = ["IIDStdUniform",
                             "IIDStdGaussian"]  # supported distributions
         super().__init__(discrete_distrib, allowed_distribs, abs_tol, rel_tol,
@@ -51,12 +56,6 @@ class MeanMC_g(StoppingCriterion):
                     (self.alpha_sigma*self.n_init)/(1-self.alpha_sigma) * \
                     (1-1/self.inflate**2)**2
         self.stage = "sigma"
-
-        if n_integrands > 1:
-            raise NotYetImplemented('''
-                MeanMC_g tot implemented for multi-level problems.
-                Use CLT stopping criterion with an iid distribution for multi-level problems
-            ''')
     
     def stop_yet(self):
         """ Determine when to stop """

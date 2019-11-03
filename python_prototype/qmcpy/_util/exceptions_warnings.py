@@ -3,19 +3,19 @@
 
 class MeasureCompatibilityError(Exception):
     """
-    Class for raising error of incompatible measures.
+    Class for raising error of incompatible measures
     """
 
 
 class DimensionError(Exception):
     """
-    Class for raising error about dimension.
+    Class for raising error about dimension
     """
 
 
 class DistributionCompatibilityError(Exception):
     """
-    Class for raising error about incompatible distribution.
+    Class for raising error about incompatible distribution
     """
 class NotYetImplemented(Exception):
     """
@@ -25,10 +25,15 @@ class NotYetImplemented(Exception):
 class TransformError(Exception):
     """
     Class for raising error about transforming function to accommodate \
-    distribution.
+    distribution
     """
 
 class MaxSamplesWarning(Warning):
     """
-    Class for issuing warning about using maximum number of data samples.
+    Class for issuing warning about using maximum number of data samples
+    """
+
+class ParameterWarning(Warning):
+    """
+    Class for issuing warnings about unacceptable parameters
     """

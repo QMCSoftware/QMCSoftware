@@ -2,11 +2,11 @@
 
 import warnings
 
-from numpy import array, tile, sqrt
+from numpy import array, tile, sqrt, log
 from scipy.stats import norm
 
 from . import StoppingCriterion
-from .._util import MaxSamplesWarning, NotYetImplemented
+from .._util import MaxSamplesWarning, NotYetImplemented, ParameterWarning
 from ..accum_data import MeanVarDataRep
 
 
@@ -29,6 +29,16 @@ class CLTRep(StoppingCriterion):
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
         """
+        # Input Checks checking
+        if len(true_measure) > 1:
+            raise NotYetImplemented('''
+                CLTRep not implemented for multi-level problems.
+                Use CLT stopping criterion with an iid distribution for multi-level problems
+            ''')
+        if (log(n_init)/log(2))%1 != 0:
+            warning_s = ' n_init must be a power of 2. Using n_init = 32'
+            warnings.warn(warning_s, ParameterWarning)
+            n_init = 32
         allowed_distribs = ["Lattice", "Sobol"]  # supported distributions
         super().__init__(discrete_distrib, allowed_distribs, abs_tol,
                          rel_tol, n_init, n_max)
@@ -41,12 +51,6 @@ class CLTRep(StoppingCriterion):
         #   house integration data
         self.data.n = tile(self.n_init, n_integrands)  # next n for each integrand
         self.data.n_final = tile(0, n_integrands)
-
-        if n_integrands > 1:
-            raise NotYetImplemented('''
-                CLTRep not implemented for multi-level problems.
-                Use CLT stopping criterion with an iid distribution for multi-level problems
-            ''')
 
     def stop_yet(self):
         """ Determine when to stop """
