@@ -24,7 +24,7 @@ class MeanMC_g(StoppingCriterion):
     def __init__(self, discrete_distrib, true_measure,
                  inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0,
-                 n_init=1024, n_max=1e8):
+                 n_init=1024, n_max=2**20):
         """
         Args:
             discrete_distrib
@@ -36,7 +36,7 @@ class MeanMC_g(StoppingCriterion):
             n_init: initial number of samples
             n_max: maximum number of samples
         """
-        if len(true_measure) > 1:
+        if len(true_measure) != 1:
             raise NotYetImplemented('''
                 MeanMC_g tot implemented for multi-level problems.
                 Use CLT stopping criterion with an iid distribution for multi-level problems
