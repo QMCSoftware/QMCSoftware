@@ -43,8 +43,10 @@ class CLTRep(StoppingCriterion):
         self.data.n_final = tile(0, n_integrands)
 
         if n_integrands > 1:
-            raise NotYetImplemented('Not implemented for multi-level problems. \
-                Use CLT stopping criterion with an iid distribution for multi-level problems.')
+            raise NotYetImplemented('''
+                CLTRep not implemented for multi-level problems.
+                Use CLT stopping criterion with an iid distribution for multi-level problems
+            ''')
 
     def stop_yet(self):
         """ Determine when to stop """

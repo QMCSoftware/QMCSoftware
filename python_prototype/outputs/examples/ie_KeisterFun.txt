@@ -13,7 +13,7 @@ CLT (StoppingCriterion Object)
 MeanVarData (Data Object)
                         n: [470869.]      
                   n_total: 471893         
-               time_total: 0.1641         
+               time_total: 0.1631         
                confid_int: [2.16427946 2.18461404]
 
 Solution: 2.1702         
@@ -31,10 +31,10 @@ CLT (StoppingCriterion Object)
 MeanVarData (Data Object)
                         n: [476600.]      
                   n_total: 477624         
-               time_total: 0.0478         
+               time_total: 0.0430         
                confid_int: [2.16005152 2.18028263]
 
-Solution: 2.1683         
+Solution: 2.1680         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Keister (Integrand Object)
 Lattice (Discrete Distribution Object)
@@ -47,12 +47,12 @@ CLTRep (StoppingCriterion Object)
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
-                        n: [1024]         
-                  n_total: 1024           
-               time_total: 0.0189         
-               confid_int: [2.1681542  2.16838594]
+                        n: [256]          
+                  n_total: 256            
+               time_total: 0.0064         
+               confid_int: [2.16639453 2.16958004]
 
-Solution: 2.1687         
+Solution: 2.1683         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Keister (Integrand Object)
 Sobol (Discrete Distribution Object)
@@ -65,8 +65,8 @@ CLTRep (StoppingCriterion Object)
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
-                        n: [1024]         
-                  n_total: 1024           
-               time_total: 0.0183         
-               confid_int: [2.16853269 2.16888595]
+                        n: [512]          
+                  n_total: 512            
+               time_total: 0.0154         
+               confid_int: [2.16784035 2.16879034]
 

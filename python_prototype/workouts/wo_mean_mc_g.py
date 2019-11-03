@@ -29,6 +29,7 @@ _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterio
 data.summarize()
 
 # Multi-Level Asian Option Pricing
+'''
 time_vec = [
     arange(1 / 4, 5 / 4, 1 / 4),
     arange(1 / 16, 17 / 16, 1 / 16),
@@ -40,3 +41,4 @@ integrand = AsianCall(true_measure)
 stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
 _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
 data.summarize()
+'''

@@ -51,11 +51,17 @@ class MeanMC_g(StoppingCriterion):
                     (self.alpha_sigma*self.n_init)/(1-self.alpha_sigma) * \
                     (1-1/self.inflate**2)**2
         self.stage = "sigma"
+
+        if n_integrands > 1:
+            raise NotYetImplemented('''
+                MeanMC_g tot implemented for multi-level problems.
+                Use CLT stopping criterion with an iid distribution for multi-level problems
+            ''')
     
     def stop_yet(self):
         """ Determine when to stop """
         if self.stage == "sigma":
-            self.sigma_up = self.inflate*sqrt((self.data.sighat**2).sum()) # CORRECT? 
+            self.sigma_up = self.inflate*sqrt((self.data.sighat**2).sum()/len(self.data.sighat))
             self.alpha_mu = 1-(1-self.alpha)/(1-self.alpha_sigma)
             if self.rel_tol == 0:
                 toloversig = self.abs_tol/self.sigma_up
