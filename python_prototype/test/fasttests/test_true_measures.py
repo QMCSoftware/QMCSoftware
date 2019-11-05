@@ -3,10 +3,8 @@ Unit tests for subclasses of TrueMeasures in QMCPy.
 """
 import unittest
 
-from numpy import array
-from qmcpy._util import DimensionError, TransformError
-from qmcpy.discrete_distribution import IIDStdGaussian, IIDStdUniform
-from qmcpy.true_measure import Gaussian, Uniform
+from qmcpy import *
+from qmcpy._util import *
 
 
 class TestTrueDistributionConstruction(unittest.TestCase):

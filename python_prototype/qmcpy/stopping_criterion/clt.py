@@ -5,7 +5,7 @@ import warnings
 from numpy import array, ceil, floor, maximum, tile
 from scipy.stats import norm
 
-from . import StoppingCriterion
+from ._stopping_criterion import StoppingCriterion
 from .._util import MaxSamplesWarning
 from ..accum_data import MeanVarData
 

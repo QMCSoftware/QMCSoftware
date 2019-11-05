@@ -2,7 +2,7 @@
 
 from numpy import cos, linalg as LA, pi
 
-from . import Integrand
+from ._integrand import Integrand
 
 
 class Keister(Integrand):

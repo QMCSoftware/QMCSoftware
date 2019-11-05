@@ -2,12 +2,9 @@
 Unit tests for discrete distributions in QMCPy.
 """
 import unittest
-
 from numpy import array, int64, log, ndarray, zeros
-from qmcpy.discrete_distribution import IIDStdUniform, IIDStdGaussian, \
-    Lattice, Sobol
-from qmcpy.discrete_distribution.digital_seq import DigitalSeq
-from qmcpy.third_party.magic_point_shop import LatticeSeq
+
+from qmcpy import *
 
 
 class TestIIDStdUniform(unittest.TestCase):

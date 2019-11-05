@@ -6,8 +6,8 @@ from scipy.stats import norm
 from scipy.optimize import fsolve
 import warnings
 
+from ._stopping_criterion import StoppingCriterion
 from .._util import NotYetImplemented, MaxSamplesWarning
-from . import StoppingCriterion
 from ..accum_data import MeanVarData
 
 class MeanMC_g(StoppingCriterion):

@@ -3,12 +3,7 @@ Keister Function Example
     Run Example: python workouts/wo_keister.py
     Save Output: python workouts/wo_keister.py  > outputs/examples/ie_KeisterFun.txt
 """
-
-from qmcpy import integrate
-from qmcpy.discrete_distribution import IIDStdUniform, IIDStdGaussian, Lattice, Sobol
-from qmcpy.integrand import Keister
-from qmcpy.stopping_criterion import CLT, CLTRep, MeanMC_g
-from qmcpy.true_measure import Gaussian
+from qmcpy import *
 
 
 def test_distributions_keister(dim, abs_tol):

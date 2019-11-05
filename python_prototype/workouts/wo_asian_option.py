@@ -5,11 +5,8 @@ Single-Level and Multi-Level Asian Option Pricing Examples
 """
 
 from numpy import arange
-from qmcpy import integrate
-from qmcpy.discrete_distribution import IIDStdGaussian, IIDStdUniform, Lattice, Sobol
-from qmcpy.integrand import AsianCall
-from qmcpy.stopping_criterion import CLT, CLTRep, MeanMC_g
-from qmcpy.true_measure import BrownianMotion
+
+from qmcpy import *
 
 
 def test_distributions_asian_option(time_vec, dim, abs_tol):

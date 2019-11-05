@@ -1,7 +1,7 @@
 """ Definition for CubLattice_g, a concrete implementation of StoppingCriterion """
 
+from ._stopping_criterion import StoppingCriterion
 from .._util import MaxSamplesWarning
-from . import StoppingCriterion
 from ..accum_data import MeanVarDataRep
 
 

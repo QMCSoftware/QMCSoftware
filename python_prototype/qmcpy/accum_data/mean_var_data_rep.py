@@ -2,7 +2,8 @@
 
 from time import process_time
 from numpy import finfo, float32, zeros
-from . import AccumData
+
+from ._accum_data import AccumData
 
 EPS = finfo(float32).eps
 

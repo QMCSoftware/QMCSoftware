@@ -4,9 +4,8 @@ Unit tests for subclasses of Integrands in QMCPy.
 import unittest
 from numpy import arange
 
-from qmcpy._util import ParameterError
-from qmcpy.integrand import AsianCall, Keister, Linear
-from qmcpy.true_measure import BrownianMotion
+from qmcpy import *
+from qmcpy._util import *
 
 
 class TestAsianCall(unittest.TestCase):

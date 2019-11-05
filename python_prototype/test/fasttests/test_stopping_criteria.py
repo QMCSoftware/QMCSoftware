@@ -4,10 +4,8 @@ Unit tests for subclasses of StoppingCriterion in QMCPy.
 import unittest
 import warnings
 
-from qmcpy._util import DistributionCompatibilityError, ParameterWarning 
-from qmcpy.discrete_distribution import IIDStdGaussian, Lattice
-from qmcpy.stopping_criterion import CLT, CLTRep
-from qmcpy.true_measure import Gaussian
+from qmcpy import *
+from qmcpy._util import *
 
 class TestClt(unittest.TestCase):
     """

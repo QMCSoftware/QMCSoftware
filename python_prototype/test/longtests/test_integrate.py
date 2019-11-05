@@ -5,11 +5,8 @@ import unittest
 
 from numpy import arange, array, sqrt
 from numpy.linalg import norm
-from qmcpy import integrate
-from qmcpy.discrete_distribution import IIDStdGaussian, IIDStdUniform, Lattice
-from qmcpy.integrand import AsianCall, Keister, Linear, QuickConstruct
-from qmcpy.stopping_criterion import CLT, CLTRep
-from qmcpy.true_measure import BrownianMotion, Gaussian, Lebesgue, Uniform
+
+from qmcpy import *
 
 
 class IntegrationExampleTest(unittest.TestCase):

@@ -2,8 +2,8 @@
 
 from numpy import exp, maximum
 
+from ._integrand import Integrand
 from .._util import ParameterError
-from . import Integrand
 
 
 class AsianCall(Integrand):

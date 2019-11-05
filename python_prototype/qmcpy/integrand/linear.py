@@ -1,6 +1,6 @@
 """ Definition for class Linear, a concrete implementation of Integrand """
 
-from . import Integrand
+from ._integrand import Integrand
 
 
 class Linear(Integrand):

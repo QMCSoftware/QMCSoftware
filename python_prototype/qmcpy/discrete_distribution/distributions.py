@@ -2,9 +2,10 @@
 
 from numpy import array, int64, log, random, zeros
 from numpy.random import Generator, PCG64
-from ..third_party.magic_point_shop import LatticeSeq
 
-from . import DigitalSeq, DiscreteDistribution
+from ._discrete_distribution import DiscreteDistribution
+from ..third_party.magic_point_shop import LatticeSeq
+from .digital_seq import DigitalSeq
 
 
 class IIDStdUniform(DiscreteDistribution):
