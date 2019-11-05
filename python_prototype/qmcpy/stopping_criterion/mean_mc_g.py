@@ -6,7 +6,7 @@ from scipy.stats import norm
 from scipy.optimize import fsolve
 import warnings
 
-from qmcpy._util import NotYetImplemented, MaxSamplesWarning
+from .._util import NotYetImplemented, MaxSamplesWarning
 from . import StoppingCriterion
 from ..accum_data import MeanVarData
 

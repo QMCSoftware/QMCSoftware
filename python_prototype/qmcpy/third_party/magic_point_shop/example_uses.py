@@ -1,7 +1,7 @@
 from time import time
 from numpy import *
 
-from qmcpy import LatticeSeq, DigitalSeq
+from . import LatticeSeq, DigitalSeq
 
 def gen_lattice_points(n,d):
     t0 = time()

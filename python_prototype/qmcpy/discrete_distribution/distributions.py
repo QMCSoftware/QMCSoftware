@@ -2,8 +2,8 @@
 
 from numpy import array, int64, log, random, zeros
 from numpy.random import Generator, PCG64
-from qmcpy._util import cast_int
-from qmcpy.third_party.magic_point_shop import LatticeSeq
+from .._util import cast_int
+from ..third_party.magic_point_shop import LatticeSeq
 
 from . import DigitalSeq, DiscreteDistribution
 

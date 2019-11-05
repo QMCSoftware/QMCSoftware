@@ -1,6 +1,6 @@
 """ Definition for CubLattice_g, a concrete implementation of StoppingCriterion """
 
-from qmcpy._util import MaxSamplesWarning
+from .._util import MaxSamplesWarning
 from . import StoppingCriterion
 from ..accum_data import MeanVarDataRep
 

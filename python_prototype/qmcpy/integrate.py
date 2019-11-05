@@ -3,10 +3,10 @@
 import copy
 from time import time
 
-from qmcpy.discrete_distribution import IIDStdUniform
-from qmcpy.integrand.linear import Linear
-from qmcpy.stopping_criterion import CLT
-from qmcpy.true_measure import Uniform
+from .discrete_distribution import IIDStdUniform
+from .integrand.linear import Linear
+from .stopping_criterion import CLT
+from .true_measure import Uniform
 
 
 def integrate(integrand=None, true_measure=None, discrete_distrib=None, stopping_criterion=None):

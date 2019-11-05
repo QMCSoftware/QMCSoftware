@@ -4,7 +4,7 @@ from abc import ABC
 from numpy import array, int64, ndarray
 from copy import deepcopy
 
-from qmcpy._util import DimensionError, TransformError, univ_repr
+from .._util import DimensionError, TransformError, univ_repr
 
 
 class TrueMeasure(ABC):

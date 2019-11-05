@@ -2,7 +2,7 @@
 
 from numpy import exp, maximum
 
-from qmcpy._util import ParameterError
+from .._util import ParameterError
 from . import Integrand
 
 
