@@ -28,12 +28,16 @@ class TransformError(Exception):
     distribution
     """
 
-class MaxSamplesWarning(Warning):
+class ParameterError(Exception):
     """
-    Class for issuing warning about using maximum number of data samples
+    Class for raising error about input parameters
     """
-
 class ParameterWarning(Warning):
     """
     Class for issuing warnings about unacceptable parameters
+    """
+
+class MaxSamplesWarning(Warning):
+    """
+    Class for issuing warning about using maximum number of data samples
     """

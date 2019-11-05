@@ -2,10 +2,10 @@
 
 from numpy import array, int64, log, random, zeros
 from numpy.random import Generator, PCG64
-from qmcpy._util import cast_int
-from qmcpy.third_party.magic_point_shop import LatticeSeq
 
-from . import DigitalSeq, DiscreteDistribution
+from ._discrete_distribution import DiscreteDistribution
+from ..third_party.magic_point_shop import LatticeSeq
+from .digital_seq import DigitalSeq
 
 
 class IIDStdUniform(DiscreteDistribution):
@@ -31,10 +31,7 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             rxnxd (numpy array)
         """
-        r = cast_int(r)
-        n = cast_int(n)
-        d = cast_int(d)
-        return self.rng.uniform(0, 1, (r, n, d))
+        return self.rng.uniform(0, 1, (int(r), int(n), int(d)))
 
 
 class IIDStdGaussian(DiscreteDistribution):
@@ -60,10 +57,7 @@ class IIDStdGaussian(DiscreteDistribution):
         Returns:
             rxnxd (numpy array)
         """
-        r = cast_int(r)
-        n = cast_int(n)
-        d = cast_int(d)
-        return self.rng.standard_normal((r, n, d))
+        return self.rng.standard_normal((int(r), int(n), int(d)))
 
 
 class Lattice(DiscreteDistribution):
@@ -90,8 +84,8 @@ class Lattice(DiscreteDistribution):
             rxnxd (numpy array)
         """
         if not hasattr(self,'lattice_rng'): # initialize lattice rng and shifts
-            self.lattice_rng = LatticeSeq(m=20, s=d)
-            self.shifts = self.rng.uniform(0,1,(r,d))
+            self.lattice_rng = LatticeSeq(m=20, s=int(d))
+            self.shifts = self.rng.uniform(0,1,(int(r),int(d)))
         x = array([next(self.lattice_rng) for i in range(int(n))])
         x_rs = array([(x + shift_r) % 1 for shift_r in self.shifts]) # random shift
         return x_rs
@@ -121,10 +115,10 @@ class Sobol(DiscreteDistribution):
             rxnxd (numpy array)
         """
         if not hasattr(self,'sobol_rng'):
-            self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=20, s=d)
+            self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=20, s=int(d))
             self.t = max(32 , self.sobol_rng.t) # we guarantee a depth of >=32 bits for shift
             self.ct = max(0, self.t-self.sobol_rng.t)  # correction factor to scale the integers
-            self.shifts = self.rng.integers(0, 2 ** self.t, (r, d), dtype=int64)
+            self.shifts = self.rng.integers(0, 2 ** self.t, (int(r), int(d)), dtype=int64)
         x = zeros((int(n), int(d)), dtype=int64)
         for i in range(int(n)):
             next(self.sobol_rng)

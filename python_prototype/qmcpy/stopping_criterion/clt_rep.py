@@ -5,7 +5,7 @@ import warnings
 from numpy import array, tile, sqrt, log
 from scipy.stats import norm
 
-from . import StoppingCriterion
+from ._stopping_criterion import StoppingCriterion
 from .._util import MaxSamplesWarning, NotYetImplemented, ParameterWarning
 from ..accum_data import MeanVarDataRep
 

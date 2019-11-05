@@ -1,11 +1,7 @@
 """
 Workout for QuickConstruct integrand class.
 """
-from qmcpy import integrate
-from qmcpy.integrand import QuickConstruct
-from qmcpy.discrete_distribution import IIDStdUniform
-from qmcpy.true_measure import Uniform
-from qmcpy.stopping_criterion import CLT
+from qmcpy import *
 
 
 def quick_construct_integrand(abs_tol):

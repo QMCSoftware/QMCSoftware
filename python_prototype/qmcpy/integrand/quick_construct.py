@@ -2,7 +2,8 @@
 
 import inspect
 import numpy as np
-from . import Integrand
+
+from ._integrand import Integrand
 
 
 class QuickConstruct(Integrand):

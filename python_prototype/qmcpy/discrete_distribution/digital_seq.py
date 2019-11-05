@@ -5,7 +5,7 @@ import sys
 import mpmath
 import pandas as pd
 
-from ..third_party.magic_point_shop.digitalseq_b2g import digitalseq_b2g
+from ..third_party.magic_point_shop import digitalseq_b2g
 
 
 # sys.path.append(os.path.abspath("../"))

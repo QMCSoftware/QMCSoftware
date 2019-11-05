@@ -2,11 +2,8 @@
 Workout for meanMC_g stopping criterion.
 """
 from numpy import arange
-from qmcpy import integrate
-from qmcpy.discrete_distribution import IIDStdGaussian, IIDStdUniform
-from qmcpy.integrand import AsianCall, Keister
-from qmcpy.stopping_criterion import MeanMC_g
-from qmcpy.true_measure import BrownianMotion, Gaussian
+
+from qmcpy import *
 
 ABS_TOL = .1
 

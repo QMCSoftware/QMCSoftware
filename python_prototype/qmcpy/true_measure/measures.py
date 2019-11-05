@@ -3,7 +3,7 @@
 from numpy import arange, cumsum, diff, insert, sqrt
 from scipy.stats import norm
 
-from . import TrueMeasure
+from ._true_measure import TrueMeasure
 
 
 class Uniform(TrueMeasure):
