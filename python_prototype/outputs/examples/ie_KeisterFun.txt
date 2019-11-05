@@ -7,13 +7,13 @@ Gaussian (True Distribution Object)
 CLT (StoppingCriterion Object)
                   abs_tol: 0.0100         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 1048576
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
                         n: [470869.]      
                   n_total: 471893         
-               time_total: 0.1631         
+               time_total: 0.1642         
                confid_int: [2.16427946 2.18461404]
 
 Solution: 2.1702         
@@ -25,14 +25,50 @@ Gaussian (True Distribution Object)
 CLT (StoppingCriterion Object)
                   abs_tol: 0.0100         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 1048576
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarData (Data Object)
                         n: [476600.]      
                   n_total: 477624         
-               time_total: 0.0430         
+               time_total: 0.0481         
                confid_int: [2.16005152 2.18028263]
+
+Solution: 2.1738         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Keister (Integrand Object)
+IIDStdUniform (Discrete Distribution Object)
+Gaussian (True Distribution Object)
+                dimension: 3 
+MeanMC_g (StoppingCriterion Object)
+                  abs_tol: 0.0100         
+                  rel_tol: 0.0000         
+                    n_max: 1048576
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarData (Data Object)
+                        n: [603479.]      
+                  n_total: 604503         
+               time_total: 0.1989         
+               confid_int: [2.16380679 2.18380677]
+
+Solution: 2.1703         
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Keister (Integrand Object)
+IIDStdGaussian (Discrete Distribution Object)
+Gaussian (True Distribution Object)
+                dimension: 3 
+MeanMC_g (StoppingCriterion Object)
+                  abs_tol: 0.0100         
+                  rel_tol: 0.0000         
+                    n_max: 1048576
+                  inflate: 1.2000         
+                    alpha: 0.0100        
+MeanVarData (Data Object)
+                        n: [610515.]      
+                  n_total: 611539         
+               time_total: 0.0555         
+               confid_int: [2.1603136 2.1803136]
 
 Solution: 2.1680         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,13 +79,13 @@ Gaussian (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0100         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 1048576
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)
                         n: [256]          
                   n_total: 256            
-               time_total: 0.0064         
+               time_total: 0.0065         
                confid_int: [2.16639453 2.16958004]
 
 Solution: 2.1683         
@@ -61,7 +97,7 @@ Gaussian (True Distribution Object)
 CLTRep (StoppingCriterion Object)
                   abs_tol: 0.0100         
                   rel_tol: 0.0000         
-                    n_max: 100000000
+                    n_max: 1048576
                   inflate: 1.2000         
                     alpha: 0.0100        
 MeanVarDataRep (Data Object)

@@ -1,14 +1,14 @@
 """
 Single-Level and Multi-Level Asian Option Pricing Examples
-    Run Workout:    python workouts/wo_asian_option.py
-    Save Output:    python workouts/wo_asian_option.py  > outputs/examples/ie_AsianOption.txt
+    Run Workout: python workouts/wo_asian_option.py
+    Save Output: python workouts/wo_asian_option.py  > outputs/examples/ie_AsianOption.txt
 """
 
 from numpy import arange
 from qmcpy import integrate
 from qmcpy.discrete_distribution import IIDStdGaussian, IIDStdUniform, Lattice, Sobol
 from qmcpy.integrand import AsianCall
-from qmcpy.stopping_criterion import CLT, CLTRep
+from qmcpy.stopping_criterion import CLT, CLTRep, MeanMC_g
 from qmcpy.true_measure import BrownianMotion
 
 
@@ -17,7 +17,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     Estimate Asian option value using various discrete sampling distributions.
     """
 
-    # IID Standard Uniform
+    # IID Standard Uniform ~ CLT
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
@@ -25,15 +25,33 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
 
-    # IID Standard Uniform
+    # IID Standard Uniform ~ CLT
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     data.summarize()
-    if len(dim) == 1: # CLTRep only implemented for single-level functions
-        # Lattice
+    
+    if len(dim) == 1: # CLTRep & MeanMC_g only implemented for single-level functions
+        
+        # IID Standard Uniform ~ MeanMC_g
+        discrete_distrib = IIDStdUniform(rng_seed=7)
+        true_measure = BrownianMotion(dim, time_vector=time_vec)
+        integrand = AsianCall(true_measure)
+        stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
+        _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        data.summarize()
+
+        # IID Standard Uniform ~ MeanMC_g
+        discrete_distrib = IIDStdGaussian(rng_seed=7)
+        true_measure = BrownianMotion(dim, time_vector=time_vec)
+        integrand = AsianCall(true_measure)
+        stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
+        _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        data.summarize()
+    
+        # Lattice ~ CLTRep
         discrete_distrib = Lattice(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
         integrand = AsianCall(true_measure)
@@ -41,7 +59,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         data.summarize()
 
-        # Sobol
+        # Sobol ~ CLTRep
         discrete_distrib = Sobol(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
         integrand = AsianCall(true_measure)

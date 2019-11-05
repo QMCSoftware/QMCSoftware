@@ -1,11 +1,12 @@
 """ Definition for MeanMC_g, a concrete implementation of StoppingCriterion """
 
 from time import time
-from numpy import array, zeros, tile, minimum, exp, sqrt, ceil, log
+from numpy import array, zeros, tile, minimum, exp, sqrt, ceil, log, floor
 from scipy.stats import norm
 from scipy.optimize import fsolve
+import warnings
 
-from qmcpy._util import NotYetImplemented
+from qmcpy._util import NotYetImplemented, MaxSamplesWarning
 from . import StoppingCriterion
 from ..accum_data import MeanVarData
 
@@ -67,7 +68,20 @@ class MeanMC_g(StoppingCriterion):
                 # absolute error tolerance over sigma
                 n, self.err_bar = \
                     self._nchebe(toloversig,self.alpha_mu,self.kurtmax,self.n_max,self.sigma_up)
-                self.data.n = tile(n,len(self.data.n))
+                self.data.n = tile(n,len(self.data.n)) # WILL NEED TO BE CHANGED FOR MULTI-LEVEL
+                if self.data.n_total + self.data.n.sum() > self.n_max:
+                    # cannot generate this many new samples
+                    warning_s = """
+                    Alread generated %d samples.
+                    Trying to generate %s new samples, which exceeds n_max = %d.
+                    The number of new samples will be decrease proportionally for each integrand.
+                    Note that error tolerances may no longer be satisfied""" \
+                    % (int(self.data.n_total), str(self.data.n), int(self.n_max))
+                    warnings.warn(warning_s, MaxSamplesWarning)
+                    # decrease n proportionally for each integrand
+                    n_decease = self.data.n_total + self.data.n.sum() - self.n_max
+                    dec_prop = n_decease / self.data.n.sum()
+                    self.data.n = floor(self.data.n - self.data.n * dec_prop)
                 self.stage = 'mu'
             else:
                 raise NotYetImplemented("Not implemented for rel_tol != 0")
