@@ -35,7 +35,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         # IID Standard Uniform ~ MeanMC_g
         discrete_distrib = IIDStdUniform(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
-        integrand = AsianCall(true_measure)
+        integrand = AsianCall(true_measure, mean_type='geometric')
         stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         data.summarize()
@@ -43,7 +43,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         # IID Standard Uniform ~ MeanMC_g
         discrete_distrib = IIDStdGaussian(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
-        integrand = AsianCall(true_measure)
+        integrand = AsianCall(true_measure, interest_rate=.01, mean_type='geometric')
         stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         data.summarize()
@@ -51,7 +51,8 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         # Lattice ~ CLTRep
         discrete_distrib = Lattice(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
-        integrand = AsianCall(true_measure)
+        integrand = AsianCall(true_measure, volatility=.4, start_price=50, strike_price=40, \
+                                            interest_rate=.02, mean_type='geometric')
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         data.summarize()
@@ -59,7 +60,8 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         # Sobol ~ CLTRep
         discrete_distrib = Sobol(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
-        integrand = AsianCall(true_measure)
+        integrand = AsianCall(true_measure, volatility=.4, start_price=50, strike_price=40, \
+                                            interest_rate=.02, mean_type='geometric')
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         data.summarize()
