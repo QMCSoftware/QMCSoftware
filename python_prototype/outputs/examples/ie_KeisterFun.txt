@@ -1,108 +1,104 @@
 Solution: 2.1744         
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Keister (Integrand Object)
 IIDStdUniform (Discrete Distribution Object)
-Gaussian (True Distribution Object)
-                dimension: 3 
-CLT (StoppingCriterion Object)
-                  abs_tol: 0.0100         
-                  rel_tol: 0.0000         
-                    n_max: 1048576
-                  inflate: 1.2000         
-                    alpha: 0.0100        
-MeanVarData (Data Object)
-                        n: [470869.]      
-                  n_total: 471893         
-               time_total: 0.1642         
-               confid_int: [2.16427946 2.18461404]
+	mimics          StdUniform
+	rng_seed        7
+Gaussian (True Measure Object)
+CLT (Stopping Criterion Object)
+	abs_tol         0.010
+	rel_tol         0
+	n_max           1048576
+	alpha           0.010
+	inflate         1.200
+MeanVarData (AccumData Object)
+	n_total         471893.0
+	confid_int      [ 2.164  2.185]
+	time_total      0.147
 
 Solution: 2.1702         
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Keister (Integrand Object)
 IIDStdGaussian (Discrete Distribution Object)
-Gaussian (True Distribution Object)
-                dimension: 3 
-CLT (StoppingCriterion Object)
-                  abs_tol: 0.0100         
-                  rel_tol: 0.0000         
-                    n_max: 1048576
-                  inflate: 1.2000         
-                    alpha: 0.0100        
-MeanVarData (Data Object)
-                        n: [476600.]      
-                  n_total: 477624         
-               time_total: 0.0481         
-               confid_int: [2.16005152 2.18028263]
+	mimics          StdGaussian
+	rng_seed        7
+Gaussian (True Measure Object)
+CLT (Stopping Criterion Object)
+	abs_tol         0.010
+	rel_tol         0
+	n_max           1048576
+	alpha           0.010
+	inflate         1.200
+MeanVarData (AccumData Object)
+	n_total         477624.0
+	confid_int      [ 2.160  2.180]
+	time_total      0.038
 
 Solution: 2.1738         
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Keister (Integrand Object)
 IIDStdUniform (Discrete Distribution Object)
-Gaussian (True Distribution Object)
-                dimension: 3 
-MeanMC_g (StoppingCriterion Object)
-                  abs_tol: 0.0100         
-                  rel_tol: 0.0000         
-                    n_max: 1048576
-                  inflate: 1.2000         
-                    alpha: 0.0100        
-MeanVarData (Data Object)
-                        n: [603479.]      
-                  n_total: 604503         
-               time_total: 0.1989         
-               confid_int: [2.16380679 2.18380677]
+	mimics          StdUniform
+	rng_seed        7
+Gaussian (True Measure Object)
+MeanMC_g (Stopping Criterion Object)
+	abs_tol         0.010
+	rel_tol         0
+	n_max           1048576
+	alpha           0.010
+	inflate         1.200
+MeanVarData (AccumData Object)
+	n_total         604503.0
+	confid_int      [ 2.164  2.184]
+	time_total      0.185
 
 Solution: 2.1703         
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Keister (Integrand Object)
 IIDStdGaussian (Discrete Distribution Object)
-Gaussian (True Distribution Object)
-                dimension: 3 
-MeanMC_g (StoppingCriterion Object)
-                  abs_tol: 0.0100         
-                  rel_tol: 0.0000         
-                    n_max: 1048576
-                  inflate: 1.2000         
-                    alpha: 0.0100        
-MeanVarData (Data Object)
-                        n: [610515.]      
-                  n_total: 611539         
-               time_total: 0.0555         
-               confid_int: [2.1603136 2.1803136]
+	mimics          StdGaussian
+	rng_seed        7
+Gaussian (True Measure Object)
+MeanMC_g (Stopping Criterion Object)
+	abs_tol         0.010
+	rel_tol         0
+	n_max           1048576
+	alpha           0.010
+	inflate         1.200
+MeanVarData (AccumData Object)
+	n_total         611539.0
+	confid_int      [ 2.160  2.180]
+	time_total      0.055
 
 Solution: 2.1680         
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Keister (Integrand Object)
 Lattice (Discrete Distribution Object)
-Gaussian (True Distribution Object)
-                dimension: 3 
-CLTRep (StoppingCriterion Object)
-                  abs_tol: 0.0100         
-                  rel_tol: 0.0000         
-                    n_max: 1048576
-                  inflate: 1.2000         
-                    alpha: 0.0100        
-MeanVarDataRep (Data Object)
-                        n: [256]          
-                  n_total: 256            
-               time_total: 0.0065         
-               confid_int: [2.16639453 2.16958004]
+	mimics          StdUniform
+	rng_seed        7
+Gaussian (True Measure Object)
+CLTRep (Stopping Criterion Object)
+	abs_tol         0.010
+	rel_tol         0
+	n_max           1048576
+	alpha           0.010
+	inflate         1.200
+MeanVarDataRep (AccumData Object)
+	n_total         256
+	confid_int      [ 2.166  2.170]
+	time_total      0.006
+	r               16
 
 Solution: 2.1683         
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Keister (Integrand Object)
 Sobol (Discrete Distribution Object)
-Gaussian (True Distribution Object)
-                dimension: 3 
-CLTRep (StoppingCriterion Object)
-                  abs_tol: 0.0100         
-                  rel_tol: 0.0000         
-                    n_max: 1048576
-                  inflate: 1.2000         
-                    alpha: 0.0100        
-MeanVarDataRep (Data Object)
-                        n: [512]          
-                  n_total: 512            
-               time_total: 0.0154         
-               confid_int: [2.16784035 2.16879034]
+	mimics          StdUniform
+	rng_seed        7
+Gaussian (True Measure Object)
+CLTRep (Stopping Criterion Object)
+	abs_tol         0.010
+	rel_tol         0
+	n_max           1048576
+	alpha           0.010
+	inflate         1.200
+MeanVarDataRep (AccumData Object)
+	n_total         512
+	confid_int      [ 2.168  2.169]
+	time_total      0.014
+	r               16
 

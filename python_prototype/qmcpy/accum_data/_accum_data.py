@@ -84,7 +84,7 @@ class AccumData(ABC):
                         self.true_measure, self.stopping_criterion]:
             if qmc_obj:
                 string += str(qmc_obj)
-        data_attributes = set(attributes + ['n', 'n_total', 'confid_int', 'time_total'])
+        attributes = set(attributes + ['n', 'n_total', 'confid_int', 'time_total'])
         #   get only unique values
-        string += univ_repr(self, 'AccumData', data_attributes)
+        string += univ_repr(self, 'AccumData', attributes)
         return string
