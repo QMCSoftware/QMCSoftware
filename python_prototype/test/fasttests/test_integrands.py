@@ -38,7 +38,6 @@ class TestKeister(unittest.TestCase):
     def test_2d_construction(self):
         fun = Keister()
         self.assertEqual(len(fun), 1)
-        self.assertEqual(fun[0].dimension, 2)
 
 
 class TestLinear(unittest.TestCase):
@@ -49,8 +48,7 @@ class TestLinear(unittest.TestCase):
     def test_2d_construction(self):
         fun = Linear()
         self.assertEqual(len(fun), 1)
-        self.assertEqual(fun[0].dimension, 2)
-
+        
 
 if __name__ == "__main__":
     unittest.main()

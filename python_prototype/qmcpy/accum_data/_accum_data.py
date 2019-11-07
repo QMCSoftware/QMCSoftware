@@ -47,33 +47,44 @@ class AccumData(ABC):
         Returns:
             None
         """
-
-    def summarize(self):
-        """Print important attribute values
+    
+    def complete(self, time_total, integrand=None, discrete_distrib=None, true_measure=None, stopping_criterion=None):
         """
-        header_fmt = "%s (%s)\n"
-        item_f = "%25s: %-15.4f\n"
-        item_s = "%25s: %-15s\n"
+        Aggregate all objects after integration completes
+        
+        Args: 
+            time_total (float): total wall clock time for integration
+            integrand (Integrand): Integrand object
+            discrete_distrib (DiscreteDistribution): Discrete Distribution object
+            true_measure (TrueMeasure): True Measure Object
+            stopping_criterion (Stopping Criterion): Stopping Criterion object
+        
+        Returns: 
+            self
+        """
+        self.time_total = time_total
+        self.integrand = integrand
+        self.discrete_distrib = discrete_distrib
+        self.true_measure = true_measure
+        self.stopping_criterion = stopping_criterion
+        return self
 
-        attrs_vals_str = "Solution: %-15.4f\n%s" % (self.solution, "~" * 50)
-        print(attrs_vals_str)
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
 
-        if self.integrand:
-            self.integrand.summarize()
-        if self.discrete_distrib:
-            self.discrete_distrib.summarize()
-        if self.true_measure:
-            self.true_measure.summarize()
-        if self.stopping_criterion:
-            self.stopping_criterion.summarize()
-
-        attrs_vals_str = header_fmt % (type(self).__name__, "Data Object")
-        attrs_vals_str += item_s % ("n", str(self.n))
-        attrs_vals_str += item_s % ("n_total",
-                                    str(int(self.n_total)))
-        attrs_vals_str += item_f % ("time_total", self.time_total)
-        attrs_vals_str += item_s % ("confid_int", str(self.confid_int))
-        print(attrs_vals_str[:-1] + "\n")
-
-    def __repr__(self):
-        return univ_repr(self)
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        string = "Solution: %-15.4f\n" % (self.solution)
+        for qmc_obj in [self.integrand, self.discrete_distrib, \
+                        self.true_measure, self.stopping_criterion]:
+            if qmc_obj:
+                string += str(qmc_obj)
+        data_attributes = set(attributes + ['n', 'n_total', 'confid_int', 'time_total'])
+        #   get only unique values
+        string += univ_repr(self, 'AccumData', data_attributes)
+        return string

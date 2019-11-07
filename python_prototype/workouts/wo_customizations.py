@@ -22,7 +22,7 @@ def quick_construct_integrand(abs_tol):
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     # exact_solution = dim*(c/2)
-    data.summarize()
+    print(data)
 
 
 if __name__ == "__main__":

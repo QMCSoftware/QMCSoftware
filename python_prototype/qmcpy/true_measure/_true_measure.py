@@ -157,23 +157,6 @@ class TrueMeasure(ABC):
         self.set_tm_gen(discrete_distrib)
         self.set_f(integrand, discrete_distrib)
 
-    def summarize(self):
-        """ Print important attribute values """
-        header_fmt = "%s (%s)"
-        item_h = "\n%25s:"
-        item_i = "\n%25s: %d"
-        item_i2 = " %d "
-        attrs_vals_str = ""
-        attrs_vals_str += header_fmt \
-            % (type(self).__name__, "True Distribution Object")
-        if isinstance(self.dimension, int):
-            attrs_vals_str += item_i % ("dimension", self.dimension)
-        elif isinstance(self.dimension, ndarray):
-            attrs_vals_str += item_h % ("dimension")
-            for d in self.dimension:
-                attrs_vals_str += item_i2 % (d)
-        print(attrs_vals_str)
-
     def __len__(self):
         return len(self.measures)
 
@@ -187,5 +170,15 @@ class TrueMeasure(ABC):
     def __setitem__(self, i, val):
         self.measures[i] = val
 
-    def __repr__(self):
-        return univ_repr(self, "True Distribution")
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
+
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        attributes = set(attributes + ['dimension'])
+        return univ_repr(self, "True Measure", attributes)

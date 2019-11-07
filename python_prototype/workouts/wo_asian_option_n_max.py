@@ -1,7 +1,9 @@
 """
 Single-Level and Multi-Level Asian Option Pricing Examples
-    Run Workout: python workouts/wo_asian_option_n_max.py
-    Save Output: python workouts/wo_asian_option_n_max.py > outputs/examples/ie_AsianOption_n_max.txt
+    Run Workout:
+        python workouts/wo_asian_option_n_max.py
+    Save Output:
+        python workouts/wo_asian_option_n_max.py > outputs/examples/ie_AsianOption_n_max.txt
 """
 
 from numpy import arange
@@ -21,7 +23,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     integrand = AsianCall(true_measure)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol, n_init=64, n_max=5000)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-    data.summarize()
+    print(data)
 
     if len(dim) == 1: # CLTRep & MeanMC_g only implemented for single-level functions
 
@@ -31,7 +33,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         integrand = AsianCall(true_measure)
         stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol, n_init=64, n_max=5000)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-        data.summarize()
+        print(data)
 
         # Lattice ~ CLTRep
         discrete_distrib = Lattice(rng_seed=7)
@@ -40,7 +42,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol,
                                     n_init=64, n_max=500)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-        data.summarize()
+        print(data)
 
 
 if __name__ == "__main__":

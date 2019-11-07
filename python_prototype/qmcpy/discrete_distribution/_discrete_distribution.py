@@ -8,14 +8,16 @@ from .._util import univ_repr
 class DiscreteDistribution(ABC):
     """ Discrete Distribution from which we can generate samples. """
 
-    def __init__(self, mimics):
+    def __init__(self, mimics, rng_seed):
         """
         Initialize Discrete Distributuion instance
 
         Args:
             mimics (str): Measure the discrete distribution attempts to mimic
+            rng_seed (int): seed for whatever generator is to be used
         """
         self.mimics = mimics
+        self.rng_seed = rng_seed
 
     @abstractmethod
     def gen_dd_samples(self, r, n, d):
@@ -32,12 +34,15 @@ class DiscreteDistribution(ABC):
         """
         return
 
-    def summarize(self):
-        """ Print important attribute values """
-        header_fmt = "%s (%s)"
-        obj_name = "Discrete Distribution Object"
-        attrs_vals_str = header_fmt % (type(self).__name__, obj_name)
-        print(attrs_vals_str)
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
 
-    def __repr__(self):
-        return univ_repr(self, "Discrete Distribution")
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        attributes = set(attributes + ['mimics','rng_seed'])
+        return univ_repr(self, "Discrete Distribution", attributes)

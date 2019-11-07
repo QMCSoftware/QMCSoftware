@@ -27,6 +27,18 @@ class Uniform(TrueMeasure):
                 lambda self, g: g] # no weight
             }
         super().__init__(dimension, transforms, a=lower_bound, b=upper_bound)
+    
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
+
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        return super().__repr__(['a', 'b'])
 
 
 class Gaussian(TrueMeasure):
@@ -50,6 +62,18 @@ class Gaussian(TrueMeasure):
                 lambda self, g: g] # no weight
             }
         super().__init__(dimension, transforms, mu=mean, sigma=sqrt(variance))
+    
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
+
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        return super().__repr__(['mu', 'sigma'])
 
 
 class BrownianMotion(TrueMeasure):
@@ -75,7 +99,18 @@ class BrownianMotion(TrueMeasure):
             }
 
         super().__init__(dimension, transforms, time_vector=time_vector)
+    
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
 
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        return super().__repr__(['time_vector'])
 
 class Lebesgue(TrueMeasure):
     """ Lebesgue Measure """
@@ -96,3 +131,15 @@ class Lebesgue(TrueMeasure):
         super().__init__(dimension, transforms,
                          a=uniform_lower_bound, b=uniform_upper_bound,
                          mu=gaussian_mean, sigma=sqrt(gaussian_variance))
+    
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
+
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        return super().__repr__(['a', 'b', 'mu', 'sigma'])

@@ -106,9 +106,9 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [2.5, 5, 7.5]
         for d in dimensions:
-            integrand = QuickConstruct(custom_fun=f, dimension=d)
-            sol, data = integrate(integrand)
-            data.summarize()
+            integrand = QuickConstruct(custom_fun=f)
+            sol, data = integrate(integrand, Uniform(d))
+            print(data)
             abs_tol = data.stopping_criterion.abs_tol
             true_value = true_values[d - 1]
             self.assertTrue(integrand.dimension == d)
@@ -134,7 +134,7 @@ class IntegrationExampleTest(unittest.TestCase):
             integrand = QuickConstruct(custom_fun=f)
             measure = Uniform(dimension=d)
             sol, data = integrate(integrand, measure)
-            data.summarize()
+            print(data)
             abs_tol = data.stopping_criterion.abs_tol
             true_value = true_values[d - 1]
             self.assertTrue(integrand.dimension == d)
@@ -149,12 +149,11 @@ class IntegrationExampleTest(unittest.TestCase):
 
         Mathematica: integrate[b*(x-a)^2, {x,1,0}]
         """
-        dim = 1
         a_list = [1, 2]
         b_list = [4, 5]
-        f_list = [QuickConstruct(lambda x, a=a, b=b: b * (x - a) ** 2, dim)
+        f_list = [QuickConstruct(lambda x, a=a, b=b: b * (x - a) ** 2)
                   for a, b in zip(a_list, b_list)]
-        sol_data_list = [integrate(f) for f in f_list]
+        sol_data_list = [integrate(f,Uniform(2)) for f in f_list]
         sols = [sol_data[0] for sol_data in sol_data_list]
         true_sols = [(b / 3) * (3 * a * (a - 1) + 1)
                      for a, b in zip(a_list, b_list)]

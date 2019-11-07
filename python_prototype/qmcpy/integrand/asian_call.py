@@ -41,7 +41,7 @@ class AsianCall(Integrand):
             self[i].strike_price = strike_price
             self[i].interest_rate = interest_rate
             self[i].mean_type = mean_type
-            self[i].t_final = bm_measure[i].time_vector[-1]
+            self[i].exercise_time = bm_measure[i].time_vector[-1]
 
     def g(self, x):
         """
@@ -67,12 +67,25 @@ class AsianCall(Integrand):
         elif self.mean_type == 'geometric':
             avg_fine = exp((log(self.start_price)/2 + log(s_fine[:,:-1]).sum(1) + \
                             log(s_fine[:,-1])/2)/self.dimension) # trapezoidal rule
-        y = maximum(avg_fine - self.strike_price, 0) * exp(-self.interest_rate*self.t_final)
+        y = maximum(avg_fine - self.strike_price, 0) * exp(-self.interest_rate*self.exercise_time)
         if self.dim_fac > 0:
             scourse = s_fine[:, int(self.dim_fac - 1):: int(self.dim_fac)]
             d_course = self.dimension / self.dim_fac
             avg_course = ((self.start_price / 2)
                           + scourse[:, : int(d_course) - 1].sum(1)
                           + scourse[:, int(d_course) - 1] / 2) / d_course
-            y -= maximum(avg_course - self.strike_price, 0)* exp(-self.interest_rate*self.t_final)
+            y -= maximum(avg_course - self.strike_price, 0)* exp(-self.interest_rate*self.exercise_time)
         return y
+
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
+
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        attributes = ['volatility', 'start_price', 'strike_price', 'interest_rate', 'mean_type', 'exercise_time']
+        return super().__repr__(attributes)

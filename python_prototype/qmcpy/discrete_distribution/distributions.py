@@ -16,7 +16,7 @@ class IIDStdUniform(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics="StdUniform")
+        super().__init__(mimics="StdUniform", rng_seed=rng_seed)
         self.rng = Generator(PCG64(rng_seed))
 
     def gen_dd_samples(self, r, n, d):
@@ -42,7 +42,7 @@ class IIDStdGaussian(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics="StdGaussian")
+        super().__init__(mimics="StdGaussian", rng_seed=rng_seed)
         self.rng = Generator(PCG64(rng_seed))
 
     def gen_dd_samples(self, r, n, d):
@@ -68,7 +68,7 @@ class Lattice(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics="StdUniform")
+        super().__init__(mimics="StdUniform", rng_seed=rng_seed)
         self.rng = Generator(PCG64(rng_seed))
 
     def gen_dd_samples(self, r, n, d):
@@ -99,7 +99,7 @@ class Sobol(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics="StdUniform")
+        super().__init__(mimics="StdUniform", rng_seed=rng_seed)
         self.rng = Generator(PCG64(rng_seed))
 
     def gen_dd_samples(self, r, n, d):

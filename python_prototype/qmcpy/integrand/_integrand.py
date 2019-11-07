@@ -11,7 +11,7 @@ class Integrand(ABC):
     :math:`\\boldsymbol{x} \\in \\mathcal{X}`
     """
 
-    def __init__(self, dimension=2):
+    def __init__(self):
         """
         Attributes:
             f (Integrand): function transformed to accept distribution \
@@ -21,7 +21,6 @@ class Integrand(ABC):
                 multi-dimensional problems
         """
         super().__init__()
-        self.dimension = dimension
         self.integrand_list = [self]
 
     @abstractmethod
@@ -92,12 +91,14 @@ class Integrand(ABC):
     def __setitem__(self, i, val):
         self.integrand_list[i] = val
 
-    def __repr__(self):
-        return univ_repr(self, "integrand_list")
-
-    def summarize(self):
-        """Print important attribute values
+    def __repr__(self, attributes=[]):
         """
-        header_fmt = "%s (%s)"
-        attrs_vals_str = header_fmt % (type(self).__name__, "Integrand Object")
-        print(attrs_vals_str)
+        Print important attribute values
+
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        return univ_repr(self[0], "Integrand", set(attributes))

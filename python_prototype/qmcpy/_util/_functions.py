@@ -1,6 +1,8 @@
 """ Utility functions. Not meant for public use """
+import numpy as np
+np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=5)
 
-def univ_repr(qmc_object, attributes=None):
+def univ_repr(qmc_object, abc_class_name, attributes):
     """Clean way to represent qmc_object data.
 
     Note: ::
@@ -12,54 +14,28 @@ def univ_repr(qmc_object, attributes=None):
         print(qmc_object.__repr__())
 
     Args:
-        qmc_object: an qmc_object instance
-        attributes: list of qmc_object attribute names whose values are to be
-        gathered
+        qmc_object (object): an qmc_object instance
+        abc_class_name (str): name of the abstract class
+        attributes (list): list of attributes to include
 
     Returns:
         str
 
     """
-    key_val = "%s qmc_object with properties:\n" % (type(qmc_object).__name__)
-    for key, val in qmc_object.__dict__.items():
-        if str(key) != attributes:
-            key_val += "%4s%s: %s\n" % (
-                "",
-                str(key),
-                str(val).replace("\n", "\n%15s" % ("")),
-            )
-    if not attributes:
-        return key_val[:-1]
-
-    # print list of subObject with properties
-    key_val += "    %s:\n" % (attributes)
-    for i, sub_obj in enumerate(qmc_object):
-        key_val += "%8s%s[%d] with properties:\n" % ("", attributes, i)
-        for key, val in sub_obj.__dict__.items():
-            if str(key) != attributes:
-                key_val += "%12s%s: %s\n" % (
-                    "",
-                    str(key),
-                    str(val).replace("\n", "\n%20s" % ("")),
-                )
-    return key_val[:-1]
-
-def summarize(stopping_criterion=None, measure=None, integrand=None, distribution=None, data=None):
-    """Print a summary of inputs and outputs for the qmc problem after execution.
-
-    Args:
-        stopping_criterion (StoppingCriterion): a Stopping Criterion object
-        measure (TrueMeasure): a Measure object
-        integrand (Integrand): an Integrand object
-        data (data): a AccumData object
-    """
-    if not integrand:
-        integrand.summarize()
-    if not measure:
-        measure.summarize()
-    if not distribution:
-        distribution.summarize()
-    if not stopping_criterion:
-        stopping_criterion.summarize()
-    if not data:
-        data.summarize()
+    obj_dict = qmc_object.__dict__
+    string = "%s (%s Object)\n" % (type(qmc_object).__name__,abc_class_name)
+    for key, val in obj_dict.items():
+        if key not in attributes:
+            # don't care about this attribute
+            continue
+        # list of one value becomes just that value
+        if type(val) == list and len(val) == 1:
+            val = val[0]
+        if type(val) == np.ndarray and val.shape == (1,):
+            val = val[0].item()
+        # printing options
+        elif type(val) == float:
+            string += '\t%-15s %0.3f\n' % (key,val)
+        else:
+            string += '\t%-15s %s\n' % (key,val)
+    return string

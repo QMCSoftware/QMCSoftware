@@ -1,7 +1,9 @@
 """
 Single-Level and Multi-Level Asian Option Pricing Examples
-    Run Workout: python workouts/wo_asian_option.py
-    Save Output: python workouts/wo_asian_option.py  > outputs/examples/ie_AsianOption.txt
+    Run Workout:
+        python workouts/wo_asian_option.py
+    Save Output:
+        python workouts/wo_asian_option.py  > outputs/examples/ie_AsianOption.txt
 """
 
 from numpy import arange
@@ -20,7 +22,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     integrand = AsianCall(true_measure)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-    data.summarize()
+    print(data)
 
     # IID Standard Uniform ~ CLT
     discrete_distrib = IIDStdGaussian(rng_seed=7)
@@ -28,7 +30,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     integrand = AsianCall(true_measure)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-    data.summarize()
+    print(data)
     
     if len(dim) == 1: # CLTRep & MeanMC_g only implemented for single-level functions
         
@@ -38,7 +40,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         integrand = AsianCall(true_measure, mean_type='geometric')
         stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-        data.summarize()
+        print(data)
 
         # IID Standard Uniform ~ MeanMC_g
         discrete_distrib = IIDStdGaussian(rng_seed=7)
@@ -46,7 +48,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         integrand = AsianCall(true_measure, interest_rate=.01, mean_type='geometric')
         stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-        data.summarize()
+        print(data)
     
         # Lattice ~ CLTRep
         discrete_distrib = Lattice(rng_seed=7)
@@ -55,7 +57,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
                                             interest_rate=.02, mean_type='geometric')
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-        data.summarize()
+        print(data)
 
         # Sobol ~ CLTRep
         discrete_distrib = Sobol(rng_seed=7)
@@ -64,7 +66,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
                                             interest_rate=.02, mean_type='geometric')
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-        data.summarize()
+        print(data)
 
 
 if __name__ == "__main__":

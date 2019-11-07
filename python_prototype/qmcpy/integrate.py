@@ -9,7 +9,7 @@ from .stopping_criterion import CLT
 from .true_measure import Uniform
 
 
-def integrate(integrand=None, true_measure=None, discrete_distrib=None, stopping_criterion=None):
+def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion=None):
     """Specify and compute integral of :math:`f(\\boldsymbol{x})` for \
     :math:`\\boldsymbol{x} \\in \\mathcal{X}`.
 
@@ -36,8 +36,6 @@ def integrate(integrand=None, true_measure=None, discrete_distrib=None, stopping
     """
 
     # Default some arguments
-    if not integrand: integrand = Linear()
-    if not true_measure: true_measure = Uniform(dimension=integrand.dimension)
     if not discrete_distrib: discrete_distrib = IIDStdUniform()
     if not stopping_criterion:
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=0.01)
@@ -50,13 +48,7 @@ def integrate(integrand=None, true_measure=None, discrete_distrib=None, stopping
         stopping_criterion.data.update_data(
             integrand, true_measure)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
-    time_total = time() - t_start
     solution = stopping_criterion.data.solution  # assign outputs
-    data = copy.deepcopy(stopping_criterion.data)
-    data.time_total = time_total
-    data.integrand = integrand
-    data.discrete_distrib = discrete_distrib
-    data.true_measure = true_measure
-    del stopping_criterion.data
-    data.stopping_criterion = stopping_criterion
-    return solution, data
+    data_obj_final = stopping_criterion.data.complete(time()-t_start, \
+        integrand, discrete_distrib, true_measure, stopping_criterion) 
+    return solution, data_obj_final

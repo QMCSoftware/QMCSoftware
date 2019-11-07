@@ -60,3 +60,15 @@ class MeanVarDataRep(AccumData):
         self.n_total = self.n.copy() # updated the total evaluations
             # standard deviation of stream means
         self.solution = self.muhat.sum()  # mean of integrand approximations
+    
+    def __repr__(self):
+        """
+        Print important attribute values
+
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        return super().__repr__(['r'])

@@ -36,19 +36,15 @@ class StoppingCriterion(ABC):
     def stop_yet(self):
         """ Determine when to stopping_criterion """
 
-    def summarize(self):
-        """ Print important attribute values """
-        header_fmt = "%s (%s)\n"
-        item_i = "%25s: %d\n"
-        item_f = "%25s: %-15.4f\n"
-        obj_name = "StoppingCriterion Object"
-        attrs_vals_str = header_fmt % (type(self).__name__, obj_name)
-        attrs_vals_str += item_f % ("abs_tol", self.abs_tol)
-        attrs_vals_str += item_f % ("rel_tol", self.rel_tol)
-        attrs_vals_str += item_i % ("n_max", self.n_max)
-        attrs_vals_str += item_f % ("inflate", self.inflate)
-        attrs_vals_str += item_f % ("alpha", self.alpha)
-        print(attrs_vals_str[:-2])
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
 
-    def __repr__(self):
-        return univ_repr(self)
+        Args: 
+            attributes (list): list of attributes to print
+        
+        Returns:
+            string of self info
+        """
+        attributes = set(attributes + ['abs_tol','rel_tol', 'n_max', 'inflate', 'alpha'])
+        return univ_repr(self, "Stopping Criterion", attributes)

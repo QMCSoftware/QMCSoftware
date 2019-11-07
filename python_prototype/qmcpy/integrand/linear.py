@@ -24,7 +24,6 @@ class Linear(Integrand):
             then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
             and :math:`x'_{ij} = c` otherwise
         """
-        if (not self.dimension) or (self.dimension != x.shape[1]):
-            self.dimension = x.shape[1]  # infer domain dimension
+        self.dimension = x.shape[1]  # infer domain dimension
         y = x.sum(1)  # Linear sum
         return y
