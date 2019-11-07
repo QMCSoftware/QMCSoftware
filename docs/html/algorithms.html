@@ -174,7 +174,7 @@
 <p>Main driver function for QMCPy.</p>
 <dl class="function">
 <dt id="qmcpy.integrate.integrate">
-<code class="sig-prename descclassname">qmcpy.integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand=None</em>, <em class="sig-param">true_measure=None</em>, <em class="sig-param">discrete_distrib=None</em>, <em class="sig-param">stopping_criterion=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrate.integrate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">qmcpy.integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">discrete_distrib=None</em>, <em class="sig-param">stopping_criterion=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrate.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and compute integral of <span class="math notranslate nohighlight">\(f(\boldsymbol{x})\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathcal{X}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -208,11 +208,11 @@ sum of two variables defined on unit square is used.</p></li>
 <p>Definition for class AsianCall, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.asian_call.AsianCall">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.asian_call.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">bm_measure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">interest_rate=0</em>, <em class="sig-param">mean_type='Arithmetic'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.asian_call.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">bm_measure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">interest_rate=0</em>, <em class="sig-param">mean_type='arithmetic'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate payoff values of an Asian Call option</p>
 <dl class="method">
 <dt id="qmcpy.integrand.asian_call.AsianCall.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">bm_measure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">interest_rate=0</em>, <em class="sig-param">mean_type='Arithmetic'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">bm_measure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">interest_rate=0</em>, <em class="sig-param">mean_type='arithmetic'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize AsianCall Integrand’s’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -250,7 +250,7 @@ sum of two variables defined on unit square is used.</p></li>
 <p>Definition for class Keister, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.keister.Keister">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values     <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \pi^{d/2} \cos(\| \boldsymbol{x} \|)\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathbb{R}^d\)</span>.</p>
 <p>The standard example integrates the Keister integrand with respect to an     IID Gaussian distribution with variance 1/2.</p>
 <dl class="simple">
@@ -284,7 +284,7 @@ sum of two variables defined on unit square is used.</p></li>
 <p>Definition for class Linear, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.linear.Linear">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \sum_{i=1}^d x_i\)</span>     for <span class="math notranslate nohighlight">\(\boldsymbol{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d\)</span></p>
 <dl class="method">
 <dt id="qmcpy.integrand.linear.Linear.g">
@@ -308,11 +308,11 @@ sum of two variables defined on unit square is used.</p></li>
 <p>Definition for class QuickConstruct, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.quick_construct.QuickConstruct">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.quick_construct.</code><code class="sig-name descname">QuickConstruct</code><span class="sig-paren">(</span><em class="sig-param">custom_fun=None</em>, <em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.quick_construct.</code><code class="sig-name descname">QuickConstruct</code><span class="sig-paren">(</span><em class="sig-param">custom_fun=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values of a user-defined function</p>
 <dl class="method">
 <dt id="qmcpy.integrand.quick_construct.QuickConstruct.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">custom_fun=None</em>, <em class="sig-param">dimension=2</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">custom_fun=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize custom Integrand</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -343,12 +343,6 @@ sum of two variables defined on unit square is used.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="qmcpy.integrand.quick_construct.QuickConstruct.summarize">
-<code class="sig-name descname">summarize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct.summarize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print important attribute values</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -358,11 +352,11 @@ sum of two variables defined on unit square is used.</p></li>
 <span class="target" id="module-qmcpy.true_measure"></span><span class="target" id="module-qmcpy.true_measure.measures"></span><p>Definitions of TrueMeasure Concrete Classes</p>
 <dl class="class">
 <dt id="qmcpy.true_measure.measures.BrownianMotion">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.measures.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">dimension, time_vector=[array([0.25, 0.5 , 0.75, 1.  ])]</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.BrownianMotion" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.measures.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">dimension, time_vector=[array([ 0.250,  0.500,  0.750,  1.000])]</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.BrownianMotion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Brownian Motion Measure</p>
 <dl class="method">
 <dt id="qmcpy.true_measure.measures.BrownianMotion.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension, time_vector=[array([0.25, 0.5 , 0.75, 1.  ])]</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.BrownianMotion.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension, time_vector=[array([ 0.250,  0.500,  0.750,  1.000])]</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.BrownianMotion.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
