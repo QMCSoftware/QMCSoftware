@@ -40,9 +40,9 @@ class DiscreteDistribution(ABC):
 
         Args: 
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """
-        attributes = set(attributes + ['mimics','rng_seed'])
+        attributes = set(attributes + ['mimics', 'rng_seed'])
         return univ_repr(self, "Discrete Distribution", attributes)

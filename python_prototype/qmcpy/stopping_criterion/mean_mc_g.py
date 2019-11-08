@@ -10,6 +10,7 @@ from ._stopping_criterion import StoppingCriterion
 from .._util import NotYetImplemented, MaxSamplesWarning
 from ..accum_data import MeanVarData
 
+
 class MeanMC_g(StoppingCriterion):
     """
     Stopping Criterion with garunteed accuracy
@@ -51,24 +52,24 @@ class MeanMC_g(StoppingCriterion):
         # Construct Data Object
         n_integrands = len(true_measure)
         self.data = MeanVarData(n_integrands)  # house integration data
-        self.data.n = tile(self.n_init,n_integrands)  # next n for each integrand
-        self.alpha_sigma = self.alpha/2 # the uncertainty for variance estimation
-        self.kurtmax = (self.n_init-3)/(self.n_init-1) + \
-                    (self.alpha_sigma*self.n_init)/(1-self.alpha_sigma) * \
-                    (1-1/self.inflate**2)**2
+        self.data.n = tile(self.n_init, n_integrands)  # next n for each integrand
+        self.alpha_sigma = self.alpha / 2  # the uncertainty for variance estimation
+        self.kurtmax = (self.n_init - 3) / (self.n_init - 1) + \
+            (self.alpha_sigma * self.n_init) / (1 - self.alpha_sigma) * \
+            (1 - 1 / self.inflate**2)**2
         self.stage = "sigma"
-    
+
     def stop_yet(self):
         """ Determine when to stop """
         if self.stage == "sigma":
-            self.sigma_up = self.inflate*sqrt((self.data.sighat**2).sum()/len(self.data.sighat))
-            self.alpha_mu = 1-(1-self.alpha)/(1-self.alpha_sigma)
+            self.sigma_up = self.inflate * sqrt((self.data.sighat**2).sum() / len(self.data.sighat))
+            self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
             if self.rel_tol == 0:
-                toloversig = self.abs_tol/self.sigma_up
+                toloversig = self.abs_tol / self.sigma_up
                 # absolute error tolerance over sigma
                 n, self.err_bar = \
-                    self._nchebe(toloversig,self.alpha_mu,self.kurtmax,self.n_max,self.sigma_up)
-                self.data.n = tile(n,len(self.data.n)) # WILL NEED TO BE CHANGED FOR MULTI-LEVEL
+                    self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_max, self.sigma_up)
+                self.data.n = tile(n, len(self.data.n))  # WILL NEED TO BE CHANGED FOR MULTI-LEVEL
                 if self.data.n_total + self.data.n.sum() > self.n_max:
                     # cannot generate this many new samples
                     warning_s = """
@@ -94,30 +95,30 @@ class MeanMC_g(StoppingCriterion):
         This method uses Chebyshev and Berry-Esseen Inequality to calculate the
         sample size needed
         """
-        ncheb = ceil(1/(alpha*toloversig**2)) # sample size by Chebyshev's Inequality
+        ncheb = ceil(1 / (alpha * toloversig**2))  # sample size by Chebyshev's Inequality
         A = 18.1139
         A1 = 0.3328
-        A2 = 0.429 # three constants in Berry-Esseen inequality
-        M3upper = kurtmax**(3/4)
+        A2 = 0.429  # three constants in Berry-Esseen inequality
+        M3upper = kurtmax**(3 / 4)
         # the upper bound on the third moment by Jensen's inequality
-        BEfun2 = lambda logsqrtn: norm.cdf(-exp(logsqrtn)*toloversig) \
-            + exp(-logsqrtn) * minimum(A1*(M3upper+A2), \
-            A*M3upper/(1+(exp(logsqrtn)*toloversig)**3)) \
-            - alpha/2
+
+        def BEfun2(logsqrtn): return norm.cdf(-exp(logsqrtn) * toloversig) \
+            + exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
+            A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3)) \
+            - alpha / 2
         # Berry-Esseen function, whose solution is the sample size needed
-        logsqrtnCLT = log(norm.ppf(1-alpha/2)/toloversig) # sample size by CLT
-        nbe = ceil(exp(2*fsolve(BEfun2,logsqrtnCLT)))
+        logsqrtnCLT = log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
+        nbe = ceil(exp(2 * fsolve(BEfun2, logsqrtnCLT)))
         # calculate Berry-Esseen n by fsolve function (scipy)
-        ncb = min(min(ncheb,nbe),nbudget) # take the min of two sample sizes
+        ncb = min(min(ncheb, nbe), nbudget)  # take the min of two sample sizes
         logsqrtn = log(sqrt(ncb))
-        BEfun3 = lambda toloversig: norm.cdf(-exp(logsqrtn)*toloversig) \
-            + exp(-logsqrtn)*min(A1*(M3upper+A2), \
-            A*M3upper/(1+(exp(logsqrtn)*toloversig)**3)) \
-            -alpha/2
-        err = fsolve(BEfun3,toloversig) * sig0up
+
+        def BEfun3(toloversig): return norm.cdf(-exp(logsqrtn) * toloversig) \
+            + exp(-logsqrtn) * min(A1 * (M3upper + A2),
+            A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3)) \
+            - alpha / 2
+        err = fsolve(BEfun3, toloversig) * sig0up
         return ncb, err
-
-
 
 
 # Will be used when rel_tol != 0

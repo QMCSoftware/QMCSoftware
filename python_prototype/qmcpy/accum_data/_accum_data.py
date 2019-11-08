@@ -47,18 +47,18 @@ class AccumData(ABC):
         Returns:
             None
         """
-    
+
     def complete(self, time_total, integrand=None, discrete_distrib=None, true_measure=None, stopping_criterion=None):
         """
         Aggregate all objects after integration completes
-        
+
         Args: 
             time_total (float): total wall clock time for integration
             integrand (Integrand): Integrand object
             discrete_distrib (DiscreteDistribution): Discrete Distribution object
             true_measure (TrueMeasure): True Measure Object
             stopping_criterion (Stopping Criterion): Stopping Criterion object
-        
+
         Returns: 
             self
         """
@@ -75,12 +75,12 @@ class AccumData(ABC):
 
         Args: 
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """
         string = "Solution: %-15.4f\n" % (self.solution)
-        for qmc_obj in [self.integrand, self.discrete_distrib, \
+        for qmc_obj in [self.integrand, self.discrete_distrib,
                         self.true_measure, self.stopping_criterion]:
             if qmc_obj:
                 string += str(qmc_obj)

@@ -35,7 +35,7 @@ class CLTRep(StoppingCriterion):
                 CLTRep not implemented for multi-level problems.
                 Use CLT stopping criterion with an iid distribution for multi-level problems
             ''')
-        if (log(n_init)/log(2))%1 != 0:
+        if (log(n_init) / log(2)) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'
             warnings.warn(warning_s, ParameterWarning)
             n_init = 32
@@ -54,9 +54,9 @@ class CLTRep(StoppingCriterion):
 
     def stop_yet(self):
         """ Determine when to stop """
-        if sqrt((self.data.sighat**2).sum()/len(self.data.sighat))*self.inflate > self.abs_tol:
+        if sqrt((self.data.sighat**2).sum() / len(self.data.sighat)) * self.inflate > self.abs_tol:
             # Not sufficiently estimated
-            if 2*self.data.n.sum() > self.n_max:
+            if 2 * self.data.n.sum() > self.n_max:
                 # doubling samples would go over n_max
                 warning_s = """
                 Alread generated %d samples.
@@ -66,8 +66,8 @@ class CLTRep(StoppingCriterion):
                 % (int(self.data.n_total.sum()), str(self.data.n), int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 self.stage = 'done'
-            else: self.data.n *= 2 # double n for next sample
-        else: self.stage = 'done' # sufficiently estimated    
+            else: self.data.n *= 2  # double n for next sample
+        else: self.stage = 'done'  # sufficiently estimated
         if self.stage == 'done':
             self.data.n_total = self.data.n_total.sum()
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \

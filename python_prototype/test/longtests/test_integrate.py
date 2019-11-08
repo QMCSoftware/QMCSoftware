@@ -153,13 +153,14 @@ class IntegrationExampleTest(unittest.TestCase):
         b_list = [4, 5]
         f_list = [QuickConstruct(lambda x, a=a, b=b: b * (x - a) ** 2)
                   for a, b in zip(a_list, b_list)]
-        sol_data_list = [integrate(f,Uniform(2)) for f in f_list]
+        sol_data_list = [integrate(f, Uniform(2)) for f in f_list]
         sols = [sol_data[0] for sol_data in sol_data_list]
         true_sols = [(b / 3) * (3 * a * (a - 1) + 1)
                      for a, b in zip(a_list, b_list)]
         abs_tol = sol_data_list[0][1].stopping_criterion.abs_tol
         max_error = max(abs(array(sols) - array(true_sols)))
         self.assertTrue(max_error < abs_tol)
+
 
 if __name__ == "__main__":
     unittest.main()

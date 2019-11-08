@@ -49,6 +49,6 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
             integrand, true_measure)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
     solution = stopping_criterion.data.solution  # assign outputs
-    data_obj_final = stopping_criterion.data.complete(time()-t_start, \
-        integrand, discrete_distrib, true_measure, stopping_criterion) 
+    data_obj_final = stopping_criterion.data.complete(time() - t_start,
+        integrand, discrete_distrib, true_measure, stopping_criterion)
     return solution, data_obj_final

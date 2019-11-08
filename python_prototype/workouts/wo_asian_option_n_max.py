@@ -16,7 +16,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     Estimate Asian option value using various discrete sampling distributions
     with the restriction to use less than maximum number of sample points.
     """
-    
+
     # IID Standard Uniform ~ CLT
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
@@ -25,7 +25,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
 
-    if len(dim) == 1: # CLTRep & MeanMC_g only implemented for single-level functions
+    if len(dim) == 1:  # CLTRep & MeanMC_g only implemented for single-level functions
 
         # IID Standard Uniform ~ MeanMC_g
         discrete_distrib = IIDStdGaussian(rng_seed=7)

@@ -97,7 +97,7 @@ class Integrand(ABC):
 
         Args: 
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """

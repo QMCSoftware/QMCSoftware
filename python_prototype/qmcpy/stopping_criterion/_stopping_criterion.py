@@ -42,9 +42,9 @@ class StoppingCriterion(ABC):
 
         Args: 
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """
-        attributes = set(attributes + ['abs_tol','rel_tol', 'n_max', 'inflate', 'alpha'])
+        attributes = set(attributes + ['abs_tol', 'rel_tol', 'n_max', 'inflate', 'alpha'])
         return univ_repr(self, "Stopping Criterion", attributes)
