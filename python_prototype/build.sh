@@ -16,8 +16,8 @@ echo "$(date)"
 # autopep8
 autopep8 . --in-place --recursive --ignore E402,E701,E501,E128,C0413 --exclude ./qmcpy/third_party/magic_point_shop
 # pylint
-pylint --variable-rgx="[a-z0-9_]{1,30}$" --disable W0622,C0103,C0321 **/*.py
-pylint --variable-rgx="[a-z0-9_]{1,30}$" --disable W0622,C0103 **/**/*.py
+pylint --variable-rgx="[a-z0-9_]{1,30}$" --disable W0622,C0103,C0321,W0614 **/*.py
+pylint --variable-rgx="[a-z0-9_]{1,30}$" --disable W0622,C0103,C0321,W0614 **/**/*.py
 
 # Uninstall and Install Qmcpy
 pip uninstall --yes qmcpy
