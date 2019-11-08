@@ -65,6 +65,7 @@ class AsianCall(Integrand):
             avg_fine = (self.start_price/2 + s_fine[:,:-1].sum(1) + s_fine[:,-1]/2) / \
                         self.dimension # trapezoidal rule
         elif self.mean_type == 'geometric':
+            raise Exception("Not working for multi-level methods yet")
             avg_fine = exp((log(self.start_price)/2 + log(s_fine[:,:-1]).sum(1) + \
                             log(s_fine[:,-1])/2)/self.dimension) # trapezoidal rule
         y = maximum(avg_fine - self.strike_price, 0) * exp(-self.interest_rate*self.exercise_time)

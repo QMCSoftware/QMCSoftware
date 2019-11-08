@@ -21,8 +21,10 @@ class TrueMeasure(ABC):
             values: functions to transform a sample by the mimiced \
                 measure into a sapmle by the true measure
         """
-        self.dimension = dimension
         super().__init__()
+        self.dimension = dimension
+        for key, val in kwargs.items():
+                setattr(self, key, array(val))
         if not dimension:  # construcing a sub-measure
             return
         # Type check dimension
