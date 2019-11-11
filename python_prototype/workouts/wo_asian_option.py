@@ -113,4 +113,3 @@ if __name__ == "__main__":
                  arange(1 / 64, 65 / 64, 1 / 64)]
     DIM2 = [len(tv) for tv in TIME_VEC2]
     test_distributions_asian_option(TIME_VEC2, DIM2, abs_tol=.05)
-Previo
