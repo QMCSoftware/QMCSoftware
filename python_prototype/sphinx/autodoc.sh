@@ -1,3 +1,4 @@
+#!/bin/bash
 ### In sphinx directory and terminal, run this file:
 #  ./autodoc.sh
 
@@ -16,9 +17,17 @@ cd python_prototype
 # jupyter notebook demos/plotDemos.ipynb
 # jupyter notebook demos/qmcpy.ipynb
 
-jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=pyqmc demos/qmcpy.ipynb --stdout >  html_from_demos/qmcpy.html
-jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=pyqmc demos/plotDemos.ipynb --stdout > html_from_demos/plotDemos.html
-jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=pyqmc demos/integrands.ipynb --stdout > html_from_demos/integrands.html
+cd demos
+FILES=*.ipynb
+for f in $FILES
+do
+  echo "Processing $f file..."
+  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=pyqmc $f
+
+done
+rm -f ../html_from_demos/*
+mv *.html ../html_from_demos/
+cd .. # to python_prototype
 
 ## Use sphinx to generate HTML documentation with inputs from above and
 ## docstrings from Python code

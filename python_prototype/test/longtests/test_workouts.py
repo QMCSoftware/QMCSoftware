@@ -11,7 +11,7 @@ class TestWorkouts(unittest.TestCase):
 
     def test_comparisons(self):
         abstol_comparison(abstols=arange(.1, .4, .1))
-        dimension_comparison(dimensions=arange(1,4))
+        dimension_comparison(dimensions=arange(1, 4))
 
     def test_asian_option(self):
         time_vec = [

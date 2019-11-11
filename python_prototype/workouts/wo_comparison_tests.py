@@ -17,12 +17,12 @@ def abstol_comparison(abstols=arange(.1, .4, .1)):
     """
     print('\nAbsolute Tolerance Comparison')
     columns = ['abs_tol'] + \
-        [type(distrib()).__name__+'_solution' for distrib in distribution_pointers] + \
-        [type(distrib()).__name__+'_time' for distrib in distribution_pointers] + \
-        [type(distrib()).__name__+'_n' for distrib in distribution_pointers]
+        [type(distrib()).__name__ + '_solution' for distrib in distribution_pointers] + \
+        [type(distrib()).__name__ + '_time' for distrib in distribution_pointers] + \
+        [type(distrib()).__name__ + '_n' for distrib in distribution_pointers]
     df = DataFrame(columns=columns, dtype=float)
     for i, abs_tol in enumerate(abstols):
-        row_i = {'abs_tol':abs_tol}
+        row_i = {'abs_tol': abs_tol}
         for distrib_pointer in distribution_pointers:
             distribution = distrib_pointer(rng_seed=7)
             integrand = Keister()
@@ -40,9 +40,9 @@ def abstol_comparison(abstols=arange(.1, .4, .1)):
                 n = data.n_total
             except:
                 sol, time, n = nan, nan, nan
-            row_i[distrib_name+'_solution'] = sol
-            row_i[distrib_name+'_time'] = time
-            row_i[distrib_name+'_n'] = n
+            row_i[distrib_name + '_solution'] = sol
+            row_i[distrib_name + '_time'] = time
+            row_i[distrib_name + '_n'] = n
         print(row_i)
         df.loc[i] = row_i
     return df
@@ -55,12 +55,12 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
     """
     print('\nDimension Comparison')
     columns = ['dimension'] + \
-        [type(distrib()).__name__+'_solution' for distrib in distribution_pointers] + \
-        [type(distrib()).__name__+'_time' for distrib in distribution_pointers] + \
-        [type(distrib()).__name__+'_n' for distrib in distribution_pointers]
+        [type(distrib()).__name__ + '_solution' for distrib in distribution_pointers] + \
+        [type(distrib()).__name__ + '_time' for distrib in distribution_pointers] + \
+        [type(distrib()).__name__ + '_n' for distrib in distribution_pointers]
     df = DataFrame(columns=columns, dtype=float)
     for i, dimension in enumerate(dimensions):
-        row_i = {'dimension':dimension}
+        row_i = {'dimension': dimension}
         for distrib_pointer in distribution_pointers:
             distribution = distrib_pointer(rng_seed=7)
             integrand = Keister()
@@ -78,12 +78,13 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
                 n = data.n_total
             except:
                 sol, time, n = nan, nan, nan
-            row_i[distrib_name+'_solution'] = sol
-            row_i[distrib_name+'_time'] = time
-            row_i[distrib_name+'_n'] = n
+            row_i[distrib_name + '_solution'] = sol
+            row_i[distrib_name + '_time'] = time
+            row_i[distrib_name + '_n'] = n
         print(row_i)
         df.loc[i] = row_i
     return df
+
 
 if __name__ == '__main__':
     abstols = arange(.0005, .1, .0005)

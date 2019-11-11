@@ -2,6 +2,7 @@
 import numpy as np
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=3)
 
+
 def univ_repr(qmc_object, abc_class_name, attributes):
     """Clean way to represent qmc_object data.
 
@@ -23,7 +24,7 @@ def univ_repr(qmc_object, abc_class_name, attributes):
 
     """
     obj_dict = qmc_object.__dict__
-    string = "%s (%s Object)\n" % (type(qmc_object).__name__,abc_class_name)
+    string = "%s (%s Object)\n" % (type(qmc_object).__name__, abc_class_name)
     for key, val in obj_dict.items():
         if key not in attributes:
             # don't care about this attribute

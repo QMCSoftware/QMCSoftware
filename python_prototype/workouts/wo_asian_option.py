@@ -46,9 +46,9 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
-    
-    if len(dim) == 1: # CLTRep & MeanMC_g only implemented for single-level functions
-        
+
+    if len(dim) == 1:  # CLTRep & MeanMC_g only implemented for single-level functions
+
         # IID Standard Uniform ~ MeanMC_g
         discrete_distrib = IIDStdUniform(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
@@ -74,7 +74,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         print(data)
-    
+
         # Lattice ~ CLTRep
         discrete_distrib = Lattice(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
@@ -113,3 +113,4 @@ if __name__ == "__main__":
                  arange(1 / 64, 65 / 64, 1 / 64)]
     DIM2 = [len(tv) for tv in TIME_VEC2]
     test_distributions_asian_option(TIME_VEC2, DIM2, abs_tol=.05)
+Previo
