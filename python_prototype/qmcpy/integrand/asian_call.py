@@ -61,21 +61,33 @@ class AsianCall(Integrand):
         s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) * \
             self.bm_measure.time_vector + self.volatility * x)
-        if self.mean_type == 'arithmetic':
-            avg_fine = (self.start_price/2 + s_fine[:,:-1].sum(1) + s_fine[:,-1]/2) / \
-                        self.dimension # trapezoidal rule
-        elif self.mean_type == 'geometric':
-            raise Exception("Not working for multi-level methods yet")
-            avg_fine = exp((log(self.start_price)/2 + log(s_fine[:,:-1]).sum(1) + \
-                            log(s_fine[:,-1])/2)/self.dimension) # trapezoidal rule
-        y = maximum(avg_fine - self.strike_price, 0) * exp(-self.interest_rate*self.exercise_time)
+        y = self.get_discounted_payoffs(s_fine, self.dimension)
         if self.dim_fac > 0:
-            scourse = s_fine[:, int(self.dim_fac - 1):: int(self.dim_fac)]
+            s_course = s_fine[:, int(self.dim_fac - 1):: int(self.dim_fac)]
             d_course = self.dimension / self.dim_fac
-            avg_course = ((self.start_price / 2)
-                          + scourse[:, : int(d_course) - 1].sum(1)
-                          + scourse[:, int(d_course) - 1] / 2) / d_course
-            y -= maximum(avg_course - self.strike_price, 0)* exp(-self.interest_rate*self.exercise_time)
+            y_course = self.get_discounted_payoffs(s_course, d_course)
+            y -= y_course
+        return y
+
+    def get_discounted_payoffs(self, stock_path, dimension):
+        """
+        Calculate the average option price using
+        either arithmatic or geometric trapazoidal rule
+
+        stock_path (ndarray): option prices at monitoring times
+        dimension (int): number of dimensions
+        """
+        if self.mean_type == 'arithmetic':
+            avg = (self.start_price/2 + \
+                    stock_path[:,:-1].sum(1) + \
+                    stock_path[:,-1]/2) / \
+                    dimension
+        elif self.mean_type == 'geometric':
+            avg = exp((log(self.start_price)/2 + \
+                    log(stock_path[:,:-1]).sum(1) + \
+                    log(stock_path[:,-1])/2) / \
+                    dimension)
+        y = maximum(avg - self.strike_price, 0) * exp(-self.interest_rate*self.exercise_time)
         return y
 
     def __repr__(self, attributes=[]):

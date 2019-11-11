@@ -25,7 +25,7 @@ class MeanMC_g(StoppingCriterion):
     def __init__(self, discrete_distrib, true_measure,
                  inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0,
-                 n_init=1024, n_max=2**20):
+                 n_init=1024, n_max=1e10):
         """
         Args:
             discrete_distrib
