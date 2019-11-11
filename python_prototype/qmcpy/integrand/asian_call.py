@@ -71,8 +71,7 @@ class AsianCall(Integrand):
 
     def get_discounted_payoffs(self, stock_path, dimension):
         """
-        Calculate the average option price using
-        either arithmatic or geometric trapazoidal rule
+        Calculate the discounted payoff from the stock path
 
         stock_path (ndarray): option prices at monitoring times
         dimension (int): number of dimensions
