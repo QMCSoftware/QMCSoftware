@@ -22,7 +22,7 @@ FILES=*.ipynb
 for f in $FILES
 do
   echo "Processing $f file..."
-  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=pyqmc $f
+  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=python $f
 
 done
 rm -f ../html_from_demos/*
