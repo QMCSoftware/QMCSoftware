@@ -6,18 +6,18 @@ IIDStdUniform (Discrete Distribution Object)
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
-	sigma           0.7071067811865476
+	sigma           0.707
 CLT (Stopping Criterion Object)
 	abs_tol         0.010
 	rel_tol         0
-	n_max           1048576
+	n_max           10000000000
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
 	n               470869
 	n_total         471893.0
 	confid_int      [ 2.164  2.185]
-	time_total      0.203
+	time_total      0.189
 
 Solution: 2.1702         
 Keister (Integrand Object)
@@ -27,18 +27,18 @@ IIDStdGaussian (Discrete Distribution Object)
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
-	sigma           0.7071067811865476
+	sigma           0.707
 CLT (Stopping Criterion Object)
 	abs_tol         0.010
 	rel_tol         0
-	n_max           1048576
+	n_max           10000000000
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
 	n               476600
 	n_total         477624.0
 	confid_int      [ 2.160  2.180]
-	time_total      0.053
+	time_total      0.051
 
 Solution: 2.1738         
 Keister (Integrand Object)
@@ -48,18 +48,18 @@ IIDStdUniform (Discrete Distribution Object)
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
-	sigma           0.7071067811865476
+	sigma           0.707
 MeanMC_g (Stopping Criterion Object)
 	abs_tol         0.010
 	rel_tol         0
-	n_max           1048576
+	n_max           10000000000
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
 	n               603479
 	n_total         604503.0
 	confid_int      [ 2.164  2.184]
-	time_total      0.249
+	time_total      0.247
 
 Solution: 2.1703         
 Keister (Integrand Object)
@@ -69,18 +69,18 @@ IIDStdGaussian (Discrete Distribution Object)
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
-	sigma           0.7071067811865476
+	sigma           0.707
 MeanMC_g (Stopping Criterion Object)
 	abs_tol         0.010
 	rel_tol         0
-	n_max           1048576
+	n_max           10000000000
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
 	n               610515
 	n_total         611539.0
 	confid_int      [ 2.160  2.180]
-	time_total      0.068
+	time_total      0.069
 
 Solution: 2.1680         
 Keister (Integrand Object)
@@ -90,7 +90,7 @@ Lattice (Discrete Distribution Object)
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
-	sigma           0.7071067811865476
+	sigma           0.707
 CLTRep (Stopping Criterion Object)
 	abs_tol         0.010
 	rel_tol         0
@@ -101,7 +101,7 @@ MeanVarDataRep (AccumData Object)
 	n               256
 	n_total         256
 	confid_int      [ 2.166  2.170]
-	time_total      0.009
+	time_total      0.008
 	r               16
 
 Solution: 2.1683         
@@ -112,7 +112,7 @@ Sobol (Discrete Distribution Object)
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
-	sigma           0.7071067811865476
+	sigma           0.707
 CLTRep (Stopping Criterion Object)
 	abs_tol         0.010
 	rel_tol         0
@@ -123,6 +123,6 @@ MeanVarDataRep (AccumData Object)
 	n               512
 	n_total         512
 	confid_int      [ 2.168  2.169]
-	time_total      0.019
+	time_total      0.020
 	r               16
 

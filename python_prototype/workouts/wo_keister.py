@@ -53,7 +53,7 @@ def test_distributions_keister(dim, abs_tol):
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
 
-    # Sobol ~ CLTRelp
+    # Sobol ~ CLTRep
     integrand = Keister()
     discrete_distrib = Sobol(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
