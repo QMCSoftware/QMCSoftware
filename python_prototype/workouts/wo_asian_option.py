@@ -25,7 +25,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
 
-    # IID Standard Uniform ~ CLT
+    # IID Standard Gaussian ~ CLT
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure, volatility=.5, start_price=30, \
@@ -45,7 +45,7 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         print(data)
 
-        # IID Standard Uniform ~ MeanMC_g
+        # IID Standard Gaussian ~ MeanMC_g
         discrete_distrib = IIDStdGaussian(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
         integrand = AsianCall(true_measure, volatility=.5, start_price=30, \
