@@ -22,11 +22,11 @@ FILES=*.ipynb
 for f in $FILES
 do
   echo "Processing $f file..."
-  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=python $f
-
+  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV $f
 done
-rm -f ../html_from_demos/*
-mv *.html ../html_from_demos/
+DIR=../html_from_demos
+rm -f $DIR/*
+mv *.html $DIR
 cd .. # to python_prototype
 
 ## Use sphinx to generate HTML documentation with inputs from above and
