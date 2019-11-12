@@ -24,7 +24,3 @@ Comparison of QMC and MC Schemes
 .. raw:: html
    :file: ../html_from_demos/comparison_plots.html
 
-NEI Demo
----------
-.. raw:: html
-   :file: ../html_from_demos/nei-demo.html
