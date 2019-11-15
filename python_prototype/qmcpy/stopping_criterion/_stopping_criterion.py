@@ -25,10 +25,10 @@ class StoppingCriterion(ABC):
                 + str(allowed_distribs)
             raise DistributionCompatibilityError(error_message)
         super().__init__()
-        self.abs_tol = abs_tol if abs_tol else 1e-2
-        self.rel_tol = rel_tol if rel_tol else 0
-        self.n_init = n_init if n_init else 1024
-        self.n_max = n_max if n_max else 1e8
+        self.abs_tol = abs_tol
+        self.rel_tol = rel_tol
+        self.n_init = n_init
+        self.n_max = n_max
         self.alpha = None
         self.inflate = None
 

@@ -54,7 +54,8 @@ class CLTRep(StoppingCriterion):
 
     def stop_yet(self):
         """ Determine when to stop """
-        if sqrt((self.data.sighat**2).sum() / len(self.data.sighat)) * self.inflate > self.abs_tol:
+        sighat_up = sqrt((self.data.sighat**2).sum() / len(self.data.sighat)) * self.inflate
+        if sighat_up > max(self.abs_tol, abs(self.data.solution) * self.rel_tol):
             # Not sufficiently estimated
             if 2 * self.data.n.sum() > self.n_max:
                 # doubling samples would go over n_max

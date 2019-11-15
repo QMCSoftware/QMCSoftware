@@ -67,10 +67,10 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
             measure = Gaussian(dimension=[dimension], variance=1 / 2)
             distrib_name = type(distribution).__name__
             if distrib_name in ['IIDStdGaussian', 'IIDStdUniform']:
-                stopping_criterion = CLT(distribution, measure, abs_tol=.05,
+                stopping_criterion = CLT(distribution, measure, rel_tol=.01, abs_tol=0,
                                          n_max=1e10, n_init=256)
             elif distrib_name in ['Lattice', 'Sobol']:
-                stopping_criterion = CLTRep(distribution, measure, abs_tol=.05,
+                stopping_criterion = CLTRep(distribution, measure, rel_tol=.01, abs_tol=0,
                                             n_max=1e10, n_init=16)
             try:
                 sol, data = integrate(integrand, measure, distribution, stopping_criterion)
@@ -87,10 +87,10 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
 
 
 if __name__ == '__main__':
-    abstols = arange(.0005, .1, .0005)
+    abstols = arange(.0002, .1002, .0002)
     df_abstols = abstol_comparison(abstols)
-    df_abstols.to_csv('outputs/comparison_tests/abs_tol.csv')
+    df_abstols.to_csv('outputs/comparison_tests/abs_tol.csv', index=False)
 
-    dimensions = arange(1, 9)
+    dimensions = arange(1, 41)
     df_dimensions = dimension_comparison(dimensions)
-    df_dimensions.to_csv('outputs/comparison_tests/dimension.csv')
+    df_dimensions.to_csv('outputs/comparison_tests/dimension.csv', index=False)

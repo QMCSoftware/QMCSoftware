@@ -49,7 +49,7 @@ class CLT(StoppingCriterion):
             # samples for computation of the mean
             # n_mu_temp := n such that confidence intervals width and conficence will be satisfied
             n_mu_temp = ceil(temp_b * (-norm.ppf(self.alpha / 2) * self.inflate /
-                                       max(self.abs_tol, self.data.solution * self.rel_tol)) ** 2
+                                       max(self.abs_tol, abs(self.data.solution) * self.rel_tol)) ** 2
                              * (self.data.sighat / self.data.t_eval ** .5))
             # n_mu := n_mu_temp adjusted for previous n
             self.data.n_mu = maximum(self.data.n, n_mu_temp)
