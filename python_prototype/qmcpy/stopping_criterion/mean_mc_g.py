@@ -47,18 +47,16 @@ class MeanMC_g(StoppingCriterion):
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
-        self.n_init = n_init
         self.n_max = n_max
         self.alpha = alpha
         self.inflate = inflate
         self.alpha_sigma = self.alpha / 2  # the uncertainty for variance estimation
-        self.kurtmax = (self.n_init - 3) / (self.n_init - 1) + \
-            (self.alpha_sigma * self.n_init) / (1 - self.alpha_sigma) * \
+        self.kurtmax = (n_init - 3) / (n_init - 1) + \
+            (self.alpha_sigma * n_init) / (1 - self.alpha_sigma) * \
             (1 - 1 / self.inflate**2)**2
         self.stage = "sigma"
         # Construct Data Object to House Integration data
-        self.data = MeanVarData(levels)  # house integration data
-        self.data.n = tile(self.n_init, levels)  # next n for each integrand
+        self.data = MeanVarData(levels, n_init)  # house integration data
         # Verify Compliant Construction
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
         super().__init__(discrete_distrib, allowed_distribs)

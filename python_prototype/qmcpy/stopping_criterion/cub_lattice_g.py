@@ -21,21 +21,17 @@ class CubLattice_g(StoppingCriterion):
             alpha (float): significance level for confidence interval
             abs_tol (float): absolute error tolerance
             rel_tol (float): relative error tolerance
-            n_init (int): initial number of samples
             n_max (int): maximum number of samples
         """
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
-        self.n_init = n_init
         self.n_max = n_max
         self.alpha = alpha
         self.inflate = inflate
         self.stage = "sigma"
         # Construct Data Object to House Integration data
-        levels = len(true_measure)
-        self.data = MeanVarData(levels)
-        self.data.n = tile(self.n_init, levels).astype(float)
+        self.data = MeanVarData(len(true_measure), n_init)
         # Verify Compliant Construction
         allowed_distribs = ["Lattice"]
         super().__init__(discrete_distrib, allowed_distribs)

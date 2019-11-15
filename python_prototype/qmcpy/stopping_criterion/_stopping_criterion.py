@@ -7,7 +7,17 @@ from .._util import DistributionCompatibilityError, univ_repr, ParameterError
 
 
 class StoppingCriterion(ABC):
-    """ Decide when to stopping_criterion """
+    """
+    Decide when to stopping_criterion
+    
+    Attributes:
+        abs_tol: absolute error tolerance
+        rel_tol: relative error tolerance
+        n_max: maximum number of samples
+        alpha: significance level for confidence interval
+        inflate: inflation factor when estimating variance
+        stage: stage of the computation
+    """
 
     def __init__(self, distribution, allowed_distribs):
         """
@@ -21,21 +31,19 @@ class StoppingCriterion(ABC):
                 + " only accepts distributions:" \
                 + str(allowed_distribs)
             raise DistributionCompatibilityError(error_message)
-        string_prefix = 'A concrete implementation of Stopping Criterion must have '
+        prefix = 'A concrete implementation of Stopping Criterion must have '
         if not hasattr(self, 'abs_tol'):
-            raise ParameterError(string_prefix+'self.abs_tol (absolute tolerance)')
+            raise ParameterError(prefix+'self.abs_tol (absolute tolerance)')
         if not hasattr(self, 'rel_tol'):
-            raise ParameterError(string_prefix+'self.rel_tol (relative tolerance)')
-        if not hasattr(self, 'n_init'):
-            raise ParameterError(string_prefix+'self.n_init (initial sample size)')
+            raise ParameterError(prefix+'self.rel_tol (relative tolerance)')
         if not hasattr(self, 'n_max'):
-            raise ParameterError(string_prefix+'self.n_max (maximum total samples)')
+            raise ParameterError(prefix+'self.n_max (maximum total samples)')
         if not hasattr(self, 'alpha'):
-            raise ParameterError(string_prefix+'self.alpha (uncertainty level)')
+            raise ParameterError(prefix+'self.alpha (uncertainty level)')
         if not hasattr(self, 'inflate'):
-            raise ParameterError(string_prefix+'self.inflate (inflation factor)')
+            raise ParameterError(prefix+'self.inflate (inflation factor)')
         if not hasattr(self, 'stage'):
-            raise ParameterError(string_prefix+'self.stage (stage of the computation)')
+            raise ParameterError(prefix+'self.stage (stage of the computation)')
 
     @abstractmethod
     def stop_yet(self):

@@ -1,9 +1,9 @@
 """ Definition of MeanVarData, a concrete implementation of AccumData """
 
-from time import process_time
-from numpy import finfo, float32, full, inf, zeros
-
 from ._accum_data import AccumData
+
+from time import *
+from numpy import *
 
 EPS = finfo(float32).eps
 
@@ -14,19 +14,22 @@ class MeanVarData(AccumData):
     and store the sample mean and variance of integrand values
     """
 
-    def __init__(self, n_integrands):
+    def __init__(self, levels, n_init):
         """
         Initialize data instance
 
         Args:
-            n_integrands (int): number of integrands
+            levels (int): number of integrands
+            n_init (int): initial number of samples
         """
+        self.solution = nan
+        self.muhat = full(levels, inf) # sample mean
+        self.sighat = full(levels, inf) # sample standard deviation
+        self.t_eval = zeros(levels) # processing time for each integrand
+        self.n = tile(n_init, levels).astype(float) # currnet number of samples
+        self.n_total = 0 # total number of samples
+        self.confid_int = array([-inf, inf]) # confidence interval for solution
         super().__init__()
-        self.n_integrands = n_integrands
-        self.muhat = full(self.n_integrands, inf)  # sample mean
-        self.sighat = full(self.n_integrands, inf)  # sample standard deviation
-        self.t_eval = zeros(self.n_integrands)  # processing time for each integrand
-        self.n_total = 0
 
     def update_data(self, integrand, true_measure):
         """

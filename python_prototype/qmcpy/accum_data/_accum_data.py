@@ -5,7 +5,7 @@ from math import inf, nan
 
 from numpy import array
 
-from .._util import univ_repr
+from .._util import univ_repr, ParameterError
 
 
 class AccumData(ABC):
@@ -23,17 +23,15 @@ class AccumData(ABC):
     def __init__(self):
         """ Initialize data instance """
         super().__init__()
-        self.solution = nan  # solution
-        self.stage = "begin"
-        # new data will be based on (quasi-)random vectors indexed by.
-        self.n = array([])  # number of samples at this stage
-        self.n_total = 0
-        self.confid_int = array([-inf, inf])
-        self.time_total = None
-        self.integrand = None
-        self.discrete_distrib = None
-        self.true_measure = None
-        self.stopping_criterion = None
+        prefix = 'A concrete implementation of AccumData must have '
+        if not hasattr(self, 'solution'):
+           raise ParameterError(prefix + 'self.solution')
+        if not hasattr(self, 'n'):
+           raise ParameterError(prefix + 'self.n (current number of samples at each level)')
+        if not hasattr(self, 'n_total'):
+           raise ParameterError(prefix + 'self.n_total (total number of samples)')
+        if not hasattr(self, 'confid_int'):
+           raise ParameterError(prefix + 'self.confid_int (confidence interval for the solution)')   
 
     @abstractmethod
     def update_data(self, integrand, true_measure):

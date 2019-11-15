@@ -1,9 +1,9 @@
 """ Definition for MeanVarDataRep, a concrete implementation of AccumData """
 
-from time import process_time
-from numpy import finfo, float32, zeros
-
 from ._accum_data import AccumData
+
+from time import *
+from numpy import *
 
 EPS = finfo(float32).eps
 
@@ -13,26 +13,25 @@ class MeanVarDataRep(AccumData):
         calculations.
     """
 
-    def __init__(self, n_integrands, replications):
+    def __init__(self, levels, n_init, replications):
         """
         Initialize data instance
 
         Args:
-            n_integrands (int): number of integrands
+            levels (int): number of integrands
+            n_init (int): initial number of samples
             replications (int): number of random nxm matrices to generate
         """
-        super().__init__()
-        self.n_integrands = n_integrands
         self.r = replications  # Number of random nxm matrices to generate
-        self.muhat_ir = zeros((self.n_integrands,self.r)) 
-        # store sample mean of ith integrand at rth replication
-        self.muhat = zeros(self.n_integrands)
-        # mean of replications means for each integrand
-        self.sighat = zeros(self.n_integrands)
-        # standard deviation of replications means for each integrand
-        self.t_eval = zeros(self.n_integrands)
-        # time used to evaluate each integrand
-        self.n_total = zeros(self.n_integrands)
+        self.muhat_ir = zeros((levels, self.r)) 
+        self.solution = nan
+        self.muhat = full(levels, inf) # sample mean
+        self.sighat = full(levels, inf) # sample standard deviation
+        self.t_eval = zeros(levels) # processing time for each integrand
+        self.n = tile(n_init, levels).astype(float) # currnet number of samples
+        self.n_total = tile(0, levels) # total number of samples
+        self.confid_int = array([-inf, inf]) # confidence interval for solution
+        super().__init__()
 
     def update_data(self, integrand, true_measure):
         """
