@@ -29,7 +29,6 @@ class IntegrationExampleTest(unittest.TestCase):
             sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
             true_value = true_values[d - 1]
             self.assertTrue(abs(sol - true_value) < abs_tol)
-            self.assertTrue(integrand.dimension == d)
 
     def test_asian_option_multi_level(self):
         abs_tol = 0.1
@@ -88,7 +87,6 @@ class IntegrationExampleTest(unittest.TestCase):
             sol, _ = integrate(integrand, measure, discrete_distrib,
                                stopping_criterion)
             true_value = true_values[d - 1]
-            self.assertTrue(integrand.dimension == d)
             self.assertTrue(abs(sol - true_value) < abs_tol)
 
     def test_quick_construct(self):
@@ -111,8 +109,6 @@ class IntegrationExampleTest(unittest.TestCase):
             print(data)
             abs_tol = data.stopping_criterion.abs_tol
             true_value = true_values[d - 1]
-            self.assertTrue(integrand.dimension == d)
-            self.assertTrue(data.integrand.dimension == d)
             self.assertTrue(data.true_measure.dimension == d)
             self.assertTrue(abs(sol - true_value) < abs_tol)
 
@@ -137,8 +133,6 @@ class IntegrationExampleTest(unittest.TestCase):
             print(data)
             abs_tol = data.stopping_criterion.abs_tol
             true_value = true_values[d - 1]
-            self.assertTrue(integrand.dimension == d)
-            self.assertTrue(data.integrand.dimension == d)
             self.assertTrue(measure.dimension == d)
             self.assertTrue(data.true_measure.dimension == d)
             self.assertTrue(abs(sol - true_value) < abs_tol)

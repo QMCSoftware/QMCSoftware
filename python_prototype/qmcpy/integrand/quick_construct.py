@@ -16,7 +16,6 @@ class QuickConstruct(Integrand):
         Args:
             custom_fun (int): a callable univariable or multivariate Python \
              function that returns a real number.
-            dimension (int): Dimension of the domain, :math:`d > 0`. Default to 2.
 
         Note:
             Input of the function:
@@ -32,7 +31,6 @@ class QuickConstruct(Integrand):
             raise Exception("Input custom_fun should be a callable function.")
 
     def g(self, x):
-        self.dimension = x.shape[1]  # infer domain dimension
         return self.custom_fun(x)
 
     def __repr__(self, attributes=[]):

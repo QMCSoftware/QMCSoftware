@@ -4,23 +4,24 @@ from abc import ABC
 from numpy import array, int64, ndarray
 from copy import deepcopy
 
-from .._util import DimensionError, TransformError, univ_repr
+from .._util import DimensionError, TransformError, univ_repr, ParameterError
 
 
 class TrueMeasure(ABC):
     """ The True Measure of the Integrand """
 
-    def __init__(self, dimension, transforms, **kwargs):
+    def __init__(self, dimension, **kwargs):
         """
         Args:
             dimension (ndarray): dimension(s) of the integrand(s)
-            transforms (dict): functions that transform discrete distribution \
-                to true measure
             keys: string matching the measure mimiced by the discrete \
                 distribution
             values: functions to transform a sample by the mimiced \
                 measure into a sapmle by the true measure
         """
+        prefix = 'A concrete implementation of TrueMeasure must have '
+        if not hasattr(self, 'transforms'):
+            raise ParameterError(prefix+'self.transforms')
         super().__init__()
         self.dimension = dimension
         for key, val in kwargs.items():
@@ -53,7 +54,7 @@ class TrueMeasure(ABC):
             self[i].dimension = self.dimension[i]
             for key, val in kwargs.items():
                 setattr(self[i], key, array(val[i]))
-            self[i].transforms = transforms
+            self[i].transforms = self.transforms
 
     def set_tm_gen(self, discrete_distrib):
         """

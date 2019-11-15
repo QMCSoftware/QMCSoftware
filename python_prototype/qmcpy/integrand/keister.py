@@ -34,7 +34,7 @@ class Keister(Integrand):
             then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
             and :math:`x'_{ij} = c` otherwise
         """
-        self.dimension = x.shape[1]  # infer domain dimension
+        dimension = x.shape[1]  # infer domain dimension
         normx = LA.norm(x, 2, axis=1)  # ||x||_2
-        y = pi ** (self.dimension / 2.0) * cos(normx)
+        y = pi ** (dimension / 2.0) * cos(normx)
         return y
