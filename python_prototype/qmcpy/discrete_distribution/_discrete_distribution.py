@@ -1,36 +1,36 @@
 """ DiscreteDistribution is an abstract class. """
 
-from abc import ABC, abstractmethod
+from .._util import univ_repr, ParameterError
 
-from .._util import univ_repr
+from abc import ABC, abstractmethod
 
 
 class DiscreteDistribution(ABC):
-    """ Discrete Distribution from which we can generate samples. """
+    """
+    Discrete Distribution from which we can generate samples
+    
+    Attributes:
+        mimics (string): True Measure mimiced by the Discrete Distribution
+    """
 
-    def __init__(self, mimics, rng_seed):
-        """
-        Initialize Discrete Distributuion instance
-
-        Args:
-            mimics (str): Measure the discrete distribution attempts to mimic
-            rng_seed (int): seed for whatever generator is to be used
-        """
-        self.mimics = mimics
-        self.rng_seed = rng_seed
+    def __init__(self):
+        """ Initialize Discrete Distributuion instance """
+        prefix = 'A concrete implementation of DiscreteDistribution must have ' 
+        if not hasattr(self, 'mimics'):
+            raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
 
     @abstractmethod
-    def gen_dd_samples(self, r, n, d):
+    def gen_dd_samples(self, replications, n_samples, dimensions):
         """
         Generate r nxd IID Standard Gaussian samples
 
         Args:
-            r (int): Number of nxd matrices to generate (sample.size()[0])
-            n (int): Number of observations (sample.size()[1])
-            d (int): Number of dimensions (sample.size()[2])
+            replications (int): Number of nxd matrices to generate (sample.size()[0])
+            n_samples (int): Number of observations (sample.size()[1])
+            dimensions (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            rxnxd (numpy array)
+            replications x n_samples x dimensions (numpy array)
         """
         return
 

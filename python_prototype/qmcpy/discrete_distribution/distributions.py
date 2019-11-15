@@ -16,22 +16,26 @@ class IIDStdUniform(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics="StdUniform", rng_seed=rng_seed)
+        self.mimics = 'StdUniform'
         self.rng = Generator(PCG64(rng_seed))
+        super().__init__()
 
-    def gen_dd_samples(self, r, n, d):
+    def gen_dd_samples(self, replications, n_samples, dimensions):
         """
         Generate r nxd IID Standard Uniform samples
 
         Args:
-            r (int): Number of nxd matrices to generate (sample.size()[0])
-            n (int): Number of observations (sample.size()[1])
-            d (int): Number of dimensions (sample.size()[2])
+            replications (int): Number of nxd matrices to generate (sample.size()[0])
+            n_samples (int): Number of observations (sample.size()[1])
+            dimensions (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            rxnxd (numpy array)
+            replications x n_samples x dimensions (numpy array)
         """
-        return self.rng.uniform(0, 1, (int(r), int(n), int(d)))
+        r = int(replications)
+        n = int(n_samples)
+        d = int(dimensions)
+        return self.rng.uniform(0, 1, (r, n, d))
 
 
 class IIDStdGaussian(DiscreteDistribution):
@@ -42,22 +46,26 @@ class IIDStdGaussian(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics="StdGaussian", rng_seed=rng_seed)
+        self.mimics = 'StdGaussian'
         self.rng = Generator(PCG64(rng_seed))
+        super().__init__()
 
-    def gen_dd_samples(self, r, n, d):
+    def gen_dd_samples(self, replications, n_samples, dimensions):
         """
         Generate r nxd IID Standard Gaussian samples
 
         Args:
-            r (int): Number of nxd matrices to generate (sample.size()[0])
-            n (int): Number of observations (sample.size()[1])
-            d (int): Number of dimensions (sample.size()[2])
+            replications (int): Number of nxd matrices to generate (sample.size()[0])
+            n_samples (int): Number of observations (sample.size()[1])
+            dimensions (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            rxnxd (numpy array)
+            replications x n_samples x dimensions (numpy array)
         """
-        return self.rng.standard_normal((int(r), int(n), int(d)))
+        r = int(replications)
+        n = int(n_samples)
+        d = int(dimensions)
+        return self.rng.standard_normal((r, n, d))
 
 
 class Lattice(DiscreteDistribution):
@@ -68,21 +76,25 @@ class Lattice(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics="StdUniform", rng_seed=rng_seed)
+        self.mimics = 'StdUniform'
         self.rng = Generator(PCG64(rng_seed))
+        super().__init__()
 
-    def gen_dd_samples(self, r, n, d):
+    def gen_dd_samples(self, replications, n_samples, dimensions):
         """
         Generate r nxd Lattice samples
 
         Args:
-            r (int): Number of nxd matrices to generate (sample.size()[0])
-            n (int): Number of observations (sample.size()[1])
-            d (int): Number of dimensions (sample.size()[2])
+            replications (int): Number of nxd matrices to generate (sample.size()[0])
+            n_samples (int): Number of observations (sample.size()[1])
+            dimensions (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            rxnxd (numpy array)
+            replications x n_samples x dimensions (numpy array)
         """
+        r = int(replications)
+        n = int(n_samples)
+        d = int(dimensions)
         if not hasattr(self, 'lattice_rng'):  # initialize lattice rng and shifts
             self.lattice_rng = LatticeSeq(m=20, s=int(d))
             self.shifts = self.rng.uniform(0, 1, (int(r), int(d)))
@@ -99,21 +111,25 @@ class Sobol(DiscreteDistribution):
         Args:
             rng_seed (int): seed the random number generator for reproducibility
         """
-        super().__init__(mimics="StdUniform", rng_seed=rng_seed)
+        self.mimics = 'StdUniform'
         self.rng = Generator(PCG64(rng_seed))
+        super().__init__()
 
-    def gen_dd_samples(self, r, n, d):
+    def gen_dd_samples(self, replications, n_samples, dimensions):
         """
         Generate r nxd Sobol samples
 
         Args:
-            r (int): Number of nxd matrices to generate (sample.size()[0])
-            n (int): Number of observations (sample.size()[1])
-            d (int): Number of dimensions (sample.size()[2])
+            replications (int): Number of nxd matrices to generate (sample.size()[0])
+            n_samples (int): Number of observations (sample.size()[1])
+            dimensions (int): Number of dimensions (sample.size()[2])
 
         Returns:
-            rxnxd (numpy array)
+            replications x n_samples x dimensions (numpy array)
         """
+        r = int(replications)
+        n = int(n_samples)
+        d = int(dimensions)
         if not hasattr(self, 'sobol_rng'):
             self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=20, s=int(d))
             self.t = max(32, self.sobol_rng.t)  # we guarantee a depth of >=32 bits for shift
