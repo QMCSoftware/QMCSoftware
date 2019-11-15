@@ -1,13 +1,13 @@
 """ Comparing mc and qmc varying parameters """
 
+from qmcpy import *
+
 import json
 from numpy import nan
 from pandas import DataFrame
 
-from qmcpy import *
 
 distribution_pointers = [IIDStdUniform, IIDStdGaussian, Lattice, Sobol]
-
 
 def abstol_comparison(abstols=arange(.1, .4, .1)):
     """

@@ -1,6 +1,5 @@
-"""
-Workout for QuickConstruct integrand class.
-"""
+""" Workout for QuickConstruct integrand class """
+
 from qmcpy import *
 
 

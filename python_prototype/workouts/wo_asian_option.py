@@ -6,9 +6,10 @@ Single-Level and Multi-Level Asian Option Pricing Examples
         python workouts/wo_asian_option.py  > outputs/examples/ie_AsianOption.txt
 """
 
+from qmcpy import *
+
 from numpy import arange
 
-from qmcpy import *
 
 volatility = .5
 start_price = 30
