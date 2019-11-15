@@ -13159,7 +13159,6 @@ div#notebook {
 Keister (Integrand Object)
 Sobol (Discrete Distribution Object)
 	mimics          StdUniform
-	rng_seed        7
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
@@ -13171,11 +13170,11 @@ CLTRep (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarDataRep (AccumData Object)
-	n               32
-	n_total         32
-	confid_int      [ 2.126  2.169]
-	time_total      0.009
 	r               16
+	n               32
+	n_total         32.0
+	confid_int      [ 2.126  2.169]
+	time_total      0.008
 
 </pre>
 </div>
@@ -13250,7 +13249,6 @@ AsianCall (Integrand Object)
 	exercise_time   1.0
 Lattice (Discrete Distribution Object)
 	mimics          StdUniform
-	rng_seed        7
 BrownianMotion (True Measure Object)
 	dimension       64
 	time_vector     [[ 0.016  0.031  0.047 ...  0.969  0.984  1.000]]
@@ -13261,11 +13259,11 @@ CLTRep (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarDataRep (AccumData Object)
-	n               2048
-	n_total         2048
-	confid_int      [ 5.833  5.838]
-	time_total      0.583
 	r               16
+	n               2048
+	n_total         2048.0
+	confid_int      [ 5.833  5.838]
+	time_total      0.465
 
 </pre>
 </div>
@@ -13324,7 +13322,7 @@ MeanVarDataRep (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 5.8309         
+<pre>Solution: 5.8376         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -13334,7 +13332,6 @@ AsianCall (Integrand Object)
 	exercise_time   1.0
 IIDStdGaussian (Discrete Distribution Object)
 	mimics          StdGaussian
-	rng_seed        7
 BrownianMotion (True Measure Object)
 	dimension       [ 4 16 64]
 	time_vector     [array([ 0.250,  0.500,  0.750,  1.000])
@@ -13347,10 +13344,10 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               [ 254414.000  29903.000  4769.000]
-	n_total         292158.0
-	confid_int      [ 5.782  5.880]
-	time_total      0.175
+	n               [ 250731.000  31163.000  5224.000]
+	n_total         290190.0
+	confid_int      [ 5.789  5.886]
+	time_total      0.150
 
 </pre>
 </div>

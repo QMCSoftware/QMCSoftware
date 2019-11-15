@@ -324,10 +324,7 @@ dimension (int): number of dimensions</p>
 <dd><p>Initialize custom Integrand</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>custom_fun</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – a callable univariable or multivariate Python              function that returns a real number.</p></li>
-<li><p><strong>dimension</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Dimension of the domain, <span class="math notranslate nohighlight">\(d &gt; 0\)</span>. Default to 2.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>custom_fun</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – a callable univariable or multivariate Python              function that returns a real number.</p>
 </dd>
 </dl>
 <div class="admonition note">
@@ -453,18 +450,18 @@ dimension (int): number of dimensions</p>
 
 <dl class="method">
 <dt id="qmcpy.discrete_distribution.distributions.IIDStdGaussian.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdGaussian.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdGaussian.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd IID Standard Gaussian samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>replications</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
+<li><p><strong>dimensions</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>rxnxd (numpy array)</p>
+<dd class="field-even"><p>replications x n_samples x dimensions (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -487,18 +484,18 @@ dimension (int): number of dimensions</p>
 
 <dl class="method">
 <dt id="qmcpy.discrete_distribution.distributions.IIDStdUniform.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdUniform.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdUniform.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd IID Standard Uniform samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>replications</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
+<li><p><strong>dimensions</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>rxnxd (numpy array)</p>
+<dd class="field-even"><p>replications x n_samples x dimensions (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -521,18 +518,18 @@ dimension (int): number of dimensions</p>
 
 <dl class="method">
 <dt id="qmcpy.discrete_distribution.distributions.Lattice.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Lattice.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Lattice.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd Lattice samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>replications</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
+<li><p><strong>dimensions</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>rxnxd (numpy array)</p>
+<dd class="field-even"><p>replications x n_samples x dimensions (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -555,18 +552,18 @@ dimension (int): number of dimensions</p>
 
 <dl class="method">
 <dt id="qmcpy.discrete_distribution.distributions.Sobol.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">n</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Sobol.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Sobol.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd Sobol samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>replications</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
+<li><p><strong>dimensions</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>rxnxd (numpy array)</p>
+<dd class="field-even"><p>replications x n_samples x dimensions (numpy array)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -579,16 +576,19 @@ dimension (int): number of dimensions</p>
 <span class="target" id="module-qmcpy.accum_data"></span><span class="target" id="module-qmcpy.accum_data.mean_var_data"></span><p>Definition of MeanVarData, a concrete implementation of AccumData</p>
 <dl class="class">
 <dt id="qmcpy.accum_data.mean_var_data.MeanVarData">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.mean_var_data.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.mean_var_data.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">levels</em>, <em class="sig-param">n_init</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data for IIDDistribution calculations,
 and store the sample mean and variance of integrand values</p>
 <dl class="method">
 <dt id="qmcpy.accum_data.mean_var_data.MeanVarData.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">levels</em>, <em class="sig-param">n_init</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize data instance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n_integrands</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of integrands</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>levels</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of integrands</p></li>
+<li><p><strong>n_init</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – initial number of samples</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -615,16 +615,17 @@ and store the sample mean and variance of integrand values</p>
 <span class="target" id="module-qmcpy.accum_data.mean_var_data_rep"></span><p>Definition for MeanVarDataRep, a concrete implementation of AccumData</p>
 <dl class="class">
 <dt id="qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.mean_var_data_rep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em>, <em class="sig-param">replications</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.mean_var_data_rep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">levels</em>, <em class="sig-param">n_init</em>, <em class="sig-param">replications</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data Repeated Central Limit Stopping Criterion (CLTRep)         calculations.</p>
 <dl class="method">
 <dt id="qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_integrands</em>, <em class="sig-param">replications</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">levels</em>, <em class="sig-param">n_init</em>, <em class="sig-param">replications</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize data instance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n_integrands</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of integrands</p></li>
+<li><p><strong>levels</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of integrands</p></li>
+<li><p><strong>n_init</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – initial number of samples</p></li>
 <li><p><strong>replications</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of random nxm matrices to generate</p></li>
 </ul>
 </dd>
@@ -670,7 +671,6 @@ and store the sample mean and variance of integrand values</p>
 <li><p><strong>alpha</strong> – significance level for confidence interval</p></li>
 <li><p><strong>abs_tol</strong> – absolute error tolerance</p></li>
 <li><p><strong>rel_tol</strong> – relative error tolerance</p></li>
-<li><p><strong>n_init</strong> – initial number of samples</p></li>
 <li><p><strong>n_max</strong> – maximum number of samples</p></li>
 </ul>
 </dd>
@@ -703,7 +703,6 @@ and store the sample mean and variance of integrand values</p>
 <li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – significance level for confidence interval</p></li>
 <li><p><strong>abs_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – absolute error tolerance</p></li>
 <li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – relative error tolerance</p></li>
-<li><p><strong>n_init</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – initial number of samples</p></li>
 <li><p><strong>n_max</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – maximum number of samples</p></li>
 </ul>
 </dd>

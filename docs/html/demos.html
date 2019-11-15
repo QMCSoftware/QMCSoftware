@@ -13338,7 +13338,7 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">()</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">discrete_distrib</span><span class="o">.</span><span class="n">gen_dd_samples</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">discrete_distrib</span><span class="o">.</span><span class="n">gen_dd_samples</span><span class="p">(</span><span class="n">replications</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 <span class="n">x</span>
 </pre></div>
 
@@ -13358,10 +13358,10 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([[ 0.795,  0.653],
-       [ 0.295,  0.153],
-       [ 0.045,  0.403],
-       [ 0.545,  0.903]])</pre>
+<pre>array([[ 0.003,  0.995],
+       [ 0.503,  0.495],
+       [ 0.253,  0.745],
+       [ 0.753,  0.245]])</pre>
 </div>
 
 </div>
@@ -13722,14 +13722,13 @@ The integrand is defined everywhere except at $x=0$ and hence the definite integ
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.6633         
+<pre>Solution: 0.6626         
 QuickConstruct (Integrand Object)
 	fun_str         def f(x):
 	                   x_norms = norm(x, axis = 1)
 	                   return x_norms ** sqrt(x_norms)
 IIDStdUniform (Discrete Distribution Object)
 	mimics          StdUniform
-	rng_seed        None
 Uniform (True Measure Object)
 	dimension       1
 	a               0
@@ -13741,10 +13740,10 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               3389
-	n_total         4413.0
-	confid_int      [ 0.653  0.673]
-	time_total      0.002
+	n               3241
+	n_total         4265.0
+	confid_int      [ 0.652  0.673]
+	time_total      0.001
 
 </pre>
 </div>
@@ -13836,14 +13835,13 @@ MeanVarData (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.8332         
+<pre>Solution: 0.8244         
 QuickConstruct (Integrand Object)
 	fun_str         def f(x):
 	                   x_norms = norm(x, axis = 1)
 	                   return x_norms ** sqrt(x_norms)
 IIDStdUniform (Discrete Distribution Object)
 	mimics          StdUniform
-	rng_seed        None
 Uniform (True Measure Object)
 	dimension       2
 	a               0
@@ -13855,9 +13853,9 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               5565
-	n_total         6589.0
-	confid_int      [ 0.823  0.843]
+	n               5707
+	n_total         6731.0
+	confid_int      [ 0.815  0.834]
 	time_total      0.002
 
 </pre>
@@ -27095,7 +27093,6 @@ div#notebook {
 Keister (Integrand Object)
 Sobol (Discrete Distribution Object)
 	mimics          StdUniform
-	rng_seed        7
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
@@ -27107,11 +27104,11 @@ CLTRep (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarDataRep (AccumData Object)
-	n               32
-	n_total         32
-	confid_int      [ 2.126  2.169]
-	time_total      0.009
 	r               16
+	n               32
+	n_total         32.0
+	confid_int      [ 2.126  2.169]
+	time_total      0.008
 
 </pre>
 </div>
@@ -27186,7 +27183,6 @@ AsianCall (Integrand Object)
 	exercise_time   1.0
 Lattice (Discrete Distribution Object)
 	mimics          StdUniform
-	rng_seed        7
 BrownianMotion (True Measure Object)
 	dimension       64
 	time_vector     [[ 0.016  0.031  0.047 ...  0.969  0.984  1.000]]
@@ -27197,11 +27193,11 @@ CLTRep (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarDataRep (AccumData Object)
-	n               2048
-	n_total         2048
-	confid_int      [ 5.833  5.838]
-	time_total      0.583
 	r               16
+	n               2048
+	n_total         2048.0
+	confid_int      [ 5.833  5.838]
+	time_total      0.465
 
 </pre>
 </div>
@@ -27260,7 +27256,7 @@ MeanVarDataRep (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 5.8309         
+<pre>Solution: 5.8376         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -27270,7 +27266,6 @@ AsianCall (Integrand Object)
 	exercise_time   1.0
 IIDStdGaussian (Discrete Distribution Object)
 	mimics          StdGaussian
-	rng_seed        7
 BrownianMotion (True Measure Object)
 	dimension       [ 4 16 64]
 	time_vector     [array([ 0.250,  0.500,  0.750,  1.000])
@@ -27283,10 +27278,10 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               [ 254414.000  29903.000  4769.000]
-	n_total         292158.0
-	confid_int      [ 5.782  5.880]
-	time_total      0.175
+	n               [ 250731.000  31163.000  5224.000]
+	n_total         290190.0
+	confid_int      [ 5.789  5.886]
+	time_total      0.150
 
 </pre>
 </div>
@@ -40845,7 +40840,6 @@ div#notebook {
 Keister (Integrand Object)
 IIDStdGaussian (Discrete Distribution Object)
 	mimics          StdGaussian
-	rng_seed        7
 Gaussian (True Measure Object)
 	dimension       2
 	mu              0
@@ -40860,7 +40854,7 @@ MeanVarData (AccumData Object)
 	n               65
 	n_total         81.0
 	confid_int      [ 1.646  2.464]
-	time_total      0.001
+	time_total      0.002
 
 </pre>
 </div>

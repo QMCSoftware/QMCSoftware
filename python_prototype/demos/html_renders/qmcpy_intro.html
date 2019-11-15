@@ -13175,7 +13175,7 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">()</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">discrete_distrib</span><span class="o">.</span><span class="n">gen_dd_samples</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">discrete_distrib</span><span class="o">.</span><span class="n">gen_dd_samples</span><span class="p">(</span><span class="n">replications</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 <span class="n">x</span>
 </pre></div>
 
@@ -13195,10 +13195,10 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([[ 0.795,  0.653],
-       [ 0.295,  0.153],
-       [ 0.045,  0.403],
-       [ 0.545,  0.903]])</pre>
+<pre>array([[ 0.003,  0.995],
+       [ 0.503,  0.495],
+       [ 0.253,  0.745],
+       [ 0.753,  0.245]])</pre>
 </div>
 
 </div>
@@ -13559,14 +13559,13 @@ The integrand is defined everywhere except at $x=0$ and hence the definite integ
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.6633         
+<pre>Solution: 0.6626         
 QuickConstruct (Integrand Object)
 	fun_str         def f(x):
 	                   x_norms = norm(x, axis = 1)
 	                   return x_norms ** sqrt(x_norms)
 IIDStdUniform (Discrete Distribution Object)
 	mimics          StdUniform
-	rng_seed        None
 Uniform (True Measure Object)
 	dimension       1
 	a               0
@@ -13578,10 +13577,10 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               3389
-	n_total         4413.0
-	confid_int      [ 0.653  0.673]
-	time_total      0.002
+	n               3241
+	n_total         4265.0
+	confid_int      [ 0.652  0.673]
+	time_total      0.001
 
 </pre>
 </div>
@@ -13673,14 +13672,13 @@ MeanVarData (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.8332         
+<pre>Solution: 0.8244         
 QuickConstruct (Integrand Object)
 	fun_str         def f(x):
 	                   x_norms = norm(x, axis = 1)
 	                   return x_norms ** sqrt(x_norms)
 IIDStdUniform (Discrete Distribution Object)
 	mimics          StdUniform
-	rng_seed        None
 Uniform (True Measure Object)
 	dimension       2
 	a               0
@@ -13692,9 +13690,9 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               5565
-	n_total         6589.0
-	confid_int      [ 0.823  0.843]
+	n               5707
+	n_total         6731.0
+	confid_int      [ 0.815  0.834]
 	time_total      0.002
 
 </pre>
