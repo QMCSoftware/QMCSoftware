@@ -29,28 +29,30 @@ class CLTRep(StoppingCriterion):
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
         """
-        # Input Checks checking
-        if len(true_measure) != 1:
+        # Input Checks
+        levels = len(true_measure)
+        if levels != 1:
             raise NotYetImplemented('''
                 CLTRep not implemented for multi-level problems.
-                Use CLT stopping criterion with an iid distribution for multi-level problems
-            ''')
+                Use CLT stopping criterion with an iid distribution for multi-level problems ''')
         if (log(n_init) / log(2)) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'
             warnings.warn(warning_s, ParameterWarning)
             n_init = 32
-        allowed_distribs = ["Lattice", "Sobol"]  # supported distributions
-        super().__init__(discrete_distrib, allowed_distribs, abs_tol,
-                         rel_tol, n_init, n_max)
-        self.inflate = inflate  # inflation factor
-        self.alpha = alpha  # uncertainty level
+        # Set Attributes
+        self.abs_tol = abs_tol
+        self.rel_tol = rel_tol
+        self.n_init = n_init
+        self.n_max = n_max
+        self.alpha = alpha
+        self.inflate = inflate
         self.stage = "begin"
-        # Construct Data Object
-        n_integrands = len(true_measure)
-        self.data = MeanVarDataRep(n_integrands, replications)
-        #   house integration data
-        self.data.n = tile(self.n_init, n_integrands)  # next n for each integrand
-        self.data.n_final = tile(0, n_integrands)
+        # Construct Data Object to House Integration data
+        self.data = MeanVarDataRep(levels, replications)
+        self.data.n = tile(self.n_init, levels)
+        # Verify Compliant Construction
+        allowed_distribs = ["Lattice", "Sobol"]
+        super().__init__(discrete_distrib, allowed_distribs)
 
     def stop_yet(self):
         """ Determine when to stop """

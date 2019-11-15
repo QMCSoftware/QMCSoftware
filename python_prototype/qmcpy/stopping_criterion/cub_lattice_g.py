@@ -24,17 +24,21 @@ class CubLattice_g(StoppingCriterion):
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
         """
-        allowed_distribs = ["Sobol"]  # supported distributions
-        super().__init__(discrete_distrib, allowed_distribs, abs_tol,
-                         rel_tol, n_init, n_max)
-        self.inflate = inflate  # inflation factor
-        self.alpha = alpha  # uncertainty level
-        self.stage = "begin"
-        # Construct Data Object
-        n_integrands = len(true_measure)
-        self.data = MeanVarDataRep(n_integrands, replications)
-        # house integration data
-        self.data.n = tile(self.n_init, n_integrands)  # next n for each integrand
+        # Set Attributes
+        self.abs_tol = abs_tol
+        self.rel_tol = rel_tol
+        self.n_init = n_init
+        self.n_max = n_max
+        self.alpha = alpha
+        self.inflate = inflate
+        self.stage = "sigma"
+        # Construct Data Object to House Integration data
+        levels = len(true_measure)
+        self.data = MeanVarData(levels)
+        self.data.n = tile(self.n_init, levels).astype(float)
+        # Verify Compliant Construction
+        allowed_distribs = ["Lattice"]
+        super().__init__(discrete_distrib, allowed_distribs)
 
     def stop_yet(self):
         """ Determine when to stop """

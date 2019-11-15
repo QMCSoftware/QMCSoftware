@@ -28,17 +28,21 @@ class CLT(StoppingCriterion):
             n_init: initial number of samples
             n_max: maximum number of samples
         """
-        allowed_distribs = ["IIDStdUniform",
-                            "IIDStdGaussian"]  # supported distributions
-        super().__init__(discrete_distrib, allowed_distribs, abs_tol, rel_tol,
-                         n_init, n_max)
-        self.inflate = inflate  # inflation factor
-        self.alpha = alpha  # uncertainty level
-        self.stage = "sigma"  # compute standard deviation next
-        # Construct Data Object
-        n_integrands = len(true_measure)
-        self.data = MeanVarData(n_integrands)  # house integration data
-        self.data.n = tile(self.n_init, n_integrands).astype(float)  # next n for each integrand
+        # Set Attributes
+        self.abs_tol = abs_tol
+        self.rel_tol = rel_tol
+        self.n_init = n_init
+        self.n_max = n_max
+        self.alpha = alpha
+        self.inflate = inflate
+        self.stage = "sigma"
+        # Construct Data Object to House Integration data
+        levels = len(true_measure)
+        self.data = MeanVarData(levels)
+        self.data.n = tile(self.n_init, levels).astype(float)
+        # Verify Compliant Construction
+        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
+        super().__init__(discrete_distrib, allowed_distribs)
 
     def stop_yet(self):
         """ Determine when to stop """
