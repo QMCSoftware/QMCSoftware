@@ -2,7 +2,7 @@
 <html>
 <head><meta charset="utf-8" />
 
-<title>integrands</title>
+<title>integration_examples</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -13017,6 +13017,19 @@ ul.typeahead-list  > li > a.pull-right {
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
     </style>
+<style type="text/css">
+    /*This file contains any manual css for this page that needs to override the global styles.
+This is only required when different pages style the same element differently. This is just
+a hack to deal with our current css styles and no new styling should be added in this file.*/
+
+#ipython-main-app {
+    position: relative;
+}
+#jupyter-main-app {
+    position: relative;
+}
+
+    </style>
 
 
 <style type="text/css">
@@ -13077,11 +13090,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Suppose we want to create the an integrand in QMCPy for evaluating the following integral: 
-    $$ \int_{[0,1]^d} \|x\|_2^{\|x\|_2^{1/2}} dx,$$
-where $[0,1]^d$ is the unit hypercube in $\mathbb{R}^d$. The integrand is defined everywhere except at $x=0$ and hence the definite integal is also defined.</p>
-<p>The key in defining a Python function of an integrand in the QMCPy framework is that not only  it should be able to take one point $x \in \mathbb{R}^d$ and return a real value, but also that it would be able to take a set of $n$ sampling points as rows in a Numpy array of size $n \times d$ and return an array with $n$ values evaluated at each sampling point. The following examples illustrate this point.</p>
-
+<h1 id="Integration-Examples-using-QMCPy-package">Integration Examples using QMCPy package<a class="anchor-link" href="#Integration-Examples-using-QMCPy-package">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -13091,8 +13100,8 @@ where $[0,1]^d$ is the unit hypercube in $\mathbb{R}^d$. The integrand is define
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qmcpy</span> <span class="k">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">norm</span> <span class="k">as</span> <span class="n">norm</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">array</span>
+
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">arange</span>
 </pre></div>
 
     </div>
@@ -13103,7 +13112,18 @@ where $[0,1]^d$ is the unit hypercube in $\mathbb{R}^d$. The integrand is define
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Our first attempt maybe to create the integrand as a Python function as follows:</p>
+<h2 id="Keister-Example">Keister Example<a class="anchor-link" href="#Keister-Example">&#182;</a></h2><p>Keister Integrand:</p>
+<ul>
+<li>$y_i = \pi^{d/2} * \cos(||x_i||_2)$</li>
+</ul>
+<p>Gaussian True Measure:</p>
+<ul>
+<li>$\mathcal{N}(0,\frac{1}{2})$</li>
+</ul>
+<p>Sobol Discrete Distribution:</p>
+<ul>
+<li>$x_j \overset{lds}{\sim}    \mathcal{U}(0,1)$</li>
+</ul>
 
 </div>
 </div>
@@ -13111,523 +13131,6 @@ where $[0,1]^d$ is the unit hypercube in $\mathbb{R}^d$. The integrand is define
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>It looks reasonable except that maybe the Numpy function norm is executed twice. It's okay for now. Let us quickly test if the function behaves as expected at a point value:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.01</span>
-<span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[3]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>0.6309573444801932</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>What about an array that represents $n=3$ sampling points in a two-dimensional domain, i.e., $d=2$?</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> 
-           <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">],</span>
-           <span class="p">[</span><span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">]])</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[5]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>1.001650000560437</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Now, the function should have returned $n=3$ real values that correponding to each of the sampling points. Let's debug our Python function.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[6]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>1.0016486409914407</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Numpy's norm(x) is obviously a matrix norm, but we want it to be vector 2-norm that acts on each row of x. To that end, let's add an axis argument to the function:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[7]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([ 1.000,  0.010,  0.057])</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Now it's working! Let's make sure that the sqrt function is acting on each element of the vector norm results:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sqrt</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[8]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([ 1.000,  0.100,  0.238])</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>It is. Putting everything together, we have:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[9]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([ 1.000,  0.631,  0.505])</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We have got our proper function definition now.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="n">x_norms</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x_norms</span> <span class="o">**</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">x_norms</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We can now create an integrand instance with our QuickConstruct class in QMCPy and then invoke QMCPy's integrate function:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">custom_fun</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-<span class="n">sol</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">Uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.6593         
-QuickConstruct (Integrand Object)
-	fun_str         def f(x):
-	                   x_norms = norm(x, axis = 1)
-	                   return x_norms ** sqrt(x_norms)
-IIDStdUniform (Discrete Distribution Object)
-	mimics          StdUniform
-	rng_seed        None
-Uniform (True Measure Object)
-	dimension       1
-	a               0
-	b               1
-CLT (Stopping Criterion Object)
-	abs_tol         0.010
-	rel_tol         0
-	n_max           10000000000
-	alpha           0.010
-	inflate         1.200
-MeanVarData (AccumData Object)
-	n               3307
-	n_total         4331.0
-	confid_int      [ 0.649  0.669]
-	time_total      0.002
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>For our integral, we know the true value. Let's check if QMCPy's solution is accurate enough:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">true_sol</span> <span class="o">=</span> <span class="mf">0.658582</span>  <span class="c1"># In WolframAlpha: Integral[x**Sqrt[x], {x,0,1}]</span>
-<span class="n">abs_tol</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">stopping_criterion</span><span class="o">.</span><span class="n">abs_tol</span>
-<span class="n">qmcpy_error</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">true_sol</span> <span class="o">-</span> <span class="n">sol</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">qmcpy_error</span> <span class="o">&lt;</span> <span class="n">abs_tol</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>True
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>It's good. Shall we test the function with $d=2$ by simply changing the input parameter value of dimension for QuickConstruct?</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">integrand2</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">custom_fun</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-<span class="n">sol2</span><span class="p">,</span> <span class="n">data2</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand2</span><span class="p">,</span> <span class="n">Uniform</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">data2</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.8265         
-QuickConstruct (Integrand Object)
-	fun_str         def f(x):
-	                   x_norms = norm(x, axis = 1)
-	                   return x_norms ** sqrt(x_norms)
-IIDStdUniform (Discrete Distribution Object)
-	mimics          StdUniform
-	rng_seed        None
-Uniform (True Measure Object)
-	dimension       2
-	a               0
-	b               1
-CLT (Stopping Criterion Object)
-	abs_tol         0.010
-	rel_tol         0
-	n_max           10000000000
-	alpha           0.010
-	inflate         1.200
-MeanVarData (AccumData Object)
-	n               5407
-	n_total         6431.0
-	confid_int      [ 0.816  0.837]
-	time_total      0.001
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Once again, we could test for accuracy of QMCPy with respect to the true value:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">true_sol2</span> <span class="o">=</span> <span class="mf">0.827606</span>  <span class="c1"># In WolframAlpha: Integral[Sqrt[x**2+y**2])**Sqrt[Sqrt[x**2+y**2]], {x,0,1}, {y,0,1}]</span>
-<span class="n">abs_tol2</span> <span class="o">=</span> <span class="n">data2</span><span class="o">.</span><span class="n">stopping_criterion</span><span class="o">.</span><span class="n">abs_tol</span>
-<span class="n">qmcpy_error2</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">true_sol2</span> <span class="o">-</span> <span class="n">sol2</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">qmcpy_error2</span> <span class="o">&lt;</span> <span class="n">abs_tol2</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>True
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Keister-Example">Keister Example<a class="anchor-link" href="#Keister-Example">&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">integrand</span> <span class="o">=</span> <span class="n">Keister</span><span class="p">()</span>
@@ -13671,7 +13174,7 @@ MeanVarDataRep (AccumData Object)
 	n               32
 	n_total         32
 	confid_int      [ 2.126  2.169]
-	time_total      0.005
+	time_total      0.009
 	r               16
 
 </pre>
@@ -13685,22 +13188,39 @@ MeanVarDataRep (AccumData Object)
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Asian-Option-Pricing-Example">Asian Option Pricing Example<a class="anchor-link" href="#Asian-Option-Pricing-Example">&#182;</a></h2>
+<h2 id="Asian-Option-Pricing-Example">Asian Option Pricing Example<a class="anchor-link" href="#Asian-Option-Pricing-Example">&#182;</a></h2><h3 id="Single-Level">Single Level<a class="anchor-link" href="#Single-Level">&#182;</a></h3><p>Asian Call Option Integrand</p>
+<ul>
+<li>$S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}$</li>
+<li>discounted put payoff $= max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)$</li>
+</ul>
+<p>Brownian Motion True Measure:</p>
+<ul>
+<li>$\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;$ for $\;Z_j \sim \mathcal{N}(0,1)$</li>
+</ul>
+<p>Lattice Discrete Distribution:</p>
+<ul>
+<li>$\:\: x_j  \overset{lds}{\sim}    \mathcal{U}(0,1)$</li>
+</ul>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Singl-Level</span>
-<span class="n">time_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">65</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">)]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">time_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">65</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">)]</span>
 <span class="n">dim</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tv</span><span class="p">)</span> <span class="k">for</span> <span class="n">tv</span> <span class="ow">in</span> <span class="n">time_vec</span><span class="p">]</span>
 
 <span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">(</span><span class="n">rng_seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="n">true_measure</span> <span class="o">=</span> <span class="n">BrownianMotion</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">time_vector</span><span class="o">=</span><span class="n">time_vec</span><span class="p">)</span>
-<span class="n">integrand</span> <span class="o">=</span> <span class="n">AsianCall</span><span class="p">(</span><span class="n">true_measure</span><span class="p">)</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">AsianCall</span><span class="p">(</span><span class="n">true_measure</span><span class="p">,</span>
+                <span class="n">volatility</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>
+                <span class="n">start_price</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+                <span class="n">strike_price</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+                <span class="n">interest_rate</span> <span class="o">=</span> <span class="o">.</span><span class="mi">01</span><span class="p">,</span>
+                <span class="n">mean_type</span> <span class="o">=</span> <span class="s1">&#39;geometric&#39;</span><span class="p">)</span>
 <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=.</span><span class="mi">05</span><span class="p">)</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -13720,13 +13240,13 @@ MeanVarDataRep (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 6.2021         
+<pre>Solution: 5.8356         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
 	strike_price    25
-	interest_rate   0
-	mean_type       arithmetic
+	interest_rate   0.010
+	mean_type       geometric
 	exercise_time   1.0
 Lattice (Discrete Distribution Object)
 	mimics          StdUniform
@@ -13743,8 +13263,8 @@ CLTRep (Stopping Criterion Object)
 MeanVarDataRep (AccumData Object)
 	n               2048
 	n_total         2048
-	confid_int      [ 6.200  6.204]
-	time_total      0.375
+	confid_int      [ 5.833  5.838]
+	time_total      0.583
 	r               16
 
 </pre>
@@ -13755,13 +13275,24 @@ MeanVarDataRep (AccumData Object)
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Asian-Option-Pricing-Example">Asian Option Pricing Example<a class="anchor-link" href="#Asian-Option-Pricing-Example">&#182;</a></h2><h3 id="Multi-Level">Multi-Level<a class="anchor-link" href="#Multi-Level">&#182;</a></h3><p>$Y_0 = 0$</p>
+<p>$Y_1$ = Asian Option Monitored at $t=[\frac{1}{4}, \frac{1}{2}, \frac{3}{4}, 1]$</p>
+<p>$Y_2$ = Asian Option Monitored at $t=[\frac{1}{16}, \frac{1}{8}, ... , 1]$</p>
+<p>$Y_3$ = Asian Option Monitored at $t=[\frac{1}{64}, \frac{1}{32}, ... , 1]$</p>
+<p>$Z_1 = \mathbb{E}[Y_1-Y_0] + \mathbb{E}[Y_2-Y_1] + \mathbb{E}[Y_3-Y_2] = \mathbb{E}[Y_3]$</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Multi-Level</span>
-<span class="n">time_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">time_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span>
                  <span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span> <span class="o">/</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">),</span>
                  <span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">65</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">)]</span>
 <span class="n">dim</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tv</span><span class="p">)</span> <span class="k">for</span> <span class="n">tv</span> <span class="ow">in</span> <span class="n">time_vec</span><span class="p">]</span>
@@ -13793,7 +13324,7 @@ MeanVarDataRep (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 5.8388         
+<pre>Solution: 5.8309         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -13816,10 +13347,10 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               [ 253336.000  28958.000  5302.000]
-	n_total         290668.0
-	confid_int      [ 5.790  5.888]
-	time_total      0.107
+	n               [ 254414.000  29903.000  4769.000]
+	n_total         292158.0
+	confid_int      [ 5.782  5.880]
+	time_total      0.175
 
 </pre>
 </div>

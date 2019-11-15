@@ -24,7 +24,7 @@ do
   echo "Processing $f file..."
   jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV $f
 done
-DIR=../html_from_demos
+DIR=../demos/html_renders
 rm -f $DIR/*
 mv *.html $DIR
 cd .. # to python_prototype
