@@ -1,9 +1,9 @@
 """ Definition for class AsianCall, a concrete implementation of Integrand """
 
-from numpy import exp, maximum, log
-
 from ._integrand import Integrand
 from .._util import ParameterError
+
+from numpy import exp, maximum, log
 
 
 class AsianCall(Integrand):

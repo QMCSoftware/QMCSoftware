@@ -1,9 +1,9 @@
 """ Definition for class QuickConstruct, a concrete implementation of Integrand """
 
+from ._integrand import Integrand
+
 import inspect
 import numpy as np
-
-from ._integrand import Integrand
 
 
 class QuickConstruct(Integrand):

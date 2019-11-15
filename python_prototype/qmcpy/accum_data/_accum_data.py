@@ -1,11 +1,10 @@
 """ Definition for abstract class AccumData """
 
+from .._util import univ_repr, ParameterError
+
 from abc import ABC, abstractmethod
 from math import inf, nan
-
 from numpy import array
-
-from .._util import univ_repr, ParameterError
 
 
 class AccumData(ABC):

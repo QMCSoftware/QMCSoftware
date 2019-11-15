@@ -1,14 +1,12 @@
 """ Sobol sequence generator """
 
+from ..third_party.magic_point_shop import digitalseq_b2g
+
 from os import path
 import sys
 import mpmath
 import pandas as pd
 
-from ..third_party.magic_point_shop import digitalseq_b2g
-
-
-# sys.path.append(os.path.abspath("../"))
 
 def bitreverse(a, m=None):
     """

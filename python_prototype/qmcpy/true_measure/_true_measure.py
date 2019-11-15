@@ -1,10 +1,10 @@
 """ Abstract Class TrueMeasure """
 
+from .._util import DimensionError, TransformError, univ_repr, ParameterError
+
 from abc import ABC
 from numpy import array, int64, ndarray
 from copy import deepcopy
-
-from .._util import DimensionError, TransformError, univ_repr, ParameterError
 
 
 class TrueMeasure(ABC):

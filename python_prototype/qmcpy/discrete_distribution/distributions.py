@@ -1,11 +1,11 @@
 """ This module implements mutiple subclasses of DiscreteDistribution. """
 
-from numpy import array, int64, log, random, zeros
-from numpy.random import Generator, PCG64
-
 from ._discrete_distribution import DiscreteDistribution
 from ..third_party.magic_point_shop import LatticeSeq
 from .digital_seq import DigitalSeq
+
+from numpy import array, int64, log, random, zeros
+from numpy.random import Generator, PCG64
 
 
 class IIDStdUniform(DiscreteDistribution):

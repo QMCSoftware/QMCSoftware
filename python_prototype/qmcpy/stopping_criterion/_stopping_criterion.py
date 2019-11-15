@@ -1,9 +1,9 @@
 """ Definition for abstract class StoppingCriterion """
 
+from .._util import DistributionCompatibilityError, univ_repr, ParameterError
+
 from abc import ABC, abstractmethod
 from numpy import floor
-
-from .._util import DistributionCompatibilityError, univ_repr, ParameterError
 
 
 class StoppingCriterion(ABC):

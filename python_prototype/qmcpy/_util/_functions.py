@@ -1,7 +1,9 @@
 """ Utility functions. Not meant for public use """
-import numpy as np
-np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=3)
 
+from numpy import array, ndarray
+import numpy as np
+
+np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=3)
 
 def univ_repr(qmc_object, abc_class_name, attributes):
     """Clean way to represent qmc_object data.
@@ -33,8 +35,8 @@ def univ_repr(qmc_object, abc_class_name, attributes):
         if type(val) == list and len(val) == 1:
             val = val[0]
         elif type(val) == list:
-            val = np.array(val)
-        elif type(val) == np.ndarray:
+            val = array(val)
+        elif type(val) == ndarray:
             if val.shape == (1,):
                 val = val[0].item()
             elif val.shape == ():

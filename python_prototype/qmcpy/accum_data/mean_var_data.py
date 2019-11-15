@@ -2,8 +2,8 @@
 
 from ._accum_data import AccumData
 
-from time import *
-from numpy import *
+from time import process_time
+from numpy import nan, full, zeros, tile, array
 
 EPS = finfo(float32).eps
 

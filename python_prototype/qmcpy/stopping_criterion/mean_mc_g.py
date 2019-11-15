@@ -1,14 +1,14 @@
 """ Definition for MeanMC_g, a concrete implementation of StoppingCriterion """
 
+from ._stopping_criterion import StoppingCriterion
+from .._util import NotYetImplemented, MaxSamplesWarning
+from ..accum_data import MeanVarData
+
 from time import time
 from numpy import array, zeros, tile, minimum, exp, sqrt, ceil, log, floor
 from scipy.stats import norm
 from scipy.optimize import fsolve
 import warnings
-
-from ._stopping_criterion import StoppingCriterion
-from .._util import NotYetImplemented, MaxSamplesWarning
-from ..accum_data import MeanVarData
 
 
 class MeanMC_g(StoppingCriterion):

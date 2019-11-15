@@ -1,12 +1,12 @@
 """ Main driver function for QMCPy. """
 
-import copy
-from time import time
-
 from .discrete_distribution import IIDStdUniform
 from .integrand.linear import Linear
 from .stopping_criterion import CLT
 from .true_measure import Uniform
+
+import copy
+from time import time
 
 
 def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion=None):

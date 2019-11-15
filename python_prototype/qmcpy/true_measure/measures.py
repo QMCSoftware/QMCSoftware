@@ -1,9 +1,9 @@
 """ Definitions of TrueMeasure Concrete Classes """
 
+from ._true_measure import TrueMeasure
+
 from numpy import arange, cumsum, diff, insert, sqrt
 from scipy.stats import norm
-
-from ._true_measure import TrueMeasure
 
 
 class Uniform(TrueMeasure):

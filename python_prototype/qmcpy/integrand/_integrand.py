@@ -1,8 +1,8 @@
 """ Definition for abstract class, ``Integrand`` """
 
-from abc import ABC, abstractmethod
-
 from .._util import univ_repr, TransformError
+
+from abc import ABC, abstractmethod
 
 
 class Integrand(ABC):
