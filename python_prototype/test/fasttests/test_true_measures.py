@@ -1,10 +1,9 @@
-"""
-Unit tests for subclasses of TrueMeasures in QMCPy.
-"""
-import unittest
+""" Unit tests for subclasses of TrueMeasures in QMCPy """
 
 from qmcpy import *
 from qmcpy._util import *
+
+import unittest
 
 
 class TestTrueDistributionConstruction(unittest.TestCase):

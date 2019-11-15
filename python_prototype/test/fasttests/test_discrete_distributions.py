@@ -1,10 +1,9 @@
-"""
-Unit tests for discrete distributions in QMCPy.
-"""
-import unittest
-from numpy import array, int64, log, ndarray, zeros
+""" Unit tests for discrete distributions in QMCPy """
 
 from qmcpy import *
+
+import unittest
+from numpy import array, int64, log, ndarray, zeros
 
 
 class TestIIDStdUniform(unittest.TestCase):

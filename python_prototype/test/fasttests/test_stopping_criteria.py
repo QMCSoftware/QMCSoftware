@@ -1,11 +1,10 @@
-"""
-Unit tests for subclasses of StoppingCriterion in QMCPy.
-"""
-import unittest
-import warnings
+""" Unit tests for subclasses of StoppingCriterion in QMCPy """
 
 from qmcpy import *
 from qmcpy._util import *
+
+import unittest
+import warnings
 
 tv_single_level = [arange(1 / 64, 65 / 64, 1 / 64)]
 dim_single_level = [len(tv) for tv in tv_single_level]
