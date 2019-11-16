@@ -6,7 +6,22 @@ from ..accum_data import MeanVarDataRep
 
 
 class CubLattice_g(StoppingCriterion):
-    """ Stopping criterion for Lattice sequence with garunteed accuracy """
+    """
+    Stopping criterion for Lattice sequence with garunteed accuracy
+    
+    Guarantee
+        This algorithm computes the integral of real valued functions in [0,1]^d
+        with a prescribed generalized error tolerance. The Fourier coefficients
+        of the integrand are assumed to be absolutely convergent. If the
+        algorithm terminates without warning messages, the output is given with
+        guarantees under the assumption that the integrand lies inside a cone of
+        functions. The guarantee is based on the decay rate of the Fourier
+        coefficients. For integration over domains other than [0,1]^d, this cone
+        condition applies to f \circ \psi (the composition of the
+        functions) where \psi is the transformation function for [0,1]^d to
+        the desired region. For more details on how the cone is defined, please
+        refer to the references below.
+    """
 
     def __init__(self, discrete_distrib, true_measure,
                  replications=16, inflate=1.2, alpha=0.01,

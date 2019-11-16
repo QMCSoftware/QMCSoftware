@@ -14,6 +14,7 @@ import warnings
 class MeanMC_g(StoppingCriterion):
     """
     Stopping Criterion with garunteed accuracy
+    
     Guarantee
         This algorithm attempts to calculate the mean, mu, of a random variable
         to a prescribed error tolerance, tolfun:= max(abstol,reltol*|mu|), with
