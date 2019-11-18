@@ -77,16 +77,16 @@ class AsianCall(Integrand):
         dimension (int): number of dimensions
         """
         if self.mean_type == 'arithmetic':
-            avg = (self.start_price/2 + \
-                    stock_path[:,:-1].sum(1) + \
-                    stock_path[:,-1]/2) / \
-                    dimension
+            avg = (self.start_price / 2 +
+                   stock_path[:, :-1].sum(1) +
+                   stock_path[:, -1] / 2) / \
+                dimension
         elif self.mean_type == 'geometric':
-            avg = exp((log(self.start_price)/2 + \
-                    log(stock_path[:,:-1]).sum(1) + \
-                    log(stock_path[:,-1])/2) / \
+            avg = exp((log(self.start_price) / 2 +
+                    log(stock_path[:, :-1]).sum(1) +
+                    log(stock_path[:, -1]) / 2) /
                     dimension)
-        y = maximum(avg - self.strike_price, 0) * exp(-self.interest_rate*self.exercise_time)
+        y = maximum(avg - self.strike_price, 0) * exp(-self.interest_rate * self.exercise_time)
         return y
 
     def __repr__(self, attributes=[]):

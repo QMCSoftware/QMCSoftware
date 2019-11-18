@@ -9,7 +9,7 @@ from numpy import floor
 class StoppingCriterion(ABC):
     """
     Decide when to stopping_criterion
-    
+
     Attributes:
         abs_tol: absolute error tolerance
         rel_tol: relative error tolerance
@@ -33,17 +33,17 @@ class StoppingCriterion(ABC):
             raise DistributionCompatibilityError(error_message)
         prefix = 'A concrete implementation of Stopping Criterion must have '
         if not hasattr(self, 'abs_tol'):
-            raise ParameterError(prefix+'self.abs_tol (absolute tolerance)')
+            raise ParameterError(prefix + 'self.abs_tol (absolute tolerance)')
         if not hasattr(self, 'rel_tol'):
-            raise ParameterError(prefix+'self.rel_tol (relative tolerance)')
+            raise ParameterError(prefix + 'self.rel_tol (relative tolerance)')
         if not hasattr(self, 'n_max'):
-            raise ParameterError(prefix+'self.n_max (maximum total samples)')
+            raise ParameterError(prefix + 'self.n_max (maximum total samples)')
         if not hasattr(self, 'alpha'):
-            raise ParameterError(prefix+'self.alpha (uncertainty level)')
+            raise ParameterError(prefix + 'self.alpha (uncertainty level)')
         if not hasattr(self, 'inflate'):
-            raise ParameterError(prefix+'self.inflate (inflation factor)')
+            raise ParameterError(prefix + 'self.inflate (inflation factor)')
         if not hasattr(self, 'stage'):
-            raise ParameterError(prefix+'self.stage (stage of the computation)')
+            raise ParameterError(prefix + 'self.stage (stage of the computation)')
 
     @abstractmethod
     def stop_yet(self):
