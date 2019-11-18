@@ -21,11 +21,11 @@ class TrueMeasure(ABC):
         """
         prefix = 'A concrete implementation of TrueMeasure must have '
         if not hasattr(self, 'transforms'):
-            raise ParameterError(prefix+'self.transforms')
+            raise ParameterError(prefix + 'self.transforms')
         super().__init__()
         self.dimension = dimension
         for key, val in kwargs.items():
-                setattr(self, key, array(val))
+            setattr(self, key, array(val))
         if not dimension:  # construcing a sub-measure
             return
         # Type check dimension
@@ -179,7 +179,7 @@ class TrueMeasure(ABC):
 
         Args: 
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """

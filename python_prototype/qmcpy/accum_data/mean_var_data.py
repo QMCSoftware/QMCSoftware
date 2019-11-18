@@ -23,12 +23,12 @@ class MeanVarData(AccumData):
             n_init (int): initial number of samples
         """
         self.solution = nan
-        self.muhat = full(levels, inf) # sample mean
-        self.sighat = full(levels, inf) # sample standard deviation
-        self.t_eval = zeros(levels) # processing time for each integrand
-        self.n = tile(n_init, levels).astype(float) # currnet number of samples
-        self.n_total = 0 # total number of samples
-        self.confid_int = array([-inf, inf]) # confidence interval for solution
+        self.muhat = full(levels, inf)  # sample mean
+        self.sighat = full(levels, inf)  # sample standard deviation
+        self.t_eval = zeros(levels)  # processing time for each integrand
+        self.n = tile(n_init, levels).astype(float)  # currnet number of samples
+        self.n_total = 0  # total number of samples
+        self.confid_int = array([-inf, inf])  # confidence interval for solution
         super().__init__()
 
     def update_data(self, integrand, true_measure):

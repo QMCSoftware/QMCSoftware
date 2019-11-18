@@ -5,6 +5,7 @@ import numpy as np
 
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=3)
 
+
 def univ_repr(qmc_object, abc_class_name, attributes):
     """Clean way to represent qmc_object data.
 
@@ -42,11 +43,11 @@ def univ_repr(qmc_object, abc_class_name, attributes):
             elif val.shape == ():
                 val = val.item()
         # printing options
-        if type(val) == int or (type(val) == float and val%1 == 0):
-            string_temp = '\t%-15s %d' % (key,int(val))
+        if type(val) == int or (type(val) == float and val % 1 == 0):
+            string_temp = '\t%-15s %d' % (key, int(val))
         elif type(val) == float:
-            string_temp = '\t%-15s %0.3f' % (key,val)
+            string_temp = '\t%-15s %0.3f' % (key, val)
         else:
-            string_temp = '\t%-15s %s' % (key,val)
-        string += string_temp.replace('\n','\n\t%-15s'%' ')+'\n'
+            string_temp = '\t%-15s %s' % (key, val)
+        string += string_temp.replace('\n', '\n\t%-15s' % ' ') + '\n'
     return string

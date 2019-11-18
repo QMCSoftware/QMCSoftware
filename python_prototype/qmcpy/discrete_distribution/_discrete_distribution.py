@@ -8,14 +8,14 @@ from abc import ABC, abstractmethod
 class DiscreteDistribution(ABC):
     """
     Discrete Distribution from which we can generate samples
-    
+
     Attributes:
         mimics (string): True Measure mimiced by the Discrete Distribution
     """
 
     def __init__(self):
         """ Initialize Discrete Distributuion instance """
-        prefix = 'A concrete implementation of DiscreteDistribution must have ' 
+        prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
 
