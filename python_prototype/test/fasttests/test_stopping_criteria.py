@@ -29,7 +29,7 @@ class TestClt(unittest.TestCase):
         true_measure = BrownianMotion(dim_single_level, time_vector=tv_single_level)
         integrand = AsianCall(true_measure)
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.1, n_init=64, n_max=1000)
-        self.assertWarns(MaxSamplesWarning, integrate, \
+        self.assertWarns(MaxSamplesWarning, integrate,
             integrand, true_measure, discrete_distrib, stopping_criterion)
 
     def test_n_max_multi_level(self):
@@ -37,8 +37,9 @@ class TestClt(unittest.TestCase):
         true_measure = BrownianMotion(dim_multi_level, time_vector=tv_multi_level)
         integrand = AsianCall(true_measure)
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.1, n_init=64, n_max=1000)
-        self.assertWarns(MaxSamplesWarning, integrate, \
+        self.assertWarns(MaxSamplesWarning, integrate,
             integrand, true_measure, discrete_distrib, stopping_criterion)
+
 
 class TestCltRep(unittest.TestCase):
     """
@@ -57,8 +58,9 @@ class TestCltRep(unittest.TestCase):
         true_measure = BrownianMotion(dim_single_level, time_vector=tv_single_level)
         integrand = AsianCall(true_measure)
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=.1, n_init=32, n_max=100)
-        self.assertWarns(MaxSamplesWarning, integrate, \
+        self.assertWarns(MaxSamplesWarning, integrate,
             integrand, true_measure, discrete_distrib, stopping_criterion)
+
 
 class TestMeanMC_g(unittest.TestCase):
     """
@@ -68,14 +70,15 @@ class TestMeanMC_g(unittest.TestCase):
     def test_raise_distribution_compatibility_error(self):
         self.assertRaises(DistributionCompatibilityError, CLT, Lattice(),
                           Gaussian(3))
-    
+
     def test_n_max_single_level(self):
         discrete_distrib = IIDStdUniform(rng_seed=7)
         true_measure = BrownianMotion(dim_single_level, time_vector=tv_single_level)
         integrand = AsianCall(true_measure)
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.1, n_init=64, n_max=1000)
-        self.assertWarns(MaxSamplesWarning, integrate, \
+        self.assertWarns(MaxSamplesWarning, integrate,
             integrand, true_measure, discrete_distrib, stopping_criterion)
+
 
 if __name__ == "__main__":
     unittest.main()

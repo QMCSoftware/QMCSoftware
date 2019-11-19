@@ -24,13 +24,13 @@ class AccumData(ABC):
         super().__init__()
         prefix = 'A concrete implementation of AccumData must have '
         if not hasattr(self, 'solution'):
-           raise ParameterError(prefix + 'self.solution')
+            raise ParameterError(prefix + 'self.solution')
         if not hasattr(self, 'n'):
-           raise ParameterError(prefix + 'self.n (current number of samples at each level)')
+            raise ParameterError(prefix + 'self.n (current number of samples at each level)')
         if not hasattr(self, 'n_total'):
-           raise ParameterError(prefix + 'self.n_total (total number of samples)')
+            raise ParameterError(prefix + 'self.n_total (total number of samples)')
         if not hasattr(self, 'confid_int'):
-           raise ParameterError(prefix + 'self.confid_int (confidence interval for the solution)')   
+            raise ParameterError(prefix + 'self.confid_int (confidence interval for the solution)')
 
     @abstractmethod
     def update_data(self, integrand, true_measure):
