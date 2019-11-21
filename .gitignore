@@ -1,7 +1,6 @@
-.DS_Store
-.idea/
-docs/_site
-docs/Gemfile.lock
+# General Python
+python_prototype/__pycache__/
+qmcpy.egg-info/
 *.blg
 *.idx
 *.bcf
@@ -10,14 +9,21 @@ docs/Gemfile.lock
 *.out
 *.pyc
 *.vrb
-python_prototype/.ipynb_checkpoints/
-python_prototype/build/
-python_prototype/.vscode/
-qmcpy.egg-info/
-python_prototype/workouts/Outputs/*.png
-python_prototype/__pycache__/
+.DS_Store
+.idea/
+
+# Website
+docs/_site
+docs/Gemfile.lock
+
+# Sphinx
 python_prototype/sphinx/_build/
 python_prototype/sphinx/_static/
+
+# Jupyter Notebooks
+*checkpoint.ipynb
+python_prototype/demos/html_renders/nei_demo.html
+
+# alegresor
 *.vscode
 *ToDo.md
-*checkpoint.ipynb

@@ -13180,6 +13180,19 @@ ul.typeahead-list  > li > a.pull-right {
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
     </style>
+<style type="text/css">
+    /*This file contains any manual css for this page that needs to override the global styles.
+This is only required when different pages style the same element differently. This is just
+a hack to deal with our current css styles and no new styling should be added in this file.*/
+
+#ipython-main-app {
+    position: relative;
+}
+#jupyter-main-app {
+    position: relative;
+}
+
+    </style>
 
 
 <style type="text/css">
@@ -13324,7 +13337,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">(</span><span class="n">rng_seed</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">discrete_distrib</span><span class="o">.</span><span class="n">gen_dd_samples</span><span class="p">(</span><span class="n">replications</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 <span class="n">x</span>
 </pre></div>
@@ -13345,10 +13358,10 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([[ 0.464,  0.759],
-       [ 0.964,  0.259],
-       [ 0.714,  0.509],
-       [ 0.214,  0.009]])</pre>
+<pre>array([[ 0.625,  0.897],
+       [ 0.125,  0.397],
+       [ 0.875,  0.647],
+       [ 0.375,  0.147]])</pre>
 </div>
 
 </div>
@@ -13709,7 +13722,7 @@ The integrand is defined everywhere except at $x=0$ and hence the definite integ
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.6626         
+<pre>Solution: 0.6595         
 QuickConstruct (Integrand Object)
 	fun_str         def f(x):
 	                   x_norms = norm(x, axis = 1)
@@ -13727,10 +13740,10 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               3446
-	n_total         4470.0
-	confid_int      [ 0.653  0.672]
-	time_total      0.002
+	n               3298
+	n_total         4322.0
+	confid_int      [ 0.649  0.670]
+	time_total      0.001
 
 </pre>
 </div>
@@ -13822,7 +13835,7 @@ MeanVarData (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.8233         
+<pre>Solution: 0.8278         
 QuickConstruct (Integrand Object)
 	fun_str         def f(x):
 	                   x_norms = norm(x, axis = 1)
@@ -13840,10 +13853,10 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               5470
-	n_total         6494.0
-	confid_int      [ 0.813  0.833]
-	time_total      0.001
+	n               5594
+	n_total         6618.0
+	confid_int      [ 0.818  0.838]
+	time_total      0.002
 
 </pre>
 </div>
@@ -26938,6 +26951,19 @@ ul.typeahead-list  > li > a.pull-right {
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
     </style>
+<style type="text/css">
+    /*This file contains any manual css for this page that needs to override the global styles.
+This is only required when different pages style the same element differently. This is just
+a hack to deal with our current css styles and no new styling should be added in this file.*/
+
+#ipython-main-app {
+    position: relative;
+}
+#jupyter-main-app {
+    position: relative;
+}
+
+    </style>
 
 
 <style type="text/css">
@@ -27082,7 +27108,7 @@ MeanVarDataRep (AccumData Object)
 	n               32
 	n_total         32.0
 	confid_int      [ 2.126  2.169]
-	time_total      0.006
+	time_total      0.009
 
 </pre>
 </div>
@@ -27171,7 +27197,7 @@ MeanVarDataRep (AccumData Object)
 	n               2048
 	n_total         2048.0
 	confid_int      [ 5.833  5.838]
-	time_total      0.410
+	time_total      0.655
 
 </pre>
 </div>
@@ -27230,7 +27256,7 @@ MeanVarDataRep (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 5.8351         
+<pre>Solution: 5.8346         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -27252,10 +27278,10 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               [ 259813.000  26185.000  4871.000]
-	n_total         293941.0
-	confid_int      [ 5.786  5.884]
-	time_total      0.109
+	n               [ 259245.000  27984.000  4427.000]
+	n_total         294728.0
+	confid_int      [ 5.786  5.883]
+	time_total      0.174
 
 </pre>
 </div>
@@ -40307,6 +40333,19 @@ ul.typeahead-list  > li > a.pull-right {
 .highlight .vi { color: #19177C } /* Name.Variable.Instance */
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+<style type="text/css">
+    /*This file contains any manual css for this page that needs to override the global styles.
+This is only required when different pages style the same element differently. This is just
+a hack to deal with our current css styles and no new styling should be added in this file.*/
+
+#ipython-main-app {
+    position: relative;
+}
+#jupyter-main-app {
+    position: relative;
+}
+
     </style>
 
 
@@ -53955,6 +53994,19 @@ ul.typeahead-list  > li > a.pull-right {
 .highlight .vi { color: #19177C } /* Name.Variable.Instance */
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+<style type="text/css">
+    /*This file contains any manual css for this page that needs to override the global styles.
+This is only required when different pages style the same element differently. This is just
+a hack to deal with our current css styles and no new styling should be added in this file.*/
+
+#ipython-main-app {
+    position: relative;
+}
+#jupyter-main-app {
+    position: relative;
+}
+
     </style>
 
 

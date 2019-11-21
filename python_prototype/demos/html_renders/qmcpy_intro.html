@@ -13174,7 +13174,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">(</span><span class="n">rng_seed</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">discrete_distrib</span><span class="o">.</span><span class="n">gen_dd_samples</span><span class="p">(</span><span class="n">replications</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 <span class="n">x</span>
 </pre></div>
@@ -13195,10 +13195,10 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([[ 0.003,  0.995],
-       [ 0.503,  0.495],
-       [ 0.253,  0.745],
-       [ 0.753,  0.245]])</pre>
+<pre>array([[ 0.625,  0.897],
+       [ 0.125,  0.397],
+       [ 0.875,  0.647],
+       [ 0.375,  0.147]])</pre>
 </div>
 
 </div>
@@ -13559,7 +13559,7 @@ The integrand is defined everywhere except at $x=0$ and hence the definite integ
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.6626         
+<pre>Solution: 0.6595         
 QuickConstruct (Integrand Object)
 	fun_str         def f(x):
 	                   x_norms = norm(x, axis = 1)
@@ -13577,9 +13577,9 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               3241
-	n_total         4265.0
-	confid_int      [ 0.652  0.673]
+	n               3298
+	n_total         4322.0
+	confid_int      [ 0.649  0.670]
 	time_total      0.001
 
 </pre>
@@ -13672,7 +13672,7 @@ MeanVarData (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.8244         
+<pre>Solution: 0.8278         
 QuickConstruct (Integrand Object)
 	fun_str         def f(x):
 	                   x_norms = norm(x, axis = 1)
@@ -13690,9 +13690,9 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 	inflate         1.200
 MeanVarData (AccumData Object)
-	n               5707
-	n_total         6731.0
-	confid_int      [ 0.815  0.834]
+	n               5594
+	n_total         6618.0
+	confid_int      [ 0.818  0.838]
 	time_total      0.002
 
 </pre>
