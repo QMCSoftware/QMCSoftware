@@ -39,4 +39,4 @@ make clean;
 make html
 
 
-rm -fr ../../docs; mkdir ../../docs; cp -a _build/html/ ../../docs;
+rm -fr ../../docs; mkdir ../../docs; cp -a _build/html/. ../../docs;
