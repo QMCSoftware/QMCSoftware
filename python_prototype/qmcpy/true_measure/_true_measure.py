@@ -1,11 +1,10 @@
 """ Abstract Class TrueMeasure """
 
-from .._util import DimensionError, TransformError, univ_repr, ParameterError
+from .._util import DimensionError, TransformError, ParameterError
+from .._util import univ_repr, multilevel_constructor
 
 from abc import ABC
-from numpy import array, int64, ndarray
 from copy import deepcopy
-
 
 class TrueMeasure(ABC):
     """ The True Measure of the Integrand """
@@ -23,38 +22,9 @@ class TrueMeasure(ABC):
         if not hasattr(self, 'transforms'):
             raise ParameterError(prefix + 'self.transforms')
         super().__init__()
-        self.dimension = dimension
-        for key, val in kwargs.items():
-            setattr(self, key, array(val))
-        if not dimension:  # construcing a sub-measure
-            return
-        # Type check dimension
-        if isinstance(self.dimension, int):  # int -> ndarray
-            self.dimension = array([self.dimension])
-        if all(isinstance(i, int) or isinstance(i, int64)
-               and i > 0 for i in self.dimension):  # all positive integers
-            self.dimension = array(self.dimension)
-        else:
-            raise DimensionError(
-                "dimension must be an numpy.ndarray/list of positive integers")
-        # Type check measureData
-        for key, val in kwargs.items():
-            if not isinstance(kwargs[key], (list, ndarray)):
-                # put single value into ndarray
-                kwargs[key] = [kwargs[key]]
-            if len(kwargs[key]) == 1 and len(self.dimension) != 1:
-                # copy single-value to all levels
-                kwargs[key] = kwargs[key] * len(self.dimension)
-            if len(kwargs[key]) != len(self.dimension):
-                raise DimensionError(
-                    key + " must be a numpy.ndarray (or list) of len(dimension)")
-        self.measures = [type(self)(None) for i in range(len(self.dimension))]
-        # Create list of measures with proper dimensions and keyword arguments
-        for i, _ in enumerate(self):
-            self[i].dimension = self.dimension[i]
-            for key, val in kwargs.items():
-                setattr(self[i], key, array(val[i]))
-            self[i].transforms = self.transforms
+        if not dimension: return # constructing child
+        measures = multilevel_constructor(self, dimension, **kwargs)
+        self.measures = measures
 
     def set_tm_gen(self, discrete_distrib):
         """

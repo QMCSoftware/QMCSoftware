@@ -112,12 +112,10 @@ class BrownianMotion(TrueMeasure):
         """
         return super().__repr__(['time_vector'])
 
-class Lebesgue(TrueMeasure):
-    """ Lebesgue Measure """
+class Lebesgue_Uniform(TrueMeasure):
+    """ Lebesgue Uniform Measure """
 
-    def __init__(self, dimension,
-                 uniform_lower_bound=0., uniform_upper_bound=1.,  # for Uniform
-                 gaussian_mean=0, gaussian_variance=1):  # for Gaussian
+    def __init__(self, dimension, lower_bound=0., upper_bound=1):
         """
         Args:
             dimension (ndarray): dimension's' of the integrand's'
@@ -128,9 +126,7 @@ class Lebesgue(TrueMeasure):
                     # stretch samples
                 lambda self, g: g * (self.b - self.a).prod()]  # multiply dimensional difference
             }
-        super().__init__(dimension,
-                         a=uniform_lower_bound, b=uniform_upper_bound,
-                         mu=gaussian_mean, sigma=sqrt(gaussian_variance))
+        super().__init__(dimension,a=lower_bound, b=upper_bound)
     
     def __repr__(self, attributes=[]):
         """
@@ -142,4 +138,4 @@ class Lebesgue(TrueMeasure):
         Returns:
             string of self info
         """
-        return super().__repr__(['a', 'b', 'mu', 'sigma'])
+        return super().__repr__(['a', 'b'])
