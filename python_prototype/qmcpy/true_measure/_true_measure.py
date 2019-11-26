@@ -153,5 +153,5 @@ class TrueMeasure(ABC):
         Returns:
             string of self info
         """
-        attributes = set(attributes + ['dimension'])
-        return univ_repr(self, "True Measure", attributes)
+        super_attributes = ['dimension']
+        return univ_repr(self, "True Measure", super_attributes+attributes)

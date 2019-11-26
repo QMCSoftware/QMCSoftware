@@ -15,7 +15,7 @@ def univ_repr(qmc_object, abc_class_name, attributes):
 
         print(qmc_object)
 
-    is equivalent to ::
+    is equivalent to ::tes)
 
         print(qmc_object.__repr__())
 
@@ -28,12 +28,14 @@ def univ_repr(qmc_object, abc_class_name, attributes):
         str
 
     """
+    unique_attributes = []
+    for attrib in attributes:
+        if attrib not in unique_attributes:
+            unique_attributes += [attrib]
     obj_dict = qmc_object.__dict__
     string = "%s (%s Object)\n" % (type(qmc_object).__name__, abc_class_name)
-    for key, val in obj_dict.items():
-        if key not in attributes:
-            # don't care about this attribute
-            continue
+    for key in unique_attributes:
+        val = getattr(qmc_object, key)
         # list of one value becomes just that value
         if type(val) == list and len(val) == 1:
             val = val[0]

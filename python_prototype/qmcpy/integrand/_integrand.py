@@ -101,4 +101,4 @@ class Integrand(ABC):
         Returns:
             string of self info
         """
-        return univ_repr(self[0], "Integrand", set(attributes))
+        return univ_repr(self[0], "Integrand", attributes)
