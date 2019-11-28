@@ -13540,8 +13540,9 @@ The integrand is defined everywhere except at $x=0$ and hence the definite integ
 <div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">custom_fun</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-<span class="n">sol</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">Uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">custom_fun</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+<span class="n">sol</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">Uniform</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 
@@ -13559,11 +13560,8 @@ The integrand is defined everywhere except at $x=0$ and hence the definite integ
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.6595         
+<pre>Solution: 0.6572         
 QuickConstruct (Integrand Object)
-	fun_str         def f(x):
-	                   x_norms = norm(x, axis = 1)
-	                   return x_norms ** sqrt(x_norms)
 IIDStdUniform (Discrete Distribution Object)
 	mimics          StdUniform
 Uniform (True Measure Object)
@@ -13574,13 +13572,13 @@ CLT (Stopping Criterion Object)
 	abs_tol         0.010
 	rel_tol         0
 	n_max           10000000000
-	alpha           0.010
 	inflate         1.200
+	alpha           0.010
 MeanVarData (AccumData Object)
-	n               3298
-	n_total         4322.0
-	confid_int      [ 0.649  0.670]
-	time_total      0.001
+	n               3297
+	n_total         4321.0
+	confid_int      [ 0.647  0.667]
+	time_total      0.002
 
 </pre>
 </div>
@@ -13653,8 +13651,9 @@ MeanVarData (AccumData Object)
 <div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">integrand2</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">custom_fun</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-<span class="n">sol2</span><span class="p">,</span> <span class="n">data2</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand2</span><span class="p">,</span> <span class="n">Uniform</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">integrand2</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+<span class="n">sol2</span><span class="p">,</span> <span class="n">data2</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand2</span><span class="p">,</span> <span class="n">Uniform</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data2</span><span class="p">)</span>
 </pre></div>
 
@@ -13672,11 +13671,8 @@ MeanVarData (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 0.8278         
+<pre>Solution: 0.8239         
 QuickConstruct (Integrand Object)
-	fun_str         def f(x):
-	                   x_norms = norm(x, axis = 1)
-	                   return x_norms ** sqrt(x_norms)
 IIDStdUniform (Discrete Distribution Object)
 	mimics          StdUniform
 Uniform (True Measure Object)
@@ -13687,13 +13683,13 @@ CLT (Stopping Criterion Object)
 	abs_tol         0.010
 	rel_tol         0
 	n_max           10000000000
-	alpha           0.010
 	inflate         1.200
+	alpha           0.010
 MeanVarData (AccumData Object)
-	n               5594
-	n_total         6618.0
-	confid_int      [ 0.818  0.838]
-	time_total      0.002
+	n               5852
+	n_total         6876.0
+	confid_int      [ 0.814  0.834]
+	time_total      0.003
 
 </pre>
 </div>

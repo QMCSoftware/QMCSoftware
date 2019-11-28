@@ -13133,9 +13133,10 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">integrand</span> <span class="o">=</span> <span class="n">Keister</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">Keister</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
 <span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Sobol</span><span class="p">(</span><span class="n">rng_seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
-<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=.</span><span class="mi">05</span><span class="p">)</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -13167,14 +13168,14 @@ CLTRep (Stopping Criterion Object)
 	abs_tol         0.050
 	rel_tol         0
 	n_max           1048576
-	alpha           0.010
 	inflate         1.200
+	alpha           0.010
 MeanVarDataRep (AccumData Object)
-	r               16
 	n               32
 	n_total         32.0
 	confid_int      [ 2.126  2.169]
-	time_total      0.009
+	time_total      0.007
+	r               16
 
 </pre>
 </div>
@@ -13251,19 +13252,19 @@ Lattice (Discrete Distribution Object)
 	mimics          StdUniform
 BrownianMotion (True Measure Object)
 	dimension       64
-	time_vector     [[ 0.016  0.031  0.047 ...  0.969  0.984  1.000]]
+	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
 CLTRep (Stopping Criterion Object)
 	abs_tol         0.050
 	rel_tol         0
 	n_max           1048576
-	alpha           0.010
 	inflate         1.200
+	alpha           0.010
 MeanVarDataRep (AccumData Object)
-	r               16
 	n               2048
 	n_total         2048.0
 	confid_int      [ 5.833  5.838]
-	time_total      0.655
+	time_total      0.457
+	r               16
 
 </pre>
 </div>
@@ -13322,14 +13323,14 @@ MeanVarDataRep (AccumData Object)
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Solution: 5.8346         
+<pre>Solution: 5.8306         
 AsianCall (Integrand Object)
-	volatility      0.500
-	start_price     30
-	strike_price    25
-	interest_rate   0.010
-	mean_type       geometric
-	exercise_time   1.0
+	volatility      [ 0.500  0.500  0.500]
+	start_price     [30 30 30]
+	strike_price    [25 25 25]
+	interest_rate   [ 0.010  0.010  0.010]
+	mean_type       [&#39;geometric&#39; &#39;geometric&#39; &#39;geometric&#39;]
+	exercise_time   [ 1.000  1.000  1.000]
 IIDStdGaussian (Discrete Distribution Object)
 	mimics          StdGaussian
 BrownianMotion (True Measure Object)
@@ -13341,13 +13342,13 @@ CLT (Stopping Criterion Object)
 	abs_tol         0.050
 	rel_tol         0
 	n_max           10000000000
-	alpha           0.010
 	inflate         1.200
+	alpha           0.010
 MeanVarData (AccumData Object)
-	n               [ 259245.000  27984.000  4427.000]
-	n_total         294728.0
-	confid_int      [ 5.786  5.883]
-	time_total      0.174
+	n               [ 251714.000  31544.000  4893.000]
+	n_total         291223.0
+	confid_int      [ 5.782  5.879]
+	time_total      0.141
 
 </pre>
 </div>
