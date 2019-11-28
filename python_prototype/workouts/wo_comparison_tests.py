@@ -88,10 +88,12 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
 
 
 if __name__ == '__main__':
+    # Absolute Tolerance Comparison Test
     abstols = arange(.0002, .1002, .0002)
     df_abstols = abstol_comparison(abstols)
     df_abstols.to_csv('outputs/comparison_tests/abs_tol.csv', index=False)
-
+    
+    # Dimension Comparison Test
     dimensions = arange(1, 41)
     df_dimensions = dimension_comparison(dimensions)
     df_dimensions.to_csv('outputs/comparison_tests/dimension.csv', index=False)

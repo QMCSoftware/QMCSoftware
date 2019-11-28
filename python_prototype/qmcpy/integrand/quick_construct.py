@@ -27,8 +27,8 @@ class QuickConstruct(Integrand):
         super().__init__(dimension,
             g = custom_fun)
         
-        def g(self, x):
-            return self.custom_fun(x)
+    def g(self, x):
+        return self.custom_fun(x)
 
     def __repr__(self, attributes=[]):
         """
@@ -40,4 +40,4 @@ class QuickConstruct(Integrand):
         Returns:
             string of self info
         """
-        return super().__repr__(['fun_str'])
+        return super().__repr__()

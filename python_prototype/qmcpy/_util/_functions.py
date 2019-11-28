@@ -71,7 +71,7 @@ def multilevel_constructor(self, dimension, **kwargs):
                          arguments distributed accordingly
     """
     # Type check dimension
-    if isinstance(dimension, int): 
+    if isinstance(dimension, (int,int64)): 
         # int -> ndarray
         dimension = array([dimension])
     if all(isinstance(i, (int, int64)) and i > 0 for i in dimension): 

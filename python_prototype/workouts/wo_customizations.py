@@ -15,7 +15,7 @@ def quick_construct_integrand(abs_tol):
 
     """
     dim = 5
-    integrand = QuickConstruct(custom_fun=lambda x, c=5: (c * x).sum(1))
+    integrand = QuickConstruct(dim, custom_fun=lambda x, c=5: (c * x).sum(1))
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Uniform(dim)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
