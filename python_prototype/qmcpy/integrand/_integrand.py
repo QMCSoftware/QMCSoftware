@@ -1,6 +1,6 @@
 """ Definition for abstract class, ``Integrand`` """
 
-from .._util import univ_repr, TransformError
+from .._util import univ_repr, multilevel_constructor, TransformError
 
 from abc import ABC, abstractmethod
 
@@ -11,17 +11,23 @@ class Integrand(ABC):
     :math:`\\boldsymbol{x} \\in \\mathcal{X}`
     """
 
-    def __init__(self):
+    def __init__(self, dimension, **kwargs):
         """
+        Args:
+            dimension (ndarray): dimension(s) of the integrand(s)
+            kwargs: keyword arguments. keys become attributes 
+                    with values distributed among object list
+
         Attributes:
             f (Integrand): function transformed to accept distribution \
                 values
             dimension (int): Dimension of the domain, :math:`d > 0`. Default to 2.
-            integrand_list (list): List of Integrands, may be more than 1 for \
+            integrands (list): List of Integrands, may be more than 1 for \
                 multi-dimensional problems
         """
         super().__init__()
-        self.integrand_list = [self]
+        integrands = multilevel_constructor(self, dimension, **kwargs)
+        self.integrands = integrands
 
     @abstractmethod
     def g(self, x):
@@ -73,23 +79,23 @@ class Integrand(ABC):
             been initialized for each integrand yet
         """
         raise TransformError("""
-            To initilize this method for each integrand call:
+            To initilize this method for each integrand call:s
                 true_measure_obj.set_f(discrete_distrib_obj, integrand_obj)
             To call this method for the ith integrand call:
                 integrand_obj[i].f(x)""")
 
     def __len__(self):
-        return len(self.integrand_list)
+        return len(self.integrands)
 
     def __iter__(self):
-        for fun in self.integrand_list:
+        for fun in self.integrands:
             yield fun
 
     def __getitem__(self, i):
-        return self.integrand_list[i]
+        return self.integrands[i]
 
     def __setitem__(self, i, val):
-        self.integrand_list[i] = val
+        self.integrands[i] = val
 
     def __repr__(self, attributes=[]):
         """
@@ -101,4 +107,4 @@ class Integrand(ABC):
         Returns:
             string of self info
         """
-        return univ_repr(self[0], "Integrand", set(attributes))
+        return univ_repr(self, "Integrand", attributes)

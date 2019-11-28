@@ -4,6 +4,7 @@ from .discrete_distribution import IIDStdUniform
 from .integrand.linear import Linear
 from .stopping_criterion import CLT
 from .true_measure import Uniform
+from ._util import DimensionError
 
 import copy
 from time import time
@@ -39,7 +40,9 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
     if not discrete_distrib: discrete_distrib = IIDStdUniform()
     if not stopping_criterion:
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=0.01)
-
+    # Check TrueMeasure and Integrand matching dimensions
+    if not all(integrand.dimension==true_measure.dimension):
+        raise DimensionError('The integrand and true measure should have the same dimension(s)')
     t_start = time()
     # Transform integrands to accept distribution values which can generate
     true_measure.transform(integrand, discrete_distrib)

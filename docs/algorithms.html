@@ -208,11 +208,11 @@ sum of two variables defined on unit square is used.</p></li>
 <p>Definition for class AsianCall, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.asian_call.AsianCall">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.asian_call.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">bm_measure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">interest_rate=0</em>, <em class="sig-param">mean_type='arithmetic'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.asian_call.</code><code class="sig-name descname">AsianCall</code><span class="sig-paren">(</span><em class="sig-param">bm_measure</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">interest_rate=0</em>, <em class="sig-param">mean_type='arithmetic'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate payoff values of an Asian Call option</p>
 <dl class="method">
 <dt id="qmcpy.integrand.asian_call.AsianCall.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">bm_measure=None</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">interest_rate=0</em>, <em class="sig-param">mean_type='arithmetic'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">bm_measure</em>, <em class="sig-param">volatility=0.5</em>, <em class="sig-param">start_price=30</em>, <em class="sig-param">strike_price=25</em>, <em class="sig-param">interest_rate=0</em>, <em class="sig-param">mean_type='arithmetic'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.asian_call.AsianCall.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize AsianCall Integrand’s’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -258,7 +258,7 @@ dimension (int): number of dimensions</p>
 <p>Definition for class Keister, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.keister.Keister">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><span class="sig-paren">(</span><em class="sig-param">dimension</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values     <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \pi^{d/2} \cos(\| \boldsymbol{x} \|)\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathbb{R}^d\)</span>.</p>
 <p>The standard example integrates the Keister integrand with respect to an     IID Gaussian distribution with variance 1/2.</p>
 <dl class="simple">
@@ -270,6 +270,16 @@ dimension (int): number of dimensions</p>
 </ol>
 </dd>
 </dl>
+<dl class="method">
+<dt id="qmcpy.integrand.keister.Keister.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension</strong> (<em>ndarray</em>) – dimension(s) of the integrand(s)</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="qmcpy.integrand.keister.Keister.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister.g" title="Permalink to this definition">¶</a></dt>
@@ -292,8 +302,18 @@ dimension (int): number of dimensions</p>
 <p>Definition for class Linear, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.linear.Linear">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">dimension</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \sum_{i=1}^d x_i\)</span>     for <span class="math notranslate nohighlight">\(\boldsymbol{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d\)</span></p>
+<dl class="method">
+<dt id="qmcpy.integrand.linear.Linear.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension</strong> (<em>ndarray</em>) – dimension(s) of the integrand(s)</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="qmcpy.integrand.linear.Linear.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.g" title="Permalink to this definition">¶</a></dt>
@@ -316,15 +336,18 @@ dimension (int): number of dimensions</p>
 <p>Definition for class QuickConstruct, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.quick_construct.QuickConstruct">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.quick_construct.</code><code class="sig-name descname">QuickConstruct</code><span class="sig-paren">(</span><em class="sig-param">custom_fun=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.quick_construct.</code><code class="sig-name descname">QuickConstruct</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">custom_fun</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify and generate values of a user-defined function</p>
 <dl class="method">
 <dt id="qmcpy.integrand.quick_construct.QuickConstruct.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">custom_fun=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">custom_fun</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize custom Integrand</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>custom_fun</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – a callable univariable or multivariate Python              function that returns a real number.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimension</strong> (<em>ndarray</em>) – dimension(s) of the integrand(s)</p></li>
+<li><p><strong>custom_fun</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – a callable univariable or multivariate Python              function that returns a real number.</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition note">
@@ -396,11 +419,11 @@ dimension (int): number of dimensions</p>
 
 <dl class="class">
 <dt id="qmcpy.true_measure.measures.Lebesgue">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.measures.</code><code class="sig-name descname">Lebesgue</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">uniform_lower_bound=0.0</em>, <em class="sig-param">uniform_upper_bound=1.0</em>, <em class="sig-param">gaussian_mean=0</em>, <em class="sig-param">gaussian_variance=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Lebesgue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Lebesgue Measure</p>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.measures.</code><code class="sig-name descname">Lebesgue</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Lebesgue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lebesgue Uniform Measure</p>
 <dl class="method">
 <dt id="qmcpy.true_measure.measures.Lebesgue.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">uniform_lower_bound=0.0</em>, <em class="sig-param">uniform_upper_bound=1.0</em>, <em class="sig-param">gaussian_mean=0</em>, <em class="sig-param">gaussian_variance=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Lebesgue.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Lebesgue.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p>

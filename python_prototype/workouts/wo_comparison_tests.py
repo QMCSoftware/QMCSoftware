@@ -15,6 +15,7 @@ def abstol_comparison(abstols=arange(.1, .4, .1)):
     for integrating the Keister function with
     varying absolute tolerances
     """
+    dimension = 3
     print('\nAbsolute Tolerance Comparison')
     columns = ['abs_tol'] + \
         [type(distrib()).__name__ + '_solution' for distrib in distribution_pointers] + \
@@ -25,8 +26,8 @@ def abstol_comparison(abstols=arange(.1, .4, .1)):
         row_i = {'abs_tol': abs_tol}
         for distrib_pointer in distribution_pointers:
             distribution = distrib_pointer(rng_seed=7)
-            integrand = Keister()
-            measure = Gaussian(dimension=3, variance=1 / 2)
+            integrand = Keister(dimension=dimension)
+            measure = Gaussian(dimension=dimension, variance=1 / 2)
             distrib_name = type(distribution).__name__
             if distrib_name in ['IIDStdGaussian', 'IIDStdUniform']:
                 stopping_criterion = CLT(distribution, measure, abs_tol=abs_tol,
@@ -63,8 +64,8 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
         row_i = {'dimension': dimension}
         for distrib_pointer in distribution_pointers:
             distribution = distrib_pointer(rng_seed=7)
-            integrand = Keister()
-            measure = Gaussian(dimension=[dimension], variance=1 / 2)
+            integrand = Keister(dimension=dimension)
+            measure = Gaussian(dimension=dimension, variance=1 / 2)
             distrib_name = type(distribution).__name__
             if distrib_name in ['IIDStdGaussian', 'IIDStdUniform']:
                 stopping_criterion = CLT(distribution, measure, rel_tol=.01, abs_tol=0,
@@ -87,10 +88,12 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
 
 
 if __name__ == '__main__':
-    abstols = arange(.0002, .1002, .0002)
+    # Absolute Tolerance Comparison Test
+    abstols = arange(.0012, .1002, .0002)
     df_abstols = abstol_comparison(abstols)
     df_abstols.to_csv('outputs/comparison_tests/abs_tol.csv', index=False)
-
+    
+    # Dimension Comparison Test
     dimensions = arange(1, 41)
     df_dimensions = dimension_comparison(dimensions)
     df_dimensions.to_csv('outputs/comparison_tests/dimension.csv', index=False)

@@ -13497,9 +13497,10 @@ div#notebook {
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Generate constants for 3d plot in following cell</span>
 <span class="n">abs_tol</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
-<span class="n">integrand</span> <span class="o">=</span> <span class="n">Keister</span><span class="p">()</span>
+<span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">Keister</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
 <span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">IIDStdGaussian</span><span class="p">(</span><span class="n">rng_seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
-<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">variance</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span><span class="n">variance</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLT</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span><span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">n_max</span><span class="o">=</span><span class="mf">1e10</span><span class="p">)</span>
 <span class="n">sol</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -13531,13 +13532,13 @@ CLT (Stopping Criterion Object)
 	abs_tol         0.500
 	rel_tol         0
 	n_max           10000000000
-	alpha           0.010
 	inflate         1.200
+	alpha           0.010
 MeanVarData (AccumData Object)
 	n               65
 	n_total         81.0
 	confid_int      [ 1.646  2.464]
-	time_total      0.001
+	time_total      0.002
 
 </pre>
 </div>
@@ -13558,8 +13559,9 @@ MeanVarData (AccumData Object)
 <span class="n">mu_hat_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.0554</span><span class="p">,</span> <span class="mf">2.0143</span><span class="p">,</span> <span class="mf">1.9926</span><span class="p">]</span>
 
 <span class="c1"># qmcpy objects</span>
-<span class="n">integrand</span> <span class="o">=</span> <span class="n">Keister</span><span class="p">()</span>
-<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">Keister</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
 <span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">IIDStdGaussian</span><span class="p">(</span><span class="n">rng_seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="n">true_measure</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">)</span>
 
@@ -13571,7 +13573,7 @@ MeanVarData (AccumData Object)
 <span class="n">x_2d</span><span class="p">,</span> <span class="n">y_2d</span> <span class="o">=</span> <span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="n">points_fun</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_2d</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 <span class="n">points_fun</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_2d</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-<span class="n">points_fun</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">integrand</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="n">points_fun</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">points_fun</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">integrand</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="n">points_fun</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
 <span class="n">x_surf</span> <span class="o">=</span> <span class="n">points_fun</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
 <span class="n">y_surf</span> <span class="o">=</span> <span class="n">points_fun</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
 <span class="n">z_surf</span> <span class="o">=</span> <span class="n">points_fun</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
@@ -13605,7 +13607,7 @@ MeanVarData (AccumData Object)
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$x_2$&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s2">&quot;$f</span><span class="se">\\</span><span class="s2">:(x_1,x_2)$&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;../outputs/visualizations/Three_3d_SurfaceScatters.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=.</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;../outputs/visualizations/Three_3d_SurfaceScatters.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=.</span><span class="mi">15</span><span class="p">)</span>
 </pre></div>
 
     </div>

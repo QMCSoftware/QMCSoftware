@@ -1,60 +1,24 @@
 """ Abstract Class TrueMeasure """
 
-from .._util import DimensionError, TransformError, univ_repr, ParameterError
+from .._util import DimensionError, TransformError, ParameterError
+from .._util import univ_repr, multilevel_constructor
 
 from abc import ABC
-from numpy import array, int64, ndarray
 from copy import deepcopy
-
 
 class TrueMeasure(ABC):
     """ The True Measure of the Integrand """
 
-    def __init__(self, dimension, **kwargs):
+    def __init__(self, dimension, transforms, **kwargs):
         """
         Args:
             dimension (ndarray): dimension(s) of the integrand(s)
-            keys: string matching the measure mimiced by the discrete \
-                distribution
-            values: functions to transform a sample by the mimiced \
-                measure into a sapmle by the true measure
+            kwargs: keyword arguments. keys become attributes 
+                    with values distributed among object list
         """
-        prefix = 'A concrete implementation of TrueMeasure must have '
-        if not hasattr(self, 'transforms'):
-            raise ParameterError(prefix + 'self.transforms')
         super().__init__()
-        self.dimension = dimension
-        for key, val in kwargs.items():
-            setattr(self, key, array(val))
-        if not dimension:  # construcing a sub-measure
-            return
-        # Type check dimension
-        if isinstance(self.dimension, int):  # int -> ndarray
-            self.dimension = array([self.dimension])
-        if all(isinstance(i, int) or isinstance(i, int64)
-               and i > 0 for i in self.dimension):  # all positive integers
-            self.dimension = array(self.dimension)
-        else:
-            raise DimensionError(
-                "dimension must be an numpy.ndarray/list of positive integers")
-        # Type check measureData
-        for key, val in kwargs.items():
-            if not isinstance(kwargs[key], (list, ndarray)):
-                # put single value into ndarray
-                kwargs[key] = [kwargs[key]]
-            if len(kwargs[key]) == 1 and len(self.dimension) != 1:
-                # copy single-value to all levels
-                kwargs[key] = kwargs[key] * len(self.dimension)
-            if len(kwargs[key]) != len(self.dimension):
-                raise DimensionError(
-                    key + " must be a numpy.ndarray (or list) of len(dimension)")
-        self.measures = [type(self)(None) for i in range(len(self.dimension))]
-        # Create list of measures with proper dimensions and keyword arguments
-        for i, _ in enumerate(self):
-            self[i].dimension = self.dimension[i]
-            for key, val in kwargs.items():
-                setattr(self[i], key, array(val[i]))
-            self[i].transforms = self.transforms
+        measures = multilevel_constructor(self, dimension, transforms = transforms, **kwargs)
+        self.measures = measures
 
     def set_tm_gen(self, discrete_distrib):
         """
@@ -183,5 +147,5 @@ class TrueMeasure(ABC):
         Returns:
             string of self info
         """
-        attributes = set(attributes + ['dimension'])
-        return univ_repr(self, "True Measure", attributes)
+        super_attributes = ['dimension']
+        return univ_repr(self, "True Measure", super_attributes+attributes)

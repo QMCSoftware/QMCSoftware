@@ -20,7 +20,7 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [1.3803884470431430, 1.808186429263620, 2.168309102165481]
         for d in dimensions:
-            integrand = Keister()
+            integrand = Keister(dimension=d)
             discrete_distrib = IIDStdGaussian(rng_seed=7)
             true_measure = Gaussian(dimension=d, variance=1 / 2)
             stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
@@ -45,10 +45,13 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_lebesgue_measure(self):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        integrand = QuickConstruct(custom_fun=lambda x: (x.prod(1))**3)
-        true_measure = Lebesgue(dimension=[2],
-                                uniform_lower_bound=[array([1, 3])],
-                                uniform_upper_bound=[array([3, 6])])
+        dimension = 2
+        integrand = QuickConstruct(
+            dimension = dimension,
+            custom_fun=lambda x: (x.prod(1))**3)
+        true_measure = Lebesgue(dimension=dimension,
+                                lower_bound=[array([1, 3])],
+                                upper_bound=[array([3, 6])])
         discrete_distrib = Lattice(rng_seed=7)
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
@@ -58,8 +61,11 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_uniform_measure(self):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        integrand = QuickConstruct(custom_fun=lambda x: (x.prod(1))**3)
-        true_measure = Uniform(dimension=[2],
+        dimension = 2
+        integrand = QuickConstruct(
+            dimension = dimension,
+            custom_fun = lambda x: (x.prod(1))**3)
+        true_measure = Uniform(dimension=dimension,
                                lower_bound=[array([1, 3])],
                                upper_bound=[array([3, 6])])
         discrete_distrib = Lattice(rng_seed=7)
@@ -78,7 +84,7 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [0.5, 1, 1.5]
         for d in dimensions:
-            integrand = Linear()
+            integrand = Linear(dimension=d)
             measure = Uniform(dimension=d)
             discrete_distrib = IIDStdUniform(rng_seed=7)
             stopping_criterion = CLT(discrete_distrib, measure, abs_tol=abs_tol)
@@ -102,8 +108,11 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [2.5, 5, 7.5]
         for d in dimensions:
-            integrand = QuickConstruct(custom_fun=f)
-            sol, data = integrate(integrand, Uniform(d))
+            integrand = QuickConstruct(
+                dimension = d,
+                custom_fun = f)
+            true_measure = Uniform(dimension = d)
+            sol, data = integrate(integrand, true_measure)
             print(data)
             abs_tol = data.stopping_criterion.abs_tol
             true_value = true_values[d - 1]
@@ -125,7 +134,9 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [2.5, 5, 7.5]
         for d in dimensions:
-            integrand = QuickConstruct(custom_fun=f)
+            integrand = QuickConstruct(
+                dimension = d,
+                custom_fun = f)
             measure = Uniform(dimension=d)
             sol, data = integrate(integrand, measure)
             print(data)
@@ -141,11 +152,15 @@ class IntegrationExampleTest(unittest.TestCase):
 
         Mathematica: integrate[b*(x-a)^2, {x,1,0}]
         """
+        dimension = 2
         a_list = [1, 2]
         b_list = [4, 5]
-        f_list = [QuickConstruct(lambda x, a=a, b=b: b * (x - a) ** 2)
+        f_list = [QuickConstruct(
+            dimension = dimension,
+            custom_fun = lambda x, a=a, b=b: b * (x - a) ** 2)
                   for a, b in zip(a_list, b_list)]
-        sol_data_list = [integrate(f, Uniform(2)) for f in f_list]
+        true_measure = Uniform(dimension=dimension)
+        sol_data_list = [integrate(f, true_measure) for f in f_list]
         sols = [sol_data[0] for sol_data in sol_data_list]
         true_sols = [(b / 3) * (3 * a * (a - 1) + 1)
                      for a, b in zip(a_list, b_list)]
