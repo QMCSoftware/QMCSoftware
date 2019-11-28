@@ -32,6 +32,14 @@ class TestTrueDistributionConstruction(unittest.TestCase):
                           discrete_distrib)
         true_measure.set_tm_gen(IIDStdGaussian())
         self.assertRaises(TransformError, true_measure.gen_tm_samples, 3, 5)
+    
+    def test_mismatched_dimensions(self):
+        true_measure = Uniform(1)
+        integrand = Keister(2)
+        self.assertRaises(DimensionError, integrate, integrand, true_measure)
+        true_measure = Uniform([1,2,3])
+        integrand = Keister([1,2,4])
+        self.assertRaises(DimensionError, integrate, integrand, true_measure)
 
 
 class TestUniform(unittest.TestCase):
