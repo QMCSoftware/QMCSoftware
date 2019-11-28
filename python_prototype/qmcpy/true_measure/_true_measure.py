@@ -9,21 +9,15 @@ from copy import deepcopy
 class TrueMeasure(ABC):
     """ The True Measure of the Integrand """
 
-    def __init__(self, dimension, **kwargs):
+    def __init__(self, dimension, transforms, **kwargs):
         """
         Args:
             dimension (ndarray): dimension(s) of the integrand(s)
-            keys: string matching the measure mimiced by the discrete \
-                distribution
-            values: functions to transform a sample by the mimiced \
-                measure into a sapmle by the true measure
+            kwargs: keyword arguments. keys become attributes 
+                    with values distributed among object list
         """
-        prefix = 'A concrete implementation of TrueMeasure must have '
-        if not hasattr(self, 'transforms'):
-            raise ParameterError(prefix + 'self.transforms')
         super().__init__()
-        if not dimension: return # constructing child
-        measures = multilevel_constructor(self, dimension, **kwargs)
+        measures = multilevel_constructor(self, dimension, transforms = transforms, **kwargs)
         self.measures = measures
 
     def set_tm_gen(self, discrete_distrib):

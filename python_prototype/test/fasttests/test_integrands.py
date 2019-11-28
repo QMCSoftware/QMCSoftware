@@ -35,7 +35,7 @@ class TestKeister(unittest.TestCase):
     """
 
     def test_2d_construction(self):
-        fun = Keister()
+        fun = Keister(5)
         self.assertEqual(len(fun), 1)
 
 
@@ -45,7 +45,7 @@ class TestLinear(unittest.TestCase):
     """
 
     def test_2d_construction(self):
-        fun = Linear()
+        fun = Linear(5)
         self.assertEqual(len(fun), 1)
 
 

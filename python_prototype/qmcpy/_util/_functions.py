@@ -2,7 +2,7 @@
 
 from . import DimensionError
 
-from numpy import array, ndarray, tile, int64
+from numpy import array, ndarray, repeat, int64
 import numpy as np
 
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=3)
@@ -63,7 +63,7 @@ def multilevel_constructor(self, dimension, **kwargs):
 
     Args:
         self (object): instance of the object
-        dimensions (int / list / ndarray): dimension of each level. len(dimension) == # levels
+        dimension (int / list / ndarray): dimension of each level. len(dimension) == # levels
         **kwargs (tuple): keyword arguments
     
     Return:
@@ -80,25 +80,28 @@ def multilevel_constructor(self, dimension, **kwargs):
     else:
         raise DimensionError(
             "dimension must be an numpy.ndarray/list of positive integers")
-    # Type check measureData
-    for key, val in kwargs.items():
-        if not isinstance(kwargs[key], (list, ndarray)):
-            # put single value into a list
-            kwargs[key] = [kwargs[key]]
-        if len(kwargs[key]) == 1 and len(dimension) != 1:
-            # copy single-value to all levels
-            kwargs[key] = tile(array(kwargs[key]), len(dimension))
-        if len(kwargs[key]) != len(dimension):
-            raise DimensionError(
-                key + " must be a numpy.ndarray (or list) of len(dimension)")
-        # properly specified, assign back to object
-        setattr(self, key, val)
+    # Constants
+    keys = list(kwargs.keys())
+    n_levels = len(dimension)
+    _type = type(self)
+    # Type check measure data
+    for key in keys:
+        try:
+            if len(kwargs[key]) == n_levels:
+                #already correctly formatted
+                continue
+        except:
+            pass
+        kwargs[key] = repeat(kwargs[key], n_levels)
+    # Give the construcing object the correctly formatted measure data
+    for key in keys:
+        setattr(self, key, kwargs[key])
     setattr(self, 'dimension', dimension) # set dimension attribute for self
-    # note: self must have dimension as its first argument to the constructor
-    obj_list = [type(self)(None) for i in range(len(dimension))]
-    # Create list of measures with proper dimensions and keyword arguments
-    for i in range(len(obj_list)):
+    # Create a list of measures and distribute measure data    
+    obj_list = [_type.__new__(_type) for i in range(n_levels)]
+    # ith object gets ith value from each measure data
+    for i in range(n_levels):
         obj_list[i].dimension = dimension[i]
         for key, val in kwargs.items():
-            setattr(obj_list[i], key, array(val[i]))
+            setattr(obj_list[i], key, val[i])
     return obj_list

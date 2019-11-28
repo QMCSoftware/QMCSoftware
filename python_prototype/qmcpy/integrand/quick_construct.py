@@ -9,11 +9,12 @@ import numpy as np
 class QuickConstruct(Integrand):
     """ Specify and generate values of a user-defined function"""
 
-    def __init__(self, custom_fun=None):
+    def __init__(self, dimension, custom_fun):
         """
         Initialize custom Integrand
 
         Args:
+            dimension (ndarray): dimension(s) of the integrand(s)
             custom_fun (int): a callable univariable or multivariate Python \
              function that returns a real number.
 
@@ -23,15 +24,11 @@ class QuickConstruct(Integrand):
             x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
                         row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
         """
-        super().__init__()
-        if callable(custom_fun):
-            self.custom_fun = custom_fun
-            self.fun_str = inspect.getsource(custom_fun).strip()
-        else:
-            raise Exception("Input custom_fun should be a callable function.")
-
-    def g(self, x):
-        return self.custom_fun(x)
+        super().__init__(dimension,
+            g = custom_fun)
+        
+        def g(self, x):
+            return self.custom_fun(x)
 
     def __repr__(self, attributes=[]):
         """

@@ -22,8 +22,7 @@ class TestTrueDistributionConstruction(unittest.TestCase):
         true_measure = Gaussian([1, 2, 3], mean=[-2, 0, 2])
         self.assertEqual(true_measure[0].sigma, 1)
         self.assertEqual(true_measure[2].mu, 2)
-        self.assertRaises(DimensionError, Gaussian, [1, 2, 3], [-1, 0])
-
+        
     def test_transform_errors(self):
         discrete_distrib = IIDStdGaussian()
         discrete_distrib.mimics = "Poisson"

@@ -15,7 +15,7 @@ def test_distributions_keister(dim, abs_tol):
     """
 
     # IID Standard Uniform ~ CLT
-    integrand = Keister()
+    integrand = Keister(dim)
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
@@ -23,7 +23,7 @@ def test_distributions_keister(dim, abs_tol):
     print(data)
 
     # IID Standard Gaussian ~ CLT
-    integrand = Keister()
+    integrand = Keister(dim)
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
@@ -31,7 +31,7 @@ def test_distributions_keister(dim, abs_tol):
     print(data)
     
     # IID Standard Uniform ~ MeanMC_g
-    integrand = Keister()
+    integrand = Keister(dim)
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
@@ -39,7 +39,7 @@ def test_distributions_keister(dim, abs_tol):
     print(data)
 
     # IID Standard Gaussian ~ MeanMC_g
-    integrand = Keister()
+    integrand = Keister(dim)
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
@@ -47,7 +47,7 @@ def test_distributions_keister(dim, abs_tol):
     print(data)
 
     # Lattice ~ CLTRep
-    integrand = Keister()
+    integrand = Keister(dim)
     discrete_distrib = Lattice(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
@@ -55,7 +55,7 @@ def test_distributions_keister(dim, abs_tol):
     print(data)
 
     # Sobol ~ CLTRep
-    integrand = Keister()
+    integrand = Keister(dim)
     discrete_distrib = Sobol(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
