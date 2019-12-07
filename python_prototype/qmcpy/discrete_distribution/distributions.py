@@ -3,7 +3,6 @@
 from ._discrete_distribution import DiscreteDistribution
 from ..third_party.magic_point_shop import LatticeSeq
 from .digital_seq import DigitalSeq
-import math
 
 from numpy import array, int64, log, random, zeros
 from numpy.random import Generator, PCG64
@@ -116,7 +115,7 @@ class Sobol(DiscreteDistribution):
         self.rng = Generator(PCG64(rng_seed))
         super().__init__()
 
-    def gen_dd_samples(self, replications, n_samples, dimensions, returnDeepCopy=True):
+    def gen_dd_samples(self, replications, n_samples, dimensions):
         """
         Generate r nxd Sobol samples
 
@@ -132,14 +131,14 @@ class Sobol(DiscreteDistribution):
         n = int(n_samples)
         d = int(dimensions)
         if not hasattr(self, 'sobol_rng'):
-            self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=math.log(n,2), s=d, returnDeepCopy=returnDeepCopy)
+            self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=20, s=int(d))
             self.t = max(32, self.sobol_rng.t)  # we guarantee a depth of >=32 bits for shift
             self.ct = max(0, self.t - self.sobol_rng.t)  # correction factor to scale the integers
-            self.shifts = self.rng.integers(0, 2 ** self.t, (r, d), dtype=int64)
-        x = zeros((n, d), dtype=int64)
-        for i in range(n):
+            self.shifts = self.rng.integers(0, 2 ** self.t, (int(r), int(d)), dtype=int64)
+        x = zeros((int(n), int(d)), dtype=int64)
+        for i in range(int(n)):
             next(self.sobol_rng)
-            x[i, :] = self.sobol_rng.cur  # set each nxm; x contains non-negative integers
+            x[i, :] = self.sobol_rng.cur  # set each nxm
         x_rs = array([(shift_r ^ (x * 2 ** self.ct)) / 2. ** self.t for shift_r in self.shifts])
-        #   randomly scramble and x_rs contains values in [0, 1]
+        #   randomly scramble
         return x_rs
