@@ -41,7 +41,7 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
     if not stopping_criterion:
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=0.01)
     # Check TrueMeasure and Integrand matching dimensions
-    if not all(integrand.dimension==true_measure.dimension):
+    if not all(integrand.dimension == true_measure.dimension):
         raise DimensionError('The integrand and true measure should have the same dimension(s)')
     t_start = time()
     # Transform integrands to accept distribution values which can generate

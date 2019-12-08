@@ -60,4 +60,4 @@ class StoppingCriterion(ABC):
             string of self info
         """
         super_attributes = ['abs_tol', 'rel_tol', 'n_max', 'inflate', 'alpha']
-        return univ_repr(self, "Stopping Criterion", super_attributes+attributes)
+        return univ_repr(self, "Stopping Criterion", super_attributes + attributes)

@@ -45,4 +45,4 @@ class DiscreteDistribution(ABC):
             string of self info
         """
         super_attributes = ['mimics']
-        return univ_repr(self, "Discrete Distribution", super_attributes+attributes)
+        return univ_repr(self, "Discrete Distribution", super_attributes + attributes)

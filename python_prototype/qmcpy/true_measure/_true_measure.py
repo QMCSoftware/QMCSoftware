@@ -6,6 +6,7 @@ from .._util import univ_repr, multilevel_constructor
 from abc import ABC
 from copy import deepcopy
 
+
 class TrueMeasure(ABC):
     """ The True Measure of the Integrand """
 
@@ -17,7 +18,7 @@ class TrueMeasure(ABC):
                     with values distributed among object list
         """
         super().__init__()
-        measures = multilevel_constructor(self, dimension, transforms = transforms, **kwargs)
+        measures = multilevel_constructor(self, dimension, transforms=transforms, **kwargs)
         self.measures = measures
 
     def set_tm_gen(self, discrete_distrib):
@@ -148,4 +149,4 @@ class TrueMeasure(ABC):
             string of self info
         """
         super_attributes = ['dimension']
-        return univ_repr(self, "True Measure", super_attributes+attributes)
+        return univ_repr(self, "True Measure", super_attributes + attributes)

@@ -27,14 +27,14 @@ class AsianCall(Integrand):
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
         dimension = bm_measure.dimension
         super().__init__(dimension,
-            bm_measure = bm_measure,
-            dim_frac = array([0] + [dimension[i]/dimension[i-1] for i in range(1,len(dimension))]),
-            volatility = volatility,
-            start_price = start_price,
-            strike_price = strike_price,
-            interest_rate = interest_rate,
-            mean_type = [mean_type],
-            exercise_time = [bm_measure[i].time_vector[-1] for i in range(len(dimension))])
+            bm_measure=bm_measure,
+            dim_frac=array([0] + [dimension[i] / dimension[i - 1] for i in range(1, len(dimension))]),
+            volatility=volatility,
+            start_price=start_price,
+            strike_price=strike_price,
+            interest_rate=interest_rate,
+            mean_type=[mean_type],
+            exercise_time=[bm_measure[i].time_vector[-1] for i in range(len(dimension))])
 
     def g(self, x):
         """

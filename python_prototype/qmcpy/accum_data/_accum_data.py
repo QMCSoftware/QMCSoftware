@@ -83,5 +83,5 @@ class AccumData(ABC):
                 string += str(qmc_obj)
         super_attributes = ['n', 'n_total', 'confid_int', 'time_total']
         #   get only unique values
-        string += univ_repr(self, 'AccumData', super_attributes+attributes)
+        string += univ_repr(self, 'AccumData', super_attributes + attributes)
         return string

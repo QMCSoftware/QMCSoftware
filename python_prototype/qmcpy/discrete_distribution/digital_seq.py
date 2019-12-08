@@ -209,12 +209,11 @@ class DigitalSeq(digitalseq_b2g):
         self.returnDeepCopy = returnDeepCopy
         self.reset()
 
-
     def calc_next(self):
         """Calculate the next sequence point and update the index counter."""
         self.k = self.k + 1
         if self.k == 0: return True
-        p = (((self.k ^ (self.k-1)) + 1) >> 1)
+        p = (((self.k ^ (self.k - 1)) + 1) >> 1)
         ctz = len(bin(p)[2:]) - 1
         for j in range(self.s):
             self.cur[j] = self.cur[j] ^ self.Csr[j][ctz]

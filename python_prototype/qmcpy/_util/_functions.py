@@ -56,6 +56,7 @@ def univ_repr(qmc_object, abc_class_name, attributes):
         string += string_temp.replace('\n', '\n\t%-15s' % ' ') + '\n'
     return string
 
+
 def multilevel_constructor(self, dimension, **kwargs):
     """
     Takes an instance (self) and copies it into a list of instances (of self)
@@ -65,16 +66,16 @@ def multilevel_constructor(self, dimension, **kwargs):
         self (object): instance of the object
         dimension (int / list / ndarray): dimension of each level. len(dimension) == # levels
         **kwargs (tuple): keyword arguments
-    
+
     Return:
         obj_list (list): a list of objects of type(self) with args and keyword
                          arguments distributed accordingly
     """
     # Type check dimension
-    if isinstance(dimension, (int,int64)): 
+    if isinstance(dimension, (int, int64)):
         # int -> ndarray
         dimension = array([dimension])
-    if all(isinstance(i, (int, int64)) and i > 0 for i in dimension): 
+    if all(isinstance(i, (int, int64)) and i > 0 for i in dimension):
         # all positive integers
         dimension = array(dimension)
     else:
@@ -88,7 +89,7 @@ def multilevel_constructor(self, dimension, **kwargs):
     for key in keys:
         try:
             if len(kwargs[key]) == n_levels:
-                #already correctly formatted
+                # already correctly formatted
                 continue
         except:
             pass
@@ -96,8 +97,8 @@ def multilevel_constructor(self, dimension, **kwargs):
     # Give the construcing object the correctly formatted measure data
     for key in keys:
         setattr(self, key, kwargs[key])
-    setattr(self, 'dimension', dimension) # set dimension attribute for self
-    # Create a list of measures and distribute measure data    
+    setattr(self, 'dimension', dimension)  # set dimension attribute for self
+    # Create a list of measures and distribute measure data
     obj_list = [_type.__new__(_type) for i in range(n_levels)]
     # ith object gets ith value from each measure data
     for i in range(n_levels):

@@ -137,7 +137,7 @@ class Sobol(DiscreteDistribution):
         n = int(n_samples)
         d = int(dimensions)
         if not hasattr(self, 'sobol_rng'):
-            self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=math.log(n,2), s=d, returnDeepCopy=returnDeepCopy)
+            self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=math.log(n, 2), s=d, returnDeepCopy=returnDeepCopy)
             if scramble:
                 self.t = max(32, self.sobol_rng.t)  # we guarantee a depth of >=32 bits for shift
                 self.ct = max(0, self.t - self.sobol_rng.t)  # correction factor to scale the integers

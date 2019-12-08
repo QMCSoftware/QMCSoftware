@@ -47,7 +47,7 @@ class IntegrationExampleTest(unittest.TestCase):
         abs_tol = 1
         dimension = 2
         integrand = QuickConstruct(
-            dimension = dimension,
+            dimension=dimension,
             custom_fun=lambda x: (x.prod(1))**3)
         true_measure = Lebesgue(dimension=dimension,
                                 lower_bound=[array([1, 3])],
@@ -63,8 +63,8 @@ class IntegrationExampleTest(unittest.TestCase):
         abs_tol = 1
         dimension = 2
         integrand = QuickConstruct(
-            dimension = dimension,
-            custom_fun = lambda x: (x.prod(1))**3)
+            dimension=dimension,
+            custom_fun=lambda x: (x.prod(1))**3)
         true_measure = Uniform(dimension=dimension,
                                lower_bound=[array([1, 3])],
                                upper_bound=[array([3, 6])])
@@ -109,9 +109,9 @@ class IntegrationExampleTest(unittest.TestCase):
         true_values = [2.5, 5, 7.5]
         for d in dimensions:
             integrand = QuickConstruct(
-                dimension = d,
-                custom_fun = f)
-            true_measure = Uniform(dimension = d)
+                dimension=d,
+                custom_fun=f)
+            true_measure = Uniform(dimension=d)
             sol, data = integrate(integrand, true_measure)
             print(data)
             abs_tol = data.stopping_criterion.abs_tol
@@ -135,8 +135,8 @@ class IntegrationExampleTest(unittest.TestCase):
         true_values = [2.5, 5, 7.5]
         for d in dimensions:
             integrand = QuickConstruct(
-                dimension = d,
-                custom_fun = f)
+                dimension=d,
+                custom_fun=f)
             measure = Uniform(dimension=d)
             sol, data = integrate(integrand, measure)
             print(data)
@@ -156,9 +156,9 @@ class IntegrationExampleTest(unittest.TestCase):
         a_list = [1, 2]
         b_list = [4, 5]
         f_list = [QuickConstruct(
-            dimension = dimension,
-            custom_fun = lambda x, a=a, b=b: b * (x - a) ** 2)
-                  for a, b in zip(a_list, b_list)]
+            dimension=dimension,
+            custom_fun=lambda x, a=a, b=b: b * (x - a) ** 2)
+            for a, b in zip(a_list, b_list)]
         true_measure = Uniform(dimension=dimension)
         sol_data_list = [integrate(f, true_measure) for f in f_list]
         sols = [sol_data[0] for sol_data in sol_data_list]
