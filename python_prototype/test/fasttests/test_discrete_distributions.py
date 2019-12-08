@@ -1,9 +1,11 @@
 """ Unit tests for discrete distributions in QMCPy """
 
-from qmcpy import *
-
 import unittest
+
 from numpy import array, int64, log, ndarray, zeros
+import numpy.testing as npt
+from qmcpy import *
+from workouts.wo_sequences import gen_mps_sobol_points, gen_qmcpy_sobol_points
 
 
 class TestIIDStdUniform(unittest.TestCase):
@@ -97,6 +99,14 @@ class TestSobol(unittest.TestCase):
                             [3221225472, 1073741824, 1073741824, 1073741824],
                             [1073741824, 3221225472, 3221225472, 3221225472]])
         self.assertTrue((array_not_shifted.squeeze() == true_array).all())
+
+
+    def test_sobol_samples(self):
+        n = 2 ** 5
+        d = 4
+        samples1 = gen_mps_sobol_points(n, d)
+        samples2 = gen_qmcpy_sobol_points(n, d)
+        self.assertTrue(npt.assert_array_equal(samples1, samples2) == None)
 
 
 if __name__ == "__main__":

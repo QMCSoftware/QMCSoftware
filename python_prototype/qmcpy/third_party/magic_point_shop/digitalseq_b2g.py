@@ -1,4 +1,4 @@
-#!/usr/bin/env python_prototype
+#!/usr/bin/env python
 from __future__ import print_function
 
 ####
@@ -46,7 +46,7 @@ class digitalseq_b2g:
           For a classical net t = m as we have square m by m generating
           matrices.
           For higher order (e.g. through interlacing) nets t = alpha m where
-          alpha is the rate of convergence aimed for in approximating
+          alpha is the rate of convergence aimed for in approximating 
           integrals (in the function space setting used to construct or analyse
           the generating matrices).
 
@@ -60,18 +60,18 @@ class digitalseq_b2g:
           Example usage with a simply unit matrix and the powers of the polynomial
           (X+1) over Z_2[X]. The first dimension is then the van der Corput
           sequence. The second matrix is the choice of the second dimension of
-          the sobol' and Niederreiter sequences.
+          the Sobol' and Niederreiter sequences.
           >>> from __future__ import print_function
           >>> m = 5
           >>> C1 = [ 2**i for i in range(m) ]  # van der Corput sequence = identity matrix
-          >>> C2 = [ 1 for i in range(m) ]     # here we build the 2nd matrix of the sobol' and Niederreiter seq
+          >>> C2 = [ 1 for i in range(m) ]     # here we build the 2nd matrix of the Sobol' and Niederreiter seq
           >>> for i in range(1, m): C2[i] = (C2[i-1] << 1) ^ C2[i-1]
           >>> Cs = [ C1, C2 ]
           >>> seq = digitalseq_b2g(Cs)
           >>> from copy import deepcopy
           >>> [ deepcopy(seq.cur) for x in seq ]
           [[0, 0], [16, 16], [24, 8], [8, 24], [12, 12], [28, 28], [20, 4], [4, 20], [6, 10], [22, 26], [30, 2], [14, 18], [10, 6], [26, 22], [18, 14], [2, 30], [3, 15], [19, 31], [27, 7], [11, 23], [15, 3], [31, 19], [23, 11], [7, 27], [5, 5], [21, 21], [29, 13], [13, 29], [9, 9], [25, 25], [17, 1], [1, 17]]
-          >>> for x in seq:
+          >>> for x in seq: 
           ...   for xj in x: print(xj, end=" ")
           ...   print()
           0 0
@@ -107,7 +107,7 @@ class digitalseq_b2g:
           0.53125 0.03125
           0.03125 0.53125
 
-          These are the first 32 sobol' or Niederreiter points in 2D.
+          These are the first 32 Sobol' or Niederreiter points in 2D.
 
           Warning: please mind the deepcopy if you store the member variables
           in a list, you get returned a reference to the value. If you don't

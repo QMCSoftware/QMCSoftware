@@ -1,13 +1,12 @@
-#!/usr/bin/env python_prototype
+#!/usr/bin/env python
 from __future__ import print_function
 from numpy import array, random
 from digitalseq_b2g import digitalseq_b2g
-#from python_prototype.distribution.DigitalSeq import DigitalSeq as digitalseq_b2g
 
 m = 3 # generate 2**3 points
 s = 2 # in 2 dimensions
 
-# straightforward enumeration of sobol points
+# straightforward enumeration of Sobol points
 # using generating matrices from file "sobol_Cs.col": (This takes some, time this is a big file!)
 gen = digitalseq_b2g("sobol_Cs.col", m=m, s=s)
 print("== Unshifted points")
