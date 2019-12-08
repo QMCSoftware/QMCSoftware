@@ -1,7 +1,7 @@
 """ Sobol sequence generator """
 
 from ..third_party.magic_point_shop import digitalseq_b2g
-
+from copy import copy
 from os import path
 import sys
 import mpmath
@@ -97,8 +97,8 @@ class DigitalSeq(digitalseq_b2g):
             >>> for i in range(1, m): C2[i] = (C2[i-1] << 1) ^ C2[i-1]
             >>> Cs = [ C1, C2 ]
             >>> seq = digitalseq_b2g(Cs)
-            >>> from copy import deepcopy
-            >>> [ deepcopy(seq.cur) for x in seq ]
+            >>> from copy import copy
+            >>> [ copy(seq.cur) for x in seq ]
 
             [[0, 0], [16, 16], [24, 8], [8, 24], [12, 12], [28, 28], [20, 4],
             [4, 20], [6, 10], [22, 26], [30, 2], [14, 18], [10, 6], [26, 22],
@@ -208,6 +208,27 @@ class DigitalSeq(digitalseq_b2g):
         self.recipd = 2 ** -self.t
         self.returnDeepCopy = returnDeepCopy
         self.reset()
+
+
+    def calc_next(self):
+        """Calculate the next sequence point and update the index counter."""
+        self.k = self.k + 1
+        if self.k == 0: return True
+        p = (((self.k ^ (self.k-1)) + 1) >> 1)
+        ctz = len(bin(p)[2:]) - 1
+        for j in range(self.s):
+            self.cur[j] = self.cur[j] ^ self.Csr[j][ctz]
+            self.x[j] = self.recipd * self.cur[j]
+        if self.k >= self.n: return False
+        return True
+
+    def __next__(self):
+        """Return the next point of the sequence or raise StopIteration."""
+        if self.k < self.n - 1:
+            self.calc_next()
+            return copy(self.x) if self.returnDeepCopy else self.x
+        else:
+            raise StopIteration
 
 
 if __name__ == "__main__":

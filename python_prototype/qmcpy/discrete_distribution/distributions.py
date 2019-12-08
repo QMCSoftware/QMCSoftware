@@ -1,12 +1,15 @@
 """ This module implements mutiple subclasses of DiscreteDistribution. """
 
-from ._discrete_distribution import DiscreteDistribution
-from ..third_party.magic_point_shop import LatticeSeq
-from .digital_seq import DigitalSeq
+from copy import copy
 import math
 
-from numpy import array, int64, log, random, zeros
+from numpy import array, int64
+import numpy as np
 from numpy.random import Generator, PCG64
+
+from ._discrete_distribution import DiscreteDistribution
+from .digital_seq import DigitalSeq
+from ..third_party.magic_point_shop import LatticeSeq
 
 
 class IIDStdUniform(DiscreteDistribution):
@@ -116,7 +119,7 @@ class Sobol(DiscreteDistribution):
         self.rng = Generator(PCG64(rng_seed))
         super().__init__()
 
-    def gen_dd_samples(self, replications, n_samples, dimensions, returnDeepCopy=True):
+    def gen_dd_samples(self, replications, n_samples, dimensions, returnDeepCopy=True, scramble=True):
         """
         Generate r nxd Sobol samples
 
@@ -124,6 +127,8 @@ class Sobol(DiscreteDistribution):
             replications (int): Number of nxd matrices to generate (sample.size()[0])
             n_samples (int): Number of observations (sample.size()[1])
             dimensions (int): Number of dimensions (sample.size()[2])
+            returnDeepCopy (bool): Return deep copies of output if True
+            normalize (bool): If true, random numbers are in unit cube, otherwise they are non-negative integers
 
         Returns:
             replications x n_samples x dimensions (numpy array)
@@ -133,13 +138,12 @@ class Sobol(DiscreteDistribution):
         d = int(dimensions)
         if not hasattr(self, 'sobol_rng'):
             self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=math.log(n,2), s=d, returnDeepCopy=returnDeepCopy)
-            self.t = max(32, self.sobol_rng.t)  # we guarantee a depth of >=32 bits for shift
-            self.ct = max(0, self.t - self.sobol_rng.t)  # correction factor to scale the integers
-            self.shifts = self.rng.integers(0, 2 ** self.t, (r, d), dtype=int64)
-        x = zeros((n, d), dtype=int64)
-        for i in range(n):
-            next(self.sobol_rng)
-            x[i, :] = self.sobol_rng.cur  # set each nxm; x contains non-negative integers
-        x_rs = array([(shift_r ^ (x * 2 ** self.ct)) / 2. ** self.t for shift_r in self.shifts])
-        #   randomly scramble and x_rs contains values in [0, 1]
-        return x_rs
+            if scramble:
+                self.t = max(32, self.sobol_rng.t)  # we guarantee a depth of >=32 bits for shift
+                self.ct = max(0, self.t - self.sobol_rng.t)  # correction factor to scale the integers
+                self.shifts = self.rng.integers(0, 2 ** self.t, (r, d), dtype=int64)
+        x = np.asarray([copy(self.sobol_rng.cur) for elment in self.sobol_rng])
+        if scramble:
+            x = array([(shift_r ^ (x * 2 ** self.ct)) / 2. ** self.t for shift_r in self.shifts])
+            #   randomly scramble and x contains values in [0, 1]
+        return x
