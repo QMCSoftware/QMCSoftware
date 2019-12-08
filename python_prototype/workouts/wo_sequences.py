@@ -1,3 +1,11 @@
+"""
+Examples of Lattice and Sobol Sequences.
+    Run Example:
+        python workouts/wo_sequences.py
+    Save Output:
+        python workouts/wo_sequences.py  > outputs/examples/wo_sequences.txt
+"""
+
 import math
 from time import time
 
