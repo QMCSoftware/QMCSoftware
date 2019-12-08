@@ -50,7 +50,7 @@ if __name__ == "__main__":
     m = 21
     n = 2 ** m
     d = 4
-    print("n=%d, m=%d, d=%d" % (n,m,d))
+    print("n=%d, m=%d, d=%d" % (n, m, d))
     gen_lattice_points(n, d)
     gen_mps_sobol_points(n, d)
     gen_qmcpy_sobol_points(n, d)

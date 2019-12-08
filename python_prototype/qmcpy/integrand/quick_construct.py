@@ -25,8 +25,8 @@ class QuickConstruct(Integrand):
                         row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
         """
         super().__init__(dimension,
-            g = custom_fun)
-        
+            g=custom_fun)
+
     def g(self, x):
         return self.custom_fun(x)
 
@@ -36,7 +36,7 @@ class QuickConstruct(Integrand):
 
         Args: 
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """
