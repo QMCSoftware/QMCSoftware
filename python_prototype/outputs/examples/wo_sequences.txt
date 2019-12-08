@@ -1,0 +1,7 @@
+n=2097152, m=21, d=4
+
+Lattice Time: 19.151
+
+MPS Sobol Time: 16.925
+
+QMCPy Sobol Time: 7.875
