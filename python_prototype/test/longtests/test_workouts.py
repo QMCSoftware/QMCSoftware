@@ -1,6 +1,6 @@
 """ Call abbreviated varsions of functions from python_prototypes/worksouts/ """
 
-from workouts.wo_comparison_tests import abstol_comparison, dimension_comparison
+from workouts.wo_comp_mc_qmc import abstol_comparison, dimension_comparison
 from workouts.wo_asian_option import test_distributions_asian_option
 from workouts.wo_customizations import quick_construct_integrand
 from workouts.wo_keister import test_distributions_keister
