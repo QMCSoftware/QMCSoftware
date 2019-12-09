@@ -1,10 +1,12 @@
-from qmcpy import *
+""" Record times for qmcpy's quasi-random generators """
+
+from qmcpy import * 
 
 from numpy import *
 from pandas import DataFrame
 from time import time
 
-distribution_pointers = [IIDStdUniform, IIDStdGaussian, Lattice, Sobol]
+distribution_pointers = [Lattice, Sobol]
 
 def samples_gentime_comparison(n_2powers=arange(1,11)):
     """
@@ -27,5 +29,5 @@ def samples_gentime_comparison(n_2powers=arange(1,11)):
     return df
 
 if __name__ == '__main__': 
-    df = samples_gentime_comparison(n_2powers=arange(1,21))
-    print('\n',df)
+    df_times = samples_gentime_comparison(n_2powers=arange(1,21))
+    df_times.to_csv('outputs/comp_quasirandom_sequences/python_sequence_times.csv', index=False)
