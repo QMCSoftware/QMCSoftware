@@ -9,7 +9,8 @@ import pandas as pd
 
 
 class DigitalSeq():
-    """A fast digital sequence point generator based on generating matrices.
+    """
+    A fast digital sequence point generator based on generating matrices.
 
     This sequence generator can take classical (m by m) generating matrices
     or higher-order (alpha m by m) generating matrices from interlaced
@@ -26,7 +27,8 @@ class DigitalSeq():
     """
 
     def __init__(self, Cs, kstart=0, m=None, s=None, returnDeepCopy=True):
-        """Construct a digital sequence point generator given a list of
+        """
+        Construct a digital sequence point generator given a list of
         generating matrices.
 
         Each generating matrix in the list is represented by a list of

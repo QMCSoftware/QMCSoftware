@@ -33,16 +33,25 @@ exod2_base2_m20_CKN_z = [1, 182667, 469891, 498753, 110745, 446247, 250185, 1186
         40729, 322721, 420175, 430359, 480757]
 
 class LatticeSeq:
+    """
+    A fast lattice sequence point generator.
+
+
+    This implementation is based upon, but faster than, ``latticeseq_b2`` from:
+
+    Reference:
+        D. Nuyens, `The Magic Point Shop of QMC point generators and generating
+        vectors.` MATLAB and Python software, 2018. Available from
+        https://people.cs.kuleuven.be/~dirk.nuyens/
+
+    """
 
     def __init__(self, z=exod2_base2_m20_CKN_z, kstart=0, m=None, s=None, returnDeepCopy=True):
-        import sys
-        basestr = str # basestr for python2, str for python3
-        if isinstance(z, basestr):
+        if isinstance(z, str):
             # filename passed in
             f = open(z)
             z = [ int(line) for line in f ]
         elif hasattr(z, 'read'):
-            # assume z is a stream like sys.stdin
             f = z
             z = [ int(line) for line in f ]
         # otherwise z should be a list of int's or something equivalent
@@ -107,18 +116,3 @@ class LatticeSeq:
 
     def next(self):
         return self.__next__()
-
-if __name__ == "__main__":
-    import sys
-    if len(sys.argv) < 2: raise ValueError("Please specify the power of 2 as a command line argument: latticeseq_b2 m < z.txt")
-    try:
-        m = int(sys.argv[1])
-    except:
-        raise ValueError("Please specify the power of 2 as a command line argument: latticeseq_b2 m < z.txt")
-    if len(sys.argv) > 2: f = sys.argv[2]
-    else: f = sys.stdin
-    seq = latticeseq_b2(f, m=m)
-    for x in seq:
-        for xj in x:
-            print(xj, end=" ")
-        print()

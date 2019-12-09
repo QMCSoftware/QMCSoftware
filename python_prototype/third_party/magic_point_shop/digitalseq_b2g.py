@@ -140,6 +140,7 @@ class digitalseq_b2g:
             # filename passed in
             f = open(Cs)
             Cs = [ list(map(int, line.split())) for line in f ]
+            f.close()
         elif hasattr(Cs, 'read'):
             # assume z is a stream like sys.stdin
             f = Cs

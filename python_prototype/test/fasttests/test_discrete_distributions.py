@@ -6,7 +6,6 @@ import unittest
 from numpy import array, int64, log, ndarray, zeros
 import numpy.testing as npt
 
-
 class TestIIDStdUniform(unittest.TestCase):
     """
     Unit tests for IIDStdUniform in QMCPy.
