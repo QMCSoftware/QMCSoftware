@@ -100,13 +100,13 @@ class TestSobol(unittest.TestCase):
                             [1073741824, 3221225472, 3221225472, 3221225472]])
         self.assertTrue((array_not_shifted.squeeze() == true_array).all())
 
-
     def test_sobol_samples(self):
         n = 2 ** 5
         d = 4
-        samples1 = gen_mps_sobol_points(n, d)
-        samples2 = gen_qmcpy_sobol_points(n, d)
+        samples1,t1 = gen_mps_sobol_points(n, d)
+        samples2,t2 = gen_qmcpy_sobol_points(n, d)
         self.assertTrue(npt.assert_array_equal(samples1, samples2) == None)
+        self.assertTrue(t1>t2)
 
 
 if __name__ == "__main__":

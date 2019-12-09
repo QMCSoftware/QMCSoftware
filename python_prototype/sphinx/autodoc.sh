@@ -22,7 +22,7 @@ FILES=*.ipynb
 for f in $FILES
 do
   echo "Processing $f file..."
-  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV $f
+  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f
 done
 DIR=../demos/html_renders
 rm -f $DIR/*
