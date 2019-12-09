@@ -64,7 +64,7 @@ class TestLattice(unittest.TestCase):
         from third_party.magic_point_shop import latticeseq_b2
         n, m = 4, 4
         gen_original_mps = latticeseq_b2(m=int(log(n) / log(2)), s=m)
-        gen_qmcpy_mps = LatticeSeq(m=int(log(n) / log(2)), s=m)
+        gen_qmcpy_mps = LatticeSeq(m=int(log(n) / log(2)), s=m, returnDeepCopy=False)
         true_array = array([
                 [0,         0,          0,          0],
                 [1 / 2,     1 / 2,      1 / 2,      1 / 2],
@@ -103,7 +103,8 @@ class TestSobol(unittest.TestCase):
         gen_qmcpy_mps = DigitalSeq(
             Cs = "sobol_Cs.col",
             m = int(log(n) / log(2)),
-            s = m)
+            s = m,
+            returnDeepCopy=False)
         true_array = array([
                 [0,          0,          0,          0],
                 [2147483648, 2147483648, 2147483648, 2147483648],
