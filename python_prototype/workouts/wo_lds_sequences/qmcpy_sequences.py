@@ -8,7 +8,7 @@ from time import time
 
 distribution_pointers = [Lattice, Sobol]
 
-def samples_gentime_comparison(n_2powers=arange(1,11)):
+def qmcpy_gentimes(n_2powers=arange(1,11)):
     """
     Record wall-clock time for generating samples from each discrete distribution
     """
@@ -29,5 +29,5 @@ def samples_gentime_comparison(n_2powers=arange(1,11)):
     return df
 
 if __name__ == '__main__': 
-    df_times = samples_gentime_comparison(n_2powers=arange(1,21))
-    df_times.to_csv('outputs/comp_quasirandom_sequences/python_sequence_times.csv', index=False)
+    df_times = qmcpy_gentimes(n_2powers=arange(1,21))
+    df_times.to_csv('outputs/lds_sequences/python_sequence_times.csv', index=False)
