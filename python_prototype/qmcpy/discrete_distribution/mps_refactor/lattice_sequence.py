@@ -38,8 +38,8 @@ exod2_len = len(exod2_base2_m20_CKN_z)
 
 class LatticeSeq:
     """
-    A fast lattice sequence point generator.
-
+    A lattice sequence point generator.
+    
 
     This implementation is based upon, but faster than, ``latticeseq_b2`` from:
 
@@ -48,6 +48,17 @@ class LatticeSeq:
         vectors.` MATLAB and Python software, 2018. Available from
         https://people.cs.kuleuven.be/~dirk.nuyens/
 
+    
+    This version is slightly faster than the original Magic Point Shop class when
+    constructing matricies with: 
+        lattice_rng = latticeseq_b2(m=30, s=dim, returnDeepCopy=True)
+        samples = array([next(lattice_rng) for i in range(n_samples)])
+        
+    However, QMCPy uses the following code, built upon the unchanged calc_block, to generate matricies:
+        from numpy import hstack
+        lattice_rng = LatticeSeq(m=30, s=dim, returnDeepCopy=False)
+        qmcpy_lattice_samples = vstack([lattice_rng.calc_block(m) for m in range(n_2+1)])
+    See workouts/wo_lds_sequences/mps_original_vs_qmcpy for more details and speed tests
     """
 
     def __init__(self, z=exod2_base2_m20_CKN_z, kstart=0, m=32, s=exod2_len, returnDeepCopy=True):
