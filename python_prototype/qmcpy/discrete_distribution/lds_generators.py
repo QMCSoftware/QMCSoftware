@@ -3,8 +3,8 @@
 
 from ._discrete_distribution import DiscreteDistribution
 from .mps_refactor import DigitalSeq, LatticeSeq
-
-from numpy import array, int64, zeros
+from .._util import DistributionGenerationError
+from numpy import array, int64, zeros, log2, vstack
 from numpy.random import Generator, PCG64
 
 
@@ -18,6 +18,7 @@ class Lattice(DiscreteDistribution):
         """
         self.mimics = 'StdUniform'
         self.rng = Generator(PCG64(rng_seed))
+        self.n_min = 0
         super().__init__()
 
     def gen_dd_samples(self, replications, n_samples, dimensions):
@@ -33,13 +34,28 @@ class Lattice(DiscreteDistribution):
         Returns:
             replications x n_samples x dimensions (numpy array)
         """
+        m = log2(n_samples)
+        if m%1 != 0:
+            raise DistributionGenerationError("n_samples must be a power of 2")
+        m = int(m)
         r = int(replications)
-        n = int(n_samples)
         d = int(dimensions)
         if not hasattr(self, 'lattice_rng'):  # initialize lattice rng and shifts
-            self.lattice_rng = LatticeSeq(m=30, s=d, returnDeepCopy=False)
+            self.lattice_rng = LatticeSeq(s=d)
             self.shifts = self.rng.uniform(0, 1, (r, d))
-        x = array([next(self.lattice_rng) for i in range(n)])
+        if self.n_min == 0:
+            # generate first 2^m points
+            x = vstack([self.lattice_rng.calc_block(i) for i in range(m+1)])
+            self.n_min = 2**m
+        elif n_samples != self.n_min:
+            raise DistributionGenerationError('''
+                This Lattice generator has returned a total of %d samples.
+                n_samples is expected to be %d
+                '''%(int(self.n_min),int(self.n_min)))
+        else:
+            # generate self.n_min more samples
+            x = self.lattice_rng.calc_block(m+1)
+            self.n_min = 2**(m+1)
         x_rs = array([(x + shift_r) % 1 for shift_r in self.shifts])  # random shift
         return x_rs
 
@@ -70,6 +86,8 @@ class Sobol(DiscreteDistribution):
         Returns:
             replications x n_samples x dimensions (numpy array)
         """
+        if (log2(n_samples))%1 != 0:
+            raise Exception("n_samples must be a power of 2")
         r = int(replications)
         n = int(n_samples)
         d = int(dimensions)

@@ -3,7 +3,7 @@
 from qmcpy import *
 
 import unittest
-from numpy import array, int64, log, ndarray, zeros
+from numpy import array, int64, log2, ndarray, zeros, vstack
 import numpy.testing as npt
 
 class TestIIDStdUniform(unittest.TestCase):
@@ -62,18 +62,20 @@ class TestLattice(unittest.TestCase):
     def test_backend_lattice(self):
         from qmcpy.discrete_distribution.mps_refactor import LatticeSeq
         from third_party.magic_point_shop import latticeseq_b2
-        n, m = 4, 4
-        gen_original_mps = latticeseq_b2(m=int(log(n) / log(2)), s=m)
-        gen_qmcpy_mps = LatticeSeq(m=int(log(n) / log(2)), s=m, returnDeepCopy=False)
-        true_array = array([
+        n, d = 4, 4
+        true_samples = array([
                 [0,         0,          0,          0],
                 [1 / 2,     1 / 2,      1 / 2,      1 / 2],
                 [1 / 4,     3 / 4,      3 / 4,      1 / 4],
                 [3 / 4,     1 / 4,      1 / 4,      3 / 4]])
-        for gen in [gen_original_mps,gen_qmcpy_mps]:
-            samples_unshifted = array([next(gen) for i in range(n)])
-            self.assertTrue((samples_unshifted.squeeze() == true_array).all())
-
+        # Original MPS Generator with standard method
+        gen_original_mps = latticeseq_b2(s=d)
+        mps_sampels = array([next(gen_original_mps) for i in range(n)])
+        self.assertTrue(all(row in mps_sampels for row in true_samples))
+        # QMCPy Generator with calc_block method (based on MPS implementation)
+        qmcpy_gen = LatticeSeq(s=d)
+        qmcpy_samples = vstack([qmcpy_gen.calc_block(m) for m in range(int(log2(n))+1)])
+        self.assertTrue(all(row in qmcpy_samples for row in true_samples))
 
 class TestSobol(unittest.TestCase):
     """
@@ -98,11 +100,11 @@ class TestSobol(unittest.TestCase):
         n, m = 4, 4
         gen_original_mps = digitalseq_b2g(
             Cs = "./third_party/magic_point_shop/sobol_Cs.col",
-            m = int(log(n) / log(2)),
+            m = int(log2(n)),
             s = m)
         gen_qmcpy_mps = DigitalSeq(
             Cs = "sobol_Cs.col",
-            m = int(log(n) / log(2)),
+            m = int(log2(n)),
             s = m,
             returnDeepCopy=False)
         true_array = array([
