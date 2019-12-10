@@ -6,13 +6,13 @@ from numpy import *
 from pandas import DataFrame
 from time import time
 
+dim = 1
 distribution_pointers = [Lattice, Sobol]
 
 def qmcpy_gentimes(n_2powers=arange(1,11)):
     """
     Record wall-clock time for generating samples from each discrete distribution
     """
-    dimension = 1
     print('\nDiscrete Distribution Generation Time Comparison')
     columns = ['n_2power'] + [type(distrib()).__name__ + '_time' for distrib in distribution_pointers]
     df = DataFrame(columns=columns, dtype=float)
@@ -22,7 +22,7 @@ def qmcpy_gentimes(n_2powers=arange(1,11)):
         for distrib_pointer in distribution_pointers:
             t0 = time()
             distribution = distrib_pointer(rng_seed=7)
-            distribution.gen_dd_samples(1, n_samples, dimension)
+            x = distribution.gen_dd_samples(1, n_samples, dim)
             row_i[type(distribution).__name__ + '_time'] = time()-t0
         print(row_i)
         df.loc[i] = row_i
