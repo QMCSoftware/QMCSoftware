@@ -49,6 +49,6 @@ def abstol_comparison(abstols=arange(.1, .4, .1)):
 
 if __name__ == '__main__':
     # Absolute Tolerance Comparison Test
-    abstols = arange(.0012, .1002, .0002)
+    abstols = arange(.0008, .1002, .0002)
     df_abstols = abstol_comparison(abstols)
     df_abstols.to_csv('outputs/mc_vs_qmc/abs_tol.csv', index=False)
