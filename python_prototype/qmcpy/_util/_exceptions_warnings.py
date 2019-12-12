@@ -33,7 +33,14 @@ class ParameterError(Exception):
 
 class DistributionGenerationError(Exception):
     """
-    Class for raising error about parameter inputs to gen_dd_samples (method of a DiscreteDistribution)
+    Class for raising error about parameter inputs 
+    to gen_dd_samples (method of a DiscreteDistribution)
+    """
+
+class DistributionGenerationWarnings(Warning):
+    """
+    Class for issuing warningssabout parameter inputs 
+    to gen_dd_samples (method of a DiscreteDistribution)
     """
 
 class ParameterWarning(Warning):
