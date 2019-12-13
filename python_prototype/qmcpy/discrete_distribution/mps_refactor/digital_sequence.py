@@ -6,7 +6,7 @@ from copy import copy
 from os import path
 import sys
 import pandas as pd
-from numpy import loadtxt, binary_repr
+from numpy import loadtxt
 
 
 class DigitalSeq():
