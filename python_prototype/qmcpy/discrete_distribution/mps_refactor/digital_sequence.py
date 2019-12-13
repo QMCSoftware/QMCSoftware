@@ -6,6 +6,7 @@ from copy import copy
 from os import path
 import sys
 import pandas as pd
+from numpy import loadtxt, binary_repr
 
 
 class DigitalSeq():
@@ -161,9 +162,7 @@ class DigitalSeq():
         basestr = str  # basestr for python2, str for python3
         if isinstance(Cs, basestr):
             abs_file_path = path.join(path.dirname(__file__), Cs)
-            # filename passed in
-            Cs = pd.read_csv(abs_file_path, header=None, delimiter=" ",
-                             nrows=s).values.tolist()
+            Cs = loadtxt(abs_file_path,int,max_rows=s).reshape(s,-1)
         elif hasattr(Cs, "read"):
             # assume z is a stream like sys.stdin
             f = Cs
