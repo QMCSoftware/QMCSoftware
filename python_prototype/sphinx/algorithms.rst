@@ -55,7 +55,10 @@ Discrete Distribution Class
 .. automodule:: qmcpy.discrete_distribution
     :members:
 
-.. automodule:: qmcpy.discrete_distribution.distributions
+.. automodule:: qmcpy.discrete_distribution.iid_generators
+    :members:
+
+.. automodule:: qmcpy.discrete_distribution.lds_generators
     :members:
 
 

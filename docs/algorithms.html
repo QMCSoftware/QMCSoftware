@@ -456,14 +456,14 @@ dimension (int): number of dimensions</p>
 </div>
 <div class="section" id="discrete-distribution-class">
 <h2>Discrete Distribution Class<a class="headerlink" href="#discrete-distribution-class" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-qmcpy.discrete_distribution"></span><span class="target" id="module-qmcpy.discrete_distribution.distributions"></span><p>This module implements mutiple subclasses of DiscreteDistribution.</p>
+<span class="target" id="module-qmcpy.discrete_distribution"></span><span class="target" id="module-qmcpy.discrete_distribution.iid_generators"></span><p>This module implements mutiple subclasses of DiscreteDistribution.</p>
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.distributions.IIDStdGaussian">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.distributions.</code><code class="sig-name descname">IIDStdGaussian</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdGaussian" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdGaussian">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.iid_generators.</code><code class="sig-name descname">IIDStdGaussian</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdGaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Standard Gaussian</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.distributions.IIDStdGaussian.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdGaussian.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdGaussian.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdGaussian.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -472,8 +472,8 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.distributions.IIDStdGaussian.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdGaussian.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdGaussian.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdGaussian.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd IID Standard Gaussian samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -492,12 +492,12 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.distributions.IIDStdUniform">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.distributions.</code><code class="sig-name descname">IIDStdUniform</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdUniform" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdUniform">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.iid_generators.</code><code class="sig-name descname">IIDStdUniform</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdUniform" title="Permalink to this definition">¶</a></dt>
 <dd><p>IID Standard Uniform</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.distributions.IIDStdUniform.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdUniform.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdUniform.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdUniform.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -506,8 +506,8 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.distributions.IIDStdUniform.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.IIDStdUniform.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdUniform.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdUniform.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd IID Standard Uniform samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -525,13 +525,14 @@ dimension (int): number of dimensions</p>
 
 </dd></dl>
 
+<span class="target" id="module-qmcpy.discrete_distribution.lds_generators"></span><p>This module implements mutiple subclasses of DiscreteDistribution.</p>
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.distributions.Lattice">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.distributions.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Lattice" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.lds_generators.Lattice">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.lds_generators.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Lattice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quasi-Random Lattice low discrepancy sequence (Base 2)</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.distributions.Lattice.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.lds_generators.Lattice.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -540,8 +541,8 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.distributions.Lattice.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Lattice.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.lds_generators.Lattice.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em>, <em class="sig-param">scramble=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Lattice.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd Lattice samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -549,6 +550,7 @@ dimension (int): number of dimensions</p>
 <li><p><strong>replications</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
 <li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
 <li><p><strong>dimensions</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+<li><p><strong>scramble</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, random numbers are in unit cube, otherwise they are non-negative integers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -560,12 +562,12 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.distributions.Sobol">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.distributions.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Sobol" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.lds_generators.Sobol">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.lds_generators.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quasi-Random Sobol low discrepancy sequence (Base 2)</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.distributions.Sobol.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.lds_generators.Sobol.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -574,8 +576,8 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.distributions.Sobol.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em>, <em class="sig-param">returnDeepCopy=True</em>, <em class="sig-param">scramble=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.distributions.Sobol.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.lds_generators.Sobol.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em>, <em class="sig-param">scramble=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd Sobol samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -583,8 +585,7 @@ dimension (int): number of dimensions</p>
 <li><p><strong>replications</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
 <li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
 <li><p><strong>dimensions</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
-<li><p><strong>returnDeepCopy</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Return deep copies of output if True</p></li>
-<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, random numbers are in unit cube, otherwise they are non-negative integers</p></li>
+<li><p><strong>scramble</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, random numbers are in unit cube, otherwise they are non-negative integers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -713,11 +714,11 @@ and store the sample mean and variance of integrand values</p>
 <span class="target" id="module-qmcpy.stopping_criterion.clt_rep"></span><p>Definition for CLTRep, a concrete implementation of StoppingCriterion</p>
 <dl class="class">
 <dt id="qmcpy.stopping_criterion.clt_rep.CLTRep">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.stopping_criterion.clt_rep.</code><code class="sig-name descname">CLTRep</code><span class="sig-paren">(</span><em class="sig-param">discrete_distrib</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">replications=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=32</em>, <em class="sig-param">n_max=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stopping_criterion.clt_rep.CLTRep" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.stopping_criterion.clt_rep.</code><code class="sig-name descname">CLTRep</code><span class="sig-paren">(</span><em class="sig-param">discrete_distrib</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">replications=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=32</em>, <em class="sig-param">n_max=1073741824</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stopping_criterion.clt_rep.CLTRep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stopping criterion based on var(stream_1_estimate, …, stream_16_estimate) &lt; errorTol</p>
 <dl class="method">
 <dt id="qmcpy.stopping_criterion.clt_rep.CLTRep.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">discrete_distrib</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">replications=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=32</em>, <em class="sig-param">n_max=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stopping_criterion.clt_rep.CLTRep.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">discrete_distrib</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">replications=16</em>, <em class="sig-param">inflate=1.2</em>, <em class="sig-param">alpha=0.01</em>, <em class="sig-param">abs_tol=0.01</em>, <em class="sig-param">rel_tol=0</em>, <em class="sig-param">n_init=32</em>, <em class="sig-param">n_max=1073741824</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.stopping_criterion.clt_rep.CLTRep.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -757,6 +758,20 @@ and store the sample mean and variance of integrand values</p>
 <dt id="qmcpy._util._exceptions_warnings.DistributionCompatibilityError">
 <em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">DistributionCompatibilityError</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.DistributionCompatibilityError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for raising error about incompatible distribution</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="qmcpy._util._exceptions_warnings.DistributionGenerationError">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">DistributionGenerationError</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.DistributionGenerationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for raising error about parameter inputs
+to gen_dd_samples (method of a DiscreteDistribution)</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="qmcpy._util._exceptions_warnings.DistributionGenerationWarnings">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">DistributionGenerationWarnings</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.DistributionGenerationWarnings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for issuing warningssabout parameter inputs
+to gen_dd_samples (method of a DiscreteDistribution)</p>
 </dd></dl>
 
 <dl class="exception">

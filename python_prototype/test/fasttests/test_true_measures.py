@@ -4,6 +4,7 @@ from qmcpy import *
 from qmcpy._util import *
 
 import unittest
+from numpy import array
 
 
 class TestTrueDistributionConstruction(unittest.TestCase):

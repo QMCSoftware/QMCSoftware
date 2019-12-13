@@ -1,12 +1,10 @@
 """ Unit tests for discrete distributions in QMCPy """
 
-import unittest
-
-from numpy import array, int64, log, ndarray, zeros
-import numpy.testing as npt
 from qmcpy import *
-from workouts.wo_sequences import gen_mps_sobol_points, gen_qmcpy_sobol_points
 
+import unittest
+from numpy import array, int64, log2, ndarray, zeros, vstack
+import numpy.testing as npt
 
 class TestIIDStdUniform(unittest.TestCase):
     """
@@ -62,14 +60,22 @@ class TestLattice(unittest.TestCase):
             self.assertEqual(samples.shape, (1, 2, 3))
 
     def test_backend_lattice(self):
-        n, m = 4, 4
-        array_not_shifted = array([list(LatticeSeq(m=int(log(n) / log(2)), s=m))])
-        true_array = array([[0, 0, 0, 0],
-                            [1 / 2, 1 / 2, 1 / 2, 1 / 2],
-                            [1 / 4, 3 / 4, 3 / 4, 1 / 4],
-                            [3 / 4, 1 / 4, 1 / 4, 3 / 4]])
-        self.assertTrue((array_not_shifted.squeeze() == true_array).all())
-
+        from qmcpy.discrete_distribution.mps_refactor import LatticeSeq
+        from third_party.magic_point_shop import latticeseq_b2
+        n, d = 4, 4
+        true_samples = array([
+                [0,         0,          0,          0],
+                [1 / 2,     1 / 2,      1 / 2,      1 / 2],
+                [1 / 4,     3 / 4,      3 / 4,      1 / 4],
+                [3 / 4,     1 / 4,      1 / 4,      3 / 4]])
+        # Original MPS Generator with standard method
+        gen_original_mps = latticeseq_b2(s=d)
+        mps_sampels = array([next(gen_original_mps) for i in range(n)])
+        self.assertTrue(all(row in mps_sampels for row in true_samples))
+        # QMCPy Generator with calc_block method (based on MPS implementation)
+        qmcpy_gen = LatticeSeq(s=d)
+        qmcpy_samples = vstack([qmcpy_gen.calc_block(m) for m in range(int(log2(n))+1)])
+        self.assertTrue(all(row in qmcpy_samples for row in true_samples))
 
 class TestSobol(unittest.TestCase):
     """
@@ -89,25 +95,28 @@ class TestSobol(unittest.TestCase):
             self.assertEqual(samples.shape, (1, 2, 3))
 
     def test_backend_sobol(self):
+        from qmcpy.discrete_distribution.mps_refactor import DigitalSeq
+        from third_party.magic_point_shop import digitalseq_b2g
         n, m = 4, 4
-        gen = DigitalSeq(Cs="sobol_Cs.col", m=int(log(n) / log(2)), s=m)
-        array_not_shifted = zeros((n, m), dtype=int64)
-        for i, _ in enumerate(gen):
-            array_not_shifted[i, :] = gen.cur  # set each nxm
-        true_array = array([[0, 0, 0, 0],
-                            [2147483648, 2147483648, 2147483648, 2147483648],
-                            [3221225472, 1073741824, 1073741824, 1073741824],
-                            [1073741824, 3221225472, 3221225472, 3221225472]])
-        self.assertTrue((array_not_shifted.squeeze() == true_array).all())
-
-    def test_sobol_samples(self):
-        n = 2 ** 5
-        d = 4
-        samples1,t1 = gen_mps_sobol_points(n, d)
-        samples2,t2 = gen_qmcpy_sobol_points(n, d)
-        self.assertTrue(npt.assert_array_equal(samples1, samples2) == None)
-        self.assertTrue(t1>t2)
-
+        gen_original_mps = digitalseq_b2g(
+            Cs = "./third_party/magic_point_shop/sobol_Cs.col",
+            m = int(log2(n)),
+            s = m)
+        gen_qmcpy_mps = DigitalSeq(
+            Cs = "sobol_Cs.col",
+            m = int(log2(n)),
+            s = m,
+            returnDeepCopy=False)
+        true_array = array([
+                [0,          0,          0,          0],
+                [2147483648, 2147483648, 2147483648, 2147483648],
+                [3221225472, 1073741824, 1073741824, 1073741824],
+                [1073741824, 3221225472, 3221225472, 3221225472]])
+        for gen in [gen_original_mps,gen_qmcpy_mps]:
+            samples_unshifted = zeros((n, m), dtype=int64)
+            for i, _ in enumerate(gen):
+                samples_unshifted[i, :] = gen.cur
+            self.assertTrue((samples_unshifted.squeeze() == true_array).all())
 
 if __name__ == "__main__":
     unittest.main()
