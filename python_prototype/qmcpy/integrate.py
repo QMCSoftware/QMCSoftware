@@ -7,7 +7,7 @@ from .true_measure import Uniform
 from ._util import DimensionError
 
 import copy
-from time import time
+from time import process_time
 
 
 def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion=None):
@@ -43,7 +43,7 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
     # Check TrueMeasure and Integrand matching dimensions
     if not all(integrand.dimension == true_measure.dimension):
         raise DimensionError('The integrand and true measure should have the same dimension(s)')
-    t_start = time()
+    t_start = process_time()
     # Transform integrands to accept distribution values which can generate
     true_measure.transform(integrand, discrete_distrib)
     while stopping_criterion.stage != "done":
@@ -52,6 +52,6 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
             integrand, true_measure)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
     solution = stopping_criterion.data.solution  # assign outputs
-    data_obj_final = stopping_criterion.data.complete(time() - t_start,
+    data_obj_final = stopping_criterion.data.complete(process_time() - t_start,
         integrand, discrete_distrib, true_measure, stopping_criterion)
     return solution, data_obj_final
