@@ -35,11 +35,13 @@ def mps_gentimes(n_2powers=arange(1, 11), check_accuracy=False):
     for n_2 in n_2powers:
         n_samples = 2**n_2
         row_i = {'n_2power': n_2}
+
         # Original MPS Lattice
         t0 = process_time()
         lattice_rng = latticeseq_b2(m=30, s=dim, returnDeepCopy=True)
         mps_lattice_samples = array([next(lattice_rng) for i in range(n_samples)])
         row_i['mps_lattice_time'] = process_time() - t0
+
         # Refactored MPS Lattice
         t0 = process_time()
         lattice_rng = LatticeSeq(m=30, s=dim, returnDeepCopy=False)
@@ -47,24 +49,23 @@ def mps_gentimes(n_2powers=arange(1, 11), check_accuracy=False):
         row_i['qmcpy_lattice_time'] = process_time() - t0
         if check_accuracy and not all(row in qmcpy_lattice_samples for row in mps_lattice_samples):
             raise Exception("Lattice sample do not match for n_samples=2^%d" % n_2)
+
         # Original MPS Sobol
         t0 = process_time()
         sobol_rng = digitalseq_b2g(Cs="./third_party/magic_point_shop/sobol_Cs.col", m=30, s=dim, returnDeepCopy=True)
-        mps_Sobol_samples = zeros((n_samples, dim), dtype=int64)
+        mps_sobol_samples = zeros((n_samples, dim), dtype=int64)
         for i in range(n_samples):
             next(sobol_rng)
-            mps_Sobol_samples[i, :] = sobol_rng.cur
+            mps_sobol_samples[i, :] = sobol_rng.cur
         row_i['mps_Sobol_time'] = process_time() - t0
+
         # Refactored MPS Sobol
         t0 = process_time()
         sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=30, s=dim, returnDeepCopy=False)
-        qmcpy_Sobol_samples = zeros((n_samples, dim), dtype=int64)
-        for i in range(n_samples):
-            next(sobol_rng)
-            qmcpy_Sobol_samples[i, :] = sobol_rng.cur
+        qmcpy_sobol_samples = array([next(sobol_rng) for i in range(n_samples)])
         row_i['qmcpy_Sobol_time'] = process_time() - t0
-        if check_accuracy and not all(row in qmcpy_Sobol_samples for row in mps_Sobol_samples):
-            raise Exception("Sobol sample do not match for n_samples=2^%d" % n_2)
+        if check_accuracy and not all(row in qmcpy_sobol_samples for row in mps_sobol_samples):
+            raise Exception("Sobol sample does not match for n_samples=2^%d" % n_2)
         print(row_i)
         df.loc[i] = row_i
     return df

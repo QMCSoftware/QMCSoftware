@@ -193,11 +193,12 @@ class DigitalSeq():
 
     def set_state(self, k):
         """Set the index of the next point to k."""
-        self.k = k - 1  # self.k is the previous point, this means we have exceptional behaviour for kstart = 0
+        self.k = k
+        last_k = k - 1  # the previous point, this means we have exceptional behaviour for kstart = 0
         self.cur = [0 for i in range(self.s)]
         self.x = [0 for i in range(self.s)]
         if k == 0: return
-        gk = (self.k >> 1) ^ self.k  # we are using Gray code ordering
+        gk = (last_k >> 1) ^ last_k  # we are using Gray code ordering
         for i in range(self.m):
             if gk & (1 << i):
                 for j in range(self.s):
@@ -207,14 +208,18 @@ class DigitalSeq():
 
     def calc_next(self):
         """Calculate the next sequence point and update the index counter."""
-        self.k = self.k + 1
-        if self.k == 0: return True
+        if self.k == 0:
+            self.k = self.k + 1;
+            return True
         p = (((self.k ^ (self.k - 1)) + 1) >> 1)
         ctz = len(bin(p)[2:]) - 1
         for j in range(self.s):
             self.cur[j] = self.cur[j] ^ self.Csr[j][ctz]
             self.x[j] = self.recipd * self.cur[j]
-        if self.k >= self.n: return False
+        if self.k >= self.n:
+            self.k = self.k + 1;
+            return False
+        self.k = self.k + 1
         return True
 
     def __iter__(self):
@@ -223,7 +228,7 @@ class DigitalSeq():
 
     def __next__(self):
         """Return the next point of the sequence or raise StopIteration."""
-        if self.k < self.n - 1:
+        if self.k < self.n:
             self.calc_next()
             return copy(self.x) if self.returnDeepCopy else self.x
         else:
