@@ -110,11 +110,15 @@ class TestSobol(unittest.TestCase):
             [2147483648, 2147483648, 2147483648, 2147483648],
             [3221225472, 1073741824, 1073741824, 1073741824],
             [1073741824, 3221225472, 3221225472, 3221225472]])
+
         for gen in [gen_original_mps, gen_qmcpy_mps]:
             samples_unshifted = zeros((n, m), dtype=int64)
             for i, _ in enumerate(gen):
                 samples_unshifted[i, :] = gen.cur
             self.assertTrue((samples_unshifted.squeeze() == true_array).all())
+
+        del gen_qmcpy_mps # Ensure shallow copy d.n. affect samples_unshifted
+        self.assertTrue((samples_unshifted == true_array).all())
 
 
 if __name__ == "__main__":
