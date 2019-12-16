@@ -51,12 +51,12 @@ class Lattice(DiscreteDistribution):
             if d != self.d or r != self.r:
                 warnings.warn('''
                     Using dimensions = %d and replications = %d
-                    as previously set for this generator.'''\
-                    %  (self.d, self.r),
+                    as previously set for this generator.'''
+                    % (self.d, self.r),
                     DistributionGenerationWarnings)
         if self.n_min == 0:
             # generate first 2^m points
-            x = vstack([self.lattice_rng.calc_block(i) for i in range(m+1)])
+            x = vstack([self.lattice_rng.calc_block(i) for i in range(m + 1)])
             self.n_min = 2**m
         elif n_samples != self.n_min:
             raise DistributionGenerationError('''
@@ -65,14 +65,15 @@ class Lattice(DiscreteDistribution):
                 ''' % (int(self.n_min), int(self.n_min)))
         else:
             # generate self.n_min more samples
-            x = self.lattice_rng.calc_block(m+1)
-            self.n_min = 2**(m+1)
+            x = self.lattice_rng.calc_block(m + 1)
+            self.n_min = 2**(m + 1)
         if scramble:
-                x = array([(x + shift_r) % 1 for shift_r in self.shifts])  # random shift
-        elif r!= 1: # and scramble==False
-            warnings.warn('as scramble==False, setting replications = 1 ', \
-                          DistributionGenerationWarnings)    
+            x = array([(x + shift_r) % 1 for shift_r in self.shifts])  # random shift
+        elif r != 1:  # and scramble==False
+            warnings.warn('as scramble==False, setting replications = 1 ',
+                          DistributionGenerationWarnings)
         return x
+
 
 class Sobol(DiscreteDistribution):
     """ Quasi-Random Sobol low discrepancy sequence (Base 2) """
@@ -99,7 +100,7 @@ class Sobol(DiscreteDistribution):
         Returns:
             replications x n_samples x dimensions (numpy array)
         """
-        if (log2(n_samples))%1 != 0:
+        if (log2(n_samples)) % 1 != 0:
             raise Exception("n_samples must be a power of 2")
         r = int(replications)
         n = int(n_samples)
@@ -115,8 +116,8 @@ class Sobol(DiscreteDistribution):
             if d != self.d or r != self.r:
                 warnings.warn('''
                     Using dimensions = %d and replications = %d
-                    as previously set for this generator.'''\
-                    %  (self.d, self.r),
+                    as previously set for this generator.'''
+                    % (self.d, self.r),
                     DistributionGenerationWarnings)
         x = zeros((n, d), dtype=int64)
         for i in range(n):
@@ -125,7 +126,7 @@ class Sobol(DiscreteDistribution):
         if scramble:
             x = array([(shift_r ^ (x * 2 ** self.ct)) / 2. ** self.t for shift_r in self.shifts])
             # randomly scramble and x contains values in [0, 1]
-        elif r!= 1: # and scramble==False
-            warnings.warn('as scramble==False, setting replications = 1 ', \
-                          DistributionGenerationWarnings)  
+        elif r != 1:  # and scramble==False
+            warnings.warn('as scramble==False, setting replications = 1 ',
+                          DistributionGenerationWarnings)
         return x

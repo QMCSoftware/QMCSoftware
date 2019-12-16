@@ -162,7 +162,7 @@ class DigitalSeq():
         basestr = str  # basestr for python2, str for python3
         if isinstance(Cs, basestr):
             abs_file_path = path.join(path.dirname(__file__), Cs)
-            Cs = loadtxt(abs_file_path,int,max_rows=s).reshape(s,-1)
+            Cs = loadtxt(abs_file_path, int, max_rows=s).reshape(s, -1)
         elif hasattr(Cs, "read"):
             # assume z is a stream like sys.stdin
             f = Cs
@@ -193,11 +193,11 @@ class DigitalSeq():
 
     def set_state(self, k):
         """Set the index of the next point to k."""
-        self.k = k - 1 # self.k is the previous point, this means we have exceptional behaviour for kstart = 0
-        self.cur = [ 0 for i in range(self.s) ]
-        self.x = [ 0 for i in range(self.s) ]
+        self.k = k - 1  # self.k is the previous point, this means we have exceptional behaviour for kstart = 0
+        self.cur = [0 for i in range(self.s)]
+        self.x = [0 for i in range(self.s)]
         if k == 0: return
-        gk = (self.k >> 1) ^ self.k # we are using Gray code ordering
+        gk = (self.k >> 1) ^ self.k  # we are using Gray code ordering
         for i in range(self.m):
             if gk & (1 << i):
                 for j in range(self.s):

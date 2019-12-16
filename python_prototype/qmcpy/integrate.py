@@ -1,13 +1,10 @@
 """ Main driver function for QMCPy. """
 
-from .discrete_distribution import IIDStdUniform
-from .integrand.linear import Linear
-from .stopping_criterion import CLT
-from .true_measure import Uniform
-from ._util import DimensionError
-
-import copy
 from time import process_time
+
+from ._util import DimensionError
+from .discrete_distribution import IIDStdUniform
+from .stopping_criterion import CLT
 
 
 def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion=None):
@@ -52,6 +49,9 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
             integrand, true_measure)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
     solution = stopping_criterion.data.solution  # assign outputs
-    data_obj_final = stopping_criterion.data.complete(process_time() - t_start,
-        integrand, discrete_distrib, true_measure, stopping_criterion)
+    cpu_time = process_time() - t_start
+    data_obj_final = stopping_criterion.data.complete(cpu_time, integrand,
+                                                      discrete_distrib,
+                                                      true_measure,
+                                                      stopping_criterion)
     return solution, data_obj_final

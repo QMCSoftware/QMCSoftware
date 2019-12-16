@@ -6,10 +6,8 @@ Single-Level and Multi-Level Asian Option Pricing Examples
         python workouts/wo_asian_option.py  > outputs/examples/ie_AsianOption.txt
 """
 
-from qmcpy import *
-
 from numpy import arange
-
+from qmcpy import *
 
 volatility = .5
 start_price = 30
@@ -27,11 +25,11 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure,
-                    volatility=volatility,
-                    start_price=start_price,
-                    strike_price=strike_price,
-                    interest_rate=interest_rate,
-                    mean_type=mean_type)
+                          volatility=volatility,
+                          start_price=start_price,
+                          strike_price=strike_price,
+                          interest_rate=interest_rate,
+                          mean_type=mean_type)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
@@ -40,11 +38,11 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure,
-                    volatility=volatility,
-                    start_price=start_price,
-                    strike_price=strike_price,
-                    interest_rate=interest_rate,
-                    mean_type=mean_type)
+                          volatility=volatility,
+                          start_price=start_price,
+                          strike_price=strike_price,
+                          interest_rate=interest_rate,
+                          mean_type=mean_type)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
@@ -55,11 +53,11 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         discrete_distrib = IIDStdUniform(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
         integrand = AsianCall(true_measure,
-                    volatility=volatility,
-                    start_price=start_price,
-                    strike_price=strike_price,
-                    interest_rate=interest_rate,
-                    mean_type=mean_type)
+                              volatility=volatility,
+                              start_price=start_price,
+                              strike_price=strike_price,
+                              interest_rate=interest_rate,
+                              mean_type=mean_type)
         stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         print(data)
@@ -68,11 +66,11 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         discrete_distrib = IIDStdGaussian(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
         integrand = AsianCall(true_measure,
-                    volatility=volatility,
-                    start_price=start_price,
-                    strike_price=strike_price,
-                    interest_rate=interest_rate,
-                    mean_type=mean_type)
+                              volatility=volatility,
+                              start_price=start_price,
+                              strike_price=strike_price,
+                              interest_rate=interest_rate,
+                              mean_type=mean_type)
         stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         print(data)
@@ -81,11 +79,11 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         discrete_distrib = Lattice(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
         integrand = AsianCall(true_measure,
-                    volatility=volatility,
-                    start_price=start_price,
-                    strike_price=strike_price,
-                    interest_rate=interest_rate,
-                    mean_type=mean_type)
+                              volatility=volatility,
+                              start_price=start_price,
+                              strike_price=strike_price,
+                              interest_rate=interest_rate,
+                              mean_type=mean_type)
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         print(data)
@@ -94,11 +92,11 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
         discrete_distrib = Sobol(rng_seed=7)
         true_measure = BrownianMotion(dim, time_vector=time_vec)
         integrand = AsianCall(true_measure,
-                    volatility=volatility,
-                    start_price=start_price,
-                    strike_price=strike_price,
-                    interest_rate=interest_rate,
-                    mean_type=mean_type)
+                              volatility=volatility,
+                              start_price=start_price,
+                              strike_price=strike_price,
+                              interest_rate=interest_rate,
+                              mean_type=mean_type)
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
         _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
         print(data)
