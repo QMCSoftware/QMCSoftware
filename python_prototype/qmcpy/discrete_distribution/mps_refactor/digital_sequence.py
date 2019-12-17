@@ -199,16 +199,13 @@ class DigitalSeq():
     def calc_next(self):
         """Calculate the next sequence point and update the index counter."""
         if self.k == 0:
-            return True
+            return
         p = (((self.k ^ (self.k - 1)) + 1) >> 1)
         ctz = len(bin(p)[2:]) - 1
         for j in range(self.s):
             self.cur[j] ^= self.Csr[j][ctz]
             self.x[j] = self.recipd * self.cur[j]
-        if self.k >= self.n:
-            return False
 
-        return True
 
     def __iter__(self):
         self.reset()
