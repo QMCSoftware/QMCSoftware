@@ -169,18 +169,11 @@ class DigitalSeq():
             f.close()
         # otherwise Cs should be a list of generating matrices
         self.kstart = kstart
-        if m is None:
-            self.m = len(Cs[0])
-        else:
-            self.m = m
-        if s is None:
-            self.s = len(Cs)
-        else:
-            self.s = s
+        self.m = len(Cs[0]) if m is None else m
+        self.s = len(Cs) if s is None else s
         self.t = max([int(a).bit_length() for a in Cs[0]])
         self.alpha = self.t / self.m
-        self.Csr = [[bitreverse(int(Csjc), self.t) for Csjc in Csj] for Csj
-                    in Cs]
+        self.Csr = [[bitreverse(int(Csjc), self.t) for Csjc in Csj] for Csj in Cs]
         self.n = 2 ** self.m
         self.recipd = 2 ** -self.t
         self.reset()
@@ -197,12 +190,9 @@ class DigitalSeq():
         self.x = [0 for i in range(self.s)]
         if k == 0: return
         gk = (last_k >> 1) ^ last_k  # we are using Gray code ordering
-        for i in range(self.m):
-            if gk & (1 << i):
-                for j in range(self.s):
-                    self.cur[j] ^= self.Csr[j][i]
-        for j in range(self.s):
-            self.x[j] = self.recipd * self.cur[j]
+        if gk:
+            self.cur[range(self.s)] ^= self.Csr[range(self.s)][range(self.m)]
+        self.x = self.recipd * self.cur
 
     def calc_next(self):
         """Calculate the next sequence point and update the index counter."""
@@ -211,7 +201,7 @@ class DigitalSeq():
         p = (((self.k ^ (self.k - 1)) + 1) >> 1)
         ctz = len(bin(p)[2:]) - 1
         for j in range(self.s):
-            self.cur[j] = self.cur[j] ^ self.Csr[j][ctz]
+            self.cur[j] ^= self.Csr[j][ctz]
             self.x[j] = self.recipd * self.cur[j]
         if self.k >= self.n:
             return False
