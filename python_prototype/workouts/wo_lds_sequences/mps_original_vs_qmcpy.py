@@ -61,7 +61,7 @@ def mps_gentimes(n_2powers=arange(1, 11), check_accuracy=False):
 
         # Refactored MPS Sobol
         t0 = process_time()
-        sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=30, s=dim, returnDeepCopy=False)
+        sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=30, s=dim)
         qmcpy_sobol_samples = array([next(sobol_rng) for i in range(n_samples)])
         row_i['qmcpy_Sobol_time'] = process_time() - t0
         if check_accuracy and not all(row in qmcpy_sobol_samples for row in mps_sobol_samples):

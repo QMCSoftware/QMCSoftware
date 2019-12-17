@@ -1,12 +1,11 @@
 """ Sobol sequence generator """
 
-from ._functions import bitreverse
-
 from copy import copy
 from os import path
-import sys
-import pandas as pd
+
 from numpy import loadtxt
+
+from ._functions import bitreverse
 
 
 class DigitalSeq():
@@ -27,7 +26,7 @@ class DigitalSeq():
 
     """
 
-    def __init__(self, Cs, kstart=0, m=None, s=None, returnDeepCopy=True):
+    def __init__(self, Cs, kstart=0, m=None, s=None):
         """
         Construct a digital sequence point generator given a list of
         generating matrices.
@@ -184,7 +183,6 @@ class DigitalSeq():
                     in Cs]
         self.n = 2 ** self.m
         self.recipd = 2 ** -self.t
-        self.returnDeepCopy = returnDeepCopy
         self.reset()
 
     def reset(self):
@@ -209,7 +207,6 @@ class DigitalSeq():
     def calc_next(self):
         """Calculate the next sequence point and update the index counter."""
         if self.k == 0:
-            self.k = self.k + 1;
             return True
         p = (((self.k ^ (self.k - 1)) + 1) >> 1)
         ctz = len(bin(p)[2:]) - 1
@@ -217,9 +214,8 @@ class DigitalSeq():
             self.cur[j] = self.cur[j] ^ self.Csr[j][ctz]
             self.x[j] = self.recipd * self.cur[j]
         if self.k >= self.n:
-            self.k = self.k + 1;
             return False
-        self.k = self.k + 1
+
         return True
 
     def __iter__(self):
@@ -230,7 +226,8 @@ class DigitalSeq():
         """Return the next point of the sequence or raise StopIteration."""
         if self.k < self.n:
             self.calc_next()
-            return copy(self.x) if self.returnDeepCopy else self.x
+            self.k = self.k + 1
+            return self.x
         else:
             raise StopIteration
 

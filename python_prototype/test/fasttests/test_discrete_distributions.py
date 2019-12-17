@@ -103,8 +103,7 @@ class TestSobol(unittest.TestCase):
         gen_qmcpy_mps = DigitalSeq(
             Cs="sobol_Cs.col",
             m=int(log2(n)),
-            s=m,
-            returnDeepCopy=False)
+            s=m)
         true_array = array([
             [0, 0, 0, 0],
             [2147483648, 2147483648, 2147483648, 2147483648],

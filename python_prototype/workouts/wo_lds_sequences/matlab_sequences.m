@@ -15,6 +15,7 @@ for i=1:size(n_2powers,1)
       x_lat_shifted = mod(x_lat+lattice_shift,1);
     end
     lattice_times(i) = (cputime-t)/repeat;
+
     % Sobol
     t=cputime;
     for j=1:repeat
