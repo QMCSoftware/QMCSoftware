@@ -189,10 +189,12 @@ class DigitalSeq():
         self.cur = [0 for i in range(self.s)]
         self.x = [0 for i in range(self.s)]
         if k == 0: return
-        gk = (last_k >> 1) ^ last_k  # we are using Gray code ordering
-        if gk:
-            self.cur[range(self.s)] ^= self.Csr[range(self.s)][range(self.m)]
-        self.x = self.recipd * self.cur
+        for i in range(self.m):
+            if gk & (1 << i):
+                for j in range(self.s):
+                    self.cur[j] ^= self.Csr[j][i]
+        for j in range(self.s):
+            self.x[j] = self.recipd * self.cur[j]
 
     def calc_next(self):
         """Calculate the next sequence point and update the index counter."""
