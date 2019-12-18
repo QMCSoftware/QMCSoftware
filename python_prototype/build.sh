@@ -5,13 +5,16 @@
 #
 # Run the following every time you want to rebuild Qmcpy:
 #
-#    conda activate pyqmc  # activate your python virtual environment
+#    conda activate qmcpy  # activate your python virtual environment
 #    ./build.sh &> outputs/qmcpy_build.log &
 
 
 echo "QMCPy build process starts..."
 
 echo "$(date)"
+
+export PYTHONPATH=$PYTHONPATH:"$(pwd)"
+echo $PYTHONPATH
 
 pwd
 
