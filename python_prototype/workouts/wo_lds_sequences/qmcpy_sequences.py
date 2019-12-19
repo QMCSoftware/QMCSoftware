@@ -4,26 +4,28 @@ from qmcpy import *
 
 from numpy import *
 from pandas import DataFrame
-from time import process_time
+from time import time
 
 dim = 1
+trials = 3
 distribution_pointers = [Lattice, Sobol]
 
 def qmcpy_gentimes(n_2powers=arange(1,11)):
     """
-    Record CPU time for generating samples from each discrete distribution
+    Record time for generating samples from each discrete distribution
     """
     print('\nDiscrete Distribution Generation Time Comparison')
-    columns = ['n_2power'] + [type(distrib()).__name__ + '_time' for distrib in distribution_pointers]
+    columns = ['n'] + [type(distrib()).__name__ + '_time' for distrib in distribution_pointers]
     df = DataFrame(columns=columns, dtype=float)
     for i, n_2 in enumerate(n_2powers):
         n_samples = 2**n_2
-        row_i = {'n_2power': n_2}
+        row_i = {'n': n_samples}
         for distrib_pointer in distribution_pointers:
-            t0 = process_time()
-            distribution = distrib_pointer(rng_seed=7)
-            x = distribution.gen_dd_samples(1, n_samples, dim)
-            row_i[type(distribution).__name__ + '_time'] = process_time()-t0
+            t0 = time()
+            for trial in range(trials):
+                distribution = distrib_pointer(rng_seed=7)
+                x = distribution.gen_dd_samples(1, n_samples, dim)
+            row_i[type(distribution).__name__ + '_time'] = (time()-t0) / trials
         print(row_i)
         df.loc[i] = row_i
     return df

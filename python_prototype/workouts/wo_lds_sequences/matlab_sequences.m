@@ -6,23 +6,23 @@ lattice_shift = rand(1,dim);
 n_2powers = (1:20)';
 lattice_times = n_2powers;
 sobol_times = n_2powers;
-repeat = 40;
+trials = 40;
 for i=1:size(n_2powers,1)
     % Lattice
-    t=cputime;
-    for j=1:repeat
+    tic;
+    for j=1:trials
       x_lat = gail.lattice_gen(1,2^i,dim);
       x_lat_shifted = mod(x_lat+lattice_shift,1);
     end
-    lattice_times(i) = (cputime-t)/repeat;
+    lattice_times(i) = toc/trials;
     % Sobol
-    t=cputime;
-    for j=1:repeat
+    tic;
+    for j=1:trials
       sob = scramble(sobolset(dim),'MatousekAffineOwen');
       x_Sobol_scrambled = net(sob,2^i);
     end
-    sobol_times(i) = (cputime-t)/repeat;
+    sobol_times(i) = toc/trials;
 end
 
-results = [n_2powers, lattice_times, sobol_times]
+results = [2.^n_2powers, lattice_times, sobol_times]
 csvwrite('matlab_sequence_times.csv',results)
