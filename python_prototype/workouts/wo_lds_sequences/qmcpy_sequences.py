@@ -10,7 +10,8 @@ dim = 1
 trials = 3
 distribution_pointers = [Lattice, Sobol]
 
-def qmcpy_gentimes(n_2powers=arange(1,11)):
+
+def qmcpy_gentimes(n_2powers=arange(1, 11)):
     """
     Record time for generating samples from each discrete distribution
     """
@@ -30,6 +31,7 @@ def qmcpy_gentimes(n_2powers=arange(1,11)):
         df.loc[i] = row_i
     return df
 
+
 if __name__ == '__main__':
-    df_times = qmcpy_gentimes(n_2powers=arange(1,21))
+    df_times = qmcpy_gentimes(n_2powers=arange(1, 21))
     df_times.to_csv('outputs/lds_sequences/python_sequence_times.csv', index=False)

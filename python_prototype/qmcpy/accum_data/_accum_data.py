@@ -49,14 +49,14 @@ class AccumData(ABC):
         """
         Aggregate all objects after integration completes
 
-        Args: 
+        Args:
             time_total (float): total wall clock time for integration
             integrand (Integrand): Integrand object
             discrete_distrib (DiscreteDistribution): Discrete Distribution object
             true_measure (TrueMeasure): True Measure Object
             stopping_criterion (Stopping Criterion): Stopping Criterion object
 
-        Returns: 
+        Returns:
             self
         """
         self.time_total = time_total
@@ -70,7 +70,7 @@ class AccumData(ABC):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

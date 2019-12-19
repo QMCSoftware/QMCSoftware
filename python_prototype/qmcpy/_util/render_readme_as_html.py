@@ -14,16 +14,18 @@ def markdown_to_html(path, _dir):
     expressions in $...$.
 
     Args:
-        path:
-        _dir:
+        path (str): Top level directory that contains README.md and
+            subdirectories that may also contain README.md
+        _dir (str):
 
-    Returns:
+    Returns: None
 
     """
     readme_path = path + "README.md"
+    html_ouput_dir = "python_prototype/sphinx/html_from_readme"
     if os.path.isfile(readme_path):
         command = "pandoc -s -c https://www.w3schools.com/w3css/4/w3.css \
-        --toc  --mathjax %s -o html_from_readme/%s.html" % (readme_path, _dir)
+        --toc  --mathjax %s -o %s/%s.html" % (readme_path, html_ouput_dir, _dir)
         os.system(command)
     dirs = os.listdir(path)
     for sub_dir in dirs:
@@ -32,4 +34,5 @@ def markdown_to_html(path, _dir):
             markdown_to_html(sub_path, sub_dir)
 
 
-markdown_to_html("./", "QMCSoftware")
+if __name__ == '__main__':
+    markdown_to_html("./", "QMCSoftware")

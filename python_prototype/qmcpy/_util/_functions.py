@@ -1,9 +1,9 @@
 """ Utility functions. Not meant for public use """
 
-from . import DimensionError
-
-from numpy import array, ndarray, repeat, int64
+from numpy import array, int64, ndarray, repeat
 import numpy as np
+
+from . import DimensionError
 
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=3)
 
@@ -32,24 +32,23 @@ def univ_repr(qmc_object, abc_class_name, attributes):
     for attrib in attributes:
         if attrib not in unique_attributes:
             unique_attributes += [attrib]
-    obj_dict = qmc_object.__dict__
     string = "%s (%s Object)\n" % (type(qmc_object).__name__, abc_class_name)
     for key in unique_attributes:
         val = getattr(qmc_object, key)
         # list of one value becomes just that value
-        if type(val) == list and len(val) == 1:
+        if isinstance(val, list) and len(val) == 1:
             val = val[0]
-        elif type(val) == list:
+        elif isinstance(val, list):
             val = array(val)
-        elif type(val) == ndarray:
+        elif isinstance(val, ndarray):
             if val.shape == (1,):
                 val = val[0].item()
             elif val.shape == ():
                 val = val.item()
         # printing options
-        if type(val) == int or (type(val) == float and val % 1 == 0):
+        if isinstance(val, int) or (isinstance(val, float) and val % 1 == 0):
             string_temp = '\t%-15s %d' % (key, int(val))
-        elif type(val) == float:
+        elif isinstance(val, float):
             string_temp = '\t%-15s %0.3f' % (key, val)
         else:
             string_temp = '\t%-15s %s' % (key, val)
@@ -88,8 +87,7 @@ def multilevel_constructor(self, dimension, **kwargs):
     # Type check measure data
     for key in keys:
         try:
-            if len(kwargs[key]) == n_levels:
-                # already correctly formatted
+            if len(kwargs[key]) == n_levels:  # already correctly formatted
                 continue
         except:
             pass

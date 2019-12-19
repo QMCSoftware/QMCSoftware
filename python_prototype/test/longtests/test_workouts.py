@@ -29,7 +29,7 @@ class TestWorkouts(unittest.TestCase):
     def test_mc_vs_qmc(self):
         abstol_comparison(abstols=arange(.1, .4, .1))
         dimension_comparison(dimensions=arange(1, 4))
-    
+
     def test_lds_gentimes(self):
-        mps_gentimes(n_2powers=arange(2,4))
-        qmcpy_gentimes(n_2powers=arange(2,4))
+        mps_gentimes(n_2powers=arange(2, 4))
+        qmcpy_gentimes(n_2powers=arange(2, 4))

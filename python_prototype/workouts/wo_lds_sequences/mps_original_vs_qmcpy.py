@@ -12,8 +12,8 @@ Note:
     A unittest for refactored generators is at /test/fasttests/test_discrete_distributions.py
 """
 
-from third_party.magic_point_shop import digitalseq_b2g, latticeseq_b2 # origianl generators
-from qmcpy.discrete_distribution.mps_refactor import LatticeSeq, DigitalSeq # refactored generators
+from third_party.magic_point_shop import digitalseq_b2g, latticeseq_b2  # origianl generators
+from qmcpy.discrete_distribution.mps_refactor import LatticeSeq, DigitalSeq  # refactored generators
 
 from time import time
 from numpy import *
@@ -22,7 +22,8 @@ from pandas import DataFrame
 dim = 1
 trials = 3
 
-def mps_gentimes(n_2powers=arange(1,11), check_accuracy=False):
+
+def mps_gentimes(n_2powers=arange(1, 11), check_accuracy=False):
     """
     Record time for generating samples from
     original and modified Magic Point Shop generators
@@ -30,7 +31,7 @@ def mps_gentimes(n_2powers=arange(1,11), check_accuracy=False):
     print('\nMagic Point Shop Generation Time Comparison')
     columns = ['n'] + \
         ['mps_lattice_time', 'qmcpy_lattice_time'] +\
-        ['mps_Sobol_time',   'qmcpy_Sobol_time']
+        ['mps_Sobol_time', 'qmcpy_Sobol_time']
     df = DataFrame(columns=columns, dtype=float)
     for n_2 in n_2powers:
         n_samples = 2**n_2
@@ -48,7 +49,8 @@ def mps_gentimes(n_2powers=arange(1,11), check_accuracy=False):
             qmcpy_lattice_samples = vstack([lattice_rng.calc_block(m) for m in range(n_2+1)])
         row_i['qmcpy_lattice_time'] = (time() - t0) / trials
         if check_accuracy and not all(row in qmcpy_lattice_samples for row in mps_lattice_samples):
-            raise Exception("Lattice sample do not match for n_samples=2^%d"%n_2)
+            raise Exception("Lattice sample do not match for n_samples=2^%d" % n_2)
+
         # Original MPS Sobol
         t0 = time()
         for j in range(trials):   
@@ -74,6 +76,6 @@ def mps_gentimes(n_2powers=arange(1,11), check_accuracy=False):
     return df
 
 if __name__ == '__main__':
-    df_times = mps_gentimes(n_2powers=arange(1,21), check_accuracy=True)
+    df_times = mps_gentimes(n_2powers=arange(1, 21), check_accuracy=True)
     df_times.to_csv('outputs/lds_sequences/magic_point_shop_times.csv', index=False)
-    print('\n',df_times)
+    print('\n', df_times)

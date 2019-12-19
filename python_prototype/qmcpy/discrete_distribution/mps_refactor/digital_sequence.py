@@ -1,12 +1,11 @@
 """ Sobol sequence generator """
 
-from ._functions import bitreverse
-
 from copy import copy
 from os import path
-import sys
-import pandas as pd
+
 from numpy import loadtxt
+
+from ._functions import bitreverse
 
 
 class DigitalSeq():
@@ -27,7 +26,7 @@ class DigitalSeq():
 
     """
 
-    def __init__(self, Cs, kstart=0, m=None, s=None, returnDeepCopy=True):
+    def __init__(self, Cs, kstart=0, m=None, s=None):
         """
         Construct a digital sequence point generator given a list of
         generating matrices.
@@ -162,7 +161,7 @@ class DigitalSeq():
         basestr = str  # basestr for python2, str for python3
         if isinstance(Cs, basestr):
             abs_file_path = path.join(path.dirname(__file__), Cs)
-            Cs = loadtxt(abs_file_path,int,max_rows=s).reshape(s,-1)
+            Cs = loadtxt(abs_file_path, int, max_rows=s).reshape(s, -1)
         elif hasattr(Cs, "read"):
             # assume z is a stream like sys.stdin
             f = Cs
@@ -170,21 +169,13 @@ class DigitalSeq():
             f.close()
         # otherwise Cs should be a list of generating matrices
         self.kstart = kstart
-        if m is None:
-            self.m = len(Cs[0])
-        else:
-            self.m = m
-        if s is None:
-            self.s = len(Cs)
-        else:
-            self.s = s
+        self.m = len(Cs[0]) if m is None else m
+        self.s = len(Cs) if s is None else s
         self.t = max([int(a).bit_length() for a in Cs[0]])
         self.alpha = self.t / self.m
-        self.Csr = [[bitreverse(int(Csjc), self.t) for Csjc in Csj] for Csj
-                    in Cs]
+        self.Csr = [[bitreverse(int(Csjc), self.t) for Csjc in Csj] for Csj in Cs]
         self.n = 2 ** self.m
         self.recipd = 2 ** -self.t
-        self.returnDeepCopy = returnDeepCopy
         self.reset()
 
     def reset(self):
@@ -193,11 +184,11 @@ class DigitalSeq():
 
     def set_state(self, k):
         """Set the index of the next point to k."""
-        self.k = k - 1 # self.k is the previous point, this means we have exceptional behaviour for kstart = 0
-        self.cur = [ 0 for i in range(self.s) ]
-        self.x = [ 0 for i in range(self.s) ]
+        self.k = k
+        last_k = k - 1  # the previous point, this means we have exceptional behaviour for kstart = 0
+        self.cur = [0 for i in range(self.s)]
+        self.x = [0 for i in range(self.s)]
         if k == 0: return
-        gk = (self.k >> 1) ^ self.k # we are using Gray code ordering
         for i in range(self.m):
             if gk & (1 << i):
                 for j in range(self.s):
@@ -207,15 +198,14 @@ class DigitalSeq():
 
     def calc_next(self):
         """Calculate the next sequence point and update the index counter."""
-        self.k = self.k + 1
-        if self.k == 0: return True
+        if self.k == 0:
+            return
         p = (((self.k ^ (self.k - 1)) + 1) >> 1)
         ctz = len(bin(p)[2:]) - 1
         for j in range(self.s):
-            self.cur[j] = self.cur[j] ^ self.Csr[j][ctz]
+            self.cur[j] ^= self.Csr[j][ctz]
             self.x[j] = self.recipd * self.cur[j]
-        if self.k >= self.n: return False
-        return True
+
 
     def __iter__(self):
         self.reset()
@@ -223,9 +213,10 @@ class DigitalSeq():
 
     def __next__(self):
         """Return the next point of the sequence or raise StopIteration."""
-        if self.k < self.n - 1:
+        if self.k < self.n:
             self.calc_next()
-            return copy(self.x) if self.returnDeepCopy else self.x
+            self.k = self.k + 1
+            return self.x
         else:
             raise StopIteration
 
