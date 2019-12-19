@@ -19,11 +19,7 @@ from time import time
 from numpy import *
 from pandas import DataFrame
 
-dim = 1
-trials = 3
-
-
-def mps_gentimes(n_2powers=arange(1, 11), check_accuracy=False):
+def mps_gentimes(n_2powers=arange(1, 11), check_accuracy=False, trials=1, dim=1):
     """
     Record time for generating samples from
     original and modified Magic Point Shop generators
@@ -48,9 +44,9 @@ def mps_gentimes(n_2powers=arange(1, 11), check_accuracy=False):
             lattice_rng = LatticeSeq(m=30, s=dim, returnDeepCopy=False)
             qmcpy_lattice_samples = vstack([lattice_rng.calc_block(m) for m in range(n_2+1)])
         row_i['qmcpy_lattice_time'] = (time() - t0) / trials
+        # Lattice Accuracy Check
         if check_accuracy and not all(row in qmcpy_lattice_samples for row in mps_lattice_samples):
             raise Exception("Lattice sample do not match for n_samples=2^%d" % n_2)
-
         # Original MPS Sobol
         t0 = time()
         for j in range(trials):   
@@ -63,19 +59,21 @@ def mps_gentimes(n_2powers=arange(1, 11), check_accuracy=False):
         # Refactored MPS Sobol
         t0 = time()
         for j in range(trials):   
-            sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=30, s=dim, returnDeepCopy=False)
+            sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=30, s=dim)
             qmcpy_Sobol_samples = zeros((n_samples, dim), dtype=int64)
             for i in range(n_samples):
                 next(sobol_rng)
                 qmcpy_Sobol_samples[i, :] = sobol_rng.cur
         row_i['qmcpy_Sobol_time'] = (time() - t0) / trials
+        # Sobol Accuracy Check
         if check_accuracy and not all(row in qmcpy_Sobol_samples for row in mps_Sobol_samples):
             raise Exception("Sobol sample do not match for n_samples=2^%d"%n_2)
+        # Set/Print Results for this n
         print(row_i)
         df.loc[i] = row_i
     return df
 
 if __name__ == '__main__':
-    df_times = mps_gentimes(n_2powers=arange(1, 21), check_accuracy=True)
+    df_times = mps_gentimes(n_2powers=arange(1, 21), check_accuracy=True, trials=3, dim=1)
     df_times.to_csv('outputs/lds_sequences/magic_point_shop_times.csv', index=False)
     print('\n', df_times)
