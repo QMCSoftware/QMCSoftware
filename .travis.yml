@@ -3,12 +3,20 @@ language: python
 # sudo false implies containerized builds
 sudo: false
 
-notifications: 
-    email:
-        - schoi32@iit.edu
-        - jrathin1@iit.edu
-        - qmc-software@googlegroups.com
-
+os:
+  - linux
+  - osx
+  - windows
+  
+notifications:
+  email:
+    recipients:
+      - schoi32@iit.edu
+      - jrathin1@iit.edu
+      - qmc-software@googlegroups.com
+    on_success: always # default: change
+    on_failure: always # default: always
+    
 python:
   - 3.7
 

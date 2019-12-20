@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/QMCSoftware/QMCSoftware.svg?branch=master)](https://travis-ci.com/QMCSoftware/QMCSoftware)
+
 # Quasi-Monte Carlo Community Software
 
 <hr>
