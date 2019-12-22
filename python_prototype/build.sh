@@ -30,6 +30,8 @@ python setup.py install
 python setup.py clean
 
 # Run unit tests
+#    May need to run "conda install python.app" once for pythonw
+#    to be in the same virutal environment as python.
 pythonw -m unittest discover -s test/fasttests
 pythonw -m unittest discover -s test/longtests
 

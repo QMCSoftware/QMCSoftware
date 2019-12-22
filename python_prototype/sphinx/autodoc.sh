@@ -44,5 +44,8 @@ make clean;
 
 make html
 
+make latex
 
-rm -fr ../../docs; mkdir ../../docs; cp -a _build/html/. ../../docs;
+rm -fr ../../docs;  mkdir ../../docs;
+cp -a _build/html/. ../../docs;
+cp -a _build/latex/qmcpy.pdf ../../docs/qmcpy.pdf
