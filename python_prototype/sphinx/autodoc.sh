@@ -10,13 +10,13 @@ echo "$(date)"
 
 cd ../..  # to go to directory QMCSoftware
 pwd
-DIR=python_prototype/sphinx/rts_from_readme/
+DIR=python_prototype/sphinx/markdown_to_rst/
 if [ ! -d $DIR ]; then
   mkdir $DIR
 fi
 rm DIR/*
 python python_prototype/qmcpy/_util/render_readme_as_rst.py
-# pandoc -s --mathjax ./README.md -o python_prototype/sphinx/rts_from_readme/QMCSoftware.html
+# pandoc -s --mathjax ./README.md -o python_prototype/sphinx/markdown_to_rst/QMCSoftware.html
 
 ## Generate rst (ReStructured Text) files from notebooks
 cd python_prototype

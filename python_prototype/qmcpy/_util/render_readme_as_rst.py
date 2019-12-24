@@ -1,7 +1,7 @@
 '''
 Uses pandoc (can change --mathjax to --katex for different math rendering).
 In python_prototype, issue:
-    pandoc -s --mathjax qmcpy/README.md -o ../rts_from_readme/qmcpy.html
+    pandoc -s --mathjax qmcpy/README.md -o ../markdown_to_rst/qmcpy.html
 See also: http://www.flutterbys.com.au/stats/tut/tut17.3.html
 '''
 
@@ -22,10 +22,10 @@ def markdown_to_rst(path, _dir):
 
     """
     readme_path = path + "README.md"
-    html_ouput_dir = "python_prototype/sphinx/rts_from_readme"
+    rst_ouput_dir = "python_prototype/sphinx/markdown_to_rst"
     if os.path.isfile(readme_path):
         command = "pandoc -s -c https://www.w3schools.com/w3css/4/w3.css \
-        --toc --toc-depth=1 --mathjax %s -o %s/%s.rst" % (readme_path, html_ouput_dir, _dir)
+        --toc --toc-depth=1 --mathjax %s -o %s/%s.rst" % (readme_path, rst_ouput_dir, _dir)
         os.system(command)
     dirs = os.listdir(path)
     for sub_dir in dirs:
