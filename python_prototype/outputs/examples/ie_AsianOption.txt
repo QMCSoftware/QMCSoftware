@@ -5,7 +5,7 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	exercise_time   1.0
+	exercise_time   1
 IIDStdUniform (Discrete Distribution Object)
 	mimics          StdUniform
 BrownianMotion (True Measure Object)
@@ -19,9 +19,9 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 MeanVarData (AccumData Object)
 	n               202444
-	n_total         203468.0
+	n_total         203468
 	confid_int      [ 5.768  5.867]
-	time_total      2.259
+	time_total      1.788
 
 Solution: 5.8292         
 AsianCall (Integrand Object)
@@ -30,7 +30,7 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	exercise_time   1.0
+	exercise_time   1
 IIDStdGaussian (Discrete Distribution Object)
 	mimics          StdGaussian
 BrownianMotion (True Measure Object)
@@ -44,9 +44,9 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 MeanVarData (AccumData Object)
 	n               199887
-	n_total         200911.0
+	n_total         200911
 	confid_int      [ 5.779  5.879]
-	time_total      0.908
+	time_total      0.673
 
 Solution: 5.8265         
 AsianCall (Integrand Object)
@@ -55,7 +55,7 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	exercise_time   1.0
+	exercise_time   1
 IIDStdUniform (Discrete Distribution Object)
 	mimics          StdUniform
 BrownianMotion (True Measure Object)
@@ -69,9 +69,9 @@ MeanMC_g (Stopping Criterion Object)
 	alpha           0.010
 MeanVarData (AccumData Object)
 	n               271876
-	n_total         272900.0
+	n_total         272900
 	confid_int      [ 5.776  5.876]
-	time_total      2.811
+	time_total      2.370
 
 Solution: 5.8245         
 AsianCall (Integrand Object)
@@ -80,7 +80,7 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	exercise_time   1.0
+	exercise_time   1
 IIDStdGaussian (Discrete Distribution Object)
 	mimics          StdGaussian
 BrownianMotion (True Measure Object)
@@ -94,9 +94,9 @@ MeanMC_g (Stopping Criterion Object)
 	alpha           0.010
 MeanVarData (AccumData Object)
 	n               268690
-	n_total         269714.0
+	n_total         269714
 	confid_int      [ 5.774  5.874]
-	time_total      1.118
+	time_total      0.896
 
 Solution: 5.8356         
 AsianCall (Integrand Object)
@@ -105,9 +105,10 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	exercise_time   1.0
+	exercise_time   1
 Lattice (Discrete Distribution Object)
 	mimics          StdUniform
+	rng_seed        7
 BrownianMotion (True Measure Object)
 	dimension       64
 	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
@@ -119,21 +120,23 @@ CLTRep (Stopping Criterion Object)
 	alpha           0.010
 MeanVarDataRep (AccumData Object)
 	n               2048
-	n_total         2048.0
+	n_total         2048
 	confid_int      [ 5.833  5.838]
-	time_total      0.375
+	time_total      0.289
 	r               16
 
-Solution: 5.8182         
+Solution: 5.8395         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	exercise_time   1.0
+	exercise_time   1
 Sobol (Discrete Distribution Object)
 	mimics          StdUniform
+	rng_seed        7
+	backend         pytorch
 BrownianMotion (True Measure Object)
 	dimension       64
 	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
@@ -144,13 +147,13 @@ CLTRep (Stopping Criterion Object)
 	inflate         1.200
 	alpha           0.010
 MeanVarDataRep (AccumData Object)
-	n               1024
-	n_total         1024.0
-	confid_int      [ 5.815  5.821]
-	time_total      0.223
+	n               2048
+	n_total         2048
+	confid_int      [ 5.838  5.841]
+	time_total      0.607
 	r               16
 
-Solution: 5.8260         
+Solution: 5.8253         
 AsianCall (Integrand Object)
 	volatility      [ 0.500  0.500  0.500]
 	start_price     [30 30 30]
@@ -172,12 +175,12 @@ CLT (Stopping Criterion Object)
 	inflate         1.200
 	alpha           0.010
 MeanVarData (AccumData Object)
-	n               [ 245153.000  21010.000  3842.000]
-	n_total         273077.0
-	confid_int      [ 5.775  5.878]
-	time_total      0.290
+	n               [ 244322.000  21474.000  3791.000]
+	n_total         272659
+	confid_int      [ 5.774  5.877]
+	time_total      0.232
 
-Solution: 5.8327         
+Solution: 5.8343         
 AsianCall (Integrand Object)
 	volatility      [ 0.500  0.500  0.500]
 	start_price     [30 30 30]
@@ -199,8 +202,8 @@ CLT (Stopping Criterion Object)
 	inflate         1.200
 	alpha           0.010
 MeanVarData (AccumData Object)
-	n               [ 274674.000  22617.000  3939.000]
-	n_total         304302.0
-	confid_int      [ 5.784  5.882]
-	time_total      0.149
+	n               [ 273630.000  22578.000  4061.000]
+	n_total         303341
+	confid_int      [ 5.785  5.883]
+	time_total      0.114
 
