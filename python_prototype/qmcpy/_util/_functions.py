@@ -1,9 +1,10 @@
 """ Utility functions. Not meant for public use """
 
-from numpy import array, int64, ndarray, repeat
-import numpy as np
-
 from . import DimensionError
+
+from scipy.stats import norm
+from numpy import array, int64, ndarray, repeat, inf
+import numpy as np
 
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=3)
 
@@ -104,3 +105,22 @@ def multilevel_constructor(self, dimension, **kwargs):
         for key, val in kwargs.items():
             setattr(obj_list[i], key, val[i])
     return obj_list
+
+def norm_inv_cdf_avoid_inf(x, loc=0, scale=1):
+    """
+    Inverse CDF of normal distribution that
+    replaces inf with 10 and -inf with -10.
+    A light wrapper around scipy.norm.ppf
+
+    Args:
+        x (ndarray): samples
+        loc (ndarray): centered location of normal distribution
+        sigma (ndarray): standard deviation of normal distribution
+    
+    Returns:
+        y (ndarray): inverse cdf of x
+    """
+    y = norm.ppf(x, loc=loc, scale=scale)
+    y[y == -inf] = -10 # invcdf(0) = 0 instead of true value -inf
+    y[y == inf] = 10 # invcdf(1) = 10 instread of true value inf
+    return y

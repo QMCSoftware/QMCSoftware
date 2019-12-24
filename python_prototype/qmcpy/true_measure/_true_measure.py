@@ -21,28 +21,6 @@ class TrueMeasure(ABC):
         measures = multilevel_constructor(self, dimension, transforms=transforms, **kwargs)
         self.measures = measures
 
-    def set_tm_gen(self, discrete_distrib):
-        """
-        Initialize gen_tm_samples method,
-        a method that samples from the discrete_distribution
-        and transforms to discrete distribution
-
-        Args:
-            discrete_distrib (DiscreteDistribution): the discrete
-                distribution samples will be drawn from will use
-                discrete_distrib.mimics to select transform from
-                self[i].transforms (dict)
-        """
-        for measure_i in self:
-            discrete_distrib_i = deepcopy(discrete_distrib)
-            if discrete_distrib_i.mimics not in list(measure_i.transforms.keys()):
-                raise TransformError(
-                    "Cannot tranform %s to %s" %
-                    (type(discrete_distrib_i).__name__, type(self).__name__))
-            measure_i.gen_tm_samples = lambda r, n, self=measure_i: \
-                self.transforms[discrete_distrib_i.mimics][0](self,
-                    discrete_distrib_i.gen_dd_samples(r, n, self.dimension))
-
     def gen_tm_samples(self, r, n):
         """
         Generate r nxd samples mimicing the TrueMeasure (d = self.dimension
@@ -82,6 +60,28 @@ class TrueMeasure(ABC):
                 true_measure_obj[i].gen_tm_samples(n,r)
             ''')
 
+    def set_tm_gen(self, discrete_distrib):
+        """
+        Initialize gen_tm_samples method,
+        a method that samples from the discrete_distribution
+        and transforms to discrete distribution
+
+        Args:
+            discrete_distrib (DiscreteDistribution): the discrete
+                distribution samples will be drawn from will use
+                discrete_distrib.mimics to select transform from
+                self[i].transforms (dict)
+        """
+        for measure_i in self:
+            discrete_distrib_i = deepcopy(discrete_distrib)
+            if discrete_distrib_i.mimics not in list(measure_i.transforms.keys()):
+                dd_name = type(discrete_distrib_i).__name__
+                msr_name = type(measure_i).__name__
+                raise TransformError("Cannot tranform %s to %s" % (dd_name, msr_name))
+            measure_i.gen_tm_samples = lambda r, n, _self=measure_i: \
+                _self.transforms[discrete_distrib_i.mimics][0](_self,
+                    discrete_distrib_i.gen_dd_samples(r, n, _self.dimension))
+
     def set_f(self, integrand, discrete_distrib):
         """
         Initialize f method for each integrand:
@@ -99,11 +99,11 @@ class TrueMeasure(ABC):
             raise TransformError("Number of distributions must match number of integrands")
         for integrand_i, measure_i in zip(integrand, self):
             if discrete_distrib.mimics not in list(measure_i.transforms.keys()):
-                raise TransformError(
-                    "Cannot tranform %s to %s" %
-                    (type(discrete_distrib).__name__, type(measure_i).__name__))
-            integrand_i.f = lambda x, self=integrand_i, msr_obj=measure_i: \
-                msr_obj.transforms[discrete_distrib.mimics][1](msr_obj, self.g(x))
+                dd_name = type(discrete_distrib).__name__
+                msr_name = type(measure_i).__name__
+                raise TransformError("Cannot tranform %s to %s" % (dd_name, msr_name))
+            integrand_i.f = lambda x, _self=integrand_i, _msr_obj=measure_i: \
+                _msr_obj.transforms[discrete_distrib.mimics][1](_msr_obj, _self.g(x))
 
     def transform(self, integrand, discrete_distrib):
         """
