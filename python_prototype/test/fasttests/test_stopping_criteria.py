@@ -3,6 +3,7 @@
 from qmcpy import *
 from qmcpy._util import *
 
+from numpy import arange
 import unittest
 import warnings
 

@@ -92,11 +92,11 @@ def multilevel_constructor(self, dimension, **kwargs):
         except:
             pass
         kwargs[key] = repeat(kwargs[key], n_levels)
-    # Give the construcing object the correctly formatted measure data
+    # Give the construcing object the correctly formatted data
     for key in keys:
         setattr(self, key, kwargs[key])
     setattr(self, 'dimension', dimension)  # set dimension attribute for self
-    # Create a list of measures and distribute measure data
+    # Create a list of objs and their data
     obj_list = [_type.__new__(_type) for i in range(n_levels)]
     # ith object gets ith value from each measure data
     for i in range(n_levels):

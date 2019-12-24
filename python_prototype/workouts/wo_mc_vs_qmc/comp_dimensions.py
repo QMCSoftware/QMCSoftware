@@ -3,7 +3,7 @@
 from qmcpy import *
 
 import json
-from numpy import nan, zeros
+from numpy import nan, zeros, arange
 from pandas import DataFrame
 
 distribution_pointers = [IIDStdUniform, IIDStdGaussian, Lattice, Sobol]

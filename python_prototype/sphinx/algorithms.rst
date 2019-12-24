@@ -45,7 +45,16 @@ Measure Class
 .. automodule:: qmcpy.true_measure
     :members:
 
-.. automodule:: qmcpy.true_measure.measures
+.. automodule:: qmcpy.true_measure.uniform
+    :members:
+
+.. automodule:: qmcpy.true_measure.gaussian
+    :members:
+
+.. automodule:: qmcpy.true_measure.brownian_motion
+    :members:
+
+.. automodule:: qmcpy.true_measure.lebesgue
     :members:
 
 Discrete Distribution Class
