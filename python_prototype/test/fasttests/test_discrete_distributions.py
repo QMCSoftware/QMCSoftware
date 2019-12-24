@@ -4,6 +4,7 @@ import unittest
 
 from numpy import array, int64, log2, ndarray, vstack, zeros
 from qmcpy import *
+from qmcpy.discrete_distribution.mps_refactor import DigitalSeq, LatticeSeq
 from third_party.magic_point_shop import digitalseq_b2g, latticeseq_b2
 
 

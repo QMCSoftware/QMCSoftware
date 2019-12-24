@@ -64,12 +64,17 @@ Discrete Distribution Class
 .. automodule:: qmcpy.discrete_distribution
     :members:
 
-.. automodule:: qmcpy.discrete_distribution.iid_generators
+.. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
-.. automodule:: qmcpy.discrete_distribution.lds_generators
+.. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
     :members:
 
+.. automodule:: qmcpy.discrete_distribution.lattice
+    :members:
+
+.. automodule:: qmcpy.discrete_distribution.sobol
+    :members:
 
 Data Class
 ----------
