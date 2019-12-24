@@ -377,69 +377,14 @@ dimension (int): number of dimensions</p>
 </div>
 <div class="section" id="measure-class">
 <h2>Measure Class<a class="headerlink" href="#measure-class" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-qmcpy.true_measure"></span><span class="target" id="module-qmcpy.true_measure.measures"></span><p>Definitions of TrueMeasure Concrete Classes</p>
+<span class="target" id="module-qmcpy.true_measure"></span><span class="target" id="module-qmcpy.true_measure.uniform"></span><p>Definition of Uniform, a concrete implementation of TrueMeasure</p>
 <dl class="class">
-<dt id="qmcpy.true_measure.measures.BrownianMotion">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.measures.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">dimension, time_vector=[array([ 0.250,  0.500,  0.750,  1.000])]</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.BrownianMotion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Brownian Motion Measure</p>
-<dl class="method">
-<dt id="qmcpy.true_measure.measures.BrownianMotion.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension, time_vector=[array([ 0.250,  0.500,  0.750,  1.000])]</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.BrownianMotion.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p></li>
-<li><p><strong>time_vector</strong> (<em>list of ndarrays</em>) – monitoring times for the Integrand’s’</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="qmcpy.true_measure.measures.Gaussian">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.measures.</code><code class="sig-name descname">Gaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">mean=0</em>, <em class="sig-param">variance=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Gaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gaussian (Normal) Measure</p>
-<dl class="method">
-<dt id="qmcpy.true_measure.measures.Gaussian.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">mean=0</em>, <em class="sig-param">variance=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Gaussian.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p></li>
-<li><p><strong>mean</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – mu for Normal(mu,sigma^2)</p></li>
-<li><p><strong>variance</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sigma^2 for Normal(mu,sigma^2)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="qmcpy.true_measure.measures.Lebesgue">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.measures.</code><code class="sig-name descname">Lebesgue</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Lebesgue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Lebesgue Uniform Measure</p>
-<dl class="method">
-<dt id="qmcpy.true_measure.measures.Lebesgue.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Lebesgue.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="qmcpy.true_measure.measures.Uniform">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.measures.</code><code class="sig-name descname">Uniform</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Uniform" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.true_measure.uniform.Uniform">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.uniform.</code><code class="sig-name descname">Uniform</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.uniform.Uniform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uniform Measure</p>
 <dl class="method">
-<dt id="qmcpy.true_measure.measures.Uniform.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.measures.Uniform.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.true_measure.uniform.Uniform.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.uniform.Uniform.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -453,51 +398,75 @@ dimension (int): number of dimensions</p>
 
 </dd></dl>
 
+<span class="target" id="module-qmcpy.true_measure.gaussian"></span><p>Definition of Gaussian, a concrete implementation of TrueMeasure</p>
+<dl class="class">
+<dt id="qmcpy.true_measure.gaussian.Gaussian">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.gaussian.</code><code class="sig-name descname">Gaussian</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">mean=0</em>, <em class="sig-param">variance=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.gaussian.Gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gaussian (Normal) Measure</p>
+<dl class="method">
+<dt id="qmcpy.true_measure.gaussian.Gaussian.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">mean=0</em>, <em class="sig-param">variance=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.gaussian.Gaussian.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p></li>
+<li><p><strong>mean</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – mu for Normal(mu,sigma^2)</p></li>
+<li><p><strong>variance</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sigma^2 for Normal(mu,sigma^2)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-qmcpy.true_measure.brownian_motion"></span><p>Definition of BrownianMotion, a concrete implementation of TrueMeasure</p>
+<dl class="class">
+<dt id="qmcpy.true_measure.brownian_motion.BrownianMotion">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.brownian_motion.</code><code class="sig-name descname">BrownianMotion</code><span class="sig-paren">(</span><em class="sig-param">dimension, time_vector=[array([ 0.250,  0.500,  0.750,  1.000])]</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.brownian_motion.BrownianMotion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Brownian Motion Measure</p>
+<dl class="method">
+<dt id="qmcpy.true_measure.brownian_motion.BrownianMotion.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension, time_vector=[array([ 0.250,  0.500,  0.750,  1.000])]</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.brownian_motion.BrownianMotion.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p></li>
+<li><p><strong>time_vector</strong> (<em>list of ndarrays</em>) – monitoring times for the Integrand’s’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-qmcpy.true_measure.lebesgue"></span><p>Definition of Lebesgue, a concrete implementation of TrueMeasure</p>
+<dl class="class">
+<dt id="qmcpy.true_measure.lebesgue.Lebesgue">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.lebesgue.</code><code class="sig-name descname">Lebesgue</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.lebesgue.Lebesgue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lebesgue Uniform Measure</p>
+<dl class="method">
+<dt id="qmcpy.true_measure.lebesgue.Lebesgue.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.lebesgue.Lebesgue.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dimension</strong> (<em>ndarray</em>) – dimension’s’ of the integrand’s’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="discrete-distribution-class">
 <h2>Discrete Distribution Class<a class="headerlink" href="#discrete-distribution-class" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-qmcpy.discrete_distribution"></span><span class="target" id="module-qmcpy.discrete_distribution.iid_generators"></span><p>This module implements mutiple subclasses of DiscreteDistribution.</p>
+<span class="target" id="module-qmcpy.discrete_distribution"></span><span class="target" id="module-qmcpy.discrete_distribution.iid_std_uniform"></span><p>Definition for IIDStdUniform, a concrete implementation of DiscreteDistribution</p>
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdGaussian">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.iid_generators.</code><code class="sig-name descname">IIDStdGaussian</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdGaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Standard Gaussian</p>
-<dl class="method">
-<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdGaussian.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdGaussian.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdGaussian.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdGaussian.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate r nxd IID Standard Gaussian samples</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>replications</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
-<li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
-<li><p><strong>dimensions</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>replications x n_samples x dimensions (numpy array)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdUniform">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.iid_generators.</code><code class="sig-name descname">IIDStdUniform</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdUniform" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.iid_std_uniform.</code><code class="sig-name descname">IIDStdUniform</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform" title="Permalink to this definition">¶</a></dt>
 <dd><p>IID Standard Uniform</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdUniform.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdUniform.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -506,8 +475,8 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.iid_generators.IIDStdUniform.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_generators.IIDStdUniform.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd IID Standard Uniform samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -525,14 +494,14 @@ dimension (int): number of dimensions</p>
 
 </dd></dl>
 
-<span class="target" id="module-qmcpy.discrete_distribution.lds_generators"></span><p>This module implements mutiple subclasses of DiscreteDistribution.</p>
+<span class="target" id="module-qmcpy.discrete_distribution.iid_std_gaussian"></span><p>Definition for IIDStdGaussian, a concrete implementation of DiscreteDistribution</p>
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.lds_generators.Lattice">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.lds_generators.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Lattice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Quasi-Random Lattice low discrepancy sequence (Base 2)</p>
+<dt id="qmcpy.discrete_distribution.iid_std_gaussian.IIDStdGaussian">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.iid_std_gaussian.</code><code class="sig-name descname">IIDStdGaussian</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_std_gaussian.IIDStdGaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard Gaussian</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.lds_generators.Lattice.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_std_gaussian.IIDStdGaussian.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_std_gaussian.IIDStdGaussian.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -541,8 +510,43 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.lds_generators.Lattice.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em>, <em class="sig-param">scramble=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Lattice.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.iid_std_gaussian.IIDStdGaussian.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.iid_std_gaussian.IIDStdGaussian.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate r nxd IID Standard Gaussian samples</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>replications</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of nxd matrices to generate (sample.size()[0])</p></li>
+<li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of observations (sample.size()[1])</p></li>
+<li><p><strong>dimensions</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of dimensions (sample.size()[2])</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>replications x n_samples x dimensions (numpy array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-qmcpy.discrete_distribution.lattice"></span><p>Definition for Lattice, a concrete implementation of DiscreteDistribution</p>
+<dl class="class">
+<dt id="qmcpy.discrete_distribution.lattice.Lattice">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.lattice.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lattice.Lattice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quasi-Random Lattice low discrepancy sequence (Base 2)</p>
+<dl class="method">
+<dt id="qmcpy.discrete_distribution.lattice.Lattice.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lattice.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="qmcpy.discrete_distribution.lattice.Lattice.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em>, <em class="sig-param">scramble=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lattice.Lattice.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd Lattice samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -561,13 +565,14 @@ dimension (int): number of dimensions</p>
 
 </dd></dl>
 
+<span class="target" id="module-qmcpy.discrete_distribution.sobol"></span><p>Definition for Sobol, a concrete implementation of DiscreteDistribution</p>
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.lds_generators.Sobol">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.lds_generators.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.sobol.Sobol">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.sobol.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quasi-Random Sobol low discrepancy sequence (Base 2)</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.lds_generators.Sobol.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.sobol.Sobol.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -576,8 +581,8 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.lds_generators.Sobol.gen_dd_samples">
-<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em>, <em class="sig-param">scramble=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.sobol.Sobol.gen_dd_samples">
+<code class="sig-name descname">gen_dd_samples</code><span class="sig-paren">(</span><em class="sig-param">replications</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">dimensions</em>, <em class="sig-param">scramble=True</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol.gen_dd_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate r nxd Sobol samples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -594,6 +599,75 @@ dimension (int): number of dimensions</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="function">
+<dt id="qmcpy.discrete_distribution.sobol.randint">
+<code class="sig-prename descclassname">qmcpy.discrete_distribution.sobol.</code><code class="sig-name descname">randint</code><span class="sig-paren">(</span><em class="sig-param">low</em>, <em class="sig-param">high=None</em>, <em class="sig-param">size=None</em>, <em class="sig-param">dtype='l'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.randint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return random integers from <cite>low</cite> (inclusive) to <cite>high</cite> (exclusive).</p>
+<p>Return random integers from the “discrete uniform” distribution of
+the specified dtype in the “half-open” interval [<cite>low</cite>, <cite>high</cite>). If
+<cite>high</cite> is None (the default), then results are from [0, <cite>low</cite>).</p>
+<dl>
+<dt>low<span class="classifier">int or array-like of ints</span></dt><dd><p>Lowest (signed) integers to be drawn from the distribution (unless
+<code class="docutils literal notranslate"><span class="pre">high=None</span></code>, in which case this parameter is one above the
+<em>highest</em> such integer).</p>
+</dd>
+<dt>high<span class="classifier">int or array-like of ints, optional</span></dt><dd><p>If provided, one above the largest (signed) integer to be drawn
+from the distribution (see above for behavior if <code class="docutils literal notranslate"><span class="pre">high=None</span></code>).
+If array-like, must contain integer values</p>
+</dd>
+<dt>size<span class="classifier">int or tuple of ints, optional</span></dt><dd><p>Output shape.  If the given shape is, e.g., <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  Default is None, in which case a
+single value is returned.</p>
+</dd>
+<dt>dtype<span class="classifier">dtype, optional</span></dt><dd><p>Desired dtype of the result. All dtypes are determined by their
+name, i.e., ‘int64’, ‘int’, etc, so byteorder is not available
+and a specific precision may have different C types depending
+on the platform. The default value is ‘np.int’.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.11.0.</span></p>
+</div>
+</dd>
+</dl>
+<dl class="simple">
+<dt>out<span class="classifier">int or ndarray of ints</span></dt><dd><p><cite>size</cite>-shaped array of random integers from the appropriate
+distribution, or a single such random int if <cite>size</cite> not provided.</p>
+</dd>
+</dl>
+<dl>
+<dt>random.random_integers<span class="classifier">similar to <cite>randint</cite>, only for the closed</span></dt><dd><p>interval [<cite>low</cite>, <cite>high</cite>], and 1 is the lowest value if <cite>high</cite> is
+omitted.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">array([1, 0, 0, 0, 1, 1, 0, 0, 1, 0]) # random</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</span>
+</pre></div>
+</div>
+<p>Generate a 2 x 4 array of ints between 0 and 4, inclusive:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">array([[4, 0, 2, 1], # random</span>
+<span class="go">       [3, 2, 2, 0]])</span>
+</pre></div>
+</div>
+<p>Generate a 1 x 3 array with 3 different upper bounds</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="go">array([2, 2, 9]) # random</span>
+</pre></div>
+</div>
+<p>Generate a 1 by 3 array with 3 different lower bounds</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">array([9, 8, 7]) # random</span>
+</pre></div>
+</div>
+<p>Generate a 2 by 4 array using broadcasting with dtype of uint8</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[[</span><span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">20</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="go">array([[ 8,  6,  9,  7], # random</span>
+<span class="go">       [ 1, 16,  9, 12]], dtype=uint8)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
