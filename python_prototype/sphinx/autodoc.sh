@@ -18,7 +18,7 @@ rm DIR/*
 python python_prototype/qmcpy/_util/render_readme_as_rst.py
 # pandoc -s --mathjax ./README.md -o python_prototype/sphinx/rts_from_readme/QMCSoftware.html
 
-## Generate html from notebooks
+## Generate rst (ReStructured Text) files from notebooks
 cd python_prototype
 
 export PYTHONPATH=$PYTHONPATH:"$(pwd; cd ..)"
@@ -28,17 +28,22 @@ echo $PYTHONPATH
 # jupyter notebook demos/plotDemos.ipynb
 cd demos
 FILES=*.ipynb
-for f in $FILES
-do
-  echo "Processing $f file..."
-  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f
-done
-DIR=../sphinx/html_from_demos
+DIR=../sphinx/rst_from_demos
 if [ ! -d $DIR ]; then
   mkdir $DIR
 fi
 rm -f $DIR/*
-mv *.html $DIR
+DIRSUFFIX="_files"
+for f in $FILES
+do
+  echo "Processing $f file..."
+  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f --to rst
+  file=${f%.ipynb}
+  echo $file
+  cp -r "$file$DIRSUFFIX" $DIR/
+done
+mv *.rst $DIR
+
 cd .. # to python_prototype
 
 ## Use sphinx to generate HTML documentation with inputs from above and

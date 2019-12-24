@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Demo of NEI &mdash; qmcpy 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/HTML-CSS"]})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> qmcpy
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">About Our QMC Software Community</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../algorithms.html">QMCPy Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demos</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">qmcpy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Demo of NEI</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="demo-of-nei">
+<h1>Demo of NEI<a class="headerlink" href="#demo-of-nei" title="Permalink to this headline">¶</a></h1>
+<p>You can also look at the Botorch implementation, but that requires a lot
+more understanding of code which involves Pytorch. So I tried to put a
+simple example together here.</p>
+<p>$ <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\DeclareMathOperator{\EI}{EI}`</span></a>
+<a href="#id3"><span class="problematic" id="id4">:raw-latex:`\DeclareMathOperator{\NEI}{NEI}`</span></a></p>
+<p>$</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="k">import</span> <span class="n">solve_triangular</span><span class="p">,</span> <span class="n">cho_solve</span><span class="p">,</span> <span class="n">cho_factor</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">norm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">lw</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">ms</span> <span class="o">=</span> <span class="mi">8</span>
+</pre></div>
+</div>
+<p>We make some fake data and consider the sequential decision making
+problem of trying to optimize the function depicted below.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">yf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">.</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="o">.</span><span class="mi">4</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">xplt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
+<span class="n">yplt</span> <span class="o">=</span> <span class="n">yf</span><span class="p">(</span><span class="n">xplt</span><span class="p">)</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">yf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">.</span><span class="mi">001</span><span class="p">,</span> <span class="o">.</span><span class="mi">05</span><span class="p">,</span> <span class="o">.</span><span class="mi">01</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">yplt</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="n">ms</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Sample data with noise&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="../_images/nei_demo_3_0.png" src="../_images/nei_demo_3_0.png" />
+<p>We can build a zero mean Gaussian process model to this data, observed
+under noise. Below are plots of the posterior distribution. We use the
+Gaussian (square exponential) kernel as our prior covariance belief.</p>
+<p>This kernel has a shape parameter, the Gaussian process has a global
+variance, which are both chosen fixed for simplicity. The
+<code class="docutils literal notranslate"><span class="pre">fudge_factor</span></code> which is added here to prevent ill-conditioning for a
+large matrix.</p>
+<p>Notice the higher uncertainty in the posterior in locations where the
+observed noise is greater.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">gaussian_kernel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">pv</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pv</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">e</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">z</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">shape_parameter</span> <span class="o">=</span> <span class="mf">4.1</span>
+<span class="n">process_variance</span> <span class="o">=</span> <span class="o">.</span><span class="mi">9</span>
+<span class="n">fudge_factor</span> <span class="o">=</span> <span class="mf">1e-10</span>
+
+<span class="n">kernel_prior_data</span> <span class="o">=</span> <span class="n">gaussian_kernel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">shape_parameter</span><span class="p">,</span> <span class="n">process_variance</span><span class="p">)</span>
+<span class="n">kernel_cross_matrix</span> <span class="o">=</span> <span class="n">gaussian_kernel</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">shape_parameter</span><span class="p">,</span> <span class="n">process_variance</span><span class="p">)</span>
+<span class="n">kernel_prior_plot</span> <span class="o">=</span> <span class="n">gaussian_kernel</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">xplt</span><span class="p">,</span> <span class="n">shape_parameter</span><span class="p">,</span> <span class="n">process_variance</span><span class="p">)</span>
+
+<span class="n">prior_cholesky</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">kernel_prior_data</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+<span class="n">partial_cardinal_functions</span> <span class="o">=</span> <span class="n">solve_triangular</span><span class="p">(</span><span class="n">prior_cholesky</span><span class="p">,</span> <span class="n">kernel_cross_matrix</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">posterior_covariance</span> <span class="o">=</span> <span class="n">kernel_prior_plot</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">partial_cardinal_functions</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">partial_cardinal_functions</span><span class="p">)</span>
+<span class="n">posterior_cholesky</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">posterior_covariance</span> <span class="o">+</span> <span class="n">fudge_factor</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xplt</span><span class="p">)))</span>
+
+<span class="n">full_cardinal_functions</span> <span class="o">=</span> <span class="n">solve_triangular</span><span class="p">(</span><span class="n">prior_cholesky</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">partial_cardinal_functions</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">posterior_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">full_cardinal_functions</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">num_posterior_draws</span> <span class="o">=</span> <span class="mi">123</span>
+<span class="n">normal_draws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_posterior_draws</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">xplt</span><span class="p">)))</span>
+<span class="n">posterior_draws</span> <span class="o">=</span> <span class="n">posterior_mean</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">posterior_cholesky</span><span class="p">,</span> <span class="n">normal_draws</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">posterior_draws</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">posterior_mean</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="../_images/nei_demo_5_0.png" src="../_images/nei_demo_5_0.png" />
+<p>First we take a look at the EI quantity by itself which, despite having
+a closed form, we will approximate using basic Monte Carlo below. The
+closed form is very preferable, but not applicable in all situations.</p>
+<p>Expected improvement is just the expectation (under the posterior
+distribution) of the improvement beyond the current best value. If we
+were trying to maximize this function that we are studying then
+improvement would be defined as</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}  I(x) = (Y_x|\mathcal{D} - y^*)_+,\\the positive part of the gap between the model :math:`Y_x|\mathcal{D}`\end{aligned}\end{align} \]</div>
+<p>and the current highest value <span class="math notranslate nohighlight">\(y^*=\max\{y_1,\ldots,y_N\}\)</span>. Since
+<span class="math notranslate nohighlight">\(Y_x|\mathcal{D}\)</span> is a random variable (normally distributed
+because we have a Gaussian process model), we generally study the
+expected value of this, which is plotted below. Written as an integral,
+this would look like</p>
+<div class="math notranslate nohighlight">
+\[\EI(x) = \int_{-\infty}^\infty (y - y^*)_+\, p_{Y_x|\mathcal{D}}(y)\; \text{d}y\]</div>
+<p><strong>NOTE</strong>: This quantity is written for maximization here, but most of
+the literature is concerned with minimization. I can rewrite this if
+needed, but the math is essentially the same.</p>
+<p>This <span class="math notranslate nohighlight">\(EI\)</span> quantity is referred to as an <em>acquisition function</em>, a
+function which defines the utility associated with sampling at a given
+point. For each acquisition function, there is a balance between
+exploration and exploitation (as is the focus of most topics involving
+sequential decision making under uncertainty).</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">improvement_draws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fmax</span><span class="p">(</span><span class="n">posterior_draws</span> <span class="o">-</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">improvement_draws</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#96CA4F&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;improvement draws&#39;</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">improvement_draws</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#A23D97&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;expected improvement&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="../_images/nei_demo_7_0.png" src="../_images/nei_demo_7_0.png" />
+<p>The NEI quantity is then computed using multiple EI computations (each
+using a different posterior GP draw) computed without noise. In this
+computation below, I will use the closed form of EI, to speed up the
+computation – it is possible to execute the same strategy as above,
+though.</p>
+<p>This computation is vectorized so as to compute for multiple <span class="math notranslate nohighlight">\(x\)</span>
+locations at the same time … the algorithm from the <a class="reference external" href="https://projecteuclid.org/download/pdfview_1/euclid.ba/1533866666">Facebook
+paper</a>
+is written for only a single location. We are omitting the constraints
+aspect of their paper because the problem can be considered without
+that. To define the integral, though, we need some more
+definitions/notation.</p>
+<p>First, we need to define <span class="math notranslate nohighlight">\(\EI(x;\yy, \cX, \eep)\)</span> to be the
+expected improvement at a location <span class="math notranslate nohighlight">\(x\)</span>, given the <span class="math notranslate nohighlight">\(N\)</span> values
+stored in the vector <span class="math notranslate nohighlight">\(\yy\)</span> having been evaluated with noise
+<span class="math notranslate nohighlight">\(\eep\)</span> at the points <span class="math notranslate nohighlight">\(\cX\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\begin{split}  \yy=\begin{pmatrix}y_1\\\vdots\\y_N\end{pmatrix},\qquad \cX=\{\xx_1,\ldots,\xx_N\},\qquad \eep=\begin{pmatrix}\epsilon_1\\\vdots\\\epsilon_N\end{pmatrix}.\end{split}\\The noise is assumed to be :math:`\epsilon_i\sim\cN(0, \sigma^2)` for\end{aligned}\end{align} \]</div>
+<p>some fixed <span class="math notranslate nohighlight">\(\sigma^2\)</span>. The noise need not actually be
+homoscedastic, but it is a standard assumption. We encapsulate this
+information in <span class="math notranslate nohighlight">\(\cD=\{\yy,\cX,\eep\}\)</span>. This is omitted from the
+earlier notation, because the data would be fixed.</p>
+<p>The point of NEI though is to deal with <strong>noisy</strong> observed values (EI,
+itself, is notorious for not dealing with noisy data very well). It does
+this by considering a variety of posterior draws at the locations in
+<span class="math notranslate nohighlight">\(\cX\)</span>. These have distribution</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}  Y_{\cX}|\cD=Y_{\cX}|\yy, \cX, \eep\sim \cN\left(\mK(\mK+\mE)^{-1}\yy, \mK - \mK(\mK+\mE)^{-1}\mK\right),\\where\end{aligned}\end{align} \]</div>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\begin{split}  \kk(x)=\begin{pmatrix}K(x,x_1)\\\vdots\\K(x,x_N)\end{pmatrix},\qquad
+  \mK=\begin{pmatrix}
+  K(x_1,x_1)&amp;\cdots&amp;K(x_1, x_N)\\&amp;\vdots&amp;\\K(x_N,x_1)&amp;\cdots&amp;K(x_N, x_N)
+  \end{pmatrix}=\begin{pmatrix}\kk(x_1)^T\\\vdots\\\kk(x_N)^T\end{pmatrix},\qquad
+  \mE=\begin{pmatrix}\epsilon_1&amp;&amp;\\&amp;\ddots&amp;\\&amp;&amp;\epsilon_N\end{pmatrix}\end{split}\\In practice, unless noise has actually been measured at each point, it\end{aligned}\end{align} \]</div>
+<p>would be common to simply plug in
+<span class="math notranslate nohighlight">\(\epsilon_1=\ldots=\epsilon_N=\sigma^2\)</span>. The term
+<code class="docutils literal notranslate"><span class="pre">noisy_predictions_at_data</span></code> below is drawn from this distribution
+(though in a standard iid fashion, not a more awesome QMC fashion).</p>
+<p>The EI integral, although approximated earlier using Monte Carlo, can
+actually be written in closed form. We do so below to also solidify our
+newer notation:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}  \EI(x;\yy, \cX, \eep) = \int_{-\infty}^\infty (y - y^*)_+\, p_{Y_x|\yy, \cX, \eep}(y)\; \text{d}y = s(z\Phi(z)+\phi(z))\\where :math:`\phi` and :math:`\Phi` are the standard normal pdf and\end{aligned}\end{align} \]</div>
+<p>cdf, and</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}  \mu=\kk(x)^T(\mK+\mE)^{-1}\yy,\qquad s^2 = K(x, x)-\kk(x)^T(\mK+\mE)^{-1}\kk(x),\qquad z=(\mu - y^*)/s.\\It is very important to remember that these quantities are functions of\end{aligned}\end{align} \]</div>
+<p><span class="math notranslate nohighlight">\(\yy,\cX,\eep\)</span> despite the absence of those quantities in the
+notation.</p>
+<p>The goal of the NEI integral is to simulate many possible random
+realizations of what could actually be the truth at the locations
+<span class="math notranslate nohighlight">\(\cX\)</span> and then run a <em>noiseless</em> EI computation over each of those
+realizations. The average of these outcomes is the NEI quantity. This
+would look like:</p>
+<div class="math notranslate nohighlight">
+\[\NEI(x) = \int_{\ff\in\RR^N} \EI(x;\ff, \cX, 0)\, p_{Y_{\cX}|\yy,\cX,\eep}(\ff)\;\dif\ff\]</div>
+<p><strong>NOTE</strong>: There are ways to do this computation in a more vectorized
+fashion, so it would more likely be a loop involving chunks of MC
+elements at a time. Just so you know.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_draws_at_data</span> <span class="o">=</span> <span class="mi">109</span>
+<span class="c1"># These draws are done through QMC in the FB paper</span>
+<span class="n">normal_draws_at_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_draws_at_data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+<span class="n">partial_cardinal_functions_at_data</span> <span class="o">=</span> <span class="n">solve_triangular</span><span class="p">(</span><span class="n">prior_cholesky</span><span class="p">,</span> <span class="n">kernel_prior_data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">posterior_covariance_at_data</span> <span class="o">=</span> <span class="n">kernel_prior_data</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">partial_cardinal_functions_at_data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">partial_cardinal_functions_at_data</span><span class="p">)</span>
+<span class="n">posterior_cholesky_at_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">posterior_covariance_at_data</span> <span class="o">+</span> <span class="n">fudge_factor</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+<span class="n">noisy_predictions_at_data</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">posterior_cholesky_at_data</span><span class="p">,</span> <span class="n">normal_draws_at_data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+<span class="n">prior_cholesky_noiseless</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">kernel_prior_data</span><span class="p">)</span>
+<span class="n">partial_cardinal_functions</span> <span class="o">=</span> <span class="n">solve_triangular</span><span class="p">(</span><span class="n">prior_cholesky_noiseless</span><span class="p">,</span> <span class="n">kernel_cross_matrix</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">full_cardinal_functions</span> <span class="o">=</span> <span class="n">solve_triangular</span><span class="p">(</span><span class="n">prior_cholesky</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">partial_cardinal_functions</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pointwise_sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fmax</span><span class="p">(</span><span class="n">process_variance</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">partial_cardinal_functions</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mf">1e-100</span><span class="p">))</span>
+
+<span class="n">all_noiseless_eis</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">draw</span> <span class="ow">in</span> <span class="n">noisy_predictions_at_data</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+    <span class="n">posterior_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">full_cardinal_functions</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">draw</span><span class="p">)</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">posterior_mean</span> <span class="o">-</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">/</span> <span class="n">pointwise_sd</span>
+    <span class="n">ei</span> <span class="o">=</span> <span class="n">pointwise_sd</span> <span class="o">*</span> <span class="p">(</span><span class="n">z</span> <span class="o">*</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+
+    <span class="n">all_noiseless_eis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ei</span><span class="p">)</span>
+
+<span class="n">all_noiseless_eis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_noiseless_eis</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">all_noiseless_eis</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#96CA4F&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;expected improvement draws&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#96CA4F&#39;</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_noiseless_eis</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#A23D97&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;noisy expected improvement&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#A23D97&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="../_images/nei_demo_9_0.png" src="../_images/nei_demo_9_0.png" />
+<div class="section" id="goal">
+<h2>Goal<a class="headerlink" href="#goal" title="Permalink to this headline">¶</a></h2>
+<p>What would be really great would be if we could compute integrals like
+the EI integral or the NEI integral using QMC. If there are
+opportunities to use the latest research to adaptively study tolerance
+and truncate, that would be absolutely amazing.</p>
+<p>I put the NEI example up first because the FB crew has already done a
+great job showing how QMC can play a role. But, as you can see, NEI is
+more complicated than EI, and also not yet as popular in the community
+(though that may change).</p>
+<div class="section" id="bonus-stuff">
+<h3>Bonus stuff<a class="headerlink" href="#bonus-stuff" title="Permalink to this headline">¶</a></h3>
+<p>Even the EI integral, which does have a closed form, might better be
+considered in a QMC fashion because of interesting use cases. I’m going
+to reconsider the same problem from above, but here I am not looking to
+maximize the function – I want to find the “level set” associated with
+the value <span class="math notranslate nohighlight">\(y=1\)</span>. Below you can see how the different outcome might
+look.</p>
+<p>In this case, the quantity of relevance is not exactly an integral, but
+it is a function of this posterior mean and standard deviation, which
+might need to be estimated through an integral (rather than the closed
+form, which we do have for a GP situation).</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">yplt</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="n">ms</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Sample data with noise&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.4</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">posterior_draws</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">posterior_mean</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Posterior draws&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.4</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">posterior_mean_distance_from_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">posterior_draws</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">posterior_standard_deviation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">posterior_draws</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">level_set_expected_improvement</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="o">-</span><span class="n">posterior_mean_distance_from_1</span> <span class="o">/</span> <span class="n">posterior_standard_deviation</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xplt</span><span class="p">,</span> <span class="n">level_set_expected_improvement</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#A23D97&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;level set expected improvement&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
+</pre></div>
+</div>
+<img alt="../_images/nei_demo_13_0.png" src="../_images/nei_demo_13_0.png" />
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/QMCSoftware/QMCSoftware">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Illinois Institute of Technology
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
