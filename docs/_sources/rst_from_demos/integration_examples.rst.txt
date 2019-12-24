@@ -117,7 +117,7 @@ Lattice Discrete Distribution: -
     	n               2048
     	n_total         2048
     	confid_int      [ 5.833  5.838]
-    	time_total      0.434
+    	time_total      0.318
     	r               16
     
 
@@ -163,7 +163,7 @@ Multi-Level
 
 .. parsed-literal::
 
-    Solution: 5.8320         
+    Solution: 5.8344         
     AsianCall (Integrand Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -185,10 +185,10 @@ Multi-Level
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               [ 249322.000  31697.000  5429.000]
-    	n_total         289520
-    	confid_int      [ 5.783  5.881]
-    	time_total      0.119
+    	n               [ 249427.000  31202.000  5566.000]
+    	n_total         289267
+    	confid_int      [ 5.786  5.883]
+    	time_total      0.093
     
 
 

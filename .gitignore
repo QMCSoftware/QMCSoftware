@@ -19,6 +19,8 @@ docs/Gemfile.lock
 # Sphinx
 python_prototype/sphinx/_build/
 python_prototype/sphinx/_static/
+python_prototype/sphinx/rst_from_demos/
+python_prototype/sphinx/rts_from_readme/
 
 # Jupyter Notebooks
 *checkpoint.ipynb

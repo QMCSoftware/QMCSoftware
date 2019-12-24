@@ -212,7 +212,7 @@ QMCPy and then invoke QMCPy’s integrate function:
 
 .. parsed-literal::
 
-    Solution: 0.6638         
+    Solution: 0.6581         
     QuickConstruct (Integrand Object)
     IIDStdUniform (Discrete Distribution Object)
     	mimics          StdUniform
@@ -227,10 +227,10 @@ QMCPy and then invoke QMCPy’s integrate function:
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               3298
-    	n_total         4322
-    	confid_int      [ 0.654  0.674]
-    	time_total      0.002
+    	n               3433
+    	n_total         4457
+    	confid_int      [ 0.648  0.668]
+    	time_total      0.003
     
 
 
@@ -266,7 +266,7 @@ changing the input parameter value of dimension for QuickConstruct
 
 .. parsed-literal::
 
-    Solution: 0.8282         
+    Solution: 0.8219         
     QuickConstruct (Integrand Object)
     IIDStdUniform (Discrete Distribution Object)
     	mimics          StdUniform
@@ -281,9 +281,9 @@ changing the input parameter value of dimension for QuickConstruct
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               5611
-    	n_total         6635
-    	confid_int      [ 0.818  0.838]
+    	n               5388
+    	n_total         6412
+    	confid_int      [ 0.812  0.832]
     	time_total      0.002
     
 
