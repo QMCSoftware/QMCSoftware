@@ -1,29 +1,42 @@
 Integration Examples using QMCPy package
 ========================================
 
+In this demo, we show how to use ``qmcpy`` for performing numerical
+multiple integration of two built-in integrands, namely, the Keister
+function and the Asian put option payoff. To start, we import the
+``qmcpy`` module and the function ``arrange()`` from ``numpy`` for
+generating evenly spaced discrete vectors in the examples.
+
 .. code:: ipython3
 
     from qmcpy import *
-    
     from numpy import arange
 
 Keister Example
 ---------------
 
-Keister Integrand: - :math:`y_i = \pi^{d/2} * \cos(||x_i||_2)`
+We recall briefly the mathematical definitions of the Keister function,
+the Gaussian measure, and the Sobol distribution:
 
-Gaussian True Measure: - :math:`\mathcal{N}(0,\frac{1}{2})`
+-  Keister integrand: :math:`y_j = \pi^{d/2} \cos(||x_j||_2)`
 
-Sobol Discrete Distribution: -
-:math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
+-  Gaussian true measure: :math:`\mathcal{N}(0,\frac{1}{2})`
+
+-  Sobol discrete distribution:
+   :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
+
+The following code snippet integrates a three-dimensional Keister
+function numerically by creating instances of ``qmcpy``\ ’s built-in
+classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CLTRep``, as inputs
+to the function ``integrate()``.
 
 .. code:: ipython3
 
     dim = 3
     integrand = Keister(dim)
-    discrete_distrib = Sobol(rng_seed=7)
     true_measure = Gaussian(dim, variance=1 / 2)
-    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=.05)
+    discrete_distrib = Sobol(rng_seed=7)
+    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=0.05)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
 
@@ -50,28 +63,34 @@ Sobol Discrete Distribution: -
     	n               128
     	n_total         128
     	confid_int      [ 2.164  2.179]
-    	time_total      0.007
+    	time_total      0.009
     	r               16
     
 
 
-Asian Option Pricing Example
-----------------------------
+European Arithmetic-Mean Asian Put Option: Single Level
+-------------------------------------------------------
 
-Single Level
-~~~~~~~~~~~~
+In this example, we want to estimate the payoff of an European Asian put
+option that matures at time :math:`T`. The key mathematical entities are
+defined as follows:
 
-Asian Call Option Integrand -
-:math:`S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}`
-- discounted put payoff
-:math:`= max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)`
+-  Stock price at time :math:`t_j := jT/d` for :math:`j=1,\dots,d` is a
+   function of its initial price :math:`S(0)`, interest rate :math:`r`,
+   and volatility :math:`\sigma`:
+   :math:`S(t_j) = S(0)e^{\left(r-\frac{\sigma^2}{2}\right)t_j + \sigma\mathcal{B}(t_j)}`
 
-Brownian Motion True Measure: -
-:math:`\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;` for
-:math:`\;Z_j \sim \mathcal{N}(0,1)`
+-  Discounted put option payoff is defined as the difference of a fixed
+   strike price :math:`K` and the arithmetic average of the underlying
+   stock prices at :math:`d` discrete time intervals in :math:`[0,T]`:
+   :math:`max \left(K-\frac{1}{d}\sum_{j=1}^{d} S(t_j), 0 \right) e^{-rT}`
 
-Lattice Discrete Distribution: -
-:math:`\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
+-  Brownian motion true measure:
+   :math:`\mathcal{B}(t_j) = B(t_{j-1}) + Z_j\sqrt{t_j-t_{j-1}} \;` for
+   :math:`\;Z_j \sim \mathcal{N}(0,1)`
+
+-  Lattice discrete distribution:
+   :math:`\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
 .. code:: ipython3
 
@@ -81,25 +100,25 @@ Lattice Discrete Distribution: -
     discrete_distrib = Lattice(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure,
-                    volatility = .5,
-                    start_price = 30,
-                    strike_price = 25,
-                    interest_rate = .01,
-                    mean_type = 'geometric')
-    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=.05)
+                          volatility = 0.5,
+                          start_price = 30,
+                          strike_price = 25,
+                          interest_rate = 0.01,
+                          mean_type = 'arithmetic')
+    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=0.05)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 5.8356         
+    Solution: 6.2595         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
     	strike_price    25
     	interest_rate   0.010
-    	mean_type       geometric
+    	mean_type       arithmetic
     	exercise_time   1
     Lattice (Discrete Distribution Object)
     	mimics          StdUniform
@@ -116,60 +135,61 @@ Lattice Discrete Distribution: -
     MeanVarDataRep (AccumData Object)
     	n               2048
     	n_total         2048
-    	confid_int      [ 5.833  5.838]
-    	time_total      0.350
+    	confid_int      [ 6.257  6.262]
+    	time_total      0.337
     	r               16
     
 
 
-Asian Option Pricing Example
-----------------------------
+European Arithmetic-Mean Asian Put Option: Multi-Level
+------------------------------------------------------
 
-Multi-Level
-~~~~~~~~~~~
+This example is similar to the last one except that we use Gile’s
+multi-level method for evaluation of the option price. The main idea can
+be summarized as follows:
 
 :math:`Y_0 = 0`
 
-:math:`Y_1` = Asian Option Monitored at
-:math:`t=[\frac{1}{4}, \frac{1}{2}, \frac{3}{4}, 1]`
+:math:`Y_1 = \mbox{ Asian option monitored at } t = [\frac{1}{4}, \frac{1}{2}, \frac{3}{4}, 1]`
 
-:math:`Y_2` = Asian Option Monitored at
-:math:`t=[\frac{1}{16}, \frac{1}{8}, ... , 1]`
+:math:`Y_2 = \mbox{ Asian option monitored at } t= [\frac{1}{16}, \frac{1}{8}, ... , 1]`
 
-:math:`Y_3` = Asian Option Monitored at
-:math:`t=[\frac{1}{64}, \frac{1}{32}, ... , 1]`
+:math:`Y_3 = \mbox{ Asian option monitored at } t= [\frac{1}{64}, \frac{1}{32}, ... , 1]`
 
 :math:`Z_1 = \mathbb{E}[Y_1-Y_0] + \mathbb{E}[Y_2-Y_1] + \mathbb{E}[Y_3-Y_2] = \mathbb{E}[Y_3]`
+
+The total run time for this example is about one-third of that for the
+last example.
 
 .. code:: ipython3
 
     time_vec = [arange(1 / 4, 5 / 4, 1 / 4),
-                     arange(1 / 16, 17 / 16, 1 / 16),
-                     arange(1 / 64, 65 / 64, 1 / 64)]
+                arange(1 / 16, 17 / 16, 1 / 16),
+                arange(1 / 64, 65 / 64, 1 / 64)]
     dim = [len(tv) for tv in time_vec]
     
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = BrownianMotion(dim, time_vector=time_vec)
     integrand = AsianCall(true_measure,
-                    volatility = .5,
-                    start_price = 30,
-                    strike_price = 25,
-                    interest_rate = .01,
-                    mean_type = 'geometric')
-    stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.05, n_max = 1e10)
+                          volatility = 0.5,
+                          start_price = 30,
+                          strike_price = 25,
+                          interest_rate = 0.01,
+                          mean_type = 'arithmetic')
+    stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=0.05, n_max = 1e10)
     _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 5.8359         
+    Solution: 6.2559         
     AsianCall (Integrand Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
     	strike_price    [25 25 25]
     	interest_rate   [ 0.010  0.010  0.010]
-    	mean_type       ['geometric' 'geometric' 'geometric']
+    	mean_type       ['arithmetic' 'arithmetic' 'arithmetic']
     	exercise_time   [ 1.000  1.000  1.000]
     IIDStdGaussian (Discrete Distribution Object)
     	mimics          StdGaussian
@@ -185,10 +205,9 @@ Multi-Level
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               [ 243544.000  33734.000  6776.000]
-    	n_total         287126
-    	confid_int      [ 5.787  5.885]
-    	time_total      0.123
+    	n               [ 287241.000  30175.000  8701.000]
+    	n_total         329189
+    	confid_int      [ 6.207  6.305]
+    	time_total      0.103
     
-
 

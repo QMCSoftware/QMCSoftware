@@ -90,17 +90,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../algorithms.html">QMCPy Documentation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../demos.html">Demos</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="qmcpy_intro.html">Welcome to QMCPy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qmcpy_intro.html#important-notes">Important Notes</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Integration Examples using QMCPy package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#keister-example">Keister Example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#asian-option-pricing-example">Asian Option Pricing Example</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#single-level">Single Level</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">Asian Option Pricing Example</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#multi-level">Multi-Level</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#european-arithmetic-mean-asian-put-option-single-level">European Arithmetic-Mean Asian Put Option: Single Level</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#european-arithmetic-mean-asian-put-option-multi-level">European Arithmetic-Mean Asian Put Option: Multi-Level</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="sample_scatter_plots.html">Scatter Plots of Samples</a></li>
@@ -177,22 +170,34 @@
             
   <div class="section" id="integration-examples-using-qmcpy-package">
 <h1>Integration Examples using QMCPy package<a class="headerlink" href="#integration-examples-using-qmcpy-package" title="Permalink to this headline">¶</a></h1>
+<p>In this demo, we show how to use <code class="docutils literal notranslate"><span class="pre">qmcpy</span></code> for performing numerical
+multiple integration of two built-in integrands, namely, the Keister
+function and the Asian put option payoff. To start, we import the
+<code class="docutils literal notranslate"><span class="pre">qmcpy</span></code> module and the function <code class="docutils literal notranslate"><span class="pre">arrange()</span></code> from <code class="docutils literal notranslate"><span class="pre">numpy</span></code> for
+generating evenly spaced discrete vectors in the examples.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qmcpy</span> <span class="k">import</span> <span class="o">*</span>
-
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">arange</span>
 </pre></div>
 </div>
 <div class="section" id="keister-example">
 <h2>Keister Example<a class="headerlink" href="#keister-example" title="Permalink to this headline">¶</a></h2>
-<p>Keister Integrand: - <span class="math notranslate nohighlight">\(y_i = \pi^{d/2} * \cos(||x_i||_2)\)</span></p>
-<p>Gaussian True Measure: - <span class="math notranslate nohighlight">\(\mathcal{N}(0,\frac{1}{2})\)</span></p>
-<p>Sobol Discrete Distribution: -
-<span class="math notranslate nohighlight">\(x_j \overset{lds}{\sim} \mathcal{U}(0,1)\)</span></p>
+<p>We recall briefly the mathematical definitions of the Keister function,
+the Gaussian measure, and the Sobol distribution:</p>
+<ul class="simple">
+<li><p>Keister integrand: <span class="math notranslate nohighlight">\(y_j = \pi^{d/2} \cos(||x_j||_2)\)</span></p></li>
+<li><p>Gaussian true measure: <span class="math notranslate nohighlight">\(\mathcal{N}(0,\frac{1}{2})\)</span></p></li>
+<li><p>Sobol discrete distribution:
+<span class="math notranslate nohighlight">\(x_j \overset{lds}{\sim} \mathcal{U}(0,1)\)</span></p></li>
+</ul>
+<p>The following code snippet integrates a three-dimensional Keister
+function numerically by creating instances of <code class="docutils literal notranslate"><span class="pre">qmcpy</span></code>’s built-in
+classes, <code class="docutils literal notranslate"><span class="pre">Keister</span></code>, <code class="docutils literal notranslate"><span class="pre">Gaussian</span></code>, <code class="docutils literal notranslate"><span class="pre">Sobol</span></code> and <code class="docutils literal notranslate"><span class="pre">CLTRep</span></code>, as inputs
+to the function <code class="docutils literal notranslate"><span class="pre">integrate()</span></code>.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">integrand</span> <span class="o">=</span> <span class="n">Keister</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
-<span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Sobol</span><span class="p">(</span><span class="n">rng_seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="n">true_measure</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=.</span><span class="mi">05</span><span class="p">)</span>
+<span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Sobol</span><span class="p">(</span><span class="n">rng_seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
@@ -217,47 +222,54 @@
     <span class="n">n</span>               <span class="mi">128</span>
     <span class="n">n_total</span>         <span class="mi">128</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">2.164</span>  <span class="mf">2.179</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.007</span>
+    <span class="n">time_total</span>      <span class="mf">0.009</span>
     <span class="n">r</span>               <span class="mi">16</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="asian-option-pricing-example">
-<h2>Asian Option Pricing Example<a class="headerlink" href="#asian-option-pricing-example" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="single-level">
-<h3>Single Level<a class="headerlink" href="#single-level" title="Permalink to this headline">¶</a></h3>
-<p>Asian Call Option Integrand -
-<span class="math notranslate nohighlight">\(S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}\)</span>
-- discounted put payoff
-<span class="math notranslate nohighlight">\(= max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)\)</span></p>
-<p>Brownian Motion True Measure: -
-<span class="math notranslate nohighlight">\(\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;\)</span> for
-<span class="math notranslate nohighlight">\(\;Z_j \sim \mathcal{N}(0,1)\)</span></p>
-<p>Lattice Discrete Distribution: -
-<span class="math notranslate nohighlight">\(\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)\)</span></p>
+<div class="section" id="european-arithmetic-mean-asian-put-option-single-level">
+<h2>European Arithmetic-Mean Asian Put Option: Single Level<a class="headerlink" href="#european-arithmetic-mean-asian-put-option-single-level" title="Permalink to this headline">¶</a></h2>
+<p>In this example, we want to estimate the payoff of an European Asian put
+option that matures at time <span class="math notranslate nohighlight">\(T\)</span>. The key mathematical entities are
+defined as follows:</p>
+<ul class="simple">
+<li><p>Stock price at time <span class="math notranslate nohighlight">\(t_j := jT/d\)</span> for <span class="math notranslate nohighlight">\(j=1,\dots,d\)</span> is a
+function of its initial price <span class="math notranslate nohighlight">\(S(0)\)</span>, interest rate <span class="math notranslate nohighlight">\(r\)</span>,
+and volatility <span class="math notranslate nohighlight">\(\sigma\)</span>:
+<span class="math notranslate nohighlight">\(S(t_j) = S(0)e^{\left(r-\frac{\sigma^2}{2}\right)t_j + \sigma\mathcal{B}(t_j)}\)</span></p></li>
+<li><p>Discounted put option payoff is defined as the difference of a fixed
+strike price <span class="math notranslate nohighlight">\(K\)</span> and the arithmetic average of the underlying
+stock prices at <span class="math notranslate nohighlight">\(d\)</span> discrete time intervals in <span class="math notranslate nohighlight">\([0,T]\)</span>:
+<span class="math notranslate nohighlight">\(max \left(K-\frac{1}{d}\sum_{j=1}^{d} S(t_j), 0 \right) e^{-rT}\)</span></p></li>
+<li><p>Brownian motion true measure:
+<span class="math notranslate nohighlight">\(\mathcal{B}(t_j) = B(t_{j-1}) + Z_j\sqrt{t_j-t_{j-1}} \;\)</span> for
+<span class="math notranslate nohighlight">\(\;Z_j \sim \mathcal{N}(0,1)\)</span></p></li>
+<li><p>Lattice discrete distribution:
+<span class="math notranslate nohighlight">\(\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)\)</span></p></li>
+</ul>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">time_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">65</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">)]</span>
 <span class="n">dim</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tv</span><span class="p">)</span> <span class="k">for</span> <span class="n">tv</span> <span class="ow">in</span> <span class="n">time_vec</span><span class="p">]</span>
 
 <span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">(</span><span class="n">rng_seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="n">true_measure</span> <span class="o">=</span> <span class="n">BrownianMotion</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">time_vector</span><span class="o">=</span><span class="n">time_vec</span><span class="p">)</span>
 <span class="n">integrand</span> <span class="o">=</span> <span class="n">AsianCall</span><span class="p">(</span><span class="n">true_measure</span><span class="p">,</span>
-                <span class="n">volatility</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>
-                <span class="n">start_price</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
-                <span class="n">strike_price</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
-                <span class="n">interest_rate</span> <span class="o">=</span> <span class="o">.</span><span class="mi">01</span><span class="p">,</span>
-                <span class="n">mean_type</span> <span class="o">=</span> <span class="s1">&#39;geometric&#39;</span><span class="p">)</span>
-<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=.</span><span class="mi">05</span><span class="p">)</span>
+                      <span class="n">volatility</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+                      <span class="n">start_price</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+                      <span class="n">strike_price</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+                      <span class="n">interest_rate</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+                      <span class="n">mean_type</span> <span class="o">=</span> <span class="s1">&#39;arithmetic&#39;</span><span class="p">)</span>
+<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">5.8356</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">6.2595</span>
 <span class="n">AsianCall</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">volatility</span>      <span class="mf">0.500</span>
     <span class="n">start_price</span>     <span class="mi">30</span>
     <span class="n">strike_price</span>    <span class="mi">25</span>
     <span class="n">interest_rate</span>   <span class="mf">0.010</span>
-    <span class="n">mean_type</span>       <span class="n">geometric</span>
+    <span class="n">mean_type</span>       <span class="n">arithmetic</span>
     <span class="n">exercise_time</span>   <span class="mi">1</span>
 <span class="n">Lattice</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">Distribution</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">mimics</span>          <span class="n">StdUniform</span>
@@ -274,50 +286,49 @@
 <span class="n">MeanVarDataRep</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">n</span>               <span class="mi">2048</span>
     <span class="n">n_total</span>         <span class="mi">2048</span>
-    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">5.833</span>  <span class="mf">5.838</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.276</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.257</span>  <span class="mf">6.262</span><span class="p">]</span>
+    <span class="n">time_total</span>      <span class="mf">0.337</span>
     <span class="n">r</span>               <span class="mi">16</span>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="id1">
-<h2>Asian Option Pricing Example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="multi-level">
-<h3>Multi-Level<a class="headerlink" href="#multi-level" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="european-arithmetic-mean-asian-put-option-multi-level">
+<h2>European Arithmetic-Mean Asian Put Option: Multi-Level<a class="headerlink" href="#european-arithmetic-mean-asian-put-option-multi-level" title="Permalink to this headline">¶</a></h2>
+<p>This example is similar to the last one except that we use Gile’s
+multi-level method for evaluation of the option price. The main idea can
+be summarized as follows:</p>
 <p><span class="math notranslate nohighlight">\(Y_0 = 0\)</span></p>
-<p><span class="math notranslate nohighlight">\(Y_1\)</span> = Asian Option Monitored at
-<span class="math notranslate nohighlight">\(t=[\frac{1}{4}, \frac{1}{2}, \frac{3}{4}, 1]\)</span></p>
-<p><span class="math notranslate nohighlight">\(Y_2\)</span> = Asian Option Monitored at
-<span class="math notranslate nohighlight">\(t=[\frac{1}{16}, \frac{1}{8}, ... , 1]\)</span></p>
-<p><span class="math notranslate nohighlight">\(Y_3\)</span> = Asian Option Monitored at
-<span class="math notranslate nohighlight">\(t=[\frac{1}{64}, \frac{1}{32}, ... , 1]\)</span></p>
+<p><span class="math notranslate nohighlight">\(Y_1 = \mbox{ Asian option monitored at } t = [\frac{1}{4}, \frac{1}{2}, \frac{3}{4}, 1]\)</span></p>
+<p><span class="math notranslate nohighlight">\(Y_2 = \mbox{ Asian option monitored at } t= [\frac{1}{16}, \frac{1}{8}, ... , 1]\)</span></p>
+<p><span class="math notranslate nohighlight">\(Y_3 = \mbox{ Asian option monitored at } t= [\frac{1}{64}, \frac{1}{32}, ... , 1]\)</span></p>
 <p><span class="math notranslate nohighlight">\(Z_1 = \mathbb{E}[Y_1-Y_0] + \mathbb{E}[Y_2-Y_1] + \mathbb{E}[Y_3-Y_2] = \mathbb{E}[Y_3]\)</span></p>
+<p>The total run time for this example is about one-third of that for the
+last example.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">time_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span>
-                 <span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span> <span class="o">/</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">),</span>
-                 <span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">65</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">)]</span>
+            <span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span> <span class="o">/</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">),</span>
+            <span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">65</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">)]</span>
 <span class="n">dim</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tv</span><span class="p">)</span> <span class="k">for</span> <span class="n">tv</span> <span class="ow">in</span> <span class="n">time_vec</span><span class="p">]</span>
 
 <span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">IIDStdGaussian</span><span class="p">(</span><span class="n">rng_seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="n">true_measure</span> <span class="o">=</span> <span class="n">BrownianMotion</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">time_vector</span><span class="o">=</span><span class="n">time_vec</span><span class="p">)</span>
 <span class="n">integrand</span> <span class="o">=</span> <span class="n">AsianCall</span><span class="p">(</span><span class="n">true_measure</span><span class="p">,</span>
-                <span class="n">volatility</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>
-                <span class="n">start_price</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
-                <span class="n">strike_price</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
-                <span class="n">interest_rate</span> <span class="o">=</span> <span class="o">.</span><span class="mi">01</span><span class="p">,</span>
-                <span class="n">mean_type</span> <span class="o">=</span> <span class="s1">&#39;geometric&#39;</span><span class="p">)</span>
-<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLT</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=.</span><span class="mi">05</span><span class="p">,</span> <span class="n">n_max</span> <span class="o">=</span> <span class="mf">1e10</span><span class="p">)</span>
+                      <span class="n">volatility</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+                      <span class="n">start_price</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+                      <span class="n">strike_price</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+                      <span class="n">interest_rate</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+                      <span class="n">mean_type</span> <span class="o">=</span> <span class="s1">&#39;arithmetic&#39;</span><span class="p">)</span>
+<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLT</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">n_max</span> <span class="o">=</span> <span class="mf">1e10</span><span class="p">)</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">5.8326</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">6.2559</span>
 <span class="n">AsianCall</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">volatility</span>      <span class="p">[</span> <span class="mf">0.500</span>  <span class="mf">0.500</span>  <span class="mf">0.500</span><span class="p">]</span>
     <span class="n">start_price</span>     <span class="p">[</span><span class="mi">30</span> <span class="mi">30</span> <span class="mi">30</span><span class="p">]</span>
     <span class="n">strike_price</span>    <span class="p">[</span><span class="mi">25</span> <span class="mi">25</span> <span class="mi">25</span><span class="p">]</span>
     <span class="n">interest_rate</span>   <span class="p">[</span> <span class="mf">0.010</span>  <span class="mf">0.010</span>  <span class="mf">0.010</span><span class="p">]</span>
-    <span class="n">mean_type</span>       <span class="p">[</span><span class="s1">&#39;geometric&#39;</span> <span class="s1">&#39;geometric&#39;</span> <span class="s1">&#39;geometric&#39;</span><span class="p">]</span>
+    <span class="n">mean_type</span>       <span class="p">[</span><span class="s1">&#39;arithmetic&#39;</span> <span class="s1">&#39;arithmetic&#39;</span> <span class="s1">&#39;arithmetic&#39;</span><span class="p">]</span>
     <span class="n">exercise_time</span>   <span class="p">[</span> <span class="mf">1.000</span>  <span class="mf">1.000</span>  <span class="mf">1.000</span><span class="p">]</span>
 <span class="n">IIDStdGaussian</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">Distribution</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">mimics</span>          <span class="n">StdGaussian</span>
@@ -333,12 +344,11 @@
     <span class="n">inflate</span>         <span class="mf">1.200</span>
     <span class="n">alpha</span>           <span class="mf">0.010</span>
 <span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
-    <span class="n">n</span>               <span class="p">[</span> <span class="mf">239356.000</span>  <span class="mf">38466.000</span>  <span class="mf">6904.000</span><span class="p">]</span>
-    <span class="n">n_total</span>         <span class="mi">287798</span>
-    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">5.784</span>  <span class="mf">5.881</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.100</span>
+    <span class="n">n</span>               <span class="p">[</span> <span class="mf">287241.000</span>  <span class="mf">30175.000</span>  <span class="mf">8701.000</span><span class="p">]</span>
+    <span class="n">n_total</span>         <span class="mi">329189</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.207</span>  <span class="mf">6.305</span><span class="p">]</span>
+    <span class="n">time_total</span>      <span class="mf">0.103</span>
 </pre></div>
-</div>
 </div>
 </div>
 </div>
