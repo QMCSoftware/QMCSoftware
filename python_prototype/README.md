@@ -42,6 +42,10 @@ Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.
 * [GitHub](https://qmcsoftware.github.io/QMCSoftware/)
 * [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) 
 
+In addition, PDF version is available at:
+* [GitHub](https://github.com/QMCSoftware/QMCSoftware/blob/master/docs/qmcpy.pdf)
+* [Read the Docs](https://readthedocs.org/projects/qmcpy/downloads/pdf/latest/)
+
 <hr>
 
 ## Installation
