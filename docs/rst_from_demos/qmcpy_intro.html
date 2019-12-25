@@ -90,12 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../algorithms.html">QMCPy Documentation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../demos.html">Demos</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Welcome to QMCPy</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#import">Import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#importing-qmcpy">Importing QMCPy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#important-notes">Important Notes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#iid-vs-lds">IID vs LDS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multi-dimensional-inputs">Multi-Dimensional Inputs</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#important-notes">Important Notes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#iid-vs-lds">IID vs LDS</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#multi-dimensional-inputs">Multi-Dimensional Inputs</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="integration_examples.html">Integration Examples using QMCPy package</a></li>
@@ -173,36 +173,40 @@
             
   <div class="section" id="welcome-to-qmcpy">
 <h1>Welcome to QMCPy<a class="headerlink" href="#welcome-to-qmcpy" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="import">
-<h2>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">qmcpy</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">qmcpy</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">qmcpy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<div class="section" id="importing-qmcpy">
+<h2>Importing QMCPy<a class="headerlink" href="#importing-qmcpy" title="Permalink to this headline">¶</a></h2>
+<p>Here we show three different ways to import QMCPy in a Python
+environment. First, we can import the package <code class="docutils literal notranslate"><span class="pre">qmcpy</span></code> under the alias
+<code class="docutils literal notranslate"><span class="pre">qp</span></code>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">qmcpy</span> <span class="k">as</span> <span class="nn">qp</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">qp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">qp</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qmcpy</span> <span class="mf">0.1</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Individual Imports</span>
-<span class="kn">from</span> <span class="nn">qmcpy</span> <span class="k">import</span> <span class="n">integrate</span>
+<p>Alternatively, we can import individual objects from ‘qmcpy’ as shown
+below.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qmcpy</span> <span class="k">import</span> <span class="n">integrate</span>
 <span class="kn">from</span> <span class="nn">qmcpy.integrand</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">qmcpy.true_measure</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">qmcpy.discrete_distribution</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">qmcpy.stopping_criterion</span> <span class="k">import</span> <span class="o">*</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Complete Import</span>
-<span class="kn">from</span> <span class="nn">qmcpy</span> <span class="k">import</span> <span class="o">*</span>
+<p>Lastly, we can import all objects from the package using an asterisk.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qmcpy</span> <span class="k">import</span> <span class="o">*</span>
 </pre></div>
 </div>
 </div>
-</div>
 <div class="section" id="important-notes">
-<h1>Important Notes<a class="headerlink" href="#important-notes" title="Permalink to this headline">¶</a></h1>
+<h2>Important Notes<a class="headerlink" href="#important-notes" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="iid-vs-lds">
-<h2>IID vs LDS<a class="headerlink" href="#iid-vs-lds" title="Permalink to this headline">¶</a></h2>
+<h3>IID vs LDS<a class="headerlink" href="#iid-vs-lds" title="Permalink to this headline">¶</a></h3>
 <p>Low discrepancy sequences (LDS) such as lattice and Sobol are not
-independent like IID points - The below code generates 1 replication
-(squeezed out) of 4 samples of 2 dimensions</p>
+independent like IID (independent identically distributed) points.</p>
+<p>The code below generates 1 replication (squeezed out) of 4 lattice
+samples of 2 dimensions.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">(</span><span class="n">rng_seed</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">discrete_distrib</span><span class="o">.</span><span class="n">gen_dd_samples</span><span class="p">(</span><span class="n">replications</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 <span class="n">x</span>
@@ -216,12 +220,13 @@ independent like IID points - The below code generates 1 replication
 </div>
 </div>
 <div class="section" id="multi-dimensional-inputs">
-<h2>Multi-Dimensional Inputs<a class="headerlink" href="#multi-dimensional-inputs" title="Permalink to this headline">¶</a></h2>
-<p>Suppose we want to create anintegrand in QMCPy for evaluating the
+<h3>Multi-Dimensional Inputs<a class="headerlink" href="#multi-dimensional-inputs" title="Permalink to this headline">¶</a></h3>
+<p>Suppose we want to create an integrand in QMCPy for evaluating the
 following integral:</p>
 <div class="math notranslate nohighlight">
-\[ \begin{align}\begin{aligned}\int_{[0,1]^d} \|x\|_2^{\|x\|_2^{1/2}} dx,\\where :math:`[0,1]^d` is the unit hypercube in :math:`\mathbb{R}^d`.\end{aligned}\end{align} \]</div>
-<p>The integrand is defined everywhere except at <span class="math notranslate nohighlight">\(x=0\)</span> and hence the
+\[\int_{[0,1]^d} \|x\|_2^{\|x\|_2^{1/2}} dx,\]</div>
+<p>where <span class="math notranslate nohighlight">\([0,1]^d\)</span> is the unit hypercube in <span class="math notranslate nohighlight">\(\mathbb{R}^d\)</span>.
+The integrand is defined everywhere except at <span class="math notranslate nohighlight">\(x=0\)</span> and hence the
 definite integral is also defined.</p>
 <p>The key in defining a Python function of an integrand in the QMCPy
 framework is that not only it should be able to take one point
@@ -269,17 +274,17 @@ function.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.0016486409914407</span>
 </pre></div>
 </div>
-<p>Numpy’s norm(x) is obviously a matrix norm, but we want it to be vector
-2-norm that acts on each row of x. To that end, let’s add an axis
-argument to the function:</p>
+<p>Numpy’s <code class="docutils literal notranslate"><span class="pre">norm(x)</span></code> is obviously a matrix norm, but we want it to be
+vector 2-norm that acts on each row of <code class="docutils literal notranslate"><span class="pre">x</span></code>. To that end, let’s add an
+axis argument to the function:</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">1.000</span><span class="p">,</span>  <span class="mf">0.010</span><span class="p">,</span>  <span class="mf">0.057</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>Now it’s working! Let’s make sure that the sqrt function is acting on
-each element of the vector norm results:</p>
+<p>Now it’s working! Let’s make sure that the <code class="docutils literal notranslate"><span class="pre">sqrt</span></code> function is acting
+on each element of the vector norm results:</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sqrt</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -299,15 +304,15 @@ each element of the vector norm results:</p>
     <span class="k">return</span> <span class="n">x_norms</span> <span class="o">**</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">x_norms</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We can now create an integrand instance with our QuickConstruct class in
-QMCPy and then invoke QMCPy’s integrate function:</p>
+<p>We can now create an <code class="docutils literal notranslate"><span class="pre">integrand</span></code> instance with our <code class="docutils literal notranslate"><span class="pre">QuickConstruct</span></code>
+class in QMCPy and then invoke QMCPy’s <code class="docutils literal notranslate"><span class="pre">integrate</span></code> function:</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">custom_fun</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
 <span class="n">sol</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">Uniform</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.6616</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.6632</span>
 <span class="n">QuickConstruct</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
 <span class="n">IIDStdUniform</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">Distribution</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">mimics</span>          <span class="n">StdUniform</span>
@@ -322,9 +327,9 @@ QMCPy and then invoke QMCPy’s integrate function:</p>
     <span class="n">inflate</span>         <span class="mf">1.200</span>
     <span class="n">alpha</span>           <span class="mf">0.010</span>
 <span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
-    <span class="n">n</span>               <span class="mi">3166</span>
-    <span class="n">n_total</span>         <span class="mi">4190</span>
-    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.651</span>  <span class="mf">0.672</span><span class="p">]</span>
+    <span class="n">n</span>               <span class="mi">3317</span>
+    <span class="n">n_total</span>         <span class="mi">4341</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.653</span>  <span class="mf">0.673</span><span class="p">]</span>
     <span class="n">time_total</span>      <span class="mf">0.002</span>
 </pre></div>
 </div>
@@ -341,15 +346,13 @@ solution is accurate enough:</p>
 </div>
 <p>It’s good. Shall we test the function with <span class="math notranslate nohighlight">\(d=2\)</span> by simply
 changing the input parameter value of dimension for QuickConstruct?</p>
-<p>It’s good. Shall we test the function with <span class="math notranslate nohighlight">\(d=2\)</span> by simply
-changing the input parameter value of dimension for QuickConstruct</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">integrand2</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 <span class="n">sol2</span><span class="p">,</span> <span class="n">data2</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand2</span><span class="p">,</span> <span class="n">Uniform</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data2</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.8244</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.8317</span>
 <span class="n">QuickConstruct</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
 <span class="n">IIDStdUniform</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">Distribution</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">mimics</span>          <span class="n">StdUniform</span>
@@ -364,10 +367,10 @@ changing the input parameter value of dimension for QuickConstruct</p>
     <span class="n">inflate</span>         <span class="mf">1.200</span>
     <span class="n">alpha</span>           <span class="mf">0.010</span>
 <span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
-    <span class="n">n</span>               <span class="mi">5520</span>
-    <span class="n">n_total</span>         <span class="mi">6544</span>
-    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.814</span>  <span class="mf">0.834</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.002</span>
+    <span class="n">n</span>               <span class="mi">5243</span>
+    <span class="n">n_total</span>         <span class="mi">6267</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.821</span>  <span class="mf">0.842</span><span class="p">]</span>
+    <span class="n">time_total</span>      <span class="mf">0.003</span>
 </pre></div>
 </div>
 <p>Once again, we could test for accuracy of QMCPy with respect to the true
@@ -380,6 +383,7 @@ value:</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kc">True</span>
 </pre></div>
+</div>
 </div>
 </div>
 </div>

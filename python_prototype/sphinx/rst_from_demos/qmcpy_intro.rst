@@ -1,13 +1,17 @@
 Welcome to QMCPy
 ================
 
-Import
-------
+Importing QMCPy
+---------------
+
+Here we show three different ways to import QMCPy in a Python
+environment. First, we can import the package ``qmcpy`` under the alias
+``qp``.
 
 .. code:: ipython3
 
-    import qmcpy
-    print(qmcpy.name, qmcpy.__version__)
+    import qmcpy as qp
+    print(qp.name, qp.__version__)
 
 
 .. parsed-literal::
@@ -15,29 +19,34 @@ Import
     qmcpy 0.1
 
 
+Alternatively, we can import individual objects from ‘qmcpy’ as shown
+below.
+
 .. code:: ipython3
 
-    # Individual Imports
     from qmcpy import integrate
     from qmcpy.integrand import *
     from qmcpy.true_measure import *
     from qmcpy.discrete_distribution import *
     from qmcpy.stopping_criterion import *
 
+Lastly, we can import all objects from the package using an asterisk.
+
 .. code:: ipython3
 
-    # Complete Import
     from qmcpy import *
 
 Important Notes
-===============
+---------------
 
 IID vs LDS
-----------
+~~~~~~~~~~
 
 Low discrepancy sequences (LDS) such as lattice and Sobol are not
-independent like IID points - The below code generates 1 replication
-(squeezed out) of 4 samples of 2 dimensions
+independent like IID (independent identically distributed) points.
+
+The code below generates 1 replication (squeezed out) of 4 lattice
+samples of 2 dimensions.
 
 .. code:: ipython3
 
@@ -58,14 +67,14 @@ independent like IID points - The below code generates 1 replication
 
 
 Multi-Dimensional Inputs
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Suppose we want to create an integrand in QMCPy for evaluating the
 following integral:
 
-.. math::  \int_{[0,1]^d} \|x\|_2^{\|x\|_2^{1/2}} dx,
+.. math:: \int_{[0,1]^d} \|x\|_2^{\|x\|_2^{1/2}} dx,
 
- where :math:`[0,1]^d` is the unit hypercube in :math:`\mathbb{R}^d`.
+\ where :math:`[0,1]^d` is the unit hypercube in :math:`\mathbb{R}^d`.
 The integrand is defined everywhere except at :math:`x=0` and hence the
 definite integral is also defined.
 
@@ -143,9 +152,9 @@ function.
 
 
 
-Numpy’s norm(x) is obviously a matrix norm, but we want it to be vector
-2-norm that acts on each row of x. To that end, let’s add an axis
-argument to the function:
+Numpy’s ``norm(x)`` is obviously a matrix norm, but we want it to be
+vector 2-norm that acts on each row of ``x``. To that end, let’s add an
+axis argument to the function:
 
 .. code:: ipython3
 
@@ -160,8 +169,8 @@ argument to the function:
 
 
 
-Now it’s working! Let’s make sure that the sqrt function is acting on
-each element of the vector norm results:
+Now it’s working! Let’s make sure that the ``sqrt`` function is acting
+on each element of the vector norm results:
 
 .. code:: ipython3
 
@@ -199,8 +208,8 @@ We have got our proper function definition now.
         x_norms = norm(x, axis = 1)
         return x_norms ** sqrt(x_norms)
 
-We can now create an integrand instance with our QuickConstruct class in
-QMCPy and then invoke QMCPy’s integrate function:
+We can now create an ``integrand`` instance with our ``QuickConstruct``
+class in QMCPy and then invoke QMCPy’s ``integrate`` function:
 
 .. code:: ipython3
 
@@ -212,7 +221,7 @@ QMCPy and then invoke QMCPy’s integrate function:
 
 .. parsed-literal::
 
-    Solution: 0.6616         
+    Solution: 0.6632         
     QuickConstruct (Integrand Object)
     IIDStdUniform (Discrete Distribution Object)
     	mimics          StdUniform
@@ -227,9 +236,9 @@ QMCPy and then invoke QMCPy’s integrate function:
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               3166
-    	n_total         4190
-    	confid_int      [ 0.651  0.672]
+    	n               3317
+    	n_total         4341
+    	confid_int      [ 0.653  0.673]
     	time_total      0.002
     
 
@@ -253,9 +262,6 @@ solution is accurate enough:
 It’s good. Shall we test the function with :math:`d=2` by simply
 changing the input parameter value of dimension for QuickConstruct?
 
-It’s good. Shall we test the function with :math:`d=2` by simply
-changing the input parameter value of dimension for QuickConstruct
-
 .. code:: ipython3
 
     dim = 2
@@ -266,7 +272,7 @@ changing the input parameter value of dimension for QuickConstruct
 
 .. parsed-literal::
 
-    Solution: 0.8244         
+    Solution: 0.8317         
     QuickConstruct (Integrand Object)
     IIDStdUniform (Discrete Distribution Object)
     	mimics          StdUniform
@@ -281,10 +287,10 @@ changing the input parameter value of dimension for QuickConstruct
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               5520
-    	n_total         6544
-    	confid_int      [ 0.814  0.834]
-    	time_total      0.002
+    	n               5243
+    	n_total         6267
+    	confid_int      [ 0.821  0.842]
+    	time_total      0.003
     
 
 
@@ -302,5 +308,4 @@ value:
 .. parsed-literal::
 
     True
-
 
