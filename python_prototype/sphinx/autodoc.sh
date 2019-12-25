@@ -62,15 +62,6 @@ cp -a _build/html/. ../../docs;
 
 make latex
 
-##pandoc -s -r html _build/html/demos.html -o _build/latex/demos.tex
-#pandoc -s -r html _build/html/demos.html -o _build/latex/demos.md
-#pandoc _build/latex/demos.md -o _build/latex/qmcpy_demos.pdf
-#pandoc -s -r html _build/html/demos.html -o _build/latex/qmcpy_demos.pdf
-
-##pandoc -N --template=template.tex _build/latex/demos.tex -o _build/latex/demos.pdf
-#pandoc -s -r html _build/html/readme.html -o _build/latex/readme.tex
-##pandoc -N --template=template.tex _build/latex/readme.tex -o _build/latex/readme.pdf
-
 cp -a _build/latex/qmcpy.pdf ../../docs/qmcpy.pdf
 
 cp ../requirements.txt ../../docs

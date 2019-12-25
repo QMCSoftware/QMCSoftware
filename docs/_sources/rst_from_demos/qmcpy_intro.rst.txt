@@ -1,4 +1,4 @@
-Welcome to QMCpy
+Welcome to QMCPy
 ================
 
 Import
@@ -35,7 +35,7 @@ Important Notes
 IID vs LDS
 ----------
 
-Low discrepancy sequences (lds) such as Lattic and Sobol are not
+Low discrepancy sequences (LDS) such as lattice and Sobol are not
 independent like IID points - The below code generates 1 replication
 (squeezed out) of 4 samples of 2 dimensions
 
@@ -60,14 +60,14 @@ independent like IID points - The below code generates 1 replication
 Multi-Dimensional Inputs
 ------------------------
 
-Suppose we want to create the an integrand in QMCPy for evaluating the
+Suppose we want to create an integrand in QMCPy for evaluating the
 following integral:
 
 .. math::  \int_{[0,1]^d} \|x\|_2^{\|x\|_2^{1/2}} dx,
 
  where :math:`[0,1]^d` is the unit hypercube in :math:`\mathbb{R}^d`.
 The integrand is defined everywhere except at :math:`x=0` and hence the
-definite integal is also defined.
+definite integral is also defined.
 
 The key in defining a Python function of an integrand in the QMCPy
 framework is that not only it should be able to take one point
@@ -127,7 +127,7 @@ two-dimensional domain, i.e., :math:`d=2`?
 
 
 Now, the function should have returned :math:`n=3` real values that
-correponding to each of the sampling points. Let’s debug our Python
+corresponding to each of the sampling points. Let’s debug our Python
 function.
 
 .. code:: ipython3
@@ -212,7 +212,7 @@ QMCPy and then invoke QMCPy’s integrate function:
 
 .. parsed-literal::
 
-    Solution: 0.6570         
+    Solution: 0.6616         
     QuickConstruct (Integrand Object)
     IIDStdUniform (Discrete Distribution Object)
     	mimics          StdUniform
@@ -227,9 +227,9 @@ QMCPy and then invoke QMCPy’s integrate function:
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               3474
-    	n_total         4498
-    	confid_int      [ 0.647  0.667]
+    	n               3166
+    	n_total         4190
+    	confid_int      [ 0.651  0.672]
     	time_total      0.002
     
 
@@ -266,7 +266,7 @@ changing the input parameter value of dimension for QuickConstruct
 
 .. parsed-literal::
 
-    Solution: 0.8265         
+    Solution: 0.8244         
     QuickConstruct (Integrand Object)
     IIDStdUniform (Discrete Distribution Object)
     	mimics          StdUniform
@@ -281,9 +281,9 @@ changing the input parameter value of dimension for QuickConstruct
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               5283
-    	n_total         6307
-    	confid_int      [ 0.816  0.837]
+    	n               5520
+    	n_total         6544
+    	confid_int      [ 0.814  0.834]
     	time_total      0.002
     
 

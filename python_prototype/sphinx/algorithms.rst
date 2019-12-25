@@ -14,7 +14,7 @@ Integrand Class
 .. automodule:: qmcpy.integrand
     :members:
 
-Asican Call Option Payoff
+Asian Call Option Payoff
 .........................
 
 .. automodule:: qmcpy.integrand.asian_call
