@@ -1,4 +1,5 @@
 # API
-from .iid_generators import IIDStdGaussian, IIDStdUniform
-from .lds_generators import Lattice, Sobol
-from .mps_refactor import DigitalSeq, LatticeSeq
+from .iid_std_uniform import IIDStdUniform
+from .iid_std_gaussian import IIDStdGaussian
+from .lattice import Lattice
+from .sobol import Sobol

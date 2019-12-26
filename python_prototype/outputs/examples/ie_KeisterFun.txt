@@ -14,9 +14,9 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 MeanVarData (AccumData Object)
 	n               470869
-	n_total         471893.0
+	n_total         471893
 	confid_int      [ 2.164  2.185]
-	time_total      0.185
+	time_total      0.153
 
 Solution: 2.1702         
 Keister (Integrand Object)
@@ -34,9 +34,9 @@ CLT (Stopping Criterion Object)
 	alpha           0.010
 MeanVarData (AccumData Object)
 	n               476600
-	n_total         477624.0
+	n_total         477624
 	confid_int      [ 2.160  2.180]
-	time_total      0.045
+	time_total      0.038
 
 Solution: 2.1738         
 Keister (Integrand Object)
@@ -54,9 +54,9 @@ MeanMC_g (Stopping Criterion Object)
 	alpha           0.010
 MeanVarData (AccumData Object)
 	n               603479
-	n_total         604503.0
+	n_total         604503
 	confid_int      [ 2.164  2.184]
-	time_total      0.211
+	time_total      0.190
 
 Solution: 2.1703         
 Keister (Integrand Object)
@@ -74,14 +74,15 @@ MeanMC_g (Stopping Criterion Object)
 	alpha           0.010
 MeanVarData (AccumData Object)
 	n               610515
-	n_total         611539.0
+	n_total         611539
 	confid_int      [ 2.160  2.180]
-	time_total      0.059
+	time_total      0.051
 
 Solution: 2.1680         
 Keister (Integrand Object)
 Lattice (Discrete Distribution Object)
 	mimics          StdUniform
+	rng_seed        7
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
@@ -94,15 +95,17 @@ CLTRep (Stopping Criterion Object)
 	alpha           0.010
 MeanVarDataRep (AccumData Object)
 	n               256
-	n_total         256.0
+	n_total         256
 	confid_int      [ 2.166  2.170]
 	time_total      0.004
 	r               16
 
-Solution: 2.1683         
+Solution: 2.1700         
 Keister (Integrand Object)
 Sobol (Discrete Distribution Object)
 	mimics          StdUniform
+	rng_seed        7
+	backend         pytorch
 Gaussian (True Measure Object)
 	dimension       3
 	mu              0
@@ -115,8 +118,8 @@ CLTRep (Stopping Criterion Object)
 	alpha           0.010
 MeanVarDataRep (AccumData Object)
 	n               512
-	n_total         512.0
-	confid_int      [ 2.168  2.169]
-	time_total      0.013
+	n_total         512
+	confid_int      [ 2.169  2.171]
+	time_total      0.050
 	r               16
 
