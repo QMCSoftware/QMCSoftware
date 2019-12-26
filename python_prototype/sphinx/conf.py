@@ -26,9 +26,10 @@ sys.path.insert(0, os.path.abspath("../python_prototype/"))
 print("root directory = %s " % os.getcwd())
 
 # -- Project information -----------------------------------------------------
-project = u"qmcpy"
+project = u"QMCPy"
 copyright = u"2019, Illinois Institute of Technology"
 author = u"Fred J. Hickernell, Aleksei Sorokin, Sou-Cheng T. Choi"
+version = u"0.1"
 
 # The full version, including alpha/beta/rc tags
 release = u"0.1"
@@ -42,7 +43,7 @@ release = u"0.1"
 
 extensions = ["sphinx.ext.autodoc",
               "sphinx.ext.githubpages",
-              # "sphinx.ext.imgmath",
+              "sphinx.ext.imgmath", # for epub latex
               "sphinx.ext.napoleon",
               "sphinx.ext.graphviz",
               "sphinx.ext.intersphinx",

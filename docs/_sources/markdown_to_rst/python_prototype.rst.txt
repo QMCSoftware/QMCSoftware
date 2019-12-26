@@ -71,6 +71,11 @@ following websites: \*
 `GitHub <https://qmcsoftware.github.io/QMCSoftware/>`__ \* `Read the
 Docs <https://qmcpy.readthedocs.io/en/latest/>`__
 
+In addition, PDF version is available at: \*
+`GitHub <https://github.com/QMCSoftware/QMCSoftware/blob/master/docs/qmcpy.pdf>`__
+\* `Read the
+Docs <https://readthedocs.org/projects/qmcpy/downloads/pdf/latest/>`__
+
 .. raw:: html
 
    <hr>
