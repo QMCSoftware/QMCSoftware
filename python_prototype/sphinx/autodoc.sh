@@ -64,11 +64,14 @@ make latex
 
 cp -a _build/latex/qmcpy.pdf ../../docs/qmcpy.pdf
 
+grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
+
 cp ../requirements.txt ../../docs
 
 ## Use sphinx to generate epub documentation
 
 make epub
+
 cp -a _build/epub/qmcpy.epub ../../docs/qmcpy.epub
 
 echo "QMCPy autodoc process ends..."

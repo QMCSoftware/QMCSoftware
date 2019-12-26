@@ -1,6 +1,6 @@
 # Tests
 
-<hr>
+---
 
 ## Fast unittests
 Quickly check functionality<br>
@@ -10,7 +10,7 @@ Run all in < 1 second
 python -m unittest discover -s test/fasttests
 ~~~
 
-<hr>
+---
 
 ## Long unittests
 Call workout functions<br>

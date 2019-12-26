@@ -7,9 +7,7 @@
 Quasi-Monte Carlo Community Software
 ====================================
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate
 integrals. They have four main components: an integrand, a discrete
@@ -29,9 +27,7 @@ ideas with those implemented by the rest of the QMC community, we also
 aim to provide practitioners with state-of-the-art QMC software for
 their applications.
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Citation
 --------
@@ -43,9 +39,7 @@ Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC
 Community Software.” Python software, 2019. Work in progress. Available
 from https://github.com/QMCSoftware/QMCSoftware
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Developers
 ----------
@@ -54,18 +48,14 @@ Developers
 -  Fred J. Hickernell
 -  Aleksei Sorokin
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Contributors
 ------------
 
 -  Michael McCourt
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Acknowledgment
 --------------
@@ -73,9 +63,7 @@ Acknowledgment
 We thank Dirk Nuyens for fruitful discussions related to Magic Point
 Shop.
 
-.. raw:: html
-
-   <hr>
+--------------
 
 References
 ----------
