@@ -90,7 +90,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">QMCPy Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-qmcpy.integrate">Integration Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#integrand-class">Integrand Class</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.asian_call">Asican Call Option Payoff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.asian_call">Asian Call Option Payoff</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.keister">Keister Function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.linear">A Linear Function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.integrand.quick_construct">Quick Construct for Function</a></li>
@@ -204,7 +204,7 @@ sum of two variables defined on unit square is used.</p></li>
 <div class="section" id="integrand-class">
 <h2>Integrand Class<a class="headerlink" href="#integrand-class" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-qmcpy.integrand"></span><div class="section" id="module-qmcpy.integrand.asian_call">
-<span id="asican-call-option-payoff"></span><h3>Asican Call Option Payoff<a class="headerlink" href="#module-qmcpy.integrand.asian_call" title="Permalink to this headline">¶</a></h3>
+<span id="asian-call-option-payoff"></span><h3>Asian Call Option Payoff<a class="headerlink" href="#module-qmcpy.integrand.asian_call" title="Permalink to this headline">¶</a></h3>
 <p>Definition for class AsianCall, a concrete implementation of Integrand</p>
 <dl class="class">
 <dt id="qmcpy.integrand.asian_call.AsianCall">
@@ -567,12 +567,12 @@ dimension (int): number of dimensions</p>
 
 <span class="target" id="module-qmcpy.discrete_distribution.sobol"></span><p>Definition for Sobol, a concrete implementation of DiscreteDistribution</p>
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.sobol.Sobol">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.sobol.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.lds_generators.Sobol">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.lds_generators.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quasi-Random Sobol low discrepancy sequence (Base 2)</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.sobol.Sobol.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.lds_generators.Sobol.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -602,8 +602,8 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="qmcpy.discrete_distribution.sobol.randint">
-<code class="sig-prename descclassname">qmcpy.discrete_distribution.sobol.</code><code class="sig-name descname">randint</code><span class="sig-paren">(</span><em class="sig-param">low</em>, <em class="sig-param">high=None</em>, <em class="sig-param">size=None</em>, <em class="sig-param">dtype='l'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.randint" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.lds_generators.randint">
+<code class="sig-prename descclassname">qmcpy.discrete_distribution.lds_generators.</code><code class="sig-name descname">randint</code><span class="sig-paren">(</span><em class="sig-param">low</em>, <em class="sig-param">high=None</em>, <em class="sig-param">size=None</em>, <em class="sig-param">dtype='l'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.randint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return random integers from <cite>low</cite> (inclusive) to <cite>high</cite> (exclusive).</p>
 <p>Return random integers from the “discrete uniform” distribution of
 the specified dtype in the “half-open” interval [<cite>low</cite>, <cite>high</cite>). If

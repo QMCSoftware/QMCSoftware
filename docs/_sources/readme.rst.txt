@@ -1,23 +1,13 @@
 About Our QMC Software Community
-================================
+=================================
 
-.. raw:: html
-   :file: html_from_readme/QMCSoftware.html
+.. toctree::
+    :maxdepth: 1
 
-About Our Python QMC Software
-------------------------------
+    markdown_to_rst/QMCSoftware.rst
 
-.. raw:: html
-   :file: html_from_readme/python_prototype.html
+    markdown_to_rst/python_prototype.rst
 
-About QMCPy
-............
+    markdown_to_rst/qmcpy.rst
 
-.. raw:: html
-   :file: html_from_readme/qmcpy.html
-
-About QMCPy Tests
-..................
-
-.. raw:: html
-   :file: html_from_readme/test.html
+    markdown_to_rst/test.rst

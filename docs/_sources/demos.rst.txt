@@ -1,27 +1,15 @@
 Demos
 =====
 
-QMCPy Intro
-------------
-.. raw:: html
-   :file: html_from_demos/qmcpy_intro.html
+.. toctree::
+    :maxdepth: 2
 
-Integration Examples
---------------------
-.. raw:: html
-   :file: html_from_demos/integration_examples.html
+    rst_from_demos/qmcpy_intro.rst
 
-Sampling Points Visualization
------------------------------
-.. raw:: html
-   :file: html_from_demos/sample_scatter_plots.html
+    rst_from_demos/integration_examples.rst
 
-MC and QMC Comparison
----------------------
-.. raw:: html
-   :file: html_from_demos/MC_vs_QMC.html
+    rst_from_demos/sample_scatter_plots.rst
 
-Quasi-Random Sequence Generators
---------------------------------
-.. raw:: html
-   :file: html_from_demos/quasirandom_generators.html
+    rst_from_demos/MC_vs_QMC.rst
+
+    rst_from_demos/quasirandom_generators.rst
