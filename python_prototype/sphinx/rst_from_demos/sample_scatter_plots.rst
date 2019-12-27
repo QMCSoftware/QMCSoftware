@@ -4,7 +4,7 @@ Scatter Plots of Samples
 .. code:: ipython3
 
     from copy import deepcopy
-    from numpy import ceil, linspace, meshgrid, zeros, array
+    from numpy import ceil, linspace, meshgrid, zeros, array, arange
     from mpl_toolkits.mplot3d.axes3d import Axes3D
     
     import matplotlib
