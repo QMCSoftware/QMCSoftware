@@ -34,7 +34,7 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
     """
 
     # Default some arguments
-    if not discrete_distrib: discrete_distrib = IIDStdUniform()
+    if not discrete_distrib: discrete_distrib = IIDStdUniform(rng_seed=7)
     if not stopping_criterion:
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=0.01)
     # Check TrueMeasure and Integrand matching dimensions
