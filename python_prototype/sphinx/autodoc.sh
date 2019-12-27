@@ -11,7 +11,12 @@ echo "$(date)"
 cd ../..  # to go to directory QMCSoftware
 pwd
 cp  README.md README.bak
+
+# remove lines in top-level README.md that contain the keywords in double quotes
+# for latex compilation
 grep -v "svg" README.md > temp && mv temp README.md
+grep -v "readthedocs" README.md > temp && mv temp README.md
+
 
 DIR=python_prototype/sphinx/markdown_to_rst/
 if [ ! -d $DIR ]; then
@@ -69,6 +74,8 @@ make latex
 
 cp -a _build/latex/qmcpy.pdf ../../docs/qmcpy.pdf
 
+# remove lines in requirements.txt that contain the keywords in double quotes
+# for latex compilation
 grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
 
 cp ../requirements.txt ../../docs
