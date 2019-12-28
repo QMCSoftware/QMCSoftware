@@ -35,7 +35,7 @@ following work:
 
 Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC
 Community Software.” Python software, 2019. Work in progress. Available
-from https://github.com/QMCSoftware/QMCSoftware
+from https://github.com/QMCSoftware/QMCSoftware.
 
 --------------
 
@@ -43,8 +43,10 @@ Documentation
 -------------
 
 Documentation of QMCPy is available at the following Read the Docs
-websites: \* HTML: https://qmcpy.readthedocs.io/en/latest/ \* PDF:
-https://readthedocs.org/projects/qmcpy/downloads/pdf/latest/
+websites:
+
+-  HTML: https://qmcpy.readthedocs.io/en/latest/
+-  PDF: https://readthedocs.org/projects/qmcpy/downloads/pdf/latest/
 
 --------------
 
