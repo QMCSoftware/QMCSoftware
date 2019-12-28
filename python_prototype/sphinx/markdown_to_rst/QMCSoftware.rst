@@ -2,8 +2,6 @@
    :depth: 1
 ..
 
-|Build Status|
-
 Quasi-Monte Carlo Community Software
 ====================================
 
@@ -38,6 +36,15 @@ following work:
 Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC
 Community Software.” Python software, 2019. Work in progress. Available
 from https://github.com/QMCSoftware/QMCSoftware
+
+--------------
+
+Documentation
+-------------
+
+Documentation of QMCPy is available at the following Read the Docs
+websites: \* HTML: https://qmcpy.readthedocs.io/en/latest/ \* PDF:
+https://readthedocs.org/projects/qmcpy/downloads/pdf/latest/
 
 --------------
 
@@ -127,6 +134,3 @@ Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D.
 Nuyens, eds.), Springer Proceedings in Mathematics and Statistics,
 vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA],
 pp. 367-383.
-
-.. |Build Status| image:: https://travis-ci.com/QMCSoftware/QMCSoftware.png?branch=master
-   :target: https://travis-ci.com/QMCSoftware/QMCSoftware

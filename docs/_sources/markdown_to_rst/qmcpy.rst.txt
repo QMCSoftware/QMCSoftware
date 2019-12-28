@@ -5,9 +5,7 @@
 QMCPy
 =====
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Integrand
 ---------
@@ -24,9 +22,7 @@ The function to integrate *Abstract class with concrete implementations*
    -  discounted put payoff
       :math:`= max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)`
 
-.. raw:: html
-
-   <hr>
+--------------
 
 True Measure
 ------------
@@ -40,9 +36,7 @@ concrete implementations*
    :math:`\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;` for
    :math:`\;Z_j \sim \mathcal{N}(0,1)`
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Discrete Distribution
 ---------------------
@@ -58,9 +52,7 @@ with concrete implementations*
    :math:`\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 -  Sobol (base 2): :math:`\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Stopping Criterion
 ------------------
@@ -73,9 +65,7 @@ class with concrete implementations* Central Limit Theorem (CLT)
 -  CLT for :math:`x_i\sim` iid
 -  CLT Repeated for :math:`\{x_{r,i}\}_{r=1}^R \sim` lds
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Accumulate Data Class
 ---------------------
@@ -86,9 +76,7 @@ Stores data values of corresponding stopping criterion procedure
 -  Mean Variance Data (Controlled by CLT)
 -  Mean Variance Repeated Data (Controlled by CLT Repeated)
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Integrate Method
 ----------------

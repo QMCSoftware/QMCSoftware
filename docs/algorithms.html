@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>QMCPy Documentation &mdash; qmcpy 0.1 documentation</title>
+  <title>QMCPy Documentation &mdash; QMCPy 0.1 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> qmcpy
+            <a href="index.html" class="icon icon-home"> QMCPy
           
 
           
@@ -61,6 +61,10 @@
 
           
             
+            
+              <div class="version">
+                0.1
+              </div>
             
           
 
@@ -118,7 +122,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">qmcpy</a>
+          <a href="index.html">QMCPy</a>
         
       </nav>
 
@@ -567,12 +571,12 @@ dimension (int): number of dimensions</p>
 
 <span class="target" id="module-qmcpy.discrete_distribution.sobol"></span><p>Definition for Sobol, a concrete implementation of DiscreteDistribution</p>
 <dl class="class">
-<dt id="qmcpy.discrete_distribution.lds_generators.Sobol">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.lds_generators.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.sobol.Sobol">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.sobol.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quasi-Random Sobol low discrepancy sequence (Base 2)</p>
 <dl class="method">
-<dt id="qmcpy.discrete_distribution.lds_generators.Sobol.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.sobol.Sobol.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -602,8 +606,8 @@ dimension (int): number of dimensions</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="qmcpy.discrete_distribution.lds_generators.randint">
-<code class="sig-prename descclassname">qmcpy.discrete_distribution.lds_generators.</code><code class="sig-name descname">randint</code><span class="sig-paren">(</span><em class="sig-param">low</em>, <em class="sig-param">high=None</em>, <em class="sig-param">size=None</em>, <em class="sig-param">dtype='l'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.lds_generators.randint" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.discrete_distribution.sobol.randint">
+<code class="sig-prename descclassname">qmcpy.discrete_distribution.sobol.</code><code class="sig-name descname">randint</code><span class="sig-paren">(</span><em class="sig-param">low</em>, <em class="sig-param">high=None</em>, <em class="sig-param">size=None</em>, <em class="sig-param">dtype='l'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.randint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return random integers from <cite>low</cite> (inclusive) to <cite>high</cite> (exclusive).</p>
 <p>Return random integers from the “discrete uniform” distribution of
 the specified dtype in the “half-open” interval [<cite>low</cite>, <cite>high</cite>). If
@@ -892,7 +896,7 @@ to gen_dd_samples (method of a DiscreteDistribution)</p>
            
           </div>
     <a href="https://github.com/QMCSoftware/QMCSoftware">
-        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
     </a>
 
           <footer>
