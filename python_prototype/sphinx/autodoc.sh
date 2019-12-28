@@ -6,17 +6,17 @@ echo "QMCPy autodoc process starts..."
 
 echo "$(date)"
 
-## Use pandoc to generate RST files from REAME.md that has LaTeX expressions
-
+################################################################################
+# Use pandoc to generate RST (ReStructured Text) files from REAME.md that has
+# LaTeX expressions
+################################################################################
 cd ../..  # to go to directory QMCSoftware
 pwd
 cp  README.md README.bak
 
-# remove lines in top-level README.md that contain the keywords in double quotes
-# for latex compilation
-grep -v "svg" README.md > temp && mv temp README.md
-grep -v "readthedocs" README.md > temp && mv temp README.md
-
+# remove lines in top-level README.md that contain the keywords (service status)
+# in double quotes for latex compilation
+grep -v  "\[\!" README.md > temp && mv temp README.md
 
 DIR=python_prototype/sphinx/markdown_to_rst/
 if [ ! -d $DIR ]; then
@@ -25,10 +25,14 @@ fi
 rm DIR/*
 python python_prototype/qmcpy/_util/render_readme_as_rst.py
 # pandoc -s --mathjax ./README.md -o python_prototype/sphinx/markdown_to_rst/QMCSoftware.html
+
+# restore original README.md that contains certain keywords
 rm README.md
 mv README.bak README.md
 
-## Generate rst (ReStructured Text) files from notebooks
+################################################################################
+# Generate RST files from Jupyter notebooks
+################################################################################
 cd python_prototype
 
 export PYTHONPATH=$PYTHONPATH:"$(pwd; cd ..)"
@@ -56,9 +60,10 @@ mv *.rst $DIR
 
 cd .. # to python_prototype
 
-## Use sphinx to generate HTML documentation with inputs from above and
-## docstrings from Python code
-
+################################################################################
+# Use sphinx to generate HTML documentation with inputs from above and
+# docstrings from Python code
+################################################################################
 cd sphinx   # to return to sphinx directory
 
 make clean;
@@ -68,8 +73,9 @@ make html
 rm -fr ../../docs;  mkdir ../../docs;
 cp -a _build/html/. ../../docs;
 
-## Use sphinx to generate PDF documentation
-
+################################################################################
+# Use sphinx to generate PDF documentation
+################################################################################
 make latex
 
 cp -a _build/latex/qmcpy.pdf ../../docs/qmcpy.pdf
@@ -80,8 +86,9 @@ grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
 
 cp ../requirements.txt ../../docs
 
-## Use sphinx to generate epub documentation
-
+################################################################################
+# Use sphinx to generate epub documentation
+################################################################################
 make epub
 
 cp -a _build/epub/qmcpy.epub ../../docs/qmcpy.epub
