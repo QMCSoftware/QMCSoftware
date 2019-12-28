@@ -4,7 +4,7 @@ from workouts.wo_asian_option import test_distributions_asian_option
 from workouts.wo_keister import test_distributions_keister
 from workouts.wo_customizations import quick_construct_integrand
 from workouts.wo_mc_vs_qmc import abstol_comparison, dimension_comparison
-from workouts.wo_lds_sequences import mps_gentimes, qmcpy_gentimes
+from workouts.wo_lds_sequences import mps_gentimes, qmcpy_gentimes, comp_sobol_backend
 
 import unittest
 from numpy import arange
@@ -33,3 +33,4 @@ class TestWorkouts(unittest.TestCase):
     def test_lds_gentimes(self):
         mps_gentimes(n_2powers=arange(2, 4))
         qmcpy_gentimes(n_2powers=arange(2, 4))
+        comp_sobol_backend(sample_sizes=[16, 16, 32])
