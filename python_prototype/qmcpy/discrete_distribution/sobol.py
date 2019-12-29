@@ -57,16 +57,16 @@ class Sobol(DiscreteDistribution):
             elif self.backend == 'pytorch':
                 # Initialize self.r SobolEngines
                 temp_seed = randint(100) if self.rng_seed is None else self.rng_seed
-                self.sobol_rng = [SobolEngine(dimension=self.d, scramble=scramble, seed=seed) \
-                                  for seed in range(temp_seed, temp_seed+self.r)]
+                self.sobol_rng = [SobolEngine(dimension=self.d, scramble=scramble, seed=seed)
+                                  for seed in range(temp_seed, temp_seed + self.r)]
         else:
             # Not the first call to this method
             if d != self.d or r != self.r:
                 warnings.warn('''
                     Using dimensions = %d and replications = %d
                     as previously set for this generator.'''
-                    % (self.d, self.r),
-                    DistributionGenerationWarnings)
+                              % (self.d, self.r),
+                              DistributionGenerationWarnings)
         if self.backend == 'mps':
             x = zeros((n, d), dtype=int64)
             for i in range(n):
@@ -76,7 +76,7 @@ class Sobol(DiscreteDistribution):
                 x = array([(shift_r ^ (x * 2 ** self.ct)) / 2. ** self.t for shift_r in self.shifts])
                 # randomly scramble and x contains values in [0, 1]
             else:
-                x = repeat(x[None,:,:], self.r, axis=0) # duplicate unshifted samples
+                x = repeat(x[None, :, :], self.r, axis=0)  # duplicate unshifted samples
         elif self.backend == 'pytorch':
             x = array([self.sobol_rng[i].draw(n).numpy() for i in range(self.r)])
         return x
@@ -91,5 +91,5 @@ class Sobol(DiscreteDistribution):
         Returns:
             string of self info
         """
-        attributes = ['mimics','rng_seed','backend']
+        attributes = ['mimics', 'rng_seed', 'backend']
         return super().__repr__(attributes)

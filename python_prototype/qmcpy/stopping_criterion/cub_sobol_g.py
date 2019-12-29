@@ -8,7 +8,7 @@ from ..accum_data import MeanVarDataRep
 class CubSobol_g(StoppingCriterion):
     """
     Stopping criterion for Lattice sequence with garunteed accuracy
-    
+
     Guarantee
         This algorithm computes the integral of real valued functions in [0,1]^d
         with a prescribed generalized error tolerance. The Fourier coefficients

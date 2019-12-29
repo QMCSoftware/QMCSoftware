@@ -18,7 +18,7 @@ class Keister(Integrand):
             B. D. Keister, Multidimensional Quadrature Algorithms, \
             `Computers in Physics`, *10*, pp. 119-122, 1996.
     """
-    
+
     def __init__(self, dimension):
         """
         Args:

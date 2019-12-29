@@ -4,6 +4,7 @@ from ._discrete_distribution import DiscreteDistribution
 
 from numpy.random import Generator, PCG64
 
+
 class IIDStdUniform(DiscreteDistribution):
     """ IID Standard Uniform """
 

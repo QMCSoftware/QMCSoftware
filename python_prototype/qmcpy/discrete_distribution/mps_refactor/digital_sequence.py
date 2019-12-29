@@ -206,7 +206,6 @@ class DigitalSeq():
             self.cur[j] ^= self.Csr[j][ctz]
             self.x[j] = self.recipd * self.cur[j]
 
-
     def __iter__(self):
         self.reset()
         return self

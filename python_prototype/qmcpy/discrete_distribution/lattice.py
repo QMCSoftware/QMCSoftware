@@ -52,8 +52,8 @@ class Lattice(DiscreteDistribution):
                 warnings.warn('''
                     Using dimensions = %d and replications = %d
                     as previously set for this generator.'''
-                    % (self.d, self.r),
-                    DistributionGenerationWarnings)
+                              % (self.d, self.r),
+                              DistributionGenerationWarnings)
         if self.n_min == 0:
             # generate first 2^m points
             x = vstack([self.lattice_rng.calc_block(i) for i in range(m + 1)])
@@ -70,7 +70,7 @@ class Lattice(DiscreteDistribution):
         if scramble:
             x = array([(x + shift_r) % 1 for shift_r in self.shifts])  # random shift
         else:
-            x = repeat(x[None,:,:], self.r, axis=0) # duplicate unshifted samples
+            x = repeat(x[None, :, :], self.r, axis=0)  # duplicate unshifted samples
         return x
 
     def __repr__(self, attributes=[]):
@@ -83,5 +83,5 @@ class Lattice(DiscreteDistribution):
         Returns:
             string of self info
         """
-        attributes = ['mimics','rng_seed']
+        attributes = ['mimics', 'rng_seed']
         return super().__repr__(attributes)

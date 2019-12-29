@@ -7,6 +7,7 @@ from pandas import DataFrame
 from time import time
 import torch
 
+
 def qmcpy_gentimes(n_2powers=arange(1, 11), trials=1, dim=1):
     """
     Record time for generating samples from each discrete distribution
@@ -22,19 +23,19 @@ def qmcpy_gentimes(n_2powers=arange(1, 11), trials=1, dim=1):
         for trial in range(trials):
             distrib = Lattice(rng_seed=7)
             x = distrib.gen_dd_samples(1, n_samples, dim)
-        row_i['Lattice_time'] = (time()-t0) / trials
+        row_i['Lattice_time'] = (time() - t0) / trials
         # Sobol Magic Point Shop
         t0 = time()
         for trial in range(trials):
             distrib = Sobol(rng_seed=7, backend='MPS')
             x = distrib.gen_dd_samples(1, n_samples, dim)
-        row_i['Sobol_MPS_time'] = (time()-t0) / trials
+        row_i['Sobol_MPS_time'] = (time() - t0) / trials
         # Sobol Pytorch
         t0 = time()
         for trial in range(trials):
             distrib = Sobol(rng_seed=7, backend='Pytorch')
             x = distrib.gen_dd_samples(1, n_samples, dim)
-        row_i['Sobol_Torch_time'] = (time()-t0) / trials
+        row_i['Sobol_Torch_time'] = (time() - t0) / trials
         # Set/Print Results for this n
         print(row_i)
         df.loc[i] = row_i

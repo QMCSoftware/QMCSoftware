@@ -9,6 +9,7 @@ from pandas import DataFrame
 distribution_pointers = [IIDStdUniform, IIDStdGaussian, Lattice, Sobol]
 trials = 3
 
+
 def abstol_comparison(abstols=arange(.1, .4, .1)):
     """
     Record solution, wall-clock time, and number of samples
@@ -33,7 +34,7 @@ def abstol_comparison(abstols=arange(.1, .4, .1)):
                 distrib_name = type(distribution).__name__
                 if distrib_name in ['IIDStdGaussian', 'IIDStdUniform']:
                     stopping_criterion = CLT(distribution, measure, abs_tol=abs_tol,
-                                            n_max=1e10, n_init=256)
+                                             n_max=1e10, n_init=256)
                 elif distrib_name in ['Lattice', 'Sobol']:
                     stopping_criterion = CLTRep(distribution, measure, abs_tol=abs_tol,
                                                 n_max=1e10, n_init=32)
@@ -52,6 +53,7 @@ def abstol_comparison(abstols=arange(.1, .4, .1)):
         print(row_i)
         df.loc[i] = row_i
     return df
+
 
 if __name__ == '__main__':
     # Absolute Tolerance Comparison Test

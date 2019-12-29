@@ -117,7 +117,7 @@ class TestSobol(unittest.TestCase):
                 samples_unshifted[i, :] = gen.cur
             self.assertTrue((samples_unshifted.squeeze() == true_array).all())
 
-        del gen_qmcpy_mps # Ensure shallow copy d.n. affect samples_unshifted
+        del gen_qmcpy_mps  # Ensure shallow copy d.n. affect samples_unshifted
         self.assertTrue((samples_unshifted == true_array).all())
 
 

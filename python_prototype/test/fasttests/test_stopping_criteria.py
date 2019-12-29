@@ -11,8 +11,8 @@ tv_single_level = [arange(1 / 64, 65 / 64, 1 / 64)]
 dim_single_level = [len(tv) for tv in tv_single_level]
 
 tv_multi_level = [arange(1 / 4, 5 / 4, 1 / 4),
-                arange(1 / 16, 17 / 16, 1 / 16),
-                arange(1 / 64, 65 / 64, 1 / 64)]
+                  arange(1 / 16, 17 / 16, 1 / 16),
+                  arange(1 / 64, 65 / 64, 1 / 64)]
 dim_multi_level = [len(tv) for tv in tv_multi_level]
 
 
@@ -31,7 +31,7 @@ class TestClt(unittest.TestCase):
         integrand = AsianCall(true_measure)
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.1, n_init=64, n_max=1000)
         self.assertWarns(MaxSamplesWarning, integrate,
-            integrand, true_measure, discrete_distrib, stopping_criterion)
+                         integrand, true_measure, discrete_distrib, stopping_criterion)
 
     def test_n_max_multi_level(self):
         discrete_distrib = IIDStdUniform(rng_seed=7)
@@ -39,7 +39,7 @@ class TestClt(unittest.TestCase):
         integrand = AsianCall(true_measure)
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.1, n_init=64, n_max=1000)
         self.assertWarns(MaxSamplesWarning, integrate,
-            integrand, true_measure, discrete_distrib, stopping_criterion)
+                         integrand, true_measure, discrete_distrib, stopping_criterion)
 
 
 class TestCltRep(unittest.TestCase):
@@ -60,7 +60,7 @@ class TestCltRep(unittest.TestCase):
         integrand = AsianCall(true_measure)
         stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=.1, n_init=32, n_max=100)
         self.assertWarns(MaxSamplesWarning, integrate,
-            integrand, true_measure, discrete_distrib, stopping_criterion)
+                         integrand, true_measure, discrete_distrib, stopping_criterion)
 
 
 class TestMeanMC_g(unittest.TestCase):
@@ -78,7 +78,7 @@ class TestMeanMC_g(unittest.TestCase):
         integrand = AsianCall(true_measure)
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=.1, n_init=64, n_max=1000)
         self.assertWarns(MaxSamplesWarning, integrate,
-            integrand, true_measure, discrete_distrib, stopping_criterion)
+                         integrand, true_measure, discrete_distrib, stopping_criterion)
 
 
 if __name__ == "__main__":
