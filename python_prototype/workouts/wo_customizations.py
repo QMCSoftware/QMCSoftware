@@ -19,7 +19,8 @@ def quick_construct_integrand(abs_tol):
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Uniform(dim)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure,
+                        discrete_distrib, stopping_criterion)
     # exact_solution = dim*(c/2)
     print(data)
 

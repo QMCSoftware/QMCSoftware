@@ -1,13 +1,14 @@
 """ Call abbreviated varsions of functions from python_prototypes/worksouts/ """
 
-from workouts.wo_asian_option import test_distributions_asian_option
-from workouts.wo_keister import test_distributions_keister
-from workouts.wo_customizations import quick_construct_integrand
-from workouts.wo_mc_vs_qmc import abstol_comparison, dimension_comparison
-from workouts.wo_lds_sequences import mps_gentimes, qmcpy_gentimes, comp_sobol_backend
-
 import unittest
+
 from numpy import arange
+from workouts.wo_asian_option import test_distributions_asian_option
+from workouts.wo_customizations import quick_construct_integrand
+from workouts.wo_keister import test_distributions_keister
+from workouts.wo_lds_sequences import comp_sobol_backend, mps_gentimes, \
+    qmcpy_gentimes
+from workouts.wo_mc_vs_qmc import abstol_comparison, dimension_comparison
 
 
 class TestWorkouts(unittest.TestCase):

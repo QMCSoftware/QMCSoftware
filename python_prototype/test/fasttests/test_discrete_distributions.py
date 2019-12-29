@@ -74,7 +74,8 @@ class TestLattice(unittest.TestCase):
         self.assertTrue(all(row in mps_sampels for row in true_samples))
         # QMCPy Generator with calc_block method (based on MPS implementation)
         qmcpy_gen = LatticeSeq(s=d)
-        qmcpy_samples = vstack([qmcpy_gen.calc_block(m) for m in range(int(log2(n)) + 1)])
+        qmcpy_samples = vstack([qmcpy_gen.calc_block(m)
+                                for m in range(int(log2(n)) + 1)])
         self.assertTrue(all(row in qmcpy_samples for row in true_samples))
 
 
@@ -117,7 +118,7 @@ class TestSobol(unittest.TestCase):
                 samples_unshifted[i, :] = gen.cur
             self.assertTrue((samples_unshifted.squeeze() == true_array).all())
 
-        del gen_qmcpy_mps # Ensure shallow copy d.n. affect samples_unshifted
+        del gen_qmcpy_mps  # Ensure shallow copy d.n. affect samples_unshifted
         self.assertTrue((samples_unshifted == true_array).all())
 
 

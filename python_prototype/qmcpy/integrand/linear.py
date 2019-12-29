@@ -8,7 +8,7 @@ class Linear(Integrand):
     Specify and generate values :math:`f(\\boldsymbol{x}) = \\sum_{i=1}^d x_i` \
     for :math:`\\boldsymbol{x} = (x_1,\\ldots,x_d) \\in \\mathbb{R}^d`
     """
-        
+
     def __init__(self, dimension):
         """
         Args:

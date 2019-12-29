@@ -1,10 +1,9 @@
 """ Abstract Class TrueMeasure """
 
-from .._util import DimensionError, TransformError, ParameterError
-from .._util import univ_repr, multilevel_constructor
-
 from abc import ABC
 from copy import deepcopy
+
+from .._util import multilevel_constructor, TransformError, univ_repr
 
 
 class TrueMeasure(ABC):
@@ -14,11 +13,12 @@ class TrueMeasure(ABC):
         """
         Args:
             dimension (ndarray): dimension(s) of the integrand(s)
-            kwargs: keyword arguments. keys become attributes 
+            kwargs: keyword arguments. keys become attributes
                     with values distributed among object list
         """
         super().__init__()
-        measures = multilevel_constructor(self, dimension, transforms=transforms, **kwargs)
+        measures = multilevel_constructor(self, dimension,
+                                          transforms=transforms, **kwargs)
         self.measures = measures
 
     def gen_tm_samples(self, r, n):
@@ -142,7 +142,7 @@ class TrueMeasure(ABC):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

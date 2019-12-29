@@ -14,20 +14,20 @@ class Lebesgue(TrueMeasure):
         transforms = {
             "StdUniform": [
                 lambda self, samples: samples * (self.b - self.a) + self.a,
-                    # stretch samples
+                # stretch samples
                 lambda self, g: g * (self.b - self.a).prod()]  # multiply dimensional difference
-            }
+        }
         super().__init__(dimension, [transforms],
-            a = lower_bound,
-            b = upper_bound)
-    
+                         a=lower_bound,
+                         b=upper_bound)
+
     def __repr__(self, attributes=[]):
         """
         Print important attribute values
 
         Args: 
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """

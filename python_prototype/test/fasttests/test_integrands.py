@@ -1,10 +1,10 @@
 """ Unit tests for subclasses of Integrands in QMCPy """
 
+import unittest
+
+from numpy import arange
 from qmcpy import *
 from qmcpy._util import *
-
-import unittest
-from numpy import arange
 
 
 class TestAsianCall(unittest.TestCase):
@@ -26,7 +26,8 @@ class TestAsianCall(unittest.TestCase):
         time_vector = [arange(1 / 4, 5 / 4, 1 / 4)]
         dims = [len(tv) for tv in time_vector]
         measure_obj = BrownianMotion(dims, time_vector=time_vector)
-        self.assertRaises(ParameterError, AsianCall, bm_measure=measure_obj, mean_type='misc')
+        self.assertRaises(ParameterError, AsianCall,
+                          bm_measure=measure_obj, mean_type='misc')
 
 
 class TestKeister(unittest.TestCase):

@@ -31,7 +31,8 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
                           interest_rate=interest_rate,
                           mean_type=mean_type)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure,
+                        discrete_distrib, stopping_criterion)
     print(data)
 
     # IID Standard Gaussian ~ CLT
@@ -44,7 +45,8 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
                           interest_rate=interest_rate,
                           mean_type=mean_type)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure,
+                        discrete_distrib, stopping_criterion)
     print(data)
 
     if len(dim) == 1:  # CLTRep & MeanMC_g only implemented for single-level functions
@@ -58,8 +60,10 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
                               strike_price=strike_price,
                               interest_rate=interest_rate,
                               mean_type=mean_type)
-        stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
-        _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        stopping_criterion = MeanMC_g(discrete_distrib, true_measure,
+                                      abs_tol=abs_tol)
+        _, data = integrate(integrand, true_measure,
+                            discrete_distrib, stopping_criterion)
         print(data)
 
         # IID Standard Gaussian ~ MeanMC_g
@@ -71,8 +75,10 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
                               strike_price=strike_price,
                               interest_rate=interest_rate,
                               mean_type=mean_type)
-        stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
-        _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        stopping_criterion = MeanMC_g(discrete_distrib, true_measure,
+                                      abs_tol=abs_tol)
+        _, data = integrate(integrand, true_measure,
+                            discrete_distrib, stopping_criterion)
         print(data)
 
         # Lattice ~ CLTRep
@@ -84,8 +90,10 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
                               strike_price=strike_price,
                               interest_rate=interest_rate,
                               mean_type=mean_type)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-        _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure,
+                                    abs_tol=abs_tol)
+        _, data = integrate(integrand, true_measure,
+                            discrete_distrib, stopping_criterion)
         print(data)
 
         # Sobol ~ CLTRep
@@ -97,8 +105,10 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
                               strike_price=strike_price,
                               interest_rate=interest_rate,
                               mean_type=mean_type)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-        _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure,
+                                    abs_tol=abs_tol)
+        _, data = integrate(integrand, true_measure,
+                            discrete_distrib, stopping_criterion)
         print(data)
 
 

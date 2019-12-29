@@ -1,9 +1,9 @@
 """ Definition of BrownianMotion, a concrete implementation of TrueMeasure """
 
+from numpy import arange, cumsum, diff, insert, sqrt
+
 from ._true_measure import TrueMeasure
 from .._util import norm_inv_cdf_avoid_inf as inv_norm_cf
-
-from numpy import arange, cumsum, diff, insert, sqrt
 
 
 class BrownianMotion(TrueMeasure):
@@ -29,17 +29,16 @@ class BrownianMotion(TrueMeasure):
             }
 
         super().__init__(dimension, [transforms],
-            time_vector = time_vector)
-    
+                         time_vector=time_vector)
+
     def __repr__(self, attributes=[]):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """
         return super().__repr__(['time_vector'])
-        

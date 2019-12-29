@@ -19,7 +19,8 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure,
+                        discrete_distrib, stopping_criterion)
     print(data)
 
     # IID Standard Gaussian ~ CLT
@@ -27,15 +28,18 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure,
+                        discrete_distrib, stopping_criterion)
     print(data)
-    
+
     # IID Standard Uniform ~ MeanMC_g
     integrand = Keister(dim)
     discrete_distrib = IIDStdUniform(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
-    stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    stopping_criterion = MeanMC_g(discrete_distrib, true_measure,
+                                  abs_tol=abs_tol)
+    _, data = integrate(integrand, true_measure,
+                        discrete_distrib, stopping_criterion)
     print(data)
 
     # IID Standard Gaussian ~ MeanMC_g
@@ -43,7 +47,8 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = IIDStdGaussian(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = MeanMC_g(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure,
+                        discrete_distrib, stopping_criterion)
     print(data)
 
     # Lattice ~ CLTRep
@@ -51,7 +56,8 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = Lattice(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure,
+                        discrete_distrib, stopping_criterion)
     print(data)
 
     # Sobol ~ CLTRep
@@ -59,7 +65,8 @@ def test_distributions_keister(dim, abs_tol):
     discrete_distrib = Sobol(rng_seed=7)
     true_measure = Gaussian(dimension=dim, variance=1 / 2)
     stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    _, data = integrate(integrand, true_measure,
+                        discrete_distrib, stopping_criterion)
     print(data)
 
 

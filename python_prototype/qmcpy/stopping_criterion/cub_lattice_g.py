@@ -1,24 +1,22 @@
 """ Definition for CubLattice_g, a concrete implementation of StoppingCriterion """
 
 from ._stopping_criterion import StoppingCriterion
-from .._util import MaxSamplesWarning
-from ..accum_data import MeanVarDataRep
 
 
 class CubLattice_g(StoppingCriterion):
     """
     Stopping criterion for Lattice sequence with garunteed accuracy
-    
+
     Guarantee
-        This algorithm computes the integral of real valued functions in [0,1]^d
+        This algorithm computes the integral of real valued functions in :math:`[0,1]^d`
         with a prescribed generalized error tolerance. The Fourier coefficients
         of the integrand are assumed to be absolutely convergent. If the
         algorithm terminates without warning messages, the output is given with
         guarantees under the assumption that the integrand lies inside a cone of
         functions. The guarantee is based on the decay rate of the Fourier
-        coefficients. For integration over domains other than [0,1]^d, this cone
-        condition applies to f \circ \psi (the composition of the
-        functions) where \psi is the transformation function for [0,1]^d to
+        coefficients. For integration over domains other than :math:`[0,1]^d`, this cone
+        condition applies to :math:`f \circ \psi` (the composition of the
+        functions) where :math:`\psi` is the transformation function for :math:`[0,1]^d` to
         the desired region. For more details on how the cone is defined, please
         refer to the references below.
     """

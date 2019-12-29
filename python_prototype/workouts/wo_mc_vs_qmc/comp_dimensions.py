@@ -1,13 +1,12 @@
 """ Comparing mc and qmc varying parameters """
 
-from qmcpy import *
-
-import json
-from numpy import nan, zeros, arange
+from numpy import arange, nan, zeros
 from pandas import DataFrame
+from qmcpy import *
 
 distribution_pointers = [IIDStdUniform, IIDStdGaussian, Lattice, Sobol]
 trials = 3
+
 
 def dimension_comparison(dimensions=arange(1, 4, 1)):
     """
@@ -31,12 +30,13 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
                 distrib_name = type(distribution).__name__
                 if distrib_name in ['IIDStdGaussian', 'IIDStdUniform']:
                     stopping_criterion = CLT(distribution, measure, rel_tol=.01, abs_tol=0,
-                                            n_max=1e10, n_init=256)
+                                             n_max=1e10, n_init=256)
                 elif distrib_name in ['Lattice', 'Sobol']:
                     stopping_criterion = CLTRep(distribution, measure, rel_tol=.01, abs_tol=0,
                                                 n_max=1e10, n_init=32)
                 try:
-                    sol, data = integrate(integrand, measure, distribution, stopping_criterion)
+                    sol, data = integrate(integrand, measure,
+                                          distribution, stopping_criterion)
                     sols[j] = sol
                     times[j] = data.time_total
                     ns[j] = data.n_total
@@ -52,7 +52,7 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
     return df
 
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     # Dimension Comparison Test
     dimensions = arange(1, 41)
     df_dimensions = dimension_comparison(dimensions)
