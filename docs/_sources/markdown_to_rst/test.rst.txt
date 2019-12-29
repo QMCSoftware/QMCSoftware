@@ -5,9 +5,7 @@
 Tests
 =====
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Fast unittests
 --------------
@@ -18,9 +16,7 @@ Quickly check functionality Run all in < 1 second
 
    python -m unittest discover -s test/fasttests
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Long unittests
 --------------

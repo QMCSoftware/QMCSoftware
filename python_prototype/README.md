@@ -38,13 +38,7 @@ Example use of QMCPy as an independent package
 ---
 
 ## sphinx
-Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.org/) and is available at the following websites:
-* [GitHub](https://qmcsoftware.github.io/QMCSoftware/)
-* [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) 
-
-In addition, PDF version is available at:
-* [GitHub](https://github.com/QMCSoftware/QMCSoftware/blob/master/docs/qmcpy.pdf)
-* [Read the Docs](https://readthedocs.org/projects/qmcpy/downloads/pdf/latest/)
+Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.org/).
 
 ---
 

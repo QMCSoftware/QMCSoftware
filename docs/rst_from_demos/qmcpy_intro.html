@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to QMCPy &mdash; qmcpy 0.1 documentation</title>
+  <title>Welcome to QMCPy &mdash; QMCPy 0.1 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> qmcpy
+            <a href="../index.html" class="icon icon-home"> QMCPy
           
 
           
@@ -61,6 +61,10 @@
 
           
             
+            
+              <div class="version">
+                0.1
+              </div>
             
           
 
@@ -120,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">qmcpy</a>
+          <a href="../index.html">QMCPy</a>
         
       </nav>
 
@@ -312,7 +316,7 @@ class in QMCPy and then invoke QMCPy’s <code class="docutils literal notransla
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.6632</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.6575</span>
 <span class="n">QuickConstruct</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
 <span class="n">IIDStdUniform</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">Distribution</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">mimics</span>          <span class="n">StdUniform</span>
@@ -327,10 +331,10 @@ class in QMCPy and then invoke QMCPy’s <code class="docutils literal notransla
     <span class="n">inflate</span>         <span class="mf">1.200</span>
     <span class="n">alpha</span>           <span class="mf">0.010</span>
 <span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
-    <span class="n">n</span>               <span class="mi">3317</span>
-    <span class="n">n_total</span>         <span class="mi">4341</span>
-    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.653</span>  <span class="mf">0.673</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.002</span>
+    <span class="n">n</span>               <span class="mi">3305</span>
+    <span class="n">n_total</span>         <span class="mi">4329</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.647</span>  <span class="mf">0.668</span><span class="p">]</span>
+    <span class="n">time_total</span>      <span class="mf">0.003</span>
 </pre></div>
 </div>
 <p>For our integral, we know the true value. Let’s check if QMCPy’s
@@ -352,7 +356,7 @@ changing the input parameter value of dimension for QuickConstruct?</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">data2</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.8317</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.8309</span>
 <span class="n">QuickConstruct</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
 <span class="n">IIDStdUniform</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">Distribution</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">mimics</span>          <span class="n">StdUniform</span>
@@ -367,9 +371,9 @@ changing the input parameter value of dimension for QuickConstruct?</p>
     <span class="n">inflate</span>         <span class="mf">1.200</span>
     <span class="n">alpha</span>           <span class="mf">0.010</span>
 <span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
-    <span class="n">n</span>               <span class="mi">5243</span>
-    <span class="n">n_total</span>         <span class="mi">6267</span>
-    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.821</span>  <span class="mf">0.842</span><span class="p">]</span>
+    <span class="n">n</span>               <span class="mi">5452</span>
+    <span class="n">n_total</span>         <span class="mi">6476</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.821</span>  <span class="mf">0.841</span><span class="p">]</span>
     <span class="n">time_total</span>      <span class="mf">0.003</span>
 </pre></div>
 </div>
@@ -393,7 +397,7 @@ value:</p>
            
           </div>
     <a href="https://github.com/QMCSoftware/QMCSoftware">
-        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
     </a>
 
           <footer>

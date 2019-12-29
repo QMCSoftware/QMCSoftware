@@ -76,9 +76,9 @@ cp -a _build/html/. ../../docs;
 ################################################################################
 # Use sphinx to generate PDF documentation
 ################################################################################
-make latex
+#make latex
 
-cp -a _build/latex/qmcpy.pdf ../../docs/qmcpy.pdf
+#cp -a _build/latex/qmcpy.pdf ../../docs/qmcpy.pdf
 
 # remove lines in requirements.txt that contain the keywords in double quotes
 # for latex compilation
@@ -89,8 +89,8 @@ cp ../requirements.txt ../../docs
 ################################################################################
 # Use sphinx to generate epub documentation
 ################################################################################
-make epub
+#make epub
 
-cp -a _build/epub/qmcpy.epub ../../docs/qmcpy.epub
+#cp -a _build/epub/qmcpy.epub ../../docs/qmcpy.epub
 
 echo "QMCPy autodoc process ends..."

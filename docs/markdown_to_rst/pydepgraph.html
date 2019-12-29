@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydepgraph - A dependencies analyzer for Python &mdash; QMCPy 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/HTML-CSS"]})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> QMCPy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">About Our QMC Software Community</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../algorithms.html">QMCPy Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demos</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QMCPy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>pydepgraph - A dependencies analyzer for Python</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#pydepgraph-a-dependencies-analyzer-for-python" id="id1">pydepgraph - A dependencies analyzer for Python</a></p></li>
+</ul>
+</div>
+<div class="section" id="pydepgraph-a-dependencies-analyzer-for-python">
+<h1><a class="toc-backref" href="#id1">pydepgraph - A dependencies analyzer for Python</a><a class="headerlink" href="#pydepgraph-a-dependencies-analyzer-for-python" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>pydepgraph is a stand-alone program that analyzes one or more tree of
+Python sources to find dependencies amongst the files, and output a DOT
+file, suitable to be displayed or converted to an image.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>From the command line help.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pydepgraph</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">EXCLUDE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">CLUSTERS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRAPH</span><span class="p">]</span>
+                  <span class="p">[</span><span class="o">-</span><span class="n">C</span><span class="p">]</span>
+
+<span class="n">Draw</span> <span class="n">the</span> <span class="n">dependency</span> <span class="n">graph</span> <span class="n">of</span> <span class="n">a</span> <span class="n">Python</span> <span class="n">project</span><span class="o">.</span>
+
+<span class="n">optional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">-</span><span class="n">p</span> <span class="n">PATH</span><span class="p">,</span> <span class="o">--</span><span class="n">path</span> <span class="n">PATH</span>  <span class="n">comma</span> <span class="n">separated</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">paths</span> <span class="n">to</span> <span class="n">include</span>
+  <span class="o">-</span><span class="n">e</span> <span class="n">EXCLUDE</span><span class="p">,</span> <span class="o">--</span><span class="n">exclude</span> <span class="n">EXCLUDE</span>
+                        <span class="n">comma</span> <span class="n">separated</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">paths</span> <span class="n">to</span> <span class="n">exclude</span>
+  <span class="o">-</span><span class="n">c</span> <span class="n">CLUSTERS</span><span class="p">,</span> <span class="o">--</span><span class="n">clusters</span> <span class="n">CLUSTERS</span>
+                        <span class="n">comma</span> <span class="n">separated</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">clusters</span>
+  <span class="o">-</span><span class="n">r</span><span class="p">,</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">recursive</span>    <span class="n">do</span> <span class="ow">not</span> <span class="n">descend</span> <span class="n">into</span> <span class="n">subdirectories</span>
+  <span class="o">-</span><span class="n">g</span> <span class="n">GRAPH</span><span class="p">,</span> <span class="o">--</span><span class="n">graph</span> <span class="n">GRAPH</span>
+                        <span class="nb">type</span> <span class="n">of</span> <span class="n">graph</span><span class="p">:</span> <span class="mi">0</span> <span class="p">(</span><span class="n">without</span> <span class="n">clusters</span><span class="p">),</span> <span class="mi">1</span> <span class="p">(</span><span class="k">with</span>
+                        <span class="n">clusters</span><span class="p">),</span> <span class="mi">2</span> <span class="p">(</span><span class="n">only</span> <span class="n">clusters</span><span class="p">),</span> <span class="mi">3</span> <span class="p">(</span><span class="n">only</span> <span class="n">clusters</span><span class="p">,</span>
+                        <span class="n">drawing</span> <span class="n">also</span> <span class="bp">self</span> <span class="n">edges</span>
+  <span class="o">-</span><span class="n">C</span><span class="p">,</span> <span class="o">--</span><span class="n">concentrate</span>     <span class="n">merge</span> <span class="n">common</span> <span class="n">path</span> <span class="n">of</span> <span class="n">different</span> <span class="n">edges</span>
+</pre></div>
+</div>
+<p>It is important to notice that the paths specified with the -p switch
+must be the root of the source tree, in order to let pydepgraph
+recognize correctly the dependencies. For example, if you want that the
+instruction</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tornado.ioloop</span>
+</pre></div>
+</div>
+<p>is correctly assessed as an edge to tornado/ioloop.py, you need to
+specify the parent directory of tornado (i.e., the grandparent of
+ioloop.py) in the path list. In future versions this limitation could be
+removed to allow sub-project inspections.</p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<p>A small tutorial can be found at [1].</p>
+<p>[1]
+<a class="reference external" href="http://poisson.phc.unipi.it/~maggiolo/index.php/2012/02/pydepgraph-a-dependencies-analyzer-for-python/">http://poisson.phc.unipi.it/~maggiolo/index.php/2012/02/pydepgraph-a-dependencies-analyzer-for-python/</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/QMCSoftware/QMCSoftware">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
+    </a>
+
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Illinois Institute of Technology
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

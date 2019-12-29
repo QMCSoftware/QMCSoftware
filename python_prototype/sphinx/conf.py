@@ -43,7 +43,7 @@ release = u"0.1"
 
 extensions = ["sphinx.ext.autodoc",
               "sphinx.ext.githubpages",
-              "sphinx.ext.imgmath", # for epub latex
+              # "sphinx.ext.imgmath",  # for epub latex
               "sphinx.ext.napoleon",
               "sphinx.ext.graphviz",
               "sphinx.ext.intersphinx",
