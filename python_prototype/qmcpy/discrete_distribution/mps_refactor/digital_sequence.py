@@ -173,7 +173,8 @@ class DigitalSeq():
         self.s = len(Cs) if s is None else s
         self.t = max([int(a).bit_length() for a in Cs[0]])
         self.alpha = self.t / self.m
-        self.Csr = [[bitreverse(int(Csjc), self.t) for Csjc in Csj] for Csj in Cs]
+        self.Csr = [[bitreverse(int(Csjc), self.t)
+                     for Csjc in Csj] for Csj in Cs]
         self.n = 2 ** self.m
         self.recipd = 2 ** -self.t
         self.reset()
@@ -188,7 +189,8 @@ class DigitalSeq():
         last_k = k - 1  # the previous point, this means we have exceptional behaviour for kstart = 0
         self.cur = [0 for i in range(self.s)]
         self.x = [0 for i in range(self.s)]
-        if k == 0: return
+        if k == 0:
+            return
         for i in range(self.m):
             if gk & (1 << i):
                 for j in range(self.s):

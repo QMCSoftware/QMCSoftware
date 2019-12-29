@@ -23,13 +23,15 @@ class IntegrationExampleTest(unittest.TestCase):
             integrand = Keister(dimension=d)
             discrete_distrib = IIDStdGaussian(rng_seed=7)
             true_measure = Gaussian(dimension=d, variance=1 / 2)
-            stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-            sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+            stopping_criterion = CLT(discrete_distrib, true_measure,
+                                     abs_tol=abs_tol)
+            sol, _ = integrate(integrand, true_measure,
+                               discrete_distrib, stopping_criterion)
             true_value = true_values[d - 1]
             self.assertTrue(abs(sol - true_value) < abs_tol)
 
     def test_asian_option_multi_level(self):
-        abs_tol = 0.1
+        abstol = 0.1
         time_vec = [arange(1 / 4, 5 / 4, 1 / 4),
                     arange(1 / 16, 17 / 16, 1 / 16),
                     arange(1 / 64, 65 / 64, 1 / 64)]
@@ -37,10 +39,11 @@ class IntegrationExampleTest(unittest.TestCase):
         discrete_distrib = IIDStdGaussian()
         true_measure = BrownianMotion(dims, time_vector=time_vec)
         integrand = AsianCall(true_measure)
-        stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-        sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abstol)
+        sol, _ = integrate(integrand, true_measure,
+                           discrete_distrib, stopping_criterion)
         true_value = 6.20
-        self.assertTrue(abs(sol - true_value) < abs_tol)
+        self.assertTrue(abs(sol - true_value) < abstol)
 
     def test_lebesgue_measure(self):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
@@ -53,8 +56,10 @@ class IntegrationExampleTest(unittest.TestCase):
                                 lower_bound=[array([1, 3])],
                                 upper_bound=[array([3, 6])])
         discrete_distrib = Lattice(rng_seed=7)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-        sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure,
+                                    abs_tol=abs_tol)
+        sol, _ = integrate(integrand, true_measure,
+                           discrete_distrib, stopping_criterion)
         true_value = 6075
         self.assertTrue(abs(sol - true_value) < abs_tol)
 
@@ -62,15 +67,16 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        integrand = QuickConstruct(
-            dimension=dimension,
-            custom_fun=lambda x: (x.prod(1))**3)
+        integrand = QuickConstruct(dimension=dimension,
+                                   custom_fun=lambda x: (x.prod(1)) ** 3)
         true_measure = Uniform(dimension=dimension,
                                lower_bound=[array([1, 3])],
                                upper_bound=[array([3, 6])])
         discrete_distrib = Lattice(rng_seed=7)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=abs_tol)
-        sol, _ = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+        stopping_criterion = CLTRep(discrete_distrib, true_measure,
+                                    abs_tol=abs_tol)
+        sol, _ = integrate(integrand, true_measure,
+                           discrete_distrib, stopping_criterion)
         true_value = 6075 / 6
         self.assertTrue(abs(sol - true_value) < abs_tol)
 

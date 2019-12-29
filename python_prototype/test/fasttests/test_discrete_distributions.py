@@ -74,7 +74,8 @@ class TestLattice(unittest.TestCase):
         self.assertTrue(all(row in mps_sampels for row in true_samples))
         # QMCPy Generator with calc_block method (based on MPS implementation)
         qmcpy_gen = LatticeSeq(s=d)
-        qmcpy_samples = vstack([qmcpy_gen.calc_block(m) for m in range(int(log2(n)) + 1)])
+        qmcpy_samples = vstack([qmcpy_gen.calc_block(m)
+                                for m in range(int(log2(n)) + 1)])
         self.assertTrue(all(row in qmcpy_samples for row in true_samples))
 
 

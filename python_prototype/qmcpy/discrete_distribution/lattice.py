@@ -68,9 +68,11 @@ class Lattice(DiscreteDistribution):
             x = self.lattice_rng.calc_block(m + 1)
             self.n_min = 2**(m + 1)
         if scramble:
-            x = array([(x + shift_r) % 1 for shift_r in self.shifts])  # random shift
+            # random shift
+            x = array([(x + shift_r) % 1 for shift_r in self.shifts])
         else:
-            x = repeat(x[None, :, :], self.r, axis=0)  # duplicate unshifted samples
+            # duplicate unshifted samples
+            x = repeat(x[None, :, :], self.r, axis=0)
         return x
 
     def __repr__(self, attributes=[]):

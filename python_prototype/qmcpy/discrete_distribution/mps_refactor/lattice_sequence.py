@@ -89,7 +89,8 @@ class LatticeSeq:
         phik = bitreverse(self.k, self.m) * self.scale
         self.x = self.z * phik
         self.x = self.x - floor(self.x)
-        if self.k >= self.n: return False
+        if self.k >= self.n:
+            return False
         return True
 
     def calc_block(self, m):
@@ -99,7 +100,8 @@ class LatticeSeq:
         faster!
         """
         n = 2**m
-        start = min(1, n / 2)  # this is a funky way of setting start to zero for m == 0
+        # this is a funky way of setting start to zero for m == 0
+        start = min(1, n / 2)
         # the arange below only ranges over odd numbers, except for m == 0, then we only have 0
         x = (outer(arange(start, n, 2, dtype='i'), self.z) % n) / float(n)
         return x

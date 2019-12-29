@@ -37,7 +37,8 @@ def dimension_comparison(dimensions=arange(1, 4, 1)):
                     stopping_criterion = CLTRep(distribution, measure, rel_tol=.01, abs_tol=0,
                                                 n_max=1e10, n_init=32)
                 try:
-                    sol, data = integrate(integrand, measure, distribution, stopping_criterion)
+                    sol, data = integrate(integrand, measure,
+                                          distribution, stopping_criterion)
                     sols[j] = sol
                     times[j] = data.time_total
                     ns[j] = data.n_total

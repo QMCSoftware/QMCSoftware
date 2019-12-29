@@ -51,9 +51,12 @@ class Sobol(DiscreteDistribution):
             if self.backend == 'mps':
                 self.rng = Generator(PCG64(self.rng_seed))
                 self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=30, s=self.d)
-                self.t = max(32, self.sobol_rng.t)  # we guarantee a depth of >=32 bits for shift
-                self.ct = max(0, self.t - self.sobol_rng.t)  # correction factor to scale the integers
-                self.shifts = self.rng.integers(0, 2 ** self.t, (self.r, self.d), dtype=int64)
+                # we guarantee a depth of >=32 bits for shift
+                self.t = max(32, self.sobol_rng.t)
+                # correction factor to scale the integers
+                self.ct = max(0, self.t - self.sobol_rng.t)
+                self.shifts = self.rng.integers(
+                    0, 2 ** self.t, (self.r, self.d), dtype=int64)
             elif self.backend == 'pytorch':
                 # Initialize self.r SobolEngines
                 temp_seed = randint(100) if self.rng_seed is None else self.rng_seed
@@ -73,12 +76,15 @@ class Sobol(DiscreteDistribution):
                 next(self.sobol_rng)
                 x[i, :] = self.sobol_rng.cur  # set each nxm
             if scramble:
-                x = array([(shift_r ^ (x * 2 ** self.ct)) / 2. ** self.t for shift_r in self.shifts])
+                x = array([(shift_r ^ (x * 2 ** self.ct)) / 2. **
+                           self.t for shift_r in self.shifts])
                 # randomly scramble and x contains values in [0, 1]
             else:
-                x = repeat(x[None, :, :], self.r, axis=0)  # duplicate unshifted samples
+                # duplicate unshifted samples
+                x = repeat(x[None, :, :], self.r, axis=0)
         elif self.backend == 'pytorch':
-            x = array([self.sobol_rng[i].draw(n).numpy() for i in range(self.r)])
+            x = array([self.sobol_rng[i].draw(n).numpy()
+                       for i in range(self.r)])
         return x
 
     def __repr__(self, attributes=[]):

@@ -29,17 +29,16 @@ class BrownianMotion(TrueMeasure):
             }
 
         super().__init__(dimension, [transforms],
-            time_vector = time_vector)
-    
+                         time_vector=time_vector)
+
     def __repr__(self, attributes=[]):
         """
         Print important attribute values
 
         Args: 
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """
         return super().__repr__(['time_vector'])
-        

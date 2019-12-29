@@ -36,10 +36,12 @@ def abstol_comparison(abstols=arange(.1, .4, .1)):
                     stopping_criterion = CLT(distribution, measure, abs_tol=abs_tol,
                                              n_max=1e10, n_init=256)
                 elif distrib_name in ['Lattice', 'Sobol']:
-                    stopping_criterion = CLTRep(distribution, measure, abs_tol=abs_tol,
-                                                n_max=1e10, n_init=32)
+                    stopping_criterion = CLTRep(distribution, measure,
+                                                abs_tol=abs_tol, n_max=1e10,
+                                                n_init=32)
                 try:
-                    sol, data = integrate(integrand, measure, distribution, stopping_criterion)
+                    sol, data = integrate(integrand, measure,
+                                          distribution, stopping_criterion)
                     sols[j] = sol
                     times[j] = data.time_total
                     ns[j] = data.n_total

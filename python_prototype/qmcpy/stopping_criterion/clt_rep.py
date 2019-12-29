@@ -52,7 +52,8 @@ class CLTRep(StoppingCriterion):
 
     def stop_yet(self):
         """ Determine when to stop """
-        sighat_up = sqrt((self.data.sighat**2).sum() / len(self.data.sighat)) * self.inflate
+        sighat_up = sqrt((self.data.sighat**2).sum() /
+                         len(self.data.sighat)) * self.inflate
         if sighat_up > max(self.abs_tol, abs(self.data.solution) * self.rel_tol):
             # Not sufficiently estimated
             if 2 * self.data.n.sum() > self.n_max:
@@ -65,11 +66,14 @@ class CLTRep(StoppingCriterion):
                 % (int(self.data.n_total.sum()), str(self.data.n), int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 self.stage = 'done'
-            else: self.data.n *= 2  # double n for next sample
-        else: self.stage = 'done'  # sufficiently estimated
+            else:
+                self.data.n *= 2  # double n for next sample
+        else:
+            self.stage = 'done'  # sufficiently estimated
         if self.stage == 'done':
             self.data.n_total = self.data.n_total.sum()
             err_bar = -norm.ppf(self.alpha / 2) * self.inflate \
                 * (self.data.sighat ** 2 / self.data.n).sum(0) ** 0.5
-            self.data.confid_int = self.data.solution + err_bar * array([-1, 1])  # CLT confidence interval
+            self.data.confid_int = self.data.solution + \
+                err_bar * array([-1, 1])  # CLT confidence interval
             self.stage = "done"

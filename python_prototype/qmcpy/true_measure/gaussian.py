@@ -26,16 +26,16 @@ class Gaussian(TrueMeasure):
                 lambda self, g: g] # no weight
             }
         super().__init__(dimension, [transforms],
-            mu = mean,
-            sigma = sqrt(variance))
-    
+                         mu=mean,
+                         sigma=sqrt(variance))
+
     def __repr__(self, attributes=[]):
         """
         Print important attribute values
 
         Args: 
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """

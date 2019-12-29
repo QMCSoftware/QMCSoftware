@@ -27,14 +27,15 @@ class AsianCall(Integrand):
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
         dimension = bm_measure.dimension
         super().__init__(dimension,
-            bm_measure=bm_measure,
-            dim_frac=array([0] + [dimension[i] / dimension[i - 1] for i in range(1, len(dimension))]),
-            volatility=volatility,
-            start_price=start_price,
-            strike_price=strike_price,
-            interest_rate=interest_rate,
-            mean_type=[mean_type],
-            exercise_time=[bm_measure[i].time_vector[-1] for i in range(len(dimension))])
+                         bm_measure=bm_measure,
+                         dim_frac=array([0] + [dimension[i] / dimension[i - 1]
+                                               for i in range(1, len(dimension))]),
+                         volatility=volatility,
+                         start_price=start_price,
+                         strike_price=strike_price,
+                         interest_rate=interest_rate,
+                         mean_type=[mean_type],
+                         exercise_time=[bm_measure[i].time_vector[-1] for i in range(len(dimension))])
 
     def g(self, x):
         """
@@ -76,10 +77,11 @@ class AsianCall(Integrand):
                 dimension
         elif self.mean_type == 'geometric':
             avg = exp((log(self.start_price) / 2 +
-                    log(stock_path[:, :-1]).sum(1) +
-                    log(stock_path[:, -1]) / 2) /
-                    dimension)
-        y = maximum(avg - self.strike_price, 0) * exp(-self.interest_rate * self.exercise_time)
+                       log(stock_path[:, :-1]).sum(1) +
+                       log(stock_path[:, -1]) / 2) /
+                      dimension)
+        y = maximum(avg - self.strike_price, 0) * \
+            exp(-self.interest_rate * self.exercise_time)
         return y
 
     def __repr__(self, attributes=[]):
@@ -92,5 +94,6 @@ class AsianCall(Integrand):
         Returns:
             string of self info
         """
-        attributes = ['volatility', 'start_price', 'strike_price', 'interest_rate', 'mean_type', 'exercise_time']
+        attributes = ['volatility', 'start_price', 'strike_price',
+                      'interest_rate', 'mean_type', 'exercise_time']
         return super().__repr__(attributes)
