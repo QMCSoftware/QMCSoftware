@@ -35,7 +35,7 @@ class IntegrationExampleTest(unittest.TestCase):
                     arange(1 / 16, 17 / 16, 1 / 16),
                     arange(1 / 64, 65 / 64, 1 / 64)]
         dims = [len(tv) for tv in time_vec]
-        discrete_distrib = IIDStdGaussian()
+        discrete_distrib = IIDStdGaussian(rng_seed=7)
         true_measure = BrownianMotion(dims, time_vector=time_vec)
         integrand = AsianCall(true_measure)
         stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abstol)
@@ -48,9 +48,8 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        integrand = QuickConstruct(
-            dimension=dimension,
-            custom_fun=lambda x: (x.prod(1))**3)
+        integrand = QuickConstruct(dimension=dimension,
+                                   custom_fun=lambda x: (x.prod(1)) ** 3)
         true_measure = Lebesgue(dimension=dimension,
                                 lower_bound=[array([1, 3])],
                                 upper_bound=[array([3, 6])])
@@ -113,9 +112,7 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [2.5, 5, 7.5]
         for d in dimensions:
-            integrand = QuickConstruct(
-                dimension=d,
-                custom_fun=f)
+            integrand = QuickConstruct(dimension=d, custom_fun=f)
             true_measure = Uniform(dimension=d)
             sol, data = integrate(integrand, true_measure)
             print(data)
@@ -139,9 +136,8 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [2.5, 5, 7.5]
         for d in dimensions:
-            integrand = QuickConstruct(
-                dimension=d,
-                custom_fun=f)
+            integrand = QuickConstruct(dimension=d,
+                                       custom_fun=f)
             measure = Uniform(dimension=d)
             sol, data = integrate(integrand, measure)
             print(data)
