@@ -1,10 +1,10 @@
 """ Utility functions. Not meant for public use """
 
-from . import DimensionError
-
-from scipy.stats import norm
-from numpy import array, int64, ndarray, repeat, inf
+from numpy import array, inf, int64, ndarray, repeat
 import numpy as np
+from scipy.stats import norm
+
+from . import DimensionError
 
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=3)
 

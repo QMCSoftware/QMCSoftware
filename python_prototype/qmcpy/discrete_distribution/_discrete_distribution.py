@@ -1,8 +1,8 @@
 """ DiscreteDistribution is an abstract class. """
 
-from .._util import univ_repr, ParameterError
-
 from abc import ABC, abstractmethod
+
+from .._util import ParameterError, univ_repr
 
 
 class DiscreteDistribution(ABC):
@@ -38,7 +38,7 @@ class DiscreteDistribution(ABC):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

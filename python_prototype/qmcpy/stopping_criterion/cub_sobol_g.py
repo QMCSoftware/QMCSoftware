@@ -1,8 +1,6 @@
 """ Definition for CubSobol_g, a concrete implementation of StoppingCriterion """
 
 from ._stopping_criterion import StoppingCriterion
-from .._util import MaxSamplesWarning
-from ..accum_data import MeanVarDataRep
 
 
 class CubSobol_g(StoppingCriterion):

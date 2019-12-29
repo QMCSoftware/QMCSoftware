@@ -1,12 +1,13 @@
 """ Definition for Lattice, a concrete implementation of DiscreteDistribution """
 
+import warnings
+
+from numpy import array, log2, repeat, vstack
+from numpy.random import Generator, PCG64
+
 from ._discrete_distribution import DiscreteDistribution
 from .mps_refactor import LatticeSeq
 from .._util import DistributionGenerationError, DistributionGenerationWarnings
-
-from numpy import array, log2, vstack, repeat
-from numpy.random import Generator, PCG64
-import warnings
 
 
 class Lattice(DiscreteDistribution):
@@ -79,7 +80,7 @@ class Lattice(DiscreteDistribution):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

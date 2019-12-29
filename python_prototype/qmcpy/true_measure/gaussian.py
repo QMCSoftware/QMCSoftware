@@ -1,8 +1,9 @@
 """ Definition of Gaussian, a concrete implementation of TrueMeasure """
 
+from numpy import sqrt
+
 from ._true_measure import TrueMeasure
 from .._util import norm_inv_cdf_avoid_inf as inv_norm_cf
-from numpy import sqrt
 
 
 class Gaussian(TrueMeasure):
@@ -33,7 +34,7 @@ class Gaussian(TrueMeasure):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

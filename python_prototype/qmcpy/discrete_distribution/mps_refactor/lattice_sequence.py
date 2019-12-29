@@ -1,8 +1,8 @@
 """ Lattice sequence generator """
 
-from ._functions import bitreverse
+from numpy import arange, array, floor, outer, zeros
 
-from numpy import array, ndarray, zeros, floor, arange, outer
+from ._functions import bitreverse
 
 # generating vector from
 #   Constructing embedded lattice rules for multivariate integration
@@ -51,7 +51,7 @@ class LatticeSeq:
 
 
     This version is slightly faster than the original Magic Point Shop class when
-    constructing matricies with: 
+    constructing matricies with:
         lattice_rng = latticeseq_b2(m=30, s=dim, returnDeepCopy=True)
         samples = array([next(lattice_rng) for i in range(n_samples)])
 

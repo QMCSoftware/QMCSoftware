@@ -1,13 +1,14 @@
 """ Definition for Sobol, a concrete implementation of DiscreteDistribution """
 
+import warnings
+
+from numpy import array, int64, log2, repeat, zeros
+from numpy.random import Generator, PCG64, randint
+from torch.quasirandom import SobolEngine
+
 from ._discrete_distribution import DiscreteDistribution
 from .mps_refactor import DigitalSeq
 from .._util import DistributionGenerationWarnings, ParameterError
-
-from numpy import array, int64, zeros, log2, repeat
-from numpy.random import Generator, PCG64, randint
-from torch.quasirandom import SobolEngine
-import warnings
 
 
 class Sobol(DiscreteDistribution):
@@ -91,7 +92,7 @@ class Sobol(DiscreteDistribution):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

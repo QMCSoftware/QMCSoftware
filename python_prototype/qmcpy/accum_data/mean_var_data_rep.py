@@ -1,9 +1,10 @@
 """ Definition for MeanVarDataRep, a concrete implementation of AccumData """
 
-from ._accum_data import AccumData
-
 from time import process_time
-from numpy import zeros, nan, full, tile, array, finfo, float32, inf
+
+from numpy import array, finfo, float32, full, inf, nan, tile, zeros
+
+from ._accum_data import AccumData
 
 EPS = finfo(float32).eps
 
@@ -64,7 +65,7 @@ class MeanVarDataRep(AccumData):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

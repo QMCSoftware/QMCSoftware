@@ -1,9 +1,9 @@
 """ Definition for class AsianCall, a concrete implementation of Integrand """
 
+from numpy import array, exp, log, maximum
+
 from ._integrand import Integrand
 from .._util import ParameterError
-
-from numpy import exp, maximum, log, zeros, array
 
 
 class AsianCall(Integrand):
@@ -88,7 +88,7 @@ class AsianCall(Integrand):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

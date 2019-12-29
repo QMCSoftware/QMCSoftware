@@ -1,8 +1,8 @@
 """ Definition for abstract class, ``Integrand`` """
 
-from .._util import univ_repr, multilevel_constructor, TransformError
-
 from abc import ABC, abstractmethod
+
+from .._util import multilevel_constructor, TransformError, univ_repr
 
 
 class Integrand(ABC):
@@ -15,7 +15,7 @@ class Integrand(ABC):
         """
         Args:
             dimension (ndarray): dimension(s) of the integrand(s)
-            kwargs: keyword arguments. keys become attributes 
+            kwargs: keyword arguments. keys become attributes
                     with values distributed among object list
 
         Attributes:
@@ -101,7 +101,7 @@ class Integrand(ABC):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

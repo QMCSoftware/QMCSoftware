@@ -1,20 +1,20 @@
 """ Definition for MeanMC_g, a concrete implementation of StoppingCriterion """
 
-from ._stopping_criterion import StoppingCriterion
-from .._util import NotYetImplemented, MaxSamplesWarning
-from ..accum_data import MeanVarData
-
-from time import time
-from numpy import array, zeros, tile, minimum, exp, sqrt, ceil, log, floor
-from scipy.stats import norm
-from scipy.optimize import fsolve
 import warnings
+
+from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
+from scipy.optimize import fsolve
+from scipy.stats import norm
+
+from ._stopping_criterion import StoppingCriterion
+from .._util import MaxSamplesWarning, NotYetImplemented
+from ..accum_data import MeanVarData
 
 
 class MeanMC_g(StoppingCriterion):
     """
     Stopping Criterion with garunteed accuracy
-    
+
     Guarantee
         This algorithm attempts to calculate the mean, mu, of a random variable
         to a prescribed error tolerance, tolfun:= max(abstol,reltol*|mu|), with

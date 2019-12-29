@@ -1,8 +1,8 @@
 """ Definition for class Keister, a concrete implementation of Integrand """
 
-from ._integrand import Integrand
-
 from numpy import cos, linalg as LA, pi
+
+from ._integrand import Integrand
 
 
 class Keister(Integrand):

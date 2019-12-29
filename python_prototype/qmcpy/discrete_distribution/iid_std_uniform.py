@@ -1,8 +1,8 @@
 """ Definition for IIDStdUniform, a concrete implementation of DiscreteDistribution """
 
-from ._discrete_distribution import DiscreteDistribution
-
 from numpy.random import Generator, PCG64
+
+from ._discrete_distribution import DiscreteDistribution
 
 
 class IIDStdUniform(DiscreteDistribution):

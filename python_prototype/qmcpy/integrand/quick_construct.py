@@ -2,9 +2,6 @@
 
 from ._integrand import Integrand
 
-import inspect
-import numpy as np
-
 
 class QuickConstruct(Integrand):
     """ Specify and generate values of a user-defined function"""
@@ -34,7 +31,7 @@ class QuickConstruct(Integrand):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:

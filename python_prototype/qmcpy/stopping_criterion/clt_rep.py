@@ -1,12 +1,13 @@
 """ Definition for CLTRep, a concrete implementation of StoppingCriterion """
 
+import warnings
+
+from numpy import array, log, sqrt
+from scipy.stats import norm
+
 from ._stopping_criterion import StoppingCriterion
 from .._util import MaxSamplesWarning, NotYetImplemented, ParameterWarning
 from ..accum_data import MeanVarDataRep
-
-import warnings
-from numpy import array, tile, sqrt, log
-from scipy.stats import norm
 
 
 class CLTRep(StoppingCriterion):

@@ -1,8 +1,8 @@
 """ Definition of Uniform, a concrete implementation of TrueMeasure """
 
-from ._true_measure import TrueMeasure
-
 from scipy.stats import norm
+
+from ._true_measure import TrueMeasure
 
 
 class Uniform(TrueMeasure):
@@ -33,7 +33,7 @@ class Uniform(TrueMeasure):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:
