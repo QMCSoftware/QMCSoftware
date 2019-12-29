@@ -1,10 +1,9 @@
 """ Unit tests for integrate method in QMCPy """
 
-from qmcpy import *
-
 import unittest
-from numpy import arange, array, sqrt
-from numpy.linalg import norm
+
+from numpy import arange, array
+from qmcpy import *
 
 
 class IntegrationExampleTest(unittest.TestCase):

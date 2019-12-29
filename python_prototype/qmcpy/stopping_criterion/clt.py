@@ -1,13 +1,12 @@
 """ Definition for CLT, a concrete implementation of StoppingCriterion """
 
-import warnings
-
-from numpy import array, ceil, floor, maximum
-from scipy.stats import norm
-
 from ._stopping_criterion import StoppingCriterion
 from .._util import MaxSamplesWarning
 from ..accum_data import MeanVarData
+
+import warnings
+from numpy import array, ceil, floor, maximum
+from scipy.stats import norm
 
 
 class CLT(StoppingCriterion):

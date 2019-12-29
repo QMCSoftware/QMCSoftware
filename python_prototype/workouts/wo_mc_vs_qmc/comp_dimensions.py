@@ -1,10 +1,8 @@
 """ Comparing mc and qmc varying parameters """
 
-from qmcpy import *
-
-import json
-from numpy import nan, zeros, arange
+from numpy import arange, nan, zeros
 from pandas import DataFrame
+from qmcpy import *
 
 distribution_pointers = [IIDStdUniform, IIDStdGaussian, Lattice, Sobol]
 trials = 3

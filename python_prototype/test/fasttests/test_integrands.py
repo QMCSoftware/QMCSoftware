@@ -1,10 +1,10 @@
 """ Unit tests for subclasses of Integrands in QMCPy """
 
+import unittest
+
+from numpy import arange
 from qmcpy import *
 from qmcpy._util import *
-
-import unittest
-from numpy import arange
 
 
 class TestAsianCall(unittest.TestCase):

@@ -1,10 +1,10 @@
 """ Compare Sobol generatros with different backends """
 
-from qmcpy import Sobol
-
 from time import time
-from pandas import DataFrame
+
 from numpy import zeros
+from pandas import DataFrame
+from qmcpy import Sobol
 
 
 def comp_sobol_backend(sample_sizes, trials=1, dims=1, replications=2):

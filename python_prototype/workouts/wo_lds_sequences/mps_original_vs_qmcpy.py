@@ -12,14 +12,14 @@ Note:
     A unittest for refactored generators is at /test/fasttests/test_discrete_distributions.py
 """
 
-# origianl generators
-from third_party.magic_point_shop import digitalseq_b2g, latticeseq_b2
-# refactored generators
-from qmcpy.discrete_distribution.mps_refactor import LatticeSeq, DigitalSeq
-
 from time import time
+
 from numpy import *
 from pandas import DataFrame
+# refactored generators
+from qmcpy.discrete_distribution.mps_refactor import DigitalSeq, LatticeSeq
+# origianl generators
+from third_party.magic_point_shop import digitalseq_b2g, latticeseq_b2
 
 
 def mps_gentimes(n_2powers=arange(1, 11), check_accuracy=False, trials=1, dim=1):

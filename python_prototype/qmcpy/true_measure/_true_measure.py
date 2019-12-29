@@ -17,7 +17,8 @@ class TrueMeasure(ABC):
                     with values distributed among object list
         """
         super().__init__()
-        measures = multilevel_constructor(self, dimension, transforms=transforms, **kwargs)
+        measures = multilevel_constructor(self, dimension,
+                                          transforms=transforms, **kwargs)
         self.measures = measures
 
     def gen_tm_samples(self, r, n):

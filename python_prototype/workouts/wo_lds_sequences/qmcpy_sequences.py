@@ -1,11 +1,10 @@
 """ Record times for qmcpy's quasi-random generators """
 
-from qmcpy import *
+from time import time
 
 from numpy import *
 from pandas import DataFrame
-from time import time
-import torch
+from qmcpy import *
 
 
 def qmcpy_gentimes(n_2powers=arange(1, 11), trials=1, dim=1):
