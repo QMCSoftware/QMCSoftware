@@ -36,7 +36,7 @@ def comp_sobol_backend(sample_sizes, trials=1, dims=1, replications=2):
     return results_df
 
 if __name__ == '__main__':
-    sample_sizes = [16] + [2**i for i in range(4,21)] # [16, 16, 32, 64, 128, ... 2^(20)]
+    sample_sizes = [16] + [2**i for i in range(4,22)] # [16, 16, 32, 64, 128, ... 2^(21)]
     df_times = comp_sobol_backend(sample_sizes, trials=3, dims=4, replications=16)
     df_times.to_csv('outputs/lds_sequences/sobol_backend_times.csv', index=False)
     print('\n', df_times)
