@@ -1,9 +1,9 @@
 """ Definition of Gaussian, a concrete implementation of TrueMeasure """
 
-from numpy import sqrt
-
 from ._true_measure import TrueMeasure
-from .._util import norm_inv_cdf_avoid_inf as inv_norm_cf
+
+from numpy import sqrt, clip
+from scipy.stats import norm
 
 
 class Gaussian(TrueMeasure):
@@ -22,7 +22,7 @@ class Gaussian(TrueMeasure):
                     # shift and stretch
                 lambda self, g: g], # no weight
             "StdUniform": [
-                lambda self, samples: inv_norm_cf(samples, loc=self.mu, scale=self.sigma),
+                lambda self, samples: clip(norm.ppf(samples, loc=self.mu, scale=self.sigma),-10,10),
                     # inverse CDF then shift and stretch
                 lambda self, g: g] # no weight
             }

@@ -1,9 +1,9 @@
 """ Definition of BrownianMotion, a concrete implementation of TrueMeasure """
 
-from numpy import arange, cumsum, diff, insert, sqrt
-
 from ._true_measure import TrueMeasure
-from .._util import norm_inv_cdf_avoid_inf as inv_norm_cf
+
+from numpy import arange, cumsum, diff, insert, sqrt, clip
+from scipy.stats import norm
 
 
 class BrownianMotion(TrueMeasure):
@@ -22,7 +22,7 @@ class BrownianMotion(TrueMeasure):
                     # insert start time then cumulative sum over monitoring times
                 lambda self, g: g], # no weight
             "StdUniform": [
-                lambda self, samples: cumsum(inv_norm_cf(samples) \
+                lambda self, samples: cumsum(clip(norm.ppf(samples),-10,10) \
                     * sqrt(diff(insert(self.time_vector, 0, 0))), 2),
                     # inverse CDF, insert start time, then cumulative sum over monitoring times
                 lambda self, g: g] # no weight
