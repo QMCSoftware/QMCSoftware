@@ -1,12 +1,13 @@
 """ Definition for Lattice, a concrete implementation of DiscreteDistribution """
 
+import warnings
+
+from numpy import array, log2, repeat, vstack
+from numpy.random import Generator, PCG64
+
 from ._discrete_distribution import DiscreteDistribution
 from .mps_refactor import LatticeSeq
 from .._util import DistributionGenerationError, DistributionGenerationWarnings
-
-from numpy import array, log2, vstack, repeat
-from numpy.random import Generator, PCG64
-import warnings
 
 
 class Lattice(DiscreteDistribution):
@@ -52,8 +53,8 @@ class Lattice(DiscreteDistribution):
                 warnings.warn('''
                     Using dimensions = %d and replications = %d
                     as previously set for this generator.'''
-                    % (self.d, self.r),
-                    DistributionGenerationWarnings)
+                              % (self.d, self.r),
+                              DistributionGenerationWarnings)
         if self.n_min == 0:
             # generate first 2^m points
             x = vstack([self.lattice_rng.calc_block(i) for i in range(m + 1)])
@@ -68,20 +69,22 @@ class Lattice(DiscreteDistribution):
             x = self.lattice_rng.calc_block(m + 1)
             self.n_min = 2**(m + 1)
         if scramble:
-            x = array([(x + shift_r) % 1 for shift_r in self.shifts])  # random shift
+            # random shift
+            x = array([(x + shift_r) % 1 for shift_r in self.shifts])
         else:
-            x = repeat(x[None,:,:], self.r, axis=0) # duplicate unshifted samples
+            # duplicate unshifted samples
+            x = repeat(x[None, :, :], self.r, axis=0)
         return x
 
     def __repr__(self, attributes=[]):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
 
         Returns:
             string of self info
         """
-        attributes = ['mimics','rng_seed']
+        attributes = ['mimics', 'rng_seed']
         return super().__repr__(attributes)

@@ -1,8 +1,8 @@
 """ Lattice sequence generator """
 
-from ._functions import bitreverse
+from numpy import arange, array, floor, outer, zeros
 
-from numpy import array, ndarray, zeros, floor, arange, outer
+from ._functions import bitreverse
 
 # generating vector from
 #   Constructing embedded lattice rules for multivariate integration
@@ -51,7 +51,7 @@ class LatticeSeq:
 
 
     This version is slightly faster than the original Magic Point Shop class when
-    constructing matricies with: 
+    constructing matricies with:
         lattice_rng = latticeseq_b2(m=30, s=dim, returnDeepCopy=True)
         samples = array([next(lattice_rng) for i in range(n_samples)])
 
@@ -89,7 +89,8 @@ class LatticeSeq:
         phik = bitreverse(self.k, self.m) * self.scale
         self.x = self.z * phik
         self.x = self.x - floor(self.x)
-        if self.k >= self.n: return False
+        if self.k >= self.n:
+            return False
         return True
 
     def calc_block(self, m):
@@ -99,7 +100,8 @@ class LatticeSeq:
         faster!
         """
         n = 2**m
-        start = min(1, n / 2)  # this is a funky way of setting start to zero for m == 0
+        # this is a funky way of setting start to zero for m == 0
+        start = min(1, n / 2)
         # the arange below only ranges over odd numbers, except for m == 0, then we only have 0
         x = (outer(arange(start, n, 2, dtype='i'), self.z) % n) / float(n)
         return x

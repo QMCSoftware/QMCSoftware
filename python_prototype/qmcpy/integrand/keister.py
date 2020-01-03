@@ -1,8 +1,8 @@
 """ Definition for class Keister, a concrete implementation of Integrand """
 
-from ._integrand import Integrand
-
 from numpy import cos, linalg as LA, pi
+
+from ._integrand import Integrand
 
 
 class Keister(Integrand):
@@ -18,7 +18,7 @@ class Keister(Integrand):
             B. D. Keister, Multidimensional Quadrature Algorithms, \
             `Computers in Physics`, *10*, pp. 119-122, 1996.
     """
-    
+
     def __init__(self, dimension):
         """
         Args:

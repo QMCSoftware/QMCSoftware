@@ -1,8 +1,8 @@
 """ Definition of Uniform, a concrete implementation of TrueMeasure """
 
-from ._true_measure import TrueMeasure
-
 from scipy.stats import norm
+
+from ._true_measure import TrueMeasure
 
 
 class Uniform(TrueMeasure):
@@ -26,18 +26,17 @@ class Uniform(TrueMeasure):
                 lambda self, g: g] # no weight
             }
         super().__init__(dimension, [transforms],
-            a = lower_bound,
-            b = upper_bound)
-    
+                         a=lower_bound,
+                         b=upper_bound)
+
     def __repr__(self, attributes=[]):
         """
         Print important attribute values
 
-        Args: 
+        Args:
             attributes (list): list of attributes to print
-        
+
         Returns:
             string of self info
         """
         return super().__repr__(['a', 'b'])
-        
