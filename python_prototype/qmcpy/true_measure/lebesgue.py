@@ -2,6 +2,8 @@
 
 from ._true_measure import TrueMeasure
 
+from numpy import array
+
 
 class Lebesgue(TrueMeasure):
     """ Lebesgue Uniform Measure """
