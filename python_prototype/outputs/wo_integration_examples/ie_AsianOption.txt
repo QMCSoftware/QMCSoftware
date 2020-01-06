@@ -21,7 +21,7 @@ MeanVarData (AccumData Object)
 	n               202444
 	n_total         203468
 	confid_int      [ 5.768  5.867]
-	time_total      1.788
+	time_total      1.918
 
 Solution: 5.8292         
 AsianCall (Integrand Object)
@@ -46,7 +46,7 @@ MeanVarData (AccumData Object)
 	n               199887
 	n_total         200911
 	confid_int      [ 5.779  5.879]
-	time_total      0.673
+	time_total      0.750
 
 Solution: 5.8265         
 AsianCall (Integrand Object)
@@ -71,7 +71,7 @@ MeanVarData (AccumData Object)
 	n               271876
 	n_total         272900
 	confid_int      [ 5.776  5.876]
-	time_total      2.370
+	time_total      2.719
 
 Solution: 5.8245         
 AsianCall (Integrand Object)
@@ -96,7 +96,7 @@ MeanVarData (AccumData Object)
 	n               268690
 	n_total         269714
 	confid_int      [ 5.774  5.874]
-	time_total      0.896
+	time_total      1.024
 
 Solution: 5.8356         
 AsianCall (Integrand Object)
@@ -122,7 +122,7 @@ MeanVarDataRep (AccumData Object)
 	n               2048
 	n_total         2048
 	confid_int      [ 5.833  5.838]
-	time_total      0.289
+	time_total      0.319
 	r               16
 
 Solution: 5.8395         
@@ -150,10 +150,10 @@ MeanVarDataRep (AccumData Object)
 	n               2048
 	n_total         2048
 	confid_int      [ 5.838  5.841]
-	time_total      0.607
+	time_total      0.666
 	r               16
 
-Solution: 5.8253         
+Solution: 5.8317         
 AsianCall (Integrand Object)
 	volatility      [ 0.500  0.500  0.500]
 	start_price     [30 30 30]
@@ -175,12 +175,12 @@ CLT (Stopping Criterion Object)
 	inflate         1.200
 	alpha           0.010
 MeanVarData (AccumData Object)
-	n               [ 244322.000  21474.000  3791.000]
-	n_total         272659
-	confid_int      [ 5.774  5.877]
-	time_total      0.232
+	n               [ 249216.000  20945.000  3504.000]
+	n_total         276737
+	confid_int      [ 5.780  5.883]
+	time_total      0.304
 
-Solution: 5.8343         
+Solution: 5.8394         
 AsianCall (Integrand Object)
 	volatility      [ 0.500  0.500  0.500]
 	start_price     [30 30 30]
@@ -202,8 +202,8 @@ CLT (Stopping Criterion Object)
 	inflate         1.200
 	alpha           0.010
 MeanVarData (AccumData Object)
-	n               [ 273630.000  22578.000  4061.000]
-	n_total         303341
-	confid_int      [ 5.785  5.883]
-	time_total      0.114
+	n               [ 268343.000  24684.000  4058.000]
+	n_total         300157
+	confid_int      [ 5.791  5.888]
+	time_total      0.138
 

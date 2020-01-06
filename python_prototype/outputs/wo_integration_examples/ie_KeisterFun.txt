@@ -16,7 +16,7 @@ MeanVarData (AccumData Object)
 	n               470869
 	n_total         471893
 	confid_int      [ 2.164  2.185]
-	time_total      0.153
+	time_total      0.161
 
 Solution: 2.1702         
 Keister (Integrand Object)
@@ -36,7 +36,7 @@ MeanVarData (AccumData Object)
 	n               476600
 	n_total         477624
 	confid_int      [ 2.160  2.180]
-	time_total      0.038
+	time_total      0.043
 
 Solution: 2.1738         
 Keister (Integrand Object)
@@ -56,7 +56,7 @@ MeanVarData (AccumData Object)
 	n               603479
 	n_total         604503
 	confid_int      [ 2.164  2.184]
-	time_total      0.190
+	time_total      0.210
 
 Solution: 2.1703         
 Keister (Integrand Object)
@@ -76,7 +76,7 @@ MeanVarData (AccumData Object)
 	n               610515
 	n_total         611539
 	confid_int      [ 2.160  2.180]
-	time_total      0.051
+	time_total      0.059
 
 Solution: 2.1680         
 Keister (Integrand Object)
@@ -97,7 +97,7 @@ MeanVarDataRep (AccumData Object)
 	n               256
 	n_total         256
 	confid_int      [ 2.166  2.170]
-	time_total      0.004
+	time_total      0.005
 	r               16
 
 Solution: 2.1700         
@@ -120,6 +120,6 @@ MeanVarDataRep (AccumData Object)
 	n               512
 	n_total         512
 	confid_int      [ 2.169  2.171]
-	time_total      0.050
+	time_total      0.039
 	r               16
 

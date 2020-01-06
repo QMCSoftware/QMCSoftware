@@ -3,9 +3,9 @@
 import unittest
 
 from numpy import arange
-from workouts.wo_asian_option import test_distributions_asian_option
-from workouts.wo_customizations import quick_construct_integrand
-from workouts.wo_keister import test_distributions_keister
+from workouts.wo_integration_examples.wo_asian_option import test_distributions_asian_option
+from workouts.wo_integration_examples.wo_customizations import quick_construct_integrand
+from workouts.wo_integration_examples.wo_keister import test_distributions_keister
 from workouts.wo_lds_sequences import comp_sobol_backend, mps_gentimes, \
     qmcpy_gentimes
 from workouts.wo_mc_vs_qmc import abstol_comparison, dimension_comparison
