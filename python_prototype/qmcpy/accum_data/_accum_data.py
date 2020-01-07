@@ -1,11 +1,9 @@
 """ Definition for abstract class AccumData """
 
-from abc import ABC, abstractmethod
-
-from .._util import ParameterError, univ_repr
+from .._util import ParameterError, MethodImplementationError, univ_repr
 
 
-class AccumData(ABC):
+class AccumData(object):
     """
     Accumulated data required in the computation of the integral, stores the \
     sample mean and variance of integrand values
@@ -30,7 +28,6 @@ class AccumData(ABC):
         if not hasattr(self, 'confid_int'):
             raise ParameterError(prefix + 'self.confid_int (confidence interval for the solution)')
 
-    @abstractmethod
     def update_data(self, integrand, true_measure):
         """
         Update the accumulated data
@@ -42,6 +39,7 @@ class AccumData(ABC):
         Returns:
             None
         """
+        raise MethodImplementationError(self, 'update_data')
 
     def complete(self, time_total, integrand=None, discrete_distrib=None,
                  true_measure=None, stopping_criterion=None):

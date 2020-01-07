@@ -44,6 +44,17 @@ class DistributionGenerationError(Exception):
     to gen_dd_samples (method of a DiscreteDistribution)
     """
 
+class MethodImplementationError(Exception):
+    """
+    Class for raising error when an abstract method has not been implemented
+    in the child class.
+    """
+
+    def __init__(self, subclass, method_name):
+        s = '%s must implement the %s method. See superclass for method description' \
+            %(type(subclass).__name__, method_name)
+        super().__init__(s)
+
 
 class DistributionGenerationWarnings(Warning):
     """

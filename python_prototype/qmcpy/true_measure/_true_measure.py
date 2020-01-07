@@ -1,12 +1,11 @@
 """ Abstract Class TrueMeasure """
 
-from abc import ABC
 from copy import deepcopy
 
 from .._util import multilevel_constructor, TransformError, univ_repr
 
 
-class TrueMeasure(ABC):
+class TrueMeasure(object):
     """ The True Measure of the Integrand """
 
     def __init__(self, dimension, transforms, **kwargs):

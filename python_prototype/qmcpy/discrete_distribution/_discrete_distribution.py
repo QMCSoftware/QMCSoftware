@@ -1,11 +1,9 @@
 """ DiscreteDistribution is an abstract class. """
 
-from abc import ABC, abstractmethod
-
-from .._util import ParameterError, univ_repr
+from .._util import ParameterError, MethodImplementationError, univ_repr
 
 
-class DiscreteDistribution(ABC):
+class DiscreteDistribution(object):
     """
     Discrete Distribution from which we can generate samples
 
@@ -19,7 +17,6 @@ class DiscreteDistribution(ABC):
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
 
-    @abstractmethod
     def gen_dd_samples(self, replications, n_samples, dimensions):
         """
         Generate r nxd IID Standard Gaussian samples
@@ -32,7 +29,7 @@ class DiscreteDistribution(ABC):
         Returns:
             replications x n_samples x dimensions (numpy array)
         """
-        return
+        raise MethodImplementationError(self, 'gen_dd_samples')
 
     def __repr__(self, attributes=[]):
         """
