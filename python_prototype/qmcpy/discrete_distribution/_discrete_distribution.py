@@ -19,6 +19,7 @@ class DiscreteDistribution(object):
 
     def gen_dd_samples(self, replications, n_samples, dimensions):
         """
+        ABSTRACT METHOD
         Generate r nxd IID Standard Gaussian samples
 
         Args:

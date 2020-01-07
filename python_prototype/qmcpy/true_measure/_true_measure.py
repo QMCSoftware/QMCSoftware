@@ -15,7 +15,6 @@ class TrueMeasure(object):
             kwargs: keyword arguments. keys become attributes
                     with values distributed among object list
         """
-        super().__init__()
         measures = multilevel_constructor(self, dimension,
                                           transforms=transforms, **kwargs)
         self.measures = measures

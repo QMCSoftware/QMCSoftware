@@ -23,7 +23,6 @@ class StoppingCriterion(object):
             distribution (DiscreteDistribution): an instance of DiscreteDistribution
             allowed_distribs: distribution's compatible with the StoppingCriterion
         """
-        super().__init__()
         if type(distribution).__name__ not in allowed_distribs:
             error_message = type(self).__name__  \
                 + " only accepts distributions:" \
@@ -44,7 +43,10 @@ class StoppingCriterion(object):
             raise ParameterError(prefix + 'self.stage (stage of the computation)')
 
     def stop_yet(self):
-        """ Determine the number of samples needed to satisfy tolerance """
+        """
+        ABSTRACT METHOD
+        Determine the number of samples needed to satisfy tolerance
+        """
         raise MethodImplementationError(self, 'stop_yet')
 
     def __repr__(self, attributes=[]):

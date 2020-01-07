@@ -17,7 +17,6 @@ class AccumData(object):
 
     def __init__(self):
         """ Initialize data instance """
-        super().__init__()
         prefix = 'A concrete implementation of AccumData must have '
         if not hasattr(self, 'solution'):
             raise ParameterError(prefix + 'self.solution')
@@ -30,6 +29,7 @@ class AccumData(object):
 
     def update_data(self, integrand, true_measure):
         """
+        ABSTRACT METHOD
         Update the accumulated data
 
         Args:

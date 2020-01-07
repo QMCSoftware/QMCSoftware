@@ -23,12 +23,12 @@ class Integrand(object):
             integrands (list): List of Integrands, may be more than 1 for \
                 multi-dimensional problems
         """
-        super().__init__()
         integrands = multilevel_constructor(self, dimension, **kwargs)
         self.integrands = integrands
 
     def g(self, x):
         """
+        ABSTRACT METHOD
         Original integrand to be integrated
 
         Args:

@@ -51,9 +51,9 @@ class MethodImplementationError(Exception):
     """
 
     def __init__(self, subclass, method_name):
-        s = '%s must implement the %s method. See superclass for method description' \
-            %(type(subclass).__name__, method_name)
-        super().__init__(s)
+        s_f = '%s must implement the %s method. See superclass for method description ' + \
+            'and expected arguments / return values.'   
+        super().__init__(s_f % (type(subclass).__name__, method_name))
 
 
 class DistributionGenerationWarnings(Warning):
