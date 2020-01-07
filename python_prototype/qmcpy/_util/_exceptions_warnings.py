@@ -1,12 +1,6 @@
 """ Exceptions and Warnings thrown by qmcpy """
 
 
-class MeasureCompatibilityError(Exception):
-    """
-    Class for raising error of incompatible measures
-    """
-
-
 class DimensionError(Exception):
     """
     Class for raising error about dimension
