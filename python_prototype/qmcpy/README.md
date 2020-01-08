@@ -26,7 +26,7 @@ General measure used to define the integrand<br>
 ---
 
 ## Discrete Distribution
-Sampling nodes iid or lds (low-discrepancy sequence)<br>
+Sampling nodes IID or LDS (low-discrepancy sequence)<br>
 *Abstract class with concrete implementations*
 
 - IID Standard Uniform: $\:\: x_j \overset{iid}{\sim}   \mathcal{U}(0,1)$
