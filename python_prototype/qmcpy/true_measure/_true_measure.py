@@ -1,12 +1,11 @@
 """ Abstract Class TrueMeasure """
 
-from abc import ABC
 from copy import deepcopy
 
 from .._util import multilevel_constructor, TransformError, univ_repr
 
 
-class TrueMeasure(ABC):
+class TrueMeasure(object):
     """ The True Measure of the Integrand """
 
     def __init__(self, dimension, transforms, **kwargs):
@@ -16,7 +15,6 @@ class TrueMeasure(ABC):
             kwargs: keyword arguments. keys become attributes
                     with values distributed among object list
         """
-        super().__init__()
         measures = multilevel_constructor(self, dimension,
                                           transforms=transforms, **kwargs)
         self.measures = measures

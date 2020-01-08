@@ -1,11 +1,9 @@
 """ Definition for abstract class, ``Integrand`` """
 
-from abc import ABC, abstractmethod
-
-from .._util import multilevel_constructor, TransformError, univ_repr
+from .._util import multilevel_constructor, MethodImplementationError, TransformError, univ_repr
 
 
-class Integrand(ABC):
+class Integrand(object):
     """
     Specify and generate values :math:`f(\\boldsymbol{x})` for \
     :math:`\\boldsymbol{x} \\in \\mathcal{X}`
@@ -25,13 +23,12 @@ class Integrand(ABC):
             integrands (list): List of Integrands, may be more than 1 for \
                 multi-dimensional problems
         """
-        super().__init__()
         integrands = multilevel_constructor(self, dimension, **kwargs)
         self.integrands = integrands
 
-    @abstractmethod
     def g(self, x):
         """
+        ABSTRACT METHOD
         Original integrand to be integrated
 
         Args:
@@ -45,6 +42,7 @@ class Integrand(ABC):
             then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
             and :math:`x'_{ij} = c` otherwise
         """
+        raise MethodImplementationError(self, 'g')
 
     def f(self, x):
         """

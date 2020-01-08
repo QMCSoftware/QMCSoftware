@@ -1,11 +1,10 @@
 """ Definition for abstract class StoppingCriterion """
 
-from abc import ABC, abstractmethod
+from .._util import DistributionCompatibilityError, ParameterError, \
+                    MethodImplementationError, univ_repr
 
-from .._util import DistributionCompatibilityError, ParameterError, univ_repr
 
-
-class StoppingCriterion(ABC):
+class StoppingCriterion(object):
     """
     Decide when to stopping_criterion
 
@@ -24,7 +23,6 @@ class StoppingCriterion(ABC):
             distribution (DiscreteDistribution): an instance of DiscreteDistribution
             allowed_distribs: distribution's compatible with the StoppingCriterion
         """
-        super().__init__()
         if type(distribution).__name__ not in allowed_distribs:
             error_message = type(self).__name__  \
                 + " only accepts distributions:" \
@@ -44,9 +42,12 @@ class StoppingCriterion(ABC):
         if not hasattr(self, 'stage'):
             raise ParameterError(prefix + 'self.stage (stage of the computation)')
 
-    @abstractmethod
     def stop_yet(self):
-        """ Determine when to stopping_criterion """
+        """
+        ABSTRACT METHOD
+        Determine the number of samples needed to satisfy tolerance
+        """
+        raise MethodImplementationError(self, 'stop_yet')
 
     def __repr__(self, attributes=[]):
         """
