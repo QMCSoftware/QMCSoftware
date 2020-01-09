@@ -22,7 +22,7 @@ class Gaussian(TrueMeasure):
                     # shift and stretch
                 lambda self, g: g], # no weight
             "StdUniform": [
-                lambda self, samples: clip(norm.ppf(samples, loc=self.mu, scale=self.sigma),-10,10),
+                lambda self, samples: clip(norm.ppf(samples, loc=self.mu, scale=self.sigma),self.mu-10,self.mu+10),
                     # inverse CDF then shift and stretch
                 lambda self, g: g] # no weight
             }
