@@ -41,7 +41,7 @@ concrete implementations*
 Discrete Distribution
 ---------------------
 
-Sampling nodes iid or lds (low-discrepancy sequence) *Abstract class
+Sampling nodes IID or LDS (low-discrepancy sequence) *Abstract class
 with concrete implementations*
 
 -  IID Standard Uniform:
