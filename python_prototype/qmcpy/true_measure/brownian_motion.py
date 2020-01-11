@@ -2,7 +2,7 @@
 
 from ._true_measure import TrueMeasure
 
-from numpy import arange, cumsum, diff, insert, sqrt, clip
+from numpy import arange, cumsum, diff, insert, sqrt
 from scipy.stats import norm
 
 
@@ -22,12 +22,10 @@ class BrownianMotion(TrueMeasure):
                     # insert start time then cumulative sum over monitoring times
                 lambda self, g: g], # no weight
             "StdUniform": [
-                lambda self, samples: cumsum(clip(norm.ppf(samples),-10,10) \
+                lambda self, samples: cumsum(norm.ppf(samples) \
                     * sqrt(diff(insert(self.time_vector, 0, 0))), 2),
                     # inverse CDF, insert start time, then cumulative sum over monitoring times
-                lambda self, g: g] # no weight
-            }
-
+                lambda self, g: g]} # no weight
         super().__init__(dimension, [transforms],
                          time_vector=time_vector)
 

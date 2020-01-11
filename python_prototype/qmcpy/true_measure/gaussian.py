@@ -2,7 +2,7 @@
 
 from ._true_measure import TrueMeasure
 
-from numpy import sqrt, clip
+from numpy import sqrt
 from scipy.stats import norm
 
 
@@ -22,10 +22,9 @@ class Gaussian(TrueMeasure):
                     # shift and stretch
                 lambda self, g: g], # no weight
             "StdUniform": [
-                lambda self, samples: clip(norm.ppf(samples, loc=self.mu, scale=self.sigma),self.mu-10,self.mu+10),
+                lambda self, samples: norm.ppf(samples, loc=self.mu, scale=self.sigma),
                     # inverse CDF then shift and stretch
-                lambda self, g: g] # no weight
-            }
+                lambda self, g: g]} # no weight
         super().__init__(dimension, [transforms],
                          mu=mean,
                          sigma=sqrt(variance))

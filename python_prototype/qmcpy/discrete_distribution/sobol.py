@@ -14,7 +14,7 @@ from .._util import DistributionGenerationWarnings, ParameterError
 class Sobol(DiscreteDistribution):
     """ Quasi-Random Sobol low discrepancy sequence (Base 2) """
 
-    def __init__(self, rng_seed=None, backend='Pytorch'):
+    def __init__(self, rng_seed=None, backend='mps'):
         """
         Args:
             rng_seed (int): seed the random number generator for reproducibility
@@ -24,6 +24,9 @@ class Sobol(DiscreteDistribution):
         self.backend = backend.lower()
         if self.backend not in ['mps', 'pytorch']:
             raise ParameterError("Sobol backend must be either 'mps' or 'pytorch'")
+        if self.backend == 'pytorch':
+            raise Exception("PyTorch SobolEngine issue. " +\
+                "See https://github.com/pytorch/pytorch/issues/32047")
         super().__init__()
 
     def gen_dd_samples(self, replications, n_samples, dimensions, scramble=True):

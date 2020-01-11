@@ -17,8 +17,7 @@ class Lebesgue(TrueMeasure):
             "StdUniform": [
                 lambda self, samples: samples * (self.b - self.a) + self.a,
                 # stretch samples
-                lambda self, g: g * (self.b - self.a).prod()]  # multiply dimensional difference
-        }
+                lambda self, g: g * (self.b - self.a).prod()]}  # multiply dimensional difference
         super().__init__(dimension, [transforms],
                          a=lower_bound,
                          b=upper_bound)

@@ -23,8 +23,7 @@ class Uniform(TrueMeasure):
             "StdGaussian": [
                 lambda self, samples: norm.cdf(samples) * (self.b - self.a) + self.a,
                     # CDF then stretch
-                lambda self, g: g] # no weight
-            }
+                lambda self, g: g]} # no weight
         super().__init__(dimension, [transforms],
                          a=lower_bound,
                          b=upper_bound)
