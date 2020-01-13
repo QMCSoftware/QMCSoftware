@@ -364,7 +364,8 @@ dimension (int): number of dimensions</p>
 <dl class="method">
 <dt id="qmcpy.integrand.quick_construct.QuickConstruct.g">
 <code class="sig-name descname">g</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.quick_construct.QuickConstruct.g" title="Permalink to this definition">¶</a></dt>
-<dd><p>Original integrand to be integrated</p>
+<dd><p>ABSTRACT METHOD
+Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
@@ -381,7 +382,8 @@ dimension (int): number of dimensions</p>
 </div>
 <div class="section" id="measure-class">
 <h2>Measure Class<a class="headerlink" href="#measure-class" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-qmcpy.true_measure"></span><span class="target" id="module-qmcpy.true_measure.uniform"></span><p>Definition of Uniform, a concrete implementation of TrueMeasure</p>
+<span class="target" id="module-qmcpy.true_measure"></span><p>API</p>
+<span class="target" id="module-qmcpy.true_measure.uniform"></span><p>Definition of Uniform, a concrete implementation of TrueMeasure</p>
 <dl class="class">
 <dt id="qmcpy.true_measure.uniform.Uniform">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.true_measure.uniform.</code><code class="sig-name descname">Uniform</code><span class="sig-paren">(</span><em class="sig-param">dimension</em>, <em class="sig-param">lower_bound=0.0</em>, <em class="sig-param">upper_bound=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.true_measure.uniform.Uniform" title="Permalink to this definition">¶</a></dt>
@@ -677,7 +679,8 @@ omitted.</p>
 </div>
 <div class="section" id="data-class">
 <h2>Data Class<a class="headerlink" href="#data-class" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-qmcpy.accum_data"></span><span class="target" id="module-qmcpy.accum_data.mean_var_data"></span><p>Definition of MeanVarData, a concrete implementation of AccumData</p>
+<span class="target" id="module-qmcpy.accum_data"></span><p>APIs of accum_data</p>
+<span class="target" id="module-qmcpy.accum_data.mean_var_data"></span><p>Definition of MeanVarData, a concrete implementation of AccumData</p>
 <dl class="class">
 <dt id="qmcpy.accum_data.mean_var_data.MeanVarData">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.mean_var_data.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">levels</em>, <em class="sig-param">n_init</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData" title="Permalink to this definition">¶</a></dt>
@@ -859,9 +862,10 @@ to gen_dd_samples (method of a DiscreteDistribution)</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.MeasureCompatibilityError">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">MeasureCompatibilityError</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.MeasureCompatibilityError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for raising error of incompatible measures</p>
+<dt id="qmcpy._util._exceptions_warnings.MethodImplementationError">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">MethodImplementationError</code><span class="sig-paren">(</span><em class="sig-param">subclass</em>, <em class="sig-param">method_name</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy._util._exceptions_warnings.MethodImplementationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for raising error when an abstract method has not been implemented
+in the child class.</p>
 </dd></dl>
 
 <dl class="exception">

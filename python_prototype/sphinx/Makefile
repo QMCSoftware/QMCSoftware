@@ -17,7 +17,7 @@ help:
 
 # Create epub documentation
 epub:
-	@$(SPHINXBUILD) -M epub $(SOURCEDIR) $(BUILDDIR) $(SPHINXOPTS)
+	@$(SPHINXBUILD) -M epub $(SOURCEDIR) $(BUILDDIR) $(SPHINXOPTS)  -D extensions=sphinx.ext.imgmath
 
 # Create PDF documentation
 latex: Makefile
