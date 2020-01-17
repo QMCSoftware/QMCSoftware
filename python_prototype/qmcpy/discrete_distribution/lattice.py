@@ -7,7 +7,7 @@ from numpy.random import Generator, PCG64
 
 from ._discrete_distribution import DiscreteDistribution
 from .mps_refactor import LatticeSeq
-from .._util import DistributionGenerationError, DistributionGenerationWarnings
+from ..util import DistributionGenerationError, DistributionGenerationWarnings
 
 
 class Lattice(DiscreteDistribution):

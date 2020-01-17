@@ -4,7 +4,7 @@ import unittest
 
 from numpy import arange
 from qmcpy import *
-from qmcpy._util import *
+from qmcpy.util import *
 
 tv_single_level = [arange(1 / 64, 65 / 64, 1 / 64)]
 dim_single_level = [len(tv) for tv in tv_single_level]

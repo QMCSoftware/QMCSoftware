@@ -1,6 +1,6 @@
 """ Definition for abstract class, ``Integrand`` """
 
-from .._util import multilevel_constructor, MethodImplementationError, TransformError, univ_repr
+from ..util import multilevel_constructor, MethodImplementationError, TransformError, univ_repr
 
 
 class Integrand(object):

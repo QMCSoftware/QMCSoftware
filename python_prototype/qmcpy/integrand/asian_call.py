@@ -3,7 +3,7 @@
 from numpy import array, exp, log, maximum
 
 from ._integrand import Integrand
-from .._util import ParameterError
+from ..util import ParameterError
 
 
 class AsianCall(Integrand):

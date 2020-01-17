@@ -2,7 +2,7 @@
 
 from time import process_time
 
-from ._util import DimensionError
+from .util import DimensionError
 from .discrete_distribution import IIDStdUniform
 from .stopping_criterion import CLT
 

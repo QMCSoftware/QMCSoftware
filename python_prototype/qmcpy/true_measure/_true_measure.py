@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from .._util import multilevel_constructor, TransformError, univ_repr
+from ..util import multilevel_constructor, TransformError, univ_repr
 
 
 class TrueMeasure(object):

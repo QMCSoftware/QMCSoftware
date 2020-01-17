@@ -1,6 +1,6 @@
 """ Definition for abstract class StoppingCriterion """
 
-from .._util import DistributionCompatibilityError, ParameterError, \
+from ..util import DistributionCompatibilityError, ParameterError, \
                     MethodImplementationError, univ_repr
 
 

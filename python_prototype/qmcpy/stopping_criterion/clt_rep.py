@@ -6,7 +6,7 @@ from numpy import array, log, sqrt
 from scipy.stats import norm
 
 from ._stopping_criterion import StoppingCriterion
-from .._util import MaxSamplesWarning, NotYetImplemented, ParameterWarning
+from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning
 from ..accum_data import MeanVarDataRep
 
 

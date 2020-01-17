@@ -4,7 +4,7 @@ import unittest
 
 from numpy import arange
 from qmcpy import *
-from qmcpy._util import *
+from qmcpy.util import *
 
 
 class TestAsianCall(unittest.TestCase):

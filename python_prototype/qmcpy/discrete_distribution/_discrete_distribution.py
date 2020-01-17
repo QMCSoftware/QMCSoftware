@@ -1,6 +1,6 @@
 """ DiscreteDistribution is an abstract class. """
 
-from .._util import ParameterError, MethodImplementationError, univ_repr
+from ..util import ParameterError, MethodImplementationError, univ_repr
 
 
 class DiscreteDistribution(object):
