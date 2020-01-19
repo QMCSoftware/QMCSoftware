@@ -30,44 +30,6 @@ function numerically by creating instances of ``qmcpy``\ ’s built-in
 classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CLTRep``, as inputs
 to the function ``integrate()``.
 
-.. code:: ipython3
-
-    dim = 3
-    integrand = Keister(dim)
-    true_measure = Gaussian(dim, variance=1 / 2)
-    discrete_distrib = Sobol(rng_seed=7)
-    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=0.05)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
-    print(data)
-
-
-.. parsed-literal::
-
-    Solution: 2.1716         
-    Keister (Integrand Object)
-    Sobol (Discrete Distribution Object)
-    	mimics          StdUniform
-    	rng_seed        7
-    	backend         pytorch
-    Gaussian (True Measure Object)
-    	dimension       3
-    	mu              0
-    	sigma           0.707
-    CLTRep (Stopping Criterion Object)
-    	abs_tol         0.050
-    	rel_tol         0
-    	n_max           1073741824
-    	inflate         1.200
-    	alpha           0.010
-    MeanVarDataRep (AccumData Object)
-    	n               128
-    	n_total         128
-    	confid_int      [ 2.164  2.179]
-    	time_total      0.009
-    	r               16
-    
-
-
 European Arithmetic-Mean Asian Put Option: Single Level
 -------------------------------------------------------
 
@@ -136,7 +98,7 @@ defined as follows:
     	n               2048
     	n_total         2048
     	confid_int      [ 6.257  6.262]
-    	time_total      0.377
+    	time_total      0.390
     	r               16
     
 
@@ -183,7 +145,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2552         
+    Solution: 6.2556         
     AsianCall (Integrand Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -205,9 +167,9 @@ last example.
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               [ 277857.000  38845.000  8006.000]
-    	n_total         327780
-    	confid_int      [ 6.206  6.304]
-    	time_total      0.113
+    	n               [ 277759.000  41548.000  6899.000]
+    	n_total         329278
+    	confid_int      [ 6.207  6.305]
+    	time_total      0.121
     
 
