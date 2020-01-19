@@ -84,9 +84,8 @@ cp -a _build/html/. ../../docs;
 
 # remove lines in requirements.txt that contain the keywords in double quotes
 # for latex compilation
-grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
 
-cp ../requirements.txt ../../docs
+
 
 ################################################################################
 # Use sphinx to generate epub documentation
@@ -94,5 +93,18 @@ cp ../requirements.txt ../../docs
 #make epub
 
 #cp -a _build/epub/qmcpy.epub ../../docs/qmcpy.epub
+
+################################################################################
+# For https://qmcpy.readthedocs.io
+################################################################################
+grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
+
+cp ../requirements.txt ../../docs
+
+cp ../README.md ../../docs
+
+cd ../..
+
+git add -f docs
 
 echo "QMCPy autodoc process ends..."

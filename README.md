@@ -21,10 +21,12 @@ Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community So
 
 ## Documentation 
 
-Documentation of QMCPy is available at the following Read the Docs websites:
+PDF and EPUB ocumentation of QMCPy is available for download at  Read the Docs website
+[https://readthedocs.org/projects/qmcpy/downloads/](https://readthedocs.org/projects/qmcpy/downloads/).
 
-* HTML: [https://qmcpy.readthedocs.io/en/latest/](https://qmcpy.readthedocs.io/en/latest/) 
-* PDF:  [https://readthedocs.org/projects/qmcpy/downloads/pdf/latest/](https://readthedocs.org/projects/qmcpy/downloads/pdf/latest/)
+In addition, we have HTML documentation can be browsed at
+ [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/) 
+ or [https://qmcpy.readthedocs.io/en/latest/](https://qmcpy.readthedocs.io/en/latest/)
 
 ---
 
