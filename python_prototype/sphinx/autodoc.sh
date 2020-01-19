@@ -101,7 +101,7 @@ grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
 
 cp ../requirements.txt ../../docs
 
-cp ../README.md ../../docs
+cp ../../README.md ../../docs
 
 cd ../..
 
