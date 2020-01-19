@@ -197,6 +197,39 @@ the Gaussian measure, and the Sobol distribution:</p>
 function numerically by creating instances of <code class="docutils literal notranslate"><span class="pre">qmcpy</span></code>’s built-in
 classes, <code class="docutils literal notranslate"><span class="pre">Keister</span></code>, <code class="docutils literal notranslate"><span class="pre">Gaussian</span></code>, <code class="docutils literal notranslate"><span class="pre">Sobol</span></code> and <code class="docutils literal notranslate"><span class="pre">CLTRep</span></code>, as inputs
 to the function <code class="docutils literal notranslate"><span class="pre">integrate()</span></code>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">Keister</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Sobol</span><span class="p">(</span><span class="n">rng_seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">2.1477</span>
+<span class="n">Keister</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
+<span class="n">Sobol</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">Distribution</span> <span class="n">Object</span><span class="p">)</span>
+    <span class="n">mimics</span>          <span class="n">StdUniform</span>
+    <span class="n">rng_seed</span>        <span class="mi">7</span>
+    <span class="n">backend</span>         <span class="n">mps</span>
+<span class="n">Gaussian</span> <span class="p">(</span><span class="kc">True</span> <span class="n">Measure</span> <span class="n">Object</span><span class="p">)</span>
+    <span class="n">dimension</span>       <span class="mi">3</span>
+    <span class="n">mu</span>              <span class="mi">0</span>
+    <span class="n">sigma</span>           <span class="mf">0.707</span>
+<span class="n">CLTRep</span> <span class="p">(</span><span class="n">Stopping</span> <span class="n">Criterion</span> <span class="n">Object</span><span class="p">)</span>
+    <span class="n">abs_tol</span>         <span class="mf">0.050</span>
+    <span class="n">rel_tol</span>         <span class="mi">0</span>
+    <span class="n">n_max</span>           <span class="mi">1073741824</span>
+    <span class="n">inflate</span>         <span class="mf">1.200</span>
+    <span class="n">alpha</span>           <span class="mf">0.010</span>
+<span class="n">MeanVarDataRep</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
+    <span class="n">n</span>               <span class="mi">32</span>
+    <span class="n">n_total</span>         <span class="mi">32</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">2.126</span>  <span class="mf">2.169</span><span class="p">]</span>
+    <span class="n">time_total</span>      <span class="mf">0.005</span>
+    <span class="n">r</span>               <span class="mi">16</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="european-arithmetic-mean-asian-put-option-single-level">
 <h2>European Arithmetic-Mean Asian Put Option: Single Level<a class="headerlink" href="#european-arithmetic-mean-asian-put-option-single-level" title="Permalink to this headline">¶</a></h2>
@@ -258,7 +291,7 @@ stock prices at <img class="math" src="../_images/math/badad346f6fbe2e237af99bfb
     <span class="n">n</span>               <span class="mi">2048</span>
     <span class="n">n_total</span>         <span class="mi">2048</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.257</span>  <span class="mf">6.262</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.390</span>
+    <span class="n">time_total</span>      <span class="mf">0.385</span>
     <span class="n">r</span>               <span class="mi">16</span>
 </pre></div>
 </div>
@@ -293,7 +326,7 @@ last example.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">6.2556</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">6.2591</span>
 <span class="n">AsianCall</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">volatility</span>      <span class="p">[</span> <span class="mf">0.500</span>  <span class="mf">0.500</span>  <span class="mf">0.500</span><span class="p">]</span>
     <span class="n">start_price</span>     <span class="p">[</span><span class="mi">30</span> <span class="mi">30</span> <span class="mi">30</span><span class="p">]</span>
@@ -315,9 +348,9 @@ last example.</p>
     <span class="n">inflate</span>         <span class="mf">1.200</span>
     <span class="n">alpha</span>           <span class="mf">0.010</span>
 <span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
-    <span class="n">n</span>               <span class="p">[</span> <span class="mf">277759.000</span>  <span class="mf">41548.000</span>  <span class="mf">6899.000</span><span class="p">]</span>
-    <span class="n">n_total</span>         <span class="mi">329278</span>
-    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.207</span>  <span class="mf">6.305</span><span class="p">]</span>
+    <span class="n">n</span>               <span class="p">[</span> <span class="mf">282839.000</span>  <span class="mf">35960.000</span>  <span class="mf">6938.000</span><span class="p">]</span>
+    <span class="n">n_total</span>         <span class="mi">328809</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.210</span>  <span class="mf">6.308</span><span class="p">]</span>
     <span class="n">time_total</span>      <span class="mf">0.121</span>
 </pre></div>
 </div>
