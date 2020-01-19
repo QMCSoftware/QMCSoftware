@@ -22,8 +22,8 @@ DIR=python_prototype/sphinx/markdown_to_rst/
 if [ ! -d $DIR ]; then
   mkdir $DIR
 fi
-rm DIR/*
-python python_prototype/qmcpy/_util/render_readme_as_rst.py
+rm $DIR/*
+python python_prototype/sphinx/render_readme_as_rst.py
 # pandoc -s --mathjax ./README.md -o python_prototype/sphinx/markdown_to_rst/QMCSoftware.html
 
 # restore original README.md that contains certain keywords
@@ -40,22 +40,24 @@ echo $PYTHONPATH
 
 # run notebooks
 # jupyter notebook demos/plotDemos.ipynb
-cd demos
+cd demos # In demos directory
 FILES=*.ipynb
 DIR=../sphinx/rst_from_demos
 if [ ! -d $DIR ]; then
   mkdir $DIR
 fi
-rm -f $DIR/*
+rm -fr $DIR/*
 DIRSUFFIX="_files"
 for f in $FILES
 do
-  echo "Processing $f file..."
-  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f --to rst
-  file=${f%.ipynb}
-  echo $file
-  cp -r "$file$DIRSUFFIX" $DIR/
+  if [  "${f}" != "nei_demo.ipynb" ]; then
+    echo "Processing $f file..."
+    jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f --to rst
+    file=${f%.ipynb}
+    echo $file
+  fi
 done
+mv *_files $DIR/
 mv *.rst $DIR
 
 cd .. # to python_prototype

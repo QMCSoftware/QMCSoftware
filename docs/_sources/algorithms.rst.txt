@@ -110,5 +110,5 @@ Utilities
 .. automodule:: qmcpy
     :members:
 
-.. automodule:: qmcpy._util._exceptions_warnings
+.. automodule:: qmcpy.util.exceptions_warnings
     :members:
