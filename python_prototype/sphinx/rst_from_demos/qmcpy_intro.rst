@@ -19,7 +19,7 @@ environment. First, we can import the package ``qmcpy`` under the alias
     qmcpy 0.1
 
 
-Alternatively, we can import individual objects from ‘qmcpy’ as shown
+Alternatively, we can import individual objects from 'qmcpy' as shown
 below.
 
 .. code:: ipython3
@@ -74,8 +74,8 @@ following integral:
 
 .. math:: \int_{[0,1]^d} \|x\|_2^{\|x\|_2^{1/2}} dx,
 
-\ where :math:`[0,1]^d` is the unit hypercube in :math:`\mathbb{R}^d`.
-The integrand is defined everywhere except at :math:`x=0` and hence the
+where :math:`[0,1]^d` is the unit hypercube in :math:`\mathbb{R}^d`. The
+integrand is defined everywhere except at :math:`x=0` and hence the
 definite integral is also defined.
 
 The key in defining a Python function of an integrand in the QMCPy
@@ -99,7 +99,7 @@ follows:
     def f(x): return norm(x) ** sqrt(norm(x))
 
 It looks reasonable except that maybe the Numpy function norm is
-executed twice. It’s okay for now. Let us quickly test if the function
+executed twice. It's okay for now. Let us quickly test if the function
 behaves as expected at a point value:
 
 .. code:: ipython3
@@ -136,7 +136,7 @@ two-dimensional domain, i.e., :math:`d=2`?
 
 
 Now, the function should have returned :math:`n=3` real values that
-corresponding to each of the sampling points. Let’s debug our Python
+corresponding to each of the sampling points. Let's debug our Python
 function.
 
 .. code:: ipython3
@@ -152,8 +152,8 @@ function.
 
 
 
-Numpy’s ``norm(x)`` is obviously a matrix norm, but we want it to be
-vector 2-norm that acts on each row of ``x``. To that end, let’s add an
+Numpy's ``norm(x)`` is obviously a matrix norm, but we want it to be
+vector 2-norm that acts on each row of ``x``. To that end, let's add an
 axis argument to the function:
 
 .. code:: ipython3
@@ -169,7 +169,7 @@ axis argument to the function:
 
 
 
-Now it’s working! Let’s make sure that the ``sqrt`` function is acting
+Now it's working! Let's make sure that the ``sqrt`` function is acting
 on each element of the vector norm results:
 
 .. code:: ipython3
@@ -209,7 +209,7 @@ We have got our proper function definition now.
         return x_norms ** sqrt(x_norms)
 
 We can now create an ``integrand`` instance with our ``QuickConstruct``
-class in QMCPy and then invoke QMCPy’s ``integrate`` function:
+class in QMCPy and then invoke QMCPy's ``integrate`` function:
 
 .. code:: ipython3
 
@@ -239,11 +239,11 @@ class in QMCPy and then invoke QMCPy’s ``integrate`` function:
     	n               3305
     	n_total         4329
     	confid_int      [ 0.647  0.668]
-    	time_total      0.003
+    	time_total      0.002
     
 
 
-For our integral, we know the true value. Let’s check if QMCPy’s
+For our integral, we know the true value. Let's check if QMCPy's
 solution is accurate enough:
 
 .. code:: ipython3
@@ -259,7 +259,7 @@ solution is accurate enough:
     True
 
 
-It’s good. Shall we test the function with :math:`d=2` by simply
+It's good. Shall we test the function with :math:`d=2` by simply
 changing the input parameter value of dimension for QuickConstruct?
 
 .. code:: ipython3
@@ -290,7 +290,7 @@ changing the input parameter value of dimension for QuickConstruct?
     	n               5452
     	n_total         6476
     	confid_int      [ 0.821  0.841]
-    	time_total      0.003
+    	time_total      0.002
     
 
 
