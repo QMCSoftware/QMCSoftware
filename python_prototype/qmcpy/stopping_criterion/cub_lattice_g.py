@@ -1,7 +1,8 @@
 """ Definition for CubLattice_g, a concrete implementation of StoppingCriterion """
 
 from ._stopping_criterion import StoppingCriterion
-from ..accum_data import
+from ..accum_data import CubatureData
+from ..util import NotYetImplemented, Parameter
 
 from numpy import log2, inf, zeros, ones, tile, \
                     exp, pi, arange, vstack, where, maximum, minimum, \
@@ -30,7 +31,7 @@ class CubLattice_g(StoppingCriterion):
     def __init__(self, discrete_distrib, true_measure,
                  inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0,
-                 n_init=2**10, n_max=1e10,
+                 n_init=2**10, n_max=2**35,
                  fudge = lambda m: 5*2**(-m)):
         """
         Args:
@@ -45,19 +46,28 @@ class CubLattice_g(StoppingCriterion):
                               sum of Fast Fourier coefficients specified 
                               in the cone of functions
         """
+        # Input Checks
+        levels = len(true_measure)
+        if levels != 1:
+            raise NotYetImplemented('''
+                cub_lattice_g not implemented for multi-level problems.
+                Use CLT stopping criterion with an iid distribution for multi-level problems ''')
         # Set Attributes
-        self.inflate = inflate
-        self.alpha = alpha
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
         self.n_max = n_max
         self.fudge = fudge
         self.stage = "sigma"
         # Construct Data Object to House Integration data
-        self.data = MeanVarData(len(true_measure), n_init)
+        m_min = log2(n_init)
+        m_max = log2(n_max)
+        if m_min%1 != 0 or m_max%1 != 0:
+            warning_s = ' n_init and n_max must be a powers of 2. Using n_init = 2**5 and n_max=2**35'
+            warnings.warn(warning_s, ParameterWarning)
+            m_min = 5
+            m_max = 35 
+        self.data = CubatureData(len(true_measure), m_min, m_max)
         # Variables used by algorithm
-        self.mmin = log2(self.data.n_init)
-        self.mmax = log2(self.n_max)
         self.exit_len = 2
         self.r_lag = 4 # distance between coefficients summed and those computed
         self.l_star = self.data.mmin - r_lag # minimum gathering of points for the sums of DFT
@@ -110,6 +120,8 @@ class CubLattice_g(StoppingCriterion):
         lb = max(self.abstol, self.reltol*abs(q - errest[0]))
         q = q - errest[0]*(ub-lb) / (ub+lb) # Optimal estimator
         appxinteg[0] = q
+
+        
         is_done = False
         if 4*errest[0]**2/(ub+lb))**2 <= 1:
             is_done = True
@@ -217,4 +229,4 @@ class CubLattice_g(StoppingCriterion):
                 kappanumap[nl+flipall] = kappanumap[flipall] # them
                 kappanumap[flipall] = temp # around
         return kappanumap
-    
+        

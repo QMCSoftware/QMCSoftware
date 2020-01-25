@@ -35,10 +35,6 @@ class StoppingCriterion(object):
             raise ParameterError(prefix + 'self.rel_tol (relative tolerance)')
         if not hasattr(self, 'n_max'):
             raise ParameterError(prefix + 'self.n_max (maximum total samples)')
-        if not hasattr(self, 'alpha'):
-            raise ParameterError(prefix + 'self.alpha (uncertainty level)')
-        if not hasattr(self, 'inflate'):
-            raise ParameterError(prefix + 'self.inflate (inflation factor)')
         if not hasattr(self, 'stage'):
             raise ParameterError(prefix + 'self.stage (stage of the computation)')
 

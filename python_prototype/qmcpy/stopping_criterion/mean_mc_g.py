@@ -43,7 +43,7 @@ class MeanMC_g(StoppingCriterion):
         levels = len(true_measure)
         if levels != 1:
             raise NotYetImplemented('''
-                MeanMC_g tot implemented for multi-level problems.
+                MeanMC_g not implemented for multi-level problems.
                 Use CLT stopping criterion with an iid distribution for multi-level problems ''')
         # Set Attributes
         self.abs_tol = abs_tol
