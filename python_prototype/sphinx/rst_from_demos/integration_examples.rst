@@ -26,9 +26,47 @@ the Gaussian measure, and the Sobol distribution:
    :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
 The following code snippet integrates a three-dimensional Keister
-function numerically by creating instances of ``qmcpy``\ ’s built-in
+function numerically by creating instances of ``qmcpy``'s built-in
 classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CLTRep``, as inputs
 to the function ``integrate()``.
+
+.. code:: ipython3
+
+    dim = 3
+    integrand = Keister(dim)
+    true_measure = Gaussian(dim, variance=1 / 2)
+    discrete_distrib = Sobol(rng_seed=7)
+    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=0.05)
+    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    print(data)
+
+
+.. parsed-literal::
+
+    Solution: 2.1477         
+    Keister (Integrand Object)
+    Sobol (Discrete Distribution Object)
+    	mimics          StdUniform
+    	rng_seed        7
+    	backend         mps
+    Gaussian (True Measure Object)
+    	dimension       3
+    	mu              0
+    	sigma           0.707
+    CLTRep (Stopping Criterion Object)
+    	abs_tol         0.050
+    	rel_tol         0
+    	n_max           1073741824
+    	inflate         1.200
+    	alpha           0.010
+    MeanVarDataRep (AccumData Object)
+    	n               32
+    	n_total         32
+    	confid_int      [ 2.126  2.169]
+    	time_total      0.004
+    	r               16
+    
+
 
 European Arithmetic-Mean Asian Put Option: Single Level
 -------------------------------------------------------
@@ -98,7 +136,7 @@ defined as follows:
     	n               2048
     	n_total         2048
     	confid_int      [ 6.257  6.262]
-    	time_total      0.390
+    	time_total      0.302
     	r               16
     
 
@@ -106,7 +144,7 @@ defined as follows:
 European Arithmetic-Mean Asian Put Option: Multi-Level
 ------------------------------------------------------
 
-This example is similar to the last one except that we use Gile’s
+This example is similar to the last one except that we use Gile's
 multi-level method for estimation of the option price. The main idea can
 be summarized as follows:
 
@@ -145,7 +183,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2556         
+    Solution: 6.2602         
     AsianCall (Integrand Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -167,9 +205,9 @@ last example.
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               [ 277759.000  41548.000  6899.000]
-    	n_total         329278
-    	confid_int      [ 6.207  6.305]
-    	time_total      0.121
+    	n               [ 289512.000  34184.000  5514.000]
+    	n_total         332282
+    	confid_int      [ 6.211  6.309]
+    	time_total      0.088
     
 

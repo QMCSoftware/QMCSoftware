@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="QMCPy for Lebesgue Integration" href="lebesgue_integration.html" />
+    <link rel="next" title="Scatter Plots of Samples" href="sample_scatter_plots.html" />
     <link rel="prev" title="Welcome to QMCPy" href="qmcpy_intro.html" /> 
 </head>
 
@@ -98,7 +98,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#european-arithmetic-mean-asian-put-option-multi-level">European Arithmetic-Mean Asian Put Option: Multi-Level</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="lebesgue_integration.html">QMCPy for Lebesgue Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sample_scatter_plots.html">Scatter Plots of Samples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MC_vs_QMC.html">A Monte Carlo vs Quasi-Monte Carlo Comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MC_vs_QMC.html#absolute-tolerance-plots">Absolute Tolerance Plots</a></li>
@@ -188,10 +187,10 @@ generating evenly spaced discrete vectors in the examples.</p>
 <p>We recall briefly the mathematical definitions of the Keister function,
 the Gaussian measure, and the Sobol distribution:</p>
 <ul class="simple">
-<li><p>Keister integrand: <img class="math" src="../_images/math/8e93d4c316edc7478370dcb4d91f9e756520e0c4.png" alt="y_j = \pi^{d/2} \cos(||x_j||_2)"/></p></li>
-<li><p>Gaussian true measure: <img class="math" src="../_images/math/f3a5434655a9ff982d0f24e5f5e135ac51e6599c.png" alt="\mathcal{N}(0,\frac{1}{2})"/></p></li>
+<li><p>Keister integrand: <span class="math">y_j = \pi^{d/2} \cos(||x_j||_2)</span></p></li>
+<li><p>Gaussian true measure: <span class="math">\mathcal{N}(0,\frac{1}{2})</span></p></li>
 <li><p>Sobol discrete distribution:
-<img class="math" src="../_images/math/c8cacd83b7cccf60b627c59b9406a6aae46ad4cd.png" alt="x_j \overset{lds}{\sim} \mathcal{U}(0,1)"/></p></li>
+<span class="math">x_j \overset{lds}{\sim} \mathcal{U}(0,1)</span></p></li>
 </ul>
 <p>The following code snippet integrates a three-dimensional Keister
 function numerically by creating instances of <code class="docutils literal notranslate"><span class="pre">qmcpy</span></code>’s built-in
@@ -226,7 +225,7 @@ to the function <code class="docutils literal notranslate"><span class="pre">int
     <span class="n">n</span>               <span class="mi">32</span>
     <span class="n">n_total</span>         <span class="mi">32</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">2.126</span>  <span class="mf">2.169</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.005</span>
+    <span class="n">time_total</span>      <span class="mf">0.004</span>
     <span class="n">r</span>               <span class="mi">16</span>
 </pre></div>
 </div>
@@ -234,22 +233,22 @@ to the function <code class="docutils literal notranslate"><span class="pre">int
 <div class="section" id="european-arithmetic-mean-asian-put-option-single-level">
 <h2>European Arithmetic-Mean Asian Put Option: Single Level<a class="headerlink" href="#european-arithmetic-mean-asian-put-option-single-level" title="Permalink to this headline">¶</a></h2>
 <p>In this example, we want to estimate the payoff of an European Asian put
-option that matures at time <img class="math" src="../_images/math/e8dea8254118f111b5fb20895b03528c17566f06.png" alt="T"/>. The key mathematical entities are
+option that matures at time <span class="math">T</span>. The key mathematical entities are
 defined as follows:</p>
 <ul class="simple">
-<li><p>Stock price at time <img class="math" src="../_images/math/6a981a006e094952cd22f224c83785773e5fe2b5.png" alt="t_j := jT/d"/> for <img class="math" src="../_images/math/9f8124522c835e17e797abefc5646f7f2392b894.png" alt="j=1,\dots,d"/> is a
-function of its initial price <img class="math" src="../_images/math/18dc2b76474a9ce924e0e17e168ad2e3c5b15550.png" alt="S(0)"/>, interest rate <img class="math" src="../_images/math/79a3d439d28652c547386f39b555d90d3aaf102d.png" alt="r"/>,
-and volatility <img class="math" src="../_images/math/b52df27bfb0b1e3af0c2c68a7b9da459178c2a7d.png" alt="\sigma"/>:
-<img class="math" src="../_images/math/44f8a7d6198d29d8ad717b833459b4d2b569d2a4.png" alt="S(t_j) = S(0)e^{\left(r-\frac{\sigma^2}{2}\right)t_j + \sigma\mathcal{B}(t_j)}"/></p></li>
+<li><p>Stock price at time <span class="math">t_j := jT/d</span> for <span class="math">j=1,\dots,d</span> is a
+function of its initial price <span class="math">S(0)</span>, interest rate <span class="math">r</span>,
+and volatility <span class="math">\sigma</span>:
+<span class="math">S(t_j) = S(0)e^{\left(r-\frac{\sigma^2}{2}\right)t_j + \sigma\mathcal{B}(t_j)}</span></p></li>
 <li><p>Discounted put option payoff is defined as the difference of a fixed
-strike price <img class="math" src="../_images/math/52ddc0cde6d632f631533173562fe3ca375b1f32.png" alt="K"/> and the arithmetic average of the underlying
-stock prices at <img class="math" src="../_images/math/badad346f6fbe2e237af99bfbd9a93a4da53a3da.png" alt="d"/> discrete time intervals in <img class="math" src="../_images/math/dc80520846361c8029d8f37876682d028d88dc84.png" alt="[0,T]"/>:
-<img class="math" src="../_images/math/d7b1e4b58f998b2e0c660a9a9b85ad04a06a0987.png" alt="max \left(K-\frac{1}{d}\sum_{j=1}^{d} S(t_j), 0 \right) e^{-rT}"/></p></li>
+strike price <span class="math">K</span> and the arithmetic average of the underlying
+stock prices at <span class="math">d</span> discrete time intervals in <span class="math">[0,T]</span>:
+<span class="math">max \left(K-\frac{1}{d}\sum_{j=1}^{d} S(t_j), 0 \right) e^{-rT}</span></p></li>
 <li><p>Brownian motion true measure:
-<img class="math" src="../_images/math/9152c5d94c73caf2af55e1545719e2737dd8b2c5.png" alt="\mathcal{B}(t_j) = B(t_{j-1}) + Z_j\sqrt{t_j-t_{j-1}} \;"/> for
-<img class="math" src="../_images/math/8decaec27b72554c40a38b137109b2cbb4541966.png" alt="\;Z_j \sim \mathcal{N}(0,1)"/></p></li>
+<span class="math">\mathcal{B}(t_j) = B(t_{j-1}) + Z_j\sqrt{t_j-t_{j-1}} \;</span> for
+<span class="math">\;Z_j \sim \mathcal{N}(0,1)</span></p></li>
 <li><p>Lattice discrete distribution:
-<img class="math" src="../_images/math/1bb1625757924968ef52963ac835f2f60b3dbf88.png" alt="\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)"/></p></li>
+<span class="math">\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)</span></p></li>
 </ul>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">time_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">65</span> <span class="o">/</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">64</span><span class="p">)]</span>
 <span class="n">dim</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tv</span><span class="p">)</span> <span class="k">for</span> <span class="n">tv</span> <span class="ow">in</span> <span class="n">time_vec</span><span class="p">]</span>
@@ -291,7 +290,7 @@ stock prices at <img class="math" src="../_images/math/badad346f6fbe2e237af99bfb
     <span class="n">n</span>               <span class="mi">2048</span>
     <span class="n">n_total</span>         <span class="mi">2048</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.257</span>  <span class="mf">6.262</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.385</span>
+    <span class="n">time_total</span>      <span class="mf">0.302</span>
     <span class="n">r</span>               <span class="mi">16</span>
 </pre></div>
 </div>
@@ -301,11 +300,11 @@ stock prices at <img class="math" src="../_images/math/badad346f6fbe2e237af99bfb
 <p>This example is similar to the last one except that we use Gile’s
 multi-level method for estimation of the option price. The main idea can
 be summarized as follows:</p>
-<p><img class="math" src="../_images/math/469ced9d6a93f0c8d81f00becc42a7dd5b1b01a4.png" alt="Y_0 = 0"/></p>
-<p><img class="math" src="../_images/math/a23fedc576de09a7428926bd62c40868cac6b502.png" alt="Y_1 = \mbox{ Asian option monitored at } t = [\frac{1}{4}, \frac{1}{2}, \frac{3}{4}, 1]"/></p>
-<p><img class="math" src="../_images/math/6ad6a446a3ae9cf3bded5ea7892b185dd674f346.png" alt="Y_2 = \mbox{ Asian option monitored at } t= [\frac{1}{16}, \frac{1}{8}, ... , 1]"/></p>
-<p><img class="math" src="../_images/math/9a2007f5411bf695ab868b544bae3ec2a32000b0.png" alt="Y_3 = \mbox{ Asian option monitored at } t= [\frac{1}{64}, \frac{1}{32}, ... , 1]"/></p>
-<p><img class="math" src="../_images/math/0007ba969179eb0e51233af8c808a9da956aa51b.png" alt="Z_1 = \mathbb{E}[Y_1-Y_0] + \mathbb{E}[Y_2-Y_1] + \mathbb{E}[Y_3-Y_2] = \mathbb{E}[Y_3]"/></p>
+<p><span class="math">Y_0 = 0</span></p>
+<p><span class="math">Y_1 = \mbox{ Asian option monitored at } t = [\frac{1}{4}, \frac{1}{2}, \frac{3}{4}, 1]</span></p>
+<p><span class="math">Y_2 = \mbox{ Asian option monitored at } t= [\frac{1}{16}, \frac{1}{8}, ... , 1]</span></p>
+<p><span class="math">Y_3 = \mbox{ Asian option monitored at } t= [\frac{1}{64}, \frac{1}{32}, ... , 1]</span></p>
+<p><span class="math">Z_1 = \mathbb{E}[Y_1-Y_0] + \mathbb{E}[Y_2-Y_1] + \mathbb{E}[Y_3-Y_2] = \mathbb{E}[Y_3]</span></p>
 <p>The total run time for this example is about one-third of that for the
 last example.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">time_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span>
@@ -326,7 +325,7 @@ last example.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">6.2591</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">6.2602</span>
 <span class="n">AsianCall</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">volatility</span>      <span class="p">[</span> <span class="mf">0.500</span>  <span class="mf">0.500</span>  <span class="mf">0.500</span><span class="p">]</span>
     <span class="n">start_price</span>     <span class="p">[</span><span class="mi">30</span> <span class="mi">30</span> <span class="mi">30</span><span class="p">]</span>
@@ -348,10 +347,10 @@ last example.</p>
     <span class="n">inflate</span>         <span class="mf">1.200</span>
     <span class="n">alpha</span>           <span class="mf">0.010</span>
 <span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
-    <span class="n">n</span>               <span class="p">[</span> <span class="mf">282839.000</span>  <span class="mf">35960.000</span>  <span class="mf">6938.000</span><span class="p">]</span>
-    <span class="n">n_total</span>         <span class="mi">328809</span>
-    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.210</span>  <span class="mf">6.308</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.121</span>
+    <span class="n">n</span>               <span class="p">[</span> <span class="mf">289512.000</span>  <span class="mf">34184.000</span>  <span class="mf">5514.000</span><span class="p">]</span>
+    <span class="n">n_total</span>         <span class="mi">332282</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.211</span>  <span class="mf">6.309</span><span class="p">]</span>
+    <span class="n">time_total</span>      <span class="mf">0.088</span>
 </pre></div>
 </div>
 </div>
@@ -369,7 +368,7 @@ last example.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="lebesgue_integration.html" class="btn btn-neutral float-right" title="QMCPy for Lebesgue Integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sample_scatter_plots.html" class="btn btn-neutral float-right" title="Scatter Plots of Samples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="qmcpy_intro.html" class="btn btn-neutral float-left" title="Welcome to QMCPy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
