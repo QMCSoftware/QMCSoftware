@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>QMCPy for Lebesgue Integration &mdash; QMCPy 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Scatter Plots of Samples" href="sample_scatter_plots.html" />
+    <link rel="prev" title="Integration Examples using QMCPy package" href="integration_examples.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> QMCPy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">About Our QMC Software Community</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../algorithms.html">QMCPy Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../demos.html">Demos</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qmcpy_intro.html">Welcome to QMCPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration_examples.html">Integration Examples using QMCPy package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">QMCPy for Lebesgue Integration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sample-problem-1">Sample Problem 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sample-problem-2">Sample Problem 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sample-problem-3">Sample Problem 3</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sample_scatter_plots.html">Scatter Plots of Samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MC_vs_QMC.html">A Monte Carlo vs Quasi-Monte Carlo Comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MC_vs_QMC.html#absolute-tolerance-plots">Absolute Tolerance Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MC_vs_QMC.html#dimension-plots">Dimension Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quasirandom_generators.html">Quasi-Random Sequence Generator Comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quasirandom_generators.html#magic-point-shop-vs-pytorch-for-sobol-backend">Magic Point Shop vs Pytorch for Sobol Backend</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QMCPy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../demos.html">Demos</a> &raquo;</li>
+        
+      <li>QMCPy for Lebesgue Integration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="qmcpy-for-lebesgue-integration">
+<h1>QMCPy for Lebesgue Integration<a class="headerlink" href="#qmcpy-for-lebesgue-integration" title="Permalink to this headline">¶</a></h1>
+<p>This notebook will give examples of how to use QMCPy for integration
+problems that not are defined in terms of a standard measure.
+i.e. Uniform or Gaussian.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qmcpy</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="section" id="sample-problem-1">
+<h2>Sample Problem 1<a class="headerlink" href="#sample-problem-1" title="Permalink to this headline">¶</a></h2>
+<p><img class="math" src="../_images/math/ddcdbf92a82a9ab26edf9e185bb5ee3bf828f8c6.png" alt="y = \int_{[0,2]} x^2 dx, \:\: \mbox{Lebesgue Measure}"/></p>
+<p><img class="math" src="../_images/math/71101a19a7c1509d840d2618b1b94730b167b75f.png" alt="\phantom{y} = 2\int_{[0,2]} \frac{x^2}{2} dx, \:\: \mbox{Uniform Measure}"/></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">abs_tol</span> <span class="o">=</span> <span class="o">.</span><span class="mi">01</span>
+<span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">]])</span>
+<span class="n">true_value</span> <span class="o">=</span> <span class="mi">8</span><span class="o">/</span><span class="mi">3</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Lebesgue Measure</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">custom_fun</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">IIDStdUniform</span><span class="p">()</span>
+<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Lebesgue</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">lower_bound</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">upper_bound</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLT</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">)</span>
+<span class="n">sol1</span><span class="p">,</span> <span class="n">data1</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;y = </span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">sol1</span>)
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Within tolerance:&#39;</span><span class="p">,</span><span class="nb">abs</span><span class="p">((</span><span class="n">sol1</span><span class="o">-</span><span class="n">true_value</span><span class="p">))</span><span class="o">&lt;</span><span class="n">abs_tol</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">2.670</span>
+<span class="n">Within</span> <span class="n">tolerance</span><span class="p">:</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uniform Measure</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">custom_fun</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">IIDStdUniform</span><span class="p">()</span>
+<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Uniform</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">lower_bound</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">upper_bound</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLT</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">)</span>
+<span class="n">sol2</span><span class="p">,</span> <span class="n">data2</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;y = </span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">sol2</span>)
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Within tolerance:&#39;</span><span class="p">,</span><span class="nb">abs</span><span class="p">((</span><span class="n">sol2</span><span class="o">-</span><span class="n">true_value</span><span class="p">))</span><span class="o">&lt;</span><span class="n">abs_tol</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">2.665</span>
+<span class="n">Within</span> <span class="n">tolerance</span><span class="p">:</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sample-problem-2">
+<h2>Sample Problem 2<a class="headerlink" href="#sample-problem-2" title="Permalink to this headline">¶</a></h2>
+<p><img class="math" src="../_images/math/ed11fca4e3bffa9248c69b0e7c33221aa8cb9ed4.png" alt="y = \int_{[a,b]^d} ||x||_2^2 dx, \:\: \mbox{Lebesgue Measure}"/></p>
+<p><img class="math" src="../_images/math/d0f4a38ee5e7f5e910fd4847f07b9f30c37dbc62.png" alt="\phantom{y} = \Pi_{i=1}^d (b_i-a_i)\int_{[a,b]^d} ||x||_2^2 \; [ \Pi_{i=1}^d (b_i-a_i)]^{-1} dx, \:\: \mbox{Uniform Measure}"/></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">abs_tol</span> <span class="o">=</span> <span class="o">.</span><span class="mi">001</span>
+<span class="n">dim</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]])</span>
+<span class="n">true_value</span> <span class="o">=</span> <span class="p">((</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="mi">3</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Answer = </span><span class="si">%.5f</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">true_value</span>)
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Answer</span> <span class="o">=</span> <span class="mf">23.33333</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Lebesgue Measure</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">custom_fun</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Sobol</span><span class="p">()</span>
+<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Lebesgue</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">lower_bound</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">upper_bound</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">)</span>
+<span class="n">sol1</span><span class="p">,</span> <span class="n">data1</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;y = </span><span class="si">%.5f</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">sol1</span>)
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Within tolerance:&#39;</span><span class="p">,</span><span class="nb">abs</span><span class="p">((</span><span class="n">sol1</span><span class="o">-</span><span class="n">true_value</span><span class="p">))</span><span class="o">&lt;</span><span class="n">abs_tol</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">23.33348</span>
+<span class="n">Within</span> <span class="n">tolerance</span><span class="p">:</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uniform Measure</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">custom_fun</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Sobol</span><span class="p">()</span>
+<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Uniform</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">lower_bound</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">upper_bound</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">)</span>
+<span class="n">sol2</span><span class="p">,</span> <span class="n">data2</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;y = </span><span class="si">%.5f</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">sol2</span>)
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Within tolerance:&#39;</span><span class="p">,</span><span class="nb">abs</span><span class="p">((</span><span class="n">sol1</span><span class="o">-</span><span class="n">true_value</span><span class="p">))</span><span class="o">&lt;</span><span class="n">abs_tol</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">23.33322</span>
+<span class="n">Within</span> <span class="n">tolerance</span><span class="p">:</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sample-problem-3">
+<h2>Sample Problem 3<a class="headerlink" href="#sample-problem-3" title="Permalink to this headline">¶</a></h2>
+<p>Integral that cannot be done in terms of any standard mathematical
+functions
+<a class="reference external" href="https://reference.wolfram.com/language/tutorial/IntegralsThatCanAndCannotBeDone.html">(WOLFRAM)</a></p>
+<div class="math">
+<p><img src="../_images/math/0389e4e670c7fe5d68349886c73d846b192ee969.png" alt="y = \int_{[a,b]} \frac{\sin{x}}{\log{x}} dx, \:\: \mbox{Lebesgue Measure}"/></p>
+</div><p>Mathematica Code: <code class="docutils literal notranslate"><span class="pre">Integrate[Sin[x]/Log[x],</span> <span class="pre">{x,a,b}]</span></code></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">abs_tol</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0001</span>
+<span class="n">dim</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">5</span><span class="p">]])</span>
+<span class="n">true_value</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.87961</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Lebesgue Measure</span>
+<span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">custom_fun</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">discrete_distrib</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">()</span>
+<span class="n">true_measure</span> <span class="o">=</span> <span class="n">Lebesgue</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">lower_bound</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">upper_bound</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+<span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CLTRep</span><span class="p">(</span><span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">)</span>
+<span class="n">sol</span><span class="p">,</span> <span class="n">data1</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">true_measure</span><span class="p">,</span> <span class="n">discrete_distrib</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;y = </span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">sol</span>)
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Within tolerance:&#39;</span><span class="p">,</span><span class="nb">abs</span><span class="p">((</span><span class="n">sol</span><span class="o">-</span><span class="n">true_value</span><span class="p">))</span><span class="o">&lt;</span><span class="n">abs_tol</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.880</span>
+<span class="n">Within</span> <span class="n">tolerance</span><span class="p">:</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/QMCSoftware/QMCSoftware">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sample_scatter_plots.html" class="btn btn-neutral float-right" title="Scatter Plots of Samples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="integration_examples.html" class="btn btn-neutral float-left" title="Integration Examples using QMCPy package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Illinois Institute of Technology
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

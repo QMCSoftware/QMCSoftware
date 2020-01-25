@@ -25,8 +25,6 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/HTML-CSS"]})</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -179,7 +177,7 @@
 <dl class="function">
 <dt id="qmcpy.integrate.integrate">
 <code class="sig-prename descclassname">qmcpy.integrate.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">true_measure</em>, <em class="sig-param">discrete_distrib=None</em>, <em class="sig-param">stopping_criterion=None</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrate.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and compute integral of <span class="math notranslate nohighlight">\(f(\boldsymbol{x})\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathcal{X}\)</span>.</p>
+<dd><p>Specify and compute integral of <img class="math" src="_images/math/62486ca5fbdbf5f4be95b099693f6e470aa583cc.png" alt="f(\boldsymbol{x})"/> for     <img class="math" src="_images/math/a2f00565c3dd53f5a194432607301ea5ed74565d.png" alt="\boldsymbol{x} \in \mathcal{X}"/>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -238,10 +236,10 @@ sum of two variables defined on unit square is used.</p></li>
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>,             then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>,             and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -263,7 +261,7 @@ dimension (int): number of dimensions</p>
 <dl class="class">
 <dt id="qmcpy.integrand.keister.Keister">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.keister.</code><code class="sig-name descname">Keister</code><span class="sig-paren">(</span><em class="sig-param">dimension</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.keister.Keister" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values     <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \pi^{d/2} \cos(\| \boldsymbol{x} \|)\)</span> for     <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathbb{R}^d\)</span>.</p>
+<dd><p>Specify and generate values     <img class="math" src="_images/math/d5465e9b76ae73e435fa14d8f24ea0dd76b94289.png" alt="f(\boldsymbol{x}) = \pi^{d/2} \cos(\| \boldsymbol{x} \|)"/> for     <img class="math" src="_images/math/b4664e1714e17b329091f0f6f5e389a6ee307ea9.png" alt="\boldsymbol{x} \in \mathbb{R}^d"/>.</p>
 <p>The standard example integrates the Keister integrand with respect to an     IID Gaussian distribution with variance 1/2.</p>
 <dl class="simple">
 <dt>Reference:</dt><dd><ol class="upperalpha simple" start="2">
@@ -290,10 +288,10 @@ dimension (int): number of dimensions</p>
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>,             then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>,             and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -307,7 +305,7 @@ dimension (int): number of dimensions</p>
 <dl class="class">
 <dt id="qmcpy.integrand.linear.Linear">
 <em class="property">class </em><code class="sig-prename descclassname">qmcpy.integrand.linear.</code><code class="sig-name descname">Linear</code><span class="sig-paren">(</span><em class="sig-param">dimension</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify and generate values <span class="math notranslate nohighlight">\(f(\boldsymbol{x}) = \sum_{i=1}^d x_i\)</span>     for <span class="math notranslate nohighlight">\(\boldsymbol{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d\)</span></p>
+<dd><p>Specify and generate values <img class="math" src="_images/math/71c4ff5ba5f802e36b76f4bbff7b72ecdfcb04a9.png" alt="f(\boldsymbol{x}) = \sum_{i=1}^d x_i"/>     for <img class="math" src="_images/math/369a24cfb7e2da06df160fcd73f91a499af30423.png" alt="\boldsymbol{x} = (x_1,\ldots,x_d) \in \mathbb{R}^d"/></p>
 <dl class="method">
 <dt id="qmcpy.integrand.linear.Linear.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">dimension</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.integrand.linear.Linear.__init__" title="Permalink to this definition">¶</a></dt>
@@ -324,10 +322,10 @@ dimension (int): number of dimensions</p>
 <dd><p>Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>,             then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>,             and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -357,7 +355,7 @@ dimension (int): number of dimensions</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Input of the function:</p>
-<p>x: nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                         row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
+<p>x: nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                         row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
 </div>
 </dd></dl>
 
@@ -368,10 +366,10 @@ dimension (int): number of dimensions</p>
 Original integrand to be integrated</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – nodes, <span class="math notranslate nohighlight">\(\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}\)</span>                 row of an <span class="math notranslate nohighlight">\(n \cdot |\mathfrak{u}|\)</span> matrix</p>
+<dd class="field-odd"><p><strong>x</strong> – nodes, <img class="math" src="_images/math/d504455dec832380c3be0747e6bc269cd56eb983.png" alt="\boldsymbol{x}_{\mathfrak{u},i} = i^{\mathtt{th}}"/>                 row of an <img class="math" src="_images/math/79668ae33dc0f511bc92c793f86fa4bc83ffe5e3.png" alt="n \cdot |\mathfrak{u}|"/> matrix</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><span class="math notranslate nohighlight">\(n \cdot p\)</span> matrix with values             <span class="math notranslate nohighlight">\(f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})\)</span> where if             <span class="math notranslate nohighlight">\(\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j\)</span>,             then <span class="math notranslate nohighlight">\(x'_{ij} = x_{ij}\)</span> for <span class="math notranslate nohighlight">\(j \in \mathfrak{u}\)</span>,             and <span class="math notranslate nohighlight">\(x'_{ij} = c\)</span> otherwise</p>
+<dd class="field-even"><p><img class="math" src="_images/math/545a511cba7ad5289ceaa4037fd570ff57f8754d.png" alt="n \cdot p"/> matrix with values             <img class="math" src="_images/math/3e27d723720bf7e78697cc039cfa4c5492b72948.png" alt="f(\boldsymbol{x}_{\mathfrak{u},i},\mathbf{c})"/> where if             <img class="math" src="_images/math/2bc380e9b2379b7f530d1d311ac3fd0fe8d606df.png" alt="\boldsymbol{x}_i' = (x_{i, \mathfrak{u}},\mathbf{c})_j"/>,             then <img class="math" src="_images/math/10638cab2409ee63161f5896a8185a18a05875a0.png" alt="x'_{ij} = x_{ij}"/> for <img class="math" src="_images/math/c1704adba9c94d3b0a8e92444a7748544c7df873.png" alt="j \in \mathfrak{u}"/>,             and <img class="math" src="_images/math/aacef5211f5792048dfdc4fc144b717385c4c0fb.png" alt="x'_{ij} = c"/> otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -574,11 +572,11 @@ Original integrand to be integrated</p>
 <span class="target" id="module-qmcpy.discrete_distribution.sobol"></span><p>Definition for Sobol, a concrete implementation of DiscreteDistribution</p>
 <dl class="class">
 <dt id="qmcpy.discrete_distribution.sobol.Sobol">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.sobol.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.discrete_distribution.sobol.</code><code class="sig-name descname">Sobol</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='mps'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quasi-Random Sobol low discrepancy sequence (Base 2)</p>
 <dl class="method">
 <dt id="qmcpy.discrete_distribution.sobol.Sobol.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='Pytorch'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">rng_seed=None</em>, <em class="sig-param">backend='mps'</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.discrete_distribution.sobol.Sobol.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – seed the random number generator for reproducibility</p>
@@ -828,67 +826,67 @@ and store the sample mean and variance of integrand values</p>
 <div class="section" id="utilities">
 <h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-qmcpy"></span><p>Meta-data and public utilities for qmcpy</p>
-<span class="target" id="module-qmcpy._util._exceptions_warnings"></span><p>Exceptions and Warnings thrown by qmcpy</p>
+<span class="target" id="module-qmcpy.util.exceptions_warnings"></span><p>Exceptions and Warnings thrown by qmcpy</p>
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.DimensionError">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">DimensionError</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.DimensionError" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.DimensionError">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">DimensionError</code><a class="headerlink" href="#qmcpy.util.exceptions_warnings.DimensionError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for raising error about dimension</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.DistributionCompatibilityError">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">DistributionCompatibilityError</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.DistributionCompatibilityError" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.DistributionCompatibilityError">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">DistributionCompatibilityError</code><a class="headerlink" href="#qmcpy.util.exceptions_warnings.DistributionCompatibilityError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for raising error about incompatible distribution</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.DistributionGenerationError">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">DistributionGenerationError</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.DistributionGenerationError" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.DistributionGenerationError">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">DistributionGenerationError</code><a class="headerlink" href="#qmcpy.util.exceptions_warnings.DistributionGenerationError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for raising error about parameter inputs
 to gen_dd_samples (method of a DiscreteDistribution)</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.DistributionGenerationWarnings">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">DistributionGenerationWarnings</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.DistributionGenerationWarnings" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.DistributionGenerationWarnings">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">DistributionGenerationWarnings</code><a class="headerlink" href="#qmcpy.util.exceptions_warnings.DistributionGenerationWarnings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for issuing warningssabout parameter inputs
 to gen_dd_samples (method of a DiscreteDistribution)</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.MaxSamplesWarning">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">MaxSamplesWarning</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.MaxSamplesWarning" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.MaxSamplesWarning">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">MaxSamplesWarning</code><a class="headerlink" href="#qmcpy.util.exceptions_warnings.MaxSamplesWarning" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for issuing warning about using maximum number of data samples</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.MethodImplementationError">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">MethodImplementationError</code><span class="sig-paren">(</span><em class="sig-param">subclass</em>, <em class="sig-param">method_name</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy._util._exceptions_warnings.MethodImplementationError" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.MethodImplementationError">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">MethodImplementationError</code><span class="sig-paren">(</span><em class="sig-param">subclass</em>, <em class="sig-param">method_name</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.util.exceptions_warnings.MethodImplementationError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for raising error when an abstract method has not been implemented
 in the child class.</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.NotYetImplemented">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">NotYetImplemented</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.NotYetImplemented" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.NotYetImplemented">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">NotYetImplemented</code><a class="headerlink" href="#qmcpy.util.exceptions_warnings.NotYetImplemented" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for raising error when a component has been implemented yet</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.ParameterError">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">ParameterError</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.ParameterError" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.ParameterError">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">ParameterError</code><a class="headerlink" href="#qmcpy.util.exceptions_warnings.ParameterError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for raising error about input parameters</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.ParameterWarning">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">ParameterWarning</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.ParameterWarning" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.ParameterWarning">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">ParameterWarning</code><a class="headerlink" href="#qmcpy.util.exceptions_warnings.ParameterWarning" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for issuing warnings about unacceptable parameters</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="qmcpy._util._exceptions_warnings.TransformError">
-<em class="property">exception </em><code class="sig-prename descclassname">qmcpy._util._exceptions_warnings.</code><code class="sig-name descname">TransformError</code><a class="headerlink" href="#qmcpy._util._exceptions_warnings.TransformError" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.util.exceptions_warnings.TransformError">
+<em class="property">exception </em><code class="sig-prename descclassname">qmcpy.util.exceptions_warnings.</code><code class="sig-name descname">TransformError</code><a class="headerlink" href="#qmcpy.util.exceptions_warnings.TransformError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for raising error about transforming function to accommodate     distribution</p>
 </dd></dl>
 

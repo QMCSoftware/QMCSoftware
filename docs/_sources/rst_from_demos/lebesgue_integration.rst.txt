@@ -13,13 +13,9 @@ i.e. Uniform or Gaussian.
 Sample Problem 1
 ----------------
 
-.. math::
+:math:`y = \int_{[0,2]} x^2 dx, \:\: \mbox{Lebesgue Measure}`
 
-
-   \begin{align}
-       y &= \int_{[0,2]} x^2 dx, \:\: \text{Lebesgue Measure}\\
-             &= 2\int_{[0,2]} \frac{x^2}{2} dx, \:\: \text{Uniform Measure}
-   \end{align}
+:math:`\phantom{y} = 2\int_{[0,2]} \frac{x^2}{2} dx, \:\: \mbox{Uniform Measure}`
 
 .. code:: ipython3
 
@@ -61,20 +57,16 @@ Sample Problem 1
 
 .. parsed-literal::
 
-    y = 2.666
+    y = 2.665
     Within tolerance: True
 
 
 Sample Problem 2
 ----------------
 
-.. math::
+:math:`y = \int_{[a,b]^d} ||x||_2^2 dx, \:\: \mbox{Lebesgue Measure}`
 
-
-   \begin{align}
-       y &= \int_{[a,b]^d} ||x||_2^2 dx, \:\: \text{Lebesgue Measure}\\
-             &= \Pi_{i=1}^d (b_i-a_i)\int_{[a,b]^d} ||x||_2^2 \; [ \Pi_{i=1}^d (b_i-a_i)]^{-1} dx, \:\: \text{Uniform Measure}
-   \end{align}
+:math:`\phantom{y} = \Pi_{i=1}^d (b_i-a_i)\int_{[a,b]^d} ||x||_2^2 \; [ \Pi_{i=1}^d (b_i-a_i)]^{-1} dx, \:\: \mbox{Uniform Measure}`
 
 .. code:: ipython3
 
@@ -105,7 +97,7 @@ Sample Problem 2
 
 .. parsed-literal::
 
-    y = 23.33303
+    y = 23.33348
     Within tolerance: True
 
 
@@ -123,7 +115,7 @@ Sample Problem 2
 
 .. parsed-literal::
 
-    y = 23.33310
+    y = 23.33322
     Within tolerance: True
 
 
@@ -134,9 +126,9 @@ Integral that cannot be done in terms of any standard mathematical
 functions
 `(WOLFRAM) <https://reference.wolfram.com/language/tutorial/IntegralsThatCanAndCannotBeDone.html>`__\ 
 
-.. math:: y = \int_{[a,b]} \frac{\sin{x}}{\log{x}} dx, \:\: \text{Lebesgue Measure}
+.. math:: y = \int_{[a,b]} \frac{\sin{x}}{\log{x}} dx, \:\: \mbox{Lebesgue Measure}
 
- ~~~ Mathematica Code: Integrate[Sin[x]/Log[x], {x,a,b}] ~~~
+Mathematica Code: ``Integrate[Sin[x]/Log[x], {x,a,b}]``
 
 .. code:: ipython3
 
@@ -162,5 +154,4 @@ functions
 
     y = -0.880
     Within tolerance: True
-
 

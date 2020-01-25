@@ -43,12 +43,12 @@ release = u"0.1"
 
 extensions = ["sphinx.ext.autodoc",
               "sphinx.ext.githubpages",
-              # "sphinx.ext.imgmath",  # for epub latex
+              "sphinx.ext.imgmath",  # for epub latex
               "sphinx.ext.napoleon",
               "sphinx.ext.graphviz",
               "sphinx.ext.intersphinx",
               "sphinx_rtd_theme",
-              "sphinx.ext.mathjax",
+              "sphinx.ext.mathjax",  # for html latex
               "sphinx.ext.doctest",
               "sphinx.ext.coverage",
               "sphinx.ext.ifconfig",
@@ -121,7 +121,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # -- Options for LaTeX output ------------------------------------------------
 
-# Paths  on S.C. Choi"s Mac machine for latex
+# Paths on S.C. Choi"s Mac machine for latex
 #imgmath_latex = r"/Library/TeX/texbin/latex"
 #imgmath_dvipng = r"/Library/TeX/texbin/dvipng"
 #imgmath_font_size = 10

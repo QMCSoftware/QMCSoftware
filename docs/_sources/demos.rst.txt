@@ -8,8 +8,11 @@ Demos
 
     rst_from_demos/integration_examples.rst
 
+    rst_from_demos/lebesgue_integration.rst
+
     rst_from_demos/sample_scatter_plots.rst
 
     rst_from_demos/MC_vs_QMC.rst
 
     rst_from_demos/quasirandom_generators.rst
+

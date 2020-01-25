@@ -25,8 +25,6 @@
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script type="text/javascript" src="../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/HTML-CSS"]})</script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -103,6 +101,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="integration_examples.html">Integration Examples using QMCPy package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lebesgue_integration.html">QMCPy for Lebesgue Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sample_scatter_plots.html">Scatter Plots of Samples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MC_vs_QMC.html">A Monte Carlo vs Quasi-Monte Carlo Comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MC_vs_QMC.html#absolute-tolerance-plots">Absolute Tolerance Plots</a></li>
@@ -228,17 +227,17 @@ samples of 2 dimensions.</p>
 <h3>Multi-Dimensional Inputs<a class="headerlink" href="#multi-dimensional-inputs" title="Permalink to this headline">¶</a></h3>
 <p>Suppose we want to create an integrand in QMCPy for evaluating the
 following integral:</p>
-<div class="math notranslate nohighlight">
-\[\int_{[0,1]^d} \|x\|_2^{\|x\|_2^{1/2}} dx,\]</div>
-<p>where <span class="math notranslate nohighlight">\([0,1]^d\)</span> is the unit hypercube in <span class="math notranslate nohighlight">\(\mathbb{R}^d\)</span>.
-The integrand is defined everywhere except at <span class="math notranslate nohighlight">\(x=0\)</span> and hence the
+<div class="math">
+<p><img src="../_images/math/6bf2402e203c2181888879db5e5139bd166e67f0.png" alt="\int_{[0,1]^d} \|x\|_2^{\|x\|_2^{1/2}} dx,"/></p>
+</div><p>where <img class="math" src="../_images/math/38fbdb5f0cd005023c1bb115f01c323f34f20446.png" alt="[0,1]^d"/> is the unit hypercube in <img class="math" src="../_images/math/884e1da60bb111e9150f609e22bf2279198ca3ce.png" alt="\mathbb{R}^d"/>.
+The integrand is defined everywhere except at <img class="math" src="../_images/math/c34170440d4046a9b3e1ef2635a2f5d6a529a421.png" alt="x=0"/> and hence the
 definite integral is also defined.</p>
 <p>The key in defining a Python function of an integrand in the QMCPy
 framework is that not only it should be able to take one point
-<span class="math notranslate nohighlight">\(x \in \mathbb{R}^d\)</span> and return a real value, but also that it
-would be able to take a set of <span class="math notranslate nohighlight">\(n\)</span> sampling points as rows in a
-Numpy array of size <span class="math notranslate nohighlight">\(n \times d\)</span> and return an array with
-<span class="math notranslate nohighlight">\(n\)</span> values evaluated at each sampling point. The following
+<img class="math" src="../_images/math/d1eb27e1a34a44fda5bd2d1d8afe28e406c2c4ec.png" alt="x \in \mathbb{R}^d"/> and return a real value, but also that it
+would be able to take a set of <img class="math" src="../_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/> sampling points as rows in a
+Numpy array of size <img class="math" src="../_images/math/4d12ac487d1a138965cbfcfb083d9756094e7a9b.png" alt="n \times d"/> and return an array with
+<img class="math" src="../_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/> values evaluated at each sampling point. The following
 examples illustrate this point.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">norm</span> <span class="k">as</span> <span class="n">norm</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">array</span>
@@ -259,8 +258,8 @@ behaves as expected at a point value:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.6309573444801932</span>
 </pre></div>
 </div>
-<p>What about an array that represents <span class="math notranslate nohighlight">\(n=3\)</span> sampling points in a
-two-dimensional domain, i.e., <span class="math notranslate nohighlight">\(d=2\)</span>?</p>
+<p>What about an array that represents <img class="math" src="../_images/math/e2dadce04a2659bc91fcda0d68abebe8b9eea927.png" alt="n=3"/> sampling points in a
+two-dimensional domain, i.e., <img class="math" src="../_images/math/70c185d024e038ba37d7018dc84eefd8616db41a.png" alt="d=2"/>?</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">],</span>
            <span class="p">[</span><span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">]])</span>
@@ -270,7 +269,7 @@ two-dimensional domain, i.e., <span class="math notranslate nohighlight">\(d=2\)
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.001650000560437</span>
 </pre></div>
 </div>
-<p>Now, the function should have returned <span class="math notranslate nohighlight">\(n=3\)</span> real values that
+<p>Now, the function should have returned <img class="math" src="../_images/math/e2dadce04a2659bc91fcda0d68abebe8b9eea927.png" alt="n=3"/> real values that
 corresponding to each of the sampling points. Let’s debug our Python
 function.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -335,7 +334,7 @@ class in QMCPy and then invoke QMCPy’s <code class="docutils literal notransla
     <span class="n">n</span>               <span class="mi">3305</span>
     <span class="n">n_total</span>         <span class="mi">4329</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.647</span>  <span class="mf">0.668</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.003</span>
+    <span class="n">time_total</span>      <span class="mf">0.004</span>
 </pre></div>
 </div>
 <p>For our integral, we know the true value. Let’s check if QMCPy’s
@@ -349,7 +348,7 @@ solution is accurate enough:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kc">True</span>
 </pre></div>
 </div>
-<p>It’s good. Shall we test the function with <span class="math notranslate nohighlight">\(d=2\)</span> by simply
+<p>It’s good. Shall we test the function with <img class="math" src="../_images/math/70c185d024e038ba37d7018dc84eefd8616db41a.png" alt="d=2"/> by simply
 changing the input parameter value of dimension for QuickConstruct?</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">integrand2</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
@@ -375,7 +374,7 @@ changing the input parameter value of dimension for QuickConstruct?</p>
     <span class="n">n</span>               <span class="mi">5452</span>
     <span class="n">n_total</span>         <span class="mi">6476</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.821</span>  <span class="mf">0.841</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.002</span>
+    <span class="n">time_total</span>      <span class="mf">0.003</span>
 </pre></div>
 </div>
 <p>Once again, we could test for accuracy of QMCPy with respect to the true
