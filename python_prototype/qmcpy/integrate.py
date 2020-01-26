@@ -46,8 +46,7 @@ def integrate(integrand, true_measure, discrete_distrib=None, stopping_criterion
     true_measure.transform(integrand, discrete_distrib)
     while stopping_criterion.stage != "done":
         # the data.stage property tells us where we are in the process
-        stopping_criterion.data.update_data(
-            integrand, true_measure)  # compute more data
+        stopping_criterion.data.update_data(integrand, true_measure)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
     solution = stopping_criterion.data.solution  # assign outputs
     cpu_time = process_time() - t_start

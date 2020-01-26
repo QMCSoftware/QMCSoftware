@@ -67,3 +67,9 @@ class MaxSamplesWarning(Warning):
     """
     Class for issuing warning about using maximum number of data samples
     """
+
+
+class CubatureWarning(Warning):
+    """
+    Class for issuing warnings throughout cubature algorithms
+    """
