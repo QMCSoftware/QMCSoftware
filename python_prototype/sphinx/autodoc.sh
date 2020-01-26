@@ -7,7 +7,7 @@ echo "QMCPy autodoc process starts..."
 echo "$(date)"
 
 ################################################################################
-# Use pandoc to generate RST (ReStructured Text) files from REAME.md that has
+# Use pandoc to generate RST (ReStructured Text) files from README.md that has
 # LaTeX expressions
 ################################################################################
 cd ../..  # to go to directory QMCSoftware
@@ -29,6 +29,8 @@ python python_prototype/sphinx/render_readme_as_rst.py
 # restore original README.md that contains certain keywords
 rm README.md
 mv README.bak README.md
+
+rm $DIR/docs.rst
 
 ################################################################################
 # Generate RST files from Jupyter notebooks
