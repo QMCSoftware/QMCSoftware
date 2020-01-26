@@ -88,6 +88,7 @@ class CubLattice_g(StoppingCriterion):
         raise Exception("Not yet implemented")
         
         if self.stage == 'sigma':
+            pass
 
         
         # generate Lattice samples into `y`
@@ -123,10 +124,10 @@ class CubLattice_g(StoppingCriterion):
 
         
         is_done = False
-        if 4*errest[0]**2/(ub+lb))**2 <= 1:
+        if 4*errest[0]**2/(ub+lb)**2 <= 1:
             is_done = True
         elif self.mmin == self.mmax: # We are on our max budget and did not meet the error condition => overbudget
-            out_param.exit[1] = True
+            self.exit[1] = True
             is_done = True
         
         ## Loop over m
@@ -150,58 +151,38 @@ class CubLattice_g(StoppingCriterion):
             kappanumap = vstack((kappanumap, 2^(m-1)+kappanumap)) #initialize map
             self.update_kappanumap(kappanumap,ls=range(m-1,m-r_lag-1,-1),m_up=m)
             
-## LEFT OFF HERE
             ## Compute Stilde
-            nllstart=int64(2^(m-r_lag-1))
-            meff=m-self.mmin+1
-            Stilde(meff)=sum(abs(y(kappanumap(nllstart+1:2*nllstart))))
-            out_param.bound_err=out_param.fudge(m)*Stilde(meff)
-            errest(meff)=out_param.bound_err
+            nllstart = int(2**(m-r_lag-1))
+            meff = m-self.mmin
+            Stilde[meff] = sum(abs(y[kappanumap[nllstart:2*nllstart]]))
+            self.bound_err = self.fudge(m)*Stilde[meff]
+            errest(meff) = self.bound_err
             
             # Necessary conditions
-            for l = l_star:m # Storing the information for the necessary conditions
-                    C_low = 1/(1+omg_hat(m-l)*omg_circ(m-l))
-                    C_up = 1/(1-omg_hat(m-l)*omg_circ(m-l))
-                    CStilde_low(l-l_star+1) = max(CStilde_low(l-l_star+1),C_low*sum(abs(y(kappanumap(2^(l-1)+1:2^l)))))
-                    if (omg_hat(m-l)*omg_circ(m-l) < 1)
-                        CStilde_up(l-l_star+1) = min(CStilde_up(l-l_star+1),C_up*sum(abs(y(kappanumap(2^(l-1)+1:2^l)))))
-                    end
-            end
+            for l in range(l_star,m+1): # Storing the information for the necessary conditions
+                C_low = 1/(1+omg_hat(m-l)*omg_circ(m-l))
+                C_up = 1/(1-omg_hat(m-l)*omg_circ(m-l))
+                CStilde_low[l-l_star] = max(CStilde_low[l-l_star],C_low*sum(abs(y[kappanumap[2^(l-1):2^l]])))
+                if omg_hat(m-l)*omg_circ(m-l) < 1:
+                    CStilde_up[l-l_star] = min(CStilde_up[l-l_star],C_up*sum(abs(y[kappanumap[2^(l-1):2^l]])))
             
-            if any(CStilde_low(:) > CStilde_up(:))
-                out_param.exit(2) = true
-            end
+            if (CStilde_low > CStilde_up).any()
+                self.exit(2) = true
             
             ## Approximate integral
-            q=mean(yval)
+            q = yval.mean()
             
             # Check the end of the algorithm
-            q = q - errest(meff)*(max(out_param.abstol, out_param.reltol*abs(q + errest(meff)))...
-                    - max(out_param.abstol, out_param.reltol*abs(q - errest(meff))))/...
-                    (max(out_param.abstol, out_param.reltol*abs(q + errest(meff)))...
-                    + max(out_param.abstol, out_param.reltol*abs(q - errest(meff)))) # Optimal estimator
+            ub = max(self.abstol, self.reltol*abs(q + errest[meff])
+            lb = max(self.abstol, self.reltol*abs(q - errest[meff])
+            q = q - errest[0]*(ub-lb) / (ub+lb) # Optimal estimator
             appxinteg(meff)=q
             
-            if 4*errest(meff)^2/(max(out_param.abstol, out_param.reltol*abs(q + errest(meff)))...
-                    + max(out_param.abstol, out_param.reltol*abs(q - errest(meff))))^2 <= 1
-                out_param.time=toc(t_start)
-                is_done = true
-            elseif m == self.mmax # We are on our max budget and did not meet the error condition => overbudget
-                out_param.exit(1) = true
-            end
-        end
-        
-        # Decode the exit structure
-        exit_str=2.^(0:exit_len-1).*out_param.exit
-        exit_str(out_param.exit==0)=[]
-        if numel(exit_str)==0
-            out_param.exitflag=0
-        else
-            out_param.exitflag=exit_str
-        end
-        
-        out_param = rmfield(out_param,'exit')
-
+            if 4*errest[meff]**2/(ub+lb)**2 <= 1:
+                is_done = True
+            elif self.mmin == self.mmax: # We are on our max budget and did not meet the error condition => overbudget
+                self.exit[1] = True
+                is_done = True
 
     def fft(self, y, ls):
         for l in ls:
