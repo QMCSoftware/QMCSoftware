@@ -78,11 +78,8 @@ class CubatureData(AccumData):
         if self.m > self.m_min: # already generated samples
             ## Compute FFT on all points
             nl = 2**mnext
-            nmminlm1 = 2**(self.m_min-self.m-2)
-            ptind_nl = hstack((tile(True,int(nl)),tile(False,int(nl))))
-            ptind = tile(ptind_nl,int(nmminlm1))
-            coef = exp(-2*pi*1j*arange(nl)/(2*nl))
-            coefv = tile(coef,int(nmminlm1))
+            ptind = hstack((tile(True,int(nl)),tile(False,int(nl))))
+            coefv = exp(-2*pi*1j*arange(nl)/(2*nl))
             evenval = self.y[ptind]
             oddval = self.y[~ptind]
             self.y[ptind] = (evenval+coefv*oddval)/2
@@ -97,10 +94,11 @@ class CubatureData(AccumData):
             nl = 2**l
             oldone = abs(self.y[self.kappanumap[1:int(nl)]-1]) # earlier values of kappa, don't touch first one
             newone = abs(self.y[self.kappanumap[nl+1:2*nl]-1]) # later values of kappa,
-            flip = where(newone>oldone)[0] # which in the pair are the larger ones
+            flip = where(newone>oldone)[0]+1 # which in the pair are the larger ones. change to matlab indexing
             if flip.size != 0:
                 additive = arange(0,2**self.m-1,2**(l+1)).reshape((1,-1))
-                flipall = (flip.reshape((-1,1)) + additive).flatten().astype(int)
+                flipall = (flip.reshape((-1,1)) + additive)
+                flipall = flipall.flatten('F').astype(int) # flatten column wise
                 temp = self.kappanumap[nl+flipall] # then flip
                 self.kappanumap[nl+flipall] = self.kappanumap[flipall] # them
                 self.kappanumap[flipall] = temp # around   
