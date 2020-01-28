@@ -136,7 +136,7 @@ defined as follows:
     	n               2048
     	n_total         2048
     	confid_int      [ 6.257  6.262]
-    	time_total      0.302
+    	time_total      0.344
     	r               16
     
 
@@ -183,7 +183,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2602         
+    Solution: 6.2569         
     AsianCall (Integrand Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -205,9 +205,9 @@ last example.
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               [ 289512.000  34184.000  5514.000]
-    	n_total         332282
-    	confid_int      [ 6.211  6.309]
-    	time_total      0.088
+    	n               [ 279683.000  40888.000  6360.000]
+    	n_total         330003
+    	confid_int      [ 6.208  6.306]
+    	time_total      0.105
     
 

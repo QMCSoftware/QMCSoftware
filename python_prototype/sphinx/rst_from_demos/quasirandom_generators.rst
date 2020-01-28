@@ -149,6 +149,7 @@ workouts/wo\_lds\_sequences/mps\_original\_vs\_qmcpy.py :sub:`~`
 .. code:: ipython3
 
     df_mps = pd.read_csv('../outputs/lds_sequences/magic_point_shop_times.csv')
+    df_mps.columns = ['n','mps_lattice_t','qmcpy_lattice_t','mps_Sobol_t','qmcpy_Sobol_t']
     df_mps.set_index('n')
 
 
@@ -174,10 +175,10 @@ workouts/wo\_lds\_sequences/mps\_original\_vs\_qmcpy.py :sub:`~`
       <thead>
         <tr style="text-align: right;">
           <th></th>
-          <th>mps_lattice_time</th>
-          <th>qmcpy_lattice_time</th>
-          <th>mps_Sobol_time</th>
-          <th>qmcpy_Sobol_time</th>
+          <th>mps_lattice_t</th>
+          <th>qmcpy_lattice_t</th>
+          <th>mps_Sobol_t</th>
+          <th>qmcpy_Sobol_t</th>
         </tr>
         <tr>
           <th>n</th>
@@ -338,8 +339,8 @@ workouts/wo\_lds\_sequences/mps\_original\_vs\_qmcpy.py :sub:`~`
 
     fig,ax = plt.subplots(nrows=1, ncols=1, figsize=(7, 5))
     n = df_mps.n
-    suf_lattice = df_mps.mps_lattice_time.values / df_mps.qmcpy_lattice_time.values
-    suf_Sobol = df_mps.mps_Sobol_time.values / df_mps.qmcpy_Sobol_time.values
+    suf_lattice = df_mps.mps_lattice_t.values / df_mps.qmcpy_lattice_t.values
+    suf_Sobol = df_mps.mps_Sobol_t.values / df_mps.qmcpy_Sobol_t.values
     ax.loglog(n, suf_lattice, label='Lattice', color='b')
     ax.loglog(n, suf_Sobol, label='Sobol', color='g')
     ax.legend(loc='center left')
@@ -383,16 +384,16 @@ https://CRAN.R-project.org/package=qrng
 .. code:: ipython3
 
     df_matlab = pd.read_csv('../outputs/lds_sequences/matlab_sequence_times.csv', header=None)
-    df_matlab.columns = ['n', 'matlab_Lattice_time', 'matlab_Sobol_time']
+    df_matlab.columns = ['n', 'm_Lattice_t', 'm_Sobol_t']
     df_python = pd.read_csv('../outputs/lds_sequences/python_sequence_times.csv')
-    df_python.columns = ['n', 'python_Lattice_time', 'python_Sobol_MPS_time', 'python_Sobol_Pytorch_time']
+    df_python.columns = ['n', 'py_Lattice_t', 'py_Sobol_MPS_t', 'py_Sobol_Pytorch_t']
     df_r = pd.read_csv('../outputs/lds_sequences/r_sequence_times.csv',sep=' ')
-    df_r.columns = ['n','r_Sobol_time']
+    df_r.columns = ['n','r_Sobol_t']
     df_r.reset_index(drop=True, inplace=True)
     df_languages = pd.concat([df_matlab['n'], 
-        df_matlab['matlab_Lattice_time'], df_python['python_Lattice_time'],\
-        df_matlab['matlab_Sobol_time'], df_r['r_Sobol_time'], \
-        df_python['python_Sobol_MPS_time'], df_python['python_Sobol_Pytorch_time']],  
+        df_matlab['m_Lattice_t'], df_python['py_Lattice_t'],\
+        df_matlab['m_Sobol_t'], df_r['r_Sobol_t'], \
+        df_python['py_Sobol_MPS_t'], df_python['py_Sobol_Pytorch_t']],  
         axis = 1)
     df_languages.set_index('n')
 
@@ -419,12 +420,12 @@ https://CRAN.R-project.org/package=qrng
       <thead>
         <tr style="text-align: right;">
           <th></th>
-          <th>matlab_Lattice_time</th>
-          <th>python_Lattice_time</th>
-          <th>matlab_Sobol_time</th>
-          <th>r_Sobol_time</th>
-          <th>python_Sobol_MPS_time</th>
-          <th>python_Sobol_Pytorch_time</th>
+          <th>m_Lattice_t</th>
+          <th>py_Lattice_t</th>
+          <th>m_Sobol_t</th>
+          <th>r_Sobol_t</th>
+          <th>py_Sobol_MPS_t</th>
+          <th>py_Sobol_Pytorch_t</th>
         </tr>
         <tr>
           <th>n</th>
@@ -628,16 +629,16 @@ https://CRAN.R-project.org/package=qrng
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     n = df_languages.n
     # Lattice Plot
-    ax[0].loglog(n, df_languages['matlab_Lattice_time'], label='MATLAB', color='c')
-    ax[0].loglog(n, df_languages['python_Lattice_time'], label='Python', color='m')
+    ax[0].loglog(n, df_languages['m_Lattice_t'], label='MATLAB', color='c')
+    ax[0].loglog(n, df_languages['py_Lattice_t'], label='Python', color='m')
     ax[0].legend(loc='upper left')
     ax[0].set_xlabel('Sampling Points')
     ax[0].set_ylabel('Lattice Generation Time (seconds)')
     # Sobol Plot
-    ax[1].loglog(n, df_languages['matlab_Sobol_time'], label='MATLAB', color='c')
-    ax[1].loglog(n, df_languages['r_Sobol_time'], label='R', color='k')
-    ax[1].loglog(n, df_languages['python_Sobol_MPS_time'], label='Python MPS', color='r')
-    ax[1].loglog(n, df_languages['python_Sobol_Pytorch_time'], label='Python Pytorch', color='y')
+    ax[1].loglog(n, df_languages['m_Sobol_t'], label='MATLAB', color='c')
+    ax[1].loglog(n, df_languages['r_Sobol_t'], label='R', color='k')
+    ax[1].loglog(n, df_languages['py_Sobol_MPS_t'], label='Python MPS', color='r')
+    ax[1].loglog(n, df_languages['py_Sobol_Pytorch_t'], label='Python Pytorch', color='y')
     ax[1].legend(loc='upper left')
     ax[1].set_xlabel('Sampling Points')
     ax[1].set_ylabel('Sobol Generation Time (seconds)')
@@ -674,6 +675,7 @@ Parameters - replications = 16 - dimension = 4
 .. code:: ipython3
 
     df_sobol_backends = pd.read_csv('../outputs/lds_sequences/sobol_backend_times.csv')
+    df_sobol_backends.columns = ['n','Sobol_MPS_t','Sobol_PyTorch_t']
     df_sobol_backends.set_index('n')
 
 
@@ -699,8 +701,8 @@ Parameters - replications = 16 - dimension = 4
       <thead>
         <tr style="text-align: right;">
           <th></th>
-          <th>Sobol_MPS_time</th>
-          <th>Sobol_Pytorch_time</th>
+          <th>Sobol_MPS_t</th>
+          <th>Sobol_PyTorch_t</th>
         </tr>
         <tr>
           <th>n</th>
@@ -815,8 +817,8 @@ Parameters - replications = 16 - dimension = 4
     fig,ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
     n = df_sobol_backends.n
     # Lattice Plot
-    ax.loglog(n, df_sobol_backends['Sobol_MPS_time'], label='MPS', color='r')
-    ax.loglog(n, df_sobol_backends['Sobol_Pytorch_time'], label='Pytorch', color='y')
+    ax.loglog(n, df_sobol_backends['Sobol_MPS_t'], label='MPS', color='r')
+    ax.loglog(n, df_sobol_backends['Sobol_PyTorch_t'], label='Pytorch', color='y')
     ax.legend(loc='upper left')
     ax.set_xlabel('Sampling Points')
     ax.set_ylabel('Sobol Generation Time (seconds)')
