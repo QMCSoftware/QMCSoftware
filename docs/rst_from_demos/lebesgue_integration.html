@@ -175,16 +175,16 @@
   <div class="section" id="qmcpy-for-lebesgue-integration">
 <h1>QMCPy for Lebesgue Integration<a class="headerlink" href="#qmcpy-for-lebesgue-integration" title="Permalink to this headline">¶</a></h1>
 <p>This notebook will give examples of how to use QMCPy for integration
-problems that not are defined in terms of a standard measure. i.e.
-Uniform or Gaussian.</p>
+problems that not are defined in terms of a standard measure.
+i.e. Uniform or Gaussian.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qmcpy</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="o">*</span>
 </pre></div>
 </div>
 <div class="section" id="sample-problem-1">
 <h2>Sample Problem 1<a class="headerlink" href="#sample-problem-1" title="Permalink to this headline">¶</a></h2>
-<p><span class="math">y = \int_{[0,2]} x^2 dx, \:\: \mbox{Lebesgue Measure}</span></p>
-<p><span class="math">\phantom{y} = 2\int_{[0,2]} \frac{x^2}{2} dx, \:\: \mbox{Uniform Measure}</span></p>
+<p><img class="math" src="../_images/math/ddcdbf92a82a9ab26edf9e185bb5ee3bf828f8c6.png" alt="y = \int_{[0,2]} x^2 dx, \:\: \mbox{Lebesgue Measure}"/></p>
+<p><img class="math" src="../_images/math/71101a19a7c1509d840d2618b1b94730b167b75f.png" alt="\phantom{y} = 2\int_{[0,2]} \frac{x^2}{2} dx, \:\: \mbox{Uniform Measure}"/></p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">abs_tol</span> <span class="o">=</span> <span class="o">.</span><span class="mi">01</span>
 <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">]])</span>
@@ -202,7 +202,7 @@ Uniform or Gaussian.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Within tolerance:&#39;</span><span class="p">,</span><span class="nb">abs</span><span class="p">((</span><span class="n">sol1</span><span class="o">-</span><span class="n">true_value</span><span class="p">))</span><span class="o">&lt;</span><span class="n">abs_tol</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">2.666</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">2.662</span>
 <span class="n">Within</span> <span class="n">tolerance</span><span class="p">:</span> <span class="kc">True</span>
 </pre></div>
 </div>
@@ -216,15 +216,15 @@ Uniform or Gaussian.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Within tolerance:&#39;</span><span class="p">,</span><span class="nb">abs</span><span class="p">((</span><span class="n">sol2</span><span class="o">-</span><span class="n">true_value</span><span class="p">))</span><span class="o">&lt;</span><span class="n">abs_tol</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">2.669</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">2.666</span>
 <span class="n">Within</span> <span class="n">tolerance</span><span class="p">:</span> <span class="kc">True</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="sample-problem-2">
 <h2>Sample Problem 2<a class="headerlink" href="#sample-problem-2" title="Permalink to this headline">¶</a></h2>
-<p><span class="math">y = \int_{[a,b]^d} ||x||_2^2 dx, \:\: \mbox{Lebesgue Measure}</span></p>
-<p><span class="math">\phantom{y} = \Pi_{i=1}^d (b_i-a_i)\int_{[a,b]^d} ||x||_2^2 \; [ \Pi_{i=1}^d (b_i-a_i)]^{-1} dx, \:\: \mbox{Uniform Measure}</span></p>
+<p><img class="math" src="../_images/math/ed11fca4e3bffa9248c69b0e7c33221aa8cb9ed4.png" alt="y = \int_{[a,b]^d} ||x||_2^2 dx, \:\: \mbox{Lebesgue Measure}"/></p>
+<p><img class="math" src="../_images/math/d0f4a38ee5e7f5e910fd4847f07b9f30c37dbc62.png" alt="\phantom{y} = \Pi_{i=1}^d (b_i-a_i)\int_{[a,b]^d} ||x||_2^2 \; [ \Pi_{i=1}^d (b_i-a_i)]^{-1} dx, \:\: \mbox{Uniform Measure}"/></p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">abs_tol</span> <span class="o">=</span> <span class="o">.</span><span class="mi">001</span>
 <span class="n">dim</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
@@ -246,7 +246,7 @@ Uniform or Gaussian.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Within tolerance:&#39;</span><span class="p">,</span><span class="nb">abs</span><span class="p">((</span><span class="n">sol1</span><span class="o">-</span><span class="n">true_value</span><span class="p">))</span><span class="o">&lt;</span><span class="n">abs_tol</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">23.33338</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">23.33330</span>
 <span class="n">Within</span> <span class="n">tolerance</span><span class="p">:</span> <span class="kc">True</span>
 </pre></div>
 </div>
@@ -260,7 +260,7 @@ Uniform or Gaussian.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Within tolerance:&#39;</span><span class="p">,</span><span class="nb">abs</span><span class="p">((</span><span class="n">sol1</span><span class="o">-</span><span class="n">true_value</span><span class="p">))</span><span class="o">&lt;</span><span class="n">abs_tol</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">23.33336</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mf">23.33351</span>
 <span class="n">Within</span> <span class="n">tolerance</span><span class="p">:</span> <span class="kc">True</span>
 </pre></div>
 </div>
