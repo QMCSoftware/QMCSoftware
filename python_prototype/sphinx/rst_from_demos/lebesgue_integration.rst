@@ -2,8 +2,8 @@ QMCPy for Lebesgue Integration
 ==============================
 
 This notebook will give examples of how to use QMCPy for integration
-problems that not are defined in terms of a standard measure. i.e.
-Uniform or Gaussian.
+problems that not are defined in terms of a standard measure.
+i.e. Uniform or Gaussian.
 
 .. code:: ipython3
 
@@ -97,7 +97,7 @@ Sample Problem 2
 
 .. parsed-literal::
 
-    y = 23.33338
+    y = 23.33315
     Within tolerance: True
 
 
@@ -115,7 +115,7 @@ Sample Problem 2
 
 .. parsed-literal::
 
-    y = 23.33336
+    y = 23.33339
     Within tolerance: True
 
 
