@@ -39,7 +39,7 @@ Sample Problem 1
 
 .. parsed-literal::
 
-    y = 2.668
+    y = 2.665
     Within tolerance: True
 
 
@@ -57,7 +57,7 @@ Sample Problem 1
 
 .. parsed-literal::
 
-    y = 2.667
+    y = 2.661
     Within tolerance: True
 
 
@@ -97,7 +97,7 @@ Sample Problem 2
 
 .. parsed-literal::
 
-    y = 23.33332
+    y = 23.33321
     Within tolerance: True
 
 
@@ -115,7 +115,7 @@ Sample Problem 2
 
 .. parsed-literal::
 
-    y = 23.33331
+    y = 23.33325
     Within tolerance: True
 
 

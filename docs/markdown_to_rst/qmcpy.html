@@ -183,15 +183,15 @@
 <h2>Integrand<a class="headerlink" href="#integrand" title="Permalink to this headline">¶</a></h2>
 <p>The function to integrate <em>Abstract class with concrete implementations</em></p>
 <ul class="simple">
-<li><p>Linear: <span class="math">\:\: y_i = \sum_{j=0}^{d-1}(x_{ij})</span></p></li>
-<li><p>Keister: <span class="math">\:\: y_i = \pi^{d/2} * \cos(||x_i||_2)</span></p></li>
+<li><p>Linear: <img class="math" src="../_images/math/13832c1187e3c4ad8e1b8be773f149150ad15385.png" alt="\:\: y_i = \sum_{j=0}^{d-1}(x_{ij})"/></p></li>
+<li><p>Keister: <img class="math" src="../_images/math/e2a2ce8250e53a0a4ee4332ec94e9447028f70ad.png" alt="\:\: y_i = \pi^{d/2} * \cos(||x_i||_2)"/></p></li>
 <li><p>Asian Call</p>
 <ul>
-<li><p><span class="math">S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}</span></p></li>
+<li><p><img class="math" src="../_images/math/82bcefbbb98d7f923303c874b9c15dff35ae6ab1.png" alt="S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}"/></p></li>
 <li><p>discounted call payoff
-<span class="math">= max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)</span></p></li>
+<img class="math" src="../_images/math/f72c62d598afc9d0050d929cdb5f18b6ae90760d.png" alt="= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)"/></p></li>
 <li><p>discounted put payoff
-<span class="math">= max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)</span></p></li>
+<img class="math" src="../_images/math/e49277458bc3bf75230004d46f079edde0487da2.png" alt="= \max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)"/></p></li>
 </ul>
 </li>
 </ul>
@@ -202,11 +202,11 @@
 <p>General measure used to define the integrand <em>Abstract class with
 concrete implementations</em></p>
 <ul class="simple">
-<li><p>Uniform: <span class="math">\:\: \mathcal{U}(a,b)</span></p></li>
-<li><p>Gaussian: <span class="math">\:\: \mathcal{N}(\mu,\sigma^2)</span></p></li>
+<li><p>Uniform: <img class="math" src="../_images/math/e4ec3e10426c55054a2398d2159f04c16181a79d.png" alt="\:\: \mathcal{U}(a,b)"/></p></li>
+<li><p>Gaussian: <img class="math" src="../_images/math/dee4c6d78075c22a92726ec68e450876c2911993.png" alt="\:\: \mathcal{N}(\mu,\sigma^2)"/></p></li>
 <li><p>Brownian Motion:
-<span class="math">\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;</span> for
-<span class="math">\;Z_j \sim \mathcal{N}(0,1)</span></p></li>
+<img class="math" src="../_images/math/2bf774c24037b3b7121940028a45d7f18fc0d149.png" alt="\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;"/> for
+<img class="math" src="../_images/math/8decaec27b72554c40a38b137109b2cbb4541966.png" alt="\;Z_j \sim \mathcal{N}(0,1)"/></p></li>
 </ul>
 </div>
 <hr class="docutils" />
@@ -216,12 +216,12 @@ concrete implementations</em></p>
 with concrete implementations</em></p>
 <ul class="simple">
 <li><p>IID Standard Uniform:
-<span class="math">\:\: x_j \overset{iid}{\sim} \mathcal{U}(0,1)</span></p></li>
+<img class="math" src="../_images/math/d9a93b25db6fb17da6999881d9c3bd147b745249.png" alt="\:\: x_j \overset{iid}{\sim} \mathcal{U}(0,1)"/></p></li>
 <li><p>IID Standard Gaussian:
-<span class="math">\:\: x_j \overset{iid}{\sim} \mathcal{N}(0,1)</span></p></li>
+<img class="math" src="../_images/math/583e315a8216dec2bbbb05417abc5d286098af2c.png" alt="\:\: x_j \overset{iid}{\sim} \mathcal{N}(0,1)"/></p></li>
 <li><p>Lattice (base 2):
-<span class="math">\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)</span></p></li>
-<li><p>Sobol (base 2): <span class="math">\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)</span></p></li>
+<img class="math" src="../_images/math/1bb1625757924968ef52963ac835f2f60b3dbf88.png" alt="\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)"/></p></li>
+<li><p>Sobol (base 2): <img class="math" src="../_images/math/1bb1625757924968ef52963ac835f2f60b3dbf88.png" alt="\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)"/></p></li>
 </ul>
 </div>
 <hr class="docutils" />
@@ -229,10 +229,10 @@ with concrete implementations</em></p>
 <h2>Stopping Criterion<a class="headerlink" href="#stopping-criterion" title="Permalink to this headline">¶</a></h2>
 <p>The stopping criterion to determine sufficient approximation <em>Abstract
 class with concrete implementations</em> Central Limit Theorem (CLT)
-<span class="math">\; \hat{\mu}_n = \overline{Y}_n \approx\mathcal{N}(\mu,\frac{\sigma^2}{n})</span><span class="math">\; \mathbb{P}[\hat{\mu}_n-\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}} \leq \mu \leq \hat{\mu}_n+\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}}] \approx 1-\alpha</span></p>
+<img class="math" src="../_images/math/73332cfa9f74c270099512f0c154f60742c5f439.png" alt="\; \hat{\mu}_n = \overline{Y}_n \approx\mathcal{N}(\mu,\frac{\sigma^2}{n})"/><img class="math" src="../_images/math/f9af5a31140e77d2deae57954162958027e20db0.png" alt="\; \mathbb{P}[\hat{\mu}_n-\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}} \leq \mu \leq \hat{\mu}_n+\frac{\mathcal{Z}_{\alpha/2}\hat{\sigma}_n}{\sqrt{n}}] \approx 1-\alpha"/></p>
 <ul class="simple">
-<li><p>CLT for <span class="math">x_i\sim</span> iid</p></li>
-<li><p>CLT Repeated for <span class="math">\{x_{r,i}\}_{r=1}^R \sim</span> lds</p></li>
+<li><p>CLT for <img class="math" src="../_images/math/6595dfd6bf49f29dcc22ba2aa27f7996dbe1a0c5.png" alt="x_i\sim"/> iid</p></li>
+<li><p>CLT Repeated for <img class="math" src="../_images/math/70e94721e1958c7e2743f8f44f583e682d0a92a6.png" alt="\{x_{r,i}\}_{r=1}^R \sim"/> lds</p></li>
 </ul>
 </div>
 <hr class="docutils" />
