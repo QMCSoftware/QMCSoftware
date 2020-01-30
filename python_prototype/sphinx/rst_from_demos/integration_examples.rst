@@ -26,7 +26,7 @@ the Gaussian measure, and the Sobol distribution:
    :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
 The following code snippet integrates a three-dimensional Keister
-function numerically by creating instances of ``qmcpy``'s built-in
+function numerically by creating instances of ``qmcpy``\ ’s built-in
 classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CLTRep``, as inputs
 to the function ``integrate()``.
 
@@ -63,7 +63,7 @@ to the function ``integrate()``.
     	n               32
     	n_total         32
     	confid_int      [ 2.126  2.169]
-    	time_total      0.004
+    	time_total      0.007
     	r               16
     
 
@@ -136,7 +136,7 @@ defined as follows:
     	n               2048
     	n_total         2048
     	confid_int      [ 6.257  6.262]
-    	time_total      0.344
+    	time_total      0.499
     	r               16
     
 
@@ -144,7 +144,7 @@ defined as follows:
 European Arithmetic-Mean Asian Put Option: Multi-Level
 ------------------------------------------------------
 
-This example is similar to the last one except that we use Gile's
+This example is similar to the last one except that we use Gile’s
 multi-level method for estimation of the option price. The main idea can
 be summarized as follows:
 
@@ -183,7 +183,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2569         
+    Solution: 6.2549         
     AsianCall (Integrand Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -205,9 +205,9 @@ last example.
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               [ 279683.000  40888.000  6360.000]
-    	n_total         330003
-    	confid_int      [ 6.208  6.306]
-    	time_total      0.105
+    	n               [ 282632.000  37446.000  6421.000]
+    	n_total         329571
+    	confid_int      [ 6.206  6.304]
+    	time_total      0.164
     
 
