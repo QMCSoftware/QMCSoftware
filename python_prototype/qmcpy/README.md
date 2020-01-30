@@ -7,7 +7,7 @@ The function to integrate<br>
 *Abstract class with concrete implementations*
 
 - Linear: $\:\: y_i = \sum_{j=0}^{d-1}(x_{ij})$
-- Keister: $\:\: y_i = \pi^{d/2} * \cos(||x_i||_2)$
+- Keister: $\:\: y_i = \pi^{d/2} \, \cos(||x_i||_2)$
 - Asian Call
     - $S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}$
     - discounted call payoff $= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)$

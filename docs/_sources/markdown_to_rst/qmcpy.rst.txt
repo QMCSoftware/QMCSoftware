@@ -13,7 +13,7 @@ Integrand
 The function to integrate *Abstract class with concrete implementations*
 
 -  Linear: :math:`\:\: y_i = \sum_{j=0}^{d-1}(x_{ij})`
--  Keister: :math:`\:\: y_i = \pi^{d/2} * \cos(||x_i||_2)`
+-  Keister: :math:`\:\: y_i = \pi^{d/2} \, \cos(||x_i||_2)`
 -  Asian Call
 
    -  :math:`S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}`
