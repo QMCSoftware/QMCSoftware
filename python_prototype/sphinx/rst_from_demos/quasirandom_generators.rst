@@ -29,6 +29,19 @@ Inc.http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-perform
     from matplotlib import pyplot as plt
     import matplotlib
     %matplotlib inline
+    
+    SMALL_SIZE = 10
+    MEDIUM_SIZE = 12
+    BIGGER_SIZE = 14
+    
+    plt.rc('font', size=BIGGER_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=BIGGER_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=BIGGER_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
 
 General Lattice & Sobol Generator Usage
 ---------------------------------------
@@ -136,156 +149,189 @@ workouts/wo_lds_sequences/mps_original_vs_qmcpy.py ~~~
 .. code:: ipython3
 
     df_mps = pd.read_csv('../outputs/lds_sequences/magic_point_shop_times.csv')
-    df_mps.style.hide_index()
+    df_mps.columns = ['n','mps_lattice_t','qmcpy_lattice_t','mps_Sobol_t','qmcpy_Sobol_t']
+    df_mps.set_index('n')
 
 
 
 
 .. raw:: html
 
-    <style  type="text/css" >
-    </style><table id="T_2eac1cfc_3329_11ea_8f84_acde48001122" ><thead>    <tr>        <th class="col_heading level0 col0" >n</th>        <th class="col_heading level0 col1" >mps_lattice_time</th>        <th class="col_heading level0 col2" >qmcpy_lattice_time</th>        <th class="col_heading level0 col3" >mps_Sobol_time</th>        <th class="col_heading level0 col4" >qmcpy_Sobol_time</th>    </tr></thead><tbody>
-                    <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row0_col0" class="data row0 col0" >2</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row0_col1" class="data row0 col1" >3.85443e-05</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row0_col2" class="data row0 col2" >8.20955e-05</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row0_col3" class="data row0 col3" >0.779898</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row0_col4" class="data row0 col4" >0.00477258</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row1_col0" class="data row1 col0" >4</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row1_col1" class="data row1 col1" >6.09557e-05</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row1_col2" class="data row1 col2" >7.72476e-05</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row1_col3" class="data row1 col3" >0.776883</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row1_col4" class="data row1 col4" >0.00282033</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row2_col0" class="data row2 col0" >8</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row2_col1" class="data row2 col1" >6.99361e-05</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row2_col2" class="data row2 col2" >8.91685e-05</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row2_col3" class="data row2 col3" >0.798332</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row2_col4" class="data row2 col4" >0.00289337</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row3_col0" class="data row3 col0" >16</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row3_col1" class="data row3 col1" >0.000130892</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row3_col2" class="data row3 col2" >8.97249e-05</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row3_col3" class="data row3 col3" >0.832067</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row3_col4" class="data row3 col4" >0.00278886</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row4_col0" class="data row4 col0" >32</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row4_col1" class="data row4 col1" >0.000260433</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row4_col2" class="data row4 col2" >0.000114202</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row4_col3" class="data row4 col3" >0.749382</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row4_col4" class="data row4 col4" >0.00283925</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row5_col0" class="data row5 col0" >64</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row5_col1" class="data row5 col1" >0.000486692</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row5_col2" class="data row5 col2" >0.00012366</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row5_col3" class="data row5 col3" >0.728639</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row5_col4" class="data row5 col4" >0.00292444</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row6_col0" class="data row6 col0" >128</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row6_col1" class="data row6 col1" >0.0008804</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row6_col2" class="data row6 col2" >0.000125647</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row6_col3" class="data row6 col3" >0.729256</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row6_col4" class="data row6 col4" >0.00304421</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row7_col0" class="data row7 col0" >256</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row7_col1" class="data row7 col1" >0.00161036</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row7_col2" class="data row7 col2" >0.000137647</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row7_col3" class="data row7 col3" >0.738188</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row7_col4" class="data row7 col4" >0.00336258</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row8_col0" class="data row8 col0" >512</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row8_col1" class="data row8 col1" >0.00342528</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row8_col2" class="data row8 col2" >0.000248114</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row8_col3" class="data row8 col3" >0.734664</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row8_col4" class="data row8 col4" >0.00387963</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row9_col0" class="data row9 col0" >1024</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row9_col1" class="data row9 col1" >0.00658393</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row9_col2" class="data row9 col2" >0.000189781</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row9_col3" class="data row9 col3" >0.734859</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row9_col4" class="data row9 col4" >0.00478856</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row10_col0" class="data row10 col0" >2048</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row10_col1" class="data row10 col1" >0.0125559</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row10_col2" class="data row10 col2" >0.000187874</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row10_col3" class="data row10 col3" >0.744764</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row10_col4" class="data row10 col4" >0.00686185</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row11_col0" class="data row11 col0" >4096</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row11_col1" class="data row11 col1" >0.0238158</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row11_col2" class="data row11 col2" >0.00022618</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row11_col3" class="data row11 col3" >0.750849</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row11_col4" class="data row11 col4" >0.0109455</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row12_col0" class="data row12 col0" >8192</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row12_col1" class="data row12 col1" >0.047155</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row12_col2" class="data row12 col2" >0.000290553</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row12_col3" class="data row12 col3" >0.776094</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row12_col4" class="data row12 col4" >0.0193885</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row13_col0" class="data row13 col0" >16384</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row13_col1" class="data row13 col1" >0.0925679</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row13_col2" class="data row13 col2" >0.000427008</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row13_col3" class="data row13 col3" >0.816853</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row13_col4" class="data row13 col4" >0.0357914</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row14_col0" class="data row14 col0" >32768</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row14_col1" class="data row14 col1" >0.192566</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row14_col2" class="data row14 col2" >0.000653982</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row14_col3" class="data row14 col3" >0.886592</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row14_col4" class="data row14 col4" >0.0683552</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row15_col0" class="data row15 col0" >65536</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row15_col1" class="data row15 col1" >0.387202</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row15_col2" class="data row15 col2" >0.00106303</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row15_col3" class="data row15 col3" >1.05024</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row15_col4" class="data row15 col4" >0.137032</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row16_col0" class="data row16 col0" >131072</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row16_col1" class="data row16 col1" >0.772658</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row16_col2" class="data row16 col2" >0.0019153</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row16_col3" class="data row16 col3" >1.35794</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row16_col4" class="data row16 col4" >0.268805</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row17_col0" class="data row17 col0" >262144</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row17_col1" class="data row17 col1" >1.57476</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row17_col2" class="data row17 col2" >0.00367109</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row17_col3" class="data row17 col3" >1.97658</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row17_col4" class="data row17 col4" >0.533286</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row18_col0" class="data row18 col0" >524288</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row18_col1" class="data row18 col1" >3.14824</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row18_col2" class="data row18 col2" >0.00764346</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row18_col3" class="data row18 col3" >3.21827</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row18_col4" class="data row18 col4" >1.06567</td>
-                </tr>
-                <tr>
-                                    <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row19_col0" class="data row19 col0" >1.04858e+06</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row19_col1" class="data row19 col1" >6.29162</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row19_col2" class="data row19 col2" >0.0153396</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row19_col3" class="data row19 col3" >5.73512</td>
-                            <td id="T_2eac1cfc_3329_11ea_8f84_acde48001122row19_col4" class="data row19 col4" >2.12622</td>
-                </tr>
-        </tbody></table>
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>mps_lattice_t</th>
+          <th>qmcpy_lattice_t</th>
+          <th>mps_Sobol_t</th>
+          <th>qmcpy_Sobol_t</th>
+        </tr>
+        <tr>
+          <th>n</th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2.00e+00</td>
+          <td>3.85e-05</td>
+          <td>8.21e-05</td>
+          <td>7.80e-01</td>
+          <td>4.77e-03</td>
+        </tr>
+        <tr>
+          <td>4.00e+00</td>
+          <td>6.10e-05</td>
+          <td>7.72e-05</td>
+          <td>7.77e-01</td>
+          <td>2.82e-03</td>
+        </tr>
+        <tr>
+          <td>8.00e+00</td>
+          <td>6.99e-05</td>
+          <td>8.92e-05</td>
+          <td>7.98e-01</td>
+          <td>2.89e-03</td>
+        </tr>
+        <tr>
+          <td>1.60e+01</td>
+          <td>1.31e-04</td>
+          <td>8.97e-05</td>
+          <td>8.32e-01</td>
+          <td>2.79e-03</td>
+        </tr>
+        <tr>
+          <td>3.20e+01</td>
+          <td>2.60e-04</td>
+          <td>1.14e-04</td>
+          <td>7.49e-01</td>
+          <td>2.84e-03</td>
+        </tr>
+        <tr>
+          <td>6.40e+01</td>
+          <td>4.87e-04</td>
+          <td>1.24e-04</td>
+          <td>7.29e-01</td>
+          <td>2.92e-03</td>
+        </tr>
+        <tr>
+          <td>1.28e+02</td>
+          <td>8.80e-04</td>
+          <td>1.26e-04</td>
+          <td>7.29e-01</td>
+          <td>3.04e-03</td>
+        </tr>
+        <tr>
+          <td>2.56e+02</td>
+          <td>1.61e-03</td>
+          <td>1.38e-04</td>
+          <td>7.38e-01</td>
+          <td>3.36e-03</td>
+        </tr>
+        <tr>
+          <td>5.12e+02</td>
+          <td>3.43e-03</td>
+          <td>2.48e-04</td>
+          <td>7.35e-01</td>
+          <td>3.88e-03</td>
+        </tr>
+        <tr>
+          <td>1.02e+03</td>
+          <td>6.58e-03</td>
+          <td>1.90e-04</td>
+          <td>7.35e-01</td>
+          <td>4.79e-03</td>
+        </tr>
+        <tr>
+          <td>2.05e+03</td>
+          <td>1.26e-02</td>
+          <td>1.88e-04</td>
+          <td>7.45e-01</td>
+          <td>6.86e-03</td>
+        </tr>
+        <tr>
+          <td>4.10e+03</td>
+          <td>2.38e-02</td>
+          <td>2.26e-04</td>
+          <td>7.51e-01</td>
+          <td>1.09e-02</td>
+        </tr>
+        <tr>
+          <td>8.19e+03</td>
+          <td>4.72e-02</td>
+          <td>2.91e-04</td>
+          <td>7.76e-01</td>
+          <td>1.94e-02</td>
+        </tr>
+        <tr>
+          <td>1.64e+04</td>
+          <td>9.26e-02</td>
+          <td>4.27e-04</td>
+          <td>8.17e-01</td>
+          <td>3.58e-02</td>
+        </tr>
+        <tr>
+          <td>3.28e+04</td>
+          <td>1.93e-01</td>
+          <td>6.54e-04</td>
+          <td>8.87e-01</td>
+          <td>6.84e-02</td>
+        </tr>
+        <tr>
+          <td>6.55e+04</td>
+          <td>3.87e-01</td>
+          <td>1.06e-03</td>
+          <td>1.05e+00</td>
+          <td>1.37e-01</td>
+        </tr>
+        <tr>
+          <td>1.31e+05</td>
+          <td>7.73e-01</td>
+          <td>1.92e-03</td>
+          <td>1.36e+00</td>
+          <td>2.69e-01</td>
+        </tr>
+        <tr>
+          <td>2.62e+05</td>
+          <td>1.57e+00</td>
+          <td>3.67e-03</td>
+          <td>1.98e+00</td>
+          <td>5.33e-01</td>
+        </tr>
+        <tr>
+          <td>5.24e+05</td>
+          <td>3.15e+00</td>
+          <td>7.64e-03</td>
+          <td>3.22e+00</td>
+          <td>1.07e+00</td>
+        </tr>
+        <tr>
+          <td>1.05e+06</td>
+          <td>6.29e+00</td>
+          <td>1.53e-02</td>
+          <td>5.74e+00</td>
+          <td>2.13e+00</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
 
 
 
@@ -293,8 +339,8 @@ workouts/wo_lds_sequences/mps_original_vs_qmcpy.py ~~~
 
     fig,ax = plt.subplots(nrows=1, ncols=1, figsize=(7, 5))
     n = df_mps.n
-    suf_lattice = df_mps.mps_lattice_time.values / df_mps.qmcpy_lattice_time.values
-    suf_Sobol = df_mps.mps_Sobol_time.values / df_mps.qmcpy_Sobol_time.values
+    suf_lattice = df_mps.mps_lattice_t.values / df_mps.qmcpy_lattice_t.values
+    suf_Sobol = df_mps.mps_Sobol_t.values / df_mps.qmcpy_Sobol_t.values
     ax.loglog(n, suf_lattice, label='Lattice', color='b')
     ax.loglog(n, suf_Sobol, label='Sobol', color='g')
     ax.legend(loc='center left')
@@ -308,20 +354,21 @@ workouts/wo_lds_sequences/mps_original_vs_qmcpy.py ~~~
 .. image:: quasirandom_generators_files/quasirandom_generators_10_0.png
 
 
-MATLAB vs Python Generator Speed
---------------------------------
+MATLAB vs R vs Python Generator Speed
+-------------------------------------
 
-Compare the speed of low-discrepancy-sequence generators from MATLAB and
-Python. The following blocks visualize a speed comparison with MATLAB
-when generating 1 dimensional shifted/scrambled sequences. Note that the
-generators are reinitialized before every trial. Python data for the
-following plots can be generated by running ~~~ python
+Compare the speed of low-discrepancy-sequence generators from MATLAB, R,
+and Python. The following blocks visualize a speed comparison with
+MATLAB when generating 1 dimensional shifted/scrambled sequences. Note
+that the generators are reinitialized before every trial. Python data
+for the following plots can be generated by running ~~~ python
 workouts/wo_lds_sequences/qmcpy_sequences.py ~~~ MATLAB data can be
 generated by running the file at
-``workouts/wo_lds_sequences/matlab_sequences.py``
-
-Notes - For Python, generators are part of the QMCPy package and located
-at ``qmcpy/discrete_distribution/`` - For MATLAB, the Sobol generator is
+``workouts/wo_lds_sequences/matlab_sequences.py`` R data can be
+generated by running the file at
+``workouts/wo_lds_sequences/r_sequences.py`` Notes - For Python,
+generators are part of the QMCPy package and located at
+``qmcpy/discrete_distribution/`` - For MATLAB, the Sobol generator is
 built in, while the lattice generator is part of the GAIL package: -
 Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis
 Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan
@@ -329,187 +376,251 @@ Zhang, Yizhi Zhang, and Xuan Zhou, GAIL: Guaranteed Automatic
 Integration Library (Version 2.3) [MATLAB Software], 2019. Available
 from http://gailgithub.github.io/GAIL_Dev/ - lattice_gen from:
 https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/lattice_gen.m
+- For R, the Sobol generator is part of the qrng package - Marius Hofert
+and Christiane Lemieux (2019). qrng: (Randomized)Quasi-Random Number
+Generators. R package version 0.0-7.
+https://CRAN.R-project.org/package=qrng
 
 .. code:: ipython3
 
     df_matlab = pd.read_csv('../outputs/lds_sequences/matlab_sequence_times.csv', header=None)
-    df_matlab.columns = ['n', 'matlab_Lattice_time', 'matlab_Sobol_time']
+    df_matlab.columns = ['n', 'm_Lattice_t', 'm_Sobol_t']
     df_python = pd.read_csv('../outputs/lds_sequences/python_sequence_times.csv')
-    df_python.columns = ['n', 'python_Lattice_time', 'python_Sobol_MPS_time', 'python_Sobol_Pytorch_time']
+    df_python.columns = ['n', 'py_Lattice_t', 'py_Sobol_MPS_t', 'py_Sobol_Pytorch_t']
+    df_r = pd.read_csv('../outputs/lds_sequences/r_sequence_times.csv',sep=' ')
+    df_r.columns = ['n','r_Sobol_t']
+    df_r.reset_index(drop=True, inplace=True)
     df_languages = pd.concat([df_matlab['n'], 
-        df_matlab['matlab_Lattice_time'], df_python['python_Lattice_time'],\
-        df_matlab['matlab_Sobol_time'], df_python['python_Sobol_MPS_time'], df_python['python_Sobol_Pytorch_time']],  
+        df_matlab['m_Lattice_t'], df_python['py_Lattice_t'],\
+        df_matlab['m_Sobol_t'], df_r['r_Sobol_t'], \
+        df_python['py_Sobol_MPS_t'], df_python['py_Sobol_Pytorch_t']],  
         axis = 1)
-    df_languages.style.hide_index()
+    df_languages.set_index('n')
 
 
 
 
 .. raw:: html
 
-    <style  type="text/css" >
-    </style><table id="T_2f44b2d2_3329_11ea_8f84_acde48001122" ><thead>    <tr>        <th class="col_heading level0 col0" >n</th>        <th class="col_heading level0 col1" >matlab_Lattice_time</th>        <th class="col_heading level0 col2" >python_Lattice_time</th>        <th class="col_heading level0 col3" >matlab_Sobol_time</th>        <th class="col_heading level0 col4" >python_Sobol_MPS_time</th>        <th class="col_heading level0 col5" >python_Sobol_Pytorch_time</th>    </tr></thead><tbody>
-                    <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row0_col0" class="data row0 col0" >2</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row0_col1" class="data row0 col1" >0.0003759</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row0_col2" class="data row0 col2" >0.000190814</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row0_col3" class="data row0 col3" >0.00063585</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row0_col4" class="data row0 col4" >0.00185927</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row0_col5" class="data row0 col5" >0.000577291</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row1_col0" class="data row1 col0" >4</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row1_col1" class="data row1 col1" >0.00022257</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row1_col2" class="data row1 col2" >0.0001719</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row1_col3" class="data row1 col3" >0.00039063</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row1_col4" class="data row1 col4" >0.000538031</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row1_col5" class="data row1 col5" >0.00231147</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row2_col0" class="data row2 col0" >8</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row2_col1" class="data row2 col1" >0.00015437</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row2_col2" class="data row2 col2" >0.000245094</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row2_col3" class="data row2 col3" >0.000368</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row2_col4" class="data row2 col4" >0.000501474</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row2_col5" class="data row2 col5" >0.00187151</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row3_col0" class="data row3 col0" >16</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row3_col1" class="data row3 col1" >0.00015948</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row3_col2" class="data row3 col2" >0.000239929</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row3_col3" class="data row3 col3" >0.00095672</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row3_col4" class="data row3 col4" >0.000562827</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row3_col5" class="data row3 col5" >0.000260671</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row4_col0" class="data row4 col0" >32</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row4_col1" class="data row4 col1" >0.00016845</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row4_col2" class="data row4 col2" >0.000251373</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row4_col3" class="data row4 col3" >0.00045785</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row4_col4" class="data row4 col4" >0.000539303</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row4_col5" class="data row4 col5" >0.00206423</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row5_col0" class="data row5 col0" >64</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row5_col1" class="data row5 col1" >0.00015965</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row5_col2" class="data row5 col2" >0.000281811</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row5_col3" class="data row5 col3" >0.00050668</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row5_col4" class="data row5 col4" >0.00066328</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row5_col5" class="data row5 col5" >0.00272504</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row6_col0" class="data row6 col0" >128</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row6_col1" class="data row6 col1" >0.00016045</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row6_col2" class="data row6 col2" >0.00023373</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row6_col3" class="data row6 col3" >0.00040888</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row6_col4" class="data row6 col4" >0.000834386</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row6_col5" class="data row6 col5" >0.00255855</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row7_col0" class="data row7 col0" >256</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row7_col1" class="data row7 col1" >0.00017202</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row7_col2" class="data row7 col2" >0.000294209</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row7_col3" class="data row7 col3" >0.00028442</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row7_col4" class="data row7 col4" >0.00112534</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row7_col5" class="data row7 col5" >0.00244649</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row8_col0" class="data row8 col0" >512</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row8_col1" class="data row8 col1" >0.00018737</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row8_col2" class="data row8 col2" >0.000284672</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row8_col3" class="data row8 col3" >0.00024717</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row8_col4" class="data row8 col4" >0.00162848</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row8_col5" class="data row8 col5" >0.00168204</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row9_col0" class="data row9 col0" >1024</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row9_col1" class="data row9 col1" >0.0001846</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row9_col2" class="data row9 col2" >0.000333627</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row9_col3" class="data row9 col3" >0.00026563</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row9_col4" class="data row9 col4" >0.00313012</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row9_col5" class="data row9 col5" >0.000374238</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row10_col0" class="data row10 col0" >2048</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row10_col1" class="data row10 col1" >0.00020232</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row10_col2" class="data row10 col2" >0.000338475</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row10_col3" class="data row10 col3" >0.0002643</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row10_col4" class="data row10 col4" >0.00564162</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row10_col5" class="data row10 col5" >0.000340462</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row11_col0" class="data row11 col0" >4096</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row11_col1" class="data row11 col1" >0.0003145</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row11_col2" class="data row11 col2" >0.000429869</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row11_col3" class="data row11 col3" >0.0008797</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row11_col4" class="data row11 col4" >0.00965261</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row11_col5" class="data row11 col5" >0.000308037</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row12_col0" class="data row12 col0" >8192</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row12_col1" class="data row12 col1" >0.00035903</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row12_col2" class="data row12 col2" >0.000534614</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row12_col3" class="data row12 col3" >0.00095893</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row12_col4" class="data row12 col4" >0.0183645</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row12_col5" class="data row12 col5" >0.000326395</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row13_col0" class="data row13 col0" >16384</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row13_col1" class="data row13 col1" >0.00052848</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row13_col2" class="data row13 col2" >0.000758489</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row13_col3" class="data row13 col3" >0.0010971</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row13_col4" class="data row13 col4" >0.0350608</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row13_col5" class="data row13 col5" >0.000352939</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row14_col0" class="data row14 col0" >32768</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row14_col1" class="data row14 col1" >0.0006847</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row14_col2" class="data row14 col2" >0.00121466</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row14_col3" class="data row14 col3" >0.0006326</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row14_col4" class="data row14 col4" >0.0719287</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row14_col5" class="data row14 col5" >0.00050354</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row15_col0" class="data row15 col0" >65536</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row15_col1" class="data row15 col1" >0.0015554</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row15_col2" class="data row15 col2" >0.00214259</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row15_col3" class="data row15 col3" >0.00086065</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row15_col4" class="data row15 col4" >0.144975</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row15_col5" class="data row15 col5" >0.000603676</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row16_col0" class="data row16 col0" >131070</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row16_col1" class="data row16 col1" >0.0023461</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row16_col2" class="data row16 col2" >0.00406241</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row16_col3" class="data row16 col3" >0.0014954</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row16_col4" class="data row16 col4" >0.287677</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row16_col5" class="data row16 col5" >0.00107956</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row17_col0" class="data row17 col0" >262140</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row17_col1" class="data row17 col1" >0.004927</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row17_col2" class="data row17 col2" >0.00935912</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row17_col3" class="data row17 col3" >0.0029189</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row17_col4" class="data row17 col4" >0.576392</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row17_col5" class="data row17 col5" >0.00169245</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row18_col0" class="data row18 col0" >524290</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row18_col1" class="data row18 col1" >0.0099234</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row18_col2" class="data row18 col2" >0.0172655</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row18_col3" class="data row18 col3" >0.0057994</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row18_col4" class="data row18 col4" >1.15772</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row18_col5" class="data row18 col5" >0.00422676</td>
-                </tr>
-                <tr>
-                                    <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row19_col0" class="data row19 col0" >1.0486e+06</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row19_col1" class="data row19 col1" >0.019946</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row19_col2" class="data row19 col2" >0.0352448</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row19_col3" class="data row19 col3" >0.011064</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row19_col4" class="data row19 col4" >2.48919</td>
-                            <td id="T_2f44b2d2_3329_11ea_8f84_acde48001122row19_col5" class="data row19 col5" >0.00649794</td>
-                </tr>
-        </tbody></table>
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>m_Lattice_t</th>
+          <th>py_Lattice_t</th>
+          <th>m_Sobol_t</th>
+          <th>r_Sobol_t</th>
+          <th>py_Sobol_MPS_t</th>
+          <th>py_Sobol_Pytorch_t</th>
+        </tr>
+        <tr>
+          <th>n</th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2.00e+00</td>
+          <td>3.76e-04</td>
+          <td>1.91e-04</td>
+          <td>6.36e-04</td>
+          <td>1.40e-04</td>
+          <td>1.86e-03</td>
+          <td>5.77e-04</td>
+        </tr>
+        <tr>
+          <td>4.00e+00</td>
+          <td>2.23e-04</td>
+          <td>1.72e-04</td>
+          <td>3.91e-04</td>
+          <td>1.69e-04</td>
+          <td>5.38e-04</td>
+          <td>2.31e-03</td>
+        </tr>
+        <tr>
+          <td>8.00e+00</td>
+          <td>1.54e-04</td>
+          <td>2.45e-04</td>
+          <td>3.68e-04</td>
+          <td>1.44e-04</td>
+          <td>5.01e-04</td>
+          <td>1.87e-03</td>
+        </tr>
+        <tr>
+          <td>1.60e+01</td>
+          <td>1.59e-04</td>
+          <td>2.40e-04</td>
+          <td>9.57e-04</td>
+          <td>1.57e-04</td>
+          <td>5.63e-04</td>
+          <td>2.61e-04</td>
+        </tr>
+        <tr>
+          <td>3.20e+01</td>
+          <td>1.68e-04</td>
+          <td>2.51e-04</td>
+          <td>4.58e-04</td>
+          <td>1.67e-04</td>
+          <td>5.39e-04</td>
+          <td>2.06e-03</td>
+        </tr>
+        <tr>
+          <td>6.40e+01</td>
+          <td>1.60e-04</td>
+          <td>2.82e-04</td>
+          <td>5.07e-04</td>
+          <td>1.48e-04</td>
+          <td>6.63e-04</td>
+          <td>2.73e-03</td>
+        </tr>
+        <tr>
+          <td>1.28e+02</td>
+          <td>1.60e-04</td>
+          <td>2.34e-04</td>
+          <td>4.09e-04</td>
+          <td>1.72e-04</td>
+          <td>8.34e-04</td>
+          <td>2.56e-03</td>
+        </tr>
+        <tr>
+          <td>2.56e+02</td>
+          <td>1.72e-04</td>
+          <td>2.94e-04</td>
+          <td>2.84e-04</td>
+          <td>1.62e-04</td>
+          <td>1.13e-03</td>
+          <td>2.45e-03</td>
+        </tr>
+        <tr>
+          <td>5.12e+02</td>
+          <td>1.87e-04</td>
+          <td>2.85e-04</td>
+          <td>2.47e-04</td>
+          <td>1.54e-04</td>
+          <td>1.63e-03</td>
+          <td>1.68e-03</td>
+        </tr>
+        <tr>
+          <td>1.02e+03</td>
+          <td>1.85e-04</td>
+          <td>3.34e-04</td>
+          <td>2.66e-04</td>
+          <td>1.96e-04</td>
+          <td>3.13e-03</td>
+          <td>3.74e-04</td>
+        </tr>
+        <tr>
+          <td>2.05e+03</td>
+          <td>2.02e-04</td>
+          <td>3.38e-04</td>
+          <td>2.64e-04</td>
+          <td>2.12e-04</td>
+          <td>5.64e-03</td>
+          <td>3.40e-04</td>
+        </tr>
+        <tr>
+          <td>4.10e+03</td>
+          <td>3.15e-04</td>
+          <td>4.30e-04</td>
+          <td>8.80e-04</td>
+          <td>2.72e-04</td>
+          <td>9.65e-03</td>
+          <td>3.08e-04</td>
+        </tr>
+        <tr>
+          <td>8.19e+03</td>
+          <td>3.59e-04</td>
+          <td>5.35e-04</td>
+          <td>9.59e-04</td>
+          <td>5.12e-04</td>
+          <td>1.84e-02</td>
+          <td>3.26e-04</td>
+        </tr>
+        <tr>
+          <td>1.64e+04</td>
+          <td>5.28e-04</td>
+          <td>7.58e-04</td>
+          <td>1.10e-03</td>
+          <td>7.29e-04</td>
+          <td>3.51e-02</td>
+          <td>3.53e-04</td>
+        </tr>
+        <tr>
+          <td>3.28e+04</td>
+          <td>6.85e-04</td>
+          <td>1.21e-03</td>
+          <td>6.33e-04</td>
+          <td>1.20e-03</td>
+          <td>7.19e-02</td>
+          <td>5.04e-04</td>
+        </tr>
+        <tr>
+          <td>6.55e+04</td>
+          <td>1.56e-03</td>
+          <td>2.14e-03</td>
+          <td>8.61e-04</td>
+          <td>2.07e-03</td>
+          <td>1.45e-01</td>
+          <td>6.04e-04</td>
+        </tr>
+        <tr>
+          <td>1.31e+05</td>
+          <td>2.35e-03</td>
+          <td>4.06e-03</td>
+          <td>1.50e-03</td>
+          <td>4.48e-03</td>
+          <td>2.88e-01</td>
+          <td>1.08e-03</td>
+        </tr>
+        <tr>
+          <td>2.62e+05</td>
+          <td>4.93e-03</td>
+          <td>9.36e-03</td>
+          <td>2.92e-03</td>
+          <td>1.42e-02</td>
+          <td>5.76e-01</td>
+          <td>1.69e-03</td>
+        </tr>
+        <tr>
+          <td>5.24e+05</td>
+          <td>9.92e-03</td>
+          <td>1.73e-02</td>
+          <td>5.80e-03</td>
+          <td>2.80e-02</td>
+          <td>1.16e+00</td>
+          <td>4.23e-03</td>
+        </tr>
+        <tr>
+          <td>1.05e+06</td>
+          <td>1.99e-02</td>
+          <td>3.52e-02</td>
+          <td>1.11e-02</td>
+          <td>7.01e-02</td>
+          <td>2.49e+00</td>
+          <td>6.50e-03</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
 
 
 
@@ -518,21 +629,22 @@ https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/lattice_ge
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     n = df_languages.n
     # Lattice Plot
-    ax[0].loglog(n, df_languages['matlab_Lattice_time'], label='MATLAB', color='c')
-    ax[0].loglog(n, df_languages['python_Lattice_time'], label='Python', color='m')
+    ax[0].loglog(n, df_languages['m_Lattice_t'], label='MATLAB', color='c')
+    ax[0].loglog(n, df_languages['py_Lattice_t'], label='Python', color='m')
     ax[0].legend(loc='upper left')
     ax[0].set_xlabel('Sampling Points')
     ax[0].set_ylabel('Lattice Generation Time (seconds)')
     # Sobol Plot
-    ax[1].loglog(n, df_languages['matlab_Sobol_time'], label='MATLAB', color='c')
-    ax[1].loglog(n, df_languages['python_Sobol_MPS_time'], label='Python MPS', color='r')
-    ax[1].loglog(n, df_languages['python_Sobol_Pytorch_time'], label='Python Pytorch', color='y')
+    ax[1].loglog(n, df_languages['m_Sobol_t'], label='MATLAB', color='c')
+    ax[1].loglog(n, df_languages['r_Sobol_t'], label='R', color='k')
+    ax[1].loglog(n, df_languages['py_Sobol_MPS_t'], label='Python MPS', color='r')
+    ax[1].loglog(n, df_languages['py_Sobol_Pytorch_t'], label='Python Pytorch', color='y')
     ax[1].legend(loc='upper left')
     ax[1].set_xlabel('Sampling Points')
     ax[1].set_ylabel('Sobol Generation Time (seconds)')
     # Metas and Export
-    fig.suptitle('Speed Comparison of MATLAB and Python Quasi-Random Generators')
-    plt.savefig('../outputs/lds_sequences/matlab_vs_python_generators.png', dpi=200)
+    fig.suptitle('Speed Comparison of MATLAB, R, and Python Quasi-Random Generators')
+    plt.savefig('../outputs/lds_sequences/matlab_vs_r_vs_python_generators.png', dpi=200)
 
 
 
@@ -563,111 +675,140 @@ Parameters - replications = 16 - dimension = 4
 .. code:: ipython3
 
     df_sobol_backends = pd.read_csv('../outputs/lds_sequences/sobol_backend_times.csv')
-    df_sobol_backends.style.hide_index()
+    df_sobol_backends.columns = ['n','Sobol_MPS_t','Sobol_PyTorch_t']
+    df_sobol_backends.set_index('n')
 
 
 
 
 .. raw:: html
 
-    <style  type="text/css" >
-    </style><table id="T_30306b6e_3329_11ea_8f84_acde48001122" ><thead>    <tr>        <th class="col_heading level0 col0" >n</th>        <th class="col_heading level0 col1" >Sobol_MPS_time</th>        <th class="col_heading level0 col2" >Sobol_Pytorch_time</th>    </tr></thead><tbody>
-                    <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row0_col0" class="data row0 col0" >16</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row0_col1" class="data row0 col1" >0.0024248</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row0_col2" class="data row0 col2" >0.0132773</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row1_col0" class="data row1 col0" >16</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row1_col1" class="data row1 col1" >0.000203133</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row1_col2" class="data row1 col2" >0.000230869</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row2_col0" class="data row2 col0" >32</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row2_col1" class="data row2 col1" >0.000234683</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row2_col2" class="data row2 col2" >0.000313997</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row3_col0" class="data row3 col0" >64</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row3_col1" class="data row3 col1" >0.000365098</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row3_col2" class="data row3 col2" >0.000246763</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row4_col0" class="data row4 col0" >128</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row4_col1" class="data row4 col1" >0.000594219</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row4_col2" class="data row4 col2" >0.000253042</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row5_col0" class="data row5 col0" >256</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row5_col1" class="data row5 col1" >0.00109943</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row5_col2" class="data row5 col2" >0.000285228</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row6_col0" class="data row6 col0" >512</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row6_col1" class="data row6 col1" >0.00221292</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row6_col2" class="data row6 col2" >0.000371615</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row7_col0" class="data row7 col0" >1024</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row7_col1" class="data row7 col1" >0.0041848</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row7_col2" class="data row7 col2" >0.00041763</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row8_col0" class="data row8 col0" >2048</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row8_col1" class="data row8 col1" >0.00860826</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row8_col2" class="data row8 col2" >0.000587861</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row9_col0" class="data row9 col0" >4096</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row9_col1" class="data row9 col1" >0.016837</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row9_col2" class="data row9 col2" >0.0012571</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row10_col0" class="data row10 col0" >8192</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row10_col1" class="data row10 col1" >0.0333868</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row10_col2" class="data row10 col2" >0.00218765</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row11_col0" class="data row11 col0" >16384</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row11_col1" class="data row11 col1" >0.0639678</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row11_col2" class="data row11 col2" >0.00365202</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row12_col0" class="data row12 col0" >32768</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row12_col1" class="data row12 col1" >0.124915</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row12_col2" class="data row12 col2" >0.00657288</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row13_col0" class="data row13 col0" >65536</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row13_col1" class="data row13 col1" >0.242437</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row13_col2" class="data row13 col2" >0.0133937</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row14_col0" class="data row14 col0" >131072</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row14_col1" class="data row14 col1" >0.483104</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row14_col2" class="data row14 col2" >0.0265319</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row15_col0" class="data row15 col0" >262144</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row15_col1" class="data row15 col1" >0.975574</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row15_col2" class="data row15 col2" >0.0617198</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row16_col0" class="data row16 col0" >524288</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row16_col1" class="data row16 col1" >1.95309</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row16_col2" class="data row16 col2" >0.137671</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row17_col0" class="data row17 col0" >1.04858e+06</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row17_col1" class="data row17 col1" >4.04611</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row17_col2" class="data row17 col2" >0.326717</td>
-                </tr>
-                <tr>
-                                    <td id="T_30306b6e_3329_11ea_8f84_acde48001122row18_col0" class="data row18 col0" >2.09715e+06</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row18_col1" class="data row18 col1" >8.36213</td>
-                            <td id="T_30306b6e_3329_11ea_8f84_acde48001122row18_col2" class="data row18 col2" >0.579214</td>
-                </tr>
-        </tbody></table>
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>Sobol_MPS_t</th>
+          <th>Sobol_PyTorch_t</th>
+        </tr>
+        <tr>
+          <th>n</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1.60e+01</td>
+          <td>2.42e-03</td>
+          <td>1.33e-02</td>
+        </tr>
+        <tr>
+          <td>1.60e+01</td>
+          <td>2.03e-04</td>
+          <td>2.31e-04</td>
+        </tr>
+        <tr>
+          <td>3.20e+01</td>
+          <td>2.35e-04</td>
+          <td>3.14e-04</td>
+        </tr>
+        <tr>
+          <td>6.40e+01</td>
+          <td>3.65e-04</td>
+          <td>2.47e-04</td>
+        </tr>
+        <tr>
+          <td>1.28e+02</td>
+          <td>5.94e-04</td>
+          <td>2.53e-04</td>
+        </tr>
+        <tr>
+          <td>2.56e+02</td>
+          <td>1.10e-03</td>
+          <td>2.85e-04</td>
+        </tr>
+        <tr>
+          <td>5.12e+02</td>
+          <td>2.21e-03</td>
+          <td>3.72e-04</td>
+        </tr>
+        <tr>
+          <td>1.02e+03</td>
+          <td>4.18e-03</td>
+          <td>4.18e-04</td>
+        </tr>
+        <tr>
+          <td>2.05e+03</td>
+          <td>8.61e-03</td>
+          <td>5.88e-04</td>
+        </tr>
+        <tr>
+          <td>4.10e+03</td>
+          <td>1.68e-02</td>
+          <td>1.26e-03</td>
+        </tr>
+        <tr>
+          <td>8.19e+03</td>
+          <td>3.34e-02</td>
+          <td>2.19e-03</td>
+        </tr>
+        <tr>
+          <td>1.64e+04</td>
+          <td>6.40e-02</td>
+          <td>3.65e-03</td>
+        </tr>
+        <tr>
+          <td>3.28e+04</td>
+          <td>1.25e-01</td>
+          <td>6.57e-03</td>
+        </tr>
+        <tr>
+          <td>6.55e+04</td>
+          <td>2.42e-01</td>
+          <td>1.34e-02</td>
+        </tr>
+        <tr>
+          <td>1.31e+05</td>
+          <td>4.83e-01</td>
+          <td>2.65e-02</td>
+        </tr>
+        <tr>
+          <td>2.62e+05</td>
+          <td>9.76e-01</td>
+          <td>6.17e-02</td>
+        </tr>
+        <tr>
+          <td>5.24e+05</td>
+          <td>1.95e+00</td>
+          <td>1.38e-01</td>
+        </tr>
+        <tr>
+          <td>1.05e+06</td>
+          <td>4.05e+00</td>
+          <td>3.27e-01</td>
+        </tr>
+        <tr>
+          <td>2.10e+06</td>
+          <td>8.36e+00</td>
+          <td>5.79e-01</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
 
 
 
@@ -676,8 +817,8 @@ Parameters - replications = 16 - dimension = 4
     fig,ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
     n = df_sobol_backends.n
     # Lattice Plot
-    ax.loglog(n, df_sobol_backends['Sobol_MPS_time'], label='MPS', color='r')
-    ax.loglog(n, df_sobol_backends['Sobol_Pytorch_time'], label='Pytorch', color='y')
+    ax.loglog(n, df_sobol_backends['Sobol_MPS_t'], label='MPS', color='r')
+    ax.loglog(n, df_sobol_backends['Sobol_PyTorch_t'], label='Pytorch', color='y')
     ax.legend(loc='upper left')
     ax.set_xlabel('Sampling Points')
     ax.set_ylabel('Sobol Generation Time (seconds)')

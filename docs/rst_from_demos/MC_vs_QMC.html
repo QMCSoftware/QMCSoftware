@@ -25,8 +25,6 @@
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script type="text/javascript" src="../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/HTML-CSS"]})</script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -95,6 +93,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../demos.html">Demos</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="qmcpy_intro.html">Welcome to QMCPy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration_examples.html">Integration Examples using QMCPy package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lebesgue_integration.html">QMCPy for Lebesgue Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sample_scatter_plots.html">Scatter Plots of Samples</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">A Monte Carlo vs Quasi-Monte Carlo Comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#absolute-tolerance-plots">Absolute Tolerance Plots</a></li>
@@ -181,6 +180,18 @@ exploited by Quasi-Monte Carlo algorithms.</p>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">SMALL_SIZE</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">MEDIUM_SIZE</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">BIGGER_SIZE</span> <span class="o">=</span> <span class="mi">14</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">BIGGER_SIZE</span><span class="p">)</span>          <span class="c1"># controls default text sizes</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;axes&#39;</span><span class="p">,</span> <span class="n">titlesize</span><span class="o">=</span><span class="n">BIGGER_SIZE</span><span class="p">)</span>     <span class="c1"># fontsize of the axes title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;axes&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">BIGGER_SIZE</span><span class="p">)</span>    <span class="c1"># fontsize of the x and y labels</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;xtick&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">MEDIUM_SIZE</span><span class="p">)</span>    <span class="c1"># fontsize of the tick labels</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;ytick&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">MEDIUM_SIZE</span><span class="p">)</span>    <span class="c1"># fontsize of the tick labels</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;legend&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">BIGGER_SIZE</span><span class="p">)</span>    <span class="c1"># legend fontsize</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;figure&#39;</span><span class="p">,</span> <span class="n">titlesize</span><span class="o">=</span><span class="n">BIGGER_SIZE</span><span class="p">)</span>  <span class="c1"># fontsize of the figure title</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">distrib_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IIDStdUniform&#39;</span><span class="p">,</span><span class="s1">&#39;IIDStdGaussian&#39;</span><span class="p">,</span><span class="s1">&#39;Lattice&#39;</span><span class="p">,</span><span class="s1">&#39;Sobol&#39;</span><span class="p">]</span>
@@ -191,168 +202,216 @@ exploited by Quasi-Monte Carlo algorithms.</p>
 <h1>Absolute Tolerance Plots<a class="headerlink" href="#absolute-tolerance-plots" title="Permalink to this headline">¶</a></h1>
 <p>Testing Parameters - relative tolerance = 0 - lds initial sample size =
 32 - iid initial sample size = 256 - Results averaged over 3 trials</p>
-<p>Keister Integrand - <span class="math notranslate nohighlight">\(y_i = \pi^{d/2} \cos(||x_i||_2)\)</span> -
-<span class="math notranslate nohighlight">\(d=3\)</span></p>
-<p>Gaussian True Measure - <span class="math notranslate nohighlight">\(\mathcal{N}_3(0,\frac{1}{2})\)</span></p>
+<p>Keister Integrand - <img class="math" src="../_images/math/b2f2a409f38a61dba282c85785deff8fbe24948a.png" alt="y_i = \pi^{d/2} \cos(||x_i||_2)"/> -
+<img class="math" src="../_images/math/eeebc0b5b8491304da0058aaf1129b214ce53be1.png" alt="d=3"/></p>
+<p>Gaussian True Measure - <img class="math" src="../_images/math/75cb2c7c2ae694c17a79e240f3a7c6520017321a.png" alt="\mathcal{N}_3(0,\frac{1}{2})"/></p>
 <p>Data for the following plot can be generated by running ~~~ python
 workouts/wo_mc_vs_qmc/comp_abstols.py ~~~</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_abstols</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../outputs/mc_vs_qmc/abs_tol.csv&#39;</span><span class="p">)</span>
-<span class="n">df_abstols</span><span class="o">.</span><span class="n">loc</span><span class="p">[::</span><span class="mi">25</span><span class="p">]</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">hide_index</span><span class="p">()</span>
+<span class="n">df_abstols</span><span class="o">.</span><span class="n">loc</span><span class="p">[::</span><span class="mi">25</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;abs_tol&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<style  type="text/css" >
-</style><table id="T_22d6d462_3329_11ea_ac8e_acde48001122" ><thead>    <tr>        <th class="col_heading level0 col0" >abs_tol</th>        <th class="col_heading level0 col1" >IIDStdUniform_solution</th>        <th class="col_heading level0 col2" >IIDStdGaussian_solution</th>        <th class="col_heading level0 col3" >Lattice_solution</th>        <th class="col_heading level0 col4" >Sobol_solution</th>        <th class="col_heading level0 col5" >IIDStdUniform_time</th>        <th class="col_heading level0 col6" >IIDStdGaussian_time</th>        <th class="col_heading level0 col7" >Lattice_time</th>        <th class="col_heading level0 col8" >Sobol_time</th>        <th class="col_heading level0 col9" >IIDStdUniform_n</th>        <th class="col_heading level0 col10" >IIDStdGaussian_n</th>        <th class="col_heading level0 col11" >Lattice_n</th>        <th class="col_heading level0 col12" >Sobol_n</th>    </tr></thead><tbody>
-                <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col0" class="data row0 col0" >0.001</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col1" class="data row0 col1" >nan</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col2" class="data row0 col2" >0.722812</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col3" class="data row0 col3" >0.722805</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col4" class="data row0 col4" >0.722832</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col5" class="data row0 col5" >nan</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col6" class="data row0 col6" >1.14761</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col7" class="data row0 col7" >0.00491103</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col8" class="data row0 col8" >0.0358956</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col9" class="data row0 col9" >nan</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col10" class="data row0 col10" >1.41952e+07</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col11" class="data row0 col11" >682.667</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row0_col12" class="data row0 col12" >2730.67</td>
-            </tr>
-            <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col0" class="data row1 col0" >0.006</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col1" class="data row1 col1" >0.72301</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col2" class="data row1 col2" >0.722584</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col3" class="data row1 col3" >0.722722</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col4" class="data row1 col4" >0.723155</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col5" class="data row1 col5" >0.117142</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col6" class="data row1 col6" >0.0318606</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col7" class="data row1 col7" >0.00186841</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col8" class="data row1 col8" >0.0164597</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col9" class="data row1 col9" >379712</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col10" class="data row1 col10" >394476</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col11" class="data row1 col11" >170.667</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row1_col12" class="data row1 col12" >341.333</td>
-            </tr>
-            <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col0" class="data row2 col0" >0.011</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col1" class="data row2 col1" >0.724931</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col2" class="data row2 col2" >0.723321</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col3" class="data row2 col3" >0.722662</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col4" class="data row2 col4" >0.723328</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col5" class="data row2 col5" >0.0336874</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col6" class="data row2 col6" >0.00912529</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col7" class="data row2 col7" >0.00133779</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col8" class="data row2 col8" >0.012137</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col9" class="data row2 col9" >113092</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col10" class="data row2 col10" >117485</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col11" class="data row2 col11" >85.3333</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row2_col12" class="data row2 col12" >170.667</td>
-            </tr>
-            <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col0" class="data row3 col0" >0.016</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col1" class="data row3 col1" >0.72614</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col2" class="data row3 col2" >0.724983</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col3" class="data row3 col3" >0.722662</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col4" class="data row3 col4" >0.723328</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col5" class="data row3 col5" >0.0156919</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col6" class="data row3 col6" >0.00437742</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col7" class="data row3 col7" >0.00130293</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col8" class="data row3 col8" >0.0131167</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col9" class="data row3 col9" >53544</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col10" class="data row3 col10" >55620</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col11" class="data row3 col11" >85.3333</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row3_col12" class="data row3 col12" >170.667</td>
-            </tr>
-            <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col0" class="data row4 col0" >0.021</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col1" class="data row4 col1" >0.728302</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col2" class="data row4 col2" >0.724899</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col3" class="data row4 col3" >0.722662</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col4" class="data row4 col4" >0.723328</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col5" class="data row4 col5" >0.00934364</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col6" class="data row4 col6" >0.00243531</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col7" class="data row4 col7" >0.00129065</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col8" class="data row4 col8" >0.0118065</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col9" class="data row4 col9" >31153.7</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col10" class="data row4 col10" >32359</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col11" class="data row4 col11" >85.3333</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row4_col12" class="data row4 col12" >170.667</td>
-            </tr>
-            <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col0" class="data row5 col0" >0.026</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col1" class="data row5 col1" >0.727016</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col2" class="data row5 col2" >0.724396</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col3" class="data row5 col3" >0.722822</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col4" class="data row5 col4" >0.723458</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col5" class="data row5 col5" >0.00629663</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col6" class="data row5 col6" >0.0016225</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col7" class="data row5 col7" >0.000919649</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col8" class="data row5 col8" >0.0108652</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col9" class="data row5 col9" >20383</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col10" class="data row5 col10" >21169.3</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col11" class="data row5 col11" >42.6667</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row5_col12" class="data row5 col12" >85.3333</td>
-            </tr>
-            <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col0" class="data row6 col0" >0.031</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col1" class="data row6 col1" >0.730251</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col2" class="data row6 col2" >0.724557</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col3" class="data row6 col3" >0.723904</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col4" class="data row6 col4" >0.723458</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col5" class="data row6 col5" >0.00468971</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col6" class="data row6 col6" >0.00134581</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col7" class="data row6 col7" >0.000663154</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col8" class="data row6 col8" >0.0128239</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col9" class="data row6 col9" >14389</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col10" class="data row6 col10" >14942</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col11" class="data row6 col11" >21.3333</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row6_col12" class="data row6 col12" >85.3333</td>
-            </tr>
-            <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col0" class="data row7 col0" >0.036</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col1" class="data row7 col1" >0.724674</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col2" class="data row7 col2" >0.724702</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col3" class="data row7 col3" >0.723904</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col4" class="data row7 col4" >0.723851</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col5" class="data row7 col5" >0.00364054</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col6" class="data row7 col6" >0.00103425</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col7" class="data row7 col7" >0.000717238</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col8" class="data row7 col8" >0.0104059</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col9" class="data row7 col9" >10713.7</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col10" class="data row7 col10" >11123.7</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col11" class="data row7 col11" >21.3333</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row7_col12" class="data row7 col12" >42.6667</td>
-            </tr>
-            <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col0" class="data row8 col0" >0.041</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col1" class="data row8 col1" >0.725528</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col2" class="data row8 col2" >0.721291</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col3" class="data row8 col3" >0.723904</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col4" class="data row8 col4" >0.723851</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col5" class="data row8 col5" >0.00325612</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col6" class="data row8 col6" >0.000946033</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col7" class="data row8 col7" >0.000675214</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col8" class="data row8 col8" >0.00963424</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col9" class="data row8 col9" >8299</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col10" class="data row8 col10" >8615.33</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col11" class="data row8 col11" >21.3333</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row8_col12" class="data row8 col12" >42.6667</td>
-            </tr>
-            <tr>
-                                <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col0" class="data row9 col0" >0.046</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col1" class="data row9 col1" >0.721912</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col2" class="data row9 col2" >0.724686</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col3" class="data row9 col3" >0.723904</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col4" class="data row9 col4" >0.723851</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col5" class="data row9 col5" >0.00461814</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col6" class="data row9 col6" >0.00100436</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col7" class="data row9 col7" >0.000887403</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col8" class="data row9 col8" >0.0109651</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col9" class="data row9 col9" >6628</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col10" class="data row9 col10" >6879.33</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col11" class="data row9 col11" >21.3333</td>
-                        <td id="T_22d6d462_3329_11ea_ac8e_acde48001122row9_col12" class="data row9 col12" >42.6667</td>
-            </tr>
-    </tbody></table><div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>IIDStdUniform_solution</th>
+      <th>IIDStdGaussian_solution</th>
+      <th>Lattice_solution</th>
+      <th>Sobol_solution</th>
+      <th>IIDStdUniform_time</th>
+      <th>IIDStdGaussian_time</th>
+      <th>Lattice_time</th>
+      <th>Sobol_time</th>
+      <th>IIDStdUniform_n</th>
+      <th>IIDStdGaussian_n</th>
+      <th>Lattice_n</th>
+      <th>Sobol_n</th>
+    </tr>
+    <tr>
+      <th>abs_tol</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1.00e-03</td>
+      <td>nan</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>nan</td>
+      <td>1.15e+00</td>
+      <td>4.91e-03</td>
+      <td>3.59e-02</td>
+      <td>nan</td>
+      <td>1.42e+07</td>
+      <td>6.83e+02</td>
+      <td>2.73e+03</td>
+    </tr>
+    <tr>
+      <td>6.00e-03</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>1.17e-01</td>
+      <td>3.19e-02</td>
+      <td>1.87e-03</td>
+      <td>1.65e-02</td>
+      <td>3.80e+05</td>
+      <td>3.94e+05</td>
+      <td>1.71e+02</td>
+      <td>3.41e+02</td>
+    </tr>
+    <tr>
+      <td>1.10e-02</td>
+      <td>7.25e-01</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>3.37e-02</td>
+      <td>9.13e-03</td>
+      <td>1.34e-03</td>
+      <td>1.21e-02</td>
+      <td>1.13e+05</td>
+      <td>1.17e+05</td>
+      <td>8.53e+01</td>
+      <td>1.71e+02</td>
+    </tr>
+    <tr>
+      <td>1.60e-02</td>
+      <td>7.26e-01</td>
+      <td>7.25e-01</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>1.57e-02</td>
+      <td>4.38e-03</td>
+      <td>1.30e-03</td>
+      <td>1.31e-02</td>
+      <td>5.35e+04</td>
+      <td>5.56e+04</td>
+      <td>8.53e+01</td>
+      <td>1.71e+02</td>
+    </tr>
+    <tr>
+      <td>2.10e-02</td>
+      <td>7.28e-01</td>
+      <td>7.25e-01</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>9.34e-03</td>
+      <td>2.44e-03</td>
+      <td>1.29e-03</td>
+      <td>1.18e-02</td>
+      <td>3.12e+04</td>
+      <td>3.24e+04</td>
+      <td>8.53e+01</td>
+      <td>1.71e+02</td>
+    </tr>
+    <tr>
+      <td>2.60e-02</td>
+      <td>7.27e-01</td>
+      <td>7.24e-01</td>
+      <td>7.23e-01</td>
+      <td>7.23e-01</td>
+      <td>6.30e-03</td>
+      <td>1.62e-03</td>
+      <td>9.20e-04</td>
+      <td>1.09e-02</td>
+      <td>2.04e+04</td>
+      <td>2.12e+04</td>
+      <td>4.27e+01</td>
+      <td>8.53e+01</td>
+    </tr>
+    <tr>
+      <td>3.10e-02</td>
+      <td>7.30e-01</td>
+      <td>7.25e-01</td>
+      <td>7.24e-01</td>
+      <td>7.23e-01</td>
+      <td>4.69e-03</td>
+      <td>1.35e-03</td>
+      <td>6.63e-04</td>
+      <td>1.28e-02</td>
+      <td>1.44e+04</td>
+      <td>1.49e+04</td>
+      <td>2.13e+01</td>
+      <td>8.53e+01</td>
+    </tr>
+    <tr>
+      <td>3.60e-02</td>
+      <td>7.25e-01</td>
+      <td>7.25e-01</td>
+      <td>7.24e-01</td>
+      <td>7.24e-01</td>
+      <td>3.64e-03</td>
+      <td>1.03e-03</td>
+      <td>7.17e-04</td>
+      <td>1.04e-02</td>
+      <td>1.07e+04</td>
+      <td>1.11e+04</td>
+      <td>2.13e+01</td>
+      <td>4.27e+01</td>
+    </tr>
+    <tr>
+      <td>4.10e-02</td>
+      <td>7.26e-01</td>
+      <td>7.21e-01</td>
+      <td>7.24e-01</td>
+      <td>7.24e-01</td>
+      <td>3.26e-03</td>
+      <td>9.46e-04</td>
+      <td>6.75e-04</td>
+      <td>9.63e-03</td>
+      <td>8.30e+03</td>
+      <td>8.62e+03</td>
+      <td>2.13e+01</td>
+      <td>4.27e+01</td>
+    </tr>
+    <tr>
+      <td>4.60e-02</td>
+      <td>7.22e-01</td>
+      <td>7.25e-01</td>
+      <td>7.24e-01</td>
+      <td>7.24e-01</td>
+      <td>4.62e-03</td>
+      <td>1.00e-03</td>
+      <td>8.87e-04</td>
+      <td>1.10e-02</td>
+      <td>6.63e+03</td>
+      <td>6.88e+03</td>
+      <td>2.13e+01</td>
+      <td>4.27e+01</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">abstols</span> <span class="o">=</span> <span class="n">df_abstols</span><span class="p">[</span><span class="s1">&#39;abs_tol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 <span class="k">for</span> <span class="n">distrib_name</span> <span class="ow">in</span> <span class="n">distrib_names</span><span class="p">:</span>
     <span class="n">times</span> <span class="o">=</span> <span class="n">df_abstols</span><span class="p">[</span><span class="n">distrib_name</span><span class="o">+</span><span class="s1">&#39;_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
@@ -371,176 +430,224 @@ workouts/wo_mc_vs_qmc/comp_abstols.py ~~~</p>
 <img alt="../_images/MC_vs_QMC_5_0.png" src="../_images/MC_vs_QMC_5_0.png" />
 <center><p>Quasi-Monte Carlo takes less time and fewer samples to achieve the same
 accuracy as regular Monte Carlo This number of points for Monte Carlo
-algorithms is <span class="math notranslate nohighlight">\(\mathcal{O}(1/\epsilon^2)\)</span> while Quasi-Monte Carlo
-algorithms can be as efficient as <span class="math notranslate nohighlight">\(\mathcal{O}(1/\epsilon)\)</span></p>
+algorithms is <img class="math" src="../_images/math/4ed34b90f01e5d7f8907d1c09aae1d3fd27d14da.png" alt="\mathcal{O}(1/\epsilon^2)"/> while Quasi-Monte Carlo
+algorithms can be as efficient as <img class="math" src="../_images/math/2125819ccbc75dd73fa57015af71da91f3f7f524.png" alt="\mathcal{O}(1/\epsilon)"/></p>
 </center></div>
 <div class="section" id="dimension-plots">
 <h1>Dimension Plots<a class="headerlink" href="#dimension-plots" title="Permalink to this headline">¶</a></h1>
 <p>Testing Parameters - absolute tolerance = 0 - relative tolerance = .01 -
 lds initial sample size = 32 - iid initial sample size = 256 - Results
 averaged over 3 trials</p>
-<p>Keister Integrand - <span class="math notranslate nohighlight">\(y_i = \pi^{d/2} \cos(||x_i||_2)\)</span></p>
-<p>Gaussian True Measure - <span class="math notranslate nohighlight">\(\mathcal{N}_d(0,\frac{1}{2})\)</span></p>
+<p>Keister Integrand - <img class="math" src="../_images/math/b2f2a409f38a61dba282c85785deff8fbe24948a.png" alt="y_i = \pi^{d/2} \cos(||x_i||_2)"/></p>
+<p>Gaussian True Measure - <img class="math" src="../_images/math/f06060799a8760d4c0e8108a86c48515de047b0d.png" alt="\mathcal{N}_d(0,\frac{1}{2})"/></p>
 <p>Data for the following plot can be generated by running ~~~ python
 workouts/wo_mc_vs_qmc/comp_dimensions.py ~~~</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_dimensions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../outputs/mc_vs_qmc/dimension.csv&#39;</span><span class="p">)</span>
 <span class="n">df_dimensions</span><span class="o">.</span><span class="n">dimension</span> <span class="o">=</span> <span class="n">df_dimensions</span><span class="o">.</span><span class="n">dimension</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-<span class="n">df_dimensions</span><span class="o">.</span><span class="n">loc</span><span class="p">[::</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">hide_index</span><span class="p">()</span>
+<span class="n">df_dimensions</span><span class="o">.</span><span class="n">loc</span><span class="p">[::</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;dimension&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<style  type="text/css" >
-</style><table id="T_23b734d0_3329_11ea_ac8e_acde48001122" ><thead>    <tr>        <th class="col_heading level0 col0" >dimension</th>        <th class="col_heading level0 col1" >IIDStdUniform_solution</th>        <th class="col_heading level0 col2" >IIDStdGaussian_solution</th>        <th class="col_heading level0 col3" >Lattice_solution</th>        <th class="col_heading level0 col4" >Sobol_solution</th>        <th class="col_heading level0 col5" >IIDStdUniform_time</th>        <th class="col_heading level0 col6" >IIDStdGaussian_time</th>        <th class="col_heading level0 col7" >Lattice_time</th>        <th class="col_heading level0 col8" >Sobol_time</th>        <th class="col_heading level0 col9" >IIDStdUniform_n</th>        <th class="col_heading level0 col10" >IIDStdGaussian_n</th>        <th class="col_heading level0 col11" >Lattice_n</th>        <th class="col_heading level0 col12" >Sobol_n</th>    </tr></thead><tbody>
-                <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col0" class="data row0 col0" >1</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col1" class="data row0 col1" >0.460108</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col2" class="data row0 col2" >0.461123</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col3" class="data row0 col3" >0.460099</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col4" class="data row0 col4" >0.459793</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col5" class="data row0 col5" >0.001007</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col6" class="data row0 col6" >0.000335375</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col7" class="data row0 col7" >0.00056274</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col8" class="data row0 col8" >0.00437529</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col9" class="data row0 col9" >3995</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col10" class="data row0 col10" >3331</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col11" class="data row0 col11" >21.3333</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row0_col12" class="data row0 col12" >21.3333</td>
-            </tr>
-            <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col0" class="data row1 col0" >5</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col1" class="data row1 col1" >0.378211</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col2" class="data row1 col2" >0.377494</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col3" class="data row1 col3" >0.379103</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col4" class="data row1 col4" >0.378883</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col5" class="data row1 col5" >0.814364</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col6" class="data row1 col6" >0.0503418</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col7" class="data row1 col7" >0.00394153</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col8" class="data row1 col8" >0.02848</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col9" class="data row1 col9" >1.55472e+06</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col10" class="data row1 col10" >415497</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col11" class="data row1 col11" >341.333</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row1_col12" class="data row1 col12" >682.667</td>
-            </tr>
-            <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col0" class="data row2 col0" >9</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col1" class="data row2 col1" >-23.6903</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col2" class="data row2 col2" >-23.8344</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col3" class="data row2 col3" >-23.8849</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col4" class="data row2 col4" >-23.8672</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col5" class="data row2 col5" >0.028255</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col6" class="data row2 col6" >0.005591</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col7" class="data row2 col7" >0.00351507</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col8" class="data row2 col8" >0.0261701</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col9" class="data row2 col9" >28459.7</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col10" class="data row2 col10" >29839.7</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col11" class="data row2 col11" >170.667</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row2_col12" class="data row2 col12" >170.667</td>
-            </tr>
-            <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col0" class="data row3 col0" >13</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col1" class="data row3 col1" >-399.334</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col2" class="data row3 col2" >-400.61</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col3" class="data row3 col3" >-401.085</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col4" class="data row3 col4" >-401.037</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col5" class="data row3 col5" >0.0086464</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col6" class="data row3 col6" >0.00251804</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col7" class="data row3 col7" >0.00597106</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col8" class="data row3 col8" >0.03662</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col9" class="data row3 col9" >4537.33</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col10" class="data row3 col10" >5826.33</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col11" class="data row3 col11" >170.667</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row3_col12" class="data row3 col12" >170.667</td>
-            </tr>
-            <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col0" class="data row4 col0" >17</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col1" class="data row4 col1" >-4776.3</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col2" class="data row4 col2" >-4760.83</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col3" class="data row4 col3" >-4772.14</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col4" class="data row4 col4" >-4772.88</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col5" class="data row4 col5" >0.00368726</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col6" class="data row4 col6" >0.000879016</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col7" class="data row4 col7" >0.00547441</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col8" class="data row4 col8" >0.0368324</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col9" class="data row4 col9" >1758.67</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col10" class="data row4 col10" >1818</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col11" class="data row4 col11" >170.667</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row4_col12" class="data row4 col12" >85.3333</td>
-            </tr>
-            <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col0" class="data row5 col0" >21</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col1" class="data row5 col1" >-48919.6</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col2" class="data row5 col2" >-48850.7</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col3" class="data row5 col3" >-48725.3</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col4" class="data row5 col4" >-48667.1</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col5" class="data row5 col5" >0.00332601</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col6" class="data row5 col6" >0.00070612</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col7" class="data row5 col7" >0.00393924</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col8" class="data row5 col8" >0.0421246</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col9" class="data row5 col9" >1211.67</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col10" class="data row5 col10" >944.333</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col11" class="data row5 col11" >85.3333</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row5_col12" class="data row5 col12" >85.3333</td>
-            </tr>
-            <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col0" class="data row6 col0" >25</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col1" class="data row6 col1" >-454219</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col2" class="data row6 col2" >-452007</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col3" class="data row6 col3" >-452298</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col4" class="data row6 col4" >-452194</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col5" class="data row6 col5" >0.00643447</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col6" class="data row6 col6" >0.00105093</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col7" class="data row6 col7" >0.00746445</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col8" class="data row6 col8" >0.0505719</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col9" class="data row6 col9" >2369.67</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col10" class="data row6 col10" >2100.67</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col11" class="data row6 col11" >170.667</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row6_col12" class="data row6 col12" >170.667</td>
-            </tr>
-            <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col0" class="data row7 col0" >29</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col1" class="data row7 col1" >-3.87576e+06</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col2" class="data row7 col2" >-3.85377e+06</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col3" class="data row7 col3" >-3.84776e+06</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col4" class="data row7 col4" >-3.83748e+06</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col5" class="data row7 col5" >0.0153839</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col6" class="data row7 col6" >0.00247255</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col7" class="data row7 col7" >0.00862802</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col8" class="data row7 col8" >0.057724</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col9" class="data row7 col9" >5434.33</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col10" class="data row7 col10" >4454.33</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col11" class="data row7 col11" >170.667</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row7_col12" class="data row7 col12" >170.667</td>
-            </tr>
-            <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col0" class="data row8 col0" >33</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col1" class="data row8 col1" >-2.9858e+07</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col2" class="data row8 col2" >-2.96617e+07</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col3" class="data row8 col3" >-2.95862e+07</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col4" class="data row8 col4" >-2.96378e+07</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col5" class="data row8 col5" >0.041836</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col6" class="data row8 col6" >0.00504077</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col7" class="data row8 col7" >0.00521742</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col8" class="data row8 col8" >0.0603707</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col9" class="data row8 col9" >11939</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col10" class="data row8 col10" >8713</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col11" class="data row8 col11" >85.3333</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row8_col12" class="data row8 col12" >170.667</td>
-            </tr>
-            <tr>
-                                <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col0" class="data row9 col0" >37</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col1" class="data row9 col1" >-1.98948e+08</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col2" class="data row9 col2" >-1.98654e+08</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col3" class="data row9 col3" >-1.98568e+08</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col4" class="data row9 col4" >-1.9902e+08</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col5" class="data row9 col5" >0.131707</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col6" class="data row9 col6" >0.0169234</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col7" class="data row9 col7" >0.010719</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col8" class="data row9 col8" >0.0641265</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col9" class="data row9 col9" >35589.7</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col10" class="data row9 col10" >26123.3</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col11" class="data row9 col11" >170.667</td>
-                        <td id="T_23b734d0_3329_11ea_ac8e_acde48001122row9_col12" class="data row9 col12" >170.667</td>
-            </tr>
-    </tbody></table><div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>IIDStdUniform_solution</th>
+      <th>IIDStdGaussian_solution</th>
+      <th>Lattice_solution</th>
+      <th>Sobol_solution</th>
+      <th>IIDStdUniform_time</th>
+      <th>IIDStdGaussian_time</th>
+      <th>Lattice_time</th>
+      <th>Sobol_time</th>
+      <th>IIDStdUniform_n</th>
+      <th>IIDStdGaussian_n</th>
+      <th>Lattice_n</th>
+      <th>Sobol_n</th>
+    </tr>
+    <tr>
+      <th>dimension</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>4.60e-01</td>
+      <td>4.61e-01</td>
+      <td>4.60e-01</td>
+      <td>4.60e-01</td>
+      <td>1.01e-03</td>
+      <td>3.35e-04</td>
+      <td>5.63e-04</td>
+      <td>4.38e-03</td>
+      <td>4.00e+03</td>
+      <td>3.33e+03</td>
+      <td>2.13e+01</td>
+      <td>2.13e+01</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>3.78e-01</td>
+      <td>3.77e-01</td>
+      <td>3.79e-01</td>
+      <td>3.79e-01</td>
+      <td>8.14e-01</td>
+      <td>5.03e-02</td>
+      <td>3.94e-03</td>
+      <td>2.85e-02</td>
+      <td>1.55e+06</td>
+      <td>4.15e+05</td>
+      <td>3.41e+02</td>
+      <td>6.83e+02</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>-2.37e+01</td>
+      <td>-2.38e+01</td>
+      <td>-2.39e+01</td>
+      <td>-2.39e+01</td>
+      <td>2.83e-02</td>
+      <td>5.59e-03</td>
+      <td>3.52e-03</td>
+      <td>2.62e-02</td>
+      <td>2.85e+04</td>
+      <td>2.98e+04</td>
+      <td>1.71e+02</td>
+      <td>1.71e+02</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>-3.99e+02</td>
+      <td>-4.01e+02</td>
+      <td>-4.01e+02</td>
+      <td>-4.01e+02</td>
+      <td>8.65e-03</td>
+      <td>2.52e-03</td>
+      <td>5.97e-03</td>
+      <td>3.66e-02</td>
+      <td>4.54e+03</td>
+      <td>5.83e+03</td>
+      <td>1.71e+02</td>
+      <td>1.71e+02</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>-4.78e+03</td>
+      <td>-4.76e+03</td>
+      <td>-4.77e+03</td>
+      <td>-4.77e+03</td>
+      <td>3.69e-03</td>
+      <td>8.79e-04</td>
+      <td>5.47e-03</td>
+      <td>3.68e-02</td>
+      <td>1.76e+03</td>
+      <td>1.82e+03</td>
+      <td>1.71e+02</td>
+      <td>8.53e+01</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>-4.89e+04</td>
+      <td>-4.89e+04</td>
+      <td>-4.87e+04</td>
+      <td>-4.87e+04</td>
+      <td>3.33e-03</td>
+      <td>7.06e-04</td>
+      <td>3.94e-03</td>
+      <td>4.21e-02</td>
+      <td>1.21e+03</td>
+      <td>9.44e+02</td>
+      <td>8.53e+01</td>
+      <td>8.53e+01</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>-4.54e+05</td>
+      <td>-4.52e+05</td>
+      <td>-4.52e+05</td>
+      <td>-4.52e+05</td>
+      <td>6.43e-03</td>
+      <td>1.05e-03</td>
+      <td>7.46e-03</td>
+      <td>5.06e-02</td>
+      <td>2.37e+03</td>
+      <td>2.10e+03</td>
+      <td>1.71e+02</td>
+      <td>1.71e+02</td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>-3.88e+06</td>
+      <td>-3.85e+06</td>
+      <td>-3.85e+06</td>
+      <td>-3.84e+06</td>
+      <td>1.54e-02</td>
+      <td>2.47e-03</td>
+      <td>8.63e-03</td>
+      <td>5.77e-02</td>
+      <td>5.43e+03</td>
+      <td>4.45e+03</td>
+      <td>1.71e+02</td>
+      <td>1.71e+02</td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>-2.99e+07</td>
+      <td>-2.97e+07</td>
+      <td>-2.96e+07</td>
+      <td>-2.96e+07</td>
+      <td>4.18e-02</td>
+      <td>5.04e-03</td>
+      <td>5.22e-03</td>
+      <td>6.04e-02</td>
+      <td>1.19e+04</td>
+      <td>8.71e+03</td>
+      <td>8.53e+01</td>
+      <td>1.71e+02</td>
+    </tr>
+    <tr>
+      <td>37</td>
+      <td>-1.99e+08</td>
+      <td>-1.99e+08</td>
+      <td>-1.99e+08</td>
+      <td>-1.99e+08</td>
+      <td>1.32e-01</td>
+      <td>1.69e-02</td>
+      <td>1.07e-02</td>
+      <td>6.41e-02</td>
+      <td>3.56e+04</td>
+      <td>2.61e+04</td>
+      <td>1.71e+02</td>
+      <td>1.71e+02</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">dimensions</span> <span class="o">=</span> <span class="n">df_dimensions</span><span class="p">[</span><span class="s1">&#39;dimension&#39;</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">distrib_name</span> <span class="ow">in</span> <span class="n">distrib_names</span><span class="p">:</span>
     <span class="n">times</span> <span class="o">=</span> <span class="n">df_dimensions</span><span class="p">[</span><span class="n">distrib_name</span><span class="o">+</span><span class="s1">&#39;_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>

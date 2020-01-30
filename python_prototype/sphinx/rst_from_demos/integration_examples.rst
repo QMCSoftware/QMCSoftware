@@ -43,12 +43,12 @@ to the function ``integrate()``.
 
 .. parsed-literal::
 
-    Solution: 2.1716         
+    Solution: 2.1477         
     Keister (Integrand Object)
     Sobol (Discrete Distribution Object)
     	mimics          StdUniform
     	rng_seed        7
-    	backend         pytorch
+    	backend         mps
     Gaussian (True Measure Object)
     	dimension       3
     	mu              0
@@ -60,10 +60,10 @@ to the function ``integrate()``.
     	inflate         1.200
     	alpha           0.010
     MeanVarDataRep (AccumData Object)
-    	n               128
-    	n_total         128
-    	confid_int      [ 2.164  2.179]
-    	time_total      0.009
+    	n               32
+    	n_total         32
+    	confid_int      [ 2.126  2.169]
+    	time_total      0.005
     	r               16
     
 
@@ -136,7 +136,7 @@ defined as follows:
     	n               2048
     	n_total         2048
     	confid_int      [ 6.257  6.262]
-    	time_total      0.377
+    	time_total      0.423
     	r               16
     
 
@@ -183,7 +183,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2552         
+    Solution: 6.2564         
     AsianCall (Integrand Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -205,9 +205,9 @@ last example.
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               [ 277857.000  38845.000  8006.000]
-    	n_total         327780
-    	confid_int      [ 6.206  6.304]
-    	time_total      0.113
+    	n               [ 282145.000  36826.000  6844.000]
+    	n_total         328887
+    	confid_int      [ 6.207  6.305]
+    	time_total      0.139
     
 

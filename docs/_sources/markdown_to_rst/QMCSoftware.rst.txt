@@ -42,11 +42,12 @@ from https://github.com/QMCSoftware/QMCSoftware.
 Documentation
 -------------
 
-Documentation of QMCPy is available at the following Read the Docs
-websites:
+PDF and EPUB ocumentation of QMCPy is available for download at Read the
+Docs website https://readthedocs.org/projects/qmcpy/downloads/.
 
--  HTML: https://qmcpy.readthedocs.io/en/latest/
--  PDF: https://readthedocs.org/projects/qmcpy/downloads/pdf/latest/
+In addition, we have HTML documentation can be browsed at
+https://qmcsoftware.github.io/QMCSoftware/ or
+https://qmcpy.readthedocs.io/en/latest/
 
 --------------
 
