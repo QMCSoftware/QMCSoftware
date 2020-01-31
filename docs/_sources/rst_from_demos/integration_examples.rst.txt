@@ -26,7 +26,7 @@ the Gaussian measure, and the Sobol distribution:
    :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
 The following code snippet integrates a three-dimensional Keister
-function numerically by creating instances of ``qmcpy``\ ’s built-in
+function numerically by creating instances of ``qmcpy``'s built-in
 classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CLTRep``, as inputs
 to the function ``integrate()``.
 
@@ -63,7 +63,7 @@ to the function ``integrate()``.
     	n               32
     	n_total         32
     	confid_int      [ 2.126  2.169]
-    	time_total      0.005
+    	time_total      0.004
     	r               16
     
 
@@ -112,7 +112,7 @@ defined as follows:
 
 .. parsed-literal::
 
-    Solution: 6.2595         
+    Solution: 6.2640         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -133,10 +133,10 @@ defined as follows:
     	inflate         1.200
     	alpha           0.010
     MeanVarDataRep (AccumData Object)
-    	n               2048
-    	n_total         2048
-    	confid_int      [ 6.257  6.262]
-    	time_total      0.423
+    	n               4096
+    	n_total         4096
+    	confid_int      [ 6.263  6.265]
+    	time_total      0.539
     	r               16
     
 
@@ -144,7 +144,7 @@ defined as follows:
 European Arithmetic-Mean Asian Put Option: Multi-Level
 ------------------------------------------------------
 
-This example is similar to the last one except that we use Gile’s
+This example is similar to the last one except that we use Gile's
 multi-level method for estimation of the option price. The main idea can
 be summarized as follows:
 
@@ -183,7 +183,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2564         
+    Solution: 6.2519         
     AsianCall (Integrand Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -205,9 +205,9 @@ last example.
     	inflate         1.200
     	alpha           0.010
     MeanVarData (AccumData Object)
-    	n               [ 282145.000  36826.000  6844.000]
-    	n_total         328887
-    	confid_int      [ 6.207  6.305]
-    	time_total      0.139
+    	n               [ 293993.000  32002.000  5204.000]
+    	n_total         334271
+    	confid_int      [ 6.203  6.301]
+    	time_total      0.083
     
 
