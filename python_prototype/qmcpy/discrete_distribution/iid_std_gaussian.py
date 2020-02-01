@@ -8,28 +8,33 @@ from ._discrete_distribution import DiscreteDistribution
 class IIDStdGaussian(DiscreteDistribution):
     """ Standard Gaussian """
 
-    def __init__(self, rng_seed=None):
+    def __init__(self, dimension=1, replications=0, seed=None):
         """
         Args:
-            rng_seed (int): seed the random number generator for reproducibility
+            dimension (int): dimension of samples
+            replications (int): Number of nxd matrices to generate
+                replications set to 0 ignores replications and returns (n_max-n_min)xd samples            
+            seed (int): seed the random number generator for reproducibility
         """
+        self.dimension = dimension
+        self.squeeze = (replications==0)
+        self.replications = max(replications,1)
         self.mimics = 'StdGaussian'
-        self.rng = Generator(PCG64(rng_seed))
+        self.seed = seed
+        self.rng = Generator(PCG64(self.seed))
         super().__init__()
 
-    def gen_dd_samples(self, replications, n_samples, dimensions):
+    def gen_samples(self, n):
         """
-        Generate r nxd IID Standard Gaussian samples
+        Generate self.replications nxself.dimension IID Standard Gaussian samples
 
         Args:
-            replications (int): Number of nxd matrices to generate (sample.size()[0])
-            n_samples (int): Number of observations (sample.size()[1])
-            dimensions (int): Number of dimensions (sample.size()[2])
+            n (int): Number of observations to generate
 
         Returns:
-            replications x n_samples x dimensions (numpy array)
+            self.replications x n x self.dimension (ndarray)
         """
-        r = int(replications)
-        n = int(n_samples)
-        d = int(dimensions)
-        return self.rng.standard_normal((r, n, d))
+        x = self.rng.standard_normal((self.replications, n, self.dimension))
+        if self.squeeze:
+            x = x.squeeze(0)
+        return x
