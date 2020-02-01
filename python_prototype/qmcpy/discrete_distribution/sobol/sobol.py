@@ -6,9 +6,9 @@ from numpy import array, int64, log2, repeat, zeros
 from numpy.random import Generator, PCG64, randint
 from torch.quasirandom import SobolEngine
 
-from ._discrete_distribution import DiscreteDistribution
-from .mps_refactor import DigitalSeq
-from ..util import DistributionGenerationWarnings, ParameterError
+from .._discrete_distribution import DiscreteDistribution
+from .digital_sequence import DigitalSeq
+from ...util import DistributionGenerationWarnings, ParameterError
 
 
 class Sobol(DiscreteDistribution):

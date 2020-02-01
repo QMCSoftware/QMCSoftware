@@ -10,7 +10,4 @@ Reference:
     arxiv link: https://arxiv.org/abs/1606.06613
 Online Link: https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/
 """
-
-# API
-from .digital_sequence import DigitalSeq
-from .lattice_sequence import LatticeSeq
+from .sobol import Sobol
