@@ -1,14 +1,12 @@
 """ Definition for Lattice, a concrete implementation of DiscreteDistribution """
 
-import warnings
-
-from numpy import array, log2, repeat, vstack
-from numpy.random import Generator, PCG64
-
 from .._discrete_distribution import DiscreteDistribution
 from .gail_lattice import gail_lattice_gen
 from .mps_lattice import mps_lattice_gen
 from ...util import DistributionGenerationError, DistributionGenerationWarnings, ParameterError
+from numpy import array, log2, repeat, vstack
+from numpy.random import Generator, PCG64
+import warnings
 
 
 class Lattice(DiscreteDistribution):

@@ -3,11 +3,10 @@
 from .._discrete_distribution import DiscreteDistribution
 from .mps_sobol import DigitalSeq
 from ...util import DistributionGenerationWarnings, ParameterError, ParameterWarning
-
-import warnings
 from numpy import array, int64, log2, repeat, zeros
 from numpy.random import Generator, PCG64, randint
 from torch.quasirandom import SobolEngine
+import warnings
 
 
 class Sobol(DiscreteDistribution):

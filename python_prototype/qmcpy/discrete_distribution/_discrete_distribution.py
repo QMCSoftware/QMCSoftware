@@ -17,7 +17,7 @@ class DiscreteDistribution(object):
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
 
-    def gen_dd_samples(self, replications, n_samples, dimensions):
+    def gen_samples(self, replications, n_samples, dimensions):
         """
         ABSTRACT METHOD
         Generate r nxd IID Standard Gaussian samples

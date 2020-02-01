@@ -62,7 +62,13 @@ gen_vec = array([ # copied from
     379415, 229547, 430067, 137053, 312839, 390385, 77155, 163911, 514381, 487453],
     dtype=float)
 
+
 def vdc(n):
+    """
+    Van der Corput sequence in base 2 where n is a power of 2. We do it this
+    way because of our own VDC construction: is much faster and cubLattice
+    does not need more.
+    """
     k = log2(n)
     q = zeros(int(n))
     for l in range(int(k)):
@@ -72,6 +78,7 @@ def vdc(n):
         ptind = tile(ptind_nl,int(kk))
         q[ptind] += 1/2**(l+1)
     return q
+
 
 def gail_lattice_gen(n_min, n_max, d):
     """
