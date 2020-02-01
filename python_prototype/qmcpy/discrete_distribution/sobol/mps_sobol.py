@@ -1,12 +1,48 @@
-""" Sobol sequence generator """
+"""
+Sobol (Digital) sequence generator from Magic Point Shop (https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/)
+
+Adapted from https://bitbucket.org/dnuyens/qmc-generators/src/master/python/digitalseq_b2g.py
+
+Reference:
+    
+    [1] F.Y. Kuo & D. Nuyens.
+    Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients 
+    - a survey of analysis and implementation, Foundations of Computational Mathematics, 
+    16(6):1631-1696, 2016.
+    springer link: https://link.springer.com/article/10.1007/s10208-016-9329-5
+    arxiv link: https://arxiv.org/abs/1606.06613
+    
+    [2] D. Nuyens, `The Magic Point Shop of QMC point generators and generating
+    vectors.` MATLAB and Python software, 2018. Available from
+    https://people.cs.kuleuven.be/~dirk.nuyens/
+
+Note that mps_sobol_Cs.col is the corresponding basis vector for this algorithm
+"""
 
 from copy import copy
 from os import path
-
 from numpy import loadtxt
 
-from ._functions import bitreverse
+def bitreverse(a, m=None):
+    """
+    Reverse bit string of an integer.
 
+    Args:
+        a (int): Integer input.
+        m (int): Length of bit string.
+
+    Returns:
+        int: Integer that corresponds to reversed bit string of ``a``
+
+    """
+    # https://tinyurl.com/yybvsmqe
+    bin_number = bin(a)
+    if m is None:
+        m = len(bin_number) - 2
+    reverse_number = bin_number[-1:1:-1]
+    reverse_number = reverse_number + (m - len(reverse_number)) * "0"
+    a_rev = int(reverse_number, 2)
+    return a_rev
 
 class DigitalSeq():
     """
@@ -16,17 +52,9 @@ class DigitalSeq():
     or higher-order (alpha m by m) generating matrices from interlaced
     digital nets, interlaced polynomial lattice rules or higher-order
     polynomial lattice rules.  This code is specific for base 2 digital nets.
-
-    This implementation is based upon, but faster than, ``digitalseq_b2g`` from:
-
-    Reference:
-        D. Nuyens, `The Magic Point Shop of QMC point generators and generating
-        vectors.` MATLAB and Python software, 2018. Available from
-        https://people.cs.kuleuven.be/~dirk.nuyens/
-
     """
 
-    def __init__(self, Cs, kstart=0, m=None, s=None):
+    def __init__(self, Cs="mps_sobol_Cs.col", kstart=0, m=None, s=None):
         """
         Construct a digital sequence point generator given a list of
         generating matrices.
@@ -185,12 +213,11 @@ class DigitalSeq():
 
     def set_state(self, k):
         """Set the index of the next point to k."""
-        self.k = k
-        last_k = k - 1  # the previous point, this means we have exceptional behaviour for kstart = 0
-        self.cur = [0 for i in range(self.s)]
-        self.x = [0 for i in range(self.s)]
-        if k == 0:
-            return
+        self.k = k - 1 # self.k is the previous point, this means we have exceptional behaviour for kstart = 0
+        self.cur = [ 0 for i in range(self.s) ]
+        self.x = [ 0 for i in range(self.s) ]
+        if k == 0: return
+        gk = (self.k >> 1) ^ self.k # we are using Gray code ordering
         for i in range(self.m):
             if gk & (1 << i):
                 for j in range(self.s):
@@ -200,13 +227,14 @@ class DigitalSeq():
 
     def calc_next(self):
         """Calculate the next sequence point and update the index counter."""
-        if self.k == 0:
-            return
-        p = (((self.k ^ (self.k - 1)) + 1) >> 1)
-        ctz = len(bin(p)[2:]) - 1
+        self.k = self.k + 1
+        if self.k == 0: return True
+        ctz = (((self.k ^ (self.k-1)) + 1) >> 1).bit_length() - 1
         for j in range(self.s):
             self.cur[j] ^= self.Csr[j][ctz]
             self.x[j] = self.recipd * self.cur[j]
+        if self.k >= self.n: return False
+        return True
 
     def __iter__(self):
         self.reset()
@@ -214,9 +242,8 @@ class DigitalSeq():
 
     def __next__(self):
         """Return the next point of the sequence or raise StopIteration."""
-        if self.k < self.n:
+        if self.k < self.n - 1:
             self.calc_next()
-            self.k = self.k + 1
             return self.x
         else:
             raise StopIteration

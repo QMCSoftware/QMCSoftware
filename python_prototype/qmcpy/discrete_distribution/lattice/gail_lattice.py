@@ -1,10 +1,13 @@
 """
 Lattice Generator copied from GAIL (http://gailgithub.github.io/GAIL_Dev/)
+
 Adapted from
     https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/vdc.m
     https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/lattice_gen.m
+
 Reference:
-    Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+
+    [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
     Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
     GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
     Available from http://gailgithub.github.io/GAIL_Dev/
