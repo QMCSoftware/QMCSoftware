@@ -1,8 +1,7 @@
 """ Abstract Class Measure """
 
+from ..util import MethodImplementationError, univ_repr
 from copy import deepcopy
-
-from ..util import multilevel_constructor, MethodImplementationError, univ_repr
 
 
 class Measure(object):
@@ -10,9 +9,9 @@ class Measure(object):
 
     def __init__(self):
         prefix = 'A concrete implementation of Measure must have '
-        if not hasattr(self, 'distrib_obj'):
-            raise ParameterError(prefix + 'self.distrib_obj (a Distribution instance)')
-        self.distribution = type(self.distrib_obj).__name__
+        if not hasattr(self, 'distribution'):
+            raise ParameterError(prefix + 'self.distribution (a Distribution instance)')
+        self.distrib_name = type(self.distribution).__name__
 
     def gen_samples(self, *args, **kwargs):
         """
@@ -20,8 +19,8 @@ class Measure(object):
         and transform them to mimic Measure samples
         
         Args:
-            *args (tuple): Ordered arguments to self.distrib_obj.gen_samples
-            **kwrags (dict): Keyword arguments to self.distrib_obj.gen_samples
+            *args (tuple): Ordered arguments to self.distribution.gen_samples
+            **kwrags (dict): Keyword arguments to self.distribution.gen_samples
         
         Returns:
             tf_samples (ndarray): samples from the Distribution object transformed
@@ -53,4 +52,4 @@ class Measure(object):
         Returns:
             string of self info
         """
-        return univ_repr(self, "True Measure", attributes)
+        return univ_repr(self, "True Measure", attributes+['distrib_name'])
