@@ -6,7 +6,7 @@ Original package found at /third_party/magic_point_shop/
         D. Nuyens, `The Magic Point Shop of QMC point generators and generating
         vectors.` MATLAB and Python software, 2018. Available from
         https://people.cs.kuleuven.be/~dirk.nuyens/
-Refactored package found at /qmcpy/discrete_distribution/mps_refactor/
+Refactored package found at /qmcpy/distribution/mps_refactor/
 
 Note:
     A unittest for refactored generators is at /test/fasttests/test_discrete_distributions.py
@@ -17,7 +17,7 @@ from time import time
 from numpy import *
 from pandas import DataFrame
 # refactored generators
-from qmcpy.discrete_distribution.mps_refactor import DigitalSeq, LatticeSeq
+from qmcpy.distribution.mps_refactor import DigitalSeq, LatticeSeq
 # origianl generators
 from third_party.magic_point_shop import digitalseq_b2g, latticeseq_b2
 

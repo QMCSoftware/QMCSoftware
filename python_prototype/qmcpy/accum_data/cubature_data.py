@@ -40,20 +40,20 @@ class CubatureData(AccumData):
         self.omg_hat = lambda m: self.fudge(m)/((1+self.fudge(self.r_lag))*self.omg_circ(self.r_lag))
         super().__init__()
 
-    def update_data(self, integrand, true_measure):
+    def update_data(self, integrand, measure):
         """
         Update data
 
         Args:
             integrand (Integrand): an instance of Integrand
-            true_measure (TrueMeasure): an instance of TrueMeasure
+            measure (Measure): an instance of Measure
 
         Returns:
             None
         """
         n_gen = 2**self.m - self.n
         # Generate sample values
-        x_lat = true_measure[0].gen_tm_samples(self.r,n_gen).squeeze() # n_gen x d samples
+        x_lat = measure[0].gen_tm_samples(self.r,n_gen).squeeze() # n_gen x d samples
         ynext = integrand[0].f(x_lat) # Only implemented for single level problems
         self.yval = hstack((self.yval,ynext))
         ynext = ynext.astype(complex)

@@ -27,15 +27,15 @@ class CubLattice_g(StoppingCriterion):
         refer to the references below.
     """
 
-    def __init__(self, discrete_distrib, true_measure,
+    def __init__(self, distrib, measure,
                  inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0,
                  n_init=2**10, n_max=2**35,
                  fudge = lambda m: 5*2**(-m)):
         """
         Args:
-            discrete_distrib
-            true_measure (DiscreteDistribution): an instance of DiscreteDistribution
+            distrib
+            measure (Distribution): an instance of Distribution
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
             abs_tol (float): absolute error tolerance
@@ -46,7 +46,7 @@ class CubLattice_g(StoppingCriterion):
                               in the cone of functions
         """
         # Input Checks
-        levels = len(true_measure)
+        levels = len(measure)
         if levels != 1:
             raise NotYetImplemented('''
                 cub_lattice_g not implemented for multi-level problems.
@@ -67,10 +67,10 @@ class CubLattice_g(StoppingCriterion):
             self.m_min = 10
             self.m_max = 35
         # Construct Data Object to House Integration data
-        self.data = CubatureData(len(true_measure), m_min, m_max, fudge)
+        self.data = CubatureData(len(measure), m_min, m_max, fudge)
         # Verify Compliant Construction
         allowed_distribs = ["Lattice"]
-        super().__init__(discrete_distrib, allowed_distribs)
+        super().__init__(distrib, allowed_distribs)
 
     def stop_yet(self):
         """ Determine when to stop """

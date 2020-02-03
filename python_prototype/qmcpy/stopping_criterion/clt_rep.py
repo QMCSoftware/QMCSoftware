@@ -13,14 +13,14 @@ from ..accum_data import MeanVarDataRep
 class CLTRep(StoppingCriterion):
     """ Stopping criterion based on var(stream_1_estimate, ..., stream_16_estimate) < errorTol """
 
-    def __init__(self, discrete_distrib, true_measure,
+    def __init__(self, distrib, measure,
                  replications=16, inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0,
                  n_init=32, n_max=2**30):
         """
         Args:
-            discrete_distrib
-            true_measure (DiscreteDistribution): an instance of DiscreteDistribution
+            distrib
+            measure (Distribution): an instance of Distribution
             replications (int): number of random nxm matrices to generate
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
@@ -29,7 +29,7 @@ class CLTRep(StoppingCriterion):
             n_max (int): maximum number of samples
         """
         # Input Checks
-        levels = len(true_measure)
+        levels = len(measure)
         if levels != 1:
             raise NotYetImplemented('''
                 CLTRep not implemented for multi-level problems.
@@ -49,7 +49,7 @@ class CLTRep(StoppingCriterion):
         self.data = MeanVarDataRep(levels, n_init, replications)
         # Verify Compliant Construction
         allowed_distribs = ["Lattice", "Sobol"]
-        super().__init__(discrete_distrib, allowed_distribs)
+        super().__init__(distrib, allowed_distribs)
 
     def stop_yet(self):
         """ Determine when to stop """

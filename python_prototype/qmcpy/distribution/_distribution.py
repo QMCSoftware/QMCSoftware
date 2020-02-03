@@ -1,9 +1,10 @@
-""" DiscreteDistribution is an abstract class. """
+""" Distribution is an abstract class. """
 
 from ..util import ParameterError, MethodImplementationError, univ_repr
+from numpy import array
 
 
-class DiscreteDistribution(object):
+class Distribution(object):
     """
     Discrete Distribution from which we can generate samples
 
@@ -13,22 +14,18 @@ class DiscreteDistribution(object):
 
     def __init__(self):
         """ Initialize Discrete Distributuion instance """
-        prefix = 'A concrete implementation of DiscreteDistribution must have '
+        prefix = 'A concrete implementation of Distribution must have '
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
-
-    def gen_samples(self, replications, n_samples, dimensions):
-        """
-        ABSTRACT METHOD
-        Generate r nxd IID Standard Gaussian samples
-
-        Args:
-            replications (int): Number of nxd matrices to generate (sample.size()[0])
-            n_samples (int): Number of observations (sample.size()[1])
-            dimensions (int): Number of dimensions (sample.size()[2])
-
+        if not hasattr(self, 'dimension'):
+            raise ParameterError(prefix + 'self.dimension')
+    
+    def gen_samples(self, *args):
+        """ ABSTRACT METHOD
+        Generate self.replications (n_max-n_min)xself.d Lattice samples
+        
         Returns:
-            replications x n_samples x dimensions (numpy array)
+            self.replications x (n_max-n_min) x self.dimension (ndarray)
         """
         raise MethodImplementationError(self, 'gen_dd_samples')
 
@@ -42,5 +39,4 @@ class DiscreteDistribution(object):
         Returns:
             string of self info
         """
-        super_attributes = ['mimics']
-        return univ_repr(self, "Discrete Distribution", super_attributes + attributes)
+        return univ_repr(self, "Discrete Distribution", attributes)

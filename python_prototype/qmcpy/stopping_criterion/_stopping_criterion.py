@@ -20,7 +20,7 @@ class StoppingCriterion(object):
     def __init__(self, distribution, allowed_distribs):
         """
         Args:
-            distribution (DiscreteDistribution): an instance of DiscreteDistribution
+            distribution (Distribution): an instance of Distribution
             allowed_distribs: distribution's compatible with the StoppingCriterion
         """
         if type(distribution).__name__ not in allowed_distribs:

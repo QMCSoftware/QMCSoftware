@@ -4,7 +4,7 @@ import unittest
 
 from numpy import array, int64, log2, ndarray, vstack, zeros
 from qmcpy import *
-from qmcpy.discrete_distribution.mps_refactor import DigitalSeq, LatticeSeq
+from qmcpy.distribution.mps_refactor import DigitalSeq, LatticeSeq
 from third_party.magic_point_shop import digitalseq_b2g, latticeseq_b2
 
 
@@ -14,12 +14,12 @@ class TestIIDStdUniform(unittest.TestCase):
     """
 
     def test_mimics(self):
-        discrete_distrib = IIDStdUniform()
-        self.assertEqual(discrete_distrib.mimics, "StdUniform")
+        distrib = IIDStdUniform()
+        self.assertEqual(distrib.mimics, "StdUniform")
 
     def test_gen_samples(self):
-        discrete_distrib = IIDStdUniform()
-        samples = discrete_distrib.gen_dd_samples(1, 2, 3)
+        distrib = IIDStdUniform()
+        samples = distrib.gen_dd_samples(1, 2, 3)
         with self.subTest():
             self.assertEqual(type(samples), ndarray)
         with self.subTest():
@@ -32,12 +32,12 @@ class TestIIDGaussian(unittest.TestCase):
     """
 
     def test_mimics(self):
-        discrete_distrib = IIDStdGaussian()
-        self.assertEqual(discrete_distrib.mimics, "StdGaussian")
+        distrib = IIDStdGaussian()
+        self.assertEqual(distrib.mimics, "StdGaussian")
 
     def test_gen_samples(self):
-        discrete_distrib = IIDStdGaussian()
-        samples = discrete_distrib.gen_dd_samples(1, 2, 3)
+        distrib = IIDStdGaussian()
+        samples = distrib.gen_dd_samples(1, 2, 3)
         with self.subTest():
             self.assertEqual(type(samples), ndarray)
         with self.subTest():
@@ -50,12 +50,12 @@ class TestLattice(unittest.TestCase):
     """
 
     def test_mimics(self):
-        discrete_distrib = Lattice()
-        self.assertEqual(discrete_distrib.mimics, "StdUniform")
+        distrib = Lattice()
+        self.assertEqual(distrib.mimics, "StdUniform")
 
     def test_gen_samples(self):
-        discrete_distrib = Lattice()
-        samples = discrete_distrib.gen_dd_samples(1, 2, 3)
+        distrib = Lattice()
+        samples = distrib.gen_dd_samples(1, 2, 3)
         with self.subTest():
             self.assertEqual(type(samples), ndarray)
         with self.subTest():
@@ -85,12 +85,12 @@ class TestSobol(unittest.TestCase):
     """
 
     def test_mimics(self):
-        discrete_distrib = Sobol()
-        self.assertEqual(discrete_distrib.mimics, "StdUniform")
+        distrib = Sobol()
+        self.assertEqual(distrib.mimics, "StdUniform")
 
     def test_gen_samples(self):
-        discrete_distrib = Sobol()
-        samples = discrete_distrib.gen_dd_samples(1, 2, 3)
+        distrib = Sobol()
+        samples = distrib.gen_dd_samples(1, 2, 3)
         with self.subTest():
             self.assertEqual(type(samples), ndarray)
         with self.subTest():

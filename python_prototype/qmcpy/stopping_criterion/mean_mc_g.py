@@ -24,14 +24,14 @@ class MeanMC_g(StoppingCriterion):
             Pr(|mu-tmu| <= tolfun) >= 1-alpha
     """
 
-    def __init__(self, discrete_distrib, true_measure,
+    def __init__(self, distrib, measure,
                  inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0,
                  n_init=1024, n_max=1e10):
         """
         Args:
-            discrete_distrib
-            true_measure: an instance of DiscreteDistribution
+            distrib
+            measure: an instance of Distribution
             inflate: inflation factor when estimating variance
             alpha: significance level for confidence interval
             abs_tol: absolute error tolerance
@@ -40,7 +40,7 @@ class MeanMC_g(StoppingCriterion):
             n_max: maximum number of samples
         """
         # Input Checks
-        levels = len(true_measure)
+        levels = len(measure)
         if levels != 1:
             raise NotYetImplemented('''
                 MeanMC_g not implemented for multi-level problems.
@@ -60,7 +60,7 @@ class MeanMC_g(StoppingCriterion):
         self.data = MeanVarData(levels, n_init)  # house integration data
         # Verify Compliant Construction
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
-        super().__init__(discrete_distrib, allowed_distribs)
+        super().__init__(distrib, allowed_distribs)
 
     def stop_yet(self):
         """ Determine when to stop """

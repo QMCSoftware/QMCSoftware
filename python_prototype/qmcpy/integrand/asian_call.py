@@ -15,7 +15,7 @@ class AsianCall(Integrand):
         Initialize AsianCall Integrand's'
 
         Args:
-            bm_measure (TrueMeasure): A BrownianMotion Measure object
+            bm_measure (Measure): A BrownianMotion Measure object
             volatility (float): sigma, the volatility of the asset
             start_price (float): S(0), the asset value at t=0
             strike_price (float): strike_price, the call/put offer

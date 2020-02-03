@@ -12,14 +12,14 @@ from scipy.stats import norm
 class CLT(StoppingCriterion):
     """ Stopping criterion based on the Central Limit Theorem (CLT) """
 
-    def __init__(self, discrete_distrib, true_measure,
+    def __init__(self, distrib, measure,
                  inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0,
                  n_init=1024, n_max=1e10):
         """
         Args:
-            discrete_distrib
-            true_measure: an instance of DiscreteDistribution
+            distrib
+            measure: an instance of Distribution
             inflate: inflation factor when estimating variance
             alpha: significance level for confidence interval
             abs_tol: absolute error tolerance
@@ -34,10 +34,10 @@ class CLT(StoppingCriterion):
         self.inflate = inflate
         self.stage = "sigma"
         # Construct Data Object to House Integration data
-        self.data = MeanVarData(len(true_measure), n_init)
+        self.data = MeanVarData(len(measure), n_init)
         # Verify Compliant Construction
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
-        super().__init__(discrete_distrib, allowed_distribs)
+        super().__init__(distrib, allowed_distribs)
 
     def stop_yet(self):
         """ Determine when to stop """

@@ -73,7 +73,7 @@ class Integrand(object):
 
         Raises:
             IntegrandError if this method is called on the original \
-            construcing TrueMeasure object or has not \
+            construcing Measure object or has not \
             been initialized for each integrand yet
         """
         raise TransformError("""

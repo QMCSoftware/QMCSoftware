@@ -34,21 +34,21 @@ class MeanVarDataRep(AccumData):
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         super().__init__()
 
-    def update_data(self, integrand, true_measure):
+    def update_data(self, integrand, measure):
         """
         Update data
 
         Args:
             integrand (Integrand): an instance of Integrand
-            true_measure (TrueMeasure): an instance of TrueMeasure
+            measure (Measure): an instance of Measure
 
         Returns:
             None
         """
-        for i in range(len(true_measure)):
+        for i in range(len(measure)):
             t_start = process_time()  # time integrand evaluation
             n_gen = self.n[i] - self.n_total[i]
-            set_x = true_measure[i].gen_tm_samples(self.r, n_gen)
+            set_x = measure[i].gen_tm_samples(self.r, n_gen)
             for r in range(self.r):
                 y = integrand[i].f(set_x[r])
                 previous_sum_y = self.muhat_ir[i, r] * self.n_total[i]  # previous mean times

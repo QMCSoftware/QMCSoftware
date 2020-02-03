@@ -20,93 +20,93 @@ def test_distributions_asian_option(time_vec, dim, abs_tol):
     """
 
     # IID Standard Uniform ~ CLT
-    discrete_distrib = IIDStdUniform(rng_seed=7)
-    true_measure = BrownianMotion(dim, time_vector=time_vec)
-    integrand = AsianCall(true_measure,
+    distrib = IIDStdUniform(rng_seed=7)
+    measure = BrownianMotion(dim, time_vector=time_vec)
+    integrand = AsianCall(measure,
                           volatility=volatility,
                           start_price=start_price,
                           strike_price=strike_price,
                           interest_rate=interest_rate,
                           mean_type=mean_type)
-    stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure,
-                        discrete_distrib, stopping_criterion)
+    stopping_criterion = CLT(distrib, measure, abs_tol=abs_tol)
+    _, data = integrate(integrand, measure,
+                        distrib, stopping_criterion)
     print(data)
 
     # IID Standard Gaussian ~ CLT
-    discrete_distrib = IIDStdGaussian(rng_seed=7)
-    true_measure = BrownianMotion(dim, time_vector=time_vec)
-    integrand = AsianCall(true_measure,
+    distrib = IIDStdGaussian(rng_seed=7)
+    measure = BrownianMotion(dim, time_vector=time_vec)
+    integrand = AsianCall(measure,
                           volatility=volatility,
                           start_price=start_price,
                           strike_price=strike_price,
                           interest_rate=interest_rate,
                           mean_type=mean_type)
-    stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure,
-                        discrete_distrib, stopping_criterion)
+    stopping_criterion = CLT(distrib, measure, abs_tol=abs_tol)
+    _, data = integrate(integrand, measure,
+                        distrib, stopping_criterion)
     print(data)
 
     if len(dim) == 1:  # CLTRep & MeanMC_g only implemented for single-level functions
 
         # IID Standard Uniform ~ MeanMC_g
-        discrete_distrib = IIDStdUniform(rng_seed=7)
-        true_measure = BrownianMotion(dim, time_vector=time_vec)
-        integrand = AsianCall(true_measure,
+        distrib = IIDStdUniform(rng_seed=7)
+        measure = BrownianMotion(dim, time_vector=time_vec)
+        integrand = AsianCall(measure,
                               volatility=volatility,
                               start_price=start_price,
                               strike_price=strike_price,
                               interest_rate=interest_rate,
                               mean_type=mean_type)
-        stopping_criterion = MeanMC_g(discrete_distrib, true_measure,
+        stopping_criterion = MeanMC_g(distrib, measure,
                                       abs_tol=abs_tol)
-        _, data = integrate(integrand, true_measure,
-                            discrete_distrib, stopping_criterion)
+        _, data = integrate(integrand, measure,
+                            distrib, stopping_criterion)
         print(data)
 
         # IID Standard Gaussian ~ MeanMC_g
-        discrete_distrib = IIDStdGaussian(rng_seed=7)
-        true_measure = BrownianMotion(dim, time_vector=time_vec)
-        integrand = AsianCall(true_measure,
+        distrib = IIDStdGaussian(rng_seed=7)
+        measure = BrownianMotion(dim, time_vector=time_vec)
+        integrand = AsianCall(measure,
                               volatility=volatility,
                               start_price=start_price,
                               strike_price=strike_price,
                               interest_rate=interest_rate,
                               mean_type=mean_type)
-        stopping_criterion = MeanMC_g(discrete_distrib, true_measure,
+        stopping_criterion = MeanMC_g(distrib, measure,
                                       abs_tol=abs_tol)
-        _, data = integrate(integrand, true_measure,
-                            discrete_distrib, stopping_criterion)
+        _, data = integrate(integrand, measure,
+                            distrib, stopping_criterion)
         print(data)
 
         # Lattice ~ CLTRep
-        discrete_distrib = Lattice(rng_seed=7)
-        true_measure = BrownianMotion(dim, time_vector=time_vec)
-        integrand = AsianCall(true_measure,
+        distrib = Lattice(rng_seed=7)
+        measure = BrownianMotion(dim, time_vector=time_vec)
+        integrand = AsianCall(measure,
                               volatility=volatility,
                               start_price=start_price,
                               strike_price=strike_price,
                               interest_rate=interest_rate,
                               mean_type=mean_type)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure,
+        stopping_criterion = CLTRep(distrib, measure,
                                     abs_tol=abs_tol)
-        _, data = integrate(integrand, true_measure,
-                            discrete_distrib, stopping_criterion)
+        _, data = integrate(integrand, measure,
+                            distrib, stopping_criterion)
         print(data)
 
         # Sobol ~ CLTRep
-        discrete_distrib = Sobol(rng_seed=7)
-        true_measure = BrownianMotion(dim, time_vector=time_vec)
-        integrand = AsianCall(true_measure,
+        distrib = Sobol(rng_seed=7)
+        measure = BrownianMotion(dim, time_vector=time_vec)
+        integrand = AsianCall(measure,
                               volatility=volatility,
                               start_price=start_price,
                               strike_price=strike_price,
                               interest_rate=interest_rate,
                               mean_type=mean_type)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure,
+        stopping_criterion = CLTRep(distrib, measure,
                                     abs_tol=abs_tol)
-        _, data = integrate(integrand, true_measure,
-                            discrete_distrib, stopping_criterion)
+        _, data = integrate(integrand, measure,
+                            distrib, stopping_criterion)
         print(data)
 
 

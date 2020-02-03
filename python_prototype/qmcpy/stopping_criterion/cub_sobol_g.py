@@ -21,14 +21,14 @@ class CubSobol_g(StoppingCriterion):
         refer to the references below.
     """
 
-    def __init__(self, discrete_distrib, true_measure,
+    def __init__(self, distrib, measure,
                  replications=16, inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0,
                  n_init=1024, n_max=1e10):
         """
         Args:
-            discrete_distrib
-            true_measure (DiscreteDistribution): an instance of DiscreteDistribution
+            distrib
+            measure (Distribution): an instance of Distribution
             replications (int): number of random nxm matrices to generate
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
@@ -45,10 +45,10 @@ class CubSobol_g(StoppingCriterion):
         self.inflate = inflate
         self.stage = "sigma"
         # Construct Data Object to House Integration data
-        self.data = MeanVarData(len(true_measure), n_init)
+        self.data = MeanVarData(len(measure), n_init)
         # Verify Compliant Construction
         allowed_distribs = ["Sobol"]
-        super().__init__(discrete_distrib, allowed_distribs)
+        super().__init__(distrib, allowed_distribs)
 
     def stop_yet(self):
         """ Determine when to stop """

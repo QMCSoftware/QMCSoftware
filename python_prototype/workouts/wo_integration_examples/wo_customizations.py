@@ -16,11 +16,11 @@ def quick_construct_integrand(abs_tol):
     """
     dim = 5
     integrand = QuickConstruct(dim, custom_fun=lambda x, c=5: (c * x).sum(1))
-    discrete_distrib = IIDStdUniform(rng_seed=7)
-    true_measure = Uniform(dim)
-    stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=abs_tol)
-    _, data = integrate(integrand, true_measure,
-                        discrete_distrib, stopping_criterion)
+    distrib = IIDStdUniform(rng_seed=7)
+    measure = Uniform(dim)
+    stopping_criterion = CLT(distrib, measure, abs_tol=abs_tol)
+    _, data = integrate(integrand, measure,
+                        distrib, stopping_criterion)
     # exact_solution = dim*(c/2)
     print(data)
 

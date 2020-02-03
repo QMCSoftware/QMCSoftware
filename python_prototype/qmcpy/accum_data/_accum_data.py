@@ -27,30 +27,30 @@ class AccumData(object):
         if not hasattr(self, 'confid_int'):
             raise ParameterError(prefix + 'self.confid_int (confidence interval for the solution)')
 
-    def update_data(self, integrand, true_measure):
+    def update_data(self, integrand, measure):
         """
         ABSTRACT METHOD
         Update the accumulated data
 
         Args:
             integrand (Integrand): an instance of Integrand
-            true_measure (TrueMeasure): an instance of TrueMeasure
+            measure (Measure): an instance of Measure
 
         Returns:
             None
         """
         raise MethodImplementationError(self, 'update_data')
 
-    def complete(self, time_total, integrand=None, discrete_distrib=None,
-                 true_measure=None, stopping_criterion=None):
+    def complete(self, time_total, integrand=None, distrib=None,
+                 measure=None, stopping_criterion=None):
         """
         Aggregate all objects after integration completes
 
         Args:
             time_total (float): total wall clock time for integration
             integrand (Integrand): Integrand object
-            discrete_distrib (DiscreteDistribution): Discrete Distribution object
-            true_measure (TrueMeasure): True Measure Object
+            distrib (Distribution): Discrete Distribution object
+            measure (Measure): True Measure Object
             stopping_criterion (Stopping Criterion): Stopping Criterion object
 
         Returns:
@@ -58,8 +58,8 @@ class AccumData(object):
         """
         self.time_total = time_total
         self.integrand = integrand
-        self.discrete_distrib = discrete_distrib
-        self.true_measure = true_measure
+        self.distrib = distrib
+        self.measure = measure
         self.stopping_criterion = stopping_criterion
         return self
 
@@ -74,8 +74,8 @@ class AccumData(object):
             string of self info
         """
         string = "Solution: %-15.4f\n" % (self.solution)
-        for qmc_obj in [self.integrand, self.discrete_distrib,
-                        self.true_measure, self.stopping_criterion]:
+        for qmc_obj in [self.integrand, self.distrib,
+                        self.measure, self.stopping_criterion]:
             if qmc_obj:
                 string += str(qmc_obj)
         super_attributes = ['n', 'n_total', 'confid_int', 'time_total']

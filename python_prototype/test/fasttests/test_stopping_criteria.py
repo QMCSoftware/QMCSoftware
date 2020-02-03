@@ -25,24 +25,24 @@ class TestClt(unittest.TestCase):
                           Gaussian(3))
 
     def test_n_max_single_level(self):
-        discrete_distrib = IIDStdUniform(rng_seed=7)
-        true_measure = BrownianMotion(dim_single_level,
+        distrib = IIDStdUniform(rng_seed=7)
+        measure = BrownianMotion(dim_single_level,
                                       time_vector=tv_single_level)
-        integrand = AsianCall(true_measure)
-        stopping_criterion = CLT(discrete_distrib, true_measure,
+        integrand = AsianCall(measure)
+        stopping_criterion = CLT(distrib, measure,
                                  abs_tol=.1, n_init=64, n_max=1000)
         self.assertWarns(MaxSamplesWarning, integrate, integrand,
-                         true_measure, discrete_distrib, stopping_criterion)
+                         measure, distrib, stopping_criterion)
 
     def test_n_max_multi_level(self):
-        discrete_distrib = IIDStdUniform(rng_seed=7)
-        true_measure = BrownianMotion(dim_multi_level,
+        distrib = IIDStdUniform(rng_seed=7)
+        measure = BrownianMotion(dim_multi_level,
                                       time_vector=tv_multi_level)
-        integrand = AsianCall(true_measure)
-        stopping_criterion = CLT(discrete_distrib, true_measure,
+        integrand = AsianCall(measure)
+        stopping_criterion = CLT(distrib, measure,
                                  abs_tol=.1, n_init=64, n_max=1000)
         self.assertWarns(MaxSamplesWarning, integrate, integrand,
-                         true_measure, discrete_distrib, stopping_criterion)
+                         measure, distrib, stopping_criterion)
 
 
 class TestCltRep(unittest.TestCase):
@@ -59,14 +59,14 @@ class TestCltRep(unittest.TestCase):
                          Lattice(), Gaussian(3), n_init=45)
 
     def test_n_max_single_level(self):
-        discrete_distrib = Lattice(rng_seed=7)
-        true_measure = BrownianMotion(dim_single_level,
+        distrib = Lattice(rng_seed=7)
+        measure = BrownianMotion(dim_single_level,
                                       time_vector=tv_single_level)
-        integrand = AsianCall(true_measure)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure,
+        integrand = AsianCall(measure)
+        stopping_criterion = CLTRep(distrib, measure,
                                     abs_tol=.1, n_init=32, n_max=100)
         self.assertWarns(MaxSamplesWarning, integrate, integrand,
-                         true_measure, discrete_distrib, stopping_criterion)
+                         measure, distrib, stopping_criterion)
 
 
 class TestMeanMC_g(unittest.TestCase):
@@ -79,14 +79,14 @@ class TestMeanMC_g(unittest.TestCase):
                           Gaussian(3))
 
     def test_n_max_single_level(self):
-        discrete_distrib = IIDStdUniform(rng_seed=7)
-        true_measure = BrownianMotion(dim_single_level,
+        distrib = IIDStdUniform(rng_seed=7)
+        measure = BrownianMotion(dim_single_level,
                                       time_vector=tv_single_level)
-        integrand = AsianCall(true_measure)
-        stopping_criterion = CLT(discrete_distrib, true_measure,
+        integrand = AsianCall(measure)
+        stopping_criterion = CLT(distrib, measure,
                                  abs_tol=.1, n_init=64, n_max=1000)
         self.assertWarns(MaxSamplesWarning, integrate, integrand,
-                         true_measure, discrete_distrib, stopping_criterion)
+                         measure, distrib, stopping_criterion)
 
 
 if __name__ == "__main__":

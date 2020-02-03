@@ -32,20 +32,20 @@ class MeanVarData(AccumData):
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         super().__init__()
 
-    def update_data(self, integrand, true_measure):
+    def update_data(self, integrand, measure):
         """
         Update data
 
         Args:
             integrand (Integrand): an instance of Integrand
-            true_measure (TrueMeasure): an instance of TrueMeasure
+            measure (Measure): an instance of Measure
 
         Returns:
             None
         """
-        for i in range(len(true_measure)):
+        for i in range(len(measure)):
             t_start = process_time()  # time the integrand values
-            set_x = true_measure[i].gen_tm_samples(1, self.n[i]).squeeze(0)
+            set_x = measure[i].gen_tm_samples(1, self.n[i]).squeeze(0)
             y = integrand[i].f(set_x).squeeze()
             self.t_eval[i] = max(process_time() - t_start, EPS)
             self.sighat[i] = y.std()  # compute the sample standard deviation

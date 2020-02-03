@@ -1,6 +1,6 @@
-""" Definition for Sobol, a concrete implementation of DiscreteDistribution """
+""" Definition for Sobol, a concrete implementation of Distribution """
 
-from .._discrete_distribution import DiscreteDistribution
+from .._distribution import Distribution
 from .mps_sobol import DigitalSeq
 from ...util import DistributionGenerationWarnings, ParameterError, ParameterWarning
 from numpy import array, int64, log2, repeat, zeros
@@ -9,7 +9,7 @@ from torch.quasirandom import SobolEngine
 import warnings
 
 
-class Sobol(DiscreteDistribution):
+class Sobol(Distribution):
     """ Quasi-Random Sobol low discrepancy sequence (Base 2) """
 
     def __init__(self, dimension=1, scramble=False, replications=0, seed=None, backend='MPS'):
@@ -22,7 +22,6 @@ class Sobol(DiscreteDistribution):
             seed (int): seed the random number generator for reproducibility
             backend (str): backend generator
         """
-        
         self.dimension = dimension
         self.scramble = scramble
         self.squeeze = (replications==0)

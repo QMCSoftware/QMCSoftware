@@ -1,6 +1,6 @@
-""" Definition for Lattice, a concrete implementation of DiscreteDistribution """
+""" Definition for Lattice, a concrete implementation of Distribution """
 
-from .._discrete_distribution import DiscreteDistribution
+from .._distribution import Distribution
 from .gail_lattice import gail_lattice_gen
 from .mps_lattice import mps_lattice_gen
 from ...util import DistributionGenerationError, DistributionGenerationWarnings, ParameterError
@@ -9,7 +9,7 @@ from numpy.random import Generator, PCG64
 import warnings
 
 
-class Lattice(DiscreteDistribution):
+class Lattice(Distribution):
     """ Quasi-Random Lattice low discrepancy sequence (Base 2) """
 
     def __init__(self, dimension=1, scramble=False, replications=0, seed=None, backend='GAIL'):

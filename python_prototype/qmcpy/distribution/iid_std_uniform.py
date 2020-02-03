@@ -1,10 +1,10 @@
-""" Definition for IIDStdUniform, a concrete implementation of DiscreteDistribution """
+""" Definition for IIDStdUniform, a concrete implementation of Distribution """
 
-from ._discrete_distribution import DiscreteDistribution
+from ._distribution import Distribution
 from numpy.random import Generator, PCG64
 
 
-class IIDStdUniform(DiscreteDistribution):
+class IIDStdUniform(Distribution):
     """ Standard Uniform """
 
     def __init__(self, dimension=1, replications=0, seed=None):
@@ -37,3 +37,16 @@ class IIDStdUniform(DiscreteDistribution):
         if self.squeeze:
             x = x.squeeze(0)
         return x
+
+    def __repr__(self, attributes=[]):
+        """
+        Print important attribute values
+
+        Args:
+            attributes (list): list of attributes to print
+
+        Returns:
+            string of self info
+        """
+        attributes = ['dimension','replications','seed','mimics']
+        return super().__repr__(attributes)
