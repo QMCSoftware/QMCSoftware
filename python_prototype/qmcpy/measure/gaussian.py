@@ -37,10 +37,10 @@ class Gaussian(Measure):
         samples = self.distribution.gen_samples(*args,**kwargs)
         if self.distribution.mimics == 'StdGaussian':
             # shift and stretch
-            tf_samples = self.mean + self.variance * samples
+            tf_samples = self.mean + sqrt(self.variance) * samples
         elif self.distribution.mimics == "StdUniform":
             # inverse CDF then shift and stretch
-            tf_samples = norm.ppf(samples, loc=self.mean, scale=self.variance)
+            tf_samples = norm.ppf(samples, loc=self.mean, scale=sqrt(self.variance))
         else:
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
