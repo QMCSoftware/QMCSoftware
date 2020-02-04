@@ -31,4 +31,4 @@ class IIDStdGaussian(Distribution):
         Returns:
             n x self.dimension (ndarray)
         """
-        return self.rng.standard_normal((n, self.dimension))
+        return self.rng.standard_normal((int(n), self.dimension))

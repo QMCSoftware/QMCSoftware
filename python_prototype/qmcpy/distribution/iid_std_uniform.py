@@ -31,5 +31,5 @@ class IIDStdUniform(Distribution):
         Returns:
             n x self.dimension (ndarray)
         """
-        return self.rng.uniform(0,1,(n, self.dimension))
+        return self.rng.uniform(0,1,(int(n), self.dimension))
         

@@ -50,10 +50,10 @@ class MeanVarData(AccumData):
             measures = [measures]
         for l in range(self.levels):
             t_start = process_time()  # time the integrand values
-            samples = measures[l].gen_samples(n=self.n[i])
-            y = integrand[l].f(samples).squeeze()
+            samples = measures[l].gen_samples(n=self.n[l])
+            y = integrands[l].f(samples).squeeze()
             self.t_eval[l] = max(process_time() - t_start, EPS)
             self.sighat[l] = y.std()  # compute the sample standard deviation
             self.muhat[l] = y.mean()  # compute the sample mean
-            self.n_total += self.n[i]  # add to total samples
+            self.n_total += self.n[l]  # add to total samples
         self.solution = self.muhat.sum()  # tentative solution

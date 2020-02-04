@@ -2,6 +2,7 @@
 
 from ._stopping_criterion import StoppingCriterion
 from ..accum_data import MeanVarData
+from ..distribution._distribution import Distribution
 from ..util import MaxSamplesWarning, ParameterError
 import warnings
 from numpy import array, ceil, floor, maximum
@@ -27,6 +28,7 @@ class CLT(StoppingCriterion):
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
+        self.n_init = n_init
         self.n_max = n_max
         self.alpha = alpha
         self.inflate = inflate
@@ -54,8 +56,8 @@ class CLT(StoppingCriterion):
             n_mu_temp = ceil(temp_b * (self.data.sighat / temp_a) * \
                              (z_star * self.inflate / tol_up)**2)
             # n_mu := n_mu_temp adjusted for previous n
-            n_mu = maximum(self.data.n, n_mu_temp)
-            self.data.n += n_mu
+            self.data.n_mu = maximum(self.data.n, n_mu_temp)
+            self.data.n += int(self.data.n_mu)
             if self.data.n_total + self.data.n.sum() > self.n_max:
                 # cannot generate this many new samples
                 warning_s = """

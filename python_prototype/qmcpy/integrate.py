@@ -7,7 +7,7 @@ from .util import DimensionError
 from time import process_time
 
 
-def integrate(integrand, measure, distribution, stopping_criterion):
+def integrate(stopping_criterion, integrand, measure, distribution):
     """
     Specify and compute integral of :math:`f(\\boldsymbol{x})` for \
     :math:`\\boldsymbol{x} \\in \\mathcal{X}`.

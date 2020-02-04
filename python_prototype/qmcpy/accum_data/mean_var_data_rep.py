@@ -51,8 +51,8 @@ class MeanVarDataRep(AccumData):
             previous_sum_y = self.muhat_r[r] * self.n_total
             self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n  # updated integrand-replication mean
         self.muhat = self.muhat_r.mean()  # mean of replication streams means
-        self.sighat = self.muhat_ir.std()
+        self.sighat = self.muhat_r.std()
         self.t_eval = max(process_time() - t_start, EPS)
-        self.n_total = self.n.copy()  # updated the total evaluations
+        self.n_total = self.n  # updated the total evaluations
         # standard deviation of stream means
         self.solution = self.muhat.copy() # mean of integrand approximations

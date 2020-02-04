@@ -60,7 +60,7 @@ class CubLattice_g(StoppingCriterion):
                 cub_lattice_g not implemented for multi-level problems.
                 Use CLT stopping criterion with an iid distribution for multi-level problems ''')
         if distribution.replications != 0:
-            raise ParmeterError('CubLattic_g requires distribution to have 0 replications.')
+            raise ParameterError('CubLattic_g requires distribution to have 0 replications.')
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
@@ -75,7 +75,7 @@ class CubLattice_g(StoppingCriterion):
             self.m_max = 35
         self.stage = None
         # Construct Data Object to House Integration data
-        self.data = CubatureData(len(measure), m_min, m_max, fudge)
+        self.data = CubatureData(m_min, m_max, fudge)
         # Verify Compliant Construction
         allowed_distribs = ["Lattice"]
         super().__init__(distribution, allowed_distribs)

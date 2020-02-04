@@ -41,6 +41,7 @@ class CLTRep(StoppingCriterion):
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
+        self.n_init = n_init
         self.n_max = n_max
         self.alpha = alpha
         self.inflate = inflate
