@@ -5,15 +5,9 @@ from numpy import array
 
 
 class Distribution(object):
-    """
-    Discrete Distribution from which we can generate samples
-
-    Attributes:
-        mimics (string): True Measure mimiced by the Discrete Distribution
-    """
+    """ Discrete Distribution from which we can generate samples """
 
     def __init__(self):
-        """ Initialize Discrete Distributuion instance """
         prefix = 'A concrete implementation of Distribution must have '
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')

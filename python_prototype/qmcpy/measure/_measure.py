@@ -11,10 +11,11 @@ class Measure(object):
         prefix = 'A concrete implementation of Measure must have '
         if not hasattr(self, 'distribution'):
             raise ParameterError(prefix + 'self.distribution (a Distribution instance)')
+        self.dimension = self.distribution.dimension
         self.distrib_name = type(self.distribution).__name__
 
     def gen_samples(self, *args, **kwargs):
-        """
+        """ ABSTRACT METHOD
         Generate samples from the Distribution object
         and transform them to mimic Measure samples
         
@@ -29,7 +30,7 @@ class Measure(object):
         raise MethodImplementationError(self,'gen_samples')
 
     def transform_g_to_f(self, g):
-        """
+        """ ABSTRACT METHOD
         Transform the g, the origianl integrand, to f,
         the integrand after transforming Distribution samples
         to mimic the Measure object. 

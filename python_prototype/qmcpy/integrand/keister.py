@@ -1,8 +1,7 @@
 """ Definition for class Keister, a concrete implementation of Integrand """
 
-from numpy import cos, linalg as LA, pi
-
 from ._integrand import Integrand
+from numpy import cos, linalg as LA, pi
 
 
 class Keister(Integrand):
@@ -19,12 +18,14 @@ class Keister(Integrand):
             `Computers in Physics`, *10*, pp. 119-122, 1996.
     """
 
-    def __init__(self, dimension):
+    def __init__(self, measure):
         """
         Args:
-            dimension (ndarray): dimension(s) of the integrand(s)
+            measure (Measure): a Measure instance
         """
-        super().__init__(dimension)
+        self.measure = measure
+        self.dimension = self.measure.dimension
+        super().__init__()
 
     def g(self, x):
         """
@@ -41,7 +42,6 @@ class Keister(Integrand):
             then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
             and :math:`x'_{ij} = c` otherwise
         """
-        dimension = x.shape[1]  # infer domain dimension
         normx = LA.norm(x, 2, axis=1)  # ||x||_2
-        y = pi ** (dimension / 2.0) * cos(normx)
+        y = pi ** (self.dimension / 2.0) * cos(normx)
         return y

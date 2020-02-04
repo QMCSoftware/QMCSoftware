@@ -6,23 +6,20 @@ from ._integrand import Integrand
 class QuickConstruct(Integrand):
     """ Specify and generate values of a user-defined function"""
 
-    def __init__(self, dimension, custom_fun):
+    def __init__(self, measure, custom_fun):
         """
         Initialize custom Integrand
 
         Args:
-            dimension (ndarray): dimension(s) of the integrand(s)
-            custom_fun (int): a callable univariable or multivariate Python \
-             function that returns a real number.
-
-        Note:
-            Input of the function:
-
-            x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
-                        row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
+            measure (Measure): a Measure instance
+            custom_fun (function): a function evaluating samples (nxd) -> (nx1)
+                Args:
+                    x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
+                       row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
         """
-        super().__init__(dimension,
-                         g=custom_fun)
+        self.measure = measure
+        self.custom_fun = custom_fun
+        super().__init__()
 
     def g(self, x):
         return self.custom_fun(x)

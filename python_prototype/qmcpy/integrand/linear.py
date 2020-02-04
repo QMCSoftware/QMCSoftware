@@ -9,12 +9,13 @@ class Linear(Integrand):
     for :math:`\\boldsymbol{x} = (x_1,\\ldots,x_d) \\in \\mathbb{R}^d`
     """
 
-    def __init__(self, dimension):
+    def __init__(self, measure):
         """
         Args:
-            dimension (ndarray): dimension(s) of the integrand(s)
+            measure (Measure): a Measure instance
         """
-        super().__init__(dimension)
+        self.measure = measure
+        super().__init__()
 
     def g(self, x):
         """
