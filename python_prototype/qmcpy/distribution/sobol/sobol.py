@@ -11,6 +11,8 @@ import warnings
 
 class Sobol(Distribution):
     """ Quasi-Random Sobol low discrepancy sequence (Base 2) """
+    
+    parameters = ['dimension','scramble','replications','seed','backend','mimics']
 
     def __init__(self, dimension=1, scramble=False, replications=0, seed=None, backend='MPS'):
         """
@@ -111,15 +113,3 @@ class Sobol(Distribution):
             x_sob_reps = x_sob_reps.squeeze(0)
         return x_sob_reps
 
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        attributes = ['dimension','scramble','replications','seed','backend','mimics']
-        return super().__repr__(attributes)

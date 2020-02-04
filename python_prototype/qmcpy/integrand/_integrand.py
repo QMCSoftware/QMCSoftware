@@ -1,6 +1,6 @@
 """ Definition for abstract class, ``Integrand`` """
 
-from ..util import multilevel_constructor, MethodImplementationError, TransformError, univ_repr, ParameterError
+from ..util import MethodImplementationError, TransformError, univ_repr, ParameterError
 
 
 class Integrand(object):
@@ -15,6 +15,8 @@ class Integrand(object):
             raise ParameterError(prefix + 'self.measure (a Measure instance)')
         self.dimension = self.measure.dimension
         self.f = self.measure.transform_g_to_f(self.g) # transformed integrand
+        if not hasattr(self,'parameters'):
+            self.parameters = []
 
     def g(self, x):
         """ ABSTRACT METHOD
@@ -33,14 +35,5 @@ class Integrand(object):
         """
         raise MethodImplementationError(self, 'g')
 
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        return univ_repr(self, "Integrand", attributes)
+    def __repr__(self):
+        return univ_repr(self, "Integrand", self.parameters)

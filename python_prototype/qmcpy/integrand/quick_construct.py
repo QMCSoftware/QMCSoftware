@@ -23,15 +23,3 @@ class QuickConstruct(Integrand):
 
     def g(self, x):
         return self.custom_fun(x)
-
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        return super().__repr__()

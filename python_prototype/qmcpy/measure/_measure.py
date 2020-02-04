@@ -13,6 +13,8 @@ class Measure(object):
             raise ParameterError(prefix + 'self.distribution (a Distribution instance)')
         self.dimension = self.distribution.dimension
         self.distrib_name = type(self.distribution).__name__
+        if not hasattr(self,'parameters'):
+            self.parameters = []
 
     def gen_samples(self, *args, **kwargs):
         """ ABSTRACT METHOD
@@ -43,14 +45,5 @@ class Measure(object):
         """
         raise MethodImplementationError(self,'transform_g_to_f')
 
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        return univ_repr(self, "True Measure", attributes+['distrib_name'])
+    def __repr__(self):
+        return univ_repr(self, "True Measure", ['distrib_name']+self.parameters)

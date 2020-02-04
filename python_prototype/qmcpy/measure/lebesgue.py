@@ -8,6 +8,8 @@ from numpy import array
 class Lebesgue(Measure):
     """ Lebesgue Uniform Measure """
 
+    parameters = ['lower_bound', 'upper_bound']
+    
     def __init__(self, distribution, lower_bound=0., upper_bound=1):
         """
         Args:
@@ -61,15 +63,3 @@ class Lebesgue(Measure):
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Lebesgue'%self.distribution.mimics)
         return f
-
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args: 
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        return super().__repr__(['lower_bound', 'upper_bound'])

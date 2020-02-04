@@ -9,6 +9,8 @@ from scipy.stats import norm
 class BrownianMotion(Measure):
     """ Brownian Motion Measure """
 
+    parameters = ['time_vector']
+
     def __init__(self, distribution, time_vector=arange(1 / 4, 5 / 4, 1 / 4)):
         """
         Args:
@@ -63,15 +65,3 @@ class BrownianMotion(Measure):
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Brownian Motion'%self.distribution.mimics)
         return f
-
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        return super().__repr__(['time_vector'])

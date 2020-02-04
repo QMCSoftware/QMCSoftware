@@ -10,6 +10,9 @@ from numpy import array, exp, log, maximum, repeat
 class AsianCall(Integrand):
     """ Specify and generate payoff values of an Asian Call option """
 
+    parameters = ['volatility', 'start_price', 'strike_price',
+                  'interest_rate','mean_type', 'dim_frac']
+                          
     def __init__(self, measure, volatility=0.5, start_price=30, strike_price=25,\
                  interest_rate=0, mean_type='arithmetic', dim_frac=0):
         """
@@ -22,6 +25,9 @@ class AsianCall(Integrand):
             strike_price (float): strike_price, the call/put offer
             interest_rate (float): r, the annual interest rate
             mean_type (string): 'arithmetic' or 'geometric' mean
+            dim_frac (float): fraciton of dimension compared to next level.
+                              0 for single-level problems.
+                              See add_multilevel_kwargs
         """
         if not isinstance(measure,BrownianMotion):
             raise ParameterError('AsianCall measure must be a BrownianMotion instance')
@@ -31,11 +37,52 @@ class AsianCall(Integrand):
         self.strike_price = strike_price
         self.interest_rate = interest_rate
         self.mean_type = mean_type.lower()
-        if mean_type not in ['arithmetic', 'geometric']:
+        if self.mean_type not in ['arithmetic', 'geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
-                self.dim_frac = dim_frac
+        self.dim_frac = dim_frac
         self.dimension = self.measure.dimension
-        self.exercise_time = [measure[i].time_vector[-1] for i in range(len(dimension))])
+        self.exercise_time = self.measure.time_vector[-1]
+        super().__init__()
+
+    @classmethod
+    def add_multilevel_kwargs(cls, levels, **kwargs):
+        """ CLASS METHOD
+        Add keyword argumnets to be distributed across levels
+        
+        Args:
+            levels (int): number of levels 
+            kwargs (dict): dictionary of keyword and multi-level arguments
+                key (string): keyword
+                val (list/ndarray): list of length levels whose elements will be 
+                                    distributed amongst levels
+        
+        Returns: 
+            kwargs (dict): input kwargs updated with more arguments
+        """
+        dims = [measure.dimension for measure in kwargs['measure']]
+        kwargs['dim_frac'] = [0] + [dims[i]/dims[i-1] for i in range(1,levels)]
+        return kwargs
+
+    def get_discounted_payoffs(self, stock_path, dimension):
+        """
+        Calculate the discounted payoff from the stock path
+
+        stock_path (ndarray): option prices at monitoring times
+        dimension (int): number of dimensions
+        """
+        if self.mean_type == 'arithmetic':
+            avg = (self.start_price / 2 +
+                   stock_path[:, :-1].sum(1) +
+                   stock_path[:, -1] / 2) / \
+                dimension
+        elif self.mean_type == 'geometric':
+            avg = exp((log(self.start_price) / 2 +
+                       log(stock_path[:, :-1]).sum(1) +
+                       log(stock_path[:, -1]) / 2) /
+                      dimension)
+        y = maximum(avg - self.strike_price, 0) * \
+            exp(-self.interest_rate * self.exercise_time)
+        return y
 
     def g(self, x):
         """
@@ -62,84 +109,3 @@ class AsianCall(Integrand):
             y_course = self.get_discounted_payoffs(s_course, d_course)
             y -= y_course
         return y
-
-    def get_discounted_payoffs(self, stock_path, dimension):
-        """
-        Calculate the discounted payoff from the stock path
-
-        stock_path (ndarray): option prices at monitoring times
-        dimension (int): number of dimensions
-        """
-        if self.mean_type == 'arithmetic':
-            avg = (self.start_price / 2 +
-                   stock_path[:, :-1].sum(1) +
-                   stock_path[:, -1] / 2) / \
-                dimension
-        elif self.mean_type == 'geometric':
-            avg = exp((log(self.start_price) / 2 +
-                       log(stock_path[:, :-1]).sum(1) +
-                       log(stock_path[:, -1]) / 2) /
-                      dimension)
-        y = maximum(avg - self.strike_price, 0) * \
-            exp(-self.interest_rate * self.exercise_time)
-        return y
-
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        attributes = ['volatility', 'start_price', 'strike_price',
-                      'interest_rate', 'mean_type', 'exercise_time']
-        return super().__repr__(attributes)
-
-
-class AsianCall_ML(MLObject):
-    """ Multi-Level AsianCall option """
-
-    def __init__(self, measures, volatilities=.05, start_prices=30,\
-                 strike_prices=25, interest_rates=0, mean_types='arithmetic'):
-        self.name = 'Multi-Level Asian Call Option '
-        try: self.dimensions = len(measure)
-        except: raise ParameterError('AsianCall_ML expects a list of measures. ' +\
-                                     'Use AsianCall for single level problems')
-        kwargs = {
-            'volatilities': volatilities,
-            'start_prices': start_prices,
-            'strike_prices': strike_prices,
-            'interest_rates': interest_rates,
-            'mean_type': mean_type}
-        for key,val in kwargs.items():
-            if hasattr(val,'__len__') and len(val)==len(self.dimensions):
-                # passed a list of attributes to be distributed
-                continue
-            kwargs[key] = repeat(val,len(self.dimensions))
-        dim_fracs = array([0] + [self.dimensions[i]/self.dimensions[i-1] for i in range(1, len(self.dimensions))])
-        self.objects_list = [None]*len(self.dimensions)
-        for i in range(len(self.dimensions)):
-            self.objects_list[i] = AsianCall(
-                                    measure = measures[i],
-                                    volatility = volatilities[i],
-                                    start_price = start_prices[i],
-                                    strike_price = strike_prices[i],
-                                    interest_rate = interest_rates[i],
-                                    mean_type = mean_types[i],
-                                    dim_frac = dim_fracs[i])
-    
-    def __len__(self):
-        return len(self.objects_list)
-
-    def __iter__(self):
-        for obj in self.objects_list:
-            yield obj
-
-    def __getitem__(self, i):
-        return self.objects_list[i]
-
-    def __setitem__(self, i, val):
-        self.objects_list[i] = val

@@ -9,6 +9,8 @@ from scipy.stats import norm
 class Uniform(Measure):
     """ Uniform Measure """
 
+    parameters = ['lower_bound', 'upper_bound']
+    
     def __init__(self, distribution, lower_bound=0., upper_bound=1.):
         """
         Args:
@@ -65,15 +67,3 @@ class Uniform(Measure):
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Uniform'%self.distribution.mimics)
         return f
-        
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        return super().__repr__(['lower_bound', 'upper_bound'])

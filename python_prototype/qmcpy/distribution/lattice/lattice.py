@@ -12,6 +12,8 @@ import warnings
 class Lattice(Distribution):
     """ Quasi-Random Lattice low discrepancy sequence (Base 2) """
 
+    parameters = ['dimension','scramble','replications','seed','backend','mimics']
+    
     def __init__(self, dimension=1, scramble=False, replications=0, seed=None, backend='GAIL'):
         """
         Args:
@@ -36,7 +38,6 @@ class Lattice(Distribution):
         else:
             raise ParameterError("Lattice backend must 'GAIL' or 'MPS'")
         self.mimics = 'StdUniform'
-        
         super().__init__()
 
     def gen_samples(self, n_min=0, n_max=8):
@@ -62,16 +63,3 @@ class Lattice(Distribution):
         if self.squeeze:
             x_lat_reps = x_lat_reps.squeeze(0)
         return x_lat_reps
-
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        attributes = ['dimension','scramble','replications','seed','backend','mimics']
-        return super().__repr__(attributes)

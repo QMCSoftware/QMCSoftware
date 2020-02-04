@@ -16,7 +16,7 @@ class StoppingCriterion(object):
         inflate: inflation factor when estimating variance
         stage: stage of the computation
     """
-
+    
     def __init__(self, distribution, allowed_distribs):
         """
         Args:
@@ -37,7 +37,9 @@ class StoppingCriterion(object):
             raise ParameterError(prefix + 'self.n_max (maximum total samples)')
         if not hasattr(self, 'stage'):
             raise ParameterError(prefix + 'self.stage (stage of the computation)')
-
+        if not hasattr(self,'parameters'):
+            self.parameters = []
+            
     def stop_yet(self):
         """
         ABSTRACT METHOD
@@ -45,15 +47,5 @@ class StoppingCriterion(object):
         """
         raise MethodImplementationError(self, 'stop_yet')
 
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        super_attributes = ['abs_tol', 'rel_tol', 'n_max', 'inflate', 'alpha']
-        return univ_repr(self, "Stopping Criterion", super_attributes + attributes)
+    def __repr__(self):
+        return univ_repr(self, "Stopping Criterion", self.parameters)

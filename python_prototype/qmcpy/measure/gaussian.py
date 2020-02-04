@@ -9,6 +9,8 @@ from scipy.stats import norm
 class Gaussian(Measure):
     """ Gaussian (Normal) Measure """
 
+    parameters = ['mean', 'variance']
+
     def __init__(self, distribution, mean=0, variance=1):
         """
         Args:
@@ -65,15 +67,3 @@ class Gaussian(Measure):
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
         return f
-
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        return super().__repr__(['mean', 'variance'])

@@ -122,15 +122,3 @@ class CubatureData(AccumData):
         # update total samples
         self.n[:] = 2**self.m
         self.n_total = self.n.copy()  # updated the total evaluations
-        
-    def __repr__(self):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        return super().__repr__(['r'])

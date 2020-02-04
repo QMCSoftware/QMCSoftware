@@ -7,6 +7,8 @@ from numpy.random import Generator, PCG64
 class IIDStdGaussian(Distribution):
     """ Standard Gaussian """
 
+    parameters = ['dimension', 'replications', 'seed', 'mimics']
+
     def __init__(self, dimension=1, replications=0, seed=None):
         """
         Args:
@@ -37,16 +39,3 @@ class IIDStdGaussian(Distribution):
         if self.squeeze:
             x = x.squeeze(0)
         return x
-    
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        attributes = ['dimension','replications','seed','mimics']
-        return super().__repr__(attributes)

@@ -3,7 +3,7 @@
 from ..util import ParameterError, MethodImplementationError, univ_repr
 
 
-class AccumData(object):
+class AccumData():
     """
     Accumulated data required in the computation of the integral, stores the \
     sample mean and variance of integrand values
@@ -26,10 +26,11 @@ class AccumData(object):
             raise ParameterError(prefix + 'self.n_total (total number of samples)')
         if not hasattr(self, 'confid_int'):
             raise ParameterError(prefix + 'self.confid_int (confidence interval for the solution)')
+        if not hasattr(self,'parameters'):
+            self.parameters = []
 
     def update_data(self, integrand, measure):
-        """
-        ABSTRACT METHOD
+        """ ABSTRACT METHOD
         Update the accumulated data
 
         Args:
@@ -63,22 +64,10 @@ class AccumData(object):
         self.stopping_criterion = stopping_criterion
         return self
 
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
+    def __repr__(self):
         string = "Solution: %-15.4f\n" % (self.solution)
-        for qmc_obj in [self.integrand, self.distrib,
-                        self.measure, self.stopping_criterion]:
+        for qmc_obj in [self.integrand, self.distrib, self.measure, self.stopping_criterion]:
             if qmc_obj:
                 string += str(qmc_obj)
-        super_attributes = ['n', 'n_total', 'confid_int', 'time_total']
-        #   get only unique values
-        string += univ_repr(self, 'AccumData', super_attributes + attributes)
+        string += univ_repr(self, 'AccumData', self.parameters)
         return string
