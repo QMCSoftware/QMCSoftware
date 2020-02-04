@@ -1,7 +1,7 @@
 """ Definition for abstract class StoppingCriterion """
 
 from ..util import DistributionCompatibilityError, ParameterError, \
-                    MethodImplementationError, univ_repr
+                   MethodImplementationError, univ_repr
 
 
 class StoppingCriterion(object):
@@ -12,8 +12,6 @@ class StoppingCriterion(object):
         abs_tol: absolute error tolerance
         rel_tol: relative error tolerance
         n_max: maximum number of samples
-        alpha: significance level for confidence interval
-        inflate: inflation factor when estimating variance
         stage: stage of the computation
     """
     
@@ -24,9 +22,8 @@ class StoppingCriterion(object):
             allowed_distribs: distribution's compatible with the StoppingCriterion
         """
         if type(distribution).__name__ not in allowed_distribs:
-            error_message = type(self).__name__  \
-                + " only accepts distributions:" \
-                + str(allowed_distribs)
+            error_message = "%s only accepts distributions: %s" %\
+                (type(self).__name__, str(allowed_distribs))
             raise DistributionCompatibilityError(error_message)
         prefix = 'A concrete implementation of Stopping Criterion must have '
         if not hasattr(self, 'abs_tol'):
@@ -41,8 +38,7 @@ class StoppingCriterion(object):
             self.parameters = []
             
     def stop_yet(self):
-        """
-        ABSTRACT METHOD
+        """ ABSTRACT METHOD
         Determine the number of samples needed to satisfy tolerance
         """
         raise MethodImplementationError(self, 'stop_yet')

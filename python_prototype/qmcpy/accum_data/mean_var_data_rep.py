@@ -1,36 +1,35 @@
 """ Definition for MeanVarDataRep, a concrete implementation of AccumData """
 
-from time import process_time
-
-from numpy import array, finfo, float32, full, inf, nan, tile, zeros
-
 from ._accum_data import AccumData
+from time import process_time
+from numpy import array, finfo, float32, full, inf, nan, tile, zeros
 
 EPS = finfo(float32).eps
 
 
 class MeanVarDataRep(AccumData):
-    """Accumulated data Repeated Central Limit Stopping Criterion (CLTRep) \
-        calculations.
+    """
+    Data from Repeated Central Limit Stopping Criterion calculations.
     """
 
-    def __init__(self, levels, n_init, replications):
+    parameters = ['replications','solution','sighat','n_total','confid_int']
+
+    def __init__(self, n_init, replications):
         """
         Initialize data instance
 
         Args:
-            levels (int): number of integrands
             n_init (int): initial number of samples
             replications (int): number of random nxm matrices to generate
         """
-        self.r = replications  # Number of random nxm matrices to generate
-        self.muhat_ir = zeros((levels, self.r))
+        self.replications = replications  # Number of random nxm matrices to generate
+        self.muhat_r = zeros(self.replications)
         self.solution = nan
-        self.muhat = full(levels, inf)  # sample mean
-        self.sighat = full(levels, inf)  # sample standard deviation
-        self.t_eval = zeros(levels)  # processing time for each integrand
-        self.n = tile(n_init, levels).astype(float)  # currnet number of samples
-        self.n_total = tile(0, levels)  # total number of samples
+        self.muhat = inf  # sample mean
+        self.sighat = inf # sample standard deviation
+        self.t_eval = 0  # processing time for each integrand
+        self.n = n_init  # currnet number of samples
+        self.n_total = 0 # total number of samples
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         super().__init__()
 
@@ -45,18 +44,15 @@ class MeanVarDataRep(AccumData):
         Returns:
             None
         """
-        for i in range(len(measure)):
-            t_start = process_time()  # time integrand evaluation
-            n_gen = self.n[i] - self.n_total[i]
-            set_x = measure[i].gen_tm_samples(self.r, n_gen)
-            for r in range(self.r):
-                y = integrand[i].f(set_x[r])
-                previous_sum_y = self.muhat_ir[i, r] * self.n_total[i]  # previous mean times
-                # Evaluate transformed function
-                self.muhat_ir[i, r] = (y.sum() + previous_sum_y) / self.n[i]  # updated integrand-replication mean
-            self.muhat[i] = self.muhat_ir[i, :].mean()  # mean of stream means
-            self.sighat[i] = self.muhat_ir[i, :].std()
-            self.t_eval[i] = max(process_time() - t_start, EPS)
+        t_start = process_time()  # time integrand evaluation
+        set_x = measure.gen_samples(n_min=self.n_total,n_max=self.n)
+        for r in range(self.replications):
+            y = integrand.f(set_x[r])
+            previous_sum_y = self.muhat_r[r] * self.n_total
+            self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n  # updated integrand-replication mean
+        self.muhat = self.muhat_r.mean()  # mean of replication streams means
+        self.sighat = self.muhat_ir.std()
+        self.t_eval = max(process_time() - t_start, EPS)
         self.n_total = self.n.copy()  # updated the total evaluations
         # standard deviation of stream means
-        self.solution = self.muhat.sum()  # mean of integrand approximations
+        self.solution = self.muhat.copy() # mean of integrand approximations

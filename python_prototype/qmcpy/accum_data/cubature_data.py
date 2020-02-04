@@ -2,42 +2,42 @@
 
 from ._accum_data import AccumData
 from ..util import CubatureWarning
-
 from numpy import array, nan, zeros, tile, inf, hstack, exp, pi, arange, where
 import warnings
+
 
 class CubatureData(AccumData):
     """
     Accumulated data relavent to cubature algorithms
     """
 
-    def __init__(self, levels, m_min, m_max, fudge):
+    parameters = ['n_total','solution','r_lag']
+
+    def __init__(self, m_min, m_max, fudge):
         """
         Initialize data instance
 
         Args:
-            levels (int): number of integrands
-            n_init (int): initial number of samples
+            m_min (int): initial n == 2^m_min)
+            m_max (int): max n == 2^m_max
         """
-        self.r = 1
         self.m_min = m_min
         self.m_max = m_max
         self.m = self.m_min
-        self.n = zeros(levels) # currnet number of samples
-        self.n_total = tile(nan, levels)  # total number of samples
+        self.n_total = 0  # total number of samples generated
         self.solution = nan
-        self.confid_int = array([-inf, inf])  # confidence interval for solution
         self.r_lag = 4 # distance between coefficients summed and those computed
         self.l_star = self.m_min - self.r_lag # minimum gathering of points for the sums of DFT
         self.yval = array([]) # hold y values
         self.y = array([],dtype=complex) # hold transformed y values
         self.kappanumap = arange(1,2**self.m+1,dtype=int)
-        self.stilde = 0 # initialize sum of DFT terms
-        self.c_stilde_low = tile(-inf,int(self.m_max-self.l_star+1)) # initialize various sums of DFT terms for necessary conditions
-        self.c_stilde_up = tile(inf,int(self.m_max-self.l_star+1)) # initialize various sums of DFT terms for necessary conditions
         self.fudge = fudge
         self.omg_circ = lambda m: 2**(-m)
         self.omg_hat = lambda m: self.fudge(m)/((1+self.fudge(self.r_lag))*self.omg_circ(self.r_lag))
+        # Initialize various sums of DFT terms for necessary conditions
+        self.stilde = 0
+        self.c_stilde_low = tile(-inf,int(self.m_max-self.l_star+1))
+        self.c_stilde_up = tile(inf,int(self.m_max-self.l_star+1))
         super().__init__()
 
     def update_data(self, integrand, measure):
@@ -51,10 +51,9 @@ class CubatureData(AccumData):
         Returns:
             None
         """
-        n_gen = 2**self.m - self.n
         # Generate sample values
-        x_lat = measure[0].gen_tm_samples(self.r,n_gen).squeeze() # n_gen x d samples
-        ynext = integrand[0].f(x_lat) # Only implemented for single level problems
+        x_lat = measure.gen_samples(n_min=self.n_total,n_max=2**self.m)
+        ynext = integrand.f(x_lat)
         self.yval = hstack((self.yval,ynext))
         ynext = ynext.astype(complex)
         mnext = self.m-1 if self.m>self.m_min else self.m_min
@@ -120,5 +119,4 @@ class CubatureData(AccumData):
         ## Approximate integral
         self.solution = self.yval.mean()
         # update total samples
-        self.n[:] = 2**self.m
-        self.n_total = self.n.copy()  # updated the total evaluations
+        self.n_total = 2**self.m # updated the total evaluations

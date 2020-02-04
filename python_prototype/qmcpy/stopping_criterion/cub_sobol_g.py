@@ -1,4 +1,15 @@
-""" Definition for CubSobol_g, a concrete implementation of StoppingCriterion """
+""" Definition for CubSobol_g, a concrete implementation of StoppingCriterion
+
+Adapted from
+    https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
+
+Reference:
+    
+    [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+    Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
+    GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
+    Available from http://gailgithub.github.io/GAIL_Dev/
+"""
 
 from ._stopping_criterion import StoppingCriterion
 
@@ -21,34 +32,8 @@ class CubSobol_g(StoppingCriterion):
         refer to the references below.
     """
 
-    def __init__(self, distrib, measure,
-                 replications=16, inflate=1.2, alpha=0.01,
-                 abs_tol=1e-2, rel_tol=0,
-                 n_init=1024, n_max=1e10):
-        """
-        Args:
-            distrib
-            measure (Distribution): an instance of Distribution
-            replications (int): number of random nxm matrices to generate
-            inflate (float): inflation factor when estimating variance
-            alpha (float): significance level for confidence interval
-            abs_tol (float): absolute error tolerance
-            rel_tol (float): relative error tolerance
-            n_init (int): initial number of samples
-            n_max (int): maximum number of samples
-        """
-        # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
-        self.n_max = n_max
-        self.alpha = alpha
-        self.inflate = inflate
-        self.stage = "sigma"
-        # Construct Data Object to House Integration data
-        self.data = MeanVarData(len(measure), n_init)
-        # Verify Compliant Construction
-        allowed_distribs = ["Sobol"]
-        super().__init__(distrib, allowed_distribs)
+    def __init__(self, distribution):
+        pass
 
     def stop_yet(self):
         """ Determine when to stop """

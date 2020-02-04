@@ -1,9 +1,20 @@
-""" Definition for CubLattice_g, a concrete implementation of StoppingCriterion """
+""" Definition for CubLattice_g, a concrete implementation of StoppingCriterion
+
+Adapted from 
+    https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
+
+Reference:
+    
+    [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+    Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
+    GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
+    Available from http://gailgithub.github.io/GAIL_Dev/
+"""
 
 from ._stopping_criterion import StoppingCriterion
 from ..accum_data import CubatureData
-from ..util import MaxSamplesWarning
-
+from ..distribution import Distribution
+from ..util import MaxSamplesWarning, NotYetImplemented, ParameterError
 from numpy import log2
 import warnings
 
@@ -27,38 +38,34 @@ class CubLattice_g(StoppingCriterion):
         refer to the references below.
     """
 
-    def __init__(self, distrib, measure,
-                 inflate=1.2, alpha=0.01,
-                 abs_tol=1e-2, rel_tol=0,
-                 n_init=2**10, n_max=2**35,
-                 fudge = lambda m: 5*2**(-m)):
+    parameters = ['abs_tol','rel_tol','n_init','n_max']
+
+    def __init__(self, distribution, abs_tol=1e-2, rel_tol=0,
+                 n_init=2**10, n_max=2**35, fudge = lambda m: 5*2**(-m)):
         """
         Args:
-            distrib
-            measure (Distribution): an instance of Distribution
-            inflate (float): inflation factor when estimating variance
-            alpha (float): significance level for confidence interval
+            distribution (Distribution): an instance of Distribution
             abs_tol (float): absolute error tolerance
             rel_tol (float): relative error tolerance
+            n_init (int): initial number of samples
             n_max (int): maximum number of samples
             fudge (function): positive function multiplying the finite
                               sum of Fast Fourier coefficients specified 
                               in the cone of functions
         """
         # Input Checks
-        levels = len(measure)
-        if levels != 1:
+        if not isinstance(distribution,Distribution):
+            # must be a list of Distributions objects -> multilevel problem
             raise NotYetImplemented('''
                 cub_lattice_g not implemented for multi-level problems.
                 Use CLT stopping criterion with an iid distribution for multi-level problems ''')
+        if distribution.replications != 0:
+            raise ParmeterError('CubLattic_g requires distribution to have 0 replications.')
         # Set Attributes
-        self.inflate = inflate
-        self.alpha = alpha
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
         self.n_init = n_init
         self.n_max = n_max
-        self.stage = None
         m_min = log2(self.n_init)
         m_max = log2(self.n_max)
         if m_min%1 != 0 or m_max%1 != 0:
@@ -66,28 +73,31 @@ class CubLattice_g(StoppingCriterion):
             warnings.warn(warning_s, ParameterWarning)
             self.m_min = 10
             self.m_max = 35
+        self.stage = None
         # Construct Data Object to House Integration data
         self.data = CubatureData(len(measure), m_min, m_max, fudge)
         # Verify Compliant Construction
         allowed_distribs = ["Lattice"]
-        super().__init__(distrib, allowed_distribs)
+        super().__init__(distribution, allowed_distribs)
 
     def stop_yet(self):
         """ Determine when to stop """
         # Check the end of the algorithm
         errest = self.data.fudge(self.data.m)*self.data.stilde
+        # Compute optimal estimator
         ub = max(self.abs_tol, self.rel_tol*abs(self.data.solution + errest))
         lb = max(self.abs_tol, self.rel_tol*abs(self.data.solution - errest))
-        self.data.solution = self.data.solution - errest*(ub-lb) / (ub+lb) # Optimal estimator
+        self.data.solution = self.data.solution - errest*(ub-lb) / (ub+lb)
         if 4*errest**2/(ub+lb)**2 <= 1:
+            # stopping criterion met
             self.stage = 'done'
         elif self.data.m == self.data.m_max:
             warning_s = """
             Alread generated %d samples.
-            Trying to generate %s new samples, which exceeds n_max = %d.
+            Trying to generate %d new samples would exceed n_max = %d.
             No more samples will be generated.
             Note that error tolerances may no longer be satisfied""" \
-            % (int(self.data.n_total.sum()), str(self.data.n), int(self.n_max))
+            % (int(2**self.data.m), int(self.data.m), int(2**self.data.m_max))
             warnings.warn(warning_s, MaxSamplesWarning)
             self.stage = 'done'
         else: # double sample size
