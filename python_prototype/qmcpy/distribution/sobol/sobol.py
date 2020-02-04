@@ -26,8 +26,8 @@ class Sobol(Distribution):
         """
         self.dimension = dimension
         self.scramble = scramble
-        self.squeeze = (replications==0)
-        self.replications = max(1,replications)
+        self.replications = replications
+        self.r = max(self.replications,1)
         self.seed = seed
         self.backend = backend.lower()
         rng = Generator(PCG64(self.seed))
@@ -37,7 +37,7 @@ class Sobol(Distribution):
             self.t = max(32, self.sobol_rng.t)
             # correction factor to scale the integers
             self.ct = max(0, self.t - self.sobol_rng.t)
-            self.shifts = rng.integers(0, 2 ** self.t, (self.replications, self.dimension), dtype=int64)
+            self.shifts = rng.integers(0, 2 ** self.t, (self.r, self.dimension), dtype=int64)
             self.backend_gen = self.mps_sobol_gen
             if not self.scramble:
                 warning_s = '''
@@ -46,7 +46,7 @@ class Sobol(Distribution):
         elif self.backend == 'pytorch':
             temp_seed = self.seed if self.seed else rng.integers(0, 100, dtype=int64)
             self.sobol_rng = [SobolEngine(dimension=self.dimension, scramble=self.scramble, seed=seed_r)
-                                for seed_r in range(temp_seed, temp_seed + self.replications)]
+                                for seed_r in range(temp_seed, temp_seed + self.r)]
             self.backend_gen = self.pytorch_sobol_gen
             warning_s = '''
                 PyTorch SobolEngine issue. See https://github.com/pytorch/pytorch/issues/32047
@@ -76,7 +76,7 @@ class Sobol(Distribution):
             x_sob_reps = array([(shift_r ^ (x_sob * 2 ** self.ct)) / 2. ** self.t \
                     for shift_r in self.shifts])
         else:
-            x_sob_reps = repeat(x_sob[None, :, :], self.replications, axis=0)
+            x_sob_reps = repeat(x_sob[None, :, :], self.r, axis=0)
         return x_sob_reps
     
     def pytorch_sobol_gen(self, n_min=0, n_max=8):
@@ -88,10 +88,10 @@ class Sobol(Distribution):
             n_max (int): maximum index (not inclusive)
         """
         n = int(n_max-n_min)
-        for i in range(self.replications):
+        for i in range(self.r):
             self.sobol_rng[i].reset()
             self.sobol_rng[i].fast_forward(n_min)
-        return array([self.sobol_rng[i].draw(n).numpy() for i in range(self.replications)])
+        return array([self.sobol_rng[i].draw(n).numpy() for i in range(self.r)])
 
     def gen_samples(self, n_min=0, n_max=8):
         """
@@ -109,7 +109,7 @@ class Sobol(Distribution):
         if not (n_min == 0 or n_min == n_max/2):
             raise DistributionGenerationError("n_min must be 0 or n_max/2")
         x_sob_reps = self.backend_gen(n_min,n_max)
-        if self.squeeze:
+        if self.replications == 0:
             x_sob_reps = x_sob_reps.squeeze(0)
         return x_sob_reps
 

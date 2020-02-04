@@ -34,12 +34,8 @@ class CLT(StoppingCriterion):
         # Construct Data Object to House Integration data
         if isinstance(distributions,Distribution): 
             levels = 1 # single level problem
-            replications = distributions.replications
         else: # list of Distribution instances
             levels = len(distributions)
-            replications = sum([distrib.replications for distrib in distributions])
-        if replications != 0:
-            raise ParameterError('CLT requires distributions to have 0 replications')
         self.data = MeanVarData(levels, n_init)
         # Verify Compliant Construction
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]

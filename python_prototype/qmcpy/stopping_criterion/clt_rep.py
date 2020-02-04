@@ -2,7 +2,7 @@
 
 from ._stopping_criterion import StoppingCriterion
 from ..accum_data import MeanVarDataRep
-from ..distribution import Distribution
+from ..distribution._distribution import Distribution
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning
 from numpy import array, log2, sqrt
 from scipy.stats import norm

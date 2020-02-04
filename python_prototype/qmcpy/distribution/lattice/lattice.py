@@ -26,10 +26,10 @@ class Lattice(Distribution):
         """
         self.dimension = dimension
         self.scramble = scramble
-        self.squeeze = (replications==0)
-        self.replications = max(1,replications)
+        self.replications = replications
+        self.r = max(self.replications,1)
         self.seed = seed
-        self.shifts = Generator(PCG64(self.seed)).uniform(0, 1, (self.replications, self.dimension))
+        self.shifts = Generator(PCG64(self.seed)).uniform(0, 1, (self.r, self.dimension))
         self.backend = backend.lower()            
         if self.backend == 'gail':
             self.backend_gen = gail_lattice_gen
@@ -59,7 +59,7 @@ class Lattice(Distribution):
         if self.scramble: # apply random shift to samples
             x_lat_reps = array([(x_lat + shift_r) % 1 for shift_r in self.shifts])
         else: # duplicate unshifted samples
-            x_lat_reps = repeat(x_lat[None, :, :], self.replications, axis=0)
-        if self.squeeze:
+            x_lat_reps = repeat(x_lat[None, :, :], self.r, axis=0)
+        if self.replications == 0:
             x_lat_reps = x_lat_reps.squeeze(0)
         return x_lat_reps

@@ -14,7 +14,7 @@ Reference:
 
 from ._stopping_criterion import StoppingCriterion
 from ..accum_data import MeanVarData
-from ..distribution import Distribution
+from ..distribution._distribution import Distribution
 from ..util import MaxSamplesWarning, NotYetImplemented
 from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
 from scipy.optimize import fsolve
