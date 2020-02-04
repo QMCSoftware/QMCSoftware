@@ -13,11 +13,11 @@ class Integrand(object):
         prefix = 'A concrete implementation of Integrand must have '
         if not hasattr(self, 'measure'):
             raise ParameterError(prefix + 'self.measure (a Measure instance)')
-        self.dimension = self.measure.dimension
-        self.f = self.measure.transform_g_to_f(self.g) # transformed integrand
         if not hasattr(self,'parameters'):
             self.parameters = []
-
+        self.dimension = self.measure.dimension
+        self.f = self.measure.transform_g_to_f(self.g) # transformed integrand
+        
     def g(self, x):
         """ ABSTRACT METHOD
         Original integrand to be integrated

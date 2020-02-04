@@ -33,6 +33,7 @@ class MultiLevelConstructor():
         for l in range(self.levels):
             kwargs_l = {key:val[l] for key,val in self.kwargs.items()}
             self.objects_list[l] = qmcpy_object(**kwargs_l)
+        self.dimensions = [obj.dimension for obj in self.objects_list]
     
     def __len__(self):
         return len(self.objects_list)

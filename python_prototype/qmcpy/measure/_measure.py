@@ -11,10 +11,10 @@ class Measure(object):
         prefix = 'A concrete implementation of Measure must have '
         if not hasattr(self, 'distribution'):
             raise ParameterError(prefix + 'self.distribution (a Distribution instance)')
-        self.dimension = self.distribution.dimension
-        self.distrib_name = type(self.distribution).__name__
         if not hasattr(self,'parameters'):
             self.parameters = []
+        self.dimension = self.distribution.dimension
+        self.distrib_name = type(self.distribution).__name__
 
     def gen_samples(self, *args, **kwargs):
         """ ABSTRACT METHOD

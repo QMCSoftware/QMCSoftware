@@ -1,5 +1,3 @@
-""" Meta-data and public utilities for qmcpy """
-
 from .integrand import *
 from .multilevel_constructor import MultiLevelConstructor
 from .distribution import *

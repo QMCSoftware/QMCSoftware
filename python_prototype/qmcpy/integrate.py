@@ -1,57 +1,61 @@
-""" Main driver function for QMCPy. """
+""" Main integration method acting on QMCPy objects """
 
+from .distribution._distribution import Distribution
+from .measure._measure import Measure
+from .integrand._integrand import Integrand
+from .util import DimensionError
 from time import process_time
 
-from .util import DimensionError
-from .distribution import IIDStdUniform
-from .stopping_criterion import CLT
 
-
-def integrate(integrand, measure, distrib=None, stopping_criterion=None):
-    """Specify and compute integral of :math:`f(\\boldsymbol{x})` for \
+def integrate(integrand, measure, distribution, stopping_criterion):
+    """
+    Specify and compute integral of :math:`f(\\boldsymbol{x})` for \
     :math:`\\boldsymbol{x} \\in \\mathcal{X}`.
 
     Args:
-        integrand (Integrand): an object from class Integrand. If None (default),
-            sum of two variables defined on unit square is used.
-        measure (Measure): an object from class Measure. If None \
-        (default), standard uniform distribution is used.
-        distrib (Distribution): an object from class \
-            Distribution. If None (default), IID standard uniform \
-            distribution is used.
-        stopping_criterion (StoppingCriterion): an object from class \
-            StoppingCriterion.  If None (default), criterion based on central \
-            limit theorem with absolute tolerance equal to 0.01 is used.
+        integrand (Integrand): an Integrand object
+        measure (Measure): a Measure object
+        distribution (Distribution): a Distribution object
+        stopping_criterion (StoppingCriterion): a StoppingCrition object
 
     Returns:
-        tuple: tuple containing:
-
-            **solution** (:obj:`float`): estimated value of the integral
-
-            **data** (:obj:`AccumData`): input data and information such as \
-                number of sampling points and run time used to obtain solution
-
+        solution (float): estimated value of the integral
+        data (AccumData): houses input and integration process data
+            Includes:
+                self.integrand (origianl Integrand): origianl integrand
+                self.measure (original Measure): origianl measure
+                self.stopping_criterion (origianl StoppingCriterion)
+            Note: Calling print(data) outputs a string of all parameters
+                        
     """
-
-    # Default some arguments
-    if not distrib:
-        distrib = IIDStdUniform(rng_seed=7)
-    if not stopping_criterion:
-        stopping_criterion = CLT(distrib, measure, abs_tol=0.01)
-    # Check Measure and Integrand matching dimensions
-    if not all(integrand.dimension == measure.dimension):
-        raise DimensionError('The integrand and true measure should have the same dimension(s)')
+    # Check matching dimensions for integrand, measure, and distribution
+    flag = 0
+    try:
+        if isinstance(distribution,Distribution):
+            distrib_dims = distribution.dimension
+            measure_dims = measure.dimension
+            integrand_dims = integrand.dimension
+        else: # multi-level
+            distrib_dims = distribution.dimensions
+            measure_dims = measure.dimensions
+            integrand_dims = integrand.dimensions
+        if distrib_dims != measure_dims or distrib_dims != integrand_dims:
+            flag = 1
+    except:
+        flag = 1
+    if flag == 1: # mismatching dimensions or incorrectlly constructed objects
+        raise DimensionError('''
+                distribution, measure, and integrand dimensions do not match. 
+                For multi-level problems ensure distribution, measure, and integrand
+                are MultiLevelConstructor instances. ''') 
+    # Start Integration
     t_start = process_time()
-    # Transform integrands to accept distribution values which can generate
-    measure.transform(integrand, distrib)
     while stopping_criterion.stage != "done":
         # the data.stage property tells us where we are in the process
         stopping_criterion.data.update_data(integrand, measure)  # compute more data
         stopping_criterion.stop_yet()  # update the status of the computation
     solution = stopping_criterion.data.solution  # assign outputs
     cpu_time = process_time() - t_start
-    data_obj_final = stopping_criterion.data.complete(cpu_time, integrand,
-                                                      distrib,
-                                                      measure,
-                                                      stopping_criterion)
-    return solution, data_obj_final
+    stopping_criterion.data.complete(\
+        cpu_time, integrand, distribution, measure, stopping_criterion)
+    return solution, stopping_criterion.data
