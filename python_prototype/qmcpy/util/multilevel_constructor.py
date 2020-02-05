@@ -1,6 +1,6 @@
 """ Multi-level abstract class """
 
-from .util import univ_repr
+from . import univ_repr
 from numpy import repeat
 
 

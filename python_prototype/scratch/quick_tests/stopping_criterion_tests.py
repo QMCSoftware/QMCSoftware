@@ -6,7 +6,7 @@ from copy import deepcopy
 
 d = 2
 true_value = 1.808186429263620
-abs_tol = .0005
+abs_tol = .005
 rel_tol = 0
 bar = '~'*100+'\n'
 print(bar)

@@ -3,7 +3,7 @@
 from .._distribution import Distribution
 from .gail_lattice import gail_lattice_gen
 from .mps_lattice import mps_lattice_gen
-from ...util import DistributionGenerationError, DistributionGenerationWarnings, ParameterError
+from ...util import ParameterError
 from numpy import array, log2, repeat, vstack
 from numpy.random import Generator, PCG64
 import warnings
@@ -52,9 +52,9 @@ class Lattice(Distribution):
             self.replications x (n_max-n_min) x self.dimension (ndarray)
         """
         if log2(n_max) % 1 != 0:
-            raise DistributionGenerationError("n_max must be a power of 2")
+            raise ParameterError("n_max must be a power of 2")
         if not (n_min == 0 or n_min == n_max/2):
-            raise DistributionGenerationError("n_min must be 0 or n_max/2")
+            raise ParameterError("n_min must be 0 or n_max/2")
         x_lat = self.backend_gen(n_min,n_max,self.dimension)
         if self.scramble: # apply random shift to samples
             x_lat_reps = array([(x_lat + shift_r) % 1 for shift_r in self.shifts])

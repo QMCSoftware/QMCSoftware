@@ -2,7 +2,7 @@
 
 from .._distribution import Distribution
 from .mps_sobol import DigitalSeq
-from ...util import DistributionGenerationWarnings, ParameterError, ParameterWarning
+from ...util import ParameterError, ParameterWarning
 from numpy import array, int64, log2, repeat, zeros
 from numpy.random import Generator, PCG64, randint
 from torch.quasirandom import SobolEngine
@@ -105,9 +105,9 @@ class Sobol(Distribution):
             self.replications x (n_max-n_min) x self.dimension (ndarray)
         """
         if log2(n_max) % 1 != 0:
-            raise DistributionGenerationError("n_max must be a power of 2")
+            raise ParameterError("n_max must be a power of 2")
         if not (n_min == 0 or n_min == n_max/2):
-            raise DistributionGenerationError("n_min must be 0 or n_max/2")
+            raise ParameterError("n_min must be 0 or n_max/2")
         x_sob_reps = self.backend_gen(n_min,n_max)
         if self.replications == 0:
             x_sob_reps = x_sob_reps.squeeze(0)
