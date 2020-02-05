@@ -37,10 +37,10 @@ class BrownianMotion(Measure):
         samples = self.distribution.gen_samples(*args,**kwargs)
         if self.distribution.mimics == 'StdGaussian':
             # insert start time then cumulative sum over monitoring times
-            tf_samples = cumsum(samples * sqrt(diff(insert(self.time_vector, 0, 0))), 1)
+            tf_samples = cumsum(samples * sqrt(diff(insert(self.time_vector, 0, 0))), -1)
         elif self.distribution.mimics == "StdUniform":
             # inverse CDF, insert start time, then cumulative sum over monitoring times
-            tf_samples = cumsum(norm.ppf(samples) * sqrt(diff(insert(self.time_vector, 0, 0))), 1)
+            tf_samples = cumsum(norm.ppf(samples) * sqrt(diff(insert(self.time_vector, 0, 0))), -1)
         else:
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Brownian Motion'%self.distribution.mimics)

@@ -14,8 +14,7 @@ integrand = AsianCall(
     start_price = 30,
     strike_price = 25,
     interest_rate = 0,
-    mean_type = 'arithmetic',
-    dim_frac=0)
+    mean_type = 'arithmetic')
 samples = measure.gen_samples(n=n)
 y = integrand.f(samples)
 print(integrand)
@@ -45,8 +44,7 @@ integrands = MultiLevelConstructor(levels,
         start_price = 30,
         strike_price = 25,
         interest_rate = 0,
-        mean_type = 'arithmetic',
-        dim_frac=0) # will be overwritten
+        mean_type = 'arithmetic')
 y = 0
 for l in range(levels):
     samples_l = measures[l].gen_samples(n_min=0,n_max=n)

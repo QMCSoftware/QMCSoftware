@@ -1,5 +1,6 @@
 """ Definition for abstract class StoppingCriterion """
 
+from ..distribution._distribution import Distribution
 from ..util import DistributionCompatibilityError, ParameterError, \
                    MethodImplementationError, univ_repr
 
@@ -15,16 +16,20 @@ class StoppingCriterion(object):
         stage: stage of the computation
     """
     
-    def __init__(self, distribution, allowed_distribs):
+    def __init__(self, distributions, allowed_distribs):
         """
         Args:
-            distribution (Distribution): an instance of Distribution
+            distributions (Distribution or list of Distributions): an instance of Distribution
             allowed_distribs: distribution's compatible with the StoppingCriterion
         """
-        if type(distribution).__name__ not in allowed_distribs:
-            error_message = "%s only accepts distributions: %s" %\
-                (type(self).__name__, str(allowed_distribs))
-            raise DistributionCompatibilityError(error_message)
+        if isinstance(distributions,Distribution):
+            # single level problem -> make it appear multi-level
+            distributions = [distributions]
+        for distribution in distributions:
+            if type(distribution).__name__ not in allowed_distribs:
+                error_message = "%s only accepts distributions: %s" %\
+                    (type(self).__name__, str(allowed_distribs))
+                raise DistributionCompatibilityError(error_message)
         prefix = 'A concrete implementation of Stopping Criterion must have '
         if not hasattr(self, 'abs_tol'):
             raise ParameterError(prefix + 'self.abs_tol (absolute tolerance)')

@@ -4,7 +4,7 @@ from . import univ_repr
 from numpy import repeat
 
 
-class MultiLevelConstructor():
+class MultiLevelConstructor(object):
     """ Abstract Multi-Level Class """
 
     def __init__(self, levels, qmcpy_object, **kwargs):
@@ -18,12 +18,10 @@ class MultiLevelConstructor():
                                     val[i] will go toward constructing qmcpy_object[i]
                                     Will also accept single arguments and repeat levels times
         """
+        self.kwargs = kwargs
         self.ex_qmcpy_obj = object.__new__(qmcpy_object) 
         self.name = type(self.ex_qmcpy_obj).__name__
         self.levels = levels
-        for key,val in kwargs.items():
-            setattr(self,key,val)
-        self.kwargs = kwargs
         for key,val in self.kwargs.items():
             if not hasattr(val,'__len__') or len(val)!=self.levels:
                 self.kwargs[key] = repeat(val,self.levels)
@@ -34,6 +32,8 @@ class MultiLevelConstructor():
             kwargs_l = {key:val[l] for key,val in self.kwargs.items()}
             self.objects_list[l] = qmcpy_object(**kwargs_l)
         self.dimensions = [obj.dimension for obj in self.objects_list]
+        for param in self.ex_qmcpy_obj.parameters:
+            setattr(self,param,[getattr(obj,param) for obj in self.objects_list])        
     
     def __len__(self):
         return len(self.objects_list)
@@ -49,5 +49,4 @@ class MultiLevelConstructor():
         self.objects_list[i] = val
     
     def __repr__(self):
-        name = self.name+' (MultiLevel)'
-        return univ_repr(self,name,self.ex_qmcpy_obj.parameters)
+        return univ_repr(self,self.name,self.ex_qmcpy_obj.parameters)

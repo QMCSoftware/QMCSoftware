@@ -57,7 +57,7 @@ class CLT(StoppingCriterion):
                              (z_star * self.inflate / tol_up)**2)
             # n_mu := n_mu_temp adjusted for previous n
             self.data.n_mu = maximum(self.data.n, n_mu_temp)
-            self.data.n += int(self.data.n_mu)
+            self.data.n += self.data.n_mu.astype(int)
             if self.data.n_total + self.data.n.sum() > self.n_max:
                 # cannot generate this many new samples
                 warning_s = """

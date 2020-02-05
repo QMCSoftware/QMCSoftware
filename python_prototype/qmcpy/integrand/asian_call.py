@@ -11,10 +11,10 @@ class AsianCall(Integrand):
     """ Specify and generate payoff values of an Asian Call option """
 
     parameters = ['volatility', 'start_price', 'strike_price',
-                  'interest_rate','mean_type', 'dim_frac']
+                  'interest_rate','mean_type', '_dim_frac']
                           
     def __init__(self, measure, volatility=0.5, start_price=30, strike_price=25,\
-                 interest_rate=0, mean_type='arithmetic', dim_frac=0):
+                 interest_rate=0, mean_type='arithmetic', _dim_frac=0):
         """
         Initialize AsianCall Integrand's'
 
@@ -25,7 +25,7 @@ class AsianCall(Integrand):
             strike_price (float): strike_price, the call/put offer
             interest_rate (float): r, the annual interest rate
             mean_type (string): 'arithmetic' or 'geometric' mean
-            dim_frac (float): fraciton of dimension compared to next level.
+            _dim_frac (float): fraciton of dimension compared to next level.
                               0 for single-level problems.
                               See add_multilevel_kwargs
         """
@@ -39,7 +39,7 @@ class AsianCall(Integrand):
         self.mean_type = mean_type.lower()
         if self.mean_type not in ['arithmetic', 'geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
-        self.dim_frac = dim_frac
+        self._dim_frac = _dim_frac
         self.dimension = self.measure.dimension
         self.exercise_time = self.measure.time_vector[-1]
         super().__init__()
@@ -60,7 +60,7 @@ class AsianCall(Integrand):
             kwargs (dict): input kwargs updated with more arguments
         """
         dims = [measure.dimension for measure in kwargs['measure']]
-        kwargs['dim_frac'] = [0] + [dims[i]/dims[i-1] for i in range(1,levels)]
+        kwargs['_dim_frac'] = [0] + [dims[i]/dims[i-1] for i in range(1,levels)]
         return kwargs
 
     def get_discounted_payoffs(self, stock_path, dimension):
@@ -103,9 +103,9 @@ class AsianCall(Integrand):
             (self.interest_rate - self.volatility ** 2 / 2) *
             self.measure.time_vector + self.volatility * x)
         y = self.get_discounted_payoffs(s_fine, self.dimension)
-        if self.dim_frac > 0:
-            s_course = s_fine[:, int(self.dim_frac - 1):: int(self.dim_frac)]
-            d_course = self.dimension / self.dim_frac
+        if self._dim_frac > 0:
+            s_course = s_fine[:, int(self._dim_frac - 1):: int(self._dim_frac)]
+            d_course = self.dimension / self._dim_frac
             y_course = self.get_discounted_payoffs(s_course, d_course)
             y -= y_course
         return y
