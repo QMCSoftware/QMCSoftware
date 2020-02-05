@@ -6,13 +6,13 @@ from copy import deepcopy
 
 d = 2
 true_value = 1.808186429263620
-abs_tol = .01
+abs_tol = .0005
 rel_tol = 0
 bar = '~'*100+'\n'
 print(bar)
 
 # CLT
-distribution = IIDStdGaussian(dimension=d, seed=7)
+distribution = IIDStdUniform(dimension=d, seed=7)
 measure = Gaussian(distribution, variance=1/2)
 integrand = Keister(measure)
 stopper = CLT(distribution,abs_tol=abs_tol,rel_tol=rel_tol)
@@ -37,7 +37,7 @@ solution,data = integrate(stopper,integrand,measure,distribution)
 print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
 # CubLattice
-distribution = Lattice(dimension=d, scramble=True, replications=0, seed=7, backend='MPS')
+distribution = Lattice(dimension=d, scramble=True, replications=0, seed=7, backend='GAIL')
 measure = Gaussian(distribution, variance=1/2)
 integrand = Keister(measure)
 stopper = CubLattice_g(distribution,abs_tol=abs_tol,rel_tol=rel_tol)
