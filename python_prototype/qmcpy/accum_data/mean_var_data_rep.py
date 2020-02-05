@@ -47,7 +47,7 @@ class MeanVarDataRep(AccumData):
         t_start = process_time()  # time integrand evaluation
         set_x = measure.gen_samples(n_min=self.n_total,n_max=self.n)
         for r in range(self.replications):
-            y = integrand.f(set_x[r])
+            y = integrand.f(set_x[r]).squeeze()
             previous_sum_y = self.muhat_r[r] * self.n_total
             self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n  # updated integrand-replication mean
         self.muhat = self.muhat_r.mean()  # mean of replication streams means

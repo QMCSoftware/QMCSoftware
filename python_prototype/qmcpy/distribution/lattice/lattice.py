@@ -4,8 +4,7 @@ from .._distribution import Distribution
 from .gail_lattice import gail_lattice_gen
 from .mps_lattice import mps_lattice_gen
 from ...util import ParameterError
-from numpy import array, log2, repeat, vstack
-from numpy.random import Generator, PCG64
+from numpy import array, log2, repeat, vstack, random
 import warnings
 
 
@@ -29,7 +28,8 @@ class Lattice(Distribution):
         self.replications = replications
         self.r = max(self.replications,1)
         self.seed = seed
-        self.shifts = Generator(PCG64(self.seed)).uniform(0, 1, (self.r, self.dimension))
+        random.seed(self.seed)
+        self.shifts = random.rand(self.r, self.dimension)
         self.backend = backend.lower()            
         if self.backend == 'gail':
             self.backend_gen = gail_lattice_gen

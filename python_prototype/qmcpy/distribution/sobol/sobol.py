@@ -3,8 +3,7 @@
 from .._distribution import Distribution
 from .mps_sobol import DigitalSeq
 from ...util import ParameterError, ParameterWarning
-from numpy import array, int64, log2, repeat, zeros
-from numpy.random import Generator, PCG64, randint
+from numpy import array, int64, log2, repeat, zeros, random
 from torch.quasirandom import SobolEngine
 import warnings
 
@@ -30,21 +29,21 @@ class Sobol(Distribution):
         self.r = max(self.replications,1)
         self.seed = seed
         self.backend = backend.lower()
-        rng = Generator(PCG64(self.seed))
-        if self.backend == 'mps': 
+        random.seed(self.seed)
+        if self.backend == 'mps':
             self.sobol_rng = DigitalSeq(m=30, s=self.dimension)
             # we guarantee a depth of >=32 bits for shift
             self.t = max(32, self.sobol_rng.t)
             # correction factor to scale the integers
             self.ct = max(0, self.t - self.sobol_rng.t)
-            self.shifts = rng.integers(0, 2 ** self.t, (self.r, self.dimension), dtype=int64)
+            self.shifts = random.randint(0, 2 ** self.t, (self.r, self.dimension), dtype=int64)
             self.backend_gen = self.mps_sobol_gen
             if not self.scramble:
                 warning_s = '''
                 Sobol MPS unscrambled samples are not in the domain [0,1)'''
                 warnings.warn(warning_s, ParameterWarning)
         elif self.backend == 'pytorch':
-            temp_seed = self.seed if self.seed else rng.integers(0, 100, dtype=int64)
+            temp_seed = self.seed if self.seed else random.randint(0, 100, dtype=int64)
             self.sobol_rng = [SobolEngine(dimension=self.dimension, scramble=self.scramble, seed=seed_r)
                                 for seed_r in range(temp_seed, temp_seed + self.r)]
             self.backend_gen = self.pytorch_sobol_gen

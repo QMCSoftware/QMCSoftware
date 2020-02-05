@@ -53,7 +53,7 @@ class CubatureData(AccumData):
         """
         # Generate sample values
         x_lat = measure.gen_samples(n_min=self.n_total,n_max=2**self.m)
-        ynext = integrand.f(x_lat)
+        ynext = integrand.f(x_lat).squeeze()
         self.yval = hstack((self.yval,ynext))
         ynext = ynext.astype(complex)
         mnext = self.m-1 if self.m>self.m_min else self.m_min

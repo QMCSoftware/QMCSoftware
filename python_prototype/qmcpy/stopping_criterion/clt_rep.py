@@ -18,7 +18,7 @@ class CLTRep(StoppingCriterion):
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
 
     def __init__(self, distribution, inflate=1.2, alpha=0.01,
-                 abs_tol=1e-2, rel_tol=0, n_init=32, n_max=2**30):
+                 abs_tol=1e-2, rel_tol=0, n_init=256, n_max=2**30):
         """
         Args:
             distribution (Distribution): an instance of Distribution
