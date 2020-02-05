@@ -5,8 +5,59 @@ from qmcpy.distribution._distribution import Distribution
 from qmcpy.integrand._integrand import Integrand
 from qmcpy.stopping_criterion._stopping_criterion import StoppingCriterion
 from qmcpy.measure._measure import Measure
-
+from qmcpy.util import TransformError
 from numpy import *
+
+
+# Discrete Distribution
+class MyDiscreteDistribution(Distribution):
+    
+    def __init__(self, dimension):
+        self.dimension = dimension
+        self.mimics = 'StdMeasure'
+        super().__init__()
+    
+    def gen_samples(self, n):
+        return zeros((self.dimension,n))
+
+my_discrete_distribution = MyDiscreteDistribution(2)
+samples = my_discrete_distribution.gen_samples(4)
+
+
+# True Measure
+class MyTrueMeasure(Measure):
+
+    def __init__(self, distribution):
+        self.distribution = distribution
+        super().__init__()
+    
+    def gen_samples(*args):
+        samples = self.distribution.gen_samples(*args)
+        if self.distribution.mimics == 'StdMeasure':
+            tf_samples = samples
+        else:
+            raise TransformError('distribution must mimic StdMeasure')
+        return tf_samples
+    
+    def transform_g_to_f(self,g):
+        f = lambda samples: g(samples)
+        return f
+
+my_true_measure = MyTrueMeasure(my_discrete_distribution)
+
+
+# Integrand
+class MyIntegrand(Integrand):
+
+    def __init__(self, measure):
+        self.measure = measure
+        super().__init__()
+    
+    def g(self,x):
+        return x.sum(1)
+
+my_integrand = MyIntegrand(my_true_measure)
+evalutations = my_integrand.f(ones((3,5)))
 
 
 # Accumulate Data
@@ -14,9 +65,7 @@ class MyAccumData(AccumData):
     
     def __init__(self):
         self.solution = None
-        self.n = None
         self.n_total = None
-        self.confid_int = None
         super().__init__()
     
     def update_data(self, integrand, measure):
@@ -24,33 +73,6 @@ class MyAccumData(AccumData):
 
 my_accum_data =  MyAccumData()
 my_accum_data.update_data(None, None)
-
-
-# Discrete Distribution
-class MyDiscreteDistribution(Distribution):
-    
-    def __init__(self):
-        self.mimics = None
-        super().__init__()
-    
-    def gen_dd_samples(self, replications, n_samples, dimensions):
-        return zeros((replications, n_samples, dimensions))
-
-my_discrete_distribution = MyDiscreteDistribution()
-samples = my_discrete_distribution.gen_dd_samples(1, 2, 3)
-
-
-# Integrand
-class MyIntegrand(Integrand):
-
-    def __init__(self, dimensions):
-        super().__init__(dimensions)
-    
-    def g(self,x):
-        return x.sum(1)
-
-my_integrand = MyIntegrand([2])
-evalutations = my_integrand.g(ones((3,5)))
 
 
 # Stopping Criterion
@@ -61,22 +83,12 @@ class MyStoppingCriterion(StoppingCriterion):
         self.rel_tol = None
         self.n_max = None
         self.stage = None
-        super().__init__(distribution, ['MyDiscreteDistribution'])
+        accepted_distribution = ['MyDiscreteDistribution']
+        super().__init__(distribution, accepted_distribution)
     
     def stop_yet(self):
+        self.stage = 'done'
         return None
 
-my_stopping_criterion = MyStoppingCriterion(MyDiscreteDistribution())
+my_stopping_criterion = MyStoppingCriterion(my_discrete_distribution)
 my_stopping_criterion.stop_yet()
-
-# True Measure
-class MyTrueMeasure(Measure):
-
-    def __init__(self, dimension):
-        transforms = {
-            "StdMeasure": [
-                lambda self, samples: samples,
-                lambda self, g: g]}
-        super().__init__(dimension, None)
-
-my_true_measure = MyTrueMeasure([2])
