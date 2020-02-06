@@ -1,0 +1,113 @@
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1649         
+Keister (Integrand Object)
+IIDStdUniform (Discrete Distribution Object)
+	dimension       3
+	seed            7
+	mimics          StdUniform
+Gaussian (True Measure Object)
+	distrib_name    IIDStdUniform
+	mean            0
+	variance        0.500
+CLT (Stopping Criterion Object)
+	inflate         1.200
+	alpha           0.010
+	abs_tol         0.050
+	rel_tol         0
+	n_init          1024
+	n_max           10000000000
+MeanVarData (AccumData Object)
+	levels          1
+	solution        2.165
+	n               19818
+	n_total         20842
+	confid_int      [ 2.114  2.215]
+	time_total      0.008
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1659         
+Keister (Integrand Object)
+Lattice (Discrete Distribution Object)
+	dimension       3
+	scramble        1
+	replications    16
+	seed            7
+	backend         mps
+	mimics          StdUniform
+Gaussian (True Measure Object)
+	distrib_name    Lattice
+	mean            0
+	variance        0.500
+CLTRep (Stopping Criterion Object)
+	inflate         1.200
+	alpha           0.010
+	abs_tol         0.050
+	rel_tol         0
+	n_init          256
+	n_max           1073741824
+MeanVarDataRep (AccumData Object)
+	replications    16
+	solution        2.166
+	sighat          0.011
+	n_total         256
+	confid_int      [ 2.164  2.168]
+	time_total      0.002
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1770         
+Keister (Integrand Object)
+IIDStdGaussian (Discrete Distribution Object)
+	dimension       3
+	seed            7
+	mimics          StdGaussian
+Gaussian (True Measure Object)
+	distrib_name    IIDStdGaussian
+	mean            0
+	variance        0.500
+MeanMC_g (Stopping Criterion Object)
+	inflate         1.200
+	alpha           0.010
+	abs_tol         0.050
+	rel_tol         0
+	n_init          1024
+	n_max           10000000000
+MeanVarData (AccumData Object)
+	levels          1
+	solution        2.177
+	n               39028
+	n_total         40052
+	confid_int      [ 2.127  2.227]
+	time_total      0.006
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1660         
+Keister (Integrand Object)
+Lattice (Discrete Distribution Object)
+	dimension       3
+	scramble        1
+	replications    0
+	seed            7
+	backend         gail
+	mimics          StdUniform
+Gaussian (True Measure Object)
+	distrib_name    Lattice
+	mean            0
+	variance        0.500
+CubLattice_g (Stopping Criterion Object)
+	abs_tol         0.050
+	rel_tol         0
+	n_init          1024
+	n_max           34359738368
+CubatureData (AccumData Object)
+	n_total         1024
+	solution        2.166
+	r_lag           4
+	time_total      0.002
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

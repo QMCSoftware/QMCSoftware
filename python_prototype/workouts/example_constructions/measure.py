@@ -1,3 +1,8 @@
+"""
+Sample Measure objects and usage
+python workouts/example_constructions/measure.py > outputs/example_constructions/measures.log
+"""
+
 from qmcpy import *
 from copy import deepcopy
 from numpy import *
@@ -10,7 +15,7 @@ iid_std_u = IIDStdUniform(dimension=d, seed=seed)
 iid_std_g = IIDStdGaussian(dimension=d, seed=seed)
 n = 8
 
-bar = '~'*100+'\n'
+bar = '\n'+'~'*100+'\n'
 print(bar)
 
 # Brownian motion

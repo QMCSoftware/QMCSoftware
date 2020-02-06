@@ -1,8 +1,13 @@
+""" 
+Sample Integrand objects and usage
+python workouts/example_constructions/integrands.py > outputs/example_constructions/integrands.log
+"""
+
 from qmcpy import *
 from numpy import *
 
 n = 2**15
-bar = '~'*100+'\n'
+bar = '\n'+'~'*100+'\n'
 print(bar)
 
 # Asian Call (Single Level)

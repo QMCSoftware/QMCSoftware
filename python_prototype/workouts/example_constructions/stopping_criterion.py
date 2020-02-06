@@ -1,5 +1,8 @@
-# Mathematica: 
-#   N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]]
+"""
+Sample Distribution objects and usage
+Mathematica: N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]]
+python workouts/example_constructions/stopping_criterion.py > outputs/example_constructions/stopping_criterion.log
+"""
 
 from qmcpy import *
 from copy import deepcopy
@@ -8,7 +11,7 @@ d = 2
 true_value = 1.808186429263620
 abs_tol = .005
 rel_tol = 0
-bar = '~'*100+'\n'
+bar = '\n'+'~'*100+'\n'
 print(bar)
 
 # CLT
@@ -18,7 +21,6 @@ integrand = Keister(measure)
 stopper = CLT(distribution,abs_tol=abs_tol,rel_tol=rel_tol)
 solution,data = integrate(stopper,integrand,measure,distribution)
 print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
-
 
 # CLTRep
 distribution = Lattice(dimension=d, scramble=True, replications=16, seed=7, backend='MPS')

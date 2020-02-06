@@ -1,3 +1,8 @@
+"""
+Sample Distribution objects and usage
+python workouts/example_constructions/distributions.py > outputs/example_constructions/distributions.log
+"""
+
 from qmcpy import Lattice, Sobol, IIDStdGaussian, IIDStdUniform
 from numpy import *
 set_printoptions(threshold=1e10)
@@ -6,7 +11,7 @@ d = 2
 r = 0
 scramble = True
 seed = 7
-bar = '~'*100+'\n'
+bar = '\n'+'~'*100+'\n'
 
 # IID RNG
 iid_std_uniform = IIDStdUniform(dimension=d, seed=seed)
