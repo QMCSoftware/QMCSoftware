@@ -1,27 +1,40 @@
-from numpy import *
 from qmcpy import *
+from numpy import *
 
-time_vector = [
-    arange(1/4,5/4,1/4),
-    arange(1/16,17/16,1/16),
-    arange(1/64,65/64,1/64)]
-levels = len(time_vector)
-distributions = MultiLevelConstructor(levels,
-    IIDStdGaussian,
-        dimension = [len(tv) for tv in time_vector],
-        seed = 7)
-measures = MultiLevelConstructor(levels,
-    BrownianMotion,
-        distribution = distributions,
-        time_vector = time_vector)
-integrands = MultiLevelConstructor(levels,
-    AsianCall,
-        measure = measures,
-        volatility = 0.5,
-        start_price = 30,
-        strike_price = 25,
-        interest_rate = 0.1,
-        mean_type = 'arithmetic')
-stopper = CLT(distributions, abs_tol=.05)
-solution,data = integrate(stopper, integrands, measures, distributions)
+# Probably Brownian Motion or Asian Call problem
+'''
+distribution = Lattice(dimension=16, replications=16, scramble=True, seed=7, backend="MPS")
+measure = BrownianMotion(distribution,time_vector=arange(1/16,17/16,1/16))
+integrand = AsianCall(measure)
+stopper = CLTRep(distribution,abs_tol=.001)
+solution,data = integrate(stopper,integrand,measure,distribution)
+print(data)
+'''
+
+# CubLattice (parallel to matlab)
+'''
+distribution = Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL')
+measure = Uniform(distribution)
+integrand = QuickConstruct(measure, lambda x: 5*x.sum(1))
+stopper = CubLattice_g(distribution, abs_tol=.0001)
+solution, data = integrate(stopper, integrand, measure, distribution)
+print(solution)
+'''
+
+# CubLattice + AsianCall working check
+'''
+distribution = Lattice(dimension=16, replications=16, scramble=True, seed=7, backend="MPS")
+measure = BrownianMotion(distribution,time_vector=arange(1/16,17/16,1/16))
+integrand = AsianCall(measure)
+stopper = CLTRep(distribution,abs_tol=.001)
+solution,data = integrate(stopper,integrand,measure,distribution)
+print(data)
+'''
+
+# Keister with breaking dimension
+distribution = IIDStdGaussian(dimension=8,seed=7)
+measure = Gaussian(distribution,variance=1/2)
+integrand = Keister(measure)
+stopper = CLT(distribution,abs_tol=.05)
+solution,data = integrate(stopper,integrand,measure,distribution)
 print(data)

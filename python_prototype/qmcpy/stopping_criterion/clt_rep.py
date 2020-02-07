@@ -34,6 +34,10 @@ class CLTRep(StoppingCriterion):
             raise NotYetImplemented('''
                 CLTRep not implemented for multi-level problems.
                 Use CLT stopping criterion with an iid distribution for multi-level problems.''')
+        if distribution.replications <16:
+            raise ParameterError('CLTRep requires distribution to have 16 replications.')
+        if not distribtution.scramble:
+            raise ParameterError("CLTRep requires distribution to have scramble=True")
         if log2(n_init) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'
             warnings.warn(warning_s, ParameterWarning)
