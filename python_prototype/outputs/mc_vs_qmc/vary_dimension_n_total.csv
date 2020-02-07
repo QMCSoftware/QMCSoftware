@@ -1,4 +1,4 @@
-dimension,CLT_IIDStdUniform,CLT_IIDStdGaussian,CLTRep_Lattice,CLTRep Sobol,MeanMC_g IIDStdUniform,MeanMC_g IIDStdGaussian,CubLattice_g
+dimension,CLT_IIDStdUniform,CLT_IIDStdGaussian,CLTRep_Lattice,CLTRep_Sobol,MeanMC_g_IIDStdUniform,MeanMC_g_IIDStdGaussian,CubLattice_g
 1.0,11985.0,9993.0,256.0,256.0,,,1024.0
 2.0,30927.0,28368.0,256.0,256.0,,,1024.0
 3.0,73043.0,70600.0,256.0,256.0,,,1024.0

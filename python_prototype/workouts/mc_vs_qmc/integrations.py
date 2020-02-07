@@ -55,7 +55,7 @@ integrations_dict = {
     'CLT_IIDStdUniform': clt_iidstduniform,
     'CLT_IIDStdGaussian': clt_iidstdgaussian,
     'CLTRep_Lattice': cltrep_lattice,
-    'CLTRep Sobol': cltrep_sobol,
-    'MeanMC_g IIDStdUniform': meanmc_g_iidstduniform,
-    'MeanMC_g IIDStdGaussian': meanmc_g_iidstdgaussian,
+    'CLTRep_Sobol': cltrep_sobol,
+    'MeanMC_g_IIDStdUniform': meanmc_g_iidstduniform,
+    'MeanMC_g_IIDStdGaussian': meanmc_g_iidstdgaussian,
     'CubLattice_g': cublattice_g}
