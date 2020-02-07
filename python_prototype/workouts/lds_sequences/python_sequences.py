@@ -7,7 +7,7 @@ from numpy import *
 from pandas import DataFrame
 
 
-def qmcpy_gentimes(powers_2=arange(1, 11), trials=1, dimension=1):
+def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
     """
     Record time for generating samples from each discrete distribution
     """
@@ -58,6 +58,6 @@ def qmcpy_gentimes(powers_2=arange(1, 11), trials=1, dimension=1):
 
 
 if __name__ == '__main__':
-    df_times = qmcpy_gentimes(powers_2=arange(1, 21), trials=3, dimension=1)
+    df_times = python_sequences(powers_2=arange(1, 21), trials=3, dimension=1)
     df_times.to_csv('outputs/lds_sequences/python_sequence_times.csv', index=False)
     print('\n', df_times)

@@ -9,86 +9,92 @@ from qmcpy.util import TransformError
 from numpy import *
 
 
-# Discrete Distribution
-class MyDiscreteDistribution(Distribution):
-    
-    def __init__(self, dimension):
-        self.dimension = dimension
-        self.mimics = 'StdMeasure'
-        super().__init__()
-    
-    def gen_samples(self, n):
-        return zeros((self.dimension,n))
+def barebones():
+        
+    # Discrete Distribution
+    class MyDiscreteDistribution(Distribution):
+        
+        def __init__(self, dimension):
+            self.dimension = dimension
+            self.mimics = 'StdMeasure'
+            super().__init__()
+        
+        def gen_samples(self, n):
+            return zeros((self.dimension,n))
 
-my_discrete_distribution = MyDiscreteDistribution(2)
-samples = my_discrete_distribution.gen_samples(4)
-
-
-# True Measure
-class MyTrueMeasure(Measure):
-
-    def __init__(self, distribution):
-        self.distribution = distribution
-        super().__init__()
-    
-    def gen_samples(*args):
-        samples = self.distribution.gen_samples(*args)
-        if self.distribution.mimics == 'StdMeasure':
-            tf_samples = samples
-        else:
-            raise TransformError('distribution must mimic StdMeasure')
-        return tf_samples
-    
-    def transform_g_to_f(self,g):
-        f = lambda samples: g(samples)
-        return f
-
-my_true_measure = MyTrueMeasure(my_discrete_distribution)
+    my_discrete_distribution = MyDiscreteDistribution(2)
+    samples = my_discrete_distribution.gen_samples(4)
 
 
-# Integrand
-class MyIntegrand(Integrand):
+    # True Measure
+    class MyTrueMeasure(Measure):
 
-    def __init__(self, measure):
-        self.measure = measure
-        super().__init__()
-    
-    def g(self,x):
-        return x.sum(1)
+        def __init__(self, distribution):
+            self.distribution = distribution
+            super().__init__()
+        
+        def gen_samples(*args):
+            samples = self.distribution.gen_samples(*args)
+            if self.distribution.mimics == 'StdMeasure':
+                tf_samples = samples
+            else:
+                raise TransformError('distribution must mimic StdMeasure')
+            return tf_samples
+        
+        def transform_g_to_f(self,g):
+            f = lambda samples: g(samples)
+            return f
 
-my_integrand = MyIntegrand(my_true_measure)
-evalutations = my_integrand.f(ones((3,5)))
-
-
-# Accumulate Data
-class MyAccumData(AccumData):
-    
-    def __init__(self):
-        self.solution = None
-        self.n_total = None
-        super().__init__()
-    
-    def update_data(self, integrand, measure):
-        return
-
-my_accum_data =  MyAccumData()
-my_accum_data.update_data(None, None)
+    my_true_measure = MyTrueMeasure(my_discrete_distribution)
 
 
-# Stopping Criterion
-class MyStoppingCriterion(StoppingCriterion):
+    # Integrand
+    class MyIntegrand(Integrand):
 
-    def __init__(self, distribution):
-        self.abs_tol = None
-        self.rel_tol = None
-        self.n_max = None
-        self.stage = None
-        accepted_distribution = ['MyDiscreteDistribution']
-        super().__init__(distribution, accepted_distribution)
-    
-    def stop_yet(self):
-        self.stage = 'done'
-        return None
+        def __init__(self, measure):
+            self.measure = measure
+            super().__init__()
+        
+        def g(self,x):
+            return x.sum(1)
 
-my_stopping_criterion = MyStoppingCriterion(my_discrete_distribution)
-my_stopping_criterion.stop_yet()
+    my_integrand = MyIntegrand(my_true_measure)
+    evalutations = my_integrand.f(ones((3,5)))
+
+
+    # Accumulate Data
+    class MyAccumData(AccumData):
+        
+        def __init__(self):
+            self.solution = None
+            self.n_total = None
+            super().__init__()
+        
+        def update_data(self, integrand, measure):
+            return
+
+    my_accum_data =  MyAccumData()
+    my_accum_data.update_data(None, None)
+
+
+    # Stopping Criterion
+    class MyStoppingCriterion(StoppingCriterion):
+
+        def __init__(self, distribution):
+            self.abs_tol = None
+            self.rel_tol = None
+            self.n_max = None
+            self.stage = None
+            accepted_distribution = ['MyDiscreteDistribution']
+            super().__init__(distribution, accepted_distribution)
+        
+        def stop_yet(self):
+            self.stage = 'done'
+            return None
+
+    my_stopping_criterion = MyStoppingCriterion(my_discrete_distribution)
+    my_stopping_criterion.stop_yet()
+
+
+if __name__ == '__main__':
+    barebones()

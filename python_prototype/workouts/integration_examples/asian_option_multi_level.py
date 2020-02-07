@@ -18,7 +18,7 @@ def asian_option_multi_level(
     strike_price = 25,
     interest_rate = .01,
     mean_type = 'geometric',
-    abs_tol = .05):
+    abs_tol = .1):
     
     levels = len(time_vector)
     print(bar)
