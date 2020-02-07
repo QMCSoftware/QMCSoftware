@@ -10,7 +10,7 @@ from numpy import arange, nan
 from pandas import DataFrame
 
 
-def vary_dimension(dimension=[1,2,3], abs_tol=.1, trials=1):
+def vary_dimension(dimension=[1,2,3], abs_tol=0, rel_tol=.1, trials=1):
     """
     Record solution, wall-clock time, and number of samples
     for integrating the Keister function with varying dimensions
@@ -32,7 +32,7 @@ def vary_dimension(dimension=[1,2,3], abs_tol=.1, trials=1):
                 n_total = 0
                 time_total = 0
                 for j in range(trials):
-                    data = function(dimension=d, abs_tol=abs_tol)
+                    data = function(dimension=d, abs_tol=abs_tol, rel_tol=rel_tol)
                     solution += data.solution
                     n_total += data.n_total
                     time_total += data.time_total
@@ -49,7 +49,7 @@ def vary_dimension(dimension=[1,2,3], abs_tol=.1, trials=1):
 
 
 if __name__ == '__main__':
-    df_solution,df_n_total,df_time = vary_dimension(dimension=arange(1, 41), abs_tol=.05, trials=3)
+    df_solution,df_n_total,df_time = vary_dimension(dimension=arange(1, 41), abs_tol=0, rel_tol=.01, trials=3)
     df_solution.to_csv('outputs/mc_vs_qmc/vary_dimension_solution.csv', index=False)
     df_n_total.to_csv('outputs/mc_vs_qmc/vary_dimension_n_total.csv', index=False)
     df_time.to_csv('outputs/mc_vs_qmc/vary_dimension_time.csv', index=False)

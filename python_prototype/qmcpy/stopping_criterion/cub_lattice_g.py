@@ -61,7 +61,7 @@ class CubLattice_g(StoppingCriterion):
                 Use CLT stopping criterion with an iid distribution for multi-level problems ''')
         if distribution.replications != 0:
             raise ParameterError('CubLattic_g requires distribution to have 0 replications.')
-        if not distribtution.scramble:
+        if not distribution.scramble:
             raise ParameterError("CubLattice_g requires distribution to have scramble=True")
         if distribution.backend != 'gail':
             raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")

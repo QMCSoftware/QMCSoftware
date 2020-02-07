@@ -3,7 +3,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accum_data import MeanVarDataRep
 from ..distribution._distribution import Distribution
-from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning
+from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import array, log2, sqrt
 from scipy.stats import norm
 import warnings
@@ -36,7 +36,7 @@ class CLTRep(StoppingCriterion):
                 Use CLT stopping criterion with an iid distribution for multi-level problems.''')
         if distribution.replications <16:
             raise ParameterError('CLTRep requires distribution to have 16 replications.')
-        if not distribtution.scramble:
+        if not distribution.scramble:
             raise ParameterError("CLTRep requires distribution to have scramble=True")
         if log2(n_init) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'

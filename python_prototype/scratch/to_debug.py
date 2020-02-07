@@ -30,11 +30,3 @@ stopper = CLTRep(distribution,abs_tol=.001)
 solution,data = integrate(stopper,integrand,measure,distribution)
 print(data)
 '''
-
-# Keister with breaking dimension
-distribution = IIDStdGaussian(dimension=8,seed=7)
-measure = Gaussian(distribution,variance=1/2)
-integrand = Keister(measure)
-stopper = CLT(distribution,abs_tol=.05)
-solution,data = integrate(stopper,integrand,measure,distribution)
-print(data)

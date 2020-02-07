@@ -10,7 +10,7 @@ from numpy import arange, nan
 from pandas import DataFrame
 
 
-def vary_abs_tol(dimension=3, abs_tol=[.1,.2,.3], trials=1):
+def vary_abs_tol(dimension=3, abs_tol=[.1,.2,.3], rel_tol=0, trials=1):
     """
     Record solution, wall-clock time, and number of samples
     for integrating the Keister function with
@@ -33,7 +33,7 @@ def vary_abs_tol(dimension=3, abs_tol=[.1,.2,.3], trials=1):
                 n_total = 0
                 time_total = 0
                 for j in range(trials):
-                    data = function(dimension=dimension, abs_tol=abs_tol)
+                    data = function(dimension=dimension, abs_tol=tol, rel_tol=rel_tol)
                     solution += data.solution
                     n_total += data.n_total
                     time_total += data.time_total
@@ -49,7 +49,7 @@ def vary_abs_tol(dimension=3, abs_tol=[.1,.2,.3], trials=1):
     return df_solution,df_n_total,df_time
 
 if __name__ == '__main__':
-    df_solution,df_n_total,df_time = vary_abs_tol(dimension=3, abs_tol=arange(.001, .0502, .0002), trials=3)
+    df_solution,df_n_total,df_time = vary_abs_tol(dimension=3, abs_tol=arange(.002, .0502, .0002), rel_tol=0, trials=3)
     df_solution.to_csv('outputs/mc_vs_qmc/vary_abs_tol_solution.csv', index=False)
     df_n_total.to_csv('outputs/mc_vs_qmc/vary_abs_tol_n_total.csv', index=False)
     df_time.to_csv('outputs/mc_vs_qmc/vary_abs_tol_time.csv', index=False)
