@@ -189,7 +189,7 @@ class DigitalSeq():
         basestr = str  # basestr for python2, str for python3
         if isinstance(Cs, basestr):
             abs_file_path = path.join(path.dirname(__file__), Cs)
-            Cs = loadtxt(abs_file_path, int, max_rows=s).reshape(s, -1)
+            Cs = loadtxt(abs_file_path, int, max_rows=int(s)).reshape((s, -1))
         elif hasattr(Cs, "read"):
             # assume z is a stream like sys.stdin
             f = Cs

@@ -1,2 +1,2 @@
-from .comp_abstols import abstol_comparison
-from .comp_dimensions import dimension_comparison
+from .vary_dimension import vary_dimension
+from .vary_abstol import vary_abstol

@@ -51,9 +51,9 @@ def qmcpy_gentimes(powers_2=arange(1, 11), trials=1, dimension=1):
             distribution = Sobol(dimension, scramble=False, replications=0, seed=7, backend='PyTorch')
             x = distribution.gen_samples(n_min=0,n_max=n)
         row_i['S_PyTorch_t'] = (time() - t0) / trials
-        # Set/Print Results for this n
-        print('\n'.join(['%s: %.4f'%(key,val) for key,val in row_i.items()])+'\n')
+        # Set and print results
         df.loc[i] = row_i
+        print('\n'.join(['%s: %.4f'%(key,val) for key,val in row_i.items()])+'\n')
     return df
 
 
