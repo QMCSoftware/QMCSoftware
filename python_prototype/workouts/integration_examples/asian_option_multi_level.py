@@ -8,7 +8,7 @@ from qmcpy import *
 
 bar = '\n'+'~'*100+'\n'
 
-def multi_level_asian_option(
+def asian_option_multi_level(
     time_vector = [
         arange(1/4, 5/4, 1/4),
         arange(1 / 64, 65 / 64, 1 / 64),
@@ -47,4 +47,4 @@ def multi_level_asian_option(
 
 if __name__ == "__main__":
     
-    multi_level_asian_option()
+    asian_option_multi_level()

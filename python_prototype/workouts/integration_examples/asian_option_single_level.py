@@ -8,7 +8,7 @@ from qmcpy import *
 
 bar = '\n'+'~'*100+'\n'
 
-def single_level_asian_option(
+def asian_option_single_level(
     time_vector = arange(1 / 64, 65 / 64, 1 / 64),
     volatility = .5,
     start_price = 30,
@@ -55,4 +55,4 @@ def single_level_asian_option(
 
 if __name__ == "__main__":
     
-    single_level_asian_option()
+    asian_option_single_level()

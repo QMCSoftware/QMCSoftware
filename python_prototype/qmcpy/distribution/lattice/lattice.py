@@ -13,7 +13,7 @@ class Lattice(Distribution):
 
     parameters = ['dimension','scramble','replications','seed','backend','mimics']
     
-    def __init__(self, dimension=1, scramble=False, replications=0, seed=None, backend='GAIL'):
+    def __init__(self, dimension=1, scramble=True, replications=0, seed=None, backend='GAIL'):
         """
         Args:
             dimension (int): dimension of samples
