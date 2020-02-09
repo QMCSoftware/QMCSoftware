@@ -2,7 +2,7 @@
 
 from ._accum_data import AccumData
 from ..util import CubatureWarning
-from numpy import array, nan, zeros, tile, inf, hstack, exp, pi, arange, where
+from numpy import array, nan, zeros, tile, inf, hstack, exp, pi, arange, where, complex128
 import warnings
 
 
@@ -29,7 +29,7 @@ class CubatureData(AccumData):
         self.r_lag = 4 # distance between coefficients summed and those computed
         self.l_star = self.m_min - self.r_lag # minimum gathering of points for the sums of DFT
         self.yval = array([]) # hold y values
-        self.y = array([],dtype=complex) # hold transformed y values
+        self.y = array([],dtype=complex128) # hold transformed y values
         self.kappanumap = arange(1,2**self.m+1,dtype=int)
         self.fudge = fudge
         self.omg_circ = lambda m: 2**(-m)
@@ -64,10 +64,6 @@ class CubatureData(AccumData):
             ptind_nl = hstack((tile(True,nl),tile(False,nl)))
             ptind = tile(ptind_nl,int(nmminlm1))
             coef = exp(-2*pi*1j*arange(nl)/(2*nl))
-            # account for epsilon sized real or imaginary parts
-            tol = 1e-16
-            coef.real[abs(coef.real) < tol] = 0.0
-            coef.imag[abs(coef.imag) < tol] = 0.0
             coefv = tile(coef,int(nmminlm1))
             evenval = ynext[ptind]
             oddval = ynext[~ptind]
