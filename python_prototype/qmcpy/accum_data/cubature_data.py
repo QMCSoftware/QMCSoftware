@@ -105,7 +105,7 @@ class CubatureData(AccumData):
             c_tmp = self.omg_hat(self.m-l)*self.omg_circ(self.m-l)
             c_low = 1/(1+c_tmp)
             c_up = 1/(1-c_tmp)
-            const1 = sum(abs(self.y[self.kappanumap[2**(l-1):2**l]-1]))
+            const1 = sum(abs(self.y[self.kappanumap[int(2**(l-1)):int(2**l)]-1]))
             idx = int(l-self.l_star)
             self.c_stilde_low[idx] = max(self.c_stilde_low[idx],c_low*const1)
             if c_tmp < 1:

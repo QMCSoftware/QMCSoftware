@@ -14,7 +14,7 @@ Reference:
 from ._stopping_criterion import StoppingCriterion
 from ..accum_data import CubatureData
 from ..distribution._distribution import Distribution
-from ..util import MaxSamplesWarning, NotYetImplemented, ParameterError
+from ..util import MaxSamplesWarning, NotYetImplemented, ParameterError, ParameterWarning
 from numpy import log2
 import warnings
 
@@ -59,30 +59,33 @@ class CubLattice_g(StoppingCriterion):
             raise NotYetImplemented('''
                 cub_lattice_g not implemented for multi-level problems.
                 Use CLT stopping criterion with an iid distribution for multi-level problems ''')
-        if distribution.replications != 0:
-            raise ParameterError('CubLattic_g requires distribution to have 0 replications.')
-        if not distribution.scramble:
-            raise ParameterError("CubLattice_g requires distribution to have scramble=True")
-        if distribution.backend != 'gail':
-            raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
-        self.n_init = n_init
-        self.n_max = n_max
-        m_min = log2(self.n_init)
-        m_max = log2(self.n_max)
-        if m_min%1 != 0 or m_max%1 != 0:
-            warning_s = ' n_init and n_max must be a powers of 2. Using n_init = 2**10 and n_max=2**35'
+        m_min = log2(n_init)
+        m_max = log2(n_max)
+        if m_min%1 != 0 or m_min < 8 or m_max%1 != 0:
+            warning_s = '''
+                n_init and n_max must be a powers of 2.
+                n_init must be >= 2^8.
+                Using n_init = 2^10 and n_max=2^35.'''
             warnings.warn(warning_s, ParameterWarning)
-            self.m_min = 10
-            self.m_max = 35
+            m_min = 10
+            m_max = 35
+        self.n_init = 2**m_min
+        self.n_max = 2**m_max
         self.stage = None
         # Construct Data Object to House Integration data
         self.data = CubatureData(m_min, m_max, fudge)
         # Verify Compliant Construction
         allowed_distribs = ["Lattice"]
         super().__init__(distribution, allowed_distribs)
+        if distribution.replications != 0:
+            raise ParameterError('CubLattic_g requires distribution to have 0 replications.')
+        if not distribution.scramble:
+            raise ParameterError("CubLattice_g requires distribution to have scramble=True")
+        if distribution.backend != 'gail':
+            raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
 
     def stop_yet(self):
         """ Determine when to stop """

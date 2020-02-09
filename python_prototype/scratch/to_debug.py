@@ -2,7 +2,7 @@ from qmcpy import *
 from numpy import *
 
 # Probably Brownian Motion or Asian Call problem
-
+'''
 distribution = Lattice(dimension=16, replications=16, scramble=True, seed=7, backend="GAIL")
 #distribution = IIDStdGaussian(dimension=16, seed=7)
 measure = BrownianMotion(distribution,time_vector=arange(1/16,17/16,1/16))
@@ -10,7 +10,7 @@ integrand = AsianCall(measure)
 stopper = CLTRep(distribution,abs_tol=.005)
 solution,data = integrate(stopper,integrand,measure,distribution)
 print(data)
-
+'''
 # CubLattice (parallel to matlab)
 '''
 distribution = Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL')
@@ -22,7 +22,7 @@ print(solution)
 '''
 # CubLattice + AsianCall working check
 '''
-distribution = Lattice(dimension=16, replications=16, scramble=True, seed=7, backend="MPS")
+distribution = Sobol(dimension=16, replications=16, scramble=True, seed=7, backend="MPS")
 measure = BrownianMotion(distribution,time_vector=arange(1/16,17/16,1/16))
 integrand = AsianCall(measure)
 stopper = CLTRep(distribution,abs_tol=.001)

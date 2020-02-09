@@ -34,10 +34,6 @@ class CLTRep(StoppingCriterion):
             raise NotYetImplemented('''
                 CLTRep not implemented for multi-level problems.
                 Use CLT stopping criterion with an iid distribution for multi-level problems.''')
-        if distribution.replications <16:
-            raise ParameterError('CLTRep requires distribution to have 16 replications.')
-        if not distribution.scramble:
-            raise ParameterError("CLTRep requires distribution to have scramble=True")
         if log2(n_init) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'
             warnings.warn(warning_s, ParameterWarning)
@@ -50,11 +46,16 @@ class CLTRep(StoppingCriterion):
         self.alpha = alpha
         self.inflate = inflate
         self.stage = "begin"
-        # Construct Data Object to House Integration data
-        self.data = MeanVarDataRep(n_init, distribution.replications)
         # Verify Compliant Construction
         allowed_distribs = ["Lattice", "Sobol"]
         super().__init__(distribution, allowed_distribs)
+        # Construct Data Object to House Integration data
+        self.data = MeanVarDataRep(n_init, distribution.replications)
+        # More Distribution checks
+        if distribution.replications <16:
+            raise ParameterError('CLTRep requires distribution to have 16 replications.')
+        if not distribution.scramble:
+            raise ParameterError("CLTRep requires distribution to have scramble=True")
 
     def stop_yet(self):
         """ Determine when to stop """

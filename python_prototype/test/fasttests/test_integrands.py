@@ -12,32 +12,22 @@ class TestAsianCall(unittest.TestCase):
     Unit tests for AsianCall function in QMCPy.
     """
 
-    def test_multi_level_construction(self):
-        time_vector = [arange(1 / 4, 5 / 4, 1 / 4),
-                       arange(1 / 64, 65 / 64, 1 / 64)]
-        dims = [len(tv) for tv in time_vector]
-        measure_obj = BrownianMotion(dims, time_vector=time_vector)
-        asf = AsianCall(bm_measure=measure_obj)
-        self.assertEqual(len(asf), 2)
-        self.assertEqual(asf[0].dimension, 4)
-        self.assertEqual(asf[1].dimension, 64)
-
-    def test_mean_type_error(self):
-        time_vector = [arange(1 / 4, 5 / 4, 1 / 4)]
-        dims = [len(tv) for tv in time_vector]
-        measure_obj = BrownianMotion(dims, time_vector=time_vector)
-        self.assertRaises(ParameterError, AsianCall,
-                          bm_measure=measure_obj, mean_type='misc')
-
+    def test_f(self):
+        distribution = Sobol(dimension=4)
+        measure = BrownianMotion(distribution, time_vector=[1/4,1/2,3/4,1])
+        integrand = AsianCall(measure)
+        integrand.f(measure.gen_samples(n_min=0,n_max=4))
 
 class TestKeister(unittest.TestCase):
     """
     Unit tests for Keister function in QMCPy.
     """
 
-    def test_2d_construction(self):
-        fun = Keister(5)
-        self.assertEqual(len(fun), 1)
+    def test_f(self):
+        distribution = Sobol(dimension=3)
+        measure = Uniform(distribution)
+        integrand = Keister(measure)
+        integrand.f(measure.gen_samples(n_min=0,n_max=4))
 
 
 class TestLinear(unittest.TestCase):
@@ -45,9 +35,22 @@ class TestLinear(unittest.TestCase):
     Unit tests for Linear function in QMCPy.
     """
 
-    def test_2d_construction(self):
-        fun = Linear(5)
-        self.assertEqual(len(fun), 1)
+    def test_f(self):
+        distribution = Sobol(dimension=3)
+        measure = Uniform(distribution)
+        integrand = Linear(measure)
+        integrand.f(measure.gen_samples(n_min=0,n_max=4))
+    
+class TestQuickConstruct(unittest.TestCase):
+    """
+    Unit tests for QuickConstruct function in QMCPy.
+    """
+
+    def test_f(self):
+        distribution = Sobol(dimension=3)
+        measure = Uniform(distribution)
+        integrand = QuickConstruct(measure, lambda x: x.sum(1))
+        integrand.f(measure.gen_samples(n_min=0,n_max=4))
 
 
 if __name__ == "__main__":

@@ -82,7 +82,7 @@ class MeanMC_g(StoppingCriterion):
                 # absolute error tolerance over sigma
                 n, self.err_bar = \
                     self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_max, self.sigma_up)
-                self.data.n = n
+                self.data.n[:] = n
                 if self.data.n_total + self.data.n > self.n_max:
                     # cannot generate this many new samples
                     n_low = int(self.n_max-self.data.n_total)
@@ -93,7 +93,7 @@ class MeanMC_g(StoppingCriterion):
                     Note that error tolerances may no longer be satisfied""" \
                     % (int(self.data.n_total), int(self.data.n), int(self.n_max), n_low)
                     warnings.warn(warning_s, MaxSamplesWarning)
-                    self.data.n = n_low
+                    self.data.n[:] = n_low
             else:
                 raise NotYetImplemented("Not implemented for rel_tol != 0")
             self.stage = 'mu'
