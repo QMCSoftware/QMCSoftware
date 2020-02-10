@@ -53,7 +53,9 @@ extensions = ["sphinx.ext.autodoc",
               "sphinx.ext.coverage",
               "sphinx.ext.ifconfig",
               "sphinx.ext.githubpages",
-              "sphinx_markdown_tables"]
+              "sphinx_markdown_tables",
+              "sphinx_math_dollar"]
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

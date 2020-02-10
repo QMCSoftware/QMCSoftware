@@ -26,8 +26,8 @@ below.
 
     from qmcpy import integrate
     from qmcpy.integrand import *
-    from qmcpy.true_measure import *
-    from qmcpy.discrete_distribution import *
+    from qmcpy.measure import *
+    from qmcpy.distribution import *
     from qmcpy.stopping_criterion import *
 
 Lastly, we can import all objects from the package using an asterisk.
@@ -45,24 +45,23 @@ IID vs LDS
 Low discrepancy sequences (LDS) such as lattice and Sobol are not
 independent like IID (independent identically distributed) points.
 
-The code below generates 1 replication (squeezed out) of 4 lattice
-samples of 2 dimensions.
+The code below generates 1 replication of 4 Sobol samples of 2
+dimensions.
 
 .. code:: ipython3
 
-    discrete_distrib = Lattice(rng_seed = 7)
-    x = discrete_distrib.gen_dd_samples(replications=1, n_samples=4, dimensions=2).squeeze()
-    x
+    distribution = Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='MPS')
+    distribution.gen_samples(n_min=0,n_max=4)
 
 
 
 
 .. parsed-literal::
 
-    array([[ 0.625,  0.897],
-           [ 0.125,  0.397],
-           [ 0.875,  0.147],
-           [ 0.375,  0.647]])
+    array([[ 0.076,  0.780],
+           [ 0.576,  0.280],
+           [ 0.326,  0.530],
+           [ 0.826,  0.030]])
 
 
 
@@ -214,8 +213,12 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
 .. code:: ipython3
 
     dim = 1
-    integrand = QuickConstruct(dim, custom_fun=f)
-    sol, data = integrate(integrand, Uniform(dim))
+    abs_tol = .01
+    distribution = IIDStdUniform(dimension=dim, seed=7)
+    measure = Uniform(distribution)
+    integrand = QuickConstruct(measure, custom_fun=f)
+    stopper = CLT(distribution,abs_tol=abs_tol,rel_tol=0)
+    solution,data = integrate(stopper,integrand,measure,distribution)
     print(data)
 
 
@@ -224,22 +227,27 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
     Solution: 0.6575         
     QuickConstruct (Integrand Object)
     IIDStdUniform (Discrete Distribution Object)
+    	dimension       1
+    	seed            7
     	mimics          StdUniform
     Uniform (True Measure Object)
-    	dimension       1
-    	a               0
-    	b               1
+    	distrib_name    IIDStdUniform
+    	lower_bound     0
+    	upper_bound     1
     CLT (Stopping Criterion Object)
-    	abs_tol         0.010
-    	rel_tol         0
-    	n_max           10000000000
     	inflate         1.200
     	alpha           0.010
+    	abs_tol         0.010
+    	rel_tol         0
+    	n_init          1024
+    	n_max           10000000000
     MeanVarData (AccumData Object)
+    	levels          1
+    	solution        0.658
     	n               3305
     	n_total         4329
     	confid_int      [ 0.647  0.668]
-    	time_total      0.003
+    	time_total      0.002
     
 
 
@@ -250,7 +258,7 @@ solution is accurate enough:
 
     true_sol = 0.658582  # In WolframAlpha: Integral[x**Sqrt[x], {x,0,1}]
     abs_tol = data.stopping_criterion.abs_tol
-    qmcpy_error = abs(true_sol - sol)
+    qmcpy_error = abs(true_sol - solution)
     print(qmcpy_error < abs_tol)
 
 
@@ -265,8 +273,11 @@ changing the input parameter value of dimension for QuickConstruct?
 .. code:: ipython3
 
     dim = 2
-    integrand2 = QuickConstruct(dim, f)
-    sol2, data2 = integrate(integrand2, Uniform(dim))
+    distribution = IIDStdUniform(dimension=dim, seed=7)
+    measure = Uniform(distribution)
+    integrand = QuickConstruct(measure, custom_fun=f)
+    stopper = CLT(distribution,abs_tol=abs_tol,rel_tol=0)
+    solution2,data2 = integrate(stopper,integrand,measure,distribution)
     print(data2)
 
 
@@ -275,18 +286,23 @@ changing the input parameter value of dimension for QuickConstruct?
     Solution: 0.8309         
     QuickConstruct (Integrand Object)
     IIDStdUniform (Discrete Distribution Object)
+    	dimension       2
+    	seed            7
     	mimics          StdUniform
     Uniform (True Measure Object)
-    	dimension       2
-    	a               0
-    	b               1
+    	distrib_name    IIDStdUniform
+    	lower_bound     0
+    	upper_bound     1
     CLT (Stopping Criterion Object)
-    	abs_tol         0.010
-    	rel_tol         0
-    	n_max           10000000000
     	inflate         1.200
     	alpha           0.010
+    	abs_tol         0.010
+    	rel_tol         0
+    	n_init          1024
+    	n_max           10000000000
     MeanVarData (AccumData Object)
+    	levels          1
+    	solution        0.831
     	n               5452
     	n_total         6476
     	confid_int      [ 0.821  0.841]
@@ -301,11 +317,12 @@ value:
 
     true_sol2 = 0.827606  # In WolframAlpha: Integral[Sqrt[x**2+y**2])**Sqrt[Sqrt[x**2+y**2]], {x,0,1}, {y,0,1}]
     abs_tol2 = data2.stopping_criterion.abs_tol
-    qmcpy_error2 = abs(true_sol2 - sol2)
+    qmcpy_error2 = abs(true_sol2 - solution2)
     print(qmcpy_error2 < abs_tol2)
 
 
 .. parsed-literal::
 
     True
+
 

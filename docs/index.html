@@ -204,11 +204,39 @@
 <li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.integrand.quick_construct">Quick Construct for Function</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="algorithms.html#measure-class">Measure Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="algorithms.html#discrete-distribution-class">Discrete Distribution Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="algorithms.html#data-class">Data Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="algorithms.html#stopping-criterion-class">Stopping Criterion Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="algorithms.html#utilities">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#measure-class">Measure Class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.measure.uniform">Uniform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.measure.gaussian">Gaussian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.measure.brownian_motion">Brownian Motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.measure.lebesgue">Lebesgue</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#discrete-distribution-class">Discrete Distribution Class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.distribution.iid_std_uniform">IID Standard Uniform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.distribution.iid_std_gaussian">IID Standard Gaussian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.distribution.lattice.lattice">Lattice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.distribution.sobol.sobol">Sobol</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#data-class">Data Class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.accum_data.mean_var_data">Mean Variance Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.accum_data.mean_var_data_rep">Mean Variance for Replications Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.accum_data.cubature_data">Cubature Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#stopping-criterion-class">Stopping Criterion Class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.stopping_criterion.clt">Central Limit Theorem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.stopping_criterion.clt_rep">Central Limit Theorem for Replications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.stopping_criterion.mean_mc_g">Mean Monte Carlo Garunteed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.stopping_criterion.cub_lattice_g">Cubature Lattice Garunteed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#utilities">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.util.multilevel_constructor">Multi-Level Constructor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.util.exceptions_warnings">Exceptions and Warnnings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.html#module-qmcpy.util.abstraction_functions">Abstraction Functions</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="demos.html">Demos</a><ul>
@@ -238,15 +266,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="rst_from_demos/MC_vs_QMC.html">A Monte Carlo vs Quasi-Monte Carlo Comparison</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rst_from_demos/MC_vs_QMC.html#absolute-tolerance-plots">Absolute Tolerance Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst_from_demos/MC_vs_QMC.html#vary-absolute-tolerance">Vary Absolute Tolerance</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rst_from_demos/MC_vs_QMC.html#dimension-plots">Dimension Plots</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rst_from_demos/quasirandom_generators.html">Quasi-Random Sequence Generator Comparison</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="rst_from_demos/quasirandom_generators.html#general-lattice-sobol-generator-usage">General Lattice &amp; Sobol Generator Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rst_from_demos/quasirandom_generators.html#magic-point-shop-generators-vs-qmcpy-generators"><em>Magic Point Shop</em> Generators vs QMCPy Generators</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rst_from_demos/quasirandom_generators.html#matlab-vs-r-vs-python-generator-speed">MATLAB vs R vs Python Generator Speed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rst_from_demos/quasirandom_generators.html#qmcpy-generator-times-comparison">QMCPy Generator Times Comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rst_from_demos/quasirandom_generators.html#magic-point-shop-generators"><em>Magic Point Shop</em> Generators</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="rst_from_demos/quasirandom_generators.html#magic-point-shop-vs-pytorch-for-sobol-backend">Magic Point Shop vs Pytorch for Sobol Backend</a></li>
 </ul>
 </li>
 </ul>

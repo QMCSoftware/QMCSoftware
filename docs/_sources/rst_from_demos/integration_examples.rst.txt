@@ -33,38 +33,43 @@ to the function ``integrate()``.
 .. code:: ipython3
 
     dim = 3
-    integrand = Keister(dim)
-    true_measure = Gaussian(dim, variance=1 / 2)
-    discrete_distrib = Sobol(rng_seed=7)
-    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=0.05)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    distribution = Lattice(dimension=dim, scramble=True, replications=16, seed=7, backend='MPS')
+    measure = Gaussian(distribution, variance=1/2)
+    integrand = Keister(measure)
+    stopper = CLTRep(distribution,abs_tol=.05)
+    solution,data = integrate(stopper,integrand,measure,distribution)
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 2.1477         
+    Solution: 2.1659         
     Keister (Integrand Object)
-    Sobol (Discrete Distribution Object)
-    	mimics          StdUniform
-    	rng_seed        7
-    	backend         mps
-    Gaussian (True Measure Object)
+    Lattice (Discrete Distribution Object)
     	dimension       3
-    	mu              0
-    	sigma           0.707
+    	scramble        1
+    	replications    16
+    	seed            7
+    	backend         mps
+    	mimics          StdUniform
+    Gaussian (True Measure Object)
+    	distrib_name    Lattice
+    	mean            0
+    	variance        0.500
     CLTRep (Stopping Criterion Object)
-    	abs_tol         0.050
-    	rel_tol         0
-    	n_max           1073741824
     	inflate         1.200
     	alpha           0.010
+    	abs_tol         0.050
+    	rel_tol         0
+    	n_init          256
+    	n_max           1073741824
     MeanVarDataRep (AccumData Object)
-    	n               32
-    	n_total         32
-    	confid_int      [ 2.126  2.169]
-    	time_total      0.007
-    	r               16
+    	replications    16
+    	solution        2.166
+    	sighat          0.011
+    	n_total         256
+    	confid_int      [ 2.164  2.168]
+    	time_total      0.003
     
 
 
@@ -94,50 +99,55 @@ defined as follows:
 
 .. code:: ipython3
 
-    time_vec = [arange(1 / 64, 65 / 64, 1 / 64)]
-    dim = [len(tv) for tv in time_vec]
-    
-    discrete_distrib = Lattice(rng_seed=7)
-    true_measure = BrownianMotion(dim, time_vector=time_vec)
-    integrand = AsianCall(true_measure,
-                          volatility = 0.5,
-                          start_price = 30,
-                          strike_price = 25,
-                          interest_rate = 0.01,
-                          mean_type = 'arithmetic')
-    stopping_criterion = CLTRep(discrete_distrib, true_measure, abs_tol=0.05)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    time_vector = arange(1 / 64, 65 / 64, 1 / 64)
+    distribution = Lattice(dimension=len(time_vector), scramble=True, replications=16, seed=7, backend='GAIL')
+    measure = BrownianMotion(distribution, time_vector=time_vector)
+    integrand = AsianCall(
+        measure = measure,
+        volatility = 0.5,
+        start_price = 30,
+        strike_price = 25,
+        interest_rate = 0.01,
+        mean_type = 'arithmetic')
+    stopper = CLTRep(distribution, abs_tol=.05)
+    solution,data = integrate(stopper, integrand, measure, distribution)
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 6.2640         
+    Solution: 6.2588         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
     	strike_price    25
     	interest_rate   0.010
     	mean_type       arithmetic
-    	exercise_time   1
+    	_dim_frac       0
     Lattice (Discrete Distribution Object)
-    	mimics          StdUniform
-    	rng_seed        7
-    BrownianMotion (True Measure Object)
     	dimension       64
+    	scramble        1
+    	replications    16
+    	seed            7
+    	backend         gail
+    	mimics          StdUniform
+    BrownianMotion (True Measure Object)
+    	distrib_name    Lattice
     	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
     CLTRep (Stopping Criterion Object)
-    	abs_tol         0.050
-    	rel_tol         0
-    	n_max           1073741824
     	inflate         1.200
     	alpha           0.010
+    	abs_tol         0.050
+    	rel_tol         0
+    	n_init          256
+    	n_max           1073741824
     MeanVarDataRep (AccumData Object)
-    	n               2048
-    	n_total         2048
-    	confid_int      [ 6.257  6.262]
-    	time_total      0.499
-    	r               16
+    	replications    16
+    	solution        6.259
+    	sighat          0.021
+    	n_total         4096
+    	confid_int      [ 6.258  6.260]
+    	time_total      0.598
     
 
 
@@ -163,51 +173,64 @@ last example.
 
 .. code:: ipython3
 
-    time_vec = [arange(1 / 4, 5 / 4, 1 / 4),
-                arange(1 / 16, 17 / 16, 1 / 16),
-                arange(1 / 64, 65 / 64, 1 / 64)]
-    dim = [len(tv) for tv in time_vec]
-    
-    discrete_distrib = IIDStdGaussian(rng_seed=7)
-    true_measure = BrownianMotion(dim, time_vector=time_vec)
-    integrand = AsianCall(true_measure,
-                          volatility = 0.5,
-                          start_price = 30,
-                          strike_price = 25,
-                          interest_rate = 0.01,
-                          mean_type = 'arithmetic')
-    stopping_criterion = CLT(discrete_distrib, true_measure, abs_tol=0.05, n_max = 1e10)
-    _, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
+    time_vector = [
+        arange(1/4,5/4,1/4),
+        arange(1/16,17/16,1/16),
+        arange(1/64,65/64,1/64)]
+    levels = len(time_vector)
+    distributions = MultiLevelConstructor(levels,
+        IIDStdGaussian,
+            dimension = [len(tv) for tv in time_vector],
+            seed = 7)
+    measures = MultiLevelConstructor(levels,
+        BrownianMotion,
+            distribution = distributions,
+            time_vector = time_vector)
+    integrands = MultiLevelConstructor(levels,
+        AsianCall,
+            measure = measures,
+            volatility = 0.5,
+            start_price = 30,
+            strike_price = 25,
+            interest_rate = 0.01,
+            mean_type = 'arithmetic')
+    stopper = CLT(distributions, abs_tol=.05)
+    solution,data = integrate(stopper, integrands, measures, distributions)
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 6.2549         
-    AsianCall (Integrand Object)
+    Solution: 6.2418         
+    MultiLevelConstructor (AsianCall Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
     	strike_price    [25 25 25]
     	interest_rate   [ 0.010  0.010  0.010]
     	mean_type       ['arithmetic' 'arithmetic' 'arithmetic']
-    	exercise_time   [ 1.000  1.000  1.000]
-    IIDStdGaussian (Discrete Distribution Object)
-    	mimics          StdGaussian
-    BrownianMotion (True Measure Object)
+    	_dim_frac       [ 0.000  4.000  4.000]
+    MultiLevelConstructor (IIDStdGaussian Object)
     	dimension       [ 4 16 64]
+    	seed            [7 7 7]
+    	mimics          ['StdGaussian' 'StdGaussian' 'StdGaussian']
+    MultiLevelConstructor (BrownianMotion Object)
     	time_vector     [array([ 0.250,  0.500,  0.750,  1.000])
     	                array([ 0.062,  0.125,  0.188, ...,  0.875,  0.938,  1.000])
     	                array([ 0.016,  0.031,  0.047, ...,  0.969,  0.984,  1.000])]
     CLT (Stopping Criterion Object)
-    	abs_tol         0.050
-    	rel_tol         0
-    	n_max           10000000000
     	inflate         1.200
     	alpha           0.010
+    	abs_tol         0.050
+    	rel_tol         0
+    	n_init          1024
+    	n_max           10000000000
     MeanVarData (AccumData Object)
-    	n               [ 282632.000  37446.000  6421.000]
-    	n_total         329571
-    	confid_int      [ 6.206  6.304]
-    	time_total      0.164
+    	levels          3
+    	solution        6.242
+    	n               [281692  40581   6411]
+    	n_total         331756
+    	confid_int      [ 6.193  6.290]
+    	time_total      0.109
     
+
 

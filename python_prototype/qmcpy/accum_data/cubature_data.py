@@ -18,7 +18,7 @@ class CubatureData(AccumData):
         Initialize data instance
 
         Args:
-            m_min (int): initial n == 2^m_min)
+            m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
         """
         self.m_min = m_min

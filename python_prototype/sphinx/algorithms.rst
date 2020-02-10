@@ -42,38 +42,70 @@ Measure Class
 -------------
 
 .. The following extract documentation in qmcpy.measures.__init__.py
-.. automodule:: qmcpy.true_measure
+.. automodule:: qmcpy.measure
     :members:
 
-.. automodule:: qmcpy.true_measure.uniform
+Uniform
+........
+
+.. automodule:: qmcpy.measure.uniform
     :members:
 
-.. automodule:: qmcpy.true_measure.gaussian
+Gaussian
+.........
+
+.. automodule:: qmcpy.measure.gaussian
     :members:
 
-.. automodule:: qmcpy.true_measure.brownian_motion
+Brownian Motion
+................
+
+.. automodule:: qmcpy.measure.brownian_motion
     :members:
 
-.. automodule:: qmcpy.true_measure.lebesgue
+Lebesgue
+.........
+
+.. automodule:: qmcpy.measure.lebesgue
     :members:
 
 Discrete Distribution Class
 ---------------------------
 
 .. The following extract documentation in qmcpy.distribution.__init__.py
-.. automodule:: qmcpy.discrete_distribution
+.. automodule:: qmcpy.distribution
     :members:
 
-.. automodule:: qmcpy.discrete_distribution.iid_std_uniform
+IID Standard Uniform
+.....................
+
+.. automodule:: qmcpy.distribution.iid_std_uniform
     :members:
 
-.. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
+IID Standard Gaussian
+......................
+
+.. automodule:: qmcpy.distribution.iid_std_gaussian
     :members:
 
-.. automodule:: qmcpy.discrete_distribution.lattice
+Lattice
+........
+.. automodule:: qmcpy.distribution.lattice.lattice
     :members:
 
-.. automodule:: qmcpy.discrete_distribution.sobol
+.. automodule:: qmcpy.distribution.lattice.mps_lattice
+    :members:
+
+.. automodule:: qmcpy.distribution.lattice.gail_lattice
+    :members:
+
+Sobol
+......
+
+.. automodule:: qmcpy.distribution.sobol.sobol
+    :members:
+
+.. automodule:: qmcpy.distribution.sobol.mps_sobol
     :members:
 
 Data Class
@@ -83,10 +115,22 @@ Data Class
 .. automodule:: qmcpy.accum_data
     :members:
 
+Mean Variance Data
+...................
+
 .. automodule:: qmcpy.accum_data.mean_var_data
     :members:
 
+Mean Variance for Replications Data
+....................................
+
 .. automodule:: qmcpy.accum_data.mean_var_data_rep
+    :members:
+
+Cubature Data
+..............
+
+.. automodule:: qmcpy.accum_data.cubature_data
     :members:
 
 Stopping Criterion Class
@@ -96,11 +140,28 @@ Stopping Criterion Class
 .. automodule:: qmcpy.stopping_criterion
     :members:
 
+Central Limit Theorem
+......................
 
 .. automodule:: qmcpy.stopping_criterion.clt
     :members:
 
+Central Limit Theorem for Replications
+.......................................
+
 .. automodule:: qmcpy.stopping_criterion.clt_rep
+    :members:
+
+Mean Monte Carlo Garunteed
+...........................
+
+.. automodule:: qmcpy.stopping_criterion.mean_mc_g
+    :members:
+
+Cubature Lattice Garunteed
+...........................
+
+.. automodule:: qmcpy.stopping_criterion.cub_lattice_g
     :members:
 
 Utilities
@@ -110,5 +171,20 @@ Utilities
 .. automodule:: qmcpy
     :members:
 
+Multi-Level Constructor
+........................
+
+.. automodule:: qmcpy.util.multilevel_constructor
+    :members:
+
+Exceptions and Warnnings
+.........................
+
 .. automodule:: qmcpy.util.exceptions_warnings
+    :members:
+
+Abstraction Functions
+......................
+
+.. automodule:: qmcpy.util.abstraction_functions
     :members:
