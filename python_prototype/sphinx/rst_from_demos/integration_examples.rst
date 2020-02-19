@@ -63,13 +63,13 @@ to the function ``integrate()``.
     	rel_tol         0
     	n_init          256
     	n_max           1073741824
-    MeanVarDataRep (AccumData Object)
+    MeanVarDataRep (Data Object)
     	replications    16
     	solution        2.166
     	sighat          0.011
     	n_total         256
     	confid_int      [ 2.164  2.168]
-    	time_total      0.003
+    	time_total      0.004
     
 
 
@@ -141,13 +141,13 @@ defined as follows:
     	rel_tol         0
     	n_init          256
     	n_max           1073741824
-    MeanVarDataRep (AccumData Object)
+    MeanVarDataRep (Data Object)
     	replications    16
     	solution        6.259
     	sighat          0.021
     	n_total         4096
     	confid_int      [ 6.258  6.260]
-    	time_total      0.598
+    	time_total      0.552
     
 
 
@@ -201,7 +201,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2418         
+    Solution: 6.2389         
     MultiLevelConstructor (AsianCall Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -224,13 +224,13 @@ last example.
     	rel_tol         0
     	n_init          1024
     	n_max           10000000000
-    MeanVarData (AccumData Object)
+    MeanVarData (Data Object)
     	levels          3
-    	solution        6.242
-    	n               [281692  40581   6411]
-    	n_total         331756
-    	confid_int      [ 6.193  6.290]
-    	time_total      0.109
+    	solution        6.239
+    	n               [284574  38751   6045]
+    	n_total         332442
+    	confid_int      [ 6.190  6.288]
+    	time_total      0.106
     
 
 

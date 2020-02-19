@@ -241,7 +241,7 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
     	rel_tol         0
     	n_init          1024
     	n_max           10000000000
-    MeanVarData (AccumData Object)
+    MeanVarData (Data Object)
     	levels          1
     	solution        0.658
     	n               3305
@@ -300,7 +300,7 @@ changing the input parameter value of dimension for QuickConstruct?
     	rel_tol         0
     	n_init          1024
     	n_max           10000000000
-    MeanVarData (AccumData Object)
+    MeanVarData (Data Object)
     	levels          1
     	solution        0.831
     	n               5452

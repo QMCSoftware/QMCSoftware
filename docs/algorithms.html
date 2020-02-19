@@ -113,9 +113,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#data-class">Data Class</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.accum_data.mean_var_data">Mean Variance Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.accum_data.mean_var_data_rep">Mean Variance for Replications Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.accum_data.cubature_data">Cubature Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.data.mean_var_data">Mean Variance Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.data.mean_var_data_rep">Mean Variance for Replications Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qmcpy.data.cubature_data">Cubature Data</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#stopping-criterion-class">Stopping Criterion Class</a><ul>
@@ -217,7 +217,7 @@
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p>estimated value of the integral
-data (AccumData): houses input and integration process data</p>
+data (Data): houses input and integration process data</p>
 <blockquote>
 <div><dl class="simple">
 <dt>Includes:</dt><dd><p>self.integrand (origianl Integrand): origianl integrand
@@ -1159,18 +1159,18 @@ reversed.</p>
 </div>
 <div class="section" id="data-class">
 <h2>Data Class<a class="headerlink" href="#data-class" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-qmcpy.accum_data"></span><p>APIs of accum_data</p>
-<div class="section" id="module-qmcpy.accum_data.mean_var_data">
-<span id="mean-variance-data"></span><h3>Mean Variance Data<a class="headerlink" href="#module-qmcpy.accum_data.mean_var_data" title="Permalink to this headline">¶</a></h3>
-<p>Definition of MeanVarData, a concrete implementation of AccumData</p>
+<span class="target" id="module-qmcpy.data"></span><p>APIs of data</p>
+<div class="section" id="module-qmcpy.data.mean_var_data">
+<span id="mean-variance-data"></span><h3>Mean Variance Data<a class="headerlink" href="#module-qmcpy.data.mean_var_data" title="Permalink to this headline">¶</a></h3>
+<p>Definition of MeanVarData, a concrete implementation of Data</p>
 <dl class="class">
-<dt id="qmcpy.accum_data.mean_var_data.MeanVarData">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.mean_var_data.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">levels</em>, <em class="sig-param">n_init</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.data.mean_var_data.MeanVarData">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.data.mean_var_data.</code><code class="sig-name descname">MeanVarData</code><span class="sig-paren">(</span><em class="sig-param">levels</em>, <em class="sig-param">n_init</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.data.mean_var_data.MeanVarData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data for IIDDistribution calculations,
 and store the sample mean and variance of integrand values</p>
 <dl class="method">
-<dt id="qmcpy.accum_data.mean_var_data.MeanVarData.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">levels</em>, <em class="sig-param">n_init</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.data.mean_var_data.MeanVarData.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">levels</em>, <em class="sig-param">n_init</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.data.mean_var_data.MeanVarData.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize data instance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1183,8 +1183,8 @@ and store the sample mean and variance of integrand values</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.accum_data.mean_var_data.MeanVarData.update_data">
-<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">integrands</em>, <em class="sig-param">measures</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.data.mean_var_data.MeanVarData.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">integrands</em>, <em class="sig-param">measures</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.data.mean_var_data.MeanVarData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1202,16 +1202,16 @@ and store the sample mean and variance of integrand values</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-qmcpy.accum_data.mean_var_data_rep">
-<span id="mean-variance-for-replications-data"></span><h3>Mean Variance for Replications Data<a class="headerlink" href="#module-qmcpy.accum_data.mean_var_data_rep" title="Permalink to this headline">¶</a></h3>
-<p>Definition for MeanVarDataRep, a concrete implementation of AccumData</p>
+<div class="section" id="module-qmcpy.data.mean_var_data_rep">
+<span id="mean-variance-for-replications-data"></span><h3>Mean Variance for Replications Data<a class="headerlink" href="#module-qmcpy.data.mean_var_data_rep" title="Permalink to this headline">¶</a></h3>
+<p>Definition for MeanVarDataRep, a concrete implementation of Data</p>
 <dl class="class">
-<dt id="qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.mean_var_data_rep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">n_init</em>, <em class="sig-param">replications</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.data.mean_var_data_rep.MeanVarDataRep">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.data.mean_var_data_rep.</code><code class="sig-name descname">MeanVarDataRep</code><span class="sig-paren">(</span><em class="sig-param">n_init</em>, <em class="sig-param">replications</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.data.mean_var_data_rep.MeanVarDataRep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Data from Repeated Central Limit Stopping Criterion calculations.</p>
 <dl class="method">
-<dt id="qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_init</em>, <em class="sig-param">replications</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.data.mean_var_data_rep.MeanVarDataRep.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">n_init</em>, <em class="sig-param">replications</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.data.mean_var_data_rep.MeanVarDataRep.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize data instance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1224,8 +1224,8 @@ and store the sample mean and variance of integrand values</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.update_data">
-<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">measure</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.mean_var_data_rep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.data.mean_var_data_rep.MeanVarDataRep.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">measure</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.data.mean_var_data_rep.MeanVarDataRep.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1243,16 +1243,16 @@ and store the sample mean and variance of integrand values</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-qmcpy.accum_data.cubature_data">
-<span id="cubature-data"></span><h3>Cubature Data<a class="headerlink" href="#module-qmcpy.accum_data.cubature_data" title="Permalink to this headline">¶</a></h3>
-<p>Definition for MeanVarDataRep, a concrete implementation of AccumData</p>
+<div class="section" id="module-qmcpy.data.cubature_data">
+<span id="cubature-data"></span><h3>Cubature Data<a class="headerlink" href="#module-qmcpy.data.cubature_data" title="Permalink to this headline">¶</a></h3>
+<p>Definition for MeanVarDataRep, a concrete implementation of Data</p>
 <dl class="class">
-<dt id="qmcpy.accum_data.cubature_data.CubatureData">
-<em class="property">class </em><code class="sig-prename descclassname">qmcpy.accum_data.cubature_data.</code><code class="sig-name descname">CubatureData</code><span class="sig-paren">(</span><em class="sig-param">m_min</em>, <em class="sig-param">m_max</em>, <em class="sig-param">fudge</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.cubature_data.CubatureData" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.data.cubature_data.CubatureData">
+<em class="property">class </em><code class="sig-prename descclassname">qmcpy.data.cubature_data.</code><code class="sig-name descname">CubatureData</code><span class="sig-paren">(</span><em class="sig-param">m_min</em>, <em class="sig-param">m_max</em>, <em class="sig-param">fudge</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.data.cubature_data.CubatureData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accumulated data relavent to cubature algorithms</p>
 <dl class="method">
-<dt id="qmcpy.accum_data.cubature_data.CubatureData.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">m_min</em>, <em class="sig-param">m_max</em>, <em class="sig-param">fudge</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.cubature_data.CubatureData.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.data.cubature_data.CubatureData.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">m_min</em>, <em class="sig-param">m_max</em>, <em class="sig-param">fudge</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.data.cubature_data.CubatureData.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize data instance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1265,8 +1265,8 @@ and store the sample mean and variance of integrand values</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="qmcpy.accum_data.cubature_data.CubatureData.update_data">
-<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">measure</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.accum_data.cubature_data.CubatureData.update_data" title="Permalink to this definition">¶</a></dt>
+<dt id="qmcpy.data.cubature_data.CubatureData.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param">integrand</em>, <em class="sig-param">measure</em><span class="sig-paren">)</span><a class="headerlink" href="#qmcpy.data.cubature_data.CubatureData.update_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

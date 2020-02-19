@@ -111,26 +111,26 @@ Sobol
 Data Class
 ----------
 
-.. The following extract documentation in qmcpy.accum_data.__init__.py
-.. automodule:: qmcpy.accum_data
+.. The following extract documentation in qmcpy.data.__init__.py
+.. automodule:: qmcpy.data
     :members:
 
 Mean Variance Data
 ...................
 
-.. automodule:: qmcpy.accum_data.mean_var_data
+.. automodule:: qmcpy.data.mean_var_data
     :members:
 
 Mean Variance for Replications Data
 ....................................
 
-.. automodule:: qmcpy.accum_data.mean_var_data_rep
+.. automodule:: qmcpy.data.mean_var_data_rep
     :members:
 
 Cubature Data
 ..............
 
-.. automodule:: qmcpy.accum_data.cubature_data
+.. automodule:: qmcpy.data.cubature_data
     :members:
 
 Stopping Criterion Class

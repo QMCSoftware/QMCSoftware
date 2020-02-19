@@ -245,7 +245,7 @@ Plots samples on a 2D Keister function
     	rel_tol         0
     	n_init          16
     	n_max           10000000000
-    MeanVarData (AccumData Object)
+    MeanVarData (Data Object)
     	levels          1
     	solution        2.055
     	n               65
