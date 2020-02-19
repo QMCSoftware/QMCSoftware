@@ -1,16 +1,16 @@
-""" Definition for abstract class AccumData """
+""" Definition for abstract class Data """
 
 from ..util import ParameterError, MethodImplementationError, univ_repr
 
 
-class AccumData():
+class Data():
     """
     Accumulated data required in the computation of the integral.
     """
 
     def __init__(self):
         """ Initialize data instance """
-        prefix = 'A concrete implementation of AccumData must have '
+        prefix = 'A concrete implementation of Data must have '
         if not hasattr(self, 'solution'):
             raise ParameterError(prefix + 'self.solution')
         if not hasattr(self, 'n_total'):
@@ -57,5 +57,5 @@ class AccumData():
         for qmc_obj in [self.integrand, self.distribution, self.measure, self.stopping_criterion]:
             if qmc_obj:
                 string += str(qmc_obj)
-        string += univ_repr(self, 'AccumData', self.parameters + ['time_total'])
+        string += univ_repr(self, 'Data', self.parameters + ['time_total'])
         return string

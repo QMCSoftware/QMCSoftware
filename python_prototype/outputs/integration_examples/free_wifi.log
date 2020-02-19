@@ -1,5 +1,5 @@
 Password: 3141592653
-CPU time: 29.07 sec
+CPU time: 34.39 sec
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -23,11 +23,11 @@ CLTRep (Stopping Criterion Object)
 	rel_tol         0
 	n_init          256
 	n_max           1073741824
-MeanVarDataRep (AccumData Object)
+MeanVarDataRep (Data Object)
 	replications    16
 	solution        3.142
 	sighat          0.000
 	n_total         16777216
 	confid_int      [ 3.142  3.142]
-	time_total      29.069
+	time_total      34.388
 

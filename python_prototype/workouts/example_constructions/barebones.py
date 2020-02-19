@@ -1,6 +1,6 @@
 """ Sample Barebones Subclasses """
 
-from qmcpy.accum_data._accum_data import AccumData
+from qmcpy.accum_data._accum_data import Data
 from qmcpy.distribution._distribution import Distribution
 from qmcpy.integrand._integrand import Integrand
 from qmcpy.stopping_criterion._stopping_criterion import StoppingCriterion
@@ -63,7 +63,7 @@ def barebones():
 
 
     # Accumulate Data
-    class MyAccumData(AccumData):
+    class MyAccumData(Data):
         
         def __init__(self):
             self.solution = None

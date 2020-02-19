@@ -1,7 +1,7 @@
 """
 Sample Distribution objects and usage
 Mathematica: N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]]
-python workouts/example_constructions/stopping_criterion.py > outputs/example_constructions/stopping_criterion.log
+python workouts/example_constructions/stopping_criteria.py > outputs/example_constructions/stopping_criteria.log
 """
 
 from qmcpy import *
@@ -49,4 +49,4 @@ def stopping_criteria():
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
 if __name__ == '__main__':
-    stopping_criterion()
+    stopping_criteria()

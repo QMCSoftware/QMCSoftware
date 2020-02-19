@@ -1,6 +1,6 @@
 """
 Sample Measure objects and usage
-python workouts/example_constructions/measure.py > outputs/example_constructions/measures.log
+python workouts/example_constructions/measures.py > outputs/example_constructions/measures.log
 """
 
 from qmcpy import *
@@ -53,4 +53,4 @@ def measures(n=2, dimension=2, replications=0, seed=7):
 
 
 if __name__ == '__main__':
-    measure(n=2, dimension=2, replications=0, seed=7)
+    measures(n=2, dimension=2, replications=0, seed=7)

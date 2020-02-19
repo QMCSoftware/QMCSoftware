@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8198         
+Solution: 5.8094         
 MultiLevelConstructor (AsianCall Object)
 	volatility      [ 0.500  0.500  0.500]
 	start_price     [30 30 30]
@@ -20,17 +20,17 @@ MultiLevelConstructor (BrownianMotion Object)
 CLT (Stopping Criterion Object)
 	inflate         1.200
 	alpha           0.010
-	abs_tol         0.050
+	abs_tol         0.100
 	rel_tol         0
 	n_init          1024
 	n_max           10000000000
-MeanVarData (AccumData Object)
+MeanVarData (Data Object)
 	levels          3
-	solution        5.820
-	n               [293237  14786   2048]
-	n_total         313143
-	confid_int      [ 5.771  5.868]
-	time_total      0.154
+	solution        5.809
+	n               [73972  4477  2048]
+	n_total         83569
+	confid_int      [ 5.712  5.906]
+	time_total      0.061
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8292         
+Solution: 5.8103         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -19,21 +19,21 @@ BrownianMotion (True Measure Object)
 CLT (Stopping Criterion Object)
 	inflate         1.200
 	alpha           0.010
-	abs_tol         0.050
+	abs_tol         0.100
 	rel_tol         0
 	n_init          1024
 	n_max           10000000000
-MeanVarData (AccumData Object)
+MeanVarData (Data Object)
 	levels          1
-	solution        5.829
-	n               199887
-	n_total         200911
-	confid_int      [ 5.779  5.879]
-	time_total      0.715
+	solution        5.810
+	n               50740
+	n_total         51764
+	confid_int      [ 5.710  5.910]
+	time_total      0.191
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8387         
+Solution: 5.8347         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -54,21 +54,21 @@ BrownianMotion (True Measure Object)
 CLTRep (Stopping Criterion Object)
 	inflate         1.200
 	alpha           0.010
-	abs_tol         0.050
+	abs_tol         0.100
 	rel_tol         0
 	n_init          256
 	n_max           1073741824
-MeanVarDataRep (AccumData Object)
+MeanVarDataRep (Data Object)
 	replications    16
-	solution        5.839
-	sighat          0.042
-	n_total         2048
-	confid_int      [ 5.836  5.842]
-	time_total      0.306
+	solution        5.835
+	sighat          0.067
+	n_total         1024
+	confid_int      [ 5.828  5.841]
+	time_total      0.146
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8245         
+Solution: 5.8169         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -86,21 +86,21 @@ BrownianMotion (True Measure Object)
 MeanMC_g (Stopping Criterion Object)
 	inflate         1.200
 	alpha           0.010
-	abs_tol         0.050
+	abs_tol         0.100
 	rel_tol         0
 	n_init          1024
 	n_max           10000000000
-MeanVarData (AccumData Object)
+MeanVarData (Data Object)
 	levels          1
-	solution        5.824
-	n               268690
-	n_total         269714
-	confid_int      [ 5.774  5.874]
-	time_total      1.093
+	solution        5.817
+	n               82304
+	n_total         83328
+	confid_int      [ 5.717  5.917]
+	time_total      0.319
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8478         
+Solution: 5.9421         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -119,15 +119,15 @@ BrownianMotion (True Measure Object)
 	distrib_name    Lattice
 	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
 CubLattice_g (Stopping Criterion Object)
-	abs_tol         0.050
+	abs_tol         0.100
 	rel_tol         0
 	n_init          1024
 	n_max           34359738368
-CubatureData (AccumData Object)
-	n_total         4096
-	solution        5.848
+CubatureData (Data Object)
+	n_total         1024
+	solution        5.942
 	r_lag           4
-	time_total      0.047
+	time_total      0.010
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

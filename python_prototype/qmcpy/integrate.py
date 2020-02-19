@@ -20,7 +20,7 @@ def integrate(stopping_criterion, integrand, measure, distribution):
 
     Returns:
         solution (float): estimated value of the integral
-        data (AccumData): houses input and integration process data
+        data (Data): houses input and integration process data
             Includes:
                 self.integrand (origianl Integrand): origianl integrand
                 self.measure (original Measure): origianl measure

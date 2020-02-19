@@ -1,12 +1,12 @@
-""" Definition for MeanVarDataRep, a concrete implementation of AccumData """
+""" Definition for MeanVarDataRep, a concrete implementation of Data """
 
-from ._accum_data import AccumData
+from ._accum_data import Data
 from ..util import CubatureWarning
 from numpy import array, nan, zeros, tile, inf, hstack, exp, pi, arange, where, complex128
 import warnings
 
 
-class CubatureData(AccumData):
+class CubatureData(Data):
     """
     Accumulated data relavent to cubature algorithms
     """

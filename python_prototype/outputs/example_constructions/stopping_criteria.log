@@ -18,13 +18,13 @@ CLT (Stopping Criterion Object)
 	rel_tol         0
 	n_init          1024
 	n_max           10000000000
-MeanVarData (AccumData Object)
+MeanVarData (Data Object)
 	levels          1
 	solution        1.812
 	n               467027
 	n_total         468051
 	confid_int      [ 1.807  1.817]
-	time_total      0.113
+	time_total      0.106
 
 Meets tolerance: True
 
@@ -50,13 +50,13 @@ CLTRep (Stopping Criterion Object)
 	rel_tol         0
 	n_init          256
 	n_max           1073741824
-MeanVarDataRep (AccumData Object)
+MeanVarDataRep (Data Object)
 	replications    16
 	solution        1.809
 	sighat          0.002
 	n_total         256
 	confid_int      [ 1.809  1.809]
-	time_total      0.003
+	time_total      0.002
 
 Meets tolerance: True
 
@@ -79,7 +79,7 @@ MeanMC_g (Stopping Criterion Object)
 	rel_tol         0
 	n_init          1024
 	n_max           10000000000
-MeanVarData (AccumData Object)
+MeanVarData (Data Object)
 	levels          1
 	solution        1.809
 	n               596905
@@ -109,7 +109,7 @@ CubLattice_g (Stopping Criterion Object)
 	rel_tol         0
 	n_init          1024
 	n_max           34359738368
-CubatureData (AccumData Object)
+CubatureData (Data Object)
 	n_total         1024
 	solution        1.808
 	r_lag           4

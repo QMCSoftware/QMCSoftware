@@ -1,13 +1,13 @@
-""" Definition for MeanVarDataRep, a concrete implementation of AccumData """
+""" Definition for MeanVarDataRep, a concrete implementation of Data """
 
-from ._accum_data import AccumData
+from ._accum_data import Data
 from time import process_time
 from numpy import array, finfo, float32, full, inf, nan, tile, zeros
 
 EPS = finfo(float32).eps
 
 
-class MeanVarDataRep(AccumData):
+class MeanVarDataRep(Data):
     """
     Data from Repeated Central Limit Stopping Criterion calculations.
     """
