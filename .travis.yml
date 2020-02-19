@@ -49,6 +49,7 @@ before_install:
 - conda create -n testenv python=$PYTHON_VERSION
 - source activate testenv
 - conda install $CONDA_DEPS
+- conda install pytorch torchvision -c pytorch
 - cd python_prototype
 - pip install codecov
 
