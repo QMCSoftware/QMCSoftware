@@ -3,7 +3,7 @@ from .distribution import *
 from .measure import *
 from .integrand import *
 from .stopping_criterion import *
-from .accum_data import *
+from .data import *
 from .util import MultiLevelConstructor
 
 name = "qmcpy"

@@ -1,6 +1,6 @@
 """ Sample Barebones Subclasses """
 
-from qmcpy.accum_data._accum_data import Data
+from qmcpy.data._data import Data
 from qmcpy.distribution._distribution import Distribution
 from qmcpy.integrand._integrand import Integrand
 from qmcpy.stopping_criterion._stopping_criterion import StoppingCriterion

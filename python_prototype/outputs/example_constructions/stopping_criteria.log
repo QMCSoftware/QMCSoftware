@@ -24,7 +24,7 @@ MeanVarData (Data Object)
 	n               467027
 	n_total         468051
 	confid_int      [ 1.807  1.817]
-	time_total      0.106
+	time_total      0.110
 
 Meets tolerance: True
 
@@ -85,7 +85,7 @@ MeanVarData (Data Object)
 	n               596905
 	n_total         597929
 	confid_int      [ 1.804  1.814]
-	time_total      0.045
+	time_total      0.044
 
 Meets tolerance: True
 

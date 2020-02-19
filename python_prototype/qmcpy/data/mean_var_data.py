@@ -1,6 +1,6 @@
 """ Definition of MeanVarData, a concrete implementation of Data """
 
-from ._accum_data import Data
+from ._data import Data
 from time import process_time
 from numpy import array, finfo, float32, full, inf, nan, tile, zeros
 

@@ -1,7 +1,7 @@
 """ Definition for CLT, a concrete implementation of StoppingCriterion """
 
 from ._stopping_criterion import StoppingCriterion
-from ..accum_data import MeanVarData
+from ..data import MeanVarData
 from ..distribution._distribution import Distribution
 from ..util import MaxSamplesWarning, ParameterError
 import warnings
