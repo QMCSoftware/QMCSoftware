@@ -25,7 +25,7 @@ class Sobol(DiscreteDistribution):
         if self.backend not in ['mps', 'pytorch']:
             raise ParameterError("Sobol backend must be either 'mps' or 'pytorch'")
         if self.backend == 'pytorch':
-            raise Exception("PyTorch SobolEngine issue. " +\
+            raise Exception("PyTorch SobolEngine issue. " +
                 "See https://github.com/pytorch/pytorch/issues/32047")
         super().__init__()
 
