@@ -15,7 +15,7 @@ class CLT(StoppingCriterion):
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
     
-    def __init__(self, integrands, inflate=1.2, alpha=0.01,
+    def __init__(self, integrand, inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e10):
         """
         Args:
@@ -45,7 +45,7 @@ class CLT(StoppingCriterion):
         """ Determine when to stop """
         t_start = process_time()
         # Pilot Sample
-        self.data.update_data(self.integrands,self.measures)
+        self.data.update_data()
         # use cost of function values to decide how to allocate
         temp_a = self.data.t_eval ** 0.5
         temp_b = (temp_a * self.data.sighat).sum(0)
@@ -72,11 +72,11 @@ class CLT(StoppingCriterion):
             dec_prop = n_decease / self.data.n.sum()
             self.data.n = floor(self.data.n - self.data.n * dec_prop)
         # Final Sample
-        self.data.update_data(self.integrands,self.measures)
+        self.data.update_data()
         # CLT confidence interval
         z_star = -norm.ppf(self.alpha / 2)
         sigma_up = (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
         err_bar = z_star * self.inflate * sigma_up
         self.data.confid_int = self.data.solution + err_bar * array([-1, 1])
         self.data.time_total = process_time() - t_start
-        return self.data.solutin, self.data
+        return self.data.solution, self.data

@@ -72,7 +72,7 @@ class MeanMC_g(StoppingCriterion):
         """ Determine when to stop """
         t_start = process_time()
         # Pilot Sample
-        self.data.update_data(self.integrand, self.measure)
+        self.data.update_data()
         self.sigma_up = self.inflate * self.data.sighat
         self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
         if self.rel_tol == 0:
@@ -95,10 +95,10 @@ class MeanMC_g(StoppingCriterion):
         else:
             raise NotYetImplemented("Not implemented for rel_tol != 0")
         # Final Sample
-        self.update_data(self.integrand, self.measure)
+        self.data.update_data()
         self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
         self.data.time_total = process_time() - t_start
-        return self.data.solutin, self.data
+        return self.data.solution, self.data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):
         """

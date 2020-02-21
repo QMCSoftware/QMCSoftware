@@ -58,7 +58,7 @@ class CLTRep(StoppingCriterion):
         """ Determine when to stop """
         t_start = process_time()
         while True:
-            self.data.update_data(self.integrand, self.measure)
+            self.data.update_data()
             sighat_up = self.data.sighat * self.inflate
             tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
             if sighat_up < tol_up:
@@ -82,4 +82,4 @@ class CLTRep(StoppingCriterion):
         err_bar = z_star * self.inflate * self.data.sighat / sqrt(self.data.n)
         self.data.confid_int = self.data.solution +  err_bar * array([-1, 1])
         self.data.time_total = process_time() - t_start
-        return self.data.solutin, self.data
+        return self.data.solution, self.data

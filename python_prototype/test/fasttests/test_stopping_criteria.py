@@ -23,16 +23,16 @@ class TestClt(unittest.TestCase):
         distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        stopper = CLT(distribution, abs_tol=.001, n_init=64, n_max=1000)
+        algorithm = CLT(distribution, abs_tol=.001, n_init=64, n_max=1000)
         self.assertWarns(MaxSamplesWarning, integrate, \
-            stopper, integrand, measure, distribution)
+            algorithm, integrand, measure, distribution)
         
     def test_keister_2d(self):
         distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        stopper = CLT(distribution, abs_tol=abs_tol)
-        solution,data = integrate(stopper, integrand, measure, distribution)
+        algorithm = CLT(distribution, abs_tol=abs_tol)
+        solution,data = integrate(algorithm, integrand, measure, distribution)
         self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
@@ -49,16 +49,16 @@ class TestCltRep(unittest.TestCase):
         distribution = Lattice(dimension=2, replications=16)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        stopper = CLTRep(distribution, abs_tol=.001, n_init=16, n_max=32)
+        algorithm = CLTRep(distribution, abs_tol=.001, n_init=16, n_max=32)
         self.assertWarns(MaxSamplesWarning, integrate, \
-            stopper, integrand, measure, distribution)
+            algorithm, integrand, measure, distribution)
     
     def test_keister_2d(self):
         distribution = Sobol(dimension=2, replications=16)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        stopper = CLTRep(distribution, abs_tol=abs_tol)
-        solution,data = integrate(stopper, integrand, measure, distribution)
+        algorithm = CLTRep(distribution, abs_tol=abs_tol)
+        solution,data = integrate(algorithm, integrand, measure, distribution)
         self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
@@ -75,16 +75,16 @@ class TestMeanMC_g(unittest.TestCase):
         distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        stopper = MeanMC_g(distribution, abs_tol=.001, n_init=64, n_max=500)
+        algorithm = MeanMC_g(distribution, abs_tol=.001, n_init=64, n_max=500)
         self.assertWarns(MaxSamplesWarning, integrate, \
-            stopper, integrand, measure, distribution)
+            algorithm, integrand, measure, distribution)
     
     def test_keister_2d(self):
         distribution = IIDStdGaussian(dimension=2)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        stopper = MeanMC_g(distribution, abs_tol=abs_tol)
-        solution,data = integrate(stopper, integrand, measure, distribution)
+        algorithm = MeanMC_g(distribution, abs_tol=abs_tol)
+        solution,data = integrate(algorithm, integrand, measure, distribution)
         self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
@@ -102,16 +102,16 @@ class TestCubLattice_g(unittest.TestCase):
         distribution = Lattice(dimension=2, replications=0, backend="GAIL")
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        stopper = CubLattice_g(distribution, abs_tol=.001, n_init=2**8, n_max=2**9)
+        algorithm = CubLattice_g(distribution, abs_tol=.001, n_init=2**8, n_max=2**9)
         self.assertWarns(MaxSamplesWarning, integrate, \
-            stopper, integrand, measure, distribution)
+            algorithm, integrand, measure, distribution)
     
     def test_keister_2d(self):
         distribution = Lattice(dimension=2)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        stopper = CubLattice_g(distribution, abs_tol=abs_tol)
-        solution,data = integrate(stopper, integrand, measure, distribution)
+        algorithm = CubLattice_g(distribution, abs_tol=abs_tol)
+        solution,data = integrate(algorithm, integrand, measure, distribution)
         self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 

@@ -87,7 +87,7 @@ class CubLattice_g(StoppingCriterion):
         """ Determine when to stop """
         t_start = process_time()
         while True:
-            self.data.update_data(self.integrand, self.measure)
+            self.data.update_data()
             # Check the end of the algorithm
             errest = self.data.fudge(self.data.m)*self.data.stilde
             # Compute optimal estimator
@@ -111,5 +111,5 @@ class CubLattice_g(StoppingCriterion):
                 # double sample size
                 self.data.m += 1
         self.data.time_total = process_time() - t_start
-        return self.data.solutin, self.data
+        return self.data.solution, self.data
             

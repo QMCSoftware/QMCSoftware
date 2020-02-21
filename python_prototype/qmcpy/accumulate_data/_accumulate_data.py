@@ -46,16 +46,9 @@ class AccumulateData():
                     For multi-level problems ensure distribution, measure, and integrand
                     are MultiLevelConstructor instances. ''') 
 
-    def update_data(self, integrand, measure):
+    def update_data(self):
         """ ABSTRACT METHOD
         Update the accumulated data
-
-        Args:
-            integrand (Integrand): an instance of Integrand
-            measure (TrueMeasure): an instance of TrueMeasure
-
-        Returns:
-            None
         """
         raise MethodImplementationError(self, 'update_data')
 

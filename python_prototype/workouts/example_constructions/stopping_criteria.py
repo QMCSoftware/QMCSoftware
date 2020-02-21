@@ -20,32 +20,32 @@ def stopping_criteria():
     distribution = IIDStdUniform(dimension=d, seed=7)
     measure = Gaussian(distribution, variance=1/2)
     integrand = Keister(measure)
-    stopper = CLT(distribution,abs_tol=abs_tol,rel_tol=rel_tol)
-    solution,data = integrate(stopper,integrand,measure,distribution)
+    algorithm = CLT(integrand,abs_tol=abs_tol,rel_tol=rel_tol)
+    solution,data = algorithm.integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
     # CLTRep
     distribution = Lattice(dimension=d, scramble=True, replications=16, seed=7, backend='MPS')
     measure = Gaussian(distribution, variance=1/2)
     integrand = Keister(measure)
-    stopper = CLTRep(distribution,abs_tol=abs_tol,rel_tol=rel_tol)
-    solution,data = integrate(stopper,integrand,measure,distribution)
+    algorithm = CLTRep(integrand,abs_tol=abs_tol,rel_tol=rel_tol)
+    solution,data = algorithm.integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
     # MeanMC_g
     distribution = IIDStdGaussian(dimension=d, seed=7)
     measure = Gaussian(distribution, variance=1/2)
     integrand = Keister(measure)
-    stopper = MeanMC_g(distribution,abs_tol=abs_tol,rel_tol=rel_tol)
-    solution,data = integrate(stopper,integrand,measure,distribution)
+    algorithm = MeanMC_g(integrand,abs_tol=abs_tol,rel_tol=rel_tol)
+    solution,data = algorithm.integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
     # CubLattice
     distribution = Lattice(dimension=d, scramble=True, replications=0, seed=7, backend='GAIL')
     measure = Gaussian(distribution, variance=1/2)
     integrand = Keister(measure)
-    stopper = CubLattice_g(distribution,abs_tol=abs_tol,rel_tol=rel_tol)
-    solution,data = integrate(stopper,integrand,measure,distribution)
+    algorithm = CubLattice_g(integrand,abs_tol=abs_tol,rel_tol=rel_tol)
+    solution,data = algorithm.integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
 if __name__ == '__main__':
