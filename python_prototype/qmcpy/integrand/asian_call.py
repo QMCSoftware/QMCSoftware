@@ -1,8 +1,8 @@
 """ Definition for class AsianCall, a concrete implementation of Integrand """
 
 from ._integrand import Integrand
-from ..measure._measure import Measure
-from ..measure import BrownianMotion
+from ..true_measure._true_measure import TrueMeasure
+from ..true_measure import BrownianMotion
 from ..util import ParameterError
 from numpy import array, exp, log, maximum, repeat
 
@@ -19,7 +19,7 @@ class AsianCall(Integrand):
         Initialize AsianCall Integrand's'
 
         Args:
-            measure (Measure): A BrownianMotion Measure object
+            measure (TrueMeasure): A BrownianMotion TrueMeasure object
             volatility (float): sigma, the volatility of the asset
             start_price (float): S(0), the asset value at t=0
             strike_price (float): strike_price, the call/put offer

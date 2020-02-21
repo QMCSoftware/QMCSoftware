@@ -1,12 +1,12 @@
-""" Definition for MeanVarDataRep, a concrete implementation of Data """
+""" Definition for MeanVarDataRep, a concrete implementation of AccumulateData """
 
-from ._data import Data
+from ._accumulate_data import AccumulateData
 from ..util import CubatureWarning
 from numpy import array, nan, zeros, tile, inf, hstack, exp, pi, arange, where, complex128
 import warnings
 
 
-class CubatureData(Data):
+class CubatureData(AccumulateData):
     """
     Accumulated data relavent to cubature algorithms
     """
@@ -46,7 +46,7 @@ class CubatureData(Data):
 
         Args:
             integrand (Integrand): an instance of Integrand
-            measure (Measure): an instance of Measure
+            measure (TrueMeasure): an instance of TrueMeasure
 
         Returns:
             None

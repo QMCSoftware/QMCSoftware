@@ -11,7 +11,7 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
     """
     Record time for generating samples from each discrete distribution
     """
-    print('\nDiscrete Distribution Generation Time Comparison')
+    print('\nDiscrete DiscreteDistribution Generation Time Comparison')
     columns = ['n', 'L_MPS_t', 'L_GAIL_t', 'S_MPS_OG_t', 'S_MPS_QMCPy_t', 'S_PyTorch_t']
     df = DataFrame(columns=columns, dtype=float)
     for i, m in enumerate(powers_2):

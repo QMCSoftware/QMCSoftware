@@ -1,6 +1,6 @@
 """ Definition for abstract class StoppingCriterion """
 
-from ..distribution._distribution import Distribution
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import DistributionCompatibilityError, ParameterError, \
                    MethodImplementationError, univ_repr
 
@@ -19,10 +19,10 @@ class StoppingCriterion(object):
     def __init__(self, distributions, allowed_distribs):
         """
         Args:
-            distributions (Distribution or list of Distributions): an instance of Distribution
+            distributions (DiscreteDistribution or list of Distributions): an instance of DiscreteDistribution
             allowed_distribs: distribution's compatible with the StoppingCriterion
         """
-        if isinstance(distributions,Distribution):
+        if isinstance(distributions,DiscreteDistribution):
             # single level problem -> make it appear multi-level
             distributions = [distributions]
         for distribution in distributions:

@@ -1,13 +1,13 @@
-""" Definition of MeanVarData, a concrete implementation of Data """
+""" Definition of MeanVarData, a concrete implementation of AccumulateData """
 
-from ._data import Data
+from ._accumulate_data import AccumulateData
 from time import process_time
 from numpy import array, finfo, float32, full, inf, nan, tile, zeros
 
 EPS = finfo(float32).eps
 
 
-class MeanVarData(Data):
+class MeanVarData(AccumulateData):
     """
     Accumulated data for IIDDistribution calculations,
     and store the sample mean and variance of integrand values
@@ -39,7 +39,7 @@ class MeanVarData(Data):
 
         Args:
             integrands (Integrand): an instance of Integrand
-            measures (Measure): an instance of Measure
+            measures (TrueMeasure): an instance of TrueMeasure
 
         Returns:
             None

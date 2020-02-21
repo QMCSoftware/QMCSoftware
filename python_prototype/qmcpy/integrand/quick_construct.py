@@ -11,7 +11,7 @@ class QuickConstruct(Integrand):
         Initialize custom Integrand
 
         Args:
-            measure (Measure): a Measure instance
+            measure (TrueMeasure): a TrueMeasure instance
             custom_fun (function): a function evaluating samples (nxd) -> (nx1)
                 Args:
                     x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \

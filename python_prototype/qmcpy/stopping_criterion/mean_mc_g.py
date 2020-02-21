@@ -13,8 +13,8 @@ Reference:
 """
 
 from ._stopping_criterion import StoppingCriterion
-from ..data import MeanVarData
-from ..distribution._distribution import Distribution
+from ..accumulate_data import MeanVarData
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import MaxSamplesWarning, NotYetImplemented
 from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
 from scipy.optimize import fsolve
@@ -40,7 +40,7 @@ class MeanMC_g(StoppingCriterion):
                  abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e10):
         """
         Args:
-            distribution (Distribution): an instance of Distribution
+            distribution (DiscreteDistribution): an instance of DiscreteDistribution
             inflate: inflation factor when estimating variance
             alpha: significance level for confidence interval
             abs_tol: absolute error tolerance
@@ -49,7 +49,7 @@ class MeanMC_g(StoppingCriterion):
             n_max: maximum number of samples
         """
         # Input Checks
-        if not isinstance(distribution,Distribution):
+        if not isinstance(distribution,DiscreteDistribution):
             # must be a list of Distributions objects -> multilevel problem
             raise NotYetImplemented('''
                 MeanMC_g not implemented for multi-level problems.
@@ -66,7 +66,7 @@ class MeanMC_g(StoppingCriterion):
             (self.alpha_sigma * n_init) / (1 - self.alpha_sigma) * \
             (1 - 1 / self.inflate**2)**2
         self.stage = "sigma"
-        # Construct Data Object to House Integration data
+        # Construct AccumulateData Object to House Integration data
         self.data = MeanVarData(levels=1,n_init=n_init)  # house integration data
         # Verify Compliant Construction
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]

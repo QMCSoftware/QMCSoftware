@@ -1,7 +1,7 @@
 """ Main integration method acting on QMCPy objects """
 
-from .distribution._distribution import Distribution
-from .measure._measure import Measure
+from .discrete_distribution._discrete_distribution import DiscreteDistribution
+from .true_measure._true_measure import TrueMeasure
 from .integrand._integrand import Integrand
 from .util import DimensionError
 from time import process_time
@@ -14,16 +14,16 @@ def integrate(stopping_criterion, integrand, measure, distribution):
 
     Args:
         integrand (Integrand): an Integrand object
-        measure (Measure): a Measure object
-        distribution (Distribution): a Distribution object
+        measure (TrueMeasure): a TrueMeasure object
+        distribution (DiscreteDistribution): a DiscreteDistribution object
         stopping_criterion (StoppingCriterion): a StoppingCrition object
 
     Returns:
         solution (float): estimated value of the integral
-        data (Data): houses input and integration process data
+        data (AccumulateData): houses input and integration process data
             Includes:
                 self.integrand (origianl Integrand): origianl integrand
-                self.measure (original Measure): origianl measure
+                self.measure (original TrueMeasure): origianl measure
                 self.stopping_criterion (origianl StoppingCriterion)
             Note: Calling print(data) outputs a string of all parameters
                         
@@ -31,7 +31,7 @@ def integrate(stopping_criterion, integrand, measure, distribution):
     # Check matching dimensions for integrand, measure, and distribution
     flag = 0
     try:
-        if isinstance(distribution,Distribution):
+        if isinstance(distribution,DiscreteDistribution):
             distrib_dims = distribution.dimension
             measure_dims = measure.dimension
             integrand_dims = integrand.dimension

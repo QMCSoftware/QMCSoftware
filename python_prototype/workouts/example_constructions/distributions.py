@@ -1,5 +1,5 @@
 """
-Sample Distribution objects and usage
+Sample DiscreteDistribution objects and usage
 python workouts/example_constructions/distributions.py > outputs/example_constructions/distributions.log
 """
 

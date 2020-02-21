@@ -1,8 +1,8 @@
 """ Definition for CLT, a concrete implementation of StoppingCriterion """
 
 from ._stopping_criterion import StoppingCriterion
-from ..data import MeanVarData
-from ..distribution._distribution import Distribution
+from ..accumulate_data import MeanVarData
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import MaxSamplesWarning, ParameterError
 import warnings
 from numpy import array, ceil, floor, maximum
@@ -18,7 +18,7 @@ class CLT(StoppingCriterion):
                  abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e10):
         """
         Args:
-            distributions (Distribution): an instance of Distribution
+            distributions (DiscreteDistribution): an instance of DiscreteDistribution
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
             abs_tol (float): absolute error tolerance
@@ -33,10 +33,10 @@ class CLT(StoppingCriterion):
         self.alpha = alpha
         self.inflate = inflate
         self.stage = "sigma"
-        # Construct Data Object to House Integration data
-        if isinstance(distributions,Distribution): 
+        # Construct AccumulateData Object to House Integration data
+        if isinstance(distributions,DiscreteDistribution): 
             levels = 1 # single level problem
-        else: # list of Distribution instances
+        else: # list of DiscreteDistribution instances
             levels = len(distributions)
         self.data = MeanVarData(levels, n_init)
         # Verify Compliant Construction

@@ -12,7 +12,7 @@ class Integrand(object):
     def __init__(self):
         prefix = 'A concrete implementation of Integrand must have '
         if not hasattr(self, 'measure'):
-            raise ParameterError(prefix + 'self.measure (a Measure instance)')
+            raise ParameterError(prefix + 'self.measure (a TrueMeasure instance)')
         if not hasattr(self,'parameters'):
             self.parameters = []
         self.dimension = self.measure.dimension

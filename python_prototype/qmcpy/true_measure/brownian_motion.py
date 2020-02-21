@@ -1,20 +1,20 @@
-""" Definition of BrownianMotion, a concrete implementation of Measure """
+""" Definition of BrownianMotion, a concrete implementation of TrueMeasure """
 
-from ._measure import Measure
+from ._true_measure import TrueMeasure
 from ..util import TransformError
 from numpy import arange, cumsum, diff, insert, sqrt, array
 from scipy.stats import norm
 
 
-class BrownianMotion(Measure):
-    """ Brownian Motion Measure """
+class BrownianMotion(TrueMeasure):
+    """ Brownian Motion TrueMeasure """
 
     parameters = ['time_vector']
 
     def __init__(self, distribution, time_vector=arange(1 / 4, 5 / 4, 1 / 4)):
         """
         Args:
-            distribution (Distribution): Distribution instance
+            distribution (DiscreteDistribution): DiscreteDistribution instance
             time_vector (list of ndarrays): monitoring times for the Integrand's'
         """
         self.distribution = distribution
@@ -23,16 +23,16 @@ class BrownianMotion(Measure):
     
     def gen_samples(self, *args, **kwargs):
         """
-        Generate samples from the Distribution object
-        and transform them to mimic Measure samples
+        Generate samples from the DiscreteDistribution object
+        and transform them to mimic TrueMeasure samples
         
         Args:
             *args (tuple): Ordered arguments to self.distribution.gen_samples
             **kwrags (dict): Keyword arguments to self.distribution.gen_samples
         
         Returns:
-            tf_samples (ndarray): samples from the Distribution object transformed
-                                  to appear like the Measure object
+            tf_samples (ndarray): samples from the DiscreteDistribution object transformed
+                                  to appear like the TrueMeasure object
         """
         samples = self.distribution.gen_samples(*args,**kwargs)
         if self.distribution.mimics == 'StdGaussian':
@@ -49,8 +49,8 @@ class BrownianMotion(Measure):
     def transform_g_to_f(self, g):
         """
         Transform the g, the origianl integrand, to f,
-        the integrand after transforming Distribution samples
-        to mimic the Measure object. 
+        the integrand after transforming DiscreteDistribution samples
+        to mimic the TrueMeasure object. 
         
         Args:
             g (method): original integrand

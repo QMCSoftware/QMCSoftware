@@ -1,5 +1,5 @@
 """
-Sample Distribution objects and usage
+Sample DiscreteDistribution objects and usage
 Mathematica: N[Integrate[E^(-x1^2 - x2^2) Cos[Sqrt[x1^2 + x2^2]], {x1, -Infinity, Infinity}, {x2, -Infinity, Infinity}]]
 python workouts/example_constructions/stopping_criteria.py > outputs/example_constructions/stopping_criteria.log
 """

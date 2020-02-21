@@ -1,13 +1,13 @@
-""" Definition for IIDStdUniform, a concrete implementation of Distribution """
+""" Definition for IIDStdGaussian, a concrete implementation of DiscreteDistribution """
 
-from ._distribution import Distribution
+from ._discrete_distribution import DiscreteDistribution
 from numpy.random import Generator, PCG64
 
 
-class IIDStdUniform(Distribution):
-    """ Standard Uniform """
+class IIDStdGaussian(DiscreteDistribution):
+    """ Standard Gaussian """
 
-    parameters = ['dimension','seed','mimics']
+    parameters = ['dimension', 'seed', 'mimics']
 
     def __init__(self, dimension=1, seed=None):
         """
@@ -18,12 +18,12 @@ class IIDStdUniform(Distribution):
         self.dimension = dimension
         self.seed = seed
         self.rng = Generator(PCG64(self.seed))
-        self.mimics = 'StdUniform'
+        self.mimics = 'StdGaussian'
         super().__init__()
 
     def gen_samples(self, n):
         """
-        Generate n x self.dimension IID Standard Uniform samples
+        Generate n x self.dimension IID Standard Gaussian samples
 
         Args:
             n (int): Number of observations to generate
@@ -31,5 +31,4 @@ class IIDStdUniform(Distribution):
         Returns:
             n x self.dimension (ndarray)
         """
-        return self.rng.uniform(0,1,(int(n), self.dimension))
-        
+        return self.rng.standard_normal((int(n), self.dimension))

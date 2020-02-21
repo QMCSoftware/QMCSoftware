@@ -1,14 +1,14 @@
-""" Distribution is an abstract class. """
+""" DiscreteDistribution is an abstract class. """
 
 from ..util import ParameterError, MethodImplementationError, univ_repr
 from numpy import array
 
 
-class Distribution(object):
-    """ Discrete Distribution from which we can generate samples """
+class DiscreteDistribution(object):
+    """ Discrete DiscreteDistribution from which we can generate samples """
 
     def __init__(self):
-        prefix = 'A concrete implementation of Distribution must have '
+        prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
         if not hasattr(self, 'dimension'):
@@ -26,4 +26,4 @@ class Distribution(object):
         raise MethodImplementationError(self, 'gen_dd_samples')
 
     def __repr__(self):
-        return univ_repr(self, "Discrete Distribution", self.parameters)
+        return univ_repr(self, "Discrete DiscreteDistribution", self.parameters)

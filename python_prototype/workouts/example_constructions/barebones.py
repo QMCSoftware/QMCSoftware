@@ -1,18 +1,18 @@
 """ Sample Barebones Subclasses """
 
-from qmcpy.data._data import Data
-from qmcpy.distribution._distribution import Distribution
+from qmcpy.accumulate_data._accumulate_data import AccumulateData
+from qmcpy.discrete_distribution._discrete_distribution import DiscreteDistribution
 from qmcpy.integrand._integrand import Integrand
 from qmcpy.stopping_criterion._stopping_criterion import StoppingCriterion
-from qmcpy.measure._measure import Measure
+from qmcpy.true_measure._true_measure import TrueMeasure
 from qmcpy.util import TransformError
 from numpy import *
 
 
 def barebones():
         
-    # Discrete Distribution
-    class MyDiscreteDistribution(Distribution):
+    # Discrete DiscreteDistribution
+    class MyDiscreteDistribution(DiscreteDistribution):
         
         def __init__(self, dimension):
             self.dimension = dimension
@@ -26,8 +26,8 @@ def barebones():
     samples = my_discrete_distribution.gen_samples(4)
 
 
-    # True Measure
-    class MyTrueMeasure(Measure):
+    # True TrueMeasure
+    class MyTrueMeasure(TrueMeasure):
 
         def __init__(self, distribution):
             self.distribution = distribution
@@ -62,8 +62,8 @@ def barebones():
     evalutations = my_integrand.f(ones((3,5)))
 
 
-    # Accumulate Data
-    class MyAccumData(Data):
+    # Accumulate AccumulateData
+    class MyAccumData(AccumulateData):
         
         def __init__(self):
             self.solution = None

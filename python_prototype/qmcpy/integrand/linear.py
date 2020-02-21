@@ -12,7 +12,7 @@ class Linear(Integrand):
     def __init__(self, measure):
         """
         Args:
-            measure (Measure): a Measure instance
+            measure (TrueMeasure): a TrueMeasure instance
         """
         self.measure = measure
         super().__init__()

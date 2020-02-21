@@ -1,8 +1,8 @@
 """ Definition for CLTRep, a concrete implementation of StoppingCriterion """
 
 from ._stopping_criterion import StoppingCriterion
-from ..data import MeanVarDataRep
-from ..distribution._distribution import Distribution
+from ..accumulate_data import MeanVarDataRep
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import array, log2, sqrt
 from scipy.stats import norm
@@ -21,7 +21,7 @@ class CLTRep(StoppingCriterion):
                  abs_tol=1e-2, rel_tol=0, n_init=256, n_max=2**30):
         """
         Args:
-            distribution (Distribution): an instance of Distribution
+            distribution (DiscreteDistribution): an instance of DiscreteDistribution
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
             abs_tol (float): absolute error tolerance
@@ -29,7 +29,7 @@ class CLTRep(StoppingCriterion):
             n_max (int): maximum number of samples
         """
         # Input Checks
-        if not isinstance(distribution,Distribution):
+        if not isinstance(distribution,DiscreteDistribution):
             # must be a list of Distributions objects -> multilevel problem
             raise NotYetImplemented('''
                 CLTRep not implemented for multi-level problems.
@@ -49,9 +49,9 @@ class CLTRep(StoppingCriterion):
         # Verify Compliant Construction
         allowed_distribs = ["Lattice", "Sobol"]
         super().__init__(distribution, allowed_distribs)
-        # Construct Data Object to House Integration data
+        # Construct AccumulateData Object to House Integration data
         self.data = MeanVarDataRep(n_init, distribution.replications)
-        # More Distribution checks
+        # More DiscreteDistribution checks
         if distribution.replications <16:
             raise ParameterError('CLTRep requires distribution to have 16 replications.')
         if not distribution.scramble:

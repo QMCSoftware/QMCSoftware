@@ -1,16 +1,16 @@
-""" Definition for abstract class Data """
+""" Definition for abstract class AccumulateData """
 
 from ..util import ParameterError, MethodImplementationError, univ_repr
 
 
-class Data():
+class AccumulateData():
     """
     Accumulated data required in the computation of the integral.
     """
 
     def __init__(self):
         """ Initialize data instance """
-        prefix = 'A concrete implementation of Data must have '
+        prefix = 'A concrete implementation of AccumulateData must have '
         if not hasattr(self, 'solution'):
             raise ParameterError(prefix + 'self.solution')
         if not hasattr(self, 'n_total'):
@@ -25,7 +25,7 @@ class Data():
 
         Args:
             integrand (Integrand): an instance of Integrand
-            measure (Measure): an instance of Measure
+            measure (TrueMeasure): an instance of TrueMeasure
 
         Returns:
             None
@@ -39,8 +39,8 @@ class Data():
         Args:
             time_total (float): total wall clock time for integration
             integrand (Integrand): Integrand object
-            distribution (Distribution): Discrete Distribution object
-            measure (Measure): True Measure Object
+            distribution (DiscreteDistribution): Discrete DiscreteDistribution object
+            measure (TrueMeasure): True TrueMeasure Object
             stopping_criterion (Stopping Criterion): Stopping Criterion object
 
         Returns:
@@ -57,5 +57,5 @@ class Data():
         for qmc_obj in [self.integrand, self.distribution, self.measure, self.stopping_criterion]:
             if qmc_obj:
                 string += str(qmc_obj)
-        string += univ_repr(self, 'Data', self.parameters + ['time_total'])
+        string += univ_repr(self, 'AccumulateData', self.parameters + ['time_total'])
         return string

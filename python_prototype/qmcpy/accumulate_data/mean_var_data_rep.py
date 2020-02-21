@@ -1,15 +1,15 @@
-""" Definition for MeanVarDataRep, a concrete implementation of Data """
+""" Definition for MeanVarDataRep, a concrete implementation of AccumulateData """
 
-from ._data import Data
+from ._accumulate_data import AccumulateData
 from time import process_time
 from numpy import array, finfo, float32, full, inf, nan, tile, zeros
 
 EPS = finfo(float32).eps
 
 
-class MeanVarDataRep(Data):
+class MeanVarDataRep(AccumulateData):
     """
-    Data from Repeated Central Limit Stopping Criterion calculations.
+    AccumulateData from Repeated Central Limit Stopping Criterion calculations.
     """
 
     parameters = ['replications','solution','sighat','n_total','confid_int']
@@ -39,7 +39,7 @@ class MeanVarDataRep(Data):
 
         Args:
             integrand (Integrand): an instance of Integrand
-            measure (Measure): an instance of Measure
+            measure (TrueMeasure): an instance of TrueMeasure
 
         Returns:
             None

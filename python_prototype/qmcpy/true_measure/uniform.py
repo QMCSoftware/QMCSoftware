@@ -1,20 +1,20 @@
-""" Definition of Uniform, a concrete implementation of Measure """
+""" Definition of Uniform, a concrete implementation of TrueMeasure """
 
-from ._measure import Measure
+from ._true_measure import TrueMeasure
 from ..util import TransformError
 from numpy import array
 from scipy.stats import norm
 
 
-class Uniform(Measure):
-    """ Uniform Measure """
+class Uniform(TrueMeasure):
+    """ Uniform TrueMeasure """
 
     parameters = ['lower_bound', 'upper_bound']
     
     def __init__(self, distribution, lower_bound=0., upper_bound=1.):
         """
         Args:
-            distribution (Distribution): Distribution instance
+            distribution (DiscreteDistribution): DiscreteDistribution instance
             lower_bound (float): a for Uniform(a,b)
             upper_bound (float): b for Uniform(a,b)
         """
@@ -25,16 +25,16 @@ class Uniform(Measure):
 
     def gen_samples(self, *args, **kwargs):
         """
-        Generate samples from the Distribution object
-        and transform them to mimic Measure samples
+        Generate samples from the DiscreteDistribution object
+        and transform them to mimic TrueMeasure samples
         
         Args:
             *args (tuple): Ordered arguments to self.distribution.gen_samples
             **kwrags (dict): Keyword arguments to self.distribution.gen_samples
         
         Returns:
-            tf_samples (ndarray): samples from the Distribution object transformed to appear 
-                                  to appear like the Measure object
+            tf_samples (ndarray): samples from the DiscreteDistribution object transformed to appear 
+                                  to appear like the TrueMeasure object
         """
         samples = self.distribution.gen_samples(*args,**kwargs)
         if self.distribution.mimics == 'StdGaussian':
@@ -51,8 +51,8 @@ class Uniform(Measure):
     def transform_g_to_f(self, g):
         """
         Transform the g, the origianl integrand, to f,
-        the integrand after transforming Distribution samples
-        to mimic the Measure object. 
+        the integrand after transforming DiscreteDistribution samples
+        to mimic the TrueMeasure object. 
         
         Args:
             g (method): original integrand

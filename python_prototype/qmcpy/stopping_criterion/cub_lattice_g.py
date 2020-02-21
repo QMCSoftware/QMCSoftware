@@ -12,8 +12,8 @@ Reference:
 """
 
 from ._stopping_criterion import StoppingCriterion
-from ..data import CubatureData
-from ..distribution._distribution import Distribution
+from ..accumulate_data import CubatureData
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterError, ParameterWarning
 from numpy import log2
 import warnings
@@ -44,7 +44,7 @@ class CubLattice_g(StoppingCriterion):
                  n_init=2**10, n_max=2**35, fudge = lambda m: 5*2**(-m)):
         """
         Args:
-            distribution (Distribution): an instance of Distribution
+            distribution (DiscreteDistribution): an instance of DiscreteDistribution
             abs_tol (float): absolute error tolerance
             rel_tol (float): relative error tolerance
             n_init (int): initial number of samples
@@ -54,7 +54,7 @@ class CubLattice_g(StoppingCriterion):
                               in the cone of functions
         """
         # Input Checks
-        if not isinstance(distribution,Distribution):
+        if not isinstance(distribution,DiscreteDistribution):
             # must be a list of Distributions objects -> multilevel problem
             raise NotYetImplemented('''
                 cub_lattice_g not implemented for multi-level problems.
@@ -75,7 +75,7 @@ class CubLattice_g(StoppingCriterion):
         self.n_init = 2**m_min
         self.n_max = 2**m_max
         self.stage = None
-        # Construct Data Object to House Integration data
+        # Construct AccumulateData Object to House Integration data
         self.data = CubatureData(m_min, m_max, fudge)
         # Verify Compliant Construction
         allowed_distribs = ["Lattice"]

@@ -1,5 +1,5 @@
 """
-Sample Measure objects and usage
+Sample TrueMeasure objects and usage
 python workouts/example_constructions/measures.py > outputs/example_constructions/measures.log
 """
 

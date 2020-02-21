@@ -21,7 +21,7 @@ class Keister(Integrand):
     def __init__(self, measure):
         """
         Args:
-            measure (Measure): a Measure instance
+            measure (TrueMeasure): a TrueMeasure instance
         """
         self.measure = measure
         self.dimension = self.measure.dimension
