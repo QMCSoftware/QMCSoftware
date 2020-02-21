@@ -60,13 +60,13 @@ class MeanMC_g(StoppingCriterion):
         self.kurtmax = (n_init - 3) / (n_init - 1) + \
             (self.alpha_sigma * n_init) / (1 - self.alpha_sigma) * \
             (1 - 1 / self.inflate**2)**2
-        # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, integrand, self.n_init)  # house integration data
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
+        # Construct AccumulateData Object to House Integration data
+        self.data = MeanVarData(self, integrand, self.n_init)  # house integration data
 
     def integrate(self):
         """ Determine when to stop """
@@ -97,7 +97,7 @@ class MeanMC_g(StoppingCriterion):
         # Final Sample
         self.data.update_data()
         self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
-        self.data.time_total = process_time() - t_start
+        self.data.time_integrate = process_time() - t_start
         return self.data.solution, self.data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):

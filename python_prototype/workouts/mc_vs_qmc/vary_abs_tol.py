@@ -31,15 +31,15 @@ def vary_abs_tol(dimension=3, abs_tol=[.1,.2,.3], rel_tol=0, trials=1):
             try:
                 solution = 0
                 n_total = 0
-                time_total = 0
+                time_integrate = 0
                 for j in range(trials):
                     data = function(dimension=dimension, abs_tol=tol, rel_tol=rel_tol)
                     solution += data.solution
                     n_total += data.n_total
-                    time_total += data.time_total
+                    time_integrate += data.time_integrate
                 row_solution[name] = solution / trials
                 row_n_total[name] = n_total / trials
-                row_time[name] = time_total / trials
+                row_time[name] = time_integrate / trials
             except: pass
         # Set and print results
         df_solution.loc[i] = row_solution

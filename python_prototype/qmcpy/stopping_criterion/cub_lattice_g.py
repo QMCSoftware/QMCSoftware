@@ -69,8 +69,6 @@ class CubLattice_g(StoppingCriterion):
             m_max = 35
         self.n_init = 2**m_min
         self.n_max = 2**m_max
-        # Construct AccumulateData Object to House Integration data
-        self.data = CubatureData(self, integrand, m_min, m_max, fudge)
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
@@ -82,6 +80,8 @@ class CubLattice_g(StoppingCriterion):
             raise ParameterError("CubLattice_g requires distribution to have scramble=True")
         if distribution.backend != 'gail':
             raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
+        # Construct AccumulateData Object to House Integration data
+        self.data = CubatureData(self, integrand, m_min, m_max, fudge)
 
     def integrate(self):
         """ Determine when to stop """
@@ -110,6 +110,6 @@ class CubLattice_g(StoppingCriterion):
             else:
                 # double sample size
                 self.data.m += 1
-        self.data.time_total = process_time() - t_start
+        self.data.time_integrate = process_time() - t_start
         return self.data.solution, self.data
             

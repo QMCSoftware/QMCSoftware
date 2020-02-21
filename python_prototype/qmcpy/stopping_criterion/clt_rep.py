@@ -42,8 +42,6 @@ class CLTRep(StoppingCriterion):
         self.n_max = n_max
         self.alpha = alpha
         self.inflate = inflate
-        # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarDataRep(self, integrand, self.n_init)
         # DiscreteDistribution checks
         distribution = integrand.measure.distribution
         allowed_levels = "single"
@@ -53,7 +51,9 @@ class CLTRep(StoppingCriterion):
             raise ParameterError('CLTRep requires distribution to have 16 replications.')
         if not distribution.scramble:
             raise ParameterError("CLTRep requires distribution to have scramble=True")
-
+        # Construct AccumulateData Object to House Integration data
+        self.data = MeanVarDataRep(self, integrand, self.n_init)
+        
     def integrate(self):
         """ Determine when to stop """
         t_start = process_time()
@@ -81,5 +81,5 @@ class CLTRep(StoppingCriterion):
         z_star = -norm.ppf(self.alpha / 2)
         err_bar = z_star * self.inflate * self.data.sighat / sqrt(self.data.n)
         self.data.confid_int = self.data.solution +  err_bar * array([-1, 1])
-        self.data.time_total = process_time() - t_start
+        self.data.time_integrate = process_time() - t_start
         return self.data.solution, self.data

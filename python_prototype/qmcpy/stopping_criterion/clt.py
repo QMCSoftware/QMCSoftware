@@ -33,13 +33,13 @@ class CLT(StoppingCriterion):
         self.n_max = n_max
         self.alpha = alpha
         self.inflate = inflate
-        # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, integrand, self.n_init)
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'multi'
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
+        # Construct AccumulateData Object to House Integration data
+        self.data = MeanVarData(self, integrand, self.n_init)
 
     def integrate(self):
         """ Determine when to stop """
@@ -78,5 +78,5 @@ class CLT(StoppingCriterion):
         sigma_up = (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
         err_bar = z_star * self.inflate * sigma_up
         self.data.confid_int = self.data.solution + err_bar * array([-1, 1])
-        self.data.time_total = process_time() - t_start
+        self.data.time_integrate = process_time() - t_start
         return self.data.solution, self.data

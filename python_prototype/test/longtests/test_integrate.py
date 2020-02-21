@@ -21,8 +21,8 @@ class IntegrationExampleTest(unittest.TestCase):
             distribution = IIDStdGaussian(dimension=dimensions[i])
             measure = Gaussian(distribution, variance=1/2)
             integrand = Keister(measure)
-            algorithm = CLT(distribution,abs_tol=abs_tol)
-            solution,data = integrate(algorithm,integrand,measure,distribution)
+            algorithm = CLT(integrand,abs_tol=abs_tol)
+            solution,data = algorithm.integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_asian_option_multi_level(self):
@@ -42,8 +42,8 @@ class IntegrationExampleTest(unittest.TestCase):
         integrands = MultiLevelConstructor(levels,
             AsianCall,
                 measure = measures)
-        algorithm = CLT(distributions, abs_tol=abs_tol)
-        solution,data = integrate(algorithm, integrands, measures, distributions)
+        algorithm = CLT(integrands, abs_tol=abs_tol)
+        solution,data = algorithm.integrate()
         true_value = 6.20
         self.assertTrue(abs(solution - true_value) < abs_tol)
 
@@ -54,8 +54,8 @@ class IntegrationExampleTest(unittest.TestCase):
         distribution = Lattice(dimension=2, replications=16, scramble=True, backend='MPS')
         measure = Lebesgue(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = QuickConstruct(measure, lambda x: (x.prod(1))**3)
-        algorithm = CLTRep(distribution, abs_tol=abs_tol)
-        solution,data = integrate(algorithm, integrand, measure, distribution)
+        algorithm = CLTRep(integrand, abs_tol=abs_tol)
+        solution,data = algorithm.integrate()
         true_value = 6075
         self.assertTrue(abs(solution - true_value) < abs_tol)
 
@@ -66,8 +66,8 @@ class IntegrationExampleTest(unittest.TestCase):
         distribution = Lattice(dimension=2, replications=16, scramble=True, backend='MPS')
         measure = Uniform(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = QuickConstruct(measure, lambda x: (x.prod(1))**3)
-        algorithm = CLTRep(distribution, abs_tol=abs_tol)
-        solution,data = integrate(algorithm, integrand, measure, distribution)
+        algorithm = CLTRep(integrand, abs_tol=abs_tol)
+        solution,data = algorithm.integrate()
         true_value = 6075 / 6
         self.assertTrue(abs(solution - true_value) < abs_tol)
 
@@ -84,8 +84,8 @@ class IntegrationExampleTest(unittest.TestCase):
             distribution = Sobol(dimension=dimensions[i], replications=16, scramble=True, backend='MPS')
             measure = Uniform(distribution)
             integrand = Linear(measure)
-            algorithm = CLTRep(distribution, abs_tol=abs_tol)
-            solution,data = integrate(algorithm, integrand, measure, distribution)
+            algorithm = CLTRep(integrand, abs_tol=abs_tol)
+            solution,data = algorithm.integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_quick_construct(self):
@@ -104,8 +104,8 @@ class IntegrationExampleTest(unittest.TestCase):
             distribution = IIDStdUniform(dimension=dimensions[i])
             measure = Uniform(distribution)
             integrand = QuickConstruct(measure, lambda x: (5*x).sum(1))
-            algorithm = MeanMC_g(distribution, abs_tol=abs_tol)
-            solution,data = integrate(algorithm, integrand, measure, distribution)
+            algorithm = MeanMC_g(integrand, abs_tol=abs_tol)
+            solution,data = algorithm.integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_quick_construct2(self):
@@ -124,8 +124,8 @@ class IntegrationExampleTest(unittest.TestCase):
             distribution = Lattice(dimension=1, replications=0, scramble=True, backend='GAIL')
             measure = Uniform(distribution)
             integrand = QuickConstruct(measure, lambda x, a=a_i, b=b_i: b * (x - a) ** 2)
-            algorithm = CubLattice_g(distribution, abs_tol=abs_tol)
-            solution,data = integrate(algorithm, integrand, measure, distribution)
+            algorithm = CubLattice_g(integrand, abs_tol=abs_tol)
+            solution,data = algorithm.integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
 

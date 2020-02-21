@@ -52,30 +52,10 @@ class AccumulateData():
         """
         raise MethodImplementationError(self, 'update_data')
 
-    def complete(self, time_total, integrand, distribution, measure, stopping_criterion):
-        """
-        Aggregate all objects after integration completes
-
-        Args:
-            time_total (float): total wall clock time for integration
-            integrand (Integrand): Integrand object
-            distribution (DiscreteDistribution): Discrete DiscreteDistribution object
-            measure (TrueMeasure): True TrueMeasure Object
-            stopping_criterion (Stopping Criterion): Stopping Criterion object
-
-        Returns:
-            self
-        """
-        self.time_total = time_total
-        self.integrand = integrand
-        self.distribution = distribution
-        self.measure = measure
-        self.stopping_criterion = stopping_criterion
-
     def __repr__(self):
         string = "Solution: %-15.4f\n" % (self.solution)
         for qmc_obj in [self.integrand, self.distribution, self.measure, self.stopping_criterion]:
             if qmc_obj:
                 string += str(qmc_obj)
-        string += univ_repr(self, 'AccumulateData', self.parameters + ['time_total'])
+        string += univ_repr(self, 'AccumulateData', self.parameters + ['time_integrate'])
         return string
