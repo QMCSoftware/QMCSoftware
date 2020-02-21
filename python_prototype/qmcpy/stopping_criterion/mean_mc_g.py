@@ -19,6 +19,7 @@ from ..util import MaxSamplesWarning, NotYetImplemented
 from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
 from scipy.optimize import fsolve
 from scipy.stats import norm
+from time import process_time
 import warnings
 
 
@@ -36,11 +37,11 @@ class MeanMC_g(StoppingCriterion):
     """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
-    def __init__(self, distribution, inflate=1.2, alpha=0.01,
+    def __init__(self, integrand, inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e10):
         """
         Args:
-            distribution (DiscreteDistribution): an instance of DiscreteDistribution
+            integrand (Integrand): an instance of Integrand
             inflate: inflation factor when estimating variance
             alpha: significance level for confidence interval
             abs_tol: absolute error tolerance
@@ -48,12 +49,6 @@ class MeanMC_g(StoppingCriterion):
             n_init: initial number of samples
             n_max: maximum number of samples
         """
-        # Input Checks
-        if not isinstance(distribution,DiscreteDistribution):
-            # must be a list of Distributions objects -> multilevel problem
-            raise NotYetImplemented('''
-                MeanMC_g not implemented for multi-level problems.
-                Use CLT stopping criterion with an iid distribution for multi-level problems ''')
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
@@ -65,41 +60,45 @@ class MeanMC_g(StoppingCriterion):
         self.kurtmax = (n_init - 3) / (n_init - 1) + \
             (self.alpha_sigma * n_init) / (1 - self.alpha_sigma) * \
             (1 - 1 / self.inflate**2)**2
-        self.stage = "sigma"
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(levels=1,n_init=n_init)  # house integration data
+        self.data = MeanVarData(self, integrand, self.n_init)  # house integration data
         # Verify Compliant Construction
+        distribution = integrand.measure.distribution
+        allowed_levels = 'single'
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
-        super().__init__(distribution, allowed_distribs)
+        super().__init__(distribution, allowed_levels, allowed_distribs)
 
-    def stop_yet(self):
+    def integrate(self):
         """ Determine when to stop """
-        if self.stage == "sigma":
-            self.sigma_up = self.inflate * self.data.sighat
-            self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
-            if self.rel_tol == 0:
-                toloversig = self.abs_tol / self.sigma_up
-                # absolute error tolerance over sigma
-                n, self.err_bar = \
-                    self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_max, self.sigma_up)
-                self.data.n[:] = n
-                if self.data.n_total + self.data.n > self.n_max:
-                    # cannot generate this many new samples
-                    n_low = int(self.n_max-self.data.n_total)
-                    warning_s = """
-                    Alread generated %d samples.
-                    Trying to generate %d new samples would exceeds n_max = %d.
-                    Will instead generate %d samples to meet n_max total samples. 
-                    Note that error tolerances may no longer be satisfied""" \
-                    % (int(self.data.n_total), int(self.data.n), int(self.n_max), n_low)
-                    warnings.warn(warning_s, MaxSamplesWarning)
-                    self.data.n[:] = n_low
-            else:
-                raise NotYetImplemented("Not implemented for rel_tol != 0")
-            self.stage = 'mu'
-        elif self.stage == "mu":
-            self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
-            self.stage = "done"  # finished with computation
+        t_start = process_time()
+        # Pilot Sample
+        self.data.update_data(self.integrand, self.measure)
+        self.sigma_up = self.inflate * self.data.sighat
+        self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
+        if self.rel_tol == 0:
+            toloversig = self.abs_tol / self.sigma_up
+            # absolute error tolerance over sigma
+            n, self.err_bar = \
+                self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_max, self.sigma_up)
+            self.data.n[:] = n
+            if self.data.n_total + self.data.n > self.n_max:
+                # cannot generate this many new samples
+                n_low = int(self.n_max-self.data.n_total)
+                warning_s = """
+                Alread generated %d samples.
+                Trying to generate %d new samples would exceeds n_max = %d.
+                Will instead generate %d samples to meet n_max total samples. 
+                Note that error tolerances may no longer be satisfied""" \
+                % (int(self.data.n_total), int(self.data.n), int(self.n_max), n_low)
+                warnings.warn(warning_s, MaxSamplesWarning)
+                self.data.n[:] = n_low
+        else:
+            raise NotYetImplemented("Not implemented for rel_tol != 0")
+        # Final Sample
+        self.update_data(self.integrand, self.measure)
+        self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
+        self.data.time_total = process_time() - t_start
+        return self.data.solutin, self.data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):
         """

@@ -16,20 +16,33 @@ class StoppingCriterion(object):
         stage: stage of the computation
     """
     
-    def __init__(self, distributions, allowed_distribs):
+    def __init__(self, distribution, allowed_levels, allowed_distribs):
         """
+        Check StoppingCriterion parameters
+
         Args:
-            distributions (DiscreteDistribution or list of Distributions): an instance of DiscreteDistribution
-            allowed_distribs: distribution's compatible with the StoppingCriterion
+            distribution: DiscreteDistribution or list of DiscreteDistributions
+            allowed_levels (string): stopping criteron works with 'single' or 'multi' level problems
+            allowed_distribs (list): list of names (strings) of compatible distributions
         """
-        if isinstance(distributions,DiscreteDistribution):
-            # single level problem -> make it appear multi-level
-            distributions = [distributions]
-        for distribution in distributions:
-            if type(distribution).__name__ not in allowed_distribs:
-                error_message = "%s only accepts distributions: %s" %\
-                    (type(self).__name__, str(allowed_distribs))
+        # check compatable level and StoppingCriterion
+        if isinstance(distribution,DiscreteDistribution):
+            levels = 'single'
+            distribution = [distribution] # make it apprea multi-level for next check
+        else:
+            levels = 'multi'
+        if levels=='multi' and allowed_levels=='single':
+            raise NotYetImplemented('''
+                StoppingCriterion not implemented for multi-level problems.
+                Use CLT stopping criterion with an iid distribution for multi-level problems.''')
+        # check distribution compatibility with stopping_criterion
+        s_name = type(self).__name__
+        for distrib in distribution:
+            d_name = type(distrib).__name__
+            if d_name not in allowed_distribs:
+                error_message = "%s only accepts distributions: %s" %(s_name, str(allowed_distribs))
                 raise DistributionCompatibilityError(error_message)
+        # parameter checks
         prefix = 'A concrete implementation of Stopping Criterion must have '
         if not hasattr(self, 'abs_tol'):
             raise ParameterError(prefix + 'self.abs_tol (absolute tolerance)')
@@ -37,16 +50,18 @@ class StoppingCriterion(object):
             raise ParameterError(prefix + 'self.rel_tol (relative tolerance)')
         if not hasattr(self, 'n_max'):
             raise ParameterError(prefix + 'self.n_max (maximum total samples)')
-        if not hasattr(self, 'stage'):
-            raise ParameterError(prefix + 'self.stage (stage of the computation)')
         if not hasattr(self,'parameters'):
             self.parameters = []
             
-    def stop_yet(self):
+    def integrate(self):
         """ ABSTRACT METHOD
         Determine the number of samples needed to satisfy tolerance
+
+        Return:
+            solution (float): approximate integral
+            data (AccumulateData): an AccumulateData object
         """
-        raise MethodImplementationError(self, 'stop_yet')
+        raise MethodImplementationError(self, 'integrate')
 
     def __repr__(self):
         return univ_repr(self, "Stopping Criterion", self.parameters)

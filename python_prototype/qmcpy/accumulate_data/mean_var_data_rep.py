@@ -14,15 +14,22 @@ class MeanVarDataRep(AccumulateData):
 
     parameters = ['replications','solution','sighat','n_total','confid_int']
 
-    def __init__(self, n_init, replications):
+    def __init__(self, stopping_criterion, integrand, n_init):
         """
         Initialize data instance
 
         Args:
+            stopping_criterion (StoppingCriterion): a StoppingCriterion instance
+            integrand (Integrand): an Integrand instance    
             n_init (int): initial number of samples
-            replications (int): number of random nxm matrices to generate
         """
-        self.replications = replications  # Number of random nxm matrices to generate
+        # Extract QMCPy objects
+        self.stopping_criterion = stopping_criterion
+        self.integrand = integrand
+        self.measure = self.integrand.measure
+        self.distribution = self.measure.distribution
+        # Set Attributes
+        self.replications = self.measure.distribution.replications
         self.muhat_r = zeros(self.replications)
         self.solution = nan
         self.muhat = inf  # sample mean
@@ -33,21 +40,12 @@ class MeanVarDataRep(AccumulateData):
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         super().__init__()
 
-    def update_data(self, integrand, measure):
-        """
-        Update data
-
-        Args:
-            integrand (Integrand): an instance of Integrand
-            measure (TrueMeasure): an instance of TrueMeasure
-
-        Returns:
-            None
-        """
+    def update_data(self):
+        """ Update data """
         t_start = process_time()  # time integrand evaluation
-        set_x = measure.gen_samples(n_min=self.n_total,n_max=self.n)
+        set_x = self.measure.gen_samples(n_min=self.n_total,n_max=self.n)
         for r in range(self.replications):
-            y = integrand.f(set_x[r]).squeeze()
+            y = self.integrand.f(set_x[r]).squeeze()
             previous_sum_y = self.muhat_r[r] * self.n_total
             self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n  # updated integrand-replication mean
         self.muhat = self.muhat_r.mean()  # mean of replication streams means

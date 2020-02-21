@@ -6,7 +6,9 @@ from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import array, log2, sqrt
 from scipy.stats import norm
+from time import process_time
 import warnings
+
 
 
 class CLTRep(StoppingCriterion):
@@ -17,11 +19,11 @@ class CLTRep(StoppingCriterion):
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
 
-    def __init__(self, distribution, inflate=1.2, alpha=0.01,
+    def __init__(self, integrand, inflate=1.2, alpha=0.01,
                  abs_tol=1e-2, rel_tol=0, n_init=256, n_max=2**30):
         """
         Args:
-            distribution (DiscreteDistribution): an instance of DiscreteDistribution
+            integrand (Integrand): an instance of Integrand
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
             abs_tol (float): absolute error tolerance
@@ -29,11 +31,6 @@ class CLTRep(StoppingCriterion):
             n_max (int): maximum number of samples
         """
         # Input Checks
-        if not isinstance(distribution,DiscreteDistribution):
-            # must be a list of Distributions objects -> multilevel problem
-            raise NotYetImplemented('''
-                CLTRep not implemented for multi-level problems.
-                Use CLT stopping criterion with an iid distribution for multi-level problems.''')
         if log2(n_init) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'
             warnings.warn(warning_s, ParameterWarning)
@@ -45,25 +42,29 @@ class CLTRep(StoppingCriterion):
         self.n_max = n_max
         self.alpha = alpha
         self.inflate = inflate
-        self.stage = "begin"
-        # Verify Compliant Construction
-        allowed_distribs = ["Lattice", "Sobol"]
-        super().__init__(distribution, allowed_distribs)
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarDataRep(n_init, distribution.replications)
-        # More DiscreteDistribution checks
+        self.data = MeanVarDataRep(self, integrand, self.n_init)
+        # DiscreteDistribution checks
+        distribution = integrand.measure.distribution
+        allowed_levels = "single"
+        allowed_distribs = ["Lattice", "Sobol"]
+        super().__init__(distribution, allowed_levels, allowed_distribs)
         if distribution.replications <16:
             raise ParameterError('CLTRep requires distribution to have 16 replications.')
         if not distribution.scramble:
             raise ParameterError("CLTRep requires distribution to have scramble=True")
 
-    def stop_yet(self):
+    def integrate(self):
         """ Determine when to stop """
-        sighat_up = self.data.sighat * self.inflate
-        tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
-        if sighat_up > tol_up:
-            # Not sufficiently estimated
-            if 2 * self.data.n > self.n_max:
+        t_start = process_time()
+        while True:
+            self.data.update_data(self.integrand, self.measure)
+            sighat_up = self.data.sighat * self.inflate
+            tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
+            if sighat_up < tol_up:
+                # sufficiently estimated
+                break
+            elif 2 * self.data.n > self.n_max:
                 # doubling samples would go over n_max
                 warning_s = """
                 Alread generated %d samples.
@@ -72,13 +73,13 @@ class CLTRep(StoppingCriterion):
                 Note that error tolerances may not be satisfied""" \
                 % (int(self.data.n_total), int(self.data.n), int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
-                self.stage = 'done'
+                break
             else:
-                self.data.n *= 2  # double n for next sample
-        else:
-            self.stage = 'done' 
-        if self.stage == 'done':
-            # sufficiently estimated -> CLT confidence interval
-            z_star = -norm.ppf(self.alpha / 2)
-            err_bar = z_star * self.inflate * self.data.sighat / sqrt(self.data.n)
-            self.data.confid_int = self.data.solution +  err_bar * array([-1, 1])
+                # double sample size
+                self.data.n *= 2
+        # CLT confidence interval
+        z_star = -norm.ppf(self.alpha / 2)
+        err_bar = z_star * self.inflate * self.data.sighat / sqrt(self.data.n)
+        self.data.confid_int = self.data.solution +  err_bar * array([-1, 1])
+        self.data.time_total = process_time() - t_start
+        return self.data.solutin, self.data

@@ -65,35 +65,37 @@ def barebones():
     # Accumulate AccumulateData
     class MyAccumData(AccumulateData):
         
-        def __init__(self):
+        def __init__(self, stopping_criterion, integrand):
+            self.stopping_criterion = stopping_criterion
+            self.integrand = integrand
+            self.measure = self.integrand.measure
+            self.distribution = self.measure.distribution
             self.solution = None
             self.n_total = None
             super().__init__()
         
-        def update_data(self, integrand, measure):
+        def update_data(self):
             return
-
-    my_accum_data =  MyAccumData()
-    my_accum_data.update_data(None, None)
 
 
     # Stopping Criterion
     class MyStoppingCriterion(StoppingCriterion):
 
-        def __init__(self, distribution):
+        def __init__(self, integrand):
             self.abs_tol = None
             self.rel_tol = None
             self.n_max = None
-            self.stage = None
-            accepted_distribution = ['MyDiscreteDistribution']
-            super().__init__(distribution, accepted_distribution)
+            self.data = MyAccumData(self, integrand)
+            distribution = integrand.measure.distribution
+            allowed_levels = 'single' # or 'multi'
+            allowed_distribs = ['MyDiscreteDistribution']
+            super().__init__(distribution, allowed_levels, allowed_distribs)
         
-        def stop_yet(self):
-            self.stage = 'done'
-            return None
+        def integrate(self):
+            return self.data.solution, self.data
 
-    my_stopping_criterion = MyStoppingCriterion(my_discrete_distribution)
-    my_stopping_criterion.stop_yet()
+    my_stopping_criterion = MyStoppingCriterion(my_integrand)
+    my_stopping_criterion.integrate()
 
 
 if __name__ == '__main__':

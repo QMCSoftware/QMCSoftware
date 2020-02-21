@@ -35,6 +35,6 @@ class CubSobol_g(StoppingCriterion):
     def __init__(self, distribution):
         pass
 
-    def stop_yet(self):
+    def integrate(self):
         """ Determine when to stop """
         raise Exception("Not yet implemented")

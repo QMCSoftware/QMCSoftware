@@ -13,14 +13,25 @@ class CubatureData(AccumulateData):
 
     parameters = ['n_total','solution','r_lag']
 
-    def __init__(self, m_min, m_max, fudge):
+    def __init__(self, stopping_criterion, integrand, m_min, m_max, fudge):
         """
         Initialize data instance
 
         Args:
+            stopping_criterion (StoppingCriterion): a StoppingCriterion instance
+            integrand (Integrand): an Integrand instance
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
+            fudge (function): positive function multiplying the finite
+                              sum of Fast Fourier coefficients specified 
+                              in the cone of functions
         """
+        # Extract attributes from integrand
+        self.stopping_criterion = stopping_criterion
+        self.integrand = integrand
+        self.measure = self.integrand.measure
+        self.distribution = self.measure.distribution
+        # Set Attributes
         self.m_min = m_min
         self.m_max = m_max
         self.m = self.m_min
@@ -40,20 +51,11 @@ class CubatureData(AccumulateData):
         self.c_stilde_up = tile(inf,int(self.m_max-self.l_star+1))
         super().__init__()
 
-    def update_data(self, integrand, measure):
-        """
-        Update data
-
-        Args:
-            integrand (Integrand): an instance of Integrand
-            measure (TrueMeasure): an instance of TrueMeasure
-
-        Returns:
-            None
-        """
+    def update_data(self):
+        """ Update data """
         # Generate sample values
-        x_lat = measure.gen_samples(n_min=self.n_total,n_max=2**self.m)
-        ynext = integrand.f(x_lat).squeeze()
+        x_lat = self.measure.gen_samples(n_min=self.n_total,n_max=2**self.m)
+        ynext = self.integrand.f(x_lat).squeeze()
         self.yval = hstack((self.yval,ynext))
         ynext = ynext.astype(complex)
         mnext = self.m-1 if self.m>self.m_min else self.m_min

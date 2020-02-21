@@ -16,6 +16,7 @@ from ..accumulate_data import CubatureData
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterError, ParameterWarning
 from numpy import log2
+from time import process_time
 import warnings
 
 class CubLattice_g(StoppingCriterion):
@@ -40,11 +41,11 @@ class CubLattice_g(StoppingCriterion):
 
     parameters = ['abs_tol','rel_tol','n_init','n_max']
 
-    def __init__(self, distribution, abs_tol=1e-2, rel_tol=0,
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2**10, n_max=2**35, fudge = lambda m: 5*2**(-m)):
         """
         Args:
-            distribution (DiscreteDistribution): an instance of DiscreteDistribution
+            integrand (Integrand): an instance of Integrand
             abs_tol (float): absolute error tolerance
             rel_tol (float): relative error tolerance
             n_init (int): initial number of samples
@@ -54,12 +55,6 @@ class CubLattice_g(StoppingCriterion):
                               in the cone of functions
         """
         # Input Checks
-        if not isinstance(distribution,DiscreteDistribution):
-            # must be a list of Distributions objects -> multilevel problem
-            raise NotYetImplemented('''
-                cub_lattice_g not implemented for multi-level problems.
-                Use CLT stopping criterion with an iid distribution for multi-level problems ''')
-        # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
         m_min = log2(n_init)
@@ -74,12 +69,13 @@ class CubLattice_g(StoppingCriterion):
             m_max = 35
         self.n_init = 2**m_min
         self.n_max = 2**m_max
-        self.stage = None
         # Construct AccumulateData Object to House Integration data
-        self.data = CubatureData(m_min, m_max, fudge)
+        self.data = CubatureData(self, integrand, m_min, m_max, fudge)
         # Verify Compliant Construction
+        distribution = integrand.measure.distribution
+        allowed_levels = 'single'
         allowed_distribs = ["Lattice"]
-        super().__init__(distribution, allowed_distribs)
+        super().__init__(distribution, allowed_levels, allowed_distribs)
         if distribution.replications != 0:
             raise ParameterError('CubLattic_g requires distribution to have 0 replications.')
         if not distribution.scramble:
@@ -87,26 +83,33 @@ class CubLattice_g(StoppingCriterion):
         if distribution.backend != 'gail':
             raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
 
-    def stop_yet(self):
+    def integrate(self):
         """ Determine when to stop """
-        # Check the end of the algorithm
-        errest = self.data.fudge(self.data.m)*self.data.stilde
-        # Compute optimal estimator
-        ub = max(self.abs_tol, self.rel_tol*abs(self.data.solution + errest))
-        lb = max(self.abs_tol, self.rel_tol*abs(self.data.solution - errest))
-        self.data.solution = self.data.solution - errest*(ub-lb) / (ub+lb)
-        if 4*errest**2/(ub+lb)**2 <= 1:
-            # stopping criterion met
-            self.stage = 'done'
-        elif self.data.m == self.data.m_max:
-            warning_s = """
-            Alread generated %d samples.
-            Trying to generate %d new samples would exceed n_max = %d.
-            No more samples will be generated.
-            Note that error tolerances may no longer be satisfied""" \
-            % (int(2**self.data.m), int(self.data.m), int(2**self.data.m_max))
-            warnings.warn(warning_s, MaxSamplesWarning)
-            self.stage = 'done'
-        else: # double sample size
-            self.data.m += 1
-                
+        t_start = process_time()
+        while True:
+            self.data.update_data(self.integrand, self.measure)
+            # Check the end of the algorithm
+            errest = self.data.fudge(self.data.m)*self.data.stilde
+            # Compute optimal estimator
+            ub = max(self.abs_tol, self.rel_tol*abs(self.data.solution + errest))
+            lb = max(self.abs_tol, self.rel_tol*abs(self.data.solution - errest))
+            self.data.solution = self.data.solution - errest*(ub-lb) / (ub+lb)
+            if 4*errest**2/(ub+lb)**2 <= 1:
+                # stopping criterion met
+                break
+            elif self.data.m == self.data.m_max:
+                # doubling samples would go over n_max
+                warning_s = """
+                Alread generated %d samples.
+                Trying to generate %d new samples would exceed n_max = %d.
+                No more samples will be generated.
+                Note that error tolerances may no longer be satisfied""" \
+                % (int(2**self.data.m), int(self.data.m), int(2**self.data.m_max))
+                warnings.warn(warning_s, MaxSamplesWarning)
+                break
+            else:
+                # double sample size
+                self.data.m += 1
+        self.data.time_total = process_time() - t_start
+        return self.data.solutin, self.data
+            

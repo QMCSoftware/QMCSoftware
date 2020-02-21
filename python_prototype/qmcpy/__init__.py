@@ -1,4 +1,3 @@
-from .integrate import integrate
 from .discrete_distribution import *
 from .true_measure import *
 from .integrand import *
