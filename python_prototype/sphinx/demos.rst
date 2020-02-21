@@ -16,3 +16,5 @@ Demos
 
     rst_from_demos/quasirandom_generators.rst
 
+    rst_from_demos/nei_demo.rst
+

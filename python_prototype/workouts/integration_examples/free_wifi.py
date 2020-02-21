@@ -11,8 +11,7 @@ t0 = process_time()
 distribution = Lattice(dimension=1, replications=16, scramble=True, seed=7, backend='MPS')
 measure = Lebesgue(distribution, lower_bound=-2, upper_bound=2)
 integrand = QuickConstruct(measure, lambda x: sqrt(4 - x**2) * (1 / 2 + x**3 * cos(x / 2)))
-algorithm = CLTRep(integrand, abs_tol=2.5e-10, n_max=2**30)
-solution,data = algorithm.integrate()
+solution,data = CLTRep(integrand, abs_tol=2.5e-10, n_max=2**30).integrate()
 password = str(solution).replace('.', '')[:10]
 print("Password:", password)  # 3141592653
 print('CPU time: %.2f sec' % (process_time() - t0))  # around 30 seconds

@@ -7,8 +7,8 @@ distribution = Lattice(dimension=16, replications=16, scramble=True, seed=7, bac
 #distribution = IIDStdGaussian(dimension=16, seed=7)
 measure = BrownianMotion(distribution,time_vector=arange(1/16,17/16,1/16))
 integrand = AsianCall(measure)
-algorithm = CLTRep(distribution,abs_tol=.005)
-solution,data = integrate(algorithm,integrand,measure,distribution)
+algorithm = CLTRep(integrand,abs_tol=.001)
+solution,data = algorithm.integrate()
 print(data)
 '''
 # CubLattice (parallel to matlab)
@@ -16,16 +16,7 @@ print(data)
 distribution = Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL')
 measure = Uniform(distribution)
 integrand = QuickConstruct(measure, lambda x: 5*x.sum(1))
-algorithm = CubLattice_g(distribution, abs_tol=1e-4)
-solution, data = integrate(algorithm, integrand, measure, distribution)
+algorithm = CubLattice_g(integrand, abs_tol=1e-4)
+solution,data = algorithm.integrate()
 print(solution)
-'''
-# CubLattice + AsianCall working check
-'''
-distribution = Sobol(dimension=16, replications=16, scramble=True, seed=7, backend="MPS")
-measure = BrownianMotion(distribution,time_vector=arange(1/16,17/16,1/16))
-integrand = AsianCall(measure)
-algorithm = CLTRep(distribution,abs_tol=.001)
-solution,data = integrate(algorithm,integrand,measure,distribution)
-print(data)
 '''

@@ -36,8 +36,7 @@ class TestClt(unittest.TestCase):
         distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        algorithm = CLT(integrand, abs_tol=abs_tol)
-        solution,data = algorithm.integrate()
+        solution,data = CLT(integrand, abs_tol=abs_tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
@@ -67,8 +66,7 @@ class TestCltRep(unittest.TestCase):
         distribution = Sobol(dimension=2, replications=16)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        algorithm = CLTRep(integrand, abs_tol=abs_tol)
-        solution,data = algorithm.integrate()
+        solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
@@ -99,8 +97,7 @@ class TestMeanMC_g(unittest.TestCase):
         distribution = IIDStdGaussian(dimension=2)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        algorithm = MeanMC_g(integrand, abs_tol=abs_tol)
-        solution,data = algorithm.integrate()
+        solution,data = MeanMC_g(integrand, abs_tol=abs_tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
@@ -134,8 +131,7 @@ class TestCubLattice_g(unittest.TestCase):
         distribution = Lattice(dimension=2)
         measure = Gaussian(distribution, variance=1/2)
         integrand = Keister(measure)
-        algorithm = CubLattice_g(integrand, abs_tol=abs_tol)
-        solution,data = algorithm.integrate()
+        solution,data = CubLattice_g(integrand, abs_tol=abs_tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
