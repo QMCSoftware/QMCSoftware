@@ -36,8 +36,7 @@ to the function ``integrate()``.
     distribution = Lattice(dimension=dim, scramble=True, replications=16, seed=7, backend='MPS')
     measure = Gaussian(distribution, variance=1/2)
     integrand = Keister(measure)
-    stopper = CLTRep(distribution,abs_tol=.05)
-    solution,data = integrate(stopper,integrand,measure,distribution)
+    solution,data = CLTRep(integrand,abs_tol=.05).integrate()
     print(data)
 
 
@@ -45,14 +44,14 @@ to the function ``integrate()``.
 
     Solution: 2.1659         
     Keister (Integrand Object)
-    Lattice (Discrete Distribution Object)
+    Lattice (Discrete DiscreteDistribution Object)
     	dimension       3
     	scramble        1
     	replications    16
     	seed            7
     	backend         mps
     	mimics          StdUniform
-    Gaussian (True Measure Object)
+    Gaussian (True TrueMeasure Object)
     	distrib_name    Lattice
     	mean            0
     	variance        0.500
@@ -63,13 +62,13 @@ to the function ``integrate()``.
     	rel_tol         0
     	n_init          256
     	n_max           1073741824
-    MeanVarDataRep (Data Object)
+    MeanVarDataRep (AccumulateData Object)
     	replications    16
     	solution        2.166
     	sighat          0.011
     	n_total         256
     	confid_int      [ 2.164  2.168]
-    	time_total      0.004
+    	time_integrate  0.003
     
 
 
@@ -109,8 +108,7 @@ defined as follows:
         strike_price = 25,
         interest_rate = 0.01,
         mean_type = 'arithmetic')
-    stopper = CLTRep(distribution, abs_tol=.05)
-    solution,data = integrate(stopper, integrand, measure, distribution)
+    solution,data = CLTRep(integrand, abs_tol=.05).integrate()
     print(data)
 
 
@@ -124,14 +122,14 @@ defined as follows:
     	interest_rate   0.010
     	mean_type       arithmetic
     	_dim_frac       0
-    Lattice (Discrete Distribution Object)
+    Lattice (Discrete DiscreteDistribution Object)
     	dimension       64
     	scramble        1
     	replications    16
     	seed            7
     	backend         gail
     	mimics          StdUniform
-    BrownianMotion (True Measure Object)
+    BrownianMotion (True TrueMeasure Object)
     	distrib_name    Lattice
     	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
     CLTRep (Stopping Criterion Object)
@@ -141,13 +139,13 @@ defined as follows:
     	rel_tol         0
     	n_init          256
     	n_max           1073741824
-    MeanVarDataRep (Data Object)
+    MeanVarDataRep (AccumulateData Object)
     	replications    16
     	solution        6.259
     	sighat          0.021
     	n_total         4096
     	confid_int      [ 6.258  6.260]
-    	time_total      0.552
+    	time_integrate  0.704
     
 
 
@@ -194,14 +192,13 @@ last example.
             strike_price = 25,
             interest_rate = 0.01,
             mean_type = 'arithmetic')
-    stopper = CLT(distributions, abs_tol=.05)
-    solution,data = integrate(stopper, integrands, measures, distributions)
+    solution,data = CLT(integrands, abs_tol=.05).integrate()
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 6.2389         
+    Solution: 6.2415         
     MultiLevelConstructor (AsianCall Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -224,13 +221,13 @@ last example.
     	rel_tol         0
     	n_init          1024
     	n_max           10000000000
-    MeanVarData (Data Object)
+    MeanVarData (AccumulateData Object)
     	levels          3
-    	solution        6.239
-    	n               [284574  38751   6045]
-    	n_total         332442
-    	confid_int      [ 6.190  6.288]
-    	time_total      0.106
+    	solution        6.242
+    	n               [280341  41830   6513]
+    	n_total         331756
+    	confid_int      [ 6.193  6.290]
+    	time_integrate  0.096
     
 
 

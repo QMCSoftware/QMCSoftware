@@ -31,8 +31,7 @@ Sample Problem 1
     distribution = IIDStdUniform(dim, seed=7)
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
     integrand = QuickConstruct(measure, lambda x: x**2)
-    stopper = CLT(distribution, abs_tol=abs_tol)
-    solution,data = integrate(stopper, integrand, measure, distribution)
+    solution,data = CLT(integrand, abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 
@@ -49,8 +48,7 @@ Sample Problem 1
     distribution = IIDStdUniform(dim, seed=7)
     measure = Uniform(distribution, lower_bound=a, upper_bound=b)
     integrand = QuickConstruct(measure, lambda x: 2*(x**2))
-    stopper = CLT(distribution, abs_tol=abs_tol)
-    solution,data = integrate(stopper, integrand, measure, distribution)
+    solution,data = CLT(integrand, abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 
@@ -89,8 +87,7 @@ Sample Problem 2
     distribution = Sobol(dim, scramble=True, replications=16, seed=7, backend='MPS')
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
     integrand = QuickConstruct(measure, lambda x: (x**2).sum(1))
-    stopper = CLTRep(distribution, abs_tol=abs_tol)
-    solution,data = integrate(stopper, integrand, measure, distribution)
+    solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
     print('y = %.5f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 
@@ -107,8 +104,7 @@ Sample Problem 2
     distribution = Sobol(dim, scramble=True, replications=16, seed=7, backend='MPS')
     measure = Uniform(distribution, lower_bound=a, upper_bound=b)
     integrand = QuickConstruct(measure, lambda x: (b-a).prod()*(x**2).sum(1))
-    stopper = CLTRep(distribution, abs_tol=abs_tol)
-    solution,data = integrate(stopper, integrand, measure, distribution)
+    solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
     print('y = %.5f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 
@@ -144,8 +140,7 @@ Mathematica Code: ``Integrate[Sin[x]/Log[x], {x,a,b}]``
     distribution = Lattice(dim, scramble=True, replications=0, seed=7, backend='GAIL')
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
     integrand = QuickConstruct(measure, lambda x: sin(x)/log(x))
-    stopper = CubLattice_g(distribution, abs_tol=abs_tol)
-    solution,data = integrate(stopper, integrand, measure, distribution)
+    solution,data = CubLattice_g(integrand, abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 

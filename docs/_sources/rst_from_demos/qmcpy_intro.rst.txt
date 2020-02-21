@@ -24,10 +24,9 @@ below.
 
 .. code:: ipython3
 
-    from qmcpy import integrate
     from qmcpy.integrand import *
-    from qmcpy.measure import *
-    from qmcpy.distribution import *
+    from qmcpy.true_measure import *
+    from qmcpy.discrete_distribution import *
     from qmcpy.stopping_criterion import *
 
 Lastly, we can import all objects from the package using an asterisk.
@@ -217,8 +216,7 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
     distribution = IIDStdUniform(dimension=dim, seed=7)
     measure = Uniform(distribution)
     integrand = QuickConstruct(measure, custom_fun=f)
-    stopper = CLT(distribution,abs_tol=abs_tol,rel_tol=0)
-    solution,data = integrate(stopper,integrand,measure,distribution)
+    solution,data = CLT(integrand,abs_tol=abs_tol,rel_tol=0).integrate()
     print(data)
 
 
@@ -226,11 +224,11 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
 
     Solution: 0.6575         
     QuickConstruct (Integrand Object)
-    IIDStdUniform (Discrete Distribution Object)
+    IIDStdUniform (Discrete DiscreteDistribution Object)
     	dimension       1
     	seed            7
     	mimics          StdUniform
-    Uniform (True Measure Object)
+    Uniform (True TrueMeasure Object)
     	distrib_name    IIDStdUniform
     	lower_bound     0
     	upper_bound     1
@@ -241,13 +239,13 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
     	rel_tol         0
     	n_init          1024
     	n_max           10000000000
-    MeanVarData (Data Object)
+    MeanVarData (AccumulateData Object)
     	levels          1
     	solution        0.658
     	n               3305
     	n_total         4329
     	confid_int      [ 0.647  0.668]
-    	time_total      0.002
+    	time_integrate  0.002
     
 
 
@@ -276,8 +274,7 @@ changing the input parameter value of dimension for QuickConstruct?
     distribution = IIDStdUniform(dimension=dim, seed=7)
     measure = Uniform(distribution)
     integrand = QuickConstruct(measure, custom_fun=f)
-    stopper = CLT(distribution,abs_tol=abs_tol,rel_tol=0)
-    solution2,data2 = integrate(stopper,integrand,measure,distribution)
+    solution2,data2 = CLT(integrand,abs_tol=abs_tol,rel_tol=0).integrate()
     print(data2)
 
 
@@ -285,11 +282,11 @@ changing the input parameter value of dimension for QuickConstruct?
 
     Solution: 0.8309         
     QuickConstruct (Integrand Object)
-    IIDStdUniform (Discrete Distribution Object)
+    IIDStdUniform (Discrete DiscreteDistribution Object)
     	dimension       2
     	seed            7
     	mimics          StdUniform
-    Uniform (True Measure Object)
+    Uniform (True TrueMeasure Object)
     	distrib_name    IIDStdUniform
     	lower_bound     0
     	upper_bound     1
@@ -300,13 +297,13 @@ changing the input parameter value of dimension for QuickConstruct?
     	rel_tol         0
     	n_init          1024
     	n_max           10000000000
-    MeanVarData (Data Object)
+    MeanVarData (AccumulateData Object)
     	levels          1
     	solution        0.831
     	n               5452
     	n_total         6476
     	confid_int      [ 0.821  0.841]
-    	time_total      0.002
+    	time_integrate  0.002
     
 
 

@@ -190,10 +190,9 @@ environment. First, we can import the package <code class="docutils literal notr
 </div>
 <p>Alternatively, we can import individual objects from ‘qmcpy’ as shown
 below.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qmcpy</span> <span class="kn">import</span> <span class="n">integrate</span>
-<span class="kn">from</span> <span class="nn">qmcpy.integrand</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">qmcpy.measure</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">qmcpy.distribution</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qmcpy.integrand</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">qmcpy.true_measure</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">qmcpy.discrete_distribution</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">qmcpy.stopping_criterion</span> <span class="kn">import</span> <span class="o">*</span>
 </pre></div>
 </div>
@@ -313,18 +312,17 @@ class in QMCPy and then invoke QMCPy’s <code class="docutils literal notransla
 <span class="n">distribution</span> <span class="o">=</span> <span class="n">IIDStdUniform</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="n">measure</span> <span class="o">=</span> <span class="n">Uniform</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span>
 <span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">measure</span><span class="p">,</span> <span class="n">custom_fun</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-<span class="n">stopper</span> <span class="o">=</span> <span class="n">CLT</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span><span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">,</span><span class="n">rel_tol</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">solution</span><span class="p">,</span><span class="n">data</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">stopper</span><span class="p">,</span><span class="n">integrand</span><span class="p">,</span><span class="n">measure</span><span class="p">,</span><span class="n">distribution</span><span class="p">)</span>
+<span class="n">solution</span><span class="p">,</span><span class="n">data</span> <span class="o">=</span> <span class="n">CLT</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span><span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">,</span><span class="n">rel_tol</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.6575</span>
 <span class="n">QuickConstruct</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
-<span class="n">IIDStdUniform</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">Distribution</span> <span class="n">Object</span><span class="p">)</span>
+<span class="n">IIDStdUniform</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">DiscreteDistribution</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">dimension</span>       <span class="mi">1</span>
     <span class="n">seed</span>            <span class="mi">7</span>
     <span class="n">mimics</span>          <span class="n">StdUniform</span>
-<span class="n">Uniform</span> <span class="p">(</span><span class="kc">True</span> <span class="n">Measure</span> <span class="n">Object</span><span class="p">)</span>
+<span class="n">Uniform</span> <span class="p">(</span><span class="kc">True</span> <span class="n">TrueMeasure</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">distrib_name</span>    <span class="n">IIDStdUniform</span>
     <span class="n">lower_bound</span>     <span class="mi">0</span>
     <span class="n">upper_bound</span>     <span class="mi">1</span>
@@ -335,13 +333,13 @@ class in QMCPy and then invoke QMCPy’s <code class="docutils literal notransla
     <span class="n">rel_tol</span>         <span class="mi">0</span>
     <span class="n">n_init</span>          <span class="mi">1024</span>
     <span class="n">n_max</span>           <span class="mi">10000000000</span>
-<span class="n">MeanVarData</span> <span class="p">(</span><span class="n">Data</span> <span class="n">Object</span><span class="p">)</span>
+<span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumulateData</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">levels</span>          <span class="mi">1</span>
     <span class="n">solution</span>        <span class="mf">0.658</span>
     <span class="n">n</span>               <span class="mi">3305</span>
     <span class="n">n_total</span>         <span class="mi">4329</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.647</span>  <span class="mf">0.668</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.002</span>
+    <span class="n">time_integrate</span>  <span class="mf">0.002</span>
 </pre></div>
 </div>
 <p>For our integral, we know the true value. Let’s check if QMCPy’s
@@ -361,18 +359,17 @@ changing the input parameter value of dimension for QuickConstruct?</p>
 <span class="n">distribution</span> <span class="o">=</span> <span class="n">IIDStdUniform</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="n">measure</span> <span class="o">=</span> <span class="n">Uniform</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span>
 <span class="n">integrand</span> <span class="o">=</span> <span class="n">QuickConstruct</span><span class="p">(</span><span class="n">measure</span><span class="p">,</span> <span class="n">custom_fun</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-<span class="n">stopper</span> <span class="o">=</span> <span class="n">CLT</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span><span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">,</span><span class="n">rel_tol</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">solution2</span><span class="p">,</span><span class="n">data2</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">stopper</span><span class="p">,</span><span class="n">integrand</span><span class="p">,</span><span class="n">measure</span><span class="p">,</span><span class="n">distribution</span><span class="p">)</span>
+<span class="n">solution2</span><span class="p">,</span><span class="n">data2</span> <span class="o">=</span> <span class="n">CLT</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span><span class="n">abs_tol</span><span class="o">=</span><span class="n">abs_tol</span><span class="p">,</span><span class="n">rel_tol</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data2</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">0.8309</span>
 <span class="n">QuickConstruct</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
-<span class="n">IIDStdUniform</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">Distribution</span> <span class="n">Object</span><span class="p">)</span>
+<span class="n">IIDStdUniform</span> <span class="p">(</span><span class="n">Discrete</span> <span class="n">DiscreteDistribution</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">dimension</span>       <span class="mi">2</span>
     <span class="n">seed</span>            <span class="mi">7</span>
     <span class="n">mimics</span>          <span class="n">StdUniform</span>
-<span class="n">Uniform</span> <span class="p">(</span><span class="kc">True</span> <span class="n">Measure</span> <span class="n">Object</span><span class="p">)</span>
+<span class="n">Uniform</span> <span class="p">(</span><span class="kc">True</span> <span class="n">TrueMeasure</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">distrib_name</span>    <span class="n">IIDStdUniform</span>
     <span class="n">lower_bound</span>     <span class="mi">0</span>
     <span class="n">upper_bound</span>     <span class="mi">1</span>
@@ -383,13 +380,13 @@ changing the input parameter value of dimension for QuickConstruct?</p>
     <span class="n">rel_tol</span>         <span class="mi">0</span>
     <span class="n">n_init</span>          <span class="mi">1024</span>
     <span class="n">n_max</span>           <span class="mi">10000000000</span>
-<span class="n">MeanVarData</span> <span class="p">(</span><span class="n">Data</span> <span class="n">Object</span><span class="p">)</span>
+<span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumulateData</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">levels</span>          <span class="mi">1</span>
     <span class="n">solution</span>        <span class="mf">0.831</span>
     <span class="n">n</span>               <span class="mi">5452</span>
     <span class="n">n_total</span>         <span class="mi">6476</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">0.821</span>  <span class="mf">0.841</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.002</span>
+    <span class="n">time_integrate</span>  <span class="mf">0.002</span>
 </pre></div>
 </div>
 <p>Once again, we could test for accuracy of QMCPy with respect to the true

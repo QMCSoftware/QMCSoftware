@@ -1,12 +1,6 @@
 QMCPy Documentation
 ===================
 
-Integration Method
-------------------
-
-.. automodule:: qmcpy.integrate
-    :members:
-
 Integrand Class
 ---------------
 
@@ -41,96 +35,96 @@ Quick Construct for Function
 Measure Class
 -------------
 
-.. The following extract documentation in qmcpy.measures.__init__.py
-.. automodule:: qmcpy.measure
+.. The following extract documentation in qmcpy.true_measure.__init__.py
+.. automodule:: qmcpy.true_measure
     :members:
 
 Uniform
 ........
 
-.. automodule:: qmcpy.measure.uniform
+.. automodule:: qmcpy.true_measure.uniform
     :members:
 
 Gaussian
 .........
 
-.. automodule:: qmcpy.measure.gaussian
+.. automodule:: qmcpy.true_measure.gaussian
     :members:
 
 Brownian Motion
 ................
 
-.. automodule:: qmcpy.measure.brownian_motion
+.. automodule:: qmcpy.true_measure.brownian_motion
     :members:
 
 Lebesgue
 .........
 
-.. automodule:: qmcpy.measure.lebesgue
+.. automodule:: qmcpy.true_measure.lebesgue
     :members:
 
 Discrete Distribution Class
 ---------------------------
 
-.. The following extract documentation in qmcpy.distribution.__init__.py
-.. automodule:: qmcpy.distribution
+.. The following extract documentation in qmcpy.discrete_distribution.__init__.py
+.. automodule:: qmcpy.discrete_distribution
     :members:
 
 IID Standard Uniform
 .....................
 
-.. automodule:: qmcpy.distribution.iid_std_uniform
+.. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
 IID Standard Gaussian
 ......................
 
-.. automodule:: qmcpy.distribution.iid_std_gaussian
+.. automodule:: qmcpy.distridiscrete_distributionbution.iid_std_gaussian
     :members:
 
 Lattice
 ........
-.. automodule:: qmcpy.distribution.lattice.lattice
+.. automodule:: qmcpy.discrete_distribution.lattice.lattice
     :members:
 
-.. automodule:: qmcpy.distribution.lattice.mps_lattice
+.. automodule:: qmcpy.discrete_distribution.lattice.mps_lattice
     :members:
 
-.. automodule:: qmcpy.distribution.lattice.gail_lattice
+.. automodule:: qmcpy.discrete_distribution.lattice.gail_lattice
     :members:
 
 Sobol
 ......
 
-.. automodule:: qmcpy.distribution.sobol.sobol
+.. automodule:: qmcpy.discrete_distribution.sobol.sobol
     :members:
 
-.. automodule:: qmcpy.distribution.sobol.mps_sobol
+.. automodule:: qmcpy.discrete_distribution.sobol.mps_sobol
     :members:
 
 Data Class
 ----------
 
-.. The following extract documentation in qmcpy.data.__init__.py
-.. automodule:: qmcpy.data
+.. The following extract documentation in qmcpy.accumulate_data.__init__.py
+.. automodule:: qmcpy.accumulate_data
     :members:
 
 Mean Variance Data
 ...................
 
-.. automodule:: qmcpy.data.mean_var_data
+.. automodule:: qmcpy.accumulate_data.mean_var_data
     :members:
 
 Mean Variance for Replications Data
 ....................................
 
-.. automodule:: qmcpy.data.mean_var_data_rep
+.. automodule:: qmcpy.accumulate_data.mean_var_data_rep
     :members:
 
 Cubature Data
 ..............
 
-.. automodule:: qmcpy.data.cubature_data
+.. automodule:: qmcpy.accumulate_data.cubature_data
     :members:
 
 Stopping Criterion Class

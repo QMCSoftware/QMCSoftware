@@ -221,8 +221,7 @@ Plots samples on a 2D Keister function
     distribution = IIDStdGaussian(dimension=2, seed=7)
     measure = Gaussian(distribution, variance=1/2)
     integrand = Keister(measure)
-    stopper = CLT(distribution,abs_tol=abs_tol,rel_tol=0,n_init=16, n_max=1e10)
-    solution,data = integrate(stopper,integrand,measure,distribution)
+    solution,data = CLT(integrand,abs_tol=abs_tol,rel_tol=0,n_init=16, n_max=1e10).integrate()
     print(data)
 
 
@@ -230,11 +229,11 @@ Plots samples on a 2D Keister function
 
     Solution: 2.0554         
     Keister (Integrand Object)
-    IIDStdGaussian (Discrete Distribution Object)
+    IIDStdGaussian (Discrete DiscreteDistribution Object)
     	dimension       2
     	seed            7
     	mimics          StdGaussian
-    Gaussian (True Measure Object)
+    Gaussian (True TrueMeasure Object)
     	distrib_name    IIDStdGaussian
     	mean            0
     	variance        0.500
@@ -245,13 +244,13 @@ Plots samples on a 2D Keister function
     	rel_tol         0
     	n_init          16
     	n_max           10000000000
-    MeanVarData (Data Object)
+    MeanVarData (AccumulateData Object)
     	levels          1
     	solution        2.055
     	n               65
     	n_total         81
     	confid_int      [ 1.646  2.464]
-    	time_total      0.001
+    	time_integrate  0.001
     
 
 
