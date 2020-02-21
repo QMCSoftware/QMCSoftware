@@ -1,5 +1,7 @@
 """ Multi-level abstract class """
 
+from ..integrand._integrand import Integrand
+from ..true_measure._true_measure import TrueMeasure
 from . import univ_repr
 from numpy import repeat
 
@@ -20,6 +22,10 @@ class MultiLevelConstructor(object):
         """
         self.kwargs = kwargs
         self.ex_qmcpy_obj = object.__new__(qmcpy_object) 
+        if isinstance(self.ex_qmcpy_obj,Integrand):
+            self.measure = kwargs['measure']
+        elif isinstance(self.ex_qmcpy_obj,TrueMeasure):
+            self.distribution = kwargs['distribution']
         self.name = type(self.ex_qmcpy_obj).__name__
         self.levels = levels
         for key,val in self.kwargs.items():

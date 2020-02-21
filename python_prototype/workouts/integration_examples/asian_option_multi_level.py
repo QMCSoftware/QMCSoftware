@@ -40,8 +40,8 @@ def asian_option_multi_level(
             strike_price = strike_price,
             interest_rate = interest_rate,
             mean_type = mean_type)
-    algorithm = CLT(distributions, abs_tol=abs_tol)
-    solution,data = integrate(algorithm, integrands, measures, distributions)
+    algorithm = CLT(integrands, abs_tol=abs_tol)
+    solution,data = algorithm.integrate()
     print('%s%s'%(data,bar))
 
 
