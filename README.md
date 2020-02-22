@@ -10,7 +10,13 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 
 
 ---
+##  Project 
 
+Homepage: [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/) 
+
+Code repostiory:  [https://github.com/QMCSoftware/QMCSoftware](https://github.com/QMCSoftware/QMCSoftware)
+
+---
 ## Citation
 
 If you find QMCPy helpful in your work, please support us by citing the following work:
@@ -24,9 +30,7 @@ Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community So
 PDF and EPUB ocumentation of QMCPy is available for download at  Read the Docs website
 [https://readthedocs.org/projects/qmcpy/downloads/](https://readthedocs.org/projects/qmcpy/downloads/).
 
-In addition, we have HTML documentation can be browsed at
- [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/) 
- or [https://qmcpy.readthedocs.io/en/latest/](https://qmcpy.readthedocs.io/en/latest/)
+In addition, we have HTML documentation at [https://qmcpy.readthedocs.io/en/latest/](https://qmcpy.readthedocs.io/en/latest/)
 
 ---
 

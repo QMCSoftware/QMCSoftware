@@ -72,8 +72,8 @@ make clean;
 
 make html
 
-rm -fr ../../docs;  mkdir ../../docs;
-cp -a _build/html/. ../../docs;
+#rm -fr ../../docs;  mkdir ../../docs;
+#cp -a _build/html/. ../../docs;
 
 ################################################################################
 # Use sphinx to generate PDF documentation
@@ -97,14 +97,14 @@ cp -a _build/html/. ../../docs;
 ################################################################################
 # For https://qmcpy.readthedocs.io
 ################################################################################
-grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
+#grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
 
-cp ../requirements.txt ../../docs
+#cp ../requirements.txt ../../docs
 
-cp ../../README.md ../../docs
+#cp ../../README.md ../../docs
 
-cd ../..
+#cd ../..
 
-git add -f docs
+#git add -f docs
 
 echo "QMCPy autodoc process ends..."
