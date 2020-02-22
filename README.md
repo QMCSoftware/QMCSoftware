@@ -81,7 +81,7 @@ We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.
 
 ---
 
-![IIT](python_prototype/sphinx/logo/IIT_logo.png )
+![IIT](python_prototype/sphinx/logo/IIT_logo.png)
 
 ![SigOpt](python_prototype/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg)
 
