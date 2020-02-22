@@ -3,20 +3,7 @@ Demo of NEI
 
 You can also look at the Botorch implementation, but that requires a lot
 more understanding of code which involves Pytorch. So I tried to put a
-simple example together here. :math:`\DeclareMathOperator{\EI}{EI}`
-:math:`\DeclareMathOperator{\NEI}{NEI}`
-:math:`\newcommand{\cD}{\mathcal{D}}`
-:math:`\newcommand{\cN}{\mathcal{N}}`
-:math:`\newcommand{\cX}{\mathcal{X}}`
-:math:`\newcommand{\eep}{\boldsymbol{\epsilon}}`
-:math:`\newcommand{\ff}{\mathbf{f}}`
-:math:`\newcommand{\kk}{\mathbf{k}}`
-:math:`\newcommand{\xx}{\mathbf{x}}`
-:math:`\newcommand{\yy}{\mathbf{y}}`
-:math:`\newcommand{\RR}{\mathbb{R}}` :math:`\newcommand{\dif}{\text{d}}`
-:math:`\newcommand{\mE}{\mathsf{E}}`
-:math:`\newcommand{\mI}{\mathsf{I}}`
-:math:`\newcommand{\mK}{\mathsf{K}}`
+simple example together here.
 
 .. code:: ipython3
 
@@ -127,7 +114,7 @@ because we have a Gaussian process model), we generally study the
 expected value of this, which is plotted below. Written as an integral,
 this would look like
 
-.. math:: \EI(x) = \int_{-\infty}^\infty (y - y^*)_+\, p_{Y_x|\mathcal{D}}(y)\; \text{d}y
+.. math:: \EI(x) = \int_{-\infty}^\infty (y - y^*)_+\, p_{Y_x|\mathcal{D}}(y)\; \mbox{d}y.
 
 **NOTE**: This quantity is written for maximization here, but most of
 the literature is concerned with minimization. I can rewrite this if
@@ -213,7 +200,7 @@ cdf, and
 
 .. math:: \mu=\kk(x)^T(\mK+\mE)^{-1}\yy,\qquad s^2 = K(x, x)-\kk(x)^T(\mK+\mE)^{-1}\kk(x),\qquad z=(\mu - y^*)/s.
 
- It is very important to remember that these quantities are functions of
+It is very important to remember that these quantities are functions of
 :math:`\yy,\cX,\eep` despite the absence of those quantities in the
 notation.
 
@@ -328,7 +315,7 @@ form, which we do have for a GP situation).
 
 
 Computation of the QEI quantity using ``qmcpy``
-===============================================
+-----------------------------------------------
 
 NEI is an important quantity, but there are other quantities as well
 which could be considered relevant demonstrations of higher dimensional
@@ -415,7 +402,7 @@ it is written here in a simplified version.
 
 .. parsed-literal::
 
-    <matplotlib.legend.Legend at 0x7fcc410929d0>
+    <matplotlib.legend.Legend at 0x7f80f0ec5fd0>
 
 
 

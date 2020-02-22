@@ -53,7 +53,7 @@ DIRSUFFIX="_files"
 for f in $FILES
 do
   echo "Processing $f file..."
-  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f --to rst
+  jupyter-nbconvert --execute --TagRemovePreprocessor.remove_cell_tags='{"remove_cell"}' --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f --to rst
   file=${f%.ipynb}
   echo $file
 done
