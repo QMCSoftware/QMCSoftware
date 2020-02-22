@@ -134,3 +134,15 @@ Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D.
 Nuyens, eds.), Springer Proceedings in Mathematics and Statistics,
 vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA],
 pp. 367-383.
+
+--------------
+
+.. figure:: python_prototype/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg
+   :alt: IIT
+
+   IIT
+
+.. figure:: python_prototype/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg
+   :alt: SigOpt
+
+   SigOpt
