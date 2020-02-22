@@ -52,12 +52,10 @@ rm -fr $DIR/*
 DIRSUFFIX="_files"
 for f in $FILES
 do
-  if [  "${f}" != "nei_demo.ipynb" ]; then
-    echo "Processing $f file..."
-    jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f --to rst
-    file=${f%.ipynb}
-    echo $file
-  fi
+  echo "Processing $f file..."
+  jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f --to rst
+  file=${f%.ipynb}
+  echo $file
 done
 mv *_files $DIR/
 mv *.rst $DIR

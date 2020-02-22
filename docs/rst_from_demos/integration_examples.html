@@ -105,6 +105,8 @@
 <li class="toctree-l2"><a class="reference internal" href="MC_vs_QMC.html#dimension-plots">Dimension Plots</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quasirandom_generators.html">Quasi-Random Sequence Generator Comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quasirandom_generators.html#magic-point-shop-vs-pytorch-for-sobol-backend">Magic Point Shop vs Pytorch for Sobol Backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nei_demo.html">Demo of NEI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nei_demo.html#computation-of-the-qei-quantity-using-qmcpy">Computation of the QEI quantity using <code class="docutils literal notranslate"><span class="pre">qmcpy</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -226,7 +228,7 @@ to the function <code class="docutils literal notranslate"><span class="pre">int
     <span class="n">n</span>               <span class="mi">32</span>
     <span class="n">n_total</span>         <span class="mi">32</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">2.126</span>  <span class="mf">2.169</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.007</span>
+    <span class="n">time_total</span>      <span class="mf">0.004</span>
     <span class="n">r</span>               <span class="mi">16</span>
 </pre></div>
 </div>
@@ -291,7 +293,7 @@ stock prices at <img class="math" src="../_images/math/badad346f6fbe2e237af99bfb
     <span class="n">n</span>               <span class="mi">2048</span>
     <span class="n">n_total</span>         <span class="mi">2048</span>
     <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.257</span>  <span class="mf">6.262</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.499</span>
+    <span class="n">time_total</span>      <span class="mf">0.328</span>
     <span class="n">r</span>               <span class="mi">16</span>
 </pre></div>
 </div>
@@ -326,7 +328,7 @@ last example.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">6.2549</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="mf">6.2584</span>
 <span class="n">AsianCall</span> <span class="p">(</span><span class="n">Integrand</span> <span class="n">Object</span><span class="p">)</span>
     <span class="n">volatility</span>      <span class="p">[</span> <span class="mf">0.500</span>  <span class="mf">0.500</span>  <span class="mf">0.500</span><span class="p">]</span>
     <span class="n">start_price</span>     <span class="p">[</span><span class="mi">30</span> <span class="mi">30</span> <span class="mi">30</span><span class="p">]</span>
@@ -348,10 +350,10 @@ last example.</p>
     <span class="n">inflate</span>         <span class="mf">1.200</span>
     <span class="n">alpha</span>           <span class="mf">0.010</span>
 <span class="n">MeanVarData</span> <span class="p">(</span><span class="n">AccumData</span> <span class="n">Object</span><span class="p">)</span>
-    <span class="n">n</span>               <span class="p">[</span> <span class="mf">282632.000</span>  <span class="mf">37446.000</span>  <span class="mf">6421.000</span><span class="p">]</span>
-    <span class="n">n_total</span>         <span class="mi">329571</span>
-    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.206</span>  <span class="mf">6.304</span><span class="p">]</span>
-    <span class="n">time_total</span>      <span class="mf">0.164</span>
+    <span class="n">n</span>               <span class="p">[</span> <span class="mf">299256.000</span>  <span class="mf">24068.000</span>  <span class="mf">9433.000</span><span class="p">]</span>
+    <span class="n">n_total</span>         <span class="mi">335829</span>
+    <span class="n">confid_int</span>      <span class="p">[</span> <span class="mf">6.209</span>  <span class="mf">6.307</span><span class="p">]</span>
+    <span class="n">time_total</span>      <span class="mf">0.117</span>
 </pre></div>
 </div>
 </div>
