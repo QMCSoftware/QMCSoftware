@@ -25,8 +25,6 @@ ideas with those implemented by the rest of the QMC community, we also
 aim to provide practitioners with state-of-the-art QMC software for
 their applications.
 
---------------
-
 Citation
 --------
 
@@ -45,8 +43,7 @@ Documentation
 PDF and EPUB ocumentation of QMCPy is available for download at Read the
 Docs website https://readthedocs.org/projects/qmcpy/downloads/.
 
-In addition, we have HTML documentation can be browsed at
-https://qmcsoftware.github.io/QMCSoftware/ or
+In addition, we have HTML documentation at
 https://qmcpy.readthedocs.io/en/latest/
 
 --------------
