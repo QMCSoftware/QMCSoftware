@@ -81,8 +81,8 @@ We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.
 
 ---
 
-![IIT](python_prototype/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg )
-
-
-![SigOpt](python_prototype/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg)
-
+<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/python_prototype/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg"
+     alt="IIT logo" style="float: left; margin-right: 10px;" />
+     
+<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/python_prototype/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg"
+     alt="IIT logo" style="float: left; margin-right: 10px;" />
