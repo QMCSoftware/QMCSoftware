@@ -54,8 +54,8 @@ extensions = ["sphinx.ext.autodoc",
               "sphinx.ext.ifconfig",
               "sphinx.ext.githubpages",
               "sphinx_markdown_tables",
-              #"sphinx.ext.autosummary",
-              "numpydoc" # to eliminate WARNING: Unexpected section title. Uncomment will surface randint documentation
+              # "sphinx.ext.autosummary",
+              # "numpydoc" # to eliminate WARNING: Unexpected section title. Uncomment will surface randint documentation
               ]
 
 
