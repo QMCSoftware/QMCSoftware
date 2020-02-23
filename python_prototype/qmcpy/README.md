@@ -1,7 +1,5 @@
 # QMCPy
 
---- 
-
 ## Integrand
 The function to integrate<br>
 *Abstract class with concrete implementations*

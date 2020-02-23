@@ -1,7 +1,5 @@
 # Python 3 Library of QMC Software
 
----
-
 ## QMCPy
 Package of main components<br>
 

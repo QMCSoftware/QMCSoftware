@@ -4,8 +4,6 @@
 
 # Quasi-Monte Carlo Community Software
 
----
-
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications. 
 
 
@@ -81,8 +79,8 @@ We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.
 
 ---
 
-<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/python_prototype/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg"
-     alt="IIT logo" style="float: left; margin-right: 10px;" />
+## Sponsors
+
+<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/python_prototype/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg" alt="IIT logo"/>
      
-<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/python_prototype/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg"
-     alt="SigOpt logo" style="float: left; margin-right: 10px;" />
+<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/python_prototype/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg" alt="SigOpt logo"/>
