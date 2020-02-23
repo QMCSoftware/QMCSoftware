@@ -5,8 +5,6 @@
 Python 3 Library of QMC Software
 ================================
 
---------------
-
 QMCPy
 -----
 

@@ -5,8 +5,6 @@
 Quasi-Monte Carlo Community Software
 ====================================
 
---------------
-
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate
 integrals. They have four main components: an integrand, a discrete
 distribution, summary output data, and stopping criterion. Information
@@ -136,3 +134,6 @@ vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA],
 pp. 367-383.
 
 --------------
+
+Sponsors
+--------

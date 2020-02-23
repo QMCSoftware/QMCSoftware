@@ -2,20 +2,16 @@ Quasi-Random Sequence Generator Comparison
 ==========================================
 
 QMCPy’s low-discrepancy-sequence generators are built upon generators
-developed by 1. D. Nuyens, *The Magic Point Shop of QMC point generators
-and generating vectors.*\  MATLAB and Python software, 2018. Available
-from https://people.cs.kuleuven.be/~dirk.nuyens/ 2. PyTorch: An
-Imperative Style, High-Performance Deep Learning Library. Paszke, Adam
-and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James
-and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein,
-Natalia and Antiga, Luca and Desmaison, Alban and Kopf, Andreas and
-Yang, Edward and DeVito, Zachary and Raison, Martin and Tejani, Alykhan
-and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai,
-Junjie and Chintala, Soumith. Advances in Neural Information Processing
-Systems 32. H. Wallach and H. Larochelle and A. Beygelzimer and F.
-d:raw-latex:`\textquotesingle `Alch'{e}-Buc and E. Fox and R. Garnett.
-Pages 8024–8035. 2019. Curran Associates,
-Inc.http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf
+developed by
+
+1. D. Nuyens, *The Magic Point Shop of QMC point generators and
+   generating vectors.* MATLAB and Python software, 2018. Available from
+   https://people.cs.kuleuven.be/~dirk.nuyens/
+
+2. Paszke, Adam, et al., *PyTorch: An imperative style, high-performance
+   deep learning library.* Advances in Neural Information Processing
+   Systems, 2019. Available from
+   https://papers.nips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf.
 
 .. code:: ipython3
 
