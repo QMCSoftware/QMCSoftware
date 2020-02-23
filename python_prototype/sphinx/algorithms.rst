@@ -45,14 +45,26 @@ Measure Class
 .. automodule:: qmcpy.true_measure
     :members:
 
+Uniform
+.........................
+
 .. automodule:: qmcpy.true_measure.uniform
     :members:
+
+Gaussian
+.........................
 
 .. automodule:: qmcpy.true_measure.gaussian
     :members:
 
+Brownian Motion
+.........................
+
 .. automodule:: qmcpy.true_measure.brownian_motion
     :members:
+
+Lebesgue
+.........................
 
 .. automodule:: qmcpy.true_measure.lebesgue
     :members:
@@ -64,15 +76,26 @@ Discrete Distribution Class
 .. automodule:: qmcpy.discrete_distribution
     :members:
 
+Uniform
+.........................
+
 .. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
+
+Gaussian
+.........................
 
 .. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
     :members:
 
+Lattice
+.........................
+
 .. automodule:: qmcpy.discrete_distribution.lattice
     :members:
 
+Sobol
+.........................
 .. automodule:: qmcpy.discrete_distribution.sobol
     :members:
 
@@ -82,6 +105,7 @@ Data Class
 .. The following extract documentation in qmcpy.accum_data.__init__.py
 .. automodule:: qmcpy.accum_data
     :members:
+
 
 .. automodule:: qmcpy.accum_data.mean_var_data
     :members:

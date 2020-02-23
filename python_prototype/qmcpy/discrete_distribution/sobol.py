@@ -16,8 +16,11 @@ class Sobol(DiscreteDistribution):
 
     def __init__(self, rng_seed=None, backend='mps'):
         """
+        Initialize Sobol sequence generator.
+
         Args:
             rng_seed (int): seed the random number generator for reproducibility
+
         """
         self.mimics = 'StdUniform'
         self.rng_seed = rng_seed
@@ -31,7 +34,7 @@ class Sobol(DiscreteDistribution):
 
     def gen_dd_samples(self, replications, n_samples, dimensions, scramble=True):
         """
-        Generate r nxd Sobol samples
+        Generate r samples of nxd Sobol points.
 
         Args:
             replications (int): Number of nxd matrices to generate (sample.size()[0])
@@ -41,6 +44,7 @@ class Sobol(DiscreteDistribution):
 
         Returns:
             replications x n_samples x dimensions (numpy array)
+
         """
         if (log2(n_samples)) % 1 != 0:
             raise Exception("n_samples must be a power of 2")
