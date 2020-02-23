@@ -25,16 +25,17 @@ class Lattice(DiscreteDistribution):
 
     def gen_dd_samples(self, replications, n_samples, dimensions, scramble=True):
         """
-        Generate r nxd Lattice samples
+        Generate :math:`r n \cdot d` lattice samples
 
         Args:
-            replications (int): Number of nxd matrices to generate (sample.size()[0])
-            n_samples (int): Number of observations (sample.size()[1])
-            dimensions (int): Number of dimensions (sample.size()[2])
+            replications (int): :math:`r`, number of nxd matrices to generate (sample.size()[0])
+            n_samples (int): :math:`n`, number of observations (sample.size()[1])
+            dimensions (int): :math:`d`, number of dimensions (sample.size()[2])
             scramble (bool): If true, random numbers are in unit cube, otherwise they are non-negative integers
 
         Returns:
-            replications x n_samples x dimensions (numpy array)
+            x (numpy.array) of size :math:`r \cdot n \cdot d`
+
         """
         m = log2(n_samples)
         if m % 1 != 0:
@@ -85,6 +86,7 @@ class Lattice(DiscreteDistribution):
 
         Returns:
             string of self info
+
         """
         attributes = ['mimics', 'rng_seed']
         return super().__repr__(attributes)

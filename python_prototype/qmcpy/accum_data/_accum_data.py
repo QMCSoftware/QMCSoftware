@@ -9,7 +9,7 @@ class AccumData(object):
     sample mean and variance of integrand values
 
     Attributes:
-        stage (str): stage of computation; "begin", or "done" when finished
+        stage (str): stage of computation; `begin`, or `done` when finished
         n_samples_total (array-like): number of samples used so far
         confid_int (array-like (2, 1)): error bound on the solution
         time_total (float): total computation time. Set by integrate method.

@@ -1,10 +1,9 @@
 """ Definition for Sobol, a concrete implementation of DiscreteDistribution """
 
-import warnings
-
-from numpy import array, int64, log2, repeat, zeros
-from numpy.random import Generator, PCG64, randint
+from numpy import array, int64, log2, random, repeat, zeros
+import numpy.random as npr
 from torch.quasirandom import SobolEngine
+import warnings
 
 from ._discrete_distribution import DiscreteDistribution
 from .mps_refactor import DigitalSeq
@@ -34,16 +33,16 @@ class Sobol(DiscreteDistribution):
 
     def gen_dd_samples(self, replications, n_samples, dimensions, scramble=True):
         """
-        Generate r samples of nxd Sobol points.
+        Generate :math:`r` samples of :math:`n \cdot d` Sobol points.
 
         Args:
-            replications (int): Number of nxd matrices to generate (sample.size()[0])
-            n_samples (int): Number of observations (sample.size()[1])
-            dimensions (int): Number of dimensions (sample.size()[2])
+            replications (int): :math:`r`, number of nxd matrices to generate
+            n_samples (int): :math:`d`, number of observations
+            dimensions (int): :math:`d`, number of dimensions
             scramble (bool): If true, random numbers are in unit cube, otherwise they are non-negative integers
 
         Returns:
-            replications x n_samples x dimensions (numpy array)
+            x (numpy.array) of with dimensions :math:`r \cdot n \cdot d`
 
         """
         if (log2(n_samples)) % 1 != 0:
@@ -57,7 +56,7 @@ class Sobol(DiscreteDistribution):
             self.d = d
             self.r = r
             if self.backend == 'mps':
-                self.rng = Generator(PCG64(self.rng_seed))
+                self.rng = random.Generator(random.PCG64(self.rng_seed))
                 self.sobol_rng = DigitalSeq(Cs="sobol_Cs.col", m=30, s=self.d)
                 # we guarantee a depth of >=32 bits for shift
                 self.t = max(32, self.sobol_rng.t)
@@ -67,7 +66,7 @@ class Sobol(DiscreteDistribution):
                     0, 2 ** self.t, (self.r, self.d), dtype=int64)
             elif self.backend == 'pytorch':
                 # Initialize self.r SobolEngines
-                temp_seed = randint(100) if self.rng_seed is None else self.rng_seed
+                temp_seed = random.randint(100) if self.rng_seed is None else self.rng_seed
                 self.sobol_rng = [SobolEngine(dimension=self.d, scramble=scramble, seed=seed)
                                   for seed in range(temp_seed, temp_seed + self.r)]
         else:
