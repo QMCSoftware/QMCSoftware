@@ -54,9 +54,10 @@ extensions = ["sphinx.ext.autodoc",
               "sphinx.ext.ifconfig",
               "sphinx.ext.githubpages",
               "sphinx_markdown_tables",
-              "sphinx.ext.autosummary",
+              #"sphinx.ext.autosummary",
               "numpydoc" # to eliminate WARNING: Unexpected section title. Uncomment will surface randint documentation
               ]
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
