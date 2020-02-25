@@ -2,25 +2,31 @@
 
 from ._true_measure import TrueMeasure
 from ..util import TransformError
-from numpy import sqrt, array
+from numpy import array, sqrt, eye, inner,dot
+from numpy.linalg import cholesky
 from scipy.stats import norm
 
 
 class Gaussian(TrueMeasure):
     """ Gaussian (Normal) TrueMeasure """
 
-    parameters = ['mean', 'variance']
+    parameters = ['mean', 'covariance']
 
-    def __init__(self, distribution, mean=0, variance=1):
+    def __init__(self, distribution, mean=0, covariance=1):
         """
         Args:
             distribution (DiscreteDistribution): DiscreteDistribution instance
             mean (float): mu for Normal(mu,sigma^2)
-            variance (float): sigma^2 for Normal(mu,sigma^2)
+            covariance (float/ndarray): sigma^2 for Normal(mu,sigma^2)
+                Note: an ndarray should be of shape dimension x dimension
+                      a float value is equivalent to float_val*eye(dimension)
         """
         self.distribution = distribution
         self.mean = array(mean)
-        self.variance = array(variance)
+        self.covariance = array(covariance)
+        d = distribution.dimension
+        cov_d = self.covariance if self.covariance.shape==(d,d) else self.covariance*eye(d)
+        self.sigma = cholesky(cov_d)
         super().__init__()
     
     def gen_samples(self, *args, **kwargs):
@@ -39,10 +45,10 @@ class Gaussian(TrueMeasure):
         samples = self.distribution.gen_samples(*args,**kwargs)
         if self.distribution.mimics == 'StdGaussian':
             # shift and stretch
-            tf_samples = self.mean + sqrt(self.variance) * samples
+            tf_samples = self.mean + inner(samples,self.sigma)
         elif self.distribution.mimics == "StdUniform":
             # inverse CDF then shift and stretch
-            tf_samples = norm.ppf(samples, loc=self.mean, scale=sqrt(self.variance))
+            tf_samples = self.mean + inner(norm.ppf(samples),self.sigma)
         else:
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)

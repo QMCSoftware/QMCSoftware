@@ -18,28 +18,28 @@ def stopping_criteria():
 
     # CLT
     distribution = IIDStdUniform(dimension=d, seed=7)
-    measure = Gaussian(distribution, variance=1/2)
+    measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = CLT(integrand,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
     # CLTRep
     distribution = Lattice(dimension=d, scramble=True, replications=16, seed=7, backend='MPS')
-    measure = Gaussian(distribution, variance=1/2)
+    measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = CLTRep(integrand,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
     # MeanMC_g
     distribution = IIDStdGaussian(dimension=d, seed=7)
-    measure = Gaussian(distribution, variance=1/2)
+    measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = MeanMC_g(integrand,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
     # CubLattice
     distribution = Lattice(dimension=d, scramble=True, replications=0, seed=7, backend='GAIL')
-    measure = Gaussian(distribution, variance=1/2)
+    measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = CubLattice_g(integrand,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))

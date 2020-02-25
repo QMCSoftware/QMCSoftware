@@ -28,7 +28,7 @@ def measures(n=2, dimension=2, replications=0, seed=7):
     mu = [3, 3]
     sigma = [5, 7]
     for distribution in [iid_std_u,iid_std_g]:
-        measure = Gaussian(distribution, mean=mu, variance=sigma)
+        measure = Gaussian(distribution, mean=mu, covariance=sigma)
         x = measure.gen_samples(n)
         print(measure)
         print(bar)

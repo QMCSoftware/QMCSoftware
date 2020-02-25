@@ -19,7 +19,7 @@ class IntegrationExampleTest(unittest.TestCase):
         true_values = [1.3803884470431430, 1.808186429263620, 2.168309102165481]
         for i in range(len(dimensions)):
             distribution = IIDStdGaussian(dimension=dimensions[i])
-            measure = Gaussian(distribution, variance=1/2)
+            measure = Gaussian(distribution, covariance=1/2)
             integrand = Keister(measure)
             solution,data = CLT(integrand,abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)

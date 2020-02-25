@@ -60,7 +60,7 @@ def integrands(n=2**15):
 
     # Keister
     distribution = IIDStdGaussian(dimension=3, seed=7)
-    measure = Gaussian(distribution, variance=1/2)
+    measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     samples = measure.gen_samples(n=n)
     y = integrand.f(samples)
