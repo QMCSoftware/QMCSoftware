@@ -49,7 +49,7 @@ def vary_abs_tol(dimension=3, abs_tol=[.1,.2,.3], rel_tol=0, trials=1):
     return df_solution,df_n_total,df_time
 
 if __name__ == '__main__':
-    df_solution,df_n_total,df_time = vary_abs_tol(dimension=3, abs_tol=arange(.002, .0502, .0002), rel_tol=0, trials=3)
+    df_solution,df_n_total,df_time = vary_abs_tol(dimension=3, abs_tol=arange(.002, .1002, .0002), rel_tol=0, trials=3)
     df_solution.to_csv('outputs/mc_vs_qmc/vary_abs_tol_solution.csv', index=False)
     df_n_total.to_csv('outputs/mc_vs_qmc/vary_abs_tol_n_total.csv', index=False)
     df_time.to_csv('outputs/mc_vs_qmc/vary_abs_tol_time.csv', index=False)
