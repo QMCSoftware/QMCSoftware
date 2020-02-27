@@ -5,8 +5,6 @@
 Quasi-Monte Carlo Community Software
 ====================================
 
---------------
-
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate
 integrals. They have four main components: an integrand, a discrete
 distribution, summary output data, and stopping criterion. Information
@@ -24,8 +22,6 @@ stopping criteria. Besides providing developers a way to link their new
 ideas with those implemented by the rest of the QMC community, we also
 aim to provide practitioners with state-of-the-art QMC software for
 their applications.
-
---------------
 
 Citation
 --------
@@ -45,8 +41,7 @@ Documentation
 PDF and EPUB ocumentation of QMCPy is available for download at Read the
 Docs website https://readthedocs.org/projects/qmcpy/downloads/.
 
-In addition, we have HTML documentation can be browsed at
-https://qmcsoftware.github.io/QMCSoftware/ or
+In addition, we have HTML documentation at
 https://qmcpy.readthedocs.io/en/latest/
 
 --------------
@@ -137,3 +132,8 @@ Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D.
 Nuyens, eds.), Springer Proceedings in Mathematics and Statistics,
 vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA],
 pp. 367-383.
+
+--------------
+
+Sponsors
+--------

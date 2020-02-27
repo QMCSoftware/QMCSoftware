@@ -11,7 +11,7 @@ Integrand Class
 ---------------
 
 .. The following extract documentation in qmcpy.integrand.__init__.py
-.. automodule:: qmcpy.integrand
+.. automodule:: qmcpy.integrand._integrand
     :members:
 
 Asian Call Option Payoff
@@ -42,17 +42,29 @@ Measure Class
 -------------
 
 .. The following extract documentation in qmcpy.measures.__init__.py
-.. automodule:: qmcpy.true_measure
+.. automodule:: qmcpy.true_measure._true_measure
     :members:
+
+Uniform
+.........................
 
 .. automodule:: qmcpy.true_measure.uniform
     :members:
 
+Gaussian
+.........................
+
 .. automodule:: qmcpy.true_measure.gaussian
     :members:
 
+Brownian Motion
+.........................
+
 .. automodule:: qmcpy.true_measure.brownian_motion
     :members:
+
+Lebesgue
+.........................
 
 .. automodule:: qmcpy.true_measure.lebesgue
     :members:
@@ -61,18 +73,29 @@ Discrete Distribution Class
 ---------------------------
 
 .. The following extract documentation in qmcpy.distribution.__init__.py
-.. automodule:: qmcpy.discrete_distribution
+.. automodule:: qmcpy.discrete_distribution._discrete_distribution
     :members:
+
+Uniform
+.........................
 
 .. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
+Gaussian
+.........................
+
 .. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
     :members:
+
+Lattice
+.........................
 
 .. automodule:: qmcpy.discrete_distribution.lattice
     :members:
 
+Sobol
+.........................
 .. automodule:: qmcpy.discrete_distribution.sobol
     :members:
 
@@ -80,8 +103,9 @@ Data Class
 ----------
 
 .. The following extract documentation in qmcpy.accum_data.__init__.py
-.. automodule:: qmcpy.accum_data
+.. automodule:: qmcpy.accum_data._accum_data
     :members:
+
 
 .. automodule:: qmcpy.accum_data.mean_var_data
     :members:
@@ -93,7 +117,7 @@ Stopping Criterion Class
 -------------------------
 
 .. The following extract documentation in qmcpy.stop.__init__.py
-.. automodule:: qmcpy.stopping_criterion
+.. automodule:: qmcpy.stopping_criterion._stopping_criterion
     :members:
 
 

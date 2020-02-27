@@ -1,7 +1,7 @@
 """ Definition for abstract class StoppingCriterion """
 
 from ..util import DistributionCompatibilityError, ParameterError, \
-                    MethodImplementationError, univ_repr
+    MethodImplementationError, univ_repr
 
 
 class StoppingCriterion(object):

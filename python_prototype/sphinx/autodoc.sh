@@ -52,12 +52,10 @@ rm -fr $DIR/*
 DIRSUFFIX="_files"
 for f in $FILES
 do
-  if [  "${f}" != "nei_demo.ipynb" ]; then
-    echo "Processing $f file..."
-    jupyter-nbconvert --execute --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f --to rst
-    file=${f%.ipynb}
-    echo $file
-  fi
+  echo "Processing $f file..."
+  jupyter-nbconvert --execute --TagRemovePreprocessor.remove_cell_tags='{"remove_cell"}' --ExecutePreprocessor.kernel_name=$CONDA_DEFAULT_ENV --ExecutePreprocessor.timeout=0 $f --to rst
+  file=${f%.ipynb}
+  echo $file
 done
 mv *_files $DIR/
 mv *.rst $DIR
@@ -74,8 +72,8 @@ make clean;
 
 make html
 
-rm -fr ../../docs;  mkdir ../../docs;
-cp -a _build/html/. ../../docs;
+#rm -fr ../../docs;  mkdir ../../docs;
+#cp -a _build/html/. ../../docs;
 
 ################################################################################
 # Use sphinx to generate PDF documentation
@@ -99,14 +97,14 @@ cp -a _build/html/. ../../docs;
 ################################################################################
 # For https://qmcpy.readthedocs.io
 ################################################################################
-grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
+#grep -v "torch" ../requirements.txt > temp && mv temp ../requirements.txt
 
-cp ../requirements.txt ../../docs
+#cp ../requirements.txt ../../docs
 
-cp ../../README.md ../../docs
+#cp ../../README.md ../../docs
 
-cd ../..
+#cd ../..
 
-git add -f docs
+#git add -f docs
 
 echo "QMCPy autodoc process ends..."

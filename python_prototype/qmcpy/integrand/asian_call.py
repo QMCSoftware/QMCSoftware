@@ -12,7 +12,7 @@ class AsianCall(Integrand):
     def __init__(self, bm_measure, volatility=0.5, start_price=30,
                  strike_price=25, interest_rate=0, mean_type='arithmetic'):
         """
-        Initialize AsianCall Integrand's'
+        Initialize AsianCall Integrand(s)
 
         Args:
             bm_measure (TrueMeasure): A BrownianMotion Measure object
