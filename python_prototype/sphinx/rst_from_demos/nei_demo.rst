@@ -13,7 +13,7 @@ simple example together here.
     from scipy.stats import norm
     import matplotlib.pyplot as plt
     %matplotlib inline
-
+    
     lw = 3
     ms = 8
 
@@ -24,14 +24,14 @@ problem of trying to optimize the function depicted below.
 
     def yf(x):
         return np.cos(10 * x) * np.exp(.2 * x) + np.exp(-5 * (x - .4) ** 2)
-
+    
     xplt = np.linspace(0, 1, 300)
     yplt = yf(xplt)
-
+    
     x = np.array([.1, .2, .4, .7, .9])
     y = yf(x)
     v = np.array([.001, .05, .01, .1, .4])
-
+    
     plt.plot(xplt, yplt, linewidth=lw)
     plt.plot(x, y, 'o', markersize=ms, color='orange')
     plt.errorbar(x, y, yerr=2 * np.sqrt(v), marker='', linestyle='', color='orange', linewidth=3)
@@ -66,27 +66,27 @@ observed noise is greater.
 
     def gaussian_kernel(x, z, e, pv):
         return pv * np.exp(-e ** 2 * (x[:, None] - z[None, :]) ** 2)
-
+    
     shape_parameter = 4.1
     process_variance = .9
     fudge_factor = 1e-10
-
+    
     kernel_prior_data = gaussian_kernel(x, x, shape_parameter, process_variance)
     kernel_cross_matrix = gaussian_kernel(xplt, x, shape_parameter, process_variance)
     kernel_prior_plot = gaussian_kernel(xplt, xplt, shape_parameter, process_variance)
-
+    
     prior_cholesky = np.linalg.cholesky(kernel_prior_data + np.diag(v))
     partial_cardinal_functions = solve_triangular(prior_cholesky, kernel_cross_matrix.T, lower=True)
     posterior_covariance = kernel_prior_plot - np.dot(partial_cardinal_functions.T, partial_cardinal_functions)
     posterior_cholesky = np.linalg.cholesky(posterior_covariance + fudge_factor * np.eye(len(xplt)))
-
+    
     full_cardinal_functions = solve_triangular(prior_cholesky.T, partial_cardinal_functions, lower=False)
     posterior_mean = np.dot(full_cardinal_functions.T, y)
-
+    
     num_posterior_draws = 123
     normal_draws = np.random.normal(size=(num_posterior_draws, len(xplt)))
     posterior_draws = posterior_mean[:, None] + np.dot(posterior_cholesky, normal_draws.T)
-
+    
     plt.plot(xplt, posterior_draws, alpha=.1, color='r')
     plt.plot(xplt, posterior_mean, color='k', linewidth=lw)
     plt.errorbar(x, y, yerr=2 * np.sqrt(v), marker='', linestyle='', color='orange', linewidth=3);
@@ -99,22 +99,6 @@ observed noise is greater.
 First we take a look at the EI quantity by itself which, despite having
 a closed form, we will approximate using basic Monte Carlo below. The
 closed form is very preferable, but not applicable in all situations.
-
-Expected improvement is just the expectation (under the posterior
-distribution) of the improvement beyond the current best value. If we
-were trying to maximize this function that we are studying then
-improvement would be defined as
-
-.. math:: I(x) = (Y_x|\mathcal{D} - y^*)_+,
-
-\ the positive part of the gap between the model :math:`Y_x|\mathcal{D}`
-and the current highest value :math:`y^*=\max\{y_1,\ldots,y_N\}`. Since
-:math:`Y_x|\mathcal{D}` is a random variable (normally distributed
-because we have a Gaussian process model), we generally study the
-expected value of this, which is plotted below. Written as an integral,
-this would look like
-
-.. math:: \EI(x) = \int_{-\infty}^\infty (y - y^*)_+\, p_{Y_x|\mathcal{D}}(y)\; \mbox{d}y.
 
 **NOTE**: This quantity is written for maximization here, but most of
 the literature is concerned with minimization. I can rewrite this if
@@ -148,7 +132,7 @@ though.
 
 This computation is vectorized so as to compute for multiple :math:`x`
 locations at the same time; the algorithm from the `Facebook
-paper <https://projecteuclid.org/download/pdfview_1/euclid.ba/1533866666>`
+paper <https://projecteuclid.org/download/pdfview_1/euclid.ba/1533866666>`__
 is written for only a single location. We are omitting the constraints
 aspect of their paper because the problem can be considered without
 that. To define the integral, though, we need some more
@@ -186,7 +170,7 @@ this by considering a variety of posterior draws at the locations in
 In practice, unless noise has actually been measured at each point, it
 would be common to simply plug in
 :math:`\epsilon_1=\ldots=\epsilon_N=\sigma^2`. The term
-`noisy_predictions_at_data` below is drawn from this distribution
+``noisy_predictions_at_data`` below is drawn from this distribution
 (though in a standard iid fashion, not a more awesome QMC fashion).
 
 The EI integral, although approximated earlier using Monte Carlo, can
@@ -200,7 +184,7 @@ cdf, and
 
 .. math:: \mu=\kk(x)^T(\mK+\mE)^{-1}\yy,\qquad s^2 = K(x, x)-\kk(x)^T(\mK+\mE)^{-1}\kk(x),\qquad z=(\mu - y^*)/s.
 
-It is very important to remember that these quantities are functions of
+ It is very important to remember that these quantities are functions of
 :math:`\yy,\cX,\eep` despite the absence of those quantities in the
 notation.
 
@@ -221,29 +205,29 @@ elements at a time. Just so you know.
     num_draws_at_data = 109
     # These draws are done through QMC in the FB paper
     normal_draws_at_data = np.random.normal(size=(num_draws_at_data, len(x)))
-
+    
     partial_cardinal_functions_at_data = solve_triangular(prior_cholesky, kernel_prior_data.T, lower=True)
     posterior_covariance_at_data = kernel_prior_data - np.dot(partial_cardinal_functions_at_data.T, partial_cardinal_functions_at_data)
     posterior_cholesky_at_data = np.linalg.cholesky(posterior_covariance_at_data + fudge_factor * np.eye(len(x)))
-
+    
     noisy_predictions_at_data = y[:, None] + np.dot(posterior_cholesky_at_data, normal_draws_at_data.T)
-
+    
     prior_cholesky_noiseless = np.linalg.cholesky(kernel_prior_data)
     partial_cardinal_functions = solve_triangular(prior_cholesky_noiseless, kernel_cross_matrix.T, lower=True)
     full_cardinal_functions = solve_triangular(prior_cholesky.T, partial_cardinal_functions, lower=False)
     pointwise_sd = np.sqrt(np.fmax(process_variance - np.sum(partial_cardinal_functions ** 2, axis=0), 1e-100))
-
+    
     all_noiseless_eis = []
     for draw in noisy_predictions_at_data.T:
         posterior_mean = np.dot(full_cardinal_functions.T, draw)
-
+        
         z = (posterior_mean - max(y)) / pointwise_sd
         ei = pointwise_sd * (z * norm.cdf(z) + norm.pdf(z))
-
+        
         all_noiseless_eis.append(ei)
-
+    
     all_noiseless_eis = np.array(all_noiseless_eis)
-
+    
     plt.plot(xplt, all_noiseless_eis.T, alpha=.1, color='#96CA4F', linewidth=lw)
     plt.ylabel('expected improvement draws', color='#96CA4F')
     ax2 = plt.gca().twinx()
@@ -286,27 +270,27 @@ form, which we do have for a GP situation).
 .. code:: ipython3
 
     fig, axes = plt.subplots(1, 3, figsize=(14, 4))
-
+    
     ax = axes[0]
     ax.plot(xplt, yplt, linewidth=lw)
     ax.plot(x, y, 'o', markersize=ms, color='orange')
     ax.errorbar(x, y, yerr=2 * np.sqrt(v), marker='', linestyle='', color='orange', linewidth=3)
     ax.set_title('Sample data with noise')
     ax.set_ylim(-2.4, 2.4)
-
+    
     ax = axes[1]
     ax.plot(xplt, posterior_draws, alpha=.1, color='r')
     ax.plot(xplt, posterior_mean, color='k', linewidth=lw)
     ax.set_title('Posterior draws')
     ax.set_ylim(-2.4, 2.4)
-
+    
     ax = axes[2]
     posterior_mean_distance_from_1 = np.mean(np.abs(posterior_draws - 1), axis=1)
     posterior_standard_deviation = np.std(posterior_draws, axis=1)
     level_set_expected_improvement = norm.cdf(-posterior_mean_distance_from_1 / posterior_standard_deviation)
     ax.plot(xplt, level_set_expected_improvement, color='#A23D97', linewidth=lw)
     ax.set_title('level set expected improvement')
-
+    
     plt.tight_layout();
 
 
@@ -345,45 +329,45 @@ it is written here in a simplified version.
 
     q = 5  # number of "next points" to be considered simultaneously
     next_x = np.array([0.158,  0.416,  0.718,  0.935,  0.465])
-
+    
     def compute_qei(next_x, mc_strat, num_posterior_draws):
         q = len(next_x)
-
+        
         kernel_prior_data = gaussian_kernel(x, x, shape_parameter, process_variance)
         kernel_cross_matrix = gaussian_kernel(next_x, x, shape_parameter, process_variance)
         kernel_prior_plot = gaussian_kernel(next_x, next_x, shape_parameter, process_variance)
         prior_cholesky = np.linalg.cholesky(kernel_prior_data + np.diag(v))
-
+        
         partial_cardinal_functions = solve_triangular(prior_cholesky, kernel_cross_matrix.T, lower=True)
         posterior_covariance = kernel_prior_plot - np.dot(partial_cardinal_functions.T, partial_cardinal_functions)
         posterior_cholesky = np.linalg.cholesky(posterior_covariance + fudge_factor * np.eye(q))
-
+        
         full_cardinal_functions = solve_triangular(prior_cholesky.T, partial_cardinal_functions, lower=False)
         posterior_mean = np.dot(full_cardinal_functions.T, y)
-
+    
         if mc_strat == 'numpy':
             normal_draws = np.random.normal(size=(num_posterior_draws, q))
         else:
             gaussian_draws = qp.Gaussian(q)
             gaussian_draws.set_tm_gen(qp.Lattice() if mc_strat == 'lattice' else qp.IIDStdGaussian())
             normal_draws = gaussian_draws[0].gen_tm_samples(1, num_posterior_draws).squeeze()
-
+    
         posterior_draws = posterior_mean[:, None] + np.dot(posterior_cholesky, normal_draws.T)
-
+        
         return np.mean(np.fmax(np.max(posterior_draws[:, :num_posterior_draws] - max(y), axis=0), 0))
 
 .. code:: ipython3
 
     num_posterior_draws_to_test = 2 ** np.arange(4, 17)
-
+    
     vals = {}
     for mc_strat in ('numpy', 'iid', 'lattice'):
         vals[mc_strat] = []
-
+    
         for num_posterior_draws in num_posterior_draws_to_test:
             qei_estimate = compute_qei(next_x, mc_strat, num_posterior_draws)
             vals[mc_strat].append(qei_estimate)
-
+    
         vals[mc_strat] = np.array(vals[mc_strat])
     reference_answer = compute_qei(next_x, 'lattice', 2 ** 7 * max(num_posterior_draws_to_test))
 
@@ -402,7 +386,7 @@ it is written here in a simplified version.
 
 .. parsed-literal::
 
-    <matplotlib.legend.Legend at 0x7f80f0ec5fd0>
+    <matplotlib.legend.Legend at 0x7ffb6829f050>
 
 
 
