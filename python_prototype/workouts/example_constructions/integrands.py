@@ -21,7 +21,7 @@ def integrands(n=2**15):
         strike_price = 25,
         interest_rate = 0,
         mean_type = 'arithmetic')
-    samples = measure.gen_samples(n=n)
+    samples = distribution.gen_samples(n=n)
     y = integrand.f(samples)
     print(integrand)
     print('Asian Call (Single Level) approx with %d samples: %.3f\n%s'%(n,y.mean(),bar))
@@ -53,7 +53,7 @@ def integrands(n=2**15):
             mean_type = 'arithmetic')
     y = 0
     for l in range(levels):
-        samples_l = measures[l].gen_samples(n_min=0,n_max=n)
+        samples_l = distributions[l].gen_samples(n_min=0,n_max=n)
         y += integrands[l].f(samples_l)
     print(integrands)
     print('Asian Call (Single Level) approx with %d samples: %.3f\n%s'%(n,y.mean(),bar))
@@ -62,7 +62,7 @@ def integrands(n=2**15):
     distribution = IIDStdGaussian(dimension=3, seed=7)
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    samples = measure.gen_samples(n=n)
+    samples = distribution.gen_samples(n=n)
     y = integrand.f(samples)
     print(integrand)
     print('Keister approx with %d samples: %.3f\n%s'%(n,y.mean(),bar))
@@ -71,7 +71,7 @@ def integrands(n=2**15):
     distribution = Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL')
     measure = Uniform(distribution)
     integrand = Linear(measure)
-    samples = measure.gen_samples(n_min=0,n_max=n)
+    samples = distribution.gen_samples(n_min=0,n_max=n)
     y = integrand.f(samples)
     print(integrand)
     print('Linear approx with %d samples: %.3f\n%s'%(n,y.mean(),bar))
@@ -80,7 +80,7 @@ def integrands(n=2**15):
     distribution = Sobol(dimension=3, scramble=True, replications=0, seed=7, backend='MPS')
     measure = Lebesgue(distribution,lower_bound=[1,2,3],upper_bound=7)
     integrand = QuickConstruct(measure,lambda x: x[:,0]*x[:,1]**x[:,2])
-    samples = measure.gen_samples(n_min=0,n_max=n)
+    samples = distribution.gen_samples(n_min=0,n_max=n)
     y = integrand.f(samples)
     print(integrand)
     print('QuickConstruct approx with %d samples: %.3f\n%s'%(n,y.mean(),bar))

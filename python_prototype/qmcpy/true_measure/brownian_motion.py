@@ -21,7 +21,43 @@ class BrownianMotion(TrueMeasure):
         self.time_vector = array(time_vector)
         super().__init__()
     
-    def gen_samples(self, *args, **kwargs):
+    def _tf_to_mimic_samples(self, samples):
+        """
+        Transform samples to appear BrownianMotion
+        
+        Args:
+            samples (ndarray): samples from a discrete distribution
+        
+        Return:
+             mimic_samples (ndarray): samples from the DiscreteDistribution transformed to appear 
+                                  to appear like the TrueMeasure object
+        """
+        if self.distribution.mimics == 'StdGaussian':
+            # insert start time then cumulative sum over monitoring times
+            mimic_samples = cumsum(samples * sqrt(diff(insert(self.time_vector, 0, 0))), -1)
+        elif self.distribution.mimics == "StdUniform":
+            # inverse CDF, insert start time, then cumulative sum over monitoring times
+            mimic_samples = cumsum(norm.ppf(samples) * sqrt(diff(insert(self.time_vector, 0, 0))), -1)
+        else:
+            raise TransformError(\
+                'Cannot transform samples mimicing %s to Brownian Motion'%self.distribution.mimics)
+        return mimic_samples
+
+    def transform_g_to_f(self, g):
+        """
+       Transform g, the origianl integrand, to f,
+        the integrand accepting standard distribution sampels.  
+        
+        Args:
+            g (method): original integrand
+        
+        Returns:
+            f (method): transformed integrand
+        """
+        f = lambda samples: g(self._tf_to_mimic_samples(samples))
+        return f
+    
+    def gen_mimic_samples(self, *args, **kwargs):
         """
         Generate samples from the DiscreteDistribution object
         and transform them to mimic TrueMeasure samples
@@ -30,38 +66,10 @@ class BrownianMotion(TrueMeasure):
             *args (tuple): Ordered arguments to self.distribution.gen_samples
             **kwrags (dict): Keyword arguments to self.distribution.gen_samples
         
-        Returns:
-            tf_samples (ndarray): samples from the DiscreteDistribution object transformed
+        Return:
+             mimic_samples (ndarray): samples from the DiscreteDistribution transformed to appear 
                                   to appear like the TrueMeasure object
         """
         samples = self.distribution.gen_samples(*args,**kwargs)
-        if self.distribution.mimics == 'StdGaussian':
-            # insert start time then cumulative sum over monitoring times
-            tf_samples = cumsum(samples * sqrt(diff(insert(self.time_vector, 0, 0))), -1)
-        elif self.distribution.mimics == "StdUniform":
-            # inverse CDF, insert start time, then cumulative sum over monitoring times
-            tf_samples = cumsum(norm.ppf(samples) * sqrt(diff(insert(self.time_vector, 0, 0))), -1)
-        else:
-            raise TransformError(\
-                'Cannot transform samples mimicing %s to Brownian Motion'%self.distribution.mimics)
-        return tf_samples
-
-    def transform_g_to_f(self, g):
-        """
-        Transform the g, the origianl integrand, to f,
-        the integrand after transforming DiscreteDistribution samples
-        to mimic the TrueMeasure object. 
-        
-        Args:
-            g (method): original integrand
-        
-        Returns:
-            f (method): transformed integrand
-        """
-        if self.distribution.mimics in ['StdUniform','StdGaussian']:
-            # no weight
-            f = lambda tf_samples: g(tf_samples)
-        else:
-            raise TransformError(\
-                'Cannot transform samples mimicing %s to Brownian Motion'%self.distribution.mimics)
-        return f
+        mimic_samples = self._tf_to_mimic_samples(samples)
+        return mimic_samples

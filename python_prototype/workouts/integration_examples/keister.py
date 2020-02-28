@@ -15,7 +15,8 @@ def keister(dimension=3, abs_tol=.1):
     distribution = IIDStdUniform(dimension, seed=7)
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CLT(integrand,abs_tol=abs_tol).integrate()
+    stopping_criterion = CLT(integrand,abs_tol=abs_tol)
+    solution,data = stopping_criterion.integrate()
     print('%s%s'%(data,bar))
 
     # CLTRep

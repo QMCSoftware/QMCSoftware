@@ -54,7 +54,7 @@ class CubatureData(AccumulateData):
     def update_data(self):
         """ Update data """
         # Generate sample values
-        x_lat = self.measure.gen_samples(n_min=self.n_total,n_max=2**self.m)
+        x_lat = self.distribution.gen_samples(n_min=self.n_total,n_max=2**self.m)
         ynext = self.integrand.f(x_lat).squeeze()
         self.yval = hstack((self.yval,ynext))
         ynext = ynext.astype(complex)

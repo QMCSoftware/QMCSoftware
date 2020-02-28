@@ -34,11 +34,11 @@ class MeanVarData(AccumulateData):
         if isinstance(self.integrand,Integrand): 
             # single level -> make it appear multi-level
             self.integrands = [self.integrand]
-            self.measures = [self.measure]
+            self.distributions = [self.distribution]
         else:
             # multi-level
             self.integrands = self.integrand 
-            self.measures = self.measure
+            self.distributions = self.distribution
         # Set Attributes
         self.levels = len(self.integrands)
         self.solution = nan
@@ -54,7 +54,7 @@ class MeanVarData(AccumulateData):
         """ Update data """
         for l in range(self.levels):
             t_start = process_time()  # time the integrand values
-            samples = self.measures[l].gen_samples(n=self.n[l])
+            samples = self.distributions[l].gen_samples(n=self.n[l])
             y = self.integrands[l].f(samples).squeeze()
             self.t_eval[l] = max(process_time() - t_start, EPS)
             self.sighat[l] = y.std()  # compute the sample standard deviation

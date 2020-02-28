@@ -43,7 +43,7 @@ class MeanVarDataRep(AccumulateData):
     def update_data(self):
         """ Update data """
         t_start = process_time()  # time integrand evaluation
-        set_x = self.measure.gen_samples(n_min=self.n_total,n_max=self.n)
+        set_x = self.distribution.gen_samples(n_min=self.n_total,n_max=self.n)
         for r in range(self.replications):
             y = self.integrand.f(set_x[r]).squeeze()
             previous_sum_y = self.muhat_r[r] * self.n_total

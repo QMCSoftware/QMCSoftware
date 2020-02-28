@@ -29,7 +29,43 @@ class Gaussian(TrueMeasure):
         self.sigma = cholesky(cov_d)
         super().__init__()
     
-    def gen_samples(self, *args, **kwargs):
+    def _tf_to_mimic_samples(self, samples):
+        """
+        Transform samples to appear Gaussian
+        
+        Args:
+            samples (ndarray): samples from a discrete distribution
+        
+        Return:
+             mimic_samples (ndarray): samples from the DiscreteDistribution transformed to appear 
+                                  to appear like the TrueMeasure object
+        """
+        if self.distribution.mimics == 'StdGaussian':
+            # shift and stretch
+            mimic_samples = self.mean + inner(samples,self.sigma)
+        elif self.distribution.mimics == "StdUniform":
+            # inverse CDF then shift and stretch
+            mimic_samples = self.mean + inner(norm.ppf(samples),self.sigma)
+        else:
+            raise TransformError(\
+                'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
+        return mimic_samples
+
+    def transform_g_to_f(self, g):
+        """
+        Transform g, the origianl integrand, to f,
+        the integrand accepting standard distribution sampels. 
+        
+        Args:
+            g (method): original integrand
+        
+        Returns:
+            f (method): transformed integrand
+        """
+        f = lambda samples: g(self._tf_to_mimic_samples(samples))
+        return f
+    
+    def gen_mimic_samples(self, *args, **kwargs):
         """
         Generate samples from the DiscreteDistribution object
         and transform them to mimic TrueMeasure samples
@@ -38,38 +74,10 @@ class Gaussian(TrueMeasure):
             *args (tuple): Ordered arguments to self.distribution.gen_samples
             **kwrags (dict): Keyword arguments to self.distribution.gen_samples
         
-        Returns:
-            tf_samples (ndarray): samples from the DiscreteDistribution object transformed
+        Return:
+             mimic_samples (ndarray): samples from the DiscreteDistribution transformed to appear 
                                   to appear like the TrueMeasure object
         """
         samples = self.distribution.gen_samples(*args,**kwargs)
-        if self.distribution.mimics == 'StdGaussian':
-            # shift and stretch
-            tf_samples = self.mean + inner(samples,self.sigma)
-        elif self.distribution.mimics == "StdUniform":
-            # inverse CDF then shift and stretch
-            tf_samples = self.mean + inner(norm.ppf(samples),self.sigma)
-        else:
-            raise TransformError(\
-                'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
-        return tf_samples
-
-    def transform_g_to_f(self, g):
-        """
-        Transform the g, the origianl integrand, to f,
-        the integrand after transforming DiscreteDistribution samples
-        to mimic the TrueMeasure object. 
-        
-        Args:
-            g (method): original integrand
-        
-        Returns:
-            f (method): transformed integrand
-        """
-        if self.distribution.mimics in ['StdUniform','StdGaussian']:
-            # no weight
-            f = lambda tf_samples: g(tf_samples)
-        else:
-            raise TransformError(\
-                'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
-        return f
+        mimic_samples = self._tf_to_mimic_samples(samples)
+        return mimic_samples

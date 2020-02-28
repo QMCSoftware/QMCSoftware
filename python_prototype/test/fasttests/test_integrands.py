@@ -16,7 +16,7 @@ class TestAsianCall(unittest.TestCase):
         distribution = Sobol(dimension=4)
         measure = BrownianMotion(distribution, time_vector=[1/4,1/2,3/4,1])
         integrand = AsianCall(measure)
-        integrand.f(measure.gen_samples(n_min=0,n_max=4))
+        integrand.f(distribution.gen_samples(n_min=0,n_max=4))
 
 class TestKeister(unittest.TestCase):
     """
@@ -27,7 +27,7 @@ class TestKeister(unittest.TestCase):
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
         integrand = Keister(measure)
-        integrand.f(measure.gen_samples(n_min=0,n_max=4))
+        integrand.f(distribution.gen_samples(n_min=0,n_max=4))
 
 
 class TestLinear(unittest.TestCase):
@@ -39,7 +39,7 @@ class TestLinear(unittest.TestCase):
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
         integrand = Linear(measure)
-        integrand.f(measure.gen_samples(n_min=0,n_max=4))
+        integrand.f(distribution.gen_samples(n_min=0,n_max=4))
     
 class TestQuickConstruct(unittest.TestCase):
     """
@@ -50,7 +50,7 @@ class TestQuickConstruct(unittest.TestCase):
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
         integrand = QuickConstruct(measure, lambda x: x.sum(1))
-        integrand.f(measure.gen_samples(n_min=0,n_max=4))
+        integrand.f(distribution.gen_samples(n_min=0,n_max=4))
 
 
 if __name__ == "__main__":

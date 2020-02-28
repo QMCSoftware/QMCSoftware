@@ -20,7 +20,7 @@ def measures(n=2, dimension=2, replications=0, seed=7):
     time_vector = [.5,1]
     for distribution in [iid_std_u,iid_std_g]:
         measure = BrownianMotion(distribution, time_vector=time_vector)
-        x = measure.gen_samples(n)
+        x = measure.gen_mimic_samples(n)
         print(measure)
         print(bar)
 
@@ -29,7 +29,7 @@ def measures(n=2, dimension=2, replications=0, seed=7):
     sigma = [5, 7]
     for distribution in [iid_std_u,iid_std_g]:
         measure = Gaussian(distribution, mean=mu, covariance=sigma)
-        x = measure.gen_samples(n)
+        x = measure.gen_mimic_samples(n)
         print(measure)
         print(bar)
 
@@ -38,16 +38,7 @@ def measures(n=2, dimension=2, replications=0, seed=7):
     b = 4
     for distribution in [iid_std_u,iid_std_g]:
         measure = Uniform(distribution, lower_bound=a, upper_bound=b)
-        x = measure.gen_samples(n)
-        print(measure)
-        print(bar)
-
-    # Lebesgue
-    a = [-2, -3]
-    b = [2, 4]
-    for distribution in [iid_std_u]:
-        measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
-        x = measure.gen_samples(n)
+        x = measure.gen_mimic_samples(n)
         print(measure)
         print(bar)
 

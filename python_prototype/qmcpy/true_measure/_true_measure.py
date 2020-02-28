@@ -16,10 +16,11 @@ class TrueMeasure(object):
         self.dimension = self.distribution.dimension
         self.distrib_name = type(self.distribution).__name__
 
-    def gen_samples(self, *args, **kwargs):
+    def gen_mimic_samples(self, *args, **kwargs):
         """ ABSTRACT METHOD
         Generate samples from the DiscreteDistribution object
-        and transform them to mimic TrueMeasure samples
+        and transform them to mimic TrueMeasure samples. 
+        May not be applicable for all measures (ex: Lebesgue)
         
         Args:
             *args (tuple): Ordered arguments to self.distribution.gen_samples
@@ -30,7 +31,7 @@ class TrueMeasure(object):
                                   to appear like the TrueMeasure object
         """
         raise MethodImplementationError(self,'gen_samples')
-
+    
     def transform_g_to_f(self, g):
         """ ABSTRACT METHOD
         Transform the g, the origianl integrand, to f,

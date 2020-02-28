@@ -13,7 +13,7 @@ class TestUniform(unittest.TestCase):
     def test_gen_samples(self):
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
-        measure.gen_samples(n_min=0,n_max=4)
+        measure.gen_mimic_samples(n_min=0,n_max=4)
 
 
 class TestGaussian(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestGaussian(unittest.TestCase):
     def test_gen_samples(self):
         distribution = Sobol(dimension=3)
         measure = Gaussian(distribution)
-        measure.gen_samples(n_min=0,n_max=4)
+        measure.gen_mimic_samples(n_min=0,n_max=4)
 
 
 class TestBrownianMontion(unittest.TestCase):
@@ -35,7 +35,7 @@ class TestBrownianMontion(unittest.TestCase):
     def test_gen_samples(self):
         distribution = Sobol(dimension=3)
         measure = BrownianMotion(distribution, time_vector=[1/3,2/3,1])
-        measure.gen_samples(n_min=0,n_max=4)
+        measure.gen_mimic_samples(n_min=0,n_max=4)
 
 
 class TestLebesgue(unittest.TestCase):
@@ -46,7 +46,6 @@ class TestLebesgue(unittest.TestCase):
     def test_gen_samples(self):
         distribution = Sobol(dimension=3)
         measure = Lebesgue(distribution)
-        measure.gen_samples(n_min=0,n_max=4) 
 
 
 if __name__ == "__main__":

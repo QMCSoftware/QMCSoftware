@@ -1,7 +1,7 @@
 """ Definition for abstract class AccumulateData """
 
-from ..util import ParameterError, MethodImplementationError, univ_repr
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..true_measure._true_measure import TrueMeasure
+from ..util import ParameterError, MethodImplementationError, univ_repr, DimensionError
 
 class AccumulateData():
     """
@@ -28,7 +28,7 @@ class AccumulateData():
         # Check matching dimensions for integrand, measure, and distribution
         flag = 0
         try:
-            if isinstance(self.distribution,DiscreteDistribution):
+            if isinstance(self.measure,TrueMeasure):
                 distrib_dims = self.distribution.dimension
                 measure_dims = self.measure.dimension
                 integrand_dims = self.integrand.dimension
