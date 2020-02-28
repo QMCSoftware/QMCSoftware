@@ -1,7 +1,7 @@
 """ Unit tests for integrate method in QMCPy """
 
 from qmcpy import *
-from numpy import arange, array
+from numpy import arange, array, inf, pi
 import unittest
 
 
@@ -45,17 +45,27 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = 6.20
         self.assertTrue(abs(solution - true_value) < abs_tol)
 
-    def test_lebesgue_measure(self):
+    def test_lebesgue_bounded_measure(self):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        distribution = Lattice(dimension=2, replications=16, scramble=True, backend='MPS')
+        distribution = Sobol(dimension=2, replications=16, scramble=True, backend='MPS')
         measure = Lebesgue(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = QuickConstruct(measure, lambda x: (x.prod(1))**3)
         solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
         true_value = 6075
         self.assertTrue(abs(solution - true_value) < abs_tol)
-
+    '''
+    def test_lebesgue_inf_measure(self):
+        abs_tol = .01
+        distribution = Lattice(1)
+        measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
+        integrand = QuickConstruct(measure, lambda x: 1/(1+x**2))
+        solution,data = CubLattice_g(integrand,abs_tol=abs_tol).integrate()
+        print(solution)
+        true_value = pi
+        self.assertTrue(abs(solution - solution) < abs_tol)
+    '''
     def test_uniform_measure(self):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1

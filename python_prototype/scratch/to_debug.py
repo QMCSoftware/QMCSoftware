@@ -20,3 +20,10 @@ algorithm = CubLattice_g(integrand, abs_tol=1e-4)
 solution,data = algorithm.integrate()
 print(solution)
 '''
+
+abs_tol = .1
+distribution = Sobol(1,replications=16)
+measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
+integrand = QuickConstruct(measure, lambda x: 1/(1+x**2))
+solution,data = CLTRep(integrand,abs_tol=abs_tol).integrate()
+print(solution)

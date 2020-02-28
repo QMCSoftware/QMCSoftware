@@ -28,6 +28,7 @@ class Lebesgue(TrueMeasure):
             self.tf_to_mimic = 'Uniform'
         elif (self.lower_bound == -inf).all() and (self.upper_bound == inf).all():
             self.tf_to_mimic = 'Gaussian'
+            raise Exception('Not working')
         else:
             raise ParameterError('self.lower_bound and self.upper_bound must both be finite ' + \
                                  'or must be -inf,inf respectively')
@@ -47,13 +48,14 @@ class Lebesgue(TrueMeasure):
         if self.tf_to_mimic == 'Uniform':
             def f(samples):
                 dist = self.upper_bound - self.lower_bound
-                vals = dist.prod() * g(dist*samples + self.lower_bound)
-                return vals
+                f_vals = dist.prod() * g(dist*samples + self.lower_bound)
+                return f_vals
         elif self.tf_to_mimic == 'Gaussian':
             def f(samples):
                 inv_cdf_vals = norm.ppf(samples)
-                vals = g(inv_cdf_vals) / norm.pdf(inv_cdf_vals)
-
+                g_vals = g(inv_cdf_vals)
+                f_vals = g_vals / norm.pdf(inv_cdf_vals).prod(-1).reshape(g_vals.shape)
+                return f_vals
         return f
     
     def gen_mimic_samples(self, *args, **kwargs):
