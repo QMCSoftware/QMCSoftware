@@ -28,7 +28,6 @@ class Lebesgue(TrueMeasure):
             self.tf_to_mimic = 'Uniform'
         elif (self.lower_bound == -inf).all() and (self.upper_bound == inf).all():
             self.tf_to_mimic = 'Gaussian'
-            raise Exception('Not working')
         else:
             raise ParameterError('self.lower_bound and self.upper_bound must both be finite ' + \
                                  'or must be -inf,inf respectively')
