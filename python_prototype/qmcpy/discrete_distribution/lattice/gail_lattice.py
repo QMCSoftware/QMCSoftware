@@ -89,8 +89,10 @@ def gail_lattice_gen(n_min, n_max, d):
         n_min (int): minimum index. Must be 0 or n_max/2
         n_max (int): maximum index (not inclusive)
     """
+    if d > len(gen_vec):
+        raise Exception('GAIL Lattice has max dimensions %d'%len(gen_vec))
     if n_max > 2**20:
-        raise Exception('The maximum number of points allowed is 2^20')    
+        raise Exception('GAIL Lattice has maximum points 2^20')    
     nelem = n_max - n_min
     if n_min == 0:
         y = vdc(nelem)

@@ -27,7 +27,7 @@ def asian_option_multi_level(
     distributions = MultiLevelConstructor(levels,
         IIDStdGaussian,
             dimension = [len(tv) for tv in time_vector],
-            seed = 7)
+            seed = arange(7,7+levels))
     measures = MultiLevelConstructor(levels,
         BrownianMotion,
             distribution = distributions,

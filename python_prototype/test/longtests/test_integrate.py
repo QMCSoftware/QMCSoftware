@@ -31,9 +31,9 @@ class IntegrationExampleTest(unittest.TestCase):
                     arange(1 / 64, 65 / 64, 1 / 64)]
         levels = 3
         distributions = MultiLevelConstructor(levels,
-        IIDStdGaussian,
-            dimension = [len(tv) for tv in time_vector],
-            seed = 7)
+            IIDStdGaussian,
+                dimension = [len(tv) for tv in time_vector],
+                seed = arange(7,7+levels))
         measures = MultiLevelConstructor(levels,
             BrownianMotion,
                 distribution = distributions,

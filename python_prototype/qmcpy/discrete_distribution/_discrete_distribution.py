@@ -26,4 +26,4 @@ class DiscreteDistribution(object):
         raise MethodImplementationError(self, 'gen_dd_samples')
 
     def __repr__(self):
-        return univ_repr(self, "Discrete DiscreteDistribution", self.parameters)
+        return univ_repr(self, "Discrete Distribution", self.parameters)

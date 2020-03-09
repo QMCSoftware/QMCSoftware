@@ -37,7 +37,7 @@ def integrands(n=2**15):
             dimension = [len(tv) for tv in time_vector],
             scramble = True,
             replications=0,
-            seed = 7,
+            seed = arange(7,7+levels),
             backend='GAIL')
     measures = MultiLevelConstructor(levels,
         BrownianMotion,

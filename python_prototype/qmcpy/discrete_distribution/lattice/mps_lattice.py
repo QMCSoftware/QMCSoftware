@@ -62,6 +62,10 @@ def mps_lattice_gen(n_min, n_max, d):
         n_min (int): minimum index. Must be 0 or n_max/2
         n_max (int): maximum index (not inclusive)
     """
+    if d > exod2_len:
+        raise Exception('MPS Lattice has max dimensions %d'%exod2_len)
+    if n_max > 2**20:
+        raise Exception('MPS Lattice has maximum points 2^20')
     z = exod2_base2_m20_CKN_z[:d]
     gen_block = lambda n: (outer(arange(1, n+1, 2), z) % n) / float(n)
     if n_min == 0:
