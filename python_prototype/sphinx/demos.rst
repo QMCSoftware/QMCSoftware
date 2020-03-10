@@ -16,5 +16,7 @@ Demos
 
     rst_from_demos/quasirandom_generators.rst
 
+    rst_from_demos/nei_demo.rst
+
 .. Need to fix LaTeX expressions in the notebook below
 .. rst_from_demos/nei_demo.rst
