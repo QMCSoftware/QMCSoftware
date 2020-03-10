@@ -54,11 +54,14 @@ extensions = ["sphinx.ext.autodoc",
               "sphinx.ext.ifconfig",
               "sphinx.ext.githubpages",
               "sphinx_markdown_tables",
-              "sphinx_math_dollar"]
+              # "sphinx.ext.autosummary",
+              # "numpydoc" # to eliminate WARNING: Unexpected section title. Uncomment will surface randint documentation
+              ]
 
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
+autodoc_mock_imports = ["torch"]
 
 # Napoleon settings
 napoleon_google_docstring = True
@@ -77,8 +80,8 @@ napoleon_use_keyword = True
 # intersphinx
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.7/", None),
-    "numpy": ("https://docs.scipy.org/doc/numpy", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "numpy": ("https://docs.scipy.org/doc/numpy-1.17.0/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy-1.3.1/reference/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None)
 }
 

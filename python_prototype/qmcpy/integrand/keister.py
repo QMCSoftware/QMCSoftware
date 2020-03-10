@@ -20,6 +20,8 @@ class Keister(Integrand):
 
     def __init__(self, measure):
         """
+        Initialize Keister integrand
+
         Args:
             measure (TrueMeasure): a TrueMeasure instance
         """
@@ -41,6 +43,7 @@ class Keister(Integrand):
             :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, \
             then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
             and :math:`x'_{ij} = c` otherwise
+
         """
         normx = LA.norm(x, 2, axis=1)  # ||x||_2
         y = pi ** (self.dimension / 2.0) * cos(normx)

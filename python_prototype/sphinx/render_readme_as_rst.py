@@ -1,12 +1,16 @@
-'''
-Uses pandoc (can change --mathjax to --katex for different math rendering).
+"""
+Use pandoc to recursively change markdown files to restructured text files.
+
+Note: can change --mathjax to --katex for different math rendering.
+
 In python_prototype, issue:
     pandoc -s --mathjax qmcpy/README.md -o ../markdown_to_rst/qmcpy.html
+
 See also: http://www.flutterbys.com.au/stats/tut/tut17.3.html
-'''
+
+"""
 
 import os
-
 
 def markdown_to_rst(path, _dir):
     """
@@ -14,9 +18,9 @@ def markdown_to_rst(path, _dir):
     expressions in $...$.
 
     Args:
-        path (str): Top level directory that contains README.md and
+        path (str): Top-level directory that contains README.md and
             subdirectories that may also contain README.md
-        _dir (str):
+        _dir (str): output filename of rst for the top-level README.md
 
     Returns: None
 

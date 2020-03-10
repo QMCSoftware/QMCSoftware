@@ -1,7 +1,5 @@
 # Tests
 
----
-
 ## Fast unittests
 Quickly check functionality<br>
 Run all in < 1 second

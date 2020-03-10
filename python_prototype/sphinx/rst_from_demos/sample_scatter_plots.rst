@@ -37,15 +37,13 @@ Visualize IID standard uniform and standard normal sampling points
 
 .. code:: ipython3
 
-    discrete_distribs = [
-        IIDStdUniform(dimension=2, seed=7),
-        IIDStdGaussian(dimension=2, seed=7)]
+    discrete_distribs = [IIDStdUniform(rng_seed=7), IIDStdGaussian(rng_seed=7)]
     dd_names = ["$\\mathcal{U}_2\\,(0,1)$", "$\\mathcal{N}_2\\,(0,1)$"]
     colors = ["b", "r"]
     lims = [[0, 1], [-2.5, 2.5]]
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(11, 6))
     for i, (dd_obj, color, lim, dd_name) in enumerate(zip(discrete_distribs, colors, lims, dd_names)):
-        samples = dd_obj.gen_samples(n)
+        samples = dd_obj.gen_dd_samples(1, n, 2).squeeze()
         ax[i].scatter(samples[:, 0], samples[:, 1], color=color)
         ax[i].set_xlabel("$x_1$")
         ax[i].set_ylabel("$x_2$")
@@ -69,15 +67,13 @@ Visualize shifted lattice and scrambled Sobol sampling points
 
 .. code:: ipython3
 
-    discrete_distribs = [
-        Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL'),
-        Sobol(dimension=2, scramble=True, replications=0, seed=7, backend='MPS')]
+    discrete_distribs = [Lattice(rng_seed=7), Sobol(rng_seed=7)]
     dd_names = ["Shifted Lattice", "Scrambled Sobol"]
     colors = ["g", "c"]
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(11, 6))
     for i, (dd_obj, color, dd_name) in \
             enumerate(zip(discrete_distribs, colors, dd_names)):
-        samples = dd_obj.gen_samples(n_min=0, n_max=n)
+        samples = dd_obj.gen_dd_samples(1, n, 2).squeeze()
         ax[i].scatter(samples[:, 0], samples[:, 1], color=color)
         ax[i].set_xlabel("$x_1$")
         ax[i].set_ylabel("$x_2$")
@@ -102,48 +98,33 @@ Distributions
 
 .. code:: ipython3
 
-    def plot_tm_tranformed(tm_name, color, lim, measure, **kwargs):
-        fig, ax = plt.subplots(nrows=1, ncols=4, figsize=(13, 4))
-        i = 0
-        # IID Distributions
-        iid_distribs = [
-            IIDStdUniform(dimension=2, seed=7),
-            IIDStdGaussian(dimension=2, seed=7)]
-        iid_names = [
-            "IID $\\mathcal{U}_2\\,(0,1)$",
-            "IID $\\mathcal{N}_2\\,(0,1)$"]
-        for distrib, distrib_name in zip(iid_distribs, iid_names):
-            measure_obj = measure(distrib, **kwargs)
-            samples = measure_obj.gen_samples(n)
-            ax[i].scatter(samples[:, 0], samples[:, 1], color=color)
-            i += 1
-        # Quasi Random Distributions
-        qrng_distribs = [
-            Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL'),
-            Sobol(dimension=2, scramble=True, replications=0, seed=7, backend='MPS')]
-        qrng_names = ["Shifted Lattice",
-                      "Scrambled Sobol"]
-        for distrib, distrib_name in zip(qrng_distribs, qrng_names):
-            measure_obj = measure(distrib, **kwargs)
-            samples = measure_obj.gen_samples(n_min=0,n_max=n)
-            ax[i].scatter(samples[:, 0], samples[:, 1], color=color)
-            i += 1
-        # Plot Metas
-        for i,distrib in enumerate(iid_distribs+qrng_distribs):
-            ax[i].set_xlabel("$x_1$")
-            ax[i].set_ylabel("$x_2$")
-            ax[i].set_xlim(lim)
-            ax[i].set_ylim(lim)
-            ax[i].set_aspect("equal")
-            ax[i].set_title(type(distrib).__name__)
+    def plot_tm_tranformed(tm_name,true_measure,color,lim):
+        discrete_distribs = [IIDStdUniform(rng_seed=7), IIDStdGaussian(rng_seed=7),
+                             Lattice(rng_seed=7), Sobol(rng_seed=7)]
+        dd_names = ["IID $\\mathcal{U}_2\\,(0,1)$", "IID $\\mathcal{N}_2\\,(0,1)$",
+                    "Shifted Lattice", "Scrambled Sobol"]
+        fig, ax = plt.subplots(nrows=1, ncols=len(discrete_distribs), figsize=(13, 4))
+        for k, (discrete_distrib, dd_name) in \
+                enumerate(zip(discrete_distribs, dd_names)):
+            tm_obj = deepcopy(true_measure)
+            dd_obj = deepcopy(discrete_distrib)
+            tm_obj.set_tm_gen(dd_obj)
+            tm_samples = tm_obj[0].gen_tm_samples(1, n).squeeze()
+            ax[k].scatter(tm_samples[:, 0], tm_samples[:, 1], color=color)
+            ax[k].set_xlabel("$x_1$")
+            ax[k].set_ylabel("$x_2$")
+            ax[k].set_xlim(lim)
+            ax[k].set_ylim(lim)
+            ax[k].set_aspect("equal")
+            ax[k].set_title(dd_name)
         fig.suptitle("Transformed to %s from..." % tm_name)
         plt.tight_layout()
-        prefix = type(measure).__name__
+        prefix = type(true_measure).__name__
         fig.savefig("../outputs/sample_scatters/%s_tm_transform.png" % prefix, dpi=200)
 
 .. code:: ipython3
 
-    plot_tm_tranformed("$\\mathcal{U}_2\\,(0,1)$","r",[0, 1],Uniform)
+    plot_tm_tranformed("$\\mathcal{U}_2\\,(0,1)$",Uniform(2),"r",[0, 1])
 
 
 
@@ -152,7 +133,7 @@ Distributions
 
 .. code:: ipython3
 
-    plot_tm_tranformed("$\\mathcal{N}_2\\,(0,1)$","g",[-2.5, 2.5],Gaussian)
+    plot_tm_tranformed("$\\mathcal{N}_2\\,(0,1)$",Gaussian(2),"g",[-2.5, 2.5])
 
 
 
@@ -161,8 +142,8 @@ Distributions
 
 .. code:: ipython3
 
-    plot_tm_tranformed("Discretized BrownianMotion with time_vector = [.5 , 1]",
-                       "b",[-2.5, 2.5],BrownianMotion,time_vector= [.5,1])
+    tm_obj = BrownianMotion(dimension=2, time_vector= [arange(1 / 2, 3 / 2, 1 / 2)])
+    plot_tm_tranformed("Discretized BrownianMotion with time_vector = [.5 , 1]",tm_obj,"b",[-2.5, 2.5])
 
 
 
@@ -172,25 +153,30 @@ Distributions
 Shift and Stretch the True Distribution
 ---------------------------------------
 
-Transform Sobol sequences to mimic non-standard Uniform and Gaussian
+Transform Sobo sequences to mimic non-standard Uniform and Gaussian
 measures
 
 .. code:: ipython3
 
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(11, 6))
     u1_a, u1_b = 2, 4
     u2_a, u2_b = 6, 8
     g1_mu, g1_var = 3, 9
     g2_mu, g2_var = 7, 9
-    distribution = Sobol(dimension=2, scramble=True, replications=0, seed=7, backend='MPS')
-    uniform_measure = Uniform(distribution,lower_bound=[u1_a, u2_a],upper_bound=[u1_b, u2_b])
-    gaussian_measure = Gaussian(distribution,mean=[g1_mu, g2_mu],variance=[g1_var, g2_var])
-    # Generate Samples and Create Scatter Plots
-    for i, (measure, color) in enumerate(zip([uniform_measure, gaussian_measure], ["m", "y"])):
-        samples = measure.gen_samples(n_min=0, n_max=n)
-        ax[i].scatter(samples[:, 0], samples[:, 1], color=color)
-    # Plot Metas
-    for i in range(2):
+    discrete_distrib = Sobol(rng_seed=7)
+    u_obj = Uniform(dimension=array([2]),
+                    lower_bound=[array([u1_a, u2_a])],
+                    upper_bound=[array([u1_b, u2_b])])
+    n_obj = Gaussian(dimension=array([2]),
+                     mean=[array([g1_mu, g2_mu])],
+                     variance=[array([g1_var, g2_var])])
+    colors = ["m", "y"]
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(11, 6))
+    for i, (true_measure, color) in enumerate(zip([u_obj, n_obj], colors)):
+        tm_obj = deepcopy(true_measure)
+        dd_obj = deepcopy(discrete_distrib)
+        tm_obj.set_tm_gen(dd_obj)
+        tm_samples = tm_obj[0].gen_tm_samples(1, n).squeeze()
+        ax[i].scatter(tm_samples[:, 0], tm_samples[:, 1], color=color)
         ax[i].set_xlabel("$x_1$")
         ax[i].set_ylabel("$x_2$")
         ax[i].set_aspect("equal")
@@ -218,10 +204,12 @@ Plots samples on a 2D Keister function
 
     # Generate constants for 3d plot in following cell
     abs_tol = .5
-    distribution = IIDStdGaussian(dimension=2, seed=7)
-    measure = Gaussian(distribution, variance=1/2)
-    integrand = Keister(measure)
-    solution,data = CLT(integrand,abs_tol=abs_tol,rel_tol=0,n_init=16, n_max=1e10).integrate()
+    dim = 2
+    integrand = Keister(dim)
+    discrete_distrib = IIDStdGaussian(rng_seed=7)
+    true_measure = Gaussian(dimension=dim,variance=1/2)
+    stopping_criterion = CLT(discrete_distrib,true_measure, abs_tol=abs_tol, n_init=16, n_max=1e10)
+    sol, data = integrate(integrand, true_measure, discrete_distrib, stopping_criterion)
     print(data)
 
 
@@ -229,28 +217,23 @@ Plots samples on a 2D Keister function
 
     Solution: 2.0554         
     Keister (Integrand Object)
-    IIDStdGaussian (Discrete DiscreteDistribution Object)
-    	dimension       2
-    	seed            7
+    IIDStdGaussian (Discrete Distribution Object)
     	mimics          StdGaussian
-    Gaussian (True TrueMeasure Object)
-    	distrib_name    IIDStdGaussian
-    	mean            0
-    	variance        0.500
+    Gaussian (True Measure Object)
+    	dimension       2
+    	mu              0
+    	sigma           0.707
     CLT (Stopping Criterion Object)
-    	inflate         1.200
-    	alpha           0.010
     	abs_tol         0.500
     	rel_tol         0
-    	n_init          16
     	n_max           10000000000
-    MeanVarData (AccumulateData Object)
-    	levels          1
-    	solution        2.055
+    	inflate         1.200
+    	alpha           0.010
+    MeanVarData (AccumData Object)
     	n               65
     	n_total         81
     	confid_int      [ 1.646  2.464]
-    	time_integrate  0.001
+    	time_total      0.002
     
 
 
@@ -258,8 +241,15 @@ Plots samples on a 2D Keister function
 
     # Constants based on running the above CLT Example
     eps_list = [.5, .4, .3]
-    n_list = [81, 92, 167]
+    n_list = [65, 92, 151]
     mu_hat_list = [2.0554, 2.0143, 1.9926]
+    
+    # qmcpy objects
+    dim = 2
+    integrand = Keister(dim)
+    true_measure = Gaussian(dim)
+    discrete_distrib = IIDStdGaussian(rng_seed=7)
+    true_measure.transform(integrand, discrete_distrib)
     
     # Function Points
     nx, ny = (100, 100)
@@ -269,7 +259,7 @@ Plots samples on a 2D Keister function
     x_2d, y_2d = meshgrid(x, y)
     points_fun[:, 0] = x_2d.flatten()
     points_fun[:, 1] = y_2d.flatten()
-    points_fun[:, 2] = integrand.f(points_fun[:, :2])
+    points_fun[:, 2] = integrand[0].f(points_fun[:, :2])
     x_surf = points_fun[:, 0].reshape((nx, ny))
     y_surf = points_fun[:, 1].reshape((nx, ny))
     z_surf = points_fun[:, 2].reshape((nx, ny))
@@ -281,16 +271,16 @@ Plots samples on a 2D Keister function
     ax3 = fig.add_subplot(133, projection="3d")
     
     for idx, ax in enumerate([ax1, ax2, ax3]):
-        n = n_list[idx]
-        epsilon = eps_list[idx]
-        mu = mu_hat_list[idx]
         # Surface
         ax.plot_surface(x_surf, y_surf, z_surf, cmap="winter", alpha=.2)
         # Scatters
         points = zeros((n, 3))
-        points[:, :2] = measure.gen_samples(n)
-        points[:, 2] = integrand.f(points[:, :2]).squeeze()
+        points[:, :2] = true_measure[0].gen_tm_samples(1, n).squeeze()
+        points[:, 2] = integrand[0].f(points[:, :2])
         ax.scatter(points[:, 0], points[:, 1], points[:, 2], color="r", s=5)
+        n = n_list[idx]
+        epsilon = eps_list[idx]
+        mu = mu_hat_list[idx]
         ax.scatter(points[:, 0], points[:, 1], points[:, 2], color="r", s=5)
         ax.set_title("\t$\\epsilon$ = %-7.1f $n$ = %-7d $\\hat{\\mu}$ = %-7.2f "
                      % (epsilon, n, mu), fontdict={"fontsize": 16})
