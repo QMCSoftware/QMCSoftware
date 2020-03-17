@@ -2,7 +2,7 @@
 
 from ._true_measure import TrueMeasure
 from ..util import TransformError
-from numpy import array, sqrt, eye, inner,dot
+from numpy import array, sqrt, eye, dot
 from numpy.linalg import cholesky
 from scipy.stats import norm
 
@@ -42,10 +42,10 @@ class Gaussian(TrueMeasure):
         """
         if self.distribution.mimics == 'StdGaussian':
             # shift and stretch
-            mimic_samples = self.mean + inner(samples,self.sigma)
+            mimic_samples = self.mean + dot(samples,self.sigma)
         elif self.distribution.mimics == "StdUniform":
             # inverse CDF then shift and stretch
-            mimic_samples = self.mean + inner(norm.ppf(samples),self.sigma)
+            mimic_samples = self.mean + dot(norm.ppf(samples),self.sigma)
         else:
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)

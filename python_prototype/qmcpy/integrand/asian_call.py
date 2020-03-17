@@ -13,7 +13,7 @@ class AsianCall(Integrand):
     parameters = ['volatility', 'start_price', 'strike_price',
                   'interest_rate','mean_type', '_dim_frac']
                           
-    def __init__(self, measure, volatility=0.5, start_price=30, strike_price=25,\
+    def __init__(self, measure, volatility=0.5, start_price=30, strike_price=35,\
                  interest_rate=0, mean_type='arithmetic', _dim_frac=0):
         """
         Initialize AsianCall Integrand(s)

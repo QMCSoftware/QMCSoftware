@@ -25,7 +25,7 @@ class IntegrationExampleTest(unittest.TestCase):
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_asian_option_multi_level(self):
-        abs_tol = .01
+        abs_tol = .05
         time_vector = [arange(1 / 4, 5 / 4, 1 / 4),
                     arange(1 / 16, 17 / 16, 1 / 16),
                     arange(1 / 64, 65 / 64, 1 / 64)]
@@ -42,7 +42,7 @@ class IntegrationExampleTest(unittest.TestCase):
             AsianCall,
                 measure = measures)
         solution,data = CLT(integrands, abs_tol=abs_tol).integrate()
-        true_value = 6.20
+        true_value = 1.7845
         self.assertTrue(abs(solution - true_value) < abs_tol)
 
     def test_lebesgue_bounded_measure(self):
