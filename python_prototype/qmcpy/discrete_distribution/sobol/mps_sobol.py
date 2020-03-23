@@ -196,7 +196,7 @@ class DigitalSeq():
             Cs = [list(map(int, line.split())) for line in f]
             f.close()
         # otherwise Cs should be a list of generating matrices
-        self.kstart = kstart
+        self.kstart = int(kstart)
         self.m = len(Cs[0]) if m is None else m
         self.s = len(Cs) if s is None else s
         self.t = max([int(a).bit_length() for a in Cs[0]])
@@ -213,7 +213,7 @@ class DigitalSeq():
 
     def set_state(self, k):
         """Set the index of the next point to k."""
-        self.k = k - 1 # self.k is the previous point, this means we have exceptional behaviour for kstart = 0
+        self.k = int(k - 1) # self.k is the previous point, this means we have exceptional behaviour for kstart = 0
         self.cur = [ 0 for i in range(self.s) ]
         self.x = [ 0 for i in range(self.s) ]
         if k == 0: return
