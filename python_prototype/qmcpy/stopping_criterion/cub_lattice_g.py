@@ -13,11 +13,11 @@ Reference:
 
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import CubatureData
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..util import MaxSamplesWarning, NotYetImplemented, ParameterError, ParameterWarning
-from numpy import log2
+from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
+from numpy import log2, hstack, tile, exp, pi, arange
 from time import process_time
 import warnings
+
 
 class CubLattice_g(StoppingCriterion):
     """
@@ -136,7 +136,7 @@ class CubLattice_g(StoppingCriterion):
             ynext[ptind] = (evenval + coefv*oddval) / 2
             ynext[~ptind] = (evenval - coefv*oddval) / 2
         y = hstack((y,ynext))
-        if y.shape > 0: # already generated some samples samples
+        if len(y) > len(ynext): # already generated some samples samples
             ## Compute FFT on all points
             nl = 2**mnext
             ptind = hstack((tile(True,int(nl)),tile(False,int(nl))))

@@ -12,7 +12,12 @@ Reference:
 """
 
 from ._stopping_criterion import StoppingCriterion
-from numpy import log2
+from ..accumulate_data import CubatureData
+from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
+from numpy import log2, hstack, tile
+from time import process_time
+import warnings
+
 
 class CubSobol_g(StoppingCriterion):
     """
@@ -123,7 +128,7 @@ class CubSobol_g(StoppingCriterion):
             ynext[ptind] = (evenval + oddval) / 2
             ynext[~ptind] = (evenval - oddval) / 2
         y = hstack((y,ynext))
-        if y.shape > 0: # already generated some samples samples
+        if len(y) > len(ynext): # already generated some samples samples
             ## Compute FWT on all points
             nl = 2**mnext
             ptind = hstack(( tile(True,int(nl)), tile(False,int(nl)) ))
