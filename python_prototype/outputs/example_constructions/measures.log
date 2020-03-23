@@ -1,37 +1,37 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-BrownianMotion (True Measure Object)
+BrownianMotion (TrueMeasure Object)
 	distrib_name    IIDStdUniform
 	time_vector     [0.5 1. ]
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-BrownianMotion (True Measure Object)
+BrownianMotion (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
 	time_vector     [0.5 1. ]
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Gaussian (True Measure Object)
+Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdUniform
 	mean            [3 3]
-	variance        [5 7]
+	covariance      [5 7]
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Gaussian (True Measure Object)
+Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
 	mean            [3 3]
-	variance        [5 7]
+	covariance      [5 7]
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Uniform (True Measure Object)
+Uniform (TrueMeasure Object)
 	distrib_name    IIDStdUniform
 	lower_bound     [-2 -3]
 	upper_bound     4
@@ -39,18 +39,10 @@ Uniform (True Measure Object)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Uniform (True Measure Object)
+Uniform (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
 	lower_bound     [-2 -3]
 	upper_bound     4
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Lebesgue (True Measure Object)
-	distrib_name    IIDStdUniform
-	lower_bound     [-2 -3]
-	upper_bound     [2 4]
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

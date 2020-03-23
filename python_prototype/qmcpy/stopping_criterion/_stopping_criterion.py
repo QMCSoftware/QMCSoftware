@@ -64,4 +64,4 @@ class StoppingCriterion(object):
         raise MethodImplementationError(self, 'integrate')
 
     def __repr__(self):
-        return univ_repr(self, "Stopping Criterion", self.parameters)
+        return univ_repr(self, "StoppingCriterion", self.parameters)

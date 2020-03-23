@@ -47,4 +47,4 @@ class TrueMeasure(object):
         raise MethodImplementationError(self,'transform_g_to_f')
 
     def __repr__(self):
-        return univ_repr(self, "True TrueMeasure", ['distrib_name']+self.parameters)
+        return univ_repr(self, "TrueMeasure", ['distrib_name']+self.parameters)

@@ -21,7 +21,7 @@ MultiLevelConstructor (AsianCall Object)
 	mean_type       ['arithmetic' 'arithmetic' 'arithmetic']
 	_dim_frac       [ 0.000  4.000  4.000]
 
-Asian Call (Single Level) approx with 32768 samples: 6.205
+Asian Call (Single Level) approx with 32768 samples: 6.203
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -39,7 +39,7 @@ Linear approx with 32768 samples: 1.000
 
 QuickConstruct (Integrand Object)
 
-QuickConstruct approx with 32768 samples: 9542246.486
+QuickConstruct approx with 32768 samples: 9539398.406
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

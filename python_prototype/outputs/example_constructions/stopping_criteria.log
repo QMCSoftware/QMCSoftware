@@ -3,28 +3,28 @@
 
 Solution: 1.8118         
 Keister (Integrand Object)
-IIDStdUniform (Discrete Distribution Object)
+IIDStdUniform (DiscreteDistribution Object)
 	dimension       2
 	seed            7
 	mimics          StdUniform
-Gaussian (True Measure Object)
+Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdUniform
 	mean            0
-	variance        0.500
-CLT (Stopping Criterion Object)
+	covariance      0.500
+CLT (StoppingCriterion Object)
 	inflate         1.200
 	alpha           0.010
 	abs_tol         0.005
 	rel_tol         0
 	n_init          1024
 	n_max           10000000000
-MeanVarData (Data Object)
+MeanVarData (AccumulateData Object)
 	levels          1
 	solution        1.812
 	n               467027
 	n_total         468051
 	confid_int      [ 1.807  1.817]
-	time_total      0.110
+	time_integrate  0.194
 
 Meets tolerance: True
 
@@ -32,31 +32,31 @@ Meets tolerance: True
 
 Solution: 1.8088         
 Keister (Integrand Object)
-Lattice (Discrete Distribution Object)
+Lattice (DiscreteDistribution Object)
 	dimension       2
 	scramble        1
 	replications    16
 	seed            7
 	backend         mps
 	mimics          StdUniform
-Gaussian (True Measure Object)
+Gaussian (TrueMeasure Object)
 	distrib_name    Lattice
 	mean            0
-	variance        0.500
-CLTRep (Stopping Criterion Object)
+	covariance      0.500
+CLTRep (StoppingCriterion Object)
 	inflate         1.200
 	alpha           0.010
 	abs_tol         0.005
 	rel_tol         0
 	n_init          256
 	n_max           1073741824
-MeanVarDataRep (Data Object)
+MeanVarDataRep (AccumulateData Object)
 	replications    16
 	solution        1.809
 	sighat          0.002
 	n_total         256
 	confid_int      [ 1.809  1.809]
-	time_total      0.002
+	time_integrate  0.018
 
 Meets tolerance: True
 
@@ -64,56 +64,84 @@ Meets tolerance: True
 
 Solution: 1.8093         
 Keister (Integrand Object)
-IIDStdGaussian (Discrete Distribution Object)
+IIDStdGaussian (DiscreteDistribution Object)
 	dimension       2
 	seed            7
 	mimics          StdGaussian
-Gaussian (True Measure Object)
+Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
 	mean            0
-	variance        0.500
-MeanMC_g (Stopping Criterion Object)
+	covariance      0.500
+MeanMC_g (StoppingCriterion Object)
 	inflate         1.200
 	alpha           0.010
 	abs_tol         0.005
 	rel_tol         0
 	n_init          1024
 	n_max           10000000000
-MeanVarData (Data Object)
+MeanVarData (AccumulateData Object)
 	levels          1
 	solution        1.809
 	n               596905
 	n_total         597929
 	confid_int      [ 1.804  1.814]
-	time_total      0.044
+	time_integrate  0.189
 
 Meets tolerance: True
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 1.8081         
+Solution: 1.8082         
 Keister (Integrand Object)
-Lattice (Discrete Distribution Object)
+Lattice (DiscreteDistribution Object)
 	dimension       2
 	scramble        1
 	replications    0
 	seed            7
 	backend         gail
 	mimics          StdUniform
-Gaussian (True Measure Object)
+Gaussian (TrueMeasure Object)
 	distrib_name    Lattice
 	mean            0
-	variance        0.500
-CubLattice_g (Stopping Criterion Object)
+	covariance      0.500
+CubLattice_g (StoppingCriterion Object)
 	abs_tol         0.005
 	rel_tol         0
 	n_init          1024
 	n_max           34359738368
-CubatureData (Data Object)
-	n_total         1024
+CubatureData (AccumulateData Object)
+	n_total         2048
 	solution        1.808
 	r_lag           4
-	time_total      0.002
+	time_integrate  0.022
+
+Meets tolerance: True
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 1.8082         
+Keister (Integrand Object)
+Sobol (DiscreteDistribution Object)
+	dimension       2
+	scramble        1
+	replications    0
+	seed            7
+	backend         mps
+	mimics          StdUniform
+Gaussian (TrueMeasure Object)
+	distrib_name    Sobol
+	mean            0
+	covariance      0.500
+CubSobol_g (StoppingCriterion Object)
+	abs_tol         0.005
+	rel_tol         0
+	n_init          1024
+	n_max           34359738368
+CubatureData (AccumulateData Object)
+	n_total         2048
+	solution        1.808
+	r_lag           4
+	time_integrate  0.036
 
 Meets tolerance: True
 

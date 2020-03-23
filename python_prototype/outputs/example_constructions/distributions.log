@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-IIDStdUniform (Discrete Distribution Object)
+IIDStdUniform (DiscreteDistribution Object)
 	dimension       2
 	seed            7
 	mimics          StdUniform
@@ -15,7 +15,7 @@ Nodes:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-IIDStdGaussian (Discrete Distribution Object)
+IIDStdGaussian (DiscreteDistribution Object)
 	dimension       2
 	seed            7
 	mimics          StdGaussian
@@ -29,7 +29,7 @@ Nodes:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Lattice (Discrete Distribution Object)
+Lattice (DiscreteDistribution Object)
 	dimension       2
 	scramble        1
 	replications    0
@@ -46,7 +46,7 @@ Nodes:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sobol (Discrete Distribution Object)
+Sobol (DiscreteDistribution Object)
 	dimension       2
 	scramble        1
 	replications    0
