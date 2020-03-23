@@ -37,6 +37,9 @@ class CubSobol_g(StoppingCriterion):
         refer to the references below.
     """
 
+    parameters = ['abs_tol','rel_tol','n_init','n_max']
+
+
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2**10, n_max=2**35, fudge = lambda m: 5*2**(-m)):
         """
@@ -71,9 +74,9 @@ class CubSobol_g(StoppingCriterion):
         allowed_distribs = ["Sobol"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
         if distribution.replications != 0:
-            raise ParameterError('CubLattic_g requires distribution to have 0 replications.')
+            raise ParameterError('CubSobol_g requires distribution to have 0 replications.')
         if not distribution.scramble:
-            raise ParameterError("CubLattice_g requires distribution to have scramble=True")
+            raise ParameterError("CubSobol_g requires distribution to have scramble=True")
         # Construct AccumulateData Object to House Integration data
         self.data = CubatureData(self, integrand, self.fwt_update, m_min, m_max, fudge)
 

@@ -51,6 +51,13 @@ def cublattice_g(dimension, abs_tol, rel_tol):
     solution,data = CubLattice_g(integrand, abs_tol=abs_tol, rel_tol=rel_tol).integrate()
     return data
 
+def cubsobol_g(dimension, abs_tol, rel_tol):
+    distribution = Sobol(dimension, scramble=True, replications=0, seed=7, backend="MPS")
+    measure = Gaussian(distribution, covariance=1/2)
+    integrand = Keister(measure)
+    solution,data = CubSobol_g(integrand, abs_tol=abs_tol, rel_tol=rel_tol).integrate()
+    return data
+
 integrations_dict = {
     'CLT_IIDStdUniform': clt_iidstduniform,
     'CLT_IIDStdGaussian': clt_iidstdgaussian,
@@ -58,4 +65,5 @@ integrations_dict = {
     'CLTRep_Sobol': cltrep_sobol,
     'MeanMC_g_IIDStdUniform': meanmc_g_iidstduniform,
     'MeanMC_g_IIDStdGaussian': meanmc_g_iidstdgaussian,
-    'CubLattice_g': cublattice_g}
+    'CubLattice_g': cublattice_g,
+    'CubSobol_g': cubsobol_g}

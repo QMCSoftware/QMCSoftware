@@ -13,7 +13,7 @@ solution,data = algorithm.integrate()
 print(data)
 '''
 
-# CubLattice (parallel to matlab)
+# CubLattice_g (parallel to matlab) (stilde error. Same with CubSobol_g)
 '''
 distribution = Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL')
 measure = Uniform(distribution)

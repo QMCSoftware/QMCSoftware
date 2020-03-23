@@ -37,11 +37,18 @@ def stopping_criteria():
     solution,data = MeanMC_g(integrand,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
-    # CubLattice
+    # CubLattice_g
     distribution = Lattice(dimension=d, scramble=True, replications=0, seed=7, backend='GAIL')
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = CubLattice_g(integrand,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
+    print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
+
+    # CubSobol_g
+    distribution = Sobol(dimension=d, scramble=True, replications=0, seed=7, backend='MPS')
+    measure = Gaussian(distribution, covariance=1/2)
+    integrand = Keister(measure)
+    solution,data = CubSobol_g(integrand,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
     print('%s\nMeets tolerance: %s\n%s'%(data,abs(solution-true_value)<abs_tol,bar))
 
 if __name__ == '__main__':
