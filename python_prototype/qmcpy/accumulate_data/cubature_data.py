@@ -2,7 +2,7 @@
 
 from ._accumulate_data import AccumulateData
 from ..util import CubatureWarning
-from numpy import array, nan, zeros, tile, inf, hstack, exp, pi, arange, where, complex128
+from numpy import array, nan, zeros, tile, inf, hstack, exp, pi, arange, where
 import warnings
 
 
@@ -13,13 +13,23 @@ class CubatureData(AccumulateData):
 
     parameters = ['n_total','solution','r_lag']
 
-    def __init__(self, stopping_criterion, integrand, m_min, m_max, fudge):
+    def __init__(self, stopping_criterion, integrand, basis_transform, m_min, m_max, fudge):
         """
         Initialize data instance
 
         Args:
             stopping_criterion (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
+            basis_transform (method):
+                Transform ynext, combine with y, and then transform all points
+                i.e.
+                    For cub_lattice this is Fast Fourier Transform (FFT).
+                    For cub_sobol this is Fast Walsh Transform (FWT)
+                Args:
+                    y (ndarray): all previous samples
+                    ynext (ndarray): next samples
+                Return:
+                    y (ndarray): all points combined and transformed
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
             fudge (function): positive function multiplying the finite
@@ -32,6 +42,7 @@ class CubatureData(AccumulateData):
         self.measure = self.integrand.measure
         self.distribution = self.measure.distribution
         # Set Attributes
+        self.ft = basis_transform # fast transform 
         self.m_min = m_min
         self.m_max = m_max
         self.m = self.m_min
@@ -40,7 +51,7 @@ class CubatureData(AccumulateData):
         self.r_lag = 4 # distance between coefficients summed and those computed
         self.l_star = self.m_min - self.r_lag # minimum gathering of points for the sums of DFT
         self.yval = array([]) # hold y values
-        self.y = array([],dtype=complex128) # hold transformed y values
+        self.y = array([]) # hold transformed y values
         self.kappanumap = arange(1,2**self.m+1,dtype=int)
         self.fudge = fudge
         self.omg_circ = lambda m: 2**(-m)
@@ -54,39 +65,19 @@ class CubatureData(AccumulateData):
     def update_data(self):
         """ Update data """
         # Generate sample values
-        x_lat = self.distribution.gen_samples(n_min=self.n_total,n_max=2**self.m)
-        ynext = self.integrand.f(x_lat).squeeze()
+        x = self.distribution.gen_samples(n_min=self.n_total,n_max=2**self.m)
+        ynext = self.integrand.f(x).squeeze()
         self.yval = hstack((self.yval,ynext))
         ynext = ynext.astype(complex)
-        mnext = self.m-1 if self.m>self.m_min else self.m_min
-        ## Compute initial FFT on next points
-        for l in range(int(mnext)):
-            nl = 2**l
-            nmminlm1 = 2**(mnext-l-1)
-            ptind_nl = hstack((tile(True,nl),tile(False,nl)))
-            ptind = tile(ptind_nl,int(nmminlm1))
-            coef = exp(-2*pi*1j*arange(nl)/(2*nl))
-            coefv = tile(coef,int(nmminlm1))
-            evenval = ynext[ptind]
-            oddval = ynext[~ptind]
-            ynext[ptind] = (evenval+coefv*oddval)/2
-            ynext[~ptind] = (evenval-coefv*oddval)/2
-        self.y = hstack((self.y,ynext))
-        if self.m > self.m_min: # already generated samples
-            ## Compute FFT on all points
-            nl = 2**mnext
-            ptind = hstack((tile(True,int(nl)),tile(False,int(nl))))
-            coefv = exp(-2*pi*1j*arange(nl)/(2*nl))
-            evenval = self.y[ptind]
-            oddval = self.y[~ptind]
-            self.y[ptind] = (evenval+coefv*oddval)/2
-            self.y[~ptind] = (evenval-coefv*oddval)/2
+        # Compute fast basis transform
+        self.y = self.ft(self.y, ynext)
+        ## Update self.kappanumap
+        if y.size == 0:
+            ls = arange(self.m-1,0,-1, dtype=int)
+        else:
+            ls = arange(int(self.m-1),int(self.m-self.r_lag-1),-1, dtype=int)
             # combine self.kappanumap from previous
             self.kappanumap = hstack((self.kappanumap, 2**(self.m-1)+self.kappanumap)).astype(int) #initialize map
-            ls = arange(int(self.m-1),int(self.m-self.r_lag-1),-1, dtype=int)
-        else: # self.m == self.m_min (first computation)
-            ls = arange(self.m-1,0,-1, dtype=int)
-        ## Update self.kappanumap
         for l in ls:
             nl = 2**l
             oldone = abs(self.y[self.kappanumap[1:int(nl)]-1]) # earlier values of kappa, don't touch first one

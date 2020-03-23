@@ -26,15 +26,15 @@ class CubLattice_g(StoppingCriterion):
     tolerance with guarantees under Fourier coefficients cone decay assumptions.
 
     Guarantee
-        This algorithm computes the integral of real valued functions in :math:`[0,1]^d`
+        This algorithm computes the integral of real valued functions in $[0,1]^d$
         with a prescribed generalized error tolerance. The Fourier coefficients
         of the integrand are assumed to be absolutely convergent. If the
         algorithm terminates without warning messages, the output is given with
         guarantees under the assumption that the integrand lies inside a cone of
         functions. The guarantee is based on the decay rate of the Fourier
-        coefficients. For integration over domains other than :math:`[0,1]^d`, this cone
-        condition applies to :math:`f \circ \psi` (the composition of the
-        functions) where :math:`\psi` is the transformation function for :math:`[0,1]^d` to
+        coefficients. For integration over domains other than $[0,1]^d$, this cone
+        condition applies to $f \circ \psi$ (the composition of the
+        functions) where $\psi$ is the transformation function for $[0,1]^d$ to
         the desired region. For more details on how the cone is defined, please
         refer to the references below.
     """
@@ -81,7 +81,7 @@ class CubLattice_g(StoppingCriterion):
         if distribution.backend != 'gail':
             raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
         # Construct AccumulateData Object to House Integration data
-        self.data = CubatureData(self, integrand, m_min, m_max, fudge)
+        self.data = CubatureData(self, integrand, self.fft_update, m_min, m_max, fudge)
 
     def integrate(self):
         """ Determine when to stop """
@@ -113,3 +113,36 @@ class CubLattice_g(StoppingCriterion):
         self.data.time_integrate = process_time() - t_start
         return self.data.solution, self.data
             
+    def fft_update(self, y, ynext):
+        """
+        Fast Fourier Transform (FFT) ynext, combine with y, then FFT all points
+        Args:
+            y (ndarray): all previous samples
+            ynext (ndarray): next samples
+        Return:
+            y (ndarray): all points combined and transformed
+        """
+        ## Compute initial FFT on next points
+        mnext = int(log2(len(ynext)))
+        for l in range(mnext):
+            nl = 2**l
+            nmminlm1 = 2**(mnext-l-1)
+            ptind_nl = hstack(( tile(True,nl), tile(False,nl) ))
+            ptind = tile(ptind_nl,int(nmminlm1))
+            coef = exp(-2*pi*1j*arange(nl)/(2*nl))
+            coefv = tile(coef,int(nmminlm1))
+            evenval = ynext[ptind]
+            oddval = ynext[~ptind]
+            ynext[ptind] = (evenval + coefv*oddval) / 2
+            ynext[~ptind] = (evenval - coefv*oddval) / 2
+        y = hstack((y,ynext))
+        if y.shape > 0: # already generated some samples samples
+            ## Compute FFT on all points
+            nl = 2**mnext
+            ptind = hstack((tile(True,int(nl)),tile(False,int(nl))))
+            coefv = exp(-2*pi*1j*arange(nl)/(2*nl))
+            evenval = y[ptind]
+            oddval = y[~ptind]
+            y[ptind] = (evenval + coefv*oddval) /2
+            y[~ptind] = (evenval - coefv*oddval) /2
+        return y
