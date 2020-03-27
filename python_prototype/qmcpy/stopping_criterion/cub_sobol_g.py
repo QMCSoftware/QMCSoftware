@@ -40,8 +40,8 @@ class CubSobol_g(StoppingCriterion):
     parameters = ['abs_tol','rel_tol','n_init','n_max']
 
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2**10, n_max=2**35, fudge = lambda m: 5*2**(-m)):
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=2**10, n_max=2**35,
+                 fudge=lambda m: 5*2**(-m), check_cone=True):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -52,6 +52,7 @@ class CubSobol_g(StoppingCriterion):
             fudge (function): positive function multiplying the finite
                               sum of Fast Fourier coefficients specified 
                               in the cone of functions
+            check_cone (boolean): check if the function falls in the cone
         """
         # Input Checks
         self.abs_tol = abs_tol
@@ -78,7 +79,7 @@ class CubSobol_g(StoppingCriterion):
         if not distribution.scramble:
             raise ParameterError("CubSobol_g requires distribution to have scramble=True")
         # Construct AccumulateData Object to House Integration data
-        self.data = CubatureData(self, integrand, self.fwt_update, m_min, m_max, fudge)
+        self.data = CubatureData(self, integrand, self.fwt_update, m_min, m_max, fudge, check_cone)
 
     def integrate(self):
         """ Determine when to stop """

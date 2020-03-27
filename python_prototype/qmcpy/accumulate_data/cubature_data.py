@@ -13,7 +13,7 @@ class CubatureData(AccumulateData):
 
     parameters = ['n_total','solution','r_lag']
 
-    def __init__(self, stopping_criterion, integrand, basis_transform, m_min, m_max, fudge):
+    def __init__(self, stopping_criterion, integrand, basis_transform, m_min, m_max, fudge, check_cone):
         """
         Initialize data instance
 
@@ -33,8 +33,9 @@ class CubatureData(AccumulateData):
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
             fudge (function): positive function multiplying the finite
-                              sum of Fast Fourier coefficients specified 
+                              sum of basis coefficients specified 
                               in the cone of functions
+            check_cone (boolean): check if the function falls in the cone
         """
         # Extract attributes from integrand
         self.stopping_criterion = stopping_criterion
@@ -60,6 +61,7 @@ class CubatureData(AccumulateData):
         self.stilde = 0
         self.c_stilde_low = tile(-inf,int(self.m_max-self.l_star+1))
         self.c_stilde_up = tile(inf,int(self.m_max-self.l_star+1))
+        self.check_cone = check_cone
         super().__init__()
 
     def update_data(self):
@@ -93,7 +95,12 @@ class CubatureData(AccumulateData):
         ## Compute Stilde
         nllstart = int(2**(self.m-self.r_lag-1))
         self.stilde = sum(abs(self.y[self.kappanumap[nllstart:2*nllstart]-1]))
+        ## Approximate integral
+        self.solution = self.yval.mean()
+        # update total samples
+        self.n_total = 2**self.m # updated the total evaluations
         # Necessary conditions
+        if not self.check_cone: return # don't check if the function falls in the cone
         for l in range(int(self.l_star),int(self.m+1)): # Storing the information for the necessary conditions
             c_tmp = self.omg_hat(self.m-l)*self.omg_circ(self.m-l)
             c_low = 1/(1+c_tmp)
@@ -105,7 +112,4 @@ class CubatureData(AccumulateData):
                 self.c_stilde_up[idx] = min(self.c_stilde_up[idx],c_up*const1)
         if (self.c_stilde_low > self.c_stilde_up).any():
             warnings.warn('An element of c_stilde_low > c_stilde_up', CubatureWarning)
-        ## Approximate integral
-        self.solution = self.yval.mean()
-        # update total samples
-        self.n_total = 2**self.m # updated the total evaluations
+        

@@ -4,7 +4,7 @@ evaluating the Keister function with varying absolute tolerance
 """
 
 from qmcpy import *
-from workouts.mc_vs_qmc.integrations import integrations_dict
+from workouts.mc_vs_qmc.integrations_keister import integrations_dict
 from time import time
 from numpy import arange, nan
 from pandas import DataFrame

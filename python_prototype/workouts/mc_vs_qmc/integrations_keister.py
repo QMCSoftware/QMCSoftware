@@ -6,64 +6,64 @@ def clt_iidstduniform(dimension, abs_tol, rel_tol):
     distribution = IIDStdUniform(dimension,seed=7)
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CLT(integrand, abs_tol=abs_tol, rel_tol=rel_tol).integrate()
+    solution,data = CLT(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def clt_iidstdgaussian(dimension, abs_tol, rel_tol):
     distribution = IIDStdGaussian(dimension,seed=7)
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CLT(integrand,abs_tol=abs_tol, rel_tol=rel_tol).integrate()
+    solution,data = CLT(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def cltrep_lattice(dimension, abs_tol, rel_tol):
     distribution = Lattice(dimension, scramble=True, replications=16, seed=7, backend="MPS")
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CLTRep(integrand,abs_tol=abs_tol, rel_tol=rel_tol).integrate()
+    solution,data = CLTRep(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def cltrep_sobol(dimension, abs_tol, rel_tol):
     distribution = Sobol(dimension, scramble=True, replications=16, seed=7, backend="MPS")
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CLTRep(integrand,abs_tol=abs_tol, rel_tol=rel_tol).integrate()
+    solution,data = CLTRep(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def meanmc_g_iidstduniform(dimension, abs_tol, rel_tol):
     distribution = IIDStdUniform(dimension,seed=7)
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = MeanMC_g(integrand,abs_tol=abs_tol, rel_tol=rel_tol).integrate()
+    solution,data = MeanMC_g(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def meanmc_g_iidstdgaussian(dimension, abs_tol, rel_tol):
     distribution = IIDStdGaussian(dimension,seed=7)
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = MeanMC_g(integrand,abs_tol=abs_tol, rel_tol=rel_tol).integrate()
+    solution,data = MeanMC_g(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def cublattice_g(dimension, abs_tol, rel_tol):
-    distribution = Lattice(dimension, scramble=True, replications=0, seed=7, backend="GAIL")
+    distribution = Lattice(dimension, seed=7, backend="GAIL")
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CubLattice_g(integrand, abs_tol=abs_tol, rel_tol=rel_tol).integrate()
+    solution,data = CubLattice_g(integrand, abs_tol, rel_tol, check_cone=False).integrate()
     return data
 
 def cubsobol_g(dimension, abs_tol, rel_tol):
-    distribution = Sobol(dimension, scramble=True, replications=0, seed=7, backend="MPS")
+    distribution = Sobol(dimension, seed=7, backend="MPS")
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CubSobol_g(integrand, abs_tol=abs_tol, rel_tol=rel_tol).integrate()
+    solution,data = CubSobol_g(integrand, abs_tol, rel_tol, check_cone=False).integrate()
     return data
 
 integrations_dict = {
-    'CLT_IIDStdUniform': clt_iidstduniform,
-    'CLT_IIDStdGaussian': clt_iidstdgaussian,
-    'CLTRep_Lattice': cltrep_lattice,
-    'CLTRep_Sobol': cltrep_sobol,
-    'MeanMC_g_IIDStdUniform': meanmc_g_iidstduniform,
-    'MeanMC_g_IIDStdGaussian': meanmc_g_iidstdgaussian,
-    'CubLattice_g': cublattice_g,
-    'CubSobol_g': cubsobol_g}
+    ('CLT','IIDStdUniform'): clt_iidstduniform,
+    ('CLT','IIDStdGaussian'): clt_iidstdgaussian,
+    ('CLTRep','Lattice'): cltrep_lattice,
+    ('CLTRep','Sobol'): cltrep_sobol,
+    ('MeanMC_g','IIDStdUniform'): meanmc_g_iidstduniform,
+    ('MeanMC_g','IIDStdGaussian'): meanmc_g_iidstdgaussian,
+    ('CubLattice_g','Lattice'): cublattice_g,
+    ('CubSobol_g','Sobol'): cubsobol_g}

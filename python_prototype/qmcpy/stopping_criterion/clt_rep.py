@@ -19,8 +19,8 @@ class CLTRep(StoppingCriterion):
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
 
-    def __init__(self, integrand, inflate=1.2, alpha=0.01,
-                 abs_tol=1e-2, rel_tol=0, n_init=256, n_max=2**30):
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=256, n_max=2**30,
+                 inflate=1.2, alpha=0.01):
         """
         Args:
             integrand (Integrand): an instance of Integrand

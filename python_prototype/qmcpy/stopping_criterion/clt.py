@@ -15,8 +15,8 @@ class CLT(StoppingCriterion):
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
     
-    def __init__(self, integrand, inflate=1.2, alpha=0.01,
-                 abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e10):
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e10,
+                 inflate=1.2, alpha=0.01):
         """
         Args:
             integrand (Integrand): an instance of Integrand
