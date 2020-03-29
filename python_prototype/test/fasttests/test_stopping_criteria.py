@@ -1,18 +1,13 @@
 """ Unit tests for subclasses of StoppingCriterion in QMCPy """
 
-import unittest
-
-from numpy import arange
 from qmcpy import *
 from qmcpy.util import *
+from numpy import arange
+import unittest
 
-tv_single_level = [arange(1 / 64, 65 / 64, 1 / 64)]
-dim_single_level = [len(tv) for tv in tv_single_level]
-
-tv_multi_level = [arange(1 / 4, 5 / 4, 1 / 4),
-                  arange(1 / 16, 17 / 16, 1 / 16),
-                  arange(1 / 64, 65 / 64, 1 / 64)]
-dim_multi_level = [len(tv) for tv in tv_multi_level]
+keister_2d_exact = 1.808186429263620
+abs_tol = .01
+rel_tol = 0
 
 
 class TestClt(unittest.TestCase):
@@ -21,28 +16,28 @@ class TestClt(unittest.TestCase):
     """
 
     def test_raise_distribution_compatibility_error(self):
-        self.assertRaises(DistributionCompatibilityError, CLT, Lattice(),
-                          Gaussian(3))
+        distribution = Lattice(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CLT, integrand)
+        distribution = Sobol(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CLT, integrand)
 
     def test_n_max_single_level(self):
-        discrete_distrib = IIDStdUniform(rng_seed=7)
-        true_measure = BrownianMotion(dim_single_level,
-                                      time_vector=tv_single_level)
-        integrand = AsianCall(true_measure)
-        stopping_criterion = CLT(discrete_distrib, true_measure,
-                                 abs_tol=.1, n_init=64, n_max=1000)
-        self.assertWarns(MaxSamplesWarning, integrate, integrand,
-                         true_measure, discrete_distrib, stopping_criterion)
-
-    def test_n_max_multi_level(self):
-        discrete_distrib = IIDStdUniform(rng_seed=7)
-        true_measure = BrownianMotion(dim_multi_level,
-                                      time_vector=tv_multi_level)
-        integrand = AsianCall(true_measure)
-        stopping_criterion = CLT(discrete_distrib, true_measure,
-                                 abs_tol=.1, n_init=64, n_max=1000)
-        self.assertWarns(MaxSamplesWarning, integrate, integrand,
-                         true_measure, discrete_distrib, stopping_criterion)
+        distribution = IIDStdUniform(dimension=2)
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        algorithm = CLT(integrand, abs_tol=.001, n_init=64, n_max=1000)
+        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
+        
+    def test_keister_2d(self):
+        distribution = IIDStdUniform(dimension=2)
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        solution,data = CLT(integrand, abs_tol=abs_tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
 class TestCltRep(unittest.TestCase):
@@ -51,22 +46,28 @@ class TestCltRep(unittest.TestCase):
     """
 
     def test_raise_distribution_compatibility_error(self):
-        self.assertRaises(DistributionCompatibilityError, CLTRep,
-                          IIDStdGaussian(), Gaussian(3))
-
-    def test_n_init_power_of_2(self):
-        self.assertWarns(ParameterWarning, CLTRep,
-                         Lattice(), Gaussian(3), n_init=45)
+        distribution = IIDStdGaussian(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CLTRep, integrand)
+        distribution = IIDStdUniform(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CLTRep, integrand)
 
     def test_n_max_single_level(self):
-        discrete_distrib = Lattice(rng_seed=7)
-        true_measure = BrownianMotion(dim_single_level,
-                                      time_vector=tv_single_level)
-        integrand = AsianCall(true_measure)
-        stopping_criterion = CLTRep(discrete_distrib, true_measure,
-                                    abs_tol=.1, n_init=32, n_max=100)
-        self.assertWarns(MaxSamplesWarning, integrate, integrand,
-                         true_measure, discrete_distrib, stopping_criterion)
+        distribution = Lattice(dimension=2, replications=16)
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        algorithm = CLTRep(integrand, abs_tol=.001, n_init=16, n_max=32)
+        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
+    
+    def test_keister_2d(self):
+        distribution = Sobol(dimension=2, replications=16)
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
 class TestMeanMC_g(unittest.TestCase):
@@ -75,19 +76,98 @@ class TestMeanMC_g(unittest.TestCase):
     """
 
     def test_raise_distribution_compatibility_error(self):
-        self.assertRaises(DistributionCompatibilityError, CLT, Lattice(),
-                          Gaussian(3))
+        distribution = Lattice(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, MeanMC_g, integrand)
+        distribution = Sobol(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, MeanMC_g, integrand)
 
     def test_n_max_single_level(self):
-        discrete_distrib = IIDStdUniform(rng_seed=7)
-        true_measure = BrownianMotion(dim_single_level,
-                                      time_vector=tv_single_level)
-        integrand = AsianCall(true_measure)
-        stopping_criterion = CLT(discrete_distrib, true_measure,
-                                 abs_tol=.1, n_init=64, n_max=1000)
-        self.assertWarns(MaxSamplesWarning, integrate, integrand,
-                         true_measure, discrete_distrib, stopping_criterion)
+        distribution = IIDStdUniform(dimension=2)
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        algorithm = MeanMC_g(integrand, abs_tol=.001, n_init=64, n_max=500)
+        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
+
+    
+    def test_keister_2d(self):
+        distribution = IIDStdGaussian(dimension=2)
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        solution,data = MeanMC_g(integrand, abs_tol=abs_tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
 
 
+class TestCubLattice_g(unittest.TestCase):
+    """
+    Unit tests for CubLattice_g in QMCPy
+    """
+
+    def test_raise_distribution_compatibility_error(self):
+        distribution = IIDStdGaussian(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CubLattice_g, integrand)
+        distribution = IIDStdUniform(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CubLattice_g, integrand)
+        distribution = Sobol(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CubLattice_g, integrand)
+
+    def test_n_max_single_level(self):
+        distribution = Lattice(dimension=2, replications=0, backend="GAIL")
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        algorithm = CubLattice_g(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)
+        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
+    
+    def test_keister_2d(self):
+        distribution = Lattice(dimension=2)
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        solution,data = CubLattice_g(integrand, abs_tol=abs_tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
+
+
+class TestCubSobol_g(unittest.TestCase):
+    """
+    Unit tests for CubSobol_g in QMCPy
+    """
+
+    def test_raise_distribution_compatibility_error(self):
+        distribution = IIDStdGaussian(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CubSobol_g, integrand)
+        distribution = IIDStdUniform(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CubSobol_g, integrand)
+        distribution = Lattice(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CubSobol_g, integrand)
+
+    def test_n_max_single_level(self):
+        distribution = Sobol(dimension=2, replications=0, backend="MPS")
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        algorithm = CubSobol_g(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)
+        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
+    
+    def test_keister_2d(self):
+        distribution = Sobol(dimension=2)
+        measure = Gaussian(distribution, covariance=1/2)
+        integrand = Keister(measure)
+        solution,data = CubSobol_g(integrand, abs_tol=abs_tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
+        
+        
 if __name__ == "__main__":
     unittest.main()

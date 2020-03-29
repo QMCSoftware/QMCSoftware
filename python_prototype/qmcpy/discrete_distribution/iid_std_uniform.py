@@ -1,35 +1,35 @@
 """ Definition for IIDStdUniform, a concrete implementation of DiscreteDistribution """
 
-from numpy.random import Generator, PCG64
-
 from ._discrete_distribution import DiscreteDistribution
+from numpy.random import Generator, PCG64
 
 
 class IIDStdUniform(DiscreteDistribution):
-    """ IID Standard Uniform """
+    """ Standard Uniform """
 
-    def __init__(self, rng_seed=None):
+    parameters = ['dimension','seed','mimics']
+
+    def __init__(self, dimension=1, seed=None):
         """
         Args:
-            rng_seed (int): seed the random number generator for reproducibility
+            dimension (int): dimension of samples
+            seed (int): seed the random number generator for reproducibility
         """
+        self.dimension = dimension
+        self.seed = seed
+        self.rng = Generator(PCG64(self.seed))
         self.mimics = 'StdUniform'
-        self.rng = Generator(PCG64(rng_seed))
         super().__init__()
 
-    def gen_dd_samples(self, replications, n_samples, dimensions):
+    def gen_samples(self, n):
         """
-        Generate r nxd IID Standard Uniform samples
+        Generate n x self.dimension IID Standard Uniform samples
 
         Args:
-            replications (int): Number of nxd matrices to generate (sample.size()[0])
-            n_samples (int): Number of observations (sample.size()[1])
-            dimensions (int): Number of dimensions (sample.size()[2])
+            n (int): Number of observations to generate
 
         Returns:
-            replications x n_samples x dimensions (numpy array)
+            n x self.dimension (ndarray)
         """
-        r = int(replications)
-        n = int(n_samples)
-        d = int(dimensions)
-        return self.rng.uniform(0, 1, (r, n, d))
+        return self.rng.uniform(0,1,(int(n), self.dimension))
+        

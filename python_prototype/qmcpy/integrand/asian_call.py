@@ -1,67 +1,67 @@
 """ Definition for class AsianCall, a concrete implementation of Integrand """
 
-from numpy import array, exp, log, maximum
-
 from ._integrand import Integrand
+from ..true_measure._true_measure import TrueMeasure
+from ..true_measure import BrownianMotion
 from ..util import ParameterError
+from numpy import array, exp, log, maximum, repeat
 
 
 class AsianCall(Integrand):
     """ Specify and generate payoff values of an Asian Call option """
 
-    def __init__(self, bm_measure, volatility=0.5, start_price=30,
-                 strike_price=25, interest_rate=0, mean_type='arithmetic'):
+    parameters = ['volatility', 'start_price', 'strike_price',
+                  'interest_rate','mean_type', '_dim_frac']
+                          
+    def __init__(self, measure, volatility=0.5, start_price=30, strike_price=35,\
+                 interest_rate=0, mean_type='arithmetic', _dim_frac=0):
         """
         Initialize AsianCall Integrand(s)
 
         Args:
-            bm_measure (TrueMeasure): A BrownianMotion Measure object
+            measure (TrueMeasure): A BrownianMotion TrueMeasure object
             volatility (float): sigma, the volatility of the asset
             start_price (float): S(0), the asset value at t=0
             strike_price (float): strike_price, the call/put offer
             interest_rate (float): r, the annual interest rate
             mean_type (string): 'arithmetic' or 'geometric' mean
+            _dim_frac (float): fraciton of dimension compared to next level.
+                              0 for single-level problems.
+                              See add_multilevel_kwargs
         """
-        mean_type = mean_type.lower()
-        if mean_type not in ['arithmetic', 'geometric']:
+        if not isinstance(measure,BrownianMotion):
+            raise ParameterError('AsianCall measure must be a BrownianMotion instance')
+        self.measure = measure
+        self.volatility = volatility
+        self.start_price = start_price
+        self.strike_price = strike_price
+        self.interest_rate = interest_rate
+        self.mean_type = mean_type.lower()
+        if self.mean_type not in ['arithmetic', 'geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
-        dimension = bm_measure.dimension
-        super().__init__(dimension,
-                         bm_measure=bm_measure,
-                         dim_frac=array([0] + [dimension[i] / dimension[i - 1]
-                                               for i in range(1, len(dimension))]),
-                         volatility=volatility,
-                         start_price=start_price,
-                         strike_price=strike_price,
-                         interest_rate=interest_rate,
-                         mean_type=[mean_type],
-                         exercise_time=[bm_measure[i].time_vector[-1] for i in range(len(dimension))])
+        self._dim_frac = _dim_frac
+        self.dimension = self.measure.dimension
+        self.exercise_time = self.measure.time_vector[-1]
+        super().__init__()
 
-    def g(self, x):
-        """
-        Original integrand to be integrated
-
+    @classmethod
+    def add_multilevel_kwargs(cls, levels, **kwargs):
+        """ CLASS METHOD
+        Add keyword argumnets to be distributed across levels
+        
         Args:
-            x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
-                row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
-
-        Returns:
-            :math:`n \\cdot p` matrix with values \
-            :math:`f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
-            :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, \
-            then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
-            and :math:`x'_{ij} = c` otherwise
+            levels (int): number of levels 
+            kwargs (dict): dictionary of keyword and multi-level arguments
+                key (string): keyword
+                val (list/ndarray): list of length levels whose elements will be 
+                                    distributed amongst levels
+        
+        Returns: 
+            kwargs (dict): input kwargs updated with more arguments
         """
-        s_fine = self.start_price * exp(
-            (self.interest_rate - self.volatility ** 2 / 2) *
-            self.bm_measure.time_vector + self.volatility * x)
-        y = self.get_discounted_payoffs(s_fine, self.dimension)
-        if self.dim_frac > 0:
-            s_course = s_fine[:, int(self.dim_frac - 1):: int(self.dim_frac)]
-            d_course = self.dimension / self.dim_frac
-            y_course = self.get_discounted_payoffs(s_course, d_course)
-            y -= y_course
-        return y
+        dims = [measure.dimension for measure in kwargs['measure']]
+        kwargs['_dim_frac'] = [0] + [dims[i]/dims[i-1] for i in range(1,levels)]
+        return kwargs
 
     def get_discounted_payoffs(self, stock_path, dimension):
         """
@@ -84,16 +84,28 @@ class AsianCall(Integrand):
             exp(-self.interest_rate * self.exercise_time)
         return y
 
-    def __repr__(self, attributes=[]):
+    def g(self, x):
         """
-        Print important attribute values
+        Original integrand to be integrated
 
         Args:
-            attributes (list): list of attributes to print
+            x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
+                row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
 
         Returns:
-            string of self info
+            :math:`n \\cdot p` matrix with values \
+            :math:`f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
+            :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, \
+            then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
+            and :math:`x'_{ij} = c` otherwise
         """
-        attributes = ['volatility', 'start_price', 'strike_price',
-                      'interest_rate', 'mean_type', 'exercise_time']
-        return super().__repr__(attributes)
+        s_fine = self.start_price * exp(
+            (self.interest_rate - self.volatility ** 2 / 2) *
+            self.measure.time_vector + self.volatility * x)
+        y = self.get_discounted_payoffs(s_fine, self.dimension)
+        if self._dim_frac > 0:
+            s_course = s_fine[:, int(self._dim_frac - 1):: int(self._dim_frac)]
+            d_course = self.dimension / self._dim_frac
+            y_course = self.get_discounted_payoffs(s_course, d_course)
+            y -= y_course
+        return y

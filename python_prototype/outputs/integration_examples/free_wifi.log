@@ -1,0 +1,33 @@
+Password: 3141592653
+CPU time: 34.39 sec
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 3.1416         
+QuickConstruct (Integrand Object)
+Lattice (Discrete Distribution Object)
+	dimension       1
+	scramble        1
+	replications    16
+	seed            7
+	backend         mps
+	mimics          StdUniform
+Lebesgue (True Measure Object)
+	distrib_name    Lattice
+	lower_bound     -2
+	upper_bound     2
+CLTRep (Stopping Criterion Object)
+	inflate         1.200
+	alpha           0.010
+	abs_tol         0.000
+	rel_tol         0
+	n_init          256
+	n_max           1073741824
+MeanVarDataRep (Data Object)
+	replications    16
+	solution        3.142
+	sighat          0.000
+	n_total         16777216
+	confid_int      [ 3.142  3.142]
+	time_total      34.388
+

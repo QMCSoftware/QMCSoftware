@@ -1,7 +1,8 @@
 """ Definition for abstract class StoppingCriterion """
 
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import DistributionCompatibilityError, ParameterError, \
-    MethodImplementationError, univ_repr
+                   MethodImplementationError, univ_repr
 
 
 class StoppingCriterion(object):
@@ -12,22 +13,36 @@ class StoppingCriterion(object):
         abs_tol: absolute error tolerance
         rel_tol: relative error tolerance
         n_max: maximum number of samples
-        alpha: significance level for confidence interval
-        inflate: inflation factor when estimating variance
         stage: stage of the computation
     """
+    
+    def __init__(self, distribution, allowed_levels, allowed_distribs):
+        """
+        Check StoppingCriterion parameters
 
-    def __init__(self, distribution, allowed_distribs):
-        """
         Args:
-            distribution (DiscreteDistribution): an instance of DiscreteDistribution
-            allowed_distribs: distribution's compatible with the StoppingCriterion
+            distribution: DiscreteDistribution or list of DiscreteDistributions
+            allowed_levels (string): stopping criteron works with 'single' or 'multi' level problems
+            allowed_distribs (list): list of names (strings) of compatible distributions
         """
-        if type(distribution).__name__ not in allowed_distribs:
-            error_message = type(self).__name__  \
-                + " only accepts distributions:" \
-                + str(allowed_distribs)
-            raise DistributionCompatibilityError(error_message)
+        # check compatable level and StoppingCriterion
+        if isinstance(distribution,DiscreteDistribution):
+            levels = 'single'
+            distribution = [distribution] # make it apprea multi-level for next check
+        else:
+            levels = 'multi'
+        if levels=='multi' and allowed_levels=='single':
+            raise NotYetImplemented('''
+                StoppingCriterion not implemented for multi-level problems.
+                Use CLT stopping criterion with an iid distribution for multi-level problems.''')
+        # check distribution compatibility with stopping_criterion
+        s_name = type(self).__name__
+        for distrib in distribution:
+            d_name = type(distrib).__name__
+            if d_name not in allowed_distribs:
+                error_message = "%s only accepts distributions: %s" %(s_name, str(allowed_distribs))
+                raise DistributionCompatibilityError(error_message)
+        # parameter checks
         prefix = 'A concrete implementation of Stopping Criterion must have '
         if not hasattr(self, 'abs_tol'):
             raise ParameterError(prefix + 'self.abs_tol (absolute tolerance)')
@@ -35,29 +50,18 @@ class StoppingCriterion(object):
             raise ParameterError(prefix + 'self.rel_tol (relative tolerance)')
         if not hasattr(self, 'n_max'):
             raise ParameterError(prefix + 'self.n_max (maximum total samples)')
-        if not hasattr(self, 'alpha'):
-            raise ParameterError(prefix + 'self.alpha (uncertainty level)')
-        if not hasattr(self, 'inflate'):
-            raise ParameterError(prefix + 'self.inflate (inflation factor)')
-        if not hasattr(self, 'stage'):
-            raise ParameterError(prefix + 'self.stage (stage of the computation)')
-
-    def stop_yet(self):
-        """
-        ABSTRACT METHOD
+        if not hasattr(self,'parameters'):
+            self.parameters = []
+            
+    def integrate(self):
+        """ ABSTRACT METHOD
         Determine the number of samples needed to satisfy tolerance
-        """
-        raise MethodImplementationError(self, 'stop_yet')
 
-    def __repr__(self, attributes=[]):
+        Return:
+            solution (float): approximate integral
+            data (AccumulateData): an AccumulateData object
         """
-        Print important attribute values
+        raise MethodImplementationError(self, 'integrate')
 
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        super_attributes = ['abs_tol', 'rel_tol', 'n_max', 'inflate', 'alpha']
-        return univ_repr(self, "Stopping Criterion", super_attributes + attributes)
+    def __repr__(self):
+        return univ_repr(self, "StoppingCriterion", self.parameters)

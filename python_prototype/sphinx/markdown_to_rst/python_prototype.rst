@@ -15,8 +15,6 @@ Package of main components
 -  Discrete Distribution classes
 -  Stopping Criterion classes
 -  Accumulate Data classes
--  Third Party contributed classes
--  integrate function
 
 --------------
 
@@ -61,11 +59,12 @@ Installation
 
 ::
 
-   pip install qmcpy
+    pip install qmcpy
 
-A virtual environment is recommended for developers/contributors Ensure
-*…/python_prototypes/* is in your path Install dependencies with
+| A virtual environment is recommended for developers/contributors
+| Ensure *.../python\_prototypes/* is in your path
+| Install dependencies with
 
 ::
 
-   pip install requirements.txt
+    pip install requirements.txt

@@ -1,46 +1,29 @@
 """ DiscreteDistribution is an abstract class. """
 
 from ..util import ParameterError, MethodImplementationError, univ_repr
+from numpy import array
 
 
 class DiscreteDistribution(object):
-    """
-    Discrete Distribution from which we can generate samples
-
-    Attributes:
-        mimics (string): True Measure mimiced by the Discrete Distribution
-    """
+    """ Discrete DiscreteDistribution from which we can generate samples """
 
     def __init__(self):
-        """ Initialize Discrete Distributuion instance """
         prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
+        if not hasattr(self, 'dimension'):
+            raise ParameterError(prefix + 'self.dimension')
+        if not hasattr(self,'parameters'):
+            self.parameters = []
 
-    def gen_dd_samples(self, replications, n_samples, dimensions):
-        """
-        ABSTRACT METHOD
-        Generate r nxd IID Standard Gaussian samples
-
-        Args:
-            replications (int): Number of nxd matrices to generate (sample.size()[0])
-            n_samples (int): Number of observations (sample.size()[1])
-            dimensions (int): Number of dimensions (sample.size()[2])
-
+    def gen_samples(self, *args):
+        """ ABSTRACT METHOD
+        Generate self.replications (n_max-n_min)xself.d Lattice samples
+        
         Returns:
-            replications x n_samples x dimensions (numpy array)
+            self.replications x (n_max-n_min) x self.dimension (ndarray)
         """
         raise MethodImplementationError(self, 'gen_dd_samples')
 
-    def __repr__(self, attributes=[]):
-        """
-        Print important attribute values
-
-        Args:
-            attributes (list): list of attributes to print
-
-        Returns:
-            string of self info
-        """
-        super_attributes = ['mimics']
-        return univ_repr(self, "Discrete Distribution", super_attributes + attributes)
+    def __repr__(self):
+        return univ_repr(self, "DiscreteDistribution", self.parameters)
