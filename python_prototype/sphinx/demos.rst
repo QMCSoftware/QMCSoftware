@@ -4,6 +4,8 @@ Demos
 .. toctree::
     :maxdepth: 2
 
+    rst_from_demos/quickstart.rst
+
     rst_from_demos/qmcpy_intro.rst
 
     rst_from_demos/integration_examples.rst

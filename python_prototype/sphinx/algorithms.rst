@@ -158,6 +158,12 @@ Cubature Lattice Garunteed
 .. automodule:: qmcpy.stopping_criterion.cub_lattice_g
     :members:
 
+Cubature Sobol Garunteed
+...........................
+
+.. automodule:: qmcpy.stopping_criterion.cub_sobol_g
+    :members:
+
 Utilities
 ---------
 
