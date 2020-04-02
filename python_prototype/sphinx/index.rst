@@ -23,3 +23,14 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Sponsors
+==================
+
+.. image:: logo/illinois-institute-of-technology-vector-logo.jpg
+   :width: 600
+   :alt: IIT
+
+.. image:: logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg
+   :width: 600
+   :alt: SigOpt

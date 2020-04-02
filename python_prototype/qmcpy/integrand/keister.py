@@ -21,8 +21,11 @@ class Keister(Integrand):
 
     def __init__(self, dimension):
         """
+        Initialize Keister integrand
+
         Args:
             dimension (ndarray): dimension(s) of the integrand(s)
+
         """
         super().__init__(dimension)
 
@@ -40,6 +43,7 @@ class Keister(Integrand):
             :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, \
             then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
             and :math:`x'_{ij} = c` otherwise
+
         """
         dimension = x.shape[1]  # infer domain dimension
         normx = LA.norm(x, 2, axis=1)  # ||x||_2
