@@ -1,7 +1,3 @@
-.. role:: math(raw)
-   :format: html latex
-..
-
 .. contents::
    :depth: 1
 ..
@@ -70,12 +66,12 @@ Stopping Criterion
 **For IID Nodes** :math:`x_i\sim` iid
 
 -  Central Limit Theorem (CLT)
--  MeanMC\_g (gauranteed)
+-  MeanMC_g (gauranteed)
 
 **For QMC Sequences** :math:`\{x_{r,i}\}_{r=1}^R \sim` lds
 
 -  CLT Repeated
--  CubLattice\_g (gauranteed)
+-  CubLattice_g (gauranteed)
 
 --------------
 

@@ -26,7 +26,7 @@ the Gaussian measure, and the Sobol distribution:
    :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
 The following code snippet integrates a three-dimensional Keister
-function numerically by creating instances of ``qmcpy``'s built-in
+function numerically by creating instances of ``qmcpy``\ ’s built-in
 classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CLTRep``, as inputs
 to the function ``integrate()``.
 
@@ -44,18 +44,18 @@ to the function ``integrate()``.
 
     Solution: 2.1659         
     Keister (Integrand Object)
-    Lattice (Discrete Distribution Object)
+    Lattice (DiscreteDistribution Object)
     	dimension       3
     	scramble        1
     	replications    16
     	seed            7
     	backend         mps
     	mimics          StdUniform
-    Gaussian (True TrueMeasure Object)
+    Gaussian (TrueMeasure Object)
     	distrib_name    Lattice
     	mean            0
     	covariance      0.500
-    CLTRep (Stopping Criterion Object)
+    CLTRep (StoppingCriterion Object)
     	inflate         1.200
     	alpha           0.010
     	abs_tol         0.050
@@ -68,7 +68,7 @@ to the function ``integrate()``.
     	sighat          0.011
     	n_total         256
     	confid_int      [ 2.164  2.168]
-    	time_integrate  0.006
+    	time_integrate  0.007
     
 
 
@@ -122,17 +122,17 @@ defined as follows:
     	interest_rate   0.010
     	mean_type       arithmetic
     	_dim_frac       0
-    Lattice (Discrete Distribution Object)
+    Lattice (DiscreteDistribution Object)
     	dimension       64
     	scramble        1
     	replications    16
     	seed            7
     	backend         gail
     	mimics          StdUniform
-    BrownianMotion (True TrueMeasure Object)
+    BrownianMotion (TrueMeasure Object)
     	distrib_name    Lattice
     	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
-    CLTRep (Stopping Criterion Object)
+    CLTRep (StoppingCriterion Object)
     	inflate         1.200
     	alpha           0.010
     	abs_tol         0.050
@@ -145,14 +145,14 @@ defined as follows:
     	sighat          0.021
     	n_total         4096
     	confid_int      [ 6.258  6.260]
-    	time_integrate  0.482
+    	time_integrate  2.666
     
 
 
 European Arithmetic-Mean Asian Put Option: Multi-Level
 ------------------------------------------------------
 
-This example is similar to the last one except that we use Gile's
+This example is similar to the last one except that we use Gile’s
 multi-level method for estimation of the option price. The main idea can
 be summarized as follows:
 
@@ -198,7 +198,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2376         
+    Solution: 6.2398         
     MultiLevelConstructor (AsianCall Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -214,7 +214,7 @@ last example.
     	time_vector     [array([ 0.250,  0.500,  0.750,  1.000])
     	                array([ 0.062,  0.125,  0.188, ...,  0.875,  0.938,  1.000])
     	                array([ 0.016,  0.031,  0.047, ...,  0.969,  0.984,  1.000])]
-    CLT (Stopping Criterion Object)
+    CLT (StoppingCriterion Object)
     	inflate         1.200
     	alpha           0.010
     	abs_tol         0.050
@@ -223,11 +223,11 @@ last example.
     	n_max           10000000000
     MeanVarData (AccumulateData Object)
     	levels          3
-    	solution        6.238
-    	n               [285480  37425   6176]
-    	n_total         332153
-    	confid_int      [ 6.189  6.286]
-    	time_integrate  0.088
+    	solution        6.240
+    	n               [283531  39081   6261]
+    	n_total         331945
+    	confid_int      [ 6.191  6.289]
+    	time_integrate  0.538
     
 
 

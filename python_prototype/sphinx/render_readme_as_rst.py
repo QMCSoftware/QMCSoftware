@@ -12,6 +12,7 @@ See also: http://www.flutterbys.com.au/stats/tut/tut17.3.html
 
 import os
 
+
 def markdown_to_rst(path, _dir):
     """
     Change README.md markdown files to .rst files. Also handle LaTeX \

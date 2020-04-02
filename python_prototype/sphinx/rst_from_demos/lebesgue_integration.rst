@@ -2,8 +2,8 @@ QMCPy for Lebesgue Integration
 ==============================
 
 This notebook will give examples of how to use QMCPy for integration
-problems that not are defined in terms of a standard measure. i.e.
-Uniform or Gaussian.
+problems that not are defined in terms of a standard measure.
+i.e. Uniform or Gaussian.
 
 .. code:: ipython3
 
@@ -149,5 +149,11 @@ Mathematica Code: ``Integrate[Sin[x]/Log[x], {x,a,b}]``
 
     y = -0.880
     Within tolerance: True
+
+
+.. parsed-literal::
+
+    /Users/terrya/Documents/ProgramData/QMCSoftware/python_prototype/qmcpy/accumulate_data/cubature_data.py:114: CubatureWarning: An element of c_stilde_low > c_stilde_up
+      warnings.warn('An element of c_stilde_low > c_stilde_up', CubatureWarning)
 
 

@@ -59,12 +59,12 @@ Installation
 
 ::
 
-    pip install qmcpy
+   pip install qmcpy
 
 | A virtual environment is recommended for developers/contributors
-| Ensure *.../python\_prototypes/* is in your path
+| Ensure *…/python_prototypes/* is in your path
 | Install dependencies with
 
 ::
 
-    pip install requirements.txt
+   pip install requirements.txt

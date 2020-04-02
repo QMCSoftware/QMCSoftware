@@ -39,9 +39,21 @@ Gaussian True Measure - :math:`\mathcal{N}_3(0,\frac{1}{2})`
 
 .. code:: ipython3
 
-    # Solutions
-    df_abstol_solutions = pd.read_csv('../outputs/mc_vs_qmc/vary_abs_tol_solution.csv')
-    df_abstol_solutions.loc[::50].set_index('abs_tol')
+    df = pd.read_csv('../outputs/mc_vs_qmc/vary_abs_tol.csv')
+    df['Problem'] = df['Stopping Criterion'] + ' ' + df['Distribution'] + ' (' + df['MC/QMC'] + ')'
+    df = df.drop(['Stopping Criterion','Distribution','MC/QMC'],axis=1)
+    problems = ['CLT IIDStdUniform (MC)',
+                'MeanMC_g IIDStdGaussian (MC)',
+                'CLTRep Sobol (QMC)',
+                'CubLattice_g Lattice (QMC)',
+                'CubSobol_g Sobol (QMC)']
+    df = df[df['Problem'].isin(problems)]
+    df['abs_tol'] = df['abs_tol'].round(4)
+    df_grouped = df.groupby(['Problem'])
+    df_abs_tols = df_grouped['abs_tol'].apply(list).reset_index(name='abs_tol')
+    df_samples = df_grouped['n_samples'].apply(list).reset_index(name='n')
+    df_times = df.groupby(['Problem'])['time'].apply(list).reset_index(name='time')
+    df[df['abs_tol'].isin([.01,.05,.1])].set_index('Problem')
 
 
 
@@ -66,19 +78,13 @@ Gaussian True Measure - :math:`\mathcal{N}_3(0,\frac{1}{2})`
       <thead>
         <tr style="text-align: right;">
           <th></th>
-          <th>CLT_IIDStdUniform</th>
-          <th>CLT_IIDStdGaussian</th>
-          <th>CLTRep_Lattice</th>
-          <th>CLTRep_Sobol</th>
-          <th>MeanMC_g_IIDStdUniform</th>
-          <th>MeanMC_g_IIDStdGaussian</th>
-          <th>CubLattice_g</th>
+          <th>abs_tol</th>
+          <th>solution</th>
+          <th>n_samples</th>
+          <th>time</th>
         </tr>
         <tr>
-          <th>abs_tol</th>
-          <th></th>
-          <th></th>
-          <th></th>
+          <th>Problem</th>
           <th></th>
           <th></th>
           <th></th>
@@ -87,414 +93,109 @@ Gaussian True Measure - :math:`\mathcal{N}_3(0,\frac{1}{2})`
       </thead>
       <tbody>
         <tr>
-          <td>2.00e-03</td>
+          <td>CLT IIDStdUniform (MC)</td>
+          <td>1.00e-02</td>
           <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
+          <td>4.72e+05</td>
+          <td>5.04e-01</td>
         </tr>
         <tr>
-          <td>1.20e-02</td>
-          <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-        </tr>
-        <tr>
-          <td>2.20e-02</td>
-          <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-        </tr>
-        <tr>
-          <td>3.20e-02</td>
-          <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.19e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-        </tr>
-        <tr>
-          <td>4.20e-02</td>
-          <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-        </tr>
-        <tr>
-          <td>5.20e-02</td>
-          <td>2.17e+00</td>
-          <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-        </tr>
-        <tr>
-          <td>6.20e-02</td>
+          <td>CLT IIDStdUniform (MC)</td>
+          <td>5.00e-02</td>
           <td>2.16e+00</td>
+          <td>2.08e+04</td>
+          <td>1.23e-02</td>
+        </tr>
+        <tr>
+          <td>CLT IIDStdUniform (MC)</td>
+          <td>1.00e-01</td>
+          <td>2.17e+00</td>
+          <td>6.75e+03</td>
+          <td>3.94e-03</td>
+        </tr>
+        <tr>
+          <td>MeanMC_g IIDStdGaussian (MC)</td>
+          <td>1.00e-02</td>
+          <td>2.17e+00</td>
+          <td>6.12e+05</td>
+          <td>2.65e-01</td>
+        </tr>
+        <tr>
+          <td>MeanMC_g IIDStdGaussian (MC)</td>
+          <td>5.00e-02</td>
           <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
+          <td>4.01e+04</td>
+          <td>3.19e-02</td>
+        </tr>
+        <tr>
+          <td>MeanMC_g IIDStdGaussian (MC)</td>
+          <td>1.00e-01</td>
           <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
+          <td>1.46e+04</td>
+          <td>5.05e-03</td>
         </tr>
         <tr>
-          <td>7.20e-02</td>
+          <td>CLTRep Sobol (QMC)</td>
+          <td>1.00e-02</td>
           <td>2.17e+00</td>
-          <td>2.19e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.18e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-        </tr>
-        <tr>
-          <td>8.20e-02</td>
-          <td>2.17e+00</td>
-          <td>2.20e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-        </tr>
-        <tr>
-          <td>9.20e-02</td>
-          <td>2.16e+00</td>
-          <td>2.22e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.17e+00</td>
-          <td>2.19e+00</td>
-          <td>2.17e+00</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-
-
-
-.. code:: ipython3
-
-    # Total Number of Samples
-    df_abstol_n_total = pd.read_csv('../outputs/mc_vs_qmc/vary_abs_tol_n_total.csv')
-    df_abstol_n_total.loc[::50].set_index('abs_tol')
-
-
-
-
-.. raw:: html
-
-    <div>
-    <style scoped>
-        .dataframe tbody tr th:only-of-type {
-            vertical-align: middle;
-        }
-    
-        .dataframe tbody tr th {
-            vertical-align: top;
-        }
-    
-        .dataframe thead th {
-            text-align: right;
-        }
-    </style>
-    <table border="1" class="dataframe">
-      <thead>
-        <tr style="text-align: right;">
-          <th></th>
-          <th>CLT_IIDStdUniform</th>
-          <th>CLT_IIDStdGaussian</th>
-          <th>CLTRep_Lattice</th>
-          <th>CLTRep_Sobol</th>
-          <th>MeanMC_g_IIDStdUniform</th>
-          <th>MeanMC_g_IIDStdGaussian</th>
-          <th>CubLattice_g</th>
-        </tr>
-        <tr>
-          <th>abs_tol</th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>2.00e-03</td>
-          <td>1.17e+07</td>
-          <td>1.19e+07</td>
-          <td>2.05e+03</td>
-          <td>1.02e+03</td>
-          <td>1.41e+07</td>
-          <td>1.43e+07</td>
-          <td>8.19e+03</td>
-        </tr>
-        <tr>
-          <td>1.20e-02</td>
-          <td>3.28e+05</td>
-          <td>3.32e+05</td>
           <td>5.12e+02</td>
+          <td>1.26e-02</td>
+        </tr>
+        <tr>
+          <td>CLTRep Sobol (QMC)</td>
+          <td>5.00e-02</td>
+          <td>2.18e+00</td>
           <td>2.56e+02</td>
-          <td>4.28e+05</td>
-          <td>4.33e+05</td>
+          <td>7.20e-03</td>
+        </tr>
+        <tr>
+          <td>CLTRep Sobol (QMC)</td>
+          <td>1.00e-01</td>
+          <td>2.18e+00</td>
+          <td>2.56e+02</td>
+          <td>6.97e-03</td>
+        </tr>
+        <tr>
+          <td>CubLattice_g Lattice (QMC)</td>
+          <td>1.00e-02</td>
+          <td>2.17e+00</td>
           <td>2.05e+03</td>
+          <td>4.74e-03</td>
         </tr>
         <tr>
-          <td>2.20e-02</td>
-          <td>9.91e+04</td>
-          <td>1.00e+05</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>1.42e+05</td>
-          <td>1.44e+05</td>
+          <td>CubLattice_g Lattice (QMC)</td>
+          <td>5.00e-02</td>
+          <td>2.17e+00</td>
           <td>1.02e+03</td>
+          <td>4.35e-03</td>
         </tr>
         <tr>
-          <td>3.20e-02</td>
-          <td>4.79e+04</td>
-          <td>4.85e+04</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>7.88e+04</td>
-          <td>7.94e+04</td>
+          <td>CubLattice_g Lattice (QMC)</td>
+          <td>1.00e-01</td>
+          <td>2.17e+00</td>
           <td>1.02e+03</td>
+          <td>3.33e-03</td>
         </tr>
         <tr>
-          <td>4.20e-02</td>
-          <td>2.87e+04</td>
-          <td>2.90e+04</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>5.20e+04</td>
-          <td>5.25e+04</td>
+          <td>CubSobol_g Sobol (QMC)</td>
+          <td>1.00e-02</td>
+          <td>2.17e+00</td>
+          <td>2.05e+03</td>
+          <td>9.61e-03</td>
+        </tr>
+        <tr>
+          <td>CubSobol_g Sobol (QMC)</td>
+          <td>5.00e-02</td>
+          <td>2.17e+00</td>
           <td>1.02e+03</td>
+          <td>5.85e-03</td>
         </tr>
         <tr>
-          <td>5.20e-02</td>
-          <td>1.94e+04</td>
-          <td>1.96e+04</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>3.74e+04</td>
-          <td>3.77e+04</td>
+          <td>CubSobol_g Sobol (QMC)</td>
+          <td>1.00e-01</td>
+          <td>2.17e+00</td>
           <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>6.20e-02</td>
-          <td>1.43e+04</td>
-          <td>1.44e+04</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>2.87e+04</td>
-          <td>2.90e+04</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>7.20e-02</td>
-          <td>1.11e+04</td>
-          <td>1.12e+04</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>2.31e+04</td>
-          <td>2.33e+04</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>8.20e-02</td>
-          <td>9.04e+03</td>
-          <td>9.12e+03</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>1.91e+04</td>
-          <td>1.93e+04</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>9.20e-02</td>
-          <td>7.60e+03</td>
-          <td>7.67e+03</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>1.63e+04</td>
-          <td>1.64e+04</td>
-          <td>1.02e+03</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-
-
-
-.. code:: ipython3
-
-    # Run Time
-    df_abstol_time = pd.read_csv('../outputs/mc_vs_qmc/vary_abs_tol_time.csv')
-    df_abstol_time.loc[::50].set_index('abs_tol')
-
-
-
-
-.. raw:: html
-
-    <div>
-    <style scoped>
-        .dataframe tbody tr th:only-of-type {
-            vertical-align: middle;
-        }
-    
-        .dataframe tbody tr th {
-            vertical-align: top;
-        }
-    
-        .dataframe thead th {
-            text-align: right;
-        }
-    </style>
-    <table border="1" class="dataframe">
-      <thead>
-        <tr style="text-align: right;">
-          <th></th>
-          <th>CLT_IIDStdUniform</th>
-          <th>CLT_IIDStdGaussian</th>
-          <th>CLTRep_Lattice</th>
-          <th>CLTRep_Sobol</th>
-          <th>MeanMC_g_IIDStdUniform</th>
-          <th>MeanMC_g_IIDStdGaussian</th>
-          <th>CubLattice_g</th>
-        </tr>
-        <tr>
-          <th>abs_tol</th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>2.00e-03</td>
-          <td>4.33e+00</td>
-          <td>1.05e+00</td>
-          <td>1.28e-02</td>
-          <td>9.13e-03</td>
-          <td>5.02e+00</td>
-          <td>1.44e+00</td>
-          <td>1.64e-02</td>
-        </tr>
-        <tr>
-          <td>1.20e-02</td>
-          <td>1.20e-01</td>
-          <td>3.33e-02</td>
-          <td>4.17e-03</td>
-          <td>2.81e-03</td>
-          <td>1.50e-01</td>
-          <td>4.53e-02</td>
-          <td>5.33e-03</td>
-        </tr>
-        <tr>
-          <td>2.20e-02</td>
-          <td>3.40e-02</td>
-          <td>9.66e-03</td>
-          <td>2.23e-03</td>
-          <td>2.87e-03</td>
-          <td>4.69e-02</td>
-          <td>1.57e-02</td>
-          <td>2.58e-03</td>
-        </tr>
-        <tr>
-          <td>3.20e-02</td>
-          <td>1.80e-02</td>
-          <td>4.92e-03</td>
-          <td>2.25e-03</td>
-          <td>2.89e-03</td>
-          <td>2.65e-02</td>
-          <td>9.31e-03</td>
-          <td>2.58e-03</td>
-        </tr>
-        <tr>
-          <td>4.20e-02</td>
-          <td>1.09e-02</td>
-          <td>3.24e-03</td>
-          <td>2.24e-03</td>
-          <td>2.85e-03</td>
-          <td>1.83e-02</td>
-          <td>7.02e-03</td>
-          <td>2.58e-03</td>
-        </tr>
-        <tr>
-          <td>5.20e-02</td>
-          <td>6.98e-03</td>
-          <td>3.42e-03</td>
-          <td>2.13e-03</td>
-          <td>2.86e-03</td>
-          <td>1.37e-02</td>
-          <td>5.48e-03</td>
-          <td>2.57e-03</td>
-        </tr>
-        <tr>
-          <td>6.20e-02</td>
-          <td>5.51e-03</td>
-          <td>2.12e-03</td>
-          <td>2.49e-03</td>
-          <td>3.08e-03</td>
-          <td>1.13e-02</td>
-          <td>4.75e-03</td>
-          <td>2.63e-03</td>
-        </tr>
-        <tr>
-          <td>7.20e-02</td>
-          <td>4.61e-03</td>
-          <td>1.61e-03</td>
-          <td>2.71e-03</td>
-          <td>2.85e-03</td>
-          <td>1.01e-02</td>
-          <td>4.28e-03</td>
-          <td>2.56e-03</td>
-        </tr>
-        <tr>
-          <td>8.20e-02</td>
-          <td>3.98e-03</td>
-          <td>1.43e-03</td>
-          <td>2.63e-03</td>
-          <td>3.37e-03</td>
-          <td>8.24e-03</td>
-          <td>3.95e-03</td>
-          <td>2.57e-03</td>
-        </tr>
-        <tr>
-          <td>9.20e-02</td>
-          <td>3.49e-03</td>
-          <td>1.33e-03</td>
-          <td>2.28e-03</td>
-          <td>3.32e-03</td>
-          <td>7.84e-03</td>
-          <td>3.74e-03</td>
-          <td>2.62e-03</td>
+          <td>6.20e-03</td>
         </tr>
       </tbody>
     </table>
@@ -505,28 +206,27 @@ Gaussian True Measure - :math:`\mathcal{N}_3(0,\frac{1}{2})`
 .. code:: ipython3
 
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(18, 5))
-    abs_tols = df_abstol_time['abs_tol'].values
-    trends = ['CLT_IIDStdGaussian','MeanMC_g_IIDStdGaussian','CLTRep_Lattice',    'CubLattice_g']
-    labels = ['CLT (MC)',          'MeanMC (MC)',           'CLT Repeated (QMC)','Lattice Cubature (QMC)']
-    for mc,label in zip(trends,labels):
-        ax[0].plot(abs_tols, df_abstol_time[mc].values, label=label)
-        ax[1].plot(abs_tols, df_abstol_n_total[mc].values, label=label)
+    for problem in problems:
+        abs_tols = df_abs_tols[df_abs_tols['Problem']==problem]['abs_tol'].tolist()[0]
+        samples = df_samples[df_samples['Problem']==problem]['n'].tolist()[0]
+        times = df_times[df_times['Problem']==problem]['time'].tolist()[0]
+        ax[0].plot(abs_tols,samples,label=problem)
+        ax[1].plot(abs_tols,times,label=problem)
     for ax_i in ax:
-        ax_i.set_xscale('log', basex=10)
         ax_i.set_yscale('log', basey=10)
         ax_i.spines['right'].set_visible(False)
         ax_i.spines['top'].set_visible(False)
         ax_i.set_xlabel('Absolute Tolerance')
     ax[0].legend(loc='upper right', frameon=False)
-    ax[0].set_ylabel('Runtime')
-    ax[1].set_ylabel('Total Samples')
+    ax[0].set_ylabel('Total Samples')
+    ax[1].set_ylabel('Runtime')
     fig.suptitle('Comparing Absolute Tolerances')
     plt.subplots_adjust(wspace=.15, hspace=0)
     plt.savefig('../outputs/mc_vs_qmc/vary_abs_tol.png',dpi=200,bbox_inches='tight')
 
 
 
-.. image:: MC_vs_QMC_files/MC_vs_QMC_6_0.png
+.. image:: MC_vs_QMC_files/MC_vs_QMC_4_0.png
 
 
 .. raw:: html
@@ -554,10 +254,19 @@ Gaussian True Measure - :math:`\mathcal{N}_d(0,\frac{1}{2})`
 
 .. code:: ipython3
 
-    # Solutions
-    df_dimension_solutions = pd.read_csv('../outputs/mc_vs_qmc/vary_dimension_solution.csv')
-    df_dimension_solutions.drop(['MeanMC_g_IIDStdUniform','MeanMC_g_IIDStdGaussian'],axis=1,inplace=True)
-    df_dimension_solutions.loc[::4].set_index('dimension')
+    df = pd.read_csv('../outputs/mc_vs_qmc/vary_dimension.csv')
+    df['Problem'] = df['Stopping Criterion'] + ' ' + df['Distribution'] + ' (' + df['MC/QMC'] + ')'
+    df = df.drop(['Stopping Criterion','Distribution','MC/QMC'],axis=1)
+    problems = ['CLT IIDStdUniform (MC)',
+                'CLTRep Sobol (QMC)',
+                'CubLattice_g Lattice (QMC)',
+                'CubSobol_g Sobol (QMC)']
+    df = df[df['Problem'].isin(problems)]
+    df_grouped = df.groupby(['Problem'])
+    df_dims = df_grouped['dimension'].apply(list).reset_index(name='dimension')
+    df_samples = df_grouped['n_samples'].apply(list).reset_index(name='n')
+    df_times = df.groupby(['Problem'])['time'].apply(list).reset_index(name='time')
+    df[df['dimension'].isin([10,20,30])].set_index('Problem')
 
 
 
@@ -582,15 +291,13 @@ Gaussian True Measure - :math:`\mathcal{N}_d(0,\frac{1}{2})`
       <thead>
         <tr style="text-align: right;">
           <th></th>
-          <th>CLT_IIDStdUniform</th>
-          <th>CLT_IIDStdGaussian</th>
-          <th>CLTRep_Lattice</th>
-          <th>CLTRep_Sobol</th>
-          <th>CubLattice_g</th>
+          <th>dimension</th>
+          <th>solution</th>
+          <th>n_samples</th>
+          <th>time</th>
         </tr>
         <tr>
-          <th>dimension</th>
-          <th></th>
+          <th>Problem</th>
           <th></th>
           <th></th>
           <th></th>
@@ -599,348 +306,88 @@ Gaussian True Measure - :math:`\mathcal{N}_d(0,\frac{1}{2})`
       </thead>
       <tbody>
         <tr>
-          <td>1.00e+00</td>
-          <td>1.38e+00</td>
-          <td>1.38e+00</td>
-          <td>1.38e+00</td>
-          <td>1.38e+00</td>
-          <td>1.38e+00</td>
+          <td>CLT IIDStdUniform (MC)</td>
+          <td>10</td>
+          <td>-1.53e+02</td>
+          <td>4.60e+04</td>
+          <td>2.11e-01</td>
         </tr>
         <tr>
-          <td>5.00e+00</td>
-          <td>1.13e+00</td>
-          <td>1.13e+00</td>
-          <td>1.14e+00</td>
-          <td>1.13e+00</td>
-          <td>1.14e+00</td>
+          <td>CLT IIDStdUniform (MC)</td>
+          <td>20</td>
+          <td>-8.28e+04</td>
+          <td>4.75e+03</td>
+          <td>4.92e-02</td>
         </tr>
         <tr>
-          <td>9.00e+00</td>
-          <td>-7.11e+01</td>
-          <td>-7.15e+01</td>
-          <td>-7.18e+01</td>
-          <td>-7.15e+01</td>
-          <td>-7.20e+01</td>
+          <td>CLT IIDStdUniform (MC)</td>
+          <td>30</td>
+          <td>-1.95e+07</td>
+          <td>2.03e+04</td>
+          <td>2.83e-01</td>
         </tr>
         <tr>
-          <td>1.30e+01</td>
-          <td>-1.20e+03</td>
-          <td>-1.20e+03</td>
-          <td>-1.20e+03</td>
-          <td>-1.20e+03</td>
-          <td>-1.21e+03</td>
-        </tr>
-        <tr>
-          <td>1.70e+01</td>
-          <td>-1.43e+04</td>
-          <td>-1.43e+04</td>
-          <td>-1.43e+04</td>
-          <td>-1.43e+04</td>
-          <td>-1.43e+04</td>
-        </tr>
-        <tr>
-          <td>2.10e+01</td>
-          <td>-1.47e+05</td>
-          <td>-1.47e+05</td>
-          <td>-1.46e+05</td>
-          <td>-1.47e+05</td>
-          <td>-1.46e+05</td>
-        </tr>
-        <tr>
-          <td>2.50e+01</td>
-          <td>-1.36e+06</td>
-          <td>-1.36e+06</td>
-          <td>-1.36e+06</td>
-          <td>-1.36e+06</td>
-          <td>-1.36e+06</td>
-        </tr>
-        <tr>
-          <td>2.90e+01</td>
-          <td>-1.16e+07</td>
-          <td>-1.16e+07</td>
-          <td>-1.15e+07</td>
-          <td>-1.15e+07</td>
-          <td>-1.15e+07</td>
-        </tr>
-        <tr>
-          <td>3.30e+01</td>
-          <td>-8.96e+07</td>
-          <td>-8.90e+07</td>
-          <td>-8.90e+07</td>
-          <td>-8.92e+07</td>
-          <td>-8.88e+07</td>
-        </tr>
-        <tr>
-          <td>3.70e+01</td>
-          <td>-5.97e+08</td>
-          <td>-5.96e+08</td>
-          <td>-5.97e+08</td>
-          <td>-5.97e+08</td>
-          <td>-5.93e+08</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-
-
-
-.. code:: ipython3
-
-    # Total Number of Samples
-    df_dimension_n_total = pd.read_csv('../outputs/mc_vs_qmc/vary_dimension_n_total.csv')
-    df_dimension_n_total.drop(['MeanMC_g_IIDStdUniform','MeanMC_g_IIDStdGaussian'],axis=1,inplace=True)
-    df_dimension_n_total.loc[::4].set_index('dimension')
-
-
-
-
-.. raw:: html
-
-    <div>
-    <style scoped>
-        .dataframe tbody tr th:only-of-type {
-            vertical-align: middle;
-        }
-    
-        .dataframe tbody tr th {
-            vertical-align: top;
-        }
-    
-        .dataframe thead th {
-            text-align: right;
-        }
-    </style>
-    <table border="1" class="dataframe">
-      <thead>
-        <tr style="text-align: right;">
-          <th></th>
-          <th>CLT_IIDStdUniform</th>
-          <th>CLT_IIDStdGaussian</th>
-          <th>CLTRep_Lattice</th>
-          <th>CLTRep_Sobol</th>
-          <th>CubLattice_g</th>
-        </tr>
-        <tr>
-          <th>dimension</th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1.00e+00</td>
-          <td>1.20e+04</td>
-          <td>9.99e+03</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>5.00e+00</td>
-          <td>4.66e+06</td>
-          <td>1.25e+06</td>
-          <td>1.02e+03</td>
-          <td>1.02e+03</td>
-          <td>8.19e+03</td>
-        </tr>
-        <tr>
-          <td>9.00e+00</td>
-          <td>8.54e+04</td>
-          <td>8.95e+04</td>
+          <td>CLTRep Sobol (QMC)</td>
+          <td>10</td>
+          <td>-1.54e+02</td>
           <td>5.12e+02</td>
-          <td>5.12e+02</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>1.30e+01</td>
-          <td>1.36e+04</td>
-          <td>1.75e+04</td>
-          <td>5.12e+02</td>
-          <td>5.12e+02</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>1.70e+01</td>
-          <td>5.28e+03</td>
-          <td>5.45e+03</td>
-          <td>5.12e+02</td>
-          <td>5.12e+02</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>2.10e+01</td>
-          <td>3.64e+03</td>
-          <td>2.83e+03</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>2.50e+01</td>
-          <td>7.11e+03</td>
-          <td>6.30e+03</td>
-          <td>5.12e+02</td>
-          <td>2.56e+02</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>2.90e+01</td>
-          <td>1.63e+04</td>
-          <td>1.34e+04</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>3.30e+01</td>
-          <td>3.58e+04</td>
-          <td>2.61e+04</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>1.02e+03</td>
-        </tr>
-        <tr>
-          <td>3.70e+01</td>
-          <td>1.07e+05</td>
-          <td>7.84e+04</td>
-          <td>2.56e+02</td>
-          <td>2.56e+02</td>
-          <td>2.05e+03</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-
-
-
-.. code:: ipython3
-
-    # Run Time
-    df_dimension_time = pd.read_csv('../outputs/mc_vs_qmc/vary_dimension_time.csv')
-    df_dimension_time.drop(['MeanMC_g_IIDStdUniform','MeanMC_g_IIDStdGaussian'],axis=1,inplace=True)
-    df_dimension_time.loc[::4].set_index('dimension')
-
-
-
-
-.. raw:: html
-
-    <div>
-    <style scoped>
-        .dataframe tbody tr th:only-of-type {
-            vertical-align: middle;
-        }
-    
-        .dataframe tbody tr th {
-            vertical-align: top;
-        }
-    
-        .dataframe thead th {
-            text-align: right;
-        }
-    </style>
-    <table border="1" class="dataframe">
-      <thead>
-        <tr style="text-align: right;">
-          <th></th>
-          <th>CLT_IIDStdUniform</th>
-          <th>CLT_IIDStdGaussian</th>
-          <th>CLTRep_Lattice</th>
-          <th>CLTRep_Sobol</th>
-          <th>CubLattice_g</th>
-        </tr>
-        <tr>
-          <th>dimension</th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1.00e+00</td>
-          <td>2.47e-03</td>
-          <td>1.04e-03</td>
-          <td>1.36e-03</td>
-          <td>1.74e-03</td>
-          <td>2.42e-03</td>
-        </tr>
-        <tr>
-          <td>5.00e+00</td>
-          <td>2.62e+00</td>
-          <td>1.65e-01</td>
-          <td>1.03e-02</td>
-          <td>1.50e-02</td>
-          <td>1.92e-02</td>
-        </tr>
-        <tr>
-          <td>9.00e+00</td>
-          <td>8.32e-02</td>
-          <td>1.87e-02</td>
-          <td>7.70e-03</td>
-          <td>9.50e-03</td>
-          <td>2.85e-03</td>
-        </tr>
-        <tr>
-          <td>1.30e+01</td>
-          <td>1.80e-02</td>
-          <td>5.03e-03</td>
-          <td>1.04e-02</td>
-          <td>1.27e-02</td>
-          <td>3.37e-03</td>
-        </tr>
-        <tr>
-          <td>1.70e+01</td>
-          <td>9.69e-03</td>
-          <td>2.35e-03</td>
-          <td>1.35e-02</td>
-          <td>1.63e-02</td>
-          <td>3.56e-03</td>
-        </tr>
-        <tr>
-          <td>2.10e+01</td>
-          <td>8.58e-03</td>
-          <td>1.68e-03</td>
-          <td>8.96e-03</td>
-          <td>1.02e-02</td>
-          <td>3.95e-03</td>
-        </tr>
-        <tr>
-          <td>2.50e+01</td>
           <td>1.83e-02</td>
-          <td>3.20e-03</td>
-          <td>1.93e-02</td>
-          <td>1.15e-02</td>
-          <td>4.39e-03</td>
         </tr>
         <tr>
-          <td>2.90e+01</td>
-          <td>4.49e-02</td>
-          <td>7.22e-03</td>
-          <td>1.12e-02</td>
-          <td>1.34e-02</td>
-          <td>4.48e-03</td>
+          <td>CLTRep Sobol (QMC)</td>
+          <td>20</td>
+          <td>-8.28e+04</td>
+          <td>5.12e+02</td>
+          <td>2.64e-02</td>
         </tr>
         <tr>
-          <td>3.30e+01</td>
-          <td>1.20e-01</td>
-          <td>1.73e-02</td>
-          <td>1.25e-02</td>
-          <td>1.51e-02</td>
-          <td>4.93e-03</td>
+          <td>CLTRep Sobol (QMC)</td>
+          <td>30</td>
+          <td>-1.94e+07</td>
+          <td>2.56e+02</td>
+          <td>2.00e-02</td>
         </tr>
         <tr>
-          <td>3.70e+01</td>
-          <td>3.65e-01</td>
-          <td>5.44e-02</td>
-          <td>1.34e-02</td>
-          <td>1.60e-02</td>
-          <td>1.05e-02</td>
+          <td>CubLattice_g Lattice (QMC)</td>
+          <td>10</td>
+          <td>-1.55e+02</td>
+          <td>1.02e+03</td>
+          <td>3.49e-03</td>
+        </tr>
+        <tr>
+          <td>CubLattice_g Lattice (QMC)</td>
+          <td>20</td>
+          <td>-8.28e+04</td>
+          <td>1.02e+03</td>
+          <td>2.56e-02</td>
+        </tr>
+        <tr>
+          <td>CubLattice_g Lattice (QMC)</td>
+          <td>30</td>
+          <td>-1.94e+07</td>
+          <td>1.02e+03</td>
+          <td>2.51e-02</td>
+        </tr>
+        <tr>
+          <td>CubSobol_g Sobol (QMC)</td>
+          <td>10</td>
+          <td>-1.53e+02</td>
+          <td>1.02e+03</td>
+          <td>7.31e-03</td>
+        </tr>
+        <tr>
+          <td>CubSobol_g Sobol (QMC)</td>
+          <td>20</td>
+          <td>-8.24e+04</td>
+          <td>1.02e+03</td>
+          <td>5.52e-02</td>
+        </tr>
+        <tr>
+          <td>CubSobol_g Sobol (QMC)</td>
+          <td>30</td>
+          <td>-1.94e+07</td>
+          <td>1.02e+03</td>
+          <td>7.88e-02</td>
         </tr>
       </tbody>
     </table>
@@ -951,20 +398,19 @@ Gaussian True Measure - :math:`\mathcal{N}_d(0,\frac{1}{2})`
 .. code:: ipython3
 
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(18, 6))
-    dimensions = df_dimension_time['dimension'].values
-    
-    trends = ['CLT_IIDStdUniform',       'CLT_IIDStdGaussian',       'CLTRep_Lattice',    'CubLattice_g']
-    labels = ['CLT IID Std Uniform (MC)','CLT IID Std Gaussian (MC)','CLT Repeated (QMC)','Lattice Cubature (QMC)']
-    for mc,label in zip(trends,labels):
-        ax[0].plot(dimensions, df_dimension_time[mc].values, label=label)
-        ax[1].plot(dimensions, df_dimension_n_total[mc].values, label=label)
+    for problem in problems:
+        dimension = df_dims[df_dims['Problem']==problem]['dimension'].tolist()[0]
+        samples = df_samples[df_samples['Problem']==problem]['n'].tolist()[0]
+        times = df_times[df_times['Problem']==problem]['time'].tolist()[0]
+        ax[0].plot(dimension,samples,label=problem)
+        ax[1].plot(dimension,times,label=problem)
     for ax_i in ax:
-        ax_i.set_xscale('log', basex=10)
+        #ax_i.set_xscale('log', basex=10)
         ax_i.set_yscale('log', basey=10)
         ax_i.spines['right'].set_visible(False)
         ax_i.spines['top'].set_visible(False)
         ax_i.set_xlabel('Dimension')
-    ax[1].legend(frameon=False, loc=(-1.3,1),ncol=len(trends))
+    ax[1].legend(frameon=False, loc=(-1.3,1),ncol=len(problems))
     ax[0].set_ylabel('Runtime')
     ax[1].set_ylabel('Total Samples')
     fig.suptitle('Comparing Dimensions')
@@ -972,6 +418,6 @@ Gaussian True Measure - :math:`\mathcal{N}_d(0,\frac{1}{2})`
 
 
 
-.. image:: MC_vs_QMC_files/MC_vs_QMC_12_0.png
+.. image:: MC_vs_QMC_files/MC_vs_QMC_8_0.png
 
 

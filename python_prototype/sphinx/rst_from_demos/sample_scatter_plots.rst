@@ -228,15 +228,15 @@ Plots samples on a 2D Keister function
 
     Solution: 2.0554         
     Keister (Integrand Object)
-    IIDStdGaussian (Discrete Distribution Object)
+    IIDStdGaussian (DiscreteDistribution Object)
     	dimension       2
     	seed            7
     	mimics          StdGaussian
-    Gaussian (True TrueMeasure Object)
+    Gaussian (TrueMeasure Object)
     	distrib_name    IIDStdGaussian
     	mean            0
     	covariance      0.500
-    CLT (Stopping Criterion Object)
+    CLT (StoppingCriterion Object)
     	inflate         1.200
     	alpha           0.010
     	abs_tol         0.500
@@ -249,7 +249,7 @@ Plots samples on a 2D Keister function
     	n               65
     	n_total         81
     	confid_int      [ 1.646  2.464]
-    	time_integrate  0.002
+    	time_integrate  0.001
     
 
 
