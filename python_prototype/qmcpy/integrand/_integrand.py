@@ -5,8 +5,8 @@ from ..util import MethodImplementationError, TransformError, univ_repr, Paramet
 
 class Integrand(object):
     """
-    Specify and generate values :math:`f(\\boldsymbol{x})` for \
-    :math:`\\boldsymbol{x} \\in \\mathcal{X}`
+    Specify and generate values $f(\\boldsymbol{x})$ for \
+    $\\boldsymbol{x} \\in \\mathcal{X}$
     """
 
     def __init__(self):
@@ -23,15 +23,15 @@ class Integrand(object):
         Original integrand to be integrated
 
         Args:
-            x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
-                row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
+            x: nodes, $\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}$ \
+                row of an $n \\cdot |\\mathfrak{u}|$ matrix
 
         Returns:
-            :math:`n \\cdot p` matrix with values \
-            :math:`f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
-            :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, \
-            then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
-            and :math:`x'_{ij} = c` otherwise
+            $n \\cdot p$ matrix with values \
+            $f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})$ where if \
+            $\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j$, \
+            then $x'_{ij} = x_{ij}$ for $j \\in \\mathfrak{u}$, \
+            and $x'_{ij} = c$ otherwise
         """
         raise MethodImplementationError(self, 'g')
 

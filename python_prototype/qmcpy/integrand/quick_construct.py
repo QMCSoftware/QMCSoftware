@@ -14,8 +14,8 @@ class QuickConstruct(Integrand):
             measure (TrueMeasure): a TrueMeasure instance
             custom_fun (function): a function evaluating samples (nxd) -> (nx1)
                 Args:
-                    x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
-                       row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
+                    x: nodes, $\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}$ \
+                       row of an $n \\cdot |\\mathfrak{u}|$ matrix
         """
         self.measure = measure
         self.custom_fun = custom_fun

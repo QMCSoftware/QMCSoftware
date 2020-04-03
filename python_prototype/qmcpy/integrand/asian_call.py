@@ -89,15 +89,15 @@ class AsianCall(Integrand):
         Original integrand to be integrated
 
         Args:
-            x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
-                row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
+            x: nodes, $\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}$ \
+                row of an $n \\cdot |\\mathfrak{u}|$ matrix
 
         Returns:
-            :math:`n \\cdot p` matrix with values \
-            :math:`f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})` where if \
-            :math:`\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j`, \
-            then :math:`x'_{ij} = x_{ij}` for :math:`j \\in \\mathfrak{u}`, \
-            and :math:`x'_{ij} = c` otherwise
+            $n \\cdot p$ matrix with values \
+            $f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})$ where if \
+            $\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j$, \
+            then $x'_{ij} = x_{ij}$ for $j \\in \\mathfrak{u}$, \
+            and $x'_{ij} = c$ otherwise
         """
         s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) *

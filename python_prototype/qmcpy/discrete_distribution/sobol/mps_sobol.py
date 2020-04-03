@@ -32,7 +32,7 @@ def bitreverse(a, m=None):
         m (int): Length of bit string.
 
     Returns:
-        int: Integer that corresponds to reversed bit string of ``a``
+        int: Integer that corresponds to reversed bit string of a
 
     """
     # https://tinyurl.com/yybvsmqe
