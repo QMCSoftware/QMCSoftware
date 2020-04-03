@@ -2,8 +2,8 @@ QMCPy for Lebesgue Integration
 ==============================
 
 This notebook will give examples of how to use QMCPy for integration
-problems that not are defined in terms of a standard measure.
-i.e. Uniform or Gaussian.
+problems that not are defined in terms of a standard measure. i.e.
+Uniform or Gaussian.
 
 .. code:: ipython3
 
@@ -151,9 +151,32 @@ Mathematica Code: ``Integrate[Sin[x]/Log[x], {x,a,b}]``
     Within tolerance: True
 
 
+Sample Problem 4
+----------------
+
+Integral over all real numbers
+
+.. math:: y = \int_{\mathbb{R}^2} e^{-||x||_2^2} dx
+
+.. code:: ipython3
+
+    abs_tol = .1
+    dim = 2
+    true_value = pi
+
+.. code:: ipython3
+
+    distribution = Sobol(dim)
+    measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
+    integrand = QuickConstruct(measure, lambda x: exp(-x**2).prod(1))
+    solution,data = CubSobol_g(integrand,abs_tol=abs_tol).integrate()
+    print('y = %.3f'%solution)
+    print('Within tolerance:',abs((solution-true_value))<abs_tol)
+
+
 .. parsed-literal::
 
-    /Users/terrya/Documents/ProgramData/QMCSoftware/python_prototype/qmcpy/accumulate_data/cubature_data.py:114: CubatureWarning: An element of c_stilde_low > c_stilde_up
-      warnings.warn('An element of c_stilde_low > c_stilde_up', CubatureWarning)
+    y = 3.142
+    Within tolerance: True
 
 

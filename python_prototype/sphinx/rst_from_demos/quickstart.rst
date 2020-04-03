@@ -6,15 +6,15 @@ QMCPy Quickstart
     from qmcpy import *
     import numpy as np
 
-Suppose we are interested in calculating :math:`\mathbb{E}[keister(x)]`
-for :math:`x \sim \mathcal{N}(0,\frac{1}{2})^d` and
-:math:`keister(x)=\pi^{d/2} \cos(||x_j||_2)`
+Suppose we are interested in calculating
+
+.. math:: \mathbb{E}[keister(x)] = \mathbb{E}[\pi^{d/2} \cos(||x_j||_2)] \text{ for } x \sim \mathcal{N}_d(0,\frac{1}{2})
 
 .. code:: ipython3
 
     dimension = 2
     true_value = 1.808186429263620
-    abs_tol = .01
+    abs_tol = 1e-4
     def keister(x): # Also implemented in qmcpy/integrands/keister.py
         # QMCPy will pass in a numpy ndarray, x, with shape n x d
         #    n samples
@@ -24,8 +24,76 @@ for :math:`x \sim \mathcal{N}(0,\frac{1}{2})^d` and
         k = np.pi**(d/2)*np.cos(norm_x)
         return k # k.shape should be n or nx1
 
-Complete Problem
-----------------
+Step 1: Discete Distribution which generates samples
+----------------------------------------------------
+
+.. code:: ipython3
+
+    discrete_distribution = Lattice(dimension)
+
+Step 2: True Measure which transforms the Integrand to accept the Discrete Distribution
+---------------------------------------------------------------------------------------
+
+.. code:: ipython3
+
+    true_measure = Gaussian(discrete_distribution, mean=0, covariance=1/2)
+
+Step 3: Integrand where samples should mimic the True Measure
+-------------------------------------------------------------
+
+.. code:: ipython3
+
+    integrand = QuickConstruct(true_measure, custom_fun=keister)
+    # or integrand = Keister(true_measure) using QMCPy Keister class
+
+Step 4: Stopping Criterion that controls integration process
+------------------------------------------------------------
+
+.. code:: ipython3
+
+    stopping_criterion = CubLattice_g(integrand, abs_tol)
+
+Step 5: Integrate
+-----------------
+
+.. code:: ipython3
+
+    solution,data = stopping_criterion.integrate()
+    print(data)
+    print('Within absolute tolerance:',abs(solution-true_value) < abs_tol)
+
+
+.. parsed-literal::
+
+    Solution: 1.8082         
+    QuickConstruct (Integrand Object)
+    Lattice (DiscreteDistribution Object)
+    	dimension       2
+    	scramble        1
+    	replications    0
+    	seed            None
+    	backend         gail
+    	mimics          StdUniform
+    Gaussian (TrueMeasure Object)
+    	distrib_name    Lattice
+    	mean            0
+    	covariance      0.500
+    CubLattice_g (StoppingCriterion Object)
+    	abs_tol         0.000
+    	rel_tol         0
+    	n_init          1024
+    	n_max           34359738368
+    CubatureData (AccumulateData Object)
+    	n_total         65536
+    	solution        1.808
+    	r_lag           4
+    	time_integrate  0.064
+    
+    Within absolute tolerance: True
+
+
+Condensed Problem
+-----------------
 
 .. code:: ipython3
 
@@ -36,8 +104,7 @@ Complete Problem
                                 Lattice(dimension), # discrete distribution
                                 covariance=1/2), # gaussian true measure attribute
                             keister), # function handle
-                        abs_tol,
-                        check_cone=False
+                        abs_tol
                     ).integrate()
     print(data)
     print('Within absolute tolerance:',abs(solution-true_value) < abs_tol)
@@ -59,85 +126,15 @@ Complete Problem
     	mean            0
     	covariance      0.500
     CubLattice_g (StoppingCriterion Object)
-    	abs_tol         0.010
+    	abs_tol         0.000
     	rel_tol         0
     	n_init          1024
     	n_max           34359738368
     CubatureData (AccumulateData Object)
-    	n_total         2048
+    	n_total         65536
     	solution        1.808
     	r_lag           4
-    	time_integrate  0.006
-    
-    Within absolute tolerance: True
-
-
-Problem Breakdown
------------------
-
-Step 1: Discete Distribution which generates samples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code:: ipython3
-
-    discrete_distribution = Sobol(dimension)
-
-Step 2: True Measure which transforms the Integrand to accept the Discrete Distribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code:: ipython3
-
-    true_measure = Gaussian(discrete_distribution, mean=0, covariance=1/2)
-
-Step 3: Integrand where samples should mimic the True Measure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code:: ipython3
-
-    integrand = QuickConstruct(true_measure, custom_fun=keister)
-
-Step 4: Stopping Criterion that controls integration process
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code:: ipython3
-
-    stopping_criterion = CubSobol_g(integrand, abs_tol, check_cone=False)
-
-Step 5: Integrate
-~~~~~~~~~~~~~~~~~
-
-.. code:: ipython3
-
-    solution,data = stopping_criterion.integrate()
-    print(data)
-    print('Within absolute tolerance:',abs(solution-true_value) < abs_tol)
-
-
-.. parsed-literal::
-
-    Solution: 1.8077         
-    QuickConstruct (Integrand Object)
-    Sobol (DiscreteDistribution Object)
-    	dimension       2
-    	scramble        1
-    	replications    0
-    	seed            None
-    	backend         mps
-    	mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-    	distrib_name    Sobol
-    	mean            0
-    	covariance      0.500
-    CubSobol_g (StoppingCriterion Object)
-    	abs_tol         0.010
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
-    CubatureData (AccumulateData Object)
-    	n_total         2048
-    	solution        1.808
-    	r_lag           4
-    	time_integrate  0.008
+    	time_integrate  0.062
     
     Within absolute tolerance: True
 

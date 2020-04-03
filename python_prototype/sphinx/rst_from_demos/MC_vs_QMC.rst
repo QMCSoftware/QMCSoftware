@@ -213,6 +213,7 @@ Gaussian True Measure - :math:`\mathcal{N}_3(0,\frac{1}{2})`
         ax[0].plot(abs_tols,samples,label=problem)
         ax[1].plot(abs_tols,times,label=problem)
     for ax_i in ax:
+        ax_i.set_xscale('log', basex=10)
         ax_i.set_yscale('log', basey=10)
         ax_i.spines['right'].set_visible(False)
         ax_i.spines['top'].set_visible(False)
@@ -405,7 +406,7 @@ Gaussian True Measure - :math:`\mathcal{N}_d(0,\frac{1}{2})`
         ax[0].plot(dimension,samples,label=problem)
         ax[1].plot(dimension,times,label=problem)
     for ax_i in ax:
-        #ax_i.set_xscale('log', basex=10)
+        ax_i.set_xscale('log', basex=10)
         ax_i.set_yscale('log', basey=10)
         ax_i.spines['right'].set_visible(False)
         ax_i.spines['top'].set_visible(False)

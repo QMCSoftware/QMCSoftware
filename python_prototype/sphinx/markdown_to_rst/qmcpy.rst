@@ -1,7 +1,3 @@
-.. contents::
-   :depth: 1
-..
-
 QMCPy
 =====
 
@@ -11,8 +7,8 @@ Integrand
 | The function to integrate
 | *Abstract class with concrete implementations*
 
--  Linear: :math:`\:\: y_i = \sum_{j=0}^{d-1}(x_{ij})`
--  Keister: :math:`\:\: y_i = \pi^{d/2} \, \cos(||\boldsymbol{x}_i||_2)`
+-  Linear: :math:`y_i = \sum_{j=0}^{d-1}(x_{ij})`
+-  Keister: :math:`y_i = \pi^{d/2} \, \cos(||\boldsymbol{x}_i||_2)`
 -  Asian Call
 
    -  :math:`S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}`
@@ -23,7 +19,9 @@ Integrand
 
 -  QuickConstruct
 
---------------
+.. raw:: html
+
+   <hr>
 
 True Measure
 ------------
@@ -31,14 +29,16 @@ True Measure
 | General measure used to define the integrand
 | *Abstract class with concrete implementations*
 
--  Uniform: :math:`\:\: \mathcal{U}(a,b)`
--  Gaussian: :math:`\:\: \mathcal{N}(\mu,\sigma^2)`
+-  Uniform: :math:`\mathcal{U}(a,b)`
+-  Gaussian: :math:`\mathcal{N}(\mu,\sigma^2)`
 -  Brownian Motion:
-   :math:`\:\: \mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;` for
+   :math:`\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;` for
    :math:`\;Z_j \sim \mathcal{N}(0,1)`
 -  Lebesgue
 
---------------
+.. raw:: html
+
+   <hr>
 
 Discrete Distribution
 ---------------------
@@ -47,14 +47,15 @@ Discrete Distribution
 | *Abstract class with concrete implementations*
 
 -  IID Standard Uniform:
-   :math:`\:\: x_j \overset{iid}{\sim} \mathcal{U}(0,1)`
+   :math:`x_j \overset{iid}{\sim} \mathcal{U}(0,1)`
 -  IID Standard Gaussian:
-   :math:`\:\: x_j \overset{iid}{\sim} \mathcal{N}(0,1)`
--  Lattice (base 2):
-   :math:`\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
--  Sobol (base 2): :math:`\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
+   :math:`x_j \overset{iid}{\sim} \mathcal{N}(0,1)`
+-  Lattice (base 2): :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
+-  Sobol (base 2): :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
---------------
+.. raw:: html
+
+   <hr>
 
 Stopping Criterion
 ------------------
@@ -66,14 +67,16 @@ Stopping Criterion
 **For IID Nodes** :math:`x_i\sim` iid
 
 -  Central Limit Theorem (CLT)
--  MeanMC_g (gauranteed)
+-  MeanMC\_g (gauranteed)
 
 **For QMC Sequences** :math:`\{x_{r,i}\}_{r=1}^R \sim` lds
 
 -  CLT Repeated
--  CubLattice_g (gauranteed)
+-  CubLattice\_g (gauranteed)
 
---------------
+.. raw:: html
+
+   <hr>
 
 Accumulate Data Class
 ---------------------

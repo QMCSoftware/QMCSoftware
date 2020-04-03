@@ -23,9 +23,15 @@ Game Example
 
 Consider a game where
 :math:`X_1, X_2 \overset{\textrm{IID}}{\sim} \mathcal{U}[0,1]` are drawn
-with a payoff of :raw-latex:`\begin{equation}
-Y = \text{payoff}(X_1,X_2) = \begin{cases} \$10, & 1.7 \le X_1 + X_2 \le 2, \\ 0, & 0 \le X_1 + X_2 < 1.7, \end{cases}
-\end{equation}` What is the expected payoff of this game?
+with a payoff of
+
+.. raw:: latex
+
+   \begin{equation}
+   Y = \text{payoff}(X_1,X_2) = \begin{cases} \$10, & 1.7 \le X_1 + X_2 \le 2, \\ 0, & 0 \le X_1 + X_2 < 1.7, \end{cases}
+   \end{equation}
+
+What is the expected payoff of this game?
 
 .. code:: ipython3
 
@@ -47,7 +53,7 @@ With ordinary Monte Carlo we do the following:
     distribution = Lattice(2)
     measure = Uniform(distribution)
     integral = QuickConstruct(measure,payoff)
-    solution1,data1 = CubLattice_g(integral, abs_tol, check_cone=False).integrate()
+    solution1,data1 = CubLattice_g(integral, abs_tol).integrate()
     data1
 
 
@@ -55,7 +61,7 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4503         
+    Solution: 0.4501         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -77,7 +83,7 @@ With ordinary Monte Carlo we do the following:
     	n_total         65536
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.045
+    	time_integrate  0.057
 
 
 
@@ -106,7 +112,7 @@ Thus,
     distribution = Lattice(2)
     measure = Uniform(distribution)
     integral = QuickConstruct(measure,lambda x: payoff(x**(1/(p+1))) / ((p+1)**2 * (x.prod(1))**(p/(p+1))))
-    solution2,data2 = CubLattice_g(integral, abs_tol, check_cone=False).integrate()
+    solution2,data2 = CubLattice_g(integral, abs_tol).integrate()
     data2
 
 
@@ -114,7 +120,7 @@ Thus,
 
 .. parsed-literal::
 
-    Solution: 0.4499         
+    Solution: 0.4505         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -134,9 +140,9 @@ Thus,
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        0.450
+    	solution        0.451
     	r_lag           4
-    	time_integrate  0.013
+    	time_integrate  0.016
 
 
 
@@ -148,7 +154,7 @@ Thus,
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.296 the time and 0.250 the samples
+    Imporance Sampling takes 0.279 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -157,25 +163,31 @@ Asian Call Option Example
 The stock price must raise significantly for the payoff to be positive.
 So we will give a upward drift to the Brownian motion that defines the
 stock price path. We can think of the option price as the
-multidimensional integral :raw-latex:`\begin{equation*} 
-\mu = \mathbb{E}[f(\boldsymbol{X})] = \int_{\mathbb{R}^d}
-f(\boldsymbol{x}) 
-\frac{\exp\bigl(-\frac12 \boldsymbol{x}^T\mathsf{\Sigma}^{-1}
-\boldsymbol{x}\bigr)}
-{\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{x} ,
-\end{equation*}`
+multidimensional integral
+
+.. raw:: latex
+
+   \begin{equation*} 
+   \mu = \mathbb{E}[f(\boldsymbol{X})] = \int_{\mathbb{R}^d}
+   f(\boldsymbol{x}) 
+   \frac{\exp\bigl(-\frac12 \boldsymbol{x}^T\mathsf{\Sigma}^{-1}
+   \boldsymbol{x}\bigr)}
+   {\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{x} ,
+   \end{equation*}
 
 where
 
-:raw-latex:`\begin{align*} 
-\boldsymbol{X} & \sim \mathcal{N}(\boldsymbol{0}, \mathsf{\Sigma}), \qquad
-\mathsf{\Sigma} = \bigl(\min(j,k)T/d \bigr)_{j,k=1}^d, \\
-d & =  13 \text{ in this case} \\
-f(\boldsymbol{x}) & = \max\biggl(K - \frac 1d \sum_{j=1}^d
-S(jT/d,\boldsymbol{x}), 0 \biggr) \mathrm{e}^{-rT}, \\
-S(jT/d,\boldsymbol{x}) &= S(0) \exp\bigl((r - \sigma^2/2) jT/d +
-\sigma x_j\bigr).
-\end{align*}`
+.. raw:: latex
+
+   \begin{align*} 
+   \boldsymbol{X} & \sim \mathcal{N}(\boldsymbol{0}, \mathsf{\Sigma}), \qquad
+   \mathsf{\Sigma} = \bigl(\min(j,k)T/d \bigr)_{j,k=1}^d, \\
+   d & =  13 \text{ in this case} \\
+   f(\boldsymbol{x}) & = \max\biggl(K - \frac 1d \sum_{j=1}^d
+   S(jT/d,\boldsymbol{x}), 0 \biggr) \mathrm{e}^{-rT}, \\
+   S(jT/d,\boldsymbol{x}) &= S(0) \exp\bigl((r - \sigma^2/2) jT/d +
+   \sigma x_j\bigr).
+   \end{align*}
 
 We will replace :math:`\boldsymbol{X}` by
 
@@ -188,25 +200,27 @@ where a positive :math:`a` will create more positive payoffs. This
 corresponds to giving our Brownian motion a drift. To do this we
 re-write the integral as
 
-:raw-latex:`\begin{gather*} 
-\mu = \mathbb{E}[f_{\mathrm{new}}(\boldsymbol{Z})] 
-= \int_{\mathbb{R}^d}
-f_{\mathrm{new}}(\boldsymbol{z}) 
-\frac{\exp\bigl(-\frac12 (\boldsymbol{z}-\boldsymbol{a})^T
-\mathsf{\Sigma}^{-1}
-(\boldsymbol{z} - \boldsymbol{a}) \bigr)}
-{\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{z} ,
-\\
-f_{\mathrm{new}}(\boldsymbol{z}) = 
-f(\boldsymbol{z}) 
-\frac{\exp\bigl(-\frac12 \boldsymbol{z}^T
-\mathsf{\Sigma}^{-1} \boldsymbol{z} \bigr)}
-{\exp\bigl(-\frac12 (\boldsymbol{z}-\boldsymbol{a})^T
-\mathsf{\Sigma}^{-1}
-(\boldsymbol{z} - \boldsymbol{a}) \bigr)}
-= f(\boldsymbol{z}) \exp\bigl((\boldsymbol{a}/2 - \boldsymbol{z})^T
-\mathsf{\Sigma}^{-1}\boldsymbol{a} \bigr)
-\end{gather*}`
+.. raw:: latex
+
+   \begin{gather*} 
+   \mu = \mathbb{E}[f_{\mathrm{new}}(\boldsymbol{Z})] 
+   = \int_{\mathbb{R}^d}
+   f_{\mathrm{new}}(\boldsymbol{z}) 
+   \frac{\exp\bigl(-\frac12 (\boldsymbol{z}-\boldsymbol{a})^T
+   \mathsf{\Sigma}^{-1}
+   (\boldsymbol{z} - \boldsymbol{a}) \bigr)}
+   {\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{z} ,
+   \\
+   f_{\mathrm{new}}(\boldsymbol{z}) = 
+   f(\boldsymbol{z}) 
+   \frac{\exp\bigl(-\frac12 \boldsymbol{z}^T
+   \mathsf{\Sigma}^{-1} \boldsymbol{z} \bigr)}
+   {\exp\bigl(-\frac12 (\boldsymbol{z}-\boldsymbol{a})^T
+   \mathsf{\Sigma}^{-1}
+   (\boldsymbol{z} - \boldsymbol{a}) \bigr)}
+   = f(\boldsymbol{z}) \exp\bigl((\boldsymbol{a}/2 - \boldsymbol{z})^T
+   \mathsf{\Sigma}^{-1}\boldsymbol{a} \bigr)
+   \end{gather*}
 
 Finally note that
 
@@ -242,7 +256,7 @@ Vanilla Monte Carlo
     distribution = Sobol(dimension)
     measure = BrownianMotion(distribution,time_vector)
     integrand = AsianCall(measure)
-    solution1,data1 = CubSobol_g(integrand, abs_tol, check_cone=False).integrate()
+    solution1,data1 = CubSobol_g(integrand, abs_tol).integrate()
     data1
 
 
@@ -250,7 +264,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7658         
+    Solution: 1.7767         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -275,9 +289,9 @@ Vanilla Monte Carlo
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        1.766
+    	solution        1.777
     	r_lag           4
-    	time_integrate  1.479
+    	time_integrate  0.295
 
 
 
@@ -299,7 +313,7 @@ Monte Carlo with Importance Sampling
     distribution = Sobol(dimension)
     measure = BrownianMotion(distribution,time_vector,mean_shift_is)
     integrand = AsianCall(measure)
-    solution2,data2 = CubSobol_g(integrand, abs_tol, check_cone=False).integrate()
+    solution2,data2 = CubSobol_g(integrand, abs_tol).integrate()
     data2
 
 
@@ -307,7 +321,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.8085         
+    Solution: 1.7979         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -332,9 +346,9 @@ Monte Carlo with Importance Sampling
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         4096
-    	solution        1.808
+    	solution        1.798
     	r_lag           4
-    	time_integrate  0.369
+    	time_integrate  0.071
 
 
 
@@ -355,7 +369,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.250 the time and 0.250 the samples
+    Imporance Sampling takes 0.239 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -364,7 +378,7 @@ Importance Sampling MC vs QMC
 **Test Parameters**
 
 -  dimension = 16
--  abs_tol = .025
+-  abs\_tol = .025
 -  trials = 3
 
 .. code:: ipython3
@@ -502,12 +516,12 @@ Importance Sampling MC vs QMC
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
     idx = arange(len(problems))
     width = .35
-    ax[0].barh(idx+width,log(df.loc[df.mean_shift==0]['n_samples'].values),width)
-    ax[0].barh(idx,log(df.loc[df.mean_shift==1]['n_samples'].values),width)
+    ax[0].barh(idx+width,df.loc[df.mean_shift==0]['n_samples'].values,width)
+    ax[0].barh(idx,df.loc[df.mean_shift==1]['n_samples'].values,width)
     ax[1].barh(idx+width,df.loc[df.mean_shift==0]['time'].values,width)
     ax[1].barh(idx,df.loc[df.mean_shift==1]['time'].values,width)
     fig.suptitle('Importance Sampling Comparison by Stopping Criterion on Asian Call Option')
-    xlabs = ['log(Samples)','Time']
+    xlabs = ['Samples','Time']
     for i in range(len(ax)):
         ax[i].set_xlabel(xlabs[i])
         ax[i].spines['top'].set_visible(False)
