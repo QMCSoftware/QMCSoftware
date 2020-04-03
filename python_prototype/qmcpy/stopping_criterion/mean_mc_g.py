@@ -19,7 +19,7 @@ from ..util import MaxSamplesWarning, NotYetImplemented
 from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
 from scipy.optimize import fsolve
 from scipy.stats import norm
-from time import process_time
+from time import perf_counter
 import warnings
 
 
@@ -70,7 +70,7 @@ class MeanMC_g(StoppingCriterion):
 
     def integrate(self):
         """ Determine when to stop """
-        t_start = process_time()
+        t_start = perf_counter()
         # Pilot Sample
         self.data.update_data()
         self.sigma_up = self.inflate * self.data.sighat
@@ -97,7 +97,7 @@ class MeanMC_g(StoppingCriterion):
         # Final Sample
         self.data.update_data()
         self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
-        self.data.time_integrate = process_time() - t_start
+        self.data.time_integrate = perf_counter() - t_start
         return self.data.solution, self.data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):

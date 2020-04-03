@@ -6,7 +6,7 @@ from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import array, log2, sqrt
 from scipy.stats import norm
-from time import process_time
+from time import perf_counter
 import warnings
 
 
@@ -56,7 +56,7 @@ class CLTRep(StoppingCriterion):
         
     def integrate(self):
         """ Determine when to stop """
-        t_start = process_time()
+        t_start = perf_counter()
         while True:
             self.data.update_data()
             sighat_up = self.data.sighat * self.inflate
@@ -81,5 +81,5 @@ class CLTRep(StoppingCriterion):
         z_star = -norm.ppf(self.alpha / 2)
         err_bar = z_star * self.inflate * self.data.sighat / sqrt(self.data.n)
         self.data.confid_int = self.data.solution +  err_bar * array([-1, 1])
-        self.data.time_integrate = process_time() - t_start
+        self.data.time_integrate = perf_counter() - t_start
         return self.data.solution, self.data

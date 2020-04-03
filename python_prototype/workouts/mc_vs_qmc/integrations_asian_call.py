@@ -48,14 +48,14 @@ def cublattice_g(dimension, abs_tol, time_vector, mean_shift_is):
     distribution = Lattice(dimension, seed=7, backend="GAIL")
     measure = BrownianMotion(distribution, time_vector, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = CubLattice_g(integrand, abs_tol, check_cone=False).integrate()
+    solution,data = CubLattice_g(integrand, abs_tol,).integrate()
     return data
 
 def cubsobol_g(dimension, abs_tol, time_vector, mean_shift_is):
     distribution = Sobol(dimension, seed=7, backend="MPS")
     measure = BrownianMotion(distribution, time_vector, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = CubSobol_g(integrand, abs_tol, check_cone=False).integrate()
+    solution,data = CubSobol_g(integrand, abs_tol).integrate()
     return data
 
 integrations_dict = {

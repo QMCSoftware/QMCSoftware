@@ -15,7 +15,7 @@ from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import CubatureData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
 from numpy import log2, hstack, tile, exp, pi, arange
-from time import process_time
+from time import perf_counter
 import warnings
 
 
@@ -42,7 +42,7 @@ class CubLattice_g(StoppingCriterion):
     parameters = ['abs_tol','rel_tol','n_init','n_max']
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=2**10, n_max=2**35,
-                 fudge=lambda m: 5*2**(-m), check_cone=True):
+                 fudge=lambda m: 5*2**(-m), check_cone=False):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -86,7 +86,7 @@ class CubLattice_g(StoppingCriterion):
 
     def integrate(self):
         """ Determine when to stop """
-        t_start = process_time()
+        t_start = perf_counter()
         while True:
             self.data.update_data()
             # Check the end of the algorithm
@@ -111,7 +111,7 @@ class CubLattice_g(StoppingCriterion):
             else:
                 # double sample size
                 self.data.m += 1
-        self.data.time_integrate = process_time() - t_start
+        self.data.time_integrate = perf_counter() - t_start
         return self.data.solution, self.data
             
     def fft_update(self, y, ynext):

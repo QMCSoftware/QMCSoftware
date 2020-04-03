@@ -6,7 +6,7 @@ from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import MaxSamplesWarning, ParameterError
 from numpy import array, ceil, floor, maximum
 from scipy.stats import norm
-from time import process_time
+from time import perf_counter
 import warnings
 
 
@@ -43,7 +43,7 @@ class CLT(StoppingCriterion):
 
     def integrate(self):
         """ Determine when to stop """
-        t_start = process_time()
+        t_start = perf_counter()
         # Pilot Sample
         self.data.update_data()
         # use cost of function values to decide how to allocate
@@ -78,5 +78,5 @@ class CLT(StoppingCriterion):
         sigma_up = (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
         err_bar = z_star * self.inflate * sigma_up
         self.data.confid_int = self.data.solution + err_bar * array([-1, 1])
-        self.data.time_integrate = process_time() - t_start
+        self.data.time_integrate = perf_counter() - t_start
         return self.data.solution, self.data

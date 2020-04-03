@@ -1,7 +1,7 @@
 """ Definition for MeanVarDataRep, a concrete implementation of AccumulateData """
 
 from ._accumulate_data import AccumulateData
-from time import process_time
+from time import perf_counter
 from numpy import array, finfo, float32, full, inf, nan, tile, zeros
 
 EPS = finfo(float32).eps
@@ -42,7 +42,7 @@ class MeanVarDataRep(AccumulateData):
 
     def update_data(self):
         """ Update data """
-        t_start = process_time()  # time integrand evaluation
+        t_start = perf_counter()  # time integrand evaluation
         set_x = self.distribution.gen_samples(n_min=self.n_total,n_max=self.n)
         for r in range(self.replications):
             y = self.integrand.f(set_x[r]).squeeze()
@@ -50,7 +50,7 @@ class MeanVarDataRep(AccumulateData):
             self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n  # updated integrand-replication mean
         self.muhat = self.muhat_r.mean()  # mean of replication streams means
         self.sighat = self.muhat_r.std()
-        self.t_eval = max(process_time() - t_start, EPS)
+        self.t_eval = max(perf_counter() - t_start, EPS)
         self.n_total = self.n  # updated the total evaluations
         # standard deviation of stream means
         self.solution = self.muhat.copy() # mean of integrand approximations

@@ -48,14 +48,14 @@ def cublattice_g(dimension, abs_tol, rel_tol):
     distribution = Lattice(dimension, seed=7, backend="GAIL")
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CubLattice_g(integrand, abs_tol, rel_tol, check_cone=False).integrate()
+    solution,data = CubLattice_g(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def cubsobol_g(dimension, abs_tol, rel_tol):
     distribution = Sobol(dimension, seed=7, backend="MPS")
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CubSobol_g(integrand, abs_tol, rel_tol, check_cone=False).integrate()
+    solution,data = CubSobol_g(integrand, abs_tol, rel_tol).integrate()
     return data
 
 integrations_dict = {
