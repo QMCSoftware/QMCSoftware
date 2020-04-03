@@ -35,22 +35,22 @@ class MeanVarDataRep(AccumulateData):
         self.muhat = inf  # sample mean
         self.sighat = inf # sample standard deviation
         self.t_eval = 0  # processing time for each integrand
-        self.n = n_init  # currnet number of samples
-        self.n_total = 0 # total number of samples
+        self.n_r = n_init  # current number of samples to draw from discrete distribution
+        self.n_r_prev = 0 # previous number of samples drawn from discrete distributoin
+        self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         super().__init__()
 
     def update_data(self):
         """ Update data """
         t_start = perf_counter()  # time integrand evaluation
-        set_x = self.distribution.gen_samples(n_min=self.n_total,n_max=self.n)
+        set_x = self.distribution.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
         for r in range(self.replications):
             y = self.integrand.f(set_x[r]).squeeze()
-            previous_sum_y = self.muhat_r[r] * self.n_total
-            self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n  # updated integrand-replication mean
-        self.muhat = self.muhat_r.mean()  # mean of replication streams means
+            previous_sum_y = self.muhat_r[r] * self.n_r_prev
+            self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n_r  # updated integrand-replication mean
+        self.solution = self.muhat_r.mean()  # mean of replication means
         self.sighat = self.muhat_r.std()
         self.t_eval = max(perf_counter() - t_start, EPS)
-        self.n_total = self.n  # updated the total evaluations
-        # standard deviation of stream means
-        self.solution = self.muhat.copy() # mean of integrand approximations
+        self.n_r_prev = self.n_r  # updated the total evaluations
+        self.n_total = self.n_r * self.replications

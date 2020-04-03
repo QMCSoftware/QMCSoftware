@@ -41,6 +41,7 @@ class CLTRep(StoppingCriterion):
         self.n_init = n_init
         self.n_max = n_max
         self.alpha = alpha
+        self.z_star = -norm.ppf(self.alpha / 2)
         self.inflate = inflate
         # DiscreteDistribution checks
         distribution = integrand.measure.distribution
@@ -59,27 +60,25 @@ class CLTRep(StoppingCriterion):
         t_start = perf_counter()
         while True:
             self.data.update_data()
-            sighat_up = self.data.sighat * self.inflate
+            err_bar = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
             tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
-            if sighat_up < tol_up:
+            if err_bar < tol_up:
                 # sufficiently estimated
                 break
-            elif 2 * self.data.n > self.n_max:
+            elif 2 * self.data.n_total > self.n_max:
                 # doubling samples would go over n_max
                 warning_s = """
                 Alread generated %d samples.
                 Trying to generate %d new samples would exceeds n_max = %d.
                 No more samples will be generated.
                 Note that error tolerances may not be satisfied""" \
-                % (int(self.data.n_total), int(self.data.n), int(self.n_max))
+                % (int(self.data.n_total), int(self.data.n_total), int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
             else:
                 # double sample size
-                self.data.n *= 2
+                self.data.n_r *= 2
         # CLT confidence interval
-        z_star = -norm.ppf(self.alpha / 2)
-        err_bar = z_star * self.inflate * self.data.sighat / sqrt(self.data.n)
         self.data.confid_int = self.data.solution +  err_bar * array([-1, 1])
         self.data.time_integrate = perf_counter() - t_start
         return self.data.solution, self.data
