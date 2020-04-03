@@ -23,8 +23,18 @@ if [ ! -d $DIR ]; then
   mkdir $DIR
 fi
 rm $DIR/*
-python python_prototype/sphinx/render_readme_as_rst.py
-# pandoc -s --mathjax ./README.md -o python_prototype/sphinx/markdown_to_rst/QMCSoftware.html
+
+# QMCSoftware README
+pandoc --mathjax README.md -o python_prototype/sphinx/markdown_to_rst/QMCSoftware.rst
+
+# python_prototype README
+pandoc --mathjax python_prototype/README.md -o python_prototype/sphinx/markdown_to_rst/python_prototype.rst
+
+# qmcpy README
+pandoc --mathjax python_prototype/qmcpy/README.md -o python_prototype/sphinx/markdown_to_rst/qmcpy.rst
+
+# test README
+pandoc --mathjax python_prototype/test/README.md -o python_prototype/sphinx/markdown_to_rst/test.rst
 
 # restore original README.md that contains certain keywords
 rm README.md

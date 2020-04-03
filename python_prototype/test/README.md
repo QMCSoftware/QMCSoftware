@@ -8,7 +8,7 @@ Run all in < 1 second
 python -W ignore -m unittest discover -s test/fasttests
 ~~~
 
----
+<hr>
 
 ## Long unittests
 Call workout functions<br>
