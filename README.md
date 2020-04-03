@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/QMCSoftware/QMCSoftware.png?branch=master)](https://travis-ci.com/QMCSoftware/QMCSoftware)
+[![codecov](https://codecov.io/gh/QMCSoftware/QMCSoftware/branch/master/graph/badge.svg)](https://codecov.io/gh/QMCSoftware/QMCSoftware)
+[![Documentation Status](https://readthedocs.org/projects/qmcpy/badge/?version=latest)](https://qmcpy.readthedocs.io/en/latest/?badge=latest)
 
 # Quasi-Monte Carlo Community Software
 
@@ -5,6 +8,7 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 
 
 <hr>
+
 ##  Project 
 
 Homepage: [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/) 
@@ -12,6 +16,7 @@ Homepage: [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.githu
 Code repostiory:  [https://github.com/QMCSoftware/QMCSoftware](https://github.com/QMCSoftware/QMCSoftware)
 
 <hr>
+
 ## Citation
 
 If you find QMCPy helpful in your work, please support us by citing the following work:

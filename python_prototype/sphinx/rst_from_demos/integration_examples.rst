@@ -145,7 +145,7 @@ defined as follows:
     	sighat          0.049
     	n_total         32768
     	confid_int      [ 6.226  6.302]
-    	time_integrate  0.333
+    	time_integrate  0.267
     
 
 
@@ -198,7 +198,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2352         
+    Solution: 6.2350         
     MultiLevelConstructor (AsianCall Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -224,10 +224,10 @@ last example.
     MeanVarData (AccumulateData Object)
     	levels          3
     	solution        6.235
-    	n               [316854  28523   3721]
-    	n_total         352170
-    	confid_int      [ 6.187  6.284]
-    	time_integrate  0.152
+    	n               [321494  28679   3430]
+    	n_total         356675
+    	confid_int      [ 6.186  6.284]
+    	time_integrate  0.117
     
 
 
