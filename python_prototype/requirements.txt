@@ -38,11 +38,13 @@ numpy==1.17.2
 numpydoc==0.9.1
 packaging==19.2
 pandas==0.25.1
+pandoc==1.0.2
 pandocfilters==1.4.2
 parso==0.6.1
 pbr==5.4.4
 pexpect==4.8.0
 pickleshare==0.7.5
+ply==3.11
 prometheus-client==0.7.1
 prompt-toolkit==3.0.3
 ptyprocess==0.6.0
