@@ -53,11 +53,11 @@ class MeanVarData(AccumulateData):
     def update_data(self):
         """ Update data """
         for l in range(self.levels):
-            t_start = perf_counter()  # time the integrand values
+            t_start = perf_counter() # time the integrand values
             samples = self.distributions[l].gen_samples(n=self.n[l])
             y = self.integrands[l].f(samples).squeeze()
             self.t_eval[l] = max(perf_counter() - t_start, EPS)
-            self.sighat[l] = y.std()  # compute the sample standard deviation
-            self.muhat[l] = y.mean()  # compute the sample mean
-            self.n_total += self.n[l]  # add to total samples
-        self.solution = self.muhat.sum()  # tentative solution
+            self.sighat[l] = y.std() # compute the sample standard deviation
+            self.muhat[l] = y.mean() # compute the sample mean
+            self.n_total += self.n[l] # add to total samples
+        self.solution = self.muhat.sum() # tentative solution

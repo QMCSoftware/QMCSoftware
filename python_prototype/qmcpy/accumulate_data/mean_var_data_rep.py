@@ -43,7 +43,6 @@ class MeanVarDataRep(AccumulateData):
 
     def update_data(self):
         """ Update data """
-        t_start = perf_counter()  # time integrand evaluation
         set_x = self.distribution.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
         for r in range(self.replications):
             y = self.integrand.f(set_x[r]).squeeze()
@@ -51,6 +50,5 @@ class MeanVarDataRep(AccumulateData):
             self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n_r  # updated integrand-replication mean
         self.solution = self.muhat_r.mean()  # mean of replication means
         self.sighat = self.muhat_r.std()
-        self.t_eval = max(perf_counter() - t_start, EPS)
         self.n_r_prev = self.n_r  # updated the total evaluations
         self.n_total = self.n_r * self.replications

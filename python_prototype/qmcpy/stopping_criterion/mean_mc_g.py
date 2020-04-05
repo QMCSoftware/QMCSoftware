@@ -15,13 +15,13 @@ Reference:
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..util import MaxSamplesWarning, NotYetImplemented
+from ..util import tolfun, MaxSamplesWarning, NotYetImplemented
 from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
 from scipy.optimize import fsolve
 from scipy.stats import norm
 from time import perf_counter
 import warnings
-
+warnings.filterwarnings('ignore', 'The iteration is not making good progress')
 
 class MeanMC_g(StoppingCriterion):
     """
@@ -74,8 +74,8 @@ class MeanMC_g(StoppingCriterion):
         # Pilot Sample
         self.data.update_data()
         self.sigma_up = self.inflate * self.data.sighat
-        self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
         if self.rel_tol == 0:
+            self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
             toloversig = self.abs_tol / self.sigma_up
             # absolute error tolerance over sigma
             n, self.err_bar = \
@@ -92,10 +92,46 @@ class MeanMC_g(StoppingCriterion):
                 % (int(self.data.n_total), int(self.data.n), int(self.n_max), n_low)
                 warnings.warn(warning_s, MaxSamplesWarning)
                 self.data.n[:] = n_low
-        else:
-            raise NotYetImplemented("Not implemented for rel_tol != 0")
-        # Final Sample
-        self.data.update_data()
+            self.data.update_data()
+        else: # self.rel_tol > 0
+            alphai = (self.alpha-self.alpha_sigma)/(2*(1-self.alpha_sigma)) # uncertainty to do iteration
+            eps1 = self._ncbinv(1e4,alphai,self.kurtmax)
+            self.err_bar = self.sigma_up*eps1
+            tau = 1 # step of the iteration 
+            self.data.n[:] = 1e4 # default initial sample size
+            while True:
+                if self.data.n_total + self.data.n > self.n_max:
+                    # cannot generate this many new samples
+                    n_low = int(self.n_max-self.data.n_total)
+                    warning_s = """
+                    Alread generated %d samples.
+                    Trying to generate %d new samples would exceeds n_max = %d.
+                    Will instead generate %d samples to meet n_max total samples. 
+                    Note that error tolerances may no longer be satisfied""" \
+                    % (int(self.data.n_total), int(self.data.n), int(self.n_max), n_low)
+                    warnings.warn(warning_s, MaxSamplesWarning)
+                    self.data.n[:] = n_low
+                    self.data.update_data()
+                    break
+                self.data.update_data()
+                lb_tol = tolfun(self.abs_tol, self.rel_tol, 0, self.data.solution-self.err_bar, 'max')
+                ub_tol = tolfun(self.abs_tol, self.rel_tol, 0, self.data.solution+self.err_bar, 'max')
+                delta_plus = (lb_tol + ub_tol) / 2
+                if delta_plus >= self.err_bar:
+                    # stopping criterion met
+                    delta_minus = (lb_tol - ub_tol) / 2
+                    self.data.solution += delta_minus # adjust solution a bit
+                    break
+                else:
+                    candidate_tol = max(self.abs_tol,.95*self.rel_tol*abs(self.data.solution))
+                    self.err_bar = min(self.err_bar/2,candidate_tol)
+                    tau += 1
+                # update next uncertainty
+                toloversig = self.err_bar / self.sigma_up
+                alphai = 2**tau * (self.alpha - self.alpha_sigma) / (1 - self.alpha_sigma)
+                n,_ = self._nchebe(toloversig, alphai, self.kurtmax, self.n_max, self.sigma_up)
+                self.data.n[:] = n            
+        # set confidence interval
         self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
         self.data.time_integrate = perf_counter() - t_start
         return self.data.solution, self.data
@@ -111,29 +147,26 @@ class MeanMC_g(StoppingCriterion):
         A2 = 0.429  # three constants in Berry-Esseen inequality
         M3upper = kurtmax**(3 / 4)
         # the upper bound on the third moment by Jensen's inequality
-
-        def BEfun2(logsqrtn): return norm.cdf(-exp(logsqrtn) * toloversig) \
+        BEfun2 = lambda logsqrtn: \
+            (norm.cdf(-exp(logsqrtn) * toloversig)
             + exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
-            A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3)) \
-            - alpha / 2
+            A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
+            - alpha / 2)
         # Berry-Esseen function, whose solution is the sample size needed
         logsqrtnCLT = log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
         nbe = ceil(exp(2 * fsolve(BEfun2, logsqrtnCLT)))
         # calculate Berry-Esseen n by fsolve function (scipy)
         ncb = min(min(ncheb, nbe), n_budget)  # take the min of two sample sizes
         logsqrtn = log(sqrt(ncb))
-
-        def BEfun3(toloversig): return norm.cdf(-exp(logsqrtn) * toloversig) \
+        BEfun3 = lambda toloversig: \
+            (norm.cdf(-exp(logsqrtn) * toloversig)
             + exp(-logsqrtn) * min(A1 * (M3upper + A2),
-            A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3)) \
-            - alpha / 2
+            A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
+            - alpha / 2)
         err = fsolve(BEfun3, toloversig) * sigma_0_up
         return ncb, err
 
-
-# To be used when rel_tol != 0
-'''
-    def _ncbinv(self, alpha1, kurtmax, n1=2):
+    def _ncbinv(self, n1, alpha1, kurtmax):
         """
         Calculate the reliable upper bound on error when given
         Chebyshev and Berry-Esseen inequality and sample size n
@@ -143,12 +176,12 @@ class MeanMC_g(StoppingCriterion):
         A = 18.1139
         A1 = 0.3328
         A2 = 0.429 # three constants in Berry-Esseen inequality
-        M3upper=kurtmax**(3/4)
+        M3upper = kurtmax**(3/4)
         # using Jensen's inequality to bound the third moment
         BEfun = lambda logsqrtb: \
-            norm.cdf(n1*logsqrtb) + min(A1*(M3upper+A2), \
-            A*M3upper/(1+(sqrt(n1)*logsqrtb)**3))/sqrt(n1) \
-            - alpha1/2
+            (norm.cdf(n1*logsqrtb) + min(A1*(M3upper+A2),
+            A*M3upper/(1+(sqrt(n1)*logsqrtb)**3))/sqrt(n1)
+            - alpha1/2)
         # Berry-Esseen inequality
         logsqrtb_clt = log(sqrt(norm.ppf(1-alpha1/2)/sqrt(n1)))
         # use CLT to get tolerance
@@ -157,4 +190,3 @@ class MeanMC_g(StoppingCriterion):
         eps = min(NCheb_inv,NBE_inv)
         # take the min of Chebyshev and Berry Esseen tolerance
         return eps
-'''

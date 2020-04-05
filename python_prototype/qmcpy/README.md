@@ -9,8 +9,8 @@ The function to integrate\
 - Keister: $y_i = \pi^{d/2} \, \cos(||\boldsymbol{x}_i||_2)$
 - Asian Call
     - $S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}$
-    - discounted call payoff $= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)$
-    - discounted put payoff $= \max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)$
+    - discounted call payoff $= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)*e^{-rT}$
+    - discounted put payoff $= \max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)*e^{-rT}$
 - QuickConstruct
 
 <hr>
