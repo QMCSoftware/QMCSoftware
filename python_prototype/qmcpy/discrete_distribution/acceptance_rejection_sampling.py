@@ -7,8 +7,8 @@ Definition of AcceptanceRejectionSampling, a concrete implementation of Discrete
         2. samples u_i from Uniform(0,1)
         3. if u_i <= m(x)/(c*k(x)) ==> keep s_i
     Note: 
-        this algorithm estimates c by taking 512 samples form the Lattice
-        and taking c ~= 1.2*max(m(s_i)/k(s_i) for i=1,...512)
+        this algorithm conservitively estimates c by taking 256 samples
+        and approximating c ~= inflate_c_factor*max(m(s_i)/k(s_i) for i=1,...512)
 """
 
 from ._discrete_distribution import DiscreteDistribution
@@ -24,13 +24,14 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
 
     parameters = ['c']
 
-    def __init__(self, objective_pdf, measure_to_sample_from, draws_multiple=inf):
+    def __init__(self, objective_pdf, measure_to_sample_from, draws_multiple=inf, inflate_c_factor=1):
         """
         Args:
             objective_pdf (function): pdf function of objective measure
             measure_to_sample_from (TrueMeasure): true measure we can sample from
             draws_multiple (float): will raise exception if drawing over n*draws_multiple samples
                                     when trying to get n samples
+            inflate_c_factor (float): c = possibly inflate c to avoid underestimating
         """
         self.mimics = 'None'
         self.m = objective_pdf
@@ -45,10 +46,10 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
             raise TransformError('Acceptance rejection sampling only works with IID distributions.'+\
                                  'Make sure measure_to_samples_from has an IID distribution')
         # approximate c
-        s = self.measure.gen_mimic_samples(512)
+        s = self.measure.gen_mimic_samples(256)
         md = apply_along_axis(self.m,1,s).squeeze()
         kd = apply_along_axis(self.k,1,s).squeeze()
-        self.c = 1.2*max( (md/kd) )
+        self.c = max( (md/kd) )
         super().__init__()
 
     def gen_samples(self, n):
