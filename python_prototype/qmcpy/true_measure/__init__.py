@@ -3,3 +3,4 @@ from .gaussian import Gaussian
 from .lebesgue import Lebesgue
 from .uniform import Uniform
 from .identity_transform import IdentityTransform
+from .inverse_cdf_transform import InverseCDFTransform

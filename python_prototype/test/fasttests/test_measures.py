@@ -1,7 +1,7 @@
 """ Unit tests for subclasses of TrueMeasures in QMCPy """
 
 from qmcpy import *
-from numpy import array, random
+from numpy import *
 import unittest
 
         
@@ -55,6 +55,14 @@ class TestIdentityTransform(unittest.TestCase):
         measure = IdentityTransform(distribution)
         samples = measure.gen_mimic_samples(n=5)
 
+
+class TestInverseCDFTransform(unittest.TestCase):
+
+    def test_gen_samples(self):
+        distribution = Sobol(2)
+        exp_lambda_5 = InverseCDFTransform(distribution,\
+            inverse_cdf_fun=lambda u,l=5: log(1-u)/(-l))
+        exp_lambda_5.gen_mimic_samples(n_min=0,n_max=4)
 
 if __name__ == "__main__":
     unittest.main()
