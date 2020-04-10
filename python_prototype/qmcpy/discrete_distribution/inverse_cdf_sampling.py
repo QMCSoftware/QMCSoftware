@@ -1,18 +1,18 @@
-""" Definition of InverseCDFTransform, a concrete implementation of DiscreteDistribution """
+""" Definition of InverseCDFSampling, a concrete implementation of DiscreteDistribution """
 
 from ._discrete_distribution import DiscreteDistribution
 from ..util import TransformError
 
 
-class InverseCDFTransform(DiscreteDistribution):
-    """ Custom InverseCDFTransform DiscreteDistribution """
+class InverseCDFSampling(DiscreteDistribution):
+    """ Custom InverseCDFSampling DiscreteDistribution """
 
     parameters = []
 
-    def __init__(self, distribution_mimicing_uniform, inverse_cdf_fun=lambda u: u):
+    def __init__(self, distribution_mimicking_uniform, inverse_cdf_fun=lambda u: u):
         """
         Args:
-            distribution_mimicing_uniform (DiscreteDistribution): DiscreteDistribution instance
+            distribution_mimicking_uniform (DiscreteDistribution): DiscreteDistribution instance
             inverse_cdf_fun (function): function accepting samples mimicing uniform
                                     and applying inverse CDF transform
                 Args:
@@ -23,7 +23,7 @@ class InverseCDFTransform(DiscreteDistribution):
             ==> F^(-1)(u) = log(1-u)/(-l) ~ exp(l) for u ~ Uniform(0,1)
             ==> inverse_cdf_fun = lambda u,l=5: log(1-u)/(-l)
         """
-        self.distribution_u = distribution_mimicing_uniform
+        self.distribution_u = distribution_mimicking_uniform
         self.inverse_cdf_fun = inverse_cdf_fun
         if self.distribution_u.mimics != 'StdUniform':
             raise TransformError(\
