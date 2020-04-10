@@ -2,7 +2,7 @@
 
 from ._true_measure import TrueMeasure
 from ..util import TransformError
-from numpy import array
+from numpy import array, prod
 from scipy.stats import norm
 
 
@@ -23,6 +23,9 @@ class Uniform(TrueMeasure):
         self.upper_bound = array(upper_bound)
         super().__init__()
     
+    def pdf(self,x):
+        return 1/( prod(self.upper_bound-self.lower_bound) )
+
     def _tf_to_mimic_samples(self, samples):
         """
         Transform samples to appear Uniform

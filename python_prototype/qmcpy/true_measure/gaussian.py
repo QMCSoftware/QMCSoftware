@@ -2,8 +2,8 @@
 
 from ._true_measure import TrueMeasure
 from ..util import TransformError
-from numpy import array, sqrt, eye, dot
-from numpy.linalg import cholesky
+from numpy import array, sqrt, eye, dot, pi, exp,dot
+from numpy.linalg import cholesky, det, inv
 from scipy.stats import norm
 
 
@@ -22,13 +22,25 @@ class Gaussian(TrueMeasure):
                       a float value is equivalent to float_val*eye(dimension)
         """
         self.distribution = distribution
-        self.mean = array(mean)
+        self.mu = array(mean)
         self.covariance = array(covariance)
-        d = distribution.dimension
-        cov_d = self.covariance if self.covariance.shape==(d,d) else self.covariance*eye(d)
+        self.d = distribution.dimension
+        cov_d = self.covariance if self.covariance.shape==(self.d,self.d) else self.covariance*eye(self.d)
         self.sigma = cholesky(cov_d)
         super().__init__()
     
+    def pdf(self, x):
+        """
+        Gaussian pdf
+        Args:
+            x (ndarray): dx1 matrix of samples from domain
+        """
+        x = x.reshape(self.d,1)
+        mu = self.mu.reshape(self.d,1)
+        density = (2*pi)**(-self.d/2) * det(self.sigma)**(-1/2) * \
+            exp(-1/2 *  dot( dot((x-mu).T,inv(self.sigma)), x-mu) )
+        return density
+
     def _tf_to_mimic_samples(self, samples):
         """
         Transform samples to appear Gaussian
@@ -42,10 +54,10 @@ class Gaussian(TrueMeasure):
         """
         if self.distribution.mimics == 'StdGaussian':
             # shift and stretch
-            mimic_samples = self.mean + dot(samples,self.sigma)
+            mimic_samples = self.mu + dot(samples,self.sigma)
         elif self.distribution.mimics == "StdUniform":
             # inverse CDF then shift and stretch
-            mimic_samples = self.mean + dot(norm.ppf(samples),self.sigma)
+            mimic_samples = self.mu + dot(norm.ppf(samples),self.sigma)
         else:
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
