@@ -1,7 +1,6 @@
 """ Definition for class AsianCall, a concrete implementation of Integrand """
 
 from ._integrand import Integrand
-from ..true_measure._true_measure import TrueMeasure
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
 from numpy import array, exp, log, maximum, repeat

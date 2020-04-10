@@ -70,7 +70,6 @@ class CubatureData(AccumulateData):
         x = self.distribution.gen_samples(n_min=self.n_total,n_max=2**self.m)
         ynext = self.integrand.f(x).squeeze()
         self.yval = hstack((self.yval,ynext))
-        ynext = ynext.astype(complex)
         # Compute fast basis transform
         self.y = self.ft(self.y, ynext)
         ## Update self.kappanumap

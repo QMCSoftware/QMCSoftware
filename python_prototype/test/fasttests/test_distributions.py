@@ -1,7 +1,7 @@
 """ Unit tests for discrete distributions in QMCPy """
 
 from qmcpy import *
-from numpy import array, int64, log2, ndarray, vstack, zeros
+from numpy import array, int64, log2, ndarray, vstack, zeros, random
 import unittest
 
 
@@ -97,6 +97,17 @@ class TestSobol(unittest.TestCase):
                 self.assertEqual(type(samples), ndarray)
             with self.subTest():
                 self.assertEqual(samples.shape, (2,4,3))
+
+
+class TestCustomIIDDistribution(unittest.TestCase):
+    """
+    Unit tests for CustomIIDDistribution
+    """
+
+    def test_gen_samples(self):
+        distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
+        distribution.gen_samples(10)
+
 
 if __name__ == "__main__":
     unittest.main()

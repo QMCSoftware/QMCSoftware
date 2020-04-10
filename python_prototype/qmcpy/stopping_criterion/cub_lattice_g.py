@@ -123,6 +123,8 @@ class CubLattice_g(StoppingCriterion):
         Return:
             y (ndarray): all points combined and transformed
         """
+        y = y.astype(complex)
+        ynext = ynext.astype(complex)
         ## Compute initial FFT on next points
         mnext = int(log2(len(ynext)))
         for l in range(mnext):

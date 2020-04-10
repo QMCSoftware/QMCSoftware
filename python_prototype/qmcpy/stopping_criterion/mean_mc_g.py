@@ -63,7 +63,7 @@ class MeanMC_g(StoppingCriterion):
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
+        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration data
         self.data = MeanVarData(self, integrand, self.n_init)  # house integration data

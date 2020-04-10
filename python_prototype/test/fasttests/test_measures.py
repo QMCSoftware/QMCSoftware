@@ -1,7 +1,7 @@
 """ Unit tests for subclasses of TrueMeasures in QMCPy """
 
 from qmcpy import *
-from numpy import array
+from numpy import array, random
 import unittest
 
         
@@ -46,6 +46,14 @@ class TestLebesgue(unittest.TestCase):
     def test_gen_samples(self):
         distribution = Sobol(dimension=3)
         measure = Lebesgue(distribution)
+        self.assertRaises(Exception,measure.gen_mimic_samples,n_min=0,n_max=4)
+
+class TestIdentityTransform(unittest.TestCase):
+
+    def test_gen_samples(self):
+        distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
+        measure = IdentityTransform(distribution)
+        samples = measure.gen_mimic_samples(n=5)
 
 
 if __name__ == "__main__":

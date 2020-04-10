@@ -36,7 +36,7 @@ class CLT(StoppingCriterion):
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'multi'
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
+        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration data
         self.data = MeanVarData(self, integrand, self.n_init)
