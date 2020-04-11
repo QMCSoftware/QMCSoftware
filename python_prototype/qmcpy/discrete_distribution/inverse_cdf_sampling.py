@@ -32,7 +32,7 @@ class InverseCDFSampling(DiscreteDistribution):
         self.mimics = 'None'
         super().__init__()
     
-    def gen_samples(self, n):
+    def gen_samples(self, *args, **kwargs):
         """
         Generate n x self.dimension samples 
 
@@ -42,6 +42,6 @@ class InverseCDFSampling(DiscreteDistribution):
         Returns:
             n x self.dimension (ndarray)
         """
-        original_samples = self.distribution_u.gen_samples(n)
+        original_samples = self.distribution_u.gen_samples(*args, **kwargs)
         mimic_samples = self.inverse_cdf_fun(original_samples)
         return mimic_samples
