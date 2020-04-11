@@ -10,7 +10,7 @@ from scipy.stats import norm
 class Gaussian(TrueMeasure):
     """ Gaussian (Normal) TrueMeasure """
 
-    parameters = ['mean', 'covariance']
+    parameters = ['mu', 'covariance']
 
     def __init__(self, distribution, mean=0, covariance=1):
         """

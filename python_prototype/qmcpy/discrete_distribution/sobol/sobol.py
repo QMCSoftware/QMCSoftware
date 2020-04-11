@@ -92,17 +92,22 @@ class Sobol(DiscreteDistribution):
             self.sobol_rng[i].fast_forward(n_min)
         return array([self.sobol_rng[i].draw(n).numpy() for i in range(self.r)])
 
-    def gen_samples(self, n_min=0, n_max=8):
+    def gen_samples(self, n=None, n_min=0, n_max=8):
         """
         Generate self.replications (n_max-n_min)xself.d Sobol samples
 
         Args:
+            n (int): if n is supplied, generate from n_min=0 to n_max=n samples.
+                     Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence. Must be 0 or n_max/2
             n_max (int): Final index of sequence. Must be a power of 2. 
 
         Returns:
             self.replications x (n_max-n_min) x self.dimension (ndarray)
         """
+        if n:
+            n_min = 0
+            n_max = n 
         if log2(n_max) % 1 != 0:
             raise ParameterError("n_max must be a power of 2")
         if not (n_min == 0 or n_min == n_max/2):
