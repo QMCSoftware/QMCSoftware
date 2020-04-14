@@ -51,7 +51,7 @@ class Uniform(TrueMeasure):
     def transform_g_to_f(self, g):
         """
         Transform g, the origianl integrand, to f,
-        the integrand accepting standard distribution sampels. 
+        the integrand accepting standard distribution samples. 
         
         Args:
             g (method): original integrand

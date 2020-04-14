@@ -89,7 +89,7 @@ class AsianCall(Integrand):
 
         Args:
             x: nodes, $\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}$ \
-                row of an $n \\cdot |\\mathfrak{u}|$ matrix
+                row of an $n \\cdot \\lvert \\mathfrak{u} \\rvert$ matrix
 
         Returns:
             $n \\cdot p$ matrix with values \

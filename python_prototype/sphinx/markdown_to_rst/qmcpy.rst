@@ -13,9 +13,9 @@ Integrand
 
    -  :math:`S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}`
    -  discounted call payoff
-      :math:`= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)`
+      :math:`= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)*e^{-rT}`
    -  discounted put payoff
-      :math:`= \max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)`
+      :math:`= \max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)*e^{-rT}`
 
 -  QuickConstruct
 
@@ -35,6 +35,7 @@ True Measure
    :math:`\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;` for
    :math:`\;Z_j \sim \mathcal{N}(0,1)`
 -  Lebesgue
+-  Identity Transform
 
 .. raw:: html
 
@@ -50,8 +51,11 @@ Discrete Distribution
    :math:`x_j \overset{iid}{\sim} \mathcal{U}(0,1)`
 -  IID Standard Gaussian:
    :math:`x_j \overset{iid}{\sim} \mathcal{N}(0,1)`
+-  Custom IID Distribution
 -  Lattice (base 2): :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 -  Sobol (base 2): :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
+-  Inverse CDF Sampling
+-  Acceptance Rejection Sampling
 
 .. raw:: html
 
@@ -73,6 +77,7 @@ Stopping Criterion
 
 -  CLT Repeated
 -  CubLattice\_g (gauranteed)
+-  CubSobol\_g (gauranteed)
 
 .. raw:: html
 

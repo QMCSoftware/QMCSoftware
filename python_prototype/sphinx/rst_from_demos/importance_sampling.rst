@@ -83,7 +83,7 @@ With ordinary Monte Carlo we do the following:
     	n_total         65536
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.055
+    	time_integrate  0.054
 
 
 
@@ -120,7 +120,7 @@ Thus,
 
 .. parsed-literal::
 
-    Solution: 0.4499         
+    Solution: 0.4501         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -142,7 +142,7 @@ Thus,
     	n_total         16384
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.015
+    	time_integrate  0.019
 
 
 
@@ -154,7 +154,7 @@ Thus,
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.279 the time and 0.250 the samples
+    Imporance Sampling takes 0.358 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -264,7 +264,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7788         
+    Solution: 1.7697         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -289,9 +289,9 @@ Vanilla Monte Carlo
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        1.779
+    	solution        1.770
     	r_lag           4
-    	time_integrate  0.318
+    	time_integrate  0.296
 
 
 
@@ -321,7 +321,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7737         
+    Solution: 1.7917         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -346,9 +346,9 @@ Monte Carlo with Importance Sampling
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         4096
-    	solution        1.774
+    	solution        1.792
     	r_lag           4
-    	time_integrate  0.072
+    	time_integrate  0.069
 
 
 
@@ -369,7 +369,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.227 the time and 0.250 the samples
+    Imporance Sampling takes 0.232 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -440,70 +440,70 @@ Importance Sampling MC vs QMC
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>3.24e+05</td>
-          <td>1.02e+00</td>
+          <td>6.70e-01</td>
         </tr>
         <tr>
           <td>CLT IIDStdUniform (MC)</td>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>8.22e+04</td>
-          <td>4.91e-01</td>
+          <td>1.78e-01</td>
         </tr>
         <tr>
           <td>MeanMC_g IIDStdGaussian (MC)</td>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.82e+05</td>
-          <td>7.03e-01</td>
+          <td>3.28e-01</td>
         </tr>
         <tr>
           <td>MeanMC_g IIDStdGaussian (MC)</td>
           <td>1.00e+00</td>
           <td>1.77e+00</td>
           <td>1.27e+05</td>
-          <td>3.96e-01</td>
+          <td>9.96e-02</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
-          <td>2.05e+03</td>
-          <td>8.26e-02</td>
+          <td>1.64e+04</td>
+          <td>4.80e-02</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>1.00e+00</td>
-          <td>1.79e+00</td>
-          <td>1.02e+03</td>
-          <td>4.47e-02</td>
+          <td>1.80e+00</td>
+          <td>8.19e+03</td>
+          <td>2.80e-02</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>0.00e+00</td>
           <td>1.75e+00</td>
           <td>4.10e+03</td>
-          <td>7.48e-02</td>
+          <td>2.01e-02</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>1.00e+00</td>
           <td>1.78e+00</td>
           <td>2.05e+03</td>
-          <td>7.89e-03</td>
+          <td>9.84e-03</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>4.10e+03</td>
-          <td>2.12e-01</td>
+          <td>5.25e-02</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>2.05e+03</td>
-          <td>2.12e-02</td>
+          <td>2.28e-02</td>
         </tr>
       </tbody>
     </table>
@@ -516,8 +516,8 @@ Importance Sampling MC vs QMC
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
     idx = arange(len(problems))
     width = .35
-    ax[0].barh(idx+width,df.loc[df.mean_shift==0]['n_samples'].values,width)
-    ax[0].barh(idx,df.loc[df.mean_shift==1]['n_samples'].values,width)
+    ax[0].barh(idx+width,log(df.loc[df.mean_shift==0]['n_samples'].values),width)
+    ax[0].barh(idx,log(df.loc[df.mean_shift==1]['n_samples'].values),width)
     ax[1].barh(idx+width,df.loc[df.mean_shift==0]['time'].values,width)
     ax[1].barh(idx,df.loc[df.mean_shift==1]['time'].values,width)
     fig.suptitle('Importance Sampling Comparison by Stopping Criterion on Asian Call Option')

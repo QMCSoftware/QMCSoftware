@@ -1,6 +1,8 @@
 QMCPy Documentation
 ===================
 
+
+
 Integrand Class
 ---------------
 
@@ -31,6 +33,10 @@ Quick Construct for Function
 
 .. automodule:: qmcpy.integrand.quick_construct
     :members:
+
+
+
+
 
 Measure Class
 -------------
@@ -63,6 +69,16 @@ Lebesgue
 .. automodule:: qmcpy.true_measure.lebesgue
     :members:
 
+IdentityTransform
+..................
+
+.. automodule:: qmcpy.true_measure.identity_transform
+    :members:
+
+
+
+
+
 Discrete Distribution Class
 ---------------------------
 
@@ -82,15 +98,28 @@ IID Standard Gaussian
 .. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
     :members:
 
+Custom IID Distribution
+......................
+
+.. automodule:: qmcpy.discrete_distribution.custom_iid_distribution
+    :members:
+
 Lattice
 ........
+
 .. automodule:: qmcpy.discrete_distribution.lattice.lattice
     :members:
 
-.. automodule:: qmcpy.discrete_distribution.lattice.mps_lattice
-    :members:
+Lattice GAIL Backend
+.....................
 
 .. automodule:: qmcpy.discrete_distribution.lattice.gail_lattice
+    :members:
+
+Lattice Magic Point Shop Backend
+.................................
+
+.. automodule:: qmcpy.discrete_distribution.lattice.mps_lattice
     :members:
 
 Sobol
@@ -99,10 +128,28 @@ Sobol
 .. automodule:: qmcpy.discrete_distribution.sobol.sobol
     :members:
 
+Sobol Magic Point Shop Backend
+...............................
+
 .. automodule:: qmcpy.discrete_distribution.sobol.mps_sobol
     :members:
 
-Data Class
+Inverse CDF Sampling
+.....................
+
+.. automodule:: qmcpy.discrete_distribution.inverse_cdf_sampling
+    :members:
+
+Acceptance Rejection Sampling
+............................
+
+.. automodule:: qmcpy.discrete_distribution.acceptance_rejection_sampling
+    :members:
+
+
+
+
+Accumulate Data Class
 ----------
 
 .. The following extract documentation in qmcpy.accumulate_data.__init__.py
@@ -127,6 +174,10 @@ Cubature Data
 .. automodule:: qmcpy.accumulate_data.cubature_data
     :members:
 
+
+
+
+
 Stopping Criterion Class
 -------------------------
 
@@ -140,16 +191,16 @@ Central Limit Theorem
 .. automodule:: qmcpy.stopping_criterion.clt
     :members:
 
-Central Limit Theorem for Replications
-.......................................
-
-.. automodule:: qmcpy.stopping_criterion.clt_rep
-    :members:
-
 Mean Monte Carlo Garunteed
 ...........................
 
 .. automodule:: qmcpy.stopping_criterion.mean_mc_g
+    :members:
+
+Central Limit Theorem for Replications
+.......................................
+
+.. automodule:: qmcpy.stopping_criterion.clt_rep
     :members:
 
 Cubature Lattice Garunteed
@@ -163,6 +214,10 @@ Cubature Sobol Garunteed
 
 .. automodule:: qmcpy.stopping_criterion.cub_sobol_g
     :members:
+
+
+
+
 
 Utilities
 ---------

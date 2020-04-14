@@ -97,105 +97,105 @@ Gaussian True Measure - :math:`\mathcal{N}_3(0,\frac{1}{2})`
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>4.72e+05</td>
-          <td>5.04e-01</td>
+          <td>1.82e-01</td>
         </tr>
         <tr>
           <td>CLT IIDStdUniform (MC)</td>
           <td>5.00e-02</td>
           <td>2.16e+00</td>
           <td>2.08e+04</td>
-          <td>1.23e-02</td>
+          <td>1.01e-02</td>
         </tr>
         <tr>
           <td>CLT IIDStdUniform (MC)</td>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>6.75e+03</td>
-          <td>3.94e-03</td>
+          <td>4.61e-03</td>
         </tr>
         <tr>
           <td>MeanMC_g IIDStdGaussian (MC)</td>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>6.12e+05</td>
-          <td>2.65e-01</td>
+          <td>7.00e-02</td>
         </tr>
         <tr>
           <td>MeanMC_g IIDStdGaussian (MC)</td>
           <td>5.00e-02</td>
           <td>2.18e+00</td>
           <td>4.01e+04</td>
-          <td>3.19e-02</td>
+          <td>8.16e-03</td>
         </tr>
         <tr>
           <td>MeanMC_g IIDStdGaussian (MC)</td>
           <td>1.00e-01</td>
           <td>2.18e+00</td>
           <td>1.46e+04</td>
-          <td>5.05e-03</td>
+          <td>4.08e-03</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>1.00e-02</td>
-          <td>2.17e+00</td>
-          <td>5.12e+02</td>
-          <td>1.26e-02</td>
+          <td>2.18e+00</td>
+          <td>4.10e+03</td>
+          <td>8.09e-03</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>5.00e-02</td>
           <td>2.18e+00</td>
-          <td>2.56e+02</td>
-          <td>7.20e-03</td>
+          <td>4.10e+03</td>
+          <td>5.72e-03</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>1.00e-01</td>
           <td>2.18e+00</td>
-          <td>2.56e+02</td>
-          <td>6.97e-03</td>
+          <td>4.10e+03</td>
+          <td>6.10e-03</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>2.05e+03</td>
-          <td>4.74e-03</td>
+          <td>5.53e-03</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>4.35e-03</td>
+          <td>3.28e-03</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>3.33e-03</td>
+          <td>3.45e-03</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>2.05e+03</td>
-          <td>9.61e-03</td>
+          <td>9.54e-03</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>5.85e-03</td>
+          <td>6.05e-03</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>6.20e-03</td>
+          <td>5.26e-03</td>
         </tr>
       </tbody>
     </table>
@@ -311,84 +311,84 @@ Gaussian True Measure - :math:`\mathcal{N}_d(0,\frac{1}{2})`
           <td>10</td>
           <td>-1.53e+02</td>
           <td>4.60e+04</td>
-          <td>2.11e-01</td>
+          <td>5.73e-02</td>
         </tr>
         <tr>
           <td>CLT IIDStdUniform (MC)</td>
           <td>20</td>
           <td>-8.28e+04</td>
           <td>4.75e+03</td>
-          <td>4.92e-02</td>
+          <td>1.48e-02</td>
         </tr>
         <tr>
           <td>CLT IIDStdUniform (MC)</td>
           <td>30</td>
           <td>-1.95e+07</td>
           <td>2.03e+04</td>
-          <td>2.83e-01</td>
+          <td>8.02e-02</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>10</td>
           <td>-1.54e+02</td>
-          <td>5.12e+02</td>
-          <td>1.83e-02</td>
+          <td>4.10e+03</td>
+          <td>9.06e-03</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>20</td>
           <td>-8.28e+04</td>
-          <td>5.12e+02</td>
-          <td>2.64e-02</td>
+          <td>4.10e+03</td>
+          <td>1.39e-02</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>30</td>
           <td>-1.94e+07</td>
-          <td>2.56e+02</td>
-          <td>2.00e-02</td>
+          <td>4.10e+03</td>
+          <td>1.84e-02</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>10</td>
           <td>-1.55e+02</td>
           <td>1.02e+03</td>
-          <td>3.49e-03</td>
+          <td>4.09e-03</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>20</td>
           <td>-8.28e+04</td>
           <td>1.02e+03</td>
-          <td>2.56e-02</td>
+          <td>9.22e-03</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>30</td>
           <td>-1.94e+07</td>
           <td>1.02e+03</td>
-          <td>2.51e-02</td>
+          <td>1.27e-02</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>10</td>
           <td>-1.53e+02</td>
           <td>1.02e+03</td>
-          <td>7.31e-03</td>
+          <td>7.90e-03</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>20</td>
           <td>-8.24e+04</td>
           <td>1.02e+03</td>
-          <td>5.52e-02</td>
+          <td>2.07e-02</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>30</td>
           <td>-1.94e+07</td>
           <td>1.02e+03</td>
-          <td>7.88e-02</td>
+          <td>2.07e-02</td>
         </tr>
       </tbody>
     </table>

@@ -53,7 +53,7 @@ to the function ``integrate()``.
     	mimics          StdUniform
     Gaussian (TrueMeasure Object)
     	distrib_name    Lattice
-    	mean            0
+    	mu              0
     	covariance      0.500
     CLTRep (StoppingCriterion Object)
     	inflate         1.200
@@ -68,12 +68,12 @@ to the function ``integrate()``.
     	sighat          0.011
     	n_total         4096
     	confid_int      [ 2.157  2.174]
-    	time_integrate  0.005
+    	time_integrate  0.007
     
 
 
-European Arithmetic-Mean Asian Put Option: Single Level
--------------------------------------------------------
+Arithmetic-Mean Asian Put Option: Single Level
+----------------------------------------------
 
 In this example, we want to estimate the payoff of an European Asian put
 option that matures at time :math:`T`. The key mathematical entities are
@@ -145,12 +145,12 @@ defined as follows:
     	sighat          0.049
     	n_total         32768
     	confid_int      [ 6.226  6.302]
-    	time_integrate  0.267
+    	time_integrate  0.271
     
 
 
-European Arithmetic-Mean Asian Put Option: Multi-Level
-------------------------------------------------------
+Arithmetic-Mean Asian Put Option: Multi-Level
+---------------------------------------------
 
 This example is similar to the last one except that we use Gile's
 multi-level method for estimation of the option price. The main idea can
@@ -198,7 +198,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2350         
+    Solution: 6.2347         
     MultiLevelConstructor (AsianCall Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -224,10 +224,10 @@ last example.
     MeanVarData (AccumulateData Object)
     	levels          3
     	solution        6.235
-    	n               [321494  28679   3430]
-    	n_total         356675
-    	confid_int      [ 6.186  6.284]
-    	time_integrate  0.117
+    	n               [324792  28070   3341]
+    	n_total         359275
+    	confid_int      [ 6.186  6.283]
+    	time_integrate  0.100
     
 
 

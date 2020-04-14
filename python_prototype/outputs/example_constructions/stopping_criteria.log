@@ -9,7 +9,7 @@ IIDStdUniform (DiscreteDistribution Object)
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdUniform
-	mean            0
+	mu              0
 	covariance      0.500
 CLT (StoppingCriterion Object)
 	inflate         1.200
@@ -24,7 +24,7 @@ MeanVarData (AccumulateData Object)
 	n               467027
 	n_total         468051
 	confid_int      [ 1.807  1.817]
-	time_integrate  0.194
+	time_integrate  0.125
 
 Meets tolerance: True
 
@@ -41,7 +41,7 @@ Lattice (DiscreteDistribution Object)
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
 	distrib_name    Lattice
-	mean            0
+	mu              0
 	covariance      0.500
 CLTRep (StoppingCriterion Object)
 	inflate         1.200
@@ -54,9 +54,9 @@ MeanVarDataRep (AccumulateData Object)
 	replications    16
 	solution        1.809
 	sighat          0.002
-	n_total         256
-	confid_int      [ 1.809  1.809]
-	time_integrate  0.018
+	n_total         4096
+	confid_int      [ 1.807  1.810]
+	time_integrate  0.004
 
 Meets tolerance: True
 
@@ -70,7 +70,7 @@ IIDStdGaussian (DiscreteDistribution Object)
 	mimics          StdGaussian
 Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
-	mean            0
+	mu              0
 	covariance      0.500
 MeanMC_g (StoppingCriterion Object)
 	inflate         1.200
@@ -85,7 +85,7 @@ MeanVarData (AccumulateData Object)
 	n               596905
 	n_total         597929
 	confid_int      [ 1.804  1.814]
-	time_integrate  0.189
+	time_integrate  0.051
 
 Meets tolerance: True
 
@@ -102,7 +102,7 @@ Lattice (DiscreteDistribution Object)
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
 	distrib_name    Lattice
-	mean            0
+	mu              0
 	covariance      0.500
 CubLattice_g (StoppingCriterion Object)
 	abs_tol         0.005
@@ -113,7 +113,7 @@ CubatureData (AccumulateData Object)
 	n_total         2048
 	solution        1.808
 	r_lag           4
-	time_integrate  0.022
+	time_integrate  0.004
 
 Meets tolerance: True
 
@@ -130,7 +130,7 @@ Sobol (DiscreteDistribution Object)
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
 	distrib_name    Sobol
-	mean            0
+	mu              0
 	covariance      0.500
 CubSobol_g (StoppingCriterion Object)
 	abs_tol         0.005
@@ -141,7 +141,7 @@ CubatureData (AccumulateData Object)
 	n_total         2048
 	solution        1.808
 	r_lag           4
-	time_integrate  0.036
+	time_integrate  0.007
 
 Meets tolerance: True
 

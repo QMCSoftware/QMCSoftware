@@ -24,6 +24,7 @@ General measure used to define the integrand\
 - Gaussian: $\mathcal{N}(\mu,\sigma^2)$
 - Brownian Motion: $\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;$ for $\;Z_j \sim \mathcal{N}(0,1)$
 - Lebesgue
+- Identity Transform
 
 <hr>
 
@@ -34,9 +35,11 @@ Sampling nodes IID or LDS (low-discrepancy sequence)\
 
 - IID Standard Uniform: $x_j \overset{iid}{\sim}   \mathcal{U}(0,1)$
 - IID Standard Gaussian: $x_j \overset{iid}{\sim}   \mathcal{N}(0,1)$
+- Custom IID Distribution
 - Lattice (base 2): $x_j  \overset{lds}{\sim}    \mathcal{U}(0,1)$
 - Sobol (base 2): $x_j \overset{lds}{\sim}    \mathcal{U}(0,1)$
-
+- Inverse CDF Sampling
+- Acceptance Rejection Sampling
 
 <hr>
 
@@ -55,6 +58,7 @@ Has class method `integrate` which preforms numerical integration\
 
 - CLT Repeated
 - CubLattice_g (gauranteed)
+- CubSobol_g (gauranteed)
 
 <hr>   
 
