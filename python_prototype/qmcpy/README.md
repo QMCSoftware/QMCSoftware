@@ -52,7 +52,7 @@ Has class method `integrate` which preforms numerical integration\
 **For IID Nodes** $x_i\sim$ iid
 
   - Central Limit Theorem (CLT) 
-  - MeanMC_g (gauranteed)
+  - MeanMC_g (guaranteed)
 
 **For QMC Sequences** $\{x_{r,i}\}_{r=1}^R \sim$ lds
 
