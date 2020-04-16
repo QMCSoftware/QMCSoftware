@@ -22,7 +22,7 @@ General measure used to define the integrand\
 
 - Uniform: $\mathcal{U}(a,b)$
 - Gaussian: $\mathcal{N}(\mu,\sigma^2)$
-- Brownian Motion: $\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;$ for $\;Z_j \sim \mathcal{N}(0,1)$
+- Discrete Brownian Motion: $\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;$ for $\;Z_j \sim \mathcal{N}(0,1)$
 - Lebesgue
 - Identity Transform
 
