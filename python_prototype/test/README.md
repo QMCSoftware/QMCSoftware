@@ -5,15 +5,15 @@ Quickly check functionality<br>
 Run all in < 1 second
 
 ~~~
-python -m unittest discover -s test/fasttests
+python -W ignore -m unittest discover -s test/fasttests
 ~~~
 
----
+<hr>
 
 ## Long unittests
 Call workout functions<br>
 Runs all in < 10 seconds
 
 ~~~
-python -m unittest discover -s test/longtests
+python -W ignore -m unittest discover -s test/longtests
 ~~~

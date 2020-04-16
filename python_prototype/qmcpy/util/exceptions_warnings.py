@@ -26,19 +26,6 @@ class TransformError(Exception):
     """
 
 
-class ParameterError(Exception):
-    """
-    Class for raising error about input parameters
-    """
-
-
-class DistributionGenerationError(Exception):
-    """
-    Class for raising error about parameter inputs
-    to gen_dd_samples (method of a DiscreteDistribution)
-    """
-
-
 class MethodImplementationError(Exception):
     """
     Class for raising error when an abstract method has not been implemented
@@ -51,10 +38,9 @@ class MethodImplementationError(Exception):
         super().__init__(s_f % (type(subclass).__name__, method_name))
 
 
-class DistributionGenerationWarnings(Warning):
+class ParameterError(Exception):
     """
-    Class for issuing warningssabout parameter inputs
-    to gen_dd_samples (method of a DiscreteDistribution)
+    Class for raising error about input parameters
     """
 
 
@@ -67,4 +53,10 @@ class ParameterWarning(Warning):
 class MaxSamplesWarning(Warning):
     """
     Class for issuing warning about using maximum number of data samples
+    """
+
+
+class CubatureWarning(Warning):
+    """
+    Class for issuing warnings throughout cubature algorithms
     """

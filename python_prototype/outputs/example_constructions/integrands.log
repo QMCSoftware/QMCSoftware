@@ -1,0 +1,45 @@
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+AsianCall (Integrand Object)
+	volatility      0.500
+	start_price     30
+	strike_price    25
+	interest_rate   0
+	mean_type       arithmetic
+	_dim_frac       0
+
+Asian Call (Single Level) approx with 32768 samples: 6.134
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MultiLevelConstructor (AsianCall Object)
+	volatility      [ 0.500  0.500  0.500]
+	start_price     [30 30 30]
+	strike_price    [25 25 25]
+	interest_rate   [0 0 0]
+	mean_type       ['arithmetic' 'arithmetic' 'arithmetic']
+	_dim_frac       [ 0.000  4.000  4.000]
+
+Asian Call (Single Level) approx with 32768 samples: 6.203
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Keister (Integrand Object)
+
+Keister approx with 32768 samples: 2.176
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Linear (Integrand Object)
+
+Linear approx with 32768 samples: 1.000
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+QuickConstruct (Integrand Object)
+
+QuickConstruct approx with 32768 samples: 9539398.406
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

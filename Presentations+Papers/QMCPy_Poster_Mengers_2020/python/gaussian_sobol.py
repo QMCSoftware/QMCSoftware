@@ -1,0 +1,1 @@
+>>> Gaussian(Sobol(dimension=2)).gen_samples(n_min=0,n_max=128)

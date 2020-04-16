@@ -6,35 +6,31 @@ from ._integrand import Integrand
 class QuickConstruct(Integrand):
     """ Specify and generate values of a user-defined function"""
 
-    def __init__(self, dimension, custom_fun):
+    def __init__(self, measure, custom_fun):
         """
         Initialize custom Integrand
 
         Args:
-            dimension (ndarray): dimension(s) of the integrand(s)
-            custom_fun (int): a callable univariable or multivariate Python \
-             function that returns a real number.
-
-        Note:
-            Input of the function:
-
-            x: nodes, :math:`\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}` \
-                        row of an :math:`n \\cdot |\\mathfrak{u}|` matrix
+            measure (TrueMeasure): a TrueMeasure instance
+            custom_fun (function): a function evaluating samples (nxd) -> (nx1). See g method.
         """
-        super().__init__(dimension,
-                         g=custom_fun)
+        self.measure = measure
+        self.custom_fun = custom_fun
+        super().__init__()
 
     def g(self, x):
-        return self.custom_fun(x)
-
-    def __repr__(self, attributes=[]):
         """
-        Print important attribute values
+        Original integrand to be integrated
 
         Args:
-            attributes (list): list of attributes to print
+            x: nodes, $\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}$ \
+               row of an $n \\cdot \\lvert \\mathfrak{u} \\rvert$ matrix
 
         Returns:
-            string of self info
+            $n \\cdot p$ matrix with values \
+            $f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})$ where if \
+            $\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j$, \
+            then $x'_{ij} = x_{ij}$ for $j \\in \\mathfrak{u}$, \
+            and $x'_{ij} = c$ otherwise
         """
-        return super().__repr__()
+        return self.custom_fun(x)

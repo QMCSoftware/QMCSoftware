@@ -1,17 +1,13 @@
 QMCPy Documentation
 ===================
 
-Integration Method
-------------------
 
-.. automodule:: qmcpy.integrate
-    :members:
 
 Integrand Class
 ---------------
 
 .. The following extract documentation in qmcpy.integrand.__init__.py
-.. automodule:: qmcpy.integrand._integrand
+.. automodule:: qmcpy.integrand
     :members:
 
 Asian Call Option Payoff
@@ -38,94 +34,190 @@ Quick Construct for Function
 .. automodule:: qmcpy.integrand.quick_construct
     :members:
 
+
+
+
+
 Measure Class
 -------------
 
-.. The following extract documentation in qmcpy.measures.__init__.py
-.. automodule:: qmcpy.true_measure._true_measure
+.. The following extract documentation in qmcpy.true_measure.__init__.py
+.. automodule:: qmcpy.true_measure
     :members:
 
 Uniform
-.........................
+........
 
 .. automodule:: qmcpy.true_measure.uniform
     :members:
 
 Gaussian
-.........................
+.........
 
 .. automodule:: qmcpy.true_measure.gaussian
     :members:
 
 Brownian Motion
-.........................
+................
 
 .. automodule:: qmcpy.true_measure.brownian_motion
     :members:
 
 Lebesgue
-.........................
+.........
 
 .. automodule:: qmcpy.true_measure.lebesgue
     :members:
 
+IdentityTransform
+..................
+
+.. automodule:: qmcpy.true_measure.identity_transform
+    :members:
+
+
+
+
+
 Discrete Distribution Class
 ---------------------------
 
-.. The following extract documentation in qmcpy.distribution.__init__.py
-.. automodule:: qmcpy.discrete_distribution._discrete_distribution
+.. The following extract documentation in qmcpy.discrete_distribution.__init__.py
+.. automodule:: qmcpy.discrete_distribution
     :members:
 
-Uniform
-.........................
+IID Standard Uniform
+.....................
 
 .. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
-Gaussian
-.........................
+IID Standard Gaussian
+......................
 
 .. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
     :members:
 
-Lattice
-.........................
+Custom IID Distribution
+......................
 
-.. automodule:: qmcpy.discrete_distribution.lattice
+.. automodule:: qmcpy.discrete_distribution.custom_iid_distribution
+    :members:
+
+Lattice
+........
+
+.. automodule:: qmcpy.discrete_distribution.lattice.lattice
+    :members:
+
+Lattice GAIL Backend
+.....................
+
+.. automodule:: qmcpy.discrete_distribution.lattice.gail_lattice
+    :members:
+
+Lattice Magic Point Shop Backend
+.................................
+
+.. automodule:: qmcpy.discrete_distribution.lattice.mps_lattice
     :members:
 
 Sobol
-.........................
-.. automodule:: qmcpy.discrete_distribution.sobol
+......
+
+.. automodule:: qmcpy.discrete_distribution.sobol.sobol
     :members:
 
-Data Class
+Sobol Magic Point Shop Backend
+...............................
+
+.. automodule:: qmcpy.discrete_distribution.sobol.mps_sobol
+    :members:
+
+Inverse CDF Sampling
+.....................
+
+.. automodule:: qmcpy.discrete_distribution.inverse_cdf_sampling
+    :members:
+
+Acceptance Rejection Sampling
+............................
+
+.. automodule:: qmcpy.discrete_distribution.acceptance_rejection_sampling
+    :members:
+
+
+
+
+Accumulate Data Class
 ----------
 
-.. The following extract documentation in qmcpy.accum_data.__init__.py
-.. automodule:: qmcpy.accum_data._accum_data
+.. The following extract documentation in qmcpy.accumulate_data.__init__.py
+.. automodule:: qmcpy.accumulate_data
+    :members:
+
+Mean Variance Data
+...................
+
+.. automodule:: qmcpy.accumulate_data.mean_var_data
+    :members:
+
+Mean Variance for Replications Data
+....................................
+
+.. automodule:: qmcpy.accumulate_data.mean_var_data_rep
+    :members:
+
+Cubature Data
+..............
+
+.. automodule:: qmcpy.accumulate_data.cubature_data
     :members:
 
 
-.. automodule:: qmcpy.accum_data.mean_var_data
-    :members:
 
-.. automodule:: qmcpy.accum_data.mean_var_data_rep
-    :members:
+
 
 Stopping Criterion Class
 -------------------------
 
 .. The following extract documentation in qmcpy.stop.__init__.py
-.. automodule:: qmcpy.stopping_criterion._stopping_criterion
+.. automodule:: qmcpy.stopping_criterion
     :members:
 
+Central Limit Theorem
+......................
 
 .. automodule:: qmcpy.stopping_criterion.clt
     :members:
 
+Mean Monte Carlo Garunteed
+...........................
+
+.. automodule:: qmcpy.stopping_criterion.mean_mc_g
+    :members:
+
+Central Limit Theorem for Replications
+.......................................
+
 .. automodule:: qmcpy.stopping_criterion.clt_rep
     :members:
+
+Cubature Lattice Garunteed
+...........................
+
+.. automodule:: qmcpy.stopping_criterion.cub_lattice_g
+    :members:
+
+Cubature Sobol Garunteed
+...........................
+
+.. automodule:: qmcpy.stopping_criterion.cub_sobol_g
+    :members:
+
+
+
+
 
 Utilities
 ---------
@@ -134,5 +226,20 @@ Utilities
 .. automodule:: qmcpy
     :members:
 
+Multi-Level Constructor
+........................
+
+.. automodule:: qmcpy.util.multilevel_constructor
+    :members:
+
+Exceptions and Warnnings
+.........................
+
 .. automodule:: qmcpy.util.exceptions_warnings
+    :members:
+
+Abstraction Functions
+......................
+
+.. automodule:: qmcpy.util.abstraction_functions
     :members:

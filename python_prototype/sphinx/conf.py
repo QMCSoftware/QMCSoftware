@@ -41,22 +41,24 @@ release = u"0.1"
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
 
-extensions = ["sphinx.ext.autodoc",
-              "sphinx.ext.githubpages",
-              "sphinx.ext.imgmath",  # for epub latex
-              "sphinx.ext.napoleon",
-              "sphinx.ext.graphviz",
-              "sphinx.ext.intersphinx",
-              "sphinx_rtd_theme",
-              "sphinx.ext.mathjax",  # for html latex
-              "sphinx.ext.doctest",
-              "sphinx.ext.coverage",
-              "sphinx.ext.ifconfig",
-              "sphinx.ext.githubpages",
-              "sphinx_markdown_tables",
-              # "sphinx.ext.autosummary",
-              # "numpydoc" # to eliminate WARNING: Unexpected section title. Uncomment will surface randint documentation
-              ]
+extensions = [
+    "sphinx_math_dollar",
+    "sphinx.ext.mathjax",  # for html latex
+    "sphinx.ext.autodoc",
+    "sphinx.ext.githubpages",
+    "sphinx.ext.imgmath",  # for epub latex
+    "sphinx.ext.napoleon",
+    "sphinx.ext.graphviz",
+    "sphinx.ext.intersphinx",
+    "sphinx_rtd_theme",
+    "sphinx.ext.doctest",
+    "sphinx.ext.coverage",
+    "sphinx.ext.ifconfig",
+    "sphinx.ext.githubpages",
+    "sphinx_markdown_tables",
+    # "sphinx.ext.autosummary",
+    # "numpydoc" # to eliminate WARNING: Unexpected section title. Uncomment will surface randint documentation
+    ]
 
 
 # Add any paths that contain templates here, relative to this directory.

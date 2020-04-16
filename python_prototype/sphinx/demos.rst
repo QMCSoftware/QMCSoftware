@@ -4,6 +4,8 @@ Demos
 .. toctree::
     :maxdepth: 2
 
+    rst_from_demos/quickstart.rst
+
     rst_from_demos/qmcpy_intro.rst
 
     rst_from_demos/integration_examples.rst
@@ -15,6 +17,8 @@ Demos
     rst_from_demos/MC_vs_QMC.rst
 
     rst_from_demos/quasirandom_generators.rst
+
+    rst_from_demos/sampling_measures.rst
 
 .. Need to fix LaTeX expressions in the notebook below
 .. rst_from_demos/nei_demo.rst

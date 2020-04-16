@@ -1,4 +1,4 @@
----
+<hr>
 title: A simple MLMC Example
 author: HajiAli
 excerpt: ""
@@ -6,7 +6,7 @@ layout: single
 
 categories:
   - MLMC
----
+<hr>
 
 $$
 \def\oS{\overline S}
