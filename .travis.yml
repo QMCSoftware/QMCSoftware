@@ -10,7 +10,7 @@ notifications:
       - schoi32@iit.edu
       - jrathin1@iit.edu
       - qmc-software@googlegroups.com
-    on_success: always # default: change
+    on_success: change # default: change
     on_failure: always # default: always
 
 
@@ -58,8 +58,8 @@ install:
 - pip install -e .
 
 script:
-- python -W ignore -m unittest discover -s test/fasttests
-- python -W ignore -m unittest discover -s test/longtests
+# - python -W ignore -m unittest discover -s test/fasttests
+# - python -W ignore -m unittest discover -s test/longtests
 - coverage run --source=./ -m unittest discover -s test/fasttests
 - coverage run --append --source=./ -m unittest discover -s test/longtests
 
