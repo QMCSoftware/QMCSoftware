@@ -39,9 +39,9 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
         self.measure = measure_to_sample_from
         self.distribution = self.measure.distribution
         self.dimension = self.distribution.dimension
-        self.k = self.measure.pdf
         if not hasattr(self.measure,'pdf'):
-            raise TransformError('measure_to_sample_from must have self.pdf function')
+            raise TransformError('measure_to_sample_from must have pdf method')
+        self.k = self.measure.pdf
         if not ('IID' in type(self.distribution).__name__):
             raise TransformError('Acceptance rejection sampling only works with IID distributions.'+\
                                  'Make sure measure_to_samples_from has an IID distribution')
