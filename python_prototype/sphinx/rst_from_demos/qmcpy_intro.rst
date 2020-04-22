@@ -245,7 +245,7 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
     	n               3305
     	n_total         4329
     	confid_int      [ 0.647  0.668]
-    	time_integrate  0.003
+    	time_integrate  0.001
     
 
 
@@ -303,7 +303,7 @@ changing the input parameter value of dimension for QuickConstruct?
     	n               5452
     	n_total         6476
     	confid_int      [ 0.821  0.841]
-    	time_integrate  0.003
+    	time_integrate  0.002
     
 
 
