@@ -43,7 +43,7 @@ setuptools.setup(
     version="0.1",
     author="Fred Hickernell, Aleksei Sorokin, and Sou-Cheng T. Choi",
     author_email="hickernell@iit.com",
-    description="(Quasi) Monte Carlo Framework in Python 3.7",
+    description="(Quasi) Monte Carlo Framework in Python 3.6 and 3.7",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/QMCSoftware/QMCSoftware",
@@ -54,6 +54,6 @@ setuptools.setup(
         "License :: OSI Approved :: IIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     cmdclass={"clean": CleanCommand}
 )
