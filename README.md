@@ -83,8 +83,9 @@ We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.
 
 ## Sponsors
 
-<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/python_prototype/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg" alt="IIT logo"/>
+<img src="./python_prototype/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg" alt="IIT logo"/>
 
-<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/python_prototype/sphinx/logo/kamakura-corporation-vector-logo.png" alt="Kamakura logo"/>
+<img src="./python_prototype/sphinx/logo/kamakura-corporation-vector-logo.png" alt="Kamakura logo"/>
 
-<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/python_prototype/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg" alt="SigOpt logo"/>
+<img src="./python_prototype/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg" alt="SigOpt logo"/>
+
