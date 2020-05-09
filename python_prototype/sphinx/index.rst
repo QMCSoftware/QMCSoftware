@@ -31,6 +31,11 @@ Sponsors
    :width: 600
    :alt: IIT
 
+.. image:: logo/kamakura-corporation-vector-logo.png
+   :width: 600
+   :alt: SigOpt
+
+
 .. image:: logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg
    :width: 600
    :alt: SigOpt

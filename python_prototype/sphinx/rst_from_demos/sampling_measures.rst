@@ -111,9 +111,6 @@ Cauchy
 Acceptance Rejection Sampling
 -----------------------------
 
-Simple Example
-~~~~~~~~~~~~~~
-
 .. raw:: latex
 
    \begin{equation}
@@ -166,9 +163,9 @@ Simple Example
 
 
 Bayesian Example
-~~~~~~~~~~~~~~~~
+----------------
 
-| Taken from Bayesian data Analysis. 3rd Edition. Andrew Gelman, John B.
+| Taken from Bayesian Data Analysis. 3rd Edition. Andrew Gelman, John B.
   Carlin, Hal S. Stern, David B. Dunson, Aki Vehtari, Donald B. Rubin.
 | Chapter 10 Section 9 (Exercises) Problem 5
 | :math:`y_j \sim Binomial(n_j,\theta_j)`
@@ -226,7 +223,7 @@ Bayesian Example
 
 .. code:: ipython3
 
-    # More Efficient sampling_measure
+    # More Efficient sampling_measure using estimate of posterior mean and covariance
     sampling_measure = Gaussian(IIDStdGaussian(2,seed=7),mean=pd_mean_estimate,covariance=pd_cov_estimate)
     distribution = AcceptanceRejectionSampling(posterior_density,sampling_measure)
     samples = distribution.gen_samples(1000)
@@ -240,5 +237,68 @@ Bayesian Example
     Successful Draws: 1000  Total Draws: 2488
     95% confidence interval for alpha: (0.526,2.186)
     95% confidence interval for beta:  (-1.014,0.421)
+
+
+Importance Sampling
+-------------------
+
+Sampling from unit quarter circle in first quadrant
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For integrand :math:`g(x,y)=x+y` with measure pdf
+:math:`\rho(x,y) = \left(\frac{\pi r^2}{4}\right)^{-1} \mathbb{1}(\sqrt{x^2+y^2}<1 , x>0 , y>0)`
+and :math:`r=1`
+
+.. math:: \int_0^1 \int_0^{\sqrt{1-y^2}} g(x,y) \rho(x,y) dxdy =  \frac{4}{\pi} \int_0^1 \int_0^{\sqrt{1-y^2}} (x+y) dxdy = \frac{8}{3\pi}
+
+.. code:: ipython3
+
+    true_value = 8/(3*pi)
+    abs_tol = .01
+    def quarter_circle_uniform_pdf(x):
+        x1,x2 = x
+        if sqrt(x1**2+x2**2)<1 and x1>=0 and x2>=0:
+            return 4/pi # 1/(pi*(1**2)/4)
+        else:
+            return 0. # outside of quarter circle
+
+.. code:: ipython3
+
+    measure = ImportanceSampling(
+        objective_pdf = quarter_circle_uniform_pdf,
+        measure_to_sample_from = Uniform(IIDStdUniform(dimension=2,seed=9)))
+    integrand = QuickConstruct(measure, lambda x: x.sum(1))
+    solution,data = MeanMC_g(integrand,abs_tol=abs_tol).integrate()
+    print(data)
+    within_tol = abs(solution-true_value)<abs_tol
+    print('Within tolerance of true value %.3f: %s'%(true_value,within_tol))
+
+
+.. parsed-literal::
+
+    Solution: 0.8498         
+    QuickConstruct (Integrand Object)
+    IIDStdUniform (DiscreteDistribution Object)
+    	dimension       2
+    	seed            9
+    	mimics          StdUniform
+    ImportanceSampling (TrueMeasure Object)
+    	distrib_name    IIDStdUniform
+    MeanMC_g (StoppingCriterion Object)
+    	inflate         1.200
+    	alpha           0.010
+    	abs_tol         0.010
+    	rel_tol         0
+    	n_init          1024
+    	n_max           10000000000
+    MeanVarData (AccumulateData Object)
+    	levels          1
+    	solution        0.850
+    	n               56396
+    	n_total         57420
+    	confid_int      [ 0.840  0.860]
+    	time_integrate  0.866
+    
+    Within tolerance of true value 0.849: True
 
 

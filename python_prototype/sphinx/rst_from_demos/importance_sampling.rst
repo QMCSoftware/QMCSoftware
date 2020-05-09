@@ -61,7 +61,7 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4501         
+    Solution: 0.4500         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -83,7 +83,7 @@ With ordinary Monte Carlo we do the following:
     	n_total         65536
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.054
+    	time_integrate  0.048
 
 
 
@@ -120,7 +120,7 @@ Thus,
 
 .. parsed-literal::
 
-    Solution: 0.4501         
+    Solution: 0.4510         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -140,9 +140,9 @@ Thus,
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        0.450
+    	solution        0.451
     	r_lag           4
-    	time_integrate  0.019
+    	time_integrate  0.017
 
 
 
@@ -154,7 +154,7 @@ Thus,
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.358 the time and 0.250 the samples
+    Imporance Sampling takes 0.350 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -264,7 +264,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7697         
+    Solution: 1.7724         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -289,9 +289,9 @@ Vanilla Monte Carlo
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        1.770
+    	solution        1.772
     	r_lag           4
-    	time_integrate  0.296
+    	time_integrate  0.286
 
 
 
@@ -321,7 +321,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7917         
+    Solution: 1.7526         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -346,7 +346,7 @@ Monte Carlo with Importance Sampling
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         4096
-    	solution        1.792
+    	solution        1.753
     	r_lag           4
     	time_integrate  0.069
 
@@ -369,7 +369,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.232 the time and 0.250 the samples
+    Imporance Sampling takes 0.240 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
