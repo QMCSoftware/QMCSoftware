@@ -40,7 +40,7 @@ pandoc --mathjax python_prototype/test/README.md -o python_prototype/sphinx/mark
 rm README.md
 mv README.bak README.md
 
-rm $DIR/docs.rst
+#rm $DIR/docs.rst
 
 ################################################################################
 # Generate RST files from Jupyter notebooks
@@ -80,7 +80,7 @@ cd sphinx   # to return to sphinx directory
 
 make clean;
 
-make html
+make html;
 
 #rm -fr ../../docs;  mkdir ../../docs;
 #cp -a _build/html/. ../../docs;

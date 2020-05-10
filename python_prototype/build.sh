@@ -59,7 +59,7 @@ ls -ltr .
 
 ls -ltr outputs
 
-ls -ltr ../docs/index.html
+ls -ltr sphinx/_build/html/index.html
 
 echo "QMCPy build process is completed."
 echo "$(date)"
