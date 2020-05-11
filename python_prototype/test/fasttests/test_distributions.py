@@ -1,7 +1,7 @@
 """ Unit tests for discrete distributions in QMCPy """
 
 from qmcpy import *
-from numpy import array, int64, log2, ndarray, vstack, zeros, random
+from numpy import array, int64, log2, ndarray, vstack, zeros, random, log
 import unittest
 
 
@@ -107,6 +107,35 @@ class TestCustomIIDDistribution(unittest.TestCase):
     def test_gen_samples(self):
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
         distribution.gen_samples(10)
+
+
+class TestAcceptanceRejectionSampling(unittest.TestCase):
+    """
+    Unit tests for AcceptanceRejectionSampling
+    """
+
+    def test_gen_samples(self):
+        def f(x):
+            # see sampling measures demo
+            x = x if x<.5 else 1-x 
+            density = 16*x/3 if x<1/4 else 4/3
+            return density  
+        distribution = AcceptanceRejectionSampling(
+            objective_pdf = f,
+            measure_to_sample_from = Uniform(IIDStdUniform(1)))
+        distribution.gen_samples(10)
+
+
+class TestInverseCDFSampling(unittest.TestCase):
+    """
+    Unit tests for InverseCDFSampling
+    """
+
+    def test_gen_samples(self):
+        distribution = InverseCDFSampling(Lattice(2),
+            inverse_cdf_fun = lambda u,l=5: -log(1-u)/l)
+                        # see sampling measures demo
+        distribution.gen_samples(8)
 
 
 if __name__ == "__main__":
