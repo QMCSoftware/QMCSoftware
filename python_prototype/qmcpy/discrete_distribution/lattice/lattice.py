@@ -24,8 +24,6 @@ class Lattice(DiscreteDistribution):
         self.dimension = dimension
         self.scramble = scramble
         self.seed = seed
-        random.seed(self.seed)
-        self.shift = random.rand(self.dimension)
         self.backend = backend.lower()            
         if self.backend == 'gail':
             self.backend_gen = gail_lattice_gen
@@ -34,21 +32,21 @@ class Lattice(DiscreteDistribution):
         else:
             raise ParameterError("Lattice backend must 'GAIL' or 'MPS'")
         self.mimics = 'StdUniform'
+        self.reseed(self.seed)
         super().__init__()
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, new_seed=None):
+    def gen_samples(self, n=None, n_min=0, n_max=8):
         """
-        Generate self.replications (n_max-n_min) x self.dimension Lattice samples
+        Generate (n_max-n_min) x self.dimension Lattice samples
 
         Args:
             n (int): if n is supplied, generate from n_min=0 to n_max=n samples.
                      Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence. Must be 0 or n_max/2
             n_max (int): Final index of sequence. Must be a power of 2.
-            new_seed (int): recalculate random shift based on new seed
 
         Returns:
-            self.replications x (n_max-n_min) x self.dimension (ndarray)
+            (n_max-n_min) x self.dimension (ndarray)
         """
         if n:
             n_min = 0
@@ -57,10 +55,17 @@ class Lattice(DiscreteDistribution):
             raise ParameterError("n_max must be a power of 2")
         if not (n_min == 0 or n_min == n_max/2):
             raise ParameterError("n_min must be 0 or n_max/2")
-        if new_seed and self.scramble:
-            random.seed(new_seed)
-            self.shift = random.rand(self.dimension)
         x_lat = self.backend_gen(n_min,n_max,self.dimension)
         if self.scramble: # apply random shift to samples
             x_lat = (x_lat + self.shift)%1
         return x_lat
+    
+    def reseed(self, new_seed):
+        """
+        Reseed the generator to get a new scrambling. 
+        Args:
+            new_seed (int): new seed for generator
+        """
+        self.seed = new_seed
+        random.seed(self.seed)
+        self.shift = random.rand(self.dimension)

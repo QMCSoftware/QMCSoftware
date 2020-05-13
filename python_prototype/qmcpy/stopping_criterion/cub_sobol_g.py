@@ -74,8 +74,6 @@ class CubSobol_g(StoppingCriterion):
         allowed_levels = 'single'
         allowed_distribs = ["Sobol"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
-        if distribution.replications != 0:
-            raise ParameterError('CubSobol_g requires distribution to have 0 replications.')
         if not distribution.scramble:
             raise ParameterError("CubSobol_g requires distribution to have scramble=True")
         # Construct AccumulateData Object to House Integration data

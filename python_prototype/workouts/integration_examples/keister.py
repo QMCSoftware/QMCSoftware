@@ -20,7 +20,7 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CLTRep
-    distribution = Lattice(dimension, scramble=True, replications=16, seed=7, backend='MPS')
+    distribution = Lattice(dimension, scramble=True, seed=7, backend='MPS')
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = CLTRep(integrand,abs_tol=abs_tol).integrate()
@@ -34,14 +34,14 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CubLattice_g
-    distribution = Lattice(dimension=dimension, scramble=True, replications=0, seed=7, backend='GAIL')
+    distribution = Lattice(dimension=dimension, scramble=True, seed=7, backend='GAIL')
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = CubLattice_g(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubSobol_g
-    distribution = Sobol(dimension=dimension, scramble=True, replications=0, seed=7, backend='MPS')
+    distribution = Sobol(dimension=dimension, scramble=True, seed=7, backend='QRNG')
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = CubSobol_g(integrand,abs_tol=abs_tol).integrate()

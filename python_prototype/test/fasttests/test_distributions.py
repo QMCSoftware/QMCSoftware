@@ -47,21 +47,20 @@ class TestLattice(unittest.TestCase):
     """
 
     def test_mimics(self):
-        distribution = Lattice(dimension=3, replications=2, scramble=True, backend='MPS')
+        distribution = Lattice(dimension=3, scramble=True, backend='MPS')
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
-        distribution1 = Lattice(dimension=3, replications=2, scramble=True, backend='MPS')
-        distribution2 = Lattice(dimension=3, replications=2, scramble=True, backend='GAIL')
-        for distribution in [distribution1,distribution2]:
+        for backend in ['MPS','GAIL']:
+            distribution = Lattice(dimension=3, scramble=True, backend=backend)
             samples = distribution.gen_samples(n_min=4, n_max=8)
             with self.subTest():
                 self.assertEqual(type(samples), ndarray)
             with self.subTest():
-                self.assertEqual(samples.shape, (2,4,3))
+                self.assertEqual(samples.shape, (4,3))
 
     def test_mps_correctness(self):
-        distribution = Lattice(dimension=4, replications=0, scramble=False, backend='MPS')
+        distribution = Lattice(dimension=4, scramble=False, backend='MPS')
         true_sample = array([
             [0,     0,      0,      0],
             [1/2,   1/2,    1/2,    1/2],
@@ -70,7 +69,7 @@ class TestLattice(unittest.TestCase):
         self.assertTrue((distribution.gen_samples(n_min=0,n_max=4)==true_sample).all())
 
     def test_gail_correctness(self):
-        distribution = Lattice(dimension=4, replications=0, scramble=False, backend='GAIL')
+        distribution = Lattice(dimension=4, scramble=False, backend='GAIL')
         true_sample = array([
             [0,     0,      0,      0],
             [1/2,   1/2,    1/2,    1/2],
@@ -85,18 +84,17 @@ class TestSobol(unittest.TestCase):
     """
 
     def test_mimics(self):
-        distribution = Sobol(dimension=3, replications=2, scramble=True, backend='MPS')
+        distribution = Sobol(dimension=3, scramble=True, backend='QRNG')
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
-        distribution1 = Sobol(dimension=3, replications=2, scramble=True, backend='MPS')
-        distribution2 = Sobol(dimension=3, replications=2, scramble=True, backend='PyTorch')
-        for distribution in [distribution1,distribution2]:
+        for backend in ['QRNG','MPS','PyTorch']:
+            distribution = Sobol(dimension=3, scramble=True, backend=backend)
             samples = distribution.gen_samples(n_min=4, n_max=8)
             with self.subTest():
                 self.assertEqual(type(samples), ndarray)
             with self.subTest():
-                self.assertEqual(samples.shape, (2,4,3))
+                self.assertEqual(samples.shape, (4,3))
 
 
 class TestCustomIIDDistribution(unittest.TestCase):

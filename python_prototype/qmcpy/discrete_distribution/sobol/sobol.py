@@ -25,11 +25,7 @@ class Sobol(DiscreteDistribution):
         self.scramble = scramble
         self.seed = seed
         self.backend = backend.lower()
-        random.seed(self.seed)
         if self.backend == 'qrng':
-            if not self.seed: 
-                # qrng cannot take in a null seed
-                self.seed = random.randint(0,1000)
             self.backend_gen = self.qrgn_sobol_gen
         elif self.backend == 'mps':
             self.mps_sobol_rng = DigitalSeq(m=30, s=self.dimension)
@@ -37,7 +33,6 @@ class Sobol(DiscreteDistribution):
             self.t = max(32, self.mps_sobol_rng.t)
             # correction factor to scale the integers
             self.ct = max(0, self.t - self.mps_sobol_rng.t)
-            self.shift = random.randint(0, 2 ** self.t, self.dimension, dtype=int64)
             self.backend_gen = self.mps_sobol_gen
             if not self.scramble:
                 warning_s = '''
@@ -53,35 +48,29 @@ class Sobol(DiscreteDistribution):
         else:
             raise ParameterError("Sobol backend must be either 'qrng', 'mps', or 'pytorch'")
         self.mimics = 'StdUniform'
+        self.reseed(self.seed)
         super().__init__()
         
-    def qrgn_sobol_gen(self, n_min=0, n_max=8, new_seed=None):
+    def qrgn_sobol_gen(self, n_min=0, n_max=8):
         """
         Generate samples from n_min to n_max
         
         Args:
             n_min (int): minimum index. Must be 0 or n_max/2
             n_max (int): maximum index (not inclusive)
-            new_seed (int): recalculate random scramble based on new seed
         """
-        if new_seed and self.scramble:
-            self.seed = new_seed
         n = int(n_max-n_min)
-        x_sob = sobol_qrng(n,self.dimension,self.scramble,skip=n_min,seed=self.seed)
+        x_sob = sobol_qrng(n,self.dimension,self.scramble,skip=int(n_min),seed=self.seed)
         return x_sob
 
-    def mps_sobol_gen(self, n_min=0, n_max=8, new_seed=None):
+    def mps_sobol_gen(self, n_min=0, n_max=8):
         """
         Generate samples from n_min to n_max
         
         Args:
             n_min (int): minimum index. Must be 0 or n_max/2
             n_max (int): maximum index (not inclusive)
-            new_seed (int): recalculate random scramble based on new seed
         """
-        if new_seed and self.scramble:
-            random.seed(new_seed)
-            self.shift = random.randint(0, 2 ** self.t, self.dimension, dtype=int64)
         n = int(n_max-n_min)
         x_sob = zeros((n, self.dimension), dtype=int64)
         self.mps_sobol_rng.set_state(n_min)
@@ -92,37 +81,33 @@ class Sobol(DiscreteDistribution):
             x_sob = (self.shift ^ (x_sob * 2 ** self.ct)) / 2. ** self.t
         return x_sob
     
-    def pytorch_sobol_gen(self, n_min=0, n_max=8, new_seed=None):
+    def pytorch_sobol_gen(self, n_min=0, n_max=8):
         """
         Generate samples from n_min to n_max
         
         Args:
             n_min (int): minimum index. Must be 0 or n_max/2
             n_max (int): maximum index (not inclusive)
-            new_seed (int): recalculate random scramble based on new seed
         """
         from torch.quasirandom import SobolEngine 
-        if new_seed and self.scramble:
-            self.seed = new_seed
         n = int(n_max-n_min)
         se = SobolEngine(dimension=self.dimension, scramble=self.scramble, seed=self.seed)
         se.fast_forward(n_min)
         x_sob = se.draw(n).numpy()
         return x_sob
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, new_seed=None):
+    def gen_samples(self, n=None, n_min=0, n_max=8):
         """
-        Generate self.replications (n_max-n_min)xself.d Sobol samples
+        Generate (n_max-n_min)xself.d Sobol samples
 
         Args:
             n (int): if n is supplied, generate from n_min=0 to n_max=n samples.
                      Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence. Must be 0 or n_max/2
             n_max (int): Final index of sequence. Must be a power of 2. 
-            new_seed (int): recalculate random scramble based on new seed
 
         Returns:
-            self.replications x (n_max-n_min) x self.dimension (ndarray)
+            (n_max-n_min) x self.dimension (ndarray)
         """
         if n:
             n_min = 0
@@ -131,6 +116,22 @@ class Sobol(DiscreteDistribution):
             raise ParameterError("n_max must be a power of 2")
         if not (n_min == 0 or n_min == n_max/2):
             raise ParameterError("n_min must be 0 or n_max/2")
-        x_sob = self.backend_gen(n_min,n_max,new_seed)
+        x_sob = self.backend_gen(n_min,n_max)
         return x_sob
+
+    def reseed(self, new_seed):
+        """
+        Reseed the generator to get a new scrambling. 
+        Args:
+            new_seed (int): new seed for generator
+        """
+        self.seed = new_seed
+        if (self.backend == 'qrng' or self.backend == 'pytorch') and (not self.seed):
+            # qrng needs a seed, even if it is random
+            random.seed(new_seed)
+            self.seed = random.randint(0,100000)
+        elif self.backend == 'mps':
+            random.seed(new_seed)
+            self.shift = random.randint(0, 2 ** self.t, self.dimension, dtype=int64)
+        
 

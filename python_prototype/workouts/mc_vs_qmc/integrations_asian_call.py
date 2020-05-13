@@ -31,14 +31,14 @@ def meanmc_g_iidstdgaussian(dimension, abs_tol, time_vector, mean_shift_is):
     return data
 
 def cltrep_lattice(dimension, abs_tol, time_vector, mean_shift_is):
-    distribution = Lattice(dimension, replications=16, seed=7, backend="MPS")
+    distribution = Lattice(dimension, seed=7, backend="MPS")
     measure = BrownianMotion(distribution, time_vector, mean_shift_is)
     integrand = AsianCall(measure)
     solution,data = CLTRep(integrand, abs_tol).integrate()
     return data
 
 def cltrep_sobol(dimension, abs_tol, time_vector, mean_shift_is):
-    distribution = Sobol(dimension, replications=16, seed=7, backend="MPS")
+    distribution = Sobol(dimension, seed=7, backend="QRNG")
     measure = BrownianMotion(distribution, time_vector, mean_shift_is)
     integrand = AsianCall(measure)
     solution,data = CLTRep(integrand, abs_tol).integrate()
@@ -52,7 +52,7 @@ def cublattice_g(dimension, abs_tol, time_vector, mean_shift_is):
     return data
 
 def cubsobol_g(dimension, abs_tol, time_vector, mean_shift_is):
-    distribution = Sobol(dimension, seed=7, backend="MPS")
+    distribution = Sobol(dimension, seed=7, backend="QRNG")
     measure = BrownianMotion(distribution, time_vector, mean_shift_is)
     integrand = AsianCall(measure)
     solution,data = CubSobol_g(integrand, abs_tol).integrate()

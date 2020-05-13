@@ -8,7 +8,7 @@ from numpy import *
 set_printoptions(threshold=1e10)
 
 
-def distributions(n=4, dimension=2, replications=0, scramble=True, seed=7):
+def distributions(n=4, dimension=2, scramble=True, seed=7):
     bar = '\n'+'~'*100+'\n'
     print(bar)
 
@@ -30,13 +30,11 @@ def distributions(n=4, dimension=2, replications=0, scramble=True, seed=7):
     lat_obj = Lattice(
         dimension = dimension,
         scramble = scramble,
-        replications = replications,
         seed = seed,
         backend = 'GAIL')
     sob_obj = Sobol(
         dimension = dimension,
         scramble = scramble,
-        replications = replications,
         seed = seed,
         backend = 'PyTorch')
     for qrng_obj in [lat_obj,sob_obj]:
@@ -48,4 +46,4 @@ def distributions(n=4, dimension=2, replications=0, scramble=True, seed=7):
 
 
 if __name__ == '__main__':
-    distributions(n=4, dimension=2, replications=0, scramble=True, seed=7)
+    distributions(n=4, dimension=2, scramble=True, seed=7)
