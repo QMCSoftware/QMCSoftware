@@ -30,7 +30,7 @@ class BrownianMotion(TrueMeasure):
         sigma = array([[min(self.time_vector[i],self.time_vector[j])
                         for i in range(self.d)]
                         for j in range(self.d)])
-        self.a = cholesky(sigma)
+        self.a = cholesky(sigma).T
         super().__init__()
     
     def _tf_to_mimic_samples(self, samples):
@@ -53,7 +53,7 @@ class BrownianMotion(TrueMeasure):
         else:
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Brownian Motion'%self.distribution.mimics)
-        mimic_samples = dot(std_gaussian_samples,self.a) + self.ms_vec
+        mimic_samples = dot(self.a,std_gaussian_samples.T).T + self.ms_vec
         return mimic_samples
 
     def transform_g_to_f(self, g):
