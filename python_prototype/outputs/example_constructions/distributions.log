@@ -32,7 +32,6 @@ Nodes:
 Lattice (DiscreteDistribution Object)
 	dimension       2
 	scramble        1
-	replications    0
 	seed            7
 	backend         gail
 	mimics          StdUniform
@@ -49,7 +48,6 @@ Nodes:
 Sobol (DiscreteDistribution Object)
 	dimension       2
 	scramble        1
-	replications    0
 	seed            7
 	backend         pytorch
 	mimics          StdUniform
