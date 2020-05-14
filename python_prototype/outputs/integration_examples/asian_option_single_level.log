@@ -29,11 +29,11 @@ MeanVarData (AccumulateData Object)
 	n               50740
 	n_total         51764
 	confid_int      [ 5.710  5.910]
-	time_integrate  0.263
+	time_integrate  0.202
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.7983         
+Solution: 5.8358         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -44,8 +44,7 @@ AsianCall (Integrand Object)
 Lattice (DiscreteDistribution Object)
 	dimension       64
 	scramble        1
-	replications    16
-	seed            7
+	seed            1092
 	backend         mps
 	mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
@@ -60,11 +59,11 @@ CLTRep (StoppingCriterion Object)
 	n_max           1073741824
 MeanVarDataRep (AccumulateData Object)
 	replications    16
-	solution        5.798
-	sighat          0.120
+	solution        5.836
+	sighat          0.118
 	n_total         8192
-	confid_int      [ 5.705  5.891]
-	time_integrate  0.088
+	confid_int      [ 5.745  5.927]
+	time_integrate  0.090
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -96,7 +95,7 @@ MeanVarData (AccumulateData Object)
 	n               82304
 	n_total         83328
 	confid_int      [ 5.717  5.917]
-	time_integrate  0.370
+	time_integrate  0.344
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -111,7 +110,6 @@ AsianCall (Integrand Object)
 Lattice (DiscreteDistribution Object)
 	dimension       64
 	scramble        1
-	replications    0
 	seed            7
 	backend         gail
 	mimics          StdUniform
@@ -127,11 +125,11 @@ CubatureData (AccumulateData Object)
 	n_total         1024
 	solution        5.942
 	r_lag           4
-	time_integrate  0.011
+	time_integrate  0.012
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8775         
+Solution: 5.8647         
 AsianCall (Integrand Object)
 	volatility      0.500
 	start_price     30
@@ -142,9 +140,8 @@ AsianCall (Integrand Object)
 Sobol (DiscreteDistribution Object)
 	dimension       64
 	scramble        1
-	replications    0
 	seed            7
-	backend         mps
+	backend         qrng
 	mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
 	distrib_name    Sobol
@@ -156,9 +153,9 @@ CubSobol_g (StoppingCriterion Object)
 	n_max           34359738368
 CubatureData (AccumulateData Object)
 	n_total         1024
-	solution        5.878
+	solution        5.865
 	r_lag           4
-	time_integrate  0.033
+	time_integrate  0.012
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

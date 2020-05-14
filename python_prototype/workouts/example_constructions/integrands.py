@@ -36,7 +36,6 @@ def integrands(n=2**15):
         Lattice,
             dimension = [len(tv) for tv in time_vector],
             scramble = True,
-            replications=0,
             seed = arange(7,7+levels),
             backend='GAIL')
     measures = MultiLevelConstructor(levels,
@@ -68,7 +67,7 @@ def integrands(n=2**15):
     print('Keister approx with %d samples: %.3f\n%s'%(n,y.mean(),bar))
 
     # Linear
-    distribution = Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL')
+    distribution = Lattice(dimension=2, scramble=True, seed=7, backend='GAIL')
     measure = Uniform(distribution)
     integrand = Linear(measure)
     samples = distribution.gen_samples(n_min=0,n_max=n)
@@ -77,7 +76,7 @@ def integrands(n=2**15):
     print('Linear approx with %d samples: %.3f\n%s'%(n,y.mean(),bar))
 
     # Quick Construct
-    distribution = Sobol(dimension=3, scramble=True, replications=0, seed=7, backend='MPS')
+    distribution = Sobol(dimension=3, scramble=True, seed=7, backend='QRNG')
     measure = Lebesgue(distribution,lower_bound=[1,2,3],upper_bound=7)
     integrand = QuickConstruct(measure,lambda x: x[:,0]*x[:,1]**x[:,2])
     samples = distribution.gen_samples(n_min=0,n_max=n)

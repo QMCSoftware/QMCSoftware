@@ -10,7 +10,6 @@ from time import perf_counter
 import warnings
 
 
-
 class CLTRep(StoppingCriterion):
     """
     Stopping criterion based on
@@ -20,7 +19,7 @@ class CLTRep(StoppingCriterion):
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=256, n_max=2**30,
-                 inflate=1.2, alpha=0.01):
+                 inflate=1.2, alpha=0.01, replications=16):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -29,6 +28,7 @@ class CLTRep(StoppingCriterion):
             abs_tol (float): absolute error tolerance
             rel_tol (float): relative error tolerance
             n_max (int): maximum number of samples
+            replications (int): number of replications
         """
         # Input Checks
         if log2(n_init) % 1 != 0:
@@ -48,12 +48,10 @@ class CLTRep(StoppingCriterion):
         allowed_levels = "single"
         allowed_distribs = ["Lattice", "Sobol"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
-        if distribution.replications <16:
-            raise ParameterError('CLTRep requires distribution to have 16 replications.')
         if not distribution.scramble:
             raise ParameterError("CLTRep requires distribution to have scramble=True")
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarDataRep(self, integrand, self.n_init)
+        self.data = MeanVarDataRep(self, integrand, self.n_init, replications)
         
     def integrate(self):
         """ Determine when to stop """

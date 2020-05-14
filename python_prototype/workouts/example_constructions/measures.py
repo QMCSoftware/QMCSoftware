@@ -9,7 +9,7 @@ from numpy import *
 set_printoptions(threshold=1e10)
 
 
-def measures(n=2, dimension=2, replications=0, seed=7):
+def measures(n=2, dimension=2, seed=7):
     bar = '\n'+'~'*100+'\n'
     print(bar)
 
@@ -44,4 +44,4 @@ def measures(n=2, dimension=2, replications=0, seed=7):
 
 
 if __name__ == '__main__':
-    measures(n=2, dimension=2, replications=0, seed=7)
+    measures(n=2, dimension=2, seed=7)

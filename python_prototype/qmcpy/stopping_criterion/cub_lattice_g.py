@@ -75,8 +75,6 @@ class CubLattice_g(StoppingCriterion):
         allowed_levels = 'single'
         allowed_distribs = ["Lattice"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
-        if distribution.replications != 0:
-            raise ParameterError('CubLattic_g requires distribution to have 0 replications.')
         if not distribution.scramble:
             raise ParameterError("CubLattice_g requires distribution to have scramble=True")
         if distribution.backend != 'gail':
