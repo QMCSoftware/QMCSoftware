@@ -8,7 +8,7 @@ QMCPy Quickstart
 
 Suppose we are interested in calculating
 
-.. math:: \mathbb{E}[keister(x)] = \mathbb{E}[\pi^{d/2} \cos(||x_j||_2)] \text{ for } x \sim \mathcal{N}_d(0,\frac{1}{2})
+.. math:: \mathbb{E}[keister(x)] = \mathbb{E}[\pi^{d/2} \cos(||x_j||_2)] \text{ for } x \sim \mathcal{N}(0,\frac{1}{2})^d
 
 .. code:: ipython3
 
@@ -70,7 +70,6 @@ Step 5: Integrate
     Lattice (DiscreteDistribution Object)
     	dimension       2
     	scramble        1
-    	replications    0
     	seed            None
     	backend         gail
     	mimics          StdUniform
@@ -87,7 +86,7 @@ Step 5: Integrate
     	n_total         65536
     	solution        1.808
     	r_lag           4
-    	time_integrate  0.072
+    	time_integrate  0.061
     
     Within absolute tolerance: True
 
@@ -117,7 +116,6 @@ Condensed Problem
     Lattice (DiscreteDistribution Object)
     	dimension       2
     	scramble        1
-    	replications    0
     	seed            None
     	backend         gail
     	mimics          StdUniform
@@ -134,7 +132,7 @@ Condensed Problem
     	n_total         65536
     	solution        1.808
     	r_lag           4
-    	time_integrate  0.064
+    	time_integrate  0.059
     
     Within absolute tolerance: True
 

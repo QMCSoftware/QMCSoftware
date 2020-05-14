@@ -33,7 +33,7 @@ to the function ``integrate()``.
 .. code:: ipython3
 
     dim = 3
-    distribution = Lattice(dimension=dim, scramble=True, replications=16, seed=7, backend='MPS')
+    distribution = Sobol(dimension=dim, scramble=True, seed=7, backend='QRNG')
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = CLTRep(integrand,abs_tol=.05).integrate()
@@ -42,17 +42,16 @@ to the function ``integrate()``.
 
 .. parsed-literal::
 
-    Solution: 2.1659         
+    Solution: 2.1677         
     Keister (Integrand Object)
-    Lattice (DiscreteDistribution Object)
+    Sobol (DiscreteDistribution Object)
     	dimension       3
     	scramble        1
-    	replications    16
-    	seed            7
-    	backend         mps
+    	seed            1092
+    	backend         qrng
     	mimics          StdUniform
     Gaussian (TrueMeasure Object)
-    	distrib_name    Lattice
+    	distrib_name    Sobol
     	mu              0
     	covariance      0.500
     CLTRep (StoppingCriterion Object)
@@ -64,11 +63,11 @@ to the function ``integrate()``.
     	n_max           1073741824
     MeanVarDataRep (AccumulateData Object)
     	replications    16
-    	solution        2.166
-    	sighat          0.011
+    	solution        2.168
+    	sighat          0.009
     	n_total         4096
-    	confid_int      [ 2.157  2.174]
-    	time_integrate  0.008
+    	confid_int      [ 2.161  2.175]
+    	time_integrate  0.006
     
 
 
@@ -99,7 +98,7 @@ defined as follows:
 .. code:: ipython3
 
     time_vector = arange(1 / 64, 65 / 64, 1 / 64)
-    distribution = Lattice(dimension=len(time_vector), scramble=True, replications=16, seed=7, backend='GAIL')
+    distribution = Lattice(dimension=len(time_vector), scramble=True, seed=7, backend='GAIL')
     measure = BrownianMotion(distribution, time_vector=time_vector)
     integrand = AsianCall(
         measure = measure,
@@ -114,7 +113,7 @@ defined as follows:
 
 .. parsed-literal::
 
-    Solution: 6.2636         
+    Solution: 6.2549         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -125,8 +124,7 @@ defined as follows:
     Lattice (DiscreteDistribution Object)
     	dimension       64
     	scramble        1
-    	replications    16
-    	seed            7
+    	seed            1092
     	backend         gail
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -141,11 +139,11 @@ defined as follows:
     	n_max           1073741824
     MeanVarDataRep (AccumulateData Object)
     	replications    16
-    	solution        6.264
-    	sighat          0.049
-    	n_total         32768
-    	confid_int      [ 6.226  6.302]
-    	time_integrate  0.486
+    	solution        6.255
+    	sighat          0.042
+    	n_total         16384
+    	confid_int      [ 6.223  6.287]
+    	time_integrate  0.242
     
 
 
@@ -158,11 +156,11 @@ be summarized as follows:
 
 :math:`Y_0 = 0`
 
-:math:`Y_1 = \mbox{ Asian option monitored at } t = [\frac{1}{4}, \frac{1}{2}, \frac{3}{4}, 1]`
+:math:`Y_1 = \text{ Asian option monitored at } t = [\frac{1}{4}, \frac{1}{2}, \frac{3}{4}, 1]`
 
-:math:`Y_2 = \mbox{ Asian option monitored at } t= [\frac{1}{16}, \frac{1}{8}, ... , 1]`
+:math:`Y_2 = \text{ Asian option monitored at } t= [\frac{1}{16}, \frac{1}{8}, ... , 1]`
 
-:math:`Y_3 = \mbox{ Asian option monitored at } t= [\frac{1}{64}, \frac{1}{32}, ... , 1]`
+:math:`Y_3 = \text{ Asian option monitored at } t= [\frac{1}{64}, \frac{1}{32}, ... , 1]`
 
 :math:`Z_1 = \mathbb{E}[Y_1-Y_0] + \mathbb{E}[Y_2-Y_1] + \mathbb{E}[Y_3-Y_2] = \mathbb{E}[Y_3]`
 
@@ -198,7 +196,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2378         
+    Solution: 6.2336         
     MultiLevelConstructor (AsianCall Object)
     	volatility      [ 0.500  0.500  0.500]
     	start_price     [30 30 30]
@@ -223,11 +221,11 @@ last example.
     	n_max           10000000000
     MeanVarData (AccumulateData Object)
     	levels          3
-    	solution        6.238
-    	n               [332686  31122   2818]
-    	n_total         369698
-    	confid_int      [ 6.189  6.286]
-    	time_integrate  0.216
+    	solution        6.234
+    	n               [328778  26698   3325]
+    	n_total         361873
+    	confid_int      [ 6.185  6.282]
+    	time_integrate  0.088
     
 
 

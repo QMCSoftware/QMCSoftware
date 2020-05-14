@@ -22,16 +22,14 @@ Game Example
 ------------
 
 Consider a game where
-:math:`X_1, X_2 \overset{\textrm{IID}}{\sim} \mathcal{U}[0,1]` are drawn
+:math:`X_1, X_2 \overset{\textrm{IID}}{\sim} \mathcal{U}(0,1)` are drawn
 with a payoff of
 
-.. raw:: latex
+.. math::
 
-   \begin{equation}
    Y = \text{payoff}(X_1,X_2) = \begin{cases} \$10, & 1.7 \le X_1 + X_2 \le 2, \\ 0, & 0 \le X_1 + X_2 < 1.7, \end{cases}
-   \end{equation}
 
-What is the expected payoff of this game?
+ What is the expected payoff of this game?
 
 .. code:: ipython3
 
@@ -61,12 +59,11 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4500         
+    Solution: 0.4501         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
     	scramble        1
-    	replications    0
     	seed            None
     	backend         gail
     	mimics          StdUniform
@@ -83,7 +80,7 @@ With ordinary Monte Carlo we do the following:
     	n_total         65536
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.048
+    	time_integrate  0.080
 
 
 
@@ -93,18 +90,21 @@ Monte Carlo with Importance Sampling
 We may add the importance sampling to increase the number of samples
 with positive payoffs. Let
 
-.. math:: \boldsymbol{Z} = (X_1^{1/(p+1)}, X_2^{1/(p+1)}), \qquad \boldsymbol{X} \sim \mathcal{U}[0,1]^2
+.. math:: \boldsymbol{Z} = (X_1^{1/(p+1)}, X_2^{1/(p+1)}), \qquad \boldsymbol{X} \sim \mathcal{U}(0,1)^2
 
- This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
-:math:`F(z) =z^{p+1}` and common PDF :math:`\varrho(z) = (p+1)z^{p}`.
-Thus,
+This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
+:math:`F(z) =z^{p+1}` and common PDF
+:math:`\varrho(z) = (p+1)z^{p}`.Thus,
 
 .. math::
 
-   \mu = \mathbb{E}(Y) = \int_{[0,1]^2} \frac{\text{payoff}(z_1,z_2)}{(p+1)^2(z_1z_2)^{p}} \, \varrho(z_1)
-   \varrho(z_2) \, \mathrm{d} z_1 \mathrm{d}z_2 = \int_{[0,1]^2}
+   \begin{align}
+   \mu = \mathbb{E}(Y) &= \int_{[0,1]^2} \frac{\text{payoff}(z_1,z_2)}{(p+1)^2(z_1z_2)^{p}} \, \varrho(z_1)
+   \varrho(z_2) \, \mathrm{d} z_1 \mathrm{d}z_2 \\
+   &= \int_{[0,1]^2}
    \frac{\text{payoff}(x_1^{1/(p+1)},x_2^{1/(p+1)})}{(p+1)^2(x_1x_2)^{p/(p+1)}}
    \, \mathrm{d} x_1 \mathrm{d}x_2
+   \end{align}
 
 .. code:: ipython3
 
@@ -120,12 +120,11 @@ Thus,
 
 .. parsed-literal::
 
-    Solution: 0.4510         
+    Solution: 0.4493         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
     	scramble        1
-    	replications    0
     	seed            None
     	backend         gail
     	mimics          StdUniform
@@ -140,9 +139,9 @@ Thus,
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        0.451
+    	solution        0.449
     	r_lag           4
-    	time_integrate  0.017
+    	time_integrate  0.021
 
 
 
@@ -154,7 +153,7 @@ Thus,
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.350 the time and 0.250 the samples
+    Imporance Sampling takes 0.268 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -165,15 +164,13 @@ So we will give a upward drift to the Brownian motion that defines the
 stock price path. We can think of the option price as the
 multidimensional integral
 
-.. raw:: latex
+.. math::
 
-   \begin{equation*} 
    \mu = \mathbb{E}[f(\boldsymbol{X})] = \int_{\mathbb{R}^d}
    f(\boldsymbol{x}) 
-   \frac{\exp\bigl(-\frac12 \boldsymbol{x}^T\mathsf{\Sigma}^{-1}
+   \frac{\exp\bigl(-\frac{1}{2} \boldsymbol{x}^T\mathsf{\Sigma}^{-1}
    \boldsymbol{x}\bigr)}
-   {\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{x} ,
-   \end{equation*}
+   {\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{x}
 
 where
 
@@ -206,16 +203,16 @@ re-write the integral as
    \mu = \mathbb{E}[f_{\mathrm{new}}(\boldsymbol{Z})] 
    = \int_{\mathbb{R}^d}
    f_{\mathrm{new}}(\boldsymbol{z}) 
-   \frac{\exp\bigl(-\frac12 (\boldsymbol{z}-\boldsymbol{a})^T
+   \frac{\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
    \mathsf{\Sigma}^{-1}
    (\boldsymbol{z} - \boldsymbol{a}) \bigr)}
    {\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{z} ,
    \\
    f_{\mathrm{new}}(\boldsymbol{z}) = 
    f(\boldsymbol{z}) 
-   \frac{\exp\bigl(-\frac12 \boldsymbol{z}^T
+   \frac{\exp\bigl(-\frac{1}{2} \boldsymbol{z}^T
    \mathsf{\Sigma}^{-1} \boldsymbol{z} \bigr)}
-   {\exp\bigl(-\frac12 (\boldsymbol{z}-\boldsymbol{a})^T
+   {\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
    \mathsf{\Sigma}^{-1}
    (\boldsymbol{z} - \boldsymbol{a}) \bigr)}
    = f(\boldsymbol{z}) \exp\bigl((\boldsymbol{a}/2 - \boldsymbol{z})^T
@@ -264,7 +261,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7724         
+    Solution: 1.7864         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -275,9 +272,8 @@ Vanilla Monte Carlo
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	replications    0
-    	seed            None
-    	backend         mps
+    	seed            15851
+    	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
     	distrib_name    Sobol
@@ -289,9 +285,9 @@ Vanilla Monte Carlo
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        1.772
+    	solution        1.786
     	r_lag           4
-    	time_integrate  0.286
+    	time_integrate  0.148
 
 
 
@@ -321,7 +317,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7526         
+    Solution: 1.7995         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -332,9 +328,8 @@ Monte Carlo with Importance Sampling
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	replications    0
-    	seed            None
-    	backend         mps
+    	seed            6410
+    	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
     	distrib_name    Sobol
@@ -346,9 +341,9 @@ Monte Carlo with Importance Sampling
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         4096
-    	solution        1.753
+    	solution        1.799
     	r_lag           4
-    	time_integrate  0.069
+    	time_integrate  0.032
 
 
 
@@ -369,7 +364,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.240 the time and 0.250 the samples
+    Imporance Sampling takes 0.217 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -440,70 +435,70 @@ Importance Sampling MC vs QMC
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>3.24e+05</td>
-          <td>6.70e-01</td>
+          <td>7.21e-01</td>
         </tr>
         <tr>
           <td>CLT IIDStdUniform (MC)</td>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>8.22e+04</td>
-          <td>1.78e-01</td>
+          <td>1.92e-01</td>
         </tr>
         <tr>
           <td>MeanMC_g IIDStdGaussian (MC)</td>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.82e+05</td>
-          <td>3.28e-01</td>
+          <td>3.10e-01</td>
         </tr>
         <tr>
           <td>MeanMC_g IIDStdGaussian (MC)</td>
           <td>1.00e+00</td>
           <td>1.77e+00</td>
           <td>1.27e+05</td>
-          <td>9.96e-02</td>
+          <td>9.38e-02</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>1.64e+04</td>
-          <td>4.80e-02</td>
+          <td>5.13e-02</td>
         </tr>
         <tr>
           <td>CLTRep Sobol (QMC)</td>
           <td>1.00e+00</td>
-          <td>1.80e+00</td>
-          <td>8.19e+03</td>
-          <td>2.80e-02</td>
+          <td>1.79e+00</td>
+          <td>1.64e+04</td>
+          <td>4.71e-02</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>0.00e+00</td>
           <td>1.75e+00</td>
           <td>4.10e+03</td>
-          <td>2.01e-02</td>
+          <td>2.03e-02</td>
         </tr>
         <tr>
           <td>CubLattice_g Lattice (QMC)</td>
           <td>1.00e+00</td>
-          <td>1.78e+00</td>
-          <td>2.05e+03</td>
-          <td>9.84e-03</td>
+          <td>1.81e+00</td>
+          <td>1.02e+03</td>
+          <td>6.12e-03</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>0.00e+00</td>
-          <td>1.78e+00</td>
+          <td>1.79e+00</td>
           <td>4.10e+03</td>
-          <td>5.25e-02</td>
+          <td>1.63e-02</td>
         </tr>
         <tr>
           <td>CubSobol_g Sobol (QMC)</td>
           <td>1.00e+00</td>
-          <td>1.79e+00</td>
-          <td>2.05e+03</td>
-          <td>2.28e-02</td>
+          <td>1.81e+00</td>
+          <td>1.02e+03</td>
+          <td>5.03e-03</td>
         </tr>
       </tbody>
     </table>

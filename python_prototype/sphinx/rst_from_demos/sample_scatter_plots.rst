@@ -66,8 +66,8 @@ Visualize shifted lattice and scrambled Sobol sampling points
 .. code:: ipython3
 
     discrete_distribs = [
-        Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL'),
-        Sobol(dimension=2, scramble=True, replications=0, seed=7, backend='MPS')]
+        Lattice(dimension=2, scramble=True, seed=7, backend='GAIL'),
+        Sobol(dimension=2, scramble=True, seed=7, backend='QRNG')]
     dd_names = ["Shifted Lattice", "Scrambled Sobol"]
     colors = ["g", "c"]
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(11, 6))
@@ -115,8 +115,8 @@ Distributions
             i += 1
         # Quasi Random Distributions
         qrng_distribs = [
-            Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='GAIL'),
-            Sobol(dimension=2, scramble=True, replications=0, seed=7, backend='MPS')]
+            Lattice(dimension=2, scramble=True, seed=7, backend='GAIL'),
+            Sobol(dimension=2, scramble=True, seed=7, backend='QRNG')]
         qrng_names = ["Shifted Lattice",
                       "Scrambled Sobol"]
         for distrib, distrib_name in zip(qrng_distribs, qrng_names):
@@ -181,7 +181,7 @@ measures
     u2_a, u2_b = 6, 8
     g1_mu, g1_var = 3, 9
     g2_mu, g2_var = 7, 9
-    distribution = Sobol(dimension=2, scramble=True, replications=0, seed=7, backend='MPS')
+    distribution = Sobol(dimension=2, scramble=True, seed=7, backend='QRNG')
     uniform_measure = Uniform(distribution,lower_bound=[u1_a, u2_a],upper_bound=[u1_b, u2_b])
     gaussian_measure = Gaussian(distribution,mean=[g1_mu, g2_mu],covariance=[g1_var, g2_var])
     # Generate Samples and Create Scatter Plots

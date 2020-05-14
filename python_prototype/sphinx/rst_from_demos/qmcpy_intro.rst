@@ -44,12 +44,11 @@ IID vs LDS
 Low discrepancy sequences (LDS) such as lattice and Sobol are not
 independent like IID (independent identically distributed) points.
 
-The code below generates 1 replication of 4 Sobol samples of 2
-dimensions.
+The code below generates 4 Sobol samples of 2 dimensions.
 
 .. code:: ipython3
 
-    distribution = Lattice(dimension=2, scramble=True, replications=0, seed=7, backend='MPS')
+    distribution = Lattice(dimension=2, scramble=True, seed=7, backend='MPS')
     distribution.gen_samples(n_min=0,n_max=4)
 
 
@@ -303,7 +302,7 @@ changing the input parameter value of dimension for QuickConstruct?
     	n               5452
     	n_total         6476
     	confid_int      [ 0.821  0.841]
-    	time_integrate  0.002
+    	time_integrate  0.001
     
 
 

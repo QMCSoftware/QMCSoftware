@@ -154,6 +154,10 @@ Nuyens, eds.), Springer Proceedings in Mathematics and Statistics, vol.
 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA], pp.
 367-383.
 
+[12] Faure, Henri, and Christiane Lemieux. “Implementation of
+Irreducible Sobol’ Sequences in Prime Power Bases.” Mathematics and
+Computers in Simulation 161 (2019): 13–22. Crossref. Web.
+
 .. raw:: html
 
    <hr>

@@ -14,11 +14,13 @@ Inverse CDF Sampling
 Exponential
 ~~~~~~~~~~~
 
-| :math:`y \sim exp(\lambda)`
-| :math:`\text{pdf y } f(x) = \lambda e^{-\lambda x}`
-| :math:`\text{cdf y } F(x) = 1-e^{-\lambda x}`
-| :math:`\text{inverse cdf } F^{-1}(x) = \frac{-log(1-x)}{\lambda}`
-| :math:`\therefore y \sim \frac{-log(1-u)}{\lambda} \text{ for } u \sim U_d(0,1)`
+.. raw:: latex
+
+   \begin{equation}
+   y \sim exp(\lambda) \qquad \text{pdf y } f(x) = \lambda e^{-\lambda x} \\
+   \text{cdf y } F(x) = 1-e^{-\lambda x} \qquad \text{inverse cdf } F^{-1}(x) = \frac{-log(1-x)}{\lambda} \\
+   \therefore y \sim \frac{-log(1-u)}{\lambda} \text{ for } u \sim U_d(0,1)
+   \end{equation}
 
 .. code:: ipython3
 
@@ -70,11 +72,14 @@ Exponential
 Cauchy
 ------
 
-| :math:`y \sim cauchy(x_0,\gamma)`
-| :math:`\text{pdf y } f(x) = [\pi \gamma (1+(\frac{x-x_0}{\gamma})^2)]^{-1}`
-| :math:`\text{cdf y } F(x) = \frac{1}{\pi} arctan(\frac{x-x_0}{\gamma}) + 1/2`
-| :math:`\text{inverse cdf } F^{-1}(x) = tan(\pi(x-\frac{1}{2}))\gamma + x_0`
-| :math:`\therefore y \sim tan(\pi(u-\frac{1}{2}))\gamma + x_0 \text{ for } u \sim U_d(0,1)`
+.. raw:: latex
+
+   \begin{equation}
+   y \sim cauchy(x_0,\gamma) \qquad \text{pdf y } f(x) = [\pi \gamma (1+(\frac{x-x_0}{\gamma})^2)]^{-1} \\
+   \text{cdf y } F(x) = \frac{1}{\pi} arctan(\frac{x-x_0}{\gamma}) + 1/2 \qquad \\
+   \text{inverse cdf } F^{-1}(x) = tan(\pi(x-\frac{1}{2}))\gamma + x_0 \\
+   \therefore y \sim  tan(\pi(u-\frac{1}{2}))\gamma + x_0 \text{ for } u \sim U_d(0,1)
+   \end{equation}
 
 .. code:: ipython3
 
@@ -115,9 +120,9 @@ Acceptance Rejection Sampling
 
    \begin{equation}
    \text{objective pdf } f(x) = \begin{cases}
-           16x/3, & 0 \leq x \leq 1/4,\\
-           4/3, & 1/4 <x < 3/4,\\
-           16(1-x)/3, & 3/4 < x < 1
+           16x/3 &, 0 \leq x \leq 1/4,\\
+           4/3 &, 1/4 <x < 3/4,\\
+           16(1-x)/3 &, 3/4 < x < 1
    \end{cases}
    \end{equation}
 
@@ -155,7 +160,7 @@ Acceptance Rejection Sampling
 .. parsed-literal::
 
     Expected (total draws / successful draws) = c = 1.333
-    Successful Draws: 5000  Total Draws: 6641
+    Successful Draws: 5000  Total Draws: 6622
 
 
 
@@ -165,17 +170,17 @@ Acceptance Rejection Sampling
 Bayesian Example
 ----------------
 
-| Taken from Bayesian Data Analysis. 3rd Edition. Andrew Gelman, John B.
-  Carlin, Hal S. Stern, David B. Dunson, Aki Vehtari, Donald B. Rubin.
-| Chapter 10 Section 9 (Exercises) Problem 5
-| :math:`y_j \sim Binomial(n_j,\theta_j)`
-| :math:`\theta_j = {logit}^{-1}(\alpha+\beta x_j)`
-| Independent priors :math:`\alpha \sim t_4(0,2^2)` and
-  :math:`\beta \sim t_4(0,1)`
-| :math:`x_j \sim U(0,1)`
-| :math:`n_j \sim Poisson^{+}(5)` where :math:`Poisson^{+}` is the
-  Poisson distribution restricted to positive values
-| :math:`j=1,...10`
+Taken from Bayesian Data Analysis. 3rd Edition. Andrew Gelman, John B.
+Carlin, Hal S. Stern, David B. Dunson, Aki Vehtari, Donald B. Rubin.
+Chapter 10 Section 9 (Exercises) Problem 5
+
+:math:`y_j \sim Binomial(n_j,\theta_j) \qquad \theta_j = {logit}^{-1}(\alpha+\beta x_j) \qquad x_j \sim U(0,1) \qquad j=1,...10`
+
+:math:`n_j \sim Poisson^{+}(5)` where :math:`Poisson^{+}` is the Poisson
+distribution restricted to positive values
+
+Independent priors :math:`\alpha \sim t_4(0,2^2)` and
+:math:`\beta \sim t_4(0,1)`
 
 .. code:: ipython3
 
@@ -242,19 +247,43 @@ Bayesian Example
 Importance Sampling
 -------------------
 
-Sampling from unit quarter circle in first quadrant
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Let :math:`\mathcal{X}` be the domain. We are interested in integrand
+:math:`g(\mathbf{x})` defined with respect to measure
+:math:`\rho(\mathbf{x})` for :math:`\mathbf{x} \in \mathcal{X}`.
 
-For integrand :math:`g(x,y)=x+y` with measure pdf
-:math:`\rho(x,y) = \left(\frac{\pi r^2}{4}\right)^{-1} \mathbb{1}(\sqrt{x^2+y^2}<1 , x>0 , y>0)`
-and :math:`r=1`
+.. math:: \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})d\mathbf{x}
 
-.. math:: \int_0^1 \int_0^{\sqrt{1-y^2}} g(x,y) \rho(x,y) dxdy =  \frac{4}{\pi} \int_0^1 \int_0^{\sqrt{1-y^2}} (x+y) dxdy = \frac{8}{3\pi}
+ For importance sampling, we can capture this domain,
+:math:`\mathcal{X}`, in a unit box, :math:`\beta=[a,b]^d`, such that
+
+.. raw:: latex
+
+   \begin{equation}
+   \forall \mathbf{x} \in \mathcal{X}: \mathbf{x} \in \beta \\
+   \tilde{g}(\mathbf{x}) = \begin{cases} g(\mathbf{x}), & \mathbf{x} \in \mathcal{X} \\ 0, & \text{otherwise} \end{cases} \qquad \text{for } \mathbf{x} \in \beta \\
+   \tilde{\rho}(\mathbf{x}) = \begin{cases} \rho(\mathbf{x}), & \mathbf{x} \in \mathcal{X} \\ 0, & \text{otherwise} \end{cases} \qquad \text{for } \mathbf{x} \in \beta \\
+   \therefore \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_{\beta} \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}
+   \end{equation}
+
+Quarter Circle Example
+~~~~~~~~~~~~~~~~~~~~~~
+
+Let the domain be the quarter unit circle in the first quadrant
+:math:`\mathcal{X} = \{\mathbf{x} : \mathbf{x}_1^2+\mathbf{x}_2^2 < 1, \mathbf{x}_1>0, \mathbf{x}_2>0\}`,
+the integrand :math:`g(\mathbf{x}) = \mathbf{x}_1+\mathbf{x}_2`, and our
+measure :math:`\rho(x) = 4/\pi`. Therefore we choose
+:math:`\beta = [0,1]^2` and solve
+
+.. raw:: latex
+
+   \begin{equation}
+       \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_0^1 \int_0^1 \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}_1d\mathbf{x}_2 = \frac{8}{3\pi}
+   \end{equation}
 
 .. code:: ipython3
 
     true_value = 8/(3*pi)
-    abs_tol = .01
+    abs_tol = .001
     def quarter_circle_uniform_pdf(x):
         x1,x2 = x
         if sqrt(x1**2+x2**2)<1 and x1>=0 and x2>=0:
@@ -266,9 +295,9 @@ and :math:`r=1`
 
     measure = ImportanceSampling(
         objective_pdf = quarter_circle_uniform_pdf,
-        measure_to_sample_from = Uniform(IIDStdUniform(dimension=2,seed=9)))
+        measure_to_sample_from = Uniform(Lattice(dimension=2,seed=9)))
     integrand = QuickConstruct(measure, lambda x: x.sum(1))
-    solution,data = MeanMC_g(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubLattice_g(integrand,abs_tol=abs_tol).integrate()
     print(data)
     within_tol = abs(solution-true_value)<abs_tol
     print('Within tolerance of true value %.3f: %s'%(true_value,within_tol))
@@ -276,28 +305,26 @@ and :math:`r=1`
 
 .. parsed-literal::
 
-    Solution: 0.8498         
+    Solution: 0.8479         
     QuickConstruct (Integrand Object)
-    IIDStdUniform (DiscreteDistribution Object)
+    Lattice (DiscreteDistribution Object)
     	dimension       2
+    	scramble        1
     	seed            9
+    	backend         gail
     	mimics          StdUniform
     ImportanceSampling (TrueMeasure Object)
-    	distrib_name    IIDStdUniform
-    MeanMC_g (StoppingCriterion Object)
-    	inflate         1.200
-    	alpha           0.010
-    	abs_tol         0.010
+    	distrib_name    Lattice
+    CubLattice_g (StoppingCriterion Object)
+    	abs_tol         0.001
     	rel_tol         0
     	n_init          1024
-    	n_max           10000000000
-    MeanVarData (AccumulateData Object)
-    	levels          1
-    	solution        0.850
-    	n               56396
-    	n_total         57420
-    	confid_int      [ 0.840  0.860]
-    	time_integrate  0.866
+    	n_max           34359738368
+    CubatureData (AccumulateData Object)
+    	n_total         8192
+    	solution        0.848
+    	r_lag           4
+    	time_integrate  0.154
     
     Within tolerance of true value 0.849: True
 
