@@ -2,8 +2,9 @@
 
 from .._discrete_distribution import DiscreteDistribution
 from .mps_sobol import DigitalSeq
-from qrng_py import sobol_qrng
+from qrng import sobol_qrng
 from ...util import ParameterError, ParameterWarning
+from torch.quasirandom import SobolEngine 
 from numpy import array, int64, log2, repeat, zeros, random
 import warnings
 
@@ -89,7 +90,6 @@ class Sobol(DiscreteDistribution):
             n_min (int): minimum index. Must be 0 or n_max/2
             n_max (int): maximum index (not inclusive)
         """
-        from torch.quasirandom import SobolEngine 
         n = int(n_max-n_min)
         se = SobolEngine(dimension=self.dimension, scramble=self.scramble, seed=self.seed)
         se.fast_forward(n_min)
