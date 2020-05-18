@@ -2,8 +2,7 @@
 
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..util import MaxSamplesWarning, ParameterError
+from ..util import MaxSamplesWarning
 from numpy import array, ceil, floor, maximum
 from scipy.stats import norm
 from time import perf_counter
