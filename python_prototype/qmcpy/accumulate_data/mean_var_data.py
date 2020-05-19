@@ -30,17 +30,12 @@ class MeanVarData(AccumulateData):
         self.integrand = integrand
         self.measure = self.integrand.measure
         self.distribution = self.measure.distribution
-        # account for multilevel
-        if isinstance(self.integrand,Integrand): 
-            # single level -> make it appear multi-level
-            self.integrands = [self.integrand]
-            self.distributions = [self.distribution]
-        else:
-            # multi-level
-            self.integrands = self.integrand 
-            self.distributions = self.distribution
+        self.integrand = integrand
         # Set Attributes
-        self.levels = len(self.integrands)
+        if self.integrand.multilevel:
+            self.levels = len(self.integrand.dimensions)
+        else:
+            self.levels = 1
         self.solution = nan
         self.muhat = full(self.levels, inf)  # sample mean
         self.sighat = full(self.levels, inf)  # sample standard deviation
@@ -54,8 +49,15 @@ class MeanVarData(AccumulateData):
         """ Update data """
         for l in range(self.levels):
             t_start = perf_counter() # time the integrand values
-            samples = self.distributions[l].gen_samples(n=self.n[l])
-            y = self.integrands[l].f(samples).squeeze()
+            if self.integrand.multilevel:
+                # reset dimension
+                new_dim = self.integrand.dim_at_level(l)
+                self.measure.set_dimension(new_dim)
+                samples = self.distribution.gen_samples(n=self.n[l])
+                y = self.integrand.f(samples,l=l).squeeze()
+            else:
+                samples = self.distribution.gen_samples(n=self.n[l])
+                y = self.integrand.f(samples).squeeze()
             self.t_eval[l] = max(perf_counter() - t_start, EPS)
             self.sighat[l] = y.std() # compute the sample standard deviation
             self.muhat[l] = y.mean() # compute the sample mean

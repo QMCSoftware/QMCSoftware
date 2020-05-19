@@ -17,9 +17,8 @@ def measures(n=2, dimension=2, seed=7):
     iid_std_g = IIDStdGaussian(dimension=dimension, seed=seed)
 
     # Brownian motion
-    time_vector = [.5,1]
     for distribution in [iid_std_u,iid_std_g]:
-        measure = BrownianMotion(distribution, time_vector=time_vector)
+        measure = BrownianMotion(distribution)
         x = measure.gen_mimic_samples(n)
         print(measure)
         print(bar)

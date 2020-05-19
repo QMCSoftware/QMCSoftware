@@ -46,12 +46,12 @@ class ImportanceSampling(TrueMeasure):
         Returns:
             f (method): transformed integrand
         """
-        def f(samples):
+        def f(samples, *args, **kwargs):
             samples_k = self.k_sample_tf(samples) # transform standard samples to mimic measure_to_sample_from
             md = apply_along_axis(self.m,1,samples_k).squeeze() # pdf of objective measure
             kd = apply_along_axis(self.k,1,samples_k).squeeze() # pdf of sampling measure
             w = md/kd
-            g_vals = g(samples_k).squeeze() # evaluations of original function
+            g_vals = g(samples_k, *args, **kwargs).squeeze() # evaluations of original function
             return w*g_vals
         return f
     

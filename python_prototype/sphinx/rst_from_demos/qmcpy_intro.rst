@@ -287,8 +287,8 @@ changing the input parameter value of dimension for QuickConstruct?
     	mimics          StdUniform
     Uniform (TrueMeasure Object)
     	distrib_name    IIDStdUniform
-    	lower_bound     0
-    	upper_bound     1
+    	lower_bound     [0 0]
+    	upper_bound     [1 1]
     CLT (StoppingCriterion Object)
     	inflate         1.200
     	alpha           0.010
@@ -302,7 +302,7 @@ changing the input parameter value of dimension for QuickConstruct?
     	n               5452
     	n_total         6476
     	confid_int      [ 0.821  0.841]
-    	time_integrate  0.001
+    	time_integrate  0.002
     
 
 

@@ -30,7 +30,7 @@ class IdentityTransform(TrueMeasure):
         Returns:
             f (method): transformed integrand
         """
-        f = lambda samples: g(samples)
+        f = lambda samples, *args, **kwargs: g(samples, *args, **kwargs)
         return f
     
     def gen_mimic_samples(self, *args, **kwargs):
@@ -47,3 +47,12 @@ class IdentityTransform(TrueMeasure):
                                   to appear like the TrueMeasure object
         """
         return self.distribution.gen_samples(*args,**kwargs)
+
+    def set_dimension(self, dimension):
+        """
+        Reset the dimension of the problem.
+        Calls DiscreteDistribution.set_dimension
+        Args:
+            dimension (int): new dimension
+        """
+        self.distribution.set_dimension(dimension)

@@ -48,7 +48,7 @@ class MeanVarDataRep(AccumulateData):
     def update_data(self):
         """ Update data """
         for r in range(self.replications):
-            self.distribution.reseed(self.seeds[r])
+            self.distribution.set_seed(self.seeds[r])
             x = self.distribution.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
             y = self.integrand.f(x).squeeze()
             previous_sum_y = self.muhat_r[r] * self.n_r_prev

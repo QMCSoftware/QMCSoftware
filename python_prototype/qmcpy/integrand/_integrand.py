@@ -17,6 +17,8 @@ class Integrand(object):
             self.parameters = []
         self.dimension = self.measure.dimension
         self.f = self.measure.transform_g_to_f(self.g) # transformed integrand
+        if not hasattr(self,'multilevel'):
+            self.multilevel = False
         
     def g(self, x):
         """ ABSTRACT METHOD
@@ -34,6 +36,13 @@ class Integrand(object):
             and $x'_{ij} = c$ otherwise
         """
         raise MethodImplementationError(self, 'g')
+    
+    def dim_at_level(self, l):
+        """ ABSTRACT METHOD
+        Return the dimension of samples to generate for level l.
+        Will call Measure.set_dimension on returned level to get samples for new level
+        """
+        raise TransformError("Integrand does not have dim_at_level method")
 
     def __repr__(self):
         return univ_repr(self, "Integrand", self.parameters)

@@ -52,7 +52,7 @@ to the function ``integrate()``.
     	mimics          StdUniform
     Gaussian (TrueMeasure Object)
     	distrib_name    Sobol
-    	mu              0
+    	mean            0
     	covariance      0.500
     CLTRep (StoppingCriterion Object)
     	inflate         1.200
@@ -67,7 +67,7 @@ to the function ``integrate()``.
     	sighat          0.009
     	n_total         4096
     	confid_int      [ 2.161  2.175]
-    	time_integrate  0.006
+    	time_integrate  0.009
     
 
 
@@ -97,9 +97,8 @@ defined as follows:
 
 .. code:: ipython3
 
-    time_vector = arange(1 / 64, 65 / 64, 1 / 64)
-    distribution = Lattice(dimension=len(time_vector), scramble=True, seed=7, backend='GAIL')
-    measure = BrownianMotion(distribution, time_vector=time_vector)
+    distribution = Lattice(dimension=64, scramble=True, seed=7, backend='GAIL')
+    measure = BrownianMotion(distribution)
     integrand = AsianCall(
         measure = measure,
         volatility = 0.5,
@@ -120,7 +119,8 @@ defined as follows:
     	strike_price    25
     	interest_rate   0.010
     	mean_type       arithmetic
-    	_dim_frac       0
+    	dimensions      64
+    	dim_fracs       0
     Lattice (DiscreteDistribution Object)
     	dimension       64
     	scramble        1
@@ -143,7 +143,7 @@ defined as follows:
     	sighat          0.042
     	n_total         16384
     	confid_int      [ 6.223  6.287]
-    	time_integrate  0.242
+    	time_integrate  0.332
     
 
 
@@ -169,49 +169,37 @@ last example.
 
 .. code:: ipython3
 
-    time_vector = [
-        arange(1/4,5/4,1/4),
-        arange(1/16,17/16,1/16),
-        arange(1/64,65/64,1/64)]
-    levels = len(time_vector)
-    distributions = MultiLevelConstructor(levels,
-        IIDStdGaussian,
-            dimension = [len(tv) for tv in time_vector],
-            seed = 7)
-    measures = MultiLevelConstructor(levels,
-        BrownianMotion,
-            distribution = distributions,
-            time_vector = time_vector)
-    integrands = MultiLevelConstructor(levels,
-        AsianCall,
-            measure = measures,
+    distribution = IIDStdGaussian(seed=7)
+    measure = BrownianMotion(distribution)
+    integrand = AsianCall(measure,
             volatility = 0.5,
             start_price = 30,
             strike_price = 25,
             interest_rate = 0.01,
-            mean_type = 'arithmetic')
-    solution,data = CLT(integrands, abs_tol=.05).integrate()
+            mean_type = 'arithmetic',
+            multi_level_dimensions = [4,16,64])
+    solution,data = CLT(integrand, abs_tol=.05).integrate()
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 6.2336         
-    MultiLevelConstructor (AsianCall Object)
-    	volatility      [ 0.500  0.500  0.500]
-    	start_price     [30 30 30]
-    	strike_price    [25 25 25]
-    	interest_rate   [ 0.010  0.010  0.010]
-    	mean_type       ['arithmetic' 'arithmetic' 'arithmetic']
-    	_dim_frac       [ 0.000  4.000  4.000]
-    MultiLevelConstructor (IIDStdGaussian Object)
-    	dimension       [ 4 16 64]
-    	seed            [7 7 7]
-    	mimics          ['StdGaussian' 'StdGaussian' 'StdGaussian']
-    MultiLevelConstructor (BrownianMotion Object)
-    	time_vector     [array([ 0.250,  0.500,  0.750,  1.000])
-    	                array([ 0.062,  0.125,  0.188, ...,  0.875,  0.938,  1.000])
-    	                array([ 0.016,  0.031,  0.047, ...,  0.969,  0.984,  1.000])]
+    Solution: 6.2517         
+    AsianCall (Integrand Object)
+    	volatility      0.500
+    	start_price     30
+    	strike_price    25
+    	interest_rate   0.010
+    	mean_type       arithmetic
+    	dimensions      [ 4 16 64]
+    	dim_fracs       [ 0.000  4.000  4.000]
+    IIDStdGaussian (DiscreteDistribution Object)
+    	dimension       64
+    	seed            7
+    	mimics          StdGaussian
+    BrownianMotion (TrueMeasure Object)
+    	distrib_name    IIDStdGaussian
+    	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
     CLT (StoppingCriterion Object)
     	inflate         1.200
     	alpha           0.010
@@ -221,11 +209,11 @@ last example.
     	n_max           10000000000
     MeanVarData (AccumulateData Object)
     	levels          3
-    	solution        6.234
-    	n               [328778  26698   3325]
-    	n_total         361873
-    	confid_int      [ 6.185  6.282]
-    	time_integrate  0.088
+    	solution        6.252
+    	n               [297058  39699   3687]
+    	n_total         343516
+    	confid_int      [ 6.203  6.301]
+    	time_integrate  0.177
     
 
 

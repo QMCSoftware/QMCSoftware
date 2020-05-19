@@ -25,23 +25,11 @@ class IntegrationExampleTest(unittest.TestCase):
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_asian_option_multi_level(self):
-        abs_tol = .05
-        time_vector = [arange(1 / 4, 5 / 4, 1 / 4),
-                    arange(1 / 16, 17 / 16, 1 / 16),
-                    arange(1 / 64, 65 / 64, 1 / 64)]
-        levels = 3
-        distributions = MultiLevelConstructor(levels,
-            IIDStdGaussian,
-                dimension = [len(tv) for tv in time_vector],
-                seed = arange(7,7+levels))
-        measures = MultiLevelConstructor(levels,
-            BrownianMotion,
-                distribution = distributions,
-                time_vector = time_vector)
-        integrands = MultiLevelConstructor(levels,
-            AsianCall,
-                measure = measures)
-        solution,data = CLT(integrands, abs_tol=abs_tol).integrate()
+        abs_tol =.05
+        distribution = IIDStdGaussian()
+        measure = BrownianMotion(distribution)
+        integrand = AsianCall(measure,multi_level_dimensions=[4,16,64])
+        solution,data = CLT(integrand, abs_tol).integrate()
         true_value = 1.7845
         self.assertTrue(abs(solution - true_value) < abs_tol)
 
