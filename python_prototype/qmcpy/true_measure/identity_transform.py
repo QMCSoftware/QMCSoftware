@@ -30,7 +30,7 @@ class IdentityTransform(TrueMeasure):
         Returns:
             f (method): transformed integrand
         """
-        f = lambda samples: g(samples)
+        f = lambda samples, *args, **kwargs: g(samples, *args, **kwargs)
         return f
     
     def gen_mimic_samples(self, *args, **kwargs):

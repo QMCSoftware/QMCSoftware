@@ -65,9 +65,9 @@ class BrownianMotion(TrueMeasure):
         Returns:
             f (method): transformed integrand
         """
-        def f(samples):
+        def f(samples, *args, **kwargs):
             z = self._tf_to_mimic_samples(samples)
-            y = g(z) * exp( (self.mean_shift_is*self.t/2 - z[:,-1]) * self.mean_shift_is)
+            y = g(z,*args,**kwargs) * exp( (self.mean_shift_is*self.t/2 - z[:,-1]) * self.mean_shift_is)
             return y
         return f
     
