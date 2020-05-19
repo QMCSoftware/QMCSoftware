@@ -46,5 +46,12 @@ class TrueMeasure(object):
         """
         raise MethodImplementationError(self,'transform_g_to_f')
 
+    def set_dimension(self, dimension):
+        """ ABSTRACT METHOD
+        Reset the dimension of the problem.
+        Calls DiscreteDistribution.set_dimension
+        """
+        raise TransformError("Cannot reset dimension of %s object"%str(type(self).__name__))
+
     def __repr__(self):
         return univ_repr(self, "TrueMeasure", ['distrib_name']+self.parameters)

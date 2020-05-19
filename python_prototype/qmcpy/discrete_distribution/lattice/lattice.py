@@ -32,7 +32,7 @@ class Lattice(DiscreteDistribution):
         else:
             raise ParameterError("Lattice backend must 'GAIL' or 'MPS'")
         self.mimics = 'StdUniform'
-        self.reseed(self.seed)
+        self.set_seed(self.seed)
         super().__init__()
 
     def gen_samples(self, n=None, n_min=0, n_max=8):
@@ -60,12 +60,23 @@ class Lattice(DiscreteDistribution):
             x_lat = (x_lat + self.shift)%1
         return x_lat
     
-    def reseed(self, new_seed):
+    def set_seed(self, seed):
         """
         Reseed the generator to get a new scrambling. 
         Args:
-            new_seed (int): new seed for generator
+            seed (int): new seed for generator
         """
-        self.seed = new_seed
+        self.seed = seed
         random.seed(self.seed)
+        self.shift = random.rand(self.dimension)
+    
+    def set_dimension(self, dimension):
+        """
+        Reset the dimension of the samples to be generated
+        Args:
+            dimension (int): dimension of samples
+        Note:
+            this also computes a new random shift to be applied to samples
+        """
+        self.dimension = dimension
         self.shift = random.rand(self.dimension)

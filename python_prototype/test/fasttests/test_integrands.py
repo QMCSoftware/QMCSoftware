@@ -14,7 +14,7 @@ class TestAsianCall(unittest.TestCase):
 
     def test_f(self):
         distribution = Sobol(dimension=4)
-        measure = BrownianMotion(distribution, time_vector=[1/4,1/2,3/4,1])
+        measure = BrownianMotion(distribution)
         integrand = AsianCall(measure)
         integrand.f(distribution.gen_samples(n_min=0,n_max=4))
 

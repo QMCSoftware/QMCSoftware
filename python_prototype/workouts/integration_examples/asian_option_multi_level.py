@@ -9,10 +9,6 @@ from qmcpy import *
 bar = '\n'+'~'*100+'\n'
 
 def asian_option_multi_level(
-    time_vector = [
-        arange(1/4, 5/4, 1/4),
-        arange(1 / 64, 65 / 64, 1 / 64),
-        arange(1/64, 65/64, 1/64)],
     volatility = .5,
     start_price = 30,
     strike_price = 25,
@@ -20,18 +16,17 @@ def asian_option_multi_level(
     mean_type = 'geometric',
     abs_tol = .1):
     
-    levels = len(time_vector)
+    levels = 3
     print(bar)
 
     # CLT
     distributions = MultiLevelConstructor(levels,
         IIDStdGaussian,
-            dimension = [len(tv) for tv in time_vector],
+            dimension = [4,16,64],
             seed = arange(7,7+levels))
     measures = MultiLevelConstructor(levels,
         BrownianMotion,
-            distribution = distributions,
-            time_vector = time_vector)
+            distribution = distributions)
     integrands = MultiLevelConstructor(levels,
         AsianCall,
             measure = measures,
