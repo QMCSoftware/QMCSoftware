@@ -10,7 +10,7 @@ from scipy.stats import norm
 class Gaussian(TrueMeasure):
     """ Gaussian (Normal) TrueMeasure """
 
-    parameters = ['mu', 'covariance']
+    parameters = ['mean', 'covariance']
 
     def __init__(self, distribution, mean=0, covariance=1):
         """
@@ -23,18 +23,20 @@ class Gaussian(TrueMeasure):
         """
         self.distribution = distribution
         self.d = distribution.dimension
+        self.mean = mean
+        self.covariance = covariance
         if isscalar(mean):
             mean = tile(mean,self.d)
         if isscalar(covariance):
             covariance = covariance*eye(self.d)
         self.mu = array(mean)
-        self.covariance = array(covariance)
-        if self.covariance.shape==(self.d,):
-            self.covariance = diag(self.covariance)
-        if not (len(self.mu)==self.d and self.covariance.shape==(self.d,self.d)):
+        self.sigma2 = array(covariance)
+        if self.sigma2.shape==(self.d,):
+            self.sigma2 = diag(self.sigma2)
+        if not (len(self.mu)==self.d and self.sigma2.shape==(self.d,self.d)):
             raise DimensionError("mean must have length dimension and "+\
                 "covariance must be of shapre dimension x dimension")
-        self.sigma = cholesky(self.covariance)
+        self.sigma = cholesky(self.sigma2)
         super().__init__()
     
     def pdf(self, x):
@@ -82,7 +84,10 @@ class Gaussian(TrueMeasure):
         Returns:
             f (method): transformed integrand
         """
-        f = lambda samples, *args, **kwargs: g(self._tf_to_mimic_samples(samples), *args, **kwargs)
+        def f(samples, *args, **kwargs):
+            z = self._tf_to_mimic_samples(samples)
+            y = g(z, *args, **kwargs)
+            return y
         return f
     
     def gen_mimic_samples(self, *args, **kwargs):
@@ -113,13 +118,13 @@ class Gaussian(TrueMeasure):
             resetting dimension may throw dimension errors
         """
         m = self.mu[0]
-        c = self.covariance[0,0]
+        c = self.sigma2[0,0]
         expected_cov = c*eye(self.d)
-        if not (all(self.mu==m) and (self.covariance==expected_cov).all()):
+        if not (all(self.mu==m) and (self.sigma2==expected_cov).all()):
             raise DimensionError('In order to change dimension of Gaussian measure '+\
                 'mean (mu) must be all the same and covariance must be a scaler times I')
         self.distribution.set_dimension(dimension)
         self.d = dimension
         self.mu = tile(m,self.d)
-        self.covariance = c*eye(self.d)
-        self.sigma = cholesky(self.covariance)
+        self.sigma2 = c*eye(self.d)
+        self.sigma = cholesky(self.sigma2)
