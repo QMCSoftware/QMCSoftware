@@ -160,7 +160,7 @@ Acceptance Rejection Sampling
 .. parsed-literal::
 
     Expected (total draws / successful draws) = c = 1.333
-    Successful Draws: 5000  Total Draws: 6622
+    Successful Draws: 5000  Total Draws: 6634
 
 
 
@@ -324,7 +324,7 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
     	n_total         8192
     	solution        0.848
     	r_lag           4
-    	time_integrate  0.154
+    	time_integrate  0.121
     
     Within tolerance of true value 0.849: True
 

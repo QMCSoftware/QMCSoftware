@@ -59,7 +59,7 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4501         
+    Solution: 0.4500         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -69,8 +69,8 @@ With ordinary Monte Carlo we do the following:
     	mimics          StdUniform
     Uniform (TrueMeasure Object)
     	distrib_name    Lattice
-    	lower_bound     0
-    	upper_bound     1
+    	lower_bound     [0 0]
+    	upper_bound     [1 1]
     CubLattice_g (StoppingCriterion Object)
     	abs_tol         0.001
     	rel_tol         0
@@ -80,7 +80,7 @@ With ordinary Monte Carlo we do the following:
     	n_total         65536
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.080
+    	time_integrate  0.048
 
 
 
@@ -120,7 +120,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Solution: 0.4493         
+    Solution: 0.4503         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -130,8 +130,8 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
     	mimics          StdUniform
     Uniform (TrueMeasure Object)
     	distrib_name    Lattice
-    	lower_bound     0
-    	upper_bound     1
+    	lower_bound     [0 0]
+    	upper_bound     [1 1]
     CubLattice_g (StoppingCriterion Object)
     	abs_tol         0.001
     	rel_tol         0
@@ -139,9 +139,9 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        0.449
+    	solution        0.450
     	r_lag           4
-    	time_integrate  0.021
+    	time_integrate  0.016
 
 
 
@@ -153,7 +153,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.268 the time and 0.250 the samples
+    Imporance Sampling takes 0.329 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -234,12 +234,11 @@ This drift in the Brownian motion may be implemented by changing the
 
     abs_tol = 1e-2
     dimension = 32
-    time_vector = [i/dimension for i in range(1,dimension+1)]
     def plt_bm_is(measure):
         n_plt = 32
         samples = measure.gen_mimic_samples(n_min=0,n_max=n_plt)
         fig,ax = plt.subplots()
-        for i in range(n_plt): ax.plot(time_vector,samples[i])
+        for i in range(n_plt): ax.plot(measure.time_vector,samples[i])
         ax.set_xlabel('time')
         ax.set_ylabel('option price')
         ax.set_title('Brownian Motion with Mean Shift %.1f'%measure.mean_shift_is)
@@ -251,7 +250,7 @@ Vanilla Monte Carlo
 .. code:: ipython3
 
     distribution = Sobol(dimension)
-    measure = BrownianMotion(distribution,time_vector)
+    measure = BrownianMotion(distribution)
     integrand = AsianCall(measure)
     solution1,data1 = CubSobol_g(integrand, abs_tol).integrate()
     data1
@@ -261,18 +260,19 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7864         
+    Solution: 1.7898         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
     	strike_price    35
     	interest_rate   0
     	mean_type       arithmetic
-    	_dim_frac       0
+    	dimensions      32
+    	dim_fracs       0
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	seed            15851
+    	seed            3905652186
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -285,9 +285,9 @@ Vanilla Monte Carlo
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        1.786
+    	solution        1.790
     	r_lag           4
-    	time_integrate  0.148
+    	time_integrate  0.103
 
 
 
@@ -307,7 +307,7 @@ Monte Carlo with Importance Sampling
 
     mean_shift_is = 1
     distribution = Sobol(dimension)
-    measure = BrownianMotion(distribution,time_vector,mean_shift_is)
+    measure = BrownianMotion(distribution,mean_shift_is)
     integrand = AsianCall(measure)
     solution2,data2 = CubSobol_g(integrand, abs_tol).integrate()
     data2
@@ -317,18 +317,19 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7995         
+    Solution: 1.7861         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
     	strike_price    35
     	interest_rate   0
     	mean_type       arithmetic
-    	_dim_frac       0
+    	dimensions      32
+    	dim_fracs       0
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	seed            6410
+    	seed            2522167006
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -341,9 +342,9 @@ Monte Carlo with Importance Sampling
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         4096
-    	solution        1.799
+    	solution        1.786
     	r_lag           4
-    	time_integrate  0.032
+    	time_integrate  0.023
 
 
 
@@ -364,7 +365,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.217 the time and 0.250 the samples
+    Imporance Sampling takes 0.221 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC

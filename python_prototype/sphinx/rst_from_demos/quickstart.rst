@@ -75,7 +75,7 @@ Step 5: Integrate
     	mimics          StdUniform
     Gaussian (TrueMeasure Object)
     	distrib_name    Lattice
-    	mu              0
+    	mean            0
     	covariance      0.500
     CubLattice_g (StoppingCriterion Object)
     	abs_tol         0.000
@@ -86,7 +86,7 @@ Step 5: Integrate
     	n_total         65536
     	solution        1.808
     	r_lag           4
-    	time_integrate  0.061
+    	time_integrate  0.080
     
     Within absolute tolerance: True
 
@@ -121,7 +121,7 @@ Condensed Problem
     	mimics          StdUniform
     Gaussian (TrueMeasure Object)
     	distrib_name    Lattice
-    	mu              0
+    	mean            0
     	covariance      0.500
     CubLattice_g (StoppingCriterion Object)
     	abs_tol         0.000
@@ -132,7 +132,7 @@ Condensed Problem
     	n_total         65536
     	solution        1.808
     	r_lag           4
-    	time_integrate  0.059
+    	time_integrate  0.060
     
     Within absolute tolerance: True
 

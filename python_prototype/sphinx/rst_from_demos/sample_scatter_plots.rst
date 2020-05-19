@@ -161,7 +161,7 @@ Distributions
 .. code:: ipython3
 
     plot_tm_tranformed("Discretized BrownianMotion with time_vector = [.5 , 1]",
-                       "g",[-2.5, 2.5],BrownianMotion,time_vector= [.5,1])
+                       "g",[-2.5, 2.5],BrownianMotion)
 
 
 
@@ -234,7 +234,7 @@ Plots samples on a 2D Keister function
     	mimics          StdGaussian
     Gaussian (TrueMeasure Object)
     	distrib_name    IIDStdGaussian
-    	mu              0
+    	mean            0
     	covariance      0.500
     CLT (StoppingCriterion Object)
     	inflate         1.200
