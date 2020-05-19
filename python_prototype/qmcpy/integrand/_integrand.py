@@ -17,6 +17,8 @@ class Integrand(object):
             self.parameters = []
         self.dimension = self.measure.dimension
         self.f = self.measure.transform_g_to_f(self.g) # transformed integrand
+        if not hasattr(self,'multilevel'):
+            self.multilevel = False
         
     def g(self, x):
         """ ABSTRACT METHOD

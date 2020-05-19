@@ -10,10 +10,10 @@ class AsianCall(Integrand):
     """ Specify and generate payoff values of an Asian Call option """
 
     parameters = ['volatility', 'start_price', 'strike_price',
-                  'interest_rate','mean_type', '_dim_frac']
+                  'interest_rate','mean_type', 'dimensions', 'dim_fracs']
                           
     def __init__(self, measure, volatility=0.5, start_price=30, strike_price=35,\
-                 interest_rate=0, mean_type='arithmetic', _dim_frac=0):
+                 interest_rate=0, mean_type='arithmetic', multi_level_dimensions=None):
         """
         Initialize AsianCall Integrand(s)
 
@@ -24,9 +24,8 @@ class AsianCall(Integrand):
             strike_price (float): strike_price, the call/put offer
             interest_rate (float): r, the annual interest rate
             mean_type (string): 'arithmetic' or 'geometric' mean
-            _dim_frac (float): fraciton of dimension compared to next level.
-                              0 for single-level problems.
-                              See add_multilevel_kwargs
+            multi_level_dimensions (list of ints): list of dimensions at each level.
+                Leave as None for single-level problems
         """
         if not isinstance(measure,BrownianMotion):
             raise ParameterError('AsianCall measure must be a BrownianMotion instance')
@@ -38,29 +37,18 @@ class AsianCall(Integrand):
         self.mean_type = mean_type.lower()
         if self.mean_type not in ['arithmetic', 'geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
-        self._dim_frac = _dim_frac
-        self.dimension = self.measure.dimension
+        if multi_level_dimensions:
+            # multi-level problem
+            self.dimensions = multi_level_dimensions
+            self.dim_fracs = [0] + [float(self.dimensions[i])/self.dimensions[i-1] \
+                for i in range(1,len(self.dimensions))]
+            self.multilevel = True
+        else:
+            # single level problem
+            self.dimensions = [self.measure.distribution.dimension]
+            self.dim_fracs = [0]
         self.exercise_time = self.measure.time_vector[-1]
-        super().__init__()
-
-    @classmethod
-    def add_multilevel_kwargs(cls, levels, **kwargs):
-        """ CLASS METHOD
-        Add keyword argumnets to be distributed across levels
-        
-        Args:
-            levels (int): number of levels 
-            kwargs (dict): dictionary of keyword and multi-level arguments
-                key (string): keyword
-                val (list/ndarray): list of length levels whose elements will be 
-                                    distributed amongst levels
-        
-        Returns: 
-            kwargs (dict): input kwargs updated with more arguments
-        """
-        dims = [measure.dimension for measure in kwargs['measure']]
-        kwargs['_dim_frac'] = [0] + [dims[i]/dims[i-1] for i in range(1,levels)]
-        return kwargs
+        super().__init__()        
 
     def get_discounted_payoffs(self, stock_path, dimension):
         """
@@ -83,13 +71,14 @@ class AsianCall(Integrand):
             exp(-self.interest_rate * self.exercise_time)
         return y
 
-    def g(self, x):
+    def g(self, x, l=0):
         """
         Original integrand to be integrated
 
         Args:
             x: nodes, $\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}$ \
                 row of an $n \\cdot \\lvert \\mathfrak{u} \\rvert$ matrix
+            l (int): level
 
         Returns:
             $n \\cdot p$ matrix with values \
@@ -98,13 +87,22 @@ class AsianCall(Integrand):
             then $x'_{ij} = x_{ij}$ for $j \\in \\mathfrak{u}$, \
             and $x'_{ij} = c$ otherwise
         """
+        dim_frac = self.dim_fracs[l]
+        dimension = self.dimensions[l]
         s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
             self.measure.time_vector + self.volatility * x)
-        y = self.get_discounted_payoffs(s_fine, self.dimension)
-        if self._dim_frac > 0:
-            s_course = s_fine[:, int(self._dim_frac - 1):: int(self._dim_frac)]
-            d_course = self.dimension / self._dim_frac
+        y = self.get_discounted_payoffs(s_fine, dimension)
+        if dim_frac > 0:
+            s_course = s_fine[:, int(dim_frac - 1):: int(dim_frac)]
+            d_course = dimension / dim_frac
             y_course = self.get_discounted_payoffs(s_course, d_course)
             y -= y_course
         return y
+    
+    def dim_at_level(self, l):
+        """ 
+        Get dimension of the SDE at level l
+            l (int): level
+        """
+        return self.dimensions[l]

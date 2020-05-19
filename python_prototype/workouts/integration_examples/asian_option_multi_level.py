@@ -16,26 +16,20 @@ def asian_option_multi_level(
     mean_type = 'geometric',
     abs_tol = .1):
     
-    levels = 3
     print(bar)
 
     # CLT
-    distributions = MultiLevelConstructor(levels,
-        IIDStdGaussian,
-            dimension = [4,16,64],
-            seed = arange(7,7+levels))
-    measures = MultiLevelConstructor(levels,
-        BrownianMotion,
-            distribution = distributions)
-    integrands = MultiLevelConstructor(levels,
-        AsianCall,
-            measure = measures,
-            volatility = volatility,
-            start_price = start_price,
-            strike_price = strike_price,
-            interest_rate = interest_rate,
-            mean_type = mean_type)
-    solution,data = CLT(integrands, abs_tol=abs_tol).integrate()
+    distribution = IIDStdGaussian(seed=7)
+    measure = BrownianMotion(distribution)
+    integrand = AsianCall(
+        measure = measure,
+        volatility = volatility,
+        start_price = start_price,
+        strike_price = strike_price,
+        interest_rate = interest_rate,
+        mean_type = mean_type,
+        multi_level_dimensions = [4,16,64])
+    solution,data = CLT(integrand, abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
 

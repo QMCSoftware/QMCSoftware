@@ -82,7 +82,7 @@ class Gaussian(TrueMeasure):
         Returns:
             f (method): transformed integrand
         """
-        f = lambda samples: g(self._tf_to_mimic_samples(samples))
+        f = lambda samples, *args, **kwargs: g(self._tf_to_mimic_samples(samples), *args, **kwargs)
         return f
     
     def gen_mimic_samples(self, *args, **kwargs):
