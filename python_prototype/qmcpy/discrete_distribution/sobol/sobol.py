@@ -2,7 +2,7 @@
 
 from .._discrete_distribution import DiscreteDistribution
 from .mps_sobol import DigitalSeq
-from qrng import sobol_qrng
+from qrngpy import sobol_qrng
 from ...util import ParameterError, ParameterWarning
 from numpy import array, int64, log2, repeat, zeros, random
 import warnings

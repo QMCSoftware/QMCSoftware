@@ -56,6 +56,11 @@ before_install:
 - cd python_prototype
 - pip install --upgrade pip
 - pip install codecov
+- git clone https://github.com/QMCSoftware/qrngpy.git
+- cd qrngpy
+- chmod +x compile.sh
+- ./compile.sh
+- cd ..
 
 install:
 - pip install --quiet -r requirements.txt
