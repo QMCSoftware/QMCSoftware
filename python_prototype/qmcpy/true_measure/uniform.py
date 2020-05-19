@@ -66,7 +66,11 @@ class Uniform(TrueMeasure):
         Returns:
             f (method): transformed integrand
         """
-        f = lambda samples, *args, **kwargs: g(self._tf_to_mimic_samples(samples), *args, **kwargs)
+        def f(samples, *args, **kwargs):
+            z = self._tf_to_mimic_samples(samples)
+            y = g(z, *args, **kwargs)
+            return y
+        return f
         return f
     
     def gen_mimic_samples(self, *args, **kwargs):
