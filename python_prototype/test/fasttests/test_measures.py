@@ -34,7 +34,7 @@ class TestBrownianMontion(unittest.TestCase):
 
     def test_gen_samples(self):
         distribution = Sobol(dimension=3)
-        measure = BrownianMotion(distribution, time_vector=[1/3,2/3,1])
+        measure = BrownianMotion(distribution)
         measure.gen_mimic_samples(n_min=0,n_max=4)
 
 

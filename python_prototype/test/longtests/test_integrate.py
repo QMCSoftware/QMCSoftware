@@ -26,18 +26,14 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_asian_option_multi_level(self):
         abs_tol = .05
-        time_vector = [arange(1 / 4, 5 / 4, 1 / 4),
-                    arange(1 / 16, 17 / 16, 1 / 16),
-                    arange(1 / 64, 65 / 64, 1 / 64)]
         levels = 3
         distributions = MultiLevelConstructor(levels,
             IIDStdGaussian,
-                dimension = [len(tv) for tv in time_vector],
+                dimension = [4,16,64],
                 seed = arange(7,7+levels))
         measures = MultiLevelConstructor(levels,
             BrownianMotion,
-                distribution = distributions,
-                time_vector = time_vector)
+                distribution = distributions)
         integrands = MultiLevelConstructor(levels,
             AsianCall,
                 measure = measures)

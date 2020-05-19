@@ -43,13 +43,6 @@ class StoppingCriterion(object):
                 error_message = "%s only accepts distributions: %s" %(s_name, str(allowed_distribs))
                 raise DistributionCompatibilityError(error_message)
         # parameter checks
-        prefix = 'A concrete implementation of Stopping Criterion must have '
-        if not hasattr(self, 'abs_tol'):
-            raise ParameterError(prefix + 'self.abs_tol (absolute tolerance)')
-        if not hasattr(self, 'rel_tol'):
-            raise ParameterError(prefix + 'self.rel_tol (relative tolerance)')
-        if not hasattr(self, 'n_max'):
-            raise ParameterError(prefix + 'self.n_max (maximum total samples)')
         if not hasattr(self,'parameters'):
             self.parameters = []
             

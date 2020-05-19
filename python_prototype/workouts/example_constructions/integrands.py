@@ -13,7 +13,7 @@ def integrands(n=2**15):
 
     # Asian Call (Single Level)
     distribution = IIDStdUniform(dimension=4, seed=7)
-    measure = BrownianMotion(distribution, time_vector=[1/4,1/2,3/4,1])
+    measure = BrownianMotion(distribution)
     integrand = AsianCall(
         measure = measure,
         volatility = 0.5,
@@ -27,21 +27,16 @@ def integrands(n=2**15):
     print('Asian Call (Single Level) approx with %d samples: %.3f\n%s'%(n,y.mean(),bar))
 
     # Asian Call (Multi-Level)
-    time_vector = [
-        arange(1/4,5/4,1/4),
-        arange(1/16,17/16,1/16),
-        arange(1/64,65/64,1/64)]
-    levels = len(time_vector)
+    levels = 3
     distributions = MultiLevelConstructor(levels,
         Lattice,
-            dimension = [len(tv) for tv in time_vector],
+            dimension = [4,16,64],
             scramble = True,
             seed = arange(7,7+levels),
             backend='GAIL')
     measures = MultiLevelConstructor(levels,
         BrownianMotion,
-            distribution = distributions,
-            time_vector = time_vector)
+            distribution = distributions)
     integrands = MultiLevelConstructor(levels,
         AsianCall,
             measure = measures,

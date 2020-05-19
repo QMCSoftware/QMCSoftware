@@ -48,7 +48,7 @@ class Sobol(DiscreteDistribution):
         else:
             raise ParameterError("Sobol backend must be either 'qrng', 'mps', or 'pytorch'")
         self.mimics = 'StdUniform'
-        self.reseed(self.seed)
+        self.set_seed(self.seed)
         super().__init__()
         
     def qrgn_sobol_gen(self, n_min=0, n_max=8):
@@ -119,19 +119,36 @@ class Sobol(DiscreteDistribution):
         x_sob = self.backend_gen(n_min,n_max)
         return x_sob
 
-    def reseed(self, new_seed):
+    def set_seed(self, seed):
         """
         Reseed the generator to get a new scrambling. 
         Args:
-            new_seed (int): new seed for generator
+            seed (int): new seed for generator
         """
-        self.seed = new_seed
+        self.seed = seed
         if (self.backend == 'qrng' or self.backend == 'pytorch') and (not self.seed):
             # qrng needs a seed, even if it is random
-            random.seed(new_seed)
-            self.seed = random.randint(0,100000)
+            random.seed(seed)
+            self.seed = random.randint(2**32)
         elif self.backend == 'mps':
-            random.seed(new_seed)
+            random.seed(seed)
             self.shift = random.randint(0, 2 ** self.t, self.dimension, dtype=int64)
         
+    def set_dimension(self, dimension):
+        """
+        Reset the dimension of the samples to be generated
+        Args:
+            dimension (int): dimension of samples
+        Note:
+            this also computes a new random shift to be applied to samples
+        """
+        self.dimension = dimension
+        if self.backend == 'mps':
+            self.mps_sobol_rng = DigitalSeq(m=30, s=self.dimension)
+            # we guarantee a depth of >=32 bits for shift
+            self.t = max(32, self.mps_sobol_rng.t)
+            # correction factor to scale the integers
+            self.ct = max(0, self.t - self.mps_sobol_rng.t)
+            self.backend_gen = self.mps_sobol_gen
+            self.shift = random.randint(0, 2 ** self.t, self.dimension, dtype=int64)
 
