@@ -17,7 +17,7 @@ BrownianMotion (TrueMeasure Object)
 
 Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdUniform
-	mu              [3 3]
+	mean            [3 3]
 	covariance      [5 7]
 
 
@@ -25,7 +25,7 @@ Gaussian (TrueMeasure Object)
 
 Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
-	mu              [3 3]
+	mean            [3 3]
 	covariance      [5 7]
 
 
@@ -34,7 +34,7 @@ Gaussian (TrueMeasure Object)
 Uniform (TrueMeasure Object)
 	distrib_name    IIDStdUniform
 	lower_bound     [-2 -3]
-	upper_bound     4
+	upper_bound     [4 4]
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,7 +42,7 @@ Uniform (TrueMeasure Object)
 Uniform (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
 	lower_bound     [-2 -3]
-	upper_bound     4
+	upper_bound     [4 4]
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

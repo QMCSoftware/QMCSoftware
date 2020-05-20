@@ -10,18 +10,18 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
 
     Args:
         integrand_qmcpy (function):
-            low-level routine for l level estimation
-            Args:
-                l = level
-                N = number of paths
-            Return:    
-                sums(1) = sum(Pf-Pc)
-                sums(2) = sum((Pf-Pc).^2)
-                sums(3) = sum((Pf-Pc).^3)
-                sums(4) = sum((Pf-Pc).^4)
-                sums(5) = sum(Pf)
-                sums(6) = sum(Pf.^2)
-                cost = user-defined computational cost
+            low-level routine for l level estimation such that 
+                Args:
+                    x (ndarray): nx(integrand.dim_at_level(l)) array of samples from discrete distribution
+                    l (int): level
+                Return:    
+                    sums(1) = sum(Pf-Pc)
+                    sums(2) = sum((Pf-Pc).^2)
+                    sums(3) = sum((Pf-Pc).^3)
+                    sums(4) = sum((Pf-Pc).^4)
+                    sums(5) = sum(Pf)
+                    sums(6) = sum(Pf.^2)
+                    cost = user-defined computational cost
         n (int): number of samples for convergence tests
         l (int): number of levels for convergence tests
         n0 (int): initial number of samples for MLMC calcs

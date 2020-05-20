@@ -55,17 +55,19 @@ before_install:
 - cd python_prototype
 - pip install --upgrade pip
 - pip install codecov
+<<<<<<< HEAD
 - cd qmcpy
 - make all
 - cd ..
+=======
+- make qrng
+>>>>>>> documentation updates
 
 install:
 - pip install --quiet -r requirements/level_1_add_tests.txt
 - pip install -e .
 
 script:
-# - python -W ignore -m unittest discover -s test/fasttests
-# - python -W ignore -m unittest discover -s test/longtests
 - coverage run --source=./ -m unittest discover -s test/fasttests
 - coverage run --append --source=./ -m unittest discover -s test/longtests
 

@@ -9,7 +9,7 @@ IIDStdUniform (DiscreteDistribution Object)
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdUniform
-	mu              0
+	mean            0
 	covariance      0.500
 CLT (StoppingCriterion Object)
 	inflate         1.200
@@ -24,7 +24,7 @@ MeanVarData (AccumulateData Object)
 	n               467027
 	n_total         468051
 	confid_int      [ 1.807  1.817]
-	time_integrate  0.115
+	time_integrate  0.119
 
 Meets tolerance: True
 
@@ -40,7 +40,7 @@ Lattice (DiscreteDistribution Object)
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
 	distrib_name    Lattice
-	mu              0
+	mean            0
 	covariance      0.500
 CLTRep (StoppingCriterion Object)
 	inflate         1.200
@@ -69,7 +69,7 @@ IIDStdGaussian (DiscreteDistribution Object)
 	mimics          StdGaussian
 Gaussian (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
-	mu              0
+	mean            0
 	covariance      0.500
 MeanMC_g (StoppingCriterion Object)
 	inflate         1.200
@@ -84,7 +84,7 @@ MeanVarData (AccumulateData Object)
 	n               596905
 	n_total         597929
 	confid_int      [ 1.804  1.814]
-	time_integrate  0.047
+	time_integrate  0.055
 
 Meets tolerance: True
 
@@ -100,7 +100,7 @@ Lattice (DiscreteDistribution Object)
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
 	distrib_name    Lattice
-	mu              0
+	mean            0
 	covariance      0.500
 CubLattice_g (StoppingCriterion Object)
 	abs_tol         0.005
@@ -127,7 +127,7 @@ Sobol (DiscreteDistribution Object)
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
 	distrib_name    Sobol
-	mu              0
+	mean            0
 	covariance      0.500
 CubSobol_g (StoppingCriterion Object)
 	abs_tol         0.005

@@ -72,7 +72,7 @@ class CallOptions(Integrand):
         """
         Original integrand on level l
         Args:
-            dwf (ndarray): nxd ndarray
+            dwf (ndarray): nxd ndarray for d=2**l as specified by dim_at_level method
             l (int): level
         Return:
             sums (ndarray): length 6 vector of sums such that    
