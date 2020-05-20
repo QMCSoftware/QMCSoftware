@@ -104,6 +104,7 @@ class MLMC(StoppingCriterion):
                 Note that error tolerances may no longer be satisfied""" \
                 % (int(self.data.n_total), int(self.data.diff_n_level.sum()), int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
+                break
             # finally, evaluate multilevel estimator
         self.data.solution = (self.data.sum_level[0,:]/self.data.n_level).sum()
         self.data.time_integrate = perf_counter() - t_start

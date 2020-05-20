@@ -36,7 +36,7 @@ def distributions(n=4, dimension=2, scramble=True, seed=7):
         dimension = dimension,
         scramble = scramble,
         seed = seed,
-        backend = 'PyTorch')
+        backend = 'QRNG')
     for qrng_obj in [lat_obj,sob_obj]:
         x = qrng_obj.gen_samples(n_min=0, n_max=n)
         print(qrng_obj)

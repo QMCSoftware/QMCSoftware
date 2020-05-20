@@ -1,56 +1,87 @@
 """ Unit tests for subclasses of Integrands in QMCPy """
 
-import unittest
-
-from numpy import arange
 from qmcpy import *
 from qmcpy.util import *
+from numpy import arange
+import unittest
 
 
 class TestAsianCall(unittest.TestCase):
-    """
-    Unit tests for AsianCall function in QMCPy.
-    """
+    """ Unit tests for AsianCall Integrand. """
 
     def test_f(self):
-        distribution = Sobol(dimension=4)
+        distribution = Sobol(dimension=2)
         measure = BrownianMotion(distribution)
         integrand = AsianCall(measure)
-        integrand.f(distribution.gen_samples(n_min=0,n_max=4))
+        samples = integrand.measure.distribution.gen_samples(4)
+        y = integrand.f(samples).squeeze()
+        self.assertTrue(y.shape==(4,))        
+
+    def test_dim_at_level(self):
+        distribution = Sobol(dimension=4)
+        measure = BrownianMotion(distribution)
+        integrand = AsianCall(measure, multi_level_dimensions=[4,8])
+        self.assertTrue(integrand.dim_at_level(0)==4)
+        self.assertTrue(integrand.dim_at_level(1)==8)
+
 
 class TestKeister(unittest.TestCase):
-    """
-    Unit tests for Keister function in QMCPy.
-    """
+    """ Unit tests for Keister Integrand. """
 
     def test_f(self):
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
         integrand = Keister(measure)
-        integrand.f(distribution.gen_samples(n_min=0,n_max=4))
+        samples = integrand.measure.distribution.gen_samples(4)
+        y = integrand.f(samples).squeeze()
+        self.assertTrue(y.shape==(4,))
 
 
 class TestLinear(unittest.TestCase):
-    """
-    Unit tests for Linear function in QMCPy.
-    """
+    """ Unit tests for Linear Integrand. """
 
     def test_f(self):
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
         integrand = Linear(measure)
-        integrand.f(distribution.gen_samples(n_min=0,n_max=4))
-    
+        samples = integrand.measure.distribution.gen_samples(4)
+        y = integrand.f(samples).squeeze()
+        self.assertTrue(y.shape==(4,))
+
+
 class TestQuickConstruct(unittest.TestCase):
-    """
-    Unit tests for QuickConstruct function in QMCPy.
-    """
+    """ Unit tests for QuickConstruct Integrand. """
 
     def test_f(self):
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
         integrand = QuickConstruct(measure, lambda x: x.sum(1))
-        integrand.f(distribution.gen_samples(n_min=0,n_max=4))
+        samples = integrand.measure.distribution.gen_samples(4)
+        y = integrand.f(samples).squeeze()
+        self.assertTrue(y.shape==(4,))
+
+
+class TestCallOptions(unittest.TestCase):
+    """ Unit tests for CallOptions Integrand. """
+
+    def test_f(self):
+        l = 3
+        distribution = IIDStdGaussian()
+        measure = Gaussian(distribution)
+        integrand = CallOptions(measure)
+        d = integrand.dim_at_level(l)
+        integrand.measure.set_dimension(d)
+        samples = integrand.measure.distribution.gen_samples(4)
+        sums,cost = integrand.f(samples,l=l)
+        self.assertTrue(sums.shape==(6,))
+
+    def test_dim_at_level(self):
+        l = 3
+        distribution = IIDStdGaussian()
+        measure = Gaussian(distribution)
+        integrand = CallOptions(measure)
+        self.assertTrue(integrand.dim_at_level(0)==2**0)
+        self.assertTrue(integrand.dim_at_level(3)==2**3)
 
 
 if __name__ == "__main__":

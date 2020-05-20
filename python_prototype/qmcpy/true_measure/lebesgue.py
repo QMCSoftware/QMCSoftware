@@ -56,6 +56,3 @@ class Lebesgue(TrueMeasure):
                 f_vals = g_vals / norm.pdf(inv_cdf_vals).prod(-1).reshape(g_vals.shape)
                 return f_vals
         return f
-    
-    def gen_mimic_samples(self, *args, **kwargs):
-        raise Exception("Cannot generate samples mimicking a Lebesgue measure")

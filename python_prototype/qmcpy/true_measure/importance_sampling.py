@@ -54,7 +54,4 @@ class ImportanceSampling(TrueMeasure):
             g_vals = g(samples_k, *args, **kwargs).squeeze() # evaluations of original function
             return w*g_vals
         return f
-    
-    def gen_mimic_samples(self, *args, **kwargs):
-        raise Exception("Cannot generate samples mimicking an importance sampling measure")
         

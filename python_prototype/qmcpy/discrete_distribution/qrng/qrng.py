@@ -5,7 +5,7 @@ import numpy
 import os
 
 path = os.path.dirname(os.path.abspath(__file__))
-lib = ctypes.CDLL(path+'/qrngpy.so',mode=ctypes.RTLD_GLOBAL)
+lib = ctypes.CDLL(path+'/qrng_lib.so',mode=ctypes.RTLD_GLOBAL)
 # MRG63k3a
 mrg63ka_f = lib.MRG63k3a
 mrg63ka_f.argtypes = None

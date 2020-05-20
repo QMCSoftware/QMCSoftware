@@ -1,7 +1,7 @@
-CC    	= gcc
-rpath = discrete_distribution/qrngpy/
-
+cc    	= gcc
+rpath = discrete_distribution/qrng/
+output = qrng_lib.so
 clean:
-	rm -f $(TARGET)
+	rm -f $(rpath)$(output)
 all:
-	$(CC) -fPIC -shared  -o $(rpath)qrngpy.so $(rpath)MRG63k3a.c $(rpath)ghalton.c $(rpath)korobov.c $(rpath)sobol.c -lm
+	$(cc) -fPIC -shared  -o $(rpath)$(output) $(rpath)MRG63k3a.c $(rpath)ghalton.c $(rpath)korobov.c $(rpath)sobol.c -lm

@@ -6,21 +6,15 @@ from numpy import arange
 import unittest
 
 keister_2d_exact = 1.808186429263620
-abs_tol = .01
+tol = .01
 rel_tol = 0
 
 
 class TestClt(unittest.TestCase):
-    """
-    Unit tests for Clt in QMCPy.
-    """
+    """ Unit tests for Clt StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
         distribution = Lattice(dimension=2)
-        measure = Gaussian(distribution)
-        integrand = Keister(measure)
-        self.assertRaises(DistributionCompatibilityError, CLT, integrand)
-        distribution = Sobol(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, CLT, integrand)
@@ -36,21 +30,15 @@ class TestClt(unittest.TestCase):
         distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
-        solution,data = CLT(integrand, abs_tol=abs_tol).integrate()
-        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
+        solution,data = CLT(integrand, abs_tol=tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
 class TestCltRep(unittest.TestCase):
-    """
-    Unit tests for CltRep in QMCPy.
-    """
+    """ Unit tests for CltRep StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
         distribution = IIDStdGaussian(dimension=2)
-        measure = Gaussian(distribution)
-        integrand = Keister(measure)
-        self.assertRaises(DistributionCompatibilityError, CLTRep, integrand)
-        distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, CLTRep, integrand)
@@ -66,21 +54,15 @@ class TestCltRep(unittest.TestCase):
         distribution = Sobol(dimension=2)
         measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
-        solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
-        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
+        solution,data = CLTRep(integrand, abs_tol=tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
 class TestMeanMC_g(unittest.TestCase):
-    """
-    Unit tests for MeanMC_g in QMCPy
-    """
+    """ Unit tests for MeanMC_g StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
         distribution = Lattice(dimension=2)
-        measure = Gaussian(distribution)
-        integrand = Keister(measure)
-        self.assertRaises(DistributionCompatibilityError, MeanMC_g, integrand)
-        distribution = Sobol(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, MeanMC_g, integrand)
@@ -97,25 +79,15 @@ class TestMeanMC_g(unittest.TestCase):
         distribution = IIDStdGaussian(dimension=2)
         measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
-        solution,data = MeanMC_g(integrand, abs_tol=abs_tol).integrate()
-        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
+        solution,data = MeanMC_g(integrand, abs_tol=tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
 class TestCubLattice_g(unittest.TestCase):
-    """
-    Unit tests for CubLattice_g in QMCPy
-    """
+    """ Unit tests for CubLattice_g StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
         distribution = IIDStdGaussian(dimension=2)
-        measure = Gaussian(distribution)
-        integrand = Keister(measure)
-        self.assertRaises(DistributionCompatibilityError, CubLattice_g, integrand)
-        distribution = IIDStdUniform(dimension=2)
-        measure = Gaussian(distribution)
-        integrand = Keister(measure)
-        self.assertRaises(DistributionCompatibilityError, CubLattice_g, integrand)
-        distribution = Sobol(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, CubLattice_g, integrand)
@@ -131,25 +103,15 @@ class TestCubLattice_g(unittest.TestCase):
         distribution = Lattice(dimension=2)
         measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
-        solution,data = CubLattice_g(integrand, abs_tol=abs_tol).integrate()
-        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
+        solution,data = CubLattice_g(integrand, abs_tol=tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
 class TestCubSobol_g(unittest.TestCase):
-    """
-    Unit tests for CubSobol_g in QMCPy
-    """
+    """ Unit tests for CubSobol_g StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
         distribution = IIDStdGaussian(dimension=2)
-        measure = Gaussian(distribution)
-        integrand = Keister(measure)
-        self.assertRaises(DistributionCompatibilityError, CubSobol_g, integrand)
-        distribution = IIDStdUniform(dimension=2)
-        measure = Gaussian(distribution)
-        integrand = Keister(measure)
-        self.assertRaises(DistributionCompatibilityError, CubSobol_g, integrand)
-        distribution = Lattice(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, CubSobol_g, integrand)
@@ -165,9 +127,33 @@ class TestCubSobol_g(unittest.TestCase):
         distribution = Sobol(dimension=2)
         measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
-        solution,data = CubSobol_g(integrand, abs_tol=abs_tol).integrate()
-        self.assertTrue(abs(solution-keister_2d_exact) < abs_tol)
+        solution,data = CubSobol_g(integrand, abs_tol=tol).integrate()
+        self.assertTrue(abs(solution-keister_2d_exact) < tol)
         
-        
+class TestMLMC(unittest.TestCase):
+    """ Unit tests for MLMC StoppingCriterion. """
+
+    def test_raise_distribution_compatibility_error(self):
+        distribution = Lattice()
+        measure = Gaussian(distribution)
+        integrand = CallOptions(measure)
+        self.assertRaises(DistributionCompatibilityError, MLMC, integrand)
+
+    def test_n_max_single_level(self):
+        distribution = IIDStdUniform()
+        measure = Gaussian(distribution)
+        integrand = CallOptions(measure,start_strike_price=30)
+        algorithm = MLMC(integrand,rmse_tol=.001,n_max=2**10)
+        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
+    
+    def test_european_option(self):
+        distribution = IIDStdUniform(seed=9)
+        measure = Gaussian(distribution)
+        integrand = CallOptions(measure,start_strike_price=30)
+        solution,data = MLMC(integrand,rmse_tol=tol).integrate()
+        exact_value = integrand.get_exact_value()
+        self.assertTrue(abs(solution-exact_value) < tol)
+
+
 if __name__ == "__main__":
     unittest.main()
