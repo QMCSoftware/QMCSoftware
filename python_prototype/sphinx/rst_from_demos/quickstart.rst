@@ -86,7 +86,11 @@ Step 5: Integrate
     	n_total         65536
     	solution        1.808
     	r_lag           4
+<<<<<<< HEAD
     	time_integrate  0.055
+=======
+    	time_integrate  0.061
+>>>>>>> improved makefile
     
     Within absolute tolerance: True
 
@@ -132,7 +136,11 @@ Condensed Problem
     	n_total         65536
     	solution        1.808
     	r_lag           4
+<<<<<<< HEAD
     	time_integrate  0.053
+=======
+    	time_integrate  0.065
+>>>>>>> improved makefile
     
     Within absolute tolerance: True
 

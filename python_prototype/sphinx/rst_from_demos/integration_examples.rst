@@ -67,7 +67,7 @@ to the function ``integrate()``.
     	sighat          0.009
     	n_total         4096
     	confid_int      [ 2.161  2.175]
-    	time_integrate  0.007
+    	time_integrate  0.006
     
 
 
@@ -143,7 +143,11 @@ defined as follows:
     	sighat          0.042
     	n_total         16384
     	confid_int      [ 6.223  6.287]
+<<<<<<< HEAD
     	time_integrate  0.193
+=======
+    	time_integrate  0.154
+>>>>>>> improved makefile
     
 
 
@@ -184,7 +188,11 @@ last example.
 
 .. parsed-literal::
 
+<<<<<<< HEAD
     Solution: 6.2571         
+=======
+    Solution: 6.2570         
+>>>>>>> improved makefile
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -210,10 +218,17 @@ last example.
     MeanVarData (AccumulateData Object)
     	levels          3
     	solution        6.257
+<<<<<<< HEAD
     	n               [291256  36022   4757]
     	n_total         335107
     	confid_int      [ 6.208  6.306]
     	time_integrate  0.116
+=======
+    	n               [320184  25229   3791]
+    	n_total         352276
+    	confid_int      [ 6.208  6.306]
+    	time_integrate  0.100
+>>>>>>> improved makefile
     
 
 

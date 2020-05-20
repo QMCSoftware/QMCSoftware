@@ -154,7 +154,11 @@ Acceptance Rejection Sampling
 .. parsed-literal::
 
     Expected (total draws / successful draws) = c = 1.333
+<<<<<<< HEAD
     Successful Draws: 5000  Total Draws: 6650
+=======
+    Successful Draws: 5000  Total Draws: 6622
+>>>>>>> improved makefile
 
 
 
@@ -314,7 +318,11 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
     	n_total         8192
     	solution        0.848
     	r_lag           4
+<<<<<<< HEAD
     	time_integrate  0.127
+=======
+    	time_integrate  0.128
+>>>>>>> improved makefile
     
     Within tolerance of true value 0.849: True
 
