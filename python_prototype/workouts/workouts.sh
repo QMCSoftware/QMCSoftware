@@ -20,4 +20,7 @@ python workouts/mc_vs_qmc/importance_sampling.py
 python workouts/mc_vs_qmc/integrations_asian_call.py
 python workouts/mc_vs_qmc/integrations_keister.py
 python workouts/mc_vs_qmc/vary_abs_tol.py
-python workouts/mc_vs_qmc/vary_dimension.py 
+python workouts/mc_vs_qmc/vary_dimension.py
+
+# mlmc
+python workouts/mlmc/mcqmc06.py > outputs/mlmc/mcqmc06.log

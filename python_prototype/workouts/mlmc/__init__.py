@@ -1,0 +1,1 @@
+from .mcqmc06 import mcqmc06
