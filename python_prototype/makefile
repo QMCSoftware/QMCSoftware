@@ -1,15 +1,15 @@
 qrngpath = qmcpy/discrete_distribution/qrng/
-qrng:
+qrng_:
 	$ gcc -fPIC -shared  -o $(qrngpath)qrng_lib.so $(qrngpath)*.c -lm
 
-unittest:
+test_:
 	python -W ignore -m unittest discover -s test/fasttests/ 1>/dev/null
 	python -W ignore -m unittest discover -s test/longtests/ 1>/dev/null
 
-docs:
+docs_:
 	cd sphinx && chmod +x autodoc.sh &&  ./autodoc.sh
 
-workouts:
+workouts_:
 	# example_constructions
 	python workouts/example_constructions/distributions.py > outputs/example_constructions/distributions.log
 	python workouts/example_constructions/integrands.py > outputs/example_constructions/integrands.log
