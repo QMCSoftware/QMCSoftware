@@ -1,9 +1,6 @@
 """ Call abbreviated varsions of functions from python_prototypes/worksouts/ """
 
-from workouts.example_constructions import barebones, distributions, integrands, measures, stopping_criteria
-from workouts.integration_examples import asian_option_multi_level, asian_option_single_level, keister
-from workouts.lds_sequences import python_sequences
-from workouts.mc_vs_qmc import vary_abs_tol, vary_dimension, compare_mean_shifts
+from workouts import *
 from numpy import arange
 import unittest
 
@@ -29,6 +26,9 @@ class TestWorkouts(unittest.TestCase):
         vary_abs_tol()
         vary_dimension()
         compare_mean_shifts()
+
+    def test_mlmc(self):
+        mcqmc06()
 
 
 if __name__ == "__main__":
