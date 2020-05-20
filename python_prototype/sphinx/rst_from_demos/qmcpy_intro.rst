@@ -244,7 +244,7 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
     	n               3305
     	n_total         4329
     	confid_int      [ 0.647  0.668]
-    	time_integrate  0.001
+    	time_integrate  0.002
     
 
 

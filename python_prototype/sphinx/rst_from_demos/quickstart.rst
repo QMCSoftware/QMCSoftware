@@ -86,7 +86,7 @@ Step 5: Integrate
     	n_total         65536
     	solution        1.808
     	r_lag           4
-    	time_integrate  0.080
+    	time_integrate  0.229
     
     Within absolute tolerance: True
 
@@ -132,7 +132,7 @@ Condensed Problem
     	n_total         65536
     	solution        1.808
     	r_lag           4
-    	time_integrate  0.060
+    	time_integrate  0.100
     
     Within absolute tolerance: True
 

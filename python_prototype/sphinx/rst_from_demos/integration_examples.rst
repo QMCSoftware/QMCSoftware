@@ -67,7 +67,7 @@ to the function ``integrate()``.
     	sighat          0.009
     	n_total         4096
     	confid_int      [ 2.161  2.175]
-    	time_integrate  0.009
+    	time_integrate  0.007
     
 
 
@@ -143,7 +143,7 @@ defined as follows:
     	sighat          0.042
     	n_total         16384
     	confid_int      [ 6.223  6.287]
-    	time_integrate  0.332
+    	time_integrate  0.212
     
 
 
@@ -184,7 +184,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2517         
+    Solution: 6.2585         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -209,11 +209,11 @@ last example.
     	n_max           10000000000
     MeanVarData (AccumulateData Object)
     	levels          3
-    	solution        6.252
-    	n               [297058  39699   3687]
-    	n_total         343516
-    	confid_int      [ 6.203  6.301]
-    	time_integrate  0.177
+    	solution        6.258
+    	n               [344820  21326   3255]
+    	n_total         372473
+    	confid_int      [ 6.209  6.308]
+    	time_integrate  0.180
     
 
 

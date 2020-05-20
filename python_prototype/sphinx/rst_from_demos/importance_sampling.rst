@@ -80,7 +80,7 @@ With ordinary Monte Carlo we do the following:
     	n_total         65536
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.048
+    	time_integrate  0.095
 
 
 
@@ -120,7 +120,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Solution: 0.4503         
+    Solution: 0.4497         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -141,7 +141,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
     	n_total         16384
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.016
+    	time_integrate  0.021
 
 
 
@@ -153,7 +153,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.329 the time and 0.250 the samples
+    Imporance Sampling takes 0.225 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -260,7 +260,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7898         
+    Solution: 1.7935         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -272,7 +272,7 @@ Vanilla Monte Carlo
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	seed            3905652186
+    	seed            1161145085
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -285,9 +285,9 @@ Vanilla Monte Carlo
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        1.790
+    	solution        1.794
     	r_lag           4
-    	time_integrate  0.103
+    	time_integrate  0.145
 
 
 
@@ -317,7 +317,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7861         
+    Solution: 1.7700         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -329,7 +329,7 @@ Monte Carlo with Importance Sampling
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	seed            2522167006
+    	seed            3838116865
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -342,9 +342,9 @@ Monte Carlo with Importance Sampling
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         4096
-    	solution        1.786
+    	solution        1.770
     	r_lag           4
-    	time_integrate  0.023
+    	time_integrate  0.034
 
 
 
@@ -365,7 +365,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.221 the time and 0.250 the samples
+    Imporance Sampling takes 0.233 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -432,70 +432,70 @@ Importance Sampling MC vs QMC
       </thead>
       <tbody>
         <tr>
-          <td>CLT IIDStdUniform (MC)</td>
+          <th>CLT IIDStdUniform (MC)</th>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>3.24e+05</td>
           <td>7.21e-01</td>
         </tr>
         <tr>
-          <td>CLT IIDStdUniform (MC)</td>
+          <th>CLT IIDStdUniform (MC)</th>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>8.22e+04</td>
           <td>1.92e-01</td>
         </tr>
         <tr>
-          <td>MeanMC_g IIDStdGaussian (MC)</td>
+          <th>MeanMC_g IIDStdGaussian (MC)</th>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.82e+05</td>
           <td>3.10e-01</td>
         </tr>
         <tr>
-          <td>MeanMC_g IIDStdGaussian (MC)</td>
+          <th>MeanMC_g IIDStdGaussian (MC)</th>
           <td>1.00e+00</td>
           <td>1.77e+00</td>
           <td>1.27e+05</td>
           <td>9.38e-02</td>
         </tr>
         <tr>
-          <td>CLTRep Sobol (QMC)</td>
+          <th>CLTRep Sobol (QMC)</th>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>1.64e+04</td>
           <td>5.13e-02</td>
         </tr>
         <tr>
-          <td>CLTRep Sobol (QMC)</td>
+          <th>CLTRep Sobol (QMC)</th>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>1.64e+04</td>
           <td>4.71e-02</td>
         </tr>
         <tr>
-          <td>CubLattice_g Lattice (QMC)</td>
+          <th>CubLattice_g Lattice (QMC)</th>
           <td>0.00e+00</td>
           <td>1.75e+00</td>
           <td>4.10e+03</td>
           <td>2.03e-02</td>
         </tr>
         <tr>
-          <td>CubLattice_g Lattice (QMC)</td>
+          <th>CubLattice_g Lattice (QMC)</th>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>
           <td>6.12e-03</td>
         </tr>
         <tr>
-          <td>CubSobol_g Sobol (QMC)</td>
+          <th>CubSobol_g Sobol (QMC)</th>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.10e+03</td>
           <td>1.63e-02</td>
         </tr>
         <tr>
-          <td>CubSobol_g Sobol (QMC)</td>
+          <th>CubSobol_g Sobol (QMC)</th>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>

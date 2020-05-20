@@ -249,7 +249,7 @@ Plots samples on a 2D Keister function
     	n               65
     	n_total         81
     	confid_int      [ 1.646  2.464]
-    	time_integrate  0.001
+    	time_integrate  0.002
     
 
 

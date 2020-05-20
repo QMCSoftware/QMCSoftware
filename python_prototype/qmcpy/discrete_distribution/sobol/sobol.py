@@ -40,11 +40,10 @@ class Sobol(DiscreteDistribution):
                 warnings.warn(warning_s, ParameterWarning)
         elif self.backend == 'pytorch':         
             self.backend_gen = self.pytorch_sobol_gen
-            warning_s = '''
+            raise ParameterError('''
                 PyTorch SobolEngine issue. See https://github.com/pytorch/pytorch/issues/32047
                     SobolEngine 0^{th} vector is \\vec{.5} rather than \\vec{0}
-                    SobolEngine sometimes generates 1 after applying scramble'''
-            warnings.warn(warning_s, ParameterWarning)
+                    SobolEngine sometimes generates 1 after applying scramble''')
         else:
             raise ParameterError("Sobol backend must be either 'qrng', 'mps', or 'pytorch'")
         self.mimics = 'StdUniform'

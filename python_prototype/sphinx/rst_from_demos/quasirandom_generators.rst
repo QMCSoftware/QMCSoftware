@@ -118,7 +118,7 @@ reinitialized before every trial. <br
 
     # Load AccumulateData
     df_py = pd.read_csv('../outputs/lds_sequences/python_sequence_times.csv')
-    df_py.columns = ['n','py_l_MPS','py_l_GAIL','py_s_QRNG','py_s_MPS_OG','py_s_MPS_QMCPy','py_s_PYTORCH']
+    df_py.columns = ['n','py_l_MPS','py_l_GAIL','py_s_QRNG','py_s_MPS_QMCPy']
     df_m = pd.read_csv('../outputs/lds_sequences/matlab_sequence_times.csv', header=None)
     df_m.columns = ['n', 'm_l', 'm_s']
     df_r = pd.read_csv('../outputs/lds_sequences/r_sequence_times.csv',sep=' ')
@@ -168,123 +168,123 @@ reinitialized before every trial. <br
       </thead>
       <tbody>
         <tr>
-          <td>2.00e+00</td>
-          <td>8.33e-05</td>
-          <td>7.90e-05</td>
+          <th>2.00e+00</th>
+          <td>7.56e-05</td>
+          <td>7.41e-05</td>
           <td>3.76e-04</td>
         </tr>
         <tr>
-          <td>4.00e+00</td>
-          <td>1.00e-04</td>
-          <td>1.19e-04</td>
+          <th>4.00e+00</th>
+          <td>1.41e-04</td>
+          <td>1.31e-04</td>
           <td>2.23e-04</td>
         </tr>
         <tr>
-          <td>8.00e+00</td>
-          <td>1.36e-04</td>
-          <td>2.11e-04</td>
+          <th>8.00e+00</th>
+          <td>1.08e-04</td>
+          <td>1.49e-04</td>
           <td>1.54e-04</td>
         </tr>
         <tr>
-          <td>1.60e+01</td>
-          <td>1.27e-04</td>
-          <td>1.54e-04</td>
+          <th>1.60e+01</th>
+          <td>1.42e-04</td>
+          <td>1.59e-04</td>
           <td>1.59e-04</td>
         </tr>
         <tr>
-          <td>3.20e+01</td>
-          <td>1.57e-04</td>
-          <td>1.92e-04</td>
+          <th>3.20e+01</th>
+          <td>2.00e-04</td>
+          <td>3.07e-04</td>
           <td>1.68e-04</td>
         </tr>
         <tr>
-          <td>6.40e+01</td>
-          <td>1.66e-04</td>
-          <td>2.05e-04</td>
+          <th>6.40e+01</th>
+          <td>1.54e-04</td>
+          <td>2.19e-04</td>
           <td>1.60e-04</td>
         </tr>
         <tr>
-          <td>1.28e+02</td>
-          <td>1.82e-04</td>
-          <td>2.34e-04</td>
+          <th>1.28e+02</th>
+          <td>1.75e-04</td>
+          <td>2.88e-04</td>
           <td>1.60e-04</td>
         </tr>
         <tr>
-          <td>2.56e+02</td>
-          <td>1.79e-04</td>
-          <td>2.86e-04</td>
+          <th>2.56e+02</th>
+          <td>2.48e-04</td>
+          <td>4.22e-04</td>
           <td>1.72e-04</td>
         </tr>
         <tr>
-          <td>5.12e+02</td>
-          <td>1.89e-04</td>
-          <td>3.70e-04</td>
+          <th>5.12e+02</th>
+          <td>2.07e-04</td>
+          <td>1.32e-03</td>
           <td>1.87e-04</td>
         </tr>
         <tr>
-          <td>1.02e+03</td>
-          <td>2.45e-04</td>
-          <td>5.05e-04</td>
+          <th>1.02e+03</th>
+          <td>2.21e-04</td>
+          <td>1.09e-03</td>
           <td>1.85e-04</td>
         </tr>
         <tr>
-          <td>2.05e+03</td>
-          <td>2.87e-04</td>
-          <td>5.75e-04</td>
+          <th>2.05e+03</th>
+          <td>3.46e-04</td>
+          <td>1.02e-03</td>
           <td>2.02e-04</td>
         </tr>
         <tr>
-          <td>4.10e+03</td>
-          <td>2.65e-04</td>
-          <td>6.65e-04</td>
+          <th>4.10e+03</th>
+          <td>3.02e-04</td>
+          <td>6.87e-04</td>
           <td>3.15e-04</td>
         </tr>
         <tr>
-          <td>8.19e+03</td>
-          <td>3.46e-04</td>
-          <td>8.70e-04</td>
+          <th>8.19e+03</th>
+          <td>3.56e-04</td>
+          <td>9.63e-04</td>
           <td>3.59e-04</td>
         </tr>
         <tr>
-          <td>1.64e+04</td>
-          <td>5.38e-04</td>
-          <td>1.22e-03</td>
+          <th>1.64e+04</th>
+          <td>5.10e-04</td>
+          <td>1.34e-03</td>
           <td>5.28e-04</td>
         </tr>
         <tr>
-          <td>3.28e+04</td>
-          <td>8.42e-04</td>
-          <td>2.80e-03</td>
+          <th>3.28e+04</th>
+          <td>8.80e-04</td>
+          <td>2.83e-03</td>
           <td>6.85e-04</td>
         </tr>
         <tr>
-          <td>6.55e+04</td>
-          <td>1.30e-03</td>
-          <td>4.94e-03</td>
+          <th>6.55e+04</th>
+          <td>1.56e-03</td>
+          <td>5.03e-03</td>
           <td>1.56e-03</td>
         </tr>
         <tr>
-          <td>1.31e+05</td>
-          <td>2.34e-03</td>
-          <td>9.28e-03</td>
+          <th>1.31e+05</th>
+          <td>3.62e-03</td>
+          <td>1.49e-02</td>
           <td>2.35e-03</td>
         </tr>
         <tr>
-          <td>2.62e+05</td>
-          <td>8.47e-03</td>
-          <td>2.37e-02</td>
+          <th>2.62e+05</th>
+          <td>8.93e-03</td>
+          <td>2.06e-02</td>
           <td>4.93e-03</td>
         </tr>
         <tr>
-          <td>5.24e+05</td>
-          <td>1.34e-02</td>
-          <td>4.22e-02</td>
+          <th>5.24e+05</th>
+          <td>1.57e-02</td>
+          <td>8.68e-02</td>
           <td>9.92e-03</td>
         </tr>
         <tr>
-          <td>1.05e+06</td>
-          <td>2.37e-02</td>
-          <td>1.01e-01</td>
+          <th>1.05e+06</th>
+          <td>2.45e-02</td>
+          <td>9.22e-02</td>
           <td>1.99e-02</td>
         </tr>
       </tbody>
@@ -296,9 +296,8 @@ reinitialized before every trial. <br
 .. code:: ipython3
 
     # Sobol DataFrame
-    df_s = pd.concat([df_py['n'], df_py['py_s_QRNG'], df_py['py_s_MPS_OG'], df_py['py_s_MPS_QMCPy'], 
-                      df_py['py_s_PYTORCH'], df_m['m_s'], df_r['r_s']], axis=1)
-    df_s.columns = ['N_Sobol','QMCPy_QRNG','OG_MPS','QMCPy_MPS','QMCPy_PYTORCH','MATLAB','R']
+    df_s = pd.concat([df_py['n'], df_py['py_s_QRNG'], df_py['py_s_MPS_QMCPy'], df_m['m_s'], df_r['r_s']], axis=1)
+    df_s.columns = ['N_Sobol','QMCPy_QRNG','QMCPy_MPS','MATLAB','R']
     df_s.set_index('N_Sobol')
 
 
@@ -325,9 +324,7 @@ reinitialized before every trial. <br
         <tr style="text-align: right;">
           <th></th>
           <th>QMCPy_QRNG</th>
-          <th>OG_MPS</th>
           <th>QMCPy_MPS</th>
-          <th>QMCPy_PYTORCH</th>
           <th>MATLAB</th>
           <th>R</th>
         </tr>
@@ -337,188 +334,146 @@ reinitialized before every trial. <br
           <th></th>
           <th></th>
           <th></th>
-          <th></th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>2.00e+00</td>
-          <td>9.37e-05</td>
-          <td>7.75e-01</td>
-          <td>5.43e-04</td>
-          <td>8.64e-02</td>
+          <th>2.00e+00</th>
+          <td>3.71e-05</td>
+          <td>4.87e-04</td>
           <td>6.36e-04</td>
           <td>1.40e-04</td>
         </tr>
         <tr>
-          <td>4.00e+00</td>
-          <td>7.19e-05</td>
-          <td>9.30e-01</td>
-          <td>7.42e-04</td>
-          <td>1.84e-04</td>
+          <th>4.00e+00</th>
+          <td>4.68e-05</td>
+          <td>4.46e-04</td>
           <td>3.91e-04</td>
           <td>1.69e-04</td>
         </tr>
         <tr>
-          <td>8.00e+00</td>
-          <td>6.85e-05</td>
-          <td>7.70e-01</td>
-          <td>3.95e-04</td>
-          <td>1.09e-04</td>
+          <th>8.00e+00</th>
+          <td>3.02e-05</td>
+          <td>3.52e-04</td>
           <td>3.68e-04</td>
           <td>1.44e-04</td>
         </tr>
         <tr>
-          <td>1.60e+01</td>
-          <td>4.71e-05</td>
-          <td>7.50e-01</td>
-          <td>3.91e-04</td>
-          <td>1.05e-04</td>
+          <th>1.60e+01</th>
+          <td>2.85e-05</td>
+          <td>3.51e-04</td>
           <td>9.57e-04</td>
           <td>1.57e-04</td>
         </tr>
         <tr>
-          <td>3.20e+01</td>
-          <td>4.71e-05</td>
-          <td>7.80e-01</td>
-          <td>4.16e-04</td>
-          <td>1.04e-04</td>
+          <th>3.20e+01</th>
+          <td>9.24e-05</td>
+          <td>1.49e-03</td>
           <td>4.58e-04</td>
           <td>1.67e-04</td>
         </tr>
         <tr>
-          <td>6.40e+01</td>
-          <td>4.87e-05</td>
-          <td>7.67e-01</td>
-          <td>4.95e-04</td>
-          <td>1.06e-04</td>
+          <th>6.40e+01</th>
+          <td>3.21e-05</td>
+          <td>4.68e-04</td>
           <td>5.07e-04</td>
           <td>1.48e-04</td>
         </tr>
         <tr>
-          <td>1.28e+02</td>
-          <td>6.56e-05</td>
-          <td>8.94e-01</td>
-          <td>6.10e-04</td>
-          <td>1.06e-04</td>
+          <th>1.28e+02</th>
+          <td>4.37e-05</td>
+          <td>1.08e-03</td>
           <td>4.09e-04</td>
           <td>1.72e-04</td>
         </tr>
         <tr>
-          <td>2.56e+02</td>
-          <td>9.68e-05</td>
-          <td>7.56e-01</td>
-          <td>9.33e-04</td>
-          <td>1.05e-04</td>
+          <th>2.56e+02</th>
+          <td>5.62e-05</td>
+          <td>9.15e-04</td>
           <td>2.84e-04</td>
           <td>1.62e-04</td>
         </tr>
         <tr>
-          <td>5.12e+02</td>
-          <td>5.59e-05</td>
-          <td>9.98e-01</td>
-          <td>2.32e-03</td>
-          <td>1.51e-04</td>
+          <th>5.12e+02</th>
+          <td>1.38e-04</td>
+          <td>2.68e-03</td>
           <td>2.47e-04</td>
           <td>1.54e-04</td>
         </tr>
         <tr>
-          <td>1.02e+03</td>
-          <td>1.15e-04</td>
-          <td>9.72e-01</td>
-          <td>2.92e-03</td>
-          <td>1.45e-04</td>
+          <th>1.02e+03</th>
+          <td>1.32e-04</td>
+          <td>3.87e-03</td>
           <td>2.66e-04</td>
           <td>1.96e-04</td>
         </tr>
         <tr>
-          <td>2.05e+03</td>
-          <td>7.63e-05</td>
-          <td>9.41e-01</td>
-          <td>4.18e-03</td>
-          <td>1.13e-04</td>
+          <th>2.05e+03</th>
+          <td>1.28e-04</td>
+          <td>6.81e-03</td>
           <td>2.64e-04</td>
           <td>2.12e-04</td>
         </tr>
         <tr>
-          <td>4.10e+03</td>
-          <td>1.19e-04</td>
-          <td>8.31e-01</td>
-          <td>8.43e-03</td>
-          <td>1.18e-04</td>
+          <th>4.10e+03</th>
+          <td>1.01e-04</td>
+          <td>1.22e-02</td>
           <td>8.80e-04</td>
           <td>2.72e-04</td>
         </tr>
         <tr>
-          <td>8.19e+03</td>
-          <td>1.25e-04</td>
-          <td>8.56e-01</td>
-          <td>1.70e-02</td>
-          <td>1.42e-04</td>
+          <th>8.19e+03</th>
+          <td>1.32e-04</td>
+          <td>2.52e-02</td>
           <td>9.59e-04</td>
           <td>5.12e-04</td>
         </tr>
         <tr>
-          <td>1.64e+04</td>
-          <td>2.02e-04</td>
-          <td>8.87e-01</td>
-          <td>3.22e-02</td>
-          <td>1.74e-04</td>
+          <th>1.64e+04</th>
+          <td>1.98e-04</td>
+          <td>3.72e-02</td>
           <td>1.10e-03</td>
           <td>7.29e-04</td>
         </tr>
         <tr>
-          <td>3.28e+04</td>
-          <td>3.87e-04</td>
-          <td>1.20e+00</td>
-          <td>6.64e-02</td>
-          <td>2.34e-04</td>
+          <th>3.28e+04</th>
+          <td>3.36e-04</td>
+          <td>7.59e-02</td>
           <td>6.33e-04</td>
           <td>1.20e-03</td>
         </tr>
         <tr>
-          <td>6.55e+04</td>
-          <td>7.04e-04</td>
-          <td>1.13e+00</td>
-          <td>1.28e-01</td>
-          <td>4.08e-04</td>
+          <th>6.55e+04</th>
+          <td>9.16e-04</td>
+          <td>1.44e-01</td>
           <td>8.61e-04</td>
           <td>2.07e-03</td>
         </tr>
         <tr>
-          <td>1.31e+05</td>
-          <td>1.37e-03</td>
-          <td>1.50e+00</td>
-          <td>2.65e-01</td>
-          <td>6.71e-04</td>
+          <th>1.31e+05</th>
+          <td>1.81e-03</td>
+          <td>3.36e-01</td>
           <td>1.50e-03</td>
           <td>4.48e-03</td>
         </tr>
         <tr>
-          <td>2.62e+05</td>
-          <td>3.45e-03</td>
-          <td>2.29e+00</td>
-          <td>5.40e-01</td>
-          <td>1.16e-03</td>
+          <th>2.62e+05</th>
+          <td>2.60e-03</td>
+          <td>6.46e-01</td>
           <td>2.92e-03</td>
           <td>1.42e-02</td>
         </tr>
         <tr>
-          <td>5.24e+05</td>
-          <td>5.21e-03</td>
-          <td>4.28e+00</td>
-          <td>1.07e+00</td>
-          <td>2.21e-03</td>
+          <th>5.24e+05</th>
+          <td>6.30e-03</td>
+          <td>1.10e+00</td>
           <td>5.80e-03</td>
           <td>2.80e-02</td>
         </tr>
         <tr>
-          <td>1.05e+06</td>
-          <td>8.99e-03</td>
-          <td>6.05e+00</td>
-          <td>2.07e+00</td>
-          <td>4.47e-03</td>
+          <th>1.05e+06</th>
+          <td>1.04e-02</td>
+          <td>2.35e+00</td>
           <td>1.11e-02</td>
           <td>7.01e-02</td>
         </tr>
@@ -542,7 +497,7 @@ reinitialized before every trial. <br
     ax[0].set_title('Lattice')
     # Sobol Plot
     n = df_s['N_Sobol']
-    for s_type,color in zip(['QMCPy_QRNG','QMCPy_MPS','QMCPy_PYTORCH','MATLAB','R'],['g','y','r','k','b']):
+    for s_type,color in zip(['QMCPy_QRNG','QMCPy_MPS','MATLAB','R'],['g','y','r','k','b']):
         ax[1].loglog(n, df_s[s_type], label=s_type, color=color)
     ax[1].legend(loc='upper left')
     ax[1].set_xlabel('Sampling Points')
@@ -562,29 +517,4 @@ is significantly slower than using PyTorch backend or generating with
 MATLAB or R. It is important to note the above results are for 1
 replication of unshifted/unscrambled nodes and individual generator
 instances were initialized before each trial.
-
-*Magic Point Shop* Generators
------------------------------
-
-In an effort to improve the generators speed, QMCPy developers modified
-the Sobol generator developed in *The Magic Point Shop*. The following
-blocks visualize the speed improvement of QMCPy when generating 1
-dimensional unscrambled sobol nodes.
-
-.. code:: ipython3
-
-    fig,ax = plt.subplots(nrows=1, ncols=1, figsize=(7, 5))
-    n = df_l['N_Lattice']
-    suf_s = df_s['OG_MPS'].values / df_s['QMCPy_MPS'].values
-    ax.loglog(n, suf_s, label='Sobol', color='b')
-    ax.legend(loc='lower left')
-    ax.set_xlabel('Sampling Points')
-    ax.set_ylabel('Speed-Up Factor')
-    fig.suptitle('Speed Improvement of QMCPy MPS to Original MPS Generators')
-    plt.savefig('../outputs/lds_sequences/mps_speed_up_factor.png', dpi=200)
-
-
-
-.. image:: quasirandom_generators_files/quasirandom_generators_12_0.png
-
 
