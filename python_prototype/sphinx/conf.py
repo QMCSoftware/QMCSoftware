@@ -23,7 +23,6 @@ from recommonmark.transform import AutoStructify
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath("../"))  # python_prototype
 sys.path.insert(0, os.path.abspath("../python_prototype/"))
-print("root directory = %s " % os.getcwd())
 
 # -- Project information -----------------------------------------------------
 project = u"QMCPy"
@@ -40,6 +39,7 @@ release = u"0.1"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
+latex_elements = {"preamble": r'\usepackage{enumitem}\setlistdepth{99}\usepackage{threeparttable}'}
 
 extensions = [
     "sphinx_math_dollar",
@@ -63,7 +63,6 @@ extensions = [
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
-autodoc_mock_imports = ["torch"]
 
 # Napoleon settings
 napoleon_google_docstring = True
