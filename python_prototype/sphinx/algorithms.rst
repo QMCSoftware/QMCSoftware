@@ -3,18 +3,49 @@ QMCPy Documentation
 
 
 
+Stopping Criterion Algorithms
+-----------------------------
+
+Cubature Lattice Garunteed (qMC)
+................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_lattice_g
+    :members:
+
+Cubature Sobol Garunteed (qMC)
+..............................
+
+.. automodule:: qmcpy.stopping_criterion.cub_sobol_g
+    :members:
+
+Central Limit Theorem for Replications (qMC)
+............................................
+
+.. automodule:: qmcpy.stopping_criterion.clt_rep
+    :members:
+
+Multilevel Monte Carlo (MC)
+...........................
+
+.. automodule:: qmcpy.stopping_criterion.mlmc
+    :members:
+
+Mean Monte Carlo Garunteed (MC)
+...............................
+
+.. automodule:: qmcpy.stopping_criterion.mean_mc_g
+    :members:
+
+Central Limit Theorem (MC)
+..........................
+
+.. automodule:: qmcpy.stopping_criterion.clt
+    :members:
+
+
+
 Integrand Class
 ---------------
-
-.. The following extract documentation in qmcpy.integrand.__init__.py
-.. automodule:: qmcpy.integrand
-    :members:
-
-Asian Call Option Payoff
-.........................
-
-.. automodule:: qmcpy.integrand.asian_call
-    :members:
 
 Keister Function
 ................
@@ -22,214 +53,156 @@ Keister Function
 .. automodule:: qmcpy.integrand.keister
     :members:
 
-A Linear Function
-..................
+Asian Call Option
+.................
 
-.. automodule:: qmcpy.integrand.linear
+.. automodule:: qmcpy.integrand.asian_call
     :members:
 
-Quick Construct for Function
-.............................
+Various Call Options by Milstein Discretization 
+...............................................
+
+.. automodule:: qmcpy.integrand.call_options
+    :members:
+
+Custom Function
+...............
 
 .. automodule:: qmcpy.integrand.quick_construct
     :members:
 
+Linear Function
+...............
 
+.. automodule:: qmcpy.integrand.linear
+    :members:
 
 
 
 Measure Class
 -------------
 
-.. The following extract documentation in qmcpy.true_measure.__init__.py
-.. automodule:: qmcpy.true_measure
-    :members:
-
 Uniform
-........
+.......
 
 .. automodule:: qmcpy.true_measure.uniform
     :members:
 
 Gaussian
-.........
+........
 
 .. automodule:: qmcpy.true_measure.gaussian
     :members:
 
 Brownian Motion
-................
+...............
 
 .. automodule:: qmcpy.true_measure.brownian_motion
     :members:
 
 Lebesgue
-.........
+........
 
 .. automodule:: qmcpy.true_measure.lebesgue
     :members:
 
-IdentityTransform
+Identity Transform
 ..................
 
 .. automodule:: qmcpy.true_measure.identity_transform
     :members:
 
+Importance Sampling
+...................
 
+.. automodule:: qmcpy.true_measure.importance_sampling
+    :members:
 
 
 
 Discrete Distribution Class
 ---------------------------
 
-.. The following extract documentation in qmcpy.discrete_distribution.__init__.py
-.. automodule:: qmcpy.discrete_distribution
+Lattice
+.......
+
+.. automodule:: qmcpy.discrete_distribution.lattice.lattice
+    :members:
+
+Sobol
+.....
+
+.. automodule:: qmcpy.discrete_distribution.sobol.sobol
     :members:
 
 IID Standard Uniform
-.....................
+....................
 
 .. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
 IID Standard Gaussian
-......................
+.....................
 
 .. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
     :members:
 
 Custom IID Distribution
-......................
+.......................
 
 .. automodule:: qmcpy.discrete_distribution.custom_iid_distribution
     :members:
 
-Lattice
-........
-
-.. automodule:: qmcpy.discrete_distribution.lattice.lattice
-    :members:
-
-Lattice GAIL Backend
-.....................
-
-.. automodule:: qmcpy.discrete_distribution.lattice.gail_lattice
-    :members:
-
-Lattice Magic Point Shop Backend
-.................................
-
-.. automodule:: qmcpy.discrete_distribution.lattice.mps_lattice
-    :members:
-
-Sobol
-......
-
-.. automodule:: qmcpy.discrete_distribution.sobol.sobol
-    :members:
-
-Sobol Magic Point Shop Backend
-...............................
-
-.. automodule:: qmcpy.discrete_distribution.sobol.mps_sobol
-    :members:
-
 Inverse CDF Sampling
-.....................
+....................
 
 .. automodule:: qmcpy.discrete_distribution.inverse_cdf_sampling
     :members:
 
 Acceptance Rejection Sampling
-............................
+.............................
 
 .. automodule:: qmcpy.discrete_distribution.acceptance_rejection_sampling
     :members:
 
 
 
-
 Accumulate Data Class
-----------
+---------------------
 
-.. The following extract documentation in qmcpy.accumulate_data.__init__.py
-.. automodule:: qmcpy.accumulate_data
-    :members:
-
-Mean Variance Data
+Cubature Data (qMC)
 ...................
-
-.. automodule:: qmcpy.accumulate_data.mean_var_data
-    :members:
-
-Mean Variance for Replications Data
-....................................
-
-.. automodule:: qmcpy.accumulate_data.mean_var_data_rep
-    :members:
-
-Cubature Data
-..............
 
 .. automodule:: qmcpy.accumulate_data.cubature_data
     :members:
 
+Mean Variance for Replications Data (qMC)
+.........................................
 
-
-
-
-Stopping Criterion Class
--------------------------
-
-.. The following extract documentation in qmcpy.stop.__init__.py
-.. automodule:: qmcpy.stopping_criterion
+.. automodule:: qmcpy.accumulate_data.mean_var_data_rep
     :members:
 
-Central Limit Theorem
-......................
+Multilevel Data (MC)
+....................
 
-.. automodule:: qmcpy.stopping_criterion.clt
+.. automodule:: qmcpy.accumulate_data.mlmc_data
     :members:
+    
+Mean Variance Data (MC)
+.......................
 
-Mean Monte Carlo Garunteed
-...........................
-
-.. automodule:: qmcpy.stopping_criterion.mean_mc_g
+.. automodule:: qmcpy.accumulate_data.mean_var_data
     :members:
-
-Central Limit Theorem for Replications
-.......................................
-
-.. automodule:: qmcpy.stopping_criterion.clt_rep
-    :members:
-
-Cubature Lattice Garunteed
-...........................
-
-.. automodule:: qmcpy.stopping_criterion.cub_lattice_g
-    :members:
-
-Cubature Sobol Garunteed
-...........................
-
-.. automodule:: qmcpy.stopping_criterion.cub_sobol_g
-    :members:
-
-
 
 
 
 Utilities
 ---------
 
-.. The following extract documentation in qmcpy.__init__.py
-.. automodule:: qmcpy
-    :members:
+Math Functions
+..............
 
-Multi-Level Constructor
-........................
-
-.. automodule:: qmcpy.util.multilevel_constructor
+.. automodule:: qmcpy.util.math_functions
     :members:
 
 Exceptions and Warnnings
@@ -239,7 +212,7 @@ Exceptions and Warnnings
     :members:
 
 Abstraction Functions
-......................
+.....................
 
 .. automodule:: qmcpy.util.abstraction_functions
     :members:

@@ -4,10 +4,10 @@ About Our QMC Software Community
 .. toctree::
     :maxdepth: 1
 
-    markdown_to_rst/QMCSoftware.rst
+    readme_rst/QMCSoftware.rst
 
-    markdown_to_rst/python_prototype.rst
+    readme_rst/python_prototype.rst
 
-    markdown_to_rst/qmcpy.rst
+    readme_rst/qmcpy.rst
 
-    markdown_to_rst/test.rst
+    readme_rst/test.rst
