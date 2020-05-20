@@ -12,6 +12,9 @@ qmcpy.egg-info/
 .DS_Store
 .idea/
 
+# C
+*.so
+
 # Website
 docs/_site
 docs/Gemfile.lock

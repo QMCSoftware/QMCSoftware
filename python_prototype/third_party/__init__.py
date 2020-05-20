@@ -1,1 +1,0 @@
-from .magic_point_shop import *
