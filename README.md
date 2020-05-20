@@ -27,7 +27,7 @@ Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community So
 
 ## Documentation 
 
-PDF and EPUB ocumentation of QMCPy is available for download at  Read the Docs website
+PDF and EPUB documentation of QMCPy is available for download at  Read the Docs website
 [https://readthedocs.org/projects/qmcpy/downloads/](https://readthedocs.org/projects/qmcpy/downloads/).
 
 In addition, we have HTML documentation at [https://qmcpy.readthedocs.io/en/latest/](https://qmcpy.readthedocs.io/en/latest/)
@@ -38,20 +38,17 @@ In addition, we have HTML documentation at [https://qmcpy.readthedocs.io/en/late
  
 - Sou-Cheng T. Choi
 - Fred J. Hickernell
+- Michael McCourt
+- Jagadeeswaran Rathinavel
 - Aleksei Sorokin
 
 <hr>
 
-## Contributors
-
-- Michael McCourt
-
-<hr>
-
-## Acknowledgment 
-
-We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.
-
+## Collaborators
+- Mike Giles
+- Marius Hofert
+- Christiane Lemieux
+- Dirk Nuyens
 
 <hr>
 
@@ -80,6 +77,12 @@ We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.
 <b>[11]</b> Fred J. Hickernell and Lluis Antoni Jimenez Rugama, "Reliable adaptive cubature using digital sequences", Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA], pp. 367-383.
 
 <b>[12]</b> Faure, Henri, and Christiane Lemieux. “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
+
+<b>[13]</b> M.B. Giles. 'Multi-level Monte Carlo path simulation'. Operations Research, 56(3):607-617, 2008. http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
+
+<b>[14]</b> M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'. 343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008. http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
+
+The MATLAB code used to produce the figures for the paper is available here.
 
 <hr>
 

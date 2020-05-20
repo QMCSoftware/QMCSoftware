@@ -8,7 +8,8 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	_dim_frac       0
+	dimensions      64
+	dim_fracs       0
 IIDStdGaussian (DiscreteDistribution Object)
 	dimension       64
 	seed            7
@@ -29,7 +30,7 @@ MeanVarData (AccumulateData Object)
 	n               50740
 	n_total         51764
 	confid_int      [ 5.710  5.910]
-	time_integrate  0.202
+	time_integrate  0.223
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -40,7 +41,8 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	_dim_frac       0
+	dimensions      64
+	dim_fracs       0
 Lattice (DiscreteDistribution Object)
 	dimension       64
 	scramble        1
@@ -63,7 +65,7 @@ MeanVarDataRep (AccumulateData Object)
 	sighat          0.118
 	n_total         8192
 	confid_int      [ 5.745  5.927]
-	time_integrate  0.090
+	time_integrate  0.091
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -74,7 +76,8 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	_dim_frac       0
+	dimensions      64
+	dim_fracs       0
 IIDStdGaussian (DiscreteDistribution Object)
 	dimension       64
 	seed            7
@@ -95,7 +98,7 @@ MeanVarData (AccumulateData Object)
 	n               82304
 	n_total         83328
 	confid_int      [ 5.717  5.917]
-	time_integrate  0.344
+	time_integrate  0.391
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -106,7 +109,8 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	_dim_frac       0
+	dimensions      64
+	dim_fracs       0
 Lattice (DiscreteDistribution Object)
 	dimension       64
 	scramble        1
@@ -136,7 +140,8 @@ AsianCall (Integrand Object)
 	strike_price    25
 	interest_rate   0.010
 	mean_type       geometric
-	_dim_frac       0
+	dimensions      64
+	dim_fracs       0
 Sobol (DiscreteDistribution Object)
 	dimension       64
 	scramble        1

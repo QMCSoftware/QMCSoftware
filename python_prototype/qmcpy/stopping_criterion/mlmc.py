@@ -21,15 +21,18 @@ class MLMC(StoppingCriterion):
         multi-level Monte Carlo estimation
 
         Args:
-            integrand (Integrand): integrand that takes in argument l (level) and returns sums,cost
-                such that
-                    sums: for Y iid samples with expected value
-                            sums(1) = sum(Y)
-                            sums(2) = sum(Y.^2)
-                        where Y are iid samples with expected value:
+            integrand (Integrand): integrand with g method such that 
+                Args:
+                    x (ndarray): nx(integrand.dim_at_level(l)) array of samples from discrete distribution
+                    l (int): level
+                Returns:
+                    sums (list/ndarray): for Y iid function evaluations with expected values
                             E[P_0]           on level 0
                             E[P_l - P_{l-1}] on level l>0
-                    cost : cost of n samples
+                        then return
+                            sums(1) = sum(Y)
+                            sums(2) = sum(Y.^2)
+                    cost (float): cost of n samples
             rmse_tol (float): desired accuracy (rms error) > 0 
             n_init (int): initial number of samples
             n_max (int): maximum number of samples

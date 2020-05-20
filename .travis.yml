@@ -55,18 +55,13 @@ before_install:
 - cd python_prototype
 - pip install --upgrade pip
 - pip install codecov
-- git clone https://github.com/QMCSoftware/qrngpy.git
-- cd qrngpy
-- make all
-- cd ..
+- make qrng
 
 install:
 - pip install --quiet -r requirements.txt
 - pip install -e .
 
 script:
-# - python -W ignore -m unittest discover -s test/fasttests
-# - python -W ignore -m unittest discover -s test/longtests
 - coverage run --source=./ -m unittest discover -s test/fasttests
 - coverage run --append --source=./ -m unittest discover -s test/longtests
 

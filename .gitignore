@@ -27,7 +27,6 @@ python_prototype/sphinx/rst_from_demos/
 
 # Jupyter Notebooks
 *checkpoint.ipynb
-python_prototype/demos/html_renders/nei_demo.html
 
 # alegresor
 *.vscode
