@@ -1,48 +1,53 @@
 qrngpath = qmcpy/discrete_distribution/qrng/
-qrng_:
+qrng:
 	$ gcc -fPIC -shared  -o $(qrngpath)qrng_lib.so $(qrngpath)*.c -lm
 
-test_:
+tests:
 	python -W ignore -m unittest discover -s test/fasttests/ 1>/dev/null
 	python -W ignore -m unittest discover -s test/longtests/ 1>/dev/null
 
 mddir = sphinx/readme_rst/
 nbdir = sphinx/demo_rst/
-nbconvertcmd = jupyter nbconvert --to rst --output-dir='$(nbdir)' demos/
-docs_:
+nbconvertcmd = jupyter nbconvert --to rst --output-dir='$(nbdir)'
+_doc:
+	# Make Directries
+	@-rm -r $(mddir) 2>/dev/null &
+	@-rm -r $(nbdir) 2>/dev/null &
 	# READMEs --> RST
-	mkdir $(mddir)
+	@mkdir $(mddir)
 	#	QMCSoftware
-	echo 'Converting README: QMCSoftware'
-	grep -v  "\[\!" ../README.md > ../README2.md
-	pandoc --mathjax ../README2.md -o $(mddir)QMCSoftware.rst
-	rm ../README2.md
+	@grep -v  "\[\!" ../README.md > ../README2.md
+	@pandoc --mathjax ../README2.md -o $(mddir)QMCSoftware.rst
+	@rm ../README2.md
 	# 	python_prototype
-	echo 'Converting README: python_prototype'
-	pandoc --mathjax README.md -o $(mddir)python_prototype.rst
+	@pandoc --mathjax README.md -o $(mddir)python_prototype.rst
 	# 	qmcpy
-	echo 'Converting README: qmcpy'
-	pandoc --mathjax qmcpy/README.md -o $(mddir)qmcpy.rst
+	@pandoc --mathjax qmcpy/README.md -o $(mddir)qmcpy.rst
 	# 	test
-	echo 'Converting README: test'
-	pandoc --mathjax test/README.md -o $(mddir)test.rst
+	@pandoc --mathjax test/README.md -o $(mddir)test.rst
 	# Jupyter Notebook Demos --> RST
-	mkdir $(nbdir)	
-	for f in demos/*.ipynb;	do
-	echo "Converting Jupyter Notebook: $f"
-	$(nbconvertcmd)$f
+	@mkdir $(nbdir)
+	@for f in demos/*.ipynb; do \
+	echo "#\tConverting $$f"; \
+	$(nbconvertcmd) $$f 2>/dev/null;\
 	done
-	# Generate HTML
-	echo 'Generating HTML'
-	cd sphinx && make clean && make html
-	# Generate PDF 
-	echo 'Generating PDF'
-	cd sphinx && make clean && make pdf
-	# Generate EPUB
-	echo 'Generating EPUB'
-	cd sphinx && make clean && make epub
-
-workouts_:
+	@rm -f $(nbdir)nei_demo.rst 
+	@rm -r $(nbdir)nei_demo_files/
+	@-cd sphinx && make clean
+doc_html: _doc
+	-$(MAKE) -C sphinx html 2>/dev/null
+	@-rm -r $(mddir)
+	@-rm -r $(nbdir)
+doc_pdf: _doc
+	-$(MAKE) -C sphinx latex 2>/dev/null
+	-$(MAKE) -C sphinx/_build/latex/ all-pdf -W --keep-going
+	@-rm -r $(mddir)
+	@-rm -r $(nbdir)
+doc_epub: _doc
+	-$(MAKE) -C sphinx epub 2>/dev/null
+	@-rm -r $(mddir)
+	@-rm -r $(nbdir)
+workout:
 	# example_constructions
 	python workouts/example_constructions/distributions.py > outputs/example_constructions/distributions.log
 	python workouts/example_constructions/integrands.py > outputs/example_constructions/integrands.log
