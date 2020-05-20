@@ -1,6 +1,6 @@
 """ Abstract Class TrueMeasure """
 
-from ..util import MethodImplementationError, univ_repr
+from ..util import MethodImplementationError, univ_repr, DimensionError
 from copy import deepcopy
 
 
@@ -51,7 +51,7 @@ class TrueMeasure(object):
         Reset the dimension of the problem.
         Calls DiscreteDistribution.set_dimension
         """
-        raise TransformError("Cannot reset dimension of %s object"%str(type(self).__name__))
+        raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
 
     def __repr__(self):
         return univ_repr(self, "TrueMeasure", ['distrib_name']+self.parameters)

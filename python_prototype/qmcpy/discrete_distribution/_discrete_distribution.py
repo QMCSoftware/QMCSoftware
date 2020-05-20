@@ -1,6 +1,6 @@
 """ DiscreteDistribution is an abstract class. """
 
-from ..util import ParameterError, MethodImplementationError, univ_repr
+from ..util import ParameterError, MethodImplementationError, univ_repr, DimensionError
 from numpy import array
 
 
@@ -30,7 +30,7 @@ class DiscreteDistribution(object):
         Reset the dimension of the problem.
         Calls DiscreteDistribution.set_dimension
         """
-        raise TransformError("Cannot reset dimension of %s object"%str(type(self).__name__))
+        raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
 
     def __repr__(self):
         return univ_repr(self, "DiscreteDistribution", self.parameters)

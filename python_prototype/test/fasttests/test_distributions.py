@@ -1,14 +1,13 @@
 """ Unit tests for discrete distributions in QMCPy """
 
 from qmcpy import *
-from numpy import array, int64, log2, ndarray, vstack, zeros, random, log
+from qmcpy.util import *
+from numpy import *
 import unittest
 
 
 class TestIIDStdUniform(unittest.TestCase):
-    """
-    Unit tests for IIDStdUniform in QMCPy.
-    """
+    """ Unit tests for IIDStdUniform DiscreteDistribution. """
 
     def test_mimics(self):
         distribution = IIDStdUniform(dimension=3)
@@ -21,12 +20,16 @@ class TestIIDStdUniform(unittest.TestCase):
             self.assertEqual(type(samples), ndarray)
         with self.subTest():
             self.assertEqual(samples.shape, (5,3))
+    
+    def test_set_dimension(self):
+        distribution = IIDStdUniform(dimension=2)
+        distribution.set_dimension(3)
+        samples = distribution.gen_samples(4)
+        self.assertTrue(samples.shape==(4,3))
 
 
 class TestIIDGaussian(unittest.TestCase):
-    """
-    Unit tests for IIDStdGaussian in QMCPy.
-    """
+    """ Unit tests for IIDStdGaussian DiscreteDistribution. """
 
     def test_mimics(self):
         distribution = IIDStdGaussian(dimension=3)
@@ -40,11 +43,15 @@ class TestIIDGaussian(unittest.TestCase):
         with self.subTest():
             self.assertEqual(samples.shape, (5,3))
 
+    def test_set_dimension(self):
+        distribution = IIDStdGaussian(dimension=2)
+        distribution.set_dimension(3)
+        samples = distribution.gen_samples(4)
+        self.assertTrue(samples.shape==(4,3))
+
 
 class TestLattice(unittest.TestCase):
-    """
-    Unit tests for Lattice sampling points in QMCPy.
-    """
+    """ Unit tests for Lattice DiscreteDistribution. """
 
     def test_mimics(self):
         distribution = Lattice(dimension=3, scramble=True, backend='MPS')
@@ -76,12 +83,18 @@ class TestLattice(unittest.TestCase):
             [1/4,   1/4,    1/4,    1/4],
             [3/4,   3/4,    3/4,    3/4]])
         self.assertTrue((distribution.gen_samples(n_min=0,n_max=4)==true_sample).all())
+    
+    def test_set_dimension(self):
+        for backend in ['MPS','GAIL']:
+            distribution = Lattice(dimension=2,backend=backend)
+            distribution.set_dimension(3)
+            samples = distribution.gen_samples(4)
+            with self.subTest():
+                self.assertTrue(samples.shape==(4,3))
 
 
 class TestSobol(unittest.TestCase):
-    """
-    Unit tests for Sobol sampling points in QMCPy.
-    """
+    """ Unit tests for Sobol DiscreteDistribution. """
 
     def test_mimics(self):
         distribution = Sobol(dimension=3, scramble=True, backend='QRNG')
@@ -96,21 +109,29 @@ class TestSobol(unittest.TestCase):
             with self.subTest():
                 self.assertEqual(samples.shape, (4,3))
 
+    def test_set_dimension(self):
+        for backend in ['MPS','QRNG']:
+            distribution = Sobol(dimension=2,backend=backend)
+            distribution.set_dimension(3)
+            samples = distribution.gen_samples(4)
+            with self.subTest():
+                self.assertTrue(samples.shape==(4,3))
+
 
 class TestCustomIIDDistribution(unittest.TestCase):
-    """
-    Unit tests for CustomIIDDistribution
-    """
+    """ Unit tests for CustomIIDDistribution DiscreteDistribution. """
 
     def test_gen_samples(self):
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
         distribution.gen_samples(10)
 
+    def test_set_dimension(self):
+        distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
+        self.assertRaises(DimensionError,distribution.set_dimension,3)
+                
 
 class TestAcceptanceRejectionSampling(unittest.TestCase):
-    """
-    Unit tests for AcceptanceRejectionSampling
-    """
+    """ Unit tests for AcceptanceRejectionSampling DiscreteDistribution. """
 
     def test_gen_samples(self):
         def f(x):
@@ -122,18 +143,24 @@ class TestAcceptanceRejectionSampling(unittest.TestCase):
             objective_pdf = f,
             measure_to_sample_from = Uniform(IIDStdUniform(1)))
         distribution.gen_samples(10)
+    
+    def test_set_dimension(self):
+        distribution = AcceptanceRejectionSampling(lambda x: 1, Uniform(IIDStdGaussian(2)))
+        self.assertRaises(DimensionError,distribution.set_dimension,3)   
 
 
 class TestInverseCDFSampling(unittest.TestCase):
-    """
-    Unit tests for InverseCDFSampling
-    """
+    """ Unit tests for InverseCDFSampling DiscreteDistribution. """
 
     def test_gen_samples(self):
         distribution = InverseCDFSampling(Lattice(2),
             inverse_cdf_fun = lambda u,l=5: -log(1-u)/l)
                         # see sampling measures demo
         distribution.gen_samples(8)
+    
+    def test_set_dimension(self):
+        distribution = InverseCDFSampling(Lattice(2),lambda u: u)
+        self.assertRaises(DimensionError,distribution.set_dimension,3)   
 
 
 if __name__ == "__main__":

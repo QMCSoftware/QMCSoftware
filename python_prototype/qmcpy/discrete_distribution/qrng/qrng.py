@@ -7,6 +7,7 @@ import platform
 
 my_os = platform.system()
 path = os.path.dirname(os.path.abspath(__file__))
+<<<<<<< HEAD:python_prototype/qmcpy/discrete_distribution/qrngpy/qrng.py
 if my_os == "Linux":
     lib = ctypes.CDLL(path + '/qrngpy.so', mode=ctypes.RTLD_GLOBAL)
 elif my_os == "Darwin":  # Mac
@@ -16,6 +17,9 @@ elif my_os == "Windows":
 else:
     print("Unknown platform %s" % my_os)
 
+=======
+lib = ctypes.CDLL(path+'/qrng_lib.so',mode=ctypes.RTLD_GLOBAL)
+>>>>>>> update fasttests:python_prototype/qmcpy/discrete_distribution/qrng/qrng.py
 # MRG63k3a
 mrg63ka_f = lib.MRG63k3a
 mrg63ka_f.argtypes = None
