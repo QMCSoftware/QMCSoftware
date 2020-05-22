@@ -7,7 +7,7 @@ Integrand
 | The function to integrate
 | *Abstract class with concrete implementations*
 
--  Linear: :math:`y_i = \sum_{j=0}^{d-1}(x_{ij})`
+-  Linear: :math:`g(\boldsymbol{x}_i) = \sum_{j=1}^{d}(x_{ij})`
 -  Keister: :math:`y_i = \pi^{d/2} \, \cos(||\boldsymbol{x}_i||_2)`
 -  Asian Call
 
