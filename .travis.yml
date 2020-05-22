@@ -58,7 +58,7 @@ before_install:
 - make qrng
 
 install:
-- pip install --quiet -r requirements.txt
+- pip install --quiet -r requirements/dev.txt
 - pip install -e .
 
 script:

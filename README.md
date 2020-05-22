@@ -76,11 +76,13 @@ In addition, we have HTML documentation at [https://qmcpy.readthedocs.io/en/late
 
 <b>[11]</b> Fred J. Hickernell and Lluis Antoni Jimenez Rugama, "Reliable adaptive cubature using digital sequences", Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA], pp. 367-383.
 
-<b>[12]</b> Faure, Henri, and Christiane Lemieux. “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
+<b>[12]</b> Marius Hofert and Christiane Lemieux (2019). qrng: (Randomized) Quasi-Random Number Generators. R package version 0.0-7. https://CRAN.R-project.org/package=qrng.
 
-<b>[13]</b> M.B. Giles. 'Multi-level Monte Carlo path simulation'. Operations Research, 56(3):607-617, 2008. http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
+<b>[13]</b> Faure, Henri, and Christiane Lemieux. “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
 
-<b>[14]</b> M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'. 343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008. http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
+<b>[14]</b> M.B. Giles. 'Multi-level Monte Carlo path simulation'. Operations Research, 56(3):607-617, 2008. http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
+
+<b>[15]</b> M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'. 343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008. http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
 
 The MATLAB code used to produce the figures for the paper is available here.
 

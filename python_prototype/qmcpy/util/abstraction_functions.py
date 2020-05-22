@@ -47,7 +47,7 @@ def univ_repr(qmc_object, abc_class_name, attributes):
         if isinstance(val, int) or (isinstance(val, float) and val % 1 == 0):
             string_temp = '\t%-15s %d' % (key, int(val))
         elif isinstance(val, float):
-            string_temp = '\t%-15s %0.3f' % (key, val)
+            string_temp = '\t%-15s %0.4f' % (key, val)
         else:
             string_temp = '\t%-15s %s' % (key, val)
         string += string_temp.replace('\n', '\n\t%-15s' % ' ') + '\n'
