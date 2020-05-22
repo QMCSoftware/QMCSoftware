@@ -1,5 +1,5 @@
 # General Python
-python_prototype/__pycache__/
+*__pycache__/
 qmcpy.egg-info/
 *.blg
 *.idx
@@ -20,10 +20,10 @@ docs/_site
 docs/Gemfile.lock
 
 # Sphinx
-python_prototype/sphinx/_build/
-python_prototype/sphinx/_static/
-python_prototype/sphinx/markdown_to_rst/
-python_prototype/sphinx/rst_from_demos/
+sphinx/_build/
+sphinx/_static/
+sphinx/markdown_to_rst/
+sphinx/rst_from_demos/
 
 # Jupyter Notebooks
 *checkpoint.ipynb
