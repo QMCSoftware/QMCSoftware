@@ -64,7 +64,11 @@ before_install:
 >>>>>>> documentation updates
 
 install:
+<<<<<<< HEAD
 - pip install --quiet -r requirements/level_1_add_tests.txt
+=======
+- pip install --quiet -r requirements/dev.txt
+>>>>>>> reference updates
 - pip install -e .
 
 script:
