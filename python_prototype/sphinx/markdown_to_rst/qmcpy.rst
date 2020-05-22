@@ -7,7 +7,7 @@ Integrand
 | The function to integrate
 | *Abstract class with concrete implementations*
 
--  Linear: :math:`g(\boldsymbol{x}_i) = \sum_{j=1}^{d}(x_{ij})`
+-  Linear: :math:`g(\boldsymbol{x}) = \sum_{j=1}^{d}(x_{j})`
 -  Keister: :math:`y_i = \pi^{d/2} \, \cos(||\boldsymbol{x}_i||_2)`
 -  Asian Call
 
@@ -31,7 +31,7 @@ True Measure
 
 -  Uniform: :math:`\mathcal{U}(a,b)`
 -  Gaussian: :math:`\mathcal{N}(\mu,\sigma^2)`
--  Brownian Motion:
+-  Discrete Brownian Motion:
    :math:`\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;` for
    :math:`\;Z_j \sim \mathcal{N}(0,1)`
 -  Lebesgue
@@ -71,13 +71,13 @@ Stopping Criterion
 **For IID Nodes** :math:`x_i\sim` iid
 
 -  Central Limit Theorem (CLT)
--  MeanMC\_g (gauranteed)
+-  MeanMC_g (guaranteed)
 
 **For QMC Sequences** :math:`\{x_{r,i}\}_{r=1}^R \sim` lds
 
 -  CLT Repeated
--  CubLattice\_g (gauranteed)
--  CubSobol\_g (gauranteed)
+-  CubLattice_g (gauranteed)
+-  CubSobol_g (gauranteed)
 
 .. raw:: html
 

@@ -59,7 +59,7 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4500         
+    Solution: 0.4498         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -80,7 +80,7 @@ With ordinary Monte Carlo we do the following:
     	n_total         65536
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.095
+    	time_integrate  0.079
 
 
 
@@ -120,7 +120,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Solution: 0.4497         
+    Solution: 0.4500         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -141,7 +141,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
     	n_total         16384
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.021
+    	time_integrate  0.018
 
 
 
@@ -174,17 +174,15 @@ multidimensional integral
 
 where
 
-.. raw:: latex
-
-   \begin{align*} 
-   \boldsymbol{X} & \sim \mathcal{N}(\boldsymbol{0}, \mathsf{\Sigma}), \qquad
-   \mathsf{\Sigma} = \bigl(\min(j,k)T/d \bigr)_{j,k=1}^d, \\
-   d & =  13 \text{ in this case} \\
-   f(\boldsymbol{x}) & = \max\biggl(K - \frac 1d \sum_{j=1}^d
-   S(jT/d,\boldsymbol{x}), 0 \biggr) \mathrm{e}^{-rT}, \\
-   S(jT/d,\boldsymbol{x}) &= S(0) \exp\bigl((r - \sigma^2/2) jT/d +
-   \sigma x_j\bigr).
-   \end{align*}
+:raw-latex:`\begin{align*} 
+\boldsymbol{X} & \sim \mathcal{N}(\boldsymbol{0}, \mathsf{\Sigma}), \qquad
+\mathsf{\Sigma} = \bigl(\min(j,k)T/d \bigr)_{j,k=1}^d, \\
+d & =  13 \text{ in this case} \\
+f(\boldsymbol{x}) & = \max\biggl(K - \frac 1d \sum_{j=1}^d
+S(jT/d,\boldsymbol{x}), 0 \biggr) \mathrm{e}^{-rT}, \\
+S(jT/d,\boldsymbol{x}) &= S(0) \exp\bigl((r - \sigma^2/2) jT/d +
+\sigma x_j\bigr).
+\end{align*}`
 
 We will replace :math:`\boldsymbol{X}` by
 
@@ -197,27 +195,25 @@ where a positive :math:`a` will create more positive payoffs. This
 corresponds to giving our Brownian motion a drift. To do this we
 re-write the integral as
 
-.. raw:: latex
-
-   \begin{gather*} 
-   \mu = \mathbb{E}[f_{\mathrm{new}}(\boldsymbol{Z})] 
-   = \int_{\mathbb{R}^d}
-   f_{\mathrm{new}}(\boldsymbol{z}) 
-   \frac{\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
-   \mathsf{\Sigma}^{-1}
-   (\boldsymbol{z} - \boldsymbol{a}) \bigr)}
-   {\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{z} ,
-   \\
-   f_{\mathrm{new}}(\boldsymbol{z}) = 
-   f(\boldsymbol{z}) 
-   \frac{\exp\bigl(-\frac{1}{2} \boldsymbol{z}^T
-   \mathsf{\Sigma}^{-1} \boldsymbol{z} \bigr)}
-   {\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
-   \mathsf{\Sigma}^{-1}
-   (\boldsymbol{z} - \boldsymbol{a}) \bigr)}
-   = f(\boldsymbol{z}) \exp\bigl((\boldsymbol{a}/2 - \boldsymbol{z})^T
-   \mathsf{\Sigma}^{-1}\boldsymbol{a} \bigr)
-   \end{gather*}
+:raw-latex:`\begin{gather*} 
+\mu = \mathbb{E}[f_{\mathrm{new}}(\boldsymbol{Z})] 
+= \int_{\mathbb{R}^d}
+f_{\mathrm{new}}(\boldsymbol{z}) 
+\frac{\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
+\mathsf{\Sigma}^{-1}
+(\boldsymbol{z} - \boldsymbol{a}) \bigr)}
+{\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{z} ,
+\\
+f_{\mathrm{new}}(\boldsymbol{z}) = 
+f(\boldsymbol{z}) 
+\frac{\exp\bigl(-\frac{1}{2} \boldsymbol{z}^T
+\mathsf{\Sigma}^{-1} \boldsymbol{z} \bigr)}
+{\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
+\mathsf{\Sigma}^{-1}
+(\boldsymbol{z} - \boldsymbol{a}) \bigr)}
+= f(\boldsymbol{z}) \exp\bigl((\boldsymbol{a}/2 - \boldsymbol{z})^T
+\mathsf{\Sigma}^{-1}\boldsymbol{a} \bigr)
+\end{gather*}`
 
 Finally note that
 
@@ -260,7 +256,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7935         
+    Solution: 1.7850         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -272,7 +268,7 @@ Vanilla Monte Carlo
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	seed            1161145085
+    	seed            2335235373
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -285,9 +281,9 @@ Vanilla Monte Carlo
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        1.794
+    	solution        1.785
     	r_lag           4
-    	time_integrate  0.145
+    	time_integrate  0.089
 
 
 
@@ -317,7 +313,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7700         
+    Solution: 1.7818         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -329,7 +325,7 @@ Monte Carlo with Importance Sampling
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	seed            3838116865
+    	seed            49082752
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -342,9 +338,9 @@ Monte Carlo with Importance Sampling
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         4096
-    	solution        1.770
+    	solution        1.782
     	r_lag           4
-    	time_integrate  0.034
+    	time_integrate  0.022
 
 
 
@@ -365,7 +361,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.233 the time and 0.250 the samples
+    Imporance Sampling takes 0.249 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -374,7 +370,7 @@ Importance Sampling MC vs QMC
 **Test Parameters**
 
 -  dimension = 16
--  abs\_tol = .025
+-  abs_tol = .025
 -  trials = 3
 
 .. code:: ipython3
@@ -432,70 +428,70 @@ Importance Sampling MC vs QMC
       </thead>
       <tbody>
         <tr>
-          <th>CLT IIDStdUniform (MC)</th>
+          <td>CLT IIDStdUniform (MC)</td>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>3.24e+05</td>
           <td>7.21e-01</td>
         </tr>
         <tr>
-          <th>CLT IIDStdUniform (MC)</th>
+          <td>CLT IIDStdUniform (MC)</td>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>8.22e+04</td>
           <td>1.92e-01</td>
         </tr>
         <tr>
-          <th>MeanMC_g IIDStdGaussian (MC)</th>
+          <td>MeanMC_g IIDStdGaussian (MC)</td>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.82e+05</td>
           <td>3.10e-01</td>
         </tr>
         <tr>
-          <th>MeanMC_g IIDStdGaussian (MC)</th>
+          <td>MeanMC_g IIDStdGaussian (MC)</td>
           <td>1.00e+00</td>
           <td>1.77e+00</td>
           <td>1.27e+05</td>
           <td>9.38e-02</td>
         </tr>
         <tr>
-          <th>CLTRep Sobol (QMC)</th>
+          <td>CLTRep Sobol (QMC)</td>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>1.64e+04</td>
           <td>5.13e-02</td>
         </tr>
         <tr>
-          <th>CLTRep Sobol (QMC)</th>
+          <td>CLTRep Sobol (QMC)</td>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>1.64e+04</td>
           <td>4.71e-02</td>
         </tr>
         <tr>
-          <th>CubLattice_g Lattice (QMC)</th>
+          <td>CubLattice_g Lattice (QMC)</td>
           <td>0.00e+00</td>
           <td>1.75e+00</td>
           <td>4.10e+03</td>
           <td>2.03e-02</td>
         </tr>
         <tr>
-          <th>CubLattice_g Lattice (QMC)</th>
+          <td>CubLattice_g Lattice (QMC)</td>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>
           <td>6.12e-03</td>
         </tr>
         <tr>
-          <th>CubSobol_g Sobol (QMC)</th>
+          <td>CubSobol_g Sobol (QMC)</td>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.10e+03</td>
           <td>1.63e-02</td>
         </tr>
         <tr>
-          <th>CubSobol_g Sobol (QMC)</th>
+          <td>CubSobol_g Sobol (QMC)</td>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>
