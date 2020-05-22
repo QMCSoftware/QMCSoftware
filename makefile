@@ -1,6 +1,6 @@
 qrngpath = qmcpy/discrete_distribution/qrng/
 qrng:
-	@gcc -fPIC -shared  -o $(qrngpath)qrng_lib.so $(qrngpath)*.c -lm
+	@gcc -Wall -fPIC -shared  -o $(qrngpath)qrng_lib.so $(qrngpath)*.c -lm
 	@echo Done compiling qrng C files
 
 tests:
