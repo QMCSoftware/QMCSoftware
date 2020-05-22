@@ -5,7 +5,7 @@
 The function to integrate\
 *Abstract class with concrete implementations*
 
-- Linear: $y_i = \sum_{j=0}^{d-1}(x_{ij})$
+- Linear: $g(\boldsymbol{x}) = \sum_{j=1}^{d}(x_{j})$
 - Keister: $y_i = \pi^{d/2} \, \cos(||\boldsymbol{x}_i||_2)$
 - Asian Call
     - $S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}$
@@ -22,7 +22,7 @@ General measure used to define the integrand\
 
 - Uniform: $\mathcal{U}(a,b)$
 - Gaussian: $\mathcal{N}(\mu,\sigma^2)$
-- Brownian Motion: $\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;$ for $\;Z_j \sim \mathcal{N}(0,1)$
+- Discrete Brownian Motion: $\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;$ for $\;Z_j \sim \mathcal{N}(0,1)$
 - Lebesgue
 - Identity Transform
 
@@ -52,7 +52,7 @@ Has class method `integrate` which preforms numerical integration\
 **For IID Nodes** $x_i\sim$ iid
 
   - Central Limit Theorem (CLT) 
-  - MeanMC_g (gauranteed)
+  - MeanMC_g (guaranteed)
 
 **For QMC Sequences** $\{x_{r,i}\}_{r=1}^R \sim$ lds
 

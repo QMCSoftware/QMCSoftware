@@ -7,19 +7,24 @@ simple example together here.
 
 $ :raw-latex:`\DeclareMathOperator{\EI}{EI}`
 :raw-latex:`\DeclareMathOperator{\NEI}{NEI}`
-:raw-latex:`\newcommand{\cD}{\mathcal{D}}`
-:raw-latex:`\newcommand{\cN}{\mathcal{N}}`
-:raw-latex:`\newcommand{\cX}{\mathcal{X}}`
-:raw-latex:`\newcommand{\eep}{\boldsymbol{\epsilon}}`
-:raw-latex:`\newcommand{\ff}{\mathbf{f}}`
-:raw-latex:`\newcommand{\kk}{\mathbf{k}}`
-:raw-latex:`\newcommand{\xx}{\mathbf{x}}`
-:raw-latex:`\newcommand{\yy}{\mathbf{y}}`
-:raw-latex:`\newcommand{\RR}{\mathbb{R}}`
-:raw-latex:`\newcommand{\dif}{\text{d}}`
-:raw-latex:`\newcommand{\mE}{\mathsf{E}}`
-:raw-latex:`\newcommand{\mI}{\mathsf{I}}`
-:raw-latex:`\newcommand{\mK}{\mathsf{K}}` $
+
+.. raw:: latex
+
+   \newcommand{\cD}{\mathcal{D}}
+   \newcommand{\cN}{\mathcal{N}}
+   \newcommand{\cX}{\mathcal{X}}
+   \newcommand{\eep}{\boldsymbol{\epsilon}}
+   \newcommand{\ff}{\mathbf{f}}
+   \newcommand{\kk}{\mathbf{k}}
+   \newcommand{\xx}{\mathbf{x}}
+   \newcommand{\yy}{\mathbf{y}}
+   \newcommand{\RR}{\mathbb{R}}
+   \newcommand{\dif}{\text{d}}
+   \newcommand{\mE}{\mathsf{E}}
+   \newcommand{\mI}{\mathsf{I}}
+   \newcommand{\mK}{\mathsf{K}}
+
+$
 
 .. code:: ipython3
 
@@ -165,11 +170,11 @@ sequential decision making under uncertainty).
 The NEI quantity is then computed using multiple EI computations (each
 using a different posterior GP draw) computed without noise. In this
 computation below, I will use the closed form of EI, to speed up the
-computation -- it is possible to execute the same strategy as above,
+computation – it is possible to execute the same strategy as above,
 though.
 
 This computation is vectorized so as to compute for multiple :math:`x`
-locations at the same time ... the algorithm from the `Facebook
+locations at the same time … the algorithm from the `Facebook
 paper <https://projecteuclid.org/download/pdfview_1/euclid.ba/1533866666>`__
 is written for only a single location. We are omitting the constraints
 aspect of their paper because the problem can be considered without
@@ -311,9 +316,9 @@ Bonus stuff
 ~~~~~~~~~~~
 
 Even the EI integral, which does have a closed form, might better be
-considered in a QMC fashion because of interesting use cases. I'm going
+considered in a QMC fashion because of interesting use cases. I’m going
 to reconsider the same problem from above, but here I am not looking to
-maximize the function -- I want to find the "level set" associated with
+maximize the function – I want to find the “level set” associated with
 the value :math:`y=1`. Below you can see how the different outcome might
 look.
 
@@ -360,7 +365,7 @@ NEI is an important quantity, but there are other quantities as well
 which could be considered relevant demonstrations of higher dimensional
 integrals.
 
-One such quantity is a computation involving :math:`q` "next points" to
+One such quantity is a computation involving :math:`q` “next points” to
 sample in a BO process; in the standard formulation this quantity might
 involve just :math:`q=1`, but :math:`q>1` is also of interest for
 batched evaluation in parallel.
