@@ -52,10 +52,13 @@ before_install:
 - conda create -n testenv python=$PYTHON_VERSION
 - source activate testenv
 - conda install $CONDA_DEPS
-- conda install pytorch torchvision -c pytorch
 - cd python_prototype
 - pip install --upgrade pip
 - pip install codecov
+- git clone https://github.com/QMCSoftware/qrngpy.git
+- cd qrngpy
+- make all
+- cd ..
 
 install:
 - pip install --quiet -r requirements.txt

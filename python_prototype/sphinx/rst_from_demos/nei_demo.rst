@@ -406,7 +406,7 @@ it is written here in a simplified version.
         if mc_strat == 'numpy':
             normal_draws = np.random.normal(size=(num_posterior_draws, q))
         elif mc_strat == 'lattice':
-            distrib = qp.Lattice(dimension=q, scramble=True, replications=0, backend='MPS')
+            distrib = qp.Lattice(dimension=q, scramble=True, backend='MPS')
             normal_draws = qp.Gaussian(distrib).gen_mimic_samples(n_min=0, n_max=num_posterior_draws)
         else:
             distrib = qp.IIDStdGaussian(dimension=q)

@@ -9,7 +9,7 @@ from numpy import *
 set_printoptions(threshold=1e10)
 
 
-def measures(n=2, dimension=2, replications=0, seed=7):
+def measures(n=2, dimension=2, seed=7):
     bar = '\n'+'~'*100+'\n'
     print(bar)
 
@@ -17,9 +17,8 @@ def measures(n=2, dimension=2, replications=0, seed=7):
     iid_std_g = IIDStdGaussian(dimension=dimension, seed=seed)
 
     # Brownian motion
-    time_vector = [.5,1]
     for distribution in [iid_std_u,iid_std_g]:
-        measure = BrownianMotion(distribution, time_vector=time_vector)
+        measure = BrownianMotion(distribution)
         x = measure.gen_mimic_samples(n)
         print(measure)
         print(bar)
@@ -44,4 +43,4 @@ def measures(n=2, dimension=2, replications=0, seed=7):
 
 
 if __name__ == '__main__':
-    measures(n=2, dimension=2, replications=0, seed=7)
+    measures(n=2, dimension=2, seed=7)

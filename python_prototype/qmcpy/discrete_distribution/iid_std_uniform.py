@@ -32,4 +32,13 @@ class IIDStdUniform(DiscreteDistribution):
             n x self.dimension (ndarray)
         """
         return self.rng.uniform(0,1,(int(n), self.dimension))
+    
+    
+    def set_dimension(self, dimension):
+        """
+        Reset the dimension of the samples to be generated
+        Args:
+            dimension (int): dimension of samples
+        """
+        self.dimension = dimension
         

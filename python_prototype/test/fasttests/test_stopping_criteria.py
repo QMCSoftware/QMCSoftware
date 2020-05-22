@@ -56,14 +56,14 @@ class TestCltRep(unittest.TestCase):
         self.assertRaises(DistributionCompatibilityError, CLTRep, integrand)
 
     def test_n_max_single_level(self):
-        distribution = Lattice(dimension=2, replications=16)
+        distribution = Lattice(dimension=2)
         measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
         algorithm = CLTRep(integrand, abs_tol=.001, n_init=16, n_max=32)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
     
     def test_keister_2d(self):
-        distribution = Sobol(dimension=2, replications=16)
+        distribution = Sobol(dimension=2)
         measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
         solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
@@ -121,7 +121,7 @@ class TestCubLattice_g(unittest.TestCase):
         self.assertRaises(DistributionCompatibilityError, CubLattice_g, integrand)
 
     def test_n_max_single_level(self):
-        distribution = Lattice(dimension=2, replications=0, backend="GAIL")
+        distribution = Lattice(dimension=2, backend="GAIL")
         measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
         algorithm = CubLattice_g(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)
@@ -155,7 +155,7 @@ class TestCubSobol_g(unittest.TestCase):
         self.assertRaises(DistributionCompatibilityError, CubSobol_g, integrand)
 
     def test_n_max_single_level(self):
-        distribution = Sobol(dimension=2, replications=0, backend="MPS")
+        distribution = Sobol(dimension=2, backend="QRNG")
         measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
         algorithm = CubSobol_g(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)

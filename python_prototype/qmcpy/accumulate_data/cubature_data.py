@@ -73,7 +73,7 @@ class CubatureData(AccumulateData):
         # Compute fast basis transform
         self.y = self.ft(self.y, ynext)
         ## Update self.kappanumap
-        if self.y.size == 0:
+        if self.y.size == ynext.size:
             ls = arange(self.m-1,0,-1, dtype=int)
         else:
             ls = arange(int(self.m-1),int(self.m-self.r_lag-1),-1, dtype=int)

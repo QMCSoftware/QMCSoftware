@@ -1,0 +1,33 @@
+from qmcpy import *
+from matplotlib import pyplot
+
+pyplot.rc('font', size=16)          # controls default text sizes
+pyplot.rc('axes', titlesize=16)     # fontsize of the axes title
+pyplot.rc('axes', labelsize=16)    # fontsize of the x and y labels
+pyplot.rc('xtick', labelsize=16)    # fontsize of the tick labels
+pyplot.rc('ytick', labelsize=16)    # fontsize of the tick labels
+pyplot.rc('legend', fontsize=16)    # legend fontsize
+pyplot.rc('figure', titlesize=16)  # fontsize of the figure title
+
+
+n = 64
+
+pts_sets = [
+    IIDStdUniform(2,seed=7).gen_samples(n),
+    Lattice(2,backend='GAIL',seed=7).gen_samples(n)]
+titles = ['$U[0,1]^2$','Shifted Lattice']
+output_files = ['iid_uniform_pts','lattice_pts']
+
+for pts,title,out_f in zip(pts_sets,titles,output_files):
+    fig,ax = pyplot.subplots(nrows=1, ncols=1, figsize=(5,5))
+    ax.scatter(pts[:,0],pts[:,1],color='b')
+    ax.set_xlabel('$X_{i1}$')
+    ax.set_xlim([0,1])
+    ax.set_xticks([0,1])
+    ax.set_ylabel('$X_{i2}$')
+    ax.set_ylim([0,1])
+    ax.set_yticks([0,1])
+    ax.set_title(title)
+    ax.set_aspect('equal')
+    pyplot.tight_layout()
+    fig.savefig('scratch/blogs/figs/%s.png'%out_f,dpi=200)

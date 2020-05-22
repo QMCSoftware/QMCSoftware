@@ -25,23 +25,11 @@ class IntegrationExampleTest(unittest.TestCase):
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_asian_option_multi_level(self):
-        abs_tol = .05
-        time_vector = [arange(1 / 4, 5 / 4, 1 / 4),
-                    arange(1 / 16, 17 / 16, 1 / 16),
-                    arange(1 / 64, 65 / 64, 1 / 64)]
-        levels = 3
-        distributions = MultiLevelConstructor(levels,
-            IIDStdGaussian,
-                dimension = [len(tv) for tv in time_vector],
-                seed = arange(7,7+levels))
-        measures = MultiLevelConstructor(levels,
-            BrownianMotion,
-                distribution = distributions,
-                time_vector = time_vector)
-        integrands = MultiLevelConstructor(levels,
-            AsianCall,
-                measure = measures)
-        solution,data = CLT(integrands, abs_tol=abs_tol).integrate()
+        abs_tol =.05
+        distribution = IIDStdGaussian()
+        measure = BrownianMotion(distribution)
+        integrand = AsianCall(measure,multi_level_dimensions=[4,16,64])
+        solution,data = CLT(integrand, abs_tol).integrate()
         true_value = 1.7845
         self.assertTrue(abs(solution - true_value) < abs_tol)
 
@@ -49,7 +37,7 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        distribution = Sobol(dimension=2, replications=16, scramble=True, backend='MPS')
+        distribution = Sobol(dimension=2, scramble=True, backend='QRNG')
         measure = Lebesgue(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = QuickConstruct(measure, lambda x: (x.prod(1))**3)
         solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
@@ -67,7 +55,7 @@ class IntegrationExampleTest(unittest.TestCase):
     
     def test_lebesgue_inf_measure_2d(self):
         abs_tol = .1
-        distribution = Lattice(2, replications=16)
+        distribution = Lattice(2)
         measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
         integrand = QuickConstruct(measure, lambda x: exp(-x**2).prod(1))
         solution,data = CLTRep(integrand,abs_tol=abs_tol).integrate()
@@ -78,7 +66,7 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        distribution = Lattice(dimension=2, replications=16, scramble=True, backend='MPS')
+        distribution = Lattice(dimension=2, scramble=True, backend='MPS')
         measure = Uniform(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = QuickConstruct(measure, lambda x: (x.prod(1))**3)
         solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
@@ -95,7 +83,7 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [0.5, 1, 1.5]
         for i in range(len(dimensions)):
-            distribution = Sobol(dimension=dimensions[i], replications=16, scramble=True, backend='MPS')
+            distribution = Sobol(dimension=dimensions[i], scramble=True, backend='QRNG')
             measure = Uniform(distribution)
             integrand = Linear(measure)
             solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
@@ -133,7 +121,7 @@ class IntegrationExampleTest(unittest.TestCase):
         for i in range(2):
             a_i = a_list[i]
             b_i = b_list[i]
-            distribution = Lattice(dimension=1, replications=0, scramble=True, backend='GAIL')
+            distribution = Lattice(dimension=1, scramble=True, backend='GAIL')
             measure = Uniform(distribution)
             integrand = QuickConstruct(measure, lambda x, a=a_i, b=b_i: b * (x - a) ** 2)
             solution,data = CubLattice_g(integrand, abs_tol=abs_tol).integrate()

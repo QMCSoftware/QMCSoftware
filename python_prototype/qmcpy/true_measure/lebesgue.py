@@ -45,14 +45,14 @@ class Lebesgue(TrueMeasure):
             f (method): transformed integrand
         """
         if self.tf_to_mimic == 'Uniform':
-            def f(samples):
+            def f(samples, *args, **kwargs):
                 dist = self.upper_bound - self.lower_bound
-                f_vals = dist.prod() * g(dist*samples + self.lower_bound)
+                f_vals = dist.prod() * g(dist*samples + self.lower_bound, *args, **kwargs)
                 return f_vals
         elif self.tf_to_mimic == 'Gaussian':
-            def f(samples):
+            def f(samples, *args, **kwargs):
                 inv_cdf_vals = norm.ppf(samples)
-                g_vals = g(inv_cdf_vals)
+                g_vals = g(inv_cdf_vals, *args, **kwargs)
                 f_vals = g_vals / norm.pdf(inv_cdf_vals).prod(-1).reshape(g_vals.shape)
                 return f_vals
         return f

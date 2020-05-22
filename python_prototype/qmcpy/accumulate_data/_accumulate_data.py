@@ -25,26 +25,6 @@ class AccumulateData():
             raise ParameterError(prefix + 'self.n_total (total number of samples)')
         if not hasattr(self,'parameters'):
             self.parameters = []
-        # Check matching dimensions for integrand, measure, and distribution
-        flag = 0
-        try:
-            if isinstance(self.measure,TrueMeasure):
-                distrib_dims = self.distribution.dimension
-                measure_dims = self.measure.dimension
-                integrand_dims = self.integrand.dimension
-            else: # multi-level
-                distrib_dims = self.distribution.dimensions
-                measure_dims = self.measure.dimensions
-                integrand_dims = self.integrand.dimensions
-            if distrib_dims != measure_dims or distrib_dims != integrand_dims:
-                flag = 1
-        except:
-            flag = 1
-        if flag == 1: # mismatching dimensions or incorrectlly constructed objects
-            raise DimensionError('''
-                    distribution, measure, and integrand dimensions do not match. 
-                    For multi-level problems ensure distribution, measure, and integrand
-                    are MultiLevelConstructor instances. ''') 
 
     def update_data(self):
         """ ABSTRACT METHOD

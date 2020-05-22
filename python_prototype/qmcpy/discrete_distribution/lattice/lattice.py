@@ -11,25 +11,19 @@ import warnings
 class Lattice(DiscreteDistribution):
     """ Quasi-Random Lattice low discrepancy sequence (Base 2) """
 
-    parameters = ['dimension','scramble','replications','seed','backend','mimics']
+    parameters = ['dimension','scramble','seed','backend','mimics']
     
-    def __init__(self, dimension=1, scramble=True, replications=0, seed=None, backend='GAIL'):
+    def __init__(self, dimension=1, scramble=True, seed=None, backend='GAIL'):
         """
         Args:
             dimension (int): dimension of samples
-            scramble (bool): If True, apply unique scramble to each replication
-            replications (int): Number of nxd matrices to generate
-                replications set to 0 ignores replications and returns (n_max-n_min)xd samples            
+            scramble (bool): If True, apply unique scramble to each replication     
             seed (int): seed the random number generator for reproducibility
             backend (str): backend generator
         """
         self.dimension = dimension
         self.scramble = scramble
-        self.replications = replications
-        self.r = max(self.replications,1)
         self.seed = seed
-        random.seed(self.seed)
-        self.shifts = random.rand(self.r, self.dimension)
         self.backend = backend.lower()            
         if self.backend == 'gail':
             self.backend_gen = gail_lattice_gen
@@ -38,20 +32,21 @@ class Lattice(DiscreteDistribution):
         else:
             raise ParameterError("Lattice backend must 'GAIL' or 'MPS'")
         self.mimics = 'StdUniform'
+        self.set_seed(self.seed)
         super().__init__()
 
     def gen_samples(self, n=None, n_min=0, n_max=8):
         """
-        Generate self.replications (n_max-n_min) x self.dimension Lattice samples
+        Generate (n_max-n_min) x self.dimension Lattice samples
 
         Args:
             n (int): if n is supplied, generate from n_min=0 to n_max=n samples.
                      Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence. Must be 0 or n_max/2
-            n_max (int): Final index of sequence. Must be a power of 2. 
+            n_max (int): Final index of sequence. Must be a power of 2.
 
         Returns:
-            self.replications x (n_max-n_min) x self.dimension (ndarray)
+            (n_max-n_min) x self.dimension (ndarray)
         """
         if n:
             n_min = 0
@@ -62,9 +57,26 @@ class Lattice(DiscreteDistribution):
             raise ParameterError("n_min must be 0 or n_max/2")
         x_lat = self.backend_gen(n_min,n_max,self.dimension)
         if self.scramble: # apply random shift to samples
-            x_lat_reps = array([(x_lat + shift_r) % 1 for shift_r in self.shifts])
-        else: # duplicate unshifted samples
-            x_lat_reps = repeat(x_lat[None, :, :], self.r, axis=0)
-        if self.replications == 0:
-            x_lat_reps = x_lat_reps.squeeze(0)
-        return x_lat_reps
+            x_lat = (x_lat + self.shift)%1
+        return x_lat
+    
+    def set_seed(self, seed):
+        """
+        Reseed the generator to get a new scrambling. 
+        Args:
+            seed (int): new seed for generator
+        """
+        self.seed = seed
+        random.seed(self.seed)
+        self.shift = random.rand(self.dimension)
+    
+    def set_dimension(self, dimension):
+        """
+        Reset the dimension of the samples to be generated
+        Args:
+            dimension (int): dimension of samples
+        Note:
+            this also computes a new random shift to be applied to samples
+        """
+        self.dimension = dimension
+        self.shift = random.rand(self.dimension)

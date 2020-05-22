@@ -18,12 +18,19 @@ class DiscreteDistribution(object):
 
     def gen_samples(self, *args):
         """ ABSTRACT METHOD
-        Generate self.replications (n_max-n_min)xself.d Lattice samples
+        Generate (n_max-n_min)xself.d Lattice samples
         
         Returns:
-            self.replications x (n_max-n_min) x self.dimension (ndarray)
+            (n_max-n_min) x self.dimension (ndarray)
         """
         raise MethodImplementationError(self, 'gen_dd_samples')
+
+    def set_dimension(self, dimension):
+        """ ABSTRACT METHOD
+        Reset the dimension of the problem.
+        Calls DiscreteDistribution.set_dimension
+        """
+        raise TransformError("Cannot reset dimension of %s object"%str(type(self).__name__))
 
     def __repr__(self):
         return univ_repr(self, "DiscreteDistribution", self.parameters)

@@ -15,19 +15,22 @@ help:
 
 .PHONY: help Makefile
 
+# Clean out documentation files to restart
+clean:
+	@rm -fr $(BUILDDIR)/*
+	@echo "QMCPy clean finished. Files in $(BUILDDIR) are removed."
+
+# Create HTML documentation
+html:
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
+	@echo "QMCPy build finished. The HTML pages are in $(BUILDDIR)/html."
+
 # Create epub documentation
 epub:
 	@$(SPHINXBUILD) -M epub $(SOURCEDIR) $(BUILDDIR) $(SPHINXOPTS) -D extensions=sphinx.ext.imgmath
 
 # Create PDF documentation
-latex: Makefile
+latex:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
 	@$(SPHINXBUILD) -M latexpdf "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
 	@echo "QMCPy build finished. The LATEX and PDF files are in $(BUILDDIR)/latex."
-
-# Catch-all target: route all unknown targets to Sphinx using the new
-# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
-%: Makefile
-	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)  $(O)
-	@echo "QMCPy build finished. The HTML pages are in $(BUILDDIR)/html."
-

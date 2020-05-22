@@ -84,7 +84,7 @@ Sample Problem 2
 .. code:: ipython3
 
     # Lebesgue Measure
-    distribution = Sobol(dim, scramble=True, replications=16, seed=7, backend='MPS')
+    distribution = Sobol(dim, scramble=True, seed=7, backend='QRNG')
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
     integrand = QuickConstruct(measure, lambda x: (x**2).sum(1))
     solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
@@ -94,14 +94,14 @@ Sample Problem 2
 
 .. parsed-literal::
 
-    y = 23.33312
+    y = 23.33343
     Within tolerance: True
 
 
 .. code:: ipython3
 
     # Uniform Measure
-    distribution = Sobol(dim, scramble=True, replications=16, seed=7, backend='MPS')
+    distribution = Sobol(dim, scramble=True, seed=7, backend='QRNG')
     measure = Uniform(distribution, lower_bound=a, upper_bound=b)
     integrand = QuickConstruct(measure, lambda x: (b-a).prod()*(x**2).sum(1))
     solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
@@ -111,7 +111,7 @@ Sample Problem 2
 
 .. parsed-literal::
 
-    y = 23.33312
+    y = 23.33343
     Within tolerance: True
 
 
@@ -137,7 +137,7 @@ Mathematica Code: ``Integrate[Sin[x]/Log[x], {x,a,b}]``
 .. code:: ipython3
 
     # Lebesgue Measure
-    distribution = Lattice(dim, scramble=True, replications=0, seed=7, backend='GAIL')
+    distribution = Lattice(dim, scramble=True, seed=7, backend='GAIL')
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
     integrand = QuickConstruct(measure, lambda x: sin(x)/log(x))
     solution,data = CubLattice_g(integrand, abs_tol=abs_tol).integrate()
@@ -176,7 +176,7 @@ Integral over all real numbers
 
 .. parsed-literal::
 
-    y = 3.141
+    y = 3.142
     Within tolerance: True
 
 

@@ -24,19 +24,18 @@ MeanVarData (AccumulateData Object)
 	n               467027
 	n_total         468051
 	confid_int      [ 1.807  1.817]
-	time_integrate  0.125
+	time_integrate  0.115
 
 Meets tolerance: True
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 1.8088         
+Solution: 1.8067         
 Keister (Integrand Object)
 Lattice (DiscreteDistribution Object)
 	dimension       2
 	scramble        1
-	replications    16
-	seed            7
+	seed            1092
 	backend         mps
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
@@ -52,11 +51,11 @@ CLTRep (StoppingCriterion Object)
 	n_max           1073741824
 MeanVarDataRep (AccumulateData Object)
 	replications    16
-	solution        1.809
-	sighat          0.002
+	solution        1.807
+	sighat          0.003
 	n_total         4096
-	confid_int      [ 1.807  1.810]
-	time_integrate  0.004
+	confid_int      [ 1.805  1.809]
+	time_integrate  0.007
 
 Meets tolerance: True
 
@@ -85,18 +84,17 @@ MeanVarData (AccumulateData Object)
 	n               596905
 	n_total         597929
 	confid_int      [ 1.804  1.814]
-	time_integrate  0.051
+	time_integrate  0.047
 
 Meets tolerance: True
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 1.8082         
+Solution: 1.8081         
 Keister (Integrand Object)
 Lattice (DiscreteDistribution Object)
 	dimension       2
 	scramble        1
-	replications    0
 	seed            7
 	backend         gail
 	mimics          StdUniform
@@ -110,23 +108,22 @@ CubLattice_g (StoppingCriterion Object)
 	n_init          1024
 	n_max           34359738368
 CubatureData (AccumulateData Object)
-	n_total         2048
+	n_total         1024
 	solution        1.808
 	r_lag           4
-	time_integrate  0.004
+	time_integrate  0.002
 
 Meets tolerance: True
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 1.8082         
+Solution: 1.8079         
 Keister (Integrand Object)
 Sobol (DiscreteDistribution Object)
 	dimension       2
 	scramble        1
-	replications    0
 	seed            7
-	backend         mps
+	backend         qrng
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
 	distrib_name    Sobol
@@ -141,7 +138,7 @@ CubatureData (AccumulateData Object)
 	n_total         2048
 	solution        1.808
 	r_lag           4
-	time_integrate  0.007
+	time_integrate  0.003
 
 Meets tolerance: True
 
