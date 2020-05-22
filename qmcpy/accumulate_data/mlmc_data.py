@@ -1,4 +1,4 @@
-""" Definition of MeanVarData, a concrete implementation of AccumulateData """
+""" Definition of MLMCData, a concrete implementation of AccumulateData """
 
 from ._accumulate_data import AccumulateData
 from numpy import zeros, absolute, maximum, tile, array, log2, arange, ones

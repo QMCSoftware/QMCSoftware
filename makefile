@@ -16,14 +16,11 @@ _doc:
 	# Make Directries
 	@-rm -r $(mddir) 2>/dev/null &
 	@-rm -r $(nbdir) 2>/dev/null &
-	# READMEs --> RST
+	# QMCSoftware READMEs --> RST
 	@mkdir $(mddir)
-	#	QMCSoftware
-	@grep -v  "\[\!" ../README.md > ../README2.md
-	@pandoc --mathjax ../README2.md -o $(mddir)QMCSoftware.rst
-	@rm ../README2.md
-	# 	python_prototype
-	@pandoc --mathjax README.md -o $(mddir)python_prototype.rst
+	@grep -v  "\[\!" README.md > README2.md
+	@pandoc --mathjax README2.md -o $(mddir)QMCSoftware.rst
+	@rm README2.md
 	# Jupyter Notebook Demos --> RST
 	@mkdir $(nbdir)
 	@for f in demos/*.ipynb; do \

@@ -52,7 +52,6 @@ before_install:
 - conda create -n testenv python=$PYTHON_VERSION
 - source activate testenv
 - conda install $CONDA_DEPS
-- cd python_prototype
 - pip install --upgrade pip
 - pip install codecov
 <<<<<<< HEAD
