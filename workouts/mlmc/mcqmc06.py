@@ -4,7 +4,7 @@ from qmcpy import IIDStdGaussian, Gaussian, CallOptions
 from workouts.mlmc.mlmc_test import mlmc_test
 
 def mcqmc06(l_convergence=3,epsilons=[.05,.1]):
-    for option in ['European']:#,'Asian','Lookback','Digital','Barrier']:
+    for option in ['European','Asian']:
         print('\n\n'+'~'*100+'\n\n')
         print('%s Call Option'%option)
         distribution = IIDStdGaussian()
@@ -22,7 +22,7 @@ def mcqmc06(l_convergence=3,epsilons=[.05,.1]):
             eps = epsilons,
             l_min = 2,
             l_max = 10)
-        print('\nExact Value: %.4f'%integrand.get_exact_value())
+        print('\nExact Value: %s'%integrand.get_exact_value())
         
 if __name__ == '__main__':
-    mcqmc06(l_convergence=8,epsilons=[0.01, 0.02, 0.05, 0.1])
+    mcqmc06(l_convergence=8,epsilons=[.005, 0.01, 0.02, 0.05, 0.1])
