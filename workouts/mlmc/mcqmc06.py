@@ -1,6 +1,6 @@
 """ Test various call options with MLMC StoppingCriterion """
 
-from qmcpy import IIDStdGaussian, Gaussian, CallOptions
+from qmcpy import IIDStdGaussian, Gaussian, MLMCCallOptions
 from workouts.mlmc.mlmc_test import mlmc_test
 
 def mcqmc06(l_convergence=3,epsilons=[.05,.1]):
@@ -9,7 +9,7 @@ def mcqmc06(l_convergence=3,epsilons=[.05,.1]):
         print('%s Call Option'%option)
         distribution = IIDStdGaussian()
         measure = Gaussian(distribution)
-        integrand = CallOptions(measure,
+        integrand = MLMCCallOptions(measure,
             option = option,
             volatility = .2,
             start_strike_price = 100, 

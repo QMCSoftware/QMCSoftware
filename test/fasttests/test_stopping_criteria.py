@@ -136,20 +136,20 @@ class TestMLMC(unittest.TestCase):
     def test_raise_distribution_compatibility_error(self):
         distribution = Lattice()
         measure = Gaussian(distribution)
-        integrand = CallOptions(measure)
+        integrand = MLMCCallOptions(measure)
         self.assertRaises(DistributionCompatibilityError, MLMC, integrand)
 
     def test_n_max_single_level(self):
         distribution = IIDStdUniform()
         measure = Gaussian(distribution)
-        integrand = CallOptions(measure,start_strike_price=30)
+        integrand = MLMCCallOptions(measure,start_strike_price=30)
         algorithm = MLMC(integrand,rmse_tol=.001,n_max=2**10)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
     
     def test_european_option(self):
         distribution = IIDStdUniform(seed=9)
         measure = Gaussian(distribution)
-        integrand = CallOptions(measure,start_strike_price=30)
+        integrand = MLMCCallOptions(measure,start_strike_price=30)
         solution,data = MLMC(integrand,rmse_tol=tol).integrate()
         exact_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-exact_value) < tol)
