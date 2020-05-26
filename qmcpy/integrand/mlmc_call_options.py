@@ -10,7 +10,7 @@ from numpy import sqrt, exp, log, zeros, maximum, minimum, tile, random, eye, lo
 from scipy.stats import norm
 
 
-class CallOptions(Integrand):
+class MLMCCallOptions(Integrand):
     """ Specify ad generate payoff values from various call options """
 
     parameters = []

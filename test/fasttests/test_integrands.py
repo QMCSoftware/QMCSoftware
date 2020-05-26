@@ -62,13 +62,13 @@ class TestQuickConstruct(unittest.TestCase):
 
 
 class TestCallOptions(unittest.TestCase):
-    """ Unit tests for CallOptions Integrand. """
+    """ Unit tests for MLMCCallOptions Integrand. """
 
     def test_f(self):
         l = 3
         distribution = IIDStdGaussian()
         measure = Gaussian(distribution)
-        integrand = CallOptions(measure)
+        integrand = MLMCCallOptions(measure)
         d = integrand.dim_at_level(l)
         integrand.measure.set_dimension(d)
         samples = integrand.measure.distribution.gen_samples(4)
@@ -79,7 +79,7 @@ class TestCallOptions(unittest.TestCase):
         l = 3
         distribution = IIDStdGaussian()
         measure = Gaussian(distribution)
-        integrand = CallOptions(measure)
+        integrand = MLMCCallOptions(measure)
         self.assertTrue(integrand.dim_at_level(0)==2**0)
         self.assertTrue(integrand.dim_at_level(3)==2**3)
 
