@@ -31,7 +31,7 @@ class CallOptions(Integrand):
         """
         if not (isinstance(measure,Gaussian) and all(measure.mu==0) and all(measure.covariance==eye(measure.d))):
             raise ParameterError('AsianCall measure must be a BrownianMotion instance')
-        options = ['european']#,'asian','lookback','digital','barrier']
+        options = ['european','asian']
         self.option = option.lower()
         if self.option not in options:
             raise ParameterError('option type must be one of\n\t%s'%str(options)) 
@@ -42,6 +42,7 @@ class CallOptions(Integrand):
         self.t = t_final
         self.b = .85*self.k
         self.multilevel = True
+        self.g_submodule = getattr(self,'g_'+self.option)
         super().__init__()
 
     def get_exact_value(self):
@@ -68,11 +69,87 @@ class CallOptions(Integrand):
                      exp(-self.r*self.t)*norm.cdf(d4) ) )
         return val
     
-    def g(self, dwf, l):
+    def g_european(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
+        """
+        Implementation for European call option. 
+        Args:
+            samples (ndarray): nxd array of samples
+            l (int): level
+            n (int): number of samples
+            d (int): number of dimensions
+            nf (int): n fine samples = 2**level
+            nc (int): n coarse sampes = nf/2
+            hf (int): fine timestep = self.t/nf
+            hc (float): coarse timestep = self.t/nc
+            xf (ndarray): n vector of fine samples values = self.k
+            xc (ndarray): n vector of coarse samples = self.k  
+        """
+        dwf = samples * sqrt(hf)
+        if l == 0:
+            dwf = dwf.squeeze()
+            xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
+        else:
+            for j in range(int(nf)):
+                xf = xf + self.r*xf*hf + self.sigma*xf*dwf[:,j] + .5*self.sigma**2*xf*(dwf[:,j]**2-hf)
+                if (j%2)==1:
+                    dwc = dwf[:,j-1] + dwf[:,j]
+                    ddw = dwf[:,j-1] - dwf[:,j]
+                    xc = xc + self.r*xc*hc + self.sigma*xc*dwc + .5*self.sigma**2*xc*(dwc**2-hc)
+        pf = maximum(0,xf-self.k)
+        pc = maximum(0,xc-self.k)
+        return pf,pc
+
+    def g_asian(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
+        """
+        Implementation for Asian call option. 
+        Args:
+            samples (ndarray): nxd array of samples
+            l (int): level
+            n (int): number of samples
+            d (int): number of dimensions
+            nf (int): n fine samples = 2**level
+            nc (int): n coarse sampes = nf/2
+            hf (int): fine timestep = self.t/nf
+            hc (float): coarse timestep = self.t/nc
+            xf (ndarray): n vector of fine samples values = self.k
+            xc (ndarray): n vector of coarse samples = self.k  
+        """
+        af = .5*hf*xf
+        ac = .5*hc*xc
+        dwf = sqrt(hf) * samples[:,:int(d/2)]
+        dif = sqrt(hf/12) * hf * samples[:,int(d/2):]
+        if l == 0:
+            dwf = dwf.squeeze()
+            dif = dif.squeeze()
+            xf0 = xf
+            xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
+            vf = self.sigma*xf0
+            af = af + .5*hf*xf + vf*dif
+        else:
+            for j in range(int(nf)):
+                xf0 = xf
+                xf = xf + self.r*xf*hf + self.sigma*xf*dwf[:,j] + .5*self.sigma**2*xf*(dwf[:,j]**2-hf)
+                vf = self.sigma*xf0
+                af = af + hf*xf + vf*dif[:,j]
+                if (j%2)==1:
+                    dwc = dwf[:,j-1] + dwf[:,j]
+                    ddw = dwf[:,j-1] - dwf[:,j]
+                    xc0 = xc
+                    xc = xc + self.r*xc*hc + self.sigma*xc*dwc + .5*self.sigma**2*xc*(dwc**2-hc)
+                    vc = self.sigma*xc0
+                    dif_cs = dif[:,j-1] + dif[:,j]
+                    ac = ac + hc*xc + vc*(dif_cs + .25*hc*ddw)
+            af = af - 0.5*hf*xf
+            ac = ac - 0.5*hc*xc
+        pf = maximum(0,af-self.k)
+        pc = maximum(0,ac-self.k)
+        return pf,pc
+    
+    def g(self, samples, l):
         """
         Original integrand on level l
         Args:
-            dwf (ndarray): nxd ndarray for d=2**l as specified by dim_at_level method
+            samples (ndarray): nxd ndarray for d=2**l as specified by dim_at_level method
             l (int): level
         Return:
             sums (ndarray): length 6 vector of sums such that    
@@ -84,73 +161,14 @@ class CallOptions(Integrand):
                 sums(6) = sum(Pf.^2)
             cost (float): user-defined computational cost
         """
-        n = dwf.shape[0]
+        n,d = samples.shape        
         nf = 2**l # n fine
         nc = nf/2 # n coarse
         hf = self.t/nf # timestep fine
         hc = self.t/nc # timestep coarse
         xf = tile(self.k,int(n))
         xc = xf
-        dwf = sqrt(hf)*dwf
-        ##af = .5*hf*xf
-        ##ac = .5*hc*xc
-        ##mf = xf
-        ##mc = xc
-        ##bf = 1
-        ##bc = 1
-        if l == 0:
-            dwf = dwf.squeeze()
-            ##xf0 = xf
-            xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
-            ##lf = log(random.rand(int(n)))
-            ##dif = sqrt(hf/12)*hf*random.randn(int(n))
-            ##vf = self.sigma*xf0
-            ##af = af + .5*hf*xf + vf*dif
-            ##mf = minimum(mf,.5*(xf0+xf-sqrt((xf-xf0)**2-2*hf*vf**2*lf)))
-            ##bf = bf*(1-exp(-2*maximum(0,(xf0-self.b)*(xf-self.b)/(hf*vf**2))))
-        else:
-            for j in range(int(nf)):
-                ##lf = log(random.rand(2,int(n)))
-                ##dif = sqrt(hf/12)*hf*random.randn(2,int(n))
-                ##xf0 = xf
-                xf = xf + self.r*xf*hf + self.sigma*xf*dwf[:,j] + .5*self.sigma**2*xf*(dwf[:,j]**2-hf)
-                ##vf = self.sigma*xf0
-                ##af = af + hf*xf + vf*dif[m,:]
-                ##mf = minimum(mf,.5*(xf0+xf-sqrt((xf-xf0)**2-2*hf*vf**2*lf[m,:])))
-                ##bf = bf*(1-exp(-2*maximum(0,(xf0-self.b)*(xf-self.b)/(hf*vf**2))))
-                if (j%2)==1:
-                    dwc = dwf[:,j-1] + dwf[:,j]
-                    ddw = dwf[:,j-1] - dwf[:,j]
-                    ##xc0 = xc
-                    xc = xc + self.r*xc*hc + self.sigma*xc*dwc + .5*self.sigma**2*xc*(dwc**2-hc)
-                    ##vc = self.sigma*xc0
-                    ##ac = ac + hc*xc + vc*(dif.sum(0) + .25*hc*ddw)
-                    ##xc1 = .5*(xc0 + xc + vc*ddw)
-                    ##mc = minimum(mc, .5*(xc0+xc1-sqrt((xc1- xc0)**2-2*hf*vc**2*lf[0,:])))
-                    ##mc = minimum(mc, .5*(xc1+xc -sqrt((xc - xc1)**2-2*hf*vc**2*lf[1,:])))
-                    ##bc = bc *(1-exp(-2*maximum(0,(xc0-self.b)*(xc1- self.b)/(hf*vc**2))))
-                    ##bc = bc *(1-exp(-2*maximum(0,(xc1-self.b)*(xc - self.b)/(hf*vc**2))))
-                ##af = af - 0.5*hf*xf
-                ##ac = ac - 0.5*hc*xc
-        if self.option == 'european':
-            pf = maximum(0,xf-self.k)
-            pc = maximum(0,xc-self.k)
-        elif self.option == 'asian':
-            pf = maximum(0,af-self.k)
-            pc = maximum(0,ac-self.k)
-        elif self.option == 'lookback':
-            pf = xf - mf
-            pc = xc - mc
-        elif self.option == 'digital':
-            if l == 0:
-                pf = self.k*norm.cdf((xf0+self.r*xf0*hf-self.k)/(self.sigma*xf0*sqrt(hf)))
-                pc = pf
-            else:
-                pf = self.k*norm.cdf((xf0+self.r*xf0*hf-self.k)/(self.sigma*xf0*sqrt(hf)))
-                pc = self.k*norm.cdf((xc0+self.r*xc0*hc+self.sigma*xc0*dwf[0,:]-self.k)/(self.sigma*xc0*sqrt(hf)))
-        elif self.option == 'barrier':
-            pf = bf*maximum(0,xf-self.k)
-            pc = bc*maximum(0,xc-self.k)
+        pf,pc = self.g_submodule(samples, l, n, d, nf, nc, hf, hc, xf, xc)
         dp = exp(-self.r*self.t)*(pf-pc)
         pf = exp(-self.r*self.t)*pf
         if l == 0:
@@ -170,4 +188,7 @@ class CallOptions(Integrand):
         Get dimension of the SDE at level l
             l (int): level
         """
-        return 2**l
+        if self.option == 'european':
+            return 2**l
+        elif self.option == 'asian':
+            return 2**(l+1)
