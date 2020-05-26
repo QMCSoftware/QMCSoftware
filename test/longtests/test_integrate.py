@@ -127,6 +127,35 @@ class IntegrationExampleTest(unittest.TestCase):
             solution,data = CubLattice_g(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
+    def test_european_call(self):
+        abs_tol = 1e-2
+        ddistrib = Sobol(dimension=8)
+        measure = BrownianMotion(ddistrib)
+        integrand = EuropeanOption(measure,
+            volatility = .5,
+            start_price = 5,
+            strike_price = 10,
+            interest_rate = .01,
+            call_put = 'call')
+        algorithm = CubSobol_g(integrand, abs_tol)
+        solution,data = algorithm.integrate()
+        true_value = integrand.get_fair_price()
+        self.assertTrue(abs(solution-true_value) < abs_tol)
+    
+    def test_european_put(self):
+        abs_tol = 1e-2
+        ddistrib = Lattice(dimension=8)
+        measure = BrownianMotion(ddistrib)
+        integrand = EuropeanOption(measure,
+            volatility = .5,
+            start_price = 20,
+            strike_price = 10,
+            interest_rate = .01,
+            call_put = 'put')
+        algorithm = CubLattice_g(integrand, abs_tol)
+        solution,data = algorithm.integrate()
+        true_value = integrand.get_fair_price()
+        self.assertTrue(abs(solution-true_value) < abs_tol)
 
 if __name__ == "__main__":
     unittest.main()
