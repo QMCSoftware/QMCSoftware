@@ -72,6 +72,7 @@ class MLMCCallOptions(Integrand):
     def g_european(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for European call option. 
+        
         Args:
             samples (ndarray): nxd array of samples
             l (int): level
@@ -102,6 +103,7 @@ class MLMCCallOptions(Integrand):
     def g_asian(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for Asian call option. 
+        
         Args:
             samples (ndarray): nxd array of samples
             l (int): level
@@ -148,9 +150,11 @@ class MLMCCallOptions(Integrand):
     def g(self, samples, l):
         """
         Original integrand on level l
+        
         Args:
             samples (ndarray): nxd ndarray for d=2**l as specified by dim_at_level method
             l (int): level
+        
         Return:
             sums (ndarray): length 6 vector of sums such that    
                 sums(1) = sum(Pf-Pc)
@@ -186,6 +190,8 @@ class MLMCCallOptions(Integrand):
     def dim_at_level(self, l):
         """ 
         Get dimension of the SDE at level l
+        
+        Args:
             l (int): level
         """
         if self.option == 'european':

@@ -53,9 +53,10 @@ class AsianCall(Integrand):
     def get_discounted_payoffs(self, stock_path, dimension):
         """
         Calculate the discounted payoff from the stock path
-
-        stock_path (ndarray): option prices at monitoring times
-        dimension (int): number of dimensions
+        
+        Args:
+            stock_path (ndarray): option prices at monitoring times
+            dimension (int): number of dimensions
         """
         if self.mean_type == 'arithmetic':
             avg = (self.start_price / 2 +
