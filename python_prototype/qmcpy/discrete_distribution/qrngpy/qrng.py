@@ -7,11 +7,11 @@ import platform
 
 my_os = platform.system()
 path = os.path.dirname(os.path.abspath(__file__))
-if my_os=="Linux":
+if my_os == "Linux":
     lib = ctypes.CDLL(path + '/qrngpy.so', mode=ctypes.RTLD_GLOBAL)
-elif my_os=="Darwin":
+elif my_os == "Darwin":  # Mac
     lib = ctypes.CDLL(path + '/qrngpy.dylib', mode=ctypes.RTLD_GLOBAL)
-elif my_os=="Windows":
+elif my_os == "Windows":
     lib = ctypes.CDLL(path + '/qrngpy.dll', mode=ctypes.RTLD_GLOBAL)
 else:
     print("Unknown platform %s" % my_os)
