@@ -2,7 +2,7 @@
 
 from ._true_measure import TrueMeasure
 from ..util import TransformError, ParameterError
-from numpy import array, isfinite, inf
+from numpy import array, isfinite, inf, isscalar, tile
 from scipy.stats import norm
 
 
@@ -19,10 +19,17 @@ class Lebesgue(TrueMeasure):
             upper_bound (float or inf): upper bound of integration
         """
         self.distribution = distribution
+        self.d = self.distribution.dimension
         if not self.distribution.mimics == "StdUniform":
-            raise ParameterError("Lebesgue measure requires a distribution mimicing 'StdUniform'")
+            raise ParameterError("Lebesgue measure requires a distribution mimicing 'StdUniform'")        
+        if isscalar(lower_bound):
+            lower_bound = tile(lower_bound,self.d)
+        if isscalar(upper_bound):
+            upper_bound = tile(upper_bound,self.d)
         self.lower_bound = array(lower_bound)
         self.upper_bound = array(upper_bound)
+        if len(self.lower_bound)!=self.d or len(self.upper_bound)!=self.d:
+            raise DimensionError('upper bound and lower bound must be of length dimension')     
         if isfinite(self.lower_bound).all() and isfinite(self.upper_bound).all() \
            and (self.lower_bound<self.upper_bound).all():
             self.tf_to_mimic = 'Uniform'
