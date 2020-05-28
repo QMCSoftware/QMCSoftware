@@ -1,4 +1,11 @@
-""" Definition of MLMCData, a concrete implementation of AccumulateData """
+"""
+Definition of MLMCData, a concrete implementation of AccumulateData
+
+Reference:
+    M.B. Giles. 'Multi-level Monte Carlo path simulation'. 
+    Operations Research, 56(3):607-617, 2008.
+    http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
+"""
 
 from ._accumulate_data import AccumulateData
 from numpy import zeros, absolute, maximum, tile, array, log2, arange, ones
@@ -14,15 +21,14 @@ class MLMCData(AccumulateData):
     parameters = ['levels','n_level','mean_level','var_level','cost_per_sample',
         'alpha','beta','gamma']
 
-    def __init__(self, stopping_criterion, integrand, l_init, n_init=1024, 
-        alpha0=-1, beta0=-1, gamma0=-1):
+    def __init__(self, stopping_criterion, integrand, levels_init, n_init, alpha0, beta0, gamma0):
         """
         Initialize data instance
 
         Args:
             stopping_criterion (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
-            l_init (int): initial number of levels
+            levels_init (int): initial number of levels
             n_init (int): initial number of samples per level
             alpha0 (float): weak error is O(2^{-alpha0*level})
             beta0 (float): variance is O(2^{-beta0*level})
@@ -34,7 +40,7 @@ class MLMCData(AccumulateData):
         self.measure = self.integrand.measure
         self.distribution = self.measure.distribution
         # Set Attributes
-        self.levels = l_init
+        self.levels = levels_init
         self.n_level = zeros(self.levels+1)
         self.sum_level = zeros((2,self.levels+1))
         self.cost_level = zeros(self.levels+1)

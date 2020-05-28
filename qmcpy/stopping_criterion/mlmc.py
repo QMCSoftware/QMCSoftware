@@ -1,6 +1,11 @@
 """
 Multi-Level Monte Carlo Method
 Translated mlmc.m from http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB
+
+Reference:
+    M.B. Giles. 'Multi-level Monte Carlo path simulation'. 
+    Operations Research, 56(3):607-617, 2008.
+    http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
 """
 
 from ._stopping_criterion import StoppingCriterion
