@@ -163,6 +163,8 @@ This work is maintained under the Apache 2.0 License.
 
 <b>[15]</b> M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'. 343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008. http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
 
+<b>[16]</b> M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'. pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics, de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
+
 <hr>
 
 ## Sponsors

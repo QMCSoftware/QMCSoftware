@@ -3,7 +3,7 @@
 from numpy import array, ndarray
 import numpy as np
 
-np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=3)
+np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=10)
 
 
 def univ_repr(qmc_object, abc_class_name, attributes):

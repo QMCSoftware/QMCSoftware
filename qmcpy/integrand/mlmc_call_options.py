@@ -1,6 +1,11 @@
 """
 Various call options from finance 
 using Milstein discretization with 2^l timesteps on level l
+
+Reference:
+    M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'.
+    343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008.
+    http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
 """
 
 from ._integrand import Integrand
