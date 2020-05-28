@@ -6,7 +6,7 @@ from numpy import arange
 import unittest
 
 keister_2d_exact = 1.808186429263620
-tol = .01
+tol = .05
 rel_tol = 0
 
 
@@ -129,28 +129,42 @@ class TestCubSobol_g(unittest.TestCase):
         integrand = Keister(measure)
         solution,data = CubSobol_g(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
-        
+
+
 class TestMLMC(unittest.TestCase):
     """ Unit tests for MLMC StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
-        distribution = Lattice()
-        measure = Gaussian(distribution)
-        integrand = MLMCCallOptions(measure)
+        integrand = MLMCCallOptions(Gaussian(Lattice()))
         self.assertRaises(DistributionCompatibilityError, MLMC, integrand)
 
-    def test_n_max_single_level(self):
-        distribution = IIDStdUniform()
-        measure = Gaussian(distribution)
-        integrand = MLMCCallOptions(measure,start_strike_price=30)
+    def test_n_max(self):
+        integrand = MLMCCallOptions(Gaussian(IIDStdUniform()),start_strike_price=30)
         algorithm = MLMC(integrand,rmse_tol=.001,n_max=2**10)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
     
     def test_european_option(self):
-        distribution = IIDStdUniform(seed=9)
-        measure = Gaussian(distribution)
-        integrand = MLMCCallOptions(measure,start_strike_price=30)
-        solution,data = MLMC(integrand,rmse_tol=tol).integrate()
+        integrand = MLMCCallOptions(Gaussian(IIDStdUniform()),start_strike_price=30)
+        solution,data = MLMC(integrand,rmse_tol=tol/2.58).integrate()
+        exact_value = integrand.get_exact_value()
+        self.assertTrue(abs(solution-exact_value) < tol)
+
+
+class TestMLQMC(unittest.TestCase):
+    """ Unit tests for MLQMC StoppingCriterion. """
+
+    def test_raise_distribution_compatibility_error(self):
+        integrand = MLMCCallOptions(Gaussian(IIDStdGaussian()))
+        self.assertRaises(DistributionCompatibilityError, MLQMC, integrand)
+
+    def test_n_max(self):
+        integrand = MLMCCallOptions(Gaussian(Lattice()),start_strike_price=30)
+        algorithm = MLQMC(integrand,rmse_tol=tol/2.58,n_max=2**10)
+        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
+    
+    def test_european_option(self):
+        integrand = MLMCCallOptions(Gaussian(Sobol()),start_strike_price=30)
+        solution,data = MLQMC(integrand,rmse_tol=tol/2.58).integrate()
         exact_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-exact_value) < tol)
 
