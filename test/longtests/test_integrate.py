@@ -129,10 +129,10 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_european_call(self):
         abs_tol = 1e-2
-        ddistrib = Sobol(dimension=8)
+        ddistrib = Sobol(dimension=16, seed=7)
         measure = BrownianMotion(ddistrib)
         integrand = EuropeanOption(measure,
-            volatility = .5,
+            volatility = .2,
             start_price = 5,
             strike_price = 10,
             interest_rate = .01,
@@ -144,11 +144,11 @@ class IntegrationExampleTest(unittest.TestCase):
     
     def test_european_put(self):
         abs_tol = 1e-2
-        ddistrib = Lattice(dimension=8)
+        ddistrib = Lattice(dimension=16, seed=17)
         measure = BrownianMotion(ddistrib)
         integrand = EuropeanOption(measure,
             volatility = .5,
-            start_price = 20,
+            start_price = 10,
             strike_price = 10,
             interest_rate = .01,
             call_put = 'put')
