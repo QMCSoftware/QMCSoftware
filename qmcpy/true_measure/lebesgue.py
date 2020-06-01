@@ -1,5 +1,3 @@
-""" Definition of Lebesgue, a concrete implementation of TrueMeasure """
-
 from ._true_measure import TrueMeasure
 from ..util import TransformError, ParameterError
 from numpy import array, isfinite, inf, isscalar, tile
@@ -7,7 +5,6 @@ from scipy.stats import norm
 
 
 class Lebesgue(TrueMeasure):
-    """ Lebesgue Uniform TrueMeasure """
 
     parameters = ['lower_bound', 'upper_bound']
     
@@ -41,16 +38,7 @@ class Lebesgue(TrueMeasure):
         super().__init__()
 
     def transform_g_to_f(self, g):
-        """
-        Transform g, the origianl integrand, to f,
-        the integrand accepting standard distribution samples. 
-        
-        Args:
-            g (method): original integrand
-        
-        Returns:
-            f (method): transformed integrand
-        """
+        """ See abstract method. """
         if self.tf_to_mimic == 'Uniform':
             def f(samples, *args, **kwargs):
                 dist = self.upper_bound - self.lower_bound

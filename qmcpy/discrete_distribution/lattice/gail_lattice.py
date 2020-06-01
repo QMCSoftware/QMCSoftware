@@ -65,8 +65,8 @@ gen_vec = array([ # copied from
 
 def vdc(n):
     """
-    Van der Corput sequence in base 2 where n is a power of 2. We do it this
-    way because of our own VDC construction: is much faster and cubLattice
+    Van der Corput sequence in base 2 where n is a power of 2. We do it this 
+    way because of our own VDC construction: is much faster and cubLattice 
     does not need more.
     """
     k = log2(n)

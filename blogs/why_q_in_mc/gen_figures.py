@@ -30,4 +30,4 @@ for pts,title,out_f in zip(pts_sets,titles,output_files):
     ax.set_title(title)
     ax.set_aspect('equal')
     pyplot.tight_layout()
-    fig.savefig('scratch/blogs/figs/%s.png'%out_f,dpi=200)
+    fig.savefig('blogs/why_q_in_mc/%s.png'%out_f,dpi=200)

@@ -1,5 +1,3 @@
-""" Definition for MeanVarDataRep, a concrete implementation of AccumulateData """
-
 from ._accumulate_data import AccumulateData
 from ..util import CubatureWarning
 from numpy import array, nan, zeros, tile, inf, hstack, arange, where
@@ -7,34 +5,21 @@ import warnings
 
 
 class CubatureData(AccumulateData):
-    """
-    Accumulated data relavent to cubature algorithms
-    """
 
     parameters = ['n_total','solution','r_lag']
 
     def __init__(self, stopping_criterion, integrand, basis_transform, m_min, m_max, fudge, check_cone):
         """
-        Initialize data instance
-
         Args:
             stopping_criterion (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
-            basis_transform (method):
-                Transform ynext, combine with y, and then transform all points
-                i.e.
-                    For cub_lattice this is Fast Fourier Transform (FFT).
-                    For cub_sobol this is Fast Walsh Transform (FWT)
-                Args:
-                    y (ndarray): all previous samples
-                    ynext (ndarray): next samples
-                Return:
-                    y (ndarray): all points combined and transformed
+            basis_transform (method): Transform ynext, combine with y, and then transform all points. 
+                For cub_lattice this is Fast Fourier Transform (FFT). 
+                For cub_sobol this is Fast Walsh Transform (FWT)
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
-            fudge (function): positive function multiplying the finite
-                              sum of basis coefficients specified 
-                              in the cone of functions
+            fudge (function): positive function multiplying the finite 
+                sum of basis coefficients specified in the cone of functions
             check_cone (boolean): check if the function falls in the cone
         """
         # Extract attributes from integrand
@@ -65,7 +50,7 @@ class CubatureData(AccumulateData):
         super().__init__()
 
     def update_data(self):
-        """ Update data """
+        """ See abstract method. """
         # Generate sample values
         x = self.distribution.gen_samples(n_min=self.n_total,n_max=2**self.m)
         ynext = self.integrand.f(x).squeeze()

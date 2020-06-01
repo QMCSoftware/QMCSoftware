@@ -1,5 +1,3 @@
-""" Definition for class EuropeanOption, a concrete implementation of Integrand """
-
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
@@ -8,15 +6,12 @@ from scipy.stats import norm
 
 
 class EuropeanOption(Integrand):
-    """ Specify and generate payoff values of an European option """
 
     parameters = ['volatility', 'start_price', 'strike_price', 'interest_rate']
                           
     def __init__(self, measure, volatility=0.5, start_price=30, strike_price=35,
         interest_rate=0, call_put='call'):
         """
-        Initialize EuropeanCall Integrand
-
         Args:
             measure (TrueMeasure): A BrownianMotion TrueMeasure object
             volatility (float): sigma, the volatility of the asset
@@ -39,15 +34,7 @@ class EuropeanOption(Integrand):
         super().__init__()        
 
     def g(self, x):
-        """
-        Original integrand to be integrated
-
-        Args:
-            x (ndarray): n samples by d dimensions brownian motion samples
-
-        Returns:
-            y (ndarray): n vector of max(S(T)-K,0)exp(-rT)
-        """
+        """ See abstract method. """
         s = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
             self.measure.time_vector + self.volatility * x)
@@ -62,11 +49,11 @@ class EuropeanOption(Integrand):
     
     def get_fair_price(self):
         """
-        Get the fair price of a European call/put option
-        under geometric Brownain Motion
+        Get the fair price of a European call/put option 
+        under geometric Brownain Motion.
         
         Return:
-            fp (float): fair price
+            float: fair price
         """
         denom = self.volatility * sqrt(self.exercise_time)
         decay = self.strike_price * exp(-self.interest_rate * self.exercise_time)

@@ -10,6 +10,9 @@ def tolfun(abs_tol, rel_tol, theta, mu, toltype):
         theta (float): parameter in 'theta' case
         mu (loat): true mean
         toltype (str): different options of tolerance function
+    
+    Return:
+        float: tolerence as weighted sum of absolute and relative tolerence
     """
     if toltype == 'combine':  # the linear combination of two tolerances
         # theta == 0 --> relative error tolarance

@@ -1,13 +1,3 @@
-"""
-Multi-Level Monte Carlo Method
-Translated mlmc.m from http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB
-
-Reference:
-    M.B. Giles. 'Multi-level Monte Carlo path simulation'. 
-    Operations Research, 56(3):607-617, 2008.
-    http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
-"""
-
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLMCData
 from ..util import MaxSamplesWarning, ParameterError
@@ -17,27 +7,24 @@ import warnings
 
 
 class MLMC(StoppingCriterion):
-    """ Stopping criterion based on multi-level monte carlo """
+    """
+    Stopping criterion based on multi-level monte carlo.
+    
+    Adapted from
+        http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB
+
+    Reference:
+        M.B. Giles. 'Multi-level Monte Carlo path simulation'. 
+        Operations Research, 56(3):607-617, 2008.
+        http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
+    """
 
     parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
 
     def __init__(self, integrand, rmse_tol=.1, n_init=256, n_max=1e10, levels_min=2, levels_max=10, alpha0=-1, beta0=-1, gamma0=-1):
         """
-        multi-level Monte Carlo estimation
-
         Args:
-            integrand (Integrand): integrand with g method such that 
-                Args:
-                    x (ndarray): nx(integrand.dim_at_level(l)) array of samples from discrete distribution
-                    l (int): level
-                Returns:
-                    sums (list/ndarray): for Y iid function evaluations with expected values
-                            E[P_0]           on level 0
-                            E[P_l - P_{l-1}] on level l>0
-                        then return
-                            sums(1) = sum(Y)
-                            sums(2) = sum(Y.^2)
-                    cost (float): cost of n samples
+            integrand (Integrand): integrand with multi-level g method
             rmse_tol (float): desired accuracy (rms error) > 0 
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
@@ -71,13 +58,13 @@ class MLMC(StoppingCriterion):
         self.data = MLMCData(self, integrand, self.levels_min, self.n_init, alpha0, beta0, gamma0)
     
     def integrate(self):
-        """ determine when to stop """
+        """ See abstract method. """
         t_start = perf_counter()
         while self.data.diff_n_level.sum() > 0:
             self.data.update_data()
             self.data.n_total += self.data.diff_n_level.sum()
             # set optimal number of additional samples
-            n_samples = self.get_next_samples()
+            n_samples = self._get_next_samples()
             self.data.diff_n_level = maximum(0, n_samples-self.data.n_level)
             # if (almost) converged, estimate remaining error and decide 
             # whether a new level is required
@@ -101,7 +88,7 @@ class MLMC(StoppingCriterion):
                         self.data.sum_level = hstack((self.data.sum_level,
                             zeros((2,1))))
                         self.data.cost_level = hstack((self.data.cost_level, 0))
-                        n_samples = self.get_next_samples()
+                        n_samples = self._get_next_samples()
                         self.data.diff_n_level = maximum(0, n_samples-self.data.n_level)
             # check if over sample budget
             if (self.data.n_total + self.data.diff_n_level.sum()) > self.n_max:
@@ -118,8 +105,7 @@ class MLMC(StoppingCriterion):
         self.data.time_integrate = perf_counter() - t_start
         return self.data.solution,self.data
     
-    def get_next_samples(self):
-        """ Get the next number of samples """
+    def _get_next_samples(self):
         ns = ceil( sqrt(self.data.var_level/self.data.cost_per_sample) * 
                 sqrt(self.data.var_level*self.data.cost_per_sample).sum() / 
                 ((1-self.theta)*self.rmse_tol**2) )

@@ -1,5 +1,3 @@
-""" Definition of Uniform, a concrete implementation of TrueMeasure """
-
 from ._true_measure import TrueMeasure
 from ..util import TransformError, DimensionError
 from numpy import array, prod, isscalar, tile
@@ -7,11 +5,10 @@ from scipy.stats import norm
 
 
 class Uniform(TrueMeasure):
-    """ Uniform TrueMeasure """
 
     parameters = ['lower_bound', 'upper_bound']
     
-    def __init__(self, distribution, lower_bound=0, upper_bound=1):
+    def __init__(self, distribution, lower_bound=0., upper_bound=1.):
         """
         Args:
             distribution (DiscreteDistribution): DiscreteDistribution instance
@@ -31,6 +28,7 @@ class Uniform(TrueMeasure):
         super().__init__()
     
     def pdf(self,x):
+        """ See abstract class. """
         return 1/( prod(self.upper_bound-self.lower_bound) )
 
     def _tf_to_mimic_samples(self, samples):
@@ -41,8 +39,7 @@ class Uniform(TrueMeasure):
             samples (ndarray): samples from a discrete distribution
         
         Return:
-             mimic_samples (ndarray): samples from the DiscreteDistribution transformed to appear 
-                                  to appear like the TrueMeasure object
+            ndarray: samples from the DiscreteDistribution transformed to mimic Uniform.
         """
         if self.distribution.mimics == 'StdGaussian':
             # CDF then stretch
@@ -56,16 +53,7 @@ class Uniform(TrueMeasure):
         return mimic_samples
 
     def transform_g_to_f(self, g):
-        """
-        Transform g, the origianl integrand, to f,
-        the integrand accepting standard distribution samples. 
-        
-        Args:
-            g (method): original integrand
-        
-        Returns:
-            f (method): transformed integrand
-        """
+        """ See abstract method. """
         def f(samples, *args, **kwargs):
             z = self._tf_to_mimic_samples(samples)
             y = g(z, *args, **kwargs)
@@ -74,29 +62,13 @@ class Uniform(TrueMeasure):
         return f
     
     def gen_mimic_samples(self, *args, **kwargs):
-        """
-        Generate samples from the DiscreteDistribution object
-        and transform them to mimic TrueMeasure samples
-        
-        Args:
-            *args (tuple): Ordered arguments to self.distribution.gen_samples
-            **kwrags (dict): Keyword arguments to self.distribution.gen_samples
-        
-        Returns:
-            mimic_samples (ndarray): samples from the DiscreteDistribution object transformed to appear 
-                                  to appear like the TrueMeasure object
-        """
+        """ See abstract method. """
         samples = self.distribution.gen_samples(*args,**kwargs)
         mimic_samples = self._tf_to_mimic_samples(samples)
         return mimic_samples
     
     def set_dimension(self, dimension):
-        """
-        Reset the dimension of the problem.
-        Calls DiscreteDistribution.set_dimension
-        Args:
-            dimension (int): new dimension
-        """
+        """ See abstract method. """
         l = self.lower_bound[0]
         u = self.upper_bound[0]
         if not (all(self.lower_bound==l) and all(self.upper_bound==u)):

@@ -1,5 +1,3 @@
-""" Definition for Lattice, a concrete implementation of DiscreteDistribution """
-
 from .._discrete_distribution import DiscreteDistribution
 from .gail_lattice import gail_lattice_gen
 from .mps_lattice import mps_lattice_gen
@@ -9,7 +7,30 @@ import warnings
 
 
 class Lattice(DiscreteDistribution):
-    """ Quasi-Random Lattice low discrepancy sequence (Base 2) """
+    """
+    Quasi-Random Lattice nets in base 2.
+    
+    References
+        Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, 
+        Lluis Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel, 
+        Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) 
+        [MATLAB Software], 2019. Available from http://gailgithub.github.io/GAIL_Dev/
+
+        F.Y. Kuo & D. Nuyens.
+        Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients 
+        - a survey of analysis and implementation, Foundations of Computational Mathematics, 
+        16(6):1631-1696, 2016.
+        springer link: https://link.springer.com/article/10.1007/s10208-016-9329-5
+        arxiv link: https://arxiv.org/abs/1606.06613
+        
+        D. Nuyens, `The Magic Point Shop of QMC point generators and generating
+        vectors.` MATLAB and Python software, 2018. Available from
+        https://people.cs.kuleuven.be/~dirk.nuyens/
+
+        Constructing embedded lattice rules for multivariate integration
+        R Cools, FY Kuo, D Nuyens -  SIAM J. Sci. Comput., 28(6), 2162-2188.
+    """
 
     parameters = ['dimension','scramble','seed','backend','mimics']
     
@@ -37,16 +58,16 @@ class Lattice(DiscreteDistribution):
 
     def gen_samples(self, n=None, n_min=0, n_max=8):
         """
-        Generate (n_max-n_min) x self.dimension Lattice samples
+        Generate lattice samples
 
         Args:
-            n (int): if n is supplied, generate from n_min=0 to n_max=n samples.
-                     Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
+            n (int): if n is supplied, generate from n_min=0 to n_max=n samples. 
+                Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence. Must be 0 or n_max/2
             n_max (int): Final index of sequence. Must be a power of 2.
 
         Returns:
-            (n_max-n_min) x self.dimension (ndarray)
+            ndarray: (n_max-n_min) x d (dimension) array of samples
         """
         if n:
             n_min = 0
@@ -62,7 +83,8 @@ class Lattice(DiscreteDistribution):
     
     def set_seed(self, seed):
         """
-        Reseed the generator to get a new scrambling. 
+        Reseed the generator to get a new scrambling.
+
         Args:
             seed (int): new seed for generator
         """
@@ -72,11 +94,10 @@ class Lattice(DiscreteDistribution):
     
     def set_dimension(self, dimension):
         """
-        Reset the dimension of the samples to be generated
-        Args:
-            dimension (int): dimension of samples
+        See abstract method. 
+
         Note:
-            this also computes a new random shift to be applied to samples
+            Will compute a new random shift to be applied to samples
         """
         self.dimension = dimension
         self.shift = random.rand(self.dimension)

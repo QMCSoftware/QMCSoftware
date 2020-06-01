@@ -1,11 +1,9 @@
-""" Abstract Class TrueMeasure """
-
 from ..util import MethodImplementationError, univ_repr, DimensionError
 from copy import deepcopy
 
 
 class TrueMeasure(object):
-    """ The True TrueMeasure of the Integrand """
+    """ True Measure abstract class. DO NOT INSTANTIATE. """
 
     def __init__(self):
         prefix = 'A concrete implementation of TrueMeasure must have '
@@ -17,41 +15,58 @@ class TrueMeasure(object):
         self.distrib_name = type(self.distribution).__name__
 
     def gen_mimic_samples(self, *args, **kwargs):
-        """ ABSTRACT METHOD
-        Generate samples from the DiscreteDistribution object
+        """
+        ABSTRACT METHOD to generate samples from the DiscreteDistribution object
         and transform them to mimic TrueMeasure samples. 
-        May not be applicable for all measures (ex: Lebesgue)
         
         Args:
             *args (tuple): Ordered arguments to self.distribution.gen_samples
             **kwrags (dict): Keyword arguments to self.distribution.gen_samples
         
         Returns:
-            tf_samples (ndarray): samples from the DiscreteDistribution object transformed
-                                  to appear like the TrueMeasure object
+            ndarray: samples from the DiscreteDistribution transformed to mimic the TrueMeasure.
+        
+        Note:
+            May not be applicable for all measures (ex: Lebesgue). 
         """
         raise MethodImplementationError(self,'gen_samples')
     
     def transform_g_to_f(self, g):
-        """ ABSTRACT METHOD
-        Transform the g, the origianl integrand, to f,
-        the integrand after transforming DiscreteDistribution samples
-        to mimic the TrueMeasure object. 
+        """
+        ABSTRACT METHOD to transform g, the origianl integrand, to f,
+        the integrand transformed to accept samples from the discrete distribution.  
         
         Args:
-            g (method): original integrand
+            g (method): original integrand (Integrand.g)
         
         Returns:
-            f (method): transformed integrand
+            function handle: transformed integrand
         """
         raise MethodImplementationError(self,'transform_g_to_f')
 
     def set_dimension(self, dimension):
-        """ ABSTRACT METHOD
-        Reset the dimension of the problem.
-        Calls DiscreteDistribution.set_dimension
+        """
+        ABSTRACT METHOD to reset the dimension of the problem. 
+        A wrapper around DiscreteDistribution.set_dimension.
+
+        Args:
+            dimension (int): new dimension to reset to 
+        
+        Note:
+            May not be applicable for all measures (ex: Gaussian with covariance != k*eye(d) for scalar k)
         """
         raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
+
+    def pdf(self, x):
+        """
+        Probability density function
+
+        Args:
+            x (ndarray): d (dimension) vector sample at which to evaluate the pdf
+        
+        Note:
+            May not be applicable for all measures (ex: Lebesgue).
+        """ 
 
     def __repr__(self):
         return univ_repr(self, "TrueMeasure", ['distrib_name']+self.parameters)

@@ -1,4 +1,4 @@
-""" Utility functions """
+""" Utility functions that abstract QMCPy objects. """
 
 from numpy import array, ndarray
 import numpy as np
@@ -7,15 +7,8 @@ np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=10)
 
 
 def univ_repr(qmc_object, abc_class_name, attributes):
-    """Clean way to represent qmc_object data.
-
-    Note: ::
-
-        print(qmc_object)
-
-    is equivalent to ::tes)
-
-        print(qmc_object.__repr__())
+    """
+    Clean way to represent qmc_object data.
 
     Args:
         qmc_object (object): an qmc_object instance
@@ -23,8 +16,11 @@ def univ_repr(qmc_object, abc_class_name, attributes):
         attributes (list): list of attributes to include
 
     Returns:
-        str
+        str: string representation of this qmcpy object
 
+    Note:
+        print(qmc_object) is equivalent to print(qmc_object.__repr__()). 
+        See an abstract classes __repr__ method for example call to this method. 
     """
     unique_attributes = []
     for attrib in attributes:
