@@ -61,7 +61,7 @@ before_install:
 - cd ..
 
 install:
-- pip install --quiet -r requirements.txt
+- pip install --quiet -r requirements/level_1_add_tests.txt
 - pip install -e .
 
 script:
