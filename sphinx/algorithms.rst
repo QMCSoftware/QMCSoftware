@@ -6,6 +6,12 @@ QMCPy Documentation
 Stopping Criterion Algorithms
 -----------------------------
 
+Abstract Stopping Criterion Class
+.................................
+
+.. automodule:: qmcpy.stopping_criterion._stopping_criterion
+    :members:
+
 Cubature Lattice Garunteed (qMC)
 ................................
 
@@ -16,6 +22,12 @@ Cubature Sobol Garunteed (qMC)
 ..............................
 
 .. automodule:: qmcpy.stopping_criterion.cub_sobol_g
+    :members:
+
+Multilevel Quasi-Monte Carlo (qMC)
+..................................
+
+.. automodule:: qmcpy.stopping_criterion.mlqmc
     :members:
 
 Central Limit Theorem for Replications (qMC)
@@ -47,6 +59,12 @@ Central Limit Theorem (MC)
 Integrand Class
 ---------------
 
+Abstract Integrand Class
+........................
+
+.. automodule:: qmcpy.integrand._integrand
+    :members:
+
 Keister Function
 ................
 
@@ -62,7 +80,7 @@ Asian Call Option
 Various Call Options by Milstein Discretization 
 ...............................................
 
-.. automodule:: qmcpy.integrand.call_options
+.. automodule:: qmcpy.integrand.mlmc_call_options
     :members:
 
 Custom Function
@@ -81,6 +99,12 @@ Linear Function
 
 Measure Class
 -------------
+
+Abstract Measure Class
+......................
+
+.. automodule:: qmcpy.true_measure._true_measure
+    :members:
 
 Uniform
 .......
@@ -122,6 +146,12 @@ Importance Sampling
 
 Discrete Distribution Class
 ---------------------------
+
+Abstract Discrete Distribution Class
+....................................
+
+.. automodule:: qmcpy.discrete_distribution._discrete_distribution
+    :members:
 
 Lattice
 .......
@@ -169,6 +199,12 @@ Acceptance Rejection Sampling
 
 Accumulate Data Class
 ---------------------
+
+Abstract Accumulate Data Class
+...................
+
+.. automodule:: qmcpy.accumulate_data._accumulate_data
+    :members:
 
 Cubature Data (qMC)
 ...................

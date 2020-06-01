@@ -1,16 +1,3 @@
-"""
-Definition of AcceptanceRejectionSampling, a concrete implementation of DiscreteDistribution
-    m(x) is pdf of measure we do not know how to generate from (mystery)
-    k(x) is pdf of measure we can generate discrete distribution samples from (known)
-    prodecure: 
-        1. samples s_i from k(x)
-        2. samples u_i from Uniform(0,1)
-        3. if u_i <= m(x)/(c*k(x)) ==> keep s_i
-    Note: 
-        this algorithm conservitively estimates c by taking 256 samples
-        and approximating c ~= inflate_c_factor*max(m(s_i)/k(s_i) for i=1,...512)
-"""
-
 from ._discrete_distribution import DiscreteDistribution
 from ..util import TransformError
 from numpy import inf, zeros, random, array, apply_along_axis
@@ -18,8 +5,18 @@ from numpy import inf, zeros, random, array, apply_along_axis
 
 class AcceptanceRejectionSampling(DiscreteDistribution):
     """
-    Perform acceptance-rejection sampling
-    on samples from the discrete distribution
+    Define
+        - m(x) is pdf of measure we do not know how to generate from (mystery)
+        - k(x) is pdf of measure we can generate discrete distribution samples from (known)
+    
+    Prodecure 
+        1. samples s_i from k(x)
+        2. samples u_i from Uniform(0,1)
+        3. if u_i <= m(s_i)/(c*k(s_i)) ==> keep s_i
+    
+    Note: 
+        this algorithm conservitively estimates c by taking 256 samples
+        and approximating c ~= inflate_c_factor*max(m(s_i)/k(s_i) for i=1,...512)
     """
 
     parameters = ['c']
@@ -54,13 +51,13 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
 
     def gen_samples(self, n):
         """
-        Generate n x self.dimension samples 
+        Generate samples 
 
         Args:
             n (int): Number of observations to generate
 
         Returns:
-            n x self.dimension (ndarray)
+            ndarray: n x d (dimension) array of samples
         """
         samples = array([sample for sample,keep in self._sample_generator(n) if keep])
         return samples

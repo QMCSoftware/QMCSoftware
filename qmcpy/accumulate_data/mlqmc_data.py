@@ -1,19 +1,15 @@
-"""
-Definition of MLMCData, a concrete implementation of AccumulateData
-
-Reference:
-    M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'.
-    pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics,
-    de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
-"""
-
 from ._accumulate_data import AccumulateData
 from numpy import tile, zeros, random, inf, hstack, vstack
 
 class MLQMCData(AccumulateData):
     """
     Accumulated data for quasi-random sequence calculations,
-    and store multi-level, multi-replications mean, variance, and cost values
+    and store multi-level, multi-replications mean, variance, and cost values. 
+
+    Reference:
+        M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'.
+        pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics,
+        de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
     """
 
     parameters = ['levels','n_level','mean_level','var_level','bias_estimate','n_total']
@@ -51,7 +47,7 @@ class MLQMCData(AccumulateData):
         super().__init__()
 
     def update_data(self):
-        """ Update data """
+        """ See abstract method. """
         # update sample sums
         for l in range(self.levels):
             if not self.eval_level[l]:
@@ -77,7 +73,7 @@ class MLQMCData(AccumulateData):
         self.solution = self.mean_level.sum()
     
     def add_level(self):
-        """ Add another level """
+        """ Add another level to relevent attributes. """
         self.levels += 1
         self.n_level = hstack((self.n_level,0))
         self.eval_level = hstack((self.eval_level,True))

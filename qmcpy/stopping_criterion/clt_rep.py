@@ -1,5 +1,3 @@
-""" Definition for CLTRep, a concrete implementation of StoppingCriterion """
-
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
@@ -11,10 +9,7 @@ import warnings
 
 
 class CLTRep(StoppingCriterion):
-    """
-    Stopping criterion based on
-    var(stream_1_estimate, ..., stream_16_estimate) < errorTol
-    """
+    """ Stopping criterion based on Central Limit Theorem for multiple replications. """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
 
@@ -54,7 +49,7 @@ class CLTRep(StoppingCriterion):
         self.data = MeanVarDataRep(self, integrand, self.n_init, replications)
         
     def integrate(self):
-        """ Determine when to stop """
+        """ See abstract method. """
         t_start = perf_counter()
         while True:
             self.data.update_data()

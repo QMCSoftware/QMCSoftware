@@ -1,5 +1,3 @@
-""" Definition for class AsianCall, a concrete implementation of Integrand """
-
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
@@ -7,7 +5,6 @@ from numpy import array, exp, log, maximum, repeat
 
 
 class AsianCall(Integrand):
-    """ Specify and generate payoff values of an Asian Call option """
 
     parameters = ['volatility', 'start_price', 'strike_price',
                   'interest_rate','mean_type', 'dimensions', 'dim_fracs']
@@ -15,8 +12,6 @@ class AsianCall(Integrand):
     def __init__(self, measure, volatility=0.5, start_price=30, strike_price=35,\
                  interest_rate=0, mean_type='arithmetic', multi_level_dimensions=None):
         """
-        Initialize AsianCall Integrand(s)
-
         Args:
             measure (TrueMeasure): A BrownianMotion TrueMeasure object
             volatility (float): sigma, the volatility of the asset
@@ -24,7 +19,7 @@ class AsianCall(Integrand):
             strike_price (float): strike_price, the call/put offer
             interest_rate (float): r, the annual interest rate
             mean_type (string): 'arithmetic' or 'geometric' mean
-            multi_level_dimensions (list of ints): list of dimensions at each level.
+            multi_level_dimensions (list of ints): list of dimensions at each level. 
                 Leave as None for single-level problems
         """
         if not isinstance(measure,BrownianMotion):
@@ -52,11 +47,14 @@ class AsianCall(Integrand):
 
     def get_discounted_payoffs(self, stock_path, dimension):
         """
-        Calculate the discounted payoff from the stock path
+        Calculate the discounted payoff from the stock path. 
         
         Args:
-            stock_path (ndarray): option prices at monitoring times
+            stock_path (ndarray): n samples by d dimension option prices at monitoring times
             dimension (int): number of dimensions
+        
+        Return:
+            ndarray: n vector of discounted payoffs
         """
         if self.mean_type == 'arithmetic':
             avg = (self.start_price / 2 +
@@ -73,21 +71,7 @@ class AsianCall(Integrand):
         return y
 
     def g(self, x, l=0):
-        """
-        Original integrand to be integrated
-
-        Args:
-            x: nodes, $\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}$ \
-                row of an $n \\cdot \\lvert \\mathfrak{u} \\rvert$ matrix
-            l (int): level
-
-        Returns:
-            $n \\cdot p$ matrix with values \
-            $f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})$ where if \
-            $\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j$, \
-            then $x'_{ij} = x_{ij}$ for $j \\in \\mathfrak{u}$, \
-            and $x'_{ij} = c$ otherwise
-        """
+        """ See abstract method. """
         dim_frac = self.dim_fracs[l]
         dimension = self.dimensions[l]
         s_fine = self.start_price * exp(
@@ -102,8 +86,5 @@ class AsianCall(Integrand):
         return y
     
     def dim_at_level(self, l):
-        """ 
-        Get dimension of the SDE at level l
-            l (int): level
-        """
+        """ See abstract method. """
         return self.dimensions[l]

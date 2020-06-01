@@ -1,11 +1,8 @@
-""" Definition for IIDStdGaussian, a concrete implementation of DiscreteDistribution """
-
 from ._discrete_distribution import DiscreteDistribution
 from numpy.random import Generator, PCG64
 
 
 class IIDStdGaussian(DiscreteDistribution):
-    """ Standard Gaussian """
 
     parameters = ['dimension', 'seed', 'mimics']
 
@@ -23,20 +20,16 @@ class IIDStdGaussian(DiscreteDistribution):
 
     def gen_samples(self, n):
         """
-        Generate n x self.dimension IID Standard Gaussian samples
+        Generate samples 
 
         Args:
             n (int): Number of observations to generate
 
         Returns:
-            n x self.dimension (ndarray)
+            ndarray: n x d (dimension) array of samples
         """
         return self.rng.standard_normal((int(n), self.dimension))
     
     def set_dimension(self, dimension):
-        """
-        Reset the dimension of the samples to be generated
-        Args:
-            dimension (int): dimension of samples
-        """
+        """ See abstract method. """
         self.dimension = dimension

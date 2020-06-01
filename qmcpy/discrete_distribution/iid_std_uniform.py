@@ -1,11 +1,8 @@
-""" Definition for IIDStdUniform, a concrete implementation of DiscreteDistribution """
-
 from ._discrete_distribution import DiscreteDistribution
 from numpy.random import Generator, PCG64
 
 
 class IIDStdUniform(DiscreteDistribution):
-    """ Standard Uniform """
 
     parameters = ['dimension','seed','mimics']
 
@@ -23,22 +20,17 @@ class IIDStdUniform(DiscreteDistribution):
 
     def gen_samples(self, n):
         """
-        Generate n x self.dimension IID Standard Uniform samples
+        Generate samples 
 
         Args:
             n (int): Number of observations to generate
 
         Returns:
-            n x self.dimension (ndarray)
+            ndarray: n x d (dimension) array of samples
         """
         return self.rng.uniform(0,1,(int(n), self.dimension))
     
-    
     def set_dimension(self, dimension):
-        """
-        Reset the dimension of the samples to be generated
-        Args:
-            dimension (int): dimension of samples
-        """
+        """ See abstract class. """
         self.dimension = dimension
         

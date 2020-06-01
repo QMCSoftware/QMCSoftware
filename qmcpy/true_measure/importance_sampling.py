@@ -1,17 +1,13 @@
-"""
-Definition of ImportanceSampling, a concrete implementation of TrueMeasure
-    m(x) is pdf of measure we do not know how to generate from (mystery)
-    k(x) is pdf of measure we can generate discrete distribution samples from (known)
-"""
-
 from ._true_measure import TrueMeasure
 from ..util import TransformError
 from numpy import apply_along_axis
 
+
 class ImportanceSampling(TrueMeasure):
     """
-    Perform importance sampling
-    on samples from the discrete distribution
+    Define
+        - m(x) is pdf of measure we do not know how to generate from (mystery) 
+        - k(x) is pdf of measure we can generate discrete distribution samples from (known)
     """
 
     parameters = []
@@ -36,16 +32,7 @@ class ImportanceSampling(TrueMeasure):
         super().__init__()
 
     def transform_g_to_f(self, g):
-        """
-        Transform g, the origianl integrand, to f,
-        the integrand accepting standard distribution samples. 
-        
-        Args:
-            g (method): original integrand
-        
-        Returns:
-            f (method): transformed integrand
-        """
+        """ See abstract method. """
         def f(samples, *args, **kwargs):
             samples_k = self.k_sample_tf(samples) # transform standard samples to mimic measure_to_sample_from
             md = apply_along_axis(self.m,1,samples_k).squeeze() # pdf of objective measure

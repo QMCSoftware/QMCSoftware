@@ -1,12 +1,8 @@
-""" Definition for abstract class AccumulateData """
-
 from ..true_measure._true_measure import TrueMeasure
 from ..util import ParameterError, MethodImplementationError, univ_repr, DimensionError
 
 class AccumulateData():
-    """
-    Accumulated data required in the computation of the integral.
-    """
+    """ Accumulated Data abstract class. DO NOT INSTANTIATE. """
 
     def __init__(self):
         """ Initialize data instance """
@@ -27,9 +23,7 @@ class AccumulateData():
             self.parameters = []
 
     def update_data(self):
-        """ ABSTRACT METHOD
-        Update the accumulated data
-        """
+        """ ABSTRACT METHOD to update the accumulated data."""
         raise MethodImplementationError(self, 'update_data')
 
     def __repr__(self):

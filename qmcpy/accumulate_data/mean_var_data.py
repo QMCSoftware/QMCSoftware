@@ -1,5 +1,3 @@
-""" Definition of MeanVarData, a concrete implementation of AccumulateData """
-
 from ._accumulate_data import AccumulateData
 from ..integrand._integrand import Integrand
 from time import perf_counter
@@ -9,17 +7,11 @@ EPS = finfo(float32).eps
 
 
 class MeanVarData(AccumulateData):
-    """
-    Accumulated data for IIDDistribution calculations,
-    and store the sample mean and variance of integrand values
-    """
 
     parameters = ['levels','solution','n','n_total','confid_int']
 
     def __init__(self, stopping_criterion, integrand, n_init):
         """
-        Initialize data instance
-
         Args:
             stopping_criterion (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
@@ -46,7 +38,7 @@ class MeanVarData(AccumulateData):
         super().__init__()
 
     def update_data(self):
-        """ Update data """
+        """ See abstract method. """
         for l in range(self.levels):
             t_start = perf_counter() # time the integrand values
             if self.integrand.multilevel:

@@ -1,16 +1,3 @@
-""" Definition for CubSobol_g, a concrete implementation of StoppingCriterion
-
-Adapted from
-    https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
-
-Reference:
-    
-    [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-    Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-    GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
-    Available from http://gailgithub.github.io/GAIL_Dev/
-"""
-
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import CubatureData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
@@ -21,7 +8,18 @@ import warnings
 
 class CubSobol_g(StoppingCriterion):
     """
-    Stopping criterion for Lattice sequence with garunteed accuracy
+    Quasi-Monte Carlo method using Sobol' cubature over the
+    d-dimensional region to integrate within a specified generalized error
+    tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
+
+    Adapted from
+        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
+
+    Reference
+        [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
+        Available from http://gailgithub.github.io/GAIL_Dev/
 
     Guarantee
         This algorithm computes the integral of real valued functions in $[0,1]^d$
@@ -80,7 +78,7 @@ class CubSobol_g(StoppingCriterion):
         self.data = CubatureData(self, integrand, self.fwt_update, m_min, m_max, fudge, check_cone)
 
     def integrate(self):
-        """ Determine when to stop """
+        """ See abstract method. """
         t_start = perf_counter()
         while True:
             self.data.update_data()
@@ -111,12 +109,14 @@ class CubSobol_g(StoppingCriterion):
     
     def fwt_update(self, y, ynext):
         """
-        Fast Walsh Transform (FWT) ynext, combine with y, then FWT all points
+        Fast Walsh Transform (FWT) ynext, combine with y, then FWT all points.
+        
         Args:
             y (ndarray): all previous samples
             ynext (ndarray): next samples
+        
         Return:
-            y (ndarray): all points combined and transformed
+            ndarray: y and ynext combined and transformed
         """
         ## Compute initial FWT on next points
         mnext = int(log2(len(ynext)))

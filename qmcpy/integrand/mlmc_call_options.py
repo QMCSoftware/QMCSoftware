@@ -1,13 +1,3 @@
-"""
-Various call options from finance 
-using Milstein discretization with 2^l timesteps on level l
-
-Reference:
-    M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'.
-    343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008.
-    http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
-"""
-
 from ._integrand import Integrand
 from ..true_measure import Gaussian
 from ..util import ParameterError
@@ -16,15 +6,20 @@ from scipy.stats import norm
 
 
 class MLMCCallOptions(Integrand):
-    """ Specify ad generate payoff values from various call options """
+    """
+    Various call options from finance using Milstein discretization with 2^l timesteps on level l
 
-    parameters = []
+    Reference:
+        M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'.
+        343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008.
+        http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
+    """
 
-    def __init__(self, measure, option='european', volatility=.2, start_strike_price=100, 
-        interest_rate=.05, t_final=1):
+    parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
+
+    def __init__(self, measure, option='european', volatility=.2,
+        start_strike_price=100, interest_rate=.05, t_final=1):
         """
-        Initialize call option object
-
         Args:
             measure (TrueMeasure): A BrownianMotion TrueMeasure object
             option_type (str): type of option in
@@ -51,7 +46,7 @@ class MLMCCallOptions(Integrand):
         super().__init__()
 
     def get_exact_value(self):
-        """Print exact analytic value, based on s0=k"""
+        """ Print exact analytic value, based on s0=k """
         d1 = (self.r+.5*self.sigma**2)*self.t / (self.sigma*sqrt(self.t))
         d2 = (self.r-0.5*self.sigma**2)*self.t / (self.sigma*sqrt(self.t))
         if self.option == 'european':
@@ -88,7 +83,12 @@ class MLMCCallOptions(Integrand):
             hf (int): fine timestep = self.t/nf
             hc (float): coarse timestep = self.t/nc
             xf (ndarray): n vector of fine samples values = self.k
-            xc (ndarray): n vector of coarse samples = self.k  
+            xc (ndarray): n vector of coarse samples = self.k
+
+        Return:
+            tuple: tuple contining:
+                - pf (ndarray): payoffs from fine paths
+                - pc (ndarray): payoffs from coarse paths
         """
         dwf = samples * sqrt(hf)
         if l == 0:
@@ -120,6 +120,11 @@ class MLMCCallOptions(Integrand):
             hc (float): coarse timestep = self.t/nc
             xf (ndarray): n vector of fine samples values = self.k
             xc (ndarray): n vector of coarse samples = self.k  
+        
+        Return:
+            tuple: tuple contining:
+                - pf (ndarray): payoffs from fine paths
+                - pc (ndarray): payoffs from coarse paths
         """
         af = .5*hf*xf
         ac = .5*hc*xc
@@ -153,23 +158,7 @@ class MLMCCallOptions(Integrand):
         return pf,pc
     
     def g(self, samples, l):
-        """
-        Original integrand on level l
-        
-        Args:
-            samples (ndarray): nxd ndarray for d=2**l as specified by dim_at_level method
-            l (int): level
-        
-        Return:
-            sums (ndarray): length 6 vector of sums such that    
-                sums(1) = sum(Pf-Pc)
-                sums(2) = sum((Pf-Pc).^2)
-                sums(3) = sum((Pf-Pc).^3)
-                sums(4) = sum((Pf-Pc).^4)
-                sums(5) = sum(Pf)
-                sums(6) = sum(Pf.^2)
-            cost (float): user-defined computational cost
-        """
+        """ See abstract method. """
         n,d = samples.shape        
         nf = 2**l # n fine
         nc = nf/2 # n coarse
@@ -193,12 +182,7 @@ class MLMCCallOptions(Integrand):
         return sums,cost
     
     def dim_at_level(self, l):
-        """ 
-        Get dimension of the SDE at level l
-        
-        Args:
-            l (int): level
-        """
+        """ See abstract method. """
         if self.option == 'european':
             return 2**l
         elif self.option == 'asian':

@@ -1,13 +1,8 @@
-""" Definition for abstract class, ``Integrand`` """
-
 from ..util import MethodImplementationError, TransformError, univ_repr, ParameterError
 
 
 class Integrand(object):
-    """
-    Specify and generate values $f(\\boldsymbol{x})$ for \
-    $\\boldsymbol{x} \\in \\mathcal{X}$
-    """
+    """ Integrand abstract class. DO NOT INSTANTIATE. """
 
     def __init__(self):
         prefix = 'A concrete implementation of Integrand must have '
@@ -21,26 +16,32 @@ class Integrand(object):
             self.multilevel = False
         
     def g(self, x):
-        """ ABSTRACT METHOD
-        Original integrand to be integrated
+        """
+        ABSTRACT METHOD for original integrand to be integrated.
 
         Args:
-            x: nodes, $\\boldsymbol{x}_{\\mathfrak{u},i} = i^{\\mathtt{th}}$ \
-                row of an $n \\cdot |\\mathfrak{u}|$ matrix
+            x (ndarray): n samples by d dimension array of samples 
+                generated according to the true measure. 
+            l (int): OPTIONAL input for multi-level integrands. The level to generate at. 
+                Note that the dimension of x is determined by the dim_at_level method for 
+                multi-level methods.
 
-        Returns:
-            $n \\cdot p$ matrix with values \
-            $f(\\boldsymbol{x}_{\\mathfrak{u},i},\\mathbf{c})$ where if \
-            $\\boldsymbol{x}_i' = (x_{i, \\mathfrak{u}},\\mathbf{c})_j$, \
-            then $x'_{ij} = x_{ij}$ for $j \\in \\mathfrak{u}$, \
-            and $x'_{ij} = c$ otherwise
+        Return:
+            ndarray: n vector of function evaluations
         """
         raise MethodImplementationError(self, 'g')
     
     def dim_at_level(self, l):
-        """ ABSTRACT METHOD
-        Return the dimension of samples to generate for level l.
-        Will call Measure.set_dimension on returned level to get samples for new level
+        """
+        ABSTRACT METHOD to return the dimension of samples to generate at level l. 
+        This method only needs to be implemented for multi-level integrands where 
+        the dimension changes depending on the level. 
+        
+        Args:
+            l (int): level
+        
+        Return:
+            int: dimension of samples needed at level l
         """
         raise MethodImplementationError(self, 'dim_at_level')
 

@@ -1,10 +1,7 @@
-""" Definition for CustomIIDDistribution, a concrete implementation of DiscreteDistribution """
-
 from ._discrete_distribution import DiscreteDistribution
 
 
 class CustomIIDDistribution(DiscreteDistribution):
-    """ Wrapper around user's discrete distribution generator """
 
     parameters = []
 
@@ -21,13 +18,13 @@ class CustomIIDDistribution(DiscreteDistribution):
 
     def gen_samples(self, n):
         """
-        Generate n iid samples
+        Generate samples 
 
         Args:
             n (int): Number of observations to generate
 
         Returns:
-            n iid samples from CustomDistribution
+            ndarray: n x d (dimension) array of samples
         """
         return self.custom_generator(n)
 

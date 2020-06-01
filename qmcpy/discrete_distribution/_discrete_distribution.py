@@ -1,11 +1,9 @@
-""" DiscreteDistribution is an abstract class. """
-
 from ..util import ParameterError, MethodImplementationError, univ_repr, DimensionError
 from numpy import array
 
 
 class DiscreteDistribution(object):
-    """ Discrete DiscreteDistribution from which we can generate samples """
+    """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
 
     def __init__(self):
         prefix = 'A concrete implementation of DiscreteDistribution must have '
@@ -17,18 +15,25 @@ class DiscreteDistribution(object):
             self.parameters = []
 
     def gen_samples(self, *args):
-        """ ABSTRACT METHOD
-        Generate (n_max-n_min)xself.d Lattice samples
+        """
+        ABSTRACT METHOD Generate samples from discrete distribution. 
         
+        Args:
+            args (tuple): tuple of positional argument. See implementations for details
         Returns:
-            (n_max-n_min) x self.dimension (ndarray)
+            ndarray: n x d array of samples
         """
         raise MethodImplementationError(self, 'gen_dd_samples')
 
     def set_dimension(self, dimension):
-        """ ABSTRACT METHOD
-        Reset the dimension of the problem.
-        Calls DiscreteDistribution.set_dimension
+        """
+        ABSTRACT METHOD to reset the dimension of the problem.
+        
+        Args:
+            dimension (int): new dimension to reset to
+        
+        Note:
+            May not be applicable to every discrete distribution (ex: custom_iit_distribution). 
         """
         raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
 

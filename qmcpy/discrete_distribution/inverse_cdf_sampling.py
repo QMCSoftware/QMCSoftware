@@ -1,27 +1,26 @@
-""" Definition of InverseCDFSampling, a concrete implementation of DiscreteDistribution """
-
 from ._discrete_distribution import DiscreteDistribution
 from ..util import TransformError
 
 
 class InverseCDFSampling(DiscreteDistribution):
-    """ Custom InverseCDFSampling DiscreteDistribution """
 
     parameters = []
 
     def __init__(self, distribution_mimicking_uniform, inverse_cdf_fun=lambda u: u):
         """
         Args:
-            distribution_mimicking_uniform (DiscreteDistribution): DiscreteDistribution instance
-            inverse_cdf_fun (function): function accepting samples mimicing uniform
-                                    and applying inverse CDF transform
-                Args:
-                    u (ndarray): nxd numpy array of samples mimicing uniform
+            distribution_mimicking_uniform (DiscreteDistribution): DiscreteDistribution instance 
+                which mimics standard uniform
+            inverse_cdf_fun (function): function accepting samples mimicing uniform 
+                and applying inverse CDF transform. Must have 1 input argument accepting an  
+                ndarray of size n (observations) by d (diemsion) 
+        
         Example of exponential distribution:
-            y ~ exp(l)
-            ==> pdf y f(x) = l*exp(-l*x) ==> cdf y F(x)= 1-exp(-l*x)
-            ==> F^(-1)(u) = log(1-u)/(-l) ~ exp(l) for u ~ Uniform(0,1)
-            ==> inverse_cdf_fun = lambda u,l=5: log(1-u)/(-l)
+            - y ~ exp(l)
+            -  pdf y f(x) = l*exp(-l*x)
+            - cdf y F(x)= 1-exp(-l*x)
+            - F^(-1)(u) = log(1-u)/(-l) ~ exp(l) for u ~ Uniform(0,1)
+            - inverse_cdf_fun = lambda u,l=5: log(1-u)/(-l)
         """
         self.distribution_u = distribution_mimicking_uniform
         self.inverse_cdf_fun = inverse_cdf_fun
@@ -34,13 +33,13 @@ class InverseCDFSampling(DiscreteDistribution):
     
     def gen_samples(self, *args, **kwargs):
         """
-        Generate n x self.dimension samples 
+        Generate samples 
 
         Args:
             n (int): Number of observations to generate
 
         Returns:
-            n x self.dimension (ndarray)
+            ndarray: n x d (dimension) array of samples
         """
         original_samples = self.distribution_u.gen_samples(*args, **kwargs)
         mimic_samples = self.inverse_cdf_fun(original_samples)

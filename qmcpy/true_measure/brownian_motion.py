@@ -1,5 +1,3 @@
-""" Definition of BrownianMotion, a concrete implementation of TrueMeasure """
-
 from ._true_measure import TrueMeasure
 from ..util import TransformError, ParameterError
 from numpy import linspace, cumsum, diff, insert, sqrt, array, exp, array, dot
@@ -8,21 +6,20 @@ from scipy.linalg import cholesky
 
 
 class BrownianMotion(TrueMeasure):
-    """ Brownian Motion TrueMeasure """
+    """ Geometric Brownian Motion """
 
-    parameters = ['time_vector']
+    parameters = ['time_vector','mean_shift_is']
 
     def __init__(self, distribution, mean_shift_is=0):
         """
         Args:
             distribution (DiscreteDistribution): DiscreteDistribution instance
-            time_vector (list of ndarrays): monitoring times for the Integrand's'
             mean_shift_is (float): mean shift for importance sampling. 
         """
         self.distribution = distribution
         self.mean_shift_is = mean_shift_is
         self.d = self.distribution.dimension
-        self.time_vector = linspace(1./self.d,1,self.d)
+        self.time_vector = linspace(1./self.d,1,self.d) # evenly spaced
         self.ms_vec = self.mean_shift_is * self.time_vector
         sigma = array([[min(self.time_vector[i],self.time_vector[j])
                         for i in range(self.d)]
@@ -33,14 +30,13 @@ class BrownianMotion(TrueMeasure):
     
     def _tf_to_mimic_samples(self, samples):
         """
-        Transform samples to appear BrownianMotion
+        Transform samples to appear BrownianMotion.
         
         Args:
             samples (ndarray): samples from a discrete distribution
         
         Return:
-             mimic_samples (ndarray): samples from the DiscreteDistribution transformed to appear 
-                                  to appear like the TrueMeasure object
+            ndarray: samples from the DiscreteDistribution transformed to mimic the Brownain Motion.
         """
         if self.distribution.mimics == 'StdGaussian':
             # insert start time then cumulative sum over monitoring times
@@ -55,16 +51,7 @@ class BrownianMotion(TrueMeasure):
         return mimic_samples
 
     def transform_g_to_f(self, g):
-        """
-        Transform g, the origianl integrand, to f,
-        the integrand accepting standard distribution samples.  
-        
-        Args:
-            g (method): original integrand
-        
-        Returns:
-            f (method): transformed integrand
-        """
+        """ See abstract method. """
         def f(samples, *args, **kwargs):
             z = self._tf_to_mimic_samples(samples)
             y = g(z,*args,**kwargs) * exp( (self.mean_shift_is*self.t/2 - z[:,-1]) * self.mean_shift_is)
@@ -72,30 +59,17 @@ class BrownianMotion(TrueMeasure):
         return f
     
     def gen_mimic_samples(self, *args, **kwargs):
-        """
-        Generate samples from the DiscreteDistribution object
-        and transform them to mimic TrueMeasure samples
-        
-        Args:
-            *args (tuple): Ordered arguments to self.distribution.gen_samples
-            **kwrags (dict): Keyword arguments to self.distribution.gen_samples
-        
-        Return:
-             mimic_samples (ndarray): samples from the DiscreteDistribution transformed to appear 
-                                  to appear like the TrueMeasure object
-        """
+        """ See abstract method. """
         samples = self.distribution.gen_samples(*args,**kwargs)
         mimic_samples = self._tf_to_mimic_samples(samples)
         return mimic_samples
     
     def set_dimension(self, dimension):
         """
-        Reset the dimension of the problem.
-        Calls DiscreteDistribution.set_dimension
-        Args:
-            dimension (int): new dimension
+        See abstract method. 
+        
         Note:
-            monitoring times are evenly spaced as linspace(1/dimension,1,dimension)
+            Monitoring times are evenly spaced as linspace(1/dimension,1,dimension)
         """
         self.distribution.set_dimension(dimension)
         self.d = dimension

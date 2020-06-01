@@ -1,5 +1,3 @@
-""" Definition for MeanVarDataRep, a concrete implementation of AccumulateData """
-
 from ._accumulate_data import AccumulateData
 from time import perf_counter
 from numpy import array, finfo, float32, full, inf, nan, tile, zeros, random
@@ -8,16 +6,11 @@ EPS = finfo(float32).eps
 
 
 class MeanVarDataRep(AccumulateData):
-    """
-    AccumulateData from Repeated Central Limit Stopping Criterion calculations.
-    """
 
     parameters = ['replications','solution','sighat','n_total','confid_int']
 
     def __init__(self, stopping_criterion, integrand, n_init, replications):
         """
-        Initialize data instance
-
         Args:
             stopping_criterion (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance    
@@ -46,7 +39,7 @@ class MeanVarDataRep(AccumulateData):
         super().__init__()
 
     def update_data(self):
-        """ Update data """
+        """ See abstract method. """
         for r in range(self.replications):
             self.distribution.set_seed(self.seeds[r])
             x = self.distribution.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)

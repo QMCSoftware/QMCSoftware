@@ -1,17 +1,3 @@
-"""
-Definition for MeanMC_g, a concrete implementation of StoppingCriterion
-
-Adapted from
-    https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
-
-Reference:
-    
-    [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-    Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-    GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
-    Available from http://gailgithub.github.io/GAIL_Dev/
-"""
-
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
@@ -21,19 +7,28 @@ from scipy.optimize import fsolve
 from scipy.stats import norm
 from time import perf_counter
 import warnings
-warnings.filterwarnings('ignore', 'The iteration is not making good progress')
+
 
 class MeanMC_g(StoppingCriterion):
     """
     Stopping Criterion with garunteed accuracy
+
+    Adapted from
+        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
+
+    Reference:
+        
+        [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
+        Available from http://gailgithub.github.io/GAIL_Dev/
 
     Guarantee
         This algorithm attempts to calculate the mean, mu, of a random variable
         to a prescribed error tolerance, tolfun:= max(abstol,reltol*|mu|), with
         guaranteed confidence level 1-alpha. If the algorithm terminates without
         showing any warning messages and provides an answer tmu, then the follow
-        inequality would be satisfied:
-            Pr(|mu-tmu| <= tolfun) >= 1-alpha
+        inequality would be satisfied: Pr(|mu-tmu| <= tolfun) >= 1-alpha
     """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
@@ -69,7 +64,7 @@ class MeanMC_g(StoppingCriterion):
         self.data = MeanVarData(self, integrand, self.n_init)  # house integration data
 
     def integrate(self):
-        """ Determine when to stop """
+        """ See abstract method. """
         t_start = perf_counter()
         # Pilot Sample
         self.data.update_data()
@@ -137,10 +132,6 @@ class MeanMC_g(StoppingCriterion):
         return self.data.solution, self.data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):
-        """
-        This method uses Chebyshev and Berry-Esseen Inequality to calculate the
-        sample size needed
-        """
         ncheb = ceil(1 / (alpha * toloversig**2))  # sample size by Chebyshev's Inequality
         A = 18.1139
         A1 = 0.3328
@@ -167,10 +158,6 @@ class MeanMC_g(StoppingCriterion):
         return ncb, err
 
     def _ncbinv(self, n1, alpha1, kurtmax):
-        """
-        Calculate the reliable upper bound on error when given
-        Chebyshev and Berry-Esseen inequality and sample size n
-        """
         NCheb_inv = 1/sqrt(n1*alpha1)
         # use Chebyshev inequality
         A = 18.1139

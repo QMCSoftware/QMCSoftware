@@ -1,5 +1,3 @@
-""" Definition of Gaussian, a concrete implementation of TrueMeasure """
-
 from ._true_measure import TrueMeasure
 from ..util import TransformError,DimensionError
 from numpy import array, sqrt, eye, dot, pi, exp,dot, tile, isscalar, diag
@@ -8,7 +6,7 @@ from scipy.stats import norm
 
 
 class Gaussian(TrueMeasure):
-    """ Gaussian (Normal) TrueMeasure """
+    """ Normal Measure """
 
     parameters = ['mean', 'covariance']
 
@@ -17,9 +15,8 @@ class Gaussian(TrueMeasure):
         Args:
             distribution (DiscreteDistribution): DiscreteDistribution instance
             mean (float): mu for Normal(mu,sigma^2)
-            covariance (float/ndarray): sigma^2 for Normal(mu,sigma^2)
-                Note: an ndarray should be of shape dimension x dimension
-                      a float value is equivalent to float_val*eye(dimension)
+            covariance (ndarray): sigma^2 for Normal(mu,sigma^2). 
+                A float or d (dimension) vector input will be extended to covariance*eye(d)
         """
         self.distribution = distribution
         self.d = distribution.dimension
@@ -40,11 +37,7 @@ class Gaussian(TrueMeasure):
         super().__init__()
     
     def pdf(self, x):
-        """
-        Gaussian pdf
-        Args:
-            x (ndarray): dx1 matrix of samples from domain
-        """
+        """ See abstract method. """
         x = x.reshape(self.d,1)
         mu = self.mu.reshape(self.d,1)
         density = (2*pi)**(-self.d/2) * det(self.sigma)**(-1/2) * \
@@ -59,8 +52,7 @@ class Gaussian(TrueMeasure):
             samples (ndarray): samples from a discrete distribution
         
         Return:
-             mimic_samples (ndarray): samples from the DiscreteDistribution transformed to appear 
-                                  to appear like the TrueMeasure object
+            ndarray: samples from the DiscreteDistribution transformed to mimic Gaussian.
         """
         if self.distribution.mimics == 'StdGaussian':
             # shift and stretch
@@ -74,16 +66,7 @@ class Gaussian(TrueMeasure):
         return mimic_samples
 
     def transform_g_to_f(self, g):
-        """
-        Transform g, the origianl integrand, to f,
-        the integrand accepting standard distribution samples. 
-        
-        Args:
-            g (method): original integrand
-        
-        Returns:
-            f (method): transformed integrand
-        """
+        """ See abstract method. """
         def f(samples, *args, **kwargs):
             z = self._tf_to_mimic_samples(samples)
             y = g(z, *args, **kwargs)
@@ -91,32 +74,13 @@ class Gaussian(TrueMeasure):
         return f
     
     def gen_mimic_samples(self, *args, **kwargs):
-        """
-        Generate samples from the DiscreteDistribution object
-        and transform them to mimic TrueMeasure samples
-        
-        Args:
-            *args (tuple): Ordered arguments to self.distribution.gen_samples
-            **kwrags (dict): Keyword arguments to self.distribution.gen_samples
-        
-        Return:
-             mimic_samples (ndarray): samples from the DiscreteDistribution transformed to appear 
-                                  to appear like the TrueMeasure object
-        """
+        """ See abstract method. """
         samples = self.distribution.gen_samples(*args,**kwargs)
         mimic_samples = self._tf_to_mimic_samples(samples)
         return mimic_samples
 
     def set_dimension(self, dimension):
-        """
-        Reset the dimension of the problem.
-        Calls DiscreteDistribution.set_dimension
-        Args:
-            dimension (int): new dimension
-        Note:
-            if mu and sigma are not scalars
-            resetting dimension may throw dimension errors
-        """
+        """ See abstract method. """
         m = self.mu[0]
         c = self.sigma2[0,0]
         expected_cov = c*eye(self.d)

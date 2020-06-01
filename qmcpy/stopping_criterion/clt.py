@@ -1,5 +1,3 @@
-""" Definition for CLT, a concrete implementation of StoppingCriterion """
-
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..util import MaxSamplesWarning
@@ -10,7 +8,7 @@ import warnings
 
 
 class CLT(StoppingCriterion):
-    """ Stopping criterion based on the Central Limit Theorem (CLT) """
+    """ Stopping criterion based on the Central Limit Theorem. """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
     
@@ -41,7 +39,7 @@ class CLT(StoppingCriterion):
         self.data = MeanVarData(self, integrand, self.n_init)
 
     def integrate(self):
-        """ Determine when to stop """
+        """ See abstract method. """
         t_start = perf_counter()
         # Pilot Sample
         self.data.update_data()
