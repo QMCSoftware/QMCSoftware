@@ -80,7 +80,7 @@ With ordinary Monte Carlo we do the following:
     	n_total         65536
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.079
+    	time_integrate  0.076
 
 
 
@@ -120,7 +120,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Solution: 0.4500         
+    Solution: 0.4504         
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -141,7 +141,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
     	n_total         16384
     	solution        0.450
     	r_lag           4
-    	time_integrate  0.018
+    	time_integrate  0.016
 
 
 
@@ -153,7 +153,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.225 the time and 0.250 the samples
+    Imporance Sampling takes 0.211 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -256,7 +256,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7850         
+    Solution: 1.7780         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -268,7 +268,7 @@ Vanilla Monte Carlo
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	seed            2335235373
+    	seed            291272157
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -281,9 +281,9 @@ Vanilla Monte Carlo
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
-    	solution        1.785
+    	solution        1.778
     	r_lag           4
-    	time_integrate  0.089
+    	time_integrate  0.095
 
 
 
@@ -313,7 +313,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7818         
+    Solution: 1.8017         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -325,7 +325,7 @@ Monte Carlo with Importance Sampling
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
-    	seed            49082752
+    	seed            845210602
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -338,9 +338,9 @@ Monte Carlo with Importance Sampling
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         4096
-    	solution        1.782
+    	solution        1.802
     	r_lag           4
-    	time_integrate  0.022
+    	time_integrate  0.020
 
 
 
@@ -361,7 +361,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.249 the time and 0.250 the samples
+    Imporance Sampling takes 0.209 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC

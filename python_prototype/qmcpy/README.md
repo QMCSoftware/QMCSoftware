@@ -5,10 +5,10 @@
 The function to integrate\
 *Abstract class with concrete implementations*
 
-- Linear: $g(\boldsymbol{x}) = \sum_{j=1}^{d}(x_{j})$
-- Keister: $y_i = \pi^{d/2} \, \cos(||\boldsymbol{x}_i||_2)$
+- Linear: $g(\boldsymbol{x}) = \sum_{j=1}^{d}x_{j}$
+- Keister: $g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)$
 - Asian Call
-    - $S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}$
+    - stock price at time $jT/d$: $S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)$
     - discounted call payoff $= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)*e^{-rT}$
     - discounted put payoff $= \max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)*e^{-rT}$
 - QuickConstruct

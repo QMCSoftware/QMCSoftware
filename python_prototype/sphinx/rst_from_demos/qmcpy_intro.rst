@@ -302,7 +302,7 @@ changing the input parameter value of dimension for QuickConstruct?
     	n               5452
     	n_total         6476
     	confid_int      [ 0.821  0.841]
-    	time_integrate  0.002
+    	time_integrate  0.001
     
 
 

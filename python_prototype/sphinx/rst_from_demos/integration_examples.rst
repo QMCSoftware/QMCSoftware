@@ -143,7 +143,7 @@ defined as follows:
     	sighat          0.042
     	n_total         16384
     	confid_int      [ 6.223  6.287]
-    	time_integrate  0.193
+    	time_integrate  0.186
     
 
 
@@ -184,7 +184,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2571         
+    Solution: 6.2583         
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -209,11 +209,11 @@ last example.
     	n_max           10000000000
     MeanVarData (AccumulateData Object)
     	levels          3
-    	solution        6.257
-    	n               [291256  36022   4757]
-    	n_total         335107
-    	confid_int      [ 6.208  6.306]
-    	time_integrate  0.116
+    	solution        6.258
+    	n               [290426  37723   4600]
+    	n_total         335821
+    	confid_int      [ 6.209  6.307]
+    	time_integrate  0.107
     
 
 

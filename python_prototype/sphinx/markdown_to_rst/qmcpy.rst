@@ -7,11 +7,13 @@ Integrand
 | The function to integrate
 | *Abstract class with concrete implementations*
 
--  Linear: :math:`g(\boldsymbol{x}) = \sum_{j=1}^{d}(x_{j})`
--  Keister: :math:`y_i = \pi^{d/2} \, \cos(||\boldsymbol{x}_i||_2)`
+-  Linear: :math:`g(\boldsymbol{x}) = \sum_{j=1}^{d}x_{j}`
+-  Keister:
+   :math:`g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)`
 -  Asian Call
 
-   -  :math:`S_i(t_j)=S(0)e^{(r-\frac{\sigma^2}{2})t_j+\sigma\mathcal{B}(t_j)}`
+   -  stock price at time :math:`jT/d`:
+      :math:`S(x_j)=S(0)\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)`
    -  discounted call payoff
       :math:`= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)*e^{-rT}`
    -  discounted put payoff

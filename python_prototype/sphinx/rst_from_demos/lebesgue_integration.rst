@@ -176,7 +176,7 @@ Integral over all real numbers
 
 .. parsed-literal::
 
-    y = 3.141
+    y = 3.142
     Within tolerance: True
 
 
