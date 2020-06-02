@@ -8,16 +8,16 @@ The function to integrate\
 - Linear: $g(\boldsymbol{x}) = \sum_{j=1}^{d}x_{j}$
 - Keister: $g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)$
 - Asian Call
-    - stock price at time $jT/d$: $S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)$
-    - discounted call payoff $= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)*e^{-rT}$
-    - discounted put payoff $= \max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)*e^{-rT}$
+    - stock price at time $jT/d$: $~~~~~~~~~~$ $S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma x_j\bigr)$
+    - discounted call payoff $\displaystyle = \max\left(\frac{1}{d}\sum_{j=1}^{d} S(x_j)-K\;,\: 0\right) \, \exp(-rT)$
+    - discounted put payoff $\displaystyle = \max\left(K-\frac{1}{d}\sum_{j=1}^{d} S(x_j)\;,\: 0\right)\, \exp(-rT)$
 - QuickConstruct
 
 <hr>
 
 ## True Measure
 
-General measure used to define the integrand\
+General measure used to define the integral\
 *Abstract class with concrete implementations*
 
 - Uniform: $\mathcal{U}(a,b)$

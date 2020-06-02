@@ -12,12 +12,12 @@ Integrand
    :math:`g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)`
 -  Asian Call
 
-   -  stock price at time :math:`jT/d`:
-      :math:`S(x_j)=S(0)\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)`
+   -  stock price at time :math:`jT/d`: :math:`~~~~~~~~~~`
+      :math:`S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma x_j\bigr)`
    -  discounted call payoff
-      :math:`= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)*e^{-rT}`
+      :math:`\displaystyle = \max\left(\frac{1}{d}\sum_{j=1}^{d} S(x_j)-K\;,\: 0\right) \, \exp(-rT)`
    -  discounted put payoff
-      :math:`= \max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)*e^{-rT}`
+      :math:`\displaystyle = \max\left(K-\frac{1}{d}\sum_{j=1}^{d} S(x_j)\;,\: 0\right)\, \exp(-rT)`
 
 -  QuickConstruct
 
@@ -28,7 +28,7 @@ Integrand
 True Measure
 ------------
 
-| General measure used to define the integrand
+| General measure used to define the integral
 | *Abstract class with concrete implementations*
 
 -  Uniform: :math:`\mathcal{U}(a,b)`
