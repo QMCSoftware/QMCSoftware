@@ -2,6 +2,7 @@ from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLQMCData
 from ..util import MaxSamplesWarning, ParameterError
 from numpy import argmax, sqrt
+from scipy.stats import norm
 from time import perf_counter
 import warnings
 
@@ -18,16 +19,20 @@ class MLQMC(StoppingCriterion):
 
     parameters = ['rmse_tol','n_init','n_max','replications']
 
-    def __init__(self, integrand, rmse_tol=.1, n_init=256, n_max=1e10, replications=32):
+    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256, n_max=1e10, replications=32):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
-            rmse_tol (float): desired accuracy (rms error) > 0 
+            abs_tol (float): absolute tolerence
+            alpha (float): uncertainty level 
+            rmse_tol (float): root mean squared error
+                If supplied (not None), then absolute tolerence and alpha are ignored
+                in favor of the rmse tolerence
             n_max (int): maximum number of samples
             replications (int): number of replications on each level
         """
         # initialization
-        self.rmse_tol = rmse_tol
+        self.rmse_tol = rmse_tol if rmse_tol else (abs_tol / norm.ppf(1-alpha/2))
         self.n_init = n_init
         self.n_max = n_max
         self.replications = replications

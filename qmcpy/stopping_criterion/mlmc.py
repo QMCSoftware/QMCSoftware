@@ -2,6 +2,7 @@ from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLMCData
 from ..util import MaxSamplesWarning, ParameterError
 from numpy import ceil, sqrt, arange, minimum, maximum, hstack, zeros
+from scipy.stats import norm
 from time import perf_counter
 import warnings
 
@@ -21,7 +22,8 @@ class MLMC(StoppingCriterion):
 
     parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
 
-    def __init__(self, integrand, rmse_tol=.1, n_init=256, n_max=1e10, levels_min=2, levels_max=10, alpha0=-1, beta0=-1, gamma0=-1):
+    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256, n_max=1e10, 
+        levels_min=2, levels_max=10, alpha0=-1, beta0=-1, gamma0=-1):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
@@ -40,10 +42,10 @@ class MLMC(StoppingCriterion):
             raise ParameterError('needs levels_min >= 2')
         if levels_max < levels_min:
             raise ParameterError('needs levels_max >= levels_min')
-        if n_init <= 0 or rmse_tol <= 0:
-            raise ParameterError('needs n_init>0, rmse_tol>0')
+        if n_init <= 0:
+            raise ParameterError('needs n_init > 0')
         # initialization
-        self.rmse_tol = rmse_tol
+        self.rmse_tol = rmse_tol if rmse_tol else (abs_tol / norm.ppf(1-alpha/2))
         self.n_init = n_init
         self.n_max = n_max
         self.levels_min = levels_min
