@@ -34,7 +34,7 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
             distribution = Sobol(dimension, scramble=False, seed=7, backend='QRNG')
             distribution.gen_samples(n_min=0,n_max=n)
         row_i['S_QRNG_t'] = (time() - t0) / trials
-        # Sobol Magic Point Shop QMCPy
+        # Sobol Magic Point Shop
         t0 = time()
         for trial in range(trials):
             distribution = Sobol(dimension, scramble=False, seed=7, backend='MPS')

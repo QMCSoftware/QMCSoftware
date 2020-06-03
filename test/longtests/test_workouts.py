@@ -6,13 +6,6 @@ import unittest
 
 
 class TestWorkouts(unittest.TestCase):
-
-    def test_example_constructions(self):
-        barebones()
-        distributions()
-        integrands()
-        measures()
-        stopping_criteria()
     
     def test_integration_examples(self):
         asian_option_multi_level()
