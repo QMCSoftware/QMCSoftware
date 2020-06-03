@@ -31,11 +31,12 @@ True Measure
 | General measure used to define the integral
 | *Abstract class with concrete implementations*
 
--  Uniform: :math:`\mathcal{U}(a,b)`
--  Gaussian: :math:`\mathcal{N}(\mu,\sigma^2)`
+-  Uniform: :math:`\mathcal{U}(\boldsymbol{a},\boldsymbol{b})`
+-  Gaussian: :math:`\mathcal{N}(\boldsymbol{\mu},\mathsf{\Sigma})`
 -  Discrete Brownian Motion:
-   :math:`\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;` for
-   :math:`\;Z_j \sim \mathcal{N}(0,1)`
+   :math:`\mathcal{N}(\boldsymbol{0},\mathsf{\Sigma})`, where
+   :math:`\mathsf{\Sigma} = \min(\boldsymbol{t},\boldsymbol{t}^T)`,
+   :math:`\boldsymbol{t} = (t_1, \ldots, t_d)^T`
 -  Lebesgue
 -  Identity Transform
 
