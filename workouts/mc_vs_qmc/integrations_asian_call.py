@@ -65,5 +65,5 @@ integrations_dict = {
     ('MeanMC_g','IIDStdGaussian','MC'): meanmc_g_iidstdgaussian,
     ('CLTRep','Lattice','QMC'): cltrep_lattice,
     ('CLTRep','Sobol','QMC'): cltrep_sobol,
-    ('CubLattice_g','Lattice','QMC'): cublattice_g,
-    ('CubSobol_g','Sobol','QMC'): cubsobol_g}
+    ('CubLattice_g','Lattice','QMC'): cublattice_g}#,
+#    ('CubSobol_g','Sobol','QMC'): cubsobol_g}

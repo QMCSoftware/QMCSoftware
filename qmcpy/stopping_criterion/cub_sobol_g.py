@@ -52,6 +52,7 @@ class CubSobol_g(StoppingCriterion):
                               in the cone of functions
             check_cone (boolean): check if the function falls in the cone
         """
+        raise Exception("CubSobol_g currently under maintenance, try using CubLattice_g instead.")
         # Input Checks
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol

@@ -74,7 +74,8 @@ MLQMCData (AccumulateData Object)
 	time_integrate  1.1190
 Within Tolerence: True
 
-\CubLattice_g:
+
+CubLattice_g:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Solution: 10.4595        
 EuropeanOption (Integrand Object)

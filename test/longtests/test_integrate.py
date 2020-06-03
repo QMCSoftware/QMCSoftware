@@ -129,7 +129,7 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_european_call(self):
         abs_tol = 1e-2
-        ddistrib = Sobol(dimension=16, seed=7)
+        ddistrib = Lattice(dimension=16, seed=7)
         measure = BrownianMotion(ddistrib)
         integrand = EuropeanOption(measure,
             volatility = .2,
@@ -137,7 +137,7 @@ class IntegrationExampleTest(unittest.TestCase):
             strike_price = 10,
             interest_rate = .01,
             call_put = 'call')
-        algorithm = CubSobol_g(integrand, abs_tol)
+        algorithm = CubLattice_g(integrand, abs_tol)
         solution,data = algorithm.integrate()
         true_value = integrand.get_fair_price()
         self.assertTrue(abs(solution-true_value) < abs_tol)

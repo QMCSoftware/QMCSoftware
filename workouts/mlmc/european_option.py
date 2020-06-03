@@ -38,7 +38,7 @@ measure = BrownianMotion(Lattice(d))
 integrand = EuropeanOption(measure,volatility,start_price,start_price,interest_rate,call_put='call')
 algorithm = CubLattice_g(integrand,abs_tol)
 sol2,data2 = algorithm.integrate()
-print('\n\CubLattice_g:\n%s\n%s'%('~'*100,data2),end='')
+print('\n\nCubLattice_g:\n%s\n%s'%('~'*100,data2),end='')
 tol_check(exact_val,sol2,abs_tol,verbose=True)
 
 measure = BrownianMotion(Lattice(d))
