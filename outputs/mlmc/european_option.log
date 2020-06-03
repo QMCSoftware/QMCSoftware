@@ -1,0 +1,140 @@
+
+
+MLMC:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Solution: 10.4463        
+MLMCCallOptions (Integrand Object)
+	option          european
+	sigma           0.2000
+	k               100
+	r               0.0500
+	t               1
+	b               85
+IIDStdGaussian (DiscreteDistribution Object)
+	dimension       512
+	seed            None
+	mimics          StdGaussian
+Gaussian (TrueMeasure Object)
+	distrib_name    IIDStdGaussian
+	mean            0
+	covariance      1
+MLMC (StoppingCriterion Object)
+	rmse_tol        0.0039
+	n_init          256
+	levels_min      2
+	levels_max      10
+	theta           0.2500
+MLMCData (AccumulateData Object)
+	levels          9
+	n_level         [ 19783959.000  387077.000  157161.000  54236.000  20116.000  7380.000
+	                 2583.000  937.000  368.000  134.000]
+	mean_level      [ 10.051  0.184  0.103  0.053  0.029  0.014  0.007  0.004  0.002  0.001]
+	var_level       [ 196.023  0.150  0.043  0.012  0.003  0.001  0.000  0.000  0.000  0.000]
+	cost_per_sample [ 1.000  2.000  4.000  8.000  16.000  32.000  64.000  128.000  256.000
+	                 512.000]
+	alpha           0.9636
+	beta            1.9115
+	gamma           1.0000
+	time_integrate  3.9758
+Within Tolerence: True
+
+
+MLQMC:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Solution: 10.4497        
+MLMCCallOptions (Integrand Object)
+	option          european
+	sigma           0.2000
+	k               100
+	r               0.0500
+	t               1
+	b               85
+Lattice (DiscreteDistribution Object)
+	dimension       256
+	scramble        1
+	seed            82384
+	backend         gail
+	mimics          StdUniform
+Gaussian (TrueMeasure Object)
+	distrib_name    Lattice
+	mean            0
+	covariance      1
+MLQMC (StoppingCriterion Object)
+	rmse_tol        0.0039
+	n_init          256
+	n_max           10000000000
+	replications    16
+MLQMCData (AccumulateData Object)
+	levels          9
+	n_level         [32768  4096  2048  2048   512   256   256   256   256]
+	mean_level      [ 10.054  0.183  0.103  0.055  0.028  0.014  0.007  0.004  0.002]
+	var_level       [ 0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000]
+	bias_estimate   0.0018
+	n_total         679936
+	time_integrate  1.1190
+Within Tolerence: True
+
+\CubLattice_g:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Solution: 10.4595        
+EuropeanOption (Integrand Object)
+	volatility      0.2000
+	start_price     100
+	strike_price    100
+	interest_rate   0.0500
+Lattice (DiscreteDistribution Object)
+	dimension       256
+	scramble        1
+	seed            None
+	backend         gail
+	mimics          StdUniform
+BrownianMotion (TrueMeasure Object)
+	distrib_name    Lattice
+	time_vector     [ 0.004  0.008  0.012 ...  0.992  0.996  1.000]
+	mean_shift_is   0
+CubLattice_g (StoppingCriterion Object)
+	abs_tol         0.0100
+	rel_tol         0
+	n_init          1024
+	n_max           34359738368
+CubatureData (AccumulateData Object)
+	n_total         131072
+	solution        10.4595
+	r_lag           4
+	time_integrate  6.2428
+Within Tolerence: True
+
+
+CLTRep:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Solution: 10.4462        
+EuropeanOption (Integrand Object)
+	volatility      0.2000
+	start_price     100
+	strike_price    100
+	interest_rate   0.0500
+Lattice (DiscreteDistribution Object)
+	dimension       256
+	scramble        1
+	seed            8540
+	backend         gail
+	mimics          StdUniform
+BrownianMotion (TrueMeasure Object)
+	distrib_name    Lattice
+	time_vector     [ 0.004  0.008  0.012 ...  0.992  0.996  1.000]
+	mean_shift_is   0
+CLTRep (StoppingCriterion Object)
+	inflate         1.2000
+	alpha           0.0100
+	abs_tol         0.0100
+	rel_tol         0
+	n_init          256
+	n_max           1073741824
+MeanVarDataRep (AccumulateData Object)
+	replications    16
+	solution        10.4462
+	sighat          0.0081
+	n_total         1048576
+	confid_int      [ 10.440  10.452]
+	time_integrate  48.4511
+Within Tolerence: True

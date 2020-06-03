@@ -64,3 +64,4 @@ workout:
 	@python workouts/mc_vs_qmc/vary_dimension.py
 	# mlmc
 	@python workouts/mlmc/mcqmc06.py > outputs/mlmc/mcqmc06.log
+	@python workouts/mlmc/european_option.py > outputs/mlmc/european_option.log
