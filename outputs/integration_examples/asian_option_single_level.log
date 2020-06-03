@@ -67,7 +67,7 @@ MeanVarDataRep (AccumulateData Object)
 	sighat          0.1181
 	n_total         8192
 	confid_int      [ 5.745  5.927]
-	time_integrate  0.0839
+	time_integrate  0.0836
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -101,7 +101,7 @@ MeanVarData (AccumulateData Object)
 	n               82304
 	n_total         83328
 	confid_int      [ 5.717  5.917]
-	time_integrate  0.3282
+	time_integrate  0.3276
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -133,7 +133,7 @@ CubatureData (AccumulateData Object)
 	n_total         1024
 	solution        5.9421
 	r_lag           4
-	time_integrate  0.0122
+	time_integrate  0.0117
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
