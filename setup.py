@@ -42,6 +42,7 @@ setuptools.setup(
     url="https://github.com/QMCSoftware/QMCSoftware",
     package_dir={"": "qmcpy"},
     packages=setuptools.find_packages('qmcpy'),
+    install_requires=['numpy','scipy']
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: IIT License",

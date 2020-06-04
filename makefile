@@ -1,6 +1,16 @@
 qrngpath = qmcpy/discrete_distribution/qrng/
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+EXT = so
+endif
+ifeq ($(UNAME), Darwin)
+EXT = dylib
+endif
+ifeq ($(UNAME), Windows)
+EXT = dll
+endif
 qrng:
-	@gcc -Wall -fPIC -shared  -o $(qrngpath)qrng_lib.so $(qrngpath)*.c -lm
+	@gcc -Wall -fPIC -shared  -o $(qrngpath)qrng_lib.$(EXT) $(qrngpath)*.c -lm
 	@echo Done compiling qrng C files
 
 tests:

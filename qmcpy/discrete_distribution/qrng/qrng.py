@@ -17,6 +17,7 @@ import numpy
 import os
 import platform
 
+<<<<<<< HEAD
 my_os = platform.system()
 path = os.path.dirname(os.path.abspath(__file__))
 <<<<<<< HEAD:python_prototype/qmcpy/discrete_distribution/qrngpy/qrng.py
@@ -32,6 +33,13 @@ else:
 =======
 lib = ctypes.CDLL(path+'/qrng_lib.so',mode=ctypes.RTLD_GLOBAL)
 >>>>>>> update fasttests:python_prototype/qmcpy/discrete_distribution/qrng/qrng.py
+=======
+# load library
+my_os = platform.system()
+os_ext = {'Linux':'so', 'Darwin':'dylib', 'Windows':'dll'}
+path = os.path.dirname(os.path.abspath(__file__))
+lib = ctypes.CDLL(path+'/qrng_lib.'+os_ext[my_os],mode=ctypes.RTLD_GLOBAL)
+>>>>>>> manually pull changes from master
 # MRG63k3a
 mrg63ka_f = lib.MRG63k3a
 mrg63ka_f.argtypes = None
