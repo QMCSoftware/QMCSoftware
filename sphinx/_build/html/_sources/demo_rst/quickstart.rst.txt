@@ -86,11 +86,7 @@ Step 5: Integrate
     	n_total         65536
     	solution        1.808
     	r_lag           4
-<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/quickstart.rst.txt
     	time_integrate  0.084
-=======
-    	time_integrate  0.060
->>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/quickstart.rst
     
     Within absolute tolerance: True
 
@@ -136,11 +132,7 @@ Condensed Problem
     	n_total         65536
     	solution        1.808
     	r_lag           4
-<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/quickstart.rst.txt
     	time_integrate  0.135
-=======
-    	time_integrate  0.059
->>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/quickstart.rst
     
     Within absolute tolerance: True
 

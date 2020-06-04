@@ -302,11 +302,7 @@ changing the input parameter value of dimension for QuickConstruct?
     	n               5452
     	n_total         6476
     	confid_int      [ 0.821  0.841]
-<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/qmcpy_intro.rst.txt
     	time_integrate  0.009
-=======
-    	time_integrate  0.001
->>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/qmcpy_intro.rst
     
 
 

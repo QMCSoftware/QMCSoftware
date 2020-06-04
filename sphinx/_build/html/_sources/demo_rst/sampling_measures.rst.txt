@@ -160,11 +160,7 @@ Acceptance Rejection Sampling
 .. parsed-literal::
 
     Expected (total draws / successful draws) = c = 1.333
-<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/sampling_measures.rst.txt
     Successful Draws: 5000  Total Draws: 6673
-=======
-    Successful Draws: 5000  Total Draws: 6651
->>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/sampling_measures.rst
 
 
 
@@ -328,11 +324,7 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
     	n_total         8192
     	solution        0.848
     	r_lag           4
-<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/sampling_measures.rst.txt
     	time_integrate  0.138
-=======
-    	time_integrate  0.121
->>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/sampling_measures.rst
     
     Within tolerance of true value 0.849: True
 

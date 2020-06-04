@@ -7,10 +7,7 @@ The function to integrate\
 
 - Linear: $g(\boldsymbol{x}) = \sum_{j=1}^{d}x_{j}$
 - Keister: $g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)$
-<<<<<<< HEAD:qmcpy/README.md
 - European Option
-=======
->>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/qmcpy/README.md
 - Asian Call
     - stock price at time $jT/d$: $S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)$
     - discounted call payoff $= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)*e^{-rT}$
