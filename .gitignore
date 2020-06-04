@@ -1,5 +1,5 @@
 # General Python
-python_prototype/__pycache__/
+*__pycache__/
 qmcpy.egg-info/
 *.blg
 *.idx
@@ -22,12 +22,11 @@ docs/_site
 docs/Gemfile.lock
 
 # Sphinx
-python_prototype/sphinx/_build/
-python_prototype/sphinx/_static/
+sphinx/_build/
+sphinx/_static/
 
 # Jupyter Notebooks
 *checkpoint.ipynb
-python_prototype/demos/html_renders/nei_demo.html
 
 # alegresor
 *.vscode
