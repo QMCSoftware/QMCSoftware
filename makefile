@@ -1,5 +1,4 @@
 qrngpath = qmcpy/discrete_distribution/qrng/
-<<<<<<< HEAD
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
 EXT = so
@@ -12,10 +11,6 @@ EXT = dll
 endif
 qrng:
 	@gcc -Wall -fPIC -shared  -o $(qrngpath)qrng_lib.$(EXT) $(qrngpath)*.c -lm
-=======
-qrng:
-	@gcc -Wall -fPIC -shared  -o $(qrngpath)qrng_lib.so $(qrngpath)*.c -lm
->>>>>>> 389b9cbbb73caab4f2f84edd6a5b380f2fec2058
 	@echo Done compiling qrng C files
 
 tests:
