@@ -1,0 +1,27 @@
+{% assign categories_max = 0 %}
+{% for category in site.categories %}
+  {% if category[1].size > categories_max %}
+    {% assign categories_max = category[1].size %}
+  {% endif %}
+{% endfor %}
+
+{% assign domain = site.url | append: site.baseurl %}
+
+<nav class="nav__list">
+{% if page.sidebar.title %}<h3 class="nav__title" style="padding-left: 0;">{{ page.sidebar.title }}</h3>{% endif %}
+<input id="ac-toc" name="accordion-toc" type="checkbox" />
+<label for="ac-toc">{{ site.data.ui-text[site.locale].menu_label | default: "Toggle Menu" }}</label>
+<ul class="nav__items">
+{% for i in (1..categories_max) reversed %}
+{% for category in site.categories %}
+{% if category[1].size == i %}
+<li>
+<a href="{{ domain }}/categories/#{{ category[0] | slugify }}">
+<span class="nav__sub-title">{{ category[0] }} ({{ i }}) </span>
+</a>
+</li>
+{% endif %}
+{% endfor %}
+{% endfor %}
+</ul>
+</nav>

@@ -1,0 +1,2 @@
+\newcommand\E[1]{\mathbb E[#1]}
+\newcommand\p[1]{\left( #1 \right)}
