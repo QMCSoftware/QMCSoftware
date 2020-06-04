@@ -55,6 +55,7 @@ before_install:
 - pip install --upgrade pip
 - pip install codecov
 <<<<<<< HEAD
+<<<<<<< HEAD
 - cd qmcpy
 - make all
 - cd ..
@@ -68,6 +69,12 @@ install:
 =======
 - pip install --quiet -r requirements/dev.txt
 >>>>>>> reference updates
+=======
+- make qrng
+
+install:
+- pip install --quiet -r requirements/dev.txt
+>>>>>>> 389b9cbbb73caab4f2f84edd6a5b380f2fec2058
 - pip install -e .
 
 script:
