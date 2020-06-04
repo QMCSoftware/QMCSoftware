@@ -9,9 +9,9 @@ The function to integrate\
 - Keister: $g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)$
 - European Option
 - Asian Call
-    - stock price at time $jT/d$: $S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)$
-    - discounted call payoff $= \max(\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d)-K)\;,\: 0)*e^{-rT}$
-    - discounted put payoff $= \max(K-\frac{1}{d}\sum_{j=0}^{d-1} S(jT/d))\;,\: 0)*e^{-rT}$
+    - stock price at time $jT/d$: $~~~~~~~~~$ $S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)$
+    - discounted call payoff $= \max\left(\frac{1}{d}\sum_{j=0}^{d} S(x_j)-K\right)\;,\: 0)  \,\exp(-rT)$
+    - discounted put payoff $= \max\left(K-\frac{1}{d}\sum_{j=0}^{d} S(x_j)\right)\;,\: 0)\,\exp(-rT)$
 - Multilevel Call Options
 - QuickConstruct
 
@@ -22,9 +22,9 @@ The function to integrate\
 General measure used to define the integrand\
 *Abstract class with concrete implementations*
 
-- Uniform: $\mathcal{U}(a,b)$
-- Gaussian: $\mathcal{N}(\mu,\sigma^2)$
-- Discrete Brownian Motion: $\mathcal{B}(t_j)=B(t_{j-1})+Z_j\sqrt{t_j-t_{j-1}} \;$ for $\;Z_j \sim \mathcal{N}(0,1)$
+- Uniform: $\mathcal{U}(\boldsymbol{a},\boldsymbol{b})$
+- Gaussian: $\mathcal{N}(\boldsymbol{\mu},\mathsf{\Sigma})$
+- Discrete Brownian Motion: $\mathcal{N}(\boldsymbol{\mu},\mathsf{\Sigma})$, where $\mathsf{\Sigma} = \min(\boldsymbol{t},\boldsymbol{t})^T)$, $\boldsymbol{t} = (t_1, \ldots, t_d)$
 - Lebesgue
 - Identity Transform
 - Importance sampling
