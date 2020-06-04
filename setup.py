@@ -10,11 +10,18 @@ To uninstall, do the following:
 
     pip uninstall qmcpy
 '''
-import os
 
 import setuptools
+from setuptools.command.install import install
 from setuptools import Command
+import os
+import subprocess
 
+class CustomInstall(install):
+    """Custom handler for the 'install' command."""
+    def run(self):
+        subprocess.check_call('make qrng',shell=True)
+        super().run()
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
@@ -49,5 +56,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    cmdclass={"clean": CleanCommand}
+    cmdclass={
+        'clean': CleanCommand,
+        'install': CustomInstall}
 )
