@@ -52,20 +52,15 @@ before_install:
 - conda create -n testenv python=$PYTHON_VERSION
 - source activate testenv
 - conda install $CONDA_DEPS
-- cd python_prototype
 - pip install --upgrade pip
 - pip install codecov
-- cd qmcpy
-- make all
-- cd ..
+- make qrng
 
 install:
-- pip install --quiet -r requirements/level_1_add_tests.txt
+- pip install --quiet -r requirements/dev.txt
 - pip install -e .
 
 script:
-# - python -W ignore -m unittest discover -s test/fasttests
-# - python -W ignore -m unittest discover -s test/longtests
 - coverage run --source=./ -m unittest discover -s test/fasttests
 - coverage run --append --source=./ -m unittest discover -s test/longtests
 
