@@ -1,0 +1,604 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>A Monte Carlo vs Quasi-Monte Carlo Comparison &mdash; QMCPy 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Quasi-Random Sequence Generator Comparison" href="quasirandom_generators.html" />
+    <link rel="prev" title="Scatter Plots of Samples" href="sample_scatter_plots.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> QMCPy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">About Our QMC Software Community</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../algorithms.html">QMCPy Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../demos.html">Demos</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">QMCPy Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qmcpy_intro.html">Welcome to QMCPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration_examples.html">Integration Examples using QMCPy package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lebesgue_integration.html">QMCPy for Lebesgue Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sample_scatter_plots.html">Scatter Plots of Samples</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">A Monte Carlo vs Quasi-Monte Carlo Comparison</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#vary-absolute-tolerance">Vary Absolute Tolerance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vary-dimension">Vary Dimension</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quasirandom_generators.html">Quasi-Random Sequence Generator Comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling_measures.html">Sampling from Known and Unknown Measures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="importance_sampling.html">Importance Sampling Examples</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QMCPy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../demos.html">Demos</a> &raquo;</li>
+        
+      <li>A Monte Carlo vs Quasi-Monte Carlo Comparison</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="a-monte-carlo-vs-quasi-monte-carlo-comparison">
+<h1>A Monte Carlo vs Quasi-Monte Carlo Comparison<a class="headerlink" href="#a-monte-carlo-vs-quasi-monte-carlo-comparison" title="Permalink to this headline">¶</a></h1>
+<p>Monte Carlo algorithms work on independent identically distributed (IID)
+points while Quasi-Monte Carlo algorithms work on low discrepancy
+sequences (LDS). LDS generators, such as those for the lattice and Sobol
+sequences, provide samples whose space filling properties can be
+exploited by Quasi-Monte Carlo algorithms.</p>
+<p>AccumulateData for the following plot can be generated by running files
+in <code class="docutils literal notranslate"><span class="pre">workouts/wo_mc_vs_qmc/</span></code></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">float_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:.2e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>          <span class="c1"># controls default text sizes</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;axes&#39;</span><span class="p">,</span> <span class="n">titlesize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>     <span class="c1"># fontsize of the axes title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;axes&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>    <span class="c1"># fontsize of the x and y labels</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;xtick&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>    <span class="c1"># fontsize of the tick labels</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;ytick&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>    <span class="c1"># fontsize of the tick labels</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;legend&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>    <span class="c1"># legend fontsize</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;figure&#39;</span><span class="p">,</span> <span class="n">titlesize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>  <span class="c1"># fontsize of the figure title</span>
+</pre></div>
+</div>
+<div class="section" id="vary-absolute-tolerance">
+<h2>Vary Absolute Tolerance<a class="headerlink" href="#vary-absolute-tolerance" title="Permalink to this headline">¶</a></h2>
+<p>Testing Parameters - relative tolerance = 0 - Results averaged over 3
+trials</p>
+<p>Keister Integrand - <img class="math" src="../_images/math/b2f2a409f38a61dba282c85785deff8fbe24948a.png" alt="y_i = \pi^{d/2} \cos(||x_i||_2)"/> -
+<img class="math" src="../_images/math/eeebc0b5b8491304da0058aaf1129b214ce53be1.png" alt="d=3"/></p>
+<p>Gaussian True Measure - <img class="math" src="../_images/math/12b12a6ba36b96157b9a69ef381fe00fa98bcb44.png" alt="\mathcal{N}(0,\frac{1}{2})^3"/></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../outputs/mc_vs_qmc/vary_abs_tol.csv&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Stopping Criterion&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Distribution&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;MC/QMC&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;Stopping Criterion&#39;</span><span class="p">,</span><span class="s1">&#39;Distribution&#39;</span><span class="p">,</span><span class="s1">&#39;MC/QMC&#39;</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">problems</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CLT IIDStdUniform (MC)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;MeanMC_g IIDStdGaussian (MC)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;CLTRep Sobol (QMC)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;CubLattice_g Lattice (QMC)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;CubSobol_g Sobol (QMC)&#39;</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">problems</span><span class="p">)]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;abs_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;abs_tol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">df_grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Problem&#39;</span><span class="p">])</span>
+<span class="n">df_abs_tols</span> <span class="o">=</span> <span class="n">df_grouped</span><span class="p">[</span><span class="s1">&#39;abs_tol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;abs_tol&#39;</span><span class="p">)</span>
+<span class="n">df_samples</span> <span class="o">=</span> <span class="n">df_grouped</span><span class="p">[</span><span class="s1">&#39;n_samples&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
+<span class="n">df_times</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Problem&#39;</span><span class="p">])[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;abs_tol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="o">.</span><span class="mi">01</span><span class="p">,</span><span class="o">.</span><span class="mi">05</span><span class="p">,</span><span class="o">.</span><span class="mi">1</span><span class="p">])]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Problem&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>abs_tol</th>
+      <th>solution</th>
+      <th>n_samples</th>
+      <th>time</th>
+    </tr>
+    <tr>
+      <th>Problem</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>CLT IIDStdUniform (MC)</th>
+      <td>1.00e-02</td>
+      <td>2.17e+00</td>
+      <td>4.72e+05</td>
+      <td>2.02e-01</td>
+    </tr>
+    <tr>
+      <th>CLT IIDStdUniform (MC)</th>
+      <td>5.00e-02</td>
+      <td>2.16e+00</td>
+      <td>2.08e+04</td>
+      <td>9.73e-03</td>
+    </tr>
+    <tr>
+      <th>CLT IIDStdUniform (MC)</th>
+      <td>1.00e-01</td>
+      <td>2.17e+00</td>
+      <td>6.75e+03</td>
+      <td>4.38e-03</td>
+    </tr>
+    <tr>
+      <th>MeanMC_g IIDStdGaussian (MC)</th>
+      <td>1.00e-02</td>
+      <td>2.17e+00</td>
+      <td>6.12e+05</td>
+      <td>7.57e-02</td>
+    </tr>
+    <tr>
+      <th>MeanMC_g IIDStdGaussian (MC)</th>
+      <td>5.00e-02</td>
+      <td>2.18e+00</td>
+      <td>4.01e+04</td>
+      <td>1.11e-02</td>
+    </tr>
+    <tr>
+      <th>MeanMC_g IIDStdGaussian (MC)</th>
+      <td>1.00e-01</td>
+      <td>2.18e+00</td>
+      <td>1.46e+04</td>
+      <td>5.08e-03</td>
+    </tr>
+    <tr>
+      <th>CLTRep Sobol (QMC)</th>
+      <td>1.00e-02</td>
+      <td>2.17e+00</td>
+      <td>4.10e+03</td>
+      <td>7.00e-03</td>
+    </tr>
+    <tr>
+      <th>CLTRep Sobol (QMC)</th>
+      <td>5.00e-02</td>
+      <td>2.17e+00</td>
+      <td>4.10e+03</td>
+      <td>7.18e-03</td>
+    </tr>
+    <tr>
+      <th>CLTRep Sobol (QMC)</th>
+      <td>1.00e-01</td>
+      <td>2.17e+00</td>
+      <td>4.10e+03</td>
+      <td>7.32e-03</td>
+    </tr>
+    <tr>
+      <th>CubLattice_g Lattice (QMC)</th>
+      <td>1.00e-02</td>
+      <td>2.17e+00</td>
+      <td>2.05e+03</td>
+      <td>5.48e-03</td>
+    </tr>
+    <tr>
+      <th>CubLattice_g Lattice (QMC)</th>
+      <td>5.00e-02</td>
+      <td>2.17e+00</td>
+      <td>1.02e+03</td>
+      <td>2.27e-03</td>
+    </tr>
+    <tr>
+      <th>CubLattice_g Lattice (QMC)</th>
+      <td>1.00e-01</td>
+      <td>2.17e+00</td>
+      <td>1.02e+03</td>
+      <td>2.97e-03</td>
+    </tr>
+    <tr>
+      <th>CubSobol_g Sobol (QMC)</th>
+      <td>1.00e-02</td>
+      <td>2.17e+00</td>
+      <td>2.05e+03</td>
+      <td>3.99e-03</td>
+    </tr>
+    <tr>
+      <th>CubSobol_g Sobol (QMC)</th>
+      <td>5.00e-02</td>
+      <td>2.17e+00</td>
+      <td>1.02e+03</td>
+      <td>1.79e-03</td>
+    </tr>
+    <tr>
+      <th>CubSobol_g Sobol (QMC)</th>
+      <td>1.00e-01</td>
+      <td>2.17e+00</td>
+      <td>1.02e+03</td>
+      <td>1.77e-03</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">:</span>
+    <span class="n">abs_tols</span> <span class="o">=</span> <span class="n">df_abs_tols</span><span class="p">[</span><span class="n">df_abs_tols</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">problem</span><span class="p">][</span><span class="s1">&#39;abs_tol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">df_samples</span><span class="p">[</span><span class="n">df_samples</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">problem</span><span class="p">][</span><span class="s1">&#39;n&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">df_times</span><span class="p">[</span><span class="n">df_times</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">problem</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">abs_tols</span><span class="p">,</span><span class="n">samples</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">problem</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">abs_tols</span><span class="p">,</span><span class="n">times</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">problem</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ax_i</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">basex</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">basey</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Absolute Tolerance&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Total Samples&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Runtime&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Comparing Absolute Tolerances&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=.</span><span class="mi">15</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;../outputs/mc_vs_qmc/vary_abs_tol.png&#39;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/MC_vs_QMC_4_0.png" src="../_images/MC_vs_QMC_4_0.png" />
+<p>Quasi-Monte Carlo takes less time and fewer samples to achieve the same
+accuracy as regular Monte Carlo The number of points for Monte Carlo
+algorithms is <img class="math" src="../_images/math/4ed34b90f01e5d7f8907d1c09aae1d3fd27d14da.png" alt="\mathcal{O}(1/\epsilon^2)"/> while Quasi-Monte Carlo
+algorithms can be as efficient as <img class="math" src="../_images/math/2125819ccbc75dd73fa57015af71da91f3f7f524.png" alt="\mathcal{O}(1/\epsilon)"/></p>
+</div>
+<div class="section" id="vary-dimension">
+<h2>Vary Dimension<a class="headerlink" href="#vary-dimension" title="Permalink to this headline">¶</a></h2>
+<p>Testing Parameters - absolute tolerance = 0 - relative tolerance = .01 -
+Results averaged over 3 trials</p>
+<p>Keister Integrand - <img class="math" src="../_images/math/b2f2a409f38a61dba282c85785deff8fbe24948a.png" alt="y_i = \pi^{d/2} \cos(||x_i||_2)"/></p>
+<p>Gaussian True Measure - <img class="math" src="../_images/math/82ebe96581fe593b080065693c3430c154c901af.png" alt="\mathcal{N}(0,\frac{1}{2})^d"/></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../outputs/mc_vs_qmc/vary_dimension.csv&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Stopping Criterion&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Distribution&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;MC/QMC&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;Stopping Criterion&#39;</span><span class="p">,</span><span class="s1">&#39;Distribution&#39;</span><span class="p">,</span><span class="s1">&#39;MC/QMC&#39;</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">problems</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CLT IIDStdUniform (MC)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;CLTRep Sobol (QMC)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;CubLattice_g Lattice (QMC)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;CubSobol_g Sobol (QMC)&#39;</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">problems</span><span class="p">)]</span>
+<span class="n">df_grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Problem&#39;</span><span class="p">])</span>
+<span class="n">df_dims</span> <span class="o">=</span> <span class="n">df_grouped</span><span class="p">[</span><span class="s1">&#39;dimension&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;dimension&#39;</span><span class="p">)</span>
+<span class="n">df_samples</span> <span class="o">=</span> <span class="n">df_grouped</span><span class="p">[</span><span class="s1">&#39;n_samples&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
+<span class="n">df_times</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Problem&#39;</span><span class="p">])[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dimension&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">])]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Problem&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dimension</th>
+      <th>solution</th>
+      <th>n_samples</th>
+      <th>time</th>
+    </tr>
+    <tr>
+      <th>Problem</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>CLT IIDStdUniform (MC)</th>
+      <td>10</td>
+      <td>-1.53e+02</td>
+      <td>4.60e+04</td>
+      <td>6.84e-02</td>
+    </tr>
+    <tr>
+      <th>CLT IIDStdUniform (MC)</th>
+      <td>20</td>
+      <td>-8.28e+04</td>
+      <td>4.75e+03</td>
+      <td>1.44e-02</td>
+    </tr>
+    <tr>
+      <th>CLT IIDStdUniform (MC)</th>
+      <td>30</td>
+      <td>-1.95e+07</td>
+      <td>2.03e+04</td>
+      <td>7.35e-02</td>
+    </tr>
+    <tr>
+      <th>CLTRep Sobol (QMC)</th>
+      <td>10</td>
+      <td>-1.54e+02</td>
+      <td>4.10e+03</td>
+      <td>1.04e-02</td>
+    </tr>
+    <tr>
+      <th>CLTRep Sobol (QMC)</th>
+      <td>20</td>
+      <td>-8.28e+04</td>
+      <td>4.10e+03</td>
+      <td>1.68e-02</td>
+    </tr>
+    <tr>
+      <th>CLTRep Sobol (QMC)</th>
+      <td>30</td>
+      <td>-1.94e+07</td>
+      <td>4.10e+03</td>
+      <td>2.20e-02</td>
+    </tr>
+    <tr>
+      <th>CubLattice_g Lattice (QMC)</th>
+      <td>10</td>
+      <td>-1.55e+02</td>
+      <td>1.02e+03</td>
+      <td>4.50e-03</td>
+    </tr>
+    <tr>
+      <th>CubLattice_g Lattice (QMC)</th>
+      <td>20</td>
+      <td>-8.28e+04</td>
+      <td>1.02e+03</td>
+      <td>8.03e-03</td>
+    </tr>
+    <tr>
+      <th>CubLattice_g Lattice (QMC)</th>
+      <td>30</td>
+      <td>-1.94e+07</td>
+      <td>1.02e+03</td>
+      <td>9.38e-03</td>
+    </tr>
+    <tr>
+      <th>CubSobol_g Sobol (QMC)</th>
+      <td>10</td>
+      <td>-1.54e+02</td>
+      <td>1.02e+03</td>
+      <td>3.84e-03</td>
+    </tr>
+    <tr>
+      <th>CubSobol_g Sobol (QMC)</th>
+      <td>20</td>
+      <td>-8.28e+04</td>
+      <td>1.02e+03</td>
+      <td>6.92e-03</td>
+    </tr>
+    <tr>
+      <th>CubSobol_g Sobol (QMC)</th>
+      <td>30</td>
+      <td>-1.94e+07</td>
+      <td>1.02e+03</td>
+      <td>1.13e-02</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">:</span>
+    <span class="n">dimension</span> <span class="o">=</span> <span class="n">df_dims</span><span class="p">[</span><span class="n">df_dims</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">problem</span><span class="p">][</span><span class="s1">&#39;dimension&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">df_samples</span><span class="p">[</span><span class="n">df_samples</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">problem</span><span class="p">][</span><span class="s1">&#39;n&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">df_times</span><span class="p">[</span><span class="n">df_times</span><span class="p">[</span><span class="s1">&#39;Problem&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">problem</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dimension</span><span class="p">,</span><span class="n">samples</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">problem</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dimension</span><span class="p">,</span><span class="n">times</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">problem</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ax_i</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">basex</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">basey</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax_i</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Dimension&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">1.3</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">ncol</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">problems</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Runtime&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Total Samples&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Comparing Dimensions&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;../outputs/mc_vs_qmc/vary_dimension.png&#39;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/MC_vs_QMC_8_0.png" src="../_images/MC_vs_QMC_8_0.png" />
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/QMCSoftware/QMCSoftware">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="quasirandom_generators.html" class="btn btn-neutral float-right" title="Quasi-Random Sequence Generator Comparison" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sample_scatter_plots.html" class="btn btn-neutral float-left" title="Scatter Plots of Samples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Illinois Institute of Technology
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

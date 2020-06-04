@@ -1,0 +1,11 @@
+UMLgui allows the automatic creation of UML class diagrams.  Running UMLgui opens the gui. You can then use the four buttons under the main panel to add directories, or directories and their (recursive) subdirectories, as well as deleting selected directories, or clearing the whole list.
+
+Various view options are available, the most significant being the Tree Layout, which is either `Aesthetic', producing a branching tree structure, or `Compact', which produces a much more compact but less visually appealing tree.
+
+Clicking the `Create UML diagram' button creates both an eps and pdf file of the diagram.  The output file can either be entered manually, or selected via a browser.
+
+Support is included for classes with multiple superclasses, but due to the potential non-planar nature of the graph, all but the first superclass are joined to the class by straight arrows.
+
+A very basic example is included in /Example (and subdirectories).
+
+It is also possible to create a script to bypass the gui; see makeAnimalDiagram.m for an example.

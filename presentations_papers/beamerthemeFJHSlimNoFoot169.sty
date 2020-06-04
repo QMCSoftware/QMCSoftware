@@ -1,0 +1,133 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is the beamerthemeORNL.sty
+% Author:  Clayton G. Webster
+% Date: July 24, 2011
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usetheme{Rochester}
+\RequirePackage{pgf}
+\RequirePackage[overlay]{textpos}
+
+%\setbeamercovered{transparent}
+\setbeamertemplate{navigation symbols}{} %remove navigation symbols
+
+%\beamer@headheight=0.13\paperwidth
+\beamer@headheight=0.15\paperheight
+
+\useoutertheme{infolines}
+\usecolortheme{FJHSlim}
+\usefonttheme[onlymath]{serif} %I want san serif fonts
+
+\pgfdeclareimage[width=1\paperwidth]{IIT_skyline}{IITcampusphotoExtend_b.pdf}
+
+\def\insertthanksnote{}
+\newcommand{\thanksnote}[1]{\def\insertthanksnote{#1}}
+\def\insertevent{}
+\newcommand{\event}[1]{\def\insertevent{#1}}
+\setbeamerfont{section in head/foot}{size=\scriptsize,series=\normalfont}
+\setbeamerfont{footer}{size=\scriptsize,series=\normalfont}
+\setbeamerfont{frametitle}{size=\Large}
+\setbeamerfont{title}{size=\Large,series = \bf}
+\setbeamerfont{institute}{size=\small,series = \bf}
+
+\newlength{\FJHCovImageVOffset}
+\setlength{\FJHCovImageVOffset}{0pt}
+
+\setbeamertemplate{headline}
+{
+\ifnumequal{\c@framenumber}{1}
+ {%
+  %\vspace{20ex}
+  \vspace{\FJHCovImageVOffset}
+  \pgfuseimage{IIT_skyline}
+  \vskip -1cm
+ }%
+ {
+  \linethickness{0.0pt}
+  \vspace{-0.6cm} %because too much space at top for whatever reason that is unclear
+%Change this and it adds a faint line along the top for some separation
+\includegraphics[width=0.5cm]{MengerIITRedGray.pdf}%
+\vspace{0.1cm}
+  \begin{beamercolorbox}
+  {section in head/foot}
+    \vskip3pt\insertnavigation{0.95\paperwidth}\vskip3pt
+  \end{beamercolorbox}%
+  
+  \begin{beamercolorbox}[wd=\paperwidth,ht=0.7\beamer@headheight]{Title bar}
+  \end{beamercolorbox}
+}
+}
+
+\setbeamertemplate{footline} %the bottom of the frame
+{
+\ifnumequal{\c@framenumber}{1}
+{
+%\includegraphics[width=0.75cm]{MengerIITRedGray.pdf}
+\vskip -0.38cm
+  \linethickness{0.0pt}
+  \framelatex{
+  %\begin{beamercolorbox}[leftskip=4cm,wd=\paperwidth,ht=0.23\beamer@headheight,sep=0.14cm]{footer}
+\begin{beamercolorbox}[wd=\paperwidth,ht=0.23\beamer@headheight,sep=0.14cm]{footer}
+    %
+    \usebeamerfont{footer}
+    \hfill
+    %\insertdate
+    \hfill 
+    %\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+}
+{
+%\includegraphics[width=0.75cm]{MengerIITRedGray.pdf}
+\vskip -0.38cm
+  \linethickness{0.0pt}
+  \framelatex{
+  \begin{beamercolorbox}[leftskip=0.75cm,wd=\paperwidth,ht=0.23\beamer@headheight,sep=0.14cm]{footer}
+    \usebeamerfont{footer}%
+    %\insertshortauthor\;\;\textbullet\;\;\insertshorttitle\;\;\textbullet\;\;\insertshortdate
+    \hfill
+    \insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}
+ }
+}
+
+
+\providecommand{\OffTitleLength}{-15ex}
+\setbeamertemplate{title page}
+{
+\vspace{\OffTitleLength}
+  \begingroup
+    \centering
+    {\usebeamerfont{title}\usebeamercolor[bg]{title}\inserttitle} \par
+    {\usebeamerfont{author}\usebeamercolor[bg]{title}\textbf{\insertauthor}} \\
+    {\usebeamerfont{institute}\usebeamercolor[bg]{title} \insertinstitute} \par
+    {\usebeamerfont{institute}\usebeamercolor[bg]{title} \insertthanksnote} \par
+    {\usebeamerfont{institute}\usebeamercolor[bg]{title} \insertevent, \insertdate} \par
+  \endgroup
+  %\vfill
+}
+
+\setlength{\TPHorizModule}{1\paperwidth}
+\setlength{\TPVertModule}{1\paperheight}
+\newcommand{\finalthankyoumessage}{Thank you}
+\newlength{\FJHThankYouMessageOffset}
+\setlength{\FJHThankYouMessageOffset}{-18ex}
+\def\insertfinalthanksnote{}
+\newcommand{\finalthanksnote}[1]{\def\insertfinalthanksnote{#1}}
+\newcommand{\thankyouframe}{ %my final thank you frame, uses textpos to position the text
+{
+\setbeamertemplate{headline}{%
+\vspace{\FJHCovImageVOffset}
+  \pgfuseimage{IIT_skyline}
+    \vskip -1cm
+  }
+\setbeamertemplate{footline}{}
+\begin{frame}
+\vspace{\FJHThankYouMessageOffset}
+\begin{center}{\usebeamerfont{title}\usebeamercolor[bg]{title}{\Huge \finalthankyoumessage}}
+\vfill
+{\usebeamerfont{text}\usebeamercolor[bg]{title}{\large \textbf{\insertfinalthanksnote}}} \par
+\end{center}
+\end{frame}
+}
+}
+

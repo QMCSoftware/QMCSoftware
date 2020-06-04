@@ -2,35 +2,104 @@
 [![codecov](https://codecov.io/gh/QMCSoftware/QMCSoftware/branch/master/graph/badge.svg)](https://codecov.io/gh/QMCSoftware/QMCSoftware)
 [![Documentation Status](https://readthedocs.org/projects/qmcpy/badge/?version=latest)](https://qmcpy.readthedocs.io/en/latest/?badge=latest)
 
+[Homepage](https://qmcsoftware.github.io/QMCSoftware/) | [GitHub Repository](https://github.com/QMCSoftware/QMCSoftware)
+
+<hr>
+
 # Quasi-Monte Carlo Community Software
 
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications. 
 
-
 <hr>
 
-##  Project 
+## Installation
 
-Homepage: [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/) 
+~~~
+pip install qmcpy
+~~~
 
-Code repostiory:  [https://github.com/QMCSoftware/QMCSoftware](https://github.com/QMCSoftware/QMCSoftware)
+**For Developers/Contributors**
 
-<hr>
+This package is dependent on the `qmcpy/` directory being on your python path. This is easiest with a virtual environment. For example, using `virtualenv` and `virtualenvwrapper`
 
-## Citation
+~~~
+mkvirtualenv qmcpy
+git clone https://github.com/QMCSoftware/QMCSoftware.git
+cd QMCSoftware
+setvirtualenvproject
+add2virtualenv $(pwd)
+pip install -r requirements/dev.txt
+make qrng
+~~~
 
-If you find QMCPy helpful in your work, please support us by citing the following work:
+ 
+To check for successful installation run
 
-Fred J. Hickernell, Sou-Cheng T. Choi, and Aleksei Sorokin, “QMC  Community Software.” Python software, 2019. Work in progress. Available from [https://github.com/QMCSoftware/QMCSoftware](https://github.com/QMCSoftware/QMCSoftware).
+~~~
+make tests
+~~~
 
 <hr>
 
 ## Documentation 
 
-PDF and EPUB ocumentation of QMCPy is available for download at  Read the Docs website
-[https://readthedocs.org/projects/qmcpy/downloads/](https://readthedocs.org/projects/qmcpy/downloads/).
+The QMCPy Read the Docs is located [here](https://qmcpy.readthedocs.io/en/latest/) with HTML, PDF, and EPUB downloads available [here](https://readthedocs.org/projects/qmcpy/downloads/).
 
-In addition, we have HTML documentation at [https://qmcpy.readthedocs.io/en/latest/](https://qmcpy.readthedocs.io/en/latest/)
+Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.org/). To compile HTML, PDF, or EPUB docs locally into `sphinx/_build/` first install additional requirements with 
+
+~~~
+pip install -r requirements/dev_docs.txt
+~~~
+
+and then run one of the following three commands
+
+~~~
+make doc_html
+make doc_pdf
+make doc_epub
+~~~
+
+<hr>
+
+## QMCPy
+
+The central package including the 5 main components as listed below. Each component is implemented as abstract classes with concrete implementations. For example, the lattice and Sobol sequences are implemented as concrete implementations of the `DiscreteDistribution` abstract class. A complete list of concrete implementations and thorough documentation can be found [here](https://qmcpy.readthedocs.io/en/latest/algorithms.html) on our Read the Docs site. 
+
+- **Stopping Criterion:** determines the number of samples necessary to meet an error tolerence.
+- **Integrand:** the function/process whose expected value will be approximated.
+- **True Measure:** the distribution which the integrand is defined for.
+- **Discrete Distribution:** a generator of nodes/sequences, that can be either iid (for Monte Carlo) or low-discrepancy (for quasi-Monte Carlo), that mimic a standard distribution.
+- **Accumulate Data:** stores information from integration process.
+
+<hr>
+
+## Workouts and Demos
+
+Workouts extensively test and compare the componenets of the the QMCPy package.
+Demos, implemented as Jupyter notebooks, demonstrate functionality and uses cases for QMCPy. They often draw from and explore the output of various workouts. 
+
+To run all workouts (~10 min) use the command
+
+~~~
+make workout
+~~~
+
+<hr>
+
+## Unitests
+
+Combined fast (<1 sec) and long (<10 sec) unittests can be run with
+
+~~~
+make tests
+~~~
+
+To run either fast or long unittests use either of the following 2 commands
+
+~~~
+python -W ignore -m unittest discover -s test/fasttests
+python -W ignore -m unittest discover -s test/longtests
+~~~
 
 <hr>
 
@@ -38,20 +107,27 @@ In addition, we have HTML documentation at [https://qmcpy.readthedocs.io/en/late
  
 - Sou-Cheng T. Choi
 - Fred J. Hickernell
+- Michael McCourt
+- Jagadeeswaran Rathinavel
 - Aleksei Sorokin
 
 <hr>
 
-## Contributors
-
-- Michael McCourt
+## Collaborators
+- Mike Giles
+- Marius Hofert
+- Christiane Lemieux
+- Dirk Nuyens
 
 <hr>
 
-## Acknowledgment 
+## Citation
 
-We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.
+If you find QMCPy helpful in your work, please support us by citing the following work:
 
+ Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. Working. 2020. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/).
+
+This work is maintained under the Apache 2.0 License.
 
 <hr>
 
@@ -79,15 +155,22 @@ We thank Dirk Nuyens for fruitful discussions related to Magic Point Shop.
 
 <b>[11]</b> Fred J. Hickernell and Lluis Antoni Jimenez Rugama, "Reliable adaptive cubature using digital sequences", Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA], pp. 367-383.
 
-<b>[12]</b> Faure, Henri, and Christiane Lemieux. “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
+<b>[12]</b> Marius Hofert and Christiane Lemieux (2019). qrng: (Randomized) Quasi-Random Number Generators. R package version 0.0-7. https://CRAN.R-project.org/package=qrng.
+
+<b>[13]</b> Faure, Henri, and Christiane Lemieux. “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
+
+<b>[14]</b> M.B. Giles. 'Multi-level Monte Carlo path simulation'. Operations Research, 56(3):607-617, 2008. http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
+
+<b>[15]</b> M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'. 343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008. http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
+
+<b>[16]</b> M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'. pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics, de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
 
 <hr>
 
 ## Sponsors
 
-<img src="./python_prototype/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg" alt="IIT logo"/>
+<img src="sphinx/logo/illinois-institute-of-technology-vector-logo.jpg" alt="IIT logo" height=200px width=400px/>
 
-<img src="./python_prototype/sphinx/logo/kamakura-corporation-vector-logo.png" alt="Kamakura logo"/>
+<img src="sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg" alt="SigOpt logo" height=100px width=400px/>
 
-<img src="./python_prototype/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg" alt="SigOpt logo"/>
-
+<img src="sphinx/logo/kamakura-corporation-vector-logo.png" alt="Kamakura logo" height=200px width=400px/>
