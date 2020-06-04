@@ -22,7 +22,7 @@ docs/_site
 docs/Gemfile.lock
 
 # Sphinx
-sphinx/_build/
+*sphinx/_build/
 sphinx/_static/
 sphinx/markdown_to_rst/
 sphinx/rst_from_demos/
