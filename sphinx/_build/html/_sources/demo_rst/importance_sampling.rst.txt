@@ -80,7 +80,11 @@ With ordinary Monte Carlo we do the following:
     	n_total         65536
     	solution        0.450
     	r_lag           4
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     	time_integrate  0.070
+=======
+    	time_integrate  0.076
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
 
 
 
@@ -120,7 +124,11 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     Solution: 0.4501         
+=======
+    Solution: 0.4504         
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
     QuickConstruct (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
@@ -141,7 +149,11 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
     	n_total         16384
     	solution        0.450
     	r_lag           4
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     	time_integrate  0.036
+=======
+    	time_integrate  0.016
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
 
 
 
@@ -153,7 +165,11 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     Imporance Sampling takes 0.507 the time and 0.250 the samples
+=======
+    Imporance Sampling takes 0.211 the time and 0.250 the samples
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
 
 
 Asian Call Option Example
@@ -260,7 +276,11 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     Solution: 1.7816         
+=======
+    Solution: 1.7780         
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -272,7 +292,11 @@ Vanilla Monte Carlo
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     	seed            839435032
+=======
+    	seed            291272157
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -285,9 +309,15 @@ Vanilla Monte Carlo
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         16384
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     	solution        1.782
     	r_lag           4
     	time_integrate  0.176
+=======
+    	solution        1.778
+    	r_lag           4
+    	time_integrate  0.095
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
 
 
 
@@ -317,7 +347,11 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     Solution: 1.8039         
+=======
+    Solution: 1.8017         
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
     AsianCall (Integrand Object)
     	volatility      0.500
     	start_price     30
@@ -329,7 +363,11 @@ Monte Carlo with Importance Sampling
     Sobol (DiscreteDistribution Object)
     	dimension       32
     	scramble        1
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     	seed            2088013629
+=======
+    	seed            845210602
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
     	backend         qrng
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
@@ -342,9 +380,15 @@ Monte Carlo with Importance Sampling
     	n_max           34359738368
     CubatureData (AccumulateData Object)
     	n_total         4096
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     	solution        1.804
     	r_lag           4
     	time_integrate  0.033
+=======
+    	solution        1.802
+    	r_lag           4
+    	time_integrate  0.020
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
 
 
 
@@ -365,7 +409,11 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
+<<<<<<< HEAD:sphinx/_build/html/_sources/demo_rst/importance_sampling.rst.txt
     Imporance Sampling takes 0.189 the time and 0.250 the samples
+=======
+    Imporance Sampling takes 0.209 the time and 0.250 the samples
+>>>>>>> ad5509724405df032683478f83a2cfd07476fecb:python_prototype/sphinx/rst_from_demos/importance_sampling.rst
 
 
 Importance Sampling MC vs QMC
