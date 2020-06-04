@@ -26,11 +26,12 @@ _doc:
 	# Make Directries
 	@-rm -r $(mddir) 2>/dev/null &
 	@-rm -r $(nbdir) 2>/dev/null &
-	# QMCSoftware READMEs --> RST
+	# READMEs --> RST
 	@mkdir $(mddir)
 	@grep -v  "\[\!" README.md > README2.md
 	@pandoc --mathjax README2.md -o $(mddir)QMCSoftware.rst
 	@rm README2.md
+	@pandoc --mathjax qmcpy/README.md -o $(mddir)qmcpy.rst
 	# Jupyter Notebook Demos --> RST
 	@mkdir $(nbdir)
 	@for f in demos/*.ipynb; do \
