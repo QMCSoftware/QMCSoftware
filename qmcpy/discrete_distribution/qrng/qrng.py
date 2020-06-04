@@ -131,15 +131,13 @@ def sobol_qrng(n, d, scramble, skip, seed):
     sobol_f(n, d, scramble, res, skip, seed)
     return res.T
 
-
-if __name__ == '__main__':
+def qrng_example_use(plot=False):
     import time
     # constants
     n = 2**11
     d = 2
     randomize = True
     seed = 7
-    plot = True
     # generate points
     #    MRG63k3a
     t0 = time.perf_counter()
@@ -176,3 +174,6 @@ if __name__ == '__main__':
         fig.suptitle('qrng points with n=%d, d=%d, randomize=%s' % (n, d, randomize))
         fig.tight_layout()
         pyplot.show()
+
+if __name__ == '__main__':
+    qrng_example_use(plot=True)

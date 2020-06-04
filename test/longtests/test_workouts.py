@@ -22,6 +22,7 @@ class TestWorkouts(unittest.TestCase):
 
     def test_mlmc(self):
         mcqmc06()
+        european_options()
 
 
 if __name__ == "__main__":

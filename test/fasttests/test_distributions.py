@@ -2,6 +2,7 @@
 
 from qmcpy import *
 from qmcpy.util import *
+from qmcpy.discrete_distribution.qrng.qrng import qrng_example_use
 from numpy import *
 import unittest
 
@@ -48,6 +49,13 @@ class TestIIDGaussian(unittest.TestCase):
         distribution.set_dimension(3)
         samples = distribution.gen_samples(4)
         self.assertTrue(samples.shape==(4,3))
+
+
+class TestQRNG(unittest.TestCase):
+    """ Unit tests for QRNG code from C """
+
+    def test_qrng_example(self):
+        qrng_example_use()
 
 
 class TestLattice(unittest.TestCase):
