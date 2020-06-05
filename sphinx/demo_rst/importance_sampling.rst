@@ -174,17 +174,15 @@ multidimensional integral
 
 where
 
-.. raw:: latex
-
-   \begin{align*} 
-   \boldsymbol{X} & \sim \mathcal{N}(\boldsymbol{0}, \mathsf{\Sigma}), \qquad
-   \mathsf{\Sigma} = \bigl(\min(j,k)T/d \bigr)_{j,k=1}^d, \\
-   d & =  13 \text{ in this case} \\
-   f(\boldsymbol{x}) & = \max\biggl(K - \frac 1d \sum_{j=1}^d
-   S(jT/d,\boldsymbol{x}), 0 \biggr) \mathrm{e}^{-rT}, \\
-   S(jT/d,\boldsymbol{x}) &= S(0) \exp\bigl((r - \sigma^2/2) jT/d +
-   \sigma x_j\bigr).
-   \end{align*}
+:raw-latex:`\begin{align*} 
+\boldsymbol{X} & \sim \mathcal{N}(\boldsymbol{0}, \mathsf{\Sigma}), \qquad
+\mathsf{\Sigma} = \bigl(\min(j,k)T/d \bigr)_{j,k=1}^d, \\
+d & =  13 \text{ in this case} \\
+f(\boldsymbol{x}) & = \max\biggl(K - \frac 1d \sum_{j=1}^d
+S(jT/d,\boldsymbol{x}), 0 \biggr) \mathrm{e}^{-rT}, \\
+S(jT/d,\boldsymbol{x}) &= S(0) \exp\bigl((r - \sigma^2/2) jT/d +
+\sigma x_j\bigr).
+\end{align*}`
 
 We will replace :math:`\boldsymbol{X}` by
 
@@ -197,27 +195,25 @@ where a positive :math:`a` will create more positive payoffs. This
 corresponds to giving our Brownian motion a drift. To do this we
 re-write the integral as
 
-.. raw:: latex
-
-   \begin{gather*} 
-   \mu = \mathbb{E}[f_{\mathrm{new}}(\boldsymbol{Z})] 
-   = \int_{\mathbb{R}^d}
-   f_{\mathrm{new}}(\boldsymbol{z}) 
-   \frac{\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
-   \mathsf{\Sigma}^{-1}
-   (\boldsymbol{z} - \boldsymbol{a}) \bigr)}
-   {\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{z} ,
-   \\
-   f_{\mathrm{new}}(\boldsymbol{z}) = 
-   f(\boldsymbol{z}) 
-   \frac{\exp\bigl(-\frac{1}{2} \boldsymbol{z}^T
-   \mathsf{\Sigma}^{-1} \boldsymbol{z} \bigr)}
-   {\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
-   \mathsf{\Sigma}^{-1}
-   (\boldsymbol{z} - \boldsymbol{a}) \bigr)}
-   = f(\boldsymbol{z}) \exp\bigl((\boldsymbol{a}/2 - \boldsymbol{z})^T
-   \mathsf{\Sigma}^{-1}\boldsymbol{a} \bigr)
-   \end{gather*}
+:raw-latex:`\begin{gather*} 
+\mu = \mathbb{E}[f_{\mathrm{new}}(\boldsymbol{Z})] 
+= \int_{\mathbb{R}^d}
+f_{\mathrm{new}}(\boldsymbol{z}) 
+\frac{\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
+\mathsf{\Sigma}^{-1}
+(\boldsymbol{z} - \boldsymbol{a}) \bigr)}
+{\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{z} ,
+\\
+f_{\mathrm{new}}(\boldsymbol{z}) = 
+f(\boldsymbol{z}) 
+\frac{\exp\bigl(-\frac{1}{2} \boldsymbol{z}^T
+\mathsf{\Sigma}^{-1} \boldsymbol{z} \bigr)}
+{\exp\bigl(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{a})^T
+\mathsf{\Sigma}^{-1}
+(\boldsymbol{z} - \boldsymbol{a}) \bigr)}
+= f(\boldsymbol{z}) \exp\bigl((\boldsymbol{a}/2 - \boldsymbol{z})^T
+\mathsf{\Sigma}^{-1}\boldsymbol{a} \bigr)
+\end{gather*}`
 
 Finally note that
 
@@ -376,7 +372,7 @@ Importance Sampling MC vs QMC
 **Test Parameters**
 
 -  dimension = 16
--  abs\_tol = .025
+-  abs_tol = .025
 -  trials = 3
 
 .. code:: ipython3

@@ -14,13 +14,11 @@ Inverse CDF Sampling
 Exponential
 ~~~~~~~~~~~
 
-.. raw:: latex
-
-   \begin{equation}
-   y \sim exp(\lambda) \qquad \text{pdf y } f(x) = \lambda e^{-\lambda x} \\
-   \text{cdf y } F(x) = 1-e^{-\lambda x} \qquad \text{inverse cdf } F^{-1}(x) = \frac{-log(1-x)}{\lambda} \\
-   \therefore y \sim \frac{-log(1-u)}{\lambda} \text{ for } u \sim U_d(0,1)
-   \end{equation}
+:raw-latex:`\begin{equation}
+y \sim exp(\lambda) \qquad \text{pdf y } f(x) = \lambda e^{-\lambda x} \\
+\text{cdf y } F(x) = 1-e^{-\lambda x} \qquad \text{inverse cdf } F^{-1}(x) = \frac{-log(1-x)}{\lambda} \\
+\therefore y \sim \frac{-log(1-u)}{\lambda} \text{ for } u \sim U_d(0,1)
+\end{equation}`
 
 .. code:: ipython3
 
@@ -72,14 +70,12 @@ Exponential
 Cauchy
 ------
 
-.. raw:: latex
-
-   \begin{equation}
-   y \sim cauchy(x_0,\gamma) \qquad \text{pdf y } f(x) = [\pi \gamma (1+(\frac{x-x_0}{\gamma})^2)]^{-1} \\
-   \text{cdf y } F(x) = \frac{1}{\pi} arctan(\frac{x-x_0}{\gamma}) + 1/2 \qquad \\
-   \text{inverse cdf } F^{-1}(x) = tan(\pi(x-\frac{1}{2}))\gamma + x_0 \\
-   \therefore y \sim  tan(\pi(u-\frac{1}{2}))\gamma + x_0 \text{ for } u \sim U_d(0,1)
-   \end{equation}
+:raw-latex:`\begin{equation}
+y \sim cauchy(x_0,\gamma) \qquad \text{pdf y } f(x) = [\pi \gamma (1+(\frac{x-x_0}{\gamma})^2)]^{-1} \\
+\text{cdf y } F(x) = \frac{1}{\pi} arctan(\frac{x-x_0}{\gamma}) + 1/2 \qquad \\
+\text{inverse cdf } F^{-1}(x) = tan(\pi(x-\frac{1}{2}))\gamma + x_0 \\
+\therefore y \sim  tan(\pi(u-\frac{1}{2}))\gamma + x_0 \text{ for } u \sim U_d(0,1)
+\end{equation}`
 
 .. code:: ipython3
 
@@ -116,15 +112,13 @@ Cauchy
 Acceptance Rejection Sampling
 -----------------------------
 
-.. raw:: latex
-
-   \begin{equation}
-   \text{objective pdf } f(x) = \begin{cases}
-           16x/3 &, 0 \leq x \leq 1/4,\\
-           4/3 &, 1/4 <x < 3/4,\\
-           16(1-x)/3 &, 3/4 < x < 1
-   \end{cases}
-   \end{equation}
+:raw-latex:`\begin{equation}
+\text{objective pdf } f(x) = \begin{cases}
+        16x/3 &, 0 \leq x \leq 1/4,\\
+        4/3 &, 1/4 <x < 3/4,\\
+        16(1-x)/3 &, 3/4 < x < 1
+\end{cases}
+\end{equation}`
 
 .. code:: ipython3
 
@@ -256,14 +250,12 @@ Let :math:`\mathcal{X}` be the domain. We are interested in integrand
  For importance sampling, we can capture this domain,
 :math:`\mathcal{X}`, in a unit box, :math:`\beta=[a,b]^d`, such that
 
-.. raw:: latex
-
-   \begin{equation}
-   \forall \mathbf{x} \in \mathcal{X}: \mathbf{x} \in \beta \\
-   \tilde{g}(\mathbf{x}) = \begin{cases} g(\mathbf{x}), & \mathbf{x} \in \mathcal{X} \\ 0, & \text{otherwise} \end{cases} \qquad \text{for } \mathbf{x} \in \beta \\
-   \tilde{\rho}(\mathbf{x}) = \begin{cases} \rho(\mathbf{x}), & \mathbf{x} \in \mathcal{X} \\ 0, & \text{otherwise} \end{cases} \qquad \text{for } \mathbf{x} \in \beta \\
-   \therefore \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_{\beta} \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}
-   \end{equation}
+:raw-latex:`\begin{equation}
+\forall \mathbf{x} \in \mathcal{X}: \mathbf{x} \in \beta \\
+\tilde{g}(\mathbf{x}) = \begin{cases} g(\mathbf{x}), & \mathbf{x} \in \mathcal{X} \\ 0, & \text{otherwise} \end{cases} \qquad \text{for } \mathbf{x} \in \beta \\
+\tilde{\rho}(\mathbf{x}) = \begin{cases} \rho(\mathbf{x}), & \mathbf{x} \in \mathcal{X} \\ 0, & \text{otherwise} \end{cases} \qquad \text{for } \mathbf{x} \in \beta \\
+\therefore \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_{\beta} \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}
+\end{equation}`
 
 Quarter Circle Example
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -274,11 +266,9 @@ the integrand :math:`g(\mathbf{x}) = \mathbf{x}_1+\mathbf{x}_2`, and our
 measure :math:`\rho(x) = 4/\pi`. Therefore we choose
 :math:`\beta = [0,1]^2` and solve
 
-.. raw:: latex
-
-   \begin{equation}
-       \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_0^1 \int_0^1 \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}_1d\mathbf{x}_2 = \frac{8}{3\pi}
-   \end{equation}
+:raw-latex:`\begin{equation}
+    \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_0^1 \int_0^1 \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}_1d\mathbf{x}_2 = \frac{8}{3\pi}
+\end{equation}`
 
 .. code:: ipython3
 
