@@ -40,7 +40,7 @@ True Measure
    :math:`\mathsf{\Sigma} = \min(\boldsymbol{t},\boldsymbol{t})^T`,
    :math:`~~~~` :math:`\boldsymbol{t} = (t_1, \ldots, t_d)`
 -  Lebesgue
--  Identical to what discrete distribution mimics
+-  Identical to what the discrete distribution mimics
 -  Importance sampling
 
 .. raw:: html
@@ -66,9 +66,8 @@ Discrete Distribution
 **Low Discrepancy (LD) nodes**
 
 -  Lattice (base 2):
-   :math:`x_j \overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
--  Sobol (base 2):
-   :math:`x_j \overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
+   :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
+-  Sobol’ (base 2): :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
 
 .. raw:: html
 

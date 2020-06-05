@@ -26,7 +26,7 @@ General measure used to define the integrand\
 - Gaussian: $\mathcal{N}(\boldsymbol{\mu},\mathsf{\Sigma})$
 - Discrete Brownian Motion: $\mathcal{N}(\boldsymbol{\mu},\mathsf{\Sigma})$, where $\mathsf{\Sigma} = \min(\boldsymbol{t},\boldsymbol{t})^T$, $~~~~$ $\boldsymbol{t} = (t_1, \ldots, t_d)$
 - Lebesgue
-- Identical to what discrete distribution mimics
+- Identical to what the discrete distribution mimics
 - Importance sampling
 
 <hr>
@@ -46,8 +46,8 @@ Sampling nodes IID or LDS (low-discrepancy sequence)\
 
 **Low Discrepancy (LD) nodes**
 
-- Lattice (base 2): $x_j  \overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
-- Sobol (base 2): $x_j \overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
+- Lattice (base 2): $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
+- Sobol' (base 2): $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
 
 <hr>
 
