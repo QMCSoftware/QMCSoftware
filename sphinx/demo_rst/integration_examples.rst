@@ -26,7 +26,7 @@ the Gaussian measure, and the Sobol distribution:
    :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
 The following code snippet integrates a three-dimensional Keister
-function numerically by creating instances of ``qmcpy``'s built-in
+function numerically by creating instances of ``qmcpy``\ ’s built-in
 classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CLTRep``, as inputs
 to the function ``integrate()``.
 
@@ -151,7 +151,7 @@ defined as follows:
 Arithmetic-Mean Asian Put Option: Multi-Level
 ---------------------------------------------
 
-This example is similar to the last one except that we use Gile's
+This example is similar to the last one except that we use Gile’s
 multi-level method for estimation of the option price. The main idea can
 be summarized as follows:
 
