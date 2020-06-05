@@ -26,11 +26,12 @@ _doc:
 	# Make Directries
 	@-rm -r $(mddir) 2>/dev/null &
 	@-rm -r $(nbdir) 2>/dev/null &
-	# QMCSoftware READMEs --> RST
+	# READMEs --> RST
 	@mkdir $(mddir)
 	@grep -v  "\[\!" README.md > README2.md
 	@pandoc --mathjax README2.md -o $(mddir)QMCSoftware.rst
 	@rm README2.md
+	@pandoc --mathjax qmcpy/README.md -o $(mddir)qmcpy.rst
 	# Jupyter Notebook Demos --> RST
 	@mkdir $(nbdir)
 	@for f in demos/*.ipynb; do \
@@ -42,17 +43,11 @@ _doc:
 	@-cd sphinx && make clean
 doc_html: _doc
 	-$(MAKE) -C sphinx html 2>/dev/null
-	@-rm -r $(mddir)
-	@-rm -r $(nbdir)
 doc_pdf: _doc
 	-$(MAKE) -C sphinx latex 2>/dev/null
 	-$(MAKE) -C sphinx/_build/latex/ all-pdf -W --keep-going
-	@-rm -r $(mddir)
-	@-rm -r $(nbdir)
 doc_epub: _doc
 	-$(MAKE) -C sphinx epub 2>/dev/null
-	@-rm -r $(mddir)
-	@-rm -r $(nbdir)
 workout:
 	# integration_examples
 	@python workouts/integration_examples/asian_option_multi_level.py  > outputs/integration_examples/asian_option_multi_level.log
