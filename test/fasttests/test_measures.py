@@ -128,22 +128,22 @@ class TestLebesgue(unittest.TestCase):
 
 
 class TestIdentityTransform(unittest.TestCase):
-    """ Unit tests for IdentityTransform Measure. """
+    """ Unit tests for IdentitalToDiscrete Measure. """
 
     def test_gen_mimic_samples(self):
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
-        measure = IdentityTransform(distribution)
+        measure = IdentitalToDiscrete(distribution)
         samples = measure.gen_mimic_samples(n=5)
     
     def test_transform_g_to_f(self):
         # implicitly called from Integrand superclass constructor
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
-        measure = IdentityTransform(distribution)
+        measure = IdentitalToDiscrete(distribution)
         Keister(measure)
     
     def test_set_dimension(self):
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
-        measure = IdentityTransform(distribution)
+        measure = IdentitalToDiscrete(distribution)
         self.assertRaises(DimensionError,measure.set_dimension,3)
 
 

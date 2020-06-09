@@ -130,10 +130,10 @@ Lebesgue
 .. automodule:: qmcpy.true_measure.lebesgue
     :members:
 
-Identity Transform
+Identical to what Discrete Distribution Mimics
 ..................
 
-.. automodule:: qmcpy.true_measure.identity_transform
+.. automodule:: qmcpy.true_measure.identical_to_discrete
     :members:
 
 Importance Sampling

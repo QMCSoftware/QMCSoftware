@@ -1,7 +1,7 @@
 from ._true_measure import TrueMeasure
 
 
-class IdentityTransform(TrueMeasure):
+class IdentitalToDiscrete(TrueMeasure):
     """
     For when Discrete Distribution samples already mimic the TrueMeasure. 
     AKA: when g, the original integrand, and f, the transformed integrand are such that: 
