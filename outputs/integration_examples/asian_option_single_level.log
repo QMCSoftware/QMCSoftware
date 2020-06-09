@@ -31,7 +31,7 @@ MeanVarData (AccumulateData Object)
 	n               50740
 	n_total         51764
 	confid_int      [ 5.710  5.910]
-	time_integrate  0.2026
+	time_integrate  0.2057
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -67,7 +67,7 @@ MeanVarDataRep (AccumulateData Object)
 	sighat          0.1181
 	n_total         8192
 	confid_int      [ 5.745  5.927]
-	time_integrate  0.0836
+	time_integrate  0.0853
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -101,7 +101,7 @@ MeanVarData (AccumulateData Object)
 	n               82304
 	n_total         83328
 	confid_int      [ 5.717  5.917]
-	time_integrate  0.3276
+	time_integrate  0.3717
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -133,7 +133,40 @@ CubatureData (AccumulateData Object)
 	n_total         1024
 	solution        5.9421
 	r_lag           4
-	time_integrate  0.0117
+	time_integrate  0.0124
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 5.8647         
+AsianCall (Integrand Object)
+	volatility      0.5000
+	start_price     30
+	strike_price    25
+	interest_rate   0.0100
+	mean_type       geometric
+	dimensions      64
+	dim_fracs       0
+Sobol (DiscreteDistribution Object)
+	dimension       64
+	scramble        1
+	seed            7
+	backend         qrng
+	mimics          StdUniform
+	graycode        0
+BrownianMotion (TrueMeasure Object)
+	distrib_name    Sobol
+	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+	mean_shift_is   0
+CubSobol_g (StoppingCriterion Object)
+	abs_tol         0.1000
+	rel_tol         0
+	n_init          1024
+	n_max           34359738368
+CubatureData (AccumulateData Object)
+	n_total         1024
+	solution        5.8647
+	r_lag           4
+	time_integrate  0.0118
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

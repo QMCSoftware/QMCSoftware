@@ -24,7 +24,7 @@ MeanVarData (AccumulateData Object)
 	n               5723
 	n_total         6747
 	confid_int      [ 2.070  2.270]
-	time_integrate  0.0033
+	time_integrate  0.0036
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -53,7 +53,7 @@ MeanVarDataRep (AccumulateData Object)
 	sighat          0.0088
 	n_total         4096
 	confid_int      [ 2.157  2.171]
-	time_integrate  0.0064
+	time_integrate  0.0071
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -80,7 +80,7 @@ MeanVarData (AccumulateData Object)
 	n               13557
 	n_total         14581
 	confid_int      [ 2.084  2.284]
-	time_integrate  0.0035
+	time_integrate  0.0039
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -105,7 +105,33 @@ CubatureData (AccumulateData Object)
 	n_total         1024
 	solution        2.1660
 	r_lag           4
-	time_integrate  0.0021
+	time_integrate  0.0022
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1718         
+Keister (Integrand Object)
+Sobol (DiscreteDistribution Object)
+	dimension       3
+	scramble        1
+	seed            7
+	backend         qrng
+	mimics          StdUniform
+	graycode        0
+Gaussian (TrueMeasure Object)
+	distrib_name    Sobol
+	mean            0
+	covariance      0.5000
+CubSobol_g (StoppingCriterion Object)
+	abs_tol         0.1000
+	rel_tol         0
+	n_init          1024
+	n_max           34359738368
+CubatureData (AccumulateData Object)
+	n_total         1024
+	solution        2.1718
+	r_lag           4
+	time_integrate  0.0015
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

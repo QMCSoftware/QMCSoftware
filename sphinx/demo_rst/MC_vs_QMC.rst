@@ -45,7 +45,8 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^3`
     problems = ['CLT IIDStdUniform (MC)',
                 'MeanMC_g IIDStdGaussian (MC)',
                 'CLTRep Sobol (QMC)',
-                'CubLattice_g Lattice (QMC)']
+                'CubLattice_g Lattice (QMC)',
+                'CubSobol_g Sobol (QMC)']
     df = df[df['Problem'].isin(problems)]
     df['abs_tol'] = df['abs_tol'].round(4)
     df_grouped = df.groupby(['Problem'])
@@ -96,84 +97,105 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^3`
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>4.72e+05</td>
-          <td>1.92e-01</td>
+          <td>1.85e-01</td>
         </tr>
         <tr>
           <th>CLT IIDStdUniform (MC)</th>
           <td>5.00e-02</td>
           <td>2.16e+00</td>
           <td>2.08e+04</td>
-          <td>1.06e-02</td>
+          <td>1.04e-02</td>
         </tr>
         <tr>
           <th>CLT IIDStdUniform (MC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>6.75e+03</td>
-          <td>2.99e-03</td>
+          <td>3.71e-03</td>
         </tr>
         <tr>
           <th>MeanMC_g IIDStdGaussian (MC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>6.12e+05</td>
-          <td>8.06e-02</td>
+          <td>8.22e-02</td>
         </tr>
         <tr>
           <th>MeanMC_g IIDStdGaussian (MC)</th>
           <td>5.00e-02</td>
           <td>2.18e+00</td>
           <td>4.01e+04</td>
-          <td>1.04e-02</td>
+          <td>1.03e-02</td>
         </tr>
         <tr>
           <th>MeanMC_g IIDStdGaussian (MC)</th>
           <td>1.00e-01</td>
           <td>2.18e+00</td>
           <td>1.46e+04</td>
-          <td>4.76e-03</td>
+          <td>3.76e-03</td>
         </tr>
         <tr>
           <th>CLTRep Sobol (QMC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>4.10e+03</td>
-          <td>7.29e-03</td>
+          <td>6.28e-03</td>
         </tr>
         <tr>
           <th>CLTRep Sobol (QMC)</th>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>4.10e+03</td>
-          <td>6.14e-03</td>
+          <td>6.20e-03</td>
         </tr>
         <tr>
           <th>CLTRep Sobol (QMC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>4.10e+03</td>
-          <td>7.60e-03</td>
+          <td>6.06e-03</td>
         </tr>
         <tr>
           <th>CubLattice_g Lattice (QMC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>2.05e+03</td>
-          <td>6.19e-03</td>
+          <td>4.91e-03</td>
         </tr>
         <tr>
           <th>CubLattice_g Lattice (QMC)</th>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>3.26e-03</td>
+          <td>2.12e-03</td>
         </tr>
         <tr>
           <th>CubLattice_g Lattice (QMC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>3.10e-03</td>
+          <td>2.48e-03</td>
+        </tr>
+        <tr>
+          <th>CubSobol_g Sobol (QMC)</th>
+          <td>1.00e-02</td>
+          <td>2.17e+00</td>
+          <td>2.05e+03</td>
+          <td>3.41e-03</td>
+        </tr>
+        <tr>
+          <th>CubSobol_g Sobol (QMC)</th>
+          <td>5.00e-02</td>
+          <td>2.17e+00</td>
+          <td>1.02e+03</td>
+          <td>1.53e-03</td>
+        </tr>
+        <tr>
+          <th>CubSobol_g Sobol (QMC)</th>
+          <td>1.00e-01</td>
+          <td>2.17e+00</td>
+          <td>1.02e+03</td>
+          <td>1.58e-03</td>
         </tr>
       </tbody>
     </table>
@@ -230,7 +252,8 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
     df = df.drop(['Stopping Criterion','Distribution','MC/QMC'],axis=1)
     problems = ['CLT IIDStdUniform (MC)',
                 'CLTRep Sobol (QMC)',
-                'CubLattice_g Lattice (QMC)']
+                'CubLattice_g Lattice (QMC)',
+                'CubSobol_g Sobol (QMC)']
     df = df[df['Problem'].isin(problems)]
     df_grouped = df.groupby(['Problem'])
     df_dims = df_grouped['dimension'].apply(list).reset_index(name='dimension')
@@ -280,63 +303,84 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
           <td>10</td>
           <td>-1.53e+02</td>
           <td>4.60e+04</td>
-          <td>6.14e-02</td>
+          <td>6.59e-02</td>
         </tr>
         <tr>
           <th>CLT IIDStdUniform (MC)</th>
           <td>20</td>
           <td>-8.28e+04</td>
           <td>4.75e+03</td>
-          <td>1.31e-02</td>
+          <td>1.61e-02</td>
         </tr>
         <tr>
           <th>CLT IIDStdUniform (MC)</th>
           <td>30</td>
           <td>-1.95e+07</td>
           <td>2.03e+04</td>
-          <td>8.03e-02</td>
+          <td>7.61e-02</td>
         </tr>
         <tr>
           <th>CLTRep Sobol (QMC)</th>
           <td>10</td>
           <td>-1.54e+02</td>
           <td>4.10e+03</td>
-          <td>1.20e-02</td>
+          <td>9.64e-03</td>
         </tr>
         <tr>
           <th>CLTRep Sobol (QMC)</th>
           <td>20</td>
           <td>-8.28e+04</td>
           <td>4.10e+03</td>
-          <td>1.59e-02</td>
+          <td>1.33e-02</td>
         </tr>
         <tr>
           <th>CLTRep Sobol (QMC)</th>
           <td>30</td>
           <td>-1.94e+07</td>
           <td>4.10e+03</td>
-          <td>2.10e-02</td>
+          <td>1.78e-02</td>
         </tr>
         <tr>
           <th>CubLattice_g Lattice (QMC)</th>
           <td>10</td>
           <td>-1.55e+02</td>
           <td>1.02e+03</td>
-          <td>4.04e-03</td>
+          <td>3.23e-03</td>
         </tr>
         <tr>
           <th>CubLattice_g Lattice (QMC)</th>
           <td>20</td>
           <td>-8.28e+04</td>
           <td>1.02e+03</td>
-          <td>6.62e-03</td>
+          <td>5.79e-03</td>
         </tr>
         <tr>
           <th>CubLattice_g Lattice (QMC)</th>
           <td>30</td>
           <td>-1.94e+07</td>
           <td>1.02e+03</td>
-          <td>8.07e-03</td>
+          <td>9.07e-03</td>
+        </tr>
+        <tr>
+          <th>CubSobol_g Sobol (QMC)</th>
+          <td>10</td>
+          <td>-1.54e+02</td>
+          <td>1.02e+03</td>
+          <td>2.45e-03</td>
+        </tr>
+        <tr>
+          <th>CubSobol_g Sobol (QMC)</th>
+          <td>20</td>
+          <td>-8.28e+04</td>
+          <td>1.02e+03</td>
+          <td>7.16e-03</td>
+        </tr>
+        <tr>
+          <th>CubSobol_g Sobol (QMC)</th>
+          <td>30</td>
+          <td>-1.94e+07</td>
+          <td>1.02e+03</td>
+          <td>7.14e-03</td>
         </tr>
       </tbody>
     </table>
@@ -360,8 +404,8 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
         ax_i.spines['top'].set_visible(False)
         ax_i.set_xlabel('Dimension')
     ax[1].legend(frameon=False, loc=(-1.3,1),ncol=len(problems))
-    ax[0].set_ylabel('Runtime')
-    ax[1].set_ylabel('Total Samples')
+    ax[0].set_ylabel('Total Samples')
+    ax[1].set_ylabel('Runtime')
     fig.suptitle('Comparing Dimensions')
     plt.savefig('../outputs/mc_vs_qmc/vary_dimension.png',dpi=200)
 

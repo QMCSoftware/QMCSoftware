@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.7927         
+Solution: 5.7987         
 AsianCall (Integrand Object)
 	volatility      0.5000
 	start_price     30
@@ -27,11 +27,11 @@ CLT (StoppingCriterion Object)
 	n_max           10000000000
 MeanVarData (AccumulateData Object)
 	levels          3
-	solution        5.7927
-	n               [70709  6454  2048]
-	n_total         82283
-	confid_int      [ 5.697  5.889]
-	time_integrate  0.0487
+	solution        5.7987
+	n               [71263  6299  2048]
+	n_total         82682
+	confid_int      [ 5.703  5.894]
+	time_integrate  0.0510
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

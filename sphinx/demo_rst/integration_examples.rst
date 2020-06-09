@@ -26,9 +26,9 @@ the Gaussian measure, and the Sobol distribution:
    :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
 The following code snippet integrates a three-dimensional Keister
-function numerically by creating instances of ``qmcpy``\ ’s built-in
-classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CLTRep``, as inputs
-to the function ``integrate()``.
+function numerically by creating instances of ``qmcpy``'s built-in
+classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CubSobol_g``, as
+inputs to the function ``integrate()``.
 
 .. code:: ipython3
 
@@ -36,38 +36,35 @@ to the function ``integrate()``.
     distribution = Sobol(dimension=dim, scramble=True, seed=7, backend='QRNG')
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CLTRep(integrand,abs_tol=.05).integrate()
+    solution,data = CubSobol_g(integrand,abs_tol=.05).integrate()
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 2.1677         
+    Solution: 2.1718         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
     	dimension       3
     	scramble        1
-    	seed            1092
+    	seed            7
     	backend         qrng
     	mimics          StdUniform
+    	graycode        0
     Gaussian (TrueMeasure Object)
     	distrib_name    Sobol
     	mean            0
     	covariance      0.5000
-    CLTRep (StoppingCriterion Object)
-    	inflate         1.2000
-    	alpha           0.0100
+    CubSobol_g (StoppingCriterion Object)
     	abs_tol         0.0500
     	rel_tol         0
-    	n_init          256
-    	n_max           1073741824
-    MeanVarDataRep (AccumulateData Object)
-    	replications    16
-    	solution        2.1677
-    	sighat          0.0090
-    	n_total         4096
-    	confid_int      [ 2.161  2.175]
-    	time_integrate  0.0093
+    	n_init          1024
+    	n_max           34359738368
+    CubatureData (AccumulateData Object)
+    	n_total         1024
+    	solution        2.1718
+    	r_lag           4
+    	time_integrate  0.0027
     
 
 
@@ -106,13 +103,13 @@ defined as follows:
         strike_price = 25,
         interest_rate = 0.01,
         mean_type = 'arithmetic')
-    solution,data = CLTRep(integrand, abs_tol=.05).integrate()
+    solution,data = CubLattice_g(integrand, abs_tol=.05).integrate()
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 6.2549         
+    Solution: 6.2744         
     AsianCall (Integrand Object)
     	volatility      0.5000
     	start_price     30
@@ -124,34 +121,30 @@ defined as follows:
     Lattice (DiscreteDistribution Object)
     	dimension       64
     	scramble        1
-    	seed            1092
+    	seed            7
     	backend         gail
     	mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
     	distrib_name    Lattice
     	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
     	mean_shift_is   0
-    CLTRep (StoppingCriterion Object)
-    	inflate         1.2000
-    	alpha           0.0100
+    CubLattice_g (StoppingCriterion Object)
     	abs_tol         0.0500
     	rel_tol         0
-    	n_init          256
-    	n_max           1073741824
-    MeanVarDataRep (AccumulateData Object)
-    	replications    16
-    	solution        6.2549
-    	sighat          0.0416
-    	n_total         16384
-    	confid_int      [ 6.223  6.287]
-    	time_integrate  0.1752
+    	n_init          1024
+    	n_max           34359738368
+    CubatureData (AccumulateData Object)
+    	n_total         4096
+    	solution        6.2744
+    	r_lag           4
+    	time_integrate  0.0541
     
 
 
 Arithmetic-Mean Asian Put Option: Multi-Level
 ---------------------------------------------
 
-This example is similar to the last one except that we use Gile’s
+This example is similar to the last one except that we use Gile's
 multi-level method for estimation of the option price. The main idea can
 be summarized as follows:
 
@@ -185,7 +178,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2494         
+    Solution: 6.2533         
     AsianCall (Integrand Object)
     	volatility      0.5000
     	start_price     30
@@ -211,11 +204,11 @@ last example.
     	n_max           10000000000
     MeanVarData (AccumulateData Object)
     	levels          3
-    	solution        6.2494
-    	n               [330782  25499   3177]
-    	n_total         362530
-    	confid_int      [ 6.200  6.298]
-    	time_integrate  0.1456
+    	solution        6.2533
+    	n               [332598  28362   2847]
+    	n_total         366879
+    	confid_int      [ 6.204  6.302]
+    	time_integrate  0.1189
     
 
 

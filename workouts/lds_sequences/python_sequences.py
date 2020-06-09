@@ -11,7 +11,7 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
     Record time for generating samples from each discrete distribution
     """
     print('\nDiscrete DiscreteDistribution Generation Time Comparison')
-    columns = ['n', 'L_MPS_t', 'L_GAIL_t', 'S_QRNG_t', 'S_MPS_QMCPy_t']
+    columns = ['n', 'L_MPS_t', 'L_GAIL_t', 'S_QRNG_gc_t', 'S_QRNG_n_t', 'S_MPS_QMCPy_t']
     df = DataFrame(columns=columns, dtype=float)
     for i, m in enumerate(powers_2):
         n = 2**m
@@ -28,12 +28,18 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
             distribution = Lattice(dimension, scramble=False, seed=7, backend='GAIL')
             x = distribution.gen_samples(n_min=0,n_max=n)
         row_i['L_GAIL_t'] = (time() - t0) / trials
-        # Sobol QRNG
+        # Sobol QRNG Natural Ordering
         t0 = time()
         for trial in range(trials):
-            distribution = Sobol(dimension, scramble=False, seed=7, backend='QRNG')
+            distribution = Sobol(dimension, scramble=False, seed=7, backend='QRNG', graycode=False)
             distribution.gen_samples(n_min=0,n_max=n)
-        row_i['S_QRNG_t'] = (time() - t0) / trials
+        row_i['S_QRNG_n_t'] = (time() - t0) / trials
+        # Sobol QRNG Graycode Ordering
+        t0 = time()
+        for trial in range(trials):
+            distribution = Sobol(dimension, scramble=False, seed=7, backend='QRNG', graycode=True)
+            distribution.gen_samples(n_min=0,n_max=n)
+        row_i['S_QRNG_gc_t'] = (time() - t0) / trials
         # Sobol Magic Point Shop
         t0 = time()
         for trial in range(trials):

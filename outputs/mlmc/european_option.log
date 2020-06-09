@@ -2,7 +2,7 @@
 
 MLMC:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Solution: 10.4477        
+Solution: 10.4762        
 MLMCCallOptions (Integrand Object)
 	option          european
 	sigma           0.2000
@@ -11,7 +11,7 @@ MLMCCallOptions (Integrand Object)
 	t               1
 	b               85
 IIDStdGaussian (DiscreteDistribution Object)
-	dimension       512
+	dimension       32
 	seed            None
 	mimics          StdGaussian
 Gaussian (TrueMeasure Object)
@@ -19,29 +19,27 @@ Gaussian (TrueMeasure Object)
 	mean            0
 	covariance      1
 MLMC (StoppingCriterion Object)
-	rmse_tol        0.0039
+	rmse_tol        0.0388
 	n_init          256
 	levels_min      2
 	levels_max      10
 	theta           0.2500
 MLMCData (AccumulateData Object)
-	levels          9
-	n_level         [ 23168875.000  571659.000  285830.000  54171.000  19680.000  7053.000
-	                 2529.000  897.000  380.000  132.000]
-	mean_level      [ 10.052  0.184  0.104  0.054  0.027  0.014  0.007  0.004  0.002  0.001]
-	var_level       [ 196.027  0.152  0.043  0.012  0.003  0.001  0.000  0.000  0.000  0.000]
-	cost_per_sample [ 1.000  2.000  4.000  8.000  16.000  32.000  64.000  128.000  256.000
-	                 512.000]
-	alpha           0.9884
-	beta            1.9661
+	levels          5
+	n_level         [ 197126.000  3984.000  1790.000  694.000  240.000  92.000]
+	mean_level      [ 10.079  0.184  0.112  0.058  0.031  0.013]
+	var_level       [ 196.471  0.161  0.058  0.015  0.005  0.001]
+	cost_per_sample [ 1.000  2.000  4.000  8.000  16.000  32.000]
+	alpha           0.9569
+	beta            1.9462
 	gamma           1.0000
-	time_integrate  4.0809
+	time_integrate  0.0406
 Within Tolerence: True
 
 
 MLQMC:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Solution: 10.4491        
+Solution: 10.4111        
 MLMCCallOptions (Integrand Object)
 	option          european
 	sigma           0.2000
@@ -50,9 +48,9 @@ MLMCCallOptions (Integrand Object)
 	t               1
 	b               85
 Lattice (DiscreteDistribution Object)
-	dimension       256
+	dimension       16
 	scramble        1
-	seed            958058
+	seed            881195
 	backend         gail
 	mimics          StdUniform
 Gaussian (TrueMeasure Object)
@@ -60,82 +58,82 @@ Gaussian (TrueMeasure Object)
 	mean            0
 	covariance      1
 MLQMC (StoppingCriterion Object)
-	rmse_tol        0.0039
+	rmse_tol        0.0388
 	n_init          256
 	n_max           10000000000
 	replications    16
 MLQMCData (AccumulateData Object)
-	levels          9
-	n_level         [32768  4096  2048  1024  1024   256   256   256   256]
-	mean_level      [ 10.054  0.183  0.103  0.054  0.028  0.014  0.007  0.003  0.002]
-	var_level       [ 0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000]
-	bias_estimate   0.0018
-	n_total         671744
-	time_integrate  0.9250
+	levels          5
+	n_level         [1024  256  256  256  256]
+	mean_level      [ 10.045  0.181  0.104  0.054  0.027]
+	var_level       [ 0.001  0.000  0.000  0.000  0.000]
+	bias_estimate   0.0273
+	n_total         32768
+	time_integrate  0.1126
 Within Tolerence: True
 
 
 CubLattice_g:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Solution: 10.4603        
+Solution: 10.3277        
 EuropeanOption (Integrand Object)
 	volatility      0.2000
 	start_price     100
 	strike_price    100
 	interest_rate   0.0500
 Lattice (DiscreteDistribution Object)
-	dimension       256
+	dimension       16
 	scramble        1
 	seed            None
 	backend         gail
 	mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
 	distrib_name    Lattice
-	time_vector     [ 0.004  0.008  0.012 ...  0.992  0.996  1.000]
+	time_vector     [ 0.062  0.125  0.188 ...  0.875  0.938  1.000]
 	mean_shift_is   0
 CubLattice_g (StoppingCriterion Object)
-	abs_tol         0.0100
+	abs_tol         0.1000
 	rel_tol         0
 	n_init          1024
 	n_max           34359738368
 CubatureData (AccumulateData Object)
-	n_total         131072
-	solution        10.4603
+	n_total         2048
+	solution        10.3277
 	r_lag           4
-	time_integrate  4.6926
-Within Tolerence: True
+	time_integrate  0.0073
+Within Tolerence: False
 
 
 CLTRep:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Solution: 10.4530        
+Solution: 10.4827        
 EuropeanOption (Integrand Object)
 	volatility      0.2000
 	start_price     100
 	strike_price    100
 	interest_rate   0.0500
 Lattice (DiscreteDistribution Object)
-	dimension       256
+	dimension       16
 	scramble        1
-	seed            98323
+	seed            75149
 	backend         gail
 	mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
 	distrib_name    Lattice
-	time_vector     [ 0.004  0.008  0.012 ...  0.992  0.996  1.000]
+	time_vector     [ 0.062  0.125  0.188 ...  0.875  0.938  1.000]
 	mean_shift_is   0
 CLTRep (StoppingCriterion Object)
 	inflate         1.2000
 	alpha           0.0100
-	abs_tol         0.0100
+	abs_tol         0.1000
 	rel_tol         0
 	n_init          256
 	n_max           1073741824
 MeanVarDataRep (AccumulateData Object)
 	replications    16
-	solution        10.4530
-	sighat          0.0106
-	n_total         1048576
-	confid_int      [ 10.445  10.461]
-	time_integrate  37.7533
+	solution        10.4827
+	sighat          0.0867
+	n_total         32768
+	confid_int      [ 10.416  10.550]
+	time_integrate  0.0865
 Within Tolerence: True

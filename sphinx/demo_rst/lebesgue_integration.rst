@@ -2,8 +2,8 @@ QMCPy for Lebesgue Integration
 ==============================
 
 This notebook will give examples of how to use QMCPy for integration
-problems that not are defined in terms of a standard measure.
-i.e. Uniform or Gaussian.
+problems that not are defined in terms of a standard measure. i.e.
+Uniform or Gaussian.
 
 .. code:: ipython3
 
@@ -101,7 +101,7 @@ Sample Problem 2
 .. code:: ipython3
 
     # Uniform Measure
-    distribution = Sobol(dim, scramble=True, seed=7, backend='QRNG')
+    distribution = Sobol(dim, scramble=True, seed=17, backend='QRNG')
     measure = Uniform(distribution, lower_bound=a, upper_bound=b)
     integrand = QuickConstruct(measure, lambda x: (b-a).prod()*(x**2).sum(1))
     solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
@@ -111,7 +111,7 @@ Sample Problem 2
 
 .. parsed-literal::
 
-    y = 23.33343
+    y = 23.33318
     Within tolerance: True
 
 

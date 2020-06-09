@@ -67,7 +67,7 @@ Discrete Distribution
 
 -  Lattice (base 2):
    :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
--  Sobol’ (base 2): :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
+-  Sobol' (base 2): :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
 
 .. raw:: html
 
@@ -88,7 +88,7 @@ Stopping Criterion
 
 **For QMC Sequences** :math:`\{x_{r,i}\}_{r=1}^R \sim` ld
 
--  CubLattice_g (gauranteed)
--  CubSobol_g (gauranteed)
+-  CubLattice\_g (gauranteed)
+-  CubSobol\_g (gauranteed)
 -  Multilevel QMC
 -  CLT Repeated
