@@ -32,19 +32,21 @@ class Sobol(DiscreteDistribution):
         https://people.cs.kuleuven.be/~dirk.nuyens/
     """
     
-    parameters = ['dimension','scramble','seed','backend','mimics']
+    parameters = ['dimension','scramble','seed','backend','mimics','graycode']
 
-    def __init__(self, dimension=1, scramble=True, seed=None, backend='QRNG'):
+    def __init__(self, dimension=1, scramble=True, seed=None, backend='QRNG', graycode=False):
         """
         Args:
             dimension (int): dimension of samples
-            scramble (bool): If True, apply unique scramble to each replication        
+            scramble (bool): If True, apply unique shift and/or scramble (depending on backend)        
             seed (int): seed the random number generator for reproducibility
             backend (str): backend generator
+            graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
         """
         self.dimension = dimension
         self.scramble = scramble
         self.seed = seed
+        self.graycode = graycode
         self.backend = backend.lower()
         if self.backend == 'qrng':
             self.backend_gen = self.qrgn_sobol_gen
@@ -67,6 +69,11 @@ class Sobol(DiscreteDistribution):
                     SobolEngine sometimes generates 1 after applying scramble''')
         else:
             raise ParameterError("Sobol backend must be either 'qrng', 'mps', or 'pytorch'")
+        if self.backend != 'qrng' and (not self.graycode):
+            warning_s = '''
+                %s backend does not (yet) support natural ordering.
+                Using graycode ordering. Use "QRNG" backend for natural ordering'''%self.backend
+            warnings.warn(warning_s,ParameterWarning)
         self.mimics = 'StdUniform'
         self.set_seed(self.seed)
         super().__init__()
@@ -80,7 +87,7 @@ class Sobol(DiscreteDistribution):
             n_max (int): maximum index (not inclusive)
         """
         n = int(n_max-n_min)
-        x_sob = sobol_qrng(n,self.dimension,self.scramble,skip=int(n_min),seed=self.seed)
+        x_sob = sobol_qrng(n,self.dimension,self.scramble,skip=int(n_min),graycode=self.graycode,seed=self.seed)
         return x_sob
 
     def mps_sobol_gen(self, n_min=0, n_max=8):

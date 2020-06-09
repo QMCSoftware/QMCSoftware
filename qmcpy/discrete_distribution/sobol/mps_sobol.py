@@ -250,3 +250,10 @@ class DigitalSeq():
 
     def next(self):
         return self.__next__()
+
+if __name__ == '__main__':
+    d = DigitalSeq(s=2,m=3)
+    for i in range(8):
+        d.calc_next()
+        v = d.cur
+        print(v)

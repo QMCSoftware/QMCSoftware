@@ -20,7 +20,10 @@ import subprocess
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
-        subprocess.check_call('make qrng',shell=True)
+        try:
+            subprocess.check_call('make qrng',shell=True)
+        except:
+            print('Problem compiling qrng c files')
         super().run()
 
 class CleanCommand(Command):

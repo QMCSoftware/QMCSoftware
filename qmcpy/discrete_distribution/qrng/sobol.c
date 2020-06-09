@@ -18510,7 +18510,9 @@ void sobol(int n, int d, int randomize, double *res, int skip, int graycode, lon
                   gskip);
     }
     initcount=skip;
-
+    /* index offset for natural ordering */
+    if(graycode){idx = 0;}
+    else{idx = (skip^(skip>>1)) - skip;}
     for(i=0; i<d; i++){
         if(skip>0){
             for(j=0;j<sizeskip;j++){
@@ -18528,9 +18530,6 @@ void sobol(int n, int d, int randomize, double *res, int skip, int graycode, lon
             val = ((double) point)/rmaxint;
         }
         else{val = ((double) *(lastpoint+i)) * recipd;}
-        /* adjust index for natural ordering */
-        if(graycode){idx = 0;}
-        else{idx = (skip^(skip>>1)) - skip;}
         res[i*n+idx] = val;
     }
 
@@ -18564,7 +18563,7 @@ void sobol(int n, int d, int randomize, double *res, int skip, int graycode, lon
 
 int main(){
     /*
-    COMMANDS (from qrng/ directory)
+    COMMANDS
     gcc sobol.c MRG63k3a.c -o sobol.o -lm
     ./sobol
     */
