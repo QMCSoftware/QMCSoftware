@@ -18406,18 +18406,21 @@ void bintogray(int n1, int size, int *b)
  * @param res pointer to the result matrix
  * @skip  number of initial terms in the sequence to be skipped (skip = 0 means
  *        that the sequence starts at the origin)
+ * @param graycode logical (here: integer) indicating whether to use Graycode (1)
+          or natural ordering (0)
  * @param seed seed for random number generator
  * @return void
  * @author Marius Hofert based on Christiane's Lemieux's RandQMC
  */
-void sobol(int n, int d, int randomize, double *res, int skip, long seed)
+void sobol(int n, int d, int randomize, double *res, int skip, int graycode, long seed)
 {
-    int i, count, numcols, j, k, initcount;
+    int i, count, numcols, j, k, initcount, idx;
     int newv, temp, degree, sizeskip;
     int column; /* the column to use */
     unsigned int maxn;
     double U; /* temporal storage for a single element of point */
     double recipd = 0.0;
+    double val;
     unsigned int *lastpoint = NULL;
     unsigned long long int randint, point; /* the int representation of U */
     int rmaxcoeff = 52;
@@ -18501,9 +18504,6 @@ void sobol(int n, int d, int randomize, double *res, int skip, long seed)
 
 
     /* Init result (and randomization) */
-    /* initcount = skip-1; */
-
-    /* if(skip == 0) { */
     if(skip > 0) {
         bintogray(skip, /* >= 1 */
                   sizeskip, /* >= 1 (see above) */
@@ -18518,7 +18518,6 @@ void sobol(int n, int d, int randomize, double *res, int skip, long seed)
                     *(lastpoint+i) = *(lastpoint+i) ^ v[i][j];
             }
         }
-        /* res[i*n] = 0.0; */
         if(randomize){
             point = *(lastpoint+i);
             point = point << (rmaxcoeff - numcols);
@@ -18526,17 +18525,23 @@ void sobol(int n, int d, int randomize, double *res, int skip, long seed)
             U *= rmaxint;
             randint = (unsigned long long int) U;
             point = point ^ randint;
-            res[i*n] = ((double) point)/rmaxint;
+            val = ((double) point)/rmaxint;
         }
-        else res[i*n] =  ((double) *(lastpoint+i)) * recipd;
+        else{val = ((double) *(lastpoint+i)) * recipd;}
+        /* adjust index for natural ordering */
+        if(graycode){idx = 0;}
+        else{idx = (skip^(skip>>1)) - skip;}
+        res[i*n+idx] = val;
     }
-    /* } */
 
     /* Main loop */
     for(count=initcount; count<n + skip-1; count++){
         column=0;
         while ((count >> column) & 0x1) /* '>>' = bitwise right shift by column-many bits and fill with 0s from the left; hexadecimal value of 1 */
             column++;
+        idx = count+1;      
+        /* adjust index for natural ordering */  
+        if(!graycode){idx = idx ^ (idx>>1);}
         /* Calculate the next point using Gray Code */
         for (i = 0; i < d; i++)
         {
@@ -18549,9 +18554,26 @@ void sobol(int n, int d, int randomize, double *res, int skip, long seed)
                 U *= rmaxint;
                 randint = (unsigned long long int) U;
                 point = point ^ randint;
-                res[i*n+count+1-skip] = ((double) point)/rmaxint;
+                val = ((double) point)/rmaxint;
             }
-            else res[i*n+count+1-skip] = ((double) *(lastpoint+i)) * recipd;
+            else{val = ((double) *(lastpoint+i)) * recipd;}
+            res[i*n+idx-skip] = val;
         }
     }
 }
+
+int main(){
+    /*
+    COMMANDS (from qrng/ directory)
+    gcc sobol.c MRG63k3a.c -o sobol.o -lm
+    ./sobol
+    */
+    int n=4, d=2, randomize=0, skip=4, seed=7, graycode=0;
+    double *res = (double *) calloc(d*n, sizeof(double));
+    sobol(n, d, randomize, res, skip, graycode, seed);
+    /* Print ndarray */
+    for(int j=0; j<d; j++){
+        for(int i=0; i<n; i++){
+            printf("%.3f\t",res[j*n+i]);}
+        printf("\n");}
+    return(0);}
