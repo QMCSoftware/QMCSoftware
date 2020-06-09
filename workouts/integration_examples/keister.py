@@ -41,13 +41,11 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CubSobol_g
-    '''
     distribution = Sobol(dimension=dimension, scramble=True, seed=7, backend='QRNG')
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
     solution,data = CubSobol_g(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
-    '''
 
 if __name__ == "__main__":
     keister()

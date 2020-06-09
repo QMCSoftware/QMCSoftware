@@ -124,6 +124,26 @@ class TestSobol(unittest.TestCase):
             samples = distribution.gen_samples(4)
             with self.subTest():
                 self.assertTrue(samples.shape==(4,3))
+    
+    def test_qrng_graycode_ordering(self):
+        s = Sobol(2,scramble=False,backend='qrng',graycode=True)
+        x = s.gen_samples(n_min=4,n_max=8)
+        x_true = array([
+            [ 0.375,  0.375],
+            [ 0.875,  0.875],
+            [ 0.625,  0.125],
+            [ 0.125,  0.625]])
+        self.assertTrue((x==x_true).all())
+
+    def test_qrng_natural_ordering(self):
+        s = Sobol(2,scramble=False,backend='qrng',graycode=False)
+        x = s.gen_samples(n_min=4,n_max=8)
+        x_true = array([
+            [ 0.125,  0.625],
+            [ 0.625,  0.125],
+            [ 0.375,  0.375],
+            [ 0.875,  0.875]])
+        self.assertTrue((x==x_true).all())
 
 
 class TestCustomIIDDistribution(unittest.TestCase):

@@ -48,13 +48,12 @@ def asian_option_single_level(
     print('%s%s'%(data,bar))
 
     # CubSobol_g
-    '''
     distribution = Sobol(dimension=dimension, scramble=True, seed=7, backend='QRNG')
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
     solution,data = CubSobol_g(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
-    '''
+
 
 if __name__ == "__main__":
     asian_option_single_level()

@@ -107,7 +107,6 @@ class TestCubLattice_g(unittest.TestCase):
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
-'''
 class TestCubSobol_g(unittest.TestCase):
     """ Unit tests for CubSobol_g StoppingCriterion. """
     def test_raise_distribution_compatibility_error(self):
@@ -129,7 +128,7 @@ class TestCubSobol_g(unittest.TestCase):
         integrand = Keister(measure)
         solution,data = CubSobol_g(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
-'''
+
 
 class TestMLMC(unittest.TestCase):
     """ Unit tests for MLMC StoppingCriterion. """

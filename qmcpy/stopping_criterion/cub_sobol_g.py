@@ -52,7 +52,6 @@ class CubSobol_g(StoppingCriterion):
                               in the cone of functions
             check_cone (boolean): check if the function falls in the cone
         """
-        raise Exception("CubSobol_g currently under maintenance, try using CubLattice_g instead.")
         # Input Checks
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
@@ -73,8 +72,8 @@ class CubSobol_g(StoppingCriterion):
         allowed_levels = 'single'
         allowed_distribs = ["Sobol"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
-        if not distribution.scramble:
-            raise ParameterError("CubSobol_g requires distribution to have scramble=True")
+        if (not distribution.scramble) or distribution.graycode:
+            raise ParameterError("CubSobol_g requires distribution to have scramble=True and graycode=False")
         # Construct AccumulateData Object to House Integration data
         self.data = CubatureData(self, integrand, self.fwt_update, m_min, m_max, fudge, check_cone)
 
