@@ -10,19 +10,17 @@ References
     “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” 
     Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
 """
-
 import ctypes
 import numpy
 import os
-import platform
+from glob import glob
 
 ispow2 = lambda n: (numpy.log2(n)%1) == 0.
 
 # load library
-my_os = platform.system()
-os_ext = {'Linux':'so', 'Darwin':'dylib', 'Windows':'dll'}
 path = os.path.dirname(os.path.abspath(__file__))
-lib = ctypes.CDLL(path+'/qrng_lib.'+os_ext[my_os],mode=ctypes.RTLD_GLOBAL)
+f = glob(path+'/qrng_lib*')[0]
+lib = ctypes.CDLL(f,mode=ctypes.RTLD_GLOBAL)
 # MRG63k3a
 mrg63ka_f = lib.MRG63k3a
 mrg63ka_f.argtypes = None

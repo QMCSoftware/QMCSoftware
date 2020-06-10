@@ -28,6 +28,8 @@ sphinx/_static/
 # Jupyter Notebooks
 *checkpoint.ipynb
 
+# release
+/build
 # alegresor
 *.vscode
 *_ags*

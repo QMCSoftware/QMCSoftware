@@ -54,7 +54,6 @@ before_install:
 - conda install $CONDA_DEPS
 - pip install --upgrade pip
 - pip install codecov
-- make qrng
 
 install:
 - pip install --quiet -r requirements/dev.txt

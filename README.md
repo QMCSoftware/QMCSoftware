@@ -27,7 +27,7 @@ cd QMCSoftware
 setvirtualenvproject
 add2virtualenv $(pwd)
 pip install -r requirements/dev.txt
-make qrng
+pip install -e ./
 ~~~
 
  

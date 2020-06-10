@@ -10,8 +10,8 @@ To uninstall, do the following:
 
     pip uninstall qmcpy
 '''
-
 import setuptools
+from setuptools import Extension
 from setuptools.command.install import install
 from setuptools import Command
 import os
@@ -43,23 +43,33 @@ long_description = "Quasi-Monte Carlo (QMC) methods are used to approximate mult
 
 setuptools.setup(
     name="qmcpy",
-    version="0.1",
+    version="v0.1-alpha",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
-    description="(Quasi) Monte Carlo Framework in Python 3.6 and 3.7",
+    license='Apache license 2.0',
+    description="(Quasi) Monte Carlo Framework in Python 3",
     long_description=long_description,
     long_description_content_type="text",
-    url="https://github.com/QMCSoftware/QMCSoftware",
+    url="https://qmcsoftware.github.io/QMCSoftware/",
+    download_url="https://github.com/QMCSoftware/QMCSoftware/archive/v0.1-alpha.tar.gz",
     package_dir={"": "qmcpy"},
     packages=setuptools.find_packages('qmcpy'),
     install_requires=['numpy','scipy'],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: IIT License",
-        "Operating System :: OS Independent",
-    ],
-    python_requires=">=3.6",
-    cmdclass={
-        'clean': CleanCommand,
-        'install': CustomInstall}
+        "License :: OSI Approved :: Apache license 2.0",
+        "Operating System :: OS Independent"],
+    keywords=['quasi','monte','carlo','community','software','cubature','numerical','integration','discrepancy','sobol','lattice'],
+    python_requires=">=3.5",
+    #cmdclass={
+    #    'clean': CleanCommand,
+    #    'install': CustomInstall},
+    ext_modules=[
+        Extension(
+            name='discrete_distribution.qrng.qrng_lib',
+            sources=['qmcpy/discrete_distribution/qrng/ghalton.c',
+                    'qmcpy/discrete_distribution/qrng/korobov.c',
+                    'qmcpy/discrete_distribution/qrng/MRG63k3a.c',
+                    'qmcpy/discrete_distribution/qrng/sobol.c'],
+            extra_compile_args=['-fPIC','-shared','-lm'])]
 )
