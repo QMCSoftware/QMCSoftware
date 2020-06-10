@@ -9,7 +9,7 @@ from time import perf_counter
 import warnings
 
 
-class MeanMC_g(StoppingCriterion):
+class CubMcG(StoppingCriterion):
     """
     Stopping Criterion with garunteed accuracy
 

@@ -5,7 +5,7 @@ from numpy import sqrt, exp, log, zeros, maximum, minimum, tile, random, eye, lo
 from scipy.stats import norm
 
 
-class MLMCCallOptions(Integrand):
+class MLCallOptions(Integrand):
     """
     Various call options from finance using Milstein discretization with 2^l timesteps on level l
 

@@ -3,59 +3,6 @@ QMCPy Documentation
 
 
 
-Stopping Criterion Algorithms
------------------------------
-
-Abstract Stopping Criterion Class
-.................................
-
-.. automodule:: qmcpy.stopping_criterion._stopping_criterion
-    :members:
-
-Cubature Lattice Garunteed (qMC)
-................................
-
-.. automodule:: qmcpy.stopping_criterion.cub_lattice_g
-    :members:
-
-Cubature Sobol Garunteed (qMC)
-..............................
-
-.. automodule:: qmcpy.stopping_criterion.cub_sobol_g
-    :members:
-
-Multilevel Quasi-Monte Carlo (qMC)
-..................................
-
-.. automodule:: qmcpy.stopping_criterion.mlqmc
-    :members:
-
-Central Limit Theorem for Replications (qMC)
-............................................
-
-.. automodule:: qmcpy.stopping_criterion.clt_rep
-    :members:
-
-Multilevel Monte Carlo (MC)
-...........................
-
-.. automodule:: qmcpy.stopping_criterion.mlmc
-    :members:
-
-Mean Monte Carlo Garunteed (MC)
-...............................
-
-.. automodule:: qmcpy.stopping_criterion.mean_mc_g
-    :members:
-
-Central Limit Theorem (MC)
-..........................
-
-.. automodule:: qmcpy.stopping_criterion.clt
-    :members:
-
-
-
 Integrand Class
 ---------------
 
@@ -71,22 +18,27 @@ Keister Function
 .. automodule:: qmcpy.integrand.keister
     :members:
 
+Custom Function
+...............
+
+.. automodule:: qmcpy.integrand.custom_fun
+    :members:
+
+European Option
+...............
+
+.. automodule:: qmcpy.integrand.european_option
+
 Asian Call Option
 .................
 
 .. automodule:: qmcpy.integrand.asian_call
     :members:
 
-Various Call Options by Milstein Discretization 
+Multilevel Call Options with Milstein Discretization 
 ...............................................
 
-.. automodule:: qmcpy.integrand.mlmc_call_options
-    :members:
-
-Custom Function
-...............
-
-.. automodule:: qmcpy.integrand.quick_construct
+.. automodule:: qmcpy.integrand.ml_call_options
     :members:
 
 Linear Function
@@ -97,7 +49,7 @@ Linear Function
 
 
 
-Measure Class
+True Measure Class
 -------------
 
 Abstract Measure Class
@@ -130,16 +82,16 @@ Lebesgue
 .. automodule:: qmcpy.true_measure.lebesgue
     :members:
 
-Identical to what Discrete Distribution Mimics
-..................
-
-.. automodule:: qmcpy.true_measure.identical_to_discrete
-    :members:
-
 Importance Sampling
 ...................
 
 .. automodule:: qmcpy.true_measure.importance_sampling
+    :members:
+
+Identical to what Discrete Distribution Mimics
+..................
+
+.. automodule:: qmcpy.true_measure.identical_to_discrete
     :members:
 
 
@@ -159,7 +111,7 @@ Lattice
 .. automodule:: qmcpy.discrete_distribution.lattice.lattice
     :members:
 
-Sobol
+Sobol'
 .....
 
 .. automodule:: qmcpy.discrete_distribution.sobol.sobol
@@ -197,6 +149,59 @@ Acceptance Rejection Sampling
 
 
 
+Stopping Criterion Algorithms
+-----------------------------
+
+Abstract Stopping Criterion Class
+.................................
+
+.. automodule:: qmcpy.stopping_criterion._stopping_criterion
+    :members:
+
+Garunteed Lattice Cubature (qMC)
+................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_lattice_g
+    :members:
+
+Garunteed Sobol Cubature (qMC)
+..............................
+
+.. automodule:: qmcpy.stopping_criterion.cub_sobol_g
+    :members:
+
+Multilevel qMC Cubature
+..................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_ml
+    :members:
+
+CLT qMC Cubature (with Replications)
+............................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_clt
+    :members:
+
+Multilevel MC Cubature
+...........................
+
+.. automodule:: qmcpy.stopping_criterion.cub_mc_ml
+    :members:
+
+Garunteed MC Cubature
+...............................
+
+.. automodule:: qmcpy.stopping_criterion.cub_mc_g
+    :members:
+
+CLT MC Cubature
+..........................
+
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_clt
+    :members:
+
+
+
 Accumulate Data Class
 ---------------------
 
@@ -206,25 +211,31 @@ Abstract Accumulate Data Class
 .. automodule:: qmcpy.accumulate_data._accumulate_data
     :members:
 
-Cubature Data (qMC)
-...................
+LD Sequence Transform Data (qMC)
+......................................
 
-.. automodule:: qmcpy.accumulate_data.cubature_data
+.. automodule:: qmcpy.accumulate_data.ld_transform_data
     :members:
 
-Mean Variance for Replications Data (qMC)
+Mean Variance qMC Data (for Replications)
 .........................................
 
 .. automodule:: qmcpy.accumulate_data.mean_var_data_rep
     :members:
 
-Multilevel Data (MC)
+Multilevel qMC Data
+....................
+
+.. automodule:: qmcpy.accumulate_data.mlqmc_data
+    :members:
+
+Multilevel MC Data
 ....................
 
 .. automodule:: qmcpy.accumulate_data.mlmc_data
     :members:
     
-Mean Variance Data (MC)
+Mean Variance MC Data
 .......................
 
 .. automodule:: qmcpy.accumulate_data.mean_var_data

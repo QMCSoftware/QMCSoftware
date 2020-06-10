@@ -1,7 +1,7 @@
 from ._integrand import Integrand
 
 
-class QuickConstruct(Integrand):
+class CustomFun(Integrand):
     """ Specify and generate values of a user-defined function"""
 
     def __init__(self, measure, custom_fun):

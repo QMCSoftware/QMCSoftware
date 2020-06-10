@@ -7,7 +7,7 @@ from time import perf_counter
 import warnings
 
 
-class MLQMC(StoppingCriterion):
+class CubQmcMl(StoppingCriterion):
     """
     Stopping criterion based on multi-level quasi-monte carlo
     

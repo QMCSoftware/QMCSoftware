@@ -4,7 +4,7 @@ from numpy import array, nan, zeros, tile, inf, hstack, arange, where
 import warnings
 
 
-class CubatureData(AccumulateData):
+class LDTransformData(AccumulateData):
 
     parameters = ['n_total','solution','r_lag']
 

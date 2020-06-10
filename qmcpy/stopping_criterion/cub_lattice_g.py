@@ -1,12 +1,12 @@
 from ._stopping_criterion import StoppingCriterion
-from ..accumulate_data import CubatureData
+from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
 from numpy import log2, hstack, tile, exp, pi, arange
 from time import perf_counter
 import warnings
 
 
-class CubLattice_g(StoppingCriterion):
+class CubLatticeG(StoppingCriterion):
     """
     Stopping Criterion quasi-Monte Carlo method using rank-1 Lattices cubature over
     a d-dimensional region to integrate within a specified generalized error
@@ -76,7 +76,7 @@ class CubLattice_g(StoppingCriterion):
         if distribution.backend != 'gail':
             raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
         # Construct AccumulateData Object to House Integration data
-        self.data = CubatureData(self, integrand, self.fft_update, m_min, m_max, fudge, check_cone)
+        self.data = LDTransformData(self, integrand, self.fft_update, m_min, m_max, fudge, check_cone)
 
     def integrate(self):
         """ See abstract method. """

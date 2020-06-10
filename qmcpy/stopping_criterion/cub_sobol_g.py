@@ -1,12 +1,12 @@
 from ._stopping_criterion import StoppingCriterion
-from ..accumulate_data import CubatureData
+from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
 from numpy import log2, hstack, tile
 from time import perf_counter
 import warnings
 
 
-class CubSobol_g(StoppingCriterion):
+class CubSobolG(StoppingCriterion):
     """
     Quasi-Monte Carlo method using Sobol' cubature over the
     d-dimensional region to integrate within a specified generalized error
@@ -75,7 +75,7 @@ class CubSobol_g(StoppingCriterion):
         if (not distribution.scramble) or distribution.graycode:
             raise ParameterError("CubSobol_g requires distribution to have scramble=True and graycode=False")
         # Construct AccumulateData Object to House Integration data
-        self.data = CubatureData(self, integrand, self.fwt_update, m_min, m_max, fudge, check_cone)
+        self.data = LDTransformData(self, integrand, self.fwt_update, m_min, m_max, fudge, check_cone)
 
     def integrate(self):
         """ See abstract method. """

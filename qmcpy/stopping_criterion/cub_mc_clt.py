@@ -7,7 +7,7 @@ from time import perf_counter
 import warnings
 
 
-class CLT(StoppingCriterion):
+class CubMcClt(StoppingCriterion):
     """ Stopping criterion based on the Central Limit Theorem. """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']

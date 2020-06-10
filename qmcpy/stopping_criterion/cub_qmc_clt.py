@@ -8,7 +8,7 @@ from time import perf_counter
 import warnings
 
 
-class CLTRep(StoppingCriterion):
+class CubQmcClt(StoppingCriterion):
     """ Stopping criterion based on Central Limit Theorem for multiple replications. """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
