@@ -43,7 +43,7 @@ Step 3: Integrand where samples should mimic the True Measure
 
 .. code:: ipython3
 
-    integrand = QuickConstruct(true_measure, custom_fun=keister)
+    integrand = CustomFun(true_measure, custom_fun=keister)
     # or integrand = Keister(true_measure) using QMCPy Keister class
 
 Step 4: Stopping Criterion that controls integration process
@@ -51,7 +51,7 @@ Step 4: Stopping Criterion that controls integration process
 
 .. code:: ipython3
 
-    stopping_criterion = CubLattice_g(integrand, abs_tol)
+    stopping_criterion = CubQmcLatticeG(integrand, abs_tol)
 
 Step 5: Integrate
 -----------------
@@ -66,7 +66,7 @@ Step 5: Integrate
 .. parsed-literal::
 
     Solution: 1.8082         
-    QuickConstruct (Integrand Object)
+    CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
     	scramble        1
@@ -77,16 +77,16 @@ Step 5: Integrate
     	distrib_name    Lattice
     	mean            0
     	covariance      0.5000
-    CubLattice_g (StoppingCriterion Object)
+    CubQmcLatticeG (StoppingCriterion Object)
     	abs_tol         0.0001
     	rel_tol         0
     	n_init          1024
     	n_max           34359738368
-    CubatureData (AccumulateData Object)
+    LDTransformData (AccumulateData Object)
     	n_total         65536
     	solution        1.8082
     	r_lag           4
-    	time_integrate  0.0701
+    	time_integrate  0.0667
     
     Within absolute tolerance: True
 
@@ -97,8 +97,8 @@ Condensed Problem
 .. code:: ipython3
 
     # solution,data =  StoppingCriterion(Integrand(TrueMeasure(DiscreteDistribution(dimension)))).integrate()
-    solution,data = CubLattice_g( # stopping criterion
-                        QuickConstruct( # integrand: QuickConstruct takes a function handle as its 2nd input
+    solution,data = CubQmcLatticeG( # stopping criterion
+                        CustomFun( # integrand: QuickConstruct takes a function handle as its 2nd input
                             Gaussian( # true measure
                                 Lattice(dimension), # discrete distribution
                                 covariance=1/2), # gaussian true measure attribute
@@ -112,7 +112,7 @@ Condensed Problem
 .. parsed-literal::
 
     Solution: 1.8082         
-    QuickConstruct (Integrand Object)
+    CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
     	scramble        1
@@ -123,16 +123,16 @@ Condensed Problem
     	distrib_name    Lattice
     	mean            0
     	covariance      0.5000
-    CubLattice_g (StoppingCriterion Object)
+    CubQmcLatticeG (StoppingCriterion Object)
     	abs_tol         0.0001
     	rel_tol         0
     	n_init          1024
     	n_max           34359738368
-    CubatureData (AccumulateData Object)
+    LDTransformData (AccumulateData Object)
     	n_total         65536
     	solution        1.8082
     	r_lag           4
-    	time_integrate  0.0741
+    	time_integrate  0.0690
     
     Within absolute tolerance: True
 

@@ -220,7 +220,7 @@ Plots samples on a 2D Keister function
     distribution = IIDStdGaussian(dimension=2, seed=7)
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CLT(integrand,abs_tol=abs_tol,rel_tol=0,n_init=16, n_max=1e10).integrate()
+    solution,data = CubMcClt(integrand,abs_tol=abs_tol,rel_tol=0,n_init=16, n_max=1e10).integrate()
     print(data)
 
 
@@ -236,7 +236,7 @@ Plots samples on a 2D Keister function
     	distrib_name    IIDStdGaussian
     	mean            0
     	covariance      0.5000
-    CLT (StoppingCriterion Object)
+    CubMcClt (StoppingCriterion Object)
     	inflate         1.2000
     	alpha           0.0100
     	abs_tol         0.5000
@@ -249,7 +249,7 @@ Plots samples on a 2D Keister function
     	n               65
     	n_total         81
     	confid_int      [ 1.646  2.464]
-    	time_integrate  0.0015
+    	time_integrate  0.0016
     
 
 

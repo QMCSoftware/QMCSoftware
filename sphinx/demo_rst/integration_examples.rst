@@ -25,18 +25,13 @@ the Gaussian measure, and the Sobol distribution:
 -  Sobol discrete distribution:
    :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
-The following code snippet integrates a three-dimensional Keister
-function numerically by creating instances of ``qmcpy``'s built-in
-classes, ``Keister``, ``Gaussian``, ``Sobol`` and ``CubSobol_g``, as
-inputs to the function ``integrate()``.
-
 .. code:: ipython3
 
     dim = 3
     distribution = Sobol(dimension=dim, scramble=True, seed=7, backend='QRNG')
     measure = Gaussian(distribution, covariance=1/2)
     integrand = Keister(measure)
-    solution,data = CubSobol_g(integrand,abs_tol=.05).integrate()
+    solution,data = CubQmcSobolG(integrand,abs_tol=.05).integrate()
     print(data)
 
 
@@ -55,16 +50,16 @@ inputs to the function ``integrate()``.
     	distrib_name    Sobol
     	mean            0
     	covariance      0.5000
-    CubSobol_g (StoppingCriterion Object)
+    CubQmcSobolG (StoppingCriterion Object)
     	abs_tol         0.0500
     	rel_tol         0
     	n_init          1024
     	n_max           34359738368
-    CubatureData (AccumulateData Object)
+    LDTransformData (AccumulateData Object)
     	n_total         1024
     	solution        2.1718
     	r_lag           4
-    	time_integrate  0.0027
+    	time_integrate  0.0030
     
 
 
@@ -103,7 +98,7 @@ defined as follows:
         strike_price = 25,
         interest_rate = 0.01,
         mean_type = 'arithmetic')
-    solution,data = CubLattice_g(integrand, abs_tol=.05).integrate()
+    solution,data = CubQmcLatticeG(integrand, abs_tol=.05).integrate()
     print(data)
 
 
@@ -128,16 +123,16 @@ defined as follows:
     	distrib_name    Lattice
     	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
     	mean_shift_is   0
-    CubLattice_g (StoppingCriterion Object)
+    CubQmcLatticeG (StoppingCriterion Object)
     	abs_tol         0.0500
     	rel_tol         0
     	n_init          1024
     	n_max           34359738368
-    CubatureData (AccumulateData Object)
+    LDTransformData (AccumulateData Object)
     	n_total         4096
     	solution        6.2744
     	r_lag           4
-    	time_integrate  0.0541
+    	time_integrate  0.0499
     
 
 
@@ -172,13 +167,13 @@ last example.
             interest_rate = 0.01,
             mean_type = 'arithmetic',
             multi_level_dimensions = [4,16,64])
-    solution,data = CLT(integrand, abs_tol=.05).integrate()
+    solution,data = CubMcClt(integrand, abs_tol=.05).integrate()
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 6.2533         
+    Solution: 6.2553         
     AsianCall (Integrand Object)
     	volatility      0.5000
     	start_price     30
@@ -195,7 +190,7 @@ last example.
     	distrib_name    IIDStdGaussian
     	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
     	mean_shift_is   0
-    CLT (StoppingCriterion Object)
+    CubMcClt (StoppingCriterion Object)
     	inflate         1.2000
     	alpha           0.0100
     	abs_tol         0.0500
@@ -204,11 +199,11 @@ last example.
     	n_max           10000000000
     MeanVarData (AccumulateData Object)
     	levels          3
-    	solution        6.2533
-    	n               [332598  28362   2847]
-    	n_total         366879
-    	confid_int      [ 6.204  6.302]
-    	time_integrate  0.1189
+    	solution        6.2553
+    	n               [334481  27777   2835]
+    	n_total         368165
+    	confid_int      [ 6.206  6.304]
+    	time_integrate  0.1106
     
 
 

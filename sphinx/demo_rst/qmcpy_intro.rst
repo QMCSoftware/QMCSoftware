@@ -214,15 +214,15 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
     abs_tol = .01
     distribution = IIDStdUniform(dimension=dim, seed=7)
     measure = Uniform(distribution)
-    integrand = QuickConstruct(measure, custom_fun=f)
-    solution,data = CLT(integrand,abs_tol=abs_tol,rel_tol=0).integrate()
+    integrand = CustomFun(measure, custom_fun=f)
+    solution,data = CubMcClt(integrand,abs_tol=abs_tol,rel_tol=0).integrate()
     print(data)
 
 
 .. parsed-literal::
 
     Solution: 0.6575         
-    QuickConstruct (Integrand Object)
+    CustomFun (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
     	dimension       1
     	seed            7
@@ -231,7 +231,7 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
     	distrib_name    IIDStdUniform
     	lower_bound     0
     	upper_bound     1
-    CLT (StoppingCriterion Object)
+    CubMcClt (StoppingCriterion Object)
     	inflate         1.2000
     	alpha           0.0100
     	abs_tol         0.0100
@@ -244,7 +244,7 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
     	n               3305
     	n_total         4329
     	confid_int      [ 0.647  0.668]
-    	time_integrate  0.0097
+    	time_integrate  0.0016
     
 
 
@@ -272,15 +272,15 @@ changing the input parameter value of dimension for QuickConstruct?
     dim = 2
     distribution = IIDStdUniform(dimension=dim, seed=7)
     measure = Uniform(distribution)
-    integrand = QuickConstruct(measure, custom_fun=f)
-    solution2,data2 = CLT(integrand,abs_tol=abs_tol,rel_tol=0).integrate()
+    integrand = CustomFun(measure, custom_fun=f)
+    solution2,data2 = CubMcClt(integrand,abs_tol=abs_tol,rel_tol=0).integrate()
     print(data2)
 
 
 .. parsed-literal::
 
     Solution: 0.8309         
-    QuickConstruct (Integrand Object)
+    CustomFun (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
     	dimension       2
     	seed            7
@@ -289,7 +289,7 @@ changing the input parameter value of dimension for QuickConstruct?
     	distrib_name    IIDStdUniform
     	lower_bound     [ 0.000  0.000]
     	upper_bound     [ 1.000  1.000]
-    CLT (StoppingCriterion Object)
+    CubMcClt (StoppingCriterion Object)
     	inflate         1.2000
     	alpha           0.0100
     	abs_tol         0.0100
@@ -302,7 +302,7 @@ changing the input parameter value of dimension for QuickConstruct?
     	n               5452
     	n_total         6476
     	confid_int      [ 0.821  0.841]
-    	time_integrate  0.0027
+    	time_integrate  0.0028
     
 
 

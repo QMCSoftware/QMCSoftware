@@ -30,8 +30,8 @@ Sample Problem 1
     # Lebesgue Measure
     distribution = IIDStdUniform(dim, seed=7)
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
-    integrand = QuickConstruct(measure, lambda x: x**2)
-    solution,data = CLT(integrand, abs_tol=abs_tol).integrate()
+    integrand = CustomFun(measure, lambda x: x**2)
+    solution,data = CubMcClt(integrand, abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 
@@ -47,8 +47,8 @@ Sample Problem 1
     # Uniform Measure
     distribution = IIDStdUniform(dim, seed=7)
     measure = Uniform(distribution, lower_bound=a, upper_bound=b)
-    integrand = QuickConstruct(measure, lambda x: 2*(x**2))
-    solution,data = CLT(integrand, abs_tol=abs_tol).integrate()
+    integrand = CustomFun(measure, lambda x: 2*(x**2))
+    solution,data = CubMcClt(integrand, abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 
@@ -86,8 +86,8 @@ Sample Problem 2
     # Lebesgue Measure
     distribution = Sobol(dim, scramble=True, seed=7, backend='QRNG')
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
-    integrand = QuickConstruct(measure, lambda x: (x**2).sum(1))
-    solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
+    integrand = CustomFun(measure, lambda x: (x**2).sum(1))
+    solution,data = CubQmcClt(integrand, abs_tol=abs_tol).integrate()
     print('y = %.5f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 
@@ -103,8 +103,8 @@ Sample Problem 2
     # Uniform Measure
     distribution = Sobol(dim, scramble=True, seed=17, backend='QRNG')
     measure = Uniform(distribution, lower_bound=a, upper_bound=b)
-    integrand = QuickConstruct(measure, lambda x: (b-a).prod()*(x**2).sum(1))
-    solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
+    integrand = CustomFun(measure, lambda x: (b-a).prod()*(x**2).sum(1))
+    solution,data = CubQmcClt(integrand, abs_tol=abs_tol).integrate()
     print('y = %.5f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 
@@ -139,8 +139,8 @@ Mathematica Code: ``Integrate[Sin[x]/Log[x], {x,a,b}]``
     # Lebesgue Measure
     distribution = Lattice(dim, scramble=True, seed=7, backend='GAIL')
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
-    integrand = QuickConstruct(measure, lambda x: sin(x)/log(x))
-    solution,data = CubLattice_g(integrand, abs_tol=abs_tol).integrate()
+    integrand = CustomFun(measure, lambda x: sin(x)/log(x))
+    solution,data = CubQmcLatticeG(integrand, abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 
@@ -168,8 +168,8 @@ Integral over all real numbers
 
     distribution = Lattice(dim)
     measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
-    integrand = QuickConstruct(measure, lambda x: exp(-x**2).prod(1))
-    solution,data = CubLattice_g(integrand,abs_tol=abs_tol).integrate()
+    integrand = CustomFun(measure, lambda x: exp(-x**2).prod(1))
+    solution,data = CubQmcLatticeG(integrand,abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance:',abs((solution-true_value))<abs_tol)
 

@@ -42,11 +42,11 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^3`
     df = pd.read_csv('../outputs/mc_vs_qmc/vary_abs_tol.csv')
     df['Problem'] = df['Stopping Criterion'] + ' ' + df['Distribution'] + ' (' + df['MC/QMC'] + ')'
     df = df.drop(['Stopping Criterion','Distribution','MC/QMC'],axis=1)
-    problems = ['CLT IIDStdUniform (MC)',
-                'MeanMC_g IIDStdGaussian (MC)',
-                'CLTRep Sobol (QMC)',
-                'CubLattice_g Lattice (QMC)',
-                'CubSobol_g Sobol (QMC)']
+    problems = ['CubMcClt IIDStdUniform (MC)',
+                'CubMcG IIDStdGaussian (MC)',
+                'CubQmcClt Sobol (QMC)',
+                'CubQmcLatticeG Lattice (QMC)',
+                'CubQmcSobolG Sobol (QMC)']
     df = df[df['Problem'].isin(problems)]
     df['abs_tol'] = df['abs_tol'].round(4)
     df_grouped = df.groupby(['Problem'])
@@ -93,105 +93,105 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^3`
       </thead>
       <tbody>
         <tr>
-          <th>CLT IIDStdUniform (MC)</th>
+          <th>CubMcClt IIDStdUniform (MC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>4.72e+05</td>
-          <td>1.85e-01</td>
+          <td>1.90e-01</td>
         </tr>
         <tr>
-          <th>CLT IIDStdUniform (MC)</th>
+          <th>CubMcClt IIDStdUniform (MC)</th>
           <td>5.00e-02</td>
           <td>2.16e+00</td>
           <td>2.08e+04</td>
-          <td>1.04e-02</td>
+          <td>8.40e-03</td>
         </tr>
         <tr>
-          <th>CLT IIDStdUniform (MC)</th>
+          <th>CubMcClt IIDStdUniform (MC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>6.75e+03</td>
-          <td>3.71e-03</td>
+          <td>3.13e-03</td>
         </tr>
         <tr>
-          <th>MeanMC_g IIDStdGaussian (MC)</th>
+          <th>CubMcG IIDStdGaussian (MC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>6.12e+05</td>
-          <td>8.22e-02</td>
+          <td>8.49e-02</td>
         </tr>
         <tr>
-          <th>MeanMC_g IIDStdGaussian (MC)</th>
+          <th>CubMcG IIDStdGaussian (MC)</th>
           <td>5.00e-02</td>
           <td>2.18e+00</td>
           <td>4.01e+04</td>
           <td>1.03e-02</td>
         </tr>
         <tr>
-          <th>MeanMC_g IIDStdGaussian (MC)</th>
+          <th>CubMcG IIDStdGaussian (MC)</th>
           <td>1.00e-01</td>
           <td>2.18e+00</td>
           <td>1.46e+04</td>
-          <td>3.76e-03</td>
+          <td>3.68e-03</td>
         </tr>
         <tr>
-          <th>CLTRep Sobol (QMC)</th>
+          <th>CubQmcClt Sobol (QMC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>4.10e+03</td>
-          <td>6.28e-03</td>
+          <td>5.96e-03</td>
         </tr>
         <tr>
-          <th>CLTRep Sobol (QMC)</th>
+          <th>CubQmcClt Sobol (QMC)</th>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>4.10e+03</td>
-          <td>6.20e-03</td>
+          <td>5.89e-03</td>
         </tr>
         <tr>
-          <th>CLTRep Sobol (QMC)</th>
+          <th>CubQmcClt Sobol (QMC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>4.10e+03</td>
-          <td>6.06e-03</td>
+          <td>5.97e-03</td>
         </tr>
         <tr>
-          <th>CubLattice_g Lattice (QMC)</th>
+          <th>CubQmcLatticeG Lattice (QMC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>2.05e+03</td>
-          <td>4.91e-03</td>
+          <td>4.76e-03</td>
         </tr>
         <tr>
-          <th>CubLattice_g Lattice (QMC)</th>
+          <th>CubQmcLatticeG Lattice (QMC)</th>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>2.12e-03</td>
+          <td>2.18e-03</td>
         </tr>
         <tr>
-          <th>CubLattice_g Lattice (QMC)</th>
+          <th>CubQmcLatticeG Lattice (QMC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>2.48e-03</td>
+          <td>2.34e-03</td>
         </tr>
         <tr>
-          <th>CubSobol_g Sobol (QMC)</th>
+          <th>CubQmcSobolG Sobol (QMC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>2.05e+03</td>
-          <td>3.41e-03</td>
+          <td>3.14e-03</td>
         </tr>
         <tr>
-          <th>CubSobol_g Sobol (QMC)</th>
+          <th>CubQmcSobolG Sobol (QMC)</th>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>1.53e-03</td>
+          <td>1.62e-03</td>
         </tr>
         <tr>
-          <th>CubSobol_g Sobol (QMC)</th>
+          <th>CubQmcSobolG Sobol (QMC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
@@ -250,10 +250,11 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
     df = pd.read_csv('../outputs/mc_vs_qmc/vary_dimension.csv')
     df['Problem'] = df['Stopping Criterion'] + ' ' + df['Distribution'] + ' (' + df['MC/QMC'] + ')'
     df = df.drop(['Stopping Criterion','Distribution','MC/QMC'],axis=1)
-    problems = ['CLT IIDStdUniform (MC)',
-                'CLTRep Sobol (QMC)',
-                'CubLattice_g Lattice (QMC)',
-                'CubSobol_g Sobol (QMC)']
+    problems = ['CubMcClt IIDStdUniform (MC)',
+                'CubMcG IIDStdGaussian (MC)',
+                'CubQmcClt Sobol (QMC)',
+                'CubQmcLatticeG Lattice (QMC)',
+                'CubQmcSobolG Sobol (QMC)']
     df = df[df['Problem'].isin(problems)]
     df_grouped = df.groupby(['Problem'])
     df_dims = df_grouped['dimension'].apply(list).reset_index(name='dimension')
@@ -299,88 +300,109 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
       </thead>
       <tbody>
         <tr>
-          <th>CLT IIDStdUniform (MC)</th>
+          <th>CubMcClt IIDStdUniform (MC)</th>
           <td>10</td>
           <td>-1.53e+02</td>
           <td>4.60e+04</td>
-          <td>6.59e-02</td>
+          <td>6.73e-02</td>
         </tr>
         <tr>
-          <th>CLT IIDStdUniform (MC)</th>
+          <th>CubMcClt IIDStdUniform (MC)</th>
           <td>20</td>
           <td>-8.28e+04</td>
           <td>4.75e+03</td>
-          <td>1.61e-02</td>
+          <td>1.74e-02</td>
         </tr>
         <tr>
-          <th>CLT IIDStdUniform (MC)</th>
+          <th>CubMcClt IIDStdUniform (MC)</th>
           <td>30</td>
           <td>-1.95e+07</td>
           <td>2.03e+04</td>
-          <td>7.61e-02</td>
+          <td>8.72e-02</td>
         </tr>
         <tr>
-          <th>CLTRep Sobol (QMC)</th>
+          <th>CubMcG IIDStdGaussian (MC)</th>
+          <td>10</td>
+          <td>-1.53e+02</td>
+          <td>1.10e+04</td>
+          <td>6.70e-03</td>
+        </tr>
+        <tr>
+          <th>CubMcG IIDStdGaussian (MC)</th>
+          <td>20</td>
+          <td>-8.26e+04</td>
+          <td>1.10e+04</td>
+          <td>1.38e-02</td>
+        </tr>
+        <tr>
+          <th>CubMcG IIDStdGaussian (MC)</th>
+          <td>30</td>
+          <td>-1.95e+07</td>
+          <td>1.10e+04</td>
+          <td>1.40e-02</td>
+        </tr>
+        <tr>
+          <th>CubQmcClt Sobol (QMC)</th>
           <td>10</td>
           <td>-1.54e+02</td>
           <td>4.10e+03</td>
-          <td>9.64e-03</td>
+          <td>9.31e-03</td>
         </tr>
         <tr>
-          <th>CLTRep Sobol (QMC)</th>
+          <th>CubQmcClt Sobol (QMC)</th>
           <td>20</td>
           <td>-8.28e+04</td>
           <td>4.10e+03</td>
-          <td>1.33e-02</td>
+          <td>1.38e-02</td>
         </tr>
         <tr>
-          <th>CLTRep Sobol (QMC)</th>
+          <th>CubQmcClt Sobol (QMC)</th>
           <td>30</td>
           <td>-1.94e+07</td>
           <td>4.10e+03</td>
-          <td>1.78e-02</td>
+          <td>1.67e-02</td>
         </tr>
         <tr>
-          <th>CubLattice_g Lattice (QMC)</th>
+          <th>CubQmcLatticeG Lattice (QMC)</th>
           <td>10</td>
           <td>-1.55e+02</td>
           <td>1.02e+03</td>
-          <td>3.23e-03</td>
+          <td>4.12e-03</td>
         </tr>
         <tr>
-          <th>CubLattice_g Lattice (QMC)</th>
+          <th>CubQmcLatticeG Lattice (QMC)</th>
           <td>20</td>
           <td>-8.28e+04</td>
           <td>1.02e+03</td>
-          <td>5.79e-03</td>
+          <td>6.90e-03</td>
         </tr>
         <tr>
-          <th>CubLattice_g Lattice (QMC)</th>
+          <th>CubQmcLatticeG Lattice (QMC)</th>
           <td>30</td>
           <td>-1.94e+07</td>
           <td>1.02e+03</td>
-          <td>9.07e-03</td>
+          <td>8.83e-03</td>
         </tr>
         <tr>
-          <th>CubSobol_g Sobol (QMC)</th>
+          <th>CubQmcSobolG Sobol (QMC)</th>
           <td>10</td>
           <td>-1.54e+02</td>
           <td>1.02e+03</td>
-          <td>2.45e-03</td>
+          <td>3.32e-03</td>
         </tr>
         <tr>
-          <th>CubSobol_g Sobol (QMC)</th>
+          <th>CubQmcSobolG Sobol (QMC)</th>
           <td>20</td>
           <td>-8.28e+04</td>
           <td>1.02e+03</td>
-          <td>7.16e-03</td>
+          <td>6.11e-03</td>
         </tr>
         <tr>
-          <th>CubSobol_g Sobol (QMC)</th>
+          <th>CubQmcSobolG Sobol (QMC)</th>
           <td>30</td>
           <td>-1.94e+07</td>
           <td>1.02e+03</td>
-          <td>7.14e-03</td>
+          <td>8.99e-03</td>
         </tr>
       </tbody>
     </table>
@@ -390,7 +412,7 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
 
 .. code:: ipython3
 
-    fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(18, 6))
+    fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(18, 5))
     for problem in problems:
         dimension = df_dims[df_dims['Problem']==problem]['dimension'].tolist()[0]
         samples = df_samples[df_samples['Problem']==problem]['n'].tolist()[0]
@@ -403,7 +425,7 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
         ax_i.spines['right'].set_visible(False)
         ax_i.spines['top'].set_visible(False)
         ax_i.set_xlabel('Dimension')
-    ax[1].legend(frameon=False, loc=(-1.3,1),ncol=len(problems))
+    ax[0].legend(loc='upper right', frameon=False)
     ax[0].set_ylabel('Total Samples')
     ax[1].set_ylabel('Runtime')
     fig.suptitle('Comparing Dimensions')

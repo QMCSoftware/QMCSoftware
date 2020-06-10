@@ -1,17 +1,31 @@
 QMCPy
 =====
 
+The QMCPy framework uses 5 abstract classes that are fleshed out in
+concrete implementations. Specifically, a user selects an integrand,
+true measure, discrete distribution, and stopping criterion specific to
+their Monte Carlo (MC) / quasi-Monte Carlo (qMC) problem. The
+:math:`5^{th}` abstract class accumulates data from the stopping
+criterion and does not need to be instantiated by the user. The
+following blocks give more detailed descriptions of each abstract class
+and the available concrete implementations. For specific class names and
+parameters see the `QMCPy Documentation
+page <https://qmcpy.readthedocs.io/en/latest/algorithms.html>`__.
+
+.. raw:: html
+
+   <hr>
+
 Integrand
 ---------
 
-| The function to integrate
-| *Abstract class with concrete implementations*
+The function to integrate.
 
--  Linear: :math:`g(\boldsymbol{x}) = \sum_{j=1}^{d}x_{j}`
--  Keister:
+-  Keister Function:
    :math:`g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)`
+-  Custom Function
 -  European Option
--  Asian Call
+-  Asian Call Option
 
    -  stock price at time :math:`jT/d`: :math:`~~~~~~~~~`
       :math:`S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)`
@@ -20,8 +34,8 @@ Integrand
    -  discounted put payoff
       :math:`= \max\left(K-\frac{1}{d}\sum_{j=1}^{d} S(x_j)\right),\: 0)\,\exp(-rT)`
 
--  Multilevel Call Options
--  QuickConstruct
+-  Multilevel Call Options with Milstein Discretization
+-  Linear Function: :math:`g(\boldsymbol{x}) = \sum_{j=1}^{d}x_{j}`
 
 .. raw:: html
 
@@ -30,8 +44,7 @@ Integrand
 True Measure
 ------------
 
-| General measure used to define the integrand
-| *Abstract class with concrete implementations*
+General measure used to define the integrand.
 
 -  Uniform: :math:`\mathcal{U}(\boldsymbol{a},\boldsymbol{b})`
 -  Gaussian: :math:`\mathcal{N}(\boldsymbol{\mu},\mathsf{\Sigma})`
@@ -40,8 +53,8 @@ True Measure
    :math:`\mathsf{\Sigma} = \min(\boldsymbol{t},\boldsymbol{t})^T`,
    :math:`~~~~` :math:`\boldsymbol{t} = (t_1, \ldots, t_d)`
 -  Lebesgue
--  Identical to what the discrete distribution mimics
 -  Importance sampling
+-  Identical to what the discrete distribution mimics
 
 .. raw:: html
 
@@ -50,8 +63,13 @@ True Measure
 Discrete Distribution
 ---------------------
 
-| Sampling nodes IID or LDS (low-discrepancy sequence)
-| *Abstract class with concrete implementations*
+Sampling nodes.
+
+**Low Discrepancy (LD) nodes**
+
+-  Lattice (base 2):
+   :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
+-  Sobol' (base 2): :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
 
 **Independent Identically Distributed (IID) Nodes**
 
@@ -63,12 +81,6 @@ Discrete Distribution
 -  Inverse CDF Sampling
 -  Acceptance Rejection Sampling
 
-**Low Discrepancy (LD) nodes**
-
--  Lattice (base 2):
-   :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
--  Sobol' (base 2): :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
-
 .. raw:: html
 
    <hr>
@@ -76,19 +88,18 @@ Discrete Distribution
 Stopping Criterion
 ------------------
 
-| The stopping criterion to determine sufficient approximation
-| Has class method ``integrate`` which preforms numerical integration
-| *Abstract class with concrete implementations*
+| The stopping criterion to determine sufficient approximation.
+| Has class method ``integrate`` which preforms numerical integration.
 
-**For IID Nodes** :math:`x_i\sim` iid
+**qMC Algorithms**
 
--  Mean MC (guaranteed)
--  Multilevel MC
--  Central Limit Theorem (CLT)
+-  Gauranteed Lattice Cubature
+-  Guaranteed Sobol Cubature
+-  Multilevel qMC Cubature
+-  CLT qMC Cubature (with Replications)
 
-**For QMC Sequences** :math:`\{x_{r,i}\}_{r=1}^R \sim` ld
+**MC Algorithms**
 
--  CubLattice\_g (gauranteed)
--  CubSobol\_g (gauranteed)
--  Multilevel QMC
--  CLT Repeated
+-  Multilevel MC Cubature
+-  Garunteed MC Cubature
+-  CLT MC Cubature

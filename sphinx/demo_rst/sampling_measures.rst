@@ -160,7 +160,7 @@ Acceptance Rejection Sampling
 .. parsed-literal::
 
     Expected (total draws / successful draws) = c = 1.333
-    Successful Draws: 5000  Total Draws: 6651
+    Successful Draws: 5000  Total Draws: 6686
 
 
 
@@ -296,8 +296,8 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
     measure = ImportanceSampling(
         objective_pdf = quarter_circle_uniform_pdf,
         measure_to_sample_from = Uniform(Lattice(dimension=2,seed=9)))
-    integrand = QuickConstruct(measure, lambda x: x.sum(1))
-    solution,data = CubLattice_g(integrand,abs_tol=abs_tol).integrate()
+    integrand = CustomFun(measure, lambda x: x.sum(1))
+    solution,data = CubQmcLatticeG(integrand,abs_tol=abs_tol).integrate()
     print(data)
     within_tol = abs(solution-true_value)<abs_tol
     print('Within tolerance of true value %.3f: %s'%(true_value,within_tol))
@@ -306,7 +306,7 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
 .. parsed-literal::
 
     Solution: 0.8479         
-    QuickConstruct (Integrand Object)
+    CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
     	dimension       2
     	scramble        1
@@ -315,16 +315,16 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
     	mimics          StdUniform
     ImportanceSampling (TrueMeasure Object)
     	distrib_name    Lattice
-    CubLattice_g (StoppingCriterion Object)
+    CubQmcLatticeG (StoppingCriterion Object)
     	abs_tol         0.0010
     	rel_tol         0
     	n_init          1024
     	n_max           34359738368
-    CubatureData (AccumulateData Object)
+    LDTransformData (AccumulateData Object)
     	n_total         8192
     	solution        0.8479
     	r_lag           4
-    	time_integrate  0.1276
+    	time_integrate  0.1344
     
     Within tolerance of true value 0.849: True
 

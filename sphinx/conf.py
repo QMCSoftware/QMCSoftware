@@ -114,7 +114,9 @@ html_theme_options = {
 
 html_theme = "sphinx_rtd_theme"
 html_show_sourcelink = False
-
+html_theme_options = {
+    'page_width': 'auto',
+}
 """
 html_theme = "bootstrap"
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
