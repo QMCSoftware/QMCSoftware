@@ -1,5 +1,5 @@
 from ._discrete_distribution import DiscreteDistribution
-from numpy.random import Generator, PCG64
+from numpy import random
 
 
 class IIDStdGaussian(DiscreteDistribution):
@@ -14,7 +14,7 @@ class IIDStdGaussian(DiscreteDistribution):
         """
         self.dimension = dimension
         self.seed = seed
-        self.rng = Generator(PCG64(self.seed))
+        random.seed(self.seed)
         self.mimics = 'StdGaussian'
         super().__init__()
 
@@ -28,7 +28,7 @@ class IIDStdGaussian(DiscreteDistribution):
         Returns:
             ndarray: n x d (dimension) array of samples
         """
-        return self.rng.standard_normal((int(n), self.dimension))
+        return random.randn(int(n), int(self.dimension))
     
     def set_dimension(self, dimension):
         """ See abstract method. """

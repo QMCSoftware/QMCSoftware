@@ -5,4 +5,4 @@ from .stopping_criterion import *
 from .accumulate_data import *
 
 name = "qmcpy"
-__version__ = "v0.1-alpha"
+__version__ = "0.2"

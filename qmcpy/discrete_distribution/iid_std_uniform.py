@@ -1,5 +1,5 @@
 from ._discrete_distribution import DiscreteDistribution
-from numpy.random import Generator, PCG64
+from numpy import random
 
 
 class IIDStdUniform(DiscreteDistribution):
@@ -14,7 +14,7 @@ class IIDStdUniform(DiscreteDistribution):
         """
         self.dimension = dimension
         self.seed = seed
-        self.rng = Generator(PCG64(self.seed))
+        random.seed(self.seed)
         self.mimics = 'StdUniform'
         super().__init__()
 
@@ -28,7 +28,7 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             ndarray: n x d (dimension) array of samples
         """
-        return self.rng.uniform(0,1,(int(n), self.dimension))
+        return random.rand(int(n), int(self.dimension))
     
     def set_dimension(self, dimension):
         """ See abstract class. """
