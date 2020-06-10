@@ -19,41 +19,40 @@ def asian_option_single_level(
     dimension = 64
     print(bar)
 
-    # CLT
+    # CubMcClt
     distribution = IIDStdGaussian(dimension, seed=7)
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = CLT(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubMcClt(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
-    # CLTRep
+    # CubQmcClt
     distribution = Lattice(dimension, scramble=True, seed=7, backend='MPS')
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = CLTRep(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubQmcClt(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
-    # MeanMC_g
+    # CubMcG
     distribution = IIDStdGaussian(dimension, seed=7)
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = MeanMC_g(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubMcG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
-    # CubLattice_g
+    # CubQMCLatticeG
     distribution = Lattice(dimension=dimension, scramble=True, seed=7, backend='GAIL')
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = CubLattice_g(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubQmcLatticeG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
-    # CubSobol_g
+    # CubQmcSobolG
     distribution = Sobol(dimension=dimension, scramble=True, seed=7, backend='QRNG')
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = CubSobol_g(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubQmcSobolG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
-
 if __name__ == "__main__":
-    asian_option_single_level()
+    asian_option_single_level(abs_tol=.025)

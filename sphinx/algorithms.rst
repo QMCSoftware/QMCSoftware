@@ -161,13 +161,13 @@ Abstract Stopping Criterion Class
 Garunteed Lattice Cubature (qMC)
 ................................
 
-.. automodule:: qmcpy.stopping_criterion.cub_lattice_g
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_lattice_g
     :members:
 
 Garunteed Sobol Cubature (qMC)
 ..............................
 
-.. automodule:: qmcpy.stopping_criterion.cub_sobol_g
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_sobol_g
     :members:
 
 Multilevel qMC Cubature

@@ -11,6 +11,7 @@ class TestWorkouts(unittest.TestCase):
         asian_option_multi_level()
         asian_option_single_level()
         keister()
+        pi_problem()
     
     def test_lds_sequences(self):
         python_sequences()

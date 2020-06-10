@@ -127,7 +127,7 @@ class TestLebesgue(unittest.TestCase):
         self.assertRaises(DimensionError,measure.set_dimension,3)
 
 
-class TestIdentityTransform(unittest.TestCase):
+class TestIdentitalToDiscrete(unittest.TestCase):
     """ Unit tests for IdentitalToDiscrete Measure. """
 
     def test_gen_mimic_samples(self):

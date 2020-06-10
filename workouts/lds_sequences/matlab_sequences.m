@@ -25,4 +25,4 @@ for i=1:size(n_2powers,1)
 end
 
 results = [2.^n_2powers, lattice_times, sobol_times]
-csvwrite('matlab_sequence_times.csv',results)
+csvwrite('matlab_sequences.csv',results)

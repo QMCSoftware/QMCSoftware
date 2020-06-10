@@ -1,6 +1,6 @@
 """ Test mlml """
 
-from qmcpy import MLMC
+from qmcpy import CubMcMl
 from numpy import *
 from numpy.linalg import lstsq
 
@@ -107,7 +107,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
     beta  = max(beta,0.5)
     theta = 0.25
     for i in range(len(eps)):
-        mlmc_qmcpy = MLMC(integrand_qmcpy,
+        mlmc_qmcpy = CubMcMl(integrand_qmcpy,
             rmse_tol = eps[i],
             n_init = n0,
             levels_min = l_min,

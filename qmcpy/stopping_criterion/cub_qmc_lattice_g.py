@@ -1,19 +1,19 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
-from numpy import log2, hstack, tile
+from numpy import log2, hstack, tile, exp, pi, arange
 from time import perf_counter
 import warnings
 
 
-class CubSobolG(StoppingCriterion):
+class CubQmcLatticeG(StoppingCriterion):
     """
-    Quasi-Monte Carlo method using Sobol' cubature over the
-    d-dimensional region to integrate within a specified generalized error
-    tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
-
-    Adapted from
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
+    Stopping Criterion quasi-Monte Carlo method using rank-1 Lattices cubature over
+    a d-dimensional region to integrate within a specified generalized error
+    tolerance with guarantees under Fourier coefficients cone decay assumptions.
+    
+    Adapted from 
+        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
 
     Reference
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
@@ -36,7 +36,6 @@ class CubSobolG(StoppingCriterion):
     """
 
     parameters = ['abs_tol','rel_tol','n_init','n_max']
-
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=2**10, n_max=2**35,
                  fudge=lambda m: 5*2**(-m), check_cone=False):
@@ -70,12 +69,14 @@ class CubSobolG(StoppingCriterion):
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
-        allowed_distribs = ["Sobol"]
+        allowed_distribs = ["Lattice"]
         super().__init__(distribution, allowed_levels, allowed_distribs)
-        if (not distribution.scramble) or distribution.graycode:
-            raise ParameterError("CubSobol_g requires distribution to have scramble=True and graycode=False")
+        if not distribution.scramble:
+            raise ParameterError("CubLattice_g requires distribution to have scramble=True")
+        if distribution.backend != 'gail':
+            raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, integrand, self.fwt_update, m_min, m_max, fudge, check_cone)
+        self.data = LDTransformData(self, integrand, self.fft_update, m_min, m_max, fudge, check_cone)
 
     def integrate(self):
         """ See abstract method. """
@@ -106,10 +107,10 @@ class CubSobolG(StoppingCriterion):
                 self.data.m += 1
         self.data.time_integrate = perf_counter() - t_start
         return self.data.solution, self.data
-    
-    def fwt_update(self, y, ynext):
+            
+    def fft_update(self, y, ynext):
         """
-        Fast Walsh Transform (FWT) ynext, combine with y, then FWT all points.
+        Fast Fourier Transform (FFT) ynext, combine with y, then FFT all points.
         
         Args:
             y (ndarray): all previous samples
@@ -118,24 +119,29 @@ class CubSobolG(StoppingCriterion):
         Return:
             ndarray: y and ynext combined and transformed
         """
-        ## Compute initial FWT on next points
+        y = y.astype(complex)
+        ynext = ynext.astype(complex)
+        ## Compute initial FFT on next points
         mnext = int(log2(len(ynext)))
         for l in range(mnext):
             nl = 2**l
             nmminlm1 = 2**(mnext-l-1)
             ptind_nl = hstack(( tile(True,nl), tile(False,nl) ))
             ptind = tile(ptind_nl,int(nmminlm1))
+            coef = exp(-2*pi*1j*arange(nl)/(2*nl))
+            coefv = tile(coef,int(nmminlm1))
             evenval = ynext[ptind]
             oddval = ynext[~ptind]
-            ynext[ptind] = (evenval + oddval) / 2
-            ynext[~ptind] = (evenval - oddval) / 2
+            ynext[ptind] = (evenval + coefv*oddval) / 2
+            ynext[~ptind] = (evenval - coefv*oddval) / 2
         y = hstack((y,ynext))
         if len(y) > len(ynext): # already generated some samples samples
-            ## Compute FWT on all points
+            ## Compute FFT on all points
             nl = 2**mnext
-            ptind = hstack(( tile(True,int(nl)), tile(False,int(nl)) ))
+            ptind = hstack((tile(True,int(nl)),tile(False,int(nl))))
+            coefv = exp(-2*pi*1j*arange(nl)/(2*nl))
             evenval = y[ptind]
             oddval = y[~ptind]
-            y[ptind] = (evenval + oddval)/2
-            y[~ptind] = (evenval - oddval)/2
+            y[ptind] = (evenval + coefv*oddval) /2
+            y[~ptind] = (evenval - coefv*oddval) /2
         return y

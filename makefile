@@ -53,12 +53,11 @@ workout:
 	@python workouts/integration_examples/asian_option_multi_level.py  > outputs/integration_examples/asian_option_multi_level.log
 	@python workouts/integration_examples/asian_option_single_level.py  > outputs/integration_examples/asian_option_single_level.log
 	@python workouts/integration_examples/keister.py  > outputs/integration_examples/keister.log
+	@python workouts/integration_examples/pi_problem.py > output/integration_examples/pi_problem.log
 	# lds_sequences
 	@python workouts/lds_sequences/python_sequences.py 
 	# mc_vs_qmc
 	@python workouts/mc_vs_qmc/importance_sampling.py
-	@python workouts/mc_vs_qmc/integrations_asian_call.py
-	@python workouts/mc_vs_qmc/integrations_keister.py
 	@python workouts/mc_vs_qmc/vary_abs_tol.py
 	@python workouts/mc_vs_qmc/vary_dimension.py
 	# mlmc

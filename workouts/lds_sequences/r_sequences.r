@@ -13,4 +13,4 @@ for (i in n_2powers){
     cat(sprintf('n %-10d sobol time %-10.4f\n',2^i,sobol_times[i]))}
 
 results = cbind(2^n_2powers,sobol_times)
-write.table(results,file='outputs/lds_sequences/r_sequence_times.csv')
+write.table(results,file='r_sequences.csv')

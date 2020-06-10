@@ -2,68 +2,68 @@
 
 from qmcpy import *
 
-def clt_iidstduniform(dimension, abs_tol, mean_shift_is):
+def cubmcclt_iidstduniform(dimension, abs_tol, mean_shift_is):
     distribution = IIDStdUniform(dimension,seed=7)
     measure = BrownianMotion(distribution, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = CLT(integrand, abs_tol).integrate()
+    solution,data = CubMcClt(integrand, abs_tol).integrate()
     return data
 
-def clt_iidstdgaussian(dimension, abs_tol, mean_shift_is):
+def cubmcclt_iidstdgaussian(dimension, abs_tol, mean_shift_is):
     distribution = IIDStdGaussian(dimension,seed=7)
     measure = BrownianMotion(distribution, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = CLT(integrand, abs_tol).integrate()
+    solution,data = CubMcClt(integrand, abs_tol).integrate()
     return data
 
-def meanmc_g_iidstduniform(dimension, abs_tol, mean_shift_is):
+def cubmcg_iidstduniform(dimension, abs_tol, mean_shift_is):
     distribution = IIDStdUniform(dimension,seed=7)
     measure = BrownianMotion(distribution, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = MeanMC_g(integrand, abs_tol).integrate()
+    solution,data = CubMcG(integrand, abs_tol).integrate()
     return data
 
-def meanmc_g_iidstdgaussian(dimension, abs_tol, mean_shift_is):
+def cubmcg_iidstdgaussian(dimension, abs_tol, mean_shift_is):
     distribution = IIDStdGaussian(dimension,seed=7)
     measure = BrownianMotion(distribution, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = MeanMC_g(integrand, abs_tol).integrate()
+    solution,data = CubMcG(integrand, abs_tol).integrate()
     return data
 
-def cltrep_lattice(dimension, abs_tol, mean_shift_is):
+def cubqmcclt_lattice(dimension, abs_tol, mean_shift_is):
     distribution = Lattice(dimension, seed=7, backend="MPS")
     measure = BrownianMotion(distribution, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = CLTRep(integrand, abs_tol).integrate()
+    solution,data = CubQmcClt(integrand, abs_tol).integrate()
     return data
 
-def cltrep_sobol(dimension, abs_tol, mean_shift_is):
+def cubqmcclt_sobol(dimension, abs_tol, mean_shift_is):
     distribution = Sobol(dimension, seed=7, backend="QRNG")
     measure = BrownianMotion(distribution, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = CLTRep(integrand, abs_tol).integrate()
+    solution,data = CubQmcClt(integrand, abs_tol).integrate()
     return data
 
-def cublattice_g(dimension, abs_tol, mean_shift_is):
+def cubqmclatticeg(dimension, abs_tol, mean_shift_is):
     distribution = Lattice(dimension, seed=7, backend="GAIL")
     measure = BrownianMotion(distribution, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = CubLattice_g(integrand, abs_tol,).integrate()
+    solution,data = CubQmcLatticeG(integrand, abs_tol,).integrate()
     return data
 
-def cubsobol_g(dimension, abs_tol, mean_shift_is):
+def cubqmcsobolg(dimension, abs_tol, mean_shift_is):
     distribution = Sobol(dimension, seed=7, backend="QRNG")
     measure = BrownianMotion(distribution, mean_shift_is)
     integrand = AsianCall(measure)
-    solution,data = CubSobol_g(integrand, abs_tol).integrate()
+    solution,data = CubQmcSobolG(integrand, abs_tol).integrate()
     return data
 
 integrations_dict = {
-    ('CLT','IIDStdUniform','MC'): clt_iidstduniform,
-    ('CLT','IIDStdGaussian','MC'): clt_iidstdgaussian,
-    ('MeanMC_g','IIDStdUniform','MC'): meanmc_g_iidstduniform,
-    ('MeanMC_g','IIDStdGaussian','MC'): meanmc_g_iidstdgaussian,
-    ('CLTRep','Lattice','QMC'): cltrep_lattice,
-    ('CLTRep','Sobol','QMC'): cltrep_sobol,
-    ('CubLattice_g','Lattice','QMC'): cublattice_g,
-    ('CubSobol_g','Sobol','QMC'): cubsobol_g}
+    ('CubMcClt','IIDStdUniform','MC'): cubmcclt_iidstduniform,
+    ('CubMcClt','IIDStdGaussian','MC'): cubmcclt_iidstdgaussian,
+    ('CubMcG','IIDStdUniform','MC'): cubmcg_iidstduniform,
+    ('CubMcG','IIDStdGaussian','MC'): cubmcg_iidstdgaussian,
+    ('CubQmcClt','Lattice','QMC'): cubqmcclt_lattice,
+    ('CubQmcClt','Sobol','QMC'): cubqmcclt_sobol,
+    ('CubQmcLatticeG','Lattice','QMC'): cubqmclatticeg,
+    ('CubQmcSobolG','Sobol','QMC'): cubqmcsobolg}

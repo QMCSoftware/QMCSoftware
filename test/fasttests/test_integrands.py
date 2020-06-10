@@ -63,27 +63,27 @@ class TestLinear(unittest.TestCase):
         self.assertTrue(y.shape==(4,))
 
 
-class TestQuickConstruct(unittest.TestCase):
-    """ Unit tests for QuickConstruct Integrand. """
+class TestCustomFun(unittest.TestCase):
+    """ Unit tests for CustomFun Integrand. """
 
     def test_f(self):
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
-        integrand = QuickConstruct(measure, lambda x: x.sum(1))
+        integrand = CustomFun(measure, lambda x: x.sum(1))
         samples = integrand.measure.distribution.gen_samples(4)
         y = integrand.f(samples).squeeze()
         self.assertTrue(y.shape==(4,))
 
 
 class TestCallOptions(unittest.TestCase):
-    """ Unit tests for MLMCCallOptions Integrand. """
+    """ Unit tests for MLCallOptions Integrand. """
 
     def test_f(self):
         l = 3
         for option in ['European','Asian']:
             distribution = IIDStdGaussian()
             measure = Gaussian(distribution)
-            integrand = MLMCCallOptions(measure,option=option)
+            integrand = MLCallOptions(measure,option=option)
             d = integrand.dim_at_level(l)
             integrand.measure.set_dimension(d)
             samples = integrand.measure.distribution.gen_samples(4)
@@ -95,13 +95,13 @@ class TestCallOptions(unittest.TestCase):
         # European 
         distribution = IIDStdGaussian()
         measure = Gaussian(distribution)
-        integrand = MLMCCallOptions(measure,option='european')
+        integrand = MLCallOptions(measure,option='european')
         self.assertTrue(integrand.dim_at_level(0)==2**0)
         self.assertTrue(integrand.dim_at_level(3)==2**3)
         # Asian 
         distribution = IIDStdGaussian()
         measure = Gaussian(distribution)
-        integrand = MLMCCallOptions(measure,option='asian')
+        integrand = MLCallOptions(measure,option='asian')
         self.assertTrue(integrand.dim_at_level(0)==2**1)
         self.assertTrue(integrand.dim_at_level(3)==2**4)
 

@@ -21,7 +21,7 @@ class IntegrationExampleTest(unittest.TestCase):
             distribution = IIDStdGaussian(dimension=dimensions[i])
             measure = Gaussian(distribution, covariance=1/2)
             integrand = Keister(measure)
-            solution,data = CLT(integrand,abs_tol=abs_tol).integrate()
+            solution,data = CubMcClt(integrand,abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_asian_option_multi_level(self):
@@ -29,7 +29,7 @@ class IntegrationExampleTest(unittest.TestCase):
         distribution = IIDStdGaussian()
         measure = BrownianMotion(distribution)
         integrand = AsianCall(measure,multi_level_dimensions=[4,16,64])
-        solution,data = CLT(integrand, abs_tol).integrate()
+        solution,data = CubMcClt(integrand, abs_tol).integrate()
         true_value = 1.7845
         self.assertTrue(abs(solution - true_value) < abs_tol)
 
@@ -39,8 +39,8 @@ class IntegrationExampleTest(unittest.TestCase):
         dimension = 2
         distribution = Sobol(dimension=2, scramble=True, backend='QRNG')
         measure = Lebesgue(distribution, lower_bound=[1,3], upper_bound=[3,6])
-        integrand = QuickConstruct(measure, lambda x: (x.prod(1))**3)
-        solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
+        integrand = CustomFun(measure, lambda x: (x.prod(1))**3)
+        solution,data = CubQmcSobolG(integrand, abs_tol=abs_tol).integrate()
         true_value = 6075
         self.assertTrue(abs(solution - true_value) < abs_tol)
     
@@ -48,8 +48,8 @@ class IntegrationExampleTest(unittest.TestCase):
         abs_tol = .1
         distribution = Lattice(1)
         measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
-        integrand = QuickConstruct(measure, lambda x: exp(-x**2))
-        solution,data = CubLattice_g(integrand,abs_tol=abs_tol).integrate()
+        integrand = CustomFun(measure, lambda x: exp(-x**2))
+        solution,data = CubQmcLatticeG(integrand,abs_tol=abs_tol).integrate()
         true_value = sqrt(pi)
         self.assertTrue(abs(solution - solution) < abs_tol)
     
@@ -57,8 +57,8 @@ class IntegrationExampleTest(unittest.TestCase):
         abs_tol = .1
         distribution = Lattice(2)
         measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
-        integrand = QuickConstruct(measure, lambda x: exp(-x**2).prod(1))
-        solution,data = CLTRep(integrand,abs_tol=abs_tol).integrate()
+        integrand = CustomFun(measure, lambda x: exp(-x**2).prod(1))
+        solution,data = CubQmcClt(integrand,abs_tol=abs_tol).integrate()
         true_value = pi
         self.assertTrue(abs(solution - solution) < abs_tol)
 
@@ -68,8 +68,8 @@ class IntegrationExampleTest(unittest.TestCase):
         dimension = 2
         distribution = Lattice(dimension=2, scramble=True, backend='MPS')
         measure = Uniform(distribution, lower_bound=[1,3], upper_bound=[3,6])
-        integrand = QuickConstruct(measure, lambda x: (x.prod(1))**3)
-        solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
+        integrand = CustomFun(measure, lambda x: (x.prod(1))**3)
+        solution,data = CubQmcClt(integrand, abs_tol=abs_tol).integrate()
         true_value = 6075 / 6
         self.assertTrue(abs(solution - true_value) < abs_tol)
 
@@ -86,7 +86,7 @@ class IntegrationExampleTest(unittest.TestCase):
             distribution = Sobol(dimension=dimensions[i], scramble=True, backend='QRNG')
             measure = Uniform(distribution)
             integrand = Linear(measure)
-            solution,data = CLTRep(integrand, abs_tol=abs_tol).integrate()
+            solution,data = CubQmcClt(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_quick_construct(self):
@@ -104,8 +104,8 @@ class IntegrationExampleTest(unittest.TestCase):
         for i in range(len(dimensions)):
             distribution = IIDStdUniform(dimension=dimensions[i])
             measure = Uniform(distribution)
-            integrand = QuickConstruct(measure, lambda x: (5*x).sum(1))
-            solution,data = MeanMC_g(integrand, abs_tol=abs_tol).integrate()
+            integrand = CustomFun(measure, lambda x: (5*x).sum(1))
+            solution,data = CubMcG(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_quick_construct2(self):
@@ -123,13 +123,13 @@ class IntegrationExampleTest(unittest.TestCase):
             b_i = b_list[i]
             distribution = Lattice(dimension=1, scramble=True, backend='GAIL')
             measure = Uniform(distribution)
-            integrand = QuickConstruct(measure, lambda x, a=a_i, b=b_i: b * (x - a) ** 2)
-            solution,data = CubLattice_g(integrand, abs_tol=abs_tol).integrate()
+            integrand = CustomFun(measure, lambda x, a=a_i, b=b_i: b * (x - a) ** 2)
+            solution,data = CubQmcLatticeG(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_european_call(self):
         abs_tol = 1e-2
-        ddistrib = Lattice(dimension=16, seed=7)
+        ddistrib = Sobol(dimension=16, seed=7)
         measure = BrownianMotion(ddistrib)
         integrand = EuropeanOption(measure,
             volatility = .2,
@@ -137,7 +137,7 @@ class IntegrationExampleTest(unittest.TestCase):
             strike_price = 10,
             interest_rate = .01,
             call_put = 'call')
-        algorithm = CubLattice_g(integrand, abs_tol)
+        algorithm = CubQmcSobolG(integrand, abs_tol)
         solution,data = algorithm.integrate()
         true_value = integrand.get_fair_price()
         self.assertTrue(abs(solution-true_value) < abs_tol)
@@ -152,7 +152,7 @@ class IntegrationExampleTest(unittest.TestCase):
             strike_price = 10,
             interest_rate = .01,
             call_put = 'put')
-        algorithm = CubLattice_g(integrand, abs_tol)
+        algorithm = CubQmcLatticeG(integrand, abs_tol)
         solution,data = algorithm.integrate()
         true_value = integrand.get_fair_price()
         self.assertTrue(abs(solution-true_value) < abs_tol)
