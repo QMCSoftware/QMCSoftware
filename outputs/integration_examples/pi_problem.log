@@ -1,0 +1,29 @@
+Password: 3141592653
+CPU time: 63.89 sec
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 3.1416         
+CustomFun (Integrand Object)
+Sobol (DiscreteDistribution Object)
+	dimension       1
+	scramble        1
+	seed            7
+	backend         qrng
+	mimics          StdUniform
+	graycode        0
+Lebesgue (TrueMeasure Object)
+	distrib_name    Sobol
+	lower_bound     -2
+	upper_bound     2
+CubQmcSobolG (StoppingCriterion Object)
+	abs_tol         0.0000
+	rel_tol         0
+	n_init          1024
+	n_max           1073741824
+LDTransformData (AccumulateData Object)
+	n_total         134217728
+	solution        3.1416
+	r_lag           4
+	time_integrate  63.8914
+

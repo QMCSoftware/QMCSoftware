@@ -21,20 +21,18 @@ def vary_dimension(dimension=[1,2,3], abs_tol=0, rel_tol=.1, trials=1):
     i = 0
     for problem,function in integrations_dict.items():
         for dim in dimension:
-            try:               
-                solution = 0
-                n = 0
-                time = 0
-                for j in range(trials):
-                    data = function(dimension=dim, abs_tol=abs_tol, rel_tol=rel_tol)
-                    solution += data.solution
-                    n += data.n_total
-                    time += data.time_integrate
-                results_i = [*problem,dim,float(solution)/trials,float(n)/trials,float(time)/trials]
-                results.loc[i] = results_i
-                print(('%-20s%-20s%-15s%-15d%-15.2f%-15d%-15.3f')%tuple(results_i))
-                i += 1
-            except: pass
+            solution = 0
+            n = 0
+            time = 0
+            for j in range(trials):
+                data = function(dimension=dim, abs_tol=abs_tol, rel_tol=rel_tol)
+                solution += data.solution
+                n += data.n_total
+                time += data.time_integrate
+            results_i = [*problem,dim,float(solution)/trials,float(n)/trials,float(time)/trials]
+            results.loc[i] = results_i
+            print(('%-20s%-20s%-15s%-15d%-15.2f%-15d%-15.3f')%tuple(results_i))
+            i += 1
     return results
 
 

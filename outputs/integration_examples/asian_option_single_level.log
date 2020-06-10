@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8103         
+Solution: 5.8169         
 AsianCall (Integrand Object)
 	volatility      0.5000
 	start_price     30
@@ -18,24 +18,24 @@ BrownianMotion (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
 	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
 	mean_shift_is   0
-CLT (StoppingCriterion Object)
+CubMcClt (StoppingCriterion Object)
 	inflate         1.2000
 	alpha           0.0100
-	abs_tol         0.1000
+	abs_tol         0.0250
 	rel_tol         0
 	n_init          1024
 	n_max           10000000000
 MeanVarData (AccumulateData Object)
 	levels          1
-	solution        5.8103
-	n               50740
-	n_total         51764
-	confid_int      [ 5.710  5.910]
-	time_integrate  0.2057
+	solution        5.8169
+	n               796476
+	n_total         797500
+	confid_int      [ 5.792  5.842]
+	time_integrate  3.4266
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8358         
+Solution: 5.8383         
 AsianCall (Integrand Object)
 	volatility      0.5000
 	start_price     30
@@ -54,24 +54,24 @@ BrownianMotion (TrueMeasure Object)
 	distrib_name    Lattice
 	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
 	mean_shift_is   0
-CLTRep (StoppingCriterion Object)
+CubQmcClt (StoppingCriterion Object)
 	inflate         1.2000
 	alpha           0.0100
-	abs_tol         0.1000
+	abs_tol         0.0250
 	rel_tol         0
 	n_init          256
 	n_max           1073741824
 MeanVarDataRep (AccumulateData Object)
 	replications    16
-	solution        5.8358
-	sighat          0.1181
-	n_total         8192
-	confid_int      [ 5.745  5.927]
-	time_integrate  0.0853
+	solution        5.8383
+	sighat          0.0195
+	n_total         65536
+	confid_int      [ 5.823  5.853]
+	time_integrate  0.8073
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8169         
+Solution: 5.8216         
 AsianCall (Integrand Object)
 	volatility      0.5000
 	start_price     30
@@ -88,24 +88,24 @@ BrownianMotion (TrueMeasure Object)
 	distrib_name    IIDStdGaussian
 	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
 	mean_shift_is   0
-MeanMC_g (StoppingCriterion Object)
+CubMcG (StoppingCriterion Object)
 	inflate         1.2000
 	alpha           0.0100
-	abs_tol         0.1000
+	abs_tol         0.0250
 	rel_tol         0
 	n_init          1024
 	n_max           10000000000
 MeanVarData (AccumulateData Object)
 	levels          1
-	solution        5.8169
-	n               82304
-	n_total         83328
-	confid_int      [ 5.717  5.917]
-	time_integrate  0.3717
+	solution        5.8216
+	n               1001571
+	n_total         1002595
+	confid_int      [ 5.797  5.847]
+	time_integrate  4.0337
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.9421         
+Solution: 5.8321         
 AsianCall (Integrand Object)
 	volatility      0.5000
 	start_price     30
@@ -124,20 +124,20 @@ BrownianMotion (TrueMeasure Object)
 	distrib_name    Lattice
 	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
 	mean_shift_is   0
-CubLattice_g (StoppingCriterion Object)
-	abs_tol         0.1000
+CubQmcLatticeG (StoppingCriterion Object)
+	abs_tol         0.0250
 	rel_tol         0
 	n_init          1024
 	n_max           34359738368
-CubatureData (AccumulateData Object)
-	n_total         1024
-	solution        5.9421
+LDTransformData (AccumulateData Object)
+	n_total         8192
+	solution        5.8321
 	r_lag           4
-	time_integrate  0.0124
+	time_integrate  0.0934
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8647         
+Solution: 5.8421         
 AsianCall (Integrand Object)
 	volatility      0.5000
 	start_price     30
@@ -157,16 +157,16 @@ BrownianMotion (TrueMeasure Object)
 	distrib_name    Sobol
 	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
 	mean_shift_is   0
-CubSobol_g (StoppingCriterion Object)
-	abs_tol         0.1000
+CubQmcSobolG (StoppingCriterion Object)
+	abs_tol         0.0250
 	rel_tol         0
 	n_init          1024
 	n_max           34359738368
-CubatureData (AccumulateData Object)
-	n_total         1024
-	solution        5.8647
+LDTransformData (AccumulateData Object)
+	n_total         8192
+	solution        5.8421
 	r_lag           4
-	time_integrate  0.0118
+	time_integrate  0.1035
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
