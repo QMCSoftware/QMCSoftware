@@ -1,5 +1,31 @@
 import setuptools
 from setuptools import Extension
+from setuptools.command.install import install
+from setuptools import Command
+import os
+import subprocess
+
+class CustomInstall(install):
+    """Custom handler for the 'install' command."""
+    def run(self):
+        try:
+            subprocess.check_call('make qrng',shell=True)
+        except:
+            print('Problem compiling qrng c files')
+        super().run()
+
+class CleanCommand(Command):
+    """Custom clean command to tidy up the project root."""
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        os.system("rm -vrf ./build ./dist ./*.pyc ./qmcpy/qmcpy.egg-info")
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -44,5 +70,8 @@ setuptools.setup(
                     'qmcpy/discrete_distribution/qrng/korobov.c',
                     'qmcpy/discrete_distribution/qrng/MRG63k3a.c',
                     'qmcpy/discrete_distribution/qrng/sobol.c'],
-            extra_compile_args=['-fPIC','-shared','-lm'])]
+            extra_compile_args=['-fPIC','-shared','-lm'])],
+     cmdclass={
+        'clean': CleanCommand,
+        'install': CustomInstall}
 )
