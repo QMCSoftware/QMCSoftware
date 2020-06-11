@@ -37,7 +37,7 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        distribution = Sobol(dimension=2, scramble=True, backend='QRNG')
+        distribution = Sobol(dimension=2, scramble=True, backend='QRNG', seed=7)
         measure = Lebesgue(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = CustomFun(measure, lambda x: (x.prod(1))**3)
         solution,data = CubQmcSobolG(integrand, abs_tol=abs_tol).integrate()

@@ -21,7 +21,8 @@ their applications.
 
 `Homepage <https://qmcsoftware.github.io/QMCSoftware/>`__ \|
 `GitHub <https://github.com/QMCSoftware/QMCSoftware>`__ \| `Read the
-Docs <https://qmcpy.readthedocs.io/en/latest/>`__
+Docs <https://qmcpy.readthedocs.io/en/latest/>`__ \|
+`PyPI <https://pypi.org/project/qmcpy/>`__
 
 .. raw:: html
 
@@ -48,7 +49,7 @@ using ``virtualenv`` and ``virtualenvwrapper``
     setvirtualenvproject
     add2virtualenv $(pwd)
     pip install -r requirements/dev.txt
-    make qrng
+    pip install -e ./
 
 To check for successful installation run
 

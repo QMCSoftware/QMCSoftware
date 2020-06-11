@@ -28,6 +28,7 @@ European Option
 ...............
 
 .. automodule:: qmcpy.integrand.european_option
+    :members:
 
 Asian Call Option
 .................
