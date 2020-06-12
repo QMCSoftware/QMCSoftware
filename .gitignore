@@ -30,6 +30,7 @@ sphinx/_static/
 
 # release
 /build
+
 # alegresor
 *.vscode
 *_ags*
