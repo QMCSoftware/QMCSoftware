@@ -30,7 +30,7 @@ pip install -r requirements/dev.txt
 pip install -e ./
 ~~~
 
-For conda users, 
+For `conda` users, 
 
 ~~~
 conda create --name qmcpy python=3.6
@@ -41,7 +41,7 @@ git checkout develop
 pip install -r requirements/dev.txt
 ~~~
 
-The package depends on C software, QRNG, and a developer can first run the following target in our makefile to compile 
+Our package, `qmcpy`, depends on C software, QRNG, and a developer can first run the following target in our makefile to compile 
 a dynamic library of QRNG. 
 
 ~~~
