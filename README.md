@@ -39,19 +39,19 @@ git clone https://github.com/QMCSoftware/QMCSoftware.git
 cd QMCSoftware
 git checkout develop
 pip install -r requirements/dev.txt
+pip install -e ./
 ~~~
 
-Our package, `qmcpy`, depends on C software, QRNG, and a developer can first run the following target in our makefile to compile 
-a dynamic library of QRNG. 
-
-~~~
-make qrng
-~~~
- 
 To check for successful installation, run
 
 ~~~
 make tests
+~~~
+
+Note that the QRNG C backend files can be explicitely recompiled with
+
+~~~
+pip install -e ./
 ~~~
 
 <hr>
@@ -60,19 +60,27 @@ make tests
 
 The QMCPy Read the Docs is located [here](https://qmcpy.readthedocs.io/en/latest/) with HTML, PDF, and EPUB downloads available [here](https://readthedocs.org/projects/qmcpy/downloads/).
 
-Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.org/). To compile HTML, PDF, or EPUB docs locally into `sphinx/_build/` first install additional requirements with 
+Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.org/). To compile HTML, PDF, or EPUB docs locally into `sphinx/_build/` first install additional requirements 
 
 ~~~
 pip install -r requirements/dev_docs.txt
 ~~~
 
-and then run one of the following three commands
+Then setup Sphinx paths (only needs to be run once for initialization)
+
+~~~
+make _doc
+~~~
+
+Finally, run one of the following three commands
 
 ~~~
 make doc_html
 make doc_pdf
 make doc_epub
 ~~~
+
+To recompile documentation you now only need one of the above three commands. 
 
 <hr>
 

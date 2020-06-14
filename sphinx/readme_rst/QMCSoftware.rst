@@ -51,11 +51,29 @@ using ``virtualenv`` and ``virtualenvwrapper``
     pip install -r requirements/dev.txt
     pip install -e ./
 
-To check for successful installation run
+For ``conda`` users,
+
+::
+
+    conda create --name qmcpy python=3.6
+    conda activate qmcpy
+    git clone https://github.com/QMCSoftware/QMCSoftware.git
+    cd QMCSoftware
+    git checkout develop
+    pip install -r requirements/dev.txt
+    pip install -e ./
+
+To check for successful installation, run
 
 ::
 
     make tests
+
+Note that the QRNG C backend files can be explicitely recompiled with
+
+::
+
+    pip install -e ./
 
 .. raw:: html
 
@@ -72,19 +90,28 @@ EPUB downloads available
 Automated project documentation is compiled with
 `Sphinx <http://www.sphinx-doc.org/>`__. To compile HTML, PDF, or EPUB
 docs locally into ``sphinx/_build/`` first install additional
-requirements with
+requirements
 
 ::
 
     pip install -r requirements/dev_docs.txt
 
-and then run one of the following three commands
+Then setup Sphinx paths (only needs to be run once for initialization)
+
+::
+
+    make _doc
+
+Finally, run one of the following three commands
 
 ::
 
     make doc_html
     make doc_pdf
     make doc_epub
+
+To recompile documentation you now only need one of the above three
+commands.
 
 .. raw:: html
 
