@@ -18562,11 +18562,6 @@ void sobol(int n, int d, int randomize, double *res, int skip, int graycode, lon
 }
 
 int main(){
-    /*
-    COMMANDS
-    gcc sobol.c MRG63k3a.c -o sobol.o -lm
-    ./sobol
-    */
     int n=4, d=2, randomize=0, skip=4, seed=7, graycode=0;
     double *res = (double *) calloc(d*n, sizeof(double));
     sobol(n, d, randomize, res, skip, graycode, seed);
