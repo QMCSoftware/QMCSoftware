@@ -118,6 +118,18 @@ Sobol'
 .. automodule:: qmcpy.discrete_distribution.sobol.sobol
     :members:
 
+Halton
+......
+
+.. automodule:: qmcpy.discrete_distribution.halton 
+    :members:
+
+Korobov
+.......
+
+.. automodule:: qmcpy.discrete_distribution.korobov  
+    :members:
+
 IID Standard Uniform
 ....................
 
