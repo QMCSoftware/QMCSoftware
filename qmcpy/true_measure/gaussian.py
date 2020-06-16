@@ -1,12 +1,44 @@
 from ._true_measure import TrueMeasure
 from ..util import TransformError,DimensionError
+from ..discrete_distribution import Sobol
 from numpy import array, sqrt, eye, dot, pi, exp,dot, tile, isscalar, diag
 from numpy.linalg import cholesky, det, inv
 from scipy.stats import norm
 
 
 class Gaussian(TrueMeasure):
-    """ Normal Measure """
+    """
+    Normal Measure.
+    
+    >>> dd = Sobol(2,seed=7)
+    >>> g = Gaussian(dd,mean=1,covariance=1./4)
+    >>> g
+    Gaussian (TrueMeasure Object)
+        distrib_name    Sobol
+        mean            1
+        covariance      0.2500
+    >>> g.gen_mimic_samples(n_min=4,n_max=8)
+    array([[ 1.533,  0.676],
+           [ 0.817,  1.351],
+           [ 1.136,  1.011],
+           [ 0.379, -0.194]])
+    >>> g.set_dimension(4)
+    >>> g
+    Gaussian (TrueMeasure Object)
+        distrib_name    Sobol
+        mean            1
+        covariance      0.2500
+    >>> g.gen_mimic_samples(n_min=2,n_max=4)
+    array([[ 1.309,  0.445,  1.128,  0.813],
+           [ 0.634,  1.171,  0.362,  1.528]])
+    >>> g2 = Gaussian(Sobol(2),mean=[1,2],covariance=[[1,.5],[.5,2]])
+    >>> g2
+    Gaussian (TrueMeasure Object)
+        distrib_name    Sobol
+        mean            [1 2]
+        covariance      [[ 1.000  0.500]
+                        [ 0.500  2.000]]
+    """
 
     parameters = ['mean', 'covariance']
 

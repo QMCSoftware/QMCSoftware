@@ -1,4 +1,5 @@
 from ._true_measure import TrueMeasure
+from ..discrete_distribution import Sobol
 from ..util import TransformError, ParameterError
 from numpy import linspace, cumsum, diff, insert, sqrt, array, exp, array, dot
 from scipy.stats import norm
@@ -6,7 +7,31 @@ from scipy.linalg import cholesky
 
 
 class BrownianMotion(TrueMeasure):
-    """ Geometric Brownian Motion """
+    """
+    Geometric Brownian Motion.
+    
+    >>> dd = Sobol(2,seed=7)
+    >>> bm = BrownianMotion(dd,mean_shift_is=1)
+    >>> bm
+    BrownianMotion (TrueMeasure Object)
+        distrib_name    Sobol
+        time_vector     [ 0.500  1.000]
+        mean_shift_is   1
+    >>> bm.gen_mimic_samples(n_min=4,n_max=8)
+    array([[ 1.254,  1.296],
+           [ 0.241,  1.237],
+           [ 0.692,  1.207],
+           [-0.379, -1.567]])
+    >>> bm.set_dimension(4)
+    >>> bm
+    BrownianMotion (TrueMeasure Object)
+        distrib_name    Sobol
+        time_vector     [ 0.250  0.500  0.750  1.000]
+        mean_shift_is   1
+    >>> bm.gen_mimic_samples(n_min=2,n_max=4)
+    array([[ 0.559,  0.254,  0.632,  0.696],
+           [-0.116,  0.304, -0.084,  0.694]])
+    """
 
     parameters = ['time_vector','mean_shift_is']
 

@@ -1,6 +1,9 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..integrand import Keister
+from ..true_measure import Gaussian
+from ..discrete_distribution import IIDStdUniform
 from ..util import tolfun, MaxSamplesWarning, NotYetImplemented
 from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
 from scipy.optimize import fsolve
@@ -12,6 +15,37 @@ import warnings
 class CubMcG(StoppingCriterion):
     """
     Stopping Criterion with garunteed accuracy
+
+    >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
+    >>> sc = CubMcG(k,abs_tol=.05)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    1.803926962264685
+    >>> data
+    Solution: 1.8039         
+    Keister (Integrand Object)
+    IIDStdUniform (DiscreteDistribution Object)
+        dimension       2
+        seed            7
+        mimics          StdUniform
+    Gaussian (TrueMeasure Object)
+        distrib_name    IIDStdUniform
+        mean            0
+        covariance      0.5000
+    CubMcG (StoppingCriterion Object)
+        inflate         1.2000
+        alpha           0.0100
+        abs_tol         0.0500
+        rel_tol         0
+        n_init          1024
+        n_max           10000000000
+    MeanVarData (AccumulateData Object)
+        levels          1
+        solution        1.8039
+        n               13473
+        n_total         14497
+        confid_int      [ 1.754  1.854]
+        time_integrate  ...
 
     Adapted from
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m

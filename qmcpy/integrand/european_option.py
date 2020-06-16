@@ -1,11 +1,27 @@
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
+from ..discrete_distribution import Sobol
 from ..util import ParameterError
 from numpy import exp, maximum, log, sqrt
 from scipy.stats import norm 
 
 
 class EuropeanOption(Integrand):
+    """
+    >>> dd = Sobol(4,seed=7)
+    >>> m = BrownianMotion(dd,mean_shift_is=-1)
+    >>> eo = EuropeanOption(m,call_put='put')
+    >>> print(eo)
+    EuropeanOption (Integrand Object)
+        volatility      0.5000
+        start_price     30
+        strike_price    35
+        interest_rate   0
+    >>> x = dd.gen_samples(2**10)
+    >>> y = eo.f(x)
+    >>> y.mean()
+    9.211939459449543
+    """
 
     parameters = ['volatility', 'start_price', 'strike_price', 'interest_rate']
                           

@@ -1,4 +1,5 @@
 from ._integrand import Integrand
+from ..discrete_distribution import Sobol
 from ..true_measure import Gaussian
 from ..util import ParameterError
 from numpy import sqrt, exp, log, zeros, maximum, minimum, tile, random, eye, log2
@@ -8,6 +9,27 @@ from scipy.stats import norm
 class MLCallOptions(Integrand):
     """
     Various call options from finance using Milstein discretization with 2^l timesteps on level l
+
+    >>> dd = Sobol(seed=7)
+    >>> m = Gaussian(dd)
+    >>> mlco = MLCallOptions(m)
+    >>> print(mlco)
+    MLCallOptions (Integrand Object)
+        option          european
+        sigma           0.2000
+        k               100
+        r               0.0500
+        t               1
+        b               85
+    >>> y = 0
+    >>> for level in range(4):
+    ...     new_dim = mlco.dim_at_level(level)
+    ...     m.set_dimension(new_dim)
+    ...     x = dd.gen_samples(2**10)
+    ...     sums,cost = mlco.f(x,l=level)
+    ...     y += sums[0]/2**10
+    >>> y
+    10.395655881343158
 
     Reference:
         M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'.
@@ -29,7 +51,7 @@ class MLCallOptions(Integrand):
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
         """
-        if not (isinstance(measure,Gaussian) and all(measure.mu==0) and all(measure.covariance==eye(measure.d))):
+        if not (isinstance(measure,Gaussian) and all(measure.mu==0) and all(measure.sigma==eye(measure.d))):
             raise ParameterError('AsianCall measure must be a BrownianMotion instance')
         options = ['european','asian']
         self.option = option.lower()

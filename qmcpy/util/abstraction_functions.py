@@ -26,7 +26,7 @@ def univ_repr(qmc_object, abc_class_name, attributes):
     for attrib in attributes:
         if attrib not in unique_attributes:
             unique_attributes += [attrib]
-    string = "%s (%s Object)\n" % (type(qmc_object).__name__, abc_class_name)
+    string = "%s (%s Object)" % (type(qmc_object).__name__, abc_class_name)
     for key in unique_attributes:
         val = getattr(qmc_object, key)
         # list of one value becomes just that value
@@ -41,10 +41,10 @@ def univ_repr(qmc_object, abc_class_name, attributes):
                 val = val.item()
         # printing options
         if isinstance(val, int) or (isinstance(val, float) and val % 1 == 0):
-            string_temp = '\t%-15s %d' % (key, int(val))
+            string_temp = '    %-15s %d' % (key, int(val))
         elif isinstance(val, float):
-            string_temp = '\t%-15s %0.4f' % (key, val)
+            string_temp = '    %-15s %0.4f' % (key, val)
         else:
-            string_temp = '\t%-15s %s' % (key, val)
-        string += string_temp.replace('\n', '\n\t%-15s' % ' ') + '\n'
+            string_temp = '    %-15s %s' % (key, val)
+        string += '\n' + string_temp.replace('\n', '\n    %-15s' % ' ')
     return string

@@ -1,3 +1,4 @@
+from ..discrete_distribution import Sobol
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
@@ -5,6 +6,46 @@ from numpy import array, exp, log, maximum, repeat
 
 
 class AsianCall(Integrand):
+    """
+    >>> dd = Sobol(4,seed=7)
+    >>> m = BrownianMotion(dd)
+    >>> ac = AsianCall(m)
+    >>> print(ac)
+    AsianCall (Integrand Object)
+        volatility      0.5000
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        mean_type       arithmetic
+        dimensions      4
+        dim_fracs       0
+    >>> x = dd.gen_samples(2**10)
+    >>> y = ac.f(x)
+    >>> y.mean()
+    1.7638343801580052
+
+    >>> dd2 = Sobol(seed=7)
+    >>> m2 = BrownianMotion(dd2,mean_shift_is=1)
+    >>> level_dims = [2,4,8]
+    >>> ac2 = AsianCall(m2,multi_level_dimensions=level_dims)
+    >>> print(ac2)
+    AsianCall (Integrand Object)
+        volatility      0.5000
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        mean_type       arithmetic
+        dimensions      [2 4 8]
+        dim_fracs       [ 0.000  2.000  2.000]
+    >>> y2 = 0
+    >>> for l in range(len(level_dims)):
+    ...     new_dim = ac2.dim_at_level(l)
+    ...     m2.set_dimension(new_dim)
+    ...     x2 = dd2.gen_samples(2**10)
+    ...     y2 += ac2.f(x2,l=l).mean()
+    >>> y2
+    1.787834256519869
+    """
 
     parameters = ['volatility', 'start_price', 'strike_price',
                   'interest_rate','mean_type', 'dimensions', 'dim_fracs']

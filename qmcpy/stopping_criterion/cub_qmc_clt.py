@@ -1,6 +1,9 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..discrete_distribution import Lattice
+from ..true_measure import Gaussian
+from ..integrand import Keister
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import array, log2, sqrt
 from scipy.stats import norm
@@ -9,7 +12,42 @@ import warnings
 
 
 class CubQmcClt(StoppingCriterion):
-    """ Stopping criterion based on Central Limit Theorem for multiple replications. """
+    """
+    Stopping criterion based on Central Limit Theorem for multiple replications.
+    
+    >>> k = Keister(Gaussian(Lattice(seed=7),covariance=1./2))
+    >>> sc = CubQmcClt(k,abs_tol=.05)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    1.3798619783658828
+    >>> data
+    Solution: 1.3799         
+    Keister (Integrand Object)
+    Lattice (DiscreteDistribution Object)
+        dimension       1
+        scramble        1
+        seed            1092
+        backend         gail
+        mimics          StdUniform
+    Gaussian (TrueMeasure Object)
+        distrib_name    Lattice
+        mean            0
+        covariance      0.5000
+    CubQmcClt (StoppingCriterion Object)
+        inflate         1.2000
+        alpha           0.0100
+        abs_tol         0.0500
+        rel_tol         0
+        n_init          256
+        n_max           1073741824
+    MeanVarDataRep (AccumulateData Object)
+        replications    16
+        solution        1.3799
+        sighat          0.0011
+        n_total         4096
+        confid_int      [ 1.379  1.381]
+        time_integrate  ...
+    """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
 

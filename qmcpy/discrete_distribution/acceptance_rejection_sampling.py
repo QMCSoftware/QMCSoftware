@@ -1,10 +1,32 @@
 from ._discrete_distribution import DiscreteDistribution
+from . import IIDStdUniform
+from ..true_measure import Uniform
 from ..util import TransformError
 from numpy import inf, zeros, random, array, apply_along_axis
 
 
 class AcceptanceRejectionSampling(DiscreteDistribution):
     """
+    >>> def f(x):
+    ...     x = x if x<.5 else 1-x
+    ...     density = 16*x/3 if x<1/4 else 4/3
+    ...     return density
+    >>> sampling_measure = Uniform(IIDStdUniform(1,seed=7))
+    >>> ars = AcceptanceRejectionSampling(objective_pdf=f,measure_to_sample_from=sampling_measure)
+    >>> print(ars)
+    AcceptanceRejectionSampling (DiscreteDistribution Object)
+        dimension       1
+        c               1.3333
+    >>> x = ars.gen_samples(5)
+    >>> x
+    array([[ 0.562],
+           [ 0.598],
+           [ 0.371],
+           [ 0.877],
+           [ 0.329]])
+    >>> x.shape
+    (5, 1)
+
     Define
         - m(x) is pdf of measure we do not know how to generate from (mystery)
         - k(x) is pdf of measure we can generate discrete distribution samples from (known)
@@ -19,7 +41,7 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
         and approximating c ~= inflate_c_factor*max(m(s_i)/k(s_i) for i=1,...512)
     """
 
-    parameters = ['c']
+    parameters = ['dimension','c']
 
     def __init__(self, objective_pdf, measure_to_sample_from, draws_multiple=inf, inflate_c_factor=1):
         """
@@ -60,7 +82,7 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
             ndarray: n x d (dimension) array of samples
         """
         samples = array([sample for sample,keep in self._sample_generator(n) if keep])
-        return samples
+        return samples.reshape((-1,self.dimension))
 
     def _sample_generator(self,n):
         self.successful_draws = 0 # successful draws

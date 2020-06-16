@@ -1,6 +1,9 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
+from ..discrete_distribution import Sobol
+from ..true_measure import Gaussian
+from ..integrand import Keister
 from numpy import log2, hstack, tile
 from time import perf_counter
 import warnings
@@ -11,6 +14,36 @@ class CubQmcSobolG(StoppingCriterion):
     Quasi-Monte Carlo method using Sobol' cubature over the
     d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
+
+    >>> k = Keister(Gaussian(Sobol(2,seed=7),covariance=1./2))
+    >>> sc = CubQmcSobolG(k,abs_tol=.05)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    1.8082479629092816
+    >>> data
+    Solution: 1.8082         
+    Keister (Integrand Object)
+    Sobol (DiscreteDistribution Object)
+        dimension       2
+        scramble        1
+        seed            7
+        backend         qrng
+        mimics          StdUniform
+        graycode        0
+    Gaussian (TrueMeasure Object)
+        distrib_name    Sobol
+        mean            0
+        covariance      0.5000
+    CubQmcSobolG (StoppingCriterion Object)
+        abs_tol         0.0500
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
+    LDTransformData (AccumulateData Object)
+        n_total         1024
+        solution        1.8082
+        r_lag           4
+        time_integrate  ...
 
     Adapted from
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m

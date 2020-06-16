@@ -1,5 +1,8 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import LDTransformData
+from ..discrete_distribution import Lattice
+from ..true_measure import Gaussian
+from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
 from numpy import log2, hstack, tile, exp, pi, arange
 from time import perf_counter
@@ -12,6 +15,35 @@ class CubQmcLatticeG(StoppingCriterion):
     a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Fourier coefficients cone decay assumptions.
     
+    >>> k = Keister(Gaussian(Lattice(2,seed=7),covariance=1./2))
+    >>> sc = CubQmcLatticeG(k,abs_tol=.05)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    1.808134131740979
+    >>> data
+    Solution: 1.8081         
+    Keister (Integrand Object)
+    Lattice (DiscreteDistribution Object)
+        dimension       2
+        scramble        1
+        seed            7
+        backend         gail
+        mimics          StdUniform
+    Gaussian (TrueMeasure Object)
+        distrib_name    Lattice
+        mean            0
+        covariance      0.5000
+    CubQmcLatticeG (StoppingCriterion Object)
+        abs_tol         0.0500
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
+    LDTransformData (AccumulateData Object)
+        n_total         1024
+        solution        1.8081
+        r_lag           4
+        time_integrate  ...
+
     Adapted from 
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
 

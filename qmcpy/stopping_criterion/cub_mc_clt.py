@@ -1,5 +1,8 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
+from ..discrete_distribution import IIDStdGaussian
+from ..true_measure import Gaussian, BrownianMotion
+from ..integrand import Keister, AsianCall
 from ..util import MaxSamplesWarning
 from numpy import array, ceil, floor, maximum
 from scipy.stats import norm
@@ -8,7 +11,46 @@ import warnings
 
 
 class CubMcClt(StoppingCriterion):
-    """ Stopping criterion based on the Central Limit Theorem. """
+    """
+    Stopping criterion based on the Central Limit Theorem.
+    
+    >>> k = Keister(Gaussian(IIDStdGaussian(2,seed=7),covariance=1./2))
+    >>> sc = CubMcClt(k,abs_tol=.05)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    1.834674149189029
+    >>> data
+    Solution: 1.8347         
+    Keister (Integrand Object)
+    IIDStdGaussian (DiscreteDistribution Object)
+        dimension       2
+        seed            7
+        mimics          StdGaussian
+    Gaussian (TrueMeasure Object)
+        distrib_name    IIDStdGaussian
+        mean            0
+        covariance      0.5000
+    CubMcClt (StoppingCriterion Object)
+        inflate         1.2000
+        alpha           0.0100
+        abs_tol         0.0500
+        rel_tol         0
+        n_init          1024
+        n_max           10000000000
+    MeanVarData (AccumulateData Object)
+        levels          1
+        solution        1.8347
+        n               5826
+        n_total         6850
+        confid_int      [ 1.785  1.885]
+        time_integrate  ...
+    
+    >>> ac = AsianCall(
+    ...     measure = BrownianMotion(IIDStdGaussian()),
+    ...     multi_level_dimensions = [2,4,8])
+    >>> sc = CubMcClt(ac,abs_tol=.05)
+    >>> solution,data = sc.integrate()
+    """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
     

@@ -30,6 +30,6 @@ class AccumulateData():
         string = "Solution: %-15.4f\n" % (self.solution)
         for qmc_obj in [self.integrand, self.distribution, self.measure, self.stopping_criterion]:
             if qmc_obj:
-                string += str(qmc_obj)
+                string += str(qmc_obj)+'\n'
         string += univ_repr(self, 'AccumulateData', self.parameters + ['time_integrate'])
         return string

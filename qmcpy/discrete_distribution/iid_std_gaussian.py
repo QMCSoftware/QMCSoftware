@@ -5,6 +5,11 @@ from numpy import random
 class IIDStdGaussian(DiscreteDistribution):
     """
     >>> dd = IIDStdGaussian(dimension=2,seed=7)
+    >>> print(dd)
+    IIDStdGaussian (DiscreteDistribution Object)
+        dimension       2
+        seed            7
+        mimics          StdGaussian
     >>> dd.gen_samples(4)
     array([[ 1.691, -0.466],
            [ 0.033,  0.408],

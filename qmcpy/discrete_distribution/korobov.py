@@ -7,6 +7,28 @@ class Korobov(DiscreteDistribution):
     """
     Quasi-Random Korobov nets.
     
+    >>> k = Korobov(1,seed=7)
+    >>> k.gen_samples(2)
+    array([[ 0.982],
+           [ 0.482]])
+    >>> k.gen_samples(2)
+    array([[ 0.982],
+           [ 0.482]])
+    >>> k.set_dimension(3)
+    >>> k.set_seed(8)
+    >>> k.gen_samples(4,generator=[2,3,1])
+    array([[ 0.265,  0.153,  0.115],
+           [ 0.765,  0.903,  0.365],
+           [ 0.265,  0.653,  0.615],
+           [ 0.765,  0.403,  0.865]])
+    >>> print(k)
+    Korobov (DiscreteDistribution Object)
+        dimension       3
+        generator       1
+        randomize       1
+        seed            8
+        mimics          StdUniform
+
     References
         Marius Hofert and Christiane Lemieux (2019). 
         qrng: (Randomized) Quasi-Random Number Generators. 

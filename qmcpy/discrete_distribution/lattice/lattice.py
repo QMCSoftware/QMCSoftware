@@ -10,6 +10,32 @@ class Lattice(DiscreteDistribution):
     """
     Quasi-Random Lattice nets in base 2.
     
+    >>> l = Lattice(2,seed=7)
+    >>> print(l)
+    Lattice (DiscreteDistribution Object)
+        dimension       2
+        scramble        1
+        seed            7
+        backend         gail
+        mimics          StdUniform
+    >>> l.gen_samples(4)
+    array([[ 0.076,  0.780],
+           [ 0.576,  0.280],
+           [ 0.326,  0.030],
+           [ 0.826,  0.530]])
+    >>> l.set_dimension(3)
+    >>> l.gen_samples(n_min=4,n_max=8)
+    array([[ 0.563,  0.348,  0.103],
+           [ 0.063,  0.848,  0.603],
+           [ 0.813,  0.598,  0.353],
+           [ 0.313,  0.098,  0.853]])
+    >>> Lattice(dimension=2,scramble=False,backend='GAIL').gen_samples(n_min=2,n_max=4)
+    array([[ 0.250,  0.250],
+           [ 0.750,  0.750]])
+    >>> Lattice(dimension=2,scramble=False,backend='MPS').gen_samples(n_min=2,n_max=4)
+    array([[ 0.250,  0.750],
+           [ 0.750,  0.250]])
+
     References
         Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, 
         Lluis Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel, 

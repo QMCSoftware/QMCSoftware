@@ -1,10 +1,24 @@
 from ._true_measure import TrueMeasure
+from ..discrete_distribution import Sobol
 from ..util import TransformError, ParameterError
 from numpy import array, isfinite, inf, isscalar, tile
 from scipy.stats import norm
 
 
 class Lebesgue(TrueMeasure):
+    """
+    >>> dd = Sobol(2,seed=7)
+    >>> Lebesgue(dd,lower_bound=[-1,0],upper_bound=[1,3])
+    Lebesgue (TrueMeasure Object)
+        distrib_name    Sobol
+        lower_bound     [-1  0]
+        upper_bound     [1 3]
+    >>> Lebesgue(dd,lower_bound=-inf,upper_bound=inf)
+    Lebesgue (TrueMeasure Object)
+        distrib_name    Sobol
+        lower_bound     [-inf -inf]
+        upper_bound     [ inf  inf]
+    """
 
     parameters = ['lower_bound', 'upper_bound']
     

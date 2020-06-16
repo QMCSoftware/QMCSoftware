@@ -1,8 +1,21 @@
 from ._integrand import Integrand
-
+from ..discrete_distribution import Sobol
+from ..true_measure import Gaussian
 
 class CustomFun(Integrand):
-    """ Specify and generate values of a user-defined function"""
+    """
+    Specify and generate values of a user-defined function
+    
+    >>> dd = Sobol(2,seed=7)
+    >>> m = Gaussian(dd,mean=[1,2])
+    >>> cf = CustomFun(m,lambda x: x[:,0]**2*x[:,1])
+    >>> x = dd.gen_samples(2**10)
+    >>> y = cf.f(x)
+    >>> y.mean()
+    4.005918911572021
+    """
+
+    parameters = []
 
     def __init__(self, measure, custom_fun):
         """

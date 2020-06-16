@@ -1,10 +1,27 @@
 from ._discrete_distribution import DiscreteDistribution
+from . import Sobol
 from ..util import TransformError
-
+from numpy import exp, log
 
 class InverseCDFSampling(DiscreteDistribution):
+    """
+    >>> _lambda = 1.5
+    >>> exp_pdf = lambda x,l=_lambda: l*exp(-l*x)
+    >>> exp_inverse_cdf = lambda u,l=_lambda: -log(1-u)/l
+    >>> exponential_measure = InverseCDFSampling(
+    ...     distribution_mimicking_uniform = Sobol(dimension=2,seed=7),
+    ...     inverse_cdf_fun = exp_inverse_cdf)
+    >>> print(exponential_measure)
+    InverseCDFSampling (DiscreteDistribution Object)
+        dimension       2
+    >>> exponential_measure.gen_samples(n_min=4,n_max=8)
+    array([[ 1.296,  0.199],
+           [ 0.294,  0.947],
+           [ 0.623,  0.474],
+           [ 0.075,  0.006]])
+    """
 
-    parameters = []
+    parameters = ['dimension']
 
     def __init__(self, distribution_mimicking_uniform, inverse_cdf_fun=lambda u: u):
         """

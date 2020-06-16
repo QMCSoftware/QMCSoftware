@@ -1,9 +1,19 @@
 from ._discrete_distribution import DiscreteDistribution
+from numpy import random
 
 
 class CustomIIDDistribution(DiscreteDistribution):
-
-    parameters = []
+    """
+    >>> random.seed(7)
+    >>> cd = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,3)))
+    >>> print(cd)
+    CustomIIDDistribution (DiscreteDistribution Object)
+        dimension       None
+    >>> cd.gen_samples(2)
+    array([[6, 3, 3],
+           [4, 6, 6]])
+    """
+    parameters = ['dimension']
 
     def __init__(self, custom_generator):
         """
