@@ -70,6 +70,8 @@ Sampling nodes.
 -  Lattice (base 2):
    :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
 -  Sobol' (base 2): :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
+-  Generalized Halton
+-  Korobov
 
 **Independent Identically Distributed (IID) Nodes**
 
