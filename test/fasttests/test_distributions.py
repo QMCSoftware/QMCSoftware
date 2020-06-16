@@ -146,6 +146,46 @@ class TestSobol(unittest.TestCase):
         self.assertTrue((x==x_true).all())
 
 
+class TestHalton(unittest.TestCase):
+    """ Unit test for Halton DiscreteDistribution. """
+
+    def test_mimics(self):
+        distribution = Halton(dimension=3, generalize=True, seed=7)
+        self.assertEqual(distribution.mimics, "StdUniform")
+    
+    def test_gen_samples(self):
+        distribution = Halton(dimension=3, generalize=False, seed=7)
+        x = distribution.gen_samples(4)
+        self.assertTrue(x.shape==(4,3))
+        distribution.set_dimension(4)
+        x = distribution.gen_samples(2)
+        self.assertTrue(x.shape==(2,4))
+
+
+class TestKorobov(unittest.TestCase):
+    """ Unit test for Korobov DiscreteDistribution. """
+
+    def test_mimics(self):
+        distribution = Korobov(dimension=3, generator=[1], randomize=True, seed=None)
+        self.assertEqual(distribution.mimics, "StdUniform")
+    
+    def test_gen_samples(self):
+        distribution = Korobov(dimension=3,generator=[2,3,1],randomize=False,seed=7)
+        x = distribution.gen_samples(4)
+        self.assertTrue(x.shape==(4,3))
+        self.assertRaises(Exception,distribution.gen_samples,4,[4])
+        self.assertRaises(Exception,distribution.gen_samples,[3,3,3])
+        self.assertRaises(Exception,distribution.gen_samples,[0])
+        distribution.set_dimension(2)
+        x = distribution.gen_samples(4,generator=[1,3])
+        x_true = array([
+            [0,     0],
+            [1./4,  3./4],
+            [1./2,  1./2],
+            [3./4,  1./4]])
+        self.assertTrue((x==x_true).all())
+
+
 class TestCustomIIDDistribution(unittest.TestCase):
     """ Unit tests for CustomIIDDistribution DiscreteDistribution. """
 

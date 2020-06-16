@@ -14,7 +14,7 @@ class Halton(DiscreteDistribution):
         https://CRAN.R-project.org/package=qrng.
     """
 
-    parameters = ['dimension','generalize','seed']
+    parameters = ['dimension','generalize','seed','mimics']
 
     def __init__(self, dimension=1, generalize=True, seed=None):
         """
@@ -25,6 +25,7 @@ class Halton(DiscreteDistribution):
         """
         self.dimension = dimension
         self.generalize = generalize
+        self.mimics = 'StdUniform'
         self.seed = seed
         self.set_seed(self.seed)
 

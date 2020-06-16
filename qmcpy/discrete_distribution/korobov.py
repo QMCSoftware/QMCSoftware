@@ -14,7 +14,7 @@ class Korobov(DiscreteDistribution):
         https://CRAN.R-project.org/package=qrng.
     """
 
-    parameters = ['dimension','generator','randomize','seed']
+    parameters = ['dimension','generator','randomize','seed','mimics']
 
     def __init__(self, dimension=1, generator=[1], randomize=True, seed=None):
         """
@@ -29,6 +29,7 @@ class Korobov(DiscreteDistribution):
         self.dimension = dimension
         self.generator = generator
         self.randomize = randomize
+        self.mimics = 'StdUniform'
         self.seed = seed
         self.set_seed(self.seed)
 
