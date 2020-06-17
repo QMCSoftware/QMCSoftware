@@ -18,7 +18,7 @@ class Halton(DiscreteDistribution):
     >>> h.gen_samples(2)
     array([[ 0.323,  0.148,  0.623,  0.913],
            [ 0.823,  0.482,  0.823,  0.056]])
-    >>> print(h)
+    >>> h
     Halton (DiscreteDistribution Object)
         dimension       4
         generalize      0

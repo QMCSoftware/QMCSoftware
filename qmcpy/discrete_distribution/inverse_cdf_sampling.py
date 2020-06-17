@@ -11,7 +11,7 @@ class InverseCDFSampling(DiscreteDistribution):
     >>> exponential_measure = InverseCDFSampling(
     ...     distribution_mimicking_uniform = Sobol(dimension=2,seed=7),
     ...     inverse_cdf_fun = exp_inverse_cdf)
-    >>> print(exponential_measure)
+    >>> exponential_measure
     InverseCDFSampling (DiscreteDistribution Object)
         dimension       2
     >>> exponential_measure.gen_samples(n_min=4,n_max=8)

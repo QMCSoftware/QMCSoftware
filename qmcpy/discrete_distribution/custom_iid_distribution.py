@@ -6,7 +6,7 @@ class CustomIIDDistribution(DiscreteDistribution):
     """
     >>> random.seed(7)
     >>> cd = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,3)))
-    >>> print(cd)
+    >>> cd
     CustomIIDDistribution (DiscreteDistribution Object)
         dimension       None
     >>> cd.gen_samples(2)

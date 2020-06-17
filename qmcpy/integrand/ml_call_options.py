@@ -13,7 +13,7 @@ class MLCallOptions(Integrand):
     >>> dd = Sobol(seed=7)
     >>> m = Gaussian(dd)
     >>> mlco = MLCallOptions(m)
-    >>> print(mlco)
+    >>> mlco
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.2000
@@ -180,7 +180,14 @@ class MLCallOptions(Integrand):
         return pf,pc
     
     def g(self, samples, l):
-        """ See abstract method. """
+        """
+        Args:
+            samples (ndarray): Gaussian(0,1^2) samples
+            l (int): level
+        Return:
+            sums (ndarray): length 6 vector of summary statistic sums  
+            cost (float): cost on this level 
+        """
         n,d = samples.shape        
         nf = 2**l # n fine
         nc = nf/2 # n coarse

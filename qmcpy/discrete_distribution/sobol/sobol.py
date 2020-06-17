@@ -11,7 +11,7 @@ class Sobol(DiscreteDistribution):
     Quasi-Random Sobol nets in base 2.
     
     >>> s = Sobol(2,seed=7)
-    >>> print(s)
+    >>> s
     Sobol (DiscreteDistribution Object)
         dimension       2
         scramble        1

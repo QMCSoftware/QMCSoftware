@@ -90,7 +90,7 @@ The central package including the 5 main components as listed below. Each compon
 
 - **Stopping Criterion:** determines the number of samples necessary to meet an error tolerence.
 - **Integrand:** the function/process whose expected value will be approximated.
-- **True Measure:** the distribution which the integrand is defined for.
+- **True Measure:** the distribution to be intergrated over.
 - **Discrete Distribution:** a generator of nodes/sequences, that can be either iid (for Monte Carlo) or low-discrepancy (for quasi-Monte Carlo), that mimic a standard distribution.
 - **Accumulate Data:** stores information from integration process.
 
@@ -111,18 +111,13 @@ make workout
 
 ## Unitests
 
-Combined fast (<1 sec) and long (<10 sec) unittests can be run with
+Combined doctests and fast (<1 sec) / long (<10 sec) unittests can be run with
 
 ~~~
 make tests
 ~~~
 
-To run either fast or long unittests use either of the following 2 commands
-
-~~~
-python -W ignore -m unittest discover -s test/fasttests
-python -W ignore -m unittest discover -s test/longtests
-~~~
+See the makefile for individual testing commands.
 
 <hr>
 

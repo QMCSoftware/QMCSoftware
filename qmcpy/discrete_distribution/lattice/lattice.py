@@ -11,7 +11,7 @@ class Lattice(DiscreteDistribution):
     Quasi-Random Lattice nets in base 2.
     
     >>> l = Lattice(2,seed=7)
-    >>> print(l)
+    >>> l
     Lattice (DiscreteDistribution Object)
         dimension       2
         scramble        1

@@ -5,7 +5,7 @@ from numpy import random
 class IIDStdGaussian(DiscreteDistribution):
     """
     >>> dd = IIDStdGaussian(dimension=2,seed=7)
-    >>> print(dd)
+    >>> dd
     IIDStdGaussian (DiscreteDistribution Object)
         dimension       2
         seed            7

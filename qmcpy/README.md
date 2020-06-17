@@ -11,6 +11,9 @@ The function to integrate.
 - Keister Function: $g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)$
 - Custom Function
 - European Option
+    - stock price at time $jT/d$: $~~~~~~~~~$ $S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)$
+    - discounted call payoff $= \max\left(S(x_d)-K\right),\: 0)  \,\exp(-rT)$
+    - discounted put payoff $= \max\left(K-S(x_d)\right),\: 0)\,\exp(-rT)$
 - Asian Call Option
     - stock price at time $jT/d$: $~~~~~~~~~$ $S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)$
     - discounted call payoff $= \max\left(\frac{1}{d}\sum_{j=1}^{d} S(x_j)-K\right),\: 0)  \,\exp(-rT)$
@@ -41,8 +44,8 @@ Sampling nodes.
 
 - Lattice (base 2): $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
 - Sobol' (base 2): $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
-- Generalized Halton
-- Korobov
+- Generalized Halton: $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
+- Korobov: $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
 
 **Independent Identically Distributed (IID) Nodes**
 

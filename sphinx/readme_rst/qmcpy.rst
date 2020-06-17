@@ -25,6 +25,14 @@ The function to integrate.
    :math:`g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)`
 -  Custom Function
 -  European Option
+
+   -  stock price at time :math:`jT/d`: :math:`~~~~~~~~~`
+      :math:`S(x_j)=S_0\exp\bigl((r-\sigma^2/2)(jT/d)+\sigma\mathcal{B}(t_j)\bigr)`
+   -  discounted call payoff
+      :math:`= \max\left(S(x_d)-K\right),\: 0) \,\exp(-rT)`
+   -  discounted put payoff
+      :math:`= \max\left(K-S(x_d)\right),\: 0)\,\exp(-rT)`
+
 -  Asian Call Option
 
    -  stock price at time :math:`jT/d`: :math:`~~~~~~~~~`
@@ -70,8 +78,9 @@ Sampling nodes.
 -  Lattice (base 2):
    :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
 -  Sobol' (base 2): :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
--  Generalized Halton
--  Korobov
+-  Generalized Halton:
+   :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
+-  Korobov: :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
 
 **Independent Identically Distributed (IID) Nodes**
 

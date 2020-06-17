@@ -10,7 +10,7 @@ class AsianCall(Integrand):
     >>> dd = Sobol(4,seed=7)
     >>> m = BrownianMotion(dd)
     >>> ac = AsianCall(m)
-    >>> print(ac)
+    >>> ac
     AsianCall (Integrand Object)
         volatility      0.5000
         start_price     30
@@ -28,7 +28,7 @@ class AsianCall(Integrand):
     >>> m2 = BrownianMotion(dd2,mean_shift_is=1)
     >>> level_dims = [2,4,8]
     >>> ac2 = AsianCall(m2,multi_level_dimensions=level_dims)
-    >>> print(ac2)
+    >>> ac2
     AsianCall (Integrand Object)
         volatility      0.5000
         start_price     30

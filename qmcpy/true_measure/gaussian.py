@@ -23,11 +23,6 @@ class Gaussian(TrueMeasure):
            [ 1.136,  1.011],
            [ 0.379, -0.194]])
     >>> g.set_dimension(4)
-    >>> g
-    Gaussian (TrueMeasure Object)
-        distrib_name    Sobol
-        mean            1
-        covariance      0.2500
     >>> g.gen_mimic_samples(n_min=2,n_max=4)
     array([[ 1.309,  0.445,  1.128,  0.813],
            [ 0.634,  1.171,  0.362,  1.528]])
@@ -38,6 +33,8 @@ class Gaussian(TrueMeasure):
         mean            [1 2]
         covariance      [[ 1.000  0.500]
                         [ 0.500  2.000]]
+    >>> g2.pdf(array([0,0]))
+    array([[ 0.027]])
     """
 
     parameters = ['mean', 'covariance']

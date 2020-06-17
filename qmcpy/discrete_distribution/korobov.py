@@ -21,7 +21,7 @@ class Korobov(DiscreteDistribution):
            [ 0.765,  0.903,  0.365],
            [ 0.265,  0.653,  0.615],
            [ 0.765,  0.403,  0.865]])
-    >>> print(k)
+    >>> k
     Korobov (DiscreteDistribution Object)
         dimension       3
         generator       1

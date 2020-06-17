@@ -13,7 +13,7 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
     ...     return density
     >>> sampling_measure = Uniform(IIDStdUniform(1,seed=7))
     >>> ars = AcceptanceRejectionSampling(objective_pdf=f,measure_to_sample_from=sampling_measure)
-    >>> print(ars)
+    >>> ars
     AcceptanceRejectionSampling (DiscreteDistribution Object)
         dimension       1
         c               1.3333

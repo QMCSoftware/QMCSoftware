@@ -210,7 +210,7 @@ Garunteed MC Cubature
 CLT MC Cubature
 ..........................
 
-.. automodule:: qmcpy.stopping_criterion.cub_qmc_clt
+.. automodule:: qmcpy.stopping_criterion.cub_mc_clt
     :members:
 
 

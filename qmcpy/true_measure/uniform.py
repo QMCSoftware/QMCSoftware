@@ -33,6 +33,8 @@ class Uniform(TrueMeasure):
         distrib_name    Sobol
         lower_bound     [-0.500  0.000]
         upper_bound     [1 3]
+    >>> u2.pdf([0,1])
+    0.2222222222222222
     """
 
     parameters = ['lower_bound', 'upper_bound']

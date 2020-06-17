@@ -5,7 +5,7 @@ from numpy import random
 class IIDStdUniform(DiscreteDistribution):
     """
     >>> dd = IIDStdUniform(dimension=2,seed=7)
-    >>> print(dd)
+    >>> dd
     IIDStdUniform (DiscreteDistribution Object)
         dimension       2
         seed            7
