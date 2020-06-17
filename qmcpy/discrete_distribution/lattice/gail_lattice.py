@@ -13,7 +13,7 @@ Reference:
     Available from http://gailgithub.github.io/GAIL_Dev/
 """
 
-from numpy import log2, zeros, hstack, tile, outer, array
+from numpy import log2, zeros, hstack, tile, outer, array, double
 
 gen_vec = array([
     1, 433461, 315689, 441789, 501101, 146355, 88411, 215837, 273599, 151719, 258185, 357967, 96407, 
@@ -60,7 +60,7 @@ gen_vec = array([
     394407, 372929, 139823, 114515, 416815, 260309, 489593, 156763, 21523, 189285, 308129, 155369, 213557, 298023, 
     391439, 379245, 409109, 229765, 28521, 464087, 470911, 435965, 201451, 64371, 370499, 276377, 331635, 196813, 
     379415, 229547, 430067, 137053, 312839, 390385, 77155, 163911, 514381, 487453],
-    dtype=float)
+    dtype=double)
 
 
 def vdc(n):

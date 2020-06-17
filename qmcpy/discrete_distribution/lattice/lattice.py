@@ -33,8 +33,8 @@ class Lattice(DiscreteDistribution):
     array([[ 0.250,  0.250],
            [ 0.750,  0.750]])
     >>> Lattice(dimension=2,scramble=False,backend='MPS').gen_samples(n_min=2,n_max=4)
-    array([[ 0.250,  0.750],
-           [ 0.750,  0.250]])
+    array([[ 0.250,  0.250],
+           [ 0.750,  0.750]])
 
     References
         Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, 

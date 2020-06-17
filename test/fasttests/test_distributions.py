@@ -77,20 +77,20 @@ class TestLattice(unittest.TestCase):
     def test_mps_correctness(self):
         distribution = Lattice(dimension=4, scramble=False, backend='MPS')
         true_sample = array([
-            [0,     0,      0,      0],
-            [1/2,   1/2,    1/2,    1/2],
-            [1/4,   3/4,    3/4,    1/4],
-            [3/4,   1/4,    1/4,    3/4]])
-        self.assertTrue((distribution.gen_samples(n_min=0,n_max=4)==true_sample).all())
+            [1/8,   5/8,    1/8,    5/8],
+            [3/8,   7/8,    3/8,    7/8],
+            [5/8,   1/8,    5/8,    1/8],
+            [7/8,   3/8,    7/8,    3/8]])
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
 
     def test_gail_correctness(self):
         distribution = Lattice(dimension=4, scramble=False, backend='GAIL')
         true_sample = array([
-            [0,     0,      0,      0],
-            [1/2,   1/2,    1/2,    1/2],
-            [1/4,   1/4,    1/4,    1/4],
-            [3/4,   3/4,    3/4,    3/4]])
-        self.assertTrue((distribution.gen_samples(n_min=0,n_max=4)==true_sample).all())
+            [1/8,   5/8,    1/8,    5/8],
+            [5/8,   1/8,    5/8,    1/8],
+            [3/8,   7/8,    3/8,    7/8],
+            [7/8,   3/8,    7/8,    3/8]])
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
     
     def test_set_dimension(self):
         for backend in ['MPS','GAIL']:
