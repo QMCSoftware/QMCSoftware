@@ -5,7 +5,7 @@ from ..true_measure import Gaussian
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
 from numpy import log2, hstack, tile, exp, pi, arange
-from time import perf_counter
+from time import time
 import warnings
 
 
@@ -102,7 +102,7 @@ class CubQmcLatticeG(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
         allowed_distribs = ["Lattice"]
-        super().__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQmcLatticeG,self).__init__(distribution, allowed_levels, allowed_distribs)
         if not distribution.scramble:
             raise ParameterError("CubLattice_g requires distribution to have scramble=True")
         if distribution.backend != 'gail':
@@ -112,7 +112,7 @@ class CubQmcLatticeG(StoppingCriterion):
 
     def integrate(self):
         """ See abstract method. """
-        t_start = perf_counter()
+        t_start = time()
         while True:
             self.data.update_data()
             # Check the end of the algorithm
@@ -137,7 +137,7 @@ class CubQmcLatticeG(StoppingCriterion):
             else:
                 # double sample size
                 self.data.m += 1
-        self.data.time_integrate = perf_counter() - t_start
+        self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
             
     def fft_update(self, y, ynext):

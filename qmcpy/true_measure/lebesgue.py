@@ -49,7 +49,7 @@ class Lebesgue(TrueMeasure):
         else:
             raise ParameterError('self.lower_bound and self.upper_bound must both be finite ' + \
                                  'or must be -inf,inf respectively')
-        super().__init__()
+        super(Lebesgue,self).__init__()
 
     def transform_g_to_f(self, g):
         """ See abstract method. """

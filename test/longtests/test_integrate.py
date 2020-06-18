@@ -1,9 +1,11 @@
 """ Unit tests for integrate method in QMCPy """
 
 from qmcpy import *
-from numpy import arange, array, inf, pi, sqrt, exp
-import unittest
-
+from numpy import array, inf, pi, sqrt, exp
+import sys
+vinvo = sys.version_info
+if vinvo[0]==3: import unittest
+else: import unittest2 as unittest
 
 class IntegrationExampleTest(unittest.TestCase):
 
@@ -19,7 +21,7 @@ class IntegrationExampleTest(unittest.TestCase):
         true_values = [1.3803884470431430, 1.808186429263620, 2.168309102165481]
         for i in range(len(dimensions)):
             distribution = IIDStdGaussian(dimension=dimensions[i])
-            measure = Gaussian(distribution, covariance=1/2)
+            measure = Gaussian(distribution, covariance=1./2)
             integrand = Keister(measure)
             solution,data = CubMcClt(integrand,abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)

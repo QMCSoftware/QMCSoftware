@@ -7,7 +7,7 @@ from ..integrand import Keister
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import array, log2, sqrt
 from scipy.stats import norm
-from time import perf_counter
+from time import time
 import warnings
 
 
@@ -80,7 +80,7 @@ class CubQmcClt(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = "single"
         allowed_distribs = ["Lattice", "Sobol"]
-        super().__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQmcClt,self).__init__(distribution, allowed_levels, allowed_distribs)
         if not distribution.scramble:
             raise ParameterError("CLTRep requires distribution to have scramble=True")
         # Construct AccumulateData Object to House Integration data
@@ -88,7 +88,7 @@ class CubQmcClt(StoppingCriterion):
         
     def integrate(self):
         """ See abstract method. """
-        t_start = perf_counter()
+        t_start = time()
         while True:
             self.data.update_data()
             err_bar = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
@@ -111,5 +111,5 @@ class CubQmcClt(StoppingCriterion):
                 self.data.n_r *= 2
         # CLT confidence interval
         self.data.confid_int = self.data.solution +  err_bar * array([-1, 1])
-        self.data.time_integrate = perf_counter() - t_start
+        self.data.time_integrate = time() - t_start
         return self.data.solution, self.data

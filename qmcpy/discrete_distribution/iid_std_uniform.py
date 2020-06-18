@@ -33,7 +33,7 @@ class IIDStdUniform(DiscreteDistribution):
         self.seed = seed
         random.seed(self.seed)
         self.mimics = 'StdUniform'
-        super().__init__()
+        super(IIDStdUniform,self).__init__()
 
     def gen_samples(self, n):
         """

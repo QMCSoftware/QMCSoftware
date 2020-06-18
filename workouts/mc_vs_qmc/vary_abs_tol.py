@@ -31,7 +31,7 @@ def vary_abs_tol(dimension=3, abs_tol=[.1,.2,.3], rel_tol=0, trials=1):
                     solution += data.solution
                     n += data.n_total
                     time += data.time_integrate
-                results_i = [*problem,tol,float(solution)/trials,float(n)/trials,float(time)/trials]
+                results_i = [problem[0],problem[1],problem[2],tol,float(solution)/trials,float(n)/trials,float(time)/trials]
                 results.loc[i] = results_i
                 print(('%-20s%-20s%-15s%-15.3f%-15.2f%-15d%-15.3f')%tuple(results_i))
                 i += 1

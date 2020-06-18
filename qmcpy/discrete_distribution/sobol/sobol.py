@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from .._discrete_distribution import DiscreteDistribution
 from .mps_sobol import DigitalSeq
 from ..qrng import sobol_qrng
@@ -44,7 +46,7 @@ class Sobol(DiscreteDistribution):
         https://CRAN.R-project.org/package=qrng.
 
         Faure, Henri, and Christiane Lemieux. 
-        “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” 
+        “Implementation of Irreducible Sobol' Sequences in Prime Power Bases.” 
         Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
 
         F.Y. Kuo & D. Nuyens.
@@ -103,7 +105,7 @@ class Sobol(DiscreteDistribution):
             warnings.warn(warning_s,ParameterWarning)
         self.mimics = 'StdUniform'
         self.set_seed(self.seed)
-        super().__init__()
+        super(Sobol,self).__init__()
         
     def qrgn_sobol_gen(self, n_min=0, n_max=8):
         """

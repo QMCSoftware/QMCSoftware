@@ -84,7 +84,7 @@ class AsianCall(Integrand):
             self.dimensions = [self.measure.distribution.dimension]
             self.dim_fracs = [0]
         self.exercise_time = self.measure.time_vector[-1]
-        super().__init__()        
+        super(AsianCall,self).__init__()        
 
     def get_discounted_payoffs(self, stock_path, dimension):
         """

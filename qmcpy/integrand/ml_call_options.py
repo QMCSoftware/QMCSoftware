@@ -40,7 +40,7 @@ class MLCallOptions(Integrand):
     parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
 
     def __init__(self, measure, option='european', volatility=.2,
-        start_strike_price=100, interest_rate=.05, t_final=1):
+        start_strike_price=100., interest_rate=.05, t_final=1.):
         """
         Args:
             measure (TrueMeasure): A BrownianMotion TrueMeasure object
@@ -65,7 +65,7 @@ class MLCallOptions(Integrand):
         self.b = .85*self.k
         self.multilevel = True
         self.g_submodule = getattr(self,'g_'+self.option)
-        super().__init__()
+        super(MLCallOptions,self).__init__()
 
     def get_exact_value(self):
         """ Print exact analytic value, based on s0=k """
@@ -190,7 +190,7 @@ class MLCallOptions(Integrand):
         """
         n,d = samples.shape        
         nf = 2**l # n fine
-        nc = nf/2 # n coarse
+        nc = float(nf)/2 # n coarse
         hf = self.t/nf # timestep fine
         hc = self.t/nc # timestep coarse
         xf = tile(self.k,int(n))

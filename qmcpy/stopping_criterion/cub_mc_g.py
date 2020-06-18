@@ -8,7 +8,7 @@ from ..util import tolfun, MaxSamplesWarning, NotYetImplemented
 from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
 from scipy.optimize import fsolve
 from scipy.stats import norm
-from time import perf_counter
+from time import time
 import warnings
 
 
@@ -93,13 +93,13 @@ class CubMcG(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super().__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubMcG,self).__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration data
         self.data = MeanVarData(self, integrand, self.n_init)  # house integration data
 
     def integrate(self):
         """ See abstract method. """
-        t_start = perf_counter()
+        t_start = time()
         # Pilot Sample
         self.data.update_data()
         self.sigma_up = self.inflate * self.data.sighat
@@ -162,7 +162,7 @@ class CubMcG(StoppingCriterion):
                 self.data.n[:] = n            
         # set confidence interval
         self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
-        self.data.time_integrate = perf_counter() - t_start
+        self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):

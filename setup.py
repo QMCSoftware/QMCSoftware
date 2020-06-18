@@ -12,7 +12,7 @@ class CustomInstall(install):
             subprocess.check_call('make qrng',shell=True)
         except:
             print('Problem compiling qrng c files')
-        super().run()
+        super(CustomInstall,self).run()
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""

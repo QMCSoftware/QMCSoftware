@@ -1,7 +1,7 @@
 from ..true_measure._true_measure import TrueMeasure
 from ..util import ParameterError, MethodImplementationError, univ_repr, DimensionError
 
-class AccumulateData():
+class AccumulateData(object):
     """ Accumulated Data abstract class. DO NOT INSTANTIATE. """
 
     def __init__(self):

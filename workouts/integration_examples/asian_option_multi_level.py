@@ -3,7 +3,6 @@ Multi level Asian Option
 python workouts/integration_examples/asian_option_multi_level.py  > outputs/integration_examples/asian_option_multi_level.log
 """
 
-from numpy import arange
 from qmcpy import *
 
 bar = '\n'+'~'*100+'\n'

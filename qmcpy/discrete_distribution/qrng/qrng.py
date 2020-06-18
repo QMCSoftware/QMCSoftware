@@ -1,4 +1,6 @@
-""" Interfaces to quasi-random sequences in C.
+# coding: utf-8
+"""
+Interfaces to quasi-random sequences in C.
 
 References
     Marius Hofert and Christiane Lemieux (2019). 
@@ -10,6 +12,7 @@ References
     “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” 
     Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
 """
+
 import ctypes
 import numpy
 import os
@@ -154,21 +157,21 @@ def qrng_example_use(plot=False):
     seed = 7
     # generate points
     #    MRG63k3a
-    t0 = time.perf_counter()
+    t0 = time.time()
     mrg63ka_pts = numpy.array([mrg63ka_f() for i in range(n * d)]).reshape((n, d))
-    mrg63ka_t = time.perf_counter() - t0
+    mrg63ka_t = time.time() - t0
     #    korobov
-    t0 = time.perf_counter()
+    t0 = time.time()
     korobov_pts = korobov_qrng(n, d, generator=[2], randomize=randomize, seed=seed)
-    korobov_t = time.perf_counter() - t0
+    korobov_t = time.time() - t0
     #    ghalton
-    t0 = time.perf_counter()
+    t0 = time.time()
     ghalton_pts = ghalton_qrng(n, d, generalize=True, seed=seed)
-    ghalton_t = time.perf_counter() - t0
+    ghalton_t = time.time() - t0
     #    sobol
-    t0 = time.perf_counter()
+    t0 = time.time()
     sobol_pts = sobol_qrng(n, d, shift=randomize, skip=0, graycode=False, seed=7)
-    sobol_t = time.perf_counter() - t0
+    sobol_t = time.time() - t0
     # outputs
     from matplotlib import pyplot
     fig, ax = pyplot.subplots(nrows=1, ncols=4, figsize=(10, 3))

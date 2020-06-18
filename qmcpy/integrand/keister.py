@@ -9,7 +9,7 @@ class Keister(Integrand):
     $f(\\boldsymbol{x}) = \\pi^{d/2} \\cos(\\| \\boldsymbol{x} \\|)$.
 
     The standard example integrates the Keister integrand with respect to an 
-    IID Gaussian distribution with variance 1/2.
+    IID Gaussian distribution with variance 1./2.
 
     >>> dd = Sobol(2,seed=7)
     >>> m = Gaussian(dd,covariance=1./2)
@@ -31,7 +31,7 @@ class Keister(Integrand):
         """
         self.measure = measure
         self.dimension = self.measure.dimension
-        super().__init__()
+        super(Keister,self).__init__()
 
     def g(self, x):
         """ See abstract method. """

@@ -80,7 +80,7 @@ class Lattice(DiscreteDistribution):
             raise ParameterError("Lattice backend must 'GAIL' or 'MPS'")
         self.mimics = 'StdUniform'
         self.set_seed(self.seed)
-        super().__init__()
+        super(Lattice,self).__init__()
 
     def gen_samples(self, n=None, n_min=0, n_max=8):
         """

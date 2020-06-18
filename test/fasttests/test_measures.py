@@ -3,7 +3,10 @@
 from qmcpy import *
 from qmcpy.util import *
 from numpy import *
-import unittest
+import sys
+vinvo = sys.version_info
+if vinvo[0]==3: import unittest
+else: import unittest2 as unittest
 
         
 class TestUniform(unittest.TestCase):

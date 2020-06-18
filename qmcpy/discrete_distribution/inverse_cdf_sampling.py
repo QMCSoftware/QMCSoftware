@@ -46,7 +46,7 @@ class InverseCDFSampling(DiscreteDistribution):
                 'Can only apply inverse CDF transform to DiscreteDistributions mimicing StdUniform')
         self.dimension = self.distribution_u.dimension
         self.mimics = 'None'
-        super().__init__()
+        super(InverseCDFSampling,self).__init__()
     
     def gen_samples(self, *args, **kwargs):
         """

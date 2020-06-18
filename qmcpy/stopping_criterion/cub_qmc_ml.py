@@ -6,7 +6,7 @@ from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError
 from numpy import argmax, sqrt
 from scipy.stats import norm
-from time import perf_counter
+from time import time
 import warnings
 
 
@@ -81,13 +81,13 @@ class CubQmcMl(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'multi'
         allowed_distribs = ["Lattice", "Sobol"]
-        super().__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQmcMl,self).__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration Data
         self.data = MLQMCData(self, integrand, self.n_init, self.replications)
     
     def integrate(self):
         """ See abstract method. """
-        t_start = perf_counter()
+        t_start = time()
         while True:
             self.data.update_data()
             self.data.eval_level[:] = False
@@ -111,6 +111,6 @@ class CubQmcMl(StoppingCriterion):
                 % (int(self.data.n_total), int(total_next_samples), int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
-        self.data.time_integrate = perf_counter() - t_start
+        self.data.time_integrate = time() - t_start
         return self.data.solution,self.data
     

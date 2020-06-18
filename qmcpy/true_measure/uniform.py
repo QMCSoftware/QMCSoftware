@@ -56,7 +56,7 @@ class Uniform(TrueMeasure):
         self.upper_bound = array(upper_bound)
         if len(self.lower_bound)!=self.d or len(self.upper_bound)!=self.d:
             raise DimensionError('upper bound and lower bound must be of length dimension')
-        super().__init__()
+        super(Uniform,self).__init__()
     
     def pdf(self,x):
         """ See abstract class. """

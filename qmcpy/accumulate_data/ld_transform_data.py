@@ -47,7 +47,7 @@ class LDTransformData(AccumulateData):
         self.c_stilde_low = tile(-inf,int(self.m_max-self.l_star+1))
         self.c_stilde_up = tile(inf,int(self.m_max-self.l_star+1))
         self.check_cone = check_cone
-        super().__init__()
+        super(LDTransformData,self).__init__()
 
     def update_data(self):
         """ See abstract method. """

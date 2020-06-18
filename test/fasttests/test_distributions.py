@@ -4,7 +4,10 @@ from qmcpy import *
 from qmcpy.util import *
 from qmcpy.discrete_distribution.qrng.qrng import qrng_example_use
 from numpy import *
-import unittest
+import sys
+vinvo = sys.version_info
+if vinvo[0]==3: import unittest
+else: import unittest2 as unittest
 
 
 class TestIIDStdUniform(unittest.TestCase):
@@ -77,19 +80,19 @@ class TestLattice(unittest.TestCase):
     def test_mps_correctness(self):
         distribution = Lattice(dimension=4, scramble=False, backend='MPS')
         true_sample = array([
-            [1/8,   5/8,    1/8,    5/8],
-            [3/8,   7/8,    3/8,    7/8],
-            [5/8,   1/8,    5/8,    1/8],
-            [7/8,   3/8,    7/8,    3/8]])
+            [1./8,   5./8,    1./8,    5./8],
+            [3./8,   7./8,    3./8,    7./8],
+            [5./8,   1./8,    5./8,    1./8],
+            [7./8,   3./8,    7./8,    3./8]])
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
 
     def test_gail_correctness(self):
         distribution = Lattice(dimension=4, scramble=False, backend='GAIL')
         true_sample = array([
-            [1/8,   5/8,    1/8,    5/8],
-            [5/8,   1/8,    5/8,    1/8],
-            [3/8,   7/8,    3/8,    7/8],
-            [7/8,   3/8,    7/8,    3/8]])
+            [1./8,   5./8,    1./8,    5./8],
+            [5./8,   1./8,    5./8,    1./8],
+            [3./8,   7./8,    3./8,    7./8],
+            [7./8,   3./8,    7./8,    3./8]])
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
     
     def test_set_dimension(self):

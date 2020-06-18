@@ -44,7 +44,7 @@ class MLQMCData(AccumulateData):
         # get seeds for each replication
         random.seed(self.distribution.seed)
         self.seeds = random.randint(0,1000000,(self.levels,self.replications))
-        super().__init__()
+        super(MLQMCData,self).__init__()
 
     def update_data(self):
         """ See abstract method. """

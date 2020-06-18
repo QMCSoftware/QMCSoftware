@@ -76,7 +76,7 @@ def vdc(n):
         kk = 2**(k-l-1)
         ptind_nl = hstack((tile(False,nl),tile(True,nl)))
         ptind = tile(ptind_nl,int(kk))
-        q[ptind] += 1/2**(l+1)
+        q[ptind] += 1./2**(l+1)
     return q
 
 
@@ -97,6 +97,6 @@ def gail_lattice_gen(n_min, n_max, d):
     if n_min == 0:
         y = vdc(nelem)
     else:
-        y = vdc(nelem)+1/(2*n_min)
+        y = vdc(nelem)+1./(2*n_min)
     xlat = outer(y,gen_vec[0:d])%1
     return xlat

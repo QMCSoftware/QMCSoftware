@@ -51,7 +51,7 @@ class BrownianMotion(TrueMeasure):
                         for j in range(self.d)])
         self.a = cholesky(sigma).T
         self.t = 1
-        super().__init__()
+        super(BrownianMotion,self).__init__()
     
     def _tf_to_mimic_samples(self, samples):
         """

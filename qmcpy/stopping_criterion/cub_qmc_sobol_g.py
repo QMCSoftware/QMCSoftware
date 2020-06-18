@@ -5,7 +5,7 @@ from ..discrete_distribution import Sobol
 from ..true_measure import Gaussian
 from ..integrand import Keister
 from numpy import log2, hstack, tile
-from time import perf_counter
+from time import time
 import warnings
 
 
@@ -104,7 +104,7 @@ class CubQmcSobolG(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
         allowed_distribs = ["Sobol"]
-        super().__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQmcSobolG,self).__init__(distribution, allowed_levels, allowed_distribs)
         if (not distribution.scramble) or distribution.graycode:
             raise ParameterError("CubSobol_g requires distribution to have scramble=True and graycode=False")
         # Construct AccumulateData Object to House Integration data
@@ -112,7 +112,7 @@ class CubQmcSobolG(StoppingCriterion):
 
     def integrate(self):
         """ See abstract method. """
-        t_start = perf_counter()
+        t_start = time()
         while True:
             self.data.update_data()
             # Check the end of the algorithm
@@ -137,7 +137,7 @@ class CubQmcSobolG(StoppingCriterion):
             else:
                 # double sample size
                 self.data.m += 1
-        self.data.time_integrate = perf_counter() - t_start
+        self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
     
     def fwt_update(self, y, ynext):

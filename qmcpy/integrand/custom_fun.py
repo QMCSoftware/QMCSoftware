@@ -25,7 +25,7 @@ class CustomFun(Integrand):
         """
         self.measure = measure
         self.custom_fun = custom_fun
-        super().__init__()
+        super(CustomFun,self).__init__()
 
     def g(self, x):
         """ See abstract method. """

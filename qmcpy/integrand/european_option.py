@@ -39,15 +39,15 @@ class EuropeanOption(Integrand):
         if not isinstance(measure,BrownianMotion):
             raise ParameterError('EuropeanCall measure must be a BrownianMotion instance')
         self.measure = measure
-        self.volatility = volatility
-        self.start_price = start_price
-        self.strike_price = strike_price
-        self.interest_rate = interest_rate
+        self.volatility = float(volatility)
+        self.start_price = float(start_price)
+        self.strike_price = float(strike_price)
+        self.interest_rate = float(interest_rate)
         self.call_put = call_put.lower()
         if self.call_put not in ['call','put']:
             raise ParameterError("call_put must be either 'call' or 'put'")
         self.exercise_time = self.measure.time_vector[-1]
-        super().__init__()        
+        super(EuropeanOption,self).__init__()        
 
     def g(self, x):
         """ See abstract method. """

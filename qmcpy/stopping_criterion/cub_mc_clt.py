@@ -6,7 +6,7 @@ from ..integrand import Keister, AsianCall
 from ..util import MaxSamplesWarning
 from numpy import array, ceil, floor, maximum
 from scipy.stats import norm
-from time import perf_counter
+from time import time
 import warnings
 
 
@@ -76,13 +76,13 @@ class CubMcClt(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'multi'
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super().__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubMcClt,self).__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration data
         self.data = MeanVarData(self, integrand, self.n_init)
 
     def integrate(self):
         """ See abstract method. """
-        t_start = perf_counter()
+        t_start = time()
         # Pilot Sample
         self.data.update_data()
         # use cost of function values to decide how to allocate
@@ -117,5 +117,5 @@ class CubMcClt(StoppingCriterion):
         sigma_up = (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
         err_bar = z_star * self.inflate * sigma_up
         self.data.confid_int = self.data.solution + err_bar * array([-1, 1])
-        self.data.time_integrate = perf_counter() - t_start
+        self.data.time_integrate = time() - t_start
         return self.data.solution, self.data

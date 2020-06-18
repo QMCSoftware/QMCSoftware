@@ -2,8 +2,10 @@
 
 from qmcpy import *
 from qmcpy.util import *
-from numpy import arange
-import unittest
+import sys
+vinvo = sys.version_info
+if vinvo[0]==3: import unittest
+else: import unittest2 as unittest
 
 
 class TestAsianCall(unittest.TestCase):

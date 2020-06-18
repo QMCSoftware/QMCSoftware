@@ -49,7 +49,7 @@ class MLMCData(AccumulateData):
         self.gamma = maximum(0,self.gamma0)
         self.solution = None
         self.n_total = 0
-        super().__init__()
+        super(MLMCData,self).__init__()
 
     def update_data(self):
         """ See abstract method. """

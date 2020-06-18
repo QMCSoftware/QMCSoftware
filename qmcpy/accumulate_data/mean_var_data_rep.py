@@ -1,5 +1,4 @@
 from ._accumulate_data import AccumulateData
-from time import perf_counter
 from numpy import array, finfo, float32, full, inf, nan, tile, zeros, random
 
 EPS = finfo(float32).eps
@@ -36,7 +35,7 @@ class MeanVarDataRep(AccumulateData):
         # get seeds for each replication
         random.seed(self.distribution.seed)
         self.seeds = random.randint(0,100000,self.replications)
-        super().__init__()
+        super(MeanVarDataRep,self).__init__()
 
     def update_data(self):
         """ See abstract method. """

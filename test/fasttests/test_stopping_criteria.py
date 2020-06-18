@@ -2,9 +2,10 @@
 
 from qmcpy import *
 from qmcpy.util import *
-from numpy import arange
-import unittest
-
+import sys
+vinvo = sys.version_info
+if vinvo[0]==3: import unittest
+else: import unittest2 as unittest
 keister_2d_exact = 1.808186429263620
 tol = .05
 rel_tol = 0
@@ -21,14 +22,14 @@ class TestCubMcClt(unittest.TestCase):
 
     def test_n_max_single_level(self):
         distribution = IIDStdUniform(dimension=2)
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         algorithm = CubMcClt(integrand, abs_tol=.001, n_init=64, n_max=1000)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
         
     def test_keister_2d(self):
         distribution = IIDStdUniform(dimension=2)
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         solution,data = CubMcClt(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
@@ -45,14 +46,14 @@ class TestCubQmcClt(unittest.TestCase):
 
     def test_n_max_single_level(self):
         distribution = Lattice(dimension=2)
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         algorithm = CubQmcClt(integrand, abs_tol=.001, n_init=16, n_max=32)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
     
     def test_keister_2d(self):
         distribution = Sobol(dimension=2)
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         solution,data = CubQmcClt(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
@@ -69,7 +70,7 @@ class TestCubMcG(unittest.TestCase):
 
     def test_n_max_single_level(self):
         distribution = IIDStdUniform(dimension=2)
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         algorithm = CubMcG(integrand, abs_tol=.001, n_init=64, n_max=500)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
@@ -77,7 +78,7 @@ class TestCubMcG(unittest.TestCase):
     
     def test_keister_2d(self):
         distribution = IIDStdGaussian(dimension=2)
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         solution,data = CubMcG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
@@ -94,14 +95,14 @@ class TestCubQmcLatticeG(unittest.TestCase):
 
     def test_n_max_single_level(self):
         distribution = Lattice(dimension=2, backend="GAIL")
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         algorithm = CubQmcLatticeG(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
     
     def test_keister_2d(self):
         distribution = Lattice(dimension=2)
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         solution,data = CubQmcLatticeG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
@@ -117,14 +118,14 @@ class TestCubQmcSobolG(unittest.TestCase):
 
     def test_n_max_single_level(self):
         distribution = Sobol(dimension=2, backend="QRNG")
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         algorithm = CubQmcSobolG(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
     
     def test_keister_2d(self):
         distribution = Sobol(dimension=2)
-        measure = Gaussian(distribution, covariance=1/2)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         solution,data = CubQmcSobolG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)

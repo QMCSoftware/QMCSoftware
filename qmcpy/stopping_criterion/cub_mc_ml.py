@@ -3,10 +3,10 @@ from ..accumulate_data import MLMCData
 from ..discrete_distribution import IIDStdGaussian
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
-from ..util import MaxSamplesWarning, ParameterError
+from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
 from numpy import ceil, sqrt, arange, minimum, maximum, hstack, zeros
 from scipy.stats import norm
-from time import perf_counter
+from time import time
 import warnings
 
 
@@ -97,13 +97,13 @@ class CubMcMl(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'multi'
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super().__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubMcMl,self).__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration Data
         self.data = MLMCData(self, integrand, self.levels_min, self.n_init, alpha0, beta0, gamma0)
     
     def integrate(self):
         """ See abstract method. """
-        t_start = perf_counter()
+        t_start = time()
         while self.data.diff_n_level.sum() > 0:
             self.data.update_data()
             self.data.n_total += self.data.diff_n_level.sum()
@@ -146,7 +146,7 @@ class CubMcMl(StoppingCriterion):
                 break
             # finally, evaluate multilevel estimator
         self.data.solution = (self.data.sum_level[0,:]/self.data.n_level).sum()
-        self.data.time_integrate = perf_counter() - t_start
+        self.data.time_integrate = time() - t_start
         return self.data.solution,self.data
     
     def _get_next_samples(self):

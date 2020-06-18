@@ -22,7 +22,7 @@ class Linear(Integrand):
             measure (TrueMeasure): a TrueMeasure instance
         """
         self.measure = measure
-        super().__init__()
+        super(Linear,self).__init__()
 
     def g(self, x):
         """ See abstract method. """

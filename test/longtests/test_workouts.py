@@ -1,9 +1,10 @@
 """ Call abbreviated varsions of functions from python_prototypes/worksouts/ """
 
 from workouts import *
-from numpy import arange
-import unittest
-
+import sys
+vinvo = sys.version_info
+if vinvo[0]==3: import unittest
+else: import unittest2 as unittest
 
 class TestWorkouts(unittest.TestCase):
     

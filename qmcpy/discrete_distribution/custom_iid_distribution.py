@@ -24,7 +24,7 @@ class CustomIIDDistribution(DiscreteDistribution):
         self.distrib_type = 'iid'
         self.mimics = 'Custom'
         self.dimension = None
-        super().__init__()
+        super(CustomIIDDistribution,self).__init__()
 
     def gen_samples(self, n):
         """

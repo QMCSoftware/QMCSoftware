@@ -63,14 +63,14 @@ class Gaussian(TrueMeasure):
             raise DimensionError("mean must have length dimension and "+\
                 "covariance must be of shapre dimension x dimension")
         self.sigma = cholesky(self.sigma2)
-        super().__init__()
+        super(Gaussian,self).__init__()
     
     def pdf(self, x):
         """ See abstract method. """
         x = x.reshape(self.d,1)
         mu = self.mu.reshape(self.d,1)
-        density = (2*pi)**(-self.d/2) * det(self.sigma)**(-1/2) * \
-            exp(-1/2 *  dot( dot((x-mu).T,inv(self.sigma)), x-mu) )
+        density = (2*pi)**(-self.d/2) * det(self.sigma)**(-1./2) * \
+            exp(-1./2 *  dot( dot((x-mu).T,inv(self.sigma)), x-mu) )
         return density
 
     def _tf_to_mimic_samples(self, samples):

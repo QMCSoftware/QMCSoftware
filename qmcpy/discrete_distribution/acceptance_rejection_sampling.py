@@ -69,7 +69,7 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
         md = apply_along_axis(self.m,1,s).squeeze()
         kd = apply_along_axis(self.k,1,s).squeeze()
         self.c = max( (md/kd) )
-        super().__init__()
+        super(AcceptanceRejectionSampling,self).__init__()
 
     def gen_samples(self, n):
         """

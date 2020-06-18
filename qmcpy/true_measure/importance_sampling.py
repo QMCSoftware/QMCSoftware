@@ -41,7 +41,7 @@ class ImportanceSampling(TrueMeasure):
         if not hasattr(self.measure,'_tf_to_mimic_samples'):
             raise TransformError('measure_to_sample_from must have _tf_to_mimic_samples method')
         self.k_sample_tf = self.measure._tf_to_mimic_samples
-        super().__init__()
+        super(ImportanceSampling,self).__init__()
 
     def transform_g_to_f(self, g):
         """ See abstract method. """
