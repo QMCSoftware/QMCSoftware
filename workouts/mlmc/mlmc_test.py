@@ -57,7 +57,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
             kurt = 0.
         else:
             kurt = ( sums[3] - 4*sums[2]*sums[0] + 6*sums[1]*sums[0]**2 - 
-                     3*sums[0]*sums[0]**3 ) /  (sums[1]-sums[0]**2)**2
+                     3*sums[0]*sums[0]**3 ) /  (sums[1]-sums[0]**2)**2.
         cost = hstack((cost, cst))
         del1 = hstack((del1, sums[0]))
         del2 = hstack((del2, sums[4]))
