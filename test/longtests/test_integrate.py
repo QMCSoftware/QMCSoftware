@@ -117,8 +117,8 @@ class IntegrationExampleTest(unittest.TestCase):
         Mathematica: integrate[b*(x-a)^2, {x,1,0}]
         """
         abs_tol = .01
-        a_list = [1, 2]
-        b_list = [4, 5]
+        a_list = [1., 2.]
+        b_list = [4., 5.]
         true_values = [(b / 3) * (3 * a * (a - 1) + 1) for a, b in zip(a_list, b_list)]
         for i in range(2):
             a_i = a_list[i]

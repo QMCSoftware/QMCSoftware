@@ -23,7 +23,7 @@ class MeanVarDataRep(AccumulateData):
         self.distribution = self.measure.distribution
         # Set Attributes
         self.replications = replications
-        self.muhat_r = zeros(self.replications)
+        self.muhat_r = zeros(int(self.replications))
         self.solution = nan
         self.muhat = inf  # sample mean
         self.sighat = inf # sample standard deviation
@@ -34,12 +34,12 @@ class MeanVarDataRep(AccumulateData):
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
         random.seed(self.distribution.seed)
-        self.seeds = random.randint(0,100000,self.replications)
+        self.seeds = random.randint(0,100000,int(self.replications))
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):
         """ See abstract method. """
-        for r in range(self.replications):
+        for r in range(int(self.replications)):
             self.distribution.set_seed(self.seeds[r])
             x = self.distribution.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
             y = self.integrand.f(x).squeeze()

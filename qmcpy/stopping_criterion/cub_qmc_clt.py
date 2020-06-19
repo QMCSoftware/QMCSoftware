@@ -51,8 +51,8 @@ class CubQmcClt(StoppingCriterion):
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=256, n_max=2**30,
-                 inflate=1.2, alpha=0.01, replications=16):
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
+                 inflate=1.2, alpha=0.01, replications=16.):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -69,13 +69,13 @@ class CubQmcClt(StoppingCriterion):
             warnings.warn(warning_s, ParameterWarning)
             n_init = 32
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
-        self.n_init = n_init
-        self.n_max = n_max
-        self.alpha = alpha
+        self.abs_tol = float(abs_tol)
+        self.rel_tol = float(rel_tol)
+        self.n_init = float(n_init)
+        self.n_max = float(n_max)
+        self.alpha = float(alpha)
         self.z_star = -norm.ppf(self.alpha / 2)
-        self.inflate = inflate
+        self.inflate = float(inflate)
         # DiscreteDistribution checks
         distribution = integrand.measure.distribution
         allowed_levels = "single"
@@ -110,6 +110,6 @@ class CubQmcClt(StoppingCriterion):
                 # double sample size
                 self.data.n_r *= 2
         # CLT confidence interval
-        self.data.confid_int = self.data.solution +  err_bar * array([-1, 1])
+        self.data.confid_int = self.data.solution +  err_bar * array([-1., 1.])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data

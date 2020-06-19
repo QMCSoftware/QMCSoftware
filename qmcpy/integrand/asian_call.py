@@ -50,8 +50,8 @@ class AsianCall(Integrand):
     parameters = ['volatility', 'start_price', 'strike_price',
                   'interest_rate','mean_type', 'dimensions', 'dim_fracs']
                           
-    def __init__(self, measure, volatility=0.5, start_price=30, strike_price=35,\
-                 interest_rate=0, mean_type='arithmetic', multi_level_dimensions=None):
+    def __init__(self, measure, volatility=0.5, start_price=30., strike_price=35.,\
+                 interest_rate=0., mean_type='arithmetic', multi_level_dimensions=None):
         """
         Args:
             measure (TrueMeasure): A BrownianMotion TrueMeasure object
@@ -66,23 +66,23 @@ class AsianCall(Integrand):
         if not isinstance(measure,BrownianMotion):
             raise ParameterError('AsianCall measure must be a BrownianMotion instance')
         self.measure = measure
-        self.volatility = volatility
-        self.start_price = start_price
-        self.strike_price = strike_price
-        self.interest_rate = interest_rate
+        self.volatility = float(volatility)
+        self.start_price = float(start_price)
+        self.strike_price = float(strike_price)
+        self.interest_rate = float(interest_rate)
         self.mean_type = mean_type.lower()
         if self.mean_type not in ['arithmetic', 'geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
         if multi_level_dimensions:
             # multi-level problem
             self.dimensions = multi_level_dimensions
-            self.dim_fracs = [0] + [float(self.dimensions[i])/self.dimensions[i-1] \
+            self.dim_fracs = [0.] + [float(self.dimensions[i])/float(self.dimensions[i-1]) \
                 for i in range(1,len(self.dimensions))]
             self.multilevel = True
         else:
             # single level problem
             self.dimensions = [self.measure.distribution.dimension]
-            self.dim_fracs = [0]
+            self.dim_fracs = [0.]
         self.exercise_time = self.measure.time_vector[-1]
         super(AsianCall,self).__init__()        
 
@@ -98,30 +98,30 @@ class AsianCall(Integrand):
             ndarray: n vector of discounted payoffs
         """
         if self.mean_type == 'arithmetic':
-            avg = (self.start_price / 2 +
+            avg = (self.start_price / 2. +
                    stock_path[:, :-1].sum(1) +
-                   stock_path[:, -1] / 2) / \
-                dimension
+                   stock_path[:, -1] / 2.) / \
+                float(dimension)
         elif self.mean_type == 'geometric':
-            avg = exp((log(self.start_price) / 2 +
+            avg = exp((log(self.start_price) / 2. +
                        log(stock_path[:, :-1]).sum(1) +
-                       log(stock_path[:, -1]) / 2) /
-                      dimension)
-        y = maximum(avg - self.strike_price, 0) * \
+                       log(stock_path[:, -1]) / 2.) /
+                      float(dimension))
+        y = maximum(avg - self.strike_price, 0.) * \
             exp(-self.interest_rate * self.exercise_time)
         return y
 
     def g(self, x, l=0):
         """ See abstract method. """
         dim_frac = self.dim_fracs[l]
-        dimension = self.dimensions[l]
+        dimension = float(self.dimensions[l])
         s_fine = self.start_price * exp(
-            (self.interest_rate - self.volatility ** 2 / 2) *
+            (self.interest_rate - self.volatility ** 2 / 2.) *
             self.measure.time_vector + self.volatility * x)
         y = self.get_discounted_payoffs(s_fine, dimension)
         if dim_frac > 0:
             s_course = s_fine[:, int(dim_frac - 1):: int(dim_frac)]
-            d_course = dimension / dim_frac
+            d_course = float(dimension) / dim_frac
             y_course = self.get_discounted_payoffs(s_course, d_course)
             y -= y_course
         return y

@@ -100,7 +100,7 @@ class Lattice(DiscreteDistribution):
             n_max = n     
         if log2(n_max) % 1 != 0:
             raise ParameterError("n_max must be a power of 2")
-        if not (n_min == 0 or n_min == n_max/2):
+        if not (n_min == 0 or n_min == float(n_max)/2):
             raise ParameterError("n_min must be 0 or n_max/2")
         x_lat = self.backend_gen(n_min,n_max,self.dimension)
         if self.scramble: # apply random shift to samples

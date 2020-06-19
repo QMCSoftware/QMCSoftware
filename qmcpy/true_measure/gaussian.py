@@ -39,7 +39,7 @@ class Gaussian(TrueMeasure):
 
     parameters = ['mean', 'covariance']
 
-    def __init__(self, distribution, mean=0, covariance=1):
+    def __init__(self, distribution, mean=0., covariance=1.):
         """
         Args:
             distribution (DiscreteDistribution): DiscreteDistribution instance
@@ -69,7 +69,7 @@ class Gaussian(TrueMeasure):
         """ See abstract method. """
         x = x.reshape(self.d,1)
         mu = self.mu.reshape(self.d,1)
-        density = (2*pi)**(-self.d/2) * det(self.sigma)**(-1./2) * \
+        density = (2*pi)**(-self.d/2.) * det(self.sigma)**(-1./2) * \
             exp(-1./2 *  dot( dot((x-mu).T,inv(self.sigma)), x-mu) )
         return density
 

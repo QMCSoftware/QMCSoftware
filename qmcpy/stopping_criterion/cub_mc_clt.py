@@ -54,7 +54,7 @@ class CubMcClt(StoppingCriterion):
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
     
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e10,
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
                  inflate=1.2, alpha=0.01):
         """
         Args:
@@ -66,12 +66,12 @@ class CubMcClt(StoppingCriterion):
             n_max (int): maximum number of samples
         """
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
-        self.n_init = n_init
-        self.n_max = n_max
-        self.alpha = alpha
-        self.inflate = inflate
+        self.abs_tol = float(abs_tol)
+        self.rel_tol = float(rel_tol)
+        self.n_init = float(n_init)
+        self.n_max = float(n_max)
+        self.alpha = float(alpha)
+        self.inflate = float(inflate)
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'multi'
@@ -91,7 +91,7 @@ class CubMcClt(StoppingCriterion):
         # samples for computation of the mean
         # n_mu_temp := n such that confidence intervals width and conficence will be satisfied
         tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
-        z_star = -norm.ppf(self.alpha / 2)
+        z_star = -norm.ppf(self.alpha / 2.)
         n_mu_temp = ceil(temp_b * (self.data.sighat / temp_a) * \
                             (z_star * self.inflate / tol_up)**2)
         # n_mu := n_mu_temp adjusted for previous n

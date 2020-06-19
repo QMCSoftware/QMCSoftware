@@ -35,14 +35,14 @@ class BrownianMotion(TrueMeasure):
 
     parameters = ['time_vector','mean_shift_is']
 
-    def __init__(self, distribution, mean_shift_is=0):
+    def __init__(self, distribution, mean_shift_is=0.):
         """
         Args:
             distribution (DiscreteDistribution): DiscreteDistribution instance
             mean_shift_is (float): mean shift for importance sampling. 
         """
         self.distribution = distribution
-        self.mean_shift_is = mean_shift_is
+        self.mean_shift_is = float(mean_shift_is)
         self.d = self.distribution.dimension
         self.time_vector = linspace(1./self.d,1,self.d) # evenly spaced
         self.ms_vec = self.mean_shift_is * self.time_vector
@@ -50,7 +50,7 @@ class BrownianMotion(TrueMeasure):
                         for i in range(self.d)]
                         for j in range(self.d)])
         self.a = cholesky(sigma).T
-        self.t = 1
+        self.t = 1.
         super(BrownianMotion,self).__init__()
     
     def _tf_to_mimic_samples(self, samples):
@@ -79,7 +79,7 @@ class BrownianMotion(TrueMeasure):
         """ See abstract method. """
         def f(samples, *args, **kwargs):
             z = self._tf_to_mimic_samples(samples)
-            y = g(z,*args,**kwargs) * exp( (self.mean_shift_is*self.t/2 - z[:,-1]) * self.mean_shift_is)
+            y = g(z,*args,**kwargs) * exp( (self.mean_shift_is*self.t/2. - z[:,-1]) * self.mean_shift_is)
             return y
         return f
     

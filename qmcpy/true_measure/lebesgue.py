@@ -22,7 +22,7 @@ class Lebesgue(TrueMeasure):
 
     parameters = ['lower_bound', 'upper_bound']
     
-    def __init__(self, distribution, lower_bound=0., upper_bound=1):
+    def __init__(self, distribution, lower_bound=0., upper_bound=1.):
         """
         Args:
             distribution (DiscreteDistribution): DiscreteDistribution instance

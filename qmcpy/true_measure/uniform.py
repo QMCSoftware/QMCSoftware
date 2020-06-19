@@ -60,7 +60,7 @@ class Uniform(TrueMeasure):
     
     def pdf(self,x):
         """ See abstract class. """
-        return 1/( prod(self.upper_bound-self.lower_bound) )
+        return 1./( prod(self.upper_bound-self.lower_bound) )
 
     def _tf_to_mimic_samples(self, samples):
         """

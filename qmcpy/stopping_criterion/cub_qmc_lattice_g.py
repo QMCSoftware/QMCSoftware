@@ -69,8 +69,8 @@ class CubQmcLatticeG(StoppingCriterion):
 
     parameters = ['abs_tol','rel_tol','n_init','n_max']
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=2**10, n_max=2**35,
-                 fudge=lambda m: 5*2**(-m), check_cone=False):
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
+                 fudge=lambda m: 5.*2.**(-m), check_cone=False):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -84,20 +84,20 @@ class CubQmcLatticeG(StoppingCriterion):
             check_cone (boolean): check if the function falls in the cone
         """
         # Input Checks
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
+        self.abs_tol = float(abs_tol)
+        self.rel_tol = float(rel_tol)
         m_min = log2(n_init)
         m_max = log2(n_max)
-        if m_min%1 != 0 or m_min < 8 or m_max%1 != 0:
+        if m_min%1 != 0. or m_min < 8 or m_max%1 != 0:
             warning_s = '''
                 n_init and n_max must be a powers of 2.
                 n_init must be >= 2^8.
                 Using n_init = 2^10 and n_max=2^35.'''
             warnings.warn(warning_s, ParameterWarning)
-            m_min = 10
-            m_max = 35
-        self.n_init = 2**m_min
-        self.n_max = 2**m_max
+            m_min = 10.
+            m_max = 35.
+        self.n_init = 2.**m_min
+        self.n_max = 2.**m_max
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
@@ -121,7 +121,7 @@ class CubQmcLatticeG(StoppingCriterion):
             ub = max(self.abs_tol, self.rel_tol*abs(self.data.solution + errest))
             lb = max(self.abs_tol, self.rel_tol*abs(self.data.solution - errest))
             self.data.solution = self.data.solution - errest*(ub-lb) / (ub+lb)
-            if 4*errest**2/(ub+lb)**2 <= 1:
+            if 4.*errest**2/(ub+lb)**2 <= 1.:
                 # stopping criterion met
                 break
             elif self.data.m == self.data.m_max:
@@ -131,12 +131,12 @@ class CubQmcLatticeG(StoppingCriterion):
                 Trying to generate %d new samples would exceed n_max = %d.
                 No more samples will be generated.
                 Note that error tolerances may no longer be satisfied""" \
-                % (int(2**self.data.m), int(self.data.m), int(2**self.data.m_max))
+                % (int(2.**self.data.m), int(self.data.m), int(2.**self.data.m_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
             else:
                 # double sample size
-                self.data.m += 1
+                self.data.m += 1.
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
             
@@ -160,12 +160,12 @@ class CubQmcLatticeG(StoppingCriterion):
             nmminlm1 = 2**(mnext-l-1)
             ptind_nl = hstack(( tile(True,nl), tile(False,nl) ))
             ptind = tile(ptind_nl,int(nmminlm1))
-            coef = exp(-2*pi*1j*arange(nl)/(2*nl))
+            coef = exp(-2.*pi*1j*arange(nl)/(2*nl))
             coefv = tile(coef,int(nmminlm1))
             evenval = ynext[ptind]
             oddval = ynext[~ptind]
-            ynext[ptind] = (evenval + coefv*oddval) / 2
-            ynext[~ptind] = (evenval - coefv*oddval) / 2
+            ynext[ptind] = (evenval + coefv*oddval) / 2.
+            ynext[~ptind] = (evenval - coefv*oddval) / 2.
         y = hstack((y,ynext))
         if len(y) > len(ynext): # already generated some samples samples
             ## Compute FFT on all points
@@ -174,6 +174,6 @@ class CubQmcLatticeG(StoppingCriterion):
             coefv = exp(-2*pi*1j*arange(nl)/(2*nl))
             evenval = y[ptind]
             oddval = y[~ptind]
-            y[ptind] = (evenval + coefv*oddval) /2
-            y[~ptind] = (evenval - coefv*oddval) /2
+            y[ptind] = (evenval + coefv*oddval) / 2.
+            y[~ptind] = (evenval - coefv*oddval) / 2.
         return y

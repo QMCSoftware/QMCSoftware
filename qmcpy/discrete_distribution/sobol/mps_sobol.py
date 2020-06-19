@@ -107,9 +107,10 @@ class DigitalSeq():
             >>> [ copy(seq.cur) for x in seq ]
             [[0, 0], [16, 16], [24, 8], [8, 24], [12, 12], [28, 28], [20, 4], [4, 20], [6, 10], [22, 26], [30, 2], [14, 18], [10, 6], [26, 22], [18, 14], [2, 30], [3, 15], [19, 31], [27, 7], [11, 23], [15, 3], [31, 19], [23, 11], [7, 27], [5, 5], [21, 21], [29, 13], [13, 29], [9, 9], [25, 25], [17, 1], [1, 17]]
             >>> for x in seq:
+            ...     s = ''
             ...     for xj in x:
-            ...            print(xj, end=" ")
-            ...     print()
+            ...            s += '%s '%str(xj)
+            ...     print(s)
             0 0 
             0.5 0.5 
             0.75 0.25 
@@ -190,7 +191,7 @@ class DigitalSeq():
         self.m = len(Cs[0]) if m is None else m
         self.s = len(Cs) if s is None else s
         self.t = max([int(a).bit_length() for a in Cs[0]])
-        self.alpha = self.t / self.m
+        self.alpha = float(self.t) / self.m
         self.Csr = [[bitreverse(int(Csjc), self.t)
                      for Csjc in Csj] for Csj in Cs]
         self.n = 2 ** self.m

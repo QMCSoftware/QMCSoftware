@@ -36,7 +36,7 @@ class MLMCData(AccumulateData):
         self.measure = self.integrand.measure
         self.distribution = self.measure.distribution
         # Set Attributes
-        self.levels = levels_init
+        self.levels = int(levels_init)
         self.n_level = zeros(self.levels+1)
         self.sum_level = zeros((2,self.levels+1))
         self.cost_level = zeros(self.levels+1)

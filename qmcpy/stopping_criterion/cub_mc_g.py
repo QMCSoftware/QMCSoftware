@@ -66,7 +66,7 @@ class CubMcG(StoppingCriterion):
     """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e10,
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
                  inflate=1.2, alpha=0.01):
         """
         Args:
@@ -79,16 +79,16 @@ class CubMcG(StoppingCriterion):
             n_max: maximum number of samples
         """
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
-        self.n_init = n_init
-        self.n_max = n_max
-        self.alpha = alpha
-        self.inflate = inflate
-        self.alpha_sigma = self.alpha / 2  # the uncertainty for variance estimation
+        self.abs_tol = float(abs_tol)
+        self.rel_tol = float(rel_tol)
+        self.n_init = float(n_init)
+        self.n_max = float(n_max)
+        self.alpha = float(alpha)
+        self.inflate = float(inflate)
+        self.alpha_sigma = float(self.alpha) / 2.  # the uncertainty for variance estimation
         self.kurtmax = (n_init - 3) / (n_init - 1) + \
             (self.alpha_sigma * n_init) / (1 - self.alpha_sigma) * \
-            (1 - 1 / self.inflate**2)**2
+            (1 - 1. / self.inflate**2)**2
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
@@ -126,7 +126,7 @@ class CubMcG(StoppingCriterion):
             alphai = (self.alpha-self.alpha_sigma)/(2*(1-self.alpha_sigma)) # uncertainty to do iteration
             eps1 = self._ncbinv(1e4,alphai,self.kurtmax)
             self.err_bar = self.sigma_up*eps1
-            tau = 1 # step of the iteration 
+            tau = 1. # step of the iteration 
             self.data.n[:] = 1e4 # default initial sample size
             while True:
                 if self.data.n_total + self.data.n > self.n_max:
@@ -143,17 +143,17 @@ class CubMcG(StoppingCriterion):
                     self.data.update_data()
                     break
                 self.data.update_data()
-                lb_tol = tolfun(self.abs_tol, self.rel_tol, 0, self.data.solution-self.err_bar, 'max')
-                ub_tol = tolfun(self.abs_tol, self.rel_tol, 0, self.data.solution+self.err_bar, 'max')
-                delta_plus = (lb_tol + ub_tol) / 2
+                lb_tol = tolfun(self.abs_tol, self.rel_tol, 0., self.data.solution-self.err_bar, 'max')
+                ub_tol = tolfun(self.abs_tol, self.rel_tol, 0., self.data.solution+self.err_bar, 'max')
+                delta_plus = (lb_tol + ub_tol) / 2.
                 if delta_plus >= self.err_bar:
                     # stopping criterion met
-                    delta_minus = (lb_tol - ub_tol) / 2
+                    delta_minus = (lb_tol - ub_tol) / 2.
                     self.data.solution += delta_minus # adjust solution a bit
                     break
                 else:
                     candidate_tol = max(self.abs_tol,.95*self.rel_tol*abs(self.data.solution))
-                    self.err_bar = min(self.err_bar/2,candidate_tol)
+                    self.err_bar = min(self.err_bar/2.,candidate_tol)
                     tau += 1
                 # update next uncertainty
                 toloversig = self.err_bar / self.sigma_up
@@ -170,13 +170,13 @@ class CubMcG(StoppingCriterion):
         A = 18.1139
         A1 = 0.3328
         A2 = 0.429  # three constants in Berry-Esseen inequality
-        M3upper = kurtmax**(3 / 4)
+        M3upper = kurtmax**(3. / 4)
         # the upper bound on the third moment by Jensen's inequality
         BEfun2 = lambda logsqrtn: \
             (norm.cdf(-exp(logsqrtn) * toloversig)
             + exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
             A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
-            - alpha / 2)
+            - alpha / 2.)
         # Berry-Esseen function, whose solution is the sample size needed
         logsqrtnCLT = log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
         nbe = ceil(exp(2 * fsolve(BEfun2, logsqrtnCLT)))
@@ -187,7 +187,7 @@ class CubMcG(StoppingCriterion):
             (norm.cdf(-exp(logsqrtn) * toloversig)
             + exp(-logsqrtn) * min(A1 * (M3upper + A2),
             A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
-            - alpha / 2)
+            - alpha / 2.)
         err = fsolve(BEfun3, toloversig) * sigma_0_up
         return ncb, err
 
@@ -197,7 +197,7 @@ class CubMcG(StoppingCriterion):
         A = 18.1139
         A1 = 0.3328
         A2 = 0.429 # three constants in Berry-Esseen inequality
-        M3upper = kurtmax**(3/4)
+        M3upper = kurtmax**(3./4)
         # using Jensen's inequality to bound the third moment
         BEfun = lambda logsqrtb: \
             (norm.cdf(n1*logsqrtb) + min(A1*(M3upper+A2),

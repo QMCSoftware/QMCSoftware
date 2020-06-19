@@ -64,8 +64,8 @@ class CubMcMl(StoppingCriterion):
 
     parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
 
-    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256, n_max=1e10, 
-        levels_min=2, levels_max=10, alpha0=-1, beta0=-1, gamma0=-1):
+    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, 
+        levels_min=2., levels_max=10., alpha0=-1., beta0=-1., gamma0=-1.):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
@@ -87,11 +87,11 @@ class CubMcMl(StoppingCriterion):
         if n_init <= 0:
             raise ParameterError('needs n_init > 0')
         # initialization
-        self.rmse_tol = rmse_tol if rmse_tol else (abs_tol / norm.ppf(1-alpha/2))
-        self.n_init = n_init
-        self.n_max = n_max
-        self.levels_min = levels_min
-        self.levels_max = levels_max
+        self.rmse_tol = float(rmse_tol) if rmse_tol else (float(abs_tol) / norm.ppf(1-alpha/2.))
+        self.n_init = float(n_init)
+        self.n_max = float(n_max)
+        self.levels_min = float(levels_min)
+        self.levels_max = float(levels_max)
         self.theta = 0.25
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
@@ -113,9 +113,10 @@ class CubMcMl(StoppingCriterion):
             # if (almost) converged, estimate remaining error and decide 
             # whether a new level is required
             if (self.data.diff_n_level > 0.01*self.data.n_level).sum() == 0:
-                range_ = arange(minimum(2,self.data.levels-1)+1)
-                rem = (self.data.mean_level[self.data.levels-range_] / 
-                        2**(range_*self.data.alpha)).max() / (2**self.data.alpha - 1)
+                range_ = arange(minimum(2.,self.data.levels-1)+1)
+                idx = (self.data.levels-range_).astype(int)
+                rem = (self.data.mean_level[idx] / 
+                        2.**(range_*self.data.alpha)).max() / (2.**self.data.alpha - 1)
                 # rem = ml(l+1) / (2^alpha - 1)
                 if rem > sqrt(self.theta)*self.rmse_tol:
                     if self.data.levels == self.levels_max:
@@ -128,12 +129,12 @@ class CubMcMl(StoppingCriterion):
                             self.data.var_level[-1] / 2**self.data.beta))
                         self.data.cost_per_sample = hstack((self.data.cost_per_sample, 
                             self.data.cost_per_sample[-1] * 2**self.data.gamma))
-                        self.data.n_level = hstack((self.data.n_level, 0))
+                        self.data.n_level = hstack((self.data.n_level, 0.))
                         self.data.sum_level = hstack((self.data.sum_level,
                             zeros((2,1))))
-                        self.data.cost_level = hstack((self.data.cost_level, 0))
+                        self.data.cost_level = hstack((self.data.cost_level, 0.))
                         n_samples = self._get_next_samples()
-                        self.data.diff_n_level = maximum(0, n_samples-self.data.n_level)
+                        self.data.diff_n_level = maximum(0., n_samples-self.data.n_level)
             # check if over sample budget
             if (self.data.n_total + self.data.diff_n_level.sum()) > self.n_max:
                 warning_s = """

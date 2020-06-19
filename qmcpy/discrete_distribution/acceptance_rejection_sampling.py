@@ -9,7 +9,7 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
     """
     >>> def f(x):
     ...     x = x if x<.5 else 1-x
-    ...     density = 16*x/3 if x<1/4 else 4/3
+    ...     density = float(16*x)/3 if x<1./4 else 4./3
     ...     return density
     >>> sampling_measure = Uniform(IIDStdUniform(1,seed=7))
     >>> ars = AcceptanceRejectionSampling(objective_pdf=f,measure_to_sample_from=sampling_measure)
