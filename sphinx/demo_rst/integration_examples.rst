@@ -7,7 +7,7 @@ function and the Asian put option payoff. To start, we import the
 ``qmcpy`` module and the function ``arrange()`` from ``numpy`` for
 generating evenly spaced discrete vectors in the examples.
 
-.. code:: ipython3
+.. code:: ipython2
 
     from qmcpy import *
     from numpy import arange
@@ -25,11 +25,11 @@ the Gaussian measure, and the Sobol distribution:
 -  Sobol discrete distribution:
    :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
-.. code:: ipython3
+.. code:: ipython2
 
     dim = 3
-    distribution = Sobol(dimension=dim, scramble=True, seed=7, backend='QRNG')
-    measure = Gaussian(distribution, covariance=1/2)
+    distribution = Sobol(dimension=dim, randomize=True, seed=7, backend='QRNG')
+    measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQmcSobolG(integrand,abs_tol=.05).integrate()
     print(data)
@@ -40,27 +40,26 @@ the Gaussian measure, and the Sobol distribution:
     Solution: 2.1718         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
-    	dimension       3
-    	scramble        1
-    	seed            7
-    	backend         qrng
-    	mimics          StdUniform
-    	graycode        0
+        dimension       3
+        randomize        1
+        seed            7
+        backend         qrng
+        mimics          StdUniform
+        graycode        0
     Gaussian (TrueMeasure Object)
-    	distrib_name    Sobol
-    	mean            0
-    	covariance      0.5000
+        distrib_name    Sobol
+        mean            0
+        covariance      0.5000
     CubQmcSobolG (StoppingCriterion Object)
-    	abs_tol         0.0500
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
+        abs_tol         0.0500
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
     LDTransformData (AccumulateData Object)
-    	n_total         1024
-    	solution        2.1718
-    	r_lag           4
-    	time_integrate  0.0030
-    
+        n_total         1024
+        solution        2.1718
+        r_lag           4
+        time_integrate  0.0030
 
 
 Arithmetic-Mean Asian Put Option: Single Level
@@ -87,9 +86,9 @@ defined as follows:
 -  Lattice discrete distribution:
    :math:`\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
-.. code:: ipython3
+.. code:: ipython2
 
-    distribution = Lattice(dimension=64, scramble=True, seed=7, backend='GAIL')
+    distribution = Lattice(dimension=64, randomize=True, seed=7, backend='GAIL')
     measure = BrownianMotion(distribution)
     integrand = AsianCall(
         measure = measure,
@@ -106,34 +105,33 @@ defined as follows:
 
     Solution: 6.2744         
     AsianCall (Integrand Object)
-    	volatility      0.5000
-    	start_price     30
-    	strike_price    25
-    	interest_rate   0.0100
-    	mean_type       arithmetic
-    	dimensions      64
-    	dim_fracs       0
+        volatility      0.5000
+        start_price     30
+        strike_price    25
+        interest_rate   0.0100
+        mean_type       arithmetic
+        dimensions      64
+        dim_fracs       0
     Lattice (DiscreteDistribution Object)
-    	dimension       64
-    	scramble        1
-    	seed            7
-    	backend         gail
-    	mimics          StdUniform
+        dimension       64
+        randomize        1
+        seed            7
+        backend         gail
+        mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
-    	distrib_name    Lattice
-    	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
-    	mean_shift_is   0
+        distrib_name    Lattice
+        time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+        mean_shift_is   0
     CubQmcLatticeG (StoppingCriterion Object)
-    	abs_tol         0.0500
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
+        abs_tol         0.0500
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
     LDTransformData (AccumulateData Object)
-    	n_total         4096
-    	solution        6.2744
-    	r_lag           4
-    	time_integrate  0.0499
-    
+        n_total         4096
+        solution        6.2744
+        r_lag           4
+        time_integrate  0.0633
 
 
 Arithmetic-Mean Asian Put Option: Multi-Level
@@ -156,7 +154,7 @@ be summarized as follows:
 The total run time for this example is about one-third of that for the
 last example.
 
-.. code:: ipython3
+.. code:: ipython2
 
     distribution = IIDStdGaussian(seed=7)
     measure = BrownianMotion(distribution)
@@ -173,37 +171,36 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2553         
+    Solution: 6.2656         
     AsianCall (Integrand Object)
-    	volatility      0.5000
-    	start_price     30
-    	strike_price    25
-    	interest_rate   0.0100
-    	mean_type       arithmetic
-    	dimensions      [ 4 16 64]
-    	dim_fracs       [ 0.000  4.000  4.000]
+        volatility      0.5000
+        start_price     30
+        strike_price    25
+        interest_rate   0.0100
+        mean_type       arithmetic
+        dimensions      [ 4 16 64]
+        dim_fracs       [ 0.000  4.000  4.000]
     IIDStdGaussian (DiscreteDistribution Object)
-    	dimension       64
-    	seed            7
-    	mimics          StdGaussian
+        dimension       64
+        seed            7
+        mimics          StdGaussian
     BrownianMotion (TrueMeasure Object)
-    	distrib_name    IIDStdGaussian
-    	time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
-    	mean_shift_is   0
+        distrib_name    IIDStdGaussian
+        time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+        mean_shift_is   0
     CubMcClt (StoppingCriterion Object)
-    	inflate         1.2000
-    	alpha           0.0100
-    	abs_tol         0.0500
-    	rel_tol         0
-    	n_init          1024
-    	n_max           10000000000
+        inflate         1.2000
+        alpha           0.0100
+        abs_tol         0.0500
+        rel_tol         0
+        n_init          1024
+        n_max           10000000000
     MeanVarData (AccumulateData Object)
-    	levels          3
-    	solution        6.2553
-    	n               [334481  27777   2835]
-    	n_total         368165
-    	confid_int      [ 6.206  6.304]
-    	time_integrate  0.1106
-    
+        levels          3
+        solution        6.2656
+        n               [ 312498.000  20261.000  2993.000]
+        n_total         338824
+        confid_int      [ 6.214  6.317]
+        time_integrate  0.2414
 
 

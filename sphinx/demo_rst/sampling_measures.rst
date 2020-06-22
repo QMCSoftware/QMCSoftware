@@ -1,7 +1,7 @@
 Sampling from Known and Unknown Measures
 ========================================
 
-.. code:: ipython3
+.. code:: ipython2
 
     from qmcpy import *
     from numpy import *
@@ -22,14 +22,14 @@ Exponential
    \therefore y \sim \frac{-log(1-u)}{\lambda} \text{ for } u \sim U_d(0,1)
    \end{equation}
 
-.. code:: ipython3
+.. code:: ipython2
 
     # constants
     lambda_ = 1.5
     exp_pdf = lambda x,l=lambda_: l*exp(-l*x)
     exp_inverse_cdf = lambda u,l=lambda_: -log(1-u)/l
 
-.. code:: ipython3
+.. code:: ipython2
 
     # 1 dimension
     exponential_measure = InverseCDFSampling(
@@ -52,17 +52,20 @@ Exponential
 .. image:: sampling_measures_files/sampling_measures_5_0.png
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     # 2 dimension
     exponential_measure = InverseCDFSampling(
         distribution_mimicking_uniform = Sobol(dimension=2,seed=7),
         inverse_cdf_fun = exp_inverse_cdf)
-    exp_samples = exponential_measure.gen_samples(2**8)
+    exp_samples = exponential_measure.gen_samples(2**7)
     pyplot.scatter(exp_samples[:,0],exp_samples[:,1],color='g')
     pyplot.xlabel('$x_0$')
     pyplot.ylabel('$x_1$')
-    pyplot.title('2 Dimensional $exp(\lambda=%.1f)$ samples'%lambda_);
+    pyplot.xlim([0,4])
+    pyplot.ylim([0,4])
+    pyplot.title('Exp(1.5)')
+    pyplot.savefig("../outputs/sample_scatters/exp_sobol.png", dpi=200);
 
 
 
@@ -81,7 +84,7 @@ Cauchy
    \therefore y \sim  tan(\pi(u-\frac{1}{2}))\gamma + x_0 \text{ for } u \sim U_d(0,1)
    \end{equation}
 
-.. code:: ipython3
+.. code:: ipython2
 
     # constants
     x0 = -2
@@ -89,7 +92,7 @@ Cauchy
     cauchy_pdf = lambda x,x0=x0,gamma=gamma: (pi*gamma*(1+((x-x0)/gamma)**2))**(-1)
     cauchy_inverse_cdf = lambda u,x0=x0,gamma=gamma: tan(pi*(u-.5))*gamma+x0
 
-.. code:: ipython3
+.. code:: ipython2
 
     # 1 dimension
     distribution = Sobol(dimension=1)
@@ -126,14 +129,14 @@ Acceptance Rejection Sampling
    \end{cases}
    \end{equation}
 
-.. code:: ipython3
+.. code:: ipython2
 
     def f(x):
         x = x if x<.5 else 1-x # utilize symmetry 
-        density = 16*x/3 if x<1/4 else 4/3
+        density = 16.*x/3. if x<1./4 else 4./3
         return density
 
-.. code:: ipython3
+.. code:: ipython2
 
     sampling_measure = Uniform(IIDStdUniform(1,seed=7))
     distribution = AcceptanceRejectionSampling(
@@ -160,7 +163,7 @@ Acceptance Rejection Sampling
 .. parsed-literal::
 
     Expected (total draws / successful draws) = c = 1.333
-    Successful Draws: 5000  Total Draws: 6686
+    Successful Draws: 5000  Total Draws: 6626
 
 
 
@@ -182,7 +185,7 @@ distribution restricted to positive values
 Independent priors :math:`\alpha \sim t_4(0,2^2)` and
 :math:`\beta \sim t_4(0,1)`
 
-.. code:: ipython3
+.. code:: ipython2
 
     # Sample a dataset
     random.seed(7)
@@ -203,7 +206,7 @@ Independent priors :math:`\alpha \sim t_4(0,2^2)` and
         posterior_dens = prior_dens*sampling_dens
         return posterior_dens
 
-.. code:: ipython3
+.. code:: ipython2
 
     # Naive sampling_measure
     sampling_measure = Gaussian(IIDStdGaussian(2,seed=7),mean=[0,0],covariance=[[2,0],[0,1]])
@@ -218,15 +221,15 @@ Independent priors :math:`\alpha \sim t_4(0,2^2)` and
 
 .. parsed-literal::
 
-    Successful Draws: 100   Total Draws: 1401
+    Successful Draws: 100   Total Draws: 2371
     Posterior samples mean
-    [ 1.339 -0.335]
+    [ 1.308 -0.358]
     Posterior samples covariance
-    [[ 0.320 -0.355]
-     [-0.355  0.568]]
+    [[ 0.372 -0.406]
+     [-0.406  0.615]]
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     # More Efficient sampling_measure using estimate of posterior mean and covariance
     sampling_measure = Gaussian(IIDStdGaussian(2,seed=7),mean=pd_mean_estimate,covariance=pd_cov_estimate)
@@ -239,9 +242,9 @@ Independent priors :math:`\alpha \sim t_4(0,2^2)` and
 
 .. parsed-literal::
 
-    Successful Draws: 1000  Total Draws: 2488
-    95% confidence interval for alpha: (0.526,2.186)
-    95% confidence interval for beta:  (-1.014,0.421)
+    Successful Draws: 1000  Total Draws: 2726
+    95% confidence interval for alpha: (0.514,2.197)
+    95% confidence interval for beta:  (-1.035,0.328)
 
 
 Importance Sampling
@@ -280,18 +283,18 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
        \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_0^1 \int_0^1 \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}_1d\mathbf{x}_2 = \frac{8}{3\pi}
    \end{equation}
 
-.. code:: ipython3
+.. code:: ipython2
 
     true_value = 8/(3*pi)
     abs_tol = .001
     def quarter_circle_uniform_pdf(x):
         x1,x2 = x
         if sqrt(x1**2+x2**2)<1 and x1>=0 and x2>=0:
-            return 4/pi # 1/(pi*(1**2)/4)
+            return 4./pi # 1/(pi*(1**2)/4)
         else:
             return 0. # outside of quarter circle
 
-.. code:: ipython3
+.. code:: ipython2
 
     measure = ImportanceSampling(
         objective_pdf = quarter_circle_uniform_pdf,
@@ -306,26 +309,25 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
 .. parsed-literal::
 
     Solution: 0.8479         
-    CustomFun (Integrand Object)
+    Custrandomizentegrand Object)
     Lattice (DiscreteDistribution Object)
-    	dimension       2
-    	scramble        1
-    	seed            9
-    	backend         gail
-    	mimics          StdUniform
+        dimension       2
+        scramble        1
+        seed            9
+        backend         gail
+        mimics          StdUniform
     ImportanceSampling (TrueMeasure Object)
-    	distrib_name    Lattice
+        distrib_name    Lattice
     CubQmcLatticeG (StoppingCriterion Object)
-    	abs_tol         0.0010
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
+        abs_tol         0.0010
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
     LDTransformData (AccumulateData Object)
-    	n_total         8192
-    	solution        0.8479
-    	r_lag           4
-    	time_integrate  0.1344
-    
+        n_total         8192
+        solution        0.8479
+        r_lag           4
+        time_integrate  0.1202
     Within tolerance of true value 0.849: True
 
 

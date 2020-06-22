@@ -25,7 +25,7 @@ class CubQmcSobolG(StoppingCriterion):
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
         dimension       2
-        scramble        1
+        randomize       1
         seed            7
         backend         qrng
         mimics          StdUniform
@@ -105,8 +105,8 @@ class CubQmcSobolG(StoppingCriterion):
         allowed_levels = 'single'
         allowed_distribs = ["Sobol"]
         super(CubQmcSobolG,self).__init__(distribution, allowed_levels, allowed_distribs)
-        if (not distribution.scramble) or distribution.graycode:
-            raise ParameterError("CubSobol_g requires distribution to have scramble=True and graycode=False")
+        if (not distribution.randomize) or distribution.graycode:
+            raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False")
         # Construct AccumulateData Object to House Integration data
         self.data = LDTransformData(self, integrand, self.fwt_update, m_min, m_max, fudge, check_cone)
 

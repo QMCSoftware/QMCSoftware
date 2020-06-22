@@ -1,7 +1,7 @@
 Importance Sampling Examples
 ============================
 
-.. code:: ipython3
+.. code:: ipython2
 
     from qmcpy import *
     from numpy import *
@@ -31,7 +31,7 @@ with a payoff of
 
  What is the expected payoff of this game?
 
-.. code:: ipython3
+.. code:: ipython2
 
     payoff = lambda x: 10*(x.sum(1)>1.7)
     abs_tol = 1e-3
@@ -46,7 +46,7 @@ With ordinary Monte Carlo we do the following:
    \mu = \mathbb{E}(Y) = \int_{[0,1]^2} \text{payoff}(x_1,x_2) \,
    \mathrm{d} x_1 \mathrm{d}x_2
 
-.. code:: ipython3
+.. code:: ipython2
 
     distribution = Lattice(2)
     measure = Uniform(distribution)
@@ -59,28 +59,28 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4497         
+    Solution: 0.4501         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
-    	dimension       2
-    	scramble        1
-    	seed            None
-    	backend         gail
-    	mimics          StdUniform
+        dimension       2
+        randomize        1
+        seed            None
+        backend         gail
+        mimics          StdUniform
     Uniform (TrueMeasure Object)
-    	distrib_name    Lattice
-    	lower_bound     [ 0.000  0.000]
-    	upper_bound     [ 1.000  1.000]
+        distrib_name    Lattice
+        lower_bound     [ 0.000  0.000]
+        upper_bound     [ 1.000  1.000]
     CubQmcLatticeG (StoppingCriterion Object)
-    	abs_tol         0.0010
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
+        abs_tol         0.0010
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
     LDTransformData (AccumulateData Object)
-    	n_total         65536
-    	solution        0.4497
-    	r_lag           4
-    	time_integrate  0.0690
+        n_total         65536
+        solution        0.4501
+        r_lag           4
+        time_integrate  0.0555
 
 
 
@@ -106,7 +106,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
    \, \mathrm{d} x_1 \mathrm{d}x_2
    \end{align}
 
-.. code:: ipython3
+.. code:: ipython2
 
     p = 1
     distribution = Lattice(2)
@@ -120,32 +120,32 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Solution: 0.4501         
+    Solution: 2.5000         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
-    	dimension       2
-    	scramble        1
-    	seed            None
-    	backend         gail
-    	mimics          StdUniform
+        dimension       2
+        randomize        1
+        seed            None
+        backend         gail
+        mimics          StdUniform
     Uniform (TrueMeasure Object)
-    	distrib_name    Lattice
-    	lower_bound     [ 0.000  0.000]
-    	upper_bound     [ 1.000  1.000]
+        distrib_name    Lattice
+        lower_bound     [ 0.000  0.000]
+        upper_bound     [ 1.000  1.000]
     CubQmcLatticeG (StoppingCriterion Object)
-    	abs_tol         0.0010
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
+        abs_tol         0.0010
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
     LDTransformData (AccumulateData Object)
-    	n_total         16384
-    	solution        0.4501
-    	r_lag           4
-    	time_integrate  0.0180
+        n_total         1024
+        solution        2.5000
+        r_lag           4
+        time_integrate  0.0016
 
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     print('Imporance Sampling takes %.3f the time and %.3f the samples'%\
          (data2.time_integrate/data1.time_integrate,data2.n_total/data1.n_total))
@@ -153,7 +153,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.261 the time and 0.250 the samples
+    Imporance Sampling takes 0.028 the time and 0.016 the samples
 
 
 Asian Call Option Example
@@ -230,7 +230,7 @@ Finally note that
 This drift in the Brownian motion may be implemented by changing the
 ``mean_shift_is`` input to the ``BrownianMotion`` object.
 
-.. code:: ipython3
+.. code:: ipython2
 
     abs_tol = 1e-2
     dimension = 32
@@ -247,7 +247,7 @@ This drift in the Brownian motion may be implemented by changing the
 Vanilla Monte Carlo
 ~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: ipython2
 
     distribution = Sobol(dimension)
     measure = BrownianMotion(distribution)
@@ -260,40 +260,40 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7862         
+    Solution: 1.7956         
     AsianCall (Integrand Object)
-    	volatility      0.5000
-    	start_price     30
-    	strike_price    35
-    	interest_rate   0
-    	mean_type       arithmetic
-    	dimensions      32
-    	dim_fracs       0
+        volatility      0.5000
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        mean_type       arithmetic
+        dimensions      32
+        dim_fracs       0
     Sobol (DiscreteDistribution Object)
-    	dimension       32
-    	scramble        1
-    	seed            1509933022
-    	backend         qrng
-    	mimics          StdUniform
-    	graycode        0
+        dimension       32
+        randomize        1
+        seed            3599842736
+        backend         qrng
+        mimics          StdUniform
+        graycode        0
     BrownianMotion (TrueMeasure Object)
-    	distrib_name    Sobol
-    	time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
-    	mean_shift_is   0
+        distrib_name    Sobol
+        time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
+        mean_shift_is   0
     CubQmcSobolG (StoppingCriterion Object)
-    	abs_tol         0.0100
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
+        abs_tol         0.0100
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
     LDTransformData (AccumulateData Object)
-    	n_total         16384
-    	solution        1.7862
-    	r_lag           4
-    	time_integrate  0.1261
+        n_total         16384
+        solution        1.7956
+        r_lag           4
+        time_integrate  0.1668
 
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     plt_bm_is(measure)
 
@@ -305,7 +305,7 @@ Vanilla Monte Carlo
 Monte Carlo with Importance Sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: ipython2
 
     mean_shift_is = 1
     distribution = Sobol(dimension)
@@ -319,40 +319,40 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7821         
+    Solution: 1.8036         
     AsianCall (Integrand Object)
-    	volatility      0.5000
-    	start_price     30
-    	strike_price    35
-    	interest_rate   0
-    	mean_type       arithmetic
-    	dimensions      32
-    	dim_fracs       0
+        volatility      0.5000
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        mean_type       arithmetic
+        dimensions      32
+        dim_fracs       0
     Sobol (DiscreteDistribution Object)
-    	dimension       32
-    	scramble        1
-    	seed            701292896
-    	backend         qrng
-    	mimics          StdUniform
-    	graycode        0
+        dimension       32
+        randomize        1
+        seed            2476879446
+        backend         qrng
+        mimics          StdUniform
+        graycode        0
     BrownianMotion (TrueMeasure Object)
-    	distrib_name    Sobol
-    	time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
-    	mean_shift_is   1
+        distrib_name    Sobol
+        time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
+        mean_shift_is   1
     CubQmcSobolG (StoppingCriterion Object)
-    	abs_tol         0.0100
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
+        abs_tol         0.0100
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
     LDTransformData (AccumulateData Object)
-    	n_total         4096
-    	solution        1.7821
-    	r_lag           4
-    	time_integrate  0.0303
+        n_total         4096
+        solution        1.8036
+        r_lag           4
+        time_integrate  0.0365
 
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     plt_bm_is(measure)
 
@@ -361,7 +361,7 @@ Monte Carlo with Importance Sampling
 .. image:: importance_sampling_files/importance_sampling_16_0.png
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     print('Imporance Sampling takes %.3f the time and %.3f the samples'%\
          (data2.time_integrate/data1.time_integrate,data2.n_total/data1.n_total))
@@ -369,7 +369,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.240 the time and 0.250 the samples
+    Imporance Sampling takes 0.219 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -381,7 +381,7 @@ Importance Sampling MC vs QMC
 -  abs\_tol = .025
 -  trials = 3
 
-.. code:: ipython3
+.. code:: ipython2
 
     df = pd.read_csv('../outputs/mc_vs_qmc/importance_sampling.csv')
     df['Problem'] = df['Stopping Criterion'] + ' ' + df['Distribution'] + ' (' + df['MC/QMC'] + ')'
@@ -511,7 +511,7 @@ Importance Sampling MC vs QMC
 
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
     idx = arange(len(problems))
@@ -540,7 +540,7 @@ Importance Sampling MC vs QMC
 .. image:: importance_sampling_files/importance_sampling_20_0.png
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(22, 8))
     df_samples.apply(lambda row: ax[0].plot(mean_shifts,log(row.n),label=row['Problem']),axis=1)

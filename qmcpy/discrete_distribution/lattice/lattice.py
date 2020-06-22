@@ -14,7 +14,7 @@ class Lattice(DiscreteDistribution):
     >>> l
     Lattice (DiscreteDistribution Object)
         dimension       2
-        scramble        1
+        randomize       1
         seed            7
         backend         gail
         mimics          StdUniform
@@ -29,10 +29,10 @@ class Lattice(DiscreteDistribution):
            [ 0.063,  0.848,  0.603],
            [ 0.813,  0.598,  0.353],
            [ 0.313,  0.098,  0.853]])
-    >>> Lattice(dimension=2,scramble=False,backend='GAIL').gen_samples(n_min=2,n_max=4)
+    >>> Lattice(dimension=2,randomize=False,backend='GAIL').gen_samples(n_min=2,n_max=4)
     array([[ 0.250,  0.250],
            [ 0.750,  0.750]])
-    >>> Lattice(dimension=2,scramble=False,backend='MPS').gen_samples(n_min=2,n_max=4)
+    >>> Lattice(dimension=2,randomize=False,backend='MPS').gen_samples(n_min=2,n_max=4)
     array([[ 0.250,  0.250],
            [ 0.750,  0.750]])
 
@@ -58,18 +58,18 @@ class Lattice(DiscreteDistribution):
         R Cools, FY Kuo, D Nuyens -  SIAM J. Sci. Comput., 28(6), 2162-2188.
     """
 
-    parameters = ['dimension','scramble','seed','backend','mimics']
+    parameters = ['dimension','randomize','seed','backend','mimics']
     
-    def __init__(self, dimension=1, scramble=True, seed=None, backend='GAIL'):
+    def __init__(self, dimension=1, randomize=True, seed=None, backend='GAIL'):
         """
         Args:
             dimension (int): dimension of samples
-            scramble (bool): If True, apply unique scramble to each replication     
+            randomize (bool): If True, apply shift to generated samples    
             seed (int): seed the random number generator for reproducibility
             backend (str): backend generator
         """
         self.dimension = dimension
-        self.scramble = scramble
+        self.randomize = randomize
         self.seed = seed
         self.backend = backend.lower()            
         if self.backend == 'gail':
@@ -103,7 +103,7 @@ class Lattice(DiscreteDistribution):
         if not (n_min == 0 or n_min == float(n_max)/2):
             raise ParameterError("n_min must be 0 or n_max/2")
         x_lat = self.backend_gen(n_min,n_max,self.dimension)
-        if self.scramble: # apply random shift to samples
+        if self.randomize: # apply random shift to samples
             x_lat = (x_lat + self.shift)%1
         return x_lat
     

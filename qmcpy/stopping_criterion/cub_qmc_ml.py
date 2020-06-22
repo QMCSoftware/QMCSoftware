@@ -30,7 +30,7 @@ class CubQmcMl(StoppingCriterion):
         b               85
     Lattice (DiscreteDistribution Object)
         dimension       64
-        scramble        1
+        randomize       1
         seed            854306
         backend         gail
         mimics          StdUniform

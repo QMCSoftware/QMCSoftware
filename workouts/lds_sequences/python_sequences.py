@@ -19,31 +19,31 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
         # Lattice Magic Point Shop
         t0 = time()
         for trial in range(trials):
-            distribution = Lattice(dimension, scramble=False, seed=7, backend='MPS')
+            distribution = Lattice(dimension, randomize=False, seed=7, backend='MPS')
             x = distribution.gen_samples(n_min=0,n_max=n)
         row_i['L_MPS_t'] = (time() - t0) / trials
         # Lattice GAIL
         t0 = time()
         for trial in range(trials):
-            distribution = Lattice(dimension, scramble=False, seed=7, backend='GAIL')
+            distribution = Lattice(dimension, randomize=False, seed=7, backend='GAIL')
             x = distribution.gen_samples(n_min=0,n_max=n)
         row_i['L_GAIL_t'] = (time() - t0) / trials
         # Sobol QRNG Natural Ordering
         t0 = time()
         for trial in range(trials):
-            distribution = Sobol(dimension, scramble=False, seed=7, backend='QRNG', graycode=False)
+            distribution = Sobol(dimension, randomize=False, seed=7, backend='QRNG', graycode=False)
             distribution.gen_samples(n_min=0,n_max=n)
         row_i['S_QRNG_n_t'] = (time() - t0) / trials
         # Sobol QRNG Graycode Ordering
         t0 = time()
         for trial in range(trials):
-            distribution = Sobol(dimension, scramble=False, seed=7, backend='QRNG', graycode=True)
+            distribution = Sobol(dimension, randomize=False, seed=7, backend='QRNG', graycode=True)
             distribution.gen_samples(n_min=0,n_max=n)
         row_i['S_QRNG_gc_t'] = (time() - t0) / trials
         # Sobol Magic Point Shop
         t0 = time()
         for trial in range(trials):
-            distribution = Sobol(dimension, scramble=False, seed=7, backend='MPS')
+            distribution = Sobol(dimension, randomize=False, seed=7, backend='MPS')
             x = distribution.gen_samples(n_min=0,n_max=n)
         row_i['S_MPS_QMCPy_t'] = (time() - t0) / trials
         # Set and print results

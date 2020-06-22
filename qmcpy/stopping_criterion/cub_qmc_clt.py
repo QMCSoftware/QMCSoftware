@@ -25,7 +25,7 @@ class CubQmcClt(StoppingCriterion):
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       1
-        scramble        1
+        randomize       1
         seed            1092
         backend         gail
         mimics          StdUniform
@@ -81,8 +81,8 @@ class CubQmcClt(StoppingCriterion):
         allowed_levels = "single"
         allowed_distribs = ["Lattice", "Sobol"]
         super(CubQmcClt,self).__init__(distribution, allowed_levels, allowed_distribs)
-        if not distribution.scramble:
-            raise ParameterError("CLTRep requires distribution to have scramble=True")
+        if not distribution.randomize:
+            raise ParameterError("CLTRep requires distribution to have randomize=True")
         # Construct AccumulateData Object to House Integration data
         self.data = MeanVarDataRep(self, integrand, self.n_init, replications)
         

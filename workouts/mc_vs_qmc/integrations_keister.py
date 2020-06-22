@@ -31,14 +31,14 @@ def cubmcg_iidstdgaussian(dimension, abs_tol, rel_tol):
     return data
 
 def cubqmcclt_lattice(dimension, abs_tol, rel_tol):
-    distribution = Lattice(dimension, scramble=True, seed=7, backend="MPS")
+    distribution = Lattice(dimension, randomize=True, seed=7, backend="MPS")
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQmcClt(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def cubqmcclt_sobol(dimension, abs_tol, rel_tol):
-    distribution = Sobol(dimension, scramble=True, seed=7, backend="QRNG")
+    distribution = Sobol(dimension, randomize=True, seed=7, backend="QRNG")
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQmcClt(integrand, abs_tol, rel_tol).integrate()

@@ -1,7 +1,7 @@
 QMCPy Quickstart
 ================
 
-.. code:: ipython3
+.. code:: ipython2
 
     from qmcpy import *
     import numpy as np
@@ -10,7 +10,7 @@ Suppose we are interested in calculating
 
 .. math:: \mathbb{E}[keister(x)] = \mathbb{E}[\pi^{d/2} \cos(||x_j||_2)] \text{ for } x \sim \mathcal{N}(0,\frac{1}{2})^d
 
-.. code:: ipython3
+.. code:: ipython2
 
     dimension = 2
     true_value = 1.808186429263620
@@ -21,27 +21,27 @@ Suppose we are interested in calculating
         #    d dimensions
         d = x.shape[1]
         norm_x = np.sqrt((x**2).sum(1)) # equivalent to np.linalg.norm(x,2,axis=1)
-        k = np.pi**(d/2)*np.cos(norm_x)
+        k = np.pi**(d/2.)*np.cos(norm_x)
         return k # k.shape should be n or nx1
 
 Step 1: Discete Distribution which generates samples
 ----------------------------------------------------
 
-.. code:: ipython3
+.. code:: ipython2
 
     discrete_distribution = Lattice(dimension)
 
 Step 2: True Measure which transforms the Integrand to accept the Discrete Distribution
 ---------------------------------------------------------------------------------------
 
-.. code:: ipython3
+.. code:: ipython2
 
-    true_measure = Gaussian(discrete_distribution, mean=0, covariance=1/2)
+    true_measure = Gaussian(discrete_distribution, mean=0, covariance=1./2)
 
 Step 3: Integrand where samples should mimic the True Measure
 -------------------------------------------------------------
 
-.. code:: ipython3
+.. code:: ipython2
 
     integrand = CustomFun(true_measure, custom_fun=keister)
     # or integrand = Keister(true_measure) using QMCPy Keister class
@@ -49,18 +49,18 @@ Step 3: Integrand where samples should mimic the True Measure
 Step 4: Stopping Criterion that controls integration process
 ------------------------------------------------------------
 
-.. code:: ipython3
+.. code:: ipython2
 
     stopping_criterion = CubQmcLatticeG(integrand, abs_tol)
 
 Step 5: Integrate
 -----------------
 
-.. code:: ipython3
+.. code:: ipython2
 
     solution,data = stopping_criterion.integrate()
     print(data)
-    print('Within absolute tolerance:',abs(solution-true_value) < abs_tol)
+    print('Within absolute tolerance: %s'%(abs(solution-true_value) < abs_tol))
 
 
 .. parsed-literal::
@@ -68,45 +68,44 @@ Step 5: Integrate
     Solution: 1.8082         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
-    	dimension       2
-    	scramble        1
-    	seed            None
-    	backend         gail
-    	mimics          StdUniform
+        dimension       2
+        randomize        1
+        seed            None
+        backend         gail
+        mimics          StdUniform
     Gaussian (TrueMeasure Object)
-    	distrib_name    Lattice
-    	mean            0
-    	covariance      0.5000
+        distrib_name    Lattice
+        mean            0
+        covariance      0.5000
     CubQmcLatticeG (StoppingCriterion Object)
-    	abs_tol         0.0001
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
+        abs_tol         0.0001
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
     LDTransformData (AccumulateData Object)
-    	n_total         65536
-    	solution        1.8082
-    	r_lag           4
-    	time_integrate  0.0667
-    
+        n_total         65536
+        solution        1.8082
+        r_lag           4
+        time_integrate  0.1046
     Within absolute tolerance: True
 
 
 Condensed Problem
 -----------------
 
-.. code:: ipython3
+.. code:: ipython2
 
     # solution,data =  StoppingCriterion(Integrand(TrueMeasure(DiscreteDistribution(dimension)))).integrate()
     solution,data = CubQmcLatticeG( # stopping criterion
                         CustomFun( # integrand: QuickConstruct takes a function handle as its 2nd input
                             Gaussian( # true measure
                                 Lattice(dimension), # discrete distribution
-                                covariance=1/2), # gaussian true measure attribute
+                                covariance=1./2), # gaussian true measure attribute
                             keister), # function handle
                         abs_tol
                     ).integrate()
     print(data)
-    print('Within absolute tolerance:',abs(solution-true_value) < abs_tol)
+    print('Within absolute tolerance: %s'%(abs(solution-true_value) < abs_tol))
 
 
 .. parsed-literal::
@@ -114,26 +113,25 @@ Condensed Problem
     Solution: 1.8082         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
-    	dimension       2
-    	scramble        1
-    	seed            None
-    	backend         gail
-    	mimics          StdUniform
+        dimension       2
+        randomize        1
+        seed            None
+        backend         gail
+        mimics          StdUniform
     Gaussian (TrueMeasure Object)
-    	distrib_name    Lattice
-    	mean            0
-    	covariance      0.5000
+        distrib_name    Lattice
+        mean            0
+        covariance      0.5000
     CubQmcLatticeG (StoppingCriterion Object)
-    	abs_tol         0.0001
-    	rel_tol         0
-    	n_init          1024
-    	n_max           34359738368
+        abs_tol         0.0001
+        rel_tol         0
+        n_init          1024
+        n_max           34359738368
     LDTransformData (AccumulateData Object)
-    	n_total         65536
-    	solution        1.8082
-    	r_lag           4
-    	time_integrate  0.0690
-    
+        n_total         65536
+        solution        1.8082
+        r_lag           4
+        time_integrate  0.0631
     Within absolute tolerance: True
 
 

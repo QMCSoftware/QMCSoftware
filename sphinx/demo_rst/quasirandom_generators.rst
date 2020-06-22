@@ -1,7 +1,7 @@
 Quasi-Random Sequence Generator Comparison
 ==========================================
 
-.. code:: ipython3
+.. code:: ipython2
 
     from qmcpy import *
     
@@ -35,12 +35,12 @@ General Lattice & Sobol Generator Usage
 The following example uses the ``Lattice`` object to generate samples.
 The same code works when replacing ``Lattice`` with ``Sobol``
 
-.. code:: ipython3
+.. code:: ipython2
 
     # Unshifted Samples
-    lattice = Lattice(dimension=2, scramble=False, seed=7, backend='MPS')
+    lattice = Lattice(dimension=2, randomize=False, seed=7, backend='MPS')
     unshifted_samples = lattice.gen_samples(n_min=0,n_max=4)
-    print('Shape:',unshifted_samples.shape)
+    print('Shape: %s'%str(unshifted_samples.shape))
     print('Samples:\n'+str(unshifted_samples))
 
 
@@ -50,16 +50,16 @@ The same code works when replacing ``Lattice`` with ``Sobol``
     Samples:
     [[0.   0.  ]
      [0.5  0.5 ]
-     [0.25 0.75]
-     [0.75 0.25]]
+     [0.25 0.25]
+     [0.75 0.75]]
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     # Shifted Samples
-    lattice = Lattice(dimension=2, scramble=True, seed=7, backend='GAIL')
+    lattice = Lattice(dimension=2, randomize=True, seed=7, backend='GAIL')
     shifted_samples = lattice.gen_samples(n_min=4, n_max=8)
-    print('Shape:',shifted_samples.shape)
+    print('Shape: %s'%str(shifted_samples.shape))
     print('Samples:\n'+str(shifted_samples))
 
 
@@ -82,7 +82,7 @@ comparison with MATLAB when generating 1 dimensional
 unshifted/unscrambled sequences. Note that the generators are
 reinitialized before every trial. <br
 
-.. code:: ipython3
+.. code:: ipython2
 
     # Load AccumulateData
     df_py = pd.read_csv('../outputs/lds_sequences/python_sequences.csv')
@@ -93,7 +93,7 @@ reinitialized before every trial. <br
     df_r.columns = ['n','r_s']
     df_r.reset_index(drop=True, inplace=True)
 
-.. code:: ipython3
+.. code:: ipython2
 
     # Lattice DataFrame
     df_l = pd.concat([df_py['n'], df_py['py_l_MPS'], df_py['py_l_GAIL'],df_m['m_l']], axis=1)
@@ -261,7 +261,7 @@ reinitialized before every trial. <br
 
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     # Sobol DataFrame
     df_s = pd.concat([df_py['n'], df_py['py_s_QRNG_n'], df_py['py_s_QRNG_gc'], df_py['py_s_MPS_QMCPy'], df_m['m_s'], df_r['r_s']], axis=1)
@@ -473,7 +473,7 @@ reinitialized before every trial. <br
 
 
 
-.. code:: ipython3
+.. code:: ipython2
 
     # Plot AccumulateData
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))

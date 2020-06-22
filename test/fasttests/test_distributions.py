@@ -65,12 +65,12 @@ class TestLattice(unittest.TestCase):
     """ Unit tests for Lattice DiscreteDistribution. """
 
     def test_mimics(self):
-        distribution = Lattice(dimension=3, scramble=True, backend='MPS')
+        distribution = Lattice(dimension=3, randomize=True, backend='MPS')
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
         for backend in ['MPS','GAIL']:
-            distribution = Lattice(dimension=3, scramble=True, backend=backend)
+            distribution = Lattice(dimension=3, randomize=True, backend=backend)
             samples = distribution.gen_samples(n_min=4, n_max=8)
             with self.subTest():
                 self.assertEqual(type(samples), ndarray)
@@ -78,7 +78,7 @@ class TestLattice(unittest.TestCase):
                 self.assertEqual(samples.shape, (4,3))
 
     def test_mps_correctness(self):
-        distribution = Lattice(dimension=4, scramble=False, backend='MPS')
+        distribution = Lattice(dimension=4, randomize=False, backend='MPS')
         true_sample = array([
             [1./8,   5./8,    1./8,    5./8],
             [3./8,   7./8,    3./8,    7./8],
@@ -87,7 +87,7 @@ class TestLattice(unittest.TestCase):
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
 
     def test_gail_correctness(self):
-        distribution = Lattice(dimension=4, scramble=False, backend='GAIL')
+        distribution = Lattice(dimension=4, randomize=False, backend='GAIL')
         true_sample = array([
             [1./8,   5./8,    1./8,    5./8],
             [5./8,   1./8,    5./8,    1./8],
@@ -108,12 +108,12 @@ class TestSobol(unittest.TestCase):
     """ Unit tests for Sobol DiscreteDistribution. """
 
     def test_mimics(self):
-        distribution = Sobol(dimension=3, scramble=True, backend='QRNG')
+        distribution = Sobol(dimension=3, randomize=True, backend='QRNG')
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
         for backend in ['QRNG','MPS']:
-            distribution = Sobol(dimension=3, scramble=True, backend=backend)
+            distribution = Sobol(dimension=3, randomize=True, backend=backend)
             samples = distribution.gen_samples(n_min=4, n_max=8)
             with self.subTest():
                 self.assertEqual(type(samples), ndarray)
@@ -129,7 +129,7 @@ class TestSobol(unittest.TestCase):
                 self.assertTrue(samples.shape==(4,3))
     
     def test_qrng_graycode_ordering(self):
-        s = Sobol(2,scramble=False,backend='qrng',graycode=True)
+        s = Sobol(2,randomize=False,backend='qrng',graycode=True)
         x = s.gen_samples(n_min=4,n_max=8)
         x_true = array([
             [ 0.375,  0.375],
@@ -139,7 +139,7 @@ class TestSobol(unittest.TestCase):
         self.assertTrue((x==x_true).all())
 
     def test_qrng_natural_ordering(self):
-        s = Sobol(2,scramble=False,backend='qrng',graycode=False)
+        s = Sobol(2,randomize=False,backend='qrng',graycode=False)
         x = s.gen_samples(n_min=4,n_max=8)
         x_true = array([
             [ 0.125,  0.625],

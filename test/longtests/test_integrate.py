@@ -39,7 +39,7 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        distribution = Sobol(dimension=2, scramble=True, backend='QRNG', seed=7)
+        distribution = Sobol(dimension=2, randomize=True, backend='QRNG', seed=7)
         measure = Lebesgue(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = CustomFun(measure, lambda x: (x.prod(1))**3)
         solution,data = CubQmcSobolG(integrand, abs_tol=abs_tol).integrate()
@@ -68,7 +68,7 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        distribution = Lattice(dimension=2, scramble=True, backend='MPS')
+        distribution = Lattice(dimension=2, randomize=True, backend='MPS')
         measure = Uniform(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = CustomFun(measure, lambda x: (x.prod(1))**3)
         solution,data = CubQmcClt(integrand, abs_tol=abs_tol).integrate()
@@ -85,7 +85,7 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [0.5, 1, 1.5]
         for i in range(len(dimensions)):
-            distribution = Sobol(dimension=dimensions[i], scramble=True, backend='QRNG')
+            distribution = Sobol(dimension=dimensions[i], randomize=True, backend='QRNG')
             measure = Uniform(distribution)
             integrand = Linear(measure)
             solution,data = CubQmcClt(integrand, abs_tol=abs_tol).integrate()
@@ -123,7 +123,7 @@ class IntegrationExampleTest(unittest.TestCase):
         for i in range(2):
             a_i = a_list[i]
             b_i = b_list[i]
-            distribution = Lattice(dimension=1, scramble=True, backend='GAIL')
+            distribution = Lattice(dimension=1, randomize=True, backend='GAIL')
             measure = Uniform(distribution)
             integrand = CustomFun(measure, lambda x, a=a_i, b=b_i: b * (x - a) ** 2)
             solution,data = CubQmcLatticeG(integrand, abs_tol=abs_tol).integrate()

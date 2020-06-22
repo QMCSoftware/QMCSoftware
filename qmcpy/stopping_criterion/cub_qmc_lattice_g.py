@@ -25,7 +25,7 @@ class CubQmcLatticeG(StoppingCriterion):
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2
-        scramble        1
+        randomize       1
         seed            7
         backend         gail
         mimics          StdUniform
@@ -103,8 +103,8 @@ class CubQmcLatticeG(StoppingCriterion):
         allowed_levels = 'single'
         allowed_distribs = ["Lattice"]
         super(CubQmcLatticeG,self).__init__(distribution, allowed_levels, allowed_distribs)
-        if not distribution.scramble:
-            raise ParameterError("CubLattice_g requires distribution to have scramble=True")
+        if not distribution.randomize:
+            raise ParameterError("CubLattice_g requires distribution to have randomize=True")
         if distribution.backend != 'gail':
             raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
         # Construct AccumulateData Object to House Integration data

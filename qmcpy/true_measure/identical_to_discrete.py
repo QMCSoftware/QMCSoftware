@@ -8,7 +8,7 @@ class IdentitalToDiscrete(TrueMeasure):
     AKA: when g, the original integrand, and f, the transformed integrand are such that: 
     g(x) = f(x) for x ~ DiscreteDistribution
     
-    >>> dd = Sobol(2,seed=7,scramble=False,graycode=False)
+    >>> dd = Sobol(2,seed=7,randomize=False,graycode=False)
     >>> itd = IdentitalToDiscrete(dd)
     >>> itd.gen_mimic_samples(4)
     array([[ 0.000,  0.000],
