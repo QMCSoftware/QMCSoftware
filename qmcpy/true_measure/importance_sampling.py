@@ -9,7 +9,7 @@ class ImportanceSampling(TrueMeasure):
     """
     Define
         - m(x) is pdf of measure we do not know how to generate from (mystery) 
-        - k(x) is pdf of measure we can generate discrete distribution samples from (known)
+        - k(x) is the pdf of the continuous distribution which the discrete distribution mimics (known)
     
     >>> def quarter_circle_uniform_pdf(x):
     ...     x1,x2 = x

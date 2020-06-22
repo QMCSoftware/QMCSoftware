@@ -29,7 +29,7 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
 
     Define
         - m(x) is pdf of measure we do not know how to generate from (mystery)
-        - k(x) is pdf of measure we can generate discrete distribution samples from (known)
+        - k(x) is the pdf of the continuous distribution which the discrete distribution mimics (known)
     
     Prodecure 
         1. samples s_i from k(x)
