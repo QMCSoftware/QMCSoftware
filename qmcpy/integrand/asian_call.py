@@ -25,7 +25,7 @@ class AsianCall(Integrand):
     1.7638343801580052
 
     >>> dd2 = Sobol(seed=7)
-    >>> m2 = BrownianMotion(dd2,mean_shift_is=1)
+    >>> m2 = BrownianMotion(dd2,drift=1)
     >>> level_dims = [2,4,8]
     >>> ac2 = AsianCall(m2,multi_level_dimensions=level_dims)
     >>> ac2

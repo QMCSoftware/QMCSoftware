@@ -2,58 +2,58 @@
 
 from qmcpy import *
 
-def cubmcclt_iidstduniform(dimension, abs_tol, mean_shift_is):
+def cubmcclt_iidstduniform(dimension, abs_tol, drift):
     distribution = IIDStdUniform(dimension,seed=7)
-    measure = BrownianMotion(distribution, mean_shift_is)
+    measure = BrownianMotion(distribution, drift)
     integrand = AsianCall(measure)
     solution,data = CubMcClt(integrand, abs_tol).integrate()
     return data
 
-def cubmcclt_iidstdgaussian(dimension, abs_tol, mean_shift_is):
+def cubmcclt_iidstdgaussian(dimension, abs_tol, drift):
     distribution = IIDStdGaussian(dimension,seed=7)
-    measure = BrownianMotion(distribution, mean_shift_is)
+    measure = BrownianMotion(distribution, drift)
     integrand = AsianCall(measure)
     solution,data = CubMcClt(integrand, abs_tol).integrate()
     return data
 
-def cubmcg_iidstduniform(dimension, abs_tol, mean_shift_is):
+def cubmcg_iidstduniform(dimension, abs_tol, drift):
     distribution = IIDStdUniform(dimension,seed=7)
-    measure = BrownianMotion(distribution, mean_shift_is)
+    measure = BrownianMotion(distribution, drift)
     integrand = AsianCall(measure)
     solution,data = CubMcG(integrand, abs_tol).integrate()
     return data
 
-def cubmcg_iidstdgaussian(dimension, abs_tol, mean_shift_is):
+def cubmcg_iidstdgaussian(dimension, abs_tol, drift):
     distribution = IIDStdGaussian(dimension,seed=7)
-    measure = BrownianMotion(distribution, mean_shift_is)
+    measure = BrownianMotion(distribution, drift)
     integrand = AsianCall(measure)
     solution,data = CubMcG(integrand, abs_tol).integrate()
     return data
 
-def cubqmcclt_lattice(dimension, abs_tol, mean_shift_is):
+def cubqmcclt_lattice(dimension, abs_tol, drift):
     distribution = Lattice(dimension, seed=7, backend="MPS")
-    measure = BrownianMotion(distribution, mean_shift_is)
+    measure = BrownianMotion(distribution, drift)
     integrand = AsianCall(measure)
     solution,data = CubQmcClt(integrand, abs_tol).integrate()
     return data
 
-def cubqmcclt_sobol(dimension, abs_tol, mean_shift_is):
+def cubqmcclt_sobol(dimension, abs_tol, drift):
     distribution = Sobol(dimension, seed=7, backend="QRNG")
-    measure = BrownianMotion(distribution, mean_shift_is)
+    measure = BrownianMotion(distribution, drift)
     integrand = AsianCall(measure)
     solution,data = CubQmcClt(integrand, abs_tol).integrate()
     return data
 
-def cubqmclatticeg(dimension, abs_tol, mean_shift_is):
+def cubqmclatticeg(dimension, abs_tol, drift):
     distribution = Lattice(dimension, seed=7, backend="GAIL")
-    measure = BrownianMotion(distribution, mean_shift_is)
+    measure = BrownianMotion(distribution, drift)
     integrand = AsianCall(measure)
     solution,data = CubQmcLatticeG(integrand, abs_tol,).integrate()
     return data
 
-def cubqmcsobolg(dimension, abs_tol, mean_shift_is):
+def cubqmcsobolg(dimension, abs_tol, drift):
     distribution = Sobol(dimension, seed=7, backend="QRNG")
-    measure = BrownianMotion(distribution, mean_shift_is)
+    measure = BrownianMotion(distribution, drift)
     integrand = AsianCall(measure)
     solution,data = CubQmcSobolG(integrand, abs_tol).integrate()
     return data

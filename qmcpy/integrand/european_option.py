@@ -9,7 +9,7 @@ from scipy.stats import norm
 class EuropeanOption(Integrand):
     """
     >>> dd = Sobol(4,seed=7)
-    >>> m = BrownianMotion(dd,mean_shift_is=-1)
+    >>> m = BrownianMotion(dd,drift=-1)
     >>> eo = EuropeanOption(m,call_put='put')
     >>> eo
     EuropeanOption (Integrand Object)
