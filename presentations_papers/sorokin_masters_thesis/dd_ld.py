@@ -1,0 +1,36 @@
+''' Code '''
+from qmcpy import *
+x_l = Lattice(dimension=2, backend="GAIL", randomize=True, seed=7).gen_samples(2**7)
+x_s = Sobol(dimension=2, backend="QRNG", randomize=True, seed=7).gen_samples(2**7)
+x_h = Halton(dimension=2, generalize=True, seed=7).gen_samples(2**7) 
+x_k = Korobov(dimension=2, generator=[7,13], randomize=True, seed=7).gen_samples(2**7)
+''' Plots '''
+from matplotlib import pyplot
+pyplot.rc('font', size=11)
+pyplot.rc('axes', titlesize=11)
+pyplot.rc('axes', labelsize=11)
+pyplot.rc('xtick', labelsize=11)
+pyplot.rc('ytick', labelsize=11)
+pyplot.rc('legend', fontsize=11)
+pyplot.rc('figure', titlesize=11)
+fig,ax = pyplot.subplots(nrows=1, ncols=4, figsize=(20,5.1))
+ax[0].scatter(x_l[:,0],x_l[:,1],color='r')
+ax[0].set_title('Shifted Lattice')
+ax[1].scatter(x_s[:,0],x_s[:,1],color='g')
+ax[1].set_title("Shifted Sobol'")
+ax[2].scatter(x_h[:,0],x_h[:,1],color='b')
+ax[2].set_title('Generalized Halton')
+ax[3].scatter(x_k[:,0],x_k[:,1],color='m')
+ax[3].set_title('Randomized Korobov')
+# meta info
+for i in range(4):
+    ax[i].set_xlim([0,1])
+    ax[i].set_xticks([0,1])
+    ax[i].set_ylim([0,1])
+    ax[i].set_yticks([0,1])
+    ax[i].set_aspect(1)
+    ax[i].set_xlabel('$x_{i1}$')
+    ax[i].set_ylabel('$x_{i2}$')
+pyplot.tight_layout()
+pyplot.savefig('presentations_papers/sorokin_masters_thesis/figs/dd_ld.png',dpi=250)
+pyplot.show()

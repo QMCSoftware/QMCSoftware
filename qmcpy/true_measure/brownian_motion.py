@@ -16,7 +16,7 @@ class BrownianMotion(TrueMeasure):
     BrownianMotion (TrueMeasure Object)
         distrib_name    Sobol
         time_vector     [ 0.500  1.000]
-        drift   1
+        drift           1
     >>> bm.gen_mimic_samples(n_min=4,n_max=8)
     array([[ 1.254,  1.296],
            [ 0.241,  1.237],
@@ -27,7 +27,7 @@ class BrownianMotion(TrueMeasure):
     BrownianMotion (TrueMeasure Object)
         distrib_name    Sobol
         time_vector     [ 0.250  0.500  0.750  1.000]
-        drift   1
+        drift           1
     >>> bm.gen_mimic_samples(n_min=2,n_max=4)
     array([[ 0.559,  0.254,  0.632,  0.696],
            [-0.116,  0.304, -0.084,  0.694]])

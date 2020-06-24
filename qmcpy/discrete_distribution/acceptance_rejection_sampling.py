@@ -12,18 +12,21 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
     ...     density = float(16*x)/3 if x<1./4 else 4./3
     ...     return density
     >>> sampling_measure = Uniform(IIDStdUniform(1,seed=7))
-    >>> ars = AcceptanceRejectionSampling(objective_pdf=f,measure_to_sample_from=sampling_measure)
+    >>> ars = AcceptanceRejectionSampling(
+    ...     objective_pdf = f,
+    ...     measure_to_sample_from = sampling_measure,
+    ...     c_est_inflation_factor = 1)
     >>> ars
     AcceptanceRejectionSampling (DiscreteDistribution Object)
         dimension       1
         c               1.3333
     >>> x = ars.gen_samples(5)
     >>> x
-    array([[ 0.562],
-           [ 0.598],
-           [ 0.371],
-           [ 0.877],
-           [ 0.329]])
+    array([[ 0.575],
+           [ 0.604],
+           [ 0.144],
+           [ 0.848],
+           [ 0.129]])
     >>> x.shape
     (5, 1)
 
@@ -43,11 +46,16 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
 
     parameters = ['dimension','c']
 
-    def __init__(self, objective_pdf, measure_to_sample_from, draws_multiple=inf, inflate_c_factor=1):
+    def __init__(self, objective_pdf, measure_to_sample_from,\
+        c=None, c_est_draws=1024, c_est_inflation_factor=1.1, draws_multiple=inf):
         """
         Args:
             objective_pdf (function): pdf function of objective measure
             measure_to_sample_from (TrueMeasure): true measure we can sample from
+            c (float): c such that for any x in domain k(x)*c >= m(x). If not supplied c will be estimated 
+                based on following 2 inputs
+            c_est_draws (int): initial number of draws used to estimate c
+            c_est_inflation_factor (float): c-hat = (inflation factor)*max(m(x_i)/k(x_i)) for i=1,...,c_est_draws 
             draws_multiple (float): will raise exception if drawing over n*draws_multiple samples
                                     when trying to get n samples
             inflate_c_factor (float): c = possibly inflate c to avoid underestimating
@@ -64,12 +72,14 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
         if not ('IID' in type(self.distribution).__name__):
             raise TransformError('Acceptance rejection sampling only works with IID distributions.'+\
                                  'Make sure measure_to_samples_from has an IID distribution')
-        # approximate c
-        s = self.measure.gen_mimic_samples(256)
-        md = apply_along_axis(self.m,1,s).squeeze()
-        kd = apply_along_axis(self.k,1,s).squeeze()
-        self.c = max( (md/kd) )
-        super(AcceptanceRejectionSampling,self).__init__()
+        if c: # c known
+            self.c = c
+        else: # approximate c
+            s = self.measure.gen_mimic_samples(c_est_draws)
+            md = apply_along_axis(self.m,1,s).squeeze()
+            kd = apply_along_axis(self.k,1,s).squeeze()
+            self.c = c_est_inflation_factor*max( (md/kd) )
+            super(AcceptanceRejectionSampling,self).__init__()
 
     def gen_samples(self, n):
         """
