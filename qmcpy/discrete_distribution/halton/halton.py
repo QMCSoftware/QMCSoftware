@@ -1,7 +1,7 @@
-from ._discrete_distribution import DiscreteDistribution
-from .qrng import ghalton_qrng
+from .._discrete_distribution import DiscreteDistribution
+from ..qrng import ghalton_qrng
 from .owen_halton import rhalton
-from ..util import ParameterWarning, ParameterError
+from ...util import ParameterWarning, ParameterError
 import warnings
 from numpy import random
 

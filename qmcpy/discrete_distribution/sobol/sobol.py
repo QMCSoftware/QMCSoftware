@@ -69,7 +69,8 @@ class Sobol(DiscreteDistribution):
             dimension (int): dimension of samples
             randomize (bool): If True, apply digital shift to generated samples        
             seed (int): seed the random number generator for reproducibility
-            backend (str): backend generator
+            backend (str): backend generator must be either "QRNG" or "MPS". 
+                "QRNG" is significantly faster, supports optional randomization, and supports optional graycode ordering
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
         """
         self.dimension = dimension
