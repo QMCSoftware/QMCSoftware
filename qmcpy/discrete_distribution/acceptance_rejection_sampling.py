@@ -31,17 +31,17 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
     (5, 1)
 
     Define
-        - m(x) is pdf of measure we do not know how to generate from (mystery)
-        - k(x) is the pdf of the continuous distribution which the discrete distribution mimics (known)
+        - $\rho$(x) is pdf of measure we do not know how to generate from (mystery)
+        - $\nu$(x) is the pdf of the continuous distribution which the discrete distribution mimics (known)
     
     Prodecure 
-        1. samples s_i from k(x)
+        1. samples s_i from $\nu$(x)
         2. samples u_i from Uniform(0,1)
-        3. if u_i <= m(s_i)/(c*k(s_i)) ==> keep s_i
+        3. if u_i <= $\rho$(s_i)/(c*$\nu$(s_i)) ==> keep s_i
     
     Note: 
         this algorithm conservitively estimates c by taking 256 samples
-        and approximating c ~= inflate_c_factor*max(m(s_i)/k(s_i) for i=1,...512)
+        and approximating c ~= inflate_c_factor*max($\rho$(s_i)/$\nu$(s_i) for i=1,...512)
     """
 
     parameters = ['dimension','c']
@@ -52,10 +52,10 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
         Args:
             objective_pdf (function): pdf function of objective measure
             measure_to_sample_from (TrueMeasure): true measure we can sample from
-            c (float): c such that for any x in domain k(x)*c >= m(x). If not supplied c will be estimated 
+            c (float): c such that for any x in domain $\nu$(x)*c >= $\rho$(x). If not supplied c will be estimated 
                 based on following 2 inputs
             c_est_draws (int): initial number of draws used to estimate c
-            c_est_inflation_factor (float): c-hat = (inflation factor)*max(m(x_i)/k(x_i)) for i=1,...,c_est_draws 
+            c_est_inflation_factor (float): c-hat = (inflation factor)*max($\rho$(x_i)/$\nu$(x_i)) for i=1,...,c_est_draws 
             draws_multiple (float): will raise exception if drawing over n*draws_multiple samples
                                     when trying to get n samples
             inflate_c_factor (float): c = possibly inflate c to avoid underestimating

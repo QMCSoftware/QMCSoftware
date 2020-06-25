@@ -1,7 +1,7 @@
 QMCPy Quickstart
 ================
 
-.. code:: ipython2
+.. code:: ipython3
 
     from qmcpy import *
     import numpy as np
@@ -10,7 +10,7 @@ Suppose we are interested in calculating
 
 .. math:: \mathbb{E}[keister(x)] = \mathbb{E}[\pi^{d/2} \cos(||x_j||_2)] \text{ for } x \sim \mathcal{N}(0,\frac{1}{2})^d
 
-.. code:: ipython2
+.. code:: ipython3
 
     dimension = 2
     true_value = 1.808186429263620
@@ -27,21 +27,21 @@ Suppose we are interested in calculating
 Step 1: Discete Distribution which generates samples
 ----------------------------------------------------
 
-.. code:: ipython2
+.. code:: ipython3
 
     discrete_distribution = Lattice(dimension)
 
 Step 2: True Measure which transforms the Integrand to accept the Discrete Distribution
 ---------------------------------------------------------------------------------------
 
-.. code:: ipython2
+.. code:: ipython3
 
     true_measure = Gaussian(discrete_distribution, mean=0, covariance=1./2)
 
 Step 3: Integrand where samples should mimic the True Measure
 -------------------------------------------------------------
 
-.. code:: ipython2
+.. code:: ipython3
 
     integrand = CustomFun(true_measure, custom_fun=keister)
     # or integrand = Keister(true_measure) using QMCPy Keister class
@@ -49,14 +49,14 @@ Step 3: Integrand where samples should mimic the True Measure
 Step 4: Stopping Criterion that controls integration process
 ------------------------------------------------------------
 
-.. code:: ipython2
+.. code:: ipython3
 
-    stopping_criterion = CubQmcLatticeG(integrand, abs_tol)
+    stopping_criterion = CubQMCLatticeG(integrand, abs_tol)
 
 Step 5: Integrate
 -----------------
 
-.. code:: ipython2
+.. code:: ipython3
 
     solution,data = stopping_criterion.integrate()
     print(data)
@@ -77,7 +77,7 @@ Step 5: Integrate
         distrib_name    Lattice
         mean            0
         covariance      0.5000
-    CubQmcLatticeG (StoppingCriterion Object)
+    CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.0001
         rel_tol         0
         n_init          1024
@@ -86,17 +86,17 @@ Step 5: Integrate
         n_total         65536
         solution        1.8082
         r_lag           4
-        time_integrate  0.0726
+        time_integrate  0.0653
     Within absolute tolerance: True
 
 
 Condensed Problem
 -----------------
 
-.. code:: ipython2
+.. code:: ipython3
 
     # solution,data =  StoppingCriterion(Integrand(TrueMeasure(DiscreteDistribution(dimension)))).integrate()
-    solution,data = CubQmcLatticeG( # stopping criterion
+    solution,data = CubQMCLatticeG( # stopping criterion
                         CustomFun( # integrand: QuickConstruct takes a function handle as its 2nd input
                             Gaussian( # true measure
                                 Lattice(dimension), # discrete distribution
@@ -122,7 +122,7 @@ Condensed Problem
         distrib_name    Lattice
         mean            0
         covariance      0.5000
-    CubQmcLatticeG (StoppingCriterion Object)
+    CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.0001
         rel_tol         0
         n_init          1024
@@ -131,7 +131,7 @@ Condensed Problem
         n_total         65536
         solution        1.8082
         r_lag           4
-        time_integrate  0.0791
+        time_integrate  0.0652
     Within absolute tolerance: True
 
 

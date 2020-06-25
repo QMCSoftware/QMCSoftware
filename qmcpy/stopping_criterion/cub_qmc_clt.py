@@ -11,12 +11,12 @@ from time import time
 import warnings
 
 
-class CubQmcClt(StoppingCriterion):
+class CubQMCCLT(StoppingCriterion):
     """
     Stopping criterion based on Central Limit Theorem for multiple replications.
     
     >>> k = Keister(Gaussian(Lattice(seed=7),covariance=1./2))
-    >>> sc = CubQmcClt(k,abs_tol=.05)
+    >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
     1.3798619783658828
@@ -33,7 +33,7 @@ class CubQmcClt(StoppingCriterion):
         distrib_name    Lattice
         mean            0
         covariance      0.5000
-    CubQmcClt (StoppingCriterion Object)
+    CubQMCCLT (StoppingCriterion Object)
         inflate         1.2000
         alpha           0.0100
         abs_tol         0.0500
@@ -80,7 +80,7 @@ class CubQmcClt(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = "single"
         allowed_distribs = ["Lattice", "Sobol"]
-        super(CubQmcClt,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQMCCLT,self).__init__(distribution, allowed_levels, allowed_distribs)
         if not distribution.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
         # Construct AccumulateData Object to House Integration data

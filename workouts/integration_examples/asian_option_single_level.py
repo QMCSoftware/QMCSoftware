@@ -18,39 +18,39 @@ def asian_option_single_level(
     dimension = 64
     print(bar)
 
-    # CubMcClt
+    # CubMCCLT
     distribution = IIDStdGaussian(dimension, seed=7)
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = CubMcClt(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubMCCLT(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
-    # CubQmcClt
+    # CubQMCCLT
     distribution = Lattice(dimension, randomize=True, seed=7, backend='MPS')
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = CubQmcClt(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
-    # CubMcG
+    # CubMCG
     distribution = IIDStdGaussian(dimension, seed=7)
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = CubMcG(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubMCG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubQMCLatticeG
     distribution = Lattice(dimension=dimension, randomize=True, seed=7, backend='GAIL')
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = CubQmcLatticeG(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubQMCLatticeG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
-    # CubQmcSobolG
+    # CubQMCSobolG
     distribution = Sobol(dimension=dimension, randomize=True, seed=7, backend='QRNG')
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure, volatility, start_price, strike_price, interest_rate, mean_type)
-    solution,data = CubQmcSobolG(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubQMCSobolG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
 if __name__ == "__main__":

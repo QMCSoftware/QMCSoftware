@@ -1,7 +1,7 @@
 Scatter Plots of Samples
 ========================
 
-.. code:: ipython2
+.. code:: ipython3
 
     from copy import deepcopy
     from numpy import ceil, linspace, meshgrid, zeros, array, arange, random
@@ -22,7 +22,7 @@ Scatter Plots of Samples
     
     from qmcpy import *
 
-.. code:: ipython2
+.. code:: ipython3
 
     n = 128
 
@@ -31,7 +31,7 @@ IID Samples
 
 Visualize IID standard uniform and standard normal sampling points
 
-.. code:: ipython2
+.. code:: ipython3
 
     random.seed(7)
     discrete_distribs = [
@@ -65,7 +65,7 @@ LDS Samples
 
 Visualize shifted lattice and scrambled Sobol sampling points
 
-.. code:: ipython2
+.. code:: ipython3
 
     discrete_distribs = [
         Lattice(dimension=2, randomize=True, seed=7, backend='GAIL'),
@@ -100,7 +100,7 @@ Transform to the True Distribution
 Transform our Discrete Distribution samples to mimic various True
 Distributions
 
-.. code:: ipython2
+.. code:: ipython3
 
     def plot_tm_tranformed(tm_name, color, lim, measure, **kwargs):
         fig, ax = plt.subplots(nrows=1, ncols=4, figsize=(13, 5))
@@ -144,7 +144,7 @@ Distributions
         prefix = type(measure_obj).__name__
         fig.savefig("../outputs/sample_scatters/%s_tm_transform.png" % prefix, dpi=200,bbox_inches='tight')
 
-.. code:: ipython2
+.. code:: ipython3
 
     plot_tm_tranformed("$\\mathcal{U}\\,(0,1)^2$","b",[0, 1],Uniform)
 
@@ -153,7 +153,7 @@ Distributions
 .. image:: sample_scatter_plots_files/sample_scatter_plots_9_0.png
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     plot_tm_tranformed("$\\mathcal{N}\\,(0,1)^2$","r",[-2.5, 2.5],Gaussian)
 
@@ -162,7 +162,7 @@ Distributions
 .. image:: sample_scatter_plots_files/sample_scatter_plots_10_0.png
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     plot_tm_tranformed("Discretized BrownianMotion with time_vector = [.5 , 1]",
                        "g",[-2.5, 2.5],BrownianMotion)
@@ -178,7 +178,7 @@ Shift and Stretch the True Distribution
 Transform Sobol sequences to mimic non-standard Uniform and Gaussian
 measures
 
-.. code:: ipython2
+.. code:: ipython3
 
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(11, 6))
     u1_a, u1_b = 2, 4
@@ -216,14 +216,14 @@ measures
 Plots samples on a 2D Keister function
 --------------------------------------
 
-.. code:: ipython2
+.. code:: ipython3
 
     # Generate constants for 3d plot in following cell
     abs_tol = .5
     distribution = IIDStdGaussian(dimension=2, seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
-    solution,data = CubMcClt(integrand,abs_tol=abs_tol,rel_tol=0,n_init=16, n_max=1e10).integrate()
+    solution,data = CubMCCLT(integrand,abs_tol=abs_tol,rel_tol=0,n_init=16, n_max=1e10).integrate()
     print(data)
 
 
@@ -239,7 +239,7 @@ Plots samples on a 2D Keister function
         distrib_name    IIDStdGaussian
         mean            0
         covariance      0.5000
-    CubMcClt (StoppingCriterion Object)
+    CubMCCLT (StoppingCriterion Object)
         inflate         1.2000
         alpha           0.0100
         abs_tol         0.5000
@@ -252,10 +252,10 @@ Plots samples on a 2D Keister function
         n               50
         n_total         66
         confid_int      [ 1.358  2.393]
-        time_integrate  0.0008
+        time_integrate  0.0013
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     # Constants based on running the above CLT Example
     eps_list = [.5, .4, .3]

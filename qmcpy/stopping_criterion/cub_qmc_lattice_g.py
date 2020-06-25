@@ -9,14 +9,14 @@ from time import time
 import warnings
 
 
-class CubQmcLatticeG(StoppingCriterion):
+class CubQMCLatticeG(StoppingCriterion):
     """
     Stopping Criterion quasi-Monte Carlo method using rank-1 Lattices cubature over
     a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Fourier coefficients cone decay assumptions.
     
     >>> k = Keister(Gaussian(Lattice(2,seed=7),covariance=1./2))
-    >>> sc = CubQmcLatticeG(k,abs_tol=.05)
+    >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
     1.808134131740979
@@ -33,7 +33,7 @@ class CubQmcLatticeG(StoppingCriterion):
         distrib_name    Lattice
         mean            0
         covariance      0.5000
-    CubQmcLatticeG (StoppingCriterion Object)
+    CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.0500
         rel_tol         0
         n_init          1024
@@ -102,7 +102,7 @@ class CubQmcLatticeG(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
         allowed_distribs = ["Lattice"]
-        super(CubQmcLatticeG,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQMCLatticeG,self).__init__(distribution, allowed_levels, allowed_distribs)
         if not distribution.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
         if distribution.backend != 'gail':

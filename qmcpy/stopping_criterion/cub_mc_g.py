@@ -12,12 +12,12 @@ from time import time
 import warnings
 
 
-class CubMcG(StoppingCriterion):
+class CubMCG(StoppingCriterion):
     """
     Stopping Criterion with garunteed accuracy
 
     >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
-    >>> sc = CubMcG(k,abs_tol=.05)
+    >>> sc = CubMCG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
     1.803926962264685
@@ -32,7 +32,7 @@ class CubMcG(StoppingCriterion):
         distrib_name    IIDStdUniform
         mean            0
         covariance      0.5000
-    CubMcG (StoppingCriterion Object)
+    CubMCG (StoppingCriterion Object)
         inflate         1.2000
         alpha           0.0100
         abs_tol         0.0500
@@ -93,7 +93,7 @@ class CubMcG(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMcG,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubMCG,self).__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration data
         self.data = MeanVarData(self, integrand, self.n_init)  # house integration data
 

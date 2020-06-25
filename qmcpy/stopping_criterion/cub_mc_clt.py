@@ -10,12 +10,12 @@ from time import time
 import warnings
 
 
-class CubMcClt(StoppingCriterion):
+class CubMCCLT(StoppingCriterion):
     """
     Stopping criterion based on the Central Limit Theorem.
     
     >>> k = Keister(Gaussian(IIDStdGaussian(2,seed=7),covariance=1./2))
-    >>> sc = CubMcClt(k,abs_tol=.05)
+    >>> sc = CubMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
     1.834674149189029
@@ -30,7 +30,7 @@ class CubMcClt(StoppingCriterion):
         distrib_name    IIDStdGaussian
         mean            0
         covariance      0.5000
-    CubMcClt (StoppingCriterion Object)
+    CubMCCLT (StoppingCriterion Object)
         inflate         1.2000
         alpha           0.0100
         abs_tol         0.0500
@@ -48,7 +48,7 @@ class CubMcClt(StoppingCriterion):
     >>> ac = AsianCall(
     ...     measure = BrownianMotion(IIDStdGaussian()),
     ...     multi_level_dimensions = [2,4,8])
-    >>> sc = CubMcClt(ac,abs_tol=.05)
+    >>> sc = CubMCCLT(ac,abs_tol=.05)
     >>> solution,data = sc.integrate()
     """
 
@@ -76,7 +76,7 @@ class CubMcClt(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'multi'
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMcClt,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubMCCLT,self).__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration data
         self.data = MeanVarData(self, integrand, self.n_init)
 

@@ -7,7 +7,7 @@ function and the Asian put option payoff. To start, we import the
 ``qmcpy`` module and the function ``arrange()`` from ``numpy`` for
 generating evenly spaced discrete vectors in the examples.
 
-.. code:: ipython2
+.. code:: ipython3
 
     from qmcpy import *
     from numpy import arange
@@ -25,13 +25,13 @@ the Gaussian measure, and the Sobol distribution:
 -  Sobol discrete distribution:
    :math:`x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
-.. code:: ipython2
+.. code:: ipython3
 
     dim = 3
     distribution = Sobol(dimension=dim, randomize=True, seed=7, backend='QRNG')
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
-    solution,data = CubQmcSobolG(integrand,abs_tol=.05).integrate()
+    solution,data = CubQMCSobolG(integrand,abs_tol=.05).integrate()
     print(data)
 
 
@@ -50,7 +50,7 @@ the Gaussian measure, and the Sobol distribution:
         distrib_name    Sobol
         mean            0
         covariance      0.5000
-    CubQmcSobolG (StoppingCriterion Object)
+    CubQMCSobolG (StoppingCriterion Object)
         abs_tol         0.0500
         rel_tol         0
         n_init          1024
@@ -59,7 +59,7 @@ the Gaussian measure, and the Sobol distribution:
         n_total         1024
         solution        2.1718
         r_lag           4
-        time_integrate  0.0023
+        time_integrate  0.0029
 
 
 Arithmetic-Mean Asian Put Option: Single Level
@@ -86,7 +86,7 @@ defined as follows:
 -  Lattice discrete distribution:
    :math:`\:\: x_j \overset{lds}{\sim} \mathcal{U}(0,1)`
 
-.. code:: ipython2
+.. code:: ipython3
 
     distribution = Lattice(dimension=64, randomize=True, seed=7, backend='GAIL')
     measure = BrownianMotion(distribution)
@@ -97,7 +97,7 @@ defined as follows:
         strike_price = 25,
         interest_rate = 0.01,
         mean_type = 'arithmetic')
-    solution,data = CubQmcLatticeG(integrand, abs_tol=.05).integrate()
+    solution,data = CubQMCLatticeG(integrand, abs_tol=.05).integrate()
     print(data)
 
 
@@ -121,8 +121,8 @@ defined as follows:
     BrownianMotion (TrueMeasure Object)
         distrib_name    Lattice
         time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
-        drift   0
-    CubQmcLatticeG (StoppingCriterion Object)
+        drift           0
+    CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.0500
         rel_tol         0
         n_init          1024
@@ -131,7 +131,7 @@ defined as follows:
         n_total         4096
         solution        6.2744
         r_lag           4
-        time_integrate  0.0710
+        time_integrate  0.0529
 
 
 Arithmetic-Mean Asian Put Option: Multi-Level
@@ -154,7 +154,7 @@ be summarized as follows:
 The total run time for this example is about one-third of that for the
 last example.
 
-.. code:: ipython2
+.. code:: ipython3
 
     distribution = IIDStdGaussian(seed=7)
     measure = BrownianMotion(distribution)
@@ -165,13 +165,13 @@ last example.
             interest_rate = 0.01,
             mean_type = 'arithmetic',
             multi_level_dimensions = [4,16,64])
-    solution,data = CubMcClt(integrand, abs_tol=.05).integrate()
+    solution,data = CubMCCLT(integrand, abs_tol=.05).integrate()
     print(data)
 
 
 .. parsed-literal::
 
-    Solution: 6.2586         
+    Solution: 6.2690         
     AsianCall (Integrand Object)
         volatility      0.5000
         start_price     30
@@ -187,8 +187,8 @@ last example.
     BrownianMotion (TrueMeasure Object)
         distrib_name    IIDStdGaussian
         time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
-        drift   0
-    CubMcClt (StoppingCriterion Object)
+        drift           0
+    CubMCCLT (StoppingCriterion Object)
         inflate         1.2000
         alpha           0.0100
         abs_tol         0.0500
@@ -197,10 +197,10 @@ last example.
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          3
-        solution        6.2586
-        n               [ 298906.000  21044.000  3439.000]
-        n_total         326461
-        confid_int      [ 6.207  6.310]
-        time_integrate  0.2109
+        solution        6.2690
+        n               [ 279321.000  29913.000  3291.000]
+        n_total         315597
+        confid_int      [ 6.218  6.321]
+        time_integrate  0.1619
 
 

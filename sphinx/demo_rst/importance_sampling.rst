@@ -1,7 +1,7 @@
 Importance Sampling Examples
 ============================
 
-.. code:: ipython2
+.. code:: ipython3
 
     from qmcpy import *
     from numpy import *
@@ -31,7 +31,7 @@ with a payoff of
 
  What is the expected payoff of this game?
 
-.. code:: ipython2
+.. code:: ipython3
 
     payoff = lambda x: 10*(x.sum(1)>1.7)
     abs_tol = 1e-3
@@ -46,12 +46,12 @@ With ordinary Monte Carlo we do the following:
    \mu = \mathbb{E}(Y) = \int_{[0,1]^2} \text{payoff}(x_1,x_2) \,
    \mathrm{d} x_1 \mathrm{d}x_2
 
-.. code:: ipython2
+.. code:: ipython3
 
     distribution = Lattice(2)
     measure = Uniform(distribution)
     integral = CustomFun(measure,payoff)
-    solution1,data1 = CubQmcLatticeG(integral, abs_tol).integrate()
+    solution1,data1 = CubQMCLatticeG(integral, abs_tol).integrate()
     data1
 
 
@@ -59,7 +59,7 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4500         
+    Solution: 0.4501         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2
@@ -71,16 +71,16 @@ With ordinary Monte Carlo we do the following:
         distrib_name    Lattice
         lower_bound     [ 0.000  0.000]
         upper_bound     [ 1.000  1.000]
-    CubQmcLatticeG (StoppingCriterion Object)
+    CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.0010
         rel_tol         0
         n_init          1024
         n_max           34359738368
     LDTransformData (AccumulateData Object)
         n_total         65536
-        solution        0.4500
+        solution        0.4501
         r_lag           4
-        time_integrate  0.0532
+        time_integrate  0.0549
 
 
 
@@ -106,13 +106,13 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
    \, \mathrm{d} x_1 \mathrm{d}x_2
    \end{align}
 
-.. code:: ipython2
+.. code:: ipython3
 
     p = 1
     distribution = Lattice(2)
     measure = Uniform(distribution)
     integral = CustomFun(measure,lambda x: payoff(x**(1/(p+1))) / ((p+1)**2 * (x.prod(1))**(p/(p+1))))
-    solution2,data2 = CubQmcLatticeG(integral, abs_tol).integrate()
+    solution2,data2 = CubQMCLatticeG(integral, abs_tol).integrate()
     data2
 
 
@@ -120,7 +120,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Solution: 2.5000         
+    Solution: 0.4503         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2
@@ -132,20 +132,20 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
         distrib_name    Lattice
         lower_bound     [ 0.000  0.000]
         upper_bound     [ 1.000  1.000]
-    CubQmcLatticeG (StoppingCriterion Object)
+    CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.0010
         rel_tol         0
         n_init          1024
         n_max           34359738368
     LDTransformData (AccumulateData Object)
-        n_total         1024
-        solution        2.5000
+        n_total         16384
+        solution        0.4503
         r_lag           4
-        time_integrate  0.0023
+        time_integrate  0.0169
 
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     print('Imporance Sampling takes %.3f the time and %.3f the samples'%\
          (data2.time_integrate/data1.time_integrate,data2.n_total/data1.n_total))
@@ -153,7 +153,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.042 the time and 0.016 the samples
+    Imporance Sampling takes 0.309 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -230,7 +230,7 @@ Finally note that
 This drift in the Brownian motion may be implemented by changing the
 ``drift`` input to the ``BrownianMotion`` object.
 
-.. code:: ipython2
+.. code:: ipython3
 
     abs_tol = 1e-2
     dimension = 32
@@ -247,12 +247,12 @@ This drift in the Brownian motion may be implemented by changing the
 Vanilla Monte Carlo
 ~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython2
+.. code:: ipython3
 
     distribution = Sobol(dimension)
     measure = BrownianMotion(distribution)
     integrand = AsianCall(measure)
-    solution1,data1 = CubQmcSobolG(integrand, abs_tol).integrate()
+    solution1,data1 = CubQMCSobolG(integrand, abs_tol).integrate()
     data1
 
 
@@ -260,7 +260,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7744         
+    Solution: 1.7872         
     AsianCall (Integrand Object)
         volatility      0.5000
         start_price     30
@@ -272,7 +272,7 @@ Vanilla Monte Carlo
     Sobol (DiscreteDistribution Object)
         dimension       32
         randomize       1
-        seed            2701371811
+        seed            244455412
         backend         qrng
         mimics          StdUniform
         graycode        0
@@ -280,20 +280,20 @@ Vanilla Monte Carlo
         distrib_name    Sobol
         time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
         drift           0
-    CubQmcSobolG (StoppingCriterion Object)
+    CubQMCSobolG (StoppingCriterion Object)
         abs_tol         0.0100
         rel_tol         0
         n_init          1024
         n_max           34359738368
     LDTransformData (AccumulateData Object)
         n_total         16384
-        solution        1.7744
+        solution        1.7872
         r_lag           4
-        time_integrate  0.1272
+        time_integrate  0.1388
 
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     plt_bm_is(measure)
 
@@ -305,13 +305,13 @@ Vanilla Monte Carlo
 Monte Carlo with Importance Sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython2
+.. code:: ipython3
 
     drift = 1
     distribution = Sobol(dimension)
     measure = BrownianMotion(distribution,drift)
     integrand = AsianCall(measure)
-    solution2,data2 = CubQmcSobolG(integrand, abs_tol).integrate()
+    solution2,data2 = CubQMCSobolG(integrand, abs_tol).integrate()
     data2
 
 
@@ -319,7 +319,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7702         
+    Solution: 1.7674         
     AsianCall (Integrand Object)
         volatility      0.5000
         start_price     30
@@ -331,7 +331,7 @@ Monte Carlo with Importance Sampling
     Sobol (DiscreteDistribution Object)
         dimension       32
         randomize       1
-        seed            1509978730
+        seed            1465995183
         backend         qrng
         mimics          StdUniform
         graycode        0
@@ -339,20 +339,20 @@ Monte Carlo with Importance Sampling
         distrib_name    Sobol
         time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
         drift           1
-    CubQmcSobolG (StoppingCriterion Object)
+    CubQMCSobolG (StoppingCriterion Object)
         abs_tol         0.0100
         rel_tol         0
         n_init          1024
         n_max           34359738368
     LDTransformData (AccumulateData Object)
         n_total         4096
-        solution        1.7702
+        solution        1.7674
         r_lag           4
-        time_integrate  0.0601
+        time_integrate  0.0298
 
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     plt_bm_is(measure)
 
@@ -361,7 +361,7 @@ Monte Carlo with Importance Sampling
 .. image:: importance_sampling_files/importance_sampling_16_0.png
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     print('Imporance Sampling takes %.3f the time and %.3f the samples'%\
          (data2.time_integrate/data1.time_integrate,data2.n_total/data1.n_total))
@@ -369,7 +369,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.472 the time and 0.250 the samples
+    Imporance Sampling takes 0.215 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -381,16 +381,16 @@ Importance Sampling MC vs QMC
 -  abs\_tol = .025
 -  trials = 3
 
-.. code:: ipython2
+.. code:: ipython3
 
     df = pd.read_csv('../outputs/mc_vs_qmc/importance_sampling.csv')
     df['Problem'] = df['Stopping Criterion'] + ' ' + df['Distribution'] + ' (' + df['MC/QMC'] + ')'
     df = df.drop(['Stopping Criterion','Distribution','MC/QMC'],axis=1)
-    problems = ['CubMcClt IIDStdUniform (MC)',
-                'CubMcG IIDStdGaussian (MC)',
-                'CubQmcClt Sobol (QMC)',
-                'CubQmcLatticeG Lattice (QMC)',
-                'CubQmcSobolG Sobol (QMC)']
+    problems = ['CubMCCLT IIDStdUniform (MC)',
+                'CubMCG IIDStdGaussian (MC)',
+                'CubQMCCLT Sobol (QMC)',
+                'CubQMCLatticeG Lattice (QMC)',
+                'CubQMCSobolG Sobol (QMC)']
     df = df[df['Problem'].isin(problems)]
     mean_shifts = df.mean_shift.unique()
     df_samples = df.groupby(['Problem'])['n_samples'].apply(list).reset_index(name='n')
@@ -436,74 +436,74 @@ Importance Sampling MC vs QMC
       </thead>
       <tbody>
         <tr>
-          <th>CubMcClt IIDStdUniform (MC)</th>
-          <td>0.00e+00</td>
-          <td>1.78e+00</td>
-          <td>3.24e+05</td>
-          <td>7.11e-01</td>
-        </tr>
-        <tr>
-          <th>CubMcClt IIDStdUniform (MC)</th>
-          <td>1.00e+00</td>
-          <td>1.79e+00</td>
-          <td>8.22e+04</td>
-          <td>1.94e-01</td>
-        </tr>
-        <tr>
-          <th>CubMcG IIDStdGaussian (MC)</th>
+          <th>CubMCCLT IIDStdUniform (MC)</th>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
-          <td>4.82e+05</td>
-          <td>3.64e-01</td>
+          <td>2.84e+05</td>
+          <td>5.63e-01</td>
         </tr>
         <tr>
-          <th>CubMcG IIDStdGaussian (MC)</th>
+          <th>CubMCCLT IIDStdUniform (MC)</th>
           <td>1.00e+00</td>
-          <td>1.77e+00</td>
-          <td>1.27e+05</td>
-          <td>1.09e-01</td>
+          <td>1.79e+00</td>
+          <td>7.66e+04</td>
+          <td>1.71e-01</td>
         </tr>
         <tr>
-          <th>CubQmcClt Sobol (QMC)</th>
+          <th>CubMCG IIDStdGaussian (MC)</th>
+          <td>0.00e+00</td>
+          <td>1.79e+00</td>
+          <td>4.36e+05</td>
+          <td>4.48e-01</td>
+        </tr>
+        <tr>
+          <th>CubMCG IIDStdGaussian (MC)</th>
+          <td>1.00e+00</td>
+          <td>1.80e+00</td>
+          <td>1.18e+05</td>
+          <td>1.47e-01</td>
+        </tr>
+        <tr>
+          <th>CubQMCCLT Sobol (QMC)</th>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>1.64e+04</td>
-          <td>4.89e-02</td>
+          <td>4.12e-02</td>
         </tr>
         <tr>
-          <th>CubQmcClt Sobol (QMC)</th>
+          <th>CubQMCCLT Sobol (QMC)</th>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>1.64e+04</td>
-          <td>4.80e-02</td>
+          <td>4.15e-02</td>
         </tr>
         <tr>
-          <th>CubQmcLatticeG Lattice (QMC)</th>
+          <th>CubQMCLatticeG Lattice (QMC)</th>
           <td>0.00e+00</td>
           <td>1.75e+00</td>
           <td>4.10e+03</td>
-          <td>2.56e-02</td>
+          <td>1.79e-02</td>
         </tr>
         <tr>
-          <th>CubQmcLatticeG Lattice (QMC)</th>
+          <th>CubQMCLatticeG Lattice (QMC)</th>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>
-          <td>4.41e-03</td>
+          <td>4.13e-03</td>
         </tr>
         <tr>
-          <th>CubQmcSobolG Sobol (QMC)</th>
+          <th>CubQMCSobolG Sobol (QMC)</th>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.10e+03</td>
-          <td>1.70e-02</td>
+          <td>1.59e-02</td>
         </tr>
         <tr>
-          <th>CubQmcSobolG Sobol (QMC)</th>
+          <th>CubQMCSobolG Sobol (QMC)</th>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>
-          <td>3.34e-03</td>
+          <td>2.95e-03</td>
         </tr>
       </tbody>
     </table>
@@ -511,7 +511,7 @@ Importance Sampling MC vs QMC
 
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
     idx = arange(len(problems))
@@ -540,7 +540,7 @@ Importance Sampling MC vs QMC
 .. image:: importance_sampling_files/importance_sampling_20_0.png
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     fig,ax = plt.subplots(nrows=1, ncols=2, figsize=(22, 8))
     df_samples.apply(lambda row: ax[0].plot(mean_shifts,log(row.n),label=row['Problem']),axis=1)

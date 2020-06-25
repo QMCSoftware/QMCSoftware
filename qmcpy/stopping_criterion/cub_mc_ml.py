@@ -10,12 +10,12 @@ from time import time
 import warnings
 
 
-class CubMcMl(StoppingCriterion):
+class CubMCML(StoppingCriterion):
     """
     Stopping criterion based on multi-level monte carlo.
     
     >>> mlco = MLCallOptions(Gaussian(IIDStdGaussian(seed=7)))
-    >>> sc = CubMcMl(mlco,abs_tol=.05)
+    >>> sc = CubMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
     10.443836668379447
@@ -36,7 +36,7 @@ class CubMcMl(StoppingCriterion):
         distrib_name    IIDStdGaussian
         mean            0
         covariance      1
-    CubMcMl (StoppingCriterion Object)
+    CubMCML (StoppingCriterion Object)
         rmse_tol        0.0194
         n_init          256
         levels_min      2
@@ -97,7 +97,7 @@ class CubMcMl(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'multi'
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMcMl,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubMCML,self).__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration Data
         self.data = MLMCData(self, integrand, self.levels_min, self.n_init, alpha0, beta0, gamma0)
     

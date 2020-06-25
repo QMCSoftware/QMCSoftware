@@ -5,7 +5,7 @@ This notebook will give examples of how to use QMCPy for integration
 problems that not are defined in terms of a standard measure. i.e.
 Uniform or Gaussian.
 
-.. code:: ipython2
+.. code:: ipython3
 
     from qmcpy import *
     from numpy import *
@@ -17,7 +17,7 @@ Sample Problem 1
 
 :math:`\phantom{y} = 2\int_{[0,2]} \frac{x^2}{2} dx, \:\: \mbox{Uniform Measure}`
 
-.. code:: ipython2
+.. code:: ipython3
 
     abs_tol = .01
     dim = 1
@@ -25,13 +25,13 @@ Sample Problem 1
     b = 2
     true_value = 8./3
 
-.. code:: ipython2
+.. code:: ipython3
 
     # Lebesgue Measure
     distribution = IIDStdUniform(dim, seed=7)
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
     integrand = CustomFun(measure, lambda x: x**2)
-    solution,data = CubMcClt(integrand, abs_tol=abs_tol).integrate()
+    solution,data = CubMCCLT(integrand, abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance: %s'%(abs((solution-true_value))<abs_tol))
 
@@ -42,13 +42,13 @@ Sample Problem 1
     Within tolerance: True
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     # Uniform Measure
     distribution = IIDStdUniform(dim, seed=7)
     measure = Uniform(distribution, lower_bound=a, upper_bound=b)
     integrand = CustomFun(measure, lambda x: 2*(x**2))
-    solution,data = CubMcClt(integrand, abs_tol=abs_tol).integrate()
+    solution,data = CubMCCLT(integrand, abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance: %s'%(abs((solution-true_value))<abs_tol))
 
@@ -66,7 +66,7 @@ Sample Problem 2
 
 :math:`\phantom{y} = \Pi_{i=1}^d (b_i-a_i)\int_{[a,b]^d} ||x||_2^2 \; [ \Pi_{i=1}^d (b_i-a_i)]^{-1} dx, \:\: \mbox{Uniform Measure}`
 
-.. code:: ipython2
+.. code:: ipython3
 
     abs_tol = .001
     dim = 2
@@ -81,13 +81,13 @@ Sample Problem 2
     Answer = 23.33333
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     # Lebesgue Measure
     distribution = Sobol(dim, randomize=True, seed=7, backend='QRNG')
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
     integrand = CustomFun(measure, lambda x: (x**2).sum(1))
-    solution,data = CubQmcClt(integrand, abs_tol=abs_tol).integrate()
+    solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
     print('y = %.5f'%solution)
     print('Within tolerance: %s'%(abs((solution-true_value))<abs_tol))
 
@@ -98,13 +98,13 @@ Sample Problem 2
     Within tolerance: True
 
 
-.. code:: ipython2
+.. code:: ipython3
 
     # Uniform Measure
     distribution = Sobol(dim, randomize=True, seed=17, backend='QRNG')
     measure = Uniform(distribution, lower_bound=a, upper_bound=b)
     integrand = CustomFun(measure, lambda x: (b-a).prod()*(x**2).sum(1))
-    solution,data = CubQmcClt(integrand, abs_tol=abs_tol).integrate()
+    solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
     print('y = %.5f'%solution)
     print('Within tolerance: %s'%(abs((solution-true_value))<abs_tol))
 
@@ -126,7 +126,7 @@ functions
 
 Mathematica Code: ``Integrate[Sin[x]/Log[x], {x,a,b}]``
 
-.. code:: ipython2
+.. code:: ipython3
 
     abs_tol = .0001
     dim = 1
@@ -134,13 +134,13 @@ Mathematica Code: ``Integrate[Sin[x]/Log[x], {x,a,b}]``
     b = 5
     true_value = -0.87961 
 
-.. code:: ipython2
+.. code:: ipython3
 
     # Lebesgue Measure
     distribution = Lattice(dim, randomize=True, seed=7, backend='GAIL')
     measure = Lebesgue(distribution, lower_bound=a, upper_bound=b)
     integrand = CustomFun(measure, lambda x: sin(x)/log(x))
-    solution,data = CubQmcLatticeG(integrand, abs_tol=abs_tol).integrate()
+    solution,data = CubQMCLatticeG(integrand, abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance: %s'%(abs((solution-true_value))<abs_tol))
 
@@ -158,18 +158,18 @@ Integral over :math:`\mathbb{R}^d`
 
 .. math:: y = \int_{\mathbb{R}^2} e^{-||x||_2^2} dx
 
-.. code:: ipython2
+.. code:: ipython3
 
     abs_tol = .1
     dim = 2
     true_value = pi
 
-.. code:: ipython2
+.. code:: ipython3
 
     distribution = Lattice(dim)
     measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
     integrand = CustomFun(measure, lambda x: exp(-x**2).prod(1))
-    solution,data = CubQmcLatticeG(integrand,abs_tol=abs_tol).integrate()
+    solution,data = CubQMCLatticeG(integrand,abs_tol=abs_tol).integrate()
     print('y = %.3f'%solution)
     print('Within tolerance: %s'%(abs((solution-true_value))<abs_tol))
 

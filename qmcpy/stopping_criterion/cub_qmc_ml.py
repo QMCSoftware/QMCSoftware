@@ -10,12 +10,12 @@ from time import time
 import warnings
 
 
-class CubQmcMl(StoppingCriterion):
+class CubQMCML(StoppingCriterion):
     """
     Stopping criterion based on multi-level quasi-monte carlo
     
     >>> mlco = MLCallOptions(Gaussian(Lattice(seed=7)))
-    >>> sc = CubQmcMl(mlco,abs_tol=.05)
+    >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
     10.444567069452214
@@ -38,7 +38,7 @@ class CubQmcMl(StoppingCriterion):
         distrib_name    Lattice
         mean            0
         covariance      1
-    CubQmcMl (StoppingCriterion Object)
+    CubQMCML (StoppingCriterion Object)
         rmse_tol        0.0194
         n_init          256
         n_max           10000000000
@@ -81,7 +81,7 @@ class CubQmcMl(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'multi'
         allowed_distribs = ["Lattice", "Sobol"]
-        super(CubQmcMl,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQMCML,self).__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration Data
         self.data = MLQMCData(self, integrand, self.n_init, self.replications)
     

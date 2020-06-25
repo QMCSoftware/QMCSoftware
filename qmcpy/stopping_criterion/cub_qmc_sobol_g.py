@@ -9,14 +9,14 @@ from time import time
 import warnings
 
 
-class CubQmcSobolG(StoppingCriterion):
+class CubQMCSobolG(StoppingCriterion):
     """
     Quasi-Monte Carlo method using Sobol' cubature over the
     d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
 
     >>> k = Keister(Gaussian(Sobol(2,seed=7),covariance=1./2))
-    >>> sc = CubQmcSobolG(k,abs_tol=.05)
+    >>> sc = CubQMCSobolG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
     1.8082479629092816
@@ -34,7 +34,7 @@ class CubQmcSobolG(StoppingCriterion):
         distrib_name    Sobol
         mean            0
         covariance      0.5000
-    CubQmcSobolG (StoppingCriterion Object)
+    CubQMCSobolG (StoppingCriterion Object)
         abs_tol         0.0500
         rel_tol         0
         n_init          1024
@@ -104,7 +104,7 @@ class CubQmcSobolG(StoppingCriterion):
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
         allowed_distribs = ["Sobol"]
-        super(CubQmcSobolG,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQMCSobolG,self).__init__(distribution, allowed_levels, allowed_distribs)
         if (not distribution.randomize) or distribution.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False")
         # Construct AccumulateData Object to House Integration data
