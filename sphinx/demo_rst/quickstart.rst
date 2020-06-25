@@ -69,7 +69,7 @@ Step 5: Integrate
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2
-        randomize        1
+        randomize       1
         seed            None
         backend         gail
         mimics          StdUniform
@@ -86,7 +86,7 @@ Step 5: Integrate
         n_total         65536
         solution        1.8082
         r_lag           4
-        time_integrate  0.1046
+        time_integrate  0.0726
     Within absolute tolerance: True
 
 
@@ -114,7 +114,7 @@ Condensed Problem
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2
-        randomize        1
+        randomize       1
         seed            None
         backend         gail
         mimics          StdUniform
@@ -131,7 +131,7 @@ Condensed Problem
         n_total         65536
         solution        1.8082
         r_lag           4
-        time_integrate  0.0631
+        time_integrate  0.0791
     Within absolute tolerance: True
 
 

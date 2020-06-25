@@ -244,7 +244,7 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
         n               3359
         n_total         4383
         confid_int      [ 0.647  0.667]
-        time_integrate  0.0012
+        time_integrate  0.0013
 
 
 For our integral, we know the true value. Let's check if QMCPy's
@@ -301,7 +301,7 @@ changing the input parameter value of dimension for QuickConstruct?
         n               5455
         n_total         6479
         confid_int      [ 0.816  0.836]
-        time_integrate  0.0017
+        time_integrate  0.0018
 
 
 Once again, we could test for accuracy of QMCPy with respect to the true

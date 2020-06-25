@@ -54,6 +54,7 @@ class Korobov(DiscreteDistribution):
         self.mimics = 'StdUniform'
         self.seed = seed
         self.set_seed(self.seed)
+        super(Korobov,self).__init__()
 
     def gen_samples(self, n=8, generator=None):
         """

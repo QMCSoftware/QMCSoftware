@@ -41,7 +41,7 @@ the Gaussian measure, and the Sobol distribution:
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
         dimension       3
-        randomize        1
+        randomize       1
         seed            7
         backend         qrng
         mimics          StdUniform
@@ -59,7 +59,7 @@ the Gaussian measure, and the Sobol distribution:
         n_total         1024
         solution        2.1718
         r_lag           4
-        time_integrate  0.0030
+        time_integrate  0.0023
 
 
 Arithmetic-Mean Asian Put Option: Single Level
@@ -114,14 +114,14 @@ defined as follows:
         dim_fracs       0
     Lattice (DiscreteDistribution Object)
         dimension       64
-        randomize        1
+        randomize       1
         seed            7
         backend         gail
         mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
         distrib_name    Lattice
         time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
-        mean_shift_is   0
+        drift   0
     CubQmcLatticeG (StoppingCriterion Object)
         abs_tol         0.0500
         rel_tol         0
@@ -131,7 +131,7 @@ defined as follows:
         n_total         4096
         solution        6.2744
         r_lag           4
-        time_integrate  0.0633
+        time_integrate  0.0710
 
 
 Arithmetic-Mean Asian Put Option: Multi-Level
@@ -171,7 +171,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2656         
+    Solution: 6.2586         
     AsianCall (Integrand Object)
         volatility      0.5000
         start_price     30
@@ -187,7 +187,7 @@ last example.
     BrownianMotion (TrueMeasure Object)
         distrib_name    IIDStdGaussian
         time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
-        mean_shift_is   0
+        drift   0
     CubMcClt (StoppingCriterion Object)
         inflate         1.2000
         alpha           0.0100
@@ -197,10 +197,10 @@ last example.
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          3
-        solution        6.2656
-        n               [ 312498.000  20261.000  2993.000]
-        n_total         338824
-        confid_int      [ 6.214  6.317]
-        time_integrate  0.2414
+        solution        6.2586
+        n               [ 298906.000  21044.000  3439.000]
+        n_total         326461
+        confid_int      [ 6.207  6.310]
+        time_integrate  0.2109
 
 

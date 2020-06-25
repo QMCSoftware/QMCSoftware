@@ -3,6 +3,7 @@
 from qmcpy import *
 from qmcpy.util import *
 from qmcpy.discrete_distribution.qrng.qrng import qrng_example_use
+from qmcpy.util import ParameterError,ParameterWarning
 from numpy import *
 import sys
 vinvo = sys.version_info
@@ -163,7 +164,20 @@ class TestHalton(unittest.TestCase):
         distribution.set_dimension(4)
         x = distribution.gen_samples(2)
         self.assertTrue(x.shape==(2,4))
-
+        distribution = Halton(dimension=3, generalize=True, backend='Owen',seed=7)
+        x = distribution.gen_samples(4)
+        self.assertTrue(x.shape==(4,3))
+        distribution.set_dimension(4)
+        x = distribution.gen_samples(3)
+        self.assertTrue(x.shape==(3,4))
+        x2 = distribution.gen_samples(n_min=1,n_max=3)
+        self.assertTrue(x2.shape==(2,4))
+        self.assertTrue((x2==x[1:]).all())
+    
+    def test_warnings_errors(self):
+        self.assertWarns(ParameterWarning,Halton,2,generalize=False,backend='Owen')
+        distribution = Halton(2, generalize=True, backend='QRNG',seed=7)
+        self.assertRaises(ParameterError,n_min=2,n_max=4)
 
 class TestKorobov(unittest.TestCase):
     """ Unit test for Korobov DiscreteDistribution. """

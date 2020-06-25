@@ -309,10 +309,10 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
 .. parsed-literal::
 
     Solution: 0.8479         
-    Custrandomizentegrand Object)
+    CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2
-        scramble        1
+        randomize       1
         seed            9
         backend         gail
         mimics          StdUniform
@@ -327,7 +327,7 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
         n_total         8192
         solution        0.8479
         r_lag           4
-        time_integrate  0.1202
+        time_integrate  0.1240
     Within tolerance of true value 0.849: True
 
 

@@ -66,7 +66,8 @@ class Lattice(DiscreteDistribution):
             dimension (int): dimension of samples
             randomize (bool): If True, apply shift to generated samples    
             seed (int): seed the random number generator for reproducibility
-            backend (str): backend generator
+            backend (str): backend generator must be either "GAIL" or "MPS". 
+                "GAIL" provides standard point ordering but is slightly slower than "MPS"
         """
         self.dimension = dimension
         self.randomize = randomize

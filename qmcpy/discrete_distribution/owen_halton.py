@@ -166,7 +166,7 @@ def randradinv(ind,b=2):
     b2r = 1./b
     ans = ind*0
     res = ind
-    while (1-b2r) < 1: # Assumes floating point comparisons, fixed precision.
+    while b2r >= 1e-16: # Assumes floating point comparisons, fixed precision.
         dig = res%b
         perm = random.permutation(b)
         pdig = perm[dig.astype(int)]
@@ -176,5 +176,5 @@ def randradinv(ind,b=2):
     return ans
 
 if __name__ == '__main__':
-    x = rhalton(n=4,d=2,n0=0,d0=0,singleseed=7)
+    x = rhalton(n=2**18,d=2,n0=0,d0=0,singleseed=7)
     print(x)

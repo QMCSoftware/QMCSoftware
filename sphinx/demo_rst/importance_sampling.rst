@@ -59,11 +59,11 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4501         
+    Solution: 0.4500         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2
-        randomize        1
+        randomize       1
         seed            None
         backend         gail
         mimics          StdUniform
@@ -78,9 +78,9 @@ With ordinary Monte Carlo we do the following:
         n_max           34359738368
     LDTransformData (AccumulateData Object)
         n_total         65536
-        solution        0.4501
+        solution        0.4500
         r_lag           4
-        time_integrate  0.0555
+        time_integrate  0.0532
 
 
 
@@ -124,7 +124,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2
-        randomize        1
+        randomize       1
         seed            None
         backend         gail
         mimics          StdUniform
@@ -141,7 +141,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
         n_total         1024
         solution        2.5000
         r_lag           4
-        time_integrate  0.0016
+        time_integrate  0.0023
 
 
 
@@ -153,7 +153,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.028 the time and 0.016 the samples
+    Imporance Sampling takes 0.042 the time and 0.016 the samples
 
 
 Asian Call Option Example
@@ -228,7 +228,7 @@ Finally note that
    f(\boldsymbol{z}) \exp\bigl((aT/2 - z_d)a \bigr)
 
 This drift in the Brownian motion may be implemented by changing the
-``mean_shift_is`` input to the ``BrownianMotion`` object.
+``drift`` input to the ``BrownianMotion`` object.
 
 .. code:: ipython2
 
@@ -241,7 +241,7 @@ This drift in the Brownian motion may be implemented by changing the
         for i in range(n_plt): ax.plot(measure.time_vector,samples[i])
         ax.set_xlabel('time')
         ax.set_ylabel('option price')
-        ax.set_title('Brownian Motion with Mean Shift %.1f'%measure.mean_shift_is)
+        ax.set_title('Brownian Motion with Mean Shift %.1f'%measure.drift)
         plt.show()
 
 Vanilla Monte Carlo
@@ -260,7 +260,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7956         
+    Solution: 1.7744         
     AsianCall (Integrand Object)
         volatility      0.5000
         start_price     30
@@ -271,15 +271,15 @@ Vanilla Monte Carlo
         dim_fracs       0
     Sobol (DiscreteDistribution Object)
         dimension       32
-        randomize        1
-        seed            3599842736
+        randomize       1
+        seed            2701371811
         backend         qrng
         mimics          StdUniform
         graycode        0
     BrownianMotion (TrueMeasure Object)
         distrib_name    Sobol
         time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
-        mean_shift_is   0
+        drift           0
     CubQmcSobolG (StoppingCriterion Object)
         abs_tol         0.0100
         rel_tol         0
@@ -287,9 +287,9 @@ Vanilla Monte Carlo
         n_max           34359738368
     LDTransformData (AccumulateData Object)
         n_total         16384
-        solution        1.7956
+        solution        1.7744
         r_lag           4
-        time_integrate  0.1668
+        time_integrate  0.1272
 
 
 
@@ -307,9 +307,9 @@ Monte Carlo with Importance Sampling
 
 .. code:: ipython2
 
-    mean_shift_is = 1
+    drift = 1
     distribution = Sobol(dimension)
-    measure = BrownianMotion(distribution,mean_shift_is)
+    measure = BrownianMotion(distribution,drift)
     integrand = AsianCall(measure)
     solution2,data2 = CubQmcSobolG(integrand, abs_tol).integrate()
     data2
@@ -319,7 +319,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.8036         
+    Solution: 1.7702         
     AsianCall (Integrand Object)
         volatility      0.5000
         start_price     30
@@ -330,15 +330,15 @@ Monte Carlo with Importance Sampling
         dim_fracs       0
     Sobol (DiscreteDistribution Object)
         dimension       32
-        randomize        1
-        seed            2476879446
+        randomize       1
+        seed            1509978730
         backend         qrng
         mimics          StdUniform
         graycode        0
     BrownianMotion (TrueMeasure Object)
         distrib_name    Sobol
         time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
-        mean_shift_is   1
+        drift           1
     CubQmcSobolG (StoppingCriterion Object)
         abs_tol         0.0100
         rel_tol         0
@@ -346,9 +346,9 @@ Monte Carlo with Importance Sampling
         n_max           34359738368
     LDTransformData (AccumulateData Object)
         n_total         4096
-        solution        1.8036
+        solution        1.7702
         r_lag           4
-        time_integrate  0.0365
+        time_integrate  0.0601
 
 
 
@@ -369,7 +369,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.219 the time and 0.250 the samples
+    Imporance Sampling takes 0.472 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC

@@ -302,6 +302,9 @@ simulation'. pp.165-181 in Advanced Financial Modelling, in Radon Series
 on Computational and Applied Mathematics, de Gruyter, 2009.
 http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
 
+[17] Owen, A. B.A randomized Halton algorithm in R2017. arXiv:1706.02808
+[stat.CO]
+
 .. raw:: html
 
    <hr>
