@@ -2,7 +2,7 @@
 from qmcpy import *
 x_l = Lattice(dimension=2, backend="GAIL", randomize=True, seed=7).gen_samples(2**7)
 x_s = Sobol(dimension=2, backend="QRNG", randomize=True, seed=7).gen_samples(2**7)
-x_h = Halton(dimension=2, generalize=True, seed=7).gen_samples(2**7) 
+x_h = Halton(dimension=2, backend="Owen", generalize=True, seed=7).gen_samples(2**7) 
 x_k = Korobov(dimension=2, generator=[7,13], randomize=True, seed=7).gen_samples(2**7)
 ''' Plots '''
 from matplotlib import pyplot

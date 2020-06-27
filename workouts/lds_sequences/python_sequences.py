@@ -11,42 +11,31 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
     Record time for generating samples from each discrete distribution
     """
     print('\nDiscrete DiscreteDistribution Generation Time Comparison')
-    columns = ['n', 'L_MPS_t', 'L_GAIL_t', 'S_QRNG_gc_t', 'S_QRNG_n_t', 'S_MPS_QMCPy_t']
+    columns = ['n',
+        'L_MPS_t', 'L_GAIL_t',
+        'S_QRNG_gc_t', 'S_QRNG_n_t', 'S_MPS_QMCPy_t',
+        'H_QRNG_t', 'H_Owen_t',
+        'K_QRNG_t']
+    dds = [
+        Lattice(dimension, randomize=True, seed=7, backend='MPS'),
+        Lattice(dimension, randomize=True, seed=7, backend='GAIL'),
+        Sobol(dimension, randomize=True, seed=7, backend='QRNG', graycode=True),
+        Sobol(dimension, randomize=True, seed=7, backend='QRNG', graycode=False),
+        Sobol(dimension, randomize=True, seed=7, backend='MPS'),
+        Halton(dimension, generalize=True, backend='QRNG', seed=7),
+        Halton(dimension, generalize=True, backend='Owen', seed=7),
+        Korobov(dimension, generator=[1], randomize=True)]
     df = DataFrame(columns=columns, dtype=float)
     for i, m in enumerate(powers_2):
         n = 2**m
         row_i = {'n': n}
-        # Lattice Magic Point Shop
-        t0 = time()
-        for trial in range(trials):
-            distribution = Lattice(dimension, randomize=False, seed=7, backend='MPS')
-            x = distribution.gen_samples(n_min=0,n_max=n)
-        row_i['L_MPS_t'] = (time() - t0) / trials
-        # Lattice GAIL
-        t0 = time()
-        for trial in range(trials):
-            distribution = Lattice(dimension, randomize=False, seed=7, backend='GAIL')
-            x = distribution.gen_samples(n_min=0,n_max=n)
-        row_i['L_GAIL_t'] = (time() - t0) / trials
-        # Sobol QRNG Natural Ordering
-        t0 = time()
-        for trial in range(trials):
-            distribution = Sobol(dimension, randomize=False, seed=7, backend='QRNG', graycode=False)
-            distribution.gen_samples(n_min=0,n_max=n)
-        row_i['S_QRNG_n_t'] = (time() - t0) / trials
-        # Sobol QRNG Graycode Ordering
-        t0 = time()
-        for trial in range(trials):
-            distribution = Sobol(dimension, randomize=False, seed=7, backend='QRNG', graycode=True)
-            distribution.gen_samples(n_min=0,n_max=n)
-        row_i['S_QRNG_gc_t'] = (time() - t0) / trials
-        # Sobol Magic Point Shop
-        t0 = time()
-        for trial in range(trials):
-            distribution = Sobol(dimension, randomize=False, seed=7, backend='MPS')
-            x = distribution.gen_samples(n_min=0,n_max=n)
-        row_i['S_MPS_QMCPy_t'] = (time() - t0) / trials
-        # Set and print results
+        for j in range(len(columns)-1):
+            dd_name = columns[j+1]
+            dd = dds[j]
+            t0 = time()
+            for trial in range(trials):
+                x = dd.gen_samples(n)
+            row_i[dd_name] = (time() - t0) / trials
         df.loc[i] = row_i
         print('\n'.join(['%s: %.4f'%(key,val) for key,val in row_i.items()])+'\n')
     return df

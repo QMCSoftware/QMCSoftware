@@ -155,7 +155,7 @@ def rhalton(n,d,n0=0,d0=0,singleseed=None,seedvector=[None]):
             random.seed(seedvector[dimj])
         ind = (n0+arange(n)).astype(int)
         b = int(primes[dimj])
-        ans[:,j] = randradinv(ind,b) # zero indexed rows
+        ans[:,j] = randradinv(ind,b)
     return ans
 
 def randradinv(ind,b=2):
@@ -166,7 +166,7 @@ def randradinv(ind,b=2):
     b2r = 1./b
     ans = ind*0
     res = ind
-    while b2r >= 1e-16: # Assumes floating point comparisons, fixed precision.
+    while b2r >= 1e-16:
         dig = res%b
         perm = random.permutation(b)
         pdig = perm[dig.astype(int)]
