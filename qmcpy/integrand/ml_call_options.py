@@ -44,7 +44,7 @@ class MLCallOptions(Integrand):
         """
         Args:
             measure (TrueMeasure): A BrownianMotion TrueMeasure object
-            option_type (str): type of option in
+            option_type (str): type of option in ["European","Asian"]
             volatility (float): sigma, the volatility of the asset
             start_strike_price (float): S(0), the asset value at t=0, and K, the strike price. 
                 Assume start_price = strike_price
