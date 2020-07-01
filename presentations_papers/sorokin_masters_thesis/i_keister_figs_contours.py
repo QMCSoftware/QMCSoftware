@@ -4,6 +4,14 @@ import matplotlib
 matplotlib.rc('text', usetex=True)
 matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
 from matplotlib import pyplot
+fs = 20
+pyplot.rc('font', size=fs)
+pyplot.rc('axes', titlesize=fs)
+pyplot.rc('axes', labelsize=fs)
+pyplot.rc('xtick', labelsize=fs)
+pyplot.rc('ytick', labelsize=fs)
+pyplot.rc('legend', fontsize=fs)
+pyplot.rc('figure', titlesize=fs)
 
 # parameterss
 n_mesh = 1002
@@ -40,17 +48,21 @@ fig,ax = pyplot.subplots(figsize=(10,5),nrows=1,ncols=2)
 #   colors 
 z_min = min(mesht[:,2].min(),mesht[:,2].min())
 z_max = max(meshb[:,2].max(),meshb[:,2].max())
-clevel = arange(z_min,z_max,.1)
-cmap = pyplot.cm.cool
+clevel = arange(z_min,z_max,.025)
+#cmap = pyplot.get_cmap('Blues')
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", [(.95,.95,.95),(0,0,1)])
 #   contours
 ax[0].contourf(x_mesh_t,y_mesh_t,z_mesh_t,clevel,cmap=cmap,extend='both')
 ax[1].contourf(x_mesh_b,y_mesh_b,z_mesh_b,clevel,cmap=cmap,extend='both')
 #   scatters
 ax[0].scatter(ptst[:,0],ptst[:,1],s=5,color='w')
 ax[1].scatter(ptsb[:,0],ptsb[:,1],s=5,color='w')
-#   limits
+#   axis
 lims = [[-2,2],[0,1]]
 for i in range(2):
+    for nsew in ['top','bottom','left','right']: ax[i].spines[nsew].set_visible(False)
+    ax[i].xaxis.set_ticks_position('none') 
+    ax[i].yaxis.set_ticks_position('none') 
     lim = lims[i]
     ax[i].set_aspect(1)
     ax[i].set_xlim(lim)
@@ -66,5 +78,6 @@ ax[1].set_ylabel('$x_1$')
 ax[1].set_title(r'$f(\boldsymbol{x})$')
 #   metas
 fig.tight_layout()
-pyplot.savefig("presentations_papers/sorokin_masters_thesis/figs/i_keister_contours.png",dpi=500)
+pyplot.savefig("presentations_papers/sorokin_masters_thesis/figs/i_keister_contours.png",
+    dpi=100,transparent=True)
 pyplot.show()
