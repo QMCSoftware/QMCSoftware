@@ -19,7 +19,7 @@ def european_options(abs_tol=.1):
 
     measure = Gaussian(Lattice())
     integrand = MLCallOptions(measure,'european',volatility,start_price,interest_rate)
-    algorithm = CubQMCML(integrand,abs_tol,n_init=256,n_max=1e10,replications=16)
+    algorithm = CubQMCML(integrand,abs_tol,n_init=16,n_max=1e10,replications=16)
     sol1,data1 = algorithm.integrate()
     print('\n%s\n\n%s'%('~'*100,data1))
 
