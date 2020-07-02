@@ -13,7 +13,7 @@ class EuropeanOption(Integrand):
     >>> eo = EuropeanOption(m,call_put='put')
     >>> eo
     EuropeanOption (Integrand Object)
-        volatility      0.5000
+        volatility      2^(-1)
         start_price     30
         strike_price    35
         interest_rate   0

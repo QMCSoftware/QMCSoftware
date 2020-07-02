@@ -13,12 +13,12 @@ class InverseCDFSampling(DiscreteDistribution):
     ...     inverse_cdf_fun = exp_inverse_cdf)
     >>> exponential_measure
     InverseCDFSampling (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
     >>> exponential_measure.gen_samples(n_min=4,n_max=8)
-    array([[ 1.296,  0.199],
-           [ 0.294,  0.947],
-           [ 0.623,  0.474],
-           [ 0.075,  0.006]])
+    array([[1.296, 0.199],
+           [0.294, 0.947],
+           [0.623, 0.474],
+           [0.075, 0.006]])
     """
 
     parameters = ['dimension']

@@ -24,24 +24,23 @@ class CubQMCLatticeG(StoppingCriterion):
     Solution: 1.8081         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         randomize       1
         seed            7
         backend         gail
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
-        distrib_name    Lattice
         mean            0
-        covariance      0.5000
+        covariance      2^(-1)
     CubQMCLatticeG (StoppingCriterion Object)
-        abs_tol         0.0500
+        abs_tol         0.050
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         1024
-        solution        1.8081
-        r_lag           4
+        n_total         2^(10)
+        solution        1.808
+        r_lag           2^(2)
         time_integrate  ...
 
     Adapted from 

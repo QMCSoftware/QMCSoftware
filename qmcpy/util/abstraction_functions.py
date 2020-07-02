@@ -1,9 +1,9 @@
 """ Utility functions that abstract QMCPy objects. """
 
-from numpy import array, ndarray
+from numpy import array, ndarray, log2
 import numpy as np
-
-np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, threshold=10)
+np.set_printoptions(precision=3,threshold=10)
+import warnings
 
 
 def univ_repr(qmc_object, abc_class_name, attributes):
@@ -35,16 +35,28 @@ def univ_repr(qmc_object, abc_class_name, attributes):
         elif isinstance(val, list):
             val = array(val)
         elif isinstance(val, ndarray):
-            if val.shape == (1,):
-                val = val[0].item()
-            elif val.shape == ():
+            if val.shape == ():
                 val = val.item()
+            elif val.size == 1:
+                val = val[0].item()
         # printing options
-        if isinstance(val, int) or (isinstance(val, float) and val % 1 == 0):
-            string_temp = '    %-15s %d' % (key, int(val))
-        elif isinstance(val, float):
-            string_temp = '    %-15s %0.4f' % (key, val)
+        s = '    %-15s '%key
+        if isinstance(val, int) or isinstance(val,float): # scalar
+            try:
+                warnings.filterwarnings("error")
+                p = log2(val)
+            except:
+                p = .1
+            if (p%1==0) and p!=0: # power of 2
+                s += '2^(%d)' % int(p)
+            elif isinstance(val, int) or (val%1==0): # int
+                s += '%d' % int(val)
+            else: # float 
+                if abs(val) < .001: # exponential format
+                    s += '%.2e' % val
+                else: # float format
+                    s += '%.3f' % val
         else:
-            string_temp = '    %-15s %s' % (key, val)
-        string += '\n' + string_temp.replace('\n', '\n    %-15s' % ' ')
+            s += '%s' % val
+        string += '\n' + s.replace('\n', '\n    %-15s' % ' ')
     return string

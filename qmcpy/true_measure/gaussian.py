@@ -14,9 +14,8 @@ class Gaussian(TrueMeasure):
     >>> g = Gaussian(dd,mean=1,covariance=1./4)
     >>> g
     Gaussian (TrueMeasure Object)
-        distrib_name    Sobol
         mean            1
-        covariance      0.2500
+        covariance      2^(-2)
     >>> g.gen_mimic_samples(n_min=4,n_max=8)
     array([[ 1.533,  0.676],
            [ 0.817,  1.351],
@@ -24,17 +23,16 @@ class Gaussian(TrueMeasure):
            [ 0.379, -0.194]])
     >>> g.set_dimension(4)
     >>> g.gen_mimic_samples(n_min=2,n_max=4)
-    array([[ 1.309,  0.445,  1.128,  0.813],
-           [ 0.634,  1.171,  0.362,  1.528]])
+    array([[1.309, 0.445, 1.128, 0.813],
+           [0.634, 1.171, 0.362, 1.528]])
     >>> g2 = Gaussian(Sobol(2),mean=[1,2],covariance=[[1,.5],[.5,2]])
     >>> g2
     Gaussian (TrueMeasure Object)
-        distrib_name    Sobol
         mean            [1 2]
-        covariance      [[ 1.000  0.500]
-                        [ 0.500  2.000]]
+        covariance      [[1.  0.5]
+                        [0.5 2. ]]
     >>> g2.pdf(array([0,0]))
-    array([[ 0.027]])
+    array([[0.027]])
     """
 
     parameters = ['mean', 'covariance']

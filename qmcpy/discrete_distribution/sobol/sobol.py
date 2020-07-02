@@ -15,29 +15,29 @@ class Sobol(DiscreteDistribution):
     >>> s = Sobol(2,seed=7)
     >>> s
     Sobol (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         randomize       1
         seed            7
         backend         qrng
         mimics          StdUniform
         graycode        0
     >>> s.gen_samples(4)
-    array([[ 0.982,  0.883],
-           [ 0.482,  0.383],
-           [ 0.732,  0.133],
-           [ 0.232,  0.633]])
+    array([[0.982, 0.883],
+           [0.482, 0.383],
+           [0.732, 0.133],
+           [0.232, 0.633]])
     >>> s.set_dimension(3)
     >>> s.gen_samples(n_min=4,n_max=8)
-    array([[ 0.857,  0.258,  0.226],
-           [ 0.357,  0.758,  0.726],
-           [ 0.607,  0.508,  0.976],
-           [ 0.107,  0.008,  0.476]])
+    array([[0.857, 0.258, 0.226],
+           [0.357, 0.758, 0.726],
+           [0.607, 0.508, 0.976],
+           [0.107, 0.008, 0.476]])
     >>> Sobol(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
-    array([[ 0.750,  0.250],
-           [ 0.250,  0.750]])
+    array([[0.75, 0.25],
+           [0.25, 0.75]])
     >>> Sobol(dimension=2,randomize=False,graycode=False).gen_samples(n_min=2,n_max=4)
-    array([[ 0.250,  0.750],
-           [ 0.750,  0.250]])
+    array([[0.25, 0.75],
+           [0.75, 0.25]])
            
     References
         Marius Hofert and Christiane Lemieux (2019). 

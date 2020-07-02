@@ -11,10 +11,10 @@ class IdentitalToDiscrete(TrueMeasure):
     >>> dd = Sobol(2,seed=7,randomize=False,graycode=False)
     >>> itd = IdentitalToDiscrete(dd)
     >>> itd.gen_mimic_samples(4)
-    array([[ 0.000,  0.000],
-           [ 0.500,  0.500],
-           [ 0.250,  0.750],
-           [ 0.750,  0.250]])
+    array([[0.  , 0.  ],
+           [0.5 , 0.5 ],
+           [0.25, 0.75],
+           [0.75, 0.25]])
     """
 
     parameters = []

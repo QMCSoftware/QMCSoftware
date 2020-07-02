@@ -19,14 +19,14 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
     >>> ars
     AcceptanceRejectionSampling (DiscreteDistribution Object)
         dimension       1
-        c               1.3333
+        c               1.333
     >>> x = ars.gen_samples(5)
     >>> x
-    array([[ 0.575],
-           [ 0.604],
-           [ 0.144],
-           [ 0.848],
-           [ 0.129]])
+    array([[0.575],
+           [0.604],
+           [0.144],
+           [0.848],
+           [0.129]])
     >>> x.shape
     (5, 1)
 

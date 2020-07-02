@@ -12,7 +12,6 @@ class TrueMeasure(object):
         if not hasattr(self,'parameters'):
             self.parameters = []
         self.dimension = self.distribution.dimension
-        self.distrib_name = type(self.distribution).__name__
 
     def gen_mimic_samples(self, *args, **kwargs):
         """
@@ -69,4 +68,4 @@ class TrueMeasure(object):
         """ 
 
     def __repr__(self):
-        return univ_repr(self, "TrueMeasure", ['distrib_name']+self.parameters)
+        return univ_repr(self, "TrueMeasure", self.parameters)

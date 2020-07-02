@@ -114,7 +114,7 @@ class TestSobol(unittest.TestCase):
 
     def test_gen_samples(self):
         for backend in ['QRNG','MPS']:
-            distribution = Sobol(dimension=3, randomize=True, backend=backend)
+            distribution = Sobol(dimension=3, randomize=True, backend=backend, graycode=True)
             samples = distribution.gen_samples(n_min=4, n_max=8)
             with self.subTest():
                 self.assertEqual(type(samples), ndarray)
@@ -123,7 +123,7 @@ class TestSobol(unittest.TestCase):
 
     def test_set_dimension(self):
         for backend in ['MPS','QRNG']:
-            distribution = Sobol(dimension=2,backend=backend)
+            distribution = Sobol(dimension=2,backend=backend, graycode=True)
             distribution.set_dimension(3)
             samples = distribution.gen_samples(4)
             with self.subTest():
@@ -177,7 +177,7 @@ class TestHalton(unittest.TestCase):
     def test_warnings_errors(self):
         self.assertWarns(ParameterWarning,Halton,2,generalize=False,backend='Owen')
         distribution = Halton(2, generalize=True, backend='QRNG',seed=7)
-        self.assertRaises(ParameterError,n_min=2,n_max=4)
+        self.assertRaises(ParameterError,distribution.gen_samples,n_min=2,n_max=4)
 
 class TestKorobov(unittest.TestCase):
     """ Unit test for Korobov DiscreteDistribution. """

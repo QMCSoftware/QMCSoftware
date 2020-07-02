@@ -23,28 +23,26 @@ class CubMCCLT(StoppingCriterion):
     Solution: 1.8347         
     Keister (Integrand Object)
     IIDStdGaussian (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         seed            7
         mimics          StdGaussian
     Gaussian (TrueMeasure Object)
-        distrib_name    IIDStdGaussian
         mean            0
-        covariance      0.5000
+        covariance      2^(-1)
     CubMCCLT (StoppingCriterion Object)
-        inflate         1.2000
-        alpha           0.0100
-        abs_tol         0.0500
+        inflate         1.200
+        alpha           0.010
+        abs_tol         0.050
         rel_tol         0
-        n_init          1024
+        n_init          2^(10)
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          1
-        solution        1.8347
+        solution        1.835
         n               5826
         n_total         6850
-        confid_int      [ 1.785  1.885]
+        confid_int      [1.785 1.885]
         time_integrate  ...
-    
     >>> ac = AsianCall(
     ...     measure = BrownianMotion(IIDStdGaussian()),
     ...     multi_level_dimensions = [2,4,8])

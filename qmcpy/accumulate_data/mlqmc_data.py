@@ -30,7 +30,7 @@ class MLQMCData(AccumulateData):
         self.distribution = self.measure.distribution
         # Set Attributes
         self.levels = 2
-        self.n_level = zeros(self.levels,dtype=int)
+        self.n_level = zeros(self.levels)
         self.eval_level = tile(True,self.levels)
         self.replications = replications
         self.n_init = n_init

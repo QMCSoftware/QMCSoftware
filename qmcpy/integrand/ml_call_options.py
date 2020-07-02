@@ -16,9 +16,9 @@ class MLCallOptions(Integrand):
     >>> mlco
     MLCallOptions (Integrand Object)
         option          european
-        sigma           0.2000
+        sigma           0.200
         k               100
-        r               0.0500
+        r               0.050
         t               1
         b               85
     >>> y = 0

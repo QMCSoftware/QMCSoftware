@@ -12,12 +12,12 @@ class AsianCall(Integrand):
     >>> ac = AsianCall(m)
     >>> ac
     AsianCall (Integrand Object)
-        volatility      0.5000
+        volatility      2^(-1)
         start_price     30
         strike_price    35
         interest_rate   0
         mean_type       arithmetic
-        dimensions      4
+        dimensions      2^(2)
         dim_fracs       0
     >>> x = dd.gen_samples(2**10)
     >>> y = ac.f(x)
@@ -30,13 +30,13 @@ class AsianCall(Integrand):
     >>> ac2 = AsianCall(m2,multi_level_dimensions=level_dims)
     >>> ac2
     AsianCall (Integrand Object)
-        volatility      0.5000
+        volatility      2^(-1)
         start_price     30
         strike_price    35
         interest_rate   0
         mean_type       arithmetic
         dimensions      [2 4 8]
-        dim_fracs       [ 0.000  2.000  2.000]
+        dim_fracs       [0. 2. 2.]
     >>> y2 = 0
     >>> for l in range(len(level_dims)):
     ...     new_dim = ac2.dim_at_level(l)

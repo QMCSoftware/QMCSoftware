@@ -25,26 +25,25 @@ class CubMCG(StoppingCriterion):
     Solution: 1.8039         
     Keister (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         seed            7
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
-        distrib_name    IIDStdUniform
         mean            0
-        covariance      0.5000
+        covariance      2^(-1)
     CubMCG (StoppingCriterion Object)
-        inflate         1.2000
-        alpha           0.0100
-        abs_tol         0.0500
+        inflate         1.200
+        alpha           0.010
+        abs_tol         0.050
         rel_tol         0
-        n_init          1024
+        n_init          2^(10)
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          1
-        solution        1.8039
+        solution        1.804
         n               13473
         n_total         14497
-        confid_int      [ 1.754  1.854]
+        confid_int      [1.754 1.854]
         time_integrate  ...
 
     Adapted from

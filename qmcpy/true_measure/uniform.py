@@ -10,28 +10,25 @@ class Uniform(TrueMeasure):
     >>> u = Uniform(Sobol(2,seed=7),lower_bound=1,upper_bound=2)
     >>> u
     Uniform (TrueMeasure Object)
-        distrib_name    Sobol
         lower_bound     [1 1]
         upper_bound     [2 2]
     >>> u.gen_mimic_samples(n_min=4,n_max=8)
-    array([[ 1.857,  1.258],
-           [ 1.357,  1.758],
-           [ 1.607,  1.508],
-           [ 1.107,  1.008]])
+    array([[1.857, 1.258],
+           [1.357, 1.758],
+           [1.607, 1.508],
+           [1.107, 1.008]])
     >>> u.set_dimension(4)
     >>> u
     Uniform (TrueMeasure Object)
-        distrib_name    Sobol
         lower_bound     [1 1 1 1]
         upper_bound     [2 2 2 2]
     >>> u.gen_mimic_samples(n_min=2,n_max=4)
-    array([[ 1.732,  1.133,  1.601,  1.354],
-           [ 1.232,  1.633,  1.101,  1.854]])
+    array([[1.732, 1.133, 1.601, 1.354],
+           [1.232, 1.633, 1.101, 1.854]])
     >>> u2 = Uniform(Sobol(2),lower_bound=[-.5,0],upper_bound=[1,3])
     >>> u2
     Uniform (TrueMeasure Object)
-        distrib_name    Sobol
-        lower_bound     [-0.500  0.000]
+        lower_bound     [-0.5  0. ]
         upper_bound     [1 3]
     >>> u2.pdf([0,1])
     0.2222222222222222

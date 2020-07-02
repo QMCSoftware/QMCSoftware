@@ -12,19 +12,19 @@ class Halton(DiscreteDistribution):
 
     >>> h = Halton(2,seed=7)
     >>> h.gen_samples(1)
-    array([[ 0.166,  0.363]])
+    array([[0.166, 0.363]])
     >>> h.gen_samples(1)
-    array([[ 0.166,  0.363]])
+    array([[0.166, 0.363]])
     >>> h.set_dimension(4)
     >>> h.set_seed(8)
     >>> h.gen_samples(2)
-    array([[ 0.323,  0.148,  0.623,  0.913],
-           [ 0.823,  0.482,  0.223,  0.342]])
+    array([[0.323, 0.148, 0.623, 0.913],
+           [0.823, 0.482, 0.223, 0.342]])
     >>> h
     Halton (DiscreteDistribution Object)
-        dimension       4
+        dimension       2^(2)
         generalize      1
-        seed            8
+        seed            2^(3)
         backend         qrng
         mimics          StdUniform
     

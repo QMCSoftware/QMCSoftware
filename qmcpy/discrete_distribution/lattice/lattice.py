@@ -13,28 +13,28 @@ class Lattice(DiscreteDistribution):
     >>> l = Lattice(2,seed=7)
     >>> l
     Lattice (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         randomize       1
         seed            7
         backend         gail
         mimics          StdUniform
     >>> l.gen_samples(4)
-    array([[ 0.076,  0.780],
-           [ 0.576,  0.280],
-           [ 0.326,  0.030],
-           [ 0.826,  0.530]])
+    array([[0.076, 0.78 ],
+           [0.576, 0.28 ],
+           [0.326, 0.03 ],
+           [0.826, 0.53 ]])
     >>> l.set_dimension(3)
     >>> l.gen_samples(n_min=4,n_max=8)
-    array([[ 0.563,  0.348,  0.103],
-           [ 0.063,  0.848,  0.603],
-           [ 0.813,  0.598,  0.353],
-           [ 0.313,  0.098,  0.853]])
+    array([[0.563, 0.348, 0.103],
+           [0.063, 0.848, 0.603],
+           [0.813, 0.598, 0.353],
+           [0.313, 0.098, 0.853]])
     >>> Lattice(dimension=2,randomize=False,backend='GAIL').gen_samples(n_min=2,n_max=4)
-    array([[ 0.250,  0.250],
-           [ 0.750,  0.750]])
+    array([[0.25, 0.25],
+           [0.75, 0.75]])
     >>> Lattice(dimension=2,randomize=False,backend='MPS').gen_samples(n_min=2,n_max=4)
-    array([[ 0.250,  0.250],
-           [ 0.750,  0.750]])
+    array([[0.25, 0.25],
+           [0.75, 0.75]])
 
     References
         Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, 

@@ -23,32 +23,31 @@ class CubQMCML(StoppingCriterion):
     Solution: 10.4446        
     MLCallOptions (Integrand Object)
         option          european
-        sigma           0.2000
+        sigma           0.200
         k               100
-        r               0.0500
+        r               0.050
         t               1
         b               85
     Lattice (DiscreteDistribution Object)
-        dimension       64
+        dimension       2^(6)
         randomize       1
         seed            854306
         backend         gail
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
-        distrib_name    Lattice
         mean            0
         covariance      1
     CubQMCML (StoppingCriterion Object)
-        rmse_tol        0.0194
-        n_init          256
+        rmse_tol        0.019
+        n_init          2^(8)
         n_max           10000000000
-        replications    32
+        replications    2^(5)
     MLQMCData (AccumulateData Object)
         levels          7
-        n_level         [4096  256  256  256  256  256  256]
-        mean_level      [ 10.055  0.184  0.103  0.054  0.028  0.014  0.007]
-        var_level       [ 0.000  0.000  0.000  0.000  0.000  0.000  0.000]
-        bias_estimate   0.0070
+        n_level         [4096.  256.  256.  256.  256.  256.  256.]
+        mean_level      [1.006e+01 1.836e-01 1.029e-01 5.410e-02 2.773e-02 1.394e-02 6.967e-03]
+        var_level       [6.143e-05 6.105e-05 4.080e-05 6.780e-06 3.139e-06 9.989e-07 4.290e-07]
+        bias_estimate   0.007
         n_total         180224
         time_integrate  ...
     

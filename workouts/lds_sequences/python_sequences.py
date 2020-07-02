@@ -21,7 +21,7 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
         Lattice(dimension, randomize=True, seed=7, backend='GAIL'),
         Sobol(dimension, randomize=True, seed=7, backend='QRNG', graycode=True),
         Sobol(dimension, randomize=True, seed=7, backend='QRNG', graycode=False),
-        Sobol(dimension, randomize=True, seed=7, backend='MPS'),
+        Sobol(dimension, randomize=True, seed=7, backend='MPS', graycode=True),
         Halton(dimension, generalize=True, backend='QRNG', seed=7),
         Halton(dimension, generalize=True, backend='Owen', seed=7),
         Korobov(dimension, generator=[1], randomize=True)]

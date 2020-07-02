@@ -30,22 +30,21 @@ class CubQMCCLT(StoppingCriterion):
         backend         gail
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
-        distrib_name    Lattice
         mean            0
-        covariance      0.5000
+        covariance      2^(-1)
     CubQMCCLT (StoppingCriterion Object)
-        inflate         1.2000
-        alpha           0.0100
-        abs_tol         0.0500
+        inflate         1.200
+        alpha           0.010
+        abs_tol         0.050
         rel_tol         0
-        n_init          256
-        n_max           1073741824
+        n_init          2^(8)
+        n_max           2^(30)
     MeanVarDataRep (AccumulateData Object)
-        replications    16
-        solution        1.3799
-        sighat          0.0011
-        n_total         4096
-        confid_int      [ 1.379  1.381]
+        replications    2^(4)
+        solution        1.380
+        sighat          0.001
+        n_total         2^(12)
+        confid_int      [1.379 1.381]
         time_integrate  ...
     """
 

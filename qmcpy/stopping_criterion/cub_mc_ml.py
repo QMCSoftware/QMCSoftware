@@ -23,34 +23,33 @@ class CubMCML(StoppingCriterion):
     Solution: 10.4438        
     MLCallOptions (Integrand Object)
         option          european
-        sigma           0.2000
+        sigma           0.200
         k               100
-        r               0.0500
+        r               0.050
         t               1
         b               85
     IIDStdGaussian (DiscreteDistribution Object)
-        dimension       64
+        dimension       2^(6)
         seed            7
         mimics          StdGaussian
     Gaussian (TrueMeasure Object)
-        distrib_name    IIDStdGaussian
         mean            0
         covariance      1
     CubMCML (StoppingCriterion Object)
-        rmse_tol        0.0194
-        n_init          256
-        levels_min      2
+        rmse_tol        0.019
+        n_init          2^(8)
+        levels_min      2^(1)
         levels_max      10
-        theta           0.2500
+        theta           2^(-2)
     MLMCData (AccumulateData Object)
         levels          6
-        n_level         [ 781732.000  15310.000  6633.000  2078.000  756.000  273.000  118.000]
-        mean_level      [ 10.060  0.184  0.101  0.051  0.025  0.013  0.008]
-        var_level       [ 196.323  0.151  0.041  0.011  0.003  0.001  0.000]
-        cost_per_sample [ 1.000  2.000  4.000  8.000  16.000  32.000  64.000]
-        alpha           0.9210
-        beta            1.8828
-        gamma           1.0000
+        n_level         [7.817e+05 1.531e+04 6.633e+03 2.078e+03 7.560e+02 2.730e+02 1.180e+02]
+        mean_level      [1.006e+01 1.844e-01 1.014e-01 5.129e-02 2.472e-02 1.341e-02 8.233e-03]
+        var_level       [1.963e+02 1.505e-01 4.124e-02 1.110e-02 2.901e-03 7.013e-04 2.446e-04]
+        cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
+        alpha           0.921
+        beta            1.883
+        gamma           1.000
         time_integrate  ...
 
     Adapted from
