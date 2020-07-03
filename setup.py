@@ -40,7 +40,8 @@ packages = [
     'qmcpy.integrand',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.qrng',
-    'qmcpy.discrete_distribution.sobol']
+    'qmcpy.discrete_distribution.sobol',
+    'qmcpy.discrete_distribution.halton']
 
 setuptools.setup(
     name="qmcpy",
