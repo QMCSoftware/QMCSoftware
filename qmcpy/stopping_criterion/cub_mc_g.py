@@ -14,7 +14,7 @@ import warnings
 
 class CubMCG(StoppingCriterion):
     """
-    Stopping Criterion with garunteed accuracy
+    Stopping criterion with guaranteed accuracy
 
     >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
     >>> sc = CubMCG(k,abs_tol=.05)
@@ -22,7 +22,7 @@ class CubMCG(StoppingCriterion):
     >>> solution
     1.803926962264685
     >>> data
-    Solution: 1.8039         
+    Solution: 1.8039
     Keister (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
         dimension       2^(1)
@@ -50,10 +50,10 @@ class CubMCG(StoppingCriterion):
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
 
     Reference:
-        
+
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
         Available from http://gailgithub.github.io/GAIL_Dev/
 
     Guarantee
@@ -125,7 +125,7 @@ class CubMCG(StoppingCriterion):
             alphai = (self.alpha-self.alpha_sigma)/(2*(1-self.alpha_sigma)) # uncertainty to do iteration
             eps1 = self._ncbinv(1e4,alphai,self.kurtmax)
             self.err_bar = self.sigma_up*eps1
-            tau = 1. # step of the iteration 
+            tau = 1. # step of the iteration
             self.data.n[:] = 1e4 # default initial sample size
             while True:
                 if self.data.n_total + self.data.n > self.n_max:
@@ -158,7 +158,7 @@ class CubMCG(StoppingCriterion):
                 toloversig = self.err_bar / self.sigma_up
                 alphai = 2**tau * (self.alpha - self.alpha_sigma) / (1 - self.alpha_sigma)
                 n,_ = self._nchebe(toloversig, alphai, self.kurtmax, self.n_max, self.sigma_up)
-                self.data.n[:] = n            
+                self.data.n[:] = n
         # set confidence interval
         self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
         self.data.time_integrate = time() - t_start

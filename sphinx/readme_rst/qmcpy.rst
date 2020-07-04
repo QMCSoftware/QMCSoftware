@@ -12,9 +12,7 @@ and the available concrete implementations. For specific class names and
 parameters see the `QMCPy Documentation
 page <https://qmcpy.readthedocs.io/en/latest/algorithms.html>`__.
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Integrand
 ---------
@@ -45,9 +43,7 @@ The function to integrate.
 -  Multilevel Call Options with Milstein Discretization
 -  Linear Function: :math:`g(\boldsymbol{x}) = \sum_{j=1}^{d}x_{j}`
 
-.. raw:: html
-
-   <hr>
+--------------
 
 True Measure
 ------------
@@ -64,9 +60,7 @@ General measure used to define the integrand.
 -  Importance sampling
 -  Identical to what the discrete distribution mimics
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Discrete Distribution
 ---------------------
@@ -77,7 +71,7 @@ Sampling nodes.
 
 -  Lattice (base 2):
    :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
--  Sobol' (base 2): :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
+-  Sobol’ (base 2): :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
 -  Generalized Halton:
    :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
 -  Korobov: :math:`\overset{\text{LD}}{\sim} \mathcal{U}(0,1)^d`
@@ -92,9 +86,7 @@ Sampling nodes.
 -  Inverse CDF Sampling
 -  Acceptance Rejection Sampling
 
-.. raw:: html
-
-   <hr>
+--------------
 
 Stopping Criterion
 ------------------
@@ -112,5 +104,5 @@ Stopping Criterion
 **MC Algorithms**
 
 -  Multilevel MC Cubature
--  Garunteed MC Cubature
+-  Guaranteed MC Cubature
 -  CLT MC Cubature

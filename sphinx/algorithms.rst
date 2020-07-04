@@ -36,7 +36,7 @@ Asian Call Option
 .. automodule:: qmcpy.integrand.asian_call
     :members:
 
-Multilevel Call Options with Milstein Discretization 
+Multilevel Call Options with Milstein Discretization
 ...............................................
 
 .. automodule:: qmcpy.integrand.ml_call_options
@@ -121,13 +121,13 @@ Sobol'
 Halton
 ......
 
-.. automodule:: qmcpy.discrete_distribution.halton 
+.. automodule:: qmcpy.discrete_distribution.halton
     :members:
 
 Korobov
 .......
 
-.. automodule:: qmcpy.discrete_distribution.korobov  
+.. automodule:: qmcpy.discrete_distribution.korobov
     :members:
 
 IID Standard Uniform
@@ -171,13 +171,13 @@ Abstract Stopping Criterion Class
 .. automodule:: qmcpy.stopping_criterion._stopping_criterion
     :members:
 
-Garunteed Lattice Cubature (qMC)
+Guaranteed Lattice Cubature (qMC)
 ................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_lattice_g
     :members:
 
-Garunteed Sobol Cubature (qMC)
+Guaranteed Sobol Cubature (qMC)
 ..............................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_sobol_g
@@ -201,7 +201,7 @@ Multilevel MC Cubature
 .. automodule:: qmcpy.stopping_criterion.cub_mc_ml
     :members:
 
-Garunteed MC Cubature
+Guaranteed MC Cubature
 ...............................
 
 .. automodule:: qmcpy.stopping_criterion.cub_mc_g
@@ -247,7 +247,7 @@ Multilevel MC Data
 
 .. automodule:: qmcpy.accumulate_data.mlmc_data
     :members:
-    
+
 Mean Variance MC Data
 .......................
 
