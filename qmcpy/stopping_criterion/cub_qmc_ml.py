@@ -13,14 +13,14 @@ import warnings
 class CubQMCML(StoppingCriterion):
     """
     Stopping criterion based on multi-level quasi-monte carlo
-    
+
     >>> mlco = MLCallOptions(Gaussian(Lattice(seed=7)))
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
     10.444567069452214
     >>> data
-    Solution: 10.4446        
+    Solution: 10.4446
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -50,7 +50,7 @@ class CubQMCML(StoppingCriterion):
         bias_estimate   0.007
         n_total         180224
         time_integrate  ...
-    
+
     Reference:
         M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'.
         pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics,
@@ -63,11 +63,11 @@ class CubQMCML(StoppingCriterion):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
-            abs_tol (float): absolute tolerence
-            alpha (float): uncertainty level 
+            abs_tol (float): absolute tolerance
+            alpha (float): uncertainty level
             rmse_tol (float): root mean squared error
-                If supplied (not None), then absolute tolerence and alpha are ignored
-                in favor of the rmse tolerence
+                If supplied (not None), then absolute tolerance and alpha are ignored
+                in favor of the rmse tolerance
             n_max (int): maximum number of samples
             replications (int): number of replications on each level
         """
@@ -83,7 +83,7 @@ class CubQMCML(StoppingCriterion):
         super(CubQMCML,self).__init__(distribution, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration Data
         self.data = MLQMCData(self, integrand, self.n_init, self.replications)
-    
+
     def integrate(self):
         """ See abstract method. """
         t_start = time()
@@ -112,4 +112,3 @@ class CubQMCML(StoppingCriterion):
                 break
         self.data.time_integrate = time() - t_start
         return self.data.solution,self.data
-    

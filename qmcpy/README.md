@@ -72,5 +72,5 @@ Has class method `integrate` which preforms numerical integration.
 **MC Algorithms**
 
   - Multilevel MC Cubature
-  - Garunteed MC Cubature
+  - Guaranteed MC Cubature
   - CLT MC Cubature 
