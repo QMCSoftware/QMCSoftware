@@ -8,7 +8,8 @@
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications. 
 
 [Homepage](https://qmcsoftware.github.io/QMCSoftware/) | [GitHub](https://github.com/QMCSoftware/QMCSoftware) | [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) | [PyPI](https://pypi.org/project/qmcpy/)
-<hr>
+
+----
 
 ## Installation
 
@@ -55,7 +56,7 @@ Note that the QRNG C backend files can be explicitly recompiled with
 pip install -e ./
 ~~~
 
-<hr>
+----
 
 ## Documentation 
 
@@ -73,7 +74,7 @@ Then setup Sphinx paths (only needs to be run once for initialization)
 make _doc
 ~~~
 
-Finally, run one of the following three commands
+Finally, run one of the following three commands:
 
 ~~~
 make doc_html
@@ -83,7 +84,7 @@ make doc_epub
 
 To recompile documentation, you now only need one of the above three commands. 
 
-<hr>
+----
 
 ## QMCPy
 
@@ -95,7 +96,7 @@ The central package including the 5 main components as listed below. Each compon
 - **Discrete Distribution:** a generator of nodes/sequences, that can be either IID (for Monte Carlo) or low-discrepancy (for quasi-Monte Carlo), that mimic a standard distribution.
 - **Accumulate Data:** stores information from integration process.
 
-<hr>
+----
 
 ## Workouts and Demos
 
@@ -108,7 +109,7 @@ To run all workouts (~10 min) use the command
 make workout
 ~~~
 
-<hr>
+----
 
 ## Unit Tests
 
@@ -120,7 +121,7 @@ make tests
 
 See `makefile` for individual testing commands.
 
-<hr>
+----
 
 ## Developers
  
@@ -130,7 +131,7 @@ See `makefile` for individual testing commands.
 - Jagadeeswaran Rathinavel
 - Aleksei Sorokin
 
-<hr>
+----
 
 ## Collaborators
 - Mike Giles
@@ -138,7 +139,7 @@ See `makefile` for individual testing commands.
 - Christiane Lemieux
 - Dirk Nuyens
 
-<hr>
+----
 
 ## Citation
 
@@ -150,7 +151,7 @@ Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A. QMC
 
 This work is maintained under the Apache 2.0 License.
 
-<hr>
+----
 
 ## References
 
@@ -188,7 +189,7 @@ This work is maintained under the Apache 2.0 License.
 
 <b>[17]</b> Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
 
-<hr>
+----
 
 ## Sponsors
 
