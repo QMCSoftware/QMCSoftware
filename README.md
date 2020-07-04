@@ -147,6 +147,8 @@ If you find QMCPy helpful in your work, please support us by citing the followin
 
 Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. Working. 2020. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/).
 
+----
+
 ## License
 
 This work is maintained under the Apache 2.0 License.

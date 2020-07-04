@@ -12,7 +12,7 @@ endif
 qrng:
 	@gcc -Wall -fPIC -shared  -o $(qrngpath)qrng_lib.$(EXT) $(qrngpath)*.c -lm
 	@echo Done compiling qrng C files
-	
+
 tests:
 	@echo "\nDoctests"
 	cd qmcpy && pytest --doctest-modules
@@ -26,8 +26,8 @@ nbdir = sphinx/demo_rst/
 nbconvertcmd = jupyter nbconvert --to rst --output-dir='$(nbdir)'
 _doc:
 	# Make Directries
-	@-rm -r $(mddir) 2>/dev/null &
-	@-rm -r $(nbdir) 2>/dev/null &
+	@rm -r $(mddir) 2>/dev/null &
+	@rm -r $(nbdir) 2>/dev/null &
 	# READMEs --> RST
 	@mkdir $(mddir)
 	@grep -v  "\[\!" README.md > README2.md
@@ -40,7 +40,7 @@ _doc:
 	echo "#\tConverting $$f"; \
 	$(nbconvertcmd) $$f 2>/dev/null;\
 	done
-	@rm -f $(nbdir)nei_demo.rst 
+	@rm -f $(nbdir)nei_demo.rst
 	@rm -r $(nbdir)nei_demo_files/
 	@-cd sphinx && make clean
 doc_html: _doc
@@ -57,7 +57,7 @@ workout:
 	@python workouts/integration_examples/keister.py  > outputs/integration_examples/keister.log
 	@python workouts/integration_examples/pi_problem.py > outputs/integration_examples/pi_problem.log
 	# lds_sequences
-	@python workouts/lds_sequences/python_sequences.py 
+	@python workouts/lds_sequences/python_sequences.py
 	# mc_vs_qmc
 	@python workouts/mc_vs_qmc/importance_sampling.py
 	@python workouts/mc_vs_qmc/vary_abs_tol.py
