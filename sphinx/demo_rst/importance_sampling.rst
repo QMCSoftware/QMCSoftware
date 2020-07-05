@@ -59,28 +59,27 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4501         
+    Solution: 0.4500         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         randomize       1
         seed            None
         backend         gail
         mimics          StdUniform
     Uniform (TrueMeasure Object)
-        distrib_name    Lattice
-        lower_bound     [ 0.000  0.000]
-        upper_bound     [ 1.000  1.000]
+        lower_bound     [0. 0.]
+        upper_bound     [1. 1.]
     CubQMCLatticeG (StoppingCriterion Object)
-        abs_tol         0.0010
+        abs_tol         0.001
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         65536
-        solution        0.4501
-        r_lag           4
-        time_integrate  0.0549
+        n_total         2^(16)
+        solution        0.450
+        r_lag           2^(2)
+        time_integrate  0.043
 
 
 
@@ -93,18 +92,16 @@ with positive payoffs. Let
 .. math:: \boldsymbol{Z} = (X_1^{1/(p+1)}, X_2^{1/(p+1)}), \qquad \boldsymbol{X} \sim \mathcal{U}(0,1)^2
 
 This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
-:math:`F(z) =z^{p+1}` and common PDF
-:math:`\varrho(z) = (p+1)z^{p}`.Thus,
+:math:`F(z) =z^{p+1}` and common PDF :math:`\varrho(z) = (p+1)z^{p}`.
+Thus,
 
 .. math::
 
-   \begin{align}
-   \mu = \mathbb{E}(Y) &= \int_{[0,1]^2} \frac{\text{payoff}(z_1,z_2)}{(p+1)^2(z_1z_2)^{p}} \, \varrho(z_1)
+   \mu = \mathbb{E}(Y) =  \int_{[0,1]^2} \frac{\text{payoff}(z_1,z_2)}{(p+1)^2(z_1z_2)^{p}} \, \varrho(z_1)
    \varrho(z_2) \, \mathrm{d} z_1 \mathrm{d}z_2 \\
-   &= \int_{[0,1]^2}
+   = \int_{[0,1]^2}
    \frac{\text{payoff}(x_1^{1/(p+1)},x_2^{1/(p+1)})}{(p+1)^2(x_1x_2)^{p/(p+1)}}
    \, \mathrm{d} x_1 \mathrm{d}x_2
-   \end{align}
 
 .. code:: ipython3
 
@@ -120,28 +117,27 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Solution: 0.4503         
+    Solution: 0.4505         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         randomize       1
         seed            None
         backend         gail
         mimics          StdUniform
     Uniform (TrueMeasure Object)
-        distrib_name    Lattice
-        lower_bound     [ 0.000  0.000]
-        upper_bound     [ 1.000  1.000]
+        lower_bound     [0. 0.]
+        upper_bound     [1. 1.]
     CubQMCLatticeG (StoppingCriterion Object)
-        abs_tol         0.0010
+        abs_tol         0.001
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         16384
-        solution        0.4503
-        r_lag           4
-        time_integrate  0.0169
+        n_total         2^(14)
+        solution        0.451
+        r_lag           2^(2)
+        time_integrate  0.014
 
 
 
@@ -153,7 +149,7 @@ This means that :math:`Z_1` and :math:`Z_2` are IID with common CDF
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.309 the time and 0.250 the samples
+    Imporance Sampling takes 0.328 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -172,19 +168,17 @@ multidimensional integral
    \boldsymbol{x}\bigr)}
    {\sqrt{(2 \pi)^{d} \det(\mathsf{\Sigma})}} \, \mathrm{d} \boldsymbol{x}
 
-where
+ where
 
-.. raw:: latex
+.. math::
 
-   \begin{align*} 
-   \boldsymbol{X} & \sim \mathcal{N}(\boldsymbol{0}, \mathsf{\Sigma}), \qquad
-   \mathsf{\Sigma} = \bigl(\min(j,k)T/d \bigr)_{j,k=1}^d, \\
-   d & =  13 \text{ in this case} \\
-   f(\boldsymbol{x}) & = \max\biggl(K - \frac 1d \sum_{j=1}^d
+   \boldsymbol{X}  \sim \mathcal{N}(\boldsymbol{0}, \mathsf{\Sigma}), \qquad
+   \mathsf{\Sigma} = \bigl(\min(j,k)T/d \bigr)_{j,k=1}^d,  \qquad
+   d  =  13, \\
+   f(\boldsymbol{x})  = \max\biggl(K - \frac 1d \sum_{j=1}^d
    S(jT/d,\boldsymbol{x}), 0 \biggr) \mathrm{e}^{-rT}, \\
-   S(jT/d,\boldsymbol{x}) &= S(0) \exp\bigl((r - \sigma^2/2) jT/d +
+   S(jT/d,\boldsymbol{x}) = S(0) \exp\bigl((r - \sigma^2/2) jT/d +
    \sigma x_j\bigr).
-   \end{align*}
 
 We will replace :math:`\boldsymbol{X}` by
 
@@ -197,9 +191,9 @@ where a positive :math:`a` will create more positive payoffs. This
 corresponds to giving our Brownian motion a drift. To do this we
 re-write the integral as
 
-.. raw:: latex
+.. math::
 
-   \begin{gather*} 
+    
    \mu = \mathbb{E}[f_{\mathrm{new}}(\boldsymbol{Z})] 
    = \int_{\mathbb{R}^d}
    f_{\mathrm{new}}(\boldsymbol{z}) 
@@ -217,7 +211,6 @@ re-write the integral as
    (\boldsymbol{z} - \boldsymbol{a}) \bigr)}
    = f(\boldsymbol{z}) \exp\bigl((\boldsymbol{a}/2 - \boldsymbol{z})^T
    \mathsf{\Sigma}^{-1}\boldsymbol{a} \bigr)
-   \end{gather*}
 
 Finally note that
 
@@ -260,36 +253,35 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7872         
+    Solution: 1.7835         
     AsianCall (Integrand Object)
-        volatility      0.5000
+        volatility      2^(-1)
         start_price     30
         strike_price    35
         interest_rate   0
         mean_type       arithmetic
-        dimensions      32
+        dimensions      2^(5)
         dim_fracs       0
     Sobol (DiscreteDistribution Object)
-        dimension       32
+        dimension       2^(5)
         randomize       1
-        seed            244455412
+        seed            965676770
         backend         qrng
         mimics          StdUniform
         graycode        0
     BrownianMotion (TrueMeasure Object)
-        distrib_name    Sobol
-        time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
+        time_vector     [0.031 0.062 0.094 ... 0.938 0.969 1.   ]
         drift           0
     CubQMCSobolG (StoppingCriterion Object)
-        abs_tol         0.0100
+        abs_tol         0.010
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         16384
-        solution        1.7872
-        r_lag           4
-        time_integrate  0.1388
+        n_total         2^(14)
+        solution        1.783
+        r_lag           2^(2)
+        time_integrate  0.074
 
 
 
@@ -319,36 +311,35 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7674         
+    Solution: 1.7932         
     AsianCall (Integrand Object)
-        volatility      0.5000
+        volatility      2^(-1)
         start_price     30
         strike_price    35
         interest_rate   0
         mean_type       arithmetic
-        dimensions      32
+        dimensions      2^(5)
         dim_fracs       0
     Sobol (DiscreteDistribution Object)
-        dimension       32
+        dimension       2^(5)
         randomize       1
-        seed            1465995183
+        seed            1909761169
         backend         qrng
         mimics          StdUniform
         graycode        0
     BrownianMotion (TrueMeasure Object)
-        distrib_name    Sobol
-        time_vector     [ 0.031  0.062  0.094 ...  0.938  0.969  1.000]
+        time_vector     [0.031 0.062 0.094 ... 0.938 0.969 1.   ]
         drift           1
     CubQMCSobolG (StoppingCriterion Object)
-        abs_tol         0.0100
+        abs_tol         0.010
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         4096
-        solution        1.7674
-        r_lag           4
-        time_integrate  0.0298
+        n_total         2^(12)
+        solution        1.793
+        r_lag           2^(2)
+        time_integrate  0.018
 
 
 
@@ -369,7 +360,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.215 the time and 0.250 the samples
+    Imporance Sampling takes 0.240 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -378,7 +369,7 @@ Importance Sampling MC vs QMC
 **Test Parameters**
 
 -  dimension = 16
--  abs\_tol = .025
+-  abs_tol = .025
 -  trials = 3
 
 .. code:: ipython3
@@ -537,7 +528,111 @@ Importance Sampling MC vs QMC
 
 
 
-.. image:: importance_sampling_files/importance_sampling_20_0.png
+
+.. parsed-literal::
+
+    <BarContainer object of 5 artists>
+
+
+
+
+
+.. parsed-literal::
+
+    <BarContainer object of 5 artists>
+
+
+
+
+
+.. parsed-literal::
+
+    <BarContainer object of 5 artists>
+
+
+
+
+
+.. parsed-literal::
+
+    <BarContainer object of 5 artists>
+
+
+
+
+
+.. parsed-literal::
+
+    Text(0.5, 0.98, 'Importance Sampling Comparison by Stopping Criterion on Asian Call Option')
+
+
+
+
+
+.. parsed-literal::
+
+    Text(0.5, 0, 'log(Samples)')
+
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.legend.Legend at 0x7f8b183afa10>
+
+
+
+
+
+.. parsed-literal::
+
+    Text(0.5, 0, 'Time')
+
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.legend.Legend at 0x7f8b183afa90>
+
+
+
+
+
+.. parsed-literal::
+
+    []
+
+
+
+
+
+.. parsed-literal::
+
+    [<matplotlib.axis.YTick at 0x7f8b38eaff10>,
+     <matplotlib.axis.YTick at 0x7f8b78fd7dd0>,
+     <matplotlib.axis.YTick at 0x7f8b78fd2ed0>,
+     <matplotlib.axis.YTick at 0x7f8b1841e3d0>,
+     <matplotlib.axis.YTick at 0x7f8b1841e890>]
+
+
+
+
+
+.. parsed-literal::
+
+    [Text(0, 0, 'CubMCCLT IIDStdUniform (MC)'),
+     Text(0, 0, 'CubMCG IIDStdGaussian (MC)'),
+     Text(0, 0, 'CubQMCCLT Sobol (QMC)'),
+     Text(0, 0, 'CubQMCLatticeG Lattice (QMC)'),
+     Text(0, 0, 'CubQMCSobolG Sobol (QMC)')]
+
+
+
+
+.. image:: importance_sampling_files/importance_sampling_20_12.png
 
 
 .. code:: ipython3
@@ -557,6 +652,79 @@ Importance Sampling MC vs QMC
 
 
 
-.. image:: importance_sampling_files/importance_sampling_21_0.png
 
+.. parsed-literal::
+
+    0     [Line2D(CubMCCLT IIDStdUniform (MC))]
+    1      [Line2D(CubMCG IIDStdGaussian (MC))]
+    2           [Line2D(CubQMCCLT Sobol (QMC))]
+    3    [Line2D(CubQMCLatticeG Lattice (QMC))]
+    4        [Line2D(CubQMCSobolG Sobol (QMC))]
+    dtype: object
+
+
+
+
+
+.. parsed-literal::
+
+    0     [Line2D(CubMCCLT IIDStdUniform (MC))]
+    1      [Line2D(CubMCG IIDStdGaussian (MC))]
+    2           [Line2D(CubQMCCLT Sobol (QMC))]
+    3    [Line2D(CubQMCLatticeG Lattice (QMC))]
+    4        [Line2D(CubQMCSobolG Sobol (QMC))]
+    dtype: object
+
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.legend.Legend at 0x7f8b489be310>
+
+
+
+
+
+.. parsed-literal::
+
+    Text(0, 0.5, 'log(samples)')
+
+
+
+
+
+.. parsed-literal::
+
+    Text(0, 0.5, 'log(time)')
+
+
+
+
+
+.. parsed-literal::
+
+    Text(0.5, 0, 'mean shift')
+
+
+
+
+
+.. parsed-literal::
+
+    Text(0.5, 0, 'mean shift')
+
+
+
+
+
+.. parsed-literal::
+
+    Text(0.5, 0.98, 'Comparing Mean Shift Across Problems')
+
+
+
+
+.. image:: importance_sampling_files/importance_sampling_21_8.png
 

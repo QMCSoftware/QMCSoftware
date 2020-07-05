@@ -16,11 +16,9 @@ Exponential
 
 .. math::
 
-   \begin{equation}
    y \sim exp(\lambda) \qquad \text{pdf y } f(x) = \lambda e^{-\lambda x} \\
    \text{cdf y } F(x) = 1-e^{-\lambda x} \qquad \text{inverse cdf } F^{-1}(x) = \frac{-log(1-x)}{\lambda} \\
    \therefore y \sim \frac{-log(1-u)}{\lambda} \text{ for } u \sim U_d(0,1)
-   \end{equation}
 
 .. code:: ipython3
 
@@ -77,12 +75,10 @@ Cauchy
 
 .. math::
 
-   \begin{equation}
    y \sim cauchy(x_0,\gamma) \qquad \text{pdf y } f(x) = [\pi \gamma (1+(\frac{x-x_0}{\gamma})^2)]^{-1} \\
    \text{cdf y } F(x) = \frac{1}{\pi} arctan(\frac{x-x_0}{\gamma}) + 1/2 \qquad \\
    \text{inverse cdf } F^{-1}(x) = tan(\pi(x-\frac{1}{2}))\gamma + x_0 \\
    \therefore y \sim  tan(\pi(u-\frac{1}{2}))\gamma + x_0 \text{ for } u \sim U_d(0,1)
-   \end{equation}
 
 .. code:: ipython3
 
@@ -121,13 +117,11 @@ Acceptance Rejection Sampling
 
 .. math::
 
-   \begin{equation}
    \text{objective pdf } f(x) = \begin{cases}
            16x/3 &, 0 \leq x \leq 1/4,\\
            4/3 &, 1/4 <x < 3/4,\\
            16(1-x)/3 &, 3/4 < x < 1
    \end{cases}
-   \end{equation}
 
 .. code:: ipython3
 
@@ -225,7 +219,7 @@ Independent priors :math:`\alpha \sim t_4(0,2^2)` and
     Posterior samples mean
     [ 1.377 -0.371]
     Posterior samples covariance
-    [[ 0.400 -0.421]
+    [[ 0.4   -0.421]
      [-0.421  0.595]]
 
 
@@ -261,12 +255,10 @@ For importance sampling, we can capture this domain,
 
 .. math::
 
-   \begin{equation}
    \forall \mathbf{x} \in \mathcal{X}: \mathbf{x} \in \beta \\
    \tilde{g}(\mathbf{x}) = \begin{cases} g(\mathbf{x}), & \mathbf{x} \in \mathcal{X} \\ 0, & \text{otherwise} \end{cases} \qquad \text{for } \mathbf{x} \in \beta \\
    \tilde{\rho}(\mathbf{x}) = \begin{cases} \rho(\mathbf{x}), & \mathbf{x} \in \mathcal{X} \\ 0, & \text{otherwise} \end{cases} \qquad \text{for } \mathbf{x} \in \beta \\
    \therefore \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_{\beta} \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}
-   \end{equation}
 
 Quarter Circle Example
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -277,11 +269,7 @@ the integrand :math:`g(\mathbf{x}) = \mathbf{x}_1+\mathbf{x}_2`, and our
 measure :math:`\rho(x) = 4/\pi`. Therefore we choose
 :math:`\beta = [0,1]^2` and solve
 
-.. math::
-
-   \begin{equation}
-       \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_0^1 \int_0^1 \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}_1d\mathbf{x}_2 = \frac{8}{3\pi}
-   \end{equation}
+.. math:: \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_0^1 \int_0^1 \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}_1d\mathbf{x}_2 = \frac{8}{3\pi}
 
 .. code:: ipython3
 
@@ -311,22 +299,21 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
     Solution: 0.8479         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         randomize       1
         seed            9
         backend         gail
         mimics          StdUniform
     ImportanceSampling (TrueMeasure Object)
-        distrib_name    Lattice
     CubQMCLatticeG (StoppingCriterion Object)
-        abs_tol         0.0010
+        abs_tol         0.001
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         8192
-        solution        0.8479
-        r_lag           4
-        time_integrate  0.1572
+        n_total         2^(13)
+        solution        0.848
+        r_lag           2^(2)
+        time_integrate  0.111
     Within tolerance of true value 0.849: True
 
