@@ -37,7 +37,7 @@ Asian Call Option
     :members:
 
 Multilevel Call Options with Milstein Discretization
-...............................................
+.....................................................
 
 .. automodule:: qmcpy.integrand.ml_call_options
     :members:
@@ -51,7 +51,7 @@ Linear Function
 
 
 True Measure Class
--------------
+------------------
 
 Abstract Measure Class
 ......................
@@ -90,7 +90,7 @@ Importance Sampling
     :members:
 
 Identical to what Discrete Distribution Mimics
-..................
+..............................................
 
 .. automodule:: qmcpy.true_measure.identical_to_discrete
     :members:
@@ -113,7 +113,7 @@ Lattice
     :members:
 
 Sobol'
-.....
+.......
 
 .. automodule:: qmcpy.discrete_distribution.sobol.sobol
     :members:
@@ -172,13 +172,13 @@ Abstract Stopping Criterion Class
     :members:
 
 Guaranteed Lattice Cubature (qMC)
-................................
+..................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_lattice_g
     :members:
 
 Guaranteed Sobol Cubature (qMC)
-..............................
+................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_sobol_g
     :members:
@@ -219,7 +219,7 @@ Accumulate Data Class
 ---------------------
 
 Abstract Accumulate Data Class
-...................
+...............................
 
 .. automodule:: qmcpy.accumulate_data._accumulate_data
     :members:

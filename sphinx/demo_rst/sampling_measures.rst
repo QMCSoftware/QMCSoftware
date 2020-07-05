@@ -14,7 +14,7 @@ Inverse CDF Sampling
 Exponential
 ~~~~~~~~~~~
 
-.. raw:: latex
+.. math::
 
    \begin{equation}
    y \sim exp(\lambda) \qquad \text{pdf y } f(x) = \lambda e^{-\lambda x} \\
@@ -75,7 +75,7 @@ Exponential
 Cauchy
 ------
 
-.. raw:: latex
+.. math::
 
    \begin{equation}
    y \sim cauchy(x_0,\gamma) \qquad \text{pdf y } f(x) = [\pi \gamma (1+(\frac{x-x_0}{\gamma})^2)]^{-1} \\
@@ -119,7 +119,7 @@ Cauchy
 Acceptance Rejection Sampling
 -----------------------------
 
-.. raw:: latex
+.. math::
 
    \begin{equation}
    \text{objective pdf } f(x) = \begin{cases}
@@ -254,12 +254,12 @@ Let :math:`\mathcal{X}` be the domain. We are interested in integrand
 :math:`g(\mathbf{x})` defined with respect to measure
 :math:`\rho(\mathbf{x})` for :math:`\mathbf{x} \in \mathcal{X}`.
 
-.. math:: \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})d\mathbf{x}
+.. math:: \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})d\mathbf{x}.
 
- For importance sampling, we can capture this domain,
+For importance sampling, we can capture this domain,
 :math:`\mathcal{X}`, in a unit box, :math:`\beta=[a,b]^d`, such that
 
-.. raw:: latex
+.. math::
 
    \begin{equation}
    \forall \mathbf{x} \in \mathcal{X}: \mathbf{x} \in \beta \\
@@ -277,7 +277,7 @@ the integrand :math:`g(\mathbf{x}) = \mathbf{x}_1+\mathbf{x}_2`, and our
 measure :math:`\rho(x) = 4/\pi`. Therefore we choose
 :math:`\beta = [0,1]^2` and solve
 
-.. raw:: latex
+.. math::
 
    \begin{equation}
        \int_{\mathcal{X}} g(\mathbf{x}) \rho(\mathbf{x})dx = \int_0^1 \int_0^1 \tilde{g}(\mathbf{x}) \tilde{\rho}(\mathbf{x}) d\mathbf{x}_1d\mathbf{x}_2 = \frac{8}{3\pi}
@@ -329,5 +329,4 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
         r_lag           4
         time_integrate  0.1572
     Within tolerance of true value 0.849: True
-
 
