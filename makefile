@@ -1,3 +1,14 @@
+# Makefile for compiling QRNG, running test suites, and compiling documentaion
+#
+# Syntax notes:
+#   @ means don't echo command
+#   2>/dev/null means hide warnings and standard error --- remove that when trying
+#   to fix warnings or errors in documentation generation
+#
+#   -C for sphix-build will not look for conf.py
+#   -b for sphinx-build will look for conf.py
+
+
 qrngpath = qmcpy/discrete_distribution/qrng/
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
@@ -9,6 +20,7 @@ endif
 ifeq ($(UNAME), Windows)
 EXT = dll
 endif
+
 qrng:
 	@gcc -Wall -fPIC -shared  -o $(qrngpath)qrng_lib.$(EXT) $(qrngpath)*.c -lm
 	@echo Done compiling qrng C files
@@ -24,6 +36,10 @@ tests:
 mddir = sphinx/readme_rst/
 nbdir = sphinx/demo_rst/
 nbconvertcmd = jupyter nbconvert --to rst --output-dir='$(nbdir)'
+SPHINXOPTS  ?= -W --keep-going
+SPHINXBUILD ?= sphinx-build
+SOURCEDIR = sphinx
+BUILDDIR = sphinx/_build
 _doc:
 	# Make Directries
 	@rm -r $(mddir) 2>/dev/null &
@@ -42,24 +58,23 @@ _doc:
 	done
 	@rm -f $(nbdir)nei_demo.rst
 	@rm -r $(nbdir)nei_demo_files/
-	@-cd sphinx && make clean
+	@cd sphinx && make clean
 doc_html: _doc
-	-$(MAKE) -C sphinx html 2>/dev/null
-doc_pdf: _doc
-	-$(MAKE) -C sphinx latex 2>/dev/null
-	-$(MAKE) -C sphinx/_build/latex/ all-pdf -W --keep-going
+	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
+doc_pdf: doc_html
+	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going 2>/dev/null
 doc_epub: _doc
-	-$(MAKE) -C sphinx epub 2>/dev/null
+	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
 workout:
 	# integration_examples
-	@python workouts/integration_examples/asian_option_multi_level.py  > outputs/integration_examples/asian_option_multi_level.log
-	@python workouts/integration_examples/asian_option_single_level.py  > outputs/integration_examples/asian_option_single_level.log
-	@python workouts/integration_examples/keister.py  > outputs/integration_examples/keister.log
+	@python workouts/integration_examples/asian_option_multi_level.py > outputs/integration_examples/asian_option_multi_level.log
+	@python workouts/integration_examples/asian_option_single_level.py > outputs/integration_examples/asian_option_single_level.log
+	@python workouts/integration_examples/keister.py > outputs/integration_examples/keister.log
 	@python workouts/integration_examples/pi_problem.py > outputs/integration_examples/pi_problem.log
 	# lds_sequences
 	@python workouts/lds_sequences/python_sequences.py
 	# mc_vs_qmc
-	@python workouts/mc_vs_qmc/importance_sampling.py
+	@python workouts/mc_vs_qmc/import   ance_sampling.py
 	@python workouts/mc_vs_qmc/vary_abs_tol.py
 	@python workouts/mc_vs_qmc/vary_dimension.py
 	# mlmc
