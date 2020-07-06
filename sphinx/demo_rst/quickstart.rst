@@ -68,25 +68,24 @@ Step 5: Integrate
     Solution: 1.8082         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         randomize       1
         seed            None
         backend         gail
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
-        distrib_name    Lattice
         mean            0
-        covariance      0.5000
+        covariance      2^(-1)
     CubQMCLatticeG (StoppingCriterion Object)
-        abs_tol         0.0001
+        abs_tol         1.00e-04
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         65536
-        solution        1.8082
-        r_lag           4
-        time_integrate  0.0653
+        n_total         2^(16)
+        solution        1.808
+        r_lag           2^(2)
+        time_integrate  0.073
     Within absolute tolerance: True
 
 
@@ -113,25 +112,24 @@ Condensed Problem
     Solution: 1.8082         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         randomize       1
         seed            None
         backend         gail
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
-        distrib_name    Lattice
         mean            0
-        covariance      0.5000
+        covariance      2^(-1)
     CubQMCLatticeG (StoppingCriterion Object)
-        abs_tol         0.0001
+        abs_tol         1.00e-04
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         65536
-        solution        1.8082
-        r_lag           4
-        time_integrate  0.0652
+        n_total         2^(16)
+        solution        1.808
+        r_lag           2^(2)
+        time_integrate  0.070
     Within absolute tolerance: True
 
 

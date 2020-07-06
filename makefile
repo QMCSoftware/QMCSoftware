@@ -42,8 +42,8 @@ SOURCEDIR = sphinx
 BUILDDIR = sphinx/_build
 _doc:
 	# Make Directries
-	@rm -r $(mddir) 2>/dev/null &
-	@rm -r $(nbdir) 2>/dev/null &
+	@rm -r -f $(mddir) 2>/dev/null &
+	@rm -r -f $(nbdir) 2>/dev/null &
 	# READMEs --> RST
 	@mkdir $(mddir)
 	@grep -v  "\[\!" README.md > README2.md
@@ -74,7 +74,7 @@ workout:
 	# lds_sequences
 	@python workouts/lds_sequences/python_sequences.py
 	# mc_vs_qmc
-	@python workouts/mc_vs_qmc/import   ance_sampling.py
+	@python workouts/mc_vs_qmc/importance_sampling.py
 	@python workouts/mc_vs_qmc/vary_abs_tol.py
 	@python workouts/mc_vs_qmc/vary_dimension.py
 	# mlmc

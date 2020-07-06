@@ -31,7 +31,7 @@ Installation
 
 ::
 
-   pip install qmcpy
+    pip install qmcpy
 
 **For Developers/Contributors**
 
@@ -41,38 +41,38 @@ using ``virtualenv`` and ``virtualenvwrapper``
 
 ::
 
-   mkvirtualenv qmcpy
-   git clone https://github.com/QMCSoftware/QMCSoftware.git
-   cd QMCSoftware
-   git checkout develop
-   setvirtualenvproject
-   add2virtualenv $(pwd)
-   pip install -r requirements/dev.txt
-   pip install -e ./
+    mkvirtualenv qmcpy
+    git clone https://github.com/QMCSoftware/QMCSoftware.git
+    cd QMCSoftware
+    git checkout develop
+    setvirtualenvproject
+    add2virtualenv $(pwd)
+    pip install -r requirements/dev.txt
+    pip install -e ./
 
 For ``conda`` users,
 
 ::
 
-   conda create --name qmcpy python=3.6
-   conda activate qmcpy
-   git clone https://github.com/QMCSoftware/QMCSoftware.git
-   cd QMCSoftware
-   git checkout develop
-   pip install -r requirements/dev.txt
-   pip install -e ./
+    conda create --name qmcpy python=3.6
+    conda activate qmcpy
+    git clone https://github.com/QMCSoftware/QMCSoftware.git
+    cd QMCSoftware
+    git checkout develop
+    pip install -r requirements/dev.txt
+    pip install -e ./
 
 To check for successful installation, run
 
 ::
 
-   make tests
+    make tests
 
 Note that the QRNG C backend files can be explicitly recompiled with
 
 ::
 
-   pip install -e ./
+    pip install -e ./
 
 --------------
 
@@ -91,21 +91,21 @@ requirements
 
 ::
 
-   pip install -r requirements/dev_docs.txt
+    pip install -r requirements/dev_docs.txt
 
 Then setup Sphinx paths (only needs to be run once for initialization)
 
 ::
 
-   make _doc
+    make _doc
 
 Finally, run one of the following three commands:
 
 ::
 
-   make doc_html
-   make doc_pdf
-   make doc_epub
+    make doc_html
+    make doc_pdf
+    make doc_epub
 
 To recompile documentation, you now only need one of the above three
 commands.
@@ -147,7 +147,7 @@ To run all workouts (~10 min) use the command
 
 ::
 
-   make workout
+    make workout
 
 --------------
 
@@ -159,7 +159,7 @@ run with
 
 ::
 
-   make tests
+    make tests
 
 See ``makefile`` for individual testing commands.
 
@@ -208,18 +208,18 @@ This work is maintained under the Apache 2.0 License.
 References
 ----------
 
-[1] F. Y. Kuo and D. Nuyens. “Application of quasi-Monte Carlo methods
+[1] F. Y. Kuo and D. Nuyens. "Application of quasi-Monte Carlo methods
 to elliptic PDEs with random diffusion coefficients - a survey of
-analysis and implementation,” Foundations of Computational Mathematics,
+analysis and implementation," Foundations of Computational Mathematics,
 16(6):1631-1696, 2016. (`springer
 link <https://link.springer.com/article/10.1007/s10208-016-9329-5>`__,
 `arxiv link <https://arxiv.org/abs/1606.06613>`__)
 
 [2] Fred J. Hickernell, Lan Jiang, Yuewei Liu, and Art B. Owen,
-“Guaranteed conservative fixed width confidence intervals via Monte
-Carlo sampling,” Monte Carlo and Quasi-Monte Carlo Methods 2012 (J.
-Dick, F.Y. Kuo, G. W. Peters, and I. H. Sloan, eds.), pp. 105-128,
-Springer-Verlag, Berlin, 2014. DOI: 10.1007/978-3-642-41095-6_5
+"Guaranteed conservative fixed width confidence intervals via Monte
+Carlo sampling," Monte Carlo and Quasi-Monte Carlo Methods 2012 (J.
+Dick, F.Y. Kuo, G. W. Peters, and I. H. Sloan, eds.), pp. 105-128,
+Springer-Verlag, Berlin, 2014. DOI: 10.1007/978-3-642-41095-6\_5
 
 [3] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis
 Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan
@@ -227,22 +227,22 @@ Zhang, Yizhi Zhang, and Xuan Zhou, GAIL: Guaranteed Automatic
 Integration Library (Version 2.3.1) [MATLAB Software], 2020. Available
 from ``http://gailgithub.github.io/GAIL_Dev/``
 
-[4] Sou-Cheng T. Choi, “MINRES-QLP Pack and Reliable Reproducible
-Research via Supportable Scientific Software,” Journal of Open Research
-Software, Volume 2, Number 1, e22, pp. 1-7, 2014.
+[4] Sou-Cheng T. Choi, "MINRES-QLP Pack and Reliable Reproducible
+Research via Supportable Scientific Software," Journal of Open Research
+Software, Volume 2, Number 1, e22, pp. 1-7, 2014.
 
-[5] Sou-Cheng T. Choi and Fred J. Hickernell, “IIT MATH-573 Reliable
-Mathematical Software” [Course Slides], Illinois Institute of
+[5] Sou-Cheng T. Choi and Fred J. Hickernell, "IIT MATH-573 Reliable
+Mathematical Software" [Course Slides], Illinois Institute of
 Technology, Chicago, IL, 2013. Available from
 ``http://gailgithub.github.io/GAIL_Dev/``
 
 [6] Daniel S. Katz, Sou-Cheng T. Choi, Hilmar Lapp, Ketan Maheshwari,
 Frank Loffler, Matthew Turk, Marcus D. Hanwell, Nancy Wilkins-Diehr,
 James Hetherington, James Howison, Shel Swenson, Gabrielle D. Allen,
-Anne C. Elster, Bruce Berriman, Colin Venters, “Summary of the First
+Anne C. Elster, Bruce Berriman, Colin Venters, "Summary of the First
 Workshop On Sustainable Software for Science: Practice and Experiences
-(WSSSPE1),” Journal of Open Research Software, Volume 2, Number 1, e6,
-pp. 1-21, 2014.
+(WSSSPE1)," Journal of Open Research Software, Volume 2, Number 1, e6,
+pp. 1-21, 2014.
 
 [7] Fang, K.-T., and Wang, Y. (1994). Number-theoretic Methods in
 Statistics. London, UK: CHAPMAN & HALL
@@ -251,22 +251,22 @@ Statistics. London, UK: CHAPMAN & HALL
 Means of Random Variables, PhD Thesis, Illinois Institute of Technology,
 2016.
 
-[9] Lluis Antoni Jimenez Rugama and Fred J. Hickernell, “Adaptive
-multidimensional integration based on rank-1 lattices,” Monte Carlo and
+[9] Lluis Antoni Jimenez Rugama and Fred J. Hickernell, "Adaptive
+multidimensional integration based on rank-1 lattices," Monte Carlo and
 Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools
 and D. Nuyens, eds.), Springer Proceedings in Mathematics and
-Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1411.1966,
-pp. 407-422.
+Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1411.1966,
+pp. 407-422.
 
 [10] Kai-Tai Fang and Yuan Wang, Number-theoretic Methods in Statistics,
 Chapman & Hall, London, 1994.
 
-[11] Fred J. Hickernell and Lluis Antoni Jimenez Rugama, “Reliable
-adaptive cubature using digital sequences,” Monte Carlo and Quasi-Monte
+[11] Fred J. Hickernell and Lluis Antoni Jimenez Rugama, "Reliable
+adaptive cubature using digital sequences," Monte Carlo and Quasi-Monte
 Carlo Methods: MCQMC, Leuven, Belgium, April 2014 (R. Cools and D.
-Nuyens, eds.), Springer Proceedings in Mathematics and Statistics,
-vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA],
-pp. 367-383.
+Nuyens, eds.), Springer Proceedings in Mathematics and Statistics, vol.
+163, Springer-Verlag, Berlin, 2016, arXiv:1410.8615 [math.NA], pp.
+367-383.
 
 [12] Marius Hofert and Christiane Lemieux (2019). qrng: (Randomized)
 Quasi-Random Number Generators. R package version 0.0-7.
@@ -276,21 +276,21 @@ Quasi-Random Number Generators. R package version 0.0-7.
 Irreducible Sobol’ Sequences in Prime Power Bases,” Mathematics and
 Computers in Simulation 161 (2019): 13–22.
 
-[14] M. B. Giles. “Multi-level Monte Carlo path simulation,” Operations
+[14] M. B. Giles. "Multi-level Monte Carlo path simulation," Operations
 Research, 56(3):607-617, 2008.
 ``http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf``.
 
-[15] M. B. Giles. “Improved multilevel Monte Carlo convergence using the
-Milstein scheme,” 343-358, in Monte Carlo and Quasi-Monte Carlo Methods
+[15] M. B. Giles. "Improved multilevel Monte Carlo convergence using the
+Milstein scheme," 343-358, in Monte Carlo and Quasi-Monte Carlo Methods
 2006, Springer, 2008.
 ``http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf``.
 
-[16] M. B. Giles and B. J. Waterhouse. “Multilevel quasi-Monte Carlo
-path simulation,” pp.165-181 in Advanced Financial Modelling, in Radon
+[16] M. B. Giles and B. J. Waterhouse. "Multilevel quasi-Monte Carlo
+path simulation," pp.165-181 in Advanced Financial Modelling, in Radon
 Series on Computational and Applied Mathematics, de Gruyter, 2009.
 ``http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf``
 
-[17] Owen, A. B. “A randomized Halton algorithm in R,” 2017.
+[17] Owen, A. B. "A randomized Halton algorithm in R," 2017.
 arXiv:1706.02808 [stat.CO]
 
 --------------

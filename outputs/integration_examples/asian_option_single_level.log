@@ -3,165 +3,160 @@
 
 Solution: 5.8318         
 AsianCall (Integrand Object)
-    volatility      0.5000
+    volatility      2^(-1)
     start_price     30
     strike_price    25
-    interest_rate   0.0100
+    interest_rate   0.010
     mean_type       geometric
-    dimensions      64
+    dimensions      2^(6)
     dim_fracs       0
 IIDStdGaussian (DiscreteDistribution Object)
-    dimension       64
+    dimension       2^(6)
     seed            7
     mimics          StdGaussian
 BrownianMotion (TrueMeasure Object)
-    distrib_name    IIDStdGaussian
-    time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
 CubMCCLT (StoppingCriterion Object)
-    inflate         1.2000
-    alpha           0.0100
-    abs_tol         0.0250
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.025
     rel_tol         0
-    n_init          1024
+    n_init          2^(10)
     n_max           10000000000
 MeanVarData (AccumulateData Object)
     levels          1
-    solution        5.8318
+    solution        5.832
     n               794434
     n_total         795458
-    confid_int      [ 5.807  5.857]
-    time_integrate  5.7315
+    confid_int      [5.807 5.857]
+    time_integrate  4.276
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8221         
 AsianCall (Integrand Object)
-    volatility      0.5000
+    volatility      2^(-1)
     start_price     30
     strike_price    25
-    interest_rate   0.0100
+    interest_rate   0.010
     mean_type       geometric
-    dimensions      64
+    dimensions      2^(6)
     dim_fracs       0
 Lattice (DiscreteDistribution Object)
-    dimension       64
+    dimension       2^(6)
     randomize       1
     seed            1092
     backend         mps
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    distrib_name    Lattice
-    time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
 CubQMCCLT (StoppingCriterion Object)
-    inflate         1.2000
-    alpha           0.0100
-    abs_tol         0.0250
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.025
     rel_tol         0
-    n_init          256
-    n_max           1073741824
+    n_init          2^(8)
+    n_max           2^(30)
 MeanVarDataRep (AccumulateData Object)
-    replications    16
-    solution        5.8221
-    sighat          0.0286
-    n_total         32768
-    confid_int      [ 5.800  5.844]
-    time_integrate  0.4103
+    replications    2^(4)
+    solution        5.822
+    sighat          0.029
+    n_total         2^(15)
+    confid_int      [5.8   5.844]
+    time_integrate  0.307
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8302         
 AsianCall (Integrand Object)
-    volatility      0.5000
+    volatility      2^(-1)
     start_price     30
     strike_price    25
-    interest_rate   0.0100
+    interest_rate   0.010
     mean_type       geometric
-    dimensions      64
+    dimensions      2^(6)
     dim_fracs       0
 IIDStdGaussian (DiscreteDistribution Object)
-    dimension       64
+    dimension       2^(6)
     seed            7
     mimics          StdGaussian
 BrownianMotion (TrueMeasure Object)
-    distrib_name    IIDStdGaussian
-    time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
 CubMCG (StoppingCriterion Object)
-    inflate         1.2000
-    alpha           0.0100
-    abs_tol         0.0250
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.025
     rel_tol         0
-    n_init          1024
+    n_init          2^(10)
     n_max           10000000000
 MeanVarData (AccumulateData Object)
     levels          1
-    solution        5.8302
+    solution        5.830
     n               999083
     n_total         1000107
-    confid_int      [ 5.805  5.855]
-    time_integrate  6.8597
+    confid_int      [5.805 5.855]
+    time_integrate  5.761
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8321         
 AsianCall (Integrand Object)
-    volatility      0.5000
+    volatility      2^(-1)
     start_price     30
     strike_price    25
-    interest_rate   0.0100
+    interest_rate   0.010
     mean_type       geometric
-    dimensions      64
+    dimensions      2^(6)
     dim_fracs       0
 Lattice (DiscreteDistribution Object)
-    dimension       64
+    dimension       2^(6)
     randomize       1
     seed            7
     backend         gail
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    distrib_name    Lattice
-    time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
 CubQMCLatticeG (StoppingCriterion Object)
-    abs_tol         0.0250
+    abs_tol         0.025
     rel_tol         0
-    n_init          1024
-    n_max           34359738368
+    n_init          2^(10)
+    n_max           2^(35)
 LDTransformData (AccumulateData Object)
-    n_total         8192
-    solution        5.8321
-    r_lag           4
-    time_integrate  0.1161
+    n_total         2^(13)
+    solution        5.832
+    r_lag           2^(2)
+    time_integrate  0.090
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8421         
 AsianCall (Integrand Object)
-    volatility      0.5000
+    volatility      2^(-1)
     start_price     30
     strike_price    25
-    interest_rate   0.0100
+    interest_rate   0.010
     mean_type       geometric
-    dimensions      64
+    dimensions      2^(6)
     dim_fracs       0
 Sobol (DiscreteDistribution Object)
-    dimension       64
+    dimension       2^(6)
     randomize       1
     seed            7
     backend         qrng
     mimics          StdUniform
     graycode        0
 BrownianMotion (TrueMeasure Object)
-    distrib_name    Sobol
-    time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
 CubQMCSobolG (StoppingCriterion Object)
-    abs_tol         0.0250
+    abs_tol         0.025
     rel_tol         0
-    n_init          1024
-    n_max           34359738368
+    n_init          2^(10)
+    n_max           2^(35)
 LDTransformData (AccumulateData Object)
-    n_total         8192
-    solution        5.8421
-    r_lag           4
-    time_integrate  0.1228
+    n_total         2^(13)
+    solution        5.842
+    r_lag           2^(2)
+    time_integrate  0.096
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

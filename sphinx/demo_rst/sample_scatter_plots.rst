@@ -232,27 +232,26 @@ Plots samples on a 2D Keister function
     Solution: 1.8757         
     Keister (Integrand Object)
     IIDStdGaussian (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         seed            7
         mimics          StdGaussian
     Gaussian (TrueMeasure Object)
-        distrib_name    IIDStdGaussian
         mean            0
-        covariance      0.5000
+        covariance      2^(-1)
     CubMCCLT (StoppingCriterion Object)
-        inflate         1.2000
-        alpha           0.0100
-        abs_tol         0.5000
+        inflate         1.200
+        alpha           0.010
+        abs_tol         2^(-1)
         rel_tol         0
-        n_init          16
+        n_init          2^(4)
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          1
-        solution        1.8757
+        solution        1.876
         n               50
         n_total         66
-        confid_int      [ 1.358  2.393]
-        time_integrate  0.0013
+        confid_int      [1.358 2.393]
+        time_integrate  0.001
 
 
 .. code:: ipython3

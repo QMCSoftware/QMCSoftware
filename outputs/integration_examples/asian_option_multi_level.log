@@ -1,36 +1,35 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8298         
+Solution: 5.8306         
 AsianCall (Integrand Object)
-    volatility      0.5000
+    volatility      2^(-1)
     start_price     30
     strike_price    25
-    interest_rate   0.0100
+    interest_rate   0.010
     mean_type       geometric
     dimensions      [ 4 16 64]
-    dim_fracs       [ 0.000  4.000  4.000]
+    dim_fracs       [0. 4. 4.]
 IIDStdGaussian (DiscreteDistribution Object)
-    dimension       64
+    dimension       2^(6)
     seed            7
     mimics          StdGaussian
 BrownianMotion (TrueMeasure Object)
-    distrib_name    IIDStdGaussian
-    time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
 CubMCCLT (StoppingCriterion Object)
-    inflate         1.2000
-    alpha           0.0100
-    abs_tol         0.0250
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.025
     rel_tol         0
-    n_init          1024
+    n_init          2^(10)
     n_max           10000000000
 MeanVarData (AccumulateData Object)
     levels          3
-    solution        5.8298
-    n               [ 1016662.000  78428.000  10148.000]
-    n_total         1108310
-    confid_int      [ 5.804  5.855]
-    time_integrate  0.6437
+    solution        5.831
+    n               [999221.  82150.  10618.]
+    n_total         1095061
+    confid_int      [5.805 5.856]
+    time_integrate  0.550
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

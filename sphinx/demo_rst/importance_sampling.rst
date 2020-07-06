@@ -59,7 +59,7 @@ With ordinary Monte Carlo we do the following:
 
 .. parsed-literal::
 
-    Solution: 0.4500         
+    Solution: 0.4498         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)
@@ -79,7 +79,7 @@ With ordinary Monte Carlo we do the following:
         n_total         2^(16)
         solution        0.450
         r_lag           2^(2)
-        time_integrate  0.043
+        time_integrate  0.051
 
 
 
@@ -117,7 +117,7 @@ Thus,
 
 .. parsed-literal::
 
-    Solution: 0.4505         
+    Solution: 0.4508         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)
@@ -137,7 +137,7 @@ Thus,
         n_total         2^(14)
         solution        0.451
         r_lag           2^(2)
-        time_integrate  0.014
+        time_integrate  0.017
 
 
 
@@ -149,7 +149,7 @@ Thus,
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.328 the time and 0.250 the samples
+    Imporance Sampling takes 0.327 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -253,7 +253,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7835         
+    Solution: 1.7796         
     AsianCall (Integrand Object)
         volatility      2^(-1)
         start_price     30
@@ -265,7 +265,7 @@ Vanilla Monte Carlo
     Sobol (DiscreteDistribution Object)
         dimension       2^(5)
         randomize       1
-        seed            965676770
+        seed            3409367576
         backend         qrng
         mimics          StdUniform
         graycode        0
@@ -279,9 +279,9 @@ Vanilla Monte Carlo
         n_max           2^(35)
     LDTransformData (AccumulateData Object)
         n_total         2^(14)
-        solution        1.783
+        solution        1.780
         r_lag           2^(2)
-        time_integrate  0.074
+        time_integrate  0.112
 
 
 
@@ -311,7 +311,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7932         
+    Solution: 1.7972         
     AsianCall (Integrand Object)
         volatility      2^(-1)
         start_price     30
@@ -323,7 +323,7 @@ Monte Carlo with Importance Sampling
     Sobol (DiscreteDistribution Object)
         dimension       2^(5)
         randomize       1
-        seed            1909761169
+        seed            4225147773
         backend         qrng
         mimics          StdUniform
         graycode        0
@@ -337,9 +337,9 @@ Monte Carlo with Importance Sampling
         n_max           2^(35)
     LDTransformData (AccumulateData Object)
         n_total         2^(12)
-        solution        1.793
+        solution        1.797
         r_lag           2^(2)
-        time_integrate  0.018
+        time_integrate  0.036
 
 
 
@@ -360,7 +360,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.240 the time and 0.250 the samples
+    Imporance Sampling takes 0.325 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -369,7 +369,7 @@ Importance Sampling MC vs QMC
 **Test Parameters**
 
 -  dimension = 16
--  abs_tol = .025
+-  abs\_tol = .025
 -  trials = 3
 
 .. code:: ipython3
@@ -431,70 +431,70 @@ Importance Sampling MC vs QMC
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>2.84e+05</td>
-          <td>5.63e-01</td>
+          <td>5.18e-01</td>
         </tr>
         <tr>
           <th>CubMCCLT IIDStdUniform (MC)</th>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>7.66e+04</td>
-          <td>1.71e-01</td>
+          <td>1.39e-01</td>
         </tr>
         <tr>
           <th>CubMCG IIDStdGaussian (MC)</th>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.36e+05</td>
-          <td>4.48e-01</td>
+          <td>4.20e-01</td>
         </tr>
         <tr>
           <th>CubMCG IIDStdGaussian (MC)</th>
           <td>1.00e+00</td>
           <td>1.80e+00</td>
           <td>1.18e+05</td>
-          <td>1.47e-01</td>
+          <td>1.17e-01</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>1.64e+04</td>
-          <td>4.12e-02</td>
+          <td>4.20e-02</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>1.64e+04</td>
-          <td>4.15e-02</td>
+          <td>4.27e-02</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
           <td>0.00e+00</td>
           <td>1.75e+00</td>
           <td>4.10e+03</td>
-          <td>1.79e-02</td>
+          <td>1.42e-02</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>
-          <td>4.13e-03</td>
+          <td>4.34e-03</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.10e+03</td>
-          <td>1.59e-02</td>
+          <td>1.18e-02</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>
-          <td>2.95e-03</td>
+          <td>3.42e-03</td>
         </tr>
       </tbody>
     </table>
@@ -528,111 +528,7 @@ Importance Sampling MC vs QMC
 
 
 
-
-.. parsed-literal::
-
-    <BarContainer object of 5 artists>
-
-
-
-
-
-.. parsed-literal::
-
-    <BarContainer object of 5 artists>
-
-
-
-
-
-.. parsed-literal::
-
-    <BarContainer object of 5 artists>
-
-
-
-
-
-.. parsed-literal::
-
-    <BarContainer object of 5 artists>
-
-
-
-
-
-.. parsed-literal::
-
-    Text(0.5, 0.98, 'Importance Sampling Comparison by Stopping Criterion on Asian Call Option')
-
-
-
-
-
-.. parsed-literal::
-
-    Text(0.5, 0, 'log(Samples)')
-
-
-
-
-
-.. parsed-literal::
-
-    <matplotlib.legend.Legend at 0x7f8b183afa10>
-
-
-
-
-
-.. parsed-literal::
-
-    Text(0.5, 0, 'Time')
-
-
-
-
-
-.. parsed-literal::
-
-    <matplotlib.legend.Legend at 0x7f8b183afa90>
-
-
-
-
-
-.. parsed-literal::
-
-    []
-
-
-
-
-
-.. parsed-literal::
-
-    [<matplotlib.axis.YTick at 0x7f8b38eaff10>,
-     <matplotlib.axis.YTick at 0x7f8b78fd7dd0>,
-     <matplotlib.axis.YTick at 0x7f8b78fd2ed0>,
-     <matplotlib.axis.YTick at 0x7f8b1841e3d0>,
-     <matplotlib.axis.YTick at 0x7f8b1841e890>]
-
-
-
-
-
-.. parsed-literal::
-
-    [Text(0, 0, 'CubMCCLT IIDStdUniform (MC)'),
-     Text(0, 0, 'CubMCG IIDStdGaussian (MC)'),
-     Text(0, 0, 'CubQMCCLT Sobol (QMC)'),
-     Text(0, 0, 'CubQMCLatticeG Lattice (QMC)'),
-     Text(0, 0, 'CubQMCSobolG Sobol (QMC)')]
-
-
-
-
-.. image:: importance_sampling_files/importance_sampling_20_12.png
+.. image:: importance_sampling_files/importance_sampling_20_0.png
 
 
 .. code:: ipython3
@@ -652,79 +548,5 @@ Importance Sampling MC vs QMC
 
 
 
-
-.. parsed-literal::
-
-    0     [Line2D(CubMCCLT IIDStdUniform (MC))]
-    1      [Line2D(CubMCG IIDStdGaussian (MC))]
-    2           [Line2D(CubQMCCLT Sobol (QMC))]
-    3    [Line2D(CubQMCLatticeG Lattice (QMC))]
-    4        [Line2D(CubQMCSobolG Sobol (QMC))]
-    dtype: object
-
-
-
-
-
-.. parsed-literal::
-
-    0     [Line2D(CubMCCLT IIDStdUniform (MC))]
-    1      [Line2D(CubMCG IIDStdGaussian (MC))]
-    2           [Line2D(CubQMCCLT Sobol (QMC))]
-    3    [Line2D(CubQMCLatticeG Lattice (QMC))]
-    4        [Line2D(CubQMCSobolG Sobol (QMC))]
-    dtype: object
-
-
-
-
-
-.. parsed-literal::
-
-    <matplotlib.legend.Legend at 0x7f8b489be310>
-
-
-
-
-
-.. parsed-literal::
-
-    Text(0, 0.5, 'log(samples)')
-
-
-
-
-
-.. parsed-literal::
-
-    Text(0, 0.5, 'log(time)')
-
-
-
-
-
-.. parsed-literal::
-
-    Text(0.5, 0, 'mean shift')
-
-
-
-
-
-.. parsed-literal::
-
-    Text(0.5, 0, 'mean shift')
-
-
-
-
-
-.. parsed-literal::
-
-    Text(0.5, 0.98, 'Comparing Mean Shift Across Problems')
-
-
-
-
-.. image:: importance_sampling_files/importance_sampling_21_8.png
+.. image:: importance_sampling_files/importance_sampling_21_0.png
 

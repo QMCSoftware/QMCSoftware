@@ -47,19 +47,18 @@ the Gaussian measure, and the Sobol distribution:
         mimics          StdUniform
         graycode        0
     Gaussian (TrueMeasure Object)
-        distrib_name    Sobol
         mean            0
-        covariance      0.5000
+        covariance      2^(-1)
     CubQMCSobolG (StoppingCriterion Object)
-        abs_tol         0.0500
+        abs_tol         0.050
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         1024
-        solution        2.1718
-        r_lag           4
-        time_integrate  0.0029
+        n_total         2^(10)
+        solution        2.172
+        r_lag           2^(2)
+        time_integrate  0.003
 
 
 Arithmetic-Mean Asian Put Option: Single Level
@@ -105,33 +104,32 @@ defined as follows:
 
     Solution: 6.2744         
     AsianCall (Integrand Object)
-        volatility      0.5000
+        volatility      2^(-1)
         start_price     30
         strike_price    25
-        interest_rate   0.0100
+        interest_rate   0.010
         mean_type       arithmetic
-        dimensions      64
+        dimensions      2^(6)
         dim_fracs       0
     Lattice (DiscreteDistribution Object)
-        dimension       64
+        dimension       2^(6)
         randomize       1
         seed            7
         backend         gail
         mimics          StdUniform
     BrownianMotion (TrueMeasure Object)
-        distrib_name    Lattice
-        time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+        time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
         drift           0
     CubQMCLatticeG (StoppingCriterion Object)
-        abs_tol         0.0500
+        abs_tol         0.050
         rel_tol         0
-        n_init          1024
-        n_max           34359738368
+        n_init          2^(10)
+        n_max           2^(35)
     LDTransformData (AccumulateData Object)
-        n_total         4096
-        solution        6.2744
-        r_lag           4
-        time_integrate  0.0529
+        n_total         2^(12)
+        solution        6.274
+        r_lag           2^(2)
+        time_integrate  0.049
 
 
 Arithmetic-Mean Asian Put Option: Multi-Level
@@ -171,36 +169,35 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2690         
+    Solution: 6.2645         
     AsianCall (Integrand Object)
-        volatility      0.5000
+        volatility      2^(-1)
         start_price     30
         strike_price    25
-        interest_rate   0.0100
+        interest_rate   0.010
         mean_type       arithmetic
         dimensions      [ 4 16 64]
-        dim_fracs       [ 0.000  4.000  4.000]
+        dim_fracs       [0. 4. 4.]
     IIDStdGaussian (DiscreteDistribution Object)
-        dimension       64
+        dimension       2^(6)
         seed            7
         mimics          StdGaussian
     BrownianMotion (TrueMeasure Object)
-        distrib_name    IIDStdGaussian
-        time_vector     [ 0.016  0.031  0.047 ...  0.969  0.984  1.000]
+        time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
         drift           0
     CubMCCLT (StoppingCriterion Object)
-        inflate         1.2000
-        alpha           0.0100
-        abs_tol         0.0500
+        inflate         1.200
+        alpha           0.010
+        abs_tol         0.050
         rel_tol         0
-        n_init          1024
+        n_init          2^(10)
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          3
-        solution        6.2690
-        n               [ 279321.000  29913.000  3291.000]
-        n_total         315597
-        confid_int      [ 6.218  6.321]
-        time_integrate  0.1619
+        solution        6.265
+        n               [296450.  21628.   3454.]
+        n_total         324604
+        confid_int      [6.213 6.316]
+        time_integrate  0.133
 
 

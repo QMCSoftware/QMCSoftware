@@ -314,6 +314,6 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
         n_total         2^(13)
         solution        0.848
         r_lag           2^(2)
-        time_integrate  0.111
+        time_integrate  0.131
     Within tolerance of true value 0.849: True
 

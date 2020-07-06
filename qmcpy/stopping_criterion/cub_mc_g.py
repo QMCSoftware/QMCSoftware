@@ -22,7 +22,7 @@ class CubMCG(StoppingCriterion):
     >>> solution
     1.803926962264685
     >>> data
-    Solution: 1.8039
+    Solution: 1.8039         
     Keister (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
         dimension       2^(1)
@@ -45,7 +45,7 @@ class CubMCG(StoppingCriterion):
         n_total         14497
         confid_int      [1.754 1.854]
         time_integrate  ...
-
+    
     Adapted from
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
 

@@ -1,5 +1,5 @@
 Password: 3141592653
-CPU time: 62.51 sec
+CPU time: 53.93 sec
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -13,16 +13,15 @@ Sobol (DiscreteDistribution Object)
     mimics          StdUniform
     graycode        0
 Lebesgue (TrueMeasure Object)
-    distrib_name    Sobol
     lower_bound     -2
-    upper_bound     2
+    upper_bound     2^(1)
 CubQMCSobolG (StoppingCriterion Object)
-    abs_tol         0.0000
+    abs_tol         4.00e-10
     rel_tol         0
-    n_init          1024
-    n_max           1073741824
+    n_init          2^(10)
+    n_max           2^(30)
 LDTransformData (AccumulateData Object)
-    n_total         134217728
-    solution        3.1416
-    r_lag           4
-    time_integrate  62.5090
+    n_total         2^(27)
+    solution        3.142
+    r_lag           2^(2)
+    time_integrate  53.933

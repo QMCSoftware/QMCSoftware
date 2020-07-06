@@ -8,23 +8,22 @@ IIDStdUniform (DiscreteDistribution Object)
     seed            7
     mimics          StdUniform
 Gaussian (TrueMeasure Object)
-    distrib_name    IIDStdUniform
     mean            0
-    covariance      0.5000
+    covariance      2^(-1)
 CubMCCLT (StoppingCriterion Object)
-    inflate         1.2000
-    alpha           0.0100
-    abs_tol         0.0050
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.005
     rel_tol         0
-    n_init          1024
+    n_init          2^(10)
     n_max           10000000000
 MeanVarData (AccumulateData Object)
     levels          1
-    solution        2.1676
+    solution        2.168
     n               1878963
     n_total         1879987
-    confid_int      [ 2.163  2.173]
-    time_integrate  0.6550
+    confid_int      [2.163 2.173]
+    time_integrate  0.685
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1693         
@@ -36,23 +35,22 @@ Lattice (DiscreteDistribution Object)
     backend         mps
     mimics          StdUniform
 Gaussian (TrueMeasure Object)
-    distrib_name    Lattice
     mean            0
-    covariance      0.5000
+    covariance      2^(-1)
 CubQMCCLT (StoppingCriterion Object)
-    inflate         1.2000
-    alpha           0.0100
-    abs_tol         0.0050
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.005
     rel_tol         0
-    n_init          256
-    n_max           1073741824
+    n_init          2^(8)
+    n_max           2^(30)
 MeanVarDataRep (AccumulateData Object)
-    replications    16
-    solution        2.1693
-    sighat          0.0040
-    n_total         8192
-    confid_int      [ 2.166  2.172]
-    time_integrate  0.0122
+    replications    2^(4)
+    solution        2.169
+    sighat          0.004
+    n_total         2^(13)
+    confid_int      [2.166 2.172]
+    time_integrate  0.014
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1682         
@@ -62,23 +60,22 @@ IIDStdGaussian (DiscreteDistribution Object)
     seed            7
     mimics          StdGaussian
 Gaussian (TrueMeasure Object)
-    distrib_name    IIDStdGaussian
     mean            0
-    covariance      0.5000
+    covariance      2^(-1)
 CubMCG (StoppingCriterion Object)
-    inflate         1.2000
-    alpha           0.0100
-    abs_tol         0.0050
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.005
     rel_tol         0
-    n_init          1024
+    n_init          2^(10)
     n_max           10000000000
 MeanVarData (AccumulateData Object)
     levels          1
-    solution        2.1682
+    solution        2.168
     n               2342182
     n_total         2343206
-    confid_int      [ 2.163  2.173]
-    time_integrate  0.4735
+    confid_int      [2.163 2.173]
+    time_integrate  0.472
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1681         
@@ -90,19 +87,18 @@ Lattice (DiscreteDistribution Object)
     backend         gail
     mimics          StdUniform
 Gaussian (TrueMeasure Object)
-    distrib_name    Lattice
     mean            0
-    covariance      0.5000
+    covariance      2^(-1)
 CubQMCLatticeG (StoppingCriterion Object)
-    abs_tol         0.0050
+    abs_tol         0.005
     rel_tol         0
-    n_init          1024
-    n_max           34359738368
+    n_init          2^(10)
+    n_max           2^(35)
 LDTransformData (AccumulateData Object)
-    n_total         4096
-    solution        2.1681
-    r_lag           4
-    time_integrate  0.0085
+    n_total         2^(12)
+    solution        2.168
+    r_lag           2^(2)
+    time_integrate  0.008
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1705         
@@ -115,18 +111,17 @@ Sobol (DiscreteDistribution Object)
     mimics          StdUniform
     graycode        0
 Gaussian (TrueMeasure Object)
-    distrib_name    Sobol
     mean            0
-    covariance      0.5000
+    covariance      2^(-1)
 CubQMCSobolG (StoppingCriterion Object)
-    abs_tol         0.0050
+    abs_tol         0.005
     rel_tol         0
-    n_init          1024
-    n_max           34359738368
+    n_init          2^(10)
+    n_max           2^(35)
 LDTransformData (AccumulateData Object)
-    n_total         4096
-    solution        2.1705
-    r_lag           4
-    time_integrate  0.0050
+    n_total         2^(12)
+    solution        2.170
+    r_lag           2^(2)
+    time_integrate  0.006
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

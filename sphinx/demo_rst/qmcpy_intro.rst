@@ -56,10 +56,10 @@ The code below generates 4 Sobol samples of 2 dimensions.
 
 .. parsed-literal::
 
-    array([[ 0.076,  0.780],
-           [ 0.576,  0.280],
-           [ 0.326,  0.030],
-           [ 0.826,  0.530]])
+    array([[0.076, 0.78 ],
+           [0.576, 0.28 ],
+           [0.326, 0.03 ],
+           [0.826, 0.53 ]])
 
 
 
@@ -162,7 +162,7 @@ axis argument to the function:
 
 .. parsed-literal::
 
-    array([ 1.000,  0.010,  0.057])
+    array([1.   , 0.01 , 0.057])
 
 
 
@@ -178,7 +178,7 @@ on each element of the vector norm results:
 
 .. parsed-literal::
 
-    array([ 1.000,  0.100,  0.238])
+    array([1.   , 0.1  , 0.238])
 
 
 
@@ -193,7 +193,7 @@ It is. Putting everything together, we have:
 
 .. parsed-literal::
 
-    array([ 1.000,  0.631,  0.505])
+    array([1.   , 0.631, 0.505])
 
 
 
@@ -228,23 +228,22 @@ class in QMCPy and then invoke QMCPy's ``integrate`` function:
         seed            7
         mimics          StdUniform
     Uniform (TrueMeasure Object)
-        distrib_name    IIDStdUniform
         lower_bound     0
         upper_bound     1
     CubMCCLT (StoppingCriterion Object)
-        inflate         1.2000
-        alpha           0.0100
-        abs_tol         0.0100
+        inflate         1.200
+        alpha           0.010
+        abs_tol         0.010
         rel_tol         0
-        n_init          1024
+        n_init          2^(10)
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          1
-        solution        0.6571
+        solution        0.657
         n               3359
         n_total         4383
-        confid_int      [ 0.647  0.667]
-        time_integrate  0.0016
+        confid_int      [0.647 0.667]
+        time_integrate  0.002
 
 
 For our integral, we know the true value. Let's check if QMCPy's
@@ -281,27 +280,26 @@ changing the input parameter value of dimension for QuickConstruct?
     Solution: 0.8264         
     CustomFun (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
-        dimension       2
+        dimension       2^(1)
         seed            7
         mimics          StdUniform
     Uniform (TrueMeasure Object)
-        distrib_name    IIDStdUniform
-        lower_bound     [ 0.000  0.000]
-        upper_bound     [ 1.000  1.000]
+        lower_bound     [0. 0.]
+        upper_bound     [1. 1.]
     CubMCCLT (StoppingCriterion Object)
-        inflate         1.2000
-        alpha           0.0100
-        abs_tol         0.0100
+        inflate         1.200
+        alpha           0.010
+        abs_tol         0.010
         rel_tol         0
-        n_init          1024
+        n_init          2^(10)
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          1
-        solution        0.8264
+        solution        0.826
         n               5455
         n_total         6479
-        confid_int      [ 0.816  0.836]
-        time_integrate  0.0017
+        confid_int      [0.816 0.836]
+        time_integrate  0.006
 
 
 Once again, we could test for accuracy of QMCPy with respect to the true

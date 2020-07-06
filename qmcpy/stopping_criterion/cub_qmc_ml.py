@@ -20,7 +20,7 @@ class CubQMCML(StoppingCriterion):
     >>> solution
     10.444567069452214
     >>> data
-    Solution: 10.4446
+    Solution: 10.4446        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -50,7 +50,7 @@ class CubQMCML(StoppingCriterion):
         bias_estimate   0.007
         n_total         180224
         time_integrate  ...
-
+    
     Reference:
         M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'.
         pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics,
