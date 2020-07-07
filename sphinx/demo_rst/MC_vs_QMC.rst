@@ -39,7 +39,7 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^3`
 
 .. code:: ipython3
 
-    df = pd.read_csv('../outputs/mc_vs_qmc/vary_abs_tol.csv')
+    df = pd.read_csv('../workouts/mc_vs_qmc/out/vary_abs_tol.csv')
     df['Problem'] = df['Stopping Criterion'] + ' ' + df['Distribution'] + ' (' + df['MC/QMC'] + ')'
     df = df.drop(['Stopping Criterion','Distribution','MC/QMC'],axis=1)
     problems = ['CubMCCLT IIDStdUniform (MC)',
@@ -97,21 +97,21 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^3`
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>4.72e+05</td>
-          <td>1.54e-01</td>
+          <td>1.57e-01</td>
         </tr>
         <tr>
           <th>CubMCCLT IIDStdUniform (MC)</th>
           <td>5.00e-02</td>
           <td>2.16e+00</td>
           <td>2.08e+04</td>
-          <td>7.97e-03</td>
+          <td>8.94e-03</td>
         </tr>
         <tr>
           <th>CubMCCLT IIDStdUniform (MC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>6.74e+03</td>
-          <td>3.67e-03</td>
+          <td>3.62e-03</td>
         </tr>
         <tr>
           <th>CubMCG IIDStdGaussian (MC)</th>
@@ -125,77 +125,77 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^3`
           <td>5.00e-02</td>
           <td>2.19e+00</td>
           <td>4.00e+04</td>
-          <td>9.29e-03</td>
+          <td>1.09e-02</td>
         </tr>
         <tr>
           <th>CubMCG IIDStdGaussian (MC)</th>
           <td>1.00e-01</td>
           <td>2.21e+00</td>
           <td>1.46e+04</td>
-          <td>5.28e-03</td>
+          <td>5.45e-03</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>4.10e+03</td>
-          <td>5.87e-03</td>
+          <td>5.74e-03</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>4.10e+03</td>
-          <td>6.46e-03</td>
+          <td>5.91e-03</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>4.10e+03</td>
-          <td>5.78e-03</td>
+          <td>6.81e-03</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>2.05e+03</td>
-          <td>4.76e-03</td>
+          <td>5.12e-03</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>2.60e-03</td>
+          <td>2.43e-03</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>2.34e-03</td>
+          <td>2.93e-03</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
           <td>1.00e-02</td>
           <td>2.17e+00</td>
           <td>2.05e+03</td>
-          <td>3.66e-03</td>
+          <td>3.74e-03</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
           <td>5.00e-02</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>1.76e-03</td>
+          <td>1.91e-03</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
           <td>1.00e-01</td>
           <td>2.17e+00</td>
           <td>1.02e+03</td>
-          <td>2.04e-03</td>
+          <td>1.52e-03</td>
         </tr>
       </tbody>
     </table>
@@ -222,8 +222,7 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^3`
     ax[0].set_ylabel('Total Samples')
     ax[1].set_ylabel('Runtime')
     fig.suptitle('Comparing Absolute Tolerances')
-    plt.subplots_adjust(wspace=.15, hspace=0)
-    plt.savefig('../outputs/mc_vs_qmc/vary_abs_tol.png',dpi=200,bbox_inches='tight')
+    plt.subplots_adjust(wspace=.15, hspace=0);
 
 
 
@@ -247,7 +246,7 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
 
 .. code:: ipython3
 
-    df = pd.read_csv('../outputs/mc_vs_qmc/vary_dimension.csv')
+    df = pd.read_csv('../workouts/mc_vs_qmc/out/vary_dimension.csv')
     df['Problem'] = df['Stopping Criterion'] + ' ' + df['Distribution'] + ' (' + df['MC/QMC'] + ')'
     df = df.drop(['Stopping Criterion','Distribution','MC/QMC'],axis=1)
     problems = ['CubMCCLT IIDStdUniform (MC)',
@@ -301,108 +300,108 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
       <tbody>
         <tr>
           <th>CubMCCLT IIDStdUniform (MC)</th>
-          <td>1.00e+01</td>
+          <td>10</td>
           <td>-1.54e+02</td>
           <td>4.60e+04</td>
-          <td>4.29e-02</td>
+          <td>4.44e-02</td>
         </tr>
         <tr>
           <th>CubMCCLT IIDStdUniform (MC)</th>
-          <td>2.00e+01</td>
+          <td>20</td>
           <td>-8.29e+04</td>
           <td>4.55e+03</td>
-          <td>8.71e-03</td>
+          <td>9.24e-03</td>
         </tr>
         <tr>
           <th>CubMCCLT IIDStdUniform (MC)</th>
-          <td>3.00e+01</td>
+          <td>30</td>
           <td>-1.95e+07</td>
           <td>2.21e+04</td>
-          <td>6.12e-02</td>
+          <td>6.31e-02</td>
         </tr>
         <tr>
           <th>CubMCG IIDStdGaussian (MC)</th>
-          <td>1.00e+01</td>
+          <td>10</td>
           <td>-1.53e+02</td>
           <td>1.10e+04</td>
-          <td>7.05e-03</td>
+          <td>1.00e-02</td>
         </tr>
         <tr>
           <th>CubMCG IIDStdGaussian (MC)</th>
-          <td>2.00e+01</td>
+          <td>20</td>
           <td>-8.25e+04</td>
           <td>1.10e+04</td>
-          <td>1.19e-02</td>
+          <td>1.39e-02</td>
         </tr>
         <tr>
           <th>CubMCG IIDStdGaussian (MC)</th>
-          <td>3.00e+01</td>
+          <td>30</td>
           <td>-1.94e+07</td>
           <td>1.10e+04</td>
-          <td>1.67e-02</td>
+          <td>1.85e-02</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
-          <td>1.00e+01</td>
+          <td>10</td>
           <td>-1.54e+02</td>
           <td>4.10e+03</td>
-          <td>7.66e-03</td>
+          <td>9.83e-03</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
-          <td>2.00e+01</td>
+          <td>20</td>
           <td>-8.28e+04</td>
           <td>4.10e+03</td>
-          <td>1.13e-02</td>
+          <td>1.34e-02</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
-          <td>3.00e+01</td>
+          <td>30</td>
           <td>-1.94e+07</td>
           <td>4.10e+03</td>
-          <td>1.54e-02</td>
+          <td>1.78e-02</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
-          <td>1.00e+01</td>
+          <td>10</td>
           <td>-1.55e+02</td>
           <td>1.02e+03</td>
-          <td>2.53e-03</td>
+          <td>3.05e-03</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
-          <td>2.00e+01</td>
+          <td>20</td>
           <td>-8.28e+04</td>
           <td>1.02e+03</td>
-          <td>3.82e-03</td>
+          <td>7.07e-03</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
-          <td>3.00e+01</td>
+          <td>30</td>
           <td>-1.94e+07</td>
           <td>1.02e+03</td>
-          <td>4.79e-03</td>
+          <td>5.09e-03</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
-          <td>1.00e+01</td>
+          <td>10</td>
           <td>-1.54e+02</td>
           <td>1.02e+03</td>
-          <td>1.91e-03</td>
+          <td>2.88e-03</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
-          <td>2.00e+01</td>
+          <td>20</td>
           <td>-8.28e+04</td>
           <td>1.02e+03</td>
-          <td>3.22e-03</td>
+          <td>4.32e-03</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
-          <td>3.00e+01</td>
+          <td>30</td>
           <td>-1.94e+07</td>
           <td>1.02e+03</td>
-          <td>4.37e-03</td>
+          <td>4.82e-03</td>
         </tr>
       </tbody>
     </table>
@@ -428,8 +427,7 @@ Gaussian True Measure - :math:`\mathcal{N}(0,\frac{1}{2})^d`
     ax[0].legend(loc='upper right', frameon=False)
     ax[0].set_ylabel('Total Samples')
     ax[1].set_ylabel('Runtime')
-    fig.suptitle('Comparing Dimensions')
-    plt.savefig('../outputs/mc_vs_qmc/vary_dimension.png',dpi=200)
+    fig.suptitle('Comparing Dimensions');
 
 
 

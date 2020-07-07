@@ -85,7 +85,7 @@ Step 5: Integrate
         n_total         2^(16)
         solution        1.808
         r_lag           2^(2)
-        time_integrate  0.073
+        time_integrate  0.072
     Within absolute tolerance: True
 
 
@@ -129,7 +129,7 @@ Condensed Problem
         n_total         2^(16)
         solution        1.808
         r_lag           2^(2)
-        time_integrate  0.070
+        time_integrate  0.067
     Within absolute tolerance: True
 
 

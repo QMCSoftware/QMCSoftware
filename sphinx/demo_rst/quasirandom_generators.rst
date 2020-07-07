@@ -82,15 +82,15 @@ reinitialized before every trial. <br
 .. code:: ipython3
 
     # Load AccumulateData
-    df_py = pd.read_csv('../outputs/lds_sequences/python_sequences.csv')
+    df_py = pd.read_csv('../workouts/lds_sequences/out/python_sequences.csv')
     df_py.columns = ['n',
                      'py_l_MPS','py_l_GAIL',
                      'py_s_QRNG_gc','py_s_QRNG_n','py_s_MPS_QMCPy',
                      'py_h_QRNG','py_h_Owen',
                      'py_k_QRNG']
-    df_m = pd.read_csv('../outputs/lds_sequences/matlab_sequences.csv', header=None)
+    df_m = pd.read_csv('../workouts/lds_sequences/out/matlab_sequences.csv', header=None)
     df_m.columns = ['n', 'm_l', 'm_s','m_h']
-    df_r = pd.read_csv('../outputs/lds_sequences/r_sequences.csv')
+    df_r = pd.read_csv('../workouts/lds_sequences/out/r_sequences.csv')
     df_r.columns = ['n','r_s','r_h','r_k']
     df_r.reset_index(drop=True, inplace=True)
 
@@ -107,7 +107,6 @@ reinitialized before every trial. <br
         ax.set_ylabel('Generation Time (Seconds)')
         # Metas and Export
         fig.suptitle('Speed Comparison of %s Generators'%name)
-        plt.savefig('../outputs/lds_sequences/lds_%s_time_comp.png'%name.lower(), dpi=250)
 
 Lattice
 ~~~~~~~
@@ -155,123 +154,123 @@ Lattice
       <tbody>
         <tr>
           <th>2.00e+00</th>
-          <td>6.06e-05</td>
-          <td>9.50e-05</td>
-          <td>7.51e-04</td>
+          <td>5.56e-05</td>
+          <td>6.19e-05</td>
+          <td>2.14e-04</td>
         </tr>
         <tr>
           <th>4.00e+00</th>
-          <td>9.16e-05</td>
-          <td>1.11e-04</td>
-          <td>1.61e-04</td>
+          <td>8.00e-05</td>
+          <td>1.04e-04</td>
+          <td>1.38e-04</td>
         </tr>
         <tr>
           <th>8.00e+00</th>
-          <td>1.44e-04</td>
-          <td>1.52e-04</td>
-          <td>1.42e-04</td>
+          <td>7.62e-05</td>
+          <td>1.46e-04</td>
+          <td>1.34e-04</td>
         </tr>
         <tr>
           <th>1.60e+01</th>
-          <td>1.25e-04</td>
+          <td>1.13e-04</td>
           <td>1.78e-04</td>
-          <td>2.40e-04</td>
+          <td>1.32e-04</td>
         </tr>
         <tr>
           <th>3.20e+01</th>
-          <td>1.11e-04</td>
-          <td>1.79e-04</td>
-          <td>1.89e-04</td>
+          <td>1.16e-04</td>
+          <td>2.21e-04</td>
+          <td>1.74e-04</td>
         </tr>
         <tr>
           <th>6.40e+01</th>
-          <td>9.52e-05</td>
-          <td>2.07e-04</td>
-          <td>1.60e-04</td>
+          <td>1.47e-04</td>
+          <td>2.94e-04</td>
+          <td>1.54e-04</td>
         </tr>
         <tr>
           <th>1.28e+02</th>
-          <td>1.48e-04</td>
-          <td>4.40e-04</td>
           <td>1.55e-04</td>
+          <td>2.50e-04</td>
+          <td>1.49e-04</td>
         </tr>
         <tr>
           <th>2.56e+02</th>
-          <td>1.60e-04</td>
-          <td>2.77e-04</td>
-          <td>1.67e-04</td>
+          <td>1.55e-04</td>
+          <td>3.23e-04</td>
+          <td>1.77e-04</td>
         </tr>
         <tr>
           <th>5.12e+02</th>
-          <td>1.67e-04</td>
-          <td>5.43e-04</td>
-          <td>1.80e-04</td>
+          <td>1.40e-04</td>
+          <td>3.62e-04</td>
+          <td>1.84e-04</td>
         </tr>
         <tr>
           <th>1.02e+03</th>
-          <td>1.84e-04</td>
-          <td>6.74e-04</td>
-          <td>1.87e-04</td>
+          <td>2.11e-04</td>
+          <td>3.80e-04</td>
+          <td>1.89e-04</td>
         </tr>
         <tr>
           <th>2.05e+03</th>
-          <td>2.19e-04</td>
-          <td>4.81e-04</td>
-          <td>2.04e-04</td>
+          <td>2.40e-04</td>
+          <td>5.84e-04</td>
+          <td>2.11e-04</td>
         </tr>
         <tr>
           <th>4.10e+03</th>
-          <td>3.06e-04</td>
-          <td>6.52e-04</td>
-          <td>2.39e-04</td>
+          <td>2.90e-04</td>
+          <td>6.17e-04</td>
+          <td>2.49e-04</td>
         </tr>
         <tr>
           <th>8.19e+03</th>
-          <td>5.43e-04</td>
-          <td>9.10e-04</td>
-          <td>3.42e-04</td>
+          <td>3.84e-04</td>
+          <td>9.51e-04</td>
+          <td>3.06e-04</td>
         </tr>
         <tr>
           <th>1.64e+04</th>
-          <td>6.41e-04</td>
-          <td>1.71e-03</td>
-          <td>5.92e-04</td>
+          <td>6.89e-04</td>
+          <td>1.64e-03</td>
+          <td>4.60e-04</td>
         </tr>
         <tr>
           <th>3.28e+04</th>
-          <td>1.05e-03</td>
-          <td>2.87e-03</td>
-          <td>7.26e-04</td>
+          <td>1.14e-03</td>
+          <td>3.01e-03</td>
+          <td>7.10e-04</td>
         </tr>
         <tr>
           <th>6.55e+04</th>
-          <td>2.22e-03</td>
-          <td>5.29e-03</td>
-          <td>1.20e-03</td>
+          <td>2.08e-03</td>
+          <td>6.09e-03</td>
+          <td>1.14e-03</td>
         </tr>
         <tr>
           <th>1.31e+05</th>
-          <td>5.12e-03</td>
-          <td>9.13e-03</td>
-          <td>2.10e-03</td>
+          <td>5.10e-03</td>
+          <td>1.03e-02</td>
+          <td>1.88e-03</td>
         </tr>
         <tr>
           <th>2.62e+05</th>
-          <td>8.79e-03</td>
-          <td>1.75e-02</td>
-          <td>3.89e-03</td>
+          <td>8.62e-03</td>
+          <td>1.92e-02</td>
+          <td>3.76e-03</td>
         </tr>
         <tr>
           <th>5.24e+05</th>
-          <td>1.53e-02</td>
-          <td>3.90e-02</td>
-          <td>7.99e-03</td>
+          <td>1.77e-02</td>
+          <td>3.97e-02</td>
+          <td>7.06e-03</td>
         </tr>
         <tr>
           <th>1.05e+06</th>
-          <td>2.80e-02</td>
-          <td>8.23e-02</td>
-          <td>1.66e-02</td>
+          <td>2.91e-02</td>
+          <td>8.40e-02</td>
+          <td>1.41e-02</td>
         </tr>
       </tbody>
     </table>
@@ -338,163 +337,163 @@ Sobol
       <tbody>
         <tr>
           <th>2.00e+00</th>
-          <td>2.43e-05</td>
-          <td>4.78e-05</td>
-          <td>2.75e-05</td>
-          <td>1.03e-03</td>
-          <td>9.54e-05</td>
+          <td>1.78e-05</td>
+          <td>3.19e-05</td>
+          <td>2.58e-05</td>
+          <td>3.13e-04</td>
+          <td>3.93e-05</td>
         </tr>
         <tr>
           <th>4.00e+00</th>
-          <td>1.71e-05</td>
-          <td>2.53e-05</td>
-          <td>2.93e-05</td>
-          <td>3.13e-04</td>
-          <td>7.23e-05</td>
+          <td>1.95e-05</td>
+          <td>3.42e-05</td>
+          <td>3.41e-05</td>
+          <td>2.30e-04</td>
+          <td>2.29e-05</td>
         </tr>
         <tr>
           <th>8.00e+00</th>
-          <td>1.83e-05</td>
-          <td>3.10e-05</td>
-          <td>3.99e-05</td>
-          <td>4.01e-04</td>
-          <td>7.08e-05</td>
+          <td>1.84e-05</td>
+          <td>2.92e-05</td>
+          <td>5.18e-05</td>
+          <td>2.28e-04</td>
+          <td>2.26e-05</td>
         </tr>
         <tr>
           <th>1.60e+01</th>
-          <td>3.10e-05</td>
-          <td>3.02e-05</td>
-          <td>9.85e-05</td>
-          <td>5.02e-04</td>
-          <td>6.95e-05</td>
+          <td>1.93e-05</td>
+          <td>3.84e-05</td>
+          <td>5.79e-05</td>
+          <td>3.53e-04</td>
+          <td>3.03e-05</td>
         </tr>
         <tr>
           <th>3.20e+01</th>
-          <td>1.87e-05</td>
-          <td>2.78e-05</td>
-          <td>8.55e-05</td>
-          <td>6.61e-04</td>
-          <td>7.21e-05</td>
+          <td>1.83e-05</td>
+          <td>2.83e-05</td>
+          <td>8.39e-05</td>
+          <td>4.88e-04</td>
+          <td>3.27e-05</td>
         </tr>
         <tr>
           <th>6.40e+01</th>
-          <td>1.87e-05</td>
-          <td>2.43e-05</td>
-          <td>1.49e-04</td>
-          <td>3.05e-04</td>
-          <td>7.38e-05</td>
+          <td>2.06e-05</td>
+          <td>3.97e-05</td>
+          <td>1.63e-04</td>
+          <td>1.50e-03</td>
+          <td>2.31e-05</td>
         </tr>
         <tr>
           <th>1.28e+02</th>
-          <td>2.47e-05</td>
-          <td>4.29e-05</td>
-          <td>4.85e-04</td>
-          <td>2.61e-04</td>
-          <td>7.40e-05</td>
+          <td>2.16e-05</td>
+          <td>4.16e-05</td>
+          <td>3.22e-04</td>
+          <td>4.36e-04</td>
+          <td>3.62e-05</td>
         </tr>
         <tr>
           <th>2.56e+02</th>
-          <td>2.31e-05</td>
-          <td>3.00e-05</td>
-          <td>5.63e-04</td>
-          <td>6.60e-04</td>
-          <td>5.47e-05</td>
+          <td>2.61e-05</td>
+          <td>3.86e-05</td>
+          <td>8.89e-04</td>
+          <td>2.78e-04</td>
+          <td>2.54e-05</td>
         </tr>
         <tr>
           <th>5.12e+02</th>
-          <td>2.74e-05</td>
-          <td>4.64e-05</td>
-          <td>1.09e-03</td>
-          <td>3.09e-04</td>
-          <td>5.64e-05</td>
+          <td>3.04e-05</td>
+          <td>6.34e-05</td>
+          <td>1.59e-03</td>
+          <td>2.29e-04</td>
+          <td>3.18e-05</td>
         </tr>
         <tr>
           <th>1.02e+03</th>
-          <td>3.69e-05</td>
-          <td>6.39e-05</td>
-          <td>2.13e-03</td>
-          <td>2.48e-04</td>
-          <td>4.00e-05</td>
+          <td>3.45e-05</td>
+          <td>4.29e-05</td>
+          <td>3.25e-03</td>
+          <td>2.98e-04</td>
+          <td>2.97e-05</td>
         </tr>
         <tr>
           <th>2.05e+03</th>
-          <td>5.00e-05</td>
-          <td>5.75e-05</td>
-          <td>5.19e-03</td>
-          <td>2.62e-04</td>
-          <td>1.91e-04</td>
+          <td>5.13e-05</td>
+          <td>6.94e-05</td>
+          <td>5.10e-03</td>
+          <td>2.59e-04</td>
+          <td>3.26e-05</td>
         </tr>
         <tr>
           <th>4.10e+03</th>
-          <td>1.12e-04</td>
-          <td>1.22e-04</td>
-          <td>9.19e-03</td>
-          <td>3.96e-04</td>
-          <td>4.04e-05</td>
+          <td>1.04e-04</td>
+          <td>9.42e-05</td>
+          <td>1.03e-02</td>
+          <td>3.25e-04</td>
+          <td>6.50e-05</td>
         </tr>
         <tr>
           <th>8.19e+03</th>
-          <td>1.54e-04</td>
-          <td>1.51e-04</td>
-          <td>1.75e-02</td>
-          <td>5.12e-04</td>
-          <td>5.89e-05</td>
+          <td>1.57e-04</td>
+          <td>1.83e-04</td>
+          <td>1.89e-02</td>
+          <td>2.97e-04</td>
+          <td>6.61e-05</td>
         </tr>
         <tr>
           <th>1.64e+04</th>
-          <td>3.22e-04</td>
-          <td>2.75e-04</td>
-          <td>3.19e-02</td>
-          <td>4.42e-04</td>
-          <td>9.48e-05</td>
+          <td>3.12e-04</td>
+          <td>3.44e-04</td>
+          <td>3.39e-02</td>
+          <td>3.70e-04</td>
+          <td>1.09e-04</td>
         </tr>
         <tr>
           <th>3.28e+04</th>
           <td>5.17e-04</td>
-          <td>4.86e-04</td>
-          <td>6.63e-02</td>
-          <td>5.27e-04</td>
-          <td>1.72e-04</td>
+          <td>5.56e-04</td>
+          <td>6.89e-02</td>
+          <td>4.84e-04</td>
+          <td>1.96e-04</td>
         </tr>
         <tr>
           <th>6.55e+04</th>
-          <td>9.90e-04</td>
-          <td>1.11e-03</td>
+          <td>1.33e-03</td>
+          <td>1.22e-03</td>
           <td>1.28e-01</td>
-          <td>7.34e-04</td>
-          <td>8.65e-04</td>
+          <td>8.00e-04</td>
+          <td>3.74e-04</td>
         </tr>
         <tr>
           <th>1.31e+05</th>
-          <td>1.95e-03</td>
-          <td>2.03e-03</td>
-          <td>2.47e-01</td>
-          <td>1.34e-03</td>
-          <td>9.01e-04</td>
+          <td>1.93e-03</td>
+          <td>2.23e-03</td>
+          <td>2.52e-01</td>
+          <td>1.30e-03</td>
+          <td>1.01e-03</td>
         </tr>
         <tr>
           <th>2.62e+05</th>
-          <td>3.91e-03</td>
-          <td>4.11e-03</td>
-          <td>4.89e-01</td>
-          <td>2.44e-03</td>
-          <td>1.72e-03</td>
+          <td>3.85e-03</td>
+          <td>4.60e-03</td>
+          <td>5.04e-01</td>
+          <td>2.47e-03</td>
+          <td>1.82e-03</td>
         </tr>
         <tr>
           <th>5.24e+05</th>
-          <td>7.78e-03</td>
-          <td>7.89e-03</td>
-          <td>9.90e-01</td>
-          <td>4.97e-03</td>
-          <td>6.61e-03</td>
+          <td>8.26e-03</td>
+          <td>9.14e-03</td>
+          <td>9.99e-01</td>
+          <td>4.52e-03</td>
+          <td>3.78e-03</td>
         </tr>
         <tr>
           <th>1.05e+06</th>
           <td>1.55e-02</td>
-          <td>1.69e-02</td>
-          <td>1.97e+00</td>
-          <td>1.00e-02</td>
-          <td>1.04e-02</td>
+          <td>1.82e-02</td>
+          <td>2.00e+00</td>
+          <td>8.49e-03</td>
+          <td>9.91e-03</td>
         </tr>
       </tbody>
     </table>
@@ -559,143 +558,143 @@ Halton (Generalized)
       <tbody>
         <tr>
           <th>2.00e+00</th>
-          <td>2.50e-05</td>
-          <td>9.09e-04</td>
-          <td>4.89e-05</td>
-          <td>3.57e-03</td>
+          <td>1.36e-05</td>
+          <td>5.39e-04</td>
+          <td>1.80e-05</td>
+          <td>1.43e-04</td>
         </tr>
         <tr>
           <th>4.00e+00</th>
-          <td>1.39e-05</td>
-          <td>5.12e-04</td>
-          <td>4.25e-05</td>
-          <td>1.30e-04</td>
+          <td>1.56e-05</td>
+          <td>5.52e-04</td>
+          <td>1.36e-05</td>
+          <td>1.05e-04</td>
         </tr>
         <tr>
           <th>8.00e+00</th>
-          <td>1.60e-05</td>
-          <td>5.33e-04</td>
-          <td>4.38e-05</td>
-          <td>1.22e-04</td>
+          <td>1.68e-05</td>
+          <td>7.32e-04</td>
+          <td>1.49e-05</td>
+          <td>1.03e-04</td>
         </tr>
         <tr>
           <th>1.60e+01</th>
-          <td>5.45e-05</td>
-          <td>9.97e-04</td>
-          <td>4.92e-05</td>
-          <td>1.48e-04</td>
+          <td>2.03e-05</td>
+          <td>6.01e-04</td>
+          <td>3.32e-05</td>
+          <td>1.16e-04</td>
         </tr>
         <tr>
           <th>3.20e+01</th>
-          <td>2.54e-05</td>
-          <td>5.74e-04</td>
-          <td>6.06e-05</td>
-          <td>1.27e-04</td>
+          <td>2.42e-05</td>
+          <td>5.65e-04</td>
+          <td>2.77e-05</td>
+          <td>1.50e-04</td>
         </tr>
         <tr>
           <th>6.40e+01</th>
-          <td>3.68e-05</td>
-          <td>6.39e-04</td>
-          <td>8.23e-05</td>
-          <td>1.21e-04</td>
+          <td>4.20e-05</td>
+          <td>9.39e-04</td>
+          <td>3.14e-05</td>
+          <td>1.14e-04</td>
         </tr>
         <tr>
           <th>1.28e+02</th>
-          <td>7.92e-05</td>
-          <td>7.67e-04</td>
-          <td>1.36e-04</td>
-          <td>1.27e-04</td>
+          <td>6.83e-05</td>
+          <td>8.45e-04</td>
+          <td>4.30e-05</td>
+          <td>1.23e-04</td>
         </tr>
         <tr>
           <th>2.56e+02</th>
-          <td>1.10e-04</td>
-          <td>1.31e-03</td>
-          <td>1.54e-04</td>
-          <td>1.51e-04</td>
+          <td>1.39e-04</td>
+          <td>1.18e-03</td>
+          <td>9.00e-05</td>
+          <td>1.36e-04</td>
         </tr>
         <tr>
           <th>5.12e+02</th>
-          <td>2.10e-04</td>
-          <td>1.47e-03</td>
-          <td>2.05e-04</td>
-          <td>1.78e-04</td>
+          <td>2.26e-04</td>
+          <td>2.03e-03</td>
+          <td>1.59e-04</td>
+          <td>1.72e-04</td>
         </tr>
         <tr>
           <th>1.02e+03</th>
-          <td>4.04e-04</td>
-          <td>3.02e-03</td>
-          <td>2.95e-04</td>
-          <td>2.51e-04</td>
+          <td>4.49e-04</td>
+          <td>2.74e-03</td>
+          <td>2.91e-04</td>
+          <td>2.45e-04</td>
         </tr>
         <tr>
           <th>2.05e+03</th>
-          <td>8.29e-04</td>
-          <td>4.59e-03</td>
-          <td>4.45e-04</td>
-          <td>4.17e-04</td>
+          <td>9.77e-04</td>
+          <td>4.63e-03</td>
+          <td>5.20e-04</td>
+          <td>4.12e-04</td>
         </tr>
         <tr>
           <th>4.10e+03</th>
-          <td>1.62e-03</td>
-          <td>7.04e-03</td>
-          <td>9.06e-04</td>
-          <td>7.89e-04</td>
+          <td>1.69e-03</td>
+          <td>7.69e-03</td>
+          <td>1.07e-03</td>
+          <td>7.87e-04</td>
         </tr>
         <tr>
           <th>8.19e+03</th>
-          <td>3.19e-03</td>
-          <td>1.31e-02</td>
-          <td>1.86e-03</td>
-          <td>1.64e-03</td>
+          <td>3.16e-03</td>
+          <td>1.33e-02</td>
+          <td>2.14e-03</td>
+          <td>1.57e-03</td>
         </tr>
         <tr>
           <th>1.64e+04</th>
-          <td>6.33e-03</td>
-          <td>2.50e-02</td>
-          <td>3.88e-03</td>
-          <td>2.91e-03</td>
+          <td>6.77e-03</td>
+          <td>2.54e-02</td>
+          <td>4.04e-03</td>
+          <td>3.13e-03</td>
         </tr>
         <tr>
           <th>3.28e+04</th>
-          <td>1.34e-02</td>
-          <td>5.24e-02</td>
-          <td>8.49e-03</td>
-          <td>6.00e-03</td>
+          <td>1.31e-02</td>
+          <td>5.21e-02</td>
+          <td>8.15e-03</td>
+          <td>6.55e-03</td>
         </tr>
         <tr>
           <th>6.55e+04</th>
-          <td>2.72e-02</td>
-          <td>9.82e-02</td>
-          <td>1.71e-02</td>
-          <td>1.28e-02</td>
+          <td>2.68e-02</td>
+          <td>9.95e-02</td>
+          <td>1.81e-02</td>
+          <td>1.27e-02</td>
         </tr>
         <tr>
           <th>1.31e+05</th>
-          <td>5.56e-02</td>
-          <td>2.12e-01</td>
-          <td>3.43e-02</td>
-          <td>2.64e-02</td>
+          <td>5.41e-02</td>
+          <td>2.17e-01</td>
+          <td>3.44e-02</td>
+          <td>2.75e-02</td>
         </tr>
         <tr>
           <th>2.62e+05</th>
           <td>1.11e-01</td>
-          <td>4.35e-01</td>
-          <td>6.79e-02</td>
-          <td>5.39e-02</td>
+          <td>4.42e-01</td>
+          <td>7.07e-02</td>
+          <td>5.76e-02</td>
         </tr>
         <tr>
           <th>5.24e+05</th>
           <td>2.26e-01</td>
-          <td>8.88e-01</td>
-          <td>1.39e-01</td>
-          <td>1.14e-01</td>
+          <td>8.95e-01</td>
+          <td>1.40e-01</td>
+          <td>1.24e-01</td>
         </tr>
         <tr>
           <th>1.05e+06</th>
-          <td>4.56e-01</td>
-          <td>1.76e+00</td>
-          <td>2.91e-01</td>
-          <td>2.50e-01</td>
+          <td>4.59e-01</td>
+          <td>1.78e+00</td>
+          <td>2.89e-01</td>
+          <td>2.52e-01</td>
         </tr>
       </tbody>
     </table>
@@ -756,103 +755,103 @@ Korobov
       <tbody>
         <tr>
           <th>2.00e+00</th>
-          <td>2.50e-05</td>
-          <td>5.16e-05</td>
+          <td>1.36e-05</td>
+          <td>2.03e-05</td>
         </tr>
         <tr>
           <th>4.00e+00</th>
-          <td>1.39e-05</td>
-          <td>5.24e-05</td>
+          <td>1.56e-05</td>
+          <td>2.08e-05</td>
         </tr>
         <tr>
           <th>8.00e+00</th>
-          <td>1.60e-05</td>
-          <td>5.11e-05</td>
+          <td>1.68e-05</td>
+          <td>1.65e-05</td>
         </tr>
         <tr>
           <th>1.60e+01</th>
-          <td>5.45e-05</td>
-          <td>5.08e-05</td>
+          <td>2.03e-05</td>
+          <td>1.99e-05</td>
         </tr>
         <tr>
           <th>3.20e+01</th>
-          <td>2.54e-05</td>
-          <td>5.28e-05</td>
+          <td>2.42e-05</td>
+          <td>2.10e-05</td>
         </tr>
         <tr>
           <th>6.40e+01</th>
-          <td>3.68e-05</td>
-          <td>5.61e-05</td>
+          <td>4.20e-05</td>
+          <td>2.69e-05</td>
         </tr>
         <tr>
           <th>1.28e+02</th>
-          <td>7.92e-05</td>
-          <td>4.86e-05</td>
+          <td>6.83e-05</td>
+          <td>1.75e-05</td>
         </tr>
         <tr>
           <th>2.56e+02</th>
-          <td>1.10e-04</td>
-          <td>3.16e-05</td>
+          <td>1.39e-04</td>
+          <td>1.79e-05</td>
         </tr>
         <tr>
           <th>5.12e+02</th>
-          <td>2.10e-04</td>
-          <td>2.79e-05</td>
+          <td>2.26e-04</td>
+          <td>1.85e-05</td>
         </tr>
         <tr>
           <th>1.02e+03</th>
-          <td>4.04e-04</td>
-          <td>2.25e-05</td>
+          <td>4.49e-04</td>
+          <td>3.37e-05</td>
         </tr>
         <tr>
           <th>2.05e+03</th>
-          <td>8.29e-04</td>
-          <td>2.58e-05</td>
+          <td>9.77e-04</td>
+          <td>3.06e-05</td>
         </tr>
         <tr>
           <th>4.10e+03</th>
-          <td>1.62e-03</td>
-          <td>3.53e-05</td>
+          <td>1.69e-03</td>
+          <td>3.71e-05</td>
         </tr>
         <tr>
           <th>8.19e+03</th>
-          <td>3.19e-03</td>
-          <td>4.97e-05</td>
+          <td>3.16e-03</td>
+          <td>5.23e-05</td>
         </tr>
         <tr>
           <th>1.64e+04</th>
-          <td>6.33e-03</td>
-          <td>1.96e-04</td>
+          <td>6.77e-03</td>
+          <td>8.42e-05</td>
         </tr>
         <tr>
           <th>3.28e+04</th>
-          <td>1.34e-02</td>
-          <td>4.71e-04</td>
+          <td>1.31e-02</td>
+          <td>3.72e-04</td>
         </tr>
         <tr>
           <th>6.55e+04</th>
-          <td>2.72e-02</td>
-          <td>4.06e-04</td>
+          <td>2.68e-02</td>
+          <td>3.94e-04</td>
         </tr>
         <tr>
           <th>1.31e+05</th>
-          <td>5.56e-02</td>
-          <td>9.34e-04</td>
+          <td>5.41e-02</td>
+          <td>8.82e-04</td>
         </tr>
         <tr>
           <th>2.62e+05</th>
           <td>1.11e-01</td>
-          <td>1.70e-03</td>
+          <td>1.42e-03</td>
         </tr>
         <tr>
           <th>5.24e+05</th>
           <td>2.26e-01</td>
-          <td>3.22e-03</td>
+          <td>3.36e-03</td>
         </tr>
         <tr>
           <th>1.05e+06</th>
-          <td>4.56e-01</td>
-          <td>1.16e-02</td>
+          <td>4.59e-01</td>
+          <td>6.72e-03</td>
         </tr>
       </tbody>
     </table>

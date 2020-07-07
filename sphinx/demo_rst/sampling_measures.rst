@@ -63,11 +63,18 @@ Exponential
     pyplot.xlim([0,4])
     pyplot.ylim([0,4])
     pyplot.title('Exp(1.5)')
-    pyplot.savefig("../outputs/sample_scatters/exp_sobol.png", dpi=200);
 
 
 
-.. image:: sampling_measures_files/sampling_measures_6_0.png
+
+.. parsed-literal::
+
+    Text(0.5, 1.0, 'Exp(1.5)')
+
+
+
+
+.. image:: sampling_measures_files/sampling_measures_6_1.png
 
 
 Cauchy
@@ -314,6 +321,6 @@ measure :math:`\rho(x) = 4/\pi`. Therefore we choose
         n_total         2^(13)
         solution        0.848
         r_lag           2^(2)
-        time_integrate  0.131
+        time_integrate  0.143
     Within tolerance of true value 0.849: True
 

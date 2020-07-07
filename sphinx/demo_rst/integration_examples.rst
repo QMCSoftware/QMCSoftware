@@ -58,7 +58,7 @@ the Gaussian measure, and the Sobol distribution:
         n_total         2^(10)
         solution        2.172
         r_lag           2^(2)
-        time_integrate  0.003
+        time_integrate  0.007
 
 
 Arithmetic-Mean Asian Put Option: Single Level
@@ -169,7 +169,7 @@ last example.
 
 .. parsed-literal::
 
-    Solution: 6.2645         
+    Solution: 6.2644         
     AsianCall (Integrand Object)
         volatility      2^(-1)
         start_price     30
@@ -194,10 +194,10 @@ last example.
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          3
-        solution        6.265
-        n               [296450.  21628.   3454.]
-        n_total         324604
+        solution        6.264
+        n               [298518.  23084.   3113.]
+        n_total         327787
         confid_int      [6.213 6.316]
-        time_integrate  0.133
+        time_integrate  0.138
 
 

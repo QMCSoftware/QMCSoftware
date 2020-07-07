@@ -79,7 +79,7 @@ With ordinary Monte Carlo we do the following:
         n_total         2^(16)
         solution        0.450
         r_lag           2^(2)
-        time_integrate  0.051
+        time_integrate  0.065
 
 
 
@@ -117,7 +117,7 @@ Thus,
 
 .. parsed-literal::
 
-    Solution: 0.4508         
+    Solution: 0.4501         
     CustomFun (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)
@@ -135,9 +135,9 @@ Thus,
         n_max           2^(35)
     LDTransformData (AccumulateData Object)
         n_total         2^(14)
-        solution        0.451
+        solution        0.450
         r_lag           2^(2)
-        time_integrate  0.017
+        time_integrate  0.022
 
 
 
@@ -149,7 +149,7 @@ Thus,
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.327 the time and 0.250 the samples
+    Imporance Sampling takes 0.332 the time and 0.250 the samples
 
 
 Asian Call Option Example
@@ -253,7 +253,7 @@ Vanilla Monte Carlo
 
 .. parsed-literal::
 
-    Solution: 1.7796         
+    Solution: 1.7831         
     AsianCall (Integrand Object)
         volatility      2^(-1)
         start_price     30
@@ -265,7 +265,7 @@ Vanilla Monte Carlo
     Sobol (DiscreteDistribution Object)
         dimension       2^(5)
         randomize       1
-        seed            3409367576
+        seed            832517333
         backend         qrng
         mimics          StdUniform
         graycode        0
@@ -279,9 +279,9 @@ Vanilla Monte Carlo
         n_max           2^(35)
     LDTransformData (AccumulateData Object)
         n_total         2^(14)
-        solution        1.780
+        solution        1.783
         r_lag           2^(2)
-        time_integrate  0.112
+        time_integrate  0.144
 
 
 
@@ -311,7 +311,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Solution: 1.7972         
+    Solution: 1.7751         
     AsianCall (Integrand Object)
         volatility      2^(-1)
         start_price     30
@@ -323,7 +323,7 @@ Monte Carlo with Importance Sampling
     Sobol (DiscreteDistribution Object)
         dimension       2^(5)
         randomize       1
-        seed            4225147773
+        seed            3625265926
         backend         qrng
         mimics          StdUniform
         graycode        0
@@ -337,9 +337,9 @@ Monte Carlo with Importance Sampling
         n_max           2^(35)
     LDTransformData (AccumulateData Object)
         n_total         2^(12)
-        solution        1.797
+        solution        1.775
         r_lag           2^(2)
-        time_integrate  0.036
+        time_integrate  0.033
 
 
 
@@ -360,7 +360,7 @@ Monte Carlo with Importance Sampling
 
 .. parsed-literal::
 
-    Imporance Sampling takes 0.325 the time and 0.250 the samples
+    Imporance Sampling takes 0.227 the time and 0.250 the samples
 
 
 Importance Sampling MC vs QMC
@@ -374,7 +374,7 @@ Importance Sampling MC vs QMC
 
 .. code:: ipython3
 
-    df = pd.read_csv('../outputs/mc_vs_qmc/importance_sampling.csv')
+    df = pd.read_csv('../workouts/mc_vs_qmc/out/importance_sampling.csv')
     df['Problem'] = df['Stopping Criterion'] + ' ' + df['Distribution'] + ' (' + df['MC/QMC'] + ')'
     df = df.drop(['Stopping Criterion','Distribution','MC/QMC'],axis=1)
     problems = ['CubMCCLT IIDStdUniform (MC)',
@@ -431,70 +431,70 @@ Importance Sampling MC vs QMC
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>2.84e+05</td>
-          <td>5.18e-01</td>
+          <td>5.23e-01</td>
         </tr>
         <tr>
           <th>CubMCCLT IIDStdUniform (MC)</th>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>7.66e+04</td>
-          <td>1.39e-01</td>
+          <td>1.43e-01</td>
         </tr>
         <tr>
           <th>CubMCG IIDStdGaussian (MC)</th>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.36e+05</td>
-          <td>4.20e-01</td>
+          <td>4.29e-01</td>
         </tr>
         <tr>
           <th>CubMCG IIDStdGaussian (MC)</th>
           <td>1.00e+00</td>
           <td>1.80e+00</td>
           <td>1.18e+05</td>
-          <td>1.17e-01</td>
+          <td>1.19e-01</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
           <td>0.00e+00</td>
           <td>1.78e+00</td>
           <td>1.64e+04</td>
-          <td>4.20e-02</td>
+          <td>4.46e-02</td>
         </tr>
         <tr>
           <th>CubQMCCLT Sobol (QMC)</th>
           <td>1.00e+00</td>
           <td>1.79e+00</td>
           <td>1.64e+04</td>
-          <td>4.27e-02</td>
+          <td>4.50e-02</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
           <td>0.00e+00</td>
           <td>1.75e+00</td>
           <td>4.10e+03</td>
-          <td>1.42e-02</td>
+          <td>1.72e-02</td>
         </tr>
         <tr>
           <th>CubQMCLatticeG Lattice (QMC)</th>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>
-          <td>4.34e-03</td>
+          <td>4.30e-03</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
           <td>0.00e+00</td>
           <td>1.79e+00</td>
           <td>4.10e+03</td>
-          <td>1.18e-02</td>
+          <td>1.50e-02</td>
         </tr>
         <tr>
           <th>CubQMCSobolG Sobol (QMC)</th>
           <td>1.00e+00</td>
           <td>1.81e+00</td>
           <td>1.02e+03</td>
-          <td>3.42e-03</td>
+          <td>3.70e-03</td>
         </tr>
       </tbody>
     </table>
@@ -523,8 +523,7 @@ Importance Sampling MC vs QMC
     ax[1].get_yaxis().set_ticks([])
     ax[0].set_yticks(idx)
     ax[0].set_yticklabels(problems)
-    plt.tight_layout()
-    plt.savefig('../outputs/mc_vs_qmc/vary_mean_shift_bar.png',dpi=200)
+    plt.tight_layout();
 
 
 
@@ -543,10 +542,10 @@ Importance Sampling MC vs QMC
         ax[i].set_xlabel('mean shift')
         ax[i].spines['top'].set_visible(False)
         ax[i].spines['right'].set_visible(False)
-    fig.suptitle('Comparing Mean Shift Across Problems')
-    plt.savefig('../outputs/mc_vs_qmc/vary_mean_shift.png',dpi=200)
+    fig.suptitle('Comparing Mean Shift Across Problems');
 
 
 
 .. image:: importance_sampling_files/importance_sampling_21_0.png
+
 

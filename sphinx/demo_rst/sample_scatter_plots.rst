@@ -52,8 +52,7 @@ Visualize IID standard uniform and standard normal sampling points
         ax[i].set_aspect("equal")
         ax[i].set_title(dd_name)
     fig.suptitle("IID Discrete Distributions")
-    plt.tight_layout()
-    fig.savefig("../outputs/sample_scatters/iid_dd.png", dpi=200)
+    plt.tight_layout();
 
 
 
@@ -86,8 +85,7 @@ Visualize shifted lattice and scrambled Sobol sampling points
         ax[i].set_aspect("equal")
         ax[i].set_title(dd_name)
     fig.suptitle("Low Discrepancy Discrete Distributions")
-    plt.tight_layout()
-    fig.savefig("../outputs/sample_scatters/lds_dd.png", dpi=200)
+    plt.tight_layout();
 
 
 
@@ -141,8 +139,7 @@ Distributions
             ax[i].set_title(type(distrib).__name__)
         fig.suptitle("Transformed to %s from..." % tm_name)
         plt.tight_layout()
-        prefix = type(measure_obj).__name__
-        fig.savefig("../outputs/sample_scatters/%s_tm_transform.png" % prefix, dpi=200,bbox_inches='tight')
+        prefix = type(measure_obj).__name__;
 
 .. code:: ipython3
 
@@ -205,8 +202,7 @@ measures
     ax[1].set_xlim([g1_mu - spread_g1, g1_mu + spread_g1])
     ax[1].set_ylim([g2_mu - spread_g2, g2_mu + spread_g2])
     fig.suptitle("Shift and Stretch Sobol Distribution")
-    plt.tight_layout()
-    fig.savefig("../outputs/sample_scatters/shift_stretch_tm.png", dpi=200)
+    plt.tight_layout();
 
 
 
@@ -302,8 +298,7 @@ Plots samples on a 2D Keister function
         ax.set_xlabel("$x_1$", fontdict={"fontsize": 16})
         ax.set_ylabel("$x_2$", fontdict={"fontsize": 16})
         ax.set_zlabel("$f\\:(x_1,x_2)$", fontdict={"fontsize": 16})
-        ax.view_init(20, 45)
-    plt.savefig("../outputs/sample_scatters/Three_3d_SurfaceScatters.png", dpi=250, bbox_inches="tight", pad_inches=.15)
+        ax.view_init(20, 45);
 
 
 
