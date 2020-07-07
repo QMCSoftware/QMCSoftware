@@ -1,5 +1,7 @@
+% make sure pwd = .../lds_sequences/
 clc
 clear
+addpath(pwd)
 
 dim = 1;
 lattice_shift = rand(1,dim);
@@ -33,4 +35,4 @@ for i=1:size(n_2powers,1)
 end
 
 results = [2.^n_2powers, lattice_times, sobol_times, halton_times]
-csvwrite('matlab_sequences.csv',results)
+csvwrite('out/matlab_sequences.csv',results)

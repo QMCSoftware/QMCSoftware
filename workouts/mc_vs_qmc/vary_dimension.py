@@ -38,5 +38,5 @@ def vary_dimension(dimension=[1,2,3], abs_tol=0, rel_tol=.1, trials=1):
 
 if __name__ == '__main__':
     results = vary_dimension(dimension=arange(1,41), abs_tol=0, rel_tol=.01, trials=3)
-    results.to_csv('outputs/mc_vs_qmc/vary_dimension.csv', index=False)
+    results.to_csv('workouts/mc_vs_qmc/out/vary_dimension.csv', index=False)
     

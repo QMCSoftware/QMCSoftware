@@ -43,5 +43,5 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
 
 if __name__ == '__main__':
     df_times = python_sequences(powers_2=arange(1, 21), trials=3, dimension=1)
-    df_times.to_csv('outputs/lds_sequences/python_sequences.csv', index=False)
+    df_times.to_csv('workouts/lds_sequences/out/python_sequences.csv', index=False)
     print('\n', df_times)

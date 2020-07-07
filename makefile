@@ -42,8 +42,8 @@ SOURCEDIR = sphinx
 BUILDDIR = sphinx/_build
 _doc:
 	# Make Directries
-	@rm -r -f $(mddir) 2>/dev/null &
-	@rm -r -f $(nbdir) 2>/dev/null &
+	@-rm -r -f $(mddir) 2>/dev/null &
+	@-rm -r -f $(nbdir) 2>/dev/null &
 	# READMEs --> RST
 	@mkdir $(mddir)
 	@grep -v  "\[\!" README.md > README2.md
@@ -67,16 +67,17 @@ doc_epub: _doc
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
 workout:
 	# integration_examples
-	@python workouts/integration_examples/asian_option_multi_level.py > outputs/integration_examples/asian_option_multi_level.log
-	@python workouts/integration_examples/asian_option_single_level.py > outputs/integration_examples/asian_option_single_level.log
-	@python workouts/integration_examples/keister.py > outputs/integration_examples/keister.log
-	@python workouts/integration_examples/pi_problem.py > outputs/integration_examples/pi_problem.log
+	@python workouts/integration_examples/asian_option_multi_level.py > workouts/integration_examples/out/asian_option_multi_level.log
+	@python workouts/integration_examples/asian_option_single_level.py > workouts/integration_examples/out/asian_option_single_level.log
+	@python workouts/integration_examples/keister.py > workouts/integration_examples/out/keister.log
+	@python workouts/integration_examples/pi_problem.py > workouts/integration_examples/out/pi_problem.log
+	# mlmc
+	@python workouts/mlmc/mcqmc06.py > workouts/mlmc/out/mcqmc06.log
+	@python workouts/mlmc/european_option.py > workouts/mlmc/out/european_option.log
 	# lds_sequences
 	@python workouts/lds_sequences/python_sequences.py
 	# mc_vs_qmc
 	@python workouts/mc_vs_qmc/importance_sampling.py
 	@python workouts/mc_vs_qmc/vary_abs_tol.py
 	@python workouts/mc_vs_qmc/vary_dimension.py
-	# mlmc
-	@python workouts/mlmc/mcqmc06.py > outputs/mlmc/mcqmc06.log
-	@python workouts/mlmc/european_option.py > outputs/mlmc/european_option.log
+	

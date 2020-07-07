@@ -34,6 +34,9 @@ sphinx/_static/
 # release
 /build
 
+# binaries
+*.png
+
 # alegresor
 *.vscode
 *_ags*

@@ -33,4 +33,4 @@ if __name__ == '__main__':
         dimension = 16,
         mean_shifts = around(arange(-.2,3.1,.1),decimals=1),
         trials = 3)
-    df_cms.to_csv('outputs/mc_vs_qmc/importance_sampling.csv', index=False)
+    df_cms.to_csv('workouts/mc_vs_qmc/out/importance_sampling.csv', index=False)

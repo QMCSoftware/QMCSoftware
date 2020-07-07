@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8306         
+Solution: 5.8307         
 AsianCall (Integrand Object)
     volatility      2^(-1)
     start_price     30
@@ -27,9 +27,9 @@ CubMCCLT (StoppingCriterion Object)
 MeanVarData (AccumulateData Object)
     levels          3
     solution        5.831
-    n               [999221.  82150.  10618.]
-    n_total         1095061
+    n               [1021618.   77081.   10103.]
+    n_total         1111874
     confid_int      [5.805 5.856]
-    time_integrate  0.550
+    time_integrate  0.602
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

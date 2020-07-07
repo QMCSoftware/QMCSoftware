@@ -40,4 +40,4 @@ def vary_abs_tol(dimension=3, abs_tol=[.1,.2,.3], rel_tol=0, trials=1):
 
 if __name__ == '__main__':
     results = vary_abs_tol(dimension=3, abs_tol=arange(.002, .1002, .0002), rel_tol=0, trials=3)
-    results.to_csv('outputs/mc_vs_qmc/vary_abs_tol.csv', index=False)
+    results.to_csv('workouts/mc_vs_qmc/out/vary_abs_tol.csv', index=False)

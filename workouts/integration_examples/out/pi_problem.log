@@ -1,5 +1,5 @@
 Password: 3141592653
-CPU time: 53.93 sec
+CPU time: 53.94 sec
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -24,4 +24,4 @@ LDTransformData (AccumulateData Object)
     n_total         2^(27)
     solution        3.142
     r_lag           2^(2)
-    time_integrate  53.933
+    time_integrate  53.935

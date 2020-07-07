@@ -23,7 +23,7 @@ MeanVarData (AccumulateData Object)
     n               1878963
     n_total         1879987
     confid_int      [2.163 2.173]
-    time_integrate  0.685
+    time_integrate  0.600
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1693         
@@ -50,7 +50,7 @@ MeanVarDataRep (AccumulateData Object)
     sighat          0.004
     n_total         2^(13)
     confid_int      [2.166 2.172]
-    time_integrate  0.014
+    time_integrate  0.011
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1682         
@@ -75,7 +75,7 @@ MeanVarData (AccumulateData Object)
     n               2342182
     n_total         2343206
     confid_int      [2.163 2.173]
-    time_integrate  0.472
+    time_integrate  0.434
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1681         
@@ -98,7 +98,7 @@ LDTransformData (AccumulateData Object)
     n_total         2^(12)
     solution        2.168
     r_lag           2^(2)
-    time_integrate  0.008
+    time_integrate  0.007
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1705         
@@ -122,6 +122,6 @@ LDTransformData (AccumulateData Object)
     n_total         2^(12)
     solution        2.170
     r_lag           2^(2)
-    time_integrate  0.006
+    time_integrate  0.004
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
