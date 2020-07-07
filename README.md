@@ -13,13 +13,55 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 
 ## Installation
 
+QMCPy can be installed from [PyPI](https://pypi.org/project/qmcpy/) with the command
+
 ~~~
 pip install qmcpy
 ~~~
 
-**For Developers/Contributors**
+----
 
-This package is dependent on the `qmcpy/` directory being on your python path. This is easiest with a virtual environment. For example, using `virtualenv` and `virtualenvwrapper`
+## The QMCPy Framework
+
+The central package including the 5 main components as listed below. Each component is implemented as abstract classes with concrete implementations. For example, the lattice and Sobol' sequences are implemented as concrete implementations of the `DiscreteDistribution` abstract class. An overview of implemented componenets and some of the underlying mathematics is available at `./qmcpy/README.md`.  A complete list of concrete implementations and thorough documentation can be found on the [QMCPy Read the Docs site](https://qmcpy.readthedocs.io/en/latest/algorithms.html). 
+
+- **Stopping Criterion:** determines the number of samples necessary to meet an error tolerance.
+- **Integrand:** the function/process whose expected value will be approximated.
+- **True Measure:** the distribution to be integrated over.
+- **Discrete Distribution:** a generator of nodes/sequences, that can be either IID (for Monte Carlo) or low-discrepancy (for quasi-Monte Carlo), that mimic a standard distribution.
+- **Accumulate Data:** stores information from integration process.
+
+----
+
+## Quickstart
+
+We will find the exptected value of the Keister integrand [18]
+$$g(\boldsymbol{x})=\pi^{d/2}\cos(||\boldsymbol{x}||)$$
+integrated over the $d$ dimensional Gaussian true measure with variance $1/2$
+$$\mathcal{X} \sim \mathcal{N}(\boldsymbol{0},\boldsymbol{I}/2).$$
+We may choose a Sobol' discrete distribution with a corresponding Sobol' cubature stopping criterion to preform quasi-Monte Carlo numerical integration.
+
+```python
+import qmcpy as qp
+from numpy import pi, cos, sqrt, linalg
+d = 2
+s = qp.Sobol(d, seed=7)
+g = qp.Gaussian(s, covariance=1./2)
+k = qp.CustomFun(g, lambda x: pi**(d/2)*cos(linalg.norm(x,axis=1)))
+cs = qp.CubQMCSobolG(k, abs_tol=1e-3)
+solution,data = cs.integrate()
+print(data)
+```
+
+A more detailed quickstart can be found in `./demos/quickstart.ipynb` or in [this Google Colab notebook](https://colab.research.google.com/drive/1CQweuON7jHJBMVyribvosJLW4LheQXBL?usp=sharing).
+
+----
+
+## Installation and Usage for Developers
+
+This package is dependent on the `qmcpy/` directory being on your python path. This is easiest with a virtual environment.
+
+Setup using `virtualenv` and `virtualenvwrapper`
 
 ~~~
 mkvirtualenv qmcpy
@@ -32,7 +74,7 @@ pip install -r requirements/dev.txt
 pip install -e ./
 ~~~
 
-For `conda` users, 
+Setup using `conda`
 
 ~~~
 conda create --name qmcpy python=3.6
@@ -50,10 +92,10 @@ To check for successful installation, run
 make tests
 ~~~
 
-Note that the QRNG C backend files can be explicitly recompiled with
+Note that the QRNG [12] C backend files can be explicitly recompiled with
 
 ~~~
-pip install -e ./
+make qrng
 ~~~
 
 ----
@@ -83,18 +125,6 @@ make doc_epub
 ~~~
 
 To recompile documentation, you now only need one of the above three commands. 
-
-----
-
-## QMCPy
-
-The central package including the 5 main components as listed below. Each component is implemented as abstract classes with concrete implementations. For example, the lattice and Sobol sequences are implemented as concrete implementations of the `DiscreteDistribution` abstract class. A complete list of concrete implementations and thorough documentation can be found on the [QMCPy Read the Docs site](https://qmcpy.readthedocs.io/en/latest/algorithms.html). 
-
-- **Stopping Criterion:** determines the number of samples necessary to meet an error tolerance.
-- **Integrand:** the function/process whose expected value will be approximated.
-- **True Measure:** the distribution to be integrated over.
-- **Discrete Distribution:** a generator of nodes/sequences, that can be either IID (for Monte Carlo) or low-discrepancy (for quasi-Monte Carlo), that mimic a standard distribution.
-- **Accumulate Data:** stores information from integration process.
 
 ----
 
@@ -190,6 +220,8 @@ This work is maintained under the Apache 2.0 License.
 <b>[16]</b> M. B. Giles and B. J. Waterhouse. "Multilevel quasi-Monte Carlo path simulation," pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics, de Gruyter, 2009. `http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf`
 
 <b>[17]</b> Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
+
+<b>[18]</b> B. D. Keister, Multidimensional Quadrature Algorithms,  'Computers in Physics', *10*, pp. 119-122, 1996.
 
 ----
 

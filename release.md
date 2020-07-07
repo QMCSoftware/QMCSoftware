@@ -1,4 +1,4 @@
-## Upcoming
+## v0.3
 - Halton + Korobov sequences
 - doctests
 - Lattice MPS backend: 250 --> 600 max dimensions
