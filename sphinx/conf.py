@@ -161,4 +161,8 @@ def setup(app):
         "auto_code_block": True,
     }, True)
     app.add_transform(AutoStructify)
-    os.system('make _doc')
+    # compile demos and rst files
+    cmd = 'make _doc'
+    dirr = os.getcwd().split('/')[-1]
+    if dirr == 'sphinx': cmd = 'cd .. && '+cmd
+    os.system(cmd)
