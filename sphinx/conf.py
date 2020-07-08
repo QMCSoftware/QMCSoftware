@@ -161,3 +161,4 @@ def setup(app):
         "auto_code_block": True,
     }, True)
     app.add_transform(AutoStructify)
+    os.system('make _doc')

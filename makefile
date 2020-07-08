@@ -40,7 +40,7 @@ SPHINXOPTS  ?= -W --keep-going
 SPHINXBUILD ?= sphinx-build
 SOURCEDIR = sphinx
 BUILDDIR = sphinx/_build
-_doc:
+_doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) and $(nbdir) 
 	# Make Directries
 	@-rm -r -f $(mddir) 2>/dev/null &
 	@-rm -r -f $(nbdir) 2>/dev/null &
@@ -59,11 +59,12 @@ _doc:
 	@rm -f $(nbdir)nei_demo.rst
 	@rm -r $(nbdir)nei_demo_files/
 	@cd sphinx && make clean
-doc_html: _doc
+doc_html:
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
-doc_pdf: doc_html
+doc_pdf:
 	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going 2>/dev/null
-doc_epub: _doc
+	@cd sphinx/_build && make
+doc_epub:
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
 workout:
 	# integration_examples

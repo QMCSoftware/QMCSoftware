@@ -36,9 +36,13 @@ The central package including the 5 main components as listed below. Each compon
 ## Quickstart
 
 We will find the exptected value of the Keister integrand [18]
+
 $$g(\boldsymbol{x})=\pi^{d/2}\cos(||\boldsymbol{x}||)$$
+
 integrated over the $d$ dimensional Gaussian true measure with variance $1/2$
+
 $$\mathcal{X} \sim \mathcal{N}(\boldsymbol{0},\boldsymbol{I}/2).$$
+
 We may choose a Sobol' discrete distribution with a corresponding Sobol' cubature stopping criterion to preform quasi-Monte Carlo numerical integration.
 
 ```python
