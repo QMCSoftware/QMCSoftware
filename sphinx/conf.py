@@ -164,5 +164,5 @@ def setup(app):
     # compile demos and rst files
     cmd = 'make _doc'
     dirr = os.getcwd().split('/')[-1]
-    if dirr == 'sphinx': cmd = 'cd .. && '+cmd
+    if dirr == 'sphinx': cmd = 'cd .. && '+cmd+' && cd sphinx'
     os.system(cmd)

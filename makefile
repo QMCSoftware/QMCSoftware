@@ -58,7 +58,6 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	done
 	@rm -f $(nbdir)nei_demo.rst
 	@rm -r $(nbdir)nei_demo_files/
-	@cd sphinx && make clean
 doc_html:
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
 doc_pdf:
