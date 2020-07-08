@@ -162,7 +162,6 @@ def setup(app):
     }, True)
     app.add_transform(AutoStructify)
     # compile demos and rst files
-    cmd = 'make _doc'
     dirr = os.getcwd().split('/')[-1]
-    if dirr == 'sphinx': cmd = 'cd .. && '+cmd+' && cd sphinx'
+    cmd = 'make _doc' if dirr=='QMCSoftware' else 'make -C .. _doc'
     os.system(cmd)
