@@ -50,7 +50,7 @@ class MeanVarData(AccumulateData):
             else:
                 samples = self.distribution.gen_samples(n=self.n[l])
                 y = self.integrand.f(samples).squeeze()
-            self.t_eval[l] = max(time() - t_start, EPS)
+            self.t_eval[l] = max( (time()-t_start)/self.n[l], EPS) 
             self.sighat[l] = y.std() # compute the sample standard deviation
             self.muhat[l] = y.mean() # compute the sample mean
             self.n_total += self.n[l] # add to total samples

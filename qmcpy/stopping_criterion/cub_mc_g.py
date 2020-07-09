@@ -50,8 +50,13 @@ class CubMCG(StoppingCriterion):
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
 
     Reference:
+        [1] Fred J. Hickernell, Lan Jiang, Yuewei Liu, and Art B. Owen, "Guaranteed
+        conservative fixed width confidence intervals via Monte Carlo
+        sampling," Monte Carlo and Quasi-Monte Carlo Methods 2012 (J. Dick, F.
+        Y. Kuo, G. W. Peters, and I. H. Sloan, eds.), pp. 105-128,
+        Springer-Verlag, Berlin, 2014. DOI: 10.1007/978-3-642-41095-6_5
 
-        [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
         Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
         GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
         Available from http://gailgithub.github.io/GAIL_Dev/

@@ -21,3 +21,5 @@ Demos
     demo_rst/sampling_measures.rst
 
     demo_rst/importance_sampling.rst
+
+    demo_rst/nei_demo.rst

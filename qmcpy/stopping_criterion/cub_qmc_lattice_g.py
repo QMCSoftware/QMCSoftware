@@ -47,7 +47,13 @@ class CubQMCLatticeG(StoppingCriterion):
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
 
     Reference
-        [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+        [1] Lluis Antoni Jimenez Rugama and Fred J. Hickernell, 
+        "Adaptive multidimensional integration based on rank-1 lattices," 
+        Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, 
+        April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics 
+        and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1411.1966, pp. 407-422.
+        
+        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
         Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
         GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
         Available from http://gailgithub.github.io/GAIL_Dev/

@@ -85,7 +85,7 @@ class CubMCCLT(StoppingCriterion):
         self.data.update_data()
         # use cost of function values to decide how to allocate
         temp_a = self.data.t_eval ** 0.5
-        temp_b = (temp_a * self.data.sighat).sum(0)
+        temp_b = (temp_a * self.data.sighat).sum()
         # samples for computation of the mean
         # n_mu_temp := n such that confidence intervals width and conficence will be satisfied
         tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
@@ -111,7 +111,6 @@ class CubMCCLT(StoppingCriterion):
         # Final Sample
         self.data.update_data()
         # CLT confidence interval
-        z_star = -norm.ppf(self.alpha / 2)
         sigma_up = (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
         err_bar = z_star * self.inflate * sigma_up
         self.data.confid_int = self.data.solution + err_bar * array([-1, 1])

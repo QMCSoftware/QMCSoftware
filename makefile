@@ -56,8 +56,6 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	echo "#\tConverting $$f"; \
 	$(nbconvertcmd) $$f 2>/dev/null;\
 	done
-	@rm -f $(nbdir)nei_demo.rst
-	@rm -r $(nbdir)nei_demo_files/
 doc_html:
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
 doc_pdf:
