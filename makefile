@@ -56,12 +56,12 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	echo "#\tConverting $$f"; \
 	$(nbconvertcmd) $$f 2>/dev/null;\
 	done
-doc_html:
+doc_html: _doc
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
-doc_pdf:
+doc_pdf: _doc
 	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going 2>/dev/null
 	@cd sphinx/_build && make
-doc_epub:
+doc_epub: _doc
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
 workout:
 	# integration_examples
