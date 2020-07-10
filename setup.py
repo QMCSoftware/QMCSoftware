@@ -8,10 +8,14 @@ import subprocess
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
+        # compile c files
+        try: os.system('make qrng')
+        except: print('Problem compiling qrng c files')
+        # compile html and pdf documentation
         try:
-            subprocess.check_call('make qrng',shell=True)
-        except:
-            print('Problem compiling qrng c files')
+            os.system('make doc_html')
+            os.system('make doc_pdf')
+        except: print('Problem compiling html or pdf documenation')
         super(CustomInstall,self).run()
 
 class CleanCommand(Command):

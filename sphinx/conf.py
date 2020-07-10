@@ -161,7 +161,3 @@ def setup(app):
         "auto_code_block": True,
     }, True)
     app.add_transform(AutoStructify)
-    # compile demos and rst files
-    dirr = os.getcwd().split('/')[-1]
-    cmd = 'make _doc' if dirr=='QMCSoftware' else 'make -C .. _doc'
-    os.system(cmd)
