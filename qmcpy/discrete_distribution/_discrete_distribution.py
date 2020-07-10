@@ -23,7 +23,7 @@ class DiscreteDistribution(object):
         Returns:
             ndarray: n x d array of samples
         """
-        raise MethodImplementationError(self, 'gen_dd_samples')
+        raise MethodImplementationError(self, 'gen_samples')
 
     def set_dimension(self, dimension):
         """
@@ -33,9 +33,21 @@ class DiscreteDistribution(object):
             dimension (int): new dimension to reset to
         
         Note:
-            May not be applicable to every discrete distribution (ex: custom_iit_distribution). 
+            May not be applicable to every discrete distribution (ex: CustomIIDDistribution). 
         """
         raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
+    
+    def set_seed(self, seed):
+        """ 
+        ABSTRACT METHOD to reset the seed of the problem.
+
+        Args: 
+            seed (int): new seed for generator
+        
+        Note:
+            May not be applicable to every discrete distribution (ex: InverseCDFSampling)
+        """
+        raise MethodImplementationError(self, 'set_seed')
 
     def __repr__(self):
         return univ_repr(self, "DiscreteDistribution", self.parameters)

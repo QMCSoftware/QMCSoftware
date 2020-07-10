@@ -89,12 +89,7 @@ class Halton(DiscreteDistribution):
         return x
 
     def set_seed(self, seed):
-        """
-        Reseed the generator to get a new scrambling.
-
-        Args:
-            seed (int): new seed for generator
-        """
+        """ See abstract method. """
         self.seed = seed if seed else random.randint(2**32)
         
     def set_dimension(self, dimension):

@@ -177,12 +177,7 @@ class Sobol(DiscreteDistribution):
         return x_sob
 
     def set_seed(self, seed):
-        """
-        Reseed the generator to get a new scrambling.
-
-        Args:
-            seed (int): new seed for generator
-        """
+        """ See abstract method. """
         self.seed = seed
         if (self.backend == 'qrng' or self.backend == 'pytorch') and (not self.seed):
             # qrng needs a seed, even if it is random

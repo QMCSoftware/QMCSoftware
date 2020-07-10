@@ -109,12 +109,7 @@ class Lattice(DiscreteDistribution):
         return x_lat
     
     def set_seed(self, seed):
-        """
-        Reseed the generator to get a new scrambling.
-
-        Args:
-            seed (int): new seed for generator
-        """
+        """ See abstract method. """
         self.seed = seed
         random.seed(self.seed)
         self.shift = random.rand(self.dimension)
