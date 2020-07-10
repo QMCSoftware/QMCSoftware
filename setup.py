@@ -11,10 +11,8 @@ class CustomInstall(install):
         # compile c files
         try: os.system('make qrng')
         except: print('Problem compiling qrng c files')
-        # compile html and pdf documentation
-        try:
-            os.system('make doc_html')
-            os.system('make doc_pdf')
+        # compile files used for docuemtnation
+        try: os.system('make _doc')
         except: print('Problem compiling html or pdf documenation')
         super(CustomInstall,self).run()
 
