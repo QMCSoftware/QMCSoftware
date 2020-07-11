@@ -51,8 +51,8 @@ class MLCallOptions(Integrand):
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
         """
-        if not (isinstance(measure,Gaussian) and all(measure.mu==0) and all(measure.sigma==eye(measure.d))):
-            raise ParameterError('AsianCall measure must be a BrownianMotion instance')
+        if not (isinstance(measure,Gaussian) and (measure.mu==0).all() and (measure.sigma==eye(measure.d)).all()):
+            raise ParameterError('AsianCall measure must be a Gaussian instance with mean 0 and variance 1')
         options = ['european','asian']
         self.option = option.lower()
         if self.option not in options:

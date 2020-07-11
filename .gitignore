@@ -39,6 +39,9 @@ sphinx/readme_rst/
 # binaries
 *.png
 
+# distribution
+dist/
+
 # alegresor
 *.vscode
 *_ags*
