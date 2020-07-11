@@ -105,9 +105,9 @@ class CubQMCLatticeG(StoppingCriterion):
         self.n_max = 2.**m_max
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
-        allowed_levels = 'single'
+        allowed_levels = ['single']
         allowed_distribs = ["Lattice"]
-        super(CubQMCLatticeG,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQMCLatticeG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         if not distribution.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
         if distribution.backend != 'gail':

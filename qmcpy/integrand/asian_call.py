@@ -78,11 +78,12 @@ class AsianCall(Integrand):
             self.dimensions = multi_level_dimensions
             self.dim_fracs = [0.] + [float(self.dimensions[i])/float(self.dimensions[i-1]) \
                 for i in range(1,len(self.dimensions))]
-            self.multilevel = True
+            self.leveltype = 'fixed-multi'
         else:
             # single level problem
             self.dimensions = [self.measure.distribution.dimension]
             self.dim_fracs = [0.]
+            self.leveltype = 'single'
         self.exercise_time = self.measure.time_vector[-1]
         super(AsianCall,self).__init__()        
 

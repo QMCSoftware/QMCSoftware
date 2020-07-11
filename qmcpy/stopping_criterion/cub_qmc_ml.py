@@ -78,9 +78,9 @@ class CubQMCML(StoppingCriterion):
         self.replications = float(replications)
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
-        allowed_levels = 'multi'
+        allowed_levels = ['adaptive-multi']
         allowed_distribs = ["Lattice", "Sobol"]
-        super(CubQMCML,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQMCML,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration Data
         self.data = MLQMCData(self, integrand, self.n_init, self.replications)
 

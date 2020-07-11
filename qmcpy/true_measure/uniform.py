@@ -12,7 +12,7 @@ class Uniform(TrueMeasure):
     Uniform (TrueMeasure Object)
         lower_bound     [1 1]
         upper_bound     [2 2]
-    >>> u.gen_mimic_samples(n_min=4,n_max=8)
+    >>> u.gen_samples(n_min=4,n_max=8)
     array([[1.857, 1.258],
            [1.357, 1.758],
            [1.607, 1.508],
@@ -22,7 +22,7 @@ class Uniform(TrueMeasure):
     Uniform (TrueMeasure Object)
         lower_bound     [1 1 1 1]
         upper_bound     [2 2 2 2]
-    >>> u.gen_mimic_samples(n_min=2,n_max=4)
+    >>> u.gen_samples(n_min=2,n_max=4)
     array([[1.732, 1.133, 1.601, 1.354],
            [1.232, 1.633, 1.101, 1.854]])
     >>> u2 = Uniform(Sobol(2),lower_bound=[-.5,0],upper_bound=[1,3])
@@ -89,7 +89,7 @@ class Uniform(TrueMeasure):
         return f
         return f
     
-    def gen_mimic_samples(self, *args, **kwargs):
+    def gen_samples(self, *args, **kwargs):
         """ See abstract method. """
         samples = self.distribution.gen_samples(*args,**kwargs)
         mimic_samples = self._tf_to_mimic_samples(samples)

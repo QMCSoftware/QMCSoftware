@@ -10,7 +10,7 @@ class IdentitalToDiscrete(TrueMeasure):
     
     >>> dd = Sobol(2,seed=7,randomize=False,graycode=False)
     >>> itd = IdentitalToDiscrete(dd)
-    >>> itd.gen_mimic_samples(4)
+    >>> itd.gen_samples(4)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
            [0.25, 0.75],
@@ -32,6 +32,6 @@ class IdentitalToDiscrete(TrueMeasure):
         f = lambda samples, *args, **kwargs: g(samples, *args, **kwargs)
         return f
     
-    def gen_mimic_samples(self, *args, **kwargs):
+    def gen_samples(self, *args, **kwargs):
         """ See abstract method. """
         return self.distribution.gen_samples(*args,**kwargs)

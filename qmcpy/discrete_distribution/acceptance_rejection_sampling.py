@@ -75,7 +75,7 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
         if c: # c known
             self.c = c
         else: # approximate c
-            s = self.measure.gen_mimic_samples(c_est_draws)
+            s = self.measure.gen_samples(c_est_draws)
             md = apply_along_axis(self.m,1,s).squeeze()
             kd = apply_along_axis(self.k,1,s).squeeze()
             self.c = c_est_inflation_factor*max( (md/kd) )
@@ -100,7 +100,7 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
         max_draws = self.draws_multiple*n
         while self.successful_draws < n:
             keep = False
-            candidate = self.measure.gen_mimic_samples(1).squeeze()
+            candidate = self.measure.gen_samples(1).squeeze()
             md = self.m(candidate) # density at objective measure
             kd = self.k(candidate) # density at measure we sampled from
             u = random.rand(1)

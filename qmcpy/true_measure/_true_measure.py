@@ -13,7 +13,7 @@ class TrueMeasure(object):
             self.parameters = []
         self.dimension = self.distribution.dimension
 
-    def gen_mimic_samples(self, *args, **kwargs):
+    def gen_samples(self, *args, **kwargs):
         """
         ABSTRACT METHOD to generate samples from the DiscreteDistribution object
         and transform them to mimic TrueMeasure samples. 

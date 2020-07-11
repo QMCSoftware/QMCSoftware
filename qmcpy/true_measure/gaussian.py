@@ -16,13 +16,13 @@ class Gaussian(TrueMeasure):
     Gaussian (TrueMeasure Object)
         mean            1
         covariance      2^(-2)
-    >>> g.gen_mimic_samples(n_min=4,n_max=8)
+    >>> g.gen_samples(n_min=4,n_max=8)
     array([[ 1.533,  0.676],
            [ 0.817,  1.351],
            [ 1.136,  1.011],
            [ 0.379, -0.194]])
     >>> g.set_dimension(4)
-    >>> g.gen_mimic_samples(n_min=2,n_max=4)
+    >>> g.gen_samples(n_min=2,n_max=4)
     array([[1.309, 0.445, 1.128, 0.813],
            [0.634, 1.171, 0.362, 1.528]])
     >>> g2 = Gaussian(Sobol(2),mean=[1,2],covariance=[[1,.5],[.5,2]])
@@ -100,7 +100,7 @@ class Gaussian(TrueMeasure):
             return y
         return f
     
-    def gen_mimic_samples(self, *args, **kwargs):
+    def gen_samples(self, *args, **kwargs):
         """ See abstract method. """
         samples = self.distribution.gen_samples(*args,**kwargs)
         mimic_samples = self._tf_to_mimic_samples(samples)

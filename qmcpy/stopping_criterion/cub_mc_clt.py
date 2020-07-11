@@ -72,9 +72,9 @@ class CubMCCLT(StoppingCriterion):
         self.inflate = float(inflate)
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
-        allowed_levels = 'multi'
+        allowed_levels = ['single','fixed-multi']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMCCLT,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubMCCLT,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration data
         self.data = MeanVarData(self, integrand, self.n_init)
 

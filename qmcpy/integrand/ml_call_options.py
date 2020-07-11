@@ -63,7 +63,7 @@ class MLCallOptions(Integrand):
         self.r = interest_rate
         self.t = t_final
         self.b = .85*self.k
-        self.multilevel = True
+        self.leveltype = 'adaptive-multi'
         self.g_submodule = getattr(self,'g_'+self.option)
         super(MLCallOptions,self).__init__()
 

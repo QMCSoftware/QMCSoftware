@@ -94,9 +94,9 @@ class CubMCML(StoppingCriterion):
         self.theta = 0.25
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
-        allowed_levels = 'multi'
+        allowed_levels = ['adaptive-multi']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMCML,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubMCML,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration Data
         self.data = MLMCData(self, integrand, self.levels_min, self.n_init, alpha0, beta0, gamma0)
     

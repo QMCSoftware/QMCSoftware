@@ -24,7 +24,7 @@ class MeanVarData(AccumulateData):
         self.distribution = self.measure.distribution
         self.integrand = integrand
         # Set Attributes
-        if self.integrand.multilevel:
+        if self.integrand.leveltype=='fixed-multi':
             self.levels = len(self.integrand.dimensions)
         else:
             self.levels = 1
@@ -41,7 +41,7 @@ class MeanVarData(AccumulateData):
         """ See abstract method. """
         for l in range(self.levels):
             t_start = time() # time the integrand values
-            if self.integrand.multilevel:
+            if self.integrand.leveltype=='fixed-multi':
                 # reset dimension
                 new_dim = self.integrand.dim_at_level(l)
                 self.measure.set_dimension(new_dim)

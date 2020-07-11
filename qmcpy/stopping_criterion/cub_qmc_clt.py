@@ -77,9 +77,9 @@ class CubQMCCLT(StoppingCriterion):
         self.inflate = float(inflate)
         # DiscreteDistribution checks
         distribution = integrand.measure.distribution
-        allowed_levels = "single"
+        allowed_levels = ["single"]
         allowed_distribs = ["Lattice", "Sobol"]
-        super(CubQMCCLT,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQMCCLT,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         if not distribution.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
         # Construct AccumulateData Object to House Integration data

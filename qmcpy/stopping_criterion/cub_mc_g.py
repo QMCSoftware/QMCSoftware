@@ -95,9 +95,9 @@ class CubMCG(StoppingCriterion):
             (1 - 1. / self.inflate**2)**2
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
-        allowed_levels = 'single'
+        allowed_levels = ['single']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMCG,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubMCG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         # Construct AccumulateData Object to House Integration data
         self.data = MeanVarData(self, integrand, self.n_init)  # house integration data
 

@@ -105,9 +105,9 @@ class CubQMCSobolG(StoppingCriterion):
         self.n_max = 2.**m_max
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
-        allowed_levels = 'single'
+        allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
-        super(CubQMCSobolG,self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubQMCSobolG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         if (not distribution.randomize) or distribution.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False")
         # Construct AccumulateData Object to House Integration data

@@ -6,11 +6,11 @@ from ..util import DistributionCompatibilityError, ParameterError, \
 class StoppingCriterion(object):
     """ Stopping Criterion abstract class. DO NOT INSTANTIATE. """
     
-    def __init__(self, distribution, allowed_levels, allowed_distribs):
+    def __init__(self, distribution, integrand, allowed_levels, allowed_distribs):
         """
         Args:
             distribution (DiscreteDistribution): a DiscreteDistribution
-            allowed_levels (str): supports 'single' or 'multi' level problems?
+            allowed_levels (list): which integrand types are supported: 'single', 'fixed-multi', 'adaptive-multi'
             allowed_distribs (list): list of names (strings) of compatible distributions
         """
         # check distribution compatibility with stopping_criterion
@@ -19,6 +19,10 @@ class StoppingCriterion(object):
         if d_name not in allowed_distribs:
             error_message = "%s only accepts distributions: %s" %(s_name, str(allowed_distribs))
             raise DistributionCompatibilityError(error_message)
+        # multilevel compatibility check
+        if integrand.leveltype  not in allowed_levels:
+            raise ParameterError('Integrand is %s level but %s only supports %s level problems.' % \
+            (integrand.leveltype, s_name, allowed_levels))
         # parameter checks
         if not hasattr(self,'parameters'):
             self.parameters = []
