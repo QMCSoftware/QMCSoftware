@@ -51,17 +51,16 @@ class EuropeanOption(Integrand):
 
     def g(self, x):
         """ See abstract method. """
-        s = self.start_price * exp(
+        s_last = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
-            self.measure.time_vector + self.volatility * x)
+            self.measure.time_vector[-1] + self.volatility * x[:,-1])
         if self.call_put == 'call':
-            y = maximum(s[:,-1] - self.strike_price, 0) * \
-                exp(-self.interest_rate * self.exercise_time)
+            y_raw = maximum(s_last - self.strike_price, 0)
         else: # put
-            s = maximum(s,0) # avoid negative stock values
-            y = maximum(self.strike_price - s[:,-1], 0) * \
-                exp(-self.interest_rate * self.exercise_time)
-        return y
+            s_last = maximum(s_last,0) # avoid negative stock values
+            y_raw = maximum(self.strike_price - s_last, 0)
+        y_adj = y_raw * exp(-self.interest_rate * self.exercise_time)
+        return y_adj
     
     def get_fair_price(self):
         """
