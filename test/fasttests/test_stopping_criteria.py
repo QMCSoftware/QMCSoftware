@@ -11,7 +11,7 @@ tol = .05
 rel_tol = 0
 
 
-class TestCubMcClt(unittest.TestCase):
+class TestCubMCCLT(unittest.TestCase):
     """ Unit tests for CubMCCLT StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
@@ -35,7 +35,7 @@ class TestCubMcClt(unittest.TestCase):
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
-class TestCubQmcClt(unittest.TestCase):
+class TestCubQMCCLT(unittest.TestCase):
     """ Unit tests for CubQMCCLT StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
@@ -52,14 +52,14 @@ class TestCubQmcClt(unittest.TestCase):
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
     
     def test_keister_2d(self):
-        distribution = Sobol(dimension=2)
+        distribution = Halton(dimension=2)
         measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         solution,data = CubQMCCLT(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
-class TestCubMcG(unittest.TestCase):
+class TestCubMCG(unittest.TestCase):
     """ Unit tests for CubMCG StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
@@ -84,7 +84,7 @@ class TestCubMcG(unittest.TestCase):
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
-class TestCubQmcLatticeG(unittest.TestCase):
+class TestCubQMCLatticeG(unittest.TestCase):
     """ Unit tests for CubQMCLatticeG StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
@@ -108,7 +108,7 @@ class TestCubQmcLatticeG(unittest.TestCase):
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
-class TestCubQmcSobolG(unittest.TestCase):
+class TestCubQMCSobolG(unittest.TestCase):
     """ Unit tests for CubQMCSobolG StoppingCriterion. """
     def test_raise_distribution_compatibility_error(self):
         distribution = IIDStdGaussian(dimension=2)
@@ -131,7 +131,7 @@ class TestCubQmcSobolG(unittest.TestCase):
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
 
-class TestCubMcMl(unittest.TestCase):
+class TestCubMCL(unittest.TestCase):
     """ Unit tests for CubMCML StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
@@ -150,7 +150,7 @@ class TestCubMcMl(unittest.TestCase):
         self.assertTrue(abs(solution-exact_value) < tol)
 
 
-class TestCubQmcMl(unittest.TestCase):
+class TestCubQMCML(unittest.TestCase):
     """ Unit tests for CubQMCML StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
@@ -163,7 +163,7 @@ class TestCubQmcMl(unittest.TestCase):
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
     
     def test_european_option(self):
-        integrand = MLCallOptions(Gaussian(Sobol()),start_strike_price=30)
+        integrand = MLCallOptions(Gaussian(Halton()),start_strike_price=30)
         solution,data = CubQMCML(integrand,rmse_tol=tol/2.58).integrate()
         exact_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-exact_value) < tol)

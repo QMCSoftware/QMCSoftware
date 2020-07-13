@@ -12,20 +12,20 @@ class Halton(DiscreteDistribution):
 
     >>> h = Halton(2,seed=7)
     >>> h.gen_samples(1)
-    array([[0.166, 0.363]])
+    array([[0.315, 0.739]])
     >>> h.gen_samples(1)
-    array([[0.166, 0.363]])
+    array([[0.315, 0.739]])
     >>> h.set_dimension(4)
     >>> h.set_seed(8)
     >>> h.gen_samples(2)
-    array([[0.323, 0.148, 0.623, 0.913],
-           [0.823, 0.482, 0.223, 0.342]])
+    array([[0.276, 0.382, 0.502, 0.356],
+           [0.776, 0.049, 0.702, 0.784]])
     >>> h
     Halton (DiscreteDistribution Object)
         dimension       2^(2)
         generalize      1
         seed            2^(3)
-        backend         qrng
+        backend         owen
         mimics          StdUniform
     
     References
@@ -33,11 +33,13 @@ class Halton(DiscreteDistribution):
         qrng: (Randomized) Quasi-Random Number Generators. 
         R package version 0.0-7.
         https://CRAN.R-project.org/package=qrng.
+
+        Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
     """
 
     parameters = ['dimension','generalize','seed','backend','mimics']
 
-    def __init__(self, dimension=1, generalize=True, backend='QRNG', seed=None):
+    def __init__(self, dimension=1, generalize=True, backend='Owen', seed=None):
         """
         Args:
             dimension (int): dimension of samples
@@ -46,12 +48,17 @@ class Halton(DiscreteDistribution):
                 "QRNG" backend supports both plain and generalized Halton with randomization and generally provides better accuracy. 
                 "Owen" only supports generalized Halton but allows for n_min!=0 in 'gen_samples' method.
             seed (int): seed the random number generator for reproducibility
+        
+        Note:
+            Halton instances are automatically randomized. 
+            See 'QRNG' and 'Owen' backend references for specific randomization methods and differences. 
         """
         self.dimension = dimension
         self.generalize = generalize
         self.backend = backend.lower()
         self.mimics = 'StdUniform'
         self.seed = seed
+        self.randomize = True
         self.set_seed(self.seed)
         if self.backend=='owen' and self.generalize==False:
             warnings.warn('\nHalton with "Owen" backend must have generalize=True. '+\
