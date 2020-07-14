@@ -47,7 +47,7 @@ packages = [
 
 setuptools.setup(
     name="qmcpy",
-    version="0.3a",
+    version="0.3b",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',

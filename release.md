@@ -6,6 +6,7 @@
 - partial python 2 compatibility
 - patch multilevel call options bug
 - TrueMeasure method naming: `gen_mimic_samples` --> `gen_samples`
+- PCA decomposition for Brownian Motion & Gaussian true measures
 
 ## v0.2
 - Initial release
