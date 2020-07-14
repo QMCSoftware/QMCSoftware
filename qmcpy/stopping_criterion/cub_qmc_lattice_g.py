@@ -32,6 +32,7 @@ class CubQMCLatticeG(StoppingCriterion):
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
+        decomp_type     pca
     CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0

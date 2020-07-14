@@ -18,9 +18,9 @@ class CubQMCML(StoppingCriterion):
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.444567069452214
+    10.444499944889085
     >>> data
-    Solution: 10.4446        
+    Solution: 10.4445        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -37,6 +37,7 @@ class CubQMCML(StoppingCriterion):
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1
+        decomp_type     pca
     CubQMCML (StoppingCriterion Object)
         rmse_tol        0.019
         n_init          2^(8)
@@ -45,8 +46,8 @@ class CubQMCML(StoppingCriterion):
     MLQMCData (AccumulateData Object)
         levels          7
         n_level         [4096.  256.  256.  256.  256.  256.  256.]
-        mean_level      [1.006e+01 1.836e-01 1.029e-01 5.410e-02 2.773e-02 1.394e-02 6.967e-03]
-        var_level       [6.143e-05 6.105e-05 4.080e-05 6.780e-06 3.139e-06 9.989e-07 4.290e-07]
+        mean_level      [1.006e+01 1.836e-01 1.029e-01 5.410e-02 2.773e-02 1.385e-02 6.988e-03]
+        var_level       [6.143e-05 6.105e-05 4.080e-05 6.780e-06 3.139e-06 7.375e-07 1.940e-07]
         bias_estimate   0.007
         n_total         180224
         time_integrate  ...

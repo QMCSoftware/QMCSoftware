@@ -13,7 +13,7 @@ class Linear(Integrand):
     >>> x = dd.gen_samples(2**10)
     >>> y = l.f(x)
     >>> y.mean()
-    -0.0008447105940667578
+    -0.0008447105940667977
     """
 
     def __init__(self, measure):

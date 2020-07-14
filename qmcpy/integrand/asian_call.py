@@ -22,7 +22,7 @@ class AsianCall(Integrand):
     >>> x = dd.gen_samples(2**10)
     >>> y = ac.f(x)
     >>> y.mean()
-    1.7638343801580052
+    1.765544672287073
 
     >>> dd2 = Sobol(seed=7)
     >>> m2 = BrownianMotion(dd2,drift=1)
@@ -44,7 +44,7 @@ class AsianCall(Integrand):
     ...     x2 = dd2.gen_samples(2**10)
     ...     y2 += ac2.f(x2,l=l).mean()
     >>> y2
-    1.787834256519869
+    1.7615439792317786
     """
 
     parameters = ['volatility', 'start_price', 'strike_price',

@@ -1,8 +1,8 @@
 from ._true_measure import TrueMeasure
 from ..util import TransformError,DimensionError
 from ..discrete_distribution import Sobol
-from numpy import array, sqrt, eye, dot, pi, exp,dot, tile, isscalar, diag
-from numpy.linalg import cholesky, det, inv
+from numpy import array, sqrt, eye, dot, pi, exp,dot, tile, isscalar, diag, argsort
+from numpy.linalg import cholesky, det, inv, eigh
 from scipy.stats import norm
 
 
@@ -16,6 +16,7 @@ class Gaussian(TrueMeasure):
     Gaussian (TrueMeasure Object)
         mean            1
         covariance      2^(-2)
+        decomp_type     pca
     >>> g.gen_samples(n_min=4,n_max=8)
     array([[ 1.533,  0.676],
            [ 0.817,  1.351],
@@ -31,37 +32,51 @@ class Gaussian(TrueMeasure):
         mean            [1 2]
         covariance      [[1.  0.5]
                         [0.5 2. ]]
+        decomp_type     pca
     >>> g2.pdf(array([0,0]))
-    array([[0.027]])
+    array([[0.038]])
     """
 
-    parameters = ['mean', 'covariance']
+    parameters = ['mean', 'covariance', 'decomp_type']
 
-    def __init__(self, distribution, mean=0., covariance=1.):
+    def __init__(self, distribution, mean=0., covariance=1., decomp_type='PCA'):
         """
         Args:
             distribution (DiscreteDistribution): DiscreteDistribution instance
             mean (float): mu for Normal(mu,sigma^2)
             covariance (ndarray): sigma^2 for Normal(mu,sigma^2). 
                 A float or d (dimension) vector input will be extended to covariance*eye(d)
+            decomp_type (str): method of decomposition either  
+                "PCA" for principal component analysis or 
+                "Cholesky" for cholesky decomposition.
         """
         self.distribution = distribution
         self.d = distribution.dimension
         self.mean = mean
         self.covariance = covariance
+        self.decomp_type = decomp_type.lower()
         if isscalar(mean):
             mean = tile(mean,self.d)
         if isscalar(covariance):
             covariance = covariance*eye(self.d)
         self.mu = array(mean)
-        self.sigma2 = array(covariance)
-        if self.sigma2.shape==(self.d,):
-            self.sigma2 = diag(self.sigma2)
-        if not (len(self.mu)==self.d and self.sigma2.shape==(self.d,self.d)):
+        self.sigma = array(covariance)
+        if self.sigma.shape==(self.d,):
+            self.sigma = diag(self.sigma)
+        if not (len(self.mu)==self.d and self.sigma.shape==(self.d,self.d)):
             raise DimensionError("mean must have length dimension and "+\
                 "covariance must be of shapre dimension x dimension")
-        self.sigma = cholesky(self.sigma2)
+        self._assemble()
         super(Gaussian,self).__init__()
+    
+    def _assemble(self):
+        """ Assemble decomposition of sigma. """
+        if self.decomp_type == 'pca':
+            evals,evecs = eigh(self.sigma) # get eigenvectors and eigenvalues for
+            order = argsort(-evals)
+            self.a = dot(evecs[:,order],diag(sqrt(evals[order]))).T
+        elif self.decomp_type == 'cholesky':
+            self.a = cholesky(self.sigma)
     
     def pdf(self, x):
         """ See abstract method. """
@@ -82,14 +97,13 @@ class Gaussian(TrueMeasure):
             ndarray: samples from the DiscreteDistribution transformed to mimic Gaussian.
         """
         if self.distribution.mimics == 'StdGaussian':
-            # shift and stretch
-            mimic_samples = self.mu + dot(samples,self.sigma)
+            std_gaussian_samples = samples
         elif self.distribution.mimics == "StdUniform":
-            # inverse CDF then shift and stretch
-            mimic_samples = self.mu + dot(norm.ppf(samples),self.sigma)
+            std_gaussian_samples = norm.ppf(samples)
         else:
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
+        mimic_samples = self.mu + dot(std_gaussian_samples,self.a)
         return mimic_samples
 
     def transform_g_to_f(self, g):
@@ -109,13 +123,13 @@ class Gaussian(TrueMeasure):
     def set_dimension(self, dimension):
         """ See abstract method. """
         m = self.mu[0]
-        c = self.sigma2[0,0]
+        c = self.sigma[0,0]
         expected_cov = c*eye(self.d)
-        if not (all(self.mu==m) and (self.sigma2==expected_cov).all()):
+        if not (all(self.mu==m) and (self.sigma==expected_cov).all()):
             raise DimensionError('In order to change dimension of Gaussian measure '+\
                 'mean (mu) must be all the same and covariance must be a scaler times I')
         self.distribution.set_dimension(dimension)
         self.d = dimension
         self.mu = tile(m,self.d)
-        self.sigma2 = c*eye(self.d)
-        self.sigma = cholesky(self.sigma2)
+        self.sigma = c*eye(self.d)
+        self._assemble()

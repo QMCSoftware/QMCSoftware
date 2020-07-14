@@ -32,6 +32,7 @@ class CubQMCCLT(StoppingCriterion):
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
+        decomp_type     pca
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
