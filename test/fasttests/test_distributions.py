@@ -113,7 +113,7 @@ class TestSobol(unittest.TestCase):
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
-        for backend in ['QRNG','MPS']:
+        for backend in ['QRNG','MPS','PyTorch']:
             distribution = Sobol(dimension=3, randomize=True, backend=backend, graycode=True)
             samples = distribution.gen_samples(n_min=4, n_max=8)
             with self.subTest():

@@ -69,8 +69,8 @@ class Sobol(DiscreteDistribution):
             dimension (int): dimension of samples
             randomize (bool): If True, apply digital shift to generated samples        
             seed (int): seed the random number generator for reproducibility
-            backend (str): backend generator must be either "QRNG" or "MPS". 
-                "QRNG" is significantly faster, supports optional randomization, and supports optional graycode ordering
+            backend (str): backend generator must be either "QRNG", "MPS", or "PyTorch" 
+                "QRNG" is significantly faster, supports optional randomization, and supports optional graycode ordering.
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
         """
         self.dimension = dimension
@@ -93,10 +93,9 @@ class Sobol(DiscreteDistribution):
                 warnings.warn(warning_s, ParameterWarning)
         elif self.backend == 'pytorch':         
             self.backend_gen = self.pytorch_sobol_gen
-            raise ParameterError('''
+            warnings.warn('''
                 PyTorch SobolEngine issue. See https://github.com/pytorch/pytorch/issues/32047
-                    SobolEngine 0^{th} vector is \\vec{.5} rather than \\vec{0}
-                    SobolEngine sometimes generates 1 after applying randomize''')
+                    SobolEngine 0^{th} vector is \\vec{.5} rather than \\vec{0}''',ParameterWarning)
         else:
             raise ParameterError("Sobol backend must be either 'qrng', 'mps', or 'pytorch'")
         if self.backend != 'qrng' and (not self.graycode):
@@ -146,11 +145,12 @@ class Sobol(DiscreteDistribution):
             n_min (int): minimum index. Must be 0 or n_max/2
             n_max (int): maximum index (not inclusive)
         """
-        from torch.quasirandom import SobolEngine 
+        import torch
+        from torch.quasirandom import SobolEngine
         n = int(n_max-n_min)
-        se = SobolEngine(dimension=self.dimension, randomize=self.randomize, seed=self.seed)
+        se = SobolEngine(dimension=self.dimension, scramble=self.randomize, seed=self.seed)
         se.fast_forward(n_min)
-        x_sob = se.draw(n).numpy()
+        x_sob = se.draw(n,dtype=torch.float64).numpy()
         return x_sob
 
     def gen_samples(self, n=None, n_min=0, n_max=8):

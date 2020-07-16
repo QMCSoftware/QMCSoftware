@@ -12,8 +12,8 @@ class Linear(Integrand):
     >>> l = Linear(m)
     >>> x = dd.gen_samples(2**10)
     >>> y = l.f(x)
-    >>> abs(y.mean() - -0.0008447105940667977) < 1e-6
-    True
+    >>> y.mean()
+    -0.0008447105940667977
     """
 
     def __init__(self, measure):

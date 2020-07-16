@@ -15,6 +15,7 @@ decorator==4.4.2
 defusedxml==0.6.0
 docutils==0.16
 entrypoints==0.3
+future==0.18.2
 idna==2.9
 imagesize==1.2.0
 importlib-metadata==1.6.0
@@ -86,6 +87,7 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
 terminado==0.8.3
 testpath==0.4.4
+torch==1.5.1
 tornado==6.0.4
 tqdm==4.46.1
 traitlets==4.3.3
