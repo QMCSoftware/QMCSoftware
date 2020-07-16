@@ -71,16 +71,17 @@ class CubMCCLT(StoppingCriterion):
         self.n_max = float(n_max)
         self.alpha = float(alpha)
         self.inflate = float(inflate)
+        self.integrand = integrand
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['single','fixed-multi']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
         super(CubMCCLT,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, integrand, self.n_init)
 
     def integrate(self):
         """ See abstract method. """
+        # Construct AccumulateData Object to House Integration data
+        self.data = MeanVarData(self, self.integrand, self.n_init)
         t_start = time()
         # Pilot Sample
         self.data.update_data()

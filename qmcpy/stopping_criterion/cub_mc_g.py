@@ -94,16 +94,17 @@ class CubMCG(StoppingCriterion):
         self.kurtmax = (n_init - 3) / (n_init - 1) + \
             (self.alpha_sigma * n_init) / (1 - self.alpha_sigma) * \
             (1 - 1. / self.inflate**2)**2
+        self.integrand = integrand
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['single']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
         super(CubMCG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, integrand, self.n_init)  # house integration data
-
+        
     def integrate(self):
         """ See abstract method. """
+        # Construct AccumulateData Object to House Integration data
+        self.data = MeanVarData(self, self.integrand, self.n_init)  # house integration data
         t_start = time()
         # Pilot Sample
         self.data.update_data()

@@ -47,7 +47,7 @@ packages = [
 
 setuptools.setup(
     name="qmcpy",
-    version="0.3b",
+    version="0.3.1a",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',
@@ -66,6 +66,7 @@ setuptools.setup(
         "Operating System :: OS Independent"],
     keywords=['quasi','monte','carlo','community','software','cubature','numerical','integration','discrepancy','sobol','lattice'],
     python_requires=">=3.5",
+    include_package_data=True,
     ext_modules=[
         Extension(
             name='qmcpy.discrete_distribution.qrng.qrng_lib',

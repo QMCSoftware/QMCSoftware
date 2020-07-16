@@ -93,16 +93,20 @@ class CubMCML(StoppingCriterion):
         self.levels_min = float(levels_min)
         self.levels_max = float(levels_max)
         self.theta = 0.25
+        self.integrand = integrand
+        self.alpha0 = alpha0
+        self.beta0 = beta0
+        self.gamma0 = gamma0
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
         super(CubMCML,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        # Construct AccumulateData Object to House Integration Data
-        self.data = MLMCData(self, integrand, self.levels_min, self.n_init, alpha0, beta0, gamma0)
     
     def integrate(self):
         """ See abstract method. """
+         # Construct AccumulateData Object to House Integration Data
+        self.data = MLMCData(self, self.integrand, self.levels_min, self.n_init, self.alpha0, self.beta0, self.gamma0)
         t_start = time()
         while self.data.diff_n_level.sum() > 0:
             self.data.update_data()

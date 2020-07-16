@@ -76,6 +76,8 @@ class CubQMCCLT(StoppingCriterion):
         self.alpha = float(alpha)
         self.z_star = -norm.ppf(self.alpha / 2)
         self.inflate = float(inflate)
+        self.replications = replications
+        self.integrand = integrand
         # DiscreteDistribution checks
         distribution = integrand.measure.distribution
         allowed_levels = ["single"]
@@ -83,11 +85,11 @@ class CubQMCCLT(StoppingCriterion):
         super(CubQMCCLT,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         if not distribution.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
-        # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarDataRep(self, integrand, self.n_init, replications)
-        
+         
     def integrate(self):
         """ See abstract method. """
+        # Construct AccumulateData Object to House Integration data
+        self.data = MeanVarDataRep(self, self.integrand, self.n_init, self.replications)
         t_start = time()
         while True:
             self.data.update_data()

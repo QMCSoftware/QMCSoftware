@@ -104,6 +104,11 @@ class CubQMCSobolG(StoppingCriterion):
             m_max = 35.
         self.n_init = 2.**m_min
         self.n_max = 2.**m_max
+        self.integrand = integrand
+        self.m_min = m_min
+        self.m_max = m_max
+        self.fudge = fudge
+        self.check_cone = check_cone
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['single']
@@ -111,11 +116,11 @@ class CubQMCSobolG(StoppingCriterion):
         super(CubQMCSobolG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         if (not distribution.randomize) or distribution.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False")
-        # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, integrand, self.fwt_update, m_min, m_max, fudge, check_cone)
 
     def integrate(self):
         """ See abstract method. """
+        # Construct AccumulateData Object to House Integration data
+        self.data = LDTransformData(self, self.integrand, self.fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone)
         t_start = time()
         while True:
             self.data.update_data()
