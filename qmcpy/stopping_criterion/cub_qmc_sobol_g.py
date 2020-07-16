@@ -115,7 +115,7 @@ class CubQMCSobolG(StoppingCriterion):
         allowed_distribs = ["Sobol"]
         super(CubQMCSobolG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         if (not distribution.randomize) or distribution.graycode:
-            raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False")
+            raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False. Use QRNG backend.")
 
     def integrate(self):
         """ See abstract method. """

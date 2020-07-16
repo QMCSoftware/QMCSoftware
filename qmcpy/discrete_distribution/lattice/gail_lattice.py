@@ -13,7 +13,7 @@ Reference:
     Available from http://gailgithub.github.io/GAIL_Dev/
 """
 
-from numpy import log2, zeros, hstack, tile, outer, array, double
+from numpy import log2, zeros, hstack, vstack, tile, outer, array, double, double, floor, ceil
 
 gen_vec = array([
     1, 433461, 315689, 441789, 501101, 146355, 88411, 215837, 273599, 151719, 258185, 357967, 96407, 
@@ -79,6 +79,12 @@ def vdc(n):
         q[ptind] += 1./2**(l+1)
     return q
 
+def gen_block(m,z):
+    """ Generate samples floor(2**(m-1)) to 2**m. """
+    n_min = floor(2**(m-1))
+    n = 2**m-n_min
+    x = outer(vdc(n)+1./(2*n_min),z)%1 if n_min>0 else outer(vdc(n),z)%1
+    return x
 
 def gail_lattice_gen(n_min, n_max, d):
     """
@@ -89,14 +95,17 @@ def gail_lattice_gen(n_min, n_max, d):
         n_min (int): minimum index. Must be 0 or n_max/2
         n_max (int): maximum index (not inclusive)
     """
+    if n_min==n_max:
+        return array([],dtype=double)
     if d > len(gen_vec):
         raise Exception('GAIL Lattice has max dimensions %d'%len(gen_vec))
     if n_max > 2**20:
         raise Exception('GAIL Lattice has maximum points 2^20')    
-    nelem = n_max - n_min
-    if n_min == 0:
-        y = vdc(nelem)
-    else:
-        y = vdc(nelem)+1./(2*n_min)
-    xlat = outer(y,gen_vec[0:d])%1
-    return xlat
+    z = gen_vec[0:d]
+    m_low = floor(log2(n_min))+1 if n_min > 0 else 0
+    m_high = ceil(log2(n_max))
+    x_lat_full = vstack([gen_block(m,z) for m in range(int(m_low),int(m_high)+1)])
+    cut1 = int(floor(n_min-2**(m_low-1))) if n_min>0 else 0
+    cut2 = int(cut1+n_max-n_min)
+    x_lat = x_lat_full[cut1:cut2,:]
+    return x_lat

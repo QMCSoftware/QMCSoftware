@@ -18,7 +18,7 @@ Reference:
 
 """
 
-from numpy import arange, array, outer, log2, vstack, double
+from numpy import arange, array, outer, log2, vstack, double, floor, ceil, zeros
 
 """
 generating vector from
@@ -86,14 +86,18 @@ def mps_lattice_gen(n_min, n_max, d):
         n_min (int): minimum index. Must be 0 or n_max/2
         n_max (int): maximum index (not inclusive)
     """
+    if n_min==n_max:
+        return array([],dtype=double)
     if d > exod2_len:
         raise Exception('MPS Lattice has max dimensions %d'%exod2_len)
     if n_max > 2**20:
         raise Exception('MPS Lattice has maximum points 2^20')
     z = exod2_base2_m20_CKN_z[:d]
+    m_low = floor(log2(n_min))+1 if n_min > 0 else 0
+    m_high = ceil(log2(n_max))
     gen_block = lambda n: (outer(arange(1, n+1, 2), z) % n) / float(n)
-    if n_min == 0:
-        x_lat = vstack([gen_block(2**m) for m in range(int(log2(n_max))+1)])
-    else:
-        x_lat = gen_block(n_max)
+    x_lat_full = vstack([gen_block(2**m) for m in range(int(m_low),int(m_high)+1)])
+    cut1 = int(floor(n_min-2**(m_low-1))) if n_min>0 else 0
+    cut2 = int(cut1+n_max-n_min)
+    x_lat = x_lat_full[cut1:cut2,:]
     return x_lat

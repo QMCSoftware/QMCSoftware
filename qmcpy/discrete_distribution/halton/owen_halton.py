@@ -137,7 +137,7 @@ def rhalton(n,d,n0=0,d0=0,singleseed=None,seedvector=[None]):
     if min(n,d) < 0:
         raise Exception("Cannot have negative n or d")
     if n==0 or d==0: # Odd corner cases: user wants n x 0 or 0 x d matrix.
-        return(matrix(nrow=n,ncol=d))
+        return array([],dtype=double)
     if d0+d > D:
         raise Exception("Implemented only for d <= %d"%D)
     # Seed rules
