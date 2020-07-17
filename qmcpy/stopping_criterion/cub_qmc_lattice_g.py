@@ -19,9 +19,9 @@ class CubQMCLatticeG(StoppingCriterion):
     >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.808134131740979
+    1.8079801428928022
     >>> data
-    Solution: 1.8081         
+    Solution: 1.8080         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)

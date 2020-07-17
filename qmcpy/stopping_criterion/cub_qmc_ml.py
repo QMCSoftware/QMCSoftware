@@ -18,9 +18,9 @@ class CubQMCML(StoppingCriterion):
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.444499944889085
+    10.446333077585034
     >>> data
-    Solution: 10.4445        
+    Solution: 10.4463        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -45,15 +45,16 @@ class CubQMCML(StoppingCriterion):
         replications    2^(5)
     MLQMCData (AccumulateData Object)
         levels          7
-        n_level         [4096.  256.  256.  256.  256.  256.  256.]
-        mean_level      [1.006e+01 1.836e-01 1.029e-01 5.410e-02 2.773e-02 1.385e-02 6.988e-03]
-        var_level       [6.143e-05 6.105e-05 4.080e-05 6.780e-06 3.139e-06 7.375e-07 1.940e-07]
+        n_level         [4096.  512.  256.  256.  256.  256.  256.]
+        mean_level      [1.006e+01 1.852e-01 1.040e-01 5.332e-02 2.751e-02 1.399e-02 6.994e-03]
+        var_level       [6.143e-05 3.535e-05 2.896e-05 1.767e-05 2.898e-06 9.919e-07 3.260e-07]
         bias_estimate   0.007
-        n_total         180224
+        n_total         188416
         time_integrate  ...
     
     Reference:
-        M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'.
+        
+        [1] M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'.
         pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics,
         de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
     """

@@ -40,23 +40,23 @@ class Sobol(DiscreteDistribution):
            [0.75, 0.25]])
            
     References
-        Marius Hofert and Christiane Lemieux (2019). 
+        [1] Marius Hofert and Christiane Lemieux (2019). 
         qrng: (Randomized) Quasi-Random Number Generators. 
         R package version 0.0-7.
         https://CRAN.R-project.org/package=qrng.
 
-        Faure, Henri, and Christiane Lemieux. 
+        [2] Faure, Henri, and Christiane Lemieux. 
         “Implementation of Irreducible Sobol' Sequences in Prime Power Bases.” 
         Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
 
-        F.Y. Kuo & D. Nuyens.
+        [3] F.Y. Kuo & D. Nuyens.
         Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients 
         - a survey of analysis and implementation, Foundations of Computational Mathematics, 
         16(6):1631-1696, 2016.
         springer link: https://link.springer.com/article/10.1007/s10208-016-9329-5
         arxiv link: https://arxiv.org/abs/1606.06613
         
-        D. Nuyens, `The Magic Point Shop of QMC point generators and generating
+        [4] D. Nuyens, `The Magic Point Shop of QMC point generators and generating
         vectors.` MATLAB and Python software, 2018. Available from
         https://people.cs.kuleuven.be/~dirk.nuyens/
     """
@@ -143,8 +143,8 @@ class Sobol(DiscreteDistribution):
         Generate samples from n_min to n_max
         
         Args:
-            n_min (int): minimum index. Must be 0 or n_max/2
-            n_max (int): maximum index (not inclusive)
+            n_min (int): minimum index.
+            n_max (int): maximum index. 
         """
         import torch
         from torch.quasirandom import SobolEngine
@@ -161,8 +161,8 @@ class Sobol(DiscreteDistribution):
         Args:
             n (int): if n is supplied, generate from n_min=0 to n_max=n samples. 
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
-            n_min (int): Starting index of sequence. Must be 0 or n_max/2
-            n_max (int): Final index of sequence. Must be a power of 2. 
+            n_min (int): Starting index of sequence.
+            n_max (int): Final index of sequence.
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples

@@ -21,41 +21,45 @@ class Lattice(DiscreteDistribution):
     >>> l.gen_samples(4)
     array([[0.076, 0.78 ],
            [0.576, 0.28 ],
-           [0.326, 0.03 ],
-           [0.826, 0.53 ]])
+           [0.326, 0.53 ],
+           [0.826, 0.03 ]])
     >>> l.set_dimension(3)
     >>> l.gen_samples(n_min=4,n_max=8)
-    array([[0.563, 0.348, 0.103],
-           [0.063, 0.848, 0.603],
-           [0.813, 0.598, 0.353],
-           [0.313, 0.098, 0.853]])
+    array([[0.563, 0.098, 0.353],
+           [0.063, 0.598, 0.853],
+           [0.813, 0.848, 0.103],
+           [0.313, 0.348, 0.603]])
     >>> Lattice(dimension=2,randomize=False,backend='GAIL').gen_samples(n_min=2,n_max=4)
-    array([[0.25, 0.25],
-           [0.75, 0.75]])
+    array([[0.25, 0.75],
+           [0.75, 0.25]])
     >>> Lattice(dimension=2,randomize=False,backend='MPS').gen_samples(n_min=2,n_max=4)
-    array([[0.25, 0.25],
-           [0.75, 0.75]])
-
+    array([[0.25, 0.75],
+           [0.75, 0.25]])
+           
     References
-        Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, 
+        [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, 
         Lluis Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel, 
         Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
         GAIL: Guaranteed Automatic Integration Library (Version 2.3) 
         [MATLAB Software], 2019. Available from http://gailgithub.github.io/GAIL_Dev/
 
-        F.Y. Kuo & D. Nuyens.
+        [2] F.Y. Kuo & D. Nuyens.
         Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients 
         - a survey of analysis and implementation, Foundations of Computational Mathematics, 
         16(6):1631-1696, 2016.
         springer link: https://link.springer.com/article/10.1007/s10208-016-9329-5
         arxiv link: https://arxiv.org/abs/1606.06613
         
-        D. Nuyens, `The Magic Point Shop of QMC point generators and generating
+        [3] D. Nuyens, `The Magic Point Shop of QMC point generators and generating
         vectors.` MATLAB and Python software, 2018. Available from
         https://people.cs.kuleuven.be/~dirk.nuyens/
 
-        Constructing embedded lattice rules for multivariate integration
+        [4] Constructing embedded lattice rules for multivariate integration
         R Cools, FY Kuo, D Nuyens -  SIAM J. Sci. Comput., 28(6), 2162-2188.
+
+        [5] L’Ecuyer, Pierre & Munger, David. (2015). 
+        LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules. 
+        ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
     parameters = ['dimension','randomize','seed','backend','mimics']
@@ -91,11 +95,16 @@ class Lattice(DiscreteDistribution):
         Args:
             n (int): if n is supplied, generate from n_min=0 to n_max=n samples. 
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
-            n_min (int): Starting index of sequence. Must be 0 or n_max/2
-            n_max (int): Final index of sequence. Must be a power of 2.
+            n_min (int): Starting index of sequence.
+            n_max (int): Final index of sequence.
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples
+        
+        Note:
+            Lattice generates in blocks from 2**m to 2**(m+1) so generating 
+            n_min=3 to n_max=9 requires necessarily produces samples from n_min=2 to n_max=16 
+            and automatically subsets. May be inefficient for non-powers-of-2 samples sizes. 
         """
         if n:
             n_min = 0
