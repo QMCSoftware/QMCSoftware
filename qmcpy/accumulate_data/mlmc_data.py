@@ -14,7 +14,7 @@ class MLMCData(AccumulateData):
         http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
     """
 
-    parameters = ['levels','n_level','mean_level','var_level','cost_per_sample',
+    parameters = ['levels','dimensions','n_level','mean_level','var_level','cost_per_sample',
         'alpha','beta','gamma']
 
     def __init__(self, stopping_criterion, integrand, levels_init, n_init, alpha0, beta0, gamma0):
@@ -37,6 +37,7 @@ class MLMCData(AccumulateData):
         self.distribution = self.measure.distribution
         # Set Attributes
         self.levels = int(levels_init)
+        self.dimensions = zeros(self.levels+1)
         self.n_level = zeros(self.levels+1)
         self.sum_level = zeros((2,self.levels+1))
         self.cost_level = zeros(self.levels+1)
@@ -57,8 +58,8 @@ class MLMCData(AccumulateData):
         for l in range(self.levels+1):
             if self.diff_n_level[l] > 0:
                 # reset dimension
-                new_dim = self.integrand._dim_at_level(l)
-                self.measure.set_dimension(new_dim)
+                self.dimensions[l] = self.integrand._dim_at_level(l)
+                self.measure.set_dimension(self.dimensions[l])
                 # evaluate integral at sampleing points samples
                 samples = self.distribution.gen_samples(n=self.diff_n_level[l])
                 sums,cost = self.integrand.f(samples,l=l)

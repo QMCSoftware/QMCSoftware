@@ -45,6 +45,7 @@ class CubQMCML(StoppingCriterion):
         replications    2^(5)
     MLQMCData (AccumulateData Object)
         levels          7
+        dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
         n_level         [4096.  512.  256.  256.  256.  256.  256.]
         mean_level      [1.006e+01 1.852e-01 1.040e-01 5.332e-02 2.751e-02 1.399e-02 6.994e-03]
         var_level       [6.143e-05 3.535e-05 2.896e-05 1.767e-05 2.898e-06 9.919e-07 3.260e-07]

@@ -43,7 +43,8 @@ class CubMCML(StoppingCriterion):
         levels_max      10
         theta           2^(-2)
     MLMCData (AccumulateData Object)
-        levels          6
+        levels          7
+        dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
         n_level         [7.804e+05 1.533e+04 6.633e+03 2.077e+03 7.560e+02 2.730e+02 9.600e+01]
         mean_level      [1.006e+01 1.848e-01 1.014e-01 5.138e-02 2.472e-02 1.452e-02 7.657e-03]
         var_level       [1.963e+02 1.515e-01 4.124e-02 1.109e-02 2.901e-03 6.799e-04 1.848e-04]
@@ -136,6 +137,7 @@ class CubMCML(StoppingCriterion):
                             MaxLevelsWarning)
                     else:
                         self.data.levels += 1
+                        self.data.dimensions = hstack((self.data.dimensions,0))
                         self.data.var_level = hstack((self.data.var_level,
                             self.data.var_level[-1] / 2**self.data.beta))
                         self.data.cost_per_sample = hstack((self.data.cost_per_sample, 
@@ -159,6 +161,7 @@ class CubMCML(StoppingCriterion):
             # finally, evaluate multilevel estimator
         self.data.solution = (self.data.sum_level[0,:]/self.data.n_level).sum()
         self.data.time_integrate = time() - t_start
+        self.data.levels += 1
         return self.data.solution,self.data
     
     def _get_next_samples(self):

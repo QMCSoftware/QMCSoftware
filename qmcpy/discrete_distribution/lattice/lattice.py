@@ -120,7 +120,7 @@ class Lattice(DiscreteDistribution):
         """ See abstract method. """
         self.seed = seed
         random.seed(self.seed)
-        self.shift = random.rand(self.dimension)
+        self.shift = random.rand(int(self.dimension))
     
     def set_dimension(self, dimension):
         """
@@ -130,4 +130,4 @@ class Lattice(DiscreteDistribution):
             Will compute a new random shift to be applied to samples
         """
         self.dimension = dimension
-        self.shift = random.rand(self.dimension)
+        self.shift = random.rand(int(self.dimension))

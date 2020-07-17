@@ -62,7 +62,8 @@ def gail_lattice_gen(n_min, n_max, d):
     if d > gen_vec_len:
         raise Exception('GAIL Lattice has max dimensions %d'%len(gen_vec))
     if n_max > 2**20:
-        raise Exception('GAIL Lattice has maximum points 2^20')    
+        raise Exception('GAIL Lattice has maximum points 2^20')
+    d = int(d)   
     z = gen_vec[0:d]
     m_low = floor(log2(n_min))+1 if n_min > 0 else 0
     m_high = ceil(log2(n_max))

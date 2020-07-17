@@ -124,12 +124,12 @@ class Gaussian(TrueMeasure):
         """ See abstract method. """
         m = self.mu[0]
         c = self.sigma[0,0]
-        expected_cov = c*eye(self.d)
+        expected_cov = c*eye(int(self.d))
         if not (all(self.mu==m) and (self.sigma==expected_cov).all()):
             raise DimensionError('In order to change dimension of Gaussian measure '+\
                 'mean (mu) must be all the same and covariance must be a scaler times I')
         self.distribution.set_dimension(dimension)
         self.d = dimension
-        self.mu = tile(m,self.d)
-        self.sigma = c*eye(self.d)
+        self.mu = tile(m,int(self.d))
+        self.sigma = c*eye(int(self.d))
         self._assemble()
