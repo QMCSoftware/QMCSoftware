@@ -4,6 +4,7 @@ from qmcpy import *
 from time import time
 from numpy import *
 from pandas import DataFrame
+import warnings
 
 
 def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
@@ -16,6 +17,7 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
         'S_QRNG_gc', 'S_QRNG_n', 'S_MPS_QMCPy','S_PyTorch',
         'H_QRNG', 'H_Owen',
         'K_QRNG']
+    warnings.simplefilter('ignore')
     dds = [
         Lattice(dimension, randomize=True, seed=7, backend='MPS'),
         Lattice(dimension, randomize=True, seed=7, backend='GAIL'),
