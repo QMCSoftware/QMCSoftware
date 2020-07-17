@@ -54,7 +54,7 @@ class MLQMCData(AccumulateData):
                 # nothing to do on this level
                 continue
             # reset dimension
-            new_dim = self.integrand.dim_at_level(l)
+            new_dim = self.integrand._dim_at_level(l)
             self.measure.set_dimension(new_dim)
             n_max = self.n_init if self.n_level[l]==0 else 2*self.n_level[l]
             for r in range(int(self.replications)):
@@ -72,7 +72,7 @@ class MLQMCData(AccumulateData):
         self.n_total = self.replications*self.n_level.sum()
         self.solution = self.mean_level.sum()
     
-    def add_level(self):
+    def _add_level(self):
         """ Add another level to relevent attributes. """
         self.levels += 1
         self.n_level = hstack((self.n_level,0))

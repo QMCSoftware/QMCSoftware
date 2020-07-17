@@ -43,7 +43,7 @@ class ImportanceSampling(TrueMeasure):
         self.k_sample_tf = self.measure._tf_to_mimic_samples
         super(ImportanceSampling,self).__init__()
 
-    def transform_g_to_f(self, g):
+    def _transform_g_to_f(self, g):
         """ See abstract method. """
         def f(samples, *args, **kwargs):
             samples_k = self.k_sample_tf(samples) # transform standard samples to mimic measure_to_sample_from

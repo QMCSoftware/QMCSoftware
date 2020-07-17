@@ -80,20 +80,20 @@ class Sobol(DiscreteDistribution):
         self.graycode = graycode
         self.backend = backend.lower()
         if self.backend == 'qrng':
-            self.backend_gen = self.qrng_sobol_gen
+            self.backend_gen = self._qrng_sobol_gen
         elif self.backend == 'mps':
             self.mps_sobol_rng = DigitalSeq(m=30, s=self.dimension)
             # we guarantee a depth of >=32 bits for shift
             self.t = max(32, self.mps_sobol_rng.t)
             # correction factor to scale the integers
             self.ct = max(0, self.t - self.mps_sobol_rng.t)
-            self.backend_gen = self.mps_sobol_gen
+            self.backend_gen = self._mps_sobol_gen
             if not self.randomize:
                 warning_s = '''
                 Sobol MPS unscrambled samples are not in the domain [0,1)'''
                 warnings.warn(warning_s, ParameterWarning)
         elif self.backend == 'pytorch':         
-            self.backend_gen = self.pytorch_sobol_gen
+            self.backend_gen = self._pytorch_sobol_gen
             warnings.warn('''
                 PyTorch SobolEngine issue. See https://github.com/pytorch/pytorch/issues/32047
                     SobolEngine 0^{th} vector is \\vec{.5} rather than \\vec{0}''',ParameterWarning)
@@ -108,7 +108,7 @@ class Sobol(DiscreteDistribution):
         self.set_seed(self.seed)
         super(Sobol,self).__init__()
         
-    def qrng_sobol_gen(self, n_min=0, n_max=8):
+    def _qrng_sobol_gen(self, n_min=0, n_max=8):
         """
         Generate samples from n_min to n_max
         
@@ -120,7 +120,7 @@ class Sobol(DiscreteDistribution):
         x_sob = sobol_qrng(n,self.dimension,self.randomize,skip=int(n_min),graycode=self.graycode,seed=self.seed)
         return x_sob
 
-    def mps_sobol_gen(self, n_min=0, n_max=8):
+    def _mps_sobol_gen(self, n_min=0, n_max=8):
         """
         Generate samples from n_min to n_max
         
@@ -138,7 +138,7 @@ class Sobol(DiscreteDistribution):
             x_sob = (self.shift ^ (x_sob * 2 ** self.ct)) / 2. ** self.t
         return x_sob
     
-    def pytorch_sobol_gen(self, n_min=0, n_max=8):
+    def _pytorch_sobol_gen(self, n_min=0, n_max=8):
         """
         Generate samples from n_min to n_max
         
@@ -200,6 +200,6 @@ class Sobol(DiscreteDistribution):
             self.t = max(32, self.mps_sobol_rng.t)
             # correction factor to scale the integers
             self.ct = max(0, self.t - self.mps_sobol_rng.t)
-            self.backend_gen = self.mps_sobol_gen
+            self.backend_gen = self._mps_sobol_gen
             self.shift = random.randint(0, 2 ** self.t, self.dimension, dtype=int64)
 

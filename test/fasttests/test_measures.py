@@ -17,7 +17,7 @@ class TestUniform(unittest.TestCase):
         measure = Uniform(distribution)
         measure.gen_samples(n_min=0,n_max=4)
     
-    def test_transform_g_to_f(self):
+    def test__transform_g_to_f(self):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
@@ -56,7 +56,7 @@ class TestGaussian(unittest.TestCase):
             measure = Gaussian(distribution,decomp_type=decomp_type)
             measure.gen_samples(n_min=0,n_max=4)
 
-    def test_transform_g_to_f(self):
+    def test__transform_g_to_f(self):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
         measure = Gaussian(distribution)
@@ -103,7 +103,7 @@ class TestBrownianMontion(unittest.TestCase):
                 measure = BrownianMotion(distribution,assembly_type=assembly_type,drift=drift)
                 measure.gen_samples(n_min=0,n_max=8)
 
-    def test_transform_g_to_f(self):
+    def test__transform_g_to_f(self):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
         measure = BrownianMotion(distribution)
@@ -121,7 +121,7 @@ class TestBrownianMontion(unittest.TestCase):
 class TestLebesgue(unittest.TestCase):
     """ Unit tests for Lebesgue Measure. """
 
-    def test_transform_g_to_f(self):
+    def test__transform_g_to_f(self):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
         measure = Lebesgue(distribution)
@@ -141,7 +141,7 @@ class TestIdentitalToDiscrete(unittest.TestCase):
         measure = IdentitalToDiscrete(distribution)
         samples = measure.gen_samples(n=5)
     
-    def test_transform_g_to_f(self):
+    def test__transform_g_to_f(self):
         # implicitly called from Integrand superclass constructor
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
         measure = IdentitalToDiscrete(distribution)

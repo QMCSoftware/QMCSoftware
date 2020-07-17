@@ -1,6 +1,6 @@
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import DistributionCompatibilityError, ParameterError, \
-                   MethodImplementationError, univ_repr
+                   MethodImplementationError, _univ_repr
 
 
 class StoppingCriterion(object):
@@ -38,8 +38,8 @@ class StoppingCriterion(object):
         """
         raise MethodImplementationError(self, 'integrate')
     
-    def reset_tolerance(self, *args, **kwargs):
+    def set_tolerance(self, *args, **kwargs):
         """ ABSTRACT METHOD to reset the absolute tolerance. """
 
     def __repr__(self):
-        return univ_repr(self, "StoppingCriterion", self.parameters)
+        return _univ_repr(self, "StoppingCriterion", self.parameters)

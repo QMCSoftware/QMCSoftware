@@ -80,7 +80,7 @@ class Uniform(TrueMeasure):
                 'Cannot transform samples mimicing %s to Uniform'%self.distribution.mimics)
         return mimic_samples
 
-    def transform_g_to_f(self, g):
+    def _transform_g_to_f(self, g):
         """ See abstract method. """
         def f(samples, *args, **kwargs):
             z = self._tf_to_mimic_samples(samples)

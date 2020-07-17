@@ -105,7 +105,7 @@ class BrownianMotion(TrueMeasure):
         is_paths = paths + self.ms_vec # add drift shift for importance sampling
         return is_paths
 
-    def transform_g_to_f(self, g):
+    def _transform_g_to_f(self, g):
         """ See abstract method. """
         def f(samples, *args, **kwargs):
             z = self._tf_to_mimic_samples(samples)

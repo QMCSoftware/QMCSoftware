@@ -182,7 +182,7 @@ class CubQMCSobolG(StoppingCriterion):
             y[~ptind] = (evenval - oddval)/ 2.
         return y
     
-    def reset_tolerance(self, abs_tol=None, rel_tol=None):
+    def set_tolerance(self, abs_tol=None, rel_tol=None):
         """
         See abstract method. 
         

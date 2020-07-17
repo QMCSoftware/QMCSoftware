@@ -106,7 +106,7 @@ class Gaussian(TrueMeasure):
         mimic_samples = self.mu + dot(std_gaussian_samples,self.a)
         return mimic_samples
 
-    def transform_g_to_f(self, g):
+    def _transform_g_to_f(self, g):
         """ See abstract method. """
         def f(samples, *args, **kwargs):
             z = self._tf_to_mimic_samples(samples)

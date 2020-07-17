@@ -12,7 +12,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
         integrand_qmcpy (function):
             low-level routine for l level estimation such that 
                 Args:
-                    x (ndarray): nx(integrand.dim_at_level(l)) array of samples from discrete distribution
+                    x (ndarray): nx(integrand._dim_at_level(l)) array of samples from discrete distribution
                     l (int): level
                 Return:    
                     sums(1) = sum(Pf-Pc)
@@ -46,7 +46,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
         cst = 0
         for j in range(1,101):
             # reset dimension
-            new_dim = integrand_qmcpy.dim_at_level(ll)
+            new_dim = integrand_qmcpy._dim_at_level(ll)
             integrand_qmcpy.measure.set_dimension(new_dim)
             # evaluate integral at sampleing points samples
             samples = integrand_qmcpy.measure.distribution.gen_samples(n=n/100)

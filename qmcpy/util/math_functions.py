@@ -1,6 +1,6 @@
 """ Math functions used across various algorithms """
 
-def tolfun(abs_tol, rel_tol, theta, mu, toltype):
+def _tol_fun(abs_tol, rel_tol, theta, mu, toltype):
     """
     Generalized error tolerance function.
 

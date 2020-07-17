@@ -141,7 +141,7 @@ class IntegrationExampleTest(unittest.TestCase):
             call_put = 'call')
         algorithm = CubQMCSobolG(integrand, abs_tol)
         solution,data = algorithm.integrate()
-        true_value = integrand.get_fair_price()
+        true_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-true_value) < abs_tol)
     
     def test_european_put(self):
@@ -156,7 +156,7 @@ class IntegrationExampleTest(unittest.TestCase):
             call_put = 'put')
         algorithm = CubQMCLatticeG(integrand, abs_tol)
         solution,data = algorithm.integrate()
-        true_value = integrand.get_fair_price()
+        true_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-true_value) < abs_tol)
 
 if __name__ == "__main__":

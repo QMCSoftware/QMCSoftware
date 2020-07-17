@@ -102,7 +102,7 @@ class CubQMCML(StoppingCriterion):
                 self.data.eval_level[efficient_level] = True
             elif self.data.bias_estimate > (self.rmse_tol/sqrt(2.)):
                 # add another level
-                self.data.add_level()
+                self.data._add_level()
             else:
                 # both conditions met
                 break
@@ -119,7 +119,7 @@ class CubQMCML(StoppingCriterion):
         self.data.time_integrate = time() - t_start
         return self.data.solution,self.data
     
-    def reset_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
+    def set_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
         """
         See abstract method. 
         

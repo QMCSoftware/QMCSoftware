@@ -49,7 +49,7 @@ class Lebesgue(TrueMeasure):
                                  'or must be -inf,inf respectively')
         super(Lebesgue,self).__init__()
 
-    def transform_g_to_f(self, g):
+    def _transform_g_to_f(self, g):
         """ See abstract method. """
         if self.tf_to_mimic == 'Uniform':
             def f(samples, *args, **kwargs):

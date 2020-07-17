@@ -4,7 +4,7 @@ from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..integrand import Keister
 from ..true_measure import Gaussian
 from ..discrete_distribution import IIDStdUniform
-from ..util import tolfun, MaxSamplesWarning, NotYetImplemented
+from ..util import _tol_fun, MaxSamplesWarning, NotYetImplemented
 from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
 from scipy.optimize import fsolve
 from scipy.stats import norm
@@ -64,10 +64,10 @@ class CubMCG(StoppingCriterion):
 
     Guarantee
         This algorithm attempts to calculate the mean, mu, of a random variable
-        to a prescribed error tolerance, tolfun:= max(abstol,reltol*|mu|), with
+        to a prescribed error tolerance, _tol_fun:= max(abstol,reltol*|mu|), with
         guaranteed confidence level 1-alpha. If the algorithm terminates without
         showing any warning messages and provides an answer tmu, then the follow
-        inequality would be satisfied: Pr(|mu-tmu| <= tolfun) >= 1-alpha
+        inequality would be satisfied: Pr(|mu-tmu| <= _tol_fun) >= 1-alpha
     """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
@@ -149,8 +149,8 @@ class CubMCG(StoppingCriterion):
                     self.data.update_data()
                     break
                 self.data.update_data()
-                lb_tol = tolfun(self.abs_tol, self.rel_tol, 0., self.data.solution-self.err_bar, 'max')
-                ub_tol = tolfun(self.abs_tol, self.rel_tol, 0., self.data.solution+self.err_bar, 'max')
+                lb_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution-self.err_bar, 'max')
+                ub_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution+self.err_bar, 'max')
                 delta_plus = (lb_tol + ub_tol) / 2.
                 if delta_plus >= self.err_bar:
                     # stopping criterion met
@@ -218,7 +218,7 @@ class CubMCG(StoppingCriterion):
         # take the min of Chebyshev and Berry Esseen tolerance
         return eps
 
-    def reset_tolerance(self, abs_tol=None, rel_tol=None):
+    def set_tolerance(self, abs_tol=None, rel_tol=None):
         """
         See abstract method. 
         

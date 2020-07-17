@@ -1,4 +1,4 @@
-from ..util import MethodImplementationError, univ_repr, DimensionError
+from ..util import MethodImplementationError, _univ_repr, DimensionError
 from copy import deepcopy
 
 
@@ -30,7 +30,7 @@ class TrueMeasure(object):
         """
         raise MethodImplementationError(self,'gen_samples')
     
-    def transform_g_to_f(self, g):
+    def _transform_g_to_f(self, g):
         """
         ABSTRACT METHOD to transform g, the origianl integrand, to f,
         the integrand transformed to accept samples from the discrete distribution.  
@@ -41,7 +41,7 @@ class TrueMeasure(object):
         Returns:
             function handle: transformed integrand
         """
-        raise MethodImplementationError(self,'transform_g_to_f')
+        raise MethodImplementationError(self,'_transform_g_to_f')
 
     def set_dimension(self, dimension):
         """
@@ -66,6 +66,7 @@ class TrueMeasure(object):
         Note:
             May not be applicable for all measures (ex: Lebesgue).
         """ 
+        raise MethodImplementationError(self,'pdf')
 
     def __repr__(self):
-        return univ_repr(self, "TrueMeasure", self.parameters)
+        return _univ_repr(self, "TrueMeasure", self.parameters)

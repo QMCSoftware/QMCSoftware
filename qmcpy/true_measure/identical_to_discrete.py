@@ -27,7 +27,7 @@ class IdentitalToDiscrete(TrueMeasure):
         self.distribution = distribution
         super(IdentitalToDiscrete,self).__init__()
 
-    def transform_g_to_f(self, g):
+    def _transform_g_to_f(self, g):
         """ See abstract method. """
         f = lambda samples, *args, **kwargs: g(samples, *args, **kwargs)
         return f

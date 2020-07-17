@@ -167,7 +167,7 @@ class CubMCML(StoppingCriterion):
                 ((1-self.theta)*self.rmse_tol**2) )
         return ns
     
-    def reset_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
+    def set_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
         """
         See abstract method. 
         

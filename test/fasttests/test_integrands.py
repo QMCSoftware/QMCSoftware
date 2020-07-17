@@ -19,12 +19,12 @@ class TestAsianCall(unittest.TestCase):
         y = integrand.f(samples).squeeze()
         self.assertTrue(y.shape==(4,))        
 
-    def test_dim_at_level(self):
+    def test__dim_at_level(self):
         distribution = Sobol(dimension=4)
         measure = BrownianMotion(distribution)
         integrand = AsianCall(measure, multi_level_dimensions=[4,8])
-        self.assertTrue(integrand.dim_at_level(0)==4)
-        self.assertTrue(integrand.dim_at_level(1)==8)
+        self.assertTrue(integrand._dim_at_level(0)==4)
+        self.assertTrue(integrand._dim_at_level(1)==8)
 
 
 class TestEuropeanOption(unittest.TestCase):
@@ -38,7 +38,7 @@ class TestEuropeanOption(unittest.TestCase):
             samples = integrand.measure.distribution.gen_samples(4)
             y = integrand.f(samples.squeeze())
             self.assertTrue(y.shape==(4,))
-            integrand.get_fair_price()
+            integrand.get_exact_value()
 
 
 class TestKeister(unittest.TestCase):
@@ -86,26 +86,26 @@ class TestCallOptions(unittest.TestCase):
             distribution = IIDStdGaussian()
             measure = Gaussian(distribution)
             integrand = MLCallOptions(measure,option=option)
-            d = integrand.dim_at_level(l)
+            d = integrand._dim_at_level(l)
             integrand.measure.set_dimension(d)
             samples = integrand.measure.distribution.gen_samples(4)
             sums,cost = integrand.f(samples,l=l)
             self.assertTrue(sums.shape==(6,))
 
-    def test_dim_at_level(self):
+    def test__dim_at_level(self):
         l = 3
         # European 
         distribution = IIDStdGaussian()
         measure = Gaussian(distribution)
         integrand = MLCallOptions(measure,option='european')
-        self.assertTrue(integrand.dim_at_level(0)==2**0)
-        self.assertTrue(integrand.dim_at_level(3)==2**3)
+        self.assertTrue(integrand._dim_at_level(0)==2**0)
+        self.assertTrue(integrand._dim_at_level(3)==2**3)
         # Asian 
         distribution = IIDStdGaussian()
         measure = Gaussian(distribution)
         integrand = MLCallOptions(measure,option='asian')
-        self.assertTrue(integrand.dim_at_level(0)==2**1)
-        self.assertTrue(integrand.dim_at_level(3)==2**4)
+        self.assertTrue(integrand._dim_at_level(0)==2**1)
+        self.assertTrue(integrand._dim_at_level(3)==2**4)
 
 
 if __name__ == "__main__":

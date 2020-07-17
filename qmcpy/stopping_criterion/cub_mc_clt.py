@@ -119,7 +119,7 @@ class CubMCCLT(StoppingCriterion):
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
 
-    def reset_tolerance(self, abs_tol=None, rel_tol=None):
+    def set_tolerance(self, abs_tol=None, rel_tol=None):
         """
         See abstract method. 
         

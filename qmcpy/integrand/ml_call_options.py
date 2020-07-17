@@ -23,7 +23,7 @@ class MLCallOptions(Integrand):
         b               85
     >>> y = 0
     >>> for level in range(4):
-    ...     new_dim = mlco.dim_at_level(level)
+    ...     new_dim = mlco._dim_at_level(level)
     ...     m.set_dimension(new_dim)
     ...     x = dd.gen_samples(2**10)
     ...     sums,cost = mlco.f(x,l=level)
@@ -64,7 +64,7 @@ class MLCallOptions(Integrand):
         self.t = t_final
         self.b = .85*self.k
         self.leveltype = 'adaptive-multi'
-        self.g_submodule = getattr(self,'g_'+self.option)
+        self.g_submodule = getattr(self,'_g_'+self.option)
         super(MLCallOptions,self).__init__()
 
     def get_exact_value(self):
@@ -91,7 +91,7 @@ class MLCallOptions(Integrand):
                      exp(-self.r*self.t)*norm.cdf(d4) ) )
         return val
     
-    def g_european(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
+    def _g_european(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for European call option. 
         
@@ -127,7 +127,7 @@ class MLCallOptions(Integrand):
         pc = maximum(0,xc-self.k)
         return pf,pc
 
-    def g_asian(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
+    def _g_asian(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for Asian call option. 
         
@@ -210,7 +210,7 @@ class MLCallOptions(Integrand):
         cost = n*nf # cost defined as number of fine timesteps
         return sums,cost
     
-    def dim_at_level(self, l):
+    def _dim_at_level(self, l):
         """ See abstract method. """
         if self.option == 'european':
             return 2**l

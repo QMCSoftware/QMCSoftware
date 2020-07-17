@@ -43,7 +43,7 @@ class MeanVarData(AccumulateData):
             t_start = time() # time the integrand values
             if self.integrand.leveltype=='fixed-multi':
                 # reset dimension
-                new_dim = self.integrand.dim_at_level(l)
+                new_dim = self.integrand._dim_at_level(l)
                 self.measure.set_dimension(new_dim)
                 samples = self.distribution.gen_samples(n=self.n[l])
                 y = self.integrand.f(samples,l=l).squeeze()

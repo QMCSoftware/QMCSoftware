@@ -1,4 +1,4 @@
-from ..util import ParameterError, MethodImplementationError, univ_repr, DimensionError
+from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 from numpy import array
 
 
@@ -50,4 +50,4 @@ class DiscreteDistribution(object):
         raise MethodImplementationError(self, 'set_seed')
 
     def __repr__(self):
-        return univ_repr(self, "DiscreteDistribution", self.parameters)
+        return _univ_repr(self, "DiscreteDistribution", self.parameters)

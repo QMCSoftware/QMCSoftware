@@ -39,7 +39,7 @@ class AsianCall(Integrand):
         dim_fracs       [0. 2. 2.]
     >>> y2 = 0
     >>> for l in range(len(level_dims)):
-    ...     new_dim = ac2.dim_at_level(l)
+    ...     new_dim = ac2._dim_at_level(l)
     ...     m2.set_dimension(new_dim)
     ...     x2 = dd2.gen_samples(2**10)
     ...     y2 += ac2.f(x2,l=l).mean()
@@ -87,7 +87,7 @@ class AsianCall(Integrand):
         self.exercise_time = self.measure.time_vector[-1]
         super(AsianCall,self).__init__()        
 
-    def get_discounted_payoffs(self, stock_path, dimension):
+    def _get_discounted_payoffs(self, stock_path, dimension):
         """
         Calculate the discounted payoff from the stock path. 
         
@@ -119,14 +119,14 @@ class AsianCall(Integrand):
         s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
             self.measure.time_vector + self.volatility * x)
-        y = self.get_discounted_payoffs(s_fine, dimension)
+        y = self._get_discounted_payoffs(s_fine, dimension)
         if dim_frac > 0:
             s_course = s_fine[:, int(dim_frac - 1):: int(dim_frac)]
             d_course = float(dimension) / dim_frac
-            y_course = self.get_discounted_payoffs(s_course, d_course)
+            y_course = self._get_discounted_payoffs(s_course, d_course)
             y -= y_course
         return y
     
-    def dim_at_level(self, l):
+    def _dim_at_level(self, l):
         """ See abstract method. """
         return self.dimensions[l]

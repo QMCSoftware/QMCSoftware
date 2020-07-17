@@ -62,7 +62,7 @@ class EuropeanOption(Integrand):
         y_adj = y_raw * exp(-self.interest_rate * self.exercise_time)
         return y_adj
     
-    def get_fair_price(self):
+    def get_exact_value(self):
         """
         Get the fair price of a European call/put option 
         under geometric Brownain Motion.
