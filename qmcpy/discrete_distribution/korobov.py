@@ -1,6 +1,8 @@
 from ._discrete_distribution import DiscreteDistribution
+from ..util import ParameterWarning
 from .qrng import korobov_qrng
 from numpy import random
+import warnings
 
 
 class Korobov(DiscreteDistribution):
@@ -51,6 +53,8 @@ class Korobov(DiscreteDistribution):
         self.dimension = dimension
         self.generator = generator
         self.randomize = randomize
+        if not self.randomize:
+            warnings.warn("Non-randomized Korobov sequence includes the origin.",ParameterWarning)
         self.mimics = 'StdUniform'
         self.seed = seed
         self.set_seed(self.seed)

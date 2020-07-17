@@ -1,7 +1,7 @@
 from .._discrete_distribution import DiscreteDistribution
 from .gail_lattice import gail_lattice_gen
 from .mps_lattice import mps_lattice_gen
-from ...util import ParameterError
+from ...util import ParameterError, ParameterWarning
 from numpy import array, log2, repeat, vstack, random
 import warnings
 
@@ -71,6 +71,8 @@ class Lattice(DiscreteDistribution):
         """
         self.dimension = dimension
         self.randomize = randomize
+        if not self.randomize:
+            warnings.warn('Non-randomized lattice sequence includes the origin.',ParameterWarning)
         self.seed = seed
         self.backend = backend.lower()            
         if self.backend == 'gail':

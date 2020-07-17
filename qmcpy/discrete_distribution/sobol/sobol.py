@@ -75,11 +75,13 @@ class Sobol(DiscreteDistribution):
         """
         self.dimension = dimension
         self.randomize = randomize
+        if not self.randomize:
+            warnings.warn("Non-randomized Sobol' sequence includes the origin.",ParameterWarning)
         self.seed = seed
         self.graycode = graycode
         self.backend = backend.lower()
         if self.backend == 'qrng':
-            self.backend_gen = self.qrgn_sobol_gen
+            self.backend_gen = self.qrng_sobol_gen
         elif self.backend == 'mps':
             self.mps_sobol_rng = DigitalSeq(m=30, s=self.dimension)
             # we guarantee a depth of >=32 bits for shift
@@ -107,7 +109,7 @@ class Sobol(DiscreteDistribution):
         self.set_seed(self.seed)
         super(Sobol,self).__init__()
         
-    def qrgn_sobol_gen(self, n_min=0, n_max=8):
+    def qrng_sobol_gen(self, n_min=0, n_max=8):
         """
         Generate samples from n_min to n_max
         
