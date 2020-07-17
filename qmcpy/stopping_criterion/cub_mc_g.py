@@ -217,3 +217,14 @@ class CubMCG(StoppingCriterion):
         eps = min(NCheb_inv,NBE_inv)
         # take the min of Chebyshev and Berry Esseen tolerance
         return eps
+
+    def reset_tolerance(self, abs_tol=None, rel_tol=None):
+        """
+        See abstract method. 
+        
+        Args:
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
+        """
+        if abs_tol: self.abs_tol = abs_tol
+        if rel_tol: self.rel_tol = rel_tol

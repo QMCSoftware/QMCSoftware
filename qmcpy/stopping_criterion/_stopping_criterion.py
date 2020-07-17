@@ -37,6 +37,9 @@ class StoppingCriterion(object):
                 - data (AccumulateData): an AccumulateData object
         """
         raise MethodImplementationError(self, 'integrate')
+    
+    def reset_tolerance(self, *args, **kwargs):
+        """ ABSTRACT METHOD to reset the absolute tolerance. """
 
     def __repr__(self):
         return univ_repr(self, "StoppingCriterion", self.parameters)

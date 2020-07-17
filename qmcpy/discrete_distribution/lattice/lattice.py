@@ -64,15 +64,14 @@ class Lattice(DiscreteDistribution):
         """
         Args:
             dimension (int): dimension of samples
-            randomize (bool): If True, apply shift to generated samples    
+            randomize (bool): If True, apply shift to generated samples. 
+                Note: Non-randomized lattice sequence includes the origin.
             seed (int): seed the random number generator for reproducibility
             backend (str): backend generator must be either "GAIL" or "MPS". 
                 "GAIL" provides standard point ordering but is slightly slower than "MPS".
         """
         self.dimension = dimension
         self.randomize = randomize
-        if not self.randomize:
-            warnings.warn('Non-randomized lattice sequence includes the origin.',ParameterWarning)
         self.seed = seed
         self.backend = backend.lower()            
         if self.backend == 'gail':
@@ -85,7 +84,7 @@ class Lattice(DiscreteDistribution):
         self.set_seed(self.seed)
         super(Lattice,self).__init__()
 
-    def gen_samples(self, n=None, n_min=0, n_max=8):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
         """
         Generate lattice samples
 
@@ -101,6 +100,8 @@ class Lattice(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
+        if n_min == 0 and self.randomize==False and warn:
+            warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
         x_lat = self.backend_gen(n_min,n_max,self.dimension)
         if self.randomize: # apply random shift to samples
             x_lat = (x_lat + self.shift)%1

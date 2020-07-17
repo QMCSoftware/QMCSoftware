@@ -3,7 +3,7 @@ from ..accumulate_data import MLMCData
 from ..discrete_distribution import IIDStdGaussian
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
-from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
+from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
 from numpy import ceil, sqrt, arange, minimum, maximum, hstack, zeros
 from scipy.stats import norm
 from time import time
@@ -69,7 +69,11 @@ class CubMCML(StoppingCriterion):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
-            rmse_tol (float): desired accuracy (rms error) > 0 
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
+            alpha (float): uncertaintly level.
+                If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
+                Takes priority over aboluste tolerance and alpha if supplied. 
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
             levels_min (int): minimum level of refinement >= 2
@@ -87,7 +91,10 @@ class CubMCML(StoppingCriterion):
         if n_init <= 0:
             raise ParameterError('needs n_init > 0')
         # initialization
-        self.rmse_tol = float(rmse_tol) if rmse_tol else (float(abs_tol) / norm.ppf(1-alpha/2.))
+        if rmse_tol:
+            self.rmse_tol = float(rmse_tol)
+        else: # use absolute tolerance
+            self.rmse_tol =  float(abs_tol) / norm.ppf(1-alpha/2)
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.levels_min = float(levels_min)
@@ -159,3 +166,19 @@ class CubMCML(StoppingCriterion):
                 sqrt(self.data.var_level*self.data.cost_per_sample).sum() / 
                 ((1-self.theta)*self.rmse_tol**2) )
         return ns
+    
+    def reset_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
+        """
+        See abstract method. 
+        
+        Args:
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
+            alpha (float): uncertaintly level.
+                If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
+                Takes priority over aboluste tolerance and alpha if supplied. 
+        """
+        if rmse_tol:
+            self.rmse_tol = float(rmse_tol)
+        elif abs_tol:
+            self.rmse_tol = (float(abs_tol) / norm.ppf(1-alpha/2.))

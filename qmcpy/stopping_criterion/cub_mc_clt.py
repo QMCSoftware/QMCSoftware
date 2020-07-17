@@ -118,3 +118,14 @@ class CubMCCLT(StoppingCriterion):
         self.data.confid_int = self.data.solution + err_bar * array([-1, 1])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
+
+    def reset_tolerance(self, abs_tol=None, rel_tol=None):
+        """
+        See abstract method. 
+        
+        Args:
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
+        """
+        if abs_tol: self.abs_tol = abs_tol
+        if rel_tol: self.rel_tol = rel_tol

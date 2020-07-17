@@ -122,7 +122,7 @@ class CubQMCLatticeG(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, self.integrand, self.fft_update, self.m_min, self.m_max, self.fudge, self.check_cone)
+        self.data = LDTransformData(self, self.integrand, self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone)
         t_start = time()
         while True:
             self.data.update_data()
@@ -151,7 +151,7 @@ class CubQMCLatticeG(StoppingCriterion):
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
             
-    def fft_update(self, y, ynext):
+    def _fft_update(self, y, ynext):
         """
         Fast Fourier Transform (FFT) ynext, combine with y, then FFT all points.
         
@@ -188,3 +188,14 @@ class CubQMCLatticeG(StoppingCriterion):
             y[ptind] = (evenval + coefv*oddval) / 2.
             y[~ptind] = (evenval - coefv*oddval) / 2.
         return y
+    
+    def reset_tolerance(self, abs_tol=None, rel_tol=None):
+        """
+        See abstract method. 
+        
+        Args:
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
+        """
+        if abs_tol: self.abs_tol = abs_tol
+        if rel_tol: self.rel_tol = rel_tol

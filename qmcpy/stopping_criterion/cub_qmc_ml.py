@@ -65,7 +65,8 @@ class CubQMCML(StoppingCriterion):
         Args:
             integrand (Integrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance
-            alpha (float): uncertainty level
+            alpha (float): uncertaintly level.
+                If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
             rmse_tol (float): root mean squared error
                 If supplied (not None), then absolute tolerance and alpha are ignored
                 in favor of the rmse tolerance
@@ -73,7 +74,10 @@ class CubQMCML(StoppingCriterion):
             replications (int): number of replications on each level
         """
         # initialization
-        self.rmse_tol = float(rmse_tol) if rmse_tol else (float(abs_tol) / norm.ppf(1-alpha/2))
+        if rmse_tol:
+            self.rmse_tol = float(rmse_tol)
+        else: # use absolute tolerance
+            self.rmse_tol =  float(abs_tol) / norm.ppf(1-alpha/2)
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.replications = float(replications)
@@ -114,3 +118,20 @@ class CubQMCML(StoppingCriterion):
                 break
         self.data.time_integrate = time() - t_start
         return self.data.solution,self.data
+    
+    def reset_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
+        """
+        See abstract method. 
+        
+        Args:
+            integrand (Integrand): integrand with multi-level g method
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
+            alpha (float): uncertaintly level.
+                If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
+                Takes priority over aboluste tolerance and alpha if supplied. 
+        """
+        if rmse_tol:
+            self.rmse_tol = float(rmse_tol)
+        elif abs_tol:
+            self.rmse_tol = (float(abs_tol) / norm.ppf(1-alpha/2.))

@@ -48,19 +48,18 @@ class Korobov(DiscreteDistribution):
                 either a vector of length d
                 or a single number (which is appropriately extended)
             randomize (bool): randomize the Korobov sequence? 
+                Note: Non-randomized Korobov sequence includes origin
             seed (int): seed the random number generator for reproducibility
         """
         self.dimension = dimension
         self.generator = generator
         self.randomize = randomize
-        if not self.randomize:
-            warnings.warn("Non-randomized Korobov sequence includes the origin.",ParameterWarning)
         self.mimics = 'StdUniform'
         self.seed = seed
         self.set_seed(self.seed)
         super(Korobov,self).__init__()
 
-    def gen_samples(self, n=8, generator=None):
+    def gen_samples(self, n=8, generator=None, warn=True):
         """
         Generate samples
 
@@ -73,6 +72,8 @@ class Korobov(DiscreteDistribution):
         Returns:
             ndarray: n x d (dimension) array of samples
         """
+        if self.randomize==False and warn:
+            warnings.warn("Non-randomized Korobov sequence includes the origin.",ParameterWarning)
         if not generator:
             generator = self.generator
         x = korobov_qrng(n, self.dimension, generator, self.randomize, self.seed)
