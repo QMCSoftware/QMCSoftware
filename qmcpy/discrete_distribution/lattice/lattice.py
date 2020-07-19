@@ -2,8 +2,9 @@ from .._discrete_distribution import DiscreteDistribution
 from .gail_lattice import gail_lattice_gen
 from .mps_lattice import mps_lattice_gen
 from ...util import ParameterError, ParameterWarning
-from numpy import array, log2, repeat, vstack, random
+from numpy import *
 import warnings
+import os
 
 
 class Lattice(DiscreteDistribution):
@@ -64,7 +65,7 @@ class Lattice(DiscreteDistribution):
 
     parameters = ['dimension','randomize','seed','backend','mimics']
     
-    def __init__(self, dimension=1, randomize=True, seed=None, backend='GAIL'):
+    def __init__(self, dimension=1, randomize=True, seed=None, backend='GAIL', gen_vector_info=None):
         """
         Args:
             dimension (int): dimension of samples
@@ -73,10 +74,14 @@ class Lattice(DiscreteDistribution):
             seed (int): seed the random number generator for reproducibility
             backend (str): backend generator must be either "GAIL" or "MPS". 
                 "GAIL" provides standard point ordering but is slightly slower than "MPS".
+            gen_vector_info (dict): if not supplied uses generating vector from [5], 
+                otherwise, supply a dictionary with the following keys: 
+                    "vector": a numpy.ndarray or list of ints comprising the generating vector. 
+                    "n_max": maximum number of samples that can be drawn based on this generating vector. 
+                Example: gen_vector_info = {'vector':[1,433461,315689], n_max=2**20}
         """
         self.dimension = dimension
         self.randomize = randomize
-        self.seed = seed
         self.backend = backend.lower()            
         if self.backend == 'gail':
             self.backend_gen = gail_lattice_gen
@@ -84,6 +89,17 @@ class Lattice(DiscreteDistribution):
             self.backend_gen = mps_lattice_gen
         else:
             raise ParameterError("Lattice backend must 'GAIL' or 'MPS'")
+        if gen_vector_info:
+            self.gen_vec = array(gen_vector_info['vector'],dtype=double)
+            self.n_global_max = gen_vector_info['n_max']
+        else: # use default from Reference [5]
+            abs_file_path = os.path.join(os.path.dirname(__file__), 'lattice-32001-1024-1048576.3600.npy')
+            self.gen_vec = load(abs_file_path).astype(double)
+            self.n_global_max = 2**20
+        self.d_global_max = len(self.gen_vec)
+        if self.dimension > self.d_global_max:
+            raise ParameterError('Lattice generating vector has max dimension %d.'%self.d_global_max)
+        self.seed = seed
         self.mimics = 'StdUniform'
         self.set_seed(self.seed)
         super(Lattice,self).__init__()
@@ -111,7 +127,9 @@ class Lattice(DiscreteDistribution):
             n_max = n
         if n_min == 0 and self.randomize==False and warn:
             warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
-        x_lat = self.backend_gen(n_min,n_max,self.dimension)
+        if n_max > self.n_global_max:
+            raise ParameterError('Lattice generating vector supports up to %d samples.'%self.n_global_max)
+        x_lat = self.backend_gen(n_min,n_max,self.dimension,self.gen_vec[:self.dimension])
         if self.randomize: # apply random shift to samples
             x_lat = (x_lat + self.shift)%1
         return x_lat
@@ -130,4 +148,6 @@ class Lattice(DiscreteDistribution):
             Will compute a new random shift to be applied to samples
         """
         self.dimension = dimension
+        if self.dimension > self.d_global_max:
+            raise ParameterError('Lattice generating vector has max dimension %d.'%self.d_global_max)
         self.shift = random.rand(int(self.dimension))

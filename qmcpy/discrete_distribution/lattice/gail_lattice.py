@@ -11,19 +11,9 @@ Reference:
     Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
     GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
     Available from http://gailgithub.github.io/GAIL_Dev/
-
-    [2] L’Ecuyer, Pierre & Munger, David. (2015). 
-    LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules. 
-    ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
 """
 
 from numpy import *
-import os
-
-# generating vector, see Reference [2]
-abs_file_path = os.path.join(os.path.dirname(__file__), 'lattice-32001-1024-1048576.3600.npy')
-gen_vec = load(abs_file_path).astype(double)
-gen_vec_len = len(gen_vec)
 
 def vdc(n):
     """
@@ -48,23 +38,16 @@ def gen_block(m,z):
     x = outer(vdc(n)+1./(2*n_min),z)%1 if n_min>0 else outer(vdc(n),z)%1
     return x
 
-def gail_lattice_gen(n_min, n_max, d):
+def gail_lattice_gen(n_min, n_max, d, z):
     """
     Generate d dimensionsal lattice samples from n_min to n_max
     
     Args:
-        d (int): dimension of the problem, 1<=d<=100.
-        n_min (int): minimum index. Must be 0 or n_max/2
-        n_max (int): maximum index (not inclusive)
+        d (int): dimension of the problem.
+        n_min (int): minimum index.
+        n_max (int): maximum index (not inclusive). 
+        z (int): length d generating vector.
     """
-    if n_min==n_max:
-        return array([],dtype=double)
-    if d > gen_vec_len:
-        raise Exception('GAIL Lattice has max dimensions %d'%len(gen_vec))
-    if n_max > 2**20:
-        raise Exception('GAIL Lattice has maximum points 2^20')
-    d = int(d)   
-    z = gen_vec[0:d]
     m_low = floor(log2(n_min))+1 if n_min > 0 else 0
     m_high = ceil(log2(n_max))
     x_lat_full = vstack([gen_block(m,z) for m in range(int(m_low),int(m_high)+1)])

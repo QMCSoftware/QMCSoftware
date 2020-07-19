@@ -18,36 +18,20 @@ Reference:
 
     [3] Constructing embedded lattice rules for multivariate integration
     R Cools, FY Kuo, D Nuyens -  SIAM J. Sci. Comput., 28(6), 2162-2188.
-
-    [4] L’Ecuyer, Pierre & Munger, David. (2015). 
-    LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules. 
-    ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
 """
 
 from numpy import *
-import os
 
-# generating vector, see Reference [2]
-abs_file_path = os.path.join(os.path.dirname(__file__), 'lattice-32001-1024-1048576.3600.npy')
-gen_vec = load(abs_file_path).astype(double)
-gen_vec_len = len(gen_vec)
-
-def mps_lattice_gen(n_min, n_max, d):
+def mps_lattice_gen(n_min, n_max, d, z):
     """
     Generate d dimensionsal lattice samples from n_min to n_max
     
     Args:
-        d (int): dimension of the problem, 1<=d<=100.
-        n_min (int): minimum index. Must be 0 or n_max/2
-        n_max (int): maximum index (not inclusive)
+        d (int): dimension of the problem.
+        n_min (int): minimum index.
+        n_max (int): maximum index (not inclusive). 
+        z (int): length d generating vector.
     """
-    if n_min==n_max:
-        return array([],dtype=double)
-    if d > gen_vec_len:
-        raise Exception('MPS Lattice has max dimensions %d'%exod2_len)
-    if n_max > 2**20:
-        raise Exception('MPS Lattice has maximum points 2^20')
-    z = gen_vec[:d]
     m_low = floor(log2(n_min))+1 if n_min > 0 else 0
     m_high = ceil(log2(n_max))
     gen_block = lambda n: (outer(arange(1, n+1, 2), z) % n) / float(n)

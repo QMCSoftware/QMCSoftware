@@ -103,7 +103,12 @@ class TestLattice(unittest.TestCase):
             samples = distribution.gen_samples(4)
             with self.subTest():
                 self.assertTrue(samples.shape==(4,3))
-
+    
+    def test_custom_vector(self):
+        self.assertRaises(ParameterError,Lattice,dimension=4,gen_vector_info={'vector':[1,433461,315689],'n_max':2**20})
+        l = Lattice(2,gen_vector_info={'vector':[1,433461,315689],'n_max':2**20})
+        self.assertRaises(ParameterError,l.gen_samples,n_min=4,n_max=2**21)
+        l.gen_samples(n_min=3,n_max=5)
 
 class TestSobol(unittest.TestCase):
     """ Unit tests for Sobol DiscreteDistribution. """
