@@ -23,3 +23,5 @@ Demos
     demo_rst/importance_sampling.rst
 
     demo_rst/nei_demo.rst
+
+    demo_rst/qei-demo-for-blog.rst
