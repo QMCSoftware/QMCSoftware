@@ -1,6 +1,7 @@
 from ._integrand import Integrand
 from ..discrete_distribution import Sobol
 from ..true_measure import Gaussian
+from numpy import *
 
 
 class Linear(Integrand):
@@ -8,12 +9,12 @@ class Linear(Integrand):
     $f(\\boldsymbol{x}) = \\sum_{i=1}^d x_i$
 
     >>> dd = Sobol(100,seed=7)
-    >>> m = Gaussian(dd,covariance=1./3)
+    >>> m = Gaussian(dd,mean=(-1)**arange(100),covariance=1./3)
     >>> l = Linear(m)
     >>> x = dd.gen_samples(2**10)
     >>> y = l.f(x)
     >>> y.mean()
-    -0.0008447105940667977
+    -0.0008447105940667683
     """
 
     def __init__(self, measure):
