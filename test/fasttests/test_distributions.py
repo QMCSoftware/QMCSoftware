@@ -153,7 +153,10 @@ class TestSobol(unittest.TestCase):
             [ 0.375,  0.375],
             [ 0.875,  0.875]])
         self.assertTrue((x==x_true).all())
-
+    
+    def test_pytorch_0th_vector(self):
+        x = Sobol(1,randomize=False,backend='PyTorch').gen_samples(4)
+        self.assertTrue((x==array([[1./2,3./4,1./4,3./8]]).T).all())
 
 class TestHalton(unittest.TestCase):
     """ Unit test for Halton DiscreteDistribution. """

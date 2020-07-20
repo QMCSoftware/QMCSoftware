@@ -44,6 +44,7 @@ class InverseCDFSampling(DiscreteDistribution):
         if self.distribution_u.mimics != 'StdUniform':
             raise TransformError(\
                 'Can only apply inverse CDF transform to DiscreteDistributions mimicing StdUniform')
+        self.low_discrepancy = True if 'IID' in type(self.distribution_u).__name__ else False
         self.dimension = self.distribution_u.dimension
         self.mimics = 'None'
         super(InverseCDFSampling,self).__init__()

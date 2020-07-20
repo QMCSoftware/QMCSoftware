@@ -49,6 +49,7 @@ class CubMCML(StoppingCriterion):
         mean_level      [1.006e+01 1.848e-01 1.014e-01 5.138e-02 2.472e-02 1.452e-02 7.657e-03]
         var_level       [1.963e+02 1.515e-01 4.124e-02 1.109e-02 2.901e-03 6.799e-04 1.848e-04]
         cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
+        n_total         805984
         alpha           0.927
         beta            1.946
         gamma           1.000
@@ -122,6 +123,16 @@ class CubMCML(StoppingCriterion):
             # set optimal number of additional samples
             n_samples = self._get_next_samples()
             self.data.diff_n_level = maximum(0, n_samples-self.data.n_level)
+            # check if over sample budget
+            if (self.data.n_total + self.data.diff_n_level.sum()) > self.n_max:
+                warning_s = """
+                Alread generated %d samples.
+                Trying to generate %d new samples, which would exceed n_max = %d.
+                Stopping integration process.
+                Note that error tolerances may no longer be satisfied""" \
+                % (int(self.data.n_total), int(self.data.diff_n_level.sum()), int(self.n_max))
+                warnings.warn(warning_s, MaxSamplesWarning)
+                break
             # if (almost) converged, estimate remaining error and decide 
             # whether a new level is required
             if (self.data.diff_n_level > 0.01*self.data.n_level).sum() == 0:
@@ -148,20 +159,10 @@ class CubMCML(StoppingCriterion):
                         self.data.cost_level = hstack((self.data.cost_level, 0.))
                         n_samples = self._get_next_samples()
                         self.data.diff_n_level = maximum(0., n_samples-self.data.n_level)
-            # check if over sample budget
-            if (self.data.n_total + self.data.diff_n_level.sum()) > self.n_max:
-                warning_s = """
-                Alread generated %d samples.
-                Trying to generate %d new samples, which would exceed n_max = %d.
-                Stopping integration process.
-                Note that error tolerances may no longer be satisfied""" \
-                % (int(self.data.n_total), int(self.data.diff_n_level.sum()), int(self.n_max))
-                warnings.warn(warning_s, MaxSamplesWarning)
-                break
-            # finally, evaluate multilevel estimator
+        # finally, evaluate multilevel estimator
         self.data.solution = (self.data.sum_level[0,:]/self.data.n_level).sum()
-        self.data.time_integrate = time() - t_start
         self.data.levels += 1
+        self.data.time_integrate = time() - t_start
         return self.data.solution,self.data
     
     def _get_next_samples(self):
@@ -181,7 +182,7 @@ class CubMCML(StoppingCriterion):
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
                 Takes priority over aboluste tolerance and alpha if supplied. 
         """
-        if rmse_tol:
+        if rmse_tol != None:
             self.rmse_tol = float(rmse_tol)
-        elif abs_tol:
+        elif abs_tol != None:
             self.rmse_tol = (float(abs_tol) / norm.ppf(1-alpha/2.))

@@ -59,6 +59,7 @@ class Halton(DiscreteDistribution):
         self.mimics = 'StdUniform'
         self.seed = seed
         self.randomize = True
+        self.low_discrepancy = True
         self.set_seed(self.seed)
         if self.backend=='owen' and self.generalize==False:
             warnings.warn('\nHalton with "Owen" backend must have generalize=True. '+\

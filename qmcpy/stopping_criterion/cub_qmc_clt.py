@@ -45,6 +45,7 @@ class CubQMCCLT(StoppingCriterion):
         solution        1.380
         sighat          0.001
         n_total         2^(12)
+        error_hat       8.30e-04
         confid_int      [1.379 1.381]
         time_integrate  ...
     """
@@ -93,9 +94,9 @@ class CubQMCCLT(StoppingCriterion):
         t_start = time()
         while True:
             self.data.update_data()
-            err_bar = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
+            self.data.error_hat = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
             tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
-            if err_bar < tol_up:
+            if self.data.error_hat < tol_up:
                 # sufficiently estimated
                 break
             elif 2 * self.data.n_total > self.n_max:
@@ -112,7 +113,7 @@ class CubQMCCLT(StoppingCriterion):
                 # double sample size
                 self.data.n_r *= 2
         # CLT confidence interval
-        self.data.confid_int = self.data.solution +  err_bar * array([-1., 1.])
+        self.data.confid_int = self.data.solution +  self.data.error_hat * array([-1., 1.])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
     
@@ -124,5 +125,5 @@ class CubQMCCLT(StoppingCriterion):
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
         """
-        if abs_tol: self.abs_tol = abs_tol
-        if rel_tol: self.rel_tol = rel_tol
+        if abs_tol != None: self.abs_tol = abs_tol
+        if rel_tol != None: self.rel_tol = rel_tol

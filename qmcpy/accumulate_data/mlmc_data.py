@@ -14,7 +14,7 @@ class MLMCData(AccumulateData):
         http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
     """
 
-    parameters = ['levels','dimensions','n_level','mean_level','var_level','cost_per_sample',
+    parameters = ['levels','dimensions','n_level','mean_level','var_level','cost_per_sample','n_total',
         'alpha','beta','gamma']
 
     def __init__(self, stopping_criterion, integrand, levels_init, n_init, alpha0, beta0, gamma0):
@@ -88,3 +88,4 @@ class MLMCData(AccumulateData):
         if self.gamma0 <= 0:
             x = lstsq(a,log2(self.cost_per_sample[1:]),rcond=None)[0]
             self.gamma = maximum(.5,x[0])
+        self.n_total = self.n_level.sum()

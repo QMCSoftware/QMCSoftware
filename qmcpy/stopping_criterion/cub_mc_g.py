@@ -44,6 +44,7 @@ class CubMCG(StoppingCriterion):
         solution        1.804
         n               13473
         n_total         14497
+        error_hat       0.050
         confid_int      [1.754 1.854]
         time_integrate  ...
     
@@ -113,7 +114,7 @@ class CubMCG(StoppingCriterion):
             self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
             toloversig = self.abs_tol / self.sigma_up
             # absolute error tolerance over sigma
-            n, self.err_bar = \
+            n, self.data.error_hat = \
                 self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_max, self.sigma_up)
             self.data.n[:] = n
             if self.data.n_total + self.data.n > self.n_max:
@@ -131,7 +132,7 @@ class CubMCG(StoppingCriterion):
         else: # self.rel_tol > 0
             alphai = (self.alpha-self.alpha_sigma)/(2*(1-self.alpha_sigma)) # uncertainty to do iteration
             eps1 = self._ncbinv(1e4,alphai,self.kurtmax)
-            self.err_bar = self.sigma_up*eps1
+            self.data.error_hat = self.sigma_up*eps1
             tau = 1. # step of the iteration
             self.data.n[:] = 1e4 # default initial sample size
             while True:
@@ -149,25 +150,25 @@ class CubMCG(StoppingCriterion):
                     self.data.update_data()
                     break
                 self.data.update_data()
-                lb_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution-self.err_bar, 'max')
-                ub_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution+self.err_bar, 'max')
+                lb_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution-self.data.error_hat, 'max')
+                ub_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution+self.data.error_hat, 'max')
                 delta_plus = (lb_tol + ub_tol) / 2.
-                if delta_plus >= self.err_bar:
+                if delta_plus >= self.data.error_hat:
                     # stopping criterion met
                     delta_minus = (lb_tol - ub_tol) / 2.
                     self.data.solution += delta_minus # adjust solution a bit
                     break
                 else:
                     candidate_tol = max(self.abs_tol,.95*self.rel_tol*abs(self.data.solution))
-                    self.err_bar = min(self.err_bar/2.,candidate_tol)
+                    self.data.error_hat = min(self.data.error_hat/2.,candidate_tol)
                     tau += 1
                 # update next uncertainty
-                toloversig = self.err_bar / self.sigma_up
+                toloversig = self.data.error_hat / self.sigma_up
                 alphai = 2**tau * (self.alpha - self.alpha_sigma) / (1 - self.alpha_sigma)
                 n,_ = self._nchebe(toloversig, alphai, self.kurtmax, self.n_max, self.sigma_up)
                 self.data.n[:] = n
         # set confidence interval
-        self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
+        self.data.confid_int = self.data.solution + self.data.error_hat * array([-1, 1])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
 
@@ -226,5 +227,5 @@ class CubMCG(StoppingCriterion):
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
         """
-        if abs_tol: self.abs_tol = abs_tol
-        if rel_tol: self.rel_tol = rel_tol
+        if abs_tol != None: self.abs_tol = abs_tol
+        if rel_tol != None: self.rel_tol = rel_tol

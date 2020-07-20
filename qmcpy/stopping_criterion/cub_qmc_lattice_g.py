@@ -41,7 +41,7 @@ class CubQMCLatticeG(StoppingCriterion):
     LDTransformData (AccumulateData Object)
         n_total         2^(10)
         solution        1.808
-        r_lag           2^(2)
+        error_hat       0.005
         time_integrate  ...
 
     Adapted from 
@@ -127,12 +127,12 @@ class CubQMCLatticeG(StoppingCriterion):
         while True:
             self.data.update_data()
             # Check the end of the algorithm
-            errest = self.data.fudge(self.data.m)*self.data.stilde
+            self.data.error_hat = self.data.fudge(self.data.m)*self.data.stilde
             # Compute optimal estimator
-            ub = max(self.abs_tol, self.rel_tol*abs(self.data.solution + errest))
-            lb = max(self.abs_tol, self.rel_tol*abs(self.data.solution - errest))
-            self.data.solution = self.data.solution - errest*(ub-lb) / (ub+lb)
-            if 4.*errest**2/(ub+lb)**2 <= 1.:
+            ub = max(self.abs_tol, self.rel_tol*abs(self.data.solution + self.data.error_hat))
+            lb = max(self.abs_tol, self.rel_tol*abs(self.data.solution - self.data.error_hat))
+            self.data.solution = self.data.solution - self.data.error_hat*(ub-lb) / (ub+lb)
+            if 4.*self.data.error_hat**2/(ub+lb)**2 <= 1.:
                 # stopping criterion met
                 break
             elif self.data.m == self.data.m_max:
@@ -197,5 +197,5 @@ class CubQMCLatticeG(StoppingCriterion):
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
         """
-        if abs_tol: self.abs_tol = abs_tol
-        if rel_tol: self.rel_tol = rel_tol
+        if abs_tol != None: self.abs_tol = abs_tol
+        if rel_tol != None: self.rel_tol = rel_tol

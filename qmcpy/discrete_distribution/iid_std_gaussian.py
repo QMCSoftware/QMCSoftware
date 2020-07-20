@@ -33,6 +33,7 @@ class IIDStdGaussian(DiscreteDistribution):
         self.seed = seed
         random.seed(self.seed)
         self.mimics = 'StdGaussian'
+        self.low_discrepancy = False
         super(IIDStdGaussian,self).__init__()
 
     def gen_samples(self, n):

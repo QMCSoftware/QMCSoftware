@@ -8,7 +8,7 @@ EPS = finfo(float32).eps
 
 class MeanVarData(AccumulateData):
 
-    parameters = ['levels','solution','n','n_total','confid_int']
+    parameters = ['levels','solution','n','n_total','error_hat','confid_int']
 
     def __init__(self, stopping_criterion, integrand, n_init):
         """

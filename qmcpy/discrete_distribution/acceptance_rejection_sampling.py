@@ -65,6 +65,7 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
         self.draws_multiple = draws_multiple
         self.measure = measure_to_sample_from
         self.distribution = self.measure.distribution
+        self.low_discrepancy = False
         self.dimension = self.distribution.dimension
         if not hasattr(self.measure,'pdf'):
             raise TransformError('measure_to_sample_from must have pdf method')

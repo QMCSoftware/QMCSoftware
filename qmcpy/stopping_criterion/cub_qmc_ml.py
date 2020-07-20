@@ -133,7 +133,7 @@ class CubQMCML(StoppingCriterion):
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
                 Takes priority over aboluste tolerance and alpha if supplied. 
         """
-        if rmse_tol:
+        if rmse_tol != None:
             self.rmse_tol = float(rmse_tol)
-        elif abs_tol:
+        elif abs_tol != None:
             self.rmse_tol = (float(abs_tol) / norm.ppf(1-alpha/2.))

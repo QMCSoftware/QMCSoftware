@@ -68,7 +68,7 @@ class Sobol(DiscreteDistribution):
         Args:
             dimension (int): dimension of samples
             randomize (bool): If True, apply digital shift to generated samples.
-                Note: Non-randomized Sobol' sequence includes the origin.",ParameterWarning
+                Note: Non-randomized Sobol' sequence includes the origin.
             seed (int): seed the random number generator for reproducibility
             backend (str): backend generator must be either "QRNG", "MPS", or "PyTorch" 
                 "QRNG" is significantly faster, supports optional randomization, and supports optional graycode ordering.
@@ -78,6 +78,7 @@ class Sobol(DiscreteDistribution):
         self.randomize = randomize
         self.seed = seed
         self.graycode = graycode
+        self.low_discrepancy = True
         self.backend = backend.lower()
         if self.backend == 'qrng':
             self.backend_gen = self._qrng_sobol_gen

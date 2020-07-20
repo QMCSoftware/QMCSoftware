@@ -42,6 +42,7 @@ class CubMCCLT(StoppingCriterion):
         solution        1.835
         n               5826
         n_total         6850
+        error_hat       0.050
         confid_int      [1.785 1.885]
         time_integrate  ...
     >>> ac = AsianCall(
@@ -114,8 +115,8 @@ class CubMCCLT(StoppingCriterion):
         self.data.update_data()
         # CLT confidence interval
         sigma_up = (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
-        err_bar = z_star * self.inflate * sigma_up
-        self.data.confid_int = self.data.solution + err_bar * array([-1, 1])
+        self.data.error_hat = z_star * self.inflate * sigma_up
+        self.data.confid_int = self.data.solution + self.data.error_hat * array([-1, 1])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
 
@@ -127,5 +128,5 @@ class CubMCCLT(StoppingCriterion):
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
         """
-        if abs_tol: self.abs_tol = abs_tol
-        if rel_tol: self.rel_tol = rel_tol
+        if abs_tol != None: self.abs_tol = abs_tol
+        if rel_tol != None: self.rel_tol = rel_tol

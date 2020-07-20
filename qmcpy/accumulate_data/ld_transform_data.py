@@ -6,7 +6,7 @@ import warnings
 
 class LDTransformData(AccumulateData):
 
-    parameters = ['n_total','solution','r_lag']
+    parameters = ['n_total','solution','error_hat']
 
     def __init__(self, stopping_criterion, integrand, basis_transform, m_min, m_max, fudge, check_cone):
         """

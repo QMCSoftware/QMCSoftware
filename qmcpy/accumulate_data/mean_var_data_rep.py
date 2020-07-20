@@ -6,7 +6,7 @@ EPS = finfo(float32).eps
 
 class MeanVarDataRep(AccumulateData):
 
-    parameters = ['replications','solution','sighat','n_total','confid_int']
+    parameters = ['replications','solution','sighat','n_total','error_hat','confid_int']
 
     def __init__(self, stopping_criterion, integrand, n_init, replications):
         """

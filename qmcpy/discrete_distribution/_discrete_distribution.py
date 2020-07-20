@@ -11,6 +11,8 @@ class DiscreteDistribution(object):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
         if not hasattr(self, 'dimension'):
             raise ParameterError(prefix + 'self.dimension')
+        if not hasattr(self, 'low_discrepancy'):
+            raise ParameterError(prefix + 'self.low_discrepancy')
         if not hasattr(self,'parameters'):
             self.parameters = []
 

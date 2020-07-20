@@ -56,6 +56,7 @@ class Korobov(DiscreteDistribution):
         self.randomize = randomize
         self.mimics = 'StdUniform'
         self.seed = seed
+        self.low_discrepancy = True
         self.set_seed(self.seed)
         super(Korobov,self).__init__()
 

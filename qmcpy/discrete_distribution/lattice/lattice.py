@@ -82,6 +82,7 @@ class Lattice(DiscreteDistribution):
         """
         self.dimension = dimension
         self.randomize = randomize
+        self.low_discrepancy = True
         self.backend = backend.lower()            
         if self.backend == 'gail':
             self.backend_gen = gail_lattice_gen
