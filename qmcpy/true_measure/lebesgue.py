@@ -29,8 +29,6 @@ class Lebesgue(TrueMeasure):
         """
         self.distribution = distribution
         self.d = self.distribution.dimension
-        if not self.distribution.mimics == "StdUniform":
-            raise ParameterError("Lebesgue measure requires a distribution mimicing 'StdUniform'")        
         if isscalar(lower_bound):
             lower_bound = tile(lower_bound,self.d)
         if isscalar(upper_bound):
@@ -41,25 +39,48 @@ class Lebesgue(TrueMeasure):
             raise DimensionError('upper bound and lower bound must be of length dimension')     
         if isfinite(self.lower_bound).all() and isfinite(self.upper_bound).all() \
            and (self.lower_bound<self.upper_bound).all():
-            self.tf_to_mimic = 'Uniform'
+            self.tf_to_mimic = 'StdUniform'
         elif (self.lower_bound == -inf).all() and (self.upper_bound == inf).all():
-            self.tf_to_mimic = 'Gaussian'
+            self.tf_to_mimic = 'StdGaussian'
         else:
             raise ParameterError('self.lower_bound and self.upper_bound must both be finite ' + \
                                  'or must be -inf,inf respectively')
         super(Lebesgue,self).__init__()
 
+    def _tf_to_mimic_samples(self, samples):
+        """
+        Transform samples to appear standard uniform or standard gaussian
+        
+        Args:
+            samples (ndarray): samples from a discrete distribution
+        
+        Return:
+            ndarray: transformed samples from the DiscreteDistribution.
+        """
+        if (self.tf_to_mimic == 'StdUniform' and self.distribution.mimics == 'StdUniform') or \
+           (self.tf_to_mimic == 'StdGaussian' and self.distribution.mimics == 'StdGaussian'):
+            mimic_samples = samples # identity
+        elif self.tf_to_mimic == 'StdUniform' and self.distribution.mimics == 'StdGaussian':
+            mimic_samples = norm.cdf(samples) # cdf normal 
+        elif self.tf_to_mimic == 'StdGaussian' and self.distribution.mimics == 'StdUniform':
+            mimic_samples = norm.ppf(samples) # inverse cdf normal
+        else:
+            raise TransformError(\
+                'Cannot transform samples mimicing %s to mimic %s'%(self.distribution.mimics,self.tf_to_mimic))
+        return mimic_samples
+    
     def _transform_g_to_f(self, g):
         """ See abstract method. """
-        if self.tf_to_mimic == 'Uniform':
+        if self.tf_to_mimic == 'StdUniform':
             def f(samples, *args, **kwargs):
+                mimic_smaples = self._tf_to_mimic_samples(samples)
                 dist = self.upper_bound - self.lower_bound
-                f_vals = dist.prod() * g(dist*samples + self.lower_bound, *args, **kwargs)
+                f_vals = dist.prod() * g(dist*mimic_smaples + self.lower_bound, *args, **kwargs)
                 return f_vals
-        elif self.tf_to_mimic == 'Gaussian':
+        elif self.tf_to_mimic == 'StdGaussian':
             def f(samples, *args, **kwargs):
-                inv_cdf_vals = norm.ppf(samples)
-                g_vals = g(inv_cdf_vals, *args, **kwargs)
-                f_vals = g_vals / norm.pdf(inv_cdf_vals).prod(-1).reshape(g_vals.shape)
+                mimic_smaples = self._tf_to_mimic_samples(samples)
+                g_vals = g(mimic_smaples, *args, **kwargs)
+                f_vals = g_vals / norm.pdf(mimic_smaples).prod(-1).reshape(g_vals.shape)
                 return f_vals
         return f
