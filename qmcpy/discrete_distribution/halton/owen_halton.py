@@ -121,7 +121,7 @@ primes = array([
 dtype=double)
 D = len(primes)
 
-def rhalton(n,d,n0=0,d0=0,singleseed=None,seedvector=[None]):
+def rhalton(n,d,n0=0,d0=0,randomize=True,singleseed=None,seedvector=[None]):
     """
     Randomly scrambled Halton sequence of n points in d dimensions.
     If you already have n0 old points, set n0 to get the next n points.
@@ -155,10 +155,10 @@ def rhalton(n,d,n0=0,d0=0,singleseed=None,seedvector=[None]):
             random.seed(seedvector[dimj])
         ind = (n0+arange(n)).astype(int)
         b = int(primes[dimj])
-        ans[:,j] = randradinv(ind,b)
+        ans[:,j] = randradinv(ind,randomize,b)
     return ans
 
-def randradinv(ind,b=2):
+def randradinv(ind,randomize,b):
     """
     Randomized radical inverse functions for indices in ind and for base b.
     The calling routine should set the random seed if reproducibility is desired.
@@ -168,9 +168,12 @@ def randradinv(ind,b=2):
     res = ind
     while b2r >= 1e-16:
         dig = res%b
-        perm = random.permutation(b)
-        pdig = perm[dig.astype(int)]
-        ans = ans + pdig * b2r
+        if randomize:
+            perm = random.permutation(b)
+            pdig = perm[dig.astype(int)]
+            ans = ans + pdig * b2r
+        else:
+            ans = ans + dig * b2r
         b2r = b2r/b
         res = (res - dig)/b
     return ans

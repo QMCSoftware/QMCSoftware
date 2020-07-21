@@ -181,11 +181,21 @@ class TestHalton(unittest.TestCase):
         x2 = distribution.gen_samples(n_min=1,n_max=3)
         self.assertTrue(x2.shape==(2,4))
         self.assertTrue((x2==x[1:]).all())
+        x_true = array([
+            [0,     0],
+            [1./2,  1./3],
+            [1./4,  2./3],
+            [3./4,  1./9]])
+        x = Halton(2,randomize=False,backend='Owen',generalize=True).gen_samples(4)
+        self.assertTrue((x==x_true).all())
     
     def test_warnings_errors(self):
         self.assertWarns(ParameterWarning,Halton,2,generalize=False,backend='Owen')
+        self.assertWarns(ParameterWarning,Halton,2,randomize=False,generalize=False,backend='QRNG')
         distribution = Halton(2, generalize=True, backend='QRNG',seed=7)
         self.assertRaises(ParameterError,distribution.gen_samples,n_min=2,n_max=4)
+        distribution = Halton(2, generalize=True, randomize=False, backend='Owen')
+        self.assertWarns(ParameterWarning,distribution.gen_samples,n_min=0,n_max=4)
 
 class TestKorobov(unittest.TestCase):
     """ Unit test for Korobov DiscreteDistribution. """

@@ -39,11 +39,12 @@ class Halton(DiscreteDistribution):
 
     parameters = ['dimension','generalize','seed','backend','mimics']
 
-    def __init__(self, dimension=1, generalize=True, backend='Owen', seed=None):
+    def __init__(self, dimension=1, generalize=True, randomize=True, backend='Owen', seed=None):
         """
         Args:
             dimension (int): dimension of samples
             generalize (bool): generalize the Halton sequence?
+            randomize (bool): randomize the sequence
             backend (str): Backend generator. Must be "QRNG" or "Owen". 
                 "QRNG" backend supports both plain and generalized Halton with randomization and generally provides better accuracy. 
                 "Owen" only supports generalized Halton but allows for n_min!=0 in 'gen_samples' method.
@@ -58,18 +59,22 @@ class Halton(DiscreteDistribution):
         self.backend = backend.lower()
         self.mimics = 'StdUniform'
         self.seed = seed
-        self.randomize = True
+        self.randomize = randomize
         self.low_discrepancy = True
         self.set_seed(self.seed)
+        if self.backend not in ['qrng','owen']:
+            raise ParameterError('Halton backend must be either "QRNG" or "Owen"')
         if self.backend=='owen' and self.generalize==False:
             warnings.warn('\nHalton with "Owen" backend must have generalize=True. '+\
                 'Using "QRNG" backend',ParameterWarning)
             self.backend='qrng'
-        if self.backend not in ['qrng','owen']:
-            raise ParameterError('Halton backend must be either "QRNG" or "Owen"')
+        if self.backend=='qrng' and self.randomize==False:
+            warnings.warn('\nHalton with "QRNG" backend must be randomized. ' +\
+                'Using "Owen" backend with randomize=False', ParameterWarning);
+            self.backend='owen'
         super(Halton,self).__init__()
 
-    def gen_samples(self, n=None, n_min=0, n_max=8):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
         """
         Generate samples
 
@@ -88,12 +93,14 @@ class Halton(DiscreteDistribution):
         if (not n) and (n_min!=0) and self.backend=='qrng':
             raise ParameterError('\nHalton with "QRNG" backend does not support skipping samples. '+\
                 'Use "Owen" backend in order to provide n_min!=0')
+        if n_min == 0 and self.randomize==False and warn:
+            warnings.warn("Non-randomized Halton sequence includes the origin",ParameterWarning)
         n = int(n_max-n_min)
         d = int(self.dimension)
         if self.backend=='qrng':
             x = ghalton_qrng(n,d,self.generalize,self.seed)
         if self.backend=='owen':
-            x = rhalton(n, d, n0=int(n_min), d0=0, singleseed=self.seed)
+            x = rhalton(n, d, n0=int(n_min), d0=0, randomize=self.randomize,singleseed=self.seed)
         return x
 
     def set_seed(self, seed):
