@@ -99,9 +99,15 @@ class AsianCall(Integrand):
             ndarray: n vector of discounted payoffs
         """
         if self.mean_type == 'arithmetic':
-            avg = stock_path.mean(1)
+            avg = (self.start_price / 2. +
+                   stock_path[:, :-1].sum(1) +
+                   stock_path[:, -1] / 2.) / \
+                float(dimension)
         elif self.mean_type == 'geometric':
-            avg = exp(log(stock_path).mean(1))
+            avg = exp((log(self.start_price) / 2. +
+                       log(stock_path[:, :-1]).sum(1) +
+                       log(stock_path[:, -1]) / 2.) /
+                      float(dimension))
         y = maximum(avg - self.strike_price, 0.) * \
             exp(-self.interest_rate * self.exercise_time)
         return y
