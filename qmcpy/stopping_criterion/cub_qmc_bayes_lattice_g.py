@@ -265,7 +265,6 @@ class CubBayesLatticeG(StoppingCriterion):
                 ftilde_, xun_, xpts_ = self.iter_fft_vdc(iter, shift, xun_, xpts_, ftilde_)
             else:
                 ftilde_, xun_, xpts_ = self.iter_fft(iter, shift, xun_, xpts_, ftilde_)
-            # end
             stop_flag, muhat, order_ = self.stopping_criterion(xun_, ftilde_, iter, m)
 
             self.timeAll.append(time() - tstart_iter)  # store per iteration time
@@ -340,7 +339,7 @@ class CubBayesLatticeG(StoppingCriterion):
                 DSC = abs(Lambda_ring[0] / n)
             else:
                 DSC = abs((Lambda[0] / n) - 1)
-            # end
+
             # 1-alpha two sided confidence interval
             ErrBd = self.uncert * sqrt(DSC * RKHSnorm / (n - 1))
         elif self.GCV == True:
@@ -349,7 +348,7 @@ class CubBayesLatticeG(StoppingCriterion):
                 DSC = abs(Lambda_ring[0] / (n + Lambda_ring[0]))
             else:
                 DSC = abs(1 - (n / Lambda[0]))
-            # end
+
             temp = Lambda
             temp[0] = n + Lambda_ring[0]
             C_Inv_trace = sum(1. / temp(temp != 0))
@@ -361,15 +360,14 @@ class CubBayesLatticeG(StoppingCriterion):
                 DSC = abs(Lambda_ring[0] / (n + Lambda_ring[0]))
             else:
                 DSC = abs(1 - (n / Lambda[0]))
-            # end
+
             ErrBd = self.uncert * sqrt(DSC * RKHSnorm / n)
-        # end
 
         if self.arbMean == True:  # zero mean case
             muhat = ftilde[0] / n
         else:  # non zero mean case
             muhat = ftilde[0] / Lambda[0]
-        # end
+
         muminus = muhat - ErrBd
         muplus = muhat + ErrBd
 
