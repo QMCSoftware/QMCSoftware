@@ -110,13 +110,18 @@ class CubBayesLatticeG(StoppingCriterion):
         self.debugEnable = True  # enable debug prints
 
         # variables to save debug info in each iteration
-        self.errorBdAll = []
-        self.muhatAll = []
-        self.aMLEAll = []
-        self.lossMLEAll = []
-        self.timeAll = []
-        self.dscAll = []
-        self.s_All = []
+        self.errorBdAll = np.array([])
+        self.muhatAll = np.array([])
+        self.aMLEAll = np.array([])
+        self.lossMLEAll = np.array([])
+        self.timeAll = np.array([])
+        self.dscAll = np.array([])
+        self.s_All = np.array([])
+
+        self.mvec = np.arange(m_min, m_max)
+        #  generator for the Lattice points
+        self.gen_vec = self.get_lattice_gen_vec(self.dim)
+        self.ff = []  # integrand after the periodization transform
 
         self.mvec = np.arange(self.m_min, self.m_max, dtype=int)
 
