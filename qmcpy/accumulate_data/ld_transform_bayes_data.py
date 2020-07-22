@@ -22,7 +22,7 @@ class OutParams():
     def __init__(self):
         self.n = None
         self.time = None
-        self.ErrBd = self.errorBdAll[-1]
+        self.ErrBd = None
         self.optParams = OutOptParams()
         self.exitflag = None
 
