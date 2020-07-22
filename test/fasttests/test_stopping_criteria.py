@@ -169,5 +169,29 @@ class TestCubQMCML(unittest.TestCase):
         self.assertTrue(abs(solution-exact_value) < tol)
 
 
+class TestCubBayesLatticeG(unittest.TestCase):
+    """ Unit tests for CubBayesLatticeG StoppingCriterion. """
+
+    def test_raise_distribution_compatibility_error(self):
+        distribution = IIDStdGaussian(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CubBayesLatticeG, integrand)
+
+    def test_n_max_single_level(self):
+        distribution = Lattice(dimension=2, backend="GAIL")
+        measure = Uniform(distribution)
+        integrand = Keister(measure)
+        algorithm = CubBayesLatticeG(integrand, abs_tol=.001, n_init=2 ** 8, n_max=2 ** 9)
+        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
+
+    def test_keister_2d(self):
+        distribution = Lattice(dimension=2)
+        measure = Gaussian(distribution, covariance=1. / 2)
+        integrand = Keister(measure)
+        solution, data = CubBayesLatticeG(integrand, abs_tol=tol).integrate()
+        self.assertTrue(abs(solution - keister_2d_exact) < tol)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -3,6 +3,28 @@ from ..util import CubatureWarning
 from numpy import array, nan, zeros, tile, inf, hstack, arange, where
 import warnings
 
+class OutOptParams():
+    def __init__(self):
+        self.ErrBdAll = array([])
+        self.muhatAll = array([])
+        self.mvec = array([])
+        self.aMLEAll = array([])
+        self.timeAll = array([])
+        self.s_All = array([])
+        self.dscAll = array([])
+        self.absTol = None
+        self.relTol = None
+        self.shift = None
+        self.stopAtTol = None
+        self.r = None
+
+class OutParams():
+    def __init__(self):
+        self.n = None
+        self.time = None
+        self.ErrBd = self.errorBdAll[-1]
+        self.optParams = OutOptParams()
+        self.exitflag = None
 
 class LDTransformBayesData(AccumulateData):
 
