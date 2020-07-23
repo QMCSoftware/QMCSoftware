@@ -1,5 +1,5 @@
 Password: 3141592653
-CPU time: 53.94 sec
+CPU time: 71.70 sec
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -23,5 +23,5 @@ CubQMCSobolG (StoppingCriterion Object)
 LDTransformData (AccumulateData Object)
     n_total         2^(27)
     solution        3.142
-    r_lag           2^(2)
-    time_integrate  53.935
+    error_hat       2.62e-10
+    time_integrate  71.699

@@ -95,5 +95,5 @@ class LDTransformData(AccumulateData):
             if c_tmp < 1:
                 self.c_stilde_up[idx] = min(self.c_stilde_up[idx],c_up*const1)
         if (self.c_stilde_low > self.c_stilde_up).any():
-            warnings.warn('An element of c_stilde_low > c_stilde_up', CubatureWarning)
+            warnings.warn('An element of c_stilde_low > c_stilde_up, this function may violate the cone function. ', CubatureWarning)
         

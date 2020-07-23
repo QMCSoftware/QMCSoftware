@@ -10,6 +10,7 @@ IIDStdUniform (DiscreteDistribution Object)
 Gaussian (TrueMeasure Object)
     mean            0
     covariance      2^(-1)
+    decomp_type     pca
 CubMCCLT (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -22,11 +23,12 @@ MeanVarData (AccumulateData Object)
     solution        2.168
     n               1878963
     n_total         1879987
+    error_hat       0.005
     confid_int      [2.163 2.173]
-    time_integrate  0.600
+    time_integrate  0.743
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 2.1693         
+Solution: 2.1671         
 Keister (Integrand Object)
 Lattice (DiscreteDistribution Object)
     dimension       3
@@ -37,6 +39,7 @@ Lattice (DiscreteDistribution Object)
 Gaussian (TrueMeasure Object)
     mean            0
     covariance      2^(-1)
+    decomp_type     pca
 CubQMCCLT (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -46,11 +49,12 @@ CubQMCCLT (StoppingCriterion Object)
     n_max           2^(30)
 MeanVarDataRep (AccumulateData Object)
     replications    2^(4)
-    solution        2.169
+    solution        2.167
     sighat          0.004
     n_total         2^(13)
-    confid_int      [2.166 2.172]
-    time_integrate  0.011
+    error_hat       0.003
+    confid_int      [2.164 2.17 ]
+    time_integrate  0.018
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1682         
@@ -62,6 +66,7 @@ IIDStdGaussian (DiscreteDistribution Object)
 Gaussian (TrueMeasure Object)
     mean            0
     covariance      2^(-1)
+    decomp_type     pca
 CubMCG (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -74,11 +79,12 @@ MeanVarData (AccumulateData Object)
     solution        2.168
     n               2342182
     n_total         2343206
+    error_hat       0.005
     confid_int      [2.163 2.173]
-    time_integrate  0.434
+    time_integrate  0.382
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 2.1681         
+Solution: 2.1688         
 Keister (Integrand Object)
 Lattice (DiscreteDistribution Object)
     dimension       3
@@ -89,15 +95,16 @@ Lattice (DiscreteDistribution Object)
 Gaussian (TrueMeasure Object)
     mean            0
     covariance      2^(-1)
+    decomp_type     pca
 CubQMCLatticeG (StoppingCriterion Object)
     abs_tol         0.005
     rel_tol         0
     n_init          2^(10)
     n_max           2^(35)
 LDTransformData (AccumulateData Object)
-    n_total         2^(12)
-    solution        2.168
-    r_lag           2^(2)
+    n_total         2^(11)
+    solution        2.169
+    error_hat       0.005
     time_integrate  0.007
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -113,6 +120,7 @@ Sobol (DiscreteDistribution Object)
 Gaussian (TrueMeasure Object)
     mean            0
     covariance      2^(-1)
+    decomp_type     pca
 CubQMCSobolG (StoppingCriterion Object)
     abs_tol         0.005
     rel_tol         0
@@ -121,7 +129,7 @@ CubQMCSobolG (StoppingCriterion Object)
 LDTransformData (AccumulateData Object)
     n_total         2^(12)
     solution        2.170
-    r_lag           2^(2)
-    time_integrate  0.004
+    error_hat       0.002
+    time_integrate  0.020
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

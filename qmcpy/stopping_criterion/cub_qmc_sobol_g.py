@@ -140,7 +140,7 @@ class CubQMCSobolG(StoppingCriterion):
                 Trying to generate %d new samples would exceed n_max = %d.
                 No more samples will be generated.
                 Note that error tolerances may no longer be satisfied""" \
-                % (int(2**self.data.m), int(self.data.m), int(2**self.data.m_max))
+                % (int(2**self.data.m), int(2**self.data.m), int(2**self.data.m_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
             else:
