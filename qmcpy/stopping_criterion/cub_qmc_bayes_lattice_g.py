@@ -110,40 +110,26 @@ class CubBayesLatticeG(StoppingCriterion):
         self.debugEnable = True  # enable debug prints
 
         # variables to save debug info in each iteration
-        self.errorBdAll = np.array([])
-        self.muhatAll = np.array([])
-        self.aMLEAll = np.array([])
-        self.lossMLEAll = np.array([])
-        self.timeAll = np.array([])
-        self.dscAll = np.array([])
-        self.s_All = np.array([])
-
-        self.mvec = np.arange(m_min, m_max)
-        #  generator for the Lattice points
-        self.gen_vec = self.get_lattice_gen_vec(self.dim)
-        self.ff = []  # integrand after the periodization transform
+        self.errorBdAll = []
+        self.muhatAll = []
+        self.aMLEAll = []
+        self.lossMLEAll = []
+        self.timeAll = []
+        self.dscAll = []
+        self.s_All = []
 
         self.mvec = np.arange(self.m_min, self.m_max, dtype=int)
 
         # Credible interval : two-sided confidence, i.e., 1-alpha percent quantile
         if self.fullBayes:
             # degrees of freedom = 2^mmin - 1
-            self.uncert = -tnorm.ppf(self.alpha/2, (2**self.m_min) - 1)
+            self.uncert = -tnorm.ppf(self.alpha / 2, (2 ** self.m_min) - 1)
         else:
-            self.uncert = -gaussnorm.ppf(self.alpha/2)
-
+            self.uncert = -gaussnorm.ppf(self.alpha / 2)
 
         #  generator for the Lattice points
         self.gen_vec = self.get_lattice_gen_vec(self.dim)
         self.ff = CubBayesLatticeG.doPeriodTx(self.f.f, self.ptransform)  # integrand after the periodization transform
-
-        '''
-        % only for developers use
-        fName = 'None'  # name of the integrand
-        figSavePath = ''  # path where to save he figures
-        visiblePlot = false  # make plots visible
-        gaussianCheckEnable = false  # enable plot to check Gaussian pdf
-        '''
 
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
@@ -169,7 +155,6 @@ class CubBayesLatticeG(StoppingCriterion):
         if iter == 0:
             # In the first iteration compute full FFT
             # xun_ = mod(bsxfun( @ times, (0:1 / n:1-1 / n)',self.gen_vec),1)
-            # xun_ = np.arange(0, 1 - 1 / n, 1 / n).reshape((n-1, 1))
             xun_ = np.arange(0, 1, 1 / n).reshape((n, 1))
             xun_ = np.mod((xun_ * self.gen_vec), 1)
 
@@ -177,11 +162,10 @@ class CubBayesLatticeG(StoppingCriterion):
             xpts_ = np.mod((xun_ + shift), 1)  # shifted
 
             # Compute initial FFT
-            ftilde_ = np.fft.fft(self.gpuArray_(self.ff(xpts_)))  # evaluate integrand's fft
+            ftilde_ = np.fft.fft(self.ff(xpts_))  # evaluate integrand's fft
             ftilde_ = ftilde_.reshape((n, 1))
         else:
             # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
-            # xunnew = np.arange(1 / n, 1 - 1 / n, 2 / n).reshape((int(n/2)-1, 1))
             xunnew = np.arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
             xunnew = np.mod(xunnew * self.gen_vec, 1)
 
@@ -192,7 +176,7 @@ class CubBayesLatticeG(StoppingCriterion):
             mnext = m - 1
 
             # Compute FFT on next set of new points
-            ftildeNextNew = np.fft.fft(self.gpuArray_(self.ff(xnew)))
+            ftildeNextNew = np.fft.fft(self.ff(xnew))
             ftildeNextNew = ftildeNextNew.reshape((int(n / 2), 1))
             if self.debugEnable:
                 CubBayesLatticeG.alertMsg(ftildeNextNew, 'Nan', 'Inf')
@@ -216,13 +200,13 @@ class CubBayesLatticeG(StoppingCriterion):
             [xpts_, xun_] = self.simple_lattice_gen(n, self.dim, shift, True)
 
             # Compute initial FFT
-            ftilde_ = self.fft_DIT(self.gpuArray_(self.ff(xpts_)), m)  # evaluate integrand's fft
+            ftilde_ = self.fft_DIT(self.ff(xpts_), m)  # evaluate integrand's fft
         else:
             [xnew, xunnew] = self.simple_lattice_gen(n, self.dim, shift, False)
             mnext = m - 1
 
             # Compute FFT on next set of new points
-            ftildeNextNew = self.fft_DIT(self.gpuArray_(self.ff(xnew)), mnext)
+            ftildeNextNew = self.fft_DIT(self.ff(xnew), mnext)
             if self.debugEnable:
                 CubBayesLatticeG.alertMsg(ftildeNextNew, 'Nan', 'Inf')
 
@@ -242,7 +226,7 @@ class CubBayesLatticeG(StoppingCriterion):
     # computes the integral
     def integrate(self):
 
-        tstart = time()   # start the clock
+        tstart = time()  # start the clock
         n = 2 ** self.mvec[0]
         order_ = None
         stop_flag = None
@@ -300,13 +284,8 @@ class CubBayesLatticeG(StoppingCriterion):
             out.exitflag = 2  # error tolerance may not be met
 
         if stop_flag == False:
-            warnings.warn('GAIL:cubBayesLattice_g:maxreached' +
-                          'In order to achieve the guaranteed accuracy, ' +
-                          f'used maximum allowed sample size {n}. \n', MaxSamplesWarning)
-
-        # convert from gpu memory to local
-        muhat = self.gather_(muhat)
-        out = self.gather_(out)
+            warnings.warn(f'In order to achieve the guaranteed accuracy, used maximum allowed sample size {n}',
+                          MaxSamplesWarning)
 
         return muhat, out
 
@@ -442,7 +421,6 @@ class CubBayesLatticeG(StoppingCriterion):
 
         return loss, Lambda, Lambda_ring, RKHSnorm
 
-
     # prints debug message if the given variable is Inf, Nan or
     # complex, etc
     # Example: alertMsg(x, 'Inf', 'Imag')
@@ -534,7 +512,6 @@ class CubBayesLatticeG(StoppingCriterion):
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fft(C1 - 1)
     '''
-
     @staticmethod
     def kernel(xun, order, a, avoidCancelError, kernType, debug_enable):
 
@@ -589,7 +566,7 @@ class CubBayesLatticeG(StoppingCriterion):
         z = [1, 433461, 315689, 441789, 501101, 146355, 88411, 215837, 273599,
              151719, 258185, 357967, 96407, 203741, 211709, 135719, 100779,
              85729, 14597, 94813, 422013, 484367]  # generator
-        z = np.array(z[:d]).reshape((1,d))
+        z = np.array(z[:d]).reshape((1, d))
         return z
 
     # generates rank-1 Lattice points in Vander Corput sequence order
@@ -684,16 +661,3 @@ class CubBayesLatticeG(StoppingCriterion):
         temp[1:n:2, :] = xnew
         x = temp
         return xun, x
-
-    # to enable GPU for computations
-    @staticmethod
-    def gpuArray_(x):
-        # y = gpuArray(x)  # use GPU
-        y = x  # use CPU
-        return y
-
-    @staticmethod
-    def gather_(x):
-        # y = gather(x)  # use GPU
-        y = x  # use CPU
-        return y

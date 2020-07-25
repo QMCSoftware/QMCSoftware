@@ -186,8 +186,8 @@ class TestCubBayesLatticeG(unittest.TestCase):
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
 
     def test_keister_2d(self):
-        distribution = Lattice(dimension=2)
-        measure = Gaussian(distribution, covariance=1. / 2)
+        distribution = Lattice(dimension=2, randomize=False, seed=12345678)
+        measure = Uniform(distribution)
         integrand = Keister(measure)
         solution, data = CubBayesLatticeG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
