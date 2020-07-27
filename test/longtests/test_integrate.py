@@ -30,7 +30,7 @@ class IntegrationExampleTest(unittest.TestCase):
         abs_tol =.05
         distribution = IIDStdGaussian()
         measure = BrownianMotion(distribution)
-        integrand = AsianCall(measure,multi_level_dimensions=[4,16,64])
+        integrand = AsianOption(measure,multi_level_dimensions=[4,16,64])
         solution,data = CubMCCLT(integrand, abs_tol).integrate()
         true_value = 1.7845
         self.assertTrue(abs(solution - true_value) < abs_tol)

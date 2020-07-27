@@ -52,7 +52,7 @@ class MLCallOptions(Integrand):
             t_final (float): exercise time
         """
         if not (isinstance(measure,Gaussian) and (measure.mu==0).all() and (measure.sigma==eye(measure.d)).all()):
-            raise ParameterError('AsianCall measure must be a Gaussian instance with mean 0 and variance 1')
+            raise ParameterError('AsianOption measure must be a Gaussian instance with mean 0 and variance 1')
         options = ['european','asian']
         self.option = option.lower()
         if self.option not in options:

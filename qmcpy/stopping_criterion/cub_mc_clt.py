@@ -2,7 +2,7 @@ from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution import IIDStdGaussian
 from ..true_measure import Gaussian, BrownianMotion
-from ..integrand import Keister, AsianCall
+from ..integrand import Keister, AsianOption
 from ..util import MaxSamplesWarning
 from numpy import array, ceil, floor, maximum
 from scipy.stats import norm
@@ -45,7 +45,7 @@ class CubMCCLT(StoppingCriterion):
         error_hat       0.050
         confid_int      [1.785 1.885]
         time_integrate  ...
-    >>> ac = AsianCall(
+    >>> ac = AsianOption(
     ...     measure = BrownianMotion(IIDStdGaussian()),
     ...     multi_level_dimensions = [2,4,8])
     >>> sc = CubMCCLT(ac,abs_tol=.05)

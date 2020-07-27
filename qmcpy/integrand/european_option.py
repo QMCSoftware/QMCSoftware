@@ -2,7 +2,7 @@ from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..discrete_distribution import Sobol
 from ..util import ParameterError
-from numpy import exp, maximum, log, sqrt
+from numpy import *
 from scipy.stats import norm 
 
 
@@ -51,14 +51,15 @@ class EuropeanOption(Integrand):
 
     def g(self, x):
         """ See abstract method. """
-        s_last = self.start_price * exp(
+        s = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
-            self.measure.time_vector[-1] + self.volatility * x[:,-1])
+            self.measure.time_vector + self.volatility * x)
+        for xx,yy in zip(*where(s<0)): # if stock becomes <=0, 0 out rest of path
+            s[xx,yy:] = 0
         if self.call_put == 'call':
-            y_raw = maximum(s_last - self.strike_price, 0)
+            y_raw = maximum(s[:,-1] - self.strike_price, 0)
         else: # put
-            s_last = maximum(s_last,0) # avoid negative stock values
-            y_raw = maximum(self.strike_price - s_last, 0)
+            y_raw = maximum(self.strike_price - s[:,-1], 0)
         y_adj = y_raw * exp(-self.interest_rate * self.exercise_time)
         return y_adj
     
