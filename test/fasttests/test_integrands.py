@@ -8,13 +8,13 @@ if vinvo[0]==3: import unittest
 else: import unittest2 as unittest
 
 
-class TestAsianCall(unittest.TestCase):
-    """ Unit tests for AsianCall Integrand. """
+class TestAsianOption(unittest.TestCase):
+    """ Unit tests for AsianOption Integrand. """
 
     def test_f(self):
         distribution = Sobol(dimension=2)
         measure = BrownianMotion(distribution)
-        integrand = AsianCall(measure)
+        integrand = AsianOption(measure)
         samples = integrand.measure.distribution.gen_samples(4)
         y = integrand.f(samples).squeeze()
         self.assertTrue(y.shape==(4,))        
@@ -22,7 +22,7 @@ class TestAsianCall(unittest.TestCase):
     def test__dim_at_level(self):
         distribution = Sobol(dimension=4)
         measure = BrownianMotion(distribution)
-        integrand = AsianCall(measure, multi_level_dimensions=[4,8])
+        integrand = AsianOption(measure, multi_level_dimensions=[4,8])
         self.assertTrue(integrand._dim_at_level(0)==4)
         self.assertTrue(integrand._dim_at_level(1)==8)
 

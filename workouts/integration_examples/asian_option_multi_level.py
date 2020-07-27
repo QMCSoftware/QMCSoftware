@@ -20,7 +20,7 @@ def asian_option_multi_level(
     # CubMCCLT
     distribution = IIDStdGaussian(seed=7)
     measure = BrownianMotion(distribution)
-    integrand = AsianCall(
+    integrand = AsianOption(
         measure = measure,
         volatility = volatility,
         start_price = start_price,
