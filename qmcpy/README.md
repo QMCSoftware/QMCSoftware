@@ -14,10 +14,13 @@ The function to integrate.
     - stock price at time $jT/d=\tau_j$: $~~~~~~~~~$ $S(\tau_j)=S_0\exp\bigl((r-\sigma^2/2)\tau_j+\sigma\mathcal{B}(\tau_j)\bigr)$
     - discounted call payoff $= \max\left(S(\tau_d)-K\right),\: 0)  \,\exp(-rT)$
     - discounted put payoff $= \max\left(K-S(\tau_d)\right),\: 0)\,\exp(-rT)$
-- Asian Call Option
+- Asian Option
     - stock price at time $jT/d=\tau_j$: $~~~~~~~~~$ $S(\tau_j)=S_0\exp\bigl((r-\sigma^2/2)\tau_j+\sigma\mathcal{B}(\tau_j)\bigr)$
-    - discounted call payoff airthmetic mean: $g_{\text{arith}}(\boldsymbol{t})= \max\left(\frac{1}{2d}\sum_{j=1}^d [S(\tau_{j-1})+S(\tau_j)]-K,\: 0\right)  \,\exp(-rT)$
-    - discounted call payoff geometric mean: $g_{\text{geo}}(\boldsymbol{t}) = \max\left(\biggl[\prod_{j=1}^d [S(\tau_{j-1})S(\tau_j)]\biggr]^{\frac{1}{2d}} -K,\: 0\right)\,\exp(-rT)$
+    - airthmetic mean: $\gamma(\boldsymbol{\tau})= \frac{1}{2d}\sum_{j=1}^d [S(\tau_{j-1})+S(\tau_j)]$
+    - geometric mean: $\gamma(\boldsymbol{\tau}) = \biggl[\prod_{j=1}^d [S(\tau_{j-1})S(\tau_j)]\biggr]^{\frac{1}{2d}}$
+    
+    - discounted call payoff $= \max( \gamma(\boldsymbol{\tau})-K,\: 0)\,\exp(-rT)$
+    - discounted put payoff $= \max(K-\gamma(\boldsymbol{\tau}),0)\,\exp(-rT)$
 - Multilevel Call Options with Milstein Discretization 
 - Linear Function: $g(\boldsymbol{x}) = \sum_{j=1}^{d}x_{j}$
 
