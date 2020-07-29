@@ -85,7 +85,8 @@ setuptools.setup(
                      'qmcpy/discrete_distribution/qrng/korobov.c',
                      'qmcpy/discrete_distribution/qrng/MRG63k3a.c',
                      'qmcpy/discrete_distribution/qrng/sobol.c'],
-            extra_compile_args=['-fPIC', '-shared', '-lm'])],
+            extra_compile_args=['-shared']
+        )],
     cmdclass={
         'clean': CleanCommand,
         'install': CustomInstall}
