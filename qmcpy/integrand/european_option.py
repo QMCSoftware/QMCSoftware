@@ -39,6 +39,7 @@ class EuropeanOption(Integrand):
         if not isinstance(measure,BrownianMotion):
             raise ParameterError('EuropeanCall measure must be a BrownianMotion instance')
         self.measure = measure
+        self.distribution = measure.distribution
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)

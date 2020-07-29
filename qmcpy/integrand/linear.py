@@ -23,6 +23,7 @@ class Linear(Integrand):
             measure (TrueMeasure): a TrueMeasure instance
         """
         self.measure = measure
+        self.distribution = self.measure.distribution
         super(Linear,self).__init__()
 
     def g(self, x):

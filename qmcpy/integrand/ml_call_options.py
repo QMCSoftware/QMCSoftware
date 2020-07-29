@@ -58,6 +58,7 @@ class MLCallOptions(Integrand):
         if self.option not in options:
             raise ParameterError('option type must be one of\n\t%s'%str(options)) 
         self.measure = measure
+        self.distribution = self.measure.distribution
         if self.measure.distribution.low_discrepancy and self.option=='asian':
             raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
         self.sigma = volatility

@@ -31,6 +31,7 @@ class Keister(Integrand):
         """
         self.measure = measure
         self.dimension = self.measure.dimension
+        self.distribution = self.measure.distribution
         super(Keister,self).__init__()
 
     def g(self, x):
@@ -38,3 +39,5 @@ class Keister(Integrand):
         normx = LA.norm(x, 2, axis=1)  # ||x||_2
         y = pi ** (self.dimension / 2.0) * cos(normx)
         return y
+
+    def plot()
