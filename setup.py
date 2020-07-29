@@ -65,7 +65,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://qmcsoftware.github.io/QMCSoftware/",
-    download_url="https://github.com/QMCSoftware/QMCSoftware/archive/v0.1-alpha.tar.gz",
+    download_url="https://github.com/QMCSoftware/QMCSoftware/archive/v0.3.2-alpha.tar.gz",
     packages=packages,
     install_requires=[
         'scipy >= 1.2.0',
