@@ -16,13 +16,12 @@ EXT = so
 endif
 ifeq ($(UNAME), Darwin)
 EXT = dylib
-endif
-ifeq ($(UNAME), Windows)
+else
 EXT = dll
 endif
 
 qrng:
-	cd $(qrngpath) && gcc -shared -o qrng_lib.$(EXT) *.c
+	gcc -shared -o $(qrngpath)qrng_lib.$(EXT) $(qrngpath)*.c
 	@echo Done compiling qrng C files
 
 tests:
