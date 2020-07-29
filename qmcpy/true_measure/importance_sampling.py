@@ -7,10 +7,6 @@ from numpy import apply_along_axis, sqrt, pi
 
 class ImportanceSampling(TrueMeasure):
     """
-    Define
-        - m(x) is pdf of measure we do not know how to generate from (mystery) 
-        - k(x) is the pdf of the continuous distribution which the discrete distribution mimics (known)
-    
     >>> def quarter_circle_uniform_pdf(x):
     ...     x1,x2 = x
     ...     if sqrt(x1**2+x2**2)<1 and x1>=0 and x2>=0:

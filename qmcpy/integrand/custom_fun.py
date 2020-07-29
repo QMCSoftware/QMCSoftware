@@ -24,6 +24,7 @@ class CustomFun(Integrand):
             custom_fun (function): a function evaluating samples (nxd) -> (nx1). See g method.
         """
         self.measure = measure
+        self.distribution = measure.distribution
         self.custom_fun = custom_fun
         super(CustomFun,self).__init__()
 

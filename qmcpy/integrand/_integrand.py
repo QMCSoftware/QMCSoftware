@@ -8,6 +8,8 @@ class Integrand(object):
         prefix = 'A concrete implementation of Integrand must have '
         if not hasattr(self, 'measure'):
             raise ParameterError(prefix + 'self.measure (a TrueMeasure instance)')
+        if not hasattr(self, 'distribution'):
+            raise ParameterError(prefix + 'self.distribution (a DiscreteDistribuiton instance)')
         if not hasattr(self,'parameters'):
             self.parameters = []
         self.dimension = self.measure.dimension
@@ -47,3 +49,7 @@ class Integrand(object):
 
     def __repr__(self):
         return _univ_repr(self, "Integrand", self.parameters)
+
+    def plot(self, *args, **kwargs):
+        """ Create a plot relevant to the true measure object. """
+        raise MethodImplementationError(self,'plot')

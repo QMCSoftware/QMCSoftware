@@ -1,8 +1,7 @@
 from ._true_measure import TrueMeasure
 from ..discrete_distribution import Sobol
 from ..util import TransformError, ParameterError
-from numpy import linspace, cumsum, sqrt, log2, ceil, \
-    array, exp, array, dot, diff, argsort, diag, hstack
+from numpy import *
 from scipy.stats import norm
 from scipy.linalg import eigh
 import warnings
@@ -129,3 +128,41 @@ class BrownianMotion(TrueMeasure):
         self.distribution.set_dimension(dimension)
         self.d = dimension
         self._assemble()
+    
+    def plot(self, n=2**5, show=True, out=None):
+        """
+        Plot Brownian Motion value vs time
+        
+        Args:
+            n (int): self.gen_samples(n)
+            show (bool): show the plot?
+            out (str): file name to output image. If None, the image is not output
+            
+        Return:
+            fig,ax (tuple): fig,ax = pyplot.subplots()
+        """
+        tvw0 = hstack((0,self.time_vector)) # time vector including 0
+        x = self.gen_samples(n)
+        xw0 = hstack((zeros((n,1)),x)) # x including 0 and time 0
+        from matplotlib import pyplot
+        pyplot.rc('font', size=16)
+        pyplot.rc('legend', fontsize=16)
+        pyplot.rc('figure', titlesize=16)
+        pyplot.rc('axes', titlesize=16, labelsize=16)
+        pyplot.rc('xtick', labelsize=16)
+        pyplot.rc('ytick', labelsize=16)
+        fig,ax = pyplot.subplots()
+        for i in range(n):
+            ax.plot(tvw0,xw0[i])
+        ax.set_xlim([0,1])
+        ax.set_xticks([0,1])
+        ax.set_xlabel('time')
+        ax.set_ylabel('value')
+        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
+        ax.set_title(s+' Brownian Motion Samples')
+        fig.tight_layout()
+        if out: pyplot.savefig(out,dpi=250)
+        if show: pyplot.show()
+        return fig,ax
+        
+
