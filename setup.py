@@ -5,16 +5,23 @@ from setuptools import Command
 import os
 import subprocess
 
+
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
+
     def run(self):
         # compile c files
-        try: os.system('make qrng')
-        except: print('Problem compiling qrng c files')
+        try:
+            os.system('make qrng')
+        except:
+            print('Problem compiling qrng c files')
         # compile files used for docuemtnation
-        try: os.system('make _doc')
-        except: print('Problem compiling html or pdf documenation')
-        super(CustomInstall,self).run()
+        try:
+            os.system('make _doc')
+        except:
+            print('Problem compiling html or pdf documenation')
+        super(CustomInstall, self).run()
+
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
@@ -29,8 +36,11 @@ class CleanCommand(Command):
     def run(self):
         os.system("rm -vrf ./build ./dist ./*.pyc ./qmcpy/qmcpy.egg-info")
 
-with open("README.md", "r", encoding = "utf-8") as fh:
-    long_description = fh.read()
+try:
+    with open("README.md", "r", encoding="utf-8", errors='ignore') as fh:
+        long_description = fh.read()
+except:
+    long_description = "QMCPy"
 
 packages = [
     'qmcpy',
@@ -64,18 +74,19 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent"],
-    keywords=['quasi','monte','carlo','community','software','cubature','numerical','integration','discrepancy','sobol','lattice'],
+    keywords=['quasi', 'monte', 'carlo', 'community', 'software', 'cubature', 'numerical', 'integration', 'discrepancy',
+              'sobol', 'lattice'],
     python_requires=">=3.5",
     include_package_data=True,
     ext_modules=[
         Extension(
             name='qmcpy.discrete_distribution.qrng.qrng_lib',
             sources=['qmcpy/discrete_distribution/qrng/ghalton.c',
-                    'qmcpy/discrete_distribution/qrng/korobov.c',
-                    'qmcpy/discrete_distribution/qrng/MRG63k3a.c',
-                    'qmcpy/discrete_distribution/qrng/sobol.c'],
-            extra_compile_args=['-fPIC','-shared','-lm'])],
-     cmdclass={
+                     'qmcpy/discrete_distribution/qrng/korobov.c',
+                     'qmcpy/discrete_distribution/qrng/MRG63k3a.c',
+                     'qmcpy/discrete_distribution/qrng/sobol.c'],
+            extra_compile_args=['-fPIC', '-shared', '-lm'])],
+    cmdclass={
         'clean': CleanCommand,
         'install': CustomInstall}
 )
