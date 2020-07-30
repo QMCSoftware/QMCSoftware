@@ -23,6 +23,12 @@ class InverseCDFSampling(DiscreteDistribution):
            [0.294, 0.947],
            [0.623, 0.474],
            [0.075, 0.006]])
+    
+    Math for above example:
+        - $y \\sim \\text{Exp}(l)$
+        - $\\text{pdf }y: f(x) = l*\\exp(-l*x)$
+        - $\\text{cdf }y: F(x)= 1-\\exp(-l*x)$
+        - $F^{-1}(u) = -\\log(1-u)/l \\sim \\text{Exp}(l) \\text{ for } u \\sim \\text{Uniform}(0,1)$
     """
 
     parameters = ['dimension']
@@ -35,13 +41,6 @@ class InverseCDFSampling(DiscreteDistribution):
             inverse_cdf_fun (function): function accepting samples mimicing uniform 
                 and applying inverse CDF transform. Must have 1 input argument accepting an  
                 ndarray of size n (observations) by d (diemsion) 
-        
-        Example of exponential distribution:
-            - y ~ exp(l)
-            - pdf y f(x) = l*exp(-l*x)
-            - cdf y F(x)= 1-exp(-l*x)
-            - F^(-1)(u) = log(1-u)/(-l) ~ exp(l) for u ~ Uniform(0,1)
-            - inverse_cdf_fun = lambda u,l=5: log(1-u)/(-l)
         """
         self.distribution_u = distribution_mimicking_uniform
         self.inverse_cdf_fun = inverse_cdf_fun

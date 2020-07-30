@@ -70,15 +70,15 @@ class Lattice(DiscreteDistribution):
         """
         Args:
             dimension (int): dimension of samples
-            randomize (bool): If True, apply shift to generated samples.
+            randomize (bool): If True, apply shift to generated samples. \
                 Note: Non-randomized lattice sequence includes the origin.
             seed (int): seed the random number generator for reproducibility
-            backend (str): backend generator must be either "GAIL" or "MPS".
+            backend (str): backend generator must be either "GAIL" or "MPS". \
                 "GAIL" provides standard point ordering but is slightly slower than "MPS".
-            gen_vector_info (dict): if not supplied uses generating vector from [5],
-                otherwise, supply a dictionary with the following keys:
-                    "vector": a numpy.ndarray or list of ints comprising the generating vector.
-                    "n_max": maximum number of samples that can be drawn based on this generating vector.
+            gen_vector_info (dict): if not supplied uses generating vector from [5], \
+                otherwise, supply a dictionary with the following keys: \
+                    "vector": a numpy.ndarray or list of ints comprising the generating vector. \
+                    "n_max": maximum number of samples that can be drawn based on this generating vector. \
                 Example: gen_vector_info = {'vector':[1,433461,315689], n_max=2**20}
         """
         self.dimension = dimension

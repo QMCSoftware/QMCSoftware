@@ -70,7 +70,7 @@ class CubMCG(StoppingCriterion):
         to a prescribed error tolerance, _tol_fun:= max(abstol,reltol*|mu|), with
         guaranteed confidence level 1-alpha. If the algorithm terminates without
         showing any warning messages and provides an answer tmu, then the follow
-        inequality would be satisfied: Pr(|mu-tmu| <= _tol_fun) >= 1-alpha
+        inequality would be satisfied: $\Pr(|mu-tmu| <= _tol_fun) >= 1-alpha
     """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']

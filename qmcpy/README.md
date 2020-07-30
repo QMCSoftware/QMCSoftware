@@ -1,6 +1,6 @@
 # QMCPy
 
-The QMCPy framework uses 5 abstract classes that are fleshed out in concrete implementations. Specifically, a user selects an integrand, true measure, discrete distribution, and stopping criterion specific to their Monte Carlo (MC) / quasi-Monte Carlo (qMC) problem. The $5^{th}$ abstract class accumulates data from the stopping criterion and does not need to be instantiated by the user. The following blocks give more detailed descriptions of each abstract class and the available concrete implementations. For specific class names and parameters see the [QMCPy Documentation page](https://qmcpy.readthedocs.io/en/latest/algorithms.html). 
+The QMCPy framework uses 5 abstract classes that are fleshed out in concrete implementations. Specifically, a user selects an integrand, true measure, discrete distribution, and stopping criterion specific to their Monte Carlo (MC) / quasi-Monte Carlo (qMC) problem. The fifth abstract class accumulates data from the stopping criterion and does not need to be instantiated by the user. The following blocks give more detailed descriptions of each abstract class and the available concrete implementations. For specific class names and parameters see the [QMCPy Documentation page](https://qmcpy.readthedocs.io/en/latest/algorithms.html). 
 
 ----
 
@@ -18,7 +18,6 @@ The function to integrate.
     - stock price at time $jT/d=\tau_j$: $~~~~~~~~~$ $S(\tau_j)=S_0\exp\bigl((r-\sigma^2/2)\tau_j+\sigma\mathcal{B}(\tau_j)\bigr)$
     - airthmetic mean: $\gamma(\boldsymbol{\tau})= \frac{1}{2d}\sum_{j=1}^d [S(\tau_{j-1})+S(\tau_j)]$
     - geometric mean: $\gamma(\boldsymbol{\tau}) = \biggl[\prod_{j=1}^d [S(\tau_{j-1})S(\tau_j)]\biggr]^{\frac{1}{2d}}$
-    
     - discounted call payoff $= \max( \gamma(\boldsymbol{\tau})-K,\: 0)\,\exp(-rT)$
     - discounted put payoff $= \max(K-\gamma(\boldsymbol{\tau}),0)\,\exp(-rT)$
 - Multilevel Call Options with Milstein Discretization 
@@ -47,7 +46,7 @@ Sampling nodes.
 
 - Lattice (base 2): $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
 - Sobol' (base 2): $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
-- Generalized Halton: $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
+- Halton: $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
 - Korobov: $\overset{\text{LD}}{\sim}    \mathcal{U}(0,1)^d$
 
 **Independent Identically Distributed (IID) Nodes**
@@ -63,7 +62,7 @@ Sampling nodes.
 ## Stopping Criterion
 
 The stopping criterion to determine sufficient approximation.\
-Has class method `integrate` which preforms numerical integration.
+Has `integrate` method to perform numerical integration.
 
 **qMC Algorithms**
 

@@ -143,10 +143,10 @@ European Option
 .. automodule:: qmcpy.integrand.european_option
     :members:
 
-Asian Call Option
+Asian Option
 .................
 
-.. automodule:: qmcpy.integrand.asian_call
+.. automodule:: qmcpy.integrand.asian_option
     :members:
 
 Multilevel Call Options with Milstein Discretization
@@ -253,27 +253,4 @@ Mean Variance MC Data
 .......................
 
 .. automodule:: qmcpy.accumulate_data.mean_var_data
-    :members:
-
-
-
-Utilities
----------
-
-Math Functions
-..............
-
-.. automodule:: qmcpy.util.math_functions
-    :members:
-
-Exceptions and Warnings
-.........................
-
-.. automodule:: qmcpy.util.exceptions_warnings
-    :members:
-
-Abstraction Functions
-.....................
-
-.. automodule:: qmcpy.util.abstraction_functions
     :members:

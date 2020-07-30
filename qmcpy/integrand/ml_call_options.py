@@ -47,7 +47,7 @@ class MLCallOptions(Integrand):
             measure (TrueMeasure): A BrownianMotion TrueMeasure object
             option_type (str): type of option in ["European","Asian"]
             volatility (float): sigma, the volatility of the asset
-            start_strike_price (float): S(0), the asset value at t=0, and K, the strike price. 
+            start_strike_price (float): S(0), the asset value at t=0, and K, the strike price. \
                 Assume start_price = strike_price
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
@@ -72,7 +72,7 @@ class MLCallOptions(Integrand):
         super(MLCallOptions,self).__init__()
 
     def get_exact_value(self):
-        """ Print exact analytic value, based on s0=k """
+        """ Print exact analytic value, based on s0=k. """
         d1 = (self.r+.5*self.sigma**2)*self.t / (self.sigma*sqrt(self.t))
         d2 = (self.r-0.5*self.sigma**2)*self.t / (self.sigma*sqrt(self.t))
         if self.option == 'european':
@@ -112,9 +112,9 @@ class MLCallOptions(Integrand):
             xc (ndarray): n vector of coarse samples = self.k
 
         Return:
-            tuple: tuple contining:
-                - pf (ndarray): payoffs from fine paths
-                - pc (ndarray): payoffs from coarse paths
+            tuple: \
+                First, an ndarray of payoffs from fine paths. \
+                Second, an ndarray of payoffs from coarse paths.
         """
         dwf = samples * sqrt(hf)
         if l == 0:
@@ -148,9 +148,9 @@ class MLCallOptions(Integrand):
             xc (ndarray): n vector of coarse samples = self.k  
         
         Return:
-            tuple: tuple contining:
-                - pf (ndarray): payoffs from fine paths
-                - pc (ndarray): payoffs from coarse paths
+            tuple: \
+                First, an ndarray of payoffs from fine paths. \
+                Second, an ndarray of payoffs from coarse paths. 
         """
         af = .5*hf*xf
         ac = .5*hc*xc
@@ -189,9 +189,9 @@ class MLCallOptions(Integrand):
             samples (ndarray): Gaussian(0,1^2) samples
             l (int): level
         Returns:
-            tuple: 
-                - ndarray of length 6 vector of summary statistic sums. 
-                - float of cost on this level.
+            tuple: \
+                First, an ndarray of length 6 vector of summary statistic sums. \
+                Second, a float of cost on this level.
         """
         n,d = samples.shape        
         nf = 2**l # n fine
