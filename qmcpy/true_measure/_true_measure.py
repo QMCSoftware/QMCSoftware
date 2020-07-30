@@ -69,3 +69,7 @@ class TrueMeasure(object):
 
     def __repr__(self):
         return _univ_repr(self, "TrueMeasure", self.parameters)
+    
+    def plot(self, *args, **kwargs):
+        """ Create a plot relevant to the true measure object. """
+        raise MethodImplementationError(self,'plot')

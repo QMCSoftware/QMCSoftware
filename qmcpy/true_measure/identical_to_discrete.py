@@ -1,5 +1,6 @@
 from ._true_measure import TrueMeasure
 from ..discrete_distribution import Sobol
+from ..util import ParameterError
 
 
 class IdentitalToDiscrete(TrueMeasure):
@@ -35,3 +36,8 @@ class IdentitalToDiscrete(TrueMeasure):
     def gen_samples(self, *args, **kwargs):
         """ See abstract method. """
         return self.distribution.gen_samples(*args,**kwargs)
+
+    def plot(self, *args, **kwargs):
+        """ Throw error if trying to plot. """
+        raise ParameterError('No plotting method for IdenticalToDiscrete. ' +\
+            'Try plotting %s directly.'%type(self.distribution).__name__)

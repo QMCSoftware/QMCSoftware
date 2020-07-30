@@ -49,3 +49,7 @@ class Integrand(object):
 
     def __repr__(self):
         return _univ_repr(self, "Integrand", self.parameters)
+
+    def plot(self, *args, **kwargs):
+        """ Create a plot relevant to the true measure object. """
+        raise MethodImplementationError(self,'plot')

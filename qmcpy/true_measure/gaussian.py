@@ -1,5 +1,5 @@
 from ._true_measure import TrueMeasure
-from ..util import TransformError,DimensionError
+from ..util import TransformError,DimensionError, ParameterError
 from ..discrete_distribution import Sobol
 from numpy import *
 from numpy.linalg import cholesky, det, inv, eigh

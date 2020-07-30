@@ -113,6 +113,7 @@ Identical to what Discrete Distribution Mimics
 .. automodule:: qmcpy.true_measure.identical_to_discrete
     :members:
     
+
     
 
 Integrand Class

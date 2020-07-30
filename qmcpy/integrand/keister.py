@@ -33,6 +33,7 @@ class Keister(Integrand):
         self.measure = measure
         self.distribution = self.measure.distribution
         self.dimension = self.measure.dimension
+        self.distribution = self.measure.distribution
         super(Keister,self).__init__()
 
     def g(self, x):
