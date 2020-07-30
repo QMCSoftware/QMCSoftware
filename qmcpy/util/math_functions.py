@@ -1,4 +1,4 @@
-""" Math functions used across various algorithms """
+""" Math functions used across various algorithms. """
 
 def _tol_fun(abs_tol, rel_tol, theta, mu, toltype):
     """

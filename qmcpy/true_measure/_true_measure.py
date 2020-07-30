@@ -1,5 +1,4 @@
 from ..util import MethodImplementationError, _univ_repr, DimensionError
-from copy import deepcopy
 
 
 class TrueMeasure(object):

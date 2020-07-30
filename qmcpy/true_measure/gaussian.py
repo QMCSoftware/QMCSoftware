@@ -1,7 +1,7 @@
 from ._true_measure import TrueMeasure
 from ..util import TransformError,DimensionError
 from ..discrete_distribution import Sobol
-from numpy import array, sqrt, eye, dot, pi, exp,dot, tile, isscalar, diag, argsort
+from numpy import *
 from numpy.linalg import cholesky, det, inv, eigh
 from scipy.stats import norm
 
@@ -133,3 +133,40 @@ class Gaussian(TrueMeasure):
         self.mu = tile(m,int(self.d))
         self.sigma = c*eye(int(self.d))
         self._assemble()
+    
+    def plot(self, dim_x=0, dim_y=1, n=2**7, point_size=5, color='c', show=True, out=None):
+        """
+        Make a scatter plot from samples. Requires dimension >= 2. 
+
+        Args:
+            dim_x (int): index of first dimension to be plotted on horizontal axis. 
+            dim_y (int): index of the second dimension to be plotted on vertical axis.
+            n (int): number of samples to draw as self.gen_samples(n)
+            point_size (int): ax.scatter(...,s=point_size)
+            color (str): ax.scatter(...,color=color)
+            show (bool): show plot or not? 
+            out (str): file name to output image. If None, the image is not output
+
+        Return: 
+            tuple: fig,ax from `fig,ax = matplotlib.pyplot.subplots(...)`
+        """
+        if self.dimension < 2:
+            raise ParameterError('Plotting a Gaussian instance requires dimension >=2. ')
+        x = self.gen_samples(n)
+        from matplotlib import pyplot
+        pyplot.rc('font', size=16)
+        pyplot.rc('legend', fontsize=16)
+        pyplot.rc('figure', titlesize=16)
+        pyplot.rc('axes', titlesize=16, labelsize=16)
+        pyplot.rc('xtick', labelsize=16)
+        pyplot.rc('ytick', labelsize=16)
+        fig,ax = pyplot.subplots()
+        ax.set_xlabel('$x_{i,%d}$'%dim_x)
+        ax.set_ylabel('$x_{i,%d}$'%dim_y)
+        ax.scatter(x[:,dim_x],x[:,dim_y],color=color,s=point_size)
+        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n
+        ax.set_title(s+' Gaussian Samples')
+        fig.tight_layout()
+        if out: pyplot.savefig(out,dpi=250)
+        if show: pyplot.show()
+        return fig,ax

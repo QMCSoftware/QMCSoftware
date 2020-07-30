@@ -4,7 +4,7 @@ from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
-from numpy import log2, hstack, tile, exp, pi, arange
+from numpy import *
 from time import time
 import warnings
 
@@ -44,10 +44,12 @@ class CubQMCLatticeG(StoppingCriterion):
         error_hat       0.005
         time_integrate  ...
 
-    Adapted from 
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
+    Original Implementation:
 
-    Reference
+        [a] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
+
+    References:
+
         [1] Lluis Antoni Jimenez Rugama and Fred J. Hickernell, 
         "Adaptive multidimensional integration based on rank-1 lattices," 
         Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, 

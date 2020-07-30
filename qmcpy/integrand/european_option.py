@@ -8,6 +8,8 @@ from scipy.stats import norm
 
 class EuropeanOption(Integrand):
     """
+    European financial option. 
+
     >>> dd = Sobol(4,seed=7)
     >>> m = BrownianMotion(dd,drift=-1)
     >>> eo = EuropeanOption(m,call_put='put')
@@ -39,6 +41,7 @@ class EuropeanOption(Integrand):
         if not isinstance(measure,BrownianMotion):
             raise ParameterError('EuropeanCall measure must be a BrownianMotion instance')
         self.measure = measure
+        self.distribution = self.measure.distribution
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
@@ -65,8 +68,7 @@ class EuropeanOption(Integrand):
     
     def get_exact_value(self):
         """
-        Get the fair price of a European call/put option 
-        under geometric Brownain Motion.
+        Get the fair price of a European call/put option.
         
         Return:
             float: fair price

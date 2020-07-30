@@ -1,9 +1,10 @@
 from ._discrete_distribution import DiscreteDistribution
 from numpy import random
 
-
 class CustomIIDDistribution(DiscreteDistribution):
     """
+    Custom IID Discrte Distribution.
+
     >>> random.seed(7)
     >>> cd = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,3)))
     >>> cd

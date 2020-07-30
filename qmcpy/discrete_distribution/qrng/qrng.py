@@ -3,12 +3,13 @@
 Interfaces to quasi-random sequences in C.
 
 References
-    Marius Hofert and Christiane Lemieux (2019). 
+    
+    [1] Marius Hofert and Christiane Lemieux (2019). 
     qrng: (Randomized) Quasi-Random Number Generators. 
     R package version 0.0-7.
     https://CRAN.R-project.org/package=qrng.
 
-    Faure, Henri, and Christiane Lemieux. 
+    [2] Faure, Henri, and Christiane Lemieux. 
     “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” 
     Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
 """
@@ -73,8 +74,8 @@ def korobov_qrng(n, d, generator, randomize, seed):
         randomize (boolean): random shift
         seed (int): random number generator seed
     
-    Return:
-        result (ndarray): (n, d)-matrix containing the quasi-random sequence
+    Returns:
+        ndarray: (n, d)-matrix containing the quasi-random sequence
     """
     generator = numpy.array(generator, dtype=numpy.int32)
     l = len(generator)
@@ -104,8 +105,8 @@ def ghalton_qrng(n, d, generalize, seed):
             (generalized Halton (1) or (plain) Halton (0))
         seed (int): random number generator seed
     
-    Return:
-        res (ndarray): an (n, d)-matrix containing the quasi-random sequence
+    Returns:
+        ndarray: an (n, d)-matrix containing the quasi-random sequence
     """
     if not(n >= 1 and d >= 1):
         raise Exception('ghalton_qrng input error')
@@ -130,8 +131,8 @@ def sobol_qrng(n, d, shift, skip, graycode, seed):
         graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
         seed (int): random number generator seed
 
-    Return:
-        res (ndarray): an (n, d)-matrix containing the quasi-random sequence
+    Returns:
+        ndarray: an (n, d)-matrix containing the quasi-random sequence
     """
     if not (n >= 1 and d >= 1 and skip >= 0):
         raise Exception('sobol_qrng input error')

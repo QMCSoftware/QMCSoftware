@@ -1,15 +1,12 @@
 from ._accumulate_data import AccumulateData
-from numpy import tile, zeros, random, inf, hstack, vstack
+from numpy import *
+
 
 class MLQMCData(AccumulateData):
     """
     Accumulated data for quasi-random sequence calculations,
     and store multi-level, multi-replications mean, variance, and cost values. 
-
-    Reference:
-        M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'.
-        pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics,
-        de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
+    See the stopping criterion that utilize this object for references.
     """
 
     parameters = ['levels','dimensions','n_level','mean_level','var_level','bias_estimate','n_total']

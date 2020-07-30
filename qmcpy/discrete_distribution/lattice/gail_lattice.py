@@ -1,11 +1,13 @@
 """
-Lattice Generator copied from GAIL (http://gailgithub.github.io/GAIL_Dev/)
+Lattice Generator from GAIL (http://gailgithub.github.io/GAIL_Dev/)
 
-Adapted from
-    https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/vdc.m
-    https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/lattice_gen.m
+Original Implementations:
 
-Reference:
+    [a] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/vdc.m
+    
+    [b] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/lattice_gen.m
+
+References:
 
     [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
     Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
@@ -47,6 +49,9 @@ def gail_lattice_gen(n_min, n_max, d, z):
         n_min (int): minimum index.
         n_max (int): maximum index (not inclusive). 
         z (int): length d generating vector.
+    
+    Returns:
+        ndarray: n samples by d dimensions array of lattice samples
     """
     m_low = floor(log2(n_min))+1 if n_min > 0 else 0
     m_high = ceil(log2(n_max))

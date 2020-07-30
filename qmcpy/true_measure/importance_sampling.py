@@ -2,15 +2,13 @@ from ._true_measure import TrueMeasure
 from ..util import TransformError
 from . import Uniform
 from ..discrete_distribution import Lattice
-from numpy import apply_along_axis, sqrt, pi
+from numpy import *
 
 
 class ImportanceSampling(TrueMeasure):
     """
-    Define
-        - m(x) is pdf of measure we do not know how to generate from (mystery) 
-        - k(x) is the pdf of the continuous distribution which the discrete distribution mimics (known)
-    
+    Importance Sampling. 
+
     >>> def quarter_circle_uniform_pdf(x):
     ...     x1,x2 = x
     ...     if sqrt(x1**2+x2**2)<1 and x1>=0 and x2>=0:

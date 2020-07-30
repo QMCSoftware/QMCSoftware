@@ -1,10 +1,12 @@
 from ._accumulate_data import AccumulateData
-from numpy import array, finfo, float32, full, inf, nan, tile, zeros, random
-
-EPS = finfo(float32).eps
+from numpy import *
 
 
 class MeanVarDataRep(AccumulateData):
+    """
+    Update and store mean and variance estimates with repliations. 
+    See the stopping criterion that utilize this object for references.
+    """
 
     parameters = ['replications','solution','sighat','n_total','error_hat','confid_int']
 

@@ -4,7 +4,7 @@ from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError
-from numpy import argmax, sqrt
+from numpy import *
 from scipy.stats import norm
 from time import time
 import warnings
@@ -12,7 +12,7 @@ import warnings
 
 class CubQMCML(StoppingCriterion):
     """
-    Stopping criterion based on multi-level quasi-monte carlo
+    Stopping criterion based on multi-level quasi-Monte Carlo.
 
     >>> mlco = MLCallOptions(Gaussian(Lattice(seed=7)))
     >>> sc = CubQMCML(mlco,abs_tol=.05)
@@ -53,7 +53,7 @@ class CubQMCML(StoppingCriterion):
         n_total         188416
         time_integrate  ...
     
-    Reference:
+    References:
         
         [1] M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'.
         pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics,

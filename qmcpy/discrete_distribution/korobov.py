@@ -31,8 +31,9 @@ class Korobov(DiscreteDistribution):
         seed            2^(3)
         mimics          StdUniform
 
-    References
-        Marius Hofert and Christiane Lemieux (2019). 
+    References:
+
+        [1] Marius Hofert and Christiane Lemieux (2019). 
         qrng: (Randomized) Quasi-Random Number Generators. 
         R package version 0.0-7.
         https://CRAN.R-project.org/package=qrng.

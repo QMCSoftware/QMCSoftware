@@ -2,11 +2,13 @@ from ._discrete_distribution import DiscreteDistribution
 from . import IIDStdUniform
 from ..true_measure import Uniform
 from ..util import TransformError
-from numpy import inf, zeros, random, array, apply_along_axis
+from numpy import *
 
 
 class AcceptanceRejectionSampling(DiscreteDistribution):
     """
+    Acceptance Rejection Sampling.
+
     >>> def f(x):
     ...     x = x if x<.5 else 1-x
     ...     density = float(16*x)/3 if x<1./4 else 4./3
@@ -30,11 +32,11 @@ class AcceptanceRejectionSampling(DiscreteDistribution):
     >>> x.shape
     (5, 1)
 
-    Define
+    Define:
         - $\rho$(x) is pdf of measure we do not know how to generate from (mystery)
         - $\nu$(x) is the pdf of the continuous distribution which the discrete distribution mimics (known)
     
-    Prodecure 
+    Prodecure:
         1. samples s_i from $\nu$(x)
         2. samples u_i from Uniform(0,1)
         3. if u_i <= $\rho$(s_i)/(c*$\nu$(s_i)) ==> keep s_i

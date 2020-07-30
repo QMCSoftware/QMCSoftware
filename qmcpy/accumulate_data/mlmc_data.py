@@ -1,5 +1,5 @@
 from ._accumulate_data import AccumulateData
-from numpy import zeros, absolute, maximum, tile, array, log2, arange, ones
+from numpy import *
 from numpy.linalg import lstsq
 
 
@@ -7,15 +7,11 @@ class MLMCData(AccumulateData):
     """
     Accumulated data for IIDDistribution calculations,
     and store multi-level mean, variance, and cost values.
-
-    Reference:
-        M.B. Giles. 'Multi-level Monte Carlo path simulation'. 
-        Operations Research, 56(3):607-617, 2008.
-        http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
+    See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['levels','dimensions','n_level','mean_level','var_level','cost_per_sample','n_total',
-        'alpha','beta','gamma']
+    parameters = ['levels','dimensions','n_level','mean_level','var_level',
+        'cost_per_sample','n_total','alpha','beta','gamma']
 
     def __init__(self, stopping_criterion, integrand, levels_init, n_init, alpha0, beta0, gamma0):
         """

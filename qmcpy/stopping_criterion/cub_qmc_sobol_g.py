@@ -4,7 +4,7 @@ from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
 from ..discrete_distribution import Sobol
 from ..true_measure import Gaussian
 from ..integrand import Keister
-from numpy import log2, hstack, tile
+from numpy import *
 from time import time
 import warnings
 
@@ -45,10 +45,12 @@ class CubQMCSobolG(StoppingCriterion):
         error_hat       0.006
         time_integrate  ...
 
-    Adapted from
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
+    Original Implementation:
 
-    Reference
+        [a] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
+
+    References:
+
         [1] Fred J. Hickernell and Lluis Antoni Jimenez Rugama, 
         Reliable adaptive cubature using digital sequences, 2014. 
         Submitted for publication: arXiv:1410.8615.
@@ -58,7 +60,7 @@ class CubQMCSobolG(StoppingCriterion):
         GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
         Available from http://gailgithub.github.io/GAIL_Dev/
 
-    Guarantee
+    Guarantee:
         This algorithm computes the integral of real valued functions in $[0,1]^d$
         with a prescribed generalized error tolerance. The Fourier coefficients
         of the integrand are assumed to be absolutely convergent. If the

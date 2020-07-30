@@ -4,7 +4,7 @@ from ..true_measure import Gaussian
 
 class CustomFun(Integrand):
     """
-    Specify and generate values of a user-defined function
+    Custom user-supplied function handle. 
     
     >>> dd = Sobol(2,seed=7)
     >>> m = Gaussian(dd,mean=[1,2])
@@ -24,6 +24,7 @@ class CustomFun(Integrand):
             custom_fun (function): a function evaluating samples (nxd) -> (nx1). See g method.
         """
         self.measure = measure
+        self.distribution = self.measure.distribution
         self.custom_fun = custom_fun
         super(CustomFun,self).__init__()
 

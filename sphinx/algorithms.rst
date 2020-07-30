@@ -3,51 +3,69 @@ QMCPy Documentation
 
 
 
-Integrand Class
----------------
+Discrete Distribution Class
+---------------------------
 
-Abstract Integrand Class
-........................
+Abstract Discrete Distribution Class
+....................................
 
-.. automodule:: qmcpy.integrand._integrand
+.. automodule:: qmcpy.discrete_distribution._discrete_distribution
     :members:
 
-Keister Function
-................
+Lattice
+.......
 
-.. automodule:: qmcpy.integrand.keister
+.. automodule:: qmcpy.discrete_distribution.lattice.lattice
     :members:
 
-Custom Function
-...............
+Sobol'
+.......
 
-.. automodule:: qmcpy.integrand.custom_fun
+.. automodule:: qmcpy.discrete_distribution.sobol.sobol
     :members:
 
-European Option
-...............
+Halton
+......
 
-.. automodule:: qmcpy.integrand.european_option
+.. automodule:: qmcpy.discrete_distribution.halton.halton
     :members:
 
-Asian Call Option
-.................
+Korobov
+.......
 
-.. automodule:: qmcpy.integrand.asian_call
+.. automodule:: qmcpy.discrete_distribution.korobov
     :members:
 
-Multilevel Call Options with Milstein Discretization
-.....................................................
+IID Standard Uniform
+....................
 
-.. automodule:: qmcpy.integrand.ml_call_options
+.. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
-Linear Function
-...............
+IID Standard Gaussian
+.....................
 
-.. automodule:: qmcpy.integrand.linear
+.. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
     :members:
 
+Custom IID Distribution
+.......................
+
+.. automodule:: qmcpy.discrete_distribution.custom_iid_distribution
+    :members:
+
+Inverse CDF Sampling
+....................
+
+.. automodule:: qmcpy.discrete_distribution.inverse_cdf_sampling
+    :members:
+
+Acceptance Rejection Sampling
+.............................
+
+.. automodule:: qmcpy.discrete_distribution.acceptance_rejection_sampling
+    :members:
+    
 
 
 True Measure Class
@@ -94,70 +112,52 @@ Identical to what Discrete Distribution Mimics
 
 .. automodule:: qmcpy.true_measure.identical_to_discrete
     :members:
+    
+    
 
+Integrand Class
+---------------
 
+Abstract Integrand Class
+........................
 
-Discrete Distribution Class
----------------------------
-
-Abstract Discrete Distribution Class
-....................................
-
-.. automodule:: qmcpy.discrete_distribution._discrete_distribution
+.. automodule:: qmcpy.integrand._integrand
     :members:
 
-Lattice
-.......
+Keister Function
+................
 
-.. automodule:: qmcpy.discrete_distribution.lattice.lattice
+.. automodule:: qmcpy.integrand.keister
     :members:
 
-Sobol'
-.......
+Custom Function
+...............
 
-.. automodule:: qmcpy.discrete_distribution.sobol.sobol
+.. automodule:: qmcpy.integrand.custom_fun
     :members:
 
-Halton
-......
+European Option
+...............
 
-.. automodule:: qmcpy.discrete_distribution.halton
+.. automodule:: qmcpy.integrand.european_option
     :members:
 
-Korobov
-.......
+Asian Call Option
+.................
 
-.. automodule:: qmcpy.discrete_distribution.korobov
+.. automodule:: qmcpy.integrand.asian_call
     :members:
 
-IID Standard Uniform
-....................
+Multilevel Call Options with Milstein Discretization
+.....................................................
 
-.. automodule:: qmcpy.discrete_distribution.iid_std_uniform
+.. automodule:: qmcpy.integrand.ml_call_options
     :members:
 
-IID Standard Gaussian
-.....................
+Linear Function
+...............
 
-.. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
-    :members:
-
-Custom IID Distribution
-.......................
-
-.. automodule:: qmcpy.discrete_distribution.custom_iid_distribution
-    :members:
-
-Inverse CDF Sampling
-....................
-
-.. automodule:: qmcpy.discrete_distribution.inverse_cdf_sampling
-    :members:
-
-Acceptance Rejection Sampling
-.............................
-
-.. automodule:: qmcpy.discrete_distribution.acceptance_rejection_sampling
+.. automodule:: qmcpy.integrand.linear
     :members:
 
 

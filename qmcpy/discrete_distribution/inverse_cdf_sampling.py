@@ -1,10 +1,14 @@
 from ._discrete_distribution import DiscreteDistribution
 from . import Sobol
 from ..util import TransformError
-from numpy import exp, log
+from numpy import *
+
 
 class InverseCDFSampling(DiscreteDistribution):
     """
+    Sampling by inverse CDF transform applied to 
+    discrete distribution samples mimics standard uniform. 
+
     >>> _lambda = 1.5
     >>> exp_pdf = lambda x,l=_lambda: l*exp(-l*x)
     >>> exp_inverse_cdf = lambda u,l=_lambda: -log(1-u)/l
@@ -34,7 +38,7 @@ class InverseCDFSampling(DiscreteDistribution):
         
         Example of exponential distribution:
             - y ~ exp(l)
-            -  pdf y f(x) = l*exp(-l*x)
+            - pdf y f(x) = l*exp(-l*x)
             - cdf y F(x)= 1-exp(-l*x)
             - F^(-1)(u) = log(1-u)/(-l) ~ exp(l) for u ~ Uniform(0,1)
             - inverse_cdf_fun = lambda u,l=5: log(1-u)/(-l)

@@ -37,7 +37,8 @@ class Lattice(DiscreteDistribution):
     array([[0.25, 0.75],
            [0.75, 0.25]])
 
-    References
+    References:
+        
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang,
         Lluis Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel,
         Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,

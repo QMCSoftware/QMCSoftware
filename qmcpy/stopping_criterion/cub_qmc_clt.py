@@ -5,7 +5,7 @@ from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
-from numpy import array, log2, sqrt
+from numpy import *
 from scipy.stats import norm
 from time import time
 import warnings

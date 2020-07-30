@@ -1,9 +1,11 @@
 """
 Sobol (Digital) sequence generator from Magic Point Shop (https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/)
 
-Adapted from https://bitbucket.org/dnuyens/qmc-generators/src/master/python/digitalseq_b2g.py
+Original Implementation:
 
-Reference:
+    [a] https://bitbucket.org/dnuyens/qmc-generators/src/master/python/digitalseq_b2g.py
+
+References:
     
     [1] F.Y. Kuo & D. Nuyens.
     Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients 
@@ -16,7 +18,8 @@ Reference:
     vectors.` MATLAB and Python software, 2018. Available from
     https://people.cs.kuleuven.be/~dirk.nuyens/
 
-Note that mps_sobol_Cs.col is the corresponding basis vector for this algorithm
+Note:
+    mps_sobol_Cs.col is the corresponding basis vector for this algorithm
 """
 
 from copy import copy
@@ -175,7 +178,6 @@ class DigitalSeq():
         Note: The generating matrices Cs which are passed in are available as
         the Csr field of this object, but note that they have been bit
         reversed.
-
         """
         basestr = str  # basestr for python2, str for python3
         if isinstance(Cs, basestr):
@@ -199,11 +201,11 @@ class DigitalSeq():
         self.reset()
 
     def reset(self):
-        """Reset this digital sequence to its initial state: next index = kstart."""
+        """ Reset this digital sequence to its initial state: next index = kstart. """
         self.set_state(self.kstart)
 
     def set_state(self, k):
-        """Set the index of the next point to k."""
+        """ Set the index of the next point to k. """
         self.k = int(k - 1) # self.k is the previous point, this means we have exceptional behaviour for kstart = 0
         self.cur = [ 0 for i in range(self.s) ]
         self.x = [ 0 for i in range(self.s) ]
@@ -217,7 +219,7 @@ class DigitalSeq():
             self.x[j] = self.recipd * self.cur[j]
 
     def calc_next(self):
-        """Calculate the next sequence point and update the index counter."""
+        """ Calculate the next sequence point and update the index counter. """
         self.k = self.k + 1
         if self.k == 0: return True
         ctz = (((self.k ^ (self.k-1)) + 1) >> 1).bit_length() - 1
@@ -232,7 +234,7 @@ class DigitalSeq():
         return self
 
     def __next__(self):
-        """Return the next point of the sequence or raise StopIteration."""
+        """ Return the next point of the sequence or raise StopIteration. """
         if self.k < self.n - 1:
             self.calc_next()
             return self.x

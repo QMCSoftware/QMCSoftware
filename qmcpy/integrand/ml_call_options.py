@@ -2,13 +2,13 @@ from ._integrand import Integrand
 from ..discrete_distribution import Sobol
 from ..true_measure import Gaussian
 from ..util import ParameterError
-from numpy import sqrt, exp, log, zeros, maximum, minimum, tile, random, eye, log2
+from numpy import *
 from scipy.stats import norm
 
 
 class MLCallOptions(Integrand):
     """
-    Various call options from finance using Milstein discretization with 2^l timesteps on level l
+    Various call options from finance using Milstein discretization with $2^l$ timesteps on level $l$.
 
     >>> dd = Sobol(seed=7)
     >>> m = Gaussian(dd)
@@ -31,8 +31,9 @@ class MLCallOptions(Integrand):
     >>> y
     10.395655881343158
 
-    Reference:
-        M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'.
+    References:
+
+        [1] M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'.
         343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008.
         http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
     """
@@ -58,7 +59,8 @@ class MLCallOptions(Integrand):
         if self.option not in options:
             raise ParameterError('option type must be one of\n\t%s'%str(options)) 
         self.measure = measure
-        if self.measure.distribution.low_discrepancy and self.option=='asian':
+        self.distribution = self.measure.distribution
+        if self.distribution.low_discrepancy and self.option=='asian':
             raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
         self.sigma = volatility
         self.k = start_strike_price
@@ -186,9 +188,10 @@ class MLCallOptions(Integrand):
         Args:
             samples (ndarray): Gaussian(0,1^2) samples
             l (int): level
-        Return:
-            sums (ndarray): length 6 vector of summary statistic sums  
-            cost (float): cost on this level 
+        Returns:
+            tuple: 
+                - ndarray of length 6 vector of summary statistic sums. 
+                - float of cost on this level.
         """
         n,d = samples.shape        
         nf = 2**l # n fine

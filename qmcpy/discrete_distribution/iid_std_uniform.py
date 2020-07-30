@@ -4,6 +4,8 @@ from numpy import random
 
 class IIDStdUniform(DiscreteDistribution):
     """
+    A wrapper around NumPy's IID Standard Uniform generator `numpy.random.rand`.
+
     >>> dd = IIDStdUniform(dimension=2,seed=7)
     >>> dd
     IIDStdUniform (DiscreteDistribution Object)

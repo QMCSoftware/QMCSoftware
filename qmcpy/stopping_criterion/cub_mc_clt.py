@@ -4,7 +4,7 @@ from ..discrete_distribution import IIDStdGaussian
 from ..true_measure import Gaussian, BrownianMotion
 from ..integrand import Keister, AsianOption
 from ..util import MaxSamplesWarning
-from numpy import array, ceil, floor, maximum
+from numpy import *
 from scipy.stats import norm
 from time import time
 import warnings

@@ -4,7 +4,7 @@ from .._discrete_distribution import DiscreteDistribution
 from .mps_sobol import DigitalSeq
 from ..qrng import sobol_qrng
 from ...util import ParameterError, ParameterWarning
-from numpy import array, int64, log2, repeat, zeros, random
+from numpy import *
 import warnings
 
 
@@ -39,7 +39,8 @@ class Sobol(DiscreteDistribution):
     array([[0.25, 0.75],
            [0.75, 0.25]])
            
-    References
+    References:
+
         [1] Marius Hofert and Christiane Lemieux (2019). 
         qrng: (Randomized) Quasi-Random Number Generators. 
         R package version 0.0-7.
@@ -116,6 +117,9 @@ class Sobol(DiscreteDistribution):
         Args:
             n_min (int): minimum index. Must be 0 or n_max/2
             n_max (int): maximum index (not inclusive)
+        
+        Returns:
+            ndarray: n samples by d dimension array of Sobol' samples
         """
         n = int(n_max-n_min)
         x_sob = sobol_qrng(n,self.dimension,self.randomize,skip=int(n_min),graycode=self.graycode,seed=self.seed)
@@ -128,6 +132,9 @@ class Sobol(DiscreteDistribution):
         Args:
             n_min (int): minimum index. Must be 0 or n_max/2
             n_max (int): maximum index (not inclusive)
+        
+        Returns:
+            ndarray: n samples by d dimension array of Sobol' samples
         """
         n = int(n_max-n_min)
         x_sob = zeros((n, self.dimension), dtype=int64)
@@ -146,6 +153,9 @@ class Sobol(DiscreteDistribution):
         Args:
             n_min (int): minimum index.
             n_max (int): maximum index. 
+        
+        Returns:
+            ndarray: n samples by d dimension array of Sobol' samples
         """
         import torch
         from torch.quasirandom import SobolEngine

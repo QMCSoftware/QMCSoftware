@@ -7,6 +7,8 @@ from numpy import *
 
 class AsianOption(Integrand):
     """
+    Asian financial option. 
+
     >>> dd = Sobol(4,seed=7)
     >>> m = BrownianMotion(dd)
     >>> ac = AsianOption(m)
@@ -66,6 +68,7 @@ class AsianOption(Integrand):
         if not isinstance(measure,BrownianMotion):
             raise ParameterError('AsianOption measure must be a BrownianMotion instance')
         self.measure = measure
+        self.distribution = self.measure.distribution
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)

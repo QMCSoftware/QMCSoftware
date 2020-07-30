@@ -8,7 +8,7 @@ from numpy import random
 
 class Halton(DiscreteDistribution):
     """
-    Quasi-Random Generalize Halton nets.
+    Quasi-Random Halton nets.
 
     >>> h = Halton(2,seed=7)
     >>> h.gen_samples(1)
@@ -28,13 +28,14 @@ class Halton(DiscreteDistribution):
         backend         owen
         mimics          StdUniform
     
-    References
-        Marius Hofert and Christiane Lemieux (2019). 
+    References:
+
+        [1] Marius Hofert and Christiane Lemieux (2019). 
         qrng: (Randomized) Quasi-Random Number Generators. 
         R package version 0.0-7.
         https://CRAN.R-project.org/package=qrng.
-
-        Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
+        
+        [2] Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
     """
 
     parameters = ['dimension','generalize','seed','backend','mimics']
@@ -51,8 +52,7 @@ class Halton(DiscreteDistribution):
             seed (int): seed the random number generator for reproducibility
         
         Note:
-            Halton instances are automatically randomized. 
-            See 'QRNG' and 'Owen' backend references for specific randomization methods and differences. 
+            See References [1] and [2] for specific randomization methods and differences. 
         """
         self.dimension = dimension
         self.generalize = generalize

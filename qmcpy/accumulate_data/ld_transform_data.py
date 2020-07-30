@@ -1,10 +1,14 @@
 from ._accumulate_data import AccumulateData
 from ..util import CubatureWarning
-from numpy import array, nan, zeros, tile, inf, hstack, arange, where
+from numpy import *
 import warnings
 
 
 class LDTransformData(AccumulateData):
+    """
+    Update and store transformation data based on low-discrepancy sequences. 
+    See the stopping criterion that utilize this object for references.
+    """
 
     parameters = ['n_total','solution','error_hat']
 

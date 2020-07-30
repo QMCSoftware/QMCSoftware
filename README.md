@@ -122,6 +122,8 @@ Then setup Sphinx paths (only needs to be run once for initialization)
 make _doc
 ~~~
 
+You will also need to install pandoc and have a latex distribution installed on your machine. 
+
 Finally, run one of the following three commands:
 
 ~~~

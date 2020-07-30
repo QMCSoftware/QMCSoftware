@@ -5,7 +5,7 @@ from ..integrand import Keister
 from ..true_measure import Gaussian
 from ..discrete_distribution import IIDStdUniform
 from ..util import _tol_fun, MaxSamplesWarning, NotYetImplemented
-from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
+from numpy import *
 from scipy.optimize import fsolve
 from scipy.stats import norm
 from time import time
@@ -14,7 +14,7 @@ import warnings
 
 class CubMCG(StoppingCriterion):
     """
-    Stopping criterion with guaranteed accuracy
+    Stopping criterion with guaranteed accuracy. 
 
     >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
     >>> sc = CubMCG(k,abs_tol=.05)
@@ -48,10 +48,12 @@ class CubMCG(StoppingCriterion):
         confid_int      [1.754 1.854]
         time_integrate  ...
     
-    Adapted from
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
+    Original Implementation:
 
-    Reference:
+        [a] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
+
+    References:
+
         [1] Fred J. Hickernell, Lan Jiang, Yuewei Liu, and Art B. Owen, "Guaranteed
         conservative fixed width confidence intervals via Monte Carlo
         sampling," Monte Carlo and Quasi-Monte Carlo Methods 2012 (J. Dick, F.
@@ -63,7 +65,7 @@ class CubMCG(StoppingCriterion):
         GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
         Available from http://gailgithub.github.io/GAIL_Dev/
 
-    Guarantee
+    Guarantee:
         This algorithm attempts to calculate the mean, mu, of a random variable
         to a prescribed error tolerance, _tol_fun:= max(abstol,reltol*|mu|), with
         guaranteed confidence level 1-alpha. If the algorithm terminates without

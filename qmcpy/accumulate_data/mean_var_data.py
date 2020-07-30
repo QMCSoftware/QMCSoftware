@@ -1,14 +1,14 @@
 from ._accumulate_data import AccumulateData
 from ..integrand._integrand import Integrand
 from time import time
-from numpy import array, finfo, float32, full, inf, nan, tile, zeros
-
-EPS = finfo(float32).eps
+from numpy import *
 
 
 class MeanVarData(AccumulateData):
+    """ Update and store mean and variance estimates. """
 
     parameters = ['levels','solution','n','n_total','error_hat','confid_int']
+    EPS = finfo(float32).eps
 
     def __init__(self, stopping_criterion, integrand, n_init):
         """
@@ -50,7 +50,7 @@ class MeanVarData(AccumulateData):
             else:
                 samples = self.distribution.gen_samples(n=self.n[l])
                 y = self.integrand.f(samples).squeeze()
-            self.t_eval[l] = max( (time()-t_start)/self.n[l], EPS) 
+            self.t_eval[l] = max( (time()-t_start)/self.n[l], self.EPS) 
             self.sighat[l] = y.std() # compute the sample standard deviation
             self.muhat[l] = y.mean() # compute the sample mean
             self.n_total += self.n[l] # add to total samples

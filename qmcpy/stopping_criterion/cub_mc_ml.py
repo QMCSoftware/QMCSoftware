@@ -4,7 +4,7 @@ from ..discrete_distribution import IIDStdGaussian
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
-from numpy import ceil, sqrt, arange, minimum, maximum, hstack, zeros
+from numpy import *
 from scipy.stats import norm
 from time import time
 import warnings
@@ -55,11 +55,13 @@ class CubMCML(StoppingCriterion):
         gamma           1.000
         time_integrate  ...
 
-    Adapted from
-        http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB
+    Original Implementation:
 
-    Reference:
-        M.B. Giles. 'Multi-level Monte Carlo path simulation'. 
+        [a] http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB
+
+    References:
+        
+        [1] M.B. Giles. 'Multi-level Monte Carlo path simulation'. 
         Operations Research, 56(3):607-617, 2008.
         http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
     """
@@ -83,6 +85,7 @@ class CubMCML(StoppingCriterion):
             alpha0 (float): weak error is O(2^{-alpha0*level})
             beta0 (float): variance is O(2^{-bet0a*level})
             gamma0 (float): sample cost is O(2^{gamma0*level})
+        
         Note:
             if alpha, beta, gamma are not positive, then they will be estimated
         """

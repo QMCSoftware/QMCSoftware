@@ -4,6 +4,8 @@ from numpy import random
 
 class IIDStdGaussian(DiscreteDistribution):
     """
+    A wrapper around NumPy's IID Standard Gaussian generator `numpy.random.randn`. 
+
     >>> dd = IIDStdGaussian(dimension=2,seed=7)
     >>> dd
     IIDStdGaussian (DiscreteDistribution Object)

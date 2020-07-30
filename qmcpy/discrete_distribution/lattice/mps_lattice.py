@@ -1,7 +1,9 @@
 """ 
 Lattice sequence generator from Magic Point Shop (https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/)
 
-Adapted from https://bitbucket.org/dnuyens/qmc-generators/src/master/python/latticeseq_b2.py
+Original Implementation:
+
+    [a] https://bitbucket.org/dnuyens/qmc-generators/src/master/python/latticeseq_b2.py
 
 Reference:
     
@@ -31,6 +33,9 @@ def mps_lattice_gen(n_min, n_max, d, z):
         n_min (int): minimum index.
         n_max (int): maximum index (not inclusive). 
         z (int): length d generating vector.
+    
+    Returns:
+        ndarray: n samples by d dimensions array of lattice samples
     """
     m_low = floor(log2(n_min))+1 if n_min > 0 else 0
     m_high = ceil(log2(n_max))
