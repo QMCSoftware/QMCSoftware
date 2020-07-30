@@ -21,7 +21,7 @@ EXT = dll
 endif
 
 qrng:
-	gcc -shared -o $(qrngpath)qrng_lib.$(EXT) $(qrngpath)*.c
+	@gcc -shared -o $(qrngpath)qrng_lib.$(EXT) $(qrngpath)*.c
 	@echo Done compiling qrng C files
 
 tests:
