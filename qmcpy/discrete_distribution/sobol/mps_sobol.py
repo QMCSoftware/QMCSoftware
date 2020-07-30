@@ -3,7 +3,7 @@ Sobol (Digital) sequence generator from Magic Point Shop (https://people.cs.kule
 
 Original Implementation:
 
-    [a] https://bitbucket.org/dnuyens/qmc-generators/src/master/python/digitalseq_b2g.py
+    https://bitbucket.org/dnuyens/qmc-generators/src/master/python/digitalseq_b2g.py
 
 References:
     

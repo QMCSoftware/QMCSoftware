@@ -50,7 +50,7 @@ class CubMCG(StoppingCriterion):
     
     Original Implementation:
 
-        [a] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
+        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
 
     References:
 

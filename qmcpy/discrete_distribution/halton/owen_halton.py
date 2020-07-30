@@ -1,6 +1,6 @@
 """
-Original Implementation:
-    [a] Owen, A. B.A randomized Halton algorithm in R2017. arXiv:1706.02808 [stat.CO]
+References:
+    [1] Owen, A. B.A randomized Halton algorithm in R2017. arXiv:1706.02808 [stat.CO]
 """
 
 from numpy import isscalar, arange, zeros, array, double, random

@@ -46,7 +46,7 @@ class CubQMCLatticeG(StoppingCriterion):
 
     Original Implementation:
 
-        [a] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
+        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
 
     References:
 

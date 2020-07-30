@@ -3,7 +3,7 @@ Lattice sequence generator from Magic Point Shop (https://people.cs.kuleuven.be/
 
 Original Implementation:
 
-    [a] https://bitbucket.org/dnuyens/qmc-generators/src/master/python/latticeseq_b2.py
+    https://bitbucket.org/dnuyens/qmc-generators/src/master/python/latticeseq_b2.py
 
 Reference:
     

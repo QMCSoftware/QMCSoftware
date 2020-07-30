@@ -57,7 +57,7 @@ class CubMCML(StoppingCriterion):
 
     Original Implementation:
 
-        [a] http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB
+        http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB
 
     References:
         

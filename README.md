@@ -31,7 +31,7 @@ The central package including the 5 main components as listed below. Each compon
 - **Integrand:** the function/process whose expected value will be approximated.
 - **True Measure:** the distribution to be integrated over.
 - **Discrete Distribution:** a generator of nodes/sequences, that can be either IID (for Monte Carlo) or low-discrepancy (for quasi-Monte Carlo), that mimic a standard distribution.
-- **Accumulate Data:** stores information from integration process.
+- **Accumulate Data:** stores and updates data used in the integration process.
 
 ----
 
@@ -51,7 +51,7 @@ We may choose a Sobol' discrete distribution with a corresponding Sobol' cubatur
 import qmcpy as qp
 from numpy import pi, cos, sqrt, linalg
 d = 2
-s = qp.Sobol(d, seed=7)
+s = qp.Sobol(d)
 g = qp.Gaussian(s, covariance=1./2)
 k = qp.CustomFun(g, lambda x: pi**(d/2)*cos(linalg.norm(x,axis=1)))
 cs = qp.CubQMCSobolG(k, abs_tol=1e-3)
@@ -59,7 +59,7 @@ solution,data = cs.integrate()
 print(data)
 ```
 
-A more detailed quickstart can be found in `./demos/quickstart.ipynb` or in [this Google Colab notebook](https://colab.research.google.com/drive/1CQweuON7jHJBMVyribvosJLW4LheQXBL?usp=sharing).
+A more detailed quickstart can be found in our GitHub repo at `QMCSoftware/demos/quickstart.ipynb` or in [this Google Colab notebook](https://colab.research.google.com/drive/1CQweuON7jHJBMVyribvosJLW4LheQXBL?usp=sharing).
 
 ----
 

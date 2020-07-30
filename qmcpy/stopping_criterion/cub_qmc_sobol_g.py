@@ -47,7 +47,7 @@ class CubQMCSobolG(StoppingCriterion):
 
     Original Implementation:
 
-        [a] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
+        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
 
     References:
 

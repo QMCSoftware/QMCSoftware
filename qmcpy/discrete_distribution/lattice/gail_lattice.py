@@ -3,9 +3,9 @@ Lattice Generator from GAIL (http://gailgithub.github.io/GAIL_Dev/)
 
 Original Implementations:
 
-    [a] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/vdc.m
+    https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/vdc.m
     
-    [b] https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/lattice_gen.m
+    https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/%2Bgail/lattice_gen.m
 
 References:
 
