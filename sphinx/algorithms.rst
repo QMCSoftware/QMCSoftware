@@ -33,7 +33,7 @@ European Option
 Asian Call Option
 .................
 
-.. automodule:: qmcpy.integrand.asian_call
+.. automodule:: qmcpy.integrand.asian_option
     :members:
 
 Multilevel Call Options with Milstein Discretization
