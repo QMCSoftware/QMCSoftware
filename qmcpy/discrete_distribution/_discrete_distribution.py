@@ -18,34 +18,35 @@ class DiscreteDistribution(object):
 
     def gen_samples(self, *args):
         """
-        ABSTRACT METHOD Generate samples from discrete distribution. 
-        
+        ABSTRACT METHOD Generate samples from discrete distribution.
+
         Args:
             args (tuple): tuple of positional argument. See implementations for details
         Returns:
-            ndarray: n x d array of samples
+            ndarray: $n \\times d$ array of samples, where $n$ is
+            number of observations and $d$ is dimension
         """
         raise MethodImplementationError(self, 'gen_samples')
 
     def set_dimension(self, dimension):
         """
         ABSTRACT METHOD to reset the dimension of the problem.
-        
+
         Args:
             dimension (int): new dimension to reset to
-        
+
         Note:
-            May not be applicable to every discrete distribution (ex: CustomIIDDistribution). 
+            May not be applicable to every discrete distribution (ex: CustomIIDDistribution).
         """
         raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
-    
+
     def set_seed(self, seed):
-        """ 
+        """
         ABSTRACT METHOD to reset the seed of the problem.
 
-        Args: 
+        Args:
             seed (int): new seed for generator
-        
+
         Note:
             May not be applicable to every discrete distribution (ex: InverseCDFSampling)
         """
@@ -53,18 +54,18 @@ class DiscreteDistribution(object):
 
     def plot(self, dim_x=0, dim_y=1, n=2**7, point_size=5, color='c', show=True, out=None):
         """
-        Make a scatter plot from samples. Requires dimension >= 2. 
+        Make a scatter plot from samples. Requires dimension >= 2.
 
         Args:
-            dim_x (int): index of first dimension to be plotted on horizontal axis. 
+            dim_x (int): index of first dimension to be plotted on horizontal axis.
             dim_y (int): index of the second dimension to be plotted on vertical axis.
             n (int): number of samples to draw as self.gen_samples(n)
             point_size (int): ax.scatter(...,s=point_size)
             color (str): ax.scatter(...,color=color)
-            show (bool): show plot or not? 
+            show (bool): show plot or not?
             out (str): file name to output image. If None, the image is not output
 
-        Return: 
+        Return:
             tuple: fig,ax from `fig,ax = matplotlib.pyplot.subplots(...)`
         """
         if self.dimension < 2:
@@ -96,30 +97,30 @@ class DiscreteDistribution(object):
         ax.set_xlabel('$x_{i,%d}$'%dim_x)
         ax.set_ylabel('$x_{i,%d}$'%dim_y)
         ax.scatter(x[:,dim_x],x[:,dim_y],color=color,s=point_size)
-        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
+        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n
         ax.set_title(s+' %s Samples'%type(self).__name__)
         fig.tight_layout()
         if out: pyplot.savefig(out,dpi=250)
         if show: pyplot.show()
         return fig,ax
-    
+
     def __repr__(self):
         return _univ_repr(self, "DiscreteDistribution", self.parameters)
-    
+
     def plot(self, dim_x=0, dim_y=1, n=2**7, point_size=5, color='c', show=True, out=None):
         """
-        Make a scatter plot from samples. Requires dimension >= 2. 
+        Make a scatter plot from samples. Requires dimension >= 2.
 
         Args:
-            dim_x (int): index of first dimension to be plotted on horizontal axis. 
+            dim_x (int): index of first dimension to be plotted on horizontal axis.
             dim_y (int): index of the second dimension to be plotted on vertical axis.
             n (int): number of samples to draw as self.gen_samples(n)
             point_size (int): ax.scatter(...,s=point_size)
             color (str): ax.scatter(...,color=color)
-            show (bool): show plot or not? 
+            show (bool): show plot or not?
             out (str): file name to output image. If None, the image is not output
 
-        Return: 
+        Return:
             fig,ax (tuple) from fig,ax = matplotlib.pyplot.subplots(...)
         """
         if self.dimension < 2:
@@ -151,7 +152,7 @@ class DiscreteDistribution(object):
         ax.set_xlabel('$x_{i,%d}$'%dim_x)
         ax.set_ylabel('$x_{i,%d}$'%dim_y)
         ax.scatter(x[:,dim_x],x[:,dim_y],color=color,s=point_size)
-        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
+        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n
         ax.set_title(s+' %s Samples'%type(self).__name__)
         fig.tight_layout()
         if out: pyplot.savefig(out,dpi=250)
