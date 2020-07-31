@@ -33,9 +33,9 @@ class MLCallOptions(Integrand):
 
     References:
 
-        [1] M.B. Giles. `Improved multilevel Monte Carlo convergence using the Milstein scheme'.
-        343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008.
-        http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
+    [1] M.B. Giles. Improved multilevel Monte Carlo convergence using the Milstein scheme.
+    343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008.
+    http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
     """
 
     parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
@@ -57,7 +57,7 @@ class MLCallOptions(Integrand):
         options = ['european','asian']
         self.option = option.lower()
         if self.option not in options:
-            raise ParameterError('option type must be one of\n\t%s'%str(options)) 
+            raise ParameterError('option type must be one of\n\t%s'%str(options))
         self.measure = measure
         self.distribution = self.measure.distribution
         if self.distribution.low_discrepancy and self.option=='asian':
@@ -82,7 +82,7 @@ class MLCallOptions(Integrand):
             val = None
         elif self.option == 'lookback':
             kk = .5*self.sigma**2/r
-            val = self.k*( norm.cdf(d1) - norm.cdf(-d1)*kk - 
+            val = self.k*( norm.cdf(d1) - norm.cdf(-d1)*kk -
                       exp(-self.r*self.t)*(norm.cdf(d2) - norm.cdf(d2)*kk) )
         elif self.option == 'digital':
             val = self.k*exp(-self.r*self.t)*norm.cdf(d2)
@@ -91,14 +91,14 @@ class MLCallOptions(Integrand):
             d3 = (2*log(self.b/self.k) + (self.r+.5*self.sigma**2)*self.t) / (self.sigma*sqrt(self.t))
             d4 = (2*log(self.b/self.k) + (self.r-.5*self.sigma**2)*self.t) / (self.sigma*sqrt(self.t))
             val = self.k*( norm.cdf(d1) - exp(-self.r*self.t)*norm.cdf(d2) -
-                     (self.k/self.b)**(1-1/kk)*( (self.b/self.k)**2*norm.cdf(d3) - 
+                     (self.k/self.b)**(1-1/kk)*( (self.b/self.k)**2*norm.cdf(d3) -
                      exp(-self.r*self.t)*norm.cdf(d4) ) )
         return val
-    
+
     def _g_european(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
         """
-        Implementation for European call option. 
-        
+        Implementation for European call option.
+
         Args:
             samples (ndarray): nxd array of samples
             l (int): level
@@ -133,8 +133,8 @@ class MLCallOptions(Integrand):
 
     def _g_asian(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
         """
-        Implementation for Asian call option. 
-        
+        Implementation for Asian call option.
+
         Args:
             samples (ndarray): nxd array of samples
             l (int): level
@@ -145,12 +145,12 @@ class MLCallOptions(Integrand):
             hf (int): fine timestep = self.t/nf
             hc (float): coarse timestep = self.t/nc
             xf (ndarray): n vector of fine samples values = self.k
-            xc (ndarray): n vector of coarse samples = self.k  
-        
+            xc (ndarray): n vector of coarse samples = self.k
+
         Return:
             tuple: \
                 First, an ndarray of payoffs from fine paths. \
-                Second, an ndarray of payoffs from coarse paths. 
+                Second, an ndarray of payoffs from coarse paths.
         """
         af = .5*hf*xf
         ac = .5*hc*xc
@@ -182,7 +182,7 @@ class MLCallOptions(Integrand):
         pf = maximum(0,af-self.k)
         pc = maximum(0,ac-self.k)
         return pf,pc
-    
+
     def g(self, samples, l):
         """
         Args:
@@ -193,7 +193,7 @@ class MLCallOptions(Integrand):
                 First, an ndarray of length 6 vector of summary statistic sums. \
                 Second, a float of cost on this level.
         """
-        n,d = samples.shape        
+        n,d = samples.shape
         nf = 2**l # n fine
         nc = float(nf)/2 # n coarse
         hf = self.t/nf # timestep fine
@@ -211,10 +211,10 @@ class MLCallOptions(Integrand):
         sums[2] = (dp**3).sum()
         sums[3] = (dp**4).sum()
         sums[4] = pf.sum()
-        sums[5] = (pf**2).sum()    
+        sums[5] = (pf**2).sum()
         cost = n*nf # cost defined as number of fine timesteps
         return sums,cost
-    
+
     def _dim_at_level(self, l):
         """ See abstract method. """
         if self.option == 'european':
