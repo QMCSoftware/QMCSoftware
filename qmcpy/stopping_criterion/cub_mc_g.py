@@ -22,7 +22,7 @@ class CubMCG(StoppingCriterion):
     >>> solution
     1.803926962264685
     >>> data
-    Solution: 1.8039
+    Solution: 1.8039         
     Keister (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
         dimension       2^(1)
