@@ -14,7 +14,7 @@ import warnings
 
 class CubMCG(StoppingCriterion):
     """
-    Stopping criterion with guaranteed accuracy. 
+    Stopping criterion with guaranteed accuracy.
 
     >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
     >>> sc = CubMCG(k,abs_tol=.05)
@@ -22,7 +22,7 @@ class CubMCG(StoppingCriterion):
     >>> solution
     1.803926962264685
     >>> data
-    Solution: 1.8039         
+    Solution: 1.8039
     Keister (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
         dimension       2^(1)
@@ -47,7 +47,7 @@ class CubMCG(StoppingCriterion):
         error_hat       0.050
         confid_int      [1.754 1.854]
         time_integrate  ...
-    
+
     Original Implementation:
 
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
@@ -70,7 +70,7 @@ class CubMCG(StoppingCriterion):
         to a prescribed error tolerance, _tol_fun:= max(abstol,reltol*|mu|), with
         guaranteed confidence level 1-alpha. If the algorithm terminates without
         showing any warning messages and provides an answer tmu, then the follow
-        inequality would be satisfied: $\Pr(|mu-tmu| <= _tol_fun) >= 1-alpha
+        inequality would be satisfied: $\Pr(| mu - tmu | <= _tol_fun) >= 1-alpha
     """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
@@ -103,7 +103,7 @@ class CubMCG(StoppingCriterion):
         allowed_levels = ['single']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
         super(CubMCG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        
+
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
@@ -223,11 +223,11 @@ class CubMCG(StoppingCriterion):
 
     def set_tolerance(self, abs_tol=None, rel_tol=None):
         """
-        See abstract method. 
-        
+        See abstract method.
+
         Args:
-            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not.
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
         """
         if abs_tol != None: self.abs_tol = abs_tol
         if rel_tol != None: self.rel_tol = rel_tol
