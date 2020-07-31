@@ -125,14 +125,14 @@ class AsianOption(Integrand):
         """ See abstract method. """
         dim_frac = self.dim_fracs[l]
         dimension = float(self.dimensions[l])
-        s_fine = self.start_price * exp(
+        self.s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
             self.measure.time_vector + self.volatility * x)
-        for xx,yy in zip(*where(s_fine<0)): # if stock becomes <=0, 0 out rest of path
-            s_fine[xx,yy:] = 0
-        y = self._get_discounted_payoffs(s_fine, dimension)
+        for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
+            self.s_fine[xx,yy:] = 0
+        y = self._get_discounted_payoffs(self.s_fine, dimension)
         if dim_frac > 0:
-            s_course = s_fine[:, int(dim_frac - 1):: int(dim_frac)]
+            s_course = self.s_fine[:, int(dim_frac - 1):: int(dim_frac)]
             d_course = float(dimension) / dim_frac
             y_course = self._get_discounted_payoffs(s_course, d_course)
             y -= y_course
@@ -141,3 +141,44 @@ class AsianOption(Integrand):
     def _dim_at_level(self, l):
         """ See abstract method. """
         return self.dimensions[l]
+
+    def plot(self, n=2**5, show=True, out=None):
+        """
+        Plot Asian Option price vs time. Does not work for multi-level Asian option. 
+        
+        Args:
+            n (int): self.gen_samples(n)
+            show (bool): show the plot?
+            out (str): file name to output image. If None, the image is not output
+            
+        Return:
+            tuple: fig,ax from `fig,ax = pyplot.subplots()`
+        """
+        if self.leveltype == 'fixed-multi':
+            raise ParameterError('Cannot plot fixed-multilevel Asian option.')
+        tvw0 = hstack((0,self.measure.time_vector)) # time vector including 0
+        x = self.distribution.gen_samples(n)
+        y = self.f(x)
+        sw0 = hstack((self.start_price*ones((n,1)),self.s_fine)) # x including 0 and time 0
+        from matplotlib import pyplot
+        pyplot.rc('font', size=16)
+        pyplot.rc('legend', fontsize=16)
+        pyplot.rc('figure', titlesize=16)
+        pyplot.rc('axes', titlesize=16, labelsize=16)
+        pyplot.rc('xtick', labelsize=16)
+        pyplot.rc('ytick', labelsize=16)
+        fig,ax = pyplot.subplots()
+        for i in range(n):
+            ax.plot(tvw0,sw0[i])
+        ax.axhline(y=self.strike_price, color='k', linestyle='--', label='Strike Price')
+        ax.set_xlim([0,1])
+        ax.set_xticks([0,1])
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Option Price')
+        ax.legend(loc='upper left')
+        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
+        ax.set_title(s+' Asian Option Paths')
+        fig.tight_layout()
+        if out: pyplot.savefig(out,dpi=250)
+        if show: pyplot.show()
+        return fig,ax

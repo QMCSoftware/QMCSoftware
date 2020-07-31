@@ -54,15 +54,15 @@ class EuropeanOption(Integrand):
 
     def g(self, x):
         """ See abstract method. """
-        s = self.start_price * exp(
+        self.s = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
             self.measure.time_vector + self.volatility * x)
-        for xx,yy in zip(*where(s<0)): # if stock becomes <=0, 0 out rest of path
-            s[xx,yy:] = 0
+        for xx,yy in zip(*where(self.s<0)): # if stock becomes <=0, 0 out rest of path
+            self.s[xx,yy:] = 0
         if self.call_put == 'call':
-            y_raw = maximum(s[:,-1] - self.strike_price, 0)
+            y_raw = maximum(self.s[:,-1] - self.strike_price, 0)
         else: # put
-            y_raw = maximum(self.strike_price - s[:,-1], 0)
+            y_raw = maximum(self.strike_price - self.s[:,-1], 0)
         y_adj = y_raw * exp(-self.interest_rate * self.exercise_time)
         return y_adj
     
@@ -87,4 +87,43 @@ class EuropeanOption(Integrand):
             term2 = log(self.strike_price / self.start_price) - \
                     (self.interest_rate + self.volatility**2/2) * self.exercise_time
             fp = decay * norm.cdf(term1/denom) - self.start_price * norm.cdf(term2/denom)
-        return fp 
+        return fp
+    
+    def plot(self, n=2**5, show=True, out=None):
+        """
+        Plot European Option price vs time.
+        
+        Args:
+            n (int): self.gen_samples(n)
+            show (bool): show the plot?
+            out (str): file name to output image. If None, the image is not output
+            
+        Return:
+            tuple: fig,ax from `fig,ax = pyplot.subplots()`
+        """
+        tvw0 = hstack((0,self.measure.time_vector)) # time vector including 0
+        x = self.distribution.gen_samples(n)
+        y = self.f(x)
+        sw0 = hstack((self.start_price*ones((n,1)),self.s)) # x including 0 and time 0
+        from matplotlib import pyplot
+        pyplot.rc('font', size=16)
+        pyplot.rc('legend', fontsize=16)
+        pyplot.rc('figure', titlesize=16)
+        pyplot.rc('axes', titlesize=16, labelsize=16)
+        pyplot.rc('xtick', labelsize=16)
+        pyplot.rc('ytick', labelsize=16)
+        fig,ax = pyplot.subplots()
+        for i in range(n):
+            ax.plot(tvw0,sw0[i])
+        ax.axhline(y=self.strike_price, color='k', linestyle='--', label='Strike Price')
+        ax.set_xlim([0,1])
+        ax.set_xticks([0,1])
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Option Price')
+        ax.legend(loc='upper left')
+        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
+        ax.set_title(s+' European Option Paths')
+        fig.tight_layout()
+        if out: pyplot.savefig(out,dpi=250)
+        if show: pyplot.show()
+        return fig,ax

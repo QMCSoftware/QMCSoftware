@@ -43,3 +43,7 @@ class StoppingCriterion(object):
 
     def __repr__(self):
         return _univ_repr(self, "StoppingCriterion", self.parameters)
+    
+    def plot(self, *args, **kwargs):
+        """ Create a plot relevant to the stopping criterion object. """
+        raise MethodImplementationError(self,'plot')

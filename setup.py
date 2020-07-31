@@ -56,7 +56,7 @@ packages = [
 
 setuptools.setup(
     name="qmcpy",
-    version="0.3.2a",
+    version="0.3.2b",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',
@@ -64,7 +64,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://qmcsoftware.github.io/QMCSoftware/",
-    download_url="https://github.com/QMCSoftware/QMCSoftware/archive/v0.3.2-alpha.tar.gz",
+    download_url="https://github.com/QMCSoftware/QMCSoftware/archive/v0.3.2-beta.tar.gz",
     packages=packages,
     install_requires=[
         'scipy >= 1.2.0',
