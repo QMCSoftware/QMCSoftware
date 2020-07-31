@@ -8,19 +8,19 @@ The QMCPy framework uses 5 abstract classes that are fleshed out in concrete imp
 
 The function to integrate.
 
-- Keister Function: $g(\boldsymbol{x}) = \pi^{d/2} \, \cos(||\boldsymbol{x}||_2)$
+- Keister Function: $g(\boldsymbol{x}) = \pi^{d/2} \, \cos(\lVert\boldsymbol{x}\rVert_2)$
 - Custom Function
-- European Option
-    - stock price at time $jT/d=\tau_j$: $~~~~~~~~~$ $S(\tau_j)=S_0\exp\bigl((r-\sigma^2/2)\tau_j+\sigma\mathcal{B}(\tau_j)\bigr)$
-    - discounted call payoff $= \max\left(S(\tau_d)-K\right),\: 0)  \,\exp(-rT)$
-    - discounted put payoff $= \max\left(K-S(\tau_d)\right),\: 0)\,\exp(-rT)$
-- Asian Option
-    - stock price at time $jT/d=\tau_j$: $~~~~~~~~~$ $S(\tau_j)=S_0\exp\bigl((r-\sigma^2/2)\tau_j+\sigma\mathcal{B}(\tau_j)\bigr)$
-    - airthmetic mean: $\gamma(\boldsymbol{\tau})= \frac{1}{2d}\sum_{j=1}^d [S(\tau_{j-1})+S(\tau_j)]$
-    - geometric mean: $\gamma(\boldsymbol{\tau}) = \biggl[\prod_{j=1}^d [S(\tau_{j-1})S(\tau_j)]\biggr]^{\frac{1}{2d}}$
-    - discounted call payoff $= \max( \gamma(\boldsymbol{\tau})-K,\: 0)\,\exp(-rT)$
-    - discounted put payoff $= \max(K-\gamma(\boldsymbol{\tau}),0)\,\exp(-rT)$
-- Multilevel Call Options with Milstein Discretization 
+- Option Pricing
+    - stock price at time $jT/d=\tau_j$: $$S(\tau_j,\boldsymbol{x})=S_0\exp\bigl((r-\sigma^2/2)\tau_j+\sigma\mathcal{B}(\tau_j,\boldsymbol{x})\bigr)$$
+    - European Option
+        - discounted call payoff $(\boldsymbol{x})= \max\left(S(\tau_d,\boldsymbol{x})-K\right),\: 0)  \,\exp(-rT)$
+        - discounted put payoff $(\boldsymbol{x})= \max\left(K-S(\tau_d,\boldsymbol{x})\right),\: 0)\,\exp(-rT)$
+    - Asian Option
+        - arithmetic mean: $\gamma(\boldsymbol{\tau},\boldsymbol{x})= \frac{1}{2d}\sum_{j=1}^d [S(\tau_{j-1,\boldsymbol{x}})+S(\tau_j,\boldsymbol{x})]$
+        - geometric mean: $\gamma(\boldsymbol{\tau},\boldsymbol{x}) = \biggl[\prod_{j=1}^d [S(\tau_{j-1},\boldsymbol{x})S(\tau_j,\boldsymbol{x})]\biggr]^{\frac{1}{2d}}$
+        - discounted call payoff $(\boldsymbol{x})= \max( \gamma(\boldsymbol{\tau},\boldsymbol{x})-K,\: 0)\,\exp(-rT)$
+        - discounted put payoff $(\boldsymbol{x})= \max(K-\gamma(\boldsymbol{\tau},\boldsymbol{x}),0)\,\exp(-rT)$
+    - Multilevel Call Options with Milstein Discretization 
 - Linear Function: $g(\boldsymbol{x}) = \sum_{j=1}^{d}x_{j}$
 
 ----
