@@ -16,6 +16,7 @@ class EuropeanOption(Integrand):
     >>> eo
     EuropeanOption (Integrand Object)
         volatility      2^(-1)
+        call_put        put
         start_price     30
         strike_price    35
         interest_rate   0
@@ -25,7 +26,7 @@ class EuropeanOption(Integrand):
     9.211371880941195
     """
 
-    parameters = ['volatility', 'start_price', 'strike_price', 'interest_rate']
+    parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
                           
     def __init__(self, measure, volatility=0.5, start_price=30, strike_price=35,
         interest_rate=0, call_put='call'):

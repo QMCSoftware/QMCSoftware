@@ -15,6 +15,7 @@ class AsianOption(Integrand):
     >>> ac
     AsianOption (Integrand Object)
         volatility      2^(-1)
+        call_put        call
         start_price     30
         strike_price    35
         interest_rate   0
@@ -33,6 +34,7 @@ class AsianOption(Integrand):
     >>> ac2
     AsianOption (Integrand Object)
         volatility      2^(-1)
+        call_put        call
         start_price     30
         strike_price    35
         interest_rate   0
@@ -49,7 +51,7 @@ class AsianOption(Integrand):
     1.7615439792317786
     """
 
-    parameters = ['volatility', 'start_price', 'strike_price',
+    parameters = ['volatility', 'call_put', 'start_price', 'strike_price',
                   'interest_rate','mean_type', 'dimensions', 'dim_fracs']
                           
     def __init__(self, measure, volatility=0.5, start_price=30., strike_price=35.,\
