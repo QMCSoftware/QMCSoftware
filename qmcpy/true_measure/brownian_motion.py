@@ -156,8 +156,8 @@ class BrownianMotion(TrueMeasure):
             ax.plot(tvw0,xw0[i])
         ax.set_xlim([0,1])
         ax.set_xticks([0,1])
-        ax.set_xlabel('time')
-        ax.set_ylabel('value')
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Brownian Motion')
         s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
         ax.set_title(s+' Brownian Motion Samples')
         fig.tight_layout()
