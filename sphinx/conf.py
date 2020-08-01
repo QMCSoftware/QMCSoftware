@@ -26,7 +26,9 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 project = u"QMCPy"
 copyright = u"2019, Illinois Institute of Technology"
-author = u"Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, \nJagadeeswaran Rathinavel, and Aleksei Sorokin"
+author = u"Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin"
+#author = u"S-C Choi, F Hickernell, M McCourt, J Rathinavel, & A Sorokin"
+
 version = u"0.3"
 
 # The full version, including alpha/beta/rc tags
@@ -40,6 +42,13 @@ master_doc = 'index'
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
 latex_elements = {"preamble": r'\usepackage{enumitem}\setlistdepth{99}\usepackage{threeparttable}'}
+
+latex_elements['printindex'] = '\tiny\raggedright\printindex'
+latex_documents = [
+    (master_doc, 'qmcpy.tex', 'Project',
+     author.replace(', ', '\\and ').replace(' and ', '\\and and '),
+     'manual'),
+]
 
 extensions = [
     "sphinx_math_dollar",
