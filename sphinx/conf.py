@@ -43,7 +43,6 @@ master_doc = 'index'
 # ones.
 latex_elements = {"preamble": r'\usepackage{enumitem}\setlistdepth{99}\usepackage{threeparttable}'}
 
-latex_elements['printindex'] = '\tiny\raggedright\printindex'
 latex_documents = [
     (master_doc, 'qmcpy.tex', 'Project',
      author.replace(', ', '\\and ').replace(' and ', '\\and and '),
