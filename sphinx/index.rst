@@ -27,6 +27,9 @@ Indices and tables
 Sponsors
 ==================
 
+Illinois Tech
+--------------
+
 .. raw:: html
 
    <p style="height:30x">
@@ -34,6 +37,9 @@ Sponsors
        <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true"/>
      </a>
    </p>
+
+Kamakura Corporation
+---------------------
 
 .. raw:: html
 
@@ -43,6 +49,9 @@ Sponsors
      </a>
    </p>
 
+
+SigOpt
+--------
 
 .. raw:: html
 

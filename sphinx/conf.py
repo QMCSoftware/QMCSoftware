@@ -44,7 +44,7 @@ master_doc = 'index'
 latex_elements = {"preamble": r'\usepackage{enumitem}\setlistdepth{99}\usepackage{threeparttable}'}
 
 latex_documents = [
-    (master_doc, 'qmcpy.tex', 'Project',
+    (master_doc, 'qmcpy.tex', 'QMCPy',
      author.replace(', ', '\\and ').replace(' and ', '\\and and '),
      'manual'),
 ]
