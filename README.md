@@ -167,8 +167,34 @@ This work is maintained under the Apache 2.0 License.
 
 ## Sponsors
 
-<img src="sphinx/logo/illinois-institute-of-technology-vector-logo.jpg" alt="IIT logo" height=200px width=400px/>
 
-<img src="sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg" alt="SigOpt logo" height=100px width=400px/>
+Illinois Tech
+--------------
 
-<img src="sphinx/logo/kamakura-corporation-vector-logo.png" alt="Kamakura logo" height=200px width=400px/>
+
+   <p style="height:30x">
+     <a href="https://www.iit.edu">
+       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true"/>
+     </a>
+   </p>
+
+Kamakura Corporation
+---------------------
+
+
+   <p style="height:30x">
+     <a href="http://www.kamakuraco.com">
+       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true"/>
+     </a>
+   </p>
+
+
+SigOpt, Inc.
+------------
+
+
+   <p style="height:30px">
+     <a href="https://sigopt.com">
+       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true"/>
+     </a>
+   </p>
