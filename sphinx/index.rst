@@ -27,15 +27,27 @@ Indices and tables
 Sponsors
 ==================
 
-.. image:: logo/illinois-institute-of-technology-vector-logo.jpg
-   :width: 600
-   :alt: IIT
+.. raw:: html
 
-.. image:: logo/kamakura-corporation-vector-logo.png
-   :width: 600
-   :alt: SigOpt
+   <p style="height:30x">
+     <a href="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true">
+       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true"/>
+     </a>
+   </p>
+
+.. raw:: html
+
+   <p style="height:30x">
+     <a href="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true">
+       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true"/>
+     </a>
+   </p>
 
 
-.. image:: logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg
-   :width: 600
-   :alt: SigOpt
+.. raw:: html
+
+   <p style="height:30px">
+     <a href="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true">
+       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true"/>
+     </a>
+   </p>
