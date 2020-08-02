@@ -88,7 +88,7 @@ class Uniform(TrueMeasure):
             return y
         return f
 
-    def gen_mimic_samples(self, *args, **kwargs):
+    def gen_samples(self, *args, **kwargs):
         """ See abstract method. """
         samples = self.distribution.gen_samples(*args,**kwargs)
         mimic_samples = self._tf_to_mimic_samples(samples)

@@ -77,7 +77,7 @@ class CubBayesLatticeG(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 10, n_max=2 ** 22, alpha=0.01):
+                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01):
         # Set Attributes
         self.absTol = abs_tol
         self.relTol = rel_tol
@@ -89,12 +89,12 @@ class CubBayesLatticeG(StoppingCriterion):
         self.order = 2  # Bernoulli kernel's order. If zero, choose order automatically
 
         # self.f = lambda x: x ** 2  # function to integrate
-        self.f = integrand
+        self.integrand = integrand
         self.dim = integrand.dimension  # dimension of the integrand
         self.useGradient = False  # If true uses gradient descent in parameter search
         self.oneTheta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
-        self.ptransform = 'Baker'  # 'C1sin'  # periodization transform
+        self.ptransform = 'C1sin'  # periodization transform
         self.stopAtTol = True  # automatic mode: stop after meeting the error tolerance
         self.arbMean = True  # by default use zero mean algorithm
         self.stopCriterion = 'MLE'  # Available options {'MLE', 'GCV', 'full'}
@@ -129,20 +129,21 @@ class CubBayesLatticeG(StoppingCriterion):
 
         #  generator for the Lattice points
         self.gen_vec = self.get_lattice_gen_vec(self.dim)
-        self.ff = CubBayesLatticeG.doPeriodTx(self.f.f, self.ptransform)  # integrand after the periodization transform
+        self.ff = CubBayesLatticeG.doPeriodTx(self.integrand.f, self.ptransform)  # integrand after the periodization transform
 
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = 'single'
         allowed_distribs = ["Lattice"]
-        super(CubBayesLatticeG, self).__init__(distribution, allowed_levels, allowed_distribs)
+        super(CubBayesLatticeG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
 
-        if not distribution.randomize:
-            raise ParameterError("CubLattice_g requires distribution to have randomize=True")
+        if distribution.randomize:
+            raise ParameterError("CubLattice_g requires distribution to have randomize=False")
         if distribution.backend != 'gail':
-            raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
+            raise ParameterError("CubBayesLattice_g requires distribution to have 'GAIL' backend")
         # Construct AccumulateData Object to House Integration data
         # self.data = LDTransformBayesData(self, integrand, self.fft_update, m_min, m_max, fudge, check_cone)
+        self.distribution = distribution
 
     # computes the integral
     def integrate(self):
@@ -154,6 +155,8 @@ class CubBayesLatticeG(StoppingCriterion):
 
         # pick a random value to apply as shift
         shift = np.random.rand(1, self.dim)
+
+        # shift = np.array([[0.58, 0.632]])
 
         xun_ = np.array([])
         xpts_ = np.array([])
@@ -221,6 +224,8 @@ class CubBayesLatticeG(StoppingCriterion):
             xun_ = np.arange(0, 1, 1 / n).reshape((n, 1))
             xun_ = np.mod((xun_ * self.gen_vec), 1)
 
+            xun_ = self.distribution.gen_samples(n_min=0, n_max=n)
+
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
             xpts_ = np.mod((xun_ + shift), 1)  # shifted
 
@@ -229,8 +234,10 @@ class CubBayesLatticeG(StoppingCriterion):
             ftilde_ = ftilde_.reshape((n, 1))
         else:
             # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
-            xunnew = np.arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            xunnew = np.arange(1 / n, 1, 2 / n).reshape((n//2, 1))
             xunnew = np.mod(xunnew * self.gen_vec, 1)
+
+            xunnew = self.distribution.gen_samples(n_min=n//2, n_max=n)
 
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
             xnew = np.mod((xunnew + shift), 1)
@@ -240,7 +247,7 @@ class CubBayesLatticeG(StoppingCriterion):
 
             # Compute FFT on next set of new points
             ftildeNextNew = np.fft.fft(self.ff(xnew))
-            ftildeNextNew = ftildeNextNew.reshape((int(n / 2), 1))
+            ftildeNextNew = ftildeNextNew.reshape((n//2, 1))
             if self.debugEnable:
                 CubBayesLatticeG.alertMsg(ftildeNextNew, 'Nan', 'Inf')
 
@@ -250,7 +257,7 @@ class CubBayesLatticeG(StoppingCriterion):
         return ftilde_, xun_, xpts_
 
     # Lattice points are ordered in van der Corput sequence, so we cannot use
-    # Matlab's built-in fft routine. We use a custom one instead.
+    # Matlab's built-in fft routine. We use a custom fft instead.
     def iter_fft_vdc(self, iter, shift, xun, xpts, ftildePrev):
         m = self.mvec[iter]
         n = 2 ** m
@@ -275,8 +282,8 @@ class CubBayesLatticeG(StoppingCriterion):
 
             xpts_ = np.vstack(xpts, xnew)
             temp = np.zeros(n, self.dim)
-            temp[1: 2:n - 1, :] = xun
-            temp[2: 2:n, :] = xunnew
+            temp[0:: 2, :] = xun
+            temp[1:: 2, :] = xunnew
             xun_ = temp
             # combine the previous batch and new batch to get FFT on all points
             ftilde_ = self.merge_fft(ftildePrev, ftildeNextNew, mnext)
@@ -288,19 +295,13 @@ class CubBayesLatticeG(StoppingCriterion):
 
     # decides if the user-defined error threshold is met
     def stopping_criterion(self, xpts, ftilde, iter, m):
+        ftilde = ftilde.squeeze()
         n = 2 ** m
         success = False
         lnaRange = [-5, 5]
-        if self.kernType == 1:
-            lnaRange = [-3, 0]
-        else:
-            lnaRange = [-5, 5]
         r = self.order
 
         # search for optimal shape parameter
-        # lnaMLE = fminbnd( @ (lna) \
-        #         ObjectiveFunction(self, exp(lna), xpts, ftilde), \
-        #         lnaRange(1), lnaRange(2), optimset('TolX', 1e-2))
         lnaMLE = fminbnd(lambda lna: self.ObjectiveFunction(exp(lna), xpts, ftilde)[0],
                          x1=lnaRange[0], x2=lnaRange[1], xtol=1e-2, disp=0)
 
@@ -344,6 +345,7 @@ class CubBayesLatticeG(StoppingCriterion):
         else:  # non zero mean case
             muhat = ftilde[0] / Lambda[0]
 
+        muhat = np.abs(muhat)
         muminus = muhat - ErrBd
         muplus = muhat + ErrBd
 
@@ -374,17 +376,13 @@ class CubBayesLatticeG(StoppingCriterion):
         [Lambda, Lambda_ring] = self.kernel(xun, self.order, a, self.avoidCancelError,
                                             self.kernType, self.debugEnable)
 
-        Lambda = Lambda.reshape((n, 1))
-        Lambda_ring = Lambda_ring.reshape((n, 1))
         Lambda = abs(Lambda)
         # compute RKHSnorm
-        # temp = abs(ftilde(Lambda != 0). ** 2). / (Lambda(Lambda != 0))
         temp = abs(ftilde[Lambda != 0] ** 2) / (Lambda[Lambda != 0])
 
         # compute loss
         if self.GCV == True:
             # GCV
-            # temp_gcv = abs(ftilde(Lambda != 0). / (Lambda(Lambda != 0))). ** 2
             temp_gcv = abs(ftilde[Lambda != 0] / (Lambda[Lambda != 0])) ** 2
             loss1 = 2 * log(sum(1. / Lambda[Lambda != 0]))
             loss2 = log(sum(temp_gcv[1:]))
@@ -535,7 +533,7 @@ class CubBayesLatticeG(StoppingCriterion):
             # eigenvalues must be real : Symmetric pos definite Kernel
             Lambda_ring = np.real(np.fft.fft(C1m1))
 
-            Lambda = Lambda_ring
+            Lambda = Lambda_ring.copy()
             Lambda[0] = Lambda_ring[0] + len(Lambda_ring)
             # C1 = prod(1 + (a)*constMult*bernPoly(xun),2)  # direct computation
             # Lambda = real(fft(C1))
@@ -634,7 +632,7 @@ class CubBayesLatticeG(StoppingCriterion):
         # ptind=[true(nl,1); false(nl,1)]
         ptind = np.ndarray(shape=(2 * nl, 1), buffer=np.array([True] * nl + [False] * nl), dtype=bool)
         # coef = exp(-2*1j*(0:nl-1)'/(2*nl))
-        coef = exp(-2 * 1j * np.ndarray(shape=(nl, 1), buffer=np.arange(0, nl), dtype=int) / (2 * nl))
+        coef = exp(-2 * np.pi * 1j * np.ndarray(shape=(nl, 1), buffer=np.arange(0, nl), dtype=int) / (2 * nl))
         # coefv = np.matlib.repmat(coef, 1, 1)
         coefv = np.tile(coef, (1, 1))
         evenval = ftildeNew[ptind].reshape((nl, 1))
@@ -648,10 +646,11 @@ class CubBayesLatticeG(StoppingCriterion):
     @staticmethod
     def merge_pts(xun, xunnew, x, xnew, n, d):
         temp = np.zeros((n, d))
-        temp[0:(n - 1):2, :] = xun
-        temp[1:n:2, :] = xunnew
+        temp[0::2, :] = xun
+        temp[1::2, :] = xunnew
         xun = temp
-        temp[0:(n - 1):2, :] = x
-        temp[1:n:2, :] = xnew
+        temp = np.zeros((n, d))
+        temp[0::2, :] = x
+        temp[1::2, :] = xnew
         x = temp
         return xun, x

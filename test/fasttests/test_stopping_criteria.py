@@ -3,6 +3,7 @@
 from qmcpy import *
 from qmcpy.util import *
 import sys
+import numpy
 vinvo = sys.version_info
 if vinvo[0]==3: import unittest
 else: import unittest2 as unittest
@@ -179,17 +180,17 @@ class TestCubBayesLatticeG(unittest.TestCase):
         self.assertRaises(DistributionCompatibilityError, CubBayesLatticeG, integrand)
 
     def test_n_max_single_level(self):
-        distribution = Lattice(dimension=2, backend="GAIL")
-        measure = Uniform(distribution)
+        distribution = Lattice(dimension=2, randomize=False, backend="GAIL")
+        measure = Gaussian(distribution)
         integrand = Keister(measure)
-        algorithm = CubBayesLatticeG(integrand, abs_tol=.001, n_init=2 ** 8, n_max=2 ** 9)
+        algorithm = CubBayesLatticeG(integrand, abs_tol=.0001, n_init=2 ** 8, n_max=2 ** 9)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
 
     def test_keister_2d(self):
-        distribution = Lattice(dimension=2, randomize=False, seed=12345678)
-        measure = Uniform(distribution)
+        distribution = Lattice(dimension=2, randomize=False, backend='GAIL', linear=True)
+        measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
-        solution, data = CubBayesLatticeG(integrand, abs_tol=tol).integrate()
+        solution, data = CubBayesLatticeG(integrand, abs_tol=tol, n_init=2 ** 5).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
 

@@ -64,7 +64,7 @@ class Lattice(DiscreteDistribution):
 
     parameters = ['dimension','randomize','seed','mimics','backend']
 
-    def __init__(self, dimension=1, randomize=True, seed=None, backend='GAIL', gen_vector_info=None):
+    def __init__(self, dimension=1, randomize=True, seed=None, backend='GAIL', gen_vector_info=None, linear=False):
         """
         Args:
             dimension (int): dimension of samples
@@ -88,7 +88,9 @@ class Lattice(DiscreteDistribution):
         self.dimension, self.randomize, self.seed = self.generator.get_params()
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
-        super(Lattice, self).__init__()
+        self.set_seed(self.seed)
+        self.linear = linear
+        super(Lattice,self).__init__()
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
         """
@@ -111,8 +113,10 @@ class Lattice(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
+
         x = self.generator.gen_samples(n_min,n_max,warn)
         return x
+
 
     def set_seed(self, seed):
         """ See abstract method. """
