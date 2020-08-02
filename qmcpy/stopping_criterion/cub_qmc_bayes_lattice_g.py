@@ -144,6 +144,69 @@ class CubBayesLatticeG(StoppingCriterion):
         # Construct AccumulateData Object to House Integration data
         # self.data = LDTransformBayesData(self, integrand, self.fft_update, m_min, m_max, fudge, check_cone)
 
+    # computes the integral
+    def integrate(self):
+        tstart = time()  # start the timer
+        n = 2 ** self.mvec[0]
+        order_ = None
+        stop_flag = None
+        muhat = None
+
+        # pick a random value to apply as shift
+        shift = np.random.rand(1, self.dim)
+
+        xun_ = np.array([])
+        xpts_ = np.array([])
+        ftilde_ = np.array([])  # temporary storage between iterations
+        # Iteratively find the number of points required for the cubature to meet
+        # the error threshold
+        for iter, m in enumerate(self.mvec):
+            tstart_iter = time()
+            n = 2 ** m
+
+            # Update function values
+            if self.vdc_order:
+                ftilde_, xun_, xpts_ = self.iter_fft_vdc(iter, shift, xun_, xpts_, ftilde_)
+            else:
+                ftilde_, xun_, xpts_ = self.iter_fft(iter, shift, xun_, xpts_, ftilde_)
+            stop_flag, muhat, order_ = self.stopping_criterion(xun_, ftilde_, iter, m)
+
+            self.timeAll.append(time() - tstart_iter)  # store per iteration time
+
+            # if stopAtTol true, exit the loop
+            # else, run for for all 'n' values.
+            # Used to compute error values for 'n' vs error plotting
+            if self.stopAtTol and stop_flag:
+                break
+
+        out = OutParams()
+        out.n = n
+        out.time = tstart - time()
+        out.ErrBd = self.errorBdAll[-1]
+
+        optParams = OutOptParams()
+        optParams.ErrBdAll = self.errorBdAll
+        optParams.muhatAll = self.muhatAll
+        optParams.mvec = self.mvec
+        optParams.aMLEAll = self.aMLEAll
+        optParams.timeAll = self.timeAll
+        optParams.s_All = self.s_All
+        optParams.dscAll = self.dscAll
+        optParams.absTol = self.absTol
+        optParams.relTol = self.relTol
+        optParams.shift = shift
+        optParams.stopAtTol = self.stopAtTol
+        optParams.r = order_
+        out.optParams = optParams
+        if stop_flag == True:
+            out.exitflag = 1
+        else:
+            out.exitflag = 2  # error tolerance may not be met
+        if stop_flag == False:
+            warnings.warn(f'In order to achieve the guaranteed accuracy, used maximum allowed sample size {n}',
+                          MaxSamplesWarning)
+        return muhat, out
+
     # Efficient FFT computation algorithm, avoids recomputing the full fft
     def iter_fft(self, iter, shift, xun, xpts, ftildePrev):
         m = self.mvec[iter]
@@ -222,72 +285,6 @@ class CubBayesLatticeG(StoppingCriterion):
             CubBayesLatticeG.alertMsg(ftilde_, 'Inf', 'Nan')
 
         return ftilde_, xun_, xpts_
-
-    # computes the integral
-    def integrate(self):
-
-        tstart = time()  # start the clock
-        n = 2 ** self.mvec[0]
-        order_ = None
-        stop_flag = None
-        muhat = None
-
-        # pick a random value to apply as shift
-        shift = np.random.rand(1, self.dim)
-
-        xun_ = np.array([])
-        xpts_ = np.array([])
-        ftilde_ = np.array([])  # temporary storage between iterations
-        # Iteratively find the number of points required for the cubature to meet
-        # the error threshold
-        for iter, m in enumerate(self.mvec):
-            tstart_iter = time()
-            n = 2 ** m
-
-            # Update function values
-            if self.vdc_order:
-                ftilde_, xun_, xpts_ = self.iter_fft_vdc(iter, shift, xun_, xpts_, ftilde_)
-            else:
-                ftilde_, xun_, xpts_ = self.iter_fft(iter, shift, xun_, xpts_, ftilde_)
-            stop_flag, muhat, order_ = self.stopping_criterion(xun_, ftilde_, iter, m)
-
-            self.timeAll.append(time() - tstart_iter)  # store per iteration time
-
-            # if stopAtTol true, exit the loop
-            # else, run for for all 'n' values.
-            # Used to compute error values for 'n' vs error plotting
-            if self.stopAtTol and stop_flag:
-                break
-
-        out = OutParams()
-        out.n = n
-        out.time = tstart - time()
-        out.ErrBd = self.errorBdAll[-1]
-
-        optParams = OutOptParams()
-        optParams.ErrBdAll = self.errorBdAll
-        optParams.muhatAll = self.muhatAll
-        optParams.mvec = self.mvec
-        optParams.aMLEAll = self.aMLEAll
-        optParams.timeAll = self.timeAll
-        optParams.s_All = self.s_All
-        optParams.dscAll = self.dscAll
-        optParams.absTol = self.absTol
-        optParams.relTol = self.relTol
-        optParams.shift = shift
-        optParams.stopAtTol = self.stopAtTol
-        optParams.r = order_
-        out.optParams = optParams
-        if stop_flag == True:
-            out.exitflag = 1
-        else:
-            out.exitflag = 2  # error tolerance may not be met
-
-        if stop_flag == False:
-            warnings.warn(f'In order to achieve the guaranteed accuracy, used maximum allowed sample size {n}',
-                          MaxSamplesWarning)
-
-        return muhat, out
 
     # decides if the user-defined error threshold is met
     def stopping_criterion(self, xpts, ftilde, iter, m):
@@ -421,8 +418,7 @@ class CubBayesLatticeG(StoppingCriterion):
 
         return loss, Lambda, Lambda_ring, RKHSnorm
 
-    # prints debug message if the given variable is Inf, Nan or
-    # complex, etc
+    # prints debug message if the given variable is Inf, Nan or complex, etc
     # Example: alertMsg(x, 'Inf', 'Imag')
     #          prints if variable 'x' is either Infinite or Imaginary
     @staticmethod
@@ -611,7 +607,6 @@ class CubBayesLatticeG(StoppingCriterion):
                 q[ptind] = q[ptind] + 1 / 2 ** (l + 1)
         else:
             q = 0
-
         return q
 
     # fft with decimation in time i.e., input is already in 'bitrevorder'
@@ -629,7 +624,6 @@ class CubBayesLatticeG(StoppingCriterion):
             oddval = y[~ptind]
             y[ptind] = (evenval + coefv * oddval)
             y[~ptind] = (evenval - coefv * oddval)
-
         return y
 
     # using FFT butefly plot technique merges two halves of fft
