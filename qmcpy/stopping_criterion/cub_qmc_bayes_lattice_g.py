@@ -1,10 +1,10 @@
 from ._stopping_criterion import StoppingCriterion
-from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData, OutParams, OutOptParams
+from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData, OutParams
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
-from numpy import sqrt, log2, hstack, tile, exp, pi, arange, log
+from numpy import sqrt, log2, exp, log
 from math import factorial
 import numpy as np
 from time import time
@@ -20,7 +20,7 @@ class CubBayesLatticeG(StoppingCriterion):
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
     
-    >>> k = Keister(Gaussian(Lattice(2,seed=7),covariance=1./2))
+    >>> k = Keister(Gaussian(Lattice(2,randomize=False, linear=True),covariance=1./2))
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
@@ -37,7 +37,7 @@ class CubBayesLatticeG(StoppingCriterion):
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
-    CubQMCLatticeG (StoppingCriterion Object)
+    CubBayesLatticeG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
@@ -75,15 +75,16 @@ class CubBayesLatticeG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained, please
         refer to the references below.
     """
+    parameters = ['abs_tol','rel_tol','n_init','n_max']
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01, ptransform = 'C1sin'):
+                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01, ptransform='C1sin'):
         # Set Attributes
-        self.absTol = abs_tol
-        self.relTol = rel_tol
+        self.abs_tol = abs_tol
+        self.rel_tol = rel_tol
         m_min = log2(n_init)
         m_max = log2(n_max)
-        if m_min%1 != 0. or m_min < 8 or m_max%1 != 0:
+        if m_min % 1 != 0. or m_min < 8 or m_max % 1 != 0:
             warning_s = '''
                 n_init and n_max must be a powers of 2.
                 n_init must be >= 2^8.
@@ -93,7 +94,7 @@ class CubBayesLatticeG(StoppingCriterion):
             m_max = 23.
         self.m_min = m_min
         self.m_max = m_max
-        self.n_min = n_init  # number of samples to start with = 2^mmin
+        self.n_init = n_init  # number of samples to start with = 2^mmin
         self.n_max = n_max  # max number of samples allowed = 2^mmax
         self.alpha = alpha  # p-value, default 0.1%.
         self.order = 2  # Bernoulli kernel's order. If zero, choose order automatically
@@ -119,15 +120,6 @@ class CubBayesLatticeG(StoppingCriterion):
         self.uncert = 0  # quantile value for the error bound
         self.debugEnable = True  # enable debug prints
 
-        # variables to save debug info in each iteration
-        self.errorBdAll = []
-        self.muhatAll = []
-        self.aMLEAll = []
-        self.lossMLEAll = []
-        self.timeAll = []
-        self.dscAll = []
-        self.s_All = []
-
         # Credible interval : two-sided confidence, i.e., 1-alpha percent quantile
         if self.fullBayes:
             # degrees of freedom = 2^mmin - 1
@@ -140,23 +132,21 @@ class CubBayesLatticeG(StoppingCriterion):
         self.distribution = distribution
         allowed_levels = ['single']
         allowed_distribs = ["Lattice"]
-        super(CubBayesLatticeG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubBayesLatticeG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
 
         if distribution.randomize:
-            raise ParameterError("CubLattice_g requires distribution to have randomize=False")
+            raise ParameterError("CubBayesLattice_g requires distribution to have randomize=False")
         if distribution.backend != 'gail':
             raise ParameterError("CubBayesLattice_g requires distribution to have 'GAIL' backend")
 
     # computes the integral
     def integrate(self):
-
         # pick a random value to apply as shift
         shift = np.random.rand(1, self.dim)
         # shift = np.array([[0.58, 0.632]])
 
         # Construct AccumulateData Object to House Integration data
         self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, shift, self.vdc_order)
-
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -166,9 +156,7 @@ class CubBayesLatticeG(StoppingCriterion):
 
             # Update function values
             xun_, ftilde_, m = self.data.update_data()
-            stop_flag, muhat, order_ = self.stopping_criterion(xun_, ftilde_, m)
-
-            self.timeAll.append(time() - tstart_iter)  # store per iteration time
+            stop_flag, muhat, order_, ErrBd = self.stopping_criterion(xun_, ftilde_, m)
 
             # if stopAtTol true, exit the loop
             # else, run for for all 'n' values.
@@ -183,30 +171,19 @@ class CubBayesLatticeG(StoppingCriterion):
                 break
 
         out = OutParams()
-        out.n = 2**m
-        out.time = tstart - time()
-        out.ErrBd = self.errorBdAll[-1]
+        out.n = 2 ** m
+        out.time = time() - tstart
+        out.ErrBd = ErrBd
+        self.data.time_integrate = out.time
+        ## Approximate integral
+        self.data.solution = muhat
 
-        optParams = OutOptParams()
-        optParams.ErrBdAll = self.errorBdAll
-        optParams.muhatAll = self.muhatAll
-        optParams.mvec = self.data.mvec
-        optParams.aMLEAll = self.aMLEAll
-        optParams.timeAll = self.timeAll
-        optParams.s_All = self.s_All
-        optParams.dscAll = self.dscAll
-        optParams.absTol = self.absTol
-        optParams.relTol = self.relTol
-        optParams.shift = shift
-        optParams.stopAtTol = self.stopAtTol
-        optParams.r = order_
-        out.optParams = optParams
         if stop_flag == True:
             out.exitflag = 1
         else:
             out.exitflag = 2  # error tolerance may not be met
 
-        return muhat, out
+        return muhat, self.data
 
     # decides if the user-defined error threshold is met
     def stopping_criterion(self, xpts, ftilde, m):
@@ -260,27 +237,20 @@ class CubBayesLatticeG(StoppingCriterion):
         else:  # non zero mean case
             muhat = ftilde[0] / Lambda[0]
 
+        self.data.error_hat = ErrBd
+
         muhat = np.abs(muhat)
         muminus = muhat - ErrBd
         muplus = muhat + ErrBd
 
-        # store intermediate values for post analysis
-        # store the debug information
-        self.dscAll.append(sqrt(DSC))
-        self.s_All.append(sqrt(RKHSnorm / n))
-        self.muhatAll.append(muhat)
-        self.errorBdAll.append(ErrBd)
-        self.aMLEAll.append(aMLE)
-        self.lossMLEAll.append(loss)
-
-        if 2 * ErrBd <= max(self.absTol, self.relTol * abs(muminus)) + max(self.absTol, self.relTol * abs(muplus)):
-            if self.errorBdAll[-1] == 0:
-                self.errorBdAll[-1] = np.finfo(float).eps
+        if 2 * ErrBd <= max(self.abs_tol, self.rel_tol * abs(muminus)) + max(self.abs_tol, self.rel_tol * abs(muplus)):
+            if ErrBd == 0:
+                ErrBd = np.finfo(float).eps
 
             # stopping criterion achieved
             success = True
 
-        return success, muhat, r
+        return success, muhat, r, ErrBd
 
     # objective function to estimate parameter theta
     # MLE : Maximum likelihood estimation
@@ -358,6 +328,7 @@ class CubBayesLatticeG(StoppingCriterion):
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fft(C1 - 1)
     '''
+
     @staticmethod
     def kernel(xun, order, a, avoidCancelError, kernType, debug_enable):
 

@@ -58,6 +58,14 @@ def cubqmcsobolg(dimension, abs_tol, rel_tol):
     solution,data = CubQMCSobolG(integrand, abs_tol, rel_tol).integrate()
     return data
 
+def cubbayeslatticeg(dimension, abs_tol, rel_tol):
+    distribution = Lattice(dimension, randomize=False, linear=True, backend="GAIL")
+    measure = Gaussian(distribution, covariance=1. / 2)
+    integrand = Keister(measure)
+    solution, data = CubBayesLatticeG(integrand, abs_tol, rel_tol).integrate()
+    return data
+
+
 integrations_dict = {
     ('CubMCCLT','IIDStdUniform','MC'): cubmcclt_iidstduniform,
     ('CubMCCLT','IIDStdGaussian','MC'): cubmcclt_iidstdgaussian,
@@ -66,4 +74,6 @@ integrations_dict = {
     ('CubQMCCLT','Lattice','QMC'): cubqmcclt_lattice,
     ('CubQMCCLT','Sobol','QMC'): cubqmcclt_sobol,
     ('CubQMCLatticeG','Lattice','QMC'): cubqmclatticeg,
-    ('CubQMCSobolG','Sobol','QMC'): cubqmcsobolg}
+    ('CubQMCSobolG','Sobol','QMC'): cubqmcsobolg,
+    ('CubBayesLatticeG', 'Lattice', 'QMC'): cubbayeslatticeg,
+}
