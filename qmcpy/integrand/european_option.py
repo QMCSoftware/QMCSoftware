@@ -123,7 +123,7 @@ class EuropeanOption(Integrand):
         ax.set_ylabel('Option Price')
         ax.legend(loc='upper left')
         s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
-        ax.set_title(s+' European Option Paths')
+        ax.set_title(s+' Asset Price Paths')
         fig.tight_layout()
         if out: pyplot.savefig(out,dpi=250)
         if show: pyplot.show()
