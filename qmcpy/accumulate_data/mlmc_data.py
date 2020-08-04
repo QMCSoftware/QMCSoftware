@@ -1,5 +1,5 @@
 from ._accumulate_data import AccumulateData
-from numpy import zeros, absolute, maximum, tile, array, log2, arange, ones
+from numpy import *
 from numpy.linalg import lstsq
 
 
@@ -7,15 +7,11 @@ class MLMCData(AccumulateData):
     """
     Accumulated data for IIDDistribution calculations,
     and store multi-level mean, variance, and cost values.
-
-    Reference:
-        M.B. Giles. 'Multi-level Monte Carlo path simulation'. 
-        Operations Research, 56(3):607-617, 2008.
-        http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
+    See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['levels','n_level','mean_level','var_level','cost_per_sample',
-        'alpha','beta','gamma']
+    parameters = ['levels','dimensions','n_level','mean_level','var_level',
+        'cost_per_sample','n_total','alpha','beta','gamma']
 
     def __init__(self, stopping_criterion, integrand, levels_init, n_init, alpha0, beta0, gamma0):
         """
@@ -36,7 +32,8 @@ class MLMCData(AccumulateData):
         self.measure = self.integrand.measure
         self.distribution = self.measure.distribution
         # Set Attributes
-        self.levels = levels_init
+        self.levels = int(levels_init)
+        self.dimensions = zeros(self.levels+1)
         self.n_level = zeros(self.levels+1)
         self.sum_level = zeros((2,self.levels+1))
         self.cost_level = zeros(self.levels+1)
@@ -49,7 +46,7 @@ class MLMCData(AccumulateData):
         self.gamma = maximum(0,self.gamma0)
         self.solution = None
         self.n_total = 0
-        super().__init__()
+        super(MLMCData,self).__init__()
 
     def update_data(self):
         """ See abstract method. """
@@ -57,8 +54,8 @@ class MLMCData(AccumulateData):
         for l in range(self.levels+1):
             if self.diff_n_level[l] > 0:
                 # reset dimension
-                new_dim = self.integrand.dim_at_level(l)
-                self.measure.set_dimension(new_dim)
+                self.dimensions[l] = self.integrand._dim_at_level(l)
+                self.measure.set_dimension(self.dimensions[l])
                 # evaluate integral at sampleing points samples
                 samples = self.distribution.gen_samples(n=self.diff_n_level[l])
                 sums,cost = self.integrand.f(samples,l=l)
@@ -87,3 +84,4 @@ class MLMCData(AccumulateData):
         if self.gamma0 <= 0:
             x = lstsq(a,log2(self.cost_per_sample[1:]),rcond=None)[0]
             self.gamma = maximum(.5,x[0])
+        self.n_total = self.n_level.sum()

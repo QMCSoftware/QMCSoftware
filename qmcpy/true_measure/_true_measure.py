@@ -1,5 +1,4 @@
-from ..util import MethodImplementationError, univ_repr, DimensionError
-from copy import deepcopy
+from ..util import MethodImplementationError, _univ_repr, DimensionError
 
 
 class TrueMeasure(object):
@@ -12,9 +11,8 @@ class TrueMeasure(object):
         if not hasattr(self,'parameters'):
             self.parameters = []
         self.dimension = self.distribution.dimension
-        self.distrib_name = type(self.distribution).__name__
 
-    def gen_mimic_samples(self, *args, **kwargs):
+    def gen_samples(self, *args, **kwargs):
         """
         ABSTRACT METHOD to generate samples from the DiscreteDistribution object
         and transform them to mimic TrueMeasure samples. 
@@ -31,7 +29,7 @@ class TrueMeasure(object):
         """
         raise MethodImplementationError(self,'gen_samples')
     
-    def transform_g_to_f(self, g):
+    def _transform_g_to_f(self, g):
         """
         ABSTRACT METHOD to transform g, the origianl integrand, to f,
         the integrand transformed to accept samples from the discrete distribution.  
@@ -42,7 +40,7 @@ class TrueMeasure(object):
         Returns:
             function handle: transformed integrand
         """
-        raise MethodImplementationError(self,'transform_g_to_f')
+        raise MethodImplementationError(self,'_transform_g_to_f')
 
     def set_dimension(self, dimension):
         """
@@ -67,6 +65,11 @@ class TrueMeasure(object):
         Note:
             May not be applicable for all measures (ex: Lebesgue).
         """ 
+        raise MethodImplementationError(self,'pdf')
 
     def __repr__(self):
-        return univ_repr(self, "TrueMeasure", ['distrib_name']+self.parameters)
+        return _univ_repr(self, "TrueMeasure", self.parameters)
+    
+    def plot(self, *args, **kwargs):
+        """ Create a plot relevant to the true measure object. """
+        raise MethodImplementationError(self,'plot')

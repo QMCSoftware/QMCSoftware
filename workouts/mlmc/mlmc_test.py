@@ -1,6 +1,6 @@
 """ Test mlml """
 
-from qmcpy import CubMcMl
+from qmcpy import CubMCML
 from numpy import *
 from numpy.linalg import lstsq
 
@@ -12,7 +12,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
         integrand_qmcpy (function):
             low-level routine for l level estimation such that 
                 Args:
-                    x (ndarray): nx(integrand.dim_at_level(l)) array of samples from discrete distribution
+                    x (ndarray): nx(integrand._dim_at_level(l)) array of samples from discrete distribution
                     l (int): level
                 Return:    
                     sums(1) = sum(Pf-Pc)
@@ -46,7 +46,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
         cst = 0
         for j in range(1,101):
             # reset dimension
-            new_dim = integrand_qmcpy.dim_at_level(ll)
+            new_dim = integrand_qmcpy._dim_at_level(ll)
             integrand_qmcpy.measure.set_dimension(new_dim)
             # evaluate integral at sampleing points samples
             samples = integrand_qmcpy.measure.distribution.gen_samples(n=n/100)
@@ -57,7 +57,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
             kurt = 0.
         else:
             kurt = ( sums[3] - 4*sums[2]*sums[0] + 6*sums[1]*sums[0]**2 - 
-                     3*sums[0]*sums[0]**3 ) /  (sums[1]-sums[0]**2)**2
+                     3*sums[0]*sums[0]**3 ) /  (sums[1]-sums[0]**2)**2.
         cost = hstack((cost, cst))
         del1 = hstack((del1, sums[0]))
         del2 = hstack((del2, sums[4]))
@@ -107,7 +107,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
     beta  = max(beta,0.5)
     theta = 0.25
     for i in range(len(eps)):
-        mlmc_qmcpy = CubMcMl(integrand_qmcpy,
+        mlmc_qmcpy = CubMCML(integrand_qmcpy,
             rmse_tol = eps[i],
             n_init = n0,
             levels_min = l_min,

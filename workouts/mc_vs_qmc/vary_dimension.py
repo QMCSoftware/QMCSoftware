@@ -29,7 +29,7 @@ def vary_dimension(dimension=[1,2,3], abs_tol=0, rel_tol=.1, trials=1):
                 solution += data.solution
                 n += data.n_total
                 time += data.time_integrate
-            results_i = [*problem,dim,float(solution)/trials,float(n)/trials,float(time)/trials]
+            results_i = [problem[0],problem[1],problem[2],dim,float(solution)/trials,float(n)/trials,float(time)/trials]
             results.loc[i] = results_i
             print(('%-20s%-20s%-15s%-15d%-15.2f%-15d%-15.3f')%tuple(results_i))
             i += 1
@@ -38,5 +38,5 @@ def vary_dimension(dimension=[1,2,3], abs_tol=0, rel_tol=.1, trials=1):
 
 if __name__ == '__main__':
     results = vary_dimension(dimension=arange(1,41), abs_tol=0, rel_tol=.01, trials=3)
-    results.to_csv('outputs/mc_vs_qmc/vary_dimension.csv', index=False)
+    results.to_csv('workouts/mc_vs_qmc/out/vary_dimension.csv', index=False)
     

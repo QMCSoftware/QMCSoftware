@@ -1,1 +1,3 @@
 include qmcpy/discrete_distribution/qrng/*.h
+include qmcpy/discrete_distribution/sobol/mps_sobol_Cs.col
+include qmcpy/discrete_distribution/lattice/lattice-32001-1024-1048576.3600.npy

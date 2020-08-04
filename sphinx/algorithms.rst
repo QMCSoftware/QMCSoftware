@@ -3,55 +3,73 @@ QMCPy Documentation
 
 
 
-Integrand Class
----------------
+Discrete Distribution Class
+---------------------------
 
-Abstract Integrand Class
-........................
+Abstract Discrete Distribution Class
+....................................
 
-.. automodule:: qmcpy.integrand._integrand
+.. automodule:: qmcpy.discrete_distribution._discrete_distribution
     :members:
 
-Keister Function
-................
+Lattice
+.......
 
-.. automodule:: qmcpy.integrand.keister
+.. automodule:: qmcpy.discrete_distribution.lattice.lattice
     :members:
 
-Custom Function
-...............
+Sobol'
+.......
 
-.. automodule:: qmcpy.integrand.custom_fun
+.. automodule:: qmcpy.discrete_distribution.sobol.sobol
     :members:
 
-European Option
-...............
+Halton
+......
 
-.. automodule:: qmcpy.integrand.european_option
+.. automodule:: qmcpy.discrete_distribution.halton.halton
     :members:
 
-Asian Call Option
-.................
+Korobov
+.......
 
-.. automodule:: qmcpy.integrand.asian_call
+.. automodule:: qmcpy.discrete_distribution.korobov
     :members:
 
-Multilevel Call Options with Milstein Discretization 
-...............................................
+IID Standard Uniform
+....................
 
-.. automodule:: qmcpy.integrand.ml_call_options
+.. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
-Linear Function
-...............
+IID Standard Gaussian
+.....................
 
-.. automodule:: qmcpy.integrand.linear
+.. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
     :members:
 
+Custom IID Distribution
+.......................
+
+.. automodule:: qmcpy.discrete_distribution.custom_iid_distribution
+    :members:
+
+Inverse CDF Sampling
+....................
+
+.. automodule:: qmcpy.discrete_distribution.inverse_cdf_sampling
+    :members:
+
+Acceptance Rejection Sampling
+.............................
+
+.. automodule:: qmcpy.discrete_distribution.acceptance_rejection_sampling
+    :members:
+    
 
 
 True Measure Class
--------------
+------------------
 
 Abstract Measure Class
 ......................
@@ -90,62 +108,57 @@ Importance Sampling
     :members:
 
 Identical to what Discrete Distribution Mimics
-..................
+..............................................
 
 .. automodule:: qmcpy.true_measure.identical_to_discrete
     :members:
+    
 
+    
 
+Integrand Class
+---------------
 
-Discrete Distribution Class
----------------------------
+Abstract Integrand Class
+........................
 
-Abstract Discrete Distribution Class
-....................................
-
-.. automodule:: qmcpy.discrete_distribution._discrete_distribution
+.. automodule:: qmcpy.integrand._integrand
     :members:
 
-Lattice
-.......
+Keister Function
+................
 
-.. automodule:: qmcpy.discrete_distribution.lattice.lattice
+.. automodule:: qmcpy.integrand.keister
     :members:
 
-Sobol'
-.....
+Custom Function
+...............
 
-.. automodule:: qmcpy.discrete_distribution.sobol.sobol
+.. automodule:: qmcpy.integrand.custom_fun
     :members:
 
-IID Standard Uniform
-....................
+European Option
+...............
 
-.. automodule:: qmcpy.discrete_distribution.iid_std_uniform
+.. automodule:: qmcpy.integrand.european_option
     :members:
 
-IID Standard Gaussian
-.....................
+Asian Option
+.................
 
-.. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
+.. automodule:: qmcpy.integrand.asian_option
     :members:
 
-Custom IID Distribution
-.......................
+Multilevel Call Options with Milstein Discretization
+.....................................................
 
-.. automodule:: qmcpy.discrete_distribution.custom_iid_distribution
+.. automodule:: qmcpy.integrand.ml_call_options
     :members:
 
-Inverse CDF Sampling
-....................
+Linear Function
+...............
 
-.. automodule:: qmcpy.discrete_distribution.inverse_cdf_sampling
-    :members:
-
-Acceptance Rejection Sampling
-.............................
-
-.. automodule:: qmcpy.discrete_distribution.acceptance_rejection_sampling
+.. automodule:: qmcpy.integrand.linear
     :members:
 
 
@@ -159,14 +172,14 @@ Abstract Stopping Criterion Class
 .. automodule:: qmcpy.stopping_criterion._stopping_criterion
     :members:
 
-Garunteed Lattice Cubature (qMC)
-................................
+Guaranteed Lattice Cubature (qMC)
+..................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_lattice_g
     :members:
 
-Garunteed Sobol Cubature (qMC)
-..............................
+Guaranteed Sobol Cubature (qMC)
+................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_sobol_g
     :members:
@@ -189,7 +202,7 @@ Multilevel MC Cubature
 .. automodule:: qmcpy.stopping_criterion.cub_mc_ml
     :members:
 
-Garunteed MC Cubature
+Guaranteed MC Cubature
 ...............................
 
 .. automodule:: qmcpy.stopping_criterion.cub_mc_g
@@ -198,7 +211,7 @@ Garunteed MC Cubature
 CLT MC Cubature
 ..........................
 
-.. automodule:: qmcpy.stopping_criterion.cub_qmc_clt
+.. automodule:: qmcpy.stopping_criterion.cub_mc_clt
     :members:
 
 
@@ -207,7 +220,7 @@ Accumulate Data Class
 ---------------------
 
 Abstract Accumulate Data Class
-...................
+...............................
 
 .. automodule:: qmcpy.accumulate_data._accumulate_data
     :members:
@@ -235,32 +248,9 @@ Multilevel MC Data
 
 .. automodule:: qmcpy.accumulate_data.mlmc_data
     :members:
-    
+
 Mean Variance MC Data
 .......................
 
 .. automodule:: qmcpy.accumulate_data.mean_var_data
-    :members:
-
-
-
-Utilities
----------
-
-Math Functions
-..............
-
-.. automodule:: qmcpy.util.math_functions
-    :members:
-
-Exceptions and Warnnings
-.........................
-
-.. automodule:: qmcpy.util.exceptions_warnings
-    :members:
-
-Abstraction Functions
-.....................
-
-.. automodule:: qmcpy.util.abstraction_functions
     :members:

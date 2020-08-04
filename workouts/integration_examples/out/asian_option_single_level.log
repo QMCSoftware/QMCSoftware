@@ -1,0 +1,170 @@
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 5.8335         
+AsianCall (Integrand Object)
+    volatility      2^(-1)
+    start_price     30
+    strike_price    25
+    interest_rate   0.010
+    mean_type       geometric
+    dimensions      2^(6)
+    dim_fracs       0
+IIDStdGaussian (DiscreteDistribution Object)
+    dimension       2^(6)
+    seed            7
+    mimics          StdGaussian
+BrownianMotion (TrueMeasure Object)
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    drift           0
+    assembly_type   pca
+CubMCCLT (StoppingCriterion Object)
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.025
+    rel_tol         0
+    n_init          2^(10)
+    n_max           10000000000
+MeanVarData (AccumulateData Object)
+    levels          1
+    solution        5.833
+    n               755748
+    n_total         756772
+    error_hat       0.026
+    confid_int      [5.808 5.859]
+    time_integrate  3.388
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 5.8304         
+AsianCall (Integrand Object)
+    volatility      2^(-1)
+    start_price     30
+    strike_price    25
+    interest_rate   0.010
+    mean_type       geometric
+    dimensions      2^(6)
+    dim_fracs       0
+Lattice (DiscreteDistribution Object)
+    dimension       2^(6)
+    randomize       1
+    seed            1092
+    backend         mps
+    mimics          StdUniform
+BrownianMotion (TrueMeasure Object)
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    drift           0
+    assembly_type   pca
+CubQMCCLT (StoppingCriterion Object)
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.025
+    rel_tol         0
+    n_init          2^(8)
+    n_max           2^(30)
+MeanVarDataRep (AccumulateData Object)
+    replications    2^(4)
+    solution        5.830
+    sighat          0.016
+    n_total         2^(14)
+    error_hat       0.012
+    confid_int      [5.818 5.843]
+    time_integrate  0.166
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 5.8341         
+AsianCall (Integrand Object)
+    volatility      2^(-1)
+    start_price     30
+    strike_price    25
+    interest_rate   0.010
+    mean_type       geometric
+    dimensions      2^(6)
+    dim_fracs       0
+IIDStdGaussian (DiscreteDistribution Object)
+    dimension       2^(6)
+    seed            7
+    mimics          StdGaussian
+BrownianMotion (TrueMeasure Object)
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    drift           0
+    assembly_type   pca
+CubMCG (StoppingCriterion Object)
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.025
+    rel_tol         0
+    n_init          2^(10)
+    n_max           10000000000
+MeanVarData (AccumulateData Object)
+    levels          1
+    solution        5.834
+    n               951924
+    n_total         952948
+    error_hat       0.025
+    confid_int      [5.809 5.859]
+    time_integrate  4.420
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 5.8389         
+AsianCall (Integrand Object)
+    volatility      2^(-1)
+    start_price     30
+    strike_price    25
+    interest_rate   0.010
+    mean_type       geometric
+    dimensions      2^(6)
+    dim_fracs       0
+Lattice (DiscreteDistribution Object)
+    dimension       2^(6)
+    randomize       1
+    seed            7
+    backend         gail
+    mimics          StdUniform
+BrownianMotion (TrueMeasure Object)
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    drift           0
+    assembly_type   pca
+CubQMCLatticeG (StoppingCriterion Object)
+    abs_tol         0.025
+    rel_tol         0
+    n_init          2^(10)
+    n_max           2^(35)
+LDTransformData (AccumulateData Object)
+    n_total         2^(11)
+    solution        5.839
+    error_hat       0.022
+    time_integrate  0.037
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 5.8335         
+AsianCall (Integrand Object)
+    volatility      2^(-1)
+    start_price     30
+    strike_price    25
+    interest_rate   0.010
+    mean_type       geometric
+    dimensions      2^(6)
+    dim_fracs       0
+Sobol (DiscreteDistribution Object)
+    dimension       2^(6)
+    randomize       1
+    seed            7
+    backend         qrng
+    mimics          StdUniform
+    graycode        0
+BrownianMotion (TrueMeasure Object)
+    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    drift           0
+    assembly_type   pca
+CubQMCSobolG (StoppingCriterion Object)
+    abs_tol         0.025
+    rel_tol         0
+    n_init          2^(10)
+    n_max           2^(35)
+LDTransformData (AccumulateData Object)
+    n_total         2^(10)
+    solution        5.834
+    error_hat       0.023
+    time_integrate  0.016
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

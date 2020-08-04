@@ -26,11 +26,13 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 project = u"QMCPy"
 copyright = u"2019, Illinois Institute of Technology"
-author = u"Fred J. Hickernell, Aleksei Sorokin, Sou-Cheng T. Choi"
-version = u"0.1"
+author = u"Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin"
+#author = u"S-C Choi, F Hickernell, M McCourt, J Rathinavel, & A Sorokin"
+
+version = u"0.3"
 
 # The full version, including alpha/beta/rc tags
-release = u"0.1"
+release = version
 master_doc = 'index'
 
 
@@ -40,6 +42,12 @@ master_doc = 'index'
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
 latex_elements = {"preamble": r'\usepackage{enumitem}\setlistdepth{99}\usepackage{threeparttable}'}
+
+latex_documents = [
+    (master_doc, 'qmcpy.tex', 'QMCPy',
+     author.replace(', ', '\\and ').replace(' and ', '\\and and '),
+     'manual'),
+]
 
 extensions = [
     "sphinx_math_dollar",
@@ -114,10 +122,11 @@ html_theme_options = {
 
 html_theme = "sphinx_rtd_theme"
 html_show_sourcelink = False
+"""
 html_theme_options = {
     'page_width': 'auto',
 }
-"""
+
 html_theme = "bootstrap"
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 """

@@ -24,6 +24,8 @@ docs/Gemfile.lock
 # Sphinx
 sphinx/_build/
 sphinx/_static/
+sphinx/demo_rst/
+sphinx/readme_rst/
 
 # Jupyter Notebooks
 *checkpoint.ipynb

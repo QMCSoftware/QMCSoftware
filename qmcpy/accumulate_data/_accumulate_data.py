@@ -1,7 +1,7 @@
 from ..true_measure._true_measure import TrueMeasure
-from ..util import ParameterError, MethodImplementationError, univ_repr, DimensionError
+from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 
-class AccumulateData():
+class AccumulateData(object):
     """ Accumulated Data abstract class. DO NOT INSTANTIATE. """
 
     def __init__(self):
@@ -30,6 +30,6 @@ class AccumulateData():
         string = "Solution: %-15.4f\n" % (self.solution)
         for qmc_obj in [self.integrand, self.distribution, self.measure, self.stopping_criterion]:
             if qmc_obj:
-                string += str(qmc_obj)
-        string += univ_repr(self, 'AccumulateData', self.parameters + ['time_integrate'])
+                string += str(qmc_obj)+'\n'
+        string += _univ_repr(self, 'AccumulateData', self.parameters + ['time_integrate'])
         return string

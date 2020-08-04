@@ -1,38 +1,80 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..util import tolfun, MaxSamplesWarning, NotYetImplemented
-from numpy import array, ceil, exp, floor, log, minimum, sqrt, tile
+from ..integrand import Keister
+from ..true_measure import Gaussian
+from ..discrete_distribution import IIDStdUniform
+from ..util import _tol_fun, MaxSamplesWarning, NotYetImplemented
+from numpy import *
 from scipy.optimize import fsolve
 from scipy.stats import norm
-from time import perf_counter
+from time import time
 import warnings
 
 
-class CubMcG(StoppingCriterion):
+class CubMCG(StoppingCriterion):
     """
-    Stopping Criterion with garunteed accuracy
+    Stopping criterion with guaranteed accuracy.
 
-    Adapted from
+    >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
+    >>> sc = CubMCG(k,abs_tol=.05)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    1.803926962264685
+    >>> data
+    Solution: 1.8039         
+    Keister (Integrand Object)
+    IIDStdUniform (DiscreteDistribution Object)
+        dimension       2^(1)
+        seed            7
+        mimics          StdUniform
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
+    CubMCG (StoppingCriterion Object)
+        inflate         1.200
+        alpha           0.010
+        abs_tol         0.050
+        rel_tol         0
+        n_init          2^(10)
+        n_max           10000000000
+    MeanVarData (AccumulateData Object)
+        levels          1
+        solution        1.804
+        n               13473
+        n_total         14497
+        error_hat       0.050
+        confid_int      [1.754 1.854]
+        time_integrate  ...
+
+    Original Implementation:
+
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
 
-    Reference:
-        
-        [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
+    References:
+
+        [1] Fred J. Hickernell, Lan Jiang, Yuewei Liu, and Art B. Owen, "Guaranteed
+        conservative fixed width confidence intervals via Monte Carlo
+        sampling," Monte Carlo and Quasi-Monte Carlo Methods 2012 (J. Dick, F.
+        Y. Kuo, G. W. Peters, and I. H. Sloan, eds.), pp. 105-128,
+        Springer-Verlag, Berlin, 2014. DOI: 10.1007/978-3-642-41095-6_5
+
+        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
         Available from http://gailgithub.github.io/GAIL_Dev/
 
-    Guarantee
+    Guarantee:
         This algorithm attempts to calculate the mean, mu, of a random variable
-        to a prescribed error tolerance, tolfun:= max(abstol,reltol*|mu|), with
+        to a prescribed error tolerance, _tol_fun:= max(abstol,reltol*|mu|), with
         guaranteed confidence level 1-alpha. If the algorithm terminates without
         showing any warning messages and provides an answer tmu, then the follow
-        inequality would be satisfied: Pr(|mu-tmu| <= tolfun) >= 1-alpha
+        inequality would be satisfied: $\P(| mu - tmu | \\le tol\_fun) \\ge 1 - \\alpha$.
     """
 
     parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0, n_init=1024, n_max=1e10,
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
                  inflate=1.2, alpha=0.01):
         """
         Args:
@@ -45,27 +87,28 @@ class CubMcG(StoppingCriterion):
             n_max: maximum number of samples
         """
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
-        self.n_init = n_init
-        self.n_max = n_max
-        self.alpha = alpha
-        self.inflate = inflate
-        self.alpha_sigma = self.alpha / 2  # the uncertainty for variance estimation
+        self.abs_tol = float(abs_tol)
+        self.rel_tol = float(rel_tol)
+        self.n_init = float(n_init)
+        self.n_max = float(n_max)
+        self.alpha = float(alpha)
+        self.inflate = float(inflate)
+        self.alpha_sigma = float(self.alpha) / 2.  # the uncertainty for variance estimation
         self.kurtmax = (n_init - 3) / (n_init - 1) + \
             (self.alpha_sigma * n_init) / (1 - self.alpha_sigma) * \
-            (1 - 1 / self.inflate**2)**2
+            (1 - 1. / self.inflate**2)**2
+        self.integrand = integrand
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
-        allowed_levels = 'single'
+        allowed_levels = ['single']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super().__init__(distribution, allowed_levels, allowed_distribs)
-        # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, integrand, self.n_init)  # house integration data
+        super(CubMCG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """
-        t_start = perf_counter()
+        # Construct AccumulateData Object to House Integration data
+        self.data = MeanVarData(self, self.integrand, self.n_init)  # house integration data
+        t_start = time()
         # Pilot Sample
         self.data.update_data()
         self.sigma_up = self.inflate * self.data.sighat
@@ -73,7 +116,7 @@ class CubMcG(StoppingCriterion):
             self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
             toloversig = self.abs_tol / self.sigma_up
             # absolute error tolerance over sigma
-            n, self.err_bar = \
+            n, self.data.error_hat = \
                 self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_max, self.sigma_up)
             self.data.n[:] = n
             if self.data.n_total + self.data.n > self.n_max:
@@ -91,8 +134,8 @@ class CubMcG(StoppingCriterion):
         else: # self.rel_tol > 0
             alphai = (self.alpha-self.alpha_sigma)/(2*(1-self.alpha_sigma)) # uncertainty to do iteration
             eps1 = self._ncbinv(1e4,alphai,self.kurtmax)
-            self.err_bar = self.sigma_up*eps1
-            tau = 1 # step of the iteration 
+            self.data.error_hat = self.sigma_up*eps1
+            tau = 1. # step of the iteration
             self.data.n[:] = 1e4 # default initial sample size
             while True:
                 if self.data.n_total + self.data.n > self.n_max:
@@ -109,26 +152,26 @@ class CubMcG(StoppingCriterion):
                     self.data.update_data()
                     break
                 self.data.update_data()
-                lb_tol = tolfun(self.abs_tol, self.rel_tol, 0, self.data.solution-self.err_bar, 'max')
-                ub_tol = tolfun(self.abs_tol, self.rel_tol, 0, self.data.solution+self.err_bar, 'max')
-                delta_plus = (lb_tol + ub_tol) / 2
-                if delta_plus >= self.err_bar:
+                lb_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution-self.data.error_hat, 'max')
+                ub_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution+self.data.error_hat, 'max')
+                delta_plus = (lb_tol + ub_tol) / 2.
+                if delta_plus >= self.data.error_hat:
                     # stopping criterion met
-                    delta_minus = (lb_tol - ub_tol) / 2
+                    delta_minus = (lb_tol - ub_tol) / 2.
                     self.data.solution += delta_minus # adjust solution a bit
                     break
                 else:
                     candidate_tol = max(self.abs_tol,.95*self.rel_tol*abs(self.data.solution))
-                    self.err_bar = min(self.err_bar/2,candidate_tol)
+                    self.data.error_hat = min(self.data.error_hat/2.,candidate_tol)
                     tau += 1
                 # update next uncertainty
-                toloversig = self.err_bar / self.sigma_up
+                toloversig = self.data.error_hat / self.sigma_up
                 alphai = 2**tau * (self.alpha - self.alpha_sigma) / (1 - self.alpha_sigma)
                 n,_ = self._nchebe(toloversig, alphai, self.kurtmax, self.n_max, self.sigma_up)
-                self.data.n[:] = n            
+                self.data.n[:] = n
         # set confidence interval
-        self.data.confid_int = self.data.solution + self.err_bar * array([-1, 1])
-        self.data.time_integrate = perf_counter() - t_start
+        self.data.confid_int = self.data.solution + self.data.error_hat * array([-1, 1])
+        self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):
@@ -136,13 +179,13 @@ class CubMcG(StoppingCriterion):
         A = 18.1139
         A1 = 0.3328
         A2 = 0.429  # three constants in Berry-Esseen inequality
-        M3upper = kurtmax**(3 / 4)
+        M3upper = kurtmax**(3. / 4)
         # the upper bound on the third moment by Jensen's inequality
         BEfun2 = lambda logsqrtn: \
             (norm.cdf(-exp(logsqrtn) * toloversig)
             + exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
             A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
-            - alpha / 2)
+            - alpha / 2.)
         # Berry-Esseen function, whose solution is the sample size needed
         logsqrtnCLT = log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
         nbe = ceil(exp(2 * fsolve(BEfun2, logsqrtnCLT)))
@@ -153,7 +196,7 @@ class CubMcG(StoppingCriterion):
             (norm.cdf(-exp(logsqrtn) * toloversig)
             + exp(-logsqrtn) * min(A1 * (M3upper + A2),
             A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
-            - alpha / 2)
+            - alpha / 2.)
         err = fsolve(BEfun3, toloversig) * sigma_0_up
         return ncb, err
 
@@ -163,7 +206,7 @@ class CubMcG(StoppingCriterion):
         A = 18.1139
         A1 = 0.3328
         A2 = 0.429 # three constants in Berry-Esseen inequality
-        M3upper = kurtmax**(3/4)
+        M3upper = kurtmax**(3./4)
         # using Jensen's inequality to bound the third moment
         BEfun = lambda logsqrtb: \
             (norm.cdf(n1*logsqrtb) + min(A1*(M3upper+A2),
@@ -177,3 +220,14 @@ class CubMcG(StoppingCriterion):
         eps = min(NCheb_inv,NBE_inv)
         # take the min of Chebyshev and Berry Esseen tolerance
         return eps
+
+    def set_tolerance(self, abs_tol=None, rel_tol=None):
+        """
+        See abstract method.
+
+        Args:
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not.
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
+        """
+        if abs_tol != None: self.abs_tol = abs_tol
+        if rel_tol != None: self.rel_tol = rel_tol

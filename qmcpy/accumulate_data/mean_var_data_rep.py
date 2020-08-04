@@ -1,13 +1,14 @@
 from ._accumulate_data import AccumulateData
-from time import perf_counter
-from numpy import array, finfo, float32, full, inf, nan, tile, zeros, random
-
-EPS = finfo(float32).eps
+from numpy import *
 
 
 class MeanVarDataRep(AccumulateData):
+    """
+    Update and store mean and variance estimates with repliations. 
+    See the stopping criterion that utilize this object for references.
+    """
 
-    parameters = ['replications','solution','sighat','n_total','confid_int']
+    parameters = ['replications','solution','sighat','n_total','error_hat','confid_int']
 
     def __init__(self, stopping_criterion, integrand, n_init, replications):
         """
@@ -24,7 +25,7 @@ class MeanVarDataRep(AccumulateData):
         self.distribution = self.measure.distribution
         # Set Attributes
         self.replications = replications
-        self.muhat_r = zeros(self.replications)
+        self.muhat_r = zeros(int(self.replications))
         self.solution = nan
         self.muhat = inf  # sample mean
         self.sighat = inf # sample standard deviation
@@ -35,12 +36,12 @@ class MeanVarDataRep(AccumulateData):
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
         random.seed(self.distribution.seed)
-        self.seeds = random.randint(0,100000,self.replications)
-        super().__init__()
+        self.seeds = random.randint(0,100000,int(self.replications))
+        super(MeanVarDataRep,self).__init__()
 
     def update_data(self):
         """ See abstract method. """
-        for r in range(self.replications):
+        for r in range(int(self.replications)):
             self.distribution.set_seed(self.seeds[r])
             x = self.distribution.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
             y = self.integrand.f(x).squeeze()

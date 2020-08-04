@@ -1,12 +1,16 @@
 from ._accumulate_data import AccumulateData
 from ..util import CubatureWarning
-from numpy import array, nan, zeros, tile, inf, hstack, arange, where
+from numpy import *
 import warnings
 
 
 class LDTransformData(AccumulateData):
+    """
+    Update and store transformation data based on low-discrepancy sequences. 
+    See the stopping criterion that utilize this object for references.
+    """
 
-    parameters = ['n_total','solution','r_lag']
+    parameters = ['n_total','solution','error_hat']
 
     def __init__(self, stopping_criterion, integrand, basis_transform, m_min, m_max, fudge, check_cone):
         """
@@ -47,7 +51,7 @@ class LDTransformData(AccumulateData):
         self.c_stilde_low = tile(-inf,int(self.m_max-self.l_star+1))
         self.c_stilde_up = tile(inf,int(self.m_max-self.l_star+1))
         self.check_cone = check_cone
-        super().__init__()
+        super(LDTransformData,self).__init__()
 
     def update_data(self):
         """ See abstract method. """
@@ -87,13 +91,13 @@ class LDTransformData(AccumulateData):
         if not self.check_cone: return # don't check if the function falls in the cone
         for l in range(int(self.l_star),int(self.m+1)): # Storing the information for the necessary conditions
             c_tmp = self.omg_hat(self.m-l)*self.omg_circ(self.m-l)
-            c_low = 1/(1+c_tmp)
-            c_up = 1/(1-c_tmp)
+            c_low = 1./(1+c_tmp)
+            c_up = 1./(1-c_tmp)
             const1 = sum(abs(self.y[self.kappanumap[int(2**(l-1)):int(2**l)]-1]))
             idx = int(l-self.l_star)
             self.c_stilde_low[idx] = max(self.c_stilde_low[idx],c_low*const1)
             if c_tmp < 1:
                 self.c_stilde_up[idx] = min(self.c_stilde_up[idx],c_up*const1)
         if (self.c_stilde_low > self.c_stilde_up).any():
-            warnings.warn('An element of c_stilde_low > c_stilde_up', CubatureWarning)
+            warnings.warn('An element of c_stilde_low > c_stilde_up, this function may violate the cone function. ', CubatureWarning)
         

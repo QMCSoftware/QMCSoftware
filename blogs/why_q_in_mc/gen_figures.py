@@ -16,15 +16,16 @@ pts_sets = [
     IIDStdUniform(2,seed=7).gen_samples(n),
     Lattice(2,backend='GAIL',seed=7).gen_samples(n)]
 titles = ['$U[0,1]^2$','Shifted Lattice']
+symbols = ['T','X']
 output_files = ['iid_uniform_pts','lattice_pts']
 
-for pts,title,out_f in zip(pts_sets,titles,output_files):
+for pts,title,symbol,out_f in zip(pts_sets,titles,symbols,output_files):
     fig,ax = pyplot.subplots(nrows=1, ncols=1, figsize=(5,5))
     ax.scatter(pts[:,0],pts[:,1],color='b')
-    ax.set_xlabel('$X_{i1}$')
+    ax.set_xlabel('$%s_{i1}$'%symbol)
     ax.set_xlim([0,1])
     ax.set_xticks([0,1])
-    ax.set_ylabel('$X_{i2}$')
+    ax.set_ylabel('$%s_{i2}$'%symbol)
     ax.set_ylim([0,1])
     ax.set_yticks([0,1])
     ax.set_title(title)

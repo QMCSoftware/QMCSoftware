@@ -1,0 +1,135 @@
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1676         
+Keister (Integrand Object)
+IIDStdUniform (DiscreteDistribution Object)
+    dimension       3
+    seed            7
+    mimics          StdUniform
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
+CubMCCLT (StoppingCriterion Object)
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.005
+    rel_tol         0
+    n_init          2^(10)
+    n_max           10000000000
+MeanVarData (AccumulateData Object)
+    levels          1
+    solution        2.168
+    n               1878963
+    n_total         1879987
+    error_hat       0.005
+    confid_int      [2.163 2.173]
+    time_integrate  0.743
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1671         
+Keister (Integrand Object)
+Lattice (DiscreteDistribution Object)
+    dimension       3
+    randomize       1
+    seed            1092
+    backend         mps
+    mimics          StdUniform
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
+CubQMCCLT (StoppingCriterion Object)
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.005
+    rel_tol         0
+    n_init          2^(8)
+    n_max           2^(30)
+MeanVarDataRep (AccumulateData Object)
+    replications    2^(4)
+    solution        2.167
+    sighat          0.004
+    n_total         2^(13)
+    error_hat       0.003
+    confid_int      [2.164 2.17 ]
+    time_integrate  0.018
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1682         
+Keister (Integrand Object)
+IIDStdGaussian (DiscreteDistribution Object)
+    dimension       3
+    seed            7
+    mimics          StdGaussian
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
+CubMCG (StoppingCriterion Object)
+    inflate         1.200
+    alpha           0.010
+    abs_tol         0.005
+    rel_tol         0
+    n_init          2^(10)
+    n_max           10000000000
+MeanVarData (AccumulateData Object)
+    levels          1
+    solution        2.168
+    n               2342182
+    n_total         2343206
+    error_hat       0.005
+    confid_int      [2.163 2.173]
+    time_integrate  0.382
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1688         
+Keister (Integrand Object)
+Lattice (DiscreteDistribution Object)
+    dimension       3
+    randomize       1
+    seed            7
+    backend         gail
+    mimics          StdUniform
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
+CubQMCLatticeG (StoppingCriterion Object)
+    abs_tol         0.005
+    rel_tol         0
+    n_init          2^(10)
+    n_max           2^(35)
+LDTransformData (AccumulateData Object)
+    n_total         2^(11)
+    solution        2.169
+    error_hat       0.005
+    time_integrate  0.007
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 2.1705         
+Keister (Integrand Object)
+Sobol (DiscreteDistribution Object)
+    dimension       3
+    randomize       1
+    seed            7
+    backend         qrng
+    mimics          StdUniform
+    graycode        0
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
+CubQMCSobolG (StoppingCriterion Object)
+    abs_tol         0.005
+    rel_tol         0
+    n_init          2^(10)
+    n_max           2^(35)
+LDTransformData (AccumulateData Object)
+    n_total         2^(12)
+    solution        2.170
+    error_hat       0.002
+    time_integrate  0.020
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

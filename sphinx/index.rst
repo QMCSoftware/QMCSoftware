@@ -27,7 +27,6 @@ Indices and tables
 Sponsors
 ==================
 
-
 Illinois Tech
 --------------
 

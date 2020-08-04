@@ -33,9 +33,9 @@ class MethodImplementationError(Exception):
     """
 
     def __init__(self, subclass, method_name):
-        s_f = '%s must implement the %s method. See superclass for method description ' + \
-            'and expected arguments / return values.'
-        super().__init__(s_f % (type(subclass).__name__, method_name))
+        s_f = '%s does not have an implementation of the  %s method. ' + \
+            'See superclass for method description.'
+        super(MethodImplementationError,self).__init__(s_f % (type(subclass).__name__, method_name))
 
 
 class ParameterError(Exception):

@@ -1,4 +1,4 @@
-from ..util import MethodImplementationError, TransformError, univ_repr, ParameterError
+from ..util import MethodImplementationError, TransformError, _univ_repr, ParameterError
 
 
 class Integrand(object):
@@ -8,12 +8,14 @@ class Integrand(object):
         prefix = 'A concrete implementation of Integrand must have '
         if not hasattr(self, 'measure'):
             raise ParameterError(prefix + 'self.measure (a TrueMeasure instance)')
+        if not hasattr(self, 'distribution'):
+            raise ParameterError(prefix + 'self.distribution (a DiscreteDistribuiton instance')
         if not hasattr(self,'parameters'):
             self.parameters = []
         self.dimension = self.measure.dimension
-        self.f = self.measure.transform_g_to_f(self.g) # transformed integrand
-        if not hasattr(self,'multilevel'):
-            self.multilevel = False
+        self.f = self.measure._transform_g_to_f(self.g) # transformed integrand
+        if not hasattr(self,'leveltype'):
+            self.leveltype = 'single'
         
     def g(self, x):
         """
@@ -23,7 +25,7 @@ class Integrand(object):
             x (ndarray): n samples by d dimension array of samples 
                 generated according to the true measure. 
             l (int): OPTIONAL input for multi-level integrands. The level to generate at. 
-                Note that the dimension of x is determined by the dim_at_level method for 
+                Note that the dimension of x is determined by the _dim_at_level method for 
                 multi-level methods.
 
         Return:
@@ -31,7 +33,7 @@ class Integrand(object):
         """
         raise MethodImplementationError(self, 'g')
     
-    def dim_at_level(self, l):
+    def _dim_at_level(self, l):
         """
         ABSTRACT METHOD to return the dimension of samples to generate at level l. 
         This method only needs to be implemented for multi-level integrands where 
@@ -43,7 +45,11 @@ class Integrand(object):
         Return:
             int: dimension of samples needed at level l
         """
-        raise MethodImplementationError(self, 'dim_at_level')
+        raise MethodImplementationError(self, '_dim_at_level')
 
     def __repr__(self):
-        return univ_repr(self, "Integrand", self.parameters)
+        return _univ_repr(self, "Integrand", self.parameters)
+
+    def plot(self, *args, **kwargs):
+        """ Create a plot relevant to the true measure object. """
+        raise MethodImplementationError(self,'plot')

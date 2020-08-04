@@ -1,16 +1,30 @@
 library(qrng)
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-dim <- 1;
-n_2powers <- (1:20);
-sobol_times <- n_2powers;
-trials = 40;
+d <- 1;
+mat <- matrix(0,20,4);
+mat[,1] <- 2^(1:20);
+trials <- 40;
 
-for (i in n_2powers){
-    t0 <- Sys.time()
+for (i in c(1:20)){
+    cat(paste('2^',i,'\n'))
+    n = mat[i,1];
+    # Sobol
+    t0 <- Sys.time();
     for (j in (1:trials)){
-        x <- sobol(2^i, d=dim, randomize='Owen',7);}
-    sobol_times[i] = (Sys.time() - t0)/trials;
-    cat(sprintf('n %-10d sobol time %-10.4f\n',2^i,sobol_times[i]))}
-
-results = cbind(2^n_2powers,sobol_times)
-write.table(results,file='r_sequences.csv')
+        x <- sobol(n, d, randomize='digital.shift',seed=7);}
+    mat[i,2] <- (Sys.time() - t0)/trials;
+    # GHalton
+    t0 <- Sys.time();
+    for (j in (1:trials)){
+        x <- ghalton(n, d, method='generalized');}
+    mat[i,3] <- (Sys.time() - t0)/trials;
+    # Korobov
+    t0 <- Sys.time();
+    for (j in (1:trials)){
+        x <- korobov(n, d, generator=c(1),randomize='shift');}
+    mat[i,4] <- (Sys.time() - t0)/trials;}
+df <- as.data.frame(mat);
+names(df) <- c('n','Sobol','GHalton','Korobov');
+df
+write.table(df,file='out/r_sequences.csv',row.names=FALSE,sep=',');

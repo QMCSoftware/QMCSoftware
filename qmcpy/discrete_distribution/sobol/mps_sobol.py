@@ -1,9 +1,11 @@
 """
 Sobol (Digital) sequence generator from Magic Point Shop (https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/)
 
-Adapted from https://bitbucket.org/dnuyens/qmc-generators/src/master/python/digitalseq_b2g.py
+Original Implementation:
 
-Reference:
+    https://bitbucket.org/dnuyens/qmc-generators/src/master/python/digitalseq_b2g.py
+
+References:
     
     [1] F.Y. Kuo & D. Nuyens.
     Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients 
@@ -16,7 +18,8 @@ Reference:
     vectors.` MATLAB and Python software, 2018. Available from
     https://people.cs.kuleuven.be/~dirk.nuyens/
 
-Note that mps_sobol_Cs.col is the corresponding basis vector for this algorithm
+Note:
+    mps_sobol_Cs.col is the corresponding basis vector for this algorithm
 """
 
 from copy import copy
@@ -98,60 +101,51 @@ class DigitalSeq():
 
             >>> from __future__ import print_function
             >>> m = 5
-            >>> C1 = [ 2**i for i in range(m) ]
-                # van der Corput sequence = identity matrix
-            >>> C2 = [ 1 for i in range(m) ]
-               # here we build the 2nd matrix of the sobol' and Niederreiter seq
+            >>> C1 = [ 2**i for i in range(m) ] # van der Corput sequence = identity matrix
+            >>> C2 = [ 1 for i in range(m) ] # here we build the 2nd matrix of the sobol' and Niederreiter seq
             >>> for i in range(1, m): C2[i] = (C2[i-1] << 1) ^ C2[i-1]
             >>> Cs = [ C1, C2 ]
-            >>> seq = digitalseq_b2g(Cs)
+            >>> seq = DigitalSeq(Cs)
             >>> from copy import copy
             >>> [ copy(seq.cur) for x in seq ]
-
-            [[0, 0], [16, 16], [24, 8], [8, 24], [12, 12], [28, 28], [20, 4],
-            [4, 20], [6, 10], [22, 26], [30, 2], [14, 18], [10, 6], [26, 22],
-            [18, 14], [2, 30], [3, 15], [19, 31], [27, 7], [11, 23], [15, 3],
-            [31, 19], [23, 11], [7, 27], [5, 5], [21, 21], [29, 13], [13, 29],
-            [9, 9], [25, 25], [17, 1], [1, 17]]
-
-            ::
-
+            [[0, 0], [16, 16], [24, 8], [8, 24], [12, 12], [28, 28], [20, 4], [4, 20], [6, 10], [22, 26], [30, 2], [14, 18], [10, 6], [26, 22], [18, 14], [2, 30], [3, 15], [19, 31], [27, 7], [11, 23], [15, 3], [31, 19], [23, 11], [7, 27], [5, 5], [21, 21], [29, 13], [13, 29], [9, 9], [25, 25], [17, 1], [1, 17]]
             >>> for x in seq:
-            >>>     for xj in x: print(xj, end=" ")
-            >>>     print()
-
-            0 0
-            0.5 0.5
-            0.75 0.25
-            0.25 0.75
-            0.375 0.375
-            0.875 0.875
-            0.625 0.125
-            0.125 0.625
-            0.1875 0.3125
-            0.6875 0.8125
-            0.9375 0.0625
-            0.4375 0.5625
-            0.3125 0.1875
-            0.8125 0.6875
-            0.5625 0.4375
-            0.0625 0.9375
-            0.09375 0.46875
-            0.59375 0.96875
-            0.84375 0.21875
-            0.34375 0.71875
-            0.46875 0.09375
-            0.96875 0.59375
-            0.71875 0.34375
-            0.21875 0.84375
-            0.15625 0.15625
-            0.65625 0.65625
-            0.90625 0.40625
-            0.40625 0.90625
-            0.28125 0.28125
-            0.78125 0.78125
-            0.53125 0.03125
-            0.03125 0.53125
+            ...     s = ''
+            ...     for xj in x:
+            ...            s += '%s '%str(xj)
+            ...     print(s)
+            0 0 
+            0.5 0.5 
+            0.75 0.25 
+            0.25 0.75 
+            0.375 0.375 
+            0.875 0.875 
+            0.625 0.125 
+            0.125 0.625 
+            0.1875 0.3125 
+            0.6875 0.8125 
+            0.9375 0.0625 
+            0.4375 0.5625 
+            0.3125 0.1875 
+            0.8125 0.6875 
+            0.5625 0.4375 
+            0.0625 0.9375 
+            0.09375 0.46875 
+            0.59375 0.96875 
+            0.84375 0.21875 
+            0.34375 0.71875 
+            0.46875 0.09375 
+            0.96875 0.59375 
+            0.71875 0.34375 
+            0.21875 0.84375 
+            0.15625 0.15625 
+            0.65625 0.65625 
+            0.90625 0.40625 
+            0.40625 0.90625 
+            0.28125 0.28125 
+            0.78125 0.78125 
+            0.53125 0.03125 
+            0.03125 0.53125 
 
         These are the first 32 sobol' or Niederreiter points in 2D.
 
@@ -184,7 +178,6 @@ class DigitalSeq():
         Note: The generating matrices Cs which are passed in are available as
         the Csr field of this object, but note that they have been bit
         reversed.
-
         """
         basestr = str  # basestr for python2, str for python3
         if isinstance(Cs, basestr):
@@ -200,7 +193,7 @@ class DigitalSeq():
         self.m = len(Cs[0]) if m is None else m
         self.s = len(Cs) if s is None else s
         self.t = max([int(a).bit_length() for a in Cs[0]])
-        self.alpha = self.t / self.m
+        self.alpha = float(self.t) / self.m
         self.Csr = [[bitreverse(int(Csjc), self.t)
                      for Csjc in Csj] for Csj in Cs]
         self.n = 2 ** self.m
@@ -208,11 +201,11 @@ class DigitalSeq():
         self.reset()
 
     def reset(self):
-        """Reset this digital sequence to its initial state: next index = kstart."""
+        """ Reset this digital sequence to its initial state: next index = kstart. """
         self.set_state(self.kstart)
 
     def set_state(self, k):
-        """Set the index of the next point to k."""
+        """ Set the index of the next point to k. """
         self.k = int(k - 1) # self.k is the previous point, this means we have exceptional behaviour for kstart = 0
         self.cur = [ 0 for i in range(self.s) ]
         self.x = [ 0 for i in range(self.s) ]
@@ -226,7 +219,7 @@ class DigitalSeq():
             self.x[j] = self.recipd * self.cur[j]
 
     def calc_next(self):
-        """Calculate the next sequence point and update the index counter."""
+        """ Calculate the next sequence point and update the index counter. """
         self.k = self.k + 1
         if self.k == 0: return True
         ctz = (((self.k ^ (self.k-1)) + 1) >> 1).bit_length() - 1
@@ -241,7 +234,7 @@ class DigitalSeq():
         return self
 
     def __next__(self):
-        """Return the next point of the sequence or raise StopIteration."""
+        """ Return the next point of the sequence or raise StopIteration. """
         if self.k < self.n - 1:
             self.calc_next()
             return self.x

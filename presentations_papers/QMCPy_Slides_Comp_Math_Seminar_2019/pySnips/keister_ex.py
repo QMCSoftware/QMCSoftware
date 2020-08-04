@@ -1,5 +1,0 @@
-integrand = Keister()
-dd = IIDStdGaussian(rng_seed=7)
-tm = Gaussian(dimension=2, variance=1/2)
-stop = CLT(dd, tm, abs_tol= $\epsilon$, n_init=16)
-sol, data = integrate(integrand, tm, dd, stop)
