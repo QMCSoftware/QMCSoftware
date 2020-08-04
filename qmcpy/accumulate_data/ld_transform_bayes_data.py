@@ -6,7 +6,7 @@ import warnings
 import numpy as np
 
 
-class OutParams():
+class OutParams:
     def __init__(self):
         self.n = None
         self.time = None
@@ -20,20 +20,16 @@ class LDTransformBayesData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['n_total','solution','error_hat']
+    parameters = ['n_total', 'solution', 'error_hat']
 
-    def __init__(self, stopping_criterion, integrand, m_min, m_max, shift, vdc_order):
+    def __init__(self, stopping_criterion, integrand, m_min: int, m_max: int, shift: np.ndarray):
         """
         Args:
             stopping_criterion (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
-            basis_transform (method): Transform ynext, combine with y, and then transform all points. 
-                For cub_lattice this is Fast Fourier Transform (FFT). 
-                For cub_sobol this is Fast Walsh Transform (FWT)
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
             shift (function): random shift for the lattice points
-            vdc_order (boolean): if True, lattice points used in VDC order else in linear order
         """
         # Extract attributes from integrand
         self.stopping_criterion = stopping_criterion
@@ -41,7 +37,6 @@ class LDTransformBayesData(AccumulateData):
         self.measure = self.integrand.measure
         self.distribution = self.measure.distribution
         self.shift = shift
-        self.vdc_order = vdc_order
         self.dim = stopping_criterion.dim
 
         # Set Attributes
@@ -60,8 +55,8 @@ class LDTransformBayesData(AccumulateData):
         self.xpts_ = array([])  # shifted lattice points
         self.xun_ = array([])  # unshifted lattice points
         self.ftilde_ = array([])  # fourier transformed integrand values
-        self.ff = self.doPeriodTx(self.integrand.f,
-                                  stopping_criterion.ptransform)  # integrand after the periodization transform
+        self.ff = self.do_period_transform(self.integrand.f,
+                                           stopping_criterion.ptransform)  # integrand after the periodization transform
 
         super(LDTransformBayesData, self).__init__()
 
@@ -84,7 +79,7 @@ class LDTransformBayesData(AccumulateData):
         return self.xun_, self.ftilde_, self.m
 
     # Efficient FFT computation algorithm, avoids recomputing the full fft
-    def iter_fft(self, iter, xun, xpts, ftildePrev):
+    def iter_fft(self, iter, xun, xpts, ftilde_prev):
         m = self.mvec[iter]
         n = 2 ** m
 
@@ -119,32 +114,29 @@ class LDTransformBayesData(AccumulateData):
             mnext = m - 1
 
             # Compute FFT on next set of new points
-            ftildeNextNew = np.fft.fft(self.ff(xnew))
-            ftildeNextNew = ftildeNextNew.reshape((n // 2, 1))
+            ftilde_next_new = np.fft.fft(self.ff(xnew))
+            ftilde_next_new = ftilde_next_new.reshape((n // 2, 1))
             if self.debugEnable:
-                self.alertMsg(ftildeNextNew, 'Nan', 'Inf')
+                self.alert_msg(ftilde_next_new, 'Nan', 'Inf')
 
             # combine the previous batch and new batch to get FFT on all points
-            ftilde_ = self.merge_fft(ftildePrev, ftildeNextNew, mnext)
+            ftilde_ = self.merge_fft(ftilde_prev, ftilde_next_new, mnext)
 
         return ftilde_, xun_, xpts_
 
     # using FFT butefly plot technique merges two halves of fft
     @staticmethod
-    def merge_fft(ftildeNew, ftildeNextNew, mnext):
-        ftildeNew = np.vstack([ftildeNew, ftildeNextNew])
+    def merge_fft(ftilde_new, ftilde_next_new, mnext):
+        ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
         nl = 2 ** mnext
-        # ptind=[true(nl,1); false(nl,1)]
         ptind = np.ndarray(shape=(2 * nl, 1), buffer=np.array([True] * nl + [False] * nl), dtype=bool)
-        # coef = exp(-2*1j*(0:nl-1)'/(2*nl))
         coef = np.exp(-2 * np.pi * 1j * np.ndarray(shape=(nl, 1), buffer=np.arange(0, nl), dtype=int) / (2 * nl))
-        # coefv = np.matlib.repmat(coef, 1, 1)
         coefv = np.tile(coef, (1, 1))
-        evenval = ftildeNew[ptind].reshape((nl, 1))
-        oddval = ftildeNew[~ptind].reshape((nl, 1))
-        ftildeNew[ptind] = np.squeeze(evenval + coefv * oddval)
-        ftildeNew[~ptind] = np.squeeze(evenval - coefv * oddval)
-        return ftildeNew
+        evenval = ftilde_new[ptind].reshape((nl, 1))
+        oddval = ftilde_new[~ptind].reshape((nl, 1))
+        ftilde_new[ptind] = np.squeeze(evenval + coefv * oddval)
+        ftilde_new[~ptind] = np.squeeze(evenval - coefv * oddval)
+        return ftilde_new
 
     # inserts newly generated points with the old set by interleaving them
     # xun - unshifted points
@@ -162,34 +154,34 @@ class LDTransformBayesData(AccumulateData):
 
     # computes the periodization transform for the given function values
     @staticmethod
-    def doPeriodTx(fInput, ptransform):
+    def do_period_transform(f_input, ptransform):
 
         if ptransform == 'Baker':
-            f = lambda x: fInput(1 - 2 * abs(x - 1 / 2))  # Baker's transform
+            f = lambda x: f_input(1 - 2 * abs(x - 1 / 2))  # Baker's transform
         elif ptransform == 'C0':
-            f = lambda x: fInput(3 * x ** 2 - 2 * x ** 3) * np.prod(6 * x * (1 - x), 1)  # C^0 transform
+            f = lambda x: f_input(3 * x ** 2 - 2 * x ** 3) * np.prod(6 * x * (1 - x), 1)  # C^0 transform
         elif ptransform == 'C1':
             # C^1 transform
-            f = lambda x: fInput(x ** 3 * (10 - 15 * x + 6 * x ** 2)) * np.prod(30 * x ** 2 * (1 - x) ** 2, 1)
+            f = lambda x: f_input(x ** 3 * (10 - 15 * x + 6 * x ** 2)) * np.prod(30 * x ** 2 * (1 - x) ** 2, 1)
         elif ptransform == 'C1sin':
             # Sidi C^1 transform
-            f = lambda x: fInput(x - np.sin(2 * np.pi * x) / (2 * np.pi)) * np.prod(2 * np.sin(np.pi * x) ** 2, 1)
+            f = lambda x: f_input(x - np.sin(2 * np.pi * x) / (2 * np.pi)) * np.prod(2 * np.sin(np.pi * x) ** 2, 1)
         elif ptransform == 'C2sin':
             # Sidi C^2 transform
             psi3 = lambda t: (8 - 9 * np.cos(np.pi * t) + np.cos(3 * np.pi * t)) / 16
             psi3_1 = lambda t: (9 * np.sin(np.pi * t) * np.pi - np.sin(3 * np.pi * t) * 3 * np.pi) / 16
-            f = lambda x: fInput(psi3(x)) * np.prod(psi3_1(x), 1)
+            f = lambda x: f_input(psi3(x)) * np.prod(psi3_1(x), 1)
         elif ptransform == 'C3sin':
             # Sidi C^3 transform
             psi4 = lambda t: (12 * np.pi * t - 8 * np.sin(2 * np.pi * t) + np.sin(4 * np.pi * t)) / (12 * np.pi)
             psi4_1 = lambda t: (12 * np.pi - 8 * np.cos(2 * np.pi * t) * 2 * np.pi + np.sin(
                 4 * np.pi * t) * 4 * np.pi) / (12 * np.pi)
-            f = lambda x: fInput(psi4(x)) * np.prod(psi4_1(x), 1)
+            f = lambda x: f_input(psi4(x)) * np.prod(psi4_1(x), 1)
         elif ptransform == 'none':
             # do nothing
-            f = lambda x: fInput(x)
+            f = lambda x: f_input(x)
         else:
-            f = fInput
+            f = f_input
             print(f'Error: Periodization transform {ptransform} not implemented')
 
         return f
@@ -198,27 +190,27 @@ class LDTransformBayesData(AccumulateData):
     # Example: alertMsg(x, 'Inf', 'Imag')
     #          prints if variable 'x' is either Infinite or Imaginary
     @staticmethod
-    def alertMsg(*args):
+    def alert_msg(*args):
         varargin = args
         nargin = len(varargin)
         if nargin > 1:
-            iStart = 0
-            varTocheck = varargin[iStart]
-            iStart = iStart + 1
+            i_start = 0
+            var_tocheck = varargin[i_start]
+            i_start = i_start + 1
             inpvarname = 'variable'
 
-            while iStart < nargin:
-                type = varargin[iStart]
-                iStart = iStart + 1
+            while i_start < nargin:
+                var_type = varargin[i_start]
+                i_start = i_start + 1
 
-                if type == 'Nan':
-                    if np.any(np.isnan(varTocheck)):
+                if var_type == 'Nan':
+                    if np.any(np.isnan(var_tocheck)):
                         print(f'{inpvarname} has NaN values')
-                elif type == 'Inf':
-                    if np.any(np.isinf(varTocheck)):
+                elif var_type == 'Inf':
+                    if np.any(np.isinf(var_tocheck)):
                         print(f'{inpvarname} has Inf values')
-                elif type == 'Imag':
-                    if not np.all(np.isreal(varTocheck)):
+                elif var_type == 'Imag':
+                    if not np.all(np.isreal(var_tocheck)):
                         print(f'{inpvarname} has complex values')
                 else:
                     print('unknown type check requested !')
