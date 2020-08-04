@@ -34,9 +34,7 @@ sphinx/readme_rst/
 *checkpoint.ipynb
 
 # release
-/build
-
-# distribution
+/build/
 dist/
 
 # alegresor
