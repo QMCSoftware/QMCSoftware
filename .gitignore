@@ -31,7 +31,9 @@ sphinx/readme_rst/
 *checkpoint.ipynb
 
 # release
-/build
+/build/
+dist/
+
 # alegresor
 *.vscode
 *_ags*
