@@ -41,7 +41,7 @@ class CubQMCLatticeG(StoppingCriterion):
     LDTransformData (AccumulateData Object)
         n_total         2^(10)
         solution        1.808
-        error_hat       0.005
+        error_bound     0.005
         time_integrate  ...
 
     Original Implementation:
@@ -129,12 +129,12 @@ class CubQMCLatticeG(StoppingCriterion):
         while True:
             self.data.update_data()
             # Check the end of the algorithm
-            self.data.error_hat = self.data.fudge(self.data.m)*self.data.stilde
+            self.data.error_bound = self.data.fudge(self.data.m)*self.data.stilde
             # Compute optimal estimator
-            ub = max(self.abs_tol, self.rel_tol*abs(self.data.solution + self.data.error_hat))
-            lb = max(self.abs_tol, self.rel_tol*abs(self.data.solution - self.data.error_hat))
-            self.data.solution = self.data.solution - self.data.error_hat*(ub-lb) / (ub+lb)
-            if 4.*self.data.error_hat**2/(ub+lb)**2 <= 1.:
+            ub = max(self.abs_tol, self.rel_tol*abs(self.data.solution + self.data.error_bound))
+            lb = max(self.abs_tol, self.rel_tol*abs(self.data.solution - self.data.error_bound))
+            self.data.solution = self.data.solution - self.data.error_bound*(ub-lb) / (ub+lb)
+            if 4.*self.data.error_bound**2/(ub+lb)**2 <= 1.:
                 # stopping criterion met
                 break
             elif self.data.m == self.data.m_max:

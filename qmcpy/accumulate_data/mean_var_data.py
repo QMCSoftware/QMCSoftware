@@ -7,7 +7,7 @@ from numpy import *
 class MeanVarData(AccumulateData):
     """ Update and store mean and variance estimates. """
 
-    parameters = ['levels','solution','n','n_total','error_hat','confid_int']
+    parameters = ['levels','solution','n','n_total','error_bound','confid_int']
     EPS = finfo(float32).eps
 
     def __init__(self, stopping_criterion, integrand, n_init):

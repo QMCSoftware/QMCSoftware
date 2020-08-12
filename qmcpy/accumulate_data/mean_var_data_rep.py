@@ -8,7 +8,7 @@ class MeanVarDataRep(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['replications','solution','sighat','n_total','error_hat','confid_int']
+    parameters = ['replications','solution','sighat','n_total','error_bound','confid_int']
 
     def __init__(self, stopping_criterion, integrand, n_init, replications):
         """
