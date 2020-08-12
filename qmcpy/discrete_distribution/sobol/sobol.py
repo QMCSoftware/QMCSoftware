@@ -2,7 +2,7 @@
 
 from .._discrete_distribution import DiscreteDistribution
 from .mps_sobol import DigitalSeq
-from ..qrng import sobol_qrng
+from ..c_lib import sobol_qrng
 from ...util import ParameterError, ParameterWarning
 from numpy import *
 import warnings
@@ -188,12 +188,8 @@ class Sobol(DiscreteDistribution):
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = seed
-        if (self.backend == 'qrng' or self.backend == 'pytorch') and (not self.seed):
-            # qrng needs a seed, even if it is random
-            random.seed(seed)
-            self.seed = random.randint(2**32)
-        elif self.backend == 'mps':
+        self.seed = seed if seed else random.randint(2**32)
+        if self.backend == 'mps':
             random.seed(seed)
             self.shift = random.randint(0, 2 ** self.t, self.dimension, dtype=int64)
         

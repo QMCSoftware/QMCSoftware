@@ -39,13 +39,11 @@ To check for successful installation, run
 make tests
 ~~~
 
-Note that the QRNG [12] C backend files can be explicitly recompiled with
+Note that the C backend files can be explicitly recompiled with
 
 ~~~
-make qrng
+pip install -e ./
 ~~~
-
-after deleting the `qrng_lib...` file at `qmcpy/discrete_distribution/qrng/` that was created from `pip install -e .`.
 
 ----
 

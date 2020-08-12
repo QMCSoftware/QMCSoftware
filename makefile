@@ -8,22 +8,6 @@
 #   -C for sphix-build will not look for conf.py
 #   -b for sphinx-build will look for conf.py
 
-
-qrngpath = qmcpy/discrete_distribution/qrng/
-UNAME := $(shell uname)
-ifeq ($(UNAME), Linux)
-EXT = so
-endif
-ifeq ($(UNAME), Darwin)
-EXT = dylib
-else
-EXT = dll
-endif
-
-qrng:
-	@gcc -shared -o $(qrngpath)qrng_lib.$(EXT) $(qrngpath)*.c -fPIC -lm
-	@echo Done compiling qrng C files
-
 tests:
 	@echo "\nDoctests"
 	cd qmcpy && pytest --doctest-modules --disable-pytest-warnings

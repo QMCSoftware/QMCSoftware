@@ -1,11 +1,27 @@
-/* C function for computing a Sobol sequence **********************************/
+/*
+C function for computing a Sobol sequence 
 
-#include "sobol.h"
+References:
+    
+    [1] Marius Hofert and Christiane Lemieux (2019). 
+    qrng: (Randomized) Quasi-Random Number Generators. 
+    R package version 0.0-7.
+    https://CRAN.R-project.org/package=qrng.
+
+    [2] Faure, Henri, and Christiane Lemieux. 
+    “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” 
+    Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "MRG63k3a.h"
+
+#define sobolMaxDim 16510
+#define sobolMaxDegree 17
+#define sobolMaxCol 32
 
 /* Primitive polynomials (one for each dimension) */
 static int poly[sobolMaxDim] =
@@ -18412,7 +18428,7 @@ void bintogray(int n1, int size, int *b)
  * @return void
  * @author Marius Hofert based on Christiane's Lemieux's RandQMC
  */
-void sobol(int n, int d, int randomize, double *res, int skip, int graycode, long seed)
+void sobol_qrng(int n, int d, int randomize, double *res, int skip, int graycode, long seed)
 {
     int i, count, numcols, j, k, initcount, idx;
     int newv, temp, degree, sizeskip;

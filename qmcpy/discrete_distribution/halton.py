@@ -1,7 +1,6 @@
-from .._discrete_distribution import DiscreteDistribution
-from ..qrng import ghalton_qrng
-from .owen_halton import rhalton
-from ...util import ParameterWarning, ParameterError
+from ._discrete_distribution import DiscreteDistribution
+from .c_lib import halton_owen, halton_qrng
+from ..util import ParameterWarning, ParameterError
 import warnings
 from numpy import random
 
@@ -12,14 +11,14 @@ class Halton(DiscreteDistribution):
 
     >>> h = Halton(2,seed=7)
     >>> h.gen_samples(1)
-    array([[0.315, 0.739]])
+    array([[0.218, 0.931]])
     >>> h.gen_samples(1)
-    array([[0.315, 0.739]])
+    array([[0.218, 0.931]])
     >>> h.set_dimension(4)
     >>> h.set_seed(8)
     >>> h.gen_samples(2)
-    array([[0.276, 0.382, 0.502, 0.356],
-           [0.776, 0.049, 0.702, 0.784]])
+    array([[0.895, 0.172, 0.023, 0.574],
+           [0.395, 0.838, 0.448, 0.234]])
     >>> h
     Halton (DiscreteDistribution Object)
         dimension       2^(2)
@@ -90,17 +89,22 @@ class Halton(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
-        if (not n) and (n_min!=0) and self.backend=='qrng':
-            raise ParameterError('\nHalton with "QRNG" backend does not support skipping samples. '+\
-                'Use "Owen" backend in order to provide n_min!=0')
         if n_min == 0 and self.randomize==False and warn:
             warnings.warn("Non-randomized Halton sequence includes the origin",ParameterWarning)
         n = int(n_max-n_min)
         d = int(self.dimension)
         if self.backend=='qrng':
-            x = ghalton_qrng(n,d,self.generalize,self.seed)
+            if n_min > 0:
+                raise ParameterError('\nHalton with "QRNG" backend does not support skipping samples. '+\
+                    'Use "Owen" backend in order to provide n_min!=0')
+            x = halton_qrng(n, d, self.generalize, self.seed)
         if self.backend=='owen':
-            x = rhalton(n, d, n0=int(n_min), d0=0, randomize=self.randomize,singleseed=self.seed)
+            if self.randomize and warn:
+                warnings.warn("""Randomized Halton with Owen backend is not yet reproducible, even with seeding. 
+                        "For example: 
+                            Halton(3,backend='Owen').gen_samples(n=4)[1:4,:] != 
+                            Halton(3,backend='Owen').gen_samples(n_min=1,n_max=4) """, ParameterWarning)
+            x = halton_owen(n, d, n0=int(n_min), d0=0, randomize=self.randomize, seed=self.seed)
         return x
 
     def set_seed(self, seed):

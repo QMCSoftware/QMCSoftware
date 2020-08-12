@@ -1,7 +1,19 @@
-/* C function for computing a Korobov sequence ********************************/
+/*
+C function for computing a Korobov sequence.
+
+References:
+    
+    [1] Marius Hofert and Christiane Lemieux (2019). 
+    qrng: (Randomized) Quasi-Random Number Generators. 
+    R package version 0.0-7.
+    https://CRAN.R-project.org/package=qrng.
+
+    [2] Faure, Henri, and Christiane Lemieux. 
+    “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” 
+    Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
+*/
 
 #include <stdlib.h>
-#include "korobov.h"
 #include "MRG63k3a.h"
 
 
@@ -16,7 +28,7 @@
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */
-void korobov(int n, int d, int *generator, int randomize, double *res, long seed)
+void korobov_qrng(int n, int d, int *generator, int randomize, double *res, long seed)
 {
 	int i, j, ij;
 	double U;

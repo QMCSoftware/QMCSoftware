@@ -6,7 +6,14 @@
            Shorter version in Operations Research,
            47, 1 (1999), 159--164.
    ---------------------------------------------------------
+
+   References:
+
+      [1] Fischer, Gregory & Carmon, Ziv & Zauberman, Gal & L’Ecuyer, Pierre. (1999).
+    Good Parameters and Implementations for Combined Multiple Recursive Random Number Generators. 
+    Operations Research. 47. 159-164. 10.1287/opre.47.1.159. 
 */
+
 #include "MRG63k3a.h"
 #include <stdio.h>
 

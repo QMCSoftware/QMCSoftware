@@ -1,6 +1,6 @@
 from ._discrete_distribution import DiscreteDistribution
 from ..util import ParameterWarning
-from .qrng import korobov_qrng
+from .c_lib import korobov_qrng
 from numpy import random
 import warnings
 

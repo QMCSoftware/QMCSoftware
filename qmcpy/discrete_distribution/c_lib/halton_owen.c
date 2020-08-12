@@ -1,24 +1,20 @@
-"""
+/*
+C function for computing Halton sequence. 
+
 References:
     [1] Owen, A. B.A randomized Halton algorithm in R2017. arXiv:1706.02808 [stat.CO]
-"""
+*/
 
-from numpy import isscalar, arange, zeros, array, double, random
+#include <string.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "MRG63k3a.h"
 
-# First fifty-eight prime numbers from OEIS A000040, April 2017
-'''
-primes = array([
-2, 3, 5, 7, 11, 13, 17, 19, 23, 29,
-31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
-73, 79, 83, 89, 97, 101, 103, 107, 109, 113,
-127, 131, 137, 139, 149, 151, 157, 163, 167, 173,
-179, 181, 191, 193, 197, 199, 211, 223, 227, 229,
-233, 239, 241, 251, 257, 263, 269, 271],
-dtype=double)
-'''
-# First 1000 prime numbers from primes.utm.edu/lists/small/1000.txt, April 2017
-primes = array([
-  2,    3,    5,    7,    11,   13,   17,   19,   23,   29
+/* First 1000 prime numbers from primes.utm.edu/lists/small/1000.txt, April 2017 */
+static int primes[1000] =
+{ 2,    3,    5,    7,    11,   13,   17,   19,   23,   29
 , 31,   37,   41,   43,   47,   53,   59,   61,   67,   71
 , 73,   79,   83,   89,   97,   101,  103,  107,  109,  113
 , 127,  131,  137,  139,  149,  151,  157,  163,  167,  173
@@ -117,67 +113,74 @@ primes = array([
 , 7573, 7577, 7583, 7589, 7591, 7603, 7607, 7621, 7639, 7643
 , 7649, 7669, 7673, 7681, 7687, 7691, 7699, 7703, 7717, 7723
 , 7727, 7741, 7753, 7757, 7759, 7789, 7793, 7817, 7823, 7829
-, 7841, 7853, 7867, 7873, 7877, 7879, 7883, 7901, 7907, 7919],
-dtype=double)
-D = len(primes)
+, 7841, 7853, 7867, 7873, 7877, 7879, 7883, 7901, 7907, 7919};
 
-def rhalton(n,d,n0=0,d0=0,randomize=True,singleseed=None,seedvector=[None]):
-    """
+void halton_owen(int n, int d, int n0, int d0, int randomize, double *ans, long seed){
+    /*
     Randomly scrambled Halton sequence of n points in d dimensions.
     If you already have n0 old points, set n0 to get the next n points.
     If you already have d0 old components, set d0 to get the next d inputs.
     Get points n0 + 0:(n-1) in dimensions d0 + (1:d).
-    
-    seedvector = optional vector of d0+d random seeds, one per dimension
-    singleseed = optional scalar seed (has lower precedence than seedvector)
-    """
-    # Handle input dimension correctness and corner cases
-    if min(n0,d0) < 0:
-        raise Exception("Starting indices (n0, d0) cannot be < 0, input had (%d,%d)"%(n0,d0))
-    if min(n,d) < 0:
-        raise Exception("Cannot have negative n or d")
-    if n==0 or d==0: # Odd corner cases: user wants n x 0 or 0 x d matrix.
-        return array([],dtype=double)
-    if d0+d > D:
-        raise Exception("Implemented only for d <= %d"%D)
-    # Seed rules
-    if singleseed and (not isscalar(singleseed)):
-        raise Exception("singleseed, if supplied, must be scalar")
-    if all(seedvector) and (len(seedvector) < (d0+d)):
-        raise Exception("seedvector, if supplied, must be have length at least d0+d")
-    if (not all(seedvector)) and isscalar(singleseed):
-        seedvector = singleseed + arange(d0+d)
-    # Generate and return the points
-    ans = zeros((n,d),dtype=double)
-    for j in range(d):
-        dimj = d0+j
-        if all(seedvector):
-            random.seed(seedvector[dimj])
-        ind = (n0+arange(n)).astype(int)
-        b = int(primes[dimj])
-        ans[:,j] = randradinv(ind,randomize,b)
-    return ans
 
-def randradinv(ind,randomize,b):
-    """
-    Randomized radical inverse functions for indices in ind and for base b.
-    The calling routine should set the random seed if reproducibility is desired.
-    """
-    b2r = 1./b
-    ans = ind*0
-    res = ind
-    while b2r >= 1e-16:
-        dig = res%b
-        if randomize:
-            perm = random.permutation(b)
-            pdig = perm[dig.astype(int)]
-            ans = ans + pdig * b2r
-        else:
-            ans = ans + dig * b2r
-        b2r = b2r/b
-        res = (res - dig)/b
-    return ans
+    Args:
+        n (int): number of samples
+        d (int): number of dimensions
+        n0 (int): starting index in the sequence
+        d0 (int): starting dimension in the index
+        randomize (int): randomize the sequence? 
+        res (*double): n x d array in which to put result
+        seed (long): seed for the generator
+    */
+    double b2r, u; 
+    int i, j, b, t, ii, dig[n], res[n], perm[d0+d-1];
+    seed_MRG63k3a(seed);
+    for(j=0; j<d; j++){
+        for(i=0;i<n;i++){res[i] = i+n0;}
+        b = primes[d0+j];
+        b2r = 1./b;
+        while(b2r >= 1e-16){
+            for(i=0;i<n;i++){
+                dig[i] = res[i]%b;
+                res[i] = (res[i]-dig[i])/b;}
+            if(randomize){
+                /* permute ints 1-b */ 
+                for(i=0;i<b;i++){perm[i]=i;}
+                for(i=b;i>1;i--){
+                    u = MRG63k3a(); /* 63 bit U(0,1) random number */
+                    ii = floor(u*i);
+                    t = perm[ii];
+                    perm[ii] = perm[i-1]; 
+                    perm[i-1] = t;}
+                for(i=0;i<n;i++){dig[i]=perm[dig[i]];}}
+            for(i=0;i<n;i++){ans[i*d+j] = ans[i*d+j]+dig[i]*b2r;}
+            b2r = b2r / b;}}}
 
-if __name__ == '__main__':
-    x = rhalton(n=2**18,d=2,n0=0,d0=0,singleseed=7)
-    print(x)
+
+int main(){
+    int n=4, d=3, n0=0, d0=0, randomize=1, seed=7;
+    double *ans = (double *) calloc(n*d, sizeof(double));
+    halton_owen(n, d, n0, d0, randomize, ans, seed);
+    for(int i=0; i<n; i++){
+        for(int j=0; j<d; j++){
+            /*printf("%.3f\t",ans[i*d+j]);*/}
+        printf("\n");}
+
+    printf("\n");
+    n=3, d=3, n0=1, d0=0, randomize=1, seed=7;
+    ans = (double *) calloc(n*d, sizeof(double));
+    halton_owen(n, d, n0, d0, randomize, ans, seed);
+    for(int i=0; i<n; i++){
+        for(int j=0; j<d; j++){
+            /*printf("%.3f\t",ans[i*d+j]);*/}
+        printf("\n");}
+
+    printf("\n");
+    n=3, d=3, n0=1, d0=0, randomize=1, seed=7;
+    ans = (double *) calloc(n*d, sizeof(double));
+    halton_owen(n, d, n0, d0, randomize, ans, seed);
+    for(int i=0; i<n; i++){
+        for(int j=0; j<d; j++){
+            /*printf("%.3f\t",ans[i*d+j]);*/}
+        printf("\n");}
+
+    return(0);}

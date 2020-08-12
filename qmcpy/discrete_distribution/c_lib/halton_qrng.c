@@ -1,11 +1,24 @@
-/* C function for computing a generalized Halton sequence *********************/
+/* C function for computing a generalized Halton sequence. 
+
+References:
+    
+    [1] Marius Hofert and Christiane Lemieux (2019). 
+    qrng: (Randomized) Quasi-Random Number Generators. 
+    R package version 0.0-7.
+    https://CRAN.R-project.org/package=qrng.
+
+    [2] Faure, Henri, and Christiane Lemieux. 
+    “Implementation of Irreducible Sobol’ Sequences in Prime Power Bases.” 
+    Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
+*/
 
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ghalton.h"
 #include "MRG63k3a.h"
+
+#define ghaltonMaxDim 360
 
 /* Primes for ghalton() */
 static int primes[ghaltonMaxDim] =
@@ -65,7 +78,7 @@ static int permTN2[ghaltonMaxDim] =
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */
-void ghalton(int n, int d, int generalized, double *res, long seed)
+void halton_qrng(int n, int d, int generalized, double *res, long seed)
 {
         static int perm[ghaltonMaxDim];
         int base, i, j, k, l, maxindex, f;

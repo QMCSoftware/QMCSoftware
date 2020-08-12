@@ -2,7 +2,7 @@
 
 from qmcpy import *
 from qmcpy.util import *
-from qmcpy.discrete_distribution.qrng.qrng import qrng_example_use
+from qmcpy.discrete_distribution.c_lib.py_c_wrappers import example_use
 from qmcpy.util import ParameterError,ParameterWarning
 from numpy import *
 import sys
@@ -59,7 +59,7 @@ class TestQRNG(unittest.TestCase):
     """ Unit tests for QRNG code from C """
 
     def test_qrng_example(self):
-        qrng_example_use()
+        example_use()
 
 
 class TestLattice(unittest.TestCase):
@@ -172,7 +172,7 @@ class TestHalton(unittest.TestCase):
         distribution.set_dimension(4)
         x = distribution.gen_samples(2)
         self.assertTrue(x.shape==(2,4))
-        distribution = Halton(dimension=3, generalize=True, backend='Owen',seed=7)
+        distribution = Halton(dimension=3, generalize=True, randomize=False, backend='Owen')
         x = distribution.gen_samples(4)
         self.assertTrue(x.shape==(4,3))
         distribution.set_dimension(4)
