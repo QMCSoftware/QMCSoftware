@@ -18581,7 +18581,7 @@ void sobol_qrng(int n, int d, int randomize, double *res, int skip, int graycode
 int main(){
     int n=4, d=2, randomize=0, skip=4, seed=7, graycode=0;
     double *res = (double *) calloc(d*n, sizeof(double));
-    sobol(n, d, randomize, res, skip, graycode, seed);
+    sobol_qrng(n, d, randomize, res, skip, graycode, seed);
     for(int j=0; j<d; j++){
         for(int i=0; i<n; i++){
             printf("%.3f\t",res[j*n+i]);}

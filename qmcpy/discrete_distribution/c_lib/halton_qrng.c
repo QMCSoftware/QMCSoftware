@@ -137,9 +137,9 @@ void halton_qrng(int n, int d, int generalized, double *res, long seed)
 
 /*
 int main(){
-    int n=4, d=3, generalize=0, skip=4, seed=7;
+    int n=4, d=3, generalize=0, skip=0, seed=7;
     double *res = (double *) calloc(d*n, sizeof(double));
-    ghalton(n, d, generalize, res, seed);
+    halton_qrng(n, d, generalize, res, seed);
     for(int j=0; j<d; j++){
         for(int i=0; i<n; i++){
             printf("%.3f\t",res[j*n+i]);}

@@ -154,7 +154,7 @@ void halton_owen(int n, int d, int n0, int d0, int randomize, double *ans, long 
             for(i=0;i<n;i++){ans[i*d+j] = ans[i*d+j]+dig[i]*b2r;}
             b2r = b2r / b;}}}
 
-
+/*
 int main(){
     int n=4, d=3, n0=0, d0=0, randomize=1, seed=7;
     double *ans = (double *) calloc(n*d, sizeof(double));
@@ -163,23 +163,5 @@ int main(){
         for(int j=0; j<d; j++){
             printf("%.3f\t",ans[i*d+j]);}
         printf("\n");}
-
-    printf("\n");
-    n=3, d=3, n0=1, d0=0, randomize=1, seed=7;
-    ans = (double *) calloc(n*d, sizeof(double));
-    halton_owen(n, d, n0, d0, randomize, ans, seed);
-    for(int i=0; i<n; i++){
-        for(int j=0; j<d; j++){
-            printf("%.3f\t",ans[i*d+j]);}
-        printf("\n");}
-    
-    printf("\n");
-    n=4, d=3, n0=0, d0=0, randomize=1, seed=7;
-    ans = (double *) calloc(n*d, sizeof(double));
-    halton_owen(n, d, n0, d0, randomize, ans, seed);
-    for(int i=0; i<n; i++){
-        for(int j=0; j<d; j++){
-            printf("%.3f\t",ans[i*d+j]);}
-        printf("\n");}
-
     return(0);}
+*/
