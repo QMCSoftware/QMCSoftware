@@ -17,8 +17,8 @@ class Halton(DiscreteDistribution):
     >>> h.set_dimension(4)
     >>> h.set_seed(8)
     >>> h.gen_samples(2)
-    array([[0.895, 0.172, 0.023, 0.574],
-           [0.395, 0.838, 0.448, 0.234]])
+    array([[0.895, 0.172, 0.048, 0.66 ],
+           [0.395, 0.838, 0.448, 0.231]])
     >>> h
     Halton (DiscreteDistribution Object)
         dimension       2^(2)
@@ -99,11 +99,6 @@ class Halton(DiscreteDistribution):
                     'Use "Owen" backend in order to provide n_min!=0')
             x = halton_qrng(n, d, self.generalize, self.seed)
         if self.backend=='owen':
-            if self.randomize and warn:
-                warnings.warn("""Randomized Halton with Owen backend is not yet reproducible, even with seeding. 
-                        "For example: 
-                            Halton(3,backend='Owen').gen_samples(n=4)[1:4,:] != 
-                            Halton(3,backend='Owen').gen_samples(n_min=1,n_max=4) """, ParameterWarning)
             x = halton_owen(n, d, n0=int(n_min), d0=0, randomize=self.randomize, seed=self.seed)
         return x
 

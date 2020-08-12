@@ -9,7 +9,6 @@ References:
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include "MRG63k3a.h"
 
 /* First 1000 prime numbers from primes.utm.edu/lists/small/1000.txt, April 2017 */
@@ -132,7 +131,7 @@ void halton_owen(int n, int d, int n0, int d0, int randomize, double *ans, long 
         seed (long): seed for the generator
     */
     double b2r, u; 
-    int i, j, b, t, ii, dig[n], res[n], perm[d0+d-1];
+    int i, j, b, t, ii, dig[n], res[n], perm[primes[d0+d-1]];
     seed_MRG63k3a(seed);
     for(j=0; j<d; j++){
         for(i=0;i<n;i++){res[i] = i+n0;}
@@ -144,14 +143,14 @@ void halton_owen(int n, int d, int n0, int d0, int randomize, double *ans, long 
                 res[i] = (res[i]-dig[i])/b;}
             if(randomize){
                 /* permute ints 1-b */ 
-                for(i=0;i<b;i++){perm[i]=i;}
+                for(i=0;i<b;i++){perm[i] = i;}
                 for(i=b;i>1;i--){
                     u = MRG63k3a(); /* 63 bit U(0,1) random number */
-                    ii = floor(u*i);
+                    ii = (int) (u*i);
                     t = perm[ii];
                     perm[ii] = perm[i-1]; 
                     perm[i-1] = t;}
-                for(i=0;i<n;i++){dig[i]=perm[dig[i]];}}
+                for(i=0;i<n;i++){dig[i] = perm[dig[i]];}}
             for(i=0;i<n;i++){ans[i*d+j] = ans[i*d+j]+dig[i]*b2r;}
             b2r = b2r / b;}}}
 
@@ -162,7 +161,7 @@ int main(){
     halton_owen(n, d, n0, d0, randomize, ans, seed);
     for(int i=0; i<n; i++){
         for(int j=0; j<d; j++){
-            /*printf("%.3f\t",ans[i*d+j]);*/}
+            printf("%.3f\t",ans[i*d+j]);}
         printf("\n");}
 
     printf("\n");
@@ -171,16 +170,16 @@ int main(){
     halton_owen(n, d, n0, d0, randomize, ans, seed);
     for(int i=0; i<n; i++){
         for(int j=0; j<d; j++){
-            /*printf("%.3f\t",ans[i*d+j]);*/}
+            printf("%.3f\t",ans[i*d+j]);}
         printf("\n");}
-
+    
     printf("\n");
-    n=3, d=3, n0=1, d0=0, randomize=1, seed=7;
+    n=4, d=3, n0=0, d0=0, randomize=1, seed=7;
     ans = (double *) calloc(n*d, sizeof(double));
     halton_owen(n, d, n0, d0, randomize, ans, seed);
     for(int i=0; i<n; i++){
         for(int j=0; j<d; j++){
-            /*printf("%.3f\t",ans[i*d+j]);*/}
+            printf("%.3f\t",ans[i*d+j]);}
         printf("\n");}
 
     return(0);}

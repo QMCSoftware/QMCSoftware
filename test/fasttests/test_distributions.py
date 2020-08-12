@@ -172,7 +172,7 @@ class TestHalton(unittest.TestCase):
         distribution.set_dimension(4)
         x = distribution.gen_samples(2)
         self.assertTrue(x.shape==(2,4))
-        distribution = Halton(dimension=3, generalize=True, randomize=False, backend='Owen')
+        distribution = Halton(dimension=3, generalize=True, backend='Owen')
         x = distribution.gen_samples(4)
         self.assertTrue(x.shape==(4,3))
         distribution.set_dimension(4)
