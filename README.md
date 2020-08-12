@@ -9,13 +9,11 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 
 <center><img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/qmcpy_logo.png?raw=true" alt="QMCPy logo" height=200px width=200px/>
 
-[Homepage](https://qmcsoftware.github.io/QMCSoftware/) | [GitHub](https://github.com/QMCSoftware/QMCSoftware) | [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) | [PyPI](https://pypi.org/project/qmcpy/)</center>
+[Homepage](https://qmcsoftware.github.io/QMCSoftware/) | [GitHub](https://github.com/QMCSoftware/QMCSoftware) | [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) | [PyPI](https://pypi.org/project/qmcpy/) | [Blogs](http://qmcpy.wordpress.com/)</center>
 
 ----
 
 ## Installation
-
-QMCPy can be installed from [PyPI](https://pypi.org/project/qmcpy/) with the command
 
 ~~~
 pip install qmcpy
@@ -25,7 +23,7 @@ pip install qmcpy
 
 ## The QMCPy Framework
 
-The central package including the 5 main components as listed below. Each component is implemented as abstract classes with concrete implementations. For example, the lattice and Sobol' sequences are implemented as concrete implementations of the `DiscreteDistribution` abstract class. An overview of implemented componenets and some of the underlying mathematics is available at `./qmcpy/README.md`.  A complete list of concrete implementations and thorough documentation can be found on the [QMCPy Read the Docs site](https://qmcpy.readthedocs.io/en/latest/algorithms.html). 
+The central package including the 5 main components as listed below. Each component is implemented as abstract classes with concrete implementations. For example, the lattice and Sobol' sequences are implemented as concrete implementations of the `DiscreteDistribution` abstract class. An overview of implemented componenets and some of the underlying mathematics is available at `./qmcpy/README.md`.  A complete list of concrete implementations and thorough documentation can be found in the [QMCPy Read the Docs](https://qmcpy.readthedocs.io/en/latest/algorithms.html) .
 
 - **Stopping Criterion:** determines the number of samples necessary to meet an error tolerance.
 - **Integrand:** the function/process whose expected value will be approximated.
@@ -37,11 +35,11 @@ The central package including the 5 main components as listed below. Each compon
 
 ## Quickstart
 
-We will find the exptected value of the Keister integrand [18]
+Will will find the exptected value of the Keister integrand [18]
 
 $$g(\boldsymbol{x})=\pi^{d/2}\cos(||\boldsymbol{x}||)$$
 
-integrated over the $d$ dimensional Gaussian true measure with variance $1/2$
+integrated over a $d$ dimensional Gaussian true measure with variance $1/2$
 
 $$\mathcal{X} \sim \mathcal{N}(\boldsymbol{0},\boldsymbol{I}/2).$$
 
@@ -63,100 +61,6 @@ A more detailed quickstart can be found in our GitHub repo at `QMCSoftware/demos
 
 ----
 
-## Installation and Usage for Developers
-
-This package is dependent on the `qmcpy/` directory being on your python path. This is easiest with a virtual environment.
-
-Setup using `virtualenv` and `virtualenvwrapper`
-
-~~~
-mkvirtualenv qmcpy
-git clone https://github.com/QMCSoftware/QMCSoftware.git
-cd QMCSoftware
-git checkout develop
-setvirtualenvproject
-add2virtualenv $(pwd)
-pip install -r requirements/dev.txt
-pip install -e ./
-~~~
-
-Setup using `conda`
-
-~~~
-conda create --name qmcpy python=3.6
-conda activate qmcpy
-git clone https://github.com/QMCSoftware/QMCSoftware.git
-cd QMCSoftware
-git checkout develop
-pip install -r requirements/dev.txt
-pip install -e ./
-~~~
-
-To check for successful installation, run
-
-~~~
-make tests
-~~~
-
-Note that the QRNG [12] C backend files can be explicitly recompiled with
-
-~~~
-make qrng
-~~~
-
-----
-
-## Documentation 
-
-The QMCPy Read the Docs is located [here](https://qmcpy.readthedocs.io/en/latest/) with HTML, PDF, and EPUB downloads available [here](https://readthedocs.org/projects/qmcpy/downloads/).
-
-Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.org/). To compile HTML, PDF, or EPUB docs locally into `sphinx/_build/` you must install [pandoc](https://pandoc.org/installing.html), a [latex distribution](https://www.latex-project.org/get/), and add additional python requirements with the command
-
-~~~
-pip install -r requirements/dev_docs.txt
-~~~
-
-Then setup Sphinx paths (only needs to be run once for initialization)
-
-~~~
-make _doc
-~~~
-
-Finally, run one of the following three commands the compile the documentation
-
-~~~
-make doc_html
-make doc_pdf
-make doc_epub
-~~~
-
-----
-
-## Workouts and Demos
-
-Workouts extensively test and compare the components of the QMCPy package.
-Demos, implemented as Jupyter notebooks, demonstrate functionality and uses cases for QMCPy. They often draw from and explore the output of various workouts. 
-
-To run all workouts (~10 min) use the command
-
-~~~
-make workout
-~~~
-
-----
-
-## Unit Tests
-
-Combined doctests and fast (<1 sec) / long (<10 sec) unittests can be run with
-
-~~~
-make tests
-~~~
-
-See `makefile` for individual testing commands.
-
-----
-
 ## Developers
  
 - Sou-Cheng T. Choi
@@ -168,6 +72,7 @@ See `makefile` for individual testing commands.
 ----
 
 ## Collaborators
+
 - Mike Giles
 - Marius Hofert
 - Pierre L’Ecuyer
@@ -181,13 +86,26 @@ See `makefile` for individual testing commands.
 
 If you find QMCPy helpful in your work, please support us by citing the following work:
 
-Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. Working. 2020. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/).
+**BibTex**
 
-----
+~~~
+@misc{QMCPy,
+  Author = {S.-C. T. Choi and F. J. Hickernell and M. McCourt and A. Sorokin},
+  Date-Added = {2020-04-15 15:19:14 -0500},
+  Date-Modified = {2020-04-26 17:13:25 -0500},
+  Title = {{QMCPy}: A quasi-{M}onte {C}arlo {P}ython Library},
+  Url = {https://github.com/QMCSoftware/QMCSoftware},
+  Year = {2020+},
+  Bdsk-Url-1 = {https://github.com/QMCSoftware/QMCSoftware}}
+~~~
 
-## License
+**Plain Text**
 
-This work is maintained under the Apache 2.0 License.
+~~~
+Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A.
+QMCPy: A quasi-Monte Carlo Python Library. Working. 2020.
+https://qmcsoftware.github.io/QMCSoftware/
+~~~
 
 ----
 
