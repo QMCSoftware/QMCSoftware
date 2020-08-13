@@ -1,10 +1,8 @@
 from .._discrete_distribution import DiscreteDistribution
-from .gail_lattice import gail_lattice_gen
-from .mps_lattice import mps_lattice_gen
-from ...util import ParameterError, ParameterWarning
+from .gail_lattice import LatticeGAIL
+from .mps_lattice import LatticeMPS
+from ...util import ParameterError
 from numpy import *
-import warnings
-import os
 
 
 class Lattice(DiscreteDistribution):
@@ -17,8 +15,8 @@ class Lattice(DiscreteDistribution):
         dimension       2^(1)
         randomize       1
         seed            7
-        backend         gail
         mimics          StdUniform
+        backend         GAIL
     >>> l.gen_samples(4)
     array([[0.076, 0.78 ],
            [0.576, 0.28 ],
@@ -64,7 +62,7 @@ class Lattice(DiscreteDistribution):
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
-    parameters = ['dimension','randomize','seed','backend','mimics']
+    parameters = ['dimension','randomize','seed','mimics','backend']
 
     def __init__(self, dimension=1, randomize=True, seed=None, backend='GAIL', gen_vector_info=None):
         """
@@ -81,32 +79,14 @@ class Lattice(DiscreteDistribution):
                     "n_max": maximum number of samples that can be drawn based on this generating vector. \
                 Example: gen_vector_info = {'vector':[1,433461,315689], n_max=2**20}
         """
-        self.dimension = dimension
-        self.randomize = randomize
+        self.backend = backend.upper()
+        backend_objs = {'GAIL':LatticeGAIL,'MPS':LatticeMPS}
+        backend_options = list(backends.keys())
+        if self.backend not in backend_options:
+            raise ParameterError('Lattice requires backend be in %s'%(str(backend_options)))
+        self.generator = backend_objs[self.backend](dimension,generalize,randomize,seed)
         self.low_discrepancy = True
-        self.backend = backend.lower()
-        if self.backend == 'gail':
-            self.backend_gen = gail_lattice_gen
-        elif self.backend == 'mps':
-            self.backend_gen = mps_lattice_gen
-        else:
-            raise ParameterError("Lattice backend must 'GAIL' or 'MPS'")
-        if gen_vector_info:
-            self.gen_vec = array(gen_vector_info['vector'], dtype=double)
-            self.n_global_max = gen_vector_info['n_max']
-        else:  # use default from Reference [5]
-            abs_file_path = os.path.join(os.path.dirname(__file__),
-                                         'lattice-32001-1024-1048576.3600.npy')
-            self.gen_vec = load(abs_file_path).astype(double)
-            self.n_global_max = 2 ** 20
-        self.d_global_max = len(self.gen_vec)
-        if self.dimension > self.d_global_max:
-            raise ParameterError(
-                'Lattice generating vector has max dimension %d.' %
-                self.d_global_max)
-        self.seed = seed
         self.mimics = 'StdUniform'
-        self.set_seed(self.seed)
         super(Lattice, self).__init__()
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
@@ -130,29 +110,13 @@ class Lattice(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
-        if n_min == 0 and self.randomize==False and warn:
-            warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
-        if n_max > self.n_global_max:
-            raise ParameterError('Lattice generating vector supports up to %d samples.'%self.n_global_max)
-        x_lat = self.backend_gen(n_min,n_max,self.dimension,self.gen_vec[:self.dimension])
-        if self.randomize: # apply random shift to samples
-            x_lat = (x_lat + self.shift)%1
-        return x_lat
+        x = self.generator.gen_samples(n_min,n_max,warn)
+        return x
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = seed if seed else random.randint(2**32)
-        random.seed(self.seed)
-        self.shift = random.rand(int(self.dimension))
-
+        self.generator.set_seed(seed)
+        
     def set_dimension(self, dimension):
-        """
-        See abstract method.
-
-        Note:
-            Will compute a new random shift to be applied to samples
-        """
-        self.dimension = dimension
-        if self.dimension > self.d_global_max:
-            raise ParameterError('Lattice generating vector has max dimension %d.'%self.d_global_max)
-        self.shift = random.rand(int(self.dimension))
+        """ See abstract method. """
+        self.generator.set_dimension(dimension)

@@ -1,8 +1,7 @@
 from ._discrete_distribution import DiscreteDistribution
-from ..util import ParameterWarning
-from .c_lib import korobov_qrng
+from ..util import ParameterError
+from .korobov_qrng import KorobovQRNG
 from numpy import random
-import warnings
 
 
 class Korobov(DiscreteDistribution):
@@ -30,7 +29,8 @@ class Korobov(DiscreteDistribution):
         randomize       1
         seed            2^(3)
         mimics          StdUniform
-
+        backend         QRNG
+    
     References:
 
         [1] Marius Hofert and Christiane Lemieux (2019). 
@@ -39,9 +39,9 @@ class Korobov(DiscreteDistribution):
         https://CRAN.R-project.org/package=qrng.
     """
 
-    parameters = ['dimension','generator','randomize','seed','mimics']
+    parameters = ['dimension','generator','randomize','seed','mimics','backend']
 
-    def __init__(self, dimension=1, generator=[1], randomize=True, seed=None):
+    def __init__(self, dimension=1, generator=[1], randomize=True, seed=None, backend='QRNG'):
         """
         Args:
             dimension (int): dimension of samples
@@ -51,17 +51,19 @@ class Korobov(DiscreteDistribution):
             randomize (bool): randomize the Korobov sequence? 
                 Note: Non-randomized Korobov sequence includes origin
             seed (int): seed the random number generator for reproducibility
+            backend (str): backend generator must be "QRNG"
         """
-        self.dimension = dimension
-        self.generator = generator
-        self.randomize = randomize
-        self.mimics = 'StdUniform'
-        self.seed = seed
+        self.backend = backend.upper()
+        backend_objs = {'QRNG':KorobovQRNG}
+        backend_options = list(backends.keys())
+        if self.backend not in backend_options:
+            raise ParameterError('Korobov requires backend be in %s'%(str(backend_options)))
+        self.generator = backend_objs[self.backend](dimension,generator,randomize,seed)
         self.low_discrepancy = True
-        self.set_seed(self.seed)
+        self.mimics = 'StdUniform'
         super(Korobov,self).__init__()
 
-    def gen_samples(self, n=8, generator=None, warn=True):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
         """
         Generate samples
 
@@ -74,17 +76,16 @@ class Korobov(DiscreteDistribution):
         Returns:
             ndarray: n x d (dimension) array of samples
         """
-        if self.randomize==False and warn:
-            warnings.warn("Non-randomized Korobov sequence includes the origin.",ParameterWarning)
-        if not generator:
-            generator = self.generator
-        x = korobov_qrng(n, self.dimension, generator, self.randomize, self.seed)
+        if n:
+            n_max = n
+            n_min = 0
+        x = self.generator.gen_samples(n_min,n_max,warn)
         return x
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = seed if seed else random.randint(2**32)
+        self.generator.set_seed(seed)
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.dimension = dimension
+        self.generator.set_dimension(dimension)

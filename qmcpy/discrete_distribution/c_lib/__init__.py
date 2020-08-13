@@ -1,1 +1,1 @@
-from .py_c_wrappers import halton_owen, halton_qrng, korobov_qrng, sobol_qrng, sobol_seq51
+from load_c_lib import c_lib
