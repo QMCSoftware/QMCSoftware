@@ -21,10 +21,8 @@ class TestIIDStdUniform(unittest.TestCase):
     def test_gen_samples(self):
         distribution = IIDStdUniform(dimension=3)
         samples = distribution.gen_samples(n=5)
-        with self.subTest():
-            self.assertEqual(type(samples), ndarray)
-        with self.subTest():
-            self.assertEqual(samples.shape, (5,3))
+        self.assertEqual(type(samples), ndarray)
+        self.assertEqual(samples.shape, (5,3))
     
     def test_set_dimension(self):
         distribution = IIDStdUniform(dimension=2)
@@ -43,10 +41,8 @@ class TestIIDGaussian(unittest.TestCase):
     def test_gen_samples(self):
         distribution = IIDStdGaussian(dimension=3)
         samples = distribution.gen_samples(n=5)
-        with self.subTest():
-            self.assertEqual(type(samples), ndarray)
-        with self.subTest():
-            self.assertEqual(samples.shape, (5,3))
+        self.assertEqual(type(samples), ndarray)
+        self.assertEqual(samples.shape, (5,3))
 
     def test_set_dimension(self):
         distribution = IIDStdGaussian(dimension=2)
@@ -73,10 +69,8 @@ class TestLattice(unittest.TestCase):
         for backend in ['MPS','GAIL']:
             distribution = Lattice(dimension=3, randomize=True, backend=backend)
             samples = distribution.gen_samples(n_min=4, n_max=8)
-            with self.subTest():
-                self.assertEqual(type(samples), ndarray)
-            with self.subTest():
-                self.assertEqual(samples.shape, (4,3))
+            self.assertEqual(type(samples), ndarray)
+            self.assertEqual(samples.shape, (4,3))
 
     def test_mps_correctness(self):
         distribution = Lattice(dimension=4, randomize=False, backend='MPS')
@@ -101,8 +95,7 @@ class TestLattice(unittest.TestCase):
             distribution = Lattice(dimension=2,backend=backend)
             distribution.set_dimension(3)
             samples = distribution.gen_samples(4)
-            with self.subTest():
-                self.assertTrue(samples.shape==(4,3))
+            self.assertTrue(samples.shape==(4,3))
     
     def test_custom_vector(self):
         self.assertRaises(ParameterError,Lattice,dimension=4,gen_vector_info={'vector':[1,433461,315689],'n_max':2**20})
@@ -121,18 +114,21 @@ class TestSobol(unittest.TestCase):
         for backend in ['QRNG','MPS','PyTorch']:
             distribution = Sobol(dimension=3, randomize=True, backend=backend, graycode=True)
             samples = distribution.gen_samples(n_min=4, n_max=8)
-            with self.subTest():
-                self.assertEqual(type(samples), ndarray)
-            with self.subTest():
-                self.assertEqual(samples.shape, (4,3))
+            self.assertEqual(type(samples), ndarray)
+            self.assertEqual(samples.shape, (4,3))
+
+    def test_sobol_seq_51(self):
+        distribution = Sobol(dimension=3,randomize=False,backend='Seq51')
+        samples = distribution.gen_samples(n_min=4,n_max=8)
+        self.assertEqual(type(samples), ndarray)
+        self.assertEqual(samples.shape, (4,3))
 
     def test_set_dimension(self):
-        for backend in ['MPS','QRNG']:
+        for backend in ['MPS','QRNG','PyTorch']:
             distribution = Sobol(dimension=2,backend=backend, graycode=True)
             distribution.set_dimension(3)
             samples = distribution.gen_samples(4)
-            with self.subTest():
-                self.assertTrue(samples.shape==(4,3))
+            self.assertTrue(samples.shape==(4,3))
     
     def test_qrng_graycode_ordering(self):
         s = Sobol(2,randomize=False,backend='qrng',graycode=True)

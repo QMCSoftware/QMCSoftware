@@ -72,6 +72,16 @@ sobol_qrng_cf.argtypes = [
     ctypes.c_int, # graycode
     ctypes.c_long]  # seed
 sobol_qrng_cf.restype = None
+# sobol_seq51
+sobol_seq51_cf = lib.sobol_seq51
+sobol_seq51_cf.argtypes = [
+    ctypes.c_int, # n
+    ctypes.c_int, # d
+    ctypes.c_int, # skip
+    numpy.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # res
+]
+sobol_seq51_cf.restype = None
+
 # MRG63k3a
 mrg63ka = lib.MRG63k3a
 mrg63ka.argtypes = None
@@ -180,6 +190,23 @@ def sobol_qrng(n, d, shift, skip, graycode, seed):
     sobol_qrng_cf(n, d, shift, res, skip, graycode, seed)
     return res.T
 
+def sobol_seq51(n, d, skip):
+    """ 
+    Sobol sequence. 
+
+    Args:
+        n (int): number of points
+        d (int): dimension
+        siip (int): number of inital points in the sequence to skip
+    """
+    max_num = 2**30-1
+    max_dim = 51
+    if (n+skip) > max_num or d > max_dim:
+        raise Exception('SobolSeq51 supports a max of %d samples and %d dimensions'%(max_num,max_dim))
+    res = numpy.zeros((n,d), dtype=numpy.double)
+    sobol_seq51_cf(n, d, skip, res)
+    return res
+
 def example_use(plot=False):
     import time
     # constants
@@ -204,17 +231,21 @@ def example_use(plot=False):
     t0 = time.time()
     sobol_qrng_pts = sobol_qrng(n, d, shift=randomize, skip=0, graycode=False, seed=7)
     sobol_qrng_t = time.time() - t0
+    #    sobol_seq51
+    t0 = time.time()
+    sobol_seq51_pts = sobol_seq51(n, d, skip=0)
+    sobol_seq51_t = time.time() - t0
     #    MRG63k3a
     t0 = time.time()
     mrg63ka_pts = numpy.array([mrg63ka() for i in range(n * d)]).reshape((n, d))
     mrg63ka_t = time.time() - t0
     # outputs
     from matplotlib import pyplot
-    fig, ax = pyplot.subplots(nrows=1, ncols=5, figsize=(10, 3))
+    fig, ax = pyplot.subplots(nrows=1, ncols=6, figsize=(15, 3))
     for i, (name, pts, time) in enumerate(zip(
-        ['Halton_Owen',   'Halton_QRNG',   'Korobov_QRNG',   'Sobol_QRNG',    'MRG63k3a'],
-        [halton_owen_pts, halton_qrng_pts, korobov_qrng_pts,  sobol_qrng_pts, mrg63ka_pts],
-        [halton_owen_t,   halton_qrng_t,   korobov_qrng_t,    sobol_qrng_t,   mrg63ka_t])):
+        ['Halton_Owen',   'Halton_QRNG',   'Korobov_QRNG',   'Sobol_QRNG',    'Sobol_Seq51',   'MRG63k3a'],
+        [halton_owen_pts, halton_qrng_pts, korobov_qrng_pts,  sobol_qrng_pts, sobol_seq51_pts, mrg63ka_pts],
+        [halton_owen_t,   halton_qrng_t,   korobov_qrng_t,    sobol_qrng_t,   sobol_seq51_t,   mrg63ka_t])):
         print('%s Points in %.3f sec' % (name, time))
         print('\t' + str(pts).replace('\n', '\n\t'))
         if plot and d == 2:

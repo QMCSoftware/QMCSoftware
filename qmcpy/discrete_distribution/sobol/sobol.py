@@ -2,7 +2,7 @@
 
 from .._discrete_distribution import DiscreteDistribution
 from .mps_sobol import DigitalSeq
-from ..c_lib import sobol_qrng
+from ..c_lib import sobol_qrng, sobol_seq51
 from ...util import ParameterError, ParameterWarning
 from numpy import *
 import warnings
@@ -71,7 +71,7 @@ class Sobol(DiscreteDistribution):
             randomize (bool): If True, apply digital shift to generated samples.
                 Note: Non-randomized Sobol' sequence includes the origin.
             seed (int): seed the random number generator for reproducibility
-            backend (str): backend generator must be either "QRNG", "MPS", or "PyTorch" 
+            backend (str): backend generator must be either "QRNG", "MPS", or "PyTorch", "Seq51"
                 "QRNG" is significantly faster, supports optional randomization, and supports optional graycode ordering.
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
         """
@@ -99,13 +99,16 @@ class Sobol(DiscreteDistribution):
             warnings.warn('''
                 PyTorch SobolEngine issue. See https://github.com/pytorch/pytorch/issues/32047
                     SobolEngine 0^{th} vector is \\vec{.5} rather than \\vec{0}''',ParameterWarning)
+        elif self.backend == 'seq51':
+            self.backend_gen = self._seq51_sobol_gen
         else:
             raise ParameterError("Sobol backend must be either 'qrng', 'mps', or 'pytorch'")
-        if self.backend != 'qrng' and (not self.graycode):
+        if (self.backend in ['mps','pytorch'] and (not self.graycode)) or (self.backend=='seq51' and self.graycode):
             warning_s = '''
-                %s backend does not (yet) support natural ordering.
-                Using graycode ordering. Use "QRNG" backend for natural ordering'''%self.backend
+                %s backend does not support graycode=%s'''%(self.backend,self.graycode)
             warnings.warn(warning_s,ParameterWarning)
+        if self.backend=='seq51' and self.randomize:
+            raise ParameterError('Sobol with "Seq51" backend does not yet support randomization.')
         self.mimics = 'StdUniform'
         self.set_seed(self.seed)
         super(Sobol,self).__init__()
@@ -123,6 +126,21 @@ class Sobol(DiscreteDistribution):
         """
         n = int(n_max-n_min)
         x_sob = sobol_qrng(n,self.dimension,self.randomize,skip=int(n_min),graycode=self.graycode,seed=self.seed)
+        return x_sob
+    
+    def _seq51_sobol_gen(self, n_min=0, n_max=8):
+        """
+        Generate samples from n_min to n_max
+        
+        Args:
+            n_min (int): minimum index. Must be 0 or n_max/2
+            n_max (int): maximum index (not inclusive)
+        
+        Returns:
+            ndarray: n samples by d dimension array of Sobol' samples
+        """
+        n = int(n_max-n_min)
+        x_sob = sobol_seq51(n,self.dimension,skip=int(n_min))
         return x_sob
 
     def _mps_sobol_gen(self, n_min=0, n_max=8):
