@@ -1,6 +1,6 @@
 from .._discrete_distribution import DiscreteDistribution
-from .gail_lattice import LatticeGAIL
-from .mps_lattice import LatticeMPS
+from .lattice_gail import LatticeGAIL
+from .lattice_mps import LatticeMPS
 from ...util import ParameterError
 from numpy import *
 
@@ -81,10 +81,11 @@ class Lattice(DiscreteDistribution):
         """
         self.backend = backend.upper()
         backend_objs = {'GAIL':LatticeGAIL,'MPS':LatticeMPS}
-        backend_options = list(backends.keys())
-        if self.backend not in backend_options:
-            raise ParameterError('Lattice requires backend be in %s'%(str(backend_options)))
-        self.generator = backend_objs[self.backend](dimension,generalize,randomize,seed)
+        backends = list(backend_objs.keys())
+        if self.backend not in backends:
+            raise ParameterError('Lattice requires backend be in %s'%(str(backends)))
+        self.dimension = dimension
+        self.generator = backend_objs[self.backend](dimension,randomize,seed,gen_vector_info)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Lattice, self).__init__()
@@ -120,3 +121,7 @@ class Lattice(DiscreteDistribution):
     def set_dimension(self, dimension):
         """ See abstract method. """
         self.generator.set_dimension(dimension)
+    
+    def __repr__(self):
+        self.dimension, self.randomize, self.seed = self.generator.get_params()
+        return super().__repr__()

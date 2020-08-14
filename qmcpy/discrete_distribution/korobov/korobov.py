@@ -1,5 +1,5 @@
-from ._discrete_distribution import DiscreteDistribution
-from ..util import ParameterError
+from .._discrete_distribution import DiscreteDistribution
+from ...util import ParameterError
 from .korobov_qrng import KorobovQRNG
 from numpy import random
 
@@ -55,10 +55,11 @@ class Korobov(DiscreteDistribution):
         """
         self.backend = backend.upper()
         backend_objs = {'QRNG':KorobovQRNG}
-        backend_options = list(backends.keys())
-        if self.backend not in backend_options:
-            raise ParameterError('Korobov requires backend be in %s'%(str(backend_options)))
-        self.generator = backend_objs[self.backend](dimension,generator,randomize,seed)
+        backends = list(backend_objs.keys())
+        if self.backend not in backends:
+            raise ParameterError('Korobov requires backend be in %s'%(str(backends)))
+        self.dimension = dimension
+        self.generator_obj = backend_objs[self.backend](dimension,generator,randomize,seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Korobov,self).__init__()
@@ -69,9 +70,6 @@ class Korobov(DiscreteDistribution):
 
         Args:
             n (int): number of samples
-            generator (ndarray of ints): generator in {1,..,n-1}
-                either a vector of length d
-                or a single number (which is appropriately extended)
 
         Returns:
             ndarray: n x d (dimension) array of samples
@@ -79,13 +77,17 @@ class Korobov(DiscreteDistribution):
         if n:
             n_max = n
             n_min = 0
-        x = self.generator.gen_samples(n_min,n_max,warn)
+        x = self.generator_obj.gen_samples(n_min,n_max,warn)
         return x
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.generator.set_seed(seed)
+        self.generator_obj.set_seed(seed)
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.generator.set_dimension(dimension)
+        self.generator_obj.set_dimension(dimension)
+    
+    def __repr__(self):
+        self.dimension, self.generator, self.randomize, self.seed = self.generator_obj.get_params()
+        return super().__repr__()

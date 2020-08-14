@@ -1,11 +1,8 @@
-# coding: utf-8
-
 from .._discrete_distribution import DiscreteDistribution
-from .mps_sobol import DigitalSeq
-from ..c_lib import sobol_qrng, sobol_seq51
-from ...util import ParameterError, ParameterWarning
-from numpy import *
-import warnings
+from ...util import ParameterError
+from .sobol_qrng import SobolQRNG
+from .sobol_pytorch import SobolPyTorch
+from .sobol_seq51 import SobolSeq51
 
 
 class Sobol(DiscreteDistribution):
@@ -60,128 +57,45 @@ class Sobol(DiscreteDistribution):
         [4] D. Nuyens, `The Magic Point Shop of QMC point generators and generating
         vectors.` MATLAB and Python software, 2018. Available from
         https://people.cs.kuleuven.be/~dirk.nuyens/
+
+        [5] Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., … Chintala, S. 
+        (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. 
+        In H. Wallach, H. Larochelle, A. Beygelzimer, F. d extquotesingle Alch&#39;e-Buc, E. Fox, & R. Garnett (Eds.), 
+        Advances in Neural Information Processing Systems 32 (pp. 8024–8035). Curran Associates, Inc. 
+        Retrieved from http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf
+
+        [6] I.M. Sobol', V.I. Turchaninov, Yu.L. Levitan, B.V. Shukhman: 
+        "Quasi-Random Sequence Generators" Keldysh Institute of Applied Mathematics, 
+        Russian Acamdey of Sciences, Moscow (1992).
+
+        [7] Sobol, Ilya & Asotsky, Danil & Kreinin, Alexander & Kucherenko, Sergei. (2011). 
+        Construction and Comparison of High-Dimensional Sobol' Generators. Wilmott. 
+        2011. 10.1002/wilm.10056. 
     """
     
-    parameters = ['dimension','randomize','seed','backend','mimics','graycode']
+    parameters = ['dimension','randomize','graycode','seed','mimics','backend']
 
-    def __init__(self, dimension=1, randomize=True, seed=None, backend='QRNG', graycode=False):
+    def __init__(self, dimension=1, randomize=True, graycode=False, seed=None, backend='QRNG'):
         """
         Args:
             dimension (int): dimension of samples
             randomize (bool): If True, apply digital shift to generated samples.
                 Note: Non-randomized Sobol' sequence includes the origin.
             seed (int): seed the random number generator for reproducibility
-            backend (str): backend generator must be either "QRNG", "MPS", or "PyTorch", "Seq51"
+            backend (str): backend generator must be either "QRNG", "MPS", "PyTorch", or "Seq51"
                 "QRNG" is significantly faster, supports optional randomization, and supports optional graycode ordering.
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
         """
+        self.backend = backend.upper()
+        backend_objs = {'QRNG':SobolQRNG, 'PYTORCH':SobolPyTorch, 'SEQ51':SobolSeq51}
+        backends = list(backend_objs.keys())
+        if self.backend not in backends:
+            raise ParameterError('Sobol requires backend be in %s'%(str(backends)))
         self.dimension = dimension
-        self.randomize = randomize
-        self.seed = seed
-        self.graycode = graycode
+        self.generator = backend_objs[self.backend](dimension,randomize,graycode,seed)
         self.low_discrepancy = True
-        self.backend = backend.lower()
-        if self.backend == 'qrng':
-            self.backend_gen = self._qrng_sobol_gen
-        elif self.backend == 'mps':
-            self.mps_sobol_rng = DigitalSeq(m=30, s=self.dimension)
-            # we guarantee a depth of >=32 bits for shift
-            self.t = max(32, self.mps_sobol_rng.t)
-            # correction factor to scale the integers
-            self.ct = max(0, self.t - self.mps_sobol_rng.t)
-            self.backend_gen = self._mps_sobol_gen
-            if not self.randomize:
-                warning_s = '''
-                Sobol MPS unscrambled samples are not in the domain [0,1)'''
-                warnings.warn(warning_s, ParameterWarning)
-        elif self.backend == 'pytorch':         
-            self.backend_gen = self._pytorch_sobol_gen
-            warnings.warn('''
-                PyTorch SobolEngine issue. See https://github.com/pytorch/pytorch/issues/32047
-                    SobolEngine 0^{th} vector is \\vec{.5} rather than \\vec{0}''',ParameterWarning)
-        elif self.backend == 'seq51':
-            self.backend_gen = self._seq51_sobol_gen
-        else:
-            raise ParameterError("Sobol backend must be either 'qrng', 'mps', or 'pytorch'")
-        if (self.backend in ['mps','pytorch'] and (not self.graycode)) or (self.backend=='seq51' and self.graycode):
-            warning_s = '''
-                %s backend does not support graycode=%s'''%(self.backend,self.graycode)
-            warnings.warn(warning_s,ParameterWarning)
-        if self.backend=='seq51' and self.randomize:
-            raise ParameterError('Sobol with "Seq51" backend does not yet support randomization.')
         self.mimics = 'StdUniform'
-        self.set_seed(self.seed)
         super(Sobol,self).__init__()
-        
-    def _qrng_sobol_gen(self, n_min=0, n_max=8):
-        """
-        Generate samples from n_min to n_max
-        
-        Args:
-            n_min (int): minimum index. Must be 0 or n_max/2
-            n_max (int): maximum index (not inclusive)
-        
-        Returns:
-            ndarray: n samples by d dimension array of Sobol' samples
-        """
-        n = int(n_max-n_min)
-        x_sob = sobol_qrng(n,self.dimension,self.randomize,skip=int(n_min),graycode=self.graycode,seed=self.seed)
-        return x_sob
-    
-    def _seq51_sobol_gen(self, n_min=0, n_max=8):
-        """
-        Generate samples from n_min to n_max
-        
-        Args:
-            n_min (int): minimum index. Must be 0 or n_max/2
-            n_max (int): maximum index (not inclusive)
-        
-        Returns:
-            ndarray: n samples by d dimension array of Sobol' samples
-        """
-        n = int(n_max-n_min)
-        x_sob = sobol_seq51(n,self.dimension,skip=int(n_min))
-        return x_sob
-
-    def _mps_sobol_gen(self, n_min=0, n_max=8):
-        """
-        Generate samples from n_min to n_max
-        
-        Args:
-            n_min (int): minimum index. Must be 0 or n_max/2
-            n_max (int): maximum index (not inclusive)
-        
-        Returns:
-            ndarray: n samples by d dimension array of Sobol' samples
-        """
-        n = int(n_max-n_min)
-        x_sob = zeros((n, self.dimension), dtype=int64)
-        self.mps_sobol_rng.set_state(n_min)
-        for i in range(n):
-            next(self.mps_sobol_rng)
-            x_sob[i, :] = self.mps_sobol_rng.cur
-        if self.randomize:
-            x_sob = (self.shift ^ (x_sob * 2 ** self.ct)) / 2. ** self.t
-        return x_sob
-    
-    def _pytorch_sobol_gen(self, n_min=0, n_max=8):
-        """
-        Generate samples from n_min to n_max
-        
-        Args:
-            n_min (int): minimum index.
-            n_max (int): maximum index. 
-        
-        Returns:
-            ndarray: n samples by d dimension array of Sobol' samples
-        """
-        import torch
-        from torch.quasirandom import SobolEngine
-        n = int(n_max-n_min)
-        se = SobolEngine(dimension=self.dimension, scramble=self.randomize, seed=self.seed)
-        se.fast_forward(n_min)
-        x_sob = se.draw(n,dtype=torch.float64).numpy()
-        return x_sob
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
         """
@@ -199,32 +113,17 @@ class Sobol(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
-        if n_min == 0 and self.backend in ['qrng','mps'] and self.randomize==False and warn:
-            warnings.warn("Non-randomized Sobol' sequence includes the origin",ParameterWarning)
-        x_sob = self.backend_gen(n_min,n_max)
-        return x_sob
+        x = self.generator.gen_samples(n_min,n_max,warn)
+        return x
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = seed if seed else random.randint(2**32)
-        if self.backend == 'mps':
-            random.seed(seed)
-            self.shift = random.randint(0, 2 ** self.t, self.dimension, dtype=int64)
+        self.generator.set_seed(seed)
         
     def set_dimension(self, dimension):
-        """
-        See abstract method. 
-
-        Note:
-            Computes a new random shift to be applied to samples
-        """
-        self.dimension = dimension
-        if self.backend == 'mps':
-            self.mps_sobol_rng = DigitalSeq(m=30, s=self.dimension)
-            # we guarantee a depth of >=32 bits for shift
-            self.t = max(32, self.mps_sobol_rng.t)
-            # correction factor to scale the integers
-            self.ct = max(0, self.t - self.mps_sobol_rng.t)
-            self.backend_gen = self._mps_sobol_gen
-            self.shift = random.randint(0, 2 ** self.t, self.dimension, dtype=int64)
-
+        """ See abstract method. """
+        self.generator.set_dimension(dimension)
+    
+    def __repr__(self):
+        self.dimension, self.randomize, self.graycode, self.seed = self.generator.get_params()
+        return super().__repr__()

@@ -1,7 +1,7 @@
-from ._discrete_distribution import DiscreteDistribution
+from .._discrete_distribution import DiscreteDistribution
 from .halton_owen import HaltonOwen
 from .halton_qrng import HaltonQRNG
-from ..util import ParameterError
+from ...util import ParameterError
 from numpy import random
 
 
@@ -37,9 +37,9 @@ class Halton(DiscreteDistribution):
         [2] Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
     """
 
-    parameters = ['dimension','generalize','seed','mimics','backend']
+    parameters = ['dimension','generalize','randomize','seed','mimics','backend']
 
-    def __init__(self, dimension=1, generalize=True, randomize=True, backend='Owen', seed=None):
+    def __init__(self, dimension=1, generalize=True, randomize=True, seed=None, backend='Owen'):
         """
         Args:
             dimension (int): dimension of samples
@@ -55,9 +55,10 @@ class Halton(DiscreteDistribution):
         """
         self.backend = backend.upper()
         backend_objs = {'OWEN':HaltonOwen,'QRNG':HaltonQRNG}
-        backend_options = list(backends.keys())
-        if self.backend not in backend_options:
-            raise ParameterError('Halton requires backend be in %s'%(str(backend_options)))
+        backends = list(backend_objs.keys())
+        if self.backend not in backends:
+            raise ParameterError('Halton requires backend be in %s'%(str(backends)))
+        self.dimension = dimension
         self.generator = backend_objs[self.backend](dimension,generalize,randomize,seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
@@ -89,3 +90,7 @@ class Halton(DiscreteDistribution):
     def set_dimension(self, dimension):
         """ See abstract method. """
         self.generator.set_dimension(dimension)
+    
+    def __repr__(self):
+        self.dimension, self.generalize, self.randomize, self.seed = self.generator.get_params()
+        return super().__repr__()

@@ -2,7 +2,6 @@
 
 from qmcpy import *
 from qmcpy.util import *
-from qmcpy.discrete_distribution.c_lib.py_c_wrappers import example_use
 from qmcpy.util import ParameterError,ParameterWarning
 from numpy import *
 import sys
@@ -51,13 +50,6 @@ class TestIIDGaussian(unittest.TestCase):
         self.assertTrue(samples.shape==(4,3))
 
 
-class TestQRNG(unittest.TestCase):
-    """ Unit tests for QRNG code from C """
-
-    def test_qrng_example(self):
-        example_use()
-
-
 class TestLattice(unittest.TestCase):
     """ Unit tests for Lattice DiscreteDistribution. """
 
@@ -98,8 +90,8 @@ class TestLattice(unittest.TestCase):
             self.assertTrue(samples.shape==(4,3))
     
     def test_custom_vector(self):
-        self.assertRaises(ParameterError,Lattice,dimension=4,gen_vector_info={'vector':[1,433461,315689],'n_max':2**20})
-        l = Lattice(2,gen_vector_info={'vector':[1,433461,315689],'n_max':2**20})
+        self.assertRaises(ParameterError,Lattice,dimension=4,gen_vector_info={'vector':[1,433461,315689],'n_lim':2**20})
+        l = Lattice(2,gen_vector_info={'vector':[1,433461,315689],'n_lim':2**20})
         self.assertRaises(ParameterError,l.gen_samples,n_min=4,n_max=2**21)
         l.gen_samples(n_min=3,n_max=5)
 
@@ -110,24 +102,17 @@ class TestSobol(unittest.TestCase):
         distribution = Sobol(dimension=3, randomize=True, backend='QRNG')
         self.assertEqual(distribution.mimics, "StdUniform")
 
-    def test_gen_samples(self):
-        for backend in ['QRNG','MPS','PyTorch']:
-            distribution = Sobol(dimension=3, randomize=True, backend=backend, graycode=True)
-            samples = distribution.gen_samples(n_min=4, n_max=8)
+    def test_gen_samples_and_set_dimension(self):
+        dds = [
+            Sobol(dimension=2, randomize=True, backend='QRNG', graycode=True),
+            Sobol(dimension=2, randomize=True, backend='PyTorch', graycode=True),
+            Sobol(dimension=2, randomize=False, backend='Seq51', graycode=False)]
+        for dd in dds:
+            samples = dd.gen_samples(n_min=4, n_max=8)
             self.assertEqual(type(samples), ndarray)
-            self.assertEqual(samples.shape, (4,3))
-
-    def test_sobol_seq_51(self):
-        distribution = Sobol(dimension=3,randomize=False,backend='Seq51')
-        samples = distribution.gen_samples(n_min=4,n_max=8)
-        self.assertEqual(type(samples), ndarray)
-        self.assertEqual(samples.shape, (4,3))
-
-    def test_set_dimension(self):
-        for backend in ['MPS','QRNG','PyTorch']:
-            distribution = Sobol(dimension=2,backend=backend, graycode=True)
-            distribution.set_dimension(3)
-            samples = distribution.gen_samples(4)
+            self.assertEqual(samples.shape, (4,2))
+            dd.set_dimension(3)
+            samples = dd.gen_samples(4)
             self.assertTrue(samples.shape==(4,3))
     
     def test_qrng_graycode_ordering(self):
@@ -151,7 +136,7 @@ class TestSobol(unittest.TestCase):
         self.assertTrue((x==x_true).all())
     
     def test_pytorch_0th_vector(self):
-        x = Sobol(1,randomize=False,backend='PyTorch').gen_samples(4)
+        x = Sobol(1,randomize=False,backend='PyTorch',graycode=True).gen_samples(4)
         self.assertTrue((x==array([[1./2,3./4,1./4,3./8]]).T).all())
 
 class TestHalton(unittest.TestCase):
@@ -162,7 +147,7 @@ class TestHalton(unittest.TestCase):
         self.assertEqual(distribution.mimics, "StdUniform")
     
     def test_gen_samples(self):
-        distribution = Halton(dimension=3, generalize=False, seed=7)
+        distribution = Halton(dimension=3, generalize=True, seed=7)
         x = distribution.gen_samples(4)
         self.assertTrue(x.shape==(4,3))
         distribution.set_dimension(4)
@@ -186,12 +171,10 @@ class TestHalton(unittest.TestCase):
         self.assertTrue((x==x_true).all())
     
     def test_warnings_errors(self):
-        self.assertWarns(ParameterWarning,Halton,2,generalize=False,backend='Owen')
-        self.assertWarns(ParameterWarning,Halton,2,randomize=False,generalize=False,backend='QRNG')
+        self.assertRaises(ParameterError,Halton,2,generalize=False,backend='Owen')
+        self.assertRaises(ParameterError,Halton,2,randomize=False,generalize=False,backend='QRNG')
         distribution = Halton(2, generalize=True, backend='QRNG',seed=7)
         self.assertRaises(ParameterError,distribution.gen_samples,n_min=2,n_max=4)
-        distribution = Halton(2, generalize=True, randomize=False, backend='Owen')
-        self.assertWarns(ParameterWarning,distribution.gen_samples,n_min=0,n_max=4)
 
 class TestKorobov(unittest.TestCase):
     """ Unit test for Korobov DiscreteDistribution. """
@@ -201,14 +184,12 @@ class TestKorobov(unittest.TestCase):
         self.assertEqual(distribution.mimics, "StdUniform")
     
     def test_gen_samples(self):
-        distribution = Korobov(dimension=3,generator=[2,3,1],randomize=False,seed=7)
+        distribution = Korobov(dimension=3,generator=[1,2,3],randomize=False,seed=7)
         x = distribution.gen_samples(4)
         self.assertTrue(x.shape==(4,3))
-        self.assertRaises(Exception,distribution.gen_samples,4,[4])
-        self.assertRaises(Exception,distribution.gen_samples,[3,3,3])
-        self.assertRaises(Exception,distribution.gen_samples,[0])
-        distribution.set_dimension(2)
-        x = distribution.gen_samples(4,generator=[1,3])
+        self.assertRaises(ParameterError,distribution.gen_samples,3)
+        distribution = Korobov(dimension=2,generator=[1,3],randomize=False,seed=7)
+        x = distribution.gen_samples(4)
         x_true = array([
             [0,     0],
             [1./4,  3./4],

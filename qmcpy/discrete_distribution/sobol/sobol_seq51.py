@@ -1,29 +1,61 @@
+from ...util import ParameterError, ParameterWarning
 from ..c_lib import c_lib
 import ctypes
 from numpy import *
+import warnings
 
-sobol_seq51_cf = c_lib.sobol_seq51
-sobol_seq51_cf.argtypes = [
-    ctypes.c_int, # n
-    ctypes.c_int, # d
-    ctypes.c_int, # skip
-    numpy.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # res
-]
-sobol_seq51_cf.restype = None
 
-def sobol_seq51(n, d, skip):
-    """ 
-    Sobol sequence. 
-
-    Args:
-        n (int): number of points
-        d (int): dimension
-        siip (int): number of inital points in the sequence to skip
+class SobolSeq51(object):
     """
-    max_num = 2**30-1
-    max_dim = 51
-    if (n+skip) > max_num or d > max_dim:
-        raise Exception('SobolSeq51 supports a max of %d samples and %d dimensions'%(max_num,max_dim))
-    res = numpy.zeros((n,d), dtype=numpy.double)
-    sobol_seq51_cf(n, d, skip, res)
-    return res
+    References:
+        
+        [1] I.M. Sobol', V.I. Turchaninov, Yu.L. Levitan, B.V. Shukhman: 
+        "Quasi-Random Sequence Generators" Keldysh Institute of Applied Mathematics, 
+        Russian Acamdey of Sciences, Moscow (1992).
+
+        [2] Sobol, Ilya & Asotsky, Danil & Kreinin, Alexander & Kucherenko, Sergei. (2011). 
+        Construction and Comparison of High-Dimensional Sobol' Generators. Wilmott. 
+        2011. 10.1002/wilm.10056. 
+    """
+
+    def __init__(self, dimension, randomize, graycode, seed):
+        
+        self.sobol_seq51_cf = c_lib.sobol_seq51
+        self.sobol_seq51_cf.argtypes = [
+            ctypes.c_int, # n
+            ctypes.c_int, # d
+            ctypes.c_int, # skip
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # res
+        ]
+        self.sobol_seq51_cf.restype = None
+        self.r = randomize
+        self.g = graycode
+        if self.g:
+            raise ParameterError('Seq51 Sobol does not support Graycode ordering. Use "QRNG" backend for graycode ordering.')
+        if self.r:
+            raise ParameterError('Seq51 Sobol does not yet support randomization.')
+        self.n_lim = 2**30
+        self.d_lim = 51
+        self.set_seed(seed)
+        self.set_dimension(dimension)
+
+    def gen_samples(self, n_min, n_max, warn):
+        if n_max > self.n_lim:
+            raise ParameterError("Seq51 Sobol requires n_max <= 2^30")
+        if n_min == 0 and self.r==False and warn:
+            warnings.warn("Non-randomized Seq51 Sobol sequence includes the origin",ParameterWarning)
+        n = int(n_max-n_min)
+        x = zeros((n,self.d), dtype=double)
+        self.sobol_seq51_cf(n, self.d, int(n_min), x)
+        return x
+
+    def set_seed(self, seed):
+        self.s = seed if seed else random.randint(2**32)
+        
+    def set_dimension(self, dimension):
+        self.d = dimension
+        if self.d > self.d_lim:
+            raise ParameterError("Seq51 Sobol requires dimension <= %d"%self.d_lim)
+    
+    def get_params(self):
+        return self.d, self.r, self.g, self.s

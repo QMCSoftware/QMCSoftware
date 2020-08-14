@@ -99,24 +99,19 @@ See the `makefile` for individual testing commands.
 
 Pull requests should be made into the `develop` branch, as we try and keep the `master` branch consistent with the current release. 
 
-**For a QMCPy component try to ...**
+**For a QMCPy component (generator, algorithm, use case) try to ...**
 
-- incorporate other QMCPy components when possible.
+- incorporate and be consistent with other QMCPy components as much as possible.
 - keep naming conventions the same across similar components.  
-- develop thorough documentation, including doctests.
-- create unittests. 
-- create a workout or demo showcasing your new component, 
-    - preferably with a connection/comparison to available components. 
-    - preferably showing theoretical complexity is met. 
-
-
-**For a QMCPy use case, try to ...**
-
-- create a demo that showcases your component, preferably including
-    - an overview of the mathematics. 
-    - figures.
+- develop thorough documentation, including doctests. See `qmcpy/stopping_criterion/cub_qmc_sobol_g.py` as an example.
+- create fast and/or long unittests in the `test/` directory. 
+- create a workout or demo showcasing your new component, preferably including
+    - a connection/comparison to available components. 
+    - how the expected cost is realized. 
+    - an overview of the relevant mathematics. 
+    - figures to illustrate important features.
     - references. 
-- develop a potential blog to put on the [QMCPy blogs site](http://qmcpy.wordpress.com/).
+- consider submitting a blog to put on the [QMCPy blogs site](http://qmcpy.wordpress.com/).
 
 **For a bug fix, try to**
 
