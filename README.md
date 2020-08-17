@@ -19,13 +19,11 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 pip install qmcpy
 ~~~
 
-If you are interested in contributing please see the CONTRIBUTING.md file.
-
 ----
 
 ## The QMCPy Framework
 
-The central package including the 5 main components as listed below. Each component is implemented as abstract classes with concrete implementations. For example, the lattice and Sobol' sequences are implemented as concrete implementations of the `DiscreteDistribution` abstract class. An overview of implemented componenets and some of the underlying mathematics is available at `./qmcpy/README.md`.  A complete list of concrete implementations and thorough documentation can be found in the [QMCPy Read the Docs](https://qmcpy.readthedocs.io/en/latest/algorithms.html) .
+The central package including the 5 main components as listed below. Each component is implemented as abstract classes with concrete implementations. For example, the lattice and Sobol' sequences are implemented as concrete implementations of the `DiscreteDistribution` abstract class. An overview of implemented componenets and some of the underlying mathematics is available in the [QMCPy README](https://github.com/QMCSoftware/QMCSoftware/blob/master/qmcpy/README.md).  A complete list of concrete implementations and thorough documentation can be found in the [QMCPy Read the Docs](https://qmcpy.readthedocs.io/en/latest/algorithms.html) .
 
 - **Stopping Criterion:** determines the number of samples necessary to meet an error tolerance.
 - **Integrand:** the function/process whose expected value will be approximated.
@@ -36,6 +34,8 @@ The central package including the 5 main components as listed below. Each compon
 ----
 
 ## Quickstart
+
+Note: If the following mathematics is not rendering try using Google Chrome and installing the [Mathjax Plugin for GitHub](https://chrome.google.com/webstore/detail/mathjax-plugin-for-github/ioemnmodlmafdkllaclgeombjnmnbima?hl=en).
 
 Will will find the exptected value of the Keister integrand [18]
 
