@@ -14,7 +14,7 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
     print('\nDiscrete DiscreteDistribution Generation Time Comparison')
     columns = ['n',
         'L_MPS', 'L_GAIL',
-        'S_QRNG_gc', 'S_QRNG_n', 'S_MPS_QMCPy','S_PyTorch',
+        'S_QRNG_gc', 'S_QRNG_n','S_PyTorch',
         'H_QRNG', 'H_Owen',
         'K_QRNG']
     warnings.simplefilter('ignore')
@@ -23,7 +23,6 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
         Lattice(dimension, randomize=True, seed=7, backend='GAIL'),
         Sobol(dimension, randomize=True, seed=7, backend='QRNG', graycode=True),
         Sobol(dimension, randomize=True, seed=7, backend='QRNG', graycode=False),
-        Sobol(dimension, randomize=True, seed=7, backend='MPS', graycode=True),
         Sobol(dimension, randomize=True, seed=7, backend='PyTorch', graycode=True),
         Halton(dimension, generalize=True, backend='QRNG', seed=7),
         Halton(dimension, generalize=True, backend='Owen', seed=7),

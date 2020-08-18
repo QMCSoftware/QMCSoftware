@@ -5,17 +5,15 @@
 
 # Quasi-Monte Carlo Community Software
 
-Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications. 
+Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.
 
 <center><img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/qmcpy_logo.png?raw=true" alt="QMCPy logo" height=200px width=200px/>
 
-[Homepage](https://qmcsoftware.github.io/QMCSoftware/) | [GitHub](https://github.com/QMCSoftware/QMCSoftware) | [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) | [PyPI](https://pypi.org/project/qmcpy/)</center>
+[Homepage](https://qmcsoftware.github.io/QMCSoftware/) | [GitHub](https://github.com/QMCSoftware/QMCSoftware) | [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) | [PyPI](https://pypi.org/project/qmcpy/) | [Blogs](http://qmcpy.wordpress.com/) | [Contributing](https://github.com/QMCSoftware/QMCSoftware/blob/master/CONTRIBUTING.md) | [Issues](https://github.com/QMCSoftware/QMCSoftware/issues)</center>
 
 ----
 
 ## Installation
-
-QMCPy can be installed from [PyPI](https://pypi.org/project/qmcpy/) with the command
 
 ~~~
 pip install qmcpy
@@ -25,7 +23,7 @@ pip install qmcpy
 
 ## The QMCPy Framework
 
-The central package including the 5 main components as listed below. Each component is implemented as abstract classes with concrete implementations. For example, the lattice and Sobol' sequences are implemented as concrete implementations of the `DiscreteDistribution` abstract class. An overview of implemented componenets and some of the underlying mathematics is available at `./qmcpy/README.md`.  A complete list of concrete implementations and thorough documentation can be found on the [QMCPy Read the Docs site](https://qmcpy.readthedocs.io/en/latest/algorithms.html). 
+The central package including the 5 main components as listed below. Each component is implemented as abstract classes with concrete implementations. For example, the lattice and Sobol' sequences are implemented as concrete implementations of the `DiscreteDistribution` abstract class. An overview of implemented componenets and some of the underlying mathematics is available in the [QMCPy README](https://github.com/QMCSoftware/QMCSoftware/blob/master/qmcpy/README.md).  A complete list of concrete implementations and thorough documentation can be found in the [QMCPy Read the Docs](https://qmcpy.readthedocs.io/en/latest/algorithms.html) .
 
 - **Stopping Criterion:** determines the number of samples necessary to meet an error tolerance.
 - **Integrand:** the function/process whose expected value will be approximated.
@@ -37,11 +35,13 @@ The central package including the 5 main components as listed below. Each compon
 
 ## Quickstart
 
-We will find the exptected value of the Keister integrand [18]
+Note: If the following mathematics is not rendering try using Google Chrome and installing the [Mathjax Plugin for GitHub](https://chrome.google.com/webstore/detail/mathjax-plugin-for-github/ioemnmodlmafdkllaclgeombjnmnbima?hl=en).
+
+Will will find the exptected value of the Keister integrand [18]
 
 $$g(\boldsymbol{x})=\pi^{d/2}\cos(||\boldsymbol{x}||)$$
 
-integrated over the $d$ dimensional Gaussian true measure with variance $1/2$
+integrated over a $d$ dimensional Gaussian true measure with variance $1/2$
 
 $$\mathcal{X} \sim \mathcal{N}(\boldsymbol{0},\boldsymbol{I}/2).$$
 
@@ -63,100 +63,6 @@ A more detailed quickstart can be found in our GitHub repo at `QMCSoftware/demos
 
 ----
 
-## Installation and Usage for Developers
-
-This package is dependent on the `qmcpy/` directory being on your python path. This is easiest with a virtual environment.
-
-Setup using `virtualenv` and `virtualenvwrapper`
-
-~~~
-mkvirtualenv qmcpy
-git clone https://github.com/QMCSoftware/QMCSoftware.git
-cd QMCSoftware
-git checkout develop
-setvirtualenvproject
-add2virtualenv $(pwd)
-pip install -r requirements/dev.txt
-pip install -e ./
-~~~
-
-Setup using `conda`
-
-~~~
-conda create --name qmcpy python=3.6
-conda activate qmcpy
-git clone https://github.com/QMCSoftware/QMCSoftware.git
-cd QMCSoftware
-git checkout develop
-pip install -r requirements/dev.txt
-pip install -e ./
-~~~
-
-To check for successful installation, run
-
-~~~
-make tests
-~~~
-
-Note that the QRNG [12] C backend files can be explicitly recompiled with
-
-~~~
-make qrng
-~~~
-
-----
-
-## Documentation 
-
-The QMCPy Read the Docs is located [here](https://qmcpy.readthedocs.io/en/latest/) with HTML, PDF, and EPUB downloads available [here](https://readthedocs.org/projects/qmcpy/downloads/).
-
-Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.org/). To compile HTML, PDF, or EPUB docs locally into `sphinx/_build/` you must install [pandoc](https://pandoc.org/installing.html), a [latex distribution](https://www.latex-project.org/get/), and add additional python requirements with the command
-
-~~~
-pip install -r requirements/dev_docs.txt
-~~~
-
-Then setup Sphinx paths (only needs to be run once for initialization)
-
-~~~
-make _doc
-~~~
-
-Finally, run one of the following three commands the compile the documentation
-
-~~~
-make doc_html
-make doc_pdf
-make doc_epub
-~~~
-
-----
-
-## Workouts and Demos
-
-Workouts extensively test and compare the components of the QMCPy package.
-Demos, implemented as Jupyter notebooks, demonstrate functionality and uses cases for QMCPy. They often draw from and explore the output of various workouts. 
-
-To run all workouts (~10 min) use the command
-
-~~~
-make workout
-~~~
-
-----
-
-## Unit Tests
-
-Combined doctests and fast (<1 sec) / long (<10 sec) unittests can be run with
-
-~~~
-make tests
-~~~
-
-See `makefile` for individual testing commands.
-
-----
-
 ## Developers
  
 - Sou-Cheng T. Choi
@@ -168,6 +74,7 @@ See `makefile` for individual testing commands.
 ----
 
 ## Collaborators
+
 - Mike Giles
 - Marius Hofert
 - Pierre L’Ecuyer
@@ -181,13 +88,26 @@ See `makefile` for individual testing commands.
 
 If you find QMCPy helpful in your work, please support us by citing the following work:
 
-Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. Working. 2020. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/).
+**BibTex**
 
-----
+~~~
+@misc{QMCPy,
+  Author = {S.-C. T. Choi and F. J. Hickernell and M. McCourt and A. Sorokin},
+  Date-Added = {2020-04-15 15:19:14 -0500},
+  Date-Modified = {2020-04-26 17:13:25 -0500},
+  Title = {{QMCPy}: A quasi-{M}onte {C}arlo {P}ython Library},
+  Url = {https://github.com/QMCSoftware/QMCSoftware},
+  Year = {2020+},
+  Bdsk-Url-1 = {https://github.com/QMCSoftware/QMCSoftware}}
+~~~
 
-## License
+**Plain Text**
 
-This work is maintained under the Apache 2.0 License.
+~~~
+Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A.
+QMCPy: A quasi-Monte Carlo Python Library. Working. 2020.
+https://qmcsoftware.github.io/QMCSoftware/
+~~~
 
 ----
 
@@ -231,6 +151,14 @@ This work is maintained under the Apache 2.0 License.
 
 <b>[19]</b> L’Ecuyer, Pierre & Munger, David. (2015). LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules. ACM Transactions on Mathematical Software. 42. 10.1145/2754929. 
 
+<b>[20]</b> Fischer, Gregory & Carmon, Ziv & Zauberman, Gal & L’Ecuyer, Pierre. (1999). Good Parameters and Implementations for Combined Multiple Recursive Random Number Generators. Operations Research. 47. 159-164. 10.1287/opre.47.1.159. 
+
+<b>[21]</b> I.M. Sobol', V.I. Turchaninov, Yu.L. Levitan, B.V. Shukhman: "Quasi-Random Sequence Generators" Keldysh Institute of Applied Mathematics, Russian Acamdey of Sciences, Moscow (1992).
+
+<b>[22]</b> Sobol, Ilya & Asotsky, Danil & Kreinin, Alexander & Kucherenko, Sergei. (2011). Construction and Comparison of High-Dimensional Sobol' Generators. Wilmott. 2011. 10.1002/wilm.10056. 
+
+<b>[23]</b> Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., … Chintala, S. (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. In H. Wallach, H. Larochelle, A. Beygelzimer, F. d extquotesingle Alch&#39;e-Buc, E. Fox, & R. Garnett (Eds.), Advances in Neural Information Processing Systems 32 (pp. 8024–8035). Curran Associates, Inc. Retrieved from http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf
+
 ----
 
 ## Sponsors
@@ -241,7 +169,7 @@ Illinois Tech
 
    <p style="height:30x">
      <a href="https://www.iit.edu">
-       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true"/>
+       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true"/ width="300" height="150">
      </a>
    </p>
 
@@ -251,7 +179,7 @@ Kamakura Corporation
 
    <p style="height:30x">
      <a href="http://www.kamakuraco.com">
-       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true"/>
+       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
      </a>
    </p>
 
@@ -260,9 +188,9 @@ SigOpt, Inc.
 ------------
 
 
-   <p style="height:30px">
+   <p>
      <a href="https://sigopt.com">
-       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true"/>
+       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true" width="300" height="100"/>
      </a>
    </p>
 

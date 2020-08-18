@@ -50,9 +50,8 @@ packages = [
     'qmcpy.util',
     'qmcpy.integrand',
     'qmcpy.discrete_distribution.lattice',
-    'qmcpy.discrete_distribution.qrng',
-    'qmcpy.discrete_distribution.sobol',
-    'qmcpy.discrete_distribution.halton']
+    'qmcpy.discrete_distribution.c_lib',
+    'qmcpy.discrete_distribution.sobol']
 
 setuptools.setup(
     name="qmcpy",
@@ -79,11 +78,14 @@ setuptools.setup(
     include_package_data=True,
     ext_modules=[
         Extension(
-            name='qmcpy.discrete_distribution.qrng.qrng_lib',
-            sources=['qmcpy/discrete_distribution/qrng/ghalton.c',
-                     'qmcpy/discrete_distribution/qrng/korobov.c',
-                     'qmcpy/discrete_distribution/qrng/MRG63k3a.c',
-                     'qmcpy/discrete_distribution/qrng/sobol.c'],
+            name='qmcpy.discrete_distribution.c_lib.c_lib',
+            sources=[
+                'qmcpy/discrete_distribution/c_lib/halton_owen.c',
+                'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
+                'qmcpy/discrete_distribution/c_lib/korobov_qrng.c',
+                'qmcpy/discrete_distribution/c_lib/sobol_qrng.c',
+                'qmcpy/discrete_distribution/c_lib/sobol_seq51.c', 
+                'qmcpy/discrete_distribution/c_lib/MRG63k3a.c'],
             extra_compile_args=['-shared'])],
     cmdclass={
         'clean': CleanCommand,

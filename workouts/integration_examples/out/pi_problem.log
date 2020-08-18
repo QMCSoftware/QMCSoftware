@@ -1,5 +1,5 @@
 Password: 3141592653
-CPU time: 71.70 sec
+CPU time: 62.20 sec
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -8,10 +8,10 @@ CustomFun (Integrand Object)
 Sobol (DiscreteDistribution Object)
     dimension       1
     randomize       1
-    seed            7
-    backend         qrng
-    mimics          StdUniform
     graycode        0
+    seed            7
+    mimics          StdUniform
+    backend         QRNG
 Lebesgue (TrueMeasure Object)
     lower_bound     -2
     upper_bound     2^(1)
@@ -23,5 +23,5 @@ CubQMCSobolG (StoppingCriterion Object)
 LDTransformData (AccumulateData Object)
     n_total         2^(27)
     solution        3.142
-    error_hat       2.62e-10
-    time_integrate  71.699
+    error_bound     2.62e-10
+    time_integrate  62.201

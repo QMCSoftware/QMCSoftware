@@ -10,7 +10,7 @@ class LDTransformData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['n_total','solution','error_hat']
+    parameters = ['n_total','solution','error_bound']
 
     def __init__(self, stopping_criterion, integrand, basis_transform, m_min, m_max, fudge, check_cone):
         """

@@ -2,6 +2,8 @@
 
 The QMCPy framework uses 5 abstract classes that are fleshed out in concrete implementations. Specifically, a user selects an integrand, true measure, discrete distribution, and stopping criterion specific to their Monte Carlo (MC) / quasi-Monte Carlo (qMC) problem. The fifth abstract class accumulates data from the stopping criterion and does not need to be instantiated by the user. The following blocks give more detailed descriptions of each abstract class and the available concrete implementations. For specific class names and parameters see the [QMCPy Documentation page](https://qmcpy.readthedocs.io/en/latest/algorithms.html). 
 
+Note: If the following mathematics is not rendering try using Google Chrome and installing the [Mathjax Plugin for GitHub](https://chrome.google.com/webstore/detail/mathjax-plugin-for-github/ioemnmodlmafdkllaclgeombjnmnbima?hl=en).
+
 ----
 
 ## Integrand

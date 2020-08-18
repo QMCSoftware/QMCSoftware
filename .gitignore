@@ -17,6 +17,9 @@ qmcpy.egg-info/
 *.dylib
 *.dll
 
+# R
+*.Rhistory 
+
 # Website
 docs/_site
 docs/Gemfile.lock

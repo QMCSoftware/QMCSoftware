@@ -42,7 +42,7 @@ class CubMCCLT(StoppingCriterion):
         solution        1.835
         n               5826
         n_total         6850
-        error_hat       0.050
+        error_bound     0.050
         confid_int      [1.785 1.885]
         time_integrate  ...
     >>> ac = AsianOption(
@@ -115,8 +115,8 @@ class CubMCCLT(StoppingCriterion):
         self.data.update_data()
         # CLT confidence interval
         sigma_up = (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
-        self.data.error_hat = z_star * self.inflate * sigma_up
-        self.data.confid_int = self.data.solution + self.data.error_hat * array([-1, 1])
+        self.data.error_bound = z_star * self.inflate * sigma_up
+        self.data.confid_int = self.data.solution + self.data.error_bound * array([-1, 1])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
 

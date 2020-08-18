@@ -23,9 +23,9 @@ MeanVarData (AccumulateData Object)
     solution        2.168
     n               1878963
     n_total         1879987
-    error_hat       0.005
+    error_bound     0.005
     confid_int      [2.163 2.173]
-    time_integrate  0.743
+    time_integrate  0.622
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1671         
@@ -34,8 +34,8 @@ Lattice (DiscreteDistribution Object)
     dimension       3
     randomize       1
     seed            1092
-    backend         mps
     mimics          StdUniform
+    backend         MPS
 Gaussian (TrueMeasure Object)
     mean            0
     covariance      2^(-1)
@@ -52,9 +52,9 @@ MeanVarDataRep (AccumulateData Object)
     solution        2.167
     sighat          0.004
     n_total         2^(13)
-    error_hat       0.003
+    error_bound     0.003
     confid_int      [2.164 2.17 ]
-    time_integrate  0.018
+    time_integrate  0.011
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1682         
@@ -79,9 +79,9 @@ MeanVarData (AccumulateData Object)
     solution        2.168
     n               2342182
     n_total         2343206
-    error_hat       0.005
+    error_bound     0.005
     confid_int      [2.163 2.173]
-    time_integrate  0.382
+    time_integrate  0.331
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1688         
@@ -90,8 +90,8 @@ Lattice (DiscreteDistribution Object)
     dimension       3
     randomize       1
     seed            7
-    backend         gail
     mimics          StdUniform
+    backend         GAIL
 Gaussian (TrueMeasure Object)
     mean            0
     covariance      2^(-1)
@@ -104,8 +104,8 @@ CubQMCLatticeG (StoppingCriterion Object)
 LDTransformData (AccumulateData Object)
     n_total         2^(11)
     solution        2.169
-    error_hat       0.005
-    time_integrate  0.007
+    error_bound     0.005
+    time_integrate  0.006
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1705         
@@ -113,10 +113,10 @@ Keister (Integrand Object)
 Sobol (DiscreteDistribution Object)
     dimension       3
     randomize       1
-    seed            7
-    backend         qrng
-    mimics          StdUniform
     graycode        0
+    seed            7
+    mimics          StdUniform
+    backend         QRNG
 Gaussian (TrueMeasure Object)
     mean            0
     covariance      2^(-1)
@@ -129,7 +129,7 @@ CubQMCSobolG (StoppingCriterion Object)
 LDTransformData (AccumulateData Object)
     n_total         2^(12)
     solution        2.170
-    error_hat       0.002
-    time_integrate  0.020
+    error_bound     0.002
+    time_integrate  0.016
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
