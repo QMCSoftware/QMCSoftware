@@ -131,9 +131,9 @@ void sobol_seq51(int n, int d, int skip, double *x){
 
 /*
 int main(){
-    int n=1048576, d=3, skip=0;
+    int n=8, d=2, skip=0;
     double *x = (double *) calloc(n*d, sizeof(double));
-    sobol_seq_51(n, d, skip, x);
+    sobol_seq51(n, d, skip, x);
     for(int i=0; i<n; i++){
         for(int j=0; j<d; j++){
             printf("%.3f\t",x[i*d+j]);}
