@@ -23,6 +23,7 @@ class HaltonQRNG(object):
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # res
             ctypes.c_long]  # seed
         self.halton_qrng_cf.restype = None
+        self.g = generalize
         self.r = randomize
         if self.r==False:
             raise ParameterError('QRNG Halton must be randomized. Use Owen backend for non-randomized Halton.', ParameterWarning)
@@ -38,16 +39,18 @@ class HaltonQRNG(object):
             raise ParameterWarning("QRNG Halton requres n_max <= 2^32.")
         n = int(n_max-n_min)
         x = zeros((self.d, n), dtype=double)
-        self.halton_qrng_cf(n, d, generalize, x, seed)
+        self.halton_qrng_cf(n, self.d, self.g, x, self.s)
         return x.T
     
     def set_seed(self, seed):
         self.s = seed if seed else random.randint(2**32)
+        return self.s
         
     def set_dimension(self, dimension):
         self.d = dimension
         if self.d > self.d_lim:
             raise ParameterError('QRNG Halton requires dimension <= %d'%self.d_lim)
+        return self.d
     
     def get_params(self):
         return self.d, self.g, self.r, self.s

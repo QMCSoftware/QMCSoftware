@@ -23,6 +23,7 @@ class Halton(DiscreteDistribution):
     Halton (DiscreteDistribution Object)
         dimension       2^(2)
         generalize      1
+        randomize       1
         seed            2^(3)
         mimics          StdUniform
         backend         OWEN
@@ -58,8 +59,8 @@ class Halton(DiscreteDistribution):
         backends = list(backend_objs.keys())
         if self.backend not in backends:
             raise ParameterError('Halton requires backend be in %s'%(str(backends)))
-        self.dimension = dimension
         self.generator = backend_objs[self.backend](dimension,generalize,randomize,seed)
+        self.dimension, self.generalize, self.randomize, self.seed = self.generator.get_params()
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Halton,self).__init__()
@@ -85,12 +86,8 @@ class Halton(DiscreteDistribution):
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.generator.set_seed(seed)
+        self.seed = self.generator.set_seed(seed)
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.generator.set_dimension(dimension)
-    
-    def __repr__(self):
-        self.dimension, self.generalize, self.randomize, self.seed = self.generator.get_params()
-        return super().__repr__()
+        self.dimension = self.generator.set_dimension(dimension)

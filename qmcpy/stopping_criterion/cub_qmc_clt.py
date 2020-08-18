@@ -27,8 +27,8 @@ class CubQMCCLT(StoppingCriterion):
         dimension       1
         randomize       1
         seed            1092
-        backend         gail
         mimics          StdUniform
+        backend         GAIL
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)

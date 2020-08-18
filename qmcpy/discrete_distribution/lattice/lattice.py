@@ -84,8 +84,8 @@ class Lattice(DiscreteDistribution):
         backends = list(backend_objs.keys())
         if self.backend not in backends:
             raise ParameterError('Lattice requires backend be in %s'%(str(backends)))
-        self.dimension = dimension
         self.generator = backend_objs[self.backend](dimension,randomize,seed,gen_vector_info)
+        self.dimension, self.randomize, self.seed = self.generator.get_params()
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Lattice, self).__init__()
@@ -116,12 +116,8 @@ class Lattice(DiscreteDistribution):
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.generator.set_seed(seed)
+        self.seed = self.generator.set_seed(seed)
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.generator.set_dimension(dimension)
-    
-    def __repr__(self):
-        self.dimension, self.randomize, self.seed = self.generator.get_params()
-        return super().__repr__()
+        self.dimension = self.generator.set_dimension(dimension)

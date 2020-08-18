@@ -26,10 +26,10 @@ class CubQMCSobolG(StoppingCriterion):
     Sobol (DiscreteDistribution Object)
         dimension       2^(1)
         randomize       1
-        seed            7
-        backend         qrng
-        mimics          StdUniform
         graycode        0
+        seed            7
+        mimics          StdUniform
+        backend         QRNG
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)

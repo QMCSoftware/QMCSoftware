@@ -17,11 +17,11 @@ class Korobov(DiscreteDistribution):
            [0.482]])
     >>> k.set_dimension(3)
     >>> k.set_seed(8)
-    >>> k.gen_samples(4,generator=[2,3,1])
+    >>> k.gen_samples(4)
     array([[0.265, 0.153, 0.115],
-           [0.765, 0.903, 0.365],
-           [0.265, 0.653, 0.615],
-           [0.765, 0.403, 0.865]])
+           [0.515, 0.403, 0.365],
+           [0.765, 0.653, 0.615],
+           [0.015, 0.903, 0.865]])
     >>> k
     Korobov (DiscreteDistribution Object)
         dimension       3
@@ -30,6 +30,11 @@ class Korobov(DiscreteDistribution):
         seed            2^(3)
         mimics          StdUniform
         backend         QRNG
+    >>> Korobov(2,generator=[3,1]).gen_samples(4)
+    array([[0.863, 0.338],
+           [0.613, 0.588],
+           [0.363, 0.838],
+           [0.113, 0.088]])
     
     References:
 
@@ -58,8 +63,8 @@ class Korobov(DiscreteDistribution):
         backends = list(backend_objs.keys())
         if self.backend not in backends:
             raise ParameterError('Korobov requires backend be in %s'%(str(backends)))
-        self.dimension = dimension
         self.generator_obj = backend_objs[self.backend](dimension,generator,randomize,seed)
+        self.dimension, self.generator, self.randomize, self.seed = self.generator_obj.get_params()
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Korobov,self).__init__()
@@ -82,12 +87,8 @@ class Korobov(DiscreteDistribution):
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.generator_obj.set_seed(seed)
+        self.seed = self.generator_obj.set_seed(seed)
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.generator_obj.set_dimension(dimension)
-    
-    def __repr__(self):
-        self.dimension, self.generator, self.randomize, self.seed = self.generator_obj.get_params()
-        return super().__repr__()
+        self.dimension = self.generator_obj.set_dimension(dimension)

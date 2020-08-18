@@ -23,7 +23,8 @@ class HaltonOwen(object):
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # result array 
             ctypes.c_long]  # seed
         self.halton_owen_cf.restype = None
-        if not generalize:
+        self.g = generalize
+        if not self.g:
             raise ParameterError("Owen Halton must be generalized")
         self.r = randomize
         self.d_lim = 1000
@@ -35,16 +36,18 @@ class HaltonOwen(object):
             warnings.warn("Non-randomized Owen Halton sequence includes the origin",ParameterWarning)
         n = int(n_max-n_min)
         x = zeros((n , self.d), dtype=double)
-        self.halton_owen_cf(n, self.d, n_min, 0, self.r, x, self.s)
+        self.halton_owen_cf(n, self.d, int(n_min), 0, self.r, x, self.s)
         return x
     
     def set_seed(self, seed):
         self.s = seed if seed else random.randint(2**32)
+        return self.s
         
     def set_dimension(self, dimension):
         self.d = dimension
         if self.d > self.d_lim:
             raise ParameterError('Owen Halton requires dimension <= %d'%self.d_lim)
+        return self.d
     
     def get_params(self):
         return self.d, self.g, self.r, self.s

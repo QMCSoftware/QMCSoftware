@@ -32,8 +32,8 @@ class CubQMCML(StoppingCriterion):
         dimension       2^(6)
         randomize       1
         seed            854306
-        backend         gail
         mimics          StdUniform
+        backend         GAIL
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1

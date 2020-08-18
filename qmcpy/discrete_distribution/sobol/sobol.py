@@ -14,10 +14,10 @@ class Sobol(DiscreteDistribution):
     Sobol (DiscreteDistribution Object)
         dimension       2^(1)
         randomize       1
-        seed            7
-        backend         qrng
-        mimics          StdUniform
         graycode        0
+        seed            7
+        mimics          StdUniform
+        backend         QRNG
     >>> s.gen_samples(4)
     array([[0.982, 0.883],
            [0.482, 0.383],
@@ -91,8 +91,8 @@ class Sobol(DiscreteDistribution):
         backends = list(backend_objs.keys())
         if self.backend not in backends:
             raise ParameterError('Sobol requires backend be in %s'%(str(backends)))
-        self.dimension = dimension
         self.generator = backend_objs[self.backend](dimension,randomize,graycode,seed)
+        self.dimension, self.randomize, self.graycode, self.seed = self.generator.get_params()
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Sobol,self).__init__()
@@ -118,12 +118,8 @@ class Sobol(DiscreteDistribution):
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.generator.set_seed(seed)
+        self.seed = self.generator.set_seed(seed)
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.generator.set_dimension(dimension)
-    
-    def __repr__(self):
-        self.dimension, self.randomize, self.graycode, self.seed = self.generator.get_params()
-        return super().__repr__()
+        self.dimension = self.generator.set_dimension(dimension)

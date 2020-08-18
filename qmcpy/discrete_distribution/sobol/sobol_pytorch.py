@@ -35,11 +35,13 @@ class SobolPyTorch(object):
 
     def set_seed(self, seed):
         self.s = seed if seed else random.randint(2**32)
+        return self.s
         
     def set_dimension(self, dimension):
         import torch
         self.d = dimension
         self.se = torch.quasirandom.SobolEngine(dimension=self.d, scramble=self.r, seed=self.s)
+        return self.d
 
     def get_params(self):
         return self.d, self.r, self.g, self.s

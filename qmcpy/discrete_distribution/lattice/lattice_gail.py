@@ -79,6 +79,7 @@ class LatticeGAIL(object):
         random.seed(self.s)
         if self.r:
             self.shift = random.rand(int(self.d))
+        return self.s
         
     def set_dimension(self, dimension):
         self.d = dimension
@@ -87,6 +88,7 @@ class LatticeGAIL(object):
         self.z = self.z_full[:self.d]
         if self.r:
             self.shift = random.rand(int(self.d))
+        return self.d
     
     def get_params(self):
         return self.d, self.r, self.s

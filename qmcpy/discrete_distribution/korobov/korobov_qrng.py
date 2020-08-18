@@ -27,7 +27,7 @@ class KorobovQRNG(object):
         self.korobov_qrng_cf.restype = None
         self.g_og = array(generator, dtype=int32)
         self.r = randomize
-        self.n_lim = 2*31
+        self.n_lim = 2**31
         self.d_lim = self.n_lim
         self.set_dimension(dimension)
         self.set_seed(seed)
@@ -50,18 +50,19 @@ class KorobovQRNG(object):
             raise ParameterError('QRNG Korobov requires n>=2.')
         if n_max > self.n_lim:
             raise Exception('QRNG Korobov requires n must be <=2^32')
-        
         x = zeros((self.d, n_max), dtype=double)
         self.korobov_qrng_cf(int(n_max), int(self.d), self.g, self.r, x, self.s)
         return x.T
 
     def set_seed(self, seed):
         self.s = seed if seed else random.randint(2**32)
+        return self.s
         
     def set_dimension(self, dimension):
         self.d = dimension
         if self.d > self.d_lim:
             raise ParameterError('QRNG Korobov requires dimension <=2^31')
+        return self.d
     
     def get_params(self):
-        return self.d, self.g, self.r, self.s
+        return self.d, self.g_og, self.r, self.s

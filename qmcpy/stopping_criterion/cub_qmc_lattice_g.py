@@ -27,8 +27,8 @@ class CubQMCLatticeG(StoppingCriterion):
         dimension       2^(1)
         randomize       1
         seed            7
-        backend         gail
         mimics          StdUniform
+        backend         GAIL
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -118,7 +118,7 @@ class CubQMCLatticeG(StoppingCriterion):
         super(CubQMCLatticeG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         if not distribution.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
-        if distribution.backend != 'gail':
+        if distribution.backend != 'GAIL':
             raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
         
     def integrate(self):
