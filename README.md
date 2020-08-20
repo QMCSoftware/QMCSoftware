@@ -88,26 +88,13 @@ A more detailed quickstart can be found in our GitHub repo at `QMCSoftware/demos
 
 If you find QMCPy helpful in your work, please support us by citing the following work:
 
-**BibTex**
-
-~~~
-@misc{QMCPy,
-  Author = {S.-C. T. Choi and F. J. Hickernell and M. McCourt and A. Sorokin},
-  Date-Added = {2020-04-15 15:19:14 -0500},
-  Date-Modified = {2020-04-26 17:13:25 -0500},
-  Title = {{QMCPy}: A quasi-{M}onte {C}arlo {P}ython Library},
-  Url = {https://github.com/QMCSoftware/QMCSoftware},
-  Year = {2020+},
-  Bdsk-Url-1 = {https://github.com/QMCSoftware/QMCSoftware}}
-~~~
-
-**Plain Text**
-
 ~~~
 Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A.
 QMCPy: A quasi-Monte Carlo Python Library. Working. 2020.
 https://qmcsoftware.github.io/QMCSoftware/
 ~~~
+
+BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
 
 ----
 
