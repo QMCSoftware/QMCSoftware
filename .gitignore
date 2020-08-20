@@ -29,6 +29,7 @@ sphinx/_build/
 sphinx/_static/
 sphinx/demo_rst/
 sphinx/readme_rst/
+node_modules/*
 
 # Jupyter Notebooks
 *checkpoint.ipynb
