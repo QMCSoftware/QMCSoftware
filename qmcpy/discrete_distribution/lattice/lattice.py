@@ -78,6 +78,7 @@ class Lattice(DiscreteDistribution):
                     "vector": a numpy.ndarray or list of ints comprising the generating vector. \
                     "n_max": maximum number of samples that can be drawn based on this generating vector. \
                 Example: gen_vector_info = {'vector':[1,433461,315689], n_max=2**20}
+            linear (bool): if True generate samples in linear order else in van der corput sequence order
         """
         self.backend = backend.upper()
         backend_objs = {'GAIL':LatticeGAIL,'MPS':LatticeMPS}
@@ -88,11 +89,10 @@ class Lattice(DiscreteDistribution):
         self.dimension, self.randomize, self.seed = self.generator.get_params()
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
-        self.set_seed(self.seed)
         self.linear = linear
         super(Lattice,self).__init__()
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_non_random=False):
         """
         Generate lattice samples
 
@@ -101,6 +101,7 @@ class Lattice(DiscreteDistribution):
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
+            return_non_random (bool): return both the samples with and without randomization
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples
@@ -113,10 +114,8 @@ class Lattice(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
-
-        x = self.generator.gen_samples(n_min,n_max,warn)
+        x = self.generator.gen_samples(n_min, n_max, warn, self.linear, return_non_random)
         return x
-
 
     def set_seed(self, seed):
         """ See abstract method. """

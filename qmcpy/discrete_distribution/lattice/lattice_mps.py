@@ -43,11 +43,15 @@ class LatticeMPS(object):
         self.set_dimension(dimension)
         self.set_seed(seed)
     
-    def gen_samples(self, n_min, n_max, warn):
+    def gen_samples(self, n_min, n_max, warn, linear=False, return_non_ramdom=False):
         if n_min == 0 and self.r==False and warn:
             warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
         if n_max > self.n_lim:
             raise ParameterError('Lattice generating vector supports up to %d samples.'%self.n_lim)
+        if return_non_ramdom:
+            raise ParameterError('return_non_ramdom=True option not implemented.')
+        if linear:
+            raise ParameterError('linear=True option not implemented.')
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
         gen_block = lambda n: (outer(arange(1, n+1, 2), self.z) % n) / float(n)

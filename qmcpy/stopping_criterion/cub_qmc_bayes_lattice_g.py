@@ -1,5 +1,5 @@
 from ._stopping_criterion import StoppingCriterion
-from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData, OutParams
+from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
 from ..integrand import Keister
@@ -98,7 +98,6 @@ class CubBayesLatticeG(StoppingCriterion):
         self.alpha = alpha  # p-value, default 0.1%.
         self.order = 2  # Bernoulli kernel's order. If zero, choose order automatically
 
-        # self.f = lambda x: x ** 2  # function to integrate
         self.integrand = integrand
         self.dim = integrand.dimension  # dimension of the integrand
         self.useGradient = False  # If true uses gradient descent in parameter search
@@ -133,26 +132,22 @@ class CubBayesLatticeG(StoppingCriterion):
         allowed_distribs = ["Lattice"]
         super(CubBayesLatticeG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
 
-        if distribution.randomize:
-            raise ParameterError("CubBayesLattice_g requires distribution to have randomize=False")
+        if distribution.randomize == False:
+            raise ParameterError("CubBayesLattice_g requires distribution to have randomize=True")
         if not distribution.linear:
             raise ParameterError("CubBayesLattice_g requires distribution to have linear=True")
-        if distribution.backend != 'gail':
+        if distribution.backend != 'GAIL':
             raise ParameterError("CubBayesLattice_g requires distribution to have 'GAIL' backend")
 
     # computes the integral
     def integrate(self):
-        # pick a random value to apply as shift
-        shift = np.random.rand(1, self.dim)
-
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, shift)
+        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
         # the error threshold
         while True:
-
             # Update function values
             xun_, ftilde_, m = self.data.update_data()
             stop_flag, muhat, order_, err_bnd = self.stopping_criterion(xun_, ftilde_, m)
@@ -169,18 +164,9 @@ class CubBayesLatticeG(StoppingCriterion):
                               MaxSamplesWarning)
                 break
 
-        out = OutParams()
-        out.n = 2 ** m
-        out.time = time() - tstart
-        out.ErrBd = err_bnd
-        self.data.time_integrate = out.time
+        self.data.time_integrate = time() - tstart
         # Approximate integral
         self.data.solution = muhat
-
-        if stop_flag:
-            out.exitflag = 1
-        else:
-            out.exitflag = 2  # error tolerance may not be met
 
         return muhat, self.data
 
@@ -234,7 +220,7 @@ class CubBayesLatticeG(StoppingCriterion):
         else:  # non zero mean case
             muhat = ftilde[0] / vec_lambda[0]
 
-        self.data.error_hat = err_bd
+        self.data.error_bound = err_bd
         muhat = np.abs(muhat)
         muminus = muhat - err_bd
         muplus = muhat + err_bd

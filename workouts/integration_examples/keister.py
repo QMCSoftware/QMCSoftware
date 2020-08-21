@@ -48,7 +48,7 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CubBayesLatticeG
-    distribution = Lattice(dimension=dimension, randomize=False, backend='GAIL', linear=True)
+    distribution = Lattice(dimension=dimension, backend='GAIL', linear=True)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubBayesLatticeG(integrand,abs_tol=abs_tol).integrate()

@@ -1,17 +1,9 @@
 from ._accumulate_data import AccumulateData
-from ..util import CubatureWarning, MaxSamplesWarning
+from ..util import MaxSamplesWarning
 
 from numpy import array, nan
 import warnings
 import numpy as np
-
-
-class OutParams:
-    def __init__(self):
-        self.n = None
-        self.time = None
-        self.ErrBd = None
-        self.exitflag = None
 
 
 class LDTransformBayesData(AccumulateData):
@@ -20,23 +12,21 @@ class LDTransformBayesData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['n_total', 'solution', 'error_hat']
+    parameters = ['n_total', 'solution', 'error_bound']
 
-    def __init__(self, stopping_criterion, integrand, m_min: int, m_max: int, shift: np.ndarray):
+    def __init__(self, stopping_criterion, integrand, m_min: int, m_max: int):
         """
         Args:
             stopping_criterion (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
-            shift (function): random shift for the lattice points
         """
         # Extract attributes from integrand
         self.stopping_criterion = stopping_criterion
         self.integrand = integrand
         self.measure = self.integrand.measure
         self.distribution = self.measure.distribution
-        self.shift = shift
         self.dim = stopping_criterion.dim
 
         # Set Attributes
@@ -53,7 +43,7 @@ class LDTransformBayesData(AccumulateData):
 
         # Initialize various temporary storage between iterations
         self.xpts_ = array([])  # shifted lattice points
-        self.xun_ = array([])  # unshifted lattice points
+        self.xun_ = array([])  # un-shifted lattice points
         self.ftilde_ = array([])  # fourier transformed integrand values
         self.ff = self.do_period_transform(self.integrand.f,
                                            stopping_criterion.ptransform)  # integrand after the periodization transform
@@ -91,11 +81,9 @@ class LDTransformBayesData(AccumulateData):
             # xun_ = mod(bsxfun( @ times, (0:1 / n:1-1 / n)',self.gen_vec),1)
             # xun_ = np.arange(0, 1, 1 / n).reshape((n, 1))
             # xun_ = np.mod((xun_ * self.gen_vec), 1)
-
-            xun_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False)
-
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
-            xpts_ = np.mod((xun_ + self.shift), 1)  # shifted
+
+            xpts_, xun_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False, return_non_random=True)
 
             # Compute initial FFT
             ftilde_ = np.fft.fft(self.ff(xpts_))  # evaluate integrand's fft
@@ -104,11 +92,9 @@ class LDTransformBayesData(AccumulateData):
             # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
             # xunnew = np.arange(1 / n, 1, 2 / n).reshape((n // 2, 1))
             # xunnew = np.mod(xunnew * self.gen_vec, 1)
-
-            xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n)
-
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
-            xnew = np.mod((xunnew + self.shift), 1)
+
+            xnew, xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n, return_non_random=True)
 
             [xun_, xpts_] = self.merge_pts(xun, xunnew, xpts, xnew, n, self.dim)
             mnext = m - 1
