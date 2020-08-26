@@ -6,7 +6,16 @@ import os
 import subprocess
 
 
+class CustomInstall(install):
+    """Custom handler for the 'install' command."""
 
+    def run(self):
+        # compile c files
+        try:
+            os.system('pip install -e .')
+        except:
+            print('Problem with "pip install -e ." command')
+        super(CustomInstall, self).run()
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
@@ -73,4 +82,6 @@ setuptools.setup(
                 'qmcpy/discrete_distribution/c_lib/sobol_seq51.c', 
                 'qmcpy/discrete_distribution/c_lib/MRG63k3a.c'],
             extra_compile_args=['-shared'])],
-    cmdclass={'clean': CleanCommand})
+    cmdclass={
+        'clean': CleanCommand,
+        'install': CustomInstall})
