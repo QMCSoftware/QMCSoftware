@@ -1,7 +1,7 @@
 from numpy import *
 import os
 
-def sobol_ags(n, d, skip, randomize='LMS', gc=False, f='gen_mat.21201.32.lsb.npy'):
+def sobol_ags(n, d, randomize='LMS', skip=0, gc=False, f='gen_mat.21201.32.lsb.npy'):
     """ 
     Sobol' generator
     
@@ -82,12 +82,10 @@ def sobol_ags(n, d, skip, randomize='LMS', gc=False, f='gen_mat.21201.32.lsb.npy
     return x
 
 def lsb_to_msb(f):
-    """ Convert a generating matrix with LSB to MSB """
+    """ Convert a generating matrix with LSB to MSB. """
     root = os.path.dirname(__file__)
     fp = root+'/generating_matricies/%s'%f
     z = load(fp).astype(uint32)
-    
-    
     z2 = zeros(z.shape,dtype=uint32)
     d,m = z.shape
     for r in range(d):
@@ -100,16 +98,16 @@ def lsb_to_msb(f):
 
 if __name__ == '__main__':
     # params
-    n = 8
+    n = 2**6
     d = 2
+    randomize = 'LMS'
     skip = 0
-    randomize = None#'LMS'
     gc = False
     f = 'gen_mat.21201.32.msb.npy' # ['gen_mat.21201.32.msb.npy', 'gen_mat.21201.32.lsb.npy', 'gen_mat.51.30.msb.npy']
     x_cuts = 8
     y_cuts = 8
     # get sobol points
-    x = sobol_ags(n, d, skip, randomize, gc, f) 
+    x = sobol_ags(n, d, randomize, skip, gc, f) 
     print(x)
     # plot
     from matplotlib import pyplot
