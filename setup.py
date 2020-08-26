@@ -5,21 +5,7 @@ from setuptools import Command
 import os
 import subprocess
 
-class CustomInstall(install):
-    """Custom handler for the 'install' command."""
 
-    def run(self):
-        # compile c files
-        try:
-            os.system('make qrng')
-        except:
-            print('Problem compiling qrng c files')
-        # compile files used for docuemtnation
-        try:
-            os.system('make _doc')
-        except:
-            print('Problem compiling html or pdf documenation')
-        super(CustomInstall, self).run()
 
 
 class CleanCommand(Command):
@@ -87,6 +73,4 @@ setuptools.setup(
                 'qmcpy/discrete_distribution/c_lib/sobol_seq51.c', 
                 'qmcpy/discrete_distribution/c_lib/MRG63k3a.c'],
             extra_compile_args=['-shared'])],
-    cmdclass={
-        'clean': CleanCommand,
-        'install': CustomInstall})
+    cmdclass={'clean': CleanCommand})
