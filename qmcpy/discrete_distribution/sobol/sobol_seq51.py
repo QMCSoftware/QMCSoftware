@@ -30,8 +30,8 @@ class SobolSeq51(object):
         self.sobol_seq51_cf.restype = None
         self.r = randomize
         self.g = graycode
-        if self.g:
-            raise ParameterError('Seq51 Sobol does not support Graycode ordering. Use "QRNG" backend for graycode ordering.')
+        if not self.g:
+            raise ParameterError('Seq51 Sobol only supports Graycode ordering. Use "QRNG" backend for natural ordering.')
         if self.r:
             raise ParameterError('Seq51 Sobol does not yet support randomization.')
         self.n_lim = 2**30

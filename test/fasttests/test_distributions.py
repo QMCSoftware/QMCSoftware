@@ -106,7 +106,7 @@ class TestSobol(unittest.TestCase):
         dds = [
             Sobol(dimension=2, randomize=True, backend='QRNG', graycode=True),
             Sobol(dimension=2, randomize=True, backend='PyTorch', graycode=True),
-            Sobol(dimension=2, randomize=False, backend='Seq51', graycode=False)]
+            Sobol(dimension=2, randomize=False, backend='Seq51', graycode=True)]
         for dd in dds:
             samples = dd.gen_samples(n_min=4, n_max=8)
             self.assertEqual(type(samples), ndarray)
