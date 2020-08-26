@@ -1,8 +1,24 @@
 from numpy import *
 import os
 
-def sobol_ags(n, d, skip, randomize='LMS', f='gen_mat.21201.32.lsb.npy'):
-    # https://web.maths.unsw.edu.au/~fkuo/sobol/
+def sobol_ags(n, d, skip, randomize='LMS', gc=False, f='gen_mat.21201.32.lsb.npy'):
+    """ 
+    Sobol' generator
+    
+    Args:
+        n (int): number of samples
+        d (int): dimension of sampels
+        skip (int): number of samples to skip
+        randomize (str): one of ['None', 'Digital Shift', 'Linear Matrix Scramble', 'Nested Uniform Scramble']
+        f (str): file name with convention (1).(2).(3).(4).npy such that 
+            - (1) any name
+            - (2) max dimension
+            - (3) m such that max samples = 2^m
+            - (4) 'lsb' for least significant bit in 0th column of j^th dimension generating vector or 
+                  'msb' for most significant ... 
+                  Note: 'msb' is faster
+            Default generator from: https://web.maths.unsw.edu.au/~fkuo/sobol/
+    """
     root = os.path.dirname(__file__)
     z = load(root+'/generating_matricies/%s'%f).astype(uint32)
     f_split = f.split('.')
@@ -45,7 +61,7 @@ def sobol_ags(n, d, skip, randomize='LMS', f='gen_mat.21201.32.lsb.npy'):
     for i in range(skip,n+skip):
         m = 0
         maskv = zeros(d,dtype=uint32)
-        im = i^(i>>1)
+        im = i^(i>>1) if gc else i
         while im!=0 and m<m_max:
             if im&1:
                 maskv = maskv ^ z[:,m]
@@ -65,16 +81,35 @@ def sobol_ags(n, d, skip, randomize='LMS', f='gen_mat.21201.32.lsb.npy'):
         x[i-skip,:] = maskv*scale
     return x
 
+def lsb_to_msb(f):
+    """ Convert a generating matrix with LSB to MSB """
+    root = os.path.dirname(__file__)
+    fp = root+'/generating_matricies/%s'%f
+    z = load(fp).astype(uint32)
+    
+    
+    z2 = zeros(z.shape,dtype=uint32)
+    d,m = z.shape
+    for r in range(d):
+        if r%1000==0: print('Completed %d'%r)
+        for c in range(m):
+            for b in range(m):
+                z2[r,c] += ((z[r,c]>>b)&1) * (2**(m-1-b))
+    save(fp.replace('lsb','msb'),z2)
+
+
 if __name__ == '__main__':
     # params
-    n = 2**6
+    n = 8
     d = 2
     skip = 0
-    randomize = 'LMS'
+    randomize = None#'LMS'
+    gc = False
+    f = 'gen_mat.21201.32.msb.npy' # ['gen_mat.21201.32.msb.npy', 'gen_mat.21201.32.lsb.npy', 'gen_mat.51.30.msb.npy']
     x_cuts = 8
     y_cuts = 8
     # get sobol points
-    x = sobol_ags(n, d, skip, randomize, f='gen_mat.21201.32.lsb.npy')# ['gen_mat.21201.32.lsb.npy','gen_mat.51.30.msb.npy']
+    x = sobol_ags(n, d, skip, randomize, gc, f) 
     print(x)
     # plot
     from matplotlib import pyplot
@@ -88,3 +123,4 @@ if __name__ == '__main__':
     ax.set_yticks([0,1])
     ax.set_aspect(1)
     pyplot.savefig('_ags/temp.png') 
+    
