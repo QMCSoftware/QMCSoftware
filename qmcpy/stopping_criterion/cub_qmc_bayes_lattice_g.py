@@ -20,20 +20,20 @@ class CubBayesLatticeG(StoppingCriterion):
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
     
-    >>> k = Keister(Gaussian(Lattice(2, randomize=False, linear=True, backend='GAIL'),covariance=1./2))
+    >>> k = Keister(Gaussian(Lattice(2, linear=True, seed=123456789, backend='GAIL'),covariance=1./2))
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8081915381949607
+    1.80818168796735...
     >>> data
-    Solution: 1.8082
+    Solution: 1.8082...
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)
-        randomize       0
-        seed            None
-        backend         gail
+        randomize       1
+        seed            123456789
         mimics          StdUniform
+        backend         GAIL
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -46,7 +46,7 @@ class CubBayesLatticeG(StoppingCriterion):
     LDTransformBayesData (AccumulateData Object)
         n_total         256
         solution        1.808
-        error_hat       7.37e-04
+        error_bound     7.36e-04
         time_integrate  ...
 
     Adapted from 
