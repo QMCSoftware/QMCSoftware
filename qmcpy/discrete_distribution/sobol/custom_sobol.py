@@ -98,9 +98,9 @@ def lsb_to_msb(f):
 
 if __name__ == '__main__':
     # params
-    n = 2**6
-    d = 2
-    randomize = 'LMS'
+    n = 8
+    d = 4
+    randomize = None#'LMS'
     skip = 0
     gc = False
     f = 'gen_mat.21201.32.msb.npy' # ['gen_mat.21201.32.msb.npy', 'gen_mat.21201.32.lsb.npy', 'gen_mat.51.30.msb.npy']

@@ -5,17 +5,18 @@
 #include <math.h>
 #include "MRG63k3a.h"
 
-void sobol_ags(unsigned long n, unsigned int d, unsigned int randomize, unsigned long skip, unsigned int graycode, unsigned long seed, double *x, unsigned int d_max, unsigned int m_max, unsigned long *z, unsigned int msb){
+void sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0, unsigned int randomize, unsigned int graycode, unsigned long seed, double *x, unsigned int d_max, unsigned int m_max, unsigned long *z, unsigned int msb){
     /*
     Custom Sobol' Generator by alegresor
 
-    n: number of samples
-    d: dimension
+    n: sample indicies include n0:(n0+n)
+    d: dimension includes d0:(d0+d)
+    n0: starting index in sequence
+    d0: starting dimension in the sequence
     randomize: 
         0 = None
         1 = linear matrix scramble (LMS) with digital shift (DS)
         2 = DS
-    skip: starting index in sequence
     graycode: 
         0 = natural ordering
         1 = graycode ordering
@@ -46,7 +47,7 @@ void sobol_ags(unsigned long n, unsigned int d, unsigned int randomize, unsigned
         unsigned long *sm = (unsigned long *) calloc(m_max, sizeof(unsigned long)); /* scramble matrix */
         unsigned long z1, b; /* scrambled directional number */
         int k1, k2, s;
-        for(j=0;j<d;j++){
+        for(j=d0;j<(d0+d);j++){
             memset(sm,0,m_max*sizeof(unsigned long));
             /* initialize the scrambling matrix */
             for(k=1;k<m_max;k++){
@@ -75,7 +76,7 @@ void sobol_ags(unsigned long n, unsigned int d, unsigned int randomize, unsigned
         for(j=0;j<d;j++){
             rshift[j] = (int) (MRG63k3a()*(1<<(m_max-1)));}}
     /* generate points */
-    for(i=skip;i<n+skip;i++){
+    for(i=n0;i<(n0+n);i++){
         m = 0;
         memset(xr,0,d*sizeof(unsigned long));
         if(graycode){
@@ -84,8 +85,8 @@ void sobol_ags(unsigned long n, unsigned int d, unsigned int randomize, unsigned
             im = i;}
         while((im!=0) && (m<m_max)){
             if(im&1){
-                for(j=0;j<d;j++){
-                    xr[j] = xr[j] ^ z[j*m_max+m];}}
+                for(j=d0;j<(d0+d);j++){
+                    xr[j-d0] = xr[j-d0] ^ z[j*m_max+m];}}
             im = im>>1;
             m = m+1;}
         if(!msb){
@@ -100,36 +101,39 @@ void sobol_ags(unsigned long n, unsigned int d, unsigned int randomize, unsigned
             for(j=0;j<d;j++){
                 xr[j] = xr[j] ^ rshift[j];}}
         for(j=0;j<d;j++){
-            x[(i-skip)*d+j] = ((double) xr[j])*scale;}}}
+            x[(i-n0)*d+j] = ((double) xr[j])*scale;}}}
 
 int main(){
-    unsigned long n = 8;
-    unsigned int d = 3;
+    unsigned long n = 1<<25;
+    unsigned int d = 2;
+    unsigned long n0 = 0; 
+    unsigned int d0 = 0;
     unsigned int randomize = 0;
-    unsigned long skip = 0;
     unsigned int graycode = 1;
     unsigned long seed = 7;
     
     double *x = (double*) calloc(n*d,sizeof(double));
     unsigned int d_max = 3;
     unsigned int m_max = 32;
-    /*
+    
+    
     unsigned long z[3][32] = {
         {2147483648     ,1073741824     ,536870912      ,268435456      ,134217728      ,67108864       ,33554432       ,16777216       ,8388608        ,4194304        ,2097152        ,1048576        ,524288         ,262144         ,131072         ,65536          ,32768          ,16384          ,8192           ,4096           ,2048           ,1024           ,512            ,256            ,128            ,64             ,32             ,16             ,8              ,4              ,2              ,1              },
         {2147483648     ,3221225472     ,2684354560     ,4026531840     ,2281701376     ,3422552064     ,2852126720     ,4278190080     ,2155872256     ,3233808384     ,2694840320     ,4042260480     ,2290614272     ,3435921408     ,2863267840     ,4294901760     ,2147516416     ,3221274624     ,2684395520     ,4026593280     ,2281736192     ,3422604288     ,2852170240     ,4278255360     ,2155905152     ,3233857728     ,2694881440     ,4042322160     ,2290649224     ,3435973836     ,2863311530     ,4294967295     },
         {2147483648     ,3221225472     ,1610612736     ,2415919104     ,3892314112     ,1543503872     ,2382364672     ,3305111552     ,1753219072     ,2629828608     ,3999268864     ,1435500544     ,2154299392     ,3231449088     ,1626210304     ,2421489664     ,3900735488     ,1556135936     ,2388680704     ,3314585600     ,1751705600     ,2627492864     ,4008611328     ,1431684352     ,2147543168     ,3221249216     ,1610649184     ,2415969680     ,3892340840     ,1543543964     ,2382425838     ,3305133397     }};
     unsigned int msb = 1;
-    */
+    /*
     unsigned long z[3][32] = {
             {1              ,2              ,4              ,8              ,16             ,32             ,64             ,128            ,256            ,512            ,1024           ,2048           ,4096           ,8192           ,16384          ,32768          ,65536          ,131072         ,262144         ,524288         ,1048576        ,2097152        ,4194304        ,8388608        ,16777216       ,33554432       ,67108864       ,134217728      ,268435456      ,536870912      ,1073741824     ,2147483648     },
 	        {1              ,3              ,5              ,15             ,17             ,51             ,85             ,255            ,257            ,771            ,1285           ,3855           ,4369           ,13107          ,21845          ,65535          ,65537          ,196611         ,327685         ,983055         ,1114129        ,3342387        ,5570645        ,16711935       ,16843009       ,50529027       ,84215045       ,252645135      ,286331153      ,858993459      ,1431655765     ,4294967295     },
 	        {1              ,3              ,6              ,9              ,23             ,58             ,113            ,163            ,278            ,825            ,1655           ,2474           ,5633           ,14595          ,30470          ,43529          ,65815          ,197434         ,394865         ,592291         ,1512982        ,3815737        ,7436151        ,10726058       ,18284545       ,54132739       ,108068870      ,161677321      ,370540567      ,960036922      ,2004287601     ,2863268003     }};
     unsigned int msb = 0;
-    
-   sobol_ags(n, d, randomize, skip, graycode, seed, x, d_max, m_max, *z, msb);
-    /* print result */
+    */
+    sobol_ags(n, d, n0, d0, randomize, graycode, seed, x, d_max, m_max, *z, msb);
+    /* print result 
     for(unsigned long i=0; i<n; i++){
         for(int j=0; j<d; j++){
             printf("%.3f\t",x[i*d+j]);}
         printf("\n");}
-    return(0);}
+    */return(0);}
+    
