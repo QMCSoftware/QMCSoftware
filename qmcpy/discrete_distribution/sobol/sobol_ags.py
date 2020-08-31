@@ -10,19 +10,21 @@ class SobolAGS(object):
     def __init__(self, dimension, randomize, graycode, seed):
         self.sobol_ags_cf = c_lib.sobol_ags
         self.sobol_ags_cf.argtypes = [
-            ctypes.c_int,  # n
-            ctypes.c_int,  # d
-            ctypes.c_int,  # randomize
-            ctypes.c_int,  # skip
-            ctypes.c_int, # graycode
-            ctypes.c_long, # seed
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # result
-            ctypeslib.ndpointer(ctypes.c_uint32, flags='C_CONTIGUOUS'),  # z (generating matrix)
+            ctypes.c_ulong,  # n
+            ctypes.c_uint32,  # d
+            ctypes.c_ulong, # n0
+            ctypes.c_uint32, # d0
+            ctypes.c_uint8,  # randomize
+            ctypes.c_uint8, # graycode
+            ctypeslib.ndpointer(ctypes.c_uint32), # seeds
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x (result)
             ctypes.c_uint32, # d_max
-            ctypes.c_uint32] # m_max
+            ctypes.c_uint32, # m_max
+            ctypeslib.ndpointer(ctypes.c_ulong, flags='C_CONTIGUOUS'),  # z (generating matrix)
+            ctypes.c_uint8] # msb
 
 
-        self.sobol_ags_cf.restype = None
+        self.sobol_ags_cf.restype = ctyps.c_uint8
         self.r = randomize
         self.g = graycode
         self.n_lim = 2**32
