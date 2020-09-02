@@ -1,15 +1,12 @@
-[![Build Status](https://travis-ci.com/QMCSoftware/QMCSoftware.png?branch=master)](https://travis-ci.com/QMCSoftware/QMCSoftware)
-[![codecov](https://codecov.io/gh/QMCSoftware/QMCSoftware/branch/master/graph/badge.svg)](https://codecov.io/gh/QMCSoftware/QMCSoftware)
-[![Documentation Status](https://readthedocs.org/projects/qmcpy/badge/?version=latest)](https://qmcpy.readthedocs.io/en/latest/?badge=latest)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964490.svg)](https://doi.org/10.5281/zenodo.3964490)
+[![Build Status](https://travis-ci.com/QMCSoftware/QMCSoftware.png?branch=master)](https://travis-ci.com/QMCSoftware/QMCSoftware) [![codecov](https://codecov.io/gh/QMCSoftware/QMCSoftware/branch/master/graph/badge.svg)](https://codecov.io/gh/QMCSoftware/QMCSoftware) [![Documentation Status](https://readthedocs.org/projects/qmcpy/badge/?version=latest)](https://qmcpy.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964490.svg)](https://doi.org/10.5281/zenodo.3964490)
 
 # Quasi-Monte Carlo Community Software
 
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.
 
-<center><img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/qmcpy_logo.png?raw=true" alt="QMCPy logo" height=200px width=200px/>
+<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/qmcpy_logo.png?raw=true" alt="QMCPy logo" height=200px width=200px/>
 
-[Homepage](https://qmcsoftware.github.io/QMCSoftware/) | [GitHub](https://github.com/QMCSoftware/QMCSoftware) | [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) | [PyPI](https://pypi.org/project/qmcpy/) | [Blogs](http://qmcpy.wordpress.com/) | [Contributing](https://github.com/QMCSoftware/QMCSoftware/blob/master/CONTRIBUTING.md) | [Issues](https://github.com/QMCSoftware/QMCSoftware/issues)</center>
+[Homepage](https://qmcsoftware.github.io/QMCSoftware/) ~ [GitHub](https://github.com/QMCSoftware/QMCSoftware) ~ [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) ~ [PyPI](https://pypi.org/project/qmcpy/) ~ [Blogs](http://qmcpy.wordpress.com/) ~ [Contributing](https://github.com/QMCSoftware/QMCSoftware/blob/master/CONTRIBUTING.md) ~ [Issues](https://github.com/QMCSoftware/QMCSoftware/issues)
 
 ----
 

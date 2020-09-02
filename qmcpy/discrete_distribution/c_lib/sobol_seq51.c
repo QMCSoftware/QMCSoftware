@@ -116,7 +116,7 @@ static int DIRECT[MAXDIM][QP] = {
 
 void sobol_seq51(int n, int d, int skip, double *x){
     int m, im, i, j, maskv[d], k;
-    for(i=skip;i<n;i++){
+    for(i=skip;i<(n+skip);i++){
         m = 0; 
         for(k=0;k<d;k++){maskv[k] = 0;}
         im = i^(i>>1);
@@ -127,11 +127,11 @@ void sobol_seq51(int n, int d, int skip, double *x){
             im = (im>>1);
             m = m+1;}
         for(j=0;j<d;j++){
-            x[i*d+j] = maskv[j]*SCALE;}}}
+            x[(i-skip)*d+j] = maskv[j]*SCALE;}}}
 
 /*
 int main(){
-    int n=8, d=2, skip=0;
+    int n=8, d=2, skip=8;
     double *x = (double *) calloc(n*d, sizeof(double));
     sobol_seq51(n, d, skip, x);
     for(int i=0; i<n; i++){

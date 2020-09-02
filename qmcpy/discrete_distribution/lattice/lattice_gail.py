@@ -52,27 +52,40 @@ class LatticeGAIL(object):
             q[ptind] += 1./2**(l+1)
         return q
 
-    def _gen_block(self,m):
+    def _gen_block(self, m):
         """ Generate samples floor(2**(m-1)) to 2**m. """
         n_min = floor(2**(m-1))
         n = 2**m-n_min
         x = outer(self._vdc(n)+1./(2*n_min),self.z)%1 if n_min>0 else outer(self._vdc(n),self.z)%1
         return x
     
-    def gen_samples(self,n_min, n_max, warn):
+    def gen_samples(self,n_min, n_max, warn, linear=False, return_non_rand=False):
         if n_min == 0 and self.r==False and warn:
             warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
         if n_max > self.n_lim:
             raise ParameterError('Lattice generating vector supports up to %d samples.'%self.n_lim)
-        m_low = floor(log2(n_min))+1 if n_min > 0 else 0
+        m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
-        x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low),int(m_high)+1)])
-        cut1 = int(floor(n_min-2**(m_low-1))) if n_min>0 else 0
-        cut2 = int(cut1+n_max-n_min)
-        x = x_lat_full[cut1:cut2,:]
+        if linear:
+            nelem = n_max - n_min
+            if n_min == 0:
+                y = arange(0, 1, 1 / nelem).reshape((nelem, 1))
+            else:
+                y = arange(1 / n_max, 1, 2 / n_max).reshape((nelem, 1))
+            x = outer(y, self.z) % 1
+        else:
+            x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low),int(m_high)+1)])
+            cut1 = int(floor(n_min-2**(m_low-1))) if n_min>0 else 0
+            cut2 = int(cut1+n_max-n_min)
+            x = x_lat_full[cut1:cut2,:]
         if self.r: # apply random shift to samples
-            x = (x + self.shift)%1
-        return x
+            x_rand = (x + self.shift)%1
+            if return_non_rand:
+                return x_rand, x
+            else:
+                return x_rand
+        else:
+            return x
 
     def set_seed(self, seed):
         self.s = seed if seed else random.randint(2**32)

@@ -18382,7 +18382,9 @@ static int minit[sobolMaxDim-1][sobolMaxDegree] =
  */
 void bintogray(int n1, int size, int *b)
 {
-    int a[size], i = 0;
+    int *a = (int *) calloc(size, sizeof(int));
+    int i = 0;
+
     while(n1 != 0) /* converting number to its binary equivalent */
     {
         /* if(i > size - 1) {  */
