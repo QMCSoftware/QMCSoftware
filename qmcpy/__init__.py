@@ -4,4 +4,4 @@ from .integrand import *
 from .stopping_criterion import *
 
 name = "qmcpy"
-__version__ = "0.4"
+__version__ = "0.6"
