@@ -1,4 +1,13 @@
+## v0.6
+
+- `CubQMCBayesLatticeG` stopping criterion 
+
+## v0.4
+
+- bug fixes and stability improvements
+
 ## v0.3
+
 - Halton + Korobov sequences
   - Hatlton compatibility for CubQMCCLT and CubQMCML
 - doctests
@@ -8,6 +17,7 @@
 - PCA decomposition for Brownian Motion & Gaussian true measures
 
 ## v0.2
+
 - Creation of QMCPy framework
   - discrete distributions
   - true measures

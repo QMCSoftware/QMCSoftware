@@ -44,6 +44,8 @@ packages = [
     'qmcpy.accumulate_data',
     'qmcpy.util',
     'qmcpy.integrand',
+    'qmcpy.discrete_distribution.halton',
+    'qmcpy.discrete_distribution.korobov',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
     'qmcpy.discrete_distribution.sobol']
@@ -64,7 +66,7 @@ packages = [
 
 setuptools.setup(
     name="qmcpy",
-    version="0.4",
+    version="0.6",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',
