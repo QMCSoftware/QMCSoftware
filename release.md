@@ -1,3 +1,11 @@
+## v0.6
+
+- `CubQMCBayesLatticeG` stopping criterion 
+
+## v0.4
+
+- bug fixes and stability improvements
+
 ## v0.3
 
 - Halton + Korobov sequences
@@ -21,11 +29,3 @@
 - demos
 - requirements
 - Sphinx documentation
-
-## v0.4
-
-- bug fixes and stability improvements
-
-## v0.6
-
-- `CubQMCBayesLatticeG` stopping criterion 
