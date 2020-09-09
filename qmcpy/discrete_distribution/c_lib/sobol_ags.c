@@ -40,6 +40,7 @@ int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0
     Error Codes:
         1) requires 32 bit precision but system has unsigned int with < 32 bit precision
         2) using natural ordering (graycode=0) and n0 and/or (n0+n) is not 0 or a power of 2
+        3) n0+n exceeds 2^m_max or d0+d exceeds d_max
 
     References:
         
@@ -48,7 +49,7 @@ int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0
         ACM Trans. Math. Softw. 14, 1 (March 1988), 88–100. 
         DOI:https://doi.org/10.1145/42288.214372
     */
-    /* parameter tests */
+    /* parameter checks */
     if( (n==0) || (d==0) ){
         return(0);}
     if(sizeof(unsigned int)<4){
@@ -57,6 +58,10 @@ int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0
     if( (graycode==0) && ( ((n0!=0)&&fmod(log(n0)/log(2),1)!=0) || (fmod(log(n0+n)/log(2),1)!=0) ) ){
         /* for natural ordering, require n0 and (n0+n) be either 0 or powers of 2 */
         return(2);}
+    if( ((n0+n)>ldexp(1,m_max)) || ((d0+d)>d_max) ){
+        /* too many samples or dimensions */
+        return(3);}
+    /* variables */
     int j, m, k, k1, k2, s;
     unsigned long i, im, u, rshift, xc, xr, z1, b;
     double scale = ldexp(1,-1*m_max);
@@ -64,16 +69,16 @@ int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0
     /* generate points */
     for(j=0;j<d;j++){
     	seed_MRG63k3a(seeds[j]); /* seed the IID RNG */
+        /* LMS */
         if(randomize==1){
-            /* LMS */
             memset(sm,0,m_max*sizeof(unsigned long));
-            /*      initialize the scrambling matrix */
+            /* initialize the scrambling matrix */
             for(k=1;k<m_max;k++){
                 u = (unsigned long) (MRG63k3a() * (((unsigned long) 1) << k)); /* get random int between 0 and 2^k */
                 sm[k] = u << (m_max-k);} /* shift bits to the left to make lower triangular matrix */
             for(k=0;k<m_max;k++){
                 sm[k] |= ((unsigned long) 1) << (m_max-1-k);}
-            /*      left multiply scrambling matrix to directional numbers */
+            /* left multiply scrambling matrix to directional numbers */
             for(k=0;k<m_max;k++){
                 z1 = 0;
                 /* lef multiply scrambling matrix by direction number represeted as a column */
@@ -88,8 +93,8 @@ int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0
                     if(s&&(!msb)){
                         z1 |= ((unsigned long) 1) << k1;}} /* restore (LSB) order */
                 z[(j+d0)*m_max+k] = z1;}}
+        /* initialize DS (will also be applied to LMS) */
         if((randomize==1) || (randomize==2)){
-            /* initialize DS (will also be applied to LMS) */
             rshift = (unsigned long) (MRG63k3a()*ldexp(1,m_max));}
         /* set an initial point */ 
         xc = 0; /* current point */
