@@ -9,7 +9,7 @@ import warnings
 class SobolAGS(object):
     """ A custom base 2 Sobol' generator by alegresor """
 
-    def __init__(self, dimension, randomize, graycode, seed, z_path=None, d0=0):
+    def __init__(self, dimension, randomize, graycode, seeds, z_path=None, d0=0):
         # initialize c code
         self.sobol_ags_cf = c_lib.sobol_ags
         self.sobol_ags_cf.argtypes = [
@@ -19,20 +19,20 @@ class SobolAGS(object):
             ctypes.c_uint32, # d0
             ctypes.c_uint8,  # randomize
             ctypes.c_uint8, # graycode
-            ctypeslib.ndpointer(ctypes.c_uint32, flags='C_CONTIGUOUS'), # seeds
+            ctypeslib.ndpointer(ctypes.c_ulong, flags='C_CONTIGUOUS'), # seeds
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x (result)
             ctypes.c_uint32, # d_max
             ctypes.c_uint32, # m_max
             ctypeslib.ndpointer(ctypes.c_ulong, flags='C_CONTIGUOUS'),  # z (generating matrix)
             ctypes.c_uint8] # msb
-        errors = {
+        self.errors = {
             1: 'requires 32 bit precision but system has unsigned int with < 32 bit precision.',
             2: 'using natural ordering (graycode=0) where n0 and/or (n0+n) is not 0 or a power of 2 is not allowed.',
             3: 'using n0+n exceeds 2^m_max or d0+d exceeds d_max.'}
         # set parameters
-        self.sobol_ags_cf.restype = ctyps.c_uint8
+        self.sobol_ags_cf.restype = ctypes.c_uint8
         self.set_dimension(dimension)
-        self.set_seed(self.s_og)
+        self.set_seed(seeds)
         self.set_randomize(randomize)
         self.set_graycode(graycode)
         self.set_d0(d0)
@@ -41,11 +41,11 @@ class SobolAGS(object):
             self.d_max = 21201
             self.m_max = 32
             self.msb = True
-            self.z = load(dirname(abspath(__file__))+'generating_matricies/gen_mat.21201.32.msb.npy')
+            self.z = load(dirname(abspath(__file__))+'/generating_matricies/gen_mat.21201.32.msb.npy').astype(uint64)
         else:
             if not isfile(z_path):
                 raise ParameterError('z_path `' + z_path + '` not found. ')
-            self.z = load(z_path)
+            self.z = load(z_path).astype(uint64)
             f = z_path.split('/')[-1]
             f_lst = f.split('.')
             self.d_max = int(f_lst[1])
@@ -61,7 +61,7 @@ class SobolAGS(object):
                     with name.d_max.m_max.msb_or_lsb.npy
                 '''
                 raise ParameterError(msg)
-
+        
     def gen_samples(self, n_min, n_max, warn):
         if len(self.s) != self.d:
             msg = '''
@@ -72,16 +72,18 @@ class SobolAGS(object):
         if n_min == 0 and self.r==False and warn:
             warnings.warn("Non-randomized AGS Sobol sequence includes the origin",ParameterWarning)
         n = int(n_max-n_min)
-        x = zeros((self.d,n), dtype=double)
-        self.sobol_ags_cf(n, self.d, int(n_min), self.d0, self.r, self.g, self.s, x, self.d_max, self.m_max, self.z, self.msb)
+        x = zeros((n,self.d), dtype=double)
+        rc = self.sobol_ags_cf(n, self.d, int(n_min), self.d0, self.r, self.g, self.s, x, self.d_max, self.m_max, self.z, self.msb)
+        if rc!= 0:
+            raise ParameterError(self.errors[rc])
         return x
 
     def set_seed(self, seed):
         if seed and len(seed)==self.d:
-            self.s = seed
+            self.s = array(seed,dtype=uint64)
         else:
             random.seed(seed)
-            self.s = random.randint(2**32,size=self.d)
+            self.s = random.randint(2**32,size=self.d).astype(uint64)
         return self.s
         
     def set_dimension(self, dimension):
@@ -92,10 +94,11 @@ class SobolAGS(object):
         return self.d, self.r, self.g, self.s
     
     def set_randomize(self, randomize):
-        randomize = randomize.upper()
-        if randomize in ["LMS","LINEAR MATRIX SCRAMBLE"]:
+        if isinstance(randomize,bool):
+            self.r = randomize
+        elif randomize.upper() in ["LMS","LINEAR MATRIX SCRAMBLE"]:
             self.r = 1
-        elif randomize in ["DS","DIGITAL SHIFT"]:
+        elif randomize.upper() in ["DS","DIGITAL SHIFT"]:
             self.r = 2
         else:
             msg = '''
