@@ -22,7 +22,6 @@ class CustomInstall(install):
             print('Problem compiling html or pdf documenation')
         super(CustomInstall, self).run()
 
-
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
     user_options = []

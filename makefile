@@ -1,4 +1,4 @@
-# Makefile for compiling QRNG, running test suites, and compiling documentaion
+# Makefile for, running test suites, running workouts, and compiling documentaion
 #
 # Syntax notes:
 #   @ means don't echo command

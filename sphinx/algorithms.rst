@@ -33,7 +33,7 @@ Halton
 Korobov
 .......
 
-.. automodule:: qmcpy.discrete_distribution.korobov
+.. automodule:: qmcpy.discrete_distribution.korobov.korobov
     :members:
 
 IID Standard Uniform
