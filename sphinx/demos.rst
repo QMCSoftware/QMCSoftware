@@ -4,11 +4,11 @@ Demos
 .. toctree::
     :maxdepth: 2
 
-    ./demo_rst/quickstart.rst
+    demo_rst/quickstart.rst
 
-    sphinx/demo_rst/qmcpy_intro.rst
+    demo_rst/qmcpy_intro.rst
 
-    QMCSoftware/sphinx/demo_rst/integration_examples.rst
+    demo_rst/integration_examples.rst
 
     demo_rst/lebesgue_integration.rst
 

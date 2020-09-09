@@ -12,9 +12,9 @@ class CustomInstall(install):
     def run(self):
         # compile c files
         try:
-            os.system('make qrng')
+            os.system('pip install -e .')
         except:
-            print('Problem compiling qrng c files')
+            print('Problem installing qmcpy')
         # compile files used for docuemtnation
         try:
             os.system('make _doc')
