@@ -38,7 +38,7 @@ def cubqmcclt_lattice(dimension, abs_tol, drift):
     return data
 
 def cubqmcclt_sobol(dimension, abs_tol, drift):
-    distribution = Sobol(dimension, seed=7, backend="QRNG")
+    distribution = Sobol(dimension, seed=7)
     measure = BrownianMotion(distribution, drift=drift)
     integrand = AsianOption(measure)
     solution,data = CubQMCCLT(integrand, abs_tol).integrate()
@@ -52,7 +52,7 @@ def cubqmclatticeg(dimension, abs_tol, drift):
     return data
 
 def cubqmcsobolg(dimension, abs_tol, drift):
-    distribution = Sobol(dimension, seed=7, backend="QRNG")
+    distribution = Sobol(dimension, seed=7)
     measure = BrownianMotion(distribution, drift=drift)
     integrand = AsianOption(measure)
     solution,data = CubQMCSobolG(integrand, abs_tol).integrate()

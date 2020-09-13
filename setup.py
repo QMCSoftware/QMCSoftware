@@ -83,9 +83,7 @@ setuptools.setup(
                 'qmcpy/discrete_distribution/c_lib/halton_owen.c',
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/korobov_qrng.c',
-                'qmcpy/discrete_distribution/c_lib/sobol_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/sobol_ags.c',
-                'qmcpy/discrete_distribution/c_lib/sobol_seq51.c', 
                 'qmcpy/discrete_distribution/c_lib/MRG63k3a.c'],
             extra_compile_args=['-shared'])],
     cmdclass={

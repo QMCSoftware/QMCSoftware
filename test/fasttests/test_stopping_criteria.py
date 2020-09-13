@@ -117,7 +117,7 @@ class TestCubQMCSobolG(unittest.TestCase):
         self.assertRaises(DistributionCompatibilityError, CubQMCSobolG, integrand)
 
     def test_n_max_single_level(self):
-        distribution = Sobol(dimension=2, backend="QRNG")
+        distribution = Sobol(dimension=2)
         measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         algorithm = CubQMCSobolG(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)

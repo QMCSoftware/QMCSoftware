@@ -99,24 +99,20 @@ class TestSobol(unittest.TestCase):
     """ Unit tests for Sobol DiscreteDistribution. """
 
     def test_mimics(self):
-        distribution = Sobol(dimension=3, randomize=True, backend='QRNG')
+        distribution = Sobol(dimension=3, randomize=True)
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples_and_set_dimension(self):
-        dds = [
-            Sobol(dimension=2, randomize=True, backend='QRNG', graycode=True),
-            Sobol(dimension=2, randomize=True, backend='PyTorch', graycode=True),
-            Sobol(dimension=2, randomize=False, backend='Seq51', graycode=True)]
-        for dd in dds:
-            samples = dd.gen_samples(n_min=4, n_max=8)
-            self.assertEqual(type(samples), ndarray)
-            self.assertEqual(samples.shape, (4,2))
-            dd.set_dimension(3)
-            samples = dd.gen_samples(4)
-            self.assertTrue(samples.shape==(4,3))
+        dd = Sobol(dimension=2, randomize=True, graycode=True)
+        samples = dd.gen_samples(n_min=4, n_max=8)
+        self.assertEqual(type(samples), ndarray)
+        self.assertEqual(samples.shape, (4,2))
+        dd.set_dimension(3)
+        samples = dd.gen_samples(4)
+        self.assertTrue(samples.shape==(4,3))
     
     def test_qrng_graycode_ordering(self):
-        s = Sobol(2,randomize=False,backend='qrng',graycode=True)
+        s = Sobol(2,randomize=False,graycode=True)
         x = s.gen_samples(n_min=4,n_max=8)
         x_true = array([
             [ 0.375,  0.375],
@@ -126,7 +122,7 @@ class TestSobol(unittest.TestCase):
         self.assertTrue((x==x_true).all())
 
     def test_qrng_natural_ordering(self):
-        s = Sobol(2,randomize=False,backend='qrng',graycode=False)
+        s = Sobol(2,randomize=False,graycode=False)
         x = s.gen_samples(n_min=4,n_max=8)
         x_true = array([
             [ 0.125,  0.625],
@@ -135,10 +131,6 @@ class TestSobol(unittest.TestCase):
             [ 0.875,  0.875]])
         self.assertTrue((x==x_true).all())
     
-    def test_pytorch_0th_vector(self):
-        x = Sobol(1,randomize=False,backend='PyTorch',graycode=True).gen_samples(4)
-        self.assertTrue((x==array([[1./2,3./4,1./4,3./8]]).T).all())
-
 class TestHalton(unittest.TestCase):
     """ Unit test for Halton DiscreteDistribution. """
 

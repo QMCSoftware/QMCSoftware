@@ -66,6 +66,7 @@ int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0
     unsigned long i, im, u, rshift, xc, xr, z1, b;
     double scale = ldexp(1,-1*m_max);
     unsigned long *sm = (unsigned long *) calloc(m_max, sizeof(unsigned long)); /* scramble matrix */
+    unsigned long *zcp = (unsigned long *) calloc(m_max, sizeof(unsigned long));
     /* generate points */
     for(j=0;j<d;j++){
     	seed_MRG63k3a(seeds[j]); /* seed the IID RNG */
@@ -92,10 +93,14 @@ int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0
                         z1 |= ((unsigned long) 1) << (m_max-1-k1);} /* restore (MSB) order */
                     if(s&&(!msb)){
                         z1 |= ((unsigned long) 1) << k1;}} /* restore (LSB) order */
-                z[(j+d0)*m_max+k] = z1;}}
+                zcp[k] = z1;}}
         /* initialize DS (will also be applied to LMS) */
         if((randomize==1) || (randomize==2)){
             rshift = (unsigned long) (MRG63k3a()*ldexp(1,m_max));}
+        /* copy generating matrix */
+        if((randomize==0) || (randomize==2)){
+            for(k=0;k<m_max;k++){
+                zcp[k] = z[(j+d0)*m_max+k];}}
         /* set an initial point */ 
         xc = 0; /* current point */
         z1 = 0; /* next directional vector */
@@ -106,14 +111,14 @@ int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0
             m = 0;
             while((im!=0) && (m<m_max)){
                 if(im&1){
-                    xc ^= z[(j+d0)*m_max+m];}
+                    xc ^= zcp[m];}
                 im >>= 1;
                 m += 1;}
             s = 0;
             while(b&1){
                 b >>= 1;
                 s += 1;}
-            z1 = z[(j+d0)*m_max+s];}
+            z1 = zcp[s];}
         /* set the rest of the points */
         for(i=n0;i<(n0+n);i++){
             xc ^= z1;
@@ -139,16 +144,16 @@ int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0
                 b >>= 1;
                 s += 1;}
             /* get the vector used for the next index */
-            z1 = z[(j+d0)*m_max+s];}}
+            z1 = zcp[s];}}
     return(0);}
 
 /*
 int main(){
-    unsigned long n = 6;
+    unsigned long n = 2;
     unsigned int d = 2;
     unsigned long n0 = 2; 
-    unsigned int d0 = 1;
-    unsigned int randomize = 2;
+    unsigned int d0 = 0;
+    unsigned int randomize = 1;
     unsigned int graycode = 0;
     unsigned long seeds[2] = {7,17};
     double *x = (double*) calloc(n*d,sizeof(double));
@@ -164,13 +169,22 @@ int main(){
 	        {1              ,3              ,5              ,15             ,17             ,51             ,85             ,255            ,257            ,771            ,1285           ,3855           ,4369           ,13107          ,21845          ,65535          ,65537          ,196611         ,327685         ,983055         ,1114129        ,3342387        ,5570645        ,16711935       ,16843009       ,50529027       ,84215045       ,252645135      ,286331153      ,858993459      ,1431655765     ,4294967295     },
 	        {1              ,3              ,6              ,9              ,23             ,58             ,113            ,163            ,278            ,825            ,1655           ,2474           ,5633           ,14595          ,30470          ,43529          ,65815          ,197434         ,394865         ,592291         ,1512982        ,3815737        ,7436151        ,10726058       ,18284545       ,54132739       ,108068870      ,161677321      ,370540567      ,960036922      ,2004287601     ,2863268003     }};
     unsigned int msb = 0;
-    int rc = sobol_ags(n, d, n0, d0, randomize, graycode, seeds, x, d_max, m_max, *z, msb);
+    int rc; 
+    rc = sobol_ags(n, d, n0, d0, randomize, graycode, seeds, x, d_max, m_max, *z, msb);
     printf("Return code: %d\n\n",rc);
     for(unsigned long i=0; i<n; i++){
         for(int j=0; j<d; j++){
             printf("%.3f\t",x[i*d+j]);}
         printf("\n");} 
+    d = 3;
+    unsigned long seeds2[3] = {7,17,18};
+    double *x2 = (double*) calloc(n*d,sizeof(double));
+    rc = sobol_ags(n, d, n0, d0, randomize, graycode, seeds2, x2, d_max, m_max, *z, msb);
+    printf("Return code: %d\n\n",rc);
+    for(unsigned long i=0; i<n; i++){
+        for(int j=0; j<d; j++){
+            printf("%.3f\t",x2[i*d+j]);}
+        printf("\n");}    
     return(0);}
 */
-
     
