@@ -222,7 +222,9 @@ class Sobol(DiscreteDistribution):
                 'LMS': linear matrix scramble with digital shift
                 'DS': just the digital shift
         """
-        if isinstance(randomize,bool):
+        if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='No')):
+            self.randomize = 0
+        elif isinstance(randomize,bool):
             self.randomize = int(randomize)
         elif randomize.upper() in ["LMS","LINEAR MATRIX SCRAMBLE"]:
             self.randomize = 1
