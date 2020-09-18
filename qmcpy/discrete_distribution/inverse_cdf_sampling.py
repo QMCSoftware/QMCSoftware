@@ -19,10 +19,10 @@ class InverseCDFSampling(DiscreteDistribution):
     InverseCDFSampling (DiscreteDistribution Object)
         dimension       2^(1)
     >>> exponential_measure.gen_samples(n_min=4,n_max=8)
-    array([[1.296, 0.199],
-           [0.294, 0.947],
-           [0.623, 0.474],
-           [0.075, 0.006]])
+    array([[0.371, 0.279],
+           [1.993, 0.586],
+           [0.056, 0.935],
+           [0.52 , 0.008]])
     
     Math for above example:
         - $y \\sim \\text{Exp}(l)$

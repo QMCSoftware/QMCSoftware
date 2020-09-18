@@ -48,7 +48,7 @@ def asian_option_single_level(
     print('%s%s'%(data,bar))
 
     # CubQMCSobolG
-    distribution = Sobol(dimension=dimension, randomize=True, seed=7, backend='QRNG')
+    distribution = Sobol(dimension=dimension, randomize=True, seed=7)
     measure = BrownianMotion(distribution)
     integrand = AsianOption(measure, volatility, start_price, strike_price, interest_rate, call_put, mean_type)
     solution,data = CubQMCSobolG(integrand,abs_tol=abs_tol).integrate()

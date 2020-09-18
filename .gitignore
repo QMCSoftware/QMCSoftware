@@ -40,4 +40,5 @@ dist/
 
 # alegresor
 *.vscode
-*_ags*
+_ags.md 
+_ags/*

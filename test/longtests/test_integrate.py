@@ -39,7 +39,7 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        distribution = Sobol(dimension=2, randomize=True, backend='QRNG', seed=7)
+        distribution = Sobol(dimension=2, randomize=True, seed=7)
         measure = Lebesgue(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = CustomFun(measure, lambda x: (x.prod(1))**3)
         solution,data = CubQMCSobolG(integrand, abs_tol=abs_tol).integrate()
@@ -85,7 +85,7 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [0.5, 1, 1.5]
         for i in range(len(dimensions)):
-            distribution = Sobol(dimension=dimensions[i], randomize=True, backend='QRNG')
+            distribution = Sobol(dimension=dimensions[i], randomize=True)
             measure = Uniform(distribution)
             integrand = Linear(measure)
             solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()

@@ -31,10 +31,10 @@ class Korobov(DiscreteDistribution):
         mimics          StdUniform
         backend         QRNG
     >>> Korobov(2,generator=[3,1]).gen_samples(4)
-    array([[0.863, 0.338],
-           [0.613, 0.588],
-           [0.363, 0.838],
-           [0.113, 0.088]])
+    array([[0.312, 0.941],
+           [0.062, 0.191],
+           [0.812, 0.441],
+           [0.562, 0.691]])
     
     References:
 

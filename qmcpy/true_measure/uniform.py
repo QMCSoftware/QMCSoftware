@@ -13,18 +13,20 @@ class Uniform(TrueMeasure):
         lower_bound     [1 1]
         upper_bound     [2 2]
     >>> u.gen_samples(n_min=4,n_max=8)
-    array([[1.857, 1.258],
-           [1.357, 1.758],
-           [1.607, 1.508],
-           [1.107, 1.008]])
+    array([[1.427, 1.342],
+           [1.95 , 1.585],
+           [1.081, 1.754],
+           [1.541, 1.013]])
     >>> u.set_dimension(4)
     >>> u
     Uniform (TrueMeasure Object)
         lower_bound     [1 1 1 1]
         upper_bound     [2 2 2 2]
-    >>> u.gen_samples(n_min=2,n_max=4)
-    array([[1.732, 1.133, 1.601, 1.354],
-           [1.232, 1.633, 1.101, 1.854]])
+    >>> u.gen_samples(n_min=4,n_max=8)
+    array([[1.427, 1.342, 1.183, 1.588],
+           [1.95 , 1.585, 1.555, 1.152],
+           [1.081, 1.754, 1.965, 1.315],
+           [1.541, 1.013, 1.344, 1.875]])
     >>> u2 = Uniform(Sobol(2),lower_bound=[-.5,0],upper_bound=[1,3])
     >>> u2
     Uniform (TrueMeasure Object)

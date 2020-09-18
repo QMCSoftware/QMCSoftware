@@ -19,17 +19,17 @@ class CubQMCSobolG(StoppingCriterion):
     >>> sc = CubQMCSobolG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8082479629092816
+    1.8083420230027842
     >>> data
-    Solution: 1.8082         
+    Solution: 1.8083         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
         dimension       2^(1)
         randomize       1
         graycode        0
-        seed            7
+        seed            [327741615 976413892]
         mimics          StdUniform
-        backend         QRNG
+        dim0            0
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -42,7 +42,7 @@ class CubQMCSobolG(StoppingCriterion):
     LDTransformData (AccumulateData Object)
         n_total         2^(10)
         solution        1.808
-        error_bound     0.006
+        error_bound     0.005
         time_integrate  ...
 
     Original Implementation:

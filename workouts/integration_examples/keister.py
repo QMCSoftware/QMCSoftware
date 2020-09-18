@@ -41,7 +41,7 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CubQMCSobolG
-    distribution = Sobol(dimension=dimension, randomize=True, seed=7, backend='QRNG')
+    distribution = Sobol(dimension=dimension, randomize=True, seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQMCSobolG(integrand,abs_tol=abs_tol).integrate()
