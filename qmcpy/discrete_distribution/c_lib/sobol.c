@@ -5,7 +5,7 @@
 #include <math.h>
 #include "MRG63k3a.h"
 
-int sobol_ags(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0, unsigned int randomize, unsigned int graycode, unsigned long *seeds, double *x, unsigned int d_max, unsigned int m_max, unsigned long *z, unsigned int msb){
+int sobol(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0, unsigned int randomize, unsigned int graycode, unsigned long *seeds, double *x, unsigned int d_max, unsigned int m_max, unsigned long *z, unsigned int msb){
     /*
     Custom Sobol' Generator by alegresor
 

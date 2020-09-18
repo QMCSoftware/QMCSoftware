@@ -95,8 +95,8 @@ class Sobol(DiscreteDistribution):
             dim0 (int): first dimension
         """
         # initialize c code
-        self.sobol_ags_cf = c_lib.sobol_ags
-        self.sobol_ags_cf.argtypes = [
+        self.sobol_cf = c_lib.sobol
+        self.sobol_cf.argtypes = [
             ctypes.c_ulong,  # n
             ctypes.c_uint32,  # d
             ctypes.c_ulong, # n0
@@ -110,7 +110,7 @@ class Sobol(DiscreteDistribution):
             ctypeslib.ndpointer(ctypes.c_ulong, flags='C_CONTIGUOUS'),  # z (generating matrix)
             ctypes.c_uint8] # msb
         # set parameters
-        self.sobol_ags_cf.restype = ctypes.c_uint8
+        self.sobol_cf.restype = ctypes.c_uint8
         self.set_dimension(dimension)
         self.set_seed(seed)
         self.set_randomize(randomize)
@@ -171,7 +171,7 @@ class Sobol(DiscreteDistribution):
             self.set_seed(self.seed)
         n = int(n_max-n_min)
         x = zeros((n,self.dimension), dtype=double)
-        rc = self.sobol_ags_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
+        rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
             self.seed, x, self.d_max, self.m_max, self.z, self.msb)
         if rc!= 0:
             raise ParameterError(self.errors[rc])
