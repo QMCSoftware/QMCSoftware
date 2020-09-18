@@ -1,6 +1,4 @@
 from .._discrete_distribution import DiscreteDistribution
-from .lattice_gail import LatticeGAIL
-from .lattice_mps import LatticeMPS
 from ...util import ParameterError
 from numpy import *
 
@@ -28,12 +26,13 @@ class Lattice(DiscreteDistribution):
            [0.063, 0.598, 0.853],
            [0.813, 0.848, 0.103],
            [0.313, 0.348, 0.603]])
-    >>> Lattice(dimension=2,randomize=False,backend='GAIL').gen_samples(n_min=2,n_max=4)
+    >>> Lattice(dimension=2,randomize=False,order='linear').gen_samples(n_min=2,n_max=4)
     array([[0.25, 0.75],
            [0.75, 0.25]])
-    >>> Lattice(dimension=2,randomize=False,backend='MPS').gen_samples(n_min=2,n_max=4)
+    >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(n_min=2,n_max=4)
     array([[0.25, 0.75],
            [0.75, 0.25]])
+    >>> Lattice(dimension=2,randomize=False,order='mps').gen_samples(n_min=2,n_max=4)
 
     References:
         
@@ -62,37 +61,110 @@ class Lattice(DiscreteDistribution):
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
-    parameters = ['dimension','randomize','seed','mimics','backend']
+    parameters = ['dimension','randomize','order','seed','mimics']
 
-    def __init__(self, dimension=1, randomize=True, seed=None, backend='GAIL', gen_vector_info=None, linear=False):
+    def __init__(self, dimension=1, randomize=True, order='natural', seed=None, z_path=None):
         """
         Args:
             dimension (int): dimension of samples
             randomize (bool): If True, apply shift to generated samples. \
                 Note: Non-randomized lattice sequence includes the origin.
+            order (str): 'linear', 'natural', or 'mps' ordering.
             seed (int): seed the random number generator for reproducibility
-            backend (str): backend generator must be either "GAIL" or "MPS". \
-                "GAIL" provides standard point ordering but is slightly slower than "MPS".
-            gen_vector_info (dict): if not supplied uses generating vector from [5], \
-                otherwise, supply a dictionary with the following keys: \
-                    "vector": a numpy.ndarray or list of ints comprising the generating vector. \
-                    "n_max": maximum number of samples that can be drawn based on this generating vector. \
-                Example: gen_vector_info = {'vector':[1,433461,315689], n_max=2**20}
-            linear (bool): if True generate samples in linear order else in van der corput sequence order
+            z_path (str): path to generating vector. 
+                z_path should be formatted like 'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy' 
+                and d_max is the maximum dimenion and 2^m_max is the max number samples supported
         """
-        self.backend = backend.upper()
-        backend_objs = {'GAIL':LatticeGAIL,'MPS':LatticeMPS}
-        backends = list(backend_objs.keys())
-        if self.backend not in backends:
-            raise ParameterError('Lattice requires backend be in %s'%(str(backends)))
-        self.generator = backend_objs[self.backend](dimension,randomize,seed,gen_vector_info)
-        self.dimension, self.randomize, self.seed = self.generator.get_params()
+        # set generating matrix
+        self.dimension = dimension
+        self.randomize = randomize
+        self.order = order.lower()
+        if self.order == 'natural':
+            self.gen = self._gail_natural
+        elif self.order == 'linear':
+            self.gen = self._gail_linear
+        elif self.order == 'mps':
+            self.gen = self._mps
+        else: 
+            raise Exception("Lattice requires natural, linear, or mps ordering.")
+        self.set_seed(seed)
+        if not z_path:
+            self.d_max = 3600
+            self.m_max = 20
+            self.msb = True
+            self.z_full = load(dirname(abspath(__file__))+'/generating_vectors/lattice_vec.3600.20.npy').astype(uint64)
+        else:
+            if not isfile(z_path):
+                raise ParameterError('z_path `' + z_path + '` not found. ')
+            self.z_full = load(z_path).astype(uint64)
+            f = z_path.split('/')[-1]
+            f_lst = f.split('.')
+            self.d_max = int(f_lst[1])
+            self.m_max = int(f_lst[2])
+            else:
+                msg = '''
+                    z_path sould be formatted like `lattice_vec.3600.20.npy.npy`
+                    with 'name.d_max.m_max.msb_or_lsb.npy'
+                '''
+                raise ParameterError(msg)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
-        self.linear = linear
         super(Lattice,self).__init__()
+    
+    def _mps(self, n_min, n_max):
+        """ Magic Point Shop Lattice generator. """
+        m_low = floor(log2(n_min))+1 if n_min > 0 else 0
+        m_high = ceil(log2(n_max))
+        gen_block = lambda n: (outer(arange(1, n+1, 2), self.z) % n) / float(n)
+        x_lat_full = vstack([gen_block(2**m) for m in range(int(m_low),int(m_high)+1)])
+        cut1 = int(floor(n_min-2**(m_low-1))) if n_min>0 else 0
+        cut2 = int(cut1+n_max-n_min)
+        x = x_lat_full[cut1:cut2,:]
+        return x
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_non_random=False):
+    def _gail_linear(self, n_min, n_max):
+        """ Gail lattice generator in linear order. """
+        nelem = n_max - n_min
+        if n_min == 0:
+            y = arange(0, 1, 1 / nelem).reshape((nelem, 1))
+        else:
+            y = arange(1 / n_max, 1, 2 / n_max).reshape((nelem, 1))
+        x = outer(y, self.z) % 1
+        return x
+
+    def _gail_natural(self,n_min, n_max, warn, linear=False, return_non_rand=False):
+        m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
+        m_high = ceil(log2(n_max))
+        x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low),int(m_high)+1)])
+        cut1 = int(floor(n_min-2**(m_low-1))) if n_min>0 else 0
+        cut2 = int(cut1+n_max-n_min)
+        x = x_lat_full[cut1:cut2,:]
+        return x
+    
+    def _vdc(self,n):
+        """
+        Van der Corput sequence in base 2 where n is a power of 2. We do it this 
+        way because of our own VDC construction: is much faster and cubLattice 
+        does not need more.
+        """
+        k = log2(n)
+        q = zeros(int(n))
+        for l in range(int(k)):
+            nl = 2**l
+            kk = 2**(k-l-1)
+            ptind_nl = hstack((tile(False,nl),tile(True,nl)))
+            ptind = tile(ptind_nl,int(kk))
+            q[ptind] += 1./2**(l+1)
+        return q
+
+    def _gen_block(self, m):
+        """ Generate samples floor(2**(m-1)) to 2**m. """
+        n_min = floor(2**(m-1))
+        n = 2**m-n_min
+        x = outer(self._vdc(n)+1./(2*n_min),self.z)%1 if n_min>0 else outer(self._vdc(n),self.z)%1
+        return x
+
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
         """
         Generate lattice samples
 
@@ -114,13 +186,42 @@ class Lattice(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
-        x = self.generator.gen_samples(n_min, n_max, warn, self.linear, return_non_random)
+        if n_min == 0 and self.randomize==False and warn:
+            warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
+        if n_max > 2**self.m_max:
+            raise ParameterError('Lattice generating vector supports up to %d samples.'%(2**self.m_max))
+        x = self.gen(n_min,n_max)
+        if self.randomize:
+            x = self.apply_randomization(x)
         return x
+    
+    def apply_randomization(self, x):
+        """
+        Apply a digital shift to the samples. 
+        
+        Args:
+            x (ndarray): un-randomized samples to be digitally shifted. 
+        
+        Return:
+            ndarray: x with digital shift aplied.
+        """
+        x_rand = (x + self.shift)%1
+        return x_rand
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = self.generator.set_seed(seed)
+        self.s = seed if seed else random.randint(2**32)
+        random.seed(self.s)
+        if self.r:
+            self.shift = random.rand(int(self.d))
+        return self.s
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.dimension = self.generator.set_dimension(dimension)
+        self.d = dimension
+        if self.d > self.d_max:
+            raise ParameterError('Lattice requires dimension <= %d'%self.d_max)
+        self.z = self.z_full[:self.d]
+        if self.r:
+            self.shift = random.rand(int(self.d))
+        return self.d

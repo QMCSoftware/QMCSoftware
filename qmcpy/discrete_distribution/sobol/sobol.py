@@ -121,7 +121,7 @@ class Sobol(DiscreteDistribution):
             self.d_max = 21201
             self.m_max = 32
             self.msb = True
-            self.z = load(dirname(abspath(__file__))+'/generating_matricies/gen_mat.21201.32.msb.npy').astype(uint64)
+            self.z = load(dirname(abspath(__file__))+'/generating_matricies/sobol_mat.21201.32.msb.npy').astype(uint64)
         else:
             if not isfile(z_path):
                 raise ParameterError('z_path `' + z_path + '` not found. ')
@@ -137,7 +137,7 @@ class Sobol(DiscreteDistribution):
                 self.msb = False
             else:
                 msg = '''
-                    z_path sould be formatted like `gen_mat.21201.32.msb.npy`
+                    z_path sould be formatted like `sobol_mat.21201.32.msb.npy`
                     with name.d_max.m_max.msb_or_lsb.npy
                 '''
                 raise ParameterError(msg)
