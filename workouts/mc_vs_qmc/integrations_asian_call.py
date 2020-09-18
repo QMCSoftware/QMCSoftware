@@ -51,6 +51,13 @@ def cubqmclatticeg(dimension, abs_tol, drift):
     solution,data = CubQMCLatticeG(integrand, abs_tol,).integrate()
     return data
 
+def cubbayeslatticeg(dimension, abs_tol, drift):
+    distribution = Lattice(dimension, seed=7, linear=True, backend="GAIL")
+    measure = BrownianMotion(distribution, drift=drift)
+    integrand = AsianOption(measure)
+    solution,data = CubBayesLatticeG(integrand, abs_tol,).integrate()
+    return data
+
 def cubqmcsobolg(dimension, abs_tol, drift):
     distribution = Sobol(dimension, seed=7)
     measure = BrownianMotion(distribution, drift=drift)
@@ -66,4 +73,5 @@ integrations_dict = {
     ('CubQMCCLT','Lattice','QMC'): cubqmcclt_lattice,
     ('CubQMCCLT','Sobol','QMC'): cubqmcclt_sobol,
     ('CubQMCLatticeG','Lattice','QMC'): cubqmclatticeg,
+    ('CubBayesLatticeG','Lattice','QMC'): cubbayeslatticeg,
     ('CubQMCSobolG','Sobol','QMC'): cubqmcsobolg}

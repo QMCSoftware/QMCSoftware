@@ -4,7 +4,7 @@ from ..discrete_distribution import Sobol
 from numpy import *
 from numpy.linalg import cholesky, det, inv, eigh
 from scipy.stats import norm
-
+from scipy.special import erfcinv
 
 class Gaussian(TrueMeasure):
     """
@@ -98,12 +98,14 @@ class Gaussian(TrueMeasure):
         """
         if self.distribution.mimics == 'StdGaussian':
             std_gaussian_samples = samples
+            mimic_samples = self.mu + dot(std_gaussian_samples, self.a)
         elif self.distribution.mimics == "StdUniform":
             std_gaussian_samples = norm.ppf(samples)
+            mimic_samples = self.mu + dot(std_gaussian_samples, self.a)
+            # mimic_samples = erfcinv(samples)
         else:
             raise TransformError(\
                 'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
-        mimic_samples = self.mu + dot(std_gaussian_samples,self.a)
         return mimic_samples
 
     def _transform_g_to_f(self, g):

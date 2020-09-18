@@ -62,6 +62,7 @@ install:
 script:
 - coverage run --source=./ -m unittest discover -s test/fasttests
 - coverage run --append --source=./ -m unittest discover -s test/longtests
+- cd qmcpy && pytest --doctest-modules --disable-pytest-warnings
 
 
 after_success:

@@ -3,6 +3,7 @@
 from qmcpy import *
 from qmcpy.util import *
 import sys
+import numpy
 vinvo = sys.version_info
 if vinvo[0]==3: import unittest
 else: import unittest2 as unittest
@@ -167,6 +168,30 @@ class TestCubQMCML(unittest.TestCase):
         solution,data = CubQMCML(integrand,rmse_tol=tol/2.58).integrate()
         exact_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-exact_value) < tol)
+
+
+class TestCubBayesLatticeG(unittest.TestCase):
+    """ Unit tests for CubBayesLatticeG StoppingCriterion. """
+
+    def test_raise_distribution_compatibility_error(self):
+        distribution = IIDStdGaussian(dimension=2)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        self.assertRaises(DistributionCompatibilityError, CubBayesLatticeG, integrand)
+
+    def test_n_max_single_level(self):
+        distribution = Lattice(dimension=2, backend="GAIL", linear=True)
+        measure = Gaussian(distribution)
+        integrand = Keister(measure)
+        algorithm = CubBayesLatticeG(integrand, abs_tol=.0001, n_init=2 ** 8, n_max=2 ** 9)
+        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
+
+    def test_keister_2d(self):
+        distribution = Lattice(dimension=2, backend='GAIL', linear=True)
+        measure = Gaussian(distribution, covariance=1./2)
+        integrand = Keister(measure)
+        solution, data = CubBayesLatticeG(integrand, abs_tol=tol, n_init=2 ** 5).integrate()
+        self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
 
 if __name__ == "__main__":

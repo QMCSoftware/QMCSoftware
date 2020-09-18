@@ -43,5 +43,12 @@ def european_options(abs_tol=.1):
     sol3,data3 = algorithm.integrate()
     print('\n%s\n\n%s'%('~'*100,data3))
 
+    d = 2**(data1.levels-1) # use the same dimension as the finest level for MLQMC
+    measure = BrownianMotion(Lattice(d, linear=True))
+    integrand = EuropeanOption(measure,volatility,start_price,start_price,interest_rate,call_put='call')
+    algorithm = CubBayesLatticeG(integrand,abs_tol,ptransform='Baker')
+    sol2,data2 = algorithm.integrate()
+    print('\n%s\n\n%s'%('~'*100,data2))
+
 if __name__ == '__main__':
     european_options(abs_tol=.025)

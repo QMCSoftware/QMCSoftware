@@ -159,5 +159,20 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-true_value) < abs_tol)
 
+    def test_european_put_bayes(self):
+        abs_tol = 1e-2
+        ddistrib = Lattice(dimension=16, seed=17, linear=True)
+        measure = BrownianMotion(ddistrib)
+        integrand = EuropeanOption(measure,
+            volatility = .5,
+            start_price = 10,
+            strike_price = 10,
+            interest_rate = .01,
+            call_put = 'put')
+        algorithm = CubBayesLatticeG(integrand, abs_tol, ptransform='Baker')
+        solution,data = algorithm.integrate()
+        true_value = integrand.get_exact_value()
+        self.assertTrue(abs(solution-true_value) < abs_tol)
+
 if __name__ == "__main__":
     unittest.main()
