@@ -54,18 +54,27 @@ class TestLattice(unittest.TestCase):
     """ Unit tests for Lattice DiscreteDistribution. """
 
     def test_mimics(self):
-        distribution = Lattice(dimension=3, randomize=True, backend='MPS')
+        distribution = Lattice(dimension=3, randomize=True)
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
         for backend in ['MPS','GAIL']:
-            distribution = Lattice(dimension=3, randomize=True, backend=backend)
+            distribution = Lattice(dimension=3, randomize=True)
             samples = distribution.gen_samples(n_min=4, n_max=8)
             self.assertEqual(type(samples), ndarray)
             self.assertEqual(samples.shape, (4,3))
 
-    def test_mps_correctness(self):
-        distribution = Lattice(dimension=4, randomize=False, backend='MPS')
+    def test_gail_order(self):
+        distribution = Lattice(dimension=4, randomize=False, order='natural')
+        true_sample = array([
+            [1./8,   3./8,    3./8,    1./8],
+            [5./8,   7./8,    7./8,    5./8],
+            [3./8,   1./8,    1./8,    3./8],
+            [7./8,   5./8,    5./8,    7./8]])
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
+
+    def test_mps_order(self):
+        distribution = Lattice(dimension=4, randomize=False, order='mps')
         true_sample = array([
             [1./8,   3./8,    3./8,    1./8],
             [3./8,   1./8,    1./8,    3./8],
@@ -73,27 +82,21 @@ class TestLattice(unittest.TestCase):
             [7./8,   5./8,    5./8,    7./8]])
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
 
-    def test_gail_correctness(self):
-        distribution = Lattice(dimension=4, randomize=False, backend='GAIL')
+    def test_linear_order(self):
+        distribution = Lattice(dimension=4, randomize=False, order='mps')
         true_sample = array([
             [1./8,   3./8,    3./8,    1./8],
-            [5./8,   7./8,    7./8,    5./8],
             [3./8,   1./8,    1./8,    3./8],
+            [5./8,   7./8,    7./8,    5./8],
             [7./8,   5./8,    5./8,    7./8]])
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
     
     def test_set_dimension(self):
-        for backend in ['MPS','GAIL']:
-            distribution = Lattice(dimension=2,backend=backend)
-            distribution.set_dimension(3)
-            samples = distribution.gen_samples(4)
-            self.assertTrue(samples.shape==(4,3))
-    
-    def test_custom_vector(self):
-        self.assertRaises(ParameterError,Lattice,dimension=4,gen_vector_info={'vector':[1,433461,315689],'n_lim':2**20})
-        l = Lattice(2,gen_vector_info={'vector':[1,433461,315689],'n_lim':2**20})
-        self.assertRaises(ParameterError,l.gen_samples,n_min=4,n_max=2**21)
-        l.gen_samples(n_min=3,n_max=5)
+        distribution = Lattice(dimension=2)
+        distribution.set_dimension(3)
+        samples = distribution.gen_samples(4)
+        self.assertTrue(samples.shape==(4,3))
+
 
 class TestSobol(unittest.TestCase):
     """ Unit tests for Sobol DiscreteDistribution. """

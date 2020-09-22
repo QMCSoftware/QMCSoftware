@@ -82,7 +82,7 @@ class Sobol(DiscreteDistribution):
     
     parameters = ['dimension','randomize','graycode','seed','mimics','dim0']
 
-    def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path=None, dim0=0):
+    def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path=None, dim0=0, backend='QMCPy'):
         """
         Args:
             dimension (int): dimension of samples

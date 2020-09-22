@@ -84,7 +84,8 @@ class LDTransformBayesData(AccumulateData):
             # xun_ = np.mod((xun_ * self.gen_vec), 1)
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
 
-            xpts_, xun_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False, return_non_random=True)
+            xun_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False)
+            xpts_ = self.distribution.apply_randomization(xun_)
 
             # Compute initial FFT
             ftilde_ = np.fft.fft(self.ff(xpts_))  # evaluate integrand's fft
@@ -95,7 +96,8 @@ class LDTransformBayesData(AccumulateData):
             # xunnew = np.mod(xunnew * self.gen_vec, 1)
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
 
-            xnew, xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n, return_non_random=True)
+            xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n)
+            xnew = self.distribution.apply_randomization(xunnew)
 
             [xun_, xpts_] = self.merge_pts(xun, xunnew, xpts, xnew, n, self.dim)
             mnext = m - 1

@@ -68,7 +68,7 @@ class IntegrationExampleTest(unittest.TestCase):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
         dimension = 2
-        distribution = Lattice(dimension=2, randomize=True, backend='MPS')
+        distribution = Lattice(dimension=2, randomize=True, order='mps')
         measure = Uniform(distribution, lower_bound=[1,3], upper_bound=[3,6])
         integrand = CustomFun(measure, lambda x: (x.prod(1))**3)
         solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
@@ -123,7 +123,7 @@ class IntegrationExampleTest(unittest.TestCase):
         for i in range(2):
             a_i = a_list[i]
             b_i = b_list[i]
-            distribution = Lattice(dimension=1, randomize=True, backend='GAIL')
+            distribution = Lattice(dimension=1, randomize=True)
             measure = Uniform(distribution)
             integrand = CustomFun(measure, lambda x, a=a_i, b=b_i: b * (x - a) ** 2)
             solution,data = CubQMCLatticeG(integrand, abs_tol=abs_tol).integrate()
@@ -161,7 +161,7 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_european_put_bayes(self):
         abs_tol = 1e-2
-        ddistrib = Lattice(dimension=16, seed=17, linear=True)
+        ddistrib = Lattice(dimension=16, seed=17, order='linear', randomize=False)
         measure = BrownianMotion(ddistrib)
         integrand = EuropeanOption(measure,
             volatility = .5,

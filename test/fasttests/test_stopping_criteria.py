@@ -95,7 +95,7 @@ class TestCubQMCLatticeG(unittest.TestCase):
         self.assertRaises(DistributionCompatibilityError, CubQMCLatticeG, integrand)
 
     def test_n_max_single_level(self):
-        distribution = Lattice(dimension=2, backend="GAIL")
+        distribution = Lattice(dimension=2)
         measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         algorithm = CubQMCLatticeG(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)
@@ -180,14 +180,14 @@ class TestCubBayesLatticeG(unittest.TestCase):
         self.assertRaises(DistributionCompatibilityError, CubBayesLatticeG, integrand)
 
     def test_n_max_single_level(self):
-        distribution = Lattice(dimension=2, backend="GAIL", linear=True)
+        distribution = Lattice(dimension=2, order='linear', randomize=False)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         algorithm = CubBayesLatticeG(integrand, abs_tol=.0001, n_init=2 ** 8, n_max=2 ** 9)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
 
     def test_keister_2d(self):
-        distribution = Lattice(dimension=2, backend='GAIL', linear=True)
+        distribution = Lattice(dimension=2, order='linear', randomize=False)
         measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         solution, data = CubBayesLatticeG(integrand, abs_tol=tol, n_init=2 ** 5).integrate()

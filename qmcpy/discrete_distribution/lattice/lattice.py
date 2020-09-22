@@ -1,6 +1,8 @@
 from .._discrete_distribution import DiscreteDistribution
-from ...util import ParameterError
+from ...util import ParameterError, ParameterWarning
 from numpy import *
+from os.path import dirname, abspath
+import warnings
 
 
 class Lattice(DiscreteDistribution):
@@ -12,9 +14,9 @@ class Lattice(DiscreteDistribution):
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)
         randomize       1
+        order           natural
         seed            7
         mimics          StdUniform
-        backend         GAIL
     >>> l.gen_samples(4)
     array([[0.076, 0.78 ],
            [0.576, 0.28 ],
@@ -26,13 +28,21 @@ class Lattice(DiscreteDistribution):
            [0.063, 0.598, 0.853],
            [0.813, 0.848, 0.103],
            [0.313, 0.348, 0.603]])
-    >>> Lattice(dimension=2,randomize=False,order='linear').gen_samples(n_min=2,n_max=4)
-    array([[0.25, 0.75],
+    >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
+    array([[0.  , 0.  ],
+           [0.5 , 0.5 ],
+           [0.25, 0.75],
            [0.75, 0.25]])
-    >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(n_min=2,n_max=4)
-    array([[0.25, 0.75],
+    >>> Lattice(dimension=2,randomize=False,order='linear').gen_samples(4, warn=False)
+    array([[0.  , 0.  ],
+           [0.25, 0.75],
+           [0.5 , 0.5 ],
            [0.75, 0.25]])
-    >>> Lattice(dimension=2,randomize=False,order='mps').gen_samples(n_min=2,n_max=4)
+    >>> Lattice(dimension=2,randomize=False,order='mps').gen_samples(4, warn=False)
+    array([[0.  , 0.  ],
+           [0.5 , 0.5 ],
+           [0.25, 0.75],
+           [0.75, 0.25]])
 
     References:
         
@@ -76,7 +86,6 @@ class Lattice(DiscreteDistribution):
                 and d_max is the maximum dimenion and 2^m_max is the max number samples supported
         """
         # set generating matrix
-        self.dimension = dimension
         self.randomize = randomize
         self.order = order.lower()
         if self.order == 'natural':
@@ -87,7 +96,6 @@ class Lattice(DiscreteDistribution):
             self.gen = self._mps
         else: 
             raise Exception("Lattice requires natural, linear, or mps ordering.")
-        self.set_seed(seed)
         if not z_path:
             self.d_max = 3600
             self.m_max = 20
@@ -101,12 +109,8 @@ class Lattice(DiscreteDistribution):
             f_lst = f.split('.')
             self.d_max = int(f_lst[1])
             self.m_max = int(f_lst[2])
-            else:
-                msg = '''
-                    z_path sould be formatted like `lattice_vec.3600.20.npy.npy`
-                    with 'name.d_max.m_max.msb_or_lsb.npy'
-                '''
-                raise ParameterError(msg)
+        self.set_dimension(dimension)
+        self.set_seed(seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Lattice,self).__init__()
@@ -132,7 +136,7 @@ class Lattice(DiscreteDistribution):
         x = outer(y, self.z) % 1
         return x
 
-    def _gail_natural(self,n_min, n_max, warn, linear=False, return_non_rand=False):
+    def _gail_natural(self, n_min, n_max):
         m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
         x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low),int(m_high)+1)])
@@ -210,18 +214,14 @@ class Lattice(DiscreteDistribution):
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.s = seed if seed else random.randint(2**32)
-        random.seed(self.s)
-        if self.r:
-            self.shift = random.rand(int(self.d))
-        return self.s
+        self.seed = seed if seed else random.randint(2**32)
+        random.seed(self.seed)
+        self.shift = random.rand(int(self.dimension))
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.d = dimension
-        if self.d > self.d_max:
+        self.dimension = dimension
+        if self.dimension > self.d_max:
             raise ParameterError('Lattice requires dimension <= %d'%self.d_max)
-        self.z = self.z_full[:self.d]
-        if self.r:
-            self.shift = random.rand(int(self.d))
-        return self.d
+        self.z = self.z_full[:self.dimension]
+        self.shift = random.rand(int(self.dimension))

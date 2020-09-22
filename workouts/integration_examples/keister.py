@@ -20,7 +20,7 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CubQMCCLT
-    distribution = Lattice(dimension, randomize=True, seed=7, backend='MPS')
+    distribution = Lattice(dimension, randomize=True, seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
@@ -34,7 +34,7 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CubQMCLatticeG
-    distribution = Lattice(dimension=dimension, randomize=True, seed=7, backend='GAIL')
+    distribution = Lattice(dimension=dimension, randomize=True, seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQMCLatticeG(integrand,abs_tol=abs_tol).integrate()
@@ -48,7 +48,7 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CubBayesLatticeG
-    distribution = Lattice(dimension=dimension, backend='GAIL', linear=True)
+    distribution = Lattice(dimension=dimension, order='linear', randomize=False)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubBayesLatticeG(integrand,abs_tol=abs_tol).integrate()

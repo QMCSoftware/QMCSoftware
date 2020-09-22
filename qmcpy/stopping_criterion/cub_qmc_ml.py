@@ -31,9 +31,9 @@ class CubQMCML(StoppingCriterion):
     Lattice (DiscreteDistribution Object)
         dimension       2^(6)
         randomize       1
+        order           natural
         seed            854306
         mimics          StdUniform
-        backend         GAIL
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1

@@ -36,7 +36,7 @@ class HaltonQRNG(object):
         if n_min > 0:
                 raise ParameterError('QRNG Halton does not support skipping samples. Use Owen backend to set n_min > 0.')
         if n_max > self.n_lim:
-            raise ParameterWarning("QRNG Halton requres n_max <= 2^32.")
+            raise ParameterWarning("QRNG Halton requires n_max <= 2^32.")
         n = int(n_max-n_min)
         x = zeros((self.d, n), dtype=double)
         self.halton_qrng_cf(n, self.d, self.g, x, self.s)
