@@ -95,13 +95,15 @@ setuptools.setup(
     ext_modules=[
         Extension(
             name='qmcpy.discrete_distribution.c_lib.c_lib',
+            # include_dirs=['qmcpy/discrete_distribution/c_lib/'],
             sources=[
                 'qmcpy/discrete_distribution/c_lib/halton_owen.c',
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/korobov_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/sobol.c',
                 'qmcpy/discrete_distribution/c_lib/MRG63k3a.c'],
-            extra_compile_args=['-shared'])],
+            # extra_compile_args=['/D_WINDLL'],
+            )],
     cmdclass={
         'clean': CleanCommand,
         'install': CustomInstall})

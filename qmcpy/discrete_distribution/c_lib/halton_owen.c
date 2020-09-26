@@ -114,7 +114,8 @@ static int primes[1000] =
 , 7727, 7741, 7753, 7757, 7759, 7789, 7793, 7817, 7823, 7829
 , 7841, 7853, 7867, 7873, 7877, 7879, 7883, 7901, 7907, 7919};
 
-void halton_owen(int n, int d, int n0, int d0, int randomize, double *ans, long seed){
+__declspec(dllexport) void __cdecl halton_owen(int n, int d, int n0, int d0, int randomize, double *ans, long seed)
+{
     /*
     Randomly scrambled Halton sequence of n points in d dimensions.
     If you already have n0 old points, set n0 to get the next n points.
@@ -131,7 +132,12 @@ void halton_owen(int n, int d, int n0, int d0, int randomize, double *ans, long 
         seed (long): seed for the generator
     */
     double b2r, u; 
-    int i, j, b, t, ii, dig[n], res[n], perm[primes[d0+d-1]];
+    int i, j, b, t, ii;
+    // int dig[n], res[n], perm[primes[d0+d-1]];
+    int *dig, *res, *perm;
+    dig = (int *)calloc(n, sizeof(int));
+    res = (int *)calloc(n, sizeof(int));
+    perm = (int *)calloc(primes[d0+d-1], sizeof(int));
     seed_MRG63k3a(seed);
     for(j=0; j<d; j++){
         for(i=0;i<n;i++){res[i] = i+n0;}
@@ -152,7 +158,13 @@ void halton_owen(int n, int d, int n0, int d0, int randomize, double *ans, long 
                     perm[i-1] = t;}
                 for(i=0;i<n;i++){dig[i] = perm[dig[i]];}}
             for(i=0;i<n;i++){ans[i*d+j] = ans[i*d+j]+dig[i]*b2r;}
-            b2r = b2r / b;}}}
+            b2r = b2r / b;
+        }
+    }
+    free(dig);
+    free(res);
+    free(perm);
+}
 
 /*
 int main(){

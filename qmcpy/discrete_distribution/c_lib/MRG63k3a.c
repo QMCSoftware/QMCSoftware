@@ -93,7 +93,7 @@ double MRG63k3a (void)
 
 void seed_MRG63k3a(long seed){
    if (seed<=0 || seed>=m2){
-      printf("seed must be in [0,%lu]. Using seed=7",m2);
+      printf("seed must be in [0,%llu] but %ld. Using seed=7\n",m2, seed);
       seed = 7;
    }
    s10 = seed; s11 = seed; s12 = seed;

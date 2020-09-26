@@ -62,4 +62,5 @@ void korobov_qrng(int n, int d, int *generator, int randomize, double *res, long
 			}
 		}
 	}
+	free(aux);
 }

@@ -14,7 +14,7 @@ n = 64
 
 pts_sets = [
     IIDStdUniform(2,seed=7).gen_samples(n),
-    Lattice(2,backend='GAIL',seed=7).gen_samples(n)]
+    Lattice(2,seed=7).gen_samples(n)]
 titles = ['$U[0,1]^2$','Shifted Lattice']
 symbols = ['T','X']
 output_files = ['iid_uniform_pts','lattice_pts']
