@@ -186,19 +186,19 @@ class Sobol(DiscreteDistribution):
         """
         if isinstance(seeds,int):
             random.seed(seeds)
-            self.seed = random.randint(0, (2**32)-1, size=self.dimension)
+            self.seed = random.randint(0, (2**32)-1, size=self.dimension, dtype=uint32)
         elif isinstance(seeds,list) or isinstance(seeds,ndarray):
             seeds = array(seeds)
             l = len(seeds)
             if l == self.dimension:
                 self.seed = seeds
             elif l < self.dimension:
-                self.seed = hstack((seeds,random.randint(0,(2**32)-1, size=self.dimension-l)))
+                self.seed = hstack((seeds,random.randint(0,(2**32)-1, size=self.dimension-l, dtype=uint32)))
             else: # l > self.dimension
                 self.seed = seeds[:self.dimension]
         elif seeds==None: # assume seed==None
             random.seed(None)
-            self.seed = random.randint(0,(2**32)-1,size=self.dimension)
+            self.seed = random.randint(0,(2**32)-1,size=self.dimension, dtype=uint32)
         else:
             msg = "Sobol' seed must be an int, list of ints, or None."
             raise ParameterError(msg)

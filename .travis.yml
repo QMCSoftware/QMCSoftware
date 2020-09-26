@@ -22,9 +22,9 @@ matrix:
       before_install:
         # - choco install python --version 3.8.0
         # - choco install mingw  # comes default
-        - choco install miniconda3 --params="'/AddToPath:1'" -y
+        - choco install miniconda3 # --params="'/AddToPath:1'" -y
         # - python -m pip install --upgrade pip
-        - setx path "%path%;C:\tools\miniconda3\bin"
+        # - setx path "%path%;C:\tools\miniconda3\bin"
         - env
         - pwd
         - ls -lrt
@@ -72,14 +72,14 @@ install:
 # - conda install pytest
 # - conda install numpy
 - conda install pytorch torchvision cpuonly -c pytorch
-- python -m pip install --quiet -r requirements/dev.txt
+- python -m pip install --quiet --use-feature=2020-resolver -r requirements/dev.txt
 - python -m pip install codecov
 - python -m pip install -e .
 - ls -lrt qmcpy/discrete_distribution/c_lib/
 
 script:
-- coverage run --source=./ -m unittest discover -s test/fasttests
-- coverage run --append --source=./ -m unittest discover -s test/longtests
+- coverage run --source=./ -m unittest discover -s test/longtests
+- coverage run --append --source=./ -m unittest discover -s test/fasttests
 - cd qmcpy && pytest --doctest-modules --disable-pytest-warnings
 
 
