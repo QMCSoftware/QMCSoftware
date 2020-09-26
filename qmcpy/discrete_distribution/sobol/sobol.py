@@ -121,11 +121,11 @@ class Sobol(DiscreteDistribution):
             self.d_max = 21201
             self.m_max = 32
             self.msb = True
-            self.z = load(dirname(abspath(__file__))+'/generating_matricies/sobol_mat.21201.32.msb.npy').astype(uint32)
+            self.z = load(dirname(abspath(__file__))+'/generating_matricies/sobol_mat.21201.32.msb.npy').astype(uint64)
         else:
             if not isfile(z_path):
                 raise ParameterError('z_path `' + z_path + '` not found. ')
-            self.z = load(z_path).astype(uint32)
+            self.z = load(z_path).astype(uint64)
             f = z_path.split('/')[-1]
             f_lst = f.split('.')
             self.d_max = int(f_lst[1])
@@ -172,7 +172,7 @@ class Sobol(DiscreteDistribution):
         n = int(n_max-n_min)
         x = zeros((n,self.dimension), dtype=double)
         rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
-            self.seed.astype(uint), x, self.d_max, self.m_max, self.z, uint(self.msb))
+            self.seed, x, self.d_max, self.m_max, self.z, self.msb)
         if rc!= 0:
             raise ParameterError(self.errors[rc])
         return x
@@ -186,19 +186,19 @@ class Sobol(DiscreteDistribution):
         """
         if isinstance(seeds,int):
             random.seed(seeds)
-            self.seed = random.randint(0, (2**32)-1, size=self.dimension, dtype=uint)
+            self.seed = random.randint(0, (2**32)-1, size=self.dimension)
         elif isinstance(seeds,list) or isinstance(seeds,ndarray):
             seeds = array(seeds)
             l = len(seeds)
             if l == self.dimension:
                 self.seed = seeds
             elif l < self.dimension:
-                self.seed = hstack((seeds,random.randint(0,(2**32)-1, size=self.dimension-l, dtype=uint)))
+                self.seed = hstack((seeds,random.randint(0,(2**32)-1, size=self.dimension-l)))
             else: # l > self.dimension
                 self.seed = seeds[:self.dimension]
         elif seeds==None: # assume seed==None
             random.seed(None)
-            self.seed = random.randint(0,(2**32)-1,size=self.dimension, dtype=uint)
+            self.seed = random.randint(0,(2**32)-1,size=self.dimension)
         else:
             msg = "Sobol' seed must be an int, list of ints, or None."
             raise ParameterError(msg)
