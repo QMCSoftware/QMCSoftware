@@ -10,7 +10,7 @@ class EuropeanOption(Integrand):
     """
     European financial option. 
 
-    >>> dd = Sobol(4,seed=7)
+    >>> dd = Sobol(4,seed=17)
     >>> m = BrownianMotion(dd,drift=-1)
     >>> eo = EuropeanOption(m,call_put='put')
     >>> eo
@@ -23,7 +23,7 @@ class EuropeanOption(Integrand):
     >>> x = dd.gen_samples(2**10)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.208362550663663
+    9.214208473412194
     """
 
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
