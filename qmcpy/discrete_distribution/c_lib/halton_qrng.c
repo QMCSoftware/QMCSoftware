@@ -27,6 +27,7 @@ References:
 // https://stackoverflow.com/questions/34689210/error-exporting-symbol-when-building-python-c-extension-in-windows
 PyMODINIT_FUNC PyInit_c_lib(void) {
     // do stuff...
+    printf("");
 }
 
 /* Primes for ghalton() */
@@ -88,7 +89,7 @@ static int permTN2[ghaltonMaxDim] =
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */
-__declspec(dllexport) void __cdecl halton_qrng(int n, int d, int generalized, double *res, long seed)
+EXPORT void halton_qrng(int n, int d, int generalized, double *res, long long seed)
 {
         static int perm[ghaltonMaxDim];
         int base, i, j, k, l, maxindex, f, start;

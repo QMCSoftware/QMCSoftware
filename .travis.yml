@@ -37,11 +37,11 @@ matrix:
         - export PATH=/c/tools/miniconda3/Library/usr/bin:/c/tools/miniconda3/Library/mingw-w64/bin:$PATH
         - export MINICONDA=/c/tools/miniconda3
         - export PATH="$MINICONDA/bin:$PATH"
-        - conda init bash
+        # - conda init bash
         - hash -r
         - echo $PATH
       env:
-        - PYTHON_VERSION="3.7"
+        - PYTHON_VERSION=3.7
         - MINICONDAPATH="https://repo.anaconda.com/miniconda/Miniconda2-latest-Windows-x86_64.exe
         # - PATH=/c/Python38:/c/Python38/Scripts:$PATH
 
@@ -59,16 +59,16 @@ install:
 # - chmod +x /c/tools/miniconda3/python.exe
 # - chmod +x /c/tools/miniconda3/condabin/conda.bat
 # - chmod +x /c/tools/miniconda3/condabin/activate.bat
-- conda
+# - conda
 # - wget $MINICONDAPATH -O miniconda.sh
 # - bash miniconda.sh -b -f -p $MINICONDA
 - conda config --set always_yes yes
 - conda update conda
 - conda info -a
-- conda create -n testenv python=3.7
+- conda create -n testenv python=$PYTHON_VERSION
 - source activate testenv
 - python -m pip install --upgrade pip
-- python.exe --version
+# - python.exe --version
 # - conda install pytest
 # - conda install numpy
 - conda install pytorch torchvision cpuonly -c pytorch

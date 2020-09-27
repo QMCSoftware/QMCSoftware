@@ -43,13 +43,13 @@ The seeds for s20, s21, s22 must be integers in [0, m2 - 1] and not all 0.
 
 #define SEED 123456789
 
-static long s10 = SEED, s11 = SEED, s12 = SEED,
+static long long s10 = SEED, s11 = SEED, s12 = SEED,
             s20 = SEED, s21 = SEED, s22 = SEED;
 
 
 double MRG63k3a (void)
 {
-   long h, p12, p13, p21, p23;
+   long long h, p12, p13, p21, p23;
    /* Component 1 */
    h = s10 / q13;
    p13 = a13n * (s10 - h * q13) - h * r13;
@@ -91,7 +91,7 @@ double MRG63k3a (void)
       return ((p12 - p21 + m1) * norm);
 }
 
-void seed_MRG63k3a(long seed){
+void seed_MRG63k3a(long long seed){
    if (seed<=0 || seed>=m2){
       printf("seed must be in [0,%llu] but %ld. Using seed=7\n",m2, seed);
       seed = 7;

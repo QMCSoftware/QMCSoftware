@@ -95,6 +95,13 @@ class Sobol(DiscreteDistribution):
             dim0 (int): first dimension
         """
         # initialize c code
+        self.get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
+        self.get_unsigned_long_long_size_cf.argtypes = []
+        self.get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
+        self.get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
+        self.get_unsigned_long_size_cf.argtypes = []
+        self.get_unsigned_long_size_cf.restype = ctypes.c_uint8
+
         self.sobol_cf = c_lib.sobol
         self.sobol_cf.argtypes = [
             ctypes.c_ulong,  # n
@@ -103,11 +110,11 @@ class Sobol(DiscreteDistribution):
             ctypes.c_uint32, # d0
             ctypes.c_uint8,  # randomize
             ctypes.c_uint8, # graycode
-            ctypeslib.ndpointer(ctypes.c_ulong, flags='C_CONTIGUOUS'), # seeds
+            ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'), # seeds
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x (result)
             ctypes.c_uint32, # d_max
             ctypes.c_uint32, # m_max
-            ctypeslib.ndpointer(ctypes.c_ulong, flags='C_CONTIGUOUS'),  # z (generating matrix)
+            ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # z (generating matrix)
             ctypes.c_uint8] # msb
         # set parameters
         self.sobol_cf.restype = ctypes.c_uint8
@@ -171,6 +178,8 @@ class Sobol(DiscreteDistribution):
             self.set_seed(self.seed)
         n = int(n_max-n_min)
         x = zeros((n,self.dimension), dtype=double)
+        # print(self.get_unsigned_long_size_cf())
+        # print(self.get_unsigned_long_long_size_cf())
         rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
             self.seed, x, self.d_max, self.m_max, self.z, self.msb)
         if rc!= 0:
@@ -186,19 +195,19 @@ class Sobol(DiscreteDistribution):
         """
         if isinstance(seeds,int):
             random.seed(seeds)
-            self.seed = random.randint(0, (2**32)-1, size=self.dimension, dtype=uint32)
+            self.seed = random.randint(0, (2**32), size=self.dimension, dtype=uint64)
         elif isinstance(seeds,list) or isinstance(seeds,ndarray):
             seeds = array(seeds)
             l = len(seeds)
             if l == self.dimension:
                 self.seed = seeds
             elif l < self.dimension:
-                self.seed = hstack((seeds,random.randint(0,(2**32)-1, size=self.dimension-l, dtype=uint32)))
+                self.seed = hstack((seeds,random.randint(0,(2**32), size=self.dimension-l, dtype=uint64)))
             else: # l > self.dimension
                 self.seed = seeds[:self.dimension]
         elif seeds==None: # assume seed==None
             random.seed(None)
-            self.seed = random.randint(0,(2**32)-1,size=self.dimension, dtype=uint32)
+            self.seed = random.randint(0,(2**32),size=self.dimension, dtype=uint64)
         else:
             msg = "Sobol' seed must be an int, list of ints, or None."
             raise ParameterError(msg)

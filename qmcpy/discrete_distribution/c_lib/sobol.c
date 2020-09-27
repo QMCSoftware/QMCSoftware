@@ -4,10 +4,19 @@
 #include <string.h>
 #include <math.h>
 #include "MRG63k3a.h"
+EXPORT int get_unsigned_long_size()
+{
+    return sizeof(unsigned long);
+}
 
-__declspec(dllexport) int __cdecl sobol(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0,
-unsigned int randomize, unsigned int graycode, unsigned long *seeds, double *x, unsigned int d_max,
-unsigned int m_max, unsigned long *z, unsigned int msb){
+EXPORT int get_unsigned_long_long_size()
+{
+    return sizeof(unsigned long long);
+}
+
+EXPORT int sobol(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0,
+unsigned int randomize, unsigned int graycode, unsigned long long *seeds, double *x, unsigned int d_max,
+unsigned int m_max, unsigned long long *z, unsigned int msb){
     /*
     Custom Sobol' Generator by alegresor
 
@@ -64,23 +73,23 @@ unsigned int m_max, unsigned long *z, unsigned int msb){
         /* too many samples or dimensions */
         return(3);}
     /* variables */
-    int j, m, k, k1, k2, s;
-    unsigned long i, im, u, rshift, xc, xr, z1, b;
+    unsigned int j, m, k, k1, k2, s;
+    unsigned long long i, im, u, rshift, xc, xr, z1, b;
     double scale = ldexp(1,-1*m_max);
-    unsigned long *sm = (unsigned long *) calloc(m_max, sizeof(unsigned long)); /* scramble matrix */
-    unsigned long *zcp = (unsigned long *) calloc(m_max, sizeof(unsigned long));
+    unsigned long long *sm = (unsigned long long *) calloc(m_max, sizeof(unsigned long long)); /* scramble matrix */
+    unsigned long long *zcp = (unsigned long long *) calloc(m_max, sizeof(unsigned long long));
     /* generate points */
     for(j=0;j<d;j++){
     	seed_MRG63k3a(seeds[j]); /* seed the IID RNG */
         /* LMS */
         if(randomize==1){
-            memset(sm,0,m_max*sizeof(unsigned long));
+            memset(sm,0,m_max*sizeof(unsigned long long));
             /* initialize the scrambling matrix */
             for(k=1;k<m_max;k++){
-                u = (unsigned long) (MRG63k3a() * (((unsigned long) 1) << k)); /* get random int between 0 and 2^k */
+                u = (unsigned long long) (MRG63k3a() * (((unsigned long long) 1) << k)); /* get random int between 0 and 2^k */
                 sm[k] = u << (m_max-k);} /* shift bits to the left to make lower triangular matrix */
             for(k=0;k<m_max;k++){
-                sm[k] |= ((unsigned long) 1) << (m_max-1-k);}
+                sm[k] |= ((unsigned long ) 1) << (m_max-1-k);}
             /* left multiply scrambling matrix to directional numbers */
             for(k=0;k<m_max;k++){
                 z1 = 0;
@@ -92,13 +101,13 @@ unsigned int m_max, unsigned long *z, unsigned int msb){
                         s += (b>>k2)&1;}
                     s %= 2;
                     if(s&&msb){
-                        z1 |= ((unsigned long) 1) << (m_max-1-k1);} /* restore (MSB) order */
+                        z1 |= ((unsigned long long) 1) << (m_max-1-k1);} /* restore (MSB) order */
                     if(s&&(!msb)){
-                        z1 |= ((unsigned long) 1) << k1;}} /* restore (LSB) order */
+                        z1 |= ((unsigned long long) 1) << k1;}} /* restore (LSB) order */
                 zcp[k] = z1;}}
         /* initialize DS (will also be applied to LMS) */
         if((randomize==1) || (randomize==2)){
-            rshift = (unsigned long) (MRG63k3a()*ldexp(1,m_max));}
+            rshift = (unsigned long long) (MRG63k3a()*ldexp(1,m_max));}
         /* copy generating matrix */
         if((randomize==0) || (randomize==2)){
             for(k=0;k<m_max;k++){
