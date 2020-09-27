@@ -28,7 +28,7 @@ References:
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */
-EXPORT void korobov_qrng(int n, int d, int *generator, int randomize, double *res, long seed)
+EXPORT void korobov_qrng(int n, int d, int *generator, int randomize, double *res, long long seed)
 {
 	int i, j, ij;
 	double U;

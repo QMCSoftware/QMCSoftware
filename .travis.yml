@@ -16,7 +16,40 @@ notifications:
 
 matrix:
   include:
-    - name: "Python 3.8.0 on Windows"
+    - name: "Python 3.7 on Xenial Linux"
+      os: linux
+      env:
+        - PYTHON_VERSION="3.7"
+        - MINICONDAPATH="http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+      before_install:
+        - export MINICONDA=$HOME/miniconda
+        - export PATH="$MINICONDA/bin:$PATH"
+        - hash -r
+        - wget $MINICONDAPATH -O miniconda.sh
+        - bash miniconda.sh -b -f -p $MINICONDA
+    - name: "Python 3.6 on Xenial Linux"
+      os: linux
+      env:
+        - PYTHON_VERSION="3.6"
+        - MINICONDAPATH="http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+      before_install:
+        - export MINICONDA=$HOME/miniconda
+        - export PATH="$MINICONDA/bin:$PATH"
+        - hash -r
+        - wget $MINICONDAPATH -O miniconda.sh
+        - bash miniconda.sh -b -f -p $MINICONDA
+    - name: "Python 3.7 on macOS"
+      os: osx
+      env:
+        - PYTHON_VERSION="3.7"
+        - MINICONDAPATH="http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
+      before_install:
+        - export MINICONDA=$HOME/miniconda
+        - export PATH="$MINICONDA/bin:$PATH"
+        - hash -r
+        - wget $MINICONDAPATH -O miniconda.sh
+        - bash miniconda.sh -b -f -p $MINICONDA
+    - name: "Python 3.7.0 on Windows"
       os: windows           # Windows 10.0.17134 N/A Build 17134
       language: shell       # 'language: python' is an error on Travis CI Windows
       before_install:
@@ -25,6 +58,11 @@ matrix:
         - choco install miniconda3 # --params="'/AddToPath:1'" -y
         # - python -m pip install --upgrade pip
         # - setx path "%path%;C:\tools\miniconda3\bin"
+        # C:\tools\miniconda3;C:\tools\miniconda3\Library\mingw-w64\bin;
+        # C:\tools\miniconda3\Library\usr\bin;C:\tools\miniconda3\Library\bin;C:\tools\miniconda3\Scripts;
+        # - chmod +x /c/tools/miniconda3/python.exe
+        # - chmod +x /c/tools/miniconda3/condabin/conda.bat
+        # - chmod +x /c/tools/miniconda3/condabin/activate.bat
         - env
         - pwd
         - ls -lrt
@@ -43,7 +81,6 @@ matrix:
       env:
         - PYTHON_VERSION=3.7
         - MINICONDAPATH="https://repo.anaconda.com/miniconda/Miniconda2-latest-Windows-x86_64.exe
-        # - PATH=/c/Python38:/c/Python38/Scripts:$PATH
 
 env:
   global:
@@ -54,34 +91,24 @@ env:
 
 install:
 # Here we download miniconda and install the dependencies
-# C:\tools\miniconda3;C:\tools\miniconda3\Library\mingw-w64\bin;
-# C:\tools\miniconda3\Library\usr\bin;C:\tools\miniconda3\Library\bin;C:\tools\miniconda3\Scripts;
-# - chmod +x /c/tools/miniconda3/python.exe
-# - chmod +x /c/tools/miniconda3/condabin/conda.bat
-# - chmod +x /c/tools/miniconda3/condabin/activate.bat
-# - conda
-# - wget $MINICONDAPATH -O miniconda.sh
-# - bash miniconda.sh -b -f -p $MINICONDA
 - conda config --set always_yes yes
 - conda update conda
 - conda info -a
 - conda create -n testenv python=$PYTHON_VERSION
 - source activate testenv
 - python -m pip install --upgrade pip
-# - python.exe --version
-# - conda install pytest
-# - conda install numpy
+- python --version
 - conda install pytorch torchvision cpuonly -c pytorch
 - python -m pip install --quiet --use-feature=2020-resolver -r requirements/dev.txt
+- conda install numpy
 - python -m pip install codecov
 - python -m pip install -e .
 - ls -lrt qmcpy/discrete_distribution/c_lib/
 
 script:
-- coverage run --source=./ -m unittest discover -s test/longtests
-- coverage run --append --source=./ -m unittest discover -s test/fasttests
-- cd qmcpy && pytest --doctest-modules --disable-pytest-warnings
-
+- pytest --doctest-modules --disable-pytest-warnings qmcpy
+- coverage run --source=./ -m unittest discover -s test/fasttests
+- coverage run --append --source=./ -m unittest discover -s test/longtests
 
 after_success:
 - codecov

@@ -21,7 +21,7 @@ class HaltonOwen(object):
             ctypes.c_int, # d0
             ctypes.c_int, # randomize
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # result array 
-            ctypes.c_long]  # seed
+            ctypes.c_uint64]  # seed
         self.halton_owen_cf.restype = None
         self.g = generalize
         if not self.g:

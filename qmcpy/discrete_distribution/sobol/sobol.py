@@ -178,8 +178,6 @@ class Sobol(DiscreteDistribution):
             self.set_seed(self.seed)
         n = int(n_max-n_min)
         x = zeros((n,self.dimension), dtype=double)
-        # print(self.get_unsigned_long_size_cf())
-        # print(self.get_unsigned_long_long_size_cf())
         rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
             self.seed, x, self.d_max, self.m_max, self.z, self.msb)
         if rc!= 0:
@@ -193,21 +191,21 @@ class Sobol(DiscreteDistribution):
         Args:
             seeds (int/list/None): new seeds
         """
-        if isinstance(seeds,int):
+        if isinstance(seeds,int) or isinstance(seeds,uint32) or isinstance(seeds,uint64):
             random.seed(seeds)
-            self.seed = random.randint(0, (2**32), size=self.dimension, dtype=uint64)
+            self.seed = random.randint(0, 2**32, size=self.dimension, dtype=uint64)
         elif isinstance(seeds,list) or isinstance(seeds,ndarray):
             seeds = array(seeds)
             l = len(seeds)
             if l == self.dimension:
                 self.seed = seeds
             elif l < self.dimension:
-                self.seed = hstack((seeds,random.randint(0,(2**32), size=self.dimension-l, dtype=uint64)))
+                self.seed = hstack((seeds,random.randint(0,2**32, size=self.dimension-l, dtype=uint64)))
             else: # l > self.dimension
                 self.seed = seeds[:self.dimension]
         elif seeds==None: # assume seed==None
             random.seed(None)
-            self.seed = random.randint(0,(2**32),size=self.dimension, dtype=uint64)
+            self.seed = random.randint(0,2**32,size=self.dimension, dtype=uint64)
         else:
             msg = "Sobol' seed must be an int, list of ints, or None."
             raise ParameterError(msg)

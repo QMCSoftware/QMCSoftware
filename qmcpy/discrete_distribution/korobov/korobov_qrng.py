@@ -23,7 +23,7 @@ class KorobovQRNG(object):
             ctypeslib.ndpointer(ctypes.c_int, flags='C_CONTIGUOUS'),  # generator
             ctypes.c_int,  # randomize
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # result array 
-            ctypes.c_long]  # seed
+            ctypes.c_uint64]  # seed
         self.korobov_qrng_cf.restype = None
         self.g_og = array(generator, dtype=int32)
         self.r = randomize

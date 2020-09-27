@@ -29,6 +29,8 @@ class BrownianMotion(TrueMeasure):
         time_vector     [0.25 0.5  0.75 1.  ]
         drift           1
         assembly_type   pca
+    >>> dd.seed
+    array([327741615, 976413892], dtype=uint64)
     >>> bm.gen_samples(n_min=2,n_max=4)
     array([[ 0.315,  0.708,  1.278,  2.092],
            [ 0.293,  0.562,  0.857, -0.073]])

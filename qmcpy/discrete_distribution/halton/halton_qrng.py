@@ -21,7 +21,7 @@ class HaltonQRNG(object):
             ctypes.c_int,  # d
             ctypes.c_int,  # generalized
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # res
-            ctypes.c_long]  # seed
+            ctypes.c_uint64]  # seed
         self.halton_qrng_cf.restype = None
         self.g = generalize
         self.r = randomize

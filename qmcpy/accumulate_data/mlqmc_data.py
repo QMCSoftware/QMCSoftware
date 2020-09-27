@@ -41,7 +41,7 @@ class MLQMCData(AccumulateData):
         self.n_total = 0
         # get seeds for each replication
         random.seed(self.distribution.seed)
-        self.seeds = random.randint(0,1000000,(self.levels,int(self.replications)))
+        self.seeds = random.randint(0,1000000,(self.levels,int(self.replications)),dtype=uint64)
         super(MLQMCData,self).__init__()
 
     def update_data(self):
@@ -80,4 +80,4 @@ class MLQMCData(AccumulateData):
         self.mean_level = hstack((self.mean_level,0))
         self.var_level = hstack((self.var_level,inf))
         self.cost_level = hstack((self.cost_level,inf))
-        self.seeds = vstack((self.seeds,random.randint(0,1000000,int(self.replications))))
+        self.seeds = vstack((self.seeds,random.randint(0,1000000,int(self.replications),dtype=uint64)))
