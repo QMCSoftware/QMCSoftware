@@ -89,7 +89,7 @@ static int permTN2[ghaltonMaxDim] =
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */
-EXPORT void halton_qrng(int n, int d, int generalized, double *res, long long seed)
+EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, long long seed)
 {
         static int perm[ghaltonMaxDim];
         int base, i, j, k, l, maxindex, f, start;
