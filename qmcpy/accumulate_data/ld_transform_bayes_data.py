@@ -4,6 +4,7 @@ from ..util import MaxSamplesWarning
 from numpy import array, nan
 import warnings
 import numpy as np
+from sympy import fwht
 
 
 class LDTransformBayesData(AccumulateData):
@@ -27,6 +28,7 @@ class LDTransformBayesData(AccumulateData):
         self.integrand = integrand
         self.measure = self.integrand.measure
         self.distribution = self.measure.distribution
+        self.distribution_name = type(self.distribution).__name__
         self.dim = stopping_criterion.dim
 
         # Set Attributes
@@ -45,7 +47,13 @@ class LDTransformBayesData(AccumulateData):
         self.xpts_ = array([])  # shifted lattice points
         self.xun_ = array([])  # un-shifted lattice points
         self.ftilde_ = array([])  # fourier transformed integrand values
-        self.ff = self.integrand.period_transform(stopping_criterion.ptransform)  # integrand after the periodization transform
+        if self.distribution_name == 'Lattice':
+            # self.ff = do_period_transform(self.integrand.f,
+            #                                stopping_criterion.ptransform)  # integrand after the periodization transform
+            self.ff = self.integrand.period_transform(
+                stopping_criterion.ptransform)  # integrand after the periodization transform
+        else:
+            self.ff = self.integrand.f
 
         super(LDTransformBayesData, self).__init__()
 
@@ -84,8 +92,14 @@ class LDTransformBayesData(AccumulateData):
 
             xpts_,xun_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False, return_unrandomized=True)
 
-            # Compute initial FFT
-            ftilde_ = np.fft.fft(self.ff(xpts_))  # evaluate integrand's fft
+            # xun_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False)
+            if self.distribution_name == 'Lattice':
+                # xpts_ = self.distribution.apply_randomization(xun_)
+                # Compute initial FFT
+                ftilde_ = np.fft.fft(self.ff(xpts_))  # evaluate integrand's fft
+            else:
+                # xpts_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False, enable_randomize=False)
+                ftilde_ = fwht(self.ff(xpts_))
             ftilde_ = ftilde_.reshape((n, 1))
         else:
             # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
@@ -94,6 +108,13 @@ class LDTransformBayesData(AccumulateData):
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
 
             xnew,xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True)
+            # xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n)
+            if self.distribution_name == 'Lattice':
+                # xnew = self.distribution.apply_randomization(xunnew)
+                pass
+            else:
+                # xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n, enable_randomize=False)
+                pass
 
             [xun_, xpts_] = self.merge_pts(xun, xunnew, xpts, xnew, n, self.dim)
             mnext = m - 1
@@ -109,7 +130,7 @@ class LDTransformBayesData(AccumulateData):
 
         return ftilde_, xun_, xpts_
 
-    # using FFT butefly plot technique merges two halves of fft
+    # using FFT butterfly plot technique merges two halves of fft
     @staticmethod
     def merge_fft(ftilde_new, ftilde_next_new, mnext):
         ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
@@ -126,7 +147,7 @@ class LDTransformBayesData(AccumulateData):
     # inserts newly generated points with the old set by interleaving them
     # xun - unshifted points
     @staticmethod
-    def merge_pts(xun, xunnew, x, xnew, n, d):
+    def merge_pts(xun, xunnew, x, xnew, n, d, distribution):
         temp = np.zeros((n, d))
         temp[0::2, :] = xun
         temp[1::2, :] = xunnew
