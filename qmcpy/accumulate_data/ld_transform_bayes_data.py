@@ -1,5 +1,4 @@
 from ._accumulate_data import AccumulateData
-from ..integrand import do_period_transform
 from ..util import MaxSamplesWarning
 
 from numpy import array, nan
@@ -46,8 +45,7 @@ class LDTransformBayesData(AccumulateData):
         self.xpts_ = array([])  # shifted lattice points
         self.xun_ = array([])  # un-shifted lattice points
         self.ftilde_ = array([])  # fourier transformed integrand values
-        self.ff = do_period_transform(self.integrand.f,
-                                           stopping_criterion.ptransform)  # integrand after the periodization transform
+        self.ff = self.integrand.period_transform(stopping_criterion.ptransform)  # integrand after the periodization transform
 
         super(LDTransformBayesData, self).__init__()
 
