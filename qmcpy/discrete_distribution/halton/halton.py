@@ -1,8 +1,8 @@
 from .._discrete_distribution import DiscreteDistribution
-from .halton_owen import HaltonOwen
-from .halton_qrng import HaltonQRNG
 from ...util import ParameterError
-from numpy import random
+from numpy import *
+from ..c_lib import c_lib
+import ctypes
 
 
 class Halton(DiscreteDistribution):
@@ -11,14 +11,14 @@ class Halton(DiscreteDistribution):
 
     >>> h = Halton(2,seed=7)
     >>> h.gen_samples(1)
-    array([[0.218, 0.931]])
+    array([[0.166, 0.363]])
     >>> h.gen_samples(1)
-    array([[0.218, 0.931]])
+    array([[0.166, 0.363]])
     >>> h.set_dimension(4)
     >>> h.set_seed(8)
     >>> h.gen_samples(2)
-    array([[0.895, 0.172, 0.048, 0.66 ],
-           [0.395, 0.838, 0.448, 0.231]])
+    array([[0.323, 0.148, 0.623, 0.913],
+           [0.823, 0.482, 0.223, 0.342]])
     >>> h
     Halton (DiscreteDistribution Object)
         dimension       2^(2)
@@ -26,7 +26,6 @@ class Halton(DiscreteDistribution):
         randomize       1
         seed            2^(3)
         mimics          StdUniform
-        backend         OWEN
     
     References:
 
@@ -38,29 +37,66 @@ class Halton(DiscreteDistribution):
         [2] Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
     """
 
-    parameters = ['dimension','generalize','randomize','seed','mimics','backend']
+    parameters = ['dimension','generalize','randomize','seed','mimics']
 
-    def __init__(self, dimension=1, generalize=True, randomize=True, seed=None, backend='Owen'):
+    def __init__(self, dimension=1, generalize=True, randomize=True, seed=None):
         """
         Args:
             dimension (int): dimension of samples
             generalize (bool): generalize the Halton sequence?
-            randomize (bool): randomize the sequence
-            backend (str): Backend generator. Must be "QRNG" or "Owen". 
-                "QRNG" backend supports both plain and generalized Halton with randomization and generally provides better accuracy. 
-                "Owen" only supports generalized Halton but allows for n_min!=0 in 'gen_samples' method.
+            randomize (bool/str): If False, does not randomize Halton points. 
+                If True, will use 'QRNG' randomization as in [1]. Supports max dimension 360. 
+                You can also set radnomize='QRNG' or randomize='Halton' to explicitly select a randomization method. 
+                Halton OWEN supports up to 1000 dimensions.
             seed (int): seed the random number generator for reproducibility
         
         Note:
             See References [1] and [2] for specific randomization methods and differences. 
         """
-        self.backend = backend.upper()
-        backend_objs = {'OWEN':HaltonOwen,'QRNG':HaltonQRNG}
-        backends = list(backend_objs.keys())
-        if self.backend not in backends:
-            raise ParameterError('Halton requires backend be in %s'%(str(backends)))
-        self.generator = backend_objs[self.backend](dimension,generalize,randomize,seed)
-        self.dimension, self.generalize, self.randomize, self.seed = self.generator.get_params()
+        if isinstance(randomize,bool):
+            self.backend = 'QRNG' if randomize else 'OWEN'
+            self.randomize = randomize
+        elif isinstance(randomize,str):
+            self.backend = randomize.upper()
+            self.randomize = True
+        else:
+            s = "Halton randomize must be True/False or 'QRNG'/'Owen'"
+            raise ParameterError(s)
+        self.generalize = generalize
+        if self.generalize==False and self.backend=='OWEN':
+            raise ParameterError("Owen halton Must be genralized")
+        if self.backend=='QRNG':
+            self.halton_cf = c_lib.halton_qrng
+            self.halton_cf.argtypes = [
+                ctypes.c_int,  # n
+                ctypes.c_int,  # d
+                ctypes.c_int, # n0
+                ctypes.c_int,  # generalized
+                ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # res
+                ctypes.c_long]  # seed
+            self.halton_cf.restype = None
+            self.g = generalize
+            self.r = randomize
+            self.d_lim = 360
+        elif self.backend=='OWEN':
+            self.halton_cf = c_lib.halton_owen
+            self.halton_cf.argtypes = [
+                ctypes.c_int,  # n
+                ctypes.c_int,  # d
+                ctypes.c_int, # n0
+                ctypes.c_int, # d0
+                ctypes.c_int, # randomize
+                ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # result array 
+                ctypes.c_long]  # seed
+            self.halton_cf.restype = None
+            self.r = randomize
+            self.d_lim = 1000
+        else:
+            s = "Halton randomize must be True/False or 'QRNG'/'Owen'"
+            raise ParameterError(s)
+        self.n_lim = 2**32
+        self.set_dimension(dimension)
+        self.set_seed(seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Halton,self).__init__()
@@ -81,13 +117,28 @@ class Halton(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
-        x = self.generator.gen_samples(n_min,n_max,warn)
-        return x
+        if n_max > self.n_lim:
+            raise ParameterWarning("Halton requires n_max <= 2^32.")
+        n = int(n_max-n_min)
+        if self.backend=='QRNG':
+            x = zeros((self.dimension, n), dtype=double)
+            self.halton_cf(n, self.dimension, int(n_min), self.generalize, x, self.seed)
+            return x.T
+        elif self.backend=='OWEN':
+            x = zeros((n,self.dimension), dtype=double)
+            self.halton_cf(n, self.dimension, int(n_min), 0, self.randomize, x, self.seed)
+            return x
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = self.generator.set_seed(seed)
+        self.seed = seed if seed else random.randint(2**32)
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.dimension = self.generator.set_dimension(dimension)
+        self.dimension = dimension
+        if self.dimension > self.d_lim:
+            s = '''
+                Halton with randomize='QRNG' backend supports dimension <= 360.
+                Halton with randomize='OWEN' backend supports dimension <= 1000. 
+                '''
+            raise ParameterError(s)        

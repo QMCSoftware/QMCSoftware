@@ -142,34 +142,25 @@ class TestHalton(unittest.TestCase):
         self.assertEqual(distribution.mimics, "StdUniform")
     
     def test_gen_samples(self):
-        distribution = Halton(dimension=3, generalize=True, seed=7)
-        x = distribution.gen_samples(4)
-        self.assertTrue(x.shape==(4,3))
-        distribution.set_dimension(4)
-        x = distribution.gen_samples(2)
-        self.assertTrue(x.shape==(2,4))
-        distribution = Halton(dimension=3, generalize=True, backend='Owen')
-        x = distribution.gen_samples(4)
-        self.assertTrue(x.shape==(4,3))
-        distribution.set_dimension(4)
-        x = distribution.gen_samples(3)
-        self.assertTrue(x.shape==(3,4))
-        x2 = distribution.gen_samples(n_min=1,n_max=3)
-        self.assertTrue(x2.shape==(2,4))
-        self.assertTrue((x2==x[1:]).all())
+        for randomize in ['QRNG','OWEN']:
+            distribution = Halton(dimension=2, randomize=randomize, generalize=True)
+            x = distribution.gen_samples(8)
+            self.assertTrue(x.shape==(8,2))
+            distribution.set_dimension(3)
+            x2 = distribution.gen_samples(n_min=4,n_max=8)
+            self.assertTrue(x2.shape==(4,3))
+            self.assertTrue((x[4:,:]==x2[:,:2]).all())
+        x_ur = Halton(dimension=2, randomize=False).gen_samples(4)
         x_true = array([
             [0,     0],
             [1./2,  1./3],
             [1./4,  2./3],
             [3./4,  1./9]])
-        x = Halton(2,randomize=False,backend='Owen',generalize=True).gen_samples(4)
-        self.assertTrue((x==x_true).all())
+        self.assertTrue((x_ur==x_true).all())
     
     def test_warnings_errors(self):
-        self.assertRaises(ParameterError,Halton,2,generalize=False,backend='Owen')
-        self.assertRaises(ParameterError,Halton,2,randomize=False,generalize=False,backend='QRNG')
-        distribution = Halton(2, generalize=True, backend='QRNG',seed=7)
-        self.assertRaises(ParameterError,distribution.gen_samples,n_min=2,n_max=4)
+        self.assertRaises(ParameterError,Halton,2,randomize='Owen',generalize=False)
+        self.assertRaises(ParameterError,Halton,400,randomize='QRNG')
 
 class TestKorobov(unittest.TestCase):
     """ Unit test for Korobov DiscreteDistribution. """

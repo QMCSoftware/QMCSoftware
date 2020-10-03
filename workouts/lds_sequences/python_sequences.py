@@ -24,8 +24,8 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
         Lattice(dimension, randomize=True, order='linear', seed=7),
         Lattice(dimension, randomize=True, order='MPS', seed=7),
         Sobol(dimension, randomize=True, seed=7, graycode=True),
-        Halton(dimension, generalize=True, backend='QRNG', seed=7),
-        Halton(dimension, generalize=True, backend='Owen', seed=7),
+        Halton(dimension, generalize=True, randomize='QRNG', seed=7),
+        Halton(dimension, generalize=True, randomize='Owen', seed=7),
         Korobov(dimension, generator=[1], randomize=True)]
     df = DataFrame(columns=columns, dtype=float)
     for i, m in enumerate(powers_2):

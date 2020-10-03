@@ -74,7 +74,7 @@ class Sobol(DiscreteDistribution):
         Construction and Comparison of High-Dimensional Sobol' Generators. Wilmott. 
         2011. 10.1002/wilm.10056. 
 
-        [8] [1] Paul Bratley and Bennett L. Fox. 1988. 
+        [8] Paul Bratley and Bennett L. Fox. 1988. 
         Algorithm 659: Implementing Sobol's quasirandom sequence generator. 
         ACM Trans. Math. Softw. 14, 1 (March 1988), 88–100. 
         DOI:https://doi.org/10.1145/42288.214372
@@ -82,7 +82,7 @@ class Sobol(DiscreteDistribution):
     
     parameters = ['dimension','randomize','graycode','seed','mimics','dim0']
 
-    def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path=None, dim0=0, backend='QMCPy'):
+    def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path=None, dim0=0):
         """
         Args:
             dimension (int): dimension of samples
