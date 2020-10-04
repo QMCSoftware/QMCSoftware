@@ -48,8 +48,6 @@ class LDTransformBayesData(AccumulateData):
         self.xun_ = array([])  # un-shifted lattice points
         self.ftilde_ = array([])  # fourier transformed integrand values
         if self.distribution_name == 'Lattice':
-            # self.ff = do_period_transform(self.integrand.f,
-            #                                stopping_criterion.ptransform)  # integrand after the periodization transform
             self.ff = self.integrand.period_transform(
                 stopping_criterion.ptransform)  # integrand after the periodization transform
         else:
@@ -62,7 +60,7 @@ class LDTransformBayesData(AccumulateData):
         # Generate sample values
 
         if self.iter < len(self.mvec):
-            self.ftilde_, self.xun_, self.xpts_ = self.iter_fft(self.iter, self.xun_, self.xpts_, self.ftilde_)
+            self.ftilde_, self.xun_, self.xpts_ = self.iter_fbt(self.iter, self.xun_, self.xpts_, self.ftilde_)
 
             self.m = self.mvec[self.iter]
             self.iter += 1
@@ -75,31 +73,25 @@ class LDTransformBayesData(AccumulateData):
 
         return self.xun_, self.ftilde_, self.m
 
-    # Efficient FFT computation algorithm, avoids recomputing the full fft
-    def iter_fft(self, iter, xun, xpts, ftilde_prev):
+    # Efficient Fast Bayesian Transform computation algorithm, avoids recomputing the full transform
+    def iter_fbt(self, iter, xun, xpts, ftilde_prev):
         m = self.mvec[iter]
         n = 2 ** m
 
         # In every iteration except the first one, "n" number_of_points is doubled,
-        # but FFT is only computed for the newly added points.
+        # but FBT is only computed for the newly added points.
         # Previously computed FFT is reused.
         if iter == 0:
-            # In the first iteration compute full FFT
+            # In the first iteration compute full FBT
             # xun_ = mod(bsxfun( @ times, (0:1 / n:1-1 / n)',self.gen_vec),1)
             # xun_ = np.arange(0, 1, 1 / n).reshape((n, 1))
             # xun_ = np.mod((xun_ * self.gen_vec), 1)
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
 
-            xpts_,xun_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False, return_unrandomized=True)
+            xpts_,xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True, distribution=self.distribution)
 
-            # xun_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False)
-            if self.distribution_name == 'Lattice':
-                # xpts_ = self.distribution.apply_randomization(xun_)
-                # Compute initial FFT
-                ftilde_ = np.fft.fft(self.ff(xpts_))  # evaluate integrand's fft
-            else:
-                # xpts_ = self.distribution.gen_samples(n_min=0, n_max=n, warn=False, enable_randomize=False)
-                ftilde_ = fwht(self.ff(xpts_))
+            # Compute initial FBT
+            ftilde_ = self.compute_fbt(self.ff(xpts_), distribution=self.distribution_name)
             ftilde_ = ftilde_.reshape((n, 1))
         else:
             # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
@@ -107,55 +99,77 @@ class LDTransformBayesData(AccumulateData):
             # xunnew = np.mod(xunnew * self.gen_vec, 1)
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
 
-            xnew,xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True)
-            # xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n)
-            if self.distribution_name == 'Lattice':
-                # xnew = self.distribution.apply_randomization(xunnew)
-                pass
-            else:
-                # xunnew = self.distribution.gen_samples(n_min=n // 2, n_max=n, enable_randomize=False)
-                pass
+            xnew, xunnew = self.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True, distribution=self.distribution)
 
-            [xun_, xpts_] = self.merge_pts(xun, xunnew, xpts, xnew, n, self.dim)
+            [xun_, xpts_] = self.merge_pts(xun, xunnew, xpts, xnew, n, self.dim, distribution=self.distribution_name)
             mnext = m - 1
 
-            # Compute FFT on next set of new points
-            ftilde_next_new = np.fft.fft(self.ff(xnew))
+            ftilde_next_new = self.compute_fbt(self.ff(xnew), distribution=self.distribution_name)
             ftilde_next_new = ftilde_next_new.reshape((n // 2, 1))
             if self.debugEnable:
                 self.alert_msg(ftilde_next_new, 'Nan', 'Inf')
 
-            # combine the previous batch and new batch to get FFT on all points
-            ftilde_ = self.merge_fft(ftilde_prev, ftilde_next_new, mnext)
+            # combine the previous batch and new batch to get FBT on all points
+            ftilde_ = self.merge_fbt(ftilde_prev, ftilde_next_new, mnext, distribution=self.distribution_name)
 
         return ftilde_, xun_, xpts_
 
-    # using FFT butterfly plot technique merges two halves of fft
     @staticmethod
-    def merge_fft(ftilde_new, ftilde_next_new, mnext):
-        ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
-        nl = 2 ** mnext
-        ptind = np.ndarray(shape=(2 * nl, 1), buffer=np.array([True] * nl + [False] * nl), dtype=bool)
-        coef = np.exp(-2 * np.pi * 1j * np.ndarray(shape=(nl, 1), buffer=np.arange(0, nl), dtype=int) / (2 * nl))
-        coefv = np.tile(coef, (1, 1))
-        evenval = ftilde_new[ptind].reshape((nl, 1))
-        oddval = ftilde_new[~ptind].reshape((nl, 1))
-        ftilde_new[ptind] = np.squeeze(evenval + coefv * oddval)
-        ftilde_new[~ptind] = np.squeeze(evenval - coefv * oddval)
+    def gen_samples(n_min, n_max, return_unrandomized, distribution):
+        warn = False if n_min == 0 else True
+        if type(distribution).__name__ == 'Lattice':
+            xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn, return_unrandomized=return_unrandomized)
+        else:
+            xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn, return_jlms=return_unrandomized)
+        return xpts_, xun_
+
+    @staticmethod
+    def compute_fbt(y, distribution='Lattice'):
+        if distribution == 'Lattice':
+            ytilde = np.fft.fft(y)
+        else:
+            ytilde = np.array(fwht(y), dtype=np.float)
+            ytilde_ = LDTransformBayesData.FWHT(y)
+        return ytilde
+
+    @staticmethod
+    def merge_fbt(ftilde_new, ftilde_next_new, mnext, distribution='Lattice'):
+        if distribution == 'Lattice':
+            # using FFT butterfly plot technique merges two halves of fft
+            ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
+            nl = 2 ** mnext
+            ptind = np.ndarray(shape=(2 * nl, 1), buffer=np.array([True] * nl + [False] * nl), dtype=bool)
+            coef = np.exp(-2 * np.pi * 1j * np.ndarray(shape=(nl, 1), buffer=np.arange(0, nl), dtype=int) / (2 * nl))
+            coefv = np.tile(coef, (1, 1))
+            evenval = ftilde_new[ptind].reshape((nl, 1))
+            oddval = ftilde_new[~ptind].reshape((nl, 1))
+            ftilde_new[ptind] = np.squeeze(evenval + coefv * oddval)
+            ftilde_new[~ptind] = np.squeeze(evenval - coefv * oddval)
+        else:
+            # fwht
+            # ftilde_new = [(ftilde+ftilde_next_new)/2; (ftilde-ftilde_next_new)/2];
+            # unlike Matlab, scipy does not normalize the fwht, no need to divide by 2
+            ftilde_new = np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
         return ftilde_new
 
     # inserts newly generated points with the old set by interleaving them
     # xun - unshifted points
     @staticmethod
     def merge_pts(xun, xunnew, x, xnew, n, d, distribution):
-        temp = np.zeros((n, d))
-        temp[0::2, :] = xun
-        temp[1::2, :] = xunnew
-        xun = temp
-        temp = np.zeros((n, d))
-        temp[0::2, :] = x
-        temp[1::2, :] = xnew
-        x = temp
+        if distribution == 'Lattice':
+            temp = np.zeros((n, d))
+            temp[0::2, :] = xun
+            temp[1::2, :] = xunnew
+            xun = temp
+            temp = np.zeros((n, d))
+            temp[0::2, :] = x
+            temp[1::2, :] = xnew
+            x = temp
+        else:
+            # xpts = [xpts;xptsnext];
+            # xpts_un = [xpts_un;xptsnext_un];
+            x = np.vstack([x, xnew])
+            xun = np.vstack([xun, xunnew])
         return xun, x
 
     # prints debug message if the given variable is Inf, Nan or complex, etc
@@ -186,3 +200,33 @@ class LDTransformBayesData(AccumulateData):
                         print(f'{inpvarname} has complex values')
                 else:
                     print('unknown type check requested !')
+
+    @staticmethod
+    def FWHT(x):
+        """ Fast Walsh-Hadamard Transform
+        Based on mex function written by Chengbo Li@Rice Uni for his TVAL3 algorithm.
+        His code is according to the K.G. Beauchamp's book -- Applications of Walsh and Related Functions.
+        """
+        x = x.squeeze()
+        N = int(x.size)
+        G = int(N/2) # Number of Groups
+        M = 2 # Number of Members in Each Group
+
+        # First stage
+        y = np.zeros((int(N/2),2))
+        y[:,0] = x[0::2] + x[1::2]
+        y[:,1] = x[0::2] - x[1::2]
+        x = y.copy()
+        # Second and further stage
+        for nStage in range(2,int(np.log2(N))+1):
+            y = np.zeros((int(G/2),M*2))
+            y[0:int(G//2),0:M*2:4] = x[0:G:2,0:M:2] + x[1:G:2,0:M:2]
+            y[0:G//2,1:M*2:4] = x[0:G:2,0:M:2] - x[1:G:2,0:M:2]
+            y[0:G//2,2:M*2:4] = x[0:G:2,1:M:2] - x[1:G:2,1:M:2]
+            y[0:G//2,3:M*2:4] = x[0:G:2,1:M:2] + x[1:G:2,1:M:2]
+            x = y.copy()
+            G = int(G/2)
+            M = M*2
+        x = y[0,:]
+        x = x.reshape((x.size,1))
+        return x/float(N)

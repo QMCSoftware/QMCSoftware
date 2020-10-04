@@ -86,7 +86,7 @@ class Sobol(DiscreteDistribution):
         """
         Args:
             dimension (int): dimension of samples
-            randomize (bool): Apply randomization? True defaults to LMS. Can also explicitly pass in  
+            randomize (bool): Apply randomization? True defaults to LMS. Can also explicitly pass in
                 'LMS': Linear matrix scramble with DS 
                 'DS': Just Digital Shift
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
@@ -159,7 +159,6 @@ class Sobol(DiscreteDistribution):
         super(Sobol,self).__init__()        
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_jlms=False):
-    # def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, enable_randomize=True):
         """
         Generate samples
 
@@ -188,12 +187,6 @@ class Sobol(DiscreteDistribution):
         xjlms = zeros((n,self.dimension), dtype=double)
         rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
             self.seed, x, self.d_max, self.m_max, self.z, self.msb, xjlms, return_jlms)
-        # if enable_randomize:
-        #     rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
-        #     self.seed, x, self.d_max, self.m_max, self.z, self.msb)
-        # else:
-        #     rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, 0, self.graycode, \
-        #     self.seed, x, self.d_max, self.m_max, self.z, self.msb)
         if rc!= 0:
             raise ParameterError(self.errors[rc])
         if self.randomize==1 and return_jlms:

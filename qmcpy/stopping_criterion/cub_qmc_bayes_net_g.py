@@ -3,7 +3,7 @@ from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Sobol
 from ..true_measure import Gaussian
 from ..integrand import Keister
-from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
+from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
 from numpy import sqrt, log2, exp, log
 from math import factorial
 import numpy as np
@@ -12,6 +12,7 @@ from scipy.optimize import fminbound as fminbnd
 from scipy.stats import norm as gaussnorm
 from scipy.stats import t as tnorm
 import warnings
+from sympy import fwht
 
 
 class CubBayesNetG(StoppingCriterion):
@@ -20,20 +21,21 @@ class CubBayesNetG(StoppingCriterion):
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
 
-    >>> k = Keister(Gaussian(Sobol(2, seed=123456789, backend='GAIL'),covariance=1./2))
+    >>> k = Keister(Gaussian(Sobol(2, seed=123456789, randomize='LMS', graycode=False),covariance=1./2))
     >>> sc = CubBayesNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.80818168796735...
+    1.8110...
     >>> data
-    Solution: 1.8082...
+    Solution: 1.8110...
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
         dimension       2^(1)
         randomize       1
-        seed            123456789
+        graycode        0
+        seed            [77469 77107]
         mimics          StdUniform
-        backend         GAIL
+        dim0            0
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -45,8 +47,8 @@ class CubBayesNetG(StoppingCriterion):
         n_max           2^(22)
     LDTransformBayesData (AccumulateData Object)
         n_total         256
-        solution        1.808
-        error_bound     7.36e-04
+        solution        1.811
+        error_bound     0.015
         time_integrate  ...
 
     Adapted from
@@ -96,7 +98,7 @@ class CubBayesNetG(StoppingCriterion):
         self.n_init = n_init  # number of samples to start with = 2^mmin
         self.n_max = n_max  # max number of samples allowed = 2^mmax
         self.alpha = alpha  # p-value, default 0.1%.
-        self.order = 2  # Bernoulli kernel's order. If zero, choose order automatically
+        self.order = 1  # Currently supports only order=1
 
         self.integrand = integrand
         self.dim = integrand.dimension  # dimension of the integrand
@@ -110,7 +112,7 @@ class CubBayesNetG(StoppingCriterion):
         # private properties
         self.full_Bayes = False  # Full Bayes - assumes m and s^2 as hyperparameters
         self.GCV = False  # Generalized cross validation
-        self.kernType = 1  # Type-1: Bernoulli polynomial based algebraic convergence, Type-2: Truncated series
+        self.kernType = 1  # Type-1:
 
         self.avoid_cancel_error = True  # avoid cancellation error in stopping criterion
         self.uncert = 0  # quantile value for the error bound
@@ -133,10 +135,6 @@ class CubBayesNetG(StoppingCriterion):
 
         if distribution.randomize == False:
             raise ParameterError("CubBayesNet_g requires distribution to have randomize=True")
-        # if not distribution.linear:
-        #     raise ParameterError("CubBayesNet_g requires distribution to have linear=True")
-        # if distribution.backend != 'GAIL':
-        #     raise ParameterError("CubBayesNet_g requires distribution to have 'GAIL' backend")
 
     # computes the integral
     def integrate(self):
@@ -303,48 +301,77 @@ class CubBayesNetG(StoppingCriterion):
     Shift invariant kernel
     C1 : first row of the covariance matrix
     Lambda : eigen values of the covariance matrix
-    Lambda_ring = fft(C1 - 1)
+    Lambda_ring = fwht(C1 - 1)
     '''
-
     @staticmethod
     def kernel(xun, order, a, avoid_cancel_error, kern_type, debug_enable):
-        if kern_type == 1:
-            b_order = order * 2  # Bernoulli polynomial order as per the equation
-            const_mult = -(-1) ** (b_order / 2) * ((2 * np.pi) ** b_order) / factorial(b_order)
-            if b_order == 2:
-                bern_poly = lambda x: (-x * (1 - x) + 1 / 6)
-            elif b_order == 4:
-                bern_poly = lambda x: (((x * (1 - x)) ** 2) - 1 / 30)
-            else:
-                print('Error: Bernoulli order not implemented !')
-
-            kernel_func = lambda x: bern_poly(x)
-        else:
-            b = order
-            kernel_func = lambda x: 2 * b * (np.cos(2 * np.pi * x) - b) / (1 + b ** 2 - 2 * b * np.cos(2 * np.pi * x))
-            const_mult = 1
+        kernel_func = CubBayesNetG.BuildKernelFunc(order)
+        const_mult = 1
 
         if avoid_cancel_error:
             # Computes C1m1 = C1 - 1
             # C1_new = 1 + C1m1 indirectly computed in the process
             (vec_C1m1, C1_alt) = CubBayesNetG.kernel_t(a * const_mult, kernel_func(xun))
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda_ring = np.real(np.fft.fft(vec_C1m1))
+            vec_lambda_ring = np.real(np.array(fwht(vec_C1m1), dtype=float))
 
             vec_lambda = vec_lambda_ring.copy()
             vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
-                vec_lambda_direct = np.real(np.fft.fft(C1_alt))  # Note: fft output unnormalized
+                vec_lambda_direct = np.real(np.array(fwht(C1_alt), dtype=float))  # Note: fwht output not normalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
             # direct approach to compute first row of the kernel Gram matrix
             vec_C1 = np.prod(1 + a * const_mult * kernel_func(xun), 2)
-            # matlab's builtin fft is much faster and accurate
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda = np.real(np.fft.fft(vec_C1))
+            vec_lambda = np.real(np.array(fwht(vec_C1), dtype=float))
             vec_lambda_ring = 0
 
         return vec_lambda, vec_lambda_ring
+
+    @staticmethod
+    def fbt(y):
+        ytilde = np.array(fwht(y), dtype=float)
+        return ytilde
+
+    # Builds High order walsh kernel function
+    @staticmethod
+    def BuildKernelFunc(order):
+        # a1 = @(x)(-floor(log2(x)))
+        def a1(x):
+            out = -np.floor(log2(x + np.finfo(float).eps))
+            out[x == 0] = 0  # a1 is zero when x is zero
+            return out
+
+        # t1 = @(x)(2.^(-a1(x)))
+        def t1(x):
+            out = 2**(-a1(x))
+            out[x == 0] = 0  # t1 is zero when x is zero
+            return out
+
+        # t2 = @(x)(2.^(-2*a1(x)))
+        def t2(x):
+            out = (2**(-2 * a1(x)))
+            out[x == 0] = 0  # t2 is zero when x is zero
+            return out
+
+        s1 = lambda x: (1 - 2 * x)
+        s2 =lambda x: (1 / 3 - 2 * (1 - x) * x)
+        ts2 = lambda x: ((1 - 5 * t1(x)) / 2 - (a1(x) - 2) * x)
+        ts3 = lambda x: ((1 - 43 * t2(x)) / 18 + (5 * t1(x) - 1) * x + (a1(x) - 2) * x**2)
+
+        if order == 1:
+            kernFunc = lambda x: (6 * ((1 / 6) - 2**(np.floor(log2(x + np.finfo(float).eps)) - 1)))
+        elif order == 2:
+            omega2_1D =lambda x: (s1(x) + ts2(x))
+            kernFunc = omega2_1D
+        elif order == 3:
+            omega3_1D = lambda x: (s1(x) + s2(x) + ts3(x))
+            kernFunc = omega3_1D
+        else:
+            NotYetImplemented('cubBayesNet_g: kernel order not yet supported')
+
+        return kernFunc

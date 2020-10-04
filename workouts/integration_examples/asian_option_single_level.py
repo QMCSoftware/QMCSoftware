@@ -61,5 +61,12 @@ def asian_option_single_level(
     solution,data = CubBayesLatticeG(integrand,abs_tol=abs_tol,ptransform='Baker').integrate()
     print('%s%s'%(data,bar))
 
+    # CubBayesNetG
+    distribution = Sobol(dimension=dimension, randomize='LMS', graycode=False)
+    measure = BrownianMotion(distribution)
+    integrand = AsianOption(measure, volatility, start_price, strike_price, interest_rate, call_put, mean_type)
+    solution,data = CubBayesNetG(integrand,abs_tol=abs_tol).integrate()
+    print('%s%s'%(data,bar))
+
 if __name__ == "__main__":
     asian_option_single_level(abs_tol=.025)
