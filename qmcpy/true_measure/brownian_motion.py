@@ -19,21 +19,16 @@ class BrownianMotion(TrueMeasure):
         drift           1
         assembly_type   pca
     >>> bm.gen_samples(n_min=4,n_max=8)
-    array([[ 0.541,  0.727],
-           [ 1.408,  2.647],
-           [-0.596, -0.202],
-           [ 1.396,  0.586]])
+    array([[ 0.659,  2.495],
+           [-0.043, -1.098],
+           [ 0.681,  1.121],
+           [ 0.374,  0.99 ]])
     >>> bm.set_dimension(4)
     >>> bm
     BrownianMotion (TrueMeasure Object)
         time_vector     [0.25 0.5  0.75 1.  ]
         drift           1
         assembly_type   pca
-    >>> dd.seed
-    array([327741615, 976413892], dtype=uint64)
-    >>> bm.gen_samples(n_min=2,n_max=4)
-    array([[ 0.315,  0.708,  1.278,  2.092],
-           [ 0.293,  0.562,  0.857, -0.073]])
     """
 
     parameters = ['time_vector','drift','assembly_type']

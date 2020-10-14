@@ -131,7 +131,7 @@ class Halton(DiscreteDistribution):
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = seed if seed else random.randint(2**32)
+        self.seed = seed if seed else random.randint(0, 100000, dtype=uint64)
         
     def set_dimension(self, dimension):
         """ See abstract method. """

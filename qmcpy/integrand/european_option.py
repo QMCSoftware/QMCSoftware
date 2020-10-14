@@ -20,10 +20,10 @@ class EuropeanOption(Integrand):
         start_price     30
         strike_price    35
         interest_rate   0
-    >>> x = dd.gen_samples(2**10)
+    >>> x = dd.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.21420847...
+    9.21...
     """
 
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']

@@ -29,7 +29,7 @@ class MLCallOptions(Integrand):
     ...     sums,cost = mlco.f(x,l=level)
     ...     y += sums[0]/2**10
     >>> y
-    10.385962150617658
+    10.39...
 
     References:
 
