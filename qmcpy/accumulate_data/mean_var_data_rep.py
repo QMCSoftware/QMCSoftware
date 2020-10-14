@@ -36,11 +36,11 @@ class MeanVarDataRep(AccumulateData):
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
         seed = self.distribution.seed
-        if isinstance(seed,int):
+        if isinstance(seed,int) or isinstance(seed, uint64):
             random.seed(seed)
         else:
             random.seed(seed[0])
-        self.seeds = random.randint(0,100000,int(self.replications))
+        self.seeds = random.randint(0,100000,int(self.replications),dtype=uint64)
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):

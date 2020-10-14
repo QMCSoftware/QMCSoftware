@@ -26,7 +26,6 @@ class AsianOption(Integrand):
     >>> y = ac.f(x)
     >>> y.mean()
     1.7631297...
-
     >>> dd2 = Sobol(seed=7)
     >>> m2 = BrownianMotion(dd2,drift=1)
     >>> level_dims = [2,4,8]

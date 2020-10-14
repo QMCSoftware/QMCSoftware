@@ -214,7 +214,7 @@ class Lattice(DiscreteDistribution):
 
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = seed if seed else random.randint(2**32)
+        self.seed = seed if seed else random.randint(2**32, dtype=uint64)
         random.seed(self.seed)
         self.shift = random.rand(int(self.dimension))
         

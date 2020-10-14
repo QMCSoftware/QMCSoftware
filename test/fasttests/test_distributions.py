@@ -5,6 +5,7 @@ from qmcpy.util import *
 from qmcpy.util import ParameterError,ParameterWarning
 from numpy import *
 import sys
+import os
 vinvo = sys.version_info
 if vinvo[0]==3: import unittest
 else: import unittest2 as unittest
@@ -228,6 +229,17 @@ class TestInverseCDFSampling(unittest.TestCase):
         distribution = InverseCDFSampling(Lattice(2),lambda u: u)
         self.assertRaises(DimensionError,distribution.set_dimension,3)   
 
+class TestDataTypes(unittest.TestCase):
+    def test_size_unisgned_long(self):
+        distribution = Sobol(dimension=3, randomize=True)
+        if os.name == 'nt':
+            self.assertEqual(distribution.get_unsigned_long_size_cf(), 4)
+        else:
+            self.assertEqual(distribution.get_unsigned_long_size_cf(), 8)
+
+    def test_size_unisgned_long_long(self):
+        distribution = Sobol(dimension=3, randomize=True)
+        self.assertEqual(distribution.get_unsigned_long_long_size_cf(), 8)
 
 if __name__ == "__main__":
     unittest.main()

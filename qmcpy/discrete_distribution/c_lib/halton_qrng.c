@@ -20,6 +20,16 @@ References:
 
 #define ghaltonMaxDim 360
 
+#include <Python.h>
+
+// in Windows, you must define an initialization function for your extension
+// because setuptools will build a .pyd file, not a DLL
+// https://stackoverflow.com/questions/34689210/error-exporting-symbol-when-building-python-c-extension-in-windows
+PyMODINIT_FUNC PyInit_c_lib(void) {
+    // do stuff...
+    printf("");
+}
+
 /* Primes for ghalton() */
 static int primes[ghaltonMaxDim] =
 {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71, 73,79,83,89,97,101,
@@ -79,7 +89,7 @@ static int permTN2[ghaltonMaxDim] =
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */
-void halton_qrng(int n, int d, int n0, int generalized, double *res, long seed)
+EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, long long seed)
 {
         static int perm[ghaltonMaxDim];
         int base, i, j, k, l, maxindex, f, start;
@@ -143,6 +153,7 @@ void halton_qrng(int n, int d, int n0, int generalized, double *res, long seed)
                 }
         }
 }
+
 
 /*
 int main(){

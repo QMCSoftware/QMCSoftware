@@ -7,31 +7,65 @@ sudo: false
 notifications:
   email:
     recipients:
+      - asorokin@hawk.iit.edu
       - schoi32@iit.edu
       - jrathin1@iit.edu
       - qmc-software@googlegroups.com
     on_success: change # default: change
-    on_failure: always # default: always
+    on_failure: change # default: always
 
 
 matrix:
   include:
-    - name: "Python 3.7.0 on Xenial Linux"
+    - name: "Python 3.7 on Xenial Linux"
       os: linux
       env:
-        - PYTHON_VERSION="3.7"
+        - PYTHON_VERSION=3.7
         - MINICONDAPATH="http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-    - name: "Python 3.6.0 on Xenial Linux"
+      before_install:
+        - export MINICONDA=$HOME/miniconda
+        - export PATH="$MINICONDA/bin:$PATH"
+        - hash -r
+        - wget $MINICONDAPATH -O miniconda.sh
+        - bash miniconda.sh -b -f -p $MINICONDA
+    - name: "Python 3.6 on Xenial Linux"
       os: linux
       env:
-        - PYTHON_VERSION="3.6"
+        - PYTHON_VERSION=3.6
         - MINICONDAPATH="http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-    - name: "Python 3.7.0 on macOS"
+      before_install:
+        - export MINICONDA=$HOME/miniconda
+        - export PATH="$MINICONDA/bin:$PATH"
+        - hash -r
+        - wget $MINICONDAPATH -O miniconda.sh
+        - bash miniconda.sh -b -f -p $MINICONDA
+    - name: "Python 3.7 on macOS"
       os: osx
       env:
-        - PYTHON_VERSION="3.7"
+        - PYTHON_VERSION=3.7
         - MINICONDAPATH="http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
-      
+      before_install:
+        - export MINICONDA=$HOME/miniconda
+        - export PATH="$MINICONDA/bin:$PATH"
+        - hash -r
+        - wget $MINICONDAPATH -O miniconda.sh
+        - bash miniconda.sh -b -f -p $MINICONDA
+    - name: "Python 3.7 on Windows"
+      os: windows           # Windows 10.0.17134 N/A Build 17134
+      language: shell       # 'language: python' is an error on Travis CI Windows
+      before_install:
+        - choco install miniconda3 --params="'/AddToPath:1'" -y
+        - export PATH=/c/tools/miniconda3:/c/tools/miniconda3/Scripts/:$PATH
+        - export PATH=/c/tools/miniconda3/Library/bin:/c/tools/miniconda3/condabin:$PATH
+        - export PATH=/c/tools/miniconda3/Library/usr/bin:/c/tools/miniconda3/Library/mingw-w64/bin:$PATH
+        - export MINICONDA=/c/tools/miniconda3
+        - export PATH="$MINICONDA/bin:$PATH"
+        - hash -r
+        - echo $PATH
+      env:
+        - PYTHON_VERSION=3.7
+        - MINICONDAPATH="https://repo.anaconda.com/miniconda/Miniconda2-latest-Windows-x86_64.exe
+
 env:
   global:
     # List package dependencies for conda
@@ -39,31 +73,26 @@ env:
     # package name for test invocation
     - PACKAGENAME="QMCPy"
 
-before_install:
+install:
 # Here we download miniconda and install the dependencies
-- export MINICONDA=$HOME/miniconda
-- export PATH="$MINICONDA/bin:$PATH"
-- hash -r
-- wget $MINICONDAPATH -O miniconda.sh
-- bash miniconda.sh -b -f -p $MINICONDA
 - conda config --set always_yes yes
 - conda update conda
 - conda info -a
 - conda create -n testenv python=$PYTHON_VERSION
 - source activate testenv
-- conda install $CONDA_DEPS
-- pip install --upgrade pip
-- pip install codecov
-
-install:
-- pip install --quiet -r requirements/dev.txt
-- pip install -e .
+- python -m pip install --upgrade pip
+- python --version
+- conda install pytorch torchvision cpuonly -c pytorch
+- python -m pip install --quiet  -r requirements/dev.txt # --use-feature=2020-resolver
+- python -m pip install codecov
+- python -m pip install -e .
+- python -m pip freeze
+- ls -lrt qmcpy/discrete_distribution/c_lib/
 
 script:
+- pytest --doctest-modules --disable-pytest-warnings qmcpy
 - coverage run --source=./ -m unittest discover -s test/fasttests
 - coverage run --append --source=./ -m unittest discover -s test/longtests
-- cd qmcpy && pytest --doctest-modules --disable-pytest-warnings
-
 
 after_success:
 - codecov
