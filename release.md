@@ -6,6 +6,7 @@
   - digital shift
   - optional graycode
   - custom generating matricies
+- Faster Halton generator
 
 ## v0.6
 
