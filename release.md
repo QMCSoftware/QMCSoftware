@@ -1,3 +1,13 @@
+## v0.7
+
+- Windows support
+- Improved Sobol' generator
+  - linear matrix scrambling
+  - digital shift
+  - optional graycode
+  - custom generating matricies
+- Faster Halton generator
+
 ## v0.6
 
 - `CubQMCBayesLatticeG` stopping criterion 

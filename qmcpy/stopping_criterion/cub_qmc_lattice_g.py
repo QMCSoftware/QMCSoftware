@@ -26,9 +26,9 @@ class CubQMCLatticeG(StoppingCriterion):
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)
         randomize       1
+        order           natural
         seed            7
         mimics          StdUniform
-        backend         GAIL
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -118,8 +118,8 @@ class CubQMCLatticeG(StoppingCriterion):
         super(CubQMCLatticeG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
         if not distribution.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
-        if distribution.backend != 'GAIL':
-            raise ParameterError("CubLattice_g requires distribution to have 'GAIL' backend")
+        if distribution.order != 'natural':
+            raise ParameterError("CubLattice_g requires Lattice with 'natural' order")
         
     def integrate(self):
         """ See abstract method. """

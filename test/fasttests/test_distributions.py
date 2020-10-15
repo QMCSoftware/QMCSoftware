@@ -5,6 +5,7 @@ from qmcpy.util import *
 from qmcpy.util import ParameterError,ParameterWarning
 from numpy import *
 import sys
+import os
 vinvo = sys.version_info
 if vinvo[0]==3: import unittest
 else: import unittest2 as unittest
@@ -54,18 +55,27 @@ class TestLattice(unittest.TestCase):
     """ Unit tests for Lattice DiscreteDistribution. """
 
     def test_mimics(self):
-        distribution = Lattice(dimension=3, randomize=True, backend='MPS')
+        distribution = Lattice(dimension=3, randomize=True)
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
         for backend in ['MPS','GAIL']:
-            distribution = Lattice(dimension=3, randomize=True, backend=backend)
+            distribution = Lattice(dimension=3, randomize=True)
             samples = distribution.gen_samples(n_min=4, n_max=8)
             self.assertEqual(type(samples), ndarray)
             self.assertEqual(samples.shape, (4,3))
 
-    def test_mps_correctness(self):
-        distribution = Lattice(dimension=4, randomize=False, backend='MPS')
+    def test_gail_order(self):
+        distribution = Lattice(dimension=4, randomize=False, order='natural')
+        true_sample = array([
+            [1./8,   3./8,    3./8,    1./8],
+            [5./8,   7./8,    7./8,    5./8],
+            [3./8,   1./8,    1./8,    3./8],
+            [7./8,   5./8,    5./8,    7./8]])
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
+
+    def test_mps_order(self):
+        distribution = Lattice(dimension=4, randomize=False, order='mps')
         true_sample = array([
             [1./8,   3./8,    3./8,    1./8],
             [3./8,   1./8,    1./8,    3./8],
@@ -73,50 +83,40 @@ class TestLattice(unittest.TestCase):
             [7./8,   5./8,    5./8,    7./8]])
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
 
-    def test_gail_correctness(self):
-        distribution = Lattice(dimension=4, randomize=False, backend='GAIL')
+    def test_linear_order(self):
+        distribution = Lattice(dimension=4, randomize=False, order='mps')
         true_sample = array([
             [1./8,   3./8,    3./8,    1./8],
-            [5./8,   7./8,    7./8,    5./8],
             [3./8,   1./8,    1./8,    3./8],
+            [5./8,   7./8,    7./8,    5./8],
             [7./8,   5./8,    5./8,    7./8]])
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
     
     def test_set_dimension(self):
-        for backend in ['MPS','GAIL']:
-            distribution = Lattice(dimension=2,backend=backend)
-            distribution.set_dimension(3)
-            samples = distribution.gen_samples(4)
-            self.assertTrue(samples.shape==(4,3))
-    
-    def test_custom_vector(self):
-        self.assertRaises(ParameterError,Lattice,dimension=4,gen_vector_info={'vector':[1,433461,315689],'n_lim':2**20})
-        l = Lattice(2,gen_vector_info={'vector':[1,433461,315689],'n_lim':2**20})
-        self.assertRaises(ParameterError,l.gen_samples,n_min=4,n_max=2**21)
-        l.gen_samples(n_min=3,n_max=5)
+        distribution = Lattice(dimension=2)
+        distribution.set_dimension(3)
+        samples = distribution.gen_samples(4)
+        self.assertTrue(samples.shape==(4,3))
+
 
 class TestSobol(unittest.TestCase):
     """ Unit tests for Sobol DiscreteDistribution. """
 
     def test_mimics(self):
-        distribution = Sobol(dimension=3, randomize=True, backend='QRNG')
+        distribution = Sobol(dimension=3, randomize=True)
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples_and_set_dimension(self):
-        dds = [
-            Sobol(dimension=2, randomize=True, backend='QRNG', graycode=True),
-            Sobol(dimension=2, randomize=True, backend='PyTorch', graycode=True),
-            Sobol(dimension=2, randomize=False, backend='Seq51', graycode=False)]
-        for dd in dds:
-            samples = dd.gen_samples(n_min=4, n_max=8)
-            self.assertEqual(type(samples), ndarray)
-            self.assertEqual(samples.shape, (4,2))
-            dd.set_dimension(3)
-            samples = dd.gen_samples(4)
-            self.assertTrue(samples.shape==(4,3))
+        dd = Sobol(dimension=2, randomize=True, graycode=True)
+        samples = dd.gen_samples(n_min=4, n_max=8)
+        self.assertEqual(type(samples), ndarray)
+        self.assertEqual(samples.shape, (4,2))
+        dd.set_dimension(3)
+        samples = dd.gen_samples(4)
+        self.assertTrue(samples.shape==(4,3))
     
     def test_qrng_graycode_ordering(self):
-        s = Sobol(2,randomize=False,backend='qrng',graycode=True)
+        s = Sobol(2,randomize=False,graycode=True)
         x = s.gen_samples(n_min=4,n_max=8)
         x_true = array([
             [ 0.375,  0.375],
@@ -126,7 +126,7 @@ class TestSobol(unittest.TestCase):
         self.assertTrue((x==x_true).all())
 
     def test_qrng_natural_ordering(self):
-        s = Sobol(2,randomize=False,backend='qrng',graycode=False)
+        s = Sobol(2,randomize=False,graycode=False)
         x = s.gen_samples(n_min=4,n_max=8)
         x_true = array([
             [ 0.125,  0.625],
@@ -135,10 +135,6 @@ class TestSobol(unittest.TestCase):
             [ 0.875,  0.875]])
         self.assertTrue((x==x_true).all())
     
-    def test_pytorch_0th_vector(self):
-        x = Sobol(1,randomize=False,backend='PyTorch',graycode=True).gen_samples(4)
-        self.assertTrue((x==array([[1./2,3./4,1./4,3./8]]).T).all())
-
 class TestHalton(unittest.TestCase):
     """ Unit test for Halton DiscreteDistribution. """
 
@@ -147,34 +143,25 @@ class TestHalton(unittest.TestCase):
         self.assertEqual(distribution.mimics, "StdUniform")
     
     def test_gen_samples(self):
-        distribution = Halton(dimension=3, generalize=True, seed=7)
-        x = distribution.gen_samples(4)
-        self.assertTrue(x.shape==(4,3))
-        distribution.set_dimension(4)
-        x = distribution.gen_samples(2)
-        self.assertTrue(x.shape==(2,4))
-        distribution = Halton(dimension=3, generalize=True, backend='Owen')
-        x = distribution.gen_samples(4)
-        self.assertTrue(x.shape==(4,3))
-        distribution.set_dimension(4)
-        x = distribution.gen_samples(3)
-        self.assertTrue(x.shape==(3,4))
-        x2 = distribution.gen_samples(n_min=1,n_max=3)
-        self.assertTrue(x2.shape==(2,4))
-        self.assertTrue((x2==x[1:]).all())
+        for randomize in ['QRNG','OWEN']:
+            distribution = Halton(dimension=2, randomize=randomize, generalize=True)
+            x = distribution.gen_samples(8)
+            self.assertTrue(x.shape==(8,2))
+            distribution.set_dimension(3)
+            x2 = distribution.gen_samples(n_min=4,n_max=8)
+            self.assertTrue(x2.shape==(4,3))
+            self.assertTrue((x[4:,:]==x2[:,:2]).all())
+        x_ur = Halton(dimension=2, randomize=False).gen_samples(4)
         x_true = array([
             [0,     0],
             [1./2,  1./3],
             [1./4,  2./3],
             [3./4,  1./9]])
-        x = Halton(2,randomize=False,backend='Owen',generalize=True).gen_samples(4)
-        self.assertTrue((x==x_true).all())
+        self.assertTrue((x_ur==x_true).all())
     
     def test_warnings_errors(self):
-        self.assertRaises(ParameterError,Halton,2,generalize=False,backend='Owen')
-        self.assertRaises(ParameterError,Halton,2,randomize=False,generalize=False,backend='QRNG')
-        distribution = Halton(2, generalize=True, backend='QRNG',seed=7)
-        self.assertRaises(ParameterError,distribution.gen_samples,n_min=2,n_max=4)
+        self.assertRaises(ParameterError,Halton,2,randomize='Owen',generalize=False)
+        self.assertRaises(ParameterError,Halton,400,randomize='QRNG')
 
 class TestKorobov(unittest.TestCase):
     """ Unit test for Korobov DiscreteDistribution. """
@@ -242,6 +229,17 @@ class TestInverseCDFSampling(unittest.TestCase):
         distribution = InverseCDFSampling(Lattice(2),lambda u: u)
         self.assertRaises(DimensionError,distribution.set_dimension,3)   
 
+class TestDataTypes(unittest.TestCase):
+    def test_size_unisgned_long(self):
+        distribution = Sobol(dimension=3, randomize=True)
+        if os.name == 'nt':
+            self.assertEqual(distribution.get_unsigned_long_size_cf(), 4)
+        else:
+            self.assertEqual(distribution.get_unsigned_long_size_cf(), 8)
+
+    def test_size_unisgned_long_long(self):
+        distribution = Sobol(dimension=3, randomize=True)
+        self.assertEqual(distribution.get_unsigned_long_long_size_cf(), 8)
 
 if __name__ == "__main__":
     unittest.main()

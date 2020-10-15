@@ -20,7 +20,7 @@ class CubBayesLatticeG(StoppingCriterion):
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
     
-    >>> k = Keister(Gaussian(Lattice(2, linear=True, seed=123456789, backend='GAIL'),covariance=1./2))
+    >>> k = Keister(Gaussian(Lattice(2, order='linear', randomize=False, seed=123456789),covariance=1./2))
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
@@ -30,10 +30,10 @@ class CubBayesLatticeG(StoppingCriterion):
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)
-        randomize       1
+        randomize       0
+        order           linear
         seed            123456789
         mimics          StdUniform
-        backend         GAIL
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -132,12 +132,10 @@ class CubBayesLatticeG(StoppingCriterion):
         allowed_distribs = ["Lattice"]
         super(CubBayesLatticeG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
 
-        if distribution.randomize == False:
-            raise ParameterError("CubBayesLattice_g requires distribution to have randomize=True")
-        if not distribution.linear:
-            raise ParameterError("CubBayesLattice_g requires distribution to have linear=True")
-        if distribution.backend != 'GAIL':
-            raise ParameterError("CubBayesLattice_g requires distribution to have 'GAIL' backend")
+        if distribution.randomize == True:
+            raise ParameterError("CubBayesLattice_g requires distribution to have randomize=False")
+        if distribution.order != 'linear':
+            raise ParameterError("CubBayesLattice_g requires distribution to have order='linear'")
 
     # computes the integral
     def integrate(self):

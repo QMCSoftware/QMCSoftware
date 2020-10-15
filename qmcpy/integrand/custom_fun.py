@@ -12,7 +12,7 @@ class CustomFun(Integrand):
     >>> x = dd.gen_samples(2**10)
     >>> y = cf.f(x)
     >>> y.mean()
-    4.005918911572021
+    4.00...
     """
 
     parameters = []

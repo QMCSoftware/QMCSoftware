@@ -55,23 +55,9 @@ packages = [
     'qmcpy.discrete_distribution.c_lib',
     'qmcpy.discrete_distribution.sobol']
 
-# module_qrng_lib = Extension(
-#     'qmcpy.discrete_distribution.qrng.qrng_lib',
-#     sources=['qmcpy/discrete_distribution/qrng/ghalton.c',
-#              'qmcpy/discrete_distribution/qrng/korobov.c',
-#              'qmcpy/discrete_distribution/qrng/MRG63k3a.c',
-#              'qmcpy/discrete_distribution/qrng/sobol.c'],
-#     # extra_compile_args=['/MD'],
-#     # extra_link_args=['/NODEFAULTLIB:LIBCMT.LIB']
-#     # cl.exe /D_USRDLL /D_WINDLL <files-to-compile> <files-to-link> /link /DLL /OUT:<desired-dll-name>.dll
-#     # /LD
-#     # extra_link_args=['/LD'],  # ['-fPIC','-shared','-lm'])],
-#     # extra_compile_args = ['/D_USRDLL /D_WINDLL /link /DLL']
-# )
-
 setuptools.setup(
     name="qmcpy",
-    version="0.6",
+    version="0.7",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',
@@ -99,10 +85,9 @@ setuptools.setup(
                 'qmcpy/discrete_distribution/c_lib/halton_owen.c',
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/korobov_qrng.c',
-                'qmcpy/discrete_distribution/c_lib/sobol_qrng.c',
-                'qmcpy/discrete_distribution/c_lib/sobol_seq51.c', 
+                'qmcpy/discrete_distribution/c_lib/sobol.c',
                 'qmcpy/discrete_distribution/c_lib/MRG63k3a.c'],
-            extra_compile_args=['-shared'])],
+            )],
     cmdclass={
         'clean': CleanCommand,
         'install': CustomInstall})

@@ -35,14 +35,18 @@ class MeanVarDataRep(AccumulateData):
         self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
-        random.seed(self.distribution.seed)
-        self.seeds = random.randint(0,100000,int(self.replications))
+        seed = self.distribution.seed
+        if isinstance(seed,int) or isinstance(seed, uint64):
+            random.seed(seed)
+        else:
+            random.seed(seed[0])
+        self.seeds = random.randint(0, 100000, int(self.replications), dtype=uint64)
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):
         """ See abstract method. """
         for r in range(int(self.replications)):
-            self.distribution.set_seed(self.seeds[r])
+            self.distribution.set_seed(int(self.seeds[r]))
             x = self.distribution.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
             y = self.integrand.f(x).squeeze()
             previous_sum_y = self.muhat_r[r] * self.n_r_prev

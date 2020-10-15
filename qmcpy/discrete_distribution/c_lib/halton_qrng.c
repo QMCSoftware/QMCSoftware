@@ -20,6 +20,16 @@ References:
 
 #define ghaltonMaxDim 360
 
+#include <Python.h>
+
+// in Windows, you must define an initialization function for your extension
+// because setuptools will build a .pyd file, not a DLL
+// https://stackoverflow.com/questions/34689210/error-exporting-symbol-when-building-python-c-extension-in-windows
+PyMODINIT_FUNC PyInit_c_lib(void) {
+    // do stuff...
+    printf("");
+}
+
 /* Primes for ghalton() */
 static int primes[ghaltonMaxDim] =
 {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71, 73,79,83,89,97,101,
@@ -71,6 +81,7 @@ static int permTN2[ghaltonMaxDim] =
  * @title Generate n Points of a d-dimensional Generalized Halton Sequence
  * @param n number of points
  * @param d dimension
+ * @param n0 number of points to skip
  * @param method int indicating which sequence is generated
  *        (generalized Halton (1) or (plain) Halton (0))
  * @param res pointer to the result matrix
@@ -78,10 +89,10 @@ static int permTN2[ghaltonMaxDim] =
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */
-void halton_qrng(int n, int d, int generalized, double *res, long seed)
+EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, long long seed)
 {
         static int perm[ghaltonMaxDim];
-        int base, i, j, k, l, maxindex, f;
+        int base, i, j, k, l, maxindex, f, start;
         double u, U;
         unsigned int tmp;
         unsigned int shcoeff[ghaltonMaxDim][32]; /* the coefficients of the shift */
@@ -98,7 +109,8 @@ void halton_qrng(int n, int d, int generalized, double *res, long seed)
                         u += shcoeff[j][k];
                         u /= base;
                 }
-                res[j*n] = u;
+                if(n0==0){
+                        res[j*n] = u;}
         }
 
         /* Main */
@@ -107,7 +119,11 @@ void halton_qrng(int n, int d, int generalized, double *res, long seed)
         } else {
                 for(j=0; j<d; j++) { perm[j] = permTN2[j]; }
         }
-        for(i=1; i<n; i++) {
+        if(n0==0){
+                start = 1;}
+        else{
+                start = n0;}
+        for(i=start; i<(n+n0); i++) {
                 for(j=0; j<d; j++) {
                         tmp = i;
                         base = primes[j]; /* (j+1)st prime number for this dimension */
@@ -130,18 +146,22 @@ void halton_qrng(int n, int d, int generalized, double *res, long seed)
                                 u /= base;
                                 k--;
                         }
-                        res[j*n + i] = u;
+                        if(n0==0){
+                                res[j*n + i] = u;}
+                        else{
+                                res[j*n+(i-n0)] = u;}
                 }
         }
 }
 
+
 /*
 int main(){
-    int n=4, d=3, generalize=0, skip=0, seed=7;
+    int n=4, d=3, n0=4, generalize=1, skip=0, seed=7;
     double *res = (double *) calloc(d*n, sizeof(double));
-    halton_qrng(n, d, generalize, res, seed);
-    for(int j=0; j<d; j++){
-        for(int i=0; i<n; i++){
+    halton_qrng(n, d, n0, generalize, res, seed);
+    for(int i=0; i<n; i++){
+        for(int j=0; j<d; j++){
             printf("%.3f\t",res[j*n+i]);}
         printf("\n");}
     return(0);}

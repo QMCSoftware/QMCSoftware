@@ -27,7 +27,7 @@ def asian_option_single_level(
     print('%s%s'%(data,bar))
 
     # CubQMCCLT
-    distribution = Lattice(dimension, randomize=True, seed=7, backend='MPS')
+    distribution = Lattice(dimension, randomize=True, seed=7, order='MPS')
     measure = BrownianMotion(distribution)
     integrand = AsianOption(measure, volatility, start_price, strike_price, interest_rate, call_put, mean_type)
     solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
@@ -41,21 +41,21 @@ def asian_option_single_level(
     print('%s%s'%(data,bar))
 
     # CubQMCLatticeG
-    distribution = Lattice(dimension=dimension, randomize=True, seed=7, backend='GAIL')
+    distribution = Lattice(dimension=dimension, randomize=True, seed=7)
     measure = BrownianMotion(distribution)
     integrand = AsianOption(measure, volatility, start_price, strike_price, interest_rate, call_put, mean_type)
     solution,data = CubQMCLatticeG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubQMCSobolG
-    distribution = Sobol(dimension=dimension, randomize=True, seed=7, backend='QRNG')
+    distribution = Sobol(dimension=dimension, randomize=True, seed=7)
     measure = BrownianMotion(distribution)
     integrand = AsianOption(measure, volatility, start_price, strike_price, interest_rate, call_put, mean_type)
     solution,data = CubQMCSobolG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubBayesLatticeG
-    distribution = Lattice(dimension=dimension, linear=True, backend='GAIL')
+    distribution = Lattice(dimension=dimension, order='linear', randomize=False)
     measure = BrownianMotion(distribution)
     integrand = AsianOption(measure, volatility, start_price, strike_price, interest_rate, call_put, mean_type)
     solution,data = CubBayesLatticeG(integrand,abs_tol=abs_tol,ptransform='Baker').integrate()

@@ -25,3 +25,5 @@ Demos
     demo_rst/nei_demo.rst
 
     demo_rst/qei-demo-for-blog.rst
+
+    demo_rst/ray_tracing.rst

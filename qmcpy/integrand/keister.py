@@ -17,7 +17,7 @@ class Keister(Integrand):
     >>> x = dd.gen_samples(2**10)
     >>> y = k.f(x)
     >>> y.mean()
-    1.8082479629092816
+    1.80...
     
     References:
 

@@ -31,35 +31,35 @@ def cubmcg_iidstdgaussian(dimension, abs_tol, rel_tol):
     return data
 
 def cubqmcclt_lattice(dimension, abs_tol, rel_tol):
-    distribution = Lattice(dimension, randomize=True, seed=7, backend="MPS")
+    distribution = Lattice(dimension, randomize=True, seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQMCCLT(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def cubqmcclt_sobol(dimension, abs_tol, rel_tol):
-    distribution = Sobol(dimension, randomize=True, seed=7, backend="QRNG")
+    distribution = Sobol(dimension, randomize=True, seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQMCCLT(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def cubqmclatticeg(dimension, abs_tol, rel_tol):
-    distribution = Lattice(dimension, seed=7, backend="GAIL")
+    distribution = Lattice(dimension, seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQMCLatticeG(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def cubqmcsobolg(dimension, abs_tol, rel_tol):
-    distribution = Sobol(dimension, seed=7, backend="QRNG")
+    distribution = Sobol(dimension, seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubQMCSobolG(integrand, abs_tol, rel_tol).integrate()
     return data
 
 def cubbayeslatticeg(dimension, abs_tol, rel_tol):
-    distribution = Lattice(dimension, linear=True, backend="GAIL")
+    distribution = Lattice(dimension, order='linear', randomize=False)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution, data = CubBayesLatticeG(integrand, abs_tol, rel_tol).integrate()
