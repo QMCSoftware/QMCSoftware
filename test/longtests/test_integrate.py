@@ -161,7 +161,7 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_european_put_bayes(self):
         abs_tol = 1e-2
-        ddistrib = Lattice(dimension=16, seed=17, order='linear', randomize=False)
+        ddistrib = Lattice(dimension=16, seed=17, order='linear', randomize=True)
         measure = BrownianMotion(ddistrib)
         integrand = EuropeanOption(measure,
             volatility = .5,

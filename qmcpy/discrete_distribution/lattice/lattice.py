@@ -168,7 +168,7 @@ class Lattice(DiscreteDistribution):
         x = outer(self._vdc(n)+1./(2*n_min),self.z)%1 if n_min>0 else outer(self._vdc(n),self.z)%1
         return x
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
         """
         Generate lattice samples
 
@@ -177,7 +177,8 @@ class Lattice(DiscreteDistribution):
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
-            return_non_random (bool): return both the samples with and without randomization
+            return_unrandomized (bool): return samples without randomization as 2nd return value. 
+                Will not be returned if randomize=False. 
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples
@@ -190,27 +191,21 @@ class Lattice(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
+        if return_unrandomized and self.randomize==False:
+            raise ParameterError("return_unrandomized=True only applies when when randomize=True.")
         if n_min == 0 and self.randomize==False and warn:
             warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
         if n_max > 2**self.m_max:
             raise ParameterError('Lattice generating vector supports up to %d samples.'%(2**self.m_max))
         x = self.gen(n_min,n_max)
         if self.randomize:
-            x = self.apply_randomization(x)
-        return x
-    
-    def apply_randomization(self, x):
-        """
-        Apply a digital shift to the samples. 
-        
-        Args:
-            x (ndarray): un-randomized samples to be digitally shifted. 
-        
-        Return:
-            ndarray: x with digital shift aplied.
-        """
-        x_rand = (x + self.shift)%1
-        return x_rand
+            xr = (x + self.shift)%1
+        if self.randomize==False:
+            return x
+        elif return_unrandomized:
+            return xr, x
+        else:
+            return xr
 
     def set_seed(self, seed):
         """ See abstract method. """

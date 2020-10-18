@@ -115,7 +115,9 @@ class Sobol(DiscreteDistribution):
             ctypes.c_uint32, # d_max
             ctypes.c_uint32, # m_max
             ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # z (generating matrix)
-            ctypes.c_uint8] # msb
+            ctypes.c_uint8, # msb
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # xjlms (result)
+            ctypes.c_uint8]
         # set parameters
         self.sobol_cf.restype = ctypes.c_uint8
         self.set_dimension(dimension)
@@ -148,6 +150,8 @@ class Sobol(DiscreteDistribution):
                     with name.d_max.m_max.msb_or_lsb.npy
                 '''
                 raise ParameterError(msg)
+        if self.msb==False:
+            raise ParameterError("Sobol with LSB matrix ordering is under construction.")
         self.errors = {
             1: 'requires 32 bit precision but system has unsigned int with < 32 bit precision.',
             2: 'using natural ordering (graycode=0) where n0 and/or (n0+n) is not 0 or a power of 2 is not allowed.',
@@ -156,7 +160,7 @@ class Sobol(DiscreteDistribution):
         self.mimics = 'StdUniform'
         super(Sobol,self).__init__()        
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_jlms=False):
         """
         Generate samples
 
@@ -165,6 +169,8 @@ class Sobol(DiscreteDistribution):
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
+            return_jlms (bool): return the LMS matrix without digital shift. 
+                Only applies when randomize='LMS' (the default). 
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples
@@ -174,15 +180,21 @@ class Sobol(DiscreteDistribution):
             n_max = n
         if n_min == 0 and self.randomize==False and warn:
             warnings.warn("Non-randomized AGS Sobol sequence includes the origin",ParameterWarning)
+        if return_jlms and self.randomize!=1:
+            raise ParameterError("return_jlms=True only applies when randomize='LMS'.")
         if len(self.seed) != self.dimension:
             self.set_seed(self.seed)
         n = int(n_max-n_min)
         x = zeros((n,self.dimension), dtype=double)
+        xjlms = zeros((n,self.dimension), dtype=double)
         rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
-            self.seed, x, self.d_max, self.m_max, self.z, self.msb)
+            self.seed, x, self.d_max, self.m_max, self.z, self.msb, xjlms, return_jlms)
         if rc!= 0:
             raise ParameterError(self.errors[rc])
-        return x
+        if self.randomize==1 and return_jlms:
+            return x,xjlms
+        else:
+            return x
     
     def set_seed(self, seeds):
         """
