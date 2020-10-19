@@ -108,18 +108,18 @@ class Sobol(DiscreteDistribution):
             ctypes.c_uint32,  # d
             ctypes.c_ulong, # n0
             ctypes.c_uint32, # d0
-            ctypes.c_uint8,  # randomize
-            ctypes.c_uint8, # graycode
+            ctypes.c_uint32,  # randomize
+            ctypes.c_uint32, # graycode
             ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'), # seeds
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x (result)
             ctypes.c_uint32, # d_max
             ctypes.c_uint32, # m_max
             ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # z (generating matrix)
-            ctypes.c_uint8, # msb
+            ctypes.c_uint32, # msb
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # xjlms (result)
-            ctypes.c_uint8]
+            ctypes.c_uint32] # set_xjlms
         # set parameters
-        self.sobol_cf.restype = ctypes.c_uint8
+        self.sobol_cf.restype = ctypes.c_uint32
         self.set_dimension(dimension)
         self.set_seed(seed)
         self.set_randomize(randomize)
@@ -150,8 +150,6 @@ class Sobol(DiscreteDistribution):
                     with name.d_max.m_max.msb_or_lsb.npy
                 '''
                 raise ParameterError(msg)
-        if self.msb==False:
-            raise ParameterError("Sobol with LSB matrix ordering is under construction.")
         self.errors = {
             1: 'requires 32 bit precision but system has unsigned int with < 32 bit precision.',
             2: 'using natural ordering (graycode=0) where n0 and/or (n0+n) is not 0 or a power of 2 is not allowed.',
