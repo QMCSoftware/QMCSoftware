@@ -19,9 +19,9 @@ class CubQMCLatticeG(StoppingCriterion):
     >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8079801428928022
+    1.8068144685964875
     >>> data
-    Solution: 1.8080         
+    Solution: 1.8068         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)
@@ -40,7 +40,7 @@ class CubQMCLatticeG(StoppingCriterion):
         n_max           2^(35)
     LDTransformData (AccumulateData Object)
         n_total         2^(10)
-        solution        1.808
+        solution        1.807
         error_bound     0.005
         time_integrate  ...
 
@@ -78,7 +78,7 @@ class CubQMCLatticeG(StoppingCriterion):
     parameters = ['abs_tol','rel_tol','n_init','n_max']
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
-                 fudge=lambda m: 5.*2.**(-m), check_cone=False):
+                 fudge=lambda m: 5.*2.**(-m), check_cone=False, ptransform='Baker'):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -111,6 +111,7 @@ class CubQMCLatticeG(StoppingCriterion):
         self.m_max = m_max
         self.fudge = fudge
         self.check_cone = check_cone
+        self.ptransform = ptransform
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['single']
@@ -124,7 +125,7 @@ class CubQMCLatticeG(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, self.integrand, self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone)
+        self.data = LDTransformData(self, self.integrand, self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform)
         t_start = time()
         while True:
             self.data.update_data()

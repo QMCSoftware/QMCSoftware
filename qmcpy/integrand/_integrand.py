@@ -20,6 +20,8 @@ class Integrand(object):
         
     def period_transform(self, ptransform):
         """ Computes the periodization transform for the given function values """
+        if self.distribution.mimics != 'StdUniform':
+            raise Exception("period_transform requires discrete distribution to mimic the standard uniform")
         if ptransform == 'Baker':
             f = lambda x: self.f(1 - 2 * abs(x - 1 / 2))  # Baker's transform
         elif ptransform == 'C0':
