@@ -86,8 +86,9 @@ class Sobol(DiscreteDistribution):
         """
         Args:
             dimension (int): dimension of samples
-            randomize (bool): If True, apply digital shift to generated samples.
-                Note: Non-randomized Sobol' sequence includes the origin.
+            randomize (bool): Apply randomization? True defaults to LMS. Can also explicitly pass in  
+                'LMS': Linear matrix scramble with DS 
+                'DS': Just Digital Shift
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seeds (list): int seed of list of seeds, one for each dimension.
             z_path (str): path to generating matricies. 

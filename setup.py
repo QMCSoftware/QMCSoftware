@@ -3,7 +3,6 @@ from setuptools import Extension
 from setuptools.command.install import install
 from setuptools import Command
 import os
-import subprocess
 
 
 class CustomInstall(install):
