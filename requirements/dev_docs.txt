@@ -9,7 +9,7 @@ chardet==3.0.4
 codecov==2.1.5
 commonmark==0.9.1
 coverage==5.1
-cryptography==2.9.2
+cryptography==3.2
 cycler==0.10.0
 decorator==4.4.2
 defusedxml==0.6.0
