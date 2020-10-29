@@ -1,7 +1,7 @@
 from .._discrete_distribution import DiscreteDistribution
 from ...util import ParameterError, ParameterWarning
 from numpy import *
-from os.path import dirname, abspath
+from os.path import dirname, abspath, isfile
 import warnings
 
 
@@ -107,8 +107,8 @@ class Lattice(DiscreteDistribution):
             self.z_full = load(z_path).astype(uint64)
             f = z_path.split('/')[-1]
             f_lst = f.split('.')
-            self.d_max = int(f_lst[1])
-            self.m_max = int(f_lst[2])
+            self.d_max = int(f_lst[-3])
+            self.m_max = int(f_lst[-2])
         self.set_dimension(dimension)
         self.set_seed(seed)
         self.low_discrepancy = True

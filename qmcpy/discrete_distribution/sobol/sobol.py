@@ -102,7 +102,6 @@ class Sobol(DiscreteDistribution):
         self.get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
         self.get_unsigned_long_size_cf.argtypes = []
         self.get_unsigned_long_size_cf.restype = ctypes.c_uint8
-
         self.sobol_cf = c_lib.sobol
         self.sobol_cf.argtypes = [
             ctypes.c_ulong,  # n
