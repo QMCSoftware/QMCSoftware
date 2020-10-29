@@ -6,31 +6,19 @@ Thank you for you interest in contributing to the QMCPy package. The following s
 
 ## Installation for Developers
 
-This package is dependent on the `qmcpy/` directory being on your python path. This is easiest with a virtual environment.
-
-Setup using `virtualenv` and `virtualenvwrapper`
+Using `conda`
 
 ~~~
-mkvirtualenv qmcpy
 git clone https://github.com/QMCSoftware/QMCSoftware.git
 cd QMCSoftware
 git checkout develop
-setvirtualenvproject
-add2virtualenv $(pwd)
-pip install -r requirements/dev.txt
-pip install -e ./
-~~~
-
-Setup using `conda`
-
-~~~
-conda create --name qmcpy python=3.6
+conda create -n qmcpy python=3.7.0
 conda activate qmcpy
-git clone https://github.com/QMCSoftware/QMCSoftware.git
-cd QMCSoftware
-git checkout develop
+conda develop .
+conda config --add channels conda-forge
+conda install -c umontreal-simul latnetbuilder=2.1.1
 pip install -r requirements/dev.txt
-pip install -e ./
+pip install -e .
 ~~~
 
 To check for successful installation, run
@@ -42,7 +30,7 @@ make tests
 Note that the C backend files can be explicitly recompiled with
 
 ~~~
-pip install -e ./
+pip install -e .
 ~~~
 
 ----
@@ -55,13 +43,7 @@ Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.
 pip install -r requirements/dev_docs.txt
 ~~~
 
-Then setup Sphinx paths (only needs to be run once for initialization) with the command
-
-~~~
-make _doc
-~~~
-
-Finally, use one of the following three commands the compile the documentation
+Then, use one of the following three commands the compile the documentation
 
 ~~~
 make doc_html

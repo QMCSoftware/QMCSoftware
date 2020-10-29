@@ -73,6 +73,7 @@ install:
 - python --version
 - conda config --add channels conda-forge
 - conda install -c umontreal-simul latnetbuilder=2.1.1
+- conda install pytorch torchvision cpuonly -c pytorch
 - python -m pip install --quiet  -r requirements/dev.txt # --use-feature=2020-resolver
 - python -m pip install -e .
 - python -m pip freeze
