@@ -17,10 +17,10 @@ notifications:
 
 matrix:
   include:
-    - name: "Python 3.7 on Xenial Linux"
+    - name: "Python 3.7.0 on Xenial Linux"
       os: linux
       env:
-        - PYTHON_VERSION=3.7
+        - PYTHON_VERSION=3.7.0
         - MINICONDAPATH="http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
       before_install:
         - export MINICONDA=$HOME/miniconda
@@ -28,21 +28,10 @@ matrix:
         - hash -r
         - wget $MINICONDAPATH -O miniconda.sh
         - bash miniconda.sh -b -f -p $MINICONDA
-    - name: "Python 3.6 on Xenial Linux"
-      os: linux
-      env:
-        - PYTHON_VERSION=3.6
-        - MINICONDAPATH="http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-      before_install:
-        - export MINICONDA=$HOME/miniconda
-        - export PATH="$MINICONDA/bin:$PATH"
-        - hash -r
-        - wget $MINICONDAPATH -O miniconda.sh
-        - bash miniconda.sh -b -f -p $MINICONDA
-    - name: "Python 3.7 on macOS"
+    - name: "Python 3.7.0 on macOS"
       os: osx
       env:
-        - PYTHON_VERSION=3.7
+        - PYTHON_VERSION=3.7.0
         - MINICONDAPATH="http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
       before_install:
         - export MINICONDA=$HOME/miniconda
@@ -50,7 +39,7 @@ matrix:
         - hash -r
         - wget $MINICONDAPATH -O miniconda.sh
         - bash miniconda.sh -b -f -p $MINICONDA
-    - name: "Python 3.7 on Windows"
+    - name: "Python 3.7.0 on Windows"
       os: windows           # Windows 10.0.17134 N/A Build 17134
       language: shell       # 'language: python' is an error on Travis CI Windows
       before_install:
@@ -63,7 +52,7 @@ matrix:
         - hash -r
         - echo $PATH
       env:
-        - PYTHON_VERSION=3.7
+        - PYTHON_VERSION=3.7.0
         - MINICONDAPATH="https://repo.anaconda.com/miniconda/Miniconda2-latest-Windows-x86_64.exe
 
 env:
@@ -82,9 +71,9 @@ install:
 - source activate testenv
 - python -m pip install --upgrade pip
 - python --version
-- conda install pytorch torchvision cpuonly -c pytorch
+- conda config --add channels conda-forge
+- conda install -c umontreal-simul latnetbuilder=2.1.1
 - python -m pip install --quiet  -r requirements/dev.txt # --use-feature=2020-resolver
-- python -m pip install codecov
 - python -m pip install -e .
 - python -m pip freeze
 - ls -lrt qmcpy/discrete_distribution/c_lib/
