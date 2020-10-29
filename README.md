@@ -6,7 +6,7 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 
 <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/qmcpy_logo.png?raw=true" alt="QMCPy logo" height=200px width=200px/>
 
-[Homepage](https://qmcsoftware.github.io/QMCSoftware/) ~ [GitHub](https://github.com/QMCSoftware/QMCSoftware) ~ [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) ~ [PyPI](https://pypi.org/project/qmcpy/) ~ [Blogs](http://qmcpy.wordpress.com/) ~ [Contributing](https://github.com/QMCSoftware/QMCSoftware/blob/master/CONTRIBUTING.md) ~ [Issues](https://github.com/QMCSoftware/QMCSoftware/issues)
+[Homepage](https://qmcsoftware.github.io/QMCSoftware/) ~ [GitHub](https://github.com/QMCSoftware/QMCSoftware) ~ [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) ~ [PyPI](https://pypi.org/project/qmcpy/) ~ [Blogs](http://qmcpy.wordpress.com/) ~ [DockerHub](https://hub.docker.com/r/alegresor/qmcpy) ~ [Contributing](https://github.com/QMCSoftware/QMCSoftware/blob/master/CONTRIBUTING.md) ~ [Issues](https://github.com/QMCSoftware/QMCSoftware/issues)
 
 ----
 
