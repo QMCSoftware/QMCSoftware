@@ -25,13 +25,6 @@ def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
     if Lines[0].split(sep)[0] == 'Ordinary':
         nb_points = int(Lines[1].split(sep)[0])
         dim = int(Lines[2].split(sep)[0])
-        base = int(Lines[3].split(sep)[0])
-        max_level = int(Lines[4].split(sep)[0])
-        if base > 0:
-            raise ParameterError("QMCPy does not yet support ordinary lattice with base > 0.")
-            set_type = 'Ordinary-multi'
-        else:
-            set_type = 'Ordinary-uni'
         gen_vector = []
         for i in range(dim):
             gen_vector.append(int(Lines[5+i].split(sep)[0]))
@@ -43,22 +36,13 @@ def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
         nb_cols = int(Lines[0].split(sep)[0])
         nb_rows = int(Lines[1].split(sep)[0])
         nb_points = int(Lines[2].split(sep)[0])
-        interlacing = int(Lines[4].split(sep)[0])
         dim = int(Lines[3].split(sep)[0])
         set_type = Lines[5].split(sep)[0]
         line = 6
         if set_type == 'Polynomial':
-            modulus = [int(x) for x in Lines[line].split('  //')[0].split(' ')]
-            gen_vector = []
-            for i in range(dim):
-                gen_vector.append([int(x) for x in Lines[line+1+i].split(' ')])
             line += dim + 1
         elif set_type == 'Sobol':
-            gen_vector = []
-            for i in range(dim):
-                gen_vector.append([int(x) for x in Lines[line+i].split(' ')])
             line += dim
-        matrices = []
         mint = []
         pows2 = 2**arange(nb_rows-1,-1,-1)[:,None]
         for c in range(dim):
@@ -67,9 +51,7 @@ def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
             for i in range(nb_rows):
                 M.append(array([int(x) for x in Lines[line+i].split(' ')]))
             line += nb_rows
-            M = array(M)
-            matrices.append(M)
-            mint.append((M*pows2).sum(0))
+            mint.append((array(M)*pows2).sum(0))
         mint = array(mint,dtype=uint64)
         f_out = '%s/%s.%d.%d.msb.npy'%(out_dir,fout_prefix,dim,log2(nb_points))
         save(f_out,mint)
