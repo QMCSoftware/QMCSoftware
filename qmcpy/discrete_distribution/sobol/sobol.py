@@ -17,7 +17,7 @@ class Sobol(DiscreteDistribution):
         dimension       2^(1)
         randomize       1
         graycode        0
-        seed            [61615 58564]
+        seed            [61616 58565]
         mimics          StdUniform
         dim0            0
     >>> s.gen_samples(4)
