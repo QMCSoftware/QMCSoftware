@@ -11,6 +11,7 @@ qmcpy.egg-info/
 *.vrb
 .DS_Store
 .idea/
+.pytest_cache/
 
 # C
 *.so

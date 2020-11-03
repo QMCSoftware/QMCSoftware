@@ -56,7 +56,9 @@ solution,data = cs.integrate()
 print(data)
 ```
 
-A more detailed quickstart can be found in our GitHub repo at `QMCSoftware/demos/quickstart.ipynb` or in [this Google Colab notebook](https://colab.research.google.com/drive/1CQweuON7jHJBMVyribvosJLW4LheQXBL?usp=sharing).
+A more detailed quickstart can be found in our GitHub repo at `QMCSoftware/demos/quickstart.ipynb` or in [this Google Colab quickstart notebook](https://colab.research.google.com/drive/1CQweuON7jHJBMVyribvosJLW4LheQXBL?usp=sharing). 
+
+We also highly recommend you take a look at [Fred Hickernell's tutorial at the Monte Carlo Quasi-Monte Carlo 2020 Conference](https://media.ed.ac.uk/media/Fred+Hickernell%2C+Illinois+Institute+of+Technology+++Quasi-Monte+Carlo+Software++%28MCQMC+2020%2C+10.08.20%29/1_2k12mwiw) and [the corresponding MCQMC2020 Google Colab notebook.](https://tinyurl.com/QMCPyTutorial)
 
 ----
 
