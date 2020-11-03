@@ -18,9 +18,9 @@ class CubQMCML(StoppingCriterion):
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.446333077585034
+    10.442361016810949
     >>> data
-    Solution: 10.4463        
+    Solution: 10.4424        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -32,7 +32,7 @@ class CubQMCML(StoppingCriterion):
         dimension       2^(6)
         randomize       1
         order           natural
-        seed            854306
+        seed            985802
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
@@ -47,11 +47,12 @@ class CubQMCML(StoppingCriterion):
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
         n_level         [4096.  512.  256.  256.  256.  256.  256.]
-        mean_level      [1.006e+01 1.852e-01 1.040e-01 5.332e-02 2.751e-02 1.399e-02 6.994e-03]
-        var_level       [6.143e-05 3.535e-05 2.896e-05 1.767e-05 2.898e-06 9.919e-07 3.260e-07]
+        mean_level      [1.005e+01 1.807e-01 1.033e-01 5.482e-02 2.823e-02 1.397e-02 7.290e-03]
+        var_level       [8.376e-05 2.660e-05 1.911e-05 1.594e-05 3.660e-06 1.478e-06 3.424e-07]
         bias_estimate   0.007
         n_total         188416
         time_integrate  ...
+    
     
     References:
         

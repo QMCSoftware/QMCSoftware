@@ -19,15 +19,15 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.3798619783658828
+    1.3806833366218165
     >>> data
-    Solution: 1.3799         
+    Solution: 1.3807         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       1
         randomize       1
         order           natural
-        seed            1092
+        seed            1093
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
@@ -42,11 +42,11 @@ class CubQMCCLT(StoppingCriterion):
         n_max           2^(30)
     MeanVarDataRep (AccumulateData Object)
         replications    2^(4)
-        solution        1.380
-        sighat          0.001
+        solution        1.381
+        sighat          4.61e-04
         n_total         2^(12)
-        error_bound     8.30e-04
-        confid_int      [1.379 1.381]
+        error_bound     3.56e-04
+        confid_int      [1.38  1.381]
         time_integrate  ...
     """
 
