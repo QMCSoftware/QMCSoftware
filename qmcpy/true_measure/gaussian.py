@@ -18,14 +18,14 @@ class Gaussian(TrueMeasure):
         covariance      2^(-2)
         decomp_type     pca
     >>> g.gen_samples(n_min=4,n_max=8)
-    array([[1.592, 1.745],
-           [0.096, 0.267],
-           [1.087, 0.897],
-           [0.967, 1.117]])
+    array([[ 1.046,  1.693],
+           [ 0.668,  0.579],
+           [ 1.42 ,  0.895],
+           [-0.027,  1.263]])
     >>> g.set_dimension(4)
     >>> g.gen_samples(n_min=2,n_max=4)
-    array([[1.291, 1.211, 0.774, 1.483],
-           [0.761, 0.785, 1.165, 0.826]])
+    array([[1.68 , 1.08 , 0.971, 1.274],
+           [0.425, 0.72 , 1.948, 0.801]])
     >>> g2 = Gaussian(Sobol(2),mean=[1,2],covariance=[[1,.5],[.5,2]])
     >>> g2
     Gaussian (TrueMeasure Object)

@@ -17,20 +17,20 @@ class Sobol(DiscreteDistribution):
         dimension       2^(1)
         randomize       1
         graycode        0
-        seed            [61615 58564]
+        seed            [61616 58565]
         mimics          StdUniform
         dim0            0
     >>> s.gen_samples(4)
-    array([[0.783, 0.173],
-           [0.128, 0.816],
-           [0.72 , 0.664],
-           [0.316, 0.334]])
+    array([[0.673, 0.063],
+           [0.398, 0.788],
+           [0.913, 0.564],
+           [0.125, 0.288]])
     >>> s.set_dimension(3)
     >>> s.gen_samples(n_min=4,n_max=8)
-    array([[0.882, 0.932, 0.573],
-           [0.035, 0.071, 0.379],
-           [0.569, 0.418, 0.036],
-           [0.474, 0.593, 0.982]])
+    array([[0.537, 0.917, 0.78 ],
+           [0.253, 0.2  , 0.27 ],
+           [0.799, 0.417, 0.068],
+           [0.02 , 0.7  , 0.578]])
     >>> Sobol(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
     array([[0.75, 0.25],
            [0.25, 0.75]])
@@ -203,19 +203,19 @@ class Sobol(DiscreteDistribution):
         """
         if isinstance(seeds,int) or isinstance(seeds,uint32) or isinstance(seeds,uint64):
             random.seed(seeds)
-            self.seed = random.randint(0, 100000, size=self.dimension, dtype=uint64)
+            self.seed = random.randint(1, 100000, size=self.dimension, dtype=uint64)
         elif isinstance(seeds,list) or isinstance(seeds,ndarray):
             seeds = array(seeds)
             l = len(seeds)
             if l == self.dimension:
                 self.seed = seeds
             elif l < self.dimension:
-                self.seed = hstack((seeds,random.randint(0, 100000, size=self.dimension-l, dtype=uint64)))
+                self.seed = hstack((seeds,random.randint(1, 100000, size=self.dimension-l, dtype=uint64)))
             else: # l > self.dimension
                 self.seed = seeds[:self.dimension]
         elif seeds==None: # assume seed==None
             random.seed(None)
-            self.seed = random.randint(0, 100000, size=self.dimension, dtype=uint64)
+            self.seed = random.randint(1, 100000, size=self.dimension, dtype=uint64)
         else:
             msg = "Sobol' seed must be an int, list of ints, or None."
             raise ParameterError(msg)
