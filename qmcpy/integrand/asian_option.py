@@ -47,7 +47,7 @@ class AsianOption(Integrand):
     ...     x2 = dd2.gen_samples(2**10)
     ...     y2 += ac2.f(x2,l=l).mean()
     >>> y2
-    1.76...
+    1.7...
     """
 
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price',
