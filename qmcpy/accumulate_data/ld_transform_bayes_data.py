@@ -4,7 +4,6 @@ from ..util import MaxSamplesWarning
 from numpy import array, nan
 import warnings
 import numpy as np
-from sympy import fwht
 
 
 class LDTransformBayesData(AccumulateData):
@@ -100,10 +99,8 @@ class LDTransformBayesData(AccumulateData):
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
 
             xnew, xunnew = self.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True, distribution=self.distribution)
-
             [xun_, xpts_] = self.merge_pts(xun, xunnew, xpts, xnew, n, self.dim, distribution=self.distribution_name)
             mnext = m - 1
-
             ftilde_next_new = self.compute_fbt(self.ff(xnew), distribution=self.distribution_name)
             ftilde_next_new = ftilde_next_new.reshape((n // 2, 1))
             if self.debugEnable:
@@ -128,8 +125,7 @@ class LDTransformBayesData(AccumulateData):
         if distribution == 'Lattice':
             ytilde = np.fft.fft(y)
         else:
-            ytilde = np.array(fwht(y), dtype=np.float)
-            ytilde_ = LDTransformBayesData.FWHT(y)
+            ytilde = LDTransformBayesData.fwht_h(np.squeeze(y))
         return ytilde
 
     @staticmethod
@@ -147,8 +143,7 @@ class LDTransformBayesData(AccumulateData):
             ftilde_new[~ptind] = np.squeeze(evenval - coefv * oddval)
         else:
             # fwht
-            # ftilde_new = [(ftilde+ftilde_next_new)/2; (ftilde-ftilde_next_new)/2];
-            # unlike Matlab, scipy does not normalize the fwht, no need to divide by 2
+            # unlike Matlab, custom fwht_h does not normalize the output, no need to divide by 2
             ftilde_new = np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
         return ftilde_new
 
@@ -230,3 +225,17 @@ class LDTransformBayesData(AccumulateData):
         x = y[0,:]
         x = x.reshape((x.size,1))
         return x/float(N)
+
+    @staticmethod
+    def fwht_h(ynext):
+        mnext = int(np.log2(len(ynext)))
+        for l in range(mnext):
+            nl = 2**l
+            nmminlm1 = 2.**(mnext-l-1)
+            ptind_nl = np.hstack(( np.tile(True,nl), np.tile(False,nl) ))
+            ptind = np.tile(ptind_nl,int(nmminlm1))
+            evenval = ynext[ptind]
+            oddval = ynext[~ptind]
+            ynext[ptind] = (evenval + oddval)
+            ynext[~ptind] = (evenval - oddval)
+        return ynext

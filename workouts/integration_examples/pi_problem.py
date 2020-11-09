@@ -28,14 +28,15 @@ def pi_problem_bayes_net(abs_tol=.01):
     return password,t_delta,data
 
 if __name__ == '__main__':
+    print('CubBayesNetG:')
+    password,total_time,data = pi_problem_bayes_net(abs_tol=4e-3) # give 3 significant figures of accuracy
+    print("  Password:", password)
+    print('  CPU time: %.2f sec'%total_time)  # very slow, takes much longer than CubQMCSobolG
+    print('\n  '+'~'*100+'\n\n%s'%str(data))
+
     print('CubQMCSobolG:')
     password,total_time,data = pi_problem(abs_tol=4e-10) # give 10 significant figures of accuracy
     print("  Password:", password)  # 3141592653
     print('  CPU time: %.2f sec'%total_time)  # around 75 seconds
     print('\n  '+'~'*100+'\n\n%s'%str(data))
 
-    print('CubBayesNetG:')
-    password,total_time,data = pi_problem_bayes_net(abs_tol=4e-3) # give 3 significant figures of accuracy
-    print("  Password:", password)
-    print('  CPU time: %.2f sec'%total_time)  # very slow, takes much longer than CubQMCSobolG
-    print('\n  '+'~'*100+'\n\n%s'%str(data))

@@ -12,7 +12,6 @@ from scipy.optimize import fminbound as fminbnd
 from scipy.stats import norm as gaussnorm
 from scipy.stats import t as tnorm
 import warnings
-from sympy import fwht
 
 
 class CubBayesNetG(StoppingCriterion):
@@ -298,7 +297,7 @@ class CubBayesNetG(StoppingCriterion):
         return [Km1, K]
 
     '''
-    Shift invariant kernel
+    Digitally shift invariant kernel
     C1 : first row of the covariance matrix
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fwht(C1 - 1)
@@ -313,28 +312,28 @@ class CubBayesNetG(StoppingCriterion):
             # C1_new = 1 + C1m1 indirectly computed in the process
             (vec_C1m1, C1_alt) = CubBayesNetG.kernel_t(a * const_mult, kernel_func(xun))
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda_ring = np.real(np.array(fwht(vec_C1m1), dtype=float))
+            vec_lambda_ring = np.real(LDTransformBayesData.fwht_h(vec_C1m1))
 
             vec_lambda = vec_lambda_ring.copy()
             vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
-                vec_lambda_direct = np.real(np.array(fwht(C1_alt), dtype=float))  # Note: fwht output not normalized
+                vec_lambda_direct = np.real(np.array(LDTransformBayesData.fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
             # direct approach to compute first row of the kernel Gram matrix
             vec_C1 = np.prod(1 + a * const_mult * kernel_func(xun), 2)
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda = np.real(np.array(fwht(vec_C1), dtype=float))
+            vec_lambda = np.real(LDTransformBayesData.fwht_h(vec_C1))
             vec_lambda_ring = 0
 
         return vec_lambda, vec_lambda_ring
 
     @staticmethod
     def fbt(y):
-        ytilde = np.array(fwht(y), dtype=float)
+        ytilde = np.array(LDTransformBayesData.fwht_h(y), dtype=float)
         return ytilde
 
     # Builds High order walsh kernel function
