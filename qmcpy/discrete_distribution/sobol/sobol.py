@@ -86,7 +86,7 @@ class Sobol(DiscreteDistribution):
         """
         Args:
             dimension (int): dimension of samples
-            randomize (bool): Apply randomization? True defaults to LMS. Can also explicitly pass in  
+            randomize (bool): Apply randomization? True defaults to LMS. Can also explicitly pass in
                 'LMS': Linear matrix scramble with DS 
                 'DS': Just Digital Shift
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)

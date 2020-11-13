@@ -73,6 +73,7 @@ install:
 - python --version
 - conda config --add channels conda-forge
 - conda install -c umontreal-simul latnetbuilder=2.1.1
+# Install pytorch via conda, recent official release not found in PyPI
 - conda install pytorch torchvision cpuonly -c pytorch
 - python -m pip install --quiet  -r requirements/dev.txt # --use-feature=2020-resolver
 - python -m pip install -e .
@@ -82,7 +83,7 @@ install:
 script:
 - pytest --doctest-modules --disable-pytest-warnings qmcpy
 - coverage run --source=./ -m unittest discover -s test/fasttests
-- coverage run --append --source=./ -m unittest discover -s test/longtests
+- coverage run --append --source=./ -m unittest discover -v -s test/longtests
 
 after_success:
 - codecov

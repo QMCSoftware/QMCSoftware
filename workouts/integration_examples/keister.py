@@ -54,5 +54,12 @@ def keister(dimension=3, abs_tol=.1):
     solution,data = CubBayesLatticeG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
+    # CubBayesNetG
+    distribution = Sobol(dimension=dimension, randomize='LMS', graycode=False)
+    measure = Gaussian(distribution, covariance=1. / 2)
+    integrand = Keister(measure)
+    solution, data = CubBayesNetG(integrand, abs_tol=abs_tol).integrate()
+    print('%s%s' % (data, bar))
+
 if __name__ == "__main__":
     keister(abs_tol=.005)
