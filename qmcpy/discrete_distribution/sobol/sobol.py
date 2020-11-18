@@ -272,3 +272,5 @@ class Sobol(DiscreteDistribution):
             dim0 (int): first dimension
         """
         self.dim0 = dim0
+
+DigitalNet = Sobol

@@ -14,6 +14,7 @@ cd QMCSoftware
 git checkout develop
 conda create -n qmcpy python=3.7.0
 conda activate qmcpy
+conda install conda-build
 conda develop .
 conda config --add channels conda-forge
 conda install -c umontreal-simul latnetbuilder=2.1.1
