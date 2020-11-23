@@ -1,5 +1,6 @@
 from ._accumulate_data import AccumulateData
 from ..util import MaxSamplesWarning
+from ..discrete_distribution import FWHT
 
 from numpy import array, nan
 import warnings
@@ -14,7 +15,7 @@ class LDTransformBayesData(AccumulateData):
 
     parameters = ['n_total', 'solution', 'error_bound']
 
-    def __init__(self, stopping_criterion, integrand, m_min: int, m_max: int):
+    def __init__(self, stopping_criterion, integrand, m_min: int, m_max: int, fbt, merge_fbt):
         """
         Args:
             stopping_criterion (StoppingCriterion): a StoppingCriterion instance
@@ -51,6 +52,9 @@ class LDTransformBayesData(AccumulateData):
                 stopping_criterion.ptransform)  # integrand after the periodization transform
         else:
             self.ff = self.integrand.f
+        # self.fwht_h = FWHT().fwht_inplace
+        self.fbt = fbt
+        self.merge_fbt = merge_fbt
 
         super(LDTransformBayesData, self).__init__()
 
@@ -90,7 +94,8 @@ class LDTransformBayesData(AccumulateData):
             xpts_,xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True, distribution=self.distribution)
 
             # Compute initial FBT
-            ftilde_ = self.compute_fbt(self.ff(xpts_), distribution=self.distribution_name)
+            # ftilde_ = self.compute_fbt(self.ff(xpts_), distribution=self.distribution)
+            ftilde_ = self.fbt(self.ff(xpts_))
             ftilde_ = ftilde_.reshape((n, 1))
         else:
             # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
@@ -101,13 +106,16 @@ class LDTransformBayesData(AccumulateData):
             xnew, xunnew = self.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True, distribution=self.distribution)
             [xun_, xpts_] = self.merge_pts(xun, xunnew, xpts, xnew, n, self.dim, distribution=self.distribution_name)
             mnext = m - 1
-            ftilde_next_new = self.compute_fbt(self.ff(xnew), distribution=self.distribution_name)
+            # ftilde_next_new = self.compute_fbt(self.ff(xnew), distribution=self.distribution)
+            ftilde_next_new = self.fbt(self.ff(xnew))
+
             ftilde_next_new = ftilde_next_new.reshape((n // 2, 1))
             if self.debugEnable:
                 self.alert_msg(ftilde_next_new, 'Nan', 'Inf')
 
             # combine the previous batch and new batch to get FBT on all points
-            ftilde_ = self.merge_fbt(ftilde_prev, ftilde_next_new, mnext, distribution=self.distribution_name)
+            # ftilde_ = self.merge_fbt(ftilde_prev, ftilde_next_new, mnext, distribution=self.distribution_name)
+            ftilde_ = self.merge_fbt(ftilde_prev, ftilde_next_new, mnext)
 
         return ftilde_, xun_, xpts_
 
@@ -120,12 +128,38 @@ class LDTransformBayesData(AccumulateData):
             xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn, return_jlms=return_unrandomized)
         return xpts_, xun_
 
-    @staticmethod
-    def compute_fbt(y, distribution='Lattice'):
-        if distribution == 'Lattice':
+    '''
+    def compute_fbt(self, y, distribution=None):
+        n = len(y)
+        ytilde = np.zeros((n,), dtype=y.dtype)
+        if type(distribution).__name__ == 'Lattice':
             ytilde = np.fft.fft(y)
         else:
-            ytilde = LDTransformBayesData.fwht_h(np.squeeze(y))
+            if False:
+                ytilde = LDTransformBayesData.fwht_h(np.squeeze(y).copy())
+                # distribution.fwht_transform_cf(len(y), y, ytilde_)
+                h = FWHT()
+                # ytilde_ = np.zeros((n,), dtype=y.dtype)
+                # h.fwht_copy(len(y), y, ytilde_)
+
+                ytilde_ = np.squeeze(y)
+                h.fwht_inplace(len(y), ytilde_)
+                assert abs(1 - (sum(ytilde/ytilde_)/n)) < 0.00001
+            else:
+                ytilde = np.squeeze(y)
+                self.fwht_h(len(y), ytilde)
+
+
+            # if False:
+            # ytilde_ = y.copy().squeeze()
+            # distribution.fwht_cf(len(y), ytilde_)
+            # ytilde = ytilde_
+
+            # distribution.fwht_h_cf(len(y), y, ytilde)
+
+            # xx = FWHT()
+            # xx.fwht_copy(n, y, ytilde)
+
         return ytilde
 
     @staticmethod
@@ -146,6 +180,7 @@ class LDTransformBayesData(AccumulateData):
             # unlike Matlab, custom fwht_h does not normalize the output, no need to divide by 2
             ftilde_new = np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
         return ftilde_new
+    '''
 
     # inserts newly generated points with the old set by interleaving them
     # xun - unshifted points
@@ -195,47 +230,3 @@ class LDTransformBayesData(AccumulateData):
                         print(f'{inpvarname} has complex values')
                 else:
                     print('unknown type check requested !')
-
-    @staticmethod
-    def FWHT(x):
-        """ Fast Walsh-Hadamard Transform
-        Based on mex function written by Chengbo Li@Rice Uni for his TVAL3 algorithm.
-        His code is according to the K.G. Beauchamp's book -- Applications of Walsh and Related Functions.
-        """
-        x = x.squeeze()
-        N = int(x.size)
-        G = int(N/2) # Number of Groups
-        M = 2 # Number of Members in Each Group
-
-        # First stage
-        y = np.zeros((int(N/2),2))
-        y[:,0] = x[0::2] + x[1::2]
-        y[:,1] = x[0::2] - x[1::2]
-        x = y.copy()
-        # Second and further stage
-        for nStage in range(2,int(np.log2(N))+1):
-            y = np.zeros((int(G/2),M*2))
-            y[0:int(G//2),0:M*2:4] = x[0:G:2,0:M:2] + x[1:G:2,0:M:2]
-            y[0:G//2,1:M*2:4] = x[0:G:2,0:M:2] - x[1:G:2,0:M:2]
-            y[0:G//2,2:M*2:4] = x[0:G:2,1:M:2] - x[1:G:2,1:M:2]
-            y[0:G//2,3:M*2:4] = x[0:G:2,1:M:2] + x[1:G:2,1:M:2]
-            x = y.copy()
-            G = int(G/2)
-            M = M*2
-        x = y[0,:]
-        x = x.reshape((x.size,1))
-        return x/float(N)
-
-    @staticmethod
-    def fwht_h(ynext):
-        mnext = int(np.log2(len(ynext)))
-        for l in range(mnext):
-            nl = 2**l
-            nmminlm1 = 2.**(mnext-l-1)
-            ptind_nl = np.hstack(( np.tile(True,nl), np.tile(False,nl) ))
-            ptind = np.tile(ptind_nl,int(nmminlm1))
-            evenval = ynext[ptind]
-            oddval = ynext[~ptind]
-            ynext[ptind] = (evenval + oddval)
-            ynext[~ptind] = (evenval - oddval)
-        return ynext

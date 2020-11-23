@@ -85,7 +85,9 @@ setuptools.setup(
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/korobov_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/sobol.c',
-                'qmcpy/discrete_distribution/c_lib/MRG63k3a.c'],
+                'qmcpy/discrete_distribution/c_lib/MRG63k3a.c',
+                'qmcpy/discrete_distribution/c_lib/fwht.c',
+            ],
             )],
     cmdclass={
         'clean': CleanCommand,

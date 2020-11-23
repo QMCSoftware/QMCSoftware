@@ -140,7 +140,7 @@ class CubBayesLatticeG(StoppingCriterion):
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max)
+        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self.fft, self.merge_fft)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -167,6 +167,25 @@ class CubBayesLatticeG(StoppingCriterion):
         self.data.solution = muhat
 
         return muhat, self.data
+
+    @staticmethod
+    def fft(y):
+        ytilde = np.fft.fft(y)
+        return ytilde
+
+    @staticmethod
+    def merge_fft(ftilde_new, ftilde_next_new, mnext):
+        # using FFT butterfly plot technique merges two halves of fft
+        ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
+        nl = 2 ** mnext
+        ptind = np.ndarray(shape=(2 * nl, 1), buffer=np.array([True] * nl + [False] * nl), dtype=bool)
+        coef = np.exp(-2 * np.pi * 1j * np.ndarray(shape=(nl, 1), buffer=np.arange(0, nl), dtype=int) / (2 * nl))
+        coefv = np.tile(coef, (1, 1))
+        evenval = ftilde_new[ptind].reshape((nl, 1))
+        oddval = ftilde_new[~ptind].reshape((nl, 1))
+        ftilde_new[ptind] = np.squeeze(evenval + coefv * oddval)
+        ftilde_new[~ptind] = np.squeeze(evenval - coefv * oddval)
+        return ftilde_new
 
     # decides if the user-defined error threshold is met
     def stopping_criterion(self, xpts, ftilde, m):

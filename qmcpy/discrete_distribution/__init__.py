@@ -8,3 +8,4 @@ from .korobov import Korobov
 from .inverse_cdf_sampling import InverseCDFSampling
 from .acceptance_rejection_sampling import AcceptanceRejectionSampling
 from .latnetbuilder_linker import latnetbuilder_linker
+from .fwht import FWHT

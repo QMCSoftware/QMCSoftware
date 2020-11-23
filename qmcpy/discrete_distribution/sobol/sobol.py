@@ -96,6 +96,14 @@ class Sobol(DiscreteDistribution):
             dim0 (int): first dimension
         """
         # initialize c code
+        # self.fwht_transform_cf = c_lib.fwht_transform
+        # self.fwht_transform_cf.argtypes = [
+        #     ctypes.c_uint32,
+        #     ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
+        #     ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')
+        # ]
+        # self.fwht_transform_cf.restype = None
+
         self.get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
         self.get_unsigned_long_long_size_cf.argtypes = []
         self.get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
