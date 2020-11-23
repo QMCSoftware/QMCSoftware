@@ -1,0 +1,8 @@
+Task: LatBuilder Search for Ordinary lattices
+Exploration method: CBC - Random Explorer - 100 random samples
+Dimension: 750
+Embedding type: Unilevel
+Modulus: 16777216
+Figure of merit: Coordinate Uniform with Kernel: P2
+Weights: ProductWeights([], default=1)
+Norm type: 2
