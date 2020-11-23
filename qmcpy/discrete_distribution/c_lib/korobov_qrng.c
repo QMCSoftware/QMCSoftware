@@ -14,6 +14,7 @@ References:
 */
 
 #include <stdlib.h>
+#include "export_ctypes.h"
 #include "MRG63k3a.h"
 
 

@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "MRG63k3a.h"
-
+#include "export_ctypes.h"
 
 EXPORT void fwht_copy(unsigned int n, double *src, double *dst)
 {

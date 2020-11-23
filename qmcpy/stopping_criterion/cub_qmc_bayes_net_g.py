@@ -140,7 +140,7 @@ class CubBayesNetG(StoppingCriterion):
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self.fwht_h, self.merge_fbt)
+        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self._fwht_h, self._merge_fwht)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -168,15 +168,15 @@ class CubBayesNetG(StoppingCriterion):
 
         return muhat, self.data
 
-    def fwht_h(self, y):
+    def _fwht_h(self, y):
         ytilde = np.squeeze(y)
         self.fwht.fwht_inplace(len(y), ytilde)
         return ytilde
-        # ytilde = np.array(LDTransformBayesData.fwht_h(y), dtype=float)
+        # ytilde = np.array(self.fwht_h_py(y), dtype=float)
         # return ytilde
 
     @staticmethod
-    def merge_fbt(ftilde_new, ftilde_next_new, mnext):
+    def _merge_fwht(ftilde_new, ftilde_next_new, mnext):
         ftilde_new = np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
         return ftilde_new
 
@@ -325,23 +325,21 @@ class CubBayesNetG(StoppingCriterion):
             # C1_new = 1 + C1m1 indirectly computed in the process
             (vec_C1m1, C1_alt) = CubBayesNetG.kernel_t(a * const_mult, kernel_func(xun))
             # eigenvalues must be real : Symmetric pos definite Kernel
-            # vec_lambda_ring = np.real(LDTransformBayesData.fwht_h(vec_C1m1))
-            vec_lambda_ring = np.real(self.fwht_h(vec_C1m1.copy()))
+            vec_lambda_ring = np.real(self._fwht_h(vec_C1m1.copy()))
 
             vec_lambda = vec_lambda_ring.copy()
             vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
-                # vec_lambda_direct = np.real(np.array(LDTransformBayesData.fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
-                vec_lambda_direct = np.real(np.array(self.fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
+                vec_lambda_direct = np.real(np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
             # direct approach to compute first row of the kernel Gram matrix
             vec_C1 = np.prod(1 + a * const_mult * kernel_func(xun), 2)
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda = np.real(LDTransformBayesData.fwht_h(vec_C1))
+            vec_lambda = np.real(self._fwht_h(vec_C1))
             vec_lambda_ring = 0
 
         return vec_lambda, vec_lambda_ring
@@ -387,37 +385,7 @@ class CubBayesNetG(StoppingCriterion):
 
     '''
     @staticmethod
-    def FWHT(x):
-        """ Fast Walsh-Hadamard Transform
-        Based on mex function written by Chengbo Li@Rice Uni for his TVAL3 algorithm.
-        His code is according to the K.G. Beauchamp's book -- Applications of Walsh and Related Functions.
-        """
-        x = x.squeeze()
-        N = int(x.size)
-        G = int(N/2) # Number of Groups
-        M = 2 # Number of Members in Each Group
-
-        # First stage
-        y = np.zeros((int(N/2),2))
-        y[:,0] = x[0::2] + x[1::2]
-        y[:,1] = x[0::2] - x[1::2]
-        x = y.copy()
-        # Second and further stage
-        for nStage in range(2,int(np.log2(N))+1):
-            y = np.zeros((int(G/2),M*2))
-            y[0:int(G//2),0:M*2:4] = x[0:G:2,0:M:2] + x[1:G:2,0:M:2]
-            y[0:G//2,1:M*2:4] = x[0:G:2,0:M:2] - x[1:G:2,0:M:2]
-            y[0:G//2,2:M*2:4] = x[0:G:2,1:M:2] - x[1:G:2,1:M:2]
-            y[0:G//2,3:M*2:4] = x[0:G:2,1:M:2] + x[1:G:2,1:M:2]
-            x = y.copy()
-            G = int(G/2)
-            M = M*2
-        x = y[0,:]
-        x = x.reshape((x.size,1))
-        return x/float(N)
-
-    @staticmethod
-    def fwht_h(ynext):
+    def fwht_h_py(ynext):
         mnext = int(np.log2(len(ynext)))
         for l in range(mnext):
             nl = 2**l

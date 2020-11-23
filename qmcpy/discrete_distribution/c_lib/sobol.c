@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "export_ctypes.h"
 #include "MRG63k3a.h"
 
 EXPORT int get_unsigned_long_size()
@@ -213,75 +214,3 @@ int main(){
         printf("\n");}   
     return(0);}
 */
-#if 0
-
-EXPORT void fwht_transform_working(unsigned int n, double *src, double *dst)
-{
-    double *a = (double *)calloc(n, sizeof(double));
-    double *b = dst;  // (double *)calloc(n, sizeof(double));
-
-    void *tmp;
-    memcpy(a, src, sizeof(double)*n);
-
-    // Fast Walsh Hadamard Transform.
-    int i, j, s;
-    for (i = n>>1; i > 0; i>>=1) {
-        for (j = 0; j < n; j++) {
-            s = j/i%2;
-            b[j] = a[(s?-i:0)+j] + (s?-1:1)*a[(s?0:i)+j];
-        }
-        tmp = a; a = b; b = tmp;
-    }
-
-    // memcpy(dst, a, sizeof(double)*n);
-    free(a);
-    // free(b);
-}
-
-
-EXPORT void fwht_transform_bad(unsigned int n, double *src, double *dst)
-{
-    double *a = dst;  // (double *)calloc(n, sizeof(double));
-    double *b = (double *)calloc(n, sizeof(double));
-
-    void *tmp;
-    memcpy(a, src, sizeof(double)*n);
-
-    // Fast Walsh Hadamard Transform.
-    int i, j, s;
-    for (i = n>>1; i > 0; i>>=1) {
-        for (j = 0; j < n; j++) {
-            s = j/i%2;
-            b[j] = a[(s?-i:0)+j] + (s?-1:1)*a[(s?0:i)+j];
-        }
-        tmp = a; a = b; b = tmp;
-    }
-
-    // memcpy(dst, a, sizeof(double)*n);
-    // free(a);
-    free(b);
-}
-
-EXPORT void fwht_transform(unsigned int n, double *src, double *dst)
-{
-    double *a = (double *)calloc(n, sizeof(double));
-    double *b = (double *)calloc(n, sizeof(double));
-
-    void *tmp;
-    memcpy(a, src, sizeof(double)*n);
-
-    // Fast Walsh Hadamard Transform.
-    int i, j, s;
-    for (i = n>>1; i > 0; i>>=1) {
-        for (j = 0; j < n; j++) {
-            s = j/i%2;
-            b[j] = a[(s?-i:0)+j] + (s?-1:1)*a[(s?0:i)+j];
-        }
-        tmp = a; a = b; b = tmp;
-    }
-
-    memcpy(dst, a, sizeof(double)*n);
-    free(a);
-    free(b);
-}
-#endif

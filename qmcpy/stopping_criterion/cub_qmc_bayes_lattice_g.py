@@ -140,7 +140,7 @@ class CubBayesLatticeG(StoppingCriterion):
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self.fft, self.merge_fft)
+        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self._fft, self._merge_fft)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -169,12 +169,12 @@ class CubBayesLatticeG(StoppingCriterion):
         return muhat, self.data
 
     @staticmethod
-    def fft(y):
+    def _fft(y):
         ytilde = np.fft.fft(y)
         return ytilde
 
     @staticmethod
-    def merge_fft(ftilde_new, ftilde_next_new, mnext):
+    def _merge_fft(ftilde_new, ftilde_next_new, mnext):
         # using FFT butterfly plot technique merges two halves of fft
         ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
         nl = 2 ** mnext
@@ -351,14 +351,14 @@ class CubBayesLatticeG(StoppingCriterion):
             # C1_new = 1 + C1m1 indirectly computed in the process
             (vec_C1m1, C1_alt) = CubBayesLatticeG.kernel_t(a * const_mult, kernel_func(xun))
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda_ring = np.real(np.fft.fft(vec_C1m1))
+            vec_lambda_ring = np.real(CubBayesLatticeG._fft(vec_C1m1))
 
             vec_lambda = vec_lambda_ring.copy()
             vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
-                vec_lambda_direct = np.real(np.fft.fft(C1_alt))  # Note: fft output unnormalized
+                vec_lambda_direct = np.real(CubBayesLatticeG._fft(C1_alt))  # Note: fft output unnormalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
@@ -366,7 +366,7 @@ class CubBayesLatticeG(StoppingCriterion):
             vec_C1 = np.prod(1 + a * const_mult * kernel_func(xun), 2)
             # matlab's builtin fft is much faster and accurate
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda = np.real(np.fft.fft(vec_C1))
+            vec_lambda = np.real(CubBayesLatticeG._fft(vec_C1))
             vec_lambda_ring = 0
 
         return vec_lambda, vec_lambda_ring

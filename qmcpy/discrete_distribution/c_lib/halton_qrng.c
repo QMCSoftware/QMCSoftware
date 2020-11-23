@@ -16,6 +16,7 @@ References:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "export_ctypes.h"
 #include "MRG63k3a.h"
 
 #define ghaltonMaxDim 360
