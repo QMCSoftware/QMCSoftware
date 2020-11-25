@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "export_ctypes.h"
 #include "MRG63k3a.h"
 
 EXPORT int get_unsigned_long_size()
@@ -213,4 +214,3 @@ int main(){
         printf("\n");}   
     return(0);}
 */
-    
