@@ -43,10 +43,11 @@ class CubBayesLatticeG(StoppingCriterion):
         rel_tol         0
         n_init          2^(8)
         n_max           2^(22)
+        order           2^1
     LDTransformBayesData (AccumulateData Object)
         n_total         256
         solution        1.808
-        error_bound     7.36e-04
+        error_bound     6.41e-04
         time_integrate  ...
     
     Adapted from 
@@ -74,10 +75,9 @@ class CubBayesLatticeG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
-
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01, ptransform='C1sin'):
-        self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
+                 n_init=2 ** 8, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin'):
+        self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max', 'order']
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
@@ -87,16 +87,16 @@ class CubBayesLatticeG(StoppingCriterion):
             warning_s = '''
                 n_init and n_max must be a powers of 2.
                 n_init must be >= 2^5.
-                Using n_init = 2^10 and n_max=2^22.'''
+                Using n_init = 2^8 and n_max=2^22.'''
             warnings.warn(warning_s, ParameterWarning)
-            m_min = 5.
-            m_max = 22.
+            m_min = 8
+            m_max = 22
         self.m_min = m_min
         self.m_max = m_max
         self.n_init = n_init  # number of samples to start with = 2^mmin
         self.n_max = n_max  # max number of samples allowed = 2^mmax
         self.alpha = alpha  # p-value, default 0.1%.
-        self.order = 2  # Bernoulli kernel's order. If zero, choose order automatically
+        self.order = order  # Bernoulli kernel's order. If zero, choose order automatically
 
         self.useGradient = False  # If true uses gradient descent in parameter search
         self.oneTheta = True  # If true use common shape parameter for all dimensions
@@ -113,7 +113,7 @@ class CubBayesLatticeG(StoppingCriterion):
 
         self.avoid_cancel_error = True  # avoid cancellation error in stopping criterion
         self.uncert = 0  # quantile value for the error bound
-        self.debug_enable = True  # enable debug prints
+        self.debug_enable = False  # enable debug prints
         self.data = None
 
         # Credible interval : two-sided confidence, i.e., 1-alpha percent quantile
@@ -194,7 +194,7 @@ class CubBayesLatticeG(StoppingCriterion):
         ftilde = ftilde.squeeze()
         n = 2 ** m
         success = False
-        lna_range = [-5, 5]
+        lna_range = [-5, 0]  # reduced from [-5, 5], to avoid kernel values getting too big causing error
         r = self.order
 
         # search for optimal shape parameter
@@ -258,37 +258,38 @@ class CubBayesLatticeG(StoppingCriterion):
     # GCV : Generalized cross validation
     def objective_function(self, a, xun, ftilde):
         n = len(ftilde)
-        [vec_lambda, vec_lambda_ring] = self.kernel(xun, self.order, a, self.avoid_cancel_error,
+        fudge = 1000*np.finfo(float).eps
+        [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, a, self.avoid_cancel_error,
                                                     self.kernType, self.debug_enable)
 
         vec_lambda = abs(vec_lambda)
         # compute RKHS_norm
-        temp = abs(ftilde[vec_lambda != 0] ** 2) / (vec_lambda[vec_lambda != 0])
+        temp = abs(ftilde[vec_lambda > fudge] ** 2) / (vec_lambda[vec_lambda > fudge])
 
         # compute loss
         if self.GCV:
             # GCV
-            temp_gcv = abs(ftilde[vec_lambda != 0] / (vec_lambda[vec_lambda != 0])) ** 2
-            loss1 = 2 * log(sum(1. / vec_lambda[vec_lambda != 0]))
+            temp_gcv = abs(ftilde[vec_lambda > fudge] / (vec_lambda[vec_lambda > fudge])) ** 2
+            loss1 = 2 * log(sum(1. / vec_lambda[vec_lambda > fudge]))
             loss2 = log(sum(temp_gcv[1:]))
             # ignore all zero eigenvalues
             loss = loss2 - loss1
 
             if self.arb_mean:
-                RKHS_norm = sum(temp_gcv[1:]) / n
+                RKHS_norm = (1/lambda_factor)*sum(temp_gcv[1:]) / n
             else:
-                RKHS_norm = sum(temp_gcv) / n
+                RKHS_norm = (1/lambda_factor)*sum(temp_gcv) / n
         else:
             # default: MLE
             if self.arb_mean:
-                RKHS_norm = sum(temp[1:]) / n
-                temp_1 = sum(temp[1:])
+                RKHS_norm = (1/lambda_factor)*sum(temp[1:]) / n
+                temp_1 = (1/lambda_factor)*sum(temp[1:])
             else:
-                RKHS_norm = sum(temp) / n
-                temp_1 = sum(temp)
+                RKHS_norm = (1/lambda_factor)*sum(temp) / n
+                temp_1 = (1/lambda_factor)*sum(temp)
 
             # ignore all zero eigenvalues
-            loss1 = sum(log(abs(vec_lambda[vec_lambda != 0])))
+            loss1 = sum(log(abs(lambda_factor*vec_lambda[vec_lambda > fudge])))
             loss2 = n * log(temp_1)
             loss = loss1 + loss2
 
@@ -299,6 +300,7 @@ class CubBayesLatticeG(StoppingCriterion):
             self.data.alert_msg(loss, 'Inf', 'Imag', 'Nan')
             self.data.alert_msg(vec_lambda, 'Imag')
 
+        vec_lambda, vec_lambda_ring = lambda_factor*vec_lambda, lambda_factor*vec_lambda_ring
         return loss, vec_lambda, vec_lambda_ring, RKHS_norm
 
     # Computes modified kernel Km1 = K - 1
@@ -335,6 +337,7 @@ class CubBayesLatticeG(StoppingCriterion):
         if kern_type == 1:
             b_order = order * 2  # Bernoulli polynomial order as per the equation
             const_mult = -(-1) ** (b_order / 2) * ((2 * np.pi) ** b_order) / factorial(b_order)
+            const_mult = -(-1) ** (b_order / 2)
             if b_order == 2:
                 bern_poly = lambda x: (-x * (1 - x) + 1 / 6)
             elif b_order == 4:
@@ -352,11 +355,15 @@ class CubBayesLatticeG(StoppingCriterion):
             # Computes C1m1 = C1 - 1
             # C1_new = 1 + C1m1 indirectly computed in the process
             (vec_C1m1, C1_alt) = CubBayesLatticeG.kernel_t(a * const_mult, kernel_func(xun))
+
+            lambda_factor = max(abs(vec_C1m1))
+            C1_alt = C1_alt / lambda_factor
+            vec_C1m1 = vec_C1m1 / lambda_factor
             # eigenvalues must be real : Symmetric pos definite Kernel
             vec_lambda_ring = np.real(CubBayesLatticeG._fft(vec_C1m1))
 
             vec_lambda = vec_lambda_ring.copy()
-            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)
+            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)/lambda_factor
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
@@ -371,4 +378,4 @@ class CubBayesLatticeG(StoppingCriterion):
             vec_lambda = np.real(CubBayesLatticeG._fft(vec_C1))
             vec_lambda_ring = 0
 
-        return vec_lambda, vec_lambda_ring
+        return vec_lambda, vec_lambda_ring, lambda_factor

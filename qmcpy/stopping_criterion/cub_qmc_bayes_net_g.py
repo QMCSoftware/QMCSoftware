@@ -77,9 +77,6 @@ class CubBayesNetG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
-    
-    
-
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, alpha=0.01):
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
@@ -91,10 +88,10 @@ class CubBayesNetG(StoppingCriterion):
         if m_min % 1 != 0. or m_min < 5 or m_max % 1 != 0:
             warning_s = '''
                 n_init and n_max must be a powers of 2.
-                n_init must be >= 2^5.
-                Using n_init = 2^10 and n_max=2^22.'''
+                n_init must be >= 2^8.
+                Using n_init = 2^8 and n_max=2^22.'''
             warnings.warn(warning_s, ParameterWarning)
-            m_min = 5.
+            m_min = 8.
             m_max = 22.
         self.m_min = m_min
         self.m_max = m_max
@@ -117,7 +114,7 @@ class CubBayesNetG(StoppingCriterion):
 
         self.avoid_cancel_error = True  # avoid cancellation error in stopping criterion
         self.uncert = 0  # quantile value for the error bound
-        self.debug_enable = True  # enable debug prints
+        self.debug_enable = False  # enable debug prints
         self.data = None
         self.fwht = FWHT()
 
@@ -190,7 +187,7 @@ class CubBayesNetG(StoppingCriterion):
         ftilde = ftilde.squeeze()
         n = 2 ** m
         success = False
-        lna_range = [-5, 5]
+        lna_range = [-5, 0]  # reduced from [-5, 5], to avoid kernel values getting too big causing error
         r = self.order
 
         # search for optimal shape parameter
@@ -253,16 +250,16 @@ class CubBayesNetG(StoppingCriterion):
         n = len(ftilde)
         [vec_lambda, vec_lambda_ring] = self.kernel(xun, self.order, a, self.avoid_cancel_error,
                                                     self.kernType, self.debug_enable)
-
+        fudge = 1000*np.finfo(float).eps
         vec_lambda = abs(vec_lambda)
         # compute RKHS_norm
-        temp = abs(ftilde[vec_lambda != 0] ** 2) / (vec_lambda[vec_lambda != 0])
+        temp = abs(ftilde[vec_lambda > fudge] ** 2) / (vec_lambda[vec_lambda > fudge])
 
         # compute loss
         if self.GCV:
             # GCV
-            temp_gcv = abs(ftilde[vec_lambda != 0] / (vec_lambda[vec_lambda != 0])) ** 2
-            loss1 = 2 * log(sum(1. / vec_lambda[vec_lambda != 0]))
+            temp_gcv = abs(ftilde[vec_lambda > fudge] / (vec_lambda[vec_lambda > fudge])) ** 2
+            loss1 = 2 * log(sum(1. / vec_lambda[vec_lambda > fudge]))
             loss2 = log(sum(temp_gcv[1:]))
             # ignore all zero eigenvalues
             loss = loss2 - loss1
@@ -281,7 +278,7 @@ class CubBayesNetG(StoppingCriterion):
                 temp_1 = sum(temp)
 
             # ignore all zero eigenvalues
-            loss1 = sum(log(abs(vec_lambda[vec_lambda != 0])))
+            loss1 = sum(log(abs(vec_lambda[vec_lambda > fudge])))
             loss2 = n * log(temp_1)
             loss = loss1 + loss2
 

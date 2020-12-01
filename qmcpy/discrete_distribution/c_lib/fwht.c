@@ -1,3 +1,6 @@
+/*
+Fast Walsh Hadamard transform.
+*/
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,7 +55,7 @@ long ilog2( long x )
 }
 
 /**
- * Fast Walsh-Hadamard transform
+ * Fast Walsh-Hadamard transform: no copy used
  * Ref: https://github.com/sheljohn/WalshHadamard/blob/master/fwht.h
  */
 EXPORT void fwht_inplace(unsigned long n, double* data )
