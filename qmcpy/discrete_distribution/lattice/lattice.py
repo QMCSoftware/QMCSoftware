@@ -24,10 +24,10 @@ class Lattice(DiscreteDistribution):
            [0.826, 0.03 ]])
     >>> l.set_dimension(3)
     >>> l.gen_samples(n_min=4,n_max=8)
-    array([[0.563, 0.098, 0.353],
-           [0.063, 0.598, 0.853],
-           [0.813, 0.848, 0.103],
-           [0.313, 0.348, 0.603]])
+    array([[0.563, 0.598, 0.853],
+           [0.063, 0.098, 0.353],
+           [0.813, 0.348, 0.603],
+           [0.313, 0.848, 0.103]])
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
@@ -97,10 +97,10 @@ class Lattice(DiscreteDistribution):
         else: 
             raise Exception("Lattice requires natural, linear, or mps ordering.")
         if not z_path:
-            self.d_max = 3600
-            self.m_max = 20
+            self.d_max = 750
+            self.m_max = 24
             self.msb = True
-            self.z_full = load(dirname(abspath(__file__))+'/generating_vectors/lattice_vec.3600.20.npy').astype(uint64)
+            self.z_full = load(dirname(abspath(__file__))+'/generating_vectors/lnb_ordinary_lattice/qmcpy_gv.750.24.npy').astype(uint64)
         else:
             if not isfile(z_path):
                 raise ParameterError('z_path `' + z_path + '` not found. ')
@@ -217,6 +217,6 @@ class Lattice(DiscreteDistribution):
         """ See abstract method. """
         self.dimension = dimension
         if self.dimension > self.d_max:
-            raise ParameterError('Lattice requires dimension <= %d'%self.d_max)
+            raise ParameterError('Lattice requires dimension <= %d.'%self.d_max)
         self.z = self.z_full[:self.dimension]
         self.shift = random.rand(int(self.dimension))

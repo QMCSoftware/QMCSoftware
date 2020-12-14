@@ -19,9 +19,9 @@ class CubQMCLatticeG(StoppingCriterion):
     >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8068144685964875
+    1.8072504898823571
     >>> data
-    Solution: 1.8068         
+    Solution: 1.8073         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
         dimension       2^(1)
@@ -41,7 +41,7 @@ class CubQMCLatticeG(StoppingCriterion):
     LDTransformData (AccumulateData Object)
         n_total         2^(10)
         solution        1.807
-        error_bound     0.005
+        error_bound     0.003
         time_integrate  ...
 
     Original Implementation:
