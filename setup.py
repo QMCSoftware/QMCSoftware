@@ -20,19 +20,6 @@ class CustomInstall(install):
             print('Problem compiling html or pdf documenation')
         super(CustomInstall, self).run()
 
-class CleanCommand(Command):
-    """Custom clean command to tidy up the project root."""
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        os.system("rm -vrf ./build ./dist ./*.pyc ./qmcpy/qmcpy.egg-info")
-
 try:
     with open("README.md", "r", encoding="utf-8", errors='ignore') as fh:
         long_description = fh.read()
@@ -86,6 +73,4 @@ setuptools.setup(
                 'qmcpy/discrete_distribution/c_lib/sobol.c',
                 'qmcpy/discrete_distribution/c_lib/MRG63k3a.c',
                 'qmcpy/discrete_distribution/c_lib/fwht.c',],)],
-    cmdclass={
-        'clean': CleanCommand,
-        'install': CustomInstall})
+    cmdclass={'install': CustomInstall})
