@@ -20,7 +20,7 @@ class TestUniform(unittest.TestCase):
     def test__transform_g_to_f(self):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
-        measure = Uniform(distribution)
+        measure = Gaussian(distribution, covariance=1/2)
         Keister(measure) 
 
     def test_set_dimension(self):
@@ -106,7 +106,7 @@ class TestBrownianMontion(unittest.TestCase):
     def test__transform_g_to_f(self):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
-        measure = BrownianMotion(distribution)
+        measure = Gaussian(distribution, covariance=1/2)
         Keister(measure)
     
     def test_set_dimension(self):
@@ -145,7 +145,7 @@ class TestIdentitalToDiscrete(unittest.TestCase):
         # implicitly called from Integrand superclass constructor
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
         measure = IdentitalToDiscrete(distribution)
-        Keister(measure)
+        Linear(measure)
     
     def test_set_dimension(self):
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))

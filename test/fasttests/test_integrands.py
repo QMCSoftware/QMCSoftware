@@ -46,7 +46,7 @@ class TestKeister(unittest.TestCase):
 
     def test_f(self):
         distribution = Sobol(dimension=3)
-        measure = Uniform(distribution)
+        measure = Gaussian(distribution, covariance=1/2)
         integrand = Keister(measure)
         samples = integrand.measure.distribution.gen_samples(4)
         y = integrand.f(samples).squeeze()

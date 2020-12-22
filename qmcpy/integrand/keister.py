@@ -1,6 +1,7 @@
 from ._integrand import Integrand
 from ..discrete_distribution import Sobol
 from ..true_measure import Gaussian
+from ..util import ParameterError
 from numpy import *
 
 
@@ -28,18 +29,33 @@ class Keister(Integrand):
     def __init__(self, measure):
         """
         Args:
-            measure (TrueMeasure): a TrueMeasure instance
+            measure (TrueMeasure): a TrueMeasure instance, either Gaussian with covariance 1/2 or lebesgue
         """
         self.measure = measure
         self.distribution = self.measure.distribution
         self.dimension = self.measure.dimension
         self.distribution = self.measure.distribution
+        if type(self.measure).__name__ == 'Gaussian':
+            self.g = self.g_gaussian_half_cov
+        elif type(self.measure).__name__ == 'Lebesgue':
+            self.g = self.g_lebesgue
+        else:
+            raise ParameterError('''
+                The Keister integrand requires true measure to be:
+                    - Gaussian with mean 0 and covriance 1/2 or 
+                    - Lebesuge with lower bound -inf and upper bound inf''')
         super(Keister,self).__init__()
 
-    def g(self, x):
+    def g_gaussian_half_cov(self, x):
         """ See abstract method. """
-        normx = linalg.norm(x, 2, axis=1)  # ||x||_2
+        normx = linalg.norm(x, 2, axis=1) # ||x||_2
         y = pi ** (self.dimension / 2.0) * cos(normx)
+        return y
+    
+    def g_lebesgue(self, x):
+        """ See abstract method. """ 
+        normx = linalg.norm(x, 2, axis=1) # ||x||_2 
+        y = cos(normx) * exp(-(normx**2))
         return y
     
     def plot(self, projection_dims=[0], n=2**7, point_size=5, color='c', show=True, out=None):

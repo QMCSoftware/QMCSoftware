@@ -33,7 +33,7 @@ class BrownianMotion(TrueMeasure):
 
     parameters = ['time_vector','drift','assembly_type']
 
-    def __init__(self, distribution, assembly_type='PCA', drift=0.):
+    def __init__(self, distribution, assembly_type='PCA', drift=0., t_final=1.):
         """
         Args:
             distribution (DiscreteDistribution): DiscreteDistribution instance
@@ -42,6 +42,7 @@ class BrownianMotion(TrueMeasure):
                 "PCA" for principal component analysis, or
                 "Bridge" for Brownian Bridge.
             drift (float): mean shift for importance sampling. 
+            t_final (float): end time for the Brownian Motion. 
         """
         self.distribution = distribution
         self.assembly_type = assembly_type.lower()
@@ -49,13 +50,13 @@ class BrownianMotion(TrueMeasure):
             raise ParameterError('Brownian Motion assembly_type parameter must be either "Diff", "PCA", or "Bridge"')
         self.drift = float(drift)
         self.d = self.distribution.dimension
+        self.t = t_final # exercise time
         self._assemble()
-        self.t = 1. # exercise time
         super(BrownianMotion,self).__init__()
     
     def _assemble(self):
         """ Set parameters dependent on the dimension. """
-        self.time_vector = linspace(1./self.d,1,self.d) # evenly spaced
+        self.time_vector = linspace(1./self.d,self.t,self.d) # evenly spaced
         self.ms_vec = self.drift * self.time_vector
         if self.assembly_type == 'diff':
             self.time_diff = diff(hstack((0,self.time_vector)))
@@ -151,8 +152,8 @@ class BrownianMotion(TrueMeasure):
         fig,ax = pyplot.subplots()
         for i in range(n):
             ax.plot(tvw0,xw0[i])
-        ax.set_xlim([0,1])
-        ax.set_xticks([0,1])
+        ax.set_xlim([0,self.t])
+        ax.set_xticks([0,self.t])
         ax.set_xlabel('Time')
         ax.set_ylabel('Brownian Motion')
         s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
