@@ -56,7 +56,7 @@ class BrownianMotion(TrueMeasure):
     
     def _assemble(self):
         """ Set parameters dependent on the dimension. """
-        self.time_vector = linspace(1./self.d,self.t,self.d) # evenly spaced
+        self.time_vector = linspace(self.t/self.d,self.t,self.d) # evenly spaced
         self.ms_vec = self.drift * self.time_vector
         if self.assembly_type == 'diff':
             self.time_diff = diff(hstack((0,self.time_vector)))
