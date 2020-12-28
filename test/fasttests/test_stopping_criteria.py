@@ -4,9 +4,8 @@ from qmcpy import *
 from qmcpy.util import *
 import sys
 import numpy
-vinvo = sys.version_info
-if vinvo[0]==3: import unittest
-else: import unittest2 as unittest
+import unittest
+
 keister_2d_exact = 1.808186429263620
 tol = .05
 rel_tol = 0

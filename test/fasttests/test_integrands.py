@@ -3,9 +3,7 @@
 from qmcpy import *
 from qmcpy.util import *
 import sys
-vinvo = sys.version_info
-if vinvo[0]==3: import unittest
-else: import unittest2 as unittest
+import unittest
 
 
 class TestAsianOption(unittest.TestCase):

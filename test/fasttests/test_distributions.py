@@ -6,9 +6,7 @@ from qmcpy.util import ParameterError,ParameterWarning
 from numpy import *
 import sys
 import os
-vinvo = sys.version_info
-if vinvo[0]==3: import unittest
-else: import unittest2 as unittest
+import unittest
 
 
 class TestIIDStdUniform(unittest.TestCase):
@@ -185,7 +183,7 @@ class TestKorobov(unittest.TestCase):
         self.assertTrue((x==x_true).all())
 
 
-class TestCustomIIDDistribution(unittest.TestCase):
+'''class TestCustomIIDDistribution(unittest.TestCase):
     """ Unit tests for CustomIIDDistribution DiscreteDistribution. """
 
     def test_gen_samples(self):
@@ -194,10 +192,10 @@ class TestCustomIIDDistribution(unittest.TestCase):
 
     def test_set_dimension(self):
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
-        self.assertRaises(DimensionError,distribution.set_dimension,3)
+        self.assertRaises(DimensionError,distribution.set_dimension,3)'''
                 
 
-class TestAcceptanceRejectionSampling(unittest.TestCase):
+'''class TestAcceptanceRejectionSampling(unittest.TestCase):
     """ Unit tests for AcceptanceRejectionSampling DiscreteDistribution. """
 
     def test_gen_samples(self):
@@ -213,10 +211,10 @@ class TestAcceptanceRejectionSampling(unittest.TestCase):
     
     def test_set_dimension(self):
         distribution = AcceptanceRejectionSampling(lambda x: 1, Uniform(IIDStdGaussian(2)))
-        self.assertRaises(DimensionError,distribution.set_dimension,3)   
+        self.assertRaises(DimensionError,distribution.set_dimension,3)'''
 
 
-class TestInverseCDFSampling(unittest.TestCase):
+'''class TestInverseCDFSampling(unittest.TestCase):
     """ Unit tests for InverseCDFSampling DiscreteDistribution. """
 
     def test_gen_samples(self):
@@ -227,7 +225,7 @@ class TestInverseCDFSampling(unittest.TestCase):
     
     def test_set_dimension(self):
         distribution = InverseCDFSampling(Lattice(2),lambda u: u)
-        self.assertRaises(DimensionError,distribution.set_dimension,3)   
+        self.assertRaises(DimensionError,distribution.set_dimension,3)'''
 
 class TestDataTypes(unittest.TestCase):
     def test_size_unisgned_long(self):

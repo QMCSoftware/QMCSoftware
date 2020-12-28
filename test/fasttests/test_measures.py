@@ -4,9 +4,7 @@ from qmcpy import *
 from qmcpy.util import *
 from numpy import *
 import sys
-vinvo = sys.version_info
-if vinvo[0]==3: import unittest
-else: import unittest2 as unittest
+import unittest
 
         
 class TestUniform(unittest.TestCase):
@@ -137,7 +135,7 @@ class TestLebesgue(unittest.TestCase):
         self.assertRaises(DimensionError,measure.set_dimension,3)
 
 
-class TestIdentitalToDiscrete(unittest.TestCase):
+'''class TestIdentitalToDiscrete(unittest.TestCase):
     """ Unit tests for IdentitalToDiscrete Measure. """
 
     def test_gen_samples(self):
@@ -155,10 +153,10 @@ class TestIdentitalToDiscrete(unittest.TestCase):
     def test_set_dimension(self):
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
         measure = IdentitalToDiscrete(distribution)
-        self.assertRaises(DimensionError,measure.set_dimension,3)
+        self.assertRaises(DimensionError,measure.set_dimension,3)'''
 
 
-class TestImportanceSampling(unittest.TestCase):
+'''class TestImportanceSampling(unittest.TestCase):
     """ Unit tests for ImportanceSampling Measure. """
     
     def test_construct(self):
@@ -171,7 +169,7 @@ class TestImportanceSampling(unittest.TestCase):
                 return 0. # outside of quarter circle
         measure = ImportanceSampling(
             objective_pdf = quarter_circle_uniform_pdf,
-            measure_to_sample_from = Uniform(Lattice(dimension=2,seed=9)))
+            measure_to_sample_from = Uniform(Lattice(dimension=2,seed=9)))'''
 
 
 if __name__ == "__main__":

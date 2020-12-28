@@ -1,11 +1,12 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Sobol
-from ..discrete_distribution import FWHT
 from ..true_measure import Gaussian
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
-from numpy import sqrt, log2, exp, log
+from ..discrete_distribution.c_lib import c_lib
+import ctypes
+from numpy import sqrt, log2, exp, log, ctypeslib
 from math import factorial
 import numpy as np
 from time import time
@@ -398,3 +399,27 @@ class CubBayesNetG(StoppingCriterion):
             ynext[~ptind] = (evenval - oddval)
         return ynext
     '''
+
+
+class FWHT():
+    def __init__(self):
+        self.fwht_copy_cf = c_lib.fwht_copy
+        self.fwht_copy_cf.argtypes = [
+            ctypes.c_uint32,
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')
+        ]
+        self.fwht_copy_cf.restype = None
+
+        self.fwht_inplace_cf = c_lib.fwht_inplace
+        self.fwht_inplace_cf.argtypes = [
+            ctypes.c_uint32,
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
+        ]
+        self.fwht_inplace_cf.restype = None
+
+    def fwht_copy(self, n, src, dst):
+        self.fwht_copy_cf(n, src, dst)
+
+    def fwht_inplace(self, n, src):
+        self.fwht_inplace_cf(n, src)

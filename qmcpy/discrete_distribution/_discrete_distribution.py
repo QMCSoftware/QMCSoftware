@@ -10,7 +10,7 @@ class DiscreteDistribution(object):
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
         if not hasattr(self, 'dimension'):
-            raise ParameterError(prefix + 'self.dimension')
+            raise ParameterError(prefix + 'self.d')
         if not hasattr(self, 'low_discrepancy'):
             raise ParameterError(prefix + 'self.low_discrepancy')
         if not hasattr(self,'parameters'):
@@ -18,7 +18,7 @@ class DiscreteDistribution(object):
 
     def gen_samples(self, *args):
         """
-        ABSTRACT METHOD Generate samples from discrete distribution.
+        ABSTRACT METHOD to generate samples from discrete distribution.
 
         Args:
             args (tuple): tuple of positional argument. See implementations for details
