@@ -47,7 +47,7 @@ class Lebesgue(TrueMeasure):
                                  'or must be -inf,inf respectively')
         super(Lebesgue,self).__init__()
 
-    def _tf_to_mimic_samples(self, samples):
+    def _transform(self, samples):
         """
         Transform samples to appear standard uniform or standard gaussian
         
@@ -69,18 +69,14 @@ class Lebesgue(TrueMeasure):
                 'Cannot transform samples mimicing %s to mimic %s'%(self.distribution.mimics,self.tf_to_mimic))
         return mimic_samples
     
-    def _transform_g_to_f(self, g):
+    def _eval_f(self, x, g, *args, **kwargs):
         """ See abstract method. """
         if self.tf_to_mimic == 'StdUniform':
-            def f(samples, *args, **kwargs):
-                mimic_smaples = self._tf_to_mimic_samples(samples)
-                dist = self.upper_bound - self.lower_bound
-                f_vals = dist.prod() * g(dist*mimic_smaples + self.lower_bound, *args, **kwargs)
-                return f_vals
+            mimic_smaples = self._transform(x)
+            dist = self.upper_bound - self.lower_bound
+            y = dist.prod() * g(dist*mimic_smaples + self.lower_bound, *args, **kwargs)
         elif self.tf_to_mimic == 'StdGaussian':
-            def f(samples, *args, **kwargs):
-                mimic_smaples = self._tf_to_mimic_samples(samples)
-                g_vals = g(mimic_smaples, *args, **kwargs)
-                f_vals = g_vals / norm.pdf(mimic_smaples).prod(-1).reshape(g_vals.shape)
-                return f_vals
-        return f
+            mimic_smaples = self._transform(x)
+            g_vals = g(mimic_smaples, *args, **kwargs)
+            y = g_vals / norm.pdf(mimic_smaples).prod(-1).reshape(g_vals.shape)
+        return y

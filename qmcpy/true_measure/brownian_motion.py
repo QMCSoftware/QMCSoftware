@@ -51,10 +51,10 @@ class BrownianMotion(TrueMeasure):
         self.drift = float(drift)
         self.d = self.distribution.dimension
         self.t = t_final # exercise time
-        self._assemble()
+        self._decomp()
         super(BrownianMotion,self).__init__()
     
-    def _assemble(self):
+    def _decomp(self):
         """ Set parameters dependent on the dimension. """
         self.time_vector = linspace(self.t/self.d,self.t,self.d) # evenly spaced
         self.ms_vec = self.drift * self.time_vector
@@ -74,7 +74,7 @@ class BrownianMotion(TrueMeasure):
             seq = sobol.gen_samples(n=n_pow2).squeeze()[:self.d]
             self.order = argsort(seq)
 
-    def _tf_to_mimic_samples(self, samples):
+    def _transform(self, samples):
         """
         Transform samples to appear BrownianMotion.
         
@@ -102,18 +102,16 @@ class BrownianMotion(TrueMeasure):
         is_paths = paths + self.ms_vec # add drift shift for importance sampling
         return is_paths
 
-    def _transform_g_to_f(self, g):
+    def _eval_f(self, x, g, *args, **kwargs):
         """ See abstract method. """
-        def f(samples, *args, **kwargs):
-            z = self._tf_to_mimic_samples(samples)
-            y = g(z,*args,**kwargs) * exp( (self.drift*self.t/2. - z[:,-1]) * self.drift)
-            return y
-        return f
+        z = self._transform(x)
+        y = g(z, *args, **kwargs) * exp( (self.drift*self.t/2. - z[:,-1]) * self.drift)
+        return y
     
     def gen_samples(self, *args, **kwargs):
         """ See abstract method. """
         samples = self.distribution.gen_samples(*args,**kwargs)
-        mimic_samples = self._tf_to_mimic_samples(samples)
+        mimic_samples = self._transform(samples)
         return mimic_samples
     
     def set_dimension(self, dimension):
@@ -125,7 +123,7 @@ class BrownianMotion(TrueMeasure):
         """
         self.distribution.set_dimension(dimension)
         self.d = dimension
-        self._assemble()
+        self._decomp()
     
     def plot(self, n=2**5, show=True, out=None):
         """

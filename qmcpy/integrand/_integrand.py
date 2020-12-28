@@ -16,7 +16,19 @@ class Integrand(object):
         self.dimension = self.measure.dimension
         if not hasattr(self,'leveltype'):
             self.leveltype = 'single'
-        self.f = self.measure._transform_g_to_f(self.g) # transformed integrand
+    
+    def f(self, x, *args, **kwargs):
+        """ transformed integrand. 
+        
+        Args:
+            x (ndarray): n x d array of samples from a discrete distribution
+            *args: ordered args to g
+            **kwargs (dict): keyword args to g
+            
+        Return: 
+            ndarray: length n vector of funciton evaluations
+        """
+        return self.measure._eval_f(x,self.g,*args,**kwargs)
         
     def period_transform(self, ptransform):
         """ Computes the periodization transform for the given function values """
@@ -49,7 +61,6 @@ class Integrand(object):
         else:
             f = self.f
             print(f'Error: Periodization transform {ptransform} not implemented')
-
         return f
 
     def g(self, x):

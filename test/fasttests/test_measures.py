@@ -21,7 +21,8 @@ class TestUniform(unittest.TestCase):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
         measure = Gaussian(distribution, covariance=1/2)
-        Keister(measure) 
+        k = Keister(measure)
+        k.f(distribution.gen_samples(2**3))
 
     def test_set_dimension(self):
         # default params
@@ -60,7 +61,8 @@ class TestGaussian(unittest.TestCase):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
         measure = Gaussian(distribution)
-        Keister(measure) 
+        k = Keister(measure) 
+        k.f(distribution.gen_samples(2**3))
 
     def test_set_dimension(self):
         # default params
@@ -107,7 +109,8 @@ class TestBrownianMontion(unittest.TestCase):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
         measure = Gaussian(distribution, covariance=1/2)
-        Keister(measure)
+        k = Keister(measure)
+        k.f(distribution.gen_samples(2**3))
     
     def test_set_dimension(self):
         distribution = Sobol(dimension=2)
@@ -125,7 +128,8 @@ class TestLebesgue(unittest.TestCase):
         # implicitly called from Integrand superclass constructor
         distribution = Sobol(dimension=3)
         measure = Lebesgue(distribution)
-        Keister(measure)
+        k = Keister(measure)
+        k.f(distribution.gen_samples(2**3))
     
     def test_set_dimension(self):
         distribution = Sobol(dimension=2)
@@ -145,7 +149,8 @@ class TestIdentitalToDiscrete(unittest.TestCase):
         # implicitly called from Integrand superclass constructor
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
         measure = IdentitalToDiscrete(distribution)
-        Linear(measure)
+        l = Linear(measure)
+        l.f(distribution.gen_samples(2**3))
     
     def test_set_dimension(self):
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))

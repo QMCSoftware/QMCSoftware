@@ -61,7 +61,7 @@ class Uniform(TrueMeasure):
         """ See abstract class. """
         return 1./( prod(self.upper_bound-self.lower_bound) )
 
-    def _tf_to_mimic_samples(self, samples):
+    def _transform(self, samples):
         """
         Transform samples to appear Uniform
         
@@ -82,18 +82,15 @@ class Uniform(TrueMeasure):
                 'Cannot transform samples mimicing %s to Uniform'%self.distribution.mimics)
         return mimic_samples
 
-    def _transform_g_to_f(self, g):
+    def _eval_f(self, x, g, *args, **kwargs):
         """ See abstract method. """
-        def f(samples, *args, **kwargs):
-            z = self._tf_to_mimic_samples(samples)
-            y = g(z, *args, **kwargs)
-            return y
-        return f
+        y = g(self._transform(x), *args, **kwargs)
+        return y
 
     def gen_samples(self, *args, **kwargs):
         """ See abstract method. """
         samples = self.distribution.gen_samples(*args,**kwargs)
-        mimic_samples = self._tf_to_mimic_samples(samples)
+        mimic_samples = self._transform(samples)
         return mimic_samples
     
     def set_dimension(self, dimension):

@@ -1,4 +1,4 @@
-from ..util import MethodImplementationError, _univ_repr, DimensionError
+from ..util import MethodImplementationError, _univ_repr, DimensionError, ParameterError
 
 
 class TrueMeasure(object):
@@ -15,7 +15,7 @@ class TrueMeasure(object):
     def gen_samples(self, *args, **kwargs):
         """
         ABSTRACT METHOD to generate samples from the DiscreteDistribution object
-        and transform them to mimic TrueMeasure samples. 
+        at which to evaluate the original integrand. 
         
         Args:
             *args (tuple): Ordered arguments to self.distribution.gen_samples
@@ -29,18 +29,32 @@ class TrueMeasure(object):
         """
         raise MethodImplementationError(self,'gen_samples')
     
-    def _transform_g_to_f(self, g):
+    def _eval_f(self, x, g, *args, **kwargs):
         """
-        ABSTRACT METHOD to transform g, the origianl integrand, to f,
-        the integrand transformed to accept samples from the discrete distribution.  
+        ABSTRACT METHOD to evaluate the transformed integrand, f 
         
         Args:
+            x (ndarray): n x d array of samples from a discrete distribution
             g (method): original integrand (Integrand.g)
+            *args: ordered args to g
+            **kwargs (dict): keyword args to g
         
         Returns:
-            function handle: transformed integrand
+            ndarray: length n vector of funciton evaluations
         """
-        raise MethodImplementationError(self,'_transform_g_to_f')
+        raise MethodImplementationError(self,'_eval_f')
+
+    def pdf(self, x):
+        """
+        Probability density function
+
+        Args:
+            x (ndarray): d (dimension) vector sample at which to evaluate the pdf
+        
+        Note:
+            May not be applicable for all measures (ex: Lebesgue).
+        """ 
+        raise MethodImplementationError(self,'pdf')
 
     def set_dimension(self, dimension):
         """
@@ -54,18 +68,6 @@ class TrueMeasure(object):
             May not be applicable for all measures (ex: Gaussian with covariance != k*eye(d) for scalar k)
         """
         raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
-
-    def pdf(self, x):
-        """
-        Probability density function
-
-        Args:
-            x (ndarray): d (dimension) vector sample at which to evaluate the pdf
-        
-        Note:
-            May not be applicable for all measures (ex: Lebesgue).
-        """ 
-        raise MethodImplementationError(self,'pdf')
 
     def __repr__(self):
         return _univ_repr(self, "TrueMeasure", self.parameters)

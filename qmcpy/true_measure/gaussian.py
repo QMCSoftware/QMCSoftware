@@ -33,8 +33,8 @@ class Gaussian(TrueMeasure):
         covariance      [[1.  0.5]
                         [0.5 2. ]]
         decomp_type     pca
-    >>> g2.pdf(array([0,0]))
-    array([[0.038]])
+    >>> g2.pdf(array([[0,0]]))
+    array([0.038])
     """
 
     parameters = ['mean', 'covariance', 'decomp_type']
@@ -66,10 +66,10 @@ class Gaussian(TrueMeasure):
         if not (len(self.mu)==self.d and self.sigma.shape==(self.d,self.d)):
             raise DimensionError("mean must have length dimension and "+\
                 "covariance must be of shapre dimension x dimension")
-        self._assemble()
+        self._decomp()
         super(Gaussian,self).__init__()
     
-    def _assemble(self):
+    def _decomp(self):
         """ Assemble decomposition of sigma. """
         if self.decomp_type == 'pca':
             evals,evecs = eigh(self.sigma) # get eigenvectors and eigenvalues for
@@ -80,13 +80,12 @@ class Gaussian(TrueMeasure):
     
     def pdf(self, x):
         """ See abstract method. """
-        x = x.reshape(self.d,1)
-        mu = self.mu.reshape(self.d,1)
-        density = (2*pi)**(-self.d/2.) * det(self.sigma)**(-1./2) * \
-            exp(-1./2 *  dot( dot((x-mu).T,inv(self.sigma)), x-mu) )
+        delta = x-self.mu
+        density = (2*pi)**(-self.d/2) * det(self.sigma)**(-1./2) * \
+            exp( (-1./2) * ((delta@inv(self.sigma))*delta).sum(1))
         return density
 
-    def _tf_to_mimic_samples(self, samples):
+    def _transform(self, samples):
         """
         Transform samples to appear Gaussian
         
@@ -108,18 +107,15 @@ class Gaussian(TrueMeasure):
                 'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
         return mimic_samples
 
-    def _transform_g_to_f(self, g):
+    def _eval_f(self, x, g, *args, **kwargs):
         """ See abstract method. """
-        def f(samples, *args, **kwargs):
-            z = self._tf_to_mimic_samples(samples)
-            y = g(z, *args, **kwargs)
-            return y
-        return f
+        y = g(self._transform(x), *args, **kwargs)
+        return y
     
     def gen_samples(self, *args, **kwargs):
         """ See abstract method. """
-        samples = self.distribution.gen_samples(*args,**kwargs)
-        mimic_samples = self._tf_to_mimic_samples(samples)
+        x = self.distribution.gen_samples(*args,**kwargs)
+        mimic_samples = self._transform(x)
         return mimic_samples
 
     def set_dimension(self, dimension):
@@ -134,7 +130,7 @@ class Gaussian(TrueMeasure):
         self.d = dimension
         self.mu = tile(m,int(self.d))
         self.sigma = c*eye(int(self.d))
-        self._assemble()
+        self._decomp()
     
     def plot(self, dim_x=0, dim_y=1, n=2**7, point_size=5, color='c', show=True, out=None):
         """
