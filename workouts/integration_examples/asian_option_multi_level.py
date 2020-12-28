@@ -18,7 +18,7 @@ def asian_option_multi_level(
     print(bar)
 
     # CubMCCLT
-    distribution = IIDStdGaussian(seed=7)
+    distribution = IIDStdUniform(seed=7)
     measure = BrownianMotion(distribution)
     integrand = AsianOption(
         measure = measure,

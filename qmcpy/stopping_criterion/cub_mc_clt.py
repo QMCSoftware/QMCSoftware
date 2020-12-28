@@ -1,6 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
-from ..discrete_distribution import IIDStdGaussian
+from ..discrete_distribution import IIDStdUniform
 from ..true_measure import Gaussian, BrownianMotion
 from ..integrand import Keister, AsianOption
 from ..util import MaxSamplesWarning
@@ -14,18 +14,18 @@ class CubMCCLT(StoppingCriterion):
     """
     Stopping criterion based on the Central Limit Theorem.
     
-    >>> k = Keister(Gaussian(IIDStdGaussian(2,seed=7),covariance=1./2))
+    >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
     >>> sc = CubMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.834674149189029
+    1.8010283270714038
     >>> data
-    Solution: 1.8347         
+    Solution: 1.8010         
     Keister (Integrand Object)
-    IIDStdGaussian (DiscreteDistribution Object)
+    IIDStdUniform (DiscreteDistribution Object)
         dimension       2^(1)
         seed            7
-        mimics          StdGaussian
+        mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -39,14 +39,14 @@ class CubMCCLT(StoppingCriterion):
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          1
-        solution        1.835
-        n               5826
-        n_total         6850
-        error_bound     0.050
-        confid_int      [1.785 1.885]
+        solution        1.801
+        n               5741
+        n_total         6765
+        error_bound     0.051
+        confid_int      [1.75  1.852]
         time_integrate  ...
     >>> ac = AsianOption(
-    ...     measure = BrownianMotion(IIDStdGaussian()),
+    ...     measure = BrownianMotion(IIDStdUniform()),
     ...     multi_level_dimensions = [2,4,8])
     >>> sc = CubMCCLT(ac,abs_tol=.05)
     >>> solution,data = sc.integrate()
@@ -76,7 +76,7 @@ class CubMCCLT(StoppingCriterion):
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['single','fixed-multi']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
+        allowed_distribs = ["IIDStdUniform"]
         super(CubMCCLT,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
 
     def integrate(self):

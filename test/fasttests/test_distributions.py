@@ -29,7 +29,7 @@ class TestIIDStdUniform(unittest.TestCase):
         self.assertTrue(samples.shape==(4,3))
 
 
-class TestIIDGaussian(unittest.TestCase):
+'''class TestIIDGaussian(unittest.TestCase):
     """ Unit tests for IIDStdGaussian DiscreteDistribution. """
 
     def test_mimics(self):
@@ -46,7 +46,7 @@ class TestIIDGaussian(unittest.TestCase):
         distribution = IIDStdGaussian(dimension=2)
         distribution.set_dimension(3)
         samples = distribution.gen_samples(4)
-        self.assertTrue(samples.shape==(4,3))
+        self.assertTrue(samples.shape==(4,3))'''
 
 
 class TestLattice(unittest.TestCase):

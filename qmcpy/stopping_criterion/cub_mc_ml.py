@@ -1,6 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLMCData
-from ..discrete_distribution import IIDStdGaussian
+from ..discrete_distribution import IIDStdUniform
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
@@ -14,13 +14,13 @@ class CubMCML(StoppingCriterion):
     """
     Stopping criterion based on multi-level monte carlo.
     
-    >>> mlco = MLCallOptions(Gaussian(IIDStdGaussian(seed=7)))
+    >>> mlco = MLCallOptions(Gaussian(IIDStdUniform(seed=7)))
     >>> sc = CubMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.445441712933263
+    10.440559985477359
     >>> data
-    Solution: 10.4454        
+    Solution: 10.4406        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -28,10 +28,10 @@ class CubMCML(StoppingCriterion):
         r               0.050
         t               1
         b               85
-    IIDStdGaussian (DiscreteDistribution Object)
+    IIDStdUniform (DiscreteDistribution Object)
         dimension       2^(6)
         seed            7
-        mimics          StdGaussian
+        mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1
@@ -45,13 +45,13 @@ class CubMCML(StoppingCriterion):
     MLMCData (AccumulateData Object)
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        n_level         [7.804e+05 1.533e+04 6.633e+03 2.077e+03 7.560e+02 2.730e+02 9.600e+01]
-        mean_level      [1.006e+01 1.848e-01 1.014e-01 5.138e-02 2.472e-02 1.452e-02 7.657e-03]
-        var_level       [1.963e+02 1.515e-01 4.124e-02 1.109e-02 2.901e-03 6.799e-04 1.848e-04]
+        n_level         [7.795e+05 1.496e+04 5.916e+03 2.244e+03 7.560e+02 2.770e+02 1.060e+02]
+        mean_level      [1.005e+01 1.777e-01 1.071e-01 5.340e-02 2.990e-02 1.167e-02 7.812e-03]
+        var_level       [1.959e+02 1.441e-01 4.433e-02 1.093e-02 2.940e-03 7.304e-04 2.261e-04]
         cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
-        n_total         805984
-        alpha           0.927
-        beta            1.946
+        n_total         804118
+        alpha           0.942
+        beta            1.893
         gamma           1.000
         time_integrate  ...
 
@@ -112,7 +112,7 @@ class CubMCML(StoppingCriterion):
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
+        allowed_distribs = ["IIDStdUniform"]
         super(CubMCML,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
     
     def integrate(self):

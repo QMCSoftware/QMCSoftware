@@ -9,22 +9,8 @@ def cubmcclt_iidstduniform(dimension, abs_tol, rel_tol):
     solution,data = CubMCCLT(integrand, abs_tol, rel_tol).integrate()
     return data
 
-def cubmcclt_iidstdgaussian(dimension, abs_tol, rel_tol):
-    distribution = IIDStdGaussian(dimension,seed=7)
-    measure = Gaussian(distribution, covariance=1./2)
-    integrand = Keister(measure)
-    solution,data = CubMCCLT(integrand, abs_tol, rel_tol).integrate()
-    return data
-
 def cubmcg_iidstduniform(dimension, abs_tol, rel_tol):
     distribution = IIDStdUniform(dimension,seed=7)
-    measure = Gaussian(distribution, covariance=1./2)
-    integrand = Keister(measure)
-    solution,data = CubMCG(integrand, abs_tol, rel_tol).integrate()
-    return data
-
-def cubmcg_iidstdgaussian(dimension, abs_tol, rel_tol):
-    distribution = IIDStdGaussian(dimension,seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubMCG(integrand, abs_tol, rel_tol).integrate()
@@ -68,9 +54,7 @@ def cubbayeslatticeg(dimension, abs_tol, rel_tol):
 
 integrations_dict = {
     ('CubMCCLT','IIDStdUniform','MC'): cubmcclt_iidstduniform,
-    ('CubMCCLT','IIDStdGaussian','MC'): cubmcclt_iidstdgaussian,
     ('CubMCG','IIDStdUniform','MC'): cubmcg_iidstduniform,
-    ('CubMCG','IIDStdGaussian','MC'): cubmcg_iidstdgaussian,
     ('CubQMCCLT','Lattice','QMC'): cubqmcclt_lattice,
     ('CubQMCCLT','Sobol','QMC'): cubqmcclt_sobol,
     ('CubQMCLatticeG','Lattice','QMC'): cubqmclatticeg,

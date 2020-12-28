@@ -101,7 +101,7 @@ class CubMCG(StoppingCriterion):
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['single']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
+        allowed_distribs = ["IIDStdUniform"]
         super(CubMCG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
 
     def integrate(self):

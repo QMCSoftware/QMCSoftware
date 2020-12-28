@@ -1,13 +1,13 @@
 """ Test various call options with MLMC StoppingCriterion """
 
-from qmcpy import IIDStdGaussian, Gaussian, MLCallOptions
+from qmcpy import IIDStdUniform, Gaussian, MLCallOptions
 from workouts.mlmc.mlmc_test import mlmc_test
 
 def mcqmc06(l_convergence=3,epsilons=[.05,.1]):
     for option in ['European','Asian']:
         print('\n\n'+'~'*100+'\n\n')
         print('%s Call Option'%option)
-        distribution = IIDStdGaussian()
+        distribution = IIDStdUniform()
         measure = Gaussian(distribution)
         integrand = MLCallOptions(measure,
             option = option,

@@ -39,7 +39,7 @@ class TestCubQMCCLT(unittest.TestCase):
     """ Unit tests for CubQMCCLT StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
-        distribution = IIDStdGaussian(dimension=2)
+        distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, CubQMCCLT, integrand)
@@ -77,7 +77,7 @@ class TestCubMCG(unittest.TestCase):
 
     
     def test_keister_2d(self):
-        distribution = IIDStdGaussian(dimension=2)
+        distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution, covariance=1./2)
         integrand = Keister(measure)
         solution,data = CubMCG(integrand, abs_tol=tol).integrate()
@@ -88,7 +88,7 @@ class TestCubQMCLatticeG(unittest.TestCase):
     """ Unit tests for CubQMCLatticeG StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
-        distribution = IIDStdGaussian(dimension=2)
+        distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, CubQMCLatticeG, integrand)
@@ -111,7 +111,7 @@ class TestCubQMCLatticeG(unittest.TestCase):
 class TestCubQMCSobolG(unittest.TestCase):
     """ Unit tests for CubQMCSobolG StoppingCriterion. """
     def test_raise_distribution_compatibility_error(self):
-        distribution = IIDStdGaussian(dimension=2)
+        distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, CubQMCSobolG, integrand)
@@ -154,7 +154,7 @@ class TestCubQMCML(unittest.TestCase):
     """ Unit tests for CubQMCML StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
-        integrand = MLCallOptions(Gaussian(IIDStdGaussian()))
+        integrand = MLCallOptions(Gaussian(IIDStdUniform()))
         self.assertRaises(DistributionCompatibilityError, CubQMCML, integrand)
 
     def test_n_max(self):
@@ -173,7 +173,7 @@ class TestCubBayesLatticeG(unittest.TestCase):
     """ Unit tests for CubBayesLatticeG StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
-        distribution = IIDStdGaussian(dimension=2)
+        distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, CubBayesLatticeG, integrand)
@@ -197,7 +197,7 @@ class TestCubBayesNetG(unittest.TestCase):
     """ Unit tests for CubBayesNetG StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
-        distribution = IIDStdGaussian(dimension=2)
+        distribution = IIDStdUniform(dimension=2)
         measure = Gaussian(distribution)
         integrand = Keister(measure)
         self.assertRaises(DistributionCompatibilityError, CubBayesNetG, integrand)

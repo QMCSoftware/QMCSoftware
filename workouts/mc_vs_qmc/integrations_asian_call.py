@@ -9,22 +9,8 @@ def cubmcclt_iidstduniform(dimension, abs_tol, drift):
     solution,data = CubMCCLT(integrand, abs_tol).integrate()
     return data
 
-def cubmcclt_iidstdgaussian(dimension, abs_tol, drift):
-    distribution = IIDStdGaussian(dimension,seed=7)
-    measure = BrownianMotion(distribution, drift=drift)
-    integrand = AsianOption(measure)
-    solution,data = CubMCCLT(integrand, abs_tol).integrate()
-    return data
-
 def cubmcg_iidstduniform(dimension, abs_tol, drift):
     distribution = IIDStdUniform(dimension,seed=7)
-    measure = BrownianMotion(distribution, drift=drift)
-    integrand = AsianOption(measure)
-    solution,data = CubMCG(integrand, abs_tol).integrate()
-    return data
-
-def cubmcg_iidstdgaussian(dimension, abs_tol, drift):
-    distribution = IIDStdGaussian(dimension,seed=7)
     measure = BrownianMotion(distribution, drift=drift)
     integrand = AsianOption(measure)
     solution,data = CubMCG(integrand, abs_tol).integrate()
@@ -67,9 +53,7 @@ def cubqmcsobolg(dimension, abs_tol, drift):
 
 integrations_dict = {
     ('CubMCCLT','IIDStdUniform','MC'): cubmcclt_iidstduniform,
-    ('CubMCCLT','IIDStdGaussian','MC'): cubmcclt_iidstdgaussian,
     ('CubMCG','IIDStdUniform','MC'): cubmcg_iidstduniform,
-    ('CubMCG','IIDStdGaussian','MC'): cubmcg_iidstdgaussian,
     ('CubQMCCLT','Lattice','QMC'): cubqmcclt_lattice,
     ('CubQMCCLT','Sobol','QMC'): cubqmcclt_sobol,
     ('CubQMCLatticeG','Lattice','QMC'): cubqmclatticeg,

@@ -27,7 +27,7 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CubMCG
-    distribution = IIDStdGaussian(dimension, seed=7)
+    distribution = IIDStdUniform(dimension, seed=7)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubMCG(integrand,abs_tol=abs_tol).integrate()

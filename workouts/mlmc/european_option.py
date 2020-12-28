@@ -9,7 +9,7 @@ def european_options(abs_tol=.1):
     start_price = 100
     interest_rate = .05
 
-    discrete_distribution = IIDStdGaussian()
+    discrete_distribution = IIDStdUniform()
     measure = Gaussian(discrete_distribution)
     integrand = MLCallOptions(measure,'european',volatility,start_price,interest_rate)
     algorithm = CubMCML(integrand,abs_tol,n_init=256,n_max=1e10)

@@ -20,7 +20,7 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [1.3803884470431430, 1.808186429263620, 2.168309102165481]
         for i in range(len(dimensions)):
-            distribution = IIDStdGaussian(dimension=dimensions[i])
+            distribution = IIDStdUniform(dimension=dimensions[i])
             measure = Gaussian(distribution, covariance=1./2)
             integrand = Keister(measure)
             solution,data = CubMCCLT(integrand,abs_tol=abs_tol).integrate()
@@ -28,7 +28,7 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_asian_option_multi_level(self):
         abs_tol =.05
-        distribution = IIDStdGaussian()
+        distribution = IIDStdUniform()
         measure = BrownianMotion(distribution)
         integrand = AsianOption(measure,multi_level_dimensions=[4,16,64])
         solution,data = CubMCCLT(integrand, abs_tol).integrate()

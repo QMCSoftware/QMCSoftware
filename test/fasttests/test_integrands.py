@@ -81,7 +81,7 @@ class TestCallOptions(unittest.TestCase):
     def test_f(self):
         l = 3
         for option in ['European','Asian']:
-            distribution = IIDStdGaussian()
+            distribution = IIDStdUniform()
             measure = Gaussian(distribution)
             integrand = MLCallOptions(measure,option=option)
             d = integrand._dim_at_level(l)
@@ -93,13 +93,13 @@ class TestCallOptions(unittest.TestCase):
     def test__dim_at_level(self):
         l = 3
         # European 
-        distribution = IIDStdGaussian()
+        distribution = IIDStdUniform()
         measure = Gaussian(distribution)
         integrand = MLCallOptions(measure,option='european')
         self.assertTrue(integrand._dim_at_level(0)==2**0)
         self.assertTrue(integrand._dim_at_level(3)==2**3)
         # Asian 
-        distribution = IIDStdGaussian()
+        distribution = IIDStdUniform()
         measure = Gaussian(distribution)
         integrand = MLCallOptions(measure,option='asian')
         self.assertTrue(integrand._dim_at_level(0)==2**1)
