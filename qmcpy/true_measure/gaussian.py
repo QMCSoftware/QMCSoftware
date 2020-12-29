@@ -10,25 +10,30 @@ class Gaussian(TrueMeasure):
     """
     Normal Measure.
     
-    >>> dd = Sobol(2,seed=7)
-    >>> g = Gaussian(dd,mean=1,covariance=1./4)
+    >>> d = 2
+    >>> s = Sobol(d,seed=7)
+    >>> g = Gaussian(d,mean=1,covariance=1./4)
     >>> g
     Gaussian (TrueMeasure Object)
+        d               2
         mean            1
         covariance      2^(-2)
         decomp_type     pca
-    >>> g.gen_samples(n_min=4,n_max=8)
+    >>> g.transform(s.gen_samples(n_min=4,n_max=8))
     array([[ 1.046,  1.693],
            [ 0.668,  0.579],
            [ 1.42 ,  0.895],
            [-0.027,  1.263]])
-    >>> g.set_dimension(4)
-    >>> g.gen_samples(n_min=2,n_max=4)
+    >>> d_new
+    >>> s.set_dimension(d_new)
+    >>> g.set_dimension(d_new)
+    >>> g.transform(s.gen_samples(n_min=2,n_max=4))
     array([[1.68 , 1.08 , 0.971, 1.274],
            [0.425, 0.72 , 1.948, 0.801]])
-    >>> g2 = Gaussian(Sobol(2),mean=[1,2],covariance=[[1,.5],[.5,2]])
+    >>> g2 = Gaussian(2,mean=[1,2],covariance=[[1,.5],[.5,2]])
     >>> g2
     Gaussian (TrueMeasure Object)
+        d               2
         mean            [1 2]
         covariance      [[1.  0.5]
                         [0.5 2. ]]
@@ -37,12 +42,12 @@ class Gaussian(TrueMeasure):
     array([0.038])
     """
 
-    parameters = ['mean', 'covariance', 'decomp_type']
+    parameters = ['d', 'mean', 'covariance', 'decomp_type']
 
-    def __init__(self, distribution, mean=0., covariance=1., decomp_type='PCA'):
+    def __init__(self, dimension=1, mean=0., covariance=1., decomp_type='PCA'):
         """
         Args:
-            distribution (DiscreteDistribution): DiscreteDistribution instance
+            dimension (int): dimension of the distribution
             mean (float): mu for Normal(mu,sigma^2)
             covariance (ndarray): sigma^2 for Normal(mu,sigma^2). 
                 A float or d (dimension) vector input will be extended to covariance*eye(d)
@@ -50,8 +55,7 @@ class Gaussian(TrueMeasure):
                 "PCA" for principal component analysis or 
                 "Cholesky" for cholesky decomposition.
         """
-        self.distribution = distribution
-        self.d = distribution.dimension
+        self.d = self.dimension
         self.mean = mean
         self.covariance = covariance
         self.decomp_type = decomp_type.lower()
@@ -64,107 +68,45 @@ class Gaussian(TrueMeasure):
         if self.sigma.shape==(self.d,):
             self.sigma = diag(self.sigma)
         if not (len(self.mu)==self.d and self.sigma.shape==(self.d,self.d)):
-            raise DimensionError("mean must have length dimension and "+\
-                "covariance must be of shapre dimension x dimension")
-        self._decomp()
+            raise DimensionError('''
+                    mean must have length d and
+                    covariance must be of shape d x d''')
+        self._set_constants()
         super(Gaussian,self).__init__()
     
-    def _decomp(self):
-        """ Assemble decomposition of sigma. """
+    def _set_constants(self):
         if self.decomp_type == 'pca':
             evals,evecs = eigh(self.sigma) # get eigenvectors and eigenvalues for
             order = argsort(-evals)
-            self.a = dot(evecs[:,order],diag(sqrt(evals[order]))).T
+            self.a = dot(evecs[:,order],diag(sqrt(evals[order])))
         elif self.decomp_type == 'cholesky':
-            self.a = cholesky(self.sigma)
+            self.a = cholesky(self.sigma).T
+        self.det_at = det(self.a.T)
+        self.det_sigma = det(self.sigma)
+        self.inv_sigma = inv(self.sigma)  
     
-    def pdf(self, x):
-        """ See abstract method. """
+    def transform(self, x):
+        return self.mu + (norm.ppf(x)@self.a.T)
+    
+    def jacobian(self, x):
+        return self.det_at/norm.pdf(norm.ppf(x)).prod(1)
+
+    def weight(self, x):
+        const = (2*pi)**(-self.d/2) * self.det_sigma**(-1./2)
         delta = x-self.mu
-        density = (2*pi)**(-self.d/2) * det(self.sigma)**(-1./2) * \
-            exp( (-1./2) * ((delta@inv(self.sigma))*delta).sum(1))
-        return density
-
-    def _transform(self, samples):
-        """
-        Transform samples to appear Gaussian
-        
-        Args:
-            samples (ndarray): samples from a discrete distribution
-        
-        Return:
-            ndarray: samples from the DiscreteDistribution transformed to mimic Gaussian.
-        """
-        if self.distribution.mimics == 'StdGaussian':
-            std_gaussian_samples = samples
-            mimic_samples = self.mu + dot(std_gaussian_samples, self.a)
-        elif self.distribution.mimics == "StdUniform":
-            std_gaussian_samples = norm.ppf(samples)
-            mimic_samples = self.mu + dot(std_gaussian_samples, self.a)
-            # mimic_samples = erfcinv(samples)
-        else:
-            raise TransformError(\
-                'Cannot transform samples mimicing %s to Gaussian'%self.distribution.mimics)
-        return mimic_samples
-
-    def _eval_f(self, x, g, *args, **kwargs):
-        """ See abstract method. """
-        y = g(self._transform(x), *args, **kwargs)
-        return y
-    
-    def gen_samples(self, *args, **kwargs):
-        """ See abstract method. """
-        x = self.distribution.gen_samples(*args,**kwargs)
-        mimic_samples = self._transform(x)
-        return mimic_samples
+        return const*exp(-(delta@self.inv_sigma)*delta).sum(1)/2)
 
     def set_dimension(self, dimension):
         """ See abstract method. """
         m = self.mu[0]
         c = self.sigma[0,0]
         expected_cov = c*eye(int(self.d))
-        if not (all(self.mu==m) and (self.sigma==expected_cov).all()):
-            raise DimensionError('In order to change dimension of Gaussian measure '+\
-                'mean (mu) must be all the same and covariance must be a scaler times I')
-        self.distribution.set_dimension(dimension)
+        if not ( (self.mu=m).all() and (self.sigma==expected_cov).all() ):
+            raise DimensionError('''
+                    In order to change dimension of Gaussian measure
+                    mean (mu) must be all the same and 
+                    covariance must be a scaler times I''')
         self.d = dimension
         self.mu = tile(m,int(self.d))
         self.sigma = c*eye(int(self.d))
-        self._decomp()
-    
-    def plot(self, dim_x=0, dim_y=1, n=2**7, point_size=5, color='c', show=True, out=None):
-        """
-        Make a scatter plot from samples. Requires dimension >= 2. 
-
-        Args:
-            dim_x (int): index of first dimension to be plotted on horizontal axis. 
-            dim_y (int): index of the second dimension to be plotted on vertical axis.
-            n (int): number of samples to draw as self.gen_samples(n)
-            point_size (int): ax.scatter(...,s=point_size)
-            color (str): ax.scatter(...,color=color)
-            show (bool): show plot or not? 
-            out (str): file name to output image. If None, the image is not output
-
-        Return: 
-            tuple: fig,ax from `fig,ax = matplotlib.pyplot.subplots(...)`
-        """
-        if self.dimension < 2:
-            raise ParameterError('Plotting a Gaussian instance requires dimension >=2. ')
-        x = self.gen_samples(n)
-        from matplotlib import pyplot
-        pyplot.rc('font', size=16)
-        pyplot.rc('legend', fontsize=16)
-        pyplot.rc('figure', titlesize=16)
-        pyplot.rc('axes', titlesize=16, labelsize=16)
-        pyplot.rc('xtick', labelsize=16)
-        pyplot.rc('ytick', labelsize=16)
-        fig,ax = pyplot.subplots()
-        ax.set_xlabel('$x_{i,%d}$'%dim_x)
-        ax.set_ylabel('$x_{i,%d}$'%dim_y)
-        ax.scatter(x[:,dim_x],x[:,dim_y],color=color,s=point_size)
-        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n
-        ax.set_title(s+' Gaussian Samples')
-        fig.tight_layout()
-        if out: pyplot.savefig(out,dpi=250)
-        if show: pyplot.show()
-        return fig,ax
+        self._set_constants()

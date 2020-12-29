@@ -12,7 +12,7 @@ class Lattice(DiscreteDistribution):
     >>> l = Lattice(2,seed=7)
     >>> l
     Lattice (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         randomize       1
         order           natural
         seed            7
@@ -71,7 +71,7 @@ class Lattice(DiscreteDistribution):
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
-    parameters = ['dimension','randomize','order','seed','mimics']
+    parameters = ['d','randomize','order','seed','mimics']
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None, z_path=None):
         """
@@ -207,16 +207,20 @@ class Lattice(DiscreteDistribution):
         else:
             return xr
 
+    def pdf(self, x):
+        """ pdf of a standard uniform """
+        return ones(x.shape[0], dtype=float))
+    
     def set_seed(self, seed):
         """ See abstract method. """
         self.seed = seed if seed else random.randint(1, 100000, dtype=uint64)
         random.seed(self.seed)
-        self.shift = random.rand(int(self.dimension))
+        self.shift = random.rand(int(self.d))
         
     def set_dimension(self, dimension):
         """ See abstract method. """
-        self.dimension = dimension
-        if self.dimension > self.d_max:
+        self.d = dimension
+        if self.d > self.d_max:
             raise ParameterError('Lattice requires dimension <= %d.'%self.d_max)
-        self.z = self.z_full[:self.dimension]
-        self.shift = random.rand(int(self.dimension))
+        self.z = self.z_full[:self.d]
+        self.shift = random.rand(int(self.d))

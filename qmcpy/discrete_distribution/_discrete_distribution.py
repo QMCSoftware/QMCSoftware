@@ -9,7 +9,7 @@ class DiscreteDistribution(object):
         prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
-        if not hasattr(self, 'dimension'):
+        if not hasattr(self, 'd'):
             raise ParameterError(prefix + 'self.d')
         if not hasattr(self, 'low_discrepancy'):
             raise ParameterError(prefix + 'self.low_discrepancy')
@@ -27,6 +27,12 @@ class DiscreteDistribution(object):
             number of observations and $d$ is dimension
         """
         raise MethodImplementationError(self, 'gen_samples')
+
+    def pdf(self, x):
+        """
+        ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. 
+        """
+        raise MethodImplementationError(self, 'pdf')
 
     def set_dimension(self, dimension):
         """

@@ -1,5 +1,5 @@
 from ._discrete_distribution import DiscreteDistribution
-from numpy import random
+from numpy import *
 
 
 class IIDStdUniform(DiscreteDistribution):
@@ -9,7 +9,7 @@ class IIDStdUniform(DiscreteDistribution):
     >>> dd = IIDStdUniform(dimension=2,seed=7)
     >>> dd
     IIDStdUniform (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         seed            7
         mimics          StdUniform
     >>> dd.gen_samples(4)
@@ -49,6 +49,10 @@ class IIDStdUniform(DiscreteDistribution):
             ndarray: n x d (dimension) array of samples
         """
         return random.rand(int(n), int(self.dimension))
+    
+    def pdf(self, x):
+        """ pdf of a standard uniform """
+        return ones(x.shape[0], dtype=float))
     
     def set_dimension(self, dimension):
         """ See abstract class. """
