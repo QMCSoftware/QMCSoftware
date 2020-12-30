@@ -10,9 +10,8 @@ class EuropeanOption(Integrand):
     """
     European financial option. 
 
-    >>> dd = Sobol(4,seed=17)
-    >>> m = BrownianMotion(dd,drift=-1)
-    >>> eo = EuropeanOption(m,call_put='put')
+    >>> d = 4
+    >>> eo = EuropeanOption(Sobol(d,seed=17),call_put='put')
     >>> eo
     EuropeanOption (Integrand Object)
         volatility      2^(-1)
@@ -20,10 +19,14 @@ class EuropeanOption(Integrand):
         start_price     30
         strike_price    35
         interest_rate   0
-    >>> x = dd.gen_samples(2**12)
+    >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.2...
+    9.211575961797148
+    >>> eo.set_transform(BrownianMotion(d,drift=1))
+    >>> y2 = eo.f(x)
+    >>> y2.mean()
+    9.189966847901108
     """
 
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
@@ -41,7 +44,8 @@ class EuropeanOption(Integrand):
             call_put (str): 'call' or 'put' option
         """
         self.discrete_distrib = discrete_distrib
-        self.true_measure = BrownianMotion(self.discrete_distrib.d,t_final)
+        self.t_final = t_final
+        self.true_measure = BrownianMotion(self.discrete_distrib.d,self.t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
@@ -49,21 +53,20 @@ class EuropeanOption(Integrand):
         self.call_put = call_put.lower()
         if self.call_put not in ['call','put']:
             raise ParameterError("call_put must be either 'call' or 'put'")
-        self.exercise_time = self.measure.time_vector[-1]
         super(EuropeanOption,self).__init__()        
 
     def g(self, x):
         """ See abstract method. """
         self.s = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
-            self.measure.time_vector + self.volatility * x)
+            self.true_measure.time_vec + self.volatility * x)
         for xx,yy in zip(*where(self.s<0)): # if stock becomes <=0, 0 out rest of path
             self.s[xx,yy:] = 0
         if self.call_put == 'call':
             y_raw = maximum(self.s[:,-1] - self.strike_price, 0)
         else: # put
             y_raw = maximum(self.strike_price - self.s[:,-1], 0)
-        y_adj = y_raw * exp(-self.interest_rate * self.exercise_time)
+        y_adj = y_raw * exp(-self.interest_rate * self.t_final)
         return y_adj
     
     def get_exact_value(self):
@@ -73,18 +76,18 @@ class EuropeanOption(Integrand):
         Return:
             float: fair price
         """
-        denom = self.volatility * sqrt(self.exercise_time)
-        decay = self.strike_price * exp(-self.interest_rate * self.exercise_time)
+        denom = self.volatility * sqrt(self.t_final)
+        decay = self.strike_price * exp(-self.interest_rate * self.t_final)
         if self.call_put == 'call':
             term1 = log(self.start_price / self.strike_price) + \
-                    (self.interest_rate + self.volatility**2/2) * self.exercise_time
+                    (self.interest_rate + self.volatility**2/2) * self.t_final
             term2 = log(self.start_price / self.strike_price) + \
-                    (self.interest_rate - self.volatility**2/2) * self.exercise_time
+                    (self.interest_rate - self.volatility**2/2) * self.t_final
             fp = self.start_price * norm.cdf(term1/denom) - decay * norm.cdf(term2/denom)
         elif self.call_put == 'put':
             term1 = log(self.strike_price / self.start_price) - \
-                    (self.interest_rate - self.volatility**2/2) * self.exercise_time
+                    (self.interest_rate - self.volatility**2/2) * self.t_final
             term2 = log(self.strike_price / self.start_price) - \
-                    (self.interest_rate + self.volatility**2/2) * self.exercise_time
+                    (self.interest_rate + self.volatility**2/2) * self.t_final
             fp = decay * norm.cdf(term1/denom) - self.start_price * norm.cdf(term2/denom)
         return fp

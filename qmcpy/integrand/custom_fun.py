@@ -6,13 +6,15 @@ class CustomFun(Integrand):
     """
     Custom user-supplied function handle. 
     
-    >>> dd = Sobol(2,seed=7)
-    >>> m = Gaussian(dd,mean=[1,2])
-    >>> cf = CustomFun(m,lambda x: x[:,0]**2*x[:,1])
-    >>> x = dd.gen_samples(2**10)
+    >>> d = 2
+    >>> s = Sobol(d,seed=7)
+    >>> n = Gaussian(d,mean=[1,2])
+    >>> g = lambda x: x[:,0]**2*x[:,1]
+    >>> cf = CustomFun(s,g,n)
+    >>> x = s.gen_samples(2**10)
     >>> y = cf.f(x)
     >>> y.mean()
-    4.00...
+    4.0092435574693095
     """
 
     parameters = []

@@ -60,11 +60,11 @@ class MLMCData(AccumulateData):
                 self.discrete_distrib.set_dimension(self.dimension[l])
                 # evaluate integral at sampleing points samples
                 samples = self.discrete_distrib.gen_samples(n=self.diff_n_level[l])
-                sums,cost = self.integrand.f(samples,l=l)
+                self.integrand.f(samples,l=l)
                 self.n_level[l] = self.n_level[l] + self.diff_n_level[l]
-                self.sum_level[0,l] = self.sum_level[0,l] + sums[0]
-                self.sum_level[1,l] = self.sum_level[1,l] + sums[1]
-                self.cost_level[l] = self.cost_level[l] + cost
+                self.sum_level[0,l] = self.sum_level[0,l] + self.integrand.sums[0]
+                self.sum_level[1,l] = self.sum_level[1,l] + self.integrand.sums[1]
+                self.cost_level[l] = self.cost_level[l] + self.integrand.cost
         # compute absolute average, variance and cost
         self.mean_level = absolute(self.sum_level[0,:]/self.n_level)
         self.var_level = maximum(0,self.sum_level[1,:]/self.n_level - self.mean_level**2)

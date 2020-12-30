@@ -10,9 +10,7 @@ class MLCallOptions(Integrand):
     """
     Various call options from finance using Milstein discretization with $2^l$ timesteps on level $l$.
 
-    >>> dd = Sobol(seed=7)
-    >>> m = Gaussian(dd)
-    >>> mlco = MLCallOptions(m)
+    >>> mlco = MLCallOptions(Sobol(seed=7))
     >>> mlco
     MLCallOptions (Integrand Object)
         option          european
@@ -24,12 +22,12 @@ class MLCallOptions(Integrand):
     >>> y = 0
     >>> for level in range(4):
     ...     new_dim = mlco._dim_at_level(level)
-    ...     m.set_dimension(new_dim)
-    ...     x = dd.gen_samples(2**10)
-    ...     sums,cost = mlco.f(x,l=level)
-    ...     y += sums[0]/2**10
+    ...     mlco.true_measure.set_dimension(new_dim)
+    ...     mlco.discrete_distrib.set_dimension(new_dim)
+    ...     x = mlco.discrete_distrib.gen_samples(2**10)
+    ...     y += mlco.f(x,l=level).mean()
     >>> y
-    10.40...
+    10.406534719562591
 
     References:
 
@@ -212,7 +210,8 @@ class MLCallOptions(Integrand):
         sums[4] = pf.sum()
         sums[5] = (pf**2).sum()
         cost = n*nf # cost defined as number of fine timesteps
-        return sums,cost
+        self.cost = cost
+        return dp
 
     def _dim_at_level(self, l):
         """ See abstract method. """

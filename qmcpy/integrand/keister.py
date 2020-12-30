@@ -1,6 +1,6 @@
 from ._integrand import Integrand
 from ..discrete_distribution import Sobol
-from ..true_measure import Gaussian, Lebesgue
+from ..true_measure import Gaussian, Lebesgue, BrownianMotion
 from ..util import ParameterError
 from numpy import *
 
@@ -13,14 +13,19 @@ class Keister(Integrand):
     IID Gaussian distribution with variance 1./2.
 
     >>> d = 2
-    >>> s = Sobol(d,seed=7)
-    >>> g = Gaussian(d,covariance=1./2)
-    >>> k = Keister(s,g)
-    >>> x = s.gen_samples(2**10)
+    >>> k = Keister(Sobol(d,seed=7))
+    >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)
     >>> y.mean()
-    1.80...
-    
+    1.8074379398240916
+    >>> y2 = k.f_periodized(x,'baker')
+    >>> y2.mean()
+    1.808937592602977
+    >>> k.set_transform(Gaussian(d,mean=0,covariance=1))
+    >>> y3 = k.f(x)
+    >>> y3.mean()
+    1.808115525723259
+
     References:
 
         [1] B. D. Keister, Multidimensional Quadrature Algorithms, 
@@ -38,4 +43,4 @@ class Keister(Integrand):
     
     def g(self, x):
         norm = sqrt((x**2).sum(1))
-        return cos(normx) * exp(-(normx**2))
+        return cos(norm) * exp(-(norm**2))

@@ -1,4 +1,4 @@
-from ..util import MethodImplementationError, TransformError, _univ_repr, ParameterError
+from ..util import MethodImplementationError, _univ_repr, ParameterError
 from ..true_measure._true_measure import TrueMeasure
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from numpy import *
@@ -10,10 +10,10 @@ class Integrand(object):
     def __init__(self):
         prefix = 'A concrete implementation of Integrand must have '
         if (not hasattr(self, 'discrete_distrib')) or \
-            type(self.discrete_distrib)!=DiscreteDistribution or \
-            self.discrete_distrib.mimics!= 'StdUniform':
+            (not isinstance(self.discrete_distrib,DiscreteDistribution)) or \
+            self.discrete_distrib.mimics!='StdUniform':
             raise ParameterError(prefix + 'self.discrete_distrib, a DiscreteDistribution instance that mimics a Standard Uniform')
-        if (not hasattr(self, 'true_measure')) or type(self.true_measure)!=TrueMeasure:
+        if (not hasattr(self, 'true_measure')) or (not isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
         if not hasattr(self,'parameters'):
             self.parameters = []
@@ -50,7 +50,7 @@ class Integrand(object):
         jacobian = self.true_measure.transformer.jacobian(x)
         weight = self.true_measure.weight(xtf)
         pdf = self.discrete_distrib.pdf(x)
-        y = self.g(xtf)*weight*jacobian/pdf
+        y = self.g(xtf,*args,**kwargs)*weight*jacobian/pdf
         return y
 
     def f_periodized(self, x, ptransform='NONE', *args, **kwargs):

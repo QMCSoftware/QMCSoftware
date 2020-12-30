@@ -9,9 +9,8 @@ class AsianOption(Integrand):
     """
     Asian financial option. 
 
-    >>> dd = Sobol(4,seed=7)
-    >>> m = BrownianMotion(dd)
-    >>> ac = AsianOption(m)
+    >>> d = 4
+    >>> ac = AsianOption(Sobol(d,seed=7))
     >>> ac
     AsianOption (Integrand Object)
         volatility      2^(-1)
@@ -22,14 +21,12 @@ class AsianOption(Integrand):
         mean_type       arithmetic
         dimensions      2^(2)
         dim_fracs       0
-    >>> x = dd.gen_samples(2**10)
+    >>> x = ac.discrete_distrib.gen_samples(2**10)
     >>> y = ac.f(x)
     >>> y.mean()
-    1.77...
-    >>> dd2 = Sobol(seed=7)
-    >>> m2 = BrownianMotion(dd2,drift=1)
+    1.7732743282379055
     >>> level_dims = [2,4,8]
-    >>> ac2 = AsianOption(m2,multi_level_dimensions=level_dims)
+    >>> ac2 = AsianOption(Sobol(seed=7),multi_level_dimensions=level_dims)
     >>> ac2
     AsianOption (Integrand Object)
         volatility      2^(-1)
@@ -43,11 +40,13 @@ class AsianOption(Integrand):
     >>> y2 = 0
     >>> for l in range(len(level_dims)):
     ...     new_dim = ac2._dim_at_level(l)
-    ...     m2.set_dimension(new_dim)
-    ...     x2 = dd2.gen_samples(2**10)
-    ...     y2 += ac2.f(x2,l=l).mean()
+    ...     ac2.true_measure.set_dimension(new_dim)
+    ...     ac2.discrete_distrib.set_dimension(new_dim)
+    ...     x2 = ac2.discrete_distrib.gen_samples(2**10)
+    ...     level_est = ac2.f(x2,l=l).mean()
+    ...     y2 += level_est
     >>> y2
-    1.7...
+    1.7932665953739864
     """
 
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price',
@@ -68,7 +67,8 @@ class AsianOption(Integrand):
                 Leave as None for single-level problems
         """
         self.discrete_distrib = discrete_distrib
-        self.true_measure = BrownianMotion(self.discrete_distrib.d,t_final)
+        self.t_final = t_final
+        self.true_measure = BrownianMotion(self.discrete_distrib.d,self.t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
@@ -87,10 +87,9 @@ class AsianOption(Integrand):
             self.leveltype = 'fixed-multi'
         else:
             # single level problem
-            self.dimensions = [self.measure.distribution.dimension]
+            self.dimensions = [self.true_measure.d]
             self.dim_fracs = [0.]
             self.leveltype = 'single'
-        self.exercise_time = self.measure.time_vector[-1]
         super(AsianOption,self).__init__()        
 
     def _get_discounted_payoffs(self, stock_path, dimension):
@@ -118,7 +117,7 @@ class AsianOption(Integrand):
             y_raw = maximum(avg - self.strike_price, 0)
         else: # put
             y_raw = maximum(self.strike_price - avg, 0)
-        y_adj = y_raw * exp(-self.interest_rate * self.exercise_time)
+        y_adj = y_raw * exp(-self.interest_rate * self.t_final)
         return y_adj
 
     def g(self, x, l=0):
@@ -127,7 +126,7 @@ class AsianOption(Integrand):
         dimension = float(self.dimensions[l])
         self.s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
-            self.measure.time_vector + self.volatility * x)
+            self.true_measure.time_vec + self.volatility * x)
         for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs(self.s_fine, dimension)
