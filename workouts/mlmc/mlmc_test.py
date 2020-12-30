@@ -47,10 +47,13 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
         for j in range(1,101):
             # reset dimension
             new_dim = integrand_qmcpy._dim_at_level(ll)
-            integrand_qmcpy.measure.set_dimension(new_dim)
+            integrand_qmcpy.discrete_distrib.set_dimension(new_dim)
+            integrand_qmcpy.true_measure.set_dimension(new_dim)
             # evaluate integral at sampleing points samples
-            samples = integrand_qmcpy.measure.distribution.gen_samples(n=n/100)
-            sums_j,cst_j = integrand_qmcpy.f(samples,l=ll)
+            samples = integrand_qmcpy.discrete_distrib.gen_samples(n=n/100)
+            integrand_qmcpy.f(samples,l=ll)
+            sums_j = integrand_qmcpy.sums
+            cst_j = integrand_qmcpy.cost
             sums = sums + sums_j/n
             cst = cst + cst_j/n
         if ll == 0:

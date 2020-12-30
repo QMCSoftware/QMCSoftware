@@ -92,15 +92,15 @@ class Gaussian(TrueMeasure):
             self.a = dot(evecs[:,order],diag(sqrt(evals[order])))
         elif self.decomp_type == 'cholesky':
             self.a = cholesky(self.sigma).T
-        self.det_at = det(self.a.T)
         self.det_sigma = det(self.sigma)
+        self.det_a = sqrt(self.det_sigma)
         self.inv_sigma = inv(self.sigma)  
     
     def transform(self, x):
         return self.mu + norm.ppf(x)@self.a.T
     
     def jacobian(self, x):
-        return self.det_at/norm.pdf(norm.ppf(x)).prod(1)
+        return self.det_a/norm.pdf(norm.ppf(x)).prod(1)
 
     def weight(self, x):
         const = (2*pi)**(-self.d/2) * self.det_sigma**(-1./2)

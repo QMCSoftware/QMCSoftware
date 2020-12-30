@@ -20,7 +20,7 @@ class CubMCG(StoppingCriterion):
     >>> sc = CubMCG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.803926962264685
+    1.8039269622646847
     >>> data
     Solution: 1.8039         
     Keister (Integrand Object)

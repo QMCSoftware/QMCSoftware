@@ -18,7 +18,7 @@ class CubMCCLT(StoppingCriterion):
     >>> sc = CubMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.801028327071404
+    1.8010283270714036
     >>> data
     Solution: 1.8010         
     Keister (Integrand Object)

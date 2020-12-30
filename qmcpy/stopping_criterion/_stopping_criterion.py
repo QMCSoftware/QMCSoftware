@@ -26,7 +26,7 @@ class StoppingCriterion(object):
         if (not hasattr(self, 'discrete_distrib')) or (self.discrete_distrib!=self.integrand.discrete_distrib):
             raise ParameterError(prefix + 'self.discrete_distrib=self.integrand.discrete_distrib')
         if type(self.integrand.discrete_distrib).__name__ not in allowed_distribs:
-            raise ParameterError('%s must have a DiscreteDistribution in %s'%(sname,str(allowed_distribs)))
+            raise DistributionCompatibilityError('%s must have a DiscreteDistribution in %s'%(sname,str(allowed_distribs)))
         # multilevel compatibility check
         if self.integrand.leveltype not in allowed_levels:
             raise ParameterError('Integrand is %s level but %s only supports %s level problems.' % \

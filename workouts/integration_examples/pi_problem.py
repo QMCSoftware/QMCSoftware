@@ -9,9 +9,11 @@ from time import time
 
 def pi_problem(abs_tol=.01):
     t0 = time()
-    distribution = Sobol(dimension=1, seed=7)
-    measure = Lebesgue(distribution, lower_bound=-2, upper_bound=2)
-    integrand = CustomFun(measure, lambda x: sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2)))
+    d = 1
+    integrand = CustomFun(
+        discrete_distrib = Sobol(d, seed=7), 
+        g = lambda x: (sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))).sum(1),
+        true_measure = Lebesgue(Uniform(d, lower_bound=-2, upper_bound=2)))
     solution,data = CubQMCSobolG(integrand, abs_tol=abs_tol, n_max=2**30).integrate()
     password = str(solution).replace('.', '')[:10]
     t_delta = time() - t0
@@ -19,9 +21,11 @@ def pi_problem(abs_tol=.01):
 
 def pi_problem_bayes_lattice(abs_tol=.01):
     t0 = time()
-    distribution = Lattice(dimension=1, seed=7, order='linear')
-    measure = Lebesgue(distribution, lower_bound=-2, upper_bound=2)
-    integrand = CustomFun(measure, lambda x: squeeze(sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))))
+    d = 1
+    integrand = CustomFun(
+        discrete_distrib = Sobol(d, seed=7), 
+        g = lambda x: (sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))).sum(1),
+        true_measure = Lebesgue(Uniform(d, lower_bound=-2, upper_bound=2)))
     solution,data = CubBayesLatticeG(integrand, abs_tol=abs_tol, n_max=2**30).integrate()
     password = str(solution).replace('.', '')[:10]
     t_delta = time() - t0
@@ -29,9 +33,11 @@ def pi_problem_bayes_lattice(abs_tol=.01):
 
 def pi_problem_bayes_net(abs_tol=.01):
     t0 = time()
-    distribution = Sobol(dimension=1, seed=7, graycode=False)
-    measure = Lebesgue(distribution, lower_bound=-2, upper_bound=2)
-    integrand = CustomFun(measure, lambda x: sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2)))
+    d = 1
+    integrand = CustomFun(
+        discrete_distrib = Sobol(d, seed=7), 
+        g = lambda x: (sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))).sum(1),
+        true_measure = Lebesgue(Uniform(d, lower_bound=-2, upper_bound=2)))
     solution,data = CubBayesNetG(integrand, abs_tol=abs_tol, n_max=2**30).integrate()
     password = str(solution).replace('.', '')[:10]
     t_delta = time() - t0

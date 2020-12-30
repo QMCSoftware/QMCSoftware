@@ -3,52 +3,51 @@
 from qmcpy import *
 
 def cubmcclt_iidstduniform(dimension, abs_tol, drift):
-    distribution = IIDStdUniform(dimension,seed=7)
-    measure = BrownianMotion(distribution, drift=drift)
-    integrand = AsianOption(measure)
+    integrand = AsianOption(IIDStdUniform(dimension,seed=7))
+    integrand.set_transform(BrownianMotion(dimension, drift=drift))
     solution,data = CubMCCLT(integrand, abs_tol).integrate()
     return data
 
 def cubmcg_iidstduniform(dimension, abs_tol, drift):
-    distribution = IIDStdUniform(dimension,seed=7)
-    measure = BrownianMotion(distribution, drift=drift)
-    integrand = AsianOption(measure)
+    integrand = AsianOption(IIDStdUniform(dimension,seed=7))
+    integrand.set_transform(BrownianMotion(dimension, drift=drift))
     solution,data = CubMCG(integrand, abs_tol).integrate()
     return data
 
 def cubqmcclt_lattice(dimension, abs_tol, drift):
-    distribution = Lattice(dimension, seed=7, order='mps')
-    measure = BrownianMotion(distribution, drift=drift)
-    integrand = AsianOption(measure)
+    integrand = AsianOption(Lattice(dimension, seed=7, order='mps'))
+    integrand.set_transform(BrownianMotion(dimension, drift=drift))
     solution,data = CubQMCCLT(integrand, abs_tol).integrate()
     return data
 
 def cubqmcclt_sobol(dimension, abs_tol, drift):
-    distribution = Sobol(dimension, seed=7)
-    measure = BrownianMotion(distribution, drift=drift)
-    integrand = AsianOption(measure)
+    integrand = AsianOption(Sobol(dimension, seed=7))
+    integrand.set_transform(BrownianMotion(dimension, drift=drift))
     solution,data = CubQMCCLT(integrand, abs_tol).integrate()
     return data
 
 def cubqmclatticeg(dimension, abs_tol, drift):
-    distribution = Lattice(dimension, seed=7)
-    measure = BrownianMotion(distribution, drift=drift)
-    integrand = AsianOption(measure)
-    solution,data = CubQMCLatticeG(integrand, abs_tol,).integrate()
-    return data
-
-def cubbayeslatticeg(dimension, abs_tol, drift):
-    distribution = Lattice(dimension, seed=7, order='linear', randomize=True)
-    measure = BrownianMotion(distribution, drift=drift)
-    integrand = AsianOption(measure)
-    solution,data = CubBayesLatticeG(integrand, abs_tol,).integrate()
+    integrand = AsianOption(Lattice(dimension, seed=7))
+    integrand.set_transform(BrownianMotion(dimension, drift=drift))
+    solution,data = CubQMCLatticeG(integrand, abs_tol).integrate()
     return data
 
 def cubqmcsobolg(dimension, abs_tol, drift):
-    distribution = Sobol(dimension, seed=7)
-    measure = BrownianMotion(distribution, drift=drift)
-    integrand = AsianOption(measure)
+    integrand = AsianOption(Sobol(dimension, seed=7))
+    integrand.set_transform(BrownianMotion(dimension, drift=drift))
     solution,data = CubQMCSobolG(integrand, abs_tol).integrate()
+    return data
+
+def cubbayeslatticeg(dimension, abs_tol, drift):
+    integrand = AsianOption(Lattice(dimension, seed=7, order='linear'))
+    integrand.set_transform(BrownianMotion(dimension, drift=drift))
+    solution,data = CubBayesLatticeG(integrand, abs_tol).integrate()
+    return data
+
+def cubbayesnetg(dimension, abs_tol, drift):
+    integrand = AsianOption(Sobol(dimension, seed=7))
+    integrand.set_transform(BrownianMotion(dimension, drift=drift))
+    solution,data = CubBayesNetG(integrand, abs_tol).integrate()
     return data
 
 integrations_dict = {
@@ -57,5 +56,6 @@ integrations_dict = {
     ('CubQMCCLT','Lattice','QMC'): cubqmcclt_lattice,
     ('CubQMCCLT','Sobol','QMC'): cubqmcclt_sobol,
     ('CubQMCLatticeG','Lattice','QMC'): cubqmclatticeg,
+    ('CubQMCSobolG','Sobol','QMC'): cubqmcsobolg,
     ('CubBayesLatticeG','Lattice','QMC'): cubbayeslatticeg,
-    ('CubQMCSobolG','Sobol','QMC'): cubqmcsobolg}
+    ('CubBayesNetG','Sobol','QMC'): cubbayesnetg}

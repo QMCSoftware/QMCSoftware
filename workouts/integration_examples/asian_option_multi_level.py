@@ -18,10 +18,8 @@ def asian_option_multi_level(
     print(bar)
 
     # CubMCCLT
-    distribution = IIDStdUniform(seed=7)
-    measure = BrownianMotion(distribution)
     integrand = AsianOption(
-        measure = measure,
+        discrete_distrib = IIDStdUniform(seed=7),
         volatility = volatility,
         start_price = start_price,
         strike_price = strike_price,

@@ -17,10 +17,10 @@ class Keister(Integrand):
     >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)
     >>> y.mean()
-    1.8074379398240916
+    1.8074379398240912
     >>> y2 = k.f_periodized(x,'baker')
     >>> y2.mean()
-    1.808937592602977
+    1.8089375926029765
     >>> k.set_transform(Gaussian(d,mean=0,covariance=1))
     >>> y3 = k.f(x)
     >>> y3.mean()

@@ -26,7 +26,7 @@ class CubBayesNetG(StoppingCriterion):
     >>> sc = CubBayesNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8110042533320707
+    1.8110042533320705
     >>> data
     Solution: 1.8110         
     Keister (Integrand Object)

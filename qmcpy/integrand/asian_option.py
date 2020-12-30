@@ -46,7 +46,7 @@ class AsianOption(Integrand):
     ...     level_est = ac2.f(x2,l=l).mean()
     ...     y2 += level_est
     >>> y2
-    1.7932665953739864
+    1.793266595373987
     """
 
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price',

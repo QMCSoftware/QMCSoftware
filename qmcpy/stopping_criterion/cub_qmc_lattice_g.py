@@ -19,7 +19,7 @@ class CubQMCLatticeG(StoppingCriterion):
     >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8072504898823571
+    1.8072504898823567
     >>> data
     Solution: 1.8073         
     Keister (Integrand Object)

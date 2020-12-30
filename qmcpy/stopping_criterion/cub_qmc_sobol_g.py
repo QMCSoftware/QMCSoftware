@@ -19,7 +19,7 @@ class CubQMCSobolG(StoppingCriterion):
     >>> sc = CubQMCSobolG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8074379398240916
+    1.8074379398240912
     >>> data
     Solution: 1.8074         
     Keister (Integrand Object)
