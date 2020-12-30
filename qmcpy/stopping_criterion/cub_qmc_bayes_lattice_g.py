@@ -98,8 +98,6 @@ class CubBayesLatticeG(StoppingCriterion):
         self.alpha = alpha  # p-value, default 0.1%.
         self.order = 2  # Bernoulli kernel's order. If zero, choose order automatically
 
-        self.integrand = integrand
-        self.dim = integrand.dimension  # dimension of the integrand
         self.useGradient = False  # If true uses gradient descent in parameter search
         self.oneTheta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
@@ -125,22 +123,26 @@ class CubBayesLatticeG(StoppingCriterion):
         else:
             self.uncert = -gaussnorm.ppf(self.alpha / 2)
 
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
+        
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
-        self.distribution = distribution
         allowed_levels = ['single']
         allowed_distribs = ["Lattice"]
-        super(CubBayesLatticeG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubBayesLatticeG, self).__init__(allowed_levels, allowed_distribs)
 
-        if distribution.randomize == False:
-            raise ParameterError("CubBayesLattice_g requires distribution to have randomize=True")
-        if distribution.order != 'linear':
-            raise ParameterError("CubBayesLattice_g requires distribution to have order='linear'")
+        if self.discrete_distrib.randomize == False:
+            raise ParameterError("CubBayesLattice_g requires discrete_distrib to have randomize=True")
+        if self.discrete_distrib.order != 'linear':
+            raise ParameterError("CubBayesLattice_g requires discrete_distrib to have order='linear'")
 
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self._fft, self._merge_fft)
+        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self.m_min, self.m_max, self._fft, self._merge_fft)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet

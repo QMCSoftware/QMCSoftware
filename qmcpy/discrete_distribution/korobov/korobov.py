@@ -74,7 +74,6 @@ class Korobov(DiscreteDistribution):
         self.d_lim = self.n_lim
         self.set_dimension(dimension)
         self.set_seed(seed)
-        self.dimension, self.generator, self.randomize, self.seed = self.generator_obj.get_params()
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Korobov,self).__init__()
@@ -115,7 +114,7 @@ class Korobov(DiscreteDistribution):
 
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[0], dtype=float))
+        return ones(x.shape[0], dtype=float)
 
     def set_seed(self, seed):
         """ See abstract method. """

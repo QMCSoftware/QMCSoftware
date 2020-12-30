@@ -10,19 +10,19 @@ class MeanVarData(AccumulateData):
     parameters = ['levels','solution','n','n_total','error_bound','confid_int']
     EPS = finfo(float32).eps
 
-    def __init__(self, stopping_criterion, integrand, n_init):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, n_init):
         """
         Args:
-            stopping_criterion (StoppingCriterion): a StoppingCriterion instance
+            stopping_crit (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
+            true_measure (TrueMeasure): A TrueMeasure instance
+            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance  
             n_init (int): initial number of samples
         """
-        # Extract QMCPy objects
-        self.stopping_criterion = stopping_criterion
+        self.stopping_crit = stopping_crit
         self.integrand = integrand
-        self.measure = self.integrand.measure
-        self.distribution = self.measure.distribution
-        self.integrand = integrand
+        self.true_measure = true_measure
+        self.discrete_distrib = discrete_distrib
         # Set Attributes
         if self.integrand.leveltype=='fixed-multi':
             self.levels = len(self.integrand.dimensions)
@@ -44,11 +44,12 @@ class MeanVarData(AccumulateData):
             if self.integrand.leveltype=='fixed-multi':
                 # reset dimension
                 new_dim = self.integrand._dim_at_level(l)
-                self.measure.set_dimension(new_dim)
-                samples = self.distribution.gen_samples(n=self.n[l])
+                self.true_measure.set_dimension(new_dim)
+                self.discrete_distrib.set_dimension(new_dim)
+                samples = self.discrete_distrib.gen_samples(n=self.n[l])
                 y = self.integrand.f(samples,l=l).squeeze()
             else:
-                samples = self.distribution.gen_samples(n=self.n[l])
+                samples = self.discrete_distrib.gen_samples(n=self.n[l])
                 y = self.integrand.f(samples).squeeze()
             self.t_eval[l] = max( (time()-t_start)/self.n[l], self.EPS) 
             self.sighat[l] = y.std() # compute the sample standard deviation

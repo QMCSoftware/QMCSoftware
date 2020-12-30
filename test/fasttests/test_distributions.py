@@ -4,7 +4,6 @@ from qmcpy import *
 from qmcpy.util import *
 from qmcpy.util import ParameterError,ParameterWarning
 from numpy import *
-import sys
 import os
 import unittest
 

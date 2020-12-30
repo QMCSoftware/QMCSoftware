@@ -13,24 +13,25 @@ class MLMCData(AccumulateData):
     parameters = ['levels','dimensions','n_level','mean_level','var_level',
         'cost_per_sample','n_total','alpha','beta','gamma']
 
-    def __init__(self, stopping_criterion, integrand, levels_init, n_init, alpha0, beta0, gamma0):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, levels_init, n_init, alpha0, beta0, gamma0):
         """
         Initialize data instance
 
         Args:
-            stopping_criterion (StoppingCriterion): a StoppingCriterion instance
+            stopping_crit (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
+            true_measure (TrueMeasure): A TrueMeasure instance
+            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
             levels_init (int): initial number of levels
             n_init (int): initial number of samples per level
             alpha0 (float): weak error is O(2^{-alpha0*level})
             beta0 (float): variance is O(2^{-beta0*level})
             gamma0 (float): sample cost is O(2^{gamma0*level})
         """
-        # Extract QMCPy objects
-        self.stopping_criterion = stopping_criterion
+        self.stopping_crit = stopping_crit
         self.integrand = integrand
-        self.measure = self.integrand.measure
-        self.distribution = self.measure.distribution
+        self.true_measure = true_measure
+        self.discrete_distrib = discrete_distrib
         # Set Attributes
         self.levels = int(levels_init)
         self.dimensions = zeros(self.levels+1)
@@ -55,9 +56,10 @@ class MLMCData(AccumulateData):
             if self.diff_n_level[l] > 0:
                 # reset dimension
                 self.dimensions[l] = self.integrand._dim_at_level(l)
-                self.measure.set_dimension(self.dimensions[l])
+                self.true_measure.set_dimension(self.dimensions[l])
+                self.discrete_distrib.set_dimension(self.dimension[l])
                 # evaluate integral at sampleing points samples
-                samples = self.distribution.gen_samples(n=self.diff_n_level[l])
+                samples = self.discrete_distrib.gen_samples(n=self.diff_n_level[l])
                 sums,cost = self.integrand.f(samples,l=l)
                 self.n_level[l] = self.n_level[l] + self.diff_n_level[l]
                 self.sum_level[0,l] = self.sum_level[0,l] + sums[0]

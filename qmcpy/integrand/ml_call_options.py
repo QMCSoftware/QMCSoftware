@@ -40,11 +40,11 @@ class MLCallOptions(Integrand):
 
     parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
 
-    def __init__(self, measure, option='european', volatility=.2,
+    def __init__(self, discrete_distrib, option='european', volatility=.2,
         start_strike_price=100., interest_rate=.05, t_final=1.):
         """
         Args:
-            measure (TrueMeasure): A BrownianMotion TrueMeasure object
+            discrete_distrib (DiscreteDistribution): a discrete distribution instance.
             option_type (str): type of option in ["European","Asian"]
             volatility (float): sigma, the volatility of the asset
             start_strike_price (float): S(0), the asset value at t=0, and K, the strike price. \
@@ -52,15 +52,14 @@ class MLCallOptions(Integrand):
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
         """
-        if not (isinstance(measure,Gaussian) and (measure.mu==0).all() and (measure.sigma==eye(measure.d)).all()):
-            raise ParameterError('AsianOption measure must be a Gaussian instance with mean 0 and variance 1')
+        self.discrete_distrib = discrete_distrib
+        
+        self.true_measure = Gaussian(self.discrete_distrib.d, mean=0, covariance=1)
         options = ['european','asian']
         self.option = option.lower()
         if self.option not in options:
             raise ParameterError('option type must be one of\n\t%s'%str(options))
-        self.measure = measure
-        self.distribution = self.measure.distribution
-        if self.distribution.low_discrepancy and self.option=='asian':
+        if self.discrete_distrib.low_discrepancy and self.option=='asian':
             raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
         self.sigma = volatility
         self.k = start_strike_price

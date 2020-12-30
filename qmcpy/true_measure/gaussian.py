@@ -55,7 +55,7 @@ class Gaussian(TrueMeasure):
                 "PCA" for principal component analysis or 
                 "Cholesky" for cholesky decomposition.
         """
-        self.d = self.dimension
+        self.d = dimension
         self.mean = mean
         self.covariance = covariance
         self.decomp_type = decomp_type.lower()
@@ -94,14 +94,14 @@ class Gaussian(TrueMeasure):
     def weight(self, x):
         const = (2*pi)**(-self.d/2) * self.det_sigma**(-1./2)
         delta = x-self.mu
-        return const*exp(-(delta@self.inv_sigma)*delta).sum(1)/2)
+        return const*exp(-((delta@self.inv_sigma)*delta).sum(1)/2)
 
     def set_dimension(self, dimension):
         """ See abstract method. """
         m = self.mu[0]
         c = self.sigma[0,0]
         expected_cov = c*eye(int(self.d))
-        if not ( (self.mu=m).all() and (self.sigma==expected_cov).all() ):
+        if not ( (self.mu==m).all() and (self.sigma==expected_cov).all() ):
             raise DimensionError('''
                     In order to change dimension of Gaussian measure
                     mean (mu) must be all the same and 
@@ -110,3 +110,4 @@ class Gaussian(TrueMeasure):
         self.mu = tile(m,int(self.d))
         self.sigma = c*eye(int(self.d))
         self._set_constants()
+    

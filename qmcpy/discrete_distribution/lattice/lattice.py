@@ -209,7 +209,7 @@ class Lattice(DiscreteDistribution):
 
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[0], dtype=float))
+        return ones(x.shape[0], dtype=float)
     
     def set_seed(self, seed):
         """ See abstract method. """

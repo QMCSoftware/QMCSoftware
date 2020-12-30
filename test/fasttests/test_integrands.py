@@ -57,7 +57,7 @@ class TestLinear(unittest.TestCase):
     def test_f(self):
         distribution = Sobol(dimension=3)
         measure = Uniform(distribution)
-        integrand = Linear(measure)
+        integrand = Linear0(measure)
         samples = integrand.measure.distribution.gen_samples(4)
         y = integrand.f(samples).squeeze()
         self.assertTrue(y.shape==(4,))

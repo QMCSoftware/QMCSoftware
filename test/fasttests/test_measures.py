@@ -10,18 +10,6 @@ import unittest
 class TestUniform(unittest.TestCase):
     """ Unit tests for Uniform Measure. """
 
-    def test_gen_samples(self):
-        distribution = Sobol(dimension=3)
-        measure = Uniform(distribution)
-        measure.gen_samples(n_min=0,n_max=4)
-    
-    def test__transform_g_to_f(self):
-        # implicitly called from Integrand superclass constructor
-        distribution = Sobol(dimension=3)
-        measure = Gaussian(distribution, covariance=1/2)
-        k = Keister(measure)
-        k.f(distribution.gen_samples(2**3))
-
     def test_set_dimension(self):
         # default params
         distribution = Sobol(dimension=2)
@@ -147,7 +135,7 @@ class TestLebesgue(unittest.TestCase):
         # implicitly called from Integrand superclass constructor
         distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
         measure = IdentitalToDiscrete(distribution)
-        l = Linear(measure)
+        l = Linear0(measure)
         l.f(distribution.gen_samples(2**3))
     
     def test_set_dimension(self):

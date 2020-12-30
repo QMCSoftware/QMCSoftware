@@ -7,76 +7,34 @@ from scipy.stats import norm
 
 class Lebesgue(TrueMeasure):
     """
-    >>> dd = Sobol(2,seed=7)
-    >>> Lebesgue(dd,lower_bound=[-1,0],upper_bound=[1,3])
+    >>> d = 2
+    >>> dd = Sobol(d,seed=7)
+    >>> Lebesgue(transform=Uniform(lower_bound=[-1,0],upper_bound=[1,3]))
     Lebesgue (TrueMeasure Object)
-        lower_bound     [-1  0]
-        upper_bound     [1 3]
-    >>> Lebesgue(dd,lower_bound=-inf,upper_bound=inf)
+        transform = Gaussian(
+                        lower_bound     [-1  0]
+                        upper_bound     [1 3])
+    >>> Lebesgue(transform=Gaussian(mean=[0,0]),covariance=[[1,0],[0,1]]))
     Lebesgue (TrueMeasure Object)
         lower_bound     [-inf -inf]
         upper_bound     [inf inf]
     """
 
-    parameters = ['lower_bound', 'upper_bound']
+    parameters = ['transform']
     
-    def __init__(self, distribution, lower_bound=0., upper_bound=1.):
+    def __init__(self, transformer):
         """
         Args:
-            distribution (DiscreteDistribution): DiscreteDistribution instance
-            lower_bound (float or inf): lower bound of integration
-            upper_bound (float or inf): upper bound of integration
+            transformer (TrueMeasure): A measure whose transform will be used.
         """
-        self.distribution = distribution
-        self.d = self.distribution.dimension
-        if isscalar(lower_bound):
-            lower_bound = tile(lower_bound,self.d)
-        if isscalar(upper_bound):
-            upper_bound = tile(upper_bound,self.d)
-        self.lower_bound = array(lower_bound)
-        self.upper_bound = array(upper_bound)
-        if len(self.lower_bound)!=self.d or len(self.upper_bound)!=self.d:
-            raise DimensionError('upper bound and lower bound must be of length dimension')     
-        if isfinite(self.lower_bound).all() and isfinite(self.upper_bound).all() \
-           and (self.lower_bound<self.upper_bound).all():
-            self.tf_to_mimic = 'StdUniform'
-        elif (self.lower_bound == -inf).all() and (self.upper_bound == inf).all():
-            self.tf_to_mimic = 'StdGaussian'
-        else:
-            raise ParameterError('self.lower_bound and self.upper_bound must both be finite ' + \
-                                 'or must be -inf,inf respectively')
+        self.transformer = transformer
+        self.d = self.transformer.d
+        self.set_transform(self.transformer)
+        self.set_dimension = self.transformer.set_dimension
         super(Lebesgue,self).__init__()
 
-    def _transform(self, samples):
-        """
-        Transform samples to appear standard uniform or standard gaussian
-        
-        Args:
-            samples (ndarray): samples from a discrete distribution
-        
-        Return:
-            ndarray: transformed samples from the DiscreteDistribution.
-        """
-        if (self.tf_to_mimic == 'StdUniform' and self.distribution.mimics == 'StdUniform') or \
-           (self.tf_to_mimic == 'StdGaussian' and self.distribution.mimics == 'StdGaussian'):
-            mimic_samples = samples # identity
-        elif self.tf_to_mimic == 'StdUniform' and self.distribution.mimics == 'StdGaussian':
-            mimic_samples = norm.cdf(samples) # cdf normal 
-        elif self.tf_to_mimic == 'StdGaussian' and self.distribution.mimics == 'StdUniform':
-            mimic_samples = norm.ppf(samples) # inverse cdf normal
-        else:
-            raise TransformError(\
-                'Cannot transform samples mimicing %s to mimic %s'%(self.distribution.mimics,self.tf_to_mimic))
-        return mimic_samples
-    
-    def _eval_f(self, x, g, *args, **kwargs):
-        """ See abstract method. """
-        if self.tf_to_mimic == 'StdUniform':
-            mimic_smaples = self._transform(x)
-            dist = self.upper_bound - self.lower_bound
-            y = dist.prod() * g(dist*mimic_smaples + self.lower_bound, *args, **kwargs)
-        elif self.tf_to_mimic == 'StdGaussian':
-            mimic_smaples = self._transform(x)
-            g_vals = g(mimic_smaples, *args, **kwargs)
-            y = g_vals / norm.pdf(mimic_smaples).prod(-1).reshape(g_vals.shape)
-        return y
+    def weight(self, x):
+        return ones(x.shape[0],dtye=float)
+
+    def set_dimension(self, dimension):
+        self.measure.set_dimension(dimension)

@@ -87,7 +87,7 @@ class IntegrationExampleTest(unittest.TestCase):
         for i in range(len(dimensions)):
             distribution = Sobol(dimension=dimensions[i], randomize=True)
             measure = Uniform(distribution)
-            integrand = Linear(measure)
+            integrand = Linear0(measure)
             solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 

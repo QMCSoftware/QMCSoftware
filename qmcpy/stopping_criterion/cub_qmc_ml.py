@@ -84,17 +84,19 @@ class CubQMCML(StoppingCriterion):
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.replications = float(replications)
+        # QMCPy Objs
         self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["Lattice", "Sobol","Halton"]
-        super(CubQMCML,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubQMCML,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration Data
-        self.data = MLQMCData(self, self.integrand, self.n_init, self.replications)
+        self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib, self.n_init, self.replications)
         t_start = time()
         while True:
             self.data.update_data()

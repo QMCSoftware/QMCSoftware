@@ -112,20 +112,24 @@ class CubQMCLatticeG(StoppingCriterion):
         self.fudge = fudge
         self.check_cone = check_cone
         self.ptransform = ptransform
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['single']
         allowed_distribs = ["Lattice"]
-        super(CubQMCLatticeG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        if not distribution.randomize:
+        super(CubQMCLatticeG,self).__init__(allowed_levels, allowed_distribs)
+        if not self.discrete_distrib.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
-        if distribution.order != 'natural':
+        if self.discrete_distrib.order != 'natural':
             raise ParameterError("CubLattice_g requires Lattice with 'natural' order")
         
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, self.integrand, self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform)
+        self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform)
         t_start = time()
         while True:
             self.data.update_data()

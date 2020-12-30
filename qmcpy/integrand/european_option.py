@@ -28,21 +28,20 @@ class EuropeanOption(Integrand):
 
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
                           
-    def __init__(self, measure, volatility=0.5, start_price=30, strike_price=35,
-        interest_rate=0, call_put='call'):
+    def __init__(self, discrete_distrib, volatility=0.5, start_price=30, strike_price=35,
+        interest_rate=0, t_final=1, call_put='call'):
         """
         Args:
-            measure (TrueMeasure): A BrownianMotion TrueMeasure object
+            discrete_distrib (DiscreteDistribution): a discrete distribution instance.
             volatility (float): sigma, the volatility of the asset
             start_price (float): S(0), the asset value at t=0
             strike_price (float): strike_price, the call/put offer
             interest_rate (float): r, the annual interest rate
+            t_final (float): exercise time
             call_put (str): 'call' or 'put' option
         """
-        if not isinstance(measure,BrownianMotion):
-            raise ParameterError('EuropeanCall measure must be a BrownianMotion instance')
-        self.measure = measure
-        self.distribution = self.measure.distribution
+        self.discrete_distrib = discrete_distrib
+        self.true_measure = BrownianMotion(self.discrete_distrib.d,t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
@@ -89,42 +88,3 @@ class EuropeanOption(Integrand):
                     (self.interest_rate + self.volatility**2/2) * self.exercise_time
             fp = decay * norm.cdf(term1/denom) - self.start_price * norm.cdf(term2/denom)
         return fp
-    
-    def plot(self, n=2**5, show=True, out=None):
-        """
-        Plot European Option price vs time.
-        
-        Args:
-            n (int): self.gen_samples(n)
-            show (bool): show the plot?
-            out (str): file name to output image. If None, the image is not output
-            
-        Return:
-            tuple: fig,ax from `fig,ax = pyplot.subplots()`
-        """
-        tvw0 = hstack((0,self.measure.time_vector)) # time vector including 0
-        x = self.distribution.gen_samples(n)
-        y = self.f(x)
-        sw0 = hstack((self.start_price*ones((n,1)),self.s)) # x including 0 and time 0
-        from matplotlib import pyplot
-        pyplot.rc('font', size=16)
-        pyplot.rc('legend', fontsize=16)
-        pyplot.rc('figure', titlesize=16)
-        pyplot.rc('axes', titlesize=16, labelsize=16)
-        pyplot.rc('xtick', labelsize=16)
-        pyplot.rc('ytick', labelsize=16)
-        fig,ax = pyplot.subplots()
-        for i in range(n):
-            ax.plot(tvw0,sw0[i])
-        ax.axhline(y=self.strike_price, color='k', linestyle='--', label='Strike Price')
-        ax.set_xlim([0,1])
-        ax.set_xticks([0,1])
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Option Price')
-        ax.legend(loc='upper left')
-        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
-        ax.set_title(s+' Asset Price Paths')
-        fig.tight_layout()
-        if out: pyplot.savefig(out,dpi=250)
-        if show: pyplot.show()
-        return fig,ax

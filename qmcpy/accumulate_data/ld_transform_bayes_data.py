@@ -14,21 +14,21 @@ class LDTransformBayesData(AccumulateData):
 
     parameters = ['n_total', 'solution', 'error_bound']
 
-    def __init__(self, stopping_criterion, integrand, m_min: int, m_max: int, fbt, merge_fbt):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, m_min: int, m_max: int, fbt, merge_fbt):
         """
         Args:
-            stopping_criterion (StoppingCriterion): a StoppingCriterion instance
+            stopping_crit (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
+            true_measure (TrueMeasure): A TrueMeasure instance
+            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
         """
-        # Extract attributes from integrand
-        self.stopping_criterion = stopping_criterion
+        self.stopping_crit = stopping_crit
         self.integrand = integrand
-        self.measure = self.integrand.measure
-        self.distribution = self.measure.distribution
-        self.distribution_name = type(self.distribution).__name__
-        self.dim = stopping_criterion.dim
+        self.true_measure = true_measure
+        self.discrete_distrib = discrete_distrib
+        self.distribution_name = type(self.discrete_distrib).__name__
 
         # Set Attributes
         self.m_min = m_min
@@ -47,8 +47,8 @@ class LDTransformBayesData(AccumulateData):
         self.xun_ = array([])  # un-shifted lattice points
         self.ftilde_ = array([])  # fourier transformed integrand values
         if self.distribution_name == 'Lattice':
-            self.ff = self.integrand.period_transform(
-                stopping_criterion.ptransform)  # integrand after the periodization transform
+            # integrand after the periodization transform
+            self.ff = lambda x,*args,**kwargs: self.integrand.f_periodized(x,stopping_crit.ptransform,*args,**kwargs)
         else:
             self.ff = self.integrand.f
         self.fbt = fbt
@@ -89,7 +89,7 @@ class LDTransformBayesData(AccumulateData):
             # xun_ = np.mod((xun_ * self.gen_vec), 1)
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
 
-            xpts_,xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True, distribution=self.distribution)
+            xpts_,xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True, distribution=self.discrete_distrib)
 
             # Compute initial FBT
             ftilde_ = self.fbt(self.ff(xpts_))
@@ -100,8 +100,8 @@ class LDTransformBayesData(AccumulateData):
             # xunnew = np.mod(xunnew * self.gen_vec, 1)
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
 
-            xnew, xunnew = self.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True, distribution=self.distribution)
-            [xun_, xpts_] = self.merge_pts(xun, xunnew, xpts, xnew, n, self.dim, distribution=self.distribution_name)
+            xnew, xunnew = self.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True, distribution=self.discrete_distrib)
+            [xun_, xpts_] = self.merge_pts(xun, xunnew, xpts, xnew, n, self.discrete_distrib.d, distribution=self.distribution_name)
             mnext = m - 1
             ftilde_next_new = self.fbt(self.ff(xnew))
 

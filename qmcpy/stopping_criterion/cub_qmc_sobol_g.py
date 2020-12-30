@@ -106,23 +106,26 @@ class CubQMCSobolG(StoppingCriterion):
             m_max = 35.
         self.n_init = 2.**m_min
         self.n_max = 2.**m_max
-        self.integrand = integrand
         self.m_min = m_min
         self.m_max = m_max
         self.fudge = fudge
         self.check_cone = check_cone
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
-        super(CubQMCSobolG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        if (not distribution.randomize) or distribution.graycode:
+        super(CubQMCSobolG,self).__init__(allowed_levels, allowed_distribs)
+        if (not self.discrete_distrib.randomize) or distribution.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False. Use QRNG backend.")
 
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, self.integrand, self._fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none')
+        self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self._fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none')
         t_start = time()
         while True:
             self.data.update_data()

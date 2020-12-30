@@ -12,11 +12,13 @@ class LDTransformData(AccumulateData):
 
     parameters = ['n_total','solution','error_bound']
 
-    def __init__(self, stopping_criterion, integrand, basis_transform, m_min, m_max, fudge, check_cone, ptransform):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, basis_transform, m_min, m_max, fudge, check_cone, ptransform):
         """
         Args:
-            stopping_criterion (StoppingCriterion): a StoppingCriterion instance
+            stopping_crit (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
+            true_measure (TrueMeasure): A TrueMeasure instance
+            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
             basis_transform (method): Transform ynext, combine with y, and then transform all points. 
                 For cub_lattice this is Fast Fourier Transform (FFT). 
                 For cub_sobol this is Fast Walsh Transform (FWT)
@@ -26,11 +28,10 @@ class LDTransformData(AccumulateData):
                 sum of basis coefficients specified in the cone of functions
             check_cone (boolean): check if the function falls in the cone
         """
-        # Extract attributes from integrand
-        self.stopping_criterion = stopping_criterion
+        self.stopping_crit = stopping_crit
         self.integrand = integrand
-        self.measure = self.integrand.measure
-        self.distribution = self.measure.distribution
+        self.true_measure = true_measure
+        self.discrete_distrib = discrete_distrib
         # Set Attributes
         self.ft = basis_transform # fast transform 
         self.m_min = m_min
@@ -59,7 +60,7 @@ class LDTransformData(AccumulateData):
     def update_data(self):
         """ See abstract method. """
         # Generate sample values
-        x = self.distribution.gen_samples(n_min=self.n_total,n_max=2**self.m)
+        x = self.discrete_distrib.gen_samples(n_min=self.n_total,n_max=2**self.m)
         ynext = self.ff(x).squeeze()
         self.yval = hstack((self.yval,ynext))
         # Compute fast basis transform

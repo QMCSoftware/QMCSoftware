@@ -31,7 +31,7 @@ class IIDStdUniform(DiscreteDistribution):
             dimension (int): dimension of samples
             seed (int): seed the random number generator for reproducibility
         """
-        self.dimension = dimension
+        self.d = dimension
         self.seed = seed
         random.seed(self.seed)
         self.mimics = 'StdUniform'
@@ -48,13 +48,13 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             ndarray: n x d (dimension) array of samples
         """
-        return random.rand(int(n), int(self.dimension))
+        return random.rand(int(n), int(self.d))
     
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[0], dtype=float))
+        return ones(x.shape[0], dtype=float)
     
     def set_dimension(self, dimension):
         """ See abstract class. """
-        self.dimension = dimension
+        self.d = dimension
         

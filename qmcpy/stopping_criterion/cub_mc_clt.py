@@ -72,17 +72,19 @@ class CubMCCLT(StoppingCriterion):
         self.n_max = float(n_max)
         self.alpha = float(alpha)
         self.inflate = float(inflate)
+        # QMCPy Objs
         self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['single','fixed-multi']
         allowed_distribs = ["IIDStdUniform"]
-        super(CubMCCLT,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubMCCLT,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, self.integrand, self.n_init)
+        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, self.n_init)
         t_start = time()
         # Pilot Sample
         self.data.update_data()

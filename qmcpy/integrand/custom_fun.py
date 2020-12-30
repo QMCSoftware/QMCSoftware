@@ -17,17 +17,14 @@ class CustomFun(Integrand):
 
     parameters = []
 
-    def __init__(self, measure, custom_fun):
+    def __init__(self, discrete_distrib, g, true_measure):
         """
         Args:
-            measure (TrueMeasure): a TrueMeasure instance
-            custom_fun (function): a function evaluating samples (nxd) -> (nx1). See g method.
+            g (function): a function handle. 
+            discrete_distrib (DiscreteDistribution): a discrete distribution instance.
+            true_measure (TrueMeasure): a TrueMeasure instance. 
         """
-        self.measure = measure
-        self.distribution = self.measure.distribution
-        self.custom_fun = custom_fun
+        self.discrete_distrib = discrete_distrib
+        self.true_measure = true_measure
+        self.g = lambda x,*args,**kwargs: g(x,*args,**kwargs) 
         super(CustomFun,self).__init__()
-
-    def g(self, x):
-        """ See abstract method. """
-        return self.custom_fun(x)

@@ -101,8 +101,6 @@ class CubBayesNetG(StoppingCriterion):
         self.alpha = alpha  # p-value, default 0.1%.
         self.order = 1  # Currently supports only order=1
 
-        self.integrand = integrand
-        self.dim = integrand.dimension  # dimension of the integrand
         self.useGradient = False  # If true uses gradient descent in parameter search
         self.oneTheta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
@@ -128,20 +126,26 @@ class CubBayesNetG(StoppingCriterion):
         else:
             self.uncert = -gaussnorm.ppf(self.alpha / 2)
 
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
+
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         self.distribution = distribution
         allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
-        super(CubBayesNetG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs)
 
-        if distribution.randomize == False:
-            raise ParameterError("CubBayesNet_g requires distribution to have randomize=True")
+        if self.discrete_distrib.randomize == False:
+            raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
 
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self._fwht_h, self._merge_fwht)
+        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib, 
+            self.m_min, self.m_max, self._fwht_h, self._merge_fwht)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet

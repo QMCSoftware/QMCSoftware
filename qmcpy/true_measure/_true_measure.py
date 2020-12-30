@@ -23,6 +23,19 @@ class TrueMeasure(object):
 
         """
         raise MethodImplementationError(self,'transform')
+
+    def set_transform(self, transformer):
+        """ 
+        Set a custom transformation to be used instead of the default 
+        one associated with the true measure. 
+
+        Args:
+            transformer (TrueMeasure): a measure whose transform method should be used. 
+        """
+        if type(transformer)!=TrueMeasure:
+            raise ParameterError("transformer must be a TrueMeasure instance")
+        self.transform = transformer.transform
+        self.jacobian = transformer.jacobian
     
     def jacobian(self, x):
         """
