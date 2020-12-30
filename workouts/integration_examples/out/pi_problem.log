@@ -1,20 +1,84 @@
-Password: 3141592653
-CPU time: 62.20 sec
+CubBayesLatticeG:
+  Password: 3141592653
+  CPU time: 0.62 sec
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 3.1416         
+CustomFun (Integrand Object)
+Lattice (DiscreteDistribution Object)
+    d               1
+    randomize       1
+    order           linear
+    seed            7
+    mimics          StdUniform
+Lebesgue (TrueMeasure Object)
+    transformer     Uniform (TrueMeasure Object)
+                       d               1
+                       lower_bound     -2
+                       upper_bound     2^(1)
+CubBayesLatticeG (StoppingCriterion Object)
+    abs_tol         4.00e-10
+    rel_tol         0
+    n_init          2^(8)
+    n_max           2^(30)
+LDTransformBayesData (AccumulateData Object)
+    n_total         32768
+    solution        3.142
+    error_bound     3.47e-10
+    time_integrate  0.621
+
+CubBayesNetG:
+  Password: 3141592653
+  CPU time: 178.07 sec
+
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 3.1416         
 CustomFun (Integrand Object)
 Sobol (DiscreteDistribution Object)
-    dimension       1
+    d               1
     randomize       1
     graycode        0
-    seed            7
+    seed            61616
     mimics          StdUniform
-    backend         QRNG
+    dim0            0
 Lebesgue (TrueMeasure Object)
-    lower_bound     -2
-    upper_bound     2^(1)
+    transformer     Uniform (TrueMeasure Object)
+                       d               1
+                       lower_bound     -2
+                       upper_bound     2^(1)
+CubBayesNetG (StoppingCriterion Object)
+    abs_tol         4.00e-08
+    rel_tol         0
+    n_init          2^(8)
+    n_max           2^(30)
+LDTransformBayesData (AccumulateData Object)
+    n_total         8388608
+    solution        3.142
+    error_bound     2.25e-08
+    time_integrate  178.065
+
+CubQMCSobolG:
+  Password: 3141592653
+  CPU time: 80.57 sec
+
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 3.1416         
+CustomFun (Integrand Object)
+Sobol (DiscreteDistribution Object)
+    d               1
+    randomize       1
+    graycode        0
+    seed            61616
+    mimics          StdUniform
+    dim0            0
+Lebesgue (TrueMeasure Object)
+    transformer     Uniform (TrueMeasure Object)
+                       d               1
+                       lower_bound     -2
+                       upper_bound     2^(1)
 CubQMCSobolG (StoppingCriterion Object)
     abs_tol         4.00e-10
     rel_tol         0
@@ -23,5 +87,5 @@ CubQMCSobolG (StoppingCriterion Object)
 LDTransformData (AccumulateData Object)
     n_total         2^(27)
     solution        3.142
-    error_bound     2.62e-10
-    time_integrate  62.201
+    error_bound     2.65e-10
+    time_integrate  80.556

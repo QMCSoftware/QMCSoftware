@@ -31,6 +31,6 @@ if __name__ == '__main__':
     df_cms = compare_mean_shifts(
         abs_tol = .025,
         dimension = 16,
-        mean_shifts = around(arange(-.2,3.1,.1),decimals=1),
+        mean_shifts = around(arange(-.1,2.6,.1),decimals=1),
         trials = 3)
     df_cms.to_csv('workouts/mc_vs_qmc/out/importance_sampling.csv', index=False)

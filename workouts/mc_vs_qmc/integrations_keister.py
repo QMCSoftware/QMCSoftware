@@ -49,6 +49,6 @@ integrations_dict = {
     ('CubQMCCLT','Lattice','QMC'): cubqmcclt_lattice,
     ('CubQMCCLT','Sobol','QMC'): cubqmcclt_sobol,
     ('CubQMCLatticeG','Lattice','QMC'): cubqmclatticeg,
-    ('CubQMCSobolG','Sobol','QMC'): cubqmcsobolg,
-    ('CubBayesLatticeG', 'Lattice', 'QMC'): cubbayeslatticeg,
-    ('CubBayesNetG', 'Sobol', 'QMC'): cubbayesnetg}
+    ('CubQMCSobolG','Sobol','QMC'): cubqmcsobolg}
+    #('CubBayesLatticeG', 'Lattice', 'QMC'): cubbayeslatticeg,
+    #('CubBayesNetG', 'Sobol', 'QMC'): cubbayesnetg}
