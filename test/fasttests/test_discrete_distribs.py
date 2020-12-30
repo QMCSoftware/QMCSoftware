@@ -1,5 +1,3 @@
-""" Unit tests for discrete distributions in QMCPy """
-
 from qmcpy import *
 from qmcpy.util import *
 from qmcpy.util import ParameterError,ParameterWarning
@@ -26,26 +24,6 @@ class TestIIDStdUniform(unittest.TestCase):
         distribution.set_dimension(3)
         samples = distribution.gen_samples(4)
         self.assertTrue(samples.shape==(4,3))
-
-
-'''class TestIIDGaussian(unittest.TestCase):
-    """ Unit tests for IIDStdGaussian DiscreteDistribution. """
-
-    def test_mimics(self):
-        distribution = IIDStdGaussian(dimension=3)
-        self.assertEqual(distribution.mimics, "StdGaussian")
-
-    def test_gen_samples(self):
-        distribution = IIDStdGaussian(dimension=3)
-        samples = distribution.gen_samples(n=5)
-        self.assertEqual(type(samples), ndarray)
-        self.assertEqual(samples.shape, (5,3))
-
-    def test_set_dimension(self):
-        distribution = IIDStdGaussian(dimension=2)
-        distribution.set_dimension(3)
-        samples = distribution.gen_samples(4)
-        self.assertTrue(samples.shape==(4,3))'''
 
 
 class TestLattice(unittest.TestCase):
@@ -169,62 +147,17 @@ class TestKorobov(unittest.TestCase):
     
     def test_gen_samples(self):
         distribution = Korobov(dimension=3,generator=[1,2,3],randomize=False,seed=7)
-        x = distribution.gen_samples(4)
+        x = distribution.gen_samples(4,warn=False)
         self.assertTrue(x.shape==(4,3))
         self.assertRaises(ParameterError,distribution.gen_samples,3)
         distribution = Korobov(dimension=2,generator=[1,3],randomize=False,seed=7)
-        x = distribution.gen_samples(4)
+        x = distribution.gen_samples(4,warn=False)
         x_true = array([
             [0,     0],
             [1./4,  3./4],
             [1./2,  1./2],
             [3./4,  1./4]])
         self.assertTrue((x==x_true).all())
-
-
-'''class TestCustomIIDDistribution(unittest.TestCase):
-    """ Unit tests for CustomIIDDistribution DiscreteDistribution. """
-
-    def test_gen_samples(self):
-        distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
-        distribution.gen_samples(10)
-
-    def test_set_dimension(self):
-        distribution = CustomIIDDistribution(lambda n: random.poisson(lam=5,size=(n,2)))
-        self.assertRaises(DimensionError,distribution.set_dimension,3)'''
-                
-
-'''class TestAcceptanceRejectionSampling(unittest.TestCase):
-    """ Unit tests for AcceptanceRejectionSampling DiscreteDistribution. """
-
-    def test_gen_samples(self):
-        def f(x):
-            # see sampling measures demo
-            x = x if x<.5 else 1-x 
-            density = 16*x/3 if x<1/4 else 4/3
-            return density  
-        distribution = AcceptanceRejectionSampling(
-            objective_pdf = f,
-            measure_to_sample_from = Uniform(IIDStdUniform(1)))
-        distribution.gen_samples(10)
-    
-    def test_set_dimension(self):
-        distribution = AcceptanceRejectionSampling(lambda x: 1, Uniform(IIDStdGaussian(2)))
-        self.assertRaises(DimensionError,distribution.set_dimension,3)'''
-
-
-'''class TestInverseCDFSampling(unittest.TestCase):
-    """ Unit tests for InverseCDFSampling DiscreteDistribution. """
-
-    def test_gen_samples(self):
-        distribution = InverseCDFSampling(Lattice(2),
-            inverse_cdf_fun = lambda u,l=5: -log(1-u)/l)
-                        # see sampling measures demo
-        distribution.gen_samples(8)
-    
-    def test_set_dimension(self):
-        distribution = InverseCDFSampling(Lattice(2),lambda u: u)
-        self.assertRaises(DimensionError,distribution.set_dimension,3)'''
 
 class TestDataTypes(unittest.TestCase):
     def test_size_unisgned_long(self):

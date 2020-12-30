@@ -84,13 +84,13 @@ class Integrand(object):
             w = prod( (9 * sin(pi * x) * pi - sin(3 * pi * x) * 3 * pi) / 16 , 1) # psi3_1
         elif ptransform == 'C3SIN': # Sidi C^3 transform
             xp = (12 * pi * x - 8 * sin(2 * pi * x) + sin(4 * pi * x)) / (12 * pi) # psi4
-            w = prod( (12 * pi - 8 * cos(2 * pi * t) * 2 * pi + sin(4 * pi * t) * 4 * pi) / (12 * pi), 1) # psi4_1
+            w = prod( (12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1) # psi4_1
         elif ptransform == 'NONE':
             xp = x
             w = 1
         else:
             raise ParameterError("The %s periodization transform is not implemented"%ptransform)
-        y = self.f(xp)*w
+        y = self.f(xp,*args,**kwargs)*w
         return y
 
     def set_transform(self, transformer):
