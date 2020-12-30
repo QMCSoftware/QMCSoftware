@@ -15,31 +15,38 @@ class Gaussian(TrueMeasure):
     >>> g = Gaussian(d,mean=1,covariance=1./4)
     >>> g
     Gaussian (TrueMeasure Object)
-        d               2
+        d               2^(1)
         mean            1
         covariance      2^(-2)
         decomp_type     pca
-    >>> g.transform(s.gen_samples(n_min=4,n_max=8))
-    array([[ 1.046,  1.693],
-           [ 0.668,  0.579],
-           [ 1.42 ,  0.895],
-           [-0.027,  1.263]])
-    >>> d_new
+    >>> g.transform(s.gen_samples(n_min=2,n_max=4))
+    array([[1.68 , 1.08 ],
+           [0.425, 0.72 ]])
+    >>> g.weight(array([[.1,.2],[.3,.4]]))
+    array([0.035, 0.116])
+    >>> g.jacobian(array([[.25,.75],[.35,.85]]))
+    array([2.476, 2.895])
+    >>> g.transformer == g
+    True
+    >>> g.set_transform(Gaussian(2,mean=[0,0],covariance=[[2,0],[0,2]]))
+    >>> g.transformer.transform(s.gen_samples(n_min=2,n_max=4))
+    array([[ 1.923,  0.226],
+           [-1.626, -0.791]])
+    >>> g.transformer.jacobian(array([[.25,.75],[.35,.85]]))
+    array([19.806, 23.158])
+    >>> d_new = 4
     >>> s.set_dimension(d_new)
     >>> g.set_dimension(d_new)
     >>> g.transform(s.gen_samples(n_min=2,n_max=4))
     array([[1.68 , 1.08 , 0.971, 1.274],
            [0.425, 0.72 , 1.948, 0.801]])
-    >>> g2 = Gaussian(2,mean=[1,2],covariance=[[1,.5],[.5,2]])
-    >>> g2
+    >>> Gaussian(2,mean=[1,2],covariance=[[1,.5],[.5,2]])
     Gaussian (TrueMeasure Object)
-        d               2
+        d               2^(1)
         mean            [1 2]
         covariance      [[1.  0.5]
                         [0.5 2. ]]
         decomp_type     pca
-    >>> g2.pdf(array([[0,0]]))
-    array([0.038])
     """
 
     parameters = ['d', 'mean', 'covariance', 'decomp_type']
@@ -56,9 +63,14 @@ class Gaussian(TrueMeasure):
                 "Cholesky" for cholesky decomposition.
         """
         self.d = dimension
+        self.decomp_type = decomp_type.lower()
+        self._set_mean_cov(mean,covariance)
+        self.transformer = self
+        super(Gaussian,self).__init__()
+    
+    def _set_mean_cov(self, mean, covariance):
         self.mean = mean
         self.covariance = covariance
-        self.decomp_type = decomp_type.lower()
         if isscalar(mean):
             mean = tile(mean,self.d)
         if isscalar(covariance):
@@ -72,7 +84,6 @@ class Gaussian(TrueMeasure):
                     mean must have length d and
                     covariance must be of shape d x d''')
         self._set_constants()
-        super(Gaussian,self).__init__()
     
     def _set_constants(self):
         if self.decomp_type == 'pca':
@@ -86,7 +97,7 @@ class Gaussian(TrueMeasure):
         self.inv_sigma = inv(self.sigma)  
     
     def transform(self, x):
-        return self.mu + (norm.ppf(x)@self.a.T)
+        return self.mu + norm.ppf(x)@self.a.T
     
     def jacobian(self, x):
         return self.det_at/norm.pdf(norm.ppf(x)).prod(1)
@@ -97,7 +108,6 @@ class Gaussian(TrueMeasure):
         return const*exp(-((delta@self.inv_sigma)*delta).sum(1)/2)
 
     def set_dimension(self, dimension):
-        """ See abstract method. """
         m = self.mu[0]
         c = self.sigma[0,0]
         expected_cov = c*eye(int(self.d))
@@ -110,4 +120,6 @@ class Gaussian(TrueMeasure):
         self.mu = tile(m,int(self.d))
         self.sigma = c*eye(int(self.d))
         self._set_constants()
+        if self.transformer!=self:
+            self.transformer.set_dimension(self.d)
     

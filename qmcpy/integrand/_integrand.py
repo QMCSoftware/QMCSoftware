@@ -46,12 +46,11 @@ class Integrand(object):
         Return: 
             ndarray: length n vector of funciton evaluations
         """
-        xp1 = x
-        mult = 1
-        for tf_obj in self.transformer: # iterate over transformations
-            mult *= tf_obj.jacobian(xp1) # multiply by Jacobian
-            xp1 = tf_obj.transform(xp1) # result of transform
-        y = self.g(xp1)*self.true_measure.weight(xp1)*mult/self.discrete_distrib.pdf(x)
+        xtf = self.true_measure.transformer.transform(x)
+        jacobian = self.true_measure.transformer.jacobian(x)
+        weight = self.true_measure.weight(xtf)
+        pdf = self.discrete_distrib.pdf(x)
+        y = self.g(xtf)*weight*jacobian/pdf
         return y
 
     def f_periodized(self, x, ptransform='NONE', *args, **kwargs):

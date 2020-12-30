@@ -8,6 +8,8 @@ class TrueMeasure(object):
         prefix = 'A concrete implementation of TrueMeasure must have '
         if not hasattr(self,'d'):
             raise ParameterError(prefix + 'self.d')
+        if not hasattr(self,'transformer'):
+            raise ParameterError(prefix + 'self.transformer')
         if not hasattr(self,'parameters'):
             self.parameters = []
 
@@ -32,10 +34,9 @@ class TrueMeasure(object):
         Args:
             transformer (TrueMeasure): a measure whose transform method should be used. 
         """
-        if type(transformer)!=TrueMeasure:
+        if not isinstance(transformer,TrueMeasure):
             raise ParameterError("transformer must be a TrueMeasure instance")
-        self.transform = transformer.transform
-        self.jacobian = transformer.jacobian
+        self.transformer = transformer
     
     def jacobian(self, x):
         """

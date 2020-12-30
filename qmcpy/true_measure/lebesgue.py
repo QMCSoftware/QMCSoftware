@@ -1,4 +1,6 @@
 from ._true_measure import TrueMeasure
+from .uniform import Uniform
+from .gaussian import Gaussian
 from ..discrete_distribution import Sobol
 from ..util import TransformError, ParameterError
 from numpy import array, isfinite, inf, isscalar, tile
@@ -9,18 +11,23 @@ class Lebesgue(TrueMeasure):
     """
     >>> d = 2
     >>> dd = Sobol(d,seed=7)
-    >>> Lebesgue(transform=Uniform(lower_bound=[-1,0],upper_bound=[1,3]))
+    >>> Lebesgue(transformer=Uniform(d,lower_bound=[-1,0],upper_bound=[1,3]))
     Lebesgue (TrueMeasure Object)
-        transform = Gaussian(
-                        lower_bound     [-1  0]
-                        upper_bound     [1 3])
-    >>> Lebesgue(transform=Gaussian(mean=[0,0]),covariance=[[1,0],[0,1]]))
+        transformer     Uniform (TrueMeasure Object)
+                           d               2^(1)
+                           lower_bound     [-1  0]
+                           upper_bound     [1 3]
+    >>> Lebesgue(transformer=Gaussian(d,mean=[0,0],covariance=[[1,0],[0,1]]))
     Lebesgue (TrueMeasure Object)
-        lower_bound     [-inf -inf]
-        upper_bound     [inf inf]
+        transformer     Gaussian (TrueMeasure Object)
+                           d               2^(1)
+                           mean            [0 0]
+                           covariance      [[1 0]
+                                           [0 1]]
+                           decomp_type     pca
     """
 
-    parameters = ['transform']
+    parameters = ['transformer']
     
     def __init__(self, transformer):
         """

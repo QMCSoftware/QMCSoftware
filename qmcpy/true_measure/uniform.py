@@ -8,34 +8,37 @@ from scipy.stats import norm
 class Uniform(TrueMeasure):
     """
     >>> d = 2
-    >>> u = Uniform(d,lower_bound=1,upper_bound=2)
+    >>> u = Uniform(d,lower_bound=1,upper_bound=4)
     >>> u
     Uniform (TrueMeasure Object)
-        d               2
+        d               2^(1)
         lower_bound     1
-        upper_bound     2
+        upper_bound     2^(2)
     >>> s = Sobol(d, seed=7)
-    >>> u.transform(s.gen_samples(n_min=4,n_max=8))
-    array([[1.537, 1.917],
-           [1.253, 1.2  ],
-           [1.799, 1.417],
-           [1.02 , 1.7  ]])
+    >>> x = u.transform(s.gen_samples(n_min=4,n_max=8))
+    >>> x
+    array([[2.61 , 3.751],
+           [1.76 , 1.6  ],
+           [3.398, 2.25 ],
+           [1.06 , 3.101]])
+    >>> u.weight(x)
+    array([0.111, 0.111, 0.111, 0.111])
+    >>> u.jacobian(x)
+    array([9, 9, 9, 9])
     >>> d_new = 4
     >>> u.set_dimension(d_new)
     >>> s.set_dimension(d_new)
     >>> u.transform(s.gen_samples(n_min=4,n_max=8))
-    array([[1.537, 1.917, 1.78 , 1.13 ],
-           [1.253, 1.2  , 1.27 , 1.798],
-           [1.799, 1.417, 1.068, 1.619],
-           [1.02 , 1.7  , 1.578, 1.451]])
+    array([[2.61 , 3.751, 3.341, 1.389],
+           [1.76 , 1.6  , 1.809, 3.393],
+           [3.398, 2.25 , 1.203, 2.858],
+           [1.06 , 3.101, 2.734, 2.354]])
     >>> u2 = Uniform(2, lower_bound=[-.5,0], upper_bound=[1,3])
     >>> u2
     Uniform (TrueMeasure Object)
-        d               2
-        lower_bound     [-.5, 0]
-        upper_bound     [1, 3]
-    >>> u2.pdf([[0,1]])
-    array([0.222])
+        d               2^(1)
+        lower_bound     [-0.5  0. ]
+        upper_bound     [1 3]
     """
 
     parameters = ['d', 'lower_bound', 'upper_bound']
@@ -47,17 +50,18 @@ class Uniform(TrueMeasure):
             lower_bound (float): a for Uniform(a,b)
             upper_bound (float): b for Uniform(a,b)
         """
-        self.d = self.dimension
+        self.d = dimension
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
         if isscalar(self.lower_bound):
-            a = tile(self.lower_bound,self.d)
+            lower_bound = tile(self.lower_bound,self.d)
         if isscalar(self.upper_bound):
-            b = tile(self.upper_bound,self.d)
-        self.a = array(a)
-        self.b = array(b)
+            upper_bound = tile(self.upper_bound,self.d)
+        self.a = array(lower_bound)
+        self.b = array(upper_bound)
         if len(self.a)!=self.d or len(self.b)!=self.d:
             raise DimensionError('upper bound and lower bound must be of length dimension')
+        self.transformer = self
         self._set_constants()
         super(Uniform,self).__init__() 
 
@@ -87,4 +91,6 @@ class Uniform(TrueMeasure):
         self.a = tile(l,self.d)
         self.b = tile(u,self.d)
         self._set_constants()
+        if self.transformer!=self:
+            self.transformer.set_dimension(self.d)
     
