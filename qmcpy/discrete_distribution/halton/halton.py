@@ -130,15 +130,12 @@ class Halton(DiscreteDistribution):
             return x
 
     def pdf(self, x):
-        """ pdf of a standard uniform """
         return ones(x.shape[0], dtype=float)
         
     def set_seed(self, seed):
-        """ See abstract method. """
         self.seed = seed if seed else random.randint(1, 100000, dtype=uint64)
         
     def set_dimension(self, dimension):
-        """ See abstract method. """
         self.d = dimension
         if self.d > self.d_lim:
             s = '''

@@ -18,20 +18,18 @@ class DiscreteDistribution(object):
 
     def gen_samples(self, *args):
         """
-        ABSTRACT METHOD to generate samples from discrete distribution.
+        ABSTRACT METHOD to generate samples from this discrete distribution.
 
         Args:
             args (tuple): tuple of positional argument. See implementations for details
+
         Returns:
-            ndarray: $n \\times d$ array of samples, where $n$ is
-            number of observations and $d$ is dimension
+            ndarray: n x d array of samples
         """
         raise MethodImplementationError(self, 'gen_samples')
 
     def pdf(self, x):
-        """
-        ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. 
-        """
+        """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
     def set_dimension(self, dimension):
@@ -40,9 +38,6 @@ class DiscreteDistribution(object):
 
         Args:
             dimension (int): new dimension to reset to
-
-        Note:
-            May not be applicable to every discrete distribution (ex: CustomIIDDistribution).
         """
         raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
 
@@ -52,9 +47,6 @@ class DiscreteDistribution(object):
 
         Args:
             seed (int): new seed for generator
-
-        Note:
-            May not be applicable to every discrete distribution (ex: InverseCDFSampling)
         """
         raise MethodImplementationError(self, 'set_seed')
 

@@ -18,12 +18,11 @@ class IIDStdUniform(DiscreteDistribution):
            [0.978, 0.538],
            [0.501, 0.072]])
     >>> dd.set_dimension(3)
-    >>> x = dd.gen_samples(5)
-    >>> x.shape
+    >>> dd.gen_samples(5).shape
     (5, 3)
     """
 
-    parameters = ['dimension','seed','mimics']
+    parameters = ['d','seed','mimics']
 
     def __init__(self, dimension=1, seed=None):
         """
@@ -46,15 +45,13 @@ class IIDStdUniform(DiscreteDistribution):
             n (int): Number of observations to generate
 
         Returns:
-            ndarray: n x d (dimension) array of samples
+            ndarray: n x self.d array of samples
         """
         return random.rand(int(n), int(self.d))
     
     def pdf(self, x):
-        """ pdf of a standard uniform """
         return ones(x.shape[0], dtype=float)
     
     def set_dimension(self, dimension):
-        """ See abstract class. """
         self.d = dimension
         

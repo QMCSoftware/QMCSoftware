@@ -31,12 +31,11 @@ class Korobov(DiscreteDistribution):
         randomize       1
         seed            2^(3)
         mimics          StdUniform
-        backend         QRNG
-    >>> Korobov(2,generator=[3,1]).gen_samples(4)
-    array([[0.668, 0.888],
-           [0.418, 0.138],
-           [0.168, 0.388],
-           [0.918, 0.638]])
+    >>> Korobov(2,generator=[3,1],seed=7).gen_samples(4)
+    array([[0.982, 0.883],
+           [0.732, 0.133],
+           [0.482, 0.383],
+           [0.232, 0.633]])
     
     References:
 
