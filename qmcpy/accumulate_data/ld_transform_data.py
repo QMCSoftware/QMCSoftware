@@ -52,16 +52,14 @@ class LDTransformData(AccumulateData):
         self.c_stilde_low = tile(-inf,int(self.m_max-self.l_star+1))
         self.c_stilde_up = tile(inf,int(self.m_max-self.l_star+1))
         self.check_cone = check_cone
-        # apply periodization transform
-        self.ff = self.integrand.period_transform(ptransform)  # integrand after the periodization transform
+        self.ptransform = ptransform
         super(LDTransformData,self).__init__()
-
 
     def update_data(self):
         """ See abstract method. """
         # Generate sample values
         x = self.discrete_distrib.gen_samples(n_min=self.n_total,n_max=2**self.m)
-        ynext = self.ff(x).squeeze()
+        ynext = self.integrand.f_periodized(x,self.ptransform).squeeze()
         self.yval = hstack((self.yval,ynext))
         # Compute fast basis transform
         self.y = self.ft(self.y, ynext)

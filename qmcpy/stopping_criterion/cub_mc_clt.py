@@ -14,22 +14,24 @@ class CubMCCLT(StoppingCriterion):
     """
     Stopping criterion based on the Central Limit Theorem.
     
-    >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
+    >>> k = Keister(IIDStdUniform(2,seed=7))
     >>> sc = CubMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8010283270714038
+    1.801028327071404
     >>> data
     Solution: 1.8010         
     Keister (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         seed            7
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transformer     Gaussian (TrueMeasure Object)
+                           d               2^(1)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubMCCLT (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
@@ -45,8 +47,7 @@ class CubMCCLT(StoppingCriterion):
         error_bound     0.051
         confid_int      [1.75  1.852]
         time_integrate  ...
-    >>> ac = AsianOption(
-    ...     measure = BrownianMotion(IIDStdUniform()),
+    >>> ac = AsianOption(IIDStdUniform(),
     ...     multi_level_dimensions = [2,4,8])
     >>> sc = CubMCCLT(ac,abs_tol=.05)
     >>> solution,data = sc.integrate()

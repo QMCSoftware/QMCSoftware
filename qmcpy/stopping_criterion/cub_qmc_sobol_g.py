@@ -15,25 +15,27 @@ class CubQMCSobolG(StoppingCriterion):
     d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
 
-    >>> k = Keister(Gaussian(Sobol(2,seed=7),covariance=1./2))
+    >>> k = Keister(Sobol(2,seed=7))
     >>> sc = CubQMCSobolG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.80...
+    1.8074379398240916
     >>> data
     Solution: 1.8074         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         randomize       1
         graycode        0
         seed            [61616 58565]
         mimics          StdUniform
         dim0            0
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transformer     Gaussian (TrueMeasure Object)
+                           d               2^(1)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubQMCSobolG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -44,6 +46,7 @@ class CubQMCSobolG(StoppingCriterion):
         solution        1.807
         error_bound     0.005
         time_integrate  ...
+    
 
     Original Implementation:
 
@@ -118,7 +121,7 @@ class CubQMCSobolG(StoppingCriterion):
         allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
         super(CubQMCSobolG,self).__init__(allowed_levels, allowed_distribs)
-        if (not self.discrete_distrib.randomize) or distribution.graycode:
+        if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False. Use QRNG backend.")
 
     def integrate(self):

@@ -15,7 +15,7 @@ class CubQMCCLT(StoppingCriterion):
     """
     Stopping criterion based on Central Limit Theorem for multiple replications.
     
-    >>> k = Keister(Gaussian(Lattice(seed=7),covariance=1./2))
+    >>> k = Keister(Lattice(seed=7))
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
@@ -24,15 +24,17 @@ class CubQMCCLT(StoppingCriterion):
     Solution: 1.3807         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       1
+        d               1
         randomize       1
         order           natural
         seed            1093
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transformer     Gaussian (TrueMeasure Object)
+                           d               1
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010

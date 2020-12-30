@@ -15,7 +15,7 @@ class CubQMCLatticeG(StoppingCriterion):
     a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Fourier coefficients cone decay assumptions.
     
-    >>> k = Keister(Gaussian(Lattice(2,seed=7),covariance=1./2))
+    >>> k = Keister(Lattice(2,seed=7))
     >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
@@ -24,15 +24,17 @@ class CubQMCLatticeG(StoppingCriterion):
     Solution: 1.8073         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         randomize       1
         order           natural
         seed            7
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transformer     Gaussian (TrueMeasure Object)
+                           d               2^(1)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -43,7 +45,7 @@ class CubQMCLatticeG(StoppingCriterion):
         solution        1.807
         error_bound     0.003
         time_integrate  ...
-
+    
     Original Implementation:
 
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m

@@ -16,7 +16,7 @@ class CubMCG(StoppingCriterion):
     """
     Stopping criterion with guaranteed accuracy.
 
-    >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
+    >>> k = Keister(IIDStdUniform(2,seed=7))
     >>> sc = CubMCG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
@@ -25,13 +25,15 @@ class CubMCG(StoppingCriterion):
     Solution: 1.8039         
     Keister (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         seed            7
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transformer     Gaussian (TrueMeasure Object)
+                           d               2^(1)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubMCG (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010

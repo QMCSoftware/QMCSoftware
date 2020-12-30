@@ -211,6 +211,7 @@ class MLCallOptions(Integrand):
         sums[5] = (pf**2).sum()
         cost = n*nf # cost defined as number of fine timesteps
         self.cost = cost
+        self.sums = sums
         return dp
 
     def _dim_at_level(self, l):

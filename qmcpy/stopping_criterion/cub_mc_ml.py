@@ -14,7 +14,7 @@ class CubMCML(StoppingCriterion):
     """
     Stopping criterion based on multi-level monte carlo.
     
-    >>> mlco = MLCallOptions(Gaussian(IIDStdUniform(seed=7)))
+    >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
     >>> sc = CubMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
@@ -29,10 +29,11 @@ class CubMCML(StoppingCriterion):
         t               1
         b               85
     IIDStdUniform (DiscreteDistribution Object)
-        dimension       2^(6)
+        d               2^(6)
         seed            7
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
+        d               2^(6)
         mean            0
         covariance      1
         decomp_type     pca

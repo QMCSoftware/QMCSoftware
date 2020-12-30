@@ -22,25 +22,27 @@ class CubBayesNetG(StoppingCriterion):
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
 
-    >>> k = Keister(Gaussian(Sobol(2, seed=123456789, randomize='LMS', graycode=False),covariance=1./2))
+    >>> k = Keister(Sobol(2, seed=123456789))
     >>> sc = CubBayesNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8110...
+    1.8110042533320707
     >>> data
-    Solution: 1.8110...
+    Solution: 1.8110         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         randomize       1
         graycode        0
         seed            [77469 77107]
         mimics          StdUniform
         dim0            0
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transformer     Gaussian (TrueMeasure Object)
+                           d               2^(1)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubBayesNetG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -51,7 +53,7 @@ class CubBayesNetG(StoppingCriterion):
         solution        1.811
         error_bound     0.015
         time_integrate  ...
-
+    
     Adapted from
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m
 
@@ -132,8 +134,6 @@ class CubBayesNetG(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
 
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
-        self.distribution = distribution
         allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
         super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs)

@@ -1,6 +1,5 @@
 from ._accumulate_data import AccumulateData
 from ..util import MaxSamplesWarning
-
 from numpy import array, nan
 import warnings
 import numpy as np

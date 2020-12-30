@@ -17,7 +17,7 @@ class StoppingCriterion(object):
         prefix = 'A concrete implementation of StoppingCriterion must have '
         # integrand check
         if (not hasattr(self, 'integrand')) or \
-            type(self.integrand)!=Integrand:
+            (not isinstance(self.integrand,Integrand)):
             raise ParameterError(prefix + 'self.integrand, an Integrand instance')
         # true measure check
         if (not hasattr(self, 'true_measure')) or (self.true_measure!=self.integrand.true_measure):

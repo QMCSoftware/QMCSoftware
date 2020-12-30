@@ -14,7 +14,7 @@ class CubQMCML(StoppingCriterion):
     """
     Stopping criterion based on multi-level quasi-Monte Carlo.
 
-    >>> mlco = MLCallOptions(Gaussian(Lattice(seed=7)))
+    >>> mlco = MLCallOptions(Lattice(seed=7))
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
@@ -29,12 +29,13 @@ class CubQMCML(StoppingCriterion):
         t               1
         b               85
     Lattice (DiscreteDistribution Object)
-        dimension       2^(6)
+        d               2^(6)
         randomize       1
         order           natural
         seed            985802
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
+        d               2^(6)
         mean            0
         covariance      1
         decomp_type     pca

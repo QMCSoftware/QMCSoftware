@@ -63,7 +63,7 @@ class MLQMCData(AccumulateData):
                 samples = self.discrete_distrib.gen_samples(n_min=self.n_level[l],n_max=n_max)
                 self.integrand.f(samples,l=l)
                 prev_sum = self.mean_level_reps[l,r]*self.n_level[l]
-                self.mean_level_reps[l,r] = (self.integrandsums[0]+prev_sum)/float(n_max)
+                self.mean_level_reps[l,r] = (self.integrand.sums[0]+prev_sum)/float(n_max)
             self.n_level[l] = n_max
             self.mean_level[l] = self.mean_level_reps[l].mean()
             self.var_level[l] = self.mean_level_reps[l].var()
