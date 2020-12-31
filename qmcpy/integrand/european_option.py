@@ -22,7 +22,7 @@ class EuropeanOption(Integrand):
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.211575961797148
+    9.211575961797152
     >>> eo.set_transform(BrownianMotion(d,drift=1))
     >>> y2 = eo.f(x)
     >>> y2.mean()

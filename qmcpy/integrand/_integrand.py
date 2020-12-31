@@ -46,12 +46,18 @@ class Integrand(object):
         Return: 
             ndarray: length n vector of funciton evaluations
         """
-        xtf = self.true_measure.transformer.transform(x)
-        jacobian = self.true_measure.transformer.jacobian(x)
-        weight = self.true_measure.weight(xtf)
         pdf = self.discrete_distrib.pdf(x)
-        y = self.g(xtf,*args,**kwargs)*weight*jacobian/pdf
-        return y
+        measure = self.true_measure
+        factor = 1. # = weight * jacobian
+        if measure == measure.transformer:
+            x = measure.transform(x) # using default transform so that f(x)=g(\Psi(x))
+        else:
+            while measure!=measure.transformer:
+                measure = measure.transformer # new \Psi
+                factor *= measure.jacobian(x) # d \Psi / dx
+                x = measure.transform(x) # chain rule
+            factor *= self.true_measure.weight(x)
+        return self.g(x,*args,**kwargs)*factor/pdf
 
     def f_periodized(self, x, ptransform='NONE', *args, **kwargs):
         """
