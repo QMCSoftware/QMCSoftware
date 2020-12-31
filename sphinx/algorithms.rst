@@ -42,31 +42,7 @@ IID Standard Uniform
 .. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
-IID Standard Gaussian
-.....................
-
-.. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
-    :members:
-
-Custom IID Distribution
-.......................
-
-.. automodule:: qmcpy.discrete_distribution.custom_iid_distribution
-    :members:
-
-Inverse CDF Sampling
-....................
-
-.. automodule:: qmcpy.discrete_distribution.inverse_cdf_sampling
-    :members:
-
-Acceptance Rejection Sampling
-.............................
-
-.. automodule:: qmcpy.discrete_distribution.acceptance_rejection_sampling
-    :members:
     
-
 
 True Measure Class
 ------------------
@@ -99,22 +75,9 @@ Lebesgue
 ........
 
 .. automodule:: qmcpy.true_measure.lebesgue
-    :members:
+    :members:   
 
-Importance Sampling
-...................
 
-.. automodule:: qmcpy.true_measure.importance_sampling
-    :members:
-
-Identical to what Discrete Distribution Mimics
-..............................................
-
-.. automodule:: qmcpy.true_measure.identical_to_discrete
-    :members:
-    
-
-    
 
 Integrand Class
 ---------------
@@ -158,7 +121,7 @@ Multilevel Call Options with Milstein Discretization
 Linear Function
 ...............
 
-.. automodule:: qmcpy.integrand.linear
+.. automodule:: qmcpy.integrand.linear0
     :members:
 
 
@@ -178,10 +141,22 @@ Guaranteed Lattice Cubature (qMC)
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_lattice_g
     :members:
 
-Guaranteed Sobol Cubature (qMC)
+Guaranteed Sobol' Cubature (qMC)
 ................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_sobol_g
+    :members:
+
+Bayesian Lattice Cubature (qMC)
+................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_bayes_lattice_g
+    :members:
+
+Bayesian Digital Net Cubature (qMC)
+...................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_bayes_net_g
     :members:
 
 Multilevel qMC Cubature
@@ -253,4 +228,12 @@ Mean Variance MC Data
 .......................
 
 .. automodule:: qmcpy.accumulate_data.mean_var_data
+    :members:
+
+
+
+Utilities
+---------
+
+.. automodule:: qmcpy.util.latnetbuilder_linker
     :members:
