@@ -98,10 +98,6 @@ class Integrand(object):
             raise ParameterError("The %s periodization transform is not implemented"%ptransform)
         y = self.f(xp,*args,**kwargs)*w
         return y
-
-    def set_transform(self, transformer):
-        """ See TrueMeasure.set_transform. """
-        self.true_measure.set_transform(transformer)
         
     def _dim_at_level(self, l):
         """

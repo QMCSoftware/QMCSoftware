@@ -23,7 +23,6 @@ class MLCallOptions(Integrand):
     >>> for level in range(4):
     ...     new_dim = mlco._dim_at_level(level)
     ...     mlco.true_measure.set_dimension(new_dim)
-    ...     mlco.discrete_distrib.set_dimension(new_dim)
     ...     x = mlco.discrete_distrib.gen_samples(2**10)
     ...     y += mlco.f(x,l=level).mean()
     >>> y

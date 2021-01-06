@@ -10,26 +10,23 @@ class Korobov(DiscreteDistribution):
     """
     Quasi-Random Korobov nets.
     
-    >>> k = Korobov(1,seed=7)
-    >>> k.gen_samples(2)
-    array([[0.982],
-           [0.482]])
-    >>> k.gen_samples(2)
-    array([[0.982],
-           [0.482]])
-    >>> k.set_dimension(3)
-    >>> k.set_seed(8)
+    >>> k = Korobov(2,generator=[1,3],seed=7)
     >>> k.gen_samples(4)
-    array([[0.265, 0.153, 0.115],
-           [0.515, 0.403, 0.365],
-           [0.765, 0.653, 0.615],
-           [0.015, 0.903, 0.865]])
+    array([[0.982, 0.883],
+           [0.232, 0.633],
+           [0.482, 0.383],
+           [0.732, 0.133]])
+    >>> k.gen_samples(4)
+    array([[0.982, 0.883],
+           [0.232, 0.633],
+           [0.482, 0.383],
+           [0.732, 0.133]])
     >>> k
     Korobov (DiscreteDistribution Object)
-        d               3
-        generator       1
+        d               2^(1)
+        generator       [1 3]
         randomize       1
-        seed            2^(3)
+        seed            7
         mimics          StdUniform
     >>> Korobov(2,generator=[3,1],seed=7).gen_samples(4)
     array([[0.982, 0.883],
@@ -71,7 +68,7 @@ class Korobov(DiscreteDistribution):
         self.randomize = randomize
         self.n_lim = 2**31
         self.d_lim = self.n_lim
-        self.set_dimension(dimension)
+        self._set_dimension(dimension)
         self.set_seed(seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
@@ -119,7 +116,7 @@ class Korobov(DiscreteDistribution):
         """ See abstract method. """
         self.seed = seed if seed else random.randint(1, 100000, dtype=uint64)
         
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         """ See abstract method. """
         self.d = dimension
         if self.d > self.d_lim:

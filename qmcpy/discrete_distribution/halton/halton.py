@@ -10,21 +10,19 @@ class Halton(DiscreteDistribution):
     Quasi-Random Halton nets.
 
     >>> h = Halton(2,seed=7)
+    >>> h.gen_samples(4)
+    array([[0.166, 0.363],
+           [0.666, 0.696],
+           [0.416, 0.03 ],
+           [0.916, 0.474]])
     >>> h.gen_samples(1)
     array([[0.166, 0.363]])
-    >>> h.gen_samples(1)
-    array([[0.166, 0.363]])
-    >>> h.set_dimension(4)
-    >>> h.set_seed(8)
-    >>> h.gen_samples(2)
-    array([[0.323, 0.148, 0.623, 0.913],
-           [0.823, 0.482, 0.223, 0.342]])
     >>> h
     Halton (DiscreteDistribution Object)
-        d               2^(2)
+        d               2^(1)
         generalize      1
         randomize       1
-        seed            2^(3)
+        seed            7
         mimics          StdUniform
     
     References:
@@ -95,7 +93,7 @@ class Halton(DiscreteDistribution):
             s = "Halton randomize must be True/False or 'QRNG'/'Owen'"
             raise ParameterError(s)
         self.n_lim = 2**32
-        self.set_dimension(dimension)
+        self._set_dimension(dimension)
         self.set_seed(seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
@@ -135,7 +133,7 @@ class Halton(DiscreteDistribution):
     def set_seed(self, seed):
         self.seed = seed if seed else random.randint(1, 100000, dtype=uint64)
         
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         self.d = dimension
         if self.d > self.d_lim:
             s = '''

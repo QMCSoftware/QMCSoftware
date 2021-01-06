@@ -52,6 +52,6 @@ class IIDStdUniform(DiscreteDistribution):
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
     
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         self.d = dimension
         

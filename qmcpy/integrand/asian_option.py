@@ -41,7 +41,6 @@ class AsianOption(Integrand):
     >>> for l in range(len(level_dims)):
     ...     new_dim = ac2._dim_at_level(l)
     ...     ac2.true_measure.set_dimension(new_dim)
-    ...     ac2.discrete_distrib.set_dimension(new_dim)
     ...     x2 = ac2.discrete_distrib.gen_samples(2**10)
     ...     level_est = ac2.f(x2,l=l).mean()
     ...     y2 += level_est

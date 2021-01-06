@@ -76,7 +76,6 @@ class TestCallOptions(unittest.TestCase):
             true_d = 2**3 if option=='European' else 2**4
             self.assertTrue(d==true_d)
             mlco.true_measure.set_dimension(d)
-            mlco.discrete_distrib.set_dimension(d)
             y = mlco.f_periodized(mlco.discrete_distrib.gen_samples(6),'c3sin',l=l)
             self.assertTrue(y.shape==(6,))
 

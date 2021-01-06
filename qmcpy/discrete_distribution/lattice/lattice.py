@@ -10,6 +10,13 @@ class Lattice(DiscreteDistribution):
     Quasi-Random Lattice nets in base 2.
 
     >>> l = Lattice(2,seed=7)
+    >>> l.gen_samples(4)
+    array([[0.076, 0.78 ],
+           [0.576, 0.28 ],
+           [0.326, 0.53 ],
+           [0.826, 0.03 ]])
+    >>> l.gen_samples(1)
+    array([[0.076, 0.78 ]])
     >>> l
     Lattice (DiscreteDistribution Object)
         d               2^(1)
@@ -17,17 +24,6 @@ class Lattice(DiscreteDistribution):
         order           natural
         seed            7
         mimics          StdUniform
-    >>> l.gen_samples(4)
-    array([[0.076, 0.78 ],
-           [0.576, 0.28 ],
-           [0.326, 0.53 ],
-           [0.826, 0.03 ]])
-    >>> l.set_dimension(3)
-    >>> l.gen_samples(n_min=4,n_max=8)
-    array([[0.563, 0.598, 0.853],
-           [0.063, 0.098, 0.353],
-           [0.813, 0.348, 0.603],
-           [0.313, 0.848, 0.103]])
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
@@ -109,7 +105,7 @@ class Lattice(DiscreteDistribution):
             f_lst = f.split('.')
             self.d_max = int(f_lst[-3])
             self.m_max = int(f_lst[-2])
-        self.set_dimension(dimension)
+        self._set_dimension(dimension)
         self.set_seed(seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
@@ -217,7 +213,7 @@ class Lattice(DiscreteDistribution):
         random.seed(self.seed)
         self.shift = random.rand(int(self.d))
         
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         """ See abstract method. """
         self.d = dimension
         if self.d > self.d_max:

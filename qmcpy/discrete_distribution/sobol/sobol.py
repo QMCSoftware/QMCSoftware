@@ -12,6 +12,13 @@ class Sobol(DiscreteDistribution):
     Quasi-Random Sobol nets in base 2.
     
     >>> s = Sobol(2,seed=7)
+    >>> s.gen_samples(4)
+    array([[0.673, 0.063],
+           [0.398, 0.788],
+           [0.913, 0.564],
+           [0.125, 0.288]])
+    >>> s.gen_samples(1)
+    array([[0.673, 0.063]])
     >>> s
     Sobol (DiscreteDistribution Object)
         d               2^(1)
@@ -20,17 +27,6 @@ class Sobol(DiscreteDistribution):
         seed            [61616 58565]
         mimics          StdUniform
         dim0            0
-    >>> s.gen_samples(4)
-    array([[0.673, 0.063],
-           [0.398, 0.788],
-           [0.913, 0.564],
-           [0.125, 0.288]])
-    >>> s.set_dimension(3)
-    >>> s.gen_samples(n_min=4,n_max=8)
-    array([[0.537, 0.917, 0.78 ],
-           [0.253, 0.2  , 0.27 ],
-           [0.799, 0.417, 0.068],
-           [0.02 , 0.7  , 0.578]])
     >>> Sobol(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
     array([[0.75, 0.25],
            [0.25, 0.75]])
@@ -120,7 +116,7 @@ class Sobol(DiscreteDistribution):
             ctypes.c_uint32] # set_xjlms
         # set parameters
         self.sobol_cf.restype = ctypes.c_uint32
-        self.set_dimension(dimension)
+        self._set_dimension(dimension)
         self.set_seed(seed)
         self.set_randomize(randomize)
         self.set_graycode(graycode)
@@ -225,7 +221,7 @@ class Sobol(DiscreteDistribution):
             raise ParameterError(msg)
         self.seed = array(self.seed,dtype=uint64)
             
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         """
         Reset the dimension
 

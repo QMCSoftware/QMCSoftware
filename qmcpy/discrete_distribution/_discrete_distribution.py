@@ -32,7 +32,7 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         """
         ABSTRACT METHOD to reset the dimension of the problem.
 

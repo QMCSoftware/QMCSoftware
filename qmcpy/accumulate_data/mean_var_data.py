@@ -45,7 +45,6 @@ class MeanVarData(AccumulateData):
                 # reset dimension
                 new_dim = self.integrand._dim_at_level(l)
                 self.true_measure.set_dimension(new_dim)
-                self.discrete_distrib.set_dimension(new_dim)
                 samples = self.discrete_distrib.gen_samples(n=self.n[l])
                 y = self.integrand.f(samples,l=l).squeeze()
             else:

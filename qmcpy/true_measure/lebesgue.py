@@ -9,49 +9,35 @@ from numpy import *
 
 class Lebesgue(TrueMeasure):
     """
-    >>> d = 2
-    >>> dd = Sobol(d,seed=7)
-    >>> Lebesgue(transformer=Uniform(d,lower_bound=[-1,0],upper_bound=[1,3]))
+    >>> Lebesgue(Gaussian(Sobol(2,seed=7)))
     Lebesgue (TrueMeasure Object)
-        transformer     Uniform (TrueMeasure Object)
-                           d               2^(1)
-                           lower_bound     [-1  0]
-                           upper_bound     [1 3]
-    >>> lg = Lebesgue(transformer=Gaussian(d,mean=[0,0],covariance=[[1,0],[0,1]]))
-    >>> lg
-    Lebesgue (TrueMeasure Object)
-        transformer     Gaussian (TrueMeasure Object)
-                           d               2^(1)
-                           mean            [0 0]
-                           covariance      [[1 0]
-                                           [0 1]]
+        transform       Gaussian (TrueMeasure Object)
+                           mean            0
+                           covariance      1
                            decomp_type     pca
-    >>> lg.set_transform(Gaussian(d,mean=[0,1],covariance=[[2,0],[0,2]]))
-    >>> lg
+    >>> Lebesgue(Uniform(Sobol(2,seed=7)))
     Lebesgue (TrueMeasure Object)
-        transformer     Gaussian (TrueMeasure Object)
-                           d               2^(1)
-                           mean            [0 1]
-                           covariance      [[2 0]
-                                           [0 2]]
-                           decomp_type     pca
+        transform       Uniform (TrueMeasure Object)
+                           lower_bound     0
+                           upper_bound     1
     """
 
-    parameters = ['transformer']
+    parameters = []
     
-    def __init__(self, transformer):
+    def __init__(self, sampler):
         """
         Args:
-            transformer (TrueMeasure): A measure whose transform will be used.
+            sampler (TrueMeasure): A  true measure by which to compose a transform.
         """
-        self.transformer = transformer
-        self.d = self.transformer.d
-        self.set_transform(self.transformer)
-        self.set_dimension = self.transformer.set_dimension
+        if not isinstance(sampler,TrueMeasure):
+            raise ParameterError("Lebesgue sampler must be a true measure by which to tranform samples.")
+        self.domain = sampler.range # hack to make sure Lebesuge is compatible with any tranform
+        self.range = None
+        self._parse_sampler(sampler)
         super(Lebesgue,self).__init__()
 
-    def weight(self, x):
+    def _weight(self, x):
         return ones(x.shape[0],dtype=float)
 
-    def set_dimension(self, dimension):
-        self.measure.set_dimension(dimension)
+    def _set_dimension(self, dimension):
+        self.d = dimension
