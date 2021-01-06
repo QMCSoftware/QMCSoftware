@@ -11,9 +11,8 @@ def pi_problem(abs_tol=.01):
     t0 = time()
     d = 1
     integrand = CustomFun(
-        discrete_distrib = Sobol(d, seed=7), 
-        g = lambda x: (sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))).sum(1),
-        true_measure = Lebesgue(Uniform(d, lower_bound=-2, upper_bound=2)))
+        true_measure = Lebesgue(Uniform(Sobol(d,seed=7), lower_bound=-2, upper_bound=2)), 
+        g = lambda x: (sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))).sum(1))
     solution,data = CubQMCSobolG(integrand, abs_tol=abs_tol, n_max=2**30).integrate()
     password = str(solution).replace('.', '')[:10]
     t_delta = time() - t0
@@ -23,9 +22,8 @@ def pi_problem_bayes_lattice(abs_tol=.01):
     t0 = time()
     d = 1
     integrand = CustomFun(
-        discrete_distrib = Lattice(d, seed=7, order='linear'), 
-        g = lambda x: (sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))).sum(1),
-        true_measure = Lebesgue(Uniform(d, lower_bound=-2, upper_bound=2)))
+        true_measure = Lebesgue(Uniform(Lattice(d, seed=7, order='linear'), lower_bound=-2, upper_bound=2)), 
+        g = lambda x: (sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))).sum(1))
     solution,data = CubBayesLatticeG(integrand, abs_tol=abs_tol, n_max=2**30).integrate()
     password = str(solution).replace('.', '')[:10]
     t_delta = time() - t0
@@ -35,9 +33,8 @@ def pi_problem_bayes_net(abs_tol=.01):
     t0 = time()
     d = 1
     integrand = CustomFun(
-        discrete_distrib = Sobol(d, seed=7), 
-        g = lambda x: (sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))).sum(1),
-        true_measure = Lebesgue(Uniform(d, lower_bound=-2, upper_bound=2)))
+        true_measure = Lebesgue(Uniform(Sobol(d, seed=7), lower_bound=-2, upper_bound=2)),
+        g = lambda x: (sqrt(4 - x**2) * (1. / 2 + x**3 * cos(x / 2))).sum(1))
     solution,data = CubBayesNetG(integrand, abs_tol=abs_tol, n_max=2**30).integrate()
     password = str(solution).replace('.', '')[:10]
     t_delta = time() - t0

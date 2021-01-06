@@ -31,8 +31,7 @@ class CubQMCSobolG(StoppingCriterion):
         mimics          StdUniform
         dim0            0
     Lebesgue (TrueMeasure Object)
-        transformer     Gaussian (TrueMeasure Object)
-                           d               2^(1)
+        transform       Gaussian (TrueMeasure Object)
                            mean            0
                            covariance      2^(-1)
                            decomp_type     pca
@@ -46,7 +45,6 @@ class CubQMCSobolG(StoppingCriterion):
         solution        1.807
         error_bound     0.005
         time_integrate  ...
-    
 
     Original Implementation:
 

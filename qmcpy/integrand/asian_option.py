@@ -9,8 +9,7 @@ class AsianOption(Integrand):
     """
     Asian financial option. 
 
-    >>> d = 4
-    >>> ac = AsianOption(Sobol(d,seed=7))
+    >>> ac = AsianOption(Sobol(4,seed=7))
     >>> ac
     AsianOption (Integrand Object)
         volatility      2^(-1)
@@ -40,7 +39,7 @@ class AsianOption(Integrand):
     >>> y2 = 0
     >>> for l in range(len(level_dims)):
     ...     new_dim = ac2._dim_at_level(l)
-    ...     ac2.true_measure.set_dimension(new_dim)
+    ...     ac2.true_measure._set_dimension_r(new_dim)
     ...     x2 = ac2.discrete_distrib.gen_samples(2**10)
     ...     level_est = ac2.f(x2,l=l).mean()
     ...     y2 += level_est
@@ -51,11 +50,13 @@ class AsianOption(Integrand):
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price',
                   'interest_rate','mean_type', 'dimensions', 'dim_fracs']
                           
-    def __init__(self, discrete_distrib, volatility=0.5, start_price=30., strike_price=35.,\
+    def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
                  interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multi_level_dimensions=None):
         """
         Args:
-            discrete_distrib (DiscreteDistribution): a discrete distribution instance.
+            sampler (DiscreteDistribution/TrueMeasure): A 
+                discrete distribution from which to transform samples or a
+                true measure by which to compose a transform
             volatility (float): sigma, the volatility of the asset
             start_price (float): S(0), the asset value at t=0
             strike_price (float): strike_price, the call/put offer
@@ -65,9 +66,8 @@ class AsianOption(Integrand):
             multi_level_dimensions (list of ints): list of dimensions at each level. 
                 Leave as None for single-level problems
         """
-        self.discrete_distrib = discrete_distrib
         self.t_final = t_final
-        self.true_measure = BrownianMotion(self.discrete_distrib.d,self.t_final)
+        self.true_measure = BrownianMotion(sampler,self.t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)

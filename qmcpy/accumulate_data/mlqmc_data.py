@@ -55,7 +55,7 @@ class MLQMCData(AccumulateData):
             # reset dimension
             self.dimensions[l] = self.integrand._dim_at_level(l)
             new_dim = int(self.dimensions[l])
-            self.true_measure.set_dimension(new_dim)
+            self.true_measure._set_dimension_r(new_dim)
             n_max = self.n_init if self.n_level[l]==0 else 2*self.n_level[l]
             for r in range(int(self.replications)):
                 self.discrete_distrib.set_seed(self.seeds[l,r]) # reset seed

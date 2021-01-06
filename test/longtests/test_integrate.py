@@ -31,33 +31,31 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_lebesgue_bounded_measure(self):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        d = 2
-        discrete_distrib = Sobol(d, randomize=True, seed=7)
-        true_measure = Lebesgue(Uniform(d,lower_bound=[1,3], upper_bound=[3,6]))
+        true_measure = Lebesgue(
+            Uniform(
+                Sobol(2, randomize=True, seed=7),
+                lower_bound=[1,3],
+                upper_bound=[3,6]))
         myfunc = lambda x: (x.prod(1))**3
-        integrand = CustomFun(discrete_distrib,myfunc,true_measure)
+        integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCSobolG(integrand, abs_tol=abs_tol).integrate()
         true_value = 6075
         self.assertTrue(abs(solution - true_value) < abs_tol)
     
     def test_lebesgue_inf_measure(self):
         abs_tol = .1
-        d = 1
-        discrete_distrib = Lattice(d)
-        true_measure = Lebesgue(Gaussian(d))
+        true_measure = Lebesgue(Gaussian(Lattice(1)))
         myfunc = lambda x: exp(-x**2).sum(1)
-        integrand = CustomFun(discrete_distrib, myfunc, true_measure)
+        integrand = CustomFun(true_measure, myfunc)
         solution,data = CubQMCLatticeG(integrand,abs_tol=abs_tol).integrate()
         true_value = sqrt(pi)
         self.assertTrue(abs(solution - solution) < abs_tol)
     
     def test_lebesgue_inf_measure_2d(self):
         abs_tol = .1
-        d = 2
-        discrete_distrib = Lattice(d)
-        true_measure = Lebesgue(Gaussian(d,mean=1,covariance=2))
+        true_measure = Lebesgue(Gaussian(Lattice(2),mean=1,covariance=2))
         myfunc = lambda x: exp(-x**2).prod(1)
-        integrand = CustomFun(discrete_distrib,myfunc,true_measure)
+        integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
         true_value = pi
         self.assertTrue(abs(solution - solution) < abs_tol)
@@ -65,11 +63,9 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_uniform_measure(self):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        d = 2
-        discrete_distrib = Lattice(d, order='mps')
-        true_measure = Uniform(d, lower_bound=[1,3], upper_bound=[3,6])
+        true_measure = Uniform(Lattice(2, order='mps'), lower_bound=[1,3], upper_bound=[3,6])
         myfunc = lambda x: (x.prod(1))**3
-        integrand = CustomFun(discrete_distrib,myfunc,true_measure)
+        integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
         true_value = 6075 / 6
         self.assertTrue(abs(solution - true_value) < abs_tol)
@@ -104,9 +100,8 @@ class IntegrationExampleTest(unittest.TestCase):
         for i in range(len(dimensions)):
             d = dimensions[i]
             integrand = CustomFun(
-                discrete_distrib = IIDStdUniform(d),
-                g = lambda x: (5*x).sum(1),
-                true_measure = Uniform(d,lower_bound=0,upper_bound=1))
+                true_measure = Uniform(IIDStdUniform(d),lower_bound=0,upper_bound=1),
+                g = lambda x: (5*x).sum(1))
             solution,data = CubMCG(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
@@ -125,9 +120,8 @@ class IntegrationExampleTest(unittest.TestCase):
             a_i = a_list[i]
             b_i = b_list[i]
             integrand = CustomFun(
-                discrete_distrib = Lattice(d),
-                g = lambda x, a=a_i, b=b_i: (b * (x - a) ** 2).sum(1),
-                true_measure = Uniform(d))
+                true_measure = Uniform(Lattice(d)),
+                g = lambda x, a=a_i, b=b_i: (b * (x - a) ** 2).sum(1))
             solution,data = CubQMCLatticeG(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
@@ -160,7 +154,7 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_european_put_bayes_lattice(self):
         abs_tol = 1e-2
         integrand = EuropeanOption(
-            discrete_distrib = Lattice(dimension=16, order='linear'),
+            sampler = Lattice(dimension=16, order='linear'),
             volatility = .5,
             start_price = 10,
             strike_price = 10,
@@ -174,7 +168,7 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_european_put_bayes_net(self):
         abs_tol = 1e-2
         integrand = EuropeanOption(
-            discrete_distrib = Sobol(dimension=4, randomize='LMS'),
+            sampler = Sobol(dimension=4, randomize='LMS'),
             volatility = .5,
             start_price = 10,
             strike_price = 10,

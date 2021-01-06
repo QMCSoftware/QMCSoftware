@@ -1,6 +1,8 @@
 from ._integrand import Integrand
 from ..discrete_distribution import Sobol
-from ..true_measure import Gaussian, Lebesgue, BrownianMotion
+from ..true_measure import Gaussian, Lebesgue
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..true_measure._true_measure import TrueMeasure
 from ..util import ParameterError
 from numpy import *
 
@@ -12,19 +14,25 @@ class Keister(Integrand):
     The standard example integrates the Keister integrand with respect to an 
     IID Gaussian distribution with variance 1./2.
 
-    >>> d = 2
-    >>> k = Keister(Sobol(d,seed=7))
+    >>> k = Keister(Sobol(2,seed=7))
     >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)
     >>> y.mean()
     1.8074379398240912
-    >>> y2 = k.f_periodized(x,'baker')
-    >>> y2.mean()
-    1.8089375926029765
-    >>> k.set_transform(Gaussian(d,mean=0,covariance=1))
-    >>> y3 = k.f(x)
-    >>> y3.mean()
-    1.808115525723259
+    >>> k.true_measure
+    Lebesgue (TrueMeasure Object)
+        transform       Gaussian (TrueMeasure Object)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
+    >>> k = Keister(Gaussian(Sobol(2,seed=7),mean=0,covariance=2))
+    >>> x = k.discrete_distrib.gen_samples(2**10)
+    >>> y = k.f(x)
+    >>> y.mean()
+    1.8083090664626913
+    >>> yp = k.f_periodized(x,'c2sin')
+    >>> yp.mean()
+    1.805376606041635
 
     References:
 
@@ -32,13 +40,19 @@ class Keister(Integrand):
         `Computers in Physics`, *10*, pp. 119-122, 1996.
     """
 
-    def __init__(self, discrete_distrib):
+    def __init__(self, sampler):
         """
         Args:
-            discrete_distrib (DiscreteDistribution): a discrete distribution instance.
+            sampler (DiscreteDistribution/TrueMeasure): A 
+                discrete distribution from which to transform samples or a
+                true measure by which to compose a transform
         """
-        self.discrete_distrib = discrete_distrib
-        self.true_measure = Lebesgue(Gaussian(self.discrete_distrib.d, mean=0, covariance=1/2))
+        if isinstance(sampler,DiscreteDistribution): # use the default transform
+            self.true_measure = Lebesgue(Gaussian(sampler, mean=0, covariance=1/2))
+        elif isinstance(sampler,TrueMeasure): # importance sampling
+            self.true_measure = Lebesgue(sampler)
+        else:
+            raise ParameterError("Keister requires sampler to be a discrete distribution or true measure.")
         super(Keister,self).__init__()
     
     def g(self, x):

@@ -8,7 +8,7 @@ def mcqmc06(l_convergence=3,epsilons=[.05,.1]):
         print('\n\n'+'~'*100+'\n\n')
         print('%s Call Option'%option)
         integrand = MLCallOptions(
-            discrete_distrib = IIDStdUniform(),
+            sampler = IIDStdUniform(),
             option = option,
             volatility = .2,
             start_strike_price = 100, 

@@ -21,7 +21,7 @@ class TestIIDStdUniform(unittest.TestCase):
     
     def test_set_dimension(self):
         distribution = IIDStdUniform(dimension=2)
-        distribution.set_dimension(3)
+        distribution._set_dimension(3)
         samples = distribution.gen_samples(4)
         self.assertTrue(samples.shape==(4,3))
 
@@ -69,7 +69,7 @@ class TestLattice(unittest.TestCase):
     
     def test_set_dimension(self):
         distribution = Lattice(dimension=2)
-        distribution.set_dimension(3)
+        distribution._set_dimension(3)
         samples = distribution.gen_samples(4)
         self.assertTrue(samples.shape==(4,3))
 
@@ -86,7 +86,7 @@ class TestSobol(unittest.TestCase):
         samples = dd.gen_samples(n_min=4, n_max=8)
         self.assertEqual(type(samples), ndarray)
         self.assertEqual(samples.shape, (4,2))
-        dd.set_dimension(3)
+        dd._set_dimension(3)
         samples = dd.gen_samples(4)
         self.assertTrue(samples.shape==(4,3))
     
@@ -122,7 +122,7 @@ class TestHalton(unittest.TestCase):
             distribution = Halton(dimension=2, randomize=randomize, generalize=True)
             x = distribution.gen_samples(8)
             self.assertTrue(x.shape==(8,2))
-            distribution.set_dimension(3)
+            distribution._set_dimension(3)
             x2 = distribution.gen_samples(n_min=4,n_max=8)
             self.assertTrue(x2.shape==(4,3))
             self.assertTrue((x[4:,:]==x2[:,:2]).all())

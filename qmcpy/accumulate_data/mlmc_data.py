@@ -56,7 +56,7 @@ class MLMCData(AccumulateData):
             if self.diff_n_level[l] > 0:
                 # reset dimension
                 self.dimensions[l] = self.integrand._dim_at_level(l)
-                self.true_measure.set_dimension(self.dimensions[l])
+                self.true_measure._set_dimension_r(self.dimensions[l])
                 # evaluate integral at sampleing points samples
                 samples = self.discrete_distrib.gen_samples(n=self.diff_n_level[l])
                 self.integrand.f(samples,l=l)

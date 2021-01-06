@@ -30,8 +30,7 @@ class CubQMCCLT(StoppingCriterion):
         seed            1093
         mimics          StdUniform
     Lebesgue (TrueMeasure Object)
-        transformer     Gaussian (TrueMeasure Object)
-                           d               1
+        transform       Gaussian (TrueMeasure Object)
                            mean            0
                            covariance      2^(-1)
                            decomp_type     pca

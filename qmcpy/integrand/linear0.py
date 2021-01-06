@@ -15,13 +15,14 @@ class Linear0(Integrand):
     8.288376592929427e-10
     """
 
-    def __init__(self, discrete_distrib):
+    def __init__(self, sampler):
         """
         Args:
-            discrete_distrib (DiscreteDistribution): a discrete distribution instance.
+            sampler (DiscreteDistribution/TrueMeasure): A 
+                discrete distribution from which to transform samples or a
+                true measure by which to compose a transform
         """
-        self.discrete_distrib = discrete_distrib
-        self.true_measure = Uniform(self.discrete_distrib.d, lower_bound=-.5, upper_bound=.5)
+        self.true_measure = Uniform(sampler, lower_bound=-.5, upper_bound=.5)
         super(Linear0,self).__init__()
 
     def g(self, x):

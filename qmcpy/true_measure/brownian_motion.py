@@ -1,7 +1,7 @@
 from .gaussian import Gaussian
 from ..discrete_distribution import Sobol
 from ._true_measure import TrueMeasure
-from ..util import ParameterError
+from ..util import ParameterError, _univ_repr
 from numpy import *
 
 
@@ -25,8 +25,6 @@ class BrownianMotion(Gaussian):
         decomp_type     pca
     """
 
-    parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
-
     def __init__(self, sampler, t_final=1, drift=0, decomp_type='PCA'):
         """
         Args:
@@ -39,6 +37,7 @@ class BrownianMotion(Gaussian):
                 "PCA" for principal component analysis or 
                 "Cholesky" for cholesky decomposition.
         """
+        self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
         self.domain = array([[0,1]])
         self._parse_sampler(sampler)
         self.t = t_final # exercise time
@@ -49,7 +48,7 @@ class BrownianMotion(Gaussian):
         self.drift_time_vec = self.drift*self.time_vec # mean
         self._set_mean_cov(self.drift_time_vec,self.sigma_bm)
         self.range = array([[-inf,inf]])
-        super(Gaussian,self).__init__() # TrueMeasure.__init__()
+        super(Gaussian,self).__init__()
 
     def _set_dimension(self, dimension):
         self.d = dimension

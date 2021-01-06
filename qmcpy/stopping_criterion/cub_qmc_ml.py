@@ -35,7 +35,6 @@ class CubQMCML(StoppingCriterion):
         seed            985802
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
-        d               2^(6)
         mean            0
         covariance      1
         decomp_type     pca
@@ -53,7 +52,6 @@ class CubQMCML(StoppingCriterion):
         bias_estimate   0.007
         n_total         204800
         time_integrate  ...
-    
     
     References:
         

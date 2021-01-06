@@ -22,7 +22,7 @@ class MLCallOptions(Integrand):
     >>> y = 0
     >>> for level in range(4):
     ...     new_dim = mlco._dim_at_level(level)
-    ...     mlco.true_measure.set_dimension(new_dim)
+    ...     mlco.true_measure._set_dimension_r(new_dim)
     ...     x = mlco.discrete_distrib.gen_samples(2**10)
     ...     y += mlco.f(x,l=level).mean()
     >>> y
@@ -37,11 +37,13 @@ class MLCallOptions(Integrand):
 
     parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
 
-    def __init__(self, discrete_distrib, option='european', volatility=.2,
+    def __init__(self, sampler, option='european', volatility=.2,
         start_strike_price=100., interest_rate=.05, t_final=1.):
         """
         Args:
-            discrete_distrib (DiscreteDistribution): a discrete distribution instance.
+            sampler (DiscreteDistribution/TrueMeasure): A 
+                discrete distribution from which to transform samples or a
+                true measure by which to compose a transform
             option_type (str): type of option in ["European","Asian"]
             volatility (float): sigma, the volatility of the asset
             start_strike_price (float): S(0), the asset value at t=0, and K, the strike price. \
@@ -49,15 +51,11 @@ class MLCallOptions(Integrand):
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
         """
-        self.discrete_distrib = discrete_distrib
-        
-        self.true_measure = Gaussian(self.discrete_distrib.d, mean=0, covariance=1)
+        self.true_measure = Gaussian(sampler, mean=0, covariance=1)
         options = ['european','asian']
         self.option = option.lower()
         if self.option not in options:
             raise ParameterError('option type must be one of\n\t%s'%str(options))
-        if self.discrete_distrib.low_discrepancy and self.option=='asian':
-            raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
         self.sigma = volatility
         self.k = start_strike_price
         self.r = interest_rate
@@ -66,6 +64,8 @@ class MLCallOptions(Integrand):
         self.leveltype = 'adaptive-multi'
         self.g_submodule = getattr(self,'_g_'+self.option)
         super(MLCallOptions,self).__init__()
+        if self.discrete_distrib.low_discrepancy and self.option=='asian':
+            raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
 
     def get_exact_value(self):
         """ Print exact analytic value, based on s0=k. """

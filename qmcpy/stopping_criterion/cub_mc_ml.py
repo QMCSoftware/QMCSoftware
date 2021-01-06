@@ -33,7 +33,6 @@ class CubMCML(StoppingCriterion):
         seed            7
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
-        d               2^(6)
         mean            0
         covariance      1
         decomp_type     pca

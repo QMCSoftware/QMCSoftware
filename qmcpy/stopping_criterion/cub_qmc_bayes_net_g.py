@@ -38,8 +38,7 @@ class CubBayesNetG(StoppingCriterion):
         mimics          StdUniform
         dim0            0
     Lebesgue (TrueMeasure Object)
-        transformer     Gaussian (TrueMeasure Object)
-                           d               2^(1)
+        transform       Gaussian (TrueMeasure Object)
                            mean            0
                            covariance      2^(-1)
                            decomp_type     pca
@@ -53,7 +52,7 @@ class CubBayesNetG(StoppingCriterion):
         solution        1.811
         error_bound     0.015
         time_integrate  ...
-    
+        
     Adapted from
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m
 

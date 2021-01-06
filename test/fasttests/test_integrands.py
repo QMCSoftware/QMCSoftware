@@ -37,12 +37,10 @@ class TestKeister(unittest.TestCase):
     """ Unit tests for Keister Integrand. """
 
     def test_f(self):
-        d = 2
-        k = Keister(Lattice(d))
+        k = Keister(Gaussian(Lattice(2),mean=1,covariance=3))
         x = k.discrete_distrib.gen_samples(2**2)
         y = k.f(x)
         self.assertTrue(y.shape==(4,))
-        k.set_transform(Gaussian(d,mean=1,covariance=3))
         y2 = k.f(x)
         self.assertTrue(y2.shape==(4,))
 
@@ -60,7 +58,7 @@ class TestCustomFun(unittest.TestCase):
     """ Unit tests for CustomFun Integrand. """
 
     def test_f(self):
-        cf = CustomFun(Lattice(2), lambda x: x.sum(1), Uniform(2))
+        cf = CustomFun(Uniform(Lattice(2)), lambda x: x.sum(1))
         y = cf.f_periodized(cf.discrete_distrib.gen_samples(2**2))
         self.assertTrue(y.shape==(4,))
 
@@ -75,7 +73,7 @@ class TestCallOptions(unittest.TestCase):
             d = mlco._dim_at_level(l)
             true_d = 2**3 if option=='European' else 2**4
             self.assertTrue(d==true_d)
-            mlco.true_measure.set_dimension(d)
+            mlco.true_measure._set_dimension_r(d)
             y = mlco.f_periodized(mlco.discrete_distrib.gen_samples(6),'c3sin',l=l)
             self.assertTrue(y.shape==(6,))
 

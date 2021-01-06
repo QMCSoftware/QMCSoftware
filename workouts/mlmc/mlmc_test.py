@@ -47,7 +47,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
         for j in range(1,101):
             # reset dimension
             new_dim = integrand_qmcpy._dim_at_level(ll)
-            integrand_qmcpy.true_measure.set_dimension(new_dim)
+            integrand_qmcpy.true_measure._set_dimension_r(new_dim)
             # evaluate integral at sampleing points samples
             samples = integrand_qmcpy.discrete_distrib.gen_samples(n=n/100)
             integrand_qmcpy.f(samples,l=ll)

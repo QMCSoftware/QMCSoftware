@@ -9,20 +9,15 @@ class Integrand(object):
 
     def __init__(self):
         prefix = 'A concrete implementation of Integrand must have '
-        if (not hasattr(self, 'discrete_distrib')) or \
-            (not isinstance(self.discrete_distrib,DiscreteDistribution)) or \
-            self.discrete_distrib.mimics!='StdUniform':
-            raise ParameterError(prefix + 'self.discrete_distrib, a DiscreteDistribution instance that mimics a Standard Uniform')
-        if (not hasattr(self, 'true_measure')) or (not isinstance(self.true_measure,TrueMeasure)):
+        if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
         if not hasattr(self,'parameters'):
             self.parameters = []
         if not hasattr(self,'leveltype'):
-            self.leveltype = 'single' 
-        if self.true_measure.d != self.discrete_distrib.d: # check dimension
-            raise ParameterError("discrete distribution and true measure dimension must match.")
+            self.leveltype = 'single'
+        self.discrete_distrib = self.true_measure.discrete_distrib
 
-    def g(self, x, *args, **kwargs):
+    def g(self, t, *args, **kwargs):
         """
         ABSTRACT METHOD for original integrand to be integrated.
 
@@ -46,18 +41,17 @@ class Integrand(object):
         Return: 
             ndarray: length n vector of funciton evaluations
         """
-        pdf = self.discrete_distrib.pdf(x)
-        measure = self.true_measure
-        factor = 1. # = weight * jacobian
-        if measure == measure.transformer:
-            x = measure.transform(x) # using default transform so that f(x)=g(\Psi(x))
-        else:
-            while measure!=measure.transformer:
-                measure = measure.transformer # new \Psi
-                factor *= measure.jacobian(x) # d \Psi / dx
-                x = measure.transform(x) # chain rule
-            factor *= self.true_measure.weight(x)
-        return self.g(x,*args,**kwargs)*factor/pdf
+        if self.true_measure == self.true_measure.transform:
+            # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
+            xtf = self.true_measure._transform(x) # get transformed samples, equivalent to self.true_measure._transform_r(x)
+            y = self.g(xtf,*args,**kwargs).squeeze()
+        else: # using importance sampling --> need to compute pdf, jacobian(s), and weight explicitly
+            pdf = self.discrete_distrib.pdf(x) # pdf of samples
+            xtf,jacobians = self.true_measure.transform._jacobian_transform_r(x) # compute recursive transform+jacobian
+            weight = self.true_measure._weight(xtf) # weight based on the true measure
+            gvals = self.g(xtf,*args,**kwargs).squeeze()
+            y = gvals*weight/pdf*jacobians
+        return y.squeeze()
 
     def f_periodized(self, x, ptransform='NONE', *args, **kwargs):
         """
@@ -72,6 +66,8 @@ class Integrand(object):
         Return: 
             ndarray: length n vector of funciton evaluations
         """
+        if self.discrete_distrib.mimics != 'StdUniform':
+            raise ParameterError("f_periodized requires a discrete distribution that mimics a standard uniform measure.")
         ptransform = ptransform.upper()
         if ptransform == 'BAKER': # Baker's transform
             xp = 1 - 2 * abs(x - 1 / 2)

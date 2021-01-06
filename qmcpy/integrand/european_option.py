@@ -10,8 +10,7 @@ class EuropeanOption(Integrand):
     """
     European financial option. 
 
-    >>> d = 4
-    >>> eo = EuropeanOption(Sobol(d,seed=17),call_put='put')
+    >>> eo = EuropeanOption(Sobol(4,seed=7),call_put='put')
     >>> eo
     EuropeanOption (Integrand Object)
         volatility      2^(-1)
@@ -22,20 +21,23 @@ class EuropeanOption(Integrand):
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.211575961797152
-    >>> eo.set_transform(BrownianMotion(d,drift=1))
-    >>> y2 = eo.f(x)
-    >>> y2.mean()
-    9.189966847901108
+    9.210676314950003
+    >>> eo = EuropeanOption(BrownianMotion(Sobol(4,seed=7),drift=1),call_put='put')
+    >>> x = eo.discrete_distrib.gen_samples(2**12)
+    >>> y = eo.f(x)
+    >>> y.mean()
+    9.220836233431381
     """
 
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
                           
-    def __init__(self, discrete_distrib, volatility=0.5, start_price=30, strike_price=35,
+    def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35,
         interest_rate=0, t_final=1, call_put='call'):
         """
         Args:
-            discrete_distrib (DiscreteDistribution): a discrete distribution instance.
+            sampler (DiscreteDistribution/TrueMeasure): A 
+                discrete distribution from which to transform samples or a
+                true measure by which to compose a transform
             volatility (float): sigma, the volatility of the asset
             start_price (float): S(0), the asset value at t=0
             strike_price (float): strike_price, the call/put offer
@@ -43,9 +45,8 @@ class EuropeanOption(Integrand):
             t_final (float): exercise time
             call_put (str): 'call' or 'put' option
         """
-        self.discrete_distrib = discrete_distrib
         self.t_final = t_final
-        self.true_measure = BrownianMotion(self.discrete_distrib.d,self.t_final)
+        self.true_measure = BrownianMotion(sampler,t_final=self.t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)

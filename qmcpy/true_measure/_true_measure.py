@@ -72,7 +72,7 @@ class TrueMeasure(object):
             ndarray: length n vector of Jacobian values at locations of x
         """
         if self.transform == self: # is \Psi_0
-            return x,self._jacobian(x)
+            return self._transform(x),self._jacobian(x)
         else: # is transform \Psi_j for j>0
             xtf,jtf = self.transform._jacobian_transform_r(x)
             return self._transform(xtf),self._jacobian(xtf)*jtf
@@ -121,7 +121,7 @@ class TrueMeasure(object):
         Returns:
             ndarray: length n vector of weights at locations of x
         """ 
-        raise MethodImplementationError(self,'weight')
+        raise MethodImplementationError(self,'weight. Try a different true measure with a weight method.')
 
     def _parse_sampler(self, sampler):
         """
@@ -146,7 +146,7 @@ class TrueMeasure(object):
             self.parameters += ['transform']
             self.d = sampler.d # take the dimension from the sub-sampler (composed transform)
             self.discrete_distrib = self.transform.discrete_distrib
-            if not (self.domain==self.transform.range).all():
+            if self.transform.transform!=self.transform and (self.domain!=self.transform.range).any():
                 raise ParameterError("This true measures domain must match the sub-sampling true-measures range.")
         else:
             raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure")

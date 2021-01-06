@@ -19,7 +19,7 @@ def asian_option_multi_level(
 
     # CubMCCLT
     integrand = AsianOption(
-        discrete_distrib = IIDStdUniform(seed=7),
+        sampler = IIDStdUniform(seed=7),
         volatility = volatility,
         start_price = start_price,
         strike_price = strike_price,

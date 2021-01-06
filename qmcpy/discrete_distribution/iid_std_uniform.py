@@ -7,19 +7,16 @@ class IIDStdUniform(DiscreteDistribution):
     A wrapper around NumPy's IID Standard Uniform generator `numpy.random.rand`.
 
     >>> dd = IIDStdUniform(dimension=2,seed=7)
-    >>> dd
-    IIDStdUniform (DiscreteDistribution Object)
-        d               2^(1)
-        seed            7
-        mimics          StdUniform
     >>> dd.gen_samples(4)
     array([[0.076, 0.78 ],
            [0.438, 0.723],
            [0.978, 0.538],
            [0.501, 0.072]])
-    >>> dd.set_dimension(3)
-    >>> dd.gen_samples(5).shape
-    (5, 3)
+    >>> dd
+    IIDStdUniform (DiscreteDistribution Object)
+        d               2^(1)
+        seed            7
+        mimics          StdUniform
     """
 
     parameters = ['d','seed','mimics']
