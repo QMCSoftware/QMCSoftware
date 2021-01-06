@@ -18,9 +18,9 @@ class CubQMCML(StoppingCriterion):
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.442231748914057
+    10.442361016810949
     >>> data
-    Solution: 10.4422        
+    Solution: 10.4424        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -46,12 +46,13 @@ class CubQMCML(StoppingCriterion):
     MLQMCData (AccumulateData Object)
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        n_level         [4096. 1024.  256.  256.  256.  256.  256.]
-        mean_level      [1.005e+01 1.818e-01 1.032e-01 5.400e-02 2.809e-02 1.412e-02 7.054e-03]
-        var_level       [8.376e-05 5.792e-06 2.967e-05 3.172e-05 4.639e-06 1.081e-06 3.738e-07]
+        n_level         [4096.  512.  256.  256.  256.  256.  256.]
+        mean_level      [1.005e+01 1.807e-01 1.033e-01 5.482e-02 2.823e-02 1.397e-02 7.290e-03]
+        var_level       [8.376e-05 2.660e-05 1.911e-05 1.594e-05 3.660e-06 1.478e-06 3.424e-07]
         bias_estimate   0.007
-        n_total         204800
+        n_total         188416
         time_integrate  ...
+    
     
     References:
         

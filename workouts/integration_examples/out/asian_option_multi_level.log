@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8464         
+Solution: 5.8575         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -16,7 +16,6 @@ IIDStdUniform (DiscreteDistribution Object)
     seed            7
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    d               2^(6)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -37,11 +36,11 @@ CubMCCLT (StoppingCriterion Object)
     n_max           10000000000
 MeanVarData (AccumulateData Object)
     levels          3
-    solution        5.846
-    n               [1067270.   95879.   13128.]
-    n_total         1179349
+    solution        5.857
+    n               [1071049.   97359.   12415.]
+    n_total         1183895
     error_bound     0.025
-    confid_int      [5.822 5.871]
-    time_integrate  2.051
+    confid_int      [5.833 5.882]
+    time_integrate  1.034
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

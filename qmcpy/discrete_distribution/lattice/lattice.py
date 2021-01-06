@@ -96,7 +96,7 @@ class Lattice(DiscreteDistribution):
             self.d_max = 750
             self.m_max = 24
             self.msb = True
-            self.z_full = load(dirname(abspath(__file__))+'/generating_vectors/lnb_ordinary_lattice/qmcpy_gv.750.24.npy').astype(uint64)
+            self.z_full = load(dirname(abspath(__file__))+'/generating_vectors/lattice_vec.3600.20.npy').astype(uint64)
         else:
             if not isfile(z_path):
                 raise ParameterError('z_path `' + z_path + '` not found. ')

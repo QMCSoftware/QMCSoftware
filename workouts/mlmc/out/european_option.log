@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 10.4580        
+Solution: 10.4482        
 MLCallOptions (Integrand Object)
     option          european
     sigma           0.200
@@ -14,7 +14,6 @@ IIDStdUniform (DiscreteDistribution Object)
     seed            None
     mimics          StdUniform
 Gaussian (TrueMeasure Object)
-    d               2^(7)
     mean            0
     covariance      1
     decomp_type     pca
@@ -27,22 +26,22 @@ CubMCML (StoppingCriterion Object)
 MLMCData (AccumulateData Object)
     levels          2^(3)
     dimensions      [  1.   2.   4.   8.  16.  32.  64. 128.]
-    n_level         [3.147e+06 6.064e+04 3.026e+04 9.128e+03 3.472e+03 1.163e+03 4.310e+02
-                    1.550e+02]
-    mean_level      [1.006e+01 1.831e-01 1.043e-01 5.629e-02 2.696e-02 1.425e-02 5.800e-03
-                    3.639e-03]
-    var_level       [1.962e+02 1.457e-01 4.365e-02 1.320e-02 3.064e-03 8.575e-04 1.726e-04
-                    5.806e-05]
+    n_level         [3.286e+06 6.050e+04 2.740e+04 8.654e+03 3.172e+03 1.176e+03 4.300e+02
+                    1.590e+02]
+    mean_level      [1.006e+01 1.815e-01 1.009e-01 5.363e-02 2.791e-02 1.360e-02 7.110e-03
+                    2.897e-03]
+    var_level       [1.963e+02 1.454e-01 4.006e-02 1.186e-02 3.191e-03 7.811e-04 2.338e-04
+                    3.680e-05]
     cost_per_sample [  1.   2.   4.   8.  16.  32.  64. 128.]
-    n_total         3254205
-    alpha           0.974
-    beta            1.921
+    n_total         3387858
+    alpha           0.984
+    beta            1.950
     gamma           1.000
-    time_integrate  1.336
+    time_integrate  0.652
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 10.4442        
+Solution: 10.4456        
 MLCallOptions (Integrand Object)
     option          european
     sigma           0.200
@@ -51,13 +50,12 @@ MLCallOptions (Integrand Object)
     t               1
     b               85
 Lattice (DiscreteDistribution Object)
-    d               2^(6)
+    d               2^(7)
     randomize       1
     order           natural
-    seed            202046
+    seed            400497
     mimics          StdUniform
 Gaussian (TrueMeasure Object)
-    d               2^(6)
     mean            0
     covariance      1
     decomp_type     pca
@@ -69,18 +67,18 @@ CubQMCML (StoppingCriterion Object)
 MLQMCData (AccumulateData Object)
     levels          2^(3)
     dimensions      [  1.   2.   4.   8.  16.  32.  64. 128.]
-    n_level         [8192. 1024. 1024. 1024.  256.   64.   32.   16.]
-    mean_level      [1.005e+01 1.817e-01 1.030e-01 5.363e-02 2.689e-02 1.392e-02 7.087e-03
-                    3.194e-03]
-    var_level       [1.398e-05 8.118e-06 1.697e-06 3.807e-06 3.097e-06 7.523e-06 1.707e-06
-                    1.252e-06]
+    n_level         [8192. 2048. 1024. 1024.  256.   64.   32.   16.]
+    mean_level      [1.005e+01 1.837e-01 1.032e-01 5.429e-02 2.742e-02 1.307e-02 6.916e-03
+                    4.182e-03]
+    var_level       [1.639e-05 1.873e-06 2.186e-06 1.582e-06 8.671e-06 4.362e-06 5.855e-06
+                    3.667e-06]
     bias_estimate   0.004
-    n_total         186112
-    time_integrate  0.786
+    n_total         202496
+    time_integrate  0.526
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 10.4365        
+Solution: 10.4249        
 EuropeanOption (Integrand Object)
     volatility      0.200
     call_put        call
@@ -91,10 +89,9 @@ Lattice (DiscreteDistribution Object)
     d               2^(7)
     randomize       1
     order           natural
-    seed            76396
+    seed            68574
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    d               2^(7)
     time_vec        [0.008 0.016 0.023 ... 0.984 0.992 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -113,13 +110,13 @@ CubQMCLatticeG (StoppingCriterion Object)
     n_max           2^(35)
 LDTransformData (AccumulateData Object)
     n_total         2^(12)
-    solution        10.437
+    solution        10.425
     error_bound     0.021
-    time_integrate  0.194
+    time_integrate  0.078
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 10.4505        
+Solution: 10.4554        
 EuropeanOption (Integrand Object)
     volatility      0.200
     call_put        call
@@ -130,11 +127,10 @@ Sobol (DiscreteDistribution Object)
     d               2^(7)
     randomize       1
     graycode        0
-    seed            [72108 68107 62937 ... 78403  3577 81953]
+    seed            [43635 91338 64342 ... 50502  9877 42373]
     mimics          StdUniform
     dim0            0
 BrownianMotion (TrueMeasure Object)
-    d               2^(7)
     time_vec        [0.008 0.016 0.023 ... 0.984 0.992 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -153,13 +149,13 @@ CubQMCSobolG (StoppingCriterion Object)
     n_max           2^(35)
 LDTransformData (AccumulateData Object)
     n_total         2^(12)
-    solution        10.451
-    error_bound     0.023
-    time_integrate  0.127
+    solution        10.455
+    error_bound     0.022
+    time_integrate  0.058
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 10.4576        
+Solution: 10.4486        
 EuropeanOption (Integrand Object)
     volatility      0.200
     call_put        call
@@ -170,10 +166,9 @@ Lattice (DiscreteDistribution Object)
     d               2^(7)
     randomize       1
     order           natural
-    seed            16960
+    seed            79464
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    d               2^(7)
     time_vec        [0.008 0.016 0.023 ... 0.984 0.992 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -194,16 +189,16 @@ CubQMCCLT (StoppingCriterion Object)
     n_max           2^(30)
 MeanVarDataRep (AccumulateData Object)
     replications    2^(4)
-    solution        10.458
-    sighat          0.028
-    n_total         2^(16)
-    error_bound     0.021
-    confid_int      [10.436 10.479]
-    time_integrate  2.249
+    solution        10.449
+    sighat          0.020
+    n_total         2^(17)
+    error_bound     0.016
+    confid_int      [10.433 10.464]
+    time_integrate  2.214
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 10.5208        
+Solution: 10.4896        
 EuropeanOption (Integrand Object)
     volatility      0.200
     call_put        call
@@ -214,10 +209,9 @@ Lattice (DiscreteDistribution Object)
     d               2^(7)
     randomize       1
     order           linear
-    seed            36154
+    seed            59778
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    d               2^(7)
     time_vec        [0.008 0.016 0.023 ... 0.984 0.992 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -236,13 +230,13 @@ CubBayesLatticeG (StoppingCriterion Object)
     n_max           2^(22)
 LDTransformBayesData (AccumulateData Object)
     n_total         256
-    solution        10.521
-    error_bound     4.13e-57
-    time_integrate  0.024
+    solution        10.490
+    error_bound     1.99e-55
+    time_integrate  0.022
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 10.4699        
+Solution: 10.3311        
 EuropeanOption (Integrand Object)
     volatility      0.200
     call_put        call
@@ -253,11 +247,10 @@ Sobol (DiscreteDistribution Object)
     d               2^(7)
     randomize       1
     graycode        0
-    seed            [33425 54148 42187 ... 94738 69419 66533]
+    seed            [28699 69063 29803 ... 78361  4544 59815]
     mimics          StdUniform
     dim0            0
 BrownianMotion (TrueMeasure Object)
-    d               2^(7)
     time_vec        [0.008 0.016 0.023 ... 0.984 0.992 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -276,6 +269,6 @@ CubBayesNetG (StoppingCriterion Object)
     n_max           2^(22)
 LDTransformBayesData (AccumulateData Object)
     n_total         256
-    solution        10.470
-    error_bound     8.70e-20
-    time_integrate  0.023
+    solution        10.331
+    error_bound     9.82e-29
+    time_integrate  0.016

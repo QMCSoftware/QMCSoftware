@@ -8,8 +8,7 @@ IIDStdUniform (DiscreteDistribution Object)
     seed            7
     mimics          StdUniform
 Lebesgue (TrueMeasure Object)
-    transformer     Gaussian (TrueMeasure Object)
-                       d               3
+    transform       Gaussian (TrueMeasure Object)
                        mean            0
                        covariance      2^(-1)
                        decomp_type     pca
@@ -27,7 +26,7 @@ MeanVarData (AccumulateData Object)
     n_total         1879987
     error_bound     0.005
     confid_int      [2.163 2.173]
-    time_integrate  1.492
+    time_integrate  1.479
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1712         
@@ -39,8 +38,7 @@ Lattice (DiscreteDistribution Object)
     seed            1093
     mimics          StdUniform
 Lebesgue (TrueMeasure Object)
-    transformer     Gaussian (TrueMeasure Object)
-                       d               3
+    transform       Gaussian (TrueMeasure Object)
                        mean            0
                        covariance      2^(-1)
                        decomp_type     pca
@@ -58,7 +56,7 @@ MeanVarDataRep (AccumulateData Object)
     n_total         2^(12)
     error_bound     0.004
     confid_int      [2.167 2.175]
-    time_integrate  0.038
+    time_integrate  0.036
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1674         
@@ -68,8 +66,7 @@ IIDStdUniform (DiscreteDistribution Object)
     seed            7
     mimics          StdUniform
 Lebesgue (TrueMeasure Object)
-    transformer     Gaussian (TrueMeasure Object)
-                       d               3
+    transform       Gaussian (TrueMeasure Object)
                        mean            0
                        covariance      2^(-1)
                        decomp_type     pca
@@ -87,7 +84,7 @@ MeanVarData (AccumulateData Object)
     n_total         2314452
     error_bound     0.005
     confid_int      [2.162 2.172]
-    time_integrate  2.035
+    time_integrate  1.838
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1681         
@@ -99,8 +96,7 @@ Lattice (DiscreteDistribution Object)
     seed            7
     mimics          StdUniform
 Lebesgue (TrueMeasure Object)
-    transformer     Gaussian (TrueMeasure Object)
-                       d               3
+    transform       Gaussian (TrueMeasure Object)
                        mean            0
                        covariance      2^(-1)
                        decomp_type     pca
@@ -113,7 +109,7 @@ LDTransformData (AccumulateData Object)
     n_total         2^(12)
     solution        2.168
     error_bound     0.004
-    time_integrate  0.033
+    time_integrate  0.027
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1682         
@@ -126,8 +122,7 @@ Sobol (DiscreteDistribution Object)
     mimics          StdUniform
     dim0            0
 Lebesgue (TrueMeasure Object)
-    transformer     Gaussian (TrueMeasure Object)
-                       d               3
+    transform       Gaussian (TrueMeasure Object)
                        mean            0
                        covariance      2^(-1)
                        decomp_type     pca
@@ -140,7 +135,7 @@ LDTransformData (AccumulateData Object)
     n_total         2^(12)
     solution        2.168
     error_bound     0.003
-    time_integrate  0.007
+    time_integrate  0.006
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1683         
@@ -152,8 +147,7 @@ Lattice (DiscreteDistribution Object)
     seed            56719
     mimics          StdUniform
 Lebesgue (TrueMeasure Object)
-    transformer     Gaussian (TrueMeasure Object)
-                       d               3
+    transform       Gaussian (TrueMeasure Object)
                        mean            0
                        covariance      2^(-1)
                        decomp_type     pca
@@ -166,21 +160,20 @@ LDTransformBayesData (AccumulateData Object)
     n_total         2048
     solution        2.168
     error_bound     2.54e-04
-    time_integrate  0.032
+    time_integrate  0.029
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 2.1680         
+Solution: 2.1688         
 Keister (Integrand Object)
 Sobol (DiscreteDistribution Object)
     d               3
     randomize       1
     graycode        0
-    seed            [18954 69165 66000]
+    seed            [69535 22028 36101]
     mimics          StdUniform
     dim0            0
 Lebesgue (TrueMeasure Object)
-    transformer     Gaussian (TrueMeasure Object)
-                       d               3
+    transform       Gaussian (TrueMeasure Object)
                        mean            0
                        covariance      2^(-1)
                        decomp_type     pca
@@ -191,8 +184,8 @@ CubBayesNetG (StoppingCriterion Object)
     n_max           2^(22)
 LDTransformBayesData (AccumulateData Object)
     n_total         2048
-    solution        2.168
+    solution        2.169
     error_bound     0.004
-    time_integrate  0.039
+    time_integrate  0.037
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

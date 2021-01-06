@@ -16,7 +16,6 @@ IIDStdUniform (DiscreteDistribution Object)
     seed            7
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    d               2^(6)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -42,7 +41,7 @@ MeanVarData (AccumulateData Object)
     n_total         828720
     error_bound     0.025
     confid_int      [5.825 5.875]
-    time_integrate  22.185
+    time_integrate  10.031
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8391         
@@ -62,7 +61,6 @@ Lattice (DiscreteDistribution Object)
     seed            1093
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    d               2^(6)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -88,7 +86,7 @@ MeanVarDataRep (AccumulateData Object)
     n_total         2^(13)
     error_bound     0.023
     confid_int      [5.817 5.862]
-    time_integrate  0.156
+    time_integrate  0.090
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8422         
@@ -106,7 +104,6 @@ IIDStdUniform (DiscreteDistribution Object)
     seed            7
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    d               2^(6)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -132,7 +129,7 @@ MeanVarData (AccumulateData Object)
     n_total         1040630
     error_bound     0.025
     confid_int      [5.817 5.867]
-    time_integrate  33.730
+    time_integrate  11.814
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8335         
@@ -152,7 +149,6 @@ Lattice (DiscreteDistribution Object)
     seed            7
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    d               2^(6)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -173,7 +169,7 @@ LDTransformData (AccumulateData Object)
     n_total         2^(11)
     solution        5.834
     error_bound     0.010
-    time_integrate  0.051
+    time_integrate  0.033
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8394         
@@ -194,7 +190,6 @@ Sobol (DiscreteDistribution Object)
     mimics          StdUniform
     dim0            0
 BrownianMotion (TrueMeasure Object)
-    d               2^(6)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -215,7 +210,7 @@ LDTransformData (AccumulateData Object)
     n_total         2^(10)
     solution        5.839
     error_bound     0.022
-    time_integrate  0.014
+    time_integrate  0.007
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8296         
@@ -235,7 +230,6 @@ Lattice (DiscreteDistribution Object)
     seed            14024
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    d               2^(6)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -256,10 +250,10 @@ LDTransformBayesData (AccumulateData Object)
     n_total         1024
     solution        5.830
     error_bound     2.29e-26
-    time_integrate  0.068
+    time_integrate  0.059
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8361         
+Solution: 5.8385         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -273,11 +267,10 @@ Sobol (DiscreteDistribution Object)
     d               2^(6)
     randomize       1
     graycode        0
-    seed            [31913  1064 27059 ... 91484 44311 44607]
+    seed            [97369 39692 68997 ... 54733 77862 84061]
     mimics          StdUniform
     dim0            0
 BrownianMotion (TrueMeasure Object)
-    d               2^(6)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
     mean            [0. 0. 0. ... 0. 0. 0.]
@@ -296,8 +289,8 @@ CubBayesNetG (StoppingCriterion Object)
     n_max           2^(22)
 LDTransformBayesData (AccumulateData Object)
     n_total         8192
-    solution        5.836
-    error_bound     0.020
-    time_integrate  0.758
+    solution        5.838
+    error_bound     0.021
+    time_integrate  0.673
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

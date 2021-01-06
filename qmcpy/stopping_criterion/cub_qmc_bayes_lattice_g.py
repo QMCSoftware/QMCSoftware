@@ -24,7 +24,7 @@ class CubBayesLatticeG(StoppingCriterion):
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8081793909247619
+    1.8081816879673565
     >>> data
     Solution: 1.8082         
     Keister (Integrand Object)
@@ -47,7 +47,7 @@ class CubBayesLatticeG(StoppingCriterion):
     LDTransformBayesData (AccumulateData Object)
         n_total         256
         solution        1.808
-        error_bound     0.001
+        error_bound     7.36e-04
         time_integrate  ...
     
     Adapted from 
