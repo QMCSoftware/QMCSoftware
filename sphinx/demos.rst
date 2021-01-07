@@ -27,3 +27,5 @@ Demos
     demo_rst/ray_tracing.rst
 
     demo_rst/latnetbuilder.rst
+
+    demo_rst/kumaraswamy.rst

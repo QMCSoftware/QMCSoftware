@@ -39,6 +39,9 @@ node_modules/*
 /build/
 dist/
 
+# blogs
+blogs/why_q_in_mc/*.png
+
 # alegresor
 *.vscode
 _ags.md 

@@ -78,6 +78,7 @@ class CubBayesNetG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
+    
     parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,

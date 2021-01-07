@@ -50,6 +50,8 @@ class Keister(Integrand):
         if isinstance(sampler,DiscreteDistribution): # use the default transform
             self.true_measure = Lebesgue(Gaussian(sampler, mean=0, covariance=1/2))
         elif isinstance(sampler,TrueMeasure): # importance sampling
+            if (sampler.range!=array([-inf,inf])).any(): 
+                raise ParameterError("Keister requires sampler whose transformation range is all reals.")
             self.true_measure = Lebesgue(sampler)
         else:
             raise ParameterError("Keister requires sampler to be a discrete distribution or true measure.")
