@@ -1,6 +1,8 @@
 from ._integrand import Integrand
 from ..discrete_distribution import Sobol
-from ..true_measure import Gaussian
+from ..true_measure import Gaussian, Lebesgue
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..true_measure._true_measure import TrueMeasure
 from ..util import ParameterError
 from numpy import *
 
@@ -12,94 +14,49 @@ class Keister(Integrand):
     The standard example integrates the Keister integrand with respect to an 
     IID Gaussian distribution with variance 1./2.
 
-    >>> dd = Sobol(2,seed=7)
-    >>> m = Gaussian(dd,covariance=1./2)
-    >>> k = Keister(m)
-    >>> x = dd.gen_samples(2**10)
+    >>> k = Keister(Sobol(2,seed=7))
+    >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)
     >>> y.mean()
-    1.80...
-    
+    1.8074379398240912
+    >>> k.true_measure
+    Lebesgue (TrueMeasure Object)
+        transform       Gaussian (TrueMeasure Object)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
+    >>> k = Keister(Gaussian(Sobol(2,seed=7),mean=0,covariance=2))
+    >>> x = k.discrete_distrib.gen_samples(2**10)
+    >>> y = k.f(x)
+    >>> y.mean()
+    1.8083090664626913
+    >>> yp = k.f_periodized(x,'c2sin')
+    >>> yp.mean()
+    1.805376606041635
+
     References:
 
         [1] B. D. Keister, Multidimensional Quadrature Algorithms, 
         `Computers in Physics`, *10*, pp. 119-122, 1996.
     """
 
-    def __init__(self, measure):
+    def __init__(self, sampler):
         """
         Args:
-            measure (TrueMeasure): a TrueMeasure instance, either Gaussian with covariance 1/2 or lebesgue
+            sampler (DiscreteDistribution/TrueMeasure): A 
+                discrete distribution from which to transform samples or a
+                true measure by which to compose a transform
         """
-        self.measure = measure
-        self.distribution = self.measure.distribution
-        self.dimension = self.measure.dimension
-        self.distribution = self.measure.distribution
-        if type(self.measure).__name__ == 'Gaussian':
-            self.g = self.g_gaussian_half_cov
-        elif type(self.measure).__name__ == 'Lebesgue':
-            self.g = self.g_lebesgue
+        if isinstance(sampler,DiscreteDistribution): # use the default transform
+            self.true_measure = Lebesgue(Gaussian(sampler, mean=0, covariance=1/2))
+        elif isinstance(sampler,TrueMeasure): # importance sampling
+            if (sampler.range!=array([-inf,inf])).any(): 
+                raise ParameterError("Keister requires sampler whose transformation range is all reals.")
+            self.true_measure = Lebesgue(sampler)
         else:
-            raise ParameterError('''
-                The Keister integrand requires true measure to be:
-                    - Gaussian with mean 0 and covriance 1/2 or 
-                    - Lebesuge with lower bound -inf and upper bound inf''')
+            raise ParameterError("Keister requires sampler to be a discrete distribution or true measure.")
         super(Keister,self).__init__()
-
-    def g_gaussian_half_cov(self, x):
-        """ See abstract method. """
-        normx = linalg.norm(x, 2, axis=1) # ||x||_2
-        y = pi ** (self.dimension / 2.0) * cos(normx)
-        return y
     
-    def g_lebesgue(self, x):
-        """ See abstract method. """ 
-        normx = linalg.norm(x, 2, axis=1) # ||x||_2 
-        y = cos(normx) * exp(-(normx**2))
-        return y
-    
-    def plot(self, projection_dims=[0], n=2**7, point_size=5, color='c', show=True, out=None):
-        """
-        Make a scatter plot from samples. Requires dimension >= 2. 
-
-        Args:
-            projection_dims (list of ints): dimensions to project onto individual dimensions. 
-                For example: projection_dims=[0,1] will make 2 plots. One with y vs x_0 and one with y vs x_1. 
-            n (int): number of samples to draw as self.gen_samples(n)
-            point_size (int): ax.scatter(...,s=point_size)
-            color (str): ax.scatter(...,color=color)
-            show (bool): show plot or not? 
-            out (str): file name to output image. If None, the image is not output
-
-        Returns: 
-            tuple: fig,ax from `fig,ax = matplotlib.pyplot.subplots(...)`
-        """
-        x = self.distribution.gen_samples(n)
-        y = self.f(x).squeeze()
-        from matplotlib import pyplot
-        pyplot.rc('font', size=16)
-        pyplot.rc('legend', fontsize=16)
-        pyplot.rc('figure', titlesize=16)
-        pyplot.rc('axes', titlesize=16, labelsize=16)
-        pyplot.rc('xtick', labelsize=16)
-        pyplot.rc('ytick', labelsize=16)
-        l = len(projection_dims)
-        fig,ax = pyplot.subplots(nrows=1,ncols=l, figsize=(5*l,6.25))
-        if l==1: ax = [ax]
-        for p in range(l):
-            d = projection_dims[p]
-            ax[p].scatter(x[:,d],y,color=color,s=point_size)
-            ax[p].set_xlabel('$x_{i,%d}$'%d)
-            if p==0: ax[p].set_ylabel('$f(x)$')
-            if self.distribution.mimics == 'StdUniform':
-                ax[p].set_xlim([0,1])
-                ax[p].set_xticks([0,1])
-            elif self.distribution.mimics == 'StdGaussian':
-                ax[p].set_xlim([-3,3])
-                ax[p].set_xticks([-3,3])
-        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n
-        fig.suptitle(s+' Keister Evaluations')
-        if l==1: pyplot.gcf().subplots_adjust(left=0.2)
-        if out: pyplot.savefig(out,dpi=250)
-        if show: pyplot.show()
-        return fig,ax
+    def g(self, x):
+        norm = sqrt((x**2).sum(1))
+        return cos(norm) * exp(-(norm**2))

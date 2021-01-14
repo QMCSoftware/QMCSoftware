@@ -14,13 +14,13 @@ class CubQMCML(StoppingCriterion):
     """
     Stopping criterion based on multi-level quasi-Monte Carlo.
 
-    >>> mlco = MLCallOptions(Gaussian(Lattice(seed=7)))
+    >>> mlco = MLCallOptions(Lattice(seed=7))
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.442231748914057
+    10.442361016810949
     >>> data
-    Solution: 10.4422        
+    Solution: 10.4424        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -29,7 +29,7 @@ class CubQMCML(StoppingCriterion):
         t               1
         b               85
     Lattice (DiscreteDistribution Object)
-        dimension       2^(6)
+        d               2^(6)
         randomize       1
         order           natural
         seed            985802
@@ -46,11 +46,11 @@ class CubQMCML(StoppingCriterion):
     MLQMCData (AccumulateData Object)
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        n_level         [4096. 1024.  256.  256.  256.  256.  256.]
-        mean_level      [1.005e+01 1.818e-01 1.032e-01 5.400e-02 2.809e-02 1.412e-02 7.054e-03]
-        var_level       [8.376e-05 5.792e-06 2.967e-05 3.172e-05 4.639e-06 1.081e-06 3.738e-07]
+        n_level         [4096.  512.  256.  256.  256.  256.  256.]
+        mean_level      [1.005e+01 1.807e-01 1.033e-01 5.482e-02 2.823e-02 1.397e-02 7.290e-03]
+        var_level       [8.376e-05 2.660e-05 1.911e-05 1.594e-05 3.660e-06 1.478e-06 3.424e-07]
         bias_estimate   0.007
-        n_total         204800
+        n_total         188416
         time_integrate  ...
     
     
@@ -84,17 +84,19 @@ class CubQMCML(StoppingCriterion):
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.replications = float(replications)
+        # QMCPy Objs
         self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["Lattice", "Sobol","Halton"]
-        super(CubQMCML,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubQMCML,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration Data
-        self.data = MLQMCData(self, self.integrand, self.n_init, self.replications)
+        self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib, self.n_init, self.replications)
         t_start = time()
         while True:
             self.data.update_data()

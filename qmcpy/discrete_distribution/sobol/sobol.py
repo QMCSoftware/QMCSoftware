@@ -12,25 +12,21 @@ class Sobol(DiscreteDistribution):
     Quasi-Random Sobol nets in base 2.
     
     >>> s = Sobol(2,seed=7)
-    >>> s
-    Sobol (DiscreteDistribution Object)
-        dimension       2^(1)
-        randomize       1
-        graycode        0
-        seed            [61616 58565]
-        mimics          StdUniform
-        dim0            0
     >>> s.gen_samples(4)
     array([[0.673, 0.063],
            [0.398, 0.788],
            [0.913, 0.564],
            [0.125, 0.288]])
-    >>> s.set_dimension(3)
-    >>> s.gen_samples(n_min=4,n_max=8)
-    array([[0.537, 0.917, 0.78 ],
-           [0.253, 0.2  , 0.27 ],
-           [0.799, 0.417, 0.068],
-           [0.02 , 0.7  , 0.578]])
+    >>> s.gen_samples(1)
+    array([[0.673, 0.063]])
+    >>> s
+    Sobol (DiscreteDistribution Object)
+        d               2^(1)
+        randomize       1
+        graycode        0
+        seed            [61616 58565]
+        mimics          StdUniform
+        dim0            0
     >>> Sobol(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
     array([[0.75, 0.25],
            [0.25, 0.75]])
@@ -80,7 +76,7 @@ class Sobol(DiscreteDistribution):
         DOI:https://doi.org/10.1145/42288.214372
     """
     
-    parameters = ['dimension','randomize','graycode','seed','mimics','dim0']
+    parameters = ['d','randomize','graycode','seed','mimics','dim0']
 
     def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path=None, dim0=0):
         """
@@ -120,7 +116,7 @@ class Sobol(DiscreteDistribution):
             ctypes.c_uint32] # set_xjlms
         # set parameters
         self.sobol_cf.restype = ctypes.c_uint32
-        self.set_dimension(dimension)
+        self._set_dimension(dimension)
         self.set_seed(seed)
         self.set_randomize(randomize)
         self.set_graycode(graycode)
@@ -180,12 +176,12 @@ class Sobol(DiscreteDistribution):
             warnings.warn("Non-randomized AGS Sobol sequence includes the origin",ParameterWarning)
         if return_jlms and self.randomize!=1:
             raise ParameterError("return_jlms=True only applies when randomize='LMS'.")
-        if len(self.seed) != self.dimension:
+        if len(self.seed) != self.d:
             self.set_seed(self.seed)
         n = int(n_max-n_min)
-        x = zeros((n,self.dimension), dtype=double)
-        xjlms = zeros((n,self.dimension), dtype=double)
-        rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
+        x = zeros((n,self.d), dtype=double)
+        xjlms = zeros((n,self.d), dtype=double)
+        rc = self.sobol_cf(n, self.d, int(n_min), self.dim0, self.randomize, self.graycode, \
             self.seed, x, self.d_max, self.m_max, self.z, self.msb, xjlms, return_jlms)
         if rc!= 0:
             raise ParameterError(self.errors[rc])
@@ -194,6 +190,10 @@ class Sobol(DiscreteDistribution):
         else:
             return x
     
+    def pdf(self, x):
+        """ pdf of a standard uniform """
+        return ones(x.shape[0], dtype=float)
+
     def set_seed(self, seeds):
         """
         Reset the seeds
@@ -203,32 +203,32 @@ class Sobol(DiscreteDistribution):
         """
         if isinstance(seeds,int) or isinstance(seeds,uint32) or isinstance(seeds,uint64):
             random.seed(seeds)
-            self.seed = random.randint(1, 100000, size=self.dimension, dtype=uint64)
+            self.seed = random.randint(1, 100000, size=self.d, dtype=uint64)
         elif isinstance(seeds,list) or isinstance(seeds,ndarray):
             seeds = array(seeds)
             l = len(seeds)
-            if l == self.dimension:
+            if l == self.d:
                 self.seed = seeds
-            elif l < self.dimension:
-                self.seed = hstack((seeds,random.randint(1, 100000, size=self.dimension-l, dtype=uint64)))
-            else: # l > self.dimension
-                self.seed = seeds[:self.dimension]
+            elif l < self.d:
+                self.seed = hstack((seeds,random.randint(1, 100000, size=self.d-l, dtype=uint64)))
+            else: # l > self.d
+                self.seed = seeds[:self.d]
         elif seeds==None: # assume seed==None
             random.seed(None)
-            self.seed = random.randint(1, 100000, size=self.dimension, dtype=uint64)
+            self.seed = random.randint(1, 100000, size=self.d, dtype=uint64)
         else:
             msg = "Sobol' seed must be an int, list of ints, or None."
             raise ParameterError(msg)
         self.seed = array(self.seed,dtype=uint64)
             
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         """
         Reset the dimension
 
         Args:
             dimension (int): new dimension
         """
-        self.dimension = dimension
+        self.d = dimension
 
     def set_randomize(self, randomize):
         """

@@ -15,24 +15,25 @@ class CubQMCLatticeG(StoppingCriterion):
     a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Fourier coefficients cone decay assumptions.
     
-    >>> k = Keister(Gaussian(Lattice(2,seed=7),covariance=1./2))
+    >>> k = Keister(Lattice(2,seed=7))
     >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8072504898823571
+    1.806814468596487
     >>> data
-    Solution: 1.8073         
+    Solution: 1.8068         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         randomize       1
         order           natural
         seed            7
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transform       Gaussian (TrueMeasure Object)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -41,9 +42,9 @@ class CubQMCLatticeG(StoppingCriterion):
     LDTransformData (AccumulateData Object)
         n_total         2^(10)
         solution        1.807
-        error_bound     0.003
+        error_bound     0.005
         time_integrate  ...
-
+    
     Original Implementation:
 
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
@@ -112,20 +113,24 @@ class CubQMCLatticeG(StoppingCriterion):
         self.fudge = fudge
         self.check_cone = check_cone
         self.ptransform = ptransform
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['single']
         allowed_distribs = ["Lattice"]
-        super(CubQMCLatticeG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        if not distribution.randomize:
+        super(CubQMCLatticeG,self).__init__(allowed_levels, allowed_distribs)
+        if not self.discrete_distrib.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
-        if distribution.order != 'natural':
+        if self.discrete_distrib.order != 'natural':
             raise ParameterError("CubLattice_g requires Lattice with 'natural' order")
         
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, self.integrand, self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform)
+        self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform)
         t_start = time()
         while True:
             self.data.update_data()

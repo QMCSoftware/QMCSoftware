@@ -28,10 +28,10 @@ class IdentitalToDiscrete(TrueMeasure):
         self.distribution = distribution
         super(IdentitalToDiscrete,self).__init__()
 
-    def _transform_g_to_f(self, g):
+    def _eval_f(self, x, g, *args, **kwargs):
         """ See abstract method. """
-        f = lambda samples, *args, **kwargs: g(samples, *args, **kwargs)
-        return f
+        y = g(x, *args, **kwargs)
+        return y
     
     def gen_samples(self, *args, **kwargs):
         """ See abstract method. """

@@ -6,28 +6,23 @@ class CustomFun(Integrand):
     """
     Custom user-supplied function handle. 
     
-    >>> dd = Sobol(2,seed=7)
-    >>> m = Gaussian(dd,mean=[1,2])
-    >>> cf = CustomFun(m,lambda x: x[:,0]**2*x[:,1])
-    >>> x = dd.gen_samples(2**10)
+    >>> cf = CustomFun(
+    ...     true_measure = Gaussian(Sobol(2,seed=7),mean=[1,2]),
+    ...     g = lambda x: x[:,0]**2*x[:,1])
+    >>> x = cf.discrete_distrib.gen_samples(2**10)
     >>> y = cf.f(x)
     >>> y.mean()
-    4.00...
+    4.0092435574693095
     """
 
     parameters = []
 
-    def __init__(self, measure, custom_fun):
+    def __init__(self, true_measure, g):
         """
         Args:
-            measure (TrueMeasure): a TrueMeasure instance
-            custom_fun (function): a function evaluating samples (nxd) -> (nx1). See g method.
+            true_measure (TrueMeasure): a TrueMeasure instance. 
+            g (function): a function handle. 
         """
-        self.measure = measure
-        self.distribution = self.measure.distribution
-        self.custom_fun = custom_fun
+        self.true_measure = true_measure
+        self.g = lambda x,*args,**kwargs: g(x,*args,**kwargs) 
         super(CustomFun,self).__init__()
-
-    def g(self, x):
-        """ See abstract method. """
-        return self.custom_fun(x)

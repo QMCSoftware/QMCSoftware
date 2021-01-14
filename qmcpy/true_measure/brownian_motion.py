@@ -1,164 +1,58 @@
-from ._true_measure import TrueMeasure
+from .gaussian import Gaussian
 from ..discrete_distribution import Sobol
-from ..util import TransformError, ParameterError
+from ._true_measure import TrueMeasure
+from ..util import ParameterError, _univ_repr
 from numpy import *
-from scipy.stats import norm
-from scipy.linalg import eigh
-import warnings
 
 
-class BrownianMotion(TrueMeasure):
+class BrownianMotion(Gaussian):
     """
     Geometric Brownian Motion.
     
-    >>> dd = Sobol(2,seed=7)
-    >>> bm = BrownianMotion(dd,drift=1)
+    >>> bm = BrownianMotion(Sobol(4,seed=7),t_final=2,drift=2)
+    >>> bm.gen_samples(2)
+    array([[0.583, 0.514, 2.726, 3.967],
+           [0.958, 2.973, 3.259, 3.951]])
     >>> bm
     BrownianMotion (TrueMeasure Object)
-        time_vector     [0.5 1. ]
-        drift           1
-        assembly_type   pca
-    >>> bm.gen_samples(n_min=4,n_max=8)
-    array([[ 0.04 ,  1.408],
-           [ 0.413,  0.161],
-           [ 1.083,  1.769],
-           [-0.931, -0.879]])
-    >>> bm.set_dimension(4)
-    >>> bm
-    BrownianMotion (TrueMeasure Object)
-        time_vector     [0.25 0.5  0.75 1.  ]
-        drift           1
-        assembly_type   pca
+        time_vec        [0.5 1.  1.5 2. ]
+        drift           2^(1)
+        mean            [1. 2. 3. 4.]
+        covariance      [[0.5 0.5 0.5 0.5]
+                        [0.5 1.  1.  1. ]
+                        [0.5 1.  1.5 1.5]
+                        [0.5 1.  1.5 2. ]]
+        decomp_type     pca
     """
 
-    parameters = ['time_vector','drift','assembly_type']
-
-    def __init__(self, distribution, assembly_type='PCA', drift=0., t_final=1.):
+    def __init__(self, sampler, t_final=1, drift=0, decomp_type='PCA'):
         """
         Args:
-            distribution (DiscreteDistribution): DiscreteDistribution instance
-            assembly_type (str): assembly type type either 
-                "Diff" for time differencing, 
-                "PCA" for principal component analysis, or
-                "Bridge" for Brownian Bridge.
-            drift (float): mean shift for importance sampling. 
+            sampler (DiscreteDistribution/TrueMeasure): A 
+                discrete distribution from which to transform samples or a
+                true measure by which to compose a transform 
             t_final (float): end time for the Brownian Motion. 
+            drift (int): Gaussian mean is time_vec*drift
+            decomp_type (str): method of decomposition either  
+                "PCA" for principal component analysis or 
+                "Cholesky" for cholesky decomposition.
         """
-        self.distribution = distribution
-        self.assembly_type = assembly_type.lower()
-        if self.assembly_type not in ['diff','pca','bridge']:
-            raise ParameterError('Brownian Motion assembly_type parameter must be either "Diff", "PCA", or "Bridge"')
-        self.drift = float(drift)
-        self.d = self.distribution.dimension
+        self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
+        self.domain = array([[0,1]])
+        self._parse_sampler(sampler)
         self.t = t_final # exercise time
-        self._assemble()
-        super(BrownianMotion,self).__init__()
-    
-    def _assemble(self):
-        """ Set parameters dependent on the dimension. """
-        self.time_vector = linspace(1./self.d,self.t,self.d) # evenly spaced
-        self.ms_vec = self.drift * self.time_vector
-        if self.assembly_type == 'diff':
-            self.time_diff = diff(hstack((0,self.time_vector)))
-        elif self.assembly_type == 'pca':
-            sigma = array([[min(self.time_vector[i],self.time_vector[j])
-                        for i in range(self.d)]
-                        for j in range(self.d)])
-            evals,evecs = eigh(sigma) # get eigenvectors and eigenvalues for
-            order = argsort(-evals)
-            self.a = dot(evecs[:,order],diag(sqrt(evals[order])))
-        elif self.assembly_type == 'bridge':
-            n_pow2 = 2**ceil(log2(self.d))
-            self.time_diff = diff(hstack((0,self.time_vector)))
-            sobol = Sobol(dimension=1, randomize=False, graycode=False)
-            seq = sobol.gen_samples(n=n_pow2).squeeze()[:self.d]
-            self.order = argsort(seq)
+        self.drift = drift
+        self.decomp_type = decomp_type.lower()
+        self.time_vec = linspace(self.t/self.d,self.t,self.d) # evenly spaced
+        self.sigma_bm = array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
+        self.drift_time_vec = self.drift*self.time_vec # mean
+        self._set_mean_cov(self.drift_time_vec,self.sigma_bm)
+        self.range = array([[-inf,inf]])
+        super(Gaussian,self).__init__()
 
-    def _tf_to_mimic_samples(self, samples):
-        """
-        Transform samples to appear BrownianMotion.
-        
-        Args:
-            samples (ndarray): samples from a discrete distribution
-        
-        Return:
-            ndarray: samples from the DiscreteDistribution transformed to mimic the Brownain Motion.
-        """
-        # transform samples to appear standard Gaussian
-        if self.distribution.mimics == 'StdGaussian':
-            std_gaussian_samples = samples
-        elif self.distribution.mimics == "StdUniform":
-            std_gaussian_samples = norm.ppf(samples)
-        else:
-            raise TransformError(\
-                'Cannot transform samples mimicing %s to Brownian Motion'%self.distribution.mimics)
-        # generate Brownian Motion paths
-        if self.assembly_type == 'diff':
-            paths = cumsum(sqrt(self.time_diff)*std_gaussian_samples,1)
-        elif self.assembly_type == 'pca':
-            paths = dot(std_gaussian_samples,self.a.T)
-        elif self.assembly_type == 'bridge':
-            paths = cumsum(sqrt(self.time_diff)*std_gaussian_samples[:,self.order],1)
-        is_paths = paths + self.ms_vec # add drift shift for importance sampling
-        return is_paths
-
-    def _transform_g_to_f(self, g):
-        """ See abstract method. """
-        def f(samples, *args, **kwargs):
-            z = self._tf_to_mimic_samples(samples)
-            y = g(z,*args,**kwargs) * exp( (self.drift*self.t/2. - z[:,-1]) * self.drift)
-            return y
-        return f
-    
-    def gen_samples(self, *args, **kwargs):
-        """ See abstract method. """
-        samples = self.distribution.gen_samples(*args,**kwargs)
-        mimic_samples = self._tf_to_mimic_samples(samples)
-        return mimic_samples
-    
-    def set_dimension(self, dimension):
-        """
-        See abstract method. 
-        
-        Note:
-            Monitoring times are evenly spaced as linspace(1/dimension,1,dimension)
-        """
-        self.distribution.set_dimension(dimension)
+    def _set_dimension(self, dimension):
         self.d = dimension
-        self._assemble()
-    
-    def plot(self, n=2**5, show=True, out=None):
-        """
-        Plot Brownian Motion value vs time
-        
-        Args:
-            n (int): self.gen_samples(n)
-            show (bool): show the plot?
-            out (str): file name to output image. If None, the image is not output
-            
-        Return:
-            tuple: fig,ax from `fig,ax = pyplot.subplots()`
-        """
-        tvw0 = hstack((0,self.time_vector)) # time vector including 0
-        x = self.gen_samples(n)
-        xw0 = hstack((zeros((n,1)),x)) # x including 0 and time 0
-        from matplotlib import pyplot
-        pyplot.rc('font', size=16)
-        pyplot.rc('legend', fontsize=16)
-        pyplot.rc('figure', titlesize=16)
-        pyplot.rc('axes', titlesize=16, labelsize=16)
-        pyplot.rc('xtick', labelsize=16)
-        pyplot.rc('ytick', labelsize=16)
-        fig,ax = pyplot.subplots()
-        for i in range(n):
-            ax.plot(tvw0,xw0[i])
-        ax.set_xlim([0,self.t])
-        ax.set_xticks([0,self.t])
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Brownian Motion')
-        s = '$2^{%d}$'%log2(n) if log2(n)%1==0 else '%d'%n 
-        ax.set_title(s+' Brownian Motion Samples')
-        fig.tight_layout()
-        if out: pyplot.savefig(out,dpi=250)
-        if show: pyplot.show()
-        return fig,ax
+        self.time_vec = linspace(self.t/self.d,self.t,self.d) # evenly spaced
+        self.sigma_bm = array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
+        self.drift_time_vec = self.drift*self.time_vec # mean
+        self._set_mean_cov(self.drift_time_vec,self.sigma_bm)
