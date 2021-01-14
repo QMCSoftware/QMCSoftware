@@ -71,6 +71,8 @@ class Gaussian(TrueMeasure):
             self.a = dot(evecs[:,order],diag(sqrt(evals[order])))
         elif self.decomp_type == 'cholesky':
             self.a = cholesky(self.sigma).T
+        else:
+            raise ParameterError("decomp_type should be 'PCA' or 'Cholesky'")
         self.det_sigma = det(self.sigma)
         self.det_a = sqrt(self.det_sigma)
         self.inv_sigma = inv(self.sigma)  
