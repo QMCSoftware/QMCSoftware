@@ -14,7 +14,7 @@ chardet==3.0.4
 codecov==2.1.5
 commonmark==0.9.1
 coverage==5.1
-cryptography==3.2
+cryptography==2.9.2
 cycler==0.10.0
 dataclasses==0.6
 decorator==4.4.2
@@ -79,7 +79,7 @@ pytest==6.2.1
 python-dateutil==2.8.1
 pytz==2020.1
 pyzmq==19.0.1
--e git+https://github.com/QMCSoftware/QMCSoftware.git@f40ca6f96f8f1bd2bdc1770f388625a7aef8c4d8#egg=qmcpy
+-e git+https://github.com/QMCSoftware/QMCSoftware.git@34c9a34839c904b6c85bebb42700a8963c68d8c9#egg=qmcpy
 qtconsole==4.7.4
 QtPy==1.9.0
 readme-renderer==26.0
