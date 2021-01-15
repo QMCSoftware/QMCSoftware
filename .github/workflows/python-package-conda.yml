@@ -12,7 +12,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7.0
+        python-version: 3.7.1
     - name: Add conda to system path
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
@@ -21,6 +21,6 @@ jobs:
       run: |
         conda env update --file environment.yml --name base
         python -m pip install -e .
-    - name: RUn Tests
+    - name: Run Tests
       run: |
         make tests
