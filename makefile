@@ -10,7 +10,7 @@
 
 tests:
 	@echo "\nDoctests"
-	cd qmcpy && pytest --doctest-modules --disable-pytest-warnings
+	cd qmcpy && python -m pytest --doctest-modules --disable-pytest-warnings
 	@echo "\nFastests"
 	python -W ignore -m unittest discover -s test/fasttests/ 1>/dev/null
 	@echo "\nLongtests"

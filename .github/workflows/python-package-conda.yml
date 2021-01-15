@@ -1,4 +1,4 @@
-name: QMCPy with Conda
+name: QMCPy_CI
 
 on: [push]
 
