@@ -23,7 +23,6 @@ jobs:
         pip install --upgrade pip
         python -m pip install -e .
         pip install -r requirements/dev.txt
-        conda install pytorch torchvision cpuonly -c pytorch
     - name: Run Tests
       run: |
         make tests
