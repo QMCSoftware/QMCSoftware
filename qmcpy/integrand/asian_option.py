@@ -23,7 +23,7 @@ class AsianOption(Integrand):
     >>> x = ac.discrete_distrib.gen_samples(2**10)
     >>> y = ac.f(x)
     >>> y.mean()
-    1.7732743282379044
+    1.773...
     >>> level_dims = [2,4,8]
     >>> ac2 = AsianOption(Sobol(seed=7),multi_level_dimensions=level_dims)
     >>> ac2
@@ -44,7 +44,7 @@ class AsianOption(Integrand):
     ...     level_est = ac2.f(x2,l=l).mean()
     ...     y2 += level_est
     >>> y2
-    1.7932665953739868
+    1.793...
     """
 
     parameters = ['volatility', 'call_put', 'start_price', 'strike_price',

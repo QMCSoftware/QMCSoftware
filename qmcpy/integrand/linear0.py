@@ -9,10 +9,10 @@ class Linear0(Integrand):
     >>> x = l.discrete_distrib.gen_samples(2**10)
     >>> y = l.f(x)
     >>> y.mean()
-    -2.6542693376541138e-08
+    -2.654...e-08
     >>> ytf = l.f_periodized(x,'C1SIN')
     >>> ytf.mean()
-    8.288376592929427e-10
+    8.288...e-10
     """
 
     def __init__(self, sampler):

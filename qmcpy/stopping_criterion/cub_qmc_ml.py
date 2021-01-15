@@ -18,7 +18,7 @@ class CubQMCML(StoppingCriterion):
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.442361016810949
+    10.442...
     >>> data
     Solution: 10.4424        
     MLCallOptions (Integrand Object)
