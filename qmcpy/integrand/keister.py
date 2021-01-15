@@ -18,7 +18,7 @@ class Keister(Integrand):
     >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)
     >>> y.mean()
-    1.8074379398240912
+    1.807...
     >>> k.true_measure
     Lebesgue (TrueMeasure Object)
         transform       Gaussian (TrueMeasure Object)
@@ -29,10 +29,10 @@ class Keister(Integrand):
     >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)
     >>> y.mean()
-    1.8083090664626913
+    1.808...
     >>> yp = k.f_periodized(x,'c2sin')
     >>> yp.mean()
-    1.805376606041635
+    1.805...
 
     References:
 
