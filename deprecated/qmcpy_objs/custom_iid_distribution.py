@@ -22,7 +22,6 @@ class CustomIIDDistribution(DiscreteDistribution):
             custom_generator (function): custom generator of discrete distribution
         """
         self.custom_generator = custom_generator
-        self.distrib_type = 'iid'
         self.mimics = 'Custom'
         self.dimension = None
         self.low_discrepancy = False

@@ -11,6 +11,7 @@ qmcpy.egg-info/
 *.vrb
 .DS_Store
 .idea/
+.pytest_cache/
 
 # C
 *.so
@@ -38,7 +39,10 @@ node_modules/*
 /build/
 dist/
 
+# blogs
+blogs/why_q_in_mc/*.png
+
 # alegresor
 *.vscode
-_ags.md 
+_ags* 
 _ags/*

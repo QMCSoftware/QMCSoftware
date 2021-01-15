@@ -9,6 +9,7 @@ References:
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "export_ctypes.h"
 #include "MRG63k3a.h"
 
 /* First 1000 prime numbers from primes.utm.edu/lists/small/1000.txt, April 2017 */

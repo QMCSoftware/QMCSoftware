@@ -18,8 +18,6 @@ Demos
 
     demo_rst/quasirandom_generators.rst
 
-    demo_rst/sampling_measures.rst
-
     demo_rst/importance_sampling.rst
 
     demo_rst/nei_demo.rst
@@ -27,3 +25,7 @@ Demos
     demo_rst/qei-demo-for-blog.rst
 
     demo_rst/ray_tracing.rst
+
+    demo_rst/latnetbuilder.rst
+
+    demo_rst/kumaraswamy.rst

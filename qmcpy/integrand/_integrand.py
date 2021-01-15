@@ -1,4 +1,6 @@
-from ..util import MethodImplementationError, TransformError, _univ_repr, ParameterError
+from ..util import MethodImplementationError, _univ_repr, ParameterError
+from ..true_measure._true_measure import TrueMeasure
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from numpy import *
 
 
@@ -7,65 +9,92 @@ class Integrand(object):
 
     def __init__(self):
         prefix = 'A concrete implementation of Integrand must have '
-        if not hasattr(self, 'measure'):
-            raise ParameterError(prefix + 'self.measure (a TrueMeasure instance)')
-        if not hasattr(self, 'distribution'):
-            raise ParameterError(prefix + 'self.distribution (a DiscreteDistribuiton instance')
+        if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
+            raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
         if not hasattr(self,'parameters'):
             self.parameters = []
-        self.dimension = self.measure.dimension
         if not hasattr(self,'leveltype'):
             self.leveltype = 'single'
-        self.f = self.measure._transform_g_to_f(self.g) # transformed integrand
-        
-    def period_transform(self, ptransform):
-        """ Computes the periodization transform for the given function values """
-        if ptransform == 'Baker':
-            f = lambda x: self.f(1 - 2 * abs(x - 1 / 2))  # Baker's transform
-        elif ptransform == 'C0':
-            f = lambda x: self.f(3 * x ** 2 - 2 * x ** 3) * prod(6 * x * (1 - x), 1)  # C^0 transform
-        elif ptransform == 'C1':
-            # C^1 transform
-            f = lambda x: self.f(x ** 3 * (10 - 15 * x + 6 * x ** 2)) * prod(30 * x ** 2 * (1 - x) ** 2, 1)
-        elif ptransform == 'C1sin':
-            # Sidi C^1 transform
-            f = lambda x: self.f(x - sin(2 * pi * x) / (2 * pi)) * prod(2 * sin(pi * x) ** 2, 1)
-        elif ptransform == 'C2sin':
-            # Sidi C^2 transform
-            psi3 = lambda t: (8 - 9 * cos(pi * t) + cos(3 * pi * t)) / 16
-            psi3_1 = lambda t: (9 * sin(pi * t) * pi - sin(3 * pi * t) * 3 * pi) / 16
-            f = lambda x: self.f(psi3(x)) * prod(psi3_1(x), 1)
-        elif ptransform == 'C3sin':
-            # Sidi C^3 transform
-            psi4 = lambda t: (12 * pi * t - 8 * sin(2 * pi * t) + sin(4 * pi * t)) / (12 * pi)
-            psi4_1 = lambda t: (12 * pi - 8 * cos(2 * pi * t) * 2 * pi + sin(
-                4 * pi * t) * 4 * pi) / (12 * pi)
-            f = lambda x: self.f(psi4(x)) * prod(psi4_1(x), 1)
-        elif ptransform == 'none':
-            # do nothing
-            f = lambda x: self.f(x)
-        else:
-            f = self.f
-            print(f'Error: Periodization transform {ptransform} not implemented')
+        self.discrete_distrib = self.true_measure.discrete_distrib
 
-        return f
-
-    def g(self, x):
+    def g(self, t, *args, **kwargs):
         """
         ABSTRACT METHOD for original integrand to be integrated.
 
         Args:
-            x (ndarray): n samples by d dimension array of samples 
-                generated according to the true measure. 
-            l (int): OPTIONAL input for multi-level integrands. The level to generate at. 
-                Note that the dimension of x is determined by the _dim_at_level method for 
-                multi-level methods.
+            t (ndarray): n x d array of samples to be intput into orignal integrand. 
 
         Return:
             ndarray: n vector of function evaluations
         """
         raise MethodImplementationError(self, 'g')
     
+    def f(self, x, *args, **kwargs):
+        """
+        Evalute transformed integrand based on true measures and discrete distribution 
+        
+        Args:
+            x (ndarray): n x d array of samples from a discrete distribution
+            *args: other ordered args to g
+            **kwargs (dict): other keyword args to g
+            
+        Return: 
+            ndarray: length n vector of funciton evaluations
+        """
+        if self.true_measure == self.true_measure.transform:
+            # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
+            xtf = self.true_measure._transform(x) # get transformed samples, equivalent to self.true_measure._transform_r(x)
+            y = self.g(xtf,*args,**kwargs).squeeze()
+        else: # using importance sampling --> need to compute pdf, jacobian(s), and weight explicitly
+            pdf = self.discrete_distrib.pdf(x) # pdf of samples
+            xtf,jacobians = self.true_measure.transform._jacobian_transform_r(x) # compute recursive transform+jacobian
+            weight = self.true_measure._weight(xtf) # weight based on the true measure
+            gvals = self.g(xtf,*args,**kwargs).squeeze()
+            y = gvals*weight/pdf*jacobians
+        return y.squeeze()
+
+    def f_periodized(self, x, ptransform='NONE', *args, **kwargs):
+        """
+        Periodized transformed integrand.
+
+        Args:
+            x (ndarray): n x d array of samples from a discrete distribution
+            ptransform (str): periodization transform. 
+            *args: other ordered args to g
+            **kwargs (dict): other keyword args to g
+            
+        Return: 
+            ndarray: length n vector of funciton evaluations
+        """
+        if self.discrete_distrib.mimics != 'StdUniform':
+            raise ParameterError("f_periodized requires a discrete distribution that mimics a standard uniform measure.")
+        ptransform = ptransform.upper()
+        if ptransform == 'BAKER': # Baker's transform
+            xp = 1 - 2 * abs(x - 1 / 2)
+            w = 1
+        elif ptransform == 'C0': # C^0 transform
+            xp = 3 * x ** 2 - 2 * x ** 3
+            w = prod(6 * x * (1 - x), 1)  
+        elif ptransform == 'C1': # C^1 transform
+            xp = x ** 3 * (10 - 15 * x + 6 * x ** 2)
+            w = prod(30 * x ** 2 * (1 - x) ** 2, 1)
+        elif ptransform == 'C1SIN': # Sidi C^1 transform
+            xp = x - sin(2 * pi * x) / (2 * pi)
+            w = prod(2 * sin(pi * x) ** 2, 1)
+        elif ptransform == 'C2SIN': # Sidi C^2 transform
+            xp = (8 - 9 * cos(pi * x) + cos(3 * pi * x)) / 16 # psi3
+            w = prod( (9 * sin(pi * x) * pi - sin(3 * pi * x) * 3 * pi) / 16 , 1) # psi3_1
+        elif ptransform == 'C3SIN': # Sidi C^3 transform
+            xp = (12 * pi * x - 8 * sin(2 * pi * x) + sin(4 * pi * x)) / (12 * pi) # psi4
+            w = prod( (12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1) # psi4_1
+        elif ptransform == 'NONE':
+            xp = x
+            w = 1
+        else:
+            raise ParameterError("The %s periodization transform is not implemented"%ptransform)
+        y = self.f(xp,*args,**kwargs)*w
+        return y
+        
     def _dim_at_level(self, l):
         """
         ABSTRACT METHOD to return the dimension of samples to generate at level l. 
@@ -82,7 +111,3 @@ class Integrand(object):
 
     def __repr__(self):
         return _univ_repr(self, "Integrand", self.parameters)
-
-    def plot(self, *args, **kwargs):
-        """ Create a plot relevant to the true measure object. """
-        raise MethodImplementationError(self,'plot')

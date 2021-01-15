@@ -50,6 +50,6 @@ class IIDStdGaussian(DiscreteDistribution):
         """
         return random.randn(int(n), int(self.dimension))
     
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         """ See abstract method. """
         self.dimension = dimension

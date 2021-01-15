@@ -1,7 +1,7 @@
 from .._discrete_distribution import DiscreteDistribution
 from ...util import ParameterError, ParameterWarning
 from numpy import *
-from os.path import dirname, abspath
+from os.path import dirname, abspath, isfile
 import warnings
 
 
@@ -10,24 +10,20 @@ class Lattice(DiscreteDistribution):
     Quasi-Random Lattice nets in base 2.
 
     >>> l = Lattice(2,seed=7)
-    >>> l
-    Lattice (DiscreteDistribution Object)
-        dimension       2^(1)
-        randomize       1
-        order           natural
-        seed            7
-        mimics          StdUniform
     >>> l.gen_samples(4)
     array([[0.076, 0.78 ],
            [0.576, 0.28 ],
            [0.326, 0.53 ],
            [0.826, 0.03 ]])
-    >>> l.set_dimension(3)
-    >>> l.gen_samples(n_min=4,n_max=8)
-    array([[0.563, 0.098, 0.353],
-           [0.063, 0.598, 0.853],
-           [0.813, 0.848, 0.103],
-           [0.313, 0.348, 0.603]])
+    >>> l.gen_samples(1)
+    array([[0.076, 0.78 ]])
+    >>> l
+    Lattice (DiscreteDistribution Object)
+        d               2^(1)
+        randomize       1
+        order           natural
+        seed            7
+        mimics          StdUniform
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
@@ -71,7 +67,7 @@ class Lattice(DiscreteDistribution):
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
-    parameters = ['dimension','randomize','order','seed','mimics']
+    parameters = ['d','randomize','order','seed','mimics']
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None, z_path=None):
         """
@@ -97,8 +93,8 @@ class Lattice(DiscreteDistribution):
         else: 
             raise Exception("Lattice requires natural, linear, or mps ordering.")
         if not z_path:
-            self.d_max = 3600
-            self.m_max = 20
+            self.d_max = 750
+            self.m_max = 24
             self.msb = True
             self.z_full = load(dirname(abspath(__file__))+'/generating_vectors/lattice_vec.3600.20.npy').astype(uint64)
         else:
@@ -107,9 +103,9 @@ class Lattice(DiscreteDistribution):
             self.z_full = load(z_path).astype(uint64)
             f = z_path.split('/')[-1]
             f_lst = f.split('.')
-            self.d_max = int(f_lst[1])
-            self.m_max = int(f_lst[2])
-        self.set_dimension(dimension)
+            self.d_max = int(f_lst[-3])
+            self.m_max = int(f_lst[-2])
+        self._set_dimension(dimension)
         self.set_seed(seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
@@ -168,7 +164,7 @@ class Lattice(DiscreteDistribution):
         x = outer(self._vdc(n)+1./(2*n_min),self.z)%1 if n_min>0 else outer(self._vdc(n),self.z)%1
         return x
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
         """
         Generate lattice samples
 
@@ -177,7 +173,8 @@ class Lattice(DiscreteDistribution):
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
-            return_non_random (bool): return both the samples with and without randomization
+            return_unrandomized (bool): return samples without randomization as 2nd return value. 
+                Will not be returned if randomize=False. 
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples
@@ -190,38 +187,36 @@ class Lattice(DiscreteDistribution):
         if n:
             n_min = 0
             n_max = n
+        if return_unrandomized and self.randomize==False:
+            raise ParameterError("return_unrandomized=True only applies when when randomize=True.")
         if n_min == 0 and self.randomize==False and warn:
             warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
         if n_max > 2**self.m_max:
             raise ParameterError('Lattice generating vector supports up to %d samples.'%(2**self.m_max))
         x = self.gen(n_min,n_max)
         if self.randomize:
-            x = self.apply_randomization(x)
-        return x
-    
-    def apply_randomization(self, x):
-        """
-        Apply a digital shift to the samples. 
-        
-        Args:
-            x (ndarray): un-randomized samples to be digitally shifted. 
-        
-        Return:
-            ndarray: x with digital shift aplied.
-        """
-        x_rand = (x + self.shift)%1
-        return x_rand
+            xr = (x + self.shift)%1
+        if self.randomize==False:
+            return x
+        elif return_unrandomized:
+            return xr, x
+        else:
+            return xr
 
+    def pdf(self, x):
+        """ pdf of a standard uniform """
+        return ones(x.shape[0], dtype=float)
+    
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = seed if seed else random.randint(0, 100000, dtype=uint64)
+        self.seed = seed if seed else random.randint(1, 100000, dtype=uint64)
         random.seed(self.seed)
-        self.shift = random.rand(int(self.dimension))
+        self.shift = random.rand(int(self.d))
         
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         """ See abstract method. """
-        self.dimension = dimension
-        if self.dimension > self.d_max:
-            raise ParameterError('Lattice requires dimension <= %d'%self.d_max)
-        self.z = self.z_full[:self.dimension]
-        self.shift = random.rand(int(self.dimension))
+        self.d = dimension
+        if self.d > self.d_max:
+            raise ParameterError('Lattice requires dimension <= %d.'%self.d_max)
+        self.z = self.z_full[:self.d]
+        self.shift = random.rand(int(self.d))

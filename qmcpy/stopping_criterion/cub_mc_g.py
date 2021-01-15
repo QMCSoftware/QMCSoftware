@@ -16,22 +16,23 @@ class CubMCG(StoppingCriterion):
     """
     Stopping criterion with guaranteed accuracy.
 
-    >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
+    >>> k = Keister(IIDStdUniform(2,seed=7))
     >>> sc = CubMCG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.803926962264685
+    1.8039269622646847
     >>> data
     Solution: 1.8039         
     Keister (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         seed            7
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transform       Gaussian (TrueMeasure Object)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubMCG (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
@@ -97,17 +98,19 @@ class CubMCG(StoppingCriterion):
         self.kurtmax = (n_init - 3) / (n_init - 1) + \
             (self.alpha_sigma * n_init) / (1 - self.alpha_sigma) * \
             (1 - 1. / self.inflate**2)**2
+        # QMCPy Objs
         self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['single']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMCG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        allowed_distribs = ["IIDStdUniform"]
+        super(CubMCG,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, self.integrand, self.n_init)  # house integration data
+        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, self.n_init)  # house integration data
         t_start = time()
         # Pilot Sample
         self.data.update_data()

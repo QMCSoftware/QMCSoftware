@@ -12,11 +12,13 @@ class LDTransformData(AccumulateData):
 
     parameters = ['n_total','solution','error_bound']
 
-    def __init__(self, stopping_criterion, integrand, basis_transform, m_min, m_max, fudge, check_cone):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, basis_transform, m_min, m_max, fudge, check_cone, ptransform):
         """
         Args:
-            stopping_criterion (StoppingCriterion): a StoppingCriterion instance
+            stopping_crit (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
+            true_measure (TrueMeasure): A TrueMeasure instance
+            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
             basis_transform (method): Transform ynext, combine with y, and then transform all points. 
                 For cub_lattice this is Fast Fourier Transform (FFT). 
                 For cub_sobol this is Fast Walsh Transform (FWT)
@@ -26,11 +28,10 @@ class LDTransformData(AccumulateData):
                 sum of basis coefficients specified in the cone of functions
             check_cone (boolean): check if the function falls in the cone
         """
-        # Extract attributes from integrand
-        self.stopping_criterion = stopping_criterion
+        self.stopping_crit = stopping_crit
         self.integrand = integrand
-        self.measure = self.integrand.measure
-        self.distribution = self.measure.distribution
+        self.true_measure = true_measure
+        self.discrete_distrib = discrete_distrib
         # Set Attributes
         self.ft = basis_transform # fast transform 
         self.m_min = m_min
@@ -51,13 +52,14 @@ class LDTransformData(AccumulateData):
         self.c_stilde_low = tile(-inf,int(self.m_max-self.l_star+1))
         self.c_stilde_up = tile(inf,int(self.m_max-self.l_star+1))
         self.check_cone = check_cone
+        self.ptransform = ptransform
         super(LDTransformData,self).__init__()
 
     def update_data(self):
         """ See abstract method. """
         # Generate sample values
-        x = self.distribution.gen_samples(n_min=self.n_total,n_max=2**self.m)
-        ynext = self.integrand.f(x).squeeze()
+        x = self.discrete_distrib.gen_samples(n_min=self.n_total,n_max=2**self.m)
+        ynext = self.integrand.f_periodized(x,self.ptransform).squeeze()
         self.yval = hstack((self.yval,ynext))
         # Compute fast basis transform
         self.y = self.ft(self.y, ynext)

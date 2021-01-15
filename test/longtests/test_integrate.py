@@ -2,10 +2,7 @@
 
 from qmcpy import *
 from numpy import array, inf, pi, sqrt, exp
-import sys
-vinvo = sys.version_info
-if vinvo[0]==3: import unittest
-else: import unittest2 as unittest
+import unittest
 
 class IntegrationExampleTest(unittest.TestCase):
 
@@ -20,17 +17,13 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [1.3803884470431430, 1.808186429263620, 2.168309102165481]
         for i in range(len(dimensions)):
-            distribution = IIDStdGaussian(dimension=dimensions[i])
-            measure = Gaussian(distribution, covariance=1./2)
-            integrand = Keister(measure)
+            integrand = Keister(IIDStdUniform(dimension=dimensions[i]))
             solution,data = CubMCCLT(integrand,abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_asian_option_multi_level(self):
         abs_tol =.05
-        distribution = IIDStdGaussian()
-        measure = BrownianMotion(distribution)
-        integrand = AsianOption(measure,multi_level_dimensions=[4,16,64])
+        integrand = AsianOption(IIDStdUniform(),multi_level_dimensions=[4,16,64])
         solution,data = CubMCCLT(integrand, abs_tol).integrate()
         true_value = 1.7845
         self.assertTrue(abs(solution - true_value) < abs_tol)
@@ -38,28 +31,31 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_lebesgue_bounded_measure(self):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        dimension = 2
-        distribution = Sobol(dimension=2, randomize=True, seed=7)
-        measure = Lebesgue(distribution, lower_bound=[1,3], upper_bound=[3,6])
-        integrand = CustomFun(measure, lambda x: (x.prod(1))**3)
+        true_measure = Lebesgue(
+            Uniform(
+                Sobol(2, randomize=True, seed=7),
+                lower_bound=[1,3],
+                upper_bound=[3,6]))
+        myfunc = lambda x: (x.prod(1))**3
+        integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCSobolG(integrand, abs_tol=abs_tol).integrate()
         true_value = 6075
         self.assertTrue(abs(solution - true_value) < abs_tol)
     
     def test_lebesgue_inf_measure(self):
         abs_tol = .1
-        distribution = Lattice(1)
-        measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
-        integrand = CustomFun(measure, lambda x: exp(-x**2))
+        true_measure = Lebesgue(Gaussian(Lattice(1)))
+        myfunc = lambda x: exp(-x**2).sum(1)
+        integrand = CustomFun(true_measure, myfunc)
         solution,data = CubQMCLatticeG(integrand,abs_tol=abs_tol).integrate()
         true_value = sqrt(pi)
         self.assertTrue(abs(solution - solution) < abs_tol)
     
     def test_lebesgue_inf_measure_2d(self):
         abs_tol = .1
-        distribution = Lattice(2)
-        measure = Lebesgue(distribution, lower_bound=-inf, upper_bound=inf)
-        integrand = CustomFun(measure, lambda x: exp(-x**2).prod(1))
+        true_measure = Lebesgue(Gaussian(Lattice(2),mean=1,covariance=2))
+        myfunc = lambda x: exp(-x**2).prod(1)
+        integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
         true_value = pi
         self.assertTrue(abs(solution - solution) < abs_tol)
@@ -67,10 +63,9 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_uniform_measure(self):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        dimension = 2
-        distribution = Lattice(dimension=2, randomize=True, order='mps')
-        measure = Uniform(distribution, lower_bound=[1,3], upper_bound=[3,6])
-        integrand = CustomFun(measure, lambda x: (x.prod(1))**3)
+        true_measure = Uniform(Lattice(2, order='mps'), lower_bound=[1,3], upper_bound=[3,6])
+        myfunc = lambda x: (x.prod(1))**3
+        integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
         true_value = 6075 / 6
         self.assertTrue(abs(solution - true_value) < abs_tol)
@@ -83,15 +78,14 @@ class IntegrationExampleTest(unittest.TestCase):
         """
         abs_tol = .01
         dimensions = [1, 2, 3]
-        true_values = [0.5, 1, 1.5]
+        true_value = 0
         for i in range(len(dimensions)):
-            distribution = Sobol(dimension=dimensions[i], randomize=True)
-            measure = Uniform(distribution)
-            integrand = Linear(measure)
+            d = dimensions[i]
+            integrand = Linear0(Sobol(d))
             solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
-            self.assertTrue(abs(solution - true_values[i]) < abs_tol)
+            self.assertTrue(abs(solution - true_value) < abs_tol)
 
-    def test_quick_construct(self):
+    def test_custom_fun(self):
         """
         Infer true measure's dimension from integrand's
 
@@ -104,36 +98,36 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [2.5, 5, 7.5]
         for i in range(len(dimensions)):
-            distribution = IIDStdUniform(dimension=dimensions[i])
-            measure = Uniform(distribution)
-            integrand = CustomFun(measure, lambda x: (5*x).sum(1))
+            d = dimensions[i]
+            integrand = CustomFun(
+                true_measure = Uniform(IIDStdUniform(d),lower_bound=0,upper_bound=1),
+                g = lambda x: (5*x).sum(1))
             solution,data = CubMCG(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
-    def test_quick_construct2(self):
+    def test_custom_fun_2(self):
         """
         Test integrands with parameters
 
         Mathematica: integrate[b*(x-a)^2, {x,1,0}]
         """
         abs_tol = .01
+        d = 1
         a_list = [1., 2.]
         b_list = [4., 5.]
         true_values = [(b / 3) * (3 * a * (a - 1) + 1) for a, b in zip(a_list, b_list)]
         for i in range(2):
             a_i = a_list[i]
             b_i = b_list[i]
-            distribution = Lattice(dimension=1, randomize=True)
-            measure = Uniform(distribution)
-            integrand = CustomFun(measure, lambda x, a=a_i, b=b_i: b * (x - a) ** 2)
+            integrand = CustomFun(
+                true_measure = Uniform(Lattice(d)),
+                g = lambda x, a=a_i, b=b_i: (b * (x - a) ** 2).sum(1))
             solution,data = CubQMCLatticeG(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_european_call(self):
         abs_tol = 1e-2
-        ddistrib = Sobol(dimension=16, seed=7)
-        measure = BrownianMotion(ddistrib)
-        integrand = EuropeanOption(measure,
+        integrand = EuropeanOption(Sobol(16),
             volatility = .2,
             start_price = 5,
             strike_price = 10,
@@ -146,12 +140,10 @@ class IntegrationExampleTest(unittest.TestCase):
     
     def test_european_put(self):
         abs_tol = 1e-2
-        ddistrib = Lattice(dimension=16, seed=17)
-        measure = BrownianMotion(ddistrib)
-        integrand = EuropeanOption(measure,
+        integrand = EuropeanOption(Lattice(16,seed=7),
             volatility = .5,
-            start_price = 10,
-            strike_price = 10,
+            start_price = 50,
+            strike_price = 40,
             interest_rate = .01,
             call_put = 'put')
         algorithm = CubQMCLatticeG(integrand, abs_tol)
@@ -159,17 +151,30 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-true_value) < abs_tol)
 
-    def test_european_put_bayes(self):
+    def test_european_put_bayes_lattice(self):
         abs_tol = 1e-2
-        ddistrib = Lattice(dimension=16, seed=17, order='linear', randomize=False)
-        measure = BrownianMotion(ddistrib)
-        integrand = EuropeanOption(measure,
+        integrand = EuropeanOption(
+            sampler = Lattice(dimension=16, order='linear'),
             volatility = .5,
             start_price = 10,
             strike_price = 10,
             interest_rate = .01,
             call_put = 'put')
         algorithm = CubBayesLatticeG(integrand, abs_tol, ptransform='Baker')
+        solution,data = algorithm.integrate()
+        true_value = integrand.get_exact_value()
+        self.assertTrue(abs(solution-true_value) < abs_tol)
+
+    def test_european_put_bayes_net(self):
+        abs_tol = 1e-2
+        integrand = EuropeanOption(
+            sampler = Sobol(dimension=4, randomize='LMS'),
+            volatility = .5,
+            start_price = 10,
+            strike_price = 10,
+            interest_rate = .01,
+            call_put = 'put')
+        algorithm = CubBayesNetG(integrand, abs_tol)
         solution,data = algorithm.integrate()
         true_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-true_value) < abs_tol)

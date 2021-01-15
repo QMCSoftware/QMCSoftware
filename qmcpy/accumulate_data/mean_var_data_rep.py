@@ -10,19 +10,20 @@ class MeanVarDataRep(AccumulateData):
 
     parameters = ['replications','solution','sighat','n_total','error_bound','confid_int']
 
-    def __init__(self, stopping_criterion, integrand, n_init, replications):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, n_init, replications):
         """
         Args:
-            stopping_criterion (StoppingCriterion): a StoppingCriterion instance
-            integrand (Integrand): an Integrand instance    
+            stopping_crit (StoppingCriterion): a StoppingCriterion instance
+            integrand (Integrand): an Integrand instance
+            true_measure (TrueMeasure): A TrueMeasure instance
+            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance  
             n_init (int): initial number of samples
             replications (int): number of replications
         """
-        # Extract QMCPy objects
-        self.stopping_criterion = stopping_criterion
+        self.stopping_crit = stopping_crit
         self.integrand = integrand
-        self.measure = self.integrand.measure
-        self.distribution = self.measure.distribution
+        self.true_measure = true_measure
+        self.discrete_distrib = discrete_distrib
         # Set Attributes
         self.replications = replications
         self.muhat_r = zeros(int(self.replications))
@@ -35,19 +36,19 @@ class MeanVarDataRep(AccumulateData):
         self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
-        seed = self.distribution.seed
+        seed = self.discrete_distrib.seed
         if isinstance(seed,int) or isinstance(seed, uint64):
             random.seed(seed)
         else:
             random.seed(seed[0])
-        self.seeds = random.randint(0, 100000, int(self.replications), dtype=uint64)
+        self.seeds = random.randint(1, 100000, int(self.replications), dtype=uint64)
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):
         """ See abstract method. """
         for r in range(int(self.replications)):
-            self.distribution.set_seed(int(self.seeds[r]))
-            x = self.distribution.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
+            self.discrete_distrib.set_seed(int(self.seeds[r]))
+            x = self.discrete_distrib.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
             y = self.integrand.f(x).squeeze()
             previous_sum_y = self.muhat_r[r] * self.n_r_prev
             self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n_r  # updated integrand-replication mean

@@ -9,7 +9,6 @@ pyplot.rc('ytick', labelsize=16)    # fontsize of the tick labels
 pyplot.rc('legend', fontsize=16)    # legend fontsize
 pyplot.rc('figure', titlesize=16)  # fontsize of the figure title
 
-
 n = 64
 
 pts_sets = [

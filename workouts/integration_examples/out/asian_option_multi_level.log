@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8569         
+Solution: 5.8575         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -11,14 +11,22 @@ AsianOption (Integrand Object)
     mean_type       geometric
     dimensions      [ 4 16 64]
     dim_fracs       [0. 4. 4.]
-IIDStdGaussian (DiscreteDistribution Object)
-    dimension       2^(6)
+IIDStdUniform (DiscreteDistribution Object)
+    d               2^(6)
     seed            7
-    mimics          StdGaussian
+    mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
-    assembly_type   pca
+    mean            [0. 0. 0. ... 0. 0. 0.]
+    covariance      [[0.016 0.016 0.016 ... 0.016 0.016 0.016]
+                    [0.016 0.031 0.031 ... 0.031 0.031 0.031]
+                    [0.016 0.031 0.047 ... 0.047 0.047 0.047]
+                    ...
+                    [0.016 0.031 0.047 ... 0.969 0.969 0.969]
+                    [0.016 0.031 0.047 ... 0.969 0.984 0.984]
+                    [0.016 0.031 0.047 ... 0.969 0.984 1.   ]]
+    decomp_type     pca
 CubMCCLT (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -29,10 +37,10 @@ CubMCCLT (StoppingCriterion Object)
 MeanVarData (AccumulateData Object)
     levels          3
     solution        5.857
-    n               [959662.  86004.  10284.]
-    n_total         1059022
-    error_bound     0.026
-    confid_int      [5.831 5.883]
-    time_integrate  0.427
+    n               [1071049.   97359.   12415.]
+    n_total         1183895
+    error_bound     0.025
+    confid_int      [5.833 5.882]
+    time_integrate  1.034
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

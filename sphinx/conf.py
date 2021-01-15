@@ -143,6 +143,16 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 #imgmath_dvipng = r"/Library/TeX/texbin/dvipng"
 #imgmath_font_size = 10
 
+# make index a single column
+latex_elements = {
+    'preamble': r'''
+\usepackage{makeidx} 
+\usepackage[columns=1]{idxlayout} 
+\makeindex
+'''
+}
+
+
 # -- Options for Mathjax -----------------------------------------------
 
 mathjax_config = {

@@ -15,24 +15,25 @@ class CubQMCLatticeG(StoppingCriterion):
     a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Fourier coefficients cone decay assumptions.
     
-    >>> k = Keister(Gaussian(Lattice(2,seed=7),covariance=1./2))
+    >>> k = Keister(Lattice(2,seed=7))
     >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8079801428928022
+    1.806814468596487
     >>> data
-    Solution: 1.8080         
+    Solution: 1.8068         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         randomize       1
         order           natural
         seed            7
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transform       Gaussian (TrueMeasure Object)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -40,10 +41,10 @@ class CubQMCLatticeG(StoppingCriterion):
         n_max           2^(35)
     LDTransformData (AccumulateData Object)
         n_total         2^(10)
-        solution        1.808
+        solution        1.807
         error_bound     0.005
         time_integrate  ...
-
+    
     Original Implementation:
 
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
@@ -78,7 +79,7 @@ class CubQMCLatticeG(StoppingCriterion):
     parameters = ['abs_tol','rel_tol','n_init','n_max']
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
-                 fudge=lambda m: 5.*2.**(-m), check_cone=False):
+                 fudge=lambda m: 5.*2.**(-m), check_cone=False, ptransform='Baker'):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -111,20 +112,25 @@ class CubQMCLatticeG(StoppingCriterion):
         self.m_max = m_max
         self.fudge = fudge
         self.check_cone = check_cone
+        self.ptransform = ptransform
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['single']
         allowed_distribs = ["Lattice"]
-        super(CubQMCLatticeG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        if not distribution.randomize:
+        super(CubQMCLatticeG,self).__init__(allowed_levels, allowed_distribs)
+        if not self.discrete_distrib.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
-        if distribution.order != 'natural':
+        if self.discrete_distrib.order != 'natural':
             raise ParameterError("CubLattice_g requires Lattice with 'natural' order")
         
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, self.integrand, self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone)
+        self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform)
         t_start = time()
         while True:
             self.data.update_data()

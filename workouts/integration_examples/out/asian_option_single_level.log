@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8335         
+Solution: 5.8500         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -11,14 +11,22 @@ AsianOption (Integrand Object)
     mean_type       geometric
     dimensions      2^(6)
     dim_fracs       0
-IIDStdGaussian (DiscreteDistribution Object)
-    dimension       2^(6)
+IIDStdUniform (DiscreteDistribution Object)
+    d               2^(6)
     seed            7
-    mimics          StdGaussian
+    mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
-    assembly_type   pca
+    mean            [0. 0. 0. ... 0. 0. 0.]
+    covariance      [[0.016 0.016 0.016 ... 0.016 0.016 0.016]
+                    [0.016 0.031 0.031 ... 0.031 0.031 0.031]
+                    [0.016 0.031 0.047 ... 0.047 0.047 0.047]
+                    ...
+                    [0.016 0.031 0.047 ... 0.969 0.969 0.969]
+                    [0.016 0.031 0.047 ... 0.969 0.984 0.984]
+                    [0.016 0.031 0.047 ... 0.969 0.984 1.   ]]
+    decomp_type     pca
 CubMCCLT (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -28,15 +36,15 @@ CubMCCLT (StoppingCriterion Object)
     n_max           10000000000
 MeanVarData (AccumulateData Object)
     levels          1
-    solution        5.833
-    n               755748
-    n_total         756772
-    error_bound     0.026
-    confid_int      [5.808 5.859]
-    time_integrate  3.196
+    solution        5.850
+    n               827696
+    n_total         828720
+    error_bound     0.025
+    confid_int      [5.825 5.875]
+    time_integrate  10.031
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8304         
+Solution: 5.8391         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -47,15 +55,23 @@ AsianOption (Integrand Object)
     dimensions      2^(6)
     dim_fracs       0
 Lattice (DiscreteDistribution Object)
-    dimension       2^(6)
+    d               2^(6)
     randomize       1
-    seed            1092
+    order           mps
+    seed            1093
     mimics          StdUniform
-    backend         MPS
 BrownianMotion (TrueMeasure Object)
-    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
-    assembly_type   pca
+    mean            [0. 0. 0. ... 0. 0. 0.]
+    covariance      [[0.016 0.016 0.016 ... 0.016 0.016 0.016]
+                    [0.016 0.031 0.031 ... 0.031 0.031 0.031]
+                    [0.016 0.031 0.047 ... 0.047 0.047 0.047]
+                    ...
+                    [0.016 0.031 0.047 ... 0.969 0.969 0.969]
+                    [0.016 0.031 0.047 ... 0.969 0.984 0.984]
+                    [0.016 0.031 0.047 ... 0.969 0.984 1.   ]]
+    decomp_type     pca
 CubQMCCLT (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -65,15 +81,15 @@ CubQMCCLT (StoppingCriterion Object)
     n_max           2^(30)
 MeanVarDataRep (AccumulateData Object)
     replications    2^(4)
-    solution        5.830
-    sighat          0.016
-    n_total         2^(14)
-    error_bound     0.012
-    confid_int      [5.818 5.843]
-    time_integrate  0.163
+    solution        5.839
+    sighat          0.029
+    n_total         2^(13)
+    error_bound     0.023
+    confid_int      [5.817 5.862]
+    time_integrate  0.090
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8341         
+Solution: 5.8422         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -83,14 +99,22 @@ AsianOption (Integrand Object)
     mean_type       geometric
     dimensions      2^(6)
     dim_fracs       0
-IIDStdGaussian (DiscreteDistribution Object)
-    dimension       2^(6)
+IIDStdUniform (DiscreteDistribution Object)
+    d               2^(6)
     seed            7
-    mimics          StdGaussian
+    mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
-    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
-    assembly_type   pca
+    mean            [0. 0. 0. ... 0. 0. 0.]
+    covariance      [[0.016 0.016 0.016 ... 0.016 0.016 0.016]
+                    [0.016 0.031 0.031 ... 0.031 0.031 0.031]
+                    [0.016 0.031 0.047 ... 0.047 0.047 0.047]
+                    ...
+                    [0.016 0.031 0.047 ... 0.969 0.969 0.969]
+                    [0.016 0.031 0.047 ... 0.969 0.984 0.984]
+                    [0.016 0.031 0.047 ... 0.969 0.984 1.   ]]
+    decomp_type     pca
 CubMCG (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -100,15 +124,15 @@ CubMCG (StoppingCriterion Object)
     n_max           10000000000
 MeanVarData (AccumulateData Object)
     levels          1
-    solution        5.834
-    n               951924
-    n_total         952948
+    solution        5.842
+    n               1039606
+    n_total         1040630
     error_bound     0.025
-    confid_int      [5.809 5.859]
-    time_integrate  3.930
+    confid_int      [5.817 5.867]
+    time_integrate  11.814
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8389         
+Solution: 5.8335         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -119,15 +143,23 @@ AsianOption (Integrand Object)
     dimensions      2^(6)
     dim_fracs       0
 Lattice (DiscreteDistribution Object)
-    dimension       2^(6)
+    d               2^(6)
     randomize       1
+    order           natural
     seed            7
     mimics          StdUniform
-    backend         GAIL
 BrownianMotion (TrueMeasure Object)
-    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
-    assembly_type   pca
+    mean            [0. 0. 0. ... 0. 0. 0.]
+    covariance      [[0.016 0.016 0.016 ... 0.016 0.016 0.016]
+                    [0.016 0.031 0.031 ... 0.031 0.031 0.031]
+                    [0.016 0.031 0.047 ... 0.047 0.047 0.047]
+                    ...
+                    [0.016 0.031 0.047 ... 0.969 0.969 0.969]
+                    [0.016 0.031 0.047 ... 0.969 0.984 0.984]
+                    [0.016 0.031 0.047 ... 0.969 0.984 1.   ]]
+    decomp_type     pca
 CubQMCLatticeG (StoppingCriterion Object)
     abs_tol         0.025
     rel_tol         0
@@ -135,12 +167,12 @@ CubQMCLatticeG (StoppingCriterion Object)
     n_max           2^(35)
 LDTransformData (AccumulateData Object)
     n_total         2^(11)
-    solution        5.839
-    error_bound     0.022
-    time_integrate  0.032
+    solution        5.834
+    error_bound     0.010
+    time_integrate  0.033
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8335         
+Solution: 5.8394         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -151,16 +183,24 @@ AsianOption (Integrand Object)
     dimensions      2^(6)
     dim_fracs       0
 Sobol (DiscreteDistribution Object)
-    dimension       2^(6)
+    d               2^(6)
     randomize       1
     graycode        0
-    seed            7
+    seed            [61616 58565 49690 ... 15260 73221 99092]
     mimics          StdUniform
-    backend         QRNG
+    dim0            0
 BrownianMotion (TrueMeasure Object)
-    time_vector     [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
     drift           0
-    assembly_type   pca
+    mean            [0. 0. 0. ... 0. 0. 0.]
+    covariance      [[0.016 0.016 0.016 ... 0.016 0.016 0.016]
+                    [0.016 0.031 0.031 ... 0.031 0.031 0.031]
+                    [0.016 0.031 0.047 ... 0.047 0.047 0.047]
+                    ...
+                    [0.016 0.031 0.047 ... 0.969 0.969 0.969]
+                    [0.016 0.031 0.047 ... 0.969 0.984 0.984]
+                    [0.016 0.031 0.047 ... 0.969 0.984 1.   ]]
+    decomp_type     pca
 CubQMCSobolG (StoppingCriterion Object)
     abs_tol         0.025
     rel_tol         0
@@ -168,8 +208,89 @@ CubQMCSobolG (StoppingCriterion Object)
     n_max           2^(35)
 LDTransformData (AccumulateData Object)
     n_total         2^(10)
-    solution        5.834
-    error_bound     0.023
-    time_integrate  0.010
+    solution        5.839
+    error_bound     0.022
+    time_integrate  0.007
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 5.8296         
+AsianOption (Integrand Object)
+    volatility      2^(-1)
+    call_put        call
+    start_price     30
+    strike_price    25
+    interest_rate   0.010
+    mean_type       geometric
+    dimensions      2^(6)
+    dim_fracs       0
+Lattice (DiscreteDistribution Object)
+    d               2^(6)
+    randomize       1
+    order           linear
+    seed            14024
+    mimics          StdUniform
+BrownianMotion (TrueMeasure Object)
+    time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    drift           0
+    mean            [0. 0. 0. ... 0. 0. 0.]
+    covariance      [[0.016 0.016 0.016 ... 0.016 0.016 0.016]
+                    [0.016 0.031 0.031 ... 0.031 0.031 0.031]
+                    [0.016 0.031 0.047 ... 0.047 0.047 0.047]
+                    ...
+                    [0.016 0.031 0.047 ... 0.969 0.969 0.969]
+                    [0.016 0.031 0.047 ... 0.969 0.984 0.984]
+                    [0.016 0.031 0.047 ... 0.969 0.984 1.   ]]
+    decomp_type     pca
+CubBayesLatticeG (StoppingCriterion Object)
+    abs_tol         0.025
+    rel_tol         0
+    n_init          2^(8)
+    n_max           2^(22)
+LDTransformBayesData (AccumulateData Object)
+    n_total         1024
+    solution        5.830
+    error_bound     2.29e-26
+    time_integrate  0.059
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solution: 5.8385         
+AsianOption (Integrand Object)
+    volatility      2^(-1)
+    call_put        call
+    start_price     30
+    strike_price    25
+    interest_rate   0.010
+    mean_type       geometric
+    dimensions      2^(6)
+    dim_fracs       0
+Sobol (DiscreteDistribution Object)
+    d               2^(6)
+    randomize       1
+    graycode        0
+    seed            [97369 39692 68997 ... 54733 77862 84061]
+    mimics          StdUniform
+    dim0            0
+BrownianMotion (TrueMeasure Object)
+    time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
+    drift           0
+    mean            [0. 0. 0. ... 0. 0. 0.]
+    covariance      [[0.016 0.016 0.016 ... 0.016 0.016 0.016]
+                    [0.016 0.031 0.031 ... 0.031 0.031 0.031]
+                    [0.016 0.031 0.047 ... 0.047 0.047 0.047]
+                    ...
+                    [0.016 0.031 0.047 ... 0.969 0.969 0.969]
+                    [0.016 0.031 0.047 ... 0.969 0.984 0.984]
+                    [0.016 0.031 0.047 ... 0.969 0.984 1.   ]]
+    decomp_type     pca
+CubBayesNetG (StoppingCriterion Object)
+    abs_tol         0.025
+    rel_tol         0
+    n_init          2^(8)
+    n_max           2^(22)
+LDTransformBayesData (AccumulateData Object)
+    n_total         8192
+    solution        5.838
+    error_bound     0.021
+    time_integrate  0.673
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

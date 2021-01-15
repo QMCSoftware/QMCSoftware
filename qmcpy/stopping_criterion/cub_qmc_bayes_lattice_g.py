@@ -20,24 +20,25 @@ class CubBayesLatticeG(StoppingCriterion):
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
     
-    >>> k = Keister(Gaussian(Lattice(2, order='linear', randomize=False, seed=123456789),covariance=1./2))
+    >>> k = Keister(Lattice(2, order='linear', seed=123456789))
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.80818168796735...
+    1.8081816879673565
     >>> data
-    Solution: 1.8082...
+    Solution: 1.8082         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2^(1)
-        randomize       0
+        d               2^(1)
+        randomize       1
         order           linear
         seed            123456789
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    Lebesgue (TrueMeasure Object)
+        transform       Gaussian (TrueMeasure Object)
+                           mean            0
+                           covariance      2^(-1)
+                           decomp_type     pca
     CubBayesLatticeG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -48,7 +49,7 @@ class CubBayesLatticeG(StoppingCriterion):
         solution        1.808
         error_bound     7.36e-04
         time_integrate  ...
-
+    
     Adapted from 
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m
 
@@ -98,8 +99,6 @@ class CubBayesLatticeG(StoppingCriterion):
         self.alpha = alpha  # p-value, default 0.1%.
         self.order = 2  # Bernoulli kernel's order. If zero, choose order automatically
 
-        self.integrand = integrand
-        self.dim = integrand.dimension  # dimension of the integrand
         self.useGradient = False  # If true uses gradient descent in parameter search
         self.oneTheta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
@@ -125,22 +124,26 @@ class CubBayesLatticeG(StoppingCriterion):
         else:
             self.uncert = -gaussnorm.ppf(self.alpha / 2)
 
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
+        
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
-        self.distribution = distribution
         allowed_levels = ['single']
         allowed_distribs = ["Lattice"]
-        super(CubBayesLatticeG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubBayesLatticeG, self).__init__(allowed_levels, allowed_distribs)
 
-        if distribution.randomize == True:
-            raise ParameterError("CubBayesLattice_g requires distribution to have randomize=False")
-        if distribution.order != 'linear':
-            raise ParameterError("CubBayesLattice_g requires distribution to have order='linear'")
+        if self.discrete_distrib.randomize == False:
+            raise ParameterError("CubBayesLattice_g requires discrete_distrib to have randomize=True")
+        if self.discrete_distrib.order != 'linear':
+            raise ParameterError("CubBayesLattice_g requires discrete_distrib to have order='linear'")
 
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max)
+        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self.m_min, self.m_max, self._fft, self._merge_fft)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -167,6 +170,25 @@ class CubBayesLatticeG(StoppingCriterion):
         self.data.solution = muhat
 
         return muhat, self.data
+
+    @staticmethod
+    def _fft(y):
+        ytilde = np.fft.fft(y)
+        return ytilde
+
+    @staticmethod
+    def _merge_fft(ftilde_new, ftilde_next_new, mnext):
+        # using FFT butterfly plot technique merges two halves of fft
+        ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
+        nl = 2 ** mnext
+        ptind = np.ndarray(shape=(2 * nl, 1), buffer=np.array([True] * nl + [False] * nl), dtype=bool)
+        coef = np.exp(-2 * np.pi * 1j * np.ndarray(shape=(nl, 1), buffer=np.arange(0, nl), dtype=int) / (2 * nl))
+        coefv = np.tile(coef, (1, 1))
+        evenval = ftilde_new[ptind].reshape((nl, 1))
+        oddval = ftilde_new[~ptind].reshape((nl, 1))
+        ftilde_new[ptind] = np.squeeze(evenval + coefv * oddval)
+        ftilde_new[~ptind] = np.squeeze(evenval - coefv * oddval)
+        return ftilde_new
 
     # decides if the user-defined error threshold is met
     def stopping_criterion(self, xpts, ftilde, m):
@@ -332,14 +354,14 @@ class CubBayesLatticeG(StoppingCriterion):
             # C1_new = 1 + C1m1 indirectly computed in the process
             (vec_C1m1, C1_alt) = CubBayesLatticeG.kernel_t(a * const_mult, kernel_func(xun))
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda_ring = np.real(np.fft.fft(vec_C1m1))
+            vec_lambda_ring = np.real(CubBayesLatticeG._fft(vec_C1m1))
 
             vec_lambda = vec_lambda_ring.copy()
             vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
-                vec_lambda_direct = np.real(np.fft.fft(C1_alt))  # Note: fft output unnormalized
+                vec_lambda_direct = np.real(CubBayesLatticeG._fft(C1_alt))  # Note: fft output unnormalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
@@ -347,7 +369,7 @@ class CubBayesLatticeG(StoppingCriterion):
             vec_C1 = np.prod(1 + a * const_mult * kernel_func(xun), 2)
             # matlab's builtin fft is much faster and accurate
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda = np.real(np.fft.fft(vec_C1))
+            vec_lambda = np.real(CubBayesLatticeG._fft(vec_C1))
             vec_lambda_ring = 0
 
         return vec_lambda, vec_lambda_ring
