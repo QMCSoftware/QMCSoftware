@@ -5,24 +5,13 @@ from numpy import *
 
 class Kumaraswamy(TrueMeasure):
     """
-    For $\boldsymbol{a},\boldsymbol{b}>0$ we have
+    For $\\boldsymbol{a},\\boldsymbol{b}>0$ we have
 
-    PDF
-    $$f(\boldsymbol{x}) = \prod_{j=1}^d [a_j b_j x_j^{a_j-1}(1-x_j^{a_j})^{b_j-1}]$$
+    PDF: $f(\\boldsymbol{x}) = \\prod_{j=1}^d [a_j b_j x_j^{a_j-1}(1-x_j^{a_j})^{b_j-1}]$
 
-    CDF
-    $$F(\boldsymbol{x}) = \prod_{j=1}^d [1-(1-x_j^{a_j})^{b_j}]$$
+    CDF: $F(\\boldsymbol{x}) = \\prod_{j=1}^d [1-(1-x_j^{a_j})^{b_j}]$
 
-    Inverse CDF
-    $$y_j = 1-(1-x_j^{a_j})^{b_j}$$
-    $$\therefore 1-y_j = (1-x_j^{a_j})^{b_j}$$
-    $$\therefore (1-y_j)^{1/b_j} = 1-x_j^{a_j}$$
-    $$\therefore 1-(1-y_j)^{1/b_j} = x_j^{a_j}$$
-    $$\therefore (1-(1-y_j)^{1/b_j})^{1/a_j} = x_j = \Psi_j(y_j)$$
-
-    Jacobian 
-    $$\frac{\mathrm{d} \Psi_j(\boldsymbol{x})}{\mathrm{d} x_i} = \chi_{i=j} \left( \frac{(1-(1-x_j)^{1/b_j})^{1/a_j-1}(1-x_j)^{1/b_j-1}}{a_jb_j}\right)$$
-    $$\left\lvert \frac{\mathrm{d} \boldsymbol{\Psi}(\boldsymbol{x})}{\mathrm{d} \boldsymbol{\boldsymbol{x}}} \right\rvert = \prod_j^d \frac{\mathrm{d} \Psi_j(x)}{\mathrm{d} x_j}$$
+    Inverse CDF: $\\Psi_j(x_j) = (1-(1-x_j)^{1/b_j})^{1/a_j}$
     """
 
     def __init__(self, sampler, a=2, b=2):
