@@ -58,7 +58,6 @@ pytest==6.2.1
 python-dateutil==2.8.1
 pytz==2020.1
 pyzmq==19.0.1
--e git+https://github.com/QMCSoftware/QMCSoftware.git@34c9a34839c904b6c85bebb42700a8963c68d8c9#egg=qmcpy
 qtconsole==4.7.4
 QtPy==1.9.0
 readme-renderer==26.0
@@ -85,7 +84,6 @@ stdlib-list==0.8.0
 terminado==0.8.3
 testpath==0.4.4
 toml==0.10.2
-torch==1.7.0
 tornado==6.0.4
 tqdm==4.46.1
 traitlets==4.3.3
