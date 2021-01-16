@@ -75,8 +75,13 @@ Lebesgue
 ........
 
 .. automodule:: qmcpy.true_measure.lebesgue
-    :members:   
+    :members:  
 
+Kumaraswamy
+...........
+
+.. automodule:: qmcpy.true_measure.kumaraswamy
+    :members:  
 
 
 Integrand Class
