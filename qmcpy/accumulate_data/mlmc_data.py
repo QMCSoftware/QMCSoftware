@@ -76,7 +76,7 @@ class MLMCData(AccumulateData):
         a = ones((self.levels,2))
         a[:,0] = arange(1,self.levels+1)
         if self.alpha0 <= 0:
-            x = lstsq(a,log2(self.mean_level[1:]),rcond=None)[0]
+            x = lstsq(a,log2(abs(self.mean_level[1:])),rcond=None)[0]
             self.alpha = maximum(.5,-x[0])
         if self.beta0 <= 0:
             x = lstsq(a,log2(self.var_level[1:]),rcond=None)[0]

@@ -63,7 +63,7 @@ class CubQMCML(StoppingCriterion):
 
     parameters = ['rmse_tol','n_init','n_max','replications']
 
-    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, replications=32.):
+    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, replications=32., bias_estimator='giles', cost_method='sde'):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
@@ -75,6 +75,8 @@ class CubQMCML(StoppingCriterion):
                 in favor of the rmse tolerance
             n_max (int): maximum number of samples
             replications (int): number of replications on each level
+            bias_estimator (str): bias estimation method (can be 'giles' [default] or 'as_mlmc')
+            cost_method (str): cost estimation method (can be 'sde' [default] or 'general')
         """
         # initialization
         if rmse_tol:
@@ -85,6 +87,8 @@ class CubQMCML(StoppingCriterion):
         self.n_max = float(n_max)
         self.replications = float(replications)
         self.integrand = integrand
+        self.bias_estimator = bias_estimator
+        self.cost_method = cost_method
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['adaptive-multi']
@@ -94,14 +98,14 @@ class CubQMCML(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration Data
-        self.data = MLQMCData(self, self.integrand, self.n_init, self.replications)
+        self.data = MLQMCData(self, self.integrand, self.n_init, self.replications, self.bias_estimator, self.cost_method)
         t_start = time()
         while True:
             self.data.update_data()
             self.data.eval_level[:] = False
             if self.data.var_level.sum() > (self.rmse_tol**2/2.):
                 # double N_l on level with largest V_l/(2^l*N_l)
-                efficient_level = argmax(self.data.cost_level)
+                efficient_level = argmax(self.data.var_cost_ratio_level)
                 self.data.eval_level[efficient_level] = True
             elif self.data.bias_estimate > (self.rmse_tol/sqrt(2.)):
                 # add another level
