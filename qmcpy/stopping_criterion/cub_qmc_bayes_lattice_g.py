@@ -34,11 +34,10 @@ class CubBayesLatticeG(StoppingCriterion):
         order           linear
         seed            123456789
         mimics          StdUniform
-    Lebesgue (TrueMeasure Object)
-        transform       Gaussian (TrueMeasure Object)
-                           mean            0
-                           covariance      2^(-1)
-                           decomp_type     pca
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     CubBayesLatticeG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -75,10 +74,10 @@ class CubBayesLatticeG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
-    parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, alpha=0.01, ptransform='C1sin'):
+        self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol

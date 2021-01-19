@@ -35,8 +35,6 @@ class MLCallOptions(Integrand):
     http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
     """
 
-    parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
-
     def __init__(self, sampler, option='european', volatility=.2,
         start_strike_price=100., interest_rate=.05, t_final=1.):
         """
@@ -51,6 +49,7 @@ class MLCallOptions(Integrand):
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
         """
+        self.parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
         self.true_measure = Gaussian(sampler, mean=0, covariance=1)
         options = ['european','asian']
         self.option = option.lower()

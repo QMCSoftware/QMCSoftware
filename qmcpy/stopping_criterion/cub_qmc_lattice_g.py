@@ -29,11 +29,10 @@ class CubQMCLatticeG(StoppingCriterion):
         order           natural
         seed            7
         mimics          StdUniform
-    Lebesgue (TrueMeasure Object)
-        transform       Gaussian (TrueMeasure Object)
-                           mean            0
-                           covariance      2^(-1)
-                           decomp_type     pca
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -76,8 +75,6 @@ class CubQMCLatticeG(StoppingCriterion):
         refer to the references below.
     """
 
-    parameters = ['abs_tol','rel_tol','n_init','n_max']
-
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
                  fudge=lambda m: 5.*2.**(-m), check_cone=False, ptransform='Baker'):
         """
@@ -92,6 +89,7 @@ class CubQMCLatticeG(StoppingCriterion):
                               in the cone of functions
             check_cone (boolean): check if the function falls in the cone
         """
+        self.parameters = ['abs_tol','rel_tol','n_init','n_max']
         # Input Checks
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)

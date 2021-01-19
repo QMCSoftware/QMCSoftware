@@ -75,8 +75,6 @@ class Sobol(DiscreteDistribution):
         ACM Trans. Math. Softw. 14, 1 (March 1988), 88–100. 
         DOI:https://doi.org/10.1145/42288.214372
     """
-    
-    parameters = ['d','randomize','graycode','seed','mimics','dim0']
 
     def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path=None, dim0=0):
         """
@@ -91,6 +89,7 @@ class Sobol(DiscreteDistribution):
                 z_path sould be formatted like `gen_mat.21201.32.msb.npy` with name.d_max.m_max.msb_or_lsb.npy
             dim0 (int): first dimension
         """
+        self.parameters = ['d','randomize','graycode','seed','mimics','dim0']
         # initialize c code
         self.get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
         self.get_unsigned_long_long_size_cf.argtypes = []

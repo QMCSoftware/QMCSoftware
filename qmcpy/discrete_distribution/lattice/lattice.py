@@ -67,8 +67,6 @@ class Lattice(DiscreteDistribution):
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
-    parameters = ['d','randomize','order','seed','mimics']
-
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None, z_path=None):
         """
         Args:
@@ -81,6 +79,7 @@ class Lattice(DiscreteDistribution):
                 z_path should be formatted like 'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy' 
                 and d_max is the maximum dimenion and 2^m_max is the max number samples supported
         """
+        self.parameters = ['d','randomize','order','seed','mimics']
         # set generating matrix
         self.randomize = randomize
         self.order = order.lower()

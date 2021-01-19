@@ -19,14 +19,13 @@ class IIDStdUniform(DiscreteDistribution):
         mimics          StdUniform
     """
 
-    parameters = ['d','seed','mimics']
-
     def __init__(self, dimension=1, seed=None):
         """
         Args:
             dimension (int): dimension of samples
             seed (int): seed the random number generator for reproducibility
         """
+        self.parameters = ['d','seed','mimics']
         self.d = dimension
         self.seed = seed
         random.seed(self.seed)

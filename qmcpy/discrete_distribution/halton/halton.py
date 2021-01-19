@@ -35,8 +35,6 @@ class Halton(DiscreteDistribution):
         [2] Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
     """
 
-    parameters = ['d','generalize','randomize','seed','mimics']
-
     def __init__(self, dimension=1, generalize=True, randomize=True, seed=None):
         """
         Args:
@@ -51,6 +49,7 @@ class Halton(DiscreteDistribution):
         Note:
             See References [1] and [2] for specific randomization methods and differences. 
         """
+        self.parameters = ['d','generalize','randomize','seed','mimics']
         if isinstance(randomize,bool):
             self.backend = 'QRNG' if randomize else 'OWEN'
             self.randomize = randomize

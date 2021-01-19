@@ -66,8 +66,6 @@ class CubMCML(StoppingCriterion):
         http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
     """
 
-    parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
-
     def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, 
         levels_min=2., levels_max=10., alpha0=-1., beta0=-1., gamma0=-1.):
         """
@@ -89,6 +87,7 @@ class CubMCML(StoppingCriterion):
         Note:
             if alpha, beta, gamma are not positive, then they will be estimated
         """
+        self.parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
         if levels_min < 2:
             raise ParameterError('needs levels_min >= 2')
         if levels_max < levels_min:

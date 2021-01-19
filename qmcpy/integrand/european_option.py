@@ -28,8 +28,6 @@ class EuropeanOption(Integrand):
     >>> y.mean()
     9.220...
     """
-
-    parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
                           
     def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35,
         interest_rate=0, t_final=1, call_put='call'):
@@ -45,6 +43,7 @@ class EuropeanOption(Integrand):
             t_final (float): exercise time
             call_put (str): 'call' or 'put' option
         """
+        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
         self.t_final = t_final
         self.true_measure = BrownianMotion(sampler,t_final=self.t_final)
         self.volatility = float(volatility)

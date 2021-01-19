@@ -15,14 +15,13 @@ class CustomFun(Integrand):
     4.009...
     """
 
-    parameters = []
-
     def __init__(self, true_measure, g):
         """
         Args:
             true_measure (TrueMeasure): a TrueMeasure instance. 
             g (function): a function handle. 
         """
+        self.parameters = []
         self.true_measure = true_measure
         self.g = lambda x,*args,**kwargs: g(x,*args,**kwargs) 
         super(CustomFun,self).__init__()

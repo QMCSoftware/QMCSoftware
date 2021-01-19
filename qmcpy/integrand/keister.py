@@ -20,11 +20,10 @@ class Keister(Integrand):
     >>> y.mean()
     1.807...
     >>> k.true_measure
-    Lebesgue (TrueMeasure Object)
-        transform       Gaussian (TrueMeasure Object)
-                           mean            0
-                           covariance      2^(-1)
-                           decomp_type     pca
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     >>> k = Keister(Gaussian(Sobol(2,seed=7),mean=0,covariance=2))
     >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)

@@ -29,11 +29,10 @@ class CubQMCCLT(StoppingCriterion):
         order           natural
         seed            1093
         mimics          StdUniform
-    Lebesgue (TrueMeasure Object)
-        transform       Gaussian (TrueMeasure Object)
-                           mean            0
-                           covariance      2^(-1)
-                           decomp_type     pca
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
@@ -51,8 +50,6 @@ class CubQMCCLT(StoppingCriterion):
         time_integrate  ...
     """
 
-    parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
-
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
                  inflate=1.2, alpha=0.01, replications=16.):
         """
@@ -65,6 +62,7 @@ class CubQMCCLT(StoppingCriterion):
             n_max (int): maximum number of samples
             replications (int): number of replications
         """
+        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Input Checks
         if log2(n_init) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'

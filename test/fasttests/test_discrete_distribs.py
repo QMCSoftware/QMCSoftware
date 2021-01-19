@@ -26,6 +26,26 @@ class TestIIDStdUniform(unittest.TestCase):
         self.assertTrue(samples.shape==(4,3))
 
 
+class TestIIDStdGaussian(unittest.TestCase):
+    """ Unit tests for IIDStdGaussian DiscreteDistribution. """
+
+    def test_mimics(self):
+        distribution = IIDStdGaussian(dimension=3)
+        self.assertEqual(distribution.mimics, "StdGaussian")
+
+    def test_gen_samples(self):
+        distribution = IIDStdGaussian(dimension=3)
+        samples = distribution.gen_samples(n=5)
+        self.assertEqual(type(samples), ndarray)
+        self.assertEqual(samples.shape, (5,3))
+    
+    def test_set_dimension(self):
+        distribution = IIDStdGaussian(dimension=2)
+        distribution._set_dimension(3)
+        samples = distribution.gen_samples(4)
+        self.assertTrue(samples.shape==(4,3))
+        
+        
 class TestLattice(unittest.TestCase):
     """ Unit tests for Lattice DiscreteDistribution. """
 

@@ -61,8 +61,6 @@ class CubQMCML(StoppingCriterion):
         de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
     """
 
-    parameters = ['rmse_tol','n_init','n_max','replications']
-
     def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, replications=32.):
         """
         Args:
@@ -76,6 +74,7 @@ class CubQMCML(StoppingCriterion):
             n_max (int): maximum number of samples
             replications (int): number of replications on each level
         """
+        self.parameters = ['rmse_tol','n_init','n_max','replications']
         # initialization
         if rmse_tol:
             self.rmse_tol = float(rmse_tol)

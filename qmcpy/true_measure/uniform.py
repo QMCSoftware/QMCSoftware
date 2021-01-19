@@ -18,8 +18,6 @@ class Uniform(TrueMeasure):
         lower_bound     [0.  0.5]
         upper_bound     [2 3]
     """
-
-    parameters = ['lower_bound', 'upper_bound']
     
     def __init__(self, sampler, lower_bound=0., upper_bound=1.):
         """
@@ -30,6 +28,7 @@ class Uniform(TrueMeasure):
             lower_bound (float): a for Uniform(a,b)
             upper_bound (float): b for Uniform(a,b)
         """
+        self.parameters = ['lower_bound', 'upper_bound']
         self.domain = array([[0,1]])
         self._parse_sampler(sampler)
         self.lower_bound = lower_bound

@@ -37,11 +37,10 @@ class CubBayesNetG(StoppingCriterion):
         seed            [77469 77107]
         mimics          StdUniform
         dim0            0
-    Lebesgue (TrueMeasure Object)
-        transform       Gaussian (TrueMeasure Object)
-                           mean            0
-                           covariance      2^(-1)
-                           decomp_type     pca
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     CubBayesNetG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -79,10 +78,11 @@ class CubBayesNetG(StoppingCriterion):
         please refer to the references below.
     """
     
-    parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
+    
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, alpha=0.01):
+        self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol

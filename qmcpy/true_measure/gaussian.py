@@ -26,8 +26,6 @@ class Gaussian(TrueMeasure):
         decomp_type     pca
     """
 
-    parameters = ['mean', 'covariance', 'decomp_type']
-
     def __init__(self, sampler, mean=0., covariance=1., decomp_type='PCA'):
         """
         Args:
@@ -41,6 +39,7 @@ class Gaussian(TrueMeasure):
                 "PCA" for principal component analysis or 
                 "Cholesky" for cholesky decomposition.
         """
+        self.parameters = ['mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform
         self.domain = array([[0,1]])
         self._transform = self._transform_std_uniform

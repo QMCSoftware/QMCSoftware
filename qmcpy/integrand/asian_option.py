@@ -46,9 +46,6 @@ class AsianOption(Integrand):
     >>> y2
     1.793...
     """
-
-    parameters = ['volatility', 'call_put', 'start_price', 'strike_price',
-                  'interest_rate','mean_type', 'dimensions', 'dim_fracs']
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
                  interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multi_level_dimensions=None):
@@ -66,6 +63,8 @@ class AsianOption(Integrand):
             multi_level_dimensions (list of ints): list of dimensions at each level. 
                 Leave as None for single-level problems
         """
+        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', \
+                  'interest_rate','mean_type', 'dimensions', 'dim_fracs']
         self.t_final = t_final
         self.true_measure = BrownianMotion(sampler,self.t_final)
         self.volatility = float(volatility)
