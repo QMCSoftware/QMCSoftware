@@ -41,15 +41,15 @@ class Gaussian(TrueMeasure):
                 "PCA" for principal component analysis or 
                 "Cholesky" for cholesky decomposition.
         """
-        if isinstance(sampler,DiscreteDistribution):
-            if sampler.mimics=='StdUniform':
-                self.domain = array([[0,1]])
-                self._transform = self._transform_std_uniform
-                self._jacobian = self._jacobian_std_uniform
-            elif sampler.mimics=='StdGaussian':
-                self.domain = array([[-inf,inf]])
-                self._transform = self._transform_std_gaussian
-                self._jacobian = self._jacobian_std_gaussian
+        # default to transform from standard uniform
+        self.domain = array([[0,1]])
+        self._transform = self._transform_std_uniform
+        self._jacobian = self._jacobian_std_uniform
+        if isinstance(sampler,DiscreteDistribution) and sampler.mimics=='StdGaussian':
+            # need to use transformation from standard gaussian
+            self.domain = array([[-inf,inf]])
+            self._transform = self._transform_std_gaussian
+            self._jacobian = self._jacobian_std_gaussian
         self._parse_sampler(sampler)
         self.decomp_type = decomp_type.lower()
         self._set_mean_cov(mean,covariance)

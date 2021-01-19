@@ -47,16 +47,11 @@ class Keister(Integrand):
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
         """
-        if isinstance(sampler,DiscreteDistribution): # use the default transform
-            self.true_measure = Lebesgue(Gaussian(sampler, mean=0, covariance=1/2))
-        elif isinstance(sampler,TrueMeasure): # importance sampling
-            if (sampler.range!=array([-inf,inf])).any(): 
-                raise ParameterError("Keister requires sampler whose transformation range is all reals.")
-            self.true_measure = Lebesgue(sampler)
-        else:
-            raise ParameterError("Keister requires sampler to be a discrete distribution or true measure.")
+        self.true_measure = Gaussian(sampler,mean=0,covariance=1/2)
         super(Keister,self).__init__()
     
     def g(self, x):
+        d = x.shape[1]
         norm = sqrt((x**2).sum(1))
-        return cos(norm) * exp(-(norm**2))
+        k = pi**(d/2)*cos(norm)
+        return k
