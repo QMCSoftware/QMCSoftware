@@ -1,4 +1,5 @@
 from ._true_measure import TrueMeasure
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import TransformError,DimensionError, ParameterError
 from ..discrete_distribution import Sobol
 from numpy import *
@@ -40,7 +41,15 @@ class Gaussian(TrueMeasure):
                 "PCA" for principal component analysis or 
                 "Cholesky" for cholesky decomposition.
         """
-        self.domain = array([[0,1]])
+        if isinstance(sampler,DiscreteDistribution):
+            if sampler.mimics=='StdUniform':
+                self.domain = array([[0,1]])
+                self._transform = self._transform_std_uniform
+                self._jacobian = self._jacobian_std_uniform
+            elif sampler.mimics=='StdGaussian':
+                self.domain = array([[-inf,inf]])
+                self._transform = self._transform_std_gaussian
+                self._jacobian = self._jacobian_std_gaussian
         self._parse_sampler(sampler)
         self.decomp_type = decomp_type.lower()
         self._set_mean_cov(mean,covariance)
@@ -77,11 +86,17 @@ class Gaussian(TrueMeasure):
         self.det_a = sqrt(self.det_sigma)
         self.inv_sigma = inv(self.sigma)  
     
-    def _transform(self, x):
+    def _transform_std_uniform(self, x):
         return self.mu + norm.ppf(x)@self.a.T
     
-    def _jacobian(self, x):
+    def _jacobian_std_uniform(self, x):
         return self.det_a/norm.pdf(norm.ppf(x)).prod(1)
+    
+    def _transform_std_gaussian(self, x):
+        return self.mu + x@self.a.T
+    
+    def _jacobian_std_gaussian(self, x):
+        return tile(self.det_a,x.shape[0])
 
     def _weight(self, x):
         const = (2*pi)**(-self.d/2) * self.det_sigma**(-1./2)

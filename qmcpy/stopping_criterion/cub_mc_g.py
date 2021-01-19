@@ -104,7 +104,7 @@ class CubMCG(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['single']
-        allowed_distribs = ["IIDStdUniform"]
+        allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
         super(CubMCG,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
