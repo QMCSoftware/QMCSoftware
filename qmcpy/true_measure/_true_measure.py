@@ -150,7 +150,7 @@ class TrueMeasure(object):
             self.parameters += ['transform']
             self.d = sampler.d # take the dimension from the sub-sampler (composed transform)
             self.discrete_distrib = self.transform.discrete_distrib
-            if self.transform.transform!=self.transform and (self.domain!=self.transform.range).any():
+            if self.transform.transform!=self.transform and (self.transform.domain!=self.transform.transform.range).any():
                 raise ParameterError("This true measures domain must match the sub-sampling true-measures range.")
         else:
             raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure")
