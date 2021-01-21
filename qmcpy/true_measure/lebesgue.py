@@ -31,7 +31,7 @@ class Lebesgue(TrueMeasure):
         if not isinstance(sampler,TrueMeasure):
             raise ParameterError("Lebesgue sampler must be a true measure by which to tranform samples.")
         self.domain = sampler.range # hack to make sure Lebesuge is compatible with any tranform
-        self.range = None
+        self.range = sampler.range
         self._parse_sampler(sampler)
         super(Lebesgue,self).__init__()
 
