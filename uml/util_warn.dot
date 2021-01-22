@@ -1,0 +1,13 @@
+digraph "classes" {
+charset="utf-8"
+rankdir=BT
+"0" [label="CubatureWarning", shape="record"];
+"1" [label="MaxLevelsWarning", shape="record"];
+"2" [label="MaxSamplesWarning", shape="record"];
+"3" [label="ParameterWarning", shape="record"];
+"4" [label="Warning", shape="record"];
+"0" -> "4" [arrowhead="empty", arrowtail="none"];
+"1" -> "4" [arrowhead="empty", arrowtail="none"];
+"2" -> "4" [arrowhead="empty", arrowtail="none"];
+"3" -> "4" [arrowhead="empty", arrowtail="none"];
+}

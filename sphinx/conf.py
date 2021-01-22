@@ -25,11 +25,11 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
 project = u"QMCPy"
-copyright = u"2019, Illinois Institute of Technology"
+copyright = u"2019 \u2014 2021, Illinois Institute of Technology"
 author = u"Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin"
 #author = u"S-C Choi, F Hickernell, M McCourt, J Rathinavel, & A Sorokin"
 
-version = u"0.3"
+version = u"0.7"
 
 # The full version, including alpha/beta/rc tags
 release = version

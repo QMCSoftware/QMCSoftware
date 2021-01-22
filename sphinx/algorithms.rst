@@ -1,13 +1,17 @@
 QMCPy Documentation
 ===================
 
-
+.. image:: ../uml/qmcpy_uml1.png
+.. image:: ../uml/qmcpy_uml2.png
+.. image:: ../uml/qmcpy_uml3.png
 
 Discrete Distribution Class
 ---------------------------
 
 Abstract Discrete Distribution Class
 ....................................
+
+.. image:: ../uml/discrete_distribution_uml.png
 
 .. automodule:: qmcpy.discrete_distribution._discrete_distribution
     :members:
@@ -42,10 +46,12 @@ IID Standard Uniform
 .. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
-    
+
 
 True Measure Class
 ------------------
+
+.. image:: ../uml/true_measure_uml.png
 
 Abstract Measure Class
 ......................
@@ -75,17 +81,19 @@ Lebesgue
 ........
 
 .. automodule:: qmcpy.true_measure.lebesgue
-    :members:  
+    :members:
 
 Kumaraswamy
 ...........
 
 .. automodule:: qmcpy.true_measure.kumaraswamy
-    :members:  
+    :members:
 
 
 Integrand Class
 ---------------
+
+.. image:: ../uml/integrand_uml.png
 
 Abstract Integrand Class
 ........................
@@ -133,6 +141,8 @@ Linear Function
 
 Stopping Criterion Algorithms
 -----------------------------
+
+.. image:: ../uml/stopping_criterion_uml.png
 
 Abstract Stopping Criterion Class
 .................................
@@ -199,6 +209,8 @@ CLT MC Cubature
 Accumulate Data Class
 ---------------------
 
+.. image:: ../uml/accumulate_data_uml.png
+
 Abstract Accumulate Data Class
 ...............................
 
@@ -239,6 +251,9 @@ Mean Variance MC Data
 
 Utilities
 ---------
+
+.. image:: ../uml/util_err.png
+.. image:: ../uml/util_warn.png
 
 .. automodule:: qmcpy.util.latnetbuilder_linker
     :members:
