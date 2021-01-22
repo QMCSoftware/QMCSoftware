@@ -14,6 +14,7 @@ class TestWorkouts(unittest.TestCase):
         asian_option_single_level()
         keister()
         pi_problem()
+        pi_problem_bayes_net()
     
     def test_lds_sequences(self):
         python_sequences()

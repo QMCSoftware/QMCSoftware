@@ -43,9 +43,8 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
         t0 = time()
         for trial in range(trials):
             s.reset()
-            x = s.draw(n,dtype=torch.float64).numpy()
+            x = s.draw(int(n),dtype=torch.float64).numpy()
         row_i['S_PyTorch'] = (time() - t0) / trials
-        
         df.loc[i] = row_i
         print('\n'.join(['%s: %.4f'%(key,val) for key,val in row_i.items()])+'\n')
     return df

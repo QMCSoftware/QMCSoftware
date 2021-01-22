@@ -3,7 +3,6 @@ from setuptools import Extension
 from setuptools.command.install import install
 from setuptools import Command
 import os
-import subprocess
 
 
 class CustomInstall(install):
@@ -57,7 +56,7 @@ packages = [
 
 setuptools.setup(
     name="qmcpy",
-    version="0.7",
+    version="0.8a",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',
@@ -86,7 +85,9 @@ setuptools.setup(
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/korobov_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/sobol.c',
-                'qmcpy/discrete_distribution/c_lib/MRG63k3a.c'],
+                'qmcpy/discrete_distribution/c_lib/MRG63k3a.c',
+                'qmcpy/discrete_distribution/c_lib/fwht.c',
+            ],
             )],
     cmdclass={
         'clean': CleanCommand,

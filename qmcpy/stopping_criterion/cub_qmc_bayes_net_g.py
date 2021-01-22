@@ -1,9 +1,10 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
-from ..discrete_distribution import Lattice
+from ..discrete_distribution import Sobol
+from ..discrete_distribution import FWHT
 from ..true_measure import Gaussian
 from ..integrand import Keister
-from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
+from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
 from numpy import sqrt, log2, exp, log
 from math import factorial
 import numpy as np
@@ -14,48 +15,49 @@ from scipy.stats import t as tnorm
 import warnings
 
 
-class CubBayesLatticeG(StoppingCriterion):
+class CubBayesNetG(StoppingCriterion):
     """
-    Stopping criterion for Bayesian Cubature using rank-1 Lattice sequence with guaranteed
+    Stopping criterion for Bayesian Cubature using digital net (Sobol) sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
-    
-    >>> k = Keister(Gaussian(Lattice(2, order='linear', randomize=True, seed=123456789),covariance=1./2))
-    >>> sc = CubBayesLatticeG(k,abs_tol=.05)
+
+    >>> k = Keister(Gaussian(Sobol(2, seed=123456789, randomize='LMS', graycode=False),covariance=1./2))
+    >>> sc = CubBayesNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.80818168796735...
+    1.8110...
     >>> data
-    Solution: 1.8082...
+    Solution: 1.8110...
     Keister (Integrand Object)
-    Lattice (DiscreteDistribution Object)
+    Sobol (DiscreteDistribution Object)
         dimension       2^(1)
         randomize       1
-        order           linear
-        seed            123456789
+        graycode        0
+        seed            [77469 77107]
         mimics          StdUniform
+        dim0            0
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     pca
-    CubBayesLatticeG (StoppingCriterion Object)
+    CubBayesNetG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(8)
         n_max           2^(22)
     LDTransformBayesData (AccumulateData Object)
         n_total         256
-        solution        1.808
-        error_bound     7.36e-04
+        solution        1.811
+        error_bound     0.015
         time_integrate  ...
 
-    Adapted from 
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m
+    Adapted from
+        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m
 
     Reference
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
         Available from http://gailgithub.github.io/GAIL_Dev/
 
     Guarantee
@@ -64,7 +66,7 @@ class CubBayesLatticeG(StoppingCriterion):
         with guaranteed confidence level, e.g., 99% when alpha=0.5%. If the
         algorithm terminates without showing any warning messages and provides
         an answer Q, then the following inequality would be satisfied:
-     
+
                 Pr(| Q - I | <= tolfun) = 99%
 
         This Bayesian cubature algorithm guarantees for integrands that are considered
@@ -77,7 +79,7 @@ class CubBayesLatticeG(StoppingCriterion):
     parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01, ptransform='C1sin'):
+                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01):
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
@@ -96,14 +98,13 @@ class CubBayesLatticeG(StoppingCriterion):
         self.n_init = n_init  # number of samples to start with = 2^mmin
         self.n_max = n_max  # max number of samples allowed = 2^mmax
         self.alpha = alpha  # p-value, default 0.1%.
-        self.order = 2  # Bernoulli kernel's order. If zero, choose order automatically
+        self.order = 1  # Currently supports only order=1
 
         self.integrand = integrand
         self.dim = integrand.dimension  # dimension of the integrand
         self.useGradient = False  # If true uses gradient descent in parameter search
         self.oneTheta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
-        self.ptransform = ptransform  # periodization transform
         self.stop_at_tol = True  # automatic mode: stop after meeting the error tolerance
         self.arb_mean = True  # by default use zero mean algorithm
         self.stopCriterion = 'MLE'  # Available options {'MLE', 'GCV', 'full'}
@@ -111,12 +112,13 @@ class CubBayesLatticeG(StoppingCriterion):
         # private properties
         self.full_Bayes = False  # Full Bayes - assumes m and s^2 as hyperparameters
         self.GCV = False  # Generalized cross validation
-        self.kernType = 1  # Type-1: Bernoulli polynomial based algebraic convergence, Type-2: Truncated series
+        self.kernType = 1  # Type-1:
 
         self.avoid_cancel_error = True  # avoid cancellation error in stopping criterion
         self.uncert = 0  # quantile value for the error bound
         self.debug_enable = True  # enable debug prints
         self.data = None
+        self.fwht = FWHT()
 
         # Credible interval : two-sided confidence, i.e., 1-alpha percent quantile
         if self.full_Bayes:
@@ -129,18 +131,16 @@ class CubBayesLatticeG(StoppingCriterion):
         distribution = integrand.measure.distribution
         self.distribution = distribution
         allowed_levels = ['single']
-        allowed_distribs = ["Lattice"]
-        super(CubBayesLatticeG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        allowed_distribs = ["Sobol"]
+        super(CubBayesNetG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
 
         if distribution.randomize == False:
-            raise ParameterError("CubBayesLattice_g requires distribution to have randomize=True")
-        if distribution.order != 'linear':
-            raise ParameterError("CubBayesLattice_g requires distribution to have order='linear'")
+            raise ParameterError("CubBayesNet_g requires distribution to have randomize=True")
 
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self._fft, self._merge_fft)
+        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self._fwht_h, self._merge_fwht)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -168,23 +168,16 @@ class CubBayesLatticeG(StoppingCriterion):
 
         return muhat, self.data
 
-    @staticmethod
-    def _fft(y):
-        ytilde = np.fft.fft(y)
+    def _fwht_h(self, y):
+        ytilde = np.squeeze(y)
+        self.fwht.fwht_inplace(len(y), ytilde)
         return ytilde
+        # ytilde = np.array(self.fwht_h_py(y), dtype=float)
+        # return ytilde
 
     @staticmethod
-    def _merge_fft(ftilde_new, ftilde_next_new, mnext):
-        # using FFT butterfly plot technique merges two halves of fft
-        ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
-        nl = 2 ** mnext
-        ptind = np.ndarray(shape=(2 * nl, 1), buffer=np.array([True] * nl + [False] * nl), dtype=bool)
-        coef = np.exp(-2 * np.pi * 1j * np.ndarray(shape=(nl, 1), buffer=np.arange(0, nl), dtype=int) / (2 * nl))
-        coefv = np.tile(coef, (1, 1))
-        evenval = ftilde_new[ptind].reshape((nl, 1))
-        oddval = ftilde_new[~ptind].reshape((nl, 1))
-        ftilde_new[ptind] = np.squeeze(evenval + coefv * oddval)
-        ftilde_new[~ptind] = np.squeeze(evenval - coefv * oddval)
+    def _merge_fwht(ftilde_new, ftilde_next_new, mnext):
+        ftilde_new = np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
         return ftilde_new
 
     # decides if the user-defined error threshold is met
@@ -198,7 +191,6 @@ class CubBayesLatticeG(StoppingCriterion):
         # search for optimal shape parameter
         lna_MLE = fminbnd(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
                           x1=lna_range[0], x2=lna_range[1], xtol=1e-2, disp=0)
-
         aMLE = exp(lna_MLE)
         _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
 
@@ -210,7 +202,6 @@ class CubBayesLatticeG(StoppingCriterion):
                 DSC = abs(vec_lambda_ring[0] / n)
             else:
                 DSC = abs((vec_lambda[0] / n) - 1)
-
             # 1-alpha two sided confidence interval
             err_bd = self.uncert * sqrt(DSC * RKHS_norm / (n - 1))
         elif self.GCV:
@@ -219,7 +210,6 @@ class CubBayesLatticeG(StoppingCriterion):
                 DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
             else:
                 DSC = abs(1 - (n / vec_lambda[0]))
-
             temp = vec_lambda
             temp[0] = n + vec_lambda_ring[0]
             mC_inv_trace = sum(1. / temp(temp != 0))
@@ -321,52 +311,90 @@ class CubBayesLatticeG(StoppingCriterion):
         return [Km1, K]
 
     '''
-    Shift invariant kernel
+    Digitally shift invariant kernel
     C1 : first row of the covariance matrix
     Lambda : eigen values of the covariance matrix
-    Lambda_ring = fft(C1 - 1)
+    Lambda_ring = fwht(C1 - 1)
     '''
-
-    @staticmethod
-    def kernel(xun, order, a, avoid_cancel_error, kern_type, debug_enable):
-
-        if kern_type == 1:
-            b_order = order * 2  # Bernoulli polynomial order as per the equation
-            const_mult = -(-1) ** (b_order / 2) * ((2 * np.pi) ** b_order) / factorial(b_order)
-            if b_order == 2:
-                bern_poly = lambda x: (-x * (1 - x) + 1 / 6)
-            elif b_order == 4:
-                bern_poly = lambda x: (((x * (1 - x)) ** 2) - 1 / 30)
-            else:
-                print('Error: Bernoulli order not implemented !')
-
-            kernel_func = lambda x: bern_poly(x)
-        else:
-            b = order
-            kernel_func = lambda x: 2 * b * (np.cos(2 * np.pi * x) - b) / (1 + b ** 2 - 2 * b * np.cos(2 * np.pi * x))
-            const_mult = 1
+    def kernel(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
+        kernel_func = CubBayesNetG.BuildKernelFunc(order)
+        const_mult = 1
 
         if avoid_cancel_error:
             # Computes C1m1 = C1 - 1
             # C1_new = 1 + C1m1 indirectly computed in the process
-            (vec_C1m1, C1_alt) = CubBayesLatticeG.kernel_t(a * const_mult, kernel_func(xun))
+            (vec_C1m1, C1_alt) = CubBayesNetG.kernel_t(a * const_mult, kernel_func(xun))
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda_ring = np.real(CubBayesLatticeG._fft(vec_C1m1))
+            vec_lambda_ring = np.real(self._fwht_h(vec_C1m1.copy()))
 
             vec_lambda = vec_lambda_ring.copy()
             vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
-                vec_lambda_direct = np.real(CubBayesLatticeG._fft(C1_alt))  # Note: fft output unnormalized
+                vec_lambda_direct = np.real(np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
             # direct approach to compute first row of the kernel Gram matrix
             vec_C1 = np.prod(1 + a * const_mult * kernel_func(xun), 2)
-            # matlab's builtin fft is much faster and accurate
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda = np.real(CubBayesLatticeG._fft(vec_C1))
+            vec_lambda = np.real(self._fwht_h(vec_C1))
             vec_lambda_ring = 0
 
         return vec_lambda, vec_lambda_ring
+
+    # Builds High order walsh kernel function
+    @staticmethod
+    def BuildKernelFunc(order):
+        # a1 = @(x)(-floor(log2(x)))
+        def a1(x):
+            out = -np.floor(log2(x + np.finfo(float).eps))
+            out[x == 0] = 0  # a1 is zero when x is zero
+            return out
+
+        # t1 = @(x)(2.^(-a1(x)))
+        def t1(x):
+            out = 2**(-a1(x))
+            out[x == 0] = 0  # t1 is zero when x is zero
+            return out
+
+        # t2 = @(x)(2.^(-2*a1(x)))
+        def t2(x):
+            out = (2**(-2 * a1(x)))
+            out[x == 0] = 0  # t2 is zero when x is zero
+            return out
+
+        s1 = lambda x: (1 - 2 * x)
+        s2 =lambda x: (1 / 3 - 2 * (1 - x) * x)
+        ts2 = lambda x: ((1 - 5 * t1(x)) / 2 - (a1(x) - 2) * x)
+        ts3 = lambda x: ((1 - 43 * t2(x)) / 18 + (5 * t1(x) - 1) * x + (a1(x) - 2) * x**2)
+
+        if order == 1:
+            kernFunc = lambda x: (6 * ((1 / 6) - 2**(np.floor(log2(x + np.finfo(float).eps)) - 1)))
+        elif order == 2:
+            omega2_1D =lambda x: (s1(x) + ts2(x))
+            kernFunc = omega2_1D
+        elif order == 3:
+            omega3_1D = lambda x: (s1(x) + s2(x) + ts3(x))
+            kernFunc = omega3_1D
+        else:
+            NotYetImplemented('cubBayesNet_g: kernel order not yet supported')
+
+        return kernFunc
+
+    '''
+    @staticmethod
+    def fwht_h_py(ynext):
+        mnext = int(np.log2(len(ynext)))
+        for l in range(mnext):
+            nl = 2**l
+            nmminlm1 = 2.**(mnext-l-1)
+            ptind_nl = np.hstack(( np.tile(True,nl), np.tile(False,nl) ))
+            ptind = np.tile(ptind_nl,int(nmminlm1))
+            evenval = ynext[ptind]
+            oddval = ynext[~ptind]
+            ynext[ptind] = (evenval + oddval)
+            ynext[~ptind] = (evenval - oddval)
+        return ynext
+    '''

@@ -21,13 +21,13 @@ class CubQMCSobolG(StoppingCriterion):
     >>> solution
     1.80...
     >>> data
-    Solution: 1.8068         
+    Solution: 1.8074         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
         dimension       2^(1)
         randomize       1
         graycode        0
-        seed            [61615 58564]
+        seed            [61616 58565]
         mimics          StdUniform
         dim0            0
     Gaussian (TrueMeasure Object)
@@ -42,7 +42,7 @@ class CubQMCSobolG(StoppingCriterion):
     LDTransformData (AccumulateData Object)
         n_total         2^(10)
         solution        1.807
-        error_bound     0.007
+        error_bound     0.005
         time_integrate  ...
 
     Original Implementation:
@@ -122,7 +122,7 @@ class CubQMCSobolG(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, self.integrand, self._fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone)
+        self.data = LDTransformData(self, self.integrand, self._fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none')
         t_start = time()
         while True:
             self.data.update_data()

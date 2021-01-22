@@ -17,20 +17,20 @@ class Sobol(DiscreteDistribution):
         dimension       2^(1)
         randomize       1
         graycode        0
-        seed            [61615 58564]
+        seed            [61616 58565]
         mimics          StdUniform
         dim0            0
     >>> s.gen_samples(4)
-    array([[0.783, 0.173],
-           [0.128, 0.816],
-           [0.72 , 0.664],
-           [0.316, 0.334]])
+    array([[0.673, 0.063],
+           [0.398, 0.788],
+           [0.913, 0.564],
+           [0.125, 0.288]])
     >>> s.set_dimension(3)
     >>> s.gen_samples(n_min=4,n_max=8)
-    array([[0.882, 0.932, 0.573],
-           [0.035, 0.071, 0.379],
-           [0.569, 0.418, 0.036],
-           [0.474, 0.593, 0.982]])
+    array([[0.537, 0.917, 0.78 ],
+           [0.253, 0.2  , 0.27 ],
+           [0.799, 0.417, 0.068],
+           [0.02 , 0.7  , 0.578]])
     >>> Sobol(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
     array([[0.75, 0.25],
            [0.25, 0.75]])
@@ -86,8 +86,9 @@ class Sobol(DiscreteDistribution):
         """
         Args:
             dimension (int): dimension of samples
-            randomize (bool): If True, apply digital shift to generated samples.
-                Note: Non-randomized Sobol' sequence includes the origin.
+            randomize (bool): Apply randomization? True defaults to LMS. Can also explicitly pass in
+                'LMS': Linear matrix scramble with DS 
+                'DS': Just Digital Shift
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seeds (list): int seed of list of seeds, one for each dimension.
             z_path (str): path to generating matricies. 
@@ -101,23 +102,24 @@ class Sobol(DiscreteDistribution):
         self.get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
         self.get_unsigned_long_size_cf.argtypes = []
         self.get_unsigned_long_size_cf.restype = ctypes.c_uint8
-
         self.sobol_cf = c_lib.sobol
         self.sobol_cf.argtypes = [
             ctypes.c_ulong,  # n
             ctypes.c_uint32,  # d
             ctypes.c_ulong, # n0
             ctypes.c_uint32, # d0
-            ctypes.c_uint8,  # randomize
-            ctypes.c_uint8, # graycode
+            ctypes.c_uint32,  # randomize
+            ctypes.c_uint32, # graycode
             ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'), # seeds
             ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x (result)
             ctypes.c_uint32, # d_max
             ctypes.c_uint32, # m_max
             ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # z (generating matrix)
-            ctypes.c_uint8] # msb
+            ctypes.c_uint32, # msb
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # xjlms (result)
+            ctypes.c_uint32] # set_xjlms
         # set parameters
-        self.sobol_cf.restype = ctypes.c_uint8
+        self.sobol_cf.restype = ctypes.c_uint32
         self.set_dimension(dimension)
         self.set_seed(seed)
         self.set_randomize(randomize)
@@ -156,7 +158,7 @@ class Sobol(DiscreteDistribution):
         self.mimics = 'StdUniform'
         super(Sobol,self).__init__()        
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_jlms=False):
         """
         Generate samples
 
@@ -165,6 +167,8 @@ class Sobol(DiscreteDistribution):
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
+            return_jlms (bool): return the LMS matrix without digital shift. 
+                Only applies when randomize='LMS' (the default). 
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples
@@ -174,15 +178,21 @@ class Sobol(DiscreteDistribution):
             n_max = n
         if n_min == 0 and self.randomize==False and warn:
             warnings.warn("Non-randomized AGS Sobol sequence includes the origin",ParameterWarning)
+        if return_jlms and self.randomize!=1:
+            raise ParameterError("return_jlms=True only applies when randomize='LMS'.")
         if len(self.seed) != self.dimension:
             self.set_seed(self.seed)
         n = int(n_max-n_min)
         x = zeros((n,self.dimension), dtype=double)
+        xjlms = zeros((n,self.dimension), dtype=double)
         rc = self.sobol_cf(n, self.dimension, int(n_min), self.dim0, self.randomize, self.graycode, \
-            self.seed, x, self.d_max, self.m_max, self.z, self.msb)
+            self.seed, x, self.d_max, self.m_max, self.z, self.msb, xjlms, return_jlms)
         if rc!= 0:
             raise ParameterError(self.errors[rc])
-        return x
+        if self.randomize==1 and return_jlms:
+            return x,xjlms
+        else:
+            return x
     
     def set_seed(self, seeds):
         """
@@ -193,19 +203,19 @@ class Sobol(DiscreteDistribution):
         """
         if isinstance(seeds,int) or isinstance(seeds,uint32) or isinstance(seeds,uint64):
             random.seed(seeds)
-            self.seed = random.randint(0, 100000, size=self.dimension, dtype=uint64)
+            self.seed = random.randint(1, 100000, size=self.dimension, dtype=uint64)
         elif isinstance(seeds,list) or isinstance(seeds,ndarray):
             seeds = array(seeds)
             l = len(seeds)
             if l == self.dimension:
                 self.seed = seeds
             elif l < self.dimension:
-                self.seed = hstack((seeds,random.randint(0, 100000, size=self.dimension-l, dtype=uint64)))
+                self.seed = hstack((seeds,random.randint(1, 100000, size=self.dimension-l, dtype=uint64)))
             else: # l > self.dimension
                 self.seed = seeds[:self.dimension]
         elif seeds==None: # assume seed==None
             random.seed(None)
-            self.seed = random.randint(0, 100000, size=self.dimension, dtype=uint64)
+            self.seed = random.randint(1, 100000, size=self.dimension, dtype=uint64)
         else:
             msg = "Sobol' seed must be an int, list of ints, or None."
             raise ParameterError(msg)
@@ -262,3 +272,5 @@ class Sobol(DiscreteDistribution):
             dim0 (int): first dimension
         """
         self.dim0 = dim0
+
+DigitalNet = Sobol

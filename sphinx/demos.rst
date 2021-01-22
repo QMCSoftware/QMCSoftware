@@ -27,3 +27,5 @@ Demos
     demo_rst/qei-demo-for-blog.rst
 
     demo_rst/ray_tracing.rst
+
+    demo_rst/latnetbuilder.rst

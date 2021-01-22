@@ -87,7 +87,7 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
 terminado==0.8.3
 testpath==0.4.4
-torch==1.6.0
+torch==1.7.0
 tornado==6.0.4
 tqdm==4.46.1
 traitlets==4.3.3

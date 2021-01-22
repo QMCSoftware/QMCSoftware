@@ -1,1 +1,1 @@
-from .sobol import Sobol
+from .sobol import Sobol, DigitalNet

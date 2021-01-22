@@ -40,7 +40,7 @@ class MeanVarDataRep(AccumulateData):
             random.seed(seed)
         else:
             random.seed(seed[0])
-        self.seeds = random.randint(0, 100000, int(self.replications), dtype=uint64)
+        self.seeds = random.randint(1, 100000, int(self.replications), dtype=uint64)
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):

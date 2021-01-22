@@ -48,11 +48,18 @@ def keister(dimension=3, abs_tol=.1):
     print('%s%s'%(data,bar))
 
     # CubBayesLatticeG
-    distribution = Lattice(dimension=dimension, order='linear', randomize=False)
+    distribution = Lattice(dimension=dimension, order='linear', randomize=True)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution,data = CubBayesLatticeG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
+
+    # CubBayesNetG
+    distribution = Sobol(dimension=dimension, randomize='LMS', graycode=False)
+    measure = Gaussian(distribution, covariance=1. / 2)
+    integrand = Keister(measure)
+    solution, data = CubBayesNetG(integrand, abs_tol=abs_tol).integrate()
+    print('%s%s' % (data, bar))
 
 if __name__ == "__main__":
     keister(abs_tol=.005)

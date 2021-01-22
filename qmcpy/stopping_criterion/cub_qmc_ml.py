@@ -3,7 +3,7 @@ from ..accumulate_data import MLQMCData
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
-from ..util import MaxSamplesWarning, ParameterError
+from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
 from numpy import *
 from scipy.stats import norm
 from time import time
@@ -18,9 +18,9 @@ class CubQMCML(StoppingCriterion):
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.446333077585034
+    10.442361016810949
     >>> data
-    Solution: 10.4463        
+    Solution: 10.4424        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -32,7 +32,7 @@ class CubQMCML(StoppingCriterion):
         dimension       2^(6)
         randomize       1
         order           natural
-        seed            854306
+        seed            985802
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
@@ -47,11 +47,12 @@ class CubQMCML(StoppingCriterion):
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
         n_level         [4096.  512.  256.  256.  256.  256.  256.]
-        mean_level      [1.006e+01 1.852e-01 1.040e-01 5.332e-02 2.751e-02 1.399e-02 6.994e-03]
-        var_level       [6.143e-05 3.535e-05 2.896e-05 1.767e-05 2.898e-06 9.919e-07 3.260e-07]
+        mean_level      [1.005e+01 1.807e-01 1.033e-01 5.482e-02 2.823e-02 1.397e-02 7.290e-03]
+        var_level       [8.376e-05 2.660e-05 1.911e-05 1.594e-05 3.660e-06 1.478e-06 3.424e-07]
         bias_estimate   0.007
         n_total         188416
         time_integrate  ...
+    
     
     References:
         
@@ -62,7 +63,7 @@ class CubQMCML(StoppingCriterion):
 
     parameters = ['rmse_tol','n_init','n_max','replications']
 
-    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, replications=32.):
+    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, replications=32., levels_max=10, bias_estimator='giles', cost_method='sde'):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
@@ -74,6 +75,9 @@ class CubQMCML(StoppingCriterion):
                 in favor of the rmse tolerance
             n_max (int): maximum number of samples
             replications (int): number of replications on each level
+            levels_max (int): maximum level of refinement >= Lmin
+            bias_estimator (str): bias estimation method (can be 'giles' [default] or 'as_mlmc')
+            cost_method (str): cost estimation method (can be 'sde' [default] or 'general')
         """
         # initialization
         if rmse_tol:
@@ -84,6 +88,8 @@ class CubQMCML(StoppingCriterion):
         self.n_max = float(n_max)
         self.replications = float(replications)
         self.integrand = integrand
+        self.bias_estimator = bias_estimator
+        self.cost_method = cost_method
         # Verify Compliant Construction
         distribution = integrand.measure.distribution
         allowed_levels = ['adaptive-multi']
@@ -93,16 +99,18 @@ class CubQMCML(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration Data
-        self.data = MLQMCData(self, self.integrand, self.n_init, self.replications)
+        self.data = MLQMCData(self, self.integrand, self.n_init, self.replications, self.bias_estimator, self.cost_method)
         t_start = time()
         while True:
             self.data.update_data()
             self.data.eval_level[:] = False
             if self.data.var_level.sum() > (self.rmse_tol**2/2.):
                 # double N_l on level with largest V_l/(2^l*N_l)
-                efficient_level = argmax(self.data.cost_level)
+                efficient_level = argmax(self.data.var_cost_ratio_level)
                 self.data.eval_level[efficient_level] = True
             elif self.data.bias_estimate > (self.rmse_tol/sqrt(2.)):
+                if self.data.levels == self.levels_max + 1:
+                        warnings.warn("Failed to achieve weak convergence. levels == levels_max.", MaxLevelsWarning)
                 # add another level
                 self.data._add_level()
             else:

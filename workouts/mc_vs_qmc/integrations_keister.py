@@ -59,7 +59,7 @@ def cubqmcsobolg(dimension, abs_tol, rel_tol):
     return data
 
 def cubbayeslatticeg(dimension, abs_tol, rel_tol):
-    distribution = Lattice(dimension, order='linear', randomize=False)
+    distribution = Lattice(dimension, order='linear', randomize=True)
     measure = Gaussian(distribution, covariance=1./2)
     integrand = Keister(measure)
     solution, data = CubBayesLatticeG(integrand, abs_tol, rel_tol).integrate()

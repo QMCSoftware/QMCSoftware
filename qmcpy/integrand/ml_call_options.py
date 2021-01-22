@@ -29,7 +29,7 @@ class MLCallOptions(Integrand):
     ...     sums,cost = mlco.f(x,l=level)
     ...     y += sums[0]/2**10
     >>> y
-    10.39...
+    10.40...
 
     References:
 
@@ -60,8 +60,8 @@ class MLCallOptions(Integrand):
             raise ParameterError('option type must be one of\n\t%s'%str(options))
         self.measure = measure
         self.distribution = self.measure.distribution
-        if self.distribution.low_discrepancy and self.option=='asian':
-            raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
+        #if self.distribution.low_discrepancy and self.option=='asian':
+        #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
         self.sigma = volatility
         self.k = start_strike_price
         self.r = interest_rate

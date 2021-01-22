@@ -52,7 +52,7 @@ def cubqmclatticeg(dimension, abs_tol, drift):
     return data
 
 def cubbayeslatticeg(dimension, abs_tol, drift):
-    distribution = Lattice(dimension, seed=7, order='linear', randomize=False)
+    distribution = Lattice(dimension, seed=7, order='linear', randomize=True)
     measure = BrownianMotion(distribution, drift=drift)
     integrand = AsianOption(measure)
     solution,data = CubBayesLatticeG(integrand, abs_tol,).integrate()
