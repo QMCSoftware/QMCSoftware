@@ -3,7 +3,7 @@ from ..accumulate_data import MLQMCData
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
-from ..util import MaxSamplesWarning, ParameterError
+from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
 from numpy import *
 from scipy.stats import norm
 from time import time
