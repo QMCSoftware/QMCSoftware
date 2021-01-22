@@ -63,7 +63,7 @@ class CubQMCML(StoppingCriterion):
 
     parameters = ['rmse_tol','n_init','n_max','replications']
 
-    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, replications=32., bias_estimator='giles', cost_method='sde'):
+    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, replications=32., levels_max=10, bias_estimator='giles', cost_method='sde'):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
@@ -75,6 +75,7 @@ class CubQMCML(StoppingCriterion):
                 in favor of the rmse tolerance
             n_max (int): maximum number of samples
             replications (int): number of replications on each level
+            levels_max (int): maximum level of refinement >= Lmin
             bias_estimator (str): bias estimation method (can be 'giles' [default] or 'as_mlmc')
             cost_method (str): cost estimation method (can be 'sde' [default] or 'general')
         """
@@ -108,6 +109,8 @@ class CubQMCML(StoppingCriterion):
                 efficient_level = argmax(self.data.var_cost_ratio_level)
                 self.data.eval_level[efficient_level] = True
             elif self.data.bias_estimate > (self.rmse_tol/sqrt(2.)):
+                if self.data.levels == self.levels_max + 1:
+                        warnings.warn("Failed to achieve weak convergence. levels == levels_max.", MaxLevelsWarning)
                 # add another level
                 self.data._add_level()
             else:
