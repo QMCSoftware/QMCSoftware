@@ -10,9 +10,7 @@ class MLCallOptions(Integrand):
     """
     Various call options from finance using Milstein discretization with $2^l$ timesteps on level $l$.
 
-    >>> dd = Sobol(seed=7)
-    >>> m = Gaussian(dd)
-    >>> mlco = MLCallOptions(m)
+    >>> mlco = MLCallOptions(Sobol(seed=7))
     >>> mlco
     MLCallOptions (Integrand Object)
         option          european
@@ -24,12 +22,11 @@ class MLCallOptions(Integrand):
     >>> y = 0
     >>> for level in range(4):
     ...     new_dim = mlco._dim_at_level(level)
-    ...     m.set_dimension(new_dim)
-    ...     x = dd.gen_samples(2**10)
-    ...     sums,cost = mlco.f(x,l=level)
-    ...     y += sums[0]/2**10
+    ...     mlco.true_measure._set_dimension_r(new_dim)
+    ...     x = mlco.discrete_distrib.gen_samples(2**10)
+    ...     y += mlco.f(x,l=level).mean()
     >>> y
-    10.40...
+    10.406...
 
     References:
 
@@ -38,13 +35,13 @@ class MLCallOptions(Integrand):
     http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
     """
 
-    parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
-
-    def __init__(self, measure, option='european', volatility=.2,
+    def __init__(self, sampler, option='european', volatility=.2,
         start_strike_price=100., interest_rate=.05, t_final=1.):
         """
         Args:
-            measure (TrueMeasure): A BrownianMotion TrueMeasure object
+            sampler (DiscreteDistribution/TrueMeasure): A 
+                discrete distribution from which to transform samples or a
+                true measure by which to compose a transform
             option_type (str): type of option in ["European","Asian"]
             volatility (float): sigma, the volatility of the asset
             start_strike_price (float): S(0), the asset value at t=0, and K, the strike price. \
@@ -52,8 +49,8 @@ class MLCallOptions(Integrand):
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
         """
-        if not (isinstance(measure,Gaussian) and (measure.mu==0).all() and (measure.sigma==eye(measure.d)).all()):
-            raise ParameterError('AsianOption measure must be a Gaussian instance with mean 0 and variance 1')
+        self.parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
+        self.true_measure = Gaussian(sampler, mean=0, covariance=1)
         options = ['european','asian']
         self.option = option.lower()
         if self.option not in options:
@@ -62,6 +59,7 @@ class MLCallOptions(Integrand):
         self.distribution = self.measure.distribution
         #if self.distribution.low_discrepancy and self.option=='asian':
         #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
+
         self.sigma = volatility
         self.k = start_strike_price
         self.r = interest_rate
@@ -70,6 +68,8 @@ class MLCallOptions(Integrand):
         self.leveltype = 'adaptive-multi'
         self.g_submodule = getattr(self,'_g_'+self.option)
         super(MLCallOptions,self).__init__()
+        if self.discrete_distrib.low_discrepancy and self.option=='asian':
+            raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
 
     def get_exact_value(self):
         """ Print exact analytic value, based on s0=k. """
@@ -213,7 +213,9 @@ class MLCallOptions(Integrand):
         sums[4] = pf.sum()
         sums[5] = (pf**2).sum()
         cost = n*nf # cost defined as number of fine timesteps
-        return sums,cost
+        self.cost = cost
+        self.sums = sums
+        return dp
 
     def _dim_at_level(self, l):
         """ See abstract method. """

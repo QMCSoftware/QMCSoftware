@@ -1,11 +1,12 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Sobol
-from ..discrete_distribution import FWHT
 from ..true_measure import Gaussian
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
-from numpy import sqrt, log2, exp, log
+from ..discrete_distribution.c_lib import c_lib
+import ctypes
+from numpy import sqrt, log2, exp, log, ctypeslib
 from math import factorial
 import numpy as np
 from time import time
@@ -21,16 +22,16 @@ class CubBayesNetG(StoppingCriterion):
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
 
-    >>> k = Keister(Gaussian(Sobol(2, seed=123456789, randomize='LMS', graycode=False),covariance=1./2))
+    >>> k = Keister(Sobol(2, seed=123456789))
     >>> sc = CubBayesNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.8110...
+    1.811...
     >>> data
-    Solution: 1.8110...
+    Solution: 1.8110         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         randomize       1
         graycode        0
         seed            [77469 77107]
@@ -50,7 +51,7 @@ class CubBayesNetG(StoppingCriterion):
         solution        1.811
         error_bound     0.015
         time_integrate  ...
-
+        
     Adapted from
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m
 
@@ -76,10 +77,12 @@ class CubBayesNetG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
-    parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
+    
+    
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, alpha=0.01):
+        self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
@@ -100,8 +103,6 @@ class CubBayesNetG(StoppingCriterion):
         self.alpha = alpha  # p-value, default 0.1%.
         self.order = 1  # Currently supports only order=1
 
-        self.integrand = integrand
-        self.dim = integrand.dimension  # dimension of the integrand
         self.useGradient = False  # If true uses gradient descent in parameter search
         self.oneTheta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
@@ -127,20 +128,24 @@ class CubBayesNetG(StoppingCriterion):
         else:
             self.uncert = -gaussnorm.ppf(self.alpha / 2)
 
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
+
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
-        self.distribution = distribution
         allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
-        super(CubBayesNetG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs)
 
-        if distribution.randomize == False:
-            raise ParameterError("CubBayesNet_g requires distribution to have randomize=True")
+        if self.discrete_distrib.randomize == False:
+            raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
 
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self._fwht_h, self._merge_fwht)
+        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib, 
+            self.m_min, self.m_max, self._fwht_h, self._merge_fwht)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -398,3 +403,27 @@ class CubBayesNetG(StoppingCriterion):
             ynext[~ptind] = (evenval - oddval)
         return ynext
     '''
+
+
+class FWHT():
+    def __init__(self):
+        self.fwht_copy_cf = c_lib.fwht_copy
+        self.fwht_copy_cf.argtypes = [
+            ctypes.c_uint32,
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')
+        ]
+        self.fwht_copy_cf.restype = None
+
+        self.fwht_inplace_cf = c_lib.fwht_inplace
+        self.fwht_inplace_cf.argtypes = [
+            ctypes.c_uint32,
+            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
+        ]
+        self.fwht_inplace_cf.restype = None
+
+    def fwht_copy(self, n, src, dst):
+        self.fwht_copy_cf(n, src, dst)
+
+    def fwht_inplace(self, n, src):
+        self.fwht_inplace_cf(n, src)

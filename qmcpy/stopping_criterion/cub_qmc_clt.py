@@ -15,16 +15,16 @@ class CubQMCCLT(StoppingCriterion):
     """
     Stopping criterion based on Central Limit Theorem for multiple replications.
     
-    >>> k = Keister(Gaussian(Lattice(seed=7),covariance=1./2))
+    >>> k = Keister(Lattice(seed=7))
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.3806833366218165
+    1.380...
     >>> data
     Solution: 1.3807         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       1
+        d               1
         randomize       1
         order           natural
         seed            1093
@@ -50,8 +50,6 @@ class CubQMCCLT(StoppingCriterion):
         time_integrate  ...
     """
 
-    parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
-
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
                  inflate=1.2, alpha=0.01, replications=16.):
         """
@@ -64,6 +62,7 @@ class CubQMCCLT(StoppingCriterion):
             n_max (int): maximum number of samples
             replications (int): number of replications
         """
+        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Input Checks
         if log2(n_init) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'
@@ -78,19 +77,21 @@ class CubQMCCLT(StoppingCriterion):
         self.z_star = -norm.ppf(self.alpha / 2)
         self.inflate = float(inflate)
         self.replications = replications
+        # QMCPy Objs
         self.integrand = integrand
-        # DiscreteDistribution checks
-        distribution = integrand.measure.distribution
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
+        # Verify Compliant Construction
         allowed_levels = ["single"]
         allowed_distribs = ["Lattice", "Sobol","Halton"]
-        super(CubQMCCLT,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        if not distribution.randomize:
+        super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs)
+        if not self.discrete_distrib.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
          
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarDataRep(self, self.integrand, self.n_init, self.replications)
+        self.data = MeanVarDataRep(self, self.integrand, self.true_measure, self.discrete_distrib, self.n_init, self.replications)
         t_start = time()
         while True:
             self.data.update_data()

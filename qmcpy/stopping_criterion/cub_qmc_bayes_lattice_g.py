@@ -20,16 +20,16 @@ class CubBayesLatticeG(StoppingCriterion):
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
     
-    >>> k = Keister(Gaussian(Lattice(2, order='linear', randomize=True, seed=123456789),covariance=1./2))
+    >>> k = Keister(Lattice(2, order='linear', seed=123456789))
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.80818168796735...
+    1.808...
     >>> data
-    Solution: 1.8082...
+    Solution: 1.8082         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         randomize       1
         order           linear
         seed            123456789
@@ -48,7 +48,7 @@ class CubBayesLatticeG(StoppingCriterion):
         solution        1.808
         error_bound     7.36e-04
         time_integrate  ...
-
+    
     Adapted from 
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m
 
@@ -74,10 +74,10 @@ class CubBayesLatticeG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
-    parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, alpha=0.01, ptransform='C1sin'):
+        self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
         # Set Attributes
         self.abs_tol = abs_tol
         self.rel_tol = rel_tol
@@ -98,8 +98,6 @@ class CubBayesLatticeG(StoppingCriterion):
         self.alpha = alpha  # p-value, default 0.1%.
         self.order = 2  # Bernoulli kernel's order. If zero, choose order automatically
 
-        self.integrand = integrand
-        self.dim = integrand.dimension  # dimension of the integrand
         self.useGradient = False  # If true uses gradient descent in parameter search
         self.oneTheta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
@@ -125,22 +123,26 @@ class CubBayesLatticeG(StoppingCriterion):
         else:
             self.uncert = -gaussnorm.ppf(self.alpha / 2)
 
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
+        
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
-        self.distribution = distribution
         allowed_levels = ['single']
         allowed_distribs = ["Lattice"]
-        super(CubBayesLatticeG, self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubBayesLatticeG, self).__init__(allowed_levels, allowed_distribs)
 
-        if distribution.randomize == False:
-            raise ParameterError("CubBayesLattice_g requires distribution to have randomize=True")
-        if distribution.order != 'linear':
-            raise ParameterError("CubBayesLattice_g requires distribution to have order='linear'")
+        if self.discrete_distrib.randomize == False:
+            raise ParameterError("CubBayesLattice_g requires discrete_distrib to have randomize=True")
+        if self.discrete_distrib.order != 'linear':
+            raise ParameterError("CubBayesLattice_g requires discrete_distrib to have order='linear'")
 
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.m_min, self.m_max, self._fft, self._merge_fft)
+        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self.m_min, self.m_max, self._fft, self._merge_fft)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet

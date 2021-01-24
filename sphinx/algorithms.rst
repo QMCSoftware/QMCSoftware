@@ -1,13 +1,17 @@
 QMCPy Documentation
 ===================
 
-
+.. image:: uml/qmcpy_uml1.png
+.. image:: uml/qmcpy_uml2.png
+.. image:: uml/qmcpy_uml3.png
 
 Discrete Distribution Class
 ---------------------------
 
 Abstract Discrete Distribution Class
 ....................................
+
+.. image:: uml/discrete_distribution_uml.png
 
 .. automodule:: qmcpy.discrete_distribution._discrete_distribution
     :members:
@@ -42,34 +46,12 @@ IID Standard Uniform
 .. automodule:: qmcpy.discrete_distribution.iid_std_uniform
     :members:
 
-IID Standard Gaussian
-.....................
-
-.. automodule:: qmcpy.discrete_distribution.iid_std_gaussian
-    :members:
-
-Custom IID Distribution
-.......................
-
-.. automodule:: qmcpy.discrete_distribution.custom_iid_distribution
-    :members:
-
-Inverse CDF Sampling
-....................
-
-.. automodule:: qmcpy.discrete_distribution.inverse_cdf_sampling
-    :members:
-
-Acceptance Rejection Sampling
-.............................
-
-.. automodule:: qmcpy.discrete_distribution.acceptance_rejection_sampling
-    :members:
-    
 
 
 True Measure Class
 ------------------
+
+.. image:: uml/true_measure_uml.png
 
 Abstract Measure Class
 ......................
@@ -101,23 +83,17 @@ Lebesgue
 .. automodule:: qmcpy.true_measure.lebesgue
     :members:
 
-Importance Sampling
-...................
+Kumaraswamy
+...........
 
-.. automodule:: qmcpy.true_measure.importance_sampling
+.. automodule:: qmcpy.true_measure.kumaraswamy
     :members:
 
-Identical to what Discrete Distribution Mimics
-..............................................
-
-.. automodule:: qmcpy.true_measure.identical_to_discrete
-    :members:
-    
-
-    
 
 Integrand Class
 ---------------
+
+.. image:: uml/integrand_uml.png
 
 Abstract Integrand Class
 ........................
@@ -158,13 +134,15 @@ Multilevel Call Options with Milstein Discretization
 Linear Function
 ...............
 
-.. automodule:: qmcpy.integrand.linear
+.. automodule:: qmcpy.integrand.linear0
     :members:
 
 
 
 Stopping Criterion Algorithms
 -----------------------------
+
+.. image:: uml/stopping_criterion_uml.png
 
 Abstract Stopping Criterion Class
 .................................
@@ -178,10 +156,22 @@ Guaranteed Lattice Cubature (qMC)
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_lattice_g
     :members:
 
-Guaranteed Sobol Cubature (qMC)
+Guaranteed Sobol' Cubature (qMC)
 ................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_sobol_g
+    :members:
+
+Bayesian Lattice Cubature (qMC)
+................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_bayes_lattice_g
+    :members:
+
+Bayesian Digital Net Cubature (qMC)
+...................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_bayes_net_g
     :members:
 
 Multilevel qMC Cubature
@@ -219,6 +209,8 @@ CLT MC Cubature
 Accumulate Data Class
 ---------------------
 
+.. image:: uml/accumulate_data_uml.png
+
 Abstract Accumulate Data Class
 ...............................
 
@@ -253,4 +245,15 @@ Mean Variance MC Data
 .......................
 
 .. automodule:: qmcpy.accumulate_data.mean_var_data
+    :members:
+
+
+
+Utilities
+---------
+
+.. image:: uml/util_err.png
+.. image:: uml/util_warn.png
+
+.. automodule:: qmcpy.util.latnetbuilder_linker
     :members:

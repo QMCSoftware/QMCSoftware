@@ -1,6 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
-from ..discrete_distribution import IIDStdGaussian
+from ..discrete_distribution import IIDStdUniform
 from ..true_measure import Gaussian, BrownianMotion
 from ..integrand import Keister, AsianOption
 from ..util import MaxSamplesWarning
@@ -14,18 +14,18 @@ class CubMCCLT(StoppingCriterion):
     """
     Stopping criterion based on the Central Limit Theorem.
     
-    >>> k = Keister(Gaussian(IIDStdGaussian(2,seed=7),covariance=1./2))
+    >>> k = Keister(IIDStdUniform(2,seed=7))
     >>> sc = CubMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.834674149189029
+    1.801...
     >>> data
-    Solution: 1.8347         
+    Solution: 1.8010         
     Keister (Integrand Object)
-    IIDStdGaussian (DiscreteDistribution Object)
-        dimension       2^(1)
+    IIDStdUniform (DiscreteDistribution Object)
+        d               2^(1)
         seed            7
-        mimics          StdGaussian
+        mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -39,21 +39,18 @@ class CubMCCLT(StoppingCriterion):
         n_max           10000000000
     MeanVarData (AccumulateData Object)
         levels          1
-        solution        1.835
-        n               5826
-        n_total         6850
-        error_bound     0.050
-        confid_int      [1.785 1.885]
+        solution        1.801
+        n               5741
+        n_total         6765
+        error_bound     0.051
+        confid_int      [1.75  1.852]
         time_integrate  ...
-    >>> ac = AsianOption(
-    ...     measure = BrownianMotion(IIDStdGaussian()),
+    >>> ac = AsianOption(IIDStdUniform(),
     ...     multi_level_dimensions = [2,4,8])
     >>> sc = CubMCCLT(ac,abs_tol=.05)
     >>> solution,data = sc.integrate()
     """
 
-    parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
-    
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
                  inflate=1.2, alpha=0.01):
         """
@@ -65,6 +62,7 @@ class CubMCCLT(StoppingCriterion):
             rel_tol (float): relative error tolerance
             n_max (int): maximum number of samples
         """
+        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -72,17 +70,19 @@ class CubMCCLT(StoppingCriterion):
         self.n_max = float(n_max)
         self.alpha = float(alpha)
         self.inflate = float(inflate)
+        # QMCPy Objs
         self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['single','fixed-multi']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMCCLT,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
+        super(CubMCCLT,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, self.integrand, self.n_init)
+        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, self.n_init)
         t_start = time()
         # Pilot Sample
         self.data.update_data()

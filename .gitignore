@@ -30,6 +30,7 @@ sphinx/_build/
 sphinx/_static/
 sphinx/demo_rst/
 sphinx/readme_rst/
+sphinx/uml/
 node_modules/*
 
 # Jupyter Notebooks
@@ -39,7 +40,10 @@ node_modules/*
 /build/
 dist/
 
+# blogs
+blogs/why_q_in_mc/*.png
+
 # alegresor
 *.vscode
-_ags.md 
+_ags* 
 _ags/*

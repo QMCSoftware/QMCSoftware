@@ -10,24 +10,20 @@ class Lattice(DiscreteDistribution):
     Quasi-Random Lattice nets in base 2.
 
     >>> l = Lattice(2,seed=7)
-    >>> l
-    Lattice (DiscreteDistribution Object)
-        dimension       2^(1)
-        randomize       1
-        order           natural
-        seed            7
-        mimics          StdUniform
     >>> l.gen_samples(4)
     array([[0.076, 0.78 ],
            [0.576, 0.28 ],
            [0.326, 0.53 ],
            [0.826, 0.03 ]])
-    >>> l.set_dimension(3)
-    >>> l.gen_samples(n_min=4,n_max=8)
-    array([[0.563, 0.098, 0.353],
-           [0.063, 0.598, 0.853],
-           [0.813, 0.848, 0.103],
-           [0.313, 0.348, 0.603]])
+    >>> l.gen_samples(1)
+    array([[0.076, 0.78 ]])
+    >>> l
+    Lattice (DiscreteDistribution Object)
+        d               2^(1)
+        randomize       1
+        order           natural
+        seed            7
+        mimics          StdUniform
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
@@ -71,8 +67,6 @@ class Lattice(DiscreteDistribution):
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
-    parameters = ['dimension','randomize','order','seed','mimics']
-
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None, z_path=None):
         """
         Args:
@@ -85,6 +79,7 @@ class Lattice(DiscreteDistribution):
                 z_path should be formatted like 'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy' 
                 and d_max is the maximum dimenion and 2^m_max is the max number samples supported
         """
+        self.parameters = ['d','randomize','order','seed','mimics']
         # set generating matrix
         self.randomize = randomize
         self.order = order.lower()
@@ -97,8 +92,8 @@ class Lattice(DiscreteDistribution):
         else: 
             raise Exception("Lattice requires natural, linear, or mps ordering.")
         if not z_path:
-            self.d_max = 3600
-            self.m_max = 20
+            self.d_max = 750
+            self.m_max = 24
             self.msb = True
             self.z_full = load(dirname(abspath(__file__))+'/generating_vectors/lattice_vec.3600.20.npy').astype(uint64)
         else:
@@ -109,7 +104,7 @@ class Lattice(DiscreteDistribution):
             f_lst = f.split('.')
             self.d_max = int(f_lst[-3])
             self.m_max = int(f_lst[-2])
-        self.set_dimension(dimension)
+        self._set_dimension(dimension)
         self.set_seed(seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
@@ -207,16 +202,20 @@ class Lattice(DiscreteDistribution):
         else:
             return xr
 
+    def pdf(self, x):
+        """ pdf of a standard uniform """
+        return ones(x.shape[0], dtype=float)
+    
     def set_seed(self, seed):
         """ See abstract method. """
         self.seed = seed if seed else random.randint(1, 100000, dtype=uint64)
         random.seed(self.seed)
-        self.shift = random.rand(int(self.dimension))
+        self.shift = random.rand(int(self.d))
         
-    def set_dimension(self, dimension):
+    def _set_dimension(self, dimension):
         """ See abstract method. """
-        self.dimension = dimension
-        if self.dimension > self.d_max:
-            raise ParameterError('Lattice requires dimension <= %d'%self.d_max)
-        self.z = self.z_full[:self.dimension]
-        self.shift = random.rand(int(self.dimension))
+        self.d = dimension
+        if self.d > self.d_max:
+            raise ParameterError('Lattice requires dimension <= %d.'%self.d_max)
+        self.z = self.z_full[:self.d]
+        self.shift = random.rand(int(self.d))

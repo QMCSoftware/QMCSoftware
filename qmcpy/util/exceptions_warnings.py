@@ -1,5 +1,11 @@
 """ Exceptions and Warnings thrown by qmcpy """
+import warnings 
 
+def custom_formatwarning(msg, *args, **kwargs):
+    # ignore everything except the message
+    return '%s:%d\n\t%s: %s\n'%(args[1],args[2],args[0].__name__,str(msg))
+
+warnings.formatwarning = custom_formatwarning
 
 class DimensionError(Exception):
     """

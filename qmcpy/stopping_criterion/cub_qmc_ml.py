@@ -14,11 +14,11 @@ class CubQMCML(StoppingCriterion):
     """
     Stopping criterion based on multi-level quasi-Monte Carlo.
 
-    >>> mlco = MLCallOptions(Gaussian(Lattice(seed=7)))
+    >>> mlco = MLCallOptions(Lattice(seed=7))
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.442361016810949
+    10.442...
     >>> data
     Solution: 10.4424        
     MLCallOptions (Integrand Object)
@@ -29,7 +29,7 @@ class CubQMCML(StoppingCriterion):
         t               1
         b               85
     Lattice (DiscreteDistribution Object)
-        dimension       2^(6)
+        d               2^(6)
         randomize       1
         order           natural
         seed            985802
@@ -61,8 +61,6 @@ class CubQMCML(StoppingCriterion):
         de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
     """
 
-    parameters = ['rmse_tol','n_init','n_max','replications']
-
     def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, replications=32., levels_max=10, bias_estimator='giles', cost_method='sde'):
         """
         Args:
@@ -79,6 +77,7 @@ class CubQMCML(StoppingCriterion):
             bias_estimator (str): bias estimation method (can be 'giles' [default] or 'as_mlmc')
             cost_method (str): cost estimation method (can be 'sde' [default] or 'general')
         """
+        self.parameters = ['rmse_tol','n_init','n_max','replications']
         # initialization
         if rmse_tol:
             self.rmse_tol = float(rmse_tol)
@@ -87,14 +86,16 @@ class CubQMCML(StoppingCriterion):
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.replications = float(replications)
+        # QMCPy Objs
         self.integrand = integrand
         self.bias_estimator = bias_estimator
         self.cost_method = cost_method
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["Lattice", "Sobol","Halton"]
-        super(CubQMCML,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubQMCML,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """

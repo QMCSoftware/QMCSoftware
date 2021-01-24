@@ -12,52 +12,45 @@ def keister(dimension=3, abs_tol=.1):
     print(bar)
 
     # CubMCCLT
-    distribution = IIDStdUniform(dimension, seed=7)
-    measure = Gaussian(distribution, covariance=1./2)
-    integrand = Keister(measure)
+    discrete_distrib = IIDStdUniform(dimension, seed=7)
+    integrand = Keister(discrete_distrib)
     stopping_criterion = CubMCCLT(integrand,abs_tol=abs_tol)
     solution,data = stopping_criterion.integrate()
     print('%s%s'%(data,bar))
 
     # CubQMCCLT
-    distribution = Lattice(dimension, randomize=True, seed=7)
-    measure = Gaussian(distribution, covariance=1./2)
-    integrand = Keister(measure)
+    discrete_distrib = Lattice(dimension, randomize=True, seed=7)
+    integrand = Keister(discrete_distrib)
     solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubMCG
-    distribution = IIDStdGaussian(dimension, seed=7)
-    measure = Gaussian(distribution, covariance=1./2)
-    integrand = Keister(measure)
+    discrete_distrib = IIDStdUniform(dimension, seed=7)
+    integrand = Keister(discrete_distrib)
     solution,data = CubMCG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubQMCLatticeG
-    distribution = Lattice(dimension=dimension, randomize=True, seed=7)
-    measure = Gaussian(distribution, covariance=1./2)
-    integrand = Keister(measure)
+    discrete_distrib = Lattice(dimension=dimension, randomize=True, seed=7)
+    integrand = Keister(discrete_distrib)
     solution,data = CubQMCLatticeG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubQMCSobolG
-    distribution = Sobol(dimension=dimension, randomize=True, seed=7)
-    measure = Gaussian(distribution, covariance=1./2)
-    integrand = Keister(measure)
+    discrete_distrib = Sobol(dimension=dimension, randomize=True, seed=7)
+    integrand = Keister(discrete_distrib)
     solution,data = CubQMCSobolG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubBayesLatticeG
-    distribution = Lattice(dimension=dimension, order='linear', randomize=True)
-    measure = Gaussian(distribution, covariance=1./2)
-    integrand = Keister(measure)
+    discrete_distrib = Lattice(dimension=dimension, order='linear', randomize=True)
+    integrand = Keister(discrete_distrib)
     solution,data = CubBayesLatticeG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubBayesNetG
-    distribution = Sobol(dimension=dimension, randomize='LMS', graycode=False)
-    measure = Gaussian(distribution, covariance=1. / 2)
-    integrand = Keister(measure)
+    discrete_distrib = Sobol(dimension=dimension, randomize='LMS', graycode=False)
+    integrand = Keister(discrete_distrib)
     solution, data = CubBayesNetG(integrand, abs_tol=abs_tol).integrate()
     print('%s%s' % (data, bar))
 

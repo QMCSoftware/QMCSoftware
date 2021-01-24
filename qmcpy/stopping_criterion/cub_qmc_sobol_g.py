@@ -15,16 +15,16 @@ class CubQMCSobolG(StoppingCriterion):
     d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
 
-    >>> k = Keister(Gaussian(Sobol(2,seed=7),covariance=1./2))
+    >>> k = Keister(Sobol(2,seed=7))
     >>> sc = CubQMCSobolG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.80...
+    1.807...
     >>> data
     Solution: 1.8074         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         randomize       1
         graycode        0
         seed            [61616 58565]
@@ -74,9 +74,6 @@ class CubQMCSobolG(StoppingCriterion):
         refer to the references below.
     """
 
-    parameters = ['abs_tol','rel_tol','n_init','n_max']
-
-
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
                  fudge=lambda m: 5.*2.**(-m), check_cone=False):
         """
@@ -91,6 +88,7 @@ class CubQMCSobolG(StoppingCriterion):
                               in the cone of functions
             check_cone (boolean): check if the function falls in the cone
         """
+        self.parameters = ['abs_tol','rel_tol','n_init','n_max']
         # Input Checks
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -106,23 +104,26 @@ class CubQMCSobolG(StoppingCriterion):
             m_max = 35.
         self.n_init = 2.**m_min
         self.n_max = 2.**m_max
-        self.integrand = integrand
         self.m_min = m_min
         self.m_max = m_max
         self.fudge = fudge
         self.check_cone = check_cone
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
-        super(CubQMCSobolG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
-        if (not distribution.randomize) or distribution.graycode:
+        super(CubQMCSobolG,self).__init__(allowed_levels, allowed_distribs)
+        if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False. Use QRNG backend.")
 
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, self.integrand, self._fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none')
+        self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self._fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none')
         t_start = time()
         while True:
             self.data.update_data()

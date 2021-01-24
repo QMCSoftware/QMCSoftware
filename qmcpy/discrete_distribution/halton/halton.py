@@ -10,21 +10,19 @@ class Halton(DiscreteDistribution):
     Quasi-Random Halton nets.
 
     >>> h = Halton(2,seed=7)
+    >>> h.gen_samples(4)
+    array([[0.166, 0.363],
+           [0.666, 0.696],
+           [0.416, 0.03 ],
+           [0.916, 0.474]])
     >>> h.gen_samples(1)
     array([[0.166, 0.363]])
-    >>> h.gen_samples(1)
-    array([[0.166, 0.363]])
-    >>> h.set_dimension(4)
-    >>> h.set_seed(8)
-    >>> h.gen_samples(2)
-    array([[0.323, 0.148, 0.623, 0.913],
-           [0.823, 0.482, 0.223, 0.342]])
     >>> h
     Halton (DiscreteDistribution Object)
-        dimension       2^(2)
+        d               2^(1)
         generalize      1
         randomize       1
-        seed            2^(3)
+        seed            7
         mimics          StdUniform
     
     References:
@@ -36,8 +34,6 @@ class Halton(DiscreteDistribution):
         
         [2] Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
     """
-
-    parameters = ['dimension','generalize','randomize','seed','mimics']
 
     def __init__(self, dimension=1, generalize=True, randomize=True, seed=None):
         """
@@ -53,6 +49,7 @@ class Halton(DiscreteDistribution):
         Note:
             See References [1] and [2] for specific randomization methods and differences. 
         """
+        self.parameters = ['d','generalize','randomize','seed','mimics']
         if isinstance(randomize,bool):
             self.backend = 'QRNG' if randomize else 'OWEN'
             self.randomize = randomize
@@ -95,7 +92,7 @@ class Halton(DiscreteDistribution):
             s = "Halton randomize must be True/False or 'QRNG'/'Owen'"
             raise ParameterError(s)
         self.n_lim = 2**32
-        self.set_dimension(dimension)
+        self._set_dimension(dimension)
         self.set_seed(seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
@@ -121,22 +118,23 @@ class Halton(DiscreteDistribution):
             raise ParameterWarning("Halton requires n_max <= 2^32.")
         n = int(n_max-n_min)
         if self.backend=='QRNG':
-            x = zeros((self.dimension, n), dtype=double)
-            self.halton_cf(n, self.dimension, int(n_min), self.generalize, x, self.seed)
+            x = zeros((self.d, n), dtype=double)
+            self.halton_cf(n, self.d, int(n_min), self.generalize, x, self.seed)
             return x.T
         elif self.backend=='OWEN':
-            x = zeros((n,self.dimension), dtype=double)
-            self.halton_cf(n, self.dimension, int(n_min), 0, self.randomize, x, self.seed)
+            x = zeros((n,self.d), dtype=double)
+            self.halton_cf(n, self.d, int(n_min), 0, self.randomize, x, self.seed)
             return x
 
+    def pdf(self, x):
+        return ones(x.shape[0], dtype=float)
+        
     def set_seed(self, seed):
-        """ See abstract method. """
         self.seed = seed if seed else random.randint(1, 100000, dtype=uint64)
         
-    def set_dimension(self, dimension):
-        """ See abstract method. """
-        self.dimension = dimension
-        if self.dimension > self.d_lim:
+    def _set_dimension(self, dimension):
+        self.d = dimension
+        if self.d > self.d_lim:
             s = '''
                 Halton with randomize='QRNG' backend supports dimension <= 360.
                 Halton with randomize='OWEN' backend supports dimension <= 1000. 

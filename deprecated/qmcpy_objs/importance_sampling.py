@@ -36,19 +36,16 @@ class ImportanceSampling(TrueMeasure):
         if not hasattr(self.measure,'pdf'):
             raise TransformError('measure_to_sample_from must have pdf methd')
         self.k = self.measure.pdf
-        if not hasattr(self.measure,'_tf_to_mimic_samples'):
-            raise TransformError('measure_to_sample_from must have _tf_to_mimic_samples method')
-        self.k_sample_tf = self.measure._tf_to_mimic_samples
+        if not hasattr(self.measure,'_transform'):
+            raise TransformError('measure_to_sample_from must have _transform method')
+        self.k_sample_tf = self.measure._transform
         super(ImportanceSampling,self).__init__()
 
-    def _transform_g_to_f(self, g):
+    def _eval_f(self, x, g, *args, **kwargs):
         """ See abstract method. """
-        def f(samples, *args, **kwargs):
-            samples_k = self.k_sample_tf(samples) # transform standard samples to mimic measure_to_sample_from
-            md = apply_along_axis(self.m,1,samples_k).squeeze() # pdf of objective measure
-            kd = apply_along_axis(self.k,1,samples_k).squeeze() # pdf of sampling measure
-            w = md/kd
-            g_vals = g(samples_k, *args, **kwargs).squeeze() # evaluations of original function
-            return w*g_vals
-        return f
+        samples_k = self.k_sample_tf(x)
+        kd = apply_along_axis(self.k,1,samples_k).squeeze() # pdf of sampling measure
+        w = md/kd
+        g_vals = g(samples_k, *args, **kwargs).squeeze() # evaluations of original function
+        return w*g_vals
         

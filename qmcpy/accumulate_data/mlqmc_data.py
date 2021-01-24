@@ -9,22 +9,22 @@ class MLQMCData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['levels','dimensions','n_level','mean_level','var_level','bias_estimate','n_total']
-
-    def __init__(self, stopping_criterion, integrand, n_init, replications, bias_estimator, cost_method):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, n_init, replications, bias_estimator, cost_method):
         """
         Initialize data instance
 
         Args:
-            stopping_criterion (StoppingCriterion): a StoppingCriterion instance
+            stopping_crit (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
+            true_measure (TrueMeasure): A TrueMeasure instance
+            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
             replications (int): number of replications on each level
         """
-        # Extract QMCPy objects
-        self.stopping_criterion = stopping_criterion
+        self.parameters = ['levels','dimensions','n_level','mean_level','var_level','bias_estimate','n_total']
+        self.stopping_crit = stopping_crit
         self.integrand = integrand
-        self.measure = self.integrand.measure
-        self.distribution = self.measure.distribution
+        self.true_measure = true_measure
+        self.discrete_distrib = discrete_distrib
         # Set Attributes
         self.levels = 3
         self.n_level = zeros(self.levels)
@@ -43,7 +43,7 @@ class MLQMCData(AccumulateData):
         self.solution = None
         self.n_total = 0
         # get seeds for each replication
-        random.seed(self.distribution.seed)
+        random.seed(self.discrete_distrib.seed)
         self.seeds = random.randint(1, 1000000, size=(self.levels,int(self.replications)), dtype=uint64)
         super(MLQMCData,self).__init__()
 
@@ -56,12 +56,13 @@ class MLQMCData(AccumulateData):
                 continue
             # reset dimension
             self.dimensions[l] = self.integrand._dim_at_level(l)
-            self.measure.set_dimension(int(self.dimensions[l]))
+            new_dim = int(self.dimensions[l])
+            self.true_measure._set_dimension_r(new_dim)
             n_max = self.n_init if self.n_level[l]==0 else 2*self.n_level[l]
             for r in range(int(self.replications)):
-                self.distribution.set_seed(self.seeds[l,r]) # reset seed
-                samples = self.distribution.gen_samples(n_min=self.n_level[l],n_max=n_max)
-                sums,cost = self.integrand.f(samples,l=l)
+                self.discrete_distrib.set_seed(self.seeds[l,r]) # reset seed
+                samples = self.discrete_distrib.gen_samples(n_min=self.n_level[l],n_max=n_max)
+                self.integrand.f(samples,l=l)
                 prev_sum = self.mean_level_reps[l,r]*self.n_level[l]
                 self.mean_level_reps[l,r] = (sums[0]+prev_sum)/float(n_max)
                 self.cost_level[l] = self.cost_level[l] + cost

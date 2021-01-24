@@ -1,6 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLMCData
-from ..discrete_distribution import IIDStdGaussian
+from ..discrete_distribution import IIDStdUniform
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
@@ -14,13 +14,13 @@ class CubMCML(StoppingCriterion):
     """
     Stopping criterion based on multi-level monte carlo.
     
-    >>> mlco = MLCallOptions(Gaussian(IIDStdGaussian(seed=7)))
+    >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
     >>> sc = CubMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.445441712933263
+    10.440...
     >>> data
-    Solution: 10.4454        
+    Solution: 10.4406        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -28,10 +28,10 @@ class CubMCML(StoppingCriterion):
         r               0.050
         t               1
         b               85
-    IIDStdGaussian (DiscreteDistribution Object)
-        dimension       2^(6)
+    IIDStdUniform (DiscreteDistribution Object)
+        d               2^(6)
         seed            7
-        mimics          StdGaussian
+        mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1
@@ -45,13 +45,13 @@ class CubMCML(StoppingCriterion):
     MLMCData (AccumulateData Object)
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        n_level         [7.804e+05 1.533e+04 6.633e+03 2.077e+03 7.560e+02 2.730e+02 9.600e+01]
-        mean_level      [1.006e+01 1.848e-01 1.014e-01 5.138e-02 2.472e-02 1.452e-02 7.657e-03]
-        var_level       [1.963e+02 1.515e-01 4.124e-02 1.109e-02 2.901e-03 6.799e-04 1.848e-04]
+        n_level         [7.795e+05 1.496e+04 5.916e+03 2.244e+03 7.560e+02 2.770e+02 1.060e+02]
+        mean_level      [1.005e+01 1.777e-01 1.071e-01 5.340e-02 2.990e-02 1.167e-02 7.812e-03]
+        var_level       [1.959e+02 1.441e-01 4.433e-02 1.093e-02 2.940e-03 7.304e-04 2.261e-04]
         cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
-        n_total         805984
-        alpha           0.927
-        beta            1.946
+        n_total         804118
+        alpha           0.942
+        beta            1.893
         gamma           1.000
         time_integrate  ...
 
@@ -65,8 +65,6 @@ class CubMCML(StoppingCriterion):
         Operations Research, 56(3):607-617, 2008.
         http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
     """
-
-    parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
 
     def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, 
         levels_min=2, levels_max=10, alpha0=-1., beta0=-1., gamma0=-1., n_tols=1, tol_mult=1.2, theta_init=0.25, theta_adaptive=False, n_fit_levels=10, bias_estimator='giles'):
@@ -94,6 +92,7 @@ class CubMCML(StoppingCriterion):
         Note:
             if alpha, beta, gamma are not positive, then they will be estimated
         """
+        self.parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
         if levels_min < 2:
             raise ParameterError('needs levels_min >= 2')
         if levels_max < levels_min:
@@ -120,7 +119,6 @@ class CubMCML(StoppingCriterion):
         self.n_fit_levels = n_fit_levels
         self.bias_estimator = bias_estimator
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
         super(CubMCML,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
@@ -141,6 +139,8 @@ class CubMCML(StoppingCriterion):
     def _integrate(self):
         """ See abstract method. """
          # Construct AccumulateData Object to House Integration Data
+        self.data = MLMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self.levels_min, self.n_init, self.alpha0, self.beta0, self.gamma0)
         t_start = time()
         while True:
             self.data.update_data()

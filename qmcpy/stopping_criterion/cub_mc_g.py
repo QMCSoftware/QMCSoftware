@@ -16,16 +16,16 @@ class CubMCG(StoppingCriterion):
     """
     Stopping criterion with guaranteed accuracy.
 
-    >>> k = Keister(Gaussian(IIDStdUniform(2,seed=7),covariance=1./2))
+    >>> k = Keister(IIDStdUniform(2,seed=7))
     >>> sc = CubMCG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.803926962264685
+    1.803...
     >>> data
     Solution: 1.8039         
     Keister (Integrand Object)
     IIDStdUniform (DiscreteDistribution Object)
-        dimension       2^(1)
+        d               2^(1)
         seed            7
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
@@ -73,7 +73,6 @@ class CubMCG(StoppingCriterion):
         inequality would be satisfied: $\P(| mu - tmu | \\le tol\_fun) \\ge 1 - \\alpha$.
     """
 
-    parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
                  inflate=1.2, alpha=0.01):
         """
@@ -86,6 +85,7 @@ class CubMCG(StoppingCriterion):
             n_init: initial number of samples
             n_max: maximum number of samples
         """
+        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -97,17 +97,19 @@ class CubMCG(StoppingCriterion):
         self.kurtmax = (n_init - 3) / (n_init - 1) + \
             (self.alpha_sigma * n_init) / (1 - self.alpha_sigma) * \
             (1 - 1. / self.inflate**2)**2
+        # QMCPy Objs
         self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
-        distribution = integrand.measure.distribution
         allowed_levels = ['single']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMCG,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
+        super(CubMCG,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, self.integrand, self.n_init)  # house integration data
+        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, self.n_init)  # house integration data
         t_start = time()
         # Pilot Sample
         self.data.update_data()
