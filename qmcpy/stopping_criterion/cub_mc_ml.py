@@ -67,7 +67,8 @@ class CubMCML(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, 
-        levels_min=2, levels_max=10, alpha0=-1., beta0=-1., gamma0=-1., n_tols=1, tol_mult=1.2, theta_init=0.25, theta_adaptive=False, n_fit_levels=10, bias_estimator='giles'):
+        levels_min=2, levels_max=10, alpha0=-1., beta0=-1., gamma0=-1., n_tols=1, tol_mult=1.2, 
+        theta_init=0.25, theta_adaptive=False, n_fit_levels=10, bias_estimator='giles'):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
@@ -110,7 +111,6 @@ class CubMCML(StoppingCriterion):
         self.levels_max = float(levels_max)
         self.theta = theta_init
         self.theta_adaptive = theta_adaptive
-        self.integrand = integrand
         self.alpha0 = alpha0
         self.beta0 = beta0
         self.gamma0 = gamma0
@@ -118,14 +118,19 @@ class CubMCML(StoppingCriterion):
         self.tol_mult = tol_mult
         self.n_fit_levels = n_fit_levels
         self.bias_estimator = bias_estimator
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
-        super(CubMCML,self).__init__(distribution, integrand, allowed_levels, allowed_distribs)
+        super(CubMCML,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         # Construct AccumulateData Object to House Integration Data
-        self.data = MLMCData(self, self.integrand, self.levels_min, self.n_init, self.alpha0, self.beta0, self.gamma0, self.theta, self.n_fit_levels)
+        self.data = MLMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self.levels_min, self.n_init, self.alpha0, self.beta0, self.gamma0, self.theta, self.n_fit_levels)
         # Loop over coarser tolerances
         for t in range(self.n_tols):
             self.data.levels = int(self.levels_min)
@@ -138,9 +143,6 @@ class CubMCML(StoppingCriterion):
     
     def _integrate(self):
         """ See abstract method. """
-         # Construct AccumulateData Object to House Integration Data
-        self.data = MLMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.levels_min, self.n_init, self.alpha0, self.beta0, self.gamma0)
         t_start = time()
         while True:
             self.data.update_data()

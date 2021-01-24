@@ -51,15 +51,13 @@ class MLCallOptions(Integrand):
         """
         self.parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
         self.true_measure = Gaussian(sampler, mean=0, covariance=1)
+        self.discrete_distrib = self.true_measure.discrete_distrib
         options = ['european','asian']
         self.option = option.lower()
         if self.option not in options:
             raise ParameterError('option type must be one of\n\t%s'%str(options))
-        self.measure = measure
-        self.distribution = self.measure.distribution
-        #if self.distribution.low_discrepancy and self.option=='asian':
-        #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
-
+        if self.discrete_distrib.low_discrepancy and self.option=='asian':
+            raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
         self.sigma = volatility
         self.k = start_strike_price
         self.r = interest_rate
@@ -81,7 +79,7 @@ class MLCallOptions(Integrand):
             print('Exact value unknown for asian option')
             val = None
         elif self.option == 'lookback':
-            kk = .5*self.sigma**2/r
+            kk = .5*self.sigma**2/self.r
             val = self.k*( norm.cdf(d1) - norm.cdf(-d1)*kk -
                       exp(-self.r*self.t)*(norm.cdf(d2) - norm.cdf(d2)*kk) )
         elif self.option == 'digital':

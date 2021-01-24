@@ -18,9 +18,9 @@ class CubQMCML(StoppingCriterion):
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.442...
+    10.444...
     >>> data
-    Solution: 10.4424        
+    Solution: 10.4445        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -32,7 +32,7 @@ class CubQMCML(StoppingCriterion):
         d               2^(6)
         randomize       1
         order           natural
-        seed            985802
+        seed            748493
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
@@ -46,13 +46,12 @@ class CubQMCML(StoppingCriterion):
     MLQMCData (AccumulateData Object)
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        n_level         [4096.  512.  256.  256.  256.  256.  256.]
-        mean_level      [1.005e+01 1.807e-01 1.033e-01 5.482e-02 2.823e-02 1.397e-02 7.290e-03]
-        var_level       [8.376e-05 2.660e-05 1.911e-05 1.594e-05 3.660e-06 1.478e-06 3.424e-07]
+        n_level         [8192.  256.  256.  256.  256.  256.  256.]
+        mean_level      [1.005e+01 1.821e-01 1.048e-01 5.404e-02 2.787e-02 1.386e-02 7.084e-03]
+        var_level       [2.254e-05 7.454e-05 3.118e-05 1.288e-05 3.455e-06 1.263e-06 3.503e-07]
         bias_estimate   0.007
-        n_total         188416
+        n_total         311296
         time_integrate  ...
-    
     
     References:
         
@@ -61,7 +60,8 @@ class CubQMCML(StoppingCriterion):
         de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
     """
 
-    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, replications=32., levels_max=10, bias_estimator='giles', cost_method='sde'):
+    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, 
+        replications=32., levels_max=10, bias_estimator='giles', cost_method='sde'):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
@@ -86,10 +86,11 @@ class CubQMCML(StoppingCriterion):
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.replications = float(replications)
-        # QMCPy Objs
-        self.integrand = integrand
         self.bias_estimator = bias_estimator
         self.cost_method = cost_method
+        self.levels_max = levels_max
+        # QMCPy Objs
+        self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
@@ -100,7 +101,8 @@ class CubQMCML(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration Data
-        self.data = MLQMCData(self, self.integrand, self.n_init, self.replications, self.bias_estimator, self.cost_method)
+        self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
+            self.n_init, self.replications, self.bias_estimator, self.cost_method)
         t_start = time()
         while True:
             self.data.update_data()
