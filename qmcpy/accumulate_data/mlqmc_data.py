@@ -43,6 +43,8 @@ class MLQMCData(AccumulateData):
         self.solution = None
         self.n_total = 0
         # get seeds for each replication
+        if self.discrete_distrib.d != 1:
+            self.true_measure._set_dimension_r(1)
         random.seed(self.discrete_distrib.seed)
         self.seeds = random.randint(1, 1000000, size=(self.levels,int(self.replications)), dtype=uint64)
         super(MLQMCData,self).__init__()
@@ -69,17 +71,17 @@ class MLQMCData(AccumulateData):
             self.n_level[l] = n_max
             self.mean_level[l] = self.mean_level_reps[l].mean()
             self.var_level[l] = self.mean_level_reps[l].var()
-            cost = self.dimensions[l] if self.cost_method == 'sde' else self.cost_level[l]/self.n_level[l]
+            cost = self.dimensions[l] if self.cost_method == 'SDE' else self.cost_level[l]/self.n_level[l]
             self.var_cost_ratio_level[l] = self.var_level[l]/cost # Required in cub_qmc_ml.py
         self._update_bias()
         self.n_total = self.replications*self.n_level.sum()
         self.solution = self.mean_level.sum()
 
     def _update_bias(self):
-        if self.bias_estimator == 'giles':
+        if self.bias_estimator == 'GILES':
             self.bias_estimate = max(.5*abs(self.mean_level[self.levels-2]), \
                 abs(self.mean_level[self.levels-1]))
-        elif self.bias_estimator == 'as_mlmc': # Use linear fit to estimate bias (as is the case for MLMC)
+        elif self.bias_estimator == 'AS_MLMC': # Use linear fit to estimate bias (as is the case for MLMC)
             range_ = arange(minimum(2.,self.levels-2)+1)
             idx = (self.levels-range_).astype(int) - 1
             a = ones((self.levels-1,2))

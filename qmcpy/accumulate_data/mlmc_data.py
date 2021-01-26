@@ -10,7 +10,8 @@ class MLMCData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, levels_init, n_init, alpha0, beta0, gamma0, theta, n_fit_levels):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, levels_init, n_init, 
+                alpha0, beta0, gamma0, theta, n_fit_levels):
         """
         Initialize data instance
 
@@ -27,7 +28,8 @@ class MLMCData(AccumulateData):
             theta (float): initial error splitting constant
             n_fit_levels (int) : number of levels to use for regression
         """
-        self.parameters = ['levels','dimensions','n_level','mean_level','var_level', 'cost_per_sample','n_total','alpha','beta','gamma']
+        self.parameters = ['levels','dimensions','n_level','mean_level','var_level', 
+            'cost_per_sample','n_total','alpha','beta','gamma']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure

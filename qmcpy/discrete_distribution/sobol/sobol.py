@@ -228,6 +228,8 @@ class Sobol(DiscreteDistribution):
             dimension (int): new dimension
         """
         self.d = dimension
+        if hasattr(self,'seed'):
+            self.set_seed(self.seed)
 
     def set_randomize(self, randomize):
         """

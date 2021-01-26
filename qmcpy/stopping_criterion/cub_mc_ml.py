@@ -42,6 +42,11 @@ class CubMCML(StoppingCriterion):
         levels_min      2^(1)
         levels_max      10
         theta           2^(-2)
+        tol_mult        1.200
+        theta_init      2^(-2)
+        theta_adaptive  0
+        n_fit_levels    10
+        bias_estimator  GILES
     MLMCData (AccumulateData Object)
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
@@ -93,7 +98,8 @@ class CubMCML(StoppingCriterion):
         Note:
             if alpha, beta, gamma are not positive, then they will be estimated
         """
-        self.parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
+        self.parameters = ['rmse_tol','n_init','levels_min','levels_max','theta',
+            'tol_mult','theta_init','theta_adaptive','n_fit_levels','bias_estimator']
         if levels_min < 2:
             raise ParameterError('needs levels_min >= 2')
         if levels_max < levels_min:
@@ -109,6 +115,7 @@ class CubMCML(StoppingCriterion):
         self.n_max = float(n_max)
         self.levels_min = float(levels_min)
         self.levels_max = float(levels_max)
+        self.theta_init = theta_init
         self.theta = theta_init
         self.theta_adaptive = theta_adaptive
         self.alpha0 = alpha0
@@ -117,14 +124,16 @@ class CubMCML(StoppingCriterion):
         self.n_tols = n_tols
         self.tol_mult = tol_mult
         self.n_fit_levels = n_fit_levels
-        self.bias_estimator = bias_estimator
+        self.bias_estimator = bias_estimator.upper()
+        if self.bias_estimator not in ['GILES','OPTIMISTIC']:
+            raise ParameterError("bias_estimator should be 'Giles' or 'Optimistic'.")
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian", "CustomIIDDistribution"]
+        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
         super(CubMCML,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
@@ -163,7 +172,7 @@ class CubMCML(StoppingCriterion):
             # if (almost) converged, estimate remaining error and decide 
             # whether a new level is required
             if (self.data.diff_n_level > 0.01*self.data.n_level[:self.data.levels+1]).sum() == 0:
-                if self.bias_estimator == 'giles':
+                if self.bias_estimator == 'GILES':
                     range_ = arange(minimum(2.,self.data.levels-1)+1)
                     idx = (self.data.levels-range_).astype(int)
                 else:

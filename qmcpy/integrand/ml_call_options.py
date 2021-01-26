@@ -56,8 +56,8 @@ class MLCallOptions(Integrand):
         self.option = option.lower()
         if self.option not in options:
             raise ParameterError('option type must be one of\n\t%s'%str(options))
-        if self.discrete_distrib.low_discrepancy and self.option=='asian':
-            raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
+        #if self.discrete_distrib.low_discrepancy and self.option=='asian':
+        #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
         self.sigma = volatility
         self.k = start_strike_price
         self.r = interest_rate

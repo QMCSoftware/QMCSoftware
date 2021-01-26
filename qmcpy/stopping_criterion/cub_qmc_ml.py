@@ -43,6 +43,8 @@ class CubQMCML(StoppingCriterion):
         n_init          2^(8)
         n_max           10000000000
         replications    2^(5)
+        bias_estimator  GILES
+        cost_method     SDE
     MLQMCData (AccumulateData Object)
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
@@ -77,7 +79,7 @@ class CubQMCML(StoppingCriterion):
             bias_estimator (str): bias estimation method (can be 'giles' [default] or 'as_mlmc')
             cost_method (str): cost estimation method (can be 'sde' [default] or 'general')
         """
-        self.parameters = ['rmse_tol','n_init','n_max','replications']
+        self.parameters = ['rmse_tol','n_init','n_max','replications','bias_estimator','cost_method']
         # initialization
         if rmse_tol:
             self.rmse_tol = float(rmse_tol)
@@ -86,8 +88,12 @@ class CubQMCML(StoppingCriterion):
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.replications = float(replications)
-        self.bias_estimator = bias_estimator
-        self.cost_method = cost_method
+        self.bias_estimator = bias_estimator.upper()
+        if self.bias_estimator not in ['GILES','AS_MLMC']:
+            raise ParameterError("bias_estimator should be 'Giles' or 'as_MLMC'")
+        self.cost_method = cost_method.upper()
+        if self.cost_method not in ["SDE","GENERAL"]:
+            raise ParameterError("cost_method should be 'SDE' or 'General'")
         self.levels_max = levels_max
         # QMCPy Objs
         self.integrand = integrand
