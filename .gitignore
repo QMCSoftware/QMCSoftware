@@ -17,6 +17,7 @@ qmcpy.egg-info/
 *.so
 *.dylib
 *.dll
+*.pyd
 
 # R
 *.Rhistory 
