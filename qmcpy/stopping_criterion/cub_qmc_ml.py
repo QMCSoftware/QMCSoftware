@@ -43,8 +43,6 @@ class CubQMCML(StoppingCriterion):
         n_init          2^(8)
         n_max           10000000000
         replications    2^(5)
-        bias_estimator  GILES
-        cost_method     SDE
     MLQMCData (AccumulateData Object)
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
@@ -63,7 +61,7 @@ class CubQMCML(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, 
-        replications=32., levels_max=10, bias_estimator='giles', cost_method='sde'):
+        replications=32., levels_min=2, levels_max=10):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
@@ -75,11 +73,10 @@ class CubQMCML(StoppingCriterion):
                 in favor of the rmse tolerance
             n_max (int): maximum number of samples
             replications (int): number of replications on each level
+            levels_min (int): minimum level of refinement >= 2
             levels_max (int): maximum level of refinement >= Lmin
-            bias_estimator (str): bias estimation method (can be 'giles' [default] or 'as_mlmc')
-            cost_method (str): cost estimation method (can be 'sde' [default] or 'general')
         """
-        self.parameters = ['rmse_tol','n_init','n_max','replications','bias_estimator','cost_method']
+        self.parameters = ['rmse_tol','n_init','n_max','replications']
         # initialization
         if rmse_tol:
             self.rmse_tol = float(rmse_tol)
@@ -88,12 +85,7 @@ class CubQMCML(StoppingCriterion):
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.replications = float(replications)
-        self.bias_estimator = bias_estimator.upper()
-        if self.bias_estimator not in ['GILES','AS_MLMC']:
-            raise ParameterError("bias_estimator should be 'Giles' or 'as_MLMC'")
-        self.cost_method = cost_method.upper()
-        if self.cost_method not in ["SDE","GENERAL"]:
-            raise ParameterError("cost_method should be 'SDE' or 'General'")
+        self.levels_min = levels_min
         self.levels_max = levels_max
         # QMCPy Objs
         self.integrand = integrand
@@ -108,11 +100,10 @@ class CubQMCML(StoppingCriterion):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration Data
         self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.n_init, self.replications, self.bias_estimator, self.cost_method)
+            self.levels_min, self.n_init, self.replications)
         t_start = time()
         while True:
             self.data.update_data()
-            self.data.eval_level[:] = False
             if self.data.var_level.sum() > (self.rmse_tol**2/2.):
                 # double N_l on level with largest V_l/(2^l*N_l)
                 efficient_level = argmax(self.data.var_cost_ratio_level)

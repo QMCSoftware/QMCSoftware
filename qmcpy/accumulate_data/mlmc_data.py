@@ -11,7 +11,7 @@ class MLMCData(AccumulateData):
     """
 
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, levels_init, n_init, 
-                alpha0, beta0, gamma0, theta, n_fit_levels):
+                alpha0, beta0, gamma0):
         """
         Initialize data instance
 
@@ -25,8 +25,6 @@ class MLMCData(AccumulateData):
             alpha0 (float): weak error is O(2^{-alpha0*level})
             beta0 (float): variance is O(2^{-beta0*level})
             gamma0 (float): sample cost is O(2^{gamma0*level})
-            theta (float): initial error splitting constant
-            n_fit_levels (int) : number of levels to use for regression
         """
         self.parameters = ['levels','dimensions','n_level','mean_level','var_level', 
             'cost_per_sample','n_total','alpha','beta','gamma']
@@ -47,8 +45,6 @@ class MLMCData(AccumulateData):
         self.alpha = maximum(0,self.alpha0)
         self.beta = maximum(0,self.beta0)
         self.gamma = maximum(0,self.gamma0)
-        self.theta = theta
-        self.n_fit_levels = n_fit_levels
         self.solution = None
         self.n_total = 0
         self.time_integrate = 0
@@ -79,17 +75,16 @@ class MLMCData(AccumulateData):
             self.mean_level[l] = maximum(self.mean_level[l], .5*self.mean_level[l-1]/2**self.alpha)
             self.var_level[l] = maximum(self.var_level[l], .5*self.var_level[l-1]/2**self.beta)
         # use linear regression to estimate alpha, beta, gamma if not given
-        n_fit_levels = min(self.n_fit_levels, self.levels)
-        a = ones((n_fit_levels,2))
-        a[:,0] = arange(self.levels+1-n_fit_levels,self.levels+1)
+        a = ones((self.levels,2))
+        a[:,0] = arange(1,self.levels+1)
         if self.alpha0 <= 0:
-            x = lstsq(a,log2(abs(self.mean_level[self.levels+1-n_fit_levels:self.levels+1])),rcond=None)[0]
+            x = lstsq(a,log2(self.mean_level[1:]),rcond=None)[0]
             self.alpha = maximum(.5,-x[0])
         if self.beta0 <= 0:
-            x = lstsq(a,log2(self.var_level[self.levels+1-n_fit_levels:self.levels+1]),rcond=None)[0]
+            x = lstsq(a,log2(self.var_level[1:]),rcond=None)[0]
             self.beta = maximum(.5,-x[0])
         if self.gamma0 <= 0:
-            x = lstsq(a,log2(self.cost_per_sample[self.levels+1-n_fit_levels:self.levels+1]),rcond=None)[0]
+            x = lstsq(a,log2(self.cost_per_sample[1:]),rcond=None)[0]
             self.gamma = maximum(.5,x[0])
         self.n_total = self.n_level.sum()
 
@@ -108,15 +103,3 @@ class MLMCData(AccumulateData):
             self.mean_level = absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
             self.var_level = maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
             self.cost_per_sample = self.cost_level[:self.levels+1]/self.n_level[:self.levels+1]
-
-    def update_theta(self, rmse_tol):
-        """Update error splitting parameter"""
-        if self.n_level[-1] > 0: # We already have samples at the highest level to estimate theta!
-            n = self.n_level.shape[0]
-            n_fit_levels = min(self.n_fit_levels, self.levels)
-            a = ones((n_fit_levels,2))
-            a[:,0] = arange(n-n_fit_levels, n)
-            mean_level = absolute(self.sum_level[0,:]/self.n_level)
-            x = lstsq(a,log2(abs(mean_level[n-n_fit_levels:n])),rcond=None)[0]
-            alpha = maximum(.5,-x[0])
-            self.theta = max(0.01, min(0.5, ((mean_level[-1] / 2**alpha / (2.**alpha - 1))/rmse_tol)**2))
