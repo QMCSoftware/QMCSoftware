@@ -201,24 +201,22 @@ class Sobol(DiscreteDistribution):
             seeds (int/list/None): new seeds
         """
         if isinstance(seeds,int) or isinstance(seeds,uint32) or isinstance(seeds,uint64):
-            random.seed(seeds)
-            self.seed = random.randint(1, 100000, size=self.d, dtype=uint64)
+            self.seed = random.RandomState(seeds).randint(1, 100000, size=self.d, dtype=uint64)
         elif isinstance(seeds,list) or isinstance(seeds,ndarray):
             seeds = array(seeds)
             l = len(seeds)
             if l == self.d:
                 self.seed = seeds
             elif l < self.d:
-                self.seed = hstack((seeds,random.randint(1, 100000, size=self.d-l, dtype=uint64)))
+                self.seed = hstack((seeds, random.randint(1, 100000, size=self.d-l, dtype=uint64)))
             else: # l > self.d
                 self.seed = seeds[:self.d]
         elif seeds==None: # assume seed==None
-            random.seed(None)
-            self.seed = random.randint(1, 100000, size=self.d, dtype=uint64)
+            self.seed = random.RandomState().randint(1, 100000, size=self.d, dtype=uint64)
         else:
             msg = "Sobol' seed must be an int, list of ints, or None."
             raise ParameterError(msg)
-        self.seed = array(self.seed,dtype=uint64)
+        self.seed = array(self.seed, dtype=uint64)
             
     def _set_dimension(self, dimension):
         """
