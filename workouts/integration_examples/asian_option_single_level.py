@@ -82,5 +82,5 @@ def asian_option_single_level_high_dimensions():
         f'CubBayesNetG            option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
 
 if __name__ == "__main__":
-    # asian_option_single_level_high_dimensions()
+    asian_option_single_level_high_dimensions()
     asian_option_single_level(abs_tol=.001)
