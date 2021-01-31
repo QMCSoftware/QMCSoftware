@@ -66,6 +66,27 @@ def asian_option_single_level_high_dimensions():
 
     import qmcpy as qp
 
+    payoff = qp.AsianOption(qp.Sobol(52), start_price=100, strike_price=200)
+    price, data = qp.CubQMCSobolG(payoff, abs_tol=0.001).integrate()
+    print(
+        f'CubQMCSobolG            option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
+
+    payoff = qp.AsianOption(qp.BrownianMotion(qp.Sobol(52), drift=1), start_price=100, strike_price=200)
+    price, data = qp.CubQMCSobolG(payoff, abs_tol=0.001).integrate()
+    print(
+        f'CubQMCSobolG with IS    option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
+
+    payoff = qp.AsianOption(qp.Lattice(52, order='linear'), start_price=100, strike_price=200)
+    price, data = qp.CubBayesLatticeG(payoff, abs_tol=0.001, order=1, ptransform='Baker').integrate()
+    print(
+        f'CubBayesLatticeG        option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
+
+    payoff = qp.AsianOption(qp.Sobol(52), start_price=100, strike_price=200)
+    price, data = qp.CubBayesNetG(payoff, abs_tol=0.001).integrate()
+    print(
+        f'CubBayesNetG            option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
+
+
     payoff = qp.AsianOption(qp.Sobol(52), start_price=30, strike_price=25)
     price, data = qp.CubQMCSobolG(payoff, abs_tol=0.001).integrate()
     print(
@@ -80,6 +101,8 @@ def asian_option_single_level_high_dimensions():
     price, data = qp.CubBayesNetG(payoff, abs_tol=0.001).integrate()
     print(
         f'CubBayesNetG            option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
+
+    print
 
 if __name__ == "__main__":
     asian_option_single_level_high_dimensions()

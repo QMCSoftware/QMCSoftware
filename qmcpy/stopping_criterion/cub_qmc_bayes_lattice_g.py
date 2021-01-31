@@ -8,9 +8,6 @@ from numpy import sqrt, log2, exp, log
 from math import factorial
 import numpy as np
 from time import time
-from scipy.optimize import fminbound as fminbnd
-from scipy.stats import norm as gaussnorm
-from scipy.stats import t as tnorm
 import warnings
 
 
@@ -86,7 +83,7 @@ class CubBayesLatticeG(StoppingCriterion):
         if m_min % 1 != 0. or m_min < 5 or m_max % 1 != 0:
             warning_s = '''
                 n_init and n_max must be a powers of 2.
-                n_init must be >= 2^5.
+                n_init must be >= 2^8.
                 Using n_init = 2^8 and n_max=2^22.'''
             warnings.warn(warning_s, ParameterWarning)
             m_min = 8
@@ -104,24 +101,16 @@ class CubBayesLatticeG(StoppingCriterion):
         self.ptransform = ptransform  # periodization transform
         self.stop_at_tol = True  # automatic mode: stop after meeting the error tolerance
         self.arb_mean = True  # by default use zero mean algorithm
-        self.stopCriterion = 'MLE'  # Available options {'MLE', 'GCV', 'full'}
+        self.errbd_type = 'MLE'  # Available options {'MLE', 'GCV', 'full'}
 
         # private properties
-        self.full_Bayes = False  # Full Bayes - assumes m and s^2 as hyperparameters
-        self.GCV = False  # Generalized cross validation
+        # full_Bayes - Full Bayes - assumes m and s^2 as hyperparameters
+        # GCV - Generalized cross validation
         self.kernType = 1  # Type-1: Bernoulli polynomial based algebraic convergence, Type-2: Truncated series
 
         self.avoid_cancel_error = True  # avoid cancellation error in stopping criterion
-        self.uncert = 0  # quantile value for the error bound
         self.debug_enable = False  # enable debug prints
         self.data = None
-
-        # Credible interval : two-sided confidence, i.e., 1-alpha percent quantile
-        if self.full_Bayes:
-            # degrees of freedom = 2^mmin - 1
-            self.uncert = -tnorm.ppf(self.alpha / 2, (2 ** self.m_min) - 1)
-        else:
-            self.uncert = -gaussnorm.ppf(self.alpha / 2)
 
         # QMCPy Objs
         self.integrand = integrand
@@ -142,7 +131,7 @@ class CubBayesLatticeG(StoppingCriterion):
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
         self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.m_min, self.m_max, self._fft, self._merge_fft)
+            self.m_min, self.m_max, self._fft, self._merge_fft, self.kernel)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -150,7 +139,7 @@ class CubBayesLatticeG(StoppingCriterion):
         while True:
             # Update function values
             xun_, ftilde_, m = self.data.update_data()
-            stop_flag, muhat, order_, err_bnd = self.stopping_criterion(xun_, ftilde_, m)
+            stop_flag, muhat, order_, err_bnd = self.data.stopping_criterion(xun_, ftilde_, m)
 
             # if stop_at_tol true, exit the loop
             # else, run for for all 'n' values.
@@ -189,120 +178,6 @@ class CubBayesLatticeG(StoppingCriterion):
         ftilde_new[~ptind] = np.squeeze(evenval - coefv * oddval)
         return ftilde_new
 
-    # decides if the user-defined error threshold is met
-    def stopping_criterion(self, xpts, ftilde, m):
-        ftilde = ftilde.squeeze()
-        n = 2 ** m
-        success = False
-        lna_range = [-5, 0]  # reduced from [-5, 5], to avoid kernel values getting too big causing error
-        r = self.order
-
-        # search for optimal shape parameter
-        lna_MLE = fminbnd(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
-                          x1=lna_range[0], x2=lna_range[1], xtol=1e-2, disp=0)
-
-        aMLE = exp(lna_MLE)
-        _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
-
-        # Check error criterion
-        # compute DSC
-        if self.full_Bayes:
-            # full Bayes
-            if self.avoid_cancel_error:
-                DSC = abs(vec_lambda_ring[0] / n)
-            else:
-                DSC = abs((vec_lambda[0] / n) - 1)
-
-            # 1-alpha two sided confidence interval
-            err_bd = self.uncert * sqrt(DSC * RKHS_norm / (n - 1))
-        elif self.GCV:
-            # GCV based stopping criterion
-            if self.avoid_cancel_error:
-                DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
-            else:
-                DSC = abs(1 - (n / vec_lambda[0]))
-
-            temp = vec_lambda
-            temp[0] = n + vec_lambda_ring[0]
-            mC_inv_trace = sum(1. / temp(temp != 0))
-            err_bd = self.uncert * sqrt(DSC * RKHS_norm / mC_inv_trace)
-        else:
-            # empirical Bayes
-            if self.avoid_cancel_error:
-                DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
-            else:
-                DSC = abs(1 - (n / vec_lambda[0]))
-            err_bd = self.uncert * sqrt(DSC * RKHS_norm / n)
-
-        if self.arb_mean:  # zero mean case
-            muhat = ftilde[0] / n
-        else:  # non zero mean case
-            muhat = ftilde[0] / vec_lambda[0]
-
-        self.data.error_bound = err_bd
-        muhat = np.abs(muhat)
-        muminus = muhat - err_bd
-        muplus = muhat + err_bd
-
-        if 2 * err_bd <= max(self.abs_tol, self.rel_tol * abs(muminus)) + max(self.abs_tol, self.rel_tol * abs(muplus)):
-            if err_bd == 0:
-                err_bd = np.finfo(float).eps
-
-            # stopping criterion achieved
-            success = True
-
-        return success, muhat, r, err_bd
-
-    # objective function to estimate parameter theta
-    # MLE : Maximum likelihood estimation
-    # GCV : Generalized cross validation
-    def objective_function(self, a, xun, ftilde):
-        n = len(ftilde)
-        fudge = 1000*np.finfo(float).eps
-        [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, a, self.avoid_cancel_error,
-                                                    self.kernType, self.debug_enable)
-
-        vec_lambda = abs(vec_lambda)
-        # compute RKHS_norm
-        temp = abs(ftilde[vec_lambda > fudge] ** 2) / (vec_lambda[vec_lambda > fudge])
-
-        # compute loss
-        if self.GCV:
-            # GCV
-            temp_gcv = abs(ftilde[vec_lambda > fudge] / (vec_lambda[vec_lambda > fudge])) ** 2
-            loss1 = 2 * log(sum(1. / vec_lambda[vec_lambda > fudge]))
-            loss2 = log(sum(temp_gcv[1:]))
-            # ignore all zero eigenvalues
-            loss = loss2 - loss1
-
-            if self.arb_mean:
-                RKHS_norm = (1/lambda_factor)*sum(temp_gcv[1:]) / n
-            else:
-                RKHS_norm = (1/lambda_factor)*sum(temp_gcv) / n
-        else:
-            # default: MLE
-            if self.arb_mean:
-                RKHS_norm = (1/lambda_factor)*sum(temp[1:]) / n
-                temp_1 = (1/lambda_factor)*sum(temp[1:])
-            else:
-                RKHS_norm = (1/lambda_factor)*sum(temp) / n
-                temp_1 = (1/lambda_factor)*sum(temp)
-
-            # ignore all zero eigenvalues
-            loss1 = sum(log(abs(lambda_factor*vec_lambda[vec_lambda > fudge])))
-            loss2 = n * log(temp_1)
-            loss = loss1 + loss2
-
-        if self.debug_enable:
-            self.data.alert_msg(loss1, 'Inf', 'Imag')
-            self.data.alert_msg(RKHS_norm, 'Imag')
-            self.data.alert_msg(loss2, 'Inf', 'Imag')
-            self.data.alert_msg(loss, 'Inf', 'Imag', 'Nan')
-            self.data.alert_msg(vec_lambda, 'Imag')
-
-        vec_lambda, vec_lambda_ring = lambda_factor*vec_lambda, lambda_factor*vec_lambda_ring
-        return loss, vec_lambda, vec_lambda_ring, RKHS_norm
-
     # Computes modified kernel Km1 = K - 1
     # Useful to avoid cancellation error in the computation of (1 - n/\lambda_1)
     @staticmethod
@@ -330,7 +205,6 @@ class CubBayesLatticeG(StoppingCriterion):
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fft(C1 - 1)
     '''
-
     @staticmethod
     def kernel(xun, order, a, avoid_cancel_error, kern_type, debug_enable):
 
@@ -377,5 +251,6 @@ class CubBayesLatticeG(StoppingCriterion):
             # eigenvalues must be real : Symmetric pos definite Kernel
             vec_lambda = np.real(CubBayesLatticeG._fft(vec_C1))
             vec_lambda_ring = 0
+            lambda_factor = 1
 
         return vec_lambda, vec_lambda_ring, lambda_factor

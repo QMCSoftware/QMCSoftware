@@ -3,7 +3,10 @@ from ..util import MaxSamplesWarning
 from numpy import array, nan
 import warnings
 import numpy as np
-
+from scipy.optimize import fminbound as fminbnd
+from numpy import sqrt, log2, exp, log, ctypeslib
+from scipy.stats import norm as gaussnorm
+from scipy.stats import t as tnorm
 
 class LDTransformBayesData(AccumulateData):
     """
@@ -13,7 +16,8 @@ class LDTransformBayesData(AccumulateData):
 
     parameters = ['n_total', 'solution', 'error_bound']
 
-    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, m_min: int, m_max: int, fbt, merge_fbt):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, m_min: int, m_max: int,
+                 fbt, merge_fbt, kernel):
         """
         Args:
             stopping_crit (StoppingCriterion): a StoppingCriterion instance
@@ -28,6 +32,24 @@ class LDTransformBayesData(AccumulateData):
         self.true_measure = true_measure
         self.discrete_distrib = discrete_distrib
         self.distribution_name = type(self.discrete_distrib).__name__
+
+        # Bayes cubature properties
+        self.errbd_type = self.stopping_crit.errbd_type
+        self.arb_mean = self.stopping_crit.arb_mean
+        self.order = self.stopping_crit.order
+        self.kernType = self.stopping_crit.kernType
+        self.avoid_cancel_error = self.stopping_crit.avoid_cancel_error
+        self.abs_tol = self.stopping_crit.abs_tol
+        self.rel_tol = self.stopping_crit.rel_tol
+        self.debug_enable = self.stopping_crit.debug_enable
+
+        # Credible interval : two-sided confidence, i.e., 1-alpha percent quantile
+        # quantile value for the error bound
+        if self.errbd_type == 'full_Bayes':
+            # degrees of freedom = 2^mmin - 1
+            self.uncert = -tnorm.ppf(self.stopping_crit.alpha / 2, (2 ** self.m_min) - 1)
+        else:
+            self.uncert = -gaussnorm.ppf(self.stopping_crit.alpha / 2)
 
         # Set Attributes
         self.m_min = m_min
@@ -52,6 +74,7 @@ class LDTransformBayesData(AccumulateData):
             self.ff = self.integrand.f
         self.fbt = fbt
         self.merge_fbt = merge_fbt
+        self.kernel = kernel
 
         super(LDTransformBayesData, self).__init__()
 
@@ -72,6 +95,119 @@ class LDTransformBayesData(AccumulateData):
                           MaxSamplesWarning)
 
         return self.xun_, self.ftilde_, self.m
+
+    # decides if the user-defined error threshold is met
+    def stopping_criterion(self, xpts, ftilde, m):
+        r = self.stopping_crit.order
+        ftilde = ftilde.squeeze()
+        n = 2 ** m
+        success = False
+        lna_range = [-5, 0]  # reduced from [-5, 5], to avoid kernel values getting too big causing error
+
+        # search for optimal shape parameter
+        lna_MLE = fminbnd(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
+                          x1=lna_range[0], x2=lna_range[1], xtol=1e-2, disp=0)
+
+        aMLE = exp(lna_MLE)
+        _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
+
+        # Check error criterion
+        # compute DSC
+        if self.errbd_type == 'full_Bayes':
+            # full Bayes
+            if self.avoid_cancel_error:
+                DSC = abs(vec_lambda_ring[0] / n)
+            else:
+                DSC = abs((vec_lambda[0] / n) - 1)
+
+            # 1-alpha two sided confidence interval
+            err_bd = self.uncert * sqrt(DSC * RKHS_norm / (n - 1))
+        elif self.errbd_type == 'GCV':
+            # GCV based stopping criterion
+            if self.avoid_cancel_error:
+                DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
+            else:
+                DSC = abs(1 - (n / vec_lambda[0]))
+
+            temp = vec_lambda
+            temp[0] = n + vec_lambda_ring[0]
+            mC_inv_trace = sum(1. / temp(temp != 0))
+            err_bd = self.uncert * sqrt(DSC * RKHS_norm / mC_inv_trace)
+        else:
+            # empirical Bayes
+            if self.avoid_cancel_error:
+                DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
+            else:
+                DSC = abs(1 - (n / vec_lambda[0]))
+            err_bd = self.uncert * sqrt(DSC * RKHS_norm / n)
+
+        if self.arb_mean:  # zero mean case
+            muhat = ftilde[0] / n
+        else:  # non zero mean case
+            muhat = ftilde[0] / vec_lambda[0]
+
+        self.error_bound = err_bd
+        muhat = np.abs(muhat)
+        muminus = muhat - err_bd
+        muplus = muhat + err_bd
+
+        if 2 * err_bd <= max(self.abs_tol, self.rel_tol * abs(muminus)) + max(self.abs_tol, self.rel_tol * abs(muplus)):
+            if err_bd == 0:
+                err_bd = np.finfo(float).eps
+
+            # stopping criterion achieved
+            success = True
+        return success, muhat, r, err_bd
+
+    # objective function to estimate parameter theta
+    # MLE : Maximum likelihood estimation
+    # GCV : Generalized cross validation
+    def objective_function(self, a, xun, ftilde):
+        n = len(ftilde)
+        fudge = 1000*np.finfo(float).eps
+        [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, a, self.avoid_cancel_error,
+                                                    self.kernType, self.debug_enable)
+
+        vec_lambda = abs(vec_lambda)
+        # compute RKHS_norm
+        temp = abs(ftilde[vec_lambda > fudge] ** 2) / (vec_lambda[vec_lambda > fudge])
+
+        # compute loss
+        if self.errbd_type == 'GCV':
+            # GCV
+            temp_gcv = abs(ftilde[vec_lambda > fudge] / (vec_lambda[vec_lambda > fudge])) ** 2
+            loss1 = 2 * log(sum(1. / vec_lambda[vec_lambda > fudge]))
+            loss2 = log(sum(temp_gcv[1:]))
+            # ignore all zero eigenvalues
+            loss = loss2 - loss1
+
+            if self.arb_mean:
+                RKHS_norm = (1/lambda_factor)*sum(temp_gcv[1:]) / n
+            else:
+                RKHS_norm = (1/lambda_factor)*sum(temp_gcv) / n
+        else:
+            # default: MLE
+            if self.arb_mean:
+                RKHS_norm = (1/lambda_factor)*sum(temp[1:]) / n
+                temp_1 = (1/lambda_factor)*sum(temp[1:])
+            else:
+                RKHS_norm = (1/lambda_factor)*sum(temp) / n
+                temp_1 = (1/lambda_factor)*sum(temp)
+
+            # ignore all zero eigenvalues
+            loss1 = sum(log(abs(lambda_factor*vec_lambda[vec_lambda > fudge])))
+            loss2 = n * log(temp_1)
+            loss = loss1 + loss2
+
+        if self.debug_enable:
+            self.alert_msg(loss1, 'Inf', 'Imag')
+            self.alert_msg(RKHS_norm, 'Imag')
+            self.alert_msg(loss2, 'Inf', 'Imag')
+            self.alert_msg(loss, 'Inf', 'Imag', 'Nan')
+            self.alert_msg(vec_lambda, 'Imag')
+
+        vec_lambda, vec_lambda_ring = lambda_factor*vec_lambda, lambda_factor*vec_lambda_ring
+        return loss, vec_lambda, vec_lambda_ring, RKHS_norm
 
     # Efficient Fast Bayesian Transform computation algorithm, avoids recomputing the full transform
     def iter_fbt(self, iter, xun, xpts, ftilde_prev):
