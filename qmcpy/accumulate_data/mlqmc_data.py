@@ -44,8 +44,7 @@ class MLQMCData(AccumulateData):
         # get seeds for each replication
         if self.discrete_distrib.d != 1:
             self.true_measure._set_dimension_r(1)
-        random.seed(self.discrete_distrib.seed)
-        self.seeds = random.randint(1, 1000000, size=(self.levels,int(self.replications)), dtype=uint64)
+        self.seeds = self.discrete_distrib.rng.choice(1000000,(self.levels,int(self.replications)),replace=False).astype(uint64)+1
         super(MLQMCData,self).__init__()
 
     def update_data(self):
@@ -99,7 +98,8 @@ class MLQMCData(AccumulateData):
             self.var_level = hstack((self.var_level,inf))
             self.cost_level = hstack((self.cost_level,0))
             self.var_cost_ratio_level = hstack((self.var_cost_ratio_level,inf))
-            self.seeds = vstack((self.seeds,random.randint(1, 1000000, int(self.replications), dtype=uint64)))
+            level_seeds = self.discrete_distrib.rng.choice(1000000,int(self.replications),replace=False).astype(dtype=uint64)+1
+            self.seeds = vstack((self.seeds,level_seeds))
 
     def _add_level_MLMC(self):
         """ Add another level to relevent attributes. """

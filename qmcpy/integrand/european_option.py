@@ -21,12 +21,12 @@ class EuropeanOption(Integrand):
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.210...
+    9.212...
     >>> eo = EuropeanOption(BrownianMotion(Sobol(4,seed=7),drift=1),call_put='put')
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.220...
+    9.159...
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35,

@@ -13,18 +13,18 @@ class Sobol(DiscreteDistribution):
     
     >>> s = Sobol(2,seed=7)
     >>> s.gen_samples(4)
-    array([[0.673, 0.063],
-           [0.398, 0.788],
-           [0.913, 0.564],
-           [0.125, 0.288]])
+    array([[0.809, 0.278],
+           [0.308, 0.566],
+           [0.661, 0.862],
+           [0.159, 0.044]])
     >>> s.gen_samples(1)
-    array([[0.673, 0.063]])
+    array([[0.809, 0.278]])
     >>> s
     Sobol (DiscreteDistribution Object)
         d               2^(1)
         randomize       1
         graycode        0
-        seed            [61616 58565]
+        seed            585903
         mimics          StdUniform
         dim0            0
     >>> Sobol(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
@@ -175,13 +175,12 @@ class Sobol(DiscreteDistribution):
             warnings.warn("Non-randomized AGS Sobol sequence includes the origin",ParameterWarning)
         if return_jlms and self.randomize!=1:
             raise ParameterError("return_jlms=True only applies when randomize='LMS'.")
-        if len(self.seed) != self.d:
-            self.set_seed(self.seed)
         n = int(n_max-n_min)
         x = zeros((n,self.d), dtype=double)
         xjlms = zeros((n,self.d), dtype=double)
+        seeds = random.RandomState(self.seed).choice(1000000, self.d, replace=False).astype(uint64)+1
         rc = self.sobol_cf(n, self.d, int(n_min), self.dim0, self.randomize, self.graycode, \
-            self.seed, x, self.d_max, self.m_max, self.z, self.msb, xjlms, return_jlms)
+            seeds, x, self.d_max, self.m_max, self.z, self.msb, xjlms, return_jlms)
         if rc!= 0:
             raise ParameterError(self.errors[rc])
         if self.randomize==1 and return_jlms:
@@ -193,30 +192,15 @@ class Sobol(DiscreteDistribution):
         """ pdf of a standard uniform """
         return ones(x.shape[0], dtype=float)
 
-    def set_seed(self, seeds):
+    def set_seed(self, seed=None):
         """
         Reset the seeds
 
         Args:
-            seeds (int/list/None): new seeds
+            seeds (int): new seed
         """
-        if isinstance(seeds,int) or isinstance(seeds,uint32) or isinstance(seeds,uint64):
-            self.seed = random.RandomState(seeds).randint(1, 100000, size=self.d, dtype=uint64)
-        elif isinstance(seeds,list) or isinstance(seeds,ndarray):
-            seeds = array(seeds)
-            l = len(seeds)
-            if l == self.d:
-                self.seed = seeds
-            elif l < self.d:
-                self.seed = hstack((seeds, random.randint(1, 100000, size=self.d-l, dtype=uint64)))
-            else: # l > self.d
-                self.seed = seeds[:self.d]
-        elif seeds==None: # assume seed==None
-            self.seed = random.RandomState().randint(1, 100000, size=self.d, dtype=uint64)
-        else:
-            msg = "Sobol' seed must be an int, list of ints, or None."
-            raise ParameterError(msg)
-        self.seed = array(self.seed, dtype=uint64)
+        self.rng = random.RandomState(seed)
+        self.seed = self.rng.choice(1000000,1)
             
     def _set_dimension(self, dimension):
         """
@@ -226,8 +210,6 @@ class Sobol(DiscreteDistribution):
             dimension (int): new dimension
         """
         self.d = dimension
-        if hasattr(self,'seed'):
-            self.set_seed(self.seed)
 
     def set_randomize(self, randomize):
         """

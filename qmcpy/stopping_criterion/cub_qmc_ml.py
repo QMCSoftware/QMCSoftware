@@ -18,9 +18,9 @@ class CubQMCML(StoppingCriterion):
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.444...
+    10.433...
     >>> data
-    Solution: 10.4445        
+    Solution: 10.4332        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -29,10 +29,10 @@ class CubQMCML(StoppingCriterion):
         t               1
         b               85
     Lattice (DiscreteDistribution Object)
-        d               2^(6)
+        d               2^(5)
         randomize       1
         order           natural
-        seed            748493
+        seed            87657
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
@@ -44,13 +44,13 @@ class CubQMCML(StoppingCriterion):
         n_max           10000000000
         replications    2^(5)
     MLQMCData (AccumulateData Object)
-        levels          7
-        dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        n_level         [8192.  256.  256.  256.  256.  256.  256.]
-        mean_level      [1.005e+01 1.821e-01 1.048e-01 5.404e-02 2.787e-02 1.386e-02 7.084e-03]
-        var_level       [2.254e-05 7.454e-05 3.118e-05 1.288e-05 3.455e-06 1.263e-06 3.503e-07]
-        bias_estimate   0.007
-        n_total         311296
+        levels          6
+        dimensions      [ 1.  2.  4.  8. 16. 32.]
+        n_level         [4096.  256.  256.  256.  256.  256.]
+        mean_level      [10.053  0.182  0.102  0.054  0.028  0.014]
+        var_level       [6.399e-05 6.275e-05 2.998e-05 1.024e-05 3.161e-06 1.411e-06]
+        bias_estimate   0.008
+        n_total         172032
         time_integrate  ...
     
     References:

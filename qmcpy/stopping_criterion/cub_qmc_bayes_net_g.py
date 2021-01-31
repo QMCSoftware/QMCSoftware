@@ -26,15 +26,15 @@ class CubBayesNetG(StoppingCriterion):
     >>> sc = CubBayesNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.811...
+    1.807...
     >>> data
-    Solution: 1.8110         
+    Solution: 1.8071         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
         d               2^(1)
         randomize       1
         graycode        0
-        seed            [77469 77107]
+        seed            507576
         mimics          StdUniform
         dim0            0
     Gaussian (TrueMeasure Object)
@@ -48,8 +48,8 @@ class CubBayesNetG(StoppingCriterion):
         n_max           2^(22)
     LDTransformBayesData (AccumulateData Object)
         n_total         256
-        solution        1.811
-        error_bound     0.015
+        solution        1.807
+        error_bound     0.014
         time_integrate  ...
         
     Adapted from

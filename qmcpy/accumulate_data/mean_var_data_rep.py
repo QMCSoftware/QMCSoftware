@@ -28,7 +28,7 @@ class MeanVarDataRep(AccumulateData):
         self.replications = replications
         self.muhat_r = zeros(int(self.replications))
         self.solution = nan
-        self.muhat = inf  # sample mean
+        self.muhat = inf # sample mean
         self.sighat = inf # sample standard deviation
         self.t_eval = 0  # processing time for each integrand
         self.n_r = n_init  # current number of samples to draw from discrete distribution
@@ -36,12 +36,7 @@ class MeanVarDataRep(AccumulateData):
         self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
-        seed = self.discrete_distrib.seed
-        if isinstance(seed,int) or isinstance(seed, uint64):
-            random.seed(seed)
-        else:
-            random.seed(seed[0])
-        self.seeds = random.randint(1, 100000, int(self.replications), dtype=uint64)
+        self.seeds = self.discrete_distrib.rng.choice(100000,int(replications),replace=False).astype(dtype=uint64)+1
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):

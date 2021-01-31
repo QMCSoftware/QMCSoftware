@@ -9,12 +9,12 @@
 #   -b for sphinx-build will look for conf.py
 
 tests:
+	cd qmcpy && python -m pytest --doctest-modules --disable-pytest-warnings
 	@echo "\nFastests"
 	python -W ignore -m unittest discover -s test/fasttests/ 1>/dev/null
 	@echo "\nLongtests"
 	python -W ignore -m unittest discover -s test/longtests/ 1>/dev/null
 	@echo "\nDoctests"
-	cd qmcpy && python -m pytest --doctest-modules --disable-pytest-warnings
 
 mddir = sphinx/readme_rst/
 nbdir = sphinx/demo_rst/

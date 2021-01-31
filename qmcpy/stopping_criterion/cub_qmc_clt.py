@@ -21,13 +21,13 @@ class CubQMCCLT(StoppingCriterion):
     >>> solution
     1.380...
     >>> data
-    Solution: 1.3807         
+    Solution: 1.3805         
     Keister (Integrand Object)
     Lattice (DiscreteDistribution Object)
         d               1
         randomize       1
         order           natural
-        seed            1093
+        seed            15417
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
@@ -42,10 +42,10 @@ class CubQMCCLT(StoppingCriterion):
         n_max           2^(30)
     MeanVarDataRep (AccumulateData Object)
         replications    2^(4)
-        solution        1.381
-        sighat          4.61e-04
+        solution        1.380
+        sighat          6.25e-04
         n_total         2^(12)
-        error_bound     3.56e-04
+        error_bound     4.83e-04
         confid_int      [1.38  1.381]
         time_integrate  ...
     """

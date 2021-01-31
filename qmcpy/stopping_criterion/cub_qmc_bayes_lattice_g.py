@@ -43,7 +43,7 @@ class CubBayesLatticeG(StoppingCriterion):
         rel_tol         0
         n_init          2^(8)
         n_max           2^(22)
-        order           2^1
+        order           2^(1)
     LDTransformBayesData (AccumulateData Object)
         n_total         256
         solution        1.808

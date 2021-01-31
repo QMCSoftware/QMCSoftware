@@ -27,8 +27,7 @@ class IIDStdUniform(DiscreteDistribution):
         """
         self.parameters = ['d','seed','mimics']
         self.d = dimension
-        self.seed = seed
-        random.seed(self.seed)
+        self.set_seed(seed)
         self.mimics = 'StdUniform'
         self.low_discrepancy = False
         super(IIDStdUniform,self).__init__()
@@ -43,11 +42,15 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             ndarray: n x self.d array of samples
         """
-        return random.rand(int(n), int(self.d))
+        return self.rng.rand(int(n), int(self.d))
     
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
     
+    def set_seed(self,seed):
+        self.seed = seed
+        self.rng = random.RandomState(self.seed)
+        
     def _set_dimension(self, dimension):
         self.d = dimension
         
