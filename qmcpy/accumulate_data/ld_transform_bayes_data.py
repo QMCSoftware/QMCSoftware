@@ -4,7 +4,7 @@ from numpy import array, nan
 import warnings
 import numpy as np
 from scipy.optimize import fminbound as fminbnd
-from numpy import sqrt, log2, exp, log, ctypeslib
+from numpy import sqrt, exp, log
 from scipy.stats import norm as gaussnorm
 from scipy.stats import t as tnorm
 
@@ -275,6 +275,28 @@ class LDTransformBayesData(AccumulateData):
             x = np.vstack([x, xnew])
             xun = np.vstack([xun, xunnew])
         return xun, x
+
+    # Computes modified kernel Km1 = K - 1
+    # Useful to avoid cancellation error in the computation of (1 - n/\lambda_1)
+    @staticmethod
+    def kernel_t(aconst, Bern):
+        theta = aconst
+        d = np.size(Bern, 1)
+
+        Kjm1 = theta * Bern[:, 0]  # Kernel at j-dim minus One
+        Kj = 1 + Kjm1  # Kernel at j-dim
+
+        for j in range(1, d):
+            Kjm1_prev = Kjm1
+            Kj_prev = Kj  # save the Kernel at the prev dim
+
+            Kjm1 = theta * Bern[:, j] * Kj_prev + Kjm1_prev
+            Kj = 1 + Kjm1
+
+        Km1 = Kjm1
+        K = Kj
+        return [Km1, K]
+
 
     # prints debug message if the given variable is Inf, Nan or complex, etc
     # Example: alertMsg(x, 'Inf', 'Imag')

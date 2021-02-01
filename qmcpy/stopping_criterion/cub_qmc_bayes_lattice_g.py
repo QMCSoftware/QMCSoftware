@@ -1,10 +1,9 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Lattice
-from ..true_measure import Gaussian
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
-from numpy import sqrt, log2, exp, log
+from numpy import log2
 from math import factorial
 import numpy as np
 from time import time
@@ -178,35 +177,13 @@ class CubBayesLatticeG(StoppingCriterion):
         ftilde_new[~ptind] = np.squeeze(evenval - coefv * oddval)
         return ftilde_new
 
-    # Computes modified kernel Km1 = K - 1
-    # Useful to avoid cancellation error in the computation of (1 - n/\lambda_1)
-    @staticmethod
-    def kernel_t(aconst, Bern):
-        theta = aconst
-        d = np.size(Bern, 1)
-
-        Kjm1 = theta * Bern[:, 0]  # Kernel at j-dim minus One
-        Kj = 1 + Kjm1  # Kernel at j-dim
-
-        for j in range(1, d):
-            Kjm1_prev = Kjm1
-            Kj_prev = Kj  # save the Kernel at the prev dim
-
-            Kjm1 = theta * Bern[:, j] * Kj_prev + Kjm1_prev
-            Kj = 1 + Kjm1
-
-        Km1 = Kjm1
-        K = Kj
-        return [Km1, K]
-
     '''
     Shift invariant kernel
     C1 : first row of the covariance matrix
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fft(C1 - 1)
     '''
-    @staticmethod
-    def kernel(xun, order, a, avoid_cancel_error, kern_type, debug_enable):
+    def kernel(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
 
         if kern_type == 1:
             b_order = order * 2  # Bernoulli polynomial order as per the equation
@@ -228,7 +205,7 @@ class CubBayesLatticeG(StoppingCriterion):
         if avoid_cancel_error:
             # Computes C1m1 = C1 - 1
             # C1_new = 1 + C1m1 indirectly computed in the process
-            (vec_C1m1, C1_alt) = CubBayesLatticeG.kernel_t(a * const_mult, kernel_func(xun))
+            (vec_C1m1, C1_alt) = self.data.kernel_t(a * const_mult, kernel_func(xun))
 
             lambda_factor = max(abs(vec_C1m1))
             C1_alt = C1_alt / lambda_factor

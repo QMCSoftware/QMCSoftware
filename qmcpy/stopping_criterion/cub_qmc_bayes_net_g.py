@@ -1,7 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Sobol
-from ..true_measure import Gaussian
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
 from ..discrete_distribution.c_lib import c_lib
@@ -9,8 +8,6 @@ import ctypes
 from numpy import log2, ctypeslib
 import numpy as np
 from time import time
-from scipy.stats import norm as gaussnorm
-from scipy.stats import t as tnorm
 import warnings
 
 
@@ -173,136 +170,6 @@ class CubBayesNetG(StoppingCriterion):
         ftilde_new = np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
         return ftilde_new
 
-    # # decides if the user-defined error threshold is met
-    # def stopping_criterion(self, xpts, ftilde, m):
-    #     ftilde = ftilde.squeeze()
-    #     n = 2 ** m
-    #     success = False
-    #     lna_range = [-5, 0]  # reduced from [-5, 5], to avoid kernel values getting too big causing error
-    #     r = self.order
-    #
-    #     # search for optimal shape parameter
-    #     lna_MLE = fminbnd(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
-    #                       x1=lna_range[0], x2=lna_range[1], xtol=1e-2, disp=0)
-    #     aMLE = exp(lna_MLE)
-    #     _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
-    #
-    #     # Check error criterion
-    #     # compute DSC
-    #     if self.full_Bayes:
-    #         # full Bayes
-    #         if self.avoid_cancel_error:
-    #             DSC = abs(vec_lambda_ring[0] / n)
-    #         else:
-    #             DSC = abs((vec_lambda[0] / n) - 1)
-    #         # 1-alpha two sided confidence interval
-    #         err_bd = self.uncert * sqrt(DSC * RKHS_norm / (n - 1))
-    #     elif self.GCV:
-    #         # GCV based stopping criterion
-    #         if self.avoid_cancel_error:
-    #             DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
-    #         else:
-    #             DSC = abs(1 - (n / vec_lambda[0]))
-    #         temp = vec_lambda
-    #         temp[0] = n + vec_lambda_ring[0]
-    #         mC_inv_trace = sum(1. / temp(temp != 0))
-    #         err_bd = self.uncert * sqrt(DSC * RKHS_norm / mC_inv_trace)
-    #     else:
-    #         # empirical Bayes
-    #         if self.avoid_cancel_error:
-    #             DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
-    #         else:
-    #             DSC = abs(1 - (n / vec_lambda[0]))
-    #         err_bd = self.uncert * sqrt(DSC * RKHS_norm / n)
-    #
-    #     if self.arb_mean:  # zero mean case
-    #         muhat = ftilde[0] / n
-    #     else:  # non zero mean case
-    #         muhat = ftilde[0] / vec_lambda[0]
-    #
-    #     self.data.error_bound = err_bd
-    #     muhat = np.abs(muhat)
-    #     muminus = muhat - err_bd
-    #     muplus = muhat + err_bd
-    #
-    #     if 2 * err_bd <= max(self.abs_tol, self.rel_tol * abs(muminus)) + max(self.abs_tol, self.rel_tol * abs(muplus)):
-    #         if err_bd == 0:
-    #             err_bd = np.finfo(float).eps
-    #
-    #         # stopping criterion achieved
-    #         success = True
-    #
-    #     return success, muhat, r, err_bd
-
-    # # objective function to estimate parameter theta
-    # # MLE : Maximum likelihood estimation
-    # # GCV : Generalized cross validation
-    # def objective_function(self, a, xun, ftilde):
-    #     n = len(ftilde)
-    #     [vec_lambda, vec_lambda_ring] = self.kernel(xun, self.order, a, self.avoid_cancel_error,
-    #                                                 self.kernType, self.debug_enable)
-    #     fudge = 1000*np.finfo(float).eps
-    #     vec_lambda = abs(vec_lambda)
-    #     # compute RKHS_norm
-    #     temp = abs(ftilde[vec_lambda > fudge] ** 2) / (vec_lambda[vec_lambda > fudge])
-    #
-    #     # compute loss
-    #     if self.GCV:
-    #         # GCV
-    #         temp_gcv = abs(ftilde[vec_lambda > fudge] / (vec_lambda[vec_lambda > fudge])) ** 2
-    #         loss1 = 2 * log(sum(1. / vec_lambda[vec_lambda > fudge]))
-    #         loss2 = log(sum(temp_gcv[1:]))
-    #         # ignore all zero eigenvalues
-    #         loss = loss2 - loss1
-    #
-    #         if self.arb_mean:
-    #             RKHS_norm = sum(temp_gcv[1:]) / n
-    #         else:
-    #             RKHS_norm = sum(temp_gcv) / n
-    #     else:
-    #         # default: MLE
-    #         if self.arb_mean:
-    #             RKHS_norm = sum(temp[1:]) / n
-    #             temp_1 = sum(temp[1:])
-    #         else:
-    #             RKHS_norm = sum(temp) / n
-    #             temp_1 = sum(temp)
-    #
-    #         # ignore all zero eigenvalues
-    #         loss1 = sum(log(abs(vec_lambda[vec_lambda > fudge])))
-    #         loss2 = n * log(temp_1)
-    #         loss = loss1 + loss2
-    #
-    #     if self.debug_enable:
-    #         self.data.alert_msg(loss1, 'Inf', 'Imag')
-    #         self.data.alert_msg(RKHS_norm, 'Imag')
-    #         self.data.alert_msg(loss2, 'Inf', 'Imag')
-    #         self.data.alert_msg(loss, 'Inf', 'Imag', 'Nan')
-    #         self.data.alert_msg(vec_lambda, 'Imag')
-    #
-    #     return loss, vec_lambda, vec_lambda_ring, RKHS_norm
-
-    # Computes modified kernel Km1 = K - 1
-    # Useful to avoid cancellation error in the computation of (1 - n/\lambda_1)
-    @staticmethod
-    def kernel_t(aconst, Bern):
-        theta = aconst
-        d = np.size(Bern, 1)
-
-        Kjm1 = theta * Bern[:, 0]  # Kernel at j-dim minus One
-        Kj = 1 + Kjm1  # Kernel at j-dim
-
-        for j in range(1, d):
-            Kjm1_prev = Kjm1
-            Kj_prev = Kj  # save the Kernel at the prev dim
-
-            Kjm1 = theta * Bern[:, j] * Kj_prev + Kjm1_prev
-            Kj = 1 + Kjm1
-
-        Km1 = Kjm1
-        K = Kj
-        return [Km1, K]
-
     '''
     Digitally shift invariant kernel
     C1 : first row of the covariance matrix
@@ -316,7 +183,7 @@ class CubBayesNetG(StoppingCriterion):
         if avoid_cancel_error:
             # Computes C1m1 = C1 - 1
             # C1_new = 1 + C1m1 indirectly computed in the process
-            (vec_C1m1, C1_alt) = CubBayesNetG.kernel_t(a * const_mult, kernel_func(xun))
+            (vec_C1m1, C1_alt) = self.data.kernel_t(a * const_mult, kernel_func(xun))
             lambda_factor = max(abs(vec_C1m1))
             C1_alt = C1_alt / lambda_factor
             vec_C1m1 = vec_C1m1 / lambda_factor
