@@ -3,6 +3,7 @@ from qmcpy.util import DimensionError
 from ..discrete_distribution import Sobol
 from numpy import *
 
+
 class Kumaraswamy(TrueMeasure):
     """
     For $\\boldsymbol{a},\\boldsymbol{b}>0$ we have
