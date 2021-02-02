@@ -93,12 +93,12 @@ class MLCallOptions(Integrand):
                      exp(-self.r*self.t)*norm.cdf(d4) ) )
         return val
 
-    def _g_european(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
+    def _g_european(self, t, l, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for European call option.
 
         Args:
-            samples (ndarray): nxd array of samples
+            t (ndarray): nxd array of samples
             l (int): level
             n (int): number of samples
             d (int): number of dimensions
@@ -114,7 +114,7 @@ class MLCallOptions(Integrand):
                 First, an ndarray of payoffs from fine paths. \
                 Second, an ndarray of payoffs from coarse paths.
         """
-        dwf = samples * sqrt(hf)
+        dwf = t * sqrt(hf)
         if l == 0:
             dwf = dwf.squeeze()
             xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
@@ -129,12 +129,12 @@ class MLCallOptions(Integrand):
         pc = maximum(0,xc-self.k)
         return pf,pc
 
-    def _g_asian(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
+    def _g_asian(self, t, l, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for Asian call option.
 
         Args:
-            samples (ndarray): nxd array of samples
+            t (ndarray): nxd array of samples
             l (int): level
             n (int): number of samples
             d (int): number of dimensions
@@ -152,8 +152,8 @@ class MLCallOptions(Integrand):
         """
         af = .5*hf*xf
         ac = .5*hc*xc
-        dwf = sqrt(hf) * samples[:,:int(d/2)]
-        dif = sqrt(hf/12) * hf * samples[:,int(d/2):]
+        dwf = sqrt(hf) * t[:,:int(d/2)]
+        dif = sqrt(hf/12) * hf * t[:,int(d/2):]
         if l == 0:
             dwf = dwf.squeeze()
             dif = dif.squeeze()
@@ -181,24 +181,24 @@ class MLCallOptions(Integrand):
         pc = maximum(0,ac-self.k)
         return pf,pc
 
-    def g(self, samples, l):
+    def g(self, t, l):
         """
         Args:
-            samples (ndarray): Gaussian(0,1^2) samples
+            t (ndarray): Gaussian(0,1^2) samples
             l (int): level
         Returns:
             tuple: \
                 First, an ndarray of length 6 vector of summary statistic sums. \
                 Second, a float of cost on this level.
         """
-        n,d = samples.shape
+        n,d = t.shape
         nf = 2**l # n fine
         nc = float(nf)/2 # n coarse
         hf = self.t/nf # timestep fine
         hc = self.t/nc # timestep coarse
         xf = tile(self.k,int(n))
         xc = xf
-        pf,pc = self.g_submodule(samples, l, n, d, nf, nc, hf, hc, xf, xc)
+        pf,pc = self.g_submodule(t, l, n, d, nf, nc, hf, hc, xf, xc)
         dp = exp(-self.r*self.t)*(pf-pc)
         pf = exp(-self.r*self.t)*pf
         if l == 0:

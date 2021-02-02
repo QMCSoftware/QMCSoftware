@@ -55,11 +55,11 @@ class EuropeanOption(Integrand):
             raise ParameterError("call_put must be either 'call' or 'put'")
         super(EuropeanOption,self).__init__()        
 
-    def g(self, x):
+    def g(self, t):
         """ See abstract method. """
         self.s = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
-            self.true_measure.time_vec + self.volatility * x)
+            self.true_measure.time_vec + self.volatility * t)
         for xx,yy in zip(*where(self.s<0)): # if stock becomes <=0, 0 out rest of path
             self.s[xx,yy:] = 0
         if self.call_put == 'call':

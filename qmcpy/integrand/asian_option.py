@@ -118,13 +118,13 @@ class AsianOption(Integrand):
         y_adj = y_raw * exp(-self.interest_rate * self.t_final)
         return y_adj
 
-    def g(self, x, l=0):
+    def g(self, t, l=0):
         """ See abstract method. """
         dim_frac = self.dim_fracs[l]
         dimension = float(self.dimensions[l])
         self.s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
-            self.true_measure.time_vec + self.volatility * x)
+            self.true_measure.time_vec + self.volatility * t)
         for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs(self.s_fine, dimension)
