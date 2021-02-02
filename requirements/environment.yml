@@ -165,4 +165,3 @@ dependencies:
     - wcwidth==0.1.9
     - wrapt==1.12.1
     - zipp==3.1.0
-prefix: /Users/alegresor/miniconda3/envs/qmcpy
