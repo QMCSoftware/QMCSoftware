@@ -16,12 +16,12 @@ class CubMCMLCont(StoppingCriterion):
     Stopping criterion based on continuation multi-level monte carlo.
     
     >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
-    >>> sc = CubMCML(mlco,abs_tol=.05)
+    >>> sc = CubMCMLCont(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.440...
+    10.427...
     >>> data
-    Solution: 10.4406        
+    Solution: 10.4273        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -30,33 +30,33 @@ class CubMCMLCont(StoppingCriterion):
         t               1
         b               85
     IIDStdUniform (DiscreteDistribution Object)
-        d               2^(6)
+        d               2^(4)
         seed            7
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1
         decomp_type     pca
-    CubMCML (StoppingCriterion Object)
+    CubMCMLCont (StoppingCriterion Object)
         rmse_tol        0.019
         n_init          2^(8)
         levels_min      2^(1)
         levels_max      10
         n_tols          10
-        tol_mult        1.200
-        theta_init      2^(-2)
-        theta           0.01
+        tol_mult        1.668
+        theta_init      2^(-1)
+        theta           0.365
     MLMCData (AccumulateData Object)
-        levels          7
-        dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        n_level         [7.795e+05 1.496e+04 5.916e+03 2.244e+03 7.560e+02 2.770e+02 1.060e+02]
-        mean_level      [1.005e+01 1.777e-01 1.071e-01 5.340e-02 2.990e-02 1.167e-02 7.812e-03]
-        var_level       [1.959e+02 1.441e-01 4.433e-02 1.093e-02 2.940e-03 7.304e-04 2.261e-04]
-        cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
-        n_total         804118
-        alpha           0.942
-        beta            1.893
-        gamma           1.000
+        levels          5
+        dimensions      [ 1.  2.  4.  8. 16.]
+        n_level         [1.160e+06 2.245e+04 8.903e+03 5.002e+03 9.230e+02]
+        mean_level      [10.055  0.183  0.102  0.056  0.031]
+        var_level       [1.963e+02 1.442e-01 4.485e-02 1.139e-02 3.477e-03]
+        cost_per_sample [ 1.  2.  4.  8. 16.]
+        n_total         1197552
+        alpha           0.856
+        beta            1.810
+        gamma           1
         time_integrate  ...
 
     Original Implementation:
