@@ -11,18 +11,18 @@ class Halton(DiscreteDistribution):
 
     >>> h = Halton(2,seed=7)
     >>> h.gen_samples(4)
-    array([[0.874, 0.206],
-           [0.374, 0.54 ],
-           [0.624, 0.873],
-           [0.124, 0.317]])
+    array([[0.166, 0.363],
+           [0.666, 0.696],
+           [0.416, 0.03 ],
+           [0.916, 0.474]])
     >>> h.gen_samples(1)
-    array([[0.874, 0.206]])
+    array([[0.166, 0.363]])
     >>> h
     Halton (DiscreteDistribution Object)
         d               2^(1)
         generalize      1
         randomize       1
-        seed            585903
+        seed            7
         mimics          StdUniform
     
     References:
@@ -128,10 +128,6 @@ class Halton(DiscreteDistribution):
 
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
-        
-    def set_seed(self, seed):
-        self.rng = random.RandomState(seed) if seed else random.RandomState()
-        self.seed = self.rng.randint(1000000, dtype=uint64)
         
     def _set_dimension(self, dimension):
         self.d = dimension

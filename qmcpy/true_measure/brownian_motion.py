@@ -12,8 +12,8 @@ class BrownianMotion(Gaussian):
     
     >>> bm = BrownianMotion(Sobol(4,seed=7),t_final=2,drift=2)
     >>> bm.gen_samples(2)
-    array([[0.095, 1.024, 2.312, 2.841],
-           [1.424, 2.605, 3.215, 4.825]])
+    array([[0.974, 2.288, 2.866, 4.49 ],
+           [0.587, 0.745, 1.999, 2.173]])
     >>> bm
     BrownianMotion (TrueMeasure Object)
         time_vec        [0.5 1.  1.5 2. ]

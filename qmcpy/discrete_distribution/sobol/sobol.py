@@ -13,18 +13,18 @@ class Sobol(DiscreteDistribution):
     
     >>> s = Sobol(2,seed=7)
     >>> s.gen_samples(4)
-    array([[0.809, 0.278],
-           [0.308, 0.566],
-           [0.661, 0.862],
-           [0.159, 0.044]])
+    array([[0.429, 0.426],
+           [0.882, 0.552],
+           [0.025, 0.97 ],
+           [0.54 , 0.095]])
     >>> s.gen_samples(1)
-    array([[0.809, 0.278]])
+    array([[0.429, 0.426]])
     >>> s
     Sobol (DiscreteDistribution Object)
         d               2^(1)
         randomize       1
         graycode        0
-        seed            585903
+        seed            7
         mimics          StdUniform
         dim0            0
     >>> Sobol(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
@@ -115,8 +115,8 @@ class Sobol(DiscreteDistribution):
             ctypes.c_uint32] # set_xjlms
         # set parameters
         self.sobol_cf.restype = ctypes.c_uint32
-        self._set_dimension(dimension)
-        self.set_seed(seed)
+        self.seed = seed
+        self._set_dimension(dimension) # calls self.set_seed(self.seed)
         self.set_randomize(randomize)
         self.set_graycode(graycode)
         self.set_dim0(dim0)
@@ -178,9 +178,9 @@ class Sobol(DiscreteDistribution):
         n = int(n_max-n_min)
         x = zeros((n,self.d), dtype=double)
         xjlms = zeros((n,self.d), dtype=double)
-        seeds = random.RandomState(self.seed).choice(1000000, self.d, replace=False).astype(uint64)+1
+        if len(self.seeds)!=self.d: raise ParameterError("Sobol' seeds must have length equal to dimension")
         rc = self.sobol_cf(n, self.d, int(n_min), self.dim0, self.randomize, self.graycode, \
-            seeds, x, self.d_max, self.m_max, self.z, self.msb, xjlms, return_jlms)
+            self.seeds, x, self.d_max, self.m_max, self.z, self.msb, xjlms, return_jlms)
         if rc!= 0:
             raise ParameterError(self.errors[rc])
         if self.randomize==1 and return_jlms:
@@ -193,15 +193,10 @@ class Sobol(DiscreteDistribution):
         return ones(x.shape[0], dtype=float)
 
     def set_seed(self, seed=None):
-        """
-        Reset the seeds
+        super(Sobol,self).set_seed(seed)        
+        self.seeds = self.rng.choice(1000000, self.d, replace=False).astype(uint64)+1
 
-        Args:
-            seeds (int): new seed
-        """
-        self.rng = random.RandomState(seed)
-        self.seed = self.rng.choice(1000000,1)
-            
+
     def _set_dimension(self, dimension):
         """
         Reset the dimension
@@ -210,6 +205,7 @@ class Sobol(DiscreteDistribution):
             dimension (int): new dimension
         """
         self.d = dimension
+        self.set_seed(self.seed)
 
     def set_randomize(self, randomize):
         """

@@ -48,10 +48,6 @@ class IIDStdGaussian(DiscreteDistribution):
     def pdf(self, x):
         return norm.pdf(x).prod(1)
     
-    def set_seed(self,seed):
-        self.seed = seed
-        self.rng = random.RandomState(self.seed)
-    
     def _set_dimension(self, dimension):
         self.d = dimension
         

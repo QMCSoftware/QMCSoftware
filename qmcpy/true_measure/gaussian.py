@@ -14,10 +14,10 @@ class Gaussian(TrueMeasure):
     
     >>> g = Gaussian(Sobol(2,seed=7),mean=[1,2],covariance=[[9,4],[4,5]])
     >>> g.gen_samples(4)
-    array([[-2.015,  1.238],
-           [ 2.585,  2.669],
-           [ 0.71 , -0.214],
-           [ 2.455,  6.079]])
+    array([[ 1.356,  2.568],
+           [-2.301, -0.282],
+           [ 8.211,  2.946],
+           [-0.381,  3.591]])
     >>> g
     Gaussian (TrueMeasure Object)
         mean            [1 2]

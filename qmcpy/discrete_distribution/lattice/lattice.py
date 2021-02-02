@@ -104,8 +104,8 @@ class Lattice(DiscreteDistribution):
             f_lst = f.split('.')
             self.d_max = int(f_lst[-3])
             self.m_max = int(f_lst[-2])
-        self._set_dimension(dimension)
-        self.set_seed(seed)
+        self.seed = seed
+        self._set_dimension(dimension) # calls self.set_seed(self.seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Lattice,self).__init__()
@@ -208,8 +208,7 @@ class Lattice(DiscreteDistribution):
     
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = seed
-        self.rng = random.RandomState(self.seed) if self.seed else random.RandomState()
+        super(Lattice,self).set_seed(seed)
         self.shift = self.rng.rand(int(self.d))
         
     def _set_dimension(self, dimension):
@@ -218,4 +217,4 @@ class Lattice(DiscreteDistribution):
         if self.d > self.d_max:
             raise ParameterError('Lattice requires dimension <= %d.'%self.d_max)
         self.z = self.z_full[:self.d]
-        self.shift = random.rand(int(self.d))
+        self.set_seed(self.seed)

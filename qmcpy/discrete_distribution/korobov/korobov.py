@@ -12,27 +12,27 @@ class Korobov(DiscreteDistribution):
     
     >>> k = Korobov(2,generator=[1,3],seed=7)
     >>> k.gen_samples(4)
-    array([[0.965, 0.094],
-           [0.215, 0.844],
-           [0.465, 0.594],
-           [0.715, 0.344]])
+    array([[0.982, 0.883],
+           [0.232, 0.633],
+           [0.482, 0.383],
+           [0.732, 0.133]])
     >>> k.gen_samples(4)
-    array([[0.965, 0.094],
-           [0.215, 0.844],
-           [0.465, 0.594],
-           [0.715, 0.344]])
+    array([[0.982, 0.883],
+           [0.232, 0.633],
+           [0.482, 0.383],
+           [0.732, 0.133]])
     >>> k
     Korobov (DiscreteDistribution Object)
         d               2^(1)
         generator       [1 3]
         randomize       1
-        seed            585903
+        seed            7
         mimics          StdUniform
     >>> Korobov(2,generator=[3,1],seed=7).gen_samples(4)
-    array([[0.965, 0.094],
-           [0.715, 0.344],
-           [0.465, 0.594],
-           [0.215, 0.844]])
+    array([[0.982, 0.883],
+           [0.732, 0.133],
+           [0.482, 0.383],
+           [0.232, 0.633]])
     
     References:
 
@@ -110,11 +110,6 @@ class Korobov(DiscreteDistribution):
     def pdf(self, x):
         """ pdf of a standard uniform """
         return ones(x.shape[0], dtype=float)
-
-    def set_seed(self, seed):
-        """ See abstract method. """
-        self.rng = random.RandomState(seed) if seed else random.RandomState()
-        self.seed = self.rng.randint(1000000, dtype=uint64)
         
     def _set_dimension(self, dimension):
         """ See abstract method. """

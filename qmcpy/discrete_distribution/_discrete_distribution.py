@@ -48,7 +48,14 @@ class DiscreteDistribution(object):
         Args:
             seed (int): new seed for generator
         """
-        raise MethodImplementationError(self, 'set_seed')
+        if isscalar(seed):
+            self.seed = seed
+            self.rng = random.RandomState(self.seed)
+        elif seed==None:
+            self.seed = random.RandomState().choice(1000000,1)[0] # get a random seed
+            self.rng = random.RandomState(seed)
+        else:
+            raise ParameterError("set_seed currently only supports integer or None input.") 
 
     def __repr__(self):
         return _univ_repr(self, "DiscreteDistribution", self.parameters)
