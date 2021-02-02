@@ -1,4 +1,4 @@
 from .asian_option_multi_level import asian_option_multi_level
-from .asian_option_single_level import asian_option_single_level
+from .asian_option_single_level import asian_option_single_level,asian_option_single_level_high_dimensions
 from .keister import keister
 from .pi_problem import pi_problem, pi_problem_bayes_net

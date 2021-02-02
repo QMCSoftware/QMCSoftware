@@ -12,10 +12,8 @@ class CustomFun(Integrand):
     >>> x = cf.discrete_distrib.gen_samples(2**10)
     >>> y = cf.f(x)
     >>> y.mean()
-    4.009...
+    3.998...
     """
-
-    parameters = []
 
     def __init__(self, true_measure, g):
         """
@@ -23,6 +21,11 @@ class CustomFun(Integrand):
             true_measure (TrueMeasure): a TrueMeasure instance. 
             g (function): a function handle. 
         """
+        self.parameters = []
         self.true_measure = true_measure
-        self.g = lambda x,*args,**kwargs: g(x,*args,**kwargs) 
+        self._g = g
         super(CustomFun,self).__init__()
+    
+    def g(self, t, *args, **kwargs):
+        return self._g(t,*args,**kwargs)
+

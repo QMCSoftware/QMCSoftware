@@ -26,7 +26,7 @@ class MLCallOptions(Integrand):
     ...     x = mlco.discrete_distrib.gen_samples(2**10)
     ...     y += mlco.f(x,l=level).mean()
     >>> y
-    10.406...
+    10.390...
 
     References:
 
@@ -34,8 +34,6 @@ class MLCallOptions(Integrand):
     343-358, in Monte Carlo and Quasi-Monte Carlo Methods 2006, Springer, 2008.
     http://people.maths.ox.ac.uk/~gilesm/files/mcqmc06.pdf.
     """
-
-    parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
 
     def __init__(self, sampler, option='european', volatility=.2,
         start_strike_price=100., interest_rate=.05, t_final=1.):
@@ -51,11 +49,15 @@ class MLCallOptions(Integrand):
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
         """
+        self.parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
         self.true_measure = Gaussian(sampler, mean=0, covariance=1)
+        self.discrete_distrib = self.true_measure.discrete_distrib
         options = ['european','asian']
         self.option = option.lower()
         if self.option not in options:
             raise ParameterError('option type must be one of\n\t%s'%str(options))
+        #if self.discrete_distrib.low_discrepancy and self.option=='asian':
+        #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
         self.sigma = volatility
         self.k = start_strike_price
         self.r = interest_rate
@@ -64,8 +66,8 @@ class MLCallOptions(Integrand):
         self.leveltype = 'adaptive-multi'
         self.g_submodule = getattr(self,'_g_'+self.option)
         super(MLCallOptions,self).__init__()
-        if self.discrete_distrib.low_discrepancy and self.option=='asian':
-            raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
+        #if self.discrete_distrib.low_discrepancy and self.option=='asian':
+        #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
 
     def get_exact_value(self):
         """ Print exact analytic value, based on s0=k. """
@@ -77,7 +79,7 @@ class MLCallOptions(Integrand):
             print('Exact value unknown for asian option')
             val = None
         elif self.option == 'lookback':
-            kk = .5*self.sigma**2/r
+            kk = .5*self.sigma**2/self.r
             val = self.k*( norm.cdf(d1) - norm.cdf(-d1)*kk -
                       exp(-self.r*self.t)*(norm.cdf(d2) - norm.cdf(d2)*kk) )
         elif self.option == 'digital':
@@ -91,12 +93,12 @@ class MLCallOptions(Integrand):
                      exp(-self.r*self.t)*norm.cdf(d4) ) )
         return val
 
-    def _g_european(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
+    def _g_european(self, t, l, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for European call option.
 
         Args:
-            samples (ndarray): nxd array of samples
+            t (ndarray): nxd array of samples
             l (int): level
             n (int): number of samples
             d (int): number of dimensions
@@ -112,7 +114,7 @@ class MLCallOptions(Integrand):
                 First, an ndarray of payoffs from fine paths. \
                 Second, an ndarray of payoffs from coarse paths.
         """
-        dwf = samples * sqrt(hf)
+        dwf = t * sqrt(hf)
         if l == 0:
             dwf = dwf.squeeze()
             xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
@@ -127,12 +129,12 @@ class MLCallOptions(Integrand):
         pc = maximum(0,xc-self.k)
         return pf,pc
 
-    def _g_asian(self, samples, l, n, d, nf, nc, hf, hc, xf, xc):
+    def _g_asian(self, t, l, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for Asian call option.
 
         Args:
-            samples (ndarray): nxd array of samples
+            t (ndarray): nxd array of samples
             l (int): level
             n (int): number of samples
             d (int): number of dimensions
@@ -150,8 +152,8 @@ class MLCallOptions(Integrand):
         """
         af = .5*hf*xf
         ac = .5*hc*xc
-        dwf = sqrt(hf) * samples[:,:int(d/2)]
-        dif = sqrt(hf/12) * hf * samples[:,int(d/2):]
+        dwf = sqrt(hf) * t[:,:int(d/2)]
+        dif = sqrt(hf/12) * hf * t[:,int(d/2):]
         if l == 0:
             dwf = dwf.squeeze()
             dif = dif.squeeze()
@@ -179,24 +181,24 @@ class MLCallOptions(Integrand):
         pc = maximum(0,ac-self.k)
         return pf,pc
 
-    def g(self, samples, l):
+    def g(self, t, l):
         """
         Args:
-            samples (ndarray): Gaussian(0,1^2) samples
+            t (ndarray): Gaussian(0,1^2) samples
             l (int): level
         Returns:
             tuple: \
                 First, an ndarray of length 6 vector of summary statistic sums. \
                 Second, a float of cost on this level.
         """
-        n,d = samples.shape
+        n,d = t.shape
         nf = 2**l # n fine
         nc = float(nf)/2 # n coarse
         hf = self.t/nf # timestep fine
         hc = self.t/nc # timestep coarse
         xf = tile(self.k,int(n))
         xc = xf
-        pf,pc = self.g_submodule(samples, l, n, d, nf, nc, hf, hc, xf, xc)
+        pf,pc = self.g_submodule(t, l, n, d, nf, nc, hf, hc, xf, xc)
         dp = exp(-self.r*self.t)*(pf-pc)
         pf = exp(-self.r*self.t)*pf
         if l == 0:

@@ -21,15 +21,13 @@ class EuropeanOption(Integrand):
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.210...
+    9.208...
     >>> eo = EuropeanOption(BrownianMotion(Sobol(4,seed=7),drift=1),call_put='put')
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.220...
+    9.164...
     """
-
-    parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
                           
     def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35,
         interest_rate=0, t_final=1, call_put='call'):
@@ -45,6 +43,7 @@ class EuropeanOption(Integrand):
             t_final (float): exercise time
             call_put (str): 'call' or 'put' option
         """
+        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
         self.t_final = t_final
         self.true_measure = BrownianMotion(sampler,t_final=self.t_final)
         self.volatility = float(volatility)
@@ -56,11 +55,11 @@ class EuropeanOption(Integrand):
             raise ParameterError("call_put must be either 'call' or 'put'")
         super(EuropeanOption,self).__init__()        
 
-    def g(self, x):
+    def g(self, t):
         """ See abstract method. """
         self.s = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
-            self.true_measure.time_vec + self.volatility * x)
+            self.true_measure.time_vec + self.volatility * t)
         for xx,yy in zip(*where(self.s<0)): # if stock becomes <=0, 0 out rest of path
             self.s[xx,yy:] = 0
         if self.call_put == 'call':

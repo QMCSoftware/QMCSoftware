@@ -23,7 +23,7 @@ class AsianOption(Integrand):
     >>> x = ac.discrete_distrib.gen_samples(2**10)
     >>> y = ac.f(x)
     >>> y.mean()
-    1.773...
+    1.769...
     >>> level_dims = [2,4,8]
     >>> ac2 = AsianOption(Sobol(seed=7),multi_level_dimensions=level_dims)
     >>> ac2
@@ -44,11 +44,8 @@ class AsianOption(Integrand):
     ...     level_est = ac2.f(x2,l=l).mean()
     ...     y2 += level_est
     >>> y2
-    1.793...
+    1.772...
     """
-
-    parameters = ['volatility', 'call_put', 'start_price', 'strike_price',
-                  'interest_rate','mean_type', 'dimensions', 'dim_fracs']
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
                  interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multi_level_dimensions=None):
@@ -66,6 +63,8 @@ class AsianOption(Integrand):
             multi_level_dimensions (list of ints): list of dimensions at each level. 
                 Leave as None for single-level problems
         """
+        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', \
+                  'interest_rate','mean_type', 'dimensions', 'dim_fracs']
         self.t_final = t_final
         self.true_measure = BrownianMotion(sampler,self.t_final)
         self.volatility = float(volatility)
@@ -119,13 +118,13 @@ class AsianOption(Integrand):
         y_adj = y_raw * exp(-self.interest_rate * self.t_final)
         return y_adj
 
-    def g(self, x, l=0):
+    def g(self, t, l=0):
         """ See abstract method. """
         dim_frac = self.dim_fracs[l]
         dimension = float(self.dimensions[l])
         self.s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
-            self.true_measure.time_vec + self.volatility * x)
+            self.true_measure.time_vec + self.volatility * t)
         for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs(self.s_fine, dimension)

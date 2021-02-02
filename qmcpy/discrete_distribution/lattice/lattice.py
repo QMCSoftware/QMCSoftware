@@ -67,8 +67,6 @@ class Lattice(DiscreteDistribution):
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
-    parameters = ['d','randomize','order','seed','mimics']
-
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None, z_path=None):
         """
         Args:
@@ -81,6 +79,7 @@ class Lattice(DiscreteDistribution):
                 z_path should be formatted like 'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy' 
                 and d_max is the maximum dimenion and 2^m_max is the max number samples supported
         """
+        self.parameters = ['d','randomize','order','seed','mimics']
         # set generating matrix
         self.randomize = randomize
         self.order = order.lower()
@@ -105,8 +104,8 @@ class Lattice(DiscreteDistribution):
             f_lst = f.split('.')
             self.d_max = int(f_lst[-3])
             self.m_max = int(f_lst[-2])
-        self._set_dimension(dimension)
-        self.set_seed(seed)
+        self.seed = seed
+        self._set_dimension(dimension) # calls self.set_seed(self.seed)
         self.low_discrepancy = True
         self.mimics = 'StdUniform'
         super(Lattice,self).__init__()
@@ -209,9 +208,8 @@ class Lattice(DiscreteDistribution):
     
     def set_seed(self, seed):
         """ See abstract method. """
-        self.seed = seed if seed else random.randint(1, 100000, dtype=uint64)
-        random.seed(self.seed)
-        self.shift = random.rand(int(self.d))
+        super(Lattice,self).set_seed(seed)
+        self.shift = self.rng.rand(int(self.d))
         
     def _set_dimension(self, dimension):
         """ See abstract method. """
@@ -219,4 +217,4 @@ class Lattice(DiscreteDistribution):
         if self.d > self.d_max:
             raise ParameterError('Lattice requires dimension <= %d.'%self.d_max)
         self.z = self.z_full[:self.d]
-        self.shift = random.rand(int(self.d))
+        self.set_seed(self.seed)

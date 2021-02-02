@@ -16,6 +16,9 @@ class Integrand(object):
         if not hasattr(self,'leveltype'):
             self.leveltype = 'single'
         self.discrete_distrib = self.true_measure.discrete_distrib
+        if self.true_measure.transform!=self.true_measure and \
+           not (self.true_measure.range==self.true_measure.transform.range).all():
+            raise ParameterError("The range of the composed transform is not compatibe with this true measure")
 
     def g(self, t, *args, **kwargs):
         """

@@ -139,14 +139,18 @@ class TrueMeasure(object):
             if sampler.mimics == 'StdUniform':
                 if not (self.domain==tile([0,1],(self.d,1))).all():
                     raise ParameterError("The True measure's transform should have unit-cube domain.")
+            elif sampler.mimics == 'StdGaussian':
+                if not (self.domain==tile([-inf,inf],(self.d,1))).all():
+                    raise ParameterError("The True measure's transform should have R^d domain, [-inf,inf]^d.")
             else:
-                raise ParameterError("True measures currently only support discrete distributions that mimic the standard uniform")
+                raise ParameterError('The %s true measure does not support discrete distributions that mimic a %s.'%\
+                    (type(self).__name__,sampler.mimics))
         elif isinstance(sampler,TrueMeasure):
             self.transform = sampler # this is a composed transform, \Psi_j for j>0
             self.parameters += ['transform']
             self.d = sampler.d # take the dimension from the sub-sampler (composed transform)
             self.discrete_distrib = self.transform.discrete_distrib
-            if self.transform.transform!=self.transform and (self.domain!=self.transform.range).any():
+            if self.transform.transform!=self.transform and (self.transform.domain!=self.transform.transform.range).any():
                 raise ParameterError("This true measures domain must match the sub-sampling true-measures range.")
         else:
             raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure")

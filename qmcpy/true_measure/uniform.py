@@ -9,17 +9,15 @@ class Uniform(TrueMeasure):
     """
     >>> u = Uniform(Sobol(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
     >>> u.gen_samples(4)
-    array([[1.346, 0.658],
-           [0.797, 2.471],
-           [1.826, 1.909],
-           [0.25 , 1.22 ]])
+    array([[0.859, 1.565],
+           [1.763, 1.879],
+           [0.05 , 2.925],
+           [1.08 , 0.739]])
     >>> u
     Uniform (TrueMeasure Object)
         lower_bound     [0.  0.5]
         upper_bound     [2 3]
     """
-
-    parameters = ['lower_bound', 'upper_bound']
     
     def __init__(self, sampler, lower_bound=0., upper_bound=1.):
         """
@@ -30,6 +28,7 @@ class Uniform(TrueMeasure):
             lower_bound (float): a for Uniform(a,b)
             upper_bound (float): b for Uniform(a,b)
         """
+        self.parameters = ['lower_bound', 'upper_bound']
         self.domain = array([[0,1]])
         self._parse_sampler(sampler)
         self.lower_bound = lower_bound

@@ -9,7 +9,7 @@ from numpy import *
 
 class Keister(Integrand):
     """
-    $f(\\boldsymbol{x}) = \\pi^{d/2} \\cos(\\| \\boldsymbol{x} \\|)$.
+    $f(\\boldsymbol{t}) = \\pi^{d/2} \\cos(\\| \\boldsymbol{t} \\|)$.
 
     The standard example integrates the Keister integrand with respect to an 
     IID Gaussian distribution with variance 1./2.
@@ -20,11 +20,10 @@ class Keister(Integrand):
     >>> y.mean()
     1.807...
     >>> k.true_measure
-    Lebesgue (TrueMeasure Object)
-        transform       Gaussian (TrueMeasure Object)
-                           mean            0
-                           covariance      2^(-1)
-                           decomp_type     pca
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     >>> k = Keister(Gaussian(Sobol(2,seed=7),mean=0,covariance=2))
     >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)
@@ -32,7 +31,7 @@ class Keister(Integrand):
     1.808...
     >>> yp = k.f_periodized(x,'c2sin')
     >>> yp.mean()
-    1.805...
+    1.808...
 
     References:
 
@@ -47,16 +46,11 @@ class Keister(Integrand):
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
         """
-        if isinstance(sampler,DiscreteDistribution): # use the default transform
-            self.true_measure = Lebesgue(Gaussian(sampler, mean=0, covariance=1/2))
-        elif isinstance(sampler,TrueMeasure): # importance sampling
-            if (sampler.range!=array([-inf,inf])).any(): 
-                raise ParameterError("Keister requires sampler whose transformation range is all reals.")
-            self.true_measure = Lebesgue(sampler)
-        else:
-            raise ParameterError("Keister requires sampler to be a discrete distribution or true measure.")
+        self.true_measure = Gaussian(sampler,mean=0,covariance=1/2)
         super(Keister,self).__init__()
     
-    def g(self, x):
-        norm = sqrt((x**2).sum(1))
-        return cos(norm) * exp(-(norm**2))
+    def g(self, t):
+        d = t.shape[1]
+        norm = sqrt((t**2).sum(1))
+        k = pi**(d/2)*cos(norm)
+        return k

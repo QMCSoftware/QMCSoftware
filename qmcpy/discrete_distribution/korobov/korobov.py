@@ -42,8 +42,6 @@ class Korobov(DiscreteDistribution):
         https://CRAN.R-project.org/package=qrng.
     """
 
-    parameters = ['d','generator','randomize','seed','mimics']
-
     def __init__(self, dimension=1, generator=[1], randomize=True, seed=None):
         """
         Args:
@@ -55,6 +53,7 @@ class Korobov(DiscreteDistribution):
                 Note: Non-randomized Korobov sequence includes origin
             seed (int): seed the random number generator for reproducibility
         """
+        self.parameters = ['d','generator','randomize','seed','mimics']
         self.korobov_qrng_cf = c_lib.korobov_qrng
         self.korobov_qrng_cf.argtypes = [
             ctypes.c_int,  # n
@@ -111,10 +110,6 @@ class Korobov(DiscreteDistribution):
     def pdf(self, x):
         """ pdf of a standard uniform """
         return ones(x.shape[0], dtype=float)
-
-    def set_seed(self, seed):
-        """ See abstract method. """
-        self.seed = seed if seed else random.randint(1, 100000, dtype=uint64)
         
     def _set_dimension(self, dimension):
         """ See abstract method. """

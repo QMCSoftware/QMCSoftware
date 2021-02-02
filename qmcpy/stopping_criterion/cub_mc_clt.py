@@ -26,11 +26,10 @@ class CubMCCLT(StoppingCriterion):
         d               2^(1)
         seed            7
         mimics          StdUniform
-    Lebesgue (TrueMeasure Object)
-        transform       Gaussian (TrueMeasure Object)
-                           mean            0
-                           covariance      2^(-1)
-                           decomp_type     pca
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     CubMCCLT (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
@@ -52,8 +51,6 @@ class CubMCCLT(StoppingCriterion):
     >>> solution,data = sc.integrate()
     """
 
-    parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
-    
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
                  inflate=1.2, alpha=0.01):
         """
@@ -65,6 +62,7 @@ class CubMCCLT(StoppingCriterion):
             rel_tol (float): relative error tolerance
             n_max (int): maximum number of samples
         """
+        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -78,7 +76,7 @@ class CubMCCLT(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['single','fixed-multi']
-        allowed_distribs = ["IIDStdUniform"]
+        allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
         super(CubMCCLT,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):

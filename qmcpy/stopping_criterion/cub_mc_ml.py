@@ -18,9 +18,9 @@ class CubMCML(StoppingCriterion):
     >>> sc = CubMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.440...
+    10.44...
     >>> data
-    Solution: 10.4406        
+    Solution: 10.4450        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -41,17 +41,17 @@ class CubMCML(StoppingCriterion):
         n_init          2^(8)
         levels_min      2^(1)
         levels_max      10
-        theta           2^(-2)
+        theta           2^(-1)
     MLMCData (AccumulateData Object)
         levels          7
         dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        n_level         [7.795e+05 1.496e+04 5.916e+03 2.244e+03 7.560e+02 2.770e+02 1.060e+02]
-        mean_level      [1.005e+01 1.777e-01 1.071e-01 5.340e-02 2.990e-02 1.167e-02 7.812e-03]
-        var_level       [1.959e+02 1.441e-01 4.433e-02 1.093e-02 2.940e-03 7.304e-04 2.261e-04]
+        n_level         [1.174e+06 2.177e+04 9.205e+03 3.845e+03 1.295e+03 4.470e+02 1.590e+02]
+        mean_level      [1.006e+01 1.758e-01 1.046e-01 5.690e-02 3.043e-02 1.367e-02 6.812e-03]
+        var_level       [1.962e+02 1.347e-01 4.817e-02 1.279e-02 3.224e-03 8.278e-04 1.541e-04]
         cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
-        n_total         804118
-        alpha           0.942
-        beta            1.893
+        n_total         1220156
+        alpha           0.947
+        beta            1.955
         gamma           1.000
         time_integrate  ...
 
@@ -66,10 +66,8 @@ class CubMCML(StoppingCriterion):
         http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
     """
 
-    parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
-
     def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, 
-        levels_min=2., levels_max=10., alpha0=-1., beta0=-1., gamma0=-1.):
+        levels_min=2, levels_max=10, alpha0=-1., beta0=-1., gamma0=-1.):
         """
         Args:
             integrand (Integrand): integrand with multi-level g method
@@ -77,7 +75,7 @@ class CubMCML(StoppingCriterion):
             alpha (float): uncertaintly level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
-                Takes priority over aboluste tolerance and alpha if supplied. 
+                Takes priority over absolute tolerance and alpha if supplied. 
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
             levels_min (int): minimum level of refinement >= 2
@@ -89,6 +87,7 @@ class CubMCML(StoppingCriterion):
         Note:
             if alpha, beta, gamma are not positive, then they will be estimated
         """
+        self.parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
         if levels_min < 2:
             raise ParameterError('needs levels_min >= 2')
         if levels_max < levels_min:
@@ -104,7 +103,7 @@ class CubMCML(StoppingCriterion):
         self.n_max = float(n_max)
         self.levels_min = float(levels_min)
         self.levels_max = float(levels_max)
-        self.theta = 0.25
+        self.theta = 0.5
         self.alpha0 = alpha0
         self.beta0 = beta0
         self.gamma0 = gamma0
@@ -114,9 +113,9 @@ class CubMCML(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = ["IIDStdUniform"]
+        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
         super(CubMCML,self).__init__(allowed_levels, allowed_distribs)
-    
+
     def integrate(self):
         """ See abstract method. """
          # Construct AccumulateData Object to House Integration Data
@@ -153,16 +152,7 @@ class CubMCML(StoppingCriterion):
                             'Failed to achieve weak convergence. levels == levels_max.',
                             MaxLevelsWarning)
                     else:
-                        self.data.levels += 1
-                        self.data.dimensions = hstack((self.data.dimensions,0))
-                        self.data.var_level = hstack((self.data.var_level,
-                            self.data.var_level[-1] / 2**self.data.beta))
-                        self.data.cost_per_sample = hstack((self.data.cost_per_sample, 
-                            self.data.cost_per_sample[-1] * 2**self.data.gamma))
-                        self.data.n_level = hstack((self.data.n_level, 0.))
-                        self.data.sum_level = hstack((self.data.sum_level,
-                            zeros((2,1))))
-                        self.data.cost_level = hstack((self.data.cost_level, 0.))
+                        self.data._add_level()
                         n_samples = self._get_next_samples()
                         self.data.diff_n_level = maximum(0., n_samples-self.data.n_level)
         # finally, evaluate multilevel estimator

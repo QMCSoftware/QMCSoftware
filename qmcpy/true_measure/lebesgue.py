@@ -21,18 +21,17 @@ class Lebesgue(TrueMeasure):
                            lower_bound     0
                            upper_bound     1
     """
-
-    parameters = []
     
     def __init__(self, sampler):
         """
         Args:
             sampler (TrueMeasure): A  true measure by which to compose a transform.
         """
+        self.parameters = []
         if not isinstance(sampler,TrueMeasure):
             raise ParameterError("Lebesgue sampler must be a true measure by which to tranform samples.")
         self.domain = sampler.range # hack to make sure Lebesuge is compatible with any tranform
-        self.range = None
+        self.range = sampler.range
         self._parse_sampler(sampler)
         super(Lebesgue,self).__init__()
 

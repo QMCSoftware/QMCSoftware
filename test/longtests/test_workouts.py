@@ -12,6 +12,7 @@ class TestWorkouts(unittest.TestCase):
     def test_integration_examples(self):
         asian_option_multi_level()
         asian_option_single_level()
+        asian_option_single_level_high_dimensions()
         keister()
         pi_problem()
         pi_problem_bayes_net()

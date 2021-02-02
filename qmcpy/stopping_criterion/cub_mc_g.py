@@ -28,11 +28,10 @@ class CubMCG(StoppingCriterion):
         d               2^(1)
         seed            7
         mimics          StdUniform
-    Lebesgue (TrueMeasure Object)
-        transform       Gaussian (TrueMeasure Object)
-                           mean            0
-                           covariance      2^(-1)
-                           decomp_type     pca
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     CubMCG (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
@@ -74,7 +73,6 @@ class CubMCG(StoppingCriterion):
         inequality would be satisfied: $\P(| mu - tmu | \\le tol\_fun) \\ge 1 - \\alpha$.
     """
 
-    parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
                  inflate=1.2, alpha=0.01):
         """
@@ -87,6 +85,7 @@ class CubMCG(StoppingCriterion):
             n_init: initial number of samples
             n_max: maximum number of samples
         """
+        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -104,7 +103,7 @@ class CubMCG(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['single']
-        allowed_distribs = ["IIDStdUniform"]
+        allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
         super(CubMCG,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):

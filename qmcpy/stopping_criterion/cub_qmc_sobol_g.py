@@ -21,20 +21,19 @@ class CubQMCSobolG(StoppingCriterion):
     >>> solution
     1.807...
     >>> data
-    Solution: 1.8074         
+    Solution: 1.8079         
     Keister (Integrand Object)
     Sobol (DiscreteDistribution Object)
         d               2^(1)
         randomize       1
         graycode        0
-        seed            [61616 58565]
+        seed            7
         mimics          StdUniform
         dim0            0
-    Lebesgue (TrueMeasure Object)
-        transform       Gaussian (TrueMeasure Object)
-                           mean            0
-                           covariance      2^(-1)
-                           decomp_type     pca
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     CubQMCSobolG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -42,7 +41,7 @@ class CubQMCSobolG(StoppingCriterion):
         n_max           2^(35)
     LDTransformData (AccumulateData Object)
         n_total         2^(10)
-        solution        1.807
+        solution        1.808
         error_bound     0.005
         time_integrate  ...
 
@@ -75,9 +74,6 @@ class CubQMCSobolG(StoppingCriterion):
         refer to the references below.
     """
 
-    parameters = ['abs_tol','rel_tol','n_init','n_max']
-
-
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
                  fudge=lambda m: 5.*2.**(-m), check_cone=False):
         """
@@ -92,6 +88,7 @@ class CubQMCSobolG(StoppingCriterion):
                               in the cone of functions
             check_cone (boolean): check if the function falls in the cone
         """
+        self.parameters = ['abs_tol','rel_tol','n_init','n_max']
         # Input Checks
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)

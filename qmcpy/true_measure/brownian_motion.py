@@ -1,4 +1,5 @@
 from .gaussian import Gaussian
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..discrete_distribution import Sobol
 from ._true_measure import TrueMeasure
 from ..util import ParameterError, _univ_repr
@@ -11,8 +12,8 @@ class BrownianMotion(Gaussian):
     
     >>> bm = BrownianMotion(Sobol(4,seed=7),t_final=2,drift=2)
     >>> bm.gen_samples(2)
-    array([[0.583, 0.514, 2.726, 3.967],
-           [0.958, 2.973, 3.259, 3.951]])
+    array([[0.974, 2.288, 2.866, 4.49 ],
+           [0.587, 0.745, 1.999, 2.173]])
     >>> bm
     BrownianMotion (TrueMeasure Object)
         time_vec        [0.5 1.  1.5 2. ]
@@ -38,7 +39,15 @@ class BrownianMotion(Gaussian):
                 "Cholesky" for cholesky decomposition.
         """
         self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
+        # default to transform from standard uniform
         self.domain = array([[0,1]])
+        self._transform = self._transform_std_uniform
+        self._jacobian = self._jacobian_std_uniform
+        if isinstance(sampler,DiscreteDistribution) and sampler.mimics=='StdGaussian':
+            # need to use transformation from standard gaussian
+            self.domain = array([[-inf,inf]])
+            self._transform = self._transform_std_gaussian
+            self._jacobian = self._jacobian_std_gaussian
         self._parse_sampler(sampler)
         self.t = t_final # exercise time
         self.drift = drift

@@ -17,6 +17,7 @@ qmcpy.egg-info/
 *.so
 *.dylib
 *.dll
+*.pyd
 
 # R
 *.Rhistory 
@@ -30,6 +31,7 @@ sphinx/_build/
 sphinx/_static/
 sphinx/demo_rst/
 sphinx/readme_rst/
+sphinx/uml/
 node_modules/*
 
 # Jupyter Notebooks

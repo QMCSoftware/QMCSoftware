@@ -6,7 +6,20 @@ Thank you for you interest in contributing to the QMCPy package. The following s
 
 ## Installation for Developers
 
-Using `conda`
+To enable `conda` environments, [install miniconda](https://docs.conda.io/en/latest/miniconda.html). 
+
+Then, setup the `qmcpy` virtual environment
+
+~~~
+git clone https://github.com/QMCSoftware/QMCSoftware.git
+cd QMCSoftware
+git checkout develop
+conda env create --file requirements/environment.yml
+conda activate qmcpy
+pip install -e .
+~~~
+
+If setup with our `environment.yml` file fails, you can manually create the environment (minus a few extra dependencies)
 
 ~~~
 git clone https://github.com/QMCSoftware/QMCSoftware.git
@@ -16,8 +29,6 @@ conda create -n qmcpy python=3.7.0
 conda activate qmcpy
 conda install conda-build
 conda develop .
-conda config --add channels conda-forge
-conda install -c umontreal-simul latnetbuilder=2.1.1
 pip install -r requirements/dev.txt
 pip install -e .
 ~~~

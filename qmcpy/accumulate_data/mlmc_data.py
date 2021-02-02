@@ -10,10 +10,8 @@ class MLMCData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['levels','dimensions','n_level','mean_level','var_level',
-        'cost_per_sample','n_total','alpha','beta','gamma']
-
-    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, levels_init, n_init, alpha0, beta0, gamma0):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, levels_init, n_init, 
+                alpha0, beta0, gamma0):
         """
         Initialize data instance
 
@@ -28,6 +26,8 @@ class MLMCData(AccumulateData):
             beta0 (float): variance is O(2^{-beta0*level})
             gamma0 (float): sample cost is O(2^{gamma0*level})
         """
+        self.parameters = ['levels','dimensions','n_level','mean_level','var_level', 
+            'cost_per_sample','n_total','alpha','beta','gamma']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -47,6 +47,7 @@ class MLMCData(AccumulateData):
         self.gamma = maximum(0,self.gamma0)
         self.solution = None
         self.n_total = 0
+        self.time_integrate = 0
         super(MLMCData,self).__init__()
 
     def update_data(self):
@@ -65,9 +66,9 @@ class MLMCData(AccumulateData):
                 self.sum_level[1,l] = self.sum_level[1,l] + self.integrand.sums[1]
                 self.cost_level[l] = self.cost_level[l] + self.integrand.cost
         # compute absolute average, variance and cost
-        self.mean_level = absolute(self.sum_level[0,:]/self.n_level)
-        self.var_level = maximum(0,self.sum_level[1,:]/self.n_level - self.mean_level**2)
-        self.cost_per_sample = self.cost_level/self.n_level
+        self.mean_level = absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
+        self.var_level = maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
+        self.cost_per_sample = self.cost_level[:self.levels+1]/self.n_level[:self.levels+1]
         # fix to cope with possible zero values for self.mean_level and self.var_level
         # (can happen in some applications when there are few samples)
         for l in range(2,self.levels+1):
@@ -86,3 +87,19 @@ class MLMCData(AccumulateData):
             x = lstsq(a,log2(self.cost_per_sample[1:]),rcond=None)[0]
             self.gamma = maximum(.5,x[0])
         self.n_total = self.n_level.sum()
+
+    def _add_level(self):
+        """ Add another level to relevent attributes. """
+        self.levels += 1
+        if not len(self.n_level) > self.levels:
+            self.dimensions = hstack((self.dimensions,0))
+            self.mean_level = hstack((self.mean_level, self.mean_level[-1] / 2**self.alpha))
+            self.var_level = hstack((self.var_level, self.var_level[-1] / 2**self.beta))
+            self.cost_per_sample = hstack((self.cost_per_sample, self.cost_per_sample[-1] * 2**self.gamma))
+            self.n_level = hstack((self.n_level, 0.))
+            self.sum_level = hstack((self.sum_level,zeros((2,1))))
+            self.cost_level = hstack((self.cost_level, 0.))
+        else:
+            self.mean_level = absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
+            self.var_level = maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
+            self.cost_per_sample = self.cost_level[:self.levels+1]/self.n_level[:self.levels+1]

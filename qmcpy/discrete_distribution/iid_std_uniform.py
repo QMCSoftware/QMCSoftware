@@ -19,17 +19,15 @@ class IIDStdUniform(DiscreteDistribution):
         mimics          StdUniform
     """
 
-    parameters = ['d','seed','mimics']
-
     def __init__(self, dimension=1, seed=None):
         """
         Args:
             dimension (int): dimension of samples
             seed (int): seed the random number generator for reproducibility
         """
+        self.parameters = ['d','seed','mimics']
         self.d = dimension
-        self.seed = seed
-        random.seed(self.seed)
+        self.set_seed(seed)
         self.mimics = 'StdUniform'
         self.low_discrepancy = False
         super(IIDStdUniform,self).__init__()
@@ -44,11 +42,11 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             ndarray: n x self.d array of samples
         """
-        return random.rand(int(n), int(self.d))
+        return self.rng.rand(int(n), int(self.d))
     
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
-    
+        
     def _set_dimension(self, dimension):
         self.d = dimension
         
