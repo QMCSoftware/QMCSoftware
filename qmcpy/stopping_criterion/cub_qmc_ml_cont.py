@@ -19,9 +19,9 @@ class CubQMCMLCont(StoppingCriterion):
     >>> sc = CubQMCMLCont(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.418...
+    10.394...
     >>> data
-    Solution: 10.4181        
+    Solution: 10.3948        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -30,10 +30,10 @@ class CubQMCMLCont(StoppingCriterion):
         t               1
         b               85
     Lattice (DiscreteDistribution Object)
-        d               2^(4)
+        d               1
         randomize       1
         order           natural
-        seed            647310
+        seed            561339
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
@@ -51,13 +51,13 @@ class CubQMCMLCont(StoppingCriterion):
         theta_init      2^(-1)
         theta           2^(-3)
     MLQMCData (AccumulateData Object)
-        levels          5
-        dimensions      [ 1.  2.  4.  8. 16.]
-        n_level         [2048.  256.  256.  256.  256.]
-        mean_level      [10.052  0.182  0.102  0.054  0.028]
-        var_level       [2.136e-04 6.275e-05 2.998e-05 1.024e-05 3.161e-06]
-        bias_estimate   0.015
-        n_total         98304
+        levels          2^(2)
+        dimensions      [1. 2. 4. 8.]
+        n_level         [4096.  256.  256.  256.]
+        mean_level      [10.053  0.184  0.102  0.055]
+        var_level       [8.703e-05 6.794e-05 2.603e-05 8.925e-06]
+        bias_estimate   0.035
+        n_total         155648
         time_integrate  ...
     
     References:
@@ -115,7 +115,7 @@ class CubQMCMLCont(StoppingCriterion):
     def integrate(self):
         # Construct AccumulateData Object to House Integration Data
         self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.levels_min, self.n_init, self.replications)
+            self.levels_min, self.levels_max, self.n_init, self.replications)
         # Loop over coarser tolerances
         for t in range(self.n_tols):
             self.rmse_tol = self.tol_mult**(self.n_tols-t-1)*self.target_tol # Set new target tolerance

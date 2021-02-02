@@ -18,9 +18,9 @@ class CubQMCML(StoppingCriterion):
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    10.433...
+    10.422...
     >>> data
-    Solution: 10.4332        
+    Solution: 10.4229        
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -29,10 +29,10 @@ class CubQMCML(StoppingCriterion):
         t               1
         b               85
     Lattice (DiscreteDistribution Object)
-        d               2^(5)
+        d               2^(4)
         randomize       1
         order           natural
-        seed            87657
+        seed            733837
         mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
@@ -44,13 +44,13 @@ class CubQMCML(StoppingCriterion):
         n_max           10000000000
         replications    2^(5)
     MLQMCData (AccumulateData Object)
-        levels          6
-        dimensions      [ 1.  2.  4.  8. 16. 32.]
-        n_level         [4096.  256.  256.  256.  256.  256.]
-        mean_level      [10.053  0.182  0.102  0.054  0.028  0.014]
-        var_level       [6.399e-05 6.275e-05 2.998e-05 1.024e-05 3.161e-06 1.411e-06]
-        bias_estimate   0.008
-        n_total         172032
+        levels          5
+        dimensions      [ 1.  2.  4.  8. 16.]
+        n_level         [8192.  256.  256.  256.  256.]
+        mean_level      [10.054  0.184  0.102  0.055  0.027]
+        var_level       [1.617e-05 6.794e-05 2.603e-05 8.925e-06 3.123e-06]
+        bias_estimate   0.014
+        n_total         294912
         time_integrate  ...
     
     References:
@@ -93,14 +93,14 @@ class CubQMCML(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = ["Lattice", "Sobol","Halton"]
+        allowed_distribs = ["Lattice", "Sobol", "Halton"]
         super(CubQMCML,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration Data
         self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.levels_min, self.n_init, self.replications)
+            self.levels_min, self.levels_max, self.n_init, self.replications)
         t_start = time()
         while True:
             self.data.update_data()

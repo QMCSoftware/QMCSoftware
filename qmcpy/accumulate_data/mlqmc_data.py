@@ -9,7 +9,7 @@ class MLQMCData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, levels_init, n_init, replications):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, levels_init, levels_max, n_init, replications):
         """
         Initialize data instance
 
@@ -41,10 +41,9 @@ class MLQMCData(AccumulateData):
         self.solution = None
         self.n_total = 0
         self.time_integrate = 0
-        # get seeds for each replication
         if self.discrete_distrib.d != 1:
             self.true_measure._set_dimension_r(1)
-        self.seeds = self.discrete_distrib.rng.choice(1000000,(self.levels,int(self.replications)),replace=False).astype(uint64)+1
+        self.seeds = self.discrete_distrib.rng.choice(1000000,(levels_max+1,int(self.replications)),replace=False)
         super(MLQMCData,self).__init__()
 
     def update_data(self):
@@ -98,8 +97,6 @@ class MLQMCData(AccumulateData):
             self.var_level = hstack((self.var_level,inf))
             self.cost_level = hstack((self.cost_level,0))
             self.var_cost_ratio_level = hstack((self.var_cost_ratio_level,inf))
-            level_seeds = self.discrete_distrib.rng.choice(1000000,int(self.replications),replace=False).astype(dtype=uint64)+1
-            self.seeds = vstack((self.seeds,level_seeds))
 
     def _add_level_MLMC(self):
         """ Add another level to relevent attributes. """
