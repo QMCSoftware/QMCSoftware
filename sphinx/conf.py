@@ -146,7 +146,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # make index a single column
 latex_elements = {
     'preamble': r'''
-\usepackage{makeidx} 
+\usepackage{makeidx,amsmath} 
 \usepackage[columns=1]{idxlayout} 
 \makeindex
 '''

@@ -28,6 +28,6 @@ Demos
 
     demo_rst/latnetbuilder.rst
 
-    demo_rst/kumaraswamy.rst
+    demo_rst/some_true_measures.rst
 
     demo_rst/asian-option-mlqmc.rst

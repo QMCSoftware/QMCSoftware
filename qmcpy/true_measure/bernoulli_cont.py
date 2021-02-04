@@ -5,9 +5,7 @@ from numpy import *
 
 
 class BernoulliCont(TrueMeasure):
-    """
-    Continuous Bernoulli Measure.
-    """
+    """ See https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution """
 
     def __init__(self, sampler, lam=1/2, b=2):
         """
@@ -32,7 +30,7 @@ class BernoulliCont(TrueMeasure):
     def _transform(self, x):
         tf = zeros(x.shape,dtype=float)
         for j in range(self.d):
-            tf[:,j] = x[:,j] if self.l[j]==1/2 else (log((2*self.l[j]-1)*x[:,j]-self.l[j]+1)-log(1-self.l[j])) / log(self.l[j]/(1-self.l[j]))
+            tf[:,j] = x[:,j] if self.l[j]==1/2 else log(((2*self.l[j]-1)*x[:,j]-self.l[j]+1)/(1-self.l[j])) / log(self.l[j]/(1-self.l[j]))
         return tf
 
     def _jacobian(self, x):
