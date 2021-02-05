@@ -56,7 +56,7 @@ class JohnsonsSU(TrueMeasure):
         term1 = (x-self._xi)/self._lam
         term2 = self._delta/(self._lam*sqrt(2*pi)) * 1/sqrt(1+term1**2)
         term3 = exp(-1/2*(self._gamma+self._delta*arcsinh(term1))**2)
-        return prod( term1*term2*term3, 1)
+        return prod( term2*term3, 1)
     
     def _set_dimension(self, dimension):
         gamma = self._gamma[0]

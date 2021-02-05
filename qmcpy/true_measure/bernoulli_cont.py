@@ -34,10 +34,10 @@ class BernoulliCont(TrueMeasure):
         return tf
 
     def _jacobian(self, x):
-        j = zeros(x.shape,dtype=float)
+        jac = zeros(x.shape,dtype=float)
         for j in range(self.d):
-            j[:,j] = 1 if self.l[j]==1/2 else 1/log(self.l[j]/(1-self.l[j])) * (2*self.l[j]-1)/((2*self.l[j]-1)*x[:,j]-self.l[j]+1)
-        return prod(j,1)
+            jac[:,j] = 1 if self.l[j]==1/2 else 1/log(self.l[j]/(1-self.l[j])) * (2*self.l[j]-1)/((2*self.l[j]-1)*x[:,j]-self.l[j]+1)
+        return prod(jac,1)
     
     def _weight(self, x):
         w = zeros(x.shape,dtype=float)
