@@ -1,6 +1,6 @@
 CubBayesLatticeG:
   Password: 3141592653
-  CPU time: 0.57 sec
+  CPU time: 13.53 sec
 
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -21,68 +21,9 @@ CubBayesLatticeG (StoppingCriterion Object)
     rel_tol         0
     n_init          2^(8)
     n_max           2^(30)
+    order           2^(1)
 LDTransformBayesData (AccumulateData Object)
-    n_total         32768
+    n_total         2097152
     solution        3.142
-    error_bound     3.47e-10
-    time_integrate  0.571
-
-CubBayesNetG:
-  Password: 3141592653
-  CPU time: 158.09 sec
-
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Solution: 3.1416         
-CustomFun (Integrand Object)
-Sobol (DiscreteDistribution Object)
-    d               1
-    randomize       1
-    graycode        0
-    seed            61616
-    mimics          StdUniform
-    dim0            0
-Lebesgue (TrueMeasure Object)
-    transform       Uniform (TrueMeasure Object)
-                       lower_bound     -2
-                       upper_bound     2^(1)
-CubBayesNetG (StoppingCriterion Object)
-    abs_tol         4.00e-08
-    rel_tol         0
-    n_init          2^(8)
-    n_max           2^(30)
-LDTransformBayesData (AccumulateData Object)
-    n_total         8388608
-    solution        3.142
-    error_bound     2.25e-08
-    time_integrate  158.087
-
-CubQMCSobolG:
-  Password: 3141592653
-  CPU time: 69.18 sec
-
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Solution: 3.1416         
-CustomFun (Integrand Object)
-Sobol (DiscreteDistribution Object)
-    d               1
-    randomize       1
-    graycode        0
-    seed            61616
-    mimics          StdUniform
-    dim0            0
-Lebesgue (TrueMeasure Object)
-    transform       Uniform (TrueMeasure Object)
-                       lower_bound     -2
-                       upper_bound     2^(1)
-CubQMCSobolG (StoppingCriterion Object)
-    abs_tol         4.00e-10
-    rel_tol         0
-    n_init          2^(10)
-    n_max           2^(30)
-LDTransformData (AccumulateData Object)
-    n_total         2^(27)
-    solution        3.142
-    error_bound     2.65e-10
-    time_integrate  69.170
+    error_bound     3.02e-10
+    time_integrate  13.524

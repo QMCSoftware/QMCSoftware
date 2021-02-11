@@ -44,9 +44,10 @@ if __name__ == '__main__':
     print('CubBayesLatticeG:')
     password, total_time, data = pi_problem_bayes_lattice(abs_tol=4e-10)  # give 3 significant figures of accuracy
     print("  Password:", password)
-    print('  CPU time: %.2f sec' % total_time)  # around 2 seconds
+    print('  CPU time: %.2f sec' % total_time)  # around 12 seconds
     print('\n  ' + '~' * 100 + '\n\n%s' % str(data))
 
+    '''
     print('\nCubBayesNetG:')
     password,total_time,data = pi_problem_bayes_net(abs_tol=4e-8) # give 3 significant figures of accuracy
     print("  Password:", password)
@@ -58,4 +59,4 @@ if __name__ == '__main__':
     print("  Password:", password)  # 3141592653
     print('  CPU time: %.2f sec'%total_time)  # around 75 seconds
     print('\n  '+'~'*100+'\n\n%s'%str(data))
-
+'''

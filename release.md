@@ -1,3 +1,11 @@
+## v1.0
+- Continuation multi-level MC and QMC
+- Improved importance sampling flexibility
+- Isolated seeding with QMCPy
+- Enhanced documentation
+- New true measures
+
+
 ## v0.7
 
 - Windows support

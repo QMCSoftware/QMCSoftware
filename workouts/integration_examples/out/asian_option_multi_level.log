@@ -1,7 +1,7 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8575         
+Solution: 5.8555         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -36,11 +36,11 @@ CubMCCLT (StoppingCriterion Object)
     n_max           10000000000
 MeanVarData (AccumulateData Object)
     levels          3
-    solution        5.857
-    n               [1071049.   97359.   12415.]
-    n_total         1183895
+    solution        5.855
+    n               [1066917.   98471.   12566.]
+    n_total         1181026
     error_bound     0.025
-    confid_int      [5.833 5.882]
-    time_integrate  1.034
+    confid_int      [5.831 5.88 ]
+    time_integrate  1.013
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
