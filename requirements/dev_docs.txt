@@ -3,14 +3,14 @@ async-generator==1.10
 attrs==19.3.0
 Babel==2.8.0
 backcall==0.1.0
-bleach==3.1.5
+bleach==3.3.0
 certifi==2020.4.5.1
 cffi==1.14.0
 chardet==3.0.4
 codecov==2.1.5
 commonmark==0.9.1
 coverage==5.1
-cryptography==3.2
+cryptography==3.3.2
 cycler==0.10.0
 dataclasses==0.6
 decorator==4.4.2
