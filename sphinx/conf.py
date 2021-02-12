@@ -29,7 +29,7 @@ copyright = u"2019 \u2014 2021, Illinois Institute of Technology"
 author = u"Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin"
 #author = u"S-C Choi, F Hickernell, M McCourt, J Rathinavel, & A Sorokin"
 
-version = u"0.7"
+version = u"1.0"
 
 # The full version, including alpha/beta/rc tags
 release = version
@@ -146,7 +146,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # make index a single column
 latex_elements = {
     'preamble': r'''
-\usepackage{makeidx} 
+\usepackage{makeidx,amsmath} 
 \usepackage[columns=1]{idxlayout} 
 \makeindex
 '''

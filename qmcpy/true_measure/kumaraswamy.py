@@ -3,16 +3,9 @@ from qmcpy.util import DimensionError
 from ..discrete_distribution import Sobol
 from numpy import *
 
+
 class Kumaraswamy(TrueMeasure):
-    """
-    For $\\boldsymbol{a},\\boldsymbol{b}>0$ we have
-
-    PDF: $f(\\boldsymbol{x}) = \\prod_{j=1}^d [a_j b_j x_j^{a_j-1}(1-x_j^{a_j})^{b_j-1}]$
-
-    CDF: $F(\\boldsymbol{x}) = \\prod_{j=1}^d [1-(1-x_j^{a_j})^{b_j}]$
-
-    Inverse CDF: $\\Psi_j(x_j) = (1-(1-x_j)^{1/b_j})^{1/a_j}$
-    """
+    """ See https://en.wikipedia.org/wiki/Kumaraswamy_distribution """
 
     def __init__(self, sampler, a=2, b=2):
         """

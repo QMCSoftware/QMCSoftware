@@ -7,11 +7,10 @@ IIDStdUniform (DiscreteDistribution Object)
     d               3
     seed            7
     mimics          StdUniform
-Lebesgue (TrueMeasure Object)
-    transform       Gaussian (TrueMeasure Object)
-                       mean            0
-                       covariance      2^(-1)
-                       decomp_type     pca
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
 CubMCCLT (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -26,22 +25,21 @@ MeanVarData (AccumulateData Object)
     n_total         1879987
     error_bound     0.005
     confid_int      [2.163 2.173]
-    time_integrate  1.479
+    time_integrate  0.680
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 2.1712         
+Solution: 2.1675         
 Keister (Integrand Object)
 Lattice (DiscreteDistribution Object)
     d               3
     randomize       1
     order           natural
-    seed            1093
+    seed            42484
     mimics          StdUniform
-Lebesgue (TrueMeasure Object)
-    transform       Gaussian (TrueMeasure Object)
-                       mean            0
-                       covariance      2^(-1)
-                       decomp_type     pca
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
 CubQMCCLT (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -51,12 +49,12 @@ CubQMCCLT (StoppingCriterion Object)
     n_max           2^(30)
 MeanVarDataRep (AccumulateData Object)
     replications    2^(4)
-    solution        2.171
-    sighat          0.005
-    n_total         2^(12)
-    error_bound     0.004
-    confid_int      [2.167 2.175]
-    time_integrate  0.036
+    solution        2.167
+    sighat          0.003
+    n_total         2^(13)
+    error_bound     0.002
+    confid_int      [2.165 2.17 ]
+    time_integrate  0.037
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 2.1674         
@@ -65,11 +63,10 @@ IIDStdUniform (DiscreteDistribution Object)
     d               3
     seed            7
     mimics          StdUniform
-Lebesgue (TrueMeasure Object)
-    transform       Gaussian (TrueMeasure Object)
-                       mean            0
-                       covariance      2^(-1)
-                       decomp_type     pca
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
 CubMCG (StoppingCriterion Object)
     inflate         1.200
     alpha           0.010
@@ -84,10 +81,10 @@ MeanVarData (AccumulateData Object)
     n_total         2314452
     error_bound     0.005
     confid_int      [2.162 2.172]
-    time_integrate  1.838
+    time_integrate  0.861
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 2.1681         
+Solution: 2.1687         
 Keister (Integrand Object)
 Lattice (DiscreteDistribution Object)
     d               3
@@ -95,11 +92,10 @@ Lattice (DiscreteDistribution Object)
     order           natural
     seed            7
     mimics          StdUniform
-Lebesgue (TrueMeasure Object)
-    transform       Gaussian (TrueMeasure Object)
-                       mean            0
-                       covariance      2^(-1)
-                       decomp_type     pca
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
 CubQMCLatticeG (StoppingCriterion Object)
     abs_tol         0.005
     rel_tol         0
@@ -107,25 +103,24 @@ CubQMCLatticeG (StoppingCriterion Object)
     n_max           2^(35)
 LDTransformData (AccumulateData Object)
     n_total         2^(12)
-    solution        2.168
-    error_bound     0.004
-    time_integrate  0.027
+    solution        2.169
+    error_bound     0.002
+    time_integrate  0.023
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 2.1682         
+Solution: 2.1681         
 Keister (Integrand Object)
 Sobol (DiscreteDistribution Object)
     d               3
     randomize       1
     graycode        0
-    seed            [61616 58565 49690]
+    seed            7
     mimics          StdUniform
     dim0            0
-Lebesgue (TrueMeasure Object)
-    transform       Gaussian (TrueMeasure Object)
-                       mean            0
-                       covariance      2^(-1)
-                       decomp_type     pca
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
 CubQMCSobolG (StoppingCriterion Object)
     abs_tol         0.005
     rel_tol         0
@@ -135,48 +130,47 @@ LDTransformData (AccumulateData Object)
     n_total         2^(12)
     solution        2.168
     error_bound     0.003
-    time_integrate  0.006
+    time_integrate  0.004
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 2.1683         
+Solution: 2.1684         
 Keister (Integrand Object)
 Lattice (DiscreteDistribution Object)
     d               3
     randomize       1
     order           linear
-    seed            56719
+    seed            188723
     mimics          StdUniform
-Lebesgue (TrueMeasure Object)
-    transform       Gaussian (TrueMeasure Object)
-                       mean            0
-                       covariance      2^(-1)
-                       decomp_type     pca
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
 CubBayesLatticeG (StoppingCriterion Object)
     abs_tol         0.005
     rel_tol         0
     n_init          2^(8)
     n_max           2^(22)
+    order           2^(1)
 LDTransformBayesData (AccumulateData Object)
-    n_total         2048
+    n_total         1024
     solution        2.168
-    error_bound     2.54e-04
-    time_integrate  0.029
+    error_bound     0.001
+    time_integrate  0.019
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 2.1688         
+Solution: 2.1702         
 Keister (Integrand Object)
 Sobol (DiscreteDistribution Object)
     d               3
     randomize       1
     graycode        0
-    seed            [69535 22028 36101]
+    seed            776158
     mimics          StdUniform
     dim0            0
-Lebesgue (TrueMeasure Object)
-    transform       Gaussian (TrueMeasure Object)
-                       mean            0
-                       covariance      2^(-1)
-                       decomp_type     pca
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     pca
 CubBayesNetG (StoppingCriterion Object)
     abs_tol         0.005
     rel_tol         0
@@ -184,8 +178,8 @@ CubBayesNetG (StoppingCriterion Object)
     n_max           2^(22)
 LDTransformBayesData (AccumulateData Object)
     n_total         2048
-    solution        2.169
+    solution        2.170
     error_bound     0.004
-    time_integrate  0.037
+    time_integrate  0.028
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

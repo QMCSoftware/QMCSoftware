@@ -1,4 +1,4 @@
-[![Documentation Status](https://readthedocs.org/projects/qmcpy/badge/?version=latest)](https://qmcpy.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964490.svg)](https://doi.org/10.5281/zenodo.3964490)
+[![Documentation Status](https://readthedocs.org/projects/qmcpy/badge/?version=latest)](https://qmcpy.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964490.svg)](https://doi.org/10.5281/zenodo.3964490) [![Tests](https://github.com/QMCSoftware/QMCSoftware/workflows/QMCPy_CI/badge.svg)](https://github.com/QMCSoftware/QMCSoftware/workflows/QMCPy_CI/badge.svg)
 
 # Quasi-Monte Carlo Community Software
 
@@ -34,13 +34,11 @@ The central package including the 5 main components as listed below. Each compon
 
 Note: If the following mathematics is not rendering try using Google Chrome and installing the [Mathjax Plugin for GitHub](https://chrome.google.com/webstore/detail/mathjax-plugin-for-github/ioemnmodlmafdkllaclgeombjnmnbima?hl=en).
 
-Will will find the exptected value of the Keister integrand [18]
+Will will find the expected value of the Keister integrand [18]
 
 $$g(\boldsymbol{x})=\pi^{d/2}\cos(||\boldsymbol{x}||)$$
 
-integrated over a $d$ dimensional Gaussian true measure with variance $1/2$
-
-$$\mathcal{X} \sim \mathcal{N}(\boldsymbol{0},\boldsymbol{I}/2).$$
+integrated over a $\mathcal{N}(\boldsymbol{0},\boldsymbol{I}/2)$ Gaussian in $d$ dimensions.
 
 We may choose a Sobol' discrete distribution with a corresponding Sobol' cubature stopping criterion to preform quasi-Monte Carlo numerical integration.
 
@@ -80,8 +78,13 @@ We also highly recommend you take a look at [Fred Hickernell's tutorial at the M
 - Christiane Lemieux
 - Dirk Nuyens
 - Art Owen
+- Pieterjan Robbe
 
 ----
+
+## Contributors
+
+- Jungtaek Kim
 
 ## Citation
 

@@ -1,3 +1,10 @@
+CubQMCSobolG            option price = $0.1905 using 0.028 seconds and 4.10e+03 samples
+CubQMCSobolG with IS    option price = $0.1819 using 0.013 seconds and 1.02e+03 samples
+CubBayesLatticeG        option price = $0.1770 using 1.244 seconds and 3.28e+04 samples
+CubBayesNetG            option price = $0.1754 using 0.861 seconds and 1.64e+04 samples
+CubQMCSobolG            option price = $6.2077 using 0.011 seconds and 1.02e+03 samples
+CubBayesLatticeG        option price = $6.2033 using 0.078 seconds and 2.05e+03 samples
+CubBayesNetG            option price = $6.2055 using 0.098 seconds and 2.05e+03 samples
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -41,10 +48,10 @@ MeanVarData (AccumulateData Object)
     n_total         828720
     error_bound     0.025
     confid_int      [5.825 5.875]
-    time_integrate  10.031
+    time_integrate  9.676
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8391         
+Solution: 5.8302         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -58,7 +65,7 @@ Lattice (DiscreteDistribution Object)
     d               2^(6)
     randomize       1
     order           mps
-    seed            1093
+    seed            12392
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
@@ -81,12 +88,12 @@ CubQMCCLT (StoppingCriterion Object)
     n_max           2^(30)
 MeanVarDataRep (AccumulateData Object)
     replications    2^(4)
-    solution        5.839
-    sighat          0.029
-    n_total         2^(13)
-    error_bound     0.023
-    confid_int      [5.817 5.862]
-    time_integrate  0.090
+    solution        5.830
+    sighat          0.021
+    n_total         2^(14)
+    error_bound     0.016
+    confid_int      [5.814 5.846]
+    time_integrate  0.160
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Solution: 5.8422         
@@ -129,10 +136,10 @@ MeanVarData (AccumulateData Object)
     n_total         1040630
     error_bound     0.025
     confid_int      [5.817 5.867]
-    time_integrate  11.814
+    time_integrate  12.859
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8335         
+Solution: 5.8367         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -166,13 +173,13 @@ CubQMCLatticeG (StoppingCriterion Object)
     n_init          2^(10)
     n_max           2^(35)
 LDTransformData (AccumulateData Object)
-    n_total         2^(11)
-    solution        5.834
-    error_bound     0.010
-    time_integrate  0.033
+    n_total         2^(10)
+    solution        5.837
+    error_bound     0.020
+    time_integrate  0.054
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8394         
+Solution: 5.8374         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -186,7 +193,7 @@ Sobol (DiscreteDistribution Object)
     d               2^(6)
     randomize       1
     graycode        0
-    seed            [61616 58565 49690 ... 15260 73221 99092]
+    seed            7
     mimics          StdUniform
     dim0            0
 BrownianMotion (TrueMeasure Object)
@@ -208,12 +215,12 @@ CubQMCSobolG (StoppingCriterion Object)
     n_max           2^(35)
 LDTransformData (AccumulateData Object)
     n_total         2^(10)
-    solution        5.839
-    error_bound     0.022
+    solution        5.837
+    error_bound     0.025
     time_integrate  0.007
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8296         
+Solution: 5.8363         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -227,7 +234,7 @@ Lattice (DiscreteDistribution Object)
     d               2^(6)
     randomize       1
     order           linear
-    seed            14024
+    seed            801520
     mimics          StdUniform
 BrownianMotion (TrueMeasure Object)
     time_vec        [0.016 0.031 0.047 ... 0.969 0.984 1.   ]
@@ -246,14 +253,15 @@ CubBayesLatticeG (StoppingCriterion Object)
     rel_tol         0
     n_init          2^(8)
     n_max           2^(22)
+    order           1
 LDTransformBayesData (AccumulateData Object)
-    n_total         1024
-    solution        5.830
-    error_bound     2.29e-26
-    time_integrate  0.059
+    n_total         2048
+    solution        5.836
+    error_bound     0.024
+    time_integrate  0.091
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solution: 5.8385         
+Solution: 5.8369         
 AsianOption (Integrand Object)
     volatility      2^(-1)
     call_put        call
@@ -267,7 +275,7 @@ Sobol (DiscreteDistribution Object)
     d               2^(6)
     randomize       1
     graycode        0
-    seed            [97369 39692 68997 ... 54733 77862 84061]
+    seed            646457
     mimics          StdUniform
     dim0            0
 BrownianMotion (TrueMeasure Object)
@@ -288,9 +296,9 @@ CubBayesNetG (StoppingCriterion Object)
     n_init          2^(8)
     n_max           2^(22)
 LDTransformBayesData (AccumulateData Object)
-    n_total         8192
-    solution        5.838
-    error_bound     0.021
-    time_integrate  0.673
+    n_total         2048
+    solution        5.837
+    error_bound     0.024
+    time_integrate  0.123
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
