@@ -94,8 +94,8 @@ class CubBayesLatticeG(StoppingCriterion):
         self.alpha = alpha  # p-value, default 0.1%.
         self.order = order  # Bernoulli kernel's order. If zero, choose order automatically
 
-        self.useGradient = False  # If true uses gradient descent in parameter search
-        self.oneTheta = True  # If true use common shape parameter for all dimensions
+        self.use_gradient = False  # If true uses gradient descent in parameter search
+        self.one_theta = False  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
         self.ptransform = ptransform  # periodization transform
         self.stop_at_tol = True  # automatic mode: stop after meeting the error tolerance
@@ -164,6 +164,46 @@ class CubBayesLatticeG(StoppingCriterion):
         return ytilde
 
     @staticmethod
+    def _fft_py(ynext):
+        """
+        Fast Fourier Transform (FFT) ynext, combine with y, then FFT all points.
+
+        Args:
+            y (ndarray): all previous samples
+            ynext (ndarray): next samples
+
+        Return:
+            ndarray: y and ynext combined and transformed
+        """
+        y = np.array([], dtype=complex)
+        # y = y.astype(complex)
+        ynext = ynext.astype(complex)
+        ## Compute initial FFT on next points
+        mnext = int(log2(len(ynext)))
+        for l in range(mnext):
+            nl = 2 ** l
+            nmminlm1 = 2 ** (mnext - l - 1)
+            ptind_nl = np.hstack((np.tile(True, nl), np.tile(False, nl)))
+            ptind = np.tile(ptind_nl, int(nmminlm1))
+            coef = np.exp(-2. * np.pi * 1j * np.arange(nl) / (2 * nl))
+            coefv = np.tile(coef, int(nmminlm1))
+            evenval = ynext[ptind]
+            oddval = ynext[~ptind]
+            ynext[ptind] = (evenval + coefv * oddval) / 2.
+            ynext[~ptind] = (evenval - coefv * oddval) / 2.
+        y = np.hstack((y, ynext))
+        if len(y) > len(ynext):  # already generated some samples samples
+            ## Compute FFT on all points
+            nl = 2 ** mnext
+            ptind = np.hstack((np.tile(True, int(nl)), np.tile(False, int(nl))))
+            coefv = np.exp(-2 * np.pi * 1j * np.arange(nl) / (2 * nl))
+            evenval = y[ptind]
+            oddval = y[~ptind]
+            y[ptind] = (evenval + coefv * oddval) / 2.
+            y[~ptind] = (evenval - coefv * oddval) / 2.
+        return y
+
+    @staticmethod
     def _merge_fft(ftilde_new, ftilde_next_new, mnext):
         # using FFT butterfly plot technique merges two halves of fft
         ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
@@ -183,8 +223,7 @@ class CubBayesLatticeG(StoppingCriterion):
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fft(C1 - 1)
     '''
-    def kernel(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
-
+    def kernel(self, xun, order, theta, avoid_cancel_error, kern_type, debug_enable):
         if kern_type == 1:
             b_order = order * 2  # Bernoulli polynomial order as per the equation
             const_mult = -(-1) ** (b_order / 2) * ((2 * np.pi) ** b_order) / factorial(b_order)
@@ -205,7 +244,7 @@ class CubBayesLatticeG(StoppingCriterion):
         if avoid_cancel_error:
             # Computes C1m1 = C1 - 1
             # C1_new = 1 + C1m1 indirectly computed in the process
-            (vec_C1m1, C1_alt) = self.data.kernel_t(a * const_mult, kernel_func(xun))
+            (vec_C1m1, C1_alt) = self.data.kernel_t(theta * const_mult, kernel_func(xun))
 
             lambda_factor = max(abs(vec_C1m1))
             C1_alt = C1_alt / lambda_factor
@@ -223,7 +262,7 @@ class CubBayesLatticeG(StoppingCriterion):
                     print('Possible error: check vec_lambda_ring computation')
         else:
             # direct approach to compute first row of the kernel Gram matrix
-            vec_C1 = np.prod(1 + a * const_mult * kernel_func(xun), 2)
+            vec_C1 = np.prod(1 + theta * const_mult * kernel_func(xun), 2)
             # matlab's builtin fft is much faster and accurate
             # eigenvalues must be real : Symmetric pos definite Kernel
             vec_lambda = np.real(CubBayesLatticeG._fft(vec_C1))
