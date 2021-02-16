@@ -74,6 +74,7 @@ We also highly recommend you take a look at [Fred Hickernell's tutorial at the M
 
 - Mike Giles
 - Marius Hofert
+- Sergei Kucherenko
 - Pierre L’Ecuyer
 - Christiane Lemieux
 - Dirk Nuyens

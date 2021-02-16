@@ -121,15 +121,19 @@ class Sobol(DiscreteDistribution):
         self.set_graycode(graycode)
         self.set_dim0(dim0)
         # set generating matrix
+        z_root = dirname(abspath(__file__))+'/generating_matricies/'
         if not z_path:
             self.d_max = 21201
             self.m_max = 32
             self.msb = True
-            self.z = load(dirname(abspath(__file__))+'/generating_matricies/sobol_mat.21201.32.msb.npy').astype(uint64)
+            self.z = load(z_root+'sobol_mat.21201.32.msb.npy').astype(uint64)
         else:
-            if not isfile(z_path):
+            if isfile(z_path):
+                self.z = load(z_path).astype(uint64)
+            elif isfile(z_root+z_path):
+                self.z = load(z_root+z_path).astype(uint64)
+            else:
                 raise ParameterError('z_path `' + z_path + '` not found. ')
-            self.z = load(z_path).astype(uint64)
             f = z_path.split('/')[-1]
             f_lst = f.split('.')
             self.d_max = int(f_lst[1])
