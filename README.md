@@ -72,12 +72,14 @@ We also highly recommend you take a look at [Fred Hickernell's tutorial at the M
 
 ## Collaborators
 
+- Adrian Ebert
 - Mike Giles
 - Marius Hofert
 - Sergei Kucherenko
 - Pierre L’Ecuyer
 - Christiane Lemieux
 - Dirk Nuyens
+- Onyekachi Osisiogu 
 - Art Owen
 - Pieterjan Robbe
 

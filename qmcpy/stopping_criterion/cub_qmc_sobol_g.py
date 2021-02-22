@@ -195,3 +195,5 @@ class CubQMCSobolG(StoppingCriterion):
         """
         if abs_tol != None: self.abs_tol = abs_tol
         if rel_tol != None: self.rel_tol = rel_tol
+
+CubQMCNetG = CubQMCSobolG
