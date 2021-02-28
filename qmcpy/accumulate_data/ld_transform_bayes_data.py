@@ -4,6 +4,7 @@ from numpy import array, nan
 import warnings
 import numpy as np
 from scipy.optimize import fminbound as fminbnd
+from scipy.optimize import fmin, fmin_bfgs
 from numpy import sqrt, exp, log
 from scipy.stats import norm as gaussnorm
 from scipy.stats import t as tnorm
@@ -105,11 +106,24 @@ class LDTransformBayesData(AccumulateData):
         lna_range = [-5, 0]  # reduced from [-5, 5], to avoid kernel values getting too big causing error
 
         # search for optimal shape parameter
-        lna_MLE = fminbnd(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
-                          x1=lna_range[0], x2=lna_range[1], xtol=1e-2, disp=0)
+        if self.stopping_crit.one_theta == True:
+            lna_MLE = fminbnd(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
+                              x1=lna_range[0], x2=lna_range[1], xtol=1e-2, disp=0)
 
-        aMLE = exp(lna_MLE)
-        _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
+            aMLE = exp(lna_MLE)
+            _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
+        else:
+            if self.stopping_crit.use_gradient == True:
+                pass
+            else:
+                # Nelder-Mead Simplex algorithm
+                theta0 = np.ones((xpts.shape[1], 1)) * (0.05)
+                theta0 = np.ones((1, xpts.shape[1])) * (0.05)
+                lna_MLE = fmin(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
+                              theta0, xtol=1e-2, disp=False)
+            aMLE = exp(lna_MLE)
+            # print(n, aMLE)
+            _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
 
         # Check error criterion
         # compute DSC
@@ -162,12 +176,13 @@ class LDTransformBayesData(AccumulateData):
     # objective function to estimate parameter theta
     # MLE : Maximum likelihood estimation
     # GCV : Generalized cross validation
-    def objective_function(self, a, xun, ftilde):
+    def objective_function(self, theta, xun, ftilde):
         n = len(ftilde)
-        fudge = 1000*np.finfo(float).eps
-        [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, a, self.avoid_cancel_error,
-                                                    self.kernType, self.debug_enable)
-
+        fudge = 100*np.finfo(float).eps
+        # if type(theta) != np.ndarray:
+        #     theta = np.ones((1, xun.shape[1])) * theta
+        [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, theta, self.avoid_cancel_error,
+                                                                   self.kernType, self.debug_enable)
         vec_lambda = abs(vec_lambda)
         # compute RKHS_norm
         temp = abs(ftilde[vec_lambda > fudge] ** 2) / (vec_lambda[vec_lambda > fudge])
@@ -280,17 +295,20 @@ class LDTransformBayesData(AccumulateData):
     # Useful to avoid cancellation error in the computation of (1 - n/\lambda_1)
     @staticmethod
     def kernel_t(aconst, Bern):
-        theta = aconst
         d = np.size(Bern, 1)
+        if type(aconst) != np.ndarray:
+            theta = np.ones((d, 1)) * aconst
+        else:
+            theta = aconst  # theta varies per dimension
 
-        Kjm1 = theta * Bern[:, 0]  # Kernel at j-dim minus One
+        Kjm1 = theta[0] * Bern[:, 0]  # Kernel at j-dim minus One
         Kj = 1 + Kjm1  # Kernel at j-dim
 
         for j in range(1, d):
             Kjm1_prev = Kjm1
             Kj_prev = Kj  # save the Kernel at the prev dim
 
-            Kjm1 = theta * Bern[:, j] * Kj_prev + Kjm1_prev
+            Kjm1 = theta[j] * Bern[:, j] * Kj_prev + Kjm1_prev
             Kj = 1 + Kjm1
 
         Km1 = Kjm1
