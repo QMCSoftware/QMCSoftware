@@ -63,7 +63,20 @@ def asian_option_single_level(
     print('%s%s'%(data,bar))
 
 def asian_option_single_level_high_dimensions(abs_tol=.5):
+    payoff = AsianOption(Sobol(52), start_price=30, strike_price=25)
+    price, data = CubQMCSobolG(payoff, abs_tol=abs_tol).integrate()
+    print(
+        f'CubQMCSobolG            option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
 
+    payoff = AsianOption(Lattice(52, order='linear'), start_price=30, strike_price=25)
+    price, data = CubBayesLatticeG(payoff, abs_tol=abs_tol, order=1, ptransform='Baker').integrate()
+    print(
+        f'CubBayesLatticeG        option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
+
+    payoff = AsianOption(Sobol(52), start_price=30, strike_price=25)
+    price, data = CubBayesNetG(payoff, abs_tol=abs_tol).integrate()
+    print(
+        f'CubBayesNetG            option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
 
     payoff = AsianOption(Sobol(52), start_price=100, strike_price=200)
     price, data = CubQMCSobolG(payoff, abs_tol=abs_tol).integrate()
@@ -81,22 +94,6 @@ def asian_option_single_level_high_dimensions(abs_tol=.5):
         f'CubBayesLatticeG        option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
 
     payoff = AsianOption(Sobol(52), start_price=100, strike_price=200)
-    price, data = CubBayesNetG(payoff, abs_tol=abs_tol).integrate()
-    print(
-        f'CubBayesNetG            option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
-
-
-    payoff = AsianOption(Sobol(52), start_price=30, strike_price=25)
-    price, data = CubQMCSobolG(payoff, abs_tol=abs_tol).integrate()
-    print(
-        f'CubQMCSobolG            option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
-
-    payoff = AsianOption(Lattice(52, order='linear'), start_price=30, strike_price=25)
-    price, data = CubBayesLatticeG(payoff, abs_tol=abs_tol, order=1, ptransform='Baker').integrate()
-    print(
-        f'CubBayesLatticeG        option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
-
-    payoff = AsianOption(Sobol(52), start_price=30, strike_price=25)
     price, data = CubBayesNetG(payoff, abs_tol=abs_tol).integrate()
     print(
         f'CubBayesNetG            option price = ${price:.4f} using {data.time_integrate:.3f} seconds and {data.n_total:.2e} samples')
