@@ -117,6 +117,7 @@ class LDTransformBayesData(AccumulateData):
                 pass
             else:
                 # Nelder-Mead Simplex algorithm
+                theta0 = np.ones((xpts.shape[1], 1)) * (0.05)
                 theta0 = np.ones((1, xpts.shape[1])) * (0.05)
                 lna_MLE = fmin(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
                               theta0, xtol=1e-2, disp=False)
@@ -178,6 +179,8 @@ class LDTransformBayesData(AccumulateData):
     def objective_function(self, theta, xun, ftilde):
         n = len(ftilde)
         fudge = 100*np.finfo(float).eps
+        # if type(theta) != np.ndarray:
+        #     theta = np.ones((1, xun.shape[1])) * theta
         [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, theta, self.avoid_cancel_error,
                                                                    self.kernType, self.debug_enable)
         vec_lambda = abs(vec_lambda)
@@ -293,8 +296,8 @@ class LDTransformBayesData(AccumulateData):
     @staticmethod
     def kernel_t(aconst, Bern):
         d = np.size(Bern, 1)
-        if len(aconst) == 1:
-            theta = np.ones((1, d)) * aconst
+        if type(aconst) != np.ndarray:
+            theta = np.ones((d, 1)) * aconst
         else:
             theta = aconst  # theta varies per dimension
 

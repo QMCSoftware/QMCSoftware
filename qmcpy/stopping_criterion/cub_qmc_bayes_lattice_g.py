@@ -43,7 +43,7 @@ class CubBayesLatticeG(StoppingCriterion):
     LDTransformBayesData (AccumulateData Object)
         n_total         256
         solution        1.808
-        error_bound     6.41e-04
+        error_bound     7.37e-04
         time_integrate  ...
     
     Adapted from 
