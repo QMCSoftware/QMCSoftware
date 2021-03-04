@@ -4,7 +4,7 @@ from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..integrand import Keister
 from ..true_measure import Gaussian
 from ..discrete_distribution import IIDStdUniform
-from ..util import _tol_fun, MaxSamplesWarning, NotYetImplemented
+from ..util import _tol_fun, MaxSamplesWarning
 from numpy import *
 from scipy.optimize import fsolve
 from scipy.stats import norm
@@ -74,7 +74,7 @@ class CubMCG(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
-                 inflate=1.2, alpha=0.01):
+                 inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -84,6 +84,10 @@ class CubMCG(StoppingCriterion):
             rel_tol: relative error tolerance
             n_init: initial number of samples
             n_max: maximum number of samples
+            control_variates (list): list of integrand objects to be used as control variates. 
+                Control variates are currently only compatible with single level problems. 
+                The same discrete distribution instance must be used for the integrand and each of the control variates. 
+            control_variate_means (list): list of means for each control variate
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Set Attributes
@@ -101,6 +105,8 @@ class CubMCG(StoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
+        self.cv = control_variates
+        self.cv_mu = control_variate_means
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
@@ -109,7 +115,8 @@ class CubMCG(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, self.n_init)  # house integration data
+        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, 
+            self.n_init, self.cv, self.cv_mu)  # house integration data
         t_start = time()
         # Pilot Sample
         self.data.update_data()
