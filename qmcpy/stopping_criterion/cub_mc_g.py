@@ -1,8 +1,8 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..integrand import Keister
-from ..true_measure import Gaussian
+from ..integrand import Keister, CustomFun
+from ..true_measure import Gaussian, Uniform
 from ..discrete_distribution import IIDStdUniform
 from ..util import _tol_fun, MaxSamplesWarning
 from numpy import *
@@ -47,6 +47,16 @@ class CubMCG(StoppingCriterion):
         error_bound     0.050
         confid_int      [1.754 1.854]
         time_integrate  ...
+    >>> dd = IIDStdUniform(1,seed=7)
+    >>> k = Keister(dd)
+    >>> cv1 = CustomFun(Uniform(dd),lambda x: sin(pi*x).sum(1))
+    >>> cv1mean = 2/pi
+    >>> cv2 = CustomFun(Uniform(dd),lambda x: (-3*(x-.5)**2+1).sum(1))
+    >>> cv2mean = 3/4
+    >>> sc1 = CubMCG(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
+    >>> sol,data = sc1.integrate()
+    >>> sol
+    1.3814738016365518
 
     Original Implementation:
 

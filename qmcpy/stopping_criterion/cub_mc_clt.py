@@ -1,8 +1,8 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution import IIDStdUniform
-from ..true_measure import Gaussian, BrownianMotion
-from ..integrand import Keister, AsianOption
+from ..true_measure import Gaussian, BrownianMotion, Uniform
+from ..integrand import Keister, AsianOption, CustomFun
 from ..util import MaxSamplesWarning
 from numpy import *
 from scipy.stats import norm
@@ -49,6 +49,16 @@ class CubMCCLT(StoppingCriterion):
     ...     multi_level_dimensions = [2,4,8])
     >>> sc = CubMCCLT(ac,abs_tol=.05)
     >>> solution,data = sc.integrate()
+    >>> dd = IIDStdUniform(1,seed=7)
+    >>> k = Keister(dd)
+    >>> cv1 = CustomFun(Uniform(dd),lambda x: sin(pi*x).sum(1))
+    >>> cv1mean = 2/pi
+    >>> cv2 = CustomFun(Uniform(dd),lambda x: (-3*(x-.5)**2+1).sum(1))
+    >>> cv2mean = 3/4
+    >>> sc1 = CubMCCLT(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
+    >>> sol,data = sc1.integrate()
+    >>> sol
+    1.3830006341932441
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
