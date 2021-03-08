@@ -15,7 +15,7 @@ def asian_option_single_level(
     t_final = 1,
     call_put = 'call',
     mean_type = 'geometric',
-    abs_tol = .1):
+    abs_tol = .5):
     
     dimension = 64
     print(bar)
