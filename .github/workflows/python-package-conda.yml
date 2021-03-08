@@ -27,11 +27,10 @@ jobs:
         python -m pip install coverage
     - name: Run Tests
       run: |
-        python -m pytest --doctest-modules --disable-pytest-warnings qmcpy
-        python -W ignore -m coverage run --source=./ -m unittest discover -s test/fasttests
-        python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests
-        python -m coverage report -m
+        make tests
     - name: Upload to Codecov
       run: |
         python -m coverage xml -i # genereate coverage.xml
-        python -m codecov -t e87cdb03-ccdd-44df-9849-8c5bc460cb9e  # fails without token
+        # python -m codecov -t e87cdb03-ccdd-44df-9849-8c5bc460cb9e  # fails without token
+        # bash <(curl https://codecov.io/bash)
+        curl -s https://codecov.io/bash | bash
