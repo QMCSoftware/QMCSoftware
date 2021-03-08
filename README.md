@@ -158,6 +158,8 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
 <b>[26]</b> P. L'Ecuyer, P. Marion, M. Godin, and F. Puchhammer, ``A Tool for Custom Construction of QMC and RQMC Point Sets,'' Monte Carlo and Quasi-Monte Carlo Methods 2020.
 
+<b>[27]</b> P Kumaraswamy, A generalized probability density function for double-bounded random processes. J. Hydrol. 46, 79–88 (1980).
+
 ----
 
 ## Sponsors
