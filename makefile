@@ -10,9 +10,9 @@
 
 tests:
 	@echo "\nDoctests"
-	python -m pytest --doctest-modules --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./ -m pytest --doctest-modules --disable-pytest-warnings qmcpy
 	@echo "\nFastests"
-	python -W ignore -m coverage run --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
+	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
 	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
 	@echo "\nCode coverage"
