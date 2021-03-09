@@ -29,7 +29,7 @@ copyright = u"2019 \u2014 2021, Illinois Institute of Technology"
 author = u"Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin"
 #author = u"S-C Choi, F Hickernell, M McCourt, J Rathinavel, & A Sorokin"
 
-version = u"1.0"
+version = u"1.0.1a"
 
 # The full version, including alpha/beta/rc tags
 release = version
