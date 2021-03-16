@@ -56,7 +56,7 @@ class CubMCG(StoppingCriterion):
     >>> sc1 = CubMCG(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
     >>> sol,data = sc1.integrate()
     >>> sol
-    1.3814738016365518
+    1.38147...
 
     Original Implementation:
 
