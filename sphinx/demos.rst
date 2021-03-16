@@ -31,3 +31,5 @@ Demos
     demo_rst/some_true_measures.rst
 
     demo_rst/asian-option-mlqmc.rst
+    
+    demo_rst/control_variates.rst
