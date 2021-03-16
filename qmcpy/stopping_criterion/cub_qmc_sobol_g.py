@@ -75,7 +75,8 @@ class CubQMCSobolG(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
-        fudge=lambda m: 5.*2.**(-m), check_cone=False, control_variates=[], control_variate_means=[]):
+        fudge=lambda m: 5.*2.**(-m), check_cone=False, 
+        control_variates=[], control_variate_means=[], update_beta=False):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -91,6 +92,7 @@ class CubQMCSobolG(StoppingCriterion):
                 Control variates are currently only compatible with single level problems. 
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
+            update_beta (bool): update control variate beta coefficients at each iteration? 
         """
         self.parameters = ['abs_tol','rel_tol','n_init','n_max']
         # Input Checks
@@ -112,12 +114,14 @@ class CubQMCSobolG(StoppingCriterion):
         self.m_max = m_max
         self.fudge = fudge
         self.check_cone = check_cone
+        self.coefv = lambda nl: ones(nl,dtype=float)
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
         self.cv = control_variates
         self.cv_mu = control_variate_means
+        self.ub = update_beta
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
@@ -129,8 +133,8 @@ class CubQMCSobolG(StoppingCriterion):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
         self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self._fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none',
-            control_variates=self.cv, control_variate_means=self.cv_mu)
+            self.coefv, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none', cast_complex=False,
+            control_variates=self.cv, control_variate_means=self.cv_mu, update_beta=self.ub)
         t_start = time()
         while True:
             self.data.update_data()
@@ -158,39 +162,6 @@ class CubQMCSobolG(StoppingCriterion):
                 self.data.m += 1.
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
-    
-    def _fwt_update(self, y, ynext):
-        """
-        Fast Walsh Transform (FWT) ynext, combine with y, then FWT all points.
-        
-        Args:
-            y (ndarray): all previous samples
-            ynext (ndarray): next samples
-        
-        Return:
-            ndarray: y and ynext combined and transformed
-        """
-        ## Compute initial FWT on next points
-        mnext = int(log2(len(ynext)))
-        for l in range(mnext):
-            nl = 2**l
-            nmminlm1 = 2.**(mnext-l-1)
-            ptind_nl = hstack(( tile(True,nl), tile(False,nl) ))
-            ptind = tile(ptind_nl,int(nmminlm1))
-            evenval = ynext[ptind]
-            oddval = ynext[~ptind]
-            ynext[ptind] = (evenval + oddval) / 2.
-            ynext[~ptind] = (evenval - oddval) / 2.
-        y = hstack((y,ynext))
-        if len(y) > len(ynext): # already generated some samples samples
-            ## Compute FWT on all points
-            nl = 2**mnext
-            ptind = hstack(( tile(True,int(nl)), tile(False,int(nl)) ))
-            evenval = y[ptind]
-            oddval = y[~ptind]
-            y[ptind] = (evenval + oddval)/ 2.
-            y[~ptind] = (evenval - oddval)/ 2.
-        return y
     
     def set_tolerance(self, abs_tol=None, rel_tol=None):
         """
