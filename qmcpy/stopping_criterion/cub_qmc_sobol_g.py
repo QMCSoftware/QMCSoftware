@@ -2,8 +2,8 @@ from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
 from ..discrete_distribution import Sobol
-from ..true_measure import Gaussian
-from ..integrand import Keister
+from ..true_measure import Gaussian, Uniform
+from ..integrand import Keister, CustomFun
 from numpy import *
 from time import time
 import warnings
@@ -44,6 +44,19 @@ class CubQMCSobolG(StoppingCriterion):
         solution        1.808
         error_bound     0.005
         time_integrate  ...
+    >>> dd = Sobol(3)
+    >>> g1 = CustomFun(Uniform(dd,0,2),lambda t: 10*t[:,0]-5*t[:,1]**2+t[:,2]**3)
+    >>> cv1 = CustomFun(Uniform(dd,0,2),lambda t: t[:,0])
+    >>> cv2 = CustomFun(Uniform(dd,0,2),lambda t: t[:,1]**2)
+    >>> sc = CubQMCSobolG(g1,abs_tol=1e-6,check_cone=True,
+    ...     control_variates = [cv1,cv2],
+    ...     control_variate_means = [1,4/3])
+    >>> sol,data = sc.integrate()
+    >>> print(sol)
+    5.3333333...
+    >>> exactsol = 16/3
+    >>> print(abs(sol-exactsol)<1e-6)
+    True
 
     Original Implementation:
 

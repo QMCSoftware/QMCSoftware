@@ -54,7 +54,7 @@ class LDTransformData(AccumulateData):
                 raise ParameterError('''
                         Each control variate's discrete distribution 
                         must be the same instance as the one for te main integrand.''')
-        self.cv_mu = array(self.cv_mu).reshape((-1,1)) # column vector
+        self.cv_mu = array(self.cv_mu) # column vector
         self.ncv = int(len(self.cv))
         self.update_beta = update_beta
         # Set Attributes
@@ -121,9 +121,9 @@ class LDTransformData(AccumulateData):
             ycv[:,0] = self.integrand.f_periodized(self.x,self.ptransform)
             for i in range(self.ncv):
                 ycv[:,i+1] = self.cv[i].f(self.x)
-            y = ycv[:,0]
+            y = ycv[:,0].copy()
             yval = y.copy()
-            yg = ycv[:,1:]
+            yg = ycv[:,1:].copy()
             if self.cast_complex: yg = yg.astype(complex)
         if self.cast_complex: y = y.astype(complex)
         # fast transform
@@ -141,8 +141,8 @@ class LDTransformData(AccumulateData):
             if self.ncv>0:
                 evenval = yg[ptind]
                 oddval = yg[~ptind]
-                yg[ptind] = (evenval + coefv*oddval) / 2.
-                yg[~ptind] = (evenval - coefv*oddval) / 2.
+                yg[ptind] = (evenval + coefv[:,None]*oddval) / 2.
+                yg[~ptind] = (evenval - coefv[:,None]*oddval) / 2.
         # create kappanumap from the data
         kappanumap = arange(1,n+1,dtype=int)
         for l in range(int(self.m_min-1),0,-1):
@@ -159,15 +159,15 @@ class LDTransformData(AccumulateData):
                 kappanumap[flipall] = temp # around   
         # if using control variates, find optimal beta
         if self.ncv>0:
-            kappa_approx = kappanumap[2**(self.m_min-self.r_lag-1):]-1 # kappa index used for fitting
+            kappa_approx = kappanumap[int(2**(self.m_min-self.r_lag-1)):]-1 # kappa index used for fitting
             x4beta = yg[kappa_approx]
             y4beta = y[kappa_approx]
             self.beta = linalg.lstsq(x4beta,y4beta,rcond=None)[0]
             yval = ycv[:,0] - ycv[:,1:]@self.beta # get new function values
-            y = y-yg@beta # redefine function
+            y = y-yg@self.beta # redefine function
             # rebuild kappa map
             kappanumap = arange(1,n+1,dtype=int) # reinitialize
-            for l in range(self.m_min-1,0,-1):
+            for l in range(int(self.m_min-1),0,-1):
                 nl = 2**l
                 oldone = abs(y[kappanumap[1:int(nl)]-1]) # earlier values of kappa, don't touch first one
                 newone = abs(y[kappanumap[nl+1:2*nl]-1]) # later values of kappa,
@@ -242,7 +242,7 @@ class LDTransformData(AccumulateData):
             yg = ycv[:,1:]
             if self.cast_complex: yg = yg.astype(complex)
             # compute fast transform 
-            for l in range(self.m):
+            for l in range(int(self.m)):
                 nl = 2**l
                 nmminlm1 = 2**(self.m-l-1)
                 ptind_nl = hstack(( tile(True,nl), tile(False,nl) ))
@@ -255,17 +255,17 @@ class LDTransformData(AccumulateData):
                 y[~ptind] = (evenval - coefv*oddval) / 2.
                 evenval = yg[ptind]
                 oddval = yg[~ptind]
-                yg[ptind] = (evenval + coefv*oddval) / 2.
-                yg[~ptind] = (evenval - coefv*oddval) / 2.
+                yg[ptind] = (evenval + coefv[:,None]*oddval) / 2.
+                yg[~ptind] = (evenval - coefv[:,None]*oddval) / 2.
             # update beta approximation
-            kappa_approx = kappanumap[2**(self.m-self.r_lag-1):]-1 # kappa index used for fitting
+            kappa_approx = self.kappanumap[int(2**(self.m-self.r_lag-1)):]-1 # kappa index used for fitting
             x4beta = yg[kappa_approx]
             y4beta = y[kappa_approx]
             self.beta = linalg.lstsq(x4beta,y4beta,rcond=None)[0]
             yval = ycv[:,0] - ycv[:,1:]@self.beta # get new function values
-            y = y-yg@beta # redefine function
+            y = y-yg@self.beta # redefine function
             # rebuild kappanumap
-            kappanumap = hstack((self.kappanumap,2**(self.m-1)+self.kappanumap))
+            kappanumap = hstack((self.kappanumap,2**(self.m-1)+self.kappanumap)).astype(int)
             for l in range(int(self.m-1),int(self.m-self.r_lag-1),-1):
                 nl = 2**l
                 oldone = abs(y[kappanumap[1:int(nl)]-1]) # earlier values of kappa, don't touch first one
@@ -280,5 +280,5 @@ class LDTransformData(AccumulateData):
                     kappanumap[flipall] = temp # around 
         # set some variables for the next iteration
         self.y,self.yval,self.kappanumap = y,yval,kappanumap
-        if self.ncv>0: self.ycv = ycv
+        if self.ncv>0 and self.update_beta: self.ycv = ycv
       
