@@ -75,7 +75,7 @@ class CubQMCSobolG(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
-                 fudge=lambda m: 5.*2.**(-m), check_cone=False):
+        fudge=lambda m: 5.*2.**(-m), check_cone=False, control_variates=[], control_variate_means=[]):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -87,6 +87,10 @@ class CubQMCSobolG(StoppingCriterion):
                               sum of Fast Fourier coefficients specified 
                               in the cone of functions
             check_cone (boolean): check if the function falls in the cone
+            control_variates (list): list of integrand objects to be used as control variates. 
+                Control variates are currently only compatible with single level problems. 
+                The same discrete distribution instance must be used for the integrand and each of the control variates. 
+            control_variate_means (list): list of means for each control variate
         """
         self.parameters = ['abs_tol','rel_tol','n_init','n_max']
         # Input Checks
@@ -112,6 +116,8 @@ class CubQMCSobolG(StoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
+        self.cv = control_variates
+        self.cv_mu = control_variate_means
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
@@ -123,7 +129,8 @@ class CubQMCSobolG(StoppingCriterion):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
         self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self._fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none')
+            self._fwt_update, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none',
+            control_variates=self.cv, control_variate_means=self.cv_mu)
         t_start = time()
         while True:
             self.data.update_data()

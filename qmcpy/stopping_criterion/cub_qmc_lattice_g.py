@@ -128,7 +128,8 @@ class CubQMCLatticeG(StoppingCriterion):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
         self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform)
+            self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform,
+            [], []) # currently not compatible with control variates
         t_start = time()
         while True:
             self.data.update_data()

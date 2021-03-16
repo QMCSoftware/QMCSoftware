@@ -1,4 +1,5 @@
 from ._accumulate_data import AccumulateData
+from ..integrand._integrand import Integrand
 from ..util import CubatureWarning
 from numpy import *
 import warnings
@@ -12,7 +13,8 @@ class LDTransformData(AccumulateData):
 
     parameters = ['n_total','solution','error_bound']
 
-    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, basis_transform, m_min, m_max, fudge, check_cone, ptransform):
+    def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, basis_transform, 
+        m_min, m_max, fudge, check_cone, ptransform, control_variates, control_variate_means):
         """
         Args:
             stopping_crit (StoppingCriterion): a StoppingCriterion instance
@@ -27,11 +29,31 @@ class LDTransformData(AccumulateData):
             fudge (function): positive function multiplying the finite 
                 sum of basis coefficients specified in the cone of functions
             check_cone (boolean): check if the function falls in the cone
+            control_variates (list): list of integrand objects to be used as control variates. 
+                Control variates are currently only compatible with single level problems. 
+                The same discrete distribution instance must be used for the integrand and each of the control variates. 
+            control_variate_means (list): list of means for each control variate
         """
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
         self.discrete_distrib = discrete_distrib
+        # setup control variates
+        self.cv = control_variates
+        self.cv_mu = control_variate_means
+        if isinstance(self.cv,Integrand):
+            self.cv = [self.cv] # take a single integrand and make it into a list of length 1
+        if isscalar(self.cv_mu):
+            self.cv_mu = [self.cv_mu]
+        if len(self.cv)!=len(self.cv_mu):
+            raise ParameterError("list of control variates and list of control variate means must be the same.")
+        for cv in self.cv:
+            if cv.discrete_distrib != self.discrete_distrib:
+                raise ParameterError('''
+                        Each control variate's discrete distribution 
+                        must be the same instance as the one for te main integrand.''')
+        self.cv_mu = array(self.cv_mu).reshape((-1,1)) # column vector
+        self.ncv = int(len(self.cv))
         # Set Attributes
         self.ft = basis_transform # fast transform 
         self.m_min = m_min
