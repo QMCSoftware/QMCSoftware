@@ -44,7 +44,7 @@ class CubQMCSobolG(StoppingCriterion):
         solution        1.808
         error_bound     0.005
         time_integrate  ...
-    >>> dd = Sobol(3)
+    >>> dd = Sobol(3,seed=7)
     >>> g1 = CustomFun(Uniform(dd,0,2),lambda t: 10*t[:,0]-5*t[:,1]**2+t[:,2]**3)
     >>> cv1 = CustomFun(Uniform(dd,0,2),lambda t: t[:,0])
     >>> cv2 = CustomFun(Uniform(dd,0,2),lambda t: t[:,1]**2)
