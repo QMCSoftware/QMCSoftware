@@ -152,7 +152,7 @@ class IntegrationExampleTest(unittest.TestCase):
         self.assertTrue(abs(solution-true_value) < abs_tol)
 
     def test_european_put_bayes_lattice(self):
-        abs_tol = 1e-2
+        abs_tol = 5e-2
         integrand = EuropeanOption(
             sampler = Lattice(dimension=16, order='linear'),
             volatility = .5,
@@ -166,7 +166,7 @@ class IntegrationExampleTest(unittest.TestCase):
         self.assertTrue(abs(solution-true_value) < abs_tol)
 
     def test_european_put_bayes_net(self):
-        abs_tol = 1e-2
+        abs_tol = 5e-2
         integrand = EuropeanOption(
             sampler = Sobol(dimension=4, randomize='LMS'),
             volatility = .5,
