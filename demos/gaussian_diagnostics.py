@@ -1,30 +1,87 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fmin as fminsearch
+from numpy import prod, sin, cos, pi
+
+from qmcpy.integrand import Keister
+from qmcpy.discrete_distribution.lattice import Lattice
 
 
 def simple_lattice_gen(n, d, shift, firstBatch):
     return  # [xlat,xpts_un,xlat_un,xpts]
 
 
-def keisterFunc(x, dim, a):
-    return
+def doPeriodTx(x, integrand, ptransform):
+    ptransform = ptransform.upper()
+    if ptransform == 'BAKER':  # Baker's transform
+        xp = 1 - 2 * abs(x - 1 / 2)
+        w = 1
+    elif ptransform == 'C0':  # C^0 transform
+        xp = 3 * x ** 2 - 2 * x ** 3
+        w = prod(6 * x * (1 - x), 1)
+    elif ptransform == 'C1':  # C^1 transform
+        xp = x ** 3 * (10 - 15 * x + 6 * x ** 2)
+        w = prod(30 * x ** 2 * (1 - x) ** 2, 1)
+    elif ptransform == 'C1SIN':  # Sidi C^1 transform
+        xp = x - sin(2 * pi * x) / (2 * pi)
+        w = prod(2 * sin(pi * x) ** 2, 1)
+    elif ptransform == 'C2SIN':  # Sidi C^2 transform
+        xp = (8 - 9 * cos(pi * x) + cos(3 * pi * x)) / 16  # psi3
+        w = prod((9 * sin(pi * x) * pi - sin(3 * pi * x) * 3 * pi) / 16, 1)  # psi3_1
+    elif ptransform == 'C3SIN':  # Sidi C^3 transform
+        xp = (12 * pi * x - 8 * sin(2 * pi * x) + sin(4 * pi * x)) / (12 * pi)  # psi4
+        w = prod((12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1)  # psi4_1
+    elif ptransform == 'NONE':
+        xp = x
+        w = 1
+    else:
+        raise ("The %s periodization transform is not implemented" % ptransform)
+    y = integrand(xp) * w
+    return y
 
 
-def f_rand(xpts, rfun, a, b, c, seed):
-    return  # fval
+def ObjectiveFunction(theta, order, xun, ftilde):
+    tol = 100 * np.finfo(float).eps
+    n = len(ftilde)
+    arbMean = True
+    Lambda = kernel2(theta, order, xun)
+
+    # compute RKHSnorm
+    # temp = abs(ftilde(Lambda  ~ = 0).^ 2)./ (Lambda(Lambda~=0));
+    temp = abs(ftilde[Lambda > tol] ** 2) / (Lambda[Lambda > tol])
+
+    # compute loss: MLE
+    if arbMean == True:
+        RKHSnorm = sum(temp[1:]) / n
+        temp_1 = sum(temp[1:])
+    else:
+        RKHSnorm = sum(temp) / n
+        temp_1 = sum(temp)
+
+    # ignore all zero eigenvalues
+    loss1 = sum(np.log(Lambda[Lambda > tol])) / n
+    loss2 = np.log(temp_1)
+    loss = (loss1 + loss2)
+    if np.imag(loss) != 0:
+        # keyboard
+        print
+
+    # print('L1 %1.3f L2 %1.3f L %1.3f r %1.3e theta %1.3e\n'.format(loss1, loss2, loss, order, theta))
+    return loss, Lambda, RKHSnorm
 
 
-def doPeriodTx(integrand, ptransform):
-    return
-
-
-def ObjectiveFunction(a, b, xlat, ftilde):
-    return
-
-
-def kernel2(thetaOpt, rOpt, xlat):
-    return  # vlambda
+def kernel2(theta, r, xun):
+    n = xun.shape[0]
+    m = np.arange(1, (n / 2))
+    tilde_g_h1 = m ** (-r)
+    tilde_g = np.hstack([0, tilde_g_h1, 0, tilde_g_h1[::-1]])
+    g = np.fft.fft(tilde_g)
+    temp_ = (theta / 2) * g[(xun * n).astype(int)]
+    C1 = prod(1 + temp_, 1)
+    # matlab's builtin fft is much faster and accurate
+    # eigenvalues must be real : Symmetric pos definite Kernel
+    vlambda = np.real(np.fft.fft(C1))
+    return vlambda
 
 
 def create_plots(type, vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt):
@@ -40,18 +97,18 @@ def create_plots(type, vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt):
         axFigNormplot.normplot(vz_real)
     else:
         # ((1:n)-1/2)'/n
-        q = np.arange(1, n) - 1 / 2
+        q = (np.arange(1, n) - 1 / 2) / n
         stNorm = np.norminv(q)  # quantiles of standard normal
-        axFigNormplot.plot(stNorm, sorted(vz_real), '.', 'MarkerSize', 20)
+        axFigNormplot.plot(stNorm, sorted(vz_real), marker='.', markersize=20)
         # hold on:
-        axFigNormplot.plot([-3, 3], [-3, 3], '-', 'linewidth', 4)
+        axFigNormplot.plot([-3, 3], [-3, 3], marker='-', linewidth=4)
         axFigNormplot.set_xlabel('Standard Gaussian Quantiles')
         axFigNormplot.set_ylabel('Data Quantiles')
 
     if np.isnan(theta):
-        plt_title = f'$d={dim}, n={n}, r_{{opt}}={rOpt:1.2f} , \\theta_{{opt}}={thetaOpt:1.2f} '
+        plt_title = f'$d={dim}, n={n}, r_{{opt}}={rOpt:1.2f} , \\theta_{{opt}}={thetaOpt:1.2f} $'
     else:
-        plt_title = f'$d={dim}, n={n}, r={r:1.3f}, r_{{opt}}={rOpt:1.3f}, \\theta={theta:1.3f}, \\theta_{{opt}}={thetaOpt:1.3f} '
+        plt_title = f'$d={dim}, n={n}, r={r:1.3f}, r_{{opt}}={rOpt:1.3f}, \\theta={theta:1.3f}, \\theta_{{opt}}={thetaOpt:1.3f} $'
 
     axFigNormplot.set_title(plt_title)
     if np.isnan(theta):
@@ -90,64 +147,69 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
         theta = np.nan
 
     for iii in range(nReps):
-        seed = seed = np.randint(low=1, high=1e6)  # randi([1, 1e6], 1, 1)  # different each rep
-        shift = np.matlib.rand(1, dim)
+        seed = np.random.randint(low=1, high=1e6)  # randi([1, 1e6], 1, 1)  # different each rep
+        shift = np.random.rand(1, dim)
 
-        _, xlat, _, xpts = simple_lattice_gen(npts, dim, shift, True)
+        # _, xlat, _, xpts = simple_lattice_gen(npts, dim, shift, True)
+        distribution = Lattice(dimension=dim, order='linear')
+        xpts, xlat = distribution.gen_samples(n_min=0, n_max=npts, warn=False, return_unrandomized=True)
 
         if fName == 'ExpCos':
             integrand = lambda x: np.exp(sum(np.cos(2 * np.pi * x), 2))
         elif fName == 'Keister':
-            integrand = lambda x: keisterFunc(x, dim, 1 / np.sqrt(2))  # a=0.8
+            keister = Keister(Lattice(dimension=dim, order='linear'))
+            integrand = lambda x: keister.f(x)
         elif fName == 'rand':
             integrand = lambda x: f_rand(x, rfun, f_std_a, f_std_b, f_mean, seed)
         else:
             print('Invalid function name')
             return
 
-        integrand_p = doPeriodTx(integrand, ptransform)
+        y = doPeriodTx(xpts, integrand, ptransform)
 
-        y = integrand_p(xpts)  # function data
+        # y = integrand_p(xpts)  # function data
         ftilde = np.fft.fft(y)  # fourier coefficients
         ftilde[0] = 0  # ftilde = \mV**H(\vf - m \vone), subtract mean
         if dim == 1:
             hFigIntegrand = plt.figure()
             plt.scatter(xpts, y, 10)
             plt.title('%s_n-%d_Tx-%s'.format(fName, npts, ptransform))  # , 'interpreter', 'none')
-            # saveas(hFigIntegrand, '%s_n-%d_Tx-%s_rFun-%1.2f.png'.format(fName, npts, ptransform, rfun))
+            hFigIntegrand.savefig('%s_n-%d_Tx-%s_rFun-%1.2f.png'.format(fName, npts, ptransform, rfun))
 
         objfun = lambda lnParams: ObjectiveFunction(np.exp(lnParams[0]), 1 + np.exp(lnParams[1]), xlat, ftilde)
         ## Plot the objective function
-        lnthetarange = np.range(-2, 2, 0.2)  # range of log(theta) for plotting
-        lnorderrange = np.range(-1, 1, 0.1)  # range of log(r) for plotting
+        lnthetarange = np.arange(-2, 2.2, 0.2)  # range of log(theta) for plotting
+        lnorderrange = np.arange(-1, 1.1, 0.1)  # range of log(r) for plotting
         [lnthth, lnordord] = np.meshgrid(lnthetarange, lnorderrange)
-        objobj = lnthth
-        for ii in range(0, lnthth.shape[0]):
-            for jj in range(0, lnthth.shape[1]):
-                objobj[ii, jj] = objfun([lnthth[ii, jj], lnordord[ii, jj]])
+        objobj = np.zeros(lnthth.shape)
+        for ii in range(lnthth.shape[0]):
+            for jj in range(lnthth.shape[1]):
+                objobj[ii, jj], _, _ = objfun([lnthth[ii, jj], lnordord[ii, jj]])
 
         figH, axH = None, None
         if iii <= nPlots:
             from matplotlib import cm
 
             figH, axH = plt.subplots(subplot_kw={"projection": "3d"})
-
             shandle = axH.plot_surface(lnthth, lnordord, objobj, cmap=cm.coolwarm,
                                        linewidth=0, antialiased=False)
-            axH.set_xticks(np.log([0.2, 0.4, 1, 3, 7]))
-            axH.set_yticks(np.log([1.4, 1.6, 2, 2.6, 3.7] - 1))
-            axH.xaxis.set_major_formatter('{x:.01f}')
-            axH.yaxis.set_major_formatter('{x:.01f}')
+            xt = np.array([.2, 0.4, 1, 3, 7])
+            axH.set_xticks(np.log(xt))
+            axH.set_xticklabels(xt.astype(str))
+            yt = np.array([1.4, 1.6, 2, 2.6, 3.7])
+            axH.set_yticks(np.log(yt - 1))
+            axH.set_yticklabels(yt.astype(str))
+            # axH.xaxis.set_major_formatter('{x:.01f}')
+            # axH.yaxis.set_major_formatter('{x:.01f}')
 
             # set(shandle, 'EdgeColor', 'none', 'facecolor', 'interp')
-            # set(gca, 'xtick', np.log([0.2, 0.4, 1, 3, 7]), 'xticklabel', {'0.2', '0.4', '1', '3', '7'}, ...
-            #   'ytick', np.log([1.4, 1.6, 2, 2.6, 3.7] - 1), 'yticklabel', {'1.4', '1.6', '2', '2.6', '3.7'})
-            axH.set_xlabel('\(\theta\)')
-            axH.set_ylabel('\(r\)')
 
-        [objMinAppx, which] = min(objobj, [], 'all', 'linear')
+            axH.set_xlabel('$\\theta$')
+            axH.set_ylabel('$r$')
+
+        objMinAppx, which = objobj.min(), objobj.argmin()
         # [whichrow, whichcol] = ind2sub(lnthth.shape, which)
-        [whichrow, whichcol] = np.unravel_index(lnthth.shape, which)
+        [whichrow, whichcol] = np.unravel_index(which, lnthth.shape)
         lnthOptAppx = lnthth[whichrow, whichcol]
         thetaOptAppx = np.exp(lnthOptAppx)
         lnordOptAppx = lnordord[whichrow, whichcol]
@@ -207,25 +269,31 @@ def f_rand(xpts, rfun, a, b, c, seed):
     np.random.seed(seed)  # initialize random number generator for reproducability
     N1 = 2 ** np.floor(16 / dim)
     Nall = N1 ** dim
-    kvec = np.zeros([dim, Nall])  # initialize kved
+    kvec = np.zeros([dim, Nall])  # initialize kvec
     kvec[0, 0:N1 - 1] = range(0, N1 - 1)  # first dimension
     Nd = N1
-    for d in range(2, dim):
+    for d in range(1, dim):
         Ndm1 = Nd
         Nd = Nd * N1
-        kvec[1:d, 1:Nd] = np.vstack(np.repmat(kvec[1:d - 1, 1:Ndm1], 1, N1),
-                                    np.reshape(np.repmat(np.range(0, N1 - 1), Ndm1, 1), 1, Nd))
+        kvec[0:d, 0:Nd] = np.vstack([
+            np.repmat(kvec[0:d - 1, 0:Ndm1], 1, N1),
+            np.reshape(np.repmat(np.range(0, N1 - 1), Ndm1, 1), 1, Nd)
+        ])
 
-    f_c = a * np.random.randn(1, Nall - 1)
-    f_s = a * np.random.randn(1, Nall - 1)
-    f_0 = c + b * np.random.randn(1, 1)
-    kbar = np.prod(max(kvec[:, 2:Nall], 1), 1)
-    argx = (2 * np.pi * xpts) * kvec[:, 2:Nall]
-    f_c_ = (f_c / kbar ** (rfun)) * np.cos(argx)
-    f_s_ = (f_s / kbar ** (rfun)) * np.sin(argx)
-    fval = f_0 + sum(f_c_ + f_s_, 2)
-    # figure plot(fval, '.')
-    # end
+    kvec = kvec[:, 1: Nall]  # remove the zero wavenumber
+    whZero = np.sum(kvec == 0, axis=0)
+    abfac = a ** (dim - whZero) * b ** whZero
+    kbar = np.prod(max(kvec, 1), axis=0)
+    totfac = abfac / (kbar ** rfun)
+
+    f_c = a * np.random.randn(1, Nall - 1) * totfac
+    f_s = a * np.random.randn(1, Nall - 1) * totfac
+
+    f_0 = c + (b ** dim) * np.random.randn(1, 1)
+    argx = (2 * np.pi * xpts) * kvec
+    f_c_ = f_c * np.cos(argx)
+    f_s_ = f_s * np.sin(argx)
+    fval = f_0 + np.sum(f_c_ + f_s_, dim=1)
     return fval
 
 
