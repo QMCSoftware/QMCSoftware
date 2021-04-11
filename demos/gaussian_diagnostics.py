@@ -10,8 +10,86 @@ from qmcpy.discrete_distribution.lattice import Lattice
 
 # print(plt.style.available)
 # plt.style.use('./presentation.mplstyle')  # custom settings
-plt.style.use('seaborn-notebook')
 # plt.style.library['seaborn-darkgrid']   # Showing the style settings
+plt.style.use('seaborn-notebook')
+
+
+def ObjectiveFunction(theta, order, xun, ftilde):
+    tol = 100 * np.finfo(float).eps
+    n = len(ftilde)
+    arbMean = True
+    Lambda = kernel2(theta, order, xun)
+
+    # compute RKHSnorm
+    # temp = abs(ftilde(Lambda  != 0).^ 2)./ (Lambda(Lambda != 0))
+    temp = abs(ftilde[Lambda > tol] ** 2) / (Lambda[Lambda > tol])
+
+    # compute loss: MLE
+    if arbMean == True:
+        RKHSnorm = sum(temp[1:]) / n
+        temp_1 = sum(temp[1:])
+    else:
+        RKHSnorm = sum(temp) / n
+        temp_1 = sum(temp)
+
+    # ignore all zero eigenvalues
+    loss1 = sum(np.log(Lambda[Lambda > tol])) / n
+    loss2 = np.log(temp_1)
+    loss = (loss1 + loss2)
+    if np.imag(loss) != 0:
+        # keyboard
+        raise ('error ! : loss value is complex')
+
+    # print('L1 %1.3f L2 %1.3f L %1.3f r %1.3e theta %1.3e\n'.format(loss1, loss2, loss, order, theta))
+    return loss, Lambda, RKHSnorm
+
+
+def kernel2(theta, r, xun):
+    n = xun.shape[0]
+    m = np.arange(1, (n / 2))
+    tilde_g_h1 = m ** (-r)
+    tilde_g = np.hstack([0, tilde_g_h1, 0, tilde_g_h1[::-1]])
+    g = np.fft.fft(tilde_g)
+    temp_ = (theta / 2) * g[(xun * n).astype(int)]
+    C1 = prod(1 + temp_, 1)
+    # eigenvalues must be real : Symmetric pos definite Kernel
+    vlambda = np.real(np.fft.fft(C1))
+    return vlambda
+
+
+# gaussian random function
+def f_rand(xpts, rfun, a, b, c, seed):
+    dim = xpts.shape[1]
+    np.random.seed(seed)  # initialize random number generator for reproducability
+    N1 = int(2 ** np.floor(16 / dim))
+    Nall = N1 ** dim
+    kvec = np.zeros([dim, Nall])  # initialize kvec
+    kvec[0, 0:N1] = range(0, N1)  # first dimension
+    Nd = N1
+    for d in range(1, dim):
+        Ndm1 = Nd
+        Nd = Nd * N1
+        kvec[0:d + 1, 0:Nd] = np.vstack([
+            np.tile(kvec[0:d, 0:Ndm1], (1, N1)),
+            np.reshape(np.tile(np.arange(0, N1), (Ndm1, 1)), (1, Nd), order="F")
+        ])
+
+    kvec = kvec[:, 1: Nall]  # remove the zero wavenumber
+    whZero = np.sum(kvec == 0, axis=0)
+    abfac = a ** (dim - whZero) * b ** whZero
+    kbar = np.prod(np.maximum(kvec, 1), axis=0)
+    totfac = abfac / (kbar ** rfun)
+
+    f_c = a * np.random.randn(1, Nall - 1) * totfac
+    f_s = a * np.random.randn(1, Nall - 1) * totfac
+
+    f_0 = c + (b ** dim) * np.random.randn()
+    argx = np.matmul((2 * np.pi * xpts), kvec)
+    f_c_ = f_c * np.cos(argx)
+    f_s_ = f_s * np.sin(argx)
+    fval = f_0 + np.sum(f_c_ + f_s_, axis=1)
+    return fval
+
 
 def doPeriodTx(x, integrand, ptransform):
     ptransform = ptransform.upper()
@@ -42,49 +120,6 @@ def doPeriodTx(x, integrand, ptransform):
     return y
 
 
-def ObjectiveFunction(theta, order, xun, ftilde):
-    tol = 100 * np.finfo(float).eps
-    n = len(ftilde)
-    arbMean = True
-    Lambda = kernel2(theta, order, xun)
-
-    # compute RKHSnorm
-    # temp = abs(ftilde(Lambda  != 0).^ 2)./ (Lambda(Lambda != 0))
-    temp = abs(ftilde[Lambda > tol] ** 2) / (Lambda[Lambda > tol])
-
-    # compute loss: MLE
-    if arbMean == True:
-        RKHSnorm = sum(temp[1:]) / n
-        temp_1 = sum(temp[1:])
-    else:
-        RKHSnorm = sum(temp) / n
-        temp_1 = sum(temp)
-
-    # ignore all zero eigenvalues
-    loss1 = sum(np.log(Lambda[Lambda > tol])) / n
-    loss2 = np.log(temp_1)
-    loss = (loss1 + loss2)
-    if np.imag(loss) != 0:
-        # keyboard
-        raise('error ! : loss value is complex')
-
-    # print('L1 %1.3f L2 %1.3f L %1.3f r %1.3e theta %1.3e\n'.format(loss1, loss2, loss, order, theta))
-    return loss, Lambda, RKHSnorm
-
-
-def kernel2(theta, r, xun):
-    n = xun.shape[0]
-    m = np.arange(1, (n / 2))
-    tilde_g_h1 = m ** (-r)
-    tilde_g = np.hstack([0, tilde_g_h1, 0, tilde_g_h1[::-1]])
-    g = np.fft.fft(tilde_g)
-    temp_ = (theta / 2) * g[(xun * n).astype(int)]
-    C1 = prod(1 + temp_, 1)
-    # eigenvalues must be real : Symmetric pos definite Kernel
-    vlambda = np.real(np.fft.fft(C1))
-    return vlambda
-
-
 def create_plots(type, vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt):
     hFigNormplot, axFigNormplot = plt.subplots()
 
@@ -105,16 +140,13 @@ def create_plots(type, vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt):
         axFigNormplot.set_xlabel('Standard Gaussian Quantiles')
         axFigNormplot.set_ylabel('Data Quantiles')
 
-    if np.isnan(theta):
-        plt_title = f'$d={dim}, n={n}, r_{{opt}}={rOpt:1.2f}, \\theta_{{opt}}={thetaOpt:1.2f} $'
-    else:
-        plt_title = f'$d={dim}, n={n}, r={r:1.2f}, r_{{opt}}={rOpt:1.2f}, \\theta={theta:1.2f}, \\theta_{{opt}}={thetaOpt:1.2f} $'
-
-    axFigNormplot.set_title(plt_title)
-    if np.isnan(theta):
-        plt_filename = f'{fName}-QQPlot-n-{n}-d-{dim}-{iii}.jpg'
-    else:
+    if theta:
+        plt_title = f'$d={dim}, n={n}, r={r:1.2f}, r_{{opt}}={rOpt:1.2f}, \\theta={theta:1.2f}, \\theta_{{opt}}={thetaOpt:1.2f}$'
         plt_filename = f'{fName}-QQPlot-n-{n}-d-{dim}-r-{r * 100}-th-{100 * theta}-{iii}.jpg'
+    else:
+        plt_title = f'$d={dim}, n={n}, r_{{opt}}={rOpt:1.2f}, \\theta_{{opt}}={thetaOpt:1.2f}$'
+        plt_filename = f'{fName}-QQPlot-n-{n}-d-{dim}-{iii}.jpg'
+    axFigNormplot.set_title(plt_title)
     hFigNormplot.savefig(plt_filename)
 
 
@@ -122,15 +154,14 @@ def create_plots(type, vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt):
 # Minimum working example to demonstrate Gaussian diagnostics concept
 #
 def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
-
     whEx = whEx - 1
     fNames = ['ExpCos', 'Keister', 'rand']
     ptransforms = ['none', 'C1sin', 'none']
     fName = fNames[whEx]
     ptransform = ptransforms[whEx]
 
-    rOptAll = [0]*nRep
-    thOptAll = [0]*nRep
+    rOptAll = [0] * nRep
+    thOptAll = [0] * nRep
 
     # parameters for random function
     # seed = 202326
@@ -141,7 +172,7 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
         f_std_b = fpar[1]  # this is square root of the b in the talk
         theta = (f_std_a / f_std_b) ** 2
     else:
-        theta = np.nan
+        theta = None
 
     for iii in range(nReps):
         seed = np.random.randint(low=1, high=1e6)  # different each rep
@@ -169,7 +200,7 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
             hFigIntegrand = plt.figure()
             plt.scatter(xpts, y, 10)
             plt.title(f'{fName}_n-{npts}_Tx-{ptransform}')
-            hFigIntegrand.savefig(f'{fName}_n-{npts}_Tx-{ptransform}_rFun-{rfun:1.2f}.png')
+            hFigIntegrand.savefig(f'{fName}_n-{npts}_Tx-{ptransform}_rFun-{rfun:1.2f}.jpg')
 
         def objfun(lnParams):
             loss, Lambda, RKHSnorm = ObjectiveFunction(np.exp(lnParams[0]), 1 + np.exp(lnParams[1]), xlat, ftilde)
@@ -188,8 +219,8 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
         if iii <= nPlots:
             figH, axH = plt.subplots(subplot_kw={"projection": "3d"})
             axH.view_init(40, 30)
-            shandle = axH.plot_surface(lnthth, lnordord, objobj, cmap=cm.coolwarm,
-                                       linewidth=0, antialiased=False)
+            shandle = axH.plot_surface(lnthth, lnordord, objobj,  # linewidth=0, cmap=cm.coolwarm,
+                                       antialiased=False, alpha=0.8)
             xt = np.array([.2, 0.4, 1, 3, 7])
             axH.set_xticks(np.log(xt))
             axH.set_xticklabels(xt.astype(str))
@@ -207,26 +238,28 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
         thetaOptAppx = np.exp(lnthOptAppx)
         lnordOptAppx = lnordord[whichrow, whichcol]
         orderOptAppx = 1 + np.exp(lnordOptAppx)
-        print(objMinAppx)  # minimum objective function by brute force search
+        # print(objMinAppx)  # minimum objective function by brute force search
 
         ## Optimize the objective function
         result = fminsearch(objfun, x0=[lnthOptAppx, lnordOptAppx], xtol=1e-3, full_output=True, disp=False)
         lnParamsOpt, objMin = result[0], result[1]
-        print(objMin)  # minimum objective function by Nelder-Mead
+        # print(objMin)  # minimum objective function by Nelder-Mead
         thetaOpt = np.exp(lnParamsOpt[0])
         rOpt = 1 + np.exp(lnParamsOpt[1])
         rOptAll[iii] = rOpt
         thOptAll[iii] = thetaOpt
+        print(
+            f'thetaOptAppx={thetaOptAppx:7.5f}, rOptAppx={orderOptAppx:7.5f}, '
+            f'objMinAppx={objMinAppx:7.5f}, objMin={objMin:7.5f}')
 
         if iii <= nPlots:
             axH.scatter(lnParamsOpt[0], lnParamsOpt[1], objfun(lnParamsOpt) * 1.002,
-                        s=200, color='orange', marker='*')
-            if np.isnan(theta):
-                filename = f'{fName}-ObjFun-n-{npts}-d-{dim}-case-{iii}.jpg'
-                figH.savefig(filename)
-            else:
+                        s=200, color='orange', marker='*', alpha=0.8)
+            if theta:
                 filename = f'{fName}-ObjFun-n-{npts}-d-{dim}-r-{r * 100}-th-{100 * theta}-case-{iii}.jpg'
-                figH.savefig(filename)
+            else:
+                filename = f'{fName}-ObjFun-n-{npts}-d-{dim}-case-{iii}.jpg'
+            figH.savefig(filename)
 
         vlambda = kernel2(thetaOpt, rOpt, xlat)
         s2 = sum(abs(ftilde[2:] ** 2) / vlambda[2:]) / (npts ** 2)
@@ -242,43 +275,10 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
             create_plots('qqplot', vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt)
 
         r_str = f"{r: 7.5f}" if type(r) == float else str(r)
-        print(f'r = {r_str}, rOpt = {rOpt:7.5f}, theta = {theta:7.5f}, thetaOpt = {thetaOpt:7.5f}\n')
+        theta_str = f"{theta: 7.5f}" if type(theta) == float else str(theta)
+        print(f'\t r = {r_str}, rOpt = {rOpt:7.5f}, theta = {theta_str}, thetaOpt = {thetaOpt:7.5f}\n')
 
     return [theta, rOptAll, thOptAll, fName]
-
-
-# gaussian random function
-def f_rand(xpts, rfun, a, b, c, seed):
-    dim = xpts.shape[1]
-    np.random.seed(seed)  # initialize random number generator for reproducability
-    N1 = int(2 ** np.floor(16 / dim))
-    Nall = N1 ** dim
-    kvec = np.zeros([dim, Nall])  # initialize kvec
-    kvec[0, 0:N1] = range(0, N1)  # first dimension
-    Nd = N1
-    for d in range(1, dim):
-        Ndm1 = Nd
-        Nd = Nd * N1
-        kvec[0:d+1, 0:Nd] = np.vstack([
-            np.tile(kvec[0:d, 0:Ndm1], (1, N1)),
-            np.reshape(np.tile(np.arange(0, N1), (Ndm1, 1)), (1, Nd), order="F")
-        ])
-
-    kvec = kvec[:, 1: Nall]  # remove the zero wavenumber
-    whZero = np.sum(kvec == 0, axis=0)
-    abfac = a ** (dim - whZero) * b ** whZero
-    kbar = np.prod(np.maximum(kvec, 1), axis=0)
-    totfac = abfac / (kbar ** rfun)
-
-    f_c = a * np.random.randn(1, Nall - 1) * totfac
-    f_s = a * np.random.randn(1, Nall - 1) * totfac
-
-    f_0 = c + (b ** dim) * np.random.randn()
-    argx = np.matmul((2 * np.pi * xpts), kvec)
-    f_c_ = f_c * np.cos(argx)
-    f_s_ = f_s * np.sin(argx)
-    fval = f_0 + np.sum(f_c_ + f_s_, axis=1)
-    return fval
 
 
 if __name__ == '__main__':
@@ -325,21 +325,21 @@ if __name__ == '__main__':
     plt.close('all')
 
     ## Plot figures for random function
-    figH, axH = plt.figure()
+    figH, axH = plt.subplots()
     colorArray = ['blue', 'orange', 'green', 'cyan', 'maroon', 'purple']
     nColArray = len(colorArray)
     for jjj in range(nrArr):
         for kkk in range(nfPArr):
             clrInd = np.mod(nfPArr * (jjj) + kkk, nColArray)
             clr = colorArray[clrInd]
-            axH.plot(rOptAll[jjj, kkk, :].reshape((nRep, 1)), thOptAll[jjj, kkk, :].reshape((nRep, 1)),
-                     marker='.', markersize=20, color=clr)
-            axH.scatter(rArray[jjj], thetaAll[jjj, kkk], s=200, c=clr, marker='D')
+            axH.scatter(rOptAll[jjj, kkk, :].reshape((nRep, 1)), thOptAll[jjj, kkk, :].reshape((nRep, 1)),
+                        marker='.', s=50, color=clr)
+            axH.scatter(rArray[jjj], thetaAll[jjj, kkk], s=50, c=clr, marker='D')
 
-    axH.set_axis([1, 6, 0.01, 100])
+    axH.set(xlim=[1, 6], ylim=[0.01, 100])
     axH.set_yscale('log')
     axH.set_title(f'$d = {dim}, n = {npts}$')
-    axH.set_xlabel('Inferred $r$)')
+    axH.set_xlabel('Inferred $r$')
     axH.set_ylabel('Inferred $\\theta$')
     figH.savefig(f'{fName}-rthInfer-n-{npts}-d-{dim}.jpg')
 
