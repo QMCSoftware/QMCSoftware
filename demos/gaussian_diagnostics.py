@@ -2,14 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fmin as fminsearch
 from numpy import prod, sin, cos, pi
+from scipy.stats import norm as gaussnorm
+from matplotlib import cm
 
 from qmcpy.integrand import Keister
 from qmcpy.discrete_distribution.lattice import Lattice
 
-
-def simple_lattice_gen(n, d, shift, firstBatch):
-    return  # [xlat,xpts_un,xlat_un,xpts]
-
+# print(plt.style.available)
+# plt.style.use('./presentation.mplstyle')  # custom settings
+plt.style.use('seaborn-notebook')
+# plt.style.library['seaborn-darkgrid']   # Showing the style settings
 
 def doPeriodTx(x, integrand, ptransform):
     ptransform = ptransform.upper()
@@ -35,7 +37,7 @@ def doPeriodTx(x, integrand, ptransform):
         xp = x
         w = 1
     else:
-        raise ("The %s periodization transform is not implemented" % ptransform)
+        raise (f"The {ptransform} periodization transform is not implemented")
     y = integrand(xp) * w
     return y
 
@@ -47,7 +49,7 @@ def ObjectiveFunction(theta, order, xun, ftilde):
     Lambda = kernel2(theta, order, xun)
 
     # compute RKHSnorm
-    # temp = abs(ftilde(Lambda  ~ = 0).^ 2)./ (Lambda(Lambda~=0));
+    # temp = abs(ftilde(Lambda  != 0).^ 2)./ (Lambda(Lambda != 0))
     temp = abs(ftilde[Lambda > tol] ** 2) / (Lambda[Lambda > tol])
 
     # compute loss: MLE
@@ -64,7 +66,7 @@ def ObjectiveFunction(theta, order, xun, ftilde):
     loss = (loss1 + loss2)
     if np.imag(loss) != 0:
         # keyboard
-        print
+        raise('error ! : loss value is complex')
 
     # print('L1 %1.3f L2 %1.3f L %1.3f r %1.3e theta %1.3e\n'.format(loss1, loss2, loss, order, theta))
     return loss, Lambda, RKHSnorm
@@ -78,16 +80,16 @@ def kernel2(theta, r, xun):
     g = np.fft.fft(tilde_g)
     temp_ = (theta / 2) * g[(xun * n).astype(int)]
     C1 = prod(1 + temp_, 1)
-    # matlab's builtin fft is much faster and accurate
     # eigenvalues must be real : Symmetric pos definite Kernel
     vlambda = np.real(np.fft.fft(C1))
     return vlambda
 
 
 def create_plots(type, vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt):
-    hFigNormplot, axFigNormplot = plt.subplots(subplot_kw={"projection": "3d"})
+    hFigNormplot, axFigNormplot = plt.subplots()
 
-    plt.rcParams.update({'font.size': 12})
+    # plt.rcParams.update({'font.size': 12})
+    # plt.rcParams.update({'lines.linewidth': 2})
 
     # set(hFigNormplot,'defaultaxesfontsize',16,
     #   'defaulttextfontsize',12,   # make font larger
@@ -96,66 +98,60 @@ def create_plots(type, vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt):
     if type == 'normplot':
         axFigNormplot.normplot(vz_real)
     else:
-        # ((1:n)-1/2)'/n
-        q = (np.arange(1, n) - 1 / 2) / n
-        stNorm = np.norminv(q)  # quantiles of standard normal
-        axFigNormplot.plot(stNorm, sorted(vz_real), marker='.', markersize=20)
-        # hold on:
-        axFigNormplot.plot([-3, 3], [-3, 3], marker='-', linewidth=4)
+        q = (np.arange(1, n + 1) - 1 / 2) / n
+        stNorm = gaussnorm.ppf(q)  # norminv: quantiles of standard normal
+        axFigNormplot.scatter(stNorm, sorted(vz_real), s=20)  # marker='.',
+        axFigNormplot.plot([-3, 3], [-3, 3], marker='_', linewidth=4, color='red')
         axFigNormplot.set_xlabel('Standard Gaussian Quantiles')
         axFigNormplot.set_ylabel('Data Quantiles')
 
     if np.isnan(theta):
-        plt_title = f'$d={dim}, n={n}, r_{{opt}}={rOpt:1.2f} , \\theta_{{opt}}={thetaOpt:1.2f} $'
+        plt_title = f'$d={dim}, n={n}, r_{{opt}}={rOpt:1.2f}, \\theta_{{opt}}={thetaOpt:1.2f} $'
     else:
-        plt_title = f'$d={dim}, n={n}, r={r:1.3f}, r_{{opt}}={rOpt:1.3f}, \\theta={theta:1.3f}, \\theta_{{opt}}={thetaOpt:1.3f} $'
+        plt_title = f'$d={dim}, n={n}, r={r:1.2f}, r_{{opt}}={rOpt:1.2f}, \\theta={theta:1.2f}, \\theta_{{opt}}={thetaOpt:1.2f} $'
 
     axFigNormplot.set_title(plt_title)
     if np.isnan(theta):
         plt_filename = f'{fName}-QQPlot-n-{n}-d-{dim}-{iii}.jpg'
     else:
         plt_filename = f'{fName}-QQPlot-n-{n}-d-{dim}-r-{r * 100}-th-{100 * theta}-{iii}.jpg'
-    plt.savefig(plt_filename)
+    hFigNormplot.savefig(plt_filename)
 
 
 #
-# Minimum working example to test Gaussian diagnostics idea
+# Minimum working example to demonstrate Gaussian diagnostics concept
 #
 def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
-    # format short
-    # close all
-    # gail.InitializeDisplay
 
-    # whEx = 3
+    whEx = whEx - 1
     fNames = ['ExpCos', 'Keister', 'rand']
     ptransforms = ['none', 'C1sin', 'none']
     fName = fNames[whEx]
     ptransform = ptransforms[whEx]
 
-    rOptAll = np.zeros((nReps, 1))
-    thOptAll = np.zeros((nReps, 1))
+    rOptAll = [0]*nRep
+    thOptAll = [0]*nRep
 
     # parameters for random function
     # seed = 202326
-    if whEx == 3:
+    if whEx == 2:
         rfun = r / 2
-        f_mean = fpar(3)
-        f_std_a = fpar(1)  # this is square root of the a in the talk
-        f_std_b = fpar(2)  # this is square root of the b in the talk
+        f_mean = fpar[2]
+        f_std_a = fpar[0]  # this is square root of the a in the talk
+        f_std_b = fpar[1]  # this is square root of the b in the talk
         theta = (f_std_a / f_std_b) ** 2
     else:
         theta = np.nan
 
     for iii in range(nReps):
-        seed = np.random.randint(low=1, high=1e6)  # randi([1, 1e6], 1, 1)  # different each rep
+        seed = np.random.randint(low=1, high=1e6)  # different each rep
         shift = np.random.rand(1, dim)
 
-        # _, xlat, _, xpts = simple_lattice_gen(npts, dim, shift, True)
         distribution = Lattice(dimension=dim, order='linear')
         xpts, xlat = distribution.gen_samples(n_min=0, n_max=npts, warn=False, return_unrandomized=True)
 
         if fName == 'ExpCos':
-            integrand = lambda x: np.exp(sum(np.cos(2 * np.pi * x), 2))
+            integrand = lambda x: np.exp(np.sum(np.cos(2 * np.pi * x), axis=1))
         elif fName == 'Keister':
             keister = Keister(Lattice(dimension=dim, order='linear'))
             integrand = lambda x: keister.f(x)
@@ -167,16 +163,18 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
 
         y = doPeriodTx(xpts, integrand, ptransform)
 
-        # y = integrand_p(xpts)  # function data
         ftilde = np.fft.fft(y)  # fourier coefficients
         ftilde[0] = 0  # ftilde = \mV**H(\vf - m \vone), subtract mean
         if dim == 1:
             hFigIntegrand = plt.figure()
             plt.scatter(xpts, y, 10)
-            plt.title('%s_n-%d_Tx-%s'.format(fName, npts, ptransform))  # , 'interpreter', 'none')
-            hFigIntegrand.savefig('%s_n-%d_Tx-%s_rFun-%1.2f.png'.format(fName, npts, ptransform, rfun))
+            plt.title(f'{fName}_n-{npts}_Tx-{ptransform}')
+            hFigIntegrand.savefig(f'{fName}_n-{npts}_Tx-{ptransform}_rFun-{rfun:1.2f}.png')
 
-        objfun = lambda lnParams: ObjectiveFunction(np.exp(lnParams[0]), 1 + np.exp(lnParams[1]), xlat, ftilde)
+        def objfun(lnParams):
+            loss, Lambda, RKHSnorm = ObjectiveFunction(np.exp(lnParams[0]), 1 + np.exp(lnParams[1]), xlat, ftilde)
+            return loss
+
         ## Plot the objective function
         lnthetarange = np.arange(-2, 2.2, 0.2)  # range of log(theta) for plotting
         lnorderrange = np.arange(-1, 1.1, 0.1)  # range of log(r) for plotting
@@ -184,13 +182,12 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
         objobj = np.zeros(lnthth.shape)
         for ii in range(lnthth.shape[0]):
             for jj in range(lnthth.shape[1]):
-                objobj[ii, jj], _, _ = objfun([lnthth[ii, jj], lnordord[ii, jj]])
+                objobj[ii, jj] = objfun([lnthth[ii, jj], lnordord[ii, jj]])
 
         figH, axH = None, None
         if iii <= nPlots:
-            from matplotlib import cm
-
             figH, axH = plt.subplots(subplot_kw={"projection": "3d"})
+            axH.view_init(40, 30)
             shandle = axH.plot_surface(lnthth, lnordord, objobj, cmap=cm.coolwarm,
                                        linewidth=0, antialiased=False)
             xt = np.array([.2, 0.4, 1, 3, 7])
@@ -199,11 +196,7 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
             yt = np.array([1.4, 1.6, 2, 2.6, 3.7])
             axH.set_yticks(np.log(yt - 1))
             axH.set_yticklabels(yt.astype(str))
-            # axH.xaxis.set_major_formatter('{x:.01f}')
-            # axH.yaxis.set_major_formatter('{x:.01f}')
-
             # set(shandle, 'EdgeColor', 'none', 'facecolor', 'interp')
-
             axH.set_xlabel('$\\theta$')
             axH.set_ylabel('$r$')
 
@@ -214,10 +207,11 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
         thetaOptAppx = np.exp(lnthOptAppx)
         lnordOptAppx = lnordord[whichrow, whichcol]
         orderOptAppx = 1 + np.exp(lnordOptAppx)
-        print(objMinAppx)  # minimum objectiove function by brute force search
+        print(objMinAppx)  # minimum objective function by brute force search
 
         ## Optimize the objective function
-        [lnParamsOpt, objMin] = fminsearch(objfun, x1=lnthOptAppx, x2=lnordOptAppx, xtol=1e-3)
+        result = fminsearch(objfun, x0=[lnthOptAppx, lnordOptAppx], xtol=1e-3, full_output=True, disp=False)
+        lnParamsOpt, objMin = result[0], result[1]
         print(objMin)  # minimum objective function by Nelder-Mead
         thetaOpt = np.exp(lnParamsOpt[0])
         rOpt = 1 + np.exp(lnParamsOpt[1])
@@ -225,84 +219,69 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
         thOptAll[iii] = thetaOpt
 
         if iii <= nPlots:
-            # hold on
-
-            plt.scatter(lnParamsOpt[0], lnParamsOpt[1], objfun(lnParamsOpt) * 1.002, 1000, color='MATLABYellow',
-                        marker='.')
+            axH.scatter(lnParamsOpt[0], lnParamsOpt[1], objfun(lnParamsOpt) * 1.002,
+                        s=200, color='orange', marker='*')
             if np.isnan(theta):
                 filename = f'{fName}-ObjFun-n-{npts}-d-{dim}-case-{iii}.jpg'
-                plt.savefig(figH, filename)
+                figH.savefig(filename)
             else:
                 filename = f'{fName}-ObjFun-n-{npts}-d-{dim}-r-{r * 100}-th-{100 * theta}-case-{iii}.jpg'
-                plt.savefig(figH, filename)
+                figH.savefig(filename)
 
-        # lambda1 = kernel(r, xlat_, thetaOpt)
         vlambda = kernel2(thetaOpt, rOpt, xlat)
         s2 = sum(abs(ftilde[2:] ** 2) / vlambda[2:]) / (npts ** 2)
         vlambda = s2 * vlambda
 
         # apply transform
         # $\vZ = \frac 1n \mV \mLambda**{-\frac 12} \mV**H(\vf - m \vone)$
-        # ifft also includes 1/n division
-        vz = np.fft.fft(ftilde / np.sqrt(vlambda))
+        # np.fft also includes 1/n division
+        vz = np.fft.ifft(ftilde / np.sqrt(vlambda))
         vz_real = np.real(vz)  # vz must be real as intended by the transformation
 
-        # create_plots('normplot')
         if iii <= nPlots:
             create_plots('qqplot', vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt)
 
-        print('r = %7.5f, rOpt = %7.5f, theta = %7.5f, thetaOpt = %7.5f\n'.format(r, rOpt, theta, thetaOpt))
+        r_str = f"{r: 7.5f}" if type(r) == float else str(r)
+        print(f'r = {r_str}, rOpt = {rOpt:7.5f}, theta = {theta:7.5f}, thetaOpt = {thetaOpt:7.5f}\n')
 
     return [theta, rOptAll, thOptAll, fName]
-
-
-def save_plot_as_image(figH, filename):
-    # AxesH = gca  # Not the GCF
-    # F = getframe(AxesH)
-    # imwrite(F.cdata, filename)
-    figH.savefig(filename)
 
 
 # gaussian random function
 def f_rand(xpts, rfun, a, b, c, seed):
     dim = xpts.shape[1]
     np.random.seed(seed)  # initialize random number generator for reproducability
-    N1 = 2 ** np.floor(16 / dim)
+    N1 = int(2 ** np.floor(16 / dim))
     Nall = N1 ** dim
     kvec = np.zeros([dim, Nall])  # initialize kvec
-    kvec[0, 0:N1 - 1] = range(0, N1 - 1)  # first dimension
+    kvec[0, 0:N1] = range(0, N1)  # first dimension
     Nd = N1
     for d in range(1, dim):
         Ndm1 = Nd
         Nd = Nd * N1
-        kvec[0:d, 0:Nd] = np.vstack([
-            np.repmat(kvec[0:d - 1, 0:Ndm1], 1, N1),
-            np.reshape(np.repmat(np.range(0, N1 - 1), Ndm1, 1), 1, Nd)
+        kvec[0:d+1, 0:Nd] = np.vstack([
+            np.tile(kvec[0:d, 0:Ndm1], (1, N1)),
+            np.reshape(np.tile(np.arange(0, N1), (Ndm1, 1)), (1, Nd), order="F")
         ])
 
     kvec = kvec[:, 1: Nall]  # remove the zero wavenumber
     whZero = np.sum(kvec == 0, axis=0)
     abfac = a ** (dim - whZero) * b ** whZero
-    kbar = np.prod(max(kvec, 1), axis=0)
+    kbar = np.prod(np.maximum(kvec, 1), axis=0)
     totfac = abfac / (kbar ** rfun)
 
     f_c = a * np.random.randn(1, Nall - 1) * totfac
     f_s = a * np.random.randn(1, Nall - 1) * totfac
 
-    f_0 = c + (b ** dim) * np.random.randn(1, 1)
-    argx = (2 * np.pi * xpts) * kvec
+    f_0 = c + (b ** dim) * np.random.randn()
+    argx = np.matmul((2 * np.pi * xpts), kvec)
     f_c_ = f_c * np.cos(argx)
     f_s_ = f_s * np.sin(argx)
-    fval = f_0 + np.sum(f_c_ + f_s_, dim=1)
+    fval = f_0 + np.sum(f_c_ + f_s_, axis=1)
     return fval
 
 
-def guassian_diagnostics_test():
-    pass
-
-
 if __name__ == '__main__':
-    # gail.InitializeWorkspaceDisplay
 
     ## Exponential Cosine example
     fwh = 1
@@ -311,24 +290,25 @@ if __name__ == '__main__':
     nRep = 20
     nPlot = 2
     [_, rOptAll, thOptAll, fName] = \
-        MWE_gaussian_diagnostics_engine(fwh, dim, npts, [], [], nRep, nPlot)
+        MWE_gaussian_diagnostics_engine(fwh, dim, npts, None, None, nRep, nPlot)
 
     ## Plot Exponential Cosine example
     figH = plt.figure()
-    plt.plot(rOptAll, thOptAll, marker='.', markersize=20, color='blue')
+    plt.scatter(rOptAll, thOptAll, s=20, color='blue')
     # axis([4 6 0.1 10])
     # set(gca,'yscale','log')
-    plt.title(f'\(d = {dim},\ n = {npts}\)')
-    plt.xlabel('Inferred \(r\)')
-    plt.ylabel('Inferred \(\theta\)')
+    plt.title(f'$d = {dim}, n = {npts}$')
+    plt.xlabel('Inferred $r$')
+    plt.ylabel('Inferred $\\theta$')
     # print('-depsc',[fName '-rthInfer-n-' int2str(npts) '-d-' \
     #   int2str(dim)])
     figH.savefig(f'{fName}-rthInfer-n-{npts}-d-{dim}.jpg')
+    plt.close('all')
 
     ## Tests with random function
     rArray = [1.5, 2, 4]
     nrArr = len(rArray)
-    fParArray = [0.5, 1, 2, 1, 1, 1, 1, 1, 1]
+    fParArray = [[0.5, 1, 2], [1, 1, 1], [1, 1, 1]]
     nfPArr = len(fParArray)
     fwh = 3
     dim = 2
@@ -341,7 +321,8 @@ if __name__ == '__main__':
     for jjj in range(nrArr):
         for kkk in range(nfPArr):
             thetaAll[jjj, kkk], rOptAll[jjj, kkk, :], thOptAll[jjj, kkk, :], fName = \
-                MWE_gaussian_diagnostics_engine(fwh, dim, npts, rArray[jjj], fParArray[:, kkk], nRep, nPlot)
+                MWE_gaussian_diagnostics_engine(fwh, dim, npts, rArray[jjj], fParArray[kkk], nRep, nPlot)
+    plt.close('all')
 
     ## Plot figures for random function
     figH, axH = plt.figure()
@@ -353,12 +334,11 @@ if __name__ == '__main__':
             clr = colorArray[clrInd]
             axH.plot(rOptAll[jjj, kkk, :].reshape((nRep, 1)), thOptAll[jjj, kkk, :].reshape((nRep, 1)),
                      marker='.', markersize=20, color=clr)
-            # hold on
             axH.scatter(rArray[jjj], thetaAll[jjj, kkk], s=200, c=clr, marker='D')
 
     axH.set_axis([1, 6, 0.01, 100])
     axH.set_yscale('log')
-    axH.set_title(f'd = {dim}, n = {npts}')
+    axH.set_title(f'$d = {dim}, n = {npts}$')
     axH.set_xlabel('Inferred $r$)')
     axH.set_ylabel('Inferred $\\theta$')
     figH.savefig(f'{fName}-rthInfer-n-{npts}-d-{dim}.jpg')
@@ -369,16 +349,16 @@ if __name__ == '__main__':
     npts = 2 ** 6
     nRep = 20
     nPlot = 2
-    _, rOptAll, thOptAll, fName = MWE_gaussian_diagnostics_engine(fwh, dim, npts, [], [], nRep, nPlot)
+    _, rOptAll, thOptAll, fName = MWE_gaussian_diagnostics_engine(fwh, dim, npts, None, None, nRep, nPlot)
 
     ## Plot Keister example
     figH = plt.figure()
-    plt.plot(rOptAll, thOptAll, marker='.', markersize=20, color='blue')
+    plt.scatter(rOptAll, thOptAll, s=20, color='blue')
     # axis([4 6 0.5 1.5])
     # set(gca,'yscale','log')
     plt.xlabel('Inferred $r$')
     plt.ylabel('Inferred $\\theta$')
-    plt.title([f'$d = {dim}, n = {npts} $'])
+    plt.title(f'$d = {dim}, n = {npts}$')
     figH.savefig(f'{fName}-rthInfer-n-{npts}-d-{dim}.jpg')
 
     ## Keister example
@@ -387,15 +367,14 @@ if __name__ == '__main__':
     npts = 2 ** 10
     nRep = 20
     nPlot = 2
-    _, rOptAll, thOptAll, fName = MWE_gaussian_diagnostics_engine(fwh, dim, npts,
-                                                                  [], [], nRep, nPlot)
+    _, rOptAll, thOptAll, fName = MWE_gaussian_diagnostics_engine(fwh, dim, npts, None, None, nRep, nPlot)
 
     ## Plot Keister example
     figH = plt.figure()
-    plt.plot(rOptAll, thOptAll, marker='.', markersize=20, color='blue')
+    plt.scatter(rOptAll, thOptAll, s=20, color='blue')
     # axis([4 6 0.5 1.5])
     # set(gca,'yscale','log')
-    plt.xlabel('Inferred \(r\)')
-    plt.ylabel('Inferred \(\theta\)')
-    plt.title(f'$d = {dim}, n = {npts} $')
+    plt.xlabel('Inferred $r$')
+    plt.ylabel('Inferred $\\theta$')
+    plt.title(f'$d = {dim}, n = {npts}$')
     figH.savefig(f'{fName}-rthInfer-n-{npts}-d-{dim}.jpg')
