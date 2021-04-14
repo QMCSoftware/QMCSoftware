@@ -142,13 +142,35 @@ def create_plots(type, vz_real, fName, dim, iii, r, rOpt, theta, thetaOpt):
 
     if theta:
         plt_title = f'$d={dim}, n={n}, r={r:1.2f}, r_{{opt}}={rOpt:1.2f}, \\theta={theta:1.2f}, \\theta_{{opt}}={thetaOpt:1.2f}$'
-        plt_filename = f'{fName}-QQPlot-n-{n}-d-{dim}-r-{r * 100}-th-{100 * theta}-{iii}.jpg'
+        plt_filename = f'{fName}-QQPlot_n-{n}_d-{dim}_r-{r * 100}_th-{100 * theta}_case-{iii}.jpg'
     else:
         plt_title = f'$d={dim}, n={n}, r_{{opt}}={rOpt:1.2f}, \\theta_{{opt}}={thetaOpt:1.2f}$'
-        plt_filename = f'{fName}-QQPlot-n-{n}-d-{dim}-{iii}.jpg'
+        plt_filename = f'{fName}-QQPlot_n-{n}_d-{dim}_case-{iii}.jpg'
     axFigNormplot.set_title(plt_title)
     hFigNormplot.savefig(plt_filename)
 
+
+def create_surf_plot(fName, lnthth, lnordord, objfun, objobj, lnParamsOpt, r, theta, iii):
+    figH, axH = plt.subplots(subplot_kw={"projection": "3d"})
+    axH.view_init(40, 30)
+    shandle = axH.plot_surface(lnthth, lnordord, objobj, cmap=cm.coolwarm,
+                               linewidth=0, antialiased=False, alpha=0.8)
+    xt = np.array([.2, 0.4, 1, 3, 7])
+    axH.set_xticks(np.log(xt))
+    axH.set_xticklabels(xt.astype(str))
+    yt = np.array([1.4, 1.6, 2, 2.6, 3.7])
+    axH.set_yticks(np.log(yt - 1))
+    axH.set_yticklabels(yt.astype(str))
+    axH.set_xlabel('$\\theta$')
+    axH.set_ylabel('$r$')
+
+    axH.scatter(lnParamsOpt[0], lnParamsOpt[1], objfun(lnParamsOpt) * 1.002,
+                s=200, color='orange', marker='*', alpha=0.8)
+    if theta:
+        filename = f'{fName}-ObjFun_n-{npts}_d-{dim}_r-{r * 100}_th-{100 * theta}_case-{iii}.jpg'
+    else:
+        filename = f'{fName}-ObjFun_n-{npts}_d-{dim}_case-{iii}.jpg'
+    figH.savefig(filename)
 
 #
 # Minimum working example to demonstrate Gaussian diagnostics concept
@@ -215,22 +237,6 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
             for jj in range(lnthth.shape[1]):
                 objobj[ii, jj] = objfun([lnthth[ii, jj], lnordord[ii, jj]])
 
-        figH, axH = None, None
-        if iii <= nPlots:
-            figH, axH = plt.subplots(subplot_kw={"projection": "3d"})
-            axH.view_init(40, 30)
-            shandle = axH.plot_surface(lnthth, lnordord, objobj,  # linewidth=0, cmap=cm.coolwarm,
-                                       antialiased=False, alpha=0.8)
-            xt = np.array([.2, 0.4, 1, 3, 7])
-            axH.set_xticks(np.log(xt))
-            axH.set_xticklabels(xt.astype(str))
-            yt = np.array([1.4, 1.6, 2, 2.6, 3.7])
-            axH.set_yticks(np.log(yt - 1))
-            axH.set_yticklabels(yt.astype(str))
-            # set(shandle, 'EdgeColor', 'none', 'facecolor', 'interp')
-            axH.set_xlabel('$\\theta$')
-            axH.set_ylabel('$r$')
-
         objMinAppx, which = objobj.min(), objobj.argmin()
         # [whichrow, whichcol] = ind2sub(lnthth.shape, which)
         [whichrow, whichcol] = np.unravel_index(which, lnthth.shape)
@@ -253,13 +259,7 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
             f'objMinAppx={objMinAppx:7.5f}, objMin={objMin:7.5f}')
 
         if iii <= nPlots:
-            axH.scatter(lnParamsOpt[0], lnParamsOpt[1], objfun(lnParamsOpt) * 1.002,
-                        s=200, color='orange', marker='*', alpha=0.8)
-            if theta:
-                filename = f'{fName}-ObjFun-n-{npts}-d-{dim}-r-{r * 100}-th-{100 * theta}-case-{iii}.jpg'
-            else:
-                filename = f'{fName}-ObjFun-n-{npts}-d-{dim}-case-{iii}.jpg'
-            figH.savefig(filename)
+            create_surf_plot(fName, lnthth, lnordord, objfun, objobj, lnParamsOpt, r, theta, iii)
 
         vlambda = kernel2(thetaOpt, rOpt, xlat)
         s2 = sum(abs(ftilde[2:] ** 2) / vlambda[2:]) / (npts ** 2)
