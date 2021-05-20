@@ -85,7 +85,7 @@ class Sobol(DiscreteDistribution):
                 'DS': Just Digital Shift
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seeds (list): int seed of list of seeds, one for each dimension.
-            z_path (str): path to generating matricies. 
+            z_path (str): path to generating matrices. 
                 z_path sould be formatted like `gen_mat.21201.32.msb.npy` with name.d_max.m_max.msb_or_lsb.npy
             dim0 (int): first dimension
         """
@@ -121,7 +121,7 @@ class Sobol(DiscreteDistribution):
         self.set_graycode(graycode)
         self.set_dim0(dim0)
         # set generating matrix
-        z_root = dirname(abspath(__file__))+'/generating_matricies/'
+        z_root = dirname(abspath(__file__))+'/generating_matrices/'
         if not z_path:
             self.d_max = 21201
             self.m_max = 32

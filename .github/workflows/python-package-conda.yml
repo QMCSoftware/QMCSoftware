@@ -23,6 +23,14 @@ jobs:
         pip install --upgrade pip
         python -m pip install -e .
         pip install -r requirements/dev.txt
+        python -m pip install codecov==2.1.6  # version 2.1.5 fails
+        python -m pip install coverage
     - name: Run Tests
       run: |
         make tests
+    - name: Upload to Codecov
+      run: |
+        python -m coverage xml -i # genereate coverage.xml
+        # python -m codecov -t e87cdb03-ccdd-44df-9849-8c5bc460cb9e  # fails without token
+        # bash <(curl https://codecov.io/bash)
+        curl -s https://codecov.io/bash | bash

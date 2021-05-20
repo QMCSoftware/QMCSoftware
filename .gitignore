@@ -13,6 +13,9 @@ qmcpy.egg-info/
 .idea/
 .pytest_cache/
 
+# tests
+.coverage
+
 # C
 *.so
 *.dylib

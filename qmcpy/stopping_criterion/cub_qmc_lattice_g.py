@@ -111,6 +111,7 @@ class CubQMCLatticeG(StoppingCriterion):
         self.fudge = fudge
         self.check_cone = check_cone
         self.ptransform = ptransform
+        self.coefv = lambda nl: exp(-2*pi*1j*arange(nl)/(2*nl))
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
@@ -128,7 +129,8 @@ class CubQMCLatticeG(StoppingCriterion):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
         self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self._fft_update, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform)
+            self.coefv, self.m_min, self.m_max, self.fudge, self.check_cone, self.ptransform, True, # need to cast as complex
+            [], [], False) # currently not compatible with control variates
         t_start = time()
         while True:
             self.data.update_data()
@@ -156,44 +158,6 @@ class CubQMCLatticeG(StoppingCriterion):
                 self.data.m += 1.
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
-            
-    def _fft_update(self, y, ynext):
-        """
-        Fast Fourier Transform (FFT) ynext, combine with y, then FFT all points.
-        
-        Args:
-            y (ndarray): all previous samples
-            ynext (ndarray): next samples
-        
-        Return:
-            ndarray: y and ynext combined and transformed
-        """
-        y = y.astype(complex)
-        ynext = ynext.astype(complex)
-        ## Compute initial FFT on next points
-        mnext = int(log2(len(ynext)))
-        for l in range(mnext):
-            nl = 2**l
-            nmminlm1 = 2**(mnext-l-1)
-            ptind_nl = hstack(( tile(True,nl), tile(False,nl) ))
-            ptind = tile(ptind_nl,int(nmminlm1))
-            coef = exp(-2.*pi*1j*arange(nl)/(2*nl))
-            coefv = tile(coef,int(nmminlm1))
-            evenval = ynext[ptind]
-            oddval = ynext[~ptind]
-            ynext[ptind] = (evenval + coefv*oddval) / 2.
-            ynext[~ptind] = (evenval - coefv*oddval) / 2.
-        y = hstack((y,ynext))
-        if len(y) > len(ynext): # already generated some samples samples
-            ## Compute FFT on all points
-            nl = 2**mnext
-            ptind = hstack((tile(True,int(nl)),tile(False,int(nl))))
-            coefv = exp(-2*pi*1j*arange(nl)/(2*nl))
-            evenval = y[ptind]
-            oddval = y[~ptind]
-            y[ptind] = (evenval + coefv*oddval) / 2.
-            y[~ptind] = (evenval - coefv*oddval) / 2.
-        return y
     
     def set_tolerance(self, abs_tol=None, rel_tol=None):
         """

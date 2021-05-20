@@ -13,7 +13,7 @@
   - linear matrix scrambling
   - digital shift
   - optional graycode
-  - custom generating matricies
+  - custom generating matrices
 - Faster Halton generator
 
 ## v0.6

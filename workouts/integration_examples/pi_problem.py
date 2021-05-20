@@ -7,7 +7,7 @@ from qmcpy import *
 from numpy import *
 from time import time
 
-def pi_problem(abs_tol=.01):
+def pi_problem(abs_tol=.5):
     t0 = time()
     d = 1
     integrand = CustomFun(
@@ -18,7 +18,7 @@ def pi_problem(abs_tol=.01):
     t_delta = time() - t0
     return password,t_delta,data
 
-def pi_problem_bayes_lattice(abs_tol=.01):
+def pi_problem_bayes_lattice(abs_tol=.5):
     t0 = time()
     d = 1
     integrand = CustomFun(
@@ -29,7 +29,7 @@ def pi_problem_bayes_lattice(abs_tol=.01):
     t_delta = time() - t0
     return password,t_delta,data
 
-def pi_problem_bayes_net(abs_tol=.01):
+def pi_problem_bayes_net(abs_tol=.5):
     t0 = time()
     d = 1
     integrand = CustomFun(
