@@ -33,3 +33,5 @@ Demos
     demo_rst/asian-option-mlqmc.rst
     
     demo_rst/control_variates.rst
+
+    demo_rst/elliptic-pde.rst
