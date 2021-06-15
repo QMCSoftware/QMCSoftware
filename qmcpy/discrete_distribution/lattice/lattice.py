@@ -91,15 +91,19 @@ class Lattice(DiscreteDistribution):
             self.gen = self._mps
         else: 
             raise Exception("Lattice requires natural, linear, or mps ordering.")
+        z_root = dirname(abspath(__file__))+'/generating_vectors/'
         if not z_path:
             self.d_max = 750
             self.m_max = 24
             self.msb = True
-            self.z_full = load(dirname(abspath(__file__))+'/generating_vectors/lattice_vec.3600.20.npy').astype(uint64)
+            self.z_full = load(z_root+'lattice_vec.3600.20.npy').astype(uint64)
         else:
-            if not isfile(z_path):
+            if isfile(z_path):
+                self.z_full = load(z_path).astype(uint64)
+            elif isfile(z_root+z_path):
+                self.z_full = load(z_root+z_path).astype(uint64)
+            else:
                 raise ParameterError('z_path `' + z_path + '` not found. ')
-            self.z_full = load(z_path).astype(uint64)
             f = z_path.split('/')[-1]
             f_lst = f.split('.')
             self.d_max = int(f_lst[-3])

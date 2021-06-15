@@ -8,7 +8,7 @@ from copy import deepcopy
 
 bar = '\n'+'~'*100+'\n'
 
-def keister(dimension=3, abs_tol=.1):
+def keister(dimension=3, abs_tol=.5):
     print(bar)
 
     # CubMCCLT

@@ -95,8 +95,8 @@ class CubBayesNetG(StoppingCriterion):
         self.alpha = alpha  # p-value, default 0.1%.
         self.order = 1  # Currently supports only order=1
 
-        self.useGradient = False  # If true uses gradient descent in parameter search
-        self.oneTheta = True  # If true use common shape parameter for all dimensions
+        self.use_gradient = False  # If true uses gradient descent in parameter search
+        self.one_theta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
         self.stop_at_tol = True  # automatic mode: stop after meeting the error tolerance
         self.arb_mean = True  # by default use zero mean algorithm

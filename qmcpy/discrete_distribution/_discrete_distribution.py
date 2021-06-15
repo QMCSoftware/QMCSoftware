@@ -59,6 +59,18 @@ class DiscreteDistribution(object):
 
     def __repr__(self):
         return _univ_repr(self, "DiscreteDistribution", self.parameters)
+    
+    def __call__(self, *args, **kwargs):
+        if len(args)>2 or len(args)==0:
+            raise Exception('''
+                expecting 1 or 2 arguments:
+                    1 argument corresponds to n, the number of smaples to generate. In this case n_min=0 and n_max=n for LD sequences
+                    2 arguments corresponds to n_min and n_max. Note this is incompatible with IID generators which only expect 1 argument.
+                ''')
+        if len(args) == 1:
+            return self.gen_samples(n=args[0])
+        else:
+            return self.gen_samples(n_min=args[0],n_max=args[1])
 
     def plot(self, dim_x=0, dim_y=1, n=2**7, point_size=5, color='c', show=True, out=None):
         """

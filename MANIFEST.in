@@ -1,4 +1,4 @@
 include qmcpy/discrete_distribution/c_lib/*.h
-include qmcpy/discrete_distribution/sobol/generating_matricies/*.npy
+include qmcpy/discrete_distribution/sobol/generating_matrices/*.npy
 include qmcpy/discrete_distribution/lattice/generating_vectors/*.npy
 include qmcpy/discrete_distribution/lattice/generating_vectors/*/*.npy

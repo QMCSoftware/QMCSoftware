@@ -76,6 +76,30 @@ class Sobol(DiscreteDistribution):
         DOI:https://doi.org/10.1145/42288.214372
     """
 
+    get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
+    get_unsigned_long_long_size_cf.argtypes = []
+    get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
+    get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
+    get_unsigned_long_size_cf.argtypes = []
+    get_unsigned_long_size_cf.restype = ctypes.c_uint8
+    sobol_cf = c_lib.sobol
+    sobol_cf.argtypes = [
+        ctypes.c_ulong,  # n
+        ctypes.c_uint32,  # d
+        ctypes.c_ulong, # n0
+        ctypes.c_uint32, # d0
+        ctypes.c_uint32,  # randomize
+        ctypes.c_uint32, # graycode
+        ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'), # seeds
+        ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x (result)
+        ctypes.c_uint32, # d_max
+        ctypes.c_uint32, # m_max
+        ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # z (generating matrix)
+        ctypes.c_uint32, # msb
+        ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # xjlms (result)
+        ctypes.c_uint32] # set_xjlms
+    sobol_cf.restype = ctypes.c_uint32
+
     def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path=None, dim0=0):
         """
         Args:
@@ -85,60 +109,40 @@ class Sobol(DiscreteDistribution):
                 'DS': Just Digital Shift
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seeds (list): int seed of list of seeds, one for each dimension.
-            z_path (str): path to generating matricies. 
+            z_path (str): path to generating matrices. 
                 z_path sould be formatted like `gen_mat.21201.32.msb.npy` with name.d_max.m_max.msb_or_lsb.npy
             dim0 (int): first dimension
         """
         self.parameters = ['d','randomize','graycode','seed','mimics','dim0']
-        # initialize c code
-        self.get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
-        self.get_unsigned_long_long_size_cf.argtypes = []
-        self.get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
-        self.get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
-        self.get_unsigned_long_size_cf.argtypes = []
-        self.get_unsigned_long_size_cf.restype = ctypes.c_uint8
-        self.sobol_cf = c_lib.sobol
-        self.sobol_cf.argtypes = [
-            ctypes.c_ulong,  # n
-            ctypes.c_uint32,  # d
-            ctypes.c_ulong, # n0
-            ctypes.c_uint32, # d0
-            ctypes.c_uint32,  # randomize
-            ctypes.c_uint32, # graycode
-            ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'), # seeds
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x (result)
-            ctypes.c_uint32, # d_max
-            ctypes.c_uint32, # m_max
-            ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # z (generating matrix)
-            ctypes.c_uint32, # msb
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # xjlms (result)
-            ctypes.c_uint32] # set_xjlms
         # set parameters
-        self.sobol_cf.restype = ctypes.c_uint32
         self.seed = seed
         self._set_dimension(dimension) # calls self.set_seed(self.seed)
         self.set_randomize(randomize)
         self.set_graycode(graycode)
         self.set_dim0(dim0)
         # set generating matrix
-        if not z_path:
+        z_root = dirname(abspath(__file__))+'/generating_matrices/'
+        if z_path is None:
             self.d_max = 21201
             self.m_max = 32
-            self.msb = True
-            self.z = load(dirname(abspath(__file__))+'/generating_matricies/sobol_mat.21201.32.msb.npy').astype(uint64)
+            self.msb = 2
+            self.z = empty(0,dtype=uint64)
         else:
-            if not isfile(z_path):
+            if isfile(z_path):
+                self.z = load(z_path).astype(uint64)
+            elif isfile(z_root+z_path):
+                self.z = load(z_root+z_path).astype(uint64)
+            else:
                 raise ParameterError('z_path `' + z_path + '` not found. ')
-            self.z = load(z_path).astype(uint64)
             f = z_path.split('/')[-1]
             f_lst = f.split('.')
             self.d_max = int(f_lst[1])
             self.m_max = int(f_lst[2])
             msblsb = f_lst[3].lower()
             if msblsb == 'msb':
-                self.msb = True
+                self.msb = 1
             elif msblsb == 'lsb':
-                self.msb = False
+                self.msb = 0
             else:
                 msg = '''
                     z_path sould be formatted like `sobol_mat.21201.32.msb.npy`

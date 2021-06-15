@@ -1,4 +1,5 @@
-[![Documentation Status](https://readthedocs.org/projects/qmcpy/badge/?version=latest)](https://qmcpy.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964489.svg)](https://doi.org/10.5281/zenodo.3964489) [![Tests](https://github.com/QMCSoftware/QMCSoftware/workflows/QMCPy_CI/badge.svg)](https://github.com/QMCSoftware/QMCSoftware/workflows/QMCPy_CI/badge.svg)
+[![Documentation Status](https://readthedocs.org/projects/qmcpy/badge/?version=latest)](https://qmcpy.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964489.svg)](https://doi.org/10.5281/zenodo.3964489) [![Tests](https://github.com/QMCSoftware/QMCSoftware/workflows/QMCPy_CI/badge.svg)](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/python-package-conda.yml)
+[![codecov](https://codecov.io/gh/QMCSoftware/QMCSoftware/branch/master/graph/badge.svg)](https://app.codecov.io/gh/QMCSoftware/QMCSoftware)
 
 # Quasi-Monte Carlo Community Software
 
@@ -34,7 +35,7 @@ The central package including the 5 main components as listed below. Each compon
 
 Note: If the following mathematics is not rendering try using Google Chrome and installing the [Mathjax Plugin for GitHub](https://chrome.google.com/webstore/detail/mathjax-plugin-for-github/ioemnmodlmafdkllaclgeombjnmnbima?hl=en).
 
-Will will find the expected value of the Keister integrand [18]
+We will find the expected value of the Keister integrand [18]
 
 $$g(\boldsymbol{x})=\pi^{d/2}\cos(||\boldsymbol{x}||)$$
 
@@ -72,11 +73,14 @@ We also highly recommend you take a look at [Fred Hickernell's tutorial at the M
 
 ## Collaborators
 
+- Adrian Ebert
 - Mike Giles
 - Marius Hofert
+- Sergei Kucherenko
 - Pierre L’Ecuyer
 - Christiane Lemieux
 - Dirk Nuyens
+- Onyekachi Osisiogu 
 - Art Owen
 - Pieterjan Robbe
 
@@ -153,6 +157,10 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 <b>[25]</b> Paul Bratley and Bennett L. Fox. 1988. Algorithm 659: Implementing Sobol's quasirandom sequence generator. ACM Trans. Math. Softw. 14, 1 (March 1988), 88–100. DOI:https://doi.org/10.1145/42288.214372
 
 <b>[26]</b> P. L'Ecuyer, P. Marion, M. Godin, and F. Puchhammer, ``A Tool for Custom Construction of QMC and RQMC Point Sets,'' Monte Carlo and Quasi-Monte Carlo Methods 2020.
+
+<b>[27]</b> P Kumaraswamy, A generalized probability density function for double-bounded random processes. J. Hydrol. 46, 79–88 (1980).
+
+<b>[28]</b> D Li, Reliable quasi-Monte Carlo with control variates. Master’s thesis, Illinois Institute of Technology (2016)
 
 ----
 

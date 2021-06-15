@@ -97,7 +97,7 @@ dependencies:
     - importlib-metadata==1.6.0
     - iniconfig==1.1.1
     - ipykernel==5.2.1
-    - ipython==7.14.0
+    - ipython==7.10.0
     - isort==5.7.0
     - jedi==0.17.0
     - jeepney==0.4.3

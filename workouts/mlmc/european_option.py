@@ -4,7 +4,7 @@ from qmcpy import *
 from scipy.stats import norm
 
 
-def european_options(abs_tol=.1):
+def european_options(abs_tol=.5):
     volatility = .2
     start_price = 100
     interest_rate = .05

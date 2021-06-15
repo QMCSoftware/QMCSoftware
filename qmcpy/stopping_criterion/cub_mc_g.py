@@ -1,10 +1,10 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..integrand import Keister
-from ..true_measure import Gaussian
+from ..integrand import Keister, CustomFun
+from ..true_measure import Gaussian, Uniform
 from ..discrete_distribution import IIDStdUniform
-from ..util import _tol_fun, MaxSamplesWarning, NotYetImplemented
+from ..util import _tol_fun, MaxSamplesWarning
 from numpy import *
 from scipy.optimize import fsolve
 from scipy.stats import norm
@@ -47,6 +47,16 @@ class CubMCG(StoppingCriterion):
         error_bound     0.050
         confid_int      [1.754 1.854]
         time_integrate  ...
+    >>> dd = IIDStdUniform(1,seed=7)
+    >>> k = Keister(dd)
+    >>> cv1 = CustomFun(Uniform(dd),lambda x: sin(pi*x).sum(1))
+    >>> cv1mean = 2/pi
+    >>> cv2 = CustomFun(Uniform(dd),lambda x: (-3*(x-.5)**2+1).sum(1))
+    >>> cv2mean = 3/4
+    >>> sc1 = CubMCG(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
+    >>> sol,data = sc1.integrate()
+    >>> sol
+    1.38147...
 
     Original Implementation:
 
@@ -74,7 +84,7 @@ class CubMCG(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
-                 inflate=1.2, alpha=0.01):
+                 inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -84,6 +94,10 @@ class CubMCG(StoppingCriterion):
             rel_tol: relative error tolerance
             n_init: initial number of samples
             n_max: maximum number of samples
+            control_variates (list): list of integrand objects to be used as control variates. 
+                Control variates are currently only compatible with single level problems. 
+                The same discrete distribution instance must be used for the integrand and each of the control variates. 
+            control_variate_means (list): list of means for each control variate
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Set Attributes
@@ -101,6 +115,8 @@ class CubMCG(StoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
+        self.cv = control_variates
+        self.cv_mu = control_variate_means
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
@@ -109,7 +125,8 @@ class CubMCG(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, self.n_init)  # house integration data
+        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, 
+            self.n_init, self.cv, self.cv_mu)  # house integration data
         t_start = time()
         # Pilot Sample
         self.data.update_data()
