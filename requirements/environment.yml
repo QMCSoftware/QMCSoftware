@@ -135,7 +135,7 @@ dependencies:
     - qtpy==1.9.0
     - readme-renderer==26.0
     - recommonmark==0.6.0
-    - requests==2.23.0
+    - requests==2.25.1
     - requests-toolbelt==0.9.1
     - scipy==1.4.1
     - secretstorage==3.1.2
@@ -161,7 +161,7 @@ dependencies:
     - twine==3.1.1
     - typed-ast==1.4.2
     - typing-extensions==3.7.4.3
-    - urllib3==1.25.9
+    - urllib3==1.26.5
     - wcwidth==0.1.9
     - wrapt==1.12.1
     - zipp==3.1.0

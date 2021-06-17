@@ -63,7 +63,7 @@ qtconsole==4.7.4
 QtPy==1.9.0
 readme-renderer==26.0
 recommonmark==0.6.0
-requests==2.23.0
+requests==2.25.1
 requests-toolbelt==0.9.1
 scipy==1.4.1
 SecretStorage==3.1.2
@@ -90,7 +90,7 @@ tqdm==4.46.1
 traitlets==4.3.3
 twine==3.1.1
 typing-extensions==3.7.4.3
-urllib3==1.25.9
+urllib3==1.26.5
 wcwidth==0.1.9
 webencodings==0.5.1
 zipp==3.1.0
