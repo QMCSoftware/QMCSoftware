@@ -6,7 +6,7 @@ from time import time
 import warnings
 
 
-class _CubQMCLDG(StoppingCriterion):
+class CubQMCLDG(StoppingCriterion):
     """
     Abstract class for CubQMC{LD}G where LD is a low discrepancy discrete distribution. 
     See subclasses for implementation differences for each LD sequence. 
@@ -46,7 +46,7 @@ class _CubQMCLDG(StoppingCriterion):
         self.cv_mu = control_variate_means
         self.ub = update_beta
         # Verify Compliant Construction
-        super(_CubQMCLDG,self).__init__(allowed_levels, allowed_distribs)
+        super(CubQMCLDG,self).__init__(allowed_levels, allowed_distribs)
 
     def integrate(self):
         """ See abstract method. """
