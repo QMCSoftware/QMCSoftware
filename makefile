@@ -17,7 +17,6 @@ tests:
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
 	@echo "\nCode coverage"
 	python -m coverage report -m
-
 mddir = sphinx/readme_rst/
 nbdir = sphinx/demo_rst/
 umldir = sphinx/uml/
