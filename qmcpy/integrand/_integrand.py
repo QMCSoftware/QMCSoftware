@@ -7,7 +7,8 @@ from numpy import *
 class Integrand(object):
     """ Integrand abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self):
+    def __init__(self, output_dims):
+        self.output_dims = output_dims # outputs per sample
         prefix = 'A concrete implementation of Integrand must have '
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
@@ -44,17 +45,18 @@ class Integrand(object):
         Return: 
             ndarray: length n vector of funciton evaluations
         """
+        n,d = x.shape
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._transform(x) # get transformed samples, equivalent to self.true_measure._transform_r(x)
-            y = self.g(xtf,*args,**kwargs).squeeze()
+            y = self.g(xtf,*args,**kwargs).reshape(n,self.output_dims)
         else: # using importance sampling --> need to compute pdf, jacobian(s), and weight explicitly
-            pdf = self.discrete_distrib.pdf(x) # pdf of samples
+            pdf = self.discrete_distrib.pdf(x).reshape(n,1) # pdf of samples
             xtf,jacobians = self.true_measure.transform._jacobian_transform_r(x) # compute recursive transform+jacobian
-            weight = self.true_measure._weight(xtf) # weight based on the true measure
-            gvals = self.g(xtf,*args,**kwargs).squeeze()
-            y = gvals*weight/pdf*jacobians
-        return y.squeeze()
+            weight = self.true_measure._weight(xtf).reshape(n,1) # weight based on the true measure
+            gvals = self.g(xtf,*args,**kwargs).reshape(n,self.output_dims)
+            y = gvals*weight/pdf*jacobians.reshape(n,1)
+        return y
 
     def f_periodized(self, x, ptransform='NONE', *args, **kwargs):
         """
@@ -72,9 +74,10 @@ class Integrand(object):
         if self.discrete_distrib.mimics != 'StdUniform':
             raise ParameterError("f_periodized requires a discrete distribution that mimics a standard uniform measure.")
         ptransform = ptransform.upper()
+        n,d = x.shape
         if ptransform == 'BAKER': # Baker's transform
             xp = 1 - 2 * abs(x - 1 / 2)
-            w = 1
+            w = ones(n,dtype=float)
         elif ptransform == 'C0': # C^0 transform
             xp = 3 * x ** 2 - 2 * x ** 3
             w = prod(6 * x * (1 - x), 1)  
@@ -92,10 +95,10 @@ class Integrand(object):
             w = prod( (12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1) # psi4_1
         elif ptransform == 'NONE':
             xp = x
-            w = 1
+            w = ones(n,dtype=float)
         else:
             raise ParameterError("The %s periodization transform is not implemented"%ptransform)
-        y = self.f(xp,*args,**kwargs)*w
+        y = self.f(xp,*args,**kwargs)*w.reshape(n,1)
         return y
         
     def _dim_at_level(self, l):

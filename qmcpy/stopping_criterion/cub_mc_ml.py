@@ -114,7 +114,8 @@ class CubMCML(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
-        super(CubMCML,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubMCML,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         """ See abstract method. """

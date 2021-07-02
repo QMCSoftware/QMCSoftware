@@ -65,7 +65,7 @@ class MLCallOptions(Integrand):
         self.b = .85*self.k
         self.leveltype = 'adaptive-multi'
         self.g_submodule = getattr(self,'_g_'+self.option)
-        super(MLCallOptions,self).__init__()
+        super(MLCallOptions,self).__init__(output_dims=1)
         #if self.discrete_distrib.low_discrepancy and self.option=='asian':
         #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
 

@@ -70,7 +70,7 @@ class LDTransformBayesData(AccumulateData):
         self.ftilde_ = array([])  # fourier transformed integrand values
         if self.distribution_name == 'Lattice':
             # integrand after the periodization transform
-            self.ff = lambda x,*args,**kwargs: self.integrand.f_periodized(x,stopping_crit.ptransform,*args,**kwargs)
+            self.ff = lambda x,*args,**kwargs: self.integrand.f_periodized(x,stopping_crit.ptransform,*args,**kwargs).squeeze()
         else:
             self.ff = self.integrand.f
         self.fbt = fbt

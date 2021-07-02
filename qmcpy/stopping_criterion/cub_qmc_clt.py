@@ -84,7 +84,8 @@ class CubQMCCLT(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ["single"]
         allowed_distribs = ["Lattice", "Sobol","Halton"]
-        super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = True
+        super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
          

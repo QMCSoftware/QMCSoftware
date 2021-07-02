@@ -93,7 +93,8 @@ class CubMCCLT(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['single','fixed-multi']
         allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
-        super(CubMCCLT,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         """ See abstract method. """

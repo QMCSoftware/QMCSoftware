@@ -94,7 +94,8 @@ class CubQMCML(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["Lattice", "Sobol", "Halton"]
-        super(CubQMCML,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubQMCML,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         """ See abstract method. """

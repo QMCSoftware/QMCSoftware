@@ -60,7 +60,7 @@ class MLMCData(AccumulateData):
                 self.true_measure._set_dimension_r(self.dimensions[l])
                 # evaluate integral at sampleing points samples
                 samples = self.discrete_distrib.gen_samples(n=self.diff_n_level[l])
-                self.integrand.f(samples,l=l)
+                self.integrand.f(samples,l=l).squeeze()
                 self.n_level[l] = self.n_level[l] + self.diff_n_level[l]
                 self.sum_level[0,l] = self.sum_level[0,l] + self.integrand.sums[0]
                 self.sum_level[1,l] = self.sum_level[1,l] + self.integrand.sums[1]

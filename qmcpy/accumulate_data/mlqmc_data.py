@@ -61,7 +61,7 @@ class MLQMCData(AccumulateData):
             for r in range(int(self.replications)):
                 self.discrete_distrib.set_seed(self.seeds[l,r]) # reset seed
                 samples = self.discrete_distrib.gen_samples(n_min=self.n_level[l],n_max=n_max)
-                self.integrand.f(samples,l=l)
+                self.integrand.f(samples,l=l).squeeze()
                 prev_sum = self.mean_level_reps[l,r]*self.n_level[l]
                 self.mean_level_reps[l,r] = (self.integrand.sums[0]+prev_sum)/float(n_max)
                 self.cost_level[l] = self.cost_level[l] + self.integrand.cost

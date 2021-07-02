@@ -120,7 +120,8 @@ class CubMCG(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
-        super(CubMCG,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubMCG,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         """ See abstract method. """

@@ -88,7 +88,7 @@ class AsianOption(Integrand):
             self.dimensions = [self.true_measure.d]
             self.dim_fracs = [0.]
             self.leveltype = 'single'
-        super(AsianOption,self).__init__()        
+        super(AsianOption,self).__init__(output_dims=1)    
 
     def _get_discounted_payoffs(self, stock_path, dimension):
         """

@@ -114,7 +114,8 @@ class CubMCMLCont(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
-        super(CubMCMLCont,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         # Construct AccumulateData Object to House Integration Data

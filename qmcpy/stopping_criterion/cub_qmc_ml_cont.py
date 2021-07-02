@@ -110,7 +110,8 @@ class CubQMCMLCont(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["Lattice", "Sobol","Halton"]
-        super(CubQMCMLCont,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubQMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         # Construct AccumulateData Object to House Integration Data
