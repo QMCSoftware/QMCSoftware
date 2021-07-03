@@ -31,8 +31,8 @@ class MeanVarDataRep(AccumulateData):
         self.muhat = inf # sample mean
         self.sighat = inf # sample standard deviation
         self.t_eval = 0  # processing time for each integrand
-        self.n_r = n_init  # current number of samples to draw from discrete distribution
-        self.n_r_prev = 0 # previous number of samples drawn from discrete distributoin
+        self.n_r = n_init*ones(self.integrand.output_dims,dtype=float)  # current number of samples to draw from discrete distribution
+        self.n_r_prev = zeros(self.integrand.output_dims,dtype=float) # previous number of samples drawn from discrete distributoin
         self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
@@ -44,12 +44,15 @@ class MeanVarDataRep(AccumulateData):
 
     def update_data(self):
         """ See abstract method. """
+        nmaxidx = argmax(self.n_r)
+        n_max = self.n_r[nmaxidx]
+        n_min = self.n_r_prev[nmaxidx]
         for r in range(self.replications):
-            x = self.ld_streams[r].gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
+            x = self.ld_streams[r].gen_samples(n_min=n_min,n_max=n_max)
             y = self.integrand.f(x,compute_flags=self.compute_flags)
-            self.ysums[r] = self.ysums[r] + y.sum(0)
+            yflagged = y*self.compute_flags
+            self.ysums[r] = self.ysums[r] + yflagged.sum(0)
         ymeans = self.ysums/self.n_r
         self.solution = ymeans.mean(0)
         self.sighat = ymeans.std(0)
-        self.n_r_prev = self.n_r
-        self.n_total = self.n_r * self.replications
+        self.n_total = (self.n_r * self.replications).max()

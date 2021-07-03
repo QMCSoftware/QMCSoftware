@@ -3,7 +3,7 @@ from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
-from ..integrand import Keister
+from ..integrand import Keister,XtoVectorizedPowers
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import *
 from scipy.stats import norm
@@ -48,6 +48,12 @@ class CubQMCCLT(StoppingCriterion):
         error_bound     4.83e-04
         confid_int      [1.38  1.381]
         time_integrate  ...
+    >>> f = XtoVectorizedPowers(Sobol(2,seed=7), powers=[4,5])
+    >>> sc = CubQMCCLT(f, abs_tol=1e-4)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    >>> data
+
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
@@ -114,7 +120,8 @@ class CubQMCCLT(StoppingCriterion):
                 break
             else:
                 # double sample size
-                self.data.n_r *= 2
+                self.data.n_r_prev = where(self.data.compute_flags,self.data.n_r,self.data.n_r_prev)
+                self.data.n_r = where(self.data.compute_flags,2*self.data.n_r,self.data.n_r)
         # CLT confidence interval
         self.data.confid_int = self.data.solution +  self.data.error_bound * array([[-1.],[1.]])
         self.data.time_integrate = time() - t_start
