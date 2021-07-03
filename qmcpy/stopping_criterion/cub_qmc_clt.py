@@ -97,8 +97,9 @@ class CubQMCCLT(StoppingCriterion):
         while True:
             self.data.update_data()
             self.data.error_bound = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
-            tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
-            if self.data.error_bound < tol_up:
+            tol_up = maximum(self.abs_tol, abs(self.data.solution) * self.rel_tol)
+            self.data.compute_flags = self.data.error_bound > tol_up
+            if sum(self.data.compute_flags)==0:
                 # sufficiently estimated
                 break
             elif 2 * self.data.n_total > self.n_max:
@@ -115,7 +116,7 @@ class CubQMCCLT(StoppingCriterion):
                 # double sample size
                 self.data.n_r *= 2
         # CLT confidence interval
-        self.data.confid_int = self.data.solution +  self.data.error_bound * array([-1., 1.])
+        self.data.confid_int = self.data.solution +  self.data.error_bound * array([[-1.],[1.]])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
     

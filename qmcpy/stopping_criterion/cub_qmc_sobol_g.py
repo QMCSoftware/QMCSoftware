@@ -112,6 +112,6 @@ class CubQMCSobolG(CubQMCLDG):
             allowed_distribs = ["Sobol"],
             cast_complex = False)
         if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
-            raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False. Use QRNG backend.")
+            raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False.")
 
 CubQMCNetG = CubQMCSobolG

@@ -53,7 +53,8 @@ class EuropeanOption(Integrand):
         self.call_put = call_put.lower()
         if self.call_put not in ['call','put']:
             raise ParameterError("call_put must be either 'call' or 'put'")
-        super(EuropeanOption,self).__init__(output_dims=1) # output dimensions per sample  
+        self.output_dims = 1
+        super(EuropeanOption,self).__init__()  
 
     def g(self, t):
         """ See abstract method. """

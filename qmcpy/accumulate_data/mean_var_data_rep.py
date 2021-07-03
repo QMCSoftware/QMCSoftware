@@ -1,6 +1,6 @@
 from ._accumulate_data import AccumulateData
 from numpy import *
-
+from copy import deepcopy
 
 class MeanVarDataRep(AccumulateData):
     """
@@ -25,8 +25,8 @@ class MeanVarDataRep(AccumulateData):
         self.true_measure = true_measure
         self.discrete_distrib = discrete_distrib
         # Set Attributes
-        self.replications = replications
-        self.muhat_r = zeros(int(self.replications))
+        self.replications = int(replications)
+        self.ysums = zeros((self.replications,self.integrand.output_dims),dtype=float)
         self.solution = nan
         self.muhat = inf # sample mean
         self.sighat = inf # sample standard deviation
@@ -36,18 +36,20 @@ class MeanVarDataRep(AccumulateData):
         self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
-        self.seeds = self.discrete_distrib.rng.choice(100000,int(replications),replace=False).astype(dtype=uint64)+1
+        ld_seeds = self.discrete_distrib.rng.choice(100000,self.replications,replace=False).astype(dtype=uint64)+1
+        self.ld_streams = [deepcopy(self.discrete_distrib) for r in range(self.replications)]
+        for r in range(self.replications): self.ld_streams[r].set_seed(ld_seeds[r])
+        self.compute_flags = ones(self.integrand.output_dims)
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):
         """ See abstract method. """
-        for r in range(int(self.replications)):
-            self.discrete_distrib.set_seed(int(self.seeds[r]))
-            x = self.discrete_distrib.gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
-            y = self.integrand.f(x).squeeze()
-            previous_sum_y = self.muhat_r[r] * self.n_r_prev
-            self.muhat_r[r] = (y.sum() + previous_sum_y) / self.n_r  # updated integrand-replication mean
-        self.solution = self.muhat_r.mean()  # mean of replication means
-        self.sighat = self.muhat_r.std()
-        self.n_r_prev = self.n_r  # updated the total evaluations
+        for r in range(self.replications):
+            x = self.ld_streams[r].gen_samples(n_min=self.n_r_prev,n_max=self.n_r)
+            y = self.integrand.f(x,compute_flags=self.compute_flags)
+            self.ysums[r] = self.ysums[r] + y.sum(0)
+        ymeans = self.ysums/self.n_r
+        self.solution = ymeans.mean(0)
+        self.sighat = ymeans.std(0)
+        self.n_r_prev = self.n_r
         self.n_total = self.n_r * self.replications

@@ -23,7 +23,8 @@ class Linear0(Integrand):
                 true measure by which to compose a transform
         """
         self.true_measure = Uniform(sampler, lower_bound=-.5, upper_bound=.5)
-        super(Linear0,self).__init__(output_dims=1)
+        self.output_dims = 1
+        super(Linear0,self).__init__()
     
     def g(self, t):
         y = t.sum(1)

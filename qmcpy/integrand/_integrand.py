@@ -7,11 +7,12 @@ from numpy import *
 class Integrand(object):
     """ Integrand abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self, output_dims):
-        self.output_dims = output_dims # outputs per sample
+    def __init__(self):
         prefix = 'A concrete implementation of Integrand must have '
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
+        if not (hasattr(self, 'output_dims')):
+            raise ParameterError('Set self.output_dims, the number of outputs for each input sample.')
         if not hasattr(self,'parameters'):
             self.parameters = []
         if not hasattr(self,'leveltype'):

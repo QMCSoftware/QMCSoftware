@@ -2,7 +2,6 @@
 
 from numpy import array, ndarray, log2
 import numpy as np
-np.set_printoptions(precision=3,threshold=10)
 import warnings
 
 
@@ -22,6 +21,7 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
         print(qmc_object) is equivalent to print(qmc_object.__repr__()). 
         See an abstract classes __repr__ method for example call to this method. 
     """
+    np.set_printoptions(precision=3,threshold=10)
     unique_attributes = []
     for attrib in attributes:
         if attrib not in unique_attributes:

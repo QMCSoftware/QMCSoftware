@@ -41,7 +41,8 @@ class XtoVectorizedPowers(Integrand):
         self.powers = array(powers)
         self.k = len(powers)
         self.true_measure = Uniform(sampler, lower_bound=0., upper_bound=1.)
-        super(XtoVectorizedPowers,self).__init__(output_dims=self.k) # output dimensions per sample
+        self.output_dims = self.k
+        super(XtoVectorizedPowers,self).__init__() # output dimensions per sample
 
     def g(self, t, compute_flags):
         n,d = t.shape

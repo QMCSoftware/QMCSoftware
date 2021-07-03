@@ -53,7 +53,7 @@ class LDTransformData(AccumulateData):
             if cv.discrete_distrib != self.discrete_distrib:
                 raise ParameterError('''
                         Each control variate's discrete distribution 
-                        must be the same instance as the one for te main integrand.''')
+                        must be the same instance as the one for the main integrand.''')
         self.cv_mu = array(self.cv_mu) # column vector
         self.ncv = int(len(self.cv))
         self.update_beta = update_beta
