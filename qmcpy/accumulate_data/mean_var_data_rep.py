@@ -8,7 +8,7 @@ class MeanVarDataRep(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['replications','solution','sighat','n_total','error_bound','confid_int']
+    parameters = ['solution','replications','sighat','n','n_total','error_bound','confid_int']
 
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, n_init, replications):
         """
@@ -31,8 +31,8 @@ class MeanVarDataRep(AccumulateData):
         self.muhat = inf # sample mean
         self.sighat = inf # sample standard deviation
         self.t_eval = 0  # processing time for each integrand
-        self.n_r = n_init*ones(self.integrand.output_dims,dtype=float)  # current number of samples to draw from discrete distribution
-        self.n_r_prev = zeros(self.integrand.output_dims,dtype=float) # previous number of samples drawn from discrete distributoin
+        self.n = n_init*ones(self.integrand.output_dims,dtype=float)  # current number of samples to draw from discrete distribution
+        self.nprev = zeros(self.integrand.output_dims,dtype=float) # previous number of samples drawn from discrete distributoin
         self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
@@ -44,15 +44,18 @@ class MeanVarDataRep(AccumulateData):
 
     def update_data(self):
         """ See abstract method. """
-        nmaxidx = argmax(self.n_r)
-        n_max = self.n_r[nmaxidx]
-        n_min = self.n_r_prev[nmaxidx]
+        nmaxidx = argmax(self.n)
+        n_max = self.n[nmaxidx]
+        n_min = self.nprev[nmaxidx]
         for r in range(self.replications):
             x = self.ld_streams[r].gen_samples(n_min=n_min,n_max=n_max)
-            y = self.integrand.f(x,compute_flags=self.compute_flags)
+            if self.integrand.output_dims>1:
+                y = self.integrand.f(x,compute_flags=self.compute_flags)
+            else:
+                y = self.integrand.f(x)
             yflagged = y*self.compute_flags
             self.ysums[r] = self.ysums[r] + yflagged.sum(0)
-        ymeans = self.ysums/self.n_r
+        ymeans = self.ysums/self.n
         self.solution = ymeans.mean(0)
         self.sighat = ymeans.std(0)
-        self.n_total = (self.n_r * self.replications).max()
+        self.n_total = (self.n * self.replications).max()

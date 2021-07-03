@@ -19,20 +19,18 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.380...
+    array([1.38049475])
     >>> data
-    Solution: 1.3805         
-    Keister (Integrand Object)
-    Lattice (DiscreteDistribution Object)
-        d               1
-        randomize       1
-        order           natural
-        seed            15417
-        mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    MeanVarDataRep (AccumulateData Object)
+        solution        1.380
+        replications    2^(4)
+        sighat          6.25e-04
+        n               2^(8)
+        n_total         2^(12)
+        error_bound     4.83e-04
+        confid_int      [[1.38 ]
+                        [1.381]]
+        time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
@@ -40,19 +38,50 @@ class CubQMCCLT(StoppingCriterion):
         rel_tol         0
         n_init          2^(8)
         n_max           2^(30)
-    MeanVarDataRep (AccumulateData Object)
-        replications    2^(4)
-        solution        1.380
-        sighat          6.25e-04
-        n_total         2^(12)
-        error_bound     4.83e-04
-        confid_int      [1.38  1.381]
-        time_integrate  ...
-    >>> f = XtoVectorizedPowers(Sobol(2,seed=7), powers=[4,5])
+    Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
+    Lattice (DiscreteDistribution Object)
+        d               1
+        randomize       1
+        order           natural
+        seed            7
+        mimics          StdUniform
+    >>> f = XtoVectorizedPowers(Lattice(2,seed=7), powers=[4,5])
     >>> sc = CubQMCCLT(f, abs_tol=1e-4)
     >>> solution,data = sc.integrate()
     >>> solution
+    array([0.4  , 0.333])
     >>> data
+    MeanVarDataRep (AccumulateData Object)
+        solution        [0.4   0.333]
+        replications    2^(4)
+        sighat          [7.984e-05 7.984e-05]
+        n               [4096. 4096.]
+        n_total         2^(16)
+        error_bound     [6.17e-05 6.17e-05]
+        confid_int      [[0.4   0.333]
+                        [0.4   0.333]]
+        time_integrate  ...
+    CubQMCCLT (StoppingCriterion Object)
+        inflate         1.200
+        alpha           0.010
+        abs_tol         1.00e-04
+        rel_tol         0
+        n_init          2^(8)
+        n_max           2^(30)
+    XtoVectorizedPowers (Integrand Object)
+    Uniform (TrueMeasure Object)
+        lower_bound     0
+        upper_bound     1
+    Lattice (DiscreteDistribution Object)
+        d               2^(1)
+        randomize       1
+        order           natural
+        seed            7
+        mimics          StdUniform
 
     """
 
@@ -120,8 +149,8 @@ class CubQMCCLT(StoppingCriterion):
                 break
             else:
                 # double sample size
-                self.data.n_r_prev = where(self.data.compute_flags,self.data.n_r,self.data.n_r_prev)
-                self.data.n_r = where(self.data.compute_flags,2*self.data.n_r,self.data.n_r)
+                self.data.nprev = where(self.data.compute_flags,self.data.n,self.data.nprev)
+                self.data.n = where(self.data.compute_flags,2*self.data.n,self.data.n)
         # CLT confidence interval
         self.data.confid_int = self.data.solution +  self.data.error_bound * array([[-1.],[1.]])
         self.data.time_integrate = time() - t_start
