@@ -24,7 +24,7 @@ class CustomFun(Integrand):
         self.parameters = []
         self.true_measure = true_measure
         self._g = g
-        self.output_dims = 1
+        self.dprime = 1
         super(CustomFun,self).__init__()
     
     def g(self, t, *args, **kwargs):

@@ -11,8 +11,8 @@ class Integrand(object):
         prefix = 'A concrete implementation of Integrand must have '
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
-        if not (hasattr(self, 'output_dims')):
-            raise ParameterError('Set self.output_dims, the number of outputs for each input sample.')
+        if not (hasattr(self, 'dprime')):
+            raise ParameterError('Set self.dprime, the number of outputs for each input sample.')
         if not hasattr(self,'parameters'):
             self.parameters = []
         if not hasattr(self,'leveltype'):
@@ -50,12 +50,12 @@ class Integrand(object):
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._transform(x) # get transformed samples, equivalent to self.true_measure._transform_r(x)
-            y = self.g(xtf,*args,**kwargs).reshape(n,self.output_dims)
+            y = self.g(xtf,*args,**kwargs).reshape(n,self.dprime)
         else: # using importance sampling --> need to compute pdf, jacobian(s), and weight explicitly
             pdf = self.discrete_distrib.pdf(x).reshape(n,1) # pdf of samples
             xtf,jacobians = self.true_measure.transform._jacobian_transform_r(x) # compute recursive transform+jacobian
             weight = self.true_measure._weight(xtf).reshape(n,1) # weight based on the true measure
-            gvals = self.g(xtf,*args,**kwargs).reshape(n,self.output_dims)
+            gvals = self.g(xtf,*args,**kwargs).reshape(n,self.dprime)
             y = gvals*weight/pdf*jacobians.reshape(n,1)
         return y
 

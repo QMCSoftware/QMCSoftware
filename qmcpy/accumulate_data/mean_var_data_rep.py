@@ -26,20 +26,20 @@ class MeanVarDataRep(AccumulateData):
         self.discrete_distrib = discrete_distrib
         # Set Attributes
         self.replications = int(replications)
-        self.ysums = zeros((self.replications,self.integrand.output_dims),dtype=float)
+        self.ysums = zeros((self.replications,self.integrand.dprime),dtype=float)
         self.solution = nan
         self.muhat = inf # sample mean
         self.sighat = inf # sample standard deviation
         self.t_eval = 0  # processing time for each integrand
-        self.n = n_init*ones(self.integrand.output_dims,dtype=float)  # current number of samples to draw from discrete distribution
-        self.nprev = zeros(self.integrand.output_dims,dtype=float) # previous number of samples drawn from discrete distributoin
+        self.n = n_init*ones(self.integrand.dprime,dtype=float)  # current number of samples to draw from discrete distribution
+        self.nprev = zeros(self.integrand.dprime,dtype=float) # previous number of samples drawn from discrete distributoin
         self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         # get seeds for each replication
         ld_seeds = self.discrete_distrib.rng.choice(100000,self.replications,replace=False).astype(dtype=uint64)+1
         self.ld_streams = [deepcopy(self.discrete_distrib) for r in range(self.replications)]
         for r in range(self.replications): self.ld_streams[r].set_seed(ld_seeds[r])
-        self.compute_flags = ones(self.integrand.output_dims)
+        self.compute_flags = ones(self.integrand.dprime)
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):
@@ -49,7 +49,7 @@ class MeanVarDataRep(AccumulateData):
         n_min = self.nprev[nmaxidx]
         for r in range(self.replications):
             x = self.ld_streams[r].gen_samples(n_min=n_min,n_max=n_max)
-            if self.integrand.output_dims>1:
+            if self.integrand.dprime>1:
                 y = self.integrand.f(x,compute_flags=self.compute_flags)
             else:
                 y = self.integrand.f(x)
