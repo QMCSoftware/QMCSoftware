@@ -51,3 +51,6 @@ blogs/why_q_in_mc/*.png
 *.vscode
 _ags* 
 _ags/*
+
+# Fred's private stuff, not for tracking
+*Fred*
