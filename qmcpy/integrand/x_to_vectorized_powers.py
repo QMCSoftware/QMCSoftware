@@ -39,16 +39,19 @@ class XtoVectorizedPowers(Integrand):
                 true measure by which to compose a transform
         """
         self.powers = array(powers)
-        self.k = len(powers)
+        self.dprime = len(powers)
         self.true_measure = Uniform(sampler, lower_bound=0., upper_bound=1.)
-        self.dprime = self.k
+        self.g = self._g if self.dprime>1 else self._g1
         super(XtoVectorizedPowers,self).__init__() # output dimensions per sample
 
-    def g(self, t, compute_flags):
+    def _g(self, t, compute_flags):
         n,d = t.shape
-        Y = zeros((n,self.k),dtype=float)
-        for j in range(self.k):
+        Y = zeros((n,self.dprime),dtype=float)
+        for j in range(self.dprime):
             if compute_flags[j] == 1: 
                 Y[:,j] = (t**self.powers[j]).sum(1)
         return Y
+
+    def _g1(self, t):
+        return self._g(t, compute_flags=[1])
 
