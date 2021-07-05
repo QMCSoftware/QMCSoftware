@@ -8,8 +8,6 @@ class MeanVarDataRep(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['solution','replications','sighat','n','n_total','error_bound','confid_int']
-
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, n_init, replications):
         """
         Args:
@@ -20,6 +18,7 @@ class MeanVarDataRep(AccumulateData):
             n_init (int): initial number of samples
             replications (int): number of replications
         """
+        self.parameters = ['solution','error_bound','n_total','n','replications']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure

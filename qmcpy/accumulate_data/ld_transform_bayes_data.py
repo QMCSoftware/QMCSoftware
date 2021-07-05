@@ -15,8 +15,6 @@ class LDTransformBayesData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['n_total', 'solution', 'error_bound']
-
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, m_min: int, m_max: int,
                  fbt, merge_fbt, kernel):
         """
@@ -28,6 +26,7 @@ class LDTransformBayesData(AccumulateData):
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
         """
+        self.parameters = ['solution','error_bound','n_total']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure

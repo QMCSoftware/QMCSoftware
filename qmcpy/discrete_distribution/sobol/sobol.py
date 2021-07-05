@@ -13,12 +13,12 @@ class Sobol(DiscreteDistribution):
     
     >>> s = Sobol(2,seed=7)
     >>> s.gen_samples(4)
-    array([[0.429, 0.426],
-           [0.882, 0.552],
-           [0.025, 0.97 ],
-           [0.54 , 0.095]])
+    array([[0.4294895 , 0.42617749],
+           [0.88165111, 0.55154761],
+           [0.02512143, 0.96984807],
+           [0.53977577, 0.0954013 ]])
     >>> s.gen_samples(1)
-    array([[0.429, 0.426]])
+    array([[0.4294895 , 0.42617749]])
     >>> s
     Sobol (DiscreteDistribution Object)
         d               2^(1)

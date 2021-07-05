@@ -11,8 +11,6 @@ class LDTransformData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['n_total','solution','error_bound']
-
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, coefv, 
         m_min, m_max, fudge, check_cone, ptransform, cast_complex,
         control_variates, control_variate_means, update_beta):
@@ -36,6 +34,7 @@ class LDTransformData(AccumulateData):
             control_variate_means (list): list of means for each control variate
             update_beta (bool): update control variate beta coefficients at each iteration? 
         """
+        self.parameters = ['solution','error_bound','n_total']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure

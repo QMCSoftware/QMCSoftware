@@ -12,14 +12,14 @@ class XtoVectorizedPowers(Integrand):
     >>> y1.shape
     (1024, 1)
     >>> y1.mean(0)
-    array([0.25])
+    array([0.25000036])
     >>> l2 = XtoVectorizedPowers(Sobol(2,seed=7), powers=[4,5])
     >>> x2 = l2.discrete_distrib.gen_samples(2**10)
     >>> y2 = l2.f(x2,compute_flags=[1,1])
     >>> y2.shape
     (1024, 2)
     >>> y2.mean(0)
-    array([0.4  , 0.333])
+    array([0.40000048, 0.33333393])
     """
 
     def __init__(self, sampler, powers=array([1,2])):

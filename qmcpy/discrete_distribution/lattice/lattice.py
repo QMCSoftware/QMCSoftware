@@ -11,12 +11,12 @@ class Lattice(DiscreteDistribution):
 
     >>> l = Lattice(2,seed=7)
     >>> l.gen_samples(4)
-    array([[0.076, 0.78 ],
-           [0.576, 0.28 ],
-           [0.326, 0.53 ],
-           [0.826, 0.03 ]])
+    array([[0.07630829, 0.77991879],
+           [0.57630829, 0.27991879],
+           [0.32630829, 0.52991879],
+           [0.82630829, 0.02991879]])
     >>> l.gen_samples(1)
-    array([[0.076, 0.78 ]])
+    array([[0.07630829, 0.77991879]])
     >>> l
     Lattice (DiscreteDistribution Object)
         d               2^(1)

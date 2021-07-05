@@ -18,28 +18,27 @@ class CubQMCLatticeG(CubQMCLDG):
     >>> solution
     1.806...
     >>> data
-    Solution: 1.8068         
+    LDTransformData (AccumulateData Object)
+        solution        1.807
+        error_bound     0.005
+        n_total         2^(10)
+        time_integrate  ...
+    CubQMCLatticeG (StoppingCriterion Object)
+        abs_tol         0.050
+        rel_tol         0
+        n_init          2^(10)
+        n_max           2^(35)
     Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     Lattice (DiscreteDistribution Object)
         d               2^(1)
         randomize       1
         order           natural
         seed            7
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
-    CubQMCLatticeG (StoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    LDTransformData (AccumulateData Object)
-        n_total         2^(10)
-        solution        1.807
-        error_bound     0.005
-        time_integrate  ...
     
     Original Implementation:
 

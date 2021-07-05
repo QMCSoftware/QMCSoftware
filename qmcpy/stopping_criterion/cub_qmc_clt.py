@@ -23,13 +23,10 @@ class CubQMCCLT(StoppingCriterion):
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
-        replications    2^(4)
-        sighat          6.25e-04
-        n               2^(8)
-        n_total         2^(12)
         error_bound     4.83e-04
-        confid_int      [[1.38 ]
-                        [1.381]]
+        n_total         2^(12)
+        n               2^(8)
+        replications    2^(4)
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
@@ -53,17 +50,14 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(f, abs_tol=1e-4)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([0.4  , 0.333])
+    array([0.40000769, 0.33334103])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [0.4   0.333]
-        replications    2^(4)
-        sighat          [7.984e-05 7.984e-05]
-        n               [4096. 4096.]
-        n_total         2^(16)
         error_bound     [6.17e-05 6.17e-05]
-        confid_int      [[0.4   0.333]
-                        [0.4   0.333]]
+        n_total         2^(16)
+        n               [4096. 4096.]
+        replications    2^(4)
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200

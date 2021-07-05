@@ -20,16 +20,13 @@ class CubMCCLT(StoppingCriterion):
     >>> solution
     1.801...
     >>> data
-    Solution: 1.8010         
-    Keister (Integrand Object)
-    IIDStdUniform (DiscreteDistribution Object)
-        d               2^(1)
-        seed            7
-        mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    MeanVarData (AccumulateData Object)
+        solution        1.801
+        error_bound     0.051
+        n_total         6765
+        n               5741
+        levels          1
+        time_integrate  ...
     CubMCCLT (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
@@ -37,14 +34,15 @@ class CubMCCLT(StoppingCriterion):
         rel_tol         0
         n_init          2^(10)
         n_max           10000000000
-    MeanVarData (AccumulateData Object)
-        levels          1
-        solution        1.801
-        n               5741
-        n_total         6765
-        error_bound     0.051
-        confid_int      [1.75  1.852]
-        time_integrate  ...
+    Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
+    IIDStdUniform (DiscreteDistribution Object)
+        d               2^(1)
+        seed            7
+        mimics          StdUniform
     >>> ac = AsianOption(IIDStdUniform(),
     ...     multi_level_dimensions = [2,4,8])
     >>> sc = CubMCCLT(ac,abs_tol=.05)

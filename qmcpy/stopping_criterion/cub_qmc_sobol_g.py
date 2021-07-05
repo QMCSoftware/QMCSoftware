@@ -18,8 +18,21 @@ class CubQMCSobolG(CubQMCLDG):
     >>> solution
     1.807...
     >>> data
-    Solution: 1.8079         
+    LDTransformData (AccumulateData Object)
+        solution        1.808
+        error_bound     0.005
+        n_total         2^(10)
+        time_integrate  ...
+    CubQMCSobolG (StoppingCriterion Object)
+        abs_tol         0.050
+        rel_tol         0
+        n_init          2^(10)
+        n_max           2^(35)
     Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     Sobol (DiscreteDistribution Object)
         d               2^(1)
         randomize       1
@@ -27,20 +40,6 @@ class CubQMCSobolG(CubQMCLDG):
         seed            7
         mimics          StdUniform
         dim0            0
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
-    CubQMCSobolG (StoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    LDTransformData (AccumulateData Object)
-        n_total         2^(10)
-        solution        1.808
-        error_bound     0.005
-        time_integrate  ...
     >>> dd = Sobol(3,seed=7)
     >>> g1 = CustomFun(Uniform(dd,0,2),lambda t: 10*t[:,0]-5*t[:,1]**2+t[:,2]**3)
     >>> cv1 = CustomFun(Uniform(dd,0,2),lambda t: t[:,0])

@@ -9,10 +9,10 @@ class IIDStdGaussian(DiscreteDistribution):
 
     >>> dd = IIDStdGaussian(dimension=2,seed=7)
     >>> dd.gen_samples(4)
-    array([[ 1.691e+00, -4.659e-01],
-           [ 3.282e-02,  4.075e-01],
-           [-7.889e-01,  2.066e-03],
-           [-8.904e-04, -1.755e+00]])
+    array([[ 1.69052570e+00, -4.65937371e-01],
+           [ 3.28201637e-02,  4.07516283e-01],
+           [-7.88923029e-01,  2.06557291e-03],
+           [-8.90385858e-04, -1.75472431e+00]])
     >>> dd
     IIDStdGaussian (DiscreteDistribution Object)
         d               2^(1)

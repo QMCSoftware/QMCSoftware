@@ -7,9 +7,6 @@ from numpy import *
 class MeanVarData(AccumulateData):
     """ Update and store mean and variance estimates. """
 
-    parameters = ['levels','solution','n','n_total','error_bound','confid_int']
-    EPS = finfo(float32).eps
-
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, n_init, control_variates, control_variate_means):
         """
         Args:
@@ -23,6 +20,8 @@ class MeanVarData(AccumulateData):
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
         """
+        self.parameters = ['solution','error_bound','n_total','n','levels']
+        self.EPS = finfo(float32).eps
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure

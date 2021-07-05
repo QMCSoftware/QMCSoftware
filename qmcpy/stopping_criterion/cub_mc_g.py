@@ -22,16 +22,13 @@ class CubMCG(StoppingCriterion):
     >>> solution
     1.803...
     >>> data
-    Solution: 1.8039         
-    Keister (Integrand Object)
-    IIDStdUniform (DiscreteDistribution Object)
-        d               2^(1)
-        seed            7
-        mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    MeanVarData (AccumulateData Object)
+        solution        1.804
+        error_bound     0.050
+        n_total         14497
+        n               13473
+        levels          1
+        time_integrate  ...
     CubMCG (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
@@ -39,14 +36,15 @@ class CubMCG(StoppingCriterion):
         rel_tol         0
         n_init          2^(10)
         n_max           10000000000
-    MeanVarData (AccumulateData Object)
-        levels          1
-        solution        1.804
-        n               13473
-        n_total         14497
-        error_bound     0.050
-        confid_int      [1.754 1.854]
-        time_integrate  ...
+    Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
+    IIDStdUniform (DiscreteDistribution Object)
+        d               2^(1)
+        seed            7
+        mimics          StdUniform
     >>> dd = IIDStdUniform(1,seed=7)
     >>> k = Keister(dd)
     >>> cv1 = CustomFun(Uniform(dd),lambda x: sin(pi*x).sum(1))

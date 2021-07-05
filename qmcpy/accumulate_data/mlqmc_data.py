@@ -20,7 +20,7 @@ class MLQMCData(AccumulateData):
             discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
             replications (int): number of replications on each level
         """
-        self.parameters = ['levels','dimensions','n_level','mean_level','var_level','bias_estimate','n_total']
+        self.parameters = ['solution','n_total','n_level','levels','dimensions','mean_level','var_level','bias_estimate']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure

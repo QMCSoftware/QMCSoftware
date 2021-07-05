@@ -20,7 +20,21 @@ class CubQMCML(StoppingCriterion):
     >>> solution
     10.422...
     >>> data
-    Solution: 10.4229        
+    MLQMCData (AccumulateData Object)
+        solution        10.423
+        n_total         294912
+        n_level         [8192.  256.  256.  256.  256.]
+        levels          5
+        dimensions      [ 1.  2.  4.  8. 16.]
+        mean_level      [10.054  0.184  0.102  0.055  0.027]
+        var_level       [1.617e-05 6.794e-05 2.603e-05 8.925e-06 3.123e-06]
+        bias_estimate   0.014
+        time_integrate  ...
+    CubQMCML (StoppingCriterion Object)
+        rmse_tol        0.019
+        n_init          2^(8)
+        n_max           10000000000
+        replications    2^(5)
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -28,30 +42,16 @@ class CubQMCML(StoppingCriterion):
         r               0.050
         t               1
         b               85
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      1
+        decomp_type     pca
     Lattice (DiscreteDistribution Object)
         d               2^(4)
         randomize       1
         order           natural
         seed            733837
         mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      1
-        decomp_type     pca
-    CubQMCML (StoppingCriterion Object)
-        rmse_tol        0.019
-        n_init          2^(8)
-        n_max           10000000000
-        replications    2^(5)
-    MLQMCData (AccumulateData Object)
-        levels          5
-        dimensions      [ 1.  2.  4.  8. 16.]
-        n_level         [8192.  256.  256.  256.  256.]
-        mean_level      [10.054  0.184  0.102  0.055  0.027]
-        var_level       [1.617e-05 6.794e-05 2.603e-05 8.925e-06 3.123e-06]
-        bias_estimate   0.014
-        n_total         294912
-        time_integrate  ...
     
     References:
         

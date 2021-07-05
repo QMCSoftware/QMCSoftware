@@ -26,8 +26,8 @@ class MLMCData(AccumulateData):
             beta0 (float): variance is O(2^{-beta0*level})
             gamma0 (float): sample cost is O(2^{gamma0*level})
         """
-        self.parameters = ['levels','dimensions','n_level','mean_level','var_level', 
-            'cost_per_sample','n_total','alpha','beta','gamma']
+        self.parameters = ['solution','n_total','levels','n_level','dimensions','mean_level','var_level', 
+            'cost_per_sample','alpha','beta','gamma']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
