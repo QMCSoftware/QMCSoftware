@@ -122,11 +122,11 @@ class Sobol(DiscreteDistribution):
         self.set_dim0(dim0)
         # set generating matrix
         z_root = dirname(abspath(__file__))+'/generating_matrices/'
-        if z_path is None:
+        if not z_path:
             self.d_max = 21201
             self.m_max = 32
-            self.msb = 2
-            self.z = empty(0,dtype=uint64)
+            self.msb = True
+            self.z = load(z_root+'sobol_mat.21201.32.msb.npy').astype(uint64)
         else:
             if isfile(z_path):
                 self.z = load(z_path).astype(uint64)
