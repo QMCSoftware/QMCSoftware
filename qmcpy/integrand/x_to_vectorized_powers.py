@@ -8,7 +8,7 @@ class XtoVectorizedPowers(Integrand):
     """
     >>> l1 = XtoVectorizedPowers(Sobol(1,seed=7), powers=[3])
     >>> x1 = l1.discrete_distrib.gen_samples(2**10)
-    >>> y1 = l1.f(x1,compute_flags=[1])
+    >>> y1 = l1.f(x1)
     >>> y1.shape
     (1024, 1)
     >>> y1.mean(0)
