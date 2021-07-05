@@ -6,7 +6,7 @@ from ..util import DistributionCompatibilityError, ParameterError, \
 class StoppingCriterion(object):
     """ Stopping Criterion abstract class. DO NOT INSTANTIATE. """
     
-    def __init__(self, allowed_levels, allowed_distribs):
+    def __init__(self, allowed_levels, allowed_distribs, allow_vectorized_integrals):
         """
         Args:
             distribution (DiscreteDistribution): a DiscreteDistribution
@@ -31,6 +31,8 @@ class StoppingCriterion(object):
         if self.integrand.leveltype not in allowed_levels:
             raise ParameterError('Integrand is %s level but %s only supports %s level problems.' % \
             (self.integrand.leveltype,sname,allowed_levels))
+        if (not allow_vectorized_integrals) and self.integrand.dprime!=1:
+            raise ParameterError('Vectorized integrals (with dprime>1 outputs per sample) are not supported by this stopping criterion')
         # parameter checks
         if not hasattr(self,'parameters'):
             self.parameters = []

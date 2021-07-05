@@ -3,7 +3,7 @@ from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
-from ..integrand import Keister
+from ..integrand import Keister,XtoVectorizedPowers
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import *
 from scipy.stats import norm
@@ -19,20 +19,15 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.380...
+    array([1.38049475])
     >>> data
-    Solution: 1.3805         
-    Keister (Integrand Object)
-    Lattice (DiscreteDistribution Object)
-        d               1
-        randomize       1
-        order           natural
-        seed            15417
-        mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    MeanVarDataRep (AccumulateData Object)
+        solution        1.380
+        error_bound     4.83e-04
+        n_total         2^(12)
+        n               2^(8)
+        replications    2^(4)
+        time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
@@ -40,14 +35,48 @@ class CubQMCCLT(StoppingCriterion):
         rel_tol         0
         n_init          2^(8)
         n_max           2^(30)
+    Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
+    Lattice (DiscreteDistribution Object)
+        d               1
+        randomize       1
+        order           natural
+        seed            7
+        mimics          StdUniform
+    >>> f = XtoVectorizedPowers(Lattice(2,seed=7), powers=[4,5])
+    >>> sc = CubQMCCLT(f, abs_tol=1e-4)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    array([0.40000769, 0.33334103])
+    >>> data
     MeanVarDataRep (AccumulateData Object)
+        solution        [0.4   0.333]
+        error_bound     [6.17e-05 6.17e-05]
+        n_total         2^(16)
+        n               [4096. 4096.]
         replications    2^(4)
-        solution        1.380
-        sighat          6.25e-04
-        n_total         2^(12)
-        error_bound     4.83e-04
-        confid_int      [1.38  1.381]
         time_integrate  ...
+    CubQMCCLT (StoppingCriterion Object)
+        inflate         1.200
+        alpha           0.010
+        abs_tol         1.00e-04
+        rel_tol         0
+        n_init          2^(8)
+        n_max           2^(30)
+    XtoVectorizedPowers (Integrand Object)
+    Uniform (TrueMeasure Object)
+        lower_bound     0
+        upper_bound     1
+    Lattice (DiscreteDistribution Object)
+        d               2^(1)
+        randomize       1
+        order           natural
+        seed            7
+        mimics          StdUniform
+
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
@@ -84,7 +113,8 @@ class CubQMCCLT(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ["single"]
         allowed_distribs = ["Lattice", "Sobol","Halton"]
-        super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = True
+        super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
          
@@ -96,8 +126,9 @@ class CubQMCCLT(StoppingCriterion):
         while True:
             self.data.update_data()
             self.data.error_bound = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
-            tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
-            if self.data.error_bound < tol_up:
+            tol_up = maximum(self.abs_tol, abs(self.data.solution) * self.rel_tol)
+            self.data.compute_flags = self.data.error_bound > tol_up
+            if sum(self.data.compute_flags)==0:
                 # sufficiently estimated
                 break
             elif 2 * self.data.n_total > self.n_max:
@@ -112,9 +143,10 @@ class CubQMCCLT(StoppingCriterion):
                 break
             else:
                 # double sample size
-                self.data.n_r *= 2
+                self.data.nprev = where(self.data.compute_flags,self.data.n,self.data.nprev)
+                self.data.n = where(self.data.compute_flags,2*self.data.n,self.data.n)
         # CLT confidence interval
-        self.data.confid_int = self.data.solution +  self.data.error_bound * array([-1., 1.])
+        self.data.confid_int = self.data.solution +  self.data.error_bound * array([[-1.],[1.]])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
     

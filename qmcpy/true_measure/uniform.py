@@ -9,10 +9,10 @@ class Uniform(TrueMeasure):
     """
     >>> u = Uniform(Sobol(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
     >>> u.gen_samples(4)
-    array([[0.859, 1.565],
-           [1.763, 1.879],
-           [0.05 , 2.925],
-           [1.08 , 0.739]])
+    array([[0.858979  , 1.56544372],
+           [1.76330223, 1.87886903],
+           [0.05024285, 2.92462018],
+           [1.07955154, 0.73850326]])
     >>> u
     Uniform (TrueMeasure Object)
         lower_bound     [0.  0.5]

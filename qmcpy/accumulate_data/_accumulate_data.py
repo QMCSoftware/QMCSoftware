@@ -27,9 +27,8 @@ class AccumulateData(object):
         raise MethodImplementationError(self, 'update_data')
 
     def __repr__(self):
-        string = "Solution: %-15.4f\n" % (self.solution)
-        for qmc_obj in [self.integrand, self.discrete_distrib, self.true_measure, self.stopping_crit]:
+        string = _univ_repr(self, 'AccumulateData', self.parameters + ['time_integrate'])
+        for qmc_obj in [self.stopping_crit, self.integrand, self.true_measure, self.discrete_distrib]:
             if qmc_obj:
-                string += str(qmc_obj)+'\n'
-        string += _univ_repr(self, 'AccumulateData', self.parameters + ['time_integrate'])
+                string += '\n'+str(qmc_obj)
         return string

@@ -1,15 +1,12 @@
-from ._stopping_criterion import StoppingCriterion
-from ..accumulate_data import LDTransformData
-from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
+from ._cub_qmc_ld_g import CubQMCLDG
+from ..util import ParameterError
 from ..discrete_distribution import Sobol
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, CustomFun
 from numpy import *
-from time import time
-import warnings
 
 
-class CubQMCSobolG(StoppingCriterion):
+class CubQMCSobolG(CubQMCLDG):
     """
     Quasi-Monte Carlo method using Sobol' cubature over the
     d-dimensional region to integrate within a specified generalized error
@@ -21,8 +18,21 @@ class CubQMCSobolG(StoppingCriterion):
     >>> solution
     1.807...
     >>> data
-    Solution: 1.8079         
+    LDTransformData (AccumulateData Object)
+        solution        1.808
+        error_bound     0.005
+        n_total         2^(10)
+        time_integrate  ...
+    CubQMCSobolG (StoppingCriterion Object)
+        abs_tol         0.050
+        rel_tol         0
+        n_init          2^(10)
+        n_max           2^(35)
     Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     Sobol (DiscreteDistribution Object)
         d               2^(1)
         randomize       1
@@ -30,20 +40,6 @@ class CubQMCSobolG(StoppingCriterion):
         seed            7
         mimics          StdUniform
         dim0            0
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
-    CubQMCSobolG (StoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    LDTransformData (AccumulateData Object)
-        n_total         2^(10)
-        solution        1.808
-        error_bound     0.005
-        time_integrate  ...
     >>> dd = Sobol(3,seed=7)
     >>> g1 = CustomFun(Uniform(dd,0,2),lambda t: 10*t[:,0]-5*t[:,1]**2+t[:,2]**3)
     >>> cv1 = CustomFun(Uniform(dd,0,2),lambda t: t[:,0])
@@ -107,84 +103,14 @@ class CubQMCSobolG(StoppingCriterion):
             control_variate_means (list): list of means for each control variate
             update_beta (bool): update control variate beta coefficients at each iteration? 
         """
-        self.parameters = ['abs_tol','rel_tol','n_init','n_max']
-        # Input Checks
-        self.abs_tol = float(abs_tol)
-        self.rel_tol = float(rel_tol)
-        m_min = log2(n_init)
-        m_max = log2(n_max)
-        if m_min%1 != 0. or m_min < 8. or m_max%1 != 0.:
-            warning_s = '''
-                n_init and n_max must be a powers of 2.
-                n_init must be >= 2^8.
-                Using n_init = 2^10 and n_max=2^35.'''
-            warnings.warn(warning_s, ParameterWarning)
-            m_min = 10.
-            m_max = 35.
-        self.n_init = 2.**m_min
-        self.n_max = 2.**m_max
-        self.m_min = m_min
-        self.m_max = m_max
-        self.fudge = fudge
-        self.check_cone = check_cone
-        self.coefv = lambda nl: ones(nl,dtype=float)
-        # QMCPy Objs
-        self.integrand = integrand
-        self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.integrand.discrete_distrib
-        self.cv = control_variates
-        self.cv_mu = control_variate_means
-        self.ub = update_beta
-        # Verify Compliant Construction
-        allowed_levels = ['single']
-        allowed_distribs = ["Sobol"]
-        super(CubQMCSobolG,self).__init__(allowed_levels, allowed_distribs)
+        super(CubQMCSobolG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,
+            check_cone,control_variates,control_variate_means,update_beta,
+            ptransform = 'none',
+            coefv = lambda nl: ones(nl,dtype=float), 
+            allowed_levels = ['single'],
+            allowed_distribs = ["Sobol"],
+            cast_complex = False)
         if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
-            raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False. Use QRNG backend.")
-
-    def integrate(self):
-        """ See abstract method. """
-        # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.coefv, self.m_min, self.m_max, self.fudge, self.check_cone, ptransform='none', cast_complex=False,
-            control_variates=self.cv, control_variate_means=self.cv_mu, update_beta=self.ub)
-        t_start = time()
-        while True:
-            self.data.update_data()
-            # Check the end of the algorithm
-            self.data.error_bound = self.data.fudge(self.data.m)*self.data.stilde
-            # Compute optimal estimator
-            ub = max(self.abs_tol, self.rel_tol*abs(self.data.solution + self.data.error_bound))
-            lb = max(self.abs_tol, self.rel_tol*abs(self.data.solution - self.data.error_bound))
-            self.data.solution = self.data.solution - self.data.error_bound*(ub-lb) / (ub+lb)
-            if 4*self.data.error_bound**2./(ub+lb)**2. <= 1.:
-                # stopping criterion met
-                break
-            elif self.data.m == self.data.m_max:
-                # doubling samples would go over n_max
-                warning_s = """
-                Alread generated %d samples.
-                Trying to generate %d new samples would exceed n_max = %d.
-                No more samples will be generated.
-                Note that error tolerances may no longer be satisfied""" \
-                % (int(2**self.data.m), int(2**self.data.m), int(2**self.data.m_max))
-                warnings.warn(warning_s, MaxSamplesWarning)
-                break
-            else:
-                # double sample size
-                self.data.m += 1.
-        self.data.time_integrate = time() - t_start
-        return self.data.solution, self.data
-    
-    def set_tolerance(self, abs_tol=None, rel_tol=None):
-        """
-        See abstract method. 
-        
-        Args:
-            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
-        """
-        if abs_tol != None: self.abs_tol = abs_tol
-        if rel_tol != None: self.rel_tol = rel_tol
+            raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False.")
 
 CubQMCNetG = CubQMCSobolG

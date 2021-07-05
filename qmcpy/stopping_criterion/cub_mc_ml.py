@@ -20,7 +20,25 @@ class CubMCML(StoppingCriterion):
     >>> solution
     10.44...
     >>> data
-    Solution: 10.4450        
+    MLMCData (AccumulateData Object)
+        solution        10.445
+        n_total         1220156
+        levels          7
+        n_level         [1.174e+06 2.177e+04 9.205e+03 3.845e+03 1.295e+03 4.470e+02 1.590e+02]
+        dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
+        mean_level      [1.006e+01 1.758e-01 1.046e-01 5.690e-02 3.043e-02 1.367e-02 6.812e-03]
+        var_level       [1.962e+02 1.347e-01 4.817e-02 1.279e-02 3.224e-03 8.278e-04 1.541e-04]
+        cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
+        alpha           0.947
+        beta            1.955
+        gamma           1.000
+        time_integrate  ...
+    CubMCML (StoppingCriterion Object)
+        rmse_tol        0.019
+        n_init          2^(8)
+        levels_min      2^(1)
+        levels_max      10
+        theta           2^(-1)
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -28,32 +46,14 @@ class CubMCML(StoppingCriterion):
         r               0.050
         t               1
         b               85
-    IIDStdUniform (DiscreteDistribution Object)
-        d               2^(6)
-        seed            7
-        mimics          StdUniform
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1
         decomp_type     pca
-    CubMCML (StoppingCriterion Object)
-        rmse_tol        0.019
-        n_init          2^(8)
-        levels_min      2^(1)
-        levels_max      10
-        theta           2^(-1)
-    MLMCData (AccumulateData Object)
-        levels          7
-        dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        n_level         [1.174e+06 2.177e+04 9.205e+03 3.845e+03 1.295e+03 4.470e+02 1.590e+02]
-        mean_level      [1.006e+01 1.758e-01 1.046e-01 5.690e-02 3.043e-02 1.367e-02 6.812e-03]
-        var_level       [1.962e+02 1.347e-01 4.817e-02 1.279e-02 3.224e-03 8.278e-04 1.541e-04]
-        cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
-        n_total         1220156
-        alpha           0.947
-        beta            1.955
-        gamma           1.000
-        time_integrate  ...
+    IIDStdUniform (DiscreteDistribution Object)
+        d               2^(6)
+        seed            7
+        mimics          StdUniform
 
     Original Implementation:
 
@@ -114,7 +114,8 @@ class CubMCML(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
-        super(CubMCML,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubMCML,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         """ See abstract method. """

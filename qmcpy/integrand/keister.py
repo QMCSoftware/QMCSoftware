@@ -47,6 +47,7 @@ class Keister(Integrand):
                 true measure by which to compose a transform
         """
         self.true_measure = Gaussian(sampler,mean=0,covariance=1/2)
+        self.dprime = 1
         super(Keister,self).__init__()
     
     def g(self, t):

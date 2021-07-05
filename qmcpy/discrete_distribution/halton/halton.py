@@ -11,12 +11,12 @@ class Halton(DiscreteDistribution):
 
     >>> h = Halton(2,seed=7)
     >>> h.gen_samples(4)
-    array([[0.166, 0.363],
-           [0.666, 0.696],
-           [0.416, 0.03 ],
-           [0.916, 0.474]])
+    array([[0.1662221 , 0.36313319],
+           [0.6662221 , 0.69646652],
+           [0.4162221 , 0.02979986],
+           [0.9162221 , 0.4742443 ]])
     >>> h.gen_samples(1)
-    array([[0.166, 0.363]])
+    array([[0.1662221 , 0.36313319]])
     >>> h
     Halton (DiscreteDistribution Object)
         d               2^(1)
@@ -34,6 +34,28 @@ class Halton(DiscreteDistribution):
         
         [2] Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
     """
+
+    # QRNG
+    halton_cf_qrng = c_lib.halton_qrng
+    halton_cf_qrng.argtypes = [
+        ctypes.c_int,  # n
+        ctypes.c_int,  # d
+        ctypes.c_int, # n0
+        ctypes.c_int,  # generalized
+        ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # res
+        ctypes.c_long]  # seed
+    halton_cf_qrng.restype = None
+    # OWEN
+    halton_cf_owen = c_lib.halton_owen
+    halton_cf_owen.argtypes = [
+        ctypes.c_int,  # n
+        ctypes.c_int,  # d
+        ctypes.c_int, # n0
+        ctypes.c_int, # d0
+        ctypes.c_int, # randomize
+        ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # result array 
+        ctypes.c_long]  # seed
+    halton_cf_owen.restype = None
 
     def __init__(self, dimension=1, generalize=True, randomize=True, seed=None):
         """
@@ -63,29 +85,10 @@ class Halton(DiscreteDistribution):
         if self.generalize==False and self.backend=='OWEN':
             raise ParameterError("Owen halton Must be genralized")
         if self.backend=='QRNG':
-            self.halton_cf = c_lib.halton_qrng
-            self.halton_cf.argtypes = [
-                ctypes.c_int,  # n
-                ctypes.c_int,  # d
-                ctypes.c_int, # n0
-                ctypes.c_int,  # generalized
-                ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # res
-                ctypes.c_long]  # seed
-            self.halton_cf.restype = None
             self.g = generalize
             self.r = randomize
             self.d_lim = 360
         elif self.backend=='OWEN':
-            self.halton_cf = c_lib.halton_owen
-            self.halton_cf.argtypes = [
-                ctypes.c_int,  # n
-                ctypes.c_int,  # d
-                ctypes.c_int, # n0
-                ctypes.c_int, # d0
-                ctypes.c_int, # randomize
-                ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # result array 
-                ctypes.c_long]  # seed
-            self.halton_cf.restype = None
             self.r = randomize
             self.d_lim = 1000
         else:
@@ -119,11 +122,11 @@ class Halton(DiscreteDistribution):
         n = int(n_max-n_min)
         if self.backend=='QRNG':
             x = zeros((self.d, n), dtype=double)
-            self.halton_cf(n, self.d, int(n_min), self.generalize, x, self.seed)
+            self.halton_cf_qrng(n, self.d, int(n_min), self.generalize, x, self.seed)
             return x.T
         elif self.backend=='OWEN':
             x = zeros((n,self.d), dtype=double)
-            self.halton_cf(n, self.d, int(n_min), 0, self.randomize, x, self.seed)
+            self.halton_cf_owen(n, self.d, int(n_min), 0, self.randomize, x, self.seed)
             return x
 
     def pdf(self, x):

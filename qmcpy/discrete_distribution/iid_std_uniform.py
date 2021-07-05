@@ -8,10 +8,10 @@ class IIDStdUniform(DiscreteDistribution):
 
     >>> dd = IIDStdUniform(dimension=2,seed=7)
     >>> dd.gen_samples(4)
-    array([[0.076, 0.78 ],
-           [0.438, 0.723],
-           [0.978, 0.538],
-           [0.501, 0.072]])
+    array([[0.07630829, 0.77991879],
+           [0.43840923, 0.72346518],
+           [0.97798951, 0.53849587],
+           [0.50112046, 0.07205113]])
     >>> dd
     IIDStdUniform (DiscreteDistribution Object)
         d               2^(1)

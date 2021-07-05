@@ -21,24 +21,16 @@ class CubQMCMLCont(StoppingCriterion):
     >>> solution
     10.394...
     >>> data
-    Solution: 10.3948        
-    MLCallOptions (Integrand Object)
-        option          european
-        sigma           0.200
-        k               100
-        r               0.050
-        t               1
-        b               85
-    Lattice (DiscreteDistribution Object)
-        d               1
-        randomize       1
-        order           natural
-        seed            561339
-        mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      1
-        decomp_type     pca
+    MLQMCData (AccumulateData Object)
+        solution        10.395
+        n_total         155648
+        n_level         [4096.  256.  256.  256.]
+        levels          2^(2)
+        dimensions      [1. 2. 4. 8.]
+        mean_level      [10.053  0.184  0.102  0.055]
+        var_level       [8.703e-05 6.794e-05 2.603e-05 8.925e-06]
+        bias_estimate   0.035
+        time_integrate  ...
     CubQMCMLCont (StoppingCriterion Object)
         rmse_tol        0.019
         n_init          2^(8)
@@ -50,15 +42,23 @@ class CubQMCMLCont(StoppingCriterion):
         tol_mult        1.668
         theta_init      2^(-1)
         theta           2^(-3)
-    MLQMCData (AccumulateData Object)
-        levels          2^(2)
-        dimensions      [1. 2. 4. 8.]
-        n_level         [4096.  256.  256.  256.]
-        mean_level      [10.053  0.184  0.102  0.055]
-        var_level       [8.703e-05 6.794e-05 2.603e-05 8.925e-06]
-        bias_estimate   0.035
-        n_total         155648
-        time_integrate  ...
+    MLCallOptions (Integrand Object)
+        option          european
+        sigma           0.200
+        k               100
+        r               0.050
+        t               1
+        b               85
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      1
+        decomp_type     pca
+    Lattice (DiscreteDistribution Object)
+        d               1
+        randomize       1
+        order           natural
+        seed            561339
+        mimics          StdUniform
     
     References:
         
@@ -110,7 +110,8 @@ class CubQMCMLCont(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
         allowed_distribs = ["Lattice", "Sobol","Halton"]
-        super(CubQMCMLCont,self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubQMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         # Construct AccumulateData Object to House Integration Data

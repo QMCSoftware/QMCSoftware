@@ -7,9 +7,6 @@ from numpy import *
 class MeanVarData(AccumulateData):
     """ Update and store mean and variance estimates. """
 
-    parameters = ['levels','solution','n','n_total','error_bound','confid_int']
-    EPS = finfo(float32).eps
-
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, n_init, control_variates, control_variate_means):
         """
         Args:
@@ -23,6 +20,8 @@ class MeanVarData(AccumulateData):
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
         """
+        self.parameters = ['solution','error_bound','n_total','n','levels']
+        self.EPS = finfo(float32).eps
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -68,16 +67,16 @@ class MeanVarData(AccumulateData):
                 new_dim = self.integrand._dim_at_level(l)
                 self.true_measure._set_dimension_r(new_dim)
                 samples = self.discrete_distrib.gen_samples(n=self.n[l])
-                y = self.integrand.f(samples,l=l)
+                y = self.integrand.f(samples,l=l).squeeze()
             else:
                 n = int(self.n[l])
                 samples = self.discrete_distrib.gen_samples(n)
-                y = self.integrand.f(samples)
+                y = self.integrand.f(samples).squeeze()
                 if self.ncv>0:
                     # using control variates
                     cvdata = zeros((n,self.ncv),dtype=float)
                     for i in range(self.ncv):
-                        cvdata[:,i] = self.cv[i].f(samples)
+                        cvdata[:,i] = self.cv[i].f(samples).squeeze()
                     cvmuhats = cvdata.mean(0)
                     if not hasattr(self,'beta_hat'):
                         # approximate control varite coefficient

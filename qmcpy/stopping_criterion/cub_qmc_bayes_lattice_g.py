@@ -22,29 +22,28 @@ class CubBayesLatticeG(StoppingCriterion):
     >>> solution
     1.808...
     >>> data
-    Solution: 1.8082         
-    Keister (Integrand Object)
-    Lattice (DiscreteDistribution Object)
-        d               2^(1)
-        randomize       1
-        order           linear
-        seed            123456789
-        mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    LDTransformBayesData (AccumulateData Object)
+        solution        1.808
+        error_bound     7.37e-04
+        n_total         256
+        time_integrate  ...
     CubBayesLatticeG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(8)
         n_max           2^(22)
         order           2^(1)
-    LDTransformBayesData (AccumulateData Object)
-        n_total         256
-        solution        1.808
-        error_bound     7.37e-04
-        time_integrate  ...
+    Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
+    Lattice (DiscreteDistribution Object)
+        d               2^(1)
+        randomize       1
+        order           linear
+        seed            123456789
+        mimics          StdUniform
     
     Adapted from 
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m
@@ -119,7 +118,8 @@ class CubBayesLatticeG(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = ["Lattice"]
-        super(CubBayesLatticeG, self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubBayesLatticeG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
         if self.discrete_distrib.randomize == False:
             raise ParameterError("CubBayesLattice_g requires discrete_distrib to have randomize=True")

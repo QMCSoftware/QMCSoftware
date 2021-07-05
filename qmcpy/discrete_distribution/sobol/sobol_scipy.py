@@ -1,6 +1,9 @@
 from .._discrete_distribution import DiscreteDistribution
 from ...util import ParameterError, ParameterWarning
-import scipy
+try:
+    from scipy.stats.qmc import Sobol as SobolScipyOG
+except:
+    raise ParameterError("scipy.stats.qmc.Sobol not found, try updating to scipy>=1.7.0")
 
 class SobolSciPy(DiscreteDistribution):
     """
@@ -8,14 +11,14 @@ class SobolSciPy(DiscreteDistribution):
     
     >>> s = SobolSciPy(2,seed=7)
     >>> s.gen_samples(4)
-    array([[5.793e-01, 7.403e-01],
-           [4.158e-02, 6.921e-04],
-           [4.788e-01, 7.753e-01],
-           [8.925e-01, 4.838e-01]])
+    array([[5.79259991e-01, 7.40284680e-01],
+           [4.15829644e-02, 6.92069530e-04],
+           [4.78844851e-01, 7.75258362e-01],
+           [8.92499685e-01, 4.83783960e-01]])
     >>> s.gen_samples(1)
-    array([[0.579, 0.74 ]])
+    array([[0.57925999, 0.74028468]])
     >>> s.gen_samples(1)
-    array([[0.579, 0.74 ]])
+    array([[0.57925999, 0.74028468]])
     >>> s
     SobolSciPy (DiscreteDistribution Object)
         d               2^(1)
@@ -42,7 +45,8 @@ class SobolSciPy(DiscreteDistribution):
            [0.25, 0.75]])
     >>> sobolscipy.gen_samples(n_min=6,n_max=8,warn=False) # uses scipy.stats.qmc.Sobol.fast_forward()
     array([[0.625, 0.125],
-           [0.125, 0.625]])"""
+           [0.125, 0.625]])
+    """
 
     def __init__(self, dimension=1, randomize=True, seed=None):
         """
@@ -55,7 +59,7 @@ class SobolSciPy(DiscreteDistribution):
         self.seed = seed
         self.d = dimension
         self.randomize = randomize
-        self.sobol = scipy.stats.qmc.Sobol(self.d,scramble=self.randomize,seed=seed)
+        self.sobol = SobolScipyOG(self.d,scramble=self.randomize,seed=seed)
         self.graycode = True
         self.low_discrepancy = True
         self.mimics = 'StdUniform'

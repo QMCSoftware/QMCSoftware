@@ -13,12 +13,12 @@ class Sobol(DiscreteDistribution):
     
     >>> s = Sobol(2,seed=7)
     >>> s.gen_samples(4)
-    array([[0.429, 0.426],
-           [0.882, 0.552],
-           [0.025, 0.97 ],
-           [0.54 , 0.095]])
+    array([[0.4294895 , 0.42617749],
+           [0.88165111, 0.55154761],
+           [0.02512143, 0.96984807],
+           [0.53977577, 0.0954013 ]])
     >>> s.gen_samples(1)
-    array([[0.429, 0.426]])
+    array([[0.4294895 , 0.42617749]])
     >>> s
     Sobol (DiscreteDistribution Object)
         d               2^(1)
@@ -122,11 +122,11 @@ class Sobol(DiscreteDistribution):
         self.set_dim0(dim0)
         # set generating matrix
         z_root = dirname(abspath(__file__))+'/generating_matrices/'
-        if z_path is None:
+        if not z_path:
             self.d_max = 21201
             self.m_max = 32
-            self.msb = 2
-            self.z = empty(0,dtype=uint64)
+            self.msb = True
+            self.z = load(z_root+'sobol_mat.21201.32.msb.npy').astype(uint64)
         else:
             if isfile(z_path):
                 self.z = load(z_path).astype(uint64)

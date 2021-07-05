@@ -23,8 +23,21 @@ class CubBayesNetG(StoppingCriterion):
     >>> solution
     1.798...
     >>> data
-    Solution: 1.7986         
+    LDTransformBayesData (AccumulateData Object)
+        solution        1.799
+        error_bound     0.019
+        n_total         256
+        time_integrate  ...
+    CubBayesNetG (StoppingCriterion Object)
+        abs_tol         0.050
+        rel_tol         0
+        n_init          2^(8)
+        n_max           2^(22)
     Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     pca
     Sobol (DiscreteDistribution Object)
         d               2^(1)
         randomize       1
@@ -32,20 +45,6 @@ class CubBayesNetG(StoppingCriterion):
         seed            123456789
         mimics          StdUniform
         dim0            0
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
-    CubBayesNetG (StoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(8)
-        n_max           2^(22)
-    LDTransformBayesData (AccumulateData Object)
-        n_total         256
-        solution        1.799
-        error_bound     0.019
-        time_integrate  ...
         
     Adapted from
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m
@@ -121,7 +120,8 @@ class CubBayesNetG(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = ["Sobol"]
-        super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs)
+        allow_vectorized_integrals = False
+        super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
         if self.discrete_distrib.randomize == False:
             raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")

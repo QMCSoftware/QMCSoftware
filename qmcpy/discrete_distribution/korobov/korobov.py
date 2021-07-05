@@ -12,15 +12,15 @@ class Korobov(DiscreteDistribution):
     
     >>> k = Korobov(2,generator=[1,3],seed=7)
     >>> k.gen_samples(4)
-    array([[0.982, 0.883],
-           [0.232, 0.633],
-           [0.482, 0.383],
-           [0.732, 0.133]])
+    array([[0.98196076, 0.88349207],
+           [0.23196076, 0.63349207],
+           [0.48196076, 0.38349207],
+           [0.73196076, 0.13349207]])
     >>> k.gen_samples(4)
-    array([[0.982, 0.883],
-           [0.232, 0.633],
-           [0.482, 0.383],
-           [0.732, 0.133]])
+    array([[0.98196076, 0.88349207],
+           [0.23196076, 0.63349207],
+           [0.48196076, 0.38349207],
+           [0.73196076, 0.13349207]])
     >>> k
     Korobov (DiscreteDistribution Object)
         d               2^(1)
@@ -29,10 +29,10 @@ class Korobov(DiscreteDistribution):
         seed            7
         mimics          StdUniform
     >>> Korobov(2,generator=[3,1],seed=7).gen_samples(4)
-    array([[0.982, 0.883],
-           [0.732, 0.133],
-           [0.482, 0.383],
-           [0.232, 0.633]])
+    array([[0.98196076, 0.88349207],
+           [0.73196076, 0.13349207],
+           [0.48196076, 0.38349207],
+           [0.23196076, 0.63349207]])
     
     References:
 
@@ -41,6 +41,16 @@ class Korobov(DiscreteDistribution):
         R package version 0.0-7.
         https://CRAN.R-project.org/package=qrng.
     """
+
+    korobov_qrng_cf = c_lib.korobov_qrng
+    korobov_qrng_cf.argtypes = [
+        ctypes.c_int,  # n
+        ctypes.c_int,  # d
+        ctypeslib.ndpointer(ctypes.c_int, flags='C_CONTIGUOUS'),  # generator
+        ctypes.c_int,  # randomize
+        ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # result array 
+        ctypes.c_uint64]  # seed
+    korobov_qrng_cf.restype = None
 
     def __init__(self, dimension=1, generator=[1], randomize=True, seed=None):
         """
@@ -54,15 +64,7 @@ class Korobov(DiscreteDistribution):
             seed (int): seed the random number generator for reproducibility
         """
         self.parameters = ['d','generator','randomize','seed','mimics']
-        self.korobov_qrng_cf = c_lib.korobov_qrng
-        self.korobov_qrng_cf.argtypes = [
-            ctypes.c_int,  # n
-            ctypes.c_int,  # d
-            ctypeslib.ndpointer(ctypes.c_int, flags='C_CONTIGUOUS'),  # generator
-            ctypes.c_int,  # randomize
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # result array 
-            ctypes.c_uint64]  # seed
-        self.korobov_qrng_cf.restype = None
+        
         self.generator = array(generator, dtype=int32)
         self.randomize = randomize
         self.n_lim = 2**31

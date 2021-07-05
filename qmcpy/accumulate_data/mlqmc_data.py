@@ -20,7 +20,7 @@ class MLQMCData(AccumulateData):
             discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
             replications (int): number of replications on each level
         """
-        self.parameters = ['levels','dimensions','n_level','mean_level','var_level','bias_estimate','n_total']
+        self.parameters = ['solution','n_total','n_level','levels','dimensions','mean_level','var_level','bias_estimate']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -61,7 +61,7 @@ class MLQMCData(AccumulateData):
             for r in range(int(self.replications)):
                 self.discrete_distrib.set_seed(self.seeds[l,r]) # reset seed
                 samples = self.discrete_distrib.gen_samples(n_min=self.n_level[l],n_max=n_max)
-                self.integrand.f(samples,l=l)
+                self.integrand.f(samples,l=l).squeeze()
                 prev_sum = self.mean_level_reps[l,r]*self.n_level[l]
                 self.mean_level_reps[l,r] = (self.integrand.sums[0]+prev_sum)/float(n_max)
                 self.cost_level[l] = self.cost_level[l] + self.integrand.cost

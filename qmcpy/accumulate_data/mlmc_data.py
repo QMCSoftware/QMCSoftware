@@ -26,8 +26,8 @@ class MLMCData(AccumulateData):
             beta0 (float): variance is O(2^{-beta0*level})
             gamma0 (float): sample cost is O(2^{gamma0*level})
         """
-        self.parameters = ['levels','dimensions','n_level','mean_level','var_level', 
-            'cost_per_sample','n_total','alpha','beta','gamma']
+        self.parameters = ['solution','n_total','levels','n_level','dimensions','mean_level','var_level', 
+            'cost_per_sample','alpha','beta','gamma']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -60,7 +60,7 @@ class MLMCData(AccumulateData):
                 self.true_measure._set_dimension_r(self.dimensions[l])
                 # evaluate integral at sampleing points samples
                 samples = self.discrete_distrib.gen_samples(n=self.diff_n_level[l])
-                self.integrand.f(samples,l=l)
+                self.integrand.f(samples,l=l).squeeze()
                 self.n_level[l] = self.n_level[l] + self.diff_n_level[l]
                 self.sum_level[0,l] = self.sum_level[0,l] + self.integrand.sums[0]
                 self.sum_level[1,l] = self.sum_level[1,l] + self.integrand.sums[1]
