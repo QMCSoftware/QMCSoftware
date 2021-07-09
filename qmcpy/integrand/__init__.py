@@ -4,4 +4,4 @@ from .keister import Keister
 from .linear0 import Linear0
 from .custom_fun import CustomFun
 from .ml_call_options import MLCallOptions
-from .x_to_vectorized_powers import XtoVectorizedPowers
+from .box_integral import BoxIntegral

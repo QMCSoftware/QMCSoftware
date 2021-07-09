@@ -3,7 +3,7 @@ from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
-from ..integrand import Keister,XtoVectorizedPowers
+from ..integrand import Keister,BoxIntegral
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import *
 from scipy.stats import norm
@@ -46,37 +46,43 @@ class CubQMCCLT(StoppingCriterion):
         order           natural
         seed            7
         mimics          StdUniform
-    >>> f = XtoVectorizedPowers(Lattice(2,seed=7), powers=[4,5])
-    >>> sc = CubQMCCLT(f, abs_tol=1e-4)
+    >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
+    >>> abs_tol = 1e-3
+    >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([0.40000769, 0.33334103])
+    array([1.19031076, 0.96093376])
     >>> data
     MeanVarDataRep (AccumulateData Object)
-        solution        [0.4   0.333]
-        error_bound     [6.17e-05 6.17e-05]
-        n_total         2^(16)
-        n               [4096. 4096.]
+        solution        [1.19  0.961]
+        error_bound     [0. 0.]
+        n_total         2^(21)
+        n               [131072.    512.]
         replications    2^(4)
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
-        abs_tol         1.00e-04
+        abs_tol         0.001
         rel_tol         0
         n_init          2^(8)
         n_max           2^(30)
-    XtoVectorizedPowers (Integrand Object)
+    BoxIntegral (Integrand Object)
+        s               [-1  1]
     Uniform (TrueMeasure Object)
         lower_bound     0
         upper_bound     1
     Lattice (DiscreteDistribution Object)
-        d               2^(1)
+        d               3
         randomize       1
         order           natural
         seed            7
         mimics          StdUniform
-
+    >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
+    >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
+    >>> true_value = array([sol3neg1,sol31])
+    >>> (abs(true_value-solution)<abs_tol).all()
+    True
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,

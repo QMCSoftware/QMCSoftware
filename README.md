@@ -162,6 +162,8 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
 <b>[28]</b> D Li, Reliable quasi-Monte Carlo with control variates. Master’s thesis, Illinois Institute of Technology (2016)
 
+<b>[29]</b> D.H. Bailey, J.M. Borwein, R.E. Crandall, Box integrals, Journal of Computational and Applied Mathematics, Volume 206, Issue 1, 2007, Pages 196-208, ISSN 0377-0427, https://doi.org/10.1016/j.cam.2006.06.010.
+
 ----
 
 ## Sponsors
