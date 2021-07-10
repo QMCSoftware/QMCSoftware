@@ -1,3 +1,14 @@
+/*
+Digital Net Generator by alegresor 
+
+References:
+        
+    [1] Paul Bratley and Bennett L. Fox. 1988. 
+    Algorithm 659: Implementing Sobol's quasirandom sequence generator. 
+    ACM Trans. Math. Softw. 14, 1 (March 1988), 88–100. 
+    DOI:https://doi.org/10.1145/42288.214372
+*/
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,30 +27,17 @@ EXPORT int get_unsigned_long_long_size()
     return sizeof(unsigned long long);
 }
 
-EXPORT int sobol(unsigned long n, unsigned int d, unsigned long n0, unsigned int d0,
-unsigned int randomize, unsigned int graycode, unsigned long long *seeds, double *x, unsigned int d_max,
-unsigned int m_max, unsigned long long *z, unsigned int msb, double *xjlms, unsigned int set_xjlms){
-    /*
-    Custom Sobol' Generator by alegresor
-
-    n: sample indicies include n0:(n0+n). Must be a power of 2 if not using Graycode ordering. 
-    d: dimension includes d0:(d0+d)
-    n0: starting index in sequence. Must be a power of 2 if not using Graycode ordering.
-    d0: starting dimension in the sequence
-    randomize: 
-        0 = None
-        1 = linear matrix scramble (LMS) with digital shift (DS)
-        2 = DS
-        3 = LMS without DS
-    graycode: 
-        0 = natural ordering
-        1 = graycode ordering
-    seed: length d array of seeds, one for each dimension
-    x: n x d memory block to store samples
-    z: d_max x m_max memory block storing directional numbers
-    d_max: max supported dimension
-    m_max: max supported samples = 2**m_max
-    msb: 
+EXPORT int set_lms_ds(
+    unsigned long *dvec, /* vector of dimesions */
+    unsigned int d, /* lenght(dvec) */
+    unsigned int set_lms, /* linear matrix scrambling flag */
+    unsigned int set_ds, /* digital shift flag */
+    unsigned long long *seeds, /* seeds, one for each dimension in dvec */
+    unsigned int d_max, /* maximum dimension */
+    unsigned int m_max, /* 2^m_max is the maximum number of samples supported */
+    unsigned int t_max, /* number of bits in each element of the generating vector */
+    unsigned long long *zold, /* original generating vector with shape d_max x m_max*/
+    unsigned int msb, /* most significant bit flag 
         1 = most significant bit (MSB) in 0^th column of directional numbers in j^th row
         0 = least significant bit (LSB) in 0^th column of direction numbers in j^th row
         Ex 
@@ -49,80 +47,96 @@ unsigned int m_max, unsigned long long *z, unsigned int msb, double *xjlms, unsi
                 [0 0 1]
             then MSB order uses int representation [4 2 1] 
             while LSB order has int representation [1 2 4]
-        Note that MSB order is faster as it does not require flipping bits
-    xjlms: n x d memory block to store samples with just the LMS, no DS. Will only be set if ...
-    set_xjlms: set xjlms? Will only be set if randomize==2 and set_xjlms==1.
-
-    Error Codes:
+        note that MSB order is faster as it does not require flipping bits */
+    unsigned long long *znew, /* new generating vector with shape d x m_max to fill */ 
+    unsigned long long *rshift){ /* random shift vector with shape d to fill */
+    /*
+    error codes:
         1) requires 32 bit precision but system has unsigned int with < 32 bit precision
-        2) using natural ordering (graycode=0) and n0 and/or (n0+n) is not 0 or a power of 2
-        3) n0+n exceeds 2^m_max or d0+d exceeds d_max
+        2) dimension in dvec greater than d_max
+        3) t_max is too large for unsigned long long precision
+    */
+    /* parameter checks */
+    if(sizeof(unsigned int)<4){ /* require 32 bit precision */
+        return(1);}
+    for(j=0;j<d;j++){
+        if (dvec[j]>d_max){ /* dimension too large */
+            return(2);}}
+    if(t_max>sizeof(unsigned long long)){
+        return(3);}
+    /* variables */
+    unsigned int j,m,t,t1;
+    unsigned long long u,z;
+    sm = (unsigned long long *) calloc(t_max, sizeof(unsigned long long)); /* scramble matrix */
+    /* set randomizations */
+    for(j=0;j<d;j++){
+    	seed_MRG63k3a(seeds[j]); /* seed the IID RNG */
+        /* set lms matrix*/
+        if(set_lms==1){
+            memset(sm,0,m_max*sizeof(unsigned long long));
+            /* initialize the scrambling matrix */
+            for(t=1;t<t_max;t++){
+                u = (unsigned long long) (MRG63k3a() * (((unsigned long long) 1) << t)); /* get random int between 0 and 2^t */
+                sm[t] = u << (t_max-t); /* lower triangular rectangular matrix */
+                sm[t] |= ((unsigned long ) 1) << (t_max-t-1);}} /* set diagonal to 1 (ul to lr) */
+        /* left multiply scrambling matrix to directional numbers */
+        for(m=0;m<m_max;m++){
+            z = zold[(dvec[j]*m_max+m)];
+            u = 0;
+            if(msb==0){ /* flip bits for lsb order */
+                for(t=0;t<t_max;t++){
+                    u |= ((z>>t)&1)<<(t_max-1-t);}}
+            else{
+                u = z;} /* use original element */
+            v = 0;
+            if(set_lms==1){
+                /* left multiply scrambling matrix by direction number represeted as a column */
+                for(t=0;t<t_max;t++){
+                    s = 0;
+                    b = sm[t]&u;
+                    for(t1=0;t1<t_max;t1++){
+                        s += (b>>t1)&1;}
+                    s %= 2;
+                    if(s){
+                        v |= ((unsigned long long) 1) << (t_max-1-t);}}}
+            else{
+                v = u;}}
+            znew[j*m_max+k] = v;
+            /* initialize DS (will also be applied to LMS) */
+            if(set_ds){
+                rshift[j] = (unsigned long long) (MRG63k3a()*ldexp(1,t_max));}}
+    free(sm);
+    return(0);}
 
-    References:
-        
-        [1] Paul Bratley and Bennett L. Fox. 1988. 
-        Algorithm 659: Implementing Sobol's quasirandom sequence generator. 
-        ACM Trans. Math. Softw. 14, 1 (March 1988), 88–100. 
-        DOI:https://doi.org/10.1145/42288.214372
+EXPORT int digitalseq2(
+    unsigned long n, /* n: sample indicies include n0:(n0+n). Must be a power of 2 if not using Graycode ordering */
+    unsigned int d, /* dimension supported by generating vector */
+    unsigned long n0, /* starting index in sequence. Must be a power of 2 if not using Graycode ordering */
+    unsigned int graycode, /* Graycode flag */
+    unsigned int m_max, /* 2^m_max is the maximum number of samples supported */
+    unsigned int t_max, /* number of bits in each element of the generating vector */
+    unsigned long long *znew, /* new generating vector with shape d x m_max */
+    double *x)}{ /* sample points with shape n x d to fill */
+    /*
+    Error Codes:
+        1) using natural ordering (graycode=0) and n0 and/or (n0+n) is not 0 or a power of 2
+        2) n0+n exceeds 2^m_max
     */
     /* parameter checks */
     if( (n==0) || (d==0) ){
         return(0);}
-    if(sizeof(unsigned int)<4){
-        /* require 32 bit precision */
-        return(1);}
     if( (graycode==0) && ( ((n0!=0)&&fmod(log(n0)/log(2),1)!=0) || (fmod(log(n0+n)/log(2),1)!=0) ) ){
         /* for natural ordering, require n0 and (n0+n) be either 0 or powers of 2 */
-        return(2);}
-    if( ((n0+n)>ldexp(1,m_max)) || ((d0+d)>d_max) ){
+        return(1);}
+    if( ((n0+n)>ldexp(1,m_max)) ||  ){
         /* too many samples or dimensions */
-        return(3);}
+        return(2);}
     /* variables */
     double scale = ldexp(1,-1*m_max);
     unsigned int j, m, k, k1, k2, s;
     unsigned long long i, im, u, rshift, xc, xr, z1, b, *sm, *zcp;
-    sm = (unsigned long long *) calloc(m_max, sizeof(unsigned long long)); /* scramble matrix */
-    zcp = (unsigned long long *) calloc(m_max, sizeof(unsigned long long));
     /* generate points */
     for(j=0;j<d;j++){
-    	seed_MRG63k3a(seeds[j]); /* seed the IID RNG */
-        /* LMS */
-        if(randomize==1){
-            memset(sm,0,m_max*sizeof(unsigned long long));
-            /* initialize the scrambling matrix */
-            for(k=1;k<m_max;k++){
-                u = (unsigned long long) (MRG63k3a() * (((unsigned long long) 1) << k)); /* get random int between 0 and 2^k */
-                if(msb){
-                    sm[k] = u << (m_max-k);}
-                else{
-                    sm[k] = u;}} /* shift bits to the left to make lower triangular matrix */
-            for(k=0;k<m_max;k++){
-                if(msb){ /* 1s on diagonal from ul to lr */
-                    sm[k] |= ((unsigned long ) 1) << (m_max-1-k);}
-                else{ /* 1s on diagnol from ur to ll */
-                    sm[k] |= ((unsigned long) 1) << (k);}}
-            /* left multiply scrambling matrix to directional numbers */
-            for(k=0;k<m_max;k++){
-                z1 = 0;
-                /* lef multiply scrambling matrix by direction number represeted as a column */
-                for(k1=0;k1<m_max;k1++){
-                    s = 0;
-                    b = sm[k1] & z[(j+d0)*m_max+k];
-                    for(k2=0;k2<m_max;k2++){
-                        s += (b>>k2)&1;}
-                    s %= 2;
-                    if(s&&msb){
-                        z1 |= ((unsigned long long) 1) << (m_max-1-k1);} /* restore (MSB) order */
-                    if(s&&(!msb)){
-                        z1 |= ((unsigned long long) 1) << k1;}} /* restore (LSB) order */
-                zcp[k] = z1;}}
-        /* initialize DS (will also be applied to LMS) */
-        if((randomize==1) || (randomize==2)){
-            rshift = (unsigned long long) (MRG63k3a()*ldexp(1,m_max));}
-        /* copy generating matrix */
-        if((randomize==0) || (randomize==2)){
-            for(k=0;k<m_max;k++){
-                zcp[k] = z[(j+d0)*m_max+k];}}
         /* set an initial point */ 
         xc = 0; /* current point */
         z1 = 0; /* next directional vector */
@@ -144,13 +158,7 @@ unsigned int m_max, unsigned long long *z, unsigned int msb, double *xjlms, unsi
         /* set the rest of the points */
         for(i=n0;i<(n0+n);i++){
             xc ^= z1;
-            xr = xc; 
-            /* flip bits if using LSB ordering*/
-            if(!msb){    
-                u = 0;
-                for(k=0;k<m_max;k++){
-                    u |= ((xr>>k)&1)<<(m_max-1-k);}
-                xr = u;}            
+            xr = xc;     
             /* set point */
             im = i;
             if(!graycode){
@@ -167,9 +175,7 @@ unsigned int m_max, unsigned long long *z, unsigned int msb, double *xjlms, unsi
                 b >>= 1;
                 s += 1;}
             /* get the vector used for the next index */
-            z1 = zcp[s];}}
-    free(sm);
-    free(zcp);
+            z1 = znew[s];}}
     return(0);}
 
 /*
