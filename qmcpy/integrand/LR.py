@@ -27,6 +27,7 @@ class LR(Integrand):
             self.t = t
         else:
             print("for all 't_i', 0 <= t_i <= 1")
+        self.dprime = 1
         
         super(LR, self).__init__()
         

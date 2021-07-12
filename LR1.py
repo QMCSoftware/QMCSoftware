@@ -4,8 +4,11 @@ import numpy
 from numpy.linalg import norm as norm
 from qmcpy import *
 
-s = numpy.array([[0]])
-t = numpy.array([1])
+# s = numpy.array([[0]])
+# t = numpy.array([1])
+
+s = numpy.array([[0, 1],[-1, 2]])
+t = numpy.array([1,0])
 
 no, dim = s.shape
 
