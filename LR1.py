@@ -24,3 +24,4 @@ my_instance = LR(sampler = Sobol(dimension=dim+1, seed = 7), s_matrix = s, t = t
 p = my_instance.discrete_distrib.gen_samples(n_min=0, n_max=1024)
 y = my_instance.f(p)
 print(y.mean())
+# testing a small change
