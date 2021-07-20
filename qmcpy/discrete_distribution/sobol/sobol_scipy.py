@@ -1,9 +1,5 @@
 from .._discrete_distribution import DiscreteDistribution
 from ...util import ParameterError, ParameterWarning
-try:
-    from scipy.stats.qmc import Sobol as SobolScipyOG
-except:
-    raise ParameterError("scipy.stats.qmc.Sobol not found, try updating to scipy>=1.7.0")
 
 class SobolSciPy(DiscreteDistribution):
     """
@@ -55,6 +51,10 @@ class SobolSciPy(DiscreteDistribution):
             randomize (bool): scramble points? 
             seeds (list): int seed of list of seeds, one for each dimension.
         """
+        try:
+            from scipy.stats.qmc import Sobol as SobolScipyOG
+        except:
+            raise ParameterError("scipy.stats.qmc.Sobol not found, try updating to scipy>=1.7.0")
         self.parameters = ['d','randomize','seed','mimics']
         self.seed = seed
         self.d = dimension
