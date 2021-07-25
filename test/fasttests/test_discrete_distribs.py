@@ -1,9 +1,11 @@
 from qmcpy import *
 from qmcpy.util import *
 from qmcpy.util import ParameterError,ParameterWarning
+from qmcpy.discrete_distribution.c_lib import c_lib
 from numpy import *
 import os
 import unittest
+import ctypes
 
 
 class TestIIDStdUniform(unittest.TestCase):
@@ -180,7 +182,11 @@ class TestKorobov(unittest.TestCase):
         self.assertTrue((x==x_true).all())
 
 class TestDataTypes(unittest.TestCase):
+    
     def test_size_unisgned_long(self):
+        get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
+        get_unsigned_long_size_cf.argtypes = []
+        get_unsigned_long_size_cf.restype = ctypes.c_uint8
         distribution = Sobol(dimension=3, randomize=True)
         if os.name == 'nt':
             self.assertEqual(distribution.get_unsigned_long_size_cf(), 4)
@@ -188,6 +194,9 @@ class TestDataTypes(unittest.TestCase):
             self.assertEqual(distribution.get_unsigned_long_size_cf(), 8)
 
     def test_size_unisgned_long_long(self):
+        get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
+        get_unsigned_long_long_size_cf.argtypes = []
+        get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
         distribution = Sobol(dimension=3, randomize=True)
         self.assertEqual(distribution.get_unsigned_long_long_size_cf(), 8)
 
