@@ -35,17 +35,13 @@ class BoxIntegral(Integrand):
         self.s = array(s)
         self.dprime = len(self.s)
         self.true_measure = Uniform(sampler, lower_bound=0., upper_bound=1.)
-        self.g = self._g if self.dprime>1 else self._g1
         super(BoxIntegral,self).__init__() # output dimensions per sample
 
-    def _g(self, t, compute_flags):
+    def g(self, t, **kwargs):
+        compute_flags = kwargs['compute_flags'] if 'compute_flags' in kwargs else ones(self.dprime,dtype=int)
         n,d = t.shape
         Y = zeros((n,self.dprime),dtype=float)
         for j in range(self.dprime):
             if compute_flags[j] == 1: 
                 Y[:,j] = (t**2).sum(1)**(self.s[j]/2)
         return Y
-
-    def _g1(self, t):
-        return self._g(t, compute_flags=[1])
-
