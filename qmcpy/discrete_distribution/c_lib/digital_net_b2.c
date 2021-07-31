@@ -10,6 +10,7 @@ EXPORT int gen_digitalnetb2(
     unsigned int d,             /* dimension supported by generating vector */
     unsigned int graycode,      /* Graycode flag */
     unsigned int m_max,         /* 2^m_max is the maximum number of samples supported */
+    unsigned int t_max,         /* rows of znew, also the number of bits in each int of znew */
     unsigned long long *znew,   /* generating vector with shape d_max x m_max from set_digitalnetb2_randomizations */
     unsigned int set_rshift,    /* random shift flag */
     unsigned long long *rshift, /* length d vector of random digital shifts from set_digitalnetb2_randomizations */
@@ -45,7 +46,7 @@ EXPORT int gen_digitalnetb2(
         return (2);
     }
     /* variables */
-    double scale = ldexp(1, -1 * m_max);
+    double scale = ldexp(1, -1 * t_max);
     unsigned int j, m, k, s;
     unsigned long long i, im, xc, z1, b;
     /* generate points */

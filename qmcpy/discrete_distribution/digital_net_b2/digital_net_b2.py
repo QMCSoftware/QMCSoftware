@@ -83,6 +83,7 @@ class DigitalNetB2(DiscreteDistribution):
         ctypes.c_uint32,  # d
         ctypes.c_uint32, # graycode
         ctypes.c_uint32, # m_max
+        ctypes.c_uint32, # t_max
         ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # znew
         ctypes.c_uint32, # set_rshift
         ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # rshift
@@ -90,7 +91,7 @@ class DigitalNetB2(DiscreteDistribution):
         ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')]  # xr
     dnb2_cf.restype = ctypes.c_uint32
 
-    def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path='sobol_mat.21201.32.32.msb.npy', verbose=False):
+    def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path='sobol_mat.21201.32.32.msb.npy', t_lms=None, verbose=False):
         """
         Args:
             dimension (int): dimension of samples
@@ -102,6 +103,7 @@ class DigitalNetB2(DiscreteDistribution):
             seed (list): int seed of list of seeds, one for each dimension.
             z_path (str): path to generating matrices. 
                 z_path sould be formatted like `gen_mat.21201.32.msb.npy` with name.d_max.m_max.msb_or_lsb.npy
+            t_lms (int): LMS scrambling matrix will be t_max x t for generating matrix of shape t x m
             verbose (bool): print randomization details
         """
         self.parameters = ['d','randomize','graycode','seed','mimics','dim_vec']
@@ -134,7 +136,7 @@ class DigitalNetB2(DiscreteDistribution):
             '''
             raise ParameterError(msg)
         # set parameters
-        if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='No')):
+        if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
             self.set_lms = False
             self.set_rshift = False
         elif isinstance(randomize,bool):
@@ -161,6 +163,7 @@ class DigitalNetB2(DiscreteDistribution):
                     'DS' for just Digital Shift. 
             '''
             raise ParameterError(msg)
+        self.t2_max = t_lms  if t_lms and self.set_lms else self.t_max
         self.randomize = randomize
         self.graycode = graycode
         if isinstance(dimension,list) or isinstance(dimension,ndarray):
@@ -179,7 +182,7 @@ class DigitalNetB2(DiscreteDistribution):
         super(DigitalNetB2,self).__init__()        
 
     def set_digitalnetb2_randomizations(self, dvec, d, set_lms, set_rshift, seeds, 
-        d_max, m_max, t_max, z, msb, print_scramble_mat=False):
+        d_max, m_max, t_max, t2_max, z, msb, print_scramble_mat=False):
         """
         initialize digital net generator in base 2 by
             - flipping least significant bit (lsb) order to most significant bit (msb) order
@@ -194,21 +197,22 @@ class DigitalNetB2(DiscreteDistribution):
             d_max (uint32): max supported dimension 
             m_max (uint32): 2^m_max is the maximum number of samples supported
             t_max (uint32): number of bits in each element of z, the generating vector
-            z (ndarray uint64): original generating vector with shape d_max x m_max
-            msb (bool): msb flag  e.g. 6 is [1 1 0] in msb and [0 1 1] in lsb
+            t2_max (uint32): number of rows in the lms matrix
+            z (ndarray uint64): original generating vector with shape d_max x m_max with each int having t_max bits
+            msb (bool): msb flag  e.g. 6 encodes [1 1 0] in msb and [0 1 1] in lsb
             print_scramble_mat (bool): flag to print the scrambling matrix
         
         Return:
             znew (ndarray uint64): d x m_max generating vector in msb order, possibly with lms applied, for gen_digitalnetb2
             rshift (ndarray uint64): length d vector of random digital shifts for gen_digitalnetb2
+        
+        See: https://bitbucket.org/dnuyens/qmc-generators/src/cb0f2fb10fa9c9f2665e41419097781b611daa1e/cpp/digitalseq_b2g.hpp
         """
         # parameter checks
         if (dvec>d_max).any():
             raise Exception("require (dvec <= d_max).all()")
-        if t_max > 64:
-            raise Exception("require t_max <= 64")
-        if m_max != t_max:
-            raise Exception("higher order digital nets with m_max != t_max are not yet supported")
+        if t_max>64 or t2_max>64 or t_max>t2_max:
+            raise Exception("require t_max <= t2_max <= 64")
         # constants
         randomizer = random.RandomState()
         znew = zeros((d,m_max),dtype=uint64)
@@ -225,24 +229,25 @@ class DigitalNetB2(DiscreteDistribution):
             randomizer.seed(seeds[j])
             if set_lms:
                 if print_scramble_mat: print('\n\ts[dvec[%d]]\n\t\t'%j,end='',flush=True)
-                for t in range(t_max):
-                    u = randomizer.randint(low=0, high=1<<t, size=1, dtype=uint64)
-                    u <<= (t_max-t)
-                    u += 1<<(t_max-t-1)
-                    if print_scramble_mat:
-                        for t1 in range(t_max):
-                            mask = 1<<(t_max-t1-1)
-                            bit = (u&mask)>0
-                            print('%-2d'%bit,end='',flush=True)
-                        print('\n\t\t',end='',flush=True)
+                for t in range(t2_max):
+                    t1 = min(t,t_max-1)
+                    u = randomizer.randint(low=0, high=1<<t1, size=1, dtype=uint64)
+                    u <<= (t_max-t1)
+                    u += 1<<(t_max-t1-1)
                     for m in range(m_max):
                         v = u&zmsb[j,m]
                         s = self._count_set_bits(v)%2
-                        if s: znew[j,m] += 1<<(t_max-t-1)
+                        if s: znew[j,m] += 1<<(t2_max-t-1)
+                    if print_scramble_mat:
+                        for tprint in range(t_max):
+                            mask = 1<<(t_max-tprint-1)
+                            bit = (u&mask)>0
+                            print('%-2d'%bit,end='',flush=True)
+                        print('\n\t\t',end='',flush=True)
             else:
                 znew = zmsb
             if set_rshift:
-                rshift[j] = randomizer.randint(low=0, high=2**m_max, size=1, dtype=uint64)
+                rshift[j] = randomizer.randint(low=0, high=2**t2_max, size=1, dtype=uint64)
         return znew,rshift
 
     def _flip_bits(self, e, t_max):
@@ -290,7 +295,7 @@ class DigitalNetB2(DiscreteDistribution):
         n = int(n_max-n_min)
         x = zeros((n,self.d), dtype=double)
         xr = zeros((n,self.d),dtype=double)
-        rc = self.dnb2_cf(n_min,n,self.d,self.graycode,self.m_max,self.znew,self.set_rshift,self.rshift,x, xr)
+        rc = self.dnb2_cf(n_min,n,self.d,self.graycode,self.m_max,self.t2_max,self.znew,self.set_rshift,self.rshift,x, xr)
         if rc!=0:
             raise ParameterError(self.errors[rc])
         if return_unrandomized:
@@ -315,7 +320,7 @@ class DigitalNetB2(DiscreteDistribution):
             self.seeds = self.rng.choice(1000000, self.d, replace=False).astype(uint64)+1
         self.znew,self.rshift = self.set_digitalnetb2_randomizations(
             self.dvec,self.d,self.set_lms,self.set_rshift,self.seeds,self.d_max,self.m_max,
-            self.t_max,self.z,self.msb,self.verbose) 
+            self.t_max,self.t2_max,self.z,self.msb,self.verbose) 
 
     def _set_dimension(self, dimension, newseed=None):
         """
@@ -333,6 +338,6 @@ class DigitalNetB2(DiscreteDistribution):
         self.seeds = self.rng.choice(1000000, self.d, replace=False).astype(uint64)+1
         self.znew,self.rshift = self.set_digitalnetb2_randomizations(
             self.dvec,self.d,self.set_lms,self.set_rshift,self.seeds,self.d_max,self.m_max,
-            self.t_max,self.z,self.msb,self.verbose)       
+            self.t_max,self.t2_max,self.z,self.msb,self.verbose)       
 
 Sobol = DigitalNetB2
