@@ -88,7 +88,6 @@ class CubQMCCLT(StoppingCriterion):
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
         inflate=1.2, alpha=0.01, replications=16., 
-        combine = lambda indv_sols: indv_sols,
         error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol),
         bound_fun = lambda phvl,phvh: (phvl,phvh,False),
         dependency = lambda flags_comb: flags_comb):
@@ -117,7 +116,6 @@ class CubQMCCLT(StoppingCriterion):
         self.z_star = -norm.ppf(self.alpha / 2)
         self.inflate = float(inflate)
         self.replications = replications
-        self.combine = combine
         self.error_fun = error_fun
         self.bound_fun = bound_fun
         self.dependency = dependency
@@ -150,7 +148,7 @@ class CubQMCCLT(StoppingCriterion):
             rem_error_low = abs(self.data.ci_comb_low-self.data.solution_comb)-error_low
             rem_error_high = abs(self.data.ci_comb_high-self.data.solution_comb)-error_high
             self.data.flags_comb = maximum(rem_error_low,rem_error_high)>=0
-            self.data.flags_comb |= array([self.data.violated])
+            self.data.flags_comb |= self.data.violated
             self.data.flags_indv = self.dependency(self.data.flags_comb)
             if sum(self.data.flags_indv)==0:
                 # sufficiently estimated
