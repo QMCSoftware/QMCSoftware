@@ -144,10 +144,12 @@ class CubQMCCLT(StoppingCriterion):
             self.data.ci_low = self.data.solution_indv-self.data.indv_error_bound
             self.data.ci_high = self.data.solution_indv+self.data.indv_error_bound
             self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.bound_fun(self.data.ci_low,self.data.ci_high)
-            self.data.solution_comb = self.combine(self.data.solution_indv)
-            self.data.flags_comb = maximum(
-                abs(self.data.ci_comb_high-self.data.solution_comb)-self.error_fun(self.data.ci_comb_high,self.abs_tol,self.rel_tol),
-                abs(self.data.ci_comb_low-self.data.solution_comb)-self.error_fun(self.data.ci_comb_low,self.abs_tol,self.rel_tol))>=0
+            error_low = self.error_fun(self.data.ci_comb_low,self.abs_tol,self.rel_tol)
+            error_high = self.error_fun(self.data.ci_comb_high,self.abs_tol,self.rel_tol)
+            self.data.solution_comb = 1/2*(self.data.ci_comb_low+self.data.ci_comb_high+error_low-error_high)
+            rem_error_low = abs(self.data.ci_comb_low-self.data.solution_comb)-error_low
+            rem_error_high = abs(self.data.ci_comb_high-self.data.solution_comb)-error_high
+            self.data.flags_comb = maximum(rem_error_low,rem_error_high)>=0
             self.data.flags_comb |= array([self.data.violated])
             self.data.flags_indv = self.dependency(self.data.flags_comb)
             if sum(self.data.flags_indv)==0:
