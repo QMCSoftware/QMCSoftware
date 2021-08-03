@@ -230,14 +230,14 @@ class DigitalNetB2(DiscreteDistribution):
             if set_lms:
                 if print_scramble_mat: print('\n\ts[dvec[%d]]\n\t\t'%j,end='',flush=True)
                 for t in range(t2_max):
-                    t1 = min(t,t_max-1)
+                    t1 = min(t,t_max)
                     u = randomizer.randint(low=0, high=1<<t1, size=1, dtype=uint64)
                     u <<= (t_max-t1)
-                    u += 1<<(t_max-t1-1)
+                    if t1<t_max: u += 1<<(t_max-t1-1)
                     for m in range(m_max):
                         v = u&zmsb[j,m]
                         s = self._count_set_bits(v)%2
-                        if s: znew[j,m] += 1<<(t2_max-t-1)
+                        if s: znew[j,m] += (1<<(t2_max-t-1))
                     if print_scramble_mat:
                         for tprint in range(t_max):
                             mask = 1<<(t_max-tprint-1)
