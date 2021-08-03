@@ -1,3 +1,4 @@
+from copy import deepcopy
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
@@ -86,7 +87,11 @@ class CubQMCCLT(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
-                 inflate=1.2, alpha=0.01, replications=16.):
+        inflate=1.2, alpha=0.01, replications=16., 
+        combine = lambda indv_sols: indv_sols,
+        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol),
+        bound_fun = lambda phvl,phvh: (phvl,phvh,False),
+        dependency = lambda flags_comb: flags_comb):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -104,14 +109,18 @@ class CubQMCCLT(StoppingCriterion):
             warnings.warn(warning_s, ParameterWarning)
             n_init = 32
         # Set Attributes
-        self.abs_tol = float(abs_tol)
-        self.rel_tol = float(rel_tol)
+        self.abs_tol = abs_tol
+        self.rel_tol = rel_tol
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.alpha = float(alpha)
         self.z_star = -norm.ppf(self.alpha / 2)
         self.inflate = float(inflate)
         self.replications = replications
+        self.combine = combine
+        self.error_fun = error_fun
+        self.bound_fun = bound_fun
+        self.dependency = dependency
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
@@ -131,10 +140,17 @@ class CubQMCCLT(StoppingCriterion):
         t_start = time()
         while True:
             self.data.update_data()
-            self.data.error_bound = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
-            tol_up = maximum(self.abs_tol, abs(self.data.solution) * self.rel_tol)
-            self.data.compute_flags = self.data.error_bound > tol_up
-            if sum(self.data.compute_flags)==0:
+            self.data.indv_error_bound = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
+            self.data.ci_low = self.data.solution_indv-self.data.indv_error_bound
+            self.data.ci_high = self.data.solution_indv+self.data.indv_error_bound
+            self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.bound_fun(self.data.ci_low,self.data.ci_high)
+            self.data.solution_comb = self.combine(self.data.solution_indv)
+            self.data.flags_comb = maximum(
+                abs(self.data.ci_comb_high-self.data.solution_comb)-self.error_fun(self.data.ci_comb_high,self.abs_tol,self.rel_tol),
+                abs(self.data.ci_comb_low-self.data.solution_comb)-self.error_fun(self.data.ci_comb_low,self.abs_tol,self.rel_tol))>=0
+            self.data.flags_comb |= array([self.data.violated])
+            self.data.flags_indv = self.dependency(self.data.flags_comb)
+            if sum(self.data.flags_indv)==0:
                 # sufficiently estimated
                 break
             elif 2 * self.data.n_total > self.n_max:
@@ -149,11 +165,10 @@ class CubQMCCLT(StoppingCriterion):
                 break
             else:
                 # double sample size
-                self.data.nprev = where(self.data.compute_flags,self.data.n,self.data.nprev)
-                self.data.n = where(self.data.compute_flags,2*self.data.n,self.data.n)
-        # CLT confidence interval
-        self.data.confid_int = self.data.solution +  self.data.error_bound * array([[-1.],[1.]])
+                self.data.nprev = where(self.data.flags_indv,self.data.n,self.data.nprev)
+                self.data.n = where(self.data.flags_indv,2*self.data.n,self.data.n)
         self.data.time_integrate = time() - t_start
+        self.data.solution = self.data.solution_comb
         return self.data.solution, self.data
     
     def set_tolerance(self, abs_tol=None, rel_tol=None):
