@@ -95,10 +95,10 @@ class DigitalNetB2(DiscreteDistribution):
         """
         Args:
             dimension (int): dimension of samples
-            randomize (bool): Apply randomization? True defaults to LMS. Can also explicitly pass in
-                'LMS': Linear matrix scramble with DS 
-                'Just LMS': Linear matrix scramble without DS
-                'DS': Just Digital Shift
+            randomize (bool): apply randomization? True defaults to LMS_DS. Can also explicitly pass in
+                'LMS_DS': linear matrix scramble with digital shift
+                'LMS': linear matrix scramble only
+                'DS': digital shift only
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
             z_path (str): path to generating matrices. 
@@ -146,21 +146,21 @@ class DigitalNetB2(DiscreteDistribution):
             else:
                 self.set_lms = False
                 self.set_rshift = False
-        elif randomize.upper() in ["LMS","LINEAR MATRIX SCRAMBLE"]:
+        elif randomize.upper() == 'LMS_DS':
             self.set_lms = True
             self.set_rshift = True
-        elif randomize.upper() in ["JUST LMS","JUST LINEAR MATRIX SCRAMBLE"]:
+        elif randomize.upper() == 'LMS':
             self.set_lms = True
             self.set_rshift = False
-        elif randomize.upper() in ["DS","DIGITAL SHIFT"]:
+        elif randomize.upper() == "DS":
             self.set_lms = False
             self.set_rshift = True
         else:
             msg = '''
                 DigitalNetB2' randomize should be either 
-                    'LMS' for Linear Matrix Scramble (LMS) with Digital Shift (DS) or 
-                    'Just LMS' for LMS without DS or 
-                    'DS' for just Digital Shift. 
+                    "LMS_DS" for linear matrix scramble with digital shift or
+                    'LMS' for linear matrix scramble only or
+                    'DS' for digital shift only. 
             '''
             raise ParameterError(msg)
         self.t2_max = t_lms  if t_lms and self.set_lms else self.t_max
@@ -237,7 +237,7 @@ class DigitalNetB2(DiscreteDistribution):
                     for m in range(m_max):
                         v = u&zmsb[j,m]
                         s = self._count_set_bits(v)%2
-                        if s: znew[j,m] += (1<<(t2_max-t-1))
+                        if s: znew[j,m] += uint64(1<<(t2_max-t-1))
                     if print_scramble_mat:
                         for tprint in range(t_max):
                             mask = 1<<(t_max-tprint-1)
