@@ -23,7 +23,7 @@ class AsianOption(Integrand):
     >>> x = ac.discrete_distrib.gen_samples(2**10)
     >>> y = ac.f(x)
     >>> y.mean()
-    1.769...
+    1.774...
     >>> level_dims = [2,4,8]
     >>> ac2 = AsianOption(Sobol(seed=7),multi_level_dimensions=level_dims)
     >>> ac2

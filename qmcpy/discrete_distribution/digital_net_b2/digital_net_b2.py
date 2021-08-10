@@ -11,26 +11,26 @@ class DigitalNetB2(DiscreteDistribution):
     """
     Quasi-Random digital nets in base 2.
     
-    >>> s = Sobol(2,seed=7)
+    >>> s = DigitalNetB2(2,seed=7)
     >>> s.gen_samples(4)
-    array([[0.4294895 , 0.42617749],
-           [0.88165111, 0.55154761],
-           [0.02512143, 0.96984807],
-           [0.53977577, 0.0954013 ]])
+    array([[0.24423122, 0.31666099],
+           [0.55776053, 0.95317207],
+           [0.26378847, 0.56871143],
+           [0.9523192 , 0.20515005]])
     >>> s.gen_samples(1)
-    array([[0.4294895 , 0.42617749]])
+    array([[0.24423122, 0.31666099]])
     >>> s
-    Sobol (DiscreteDistribution Object)
+    DigitalNetB2 (DiscreteDistribution Object)
         d               2^(1)
-        randomize       1
+        randomize       LMS_DS
         graycode        0
         seed            7
         mimics          StdUniform
-        dim0            0
-    >>> Sobol(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
+        dvec            [0 1]
+    >>> DigitalNetB2(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
     array([[0.75, 0.25],
            [0.25, 0.75]])
-    >>> Sobol(dimension=2,randomize=False,graycode=False).gen_samples(n_min=2,n_max=4)
+    >>> DigitalNetB2(dimension=2,randomize=False,graycode=False).gen_samples(n_min=2,n_max=4)
     array([[0.25, 0.75],
            [0.75, 0.25]])
            
@@ -91,7 +91,7 @@ class DigitalNetB2(DiscreteDistribution):
         ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')]  # xr
     dnb2_cf.restype = ctypes.c_uint32
 
-    def __init__(self, dimension=1, randomize='LMS', graycode=False, seed=None, z_path='sobol_mat.21201.32.32.msb.npy', t_lms=None, verbose=False):
+    def __init__(self, dimension=1, randomize='LMS_DS', graycode=False, seed=None, z_path='sobol_mat.21201.32.32.msb.npy', t_lms=None, verbose=False):
         """
         Args:
             dimension (int): dimension of samples
@@ -106,7 +106,7 @@ class DigitalNetB2(DiscreteDistribution):
             t_lms (int): LMS scrambling matrix will be t_max x t for generating matrix of shape t x m
             verbose (bool): print randomization details
         """
-        self.parameters = ['d','randomize','graycode','seed','mimics','dim_vec']
+        self.parameters = ['d','randomize','graycode','seed','mimics','dvec']
         # set generating matrix
         z_root = dirname(abspath(__file__))+'/generating_matrices/'
         if isfile(z_path):

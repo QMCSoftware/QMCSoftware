@@ -26,7 +26,7 @@ class MLCallOptions(Integrand):
     ...     x = mlco.discrete_distrib.gen_samples(2**10)
     ...     y += mlco.f(x,l=level).mean()
     >>> y
-    10.390...
+    10.391...
 
     References:
 

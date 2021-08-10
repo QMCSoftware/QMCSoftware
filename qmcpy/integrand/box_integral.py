@@ -12,7 +12,7 @@ class BoxIntegral(Integrand):
     >>> y1.shape
     (1024, 1)
     >>> y1.mean(0)
-    array([0.75165595])
+    array([0.75163144])
     >>> l2 = BoxIntegral(Sobol(5,seed=7), s=[-7,7])
     >>> x2 = l2.discrete_distrib.gen_samples(2**10)
     >>> y2 = l2.f(x2,compute_flags=[1,1])

@@ -12,7 +12,7 @@ class CustomFun(Integrand):
     >>> x = cf.discrete_distrib.gen_samples(2**10)
     >>> y = cf.f(x)
     >>> y.mean()
-    3.998...
+    4.001...
     """
 
     def __init__(self, true_measure, g):
