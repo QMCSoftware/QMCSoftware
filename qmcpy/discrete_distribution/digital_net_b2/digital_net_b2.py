@@ -55,6 +55,7 @@ class DigitalNetB2(DiscreteDistribution):
         [4] D. Nuyens, `The Magic Point Shop of QMC point generators and generating
         vectors.` MATLAB and Python software, 2018. Available from
         https://people.cs.kuleuven.be/~dirk.nuyens/
+        https://bitbucket.org/dnuyens/qmc-generators/src/cb0f2fb10fa9c9f2665e41419097781b611daa1e/cpp/digitalseq_b2g.hpp
 
         [5] Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., … Chintala, S. 
         (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. 
@@ -91,7 +92,9 @@ class DigitalNetB2(DiscreteDistribution):
         ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')]  # xr
     dnb2_cf.restype = ctypes.c_uint32
 
-    def __init__(self, dimension=1, randomize='LMS_DS', graycode=False, seed=None, z_path='sobol_mat.21201.32.32.msb.npy', t_lms=None, verbose=False):
+    def __init__(self, dimension=1, randomize='LMS_DS', graycode=False, seed=None, 
+        generating_matrices='sobol_mat.21201.32.32.msb.npy', d_max=None, t_max=None, m_max=None, msb=None, t_lms=None, 
+        _verbose=False):
         """
         Args:
             dimension (int): dimension of samples
@@ -101,41 +104,26 @@ class DigitalNetB2(DiscreteDistribution):
                 'DS': digital shift only
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
-            z_path (str): path to generating matrices. 
-                z_path sould be formatted like `gen_mat.21201.32.msb.npy` with name.d_max.m_max.msb_or_lsb.npy
-            t_lms (int): LMS scrambling matrix will be t_max x t for generating matrix of shape t x m
-            verbose (bool): print randomization details
+            generating_matrices (ndarray or str): generating matricies or path to generating matrices.
+                ndarray should have shape (d_max, m_max) where each int has t_max bits
+                generating_matrices sould be formatted like `gen_mat.21201.32.32.msb.npy` 
+                with name.d_max.t_max.m_max.{msb,lsb}.npy
+            d_max (int): max dimension
+            t_max (int): number of bits in each int of each generating matrix. 
+                aka: number of rows in a generating matrix with ints expanded into columns
+            m_max (int): 2^m_max is the number of samples supported. 
+                aka: number of columns in a generating matrix with ints expanded into columns
+            msb (bool): bit storage as ints. e.g. if t_max=3, then 6 is [1 1 0] in MSB (True) and [0 1 1] in LSB (False)
+            t_lms (int): LMS scrambling matrix will be t_lms x t_max for generating matrix of shape t_max x m_max
+            _verbose (bool): print randomization details
         """
         self.parameters = ['d','randomize','graycode','seed','mimics','dvec']
-        # set generating matrix
-        z_root = dirname(abspath(__file__))+'/generating_matrices/'
-        if isfile(z_path):
-            self.z = load(z_path).astype(uint64)
-        elif isfile(z_root+z_path):
-            self.z = load(z_root+z_path).astype(uint64)
+        if isinstance(dimension,list) or isinstance(dimension,ndarray):
+            self.dvec = array(dimension)
+            self.d = len(self.dvec)
         else:
-            raise ParameterError('z_path `' + z_path + '` not found. ')
-        f = z_path.split('/')[-1]
-        f_lst = f.split('.')
-        self.d_max = int(f_lst[1])
-        self.m_max = int(f_lst[2])
-        self.t_max = int(f_lst[3])
-        msblsb = f_lst[4].lower()
-        if msblsb == 'msb':
-            self.msb = 1
-        elif msblsb == 'lsb':
-            self.msb = 0
-        else:
-            msg = '''
-                z_path sould be formatted like `name.d_max.m_max.t_max.msb_or_lsb.npy`
-                    d_max is the max dimension, 
-                    m_max is such that 2^m_max is the max number of samples supported 
-                    t_max is the number of bits in each int of the generating matrix
-                    msb_or_lsb is how each int encodes the binary vector
-                        e.g. 6 is [1 1 0] in msb and [0 1 1] in lsb
-            '''
-            raise ParameterError(msg)
-        # set parameters
+            self.d = dimension
+            self.dvec = arange(self.d)
         if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
             self.set_lms = False
             self.set_rshift = False
@@ -163,102 +151,98 @@ class DigitalNetB2(DiscreteDistribution):
                     'DS' for digital shift only. 
             '''
             raise ParameterError(msg)
-        self.t2_max = t_lms  if t_lms and self.set_lms else self.t_max
-        self.randomize = randomize
         self.graycode = graycode
+        self.randomize = randomize
         if isinstance(dimension,list) or isinstance(dimension,ndarray):
             self.dvec = array(dimension)
             self.d = len(self.dvec)
         else:
             self.d = dimension
             self.dvec = arange(self.d)
-        self.verbose = verbose
-        self.set_seed(seed) # calls self.set_seed(self.seed)
+        if isinstance(generating_matrices,ndarray):
+            self.z_og = generating_matrices
+            if d_max is None or t_max is None or m_max is None or msb is None:
+                raise ParameterError("d_max, t_max, m_max, and msb must be supplied when generating_matrices is a ndarray")
+            self.d_max = d_max
+            self.t_max = t_max
+            self.m_max = m_max
+            self.msb = msb
+        elif isinstance(generating_matrices,str):
+            root = dirname(abspath(__file__))+'/generating_matrices/'
+            if isfile(root+generating_matrices):
+                self.z_og = load(root+generating_matrices).astype(uint64)
+            elif isfile(generating_matrices):
+                self.z_og = load(generating_matrices).astype(uint64)
+            else:
+                raise ParameterError("generating_matrices '%s' not found."%generating_matrices)
+            parts = generating_matrices.split('.')
+            self.d_max = int(parts[-5])
+            self.t_max = int(parts[-4])
+            self.m_max = int(parts[-3])
+            self.msb = bool(parts[-2].lower()=='msb')
+        else:
+            msg = '''
+                z_path sould be formatted like `name.d_max.m_max.t_max.msb_or_lsb.npy`
+                    d_max is the max dimension, 
+                    m_max is such that 2^m_max is the max number of samples supported 
+                    t_max is the number of bits in each int of the generating matrix
+                    msb_or_lsb is how each int encodes the binary vector
+                        e.g. 6 is [1 1 0] in msb and [0 1 1] in lsb
+            '''
+            raise ParameterError(msg)
+        self.t_lms = t_lms if t_lms and self.set_lms else self.t_max
+        self._verbose = _verbose
         self.errors = {
             1: 'using natural ordering (graycode=0) where n0 and/or (n0+n) is not 0 or a power of 2 is not allowed.',
             2: 'Exceeding max samples (2^%d) or max dimensions (%d).'%(self.m_max,self.d_max)}
-        self.low_discrepancy = True
         self.mimics = 'StdUniform'
-        super(DigitalNetB2,self).__init__()        
-
-    def set_digitalnetb2_randomizations(self, dvec, d, set_lms, set_rshift, seeds, 
-        d_max, m_max, t_max, t2_max, z, msb, print_scramble_mat=False):
-        """
-        initialize digital net generator in base 2 by
-            - flipping least significant bit (lsb) order to most significant bit (msb) order
-            - optionally applying a linear matrix scramble (lms) to the generating vector
-            - optionally creating a vector of random (digital) shifts 
-        Args:
-            dvec (ndarray uint32): length d vector of dimesions
-            d (int): length(dvec) = number of dimensions
-            set_lms (bool): lms flag
-            set_rshift (bool): random shift flag
-            seeds (ndarray uint32): length d vector of seeds, one for each dimension in dvec
-            d_max (uint32): max supported dimension 
-            m_max (uint32): 2^m_max is the maximum number of samples supported
-            t_max (uint32): number of bits in each element of z, the generating vector
-            t2_max (uint32): number of rows in the lms matrix
-            z (ndarray uint64): original generating vector with shape d_max x m_max with each int having t_max bits
-            msb (bool): msb flag  e.g. 6 encodes [1 1 0] in msb and [0 1 1] in lsb
-            print_scramble_mat (bool): flag to print the scrambling matrix
-        
-        Return:
-            znew (ndarray uint64): d x m_max generating vector in msb order, possibly with lms applied, for gen_digitalnetb2
-            rshift (ndarray uint64): length d vector of random digital shifts for gen_digitalnetb2
-        
-        See: https://bitbucket.org/dnuyens/qmc-generators/src/cb0f2fb10fa9c9f2665e41419097781b611daa1e/cpp/digitalseq_b2g.hpp
-        """
-        # parameter checks
-        if (dvec>d_max).any():
+        self.low_discrepancy = True
+        super(DigitalNetB2,self).__init__(seed)
+        if (self.dvec>d_max).any():
             raise Exception("require (dvec <= d_max).all()")
-        if t_max>64 or t2_max>64 or t_max>t2_max:
-            raise Exception("require t_max <= t2_max <= 64")
-        # constants
-        randomizer = random.RandomState()
-        znew = zeros((d,m_max),dtype=uint64)
-        rshift = zeros(d,dtype=uint64)
-        zmsb = z[dvec,:]
-        # flip bits if using lsb (least significant bit first) order
-        if not msb:
-            for j in range(d):
-                for m in range(m_max):
-                    zmsb[j,m] = self._flip_bits(zmsb[j,m],t_max)
+        if t_max>64 or self.t_lms>64 or t_max>self.t_lms:
+            raise Exception("require t_max <= self.t_lms <= 64")
+        self.z = empty((self.d,self.m_max),dtype=uint64)
+        self.rshift = empty(self.d,dtype=uint64)
+        if not msb: # flip bits if using lsb (least significant bit first) order
+            for j in range(self.d):
+                for m in range(self.m_max):
+                    self.z_og[j,m] = self._flip_bits(self.z_og[j,m])
         # set the linear matrix scrambling and random shift
-        if set_lms and print_scramble_mat: print('s (scrambling_matrix)')
-        for j in range(d):
-            randomizer.seed(seeds[j])
-            if set_lms:
-                if print_scramble_mat: print('\n\ts[dvec[%d]]\n\t\t'%j,end='',flush=True)
-                for t in range(t2_max):
-                    t1 = min(t,t_max)
-                    u = randomizer.randint(low=0, high=1<<t1, size=1, dtype=uint64)
-                    u <<= (t_max-t1)
-                    if t1<t_max: u += 1<<(t_max-t1-1)
-                    for m in range(m_max):
-                        v = u&zmsb[j,m]
+        if self.set_lms and self._verbose: print('s (scrambling_matrix)')
+        for j in range(self.d):
+            dvecj = self.dvec[j]
+            if self.set_lms:
+                if self._verbose: print('\n\ts[dvec[%d]]\n\t\t'%j,end='',flush=True)
+                for t in range(self.t_lms):
+                    t1 = min(t,self.t_max)
+                    u = self.rng.integers(low=0, high=1<<t1, size=1, dtype=uint64)
+                    u <<= (self.t_max-t1)
+                    if t1<self.t_max: u += 1<<(self.t_max-t1-1)
+                    for m in range(self.m_max):
+                        v = u&self.z_og[dvecj,m]
                         s = self._count_set_bits(v)%2
-                        if s: znew[j,m] += uint64(1<<(t2_max-t-1))
-                    if print_scramble_mat:
-                        for tprint in range(t_max):
-                            mask = 1<<(t_max-tprint-1)
+                        if s: self.z[j,m] += uint64(1<<(self.t_lms-t-1))
+                    if self._verbose:
+                        for tprint in range(self.t_max):
+                            mask = 1<<(self.t_max-tprint-1)
                             bit = (u&mask)>0
                             print('%-2d'%bit,end='',flush=True)
                         print('\n\t\t',end='',flush=True)
             else:
-                znew = zmsb
-            if set_rshift:
-                rshift[j] = randomizer.randint(low=0, high=2**t2_max, size=1, dtype=uint64)
-        return znew,rshift
+                self.z[j,:] = self.z_og[dvecj,:]
+            if self.set_rshift:
+                self.rshift[j] = self.rng.integers(low=0, high=1<<self.t_lms, size=1, dtype=uint64)
 
-    def _flip_bits(self, e, t_max):
+    def _flip_bits(self, e):
         """
-        flip the int e with t_max bits
+        flip the int e with self.t_max bits
         """
         u = 0
-        for t in range(t_max):
+        for t in range(self.t_max):
             bit = array((1<<t),dtype=uint64)&e
             if bit:
-                u += 1<<(t_max-t-1)
+                u += 1<<(self.t_max-t-1)
         return u
 
     def _count_set_bits(self, e):
@@ -278,8 +262,10 @@ class DigitalNetB2(DiscreteDistribution):
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
-            return_unrandomized (bool): return the LMS matrix without digital shift. 
-                Only applies when randomize='LMS' (the default). 
+            return_unrandomized (bool): return unrandomized samples as well? 
+                If True, return randomized_samples,unrandomized_samples. 
+                Note that this only applies when randomize includes Digital Shift.
+                Also note that unrandomized samples included linear matrix scrambling if applicable.
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples
@@ -289,13 +275,12 @@ class DigitalNetB2(DiscreteDistribution):
             n_max = n
         if n_min == 0 and self.set_rshift==False and warn:
             warnings.warn("Non-randomized DigitalNetB2 sequence includes the origin",ParameterWarning)
-        if return_unrandomized and not (self.set_lms and self.set_rshift):
-            print(self.set_lms,self.set_rshift)
-            raise ParameterError("return_unrandomized=True only applies when randomize=True.")
+        if return_unrandomized and not self.set_rshift:
+            raise ParameterError("return_unrandomized=True only applies when randomize includes a digital shift.")
         n = int(n_max-n_min)
-        x = zeros((n,self.d), dtype=double)
+        x = zeros((n,self.d),dtype=double)
         xr = zeros((n,self.d),dtype=double)
-        rc = self.dnb2_cf(n_min,n,self.d,self.graycode,self.m_max,self.t2_max,self.znew,self.set_rshift,self.rshift,x, xr)
+        rc = self.dnb2_cf(n_min,n,self.d,self.graycode,self.m_max,self.t_lms,self.z,self.set_rshift,self.rshift,x,xr)
         if rc!=0:
             raise ParameterError(self.errors[rc])
         if return_unrandomized:
@@ -307,37 +292,21 @@ class DigitalNetB2(DiscreteDistribution):
     
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[0], dtype=float)
-
-    def set_seed(self, seed=None):
-        if isinstance(seed,list) or isinstance(seed,ndarray):
-            self.seeds = array(seed)
-            seed = seed[0]
-            super(DigitalNetB2,self).set_seed(seed)
-        else:
-            self.seed = seed
-            super(DigitalNetB2,self).set_seed(seed)
-            self.seeds = self.rng.choice(1000000, self.d, replace=False).astype(uint64)+1
-        self.znew,self.rshift = self.set_digitalnetb2_randomizations(
-            self.dvec,self.d,self.set_lms,self.set_rshift,self.seeds,self.d_max,self.m_max,
-            self.t_max,self.t2_max,self.z,self.msb,self.verbose) 
-
-    def _set_dimension(self, dimension, newseed=None):
-        """
-        Reset the dimension
-
-        Args:
-            dimension (int): new dimension
-        """
-        if isinstance(dimension,list) or isinstance(dimension,ndarray):
-            self.dvec = array(dimension)
-            self.d = len(self.dvec)
-        else:
-            self.d = dimension
-            self.dvec = arange(self.d)
-        self.seeds = self.rng.choice(1000000, self.d, replace=False).astype(uint64)+1
-        self.znew,self.rshift = self.set_digitalnetb2_randomizations(
-            self.dvec,self.d,self.set_lms,self.set_rshift,self.seeds,self.d_max,self.m_max,
-            self.t_max,self.t2_max,self.z,self.msb,self.verbose)       
+        return ones(x.shape[0], dtype=float)        
+    
+    def _spawn(self, s, child_seeds, dimensions):
+        return [
+            DigitalNetB2(
+                dimension=dimensions[i],
+                randomize=self.randomize,
+                graycode=self.graycode,
+                seed=child_seeds[i],
+                generating_matrices=self.z_og,
+                d_max=self.d_max,
+                t_max=self.t_max,
+                m_max=self.m_max,
+                msb=True, # self.z_og is put into MSB during first initialization 
+                t_lms=self.t_lms)
+            for i in range(s)]
 
 Sobol = DigitalNetB2

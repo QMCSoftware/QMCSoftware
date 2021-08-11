@@ -56,8 +56,10 @@ class DiscreteDistribution(object):
             dimensions = tile(self.d,s)
         elif isscalar(dimensions) and dimensions%1==0:
             dimensions = tile(dimensions,s)
-        elif len(dimensions)==s and all(isscalar(d) and d%1==0 for d in dimensions):
+        elif len(dimensions)==s:
             dimensions = array(dimensions)
+        else:
+            raise ParameterError("invalid spawn dimensions, must be None, int, or length s ndarray")
         child_seeds = self._base_seed.spawn(s)
         return self._spawn(s,child_seeds,dimensions)
     
