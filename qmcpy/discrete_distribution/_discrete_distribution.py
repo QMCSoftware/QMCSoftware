@@ -5,7 +5,11 @@ from numpy import *
 class DiscreteDistribution(object):
     """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self):
+    def __init__(self, seed):
+        """ 
+        Args:
+            seed (int or numpy.random.SeedSequence): seed to create random number generator
+        """
         prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
@@ -15,6 +19,10 @@ class DiscreteDistribution(object):
             raise ParameterError(prefix + 'self.low_discrepancy')
         if not hasattr(self,'parameters'):
             self.parameters = []
+        self._base_seed = seed if isinstance(seed,random.SeedSequence) else random.SeedSequence(seed)
+        self.entropy = self._base_seed.entropy
+        self.spawn_key = self._base_seed.spawn_key
+        self.rng = random.Generator(random.SFC64(self._base_seed))
 
     def gen_samples(self, *args):
         """
@@ -32,33 +40,43 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
-    def _set_dimension(self, dimension):
+    def spawn(self, s=1, dimensions=None):
         """
-        ABSTRACT METHOD to reset the dimension of the problem.
-
+        Spawn new instances of the current discrete distribution but with new seeds and dimensions. 
+        Developed for multi-level and multi-replication (Q)MC algorithms.
+        
         Args:
-            dimension (int): new dimension to reset to
+            s (int): number of spawn
+            dimensions (ndarray): length s array of dimension for each spawn. Defaults to current dimension
+        
+        Return: 
+            list: list of DiscreteDistribution instances with new seeds and dimensions
         """
-        raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
-
-    def set_seed(self, seed):
+        if dimensions is None:
+            dimensions = tile(self.d,s)
+        elif isscalar(dimensions) and dimensions%1==0:
+            dimensions = tile(dimensions,s)
+        elif len(dimensions)==s and all(isscalar(d) and d%1==0 for d in dimensions):
+            dimensions = array(dimensions)
+        child_seeds = self._base_seed.spawn(s)
+        return self._spawn(s,child_seeds,dimensions)
+    
+    def _spawn(self, s, child_seeds, dimensions):
         """
-        ABSTRACT METHOD to reset the seed of the problem.
-
+        ABSTRACT METHOD, used by self.spawn
+        
         Args:
-            seed (int): new seed for generator
+            s (int): number of spawns
+            child_seeds (numpy.random.SeedSequence): length s array of seeds for each spawn
+            dimensions (ndarray): lenth s array of dimensions for each spawn
+        
+        Return: 
+            list: list of DiscreteDistribution instances with new seeds and dimensions
         """
-        if isscalar(seed):
-            self.seed = seed
-            self.rng = random.RandomState(self.seed)
-        elif seed==None:
-            self.seed = random.RandomState().choice(1000000,1)[0] # get a random seed
-            self.rng = random.RandomState(seed)
-        else:
-            raise ParameterError("set_seed currently only supports integer or None input.") 
-
+        raise MethodImplementationError(self, '_spawn')
+        
     def __repr__(self):
-        return _univ_repr(self, "DiscreteDistribution", self.parameters)
+        return _univ_repr(self, "DiscreteDistribution", self.parameters+['entropy','spawn_key'])
     
     def __call__(self, *args, **kwargs):
         if len(args)>2 or len(args)==0:

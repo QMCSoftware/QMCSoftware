@@ -24,14 +24,13 @@ class IIDStdGaussian(DiscreteDistribution):
         """
         Args:
             dimension (int): dimension of samples
-            seed (int): seed the random number generator for reproducibility
+            seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
         """
-        self.parameters = ['d','seed','mimics']
+        self.parameters = ['d']
         self.d = dimension
-        self.set_seed(seed)
         self.mimics = 'StdGaussian'
         self.low_discrepancy = False
-        super(IIDStdGaussian,self).__init__()
+        super(IIDStdGaussian,self).__init__(seed)
 
     def gen_samples(self, n):
         """
@@ -43,11 +42,12 @@ class IIDStdGaussian(DiscreteDistribution):
         Returns:
             ndarray: n x self.d array of samples
         """
-        return self.rng.randn(int(n), int(self.d))
+        return self.rng.normal(size=(n,self.d))
     
     def pdf(self, x):
         return norm.pdf(x).prod(1)
-    
-    def _set_dimension(self, dimension):
-        self.d = dimension
+
+    def _spawn(self, s, child_seeds, dimensions):
+        return [IIDStdGaussian(dimension=dimensions[i],seed=child_seeds[i]) for i in range(s)]
+        
         

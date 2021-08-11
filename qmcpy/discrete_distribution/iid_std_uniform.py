@@ -23,14 +23,13 @@ class IIDStdUniform(DiscreteDistribution):
         """
         Args:
             dimension (int): dimension of samples
-            seed (int): seed the random number generator for reproducibility
+            seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
         """
-        self.parameters = ['d','seed','mimics']
+        self.parameters = ['d']
         self.d = dimension
-        self.set_seed(seed)
         self.mimics = 'StdUniform'
         self.low_discrepancy = False
-        super(IIDStdUniform,self).__init__()
+        super(IIDStdUniform,self).__init__(seed)
 
     def gen_samples(self, n):
         """
@@ -42,11 +41,11 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             ndarray: n x self.d array of samples
         """
-        return self.rng.rand(int(n), int(self.d))
+        return self.rng.uniform(size=(n,self.d))
     
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
         
-    def _set_dimension(self, dimension):
-        self.d = dimension
+    def _spawn(self, s, child_seeds, dimensions):
+        return [IIDStdUniform(dimension=dimensions[i],seed=child_seeds[i]) for i in range(s)]
         
