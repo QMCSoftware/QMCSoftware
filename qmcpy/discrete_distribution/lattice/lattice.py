@@ -88,12 +88,6 @@ class Lattice(DiscreteDistribution):
             If generating_vectors is an string (path), d_max and m_max can be taken from the file name if None
         """
         self.parameters = ['d','dvec','randomize','order']
-        if isinstance(dimension,list) or isinstance(dimension,ndarray):
-            self.dvec = array(dimension)
-            self.d = len(self.dvec)
-        else:
-            self.d = dimension
-            self.dvec = arange(self.d)
         self.randomize = randomize
         self.order = order.lower()
         if self.order == 'natural':
@@ -123,8 +117,6 @@ class Lattice(DiscreteDistribution):
             self.m_max = int(parts[-2])
         else:
             raise ParameterError("generating_vectors should a ndarray or file path string")
-        if (self.dvec > self.d_max).any():
-            raise ParameterError('Lattice requires dimension <= %d.'%self.d_max)
         self.shift = self.rng.uniform(int(self.d))
         self.z = self.z_og[:self.dvec]
         self.mimics = 'StdUniform'

@@ -5,7 +5,7 @@ from numpy import *
 class DiscreteDistribution(object):
     """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self, seed):
+    def __init__(self, dimension, seed):
         """ 
         Args:
             seed (int or numpy.random.SeedSequence): seed to create random number generator
@@ -13,12 +13,18 @@ class DiscreteDistribution(object):
         prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
-        if not hasattr(self, 'd'):
-            raise ParameterError(prefix + 'self.d')
         if not hasattr(self, 'low_discrepancy'):
             raise ParameterError(prefix + 'self.low_discrepancy')
         if not hasattr(self,'parameters'):
             self.parameters = []
+        if isinstance(dimension,list) or isinstance(dimension,ndarray):
+            self.dvec = array(dimension)
+            self.d = len(self.dvec)
+        else:
+            self.d = dimension
+            self.dvec = arange(self.d)
+        if any(self.dvec>self.d_max):
+            raise ParameterError('dimension greater than max dimension %d'%self.d_max)
         self._base_seed = seed if isinstance(seed,random.SeedSequence) else random.SeedSequence(seed)
         self.entropy = self._base_seed.entropy
         self.spawn_key = self._base_seed.spawn_key

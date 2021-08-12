@@ -17,7 +17,6 @@ References:
 #include <stdlib.h>
 #include <string.h>
 #include "export_ctypes.h"
-#include "MRG63k3a.h"
 
 #define ghaltonMaxDim 360
 
@@ -87,29 +86,29 @@ static int permTN2[ghaltonMaxDim] =
  * @param method int indicating which sequence is generated
  *        (generalized Halton (1) or (plain) Halton (0))
  * @param res pointer to the result matrix
- * @param seed seed for random number generator
+ * @param randu_d_32 seeds for random number generator
+ * @param dvec dimenions to use
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */
-EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, long long seed)
+EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, double *randu_d_32, int *dvec)
 {
     static int perm[ghaltonMaxDim];
     int base, i, j, k, l, maxindex, f, start;
-    double u, U;
+    double u;
     unsigned int tmp;
     unsigned int shcoeff[ghaltonMaxDim][32]; /* the coefficients of the shift */
     unsigned int coeff[32];
-    seed_MRG63k3a(seed);
 
     /* Init */
     for (j = 0; j < d; j++)
     {
-        base = primes[j];
+
+        base = primes[dvec[j]];
         u = 0;
         for (k = 31; k >= 0; k--)
         {
-            U = MRG63k3a(); /* 63 bit U(0,1) random number */
-            shcoeff[j][k] = (int)(base * U);
+            shcoeff[j][k] = (int)(base * randu_d_32[j * 32 + k]);
             u += shcoeff[j][k];
             u /= base;
         }
@@ -131,7 +130,7 @@ EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, long
     {
         for (j = 0; j < d; j++)
         {
-            perm[j] = permTN2[j];
+            perm[j] = permTN2[dvec[j]];
         }
     }
     if (n0 == 0)
@@ -147,7 +146,7 @@ EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, long
         for (j = 0; j < d; j++)
         {
             tmp = i;
-            base = primes[j];                    /* (j+1)st prime number for this dimension */
+            base = primes[dvec[j]];              /* (j+1)st prime number for this dimension */
             memset(&coeff, 0, sizeof(int) * 32); /* clear the coefficients */
 
             /* Find i in the prime base */

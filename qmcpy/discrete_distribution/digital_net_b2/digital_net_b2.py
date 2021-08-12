@@ -118,12 +118,6 @@ class DigitalNetB2(DiscreteDistribution):
             _verbose (bool): print randomization details
         """
         self.parameters = ['d','randomize','graycode','seed','mimics','dvec']
-        if isinstance(dimension,list) or isinstance(dimension,ndarray):
-            self.dvec = array(dimension)
-            self.d = len(self.dvec)
-        else:
-            self.d = dimension
-            self.dvec = arange(self.d)
         if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
             self.set_lms = False
             self.set_rshift = False
