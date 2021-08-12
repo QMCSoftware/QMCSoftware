@@ -1,3 +1,4 @@
+from numpy.core.numeric import isscalar
 from .._discrete_distribution import DiscreteDistribution
 from ...util import ParameterError, ParameterWarning
 
@@ -19,8 +20,9 @@ class SobolSciPy(DiscreteDistribution):
     SobolSciPy (DiscreteDistribution Object)
         d               2^(1)
         randomize       1
-        seed            7
-        mimics          StdUniform
+        graycode        1
+        entropy         7
+        spawn_key       ()
     >>> SobolSciPy(dimension=2,randomize=False).gen_samples(n_min=2,n_max=4)
     array([[0.75, 0.25],
            [0.25, 0.75]])
@@ -30,7 +32,6 @@ class SobolSciPy(DiscreteDistribution):
            [0.5 , 0.5 ],
            [0.75, 0.25],
            [0.25, 0.75]])
-    
     >>> sobolscipy.gen_samples(n_min=4,n_max=8,warn=False) # only uses scipy.stats.qmc.Sobol.random()
     array([[0.375, 0.375],
            [0.875, 0.875],
@@ -55,16 +56,17 @@ class SobolSciPy(DiscreteDistribution):
             from scipy.stats.qmc import Sobol as SobolScipyOG
         except:
             raise ParameterError("scipy.stats.qmc.Sobol not found, try updating to scipy>=1.7.0")
-        self.parameters = ['d','randomize','seed','mimics']
-        self.seed = seed
-        self.d = dimension
+        self.parameters = ['randomize','graycode']
+        if not isscalar(dimension):
+            raise ParameterError("SobolSciPy does not support vectorized dimension indexing")
         self.randomize = randomize
-        self.sobol = SobolScipyOG(self.d,scramble=self.randomize,seed=seed)
         self.graycode = True
-        self.low_discrepancy = True
         self.mimics = 'StdUniform'
+        self.low_discrepancy = True
+        self.d_max = 21201
+        super(SobolSciPy,self).__init__(dimension,seed)        
+        self.sobol = SobolScipyOG(self.d,scramble=self.randomize,seed=self.entropy)
         self.ncurrent = 0
-        super(SobolSciPy,self).__init__()        
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
         """

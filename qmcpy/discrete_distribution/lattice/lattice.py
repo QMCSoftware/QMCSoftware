@@ -11,19 +11,20 @@ class Lattice(DiscreteDistribution):
 
     >>> l = Lattice(2,seed=7)
     >>> l.gen_samples(4)
-    array([[0.07630829, 0.77991879],
-           [0.57630829, 0.27991879],
-           [0.32630829, 0.52991879],
-           [0.82630829, 0.02991879]])
+    array([[0.95613942, 0.95613942],
+           [0.45613942, 0.45613942],
+           [0.20613942, 0.70613942],
+           [0.70613942, 0.20613942]])
     >>> l.gen_samples(1)
-    array([[0.07630829, 0.77991879]])
+    array([[0.95613942, 0.95613942]])
     >>> l
     Lattice (DiscreteDistribution Object)
         d               2^(1)
+        dvec            [0 1]
         randomize       1
         order           natural
-        seed            7
-        mimics          StdUniform
+        entropy         7
+        spawn_key       ()
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
@@ -107,7 +108,7 @@ class Lattice(DiscreteDistribution):
             self.d_max = d_max
             self.m_max = m_max
         elif isinstance(generating_vector,str):
-            root = dirname(abspath(__file__))+'/generating_matrices/'
+            root = dirname(abspath(__file__))+'/generating_vectors/'
             if isfile(root+generating_vector):
                 self.z_og = load(root+generating_vector).astype(uint64)
             elif isfile(generating_vector):
@@ -119,10 +120,10 @@ class Lattice(DiscreteDistribution):
             self.m_max = int(parts[-2])
         else:
             raise ParameterError("generating_vector should a ndarray or file path string")
-        self.z = self.z_og[self.dvec]
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
+        self.z = self.z_og[self.dvec]
         self.shift = self.rng.uniform(int(self.d))
     
     def _mps(self, n_min, n_max):

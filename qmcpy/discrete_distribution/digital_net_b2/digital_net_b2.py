@@ -11,22 +11,22 @@ class DigitalNetB2(DiscreteDistribution):
     """
     Quasi-Random digital nets in base 2.
     
-    >>> s = DigitalNetB2(2,seed=7)
-    >>> s.gen_samples(4)
-    array([[0.24423122, 0.31666099],
-           [0.55776053, 0.95317207],
-           [0.26378847, 0.56871143],
-           [0.9523192 , 0.20515005]])
-    >>> s.gen_samples(1)
-    array([[0.24423122, 0.31666099]])
-    >>> s
+    >>> dnb2 = DigitalNetB2(2,seed=7)
+    >>> dnb2.gen_samples(4)
+    array([[0.56269008, 0.17377997],
+           [0.346653  , 0.65070632],
+           [0.82074548, 0.95490574],
+           [0.10422261, 0.49458097]])
+    >>> dnb2.gen_samples(1)
+    array([[0.56269008, 0.17377997]])
+    >>> dnb2
     DigitalNetB2 (DiscreteDistribution Object)
         d               2^(1)
+        dvec            [0 1]
         randomize       LMS_DS
         graycode        0
-        seed            7
-        mimics          StdUniform
-        dvec            [0 1]
+        entropy         7
+        spawn_key       ()
     >>> DigitalNetB2(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
     array([[0.75, 0.25],
            [0.25, 0.75]])
@@ -188,11 +188,11 @@ class DigitalNetB2(DiscreteDistribution):
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(DigitalNetB2,self).__init__(dimension,seed)
-        if t_max>64 or self.t_lms>64 or t_max>self.t_lms:
-            raise Exception("require t_max <= self.t_lms <= 64")
-        self.z = empty((self.d,self.m_max),dtype=uint64)
-        self.rshift = empty(self.d,dtype=uint64)
-        if not msb: # flip bits if using lsb (least significant bit first) order
+        if self.t_max>64 or self.t_lms>64 or self.t_max>self.t_lms:
+            raise Exception("require t_max <= t_lms <= 64")
+        self.z = zeros((self.d,self.m_max),dtype=uint64)
+        self.rshift = zeros(self.d,dtype=uint64)
+        if not self.msb: # flip bits if using lsb (least significant bit first) order
             for j in range(self.d):
                 for m in range(self.m_max):
                     self.z_og[j,m] = self._flip_bits(self.z_og[j,m])
@@ -297,4 +297,4 @@ class DigitalNetB2(DiscreteDistribution):
                 t_lms=self.t_lms)
             for i in range(s)]
 
-Sobol = DigitalNetB2
+class Sobol(DigitalNetB2): pass

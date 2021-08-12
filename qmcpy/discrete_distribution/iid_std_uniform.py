@@ -8,15 +8,15 @@ class IIDStdUniform(DiscreteDistribution):
 
     >>> dd = IIDStdUniform(dimension=2,seed=7)
     >>> dd.gen_samples(4)
-    array([[0.07630829, 0.77991879],
-           [0.43840923, 0.72346518],
-           [0.97798951, 0.53849587],
-           [0.50112046, 0.07205113]])
+    array([[0.04386058, 0.58727432],
+           [0.3691824 , 0.65212985],
+           [0.69669968, 0.10605352],
+           [0.63025643, 0.13630282]])
     >>> dd
     IIDStdUniform (DiscreteDistribution Object)
         d               2^(1)
-        seed            7
-        mimics          StdUniform
+        entropy         7
+        spawn_key       ()
     """
 
     def __init__(self, dimension=1, seed=None):
