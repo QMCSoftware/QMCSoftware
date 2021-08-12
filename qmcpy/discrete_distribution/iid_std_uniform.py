@@ -25,11 +25,10 @@ class IIDStdUniform(DiscreteDistribution):
             dimension (int): dimension of samples
             seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
         """
-        self.parameters = ['d']
-        self.d = dimension
         self.mimics = 'StdUniform'
         self.low_discrepancy = False
-        super(IIDStdUniform,self).__init__(seed)
+        self.d_max = inf
+        super(IIDStdUniform,self).__init__(dimension,seed)
 
     def gen_samples(self, n):
         """

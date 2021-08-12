@@ -8,6 +8,10 @@ class DiscreteDistribution(object):
     def __init__(self, dimension, seed):
         """ 
         Args:
+            dimension (int or ndarray): dimension of the generator. 
+                If an int is passed in, use sequence dimensions [0,...,dimensions-1].
+                If a ndarray is passed in, use these dimension indices in the sequence. 
+                    Note that this is not relevent for IID generators.
             seed (int or numpy.random.SeedSequence): seed to create random number generator
         """
         prefix = 'A concrete implementation of DiscreteDistribution must have '
@@ -17,6 +21,8 @@ class DiscreteDistribution(object):
             raise ParameterError(prefix + 'self.low_discrepancy')
         if not hasattr(self,'parameters'):
             self.parameters = []
+        if not hasattr(self,'d_max'):
+            raise ParameterError(prefix+ 'self.dmax')
         if isinstance(dimension,list) or isinstance(dimension,ndarray):
             self.dvec = array(dimension)
             self.d = len(self.dvec)
@@ -84,7 +90,7 @@ class DiscreteDistribution(object):
         raise MethodImplementationError(self, '_spawn')
         
     def __repr__(self):
-        return _univ_repr(self, "DiscreteDistribution", self.parameters+['entropy','spawn_key'])
+        return _univ_repr(self, "DiscreteDistribution", ['d']+self.parameters+['entropy','spawn_key'])
     
     def __call__(self, *args, **kwargs):
         if len(args)>2 or len(args)==0:

@@ -68,26 +68,28 @@ class Lattice(DiscreteDistribution):
     """
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None, 
-        generating_vectors='lattice_vec.3600.20.npy', d_max=None, m_max=None):
+        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None):
         """
         Args:
-            dimension (int, ndarray): dimension of samples
+           dimension (int or ndarray): dimension of the generator. 
+                If an int is passed in, use sequence dimensions [0,...,dimensions-1].
+                If a ndarray is passed in, use these dimension indices in the sequence. 
             randomize (bool): If True, apply shift to generated samples. \
                 Note: Non-randomized lattice sequence includes the origin.
             order (str): 'linear', 'natural', or 'mps' ordering.
             seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
-            generating_vectors (ndarray or str): generating matrix or path to generating matricies. 
-                ndarray should have shape (d_max, m_max).  
-                a string generating_vectors should be formatted like 
+            generating_vector (ndarray or str): generating matrix or path to generating matricies. 
+                ndarray should have shape (d_max).  
+                a string generating_vector should be formatted like 
                 'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy' 
             d_max (int): maximum dimension
             m_max (int): 2^m_max is the max number of supported samples
         
         Note:
-            d_max and m_max are required if generating_vectors is a ndarray.
-            If generating_vectors is an string (path), d_max and m_max can be taken from the file name if None
+            d_max and m_max are required if generating_vector is a ndarray.
+            If generating_vector is an string (path), d_max and m_max can be taken from the file name if None
         """
-        self.parameters = ['d','dvec','randomize','order']
+        self.parameters = ['dvec','randomize','order']
         self.randomize = randomize
         self.order = order.lower()
         if self.order == 'natural':
@@ -98,30 +100,30 @@ class Lattice(DiscreteDistribution):
             self.gen = self._mps
         else: 
             raise Exception("Lattice requires natural, linear, or mps ordering.")
-        if isinstance(generating_vectors,ndarray):
-            self.z_og = generating_vectors
+        if isinstance(generating_vector,ndarray):
+            self.z_og = generating_vector
             if d_max is None or m_max is None:
-                raise ParameterError("d_max and m_max must be supplied when generating_vectors is a ndarray")
+                raise ParameterError("d_max and m_max must be supplied when generating_vector is a ndarray")
             self.d_max = d_max
             self.m_max = m_max
-        elif isinstance(generating_vectors,str):
+        elif isinstance(generating_vector,str):
             root = dirname(abspath(__file__))+'/generating_matrices/'
-            if isfile(root+generating_vectors):
-                self.z_og = load(root+generating_vectors).astype(uint64)
-            elif isfile(generating_vectors):
-                self.z_og = load(generating_vectors).astype(uint64)
+            if isfile(root+generating_vector):
+                self.z_og = load(root+generating_vector).astype(uint64)
+            elif isfile(generating_vector):
+                self.z_og = load(generating_vector).astype(uint64)
             else:
-                raise ParameterError("generating_vectors '%s' not found."%generating_vectors)
-            parts = generating_vectors.split('.')
+                raise ParameterError("generating_vector '%s' not found."%generating_vector)
+            parts = generating_vector.split('.')
             self.d_max = int(parts[-3])
             self.m_max = int(parts[-2])
         else:
-            raise ParameterError("generating_vectors should a ndarray or file path string")
-        self.shift = self.rng.uniform(int(self.d))
-        self.z = self.z_og[:self.dvec]
+            raise ParameterError("generating_vector should a ndarray or file path string")
+        self.z = self.z_og[self.dvec]
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
-        super(Lattice,self).__init__(seed)
+        super(Lattice,self).__init__(dimension,seed)
+        self.shift = self.rng.uniform(int(self.d))
     
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
@@ -226,7 +228,7 @@ class Lattice(DiscreteDistribution):
                 randomize=self.randomize,
                 order=self.order,
                 seed=child_seeds[i],
-                generating_vectors=self.z_og,
+                generating_vector=self.z_og,
                 d_max=self.d_max,
                 m_max=self.m_max) 
             for i in range(s)]

@@ -97,7 +97,9 @@ class DigitalNetB2(DiscreteDistribution):
         _verbose=False):
         """
         Args:
-            dimension (int): dimension of samples
+            dimension (int or ndarray): dimension of the generator. 
+                If an int is passed in, use sequence dimensions [0,...,dimensions-1].
+                If a ndarray is passed in, use these dimension indices in the sequence. 
             randomize (bool): apply randomization? True defaults to LMS_DS. Can also explicitly pass in
                 'LMS_DS': linear matrix scramble with digital shift
                 'LMS': linear matrix scramble only
@@ -117,7 +119,7 @@ class DigitalNetB2(DiscreteDistribution):
             t_lms (int): LMS scrambling matrix will be t_lms x t_max for generating matrix of shape t_max x m_max
             _verbose (bool): print randomization details
         """
-        self.parameters = ['d','randomize','graycode','seed','mimics','dvec']
+        self.parameters = ['dvec','randomize','graycode']
         if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
             self.set_lms = False
             self.set_rshift = False
@@ -147,12 +149,6 @@ class DigitalNetB2(DiscreteDistribution):
             raise ParameterError(msg)
         self.graycode = graycode
         self.randomize = randomize
-        if isinstance(dimension,list) or isinstance(dimension,ndarray):
-            self.dvec = array(dimension)
-            self.d = len(self.dvec)
-        else:
-            self.d = dimension
-            self.dvec = arange(self.d)
         if isinstance(generating_matrices,ndarray):
             self.z_og = generating_matrices
             if d_max is None or t_max is None or m_max is None or msb is None:
@@ -191,9 +187,7 @@ class DigitalNetB2(DiscreteDistribution):
             2: 'Exceeding max samples (2^%d) or max dimensions (%d).'%(self.m_max,self.d_max)}
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
-        super(DigitalNetB2,self).__init__(seed)
-        if (self.dvec>d_max).any():
-            raise Exception("require (dvec <= d_max).all()")
+        super(DigitalNetB2,self).__init__(dimension,seed)
         if t_max>64 or self.t_lms>64 or t_max>self.t_lms:
             raise Exception("require t_max <= self.t_lms <= 64")
         self.z = empty((self.d,self.m_max),dtype=uint64)
