@@ -1,4 +1,5 @@
 #include "export_ctypes.h"
+#include <stdlib.h>
 #include <math.h>
 
 EXPORT int get_unsigned_long_size() { return sizeof(unsigned long); }
@@ -14,8 +15,8 @@ EXPORT int gen_digitalnetb2(
     unsigned long long *znew,   /* generating vector with shape d_max x m_max from set_digitalnetb2_randomizations */
     unsigned int set_rshift,    /* random shift flag */
     unsigned long long *rshift, /* length d vector of random digital shifts from set_digitalnetb2_randomizations */
-    double *x,                  /* unrandomized points with shape n x d */
-    double *xr)                 /* randomized points with shape n x d */
+    double *x,                  /* unrandomized points with shape n x d initialized to 0*/
+    double *xr)                 /* randomized points with shape n x d initialized to 0*/
 {
     /*
     Digital Net Generator by alegresor 
@@ -45,66 +46,79 @@ EXPORT int gen_digitalnetb2(
         /* too many samples */
         return (2);
     }
-    /* variables */
     double scale = ldexp(1, -1 * t2_max);
-    unsigned int j, m, k, s;
-    unsigned long long i, im, xc, z1, b;
-    /* generate points */
+    unsigned int j, m, rm1bit;
+    unsigned long long i, i_gc, idx;
+    unsigned long long *xc = (unsigned long long *)calloc(d, sizeof(unsigned long long)); /* binary current point before scaling */
+    /* n0 point */
+    i = n0;
+    i_gc = i ^ (i >> 1);
+    if (graycode)
+    {
+        idx = i;
+    }
+    else
+    {
+        idx = i_gc;
+    }
+    for (m = 0; m < m_max; m++)
+    {
+        if (i_gc == 0)
+        {
+            break;
+        }
+        if (i_gc & 1)
+        {
+            for (j = 0; j < d; j++)
+            {
+                xc[j] = xc[j] ^ znew[j * m_max + m];
+            }
+        }
+        i_gc >>= 1;
+    }
     for (j = 0; j < d; j++)
     {
-        /* set an initial point */
-        xc = 0; /* current point */
-        z1 = 0; /* next directional vector */
-        if (n0 > 0)
+        x[(idx - n0) * d + j] = ((double)xc[j]) * scale;
+        if (set_rshift)
         {
-            im = n0 - 1;
-            b = im;
-            im ^= im >> 1;
-            m = 0;
-            while ((im != 0) && (m < m_max))
-            {
-                if (im & 1)
-                {
-                    xc ^= znew[j * m_max + m];
-                }
-                im >>= 1;
-                m += 1;
-            }
-            s = 0;
-            while (b & 1)
-            {
-                b >>= 1;
-                s += 1;
-            }
-            z1 = znew[j * m_max + m];
-        }
-        /* set the rest of the points */
-        for (i = n0; i < (n0 + n); i++)
-        {
-            xc ^= z1;
-            /* set point */
-            im = i;
-            if (!graycode)
-            {
-                im = i ^ (i >> 1);
-            }
-            x[(im - n0) * d + j] = ((double)xc) * scale;
-            if (set_rshift == 1)
-            {
-                xr[(im - n0) * d + j] = ((double)(xc ^ rshift[j])) * scale;
-            }
-            /* get the index of the rightmost 0 bit in i */
-            b = i;
-            s = 0;
-            while (b & 1)
-            {
-                b >>= 1;
-                s += 1;
-            }
-            /* get the vector used for the next index */
-            z1 = znew[j * m_max + s];
+            xr[(idx - n0) * d + j] = ((double)(xc[j] ^ rshift[j])) * scale;
         }
     }
+    /* n0+1,...,n0+n points */
+    for (i = n0 + 1; i < (n0 + n); i++)
+    {
+        /* rightmost 1 bit of i */
+        rm1bit = 0;
+        for (m = 0; m < m_max; m++)
+        {
+            if ((i >> m) & 1)
+            {
+                break;
+            }
+            rm1bit += 1;
+        }
+        if (graycode)
+        {
+            idx = i;
+        }
+        else
+        {
+            idx = i ^ (i >> 1);
+        }
+        for (j = 0; j < d; j++)
+        {
+            xc[j] = xc[j] ^ znew[j * m_max + rm1bit];
+        }
+        for (j = 0; j < d; j++)
+        {
+            x[(idx - n0) * d + j] = ((double)xc[j]) * scale;
+            if (set_rshift)
+            {
+                xr[(idx - n0) * d + j] = ((double)(xc[j] ^ rshift[j])) * scale;
+            }
+        }
+    }
+    free(xc);
     return (0);
 }
 

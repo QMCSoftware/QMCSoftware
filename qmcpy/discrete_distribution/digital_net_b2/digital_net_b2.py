@@ -195,7 +195,7 @@ class DigitalNetB2(DiscreteDistribution):
         if not self.msb: # flip bits if using lsb (least significant bit first) order
             for j in range(self.d):
                 for m in range(self.m_max):
-                    self.z_og[j,m] = self._flip_bits(self.z_og[j,m])
+                    self.z_og[self.dvec[j],m] = self._flip_bits(self.z_og[self.dvec[j],m])
         # set the linear matrix scrambling and random shift
         if self.set_lms and self._verbose: print('s (scrambling_matrix)')
         for j in range(self.d):

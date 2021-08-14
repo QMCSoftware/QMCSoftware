@@ -1,67 +1,75 @@
 from qmcpy import *
 from qmcpy.util import *
-from qmcpy.util import ParameterError,ParameterWarning
 from qmcpy.discrete_distribution.c_lib import c_lib
-from numpy import *
 import os
 import unittest
 import ctypes
+from numpy import *
 
 
-class TestIIDStdUniform(unittest.TestCase):
-    """ Unit tests for IIDStdUniform DiscreteDistribution. """
+class TestDiscreteDistribution(unittest.TestCase):
 
-    def test_mimics(self):
-        distribution = IIDStdUniform(dimension=3)
-        self.assertEqual(distribution.mimics, "StdUniform")
+    def test_size_unisgned_long(self):
+        get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
+        get_unsigned_long_size_cf.argtypes = []
+        get_unsigned_long_size_cf.restype = ctypes.c_uint8
+        if os.name == 'nt':
+            self.assertEqual(get_unsigned_long_size_cf(),4)
+        else:
+            self.assertEqual(get_unsigned_long_size_cf(),8)
 
-    def test_gen_samples(self):
-        distribution = IIDStdUniform(dimension=3)
-        samples = distribution.gen_samples(n=5)
-        self.assertEqual(type(samples), ndarray)
-        self.assertEqual(samples.shape, (5,3))
-    
-    def test_set_dimension(self):
-        distribution = IIDStdUniform(dimension=2)
-        distribution._set_dimension(3)
-        samples = distribution.gen_samples(4)
-        self.assertTrue(samples.shape==(4,3))
-
-
-class TestIIDStdGaussian(unittest.TestCase):
-    """ Unit tests for IIDStdGaussian DiscreteDistribution. """
-
-    def test_mimics(self):
-        distribution = IIDStdGaussian(dimension=3)
-        self.assertEqual(distribution.mimics, "StdGaussian")
+    def test_size_unisgned_long_long(self):
+        get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
+        get_unsigned_long_long_size_cf.argtypes = []
+        get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
+        self.assertEqual(get_unsigned_long_long_size_cf(),8)
 
     def test_gen_samples(self):
-        distribution = IIDStdGaussian(dimension=3)
-        samples = distribution.gen_samples(n=5)
-        self.assertEqual(type(samples), ndarray)
-        self.assertEqual(samples.shape, (5,3))
-    
-    def test_set_dimension(self):
-        distribution = IIDStdGaussian(dimension=2)
-        distribution._set_dimension(3)
-        samples = distribution.gen_samples(4)
-        self.assertTrue(samples.shape==(4,3))
-        
+        for d in [3,[1,3,5]]:
+            dds = [IIDStdUniform(d),IIDStdGaussian(d),Lattice(d),DigitalNetB2(d)]
+            for dd in dds:
+                x = dd.gen_samples(4)
+                if dd.mimics=='StdUniform':
+                    self.assertTrue((x>0).all() and (x<1).all())
+                self.assertTrue(x.shape==(4,3))
+                self.assertTrue(x.dtype==float64)
+    def test_spawn(self):
+        d = 3
+        for dd in [IIDStdUniform(d),IIDStdGaussian(d),Lattice(d),DigitalNetB2(d)]:
+            s = 3
+            for spawn_dim in [4,[1,4,6]]:
+                spawns = dd.spawn(s=s,dimensions=spawn_dim)
+                self.assertTrue(len(spawns)==s)
+                self.assertTrue(all(type(spawn)==type(dd) for spawn in spawns))
+                self.assertTrue((array([spawn.d for spawn in spawns])==spawn_dim).all())
+
         
 class TestLattice(unittest.TestCase):
     """ Unit tests for Lattice DiscreteDistribution. """
 
-    def test_mimics(self):
-        distribution = Lattice(dimension=3, randomize=True)
-        self.assertEqual(distribution.mimics, "StdUniform")
-
     def test_gen_samples(self):
-        for backend in ['MPS','GAIL']:
-            distribution = Lattice(dimension=3, randomize=True)
-            samples = distribution.gen_samples(n_min=4, n_max=8)
-            self.assertEqual(type(samples), ndarray)
-            self.assertEqual(samples.shape, (4,3))
+        for order in ['natural','mps']: # ['natural','mps','linear']
+            lattice0123 = Lattice(dimension=4,order=order,randomize=False)
+            x0123 = lattice0123.gen_samples(8)
+            lattice13 = Lattice(dimension=[1,3],order=order,randomize=False)
+            x13 = lattice13.gen_samples(n_min=5,n_max=7)
+            self.assertTrue((x0123[5:7,[1,3]]==x13).all())
+        # special case linear order. combine into above loop when non-power-of-2 indexing is supported
+        lattice0123 = Lattice(dimension=4,order='linear',randomize=False)
+        x0123 = lattice0123.gen_samples(8)
+        lattice13 = Lattice(dimension=[1,3],order='linear',randomize=False)
+        x13 = lattice13.gen_samples(n_min=4,n_max=8)
+        self.assertTrue((x0123[4:8,[1,3]]==x13).all())
 
+    def test_linear_order(self):
+        distribution = Lattice(dimension=4, randomize=False, order='linear')
+        true_sample = array([
+            [1./8,   3./8,    3./8,    1./8],
+            [3./8,   1./8,    1./8,    3./8],
+            [5./8,   7./8,    7./8,    5./8],
+            [7./8,   5./8,    5./8,    7./8]])
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
+    
     def test_gail_order(self):
         distribution = Lattice(dimension=4, randomize=False, order='natural')
         true_sample = array([
@@ -80,41 +88,29 @@ class TestLattice(unittest.TestCase):
             [7./8,   5./8,    5./8,    7./8]])
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
 
-    def test_linear_order(self):
-        distribution = Lattice(dimension=4, randomize=False, order='mps')
-        true_sample = array([
-            [1./8,   3./8,    3./8,    1./8],
-            [3./8,   1./8,    1./8,    3./8],
-            [5./8,   7./8,    7./8,    5./8],
-            [7./8,   5./8,    5./8,    7./8]])
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
-    
-    def test_set_dimension(self):
-        distribution = Lattice(dimension=2)
-        distribution._set_dimension(3)
-        samples = distribution.gen_samples(4)
-        self.assertTrue(samples.shape==(4,3))
 
-
-class TestSobol(unittest.TestCase):
-    """ Unit tests for Sobol DiscreteDistribution. """
+class TestDigitalNetB2(unittest.TestCase):
+    """ Unit tests for DigitalNetB2 DiscreteDistribution. """
 
     def test_mimics(self):
         distribution = Sobol(dimension=3, randomize=True)
         self.assertEqual(distribution.mimics, "StdUniform")
 
-    def test_gen_samples_and_set_dimension(self):
-        dd = Sobol(dimension=2, randomize=True, graycode=True)
-        samples = dd.gen_samples(n_min=4, n_max=8)
-        self.assertEqual(type(samples), ndarray)
-        self.assertEqual(samples.shape, (4,2))
-        dd._set_dimension(3)
-        samples = dd.gen_samples(4)
-        self.assertTrue(samples.shape==(4,3))
+    def test_gen_samples(self):
+        dn123 = DigitalNetB2(dimension=4,graycode=False,randomize=False)
+        x0123 = dn123.gen_samples(8)
+        dn13 = DigitalNetB2(dimension=[1,3],graycode=False,randomize=False)
+        x13 = dn13.gen_samples(n_min=4,n_max=8)
+        self.assertTrue((x0123[4:8,[1,3]]==x13).all())
+        dn123 = DigitalNetB2(dimension=4,graycode=True,randomize=False)
+        x0123 = dn123.gen_samples(8)
+        dn13 = DigitalNetB2(dimension=[1,3],graycode=True,randomize=False)
+        x13 = dn13.gen_samples(n_min=5,n_max=7)
+        self.assertTrue((x0123[5:7,[1,3]]==x13).all())
     
-    def test_qrng_graycode_ordering(self):
-        s = Sobol(2,randomize=False,graycode=True)
-        x = s.gen_samples(n_min=4,n_max=8)
+    def test_graycode_ordering(self):
+        dnb2 = DigitalNetB2(2,randomize=False,graycode=True)
+        x = dnb2.gen_samples(n_min=4,n_max=8)
         x_true = array([
             [ 0.375,  0.375],
             [ 0.875,  0.875],
@@ -122,9 +118,9 @@ class TestSobol(unittest.TestCase):
             [ 0.125,  0.625]])
         self.assertTrue((x==x_true).all())
 
-    def test_qrng_natural_ordering(self):
-        s = Sobol(2,randomize=False,graycode=False)
-        x = s.gen_samples(n_min=4,n_max=8)
+    def test_natural_ordering(self):
+        dnb2 = DigitalNetB2(2,randomize=False,graycode=False)
+        x = dnb2.gen_samples(n_min=4,n_max=8)
         x_true = array([
             [ 0.125,  0.625],
             [ 0.625,  0.125],
@@ -132,22 +128,18 @@ class TestSobol(unittest.TestCase):
             [ 0.875,  0.875]])
         self.assertTrue((x==x_true).all())
     
+
 class TestHalton(unittest.TestCase):
     """ Unit test for Halton DiscreteDistribution. """
-
-    def test_mimics(self):
-        distribution = Halton(dimension=3, generalize=True, seed=7)
-        self.assertEqual(distribution.mimics, "StdUniform")
     
     def test_gen_samples(self):
-        for randomize in ['QRNG','OWEN']:
-            distribution = Halton(dimension=2, randomize=randomize, generalize=True)
-            x = distribution.gen_samples(8)
-            self.assertTrue(x.shape==(8,2))
-            distribution._set_dimension(3)
-            x2 = distribution.gen_samples(n_min=4,n_max=8)
-            self.assertTrue(x2.shape==(4,3))
-            self.assertTrue((x[4:,:]==x2[:,:2]).all())
+        h123 = Halton(dimension=4,randomize=False)
+        x0123 = h123.gen_samples(8)
+        h13 = Halton(dimension=[1,3],randomize=False)
+        x13 = h13.gen_samples(n_min=5,n_max=7)
+        self.assertTrue((x0123[5:7,[1,3]]==x13).all())
+    
+    def test_unrandomized(self):
         x_ur = Halton(dimension=2, randomize=False).gen_samples(4)
         x_true = array([
             [0,     0],
@@ -156,49 +148,6 @@ class TestHalton(unittest.TestCase):
             [3./4,  1./9]])
         self.assertTrue((x_ur==x_true).all())
     
-    def test_warnings_errors(self):
-        self.assertRaises(ParameterError,Halton,2,randomize='Owen',generalize=False)
-        self.assertRaises(ParameterError,Halton,400,randomize='QRNG')
-
-class TestKorobov(unittest.TestCase):
-    """ Unit test for Korobov DiscreteDistribution. """
-
-    def test_mimics(self):
-        distribution = Korobov(dimension=3, generator=[1], randomize=True, seed=None)
-        self.assertEqual(distribution.mimics, "StdUniform")
-    
-    def test_gen_samples(self):
-        distribution = Korobov(dimension=3,generator=[1,2,3],randomize=False,seed=7)
-        x = distribution.gen_samples(4,warn=False)
-        self.assertTrue(x.shape==(4,3))
-        self.assertRaises(ParameterError,distribution.gen_samples,3)
-        distribution = Korobov(dimension=2,generator=[1,3],randomize=False,seed=7)
-        x = distribution.gen_samples(4,warn=False)
-        x_true = array([
-            [0,     0],
-            [1./4,  3./4],
-            [1./2,  1./2],
-            [3./4,  1./4]])
-        self.assertTrue((x==x_true).all())
-
-class TestDataTypes(unittest.TestCase):
-    
-    def test_size_unisgned_long(self):
-        get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
-        get_unsigned_long_size_cf.argtypes = []
-        get_unsigned_long_size_cf.restype = ctypes.c_uint8
-        distribution = Sobol(dimension=3, randomize=True)
-        if os.name == 'nt':
-            self.assertEqual(distribution.get_unsigned_long_size_cf(), 4)
-        else:
-            self.assertEqual(distribution.get_unsigned_long_size_cf(), 8)
-
-    def test_size_unisgned_long_long(self):
-        get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
-        get_unsigned_long_long_size_cf.argtypes = []
-        get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
-        distribution = Sobol(dimension=3, randomize=True)
-        self.assertEqual(distribution.get_unsigned_long_long_size_cf(), 8)
 
 if __name__ == "__main__":
     unittest.main()

@@ -139,6 +139,8 @@ class Lattice(DiscreteDistribution):
 
     def _gail_linear(self, n_min, n_max):
         """ Gail lattice generator in linear order. """
+        if (n_min!=0 and log2(n_min)%1!=0) or log2(n_max)%1!=0:
+            raise Exception("Lattice with linear ordering currently does not support n_min, n_max not powers of 2.")
         nelem = n_max - n_min
         if n_min == 0:
             y = arange(0, 1, 1 / nelem).reshape((nelem, 1))

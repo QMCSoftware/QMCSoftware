@@ -47,7 +47,7 @@ packages = [
     'qmcpy.accumulate_data',
     'qmcpy.util',
     'qmcpy.integrand',
-    'qmcpy.discrete_distribution.halton',
+    'qmcpy.discrete_distribution',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
     'qmcpy.discrete_distribution.digital_net_b2']
