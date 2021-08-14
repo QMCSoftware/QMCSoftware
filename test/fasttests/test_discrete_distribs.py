@@ -86,7 +86,12 @@ class TestLattice(unittest.TestCase):
             [5./8,   7./8,    7./8,    5./8],
             [7./8,   5./8,    5./8,    7./8]])
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
-    
+
+    def test_linear_order_not_power_of_2(self):
+        l = Lattice(dimension=3, order='linear')
+        x = l.gen_samples(n_min=2, n_max=5)
+        assert x.shape == (4, 3)
+
     def test_set_dimension(self):
         distribution = Lattice(dimension=2)
         distribution._set_dimension(3)
