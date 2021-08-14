@@ -26,16 +26,32 @@ class TestDiscreteDistribution(unittest.TestCase):
 
     def test_gen_samples(self):
         for d in [3,[1,3,5]]:
-            dds = [IIDStdUniform(d),IIDStdGaussian(d),Lattice(d),DigitalNetB2(d)]
+            dds = [
+                IIDStdUniform(d),
+                IIDStdGaussian(d),
+                Lattice(d,order='natural'),
+                Lattice(d,order='mps'),
+                Lattice(d,order='linear'),
+                Lattice(d,generating_vector='lattice_vec_lnb.750.24.npy'),
+                DigitalNetB2(d,randomize='LMS_DS',graycode=False),
+                DigitalNetB2(d,randomize='DS'),
+                DigitalNetB2(d,graycode=True),
+                DigitalNetB2(d,generating_matrices='niederreiter_mat.1377.52.52.lsb.npy'),
+                Halton(d,randomize='QRNG',generalize=True),
+                Halton(d,randomize='QRNG',generalize=False),
+                Halton(d,randomize='Owen',generalize=False),
+            ]
             for dd in dds:
-                x = dd.gen_samples(4)
-                if dd.mimics=='StdUniform':
-                    self.assertTrue((x>0).all() and (x<1).all())
-                self.assertTrue(x.shape==(4,3))
-                self.assertTrue(x.dtype==float64)
+                dd_plus_spawn = [dd]+dd.spawn(1)
+                for _dd in [dd]+dd.spawn(1):
+                    x = _dd.gen_samples(4)
+                    if _dd.mimics=='StdUniform':
+                        self.assertTrue((x>0).all() and (x<1).all())
+                    self.assertTrue(x.shape==(4,3))
+                    self.assertTrue(x.dtype==float64)
     def test_spawn(self):
         d = 3
-        for dd in [IIDStdUniform(d),IIDStdGaussian(d),Lattice(d),DigitalNetB2(d)]:
+        for dd in [IIDStdUniform(d),IIDStdGaussian(d),Lattice(d),DigitalNetB2(d),Halton(d)]:
             s = 3
             for spawn_dim in [4,[1,4,6]]:
                 spawns = dd.spawn(s=s,dimensions=spawn_dim)
@@ -54,12 +70,6 @@ class TestLattice(unittest.TestCase):
             lattice13 = Lattice(dimension=[1,3],order=order,randomize=False)
             x13 = lattice13.gen_samples(n_min=5,n_max=7)
             self.assertTrue((x0123[5:7,[1,3]]==x13).all())
-        # special case linear order. combine into above loop when non-power-of-2 indexing is supported
-        lattice0123 = Lattice(dimension=4,order='linear',randomize=False)
-        x0123 = lattice0123.gen_samples(8)
-        lattice13 = Lattice(dimension=[1,3],order='linear',randomize=False)
-        x13 = lattice13.gen_samples(n_min=4,n_max=8)
-        self.assertTrue((x0123[4:8,[1,3]]==x13).all())
 
     def test_linear_order(self):
         distribution = Lattice(dimension=4, randomize=False, order='linear')

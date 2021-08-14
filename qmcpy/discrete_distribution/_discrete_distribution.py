@@ -22,7 +22,7 @@ class DiscreteDistribution(object):
         if not hasattr(self,'parameters'):
             self.parameters = []
         if not hasattr(self,'d_max'):
-            raise ParameterError(prefix+ 'self.dmax')
+            raise ParameterError(prefix+ 'self.d_max')
         if isinstance(dimension,list) or isinstance(dimension,ndarray):
             self.dvec = array(dimension)
             self.d = len(self.dvec)
