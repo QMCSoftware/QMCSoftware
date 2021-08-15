@@ -224,14 +224,12 @@ class Lattice(DiscreteDistribution):
         """ pdf of a standard uniform """
         return ones(x.shape[0], dtype=float)
     
-    def _spawn(self, s, child_seeds, dimensions):
-        return [
-            Lattice(
-                dimension=dimensions[i],
+    def _spawn(self, child_seed, dimension):
+        return Lattice(
+                dimension=dimension,
                 randomize=self.randomize,
                 order=self.order,
-                seed=child_seeds[i],
+                seed=child_seed,
                 generating_vector=self.z_og,
                 d_max=self.d_max,
-                m_max=self.m_max) 
-            for i in range(s)]
+                m_max=self.m_max)

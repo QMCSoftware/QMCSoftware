@@ -17,7 +17,7 @@ class DiscreteDistribution(object):
         prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
             raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
-        if not hasattr(self, 'low_discrepancy'):
+        if not hasattr(self,'low_discrepancy'):
             raise ParameterError(prefix + 'self.low_discrepancy')
         if not hasattr(self,'parameters'):
             self.parameters = []
@@ -64,25 +64,24 @@ class DiscreteDistribution(object):
         Return: 
             list: list of DiscreteDistribution instances with new seeds and dimensions
         """
-        if dimensions is None:
-            dimensions = tile(self.d,s)
+        if (isinstance(dimensions,list) or isinstance(dimensions,ndarray)) and len(dimensions)==s:
+            dimensions = array(dimensions)
         elif isscalar(dimensions) and dimensions%1==0:
             dimensions = tile(dimensions,s)
-        elif len(dimensions)==s:
-            dimensions = array(dimensions)
+        elif dimensions is None:
+            dimensions = tile(self.d,s)
         else:
             raise ParameterError("invalid spawn dimensions, must be None, int, or length s ndarray")
         child_seeds = self._base_seed.spawn(s)
-        return self._spawn(s,child_seeds,dimensions)
+        return [self._spawn(i,child_seeds[i],dimensions[i]) for i in range(s)]
     
-    def _spawn(self, s, child_seeds, dimensions):
+    def _spawn(self, child_seed, dimension):
         """
         ABSTRACT METHOD, used by self.spawn
         
         Args:
-            s (int): number of spawns
             child_seeds (numpy.random.SeedSequence): length s array of seeds for each spawn
-            dimensions (ndarray): lenth s array of dimensions for each spawn
+            dimension (int): lenth s array of dimensions for each spawn
         
         Return: 
             list: list of DiscreteDistribution instances with new seeds and dimensions

@@ -6,7 +6,7 @@ from numpy import *
 class TrueMeasure(object):
     """ True Measure abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self):
+    def __init__(self, sampler):
         prefix = 'A concrete implementation of TrueMeasure must have '
         if not hasattr(self,'domain'):
             raise ParameterError(prefix + 'self.domain, 2xd ndarray of domain lower bounds (first col) and upper bounds (second col)')
@@ -14,6 +14,28 @@ class TrueMeasure(object):
             raise ParameterError(prefix + 'self.range, 2xd ndarray of range lower bounds (first col) and upper bounds (second col)')
         if not hasattr(self,'parameters'):
             self.parameters = []
+        if isinstance(sampler,DiscreteDistribution):
+            self.transform = self # this is the initial transformation, \Psi_0
+            self.d = sampler.d # take the dimension from the discrete distribution
+            self.discrete_distrib = sampler
+            if sampler.mimics == 'StdUniform':
+                if not (self.domain==tile([0,1],(self.d,1))).all():
+                    raise ParameterError("The True measure's transform should have unit-cube domain.")
+            elif sampler.mimics == 'StdGaussian':
+                if not (self.domain==tile([-inf,inf],(self.d,1))).all():
+                    raise ParameterError("The True measure's transform should have R^d domain, [-inf,inf]^d.")
+            else:
+                raise ParameterError('The %s true measure does not support discrete distributions that mimic a %s.'%\
+                    (type(self).__name__,sampler.mimics))
+        elif isinstance(sampler,TrueMeasure):
+            self.transform = sampler # this is a composed transform, \Psi_j for j>0
+            self.parameters += ['transform']
+            self.d = sampler.d # take the dimension from the sub-sampler (composed transform)
+            self.discrete_distrib = self.transform.discrete_distrib
+            if self.transform.transform!=self.transform and (self.transform.domain!=self.transform.transform.range).any():
+                raise ParameterError("This true measures domain must match the sub-sampling true-measures range.")
+        else:
+            raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure")
     
     def gen_samples(self, *args, **kwargs):
         """
@@ -86,32 +108,56 @@ class TrueMeasure(object):
         
         Returns:
             ndarray: length n vector of Jacobian values at locations of x
-        """ 
+        """
         raise MethodImplementationError(self,'jacobian. Try setting sampler to be in a PDF TrueMeasure to importance sample by.')
 
-    def _set_dimension(self, dimension):
+    def spawn(self, s=1, dimensions=None):
         """
-        ABSTRACT METHOD to reset the dimension for this true measure. 
-
+        Spawn new instances of the current discrete distribution but with new seeds and dimensions. 
+        Developed for multi-level and multi-replication (Q)MC algorithms.
+        
         Args:
-            dimension (int): new dimension to reset to 
+            s (int): number of spawn
+            dimensions (ndarray): length s array of dimension for each spawn. Defaults to current dimension
+        
+        Return: 
+            list: list of DiscreteDistribution instances with new seeds and dimensions
         """
-        raise DimensionError("Cannot reset dimension of %s object"%str(type(self).__name__))
+        if (isinstance(dimensions,list) or isinstance(dimensions,ndarray)) and len(dimensions)==s:
+            dimensions = array(dimensions)
+        elif isscalar(dimensions) and dimensions%1==0:
+            dimensions = tile(dimensions,s)
+        elif dimensions is None:
+            dimensions = tile(self.d,s)
+        else:
+            raise ParameterError("invalid spawn dimensions, must be None, int, or length s ndarray")
+        spawns = [None*s]
+        samplers = [None]*s
+        for i in range(s):
+            d_i = dimensions[i]
+            if self.transform==self: # no further transform compositions --> spawn from discrete distribution
+                samplers[i] = self.discrete_distrib.spawn(s=1,dimensions=[d_i])[0]
+            else: # has composed transform --> spawn from composed true measure
+                samplers[i] = self.transform.spawn(s=1,dimensions=[d_i])[0] # recursion
+            spawns[i] = self._spawn(samplers[i],d_i)
+        return spawns
     
-    def _set_dimension_r(self, dimension):
+    def _spawn(self, sampler, dimension):
         """
-        Completely reset the dimension. 
-        Takes into account composed transforms. 
+        ABSTRACT METHOD, used by self.spawn
+        
+        Args:
+            sampler (DiscreteDistribution or TrueMeasure): spawn of sampler for this measure
+            dimension (ndarray): dimension of new spawn
+        
+        Return: 
+            list: list of DiscreteDistribution instances with new seeds and dimensions
         """
-        self._set_dimension(dimension)
-        if self.transform == self: # is \Psi_0
-            self.discrete_distrib._set_dimension(dimension)
-        else: # is \Psi_j for some j>0
-            self.transform._set_dimension_r(dimension)
+        raise MethodImplementationError(self, '_spawn')
     
     def _weight(self, x):
         """
-        Non-negative weight function, \lambda. 
+        Non-negative weight function, lambda. 
         This is often a PDF, but is not required to be 
         i.e. Lebesgue weight is always 1, but is not a PDF.
 
@@ -121,39 +167,7 @@ class TrueMeasure(object):
         Returns:
             ndarray: length n vector of weights at locations of x
         """ 
-        raise MethodImplementationError(self,'weight. Try a different true measure with a weight method.')
-
-    def _parse_sampler(self, sampler):
-        """
-        Parse the sampler input to any TrueMeasure instance.
-
-        Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform. 
-        """
-        if isinstance(sampler,DiscreteDistribution):
-            self.transform = self # this is the initial transformation, \Psi_0
-            self.d = sampler.d # take the dimension from the discrete distribution
-            self.discrete_distrib = sampler
-            if sampler.mimics == 'StdUniform':
-                if not (self.domain==tile([0,1],(self.d,1))).all():
-                    raise ParameterError("The True measure's transform should have unit-cube domain.")
-            elif sampler.mimics == 'StdGaussian':
-                if not (self.domain==tile([-inf,inf],(self.d,1))).all():
-                    raise ParameterError("The True measure's transform should have R^d domain, [-inf,inf]^d.")
-            else:
-                raise ParameterError('The %s true measure does not support discrete distributions that mimic a %s.'%\
-                    (type(self).__name__,sampler.mimics))
-        elif isinstance(sampler,TrueMeasure):
-            self.transform = sampler # this is a composed transform, \Psi_j for j>0
-            self.parameters += ['transform']
-            self.d = sampler.d # take the dimension from the sub-sampler (composed transform)
-            self.discrete_distrib = self.transform.discrete_distrib
-            if self.transform.transform!=self.transform and (self.transform.domain!=self.transform.transform.range).any():
-                raise ParameterError("This true measures domain must match the sub-sampling true-measures range.")
-        else:
-            raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure")
+        raise MethodImplementationError(self,'weight. Try a different true measure with a weight method.')    
         
     def __repr__(self):
         return _univ_repr(self, "TrueMeasure", self.parameters)

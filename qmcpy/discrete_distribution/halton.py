@@ -158,7 +158,7 @@ class Halton(DiscreteDistribution):
             n_min = 0
             n_max = n
         if n_max > self.n_lim:
-            raise ParameterWarning("Halton requires n_max <= 2^32.")
+            raise ParameterError("Halton requires n_max <= 2^32.")
         n = int(n_max-n_min)
         if n_min == 0 and self.randomize is False and warn:
             warnings.warn("Unradnzomied Halton includes the orgin as the first point.")
@@ -172,11 +172,9 @@ class Halton(DiscreteDistribution):
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
 
-    def _spawn(self, s, child_seeds, dimensions):
-        return [
-            Halton(
-                dimension=dimensions[i],
-                generalize=self.generalize,
-                randomize=self.randomize,
-                seed=child_seeds[i])
-            for i in range(s)]
+    def _spawn(self, child_seed, dimension):
+        return Halton(
+            dimension=dimension,
+            generalize=self.generalize,
+            randomize=self.randomize,
+            seed=child_seed)

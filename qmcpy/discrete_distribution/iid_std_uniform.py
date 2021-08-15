@@ -45,6 +45,6 @@ class IIDStdUniform(DiscreteDistribution):
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
         
-    def _spawn(self, s, child_seeds, dimensions):
-        return [IIDStdUniform(dimension=dimensions[i],seed=child_seeds[i]) for i in range(s)]
+    def _spawn(self, child_seed, dimension):
+        return IIDStdUniform(dimension=dimension,seed=child_seed)
         

@@ -46,7 +46,7 @@ class IIDStdGaussian(DiscreteDistribution):
     def pdf(self, x):
         return norm.pdf(x).prod(1)
 
-    def _spawn(self, s, child_seeds, dimensions):
-        return [IIDStdGaussian(dimension=dimensions[i],seed=child_seeds[i]) for i in range(s)]
+    def _spawn(self, child_seed, dimension):
+        return IIDStdGaussian(dimension=dimension,seed=child_seed)
         
         

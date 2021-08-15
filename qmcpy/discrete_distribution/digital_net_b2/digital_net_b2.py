@@ -282,19 +282,17 @@ class DigitalNetB2(DiscreteDistribution):
         """ pdf of a standard uniform """
         return ones(x.shape[0], dtype=float)        
     
-    def _spawn(self, s, child_seeds, dimensions):
-        return [
-            DigitalNetB2(
-                dimension=dimensions[i],
-                randomize=self.randomize,
-                graycode=self.graycode,
-                seed=child_seeds[i],
-                generating_matrices=self.z_og,
-                d_max=self.d_max,
-                t_max=self.t_max,
-                m_max=self.m_max,
-                msb=True, # self.z_og is put into MSB during first initialization 
-                t_lms=self.t_lms)
-            for i in range(s)]
+    def _spawn(self, child_seed, dimension):
+        return DigitalNetB2(
+            dimension=dimension,
+            randomize=self.randomize,
+            graycode=self.graycode,
+            seed=child_seed,
+            generating_matrices=self.z_og,
+            d_max=self.d_max,
+            t_max=self.t_max,
+            m_max=self.m_max,
+            msb=True, # self.z_og is put into MSB during first initialization 
+            t_lms=self.t_lms)
 
 class Sobol(DigitalNetB2): pass

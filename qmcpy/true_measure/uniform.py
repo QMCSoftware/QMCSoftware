@@ -1,13 +1,13 @@
 from ._true_measure import TrueMeasure
 from ..util import TransformError, DimensionError
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from numpy import *
 from scipy.stats import norm
 
 
 class Uniform(TrueMeasure):
     """
-    >>> u = Uniform(Sobol(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
+    >>> u = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
     >>> u.gen_samples(4)
     array([[0.858979  , 1.56544372],
            [1.76330223, 1.87886903],
