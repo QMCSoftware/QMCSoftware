@@ -14,7 +14,7 @@ class Lebesgue(TrueMeasure):
         transform       Gaussian (TrueMeasure Object)
                            mean            0
                            covariance      1
-                           decomp_type     pca
+                           decomp_type     PCA
     >>> Lebesgue(Uniform(Sobol(2,seed=7)))
     Lebesgue (TrueMeasure Object)
         transform       Uniform (TrueMeasure Object)
@@ -38,5 +38,5 @@ class Lebesgue(TrueMeasure):
     def _weight(self, x):
         return ones(x.shape[0],dtype=float)
 
-    def _set_dimension(self, dimension):
-        self.d = dimension
+    def _spawn(self, sampler, dimension):
+        return Lebesgue(sampler)

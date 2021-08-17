@@ -6,7 +6,7 @@ from numpy import *
 class TrueMeasure(object):
     """ True Measure abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self, sampler):
+    def __init__(self):
         prefix = 'A concrete implementation of TrueMeasure must have '
         if not hasattr(self,'domain'):
             raise ParameterError(prefix + 'self.domain, 2xd ndarray of domain lower bounds (first col) and upper bounds (second col)')
@@ -14,6 +14,8 @@ class TrueMeasure(object):
             raise ParameterError(prefix + 'self.range, 2xd ndarray of range lower bounds (first col) and upper bounds (second col)')
         if not hasattr(self,'parameters'):
             self.parameters = []
+    
+    def _parse_sampler(self, sampler):
         if isinstance(sampler,DiscreteDistribution):
             self.transform = self # this is the initial transformation, \Psi_0
             self.d = sampler.d # take the dimension from the discrete distribution
@@ -111,6 +113,20 @@ class TrueMeasure(object):
         """
         raise MethodImplementationError(self,'jacobian. Try setting sampler to be in a PDF TrueMeasure to importance sample by.')
 
+    def _weight(self, x):
+        """
+        Non-negative weight function, lambda. 
+        This is often a PDF, but is not required to be 
+        i.e. Lebesgue weight is always 1, but is not a PDF.
+
+        Args:
+            x (ndarray): n x d  matrix of samples
+        
+        Returns:
+            ndarray: length n vector of weights at locations of x
+        """ 
+        raise MethodImplementationError(self,'weight. Try a different true measure with a weight method.')  
+    
     def spawn(self, s=1, dimensions=None):
         """
         Spawn new instances of the current discrete distribution but with new seeds and dimensions. 
@@ -131,15 +147,12 @@ class TrueMeasure(object):
             dimensions = tile(self.d,s)
         else:
             raise ParameterError("invalid spawn dimensions, must be None, int, or length s ndarray")
-        spawns = [None*s]
-        samplers = [None]*s
+        spawns = [None]*s
+        sampler_spawns = [None]*s
         for i in range(s):
-            d_i = dimensions[i]
-            if self.transform==self: # no further transform compositions --> spawn from discrete distribution
-                samplers[i] = self.discrete_distrib.spawn(s=1,dimensions=[d_i])[0]
-            else: # has composed transform --> spawn from composed true measure
-                samplers[i] = self.transform.spawn(s=1,dimensions=[d_i])[0] # recursion
-            spawns[i] = self._spawn(samplers[i],d_i)
+            sampler = self.discrete_distrib if self.transform==self else self.transform
+            sampler_spawns[i] = sampler.spawn(s=1,dimensions=[dimensions[i]])[0]
+            spawns[i] = self._spawn(sampler_spawns[i],dimensions[i])
         return spawns
     
     def _spawn(self, sampler, dimension):
@@ -153,21 +166,7 @@ class TrueMeasure(object):
         Return: 
             list: list of DiscreteDistribution instances with new seeds and dimensions
         """
-        raise MethodImplementationError(self, '_spawn')
-    
-    def _weight(self, x):
-        """
-        Non-negative weight function, lambda. 
-        This is often a PDF, but is not required to be 
-        i.e. Lebesgue weight is always 1, but is not a PDF.
-
-        Args:
-            x (ndarray): n x d  matrix of samples
-        
-        Returns:
-            ndarray: length n vector of weights at locations of x
-        """ 
-        raise MethodImplementationError(self,'weight. Try a different true measure with a weight method.')    
+        raise MethodImplementationError(self, '_spawn')  
         
     def __repr__(self):
         return _univ_repr(self, "TrueMeasure", self.parameters)

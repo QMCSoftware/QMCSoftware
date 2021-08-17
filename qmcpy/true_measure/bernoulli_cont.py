@@ -1,13 +1,25 @@
-from qmcpy.true_measure._true_measure import TrueMeasure
-from qmcpy.util import DimensionError
-from ..discrete_distribution import Sobol
+from ._true_measure import TrueMeasure
+from ..util import DimensionError, ParameterError
+from ..discrete_distribution import DigitalNetB2
 from numpy import *
 
 
 class BernoulliCont(TrueMeasure):
-    """ See https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution """
+    """    
+    >>> bc = BernoulliCont(DigitalNetB2(2,seed=7),lam=.2)
+    >>> bc.gen_samples(4)
+    array([[0.39545122, 0.10073414],
+           [0.21719142, 0.48293404],
+           [0.68958314, 0.90847415],
+           [0.05871131, 0.33436033]])
+    >>> bc
+    BernoulliCont (TrueMeasure Object)
+        lam             0.200
+    
+    See https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution
+    """
 
-    def __init__(self, sampler, lam=1/2, b=2):
+    def __init__(self, sampler, lam=1/2):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
@@ -47,10 +59,18 @@ class BernoulliCont(TrueMeasure):
         return prod(w,1)
     
     def _set_dimension(self, dimension):
-        l0 = self.l[0]
-        if (self.l!=l0).any():
-            raise DimensionError('''
-                In order to change dimension of a Continuous Bernoulli measure
-                lam must all be the same.''')
+        
         self.d = dimension
         self.l = tile(l0,self.d)
+    
+    def _spawn(self, sampler, dimension):
+        if dimension==self.d: # don't do anything if the dimension doesn't change
+            spawn = BernoulliCont(sampler,lam=self.lam)
+        else:
+            l0 = self.l[0]
+            if (self.l!=l0).any():
+                raise DimensionError('''
+                        In order to spawn a BernoulliCont measure
+                        lam must all be the same.''')
+            spawn = BernoulliCont(sampler,lam=l0)
+        return spawn

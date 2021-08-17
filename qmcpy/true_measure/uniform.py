@@ -1,3 +1,4 @@
+from numpy.core.defchararray import lower, upper
 from ._true_measure import TrueMeasure
 from ..util import TransformError, DimensionError
 from ..discrete_distribution import DigitalNetB2
@@ -9,10 +10,10 @@ class Uniform(TrueMeasure):
     """
     >>> u = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
     >>> u.gen_samples(4)
-    array([[0.858979  , 1.56544372],
-           [1.76330223, 1.87886903],
-           [0.05024285, 2.92462018],
-           [1.07955154, 0.73850326]])
+    array([[1.12538017, 0.93444992],
+           [0.693306  , 2.12676579],
+           [1.64149095, 2.88726434],
+           [0.20844522, 1.73645241]])
     >>> u
     Uniform (TrueMeasure Object)
         lower_bound     [0.  0.5]
@@ -43,7 +44,7 @@ class Uniform(TrueMeasure):
             raise DimensionError('upper bound and lower bound must be of length dimension')
         self._set_constants()
         self.range = hstack((self.a,self.b))
-        super(Uniform,self).__init__() 
+        super(Uniform,self).__init__()
 
     def _set_constants(self):
         self.delta = self.b - self.a
@@ -59,16 +60,17 @@ class Uniform(TrueMeasure):
     def _weight(self, x):
         return tile(self.inv_delta_prod,x.shape[0])
     
-    def _set_dimension(self, dimension):
-        l = self.a[0]
-        u = self.b[0]
-        if not (all(self.a==l) and all(self.b==u)):
-            raise DimensionError('''
-                In order to change dimension of uniform measure
-                the lower bounds must all be the same and 
-                the upper bounds must all be the same''')
-        self.d = dimension
-        self.a = tile(l,self.d)
-        self.b = tile(u,self.d)
-        self._set_constants()
+    def _spawn(self, sampler, dimension):
+        if dimension==self.d: # don't do anything if the dimension doesn't change
+            spawn = Uniform(sampler,lower_bound=self.a,upper_bound=self.b)
+        else:
+            l = self.a[0]
+            u = self.b[0]
+            if not (all(self.a==l) and all(self.b==u)):
+                raise DimensionError('''
+                    In order to spawn a uniform measure
+                    the lower bounds must all be the same and 
+                    the upper bounds must all be the same''')
+            spawn = Uniform(sampler,lower_bound=l,upper_bound=u)
+        return spawn
     

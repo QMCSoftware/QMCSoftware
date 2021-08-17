@@ -1,11 +1,24 @@
-from qmcpy.true_measure._true_measure import TrueMeasure
-from qmcpy.util import DimensionError
-from ..discrete_distribution import Sobol
+from ._true_measure import TrueMeasure
+from ..util import DimensionError, ParameterError
+from ..discrete_distribution import DigitalNetB2
 from numpy import *
 
 
 class Kumaraswamy(TrueMeasure):
-    """ See https://en.wikipedia.org/wiki/Kumaraswamy_distribution """
+    """
+    >>> k = Kumaraswamy(DigitalNetB2(2,seed=7),a=[1,2],b=[3,4])
+    >>> k.gen_samples(4)
+    array([[0.24096272, 0.21587652],
+           [0.13227662, 0.4808615 ],
+           [0.43615893, 0.73428949],
+           [0.03602294, 0.39602319]])
+    >>> k
+    Kumaraswamy (TrueMeasure Object)
+        a               [1 2]
+        b               [3 4]
+        
+    See https://en.wikipedia.org/wiki/Kumaraswamy_distribution
+    """
 
     def __init__(self, sampler, a=2, b=2):
         """
@@ -30,6 +43,8 @@ class Kumaraswamy(TrueMeasure):
         self.beta = array(b)
         if len(self.alpha)!=self.d or len(self.beta)!=self.d:
             raise DimensionError('a and b must be scalar or have length equal to dimension.')
+        if not (all(self.alpha>0) and all(self.beta>0)):
+            raise ParameterError("Kumaraswamy requires a,b>0.")
         super(Kumaraswamy,self).__init__() 
 
     def _transform(self, x):
@@ -41,14 +56,16 @@ class Kumaraswamy(TrueMeasure):
     def _weight(self, x):
         return prod( self.alpha*self.beta*x**(self.alpha-1)*(1-x**self.alpha)**(self.beta-1), 1)
     
-    def _set_dimension(self, dimension):
-        a = self.alpha[0]
-        b = self.beta[0]
-        if not (all(self.alpha==a) and all(self.beta==b)):
-            raise DimensionError('''
-                In order to change dimension of a Kumaraswamy measure
-                a must all be the same and 
-                b must all be the same''')
-        self.d = dimension
-        self.alpha = tile(a,self.d)
-        self.beta = tile(b,self.d)
+    def _spawn(self, sampler, dimension):
+        if dimension==self.d: # don't do anything if the dimension doesn't change
+            spawn = Kumaraswamy(sampler,a=self.alpha,b=self.beta)
+        else:
+            a = self.alpha[0]
+            b = self.beta[0]
+            if not (all(self.alpha==a) and all(self.beta==b)):
+                raise DimensionError('''
+                    In order to spawn a Kumaraswamy measure
+                    a must all be the same and 
+                    b must all be the same''')
+            spawn = Kumaraswamy(sampler,a=self.alpha,b=self.beta)
+        return spawn
