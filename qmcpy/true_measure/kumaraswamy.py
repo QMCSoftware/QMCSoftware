@@ -26,8 +26,8 @@ class Kumaraswamy(TrueMeasure):
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
-            a (ndarray): a 
-            b (ndarray): b
+            a (ndarray): alpha > 0
+            b (ndarray): beta > 0
         """
         self.parameters = ['a', 'b']
         self.domain = array([[0,1]])
@@ -67,5 +67,5 @@ class Kumaraswamy(TrueMeasure):
                     In order to spawn a Kumaraswamy measure
                     a must all be the same and 
                     b must all be the same''')
-            spawn = Kumaraswamy(sampler,a=self.alpha,b=self.beta)
+            spawn = Kumaraswamy(sampler,a=a,b=b)
         return spawn

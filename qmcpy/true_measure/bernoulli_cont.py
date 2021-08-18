@@ -25,7 +25,7 @@ class BernoulliCont(TrueMeasure):
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
-            lam (ndarray): lambda, a shape parameter, independent for each dimension 
+            lam (ndarray): 0 < lambda < 1, a shape parameter, independent for each dimension 
         """
         self.parameters = ['lam']
         self.domain = array([[0,1]])

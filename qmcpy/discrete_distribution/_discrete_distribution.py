@@ -73,7 +73,7 @@ class DiscreteDistribution(object):
         else:
             raise ParameterError("invalid spawn dimensions, must be None, int, or length s ndarray")
         child_seeds = self._base_seed.spawn(s)
-        return [self._spawn(i,child_seeds[i],dimensions[i]) for i in range(s)]
+        return [self._spawn(child_seeds[i],dimensions[i]) for i in range(s)]
     
     def _spawn(self, child_seed, dimension):
         """

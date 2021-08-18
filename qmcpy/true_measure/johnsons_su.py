@@ -31,8 +31,8 @@ class JohnsonsSU(TrueMeasure):
                 true measure by which to compose a transform 
             gamma (ndarray): gamma
             xi (ndarray): xi
-            delta (ndarray): delta
-            lam (ndarray): lambda
+            delta (ndarray): delta > 0
+            lam (ndarray): lambda > 0
         """
         self.parameters = ['gamma', 'xi', 'delta', 'lam']
         self.domain = array([[0,1]])
@@ -88,5 +88,5 @@ class JohnsonsSU(TrueMeasure):
                     xi must all be the same and 
                     delta must all be the same and 
                     lam (lambda) must all be the same.''')
-            spwan = JohnsonsSU(sampler,gamma=gamma,xi=xi,delta=delta,lam=lam)
+            spawn = JohnsonsSU(sampler,gamma=gamma,xi=xi,delta=delta,lam=lam)
         return spawn

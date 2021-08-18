@@ -24,7 +24,7 @@ class TestDiscreteDistribution(unittest.TestCase):
         get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
         self.assertEqual(get_unsigned_long_long_size_cf(),8)
 
-    def test_gen_samples(self):
+    def test_abstract_methods(self):
         for d in [3,[1,3,5]]:
             dds = [
                 IIDStdUniform(d),
@@ -42,13 +42,16 @@ class TestDiscreteDistribution(unittest.TestCase):
                 Halton(d,randomize='Owen',generalize=False),
             ]
             for dd in dds:
-                dd_plus_spawn = [dd]+dd.spawn(1)
                 for _dd in [dd]+dd.spawn(1):
                     x = _dd.gen_samples(4)
                     if _dd.mimics=='StdUniform':
                         self.assertTrue((x>0).all() and (x<1).all())
+                    pdf = _dd.pdf(_dd.gen_samples(4))
+                    self.assertTrue(pdf.shape==(4,))
                     self.assertTrue(x.shape==(4,3))
                     self.assertTrue(x.dtype==float64)
+                    s = str(_dd)
+    
     def test_spawn(self):
         d = 3
         for dd in [IIDStdUniform(d),IIDStdGaussian(d),Lattice(d),DigitalNetB2(d),Halton(d)]:
@@ -66,7 +69,7 @@ class TestLattice(unittest.TestCase):
     def test_gen_samples(self):
         for order in ['natural','mps']: # ['natural','mps','linear']
             lattice0123 = Lattice(dimension=4,order=order,randomize=False)
-            x0123 = lattice0123.gen_samples(8)
+            x0123 = lattice0123.gen_samples(8,warn=False)
             lattice13 = Lattice(dimension=[1,3],order=order,randomize=False)
             x13 = lattice13.gen_samples(n_min=5,n_max=7)
             self.assertTrue((x0123[5:7,[1,3]]==x13).all())
@@ -78,7 +81,7 @@ class TestLattice(unittest.TestCase):
             [3./8,   1./8,    1./8,    3./8],
             [5./8,   7./8,    7./8,    5./8],
             [7./8,   5./8,    5./8,    7./8]])
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
     
     def test_gail_order(self):
         distribution = Lattice(dimension=4, randomize=False, order='natural')
@@ -144,13 +147,13 @@ class TestHalton(unittest.TestCase):
     
     def test_gen_samples(self):
         h123 = Halton(dimension=4,randomize=False)
-        x0123 = h123.gen_samples(8)
+        x0123 = h123.gen_samples(8,warn=False)
         h13 = Halton(dimension=[1,3],randomize=False)
-        x13 = h13.gen_samples(n_min=5,n_max=7)
+        x13 = h13.gen_samples(n_min=5,n_max=7,warn=False)
         self.assertTrue((x0123[5:7,[1,3]]==x13).all())
     
     def test_unrandomized(self):
-        x_ur = Halton(dimension=2, randomize=False).gen_samples(4)
+        x_ur = Halton(dimension=2, randomize=False).gen_samples(4,warn=False)
         x_true = array([
             [0,     0],
             [1./2,  1./3],
