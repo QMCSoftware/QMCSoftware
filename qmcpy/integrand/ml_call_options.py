@@ -1,5 +1,5 @@
 from ._integrand import Integrand
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian
 from ..util import ParameterError
 from numpy import *
@@ -10,7 +10,7 @@ class MLCallOptions(Integrand):
     """
     Various call options from finance using Milstein discretization with $2^l$ timesteps on level $l$.
 
-    >>> mlco = MLCallOptions(Sobol(seed=7))
+    >>> mlco = MLCallOptions(DigitalNetB2(seed=7))
     >>> mlco
     MLCallOptions (Integrand Object)
         option          european
@@ -21,10 +21,10 @@ class MLCallOptions(Integrand):
         b               85
     >>> y = 0
     >>> for level in range(4):
-    ...     new_dim = mlco._dim_at_level(level)
-    ...     mlco.true_measure._set_dimension_r(new_dim)
-    ...     x = mlco.discrete_distrib.gen_samples(2**10)
-    ...     y += mlco.f(x,l=level).mean()
+    ...     new_dim = mlco._dimension_at_level(level)
+    ...     new_tm = mlco.true_measure.spawn(1,dimensions=new_dim)[0]
+    ...     x = new_tm.discrete_distrib.gen_samples(2**10)
+    ...     y += mlco.f(x,level=level).mean()
     >>> y
     10.391...
 
@@ -182,7 +182,7 @@ class MLCallOptions(Integrand):
         pc = maximum(0,ac-self.k)
         return pf,pc
 
-    def g(self, t, l):
+    def g(self, t, level):
         """
         Args:
             t (ndarray): Gaussian(0,1^2) samples
@@ -193,16 +193,16 @@ class MLCallOptions(Integrand):
                 Second, a float of cost on this level.
         """
         n,d = t.shape
-        nf = 2**l # n fine
+        nf = 2**level # n fine
         nc = float(nf)/2 # n coarse
         hf = self.t/nf # timestep fine
         hc = self.t/nc # timestep coarse
         xf = tile(self.k,int(n))
         xc = xf
-        pf,pc = self.g_submodule(t, l, n, d, nf, nc, hf, hc, xf, xc)
+        pf,pc = self.g_submodule(t, level, n, d, nf, nc, hf, hc, xf, xc)
         dp = exp(-self.r*self.t)*(pf-pc)
         pf = exp(-self.r*self.t)*pf
-        if l == 0:
+        if level == 0:
             dp = pf
         sums = zeros(6)
         sums[0] = dp.sum()
@@ -216,9 +216,9 @@ class MLCallOptions(Integrand):
         self.sums = sums
         return dp
 
-    def _dim_at_level(self, l):
+    def _dimension_at_level(self, level):
         """ See abstract method. """
         if self.option == 'european':
-            return 2**l
+            return 2**level
         elif self.option == 'asian':
-            return 2**(l+1)
+            return 2**(level+1)

@@ -1,6 +1,6 @@
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
 from numpy import *
 from scipy.stats import norm 
@@ -10,7 +10,7 @@ class EuropeanOption(Integrand):
     """
     European financial option. 
 
-    >>> eo = EuropeanOption(Sobol(4,seed=7),call_put='put')
+    >>> eo = EuropeanOption(DigitalNetB2(4,seed=7),call_put='put')
     >>> eo
     EuropeanOption (Integrand Object)
         volatility      2^(-1)
@@ -21,12 +21,14 @@ class EuropeanOption(Integrand):
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.210...
-    >>> eo = EuropeanOption(BrownianMotion(Sobol(4,seed=7),drift=1),call_put='put')
+    9.209...
+    >>> eo = EuropeanOption(BrownianMotion(DigitalNetB2(4,seed=7),drift=1),call_put='put')
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.164...
+    9.162...
+    >>> eo.get_exact_value()
+    9.211452976234058
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35,

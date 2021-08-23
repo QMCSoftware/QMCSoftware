@@ -1,18 +1,18 @@
 from ._integrand import Integrand
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
 
 
 class Linear0(Integrand):
     """
-    >>> l = Linear0(Sobol(100,seed=7))
+    >>> l = Linear0(DigitalNetB2(100,seed=7))
     >>> x = l.discrete_distrib.gen_samples(2**10)
     >>> y = l.f(x)
     >>> y.mean()
-    -1.350...e-08
-    >>> ytf = l.f_periodized(x,'C1SIN')
+    -1.175...e-08
+    >>> ytf = l.f(x,periodization_transform='C1SIN')
     >>> ytf.mean()
-    9.037...e-12
+    -4.050...e-12
     """
 
     def __init__(self, sampler):

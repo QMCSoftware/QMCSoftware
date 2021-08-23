@@ -137,7 +137,7 @@ class TrueMeasure(object):
             dimensions (ndarray): length s array of dimension for each spawn. Defaults to current dimension
         
         Return: 
-            list: list of DiscreteDistribution instances with new seeds and dimensions
+            list: list of TrueMeasures linked to newly spawned DiscreteDistributions
         """
         if (isinstance(dimensions,list) or isinstance(dimensions,ndarray)) and len(dimensions)==s:
             dimensions = array(dimensions)

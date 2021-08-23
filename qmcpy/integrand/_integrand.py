@@ -34,87 +34,81 @@ class Integrand(object):
         """
         raise MethodImplementationError(self, 'g')
     
-    def f(self, x, *args, **kwargs):
+    def f(self, x, periodization_transform='NONE', parallel_cores=0, *args, **kwargs):
         """
         Evalute transformed integrand based on true measures and discrete distribution 
         
         Args:
             x (ndarray): n x d array of samples from a discrete distribution
+            ptransform (str): periodization transform. 
+            parallel_cores (int): number of compute cores to use in
             *args: other ordered args to g
             **kwargs (dict): other keyword args to g
             
         Return: 
             ndarray: length n vector of funciton evaluations
         """
+        periodization_transform = periodization_transform.upper()
         n,d = x.shape
+        # parameter checks
+        if parallel_cores!=0:
+            raise ParameterError("QMCPy parallel multicore computation is not yet supproted.")
+        if self.discrete_distrib.mimics != 'StdUniform' and periodization_transform!='NONE':
+            raise ParameterError('''
+                Applying a periodization transform currently requires a discrete distribution 
+                that mimics a standard uniform measure.''')
+        # periodization transform
+        if periodization_transform == 'NONE': 
+            xp = x
+            wp = ones(n,dtype=float)
+        elif periodization_transform == 'BAKER': # Baker's transform
+            xp = 1 - 2 * abs(x - 1 / 2)
+            wp = ones(n,dtype=float)
+        elif periodization_transform == 'C0': # C^0 transform
+            xp = 3 * x ** 2 - 2 * x ** 3
+            wp = prod(6 * x * (1 - x), 1)  
+        elif periodization_transform == 'C1': # C^1 transform
+            xp = x ** 3 * (10 - 15 * x + 6 * x ** 2)
+            wp = prod(30 * x ** 2 * (1 - x) ** 2, 1)
+        elif periodization_transform == 'C1SIN': # Sidi C^1 transform
+            xp = x - sin(2 * pi * x) / (2 * pi)
+            wp = prod(2 * sin(pi * x) ** 2, 1)
+        elif periodization_transform == 'C2SIN': # Sidi C^2 transform
+            xp = (8 - 9 * cos(pi * x) + cos(3 * pi * x)) / 16 # psi3
+            wp = prod( (9 * sin(pi * x) * pi - sin(3 * pi * x) * 3 * pi) / 16 , 1) # psi3_1
+        elif periodization_transform == 'C3SIN': # Sidi C^3 transform
+            xp = (12 * pi * x - 8 * sin(2 * pi * x) + sin(4 * pi * x)) / (12 * pi) # psi4
+            wp = prod( (12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1) # psi4_1            
+        else:
+            raise ParameterError("The %s periodization transform is not implemented"%periodization_transform)
+        # function evaluation with chain rule
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
-            xtf = self.true_measure._transform(x) # get transformed samples, equivalent to self.true_measure._transform_r(x)
+            xtf = self.true_measure._transform(xp) # get transformed samples, equivalent to self.true_measure._transform_r(x)
             y = self.g(xtf,*args,**kwargs).reshape(n,self.dprime)
         else: # using importance sampling --> need to compute pdf, jacobian(s), and weight explicitly
-            pdf = self.discrete_distrib.pdf(x).reshape(n,1) # pdf of samples
-            xtf,jacobians = self.true_measure.transform._jacobian_transform_r(x) # compute recursive transform+jacobian
+            pdf = self.discrete_distrib.pdf(xp).reshape(n,1) # pdf of samples
+            xtf,jacobians = self.true_measure.transform._jacobian_transform_r(xp) # compute recursive transform+jacobian
             weight = self.true_measure._weight(xtf).reshape(n,1) # weight based on the true measure
             gvals = self.g(xtf,*args,**kwargs).reshape(n,self.dprime)
             y = gvals*weight/pdf*jacobians.reshape(n,1)
-        return y
+        # account for periodization weight
+        yp = y*wp.reshape(n,1)
+        return yp
 
-    def f_periodized(self, x, ptransform='NONE', *args, **kwargs):
-        """
-        Periodized transformed integrand.
-
-        Args:
-            x (ndarray): n x d array of samples from a discrete distribution
-            ptransform (str): periodization transform. 
-            *args: other ordered args to g
-            **kwargs (dict): other keyword args to g
-            
-        Return: 
-            ndarray: length n vector of funciton evaluations
-        """
-        if self.discrete_distrib.mimics != 'StdUniform':
-            raise ParameterError("f_periodized requires a discrete distribution that mimics a standard uniform measure.")
-        ptransform = ptransform.upper()
-        n,d = x.shape
-        if ptransform == 'BAKER': # Baker's transform
-            xp = 1 - 2 * abs(x - 1 / 2)
-            w = ones(n,dtype=float)
-        elif ptransform == 'C0': # C^0 transform
-            xp = 3 * x ** 2 - 2 * x ** 3
-            w = prod(6 * x * (1 - x), 1)  
-        elif ptransform == 'C1': # C^1 transform
-            xp = x ** 3 * (10 - 15 * x + 6 * x ** 2)
-            w = prod(30 * x ** 2 * (1 - x) ** 2, 1)
-        elif ptransform == 'C1SIN': # Sidi C^1 transform
-            xp = x - sin(2 * pi * x) / (2 * pi)
-            w = prod(2 * sin(pi * x) ** 2, 1)
-        elif ptransform == 'C2SIN': # Sidi C^2 transform
-            xp = (8 - 9 * cos(pi * x) + cos(3 * pi * x)) / 16 # psi3
-            w = prod( (9 * sin(pi * x) * pi - sin(3 * pi * x) * 3 * pi) / 16 , 1) # psi3_1
-        elif ptransform == 'C3SIN': # Sidi C^3 transform
-            xp = (12 * pi * x - 8 * sin(2 * pi * x) + sin(4 * pi * x)) / (12 * pi) # psi4
-            w = prod( (12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1) # psi4_1
-        elif ptransform == 'NONE':
-            xp = x
-            w = ones(n,dtype=float)
-        else:
-            raise ParameterError("The %s periodization transform is not implemented"%ptransform)
-        y = self.f(xp,*args,**kwargs)*w.reshape(n,1)
-        return y
-        
-    def _dim_at_level(self, l):
+    def _dimension_at_level(self, level):
         """
         ABSTRACT METHOD to return the dimension of samples to generate at level l. 
         This method only needs to be implemented for multi-level integrands where 
         the dimension changes depending on the level. 
         
         Args:
-            l (int): level
+            level (int): level at which to return the dimension
         
         Return:
-            int: dimension of samples needed at level l
+            int: dimension at input level
         """
-        raise MethodImplementationError(self, '_dim_at_level')
+        raise MethodImplementationError(self, '_dimension_at_level')
 
     def __repr__(self):
         return _univ_repr(self, "Integrand", self.parameters)

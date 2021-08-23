@@ -1,4 +1,4 @@
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
@@ -9,7 +9,7 @@ class AsianOption(Integrand):
     """
     Asian financial option. 
 
-    >>> ac = AsianOption(Sobol(4,seed=7))
+    >>> ac = AsianOption(DigitalNetB2(4,seed=7))
     >>> ac
     AsianOption (Integrand Object)
         volatility      2^(-1)
@@ -23,9 +23,9 @@ class AsianOption(Integrand):
     >>> x = ac.discrete_distrib.gen_samples(2**10)
     >>> y = ac.f(x)
     >>> y.mean()
-    1.774...
+    1.766...
     >>> level_dims = [2,4,8]
-    >>> ac2 = AsianOption(Sobol(seed=7),multi_level_dimensions=level_dims)
+    >>> ac2 = AsianOption(DigitalNetB2(seed=7),multi_level_dimensions=level_dims)
     >>> ac2
     AsianOption (Integrand Object)
         volatility      2^(-1)
@@ -37,11 +37,11 @@ class AsianOption(Integrand):
         dimensions      [2 4 8]
         dim_fracs       [0. 2. 2.]
     >>> y2 = 0
-    >>> for l in range(len(level_dims)):
-    ...     new_dim = ac2._dim_at_level(l)
-    ...     ac2.true_measure._set_dimension_r(new_dim)
-    ...     x2 = ac2.discrete_distrib.gen_samples(2**10)
-    ...     level_est = ac2.f(x2,l=l).mean()
+    >>> for level in range(len(level_dims)):
+    ...     new_dim = ac2._dimension_at_level(level)
+    ...     new_tm = ac2.true_measure.spawn(1,dimensions=new_dim)[0]
+    ...     x2 = new_tm.discrete_distrib.gen_samples(2**10)
+    ...     level_est = ac2.f(x2,level=l).mean()
     ...     y2 += level_est
     >>> y2
     1.772...
@@ -65,17 +65,17 @@ class AsianOption(Integrand):
         """
         self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', \
                   'interest_rate','mean_type', 'dimensions', 'dim_fracs']
-        self.t_final = t_final
         self.true_measure = BrownianMotion(sampler,self.t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
         self.interest_rate = float(interest_rate)
+        self.t_final = t_final
         self.call_put = call_put.lower()
         if self.call_put not in ['call','put']:
             raise ParameterError("call_put must be either 'call' or 'put'")
         self.mean_type = mean_type.lower()
-        if self.mean_type not in ['arithmetic', 'geometric']:
+        if self.mean_type not in ['arithmetic','geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
         if multi_level_dimensions:
             # multi-level problem
@@ -119,10 +119,10 @@ class AsianOption(Integrand):
         y_adj = y_raw * exp(-self.interest_rate * self.t_final)
         return y_adj
 
-    def g(self, t, l=0):
+    def g(self, t, level=0):
         """ See abstract method. """
-        dim_frac = self.dim_fracs[l]
-        dimension = float(self.dimensions[l])
+        dim_frac = self.dim_fracs[level]
+        dimension = float(self.dimensions[level])
         self.s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
             self.true_measure.time_vec + self.volatility * t)
@@ -136,6 +136,6 @@ class AsianOption(Integrand):
             y -= y_course
         return y
     
-    def _dim_at_level(self, l):
+    def _dimension_at_level(self, level):
         """ See abstract method. """
-        return self.dimensions[l]
+        return self.dimensions[level]
