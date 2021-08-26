@@ -1,7 +1,7 @@
-from numpy.core.defchararray import lower, upper
 from qmcpy import *
 from qmcpy.util import *
 from numpy import *
+import scipy.stats
 import unittest
 
 
@@ -19,10 +19,13 @@ class TestTrueMeasure(unittest.TestCase):
             JohnsonsSU(DigitalNetB2(d),gamma=[1,2],xi=[4,5],delta=[7,8],lam=[10,11]),
             Gaussian(DigitalNetB2(d)),
             Gaussian(DigitalNetB2(d),mean=[1,2],covariance=[[9,5],[5,9]],decomp_type='Cholesky'),
+            Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d)))),
             BrownianMotion(DigitalNetB2(d)),
             BrownianMotion(DigitalNetB2(d),t_final=2,drift=3,decomp_type='Cholesky'),
             BernoulliCont(DigitalNetB2(d)),
             BernoulliCont(DigitalNetB2(d),lam=[.25,.75]),
+            SciPyWrapper(DigitalNetB2(2),scipy.stats.triang,c=[0.1,.2],loc=[1,2],scale=[3,4]),
+            SciPyWrapper(SciPyWrapper(DigitalNetB2(2),scipy.stats.triang,c=[0.1,.2]),scipy.stats.triang,c=[.3,.4]),
         ]
         for tm in tms:
             for _tm in [tm]+tm.spawn(1):
@@ -45,9 +48,10 @@ class TestTrueMeasure(unittest.TestCase):
             Kumaraswamy(DigitalNetB2(d)),
             JohnsonsSU(DigitalNetB2(d)),
             Gaussian(DigitalNetB2(d)),
+            Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d)))),
             BrownianMotion(DigitalNetB2(d)),
             BernoulliCont(DigitalNetB2(d)),
-            Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d)))),
+            SciPyWrapper(SciPyWrapper(DigitalNetB2(2),scipy.stats.triang,c=.25),scipy.stats.triang,c=.75),
         ]
         for tm in tms:
             s = 3

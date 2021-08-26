@@ -16,6 +16,7 @@ class TrueMeasure(object):
             self.parameters = []
     
     def _parse_sampler(self, sampler):
+        self.sub_comptibility_error = False
         if isinstance(sampler,DiscreteDistribution):
             self.transform = self # this is the initial transformation, \Psi_0
             self.d = sampler.d # take the dimension from the discrete distribution
@@ -34,8 +35,10 @@ class TrueMeasure(object):
             self.parameters += ['transform']
             self.d = sampler.d # take the dimension from the sub-sampler (composed transform)
             self.discrete_distrib = self.transform.discrete_distrib
+            if (self.domain!=self.transform.range).any():
+                self.sub_comptibility_error = True
             if self.transform.transform!=self.transform and (self.transform.domain!=self.transform.transform.range).any():
-                raise ParameterError("This true measures domain must match the sub-sampling true-measures range.")
+                raise ParameterError("The sub-transform domain must match the sub-sub-transform range.")
         else:
             raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure")
     
@@ -65,6 +68,8 @@ class TrueMeasure(object):
         Returns:
             ndarray: n x d matrix of transformed x.  
         """
+        if self.sub_comptibility_error:
+            raise ParameterError("The transform domain must match the sub-transform range.")
         if self.transform == self: # is \Psi_0
             return self._transform(x)
         else: # is transform \Psi_j for j>0
@@ -95,6 +100,8 @@ class TrueMeasure(object):
             ndarray: length n vector of transformed samples at locations of x
             ndarray: length n vector of Jacobian values at locations of x
         """
+        if self.sub_comptibility_error:
+            raise ParameterError("The transform domain must match the sub-transform range.")
         if self.transform == self: # is \Psi_0
             return self._transform(x),self._jacobian(x)
         else: # is transform \Psi_j for j>0

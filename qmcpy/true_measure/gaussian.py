@@ -116,3 +116,5 @@ class Gaussian(TrueMeasure):
                         covariance must be a scaler times I''')
             spawn = Gaussian(sampler,mean=m,covariance=c,decomp_type=self.decomp_type)
         return spawn
+
+class Normal(Gaussian): pass

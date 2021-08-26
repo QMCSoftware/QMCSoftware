@@ -1,4 +1,3 @@
-from numpy.core.defchararray import lower, upper
 from ._true_measure import TrueMeasure
 from ..util import TransformError, DimensionError
 from ..discrete_distribution import DigitalNetB2
@@ -43,7 +42,7 @@ class Uniform(TrueMeasure):
         if len(self.a)!=self.d or len(self.b)!=self.d:
             raise DimensionError('upper bound and lower bound must be of length dimension')
         self._set_constants()
-        self.range = hstack((self.a,self.b))
+        self.range = hstack((self.a.reshape((self.d,1)),self.b.reshape((self.d,1))))
         super(Uniform,self).__init__()
 
     def _set_constants(self):
