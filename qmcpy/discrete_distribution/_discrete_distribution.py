@@ -84,7 +84,7 @@ class DiscreteDistribution(object):
             dimension (int): lenth s array of dimensions for each spawn
         
         Return: 
-            list: list of DiscreteDistribution instances with new seeds and dimensions
+            DiscreteDistribution: spawn with new dimension using child_seed
         """
         raise MethodImplementationError(self, '_spawn')
         

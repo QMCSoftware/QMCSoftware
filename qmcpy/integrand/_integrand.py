@@ -9,6 +9,7 @@ class Integrand(object):
 
     def __init__(self):
         prefix = 'A concrete implementation of Integrand must have '
+        self.d = self.true_measure.d
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
         if not (hasattr(self, 'dprime')):
@@ -17,6 +18,8 @@ class Integrand(object):
             self.parameters = []
         if not hasattr(self,'leveltype'):
             self.leveltype = 'single'
+        if not hasattr(self,'max_level'):
+            self.max_level = inf
         self.discrete_distrib = self.true_measure.discrete_distrib
         if self.true_measure.transform!=self.true_measure and \
            not (self.true_measure.range==self.true_measure.transform.range).all():
@@ -109,6 +112,41 @@ class Integrand(object):
             int: dimension at input level
         """
         raise MethodImplementationError(self, '_dimension_at_level')
+
+    def spawn(self, levels):
+        """
+        Spawn new instances of the current integrand at the specified levels.
+        
+        Args:
+            levels (ndarray): array of levels at which to spawn new integrands
+        
+        Return: 
+            list: list of Integrands linked to newly spawned TrueMeasures and DiscreteDistributions
+        """
+        levels = array([levels]) if isscalar(levels) else array(levels)
+        if (levels>self.max_level).any():
+            raise ParameterError("requested spawn level exceeds max level")
+        n_levels = len(levels)
+        spawns = [None*n_levels]
+        for l in range(n_levels):
+            level = levels[l]
+            new_dim = self._dimension_at_level(level)
+            tm_spawn = self.sampler.spawn(s=1,dimensions=[new_dim])[0]
+            spawns[l] = self.spawn(level,tm_spawn)
+        return spawns
+    
+    def _spawn(self, level, tm_sapwn):
+        """
+        ABSTRACT METHOD, used by self.spawn
+        
+        Args:
+            level (numpy.random.SeedSequence): level at which to spawn new instance 
+            tm_sapwn (TrueMeasure): true measure spawn to use as new sampler
+        
+        Return: 
+            Integrand: spawn at this level
+        """
+        raise MethodImplementationError(self, '_spawn')
 
     def __repr__(self):
         return _univ_repr(self, "Integrand", self.parameters)

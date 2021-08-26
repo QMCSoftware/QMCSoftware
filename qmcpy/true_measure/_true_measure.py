@@ -37,7 +37,7 @@ class TrueMeasure(object):
             self.discrete_distrib = self.transform.discrete_distrib
             if (self.domain!=self.transform.range).any():
                 self.sub_comptibility_error = True
-            if self.transform.transform!=self.transform and (self.transform.domain!=self.transform.transform.range).any():
+            if self.transform.sub_comptibility_error:
                 raise ParameterError("The sub-transform domain must match the sub-sub-transform range.")
         else:
             raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure")
@@ -171,7 +171,7 @@ class TrueMeasure(object):
             dimension (ndarray): dimension of new spawn
         
         Return: 
-            list: list of DiscreteDistribution instances with new seeds and dimensions
+            TrueMeasure: spawn with dimension and sampler
         """
         raise MethodImplementationError(self, '_spawn')  
         

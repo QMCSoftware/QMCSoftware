@@ -48,7 +48,7 @@ class AsianOption(Integrand):
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
-                 interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multi_level_dimensions=None):
+        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multi_level_dimensions=None, _dim_frac=0):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
@@ -62,10 +62,12 @@ class AsianOption(Integrand):
             mean_type (string): 'arithmetic' or 'geometric' mean
             multi_level_dimensions (list of ints): list of dimensions at each level. 
                 Leave as None for single-level problems
+            _dim_frac (float): for internal use only, users should not set this parameter. 
         """
         self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', \
                   'interest_rate','mean_type', 'dimensions', 'dim_fracs']
-        self.true_measure = BrownianMotion(sampler,self.t_final)
+        self.sampler = sampler
+        self.true_measure = BrownianMotion(self.sampler,self.t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
@@ -77,17 +79,17 @@ class AsianOption(Integrand):
         self.mean_type = mean_type.lower()
         if self.mean_type not in ['arithmetic','geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
-        if multi_level_dimensions:
-            # multi-level problem
+        # handle single vs multilevel
+        if multi_level_dimensions is not None: # multi-level problem
             self.dimensions = multi_level_dimensions
-            self.dim_fracs = [0.] + [float(self.dimensions[i])/float(self.dimensions[i-1]) \
-                for i in range(1,len(self.dimensions))]
+            self.dim_fracs = array([0]+[float(self.dimensions[i])/float(self.dimensions[i-1]) for i in range(1,len(self.dimensions))],dtype=float)
+            self.max_level = len(self.dimensions)-1
             self.leveltype = 'fixed-multi'
-        else:
-            # single level problem
-            self.dimensions = [self.true_measure.d]
-            self.dim_fracs = [0.]
+            self.parent = True
+        else: # single level problem
+            self.dim_frac = _dim_frac
             self.leveltype = 'single'
+            self.parent = False
         self.dprime = 1
         super(AsianOption,self).__init__()    
 
@@ -119,19 +121,20 @@ class AsianOption(Integrand):
         y_adj = y_raw * exp(-self.interest_rate * self.t_final)
         return y_adj
 
-    def g(self, t, level=0):
-        """ See abstract method. """
-        dim_frac = self.dim_fracs[level]
-        dimension = float(self.dimensions[level])
+    def g(self, t):
+        if self.parent:
+            raise ParameterError('''
+                Cannot evaluate an integrand with multi_level_dimensions directly,
+                instead spawn some children and evaluate those.''')
         self.s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
             self.true_measure.time_vec + self.volatility * t)
         for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
-        y = self._get_discounted_payoffs(self.s_fine, dimension)
-        if dim_frac > 0:
-            s_course = self.s_fine[:, int(dim_frac - 1):: int(dim_frac)]
-            d_course = float(dimension) / dim_frac
+        y = self._get_discounted_payoffs(self.s_fine,self.d)
+        if self.dim_frac > 0:
+            s_course = self.s_fine[:, int(self.dim_frac - 1):: int(self.dim_frac)]
+            d_course = float(self.d) / self.dim_frac
             y_course = self._get_discounted_payoffs(s_course, d_course)
             y -= y_course
         return y
@@ -139,3 +142,20 @@ class AsianOption(Integrand):
     def _dimension_at_level(self, level):
         """ See abstract method. """
         return self.dimensions[level]
+    
+    def _spawn(self, level, sampler):
+        if not self.parent:
+            raise ParameterError('''
+                Cannot spawn from integrand without multi_level_dimensions.
+                Note that if you cannot spawn from spawns of integrands.''')
+        return AsianOption(
+            sampler = sampler,
+            volatility = self.volatility,
+            start_price = self.start_price,
+            strike_price = self.strike_price,
+            interest_rate = self.interest_rate,
+            t_final = self.t_final,
+            call_put = self.call_put,
+            mean_type = self.mean_type,
+            _dim_frac = self.dim_fracs[level])
+    
