@@ -127,12 +127,12 @@ class Integrand(object):
         if (levels>self.max_level).any():
             raise ParameterError("requested spawn level exceeds max level")
         n_levels = len(levels)
-        spawns = [None*n_levels]
+        spawns = [None]*n_levels
         for l in range(n_levels):
             level = levels[l]
             new_dim = self._dimension_at_level(level)
             tm_spawn = self.sampler.spawn(s=1,dimensions=[new_dim])[0]
-            spawns[l] = self.spawn(level,tm_spawn)
+            spawns[l] = self._spawn(level,tm_spawn)
         return spawns
     
     def _spawn(self, level, tm_sapwn):

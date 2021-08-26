@@ -10,8 +10,8 @@ class MLCallOptions(Integrand):
     """
     Various call options from finance using Milstein discretization with $2^l$ timesteps on level $l$.
 
-    >>> mlco = MLCallOptions(DigitalNetB2(seed=7))
-    >>> mlco
+    >>> mlco_original = MLCallOptions(DigitalNetB2(seed=7))
+    >>> mlco_original
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -19,14 +19,14 @@ class MLCallOptions(Integrand):
         r               0.050
         t               1
         b               85
-    >>> y = 0
-    >>> for level in range(4):
-    ...     new_dim = mlco._dimension_at_level(level)
-    ...     new_tm = mlco.true_measure.spawn(1,dimensions=new_dim)[0]
-    ...     x = new_tm.discrete_distrib.gen_samples(2**10)
-    ...     y += mlco.f(x,level=level).mean()
-    >>> y
-    10.391...
+        level           0
+    >>> mlco_ml_dims = mlco_original.spawn(levels=arange(4))
+    >>> yml = 0
+    >>> for mlco in mlco_ml_dims:
+    ...     x = mlco.discrete_distrib.gen_samples(2**10)
+    ...     yml += mlco.f(x).mean()
+    >>> yml
+    10.390...
 
     References:
 
@@ -51,7 +51,7 @@ class MLCallOptions(Integrand):
             _level (int): for internal use only, users should not set this parameter. 
 
         """
-        self.parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
+        self.parameters = ['option', 'sigma', 'k', 'r', 't', 'b', 'level']
         self.sampler = sampler
         self.true_measure = Gaussian(self.sampler, mean=0, covariance=1)
         self.discrete_distrib = self.true_measure.discrete_distrib
@@ -120,7 +120,7 @@ class MLCallOptions(Integrand):
                 Second, an ndarray of payoffs from coarse paths.
         """
         dwf = t * sqrt(hf)
-        if self.l == 0:
+        if self.level == 0:
             dwf = dwf.squeeze()
             xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
         else:
@@ -202,7 +202,7 @@ class MLCallOptions(Integrand):
         hc = self.t/nc # timestep coarse
         xf = tile(self.k,int(n))
         xc = xf
-        pf,pc = self.g_submodule(t, self.level, n, d, nf, nc, hf, hc, xf, xc)
+        pf,pc = self.g_submodule(t, n, d, nf, nc, hf, hc, xf, xc)
         dp = exp(-self.r*self.t)*(pf-pc)
         pf = exp(-self.r*self.t)*pf
         if self.level == 0:

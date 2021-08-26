@@ -18,33 +18,22 @@ class AsianOption(Integrand):
         strike_price    35
         interest_rate   0
         mean_type       arithmetic
-        dimensions      2^(2)
-        dim_fracs       0
-    >>> x = ac.discrete_distrib.gen_samples(2**10)
+        dim_frac        0
+    >>> x = ac.discrete_distrib.gen_samples(2**12)
     >>> y = ac.f(x)
     >>> y.mean()
-    1.766...
+    1.768...
     >>> level_dims = [2,4,8]
-    >>> ac2 = AsianOption(DigitalNetB2(seed=7),multi_level_dimensions=level_dims)
-    >>> ac2
-    AsianOption (Integrand Object)
-        volatility      2^(-1)
-        call_put        call
-        start_price     30
-        strike_price    35
-        interest_rate   0
-        mean_type       arithmetic
-        dimensions      [2 4 8]
-        dim_fracs       [0. 2. 2.]
-    >>> y2 = 0
-    >>> for level in range(len(level_dims)):
-    ...     new_dim = ac2._dimension_at_level(level)
-    ...     new_tm = ac2.true_measure.spawn(1,dimensions=new_dim)[0]
-    ...     x2 = new_tm.discrete_distrib.gen_samples(2**10)
-    ...     level_est = ac2.f(x2,level=l).mean()
-    ...     y2 += level_est
-    >>> y2
-    1.772...
+    >>> ac2_multilevel = AsianOption(DigitalNetB2(seed=7),multi_level_dimensions=level_dims)
+    >>> levels_to_spawn = arange(ac2_multilevel.max_level+1)
+    >>> ac2_single_levels = ac2_multilevel.spawn(levels_to_spawn)
+    >>> yml = 0
+    >>> for ac2_single_level in ac2_single_levels:
+    ...     x = ac2_single_level.discrete_distrib.gen_samples(2**12)
+    ...     level_est = ac2_single_level.f(x).mean()
+    ...     yml += level_est
+    >>> yml
+    1.779...
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
@@ -64,10 +53,9 @@ class AsianOption(Integrand):
                 Leave as None for single-level problems
             _dim_frac (float): for internal use only, users should not set this parameter. 
         """
-        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', \
-                  'interest_rate','mean_type', 'dimensions', 'dim_fracs']
+        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate','mean_type']
         self.sampler = sampler
-        self.true_measure = BrownianMotion(self.sampler,self.t_final)
+        self.true_measure = BrownianMotion(self.sampler,t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
@@ -81,15 +69,20 @@ class AsianOption(Integrand):
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
         # handle single vs multilevel
         if multi_level_dimensions is not None: # multi-level problem
-            self.dimensions = multi_level_dimensions
-            self.dim_fracs = array([0]+[float(self.dimensions[i])/float(self.dimensions[i-1]) for i in range(1,len(self.dimensions))],dtype=float)
-            self.max_level = len(self.dimensions)-1
+            self.multilevel_dims = multi_level_dimensions
+            self.dim_fracs = array(
+                [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
+                for i in range(1,len(self.multilevel_dims))],
+                dtype=float)
+            self.max_level = len(self.multilevel_dims)-1
             self.leveltype = 'fixed-multi'
             self.parent = True
+            self.parameters += ['multilevel_dims']
         else: # single level problem
             self.dim_frac = _dim_frac
             self.leveltype = 'single'
             self.parent = False
+            self.parameters += ['dim_frac']
         self.dprime = 1
         super(AsianOption,self).__init__()    
 
@@ -141,7 +134,7 @@ class AsianOption(Integrand):
     
     def _dimension_at_level(self, level):
         """ See abstract method. """
-        return self.dimensions[level]
+        return self.multilevel_dims[level]
     
     def _spawn(self, level, sampler):
         if not self.parent:
