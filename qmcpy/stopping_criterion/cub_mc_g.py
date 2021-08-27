@@ -13,38 +13,38 @@ import warnings
 
 
 class CubMCG(StoppingCriterion):
-    """
+    r"""
     Stopping criterion with guaranteed accuracy.
 
     >>> k = Keister(IIDStdUniform(2,seed=7))
     >>> sc = CubMCG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.803...
+    1.806...
     >>> data
     MeanVarData (AccumulateData Object)
-        solution        1.804
+        solution        1.807
         error_bound     0.050
-        n_total         14497
-        n               13473
+        n_total         15256
+        n               14232
         levels          1
         time_integrate  ...
     CubMCG (StoppingCriterion Object)
-        inflate         1.200
-        alpha           0.010
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
         n_max           10000000000
+        inflate         1.200
+        alpha           0.010
     Keister (Integrand Object)
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
-        decomp_type     pca
+        decomp_type     PCA
     IIDStdUniform (DiscreteDistribution Object)
         d               2^(1)
-        seed            7
-        mimics          StdUniform
+        entropy         7
+        spawn_key       ()
     >>> dd = IIDStdUniform(1,seed=7)
     >>> k = Keister(dd)
     >>> cv1 = CustomFun(Uniform(dd),lambda x: sin(pi*x).sum(1))
@@ -54,7 +54,7 @@ class CubMCG(StoppingCriterion):
     >>> sc1 = CubMCG(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
     >>> sol,data = sc1.integrate()
     >>> sol
-    1.38147...
+    1.384...
 
     Original Implementation:
 
@@ -97,7 +97,7 @@ class CubMCG(StoppingCriterion):
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
         """
-        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
+        self.parameters = ['abs_tol','rel_tol','n_init','n_max','inflate','alpha']
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -117,7 +117,7 @@ class CubMCG(StoppingCriterion):
         self.cv_mu = control_variate_means
         # Verify Compliant Construction
         allowed_levels = ['single']
-        allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
+        allowed_distribs = [IIDStdUniform]
         allow_vectorized_integrals = False
         super(CubMCG,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 

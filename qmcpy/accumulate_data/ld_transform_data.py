@@ -113,11 +113,11 @@ class LDTransformData(AccumulateData):
         # evaluate function (including CVs)
         n = int(2**self.m_min)
         if self.ncv==0: # not using control variates
-            y = self.integrand.f_periodized(self.x,self.ptransform).squeeze()
+            y = self.integrand.f(self.x,periodization_transform=self.ptransform).squeeze()
             yval = y.copy()
         else: # using control variates
             ycv = zeros((n,1+self.ncv),dtype=float)
-            ycv[:,0] = self.integrand.f_periodized(self.x,self.ptransform).squeeze()
+            ycv[:,0] = self.integrand.f(self.x,periodization_transform=self.ptransform).squeeze()
             for i in range(self.ncv):
                 ycv[:,i+1] = self.cv[i].f(self.x).squeeze()
             y = ycv[:,0].copy()
@@ -187,11 +187,11 @@ class LDTransformData(AccumulateData):
         mnext = int(self.m-1)
         n = int(2**mnext)
         if self.ncv==0: # not using control variates
-            ynext = self.integrand.f_periodized(self.x,self.ptransform).squeeze()
+            ynext = self.integrand.f(self.x,periodization_transform=self.ptransform).squeeze()
             yval = hstack((self.yval,ynext))
         else: # using control variates
             ycvnext = zeros((n,1+self.ncv),dtype=float)
-            ycvnext[:,0] = self.integrand.f_periodized(self.x,self.ptransform).squeeze()
+            ycvnext[:,0] = self.integrand.f(self.x,periodization_transform=self.ptransform).squeeze()
             for i in range(self.ncv):
                 ycvnext[:,i+1] = self.cv[i].f(self.x).squeeze()
             ynext = ycvnext[:,0] - ycvnext[:,1:]@self.beta

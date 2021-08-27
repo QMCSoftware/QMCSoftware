@@ -268,7 +268,7 @@ class DigitalNetB2(DiscreteDistribution):
         n = int(n_max-n_min)
         x = zeros((n,self.d),dtype=double)
         xr = zeros((n,self.d),dtype=double)
-        rc = self.dnb2_cf(n_min,n,self.d,self.graycode,self.m_max,self.t_lms,self.z,self.set_rshift,self.rshift,x,xr)
+        rc = self.dnb2_cf(int(n_min),n,self.d,self.graycode,self.m_max,self.t_lms,self.z,self.set_rshift,self.rshift,x,xr)
         if rc!=0:
             raise ParameterError(self.errors[rc])
         if return_unrandomized:

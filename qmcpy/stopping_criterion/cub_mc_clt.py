@@ -18,31 +18,31 @@ class CubMCCLT(StoppingCriterion):
     >>> sc = CubMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    1.801...
+    1.804...
     >>> data
     MeanVarData (AccumulateData Object)
-        solution        1.801
-        error_bound     0.051
-        n_total         6765
-        n               5741
+        solution        1.805
+        error_bound     0.049
+        n_total         7122
+        n               6098
         levels          1
-        time_integrate  ...
+        time_integrate  0.002
     CubMCCLT (StoppingCriterion Object)
-        inflate         1.200
-        alpha           0.010
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
         n_max           10000000000
+        inflate         1.200
+        alpha           0.010
     Keister (Integrand Object)
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
-        decomp_type     pca
+        decomp_type     PCA
     IIDStdUniform (DiscreteDistribution Object)
         d               2^(1)
-        seed            7
-        mimics          StdUniform
+        entropy         7
+        spawn_key       ()
     >>> ac = AsianOption(IIDStdUniform(),
     ...     multi_level_dimensions = [2,4,8])
     >>> sc = CubMCCLT(ac,abs_tol=.05)
@@ -60,7 +60,7 @@ class CubMCCLT(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
-                 inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
+        inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -74,7 +74,7 @@ class CubMCCLT(StoppingCriterion):
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
         """
-        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
+        self.parameters = ['abs_tol','rel_tol','n_init','n_max','inflate','alpha']
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -90,7 +90,7 @@ class CubMCCLT(StoppingCriterion):
         self.cv_mu = control_variate_means
         # Verify Compliant Construction
         allowed_levels = ['single','fixed-multi']
-        allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
+        allowed_distribs = [IIDStdUniform]
         allow_vectorized_integrals = False
         super(CubMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 

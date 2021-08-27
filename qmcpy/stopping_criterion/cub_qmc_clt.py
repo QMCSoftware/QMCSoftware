@@ -1,7 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..discrete_distribution import Lattice
+from ..discrete_distribution import DigitalNetB2, Lattice, Halton
 from ..true_measure import Gaussian
 from ..integrand import Keister,BoxIntegral
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
@@ -118,7 +118,7 @@ class CubQMCCLT(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ["single"]
-        allowed_distribs = ["Lattice", "Sobol","Halton"]
+        allowed_distribs = [DigitalNetB2,Lattice,Halton]
         allow_vectorized_integrals = True
         super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
         if not self.discrete_distrib.randomize:
