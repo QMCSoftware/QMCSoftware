@@ -28,7 +28,6 @@ class TestDiscreteDistribution(unittest.TestCase):
         for d in [3,[1,3,5]]:
             dds = [
                 IIDStdUniform(d),
-                IIDStdGaussian(d),
                 Lattice(d,order='natural'),
                 Lattice(d,order='mps'),
                 Lattice(d,order='linear'),
@@ -54,7 +53,7 @@ class TestDiscreteDistribution(unittest.TestCase):
     
     def test_spawn(self):
         d = 3
-        for dd in [IIDStdUniform(d),IIDStdGaussian(d),Lattice(d),DigitalNetB2(d),Halton(d)]:
+        for dd in [IIDStdUniform(d),Lattice(d),DigitalNetB2(d),Halton(d)]:
             s = 3
             for spawn_dim in [4,[1,4,6]]:
                 spawns = dd.spawn(s=s,dimensions=spawn_dim)

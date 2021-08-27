@@ -11,7 +11,7 @@ class StoppingCriterion(object):
         Args:
             distribution (DiscreteDistribution): a DiscreteDistribution
             allowed_levels (list): which integrand types are supported: 'single', 'fixed-multi', 'adaptive-multi'
-            allowed_distribs (list): list of names (strings) of compatible distributions
+            allowed_distribs (list): list of compatible DiscreteDistribution classes
         """
         sname = type(self).__name__
         prefix = 'A concrete implementation of StoppingCriterion must have '
