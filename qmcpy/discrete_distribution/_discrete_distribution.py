@@ -136,13 +136,6 @@ class DiscreteDistribution(object):
             ax.set_xticks([0,1])
             ax.set_yticks([0,1])
             ax.set_aspect(1)
-        elif self.mimics == 'StdGaussian':
-            fig,ax = pyplot.subplots(figsize=(5,5))
-            ax.set_xlim([-3,3])
-            ax.set_ylim([-3,3])
-            ax.set_xticks([-3,3])
-            ax.set_yticks([-3,3])
-            ax.set_aspect(1)
         else:
             fig,ax = pyplot.subplots()
         ax.set_xlabel('$x_{i,%d}$'%dim_x)

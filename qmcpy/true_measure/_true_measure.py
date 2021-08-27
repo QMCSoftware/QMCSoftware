@@ -24,9 +24,6 @@ class TrueMeasure(object):
             if sampler.mimics == 'StdUniform':
                 if not (self.domain==tile([0,1],(self.d,1))).all():
                     raise ParameterError("The True measure's transform should have unit-cube domain.")
-            elif sampler.mimics == 'StdGaussian':
-                if not (self.domain==tile([-inf,inf],(self.d,1))).all():
-                    raise ParameterError("The True measure's transform should have R^d domain, [-inf,inf]^d.")
             else:
                 raise ParameterError('The %s true measure does not support discrete distributions that mimic a %s.'%\
                     (type(self).__name__,sampler.mimics))
