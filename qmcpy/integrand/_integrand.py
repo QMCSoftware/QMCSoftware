@@ -10,6 +10,8 @@ class Integrand(object):
     def __init__(self):
         prefix = 'A concrete implementation of Integrand must have '
         self.d = self.true_measure.d
+        if not (hasattr(self, 'sampler') and isinstance(self.sampler,(TrueMeasure,DiscreteDistribution))):
+            raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistributioninstance')
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
         if not (hasattr(self, 'dprime')):
@@ -101,6 +103,9 @@ class Integrand(object):
         ABSTRACT METHOD to return the dimension of samples to generate at level l. 
         This method only needs to be implemented for multi-level integrands where 
         the dimension changes depending on the level. 
+
+        Will default to return the current dimension (not using multilevel methods). 
+        Overwrite this method for multilevel integrands
         
         Args:
             level (int): level at which to return the dimension
@@ -108,7 +113,9 @@ class Integrand(object):
         Return:
             int: dimension at input level
         """
-        raise MethodImplementationError(self, '_dimension_at_level')
+        if self.leveltype!='single':
+            raise MethodImplementationError(self, '_dimension_at_level')
+        return self.d
 
     def spawn(self, levels):
         """

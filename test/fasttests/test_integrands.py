@@ -29,7 +29,7 @@ class TestIntegrand(unittest.TestCase):
             Linear0(DigitalNetB2(d)),
         ]
         for ao_ml_dim in [[2,4,8],[3,5]]:
-            ao_og = AsianOption(DigitalNetB2(d),multi_level_dimensions=ao_ml_dim)
+            ao_og = AsianOption(DigitalNetB2(d),multilevel_dims=ao_ml_dim)
             ao_spawns = ao_og.spawn(levels=arange(len(ao_ml_dim)))
             for ao_spawn,true_d in zip(ao_spawns,ao_ml_dim):
                 self.assertTrue(ao_spawn.d==true_d)
@@ -46,7 +46,8 @@ class TestIntegrand(unittest.TestCase):
                 integrands += ml_spawns
             s = str(ml_option)
         n = 8
-        for integrand in integrands:
+        spawned_integrands = [integrand.spawn(levels=0)[0] for integrand in integrands]
+        for integrand in integrands+spawned_integrands:
             x = integrand.discrete_distrib.gen_samples(n)
             s = str(integrand)
             for ptransform in ['None','Baker','C0','C1','C1sin','C2sin','None']:

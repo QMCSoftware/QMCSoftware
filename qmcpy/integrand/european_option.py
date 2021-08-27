@@ -47,7 +47,8 @@ class EuropeanOption(Integrand):
         """
         self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
         self.t_final = t_final
-        self.true_measure = BrownianMotion(sampler,t_final=self.t_final)
+        self.sampler = sampler
+        self.true_measure = BrownianMotion(self.sampler,t_final=self.t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
@@ -94,3 +95,13 @@ class EuropeanOption(Integrand):
                     (self.interest_rate + self.volatility**2/2) * self.t_final
             fp = decay * norm.cdf(term1/denom) - self.start_price * norm.cdf(term2/denom)
         return fp
+    
+    def _spawn(self, level, sampler):
+        return EuropeanOption(
+            sampler=sampler,
+            volatility=self.volatility,
+            start_price=self.start_price,
+            strike_price=self.strike_price,
+            interest_rate=self.interest_rate,
+            t_final=self.t_final,
+            call_put=self.call_put)

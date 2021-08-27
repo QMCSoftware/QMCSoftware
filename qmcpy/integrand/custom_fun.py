@@ -2,6 +2,7 @@ from ._integrand import Integrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
 
+
 class CustomFun(Integrand):
     """
     Integrand wrapper for a user's function 
@@ -36,10 +37,13 @@ class CustomFun(Integrand):
         """
         self.parameters = []
         self.true_measure = true_measure
+        self.sampler = self.true_measure
         self._g = g
         self.dprime = dprime
         super(CustomFun,self).__init__()
     
     def g(self, t, *args, **kwargs):
         return self._g(t,*args,**kwargs)
-
+    
+    def _spawn(self, level, sampler):
+        return CustomFun(true_measure=sampler,g=self._g,dprime=self.dprime)

@@ -43,7 +43,8 @@ class Keister(Integrand):
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
         """
-        self.true_measure = Gaussian(sampler,mean=0,covariance=1/2)
+        self.sampler = sampler
+        self.true_measure = Gaussian(self.sampler,mean=0,covariance=1/2)
         self.dprime = 1
         super(Keister,self).__init__()
     
@@ -52,3 +53,6 @@ class Keister(Integrand):
         norm = sqrt((t**2).sum(1))
         k = pi**(d/2)*cos(norm)
         return k
+    
+    def _spawn(self, level, sampler):
+        return Keister(sampler=sampler)

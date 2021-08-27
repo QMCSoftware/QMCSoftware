@@ -24,7 +24,7 @@ class AsianOption(Integrand):
     >>> y.mean()
     1.768...
     >>> level_dims = [2,4,8]
-    >>> ac2_multilevel = AsianOption(DigitalNetB2(seed=7),multi_level_dimensions=level_dims)
+    >>> ac2_multilevel = AsianOption(DigitalNetB2(seed=7),multilevel_dims=level_dims)
     >>> levels_to_spawn = arange(ac2_multilevel.max_level+1)
     >>> ac2_single_levels = ac2_multilevel.spawn(levels_to_spawn)
     >>> yml = 0
@@ -37,7 +37,7 @@ class AsianOption(Integrand):
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
-        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multi_level_dimensions=None, _dim_frac=0):
+        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multilevel_dims=None, _dim_frac=0):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
@@ -49,7 +49,7 @@ class AsianOption(Integrand):
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
             mean_type (string): 'arithmetic' or 'geometric' mean
-            multi_level_dimensions (list of ints): list of dimensions at each level. 
+            multilevel_dims (list of ints): list of dimensions at each level. 
                 Leave as None for single-level problems
             _dim_frac (float): for internal use only, users should not set this parameter. 
         """
@@ -68,8 +68,8 @@ class AsianOption(Integrand):
         if self.mean_type not in ['arithmetic','geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
         # handle single vs multilevel
-        if multi_level_dimensions is not None: # multi-level problem
-            self.multilevel_dims = multi_level_dimensions
+        self.multilevel_dims = multilevel_dims
+        if self.multilevel_dims is not None: # multi-level problem
             self.dim_fracs = array(
                 [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
                 for i in range(1,len(self.multilevel_dims))],
@@ -117,7 +117,7 @@ class AsianOption(Integrand):
     def g(self, t):
         if self.parent:
             raise ParameterError('''
-                Cannot evaluate an integrand with multi_level_dimensions directly,
+                Cannot evaluate an integrand with multilevel_dims directly,
                 instead spawn some children and evaluate those.''')
         self.s_fine = self.start_price * exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
@@ -133,14 +133,9 @@ class AsianOption(Integrand):
         return y
     
     def _dimension_at_level(self, level):
-        """ See abstract method. """
-        return self.multilevel_dims[level]
-    
-    def _spawn(self, level, sampler):
-        if not self.parent:
-            raise ParameterError('''
-                Cannot spawn from integrand without multi_level_dimensions.
-                Note that if you cannot spawn from spawns of integrands.''')
+        return self.d if self.multilevel_dims is None else self.multilevel_dims[level]
+        
+    def _spawn(self, level, sampler):            
         return AsianOption(
             sampler = sampler,
             volatility = self.volatility,
@@ -150,5 +145,5 @@ class AsianOption(Integrand):
             t_final = self.t_final,
             call_put = self.call_put,
             mean_type = self.mean_type,
-            _dim_frac = self.dim_fracs[level])
+            _dim_frac = self.dim_fracs[level] if hasattr(self,'dim_fracs') else 0)
     

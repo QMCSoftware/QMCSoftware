@@ -22,7 +22,8 @@ class Linear0(Integrand):
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
         """
-        self.true_measure = Uniform(sampler, lower_bound=-.5, upper_bound=.5)
+        self.sampler = sampler
+        self.true_measure = Uniform(self.sampler, lower_bound=-.5, upper_bound=.5)
         self.dprime = 1
         super(Linear0,self).__init__()
     
@@ -30,3 +31,5 @@ class Linear0(Integrand):
         y = t.sum(1)
         return y
 
+    def _spawn(self, level, sampler):
+        return Linear0(sampler=sampler)
