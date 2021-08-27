@@ -66,11 +66,6 @@ class SciPyWrapper(TrueMeasure):
 
     def _transform(self, x):
         return array([self.sd.ppf(x[:,j],**self.kwargs_dims[j]) for j in range(self.d)],dtype=float).T
-
-    def _jacobian(self, x):
-        return array([
-            1/self.sd.pdf(self.sd.ppf(x[:,j],**self.kwargs_dims[j]),**self.kwargs_dims[j])
-            for j in range(self.d)],dtype=float).T.prod(1)
     
     def _weight(self, x):
         return array([self.sd.pdf(x[:,j],**self.kwargs_dims[j]) for j in range(self.d)],dtype=float).T.prod(1)

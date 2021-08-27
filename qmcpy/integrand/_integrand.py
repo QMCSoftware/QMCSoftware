@@ -37,14 +37,13 @@ class Integrand(object):
         """
         raise MethodImplementationError(self, 'g')
     
-    def f(self, x, periodization_transform='NONE', parallel_cores=0, *args, **kwargs):
+    def f(self, x, periodization_transform='NONE', *args, **kwargs):
         """
         Evalute transformed integrand based on true measures and discrete distribution 
         
         Args:
             x (ndarray): n x d array of samples from a discrete distribution
             ptransform (str): periodization transform. 
-            parallel_cores (int): number of compute cores to use in
             *args: other ordered args to g
             **kwargs (dict): other keyword args to g
             
@@ -54,8 +53,6 @@ class Integrand(object):
         periodization_transform = periodization_transform.upper()
         n,d = x.shape
         # parameter checks
-        if parallel_cores!=0:
-            raise ParameterError("QMCPy parallel multicore computation is not yet supproted.")
         if self.discrete_distrib.mimics != 'StdUniform' and periodization_transform!='NONE':
             raise ParameterError('''
                 Applying a periodization transform currently requires a discrete distribution 

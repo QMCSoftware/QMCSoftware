@@ -62,10 +62,6 @@ class JohnsonsSU(TrueMeasure):
 
     def _transform(self, x):
         return self._lam*sinh((norm.ppf(x)-self._gamma)/self._delta)+self._xi
-
-    def _jacobian(self, x):
-        nppf = norm.ppf(x)
-        return prod( self._lam*cosh((nppf-self._gamma)/self._delta)/(self._delta*norm.pdf(nppf)), 1)
     
     def _weight(self, x):
         term1 = (x-self._xi)/self._lam

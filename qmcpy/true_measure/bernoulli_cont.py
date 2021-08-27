@@ -44,12 +44,6 @@ class BernoulliCont(TrueMeasure):
         for j in range(self.d):
             tf[:,j] = x[:,j] if self.l[j]==1/2 else log(((2*self.l[j]-1)*x[:,j]-self.l[j]+1)/(1-self.l[j])) / log(self.l[j]/(1-self.l[j]))
         return tf
-
-    def _jacobian(self, x):
-        jac = zeros(x.shape,dtype=float)
-        for j in range(self.d):
-            jac[:,j] = 1 if self.l[j]==1/2 else 1/log(self.l[j]/(1-self.l[j])) * (2*self.l[j]-1)/((2*self.l[j]-1)*x[:,j]-self.l[j]+1)
-        return prod(jac,1)
     
     def _weight(self, x):
         w = zeros(x.shape,dtype=float)
@@ -57,11 +51,6 @@ class BernoulliCont(TrueMeasure):
             C = 2 if self.l[j]==1/2 else 2*arctanh(1-2*self.l[j])/(1-2*self.l[j])
             w[:,j] = C*self.l[j]**x[:,j]*(1-self.l[j])**(1-x[:,j])
         return prod(w,1)
-    
-    def _set_dimension(self, dimension):
-        
-        self.d = dimension
-        self.l = tile(l0,self.d)
     
     def _spawn(self, sampler, dimension):
         if dimension==self.d: # don't do anything if the dimension doesn't change

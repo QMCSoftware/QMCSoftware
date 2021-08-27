@@ -41,21 +41,14 @@ class BrownianMotion(Gaussian):
         self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform
         self.domain = array([[0,1]])
-        self._transform = self._transform_std_uniform
-        self._jacobian = self._jacobian_std_uniform
-        if isinstance(sampler,DiscreteDistribution) and sampler.mimics=='StdGaussian':
-            # need to use transformation from standard gaussian
-            self.domain = array([[-inf,inf]])
-            self._transform = self._transform_std_gaussian
-            self._jacobian = self._jacobian_std_gaussian
         self._parse_sampler(sampler)
         self.t = t_final # exercise time
         self.drift = drift
-        self.decomp_type = decomp_type.upper()
         self.time_vec = linspace(self.t/self.d,self.t,self.d) # evenly spaced
         self.sigma_bm = array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
         self.drift_time_vec = self.drift*self.time_vec # mean
-        self._set_mean_cov(self.drift_time_vec,self.sigma_bm)
+        self._parse_gaussian_params(self.drift_time_vec,self.sigma_bm,decomp_type)
+
         self.range = array([[-inf,inf]])
         super(Gaussian,self).__init__()
     

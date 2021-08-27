@@ -49,9 +49,6 @@ class Kumaraswamy(TrueMeasure):
 
     def _transform(self, x):
         return (1-(1-x)**(1/self.beta))**(1/self.alpha)
-
-    def _jacobian(self, x):
-        return prod( (1-(1-x)**(1/self.beta))**(1/self.alpha-1)*(1-x)**(1/self.beta-1)/(self.alpha*self.beta), 1)
     
     def _weight(self, x):
         return prod( self.alpha*self.beta*x**(self.alpha-1)*(1-x**self.alpha)**(self.beta-1), 1)

@@ -47,14 +47,10 @@ class Uniform(TrueMeasure):
 
     def _set_constants(self):
         self.delta = self.b - self.a
-        self.delta_prod = self.delta.prod()
-        self.inv_delta_prod = 1/self.delta_prod
+        self.inv_delta_prod = 1/self.delta.prod()
 
     def _transform(self, x):
         return x * self.delta + self.a
-
-    def _jacobian(self, x):
-        return tile(self.delta_prod,x.shape[0])
     
     def _weight(self, x):
         return tile(self.inv_delta_prod,x.shape[0])

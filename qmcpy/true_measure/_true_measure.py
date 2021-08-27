@@ -99,26 +99,20 @@ class TrueMeasure(object):
         Returns:
             ndarray: length n vector of transformed samples at locations of x
             ndarray: length n vector of Jacobian values at locations of x
+
+        Note: If transform is T, then the jacobian of T is 1/lambda(T(x)) for 
         """
         if self.sub_comptibility_error:
             raise ParameterError("The transform domain must match the sub-transform range.")
         if self.transform == self: # is \Psi_0
-            return self._transform(x),self._jacobian(x)
+            t = self._transform(x)
+            jac = 1/self._weight(t)
+            return t,jac
         else: # is transform \Psi_j for j>0
-            xtf,jtf = self.transform._jacobian_transform_r(x)
-            return self._transform(xtf),self._jacobian(xtf)*jtf
-    
-    def _jacobian(self, x):
-        """
-        ABSTRACT method to evaluate the Jacobian for this true measure.
-
-        Args:
-            x (ndarray): n x d matrix of samples
-        
-        Returns:
-            ndarray: length n vector of Jacobian values at locations of x
-        """
-        raise MethodImplementationError(self,'jacobian. Try setting sampler to be in a PDF TrueMeasure to importance sample by.')
+            t_sub,jac_sub  = self._jacobian_transform_r(x)
+            t = self._transform(t_sub) # 
+            jac = self._weight(t) # |\Psi1/\lambda(\psi(x))
+            return t,jac_sub*jac
 
     def _weight(self, x):
         """
@@ -132,7 +126,7 @@ class TrueMeasure(object):
         Returns:
             ndarray: length n vector of weights at locations of x
         """ 
-        raise MethodImplementationError(self,'weight. Try a different true measure with a weight method.')  
+        raise MethodImplementationError(self,'weight. Try a different true measure with a _weight method.')  
     
     def spawn(self, s=1, dimensions=None):
         """

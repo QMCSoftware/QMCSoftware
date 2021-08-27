@@ -41,7 +41,7 @@ class BoxIntegral(Integrand):
             s (list or ndarray): vectorized s parameter, len(s) is the number of vectorized integrals to evalute.
         """
         self.parameters = ['s']
-        self.s = array(s)
+        self.s = array([s]) if isscalar(s) else array(s)
         self.dprime = len(self.s)
         self.true_measure = Uniform(sampler, lower_bound=0., upper_bound=1.)
         super(BoxIntegral,self).__init__() # output dimensions per sample

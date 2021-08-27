@@ -158,7 +158,7 @@ class MLCallOptions(Integrand):
         ac = .5*hc*xc
         dwf = sqrt(hf) * t[:,:int(d/2)]
         dif = sqrt(hf/12) * hf * t[:,int(d/2):]
-        if self.l == 0:
+        if self.level == 0:
             dwf = dwf.squeeze()
             dif = dif.squeeze()
             xf0 = xf
