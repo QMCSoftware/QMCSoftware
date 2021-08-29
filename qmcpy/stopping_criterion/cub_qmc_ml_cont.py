@@ -1,6 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLQMCData
-from ..discrete_distribution import Lattice
+from ..discrete_distribution import DigitalNetB2,Lattice,Halton
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
@@ -18,18 +18,15 @@ class CubQMCMLCont(StoppingCriterion):
     >>> mlco = MLCallOptions(Lattice(seed=7))
     >>> sc = CubQMCMLCont(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    10.394...
     >>> data
     MLQMCData (AccumulateData Object)
-        solution        10.395
+        solution        10.393
         n_total         155648
         n_level         [4096.  256.  256.  256.]
         levels          2^(2)
-        dimensions      [1. 2. 4. 8.]
-        mean_level      [10.053  0.184  0.102  0.055]
-        var_level       [8.703e-05 6.794e-05 2.603e-05 8.925e-06]
-        bias_estimate   0.035
+        mean_level      [10.053  0.184  0.103  0.053]
+        var_level       [4.993e-05 9.163e-05 2.536e-05 1.161e-05]
+        bias_estimate   0.030
         time_integrate  ...
     CubQMCMLCont (StoppingCriterion Object)
         rmse_tol        0.019
@@ -49,22 +46,23 @@ class CubQMCMLCont(StoppingCriterion):
         r               0.050
         t               1
         b               85
+        level           0
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1
-        decomp_type     pca
+        decomp_type     PCA
     Lattice (DiscreteDistribution Object)
         d               1
+        dvec            0
         randomize       1
         order           natural
-        seed            561339
-        mimics          StdUniform
+        entropy         7
+        spawn_key       ()
     
     References:
         
-        [1] M.B. Giles and B.J. Waterhouse. 'Multilevel quasi-Monte Carlo path simulation'.
-        pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics,
-        de Gruyter, 2009. http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf
+        [1] https://github.com/PieterjanRobbe/MultilevelEstimators.jl
+
     """
 
     def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, 
@@ -109,7 +107,7 @@ class CubQMCMLCont(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = ["Lattice", "Sobol","Halton"]
+        allowed_distribs = [DigitalNetB2,Lattice,Halton]
         allow_vectorized_integrals = False
         super(CubQMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
@@ -166,7 +164,7 @@ class CubQMCMLCont(StoppingCriterion):
                 else:
                     self.data._add_level()
 
-        self.data.time_integrate += time() - t_start
+        self.data.time_integrate = time() - t_start
     
     def set_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
         """

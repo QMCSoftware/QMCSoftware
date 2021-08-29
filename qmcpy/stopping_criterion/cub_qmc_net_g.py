@@ -15,8 +15,6 @@ class CubQMCNetG(CubQMCLDG):
     >>> k = Keister(DigitalNetB2(2,seed=7))
     >>> sc = CubQMCNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.808...
     >>> data
     LDTransformData (AccumulateData Object)
         solution        1.809

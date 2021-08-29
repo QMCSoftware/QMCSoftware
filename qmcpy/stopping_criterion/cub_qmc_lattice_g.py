@@ -15,11 +15,9 @@ class CubQMCLatticeG(CubQMCLDG):
     >>> k = Keister(Lattice(2,seed=7))
     >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.809...
     >>> data
     LDTransformData (AccumulateData Object)
-        solution        1.809
+        solution        1.810
         error_bound     0.005
         n_total         2^(10)
         time_integrate  ...

@@ -19,8 +19,6 @@ class CubBayesLatticeG(StoppingCriterion):
     >>> k = Keister(Lattice(2, order='linear', seed=123456789))
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.808...
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.808

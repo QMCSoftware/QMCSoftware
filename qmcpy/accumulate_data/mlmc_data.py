@@ -26,7 +26,7 @@ class MLMCData(AccumulateData):
             beta0 (float): variance is O(2^{-beta0*level})
             gamma0 (float): sample cost is O(2^{gamma0*level})
         """
-        self.parameters = ['solution','n_total','levels','n_level','dimensions','mean_level','var_level', 
+        self.parameters = ['solution','n_total','levels','n_level','mean_level','var_level', 
             'cost_per_sample','alpha','beta','gamma']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
@@ -34,7 +34,6 @@ class MLMCData(AccumulateData):
         self.discrete_distrib = discrete_distrib
         # Set Attributes
         self.levels = int(levels_init)
-        self.dimensions = zeros(self.levels+1)
         self.n_level = zeros(self.levels+1)
         self.sum_level = zeros((2,self.levels+1))
         self.cost_level = zeros(self.levels+1)
@@ -48,23 +47,25 @@ class MLMCData(AccumulateData):
         self.solution = None
         self.n_total = 0
         self.time_integrate = 0
+        self.level_integrands = []
         super(MLMCData,self).__init__()
 
     def update_data(self):
         """ See abstract method. """
         # update sample sums
         for l in range(self.levels+1):
+            if l==len(self.level_integrands):
+                # haven't spawned this level's integrand yet
+                self.level_integrands += self.integrand.spawn(levels=int(l))
+            integrand_l = self.level_integrands[l]
             if self.diff_n_level[l] > 0:
-                # reset dimension
-                self.dimensions[l] = self.integrand._dim_at_level(l)
-                self.true_measure._set_dimension_r(self.dimensions[l])
                 # evaluate integral at sampleing points samples
-                samples = self.discrete_distrib.gen_samples(n=self.diff_n_level[l])
-                self.integrand.f(samples,l=l).squeeze()
+                samples = integrand_l.discrete_distrib.gen_samples(n=self.diff_n_level[l])
+                integrand_l.f(samples).squeeze()
                 self.n_level[l] = self.n_level[l] + self.diff_n_level[l]
-                self.sum_level[0,l] = self.sum_level[0,l] + self.integrand.sums[0]
-                self.sum_level[1,l] = self.sum_level[1,l] + self.integrand.sums[1]
-                self.cost_level[l] = self.cost_level[l] + self.integrand.cost
+                self.sum_level[0,l] = self.sum_level[0,l] + integrand_l.sums[0]
+                self.sum_level[1,l] = self.sum_level[1,l] + integrand_l.sums[1]
+                self.cost_level[l] = self.cost_level[l] + integrand_l.cost
         # compute absolute average, variance and cost
         self.mean_level = absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
         self.var_level = maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
@@ -92,7 +93,6 @@ class MLMCData(AccumulateData):
         """ Add another level to relevent attributes. """
         self.levels += 1
         if not len(self.n_level) > self.levels:
-            self.dimensions = hstack((self.dimensions,0))
             self.mean_level = hstack((self.mean_level, self.mean_level[-1] / 2**self.alpha))
             self.var_level = hstack((self.var_level, self.var_level[-1] / 2**self.beta))
             self.cost_per_sample = hstack((self.cost_per_sample, self.cost_per_sample[-1] * 2**self.gamma))

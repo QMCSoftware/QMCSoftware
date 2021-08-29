@@ -124,7 +124,7 @@ class Lattice(DiscreteDistribution):
         self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
         self.z = self.z_og[self.dvec]
-        self.shift = self.rng.uniform(int(self.d))
+        self.shift = self.rng.uniform(size=int(self.d))
     
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """

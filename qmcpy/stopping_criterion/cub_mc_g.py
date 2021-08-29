@@ -19,8 +19,6 @@ class CubMCG(StoppingCriterion):
     >>> k = Keister(IIDStdUniform(2,seed=7))
     >>> sc = CubMCG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.806...
     >>> data
     MeanVarData (AccumulateData Object)
         solution        1.807

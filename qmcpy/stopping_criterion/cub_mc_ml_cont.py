@@ -18,20 +18,17 @@ class CubMCMLCont(StoppingCriterion):
     >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
     >>> sc = CubMCMLCont(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    10.427...
     >>> data
     MLMCData (AccumulateData Object)
-        solution        10.427
-        n_total         1197552
+        solution        10.413
+        n_total         1198893
         levels          5
-        n_level         [1.160e+06 2.245e+04 8.903e+03 5.002e+03 9.230e+02]
-        dimensions      [ 1.  2.  4.  8. 16.]
-        mean_level      [10.055  0.183  0.102  0.056  0.031]
-        var_level       [1.963e+02 1.442e-01 4.485e-02 1.139e-02 3.477e-03]
+        n_level         [1.161e+06 2.245e+04 9.014e+03 5.482e+03 5.760e+02]
+        mean_level      [10.047  0.183  0.101  0.057  0.024]
+        var_level       [1.959e+02 1.476e-01 4.393e-02 1.365e-02 2.802e-03]
         cost_per_sample [ 1.  2.  4.  8. 16.]
-        alpha           0.856
-        beta            1.810
+        alpha           0.970
+        beta            1.884
         gamma           1
         time_integrate  ...
     CubMCMLCont (StoppingCriterion Object)
@@ -42,7 +39,7 @@ class CubMCMLCont(StoppingCriterion):
         n_tols          10
         tol_mult        1.668
         theta_init      2^(-1)
-        theta           0.365
+        theta           0.110
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -50,20 +47,19 @@ class CubMCMLCont(StoppingCriterion):
         r               0.050
         t               1
         b               85
+        level           0
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1
-        decomp_type     pca
+        decomp_type     PCA
     IIDStdUniform (DiscreteDistribution Object)
-        d               2^(4)
-        seed            7
-        mimics          StdUniform
-
-    Original Implementation:
-
-        # Perhaps this should point to https://github.com/PieterjanRobbe/MultilevelEstimators.jl now?
-
+        d               1
+        entropy         7
+        spawn_key       ()
+    
     References:
+
+        [1] https://github.com/PieterjanRobbe/MultilevelEstimators.jl
         
     """
 
@@ -113,7 +109,7 @@ class CubMCMLCont(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
+        allowed_distribs = [IIDStdUniform]
         allow_vectorized_integrals = False
         super(CubMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 

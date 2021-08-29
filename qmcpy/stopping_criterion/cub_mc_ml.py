@@ -17,19 +17,16 @@ class CubMCML(StoppingCriterion):
     >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
     >>> sc = CubMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    10.44...
     >>> data
     MLMCData (AccumulateData Object)
-        solution        10.445
-        n_total         1220156
+        solution        10.436
+        n_total         1211585
         levels          7
-        n_level         [1.174e+06 2.177e+04 9.205e+03 3.845e+03 1.295e+03 4.470e+02 1.590e+02]
-        dimensions      [ 1.  2.  4.  8. 16. 32. 64.]
-        mean_level      [1.006e+01 1.758e-01 1.046e-01 5.690e-02 3.043e-02 1.367e-02 6.812e-03]
-        var_level       [1.962e+02 1.347e-01 4.817e-02 1.279e-02 3.224e-03 8.278e-04 1.541e-04]
+        n_level         [1.175e+06 2.277e+04 8.802e+03 3.510e+03 1.358e+03 4.460e+02 1.640e+02]
+        mean_level      [1.005e+01 1.827e-01 1.014e-01 5.806e-02 2.738e-02 1.394e-02 5.776e-03]
+        var_level       [1.959e+02 1.468e-01 4.409e-02 1.400e-02 3.233e-03 8.823e-04 1.561e-04]
         cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
-        alpha           0.947
+        alpha           0.988
         beta            1.955
         gamma           1.000
         time_integrate  ...
@@ -46,14 +43,15 @@ class CubMCML(StoppingCriterion):
         r               0.050
         t               1
         b               85
+        level           0
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1
-        decomp_type     pca
+        decomp_type     PCA
     IIDStdUniform (DiscreteDistribution Object)
-        d               2^(6)
-        seed            7
-        mimics          StdUniform
+        d               1
+        entropy         7
+        spawn_key       ()
 
     Original Implementation:
 
@@ -113,7 +111,7 @@ class CubMCML(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
+        allowed_distribs = [IIDStdUniform]
         allow_vectorized_integrals = False
         super(CubMCML,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 

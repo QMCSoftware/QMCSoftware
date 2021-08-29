@@ -20,8 +20,6 @@ class CubBayesNetG(StoppingCriterion):
     >>> k = Keister(DigitalNetB2(2, seed=123456789))
     >>> sc = CubBayesNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.811...
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.812

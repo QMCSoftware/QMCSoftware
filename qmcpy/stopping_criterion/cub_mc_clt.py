@@ -14,19 +14,17 @@ class CubMCCLT(StoppingCriterion):
     """
     Stopping criterion based on the Central Limit Theorem.
     
-    >>> k = Keister(IIDStdUniform(2,seed=7))
-    >>> sc = CubMCCLT(k,abs_tol=.05)
+    >>> ao = AsianOption(IIDStdUniform(seed=7))
+    >>> sc = CubMCCLT(ao,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.804...
     >>> data
     MeanVarData (AccumulateData Object)
-        solution        1.805
-        error_bound     0.049
-        n_total         7122
-        n               6098
+        solution        1.519
+        error_bound     0.046
+        n_total         96028
+        n               95004
         levels          1
-        time_integrate  0.002
+        time_integrate  ...
     CubMCCLT (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -34,18 +32,26 @@ class CubMCCLT(StoppingCriterion):
         n_max           10000000000
         inflate         1.200
         alpha           0.010
-    Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+    AsianOption (Integrand Object)
+        volatility      2^(-1)
+        call_put        call
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        mean_type       arithmetic
+        dim_frac        0
+    BrownianMotion (TrueMeasure Object)
+        time_vec        1
+        drift           0
         mean            0
-        covariance      2^(-1)
+        covariance      1
         decomp_type     PCA
     IIDStdUniform (DiscreteDistribution Object)
-        d               2^(1)
+        d               1
         entropy         7
         spawn_key       ()
-    >>> ac = AsianOption(IIDStdUniform(),
-    ...     multi_level_dimensions = [2,4,8])
-    >>> sc = CubMCCLT(ac,abs_tol=.05)
+    >>> ao = AsianOption(IIDStdUniform(seed=7),multilevel_dims=[2,4,8])
+    >>> sc = CubMCCLT(ao,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> dd = IIDStdUniform(1,seed=7)
     >>> k = Keister(dd)
@@ -56,7 +62,7 @@ class CubMCCLT(StoppingCriterion):
     >>> sc1 = CubMCCLT(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
     >>> sol,data = sc1.integrate()
     >>> sol
-    1.38300...
+    1.381...
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,

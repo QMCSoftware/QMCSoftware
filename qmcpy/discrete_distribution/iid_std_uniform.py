@@ -40,7 +40,7 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             ndarray: n x self.d array of samples
         """
-        return self.rng.uniform(size=(n,self.d))
+        return self.rng.uniform(size=(int(n),self.d))
     
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
