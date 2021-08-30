@@ -53,7 +53,7 @@ def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
             line += nb_rows
             mint.append((array(M)*pows2).sum(0))
         mint = array(mint,dtype=uint64)
-        f_out = '%s/%s.%d.%d.msb.npy'%(out_dir,fout_prefix,dim,log2(nb_points))
+        f_out = '%s/%s.%d.%d.%d.msb.npy'%(out_dir,fout_prefix,dim,nb_rows,nb_cols)
         save(f_out,mint)
         return f_out
 

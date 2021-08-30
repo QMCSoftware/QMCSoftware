@@ -124,20 +124,16 @@ class Halton(DiscreteDistribution):
         res = zeros(n,dtype=int64)
         x = zeros((n,self.d),dtype=float64)
         for j in range(self.d):
-            for i in range(n):
-                res[i] = i + n0
-            b = self.primes[d0+j]
+            res = arange(n0,n0+n)
+            b = self.primes[j]
             b2r = 1. / b
             rec = 0
             while (b2r>=self.eps):
-                for i in range(n):
-                    dig[i] = res[i]%b
-                    res[i] = (res[i]-dig[i])/b
+                dig = res%b
+                res = (res-dig)/b
                 if self.randomize is not False: #permute ints 1-b
-                    for i in range(n):
-                        dig[i] = self.perm[j,rec,dig[i]]
-                for i in range(n):
-                    x[i,j] = x[i,j] + dig[i] * b2r
+                    dig = self.perm[j,rec,dig.astype(int)]
+                x[:,j] = x[:,j]+dig*b2r
                 rec += 1
                 b2r = b2r / b
         return x
@@ -167,7 +163,7 @@ class Halton(DiscreteDistribution):
             self.halton_cf_qrng(n,self.d,int(n_min),self.generalize,x,self.randu_d_32,int32(self.dvec))
             return x.T
         elif self.backend=='OWEN':
-            return self.halton_owen(n,n_min,d0=0)
+            return self.halton_owen(n,n_min)
 
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)

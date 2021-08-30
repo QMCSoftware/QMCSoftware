@@ -108,7 +108,7 @@ class TrueMeasure(object):
         else: # is transform \Psi_j for j>0
             t_sub,jac_sub  = self.transform._jacobian_transform_r(x)
             t = self._transform(t_sub) # 
-            jac = self._weight(t) # |\Psi1/\lambda(\psi(x))
+            jac = 1/self._weight(t) # |\Psi1/\lambda(\psi(x))
             return t,jac_sub*jac
 
     def _weight(self, x):

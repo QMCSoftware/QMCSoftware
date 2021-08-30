@@ -30,4 +30,4 @@ def asian_option_multi_level(
     print('%s%s'%(data,bar))
 
 if __name__ == "__main__":
-    asian_option_multi_level(abs_tol=.025)
+    asian_option_multi_level(abs_tol=.01)
