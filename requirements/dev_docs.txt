@@ -85,7 +85,7 @@ stdlib-list==0.8.0
 terminado==0.8.3
 testpath==0.4.4
 toml==0.10.2
-tornado==6.0.4
+tornado==6.1
 tqdm==4.46.1
 traitlets==4.3.3
 twine==3.1.1
