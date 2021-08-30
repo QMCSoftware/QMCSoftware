@@ -57,7 +57,7 @@ def asian_option_single_level(
     print('%s%s'%(data,bar))
 
     # CubBayesNetG
-    discrete_distrib = Sobol(dimension=dimension, randomize='LMS', graycode=False)
+    discrete_distrib = Sobol(dimension=dimension, graycode=False)
     integrand = AsianOption(discrete_distrib, volatility, start_price, strike_price, interest_rate, t_final, call_put, mean_type)
     solution,data = CubBayesNetG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))

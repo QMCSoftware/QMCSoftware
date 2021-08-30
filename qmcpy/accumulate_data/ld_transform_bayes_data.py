@@ -268,7 +268,7 @@ class LDTransformBayesData(AccumulateData):
 
     @staticmethod
     def gen_samples(n_min, n_max, return_unrandomized, distribution):
-        warn = False if n_min == 0 else True
+        warn = False
         xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn, return_unrandomized=return_unrandomized)
         return xpts_, xun_
 

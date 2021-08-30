@@ -14,17 +14,16 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
     columns = ['n',
         'L_natural', 'L_linear', 'L_MPS',
         'H_QRNG', 'H_Owen',
-        'K_QRNG',
         'S_QMCPy']
     warnings.simplefilter('ignore')
     dds = [
         Lattice(dimension, randomize=True, order='natural', seed=7),
         Lattice(dimension, randomize=True, order='linear', seed=7),
         Lattice(dimension, randomize=True, order='MPS', seed=7),
-        Sobol(dimension, randomize=True, seed=7, graycode=True),
         Halton(dimension, generalize=True, randomize='QRNG', seed=7),
-        Halton(dimension, generalize=True, randomize='Owen', seed=7),
-        Korobov(dimension, generator=[1], randomize=True)]
+        Halton(dimension, generalize=False, randomize='Owen', seed=7),
+        Sobol(dimension, randomize=True, seed=7, graycode=True),
+    ]
     df = DataFrame(columns=columns, dtype=float)
     for i, m in enumerate(powers_2):
         n = 2**m

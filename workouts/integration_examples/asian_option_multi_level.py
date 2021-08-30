@@ -25,7 +25,7 @@ def asian_option_multi_level(
         strike_price = strike_price,
         interest_rate = interest_rate,
         mean_type = mean_type,
-        multi_level_dimensions = [4,16,64])
+        multilevel_dims = [4,16,64])
     solution,data = CubMCCLT(integrand, abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
