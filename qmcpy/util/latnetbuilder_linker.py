@@ -1,6 +1,7 @@
 from ..util import ParameterError
 from numpy import *
 
+
 def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
     """
     Args:

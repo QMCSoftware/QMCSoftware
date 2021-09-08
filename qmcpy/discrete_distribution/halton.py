@@ -9,6 +9,7 @@ import ctypes
 class Halton(DiscreteDistribution):
     """
     Quasi-Random Halton nets.
+    
     >>> h_qrng = Halton(2,randomize='QRNG',generalize=True,seed=7)
     >>> h_qrng.gen_samples(4)
     array([[0.35362988, 0.38733489],

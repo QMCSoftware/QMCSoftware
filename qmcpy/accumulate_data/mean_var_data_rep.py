@@ -1,6 +1,5 @@
 from ._accumulate_data import AccumulateData
 from numpy import *
-from copy import deepcopy
 
 class MeanVarDataRep(AccumulateData):
     """

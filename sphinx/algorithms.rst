@@ -5,6 +5,8 @@ QMCPy Documentation
 .. image:: uml/qmcpy_uml2.png
 .. image:: uml/qmcpy_uml3.png
 
+
+
 Discrete Distribution Class
 ---------------------------
 
@@ -16,28 +18,22 @@ Abstract Discrete Distribution Class
 .. automodule:: qmcpy.discrete_distribution._discrete_distribution
     :members:
 
+Digital Net Base 2
+..................
+
+.. automodule:: qmcpy.discrete_distribution.digital_net_b2.digital_net_b2
+    :members:
+
 Lattice
 .......
 
 .. automodule:: qmcpy.discrete_distribution.lattice.lattice
     :members:
 
-Sobol'
-.......
-
-.. automodule:: qmcpy.discrete_distribution.sobol.sobol
-    :members:
-
 Halton
 ......
 
-.. automodule:: qmcpy.discrete_distribution.halton.halton
-    :members:
-
-Korobov
-.......
-
-.. automodule:: qmcpy.discrete_distribution.korobov.korobov
+.. automodule:: qmcpy.discrete_distribution.halton
     :members:
 
 IID Standard Uniform
@@ -83,10 +79,28 @@ Lebesgue
 .. automodule:: qmcpy.true_measure.lebesgue
     :members:
 
+Continuous Bernoulli
+....................
+
+.. automodule:: qmcpy.true_measure.bernoulli_cont
+    :members:
+
+Johnson's SU
+............
+
+.. automodule:: qmcpy.true_measure.johnsons_su
+    :members:
+
 Kumaraswamy
 ...........
 
 .. automodule:: qmcpy.true_measure.kumaraswamy
+    :members:
+
+SciPy Wrapper
+.............
+
+.. automodule:: qmcpy.true_measure.scipy_wrapper
     :members:
 
 
@@ -101,16 +115,22 @@ Abstract Integrand Class
 .. automodule:: qmcpy.integrand._integrand
     :members:
 
+Custom Function
+...............
+
+.. automodule:: qmcpy.integrand.custom_fun
+    :members:
+
 Keister Function
 ................
 
 .. automodule:: qmcpy.integrand.keister
     :members:
 
-Custom Function
-...............
+Box Integral
+.............
 
-.. automodule:: qmcpy.integrand.custom_fun
+.. automodule:: qmcpy.integrand.box_integral
     :members:
 
 European Option
@@ -150,50 +170,38 @@ Abstract Stopping Criterion Class
 .. automodule:: qmcpy.stopping_criterion._stopping_criterion
     :members:
 
-Guaranteed Lattice Cubature (qMC)
-..................................
+Guaranteed Digital Net Cubature (QMC)
+.....................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_net_g
+    :members:
+
+Guaranteed Lattice Cubature (QMC)
+.................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_lattice_g
     :members:
 
-Guaranteed Sobol' Cubature (qMC)
-................................
-
-.. automodule:: qmcpy.stopping_criterion.cub_qmc_sobol_g
-    :members:
-
-Bayesian Lattice Cubature (qMC)
+Bayesian Lattice Cubature (QMC)
 ................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_bayes_lattice_g
     :members:
 
-Bayesian Digital Net Cubature (qMC)
+Bayesian Digital Net Cubature (QMC)
 ...................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_bayes_net_g
     :members:
 
-Multilevel qMC Cubature
-..................................
-
-.. automodule:: qmcpy.stopping_criterion.cub_qmc_ml
-    :members:
-
-CLT qMC Cubature (with Replications)
-............................................
+CLT QMC Cubature (with Replications)
+....................................
 
 .. automodule:: qmcpy.stopping_criterion.cub_qmc_clt
     :members:
 
-Multilevel MC Cubature
-...........................
-
-.. automodule:: qmcpy.stopping_criterion.cub_mc_ml
-    :members:
-
 Guaranteed MC Cubature
-...............................
+......................
 
 .. automodule:: qmcpy.stopping_criterion.cub_mc_g
     :members:
@@ -204,49 +212,29 @@ CLT MC Cubature
 .. automodule:: qmcpy.stopping_criterion.cub_mc_clt
     :members:
 
+Continuation Multilevel QMC Cubature
+....................................
 
-
-Accumulate Data Class
----------------------
-
-.. image:: uml/accumulate_data_uml.png
-
-Abstract Accumulate Data Class
-...............................
-
-.. automodule:: qmcpy.accumulate_data._accumulate_data
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_ml_cont
     :members:
 
-LD Sequence Transform Data (qMC)
-......................................
-
-.. automodule:: qmcpy.accumulate_data.ld_transform_data
-    :members:
-
-Mean Variance qMC Data (for Replications)
-.........................................
-
-.. automodule:: qmcpy.accumulate_data.mean_var_data_rep
-    :members:
-
-Multilevel qMC Data
-....................
-
-.. automodule:: qmcpy.accumulate_data.mlqmc_data
-    :members:
-
-Multilevel MC Data
-....................
-
-.. automodule:: qmcpy.accumulate_data.mlmc_data
-    :members:
-
-Mean Variance MC Data
+Multilevel QMC Cubature
 .......................
 
-.. automodule:: qmcpy.accumulate_data.mean_var_data
+.. automodule:: qmcpy.stopping_criterion.cub_qmc_ml
     :members:
 
+Continuation Multilevel MC Cubature
+...................................
+
+.. automodule:: qmcpy.stopping_criterion.cub_mc_ml_cont
+    :members:
+
+Multilevel MC Cubature
+......................
+
+.. automodule:: qmcpy.stopping_criterion.cub_mc_ml
+    :members:
 
 
 Utilities
