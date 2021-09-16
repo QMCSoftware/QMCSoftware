@@ -20,9 +20,9 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        pip install --upgrade pip
-        python -m pip install -e .
+        python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements/dev.txt
+        python -m pip install -e .
         python -m pip install codecov==2.1.6  # version 2.1.5 fails
         python -m pip install coverage
     - name: Run Tests

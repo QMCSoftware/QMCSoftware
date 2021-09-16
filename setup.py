@@ -67,7 +67,7 @@ setuptools.setup(
     packages=packages,
     install_requires=[
         'scipy >= 1.2.0',
-        'numpy >= 1.18.5'],
+        'numpy == 1.21.1'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
