@@ -17,7 +17,8 @@ class MeanVarDataRep(AccumulateData):
             n_init (int): initial number of samples
             replications (int): number of replications
         """
-        self.parameters = ['solution','error_bound','n_total','n','replications']
+        self.parameters = ['solution','indv_error_bound','ci_low','ci_high','ci_comb_low','ci_comb_high',
+            'solution_comb','flags_comb','flags_indv','n_total','n','replications']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -26,6 +27,7 @@ class MeanVarDataRep(AccumulateData):
         self.replications = int(replications)
         self.ysums = zeros((self.replications,self.integrand.dprime),dtype=float)
         self.solution = nan
+        self.solution_indv = nan
         self.muhat = inf # sample mean
         self.sighat = inf # sample standard deviation
         self.t_eval = 0  # processing time for each integrand
@@ -35,6 +37,7 @@ class MeanVarDataRep(AccumulateData):
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         self.compute_flags = ones(self.integrand.dprime)
         self.rep_integrands = self.integrand.spawn(levels=tile(0,int(self.replications)))
+        self.flags_indv = ones(self.integrand.dprime)
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):
@@ -46,12 +49,12 @@ class MeanVarDataRep(AccumulateData):
             integrand_r = self.rep_integrands[r]
             x = integrand_r.discrete_distrib.gen_samples(n_min=n_min,n_max=n_max)
             if integrand_r.dprime>1:
-                y = integrand_r.f(x,compute_flags=self.compute_flags)
+                y = integrand_r.f(x,compute_flags=self.flags_indv)
             else:
                 y = integrand_r.f(x)
-            yflagged = y*self.compute_flags
+            yflagged = y*self.flags_indv
             self.ysums[r] = self.ysums[r] + yflagged.sum(0)
         ymeans = self.ysums/self.n
-        self.solution = ymeans.mean(0)
+        self.solution_indv = ymeans.mean(0)
         self.sighat = ymeans.std(0)
         self.n_total = (self.n * self.replications).max()

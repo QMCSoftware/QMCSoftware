@@ -1,7 +1,8 @@
+from copy import deepcopy
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..discrete_distribution import DigitalNetB2,Lattice,Halton
+from ..discrete_distribution import Lattice,DigitalNetB2,Halton
 from ..true_measure import Gaussian
 from ..integrand import Keister,BoxIntegral
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
@@ -18,10 +19,19 @@ class CubQMCCLT(StoppingCriterion):
     >>> k = Keister(Lattice(seed=7))
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
+    >>> solution
+    array([1.38030146])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
-        error_bound     6.92e-04
+        indv_error_bound 6.92e-04
+        ci_low          1.380
+        ci_high         1.381
+        ci_comb_low     1.380
+        ci_comb_high    1.381
+        solution_comb   1.380
+        flags_comb      0
+        flags_indv      0
         n_total         2^(12)
         n               2^(8)
         replications    2^(4)
@@ -49,10 +59,19 @@ class CubQMCCLT(StoppingCriterion):
     >>> abs_tol = 1e-3
     >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
+    >>> solution
+    array([1.19023153, 0.96068581])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [1.19  0.961]
-        error_bound     [0.001 0.001]
+        indv_error_bound [0.001 0.001]
+        ci_low          [1.19 0.96]
+        ci_high         [1.191 0.961]
+        ci_comb_low     [1.19 0.96]
+        ci_comb_high    [1.191 0.961]
+        solution_comb   [1.19  0.961]
+        flags_comb      [False False]
+        flags_indv      [False False]
         n_total         2^(21)
         n               [131072.    512.]
         replications    2^(4)
@@ -84,7 +103,10 @@ class CubQMCCLT(StoppingCriterion):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
-                 inflate=1.2, alpha=0.01, replications=16.):
+        inflate=1.2, alpha=0.01, replications=16., 
+        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol),
+        bound_fun = lambda phvl,phvh: (phvl,phvh,False),
+        dependency = lambda flags_comb: flags_comb):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -94,6 +116,18 @@ class CubQMCCLT(StoppingCriterion):
             rel_tol (float): relative error tolerance
             n_max (int): maximum number of samples
             replications (int): number of replications
+            error_fun: function taking in the approximate solution vector, 
+                absolute tolerance, and relative tolerance which returns the approximate error. 
+                Default indicates integration until either absolute OR relative tolerance is satisfied.
+            bound_fun: function to compute the bounds on the combined function based on bounds for the individual functions. 
+                Defaults to the identity where we essentiallly do not combine integrands, 
+                but instead integrate each function individually.
+            dependency: function that takes a vector of indicators of wheather of not 
+                the error bound is satisfied for combined integrands and which returns flags for individual integrands. 
+                For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio 
+                has not been approximated to within the tolerance, so the dependency function should return [True,True]
+                indicating that both the numerator and denominator integrands need to be better approximated.
+
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Input Checks
@@ -102,21 +136,24 @@ class CubQMCCLT(StoppingCriterion):
             warnings.warn(warning_s, ParameterWarning)
             n_init = 32
         # Set Attributes
-        self.abs_tol = float(abs_tol)
-        self.rel_tol = float(rel_tol)
+        self.abs_tol = abs_tol
+        self.rel_tol = rel_tol
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.alpha = float(alpha)
         self.z_star = -norm.ppf(self.alpha / 2)
         self.inflate = float(inflate)
         self.replications = replications
+        self.error_fun = error_fun
+        self.bound_fun = bound_fun
+        self.dependency = dependency
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ["single"]
-        allowed_distribs = [DigitalNetB2,Lattice,Halton]
+        allowed_distribs = [Lattice,DigitalNetB2,Halton]
         allow_vectorized_integrals = True
         super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
         if not self.discrete_distrib.randomize:
@@ -129,10 +166,19 @@ class CubQMCCLT(StoppingCriterion):
         t_start = time()
         while True:
             self.data.update_data()
-            self.data.error_bound = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
-            tol_up = maximum(self.abs_tol, abs(self.data.solution) * self.rel_tol)
-            self.data.compute_flags = self.data.error_bound > tol_up
-            if sum(self.data.compute_flags)==0:
+            self.data.indv_error_bound = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
+            self.data.ci_low = self.data.solution_indv-self.data.indv_error_bound
+            self.data.ci_high = self.data.solution_indv+self.data.indv_error_bound
+            self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.bound_fun(self.data.ci_low,self.data.ci_high)
+            error_low = self.error_fun(self.data.ci_comb_low,self.abs_tol,self.rel_tol)
+            error_high = self.error_fun(self.data.ci_comb_high,self.abs_tol,self.rel_tol)
+            self.data.solution_comb = 1/2*(self.data.ci_comb_low+self.data.ci_comb_high+error_low-error_high)
+            rem_error_low = abs(self.data.ci_comb_low-self.data.solution_comb)-error_low
+            rem_error_high = abs(self.data.ci_comb_high-self.data.solution_comb)-error_high
+            self.data.flags_comb = maximum(rem_error_low,rem_error_high)>=0
+            self.data.flags_comb |= self.data.violated
+            self.data.flags_indv = self.dependency(self.data.flags_comb)
+            if sum(self.data.flags_indv)==0:
                 # sufficiently estimated
                 break
             elif 2 * self.data.n_total > self.n_max:
@@ -147,11 +193,10 @@ class CubQMCCLT(StoppingCriterion):
                 break
             else:
                 # double sample size
-                self.data.nprev = where(self.data.compute_flags,self.data.n,self.data.nprev)
-                self.data.n = where(self.data.compute_flags,2*self.data.n,self.data.n)
-        # CLT confidence interval
-        self.data.confid_int = self.data.solution +  self.data.error_bound * array([[-1.],[1.]])
+                self.data.nprev = where(self.data.flags_indv,self.data.n,self.data.nprev)
+                self.data.n = where(self.data.flags_indv,2*self.data.n,self.data.n)
         self.data.time_integrate = time() - t_start
+        self.data.solution = self.data.solution_comb
         return self.data.solution, self.data
     
     def set_tolerance(self, abs_tol=None, rel_tol=None):
