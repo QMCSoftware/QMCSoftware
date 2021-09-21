@@ -116,6 +116,18 @@ class CubQMCCLT(StoppingCriterion):
             rel_tol (float): relative error tolerance
             n_max (int): maximum number of samples
             replications (int): number of replications
+            error_fun: function taking in the approximate solution vector, 
+                absolute tolerance, and relative tolerance which returns the approximate error. 
+                Default indicates integration until either absolute OR relative tolerance is satisfied.
+            bound_fun: function to compute the bounds on the combined function based on bounds for the individual functions. 
+                Defaults to the identity where we essentiallly do not combine integrands, 
+                but instead integrate each function individually.
+            dependency: function that takes a vector of indicators of wheather of not 
+                the error bound is satisfied for combined integrands and which returns flags for individual integrands. 
+                For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio 
+                has not been approximated to within the tolerance, so the dependency function should return [True,True]
+                indicating that both the numerator and denominator integrands need to be better approximated.
+
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Input Checks
