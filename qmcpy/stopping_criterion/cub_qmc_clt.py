@@ -2,7 +2,7 @@ from copy import deepcopy
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..discrete_distribution import DigitalNetB2,Lattice,Halton
+from ..discrete_distribution import Lattice,DigitalNetB2,Halton
 from ..true_measure import Gaussian
 from ..integrand import Keister,BoxIntegral
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
@@ -19,10 +19,19 @@ class CubQMCCLT(StoppingCriterion):
     >>> k = Keister(Lattice(seed=7))
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
+    >>> solution
+    array([1.38030146])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
-        error_bound     6.92e-04
+        indv_error_bound 6.92e-04
+        ci_low          1.380
+        ci_high         1.381
+        ci_comb_low     1.380
+        ci_comb_high    1.381
+        solution_comb   1.380
+        flags_comb      0
+        flags_indv      0
         n_total         2^(12)
         n               2^(8)
         replications    2^(4)
@@ -50,10 +59,19 @@ class CubQMCCLT(StoppingCriterion):
     >>> abs_tol = 1e-3
     >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
+    >>> solution
+    array([1.19023153, 0.96068581])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [1.19  0.961]
-        error_bound     [0.001 0.001]
+        indv_error_bound [0.001 0.001]
+        ci_low          [1.19 0.96]
+        ci_high         [1.191 0.961]
+        ci_comb_low     [1.19 0.96]
+        ci_comb_high    [1.191 0.961]
+        solution_comb   [1.19  0.961]
+        flags_comb      [False False]
+        flags_indv      [False False]
         n_total         2^(21)
         n               [131072.    512.]
         replications    2^(4)
@@ -123,7 +141,7 @@ class CubQMCCLT(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ["single"]
-        allowed_distribs = [DigitalNetB2,Lattice,Halton]
+        allowed_distribs = [Lattice,DigitalNetB2,Halton]
         allow_vectorized_integrals = True
         super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
         if not self.discrete_distrib.randomize:
