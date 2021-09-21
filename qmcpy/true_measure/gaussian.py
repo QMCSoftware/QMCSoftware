@@ -1,29 +1,28 @@
 from ._true_measure import TrueMeasure
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..util import TransformError,DimensionError, ParameterError
-from ..discrete_distribution import Sobol
+from ..util import DimensionError, ParameterError
+from ..discrete_distribution import DigitalNetB2
 from numpy import *
-from numpy.linalg import cholesky, det, inv, eigh
-from scipy.stats import norm
-from scipy.special import erfcinv
+from numpy.linalg import cholesky, slogdet, eigh
+from scipy.stats import norm, multivariate_normal
 
 
 class Gaussian(TrueMeasure):
     """
     Normal Measure.
     
-    >>> g = Gaussian(Sobol(2,seed=7),mean=[1,2],covariance=[[9,4],[4,5]])
+    >>> g = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2],covariance=[[9,4],[4,5]])
     >>> g.gen_samples(4)
-    array([[ 1.35634625,  2.56809509],
-           [-2.30096376, -0.28228758],
-           [ 8.21131804,  2.94566957],
-           [-0.38123886,  3.59148049]])
+    array([[-0.23979685,  2.98944192],
+           [ 2.45994002,  2.17853622],
+           [-0.22923897, -1.92667105],
+           [ 4.6127697 ,  4.25820377]])
     >>> g
     Gaussian (TrueMeasure Object)
         mean            [1 2]
         covariance      [[9 4]
                         [4 5]]
-        decomp_type     pca
+        decomp_type     PCA
     """
 
     def __init__(self, sampler, mean=0., covariance=1., decomp_type='PCA'):
@@ -42,20 +41,13 @@ class Gaussian(TrueMeasure):
         self.parameters = ['mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform
         self.domain = array([[0,1]])
-        self._transform = self._transform_std_uniform
-        self._jacobian = self._jacobian_std_uniform
-        if isinstance(sampler,DiscreteDistribution) and sampler.mimics=='StdGaussian':
-            # need to use transformation from standard gaussian
-            self.domain = array([[-inf,inf]])
-            self._transform = self._transform_std_gaussian
-            self._jacobian = self._jacobian_std_gaussian
         self._parse_sampler(sampler)
-        self.decomp_type = decomp_type.lower()
-        self._set_mean_cov(mean,covariance)
+        self._parse_gaussian_params(mean,covariance,decomp_type)
         self.range = array([[-inf,inf]])
         super(Gaussian,self).__init__()
     
-    def _set_mean_cov(self, mean, covariance):
+    def _parse_gaussian_params(self, mean, covariance, decomp_type):
+        self.decomp_type = decomp_type.upper()
         self.mean = mean
         self.covariance = covariance
         if isscalar(mean):
@@ -70,49 +62,35 @@ class Gaussian(TrueMeasure):
             raise DimensionError('''
                     mean must have length d and
                     covariance must be of shape d x d''')
-        self._set_constants()
-    
-    def _set_constants(self):
-        if self.decomp_type == 'pca':
+        if self.decomp_type == 'PCA':
             evals,evecs = eigh(self.sigma) # get eigenvectors and eigenvalues for
             order = argsort(-evals)
             self.a = dot(evecs[:,order],diag(sqrt(evals[order])))
-        elif self.decomp_type == 'cholesky':
+        elif self.decomp_type == 'CHOLESKY':
             self.a = cholesky(self.sigma).T
         else:
-            raise ParameterError("decomp_type should be 'PCA' or 'Cholesky'")
-        self.det_sigma = det(self.sigma)
-        self.det_a = sqrt(self.det_sigma)
-        self.inv_sigma = inv(self.sigma)  
-    
-    def _transform_std_uniform(self, x):
+            raise ParameterError("decomp_type should be 'PCA' or 'Cholesky'") 
+        self.mvn_scipy = multivariate_normal(mean=self.mu,cov=self.sigma)
+
+    def _transform(self, x):
         return self.mu + norm.ppf(x)@self.a.T
-    
-    def _jacobian_std_uniform(self, x):
-        return self.det_a/norm.pdf(norm.ppf(x)).prod(1)
-    
-    def _transform_std_gaussian(self, x):
-        return self.mu + x@self.a.T
-    
-    def _jacobian_std_gaussian(self, x):
-        return tile(self.det_a,x.shape[0])
 
-    def _weight(self, x):
-        const = (2*pi)**(-self.d/2) * self.det_sigma**(-1./2)
-        delta = x-self.mu
-        return const*exp(-((delta@self.inv_sigma)*delta).sum(1)/2)
-
-    def _set_dimension(self, dimension):
-        m = self.mu[0]
-        c = self.sigma[0,0]
-        expected_cov = c*eye(int(self.d))
-        if not ( (self.mu==m).all() and (self.sigma==expected_cov).all() ):
-            raise DimensionError('''
-                    In order to change dimension of Gaussian measure
-                    mean (mu) must be all the same and 
-                    covariance must be a scaler times I''')
-        self.d = dimension
-        self.mu = tile(m,int(self.d))
-        self.sigma = c*eye(int(self.d))
-        self._set_constants()
+    def _weight(self, t):
+        return self.mvn_scipy.pdf(t)
     
+    def _spawn(self, sampler, dimension):
+        if dimension==self.d: # don't do anything if the dimension doesn't change
+            spawn = Gaussian(sampler,mean=self.mu,covariance=self.covariance,decomp_type=self.decomp_type)
+        else:
+            m = self.mu[0]
+            c = self.sigma[0,0]
+            expected_cov = c*eye(int(self.d))
+            if not ( (self.mu==m).all() and (self.sigma==expected_cov).all() ):
+                raise DimensionError('''
+                        In order to spawn a Gaussian measure
+                        mean (mu) must be all the same and 
+                        covariance must be a scaler times I''')
+            spawn = Gaussian(sampler,mean=m,covariance=c,decomp_type=self.decomp_type)
+        return spawn
+
+class Normal(Gaussian): pass

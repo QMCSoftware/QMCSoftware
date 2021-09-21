@@ -18,16 +18,16 @@ def keister(dimension=3, abs_tol=.5):
     solution,data = stopping_criterion.integrate()
     print('%s%s'%(data,bar))
 
-    # CubQMCCLT
-    discrete_distrib = Lattice(dimension, randomize=True, seed=7)
-    integrand = Keister(discrete_distrib)
-    solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
-    print('%s%s'%(data,bar))
-
     # CubMCG
     discrete_distrib = IIDStdUniform(dimension, seed=7)
     integrand = Keister(discrete_distrib)
     solution,data = CubMCG(integrand,abs_tol=abs_tol).integrate()
+    print('%s%s'%(data,bar))
+
+    # CubQMCCLT
+    discrete_distrib = Lattice(dimension, randomize=True, seed=7)
+    integrand = Keister(discrete_distrib)
+    solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubQMCLatticeG
@@ -49,10 +49,10 @@ def keister(dimension=3, abs_tol=.5):
     print('%s%s'%(data,bar))
 
     # CubBayesNetG
-    discrete_distrib = Sobol(dimension=dimension, randomize='LMS', graycode=False)
+    discrete_distrib = Sobol(dimension=dimension, graycode=False)
     integrand = Keister(discrete_distrib)
     solution, data = CubBayesNetG(integrand, abs_tol=abs_tol).integrate()
     print('%s%s' % (data, bar))
 
 if __name__ == "__main__":
-    keister(abs_tol=.005)
+    keister(abs_tol=.0025)

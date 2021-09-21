@@ -7,7 +7,7 @@ from workouts.mc_vs_qmc.integrations_asian_call import integrations_dict
 
 def compare_mean_shifts(abs_tol=.1, dimension=4, mean_shifts=[0,.5,1], trials=1):
     header = ['Stopping Criterion','Distribution','MC/QMC','mean_shift','solution','n_samples','time']
-    results = pd.DataFrame(columns=header)
+    results = pd.DataFrame(columns=header,dtype=float)
     print(('%-15s'*7)%tuple(header))
     i = 0
     for problem,function in integrations_dict.items():

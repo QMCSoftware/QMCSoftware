@@ -44,11 +44,13 @@ class MeanVarData(AccumulateData):
         self.ncv = int(len(self.cv))
         # Set Attributes
         if self.integrand.leveltype=='fixed-multi':
-            self.levels = len(self.integrand.dimensions)
-            if not self.cv == []:
+            self.levels = self.integrand.max_level+1
+            self.level_integrands = self.integrand.spawn(arange(self.levels))
+            if self.ncv>0:
                 raise ParameterError("Control variates are currently only supported for single-level problems.")
         else:
             self.levels = 1
+            self.level_integrands = [self.integrand]
         self.solution = nan
         self.muhat = full(self.levels, inf)  # sample mean
         self.sighat = full(self.levels, inf)  # sample standard deviation
@@ -59,32 +61,25 @@ class MeanVarData(AccumulateData):
         super(MeanVarData,self).__init__()
 
     def update_data(self):
-        """ See abstract method. """
         for l in range(self.levels):
             t_start = time() # time the integrand values
-            if self.integrand.leveltype=='fixed-multi':
-                # reset dimension
-                new_dim = self.integrand._dim_at_level(l)
-                self.true_measure._set_dimension_r(new_dim)
-                samples = self.discrete_distrib.gen_samples(n=self.n[l])
-                y = self.integrand.f(samples,l=l).squeeze()
-            else:
-                n = int(self.n[l])
-                samples = self.discrete_distrib.gen_samples(n)
-                y = self.integrand.f(samples).squeeze()
-                if self.ncv>0:
-                    # using control variates
-                    cvdata = zeros((n,self.ncv),dtype=float)
-                    for i in range(self.ncv):
-                        cvdata[:,i] = self.cv[i].f(samples).squeeze()
-                    cvmuhats = cvdata.mean(0)
-                    if not hasattr(self,'beta_hat'):
-                        # approximate control varite coefficient
-                        x4beta = cvdata-cvmuhats[None,:]
-                        y4beta = y-y.mean()
-                        self.beta_hat = linalg.lstsq(x4beta,y4beta,rcond=None)[0].reshape((-1,1))
-                    cvterm = self.beta_hat.T@(cvdata-self.cv_mu.T).T
-                    y = y-cvterm.squeeze() # use control variates and apprixmated coefficient to 
+            integrand_l = self.level_integrands[l]
+            n  = int(int(self.n[l]))
+            samples = integrand_l.discrete_distrib.gen_samples(n)
+            y = integrand_l.f(samples).squeeze()
+            if self.ncv>0:
+                # using control variates
+                cvdata = zeros((n,self.ncv),dtype=float)
+                for i in range(self.ncv):
+                    cvdata[:,i] = self.cv[i].f(samples).squeeze()
+                cvmuhats = cvdata.mean(0)
+                if not hasattr(self,'beta_hat'):
+                    # approximate control varite coefficient
+                    x4beta = cvdata-cvmuhats[None,:]
+                    y4beta = y-y.mean()
+                    self.beta_hat = linalg.lstsq(x4beta,y4beta,rcond=None)[0].reshape((-1,1))
+                cvterm = self.beta_hat.T@(cvdata-self.cv_mu.T).T
+                y = y-cvterm.squeeze() # use control variates and apprixmated coefficient to 
             self.t_eval[l] = max( (time()-t_start)/self.n[l], self.EPS) 
             self.sighat[l] = y.std() # compute the sample standard deviation
             self.muhat[l] = y.mean() # compute the sample mean

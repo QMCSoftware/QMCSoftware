@@ -16,7 +16,7 @@ def vary_dimension(dimension=[1,2,3], abs_tol=0, rel_tol=.1, trials=1):
     for integrating the Keister function with varying dimensions
     """
     header = ['Stopping Criterion','Distribution','MC/QMC','dimension','solution','n_samples','time']
-    results = pd.DataFrame(columns=header)
+    results = pd.DataFrame(columns=header,dtype=float)
     print(('%-20s'*2+'%-15s'*5)%tuple(header))
     i = 0
     for problem,function in integrations_dict.items():

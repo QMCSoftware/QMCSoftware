@@ -41,18 +41,17 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
     kur1 = array([])
     chk1 = array([])
     cost = array([])
+    integrands = integrand_qmcpy.spawn(levels=arange(l+1))
     for ll in range(l+1):
         sums = 0
         cst = 0
+        intgrand_level = integrands[ll]
         for j in range(1,101):
-            # reset dimension
-            new_dim = integrand_qmcpy._dim_at_level(ll)
-            integrand_qmcpy.true_measure._set_dimension_r(new_dim)
             # evaluate integral at sampleing points samples
-            samples = integrand_qmcpy.discrete_distrib.gen_samples(n=n/100)
-            integrand_qmcpy.f(samples,l=ll)
-            sums_j = integrand_qmcpy.sums
-            cst_j = integrand_qmcpy.cost
+            samples = intgrand_level.discrete_distrib.gen_samples(n=n/100)
+            intgrand_level.f(samples)
+            sums_j = intgrand_level.sums
+            cst_j = intgrand_level.cost
             sums = sums + sums_j/n
             cst = cst + cst_j/n
         if ll == 0:

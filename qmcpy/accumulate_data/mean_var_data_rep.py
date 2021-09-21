@@ -1,6 +1,5 @@
 from ._accumulate_data import AccumulateData
 from numpy import *
-from copy import deepcopy
 
 class MeanVarDataRep(AccumulateData):
     """
@@ -34,11 +33,8 @@ class MeanVarDataRep(AccumulateData):
         self.nprev = zeros(self.integrand.dprime,dtype=float) # previous number of samples drawn from discrete distributoin
         self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
-        # get seeds for each replication
-        ld_seeds = self.discrete_distrib.rng.choice(100000,self.replications,replace=False).astype(dtype=uint64)+1
-        self.ld_streams = [deepcopy(self.discrete_distrib) for r in range(self.replications)]
-        for r in range(self.replications): self.ld_streams[r].set_seed(ld_seeds[r])
         self.compute_flags = ones(self.integrand.dprime)
+        self.rep_integrands = self.integrand.spawn(levels=tile(0,int(self.replications)))
         super(MeanVarDataRep,self).__init__()
 
     def update_data(self):
@@ -47,11 +43,12 @@ class MeanVarDataRep(AccumulateData):
         n_max = self.n[nmaxidx]
         n_min = self.nprev[nmaxidx]
         for r in range(self.replications):
-            x = self.ld_streams[r].gen_samples(n_min=n_min,n_max=n_max)
-            if self.integrand.dprime>1:
-                y = self.integrand.f(x,compute_flags=self.compute_flags)
+            integrand_r = self.rep_integrands[r]
+            x = integrand_r.discrete_distrib.gen_samples(n_min=n_min,n_max=n_max)
+            if integrand_r.dprime>1:
+                y = integrand_r.f(x,compute_flags=self.compute_flags)
             else:
-                y = self.integrand.f(x)
+                y = integrand_r.f(x)
             yflagged = y*self.compute_flags
             self.ysums[r] = self.ysums[r] + yflagged.sum(0)
         ymeans = self.ysums/self.n

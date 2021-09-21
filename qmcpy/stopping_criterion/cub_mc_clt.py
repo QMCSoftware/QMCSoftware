@@ -14,38 +14,44 @@ class CubMCCLT(StoppingCriterion):
     """
     Stopping criterion based on the Central Limit Theorem.
     
-    >>> k = Keister(IIDStdUniform(2,seed=7))
-    >>> sc = CubMCCLT(k,abs_tol=.05)
+    >>> ao = AsianOption(IIDStdUniform(seed=7))
+    >>> sc = CubMCCLT(ao,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.801...
     >>> data
     MeanVarData (AccumulateData Object)
-        solution        1.801
-        error_bound     0.051
-        n_total         6765
-        n               5741
+        solution        1.519
+        error_bound     0.046
+        n_total         96028
+        n               95004
         levels          1
         time_integrate  ...
     CubMCCLT (StoppingCriterion Object)
-        inflate         1.200
-        alpha           0.010
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
         n_max           10000000000
-    Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+        inflate         1.200
+        alpha           0.010
+    AsianOption (Integrand Object)
+        volatility      2^(-1)
+        call_put        call
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        mean_type       arithmetic
+        dim_frac        0
+    BrownianMotion (TrueMeasure Object)
+        time_vec        1
+        drift           0
         mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+        covariance      1
+        decomp_type     PCA
     IIDStdUniform (DiscreteDistribution Object)
-        d               2^(1)
-        seed            7
-        mimics          StdUniform
-    >>> ac = AsianOption(IIDStdUniform(),
-    ...     multi_level_dimensions = [2,4,8])
-    >>> sc = CubMCCLT(ac,abs_tol=.05)
+        d               1
+        entropy         7
+        spawn_key       ()
+    >>> ao = AsianOption(IIDStdUniform(seed=7),multilevel_dims=[2,4,8])
+    >>> sc = CubMCCLT(ao,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> dd = IIDStdUniform(1,seed=7)
     >>> k = Keister(dd)
@@ -56,11 +62,11 @@ class CubMCCLT(StoppingCriterion):
     >>> sc1 = CubMCCLT(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
     >>> sol,data = sc1.integrate()
     >>> sol
-    1.38300...
+    1.381...
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
-                 inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
+        inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -74,7 +80,7 @@ class CubMCCLT(StoppingCriterion):
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
         """
-        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
+        self.parameters = ['abs_tol','rel_tol','n_init','n_max','inflate','alpha']
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -90,7 +96,7 @@ class CubMCCLT(StoppingCriterion):
         self.cv_mu = control_variate_means
         # Verify Compliant Construction
         allowed_levels = ['single','fixed-multi']
-        allowed_distribs = ["IIDStdUniform","IIDStdGaussian"]
+        allowed_distribs = [IIDStdUniform]
         allow_vectorized_integrals = False
         super(CubMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 

@@ -4,6 +4,7 @@ evaluating the Keister function with varying absolute tolerance
 """
 
 from qmcpy import *
+from numpy import *
 from workouts.mc_vs_qmc.integrations_keister import integrations_dict
 from time import time
 from numpy import arange, nan
@@ -17,7 +18,7 @@ def vary_abs_tol(dimension=3, abs_tol=[.1,.2,.3], rel_tol=0, trials=1):
     varying absolute tolerances
     """
     header = ['Stopping Criterion','Distribution','MC/QMC','abs_tol','solution','n_samples','time']
-    results = pd.DataFrame(columns=header)
+    results = pd.DataFrame(columns=header,dtype=float)
     print(('%-20s'*2+'%-15s'*5)%tuple(header))
     i = 0
     for problem,function in integrations_dict.items():

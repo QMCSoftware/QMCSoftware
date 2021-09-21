@@ -22,8 +22,8 @@ class IntegrationExampleTest(unittest.TestCase):
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_asian_option_multi_level(self):
-        abs_tol =.05
-        integrand = AsianOption(IIDStdUniform(),multi_level_dimensions=[4,16,64])
+        abs_tol =.01
+        integrand = AsianOption(IIDStdUniform(),multilevel_dims=[4,16,64])
         solution,data = CubMCCLT(integrand, abs_tol).integrate()
         true_value = 1.7845
         self.assertTrue(abs(solution - true_value) < abs_tol)
@@ -33,7 +33,7 @@ class IntegrationExampleTest(unittest.TestCase):
         abs_tol = 1
         true_measure = Lebesgue(
             Uniform(
-                Sobol(2, randomize=True, seed=7),
+                DigitalNetB2(2, seed=7),
                 lower_bound=[1,3],
                 upper_bound=[3,6]))
         myfunc = lambda x: (x.prod(1))**3
@@ -81,7 +81,7 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = 0
         for i in range(len(dimensions)):
             d = dimensions[i]
-            integrand = Linear0(Sobol(d))
+            integrand = Linear0(DigitalNetB2(d))
             solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_value) < abs_tol)
 
@@ -127,7 +127,7 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_european_call(self):
         abs_tol = 1e-2
-        integrand = EuropeanOption(Sobol(16),
+        integrand = EuropeanOption(DigitalNetB2(16),
             volatility = .2,
             start_price = 5,
             strike_price = 10,
@@ -168,7 +168,7 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_european_put_bayes_net(self):
         abs_tol = 5e-2
         integrand = EuropeanOption(
-            sampler = Sobol(dimension=4, randomize='LMS'),
+            sampler = DigitalNetB2(dimension=4),
             volatility = .5,
             start_price = 10,
             strike_price = 10,
@@ -178,6 +178,7 @@ class IntegrationExampleTest(unittest.TestCase):
         solution,data = algorithm.integrate()
         true_value = integrand.get_exact_value()
         self.assertTrue(abs(solution-true_value) < abs_tol)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..discrete_distribution import Lattice
+from ..discrete_distribution import DigitalNetB2,Lattice,Halton
 from ..true_measure import Gaussian
 from ..integrand import Keister,BoxIntegral
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
@@ -18,12 +18,10 @@ class CubQMCCLT(StoppingCriterion):
     >>> k = Keister(Lattice(seed=7))
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.38049475])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
-        error_bound     4.83e-04
+        error_bound     6.92e-04
         n_total         2^(12)
         n               2^(8)
         replications    2^(4)
@@ -39,23 +37,22 @@ class CubQMCCLT(StoppingCriterion):
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
-        decomp_type     pca
+        decomp_type     PCA
     Lattice (DiscreteDistribution Object)
         d               1
+        dvec            0
         randomize       1
         order           natural
-        seed            7
-        mimics          StdUniform
+        entropy         7
+        spawn_key       ()
     >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
     >>> abs_tol = 1e-3
     >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.19031076, 0.96093376])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [1.19  0.961]
-        error_bound     [0. 0.]
+        error_bound     [0.001 0.001]
         n_total         2^(21)
         n               [131072.    512.]
         replications    2^(4)
@@ -74,10 +71,11 @@ class CubQMCCLT(StoppingCriterion):
         upper_bound     1
     Lattice (DiscreteDistribution Object)
         d               3
+        dvec            [0 1 2]
         randomize       1
         order           natural
-        seed            7
-        mimics          StdUniform
+        entropy         7
+        spawn_key       ()
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
     >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
     >>> true_value = array([sol3neg1,sol31])
@@ -118,7 +116,7 @@ class CubQMCCLT(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ["single"]
-        allowed_distribs = ["Lattice", "Sobol","Halton"]
+        allowed_distribs = [DigitalNetB2,Lattice,Halton]
         allow_vectorized_integrals = True
         super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
         if not self.discrete_distrib.randomize:

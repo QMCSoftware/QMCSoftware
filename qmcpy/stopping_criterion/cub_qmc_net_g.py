@@ -1,29 +1,27 @@
 from ._cub_qmc_ld_g import CubQMCLDG
 from ..util import ParameterError
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, CustomFun
 from numpy import *
 
 
-class CubQMCSobolG(CubQMCLDG):
-    """
+class CubQMCNetG(CubQMCLDG):
+    r"""
     Quasi-Monte Carlo method using Sobol' cubature over the
     d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
 
-    >>> k = Keister(Sobol(2,seed=7))
-    >>> sc = CubQMCSobolG(k,abs_tol=.05)
+    >>> k = Keister(DigitalNetB2(2,seed=7))
+    >>> sc = CubQMCNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.807...
     >>> data
     LDTransformData (AccumulateData Object)
-        solution        1.808
+        solution        1.809
         error_bound     0.005
         n_total         2^(10)
         time_integrate  ...
-    CubQMCSobolG (StoppingCriterion Object)
+    CubQMCNetG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
@@ -32,24 +30,24 @@ class CubQMCSobolG(CubQMCLDG):
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
-        decomp_type     pca
-    Sobol (DiscreteDistribution Object)
+        decomp_type     PCA
+    DigitalNetB2 (DiscreteDistribution Object)
         d               2^(1)
-        randomize       1
+        dvec            [0 1]
+        randomize       LMS_DS
         graycode        0
-        seed            7
-        mimics          StdUniform
-        dim0            0
-    >>> dd = Sobol(3,seed=7)
+        entropy         7
+        spawn_key       ()
+    >>> dd = DigitalNetB2(3,seed=7)
     >>> g1 = CustomFun(Uniform(dd,0,2),lambda t: 10*t[:,0]-5*t[:,1]**2+t[:,2]**3)
     >>> cv1 = CustomFun(Uniform(dd,0,2),lambda t: t[:,0])
     >>> cv2 = CustomFun(Uniform(dd,0,2),lambda t: t[:,1]**2)
-    >>> sc = CubQMCSobolG(g1,abs_tol=1e-6,check_cone=True,
+    >>> sc = CubQMCNetG(g1,abs_tol=1e-6,check_cone=True,
     ...     control_variates = [cv1,cv2],
     ...     control_variate_means = [1,4/3])
     >>> sol,data = sc.integrate()
     >>> print(sol)
-    5.3333333...
+    5.333...
     >>> exactsol = 16/3
     >>> print(abs(sol-exactsol)<1e-6)
     True
@@ -103,14 +101,15 @@ class CubQMCSobolG(CubQMCLDG):
             control_variate_means (list): list of means for each control variate
             update_beta (bool): update control variate beta coefficients at each iteration? 
         """
-        super(CubQMCSobolG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,
+        super(CubQMCNetG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,
             check_cone,control_variates,control_variate_means,update_beta,
             ptransform = 'none',
             coefv = lambda nl: ones(nl,dtype=float), 
             allowed_levels = ['single'],
-            allowed_distribs = ["Sobol"],
+            allowed_distribs = [DigitalNetB2],
             cast_complex = False)
         if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False.")
 
-CubQMCNetG = CubQMCSobolG
+
+class CubQMCSobolG(CubQMCNetG): pass
