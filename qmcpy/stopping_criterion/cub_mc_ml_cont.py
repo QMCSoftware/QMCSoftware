@@ -20,16 +20,16 @@ class CubMCMLCont(StoppingCriterion):
     >>> solution,data = sc.integrate()
     >>> data
     MLMCData (AccumulateData Object)
-        solution        10.413
-        n_total         1198893
-        levels          5
-        n_level         [1.161e+06 2.245e+04 9.014e+03 5.482e+03 5.760e+02]
-        mean_level      [10.047  0.183  0.101  0.057  0.024]
-        var_level       [1.959e+02 1.476e-01 4.393e-02 1.365e-02 2.802e-03]
-        cost_per_sample [ 1.  2.  4.  8. 16.]
-        alpha           0.970
-        beta            1.884
-        gamma           1
+        solution        10.400
+        n_total         1193331
+        levels          2^(2)
+        n_level         [1133772.   22940.    8676.    2850.]
+        mean_level      [10.059  0.186  0.105  0.05 ]
+        var_level       [1.959e+02 1.603e-01 4.567e-02 1.013e-02]
+        cost_per_sample [1. 2. 4. 8.]
+        alpha           0.942
+        beta            1.992
+        gamma           1.000
         time_integrate  ...
     CubMCMLCont (StoppingCriterion Object)
         rmse_tol        0.019
@@ -39,7 +39,7 @@ class CubMCMLCont(StoppingCriterion):
         n_tols          10
         tol_mult        1.668
         theta_init      2^(-1)
-        theta           0.110
+        theta           2^(-1)
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -56,7 +56,7 @@ class CubMCMLCont(StoppingCriterion):
         d               1
         entropy         7
         spawn_key       ()
-    
+
     References:
 
         [1] https://github.com/PieterjanRobbe/MultilevelEstimators.jl

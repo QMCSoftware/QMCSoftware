@@ -21,7 +21,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
-        error_bound     6.97e-04
+        error_bound     6.92e-04
         n_total         2^(12)
         n               2^(8)
         replications    2^(4)
@@ -51,7 +51,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> solution,data = sc.integrate()
     >>> data
     MeanVarDataRep (AccumulateData Object)
-        solution        [1.19 0.96]
+        solution        [1.19  0.961]
         error_bound     [0.001 0.001]
         n_total         2^(21)
         n               [131072.    512.]
