@@ -54,7 +54,7 @@ class TestIntegrand(unittest.TestCase):
                 y = integrand.f(x,periodization_transform=ptransform)
                 self.assertTrue(y.shape==(n,integrand.dprime))
                 self.assertTrue(isfinite(y).all())
-                self.assertTrue(y.dtype==float)
+                self.assertTrue(y.dtype==float64)
 
 
 if __name__ == "__main__":
