@@ -137,17 +137,34 @@ class Lattice(DiscreteDistribution):
         x = x_lat_full[cut1:cut2,:]
         return x
 
-    def _gail_linear(self, n_min, n_max):
-        """ Gail lattice generator in linear order. """
-        if (n_min!=0 and log2(n_min)%1!=0) or log2(n_max)%1!=0:
-            raise Exception("Lattice with linear ordering currently does not support n_min, n_max not powers of 2.")
-        nelem = n_max - n_min
-        if n_min == 0:
-            y = arange(0, 1, 1 / nelem).reshape((nelem, 1))
+    def _gen_block_linear(self, m_next, first=True):
+        n = int(2**m_next)
+        if first:
+            y = arange(0, 1, 1 / n).reshape((n, 1))
         else:
-            y = arange(1 / n_max, 1, 2 / n_max).reshape((nelem, 1))
+            y = arange(1 / n, 1, 2 / n).reshape((n, 1))
         x = outer(y, self.z) % 1
         return x
+
+    def _gail_linear(self, n_min, n_max):
+        """ Gail lattice generator in linear order. """
+        m_low = int(floor(log2(n_min))) + 1 if n_min > 0 else 0
+        m_high = int(ceil(log2(n_max)))
+        if n_min == 0:
+            return self._gen_block_linear(m_high, first=True)
+        else:
+            n = 2**(m_low)
+            y = arange(1 / n, 1, 2 / n).reshape((int(n/2), 1))
+            for m in range(m_low, m_high):
+                n = 2**(m)
+                y_next = arange(1 / n, 1, 2 / n).reshape((int(n/2), 1))
+                temp = zeros((n, 1))
+                temp[0::2] = y
+                temp[1::2] = y_next
+                y = temp
+
+            x = outer(y, self.z) % 1
+            return x
 
     def _gail_natural(self, n_min, n_max):
         m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
