@@ -103,13 +103,7 @@ class TestLattice(unittest.TestCase):
     def test_linear_order_not_power_of_2(self):
         l = Lattice(dimension=3, order='linear')
         x = l.gen_samples(n_min=2, n_max=5)
-        assert x.shape == (4, 3)
-
-    def test_set_dimension(self):
-        distribution = Lattice(dimension=2)
-        distribution._set_dimension(3)
-        samples = distribution.gen_samples(4)
-        self.assertTrue(samples.shape==(4,3))
+        assert x.shape==(4,3)
 
 
 class TestDigitalNetB2(unittest.TestCase):

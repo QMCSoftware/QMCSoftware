@@ -227,13 +227,6 @@ class Lattice(DiscreteDistribution):
             warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
         if n_max > 2**self.m_max:
             raise ParameterError('Lattice generating vector supports up to %d samples.'%(2**self.m_max))
-        if self.order=='linear' and n_min!=0 and warn:
-            warnings.warn('''
-                Lattice in linear does not support taking subsets with n_min!=0. for example, if 
-                    x08 = Lattice(2,order='linear',seed=7).gen_samples(n_min=0,n_max=8)
-                    x48 = Lattice(2,order='linear',seed=7).gen_samples(n_min=4,n_max=8)
-                then 
-                    x08[4:8,:] != x48''')
         x = self.gen(n_min,n_max)
         if self.randomize:
             xr = (x + self.shift)%1
