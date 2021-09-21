@@ -19,8 +19,6 @@ class CubBayesLatticeG(StoppingCriterion):
     >>> k = Keister(Lattice(2, order='linear', seed=123456789))
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.808...
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.808
@@ -37,13 +35,14 @@ class CubBayesLatticeG(StoppingCriterion):
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
-        decomp_type     pca
+        decomp_type     PCA
     Lattice (DiscreteDistribution Object)
         d               2^(1)
+        dvec            [0 1]
         randomize       1
         order           linear
-        seed            123456789
-        mimics          StdUniform
+        entropy         123456789
+        spawn_key       ()
     
     Adapted from 
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m
@@ -117,7 +116,7 @@ class CubBayesLatticeG(StoppingCriterion):
         
         # Verify Compliant Construction
         allowed_levels = ['single']
-        allowed_distribs = ["Lattice"]
+        allowed_distribs = [Lattice]
         allow_vectorized_integrals = False
         super(CubBayesLatticeG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 

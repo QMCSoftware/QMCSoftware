@@ -47,11 +47,10 @@ packages = [
     'qmcpy.accumulate_data',
     'qmcpy.util',
     'qmcpy.integrand',
-    'qmcpy.discrete_distribution.halton',
-    'qmcpy.discrete_distribution.korobov',
+    'qmcpy.discrete_distribution',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
-    'qmcpy.discrete_distribution.sobol']
+    'qmcpy.discrete_distribution.digital_net_b2']
 
 setuptools.setup(
     name="qmcpy",
@@ -67,7 +66,7 @@ setuptools.setup(
     packages=packages,
     install_requires=[
         'scipy >= 1.2.0',
-        'numpy >= 1.18.5'],
+        'numpy == 1.21.1'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
@@ -80,11 +79,8 @@ setuptools.setup(
         Extension(
             name='qmcpy.discrete_distribution.c_lib.c_lib',
             sources=[
-                'qmcpy/discrete_distribution/c_lib/halton_owen.c',
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
-                'qmcpy/discrete_distribution/c_lib/korobov_qrng.c',
-                'qmcpy/discrete_distribution/c_lib/sobol.c',
-                'qmcpy/discrete_distribution/c_lib/MRG63k3a.c',
+                'qmcpy/discrete_distribution/c_lib/digital_net_b2.c',
                 'qmcpy/discrete_distribution/c_lib/fwht.c',],)],
     cmdclass={
         'clean': CleanCommand,

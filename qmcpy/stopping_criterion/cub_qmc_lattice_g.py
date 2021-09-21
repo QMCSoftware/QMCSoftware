@@ -7,7 +7,7 @@ from numpy import *
 
 
 class CubQMCLatticeG(CubQMCLDG):
-    """
+    r"""
     Stopping Criterion quasi-Monte Carlo method using rank-1 Lattices cubature over
     a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Fourier coefficients cone decay assumptions.
@@ -15,11 +15,9 @@ class CubQMCLatticeG(CubQMCLDG):
     >>> k = Keister(Lattice(2,seed=7))
     >>> sc = CubQMCLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.806...
     >>> data
     LDTransformData (AccumulateData Object)
-        solution        1.807
+        solution        1.810
         error_bound     0.005
         n_total         2^(10)
         time_integrate  ...
@@ -32,13 +30,14 @@ class CubQMCLatticeG(CubQMCLDG):
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
-        decomp_type     pca
+        decomp_type     PCA
     Lattice (DiscreteDistribution Object)
         d               2^(1)
+        dvec            [0 1]
         randomize       1
         order           natural
-        seed            7
-        mimics          StdUniform
+        entropy         7
+        spawn_key       ()
     
     Original Implementation:
 
@@ -92,7 +91,7 @@ class CubQMCLatticeG(CubQMCLDG):
             ptransform = ptransform,
             coefv = lambda nl: exp(-2*pi*1j*arange(nl)/(2*nl)), 
             allowed_levels = ['single'],
-            allowed_distribs = ["Lattice"],
+            allowed_distribs = [Lattice],
             cast_complex = True)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")

@@ -1,64 +1,71 @@
 from qmcpy import *
 from qmcpy.util import *
 from numpy import *
-import sys
+import scipy.stats
 import unittest
 
-        
-class TestUniform(unittest.TestCase):
-    """ Unit tests for Uniform Measure. """
 
-    def test_methods(self):
-        u = Uniform(Sobol(2), lower_bound=-2, upper_bound=2)
-        t = u.gen_samples(2**2)
-        self.assertTrue(t.shape==(4,2))
-        self.assertTrue((u.a==tile(-2,2)).all() and (u.b==tile(2,2)).all())
-
-    def test_errors(self):
-        u = Uniform(Sobol(2), lower_bound=[0,-2],upper_bound=[2,2])
-        self.assertRaises(DimensionError,u._set_dimension,3)
-        u = Uniform(Sobol(2), lower_bound=[-2,-2],upper_bound=[5,2])
-        self.assertRaises(DimensionError,u._set_dimension,3) 
-
-
-class TestGaussian(unittest.TestCase):
-    """ Unit tests for Gaussian Measure. """
-
-    def test_methods(self):
-        for decomp_type in ['Cholesky','PCA']:
-            g = Gaussian(Sobol(2), mean=5, covariance=2)
-            t = g.gen_samples(2**2)
-            self.assertTrue(t.shape==(4,2))
-            self.assertTrue((g.mu==tile(5,2)).all() and (g.sigma==(2*eye(2))).all())
-
-    def test_errors(self):
-        g = Gaussian(Sobol(2), mean=[1,1],covariance=[1,2])
-        self.assertRaises(DimensionError,g._set_dimension,3)
-        g = Gaussian(Sobol(2), mean=[1,2],covariance=[2,2])
-        self.assertRaises(DimensionError,g._set_dimension,3)
-
-
-class TestBrownianMontion(unittest.TestCase):
-    """ Unit tests for Brownian Motion Measure. """
+class TestTrueMeasure(unittest.TestCase):
+    """ General tests for TrueMeasures """
     
-    def test_set_dimension(self):
-        bm = BrownianMotion(Sobol(4), t_final=1, drift=0)
-        self.assertTrue((bm.time_vec==array([1/4,1/2,3/4,1])).all())
-        bm = BrownianMotion(Sobol(4), t_final=2, drift=0)
-        self.assertTrue((bm.time_vec==array([1/2,1,3/2,2])).all())
-        bm = BrownianMotion(Sobol(4), t_final=2, drift=1)
-        self.assertTrue((bm.time_vec==bm.drift_time_vec).all())
-        bm._set_dimension(5)
-        self.assertTrue((bm.time_vec==bm.drift_time_vec).all())
+    def test_abstract_methods(self):
+        d = 2
+        tms = [
+            Uniform(DigitalNetB2(d)),
+            Uniform(DigitalNetB2(d),lower_bound=[1,2],upper_bound=[2,3]),
+            Kumaraswamy(DigitalNetB2(d)),
+            Kumaraswamy(DigitalNetB2(d),a=[2,4],b=[1,3]),
+            JohnsonsSU(DigitalNetB2(d)),
+            JohnsonsSU(DigitalNetB2(d),gamma=[1,2],xi=[4,5],delta=[7,8],lam=[10,11]),
+            Gaussian(DigitalNetB2(d)),
+            Gaussian(DigitalNetB2(d),mean=[1,2],covariance=[[9,5],[5,9]],decomp_type='Cholesky'),
+            Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d)))),
+            BrownianMotion(DigitalNetB2(d)),
+            BrownianMotion(DigitalNetB2(d),t_final=2,drift=3,decomp_type='Cholesky'),
+            BernoulliCont(DigitalNetB2(d)),
+            BernoulliCont(DigitalNetB2(d),lam=[.25,.75]),
+            SciPyWrapper(DigitalNetB2(2),scipy.stats.triang,c=[0.1,.2],loc=[1,2],scale=[3,4]),
+            SciPyWrapper(SciPyWrapper(DigitalNetB2(2),scipy.stats.triang,c=[0.1,.2]),scipy.stats.triang,c=[.3,.4]),
+        ]
+        for tm in tms:
+            for _tm in [tm]+tm.spawn(1):
+                t = _tm.gen_samples(4)
+                self.assertTrue(t.shape==(4,2))
+                self.assertTrue(t.dtype==float64)
+                x = _tm.discrete_distrib.gen_samples(4)
+                xtf,jtf = _tm._jacobian_transform_r(x)
+                self.assertTrue(xtf.shape==(4,d),jtf.shape==(4,))
+                w = _tm._weight(x)
+                self.assertTrue(w.shape==(4,))
+                s = str(_tm)
+            
+    def test_spawn(self):
+        d = 3
+        tms = [
+            Uniform(DigitalNetB2(d)),
+            Lebesgue(Uniform(DigitalNetB2(d))),
+            Lebesgue(Gaussian(DigitalNetB2(d))),
+            Kumaraswamy(DigitalNetB2(d)),
+            JohnsonsSU(DigitalNetB2(d)),
+            Gaussian(DigitalNetB2(d)),
+            Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d)))),
+            BrownianMotion(DigitalNetB2(d)),
+            BernoulliCont(DigitalNetB2(d)),
+            SciPyWrapper(SciPyWrapper(DigitalNetB2(2),scipy.stats.triang,c=.25),scipy.stats.triang,c=.75),
+        ]
+        for tm in tms:
+            s = 3
+            for spawn_dim in [4,[1,4,6]]:
+                spawns = tm.spawn(s=s,dimensions=spawn_dim)
+                self.assertTrue(len(spawns)==s)
+                self.assertTrue(all(type(spawn)==type(tm) for spawn in spawns))
+                self.assertTrue((array([spawn.d for spawn in spawns])==spawn_dim).all())
+                self.assertTrue((array([spawn.transform.d for spawn in spawns])==spawn_dim).all())
+                self.assertTrue((array([spawn.transform.transform.d for spawn in spawns])==spawn_dim).all())
+                self.assertTrue((array([spawn.discrete_distrib.d for spawn in spawns])==spawn_dim).all())
+                self.assertTrue((all(spawn.discrete_distrib!=tm.discrete_distrib for spawn in spawns)))
+                self.assertTrue(all(spawn.transform!=tm.transform for spawn in spawns))
 
-
-class TestLebesgue(unittest.TestCase):
-    """ Unit tests for Lebesgue Measure. """
-
-    def test_transformers(self):
-        for tf in [Uniform(Sobol(4)),Gaussian(Sobol(4)),BrownianMotion(Sobol(4))]:
-            l = Lebesgue(tf)
-            l._set_dimension_r(2)
 
 if __name__ == "__main__":
     unittest.main()

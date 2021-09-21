@@ -26,16 +26,16 @@ def asian_option_single_level(
     solution,data = CubMCCLT(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
-    # CubQMCCLT
-    discrete_distrib = Lattice(dimension, randomize=True, seed=7, order='MPS')
-    integrand = AsianOption(discrete_distrib, volatility, start_price, strike_price, interest_rate, t_final, call_put, mean_type)
-    solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
-    print('%s%s'%(data,bar))
-
     # CubMCG
     discrete_distrib = IIDStdUniform(dimension, seed=7)
     integrand = AsianOption(discrete_distrib, volatility, start_price, strike_price, interest_rate, t_final, call_put, mean_type)
     solution,data = CubMCG(integrand,abs_tol=abs_tol).integrate()
+    print('%s%s'%(data,bar))
+    
+    # CubQMCCLT
+    discrete_distrib = Lattice(dimension, randomize=True, seed=7, order='MPS')
+    integrand = AsianOption(discrete_distrib, volatility, start_price, strike_price, interest_rate, t_final, call_put, mean_type)
+    solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
 
     # CubQMCLatticeG
@@ -57,7 +57,7 @@ def asian_option_single_level(
     print('%s%s'%(data,bar))
 
     # CubBayesNetG
-    discrete_distrib = Sobol(dimension=dimension, randomize='LMS', graycode=False)
+    discrete_distrib = Sobol(dimension=dimension, graycode=False)
     integrand = AsianOption(discrete_distrib, volatility, start_price, strike_price, interest_rate, t_final, call_put, mean_type)
     solution,data = CubBayesNetG(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
@@ -101,5 +101,5 @@ def asian_option_single_level_high_dimensions(abs_tol=.5):
     print
 
 if __name__ == "__main__":
-    asian_option_single_level_high_dimensions(abs_tol=.025)
     asian_option_single_level(abs_tol=.025)
+    asian_option_single_level_high_dimensions(abs_tol=.025)

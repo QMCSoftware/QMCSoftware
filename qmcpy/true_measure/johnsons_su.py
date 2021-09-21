@@ -1,12 +1,27 @@
-from qmcpy.true_measure._true_measure import TrueMeasure
-from qmcpy.util import DimensionError, ParameterError
-from ..discrete_distribution import Sobol
+from ._true_measure import TrueMeasure
+from ..util import DimensionError, ParameterError
+from ..discrete_distribution import DigitalNetB2
 from numpy import *
 from scipy.stats import norm
 
 
 class JohnsonsSU(TrueMeasure):
-    """ See https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution """
+    """
+    >>> jsu = JohnsonsSU(DigitalNetB2(2,seed=7),gamma=1,xi=2,delta=3,lam=4)
+    >>> jsu.gen_samples(4)
+    array([[ 0.86224892, -0.76967276],
+           [ 0.07317047,  1.17727769],
+           [ 1.89093286,  2.9341619 ],
+           [-1.30283298,  0.62269632]])
+    >>> jsu
+    JohnsonsSU (TrueMeasure Object)
+        gamma           1
+        xi              2^(1)
+        delta           3
+        lam             2^(2)
+    
+    See https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution
+    """
 
     def __init__(self, sampler, gamma=1, xi=1, delta=2, lam=2):
         """
@@ -16,8 +31,8 @@ class JohnsonsSU(TrueMeasure):
                 true measure by which to compose a transform 
             gamma (ndarray): gamma
             xi (ndarray): xi
-            delta (ndarray): delta
-            lam (ndarray): lambda
+            delta (ndarray): delta > 0
+            lam (ndarray): lambda > 0
         """
         self.parameters = ['gamma', 'xi', 'delta', 'lam']
         self.domain = array([[0,1]])
@@ -47,10 +62,6 @@ class JohnsonsSU(TrueMeasure):
 
     def _transform(self, x):
         return self._lam*sinh((norm.ppf(x)-self._gamma)/self._delta)+self._xi
-
-    def _jacobian(self, x):
-        nppf = norm.ppf(x)
-        return prod( self._lam*cosh((nppf-self._gamma)/self._delta)/(self._delta*norm.pdf(nppf)), 1)
     
     def _weight(self, x):
         term1 = (x-self._xi)/self._lam
@@ -58,20 +69,20 @@ class JohnsonsSU(TrueMeasure):
         term3 = exp(-1/2*(self._gamma+self._delta*arcsinh(term1))**2)
         return prod( term2*term3, 1)
     
-    def _set_dimension(self, dimension):
-        gamma = self._gamma[0]
-        xi = self._xi[0]
-        delta = self._delta[0]
-        lam = self._lam[0]
-        if not ( all(self._gamma==gamma) and all(self._xi==xi) and all(self._delta==delta) and all(self._lam==lam) ):
-            raise DimensionError('''
-                In order to change dimension of a Johnson's S_U measure
-                gamma must all be the same and 
-                xi must all be the same and 
-                delta must all be the same and 
-                lam (lambda) must all be the same.''')
-        self.d = dimension
-        self._gamma = tile(gamma,self.d)
-        self._xi = tile(xi,self.d)
-        self._delta = tile(delta,self.d)
-        self._lam = tile(lam,self.d)
+    def _spawn(self, sampler, dimension):
+        if dimension==self.d: # don't do anything if the dimension doesn't change
+            spawn = JohnsonsSU(sampler,gamma=self._gamma,xi=self._xi,delta=self._delta,lam=self._lam)
+        else:
+            gamma = self._gamma[0]
+            xi = self._xi[0]
+            delta = self._delta[0]
+            lam = self._lam[0]
+            if not ( all(self._gamma==gamma) and all(self._xi==xi) and all(self._delta==delta) and all(self._lam==lam) ):
+                raise DimensionError('''
+                    In order to spawn a JohnsonsSU measure
+                    gamma must all be the same and 
+                    xi must all be the same and 
+                    delta must all be the same and 
+                    lam (lambda) must all be the same.''')
+            spawn = JohnsonsSU(sampler,gamma=gamma,xi=xi,delta=delta,lam=lam)
+        return spawn

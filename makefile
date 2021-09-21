@@ -1,22 +1,9 @@
-# Makefile for, running test suites, running workouts, and compiling documentaion
-#
 # Syntax notes:
 #   @ means don't echo command
-#   2>/dev/null means hide warnings and standard error --- remove that when trying
-#   to fix warnings or errors in documentation generation
-#
+#   2>/dev/null means hide warnings and standard error - remove when debugging
 #   -C for sphix-build will not look for conf.py
 #   -b for sphinx-build will look for conf.py
 
-tests:
-	@echo "\nDoctests"
-	python -m coverage run --source=./ -m pytest --doctest-modules --disable-pytest-warnings qmcpy
-	@echo "\nFastests"
-	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
-	@echo "\nLongtests"
-	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
-	@echo "\nCode coverage"
-	python -m coverage report -m
 mddir = sphinx/readme_rst/
 nbdir = sphinx/demo_rst/
 umldir = sphinx/uml/
@@ -25,6 +12,7 @@ SPHINXOPTS  ?= -W --keep-going
 SPHINXBUILD ?= sphinx-build
 SOURCEDIR = sphinx
 BUILDDIR = sphinx/_build
+
 _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) and $(nbdir) 
 	# Make Directries
 	@-rm -r -f $(mddir) 2>/dev/null &
@@ -35,7 +23,6 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	@grep -v  "\[\!" README.md > README2.md
 	@pandoc --mathjax README2.md -o $(mddir)QMCSoftware.rst
 	@rm README2.md
-	@pandoc --mathjax qmcpy/README.md -o $(mddir)qmcpy.rst
 	# Jupyter Notebook Demos --> RST
 	@mkdir $(nbdir)
 	@for f in demos/*.ipynb; do \
@@ -68,13 +55,27 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	@dot -Tpng sphinx/util_err.dot > $(umldir)util_err.png
 	#	Packages
 	@mv packages.png $(umldir)packages.png
+
 doc_html: _doc
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
+
 doc_pdf: _doc
 	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going 2>/dev/null
 	@cd sphinx/_build && make
+
 doc_epub: _doc
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
+
+tests:
+	@echo "\nDoctests"
+	python -m coverage run --source=./ -m pytest --doctest-modules --disable-pytest-warnings qmcpy
+	@echo "\nFastests"
+	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
+	@echo "\nLongtests"
+	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
+	@echo "\nCode coverage"
+	python -m coverage report -m
+
 workout:
 	# integration_examples
 	@python workouts/integration_examples/asian_option_multi_level.py > workouts/integration_examples/out/asian_option_multi_level.log

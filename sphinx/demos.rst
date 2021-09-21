@@ -14,7 +14,7 @@ Demos
 
     demo_rst/sample_scatter_plots.rst
 
-    demo_rst/MC_vs_QMC.rst
+    demo_rst/mc_vs_qmc.rst
 
     demo_rst/quasirandom_generators.rst
 
@@ -25,6 +25,8 @@ Demos
     demo_rst/qei-demo-for-blog.rst
 
     demo_rst/ray_tracing.rst
+
+    demo_rst/digital_net_b2.rst
 
     demo_rst/latnetbuilder.rst
 
