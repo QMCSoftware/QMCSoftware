@@ -36,7 +36,7 @@ class MeanVarDataRep(AccumulateData):
         self.n_total = 0 # total number of samples across all replications
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         self.compute_flags = ones(self.integrand.dprime)
-        self.rep_integrands = self.integrand.spawn(levels=tile(0,int(self.replications)))
+        self.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
         self.flags_indv = ones(self.integrand.dprime)
         super(MeanVarDataRep,self).__init__()
 
@@ -46,12 +46,11 @@ class MeanVarDataRep(AccumulateData):
         n_max = self.n[nmaxidx]
         n_min = self.nprev[nmaxidx]
         for r in range(self.replications):
-            integrand_r = self.rep_integrands[r]
-            x = integrand_r.discrete_distrib.gen_samples(n_min=n_min,n_max=n_max)
-            if integrand_r.dprime>1:
-                y = integrand_r.f(x,compute_flags=self.flags_indv)
+            x = self.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max)
+            if self.integrand.dprime>1:
+                y = self.integrand.f(x,compute_flags=self.flags_indv)
             else:
-                y = integrand_r.f(x)
+                y = self.integrand.f(x)
             yflagged = y*self.flags_indv
             self.ysums[r] = self.ysums[r] + yflagged.sum(0)
         ymeans = self.ysums/self.n

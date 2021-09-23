@@ -22,7 +22,8 @@ class Integrand(object):
             self.leveltype = 'single'
         if not hasattr(self,'max_level'):
             self.max_level = inf
-        self.discrete_distrib = self.true_measure.discrete_distrib
+        if not hasattr(self,'discrete_distrib'):
+            self.discrete_distrib = self.true_measure.discrete_distrib
         if self.true_measure.transform!=self.true_measure and \
            not (self.true_measure.range==self.true_measure.transform.range).all():
             raise ParameterError("The range of the composed transform is not compatibe with this true measure")
