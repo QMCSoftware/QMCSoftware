@@ -47,8 +47,8 @@ We may choose a Sobol' discrete distribution with a corresponding Sobol' cubatur
 import qmcpy as qp
 from numpy import pi, cos, sqrt, linalg
 d = 2
-sobol = qp.Sobol(d)
-gauss_sobol = qp.Gaussian(sobol, mean=0, covariance=1/2)
+dnb2 = qp.DigitalNetB2(d)
+gauss_sobol = qp.Gaussian(dnb2, mean=0, covariance=1/2)
 k = qp.CustomFun(
   true_measure = gauss_sobol, 
   g = lambda x: pi**(d/2)*cos(linalg.norm(x,axis=1)))
@@ -62,9 +62,9 @@ Running the above code outputs
 ```
 LDTransformData (AccumulateData Object)
     solution        1.808
-    error_bound     7.96e-04
-    n_total         2^(12)
-    time_integrate  0.006
+    error_bound     4.68e-04
+    n_total         2^(13)
+    time_integrate  0.008
 CubQMCSobolG (StoppingCriterion Object)
     abs_tol         0.001
     rel_tol         0
@@ -80,7 +80,7 @@ Sobol (DiscreteDistribution Object)
     dvec            [0 1]
     randomize       LMS_DS
     graycode        0
-    entropy         31478015904463279523976608227420809332
+    entropy         127071403717453177593768120720330942628
     spawn_key       ()
 ```
 
@@ -193,35 +193,20 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
 <b>[29]</b> D.H. Bailey, J.M. Borwein, R.E. Crandall, Box integrals, Journal of Computational and Applied Mathematics, Volume 206, Issue 1, 2007, Pages 196-208, ISSN 0377-0427, https://doi.org/10.1016/j.cam.2006.06.010.
 
+<b>[30]</b> Art B. Owen.Monte Carlo theory, methods and examples. 2013.
+
 ----
 
 ## Sponsors
 
-Illinois Tech
---------------
+- **[Illinois Tech](https://www.iit.edu)**
 
-   <p style="height:30x">
-     <a href="https://www.iit.edu">
-       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true" width="300" height="150">
-     </a>
-   </p>
+  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true" width="300" height="150">
 
-Kamakura Corporation
----------------------
+- **[Kamakura Corporation](http://www.kamakuraco.com)**
 
-   <p style="height:30x">
-     <a href="http://www.kamakuraco.com">
-       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
-     </a>
-   </p>
+  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
 
+- **[SigOpt, Inc.](https://sigopt.com)**
 
-SigOpt, Inc.
-------------
-
-   <p>
-     <a href="https://sigopt.com">
-       <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true" width="300" height="100"/>
-     </a>
-   </p>
-
+  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true" width="300" height="100"/>

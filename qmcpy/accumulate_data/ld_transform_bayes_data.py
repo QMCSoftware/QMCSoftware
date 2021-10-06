@@ -93,9 +93,10 @@ class LDTransformBayesData(AccumulateData):
             # update total samples
             self.n_total = 2 ** self.m  # updated the total evaluations
         else:
-            warnings.warn(f'Already used maximum allowed sample size {2 ** self.m_max}.'
-                          f' Note that error tolerances may no longer be satisfied',
-                          MaxSamplesWarning)
+            warnings.warn('''
+                Already used maximum allowed sample size %d.
+                Note that error tolerances may no longer be satisfied.'''%(2**self.m_max),
+                MaxSamplesWarning)
 
         return self.xun_, self.ftilde_, self.m
 
@@ -334,12 +335,12 @@ class LDTransformBayesData(AccumulateData):
 
                 if var_type == 'Nan':
                     if np.any(np.isnan(var_tocheck)):
-                        print(f'{inpvarname} has NaN values')
+                        print('%s has NaN values'%inpvarname)
                 elif var_type == 'Inf':
                     if np.any(np.isinf(var_tocheck)):
-                        print(f'{inpvarname} has Inf values')
+                        print('%s has Inf values'%inpvarname)
                 elif var_type == 'Imag':
                     if not np.all(np.isreal(var_tocheck)):
-                        print(f'{inpvarname} has complex values')
+                        print('%s has complex values'%inpvarname)
                 else:
                     print('unknown type check requested !')

@@ -33,7 +33,8 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
             if isinstance(val, list) and len(val) == 1:
                 val = val[0]
             elif isinstance(val, list):
-                val = array(val)
+                try: val = array(val)
+                except: pass
             elif isinstance(val, ndarray):
                 if val.shape == ():
                     val = val.item()

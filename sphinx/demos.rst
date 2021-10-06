@@ -37,3 +37,5 @@ Demos
     demo_rst/control_variates.rst
 
     demo_rst/elliptic-pde.rst
+
+    demo_rst/gaussian_diagnostics_demo.rst

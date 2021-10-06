@@ -31,22 +31,22 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	done
 	# UML Diagrams
 	@mkdir $(umldir)
-	#	General Uml 1
-	@pyreverse -k qmcpy/ --ignore util,stopping_criterion,accumulate_data,discrete_distribution -o png 1>/dev/null && mv classes.png $(umldir)qmcpy_uml1.png
-	#	General Uml 2
-	@pyreverse -k qmcpy/discrete_distribution/ -o png 1>/dev/null && mv classes.png $(umldir)qmcpy_uml2.png
-	#	General Uml 3
-	@pyreverse -k qmcpy/ --ignore util,integrand,true_measure,discrete_distribution -o png 1>/dev/null && mv classes.png $(umldir)qmcpy_uml3.png
-	#	Accumulate Data
-	@pyreverse qmcpy/accumulate_data/ -o png 1>/dev/null && mv classes.png $(umldir)accumulate_data_uml.png
-	#	Discrete Distribution
-	@pyreverse qmcpy/discrete_distribution/ -o png 1>/dev/null && mv classes.png $(umldir)discrete_distribution_uml.png
-	#	True Measure
-	@pyreverse qmcpy/true_measure/ -o png 1>/dev/null && mv classes.png $(umldir)true_measure_uml.png
-	#	Integrand
-	@pyreverse qmcpy/integrand/ -o png 1>/dev/null && mv classes.png $(umldir)integrand_uml.png
-	#	Stopping Criterion
-	@pyreverse qmcpy/stopping_criterion/ -o png 1>/dev/null && mv classes.png $(umldir)stopping_criterion_uml.png
+	#	Discrete Distribution Overview
+	@pyreverse -k qmcpy/discrete_distribution/ -o png 1>/dev/null && mv classes.png $(umldir)discrete_distribution_overview.png
+	#	True Measure Overview
+	@pyreverse -k qmcpy/true_measure/ -o png 1>/dev/null && mv classes.png $(umldir)true_measure_overview.png
+	#	Integrand Overview
+	@pyreverse -k qmcpy/integrand/ -o png 1>/dev/null && mv classes.png $(umldir)integrand_overview.png
+	#	Stopping Criterion Overview
+	@pyreverse -k qmcpy/stopping_criterion/ -o png 1>/dev/null && mv classes.png $(umldir)stopping_criterion_overview.png
+	#	Discrete Distribution Specific
+	@pyreverse qmcpy/discrete_distribution/ -o png 1>/dev/null && mv classes.png $(umldir)discrete_distribution_specific.png
+	#	True Measure Specific
+	@pyreverse qmcpy/true_measure/ -o png 1>/dev/null && mv classes.png $(umldir)true_measure_specific.png
+	#	Integrand Specific
+	@pyreverse qmcpy/integrand/ -o png 1>/dev/null && mv classes.png $(umldir)integrand_specific.png
+	#	Stopping Criterion Specific
+	@pyreverse qmcpy/stopping_criterion/ -o png 1>/dev/null && mv classes.png $(umldir)stopping_criterion_specific.png
 	#	Util
 	@pyreverse -k qmcpy/util/ -o png 1>/dev/null && mv classes.png $(umldir)util_uml.png
 	# 	Warning

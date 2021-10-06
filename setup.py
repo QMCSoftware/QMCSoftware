@@ -41,20 +41,19 @@ except:
 
 packages = [
     'qmcpy',
-    'qmcpy.true_measure',
-    'qmcpy.stopping_criterion',
     'qmcpy.discrete_distribution',
+    'qmcpy.true_measure',
+    'qmcpy.integrand',
+    'qmcpy.stopping_criterion',
     'qmcpy.accumulate_data',
     'qmcpy.util',
-    'qmcpy.integrand',
-    'qmcpy.discrete_distribution',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
     'qmcpy.discrete_distribution.digital_net_b2']
 
 setuptools.setup(
     name="qmcpy",
-    version="1.0.1",
+    version="1.1",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',
@@ -65,8 +64,8 @@ setuptools.setup(
     download_url="https://github.com/QMCSoftware/QMCSoftware/releases/tag/v0.4.gz",
     packages=packages,
     install_requires=[
-        'scipy >= 1.2.0',
-        'numpy == 1.21.1'],
+        'numpy >= 1.17.0',
+        'scipy >= 1.0.0'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",

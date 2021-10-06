@@ -1,10 +1,18 @@
+## v1.1
+
+- precompute LD sequence ranomization
+- spawn QMCPy objects for efficient replicated and multilevel stopping criterion
+- utilize numpy's seed sequence
+- `CubQMCCLT` stopping criterion support for vectorized integrals and advanced stopping criterion
+- `SobolIndices` integrand wrapper
+
 ## v1.0
+
 - Continuation multi-level MC and QMC
 - Improved importance sampling flexibility
 - Isolated seeding with QMCPy
 - Enhanced documentation
 - New true measures
-
 
 ## v0.7
 
