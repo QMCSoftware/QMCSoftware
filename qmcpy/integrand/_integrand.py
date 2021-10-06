@@ -22,7 +22,8 @@ class Integrand(object):
             self.leveltype = 'single'
         if not hasattr(self,'max_level'):
             self.max_level = inf
-        self.discrete_distrib = self.true_measure.discrete_distrib
+        if not hasattr(self,'discrete_distrib'):
+            self.discrete_distrib = self.true_measure.discrete_distrib
         if self.true_measure.transform!=self.true_measure and \
            not (self.true_measure.range==self.true_measure.transform.range).all():
             raise ParameterError("The range of the composed transform is not compatibe with this true measure")
@@ -97,6 +98,39 @@ class Integrand(object):
         # account for periodization weight
         yp = y*wp.reshape(n,1)
         return yp
+
+    def bound_fun(self, bound_low, bound_high):
+        """
+        compute the bounds on the combined function based on bounds for the individual functions. 
+        Defaults to the identity where we essentiallly do not combine integrands, 
+        but instead integrate each function individually.
+
+        Args:
+            bound_low (ndarray): length Integrand.dprime lower error bound
+            bound_high (ndarray): length Integrand.dprime upper error bound
+        
+        Return:
+            ndarray: lower bound on function combining estimates,
+            ndarray: upper bound on function combining estimates,
+            bool ndarray: flags to override suffient combined integrand estimation. 
+                e.g. when approximating a ratio of integrals, if the denominator's bounds straddle 0, 
+                then returning True here forces ratio to be flagged as insuffiently approximated.
+        """
+        return bound_low,bound_high,False
+
+    def dependency(self, flags_comb):
+        """
+        takes a vector of indicators of wheather of not 
+        the error bound is satisfied for combined integrands and which returns flags for individual integrands. 
+        For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio 
+        has not been approximated to within the tolerance, so the dependency function should return [True,True]
+        indicating that both the numerator and denominator integrands need to be better approximated.
+        Args:
+            flags_comb (bool ndarray): flags indicating wheather the combined integrals are insufficiently approximated
+        
+        Return:
+            (bool ndarray): length (Integrand.dprime) flags for individual integrands"""
+        return flags_comb
 
     def _dimension_at_level(self, level):
         """

@@ -104,9 +104,7 @@ class CubQMCCLT(StoppingCriterion):
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
         inflate=1.2, alpha=0.01, replications=16., 
-        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol),
-        bound_fun = lambda phvl,phvh: (phvl,phvh,False),
-        dependency = lambda flags_comb: flags_comb):
+        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -119,15 +117,6 @@ class CubQMCCLT(StoppingCriterion):
             error_fun: function taking in the approximate solution vector, 
                 absolute tolerance, and relative tolerance which returns the approximate error. 
                 Default indicates integration until either absolute OR relative tolerance is satisfied.
-            bound_fun: function to compute the bounds on the combined function based on bounds for the individual functions. 
-                Defaults to the identity where we essentiallly do not combine integrands, 
-                but instead integrate each function individually.
-            dependency: function that takes a vector of indicators of wheather of not 
-                the error bound is satisfied for combined integrands and which returns flags for individual integrands. 
-                For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio 
-                has not been approximated to within the tolerance, so the dependency function should return [True,True]
-                indicating that both the numerator and denominator integrands need to be better approximated.
-
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Input Checks
@@ -145,8 +134,6 @@ class CubQMCCLT(StoppingCriterion):
         self.inflate = float(inflate)
         self.replications = replications
         self.error_fun = error_fun
-        self.bound_fun = bound_fun
-        self.dependency = dependency
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
@@ -169,7 +156,7 @@ class CubQMCCLT(StoppingCriterion):
             self.data.indv_error_bound = self.z_star * self.inflate * self.data.sighat / sqrt(self.data.replications)
             self.data.ci_low = self.data.solution_indv-self.data.indv_error_bound
             self.data.ci_high = self.data.solution_indv+self.data.indv_error_bound
-            self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.bound_fun(self.data.ci_low,self.data.ci_high)
+            self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
             error_low = self.error_fun(self.data.ci_comb_low,self.abs_tol,self.rel_tol)
             error_high = self.error_fun(self.data.ci_comb_high,self.abs_tol,self.rel_tol)
             self.data.solution_comb = 1/2*(self.data.ci_comb_low+self.data.ci_comb_high+error_low-error_high)
@@ -177,7 +164,7 @@ class CubQMCCLT(StoppingCriterion):
             rem_error_high = abs(self.data.ci_comb_high-self.data.solution_comb)-error_high
             self.data.flags_comb = maximum(rem_error_low,rem_error_high)>=0
             self.data.flags_comb |= self.data.violated
-            self.data.flags_indv = self.dependency(self.data.flags_comb)
+            self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
             if sum(self.data.flags_indv)==0:
                 # sufficiently estimated
                 break

@@ -46,7 +46,7 @@ class CubQMCLDG(StoppingCriterion):
         self.cv_mu = control_variate_means
         self.ub = update_beta
         # Verify Compliant Construction
-        super(CubQMCLDG,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals=True)
+        super(CubQMCLDG,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals=False)
 
     def integrate(self):
         """ See abstract method. """
