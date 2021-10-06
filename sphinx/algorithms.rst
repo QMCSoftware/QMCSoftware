@@ -1,19 +1,25 @@
 QMCPy Documentation
 ===================
 
-.. image:: uml/qmcpy_uml1.png
-.. image:: uml/qmcpy_uml2.png
-.. image:: uml/qmcpy_uml3.png
+.. image:: uml/discrete_distribution_overview.png
+.. image:: uml/true_measure_overview.png
+.. image:: uml/integrand_overview.png
+.. image:: uml/stopping_criterion_overview.png
+
+
+
+
+
 
 
 
 Discrete Distribution Class
 ---------------------------
 
+.. image:: uml/discrete_distribution_specific.png
+
 Abstract Discrete Distribution Class
 ....................................
-
-.. image:: uml/discrete_distribution_uml.png
 
 .. automodule:: qmcpy.discrete_distribution._discrete_distribution
     :members:
@@ -44,10 +50,14 @@ IID Standard Uniform
 
 
 
+
+
+
+
 True Measure Class
 ------------------
 
-.. image:: uml/true_measure_uml.png
+.. image:: uml/true_measure_specific.png
 
 Abstract Measure Class
 ......................
@@ -104,10 +114,14 @@ SciPy Wrapper
     :members:
 
 
+
+
+
+
 Integrand Class
 ---------------
 
-.. image:: uml/integrand_uml.png
+.. image:: uml/integrand_specific.png
 
 Abstract Integrand Class
 ........................
@@ -157,12 +171,21 @@ Linear Function
 .. automodule:: qmcpy.integrand.linear0
     :members:
 
+Sobol' Indices
+..............
+
+.. automodule:: qmcpy.integrand.sobol_indices
+    :members:
+
+
+
+
 
 
 Stopping Criterion Algorithms
 -----------------------------
 
-.. image:: uml/stopping_criterion_uml.png
+.. image:: uml/stopping_criterion_specific.png
 
 Abstract Stopping Criterion Class
 .................................
@@ -235,6 +258,10 @@ Multilevel MC Cubature
 
 .. automodule:: qmcpy.stopping_criterion.cub_mc_ml
     :members:
+
+
+
+
 
 
 Utilities

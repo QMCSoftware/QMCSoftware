@@ -146,9 +146,10 @@ class CubBayesLatticeG(StoppingCriterion):
                 break
 
             if m >= self.m_max:
-                warnings.warn(f'Already used maximum allowed sample size {2 ** self.m_max}.'
-                              f' Note that error tolerances may no longer be satisfied',
-                              MaxSamplesWarning)
+                warnings.warn('''
+                    Already used maximum allowed sample size %d.
+                    Note that error tolerances may no longer be satisfied.'''%(2**self.m_max),
+                    MaxSamplesWarning)
                 break
 
         self.data.time_integrate = time() - tstart
