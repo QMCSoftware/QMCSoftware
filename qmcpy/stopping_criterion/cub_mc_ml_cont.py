@@ -18,25 +18,19 @@ class CubMCMLCont(StoppingCriterion):
     >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
     >>> sc = CubMCMLCont(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    10.427...
     >>> data
-    Solution: 10.4273        
-    MLCallOptions (Integrand Object)
-        option          european
-        sigma           0.200
-        k               100
-        r               0.050
-        t               1
-        b               85
-    IIDStdUniform (DiscreteDistribution Object)
-        d               2^(4)
-        seed            7
-        mimics          StdUniform
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      1
-        decomp_type     pca
+    MLMCData (AccumulateData Object)
+        solution        10.400
+        n_total         1193331
+        levels          2^(2)
+        n_level         [1133772.   22940.    8676.    2850.]
+        mean_level      [10.059  0.186  0.105  0.05 ]
+        var_level       [1.959e+02 1.603e-01 4.567e-02 1.013e-02]
+        cost_per_sample [1. 2. 4. 8.]
+        alpha           0.942
+        beta            1.992
+        gamma           1.000
+        time_integrate  ...
     CubMCMLCont (StoppingCriterion Object)
         rmse_tol        0.019
         n_init          2^(8)
@@ -45,25 +39,27 @@ class CubMCMLCont(StoppingCriterion):
         n_tols          10
         tol_mult        1.668
         theta_init      2^(-1)
-        theta           0.365
-    MLMCData (AccumulateData Object)
-        levels          5
-        dimensions      [ 1.  2.  4.  8. 16.]
-        n_level         [1.160e+06 2.245e+04 8.903e+03 5.002e+03 9.230e+02]
-        mean_level      [10.055  0.183  0.102  0.056  0.031]
-        var_level       [1.963e+02 1.442e-01 4.485e-02 1.139e-02 3.477e-03]
-        cost_per_sample [ 1.  2.  4.  8. 16.]
-        n_total         1197552
-        alpha           0.856
-        beta            1.810
-        gamma           1
-        time_integrate  ...
-
-    Original Implementation:
-
-        # Perhaps this should point to https://github.com/PieterjanRobbe/MultilevelEstimators.jl now?
+        theta           2^(-1)
+    MLCallOptions (Integrand Object)
+        option          european
+        sigma           0.200
+        k               100
+        r               0.050
+        t               1
+        b               85
+        level           0
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      1
+        decomp_type     PCA
+    IIDStdUniform (DiscreteDistribution Object)
+        d               1
+        entropy         7
+        spawn_key       ()
 
     References:
+
+        [1] https://github.com/PieterjanRobbe/MultilevelEstimators.jl
         
     """
 
@@ -113,8 +109,9 @@ class CubMCMLCont(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = ["IIDStdUniform", "IIDStdGaussian"]
-        super(CubMCMLCont,self).__init__(allowed_levels, allowed_distribs)
+        allowed_distribs = [IIDStdUniform]
+        allow_vectorized_integrals = False
+        super(CubMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         # Construct AccumulateData Object to House Integration Data

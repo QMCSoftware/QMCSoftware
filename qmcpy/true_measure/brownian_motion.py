@@ -1,6 +1,6 @@
 from .gaussian import Gaussian
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ._true_measure import TrueMeasure
 from ..util import ParameterError, _univ_repr
 from numpy import *
@@ -10,10 +10,10 @@ class BrownianMotion(Gaussian):
     """
     Geometric Brownian Motion.
     
-    >>> bm = BrownianMotion(Sobol(4,seed=7),t_final=2,drift=2)
+    >>> bm = BrownianMotion(DigitalNetB2(4,seed=7),t_final=2,drift=2)
     >>> bm.gen_samples(2)
-    array([[0.974, 2.288, 2.866, 4.49 ],
-           [0.587, 0.745, 1.999, 2.173]])
+    array([[0.44018403, 1.62690477, 2.69418273, 4.21753174],
+           [1.97549563, 2.27002956, 2.92802765, 4.77126959]])
     >>> bm
     BrownianMotion (TrueMeasure Object)
         time_vec        [0.5 1.  1.5 2. ]
@@ -23,7 +23,7 @@ class BrownianMotion(Gaussian):
                         [0.5 1.  1.  1. ]
                         [0.5 1.  1.5 1.5]
                         [0.5 1.  1.5 2. ]]
-        decomp_type     pca
+        decomp_type     PCA
     """
 
     def __init__(self, sampler, t_final=1, drift=0, decomp_type='PCA'):
@@ -41,27 +41,17 @@ class BrownianMotion(Gaussian):
         self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform
         self.domain = array([[0,1]])
-        self._transform = self._transform_std_uniform
-        self._jacobian = self._jacobian_std_uniform
-        if isinstance(sampler,DiscreteDistribution) and sampler.mimics=='StdGaussian':
-            # need to use transformation from standard gaussian
-            self.domain = array([[-inf,inf]])
-            self._transform = self._transform_std_gaussian
-            self._jacobian = self._jacobian_std_gaussian
         self._parse_sampler(sampler)
         self.t = t_final # exercise time
         self.drift = drift
-        self.decomp_type = decomp_type.lower()
         self.time_vec = linspace(self.t/self.d,self.t,self.d) # evenly spaced
         self.sigma_bm = array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
         self.drift_time_vec = self.drift*self.time_vec # mean
-        self._set_mean_cov(self.drift_time_vec,self.sigma_bm)
+        self._parse_gaussian_params(self.drift_time_vec,self.sigma_bm,decomp_type)
+
         self.range = array([[-inf,inf]])
         super(Gaussian,self).__init__()
-
-    def _set_dimension(self, dimension):
-        self.d = dimension
-        self.time_vec = linspace(self.t/self.d,self.t,self.d) # evenly spaced
-        self.sigma_bm = array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
-        self.drift_time_vec = self.drift*self.time_vec # mean
-        self._set_mean_cov(self.drift_time_vec,self.sigma_bm)
+    
+    def _spawn(self, sampler, dimension):
+        return BrownianMotion(sampler,t_final=self.t,drift=self.drift,decomp_type=self.decomp_type)
+        

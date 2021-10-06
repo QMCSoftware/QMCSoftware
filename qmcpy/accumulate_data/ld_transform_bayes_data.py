@@ -1,5 +1,6 @@
 from ._accumulate_data import AccumulateData
 from ..util import MaxSamplesWarning
+from ..discrete_distribution import Lattice
 from numpy import array, nan
 import warnings
 import numpy as np
@@ -15,8 +16,6 @@ class LDTransformBayesData(AccumulateData):
     See the stopping criterion that utilize this object for references.
     """
 
-    parameters = ['n_total', 'solution', 'error_bound']
-
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, m_min: int, m_max: int,
                  fbt, merge_fbt, kernel):
         """
@@ -28,6 +27,7 @@ class LDTransformBayesData(AccumulateData):
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
         """
+        self.parameters = ['solution','error_bound','n_total']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -68,9 +68,11 @@ class LDTransformBayesData(AccumulateData):
         self.xpts_ = array([])  # shifted lattice points
         self.xun_ = array([])  # un-shifted lattice points
         self.ftilde_ = array([])  # fourier transformed integrand values
-        if self.distribution_name == 'Lattice':
+        if isinstance(self.discrete_distrib,Lattice):
             # integrand after the periodization transform
-            self.ff = lambda x,*args,**kwargs: self.integrand.f_periodized(x,stopping_crit.ptransform,*args,**kwargs)
+            self.ff = lambda x,*args,**kwargs: self.integrand.f(x,
+                periodization_transform=stopping_crit.ptransform,
+                *args,**kwargs).squeeze()
         else:
             self.ff = self.integrand.f
         self.fbt = fbt
@@ -266,11 +268,8 @@ class LDTransformBayesData(AccumulateData):
 
     @staticmethod
     def gen_samples(n_min, n_max, return_unrandomized, distribution):
-        warn = False if n_min == 0 else True
-        if type(distribution).__name__ == 'Lattice':
-            xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn, return_unrandomized=return_unrandomized)
-        else:
-            xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn, return_jlms=return_unrandomized)
+        warn = False
+        xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn, return_unrandomized=return_unrandomized)
         return xpts_, xun_
 
     # inserts newly generated points with the old set by interleaving them

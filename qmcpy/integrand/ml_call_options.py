@@ -1,5 +1,5 @@
 from ._integrand import Integrand
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian
 from ..util import ParameterError
 from numpy import *
@@ -10,8 +10,8 @@ class MLCallOptions(Integrand):
     """
     Various call options from finance using Milstein discretization with $2^l$ timesteps on level $l$.
 
-    >>> mlco = MLCallOptions(Sobol(seed=7))
-    >>> mlco
+    >>> mlco_original = MLCallOptions(DigitalNetB2(seed=7))
+    >>> mlco_original
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -19,14 +19,14 @@ class MLCallOptions(Integrand):
         r               0.050
         t               1
         b               85
-    >>> y = 0
-    >>> for level in range(4):
-    ...     new_dim = mlco._dim_at_level(level)
-    ...     mlco.true_measure._set_dimension_r(new_dim)
+        level           0
+    >>> mlco_ml_dims = mlco_original.spawn(levels=arange(4))
+    >>> yml = 0
+    >>> for mlco in mlco_ml_dims:
     ...     x = mlco.discrete_distrib.gen_samples(2**10)
-    ...     y += mlco.f(x,l=level).mean()
-    >>> y
-    10.390...
+    ...     yml += mlco.f(x).mean()
+    >>> yml
+    10.393...
 
     References:
 
@@ -36,7 +36,7 @@ class MLCallOptions(Integrand):
     """
 
     def __init__(self, sampler, option='european', volatility=.2,
-        start_strike_price=100., interest_rate=.05, t_final=1.):
+        start_strike_price=100., interest_rate=.05, t_final=1., _level=0):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
@@ -48,9 +48,12 @@ class MLCallOptions(Integrand):
                 Assume start_price = strike_price
             interest_rate (float): r, the annual interest rate
             t_final (float): exercise time
+            _level (int): for internal use only, users should not set this parameter. 
+
         """
-        self.parameters = ['option', 'sigma', 'k', 'r', 't', 'b']
-        self.true_measure = Gaussian(sampler, mean=0, covariance=1)
+        self.parameters = ['option', 'sigma', 'k', 'r', 't', 'b', 'level']
+        self.sampler = sampler
+        self.true_measure = Gaussian(self.sampler, mean=0, covariance=1)
         self.discrete_distrib = self.true_measure.discrete_distrib
         options = ['european','asian']
         self.option = option.lower()
@@ -65,6 +68,9 @@ class MLCallOptions(Integrand):
         self.b = .85*self.k
         self.leveltype = 'adaptive-multi'
         self.g_submodule = getattr(self,'_g_'+self.option)
+        self.dprime = 1
+        self.level = _level
+        self.max_level = inf
         super(MLCallOptions,self).__init__()
         #if self.discrete_distrib.low_discrepancy and self.option=='asian':
         #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
@@ -93,13 +99,12 @@ class MLCallOptions(Integrand):
                      exp(-self.r*self.t)*norm.cdf(d4) ) )
         return val
 
-    def _g_european(self, t, l, n, d, nf, nc, hf, hc, xf, xc):
+    def _g_european(self, t, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for European call option.
 
         Args:
             t (ndarray): nxd array of samples
-            l (int): level
             n (int): number of samples
             d (int): number of dimensions
             nf (int): n fine samples = 2**level
@@ -115,7 +120,7 @@ class MLCallOptions(Integrand):
                 Second, an ndarray of payoffs from coarse paths.
         """
         dwf = t * sqrt(hf)
-        if l == 0:
+        if self.level == 0:
             dwf = dwf.squeeze()
             xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
         else:
@@ -129,13 +134,12 @@ class MLCallOptions(Integrand):
         pc = maximum(0,xc-self.k)
         return pf,pc
 
-    def _g_asian(self, t, l, n, d, nf, nc, hf, hc, xf, xc):
+    def _g_asian(self, t, n, d, nf, nc, hf, hc, xf, xc):
         """
         Implementation for Asian call option.
 
         Args:
             t (ndarray): nxd array of samples
-            l (int): level
             n (int): number of samples
             d (int): number of dimensions
             nf (int): n fine samples = 2**level
@@ -154,7 +158,7 @@ class MLCallOptions(Integrand):
         ac = .5*hc*xc
         dwf = sqrt(hf) * t[:,:int(d/2)]
         dif = sqrt(hf/12) * hf * t[:,int(d/2):]
-        if l == 0:
+        if self.level == 0:
             dwf = dwf.squeeze()
             dif = dif.squeeze()
             xf0 = xf
@@ -181,27 +185,27 @@ class MLCallOptions(Integrand):
         pc = maximum(0,ac-self.k)
         return pf,pc
 
-    def g(self, t, l):
+    def g(self, t):
         """
         Args:
             t (ndarray): Gaussian(0,1^2) samples
-            l (int): level
+
         Returns:
             tuple: \
                 First, an ndarray of length 6 vector of summary statistic sums. \
                 Second, a float of cost on this level.
         """
         n,d = t.shape
-        nf = 2**l # n fine
+        nf = 2**self.level # n fine
         nc = float(nf)/2 # n coarse
         hf = self.t/nf # timestep fine
         hc = self.t/nc # timestep coarse
         xf = tile(self.k,int(n))
         xc = xf
-        pf,pc = self.g_submodule(t, l, n, d, nf, nc, hf, hc, xf, xc)
+        pf,pc = self.g_submodule(t, n, d, nf, nc, hf, hc, xf, xc)
         dp = exp(-self.r*self.t)*(pf-pc)
         pf = exp(-self.r*self.t)*pf
-        if l == 0:
+        if self.level == 0:
             dp = pf
         sums = zeros(6)
         sums[0] = dp.sum()
@@ -215,9 +219,19 @@ class MLCallOptions(Integrand):
         self.sums = sums
         return dp
 
-    def _dim_at_level(self, l):
+    def _dimension_at_level(self, level):
         """ See abstract method. """
         if self.option == 'european':
-            return 2**l
+            return 2**level
         elif self.option == 'asian':
-            return 2**(l+1)
+            return 2**(level+1)
+    
+    def _spawn(self, level, sampler):
+        return MLCallOptions(
+            sampler = sampler,
+            option = self.option,
+            volatility = self.sigma,
+            start_strike_price = self.k,
+            interest_rate = self.r,
+            t_final = self.t,
+            _level = level)

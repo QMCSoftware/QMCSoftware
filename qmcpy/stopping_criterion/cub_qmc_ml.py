@@ -1,6 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLQMCData
-from ..discrete_distribution import Lattice
+from ..discrete_distribution import DigitalNetB2,Lattice,Halton
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
@@ -17,10 +17,21 @@ class CubQMCML(StoppingCriterion):
     >>> mlco = MLCallOptions(Lattice(seed=7))
     >>> sc = CubQMCML(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    10.422...
     >>> data
-    Solution: 10.4229        
+    MLQMCData (AccumulateData Object)
+        solution        10.434
+        n_total         172032
+        n_level         [4096.  256.  256.  256.  256.  256.]
+        levels          6
+        mean_level      [10.053  0.183  0.102  0.054  0.028  0.014]
+        var_level       [5.699e-05 5.129e-05 2.656e-05 1.064e-05 3.466e-06 1.113e-06]
+        bias_estimate   0.007
+        time_integrate  ...
+    CubQMCML (StoppingCriterion Object)
+        rmse_tol        0.019
+        n_init          2^(8)
+        n_max           10000000000
+        replications    2^(5)
     MLCallOptions (Integrand Object)
         option          european
         sigma           0.200
@@ -28,30 +39,18 @@ class CubQMCML(StoppingCriterion):
         r               0.050
         t               1
         b               85
-    Lattice (DiscreteDistribution Object)
-        d               2^(4)
-        randomize       1
-        order           natural
-        seed            733837
-        mimics          StdUniform
+        level           0
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      1
-        decomp_type     pca
-    CubQMCML (StoppingCriterion Object)
-        rmse_tol        0.019
-        n_init          2^(8)
-        n_max           10000000000
-        replications    2^(5)
-    MLQMCData (AccumulateData Object)
-        levels          5
-        dimensions      [ 1.  2.  4.  8. 16.]
-        n_level         [8192.  256.  256.  256.  256.]
-        mean_level      [10.054  0.184  0.102  0.055  0.027]
-        var_level       [1.617e-05 6.794e-05 2.603e-05 8.925e-06 3.123e-06]
-        bias_estimate   0.014
-        n_total         294912
-        time_integrate  ...
+        decomp_type     PCA
+    Lattice (DiscreteDistribution Object)
+        d               1
+        dvec            0
+        randomize       1
+        order           natural
+        entropy         7
+        spawn_key       ()
     
     References:
         
@@ -93,8 +92,9 @@ class CubQMCML(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = ["Lattice", "Sobol", "Halton"]
-        super(CubQMCML,self).__init__(allowed_levels, allowed_distribs)
+        allowed_distribs = [DigitalNetB2,Lattice,Halton]
+        allow_vectorized_integrals = False
+        super(CubQMCML,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         """ See abstract method. """

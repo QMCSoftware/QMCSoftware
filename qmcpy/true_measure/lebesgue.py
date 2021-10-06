@@ -1,7 +1,7 @@
 from ._true_measure import TrueMeasure
 from .uniform import Uniform
 from .gaussian import Gaussian
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ..util import TransformError, ParameterError
 from scipy.stats import norm
 from numpy import *
@@ -9,13 +9,13 @@ from numpy import *
 
 class Lebesgue(TrueMeasure):
     """
-    >>> Lebesgue(Gaussian(Sobol(2,seed=7)))
+    >>> Lebesgue(Gaussian(DigitalNetB2(2,seed=7)))
     Lebesgue (TrueMeasure Object)
         transform       Gaussian (TrueMeasure Object)
                            mean            0
                            covariance      1
-                           decomp_type     pca
-    >>> Lebesgue(Uniform(Sobol(2,seed=7)))
+                           decomp_type     PCA
+    >>> Lebesgue(Uniform(DigitalNetB2(2,seed=7)))
     Lebesgue (TrueMeasure Object)
         transform       Uniform (TrueMeasure Object)
                            lower_bound     0
@@ -38,5 +38,5 @@ class Lebesgue(TrueMeasure):
     def _weight(self, x):
         return ones(x.shape[0],dtype=float)
 
-    def _set_dimension(self, dimension):
-        self.d = dimension
+    def _spawn(self, sampler, dimension):
+        return Lebesgue(sampler)

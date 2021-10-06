@@ -20,7 +20,7 @@ class MLQMCData(AccumulateData):
             discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
             replications (int): number of replications on each level
         """
-        self.parameters = ['levels','dimensions','n_level','mean_level','var_level','bias_estimate','n_total']
+        self.parameters = ['solution','n_total','n_level','levels','mean_level','var_level','bias_estimate']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -28,7 +28,6 @@ class MLQMCData(AccumulateData):
         # Set Attributes
         self.levels = int(levels_init + 1)
         self.n_level = zeros(self.levels)
-        self.dimensions = zeros(self.levels)
         self.eval_level = tile(True,self.levels)
         self.replications = replications
         self.n_init = n_init
@@ -40,10 +39,7 @@ class MLQMCData(AccumulateData):
         self.bias_estimate = inf
         self.solution = None
         self.n_total = 0
-        self.time_integrate = 0
-        if self.discrete_distrib.d != 1:
-            self.true_measure._set_dimension_r(1)
-        self.seeds = self.discrete_distrib.rng.choice(1000000,(levels_max+1,int(self.replications)),replace=False)
+        self.level_integrands = []
         super(MLQMCData,self).__init__()
 
     def update_data(self):
@@ -53,18 +49,18 @@ class MLQMCData(AccumulateData):
             if not self.eval_level[l]:
                 # nothing to do on this level
                 continue
+            if l==len(self.level_integrands):
+                # haven't spawned this level's integrand yet
+                self.level_integrands += [self.integrand.spawn(levels=tile(l,int(self.replications)))]
             # reset dimension
-            self.dimensions[l] = self.integrand._dim_at_level(l)
-            new_dim = int(self.dimensions[l])
-            self.true_measure._set_dimension_r(new_dim)
             n_max = self.n_init if self.n_level[l]==0 else 2*self.n_level[l]
             for r in range(int(self.replications)):
-                self.discrete_distrib.set_seed(self.seeds[l,r]) # reset seed
-                samples = self.discrete_distrib.gen_samples(n_min=self.n_level[l],n_max=n_max)
-                self.integrand.f(samples,l=l)
+                integrand_l = self.level_integrands[l][r]
+                samples = integrand_l.discrete_distrib.gen_samples(n_min=self.n_level[l],n_max=n_max)
+                integrand_l.f(samples).squeeze()
                 prev_sum = self.mean_level_reps[l,r]*self.n_level[l]
-                self.mean_level_reps[l,r] = (self.integrand.sums[0]+prev_sum)/float(n_max)
-                self.cost_level[l] = self.cost_level[l] + self.integrand.cost
+                self.mean_level_reps[l,r] = (integrand_l.sums[0]+prev_sum)/float(n_max)
+                self.cost_level[l] = self.cost_level[l] + integrand_l.cost
             self.n_level[l] = n_max
             self.mean_level[l] = self.mean_level_reps[l].mean()
             self.var_level[l] = self.mean_level_reps[l].var()
@@ -89,7 +85,6 @@ class MLQMCData(AccumulateData):
         """ Add another level to relevent attributes. """
         self.levels += 1
         if self.levels > len(self.n_level):
-            self.dimensions = hstack((self.dimensions,0))
             self.n_level = hstack((self.n_level,0))
             self.eval_level = hstack((self.eval_level,True))
             self.mean_level_reps = vstack((self.mean_level_reps,zeros(int(self.replications))))
@@ -102,7 +97,6 @@ class MLQMCData(AccumulateData):
         """ Add another level to relevent attributes. """
         self.levels += 1
         if not len(self.n_level) > self.levels:
-            self.dimensions = hstack((self.dimensions,0))
             self.mean_level = hstack((self.mean_level, self.mean_level[-1] / 2**self.alpha))
             self.var_level = hstack((self.var_level, self.var_level[-1] / 2**self.beta))
             self.cost_per_sample = hstack((self.cost_per_sample, self.cost_per_sample[-1] * 2**self.gamma))

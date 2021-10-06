@@ -8,29 +8,27 @@ class IIDStdUniform(DiscreteDistribution):
 
     >>> dd = IIDStdUniform(dimension=2,seed=7)
     >>> dd.gen_samples(4)
-    array([[0.076, 0.78 ],
-           [0.438, 0.723],
-           [0.978, 0.538],
-           [0.501, 0.072]])
+    array([[0.04386058, 0.58727432],
+           [0.3691824 , 0.65212985],
+           [0.69669968, 0.10605352],
+           [0.63025643, 0.13630282]])
     >>> dd
     IIDStdUniform (DiscreteDistribution Object)
         d               2^(1)
-        seed            7
-        mimics          StdUniform
+        entropy         7
+        spawn_key       ()
     """
 
     def __init__(self, dimension=1, seed=None):
         """
         Args:
             dimension (int): dimension of samples
-            seed (int): seed the random number generator for reproducibility
+            seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
         """
-        self.parameters = ['d','seed','mimics']
-        self.d = dimension
-        self.set_seed(seed)
         self.mimics = 'StdUniform'
         self.low_discrepancy = False
-        super(IIDStdUniform,self).__init__()
+        self.d_max = inf
+        super(IIDStdUniform,self).__init__(dimension,seed)
 
     def gen_samples(self, n):
         """
@@ -42,11 +40,11 @@ class IIDStdUniform(DiscreteDistribution):
         Returns:
             ndarray: n x self.d array of samples
         """
-        return self.rng.rand(int(n), int(self.d))
+        return self.rng.uniform(size=(int(n),self.d))
     
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
         
-    def _set_dimension(self, dimension):
-        self.d = dimension
+    def _spawn(self, child_seed, dimension):
+        return IIDStdUniform(dimension=dimension,seed=child_seed)
         

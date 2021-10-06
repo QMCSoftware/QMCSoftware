@@ -1,6 +1,6 @@
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
 from numpy import *
 from scipy.stats import norm 
@@ -10,7 +10,7 @@ class EuropeanOption(Integrand):
     """
     European financial option. 
 
-    >>> eo = EuropeanOption(Sobol(4,seed=7),call_put='put')
+    >>> eo = EuropeanOption(DigitalNetB2(4,seed=7),call_put='put')
     >>> eo
     EuropeanOption (Integrand Object)
         volatility      2^(-1)
@@ -21,12 +21,14 @@ class EuropeanOption(Integrand):
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.208...
-    >>> eo = EuropeanOption(BrownianMotion(Sobol(4,seed=7),drift=1),call_put='put')
+    9.209...
+    >>> eo = EuropeanOption(BrownianMotion(DigitalNetB2(4,seed=7),drift=1),call_put='put')
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.164...
+    9.162...
+    >>> eo.get_exact_value()
+    9.211452976234058
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35,
@@ -45,7 +47,8 @@ class EuropeanOption(Integrand):
         """
         self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
         self.t_final = t_final
-        self.true_measure = BrownianMotion(sampler,t_final=self.t_final)
+        self.sampler = sampler
+        self.true_measure = BrownianMotion(self.sampler,t_final=self.t_final)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
@@ -53,7 +56,8 @@ class EuropeanOption(Integrand):
         self.call_put = call_put.lower()
         if self.call_put not in ['call','put']:
             raise ParameterError("call_put must be either 'call' or 'put'")
-        super(EuropeanOption,self).__init__()        
+        self.dprime = 1
+        super(EuropeanOption,self).__init__()  
 
     def g(self, t):
         """ See abstract method. """
@@ -91,3 +95,13 @@ class EuropeanOption(Integrand):
                     (self.interest_rate + self.volatility**2/2) * self.t_final
             fp = decay * norm.cdf(term1/denom) - self.start_price * norm.cdf(term2/denom)
         return fp
+    
+    def _spawn(self, level, sampler):
+        return EuropeanOption(
+            sampler=sampler,
+            volatility=self.volatility,
+            start_price=self.start_price,
+            strike_price=self.strike_price,
+            interest_rate=self.interest_rate,
+            t_final=self.t_final,
+            call_put=self.call_put)

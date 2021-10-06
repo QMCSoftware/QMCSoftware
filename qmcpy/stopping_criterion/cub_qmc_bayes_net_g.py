@@ -1,6 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
 from ..discrete_distribution.c_lib import c_lib
@@ -13,39 +13,36 @@ import warnings
 
 class CubBayesNetG(StoppingCriterion):
     """
-    Stopping criterion for Bayesian Cubature using digital net (Sobol) sequence with guaranteed
+    Stopping criterion for Bayesian Cubature using digital net sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
 
-    >>> k = Keister(Sobol(2, seed=123456789))
+    >>> k = Keister(DigitalNetB2(2, seed=123456789))
     >>> sc = CubBayesNetG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
-    >>> solution
-    1.798...
     >>> data
-    Solution: 1.7986         
-    Keister (Integrand Object)
-    Sobol (DiscreteDistribution Object)
-        d               2^(1)
-        randomize       1
-        graycode        0
-        seed            123456789
-        mimics          StdUniform
-        dim0            0
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     pca
+    LDTransformBayesData (AccumulateData Object)
+        solution        1.812
+        error_bound     0.015
+        n_total         256
+        time_integrate  ...
     CubBayesNetG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(8)
         n_max           2^(22)
-    LDTransformBayesData (AccumulateData Object)
-        n_total         256
-        solution        1.799
-        error_bound     0.019
-        time_integrate  ...
+    Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     PCA
+    DigitalNetB2 (DiscreteDistribution Object)
+        d               2^(1)
+        dvec            [0 1]
+        randomize       LMS_DS
+        graycode        0
+        entropy         123456789
+        spawn_key       ()
         
     Adapted from
         https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m
@@ -120,8 +117,9 @@ class CubBayesNetG(StoppingCriterion):
 
         # Verify Compliant Construction
         allowed_levels = ['single']
-        allowed_distribs = ["Sobol"]
-        super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs)
+        allowed_distribs = [DigitalNetB2]
+        allow_vectorized_integrals = False
+        super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
         if self.discrete_distrib.randomize == False:
             raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
@@ -287,3 +285,6 @@ class FWHT():
 
     def fwht_inplace(self, n, src):
         self.fwht_inplace_cf(n, src)
+
+
+class CubBayesSobolG(CubBayesNetG): pass

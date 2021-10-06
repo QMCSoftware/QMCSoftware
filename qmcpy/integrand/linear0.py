@@ -1,18 +1,18 @@
 from ._integrand import Integrand
-from ..discrete_distribution import Sobol
+from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
 
 
 class Linear0(Integrand):
     """
-    >>> l = Linear0(Sobol(100,seed=7))
+    >>> l = Linear0(DigitalNetB2(100,seed=7))
     >>> x = l.discrete_distrib.gen_samples(2**10)
     >>> y = l.f(x)
     >>> y.mean()
-    -7.378...e-06
-    >>> ytf = l.f_periodized(x,'C1SIN')
+    -1.175...e-08
+    >>> ytf = l.f(x,periodization_transform='C1SIN')
     >>> ytf.mean()
-    9.037...e-12
+    -4.050...e-12
     """
 
     def __init__(self, sampler):
@@ -22,10 +22,14 @@ class Linear0(Integrand):
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
         """
-        self.true_measure = Uniform(sampler, lower_bound=-.5, upper_bound=.5)
+        self.sampler = sampler
+        self.true_measure = Uniform(self.sampler, lower_bound=-.5, upper_bound=.5)
+        self.dprime = 1
         super(Linear0,self).__init__()
-
+    
     def g(self, t):
         y = t.sum(1)
         return y
 
+    def _spawn(self, level, sampler):
+        return Linear0(sampler=sampler)
