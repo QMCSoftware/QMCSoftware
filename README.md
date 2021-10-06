@@ -199,27 +199,14 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
 ## Sponsors
 
-- **Illinois Tech**
+- **[Illinois Tech](https://www.iit.edu)**
 
-  <p style="height:30x">
-    <a href="https://www.iit.edu">
-      <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true" width="300" height="150">
-    </a>
-  </p>
+  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true" width="300" height="150">
 
-- **Kamakura Corporation**
+- **[Kamakura Corporation](http://www.kamakuraco.com)**
 
-  <p style="height:30x">
-    <a href="http://www.kamakuraco.com">
-      <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
-    </a>
-  </p>
+  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
 
+- **[SigOpt, Inc.](https://sigopt.com)**
 
-- **SigOpt, Inc.**
-
-  <p>
-    <a href="https://sigopt.com">
-      <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true" width="300" height="100"/>
-    </a>
-  </p>
+  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true" width="300" height="100"/>
