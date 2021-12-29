@@ -88,7 +88,7 @@ class SobolIndices(Integrand):
         self.discrete_distrib = self.true_measure.discrete_distrib.spawn(s=1,dimensions=[self.dtilde])[0]
         self.sampler = self.integrand.sampler
         self.g = self.integrand.g
-        super(SobolIndices,self).__init__()
+        super(SobolIndices,self).__init__(parallel=False)
     
     def f(self, x, periodization_transform='NONE', *args, **kwargs):
         z = x[:,self.d:]

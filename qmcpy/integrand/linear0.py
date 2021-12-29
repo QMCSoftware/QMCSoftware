@@ -25,7 +25,7 @@ class Linear0(Integrand):
         self.sampler = sampler
         self.true_measure = Uniform(self.sampler, lower_bound=-.5, upper_bound=.5)
         self.dprime = 1
-        super(Linear0,self).__init__()
+        super(Linear0,self).__init__(parallel=False)
     
     def g(self, t):
         y = t.sum(1)
