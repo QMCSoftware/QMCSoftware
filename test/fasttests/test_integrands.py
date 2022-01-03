@@ -14,14 +14,11 @@ class TestIntegrand(unittest.TestCase):
         dnb2 = DigitalNetB2(5)
         gauss = Gaussian(dnb2)
         cf_serial = CustomFun(gauss,my_custom_fun,dprime=1,parallel=False)
-        cf_parallel = CustomFun(gauss,my_custom_fun,dprime=1,parallel=True)
-        cf_parallel2 = CustomFun(gauss,my_custom_fun,dprime=1,parallel=2)
+        cf_parallel = CustomFun(gauss,my_custom_fun,dprime=1,parallel=2)
         x = dnb2.gen_samples(2**8)
         y_serial = cf_serial.f(x)
         y_parallel = cf_parallel.f(x)
-        y_parallel2 = cf_parallel2.f(x)
         self.assertTrue((y_serial==y_parallel).all())
-        self.assertTrue((y_parallel==y_parallel2).all())
 
     def test_abstract_methods(self):
         d = 2
