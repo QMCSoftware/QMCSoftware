@@ -41,6 +41,7 @@ class Integrand(object):
         if self.true_measure.transform!=self.true_measure and \
            not (self.true_measure.range==self.true_measure.transform.range).all():
             raise ParameterError("The range of the composed transform is not compatibe with this true measure")
+        self.EPS = finfo(float).eps
 
     def g(self, t, *args, **kwargs):
         """
@@ -92,6 +93,8 @@ class Integrand(object):
             wp = prod(2 * sin(pi * x) ** 2, 1)
         elif periodization_transform == 'C2SIN': # Sidi C^2 transform
             xp = (8 - 9 * cos(pi * x) + cos(3 * pi * x)) / 16 # psi3
+            xp[xp==0] = self.EPS
+            xp[xp==1] = 1-self.EPS
             wp = prod( (9 * sin(pi * x) * pi - sin(3 * pi * x) * 3 * pi) / 16 , 1) # psi3_1
         elif periodization_transform == 'C3SIN': # Sidi C^3 transform
             xp = (12 * pi * x - 8 * sin(2 * pi * x) + sin(4 * pi * x)) / (12 * pi) # psi4
