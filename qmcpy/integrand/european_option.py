@@ -57,7 +57,7 @@ class EuropeanOption(Integrand):
         if self.call_put not in ['call','put']:
             raise ParameterError("call_put must be either 'call' or 'put'")
         self.dprime = 1
-        super(EuropeanOption,self).__init__()  
+        super(EuropeanOption,self).__init__(parallel=False)  
 
     def g(self, t):
         """ See abstract method. """

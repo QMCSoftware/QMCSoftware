@@ -4,11 +4,9 @@ from numpy import *
 import unittest
 import scipy.stats
 
-
 class TestIntegrand(unittest.TestCase):
     """ General tests for Integrand """
 
-    
     def test_abstract_methods(self):
         d = 2
         integrands = [

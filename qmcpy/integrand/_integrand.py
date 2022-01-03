@@ -2,14 +2,28 @@ from ..util import MethodImplementationError, _univ_repr, ParameterError
 from ..true_measure._true_measure import TrueMeasure
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from numpy import *
+import os 
+import multiprocessing
+from itertools import repeat
 
 
 class Integrand(object):
     """ Integrand abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self):
+    def __init__(self,parallel):
+        """
+        Args:
+            parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion. 
+                Otherwise, parallel specifies the number of CPUs used by multiprocessing.Pool. 
+                Passing parallel=True sets the number of CPUs equal to os.cpu_count().
+        """
         prefix = 'A concrete implementation of Integrand must have '
         self.d = self.true_measure.d
+        cpus = os.cpu_count()
+        self.parallel = cpus if parallel is True else int(parallel)
+        self.parallel = 0 if self.parallel==1 else self.parallel
+        if self.parallel>cpus:
+            raise ParameterError("parallel must be less than %d, the number of CPUs on this machine."%cpus)
         if not (hasattr(self, 'sampler') and isinstance(self.sampler,(TrueMeasure,DiscreteDistribution))):
             raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistributioninstance')
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
@@ -27,6 +41,7 @@ class Integrand(object):
         if self.true_measure.transform!=self.true_measure and \
            not (self.true_measure.range==self.true_measure.transform.range).all():
             raise ParameterError("The range of the composed transform is not compatibe with this true measure")
+        self.EPS = finfo(float).eps
 
     def g(self, t, *args, **kwargs):
         """
@@ -78,6 +93,8 @@ class Integrand(object):
             wp = prod(2 * sin(pi * x) ** 2, 1)
         elif periodization_transform == 'C2SIN': # Sidi C^2 transform
             xp = (8 - 9 * cos(pi * x) + cos(3 * pi * x)) / 16 # psi3
+            xp[xp==0] = self.EPS
+            xp[xp==1] = 1-self.EPS
             wp = prod( (9 * sin(pi * x) * pi - sin(3 * pi * x) * 3 * pi) / 16 , 1) # psi3_1
         elif periodization_transform == 'C3SIN': # Sidi C^3 transform
             xp = (12 * pi * x - 8 * sin(2 * pi * x) + sin(4 * pi * x)) / (12 * pi) # psi4
@@ -88,16 +105,35 @@ class Integrand(object):
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._transform(xp) # get transformed samples, equivalent to self.true_measure._transform_r(x)
-            y = self.g(xtf,*args,**kwargs).reshape(n,self.dprime)
+            y = self._g(xtf,*args,**kwargs)
         else: # using importance sampling --> need to compute pdf, jacobian(s), and weight explicitly
             pdf = self.discrete_distrib.pdf(xp).reshape(n,1) # pdf of samples
             xtf,jacobians = self.true_measure.transform._jacobian_transform_r(xp) # compute recursive transform+jacobian
             weight = self.true_measure._weight(xtf).reshape(n,1) # weight based on the true measure
-            gvals = self.g(xtf,*args,**kwargs).reshape(n,self.dprime)
+            gvals = self._g(xtf,*args,**kwargs)
             y = gvals*weight/pdf*jacobians.reshape(n,1)
         # account for periodization weight
         yp = y*wp.reshape(n,1)
         return yp
+
+    def _g(self,t,*args,**kwargs):
+        n = len(t)  
+        if self.parallel:
+            pool = multiprocessing.Pool(processes=self.parallel)
+            y = pool.map(self._g_mp,t) if not args and not kwargs else pool.starmap(self._g_mp,zip(t,repeat((args,kwargs))))
+            y = concatenate(y,dtype=float)
+        else:
+            y = self.g(t,*args,**kwargs)
+        y = y.reshape(n,self.dprime)
+        return y
+    
+    def _g_mp(self,t,comb_args=((),{})):
+        args = comb_args[0]
+        kwargs = comb_args[1]
+        t = atleast_2d(t)
+        y = self.g(t,*args,**kwargs)
+        return y
+
 
     def bound_fun(self, bound_low, bound_high):
         """
