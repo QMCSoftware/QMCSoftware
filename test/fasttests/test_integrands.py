@@ -4,9 +4,6 @@ from numpy import *
 import unittest
 import scipy.stats
 
-def my_custom_fun(x):
-    return x.prod(1)
-
 class TestIntegrand(unittest.TestCase):
     """ General tests for Integrand """
 
