@@ -68,7 +68,7 @@ class Integrand(object):
         Return: 
             ndarray: length n vector of funciton evaluations
         """
-        periodization_transform = periodization_transform.upper()
+        periodization_transform = 'NONE' if periodization_transform is None else periodization_transform.upper()
         n,d = x.shape
         # parameter checks
         if self.discrete_distrib.mimics != 'StdUniform' and periodization_transform!='NONE':
@@ -93,14 +93,15 @@ class Integrand(object):
             wp = prod(2 * sin(pi * x) ** 2, 1)
         elif periodization_transform == 'C2SIN': # Sidi C^2 transform
             xp = (8 - 9 * cos(pi * x) + cos(3 * pi * x)) / 16 # psi3
-            xp[xp==0] = self.EPS
-            xp[xp==1] = 1-self.EPS
             wp = prod( (9 * sin(pi * x) * pi - sin(3 * pi * x) * 3 * pi) / 16 , 1) # psi3_1
         elif periodization_transform == 'C3SIN': # Sidi C^3 transform
             xp = (12 * pi * x - 8 * sin(2 * pi * x) + sin(4 * pi * x)) / (12 * pi) # psi4
-            wp = prod( (12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1) # psi4_1            
+            wp = prod( (12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1) # psi4_1
         else:
             raise ParameterError("The %s periodization transform is not implemented"%periodization_transform)
+        if periodization_transform in ['C1','C1SIN','C2SIN','C3SIN']:
+            xp[xp<=0] = self.EPS
+            xp[xp>=1] = 1-self.EPS
         # function evaluation with chain rule
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))

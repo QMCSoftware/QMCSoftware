@@ -48,11 +48,23 @@ class TestIntegrand(unittest.TestCase):
         for integrand in integrands+spawned_integrands:
             x = integrand.discrete_distrib.gen_samples(n)
             s = str(integrand)
-            for ptransform in ['None','Baker','C0','C1','C1sin','C2sin','None']:
-                y = integrand.f(x,periodization_transform=ptransform)
-                self.assertTrue(y.shape==(n,integrand.dprime))
-                self.assertTrue(isfinite(y).all())
-                self.assertTrue(y.dtype==float64)
+            y = integrand.f(x,periodization_transform='None')
+            self.assertTrue(y.shape==(n,integrand.dprime))
+            self.assertTrue(isfinite(y).all())
+            self.assertTrue(y.dtype==float64)
+
+    def test_ptransform(self):
+        d = 8
+        n = 64
+        integrand = CustomFun(Uniform(DigitalNetB2(d)),g=lambda x: x, dprime=d)
+        for ptransform in ['None','Baker','C0','C1','C1sin','C2sin','C3sin']:
+            x = integrand.discrete_distrib.gen_samples(n=n)
+            y = integrand.f(x,periodization_transform=ptransform)
+            self.assertTrue(y.shape==(n,d))
+            self.assertTrue(isfinite(y).all())
+            self.assertTrue((y>0).all())
+            self.assertTrue((y<1).all())
+            self.assertTrue(y.dtype==float64)
 
 
 if __name__ == "__main__":
