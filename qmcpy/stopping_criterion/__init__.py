@@ -1,3 +1,4 @@
+from ._stopping_criterion import StoppingCriterion
 from .cub_mc_clt import CubMCCLT
 from .cub_qmc_clt import CubQMCCLT
 from .cub_mc_g import CubMCG

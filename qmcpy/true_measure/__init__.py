@@ -1,3 +1,4 @@
+from ._true_measure import TrueMeasure
 from .brownian_motion import BrownianMotion
 from .gaussian import Gaussian, Normal
 from .lebesgue import Lebesgue
