@@ -1,4 +1,4 @@
-## v1.1
+## v1.2
 
 - precompute LD sequence ranomization
 - spawn QMCPy objects for efficient replicated and multilevel stopping criterion

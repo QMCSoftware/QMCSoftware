@@ -28,7 +28,7 @@ class CustomFun(Integrand):
     array([3., 4., 5.])
     """
 
-    def __init__(self, true_measure, g, dprime=1):
+    def __init__(self, true_measure, g, dprime=1, parallel=False):
         """
         Args:
             true_measure (TrueMeasure): a TrueMeasure instance. 
@@ -38,12 +38,16 @@ class CustomFun(Integrand):
         self.parameters = []
         self.true_measure = true_measure
         self.sampler = self.true_measure
-        self._g = g
+        self.__g = g
         self.dprime = dprime
-        super(CustomFun,self).__init__()
+        super(CustomFun,self).__init__(parallel)
     
     def g(self, t, *args, **kwargs):
-        return self._g(t,*args,**kwargs)
+        return self.__g(t,*args,**kwargs)
     
     def _spawn(self, level, sampler):
-        return CustomFun(true_measure=sampler,g=self._g,dprime=self.dprime)
+        return CustomFun(
+            true_measure = sampler,
+            g = self.__g,
+            dprime = self.dprime,
+            parallel = self.parallel)

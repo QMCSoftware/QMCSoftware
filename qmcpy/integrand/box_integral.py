@@ -45,7 +45,7 @@ class BoxIntegral(Integrand):
         self.dprime = len(self.s)
         self.sampler = sampler
         self.true_measure = Uniform(self.sampler, lower_bound=0., upper_bound=1.)
-        super(BoxIntegral,self).__init__() # output dimensions per sample
+        super(BoxIntegral,self).__init__(parallel=False) # output dimensions per sample
 
     def g(self, t, **kwargs):
         compute_flags = kwargs['compute_flags'] if 'compute_flags' in kwargs else ones(self.dprime,dtype=int)

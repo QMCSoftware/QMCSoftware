@@ -1,7 +1,8 @@
 attrs==19.3.0
 backcall==0.2.0
 bleach==3.3.0
-codecov==2.1.5
+codecov==2.1.6
+coverage==4.5.4
 cycler==0.10.0
 decorator==4.4.2
 defusedxml==0.6.0

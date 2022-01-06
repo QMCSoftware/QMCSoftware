@@ -4,11 +4,9 @@ from numpy import *
 import unittest
 import scipy.stats
 
-
 class TestIntegrand(unittest.TestCase):
     """ General tests for Integrand """
 
-    
     def test_abstract_methods(self):
         d = 2
         integrands = [
@@ -50,7 +48,7 @@ class TestIntegrand(unittest.TestCase):
         for integrand in integrands+spawned_integrands:
             x = integrand.discrete_distrib.gen_samples(n)
             s = str(integrand)
-            for ptransform in ['None','Baker','C0','C1','C1sin','C2sin','None']:
+            for ptransform in ['None','Baker','C0','C1','C1sin','C2sin','C3sin']:
                 y = integrand.f(x,periodization_transform=ptransform)
                 self.assertTrue(y.shape==(n,integrand.dprime))
                 self.assertTrue(isfinite(y).all())

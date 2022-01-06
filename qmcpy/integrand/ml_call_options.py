@@ -71,7 +71,7 @@ class MLCallOptions(Integrand):
         self.dprime = 1
         self.level = _level
         self.max_level = inf
-        super(MLCallOptions,self).__init__()
+        super(MLCallOptions,self).__init__(parallel=False)
         #if self.discrete_distrib.low_discrepancy and self.option=='asian':
         #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
 
