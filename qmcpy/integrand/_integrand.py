@@ -55,7 +55,7 @@ class Integrand(object):
         """
         raise MethodImplementationError(self, 'g')
     
-    def f(self, x, periodization_transform='NONE', *args, **kwargs):
+    def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
         """
         Evalute transformed integrand based on true measures and discrete distribution 
         
@@ -69,6 +69,7 @@ class Integrand(object):
             ndarray: length n vector of funciton evaluations
         """
         periodization_transform = 'NONE' if periodization_transform is None else periodization_transform.upper()
+        compute_flags = tile(1,self.dprime) if compute_flags is None else atleast_1d(compute_flags)
         n,d = x.shape
         # parameter checks
         if self.discrete_distrib.mimics != 'StdUniform' and periodization_transform!='NONE':
@@ -106,32 +107,34 @@ class Integrand(object):
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._transform(xp) # get transformed samples, equivalent to self.true_measure._transform_r(x)
-            y = self._g(xtf,*args,**kwargs)
+            y = self._g(xtf,compute_flags,*args,**kwargs,)
         else: # using importance sampling --> need to compute pdf, jacobian(s), and weight explicitly
             pdf = self.discrete_distrib.pdf(xp).reshape(n,1) # pdf of samples
             xtf,jacobians = self.true_measure.transform._jacobian_transform_r(xp) # compute recursive transform+jacobian
             weight = self.true_measure._weight(xtf).reshape(n,1) # weight based on the true measure
-            gvals = self._g(xtf,*args,**kwargs)
+            gvals = self._g(xtf,compute_flags,*args,**kwargs)
             y = gvals*weight/pdf*jacobians.reshape(n,1)
         # account for periodization weight
         yp = y*wp.reshape(n,1)
         return yp
 
-    def _g(self,t,*args,**kwargs):
-        n = len(t)  
+    def _g(self,t,compute_flags,*args,**kwargs):
+        n = len(t)
+        kwargs['compute_flags'] = compute_flags
         if self.parallel:
             pool = multiprocessing.Pool(processes=self.parallel)
-            y = pool.map(self._g_mp,t) if not args and not kwargs else pool.starmap(self._g_mp,zip(t,repeat((args,kwargs))))
+            y = pool.map(self._g2,t) if not args and not kwargs else pool.starmap(self._g_mp,zip(t,repeat((args,kwargs))))
             y = concatenate(y,dtype=float)
         else:
-            y = self.g(t,*args,**kwargs)
+            y = self._g2(t,comb_args=(args,kwargs))
         y = y.reshape(n,self.dprime)
         return y
     
-    def _g_mp(self,t,comb_args=((),{})):
+    def _g2(self,t,comb_args=((),{})):
         args = comb_args[0]
         kwargs = comb_args[1]
         t = atleast_2d(t)
+        if self.dprime==1: del kwargs['compute_flags']
         y = self.g(t,*args,**kwargs)
         return y
 
