@@ -24,12 +24,11 @@ class SobolIndices(Integrand):
         ci_high         [1.739 1.801 1.731 1.763 1.823 1.775 2.177 9.871]
         ci_comb_low     [0.3   0.307 0.316 0.321 0.324 0.32 ]
         ci_comb_high    [0.342 0.354 0.34  0.346 0.358 0.349]
-        solution_comb   [0.321 0.331 0.328 0.334 0.341 0.334]
         flags_comb      [False False False False False False]
         flags_indv      [False False False False False False False False]
         n_total         2^(12)
-        n               [256. 256. 256. 256. 256. 256. 256. 256.]
-        replications    2^(4)
+        n               [4096. 4096. 4096. 4096. 4096. 4096. 4096. 4096.]
+        n_rep           [256. 256. 256. 256. 256. 256. 256. 256.]
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
@@ -38,6 +37,7 @@ class SobolIndices(Integrand):
         rel_tol         0
         n_init          2^(8)
         n_max           2^(30)
+        replications    2^(4)
     SobolIndices (Integrand Object)
         indices         [[0]
                         [1]
