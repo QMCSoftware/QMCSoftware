@@ -1,4 +1,4 @@
-from ._cub_qmc_ld_g import CubQMCLDG
+from ._cub_qmc_ld_g import _CubQMCLDG
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
 from ..integrand import Keister
@@ -6,7 +6,7 @@ from ..util import ParameterError
 from numpy import *
 
 
-class CubQMCLatticeG(CubQMCLDG):
+class CubQMCLatticeG(_CubQMCLDG):
     r"""
     Stopping Criterion quasi-Monte Carlo method using rank-1 Lattices cubature over
     a d-dimensional region to integrate within a specified generalized error

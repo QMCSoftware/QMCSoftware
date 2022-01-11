@@ -150,7 +150,7 @@ class CubQMCCLT(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         t_start = time()
-        self.datas = [MeanVarDataRep(self.z_star,self.inflate,self.replications) for j in range(self.dprime)]
+        self.datum = [MeanVarDataRep(self.z_star,self.inflate,self.replications) for j in range(self.dprime)]
         self.data = MeanVarDataRep.__new__(MeanVarDataRep)
         self.data.flags_indv = tile(True,self.dprime)
         self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
@@ -168,7 +168,7 @@ class CubQMCCLT(StoppingCriterion):
             for j in range(self.dprime):
                 if not self.data.flags_indv[j]: continue
                 yj = yfull[:,j].reshape((n,self.replications),order='f')
-                self.data.solution_indv[j],self.data.bounds[:,j] = self.datas[j].update_data(yj)
+                self.data.solution_indv[j],self.data.bounds[:,j] = self.datum[j].update_data(yj)
             self.data.indv_error_bound = (self.data.bounds[1]-self.data.bounds[0])/2
             self.data.ci_low,self.data.ci_high = self.data.bounds[0],self.data.bounds[1]
             self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
@@ -184,19 +184,18 @@ class CubQMCCLT(StoppingCriterion):
             self.data.n_total = self.data.n.max()
             if sum(self.data.flags_indv)==0:
                 break # sufficiently estimated
-            elif 2*self.data.n_total > self.n_max:
+            elif 2*self.data.n_total>self.n_max:
                 warning_s = """
                 Alread generated %d samples.
                 Trying to generate %d new samples would exceeds n_max = %d.
                 No more samples will be generated.
-                Note that error tolerances may not be satisfied""" \
+                Note that error tolerances may not be satisfied. """ \
                 % (int(self.data.n_total),int(self.data.n_total),int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
             else:
                 self.data.n_min_rep = n_max
                 self.data.n_rep += self.data.n_rep*self.data.flags_indv # double sample size
-        # create data object
         self.data.integrand = self.integrand
         self.data.true_measure = self.true_measure
         self.data.discrete_distrib = self.discrete_distrib
@@ -214,6 +213,7 @@ class CubQMCCLT(StoppingCriterion):
             'n',
             'n_rep',
             'time_integrate']
+        self.data.datum = self.datum
         self.data.time_integrate = time()-t_start
         return self.data.solution,self.data
     

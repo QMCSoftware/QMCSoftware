@@ -1,4 +1,4 @@
-from ._cub_qmc_ld_g import CubQMCLDG
+from ._cub_qmc_ld_g import _CubQMCLDG
 from ..util import ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
@@ -6,7 +6,7 @@ from ..integrand import Keister, CustomFun
 from numpy import *
 
 
-class CubQMCNetG(CubQMCLDG):
+class CubQMCNetG(_CubQMCLDG):
     r"""
     Quasi-Monte Carlo method using Sobol' cubature over the
     d-dimensional region to integrate within a specified generalized error
