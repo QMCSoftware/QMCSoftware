@@ -1,7 +1,7 @@
 from ._cub_qmc_ld_g import _CubQMCLDG
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian
-from ..integrand import Keister
+from ..integrand import Keister, BoxIntegral
 from ..util import ParameterError
 from numpy import *
 
@@ -18,8 +18,15 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> data
     LDTransformData (AccumulateData Object)
         solution        1.810
-        error_bound     0.005
+        indv_error      0.005
+        ci_low          1.806
+        ci_high         1.815
+        ci_comb_low     1.806
+        ci_comb_high    1.815
+        flags_comb      0
+        flags_indv      0
         n_total         2^(10)
+        n               2^(10)
         time_integrate  ...
     CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.050
@@ -38,6 +45,17 @@ class CubQMCLatticeG(_CubQMCLDG):
         order           natural
         entropy         7
         spawn_key       ()
+    >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
+    >>> abs_tol = 1e-3
+    >>> sc = CubQMCLatticeG(f, abs_tol=abs_tol)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    array([1.18954582, 0.96056304])
+    >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
+    >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
+    >>> true_value = array([sol3neg1,sol31])
+    >>> (abs(true_value-solution)<abs_tol).all()
+    True
     
     Original Implementation:
 

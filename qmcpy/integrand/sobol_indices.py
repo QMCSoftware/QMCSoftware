@@ -19,7 +19,7 @@ class SobolIndices(Integrand):
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [0.321 0.331 0.328 0.334 0.341 0.334]
-        indv_error_bound [0.092 0.103 0.046 0.048 0.072 0.058 0.007 0.051]
+        indv_error      [0.092 0.103 0.046 0.048 0.072 0.058 0.007 0.051]
         ci_low          [1.555 1.595 1.64  1.667 1.679 1.659 2.163 9.77 ]
         ci_high         [1.739 1.801 1.731 1.763 1.823 1.775 2.177 9.871]
         ci_comb_low     [0.3   0.307 0.316 0.321 0.324 0.32 ]

@@ -52,6 +52,9 @@ class LDTransformData(AccumulateData):
         else: # any iteration after the first
             mnext = int(m-1)
             n = int(2**mnext)
+            if self.ncv>0:
+                self.y_val[-n:] = self.y_val[-n:]-self.yg_val[-n:]@self.beta
+                self.y_cp[-n:] = self.y_val[-n:]
             if not self.update_beta: # do not update the beta coefficients
                 self.y_cp[-n:] = self.fast_transform(self.y_cp[-n:],0,mnext,mnext)
                 self.y_cp = self.fast_transform(self.y_cp,mnext,mnext+1,mnext)
@@ -67,7 +70,7 @@ class LDTransformData(AccumulateData):
         stilde = sum(abs(self.y_cp[self.kappanumap[nllstart:2*nllstart]-1]))
         self.bounds = self.muhat+array([-1,1])*self.fudge(m)*stilde
         if self.check_cone:
-            for l in range(self.l_star,m+1): # Storing the information for the necessary conditions
+            for l in range(self.l_star,int(m+1)): # Storing the information for the necessary conditions
                 c_tmp = self.omg_hat(m-l)*self.omg_circ(m-l)
                 c_low = 1./(1+c_tmp)
                 c_up = 1./(1-c_tmp)
@@ -91,8 +94,8 @@ class LDTransformData(AccumulateData):
             coefv = tile(coef,nmminlm1)
             evenval = y2tf[ptind]
             oddval = y2tf[~ptind]
-            y2tf[ptind] = (evenval+coefv*oddval)/2.
-            y2tf[~ptind] = (evenval-coefv*oddval)/2.
+            y2tf[ptind] = (evenval+(coefv*oddval.T).T)/2.
+            y2tf[~ptind] = (evenval-(coefv*oddval.T).T)/2.
         return y2tf
 
     def update_kappanumap(self, mfrom, mto, m):

@@ -24,7 +24,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
-        indv_error_bound 6.92e-04
+        indv_error      6.92e-04
         ci_low          1.380
         ci_high         1.381
         ci_comb_low     1.380
@@ -64,7 +64,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [1.19  0.961]
-        indv_error_bound [0.001 0.001]
+        indv_error      [0.001 0.001]
         ci_low          [1.19 0.96]
         ci_high         [1.191 0.961]
         ci_comb_low     [1.19 0.96]
@@ -169,7 +169,7 @@ class CubQMCCLT(StoppingCriterion):
                 if not self.data.flags_indv[j]: continue
                 yj = yfull[:,j].reshape((n,self.replications),order='f')
                 self.data.solution_indv[j],self.data.bounds[:,j] = self.datum[j].update_data(yj)
-            self.data.indv_error_bound = (self.data.bounds[1]-self.data.bounds[0])/2
+            self.data.indv_error = (self.data.bounds[1]-self.data.bounds[0])/2
             self.data.ci_low,self.data.ci_high = self.data.bounds[0],self.data.bounds[1]
             self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
             error_low = self.error_fun(self.data.ci_comb_low,self.abs_tol,self.rel_tol)
@@ -202,7 +202,7 @@ class CubQMCCLT(StoppingCriterion):
         self.data.stopping_crit = self
         self.data.parameters = [
             'solution',
-            'indv_error_bound',
+            'indv_error',
             'ci_low',
             'ci_high',
             'ci_comb_low',
