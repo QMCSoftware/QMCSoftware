@@ -21,5 +21,5 @@ class MeanVarDataRep(AccumulateData):
         self.muhats = self.ysums/self.n_rep
         self.muhat = self.muhats.mean()
         self.sighat = self.muhats.std()
-        self.bounds = self.muhat + array([-1,1])*self.z_star*self.inflate*self.sighat/sqrt(self.replications)
+        self.bounds = self.muhat+array([-1,1])*self.z_star*self.inflate*self.sighat/sqrt(self.replications)
         return self.muhat,self.bounds
