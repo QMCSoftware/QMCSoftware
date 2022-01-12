@@ -1,12 +1,12 @@
-from ._cub_qmc_ld_g import CubQMCLDG
+from ._cub_qmc_ld_g import _CubQMCLDG
 from ..util import ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
-from ..integrand import Keister, CustomFun
+from ..integrand import Keister, CustomFun, BoxIntegral
 from numpy import *
 
 
-class CubQMCNetG(CubQMCLDG):
+class CubQMCNetG(_CubQMCLDG):
     r"""
     Quasi-Monte Carlo method using Sobol' cubature over the
     d-dimensional region to integrate within a specified generalized error
@@ -18,8 +18,15 @@ class CubQMCNetG(CubQMCLDG):
     >>> data
     LDTransformData (AccumulateData Object)
         solution        1.809
-        error_bound     0.005
+        indv_error      0.005
+        ci_low          1.804
+        ci_high         1.814
+        ci_comb_low     1.804
+        ci_comb_high    1.814
+        flags_comb      0
+        flags_indv      0
         n_total         2^(10)
+        n               2^(10)
         time_integrate  ...
     CubQMCNetG (StoppingCriterion Object)
         abs_tol         0.050
@@ -46,11 +53,63 @@ class CubQMCNetG(CubQMCLDG):
     ...     control_variates = [cv1,cv2],
     ...     control_variate_means = [1,4/3])
     >>> sol,data = sc.integrate()
-    >>> print(sol)
-    5.333...
+    >>> sol
+    array([5.33333333])
     >>> exactsol = 16/3
-    >>> print(abs(sol-exactsol)<1e-6)
+    >>> abs(sol-exactsol)<1e-6
+    array([ True])
+    >>> dnb2 = DigitalNetB2(3,seed=7)
+    >>> f = BoxIntegral(dnb2, s=[-1,1])
+    >>> abs_tol = 1e-3
+    >>> sc = CubQMCNetG(f, abs_tol=abs_tol)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    array([1.18944142, 0.96064165])
+    >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
+    >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
+    >>> true_value = array([sol3neg1,sol31])
+    >>> (abs(true_value-solution)<abs_tol).all()
     True
+    >>> f2 = BoxIntegral(dnb2,s=[3,4])
+    >>> sc = CubQMCNetG(f2,control_variates=f,control_variate_means=true_value,update_beta=True)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    array([1.10168119, 1.26661293])
+    >>> data
+    LDTransformData (AccumulateData Object)
+        solution        [1.102 1.267]
+        indv_error      [0.002 0.005]
+        ci_low          [1.099 1.262]
+        ci_high         [1.104 1.271]
+        ci_comb_low     [1.099 1.262]
+        ci_comb_high    [1.104 1.271]
+        flags_comb      [False False]
+        flags_indv      [False False]
+        n_total         2^(10)
+        n               2^(10)
+        time_integrate  ...
+    CubQMCNetG (StoppingCriterion Object)
+        abs_tol         0.010
+        rel_tol         0
+        n_init          2^(10)
+        n_max           2^(35)
+        cv              BoxIntegral (Integrand Object)
+                           s               [-1  1]
+        cv_mu           [[1.19 ]
+                        [0.961]]
+        update_beta     1
+    BoxIntegral (Integrand Object)
+        s               [3 4]
+    Uniform (TrueMeasure Object)
+        lower_bound     0
+        upper_bound     1
+    DigitalNetB2 (DiscreteDistribution Object)
+        d               3
+        dvec            [0 1 2]
+        randomize       LMS_DS
+        graycode        0
+        entropy         7
+        spawn_key       ()
 
     Original Implementation:
 
@@ -83,7 +142,9 @@ class CubQMCNetG(CubQMCLDG):
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
         fudge=lambda m: 5.*2.**(-m), check_cone=False, 
-        control_variates=[], control_variate_means=[], update_beta=False):
+        control_variates=[], control_variate_means=[], update_beta=False,
+        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
+
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -100,6 +161,9 @@ class CubQMCNetG(CubQMCLDG):
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
             update_beta (bool): update control variate beta coefficients at each iteration? 
+            error_fun: function taking in the approximate solution vector, 
+                absolute tolerance, and relative tolerance which returns the approximate error. 
+                Default indicates integration until either absolute OR relative tolerance is satisfied.
         """
         super(CubQMCNetG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,
             check_cone,control_variates,control_variate_means,update_beta,
@@ -107,7 +171,8 @@ class CubQMCNetG(CubQMCLDG):
             coefv = lambda nl: ones(nl,dtype=float), 
             allowed_levels = ['single'],
             allowed_distribs = [DigitalNetB2],
-            cast_complex = False)
+            cast_complex = False,
+            error_fun = error_fun)
         if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False.")
 

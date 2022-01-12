@@ -18,7 +18,7 @@ class CustomFun(Integrand):
     3.995...
     >>> cf = CustomFun(
     ...     true_measure = Uniform(DigitalNetB2(3,seed=7),lower_bound=[2,3,4],upper_bound=[4,5,6]),
-    ...     g = lambda x: x,
+    ...     g = lambda x,compute_flags=None: x,
     ...     dprime = 3)
     >>> x = cf.discrete_distrib.gen_samples(2**10)
     >>> y = cf.f(x)
