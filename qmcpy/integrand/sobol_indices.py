@@ -16,6 +16,9 @@ class SobolIndices(Integrand):
     >>> keister_indices = SobolIndices(keister_d,indices='singletons')
     >>> sc = CubQMCCLT(keister_indices,abs_tol=.05)
     >>> solution,data = sc.integrate()
+    >>> solution.reshape((2,-1))
+    array([[0.32057613, 0.3306119 , 0.32798613],
+           [0.33379281, 0.34085902, 0.33412903]])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [0.321 0.331 0.328 0.334 0.341 0.334]
