@@ -95,8 +95,7 @@ class CubQMCNetG(_CubQMCLDG):
         n_max           2^(35)
         cv              BoxIntegral (Integrand Object)
                            s               [-1  1]
-        cv_mu           [[1.19 ]
-                        [0.961]]
+        cv_mu           [[1.19  0.961]]
         update_beta     1
     BoxIntegral (Integrand Object)
         s               [3 4]
@@ -106,6 +105,48 @@ class CubQMCNetG(_CubQMCLDG):
     DigitalNetB2 (DiscreteDistribution Object)
         d               3
         dvec            [0 1 2]
+        randomize       LMS_DS
+        graycode        0
+        entropy         7
+        spawn_key       ()
+    >>> cf = CustomFun(
+    ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
+    ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
+    ...     dprime = (2,3))
+    >>> sol,data = CubQMCNetG(cf,abs_tol=1e-6).integrate()
+    >>> data
+    LDTransformData (AccumulateData Object)
+        solution        [[1. 2. 3.]
+                        [4. 5. 6.]]
+        indv_error      [[2.825e-08 6.101e-07 2.456e-10]
+                        [4.547e-12 3.725e-07 3.499e-09]]
+        ci_low          [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_high         [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_comb_low     [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_comb_high    [[1. 2. 3.]
+                        [4. 5. 6.]]
+        flags_comb      [[False False False]
+                        [False False False]]
+        flags_indv      [[False False False]
+                        [False False False]]
+        n_total         2^(13)
+        n               2^(13)
+        time_integrate  ...
+    CubQMCNetG (StoppingCriterion Object)
+        abs_tol         1.00e-06
+        rel_tol         0
+        n_init          2^(10)
+        n_max           2^(35)
+    CustomFun (Integrand Object)
+    Uniform (TrueMeasure Object)
+        lower_bound     0
+        upper_bound     1
+    DigitalNetB2 (DiscreteDistribution Object)
+        d               6
+        dvec            [0 1 2 3 4 5]
         randomize       LMS_DS
         graycode        0
         entropy         7

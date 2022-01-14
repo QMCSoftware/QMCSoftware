@@ -10,15 +10,17 @@ from itertools import repeat
 class Integrand(object):
     """ Integrand abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self,parallel):
+    def __init__(self, dprime, parallel):
         """
         Args:
+            dprime (tuple): function output dimension shape.
             parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion. 
                 Otherwise, parallel specifies the number of CPUs used by multiprocessing.Pool. 
                 Passing parallel=True sets the number of CPUs equal to os.cpu_count().
         """
         prefix = 'A concrete implementation of Integrand must have '
         self.d = self.true_measure.d
+        self.dprime = (dprime,) if isinstance(dprime,int) else tuple(dprime)
         cpus = os.cpu_count()
         self.parallel = cpus if parallel is True else int(parallel)
         self.parallel = 0 if self.parallel==1 else self.parallel
@@ -28,8 +30,6 @@ class Integrand(object):
             raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistributioninstance')
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
-        if not (hasattr(self, 'dprime')):
-            raise ParameterError('Set self.dprime, the number of outputs for each input sample.')
         if not hasattr(self,'parameters'):
             self.parameters = []
         if not hasattr(self,'leveltype'):
@@ -100,41 +100,44 @@ class Integrand(object):
             wp = prod( (12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1) # psi4_1
         else:
             raise ParameterError("The %s periodization transform is not implemented"%periodization_transform)
+        wp = wp.reshape(n)
         if periodization_transform in ['C1','C1SIN','C2SIN','C3SIN']:
             xp[xp<=0] = self.EPS
             xp[xp>=1] = 1-self.EPS
         # function evaluation with chain rule
+        y = empty((n,)+self.dprime,dtype=float)
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._transform(xp) # get transformed samples, equivalent to self.true_measure._transform_r(x)
-            y = self._g(xtf,compute_flags,*args,**kwargs,)
+            y[:] = self._g(xtf,compute_flags,*args,**kwargs)
         else: # using importance sampling --> need to compute pdf, jacobian(s), and weight explicitly
-            pdf = self.discrete_distrib.pdf(xp).reshape(n,1) # pdf of samples
+            pdf = self.discrete_distrib.pdf(xp).reshape(n) # pdf of samples
             xtf,jacobians = self.true_measure.transform._jacobian_transform_r(xp) # compute recursive transform+jacobian
-            weight = self.true_measure._weight(xtf).reshape(n,1) # weight based on the true measure
+            jacobians = jacobians.reshape(n)
+            weight = self.true_measure._weight(xtf).reshape(n) # weight based on the true measure
             gvals = self._g(xtf,compute_flags,*args,**kwargs)
-            y = gvals*weight/pdf*jacobians.reshape(n,1)
+            for i in range(n): y[i] = gvals[i]*weight[i]/pdf[i]*jacobians[i]
         # account for periodization weight
-        yp = y*wp.reshape(n,1)
-        return yp
+        for i in range(n): y[i] = y[i]*wp[i]
+        return y
 
     def _g(self,t,compute_flags,*args,**kwargs):
         n = len(t)
         kwargs['compute_flags'] = compute_flags
         if self.parallel:
             pool = multiprocessing.Pool(processes=self.parallel)
-            y = pool.map(self._g2,t) if not args and not kwargs else pool.starmap(self._g_mp,zip(t,repeat((args,kwargs))))
+            y = pool.starmap(self._g2,zip(t,repeat((args,kwargs))))
             y = concatenate(y,dtype=float)
         else:
             y = self._g2(t,comb_args=(args,kwargs))
-        y = y.reshape(n,self.dprime)
+        y = y.reshape((n,)+self.dprime)
         return y
     
     def _g2(self,t,comb_args=((),{})):
         args = comb_args[0]
         kwargs = comb_args[1]
         t = atleast_2d(t)
-        if self.dprime==1: del kwargs['compute_flags']
+        if self.dprime==(1,): del kwargs['compute_flags']
         y = self.g(t,*args,**kwargs)
         return y
 

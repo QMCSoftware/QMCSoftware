@@ -28,19 +28,22 @@ class CustomFun(Integrand):
     array([3., 4., 5.])
     """
 
-    def __init__(self, true_measure, g, dprime=1, parallel=False):
+    def __init__(self, true_measure, g, dprime=(1,), parallel=False):
         """
         Args:
             true_measure (TrueMeasure): a TrueMeasure instance. 
             g (function): a function handle. 
-            dprime (int): output dimension of the function.
+            dprime (tuple): function output dimension shape.
+            parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion. 
+                Otherwise, parallel specifies the number of CPUs used by multiprocessing.Pool. 
+                Passing parallel=True sets the number of CPUs equal to os.cpu_count(). 
+                Do NOT set g to a lambda function when doing parallel computation
         """
         self.parameters = []
         self.true_measure = true_measure
         self.sampler = self.true_measure
         self.__g = g
-        self.dprime = dprime
-        super(CustomFun,self).__init__(parallel)
+        super(CustomFun,self).__init__(dprime,parallel)
     
     def g(self, t, *args, **kwargs):
         return self.__g(t,*args,**kwargs)
