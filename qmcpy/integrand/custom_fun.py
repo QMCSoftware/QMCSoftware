@@ -9,7 +9,8 @@ class CustomFun(Integrand):
     
     >>> cf = CustomFun(
     ...     true_measure = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2]),
-    ...     g = lambda x: x[:,0]**2*x[:,1])
+    ...     g = lambda x: x[:,0]**2*x[:,1],
+    ...     dprime = 1)
     >>> x = cf.discrete_distrib.gen_samples(2**10)
     >>> y = cf.f(x)
     >>> y.shape

@@ -86,7 +86,7 @@ class CubQMCNetG(_CubQMCLDG):
         flags_comb      [False False]
         flags_indv      [False False]
         n_total         2^(10)
-        n               2^(10)
+        n               [1024. 1024.]
         time_integrate  ...
     CubQMCNetG (StoppingCriterion Object)
         abs_tol         0.010
@@ -95,7 +95,7 @@ class CubQMCNetG(_CubQMCLDG):
         n_max           2^(35)
         cv              BoxIntegral (Integrand Object)
                            s               [-1  1]
-        cv_mu           [[1.19  0.961]]
+        cv_mu           [1.19  0.961]
         update_beta     1
     BoxIntegral (Integrand Object)
         s               [3 4]
@@ -133,7 +133,8 @@ class CubQMCNetG(_CubQMCLDG):
         flags_indv      [[False False False]
                         [False False False]]
         n_total         2^(13)
-        n               2^(13)
+        n               [[2048. 1024. 1024.]
+                        [8192. 4096. 2048.]]
         time_integrate  ...
     CubQMCNetG (StoppingCriterion Object)
         abs_tol         1.00e-06

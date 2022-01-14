@@ -80,7 +80,8 @@ class CubQMCLatticeG(_CubQMCLDG):
         flags_indv      [[False False False]
                         [False False False]]
         n_total         2^(15)
-        n               2^(15)
+        n               [[ 8192. 16384. 16384.]
+                        [16384. 32768. 32768.]]
         time_integrate  ...
     CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         1.00e-06

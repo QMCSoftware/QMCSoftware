@@ -112,7 +112,7 @@ class _CubQMCLDG(StoppingCriterion):
             self.data.flags_comb = maximum(rem_error_low,rem_error_high)>=0
             self.data.flags_comb |= self.data.violated
             self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
-            self.data.n = 2**m
+            self.data.n = 2**self.data.m
             self.data.n_total = self.data.n.max()
             if sum(self.data.flags_indv)==0:
                 break # stopping criterion met

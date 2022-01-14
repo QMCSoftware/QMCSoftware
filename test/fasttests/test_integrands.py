@@ -50,7 +50,7 @@ class TestIntegrand(unittest.TestCase):
             s = str(integrand)
             for ptransform in ['None','Baker','C0','C1','C1sin','C2sin','C3sin']:
                 y = integrand.f(x,periodization_transform=ptransform)
-                self.assertTrue(y.shape==(n,integrand.dprime))
+                self.assertTrue(y.shape==((n,)+integrand.dprime))
                 self.assertTrue(isfinite(y).all())
                 self.assertTrue(y.dtype==float64)
 
