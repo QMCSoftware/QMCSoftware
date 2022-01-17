@@ -48,7 +48,7 @@ class Integrand(object):
         ABSTRACT METHOD for original integrand to be integrated.
 
         Args:
-            t (ndarray): n x d array of samples to be intput into orignal integrand. 
+            t (ndarray): n x d array of samples to be input into original integrand.
 
         Return:
             ndarray: n vector of function evaluations
@@ -57,7 +57,7 @@ class Integrand(object):
     
     def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
         """
-        Evalute transformed integrand based on true measures and discrete distribution 
+        Evaluate transformed integrand based on true measures and discrete distribution
         
         Args:
             x (ndarray): n x d array of samples from a discrete distribution
@@ -66,7 +66,7 @@ class Integrand(object):
             **kwargs (dict): other keyword args to g
             
         Return: 
-            ndarray: length n vector of funciton evaluations
+            ndarray: length n vector of function evaluations
         """
         periodization_transform = 'NONE' if periodization_transform is None else periodization_transform.upper()
         compute_flags = tile(1,self.dprime) if compute_flags is None else atleast_1d(compute_flags)
@@ -147,7 +147,7 @@ class Integrand(object):
     def bound_fun(self, bound_low, bound_high):
         """
         compute the bounds on the combined function based on bounds for the individual functions. 
-        Defaults to the identity where we essentiallly do not combine integrands, 
+        Defaults to the identity where we essentially do not combine integrands,
         but instead integrate each function individually.
 
         Args:
@@ -157,21 +157,21 @@ class Integrand(object):
         Return:
             ndarray: lower bound on function combining estimates,
             ndarray: upper bound on function combining estimates,
-            bool ndarray: flags to override suffient combined integrand estimation. 
+            bool ndarray: flags to override sufficient combined integrand estimation.
                 e.g. when approximating a ratio of integrals, if the denominator's bounds straddle 0, 
-                then returning True here forces ratio to be flagged as insuffiently approximated.
+                then returning True here forces ratio to be flagged as insufficiently approximated.
         """
         return bound_low,bound_high,False
 
     def dependency(self, flags_comb):
         """
-        takes a vector of indicators of wheather of not 
+        takes a vector of indicators of weather of not
         the error bound is satisfied for combined integrands and which returns flags for individual integrands. 
         For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio 
         has not been approximated to within the tolerance, so the dependency function should return [True,True]
         indicating that both the numerator and denominator integrands need to be better approximated.
         Args:
-            flags_comb (bool ndarray): flags indicating wheather the combined integrals are insufficiently approximated
+            flags_comb (bool ndarray): flags indicating weather the combined integrals are insufficiently approximated
         
         Return:
             (bool ndarray): length (Integrand.dprime) flags for individual integrands"""
@@ -218,13 +218,13 @@ class Integrand(object):
             spawns[l] = self._spawn(level,tm_spawn)
         return spawns
     
-    def _spawn(self, level, tm_sapwn):
+    def _spawn(self, level, tm_spawn):
         """
         ABSTRACT METHOD, used by self.spawn
         
         Args:
             level (numpy.random.SeedSequence): level at which to spawn new instance 
-            tm_sapwn (TrueMeasure): true measure spawn to use as new sampler
+            tm_spawn (TrueMeasure): true measure spawn to use as new sampler
         
         Return: 
             Integrand: spawn at this level
