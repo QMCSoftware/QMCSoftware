@@ -54,7 +54,7 @@ class _CubQMCLDG(StoppingCriterion):
         for cv in self.cv:
             if (cv.discrete_distrib!=self.discrete_distrib) or (not isinstance(cv,Integrand)) or (cv.dprime!=self.dprime):
                 raise ParameterError('''
-                        Each control variate's discrete distribution must be an Integrand instance 
+                        Each control variates discrete distribution must be an Integrand instance 
                         with the same discrete distribution as the main integrand. dprime must also match 
                         that of the main integrand instance for each control variate.''')
         self.update_beta = update_beta
@@ -119,7 +119,7 @@ class _CubQMCLDG(StoppingCriterion):
             elif 2*self.data.n_total>self.n_max:
                 # doubling samples would go over n_max
                 warning_s = """
-                Alread generated %d samples.
+                Already generated %d samples.
                 Trying to generate %d new samples would exceed n_max = %d.
                 No more samples will be generated.
                 Note that error tolerances may no longer be satisfied.""" \
