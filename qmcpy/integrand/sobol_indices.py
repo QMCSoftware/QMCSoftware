@@ -50,6 +50,7 @@ class SobolIndices(Integrand):
         indices         [[0]
                         [1]
                         [2]]
+        n_multiplier    3
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -154,6 +155,7 @@ class SobolIndices(Integrand):
         indices         [[0]
                         [1]
                         [2]]
+        n_multiplier    3
     Uniform (TrueMeasure Object)
         lower_bound     0
         upper_bound     1
@@ -177,7 +179,7 @@ class SobolIndices(Integrand):
                 The default indices='singletons' sets indices=[[0],[1],...[d-1]]. 
                 Should not include [], the null set
         """
-        self.parameters = ['indices']
+        self.parameters = ['indices','n_multiplier']
         self.integrand = integrand
         self.d = self.integrand.d
         # indices
@@ -191,6 +193,7 @@ class SobolIndices(Integrand):
         for k in range(self.s): self.indices_bool_mat[k,self.indices[k]] = True
         self.not_indices_bool_mat = ~self.indices_bool_mat
         # sensitivity_index
+        self.n_multiplier = self.s
         self.dtilde = 2*self.d
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib.spawn(s=1,dimensions=[self.dtilde])[0]

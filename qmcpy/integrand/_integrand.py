@@ -137,7 +137,9 @@ class Integrand(object):
         args = comb_args[0]
         kwargs = comb_args[1]
         t = atleast_2d(t)
-        if self.dprime==(1,): del kwargs['compute_flags']
+        if self.dprime==(1,): 
+            kwargs = dict(kwargs)
+            del kwargs['compute_flags']
         y = self.g(t,*args,**kwargs)
         return y
 

@@ -1,4 +1,3 @@
-from copy import deepcopy
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
