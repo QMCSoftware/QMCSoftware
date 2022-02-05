@@ -117,7 +117,7 @@ class CubBayesLatticeG(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = [Lattice]
-        allow_vectorized_integrals = False
+        allow_vectorized_integrals = True
         super(CubBayesLatticeG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
         if self.discrete_distrib.randomize == False:

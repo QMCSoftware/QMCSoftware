@@ -100,12 +100,13 @@ class TestCubQMCNetG(unittest.TestCase):
         solution,data = CubQMCNetG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
-    def test_sobol_indices(self, dims=2):
+    def test_sobol_indices_qmc_net(self, dims=2):
         dnb2 = DigitalNetB2(dimension=dims, seed=7)
         keister_d = Keister(dnb2)
         keister_indices = SobolIndices(keister_d, indices='singletons')
         sc = CubQMCNetG(keister_indices, abs_tol=1e-3)
         solution, data = sc.integrate()
+        self.assertTrue(solution.shape, (dims, dims, 1))
         solution = solution.squeeze()
         keister_integ_exact = keister_d.exact_integ(dims)
         print(abs(solution.sum()-keister_integ_exact) < tol)
@@ -128,6 +129,17 @@ class TestCubBayesLatticeG(unittest.TestCase):
         solution, data = CubBayesLatticeG(integrand, abs_tol=tol, n_init=2 ** 5).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
+    def test_sobol_indices(self, dims=2):
+        dnb2 = Lattice(dimension=dims, order='linear')
+        keister_d = Keister(dnb2)
+        keister_indices = SobolIndices(keister_d, indices='singletons')
+        sc = CubBayesLatticeG(keister_indices, abs_tol=1e-3)
+        solution, data = sc.integrate()
+        self.assertTrue(solution.shape, (dims, dims, 1))
+        solution = solution.squeeze()
+        keister_integ_exact = keister_d.exact_integ(dims)
+        print(abs(solution.sum()-keister_integ_exact) < tol)
+        # self.assertTrue(abs(solution.sum()-keister_integ_exact) < tol)
 
 class TestCubBayesNetG(unittest.TestCase):
     """ Unit tests for CubBayesNetG StoppingCriterion. """
