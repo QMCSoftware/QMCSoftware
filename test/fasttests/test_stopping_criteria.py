@@ -141,18 +141,15 @@ class TestCubBayesLatticeG(unittest.TestCase):
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
     def test_sobol_indices_bayes_lattice(self, dims=2):
-        dnb2 = Lattice(dimension=dims, order='linear')
-        keister_d = Keister(dnb2)
+        keister_d = Keister(Lattice(dimension=dims, order='linear', seed=7))
         keister_indices = SobolIndices(keister_d, indices='singletons')
-        sc = CubBayesLatticeG(keister_indices, abs_tol=1e-3)
+        sc = CubBayesLatticeG(keister_indices, abs_tol=1e-3, ptransform='Baker')
         solution, data = sc.integrate_nd()
 
-        dnb2 = Lattice(dimension=dims)
-        keister_d = Keister(dnb2)
-        keister_indices = SobolIndices(keister_d, indices='singletons')
+        keister_d_ = Keister(Lattice(dimension=dims, seed=7))
+        keister_indices = SobolIndices(keister_d_, indices='singletons')
         sc_ = CubQMCLatticeG(keister_indices, abs_tol=1e-3, ptransform='Baker')
         solution_, data_ = sc_.integrate()
-
 
         self.assertTrue(solution.shape, (dims, dims, 1))
         solution = solution.squeeze()

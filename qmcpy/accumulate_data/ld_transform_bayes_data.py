@@ -86,8 +86,7 @@ class LDTransformBayesData(AccumulateData):
         # Generate sample values
 
         if self.iter < len(self.mvec):
-            # self.ftilde_, self.xun_, self.xpts_ = self.iter_fbt(self.iter, self.xun_, self.xpts_, self.ftilde_)
-            self.xpts_, self.xun_, self.ftilde_ = self.iter_fbt(y_val_new, self.iter, self.ftilde_, xnew, xunnew, self.xpts_, self.xun_)
+            self.ftilde_, self.xun_, self.xpts_  = self.iter_fbt(self.iter, self.xun_, self.xpts_, self.ftilde_, y_val_new, xunnew, xnew)
             self.m = self.mvec[self.iter]
             self.iter += 1
             # update total samples
@@ -167,7 +166,6 @@ class LDTransformBayesData(AccumulateData):
         muhat = np.abs(muhat)
         muminus = muhat - err_bd
         muplus = muhat + err_bd
-        # error_fun = lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, rel_tol * abs(sv))
         if 2 * err_bd <= max(self.abs_tol, self.rel_tol * abs(muminus)) + max(self.abs_tol, self.rel_tol * abs(muplus)):
             if err_bd == 0:
                 err_bd = np.finfo(float).eps
@@ -232,7 +230,7 @@ class LDTransformBayesData(AccumulateData):
         return loss, vec_lambda, vec_lambda_ring, RKHS_norm
 
     # Efficient Fast Bayesian Transform computation algorithm, avoids recomputing the full transform
-    def iter_fbt(self, y_val_new, iter, ftilde_prev, xnew, xunnew, xpts_, xun_):
+    def iter_fbt(self, iter, xun_, xpts_, ftilde_prev, y_val_new, xunnew, xnew):
         m = self.mvec[iter]
         n = 2 ** m
 
@@ -247,7 +245,7 @@ class LDTransformBayesData(AccumulateData):
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
 
             # xpts_,xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True, distribution=self.discrete_distrib)
-            xun_, xpts_ = xnew, xunnew
+            xpts_,xun_ = xnew, xunnew
 
             # Compute initial FBT
             ftilde_ = self.fbt(y_val_new)  # self.ff(xpts_)
@@ -270,7 +268,7 @@ class LDTransformBayesData(AccumulateData):
             # combine the previous batch and new batch to get FBT on all points
             ftilde_ = self.merge_fbt(ftilde_prev, ftilde_next_new, mnext)
 
-        return xpts_, xun_, ftilde_
+        return ftilde_, xun_, xpts_
 
     @staticmethod
     def gen_samples(n_min, n_max, return_unrandomized, distribution):

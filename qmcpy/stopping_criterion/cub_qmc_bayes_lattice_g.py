@@ -138,9 +138,6 @@ class CubBayesLatticeG(StoppingCriterion):
         t_start = time()
         self.datum = np.empty(self.dprime, dtype=object)
         for j in np.ndindex(self.dprime):
-            # cv_mu_j = self.cv_mu[(slice(None),) + j]
-            # self.datum[j] = LDTransformData(self.m_min, self.m_max, self.coefv, self.fudge, self.check_cone, self.ncv,
-            #                                 cv_mu_j, self.update_beta)
             self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
                                              self.m_min, self.m_max, self._fft, self._merge_fft, self.kernel)
 
@@ -167,26 +164,17 @@ class CubBayesLatticeG(StoppingCriterion):
             for k in range(self.ncv):
                 ycvnext[1 + k] = self.cv[k].f(xnext, periodization_transform=self.ptransform,
                                               compute_flags=self.data.flags_indv)
-            ycvnext_cp = ycvnext.astype(complex) if self.cast_complex else ycvnext.copy()
             for j in np.ndindex(self.dprime):
                 if not self.data.flags_indv[j]:
                     continue
                 slice_yj = (0, slice(None),) + j
-                slice_ygj = (slice(1, None), slice(None),) + j
                 y_val = ycvnext[slice_yj]
-                y_cp = ycvnext_cp[slice_yj]
-                yg_val = ycvnext[slice_ygj].T
-                yg_cp = ycvnext_cp[slice_ygj].T
+
                 # Update function values
                 xnext_un_, ftilde_, m_ = self.datum[j].update_data(y_val, xnew=xnext, xunnew=xnext_un)
                 stop_flag[j], self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j], _ = \
                     self.datum[j].stopping_criterion(xnext_un_, ftilde_, m_)
 
-                # self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j], cone_violation = self.datum[
-                #     j].update_data(m, y_val, y_cp, yg_val, yg_cp)
-                # if cone_violation:
-                #     warnings.warn('Function at index %d (indexing dprime) violates cone conditions.' % j,
-                #                   CubatureWarning)
             self.data.xfull = np.vstack((self.data.xfull, xnext))
             self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
             self.data.indv_error = (self.data.ci_high - self.data.ci_low) / 2
