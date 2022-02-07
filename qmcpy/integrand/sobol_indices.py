@@ -17,39 +17,29 @@ class SobolIndices(Integrand):
     >>> sc = CubQMCNetG(keister_indices,abs_tol=1e-3)
     >>> solution,data = sc.integrate()
     >>> solution.squeeze()
-    array([[0.32805051, 0.3279677 , 0.32808771],
-           [0.3388433 , 0.33857474, 0.33883778]])
+    array([[0.32833328, 0.32747355, 0.32823724],
+           [0.33871672, 0.33844826, 0.3387112 ]])
     >>> data
     LDTransformData (AccumulateData Object)
-        solution        [[0.328 0.328 0.328]
-                        [0.339 0.339 0.339]]
-        indv_error      [[0.002 0.002 0.002]
-                        [0.002 0.002 0.002]
-                        [0.    0.    0.   ]
-                        [0.003 0.003 0.003]]
-        ci_low          [[1.67  1.67  1.671]
-                        [1.725 1.724 1.725]
-                        [2.168 2.168 2.168]
-                        [9.797 9.797 9.797]]
-        ci_high         [[1.675 1.674 1.675]
-                        [1.73  1.729 1.73 ]
-                        [2.168 2.168 2.168]
-                        [9.803 9.803 9.803]]
+        solution        [[0.328 0.327 0.328]
+                        [0.339 0.338 0.339]]
+        indv_error      [[0.004 0.004 0.004 0.   ]
+                        [0.002 0.002 0.002 0.003]]
+        ci_low          [[1.671 1.667 1.671 2.168]
+                        [1.725 1.724 1.725 9.797]]
+        ci_high         [[1.679 1.674 1.678 2.169]
+                        [1.73  1.729 1.73  9.803]]
         ci_comb_low     [[0.327 0.327 0.327]
                         [0.338 0.338 0.338]]
-        ci_comb_high    [[0.329 0.329 0.329]
-                        [0.34  0.339 0.34 ]]
+        ci_comb_high    [[0.329 0.328 0.329]
+                        [0.339 0.339 0.339]]
         flags_comb      [[False False False]
                         [False False False]]
-        flags_indv      [[False False False]
-                        [False False False]
-                        [False False False]
-                        [False False False]]
-        n_total         2^(16)
-        n               [[65536. 65536. 65536.]
-                        [32768. 32768. 32768.]
-                        [65536. 65536. 65536.]
-                        [32768. 32768. 32768.]]
+        flags_indv      [[False False False False]
+                        [False False False False]]
+        n_total         2^(15)
+        n               [[32768. 32768. 32768. 32768.]
+                        [32768. 32768. 32768. 32768.]]
         time_integrate  ...
     CubQMCNetG (StoppingCriterion Object)
         abs_tol         0.001
@@ -60,7 +50,6 @@ class SobolIndices(Integrand):
         indices         [[0]
                         [1]
                         [2]]
-        n_multiplier    3
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -72,6 +61,109 @@ class SobolIndices(Integrand):
         graycode        0
         entropy         7
         spawn_key       (0,)
+    >>> cf = CustomFun(
+    ...     true_measure = Uniform(dnb2),
+    ...     g = lambda x,compute_flags=None: x,
+    ...     dprime = 3)
+    >>> keister_indices = SobolIndices(cf,indices='singletons')
+    >>> sc = CubQMCNetG(keister_indices,abs_tol=1e-5)
+    >>> solution,data = sc.integrate()
+    >>> print(data)
+    LDTransformData (AccumulateData Object)
+        solution        [[[1. 0. 0.]
+                         [0. 1. 0.]
+                         [0. 0. 1.]]
+    <BLANKLINE>
+                        [[1. 0. 0.]
+                         [0. 1. 0.]
+                         [0. 0. 1.]]]
+        indv_error      [[[7.396e-09 0.000e+00 0.000e+00]
+                         [0.000e+00 2.340e-07 0.000e+00]
+                         [0.000e+00 0.000e+00 1.551e-07]
+                         [4.547e-12 0.000e+00 0.000e+00]]
+    <BLANKLINE>
+                        [[5.584e-09 0.000e+00 0.000e+00]
+                         [0.000e+00 2.073e-07 0.000e+00]
+                         [0.000e+00 0.000e+00 1.178e-08]
+                         [1.708e-09 3.107e-08 4.336e-08]]]
+        ci_low          [[[0.083 0.    0.   ]
+                         [0.    0.083 0.   ]
+                         [0.    0.    0.083]
+                         [0.5   0.5   0.5  ]]
+    <BLANKLINE>
+                        [[0.083 0.    0.   ]
+                         [0.    0.083 0.   ]
+                         [0.    0.    0.083]
+                         [0.333 0.333 0.333]]]
+        ci_high         [[[0.083 0.    0.   ]
+                         [0.    0.083 0.   ]
+                         [0.    0.    0.083]
+                         [0.5   0.5   0.5  ]]
+    <BLANKLINE>
+                        [[0.083 0.    0.   ]
+                         [0.    0.083 0.   ]
+                         [0.    0.    0.083]
+                         [0.333 0.333 0.333]]]
+        ci_comb_low     [[[1. 0. 0.]
+                         [0. 1. 0.]
+                         [0. 0. 1.]]
+    <BLANKLINE>
+                        [[1. 0. 0.]
+                         [0. 1. 0.]
+                         [0. 0. 1.]]]
+        ci_comb_high    [[[1. 0. 0.]
+                         [0. 1. 0.]
+                         [0. 0. 1.]]
+    <BLANKLINE>
+                        [[1. 0. 0.]
+                         [0. 1. 0.]
+                         [0. 0. 1.]]]
+        flags_comb      [[[False False False]
+                         [False False False]
+                         [False False False]]
+    <BLANKLINE>
+                        [[False False False]
+                         [False False False]
+                         [False False False]]]
+        flags_indv      [[[False False False]
+                         [False False False]
+                         [False False False]
+                         [False False False]]
+    <BLANKLINE>
+                        [[False False False]
+                         [False False False]
+                         [False False False]
+                         [False False False]]]
+        n_total         2^(15)
+        n               [[[32768.  1024.  1024.]
+                         [ 1024. 16384.  1024.]
+                         [ 1024.  1024. 16384.]
+                         [32768. 16384. 32768.]]
+    <BLANKLINE>
+                        [[32768.  1024.  1024.]
+                         [ 1024. 16384.  1024.]
+                         [ 1024.  1024. 32768.]
+                         [32768. 16384. 32768.]]]
+        time_integrate  ...
+    CubQMCNetG (StoppingCriterion Object)
+        abs_tol         1.00e-05
+        rel_tol         0
+        n_init          2^(10)
+        n_max           2^(35)
+    SobolIndices (Integrand Object)
+        indices         [[0]
+                        [1]
+                        [2]]
+    Uniform (TrueMeasure Object)
+        lower_bound     0
+        upper_bound     1
+    DigitalNetB2 (DiscreteDistribution Object)
+        d               6
+        dvec            [0 1 2 3 4 5]
+        randomize       LMS_DS
+        graycode        0
+        entropy         7
+        spawn_key       (1,)
     
     References: 
         [1] Art B. Owen.Monte Carlo theory, methods and examples. 2013. Appendix A.
@@ -85,26 +177,25 @@ class SobolIndices(Integrand):
                 The default indices='singletons' sets indices=[[0],[1],...[d-1]]. 
                 Should not include [], the null set
         """
-        self.parameters = ['indices','n_multiplier']
+        self.parameters = ['indices']
         self.integrand = integrand
-        self.d = self.integrand.d
+        self.d = self.integrand.d  # dimension of the integrand
         # indices
         self.indices = indices
         if self.indices=='singletons':
             self.indices = [[j] for j in range(self.d)]
         if [] in self.indices:
             raise ParameterError('SobolIndices indices cannot include [], the null set.')
-        self.s = len(self.indices)
+        self.s = len(self.indices)   # length of indices
         self.indices_bool_mat = tile(False,(self.s,self.d))
         for k in range(self.s): self.indices_bool_mat[k,self.indices[k]] = True
         self.not_indices_bool_mat = ~self.indices_bool_mat
         # sensitivity_index
-        self.n_multiplier = self.s
-        self.dtilde = 2*self.d
+        self.dtilde = 2*self.d  # dimension of sensitivity indices
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib.spawn(s=1,dimensions=[self.dtilde])[0]
         self.sampler = self.integrand.sampler
-        dprime = (4,self.s,)+self.integrand.dprime
+        dprime = (2,self.s+1,)+self.integrand.dprime
         super(SobolIndices,self).__init__(dprime,parallel=False)
     
     def f(self, x, *args, **kwargs):
@@ -121,7 +212,7 @@ class SobolIndices(Integrand):
             flags_closed = compute_flags[0,k,:]
             flags_total = compute_flags[1,k,:]
             flags_k = flags_closed|flags_total
-            if not flags_k.any(): continue
+            if not flags_total.any(): continue
             u_bool = self.indices_bool_mat[k]
             not_u_bool = self.not_indices_bool_mat[k]
             v[:,u_bool] = x[:,u_bool]
@@ -129,8 +220,8 @@ class SobolIndices(Integrand):
             f_v = self.integrand.f(v,compute_flags=flags_k,*args,**kwargs)
             y[:,0,k] = f_x*(f_v-f_z) # A.18
             y[:,1,k] = (f_z-f_v)**2/2 # A.16
-            y[:,2,k] = f_x # mu
-            y[:,3,k] = f_x**2 # sigma^2+mu^2
+        y[:,0,-1] = f_x # mu
+        y[:,1,-1] = f_x**2 # sigma^2+mu^2
         return y
     
     def _spawn(self, level, sampler):
@@ -140,21 +231,22 @@ class SobolIndices(Integrand):
             indices = self.indices)
     
     def bound_fun(self, bound_low, bound_high):
-        tau_low,mu_low,f2_low = bound_low[:2],bound_low[2],bound_low[3]
-        tau_high,mu_high,f2_high = bound_high[:2],bound_high[2],bound_high[3]
-        sigma2_low1,sigma2_low2 = f2_high-mu_low**2,f2_high-mu_high**2
-        comb_bounds_low = minimum.reduce([tau_low/sigma2_low1,tau_low/sigma2_low2])
-        comb_bounds_low = minimum.reduce([ones(tau_low.shape),maximum.reduce([zeros(tau_low.shape),comb_bounds_low])])
-        sigma2_high1,sigma2_high2 = f2_low-mu_low**2,f2_low-mu_high**2
-        comb_bounds_high = minimum.reduce([ones(tau_high.shape),maximum.reduce([tau_high/sigma2_high1,tau_high/sigma2_high2])])
-        comb_bounds_high = minimum.reduce([ones(tau_high.shape),maximum.reduce([zeros(tau_high.shape),comb_bounds_high])])
-        violated = (sigma2_high1<0)|(sigma2_high2<0)
+        mu_low,mu_high = bound_low[0,-1],bound_low[0,-1]
+        f2_low,f2_high = bound_low[1,-1],bound_high[1,-1]
+        sigma2_low,sigma2_high = f2_low-mu_high**2,f2_high-mu_low**2
+        violated = sign(sigma2_low)!=sign(sigma2_high)
+        bl_sl = bound_low[:,:-1]/sigma2_low
+        bl_sh = bound_low[:,:-1]/sigma2_high
+        bh_sl = bound_high[:,:-1]/sigma2_low
+        bh_sh = bound_high[:,:-1]/sigma2_high
+        comb_bounds_low  = minimum.reduce([bl_sl,bl_sh,bh_sl,bh_sh])
+        comb_bounds_high = maximum.reduce([bl_sl,bl_sh,bh_sl,bh_sh])
         return comb_bounds_low,comb_bounds_high,violated
     
     def dependency(self, flags_comb):
         individual_flags = zeros(self.dprime,dtype=bool)
-        individual_flags[:2] = flags_comb # numerator
-        individual_flags[2:] = flags_comb 
+        individual_flags[:,:-1] = flags_comb # numerator
+        closed_flags = flags_comb[0]
+        total_flags = flags_comb[1]
+        individual_flags[:,-1] = (closed_flags|total_flags).any(0)
         return individual_flags
-
-class SensitivityIndices(SobolIndices): pass

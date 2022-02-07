@@ -70,7 +70,8 @@ class CubBayesLatticeG(StoppingCriterion):
         please refer to the references below.
     """
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin'):
+                 n_init=2 ** 10, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin',
+                 error_fun=lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max', 'order']
         # Set Attributes
         self.abs_tol = abs_tol
@@ -113,7 +114,15 @@ class CubBayesLatticeG(StoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
-        
+
+        # Sobol indices
+        self.dprime = self.integrand.dprime
+        self.cv = []
+        self.ncv = len(self.cv)
+        self.cast_complex = False
+        self.d = self.discrete_distrib.d
+        self.error_fun = error_fun
+
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = [Lattice]
@@ -124,6 +133,111 @@ class CubBayesLatticeG(StoppingCriterion):
             raise ParameterError("CubBayesLattice_g requires discrete_distrib to have randomize=True")
         if self.discrete_distrib.order != 'linear':
             raise ParameterError("CubBayesLattice_g requires discrete_distrib to have order='linear'")
+
+    def integrate_nd(self):
+        t_start = time()
+        self.datum = np.empty(self.dprime, dtype=object)
+        for j in np.ndindex(self.dprime):
+            # cv_mu_j = self.cv_mu[(slice(None),) + j]
+            # self.datum[j] = LDTransformData(self.m_min, self.m_max, self.coefv, self.fudge, self.check_cone, self.ncv,
+            #                                 cv_mu_j, self.update_beta)
+            self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                                             self.m_min, self.m_max, self._fft, self._merge_fft, self.kernel)
+
+        self.data = LDTransformBayesData.__new__(LDTransformBayesData)
+        self.data.flags_indv = np.tile(True, self.dprime)
+        self.data.m = np.tile(self.m_min, self.dprime)
+        self.data.n_min = 0
+        self.data.ci_low = np.tile(-np.inf, self.dprime)
+        self.data.ci_high = np.tile(np.inf, self.dprime)
+        self.data.solution_indv = np.tile(np.nan, self.dprime)
+        self.data.solution = np.nan
+        self.data.xfull = np.empty((0, self.d))
+        self.data.yfull = np.empty((0,) + self.dprime)
+        stop_flag = np.tile(None, self.dprime)
+        while True:
+            m = self.data.m.max()
+            n_min = self.data.n_min
+            n_max = int(2 ** m)
+            n = int(n_max - n_min)
+            xnext, xnext_un = self.discrete_distrib.gen_samples(n_min=n_min, n_max=n_max, return_unrandomized=True, warn=False)
+            ycvnext = np.empty((1 + self.ncv, n,) + self.dprime, dtype=float)
+            ycvnext[0] = self.integrand.f(xnext, periodization_transform=self.ptransform,
+                                          compute_flags=self.data.flags_indv)
+            for k in range(self.ncv):
+                ycvnext[1 + k] = self.cv[k].f(xnext, periodization_transform=self.ptransform,
+                                              compute_flags=self.data.flags_indv)
+            ycvnext_cp = ycvnext.astype(complex) if self.cast_complex else ycvnext.copy()
+            for j in np.ndindex(self.dprime):
+                if not self.data.flags_indv[j]:
+                    continue
+                slice_yj = (0, slice(None),) + j
+                slice_ygj = (slice(1, None), slice(None),) + j
+                y_val = ycvnext[slice_yj]
+                y_cp = ycvnext_cp[slice_yj]
+                yg_val = ycvnext[slice_ygj].T
+                yg_cp = ycvnext_cp[slice_ygj].T
+                # Update function values
+                xnext_un_, ftilde_, m_ = self.datum[j].update_data(y_val, xnew=xnext, xunnew=xnext_un)
+                stop_flag[j], self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j], _ = \
+                    self.datum[j].stopping_criterion(xnext_un_, ftilde_, m_)
+
+                # self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j], cone_violation = self.datum[
+                #     j].update_data(m, y_val, y_cp, yg_val, yg_cp)
+                # if cone_violation:
+                #     warnings.warn('Function at index %d (indexing dprime) violates cone conditions.' % j,
+                #                   CubatureWarning)
+            self.data.xfull = np.vstack((self.data.xfull, xnext))
+            self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
+            self.data.indv_error = (self.data.ci_high - self.data.ci_low) / 2
+            self.data.ci_comb_low, self.data.ci_comb_high, self.data.violated = self.integrand.bound_fun(
+                self.data.ci_low, self.data.ci_high)
+            error_low = self.error_fun(self.data.ci_comb_low, self.abs_tol, self.rel_tol)
+            error_high = self.error_fun(self.data.ci_comb_high, self.abs_tol, self.rel_tol)
+            self.data.solution = 1 / 2 * (self.data.ci_comb_low + self.data.ci_comb_high + error_low - error_high)
+            rem_error_low = abs(self.data.ci_comb_low - self.data.solution) - error_low
+            rem_error_high = abs(self.data.ci_comb_high - self.data.solution) - error_high
+            self.data.flags_comb = np.maximum(rem_error_low, rem_error_high) >= 0
+            self.data.flags_comb |= self.data.violated
+            self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
+            self.data.n = 2 ** self.data.m
+            self.data.n_total = self.data.n.max()
+
+            if np.sum(self.data.flags_indv)==0:
+                break # stopping criterion met
+            elif 2*self.data.n_total>self.n_max:
+                # doubling samples would go over n_max
+                warning_s = """
+                Already generated %d samples.
+                Trying to generate %d new samples would exceed n_max = %d.
+                No more samples will be generated.
+                Note that error tolerances may no longer be satisfied.""" \
+                % (int(self.data.n_total),int(self.data.n_total),int(self.n_max))
+                warnings.warn(warning_s, MaxSamplesWarning)
+                break
+            else:
+                self.data.n_min = n_max
+                self.data.m += self.data.flags_indv
+
+        self.data.integrand = self.integrand
+        self.data.true_measure = self.true_measure
+        self.data.discrete_distrib = self.discrete_distrib
+        self.data.stopping_crit = self
+        self.data.parameters = [
+            'solution',
+            'indv_error',
+            'ci_low',
+            'ci_high',
+            'ci_comb_low',
+            'ci_comb_high',
+            'flags_comb',
+            'flags_indv',
+            'n_total',
+            'n',
+            'time_integrate']
+        self.data.datum = self.datum
+        self.data.time_integrate = time()-t_start
+        return self.data.solution,self.data
 
     # computes the integral
     def integrate(self):
