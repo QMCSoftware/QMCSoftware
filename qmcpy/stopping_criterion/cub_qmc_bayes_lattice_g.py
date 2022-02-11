@@ -22,7 +22,7 @@ class CubBayesLatticeG(StoppingCriterion):
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.808
-        error_bound     7.37e-04
+        error_bound     6.41e-04
         n_total         256
         time_integrate  ...
     CubBayesLatticeG (StoppingCriterion Object)
@@ -70,7 +70,7 @@ class CubBayesLatticeG(StoppingCriterion):
         please refer to the references below.
     """
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 10, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin',
+                 n_init=2 ** 8, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin',
                  error_fun=lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max', 'order']
         # Set Attributes
@@ -94,7 +94,7 @@ class CubBayesLatticeG(StoppingCriterion):
         self.order = order  # Bernoulli kernel's order. If zero, choose order automatically
 
         self.use_gradient = False  # If true uses gradient descent in parameter search
-        self.one_theta = False  # If true use common shape parameter for all dimensions
+        self.one_theta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
         self.ptransform = ptransform  # periodization transform
         self.stop_at_tol = True  # automatic mode: stop after meeting the error tolerance
@@ -171,9 +171,11 @@ class CubBayesLatticeG(StoppingCriterion):
                 y_val = ycvnext[slice_yj]
 
                 # Update function values
-                xnext_un_, ftilde_, m_ = self.datum[j].update_data(y_val, xnew=xnext, xunnew=xnext_un)
-                stop_flag[j], self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j], _ = \
-                    self.datum[j].stopping_criterion(xnext_un_, ftilde_, m_)
+                xnext_un_, ftilde_, m_ = self.datum[j].update_data(y_val_new=y_val, xnew=xnext, xunnew=xnext_un)
+                success, muhat, r_order, err_bd = self.datum[j].stopping_criterion(xnext_un_, ftilde_, m_)
+                bounds = muhat + np.array([-1, 1]) * err_bd
+                stop_flag[j], self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j] = \
+                    success, muhat, bounds[0], bounds[1]
 
             self.data.xfull = np.vstack((self.data.xfull, xnext))
             self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))

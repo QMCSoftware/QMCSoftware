@@ -81,12 +81,16 @@ class LDTransformBayesData(AccumulateData):
 
         super(LDTransformBayesData, self).__init__()
 
-    def update_data(self, y_val_new, xnew, xunnew):
+    def update_data(self, y_val_new=None, xnew=None, xunnew=None):
         """ See abstract method. """
         # Generate sample values
 
         if self.iter < len(self.mvec):
-            self.ftilde_, self.xun_, self.xpts_  = self.iter_fbt(self.iter, self.xun_, self.xpts_, self.ftilde_, y_val_new, xunnew, xnew)
+            if y_val_new is None:
+                self.ftilde_, self.xun_, self.xpts_ = self.iter_fbt(self.iter, self.xun_, self.xpts_, self.ftilde_)
+            else:
+                self.ftilde_, self.xun_, self.xpts_ = self.iter_fbt(self.iter, self.xun_, self.xpts_, self.ftilde_,
+                                                                    y_val_new, xunnew, xnew)
             self.m = self.mvec[self.iter]
             self.iter += 1
             # update total samples
@@ -166,14 +170,14 @@ class LDTransformBayesData(AccumulateData):
         muhat = np.abs(muhat)
         muminus = muhat - err_bd
         muplus = muhat + err_bd
+
         if 2 * err_bd <= max(self.abs_tol, self.rel_tol * abs(muminus)) + max(self.abs_tol, self.rel_tol * abs(muplus)):
             if err_bd == 0:
                 err_bd = np.finfo(float).eps
 
             # stopping criterion achieved
             success = True
-        bounds = muhat + np.array([-1,1])*err_bd
-        return success, muhat, bounds[0], bounds[1], r
+        return success, muhat, r, err_bd
 
     # objective function to estimate parameter theta
     # MLE : Maximum likelihood estimation
@@ -187,10 +191,7 @@ class LDTransformBayesData(AccumulateData):
                                                                    self.kernType, self.debug_enable)
         vec_lambda = abs(vec_lambda)
         # compute RKHS_norm
-        try:
-            temp = abs(ftilde[vec_lambda > fudge] ** 2) / (vec_lambda[vec_lambda > fudge])
-        except Exception as e:
-            print(e)
+        temp = abs(ftilde[vec_lambda > fudge] ** 2) / (vec_lambda[vec_lambda > fudge])
 
         # compute loss
         if self.errbd_type == 'GCV':
@@ -230,7 +231,7 @@ class LDTransformBayesData(AccumulateData):
         return loss, vec_lambda, vec_lambda_ring, RKHS_norm
 
     # Efficient Fast Bayesian Transform computation algorithm, avoids recomputing the full transform
-    def iter_fbt(self, iter, xun_, xpts_, ftilde_prev, y_val_new, xunnew, xnew):
+    def iter_fbt(self, iter, xun_, xpts_, ftilde_prev, y_val_new=None, xunnew=None, xnew=None):
         m = self.mvec[iter]
         n = 2 ** m
 
@@ -244,11 +245,15 @@ class LDTransformBayesData(AccumulateData):
             # xun_ = np.mod((xun_ * self.gen_vec), 1)
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
 
-            # xpts_,xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True, distribution=self.discrete_distrib)
-            xpts_,xun_ = xnew, xunnew
+            if xnew is None:
+                xpts_,xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True, distribution=self.discrete_distrib)
 
-            # Compute initial FBT
-            ftilde_ = self.fbt(y_val_new)  # self.ff(xpts_)
+                # Compute initial FBT
+                ftilde_ = self.fbt(self.ff(xpts_))
+            else:
+                xpts_,xun_ = xnew, xunnew
+                ftilde_ = self.fbt(y_val_new)
+
             ftilde_ = ftilde_.reshape((n, 1))
         else:
             # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
@@ -256,10 +261,16 @@ class LDTransformBayesData(AccumulateData):
             # xunnew = np.mod(xunnew * self.gen_vec, 1)
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
 
-            # xnew, xunnew = self.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True, distribution=self.discrete_distrib)
-            [xun_, xpts_] = self.merge_pts(xun_, xunnew, xpts_, xnew, n, self.discrete_distrib.d, distribution=self.distribution_name)
+            if xnew is None:
+                xnew, xunnew = self.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True,
+                                                distribution=self.discrete_distrib)
+            [xun_, xpts_] = self.merge_pts(xun_, xunnew, xpts_, xnew, n, self.discrete_distrib.d,
+                                           distribution=self.distribution_name)
             mnext = m - 1
-            ftilde_next_new = self.fbt(y_val_new)  # self.ff(xnew)
+            if y_val_new is None:
+                ftilde_next_new = self.fbt(self.ff(xnew))
+            else:
+                ftilde_next_new = self.fbt(y_val_new)
 
             ftilde_next_new = ftilde_next_new.reshape((n // 2, 1))
             if self.debugEnable:
