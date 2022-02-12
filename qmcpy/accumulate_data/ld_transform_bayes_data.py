@@ -10,6 +10,7 @@ from numpy import sqrt, exp, log
 from scipy.stats import norm as gaussnorm
 from scipy.stats import t as tnorm
 
+
 class LDTransformBayesData(AccumulateData):
     """
     Update and store transformation data based on low-discrepancy sequences.
@@ -27,7 +28,7 @@ class LDTransformBayesData(AccumulateData):
             m_min (int): initial n == 2^m_min
             m_max (int): max n == 2^m_max
         """
-        self.parameters = ['solution','error_bound','n_total']
+        self.parameters = ['solution', 'error_bound', 'n_total']
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -68,11 +69,11 @@ class LDTransformBayesData(AccumulateData):
         self.xpts_ = array([])  # shifted lattice points
         self.xun_ = array([])  # un-shifted lattice points
         self.ftilde_ = array([])  # fourier transformed integrand values
-        if isinstance(self.discrete_distrib,Lattice):
+        if isinstance(self.discrete_distrib, Lattice):
             # integrand after the periodization transform
-            self.ff = lambda x,*args,**kwargs: self.integrand.f(x,
-                periodization_transform=stopping_crit.ptransform,
-                *args,**kwargs).squeeze()
+            self.ff = lambda x, *args, **kwargs: self.integrand.f(x,
+                                                                  periodization_transform=stopping_crit.ptransform,
+                                                                  *args, **kwargs).squeeze()
         else:
             self.ff = self.integrand.f
         self.fbt = fbt
@@ -98,8 +99,8 @@ class LDTransformBayesData(AccumulateData):
         else:
             warnings.warn('''
                 Already used maximum allowed sample size %d.
-                Note that error tolerances may no longer be satisfied.'''%(2**self.m_max),
-                MaxSamplesWarning)
+                Note that error tolerances may no longer be satisfied.''' % (2 ** self.m_max),
+                          MaxSamplesWarning)
 
         return self.xun_, self.ftilde_, self.m
 
@@ -126,7 +127,7 @@ class LDTransformBayesData(AccumulateData):
                 theta0 = np.ones((xpts.shape[1], 1)) * (0.05)
                 theta0 = np.ones((1, xpts.shape[1])) * (0.05)
                 lna_MLE = fmin(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
-                              theta0, xtol=1e-2, disp=False)
+                               theta0, xtol=1e-2, disp=False)
             aMLE = exp(lna_MLE)
             # print(n, aMLE)
             _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
@@ -184,7 +185,7 @@ class LDTransformBayesData(AccumulateData):
     # GCV : Generalized cross validation
     def objective_function(self, theta, xun, ftilde):
         n = len(ftilde)
-        fudge = 100*np.finfo(float).eps
+        fudge = 100 * np.finfo(float).eps
         # if type(theta) != np.ndarray:
         #     theta = np.ones((1, xun.shape[1])) * theta
         [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, theta, self.avoid_cancel_error,
@@ -203,20 +204,20 @@ class LDTransformBayesData(AccumulateData):
             loss = loss2 - loss1
 
             if self.arb_mean:
-                RKHS_norm = (1/lambda_factor)*sum(temp_gcv[1:]) / n
+                RKHS_norm = (1 / lambda_factor) * sum(temp_gcv[1:]) / n
             else:
-                RKHS_norm = (1/lambda_factor)*sum(temp_gcv) / n
+                RKHS_norm = (1 / lambda_factor) * sum(temp_gcv) / n
         else:
             # default: MLE
             if self.arb_mean:
-                RKHS_norm = (1/lambda_factor)*sum(temp[1:]) / n
-                temp_1 = (1/lambda_factor)*sum(temp[1:])
+                RKHS_norm = (1 / lambda_factor) * sum(temp[1:]) / n
+                temp_1 = (1 / lambda_factor) * sum(temp[1:])
             else:
-                RKHS_norm = (1/lambda_factor)*sum(temp) / n
-                temp_1 = (1/lambda_factor)*sum(temp)
+                RKHS_norm = (1 / lambda_factor) * sum(temp) / n
+                temp_1 = (1 / lambda_factor) * sum(temp)
 
             # ignore all zero eigenvalues
-            loss1 = sum(log(abs(lambda_factor*vec_lambda[vec_lambda > fudge])))
+            loss1 = sum(log(abs(lambda_factor * vec_lambda[vec_lambda > fudge])))
             loss2 = n * log(temp_1)
             loss = loss1 + loss2
 
@@ -227,7 +228,7 @@ class LDTransformBayesData(AccumulateData):
             self.alert_msg(loss, 'Inf', 'Imag', 'Nan')
             self.alert_msg(vec_lambda, 'Imag')
 
-        vec_lambda, vec_lambda_ring = lambda_factor*vec_lambda, lambda_factor*vec_lambda_ring
+        vec_lambda, vec_lambda_ring = lambda_factor * vec_lambda, lambda_factor * vec_lambda_ring
         return loss, vec_lambda, vec_lambda_ring, RKHS_norm
 
     # Efficient Fast Bayesian Transform computation algorithm, avoids recomputing the full transform
@@ -246,12 +247,13 @@ class LDTransformBayesData(AccumulateData):
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
 
             if xnew is None:
-                xpts_,xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True, distribution=self.discrete_distrib)
+                xpts_, xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True,
+                                               distribution=self.discrete_distrib)
 
                 # Compute initial FBT
                 ftilde_ = self.fbt(self.ff(xpts_))
             else:
-                xpts_,xun_ = xnew, xunnew
+                xpts_, xun_ = xnew, xunnew
                 ftilde_ = self.fbt(y_val_new)
 
             ftilde_ = ftilde_.reshape((n, 1))
@@ -284,7 +286,8 @@ class LDTransformBayesData(AccumulateData):
     @staticmethod
     def gen_samples(n_min, n_max, return_unrandomized, distribution):
         warn = False
-        xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn, return_unrandomized=return_unrandomized)
+        xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn,
+                                               return_unrandomized=return_unrandomized)
         return xpts_, xun_
 
     # inserts newly generated points with the old set by interleaving them
@@ -329,7 +332,6 @@ class LDTransformBayesData(AccumulateData):
         K = Kj
         return [Km1, K]
 
-
     # prints debug message if the given variable is Inf, Nan or complex, etc
     # Example: alertMsg(x, 'Inf', 'Imag')
     #          prints if variable 'x' is either Infinite or Imaginary
@@ -349,12 +351,12 @@ class LDTransformBayesData(AccumulateData):
 
                 if var_type == 'Nan':
                     if np.any(np.isnan(var_tocheck)):
-                        print('%s has NaN values'%inpvarname)
+                        print('%s has NaN values' % inpvarname)
                 elif var_type == 'Inf':
                     if np.any(np.isinf(var_tocheck)):
-                        print('%s has Inf values'%inpvarname)
+                        print('%s has Inf values' % inpvarname)
                 elif var_type == 'Imag':
                     if not np.all(np.isreal(var_tocheck)):
-                        print('%s has complex values'%inpvarname)
+                        print('%s has complex values' % inpvarname)
                 else:
                     print('unknown type check requested !')

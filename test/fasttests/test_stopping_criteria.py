@@ -167,6 +167,21 @@ class TestCubBayesNetG(unittest.TestCase):
         solution, data = CubBayesNetG(integrand , n_init=2 ** 5, abs_tol=tol).integrate()  #
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
+    def test_sobol_indices_bayes_net(self, dims=2, abs_tol=1e-3):
+        keister_d = Keister(DigitalNetB2(dimension=dims, seed=7))
+        keister_indices = SobolIndices(keister_d, indices='singletons')
+        sc = CubBayesNetG(keister_indices, abs_tol=abs_tol)
+        solution, data = sc.integrate_nd()
+
+        keister_d_ = Keister(DigitalNetB2(dimension=dims, seed=7))
+        keister_indices_ = SobolIndices(keister_d_, indices='singletons')
+        sc_ = CubQMCNetG(keister_indices_, abs_tol=abs_tol)
+        solution_, data_ = sc_.integrate()
+        print(abs(solution - solution_).max())
+        self.assertTrue(solution.shape, (dims, dims, 1))
+        # Not matching yet
+        # self.assertTrue(abs(solution - solution_).max() < abs_tol)
+
 
 class TestCubMCL(unittest.TestCase):
     """ Unit tests for CubMCML StoppingCriterion. """

@@ -69,9 +69,10 @@ class CubBayesLatticeG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
+
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin',
-                 error_fun=lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
+                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max', 'order']
         # Set Attributes
         self.abs_tol = abs_tol
@@ -139,7 +140,7 @@ class CubBayesLatticeG(StoppingCriterion):
         self.datum = np.empty(self.dprime, dtype=object)
         for j in np.ndindex(self.dprime):
             self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-                                             self.m_min, self.m_max, self._fft, self._merge_fft, self.kernel)
+                                                 self.m_min, self.m_max, self._fft, self._merge_fft, self.kernel)
 
         self.data = LDTransformBayesData.__new__(LDTransformBayesData)
         self.data.flags_indv = np.tile(True, self.dprime)
@@ -157,7 +158,8 @@ class CubBayesLatticeG(StoppingCriterion):
             n_min = self.data.n_min
             n_max = int(2 ** m)
             n = int(n_max - n_min)
-            xnext, xnext_un = self.discrete_distrib.gen_samples(n_min=n_min, n_max=n_max, return_unrandomized=True, warn=False)
+            xnext, xnext_un = self.discrete_distrib.gen_samples(n_min=n_min, n_max=n_max, return_unrandomized=True,
+                                                                warn=False)
             ycvnext = np.empty((1 + self.ncv, n,) + self.dprime, dtype=float)
             ycvnext[0] = self.integrand.f(xnext, periodization_transform=self.ptransform,
                                           compute_flags=self.data.flags_indv)
@@ -193,16 +195,16 @@ class CubBayesLatticeG(StoppingCriterion):
             self.data.n = 2 ** self.data.m
             self.data.n_total = self.data.n.max()
 
-            if np.sum(self.data.flags_indv)==0:
-                break # stopping criterion met
-            elif 2*self.data.n_total>self.n_max:
+            if np.sum(self.data.flags_indv) == 0:
+                break  # stopping criterion met
+            elif 2 * self.data.n_total > self.n_max:
                 # doubling samples would go over n_max
                 warning_s = """
                 Already generated %d samples.
                 Trying to generate %d new samples would exceed n_max = %d.
                 No more samples will be generated.
                 Note that error tolerances may no longer be satisfied.""" \
-                % (int(self.data.n_total),int(self.data.n_total),int(self.n_max))
+                            % (int(self.data.n_total), int(self.data.n_total), int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
             else:
@@ -226,14 +228,14 @@ class CubBayesLatticeG(StoppingCriterion):
             'n',
             'time_integrate']
         self.data.datum = self.datum
-        self.data.time_integrate = time()-t_start
-        return self.data.solution,self.data
+        self.data.time_integrate = time() - t_start
+        return self.data.solution, self.data
 
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
         self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.m_min, self.m_max, self._fft, self._merge_fft, self.kernel)
+                                         self.m_min, self.m_max, self._fft, self._merge_fft, self.kernel)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -252,8 +254,8 @@ class CubBayesLatticeG(StoppingCriterion):
             if m >= self.m_max:
                 warnings.warn('''
                     Already used maximum allowed sample size %d.
-                    Note that error tolerances may no longer be satisfied.'''%(2**self.m_max),
-                    MaxSamplesWarning)
+                    Note that error tolerances may no longer be satisfied.''' % (2 ** self.m_max),
+                              MaxSamplesWarning)
                 break
 
         self.data.time_integrate = time() - tstart
@@ -327,6 +329,7 @@ class CubBayesLatticeG(StoppingCriterion):
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fft(C1 - 1)
     '''
+
     def kernel(self, xun, order, theta, avoid_cancel_error, kern_type, debug_enable):
         if kern_type == 1:
             b_order = order * 2  # Bernoulli polynomial order as per the equation
@@ -357,7 +360,7 @@ class CubBayesLatticeG(StoppingCriterion):
             vec_lambda_ring = np.real(CubBayesLatticeG._fft(vec_C1m1))
 
             vec_lambda = vec_lambda_ring.copy()
-            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)/lambda_factor
+            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring) / lambda_factor
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel

@@ -69,8 +69,10 @@ class CubBayesNetG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
+
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01):
+                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01,
+                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
         # Set Attributes
         self.abs_tol = abs_tol
@@ -115,20 +117,124 @@ class CubBayesNetG(StoppingCriterion):
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
 
+        # Sobol indices
+        self.dprime = self.integrand.dprime
+        self.cv = []
+        self.ncv = len(self.cv)
+        self.cast_complex = False
+        self.d = self.discrete_distrib.d
+        self.error_fun = error_fun
+
         # Verify Compliant Construction
         allowed_levels = ['single']
         allowed_distribs = [DigitalNetB2]
-        allow_vectorized_integrals = False
+        allow_vectorized_integrals = True
         super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
         if self.discrete_distrib.randomize == False:
             raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
 
+    def integrate_nd(self):
+        t_start = time()
+        self.datum = np.empty(self.dprime, dtype=object)
+        for j in np.ndindex(self.dprime):
+            self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                                                 self.m_min, self.m_max, self._fwht_h, self._merge_fwht, self.kernel)
+
+        self.data = LDTransformBayesData.__new__(LDTransformBayesData)
+        self.data.flags_indv = np.tile(True, self.dprime)
+        self.data.m = np.tile(self.m_min, self.dprime)
+        self.data.n_min = 0
+        self.data.ci_low = np.tile(-np.inf, self.dprime)
+        self.data.ci_high = np.tile(np.inf, self.dprime)
+        self.data.solution_indv = np.tile(np.nan, self.dprime)
+        self.data.solution = np.nan
+        self.data.xfull = np.empty((0, self.d))
+        self.data.yfull = np.empty((0,) + self.dprime)
+        stop_flag = np.tile(None, self.dprime)
+        while True:
+            m = self.data.m.max()
+            n_min = self.data.n_min
+            n_max = int(2 ** m)
+            n = int(n_max - n_min)
+            xnext, xnext_un = self.discrete_distrib.gen_samples(n_min=n_min, n_max=n_max, return_unrandomized=True,
+                                                                warn=False)
+            ycvnext = np.empty((1 + self.ncv, n,) + self.dprime, dtype=float)
+            ycvnext[0] = self.integrand.f(xnext,
+                                          compute_flags=self.data.flags_indv)
+            for k in range(self.ncv):
+                ycvnext[1 + k] = self.cv[k].f(xnext,
+                                              compute_flags=self.data.flags_indv)
+            for j in np.ndindex(self.dprime):
+                if not self.data.flags_indv[j]:
+                    continue
+                slice_yj = (0, slice(None),) + j
+                y_val = ycvnext[slice_yj].copy()
+
+                # Update function values
+                xnext_un_, ftilde_, m_ = self.datum[j].update_data(y_val_new=y_val, xnew=xnext, xunnew=xnext_un)
+                success, muhat, r_order, err_bd = self.datum[j].stopping_criterion(xnext_un_, ftilde_, m_)
+                bounds = muhat + np.array([-1, 1]) * err_bd
+                stop_flag[j], self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j] = \
+                    success, muhat, bounds[0], bounds[1]
+
+            self.data.xfull = np.vstack((self.data.xfull, xnext))
+            self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
+            self.data.indv_error = (self.data.ci_high - self.data.ci_low) / 2
+            self.data.ci_comb_low, self.data.ci_comb_high, self.data.violated = self.integrand.bound_fun(
+                self.data.ci_low, self.data.ci_high)
+            error_low = self.error_fun(self.data.ci_comb_low, self.abs_tol, self.rel_tol)
+            error_high = self.error_fun(self.data.ci_comb_high, self.abs_tol, self.rel_tol)
+            self.data.solution = 1 / 2 * (self.data.ci_comb_low + self.data.ci_comb_high + error_low - error_high)
+            rem_error_low = abs(self.data.ci_comb_low - self.data.solution) - error_low
+            rem_error_high = abs(self.data.ci_comb_high - self.data.solution) - error_high
+            self.data.flags_comb = np.maximum(rem_error_low, rem_error_high) >= 0
+            self.data.flags_comb |= self.data.violated
+            self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
+            self.data.n = 2 ** self.data.m
+            self.data.n_total = self.data.n.max()
+
+            if np.sum(self.data.flags_indv) == 0:
+                break  # stopping criterion met
+            elif 2 * self.data.n_total > self.n_max:
+                # doubling samples would go over n_max
+                warning_s = """
+                Already generated %d samples.
+                Trying to generate %d new samples would exceed n_max = %d.
+                No more samples will be generated.
+                Note that error tolerances may no longer be satisfied.""" \
+                            % (int(self.data.n_total), int(self.data.n_total), int(self.n_max))
+                warnings.warn(warning_s, MaxSamplesWarning)
+                break
+            else:
+                self.data.n_min = n_max
+                self.data.m += self.data.flags_indv
+
+        self.data.integrand = self.integrand
+        self.data.true_measure = self.true_measure
+        self.data.discrete_distrib = self.discrete_distrib
+        self.data.stopping_crit = self
+        self.data.parameters = [
+            'solution',
+            'indv_error',
+            'ci_low',
+            'ci_high',
+            'ci_comb_low',
+            'ci_comb_high',
+            'flags_comb',
+            'flags_indv',
+            'n_total',
+            'n',
+            'time_integrate']
+        self.data.datum = self.datum
+        self.data.time_integrate = time() - t_start
+        return self.data.solution, self.data
+
     # computes the integral
     def integrate(self):
         # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib, 
-            self.m_min, self.m_max, self._fwht_h, self._merge_fwht, self.kernel)
+        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                                         self.m_min, self.m_max, self._fwht_h, self._merge_fwht, self.kernel)
         tstart = time()  # start the timer
 
         # Iteratively find the number of points required for the cubature to meet
@@ -147,8 +253,8 @@ class CubBayesNetG(StoppingCriterion):
             if m >= self.m_max:
                 warnings.warn('''
                     Already used maximum allowed sample size %d.
-                    Note that error tolerances may no longer be satisfied'''%(2**self.m_max),
-                    MaxSamplesWarning)
+                    Note that error tolerances may no longer be satisfied''' % (2 ** self.m_max),
+                              MaxSamplesWarning)
                 break
 
         self.data.time_integrate = time() - tstart
@@ -175,9 +281,10 @@ class CubBayesNetG(StoppingCriterion):
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fwht(C1 - 1)
     '''
+
     def kernel(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
         kernel_func = CubBayesNetG.BuildKernelFunc(order)
-        const_mult = 1/10
+        const_mult = 1 / 10
 
         if avoid_cancel_error:
             # Computes C1m1 = C1 - 1
@@ -191,11 +298,12 @@ class CubBayesNetG(StoppingCriterion):
             vec_lambda_ring = np.real(self._fwht_h(vec_C1m1.copy()))
 
             vec_lambda = vec_lambda_ring.copy()
-            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)/lambda_factor
+            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring) / lambda_factor
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
-                vec_lambda_direct = np.real(np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
+                vec_lambda_direct = np.real(
+                    np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
@@ -219,25 +327,25 @@ class CubBayesNetG(StoppingCriterion):
 
         # t1 = @(x)(2.^(-a1(x)))
         def t1(x):
-            out = 2**(-a1(x))
+            out = 2 ** (-a1(x))
             out[x == 0] = 0  # t1 is zero when x is zero
             return out
 
         # t2 = @(x)(2.^(-2*a1(x)))
         def t2(x):
-            out = (2**(-2 * a1(x)))
+            out = (2 ** (-2 * a1(x)))
             out[x == 0] = 0  # t2 is zero when x is zero
             return out
 
         s1 = lambda x: (1 - 2 * x)
-        s2 =lambda x: (1 / 3 - 2 * (1 - x) * x)
+        s2 = lambda x: (1 / 3 - 2 * (1 - x) * x)
         ts2 = lambda x: ((1 - 5 * t1(x)) / 2 - (a1(x) - 2) * x)
-        ts3 = lambda x: ((1 - 43 * t2(x)) / 18 + (5 * t1(x) - 1) * x + (a1(x) - 2) * x**2)
+        ts3 = lambda x: ((1 - 43 * t2(x)) / 18 + (5 * t1(x) - 1) * x + (a1(x) - 2) * x ** 2)
 
         if order == 1:
-            kernFunc = lambda x: (6 * ((1 / 6) - 2**(np.floor(log2(x + np.finfo(float).eps)) - 1)))
+            kernFunc = lambda x: (6 * ((1 / 6) - 2 ** (np.floor(log2(x + np.finfo(float).eps)) - 1)))
         elif order == 2:
-            omega2_1D =lambda x: (s1(x) + ts2(x))
+            omega2_1D = lambda x: (s1(x) + ts2(x))
             kernFunc = omega2_1D
         elif order == 3:
             omega3_1D = lambda x: (s1(x) + s2(x) + ts3(x))
