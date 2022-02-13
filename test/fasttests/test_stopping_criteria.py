@@ -173,14 +173,20 @@ class TestCubBayesNetG(unittest.TestCase):
         sc = CubBayesNetG(keister_indices, abs_tol=abs_tol)
         solution, data = sc.integrate_nd()
 
+        keister_d2_ = Keister(Lattice(dimension=dims, seed=7))
+        keister_indices2_ = SobolIndices(keister_d2_, indices='singletons')
+        sc2_ = CubQMCLatticeG(keister_indices2_, abs_tol=abs_tol, ptransform='Baker')
+        solution2_, data2_ = sc2_.integrate()
+
         keister_d_ = Keister(DigitalNetB2(dimension=dims, seed=7))
         keister_indices_ = SobolIndices(keister_d_, indices='singletons')
         sc_ = CubQMCNetG(keister_indices_, abs_tol=abs_tol)
         solution_, data_ = sc_.integrate()
-        print(abs(solution - solution_).max())
+
+        print(abs(solution - solution2_).max())
         self.assertTrue(solution.shape, (dims, dims, 1))
         # Not matching yet
-        # self.assertTrue(abs(solution - solution_).max() < abs_tol)
+        self.assertTrue(abs(solution - solution2_).max() < abs_tol)
 
 
 class TestCubMCL(unittest.TestCase):

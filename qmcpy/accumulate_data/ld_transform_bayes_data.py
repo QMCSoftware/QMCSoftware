@@ -49,7 +49,7 @@ class LDTransformBayesData(AccumulateData):
         # quantile value for the error bound
         if self.errbd_type == 'full_Bayes':
             # degrees of freedom = 2^mmin - 1
-            self.uncert = -tnorm.ppf(self.stopping_crit.alpha / 2, (2 ** self.m_min) - 1)
+            self.uncert = -tnorm.ppf(self.stopping_crit.alpha / 2, (2 ** m_min) - 1)
         else:
             self.uncert = -gaussnorm.ppf(self.stopping_crit.alpha / 2)
 
@@ -121,7 +121,7 @@ class LDTransformBayesData(AccumulateData):
             _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
         else:
             if self.stopping_crit.use_gradient == True:
-                pass
+                warnings.warn('Not implemented !')
             else:
                 # Nelder-Mead Simplex algorithm
                 theta0 = np.ones((xpts.shape[1], 1)) * (0.05)
