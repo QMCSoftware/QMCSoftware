@@ -136,15 +136,16 @@ class TestCubBayesLatticeG(unittest.TestCase):
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
     def test_sobol_indices_bayes_lattice(self, dims=2, abs_tol=1e-3):
-        keister_d = Keister(Lattice(dimension=dims, order='linear', seed=7))
-        keister_indices = SobolIndices(keister_d, indices='singletons')
-        sc = CubBayesLatticeG(keister_indices, abs_tol=abs_tol, ptransform='Baker')
-        solution, data = sc.integrate_nd()
-
         keister_d_ = Keister(Lattice(dimension=dims, seed=7))
         keister_indices_ = SobolIndices(keister_d_, indices='singletons')
-        sc_ = CubQMCLatticeG(keister_indices_, abs_tol=abs_tol, ptransform='Baker')
+        sc_ = CubQMCLatticeG(keister_indices_, abs_tol=abs_tol, ptransform='C1sin')
         solution_, data_ = sc_.integrate()
+
+        keister_d = Keister(Lattice(dimension=dims, order='linear', seed=7))
+        keister_indices = SobolIndices(keister_d, indices='singletons')
+        sc = CubBayesLatticeG(keister_indices, abs_tol=abs_tol, ptransform='C1sin')
+        solution, data = sc.integrate_nd()
+
         print(abs(solution - solution_).max())
         self.assertTrue(solution.shape, (dims, dims, 1))
         self.assertTrue(abs(solution - solution_).max() < abs_tol)
@@ -167,7 +168,7 @@ class TestCubBayesNetG(unittest.TestCase):
         solution, data = CubBayesNetG(integrand , n_init=2 ** 5, abs_tol=tol).integrate()  #
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
-    def test_sobol_indices_bayes_net(self, dims=2, abs_tol=1e-3):
+    def test_sobol_indices_bayes_net(self, dims=3, abs_tol=1e-3):
         keister_d = Keister(DigitalNetB2(dimension=dims, seed=7))
         keister_indices = SobolIndices(keister_d, indices='singletons')
         sc = CubBayesNetG(keister_indices, abs_tol=abs_tol)
@@ -183,10 +184,9 @@ class TestCubBayesNetG(unittest.TestCase):
         sc_ = CubQMCNetG(keister_indices_, abs_tol=abs_tol)
         solution_, data_ = sc_.integrate()
 
-        print(abs(solution - solution2_).max())
+        print(abs(solution - solution_).max(), abs(solution - solution2_).max())
         self.assertTrue(solution.shape, (dims, dims, 1))
-        # Not matching yet
-        self.assertTrue(abs(solution - solution2_).max() < abs_tol)
+        self.assertTrue(abs(solution - solution_).max() < abs_tol)
 
 
 class TestCubMCL(unittest.TestCase):

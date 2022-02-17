@@ -212,7 +212,7 @@ class SobolIndices(Integrand):
             flags_closed = compute_flags[0,k,:]
             flags_total = compute_flags[1,k,:]
             flags_k = flags_closed|flags_total
-            if not flags_total.any(): continue
+            if not flags_k.any(): continue
             u_bool = self.indices_bool_mat[k]
             not_u_bool = self.not_indices_bool_mat[k]
             v[:,u_bool] = x[:,u_bool]
