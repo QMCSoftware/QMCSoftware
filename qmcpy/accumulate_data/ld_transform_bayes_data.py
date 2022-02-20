@@ -122,6 +122,7 @@ class LDTransformBayesData(AccumulateData):
         else:
             if self.stopping_crit.use_gradient == True:
                 warnings.warn('Not implemented !')
+                lna_MLE = 0
             else:
                 # Nelder-Mead Simplex algorithm
                 theta0 = np.ones((xpts.shape[1], 1)) * (0.05)

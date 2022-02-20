@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._cub_bayes_ld_g import _CubBayesLDG
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister
@@ -11,7 +11,7 @@ from time import time
 import warnings
 
 
-class CubBayesNetG(StoppingCriterion):
+class CubBayesNetG(_CubBayesLDG):
     """
     Stopping criterion for Bayesian Cubature using digital net sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error
@@ -73,32 +73,20 @@ class CubBayesNetG(StoppingCriterion):
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, alpha=0.01,
                  error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
+        super(CubBayesNetG, self).__init__(integrand, fbt=self._fwht_h, merge_fbt=self._merge_fwht,
+                                           ptransform=None,
+                                           allowed_distribs=[DigitalNetB2],
+                                           kernel=self.kernel,
+                                           abs_tol=abs_tol, rel_tol=rel_tol,
+                 n_init=n_init, n_max=n_max, alpha=alpha,error_fun=error_fun)
+
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
-        m_min = log2(n_init)
-        m_max = log2(n_max)
-        if m_min % 1 != 0. or m_min < 5 or m_max % 1 != 0:
-            warning_s = '''
-                n_init and n_max must be a powers of 2.
-                n_init must be >= 2^8.
-                Using n_init = 2^8 and n_max=2^22.'''
-            warnings.warn(warning_s, ParameterWarning)
-            m_min = 8.
-            m_max = 22.
-        self.m_min = m_min
-        self.m_max = m_max
-        self.n_init = n_init  # number of samples to start with = 2^mmin
-        self.n_max = n_max  # max number of samples allowed = 2^mmax
-        self.alpha = alpha  # p-value, default 0.1%.
         self.order = 1  # Currently supports only order=1
 
         self.use_gradient = False  # If true uses gradient descent in parameter search
         self.one_theta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
-        self.stop_at_tol = True  # automatic mode: stop after meeting the error tolerance
-        self.arb_mean = True  # by default use zero mean algorithm
         self.errbd_type = 'MLE'  # Available options {'MLE', 'GCV', 'full'}
 
         # private properties
@@ -106,129 +94,12 @@ class CubBayesNetG(StoppingCriterion):
         # GCV - Generalized cross validation
         self.kernType = 1  # Type-1:
 
-        self.avoid_cancel_error = True  # avoid cancellation error in stopping criterion
         self.uncert = 0  # quantile value for the error bound
-        self.debug_enable = False  # enable debug prints
         self.data = None
         self.fwht = FWHT()
 
-        # QMCPy Objs
-        self.integrand = integrand
-        self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.integrand.discrete_distrib
-
-        # Sobol indices
-        self.dprime = self.integrand.dprime
-        self.cv = []
-        self.ncv = len(self.cv)
-        self.cast_complex = False
-        self.d = self.discrete_distrib.d
-        self.error_fun = error_fun
-
-        # Verify Compliant Construction
-        allowed_levels = ['single']
-        allowed_distribs = [DigitalNetB2]
-        allow_vectorized_integrals = True
-        super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
-
         if self.discrete_distrib.randomize == False:
             raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
-
-    def integrate_nd(self):
-        t_start = time()
-        self.datum = np.empty(self.dprime, dtype=object)
-        for j in np.ndindex(self.dprime):
-            self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-                                                 self.m_min, self.m_max, self._fwht_h, self._merge_fwht, self.kernel)
-
-        self.data = LDTransformBayesData.__new__(LDTransformBayesData)
-        self.data.flags_indv = np.tile(True, self.dprime)
-        self.data.m = np.tile(self.m_min, self.dprime)
-        self.data.n_min = 0
-        self.data.ci_low = np.tile(-np.inf, self.dprime)
-        self.data.ci_high = np.tile(np.inf, self.dprime)
-        self.data.solution_indv = np.tile(np.nan, self.dprime)
-        self.data.solution = np.nan
-        self.data.xfull = np.empty((0, self.d))
-        self.data.yfull = np.empty((0,) + self.dprime)
-        stop_flag = np.tile(None, self.dprime)
-        while True:
-            m = self.data.m.max()
-            n_min = self.data.n_min
-            n_max = int(2 ** m)
-            n = int(n_max - n_min)
-            xnext, xnext_un = self.discrete_distrib.gen_samples(n_min=n_min, n_max=n_max, return_unrandomized=True,
-                                                                warn=False)
-            ycvnext = np.empty((1 + self.ncv, n,) + self.dprime, dtype=float)
-            ycvnext[0] = self.integrand.f(xnext,
-                                          compute_flags=self.data.flags_indv)
-            for k in range(self.ncv):
-                ycvnext[1 + k] = self.cv[k].f(xnext,
-                                              compute_flags=self.data.flags_indv)
-            for j in np.ndindex(self.dprime):
-                if not self.data.flags_indv[j]:
-                    continue
-                slice_yj = (0, slice(None),) + j
-                y_val = ycvnext[slice_yj].copy()
-
-                # Update function values
-                xnext_un_, ftilde_, m_ = self.datum[j].update_data(y_val_new=y_val, xnew=xnext, xunnew=xnext_un)
-                success, muhat, r_order, err_bd = self.datum[j].stopping_criterion(xnext_un_, ftilde_, m_)
-                bounds = muhat + np.array([-1, 1]) * err_bd
-                stop_flag[j], self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j] = \
-                    success, muhat, bounds[0], bounds[1]
-
-            self.data.xfull = np.vstack((self.data.xfull, xnext))
-            self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
-            self.data.indv_error = (self.data.ci_high - self.data.ci_low) / 2
-            self.data.ci_comb_low, self.data.ci_comb_high, self.data.violated = self.integrand.bound_fun(
-                self.data.ci_low, self.data.ci_high)
-            error_low = self.error_fun(self.data.ci_comb_low, self.abs_tol, self.rel_tol)
-            error_high = self.error_fun(self.data.ci_comb_high, self.abs_tol, self.rel_tol)
-            self.data.solution = 1 / 2 * (self.data.ci_comb_low + self.data.ci_comb_high + error_low - error_high)
-            rem_error_low = abs(self.data.ci_comb_low - self.data.solution) - error_low
-            rem_error_high = abs(self.data.ci_comb_high - self.data.solution) - error_high
-            self.data.flags_comb = np.maximum(rem_error_low, rem_error_high) >= 0
-            self.data.flags_comb |= self.data.violated
-            self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
-            self.data.n = 2 ** self.data.m
-            self.data.n_total = self.data.n.max()
-
-            if np.sum(self.data.flags_indv) == 0:
-                break  # stopping criterion met
-            elif 2 * self.data.n_total > self.n_max:
-                # doubling samples would go over n_max
-                warning_s = """
-                Already generated %d samples.
-                Trying to generate %d new samples would exceed n_max = %d.
-                No more samples will be generated.
-                Note that error tolerances may no longer be satisfied.""" \
-                            % (int(self.data.n_total), int(self.data.n_total), int(self.n_max))
-                warnings.warn(warning_s, MaxSamplesWarning)
-                break
-            else:
-                self.data.n_min = n_max
-                self.data.m += self.data.flags_indv
-
-        self.data.integrand = self.integrand
-        self.data.true_measure = self.true_measure
-        self.data.discrete_distrib = self.discrete_distrib
-        self.data.stopping_crit = self
-        self.data.parameters = [
-            'solution',
-            'indv_error',
-            'ci_low',
-            'ci_high',
-            'ci_comb_low',
-            'ci_comb_high',
-            'flags_comb',
-            'flags_indv',
-            'n_total',
-            'n',
-            'time_integrate']
-        self.data.datum = self.datum
-        self.data.time_integrate = time() - t_start
-        return self.data.solution, self.data
 
     # computes the integral
     def integrate(self):
