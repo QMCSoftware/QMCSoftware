@@ -22,8 +22,15 @@ class CubBayesLatticeG(_CubBayesLDG):
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.808
-        error_bound     6.41e-04
-        n_total         256
+        indv_error      6.41e-04
+        ci_low          1.808
+        ci_high         1.809
+        ci_comb_low     1.808
+        ci_comb_high    1.809
+        flags_comb      0
+        flags_indv      0
+        n_total         2^(8)
+        n               2^(8)
         time_integrate  ...
     CubBayesLatticeG (StoppingCriterion Object)
         abs_tol         0.050
@@ -77,9 +84,9 @@ class CubBayesLatticeG(_CubBayesLDG):
         super(CubBayesLatticeG, self).__init__(integrand, fbt=self._fft, merge_fbt=self._merge_fft,
                                                ptransform=ptransform,
                                                allowed_distribs=[Lattice],
-                                               kernel=self.kernel,
+                                               kernel=self._shift_inv_kernel,
                                                abs_tol=abs_tol, rel_tol=rel_tol,
-                 n_init=n_init, n_max=n_max, alpha=alpha,error_fun=error_fun)
+                                               n_init=n_init, n_max=n_max, alpha=alpha, error_fun=error_fun)
 
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max', 'order']
         # Set Attributes
@@ -101,38 +108,6 @@ class CubBayesLatticeG(_CubBayesLDG):
         if self.discrete_distrib.order != 'linear':
             raise ParameterError("CubBayesLattice_g requires discrete_distrib to have order='linear'")
 
-    # computes the integral
-    def integrate(self):
-        # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-                                         self.m_min, self.m_max, self._fft, self._merge_fft, self.kernel)
-        tstart = time()  # start the timer
-
-        # Iteratively find the number of points required for the cubature to meet
-        # the error threshold
-        while True:
-            # Update function values
-            xun_, ftilde_, m = self.data.update_data()
-            stop_flag, muhat, order_, err_bnd = self.data.stopping_criterion(xun_, ftilde_, m)
-
-            # if stop_at_tol true, exit the loop
-            # else, run for for all 'n' values.
-            # Used to compute error values for 'n' vs error plotting
-            if self.stop_at_tol and stop_flag:
-                break
-
-            if m >= self.m_max:
-                warnings.warn('''
-                    Already used maximum allowed sample size %d.
-                    Note that error tolerances may no longer be satisfied.''' % (2 ** self.m_max),
-                              MaxSamplesWarning)
-                break
-
-        self.data.time_integrate = time() - tstart
-        # Approximate integral
-        self.data.solution = muhat
-
-        return muhat, self.data
 
     @staticmethod
     def _fft(y):
@@ -200,7 +175,7 @@ class CubBayesLatticeG(_CubBayesLDG):
     Lambda_ring = fft(C1 - 1)
     '''
 
-    def kernel(self, xun, order, theta, avoid_cancel_error, kern_type, debug_enable):
+    def _shift_inv_kernel(self, xun, order, theta, avoid_cancel_error, kern_type, debug_enable):
         if kern_type == 1:
             b_order = order * 2  # Bernoulli polynomial order as per the equation
             const_mult = -(-1) ** (b_order / 2) * ((2 * np.pi) ** b_order) / factorial(b_order)

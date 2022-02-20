@@ -23,8 +23,15 @@ class CubBayesNetG(_CubBayesLDG):
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.812
-        error_bound     0.015
-        n_total         256
+        indv_error      0.015
+        ci_low          1.796
+        ci_high         1.827
+        ci_comb_low     1.796
+        ci_comb_high    1.827
+        flags_comb      0
+        flags_indv      0
+        n_total         2^(8)
+        n               2^(8)
         time_integrate  ...
     CubBayesNetG (StoppingCriterion Object)
         abs_tol         0.050
@@ -76,9 +83,9 @@ class CubBayesNetG(_CubBayesLDG):
         super(CubBayesNetG, self).__init__(integrand, fbt=self._fwht_h, merge_fbt=self._merge_fwht,
                                            ptransform=None,
                                            allowed_distribs=[DigitalNetB2],
-                                           kernel=self.kernel,
+                                           kernel=self._shift_inv_kernel_digital,
                                            abs_tol=abs_tol, rel_tol=rel_tol,
-                 n_init=n_init, n_max=n_max, alpha=alpha,error_fun=error_fun)
+                                           n_init=n_init, n_max=n_max, alpha=alpha, error_fun=error_fun)
 
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
         # Set Attributes
@@ -101,38 +108,6 @@ class CubBayesNetG(_CubBayesLDG):
         if self.discrete_distrib.randomize == False:
             raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
 
-    # computes the integral
-    def integrate(self):
-        # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-                                         self.m_min, self.m_max, self._fwht_h, self._merge_fwht, self.kernel)
-        tstart = time()  # start the timer
-
-        # Iteratively find the number of points required for the cubature to meet
-        # the error threshold
-        while True:
-            # Update function values
-            xun_, ftilde_, m = self.data.update_data()
-            stop_flag, muhat, order_, err_bnd = self.data.stopping_criterion(xun_, ftilde_, m)
-
-            # if stop_at_tol true, exit the loop
-            # else, run for for all 'n' values.
-            # Used to compute error values for 'n' vs error plotting
-            if self.stop_at_tol and stop_flag:
-                break
-
-            if m >= self.m_max:
-                warnings.warn('''
-                    Already used maximum allowed sample size %d.
-                    Note that error tolerances may no longer be satisfied''' % (2 ** self.m_max),
-                              MaxSamplesWarning)
-                break
-
-        self.data.time_integrate = time() - tstart
-        # Approximate integral
-        self.data.solution = muhat
-
-        return muhat, self.data
 
     def _fwht_h(self, y):
         ytilde = np.squeeze(y)
@@ -153,7 +128,7 @@ class CubBayesNetG(_CubBayesLDG):
     Lambda_ring = fwht(C1 - 1)
     '''
 
-    def kernel(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
+    def _shift_inv_kernel_digital(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
         kernel_func = CubBayesNetG.BuildKernelFunc(order)
         const_mult = 1 / 10
 

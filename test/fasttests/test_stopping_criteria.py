@@ -144,7 +144,7 @@ class TestCubBayesLatticeG(unittest.TestCase):
         keister_d = Keister(Lattice(dimension=dims, order='linear', seed=7))
         keister_indices = SobolIndices(keister_d, indices='singletons')
         sc = CubBayesLatticeG(keister_indices, abs_tol=abs_tol, ptransform='C1sin')
-        solution, data = sc.integrate_nd()
+        solution, data = sc.integrate()
 
         print(abs(solution - solution_).max())
         self.assertTrue(solution.shape, (dims, dims, 1))
@@ -165,14 +165,14 @@ class TestCubBayesNetG(unittest.TestCase):
 
     def test_keister_2d(self):
         integrand = Keister(DigitalNetB2(dimension=2))
-        solution, data = CubBayesNetG(integrand , n_init=2 ** 5, abs_tol=tol).integrate()  #
+        solution, data = CubBayesNetG(integrand , n_init=2 ** 5, abs_tol=tol).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
     def test_sobol_indices_bayes_net(self, dims=3, abs_tol=1e-3):
         keister_d = Keister(DigitalNetB2(dimension=dims, seed=7))
         keister_indices = SobolIndices(keister_d, indices='singletons')
         sc = CubBayesNetG(keister_indices, abs_tol=abs_tol)
-        solution, data = sc.integrate_nd()
+        solution, data = sc.integrate()
 
         keister_d2_ = Keister(Lattice(dimension=dims, seed=7))
         keister_indices2_ = SobolIndices(keister_d2_, indices='singletons')

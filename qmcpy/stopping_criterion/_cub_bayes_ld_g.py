@@ -5,6 +5,7 @@ import numpy as np
 from time import time
 import warnings
 
+
 class _CubBayesLDG(StoppingCriterion):
     """
     Abstract class for CubBayes{LD}G where LD is a low discrepancy discrete distribution.
@@ -59,7 +60,7 @@ class _CubBayesLDG(StoppingCriterion):
         allow_vectorized_integrals = True
         super(_CubBayesLDG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
-    def integrate_nd(self):
+    def integrate(self):
         t_start = time()
         self.datum = np.empty(self.dprime, dtype=object)
         for j in np.ndindex(self.dprime):
@@ -94,14 +95,14 @@ class _CubBayesLDG(StoppingCriterion):
                 if not self.data.flags_indv[j]:
                     continue
                 slice_yj = (0, slice(None),) + j
-                if type(self.discrete_distrib).__name__ == 'Lattice':
-                    y_val = ycvnext[slice_yj]
+                if type(self.discrete_distrib).__name__ == 'DigitalNetB2':
+                    y_val = ycvnext[slice_yj].copy()  # to statisfy C_CONTIGUOUS
                 else:
-                    y_val = ycvnext[slice_yj].copy()
+                    y_val = ycvnext[slice_yj]
 
                 # Update function values
-                xnext_un_, ftilde_, m_ = self.datum[j].update_data(y_val_new=y_val, xnew=xnext, xunnew=xnext_un)
-                success, muhat, r_order, err_bd = self.datum[j].stopping_criterion(xnext_un_, ftilde_, m_)
+                success, muhat, r_order, err_bd, _ = self.datum[j].update_data(y_val_new=y_val, xnew=xnext, xunnew=xnext_un)
+
                 bounds = muhat + np.array([-1, 1]) * err_bd
                 stop_flag[j], self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j] = \
                     success, muhat, bounds[0], bounds[1]
@@ -157,3 +158,36 @@ class _CubBayesLDG(StoppingCriterion):
         self.data.datum = self.datum
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
+
+    # computes the integral
+    # ## Obsolete - do not use ##
+    def integrate_1d(self):
+        # Construct AccumulateData Object to House Integration data
+        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                                         self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel)
+        tstart = time()  # start the timer
+
+        # Iteratively find the number of points required for the cubature to meet
+        # the error threshold
+        while True:
+            # Update function values
+            stop_flag, muhat, order_, err_bnd, m = self.data.update_data()
+
+            # if stop_at_tol true, exit the loop
+            # else, run for for all 'n' values.
+            # Used to compute error values for 'n' vs error plotting
+            if self.stop_at_tol and stop_flag:
+                break
+
+            if m >= self.m_max:
+                warnings.warn('''
+                    Already used maximum allowed sample size %d.
+                    Note that error tolerances may no longer be satisfied.''' % (2 ** self.m_max),
+                              MaxSamplesWarning)
+                break
+
+        self.data.time_integrate = time() - tstart
+        # Approximate integral
+        self.data.solution = muhat
+
+        return muhat, self.data

@@ -102,10 +102,10 @@ class LDTransformBayesData(AccumulateData):
                 Note that error tolerances may no longer be satisfied.''' % (2 ** self.m_max),
                           MaxSamplesWarning)
 
-        return self.xun_, self.ftilde_, self.m
+        return self._stopping_criterion(self.xun_, self.ftilde_, self.m)
 
     # decides if the user-defined error threshold is met
-    def stopping_criterion(self, xpts, ftilde, m):
+    def _stopping_criterion(self, xpts, ftilde, m):
         r = self.stopping_crit.order
         ftilde = ftilde.squeeze()
         n = 2 ** m
@@ -179,7 +179,7 @@ class LDTransformBayesData(AccumulateData):
 
             # stopping criterion achieved
             success = True
-        return success, muhat, r, err_bd
+        return success, muhat, r, err_bd, m
 
     # objective function to estimate parameter theta
     # MLE : Maximum likelihood estimation
