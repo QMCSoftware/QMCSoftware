@@ -111,6 +111,7 @@ dependencies:
     - decorator==4.4.2
     - defusedxml==0.6.0
     - docutils==0.16
+    - fonttools==4.29.1
     - future==0.18.2
     - idna==2.9
     - imagesize==1.2.0
@@ -123,6 +124,7 @@ dependencies:
     - jedi==0.17.0
     - jeepney==0.4.3
     - jinja2==2.11.3
+    - joblib==1.1.0
     - jsonschema==3.2.0
     - jupyter==1.0.0
     - jupyter-client==6.1.5
@@ -133,7 +135,7 @@ dependencies:
     - lazy-object-proxy==1.6.0
     - markdown==3.2.2
     - markupsafe==1.1.1
-    - matplotlib==3.2.1
+    - matplotlib==3.5.1
     - mccabe==0.6.1
     - more-itertools==8.4.0
     - nbconvert==5.6.1
@@ -153,6 +155,7 @@ dependencies:
     - prompt-toolkit==3.0.5
     - ptyprocess==0.6.0
     - py==1.10.0
+    - pyaml==21.10.1
     - pydeps==1.9.13
     - pygments==2.7.4
     - pylint==2.11.1
@@ -166,6 +169,8 @@ dependencies:
     - readme-renderer==26.0
     - recommonmark==0.6.0
     - requests-toolbelt==0.9.1
+    - scikit-learn==1.0.2
+    - scikit-optimize==0.9.0
     - scipy==1.7.0
     - secretstorage==3.1.2
     - send2trash==1.5.0
@@ -185,6 +190,7 @@ dependencies:
     - stdlib-list==0.8.0
     - terminado==0.8.3
     - testpath==0.4.4
+    - threadpoolctl==3.0.0
     - toml==0.10.2
     - tqdm==4.46.1
     - traitlets==4.3.3
@@ -195,4 +201,3 @@ dependencies:
     - wcwidth==0.1.9
     - wrapt==1.12.1
     - zipp==3.1.0
-prefix: /Users/alegresor/miniconda3/envs/qmcpy
