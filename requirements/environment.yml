@@ -134,7 +134,7 @@ dependencies:
     - kiwisolver==1.2.0
     - lazy-object-proxy==1.6.0
     - markdown==3.2.2
-    - markupsafe==1.1.1
+    - markupsafe==2.1.0
     - matplotlib==3.5.1
     - mccabe==0.6.1
     - more-itertools==8.4.0
