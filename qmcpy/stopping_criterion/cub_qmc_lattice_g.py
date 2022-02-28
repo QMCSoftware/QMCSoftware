@@ -1,7 +1,7 @@
 from ._cub_qmc_ld_g import _CubQMCLDG
 from ..discrete_distribution import Lattice
-from ..true_measure import Gaussian
-from ..integrand import Keister, BoxIntegral
+from ..true_measure import Gaussian, Uniform
+from ..integrand import Keister, BoxIntegral, CustomFun
 from ..util import ParameterError
 from numpy import *
 
@@ -56,6 +56,49 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> true_value = array([sol3neg1,sol31])
     >>> (abs(true_value-solution)<abs_tol).all()
     True
+    >>> cf = CustomFun(
+    ...     true_measure = Uniform(Lattice(6,seed=7)),
+    ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
+    ...     dprime = (2,3))
+    >>> sol,data = CubQMCLatticeG(cf,abs_tol=1e-6).integrate()
+    >>> data
+    LDTransformData (AccumulateData Object)
+        solution        [[1. 2. 3.]
+                        [4. 5. 6.]]
+        indv_error      [[9.658e-07 4.835e-07 7.244e-07]
+                        [9.655e-07 3.017e-07 3.625e-07]]
+        ci_low          [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_high         [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_comb_low     [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_comb_high    [[1. 2. 3.]
+                        [4. 5. 6.]]
+        flags_comb      [[False False False]
+                        [False False False]]
+        flags_indv      [[False False False]
+                        [False False False]]
+        n_total         2^(15)
+        n               [[ 8192. 16384. 16384.]
+                        [16384. 32768. 32768.]]
+        time_integrate  ...
+    CubQMCLatticeG (StoppingCriterion Object)
+        abs_tol         1.00e-06
+        rel_tol         0
+        n_init          2^(10)
+        n_max           2^(35)
+    CustomFun (Integrand Object)
+    Uniform (TrueMeasure Object)
+        lower_bound     0
+        upper_bound     1
+    Lattice (DiscreteDistribution Object)
+        d               6
+        dvec            [0 1 2 3 4 5]
+        randomize       1
+        order           natural
+        entropy         7
+        spawn_key       ()
     
     Original Implementation:
 

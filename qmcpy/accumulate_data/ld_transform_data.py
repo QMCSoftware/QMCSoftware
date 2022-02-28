@@ -82,7 +82,7 @@ class LDTransformData(AccumulateData):
             cone_violation = (self.c_stilde_low > self.c_stilde_up).any()
         else:
             cone_violation = False
-        return self.muhat,self.bounds,cone_violation 
+        return self.muhat,self.bounds[0],self.bounds[1],cone_violation 
 
     def fast_transform(self, y2tf, mfrom, mto, m):
         for l in range(int(mfrom),int(mto)):

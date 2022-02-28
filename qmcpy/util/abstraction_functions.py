@@ -3,6 +3,7 @@
 from numpy import array, ndarray, log2
 import numpy as np
 import warnings
+from copy import copy
 
 
 def _univ_repr(qmc_object, abc_class_name, attributes):
@@ -31,11 +32,12 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
             val = getattr(qmc_object, key)
             # list of one value becomes just that value
             if isinstance(val, list) and len(val) == 1:
-                val = val[0]
+                val = copy(val[0])
             elif isinstance(val, list):
-                try: val = array(val)
+                try: val = array(val).copy()
                 except: pass
             elif isinstance(val, ndarray):
+                val = val.copy().squeeze()
                 if val.shape == ():
                     val = val.item()
                 elif val.size == 1:

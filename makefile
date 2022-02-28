@@ -91,4 +91,7 @@ workout:
 	@python workouts/mc_vs_qmc/importance_sampling.py
 	@python workouts/mc_vs_qmc/vary_abs_tol.py
 	@python workouts/mc_vs_qmc/vary_dimension.py
-	
+
+exportcondaenv: 
+	@-rm -f requirements/environment.yml 2>/dev/null &
+	@conda env export --no-builds | grep -v "^prefix: " > requirements/environment.yml

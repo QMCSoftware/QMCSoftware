@@ -1,10 +1,9 @@
-from copy import deepcopy
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..discrete_distribution import Lattice,DigitalNetB2,Halton
-from ..true_measure import Gaussian
-from ..integrand import Keister,BoxIntegral
+from ..true_measure import Gaussian,Uniform
+from ..integrand import Keister,BoxIntegral,CustomFun
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import *
 from scipy.stats import norm
@@ -100,6 +99,54 @@ class CubQMCCLT(StoppingCriterion):
     >>> true_value = array([sol3neg1,sol31])
     >>> (abs(true_value-solution)<abs_tol).all()
     True
+    >>> cf = CustomFun(
+    ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
+    ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
+    ...     dprime = (2,3))
+    >>> sol,data = CubQMCCLT(cf,abs_tol=1e-4).integrate()
+    >>> data
+    MeanVarDataRep (AccumulateData Object)
+        solution        [[1. 2. 3.]
+                        [4. 5. 6.]]
+        indv_error      [[2.484e-05 0.000e+00 0.000e+00]
+                        [5.708e-06 2.178e-10 0.000e+00]]
+        ci_low          [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_high         [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_comb_low     [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_comb_high    [[1. 2. 3.]
+                        [4. 5. 6.]]
+        flags_comb      [[False False False]
+                        [False False False]]
+        flags_indv      [[False False False]
+                        [False False False]]
+        n_total         2^(14)
+        n               [[ 4096.  4096.  4096.]
+                        [16384.  4096.  4096.]]
+        n_rep           [[ 256.  256.  256.]
+                        [1024.  256.  256.]]
+        time_integrate  ...
+    CubQMCCLT (StoppingCriterion Object)
+        inflate         1.200
+        alpha           0.010
+        abs_tol         1.00e-04
+        rel_tol         0
+        n_init          2^(8)
+        n_max           2^(30)
+        replications    2^(4)
+    CustomFun (Integrand Object)
+    Uniform (TrueMeasure Object)
+        lower_bound     0
+        upper_bound     1
+    DigitalNetB2 (DiscreteDistribution Object)
+        d               6
+        dvec            [0 1 2 3 4 5]
+        randomize       LMS_DS
+        graycode        0
+        entropy         7
+        spawn_key       ()
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
@@ -138,7 +185,8 @@ class CubQMCCLT(StoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
-        self.dprime = int(self.integrand.dprime)
+        self.dprime = self.integrand.dprime
+        self.d = self.discrete_distrib.d
         # Verify Compliant Construction
         allowed_levels = ["single"]
         allowed_distribs = [Lattice,DigitalNetB2,Halton]
@@ -150,27 +198,33 @@ class CubQMCCLT(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         t_start = time()
-        self.datum = [MeanVarDataRep(self.z_star,self.inflate,self.replications) for j in range(self.dprime)]
+        self.datum = empty(self.dprime,dtype=object)
+        for j in ndindex(self.dprime):
+            self.datum[j] = MeanVarDataRep(self.z_star,self.inflate,self.replications)
         self.data = MeanVarDataRep.__new__(MeanVarDataRep)
         self.data.flags_indv = tile(True,self.dprime)
         self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
         self.data.n_rep = tile(self.n_init,self.dprime)
         self.data.n_min_rep = 0
-        self.data.bounds = vstack([tile(-inf,(1,self.dprime)),tile(inf,(1,self.dprime))])
+        self.data.ci_low = tile(-inf,self.dprime)
+        self.data.ci_high = tile(inf,self.dprime)
         self.data.solution_indv = tile(nan,self.dprime)
         self.data.solution = nan
+        self.data.xfull = empty((0,self.d))
+        self.data.yfull = empty((0,)+self.dprime)
         while True:
             n_min = self.data.n_min_rep
             n_max = int(self.data.n_rep.max())
             n = int(n_max-n_min)
-            xfull = vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
-            yfull = self.integrand.f(xfull,compute_flags=self.data.flags_indv)
-            for j in range(self.dprime):
+            xnext = vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
+            ynext = self.integrand.f(xnext,compute_flags=self.data.flags_indv)
+            for j in ndindex(self.dprime):
                 if not self.data.flags_indv[j]: continue
-                yj = yfull[:,j].reshape((n,self.replications),order='f')
-                self.data.solution_indv[j],self.data.bounds[:,j] = self.datum[j].update_data(yj)
-            self.data.indv_error = (self.data.bounds[1]-self.data.bounds[0])/2
-            self.data.ci_low,self.data.ci_high = self.data.bounds[0],self.data.bounds[1]
+                yj = ynext[(slice(None),)+j].reshape((n,self.replications),order='f')
+                self.data.solution_indv[j],self.data.ci_low[j],self.data.ci_high[j] = self.datum[j].update_data(yj)
+            self.data.xfull = vstack((self.data.xfull,xnext))
+            self.data.yfull = vstack((self.data.yfull,ynext))
+            self.data.indv_error = (self.data.ci_high-self.data.ci_low)/2
             self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
             error_low = self.error_fun(self.data.ci_comb_low,self.abs_tol,self.rel_tol)
             error_high = self.error_fun(self.data.ci_comb_high,self.abs_tol,self.rel_tol)

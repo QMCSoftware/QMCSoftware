@@ -1,6 +1,6 @@
 from ._integrand import Integrand
-from . import Keister
-from ..stopping_criterion import CubQMCCLT
+from . import Keister, CustomFun
+from ..stopping_criterion import CubQMCNetG
 from ..util import ParameterError
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
@@ -14,34 +14,53 @@ class SobolIndices(Integrand):
     >>> dnb2 = DigitalNetB2(dimension=3,seed=7)
     >>> keister_d = Keister(dnb2)
     >>> keister_indices = SobolIndices(keister_d,indices='singletons')
-    >>> sc = CubQMCCLT(keister_indices,abs_tol=.05)
+    >>> sc = CubQMCNetG(keister_indices,abs_tol=1e-3)
     >>> solution,data = sc.integrate()
+    >>> solution.squeeze()
+    array([[0.32805051, 0.3279677 , 0.32808771],
+           [0.3388433 , 0.33857474, 0.33883778]])
     >>> data
-    MeanVarDataRep (AccumulateData Object)
-        solution        [0.321 0.331 0.328 0.334 0.341 0.334]
-        indv_error      [0.092 0.103 0.046 0.048 0.072 0.058 0.007 0.051]
-        ci_low          [1.555 1.595 1.64  1.667 1.679 1.659 2.163 9.77 ]
-        ci_high         [1.739 1.801 1.731 1.763 1.823 1.775 2.177 9.871]
-        ci_comb_low     [0.3   0.307 0.316 0.321 0.324 0.32 ]
-        ci_comb_high    [0.342 0.354 0.34  0.346 0.358 0.349]
-        flags_comb      [False False False False False False]
-        flags_indv      [False False False False False False False False]
-        n_total         2^(12)
-        n               [4096. 4096. 4096. 4096. 4096. 4096. 4096. 4096.]
-        n_rep           [256. 256. 256. 256. 256. 256. 256. 256.]
+    LDTransformData (AccumulateData Object)
+        solution        [[0.328 0.328 0.328]
+                        [0.339 0.339 0.339]]
+        indv_error      [[0.002 0.002 0.002]
+                        [0.002 0.002 0.002]
+                        [0.    0.    0.   ]
+                        [0.003 0.003 0.003]]
+        ci_low          [[1.67  1.67  1.671]
+                        [1.725 1.724 1.725]
+                        [2.168 2.168 2.168]
+                        [9.797 9.797 9.797]]
+        ci_high         [[1.675 1.674 1.675]
+                        [1.73  1.729 1.73 ]
+                        [2.168 2.168 2.168]
+                        [9.803 9.803 9.803]]
+        ci_comb_low     [[0.327 0.327 0.327]
+                        [0.338 0.338 0.338]]
+        ci_comb_high    [[0.329 0.329 0.329]
+                        [0.34  0.339 0.34 ]]
+        flags_comb      [[False False False]
+                        [False False False]]
+        flags_indv      [[False False False]
+                        [False False False]
+                        [False False False]
+                        [False False False]]
+        n_total         2^(16)
+        n               [[65536. 65536. 65536.]
+                        [32768. 32768. 32768.]
+                        [65536. 65536. 65536.]
+                        [32768. 32768. 32768.]]
         time_integrate  ...
-    CubQMCCLT (StoppingCriterion Object)
-        inflate         1.200
-        alpha           0.010
-        abs_tol         0.050
+    CubQMCNetG (StoppingCriterion Object)
+        abs_tol         0.001
         rel_tol         0
-        n_init          2^(8)
-        n_max           2^(30)
-        replications    2^(4)
+        n_init          2^(10)
+        n_max           2^(35)
     SobolIndices (Integrand Object)
         indices         [[0]
                         [1]
                         [2]]
+        n_multiplier    3
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -66,12 +85,10 @@ class SobolIndices(Integrand):
                 The default indices='singletons' sets indices=[[0],[1],...[d-1]]. 
                 Should not include [], the null set
         """
-        self.parameters = ['indices']
+        self.parameters = ['indices','n_multiplier']
         self.integrand = integrand
         self.d = self.integrand.d
         # indices
-        if self.integrand.dprime>1: 
-            raise ParameterError('SobolIndices currently only supports integrand.dprime = 1')
         self.indices = indices
         if self.indices=='singletons':
             self.indices = [[j] for j in range(self.d)]
@@ -82,34 +99,38 @@ class SobolIndices(Integrand):
         for k in range(self.s): self.indices_bool_mat[k,self.indices[k]] = True
         self.not_indices_bool_mat = ~self.indices_bool_mat
         # sensitivity_index
+        self.n_multiplier = self.s
         self.dtilde = 2*self.d
-        self.dprime = 2*self.s+2
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib.spawn(s=1,dimensions=[self.dtilde])[0]
         self.sampler = self.integrand.sampler
-        self.g = self.integrand.g
-        super(SobolIndices,self).__init__(parallel=False)
+        dprime = (4,self.s,)+self.integrand.dprime
+        super(SobolIndices,self).__init__(dprime,parallel=False)
     
-    def f(self, x, periodization_transform='NONE', *args, **kwargs):
+    def f(self, x, *args, **kwargs):
         z = x[:,self.d:]
         x = x[:,:self.d]
-        y = zeros((x.shape[0],self.dprime),dtype=float)
+        n,d = x.shape
+        y = zeros((n,)+self.dprime,dtype=float)
         compute_flags = kwargs['compute_flags']
         del kwargs['compute_flags']
-        v = zeros(x.shape,dtype=float)
-        f_x = self.integrand.f(x,periodization_transform,*args,**kwargs).squeeze()
-        f_z = self.integrand.f(z,periodization_transform,*args,**kwargs).squeeze()
+        v = zeros((n,d),dtype=float)
+        f_x = self.integrand.f(x,*args,**kwargs)
+        f_z = self.integrand.f(z,*args,**kwargs)
         for k in range(self.s):
-            if not compute_flags[k]: continue
+            flags_closed = compute_flags[0,k,:]
+            flags_total = compute_flags[1,k,:]
+            flags_k = flags_closed|flags_total
+            if not flags_k.any(): continue
             u_bool = self.indices_bool_mat[k]
             not_u_bool = self.not_indices_bool_mat[k]
             v[:,u_bool] = x[:,u_bool]
             v[:,not_u_bool] = z[:,not_u_bool]
-            f_v = self.integrand.f(v,periodization_transform,*args,**kwargs).squeeze()
-            y[:,k] = f_x*(f_v-f_z) # A.18
-            y[:,self.s+k] = (f_z-f_v)**2/2 # A.16
-        if compute_flags[-2]: y[:,-2] = f_x # mu
-        if compute_flags[-1]: y[:,-1] = f_x**2 # sigma^2+mu^2
+            f_v = self.integrand.f(v,compute_flags=flags_k,*args,**kwargs)
+            y[:,0,k] = f_x*(f_v-f_z) # A.18
+            y[:,1,k] = (f_z-f_v)**2/2 # A.16
+            y[:,2,k] = f_x # mu
+            y[:,3,k] = f_x**2 # sigma^2+mu^2
         return y
     
     def _spawn(self, level, sampler):
@@ -119,16 +140,21 @@ class SobolIndices(Integrand):
             indices = self.indices)
     
     def bound_fun(self, bound_low, bound_high):
-        f2_low,f2_high = bound_low[-1],bound_high[-1]
-        mu_low,mu_high = bound_low[-2],bound_low[-2]
-        sigma2_low,sigma2_high = f2_low-mu_high**2,f2_high-mu_low**2
-        violated = sign(sigma2_low)!=sign(sigma2_high)
-        bound_opts = [bound_low[:-2]/sigma2_low,bound_low[:-2]/sigma2_high,bound_high[:-2]/sigma2_low,bound_high[:-2]/sigma2_high]
-        comb_bounds_low  = minimum.reduce(bound_opts)
-        comb_bounds_high = maximum.reduce(bound_opts)
+        tau_low,mu_low,f2_low = bound_low[:2],bound_low[2],bound_low[3]
+        tau_high,mu_high,f2_high = bound_high[:2],bound_high[2],bound_high[3]
+        sigma2_low1,sigma2_low2 = f2_high-mu_low**2,f2_high-mu_high**2
+        comb_bounds_low = minimum.reduce([tau_low/sigma2_low1,tau_low/sigma2_low2])
+        comb_bounds_low = minimum.reduce([ones(tau_low.shape),maximum.reduce([zeros(tau_low.shape),comb_bounds_low])])
+        sigma2_high1,sigma2_high2 = f2_low-mu_low**2,f2_low-mu_high**2
+        comb_bounds_high = minimum.reduce([ones(tau_high.shape),maximum.reduce([tau_high/sigma2_high1,tau_high/sigma2_high2])])
+        comb_bounds_high = minimum.reduce([ones(tau_high.shape),maximum.reduce([zeros(tau_high.shape),comb_bounds_high])])
+        violated = (sigma2_high1<0)|(sigma2_high2<0)
         return comb_bounds_low,comb_bounds_high,violated
     
     def dependency(self, flags_comb):
-        numer_flags = flags_comb
-        denom_flag = flags_comb.any()
-        return hstack((numer_flags,denom_flag,denom_flag))
+        individual_flags = zeros(self.dprime,dtype=bool)
+        individual_flags[:2] = flags_comb # numerator
+        individual_flags[2:] = flags_comb 
+        return individual_flags
+
+class SensitivityIndices(SobolIndices): pass
