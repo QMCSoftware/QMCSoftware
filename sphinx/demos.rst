@@ -39,3 +39,5 @@ Demos
     demo_rst/elliptic-pde.rst
 
     demo_rst/gaussian_diagnostics_demo.rst
+
+    demo_rst/iris.rst
