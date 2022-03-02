@@ -83,6 +83,15 @@ class TestCubQMCLatticeG(unittest.TestCase):
         solution,data = CubQMCLatticeG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
+    def test_sobol_indices_qmc_lattice(self, dims=2):
+        dnb2 = Lattice(dimension=dims, seed=7)
+        keister_d = Keister(dnb2)
+        keister_indices = SobolIndices(keister_d, indices='singletons')
+        sc = CubQMCLatticeG(keister_indices, abs_tol=1e-3, ptransform='Baker')
+        solution, data = sc.integrate()
+        self.assertTrue(solution.shape, (dims, dims, 1))
+        solution = solution.squeeze()
+
 
 class TestCubQMCNetG(unittest.TestCase):
     """ Unit tests for CubQMCNetG StoppingCriterion. """
@@ -100,6 +109,14 @@ class TestCubQMCNetG(unittest.TestCase):
         solution,data = CubQMCNetG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
+    def test_sobol_indices_qmc_net(self, dims=2):
+        dnb2 = DigitalNetB2(dimension=dims, seed=7)
+        keister_d = Keister(dnb2)
+        keister_indices = SobolIndices(keister_d, indices='singletons')
+        sc = CubQMCNetG(keister_indices, abs_tol=1e-3)
+        solution, data = sc.integrate()
+        self.assertTrue(solution.shape, (dims, dims, 1))
+        solution = solution.squeeze()
 
 class TestCubBayesLatticeG(unittest.TestCase):
     """ Unit tests for CubBayesLatticeG StoppingCriterion. """
@@ -118,6 +135,21 @@ class TestCubBayesLatticeG(unittest.TestCase):
         solution, data = CubBayesLatticeG(integrand, abs_tol=tol, n_init=2 ** 5).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
+    def test_sobol_indices_bayes_lattice(self, dims=3, abs_tol=1e-2):
+        keister_d_ = Keister(Lattice(dimension=dims, seed=7))
+        keister_indices_ = SobolIndices(keister_d_, indices='singletons')
+        sc_ = CubQMCLatticeG(keister_indices_, abs_tol=abs_tol, ptransform='Baker')
+        solution_, data_ = sc_.integrate()
+
+        keister_d = Keister(Lattice(dimension=dims, order='linear', seed=7))
+        keister_indices = SobolIndices(keister_d, indices='singletons')
+        sc = CubBayesLatticeG(keister_indices, order=1, abs_tol=abs_tol, ptransform='Baker')
+        solution, data = sc.integrate()
+
+        print(abs(solution - solution_).max())
+        self.assertTrue(solution.shape, (dims, dims, 1))
+        self.assertTrue(abs(solution - solution_).max() < abs_tol)
+
 
 class TestCubBayesNetG(unittest.TestCase):
     """ Unit tests for CubBayesNetG StoppingCriterion. """
@@ -133,8 +165,28 @@ class TestCubBayesNetG(unittest.TestCase):
 
     def test_keister_2d(self):
         integrand = Keister(DigitalNetB2(dimension=2))
-        solution, data = CubBayesNetG(integrand , n_init=2 ** 5, abs_tol=tol).integrate()  #
+        solution, data = CubBayesNetG(integrand , n_init=2 ** 5, abs_tol=tol).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
+
+    def test_sobol_indices_bayes_net(self, dims=3, abs_tol=1e-2):
+        keister_d = Keister(DigitalNetB2(dimension=dims, seed=7))
+        keister_indices = SobolIndices(keister_d, indices='singletons')
+        sc = CubBayesNetG(keister_indices, abs_tol=abs_tol)
+        solution, data = sc.integrate()
+
+        keister_d2_ = Keister(Lattice(dimension=dims, seed=7))
+        keister_indices2_ = SobolIndices(keister_d2_, indices='singletons')
+        sc2_ = CubQMCLatticeG(keister_indices2_, abs_tol=abs_tol, ptransform='Baker')
+        solution2_, data2_ = sc2_.integrate()
+
+        keister_d_ = Keister(DigitalNetB2(dimension=dims, seed=7))
+        keister_indices_ = SobolIndices(keister_d_, indices='singletons')
+        sc_ = CubQMCNetG(keister_indices_, abs_tol=abs_tol)
+        solution_, data_ = sc_.integrate()
+
+        print(abs(solution - solution_).max(), abs(solution - solution2_).max())
+        self.assertTrue(solution.shape, (dims, dims, 1))
+        self.assertTrue(abs(solution - solution_).max() < abs_tol)
 
 
 class TestCubMCL(unittest.TestCase):

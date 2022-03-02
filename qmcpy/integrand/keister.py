@@ -2,6 +2,7 @@ from ._integrand import Integrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian
 from numpy import *
+from scipy.special import gamma
 
 
 class Keister(Integrand):
@@ -55,3 +56,22 @@ class Keister(Integrand):
     
     def _spawn(self, level, sampler):
         return Keister(sampler=sampler)
+
+    def exact_integ(self, d):
+        """
+        computes the true value of the Keister integral in dimension d.
+        Accuracy might degrade as d increases due to round-off error.
+        :param d:
+        :return: true_integral
+        """
+        cosinteg = zeros(shape=(d))
+        cosinteg[0] = sqrt(pi) / (2 * exp(1 / 4))
+        sininteg = zeros(shape=(d))
+        sininteg[0] = 4.244363835020225e-01
+        cosinteg[1] = (1 - sininteg[0]) / 2
+        sininteg[1] = cosinteg[0] / 2
+        for j in range(2, d):
+            cosinteg[j] = ((j-1)*cosinteg[j-2]-sininteg[j-1])/2
+            sininteg[j] = ((j-1)*sininteg[j-2]+cosinteg[j-1])/2
+        I = (2*(pi**(d/2))/gamma(d/2))*cosinteg[d-1]
+        return I

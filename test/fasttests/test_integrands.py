@@ -54,6 +54,12 @@ class TestIntegrand(unittest.TestCase):
                 self.assertTrue(isfinite(y).all())
                 self.assertTrue(y.dtype==float64)
 
+    def test_keister(self, dims=3):
+        k = Keister(DigitalNetB2(dims,seed=7))
+        exact_integ = k.exact_integ(dims)
+        x = k.discrete_distrib.gen_samples(2 ** 10)
+        y = k.f(x)
+        self.assertAlmostEqual(y.mean(), exact_integ, places=2)
 
 if __name__ == "__main__":
     unittest.main()

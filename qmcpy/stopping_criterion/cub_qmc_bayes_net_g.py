@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._cub_bayes_ld_g import _CubBayesLDG
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister
@@ -11,7 +11,7 @@ from time import time
 import warnings
 
 
-class CubBayesNetG(StoppingCriterion):
+class CubBayesNetG(_CubBayesLDG):
     """
     Stopping criterion for Bayesian Cubature using digital net sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error
@@ -23,8 +23,15 @@ class CubBayesNetG(StoppingCriterion):
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.812
-        error_bound     0.015
-        n_total         256
+        indv_error      0.015
+        ci_low          1.796
+        ci_high         1.827
+        ci_comb_low     1.796
+        ci_comb_high    1.827
+        flags_comb      0
+        flags_indv      0
+        n_total         2^(8)
+        n               2^(8)
         time_integrate  ...
     CubBayesNetG (StoppingCriterion Object)
         abs_tol         0.050
@@ -69,34 +76,24 @@ class CubBayesNetG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
+
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01):
+                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01,
+                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
+        super(CubBayesNetG, self).__init__(integrand, fbt=self._fwht_h, merge_fbt=self._merge_fwht,
+                                           ptransform=None,
+                                           allowed_distribs=[DigitalNetB2],
+                                           kernel=self._shift_inv_kernel_digital,
+                                           abs_tol=abs_tol, rel_tol=rel_tol,
+                                           n_init=n_init, n_max=n_max, alpha=alpha, error_fun=error_fun)
+
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
-        m_min = log2(n_init)
-        m_max = log2(n_max)
-        if m_min % 1 != 0. or m_min < 5 or m_max % 1 != 0:
-            warning_s = '''
-                n_init and n_max must be a powers of 2.
-                n_init must be >= 2^8.
-                Using n_init = 2^8 and n_max=2^22.'''
-            warnings.warn(warning_s, ParameterWarning)
-            m_min = 8.
-            m_max = 22.
-        self.m_min = m_min
-        self.m_max = m_max
-        self.n_init = n_init  # number of samples to start with = 2^mmin
-        self.n_max = n_max  # max number of samples allowed = 2^mmax
-        self.alpha = alpha  # p-value, default 0.1%.
         self.order = 1  # Currently supports only order=1
 
         self.use_gradient = False  # If true uses gradient descent in parameter search
         self.one_theta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
-        self.stop_at_tol = True  # automatic mode: stop after meeting the error tolerance
-        self.arb_mean = True  # by default use zero mean algorithm
         self.errbd_type = 'MLE'  # Available options {'MLE', 'GCV', 'full'}
 
         # private properties
@@ -104,58 +101,13 @@ class CubBayesNetG(StoppingCriterion):
         # GCV - Generalized cross validation
         self.kernType = 1  # Type-1:
 
-        self.avoid_cancel_error = True  # avoid cancellation error in stopping criterion
         self.uncert = 0  # quantile value for the error bound
-        self.debug_enable = False  # enable debug prints
         self.data = None
         self.fwht = FWHT()
-
-        # QMCPy Objs
-        self.integrand = integrand
-        self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.integrand.discrete_distrib
-
-        # Verify Compliant Construction
-        allowed_levels = ['single']
-        allowed_distribs = [DigitalNetB2]
-        allow_vectorized_integrals = False
-        super(CubBayesNetG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
         if self.discrete_distrib.randomize == False:
             raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
 
-    # computes the integral
-    def integrate(self):
-        # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib, 
-            self.m_min, self.m_max, self._fwht_h, self._merge_fwht, self.kernel)
-        tstart = time()  # start the timer
-
-        # Iteratively find the number of points required for the cubature to meet
-        # the error threshold
-        while True:
-            # Update function values
-            xun_, ftilde_, m = self.data.update_data()
-            stop_flag, muhat, order_, err_bnd = self.data.stopping_criterion(xun_, ftilde_, m)
-
-            # if stop_at_tol true, exit the loop
-            # else, run for for all 'n' values.
-            # Used to compute error values for 'n' vs error plotting
-            if self.stop_at_tol and stop_flag:
-                break
-
-            if m >= self.m_max:
-                warnings.warn('''
-                    Already used maximum allowed sample size %d.
-                    Note that error tolerances may no longer be satisfied'''%(2**self.m_max),
-                    MaxSamplesWarning)
-                break
-
-        self.data.time_integrate = time() - tstart
-        # Approximate integral
-        self.data.solution = muhat
-
-        return muhat, self.data
 
     def _fwht_h(self, y):
         ytilde = np.squeeze(y)
@@ -175,9 +127,10 @@ class CubBayesNetG(StoppingCriterion):
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fwht(C1 - 1)
     '''
-    def kernel(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
+
+    def _shift_inv_kernel_digital(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
         kernel_func = CubBayesNetG.BuildKernelFunc(order)
-        const_mult = 1/10
+        const_mult = 1 / 10
 
         if avoid_cancel_error:
             # Computes C1m1 = C1 - 1
@@ -191,11 +144,12 @@ class CubBayesNetG(StoppingCriterion):
             vec_lambda_ring = np.real(self._fwht_h(vec_C1m1.copy()))
 
             vec_lambda = vec_lambda_ring.copy()
-            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)/lambda_factor
+            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring) / lambda_factor
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
-                vec_lambda_direct = np.real(np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
+                vec_lambda_direct = np.real(
+                    np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
@@ -219,25 +173,25 @@ class CubBayesNetG(StoppingCriterion):
 
         # t1 = @(x)(2.^(-a1(x)))
         def t1(x):
-            out = 2**(-a1(x))
+            out = 2 ** (-a1(x))
             out[x == 0] = 0  # t1 is zero when x is zero
             return out
 
         # t2 = @(x)(2.^(-2*a1(x)))
         def t2(x):
-            out = (2**(-2 * a1(x)))
+            out = (2 ** (-2 * a1(x)))
             out[x == 0] = 0  # t2 is zero when x is zero
             return out
 
         s1 = lambda x: (1 - 2 * x)
-        s2 =lambda x: (1 / 3 - 2 * (1 - x) * x)
+        s2 = lambda x: (1 / 3 - 2 * (1 - x) * x)
         ts2 = lambda x: ((1 - 5 * t1(x)) / 2 - (a1(x) - 2) * x)
-        ts3 = lambda x: ((1 - 43 * t2(x)) / 18 + (5 * t1(x) - 1) * x + (a1(x) - 2) * x**2)
+        ts3 = lambda x: ((1 - 43 * t2(x)) / 18 + (5 * t1(x) - 1) * x + (a1(x) - 2) * x ** 2)
 
         if order == 1:
-            kernFunc = lambda x: (6 * ((1 / 6) - 2**(np.floor(log2(x + np.finfo(float).eps)) - 1)))
+            kernFunc = lambda x: (6 * ((1 / 6) - 2 ** (np.floor(log2(x + np.finfo(float).eps)) - 1)))
         elif order == 2:
-            omega2_1D =lambda x: (s1(x) + ts2(x))
+            omega2_1D = lambda x: (s1(x) + ts2(x))
             kernFunc = omega2_1D
         elif order == 3:
             omega3_1D = lambda x: (s1(x) + s2(x) + ts3(x))
