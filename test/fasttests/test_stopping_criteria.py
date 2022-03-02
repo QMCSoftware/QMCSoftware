@@ -2,14 +2,35 @@
 
 from qmcpy import *
 from qmcpy.util import *
-import sys
-import numpy
+from numpy import *
 import unittest
 
 keister_2d_exact = 1.808186429263620
 tol = .005
 rel_tol = 0
 
+
+class TestStoppingCriterion(unittest.TestCase):
+    """ General unit tests for StoppingCriterion. """
+
+    def test_sobol_indices(self):
+        abs_tol,rel_tol = 2.5e-2,0
+        a,b = 10*random.rand(),random.rand()
+        indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
+        true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
+        for SC,dd in [
+            (CubQMCNetG,DigitalNetB2(3)),
+            (CubQMCLatticeG,Lattice(3)),
+            (CubBayesNetG,DigitalNetB2(3)),
+            #(CubBayesLatticeG,Lattice(3,order='linear')),
+            (CubQMCCLT,DigitalNetB2(3)),
+            (CubQMCCLT,Lattice(3)),
+            (CubQMCCLT,Halton(3))]:
+            si_ishigami = SensitivityIndices(Ishigami(dd,a,b),indices)
+            sc = SC(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol)
+            solution,data = sc.integrate()
+            error_satisfied = ((solution.squeeze()-true_solution)<abs_tol).all()
+            self.assertTrue(error_satisfied)
 
 class TestCubMCCLT(unittest.TestCase):
     """ Unit tests for CubMCCLT StoppingCriterion. """
