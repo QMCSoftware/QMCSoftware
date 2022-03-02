@@ -89,9 +89,9 @@ class Ishigami(Integrand):
             repr([1]): -1/2*a*cos(4*pi*x1),
             repr([2]): 0,
             repr([0,1]): 0,
-            repr([0,1]): -4/5*b*pi**4*(1+10*(-1+x2)*x2*(1+2*(-1+x2)*x2))*sin(2*pi*x0),
+            repr([0,2]): -4/5*b*pi**4*(1+10*(-1+x2)*x2*(1+2*(-1+x2)*x2))*sin(2*pi*x0),
             repr([1,2]): -1/2*a*cos(4*pi*x1)+1/5*(5+b*pi**4)*sin(2*pi*x2),
             repr([0,1,2]): 1/2*a*cos(4*pi*x1)-1/5*(5+b*pi**4)*sin(2*pi*x1)}
         solution = zeros((n,len(indices)),dtype=float)
-        for j,idx in indices: solution[:,j] = fus[repr(idx)]
+        for j,idx in enumerate(indices): solution[:,j] = fus[repr(idx)]
         return solution.squeeze()
