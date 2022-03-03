@@ -10,28 +10,6 @@ tol = .005
 rel_tol = 0
 
 
-class TestStoppingCriterion(unittest.TestCase):
-    """ General unit tests for StoppingCriterion. """
-
-    def test_sobol_indices(self):
-        abs_tol,rel_tol = 2.5e-2,0
-        a,b = 10*random.rand(),random.rand()
-        indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
-        true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
-        for SC,dd in [
-            (CubQMCNetG,DigitalNetB2(3)),
-            (CubQMCLatticeG,Lattice(3)),
-            (CubBayesNetG,DigitalNetB2(3)),
-            #(CubBayesLatticeG,Lattice(3,order='linear')),
-            (CubQMCCLT,DigitalNetB2(3)),
-            (CubQMCCLT,Lattice(3)),
-            (CubQMCCLT,Halton(3))]:
-            si_ishigami = SensitivityIndices(Ishigami(dd,a,b),indices)
-            sc = SC(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol)
-            solution,data = sc.integrate()
-            error_satisfied = ((solution.squeeze()-true_solution)<abs_tol).all()
-            self.assertTrue(error_satisfied)
-
 class TestCubMCCLT(unittest.TestCase):
     """ Unit tests for CubMCCLT StoppingCriterion. """
 
@@ -62,7 +40,6 @@ class TestCubMCG(unittest.TestCase):
         algorithm = CubMCG(integrand, abs_tol=.001, n_init=64, n_max=500)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
 
-    
     def test_keister_2d(self):
         integrand = Keister(IIDStdUniform(dimension=2))
         solution,data = CubMCG(integrand, abs_tol=tol).integrate()
@@ -84,7 +61,46 @@ class TestCubQMCCLT(unittest.TestCase):
     def test_keister_2d(self):
         integrand = Keister(Halton(dimension=2))
         solution,data = CubQMCCLT(integrand, abs_tol=tol).integrate()
-        self.assertTrue(abs(solution-keister_2d_exact) < tol)
+        self.assertTrue(abs(solution-keister_2d_exact)<tol)
+    
+    def test_sobol_indices_dnb2(self):
+        abs_tol,rel_tol = 5e-2,0
+        a,b = 7,0.1
+        indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
+        true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
+        for i in range(5):
+            si_ishigami = SensitivityIndices(Ishigami(DigitalNetB2(3),a,b),indices)
+            solution,data = CubQMCCLT(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
+            abs_error = abs(solution.squeeze()-true_solution)
+            success = (abs_error<abs_tol).all()
+            if success: break
+        self.assertTrue(success)
+    
+    def test_sobol_indices_lattice(self):
+        abs_tol,rel_tol = 5e-2,0
+        a,b = 7,0.1
+        indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
+        true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
+        for i in range(5):
+            si_ishigami = SensitivityIndices(Ishigami(Lattice(3),a,b),indices)
+            solution,data = CubQMCCLT(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
+            abs_error = abs(solution.squeeze()-true_solution)
+            success = (abs_error<abs_tol).all()
+            if success: break
+        self.assertTrue(success)
+    
+    def test_sobol_indices_halton(self):
+        abs_tol,rel_tol = 5e-2,0
+        a,b = 7,0.1
+        indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
+        true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
+        for i in range(5):
+            si_ishigami = SensitivityIndices(Ishigami(Halton(3),a,b),indices)
+            solution,data = CubQMCCLT(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
+            abs_error = abs(solution.squeeze()-true_solution)
+            success = (abs_error<abs_tol).all()
+            if success: break
+        self.assertTrue(success)
 
 
 class TestCubQMCLatticeG(unittest.TestCase):
@@ -104,14 +120,18 @@ class TestCubQMCLatticeG(unittest.TestCase):
         solution,data = CubQMCLatticeG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
-    def test_sobol_indices_qmc_lattice(self, dims=2):
-        dnb2 = Lattice(dimension=dims, seed=7)
-        keister_d = Keister(dnb2)
-        keister_indices = SobolIndices(keister_d, indices='singletons')
-        sc = CubQMCLatticeG(keister_indices, abs_tol=1e-3, ptransform='Baker')
-        solution, data = sc.integrate()
-        self.assertTrue(solution.shape, (dims, dims, 1))
-        solution = solution.squeeze()
+    def test_sobol_indices(self):
+        abs_tol,rel_tol = 1e-2,0
+        a,b = 7,0.1
+        indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
+        true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
+        for i in range(5):
+            si_ishigami = SensitivityIndices(Ishigami(Lattice(3),a,b),indices)
+            solution,data = CubQMCLatticeG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
+            abs_error = abs(solution.squeeze()-true_solution)
+            success = (abs_error<abs_tol).all()
+            if success: break
+        self.assertTrue(success)
 
 
 class TestCubQMCNetG(unittest.TestCase):
@@ -130,14 +150,18 @@ class TestCubQMCNetG(unittest.TestCase):
         solution,data = CubQMCNetG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
-    def test_sobol_indices_qmc_net(self, dims=2):
-        dnb2 = DigitalNetB2(dimension=dims, seed=7)
-        keister_d = Keister(dnb2)
-        keister_indices = SobolIndices(keister_d, indices='singletons')
-        sc = CubQMCNetG(keister_indices, abs_tol=1e-3)
-        solution, data = sc.integrate()
-        self.assertTrue(solution.shape, (dims, dims, 1))
-        solution = solution.squeeze()
+    def test_sobol_indices(self):
+        abs_tol,rel_tol = 1e-2,0
+        a,b = 7,0.1
+        indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
+        true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
+        for i in range(5):
+            si_ishigami = SensitivityIndices(Ishigami(DigitalNetB2(3),a,b),indices)
+            solution,data = CubQMCNetG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
+            abs_error = abs(solution.squeeze()-true_solution)
+            success = (abs_error<abs_tol).all()
+            if success: break
+        self.assertTrue(success)
 
 class TestCubBayesLatticeG(unittest.TestCase):
     """ Unit tests for CubBayesLatticeG StoppingCriterion. """
@@ -170,6 +194,19 @@ class TestCubBayesLatticeG(unittest.TestCase):
         print(abs(solution - solution_).max())
         self.assertTrue(solution.shape, (dims, dims, 1))
         self.assertTrue(abs(solution - solution_).max() < abs_tol)
+    
+    def test_sobol_indices(self):
+        abs_tol,rel_tol = 5e-2,0
+        a,b = 7,0.1
+        indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
+        true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
+        for i in range(5):
+            si_ishigami = SensitivityIndices(Ishigami(Lattice(3,order='linear'),a,b),indices)
+            solution,data = CubBayesLatticeG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol,order=1,ptransform='Baker',).integrate()
+            abs_error = abs(solution.squeeze()-true_solution)
+            success = (abs_error<abs_tol).all()
+            if success: break
+        self.assertTrue(success)
 
 
 class TestCubBayesNetG(unittest.TestCase):
@@ -188,26 +225,19 @@ class TestCubBayesNetG(unittest.TestCase):
         integrand = Keister(DigitalNetB2(dimension=2))
         solution, data = CubBayesNetG(integrand , n_init=2 ** 5, abs_tol=tol).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
-
-    def test_sobol_indices_bayes_net(self, dims=3, abs_tol=1e-2):
-        keister_d = Keister(DigitalNetB2(dimension=dims, seed=7))
-        keister_indices = SobolIndices(keister_d, indices='singletons')
-        sc = CubBayesNetG(keister_indices, abs_tol=abs_tol)
-        solution, data = sc.integrate()
-
-        keister_d2_ = Keister(Lattice(dimension=dims, seed=7))
-        keister_indices2_ = SobolIndices(keister_d2_, indices='singletons')
-        sc2_ = CubQMCLatticeG(keister_indices2_, abs_tol=abs_tol, ptransform='Baker')
-        solution2_, data2_ = sc2_.integrate()
-
-        keister_d_ = Keister(DigitalNetB2(dimension=dims, seed=7))
-        keister_indices_ = SobolIndices(keister_d_, indices='singletons')
-        sc_ = CubQMCNetG(keister_indices_, abs_tol=abs_tol)
-        solution_, data_ = sc_.integrate()
-
-        print(abs(solution - solution_).max(), abs(solution - solution2_).max())
-        self.assertTrue(solution.shape, (dims, dims, 1))
-        self.assertTrue(abs(solution - solution_).max() < abs_tol)
+    
+    def test_sobol_indices(self):
+        abs_tol,rel_tol = 5e-2,0
+        a,b = 7,0.1
+        indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
+        true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
+        for i in range(5):
+            si_ishigami = SensitivityIndices(Ishigami(DigitalNetB2(3),a,b),indices)
+            solution,data = CubBayesNetG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
+            abs_error = abs(solution.squeeze()-true_solution)
+            success = (abs_error<abs_tol).all()
+            if success: break
+        self.assertTrue(success)
 
 
 class TestCubMCL(unittest.TestCase):
