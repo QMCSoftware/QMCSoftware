@@ -298,7 +298,10 @@ class LDTransformBayesData(AccumulateData):
         if distribution == 'Lattice':
             temp = np.zeros((n, d))
             temp[0::2, :] = xun
-            temp[1::2, :] = xunnew
+            try:
+                temp[1::2, :] = xunnew
+            except Exception as e:
+                raise(e)
             xun = temp
             temp = np.zeros((n, d))
             temp[0::2, :] = x

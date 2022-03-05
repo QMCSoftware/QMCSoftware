@@ -69,6 +69,7 @@ class _CubBayesLDG(StoppingCriterion):
 
         self.data = LDTransformBayesData.__new__(LDTransformBayesData)
         self.data.flags_indv = np.tile(True, self.dprime)
+        prev_flags_indv = self.data.flags_indv
         self.data.m = np.tile(self.m_min, self.dprime)
         self.data.n_min = 0
         self.data.ci_low = np.tile(-np.inf, self.dprime)
@@ -91,7 +92,10 @@ class _CubBayesLDG(StoppingCriterion):
             for k in range(self.ncv):
                 ycvnext[1 + k] = self.cv[k].f(xnext, periodization_transform=self.ptransform,
                                               compute_flags=self.data.flags_indv)
+            # print(self.data.flags_indv)
             for j in np.ndindex(self.dprime):
+                if prev_flags_indv[j] == False and self.data.flags_indv[j] == True:
+                    assert not(prev_flags_indv[j] == False and self.data.flags_indv[j] == True), 'This cannot happen !'
                 if not self.data.flags_indv[j]:
                     continue
                 slice_yj = (0, slice(None),) + j
@@ -119,6 +123,7 @@ class _CubBayesLDG(StoppingCriterion):
             rem_error_high = abs(self.data.ci_comb_high - self.data.solution) - error_high
             self.data.flags_comb = np.maximum(rem_error_low, rem_error_high) >= 0
             self.data.flags_comb |= self.data.violated
+            prev_flags_indv = self.data.flags_indv
             self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
             self.data.n = 2 ** self.data.m
             self.data.n_total = self.data.n.max()
