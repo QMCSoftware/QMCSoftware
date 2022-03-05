@@ -1,6 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
-from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
+from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning, NotYetImplemented
 import numpy as np
 from time import time
 import warnings
@@ -95,7 +95,7 @@ class _CubBayesLDG(StoppingCriterion):
             # print(self.data.flags_indv)
             for j in np.ndindex(self.dprime):
                 if prev_flags_indv[j] == False and self.data.flags_indv[j] == True:
-                    assert not(prev_flags_indv[j] == False and self.data.flags_indv[j] == True), 'This cannot happen !'
+                    raise NotYetImplemented('_CubBayesLDG: Cannot resume data update: flags_indv[j] switched from False to True')
                 if not self.data.flags_indv[j]:
                     continue
                 slice_yj = (0, slice(None),) + j
