@@ -13,7 +13,7 @@ SPHINXBUILD ?= sphinx-build
 SOURCEDIR = sphinx
 BUILDDIR = sphinx/_build
 
-_doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) and $(nbdir) 
+_doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) and $(nbdir)
 	# Make Directries
 	@-rm -r -f $(mddir) 2>/dev/null &
 	@-rm -r -f $(nbdir) 2>/dev/null &
@@ -76,22 +76,23 @@ tests:
 	@echo "\nCode coverage"
 	python -m coverage report -m
 
+# "[command] | tee [logfile]" prints to both stdout and logfile
 workout:
 	# integration_examples
-	@python workouts/integration_examples/asian_option_multi_level.py > workouts/integration_examples/out/asian_option_multi_level.log
-	@python workouts/integration_examples/asian_option_single_level.py > workouts/integration_examples/out/asian_option_single_level.log
-	@python workouts/integration_examples/keister.py > workouts/integration_examples/out/keister.log
-	@python workouts/integration_examples/pi_problem.py > workouts/integration_examples/out/pi_problem.log
+	@python workouts/integration_examples/asian_option_multi_level.py | tee workouts/integration_examples/out/asian_option_multi_level.log
+	@python workouts/integration_examples/asian_option_single_level.py | tee workouts/integration_examples/out/asian_option_single_level.log
+	@python workouts/integration_examples/keister.py  | tee  workouts/integration_examples/out/keister.log
+	@python workouts/integration_examples/pi_problem.py | tee workouts/integration_examples/out/pi_problem.log
 	# mlmc
-	@python workouts/mlmc/mcqmc06.py > workouts/mlmc/out/mcqmc06.log
-	@python workouts/mlmc/european_option.py > workouts/mlmc/out/european_option.log
+	@python workouts/mlmc/mcqmc06.py | tee workouts/mlmc/out/mcqmc06.log
+	@python workouts/mlmc/european_option.py | tee workouts/mlmc/out/european_option.log
 	# lds_sequences
-	@python workouts/lds_sequences/python_sequences.py
+	@python workouts/lds_sequences/python_sequences.py | tee workouts/lds_sequences/out/python_sequences.log
 	# mc_vs_qmc
-	@python workouts/mc_vs_qmc/importance_sampling.py
-	@python workouts/mc_vs_qmc/vary_abs_tol.py
-	@python workouts/mc_vs_qmc/vary_dimension.py
+	@python workouts/mc_vs_qmc/importance_sampling.py | tee workouts/mc_vs_qmc/out/importance_sampling.log
+	@python workouts/mc_vs_qmc/vary_abs_tol.py | tee workouts/mc_vs_qmc/out/vary_abs_tol.log
+	@python workouts/mc_vs_qmc/vary_dimension.py | tee workouts/mc_vs_qmc/out/vary_dimension.log
 
-exportcondaenv: 
+exportcondaenv:
 	@-rm -f requirements/environment.yml 2>/dev/null &
 	@conda env export --no-builds | grep -v "^prefix: " > requirements/environment.yml
