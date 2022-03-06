@@ -14,7 +14,7 @@ Demos
 
     demo_rst/sample_scatter_plots.rst
 
-    demo_rst/mc_vs_qmc.rst
+    demo_rst/MC_vs_QMC.rst
 
     demo_rst/quasirandom_generators.rst
 
@@ -33,7 +33,7 @@ Demos
     demo_rst/some_true_measures.rst
 
     demo_rst/asian-option-mlqmc.rst
-    
+
     demo_rst/control_variates.rst
 
     demo_rst/elliptic-pde.rst

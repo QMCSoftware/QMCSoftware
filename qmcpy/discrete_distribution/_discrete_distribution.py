@@ -6,12 +6,12 @@ class DiscreteDistribution(object):
     """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
 
     def __init__(self, dimension, seed):
-        """ 
+        """
         Args:
-            dimension (int or ndarray): dimension of the generator. 
+            dimension (int or ndarray): dimension of the generator.
                 If an int is passed in, use sequence dimensions [0,...,dimensions-1].
-                If a ndarray is passed in, use these dimension indices in the sequence. 
-                    Note that this is not relevent for IID generators.
+                If a ndarray is passed in, use these dimension indices in the sequence.
+                Note that this is not relevant for IID generators.
             seed (int or numpy.random.SeedSequence): seed to create random number generator
         """
         prefix = 'A concrete implementation of DiscreteDistribution must have '
@@ -54,14 +54,14 @@ class DiscreteDistribution(object):
 
     def spawn(self, s=1, dimensions=None):
         """
-        Spawn new instances of the current discrete distribution but with new seeds and dimensions. 
+        Spawn new instances of the current discrete distribution but with new seeds and dimensions.
         Developed for multi-level and multi-replication (Q)MC algorithms.
-        
+
         Args:
             s (int): number of spawn
             dimensions (ndarray): length s array of dimension for each spawn. Defaults to current dimension
-        
-        Return: 
+
+        Return:
             list: list of DiscreteDistribution instances with new seeds and dimensions
         """
         if (isinstance(dimensions,list) or isinstance(dimensions,ndarray)) and len(dimensions)==s:
@@ -74,23 +74,23 @@ class DiscreteDistribution(object):
             raise ParameterError("invalid spawn dimensions, must be None, int, or length s ndarray")
         child_seeds = self._base_seed.spawn(s)
         return [self._spawn(child_seeds[i],dimensions[i]) for i in range(s)]
-    
+
     def _spawn(self, child_seed, dimension):
         """
         ABSTRACT METHOD, used by self.spawn
-        
+
         Args:
             child_seeds (numpy.random.SeedSequence): length s array of seeds for each spawn
             dimension (int): lenth s array of dimensions for each spawn
-        
-        Return: 
+
+        Return:
             DiscreteDistribution: spawn with new dimension using child_seed
         """
         raise MethodImplementationError(self, '_spawn')
-        
+
     def __repr__(self):
         return _univ_repr(self, "DiscreteDistribution", ['d']+self.parameters+['entropy','spawn_key'])
-    
+
     def __call__(self, *args, **kwargs):
         if len(args)>2 or len(args)==0:
             raise Exception('''

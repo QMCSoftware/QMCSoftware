@@ -42,7 +42,7 @@ class Lattice(DiscreteDistribution):
            [0.75, 0.25]])
 
     References:
-        
+
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang,
         Lluis Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel,
         Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
@@ -68,24 +68,24 @@ class Lattice(DiscreteDistribution):
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
-    def __init__(self, dimension=1, randomize=True, order='natural', seed=None, 
+    def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
         generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None):
         """
         Args:
-           dimension (int or ndarray): dimension of the generator. 
+            dimension (int or ndarray): dimension of the generator.
                 If an int is passed in, use sequence dimensions [0,...,dimensions-1].
-                If a ndarray is passed in, use these dimension indices in the sequence. 
-            randomize (bool): If True, apply shift to generated samples. \
+                If a ndarray is passed in, use these dimension indices in the sequence.
+            randomize (bool): If True, apply shift to generated samples.
                 Note: Non-randomized lattice sequence includes the origin.
             order (str): 'linear', 'natural', or 'mps' ordering.
             seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
-            generating_vector (ndarray or str): generating matrix or path to generating matricies. 
-                ndarray should have shape (d_max).  
-                a string generating_vector should be formatted like 
-                'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy' 
+            generating_vector (ndarray or str): generating matrix or path to generating matrices.
+                ndarray should have shape (d_max).
+                a string generating_vector should be formatted like
+                'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy'
             d_max (int): maximum dimension
             m_max (int): 2^m_max is the max number of supported samples
-        
+
         Note:
             d_max and m_max are required if generating_vector is a ndarray.
             If generating_vector is an string (path), d_max and m_max can be taken from the file name if None
@@ -99,7 +99,7 @@ class Lattice(DiscreteDistribution):
             self.gen = self._gail_linear
         elif self.order == 'mps':
             self.gen = self._mps
-        else: 
+        else:
             raise Exception("Lattice requires natural, linear, or mps ordering.")
         if isinstance(generating_vector,ndarray):
             self.z_og = generating_vector
@@ -125,7 +125,7 @@ class Lattice(DiscreteDistribution):
         super(Lattice,self).__init__(dimension,seed)
         self.z = self.z_og[self.dvec]
         self.shift = self.rng.uniform(size=int(self.d))
-    
+
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
@@ -174,11 +174,11 @@ class Lattice(DiscreteDistribution):
         cut2 = int(cut1+n_max-n_min)
         x = x_lat_full[cut1:cut2,:]
         return x
-    
+
     def _vdc(self,n):
         """
-        Van der Corput sequence in base 2 where n is a power of 2. We do it this 
-        way because of our own VDC construction: is much faster and cubLattice 
+        Van der Corput sequence in base 2 where n is a power of 2. We do it this
+        way because of our own VDC construction: is much faster and cubLattice
         does not need more.
         """
         k = log2(n)
@@ -207,8 +207,8 @@ class Lattice(DiscreteDistribution):
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
-            return_unrandomized (bool): return samples without randomization as 2nd return value. 
-                Will not be returned if randomize=False. 
+            return_unrandomized (bool): return samples without randomization as 2nd return value.
+                Will not be returned if randomize=False.
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples
@@ -240,7 +240,7 @@ class Lattice(DiscreteDistribution):
     def pdf(self, x):
         """ pdf of a standard uniform """
         return ones(x.shape[0], dtype=float)
-    
+
     def _spawn(self, child_seed, dimension):
         return Lattice(
                 dimension=dimension,
