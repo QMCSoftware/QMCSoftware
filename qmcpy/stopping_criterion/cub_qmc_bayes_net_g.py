@@ -50,24 +50,28 @@ class CubBayesNetG(_CubBayesLDG):
         graycode        0
         entropy         123456789
         spawn_key       ()
-        
-    Adapted from
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m
+
+    Adapted from 
+	`GAIL cubBayesNet_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m>`_.
+
 
     Reference
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
         Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
         GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
-        Available from http://gailgithub.github.io/GAIL_Dev/
+        Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
 
     Guarantee
         This algorithm attempts to calculate the integral of function f over the
-        hyperbox [0,1]^d to a prescribed error tolerance tolfun:= max(abstol,reltol*| I |)
+        hyperbox [0,1]^d to a prescribed error tolerance
+
+            tolfun:= max(abstol, reltol*| I |)
+
         with guaranteed confidence level, e.g., 99% when alpha=0.5%. If the
         algorithm terminates without showing any warning messages and provides
         an answer Q, then the following inequality would be satisfied:
 
-                Pr(| Q - I | <= tolfun) = 99%
+                Pr(| Q - I | <= tolfun) = 99%.
 
         This Bayesian cubature algorithm guarantees for integrands that are considered
         to be an instance of a gaussian process that fall in the middle of samples space spanned.

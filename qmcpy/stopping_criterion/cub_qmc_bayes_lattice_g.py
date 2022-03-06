@@ -1,13 +1,13 @@
 from ._cub_bayes_ld_g import _CubBayesLDG
-from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
+#from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Lattice
 from ..integrand import Keister
-from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
+from ..util import ParameterError#, ParameterWarning #MaxSamplesWarning,
 from numpy import log2
-from math import factorial
+#from math import factorial
 import numpy as np
-from time import time
-import warnings
+#from time import time
+#import warnings
 
 
 class CubBayesLatticeG(_CubBayesLDG):
@@ -15,7 +15,7 @@ class CubBayesLatticeG(_CubBayesLDG):
     Stopping criterion for Bayesian Cubature using rank-1 Lattice sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
-    
+
     >>> k = Keister(Lattice(2, order='linear', seed=123456789))
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
@@ -50,24 +50,25 @@ class CubBayesLatticeG(_CubBayesLDG):
         order           linear
         entropy         123456789
         spawn_key       ()
-    
-    Adapted from 
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m
+
+    Adapted from
+	`GAIL cubBayesLattice_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m>`_.
 
     Reference
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
-        Available from http://gailgithub.github.io/GAIL_Dev/
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
+	Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
 
     Guarantee
         This algorithm attempts to calculate the integral of function f over the
-        hyperbox [0,1]^d to a prescribed error tolerance tolfun:= max(abstol,reltol*| I |)
+        hyperbox [0,1]^d to a prescribed error tolerance tolfun:= max(abstol,
+        reltol*| I |)
         with guaranteed confidence level, e.g., 99% when alpha=0.5%. If the
         algorithm terminates without showing any warning messages and provides
         an answer Q, then the following inequality would be satisfied:
-     
-                Pr(| Q - I | <= tolfun) = 99%
+
+                Pr(| Q - I | <= tolfun) = 99%.
 
         This Bayesian cubature algorithm guarantees for integrands that are considered
         to be an instance of a gaussian process that fall in the middle of samples space spanned.
@@ -120,7 +121,6 @@ class CubBayesLatticeG(_CubBayesLDG):
         Fast Fourier Transform (FFT) ynext, combine with y, then FFT all points.
 
         Args:
-            y (ndarray): all previous samples
             ynext (ndarray): next samples
 
         Return:
@@ -178,7 +178,7 @@ class CubBayesLatticeG(_CubBayesLDG):
     def _shift_inv_kernel(self, xun, order, theta, avoid_cancel_error, kern_type, debug_enable):
         if kern_type == 1:
             b_order = order * 2  # Bernoulli polynomial order as per the equation
-            const_mult = -(-1) ** (b_order / 2) * ((2 * np.pi) ** b_order) / factorial(b_order)
+            #const_mult = -(-1) ** (b_order / 2) * ((2 * np.pi) ** b_order) / factorial(b_order)
             const_mult = -(-1) ** (b_order / 2)
             if b_order == 2:
                 bern_poly = lambda x: (-x * (1 - x) + 1 / 6)
