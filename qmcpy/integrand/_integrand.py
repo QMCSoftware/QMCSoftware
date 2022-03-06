@@ -2,7 +2,7 @@ from ..util import MethodImplementationError, _univ_repr, ParameterError
 from ..true_measure._true_measure import TrueMeasure
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from numpy import *
-import os 
+import os
 import multiprocessing
 from itertools import repeat
 
@@ -14,8 +14,8 @@ class Integrand(object):
         """
         Args:
             dprime (tuple): function output dimension shape.
-            parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion. 
-                Otherwise, parallel specifies the number of CPUs used by multiprocessing.Pool. 
+            parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion.
+                Otherwise, parallel specifies the number of CPUs used by multiprocessing.Pool.
                 Passing parallel=True sets the number of CPUs equal to os.cpu_count().
         """
         prefix = 'A concrete implementation of Integrand must have '
@@ -54,18 +54,19 @@ class Integrand(object):
             ndarray: n vector of function evaluations
         """
         raise MethodImplementationError(self, 'g')
-    
+
     def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
         """
         Evaluate transformed integrand based on true measures and discrete distribution
-        
+
         Args:
             x (ndarray): n x d array of samples from a discrete distribution
-            ptransform (str): periodization transform. 
+            periodization_transform (str): periodization transform
+            compute_flags (ndarray): TODO
             *args: other ordered args to g
             **kwargs (dict): other keyword args to g
-            
-        Return: 
+
+        Return:
             ndarray: length n vector of function evaluations
         """
         periodization_transform = 'NONE' if periodization_transform is None else periodization_transform.upper()
@@ -77,7 +78,7 @@ class Integrand(object):
                 Applying a periodization transform currently requires a discrete distribution 
                 that mimics a standard uniform measure.''')
         # periodization transform
-        if periodization_transform == 'NONE': 
+        if periodization_transform == 'NONE':
             xp = x
             wp = ones(n,dtype=float)
         elif periodization_transform == 'BAKER': # Baker's transform
@@ -85,7 +86,7 @@ class Integrand(object):
             wp = ones(n,dtype=float)
         elif periodization_transform == 'C0': # C^0 transform
             xp = 3 * x ** 2 - 2 * x ** 3
-            wp = prod(6 * x * (1 - x), 1)  
+            wp = prod(6 * x * (1 - x), 1)
         elif periodization_transform == 'C1': # C^1 transform
             xp = x ** 3 * (10 - 15 * x + 6 * x ** 2)
             wp = prod(30 * x ** 2 * (1 - x) ** 2, 1)
@@ -132,63 +133,63 @@ class Integrand(object):
             y = self._g2(t,comb_args=(args,kwargs))
         y = y.reshape((n,)+self.dprime)
         return y
-    
+
     def _g2(self,t,comb_args=((),{})):
         args = comb_args[0]
         kwargs = comb_args[1]
         t = atleast_2d(t)
-        if self.dprime==(1,): 
+        if self.dprime==(1,):
             kwargs = dict(kwargs)
             del kwargs['compute_flags']
         y = self.g(t,*args,**kwargs)
         return y
 
-
     def bound_fun(self, bound_low, bound_high):
         """
-        compute the bounds on the combined function based on bounds for the individual functions. 
-        Defaults to the identity where we essentially do not combine integrands,
-        but instead integrate each function individually.
+        Compute the bounds on the combined function based on bounds for the
+        individual functions. Defaults to the identity where we essentially
+        do not combine integrands, but instead integrate each function
+        individually.
 
         Args:
             bound_low (ndarray): length Integrand.dprime lower error bound
             bound_high (ndarray): length Integrand.dprime upper error bound
-        
+
         Return:
-            ndarray: lower bound on function combining estimates,
-            ndarray: upper bound on function combining estimates,
-            bool ndarray: flags to override sufficient combined integrand estimation.
-                e.g. when approximating a ratio of integrals, if the denominator's bounds straddle 0, 
-                then returning True here forces ratio to be flagged as insufficiently approximated.
+            (tuple) containing
+
+            - (ndarray): lower bound on function combining estimates
+            - (ndarray): upper bound on function combining estimates
+            - (ndarray): bool flags to override sufficient combined integrand estimation, e.g., when approximating a ratio of integrals, if the denominator's bounds straddle 0, then returning True here forces ratio to be flagged as insufficiently approximated.
         """
-        return bound_low,bound_high,False
+        return bound_low, bound_high, array([False])
 
     def dependency(self, flags_comb):
         """
         takes a vector of indicators of weather of not
-        the error bound is satisfied for combined integrands and which returns flags for individual integrands. 
-        For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio 
+        the error bound is satisfied for combined integrands and which returns flags for individual integrands.
+        For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio
         has not been approximated to within the tolerance, so the dependency function should return [True,True]
         indicating that both the numerator and denominator integrands need to be better approximated.
         Args:
             flags_comb (bool ndarray): flags indicating weather the combined integrals are insufficiently approximated
-        
+
         Return:
             (bool ndarray): length (Integrand.dprime) flags for individual integrands"""
         return flags_comb
 
     def _dimension_at_level(self, level):
         """
-        ABSTRACT METHOD to return the dimension of samples to generate at level l. 
-        This method only needs to be implemented for multi-level integrands where 
-        the dimension changes depending on the level. 
+        ABSTRACT METHOD to return the dimension of samples to generate at level l.
+        This method only needs to be implemented for multi-level integrands where
+        the dimension changes depending on the level.
 
-        Will default to return the current dimension (not using multilevel methods). 
+        Will default to return the current dimension (not using multilevel methods).
         Overwrite this method for multilevel integrands
-        
+
         Args:
             level (int): level at which to return the dimension
-        
+
         Return:
             int: dimension at input level
         """
@@ -199,11 +200,11 @@ class Integrand(object):
     def spawn(self, levels):
         """
         Spawn new instances of the current integrand at the specified levels.
-        
+
         Args:
             levels (ndarray): array of levels at which to spawn new integrands
-        
-        Return: 
+
+        Return:
             list: list of Integrands linked to newly spawned TrueMeasures and DiscreteDistributions
         """
         levels = array([levels]) if isscalar(levels) else array(levels)
@@ -217,16 +218,16 @@ class Integrand(object):
             tm_spawn = self.sampler.spawn(s=1,dimensions=[new_dim])[0]
             spawns[l] = self._spawn(level,tm_spawn)
         return spawns
-    
+
     def _spawn(self, level, tm_spawn):
         """
         ABSTRACT METHOD, used by self.spawn
-        
+
         Args:
-            level (numpy.random.SeedSequence): level at which to spawn new instance 
+            level (numpy.random.SeedSequence): level at which to spawn new instance
             tm_spawn (TrueMeasure): true measure spawn to use as new sampler
-        
-        Return: 
+
+        Return:
             Integrand: spawn at this level
         """
         raise MethodImplementationError(self, '_spawn')
