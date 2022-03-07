@@ -22,7 +22,7 @@ class CubBayesLatticeG(_CubBayesLDG):
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.808
-        indv_error      6.41e-04
+        indv_error      3.20e-04
         ci_low          1.808
         ci_high         1.809
         ci_comb_low     1.808

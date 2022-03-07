@@ -107,7 +107,7 @@ class _CubBayesLDG(StoppingCriterion):
                 # Update function values
                 success, muhat, r_order, err_bd, _ = self.datum[j].update_data(y_val_new=y_val, xnew=xnext, xunnew=xnext_un)
 
-                bounds = muhat + np.array([-1, 1]) * err_bd
+                bounds = muhat + np.array([-1, 1]) * err_bd/2
                 stop_flag[j], self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j] = \
                     success, muhat, bounds[0], bounds[1]
 

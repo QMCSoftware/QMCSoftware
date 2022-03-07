@@ -23,11 +23,11 @@ class CubBayesNetG(_CubBayesLDG):
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.812
-        indv_error      0.015
-        ci_low          1.796
-        ci_high         1.827
-        ci_comb_low     1.796
-        ci_comb_high    1.827
+        indv_error      0.008
+        ci_low          1.804
+        ci_high         1.819
+        ci_comb_low     1.804
+        ci_comb_high    1.819
         flags_comb      0
         flags_indv      0
         n_total         2^(8)
