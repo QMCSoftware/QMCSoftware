@@ -17,8 +17,8 @@ class SobolIndices(Integrand):
     >>> sc = CubQMCNetG(keister_indices,abs_tol=1e-3)
     >>> solution,data = sc.integrate()
     >>> solution.squeeze()
-    array([[0.32805051, 0.3279677 , 0.32808771],
-           [0.3388433 , 0.33857474, 0.33883778]])
+    array([[0.32803639, 0.32795358, 0.32807359],
+           [0.33884667, 0.33857811, 0.33884115]])
     >>> data
     LDTransformData (AccumulateData Object)
         solution        [[0.328 0.328 0.328]
@@ -26,16 +26,22 @@ class SobolIndices(Integrand):
         indv_error      [[0.002 0.002 0.002]
                         [0.002 0.002 0.002]
                         [0.    0.    0.   ]
+                        [0.    0.    0.   ]
+                        [0.001 0.001 0.001]
                         [0.003 0.003 0.003]]
         ci_low          [[1.67  1.67  1.671]
                         [1.725 1.724 1.725]
                         [2.168 2.168 2.168]
+                        [2.168 2.168 2.168]
+                        [9.799 9.799 9.799]
                         [9.797 9.797 9.797]]
         ci_high         [[1.675 1.674 1.675]
                         [1.73  1.729 1.73 ]
                         [2.168 2.168 2.168]
+                        [2.169 2.169 2.169]
+                        [9.802 9.802 9.802]
                         [9.803 9.803 9.803]]
-        ci_comb_low     [[0.327 0.327 0.327]
+        ci_comb_low     [[0.327 0.327 0.328]
                         [0.338 0.338 0.338]]
         ci_comb_high    [[0.329 0.329 0.329]
                         [0.34  0.339 0.34 ]]
@@ -44,9 +50,13 @@ class SobolIndices(Integrand):
         flags_indv      [[False False False]
                         [False False False]
                         [False False False]
+                        [False False False]
+                        [False False False]
                         [False False False]]
         n_total         2^(16)
         n               [[65536. 65536. 65536.]
+                        [32768. 32768. 32768.]
+                        [65536. 65536. 65536.]
                         [32768. 32768. 32768.]
                         [65536. 65536. 65536.]
                         [32768. 32768. 32768.]]
@@ -104,7 +114,7 @@ class SobolIndices(Integrand):
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib.spawn(s=1,dimensions=[self.dtilde])[0]
         self.sampler = self.integrand.sampler
-        dprime = (4,self.s,)+self.integrand.dprime
+        dprime = (6,self.s,)+self.integrand.dprime
         super(SobolIndices,self).__init__(dprime,parallel=False)
     
     def f(self, x, *args, **kwargs):
@@ -130,7 +140,9 @@ class SobolIndices(Integrand):
             y[:,0,k] = f_x*(f_v-f_z) # A.18
             y[:,1,k] = (f_z-f_v)**2/2 # A.16
             y[:,2,k] = f_x # mu
-            y[:,3,k] = f_x**2 # sigma^2+mu^2
+            y[:,3,k] = f_x # mu copy
+            y[:,4,k] = f_x**2 # sigma^2+mu^2
+            y[:,5,k] = f_x**2 # sigma^2+mu^2 copy
         return y
     
     def _spawn(self, level, sampler):
@@ -140,8 +152,8 @@ class SobolIndices(Integrand):
             indices = self.indices)
     
     def bound_fun(self, bound_low, bound_high):
-        tau_low,mu_low,f2_low = bound_low[:2],bound_low[2],bound_low[3]
-        tau_high,mu_high,f2_high = bound_high[:2],bound_high[2],bound_high[3]
+        tau_low,mu_low,f2_low = bound_low[:2],bound_low[2:4],bound_low[4:6]
+        tau_high,mu_high,f2_high = bound_high[:2],bound_high[2:4],bound_high[4:6]
         sigma2_low1,sigma2_low2 = f2_high-mu_low**2,f2_high-mu_high**2
         comb_bounds_low = minimum.reduce([tau_low/sigma2_low1,tau_low/sigma2_low2])
         comb_bounds_low = minimum.reduce([ones(tau_low.shape),maximum.reduce([zeros(tau_low.shape),comb_bounds_low])])
@@ -154,7 +166,8 @@ class SobolIndices(Integrand):
     def dependency(self, flags_comb):
         individual_flags = zeros(self.dprime,dtype=bool)
         individual_flags[:2] = flags_comb # numerator
-        individual_flags[2:] = flags_comb 
+        individual_flags[2:4] = flags_comb # copy to mu flags
+        individual_flags[4:6] = flags_comb # copy to second moment flags
         return individual_flags
 
 class SensitivityIndices(SobolIndices): pass

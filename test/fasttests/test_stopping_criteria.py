@@ -68,7 +68,7 @@ class TestCubQMCCLT(unittest.TestCase):
         a,b = 7,0.1
         indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
         true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
-        for i in range(5):
+        for i in range(3):
             si_ishigami = SensitivityIndices(Ishigami(DigitalNetB2(3),a,b),indices)
             solution,data = CubQMCCLT(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
             abs_error = abs(solution.squeeze()-true_solution)
@@ -81,7 +81,7 @@ class TestCubQMCCLT(unittest.TestCase):
         a,b = 7,0.1
         indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
         true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
-        for i in range(5):
+        for i in range(3):
             si_ishigami = SensitivityIndices(Ishigami(Lattice(3),a,b),indices)
             solution,data = CubQMCCLT(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
             abs_error = abs(solution.squeeze()-true_solution)
@@ -94,7 +94,7 @@ class TestCubQMCCLT(unittest.TestCase):
         a,b = 7,0.1
         indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
         true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
-        for i in range(5):
+        for i in range(3):
             si_ishigami = SensitivityIndices(Ishigami(Halton(3),a,b),indices)
             solution,data = CubQMCCLT(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
             abs_error = abs(solution.squeeze()-true_solution)
@@ -125,7 +125,7 @@ class TestCubQMCLatticeG(unittest.TestCase):
         a,b = 7,0.1
         indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
         true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
-        for i in range(5):
+        for i in range(3):
             si_ishigami = SensitivityIndices(Ishigami(Lattice(3),a,b),indices)
             solution,data = CubQMCLatticeG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
             abs_error = abs(solution.squeeze()-true_solution)
@@ -155,7 +155,7 @@ class TestCubQMCNetG(unittest.TestCase):
         a,b = 7,0.1
         indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
         true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
-        for i in range(5):
+        for i in range(3):
             si_ishigami = SensitivityIndices(Ishigami(DigitalNetB2(3),a,b),indices)
             solution,data = CubQMCNetG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
             abs_error = abs(solution.squeeze()-true_solution)
@@ -191,7 +191,6 @@ class TestCubBayesLatticeG(unittest.TestCase):
         sc = CubBayesLatticeG(keister_indices, order=1, abs_tol=abs_tol, ptransform='Baker')
         solution, data = sc.integrate()
 
-        print(abs(solution - solution_).max())
         self.assertTrue(solution.shape, (dims, dims, 1))
         self.assertTrue(abs(solution - solution_).max() < abs_tol)
     
@@ -200,9 +199,9 @@ class TestCubBayesLatticeG(unittest.TestCase):
         a,b = 7,0.1
         indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
         true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
-        for i in range(5):
+        for i in range(3):
             si_ishigami = SensitivityIndices(Ishigami(Lattice(3,order='linear'),a,b),indices)
-            solution,data = CubBayesLatticeG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol,order=1,ptransform='Baker',).integrate()
+            solution,data = CubBayesLatticeG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol,order=1,ptransform='Baker').integrate()
             abs_error = abs(solution.squeeze()-true_solution)
             success = (abs_error<abs_tol).all()
             if success: break
@@ -231,7 +230,7 @@ class TestCubBayesNetG(unittest.TestCase):
         a,b = 7,0.1
         indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
         true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
-        for i in range(5):
+        for i in range(3):
             si_ishigami = SensitivityIndices(Ishigami(DigitalNetB2(3),a,b),indices)
             solution,data = CubBayesNetG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
             abs_error = abs(solution.squeeze()-true_solution)
