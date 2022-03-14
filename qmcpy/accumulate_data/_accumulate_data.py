@@ -7,18 +7,6 @@ class AccumulateData(object):
     def __init__(self):
         """ Initialize data instance """
         prefix = 'A concrete implementation of AccumulateData must have '
-        if not hasattr(self,'stopping_crit'):
-            raise ParameterError(prefix + 'self.stopping_crit (a StoppingCriterion)')
-        if not hasattr(self,'integrand'):
-            raise ParameterError(prefix + 'self.integrand (an Integrand)')
-        if not hasattr(self,'true_measure'):
-            raise ParameterError(prefix + 'self.true_measure (a TrueMeasure)')
-        if not hasattr(self,'discrete_distrib'):
-            raise ParameterError(prefix + 'self.discrete_distrib (a DiscreteDistribution)')
-        if not hasattr(self, 'solution'):
-            raise ParameterError(prefix + 'self.solution')
-        if not hasattr(self, 'n_total'):
-            raise ParameterError(prefix + 'self.n_total (total number of samples)')
         if not hasattr(self,'parameters'):
             self.parameters = []
 

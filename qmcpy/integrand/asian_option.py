@@ -83,8 +83,7 @@ class AsianOption(Integrand):
             self.leveltype = 'single'
             self.parent = False
             self.parameters += ['dim_frac']
-        self.dprime = 1
-        super(AsianOption,self).__init__(parallel=False)    
+        super(AsianOption,self).__init__(dprime=1,parallel=False)    
 
     def _get_discounted_payoffs(self, stock_path, dimension):
         """

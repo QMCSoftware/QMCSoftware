@@ -1,12 +1,12 @@
-from ._cub_qmc_ld_g import CubQMCLDG
+from ._cub_qmc_ld_g import _CubQMCLDG
 from ..discrete_distribution import Lattice
-from ..true_measure import Gaussian
-from ..integrand import Keister
+from ..true_measure import Gaussian, Uniform
+from ..integrand import Keister, BoxIntegral, CustomFun
 from ..util import ParameterError
 from numpy import *
 
 
-class CubQMCLatticeG(CubQMCLDG):
+class CubQMCLatticeG(_CubQMCLDG):
     r"""
     Stopping Criterion quasi-Monte Carlo method using rank-1 Lattices cubature over
     a d-dimensional region to integrate within a specified generalized error
@@ -18,8 +18,15 @@ class CubQMCLatticeG(CubQMCLDG):
     >>> data
     LDTransformData (AccumulateData Object)
         solution        1.810
-        error_bound     0.005
+        indv_error      0.005
+        ci_low          1.806
+        ci_high         1.815
+        ci_comb_low     1.806
+        ci_comb_high    1.815
+        flags_comb      0
+        flags_indv      0
         n_total         2^(10)
+        n               2^(10)
         time_integrate  ...
     CubQMCLatticeG (StoppingCriterion Object)
         abs_tol         0.050
@@ -34,6 +41,60 @@ class CubQMCLatticeG(CubQMCLDG):
     Lattice (DiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
+        randomize       1
+        order           natural
+        entropy         7
+        spawn_key       ()
+    >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
+    >>> abs_tol = 1e-3
+    >>> sc = CubQMCLatticeG(f, abs_tol=abs_tol)
+    >>> solution,data = sc.integrate()
+    >>> solution
+    array([1.18954582, 0.96056304])
+    >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
+    >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
+    >>> true_value = array([sol3neg1,sol31])
+    >>> (abs(true_value-solution)<abs_tol).all()
+    True
+    >>> cf = CustomFun(
+    ...     true_measure = Uniform(Lattice(6,seed=7)),
+    ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
+    ...     dprime = (2,3))
+    >>> sol,data = CubQMCLatticeG(cf,abs_tol=1e-6).integrate()
+    >>> data
+    LDTransformData (AccumulateData Object)
+        solution        [[1. 2. 3.]
+                        [4. 5. 6.]]
+        indv_error      [[9.658e-07 4.835e-07 7.244e-07]
+                        [9.655e-07 3.017e-07 3.625e-07]]
+        ci_low          [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_high         [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_comb_low     [[1. 2. 3.]
+                        [4. 5. 6.]]
+        ci_comb_high    [[1. 2. 3.]
+                        [4. 5. 6.]]
+        flags_comb      [[False False False]
+                        [False False False]]
+        flags_indv      [[False False False]
+                        [False False False]]
+        n_total         2^(15)
+        n               [[ 8192. 16384. 16384.]
+                        [16384. 32768. 32768.]]
+        time_integrate  ...
+    CubQMCLatticeG (StoppingCriterion Object)
+        abs_tol         1.00e-06
+        rel_tol         0
+        n_init          2^(10)
+        n_max           2^(35)
+    CustomFun (Integrand Object)
+    Uniform (TrueMeasure Object)
+        lower_bound     0
+        upper_bound     1
+    Lattice (DiscreteDistribution Object)
+        d               6
+        dvec            [0 1 2 3 4 5]
         randomize       1
         order           natural
         entropy         7
@@ -71,7 +132,8 @@ class CubQMCLatticeG(CubQMCLDG):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
-        fudge=lambda m: 5.*2.**(-m), check_cone=False, ptransform='Baker'):
+        fudge=lambda m: 5.*2.**(-m), check_cone=False, ptransform='Baker',
+        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -83,6 +145,9 @@ class CubQMCLatticeG(CubQMCLDG):
                               sum of Fast Fourier coefficients specified 
                               in the cone of functions
             check_cone (boolean): check if the function falls in the cone
+            error_fun: function taking in the approximate solution vector, 
+                absolute tolerance, and relative tolerance which returns the approximate error. 
+                Default indicates integration until either absolute OR relative tolerance is satisfied.
         """
         super(CubQMCLatticeG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,check_cone,
             control_variates = [],
@@ -92,7 +157,8 @@ class CubQMCLatticeG(CubQMCLDG):
             coefv = lambda nl: exp(-2*pi*1j*arange(nl)/(2*nl)), 
             allowed_levels = ['single'],
             allowed_distribs = [Lattice],
-            cast_complex = True)
+            cast_complex = True,
+            error_fun = error_fun)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
         if self.discrete_distrib.order != 'natural':
