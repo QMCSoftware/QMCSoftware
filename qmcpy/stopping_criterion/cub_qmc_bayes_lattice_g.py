@@ -1,29 +1,36 @@
-from ._stopping_criterion import StoppingCriterion
-from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
+from ._cub_bayes_ld_g import _CubBayesLDG
+#from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Lattice
 from ..integrand import Keister
-from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
+from ..util import ParameterError#, ParameterWarning #MaxSamplesWarning,
 from numpy import log2
-from math import factorial
+#from math import factorial
 import numpy as np
-from time import time
-import warnings
+#from time import time
+#import warnings
 
 
-class CubBayesLatticeG(StoppingCriterion):
+class CubBayesLatticeG(_CubBayesLDG):
     """
     Stopping criterion for Bayesian Cubature using rank-1 Lattice sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
-    
+
     >>> k = Keister(Lattice(2, order='linear', seed=123456789))
     >>> sc = CubBayesLatticeG(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.808
-        error_bound     7.37e-04
-        n_total         256
+        indv_error      3.20e-04
+        ci_low          1.808
+        ci_high         1.809
+        ci_comb_low     1.808
+        ci_comb_high    1.809
+        flags_comb      0
+        flags_indv      0
+        n_total         2^(8)
+        n               2^(8)
         time_integrate  ...
     CubBayesLatticeG (StoppingCriterion Object)
         abs_tol         0.050
@@ -43,24 +50,25 @@ class CubBayesLatticeG(StoppingCriterion):
         order           linear
         entropy         123456789
         spawn_key       ()
-    
-    Adapted from 
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m
+
+    Adapted from
+	`GAIL cubBayesLattice_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m>`_.
 
     Reference
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
-        Available from http://gailgithub.github.io/GAIL_Dev/
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
+	Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
 
     Guarantee
         This algorithm attempts to calculate the integral of function f over the
-        hyperbox [0,1]^d to a prescribed error tolerance tolfun:= max(abstol,reltol*| I |)
+        hyperbox [0,1]^d to a prescribed error tolerance tolfun:= max(abstol,
+        reltol*| I |)
         with guaranteed confidence level, e.g., 99% when alpha=0.5%. If the
         algorithm terminates without showing any warning messages and provides
         an answer Q, then the following inequality would be satisfied:
-     
-                Pr(| Q - I | <= tolfun) = 99%
+
+                Pr(| Q - I | <= tolfun) = 99%.
 
         This Bayesian cubature algorithm guarantees for integrands that are considered
         to be an instance of a gaussian process that fall in the middle of samples space spanned.
@@ -69,35 +77,26 @@ class CubBayesLatticeG(StoppingCriterion):
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
     """
+
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin'):
+                 n_init=2 ** 8, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin',
+                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
+
+        super(CubBayesLatticeG, self).__init__(integrand, fbt=self._fft, merge_fbt=self._merge_fft,
+                                               ptransform=ptransform,
+                                               allowed_distribs=[Lattice],
+                                               kernel=self._shift_inv_kernel,
+                                               abs_tol=abs_tol, rel_tol=rel_tol,
+                                               n_init=n_init, n_max=n_max, alpha=alpha, error_fun=error_fun)
+
         self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max', 'order']
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
-        m_min = log2(n_init)
-        m_max = log2(n_max)
-        if m_min % 1 != 0. or m_min < 5 or m_max % 1 != 0:
-            warning_s = '''
-                n_init and n_max must be a powers of 2.
-                n_init must be >= 2^8.
-                Using n_init = 2^8 and n_max=2^22.'''
-            warnings.warn(warning_s, ParameterWarning)
-            m_min = 8
-            m_max = 22
-        self.m_min = m_min
-        self.m_max = m_max
-        self.n_init = n_init  # number of samples to start with = 2^mmin
-        self.n_max = n_max  # max number of samples allowed = 2^mmax
-        self.alpha = alpha  # p-value, default 0.1%.
         self.order = order  # Bernoulli kernel's order. If zero, choose order automatically
 
         self.use_gradient = False  # If true uses gradient descent in parameter search
-        self.one_theta = False  # If true use common shape parameter for all dimensions
+        self.one_theta = True  # If true use common shape parameter for all dimensions
         # else allow shape parameter vary across dimensions
         self.ptransform = ptransform  # periodization transform
-        self.stop_at_tol = True  # automatic mode: stop after meeting the error tolerance
-        self.arb_mean = True  # by default use zero mean algorithm
         self.errbd_type = 'MLE'  # Available options {'MLE', 'GCV', 'full'}
 
         # private properties
@@ -105,58 +104,11 @@ class CubBayesLatticeG(StoppingCriterion):
         # GCV - Generalized cross validation
         self.kernType = 1  # Type-1: Bernoulli polynomial based algebraic convergence, Type-2: Truncated series
 
-        self.avoid_cancel_error = True  # avoid cancellation error in stopping criterion
-        self.debug_enable = False  # enable debug prints
-        self.data = None
-
-        # QMCPy Objs
-        self.integrand = integrand
-        self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.integrand.discrete_distrib
-        
-        # Verify Compliant Construction
-        allowed_levels = ['single']
-        allowed_distribs = [Lattice]
-        allow_vectorized_integrals = False
-        super(CubBayesLatticeG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
-
         if self.discrete_distrib.randomize == False:
             raise ParameterError("CubBayesLattice_g requires discrete_distrib to have randomize=True")
         if self.discrete_distrib.order != 'linear':
             raise ParameterError("CubBayesLattice_g requires discrete_distrib to have order='linear'")
 
-    # computes the integral
-    def integrate(self):
-        # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.m_min, self.m_max, self._fft, self._merge_fft, self.kernel)
-        tstart = time()  # start the timer
-
-        # Iteratively find the number of points required for the cubature to meet
-        # the error threshold
-        while True:
-            # Update function values
-            xun_, ftilde_, m = self.data.update_data()
-            stop_flag, muhat, order_, err_bnd = self.data.stopping_criterion(xun_, ftilde_, m)
-
-            # if stop_at_tol true, exit the loop
-            # else, run for for all 'n' values.
-            # Used to compute error values for 'n' vs error plotting
-            if self.stop_at_tol and stop_flag:
-                break
-
-            if m >= self.m_max:
-                warnings.warn('''
-                    Already used maximum allowed sample size %d.
-                    Note that error tolerances may no longer be satisfied.'''%(2**self.m_max),
-                    MaxSamplesWarning)
-                break
-
-        self.data.time_integrate = time() - tstart
-        # Approximate integral
-        self.data.solution = muhat
-
-        return muhat, self.data
 
     @staticmethod
     def _fft(y):
@@ -169,7 +121,6 @@ class CubBayesLatticeG(StoppingCriterion):
         Fast Fourier Transform (FFT) ynext, combine with y, then FFT all points.
 
         Args:
-            y (ndarray): all previous samples
             ynext (ndarray): next samples
 
         Return:
@@ -223,10 +174,11 @@ class CubBayesLatticeG(StoppingCriterion):
     Lambda : eigen values of the covariance matrix
     Lambda_ring = fft(C1 - 1)
     '''
-    def kernel(self, xun, order, theta, avoid_cancel_error, kern_type, debug_enable):
+
+    def _shift_inv_kernel(self, xun, order, theta, avoid_cancel_error, kern_type, debug_enable):
         if kern_type == 1:
             b_order = order * 2  # Bernoulli polynomial order as per the equation
-            const_mult = -(-1) ** (b_order / 2) * ((2 * np.pi) ** b_order) / factorial(b_order)
+            #const_mult = -(-1) ** (b_order / 2) * ((2 * np.pi) ** b_order) / factorial(b_order)
             const_mult = -(-1) ** (b_order / 2)
             if b_order == 2:
                 bern_poly = lambda x: (-x * (1 - x) + 1 / 6)
@@ -253,7 +205,7 @@ class CubBayesLatticeG(StoppingCriterion):
             vec_lambda_ring = np.real(CubBayesLatticeG._fft(vec_C1m1))
 
             vec_lambda = vec_lambda_ring.copy()
-            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring)/lambda_factor
+            vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring) / lambda_factor
 
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
