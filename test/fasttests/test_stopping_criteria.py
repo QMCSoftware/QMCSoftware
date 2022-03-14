@@ -202,14 +202,7 @@ class TestCubBayesLatticeG(unittest.TestCase):
         success = False
         for i in range(3):
             si_ishigami = SensitivityIndices(Ishigami(Lattice(3,order='linear'),a,b),indices)
-            try:
-                solution,data = CubBayesLatticeG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol,order=1,ptransform='Baker').integrate()
-            except NotYetImplemented as e:
-                print(e)
-                continue
-            except MaxSamplesWarning as e:
-                print(e)
-                continue
+            solution,data = CubBayesLatticeG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol,order=1,ptransform='Baker').integrate()
             abs_error = abs(solution.squeeze()-true_solution)
             success = (abs_error<abs_tol).all()
             if success: break
@@ -240,11 +233,7 @@ class TestCubBayesNetG(unittest.TestCase):
         true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
         for i in range(3):
             si_ishigami = SensitivityIndices(Ishigami(DigitalNetB2(3),a,b),indices)
-            try:
-                solution,data = CubBayesNetG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
-            except MaxSamplesWarning as e:
-                print(e)
-                continue
+            solution,data = CubBayesNetG(si_ishigami,abs_tol=abs_tol,rel_tol=rel_tol).integrate()
             abs_error = abs(solution.squeeze()-true_solution)
             success = (abs_error<abs_tol).all()
             if success: break
