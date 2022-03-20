@@ -7,6 +7,7 @@
 mddir = sphinx/readme_rst/
 nbdir = sphinx/demo_rst/
 umldir = sphinx/uml/
+pfdir = profile/
 nbconvertcmd = jupyter nbconvert --to rst --output-dir='$(nbdir)'
 SPHINXOPTS  ?= -W --keep-going
 SPHINXBUILD ?= sphinx-build
@@ -96,3 +97,24 @@ workout:
 exportcondaenv:
 	@-rm -f requirements/environment.yml 2>/dev/null &
 	@conda env export --no-builds | grep -v "^prefix: " > requirements/environment.yml
+
+profile:
+	# profile workouts
+	@for f in workouts/*/[a-zA-Z]*.py; do \
+	echo "#\tProfiling $$f"; \
+	python -m cProfile -o $$f.prof $$f ; \
+	done
+	# move .prof files for workouts to $(pfdir)
+	rm -r -f $(pfdir) ;
+	mkdir $(pfdir) ;
+	find workouts -type f -name '*.prof' -exec mv -i {} $(pfdir) \;
+	# profile tests
+	echo "#\tProfiling tests";
+	python -m cProfile -o $(pfdir)/doctest.prof  -m coverage run --source=./ -m pytest --doctest-modules --disable-pytest-warnings qmcpy ;
+	python -m cProfile -o $(pfdir)/fasttest.prof -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null ;
+	python -m cProfile -o $(pfdir)/longtest.prof -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null ;
+
+
+
+
+
