@@ -43,12 +43,16 @@ class Integrand(object):
             raise ParameterError("The range of the composed transform is not compatibe with this true measure")
         self.EPS = finfo(float).eps
 
-    def g(self, t, *args, **kwargs):
+    def g(self, t, compute_flags=None, *args, **kwargs):
         """
         ABSTRACT METHOD for original integrand to be integrated.
 
         Args:
             t (ndarray): n x d array of samples to be input into original integrand.
+            compute_flags (ndarray): outputs that require computation. 
+                For example, if the vector function has 3 outputs and compute_flags = [False, True, False], 
+                then the function is only required to compute the second output and may leave the remaining outputs as e.g. 0. 
+                The False outputs will not be used in the computation since those integrals have been sufficiently approximated.
 
         Return:
             ndarray: n vector of function evaluations
@@ -62,7 +66,10 @@ class Integrand(object):
         Args:
             x (ndarray): n x d array of samples from a discrete distribution
             periodization_transform (str): periodization transform
-            compute_flags (ndarray): TODO
+            compute_flags (ndarray): outputs that require computation. 
+                For example, if the vector function has 3 outputs and compute_flags = [False, True, False], 
+                then the function is only required to compute the second output and may leave the remaining outputs as e.g. 0. 
+                The False outputs will not be used in the computation since those integrals have been sufficiently approximated.
             *args: other ordered args to g
             **kwargs (dict): other keyword args to g
 
