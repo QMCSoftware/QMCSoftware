@@ -5,7 +5,7 @@ from numpy import *
 import os
 import multiprocessing
 from itertools import repeat
-
+from numba import jit
 
 class Integrand(object):
     """ Integrand abstract class. DO NOT INSTANTIATE. """
@@ -119,7 +119,13 @@ class Integrand(object):
             gvals = self._g(xtf,compute_flags,*args,**kwargs)
             for i in range(n): y[i] = gvals[i]*weight[i]/pdf[i]*jacobians[i]
         # account for periodization weight
-        for i in range(n): y[i] = y[i]*wp[i]
+        @jit
+        def f(y, wp):
+            for i in range(n): y[i] = y[i]*wp[i]
+            return y
+
+        y = f(y, wp)
+
         return y
 
     def _g(self,t,compute_flags,*args,**kwargs):
