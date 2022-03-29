@@ -1,7 +1,8 @@
-name: qmcpy
+name: base
 channels:
   - umontreal-simul
   - conda-forge
+  - anaconda-fusion
   - defaults
 dependencies:
   - appmode=0.8.0
@@ -12,22 +13,35 @@ dependencies:
   - backports=1.0
   - backports.functools_lru_cache=1.6.4
   - beautifulsoup4=4.10.0
+  - brotli=1.0.9
+  - brotli-bin=1.0.9
   - brotlipy=0.7.0
   - bzip2=1.0.8
-  - ca-certificates=2021.5.30
+  - ca-certificates=2021.10.8
   - colorama=0.4.4
   - conda=4.10.3
   - conda-build=3.21.4
   - conda-package-handling=1.7.3
   - cycler=0.10.0
+  - dbus=1.13.6
+  - debugpy=1.5.1
   - entrypoints=0.3
   - expat=2.4.1
   - filelock=3.3.0
+  - fonttools=4.29.1
   - freetype=2.10.4
+  - gettext=0.19.8.1
+  - glib=2.58.3
   - glob2=0.7
+  - icu=58.2
+  - importlib_resources=5.4.0
   - ipython_genutils=0.2.0
   - jbig=2.1
   - jpeg=9d
+  - jupyter=1.0.0
+  - jupyter_client=7.1.2
+  - jupyter_console=6.4.0
+  - jupyter_core=4.9.2
   - jupyterlab_pygments=0.1.2
   - jupyterlab_widgets=1.0.2
   - latnetbuilder=2.1.1
@@ -35,6 +49,9 @@ dependencies:
   - lerc=2.2.1
   - libarchive=3.3.3
   - libblas=3.9.0
+  - libbrotlicommon=1.0.9
+  - libbrotlidec=1.0.9
+  - libbrotlienc=1.0.9
   - libcblas=3.9.0
   - libcxx=12.0.1
   - libdeflate=1.7
@@ -52,8 +69,11 @@ dependencies:
   - libzlib=1.2.11
   - llvm-openmp=12.0.1
   - lz4-c=1.9.3
+  - matplotlib=3.5.1
+  - matplotlib-base=3.5.1
   - matplotlib-inline=0.1.3
   - mistune=0.8.4
+  - munkres=1.1.4
   - nbclient=0.5.4
   - ncurses=6.2
   - nest-asyncio=1.5.1
@@ -61,30 +81,39 @@ dependencies:
   - olefile=0.46
   - openjpeg=2.4.0
   - openssl=1.0.2u
+  - pcre=8.45
   - pexpect=4.8.0
   - pickleshare=0.7.5
   - pillow=8.3.2
   - pip=21.2.4
+  - prometheus_client=0.13.1
+  - prompt_toolkit=3.0.27
   - psutil=5.8.0
   - py-lief=0.11.5
   - pycosat=0.6.3
   - pycparser=2.20
   - pyopenssl=19.0.0
   - pyparsing=2.4.7
+  - pyqt=5.9.2
   - pysocks=1.7.1
   - python=3.7.0
   - python-libarchive-c=3.1
   - python_abi=3.7
   - pyyaml=5.4.1
+  - qt=5.9.7
+  - qtconsole-base=5.2.2
   - readline=7.0
   - requests=2.25.1
   - ripgrep=13.0.0
   - ruamel_yaml=0.15.80
   - setuptools=58.2.0
+  - sip=4.19.8
   - soupsieve=2.0.1
   - sqlite=3.28.0
   - tk=8.6.11
   - tornado=6.1
+  - typing_extensions=4.1.1
+  - unicodedata2=14.0.0
   - webencodings=0.5.1
   - wheel=0.37.0
   - widgetsnbextension=3.5.1
@@ -111,7 +140,6 @@ dependencies:
     - decorator==4.4.2
     - defusedxml==0.6.0
     - docutils==0.16
-    - fonttools==4.29.1
     - future==0.18.2
     - idna==2.9
     - imagesize==1.2.0
@@ -126,21 +154,23 @@ dependencies:
     - jinja2==2.11.3
     - joblib==1.1.0
     - jsonschema==3.2.0
-    - jupyter==1.0.0
     - jupyter-client==6.1.5
     - jupyter-console==6.1.0
     - jupyter-core==4.6.3
     - keyring==21.2.1
     - kiwisolver==1.2.0
     - lazy-object-proxy==1.6.0
+    - line-profiler==3.5.0
+    - llvmlite==0.38.0
     - markdown==3.2.2
     - markupsafe==2.0.1
-    - matplotlib==3.5.1
     - mccabe==0.6.1
+    - memory-profiler==0.59.0
     - more-itertools==8.4.0
     - nbconvert==5.6.1
     - nbformat==5.0.6
     - notebook==6.4.1
+    - numba==0.55.1
     - numpy==1.21.1
     - packaging==20.4
     - pandas==1.0.3
@@ -176,6 +206,7 @@ dependencies:
     - send2trash==1.5.0
     - simplegeneric==0.8.1
     - six==1.14.0
+    - snakeviz==2.1.1
     - snowballstemmer==2.0.0
     - sphinx==3.0.3
     - sphinx-markdown-tables==0.0.14
@@ -194,6 +225,7 @@ dependencies:
     - toml==0.10.2
     - tqdm==4.46.1
     - traitlets==4.3.3
+    - tuna==0.5.11
     - twine==3.1.1
     - typed-ast==1.4.3
     - typing-extensions==3.10.0.0
