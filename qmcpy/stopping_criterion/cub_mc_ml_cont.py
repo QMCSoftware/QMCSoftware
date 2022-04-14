@@ -1,6 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLMCData
 from ..discrete_distribution import IIDStdUniform
+from ..discrete_distribution._discrete_distribution import IID
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
@@ -109,7 +110,7 @@ class CubMCMLCont(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = [IIDStdUniform]
+        allowed_distribs = [IID]
         allow_vectorized_integrals = False
         super(CubMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 

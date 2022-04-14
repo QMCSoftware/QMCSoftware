@@ -1,8 +1,8 @@
-from ._discrete_distribution import DiscreteDistribution
+from ._discrete_distribution import IID
 from numpy import *
 
 
-class IIDStdUniform(DiscreteDistribution):
+class IIDStdUniform(IID):
     """
     A wrapper around NumPy's IID Standard Uniform generator `numpy.random.rand`.
 

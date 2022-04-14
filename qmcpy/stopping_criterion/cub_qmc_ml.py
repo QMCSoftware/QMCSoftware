@@ -1,6 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLQMCData
 from ..discrete_distribution import DigitalNetB2,Lattice,Halton
+from ..discrete_distribution._discrete_distribution import LD
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
@@ -92,7 +93,7 @@ class CubQMCML(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         # Verify Compliant Construction
         allowed_levels = ['adaptive-multi']
-        allowed_distribs = [DigitalNetB2,Lattice,Halton]
+        allowed_distribs = [LD]
         allow_vectorized_integrals = False
         super(CubQMCML,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 

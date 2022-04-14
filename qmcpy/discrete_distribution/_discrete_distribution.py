@@ -102,3 +102,7 @@ class DiscreteDistribution(object):
             return self.gen_samples(n=args[0])
         else:
             return self.gen_samples(n_min=args[0],n_max=args[1])
+
+class LD(DiscreteDistribution): pass
+
+class IID(DiscreteDistribution): pass
