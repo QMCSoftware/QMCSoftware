@@ -8,3 +8,4 @@ from .ml_call_options import MLCallOptions
 from .box_integral import BoxIntegral
 from .sobol_indices import SobolIndices,SensitivityIndices
 from .ishigami import Ishigami
+from .bayesian_lr_coeffs import BayesianLRCoeffs
