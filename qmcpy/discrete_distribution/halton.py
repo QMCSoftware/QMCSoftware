@@ -1,12 +1,12 @@
 import warnings
-from ._discrete_distribution import DiscreteDistribution
+from ._discrete_distribution import LD
 from ..util import ParameterError,ParameterWarning
 from numpy import *
 from .c_lib import c_lib
 import ctypes
 
 
-class Halton(DiscreteDistribution):
+class Halton(LD):
     """
     Quasi-Random Halton nets.
     

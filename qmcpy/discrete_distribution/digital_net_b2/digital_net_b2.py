@@ -1,4 +1,4 @@
-from .._discrete_distribution import DiscreteDistribution
+from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 from ..c_lib import c_lib
 import ctypes
@@ -7,7 +7,7 @@ from numpy import *
 import warnings
 
 
-class DigitalNetB2(DiscreteDistribution):
+class DigitalNetB2(LD):
     """
     Quasi-Random digital nets in base 2.
     

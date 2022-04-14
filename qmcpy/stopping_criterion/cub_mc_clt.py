@@ -1,6 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution import IIDStdUniform
+from ..discrete_distribution._discrete_distribution import IID
 from ..true_measure import Gaussian, BrownianMotion, Uniform
 from ..integrand import Keister, AsianOption, CustomFun
 from ..util import MaxSamplesWarning
@@ -96,7 +97,7 @@ class CubMCCLT(StoppingCriterion):
         self.cv_mu = control_variate_means
         # Verify Compliant Construction
         allowed_levels = ['single','fixed-multi']
-        allowed_distribs = [IIDStdUniform]
+        allowed_distribs = [IID]
         allow_vectorized_integrals = False
         super(CubMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
