@@ -45,14 +45,14 @@ class SobolIndices(Integrand):
                         [0.338 0.338 0.338]]
         ci_comb_high    [[0.329 0.329 0.329]
                         [0.34  0.339 0.34 ]]
-        flags_comb      [[False False False]
-                        [False False False]]
-        flags_indv      [[False False False]
-                        [False False False]
-                        [False False False]
-                        [False False False]
-                        [False False False]
-                        [False False False]]
+        flags_comb      [[ True  True  True]
+                        [ True  True  True]]
+        flags_indv      [[ True  True  True]
+                        [ True  True  True]
+                        [ True  True  True]
+                        [ True  True  True]
+                        [ True  True  True]
+                        [ True  True  True]]
         n_total         2^(16)
         n               [[65536. 65536. 65536.]
                         [32768. 32768. 32768.]
@@ -155,13 +155,12 @@ class SobolIndices(Integrand):
         tau_low,mu_low,f2_low = bound_low[:2],bound_low[2:4],bound_low[4:6]
         tau_high,mu_high,f2_high = bound_high[:2],bound_high[2:4],bound_high[4:6]
         sigma2_low1,sigma2_low2 = f2_high-mu_low**2,f2_high-mu_high**2
-        comb_bounds_low = minimum.reduce([tau_low/sigma2_low1,tau_low/sigma2_low2])
-        comb_bounds_low = minimum.reduce([ones(tau_low.shape),maximum.reduce([zeros(tau_low.shape),comb_bounds_low])])
+        comb_bounds_low = clip(minimum.reduce([tau_low/sigma2_low1,tau_low/sigma2_low2]),0,1)
         sigma2_high1,sigma2_high2 = f2_low-mu_low**2,f2_low-mu_high**2
-        comb_bounds_high = minimum.reduce([ones(tau_high.shape),maximum.reduce([tau_high/sigma2_high1,tau_high/sigma2_high2])])
-        comb_bounds_high = minimum.reduce([ones(tau_high.shape),maximum.reduce([zeros(tau_high.shape),comb_bounds_high])])
-        violated = (sigma2_high1<0)|(sigma2_high2<0)
-        return comb_bounds_low,comb_bounds_high,violated
+        comb_bounds_high = clip(maximum.reduce([tau_high/sigma2_high1,tau_high/sigma2_high2]),0,1)
+        violated = (sigma2_high1<=0)|(sigma2_high2<=0)
+        comb_bounds_low[violated],comb_bounds_high[violated] = 0,1
+        return comb_bounds_low,comb_bounds_high
     
     def dependency(self, flags_comb):
         individual_flags = zeros(self.dprime,dtype=bool)

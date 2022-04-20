@@ -69,7 +69,8 @@ class _CubQMCLDG(StoppingCriterion):
             cv_mu_j = self.cv_mu[(slice(None),)+j]
             self.datum[j] = LDTransformData(self.m_min,self.m_max,self.coefv,self.fudge,self.check_cone,self.ncv,cv_mu_j,self.update_beta)
         self.data = LDTransformData.__new__(LDTransformData)
-        self.data.flags_indv = tile(True,self.dprime)
+        self.data.flags_indv = tile(False,self.dprime)
+        self.data.compute_flags = tile(True,self.dprime)
         self.data.m = tile(self.m_min,self.dprime)
         self.data.n_min = 0
         self.data.ci_low = tile(-inf,self.dprime)
@@ -85,12 +86,12 @@ class _CubQMCLDG(StoppingCriterion):
             n = int(n_max-n_min)
             xnext = self.discrete_distrib.gen_samples(n_min=n_min,n_max=n_max)
             ycvnext = empty((1+self.ncv,n,)+self.dprime,dtype=float)
-            ycvnext[0] = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.flags_indv)
+            ycvnext[0] = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
             for k in range(self.ncv):
-                ycvnext[1+k] = self.cv[k].f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.flags_indv)
+                ycvnext[1+k] = self.cv[k].f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
             ycvnext_cp = ycvnext.astype(complex) if self.cast_complex else ycvnext.copy()
             for j in ndindex(self.dprime):
-                if not self.data.flags_indv[j]: continue
+                if self.data.flags_indv[j]: continue
                 slice_yj = (0,slice(None),)+j
                 slice_ygj = (slice(1,None),slice(None),)+j
                 y_val = ycvnext[slice_yj]
@@ -103,18 +104,19 @@ class _CubQMCLDG(StoppingCriterion):
             self.data.xfull = vstack((self.data.xfull,xnext))
             self.data.yfull = vstack((self.data.yfull,ycvnext[0]))
             self.data.indv_error = (self.data.ci_high-self.data.ci_low)/2
-            self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
-            error_low = self.error_fun(self.data.ci_comb_low,self.abs_tol,self.rel_tol)
-            error_high = self.error_fun(self.data.ci_comb_high,self.abs_tol,self.rel_tol)
-            self.data.solution = 1/2*(self.data.ci_comb_low+self.data.ci_comb_high+error_low-error_high)
-            rem_error_low = abs(self.data.ci_comb_low-self.data.solution)-error_low
-            rem_error_high = abs(self.data.ci_comb_high-self.data.solution)-error_high
-            self.data.flags_comb = maximum(rem_error_low,rem_error_high)>=0
-            self.data.flags_comb |= self.data.violated
+            self.data.ci_comb_low,self.data.ci_comb_high = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
+            self.abs_tols,self.rel_tols = tile(self.abs_tol,self.data.ci_comb_low.shape),tile(self.rel_tol,self.data.ci_comb_low.shape)
+            fidxs = isfinite(self.data.ci_comb_low)&isfinite(self.data.ci_comb_high)
+            slow,shigh,abs_tols,rel_tols = self.data.ci_comb_low[fidxs],self.data.ci_comb_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
+            self.data.solution = tile(nan,self.data.ci_comb_low.shape)
+            self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
+            self.data.flags_comb = tile(False,self.data.ci_comb_low.shape)
+            self.data.flags_comb[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
+            self.data.compute_flags = ~self.data.flags_indv
             self.data.n = 2**self.data.m
             self.data.n_total = self.data.n.max()
-            if sum(self.data.flags_indv)==0:
+            if sum(self.data.compute_flags)==0:
                 break # stopping criterion met
             elif 2*self.data.n_total>self.n_max:
                 # doubling samples would go over n_max
@@ -128,7 +130,7 @@ class _CubQMCLDG(StoppingCriterion):
                 break
             else:
                 self.data.n_min = n_max
-                self.data.m += self.data.flags_indv
+                self.data.m += self.data.compute_flags
         self.data.integrand = self.integrand
         self.data.true_measure = self.true_measure
         self.data.discrete_distrib = self.discrete_distrib

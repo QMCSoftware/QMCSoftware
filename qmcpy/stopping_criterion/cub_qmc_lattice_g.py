@@ -23,8 +23,8 @@ class CubQMCLatticeG(_CubQMCLDG):
         ci_high         1.815
         ci_comb_low     1.806
         ci_comb_high    1.815
-        flags_comb      0
-        flags_indv      0
+        flags_comb      1
+        flags_indv      1
         n_total         2^(10)
         n               2^(10)
         time_integrate  ...
@@ -75,10 +75,10 @@ class CubQMCLatticeG(_CubQMCLDG):
                         [4. 5. 6.]]
         ci_comb_high    [[1. 2. 3.]
                         [4. 5. 6.]]
-        flags_comb      [[False False False]
-                        [False False False]]
-        flags_indv      [[False False False]
-                        [False False False]]
+        flags_comb      [[ True  True  True]
+                        [ True  True  True]]
+        flags_indv      [[ True  True  True]
+                        [ True  True  True]]
         n_total         2^(15)
         n               [[ 8192. 16384. 16384.]
                         [16384. 32768. 32768.]]
