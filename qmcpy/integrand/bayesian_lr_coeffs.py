@@ -52,7 +52,8 @@ class BayesianLRCoeffs(Integrand):
     def g(self, x, compute_flags):
         z = x@self.feature_array.T
         z1 = z*self.response_vector
-        den = prod(exp(z1)/(1+exp(z)),1)[:,None]
+        #den = prod(exp(z1)/(1+exp(z)),1)[:,None]
+        den = exp(sum(z1-log(1+exp(z)),1))[:,None]
         y = zeros((len(x),2*self.num_coeffs),dtype=float)
         y[:,:self.num_coeffs] = x*den
         y[:,self.num_coeffs:] = den
@@ -71,8 +72,9 @@ class BayesianLRCoeffs(Integrand):
         num_bounds_high,den_bounds_high = bound_high[:self.num_coeffs],bound_high[self.num_coeffs:]
         comb_bounds_low = minimum.reduce([num_bounds_low/den_bounds_low,num_bounds_high/den_bounds_low,num_bounds_low/den_bounds_high,num_bounds_high/den_bounds_high])
         comb_bounds_high = maximum.reduce([num_bounds_low/den_bounds_low,num_bounds_high/den_bounds_low,num_bounds_low/den_bounds_high,num_bounds_high/den_bounds_high])
-        violated = sign(den_bounds_low)!=sign(den_bounds_high)
-        return comb_bounds_low,comb_bounds_high,violated
+        violated = (den_bounds_low<=0)*(0<=den_bounds_high)
+        comb_bounds_low[violated],comb_bounds_high[violated] = -inf,inf
+        return comb_bounds_low,comb_bounds_high
     
     def dependency(self, flags_comb):
         return hstack((flags_comb,flags_comb))

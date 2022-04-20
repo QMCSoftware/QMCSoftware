@@ -169,7 +169,7 @@ class Integrand(object):
             - (ndarray): upper bound on function combining estimates
             - (ndarray): bool flags to override sufficient combined integrand estimation, e.g., when approximating a ratio of integrals, if the denominator's bounds straddle 0, then returning True here forces ratio to be flagged as insufficiently approximated.
         """
-        return bound_low, bound_high, array([False])
+        return bound_low,bound_high
 
     def dependency(self, flags_comb):
         """
