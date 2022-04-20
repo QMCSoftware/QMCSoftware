@@ -113,7 +113,7 @@ class _CubBayesLDG(StoppingCriterion):
             self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
             self.data.indv_error = (self.data.ci_high - self.data.ci_low) / 2
             self.data.ci_comb_low,self.data.ci_comb_high = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
-            self.abs_tols,self.rel_tols = np.tile(self.abs_tol,self.data.ci_comb_low.shape),np.tile(self.rel_tol,self.data.ci_comb_low.shape)
+            self.abs_tols,self.rel_tols = np.full_like(self.data.ci_comb_low,self.abs_tol),np.full_like(self.data.ci_comb_low,self.rel_tol)
             fidxs = np.isfinite(self.data.ci_comb_low)&np.isfinite(self.data.ci_comb_high)
             slow,shigh,abs_tols,rel_tols = self.data.ci_comb_low[fidxs],self.data.ci_comb_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
             self.data.solution = np.tile(np.nan,self.data.ci_comb_low.shape)
