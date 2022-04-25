@@ -27,8 +27,8 @@ class CubBayesLatticeG(_CubBayesLDG):
         ci_high         1.809
         ci_comb_low     1.808
         ci_comb_high    1.809
-        flags_comb      0
-        flags_indv      0
+        flags_comb      1
+        flags_indv      1
         n_total         2^(8)
         n               2^(8)
         time_integrate  ...
