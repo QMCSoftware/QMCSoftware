@@ -7,7 +7,7 @@ from ..true_measure import Gaussian,Uniform
 from ..integrand import Keister,BoxIntegral,CustomFun
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 from numpy import *
-from scipy.stats import norm
+from scipy.stats import t
 from time import time
 import warnings
 
@@ -24,13 +24,13 @@ class CubQMCCLT(StoppingCriterion):
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
-        indv_error      6.92e-04
+        indv_error      7.92e-04
         ci_low          1.380
         ci_high         1.381
         ci_comb_low     1.380
         ci_comb_high    1.381
-        flags_comb      0
-        flags_indv      0
+        flags_comb      1
+        flags_indv      1
         n_total         2^(12)
         n               2^(12)
         n_rep           2^(8)
@@ -69,8 +69,8 @@ class CubQMCCLT(StoppingCriterion):
         ci_high         [1.191 0.961]
         ci_comb_low     [1.19 0.96]
         ci_comb_high    [1.191 0.961]
-        flags_comb      [False False]
-        flags_indv      [False False]
+        flags_comb      [ True  True]
+        flags_indv      [ True  True]
         n_total         2^(21)
         n               [2097152.    8192.]
         n_rep           [131072.    512.]
@@ -109,8 +109,8 @@ class CubQMCCLT(StoppingCriterion):
     MeanVarDataRep (AccumulateData Object)
         solution        [[1. 2. 3.]
                         [4. 5. 6.]]
-        indv_error      [[2.484e-05 0.000e+00 0.000e+00]
-                        [5.708e-06 2.178e-10 0.000e+00]]
+        indv_error      [[2.842e-05 0.000e+00 0.000e+00]
+                        [6.530e-06 2.491e-10 0.000e+00]]
         ci_low          [[1. 2. 3.]
                         [4. 5. 6.]]
         ci_high         [[1. 2. 3.]
@@ -119,10 +119,10 @@ class CubQMCCLT(StoppingCriterion):
                         [4. 5. 6.]]
         ci_comb_high    [[1. 2. 3.]
                         [4. 5. 6.]]
-        flags_comb      [[False False False]
-                        [False False False]]
-        flags_indv      [[False False False]
-                        [False False False]]
+        flags_comb      [[ True  True  True]
+                        [ True  True  True]]
+        flags_indv      [[ True  True  True]
+                        [ True  True  True]]
         n_total         2^(14)
         n               [[ 4096.  4096.  4096.]
                         [16384.  4096.  4096.]]
@@ -178,21 +178,17 @@ class CubQMCCLT(StoppingCriterion):
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.alpha = float(alpha)
-        self.z_star = -norm.ppf(self.alpha / 2)
         self.inflate = float(inflate)
         self.replications = int(replications)
         self.error_fun = error_fun
+        self.t_star = -t.ppf(self.alpha/2,df=self.replications-1)
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
         self.dprime = self.integrand.dprime
         self.d = self.discrete_distrib.d
-        # Verify Compliant Construction
-        allowed_levels = ["single"]
-        allowed_distribs = [LD]
-        allow_vectorized_integrals = True
-        super(CubQMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
+        super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[LD], allow_vectorized_integrals=True)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
          
@@ -201,9 +197,10 @@ class CubQMCCLT(StoppingCriterion):
         t_start = time()
         self.datum = empty(self.dprime,dtype=object)
         for j in ndindex(self.dprime):
-            self.datum[j] = MeanVarDataRep(self.z_star,self.inflate,self.replications)
+            self.datum[j] = MeanVarDataRep(self.t_star,self.inflate,self.replications)
         self.data = MeanVarDataRep.__new__(MeanVarDataRep)
-        self.data.flags_indv = tile(True,self.dprime)
+        self.data.flags_indv = tile(False,self.dprime)
+        self.data.compute_flags = tile(True,self.dprime)
         self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
         self.data.n_rep = tile(self.n_init,self.dprime)
         self.data.n_min_rep = 0
@@ -218,26 +215,27 @@ class CubQMCCLT(StoppingCriterion):
             n_max = int(self.data.n_rep.max())
             n = int(n_max-n_min)
             xnext = vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
-            ynext = self.integrand.f(xnext,compute_flags=self.data.flags_indv)
+            ynext = self.integrand.f(xnext,compute_flags=self.data.compute_flags)
             for j in ndindex(self.dprime):
-                if not self.data.flags_indv[j]: continue
+                if self.data.flags_indv[j]: continue
                 yj = ynext[(slice(None),)+j].reshape((n,self.replications),order='f')
                 self.data.solution_indv[j],self.data.ci_low[j],self.data.ci_high[j] = self.datum[j].update_data(yj)
             self.data.xfull = vstack((self.data.xfull,xnext))
             self.data.yfull = vstack((self.data.yfull,ynext))
             self.data.indv_error = (self.data.ci_high-self.data.ci_low)/2
-            self.data.ci_comb_low,self.data.ci_comb_high,self.data.violated = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
-            error_low = self.error_fun(self.data.ci_comb_low,self.abs_tol,self.rel_tol)
-            error_high = self.error_fun(self.data.ci_comb_high,self.abs_tol,self.rel_tol)
-            self.data.solution = 1/2*(self.data.ci_comb_low+self.data.ci_comb_high+error_low-error_high)
-            rem_error_low = abs(self.data.ci_comb_low-self.data.solution)-error_low
-            rem_error_high = abs(self.data.ci_comb_high-self.data.solution)-error_high
-            self.data.flags_comb = maximum(rem_error_low,rem_error_high)>=0
-            self.data.flags_comb |= self.data.violated
+            self.data.ci_comb_low,self.data.ci_comb_high = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
+            self.abs_tols,self.rel_tols = full_like(self.data.ci_comb_low,self.abs_tol),full_like(self.data.ci_comb_low,self.rel_tol)
+            fidxs = isfinite(self.data.ci_comb_low)&isfinite(self.data.ci_comb_high)
+            slow,shigh,abs_tols,rel_tols = self.data.ci_comb_low[fidxs],self.data.ci_comb_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
+            self.data.solution = tile(nan,self.data.ci_comb_low.shape)
+            self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
+            self.data.flags_comb = tile(False,self.data.ci_comb_low.shape)
+            self.data.flags_comb[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
+            self.data.compute_flags = ~self.data.flags_indv
             self.data.n = self.replications*self.data.n_rep
             self.data.n_total = self.data.n.max()
-            if sum(self.data.flags_indv)==0:
+            if sum(self.data.compute_flags)==0:
                 break # sufficiently estimated
             elif 2*self.data.n_total>self.n_max:
                 warning_s = """
@@ -250,7 +248,7 @@ class CubQMCCLT(StoppingCriterion):
                 break
             else:
                 self.data.n_min_rep = n_max
-                self.data.n_rep += self.data.n_rep*self.data.flags_indv # double sample size
+                self.data.n_rep += self.data.n_rep*(self.data.compute_flags) # double sample size
         self.data.integrand = self.integrand
         self.data.true_measure = self.true_measure
         self.data.discrete_distrib = self.discrete_distrib

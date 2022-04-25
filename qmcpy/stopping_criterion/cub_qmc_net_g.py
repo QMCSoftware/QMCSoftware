@@ -23,8 +23,8 @@ class CubQMCNetG(_CubQMCLDG):
         ci_high         1.814
         ci_comb_low     1.804
         ci_comb_high    1.814
-        flags_comb      0
-        flags_indv      0
+        flags_comb      1
+        flags_indv      1
         n_total         2^(10)
         n               2^(10)
         time_integrate  ...
@@ -83,8 +83,8 @@ class CubQMCNetG(_CubQMCLDG):
         ci_high         [1.104 1.271]
         ci_comb_low     [1.099 1.262]
         ci_comb_high    [1.104 1.271]
-        flags_comb      [False False]
-        flags_indv      [False False]
+        flags_comb      [ True  True]
+        flags_indv      [ True  True]
         n_total         2^(10)
         n               [1024. 1024.]
         time_integrate  ...
@@ -128,10 +128,10 @@ class CubQMCNetG(_CubQMCLDG):
                         [4. 5. 6.]]
         ci_comb_high    [[1. 2. 3.]
                         [4. 5. 6.]]
-        flags_comb      [[False False False]
-                        [False False False]]
-        flags_indv      [[False False False]
-                        [False False False]]
+        flags_comb      [[ True  True  True]
+                        [ True  True  True]]
+        flags_indv      [[ True  True  True]
+                        [ True  True  True]]
         n_total         2^(13)
         n               [[2048. 1024. 1024.]
                         [8192. 4096. 2048.]]

@@ -56,9 +56,7 @@ class _CubBayesLDG(StoppingCriterion):
         self.error_fun = error_fun
 
         # Verify Compliant Construction
-        allowed_levels = ['single']
-        allow_vectorized_integrals = True
-        super(_CubBayesLDG, self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
+        super(_CubBayesLDG, self).__init__(allowed_levels=['single'], allowed_distribs=allowed_distribs, allow_vectorized_integrals=True)
 
     def integrate(self):
         t_start = time()
@@ -68,7 +66,8 @@ class _CubBayesLDG(StoppingCriterion):
                                                  self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel)
 
         self.data = LDTransformBayesData.__new__(LDTransformBayesData)
-        self.data.flags_indv = np.tile(True, self.dprime)
+        self.data.flags_indv = np.tile(False, self.dprime)
+        self.data.compute_flags = np.tile(True,self.dprime)
         prev_flags_indv = self.data.flags_indv
         self.data.m = np.tile(self.m_min, self.dprime)
         self.data.n_min = 0
@@ -88,15 +87,15 @@ class _CubBayesLDG(StoppingCriterion):
                                                                 warn=False)
             ycvnext = np.empty((1 + self.ncv, n,) + self.dprime, dtype=float)
             ycvnext[0] = self.integrand.f(xnext, periodization_transform=self.ptransform,
-                                          compute_flags=self.data.flags_indv)
+                                          compute_flags=self.data.compute_flags)
             for k in range(self.ncv):
                 ycvnext[1 + k] = self.cv[k].f(xnext, periodization_transform=self.ptransform,
-                                              compute_flags=self.data.flags_indv)
+                                              compute_flags=self.data.compute_flags)
             # print(self.data.flags_indv)
             for j in np.ndindex(self.dprime):
-                if prev_flags_indv[j] == False and self.data.flags_indv[j] == True:
-                    assert not(prev_flags_indv[j] == False and self.data.flags_indv[j] == True), 'This cannot happen !'
-                if not self.data.flags_indv[j]:
+                if prev_flags_indv[j] == True and self.data.flags_indv[j] == False:
+                    assert not(prev_flags_indv[j] == True and self.data.flags_indv[j] == False), 'This cannot happen !'
+                if self.data.flags_indv[j]:
                     continue
                 slice_yj = (0, slice(None),) + j
                 if type(self.discrete_distrib).__name__ == 'DigitalNetB2':
@@ -114,21 +113,20 @@ class _CubBayesLDG(StoppingCriterion):
             self.data.xfull = np.vstack((self.data.xfull, xnext))
             self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
             self.data.indv_error = (self.data.ci_high - self.data.ci_low) / 2
-            self.data.ci_comb_low, self.data.ci_comb_high, self.data.violated = self.integrand.bound_fun(
-                self.data.ci_low, self.data.ci_high)
-            error_low = self.error_fun(self.data.ci_comb_low, self.abs_tol, self.rel_tol)
-            error_high = self.error_fun(self.data.ci_comb_high, self.abs_tol, self.rel_tol)
-            self.data.solution = 1 / 2 * (self.data.ci_comb_low + self.data.ci_comb_high + error_low - error_high)
-            rem_error_low = abs(self.data.ci_comb_low - self.data.solution) - error_low
-            rem_error_high = abs(self.data.ci_comb_high - self.data.solution) - error_high
-            self.data.flags_comb = np.maximum(rem_error_low, rem_error_high) >= 0
-            self.data.flags_comb |= self.data.violated
-            prev_flags_indv = self.data.flags_indv
+            self.data.ci_comb_low,self.data.ci_comb_high = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
+            self.abs_tols,self.rel_tols = np.full_like(self.data.ci_comb_low,self.abs_tol),np.full_like(self.data.ci_comb_low,self.rel_tol)
+            fidxs = np.isfinite(self.data.ci_comb_low)&np.isfinite(self.data.ci_comb_high)
+            slow,shigh,abs_tols,rel_tols = self.data.ci_comb_low[fidxs],self.data.ci_comb_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
+            self.data.solution = np.tile(np.nan,self.data.ci_comb_low.shape)
+            self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
+            self.data.flags_comb = np.tile(False,self.data.ci_comb_low.shape)
+            self.data.flags_comb[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
+            self.data.compute_flags = ~self.data.flags_indv
             self.data.n = 2 ** self.data.m
             self.data.n_total = self.data.n.max()
 
-            if np.sum(self.data.flags_indv) == 0:
+            if np.sum(self.data.compute_flags) == 0:
                 break  # stopping criterion met
             elif 2 * self.data.n_total > self.n_max:
                 # doubling samples would go over n_max
@@ -142,7 +140,7 @@ class _CubBayesLDG(StoppingCriterion):
                 break
             else:
                 self.data.n_min = n_max
-                self.data.m += self.data.flags_indv
+                self.data.m += self.data.compute_flags
 
         self.data.integrand = self.integrand
         self.data.true_measure = self.true_measure
