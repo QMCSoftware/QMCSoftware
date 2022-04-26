@@ -101,6 +101,6 @@ conda_dev:
 	@conda create -n qmcpy python=3.7.0
 	@conda activate qmcpy
 	@conda install conda-build
- 	@conda develop .
+	@conda develop .
 	@pip install -r requirements/dev.txt
 	@pip install -e .
