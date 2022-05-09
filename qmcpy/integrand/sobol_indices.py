@@ -94,7 +94,7 @@ class SobolIndices(Integrand):
             indices (list of lists): each element of indices should be a list of indices, u,
                 at which to compute the Sobol' indices. 
                 The default indices='singletons' sets indices=[[0],[1],...[d-1]]. 
-                Should not include [], the null set. 
+                Should not include [], the null set, or [0,...,d-1], the set of all indices. 
                 Setting indices='all' will compute all sensitivity indices
         """
         self.parameters = ['indices','n_multiplier']
@@ -106,9 +106,9 @@ class SobolIndices(Integrand):
             self.indices = [[j] for j in range(self.d)]
         elif self.indices=='all':
             self.indices = []
-            for r in range(1,self.d+1):
+            for r in range(1,self.d):
                 self.indices += [list(idx) for idx in combinations(arange(self.d),r)]
-        if [] in self.indices:
+        if [] in self.indices or [i for i in range(self.d)] in self.indices:
             raise ParameterError('SobolIndices indices cannot include [], the null set.')
         self.s = len(self.indices)
         self.indices_bool_mat = tile(False,(self.s,self.d))
