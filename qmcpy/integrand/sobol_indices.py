@@ -5,6 +5,7 @@ from ..util import ParameterError
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
 from numpy import *
+from itertools import combinations
 
 
 class SobolIndices(Integrand):
@@ -93,7 +94,8 @@ class SobolIndices(Integrand):
             indices (list of lists): each element of indices should be a list of indices, u,
                 at which to compute the Sobol' indices. 
                 The default indices='singletons' sets indices=[[0],[1],...[d-1]]. 
-                Should not include [], the null set
+                Should not include [], the null set. 
+                Setting indices='all' will compute all sensitivity indices
         """
         self.parameters = ['indices','n_multiplier']
         self.integrand = integrand
@@ -102,6 +104,10 @@ class SobolIndices(Integrand):
         self.indices = indices
         if self.indices=='singletons':
             self.indices = [[j] for j in range(self.d)]
+        elif self.indices=='all':
+            self.indices = []
+            for r in range(1,self.d+1):
+                self.indices += [list(idx) for idx in combinations(arange(self.d),r)]
         if [] in self.indices:
             raise ParameterError('SobolIndices indices cannot include [], the null set.')
         self.s = len(self.indices)
