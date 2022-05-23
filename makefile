@@ -96,3 +96,11 @@ workout:
 exportcondaenv:
 	@-rm -f requirements/environment.yml 2>/dev/null &
 	@conda env export --no-builds | grep -v "^prefix: " > requirements/environment.yml
+
+conda_dev:
+	@conda create -n qmcpy python=3.7.0
+	@conda activate qmcpy
+	@conda install conda-build
+	@conda develop .
+	@pip install -r requirements/dev.txt
+	@pip install -e .
