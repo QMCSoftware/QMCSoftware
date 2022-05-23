@@ -6,7 +6,7 @@ Thank you for you interest in contributing to the QMCPy package. The following s
 
 ## Installation for Developers
 
-To enable `conda` environments, [install miniconda](https://docs.conda.io/en/latest/miniconda.html). 
+To enable `conda` environments, [install miniconda](https://docs.conda.io/en/latest/miniconda.html).
 
 Then, setup the `qmcpy` virtual environment
 
@@ -14,7 +14,7 @@ Then, setup the `qmcpy` virtual environment
 git clone https://github.com/QMCSoftware/QMCSoftware.git
 cd QMCSoftware
 git checkout develop
-conda env create --file requirements/environment.yml
+conda env create --name qmcpy python=3.7.12 --file requirements/environment.ymlv
 conda activate qmcpy
 pip install -e .
 ~~~
@@ -47,7 +47,7 @@ pip install -e .
 
 ----
 
-## Documentation 
+## Documentation
 
 Automated project documentation is compiled with [Sphinx](http://www.sphinx-doc.org/). To compile HTML, PDF, or EPUB docs locally into `sphinx/_build/` you must install [pandoc](https://pandoc.org/installing.html), a [latex distribution](https://www.latex-project.org/get/), and add additional python requirements with the command
 
@@ -67,7 +67,7 @@ make doc_epub
 
 ## Workouts and Demos
 
-Workouts extensively test and compare the components of the QMCPy package. Demos, implemented as Jupyter notebooks, demonstrate functionality and uses cases for QMCPy. They often draw on results from corresponding workouts. 
+Workouts extensively test and compare the components of the QMCPy package. Demos, implemented as Jupyter notebooks, demonstrate functionality and uses cases for QMCPy. They often draw on results from corresponding workouts.
 
 To run all workouts (~10 min) use the command
 
@@ -91,23 +91,23 @@ See the `makefile` for individual testing commands.
 
 ## Pull Requests
 
-Pull requests should be made into the `develop` branch, as we try and keep the `master` branch consistent with the current release. 
+Pull requests should be made into the `develop` branch, as we try and keep the `master` branch consistent with the current release.
 
 **For a QMCPy component (generator, algorithm, use case) try to ...**
 
 - incorporate and be consistent with other QMCPy components as much as possible.
-- keep naming conventions the same across similar components.  
+- keep naming conventions the same across similar components.
 - develop thorough documentation, including doctests. See `qmcpy/stopping_criterion/cub_qmc_sobol_g.py` as an example.
-- create fast and/or long unittests in the `test/` directory. 
+- create fast and/or long unittests in the `test/` directory.
 - create a workout or demo showcasing your new component, preferably including
-    - a connection/comparison to available components. 
-    - how the expected cost is realized. 
-    - an overview of the relevant mathematics. 
+    - a connection/comparison to available components.
+    - how the expected cost is realized.
+    - an overview of the relevant mathematics.
     - figures to illustrate important features.
-    - references. 
+    - references.
 - consider submitting a blog to put on the [QMCPy blogs site](http://qmcpy.wordpress.com/).
 
 **For a bug fix, try to**
 
 - fix/add doctests and unittests.
-- update documentation/references. 
+- update documentation/references.
