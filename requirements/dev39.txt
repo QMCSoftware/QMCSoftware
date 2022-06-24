@@ -9,7 +9,7 @@ defusedxml==0.6.0
 entrypoints==0.3
 importlib-metadata==1.6.1
 ipykernel==5.3.0
-ipython==7.16.3
+ipython==7.10.0
 ipython-genutils==0.2.0
 ipywidgets==7.5.1
 jedi==0.17.1
@@ -27,7 +27,7 @@ more-itertools==8.4.0
 nbconvert==5.6.1
 nbformat==5.0.7
 notebook==6.4.1
-numpy==1.22.0
+numpy==1.21.1
 packaging==20.4
 pandas==1.1.5
 pandocfilters==1.4.2
@@ -48,7 +48,7 @@ pytz==2020.1
 pyzmq==19.0.1
 qtconsole==4.7.5
 QtPy==1.9.0
-scipy==1.7.0
+scipy==1.7.2
 Send2Trash==1.5.0
 six==1.15.0
 terminado==0.8.3
