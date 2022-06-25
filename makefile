@@ -17,7 +17,6 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	# Make Directries
 	@-rm -r -f $(mddir) 2>/dev/null &
 	@-rm -r -f $(nbdir) 2>/dev/null &
-	@-rm -r -f $(umldir) 2>/dev/null &
 	# READMEs --> RST
 	@mkdir $(mddir)
 	@grep -v  "\[\!" README.md > README2.md
@@ -26,10 +25,17 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	# Jupyter Notebook Demos --> RST
 	@mkdir $(nbdir)
 	@for f in demos/*.ipynb; do \
-	echo "#\tConverting $$f"; \
-	$(nbconvertcmd) $$f 2>/dev/null;\
+	    echo "#\tConverting $$f"; \
+	    $(nbconvertcmd) $$f 2>/dev/null;\
 	done
+	# remove Colab references in rst files using regular expression
+	@for f in $(nbdir)/*.rst; do \
+	    grep -vE "(colab-badge.svg|Open In Colab|colab.research)" $$f > $(nbdir)/tmp.rst && mv $(nbdir)/tmp.rst  $$f; \
+    done
+
+_uml:
 	# UML Diagrams
+	@rm -r -f $(umldir) 2>/dev/null
 	@mkdir $(umldir)
 	#	Discrete Distribution Overview
 	@pyreverse -k qmcpy/discrete_distribution/ -o png 1>/dev/null && mv classes.png $(umldir)discrete_distribution_overview.png
@@ -56,15 +62,14 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	#	Packages
 	@mv packages.png $(umldir)packages.png
 
-doc_html: _doc
+doc_html: _doc _uml
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
 
-doc_pdf: _doc
-	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going 2>/dev/null
-	@grep -v "colab-badge" sphinx/_build/qmcpy.tex > sphinx/_build/qmcpy_tmp.tex && mv sphinx/_build/qmcpy_tmp.tex  sphinx/_build/qmcpy.tex
+doc_pdf: _doc _uml
+	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going  2>/dev/null
 	@cd sphinx/_build && make
 
-doc_epub: _doc
+doc_epub: _doc _uml
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
 
 tests:
