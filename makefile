@@ -61,6 +61,7 @@ doc_html: _doc
 
 doc_pdf: _doc
 	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going 2>/dev/null
+	@grep -v "colab-badge" sphinx/_build/qmcpy.tex > sphinx/_build/qmcpy_tmp.tex && mv sphinx/_build/qmcpy_tmp.tex  sphinx/_build/qmcpy.tex
 	@cd sphinx/_build && make
 
 doc_epub: _doc
