@@ -15,8 +15,8 @@ BUILDDIR = sphinx/_build
 
 _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) and $(nbdir)
 	# Make Directries
-	@-rm -r -f $(mddir) 2>/dev/null &
-	@-rm -r -f $(nbdir) 2>/dev/null &
+	@rm -r -f $(mddir) 2>/dev/null
+	@rm -r -f $(nbdir) 2>/dev/null
 	# READMEs --> RST
 	@mkdir $(mddir)
 	@grep -v  "\[\!" README.md > README2.md
@@ -28,7 +28,7 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	    echo "#\tConverting $$f"; \
 	    $(nbconvertcmd) $$f 2>/dev/null;\
 	done
-	# remove Colab references in rst files using regular expression
+	# Removing Colab references in rst files using regular expression
 	@for f in $(nbdir)/*.rst; do \
 	    grep -vE "(colab-badge.svg|Open In Colab|colab.research)" $$f > $(nbdir)/tmp.rst && mv $(nbdir)/tmp.rst  $$f; \
     done
@@ -103,10 +103,35 @@ exportcondaenv:
 	@-rm -f requirements/environment.yml 2>/dev/null &
 	@conda env export --no-builds | grep -v "^prefix: " > requirements/environment.yml
 
-conda_dev:
+exportpipreq:
+	@pip freeze > requirements/dev.txt
+
+conda_colab:
 	@conda create -n qmcpy python=3.7.0
 	@conda activate qmcpy
 	@conda install conda-build
 	@conda develop .
 	@pip install -r requirements/dev.txt
 	@pip install -e .
+
+conda_doc:
+	#   Assuming QMCPy repository is cloned locally and the correct branch is checked out
+	@conda env create --file requirements/environment.yml
+	@conda activate qmcpy
+	@pip install -e .
+	#   Suggest to run `make tests` to check environment is working
+
+gen_doc:
+	#   Compiling QMCPy HTML documentation.
+	@make doc_html
+	#   Suggest to check time stamp of index.html
+	@ls -l sphinx/_build/index.html
+	#   Compiling QMCPy EPUB documentation.
+	@make doc_epub
+	#   Suggest to check time stamp of qmcpy.epub
+	@ls -l sphinx/_build/epub/qmcpy.epub
+	#   Assumed pdflatex is installed.
+	#   Compiling QMCPy PDF documentation. If failed, remove "2>/dev/null" in the task `doc_pdf` to debug
+	@make doc_pdf
+	#   Suggest to check time stamp of qmcpy.pdf
+	@ls -l sphinx/_build/qmcpy.pdf
