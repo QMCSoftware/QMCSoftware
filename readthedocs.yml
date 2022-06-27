@@ -1,19 +1,14 @@
-# https://gist.github.com/zonca/c6f29060a2e77cffcfb155dd4ef1a558
+# https://docs.readthedocs.io/en/stable/config-file/v2.html
+
 version: 2
 
+formats: all
+
 conda:
-    environment: requirements/environment.yml
+  environment: requirements/environment.yml
 
 build:
-   image: latest
+  os: osx
 
-# This part is necessary otherwise the project is not built
-python:
-   version: 3.7
-   install:
-      - method: pip
-        path: .
-        
-# By default readthedocs does not checkout git submodules
-submodules:                                                                                                                          
-    include: all
+sphinx:
+   configuration: sphinx/conf.py
