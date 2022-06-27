@@ -4,29 +4,201 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - appmode=0.8.0
+  - appnope=0.1.2
+  - argon2-cffi=20.1.0
+  - asn1crypto=1.4.0
+  - async_generator=1.10
+  - backports=1.0
+  - backports.functools_lru_cache=1.6.4
+  - beautifulsoup4=4.10.0
+  - brotlipy=0.7.0
+  - bzip2=1.0.8
+  - ca-certificates=2021.5.30
+  - colorama=0.4.4
   - conda=4.10.3
   - conda-build=3.21.4
+  - conda-package-handling=1.7.3
+  - cycler=0.10.0
+  - entrypoints=0.3
+  - expat=2.4.1
+  - filelock=3.3.0
+  - freetype=2.10.4
+  - glob2=0.7
+  - ipython_genutils=0.2.0
+  - jbig=2.1
+  - jpeg=9d
+  - jupyterlab_pygments=0.1.2
+  - jupyterlab_widgets=1.0.2
   - latnetbuilder=2.1.1
+  - lcms2=2.12
+  - lerc=2.2.1
+  - libarchive=3.3.3
+  - libblas=3.9.0
+  - libcblas=3.9.0
+  - libcxx=12.0.1
+  - libdeflate=1.7
+  - libffi=3.2.1
+  - libgfortran=5.0.0
+  - libgfortran5=9.3.0
+  - libiconv=1.16
+  - liblapack=3.9.0
+  - liblief=0.11.5
+  - libopenblas=0.3.17
+  - libpng=1.6.37
+  - libsodium=1.0.18
+  - libtiff=4.3.0
+  - libwebp-base=1.2.1
+  - libzlib=1.2.11
+  - llvm-openmp=12.0.1
+  - lz4-c=1.9.3
+  - matplotlib-inline=0.1.3
+  - mistune=0.8.4
+  - nbclient=0.5.4
+  - ncurses=6.2
+  - nest-asyncio=1.5.1
+  - numexpr=2.7.3
+  - olefile=0.46
+  - openjpeg=2.4.0
+  - openssl=1.0.2u
+  - pexpect=4.8.0
+  - pickleshare=0.7.5
+  - pillow=8.3.2
   - pip=21.2.4
+  - psutil=5.8.0
+  - py-lief=0.11.5
+  - pycosat=0.6.3
+  - pycparser=2.20
+  - pyopenssl=19.0.0
+  - pyparsing=2.4.7
+  - pysocks=1.7.1
   - python=3.7.0
+  - python-libarchive-c=3.1
+  - python_abi=3.7
+  - pyyaml=5.4.1
+  - readline=7.0
+  - requests=2.25.1
+  - ripgrep=13.0.0
+  - ruamel_yaml=0.15.80
   - setuptools=58.2.0
+  - soupsieve=2.0.1
+  - sqlite=3.28.0
+  - tk=8.6.11
+  - tornado=6.1
+  - webencodings=0.5.1
+  - wheel=0.37.0
+  - widgetsnbextension=3.5.1
+  - xz=5.2.5
+  - yaml=0.2.5
+  - zeromq=4.3.4
+  - zlib=1.2.11
+  - zstd=1.5.0
   - pip:
+    - alabaster==0.7.12
+    - astroid==2.8.0
+    - attrs==19.3.0
+    - babel==2.8.0
+    - backcall==0.1.0
+    - bleach==3.3.0
+    - certifi==2020.4.5.1
+    - cffi==1.14.0
+    - chardet==3.0.4
     - codecov==2.1.6
+    - commonmark==0.9.1
     - coverage==4.5.4
+    - cryptography==3.3.2
+    - dataclasses==0.6
+    - decorator==4.4.2
+    - defusedxml==0.6.0
+    - docutils==0.16
+    - fonttools==4.29.1
+    - future==0.18.2
+    - idna==2.9
+    - imagesize==1.2.0
+    - importlib-metadata==1.6.0
+    - iniconfig==1.1.1
+    - ipykernel==5.2.1
     - ipython==7.10.0
+    - ipywidgets==7.5.1
+    - isort==5.9.3
+    - jedi==0.17.0
+    - jeepney==0.4.3
+    - jinja2==2.11.3
+    - joblib==1.1.0
+    - jsonschema==3.2.0
     - jupyter==1.0.0
+    - jupyter-client==6.1.5
+    - jupyter-console==6.1.0
+    - jupyter-core==4.6.3
+    - keyring==21.2.1
+    - kiwisolver==1.2.0
+    - lazy-object-proxy==1.6.0
     - line-profiler==3.5.0
+    - markdown==3.2.2
+    - markupsafe==2.0.1
     - matplotlib==3.5.2
+    - mccabe==0.6.1
+    - more-itertools==8.4.0
     - nbconvert==5.6.1
+    - nbformat==5.0.6
     - notebook==6.4.1
     - numpy==1.21.6
+    - packaging==20.4
     - pandas==1.1.5
     - pandoc==1.0.2
+    - pandocfilters==1.4.2
+    - parso==0.7.0
+    - pkginfo==1.5.0.1
+    - platformdirs==2.4.0
+    - pluggy==0.13.1
+    - ply==3.11
+    - prometheus-client==0.7.1
+    - prompt-toolkit==3.0.5
+    - ptyprocess==0.6.0
+    - py==1.10.0
+    - pyaml==21.10.1
+    - pydeps==1.9.13
+    - pygments==2.7.4
+    - pylint==2.11.1
+    - pyrsistent==0.16.0
+    - pytest==6.2.1
+    - python-dateutil==2.8.1
+    - pytz==2020.1
+    - pyzmq==19.0.1
+    - qtconsole==4.7.4
+    - qtpy==1.9.0
+    - readme-renderer==26.0
+    - recommonmark==0.6.0
+    - requests-toolbelt==0.9.1
     - scikit-learn==1.0.2
     - scikit-optimize==0.9.0
     - scipy==1.7.0
+    - secretstorage==3.1.2
+    - send2trash==1.5.0
+    - simplegeneric==0.8.1
+    - six==1.14.0
+    - snowballstemmer==2.0.0
     - sphinx==3.0.3
     - sphinx-markdown-tables==0.0.14
     - sphinx-math-dollar==1.1.1
     - sphinx-rtd-theme==0.4.3
+    - sphinxcontrib-applehelp==1.0.2
+    - sphinxcontrib-devhelp==1.0.2
+    - sphinxcontrib-htmlhelp==1.0.3
+    - sphinxcontrib-jsmath==1.0.1
+    - sphinxcontrib-qthelp==1.0.3
+    - sphinxcontrib-serializinghtml==1.1.4
+    - stdlib-list==0.8.0
+    - terminado==0.8.3
+    - testpath==0.4.4
+    - threadpoolctl==3.0.0
+    - toml==0.10.2
+    - tqdm==4.46.1
+    - traitlets==4.3.3
     - twine==3.1.1
+    - typed-ast==1.4.3
+    - typing-extensions==3.10.0.0
+    - urllib3==1.26.5
+    - wcwidth==0.1.9
+    - wrapt==1.12.1
+    - zipp==3.1.0
