@@ -2,6 +2,15 @@
 
 Thank you for you interest in contributing to the QMCPy package. The following sections describe how to get set up as a developer, some helpful commands, and a few suggestions before merging changes. Let us know if you have any trouble by sending an email to [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com).
 
+Here is an overview of the key steps:
+
+* [Dev Tools](https://qmcpy.org/references-for-python-and-mathematical-software-development/) has helpful links to development tools we often use, e.g., VSCode, git,  conda, and LaTeX. You should install Python, make sure Git is installed, and select an IDE (integrated development environment).
+* [This page](https://github.com/QMCSoftware/QMCSoftware/blob/master/CONTRIBUTING.md) has QMCPy-specific setup instructions, e.g., cloning the QMCSoftware Repo, setting up a conda virtual environment, generating documentation and running tests locally, etc. 
+  * Windows users would need to install [Cygwin](https://www.cygwin.com) or [MinGW](https://www.mingw-w64.org) to run UNIX commands such as `cd` and `make`.
+  * Others have run into an issue when running `pip install -e .` since not all machines ship with C/C++ compilers. If you run into this issue on Windows and are using VSCode, then compilers can be installed from [C/C++ for Visual Studio Code](https://code.visualstudio.com/docs/languages/cpp) to fix the problem.
+  * QMCPy uses Python 3.7 by default. If you are a Mac M1 user or wish to use another Python version for QMCPy development, consider [an experimental solution approach](https://github.com/QMCSoftware/QMCSoftware/tree/develop/requirements) and let us know if it works for you.
+* Once you get the `make tests` and `make doc_html` targets in QMCPy to run without errors, your setup should be working fine!
+
 ---
 
 ## Installation for Developers
