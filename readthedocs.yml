@@ -7,8 +7,5 @@ formats: all
 conda:
   environment: requirements/environment.yml
 
-build:
-  os: ubuntu-22.04
-
 sphinx:
    configuration: sphinx/conf.py
