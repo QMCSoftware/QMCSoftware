@@ -23,7 +23,7 @@ Then, setup the `qmcpy` virtual environment
 git clone https://github.com/QMCSoftware/QMCSoftware.git
 cd QMCSoftware
 git checkout develop
-conda env create --name qmcpy python=3.7.12 --file requirements/environment.ymlv
+conda env create --file environment.yml
 conda activate qmcpy
 pip install -e .
 ~~~
