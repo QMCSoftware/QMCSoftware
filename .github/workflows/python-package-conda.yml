@@ -24,10 +24,10 @@ jobs:
         run: |
           pip install -e .
       - name: Run Tests
-        shell: bash -l {0}
         run: |
           make tests
       - name: Upload to Codecov
+        shell: bash -l {0}
         run: |
           python -m coverage xml -i # genereate coverage.xml
           # python -m codecov -t e87cdb03-ccdd-44df-9849-8c5bc460cb9e  # fails without token
