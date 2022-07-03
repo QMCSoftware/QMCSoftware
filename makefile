@@ -100,23 +100,12 @@ workout:
 	@python workouts/mc_vs_qmc/vary_dimension.py | tee workouts/mc_vs_qmc/out/vary_dimension.log
 
 exportcondaenv:
-	@-rm -f requirements/environment.yml 2>/dev/null &
-	@conda env export --no-builds | grep -v "^prefix: " > requirements/environment.yml
-
-exportpipreq:
-	@pip freeze > requirements/dev.txt
-
-conda_colab:
-	@conda create -n qmcpy python=3.7.0
-	@conda activate qmcpy
-	@conda install conda-build
-	@conda develop .
-	@pip install -r requirements/dev.txt
-	@pip install -e .
+	@-rm -f environment.yml 2>/dev/null &
+	@conda env export --no-builds | grep -v "^prefix: " > environment.yml
 
 conda_doc:
 	#   Assuming QMCPy repository is cloned locally and the correct branch is checked out
-	@conda env create --file requirements/environment.yml
+	@conda env create --file environment.yml
 	@conda activate qmcpy
 	@pip install -e .
 	#   Suggest to run `make tests` to check environment is working
