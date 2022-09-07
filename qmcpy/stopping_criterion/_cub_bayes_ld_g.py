@@ -57,13 +57,14 @@ class _CubBayesLDG(StoppingCriterion):
 
         # Verify Compliant Construction
         super(_CubBayesLDG, self).__init__(allowed_levels=['single'], allowed_distribs=allowed_distribs, allow_vectorized_integrals=True)
+        self.alphas_indv = self._compute_indv_alphas(np.full(self.integrand.eta,self.alpha))
 
     def integrate(self):
         t_start = time()
         self.datum = np.empty(self.rho, dtype=object)
         for j in np.ndindex(self.rho):
             self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-                                                 self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel)
+                                                 self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel, self.alphas_indv[j])
 
         self.data = LDTransformBayesData.__new__(LDTransformBayesData)
         self.data.flags_indv = np.tile(False, self.rho)
