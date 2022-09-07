@@ -137,8 +137,8 @@ class CubQMCLatticeG(_CubQMCLDG):
         """
         Args:
             integrand (Integrand): an instance of Integrand
-            abs_tol (float): absolute error tolerance
-            rel_tol (float): relative error tolerance
+            abs_tol (ndarray): absolute error tolerance
+            rel_tol (ndarray): relative error tolerance
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
             fudge (function): positive function multiplying the finite

@@ -157,9 +157,9 @@ class CubQMCCLT(StoppingCriterion):
         Args:
             integrand (Integrand): an instance of Integrand
             inflate (float): inflation factor when estimating variance
-            alpha (float): significance level for confidence interval
-            abs_tol (float): absolute error tolerance
-            rel_tol (float): relative error tolerance
+            alpha (ndarray): significance level for confidence interval
+            abs_tol (ndarray): absolute error tolerance
+            rel_tol (ndarray): relative error tolerance
             n_max (int): maximum number of samples
             replications (int): number of replications
             error_fun: function taking in the approximate solution vector, 
@@ -190,7 +190,7 @@ class CubQMCCLT(StoppingCriterion):
         super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[LD], allow_vectorized_integrals=True)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
-        self.alphas_indv = self._compute_indv_alphas(full(self.integrand.eta,self.alpha))
+        self.alphas_indv,identity_dependency = self._compute_indv_alphas(full(self.integrand.eta,self.alpha))
         self.t_star = -t.ppf(self.alphas_indv/2,df=self.replications-1)
          
     def integrate(self):

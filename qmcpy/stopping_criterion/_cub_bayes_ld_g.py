@@ -57,7 +57,7 @@ class _CubBayesLDG(StoppingCriterion):
 
         # Verify Compliant Construction
         super(_CubBayesLDG, self).__init__(allowed_levels=['single'], allowed_distribs=allowed_distribs, allow_vectorized_integrals=True)
-        self.alphas_indv = self._compute_indv_alphas(np.full(self.integrand.eta,self.alpha))
+        self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.eta,self.alpha))
 
     def integrate(self):
         t_start = time()
