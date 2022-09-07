@@ -60,16 +60,18 @@ class StoppingCriterion(object):
         Return:
             ndarray: uncertainty levels on individual solutions"""
         alphas_indv = tile(1,self.integrand.rho)
+        identity_dependency = True
         for k in ndindex(self.integrand.eta):
             flags_comb = tile(True,self.integrand.eta)
             flags_comb[k] = False
             flags_indv = self.integrand.dependency(flags_comb)
+            if self.integrand.rho!=self.integrand.eta or (flags_indv!=flags_comb).any(): identity_dependency=False
             dependents_k = ~flags_indv
             n_dep_k = dependents_k.sum()
             alpha_k = alphas_comb[k]/n_dep_k
             alpha_k_mat = alpha_k*dependents_k
             alpha_k_mat[alpha_k_mat==0] = 1
             alphas_indv = minimum(alphas_indv,alpha_k_mat)
-        return alphas_indv
+        return alphas_indv,identity_dependency
     def __repr__(self):
         return _univ_repr(self, "StoppingCriterion", self.parameters)
