@@ -59,7 +59,7 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> cf = CustomFun(
     ...     true_measure = Uniform(Lattice(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
-    ...     dprime = (2,3))
+    ...     rho = (2,3))
     >>> sol,data = CubQMCLatticeG(cf,abs_tol=1e-6).integrate()
     >>> data
     LDTransformData (AccumulateData Object)
