@@ -44,18 +44,18 @@ class _CubQMCLDG(StoppingCriterion):
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
         self.d = self.discrete_distrib.d
-        self.dprime = self.integrand.dprime
+        self.rho = self.integrand.rho
         self.cv = list(atleast_1d(control_variates))
         self.ncv = len(self.cv)
-        self.cv_mu = array(control_variate_means) if self.ncv>0 else empty((self.ncv,)+self.dprime)
+        self.cv_mu = array(control_variate_means) if self.ncv>0 else empty((self.ncv,)+self.rho)
         self.cv_mu = self.cv_mu if self.cv_mu.ndim>1 else self.cv_mu.reshape(self.ncv,-1)
-        if self.cv_mu.shape!=((self.ncv,)+self.dprime):
-            raise ParameterError('''Control variate means should have shape (len(control variates),dprime).''')
+        if self.cv_mu.shape!=((self.ncv,)+self.rho):
+            raise ParameterError('''Control variate means should have shape (len(control variates),rho).''')
         for cv in self.cv:
-            if (cv.discrete_distrib!=self.discrete_distrib) or (not isinstance(cv,Integrand)) or (cv.dprime!=self.dprime):
+            if (cv.discrete_distrib!=self.discrete_distrib) or (not isinstance(cv,Integrand)) or (cv.rho!=self.rho):
                 raise ParameterError('''
                         Each control variates discrete distribution must be an Integrand instance 
-                        with the same discrete distribution as the main integrand. dprime must also match 
+                        with the same discrete distribution as the main integrand. rho must also match 
                         that of the main integrand instance for each control variate.''')
         self.update_beta = update_beta
         if self.ncv>0:
@@ -64,33 +64,33 @@ class _CubQMCLDG(StoppingCriterion):
 
     def integrate(self):
         t_start = time()
-        self.datum = empty(self.dprime,dtype=object)
-        for j in ndindex(self.dprime):
+        self.datum = empty(self.rho,dtype=object)
+        for j in ndindex(self.rho):
             cv_mu_j = self.cv_mu[(slice(None),)+j]
             self.datum[j] = LDTransformData(self.m_min,self.m_max,self.coefv,self.fudge,self.check_cone,self.ncv,cv_mu_j,self.update_beta)
         self.data = LDTransformData.__new__(LDTransformData)
-        self.data.flags_indv = tile(False,self.dprime)
-        self.data.compute_flags = tile(True,self.dprime)
-        self.data.m = tile(self.m_min,self.dprime)
+        self.data.flags_indv = tile(False,self.rho)
+        self.data.compute_flags = tile(True,self.rho)
+        self.data.m = tile(self.m_min,self.rho)
         self.data.n_min = 0
-        self.data.ci_low = tile(-inf,self.dprime)
-        self.data.ci_high = tile(inf,self.dprime)
-        self.data.solution_indv = tile(nan,self.dprime)
+        self.data.ci_low = tile(-inf,self.rho)
+        self.data.ci_high = tile(inf,self.rho)
+        self.data.solution_indv = tile(nan,self.rho)
         self.data.solution = nan
         self.data.xfull = empty((0,self.d))
-        self.data.yfull = empty((0,)+self.dprime)
+        self.data.yfull = empty((0,)+self.rho)
         while True:
             m = self.data.m.max()
             n_min = self.data.n_min
             n_max = int(2**m)
             n = int(n_max-n_min)
             xnext = self.discrete_distrib.gen_samples(n_min=n_min,n_max=n_max)
-            ycvnext = empty((1+self.ncv,n,)+self.dprime,dtype=float)
+            ycvnext = empty((1+self.ncv,n,)+self.rho,dtype=float)
             ycvnext[0] = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
             for k in range(self.ncv):
                 ycvnext[1+k] = self.cv[k].f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
             ycvnext_cp = ycvnext.astype(complex) if self.cast_complex else ycvnext.copy()
-            for j in ndindex(self.dprime):
+            for j in ndindex(self.rho):
                 if self.data.flags_indv[j]: continue
                 slice_yj = (0,slice(None),)+j
                 slice_ygj = (slice(1,None),slice(None),)+j
@@ -100,7 +100,7 @@ class _CubQMCLDG(StoppingCriterion):
                 yg_cp = ycvnext_cp[slice_ygj].T
                 self.data.solution_indv[j],self.data.ci_low[j],self.data.ci_high[j],cone_violation = self.datum[j].update_data(m,y_val,y_cp,yg_val,yg_cp)
                 if cone_violation:
-                    warnings.warn('Function at index %d (indexing dprime) violates cone conditions.'%j,CubatureWarning)
+                    warnings.warn('Function at index %d (indexing rho) violates cone conditions.'%j,CubatureWarning)
             self.data.xfull = vstack((self.data.xfull,xnext))
             self.data.yfull = vstack((self.data.yfull,ycvnext[0]))
             self.data.indv_error = (self.data.ci_high-self.data.ci_low)/2

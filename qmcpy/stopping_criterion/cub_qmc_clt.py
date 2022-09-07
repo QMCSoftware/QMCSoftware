@@ -103,7 +103,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> cf = CustomFun(
     ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
-    ...     dprime = (2,3))
+    ...     rho = (2,3))
     >>> sol,data = CubQMCCLT(cf,abs_tol=1e-4).integrate()
     >>> data
     MeanVarDataRep (AccumulateData Object)
@@ -186,7 +186,7 @@ class CubQMCCLT(StoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
-        self.dprime = self.integrand.dprime
+        self.rho = self.integrand.rho
         self.d = self.discrete_distrib.d
         super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[LD], allow_vectorized_integrals=True)
         if not self.discrete_distrib.randomize:
@@ -195,28 +195,28 @@ class CubQMCCLT(StoppingCriterion):
     def integrate(self):
         """ See abstract method. """
         t_start = time()
-        self.datum = empty(self.dprime,dtype=object)
-        for j in ndindex(self.dprime):
+        self.datum = empty(self.rho,dtype=object)
+        for j in ndindex(self.rho):
             self.datum[j] = MeanVarDataRep(self.t_star,self.inflate,self.replications)
         self.data = MeanVarDataRep.__new__(MeanVarDataRep)
-        self.data.flags_indv = tile(False,self.dprime)
-        self.data.compute_flags = tile(True,self.dprime)
+        self.data.flags_indv = tile(False,self.rho)
+        self.data.compute_flags = tile(True,self.rho)
         self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
-        self.data.n_rep = tile(self.n_init,self.dprime)
+        self.data.n_rep = tile(self.n_init,self.rho)
         self.data.n_min_rep = 0
-        self.data.ci_low = tile(-inf,self.dprime)
-        self.data.ci_high = tile(inf,self.dprime)
-        self.data.solution_indv = tile(nan,self.dprime)
+        self.data.ci_low = tile(-inf,self.rho)
+        self.data.ci_high = tile(inf,self.rho)
+        self.data.solution_indv = tile(nan,self.rho)
         self.data.solution = nan
         self.data.xfull = empty((0,self.d))
-        self.data.yfull = empty((0,)+self.dprime)
+        self.data.yfull = empty((0,)+self.rho)
         while True:
             n_min = self.data.n_min_rep
             n_max = int(self.data.n_rep.max())
             n = int(n_max-n_min)
             xnext = vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
             ynext = self.integrand.f(xnext,compute_flags=self.data.compute_flags)
-            for j in ndindex(self.dprime):
+            for j in ndindex(self.rho):
                 if self.data.flags_indv[j]: continue
                 yj = ynext[(slice(None),)+j].reshape((n,self.replications),order='f')
                 self.data.solution_indv[j],self.data.ci_low[j],self.data.ci_high[j] = self.datum[j].update_data(yj)

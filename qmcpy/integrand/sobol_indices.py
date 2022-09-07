@@ -120,14 +120,16 @@ class SobolIndices(Integrand):
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib.spawn(s=1,dimensions=[self.dtilde])[0]
         self.sampler = self.integrand.sampler
-        dprime = (6,self.s,)+self.integrand.dprime
-        super(SobolIndices,self).__init__(dprime,parallel=False)
+        super(SobolIndices,self).__init__(
+            rho = (6,self.s,)+self.integrand.rho,
+            eta = (2,self.s,)+self.integrand.rho,
+            parallel = False)
     
     def f(self, x, *args, **kwargs):
         z = x[:,self.d:]
         x = x[:,:self.d]
         n,d = x.shape
-        y = zeros((n,)+self.dprime,dtype=float)
+        y = zeros((n,)+self.rho,dtype=float)
         compute_flags = kwargs['compute_flags']
         del kwargs['compute_flags']
         v = zeros((n,d),dtype=float)
@@ -169,7 +171,7 @@ class SobolIndices(Integrand):
         return comb_bounds_low,comb_bounds_high
     
     def dependency(self, flags_comb):
-        individual_flags = zeros(self.dprime,dtype=bool)
+        individual_flags = zeros(self.rho,dtype=bool)
         individual_flags[:2] = flags_comb # numerator
         individual_flags[2:4] = flags_comb # copy to mu flags
         individual_flags[4:6] = flags_comb # copy to second moment flags

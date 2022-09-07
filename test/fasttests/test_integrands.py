@@ -18,7 +18,7 @@ class TestIntegrand(unittest.TestCase):
             BoxIntegral(DigitalNetB2(d),s=[3,5,7]),
             CustomFun(Uniform(DigitalNetB2(d)),lambda x: x.prod(1)),
             CustomFun(Uniform(Kumaraswamy(SciPyWrapper(DigitalNetB2(d),scipy.stats.triang,c=[0.1,.2]))),lambda x: x.prod(1)),
-            CustomFun(Gaussian(DigitalNetB2(2)),lambda x,compute_flags=None: x,dprime=d),
+            CustomFun(Gaussian(DigitalNetB2(2)),lambda x,compute_flags=None: x,rho=d),
             EuropeanOption(DigitalNetB2(d),call_put='call'),
             EuropeanOption(DigitalNetB2(d),call_put='put'),
             Keister(DigitalNetB2(d)),
@@ -50,7 +50,7 @@ class TestIntegrand(unittest.TestCase):
             s = str(integrand)
             for ptransform in ['None','Baker','C0','C1','C1sin','C2sin','C3sin']:
                 y = integrand.f(x,periodization_transform=ptransform)
-                self.assertTrue(y.shape==((n,)+integrand.dprime))
+                self.assertTrue(y.shape==((n,)+integrand.rho))
                 self.assertTrue(isfinite(y).all())
                 self.assertTrue(y.dtype==float64)
 

@@ -48,7 +48,7 @@ class _CubBayesLDG(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
 
         # Sobol indices
-        self.dprime = self.integrand.dprime
+        self.rho = self.integrand.rho
         self.cv = []
         self.ncv = len(self.cv)
         self.cast_complex = False
@@ -60,24 +60,24 @@ class _CubBayesLDG(StoppingCriterion):
 
     def integrate(self):
         t_start = time()
-        self.datum = np.empty(self.dprime, dtype=object)
-        for j in np.ndindex(self.dprime):
+        self.datum = np.empty(self.rho, dtype=object)
+        for j in np.ndindex(self.rho):
             self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
                                                  self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel)
 
         self.data = LDTransformBayesData.__new__(LDTransformBayesData)
-        self.data.flags_indv = np.tile(False, self.dprime)
-        self.data.compute_flags = np.tile(True,self.dprime)
+        self.data.flags_indv = np.tile(False, self.rho)
+        self.data.compute_flags = np.tile(True,self.rho)
         prev_flags_indv = self.data.flags_indv
-        self.data.m = np.tile(self.m_min, self.dprime)
+        self.data.m = np.tile(self.m_min, self.rho)
         self.data.n_min = 0
-        self.data.ci_low = np.tile(-np.inf, self.dprime)
-        self.data.ci_high = np.tile(np.inf, self.dprime)
-        self.data.solution_indv = np.tile(np.nan, self.dprime)
+        self.data.ci_low = np.tile(-np.inf, self.rho)
+        self.data.ci_high = np.tile(np.inf, self.rho)
+        self.data.solution_indv = np.tile(np.nan, self.rho)
         self.data.solution = np.nan
         self.data.xfull = np.empty((0, self.d))
-        self.data.yfull = np.empty((0,) + self.dprime)
-        stop_flag = np.tile(None, self.dprime)
+        self.data.yfull = np.empty((0,) + self.rho)
+        stop_flag = np.tile(None, self.rho)
         while True:
             m = self.data.m.max()
             n_min = self.data.n_min
@@ -85,14 +85,14 @@ class _CubBayesLDG(StoppingCriterion):
             n = int(n_max - n_min)
             xnext, xnext_un = self.discrete_distrib.gen_samples(n_min=n_min, n_max=n_max, return_unrandomized=True,
                                                                 warn=False)
-            ycvnext = np.empty((1 + self.ncv, n,) + self.dprime, dtype=float)
+            ycvnext = np.empty((1 + self.ncv, n,) + self.rho, dtype=float)
             ycvnext[0] = self.integrand.f(xnext, periodization_transform=self.ptransform,
                                           compute_flags=self.data.compute_flags)
             for k in range(self.ncv):
                 ycvnext[1 + k] = self.cv[k].f(xnext, periodization_transform=self.ptransform,
                                               compute_flags=self.data.compute_flags)
-            # print(self.data.flags_indv)
-            for j in np.ndindex(self.dprime):
+
+            for j in np.ndindex(self.rho):
                 if prev_flags_indv[j] == True and self.data.flags_indv[j] == False:
                     assert not(prev_flags_indv[j] == True and self.data.flags_indv[j] == False), 'This cannot happen !'
                 if self.data.flags_indv[j]:
