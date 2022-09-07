@@ -1,6 +1,6 @@
 from ..integrand._integrand import Integrand
 from ..util import DistributionCompatibilityError, ParameterError, MethodImplementationError, _univ_repr
-
+from numpy import *
 
 class StoppingCriterion(object):
     """ Stopping Criterion abstract class. DO NOT INSTANTIATE. """
@@ -34,7 +34,6 @@ class StoppingCriterion(object):
         # parameter checks
         if not hasattr(self,'parameters'):
             self.parameters = []
-        
             
     def integrate(self):
         """
@@ -51,5 +50,26 @@ class StoppingCriterion(object):
         """ ABSTRACT METHOD to reset the absolute tolerance. """
         raise ParameterError("The %s StoppingCriterioin does not yet support resetting tolerances.")
 
+    def _compute_indv_alphas(self, alphas_comb):
+        """
+        Compute individual uncertainty levels required to achieve combined uncertainty levels. 
+
+        Args:
+            alphas_comb (ndarray): desired uncertainty levels on combined solutions. 
+        
+        Return:
+            ndarray: uncertainty levels on individual solutions"""
+        alphas_indv = tile(1,self.integrand.rho)
+        for k in ndindex(self.integrand.eta):
+            flags_comb = tile(True,self.integrand.eta)
+            flags_comb[k] = False
+            flags_indv = self.integrand.dependency(flags_comb)
+            dependents_k = ~flags_indv
+            n_dep_k = dependents_k.sum()
+            alpha_k = alphas_comb[k]/n_dep_k
+            alpha_k_mat = alpha_k*dependents_k
+            alpha_k_mat[alpha_k_mat==0] = 1
+            alphas_indv = minimum(alphas_indv,alpha_k_mat)
+        return alphas_indv
     def __repr__(self):
         return _univ_repr(self, "StoppingCriterion", self.parameters)

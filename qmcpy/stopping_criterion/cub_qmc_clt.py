@@ -177,11 +177,10 @@ class CubQMCCLT(StoppingCriterion):
         self.rel_tol = rel_tol
         self.n_init = float(n_init)
         self.n_max = float(n_max)
-        self.alpha = float(alpha)
+        self.alpha = alpha
         self.inflate = float(inflate)
         self.replications = int(replications)
         self.error_fun = error_fun
-        self.t_star = -t.ppf(self.alpha/2,df=self.replications-1)
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
@@ -191,13 +190,15 @@ class CubQMCCLT(StoppingCriterion):
         super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[LD], allow_vectorized_integrals=True)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
+        self.alphas_indv = self._compute_indv_alphas(full(self.integrand.eta,self.alpha))
+        self.t_star = -t.ppf(self.alphas_indv/2,df=self.replications-1)
          
     def integrate(self):
         """ See abstract method. """
         t_start = time()
         self.datum = empty(self.rho,dtype=object)
         for j in ndindex(self.rho):
-            self.datum[j] = MeanVarDataRep(self.t_star,self.inflate,self.replications)
+            self.datum[j] = MeanVarDataRep(self.t_star[j],self.inflate,self.replications)
         self.data = MeanVarDataRep.__new__(MeanVarDataRep)
         self.data.flags_indv = tile(False,self.rho)
         self.data.compute_flags = tile(True,self.rho)
