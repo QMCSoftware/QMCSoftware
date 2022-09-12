@@ -247,3 +247,5 @@ class FWHT():
 
 
 class CubBayesSobolG(CubBayesNetG): pass
+class CubQMCBayesSobolG(CubBayesNetG): pass
+class CubQMCBayesNetG(CubBayesNetG): pass
