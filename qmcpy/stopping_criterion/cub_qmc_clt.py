@@ -231,7 +231,7 @@ class CubQMCCLT(StoppingCriterion):
             self.data.solution = tile(nan,self.data.ci_comb_low.shape)
             self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_comb = tile(False,self.data.ci_comb_low.shape)
-            self.data.flags_comb[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
+            self.data.flags_comb[fidxs] = (shigh-slow) <= (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
             self.data.compute_flags = ~self.data.flags_indv
             self.data.n = self.replications*self.data.n_rep
@@ -281,3 +281,5 @@ class CubQMCCLT(StoppingCriterion):
         """
         if abs_tol != None: self.abs_tol = abs_tol
         if rel_tol != None: self.rel_tol = rel_tol
+
+class CubQMCRep(CubQMCCLT): pass
