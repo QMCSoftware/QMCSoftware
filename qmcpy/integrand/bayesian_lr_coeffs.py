@@ -76,4 +76,4 @@ class BayesianLRCoeffs(Integrand):
         return comb_bounds_low,comb_bounds_high
     
     def dependency(self, flags_comb):
-        return hstack((flags_comb,flags_comb))
+        return vstack((flags_comb,flags_comb))
