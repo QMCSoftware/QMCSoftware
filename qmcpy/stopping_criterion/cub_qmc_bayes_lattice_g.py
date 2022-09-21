@@ -223,4 +223,4 @@ class CubBayesLatticeG(_CubBayesLDG):
 
         return vec_lambda, vec_lambda_ring, lambda_factor
 
-class CubQMCBayesLatticeG(CubQMCBayesLatticeG): pass
+class CubQMCBayesLatticeG(CubBayesLatticeG): pass
