@@ -3,7 +3,7 @@ import pickle
 from ctypes import *
 from numpy.ctypeslib import ndpointer
 import tensorflow as tf
-from qmcpy import *
+#from qmcpy import *
 
 m = 10
 nu = 3
@@ -33,9 +33,8 @@ outs = y_train.shape[1]
 # flatten 10x10 to 100x1 for weight computation
 x_train_flat = np.float64(0.99*np.transpose(x_train.reshape(x_train.shape[0],s)))
 
-# load qmc points
-dig_net = DigitalNetB2(2,seed=6)
-qmc_points_gen = np.array(dig_net.gen_samples(Nqmc), dtype=np.ndarray)
+#dig_net = DigitalNetB2(2,seed=6)
+#qmc_points = np.array(dig_net.gen_samples(Nqmc), dtype=np.ndarray)
 qmc_points = np.loadtxt('sobol.dat')
 #breakpoint()
 qmc_points = qmc_points[0:Nqmc,0:s]
