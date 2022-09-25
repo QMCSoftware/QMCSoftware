@@ -35,8 +35,8 @@ x_train_flat = np.float64(0.99*np.transpose(x_train.reshape(x_train.shape[0],s))
 
 # load qmc points
 dig_net = DigitalNetB2(2,seed=6)
-qmc_points = np.array(dig_net.gen_samples(Nqmc), dtype=np.ndarray)
-#qmc_points = np.loadtxt('sobol.dat')
+qmc_points_gen = np.array(dig_net.gen_samples(Nqmc), dtype=np.ndarray)
+qmc_points = np.loadtxt('sobol.dat')
 #breakpoint()
 qmc_points = qmc_points[0:Nqmc,0:s]
 
@@ -48,16 +48,15 @@ print(x_train_flat.shape)
 lib = cdll.LoadLibrary("/home/r2q2/Projects/QMCSoftware/qmcpy/machine_learning/c_lib/computeMXY.so")
 computeWeights = lib.computeWeights
 computeWeights.restype=ndpointer(dtype=c_double,shape=(1+outs,Nqmc))
-print('Weights loaded'
-)
+print('Weights loaded')
 
 # compute weights
 weights = computeWeights(c_int(nu),c_int(m),c_int(s),c_int(Ndata),c_int(Nqmc),c_int(outs),c_void_p(x_train_flat.ctypes.data),
 		c_void_p(qmc_points.ctypes.data),c_void_p(y_train.ctypes.data))
 weights = np.transpose(weights)
-weights.savetxt()
-#breakpoint()
 
-#with open('weights.pkl', 'wb') as handle:
-#    pickle.dump(weights, handle, protocol=pickle.HIGHEST_PROTOCOL)
+breakpoint()
+
+with open('weights.pkl', 'wb') as handle:
+    pickle.dump(weights, handle, protocol=pickle.HIGHEST_PROTOCOL)
     

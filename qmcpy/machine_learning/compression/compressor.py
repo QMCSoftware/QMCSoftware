@@ -1,6 +1,6 @@
 import warnings
 from numpy import *
-from .c_lib import c_lib
+#from ..c_lib import c_lib
 import numpy as np
 from ctypes import *
 from numpy.ctypeslib import ndpointer
@@ -8,7 +8,7 @@ import tensorflow as tf
 
 
 
-class compressor:
+class compression:
 
         '''
         Computes the weights W_X,Y and W_X.
@@ -28,19 +28,20 @@ class compressor:
 
         Output is a pointer to a vector which contains the weights W_X (Nqmc entries),
         and then the dimensions of W_X,Y (Nqmc x outs entries)  in the same order as the qmc points.'''
-        def __init__(self, nu, m, dimentsion, N, Ndata, Nqmc):
-                self.m = m #ell in the paper
+        def __init__(self, nu, m, s, N, Ndata, Nqmc):
+                self.m = 10 #ell in the paper
                 self.nu = 3
                 self.Ndata = 60000
                 self.Nqmc = 2**m
-                self.s = dimenstion
-                self.Nqmc = datapoints
+                self.s = s
+                self.Nqmc = Nqmc
                 self.outs = output_dimentsion
 
                 # load c functions
                 lib = cdll.LoadLibrary("/home/r2q2/Projects/QMCSoftware/qmcpy/machine_learning/c_lib/computeMXY.so")
                 computeWeights = lib.computeWeights
                 computeWeights.restype=ndpointer(dtype=c_double,shape=(1+outs,Nqmc))
+
         def get_dataset(self, dataset):
                 mnist = tf.keras.datasets.mnist
                 return mnist
