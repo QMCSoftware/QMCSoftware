@@ -80,7 +80,11 @@ setuptools.setup(
             sources=[
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/digital_net_b2.c',
-                'qmcpy/discrete_distribution/c_lib/fwht.c',],)],
+                'qmcpy/discrete_distribution/c_lib/fwht.c',],),
+		Extension(
+            name='qmcpy.machine_learning.c_lib.c_lib',
+            sources=[
+                'qmcpy/machine_learning/c_lib/computeMXY.c',],)],
     cmdclass={
         'clean': CleanCommand,
         'install': CustomInstall})
