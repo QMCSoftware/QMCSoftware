@@ -1,3 +1,4 @@
+from random import randint
 from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 from numpy import *
@@ -107,6 +108,10 @@ class Lattice(LD):
                 raise ParameterError("d_max and m_max must be supplied when generating_vector is a ndarray")
             self.d_max = d_max
             self.m_max = m_max
+        elif isinstance(generating_vector,int):
+            self.m_max = max(2,generating_vector)
+            self.d_max = dimension 
+            self.z_og = append(1,2*random.randint(1,2**(self.m_max-1),size=dimension-1)+1)
         elif isinstance(generating_vector,str):
             root = dirname(abspath(__file__))+'/generating_vectors/'
             if isfile(root+generating_vector):
