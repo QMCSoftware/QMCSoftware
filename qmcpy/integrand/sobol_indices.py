@@ -8,13 +8,13 @@ from numpy import *
 from itertools import combinations
 
 
-class SobolIndices(Integrand):
+class SensitivityIndices(Integrand):
     """
-    Sobol' Indicies in QMCPy. 
+    Sensitivity' Indicies, normalized Sobol' Indices. 
 
     >>> dnb2 = DigitalNetB2(dimension=3,seed=7)
     >>> keister_d = Keister(dnb2)
-    >>> keister_indices = SobolIndices(keister_d,indices='singletons')
+    >>> keister_indices = SensitivityIndices(keister_d,indices='singletons')
     >>> sc = CubQMCNetG(keister_indices,abs_tol=1e-3)
     >>> solution,data = sc.integrate()
     >>> solution.squeeze()
@@ -67,7 +67,7 @@ class SobolIndices(Integrand):
         rel_tol         0
         n_init          2^(10)
         n_max           2^(35)
-    SobolIndices (Integrand Object)
+    SensitivityIndices (Integrand Object)
         indices         [[0]
                         [1]
                         [2]]
@@ -109,7 +109,7 @@ class SobolIndices(Integrand):
             for r in range(1,self.d):
                 self.indices += [list(idx) for idx in combinations(arange(self.d),r)]
         if [] in self.indices or [i for i in range(self.d)] in self.indices:
-            raise ParameterError('SobolIndices indices cannot include [], the null set.')
+            raise ParameterError('SensitivityIndices indices cannot include [], the null set.')
         self.s = len(self.indices)
         self.indices_bool_mat = tile(False,(self.s,self.d))
         for k in range(self.s): self.indices_bool_mat[k,self.indices[k]] = True
@@ -120,8 +120,8 @@ class SobolIndices(Integrand):
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib.spawn(s=1,dimensions=[self.dtilde])[0]
         self.sampler = self.integrand.sampler
-        super(SobolIndices,self).__init__(
-            rho = (6,self.s,)+self.integrand.rho,
+        super(SensitivityIndices,self).__init__(
+            rho = (2,3,self.s,)+self.integrand.rho,
             eta = (2,self.s,)+self.integrand.rho,
             parallel = False)
     
@@ -136,8 +136,8 @@ class SobolIndices(Integrand):
         f_x = self.integrand.f(x,*args,**kwargs)
         f_z = self.integrand.f(z,*args,**kwargs)
         for k in range(self.s):
-            flags_closed = compute_flags[0,k,:]
-            flags_total = compute_flags[1,k,:]
+            flags_closed = compute_flags[0,0,k,:]
+            flags_total = compute_flags[1,0,k,:]
             flags_k = flags_closed|flags_total
             if not flags_k.any(): continue
             u_bool = self.indices_bool_mat[k]
@@ -145,23 +145,21 @@ class SobolIndices(Integrand):
             v[:,u_bool] = x[:,u_bool]
             v[:,not_u_bool] = z[:,not_u_bool]
             f_v = self.integrand.f(v,compute_flags=flags_k,*args,**kwargs)
-            y[:,0,k] = f_x*(f_v-f_z) # A.18
-            y[:,1,k] = (f_z-f_v)**2/2 # A.16
-            y[:,2,k] = f_x # mu
-            y[:,3,k] = f_x # mu copy
-            y[:,4,k] = f_x**2 # sigma^2+mu^2
-            y[:,5,k] = f_x**2 # sigma^2+mu^2 copy
+            y[:,0,0,k] = f_x*(f_v-f_z) # A.18
+            y[:,1,0,k] = (f_z-f_v)**2/2 # A.16
+            y[:,:,1,k] = f_x[:,None,:] # mu
+            y[:,:,2,k] = f_x[:,None,:]**2 # sigma^2+mu^2
         return y
     
     def _spawn(self, level, sampler):
         new_integrand = self.integrand.spawn(level,sampler)
-        return SobolIndices(
+        return SensitivityIndices(
             integrand = new_integrand,
             indices = self.indices)
     
     def bound_fun(self, bound_low, bound_high):
-        tau_low,mu_low,f2_low = bound_low[:2],bound_low[2:4],bound_low[4:6]
-        tau_high,mu_high,f2_high = bound_high[:2],bound_high[2:4],bound_high[4:6]
+        tau_low,mu_low,f2_low = bound_low[:,0],bound_low[:,1],bound_low[:,2]
+        tau_high,mu_high,f2_high = bound_high[:,0],bound_high[:,1],bound_high[:,2]
         sigma2_low1,sigma2_low2 = f2_high-mu_low**2,f2_high-mu_high**2
         comb_bounds_low = clip(minimum.reduce([tau_low/sigma2_low1,tau_low/sigma2_low2]),0,1)
         sigma2_high1,sigma2_high2 = f2_low-mu_low**2,f2_low-mu_high**2
@@ -171,10 +169,8 @@ class SobolIndices(Integrand):
         return comb_bounds_low,comb_bounds_high
     
     def dependency(self, flags_comb):
-        individual_flags = zeros(self.rho,dtype=bool)
-        individual_flags[:2] = flags_comb # numerator
-        individual_flags[2:4] = flags_comb # copy to mu flags
-        individual_flags[4:6] = flags_comb # copy to second moment flags
-        return individual_flags
+        return repeat(flags_comb[:,None,:],3,axis=1)
 
-class SensitivityIndices(SobolIndices): pass
+class SobolIndices(SensitivityIndices):
+    """ Normalized Sobol' Indices, an alias for SensitivityIndices. """
+    pass
