@@ -10,12 +10,6 @@ class SciPyWrapper(TrueMeasure):
     """
     Multivariate True Measure from Independent SciPy 1 Dimensional Marginals
 
-    >>> betas_2d = SciPyWrapper(discrete_distrib=DigitalNetB2(2,seed=7),scipy_distribs=[scipy.stats.beta(a=5,b=1)])
-    >>> betas_2d.gen_samples(4)
-    array([[0.89136146, 0.70469298],
-           [0.80905676, 0.91764986],
-           [0.96126183, 0.99081392],
-           [0.63619813, 0.86865531]])
     >>> unif_gauss_gamma = SciPyWrapper(
     ...     discrete_distrib = DigitalNetB2(3,seed=7),
     ...     scipy_distribs = [
@@ -31,6 +25,12 @@ class SciPyWrapper(TrueMeasure):
            [ 1.693306  ,  4.54891231, 80.23287215],
            [ 2.64149095,  9.77761625, 43.6883765 ],
            [ 1.20844522,  2.94566431, 22.68122716]])
+    >>> betas_2d = SciPyWrapper(discrete_distrib=DigitalNetB2(2,seed=7),scipy_distribs=[scipy.stats.beta(a=5,b=1)])
+    >>> betas_2d.gen_samples(4)
+    array([[0.89136146, 0.70469298],
+           [0.80905676, 0.91764986],
+           [0.96126183, 0.99081392],
+           [0.63619813, 0.86865531]])
     """
     
     def __init__(self, discrete_distrib, scipy_distribs):
