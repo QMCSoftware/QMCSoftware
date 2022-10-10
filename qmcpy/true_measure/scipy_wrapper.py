@@ -25,7 +25,7 @@ class SciPyWrapper(TrueMeasure):
            [ 1.693306  ,  4.54891231, 80.23287215],
            [ 2.64149095,  9.77761625, 43.6883765 ],
            [ 1.20844522,  2.94566431, 22.68122716]])
-    >>> betas_2d = SciPyWrapper(discrete_distrib=DigitalNetB2(2,seed=7),scipy_distribs=[scipy.stats.beta(a=5,b=1)])
+    >>> betas_2d = SciPyWrapper(discrete_distrib=DigitalNetB2(2,seed=7),scipy_distribs=scipy.stats.beta(a=5,b=1))
     >>> betas_2d.gen_samples(4)
     array([[0.89136146, 0.70469298],
            [0.80905676, 0.91764986],
@@ -46,7 +46,7 @@ class SciPyWrapper(TrueMeasure):
         if not isinstance(discrete_distrib,DiscreteDistribution):
             raise ParameterError("SciPyWrapper requires discrete_distrib be a DiscreteDistribution.")
         self._parse_sampler(discrete_distrib)
-        self.scipy_distrib = list(scipy_distribs)
+        self.scipy_distrib = list(scipy_distribs) if not isinstance(scipy_distribs,scipy.stats._distn_infrastructure.rv_continuous_frozen) else [scipy_distribs]
         for sd in self.scipy_distrib:
             if isinstance(sd,scipy.stats._distn_infrastructure.rv_continuous_frozen): continue
             raise ParameterError('''

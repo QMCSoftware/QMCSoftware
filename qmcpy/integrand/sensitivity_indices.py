@@ -1,5 +1,5 @@
 from ._integrand import Integrand
-from . import Keister, CustomFun
+from . import Keister, BoxIntegral
 from ..stopping_criterion import CubQMCNetG
 from ..util import ParameterError
 from ..true_measure import Uniform
@@ -24,43 +24,48 @@ class SensitivityIndices(Integrand):
     LDTransformData (AccumulateData Object)
         solution        [[0.328 0.328 0.328]
                         [0.339 0.339 0.339]]
-        indv_error      [[0.002 0.002 0.002]
-                        [0.002 0.002 0.002]
-                        [0.    0.    0.   ]
-                        [0.    0.    0.   ]
-                        [0.001 0.001 0.001]
-                        [0.003 0.003 0.003]]
-        ci_low          [[1.67  1.67  1.671]
-                        [1.725 1.724 1.725]
-                        [2.168 2.168 2.168]
-                        [2.168 2.168 2.168]
-                        [9.799 9.799 9.799]
-                        [9.797 9.797 9.797]]
-        ci_high         [[1.675 1.674 1.675]
-                        [1.73  1.729 1.73 ]
-                        [2.168 2.168 2.168]
-                        [2.169 2.169 2.169]
-                        [9.802 9.802 9.802]
-                        [9.803 9.803 9.803]]
+        indv_error      [[[0.002 0.002 0.002]
+                         [0.    0.    0.   ]
+                         [0.001 0.001 0.001]]
+    <BLANKLINE>
+                        [[0.002 0.002 0.002]
+                         [0.    0.    0.   ]
+                         [0.003 0.003 0.003]]]
+        ci_low          [[[1.67  1.67  1.671]
+                         [2.168 2.168 2.168]
+                         [9.799 9.799 9.799]]
+    <BLANKLINE>
+                        [[1.725 1.724 1.725]
+                         [2.168 2.168 2.168]
+                         [9.797 9.797 9.797]]]
+        ci_high         [[[1.675 1.674 1.675]
+                         [2.168 2.168 2.168]
+                         [9.802 9.802 9.802]]
+    <BLANKLINE>
+                        [[1.73  1.729 1.73 ]
+                         [2.169 2.169 2.169]
+                         [9.803 9.803 9.803]]]
         ci_comb_low     [[0.327 0.327 0.328]
                         [0.338 0.338 0.338]]
         ci_comb_high    [[0.329 0.329 0.329]
                         [0.34  0.339 0.34 ]]
         flags_comb      [[ True  True  True]
                         [ True  True  True]]
-        flags_indv      [[ True  True  True]
-                        [ True  True  True]
-                        [ True  True  True]
-                        [ True  True  True]
-                        [ True  True  True]
-                        [ True  True  True]]
+        flags_indv      [[[ True  True  True]
+                         [ True  True  True]
+                         [ True  True  True]]
+    <BLANKLINE>
+                        [[ True  True  True]
+                         [ True  True  True]
+                         [ True  True  True]]]
         n_total         2^(16)
-        n               [[65536. 65536. 65536.]
-                        [32768. 32768. 32768.]
-                        [65536. 65536. 65536.]
-                        [32768. 32768. 32768.]
-                        [65536. 65536. 65536.]
-                        [32768. 32768. 32768.]]
+        n               [[[65536. 65536. 65536.]
+                         [65536. 65536. 65536.]
+                         [65536. 65536. 65536.]]
+    <BLANKLINE>
+                        [[32768. 32768. 32768.]
+                         [32768. 32768. 32768.]
+                         [32768. 32768. 32768.]]]
         time_integrate  ...
     CubQMCNetG (StoppingCriterion Object)
         abs_tol         0.001
@@ -83,6 +88,22 @@ class SensitivityIndices(Integrand):
         graycode        0
         entropy         7
         spawn_key       (0,)
+    >>> sc = CubQMCNetG(SobolIndices(BoxIntegral(DigitalNetB2(3,seed=7)),indices='all'),abs_tol=.01)
+    >>> sol,data = sc.integrate()
+    >>> print(sol)
+    [[[0.32312991 0.33340559]
+      [0.32331463 0.33342669]
+      [0.32160276 0.33318619]
+      [0.65559598 0.6667154 ]
+      [0.65551702 0.66670251]
+      [0.6556618  0.66672429]]
+    <BLANKLINE>
+     [[0.3440018  0.33341845]
+      [0.34501082 0.33347005]
+      [0.34504829 0.33345212]
+      [0.67659368 0.6667021 ]
+      [0.67725088 0.66667925]
+      [0.67802866 0.66672587]]]
     
     References: 
         [1] Art B. Owen.Monte Carlo theory, methods and examples. 2013. Appendix A.
