@@ -72,8 +72,8 @@ class _CubBayesLDG(StoppingCriterion):
         prev_flags_indv = self.data.flags_indv
         self.data.m = np.tile(self.m_min, self.rho)
         self.data.n_min = 0
-        self.data.ci_low = np.tile(-np.inf, self.rho)
-        self.data.ci_high = np.tile(np.inf, self.rho)
+        self.data.indv_bound_low = np.tile(-np.inf, self.rho)
+        self.data.indv_bound_high = np.tile(np.inf, self.rho)
         self.data.solution_indv = np.tile(np.nan, self.rho)
         self.data.solution = np.nan
         self.data.xfull = np.empty((0, self.d))
@@ -106,22 +106,21 @@ class _CubBayesLDG(StoppingCriterion):
                 # Update function values
                 success, muhat, r_order, err_bd, _ = self.datum[j].update_data(y_val_new=y_val, xnew=xnext, xunnew=xnext_un)
 
-                bounds = muhat + np.array([-1, 1]) * err_bd/2
-                stop_flag[j], self.data.solution_indv[j], self.data.ci_low[j], self.data.ci_high[j] = \
+                bounds = muhat + np.array([-1, 1]) * err_bd
+                stop_flag[j], self.data.solution_indv[j], self.data.indv_bound_low[j], self.data.indv_bound_high[j] = \
                     success, muhat, bounds[0], bounds[1]
 
             self.data.xfull = np.vstack((self.data.xfull, xnext))
             self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
-            self.data.indv_error = (self.data.ci_high - self.data.ci_low) / 2
-            self.data.ci_comb_low,self.data.ci_comb_high = self.integrand.bound_fun(self.data.ci_low,self.data.ci_high)
-            self.abs_tols,self.rel_tols = np.full_like(self.data.ci_comb_low,self.abs_tol),np.full_like(self.data.ci_comb_low,self.rel_tol)
-            fidxs = np.isfinite(self.data.ci_comb_low)&np.isfinite(self.data.ci_comb_high)
-            slow,shigh,abs_tols,rel_tols = self.data.ci_comb_low[fidxs],self.data.ci_comb_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = np.tile(np.nan,self.data.ci_comb_low.shape)
+            self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
+            self.abs_tols,self.rel_tols = np.full_like(self.data.comb_bound_low,self.abs_tol),np.full_like(self.data.comb_bound_low,self.rel_tol)
+            fidxs = np.isfinite(self.data.comb_bound_low)&np.isfinite(self.data.comb_bound_high)
+            slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
+            self.data.solution = np.tile(np.nan,self.data.comb_bound_low.shape)
             self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.flags_comb = np.tile(False,self.data.ci_comb_low.shape)
-            self.data.flags_comb[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.flags_indv = self.integrand.dependency(self.data.flags_comb)
+            self.data.comb_flags = np.tile(False,self.data.comb_bound_low.shape)
+            self.data.comb_flags[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
+            self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
             self.data.compute_flags = ~self.data.flags_indv
             self.data.n = 2 ** self.data.m
             self.data.n_total = self.data.n.max()
@@ -148,13 +147,9 @@ class _CubBayesLDG(StoppingCriterion):
         self.data.stopping_crit = self
         self.data.parameters = [
             'solution',
-            'indv_error',
-            'ci_low',
-            'ci_high',
-            'ci_comb_low',
-            'ci_comb_high',
-            'flags_comb',
-            'flags_indv',
+            'comb_bound_low',
+            'comb_bound_high',
+            'comb_flags',
             'n_total',
             'n',
             'time_integrate']

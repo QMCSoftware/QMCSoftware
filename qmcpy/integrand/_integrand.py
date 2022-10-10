@@ -179,7 +179,7 @@ class Integrand(object):
                 QMCPy cannot infer a reasonable bound function.''')
         return bound_low,bound_high
 
-    def dependency(self, flags_comb):
+    def dependency(self, comb_flags):
         """
         Takes a vector of indicators of weather of not
         the error bound is satisfied for combined integrands and which returns flags for individual integrands.
@@ -187,12 +187,12 @@ class Integrand(object):
         has not been approximated to within the tolerance, so the dependency function should return [True,True]
         indicating that both the numerator and denominator integrands need to be better approximated.
         Args:
-            flags_comb (bool ndarray): flags indicating weather the combined integrals are insufficiently approximated
+            comb_flags (bool ndarray): flags indicating weather the combined integrals are insufficiently approximated
 
         Return:
             (bool ndarray): length (Integrand.rho) flags for individual integrands
         """
-        return flags_comb if self.rho==self.eta else  tile((flags_comb==False).any(),self.rho)
+        return comb_flags if self.rho==self.eta else  tile((comb_flags==False).any(),self.rho)
 
     def _dimension_at_level(self, level):
         """
