@@ -17,7 +17,7 @@ class TestIntegrand(unittest.TestCase):
             BoxIntegral(DigitalNetB2(d),s=1),
             BoxIntegral(DigitalNetB2(d),s=[3,5,7]),
             CustomFun(Uniform(DigitalNetB2(d)),lambda x: x.prod(1)),
-            CustomFun(Uniform(Kumaraswamy(SciPyWrapper(DigitalNetB2(d),scipy.stats.triang,c=[0.1,.2]))),lambda x: x.prod(1)),
+            CustomFun(Uniform(Kumaraswamy(SciPyWrapper(DigitalNetB2(d),[scipy.stats.triang(c=.1),scipy.stats.uniform()]))),lambda x: x.prod(1)),
             CustomFun(Gaussian(DigitalNetB2(2)),lambda x,compute_flags=None: x,rho=d),
             EuropeanOption(DigitalNetB2(d),call_put='call'),
             EuropeanOption(DigitalNetB2(d),call_put='put'),
