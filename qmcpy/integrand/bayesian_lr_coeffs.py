@@ -75,5 +75,5 @@ class BayesianLRCoeffs(Integrand):
         comb_bounds_low[violated],comb_bounds_high[violated] = -inf,inf
         return comb_bounds_low,comb_bounds_high
     
-    def dependency(self, flags_comb):
-        return vstack((flags_comb,flags_comb))
+    def dependency(self, comb_flags):
+        return vstack((comb_flags,comb_flags))

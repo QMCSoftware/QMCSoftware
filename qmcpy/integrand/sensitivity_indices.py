@@ -24,40 +24,12 @@ class SensitivityIndices(Integrand):
     LDTransformData (AccumulateData Object)
         solution        [[0.328 0.328 0.328]
                         [0.339 0.339 0.339]]
-        indv_error      [[[0.002 0.002 0.002]
-                         [0.    0.    0.   ]
-                         [0.001 0.001 0.001]]
-    <BLANKLINE>
-                        [[0.002 0.002 0.002]
-                         [0.    0.    0.   ]
-                         [0.003 0.003 0.003]]]
-        ci_low          [[[1.67  1.67  1.671]
-                         [2.168 2.168 2.168]
-                         [9.799 9.799 9.799]]
-    <BLANKLINE>
-                        [[1.725 1.724 1.725]
-                         [2.168 2.168 2.168]
-                         [9.797 9.797 9.797]]]
-        ci_high         [[[1.675 1.674 1.675]
-                         [2.168 2.168 2.168]
-                         [9.802 9.802 9.802]]
-    <BLANKLINE>
-                        [[1.73  1.729 1.73 ]
-                         [2.169 2.169 2.169]
-                         [9.803 9.803 9.803]]]
-        ci_comb_low     [[0.327 0.327 0.328]
+        comb_bound_low  [[0.327 0.327 0.328]
                         [0.338 0.338 0.338]]
-        ci_comb_high    [[0.329 0.329 0.329]
+        comb_bound_high [[0.329 0.329 0.329]
                         [0.34  0.339 0.34 ]]
-        flags_comb      [[ True  True  True]
+        comb_flags      [[ True  True  True]
                         [ True  True  True]]
-        flags_indv      [[[ True  True  True]
-                         [ True  True  True]
-                         [ True  True  True]]
-    <BLANKLINE>
-                        [[ True  True  True]
-                         [ True  True  True]
-                         [ True  True  True]]]
         n_total         2^(16)
         n               [[[65536. 65536. 65536.]
                          [65536. 65536. 65536.]
@@ -189,8 +161,8 @@ class SensitivityIndices(Integrand):
         comb_bounds_low[violated],comb_bounds_high[violated] = 0,1
         return comb_bounds_low,comb_bounds_high
     
-    def dependency(self, flags_comb):
-        return repeat(flags_comb[:,None,:],3,axis=1)
+    def dependency(self, comb_flags):
+        return repeat(comb_flags[:,None,:],3,axis=1)
 
 class SobolIndices(SensitivityIndices):
     """ Normalized Sobol' Indices, an alias for SensitivityIndices. """
