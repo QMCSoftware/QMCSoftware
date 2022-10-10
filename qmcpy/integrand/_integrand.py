@@ -10,17 +10,19 @@ from itertools import repeat
 class Integrand(object):
     """ Integrand abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self, dprime, parallel):
+    def __init__(self, rho, eta, parallel):
         """
         Args:
-            dprime (tuple): function output dimension shape.
+            rho (tuple): individual solution shape.
+            eta (tuple): combined solution shape. 
             parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion.
                 Otherwise, parallel specifies the number of CPUs used by multiprocessing.Pool.
                 Passing parallel=True sets the number of CPUs equal to os.cpu_count().
         """
         prefix = 'A concrete implementation of Integrand must have '
         self.d = self.true_measure.d
-        self.dprime = (dprime,) if isinstance(dprime,int) else tuple(dprime)
+        self.rho = (rho,) if isinstance(rho,int) else tuple(rho)
+        self.eta = (eta,) if isinstance(eta,int) else tuple(eta)
         cpus = os.cpu_count()
         self.parallel = cpus if parallel is True else int(parallel)
         self.parallel = 0 if self.parallel==1 else self.parallel
@@ -77,7 +79,7 @@ class Integrand(object):
             ndarray: length n vector of function evaluations
         """
         periodization_transform = 'NONE' if periodization_transform is None else periodization_transform.upper()
-        compute_flags = tile(1,self.dprime) if compute_flags is None else atleast_1d(compute_flags)
+        compute_flags = tile(1,self.rho) if compute_flags is None else atleast_1d(compute_flags)
         n,d = x.shape
         # parameter checks
         if self.discrete_distrib.mimics != 'StdUniform' and periodization_transform!='NONE':
@@ -113,7 +115,7 @@ class Integrand(object):
             xp[xp<=0] = self.EPS
             xp[xp>=1] = 1-self.EPS
         # function evaluation with chain rule
-        y = empty((n,)+self.dprime,dtype=float)
+        y = empty((n,)+self.rho,dtype=float)
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._transform(xp) # get transformed samples, equivalent to self.true_measure._transform_r(x)
@@ -138,14 +140,14 @@ class Integrand(object):
             y = concatenate(y,dtype=float)
         else:
             y = self._g2(t,comb_args=(args,kwargs))
-        y = y.reshape((n,)+self.dprime)
+        y = y.reshape((n,)+self.rho)
         return y
 
     def _g2(self,t,comb_args=((),{})):
         args = comb_args[0]
         kwargs = comb_args[1]
         t = atleast_2d(t)
-        if self.dprime==(1,):
+        if self.rho==(1,):
             kwargs = dict(kwargs)
             del kwargs['compute_flags']
         y = self.g(t,*args,**kwargs)
@@ -159,8 +161,8 @@ class Integrand(object):
         individually.
 
         Args:
-            bound_low (ndarray): length Integrand.dprime lower error bound
-            bound_high (ndarray): length Integrand.dprime upper error bound
+            bound_low (ndarray): length Integrand.rho lower error bound
+            bound_high (ndarray): length Integrand.rho upper error bound
 
         Return:
             (tuple) containing
@@ -169,21 +171,28 @@ class Integrand(object):
             - (ndarray): upper bound on function combining estimates
             - (ndarray): bool flags to override sufficient combined integrand estimation, e.g., when approximating a ratio of integrals, if the denominator's bounds straddle 0, then returning True here forces ratio to be flagged as insufficiently approximated.
         """
+        if self.rho!=self.eta:
+            raise ParameterError('''
+                Set bound_fun explicity. 
+                The default bound_fun is the identity map. 
+                Since individual solution dimension rho != combined solution dimension eta, 
+                QMCPy cannot infer a reasonable bound function.''')
         return bound_low,bound_high
 
-    def dependency(self, flags_comb):
+    def dependency(self, comb_flags):
         """
-        takes a vector of indicators of weather of not
+        Takes a vector of indicators of weather of not
         the error bound is satisfied for combined integrands and which returns flags for individual integrands.
         For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio
         has not been approximated to within the tolerance, so the dependency function should return [True,True]
         indicating that both the numerator and denominator integrands need to be better approximated.
         Args:
-            flags_comb (bool ndarray): flags indicating weather the combined integrals are insufficiently approximated
+            comb_flags (bool ndarray): flags indicating weather the combined integrals are insufficiently approximated
 
         Return:
-            (bool ndarray): length (Integrand.dprime) flags for individual integrands"""
-        return flags_comb
+            (bool ndarray): length (Integrand.rho) flags for individual integrands
+        """
+        return comb_flags if self.rho==self.eta else  tile((comb_flags==False).any(),self.rho)
 
     def _dimension_at_level(self, level):
         """

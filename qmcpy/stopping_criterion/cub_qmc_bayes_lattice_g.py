@@ -22,13 +22,9 @@ class CubBayesLatticeG(_CubBayesLDG):
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.808
-        indv_error      6.41e-04
-        ci_low          1.808
-        ci_high         1.809
-        ci_comb_low     1.808
-        ci_comb_high    1.809
-        flags_comb      1
-        flags_indv      1
+        comb_bound_low  1.808
+        comb_bound_high 1.809
+        comb_flags      1
         n_total         2^(8)
         n               2^(8)
         time_integrate  ...
@@ -222,3 +218,5 @@ class CubBayesLatticeG(_CubBayesLDG):
             lambda_factor = 1
 
         return vec_lambda, vec_lambda_ring, lambda_factor
+
+class CubQMCBayesLatticeG(CubBayesLatticeG): pass

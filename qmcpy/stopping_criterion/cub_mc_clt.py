@@ -62,19 +62,42 @@ class CubMCCLT(StoppingCriterion):
     >>> cv2mean = 3/4
     >>> sc1 = CubMCCLT(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
     >>> sol,data = sc1.integrate()
-    >>> sol
-    1.381...
+    >>> data
+    MeanVarData (AccumulateData Object)
+        solution        1.381
+        error_bound     0.010
+        n_total         3072
+        n               2^(11)
+        levels          1
+        time_integrate  ...
+    CubMCCLT (StoppingCriterion Object)
+        abs_tol         0.050
+        rel_tol         0
+        n_init          2^(10)
+        n_max           10000000000
+        inflate         1.200
+        alpha           0.010
+    Keister (Integrand Object)
+    Gaussian (TrueMeasure Object)
+        mean            0
+        covariance      2^(-1)
+        decomp_type     PCA
+    IIDStdUniform (DiscreteDistribution Object)
+        d               1
+        entropy         7
+        spawn_key       ()
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
-        inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
+        inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[],
+        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
             integrand (Integrand): an instance of Integrand
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
-            abs_tol (float): absolute error tolerance
-            rel_tol (float): relative error tolerance
+            abs_tol (ndarray): absolute error tolerance
+            rel_tol (ndarray): relative error tolerance
             n_max (int): maximum number of samples
             control_variates (list): list of integrand objects to be used as control variates. 
                 Control variates are currently only compatible with single level problems. 
@@ -83,12 +106,12 @@ class CubMCCLT(StoppingCriterion):
         """
         self.parameters = ['abs_tol','rel_tol','n_init','n_max','inflate','alpha']
         # Set Attributes
-        self.abs_tol = float(abs_tol)
-        self.rel_tol = float(rel_tol)
-        self.n_init = float(n_init)
-        self.n_max = float(n_max)
-        self.alpha = float(alpha)
-        self.inflate = float(inflate)
+        self.abs_tol = abs_tol
+        self.rel_tol = rel_tol
+        self.n_init = n_init
+        self.n_max = n_max
+        self.alpha = alpha
+        self.inflate = inflate
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
@@ -98,7 +121,7 @@ class CubMCCLT(StoppingCriterion):
         # Verify Compliant Construction
         allowed_levels = ['single','fixed-multi']
         allowed_distribs = [IID]
-        allow_vectorized_integrals = False
+        allow_vectorized_integrals = True
         super(CubMCCLT,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
@@ -116,8 +139,7 @@ class CubMCCLT(StoppingCriterion):
         # n_mu_temp := n such that confidence intervals width and conficence will be satisfied
         tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
         z_star = -norm.ppf(self.alpha / 2.)
-        n_mu_temp = ceil(temp_b * (self.data.sighat / temp_a) * \
-                            (z_star * self.inflate / tol_up)**2)
+        n_mu_temp = ceil(temp_b * (self.data.sighat / temp_a) * (z_star * self.inflate / tol_up)**2)
         # n_mu := n_mu_temp adjusted for previous n
         self.data.n_mu = maximum(self.data.n, n_mu_temp)
         self.data.n += self.data.n_mu.astype(int)
@@ -127,7 +149,7 @@ class CubMCCLT(StoppingCriterion):
             Alread generated %d samples.
             Trying to generate %d new samples, which would exceed n_max = %d.
             The number of new samples will be decrease proportionally for each integrand.
-            Note that error tolerances may no longer be satisfied""" \
+            Note that error tolerances may no longer be satisfied.""" \
             % (int(self.data.n_total), int(self.data.n.sum()), int(self.n_max))
             warnings.warn(warning_s, MaxSamplesWarning)
             # decrease n proportionally for each integrand
