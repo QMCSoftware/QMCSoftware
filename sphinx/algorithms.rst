@@ -171,10 +171,10 @@ Linear Function
 .. automodule:: qmcpy.integrand.linear0
     :members:
 
-Sobol' Indices
+Sensitivity Indices
 ..............
 
-.. automodule:: qmcpy.integrand.sobol_indices
+.. automodule:: qmcpy.integrand.sensitivity_indices
     :members:
 
 
