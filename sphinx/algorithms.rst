@@ -172,7 +172,7 @@ Linear Function
     :members:
 
 Sensitivity Indices
-..............
+...................
 
 .. automodule:: qmcpy.integrand.sensitivity_indices
     :members:

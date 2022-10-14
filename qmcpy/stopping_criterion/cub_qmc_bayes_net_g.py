@@ -48,14 +48,14 @@ class CubBayesNetG(_CubBayesLDG):
         spawn_key       ()
 
     Adapted from 
-	`GAIL cubBayesNet_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m>`_.
+	GAIL cubBayesNet_g https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m.
 
 
     Reference
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
         Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
         GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
-        Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
+        Available from GAIL http://gailgithub.github.io/GAIL_Dev/.
 
     Guarantee
         This algorithm attempts to calculate the integral of function f over the
