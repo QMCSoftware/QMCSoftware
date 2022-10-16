@@ -43,7 +43,7 @@ Output is a pointer to a vector which contains the weights W_X (Nqmc entries), a
 in the same order as the qmc points.
 */
 EXPORT double* computeWeights(int nu, int m, int s, int N, int Nqmc, int outs, double* px, double* pz, double* py){
-   
+  print("I am in compute Weights");
     int base = 2;
     double* weights;
     

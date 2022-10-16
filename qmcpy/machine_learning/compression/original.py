@@ -3,7 +3,8 @@ import pickle
 from ctypes import *
 from numpy.ctypeslib import ndpointer
 import tensorflow as tf
-#from qmcpy import *
+from qmcpy import *
+#import ..c_lib
 
 m = 10
 nu = 3
