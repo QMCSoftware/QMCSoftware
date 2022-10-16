@@ -9,20 +9,20 @@ m = 10
 nu = 3
 
 Ndata = 60000
-Nqmc = 2**m;
+Nqmc = 2**m
 
 # load mnist data and rescale to 10x10
 mnist = tf.keras.datasets.mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 x_train, x_test = x_train / 255.0, x_test / 255.0
-y_train =  np.float64(tf.one_hot(y_train,10).numpy())
+y_train =  np.float64(tf.one_hot(y_train, 10).numpy())
 
 
 x_train=x_train[:Ndata,:,:]
 y_train = y_train[:Ndata]
 
 x_train = x_train[...,tf.newaxis]
-x_train = tf.image.resize(x_train,[10,10])
+x_train = tf.image.resize(x_train,[10, 10])
 x_train = x_train.numpy()[:,:,:,0]
 
 # data dimension
@@ -44,7 +44,7 @@ print(qmc_points.shape)
 print(x_train_flat.shape)
 
 # load c functions
-lib = cdll.LoadLibrary("/home/r2q2/Projects/QMCSoftware/qmcpy/machine_learning/c_lib/computeMXY.so")
+lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
 computeWeights = lib.computeWeights
 computeWeights.restype=ndpointer(dtype=c_double,shape=(1+outs,Nqmc))
 print('Weights loaded')
@@ -54,8 +54,7 @@ weights = computeWeights(c_int(nu),c_int(m),c_int(s),c_int(Ndata),c_int(Nqmc),c_
 		c_void_p(qmc_points.ctypes.data),c_void_p(y_train.ctypes.data))
 weights = np.transpose(weights)
 
-breakpoint()
+#breakpoint()
 
-with open('weights.pkl', 'wb') as handle:
+with open('../../../demos/weights.pkl', 'wb') as handle:
     pickle.dump(weights, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    
