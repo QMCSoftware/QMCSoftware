@@ -1,12 +1,8 @@
-import warnings
-from numpy import *
-#from ..c_lib import c_lib
-import numpy as np
 from ctypes import *
 from numpy.ctypeslib import ndpointer
 import tensorflow as tf
-
-
+from numpy import *
+from qmcpy import *
 
 class compression:
 
@@ -28,7 +24,7 @@ class compression:
 
         Output is a pointer to a vector which contains the weights W_X (Nqmc entries),
         and then the dimensions of W_X,Y (Nqmc x outs entries)  in the same order as the qmc points.'''
-        def __init__(self, nu, m, s, N, Ndata, Nqmc):
+        def __init__(self, nu, m, s, N, Ndata, Nqmc, output_dimentsion):
                 self.m = 10 #ell in the paper
                 self.nu = 3
                 self.Ndata = 60000
@@ -40,7 +36,7 @@ class compression:
                 # load c functions
                 lib = cdll.LoadLibrary("/home/r2q2/Projects/QMCSoftware/qmcpy/machine_learning/c_lib/computeMXY.so")
                 computeWeights = lib.computeWeights
-                computeWeights.restype=ndpointer(dtype=c_double,shape=(1+outs,Nqmc))
+                computeWeights.restype=ndpointer(dtype=c_double,shape=(1+self.outs,Nqmc))
 
         def get_dataset(self, dataset):
                 mnist = tf.keras.datasets.mnist
@@ -56,8 +52,8 @@ class compression:
                 y_train =  np.float64(tf.one_hot(y_train,10).numpy())
 
 
-                x_train=x_train[:Ndata,:,:]
-                y_train = y_train[:Ndata]
+                x_train=x_train[:self.Ndata,:,:]
+                y_train = y_train[:self.Ndata]
 
                 x_train = x_train[...,tf.newaxis]
                 x_train = tf.image.resize(x_train,[10,10])
@@ -73,23 +69,26 @@ class compression:
 
                 # load qmc points
                 dig_net = DigitalNetB2(2,seed=6)
-                qmc_points = np.array(dig_net.gen_samples(Nqmc), dtype=np.ndarray)
+                qmc_points = np.array(dig_net.gen_samples(self.Nqmc), dtype=np.ndarray)
                 #qmc_points = np.loadtxt('sobol.dat')
                 #breakpoint()
-                qmc_points = qmc_points[0:Nqmc,0:s]
+                qmc_points = qmc_points[0:self.Nqmc,0:s]
 
 
                 print(qmc_points.shape)
                 print(x_train_flat.shape)
 
+                # load c functions
+                lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
+                computeWeights = lib.computeWeights
                 weights = computeWeights(c_int(self.nu),
                                          c_int(self.m),
                                          c_int(self.s),
                                          c_int(self.Ndata),
                                          c_int(self.Nqmc),
                                          c_int(self.outs),
-                                         c_void_p(self.x_train_flat.ctypes.data),
-                                         c_void_p(self.qmc_points.ctypes.data),
-                                         c_void_p(self.y_train.ctypes.data))
+                                         c_void_p(x_train_flat.ctypes.data),
+                                         c_void_p(qmc_points.ctypes.data),
+                                         c_void_p(y_train.ctypes.data))
                 weights = np.transpose(weights)
                 breakpoint()
