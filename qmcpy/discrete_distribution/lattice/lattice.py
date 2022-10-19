@@ -1,4 +1,3 @@
-from random import randint
 from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 from numpy import *
@@ -26,6 +25,21 @@ class Lattice(LD):
         order           natural
         entropy         7
         spawn_key       ()
+    >>> l = Lattice(2,generating_vector = 17,seed = 9)
+    >>> l.gen_samples(5)
+    array([[0.2943626 , 0.88967111],
+       [0.7943626 , 0.38967111],
+       [0.5443626 , 0.63967111],
+       [0.0443626 , 0.13967111],
+       [0.4193626 , 0.76467111]])
+    >>> l 
+    Lattice (DiscreteDistribution Object)
+    d               2^(1)
+    dvec            [0 1]
+    randomize       1
+    order           natural
+    entropy         9
+    spawn_key       ()
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
@@ -41,6 +55,15 @@ class Lattice(LD):
            [0.5 , 0.5 ],
            [0.25, 0.75],
            [0.75, 0.25]])
+    >>> Lattice(dimension = 2, generating_vector = 25,seed = 55,randomize = False).gen_samples(8, warn = False)
+    array([[0.   , 0.   ],
+       [0.5  , 0.5  ],
+       [0.25 , 0.25 ],
+       [0.75 , 0.75 ],
+       [0.125, 0.625],
+       [0.625, 0.125],
+       [0.375, 0.875],
+       [0.875, 0.375]])
 
     References:
 
@@ -80,10 +103,11 @@ class Lattice(LD):
                 Note: Non-randomized lattice sequence includes the origin.
             order (str): 'linear', 'natural', or 'mps' ordering.
             seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
-            generating_vector (ndarray or str): generating matrix or path to generating matrices.
+            generating_vector (ndarray, str or int): generating matrix or path to generating matrices.
                 ndarray should have shape (d_max).
                 a string generating_vector should be formatted like
                 'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy'
+                an integer should be larger than 1
             d_max (int): maximum dimension
             m_max (int): 2^m_max is the max number of supported samples
 
@@ -111,7 +135,6 @@ class Lattice(LD):
         elif isinstance(generating_vector,int):
             self.m_max = max(2,generating_vector)
             self.d_max = dimension 
-            self.z_og = append(1,2*random.randint(1,2**(self.m_max-1),size=dimension-1)+1)
         elif isinstance(generating_vector,str):
             root = dirname(abspath(__file__))+'/generating_vectors/'
             if isfile(root+generating_vector):
@@ -128,6 +151,7 @@ class Lattice(LD):
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
+        self.z_og = append(1,2*self.rng.integers(1,2**(self.m_max-1),size = dimension-1)+1);
         self.z = self.z_og[self.dvec]
         self.shift = self.rng.uniform(size=int(self.d))
 
