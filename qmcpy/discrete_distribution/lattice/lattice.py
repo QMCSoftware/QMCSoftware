@@ -133,7 +133,7 @@ class Lattice(LD):
             self.d_max = d_max
             self.m_max = m_max
         elif isinstance(generating_vector,int):
-            self.m_max = max(2,generating_vector)
+            self.m_max = min(64,max(2,generating_vector))
             self.d_max = dimension 
         elif isinstance(generating_vector,str):
             root = dirname(abspath(__file__))+'/generating_vectors/'
@@ -151,7 +151,8 @@ class Lattice(LD):
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
-        self.z_og = append(1,2*self.rng.integers(1,2**(self.m_max-1),size = dimension-1)+1);
+        if isinstance(generating_vector,int):
+            self.z_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-1),size = dimension-1,dtype = uint64)+1);
         self.z = self.z_og[self.dvec]
         self.shift = self.rng.uniform(size=int(self.d))
 
