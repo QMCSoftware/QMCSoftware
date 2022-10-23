@@ -49,6 +49,7 @@ packages = [
     'qmcpy.integrand',
     'qmcpy.stopping_criterion',
     'qmcpy.accumulate_data',
+    'qmcpy.machine_learning',
     'qmcpy.util',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
