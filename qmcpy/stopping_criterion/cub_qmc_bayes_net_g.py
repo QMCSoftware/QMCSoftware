@@ -47,34 +47,34 @@ class CubBayesNetG(_CubBayesLDG):
         entropy         123456789
         spawn_key       ()
 
-    Adapted from 
-	GAIL cubBayesNet_g https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m.
+    Adapted from `GAIL cubBayesNet_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m>`_.
 
+    Guarantee:
+        This algorithm attempts to calculate the integral of function :math:`f` over the
+        hyperbox :math:`[0,1]^d` to a prescribed error tolerance :math:`\mbox{tolfun} := max(\mbox{abstol},
+        \mbox{reltol}*| I |)` with a guaranteed confidence level, e.g., :math:`99\%` when alpha= :math:`0.5\%`.
+        If the algorithm terminates without showing any warning messages and provides
+        an answer :math:`Q`, then the following inequality would be satisfied:
 
-    Reference
-        [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
-        Available from GAIL http://gailgithub.github.io/GAIL_Dev/.
-
-    Guarantee
-        This algorithm attempts to calculate the integral of function f over the
-        hyperbox [0,1]^d to a prescribed error tolerance
-
-            tolfun:= max(abstol, reltol*| I |)
-
-        with guaranteed confidence level, e.g., 99% when alpha=0.5%. If the
-        algorithm terminates without showing any warning messages and provides
-        an answer Q, then the following inequality would be satisfied:
-
-                Pr(| Q - I | <= tolfun) = 99%.
+        .. math::
+                Pr(| Q - I | <= \mbox{tolfun}) = 99\%.
 
         This Bayesian cubature algorithm guarantees for integrands that are considered
-        to be an instance of a gaussian process that fall in the middle of samples space spanned.
+        to be an instance of a Gaussian process that falls in the middle of samples space spanned.
         Where The sample space is spanned by the covariance kernel parametrized by the scale
         and shape parameter inferred from the sampled values of the integrand.
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
+
+    References:
+        [1] Jagadeeswaran Rathinavel, Fast automatic Bayesian cubature using matching kernels and designs,
+        PhD thesis, Illinois Institute of Technology, 2019.
+
+        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
+        Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
+
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
