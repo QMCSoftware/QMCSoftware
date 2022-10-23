@@ -38,10 +38,10 @@ x_train_flat = np.float64(0.99*np.transpose(x_train.reshape(x_train.shape[0],s))
 qmc_points = np.loadtxt('sobol.dat')
 #breakpoint()
 qmc_points = qmc_points[0:Nqmc,0:s]
+print(f"qmc_points: \n {qmc_points}")
 
-
-print(qmc_points.shape)
-print(x_train_flat.shape)
+print(f"qmc_points.shape = {qmc_points.shape}")
+print(f"x_train_flat.shape = {x_train_flat.shape}")
 
 # load c functions
 lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
@@ -53,6 +53,8 @@ print('Weights loaded')
 weights = computeWeights(c_int(nu),c_int(m),c_int(s),c_int(Ndata),c_int(Nqmc),c_int(outs),c_void_p(x_train_flat.ctypes.data),
 		c_void_p(qmc_points.ctypes.data),c_void_p(y_train.ctypes.data))
 weights = np.transpose(weights)
+print(f"weights.shape = {weights.shape}")
+print(f"weights: \n {weights}")
 
 #breakpoint()
 
