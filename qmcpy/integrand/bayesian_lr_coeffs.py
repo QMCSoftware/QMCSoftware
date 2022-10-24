@@ -14,10 +14,10 @@ class BayesianLRCoeffs(Integrand):
     >>> x = blrcoeffs.discrete_distrib.gen_samples(2**10)
     >>> y = blrcoeffs.f(x)
     >>> y.shape
-    (1024, 6)
+    (1024, 2, 3)
     >>> y.mean(0)
-    array([ 0.04639394, -0.01440543, -0.05498496,  0.02176581,  0.02176581,
-            0.02176581])
+    array([[ 0.04639394, -0.01440543, -0.05498496],
+           [ 0.02176581,  0.02176581,  0.02176581]])
     """
 
     def __init__(self, sampler, feature_array, response_vector, prior_mean=0, prior_covariance=10):
@@ -46,17 +46,16 @@ class BayesianLRCoeffs(Integrand):
         if self.response_vector.shape!=(obs,) or ((self.response_vector!=0)&(self.response_vector!=1)).any():
             ParameterError("response_vector must have the same length as feature_array and contain only 0 or 1 enteries.")
         self.feature_array = column_stack((self.feature_array,ones((obs,1))))
-        self.dprime = 2*self.num_coeffs
-        super(BayesianLRCoeffs,self).__init__(dprime=self.dprime,parallel=False)
+        super(BayesianLRCoeffs,self).__init__(rho=(2,self.num_coeffs),eta=self.num_coeffs,parallel=False)
         
     def g(self, x, compute_flags):
         z = x@self.feature_array.T
         z1 = z*self.response_vector
         with errstate(over='ignore'):
             den = exp(sum(z1-log(1+exp(z)),1))[:,None]
-        y = zeros((len(x),2*self.num_coeffs),dtype=float)
-        y[:,:self.num_coeffs] = x*den
-        y[:,self.num_coeffs:] = den
+        y = zeros((len(x),2,self.num_coeffs),dtype=float)
+        y[:,0] = x*den
+        y[:,1] = den
         return y
     
     def _spawn(self, level, sampler):
@@ -68,13 +67,13 @@ class BayesianLRCoeffs(Integrand):
             prior_covariance = self.prior_covariance)
     
     def bound_fun(self, bound_low, bound_high):
-        num_bounds_low,den_bounds_low = bound_low[:self.num_coeffs],bound_low[self.num_coeffs:]
-        num_bounds_high,den_bounds_high = bound_high[:self.num_coeffs],bound_high[self.num_coeffs:]
+        num_bounds_low,den_bounds_low = bound_low[0],bound_low[1]
+        num_bounds_high,den_bounds_high = bound_high[0],bound_high[1]
         comb_bounds_low = minimum.reduce([num_bounds_low/den_bounds_low,num_bounds_high/den_bounds_low,num_bounds_low/den_bounds_high,num_bounds_high/den_bounds_high])
         comb_bounds_high = maximum.reduce([num_bounds_low/den_bounds_low,num_bounds_high/den_bounds_low,num_bounds_low/den_bounds_high,num_bounds_high/den_bounds_high])
         violated = (den_bounds_low<=0)*(0<=den_bounds_high)
         comb_bounds_low[violated],comb_bounds_high[violated] = -inf,inf
         return comb_bounds_low,comb_bounds_high
     
-    def dependency(self, flags_comb):
-        return hstack((flags_comb,flags_comb))
+    def dependency(self, comb_flags):
+        return vstack((comb_flags,comb_flags))

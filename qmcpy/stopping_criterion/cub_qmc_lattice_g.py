@@ -18,13 +18,9 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> data
     LDTransformData (AccumulateData Object)
         solution        1.810
-        indv_error      0.005
-        ci_low          1.806
-        ci_high         1.815
-        ci_comb_low     1.806
-        ci_comb_high    1.815
-        flags_comb      1
-        flags_indv      1
+        comb_bound_low  1.806
+        comb_bound_high 1.815
+        comb_flags      1
         n_total         2^(10)
         n               2^(10)
         time_integrate  ...
@@ -59,25 +55,17 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> cf = CustomFun(
     ...     true_measure = Uniform(Lattice(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
-    ...     dprime = (2,3))
+    ...     rho = (2,3))
     >>> sol,data = CubQMCLatticeG(cf,abs_tol=1e-6).integrate()
     >>> data
     LDTransformData (AccumulateData Object)
         solution        [[1. 2. 3.]
                         [4. 5. 6.]]
-        indv_error      [[9.658e-07 4.835e-07 7.244e-07]
-                        [9.655e-07 3.017e-07 3.625e-07]]
-        ci_low          [[1. 2. 3.]
+        comb_bound_low  [[1. 2. 3.]
                         [4. 5. 6.]]
-        ci_high         [[1. 2. 3.]
+        comb_bound_high [[1. 2. 3.]
                         [4. 5. 6.]]
-        ci_comb_low     [[1. 2. 3.]
-                        [4. 5. 6.]]
-        ci_comb_high    [[1. 2. 3.]
-                        [4. 5. 6.]]
-        flags_comb      [[ True  True  True]
-                        [ True  True  True]]
-        flags_indv      [[ True  True  True]
+        comb_flags      [[ True  True  True]
                         [ True  True  True]]
         n_total         2^(15)
         n               [[ 8192. 16384. 16384.]
@@ -137,8 +125,8 @@ class CubQMCLatticeG(_CubQMCLDG):
         """
         Args:
             integrand (Integrand): an instance of Integrand
-            abs_tol (float): absolute error tolerance
-            rel_tol (float): relative error tolerance
+            abs_tol (ndarray): absolute error tolerance
+            rel_tol (ndarray): relative error tolerance
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
             fudge (function): positive function multiplying the finite

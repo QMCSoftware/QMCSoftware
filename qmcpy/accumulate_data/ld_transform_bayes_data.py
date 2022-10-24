@@ -18,7 +18,7 @@ class LDTransformBayesData(AccumulateData):
     """
 
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, m_min: int, m_max: int,
-                 fbt, merge_fbt, kernel):
+                 fbt, merge_fbt, kernel, alpha):
         """
         Args:
             stopping_crit (StoppingCriterion): a StoppingCriterion instance
@@ -49,9 +49,9 @@ class LDTransformBayesData(AccumulateData):
         # quantile value for the error bound
         if self.errbd_type == 'full_Bayes':
             # degrees of freedom = 2^mmin - 1
-            self.uncert = -tnorm.ppf(self.stopping_crit.alpha / 2, (2 ** m_min) - 1)
+            self.uncert = -tnorm.ppf(alpha / 2, (2 ** m_min) - 1)
         else:
-            self.uncert = -gaussnorm.ppf(self.stopping_crit.alpha / 2)
+            self.uncert = -gaussnorm.ppf(alpha / 2)
 
         # Set Attributes
         self.m_min = m_min
