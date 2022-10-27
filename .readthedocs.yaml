@@ -11,5 +11,8 @@ build:
     python: "3.9"
   jobs:
     post_install:
+      - conda env create --file environment.yml
+      - conda activate qmcpy
+      - pip install -e .
       - make _uml
       - make _doc
