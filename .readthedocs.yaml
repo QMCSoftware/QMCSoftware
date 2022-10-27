@@ -4,3 +4,11 @@ formats: all
 
 conda:
   environment: environment.yml
+
+build:
+  tools:
+    python: "3.9"
+  jobs:
+    post_install:
+      - make _doc
+      - make _uml
