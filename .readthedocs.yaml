@@ -11,5 +11,5 @@ build:
     python: "3.9"
   jobs:
     post_install:
-      - make _doc
       - make _uml
+      - make _doc
