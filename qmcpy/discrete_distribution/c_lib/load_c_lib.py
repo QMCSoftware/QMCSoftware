@@ -3,4 +3,7 @@ from os.path import dirname, abspath
 from glob import glob
 import os
 
-c_lib = CDLL(glob(dirname(abspath(__file__)) + os.sep + "c_lib*")[0], mode=RTLD_GLOBAL)
+try:
+    c_lib = CDLL(glob(dirname(abspath(__file__)) + os.sep + "c_lib*")[0], mode=RTLD_GLOBAL)
+except e:
+    pass
