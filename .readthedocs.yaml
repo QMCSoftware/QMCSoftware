@@ -9,10 +9,6 @@ build:
   os: "ubuntu-20.04"
   tools:
     python: "3.9"
-  jobs:
-    post_install:
-      - conda env create --file environment.yml
-      - conda activate qmcpy
-      - pip install -e .
-      - make _uml
-      - make _doc
+  commands:
+    - make _uml
+    - make _doc
