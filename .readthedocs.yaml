@@ -10,6 +10,6 @@ build:
   tools:
     python: "3.9"
   jobs:
-    post_install:
+    pre_build:
       - make _uml
       - make _doc
