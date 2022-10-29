@@ -72,7 +72,7 @@ class CubQMCMLCont(StoppingCriterion):
         Args:
             integrand (Integrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance
-            alpha (float): uncertaintly level.
+            alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
             rmse_tol (float): root mean squared error
                 If supplied (not None), then absolute tolerance and alpha are ignored
@@ -142,7 +142,7 @@ class CubQMCMLCont(StoppingCriterion):
                 total_next_samples = (self.data.replications*self.data.eval_level*self.data.n_level*2).sum()
                 if (self.data.n_total + total_next_samples) > self.n_max:
                     warning_s = """
-                    Alread generated %d samples.
+                    Already generated %d samples.
                     Trying to generate %d new samples, which would exceed n_max = %d.
                     Stopping integration process.
                     Note that error tolerances may no longer be satisfied""" \
@@ -174,10 +174,10 @@ class CubQMCMLCont(StoppingCriterion):
         Args:
             integrand (Integrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            alpha (float): uncertaintly level.
+            alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
-                Takes priority over aboluste tolerance and alpha if supplied. 
+                Takes priority over absolute tolerance and alpha if supplied.
         """
         if rmse_tol != None:
             self.rmse_tol = float(rmse_tol)

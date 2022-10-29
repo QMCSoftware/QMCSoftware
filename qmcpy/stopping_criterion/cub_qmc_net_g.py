@@ -186,7 +186,7 @@ class CubQMCNetG(_CubQMCLDG):
                 Control variates are currently only compatible with single level problems. 
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
-            update_beta (bool): update control variate beta coefficients at each iteration? 
+            update_beta (bool): update control variate beta coefficients at each iteration
             error_fun: function taking in the approximate solution vector, 
                 absolute tolerance, and relative tolerance which returns the approximate error. 
                 Default indicates integration until either absolute OR relative tolerance is satisfied.
