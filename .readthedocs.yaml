@@ -1,15 +1,16 @@
 version: 2
 
-formats: all
-
-conda:
-  environment: environment.yml
-
 build:
   os: "ubuntu-20.04"
   tools:
     python: "3.9"
   jobs:
-    pre_build:
+    post_install:
+      - "pip install -e ."
       - make _uml
       - make _doc
+
+conda:
+  environment: environment.yml
+
+formats: all
