@@ -50,13 +50,18 @@ computeWeights.restype=ndpointer(dtype=c_double,shape=(1+outs, Nqmc))
 print('Weights loaded')
 
 # compute weights
+
 weights = computeWeights(c_int(nu),c_int(m),c_int(s),c_int(Ndata),c_int(Nqmc),c_int(outs),c_void_p(x_train_flat.ctypes.data),
 		c_void_p(qmc_points.ctypes.data),c_void_p(y_train.ctypes.data))
 weights = np.transpose(weights)
 print(f"weights.shape = {weights.shape}")
 print(f"weights: \n {weights}")
 
-#breakpoint()
-
-with open('../../../demos/weights.pkl', 'wb') as handle:
+#if: 
+with open('weights.pkl', 'wb') as handle:
     pickle.dump(weights, handle, protocol=pickle.HIGHEST_PROTOCOL)
+#pickled_model = pickle.load(open('weights.pkl', 'rb'))
+breakpoint()
+
+#if __name__ == '__main__':
+#    pass

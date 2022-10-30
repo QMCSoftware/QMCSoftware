@@ -24,28 +24,29 @@ class compression:
 
         Output is a pointer to a vector which contains the weights W_X (Nqmc entries),
         and then the dimensions of W_X,Y (Nqmc x outs entries)  in the same order as the qmc points.'''
-        def __init__(self, nu, m, s, N, Ndata, Nqmc, output_dimentsion):
+        def __init__(self, nu = 10 , m = 3 , s, N, Ndata= 60000, Nqmc, output_dimentsion, dataset = tf.keras.datasets.mnist):
                 self.m = 10 #ell in the paper
                 self.nu = 3
                 self.Ndata = 60000
                 self.Nqmc = 2**m
-                self.s = s
+                self.s = s2
                 self.Nqmc = Nqmc
                 self.outs = output_dimentsion
-
+				self.dataset = dataset
+				self.outputfile = outputfile
                 # load c functions
-                lib = cdll.LoadLibrary("/home/r2q2/Projects/QMCSoftware/qmcpy/machine_learning/c_lib/computeMXY.so")
+                lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")# rename
                 computeWeights = lib.computeWeights
-                computeWeights.restype=ndpointer(dtype=c_double,shape=(1+self.outs,Nqmc))
+                computeWeights.restype=ndpointer(dtype=c_double,shape=(1+self.outs,Nqmc)) 
 
-        def get_dataset(self, dataset):
-                mnist = tf.keras.datasets.mnist
-                return mnist
+        def get_dataset(self, dataset = tf.keras.datasets.mnist):
+                self.dataset = dataset
+                return dataset
 
-        def compute_weights(self, x_train, y_train, x_test, y_test, output_file):
+        def compute_weights(self):
                 # compute weights
                 # load mnist data and rescale to 10x10
-                mnist = self.get_dataset('dataset')
+                mnist = self.get_dataset(self.dataset)
 
                 (x_train, y_train), (x_test, y_test) = mnist.load_data()
                 x_train, x_test = x_train / 255.0, x_test / 255.0
@@ -70,9 +71,8 @@ class compression:
                 # load qmc points
                 dig_net = DigitalNetB2(2,seed=6)
                 qmc_points = np.array(dig_net.gen_samples(self.Nqmc), dtype=np.ndarray)
-                #qmc_points = np.loadtxt('sobol.dat')
-                #breakpoint()
-                qmc_points = qmc_points[0:self.Nqmc,0:s]
+                qmc_points = np.loadtxt('sobol.dat')
+                #qmc_points = qmc_points[0:self.Nqmc,0:s]
 
 
                 print(qmc_points.shape)
@@ -91,4 +91,4 @@ class compression:
                                          c_void_p(qmc_points.ctypes.data),
                                          c_void_p(y_train.ctypes.data))
                 weights = np.transpose(weights)
-                breakpoint()
+                #breakpoint()
