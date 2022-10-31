@@ -38,7 +38,7 @@ class BoxIntegral(Integrand):
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
-            s (list or ndarray): vectorized s parameter, len(s) is the number of vectorized integrals to evalute.
+            s (list or ndarray): vectorized s parameter, len(s) is the number of vectorized integrals to evaluate.
         """
         self.parameters = ['s']
         self.s = array([s]) if isscalar(s) else array(s)

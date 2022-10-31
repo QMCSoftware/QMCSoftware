@@ -66,7 +66,7 @@ class CubQMCML(StoppingCriterion):
         Args:
             integrand (Integrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance
-            alpha (float): uncertaintly level.
+            alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
             rmse_tol (float): root mean squared error
                 If supplied (not None), then absolute tolerance and alpha are ignored

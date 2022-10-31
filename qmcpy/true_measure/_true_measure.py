@@ -97,7 +97,7 @@ class TrueMeasure(object):
             ndarray: length n vector of transformed samples at locations of x
             ndarray: length n vector of Jacobian values at locations of x
 
-        Note: If transform is T, then the jacobian of T is 1/lambda(T(x)) for 
+        Note: If transform is T, then the Jacobian of T is 1/lambda(T(x)) for
         """
         if self.sub_comptibility_error:
             raise ParameterError("The transform domain must match the sub-transform range.")
