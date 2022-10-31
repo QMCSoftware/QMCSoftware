@@ -1,15 +1,14 @@
-import numpy as np
-from sklearn import datasets
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 import numpy as np
 from ctypes import *
 from numpy.ctypeslib import ndpointer
 from sklearn.preprocessing import MinMaxScaler
+import logging
 
 np.set_printoptions(precision=3)
 
-# Load the diabetes dataset
+# Create a random dataset for testing.
 mu, sigma = 0, 1
 Ndata, s = 1000000, 6
 X = np.random.default_rng().normal(mu, sigma, size=(Ndata, s))
@@ -38,9 +37,9 @@ regr = LinearRegression()
 mod = regr.fit(X_minmax, y, sample_weight)
 yfit = mod.predict(X_minmax)
 mse = mean_squared_error(y, yfit, sample_weight=sample_weight)
-print(f"\nWeighted {mse = }")
-print(f"{sample_weight.shape = }")
-print(f"{mod.coef_ = }")
+logging.info(f"\nWeighted {mse = }")
+logging.info(f"{sample_weight.shape = }")
+logging.info(f"{mod.coef_ = }")
 
 # load QMC points
 m, nu = 10, 3
@@ -55,7 +54,7 @@ computeWeights = lib.computeWeights
 computeWeights.restype = ndpointer(dtype=c_double, shape=(1 + outs, Nqmc))
 
 # compute weights
-print(f"\n{nu = }, {m = }, {s = }, {Ndata = }, {Nqmc = }, {outs = }")
+logging.info(f"\n{nu = }, {m = }, {s = }, {Ndata = }, {Nqmc = }, {outs = }")
 weights = computeWeights(c_int(nu), c_int(m), c_int(s), c_int(Ndata), c_int(Nqmc), c_int(outs),
                          c_void_p(X.ctypes.data), c_void_p(qmc_points.ctypes.data), c_void_p(y.ctypes.data))
 weights = np.transpose(weights)
@@ -66,8 +65,8 @@ regr = LinearRegression()
 mod = regr.fit(weights[:, :-1], weights[:, -1])
 yfit = mod.predict(weights[:, :-1])
 mse = mean_squared_error(weights[:, -1], yfit)
-print(f"Compressed data {mse = }")
-print(f"{mod.coef_ = }")
+logging.info(f"Compressed data {mse = }")
+logging.info(f"{mod.coef_ = }")
 
 """
 mse = 0.08328613078165403
