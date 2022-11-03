@@ -114,15 +114,15 @@ class SensitivityIndices(Integrand):
         self.discrete_distrib = self.true_measure.discrete_distrib.spawn(s=1,dimensions=[self.dtilde])[0]
         self.sampler = self.integrand.sampler
         super(SensitivityIndices,self).__init__(
-            rho = (2,3,self.s,)+self.integrand.rho,
-            eta = (2,self.s,)+self.integrand.rho,
+            dimension_indv = (2,3,self.s,)+self.integrand.d_indv,
+            dimension_comb = (2,self.s,)+self.integrand.d_indv,
             parallel = False)
     
     def f(self, x, *args, **kwargs):
         z = x[:,self.d:]
         x = x[:,:self.d]
         n,d = x.shape
-        y = zeros((n,)+self.rho,dtype=float)
+        y = zeros((n,)+self.d_indv,dtype=float)
         compute_flags = kwargs['compute_flags']
         del kwargs['compute_flags']
         v = zeros((n,d),dtype=float)

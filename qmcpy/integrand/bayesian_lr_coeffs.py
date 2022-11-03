@@ -46,7 +46,7 @@ class BayesianLRCoeffs(Integrand):
         if self.response_vector.shape!=(obs,) or ((self.response_vector!=0)&(self.response_vector!=1)).any():
             ParameterError("response_vector must have the same length as feature_array and contain only 0 or 1 enteries.")
         self.feature_array = column_stack((self.feature_array,ones((obs,1))))
-        super(BayesianLRCoeffs,self).__init__(rho=(2,self.num_coeffs),eta=self.num_coeffs,parallel=False)
+        super(BayesianLRCoeffs,self).__init__(dimension_indv=(2,self.num_coeffs),dimension_comb=self.num_coeffs,parallel=False)
         
     def g(self, x, compute_flags):
         z = x@self.feature_array.T
