@@ -48,7 +48,7 @@ class _CubBayesLDG(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
 
         # Sobol indices
-        self.rho = self.integrand.rho
+        self.d_indv = self.integrand.d_indv
         self.cv = []
         self.ncv = len(self.cv)
         self.cast_complex = False
@@ -57,28 +57,28 @@ class _CubBayesLDG(StoppingCriterion):
 
         # Verify Compliant Construction
         super(_CubBayesLDG, self).__init__(allowed_levels=['single'], allowed_distribs=allowed_distribs, allow_vectorized_integrals=True)
-        self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.eta,self.alpha))
+        self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
 
     def integrate(self):
         t_start = time()
-        self.datum = np.empty(self.rho, dtype=object)
-        for j in np.ndindex(self.rho):
+        self.datum = np.empty(self.d_indv, dtype=object)
+        for j in np.ndindex(self.d_indv):
             self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
                                                  self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel, self.alphas_indv[j])
 
         self.data = LDTransformBayesData.__new__(LDTransformBayesData)
-        self.data.flags_indv = np.tile(False, self.rho)
-        self.data.compute_flags = np.tile(True,self.rho)
+        self.data.flags_indv = np.tile(False, self.d_indv)
+        self.data.compute_flags = np.tile(True,self.d_indv)
         prev_flags_indv = self.data.flags_indv
-        self.data.m = np.tile(self.m_min, self.rho)
+        self.data.m = np.tile(self.m_min, self.d_indv)
         self.data.n_min = 0
-        self.data.indv_bound_low = np.tile(-np.inf, self.rho)
-        self.data.indv_bound_high = np.tile(np.inf, self.rho)
-        self.data.solution_indv = np.tile(np.nan, self.rho)
+        self.data.indv_bound_low = np.tile(-np.inf, self.d_indv)
+        self.data.indv_bound_high = np.tile(np.inf, self.d_indv)
+        self.data.solution_indv = np.tile(np.nan, self.d_indv)
         self.data.solution = np.nan
         self.data.xfull = np.empty((0, self.d))
-        self.data.yfull = np.empty((0,) + self.rho)
-        stop_flag = np.tile(None, self.rho)
+        self.data.yfull = np.empty((0,) + self.d_indv)
+        stop_flag = np.tile(None, self.d_indv)
         while True:
             m = self.data.m.max()
             n_min = self.data.n_min
@@ -86,16 +86,21 @@ class _CubBayesLDG(StoppingCriterion):
             n = int(n_max - n_min)
             xnext, xnext_un = self.discrete_distrib.gen_samples(n_min=n_min, n_max=n_max, return_unrandomized=True,
                                                                 warn=False)
-            ycvnext = np.empty((1 + self.ncv, n,) + self.rho, dtype=float)
+            ycvnext = np.empty((1 + self.ncv, n,) + self.d_indv, dtype=float)
             ycvnext[0] = self.integrand.f(xnext, periodization_transform=self.ptransform,
                                           compute_flags=self.data.compute_flags)
             for k in range(self.ncv):
                 ycvnext[1 + k] = self.cv[k].f(xnext, periodization_transform=self.ptransform,
                                               compute_flags=self.data.compute_flags)
-            for j in np.ndindex(self.dprime):
-                if prev_flags_indv[j] == False and self.data.flags_indv[j] == True:
-                    raise NotYetImplemented('_CubBayesLDG: Cannot resume data update: flags_indv[j] switched from False to True')
-                if not self.data.flags_indv[j]:
+            # for j in np.ndindex(self.dprime):
+            #     if prev_flags_indv[j] == False and self.data.flags_indv[j] == True:
+            #         raise NotYetImplemented('_CubBayesLDG: Cannot resume data update: flags_indv[j] switched from False to True')
+            #     if not self.data.flags_indv[j]:
+
+            for j in np.ndindex(self.d_indv):
+                if prev_flags_indv[j] == True and self.data.flags_indv[j] == False:
+                    assert not(prev_flags_indv[j] == True and self.data.flags_indv[j] == False), 'This cannot happen !'
+                if self.data.flags_indv[j]:
                     continue
                 slice_yj = (0, slice(None),) + j
                 if type(self.discrete_distrib).__name__ == 'DigitalNetB2':

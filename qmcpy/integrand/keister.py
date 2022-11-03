@@ -46,7 +46,7 @@ class Keister(Integrand):
         """
         self.sampler = sampler
         self.true_measure = Gaussian(self.sampler,mean=0,covariance=1/2)
-        super(Keister,self).__init__(rho=1,eta=1,parallel=False)
+        super(Keister,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
     
     def g(self, t):
         d = t.shape[1]
