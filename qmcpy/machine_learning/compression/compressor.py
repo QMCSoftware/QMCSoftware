@@ -29,7 +29,7 @@ class compression:
                 self.nu = 3
                 self.Ndata = 60000
                 self.Nqmc = 2**m
-                self.s = s2
+                self.s = s
                 self.Nqmc = Nqmc
                 self.outs = output_dimentsion
 				self.dataset = dataset
