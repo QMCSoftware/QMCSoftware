@@ -8,7 +8,6 @@ import warnings
 class Lattice(LD):
     """
     Quasi-Random Lattice nets in base 2.
-
     >>> l = Lattice(2,seed=7)
     >>> l.gen_samples(4)
     array([[0.04386058, 0.58727432],
@@ -25,21 +24,17 @@ class Lattice(LD):
         order           natural
         entropy         7
         spawn_key       ()
-    >>> l = Lattice(2,generating_vector = 17,seed = 9)
-    >>> l.gen_samples(5)
-    array([[0.2943626 , 0.88967111],
-       [0.7943626 , 0.38967111],
-       [0.5443626 , 0.63967111],
-       [0.0443626 , 0.13967111],
-       [0.4193626 , 0.76467111]])
-    >>> l 
+    >>> l = Lattice(2,generating_vector=28,seed=55)
+    >>> l.gen_samples(1)
+    array([[0.84489224, 0.30534549]])
+    >>> l
     Lattice (DiscreteDistribution Object)
-    d               2^(1)
-    dvec            [0 1]
-    randomize       1
-    order           natural
-    entropy         9
-    spawn_key       ()
+        d               2^(1)
+        dvec            [0 1]
+        randomize       1
+        order           natural
+        entropy         55
+        spawn_key       ()
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
@@ -55,15 +50,24 @@ class Lattice(LD):
            [0.5 , 0.5 ],
            [0.25, 0.75],
            [0.75, 0.25]])
-    >>> Lattice(dimension = 2, generating_vector = 25,seed = 55,randomize = False).gen_samples(8, warn = False)
+    >>> Lattice(dimension=2,randomize=False,seed=182,generating_vector = 23).gen_samples(8, warn=False)
     array([[0.   , 0.   ],
-       [0.5  , 0.5  ],
-       [0.25 , 0.25 ],
-       [0.75 , 0.75 ],
-       [0.125, 0.625],
-       [0.625, 0.125],
-       [0.375, 0.875],
-       [0.875, 0.375]])
+           [0.5  , 0.5  ],
+           [0.25 , 0.25 ],
+           [0.75 , 0.75 ],
+           [0.125, 0.125],
+           [0.625, 0.625],
+           [0.375, 0.375],
+           [0.875, 0.875]])
+    >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector = 26).gen_samples(8,warn=False)
+    array([[0.   , 0.   , 0.   , 0.   ],
+           [0.5  , 0.5  , 0.5  , 0.5  ],
+           [0.25 , 0.25 , 0.75 , 0.75 ],
+           [0.75 , 0.75 , 0.25 , 0.25 ],
+           [0.125, 0.625, 0.875, 0.875],
+           [0.625, 0.125, 0.375, 0.375],
+           [0.375, 0.875, 0.625, 0.625],
+           [0.875, 0.375, 0.125, 0.125]])
 
     References:
 
