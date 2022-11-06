@@ -1,14 +1,16 @@
 name: qmcpy
 channels:
+  - anaconda
   - conda-forge
   - defaults
 dependencies:
   - alabaster=0.7.12=py_0
   - babel=2.10.3=pyhd8ed1ab_0
+  - blas=1.0=openblas
   - brotlipy=0.7.0=py39h02fc5c5_1005
   - bzip2=1.0.8=h3422bc3_4
-  - ca-certificates=2022.9.24=h4653dfc_0
-  - certifi=2022.9.24=pyhd8ed1ab_0
+  - ca-certificates=2022.4.26=hca03da5_0
+  - certifi=2022.6.15=py39hca03da5_0
   - cffi=1.15.1=py39h7e6b969_1
   - charset-normalizer=2.1.1=pyhd8ed1ab_0
   - colorama=0.4.6=pyhd8ed1ab_0
@@ -17,11 +19,18 @@ dependencies:
   - imagesize=1.4.1=pyhd8ed1ab_0
   - importlib-metadata=5.0.0=pyha770c72_1
   - jinja2=3.1.2=pyhd8ed1ab_1
+  - joblib=1.1.0=pyhd3eb1b0_0
+  - libcxx=12.0.0=hf6beb65_1
   - libffi=3.4.2=h3422bc3_5
+  - libgfortran=5.0.0=11_2_0_he6877d6_26
+  - libgfortran5=11.2.0=he6877d6_26
+  - libopenblas=0.3.20=hea475bc_0
   - libsqlite=3.39.4=h76d750c_0
   - libzlib=1.2.13=h03a7124_4
+  - llvm-openmp=12.0.0=haf9daa7_1
   - markupsafe=2.1.1=py39h02fc5c5_2
   - ncurses=6.3=h07bb92c_1
+  - numpy-base=1.22.3=py39h974a1f5_0
   - openssl=3.0.7=h03a7124_0
   - packaging=21.3=pyhd8ed1ab_0
   - pandoc=2.19.2=hce30654_1
@@ -36,6 +45,7 @@ dependencies:
   - pytz=2022.6=pyhd8ed1ab_0
   - readline=8.1.2=h46ed386_0
   - requests=2.28.1=pyhd8ed1ab_1
+  - scikit-learn=1.0.2=py39h9197a36_1
   - setuptools=65.5.1=pyhd8ed1ab_0
   - snowballstemmer=2.2.0=pyhd8ed1ab_0
   - sphinx=5.0.2=pyh6c4a22f_0
@@ -46,6 +56,7 @@ dependencies:
   - sphinxcontrib-qthelp=1.0.3=py_0
   - sphinxcontrib-serializinghtml=1.1.5=pyhd8ed1ab_2
   - sqlite=3.39.4=h2229b38_0
+  - threadpoolctl=2.2.0=pyh0d69192_0
   - tk=8.6.12=he1e0b03_0
   - tzdata=2022f=h191b570_0
   - urllib3=1.26.11=pyhd8ed1ab_0
