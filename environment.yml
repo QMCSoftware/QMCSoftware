@@ -21,4 +21,5 @@ dependencies:
     - sphinx-math-dollar==1.2.1
     - sphinx-rtd-theme==1.0.0
     - sphinx-markdown-tables==0.0.17
+    - umbridge==1.2.1
     - -e .
