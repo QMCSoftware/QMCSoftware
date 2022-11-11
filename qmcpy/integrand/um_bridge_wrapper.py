@@ -10,11 +10,11 @@ class UMBridgeWrapper(Integrand):
     """
     UM-Bridge Model Wrapper
 
-    >>> _ = os.system('docker run --name muqbp -d -it -p 4243:4243 linusseelinger/benchmark-muq-beam-propagation:latest > /dev/null')
+    >>> _ = os.system('docker run --name muqbp -dit -p 4243:4243 linusseelinger/benchmark-muq-beam-propagation:latest > /dev/null')
     >>> import umbridge
     >>> dnb2 = DigitalNetB2(dimension=3,seed=7)
     >>> distribution = Uniform(dnb2,lower_bound=1,upper_bound=1.05)
-    >>> model = umbridge.HTTPModel('http://127.0.0.1:4243','forward')
+    >>> model = umbridge.HTTPModel('http://localhost:4243','forward')
     >>> umbridge_config = {"d": dnb2.d}
     >>> um_bridge_integrand = UMBridgeWrapper(distribution,model,umbridge_config,parallel=False)
     >>> solution,data = CubQMCNetG(um_bridge_integrand,abs_tol=5e-2).integrate()
