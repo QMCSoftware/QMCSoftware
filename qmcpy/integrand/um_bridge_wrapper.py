@@ -14,7 +14,7 @@ class UMBridgeWrapper(Integrand):
     >>> import umbridge
     >>> dnb2 = DigitalNetB2(dimension=3,seed=7)
     >>> distribution = Uniform(dnb2,lower_bound=1,upper_bound=1.05)
-    >>> model = umbridge.HTTPModel('http://localhost:4243','forward')
+    >>> model = umbridge.HTTPModel('http://0.0.0.0:4243','forward')
     >>> umbridge_config = {"d": dnb2.d}
     >>> um_bridge_integrand = UMBridgeWrapper(distribution,model,umbridge_config,parallel=False)
     >>> solution,data = CubQMCNetG(um_bridge_integrand,abs_tol=5e-2).integrate()
