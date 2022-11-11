@@ -21,7 +21,7 @@ class Integrand(object):
                 multiprocessing.Pool or multiprocessing.pool.ThreadPool.
                 Passing parallel=True sets processes = os.cpu_count().
             threadpool (bool): When parallel > 1, 
-                if use_threads = True then use multiprocessing.pool.ThreadPool 
+                if threadpool = True then use multiprocessing.pool.ThreadPool 
                 else use multiprocessing.Pool. 
         """
         prefix = 'A concrete implementation of Integrand must have '
