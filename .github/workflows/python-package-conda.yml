@@ -26,10 +26,10 @@ jobs:
       - name: Run Tests
         shell: bash -l {0}
         run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            make tests_no_docker
-          else
+          if [ "$RUNNER_OS" == "Linux" ]; then
             make tests
+          else
+            make tests_no_docker
           fi
       - name: Upload to Codecov
         shell: bash -l {0}
