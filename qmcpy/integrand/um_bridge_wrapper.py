@@ -10,8 +10,8 @@ class UMBridgeWrapper(Integrand):
     """
     UM-Bridge Model Wrapper
 
-    >>> import umbridge
     >>> _ = os.system('docker run --name muqbp -dit -p 4243:4243 linusseelinger/benchmark-muq-beam-propagation:latest > /dev/null')
+    >>> import umbridge
     >>> dnb2 = DigitalNetB2(dimension=3,seed=7)
     >>> distribution = Uniform(dnb2,lower_bound=1,upper_bound=1.05)
     >>> model = umbridge.HTTPModel('http://localhost:4243','forward')
