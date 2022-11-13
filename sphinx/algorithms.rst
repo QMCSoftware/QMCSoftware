@@ -177,6 +177,14 @@ Sensitivity Indices
 .. automodule:: qmcpy.integrand.sensitivity_indices
     :members:
 
+UM-Bridge Wrapper
+.................
+
+.. automodule:: qmcpy.integrand.um_bridge_wrapper
+    :members:
+
+
+
 
 
 
