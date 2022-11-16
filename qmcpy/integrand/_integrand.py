@@ -3,21 +3,26 @@ from ..true_measure._true_measure import TrueMeasure
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from numpy import *
 import os
-import multiprocessing
+from multiprocessing import get_context
+from multiprocessing.pool import ThreadPool
 from itertools import repeat
 
 
 class Integrand(object):
     """ Integrand abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self, dimension_indv, dimension_comb, parallel):
+    def __init__(self, dimension_indv, dimension_comb, parallel, threadpool=False):
         """
         Args:
             dimension_indv (tuple): individual solution shape.
             dimension_comb (tuple): combined solution shape. 
             parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion.
-                Otherwise, parallel specifies the number of CPUs used by multiprocessing.Pool.
-                Passing parallel=True sets the number of CPUs equal to os.cpu_count().
+                Otherwise, parallel specifies the number of processes used by 
+                multiprocessing.Pool or multiprocessing.pool.ThreadPool.
+                Passing parallel=True sets processes = os.cpu_count().
+            threadpool (bool): When parallel > 1, 
+                if threadpool = True then use multiprocessing.pool.ThreadPool 
+                else use multiprocessing.Pool. 
         """
         prefix = 'A concrete implementation of Integrand must have '
         self.d = self.true_measure.d
@@ -26,8 +31,7 @@ class Integrand(object):
         cpus = os.cpu_count()
         self.parallel = cpus if parallel is True else int(parallel)
         self.parallel = 0 if self.parallel==1 else self.parallel
-        if self.parallel>cpus:
-            raise ParameterError("parallel must be less than %d, the number of CPUs on this machine."%cpus)
+        self.threadpool = threadpool
         if not (hasattr(self, 'sampler') and isinstance(self.sampler,(TrueMeasure,DiscreteDistribution))):
             raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistributioninstance')
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
@@ -135,8 +139,9 @@ class Integrand(object):
         n = len(t)
         kwargs['compute_flags'] = compute_flags
         if self.parallel:
-            pool = multiprocessing.Pool(processes=self.parallel)
+            pool = get_context(method='fork').Pool(processes=self.parallel) if self.threadpool==False else ThreadPool(processes=self.parallel) 
             y = pool.starmap(self._g2,zip(t,repeat((args,kwargs))))
+            pool.close()
             y = concatenate(y,dtype=float)
         else:
             y = self._g2(t,comb_args=(args,kwargs))
