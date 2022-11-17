@@ -1,5 +1,4 @@
 from ._true_measure import TrueMeasure
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 from numpy import *
