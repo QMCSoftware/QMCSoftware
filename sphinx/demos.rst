@@ -41,3 +41,5 @@ Demos
     demo_rst/gaussian_diagnostics_demo.rst
 
     demo_rst/iris.rst
+
+    demo_rst/vectorized_qmc.rst

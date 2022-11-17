@@ -24,8 +24,8 @@ class TestTrueMeasure(unittest.TestCase):
             BrownianMotion(DigitalNetB2(d),t_final=2,drift=3,decomp_type='Cholesky'),
             BernoulliCont(DigitalNetB2(d)),
             BernoulliCont(DigitalNetB2(d),lam=[.25,.75]),
-            SciPyWrapper(DigitalNetB2(2),scipy.stats.triang,c=[0.1,.2],loc=[1,2],scale=[3,4]),
-            SciPyWrapper(SciPyWrapper(DigitalNetB2(2),scipy.stats.triang,c=[0.1,.2]),scipy.stats.triang,c=[.3,.4]),
+            SciPyWrapper(DigitalNetB2(2),[scipy.stats.triang(c=.1),scipy.stats.uniform(loc=1,scale=2)]),
+            SciPyWrapper(DigitalNetB2(2),scipy.stats.triang(c=.1,loc=1,scale=2)),
         ]
         for tm in tms:
             for _tm in [tm]+tm.spawn(1):
@@ -51,7 +51,7 @@ class TestTrueMeasure(unittest.TestCase):
             Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d)))),
             BrownianMotion(DigitalNetB2(d)),
             BernoulliCont(DigitalNetB2(d)),
-            SciPyWrapper(SciPyWrapper(DigitalNetB2(2),scipy.stats.triang,c=.25),scipy.stats.triang,c=.75),
+            SciPyWrapper(DigitalNetB2(2),scipy.stats.triang(c=.1,loc=1,scale=2)),
         ]
         for tm in tms:
             s = 3

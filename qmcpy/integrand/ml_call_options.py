@@ -70,7 +70,7 @@ class MLCallOptions(Integrand):
         self.g_submodule = getattr(self,'_g_'+self.option)
         self.level = _level
         self.max_level = inf
-        super(MLCallOptions,self).__init__(dprime=1,parallel=False)
+        super(MLCallOptions,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
         #if self.discrete_distrib.low_discrepancy and self.option=='asian':
         #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
 

@@ -1,11 +1,11 @@
-from .._discrete_distribution import DiscreteDistribution
+from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 from numpy import *
 from os.path import dirname, abspath, isfile
 import warnings
 
 
-class Lattice(DiscreteDistribution):
+class Lattice(LD):
     """
     Quasi-Random Lattice nets in base 2.
 

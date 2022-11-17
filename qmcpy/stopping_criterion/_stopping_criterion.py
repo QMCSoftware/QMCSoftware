@@ -1,6 +1,6 @@
 from ..integrand._integrand import Integrand
 from ..util import DistributionCompatibilityError, ParameterError, MethodImplementationError, _univ_repr
-
+from numpy import *
 
 class StoppingCriterion(object):
     """ Stopping Criterion abstract class. DO NOT INSTANTIATE. """
@@ -29,8 +29,8 @@ class StoppingCriterion(object):
         # multilevel compatibility check
         if self.integrand.leveltype not in allowed_levels:
             raise ParameterError('Integrand is %s level but %s only supports %s level problems.'%(self.integrand.leveltype,sname,allowed_levels))
-        if (not allow_vectorized_integrals) and self.integrand.dprime!=(1,):
-            raise ParameterError('Vectorized integrals (with dprime>1 outputs per sample) are not supported by this stopping criterion')
+        if (not allow_vectorized_integrals) and self.integrand.d_indv!=(1,):
+            raise ParameterError('Vectorized integrals (with d_indv>1 outputs per sample) are not supported by this stopping criterion')
         # parameter checks
         if not hasattr(self,'parameters'):
             self.parameters = []
@@ -50,5 +50,28 @@ class StoppingCriterion(object):
         """ ABSTRACT METHOD to reset the absolute tolerance. """
         raise ParameterError("The %s StoppingCriterioin does not yet support resetting tolerances.")
 
+    def _compute_indv_alphas(self, alphas_comb):
+        """
+        Compute individual uncertainty levels required to achieve combined uncertainty levels. 
+
+        Args:
+            alphas_comb (ndarray): desired uncertainty levels on combined solutions. 
+        
+        Return:
+            ndarray: uncertainty levels on individual solutions"""
+        alphas_indv = tile(1,self.integrand.d_indv)
+        identity_dependency = True
+        for k in ndindex(self.integrand.d_comb):
+            comb_flags = tile(True,self.integrand.d_comb)
+            comb_flags[k] = False
+            flags_indv = self.integrand.dependency(comb_flags)
+            if self.integrand.d_indv!=self.integrand.d_comb or (flags_indv!=comb_flags).any(): identity_dependency=False
+            dependents_k = ~flags_indv
+            n_dep_k = dependents_k.sum()
+            alpha_k = alphas_comb[k]/n_dep_k
+            alpha_k_mat = alpha_k*dependents_k
+            alpha_k_mat[alpha_k_mat==0] = 1
+            alphas_indv = minimum(alphas_indv,alpha_k_mat)
+        return alphas_indv,identity_dependency
     def __repr__(self):
         return _univ_repr(self, "StoppingCriterion", self.parameters)
