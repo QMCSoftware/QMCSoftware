@@ -43,3 +43,5 @@ Demos
     demo_rst/iris.rst
 
     demo_rst/vectorized_qmc.rst
+
+    demo_rst/umbridge.rst
