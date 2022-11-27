@@ -61,7 +61,16 @@ print(f"weights: \n {weights}")
 with open('weights.pkl', 'wb') as handle:
     pickle.dump(weights, handle, protocol=pickle.HIGHEST_PROTOCOL)
 #pickled_model = pickle.load(open('weights.pkl', 'rb'))
-breakpoint()
+
+model = tf.keras.models.Sequential([
+  tf.keras.layers.Flatten(input_shape=(10, 10)),
+  tf.keras.layers.Dense(200, activation='relu'),
+  tf.keras.layers.Dense(100, activation='relu'),
+  tf.keras.layers.Dense(50, activation='relu'),
+  tf.keras.layers.Dense(50, activation='relu'),
+  tf.keras.layers.Dense(20, activation='relu'),
+  tf.keras.layers.Flatten(1)
+])
 
 #if __name__ == '__main__':
 #    pass
