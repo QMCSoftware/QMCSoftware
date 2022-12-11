@@ -8,7 +8,8 @@ import os
 
 class UMBridgeWrapper(Integrand):
     """
-    UM-Bridge Model Wrapper
+    UM-Bridge Model Wrapper. 
+    Requires Docker be installed, see https://www.docker.com/. 
 
     >>> _ = os.system('docker run --name muqbp -dit -p 4243:4243 linusseelinger/benchmark-muq-beam-propagation:latest > /dev/null')
     >>> import umbridge
