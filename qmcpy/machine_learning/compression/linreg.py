@@ -8,6 +8,69 @@ from ctypes import *
 from numpy.ctypeslib import ndpointer
 from sklearn.preprocessing import MinMaxScaler
 import logging
+import math
+def approxmeanMXY(nu, m, x, y, d):
+    base = 2
+    s = x.shape[1]
+    MyHOSobol(m,s,d)
+    weights = MyHOSobol(m,s,d)
+
+def firstMissingPositive(nums):
+    """
+    :type nums: List[int]
+    :rtype: int
+    """
+    bits = 0
+    for num in nums:
+        if 0 < num <= len(nums):
+            bits |= 1 << (num - 1)
+
+    ret = 1
+    while bits & 1 != 0:
+        bits >>= 1
+        ret += 1
+    return ret
+
+
+def MyHOSobol(m,s,d):
+    # Higher order Sobol sequence
+    # Create a higher order Sobol sequence.
+    # 2^m number of points
+    # s dimension of final point set
+    # d interlacing factor
+    # X Output Sobol sequence
+    z = np.loadtxt('sobol.dat')
+    
+    #z = z(1:2^(m) # Row 1 to 2^m ,1:s*d); #Column 1 to s*d
+    #end_slice_value = 2 ** m
+    z = z[0:2**m,0:s*d]
+    #end_slice_value_2 = s*d
+    #submatrix_z_1 = z[0: s*d]
+    #z = z[submatrix_z_0,submatrix_z_1]
+    if (d > 1):
+        N = 2 ** m #; % Number of points;
+        u=52
+        depth = math.floor(u/d)
+        
+        # Create binary representation of digits;
+        
+        W = z * (2 ** depth)
+        Z = np.floor(np.transpose(W)) #floor(transpose(W.T));
+        Y = np.zeros([s, N])#zeros(s,N)
+        for j in range(0, s):
+            for in range(0, depth): #i = 1:depth
+                for k in range(0,d):#k = 1:d
+                    
+                    Y(j,:) = bitset( Y(j,:),(depth*d+1) - k - (i-1)*d,bitget( Z((j-1)*d+k,:),(depth+1) - i))
+                    
+        Y = Y * pow2(-depth*d);
+        
+        X=transpose(Y); # X is matrix of higher order Sobol points,
+        # where the number of columns equals the dimension
+        # and the number of rows equals the number of points;
+        
+    else
+        X=z
 
 
 
@@ -51,13 +114,12 @@ def main():
 	# The compressed data model
 	# load c functions
 	lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
-	computeWeights = lib.computeWeights
+	computeWeights = lib.mexFunction
 	computeWeights.restype = ndpointer(dtype=c_double, shape=(1 + outs, Nqmc))
 
 	# compute weights
 	logging.info(f"\n{nu = }, {m = }, {s = }, {Ndata = }, {Nqmc = }, {outs = }")
-	weights = computeWeights(c_int(nu), c_int(m), c_int(s), c_int(Ndata), c_int(Nqmc), c_int(outs),
-                         c_void_p(X.ctypes.data), c_void_p(qmc_points.ctypes.data), c_void_p(y.ctypes.data))
+	#weights = computeWeights(c_int(nu), c_int(m), c_int(s), c_int(Ndata), c_int(Nqmc), c_int(outs), c_void_p(X.ctypes.data), c_void_p(qmc_points.ctypes.data), c_void_p(y.ctypes.data))
 	weights = np.transpose(weights)
 	print(f"{weights.shape = }")
 	weights=computeMXYmex(nu,m,base,x,z,y)
@@ -67,13 +129,13 @@ def main():
 	mse = mean_squared_error(weights[:, -1], yfit)
 	logging.info(f"Compressed data {mse = }")
 	logging.info(f"{mod.coef_ = }")
-	
+	#breakpoint()
 	# load QMC points
-	m, nu = 10, 3
-	Nqmc = 100
-	outs = s
-	qmc_points = np.loadtxt('sobol.dat')  # 4097 x 100
-	qmc_points = qmc_points[0:Nqmc, 0:s]  # Nqmc x s
+	#m, nu = 10, 3
+	#Nqmc = 100
+	#outs = s
+	#qmc_points = np.loadtxt('sobol.dat')  # 4097 x 100
+	#qmc_points = qmc_points[0:Nqmc, 0:s]  # Nqmc x s
 
 
 
