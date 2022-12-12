@@ -10,12 +10,12 @@ class CustomInstall(install):
     def run(self):
         # compile c files
         try:
-            os.system('pip install -e .')
+            print("do nothing") # os.system('pip3 install -e .')
         except:
             print('Problem installing qmcpy')
         # compile files used for docuemtnation
         try:
-            os.system('make _doc')
+            print("") #os.system('make _doc')
         except:
             print('Problem compiling html or pdf documenation')
         super(CustomInstall, self).run()
@@ -31,7 +31,7 @@ class CleanCommand(Command):
         pass
 
     def run(self):
-        os.system("rm -vrf ./build ./dist ./*.pyc ./qmcpy/qmcpy.egg-info")
+        print("no cleaning") #os.system("rm -vrf ./build ./dist ./*.pyc ./qmcpy/qmcpy.egg-info")
 
 try:
     with open("README.md", "r", encoding="utf-8", errors='ignore') as fh:
