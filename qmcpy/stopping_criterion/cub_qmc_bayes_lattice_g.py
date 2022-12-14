@@ -87,8 +87,8 @@ class CubBayesLatticeG(_CubBayesLDG):
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
             order (int): Bernoulli kernel's order. If zero, choose order automatically
-            alpha (float): signifcance level or p-value
-            ptransform (str): periodization transform
+            alpha (float): p-value
+            ptransform (str): periodization transform applied to the integrand
             error_fun: function taking in the approximate solution vector,
                 absolute tolerance, and relative tolerance which returns the approximate error.
                 Default indicates integration until either absolute OR relative tolerance is satisfied.

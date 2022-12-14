@@ -12,7 +12,7 @@ import warnings
 
 
 class CubBayesNetG(_CubBayesLDG):
-    """
+    r"""
     Stopping criterion for Bayesian Cubature using digital net sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
