@@ -219,7 +219,11 @@ class LDTransformBayesData(AccumulateData):
 
             # ignore all zero eigenvalues
             loss1 = sum(log(abs(lambda_factor * vec_lambda[vec_lambda > fudge])))
-            loss2 = n * log(temp_1)
+            if temp_1 != 0:
+                loss2 = n * log(temp_1 )
+            else:
+                loss2 = n * log(temp_1 + np.finfo(float).eps )
+
             loss = loss1 + loss2
 
         if self.debug_enable:

@@ -122,11 +122,11 @@ class CubBayesNetG(_CubBayesLDG):
 
 
     def _fwht_h(self, y):
-        ytilde = np.squeeze(y)
-        self.fwht.fwht_inplace(len(y), ytilde)
-        return ytilde
-        # ytilde = np.array(self.fwht_h_py(y), dtype=float)
+        # ytilde = np.squeeze(y)
+        # self.fwht.fwht_inplace(len(y), ytilde)
         # return ytilde
+        ytilde = np.array(self.fwht_h_py(y), dtype=float)
+        return ytilde
 
     @staticmethod
     def _merge_fwht(ftilde_new, ftilde_next_new, mnext):
@@ -213,7 +213,7 @@ class CubBayesNetG(_CubBayesLDG):
 
         return kernFunc
 
-    '''
+
     @staticmethod
     def fwht_h_py(ynext):
         mnext = int(np.log2(len(ynext)))
@@ -227,7 +227,7 @@ class CubBayesNetG(_CubBayesLDG):
             ynext[ptind] = (evenval + oddval)
             ynext[~ptind] = (evenval - oddval)
         return ynext
-    '''
+
 
 
 class FWHT():
