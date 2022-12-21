@@ -171,6 +171,12 @@ Linear Function
 .. automodule:: qmcpy.integrand.linear0
     :members:
 
+Genz Function
+.............
+
+.. automodule:: qmcpy.integrand.genz
+    :members:
+
 Sensitivity Indices
 ...................
 
