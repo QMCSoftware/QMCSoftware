@@ -53,7 +53,7 @@ class DiscreteDistribution(object):
         raise MethodImplementationError(self, 'pdf')
 
     def plot(self, n, d_vertical, d_horizontial):
-        pass
+        print("Hello, world")
 
     def spawn(self, s=1, dimensions=None):
         """
