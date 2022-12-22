@@ -52,6 +52,9 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
+    def plot(self, n, d_vertical, d_horizontial):
+        pass
+
     def spawn(self, s=1, dimensions=None):
         """
         Spawn new instances of the current discrete distribution but with new seeds and dimensions.
