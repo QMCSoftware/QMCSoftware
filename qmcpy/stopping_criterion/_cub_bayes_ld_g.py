@@ -16,8 +16,8 @@ class _CubBayesLDG(StoppingCriterion):
                  abs_tol, rel_tol, n_init, n_max, alpha, error_fun):
 
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
+        self.abs_tol = float(abs_tol)
+        self.rel_tol = float(rel_tol)
         m_min = np.log2(n_init)
         m_max = np.log2(n_max)
         if m_min % 1 != 0. or m_min < 5 or m_max % 1 != 0:

@@ -22,4 +22,5 @@ dependencies:
     - sphinx-rtd-theme==1.0.0
     - sphinx-markdown-tables==0.0.17
     - umbridge==1.2.1
+    - scikit-learn
     - -e .
