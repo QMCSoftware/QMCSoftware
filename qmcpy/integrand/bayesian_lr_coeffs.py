@@ -52,7 +52,7 @@ class BayesianLRCoeffs(Integrand):
         z = x@self.feature_array.T
         z1 = z*self.response_vector
         with errstate(over='ignore'):
-            den = exp(sum(z1-log(1+exp(z)),1))[:,None]
+            den = exp(sum(z1-log(1+exp(z)),1))[:,None]   #  + finfo(float).eps
         y = zeros((len(x),2,self.num_coeffs),dtype=float)
         y[:,0] = x*den
         y[:,1] = den

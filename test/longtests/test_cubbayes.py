@@ -2,9 +2,6 @@ import qmcpy as qp
 import numpy as np
 import scipy
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
-
-
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -29,6 +26,15 @@ blr = qp.BayesianLRCoeffs(
     prior_mean = 0, # normal prior mean = (0,0,...,0)
     prior_covariance = 5) # normal prior covariance = 5I
 
+if False:
+    qmc_sc = qp.CubBayesNetG(blr,
+        abs_tol = .05,
+        rel_tol = .5,
+        error_fun = lambda s,abs_tols,rel_tols:
+            np.minimum(abs_tols,np.abs(s)*rel_tols))
+    blr_coefs,blr_data = qmc_sc.integrate()
+    print(blr_data)
+
 qmc_sc = qp.CubQMCNetG(blr,
     abs_tol = .05,
     rel_tol = .5,
@@ -37,13 +43,6 @@ qmc_sc = qp.CubQMCNetG(blr,
 blr_coefs,blr_data = qmc_sc.integrate()
 print(blr_data)
 
-qmc_sc = qp.CubBayesNetG(blr,
-    abs_tol = .05,
-    rel_tol = .5,
-    error_fun = lambda s,abs_tols,rel_tols:
-        np.minimum(abs_tols,np.abs(s)*rel_tols))
-blr_coefs,blr_data = qmc_sc.integrate()
-print(blr_data)
 # LDTransformData (AccumulateData Object)
 #     solution        [-0.004  0.13  -0.157  0.008]
 #     comb_bound_low  [-0.006  0.092 -0.205  0.007]
@@ -53,7 +52,6 @@ print(blr_data)
 #     n               [[  1024.   1024. 262144.   2048.]
 #                     [  1024.   1024. 262144.   2048.]]
 #     time_integrate  2.229
-
 
 
 
