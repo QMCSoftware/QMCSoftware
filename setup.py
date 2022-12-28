@@ -13,11 +13,11 @@ class CustomInstall(install):
             os.system('pip install -e .')
         except:
             print('Problem installing qmcpy')
-        # compile files used for docuemtnation
+        # compile files used for documentation
         try:
             os.system('make _doc')
         except:
-            print('Problem compiling html or pdf documenation')
+            print('Problem compiling html or pdf documentation')
         super(CustomInstall, self).run()
 
 class CleanCommand(Command):

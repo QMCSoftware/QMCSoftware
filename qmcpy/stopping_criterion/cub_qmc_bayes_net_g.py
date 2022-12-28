@@ -12,7 +12,7 @@ import warnings
 
 
 class CubBayesNetG(_CubBayesLDG):
-    """
+    r"""
     Stopping criterion for Bayesian Cubature using digital net sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
@@ -80,6 +80,18 @@ class CubBayesNetG(_CubBayesLDG):
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, alpha=0.01,
                  error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
+        """
+        Args:
+            integrand (Integrand): an instance of Integrand
+            abs_tol (ndarray): absolute error tolerance
+            rel_tol (ndarray): relative error tolerance
+            n_init (int): initial number of samples
+            n_max (int): maximum number of samples
+            alpha (float): signifcance level or p-value
+            error_fun: function taking in the approximate solution vector,
+                absolute tolerance, and relative tolerance which returns the approximate error.
+                Default indicates integration until either absolute OR relative tolerance is satisfied.
+        """
         super(CubBayesNetG, self).__init__(integrand, fbt=self._fwht_h, merge_fbt=self._merge_fwht,
                                            ptransform=None,
                                            allowed_distribs=[DigitalNetB2],
