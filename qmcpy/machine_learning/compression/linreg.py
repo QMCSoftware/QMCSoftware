@@ -64,8 +64,8 @@ def MyHOSobol(m,s,d):
         for j in range(0, s):
             for in range(0, depth): #i = 1:depth
                 for k in range(0,d):#k = 1:d
-                    
-                    Y = np.unpackbits(a, axis=1) #Y(j,:) = bitset( Y(j,:),(depth*d+1) - k - (i-1)*d,bitget( Z((j-1)*d+k,:),(depth+1) - i))
+                    Y[j,:] = (Y[j,:] & ~(1 << ((depth*d+1) - k - (i-1)*d))) | (((Z[(j-1)*d+k,:] >> ((depth+1) - i)) & 1) << ((depth*d+1) - k - (i-1)*d))
+                    #Y = np.unpackbits(a, axis=1) #Y(j,:) = bitset( Y(j,:),(depth*d+1) - k - (i-1)*d,bitget( Z((j-1)*d+k,:),(depth+1) - i))
                    
         Y = Y * numpy.exp2(-depth * d) #Y = Y * np2(-depth*d);
         
