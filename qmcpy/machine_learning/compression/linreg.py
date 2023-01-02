@@ -32,38 +32,42 @@ def firstMissingPositive(nums):
     return ret
 
 
-def MyHOSobol(m,s,d):
-    # Higher order Sobol sequence
-    # Create a higher order Sobol sequence.
-    # 2^m number of points
-    # s dimension of final point set
-    # d interlacing factor
-    # X Output Sobol sequence
-    z = np.loadtxt('sobol.dat')
     
-    #z = z(1:2^(m) # Row 1 to 2^m ,1:s*d); #Column 1 to s*d
+def MyHOSobol(m,s,d):
+
+	'''
+	Higher order Sobol sequence
+    Create a higher order Sobol sequence.
+    2^m number of points
+    s dimension of final point set
+    d interlacing factor
+    X Output Sobol sequence
+    z = np.loadtxt('sobol.dat')
+    '''
+
+	#z = z(1:2^(m) # Row 1 to 2^m ,1:s*d); #Column 1 to s*d
     #end_slice_value = 2 ** m
     z = z[0:2**m,0:s*d]
     #end_slice_value_2 = s*d
     #submatrix_z_1 = z[0: s*d]
     #z = z[submatrix_z_0,submatrix_z_1]
     if (d > 1):
-        N = 2 ** m #; % Number of points;
-        u=52
+        N     = 2 ** m #; % Number of points;
+        u     = 52
         depth = math.floor(u/d)
         
         # Create binary representation of digits;
-        
-        W = z * (2 ** depth)
+        # numpy.exp2
+        W = z * exp2(depth)           #W = z* pow2(depth);
         Z = np.floor(np.transpose(W)) #floor(transpose(W.T));
-        Y = np.zeros([s, N])#zeros(s,N)
+        Y = np.zeros([s, N])          #zeros(s,N)
         for j in range(0, s):
             for in range(0, depth): #i = 1:depth
                 for k in range(0,d):#k = 1:d
                     
-                    Y(j,:) = bitset( Y(j,:),(depth*d+1) - k - (i-1)*d,bitget( Z((j-1)*d+k,:),(depth+1) - i))
-                    
-        Y = Y * pow2(-depth*d);
+                    Y = np.unpackbits(a, axis=1) #Y(j,:) = bitset( Y(j,:),(depth*d+1) - k - (i-1)*d,bitget( Z((j-1)*d+k,:),(depth+1) - i))
+                   
+        Y = Y * numpy.exp2(-depth * d) #Y = Y * np2(-depth*d);
         
         X=transpose(Y); # X is matrix of higher order Sobol points,
         # where the number of columns equals the dimension
