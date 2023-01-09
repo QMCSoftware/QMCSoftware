@@ -171,11 +171,37 @@ Linear Function
 .. automodule:: qmcpy.integrand.linear0
     :members:
 
-Sobol' Indices
-..............
+Bayesian Logistic Regression
+............................
 
-.. automodule:: qmcpy.integrand.sobol_indices
+.. automodule:: qmcpy.integrand.bayesian_lr_coeffs
     :members:
+
+Genz Function
+.............
+
+.. automodule:: qmcpy.integrand.genz
+    :members:
+
+Ishigami Function
+.................
+
+.. automodule:: qmcpy.integrand.ishigami
+    :members:
+
+Sensitivity Indices
+...................
+
+.. automodule:: qmcpy.integrand.sensitivity_indices
+    :members:
+
+UM-Bridge Wrapper
+.................
+
+.. automodule:: qmcpy.integrand.um_bridge_wrapper
+    :members:
+
+
 
 
 

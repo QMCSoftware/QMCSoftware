@@ -1,4 +1,4 @@
-from ..util import ParameterError
+from ..util import ParameterError,NotYetImplemented
 from numpy import *
 
 
@@ -20,6 +20,7 @@ def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
     Adapted from latnetbuilder parser:
         https://github.com/umontreal-simul/latnetbuilder/blob/master/python-wrapper/latnetbuilder/parse_output.py#L74
     """
+    raise NotYetImplemented("latnetbuilder_linker is currently under reconstruction.")
     with open(lnb_dir+'/outputMachine.txt') as f:
         Lines = f.read().split("\n")
     sep = '  //'

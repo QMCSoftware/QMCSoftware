@@ -18,7 +18,7 @@ class LDTransformBayesData(AccumulateData):
     """
 
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, m_min: int, m_max: int,
-                 fbt, merge_fbt, kernel):
+                 fbt, merge_fbt, kernel, alpha):
         """
         Args:
             stopping_crit (StoppingCriterion): a StoppingCriterion instance
@@ -49,9 +49,9 @@ class LDTransformBayesData(AccumulateData):
         # quantile value for the error bound
         if self.errbd_type == 'full_Bayes':
             # degrees of freedom = 2^mmin - 1
-            self.uncert = -tnorm.ppf(self.stopping_crit.alpha / 2, (2 ** m_min) - 1)
+            self.uncert = -tnorm.ppf(alpha / 2, (2 ** m_min) - 1)
         else:
-            self.uncert = -gaussnorm.ppf(self.stopping_crit.alpha / 2)
+            self.uncert = -gaussnorm.ppf(alpha / 2)
 
         # Set Attributes
         self.m_min = m_min
@@ -219,7 +219,10 @@ class LDTransformBayesData(AccumulateData):
 
             # ignore all zero eigenvalues
             loss1 = sum(log(abs(lambda_factor * vec_lambda[vec_lambda > fudge])))
-            loss2 = n * log(temp_1)
+            if temp_1 != 0:
+                loss2 = n * log(temp_1)
+            else:
+                loss2 = n * log(temp_1 + np.finfo(float).eps)
             loss = loss1 + loss2
 
         if self.debug_enable:

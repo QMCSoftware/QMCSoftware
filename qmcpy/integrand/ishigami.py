@@ -41,7 +41,7 @@ class Ishigami(Integrand):
         self.a = a
         self.b = b
         self.true_measure = Uniform(self.sampler, lower_bound=-pi, upper_bound=pi)
-        super(Ishigami,self).__init__(dprime=1,parallel=False)
+        super(Ishigami,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
     
     def g(self, t):
         y = (1+self.b*t[:,2]**4)*sin(t[:,0])+self.a*sin(t[:,1])**2
