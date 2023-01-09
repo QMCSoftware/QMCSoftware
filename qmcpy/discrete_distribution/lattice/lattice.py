@@ -24,21 +24,17 @@ class Lattice(LD):
         order           natural
         entropy         7
         spawn_key       ()
-    >>> l = Lattice(2,generating_vector = 17,seed = 9)
-    >>> l.gen_samples(5)
-    array([[0.2943626 , 0.88967111],
-       [0.7943626 , 0.38967111],
-       [0.5443626 , 0.63967111],
-       [0.0443626 , 0.13967111],
-       [0.4193626 , 0.76467111]])
-    >>> l 
+    >>> l = Lattice(2,generating_vector=28,seed=55)
+    >>> l.gen_samples(1)
+    array([[0.84489224, 0.30534549]])
+    >>> l
     Lattice (DiscreteDistribution Object)
-    d               2^(1)
-    dvec            [0 1]
-    randomize       1
-    order           natural
-    entropy         9
-    spawn_key       ()
+        d               2^(1)
+        dvec            [0 1]
+        randomize       1
+        order           natural
+        entropy         55
+        spawn_key       ()
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
@@ -54,15 +50,24 @@ class Lattice(LD):
            [0.5 , 0.5 ],
            [0.25, 0.75],
            [0.75, 0.25]])
-    >>> Lattice(dimension = 2, generating_vector = 25,seed = 55,randomize = False).gen_samples(8, warn = False)
+    >>> Lattice(dimension=2,randomize=False,seed=182,generating_vector = 23).gen_samples(8, warn=False)
     array([[0.   , 0.   ],
-       [0.5  , 0.5  ],
-       [0.25 , 0.25 ],
-       [0.75 , 0.75 ],
-       [0.125, 0.625],
-       [0.625, 0.125],
-       [0.375, 0.875],
-       [0.875, 0.375]])
+           [0.5  , 0.5  ],
+           [0.25 , 0.25 ],
+           [0.75 , 0.75 ],
+           [0.125, 0.125],
+           [0.625, 0.625],
+           [0.375, 0.375],
+           [0.875, 0.875]])
+    >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector = 26).gen_samples(8,warn=False)
+    array([[0.   , 0.   , 0.   , 0.   ],
+           [0.5  , 0.5  , 0.5  , 0.5  ],
+           [0.25 , 0.25 , 0.75 , 0.75 ],
+           [0.75 , 0.75 , 0.25 , 0.25 ],
+           [0.125, 0.625, 0.875, 0.875],
+           [0.625, 0.125, 0.375, 0.375],
+           [0.375, 0.875, 0.625, 0.625],
+           [0.875, 0.375, 0.125, 0.125]])
 
     References:
 
@@ -86,7 +91,7 @@ class Lattice(LD):
         [4] Constructing embedded lattice rules for multivariate integration
         R Cools, FY Kuo, D Nuyens -  SIAM J. Sci. Comput., 28(6), 2162-2188.
 
-        [5] L’Ecuyer, Pierre & Munger, David. (2015).
+        [5] L'Ecuyer, Pierre & Munger, David. (2015).
         LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules.
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
@@ -132,8 +137,8 @@ class Lattice(LD):
             self.d_max = d_max
             self.m_max = m_max
         elif isinstance(generating_vector,int):
-            self.m_max = min(64,max(2,generating_vector))
-            self.d_max = dimension 
+            self.m_max = min(26,max(2,generating_vector))
+            self.d_max = dimension
         elif isinstance(generating_vector,str):
             root = dirname(abspath(__file__))+'/generating_vectors/'
             if isfile(root+generating_vector):
@@ -151,7 +156,7 @@ class Lattice(LD):
         self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
         if isinstance(generating_vector,int):
-            self.z_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-1),size = dimension-1,dtype = uint64)+1);
+            self.z_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-2),size = dimension-1,dtype = uint64)+1)
         self.z = self.z_og[self.dvec]
         self.shift = self.rng.uniform(size=int(self.d))
 
