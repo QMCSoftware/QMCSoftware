@@ -106,7 +106,7 @@ class TestLattice(unittest.TestCase):
         assert x.shape==(4,3)
 
     def test_integer_generating_vectors(self):
-        distribution = Lattice(dimension = 4, generating_vector= 27, randomize = False,seed=136)
+        distribution = Lattice(dimension=4, generating_vector=27, randomize=False,seed=136)
         true_sample =array([
             [0.125, 0.625, 0.875, 0.625],
             [0.625, 0.125, 0.375, 0.125],

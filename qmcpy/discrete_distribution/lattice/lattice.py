@@ -25,8 +25,11 @@ class Lattice(LD):
         entropy         7
         spawn_key       ()
     >>> l = Lattice(2,generating_vector=28,seed=55)
-    >>> l.gen_samples(1)
-    array([[0.84489224, 0.30534549]])
+    >>> l.gen_samples(4)
+    array([[0.84489224, 0.30534549],
+           [0.34489224, 0.80534549],
+           [0.09489224, 0.05534549],
+           [0.59489224, 0.55534549]])
     >>> l
     Lattice (DiscreteDistribution Object)
         d               2^(1)
@@ -50,16 +53,7 @@ class Lattice(LD):
            [0.5 , 0.5 ],
            [0.25, 0.75],
            [0.75, 0.25]])
-    >>> Lattice(dimension=2,randomize=False,seed=182,generating_vector = 23).gen_samples(8, warn=False)
-    array([[0.   , 0.   ],
-           [0.5  , 0.5  ],
-           [0.25 , 0.25 ],
-           [0.75 , 0.75 ],
-           [0.125, 0.125],
-           [0.625, 0.625],
-           [0.375, 0.375],
-           [0.875, 0.875]])
-    >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector = 26).gen_samples(8,warn=False)
+    >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector=26).gen_samples(8,warn=False)
     array([[0.   , 0.   , 0.   , 0.   ],
            [0.5  , 0.5  , 0.5  , 0.5  ],
            [0.25 , 0.25 , 0.75 , 0.75 ],
@@ -111,7 +105,9 @@ class Lattice(LD):
                 ndarray should have shape (d_max).
                 a string generating_vector should be formatted like
                 'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy'
-                an integer should be larger than 1
+                an integer should be larger than 1; passing an integer M would create a random generating vector supporting up to 2^M points. 
+                M is restricted between 2 and 26 for numerical percision. The generating vector is [1,v_1,v_2,...,v_dimension], where v_i is an integer 
+                in [3,2^M-1]. 
             d_max (int): maximum dimension
             m_max (int): 2^m_max is the max number of supported samples
 
@@ -156,7 +152,7 @@ class Lattice(LD):
         self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
         if isinstance(generating_vector,int):
-            self.z_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-2),size = dimension-1,dtype = uint64)+1)
+            self.z_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-1),size=dimension-1,dtype=uint64)+1)
         self.z = self.z_og[self.dvec]
         self.shift = self.rng.uniform(size=int(self.d))
 
