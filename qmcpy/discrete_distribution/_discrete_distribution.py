@@ -1,5 +1,6 @@
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 from numpy import *
+import matplotlib.pyplot as plt
 
 
 class DiscreteDistribution(object):
@@ -57,33 +58,22 @@ class DiscreteDistribution(object):
         ABSTRACT METHOD for ploting a distrubution, you will also need to import matplotlib.pyplot as plt
 
         Args:
-            n (int): n is the number of samples that will be calculated 
+            n (int): n is the number of samples that will be plotted 
 
-            d_vertical (int): d_vertical is the index of points that will be plotted on the vertical axis. See below
-            
+            d_vertical (int): d_vertical is the index of points that will be plotted on the vertical axis. 
 
-            d_horizontial (int): d_horizontial is the index of points that will be plotted as the horizontial axis. See below
+            d_horizontial (int): d_horizontial is the index of points that will be plotted as the horizontial axis.
 
-        d_horizontial and d_vertical explanation:
-            Both of theses numbers act as an index in an array of dimensions for the given object. 
-            The chosen number for d_horizontial or d_vertical will index a given dimension. With the d_horizontial the dimension will be on the 
-            x-axis and the d_vertical index will then become the y-axis. 
-
-            
-
-        The plot method should be defined similar to :
+        """
+        try:
             fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(16, 6))
             samples = self.gen_samples(n)
             ax.scatter(samples[:, d_vertical], samples[:, d_horizontial])
             plt.show()
-
+        except:
+            raise ImportError("Missing matplotlib.pyplot as plt")
         
-        This method does not return anything it just plots a scatter plot.
-
-
-        """
-        
-        raise MethodImplementationError(self, 'plot')
+        return fig, ax
 
     def spawn(self, s=1, dimensions=None):
         """
