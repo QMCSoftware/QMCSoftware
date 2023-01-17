@@ -1,6 +1,6 @@
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 from numpy import *
-import matplotlib.pyplot as plt
+
 
 
 class DiscreteDistribution(object):
@@ -55,26 +55,27 @@ class DiscreteDistribution(object):
 
     def plot(self, n, d_vertical=0, d_horizontial =1):
         """
-        ABSTRACT METHOD for ploting a distrubution, you will also need to import matplotlib.pyplot as plt
 
         Args:
             n (int): n is the number of samples that will be plotted 
-
             d_vertical (int): d_vertical is the index of points that will be plotted on the vertical axis. 
-
             d_horizontial (int): d_horizontial is the index of points that will be plotted as the horizontial axis.
 
         """
         try:
-            fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(16, 6))
-            samples = self.gen_samples(n)
-            ax.scatter(samples[:, d_vertical], samples[:, d_horizontial])
-            plt.show()
+            import matplotlib.pyplot as plt
+            
+            
         except:
             raise ImportError("Missing matplotlib.pyplot as plt")
         
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 5))
+        samples = self.gen_samples(n)
+        ax.scatter(samples[:, d_horizontial], samples[:, d_vertical])
+
         return fig, ax
 
+        
     def spawn(self, s=1, dimensions=None):
         """
         Spawn new instances of the current discrete distribution but with new seeds and dimensions.
