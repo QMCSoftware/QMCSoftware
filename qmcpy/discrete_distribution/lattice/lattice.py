@@ -24,20 +24,6 @@ class Lattice(LD):
         order           natural
         entropy         7
         spawn_key       ()
-    >>> l = Lattice(2,generating_vector=28,seed=55)
-    >>> l.gen_samples(4)
-    array([[0.84489224, 0.30534549],
-           [0.34489224, 0.80534549],
-           [0.09489224, 0.05534549],
-           [0.59489224, 0.55534549]])
-    >>> l
-    Lattice (DiscreteDistribution Object)
-        d               2^(1)
-        dvec            [0 1]
-        randomize       1
-        order           natural
-        entropy         55
-        spawn_key       ()
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
     array([[0.  , 0.  ],
            [0.5 , 0.5 ],
@@ -53,6 +39,20 @@ class Lattice(LD):
            [0.5 , 0.5 ],
            [0.25, 0.75],
            [0.75, 0.25]])
+    >>> l = Lattice(2,generating_vector=25,seed=55)
+    >>> l.gen_samples(4)
+    array([[0.84489224, 0.30534549],
+           [0.34489224, 0.80534549],
+           [0.09489224, 0.05534549],
+           [0.59489224, 0.55534549]])
+    >>> l
+    Lattice (DiscreteDistribution Object)
+        d               2^(1)
+        dvec            [0 1]
+        randomize       1
+        order           natural
+        entropy         55
+        spawn_key       ()
     >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector=26).gen_samples(8,warn=False)
     array([[0.   , 0.   , 0.   , 0.   ],
            [0.5  , 0.5  , 0.5  , 0.5  ],
@@ -105,9 +105,8 @@ class Lattice(LD):
                 ndarray should have shape (d_max).
                 a string generating_vector should be formatted like
                 'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy'
-                an integer should be larger than 1; passing an integer M would create a random generating vector supporting up to 2^M points. 
-                M is restricted between 2 and 26 for numerical percision. The generating vector is [1,v_1,v_2,...,v_dimension], where v_i is an integer 
-                in [3,2^M-1]. 
+                an integer should be an odd larger than 1; passing an integer M would create a random generating vector supporting up to 2^M points. 
+                M is restricted between 2 and 26 for numerical percision. The generating vector is [1,v_1,v_2,...,v_dimension], where v_i is an integer in {3,5,...,2*M-1}. 
             d_max (int): maximum dimension
             m_max (int): 2^m_max is the max number of supported samples
 
