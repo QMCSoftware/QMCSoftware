@@ -126,7 +126,7 @@ class Lattice(LD):
         else:
             raise Exception("Lattice requires natural, linear, or mps ordering.")
         if isinstance(generating_vector,ndarray):
-            self.z_og = generating_vector
+            self.gen_vec_og = generating_vector
             if d_max is None or m_max is None:
                 raise ParameterError("d_max and m_max must be supplied when generating_vector is a ndarray")
             self.d_max = d_max
@@ -137,9 +137,9 @@ class Lattice(LD):
         elif isinstance(generating_vector,str):
             root = dirname(abspath(__file__))+'/generating_vectors/'
             if isfile(root+generating_vector):
-                self.z_og = load(root+generating_vector).astype(uint64)
+                self.gen_vec_og = load(root+generating_vector).astype(uint64)
             elif isfile(generating_vector):
-                self.z_og = load(generating_vector).astype(uint64)
+                self.gen_vec_og = load(generating_vector).astype(uint64)
             else:
                 raise ParameterError("generating_vector '%s' not found."%generating_vector)
             parts = generating_vector.split('.')
@@ -151,15 +151,16 @@ class Lattice(LD):
         self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
         if isinstance(generating_vector,int):
-            self.z_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-1),size=dimension-1,dtype=uint64)+1)
-        self.z = self.z_og[self.dvec]
+            self.gen_vec_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-1),size=dimension-1,dtype=uint64)+1)
+        self.gen_vec = self.gen_vec_og[self.dvec]
         self.shift = self.rng.uniform(size=int(self.d))
-
+        self.parameters += ["gen_vec"]
+        
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
-        gen_block = lambda n: (outer(arange(1, n+1, 2), self.z) % n) / float(n)
+        gen_block = lambda n: (outer(arange(1, n+1, 2), self.gen_vec) % n) / float(n)
         x_lat_full = vstack([gen_block(2**m) for m in range(int(m_low),int(m_high)+1)])
         cut1 = int(floor(n_min-2**(m_low-1))) if n_min>0 else 0
         cut2 = int(cut1+n_max-n_min)
@@ -172,7 +173,7 @@ class Lattice(LD):
             y = arange(0, 1, 1 / n).reshape((n, 1))
         else:
             y = arange(1 / n, 1, 2 / n).reshape((n, 1))
-        x = outer(y, self.z) % 1
+        x = outer(y, self.gen_vec) % 1
         return x
 
     def _gail_linear(self, n_min, n_max):
@@ -192,7 +193,7 @@ class Lattice(LD):
                 temp[1::2] = y_next
                 y = temp
 
-            x = outer(y, self.z) % 1
+            x = outer(y, self.gen_vec) % 1
             return x
 
     def _gail_natural(self, n_min, n_max):
@@ -224,7 +225,7 @@ class Lattice(LD):
         """ Generate samples floor(2**(m-1)) to 2**m. """
         n_min = floor(2**(m-1))
         n = 2**m-n_min
-        x = outer(self._vdc(n)+1./(2*n_min),self.z)%1 if n_min>0 else outer(self._vdc(n),self.z)%1
+        x = outer(self._vdc(n)+1./(2*n_min),self.gen_vec)%1 if n_min>0 else outer(self._vdc(n),self.gen_vec)%1
         return x
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
@@ -276,6 +277,6 @@ class Lattice(LD):
                 randomize=self.randomize,
                 order=self.order,
                 seed=child_seed,
-                generating_vector=self.z_og,
+                generating_vector=self.gen_vec_og,
                 d_max=self.d_max,
                 m_max=self.m_max)
