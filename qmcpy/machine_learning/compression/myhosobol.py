@@ -121,7 +121,6 @@ def bin_zfill(a):
 
     l = bin_len_max(a)
     y = "0b" + dec2bin(a, l)
-    #print(f"{a = }, {type(a) = }, {l = }, {y = }")
     return y
 
 def bin_len_max(a):
@@ -150,7 +149,7 @@ def bin_len_max(a):
 
 def is_signed(a):
     """
-    If the type of a is an unsigned integer, return False. If the type of a is a signed integer,
+    If a is an unsigned integer, return False. If a is a signed integer,
     return True. Otherwise, raise an error if the type of integer is not known.
 
     Args:
@@ -253,12 +252,11 @@ def bitset(a, bit, v=1):
     if type(bit) == list:
         return [bitset(a, b, v) for b in bit]
 
-    #l = bin_len_max(a)
     if type(a) in [float, int, np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]:
         if (bit > 0) and (bit <= len(bin_zfill(a)[2:])):
             return a | (v << (bit - 1))
         else:
-            raise ValueError(f"bit must be between 1 and the number of bits {l} in the integer class of a.")
+            raise ValueError(f"bit must be between 1 and the number of bits in the integer class of a.")
     elif type(a) in [list, np.ndarray]:
         print("Contact QMCPy team for implementation of this case.")
         """
@@ -315,9 +313,8 @@ def MyHOSobol(m, s, d=1):
     z = np.loadtxt('sobol.dat')
     z = z[:2 ** m, :s * d]
     if d > 1:
-        #print("Please contact the QMCPy team for this use case")
 
-        N = pow(2, m) # Number of points;
+        N = pow(2, m)  # Number of points
         u = 52
         depth = int(np.floor(u/d))
         
