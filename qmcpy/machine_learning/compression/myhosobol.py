@@ -1,7 +1,7 @@
 import numpy as np
 
 # TODO move utility functions to util
-# TODO put some trival doctests in unit tests
+# TODO put some trivial doctests in unit tests
 # TODO attempt to speed up nested for loops or list comprehension using numba if possible
 
 def dec2bin(a, numbits=1):
@@ -137,7 +137,7 @@ def bin_len_max(a):
 
     if type(a) in [np.uint8, np.int8]:
         len_max = 8
-    elif type(a) in [np.uint16, np.int16, np.half, np.float16]:  # TODO check and add documentation for treating np.float16 as uint16?
+    elif type(a) in [np.uint16, np.int16, np.half, np.float16]:
         len_max = 16
     elif type(a) in [int, np.uint32, np.int32, np.single]:
         len_max = 32
@@ -154,8 +154,9 @@ def bitget(a, bit):
 
     Args:
         a: a signed or unsigned integer.
-        bit: an integer between 1 (least significant bit) and the number of bits in the integer class of a. Or a list of integers,
-             with each element being an integer between 1 and the number of bits in the integer class of a.
+        bit: an integer between 1 (least significant bit) and the number of bits in the integer class of a.
+             Or bit can be  a list of integers, with each element being an integer between 1 and the number of bits
+             in the integer class of a.
 
     Returns:
         an integer or a list of integers representing the value of the bit at position bit in a.
@@ -198,7 +199,9 @@ def bitget(a, bit):
     if type(bit) == int:
         if type(a) in [int, np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]:
             if (bit > 0) and (bit <= len(bin_zfill(a)[2:])):
-                return (a >> (type(a) (bit - 1))) & (np.array([1], dtype=type(a))[0])
+                one = np.array([1], dtype=type(a))[0]  # cast 1 to type a
+                bit_minus_one = type(a)(bit - 1)
+                return (a >> bit_minus_one) & one
             else:
                 raise ValueError("bit must be between 1 and the number of bits in the integer class of a.")
 
@@ -214,20 +217,20 @@ def bitset(a, bit, v=1):
 
     Args:
         a: a signed or unsigned integer or an array of integers.
-            If a is a double array, then each element is treated as an unsigned 64-bit integer.
-            If a is a single array, then each element is treated as an unsigned 32-bit integer.
-            If a is a NumPy float16 or half array, then each element is treated as an unsigned 16-bit integer.
-        bit: an integer between 1 (least significant bit) and the number of bits in the integer class of a. If a is a double array, then all elements
-        must be non-negative integers less than or equal to intmax('uint64'), and bit must be between 1 and 64.
-        v: Zero values of v sets the bit to 0 (off), and non-zero values of v sets the bit to 1 (on).
+           If a is a double array, then each element is treated as an unsigned 64-bit integer.
+           If a is a single array, then each element is treated as an unsigned 32-bit integer.
+           If a is a NumPy float16 or half array, then each element is treated as an unsigned 16-bit integer.
+        bit: an integer between 1 (least significant bit) and the number of bits in the integer class of a.
+             If a is a double array, then all elements must be non-negative integers less than or equal to
+             intmax('uint64'), and bit must be between 1 and 64.
+        v: zero values of v sets the bit to 0 (off), and non-zero values of v sets the bit to 1 (on).
 
     Returns:
         an integer or a list of integers representing a with bit position bit set to 1.
 
     Raises:
         TypeError: If a is not an integer or a list of integers.
-        ValueError: If bit is not between 1 and the number of bits in the integer class of a or bit is not between 1 and 64
-            if a is a list of integers.
+        ValueError: If bit is not between 1 and the number of bits in the integer class.
 
     Reference:
         https://www.mathworks.com/help/matlab/ref/bitset.html
@@ -274,8 +277,8 @@ def bitset(a, bit, v=1):
     if type(bit) in [list, np.ndarray]:
         return [bitset(a, b, v) for b in bit]
 
-    if (type(a) in [list, np.ndarray]):
-        if (type(v) in [list, np.ndarray]):
+    if type(a) in [list, np.ndarray]:
+        if type(v) in [list, np.ndarray]:
             if len(a) == len(v):
                 return [bitset(aa, bit, vv) for aa, vv in zip(a, v)]
             else:
@@ -299,12 +302,34 @@ def bitset(a, bit, v=1):
 
 
 def list1_to_int(a):
+    """
+    If the input is a list or numpy array with only one element, return that element
+
+    Args:
+      a: list or numpy array of numbers
+
+    Returns:
+      the first element of the list if length of the list is 1. Otherwise the list itself.
+    """
     if (type(a) in [list, np.ndarray]) and (len(a) == 1):
         a = a[0]
     return a
 
 
 def float_to_int(a):
+    """
+    If the input is a floating point number, convert it to an integer of the same size.
+
+    If a is double, then it is cast as an unsigned 64-bit integer.
+    If a is single, then it is cast as an unsigned 32-bit integer.
+    If a is of type NumPy float16 or half, then it is cast as an unsigned 16-bit integer.
+
+    Args:
+      a: floating point
+
+    Returns:
+      integer after conversion
+    """
     if np.issubdtype(type(a), np.floating):
         if type(a) in [np.half, np.float16]:
             a = np.uint16(a)
@@ -402,6 +427,6 @@ def MyHOSobol(m, s, d=1):
     return X
 
 if __name__ == "__main__":
-    MyHOSobol(0, 1, 2)
+
     import doctest
     doctest.testmod()
