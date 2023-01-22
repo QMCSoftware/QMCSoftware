@@ -1,6 +1,8 @@
 import numpy as np
 
 # TODO move utility functions to util
+# TODO put some trival doctests in unit tests
+# TODO attempt to speed up nested for loops or list comprehension using numba if possible
 
 def dec2bin(a, numbits=1):
     """
@@ -135,7 +137,7 @@ def bin_len_max(a):
 
     if type(a) in [np.uint8, np.int8]:
         len_max = 8
-    elif type(a) in [np.uint16, np.int16, np.half, np.float16]:
+    elif type(a) in [np.uint16, np.int16, np.half, np.float16]:  # TODO check and add documentation for treating np.float16 as uint16?
         len_max = 16
     elif type(a) in [int, np.uint32, np.int32, np.single]:
         len_max = 32
@@ -144,25 +146,6 @@ def bin_len_max(a):
     else:
         raise ValueError(f"Unknown type of a, {type(a)}")
     return len_max
-
-
-def is_signed(a):
-    """
-    If a is an unsigned integer, return False. If a is a signed integer,
-    return True. Otherwise, raise an error if the type of integer is not known.
-
-    Args:
-      a: a signed or unsigned integer in Python or Numpy.
-
-    Returns:
-      The function is_signed() returns a boolean value.
-    """
-    if type(a) in [np.uint8, np.uint16, np.uint32, np.uint64]:
-        return False
-    elif type(a) in [int, np.int8, np.int16, np.int32, np.int64]:
-        return True
-    else:
-        raise ValueError("Unknown type of a, {type(a)}")
 
 
 def bitget(a, bit):
@@ -201,17 +184,21 @@ def bitget(a, bit):
     >>> bitget([np.int8(127), np.uint8(255), np.int8(-29)], [8, 1])
     [[0, 1, 1], [1, 1, 1]]
     """
-    if type(bit) == list:
+    a = list1_to_int(a)
+    bit = list1_to_int(bit)
+
+    if type(bit) in [list, np.ndarray]:
         return [bitget(a, b) for b in bit]
 
-    if type(a) == list:
+    if type(a) in [list, np.ndarray]:
         return [bitget(aa, bit) for aa in a]
 
-    l = bin_len_max(a)
+    a = float_to_int(a)
+
     if type(bit) == int:
         if type(a) in [int, np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]:
             if (bit > 0) and (bit <= len(bin_zfill(a)[2:])):
-                return (a >> (bit - 1)) & 1
+                return (a >> (type(a) (bit - 1))) & (np.array([1], dtype=type(a))[0])
             else:
                 raise ValueError("bit must be between 1 and the number of bits in the integer class of a.")
 
@@ -227,7 +214,9 @@ def bitset(a, bit, v=1):
 
     Args:
         a: a signed or unsigned integer or an array of integers.
-            If a is a double array, then MATLAB® treats A as an unsigned 64-bit integer.
+            If a is a double array, then each element is treated as an unsigned 64-bit integer.
+            If a is a single array, then each element is treated as an unsigned 32-bit integer.
+            If a is a NumPy float16 or half array, then each element is treated as an unsigned 16-bit integer.
         bit: an integer between 1 (least significant bit) and the number of bits in the integer class of a. If a is a double array, then all elements
         must be non-negative integers less than or equal to intmax('uint64'), and bit must be between 1 and 64.
         v: Zero values of v sets the bit to 0 (off), and non-zero values of v sets the bit to 1 (on).
@@ -278,12 +267,9 @@ def bitset(a, bit, v=1):
     3
     """
 
-    if (type(a) in [list, np.ndarray]) and len(a)==1:
-        a=a[0]
-    if (type(v) in [list, np.ndarray]) and len(v)==1:
-        v=v[0]
-    if (type(bit) in [list, np.ndarray]) and len(bit)==1:
-        bit=bit[0]
+    a = list1_to_int(a)
+    v = list1_to_int(v)
+    bit = list1_to_int(bit)
 
     if type(bit) in [list, np.ndarray]:
         return [bitset(a, b, v) for b in bit]
@@ -297,18 +283,36 @@ def bitset(a, bit, v=1):
         else:
             return [bitset(aa, bit, v) for aa in a]
 
-    if (type(v) in [list, np.ndarray]):
+    if type(v) in [list, np.ndarray]:
         return [bitset(a, bit, vv) for vv in v]
 
-    if np.issubdtype(type(a), np.floating):
-        a = np.uint64(a)
+    a = float_to_int(a)
 
     if type(a) in [int, np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]:
         if (bit > 0) and (bit <= len(bin_zfill(a)[2:])):
             # bitwise or of a and v left-shifted by (bit -1) and cast to type of a
-            return a | type(a) (v << (bit - 1))
+            v = np.array([v], dtype=type(a))[0]
+            bit_minus_1 = np.array([bit - 1], dtype=type(a))[0]
+            return a | (v << bit_minus_1)
         else:
             raise ValueError(f"bit must be between 1 and the number of bits in the integer class of a.")
+
+
+def list1_to_int(a):
+    if (type(a) in [list, np.ndarray]) and (len(a) == 1):
+        a = a[0]
+    return a
+
+
+def float_to_int(a):
+    if np.issubdtype(type(a), np.floating):
+        if type(a) in [np.half, np.float16]:
+            a = np.uint16(a)
+        elif type(a) in [np.single]:
+            a = np.uint32(a)
+        if type(a) in [float, np.double]:
+            a = np.uint64(a)
+    return a
 
 
 def MyHOSobol(m, s, d=1):
@@ -321,7 +325,7 @@ def MyHOSobol(m, s, d=1):
         d: interlacing factor. Defaults to 1
 
     Returns:
-        A matrix of higher order Sobol points, where the number of columns equals the dimension and the
+        A matrix of higher-order Sobol points, where the number of columns equals the dimension and the
         number of rows equals the number of points.
 
     Examples:
@@ -348,13 +352,33 @@ def MyHOSobol(m, s, d=1):
            [0.625, 0.125, 0.875, 0.625],
            [0.125, 0.625, 0.375, 0.125]])
 
+   >>> MyHOSobol(0, 1, 2)
+   array([[0.]])
 
+    >>> MyHOSobol(1, 1, 2)
+    array([[0.  ],
+           [0.75]])
+
+    >>> MyHOSobol(2, 1, 2)
+    array([[0.    ],
+           [0.75  ],
+           [0.6875],
+           [0.4375]])
+
+    >>> MyHOSobol(3, 4, 2)
+    array([[0.      , 0.      , 0.      , 0.      ],
+           [0.75    , 0.75    , 0.75    , 0.75    ],
+           [0.6875  , 0.1875  , 0.9375  , 0.4375  ],
+           [0.4375  , 0.9375  , 0.1875  , 0.6875  ],
+           [0.234375, 0.859375, 0.171875, 0.484375],
+           [0.984375, 0.109375, 0.921875, 0.734375],
+           [0.546875, 0.921875, 0.859375, 0.046875],
+           [0.296875, 0.171875, 0.109375, 0.796875]])
     """
 
     z = np.loadtxt('sobol.dat')
     z = z[:2 ** m, :s * d]
     if d > 1:
-
         N = pow(2, m)  # Number of points
         u = 52
         depth = int(np.floor(u/d))
@@ -378,6 +402,6 @@ def MyHOSobol(m, s, d=1):
     return X
 
 if __name__ == "__main__":
-
+    MyHOSobol(0, 1, 2)
     import doctest
     doctest.testmod()
