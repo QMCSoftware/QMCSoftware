@@ -4,6 +4,7 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 import numpy as np
+#from .c_lib import c_lib
 from ctypes import *
 from numpy.ctypeslib import ndpointer
 from sklearn.preprocessing import MinMaxScaler
@@ -73,7 +74,8 @@ def main():
 
 	# The compressed data model
 	# load c functions
-	#lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
+	#lib = c_lib.mexFunction
+	cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
 	computeWeights = lib.mexFunction
 	computeWeights.restype = ndpointer(dtype=c_double, shape=(1 + outs, Nqmc))
 
