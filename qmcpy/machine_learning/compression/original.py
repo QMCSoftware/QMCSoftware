@@ -57,11 +57,25 @@ weights = np.transpose(weights)
 print(f"weights.shape = {weights.shape}")
 print(f"weights: \n {weights}")
 
-#if: 
+    
+breakpoint()
+
 with open('weights.pkl', 'wb') as handle:
     pickle.dump(weights, handle, protocol=pickle.HIGHEST_PROTOCOL)
 #pickled_model = pickle.load(open('weights.pkl', 'rb'))
-breakpoint()
+
+#Input dimention is 100 (10 by 10)
+
+#Layers from matlab [100,200,100,50,20,1]; %layer size
+
+model = tf.keras.models.Sequential([
+  tf.keras.layers.Flatten(input_shape=(10, 10)),
+  tf.keras.layers.Dense(200, activation='relu'),
+  tf.keras.layers.Dense(100, activation='relu'),
+  tf.keras.layers.Dense(50, activation='relu'),
+  tf.keras.layers.Dense(20, activation='relu'),
+  tf.keras.layers.Flatten(1)
+])
 
 #if __name__ == '__main__':
 #    pass
