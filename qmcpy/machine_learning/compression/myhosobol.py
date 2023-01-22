@@ -2,7 +2,6 @@ import numpy as np
 
 # TODO move utility functions to util
 
-
 def dec2bin(a, numbits=1):
     """
     Produces a binary representation of an integer a with at least numbits bits.
@@ -187,27 +186,32 @@ def bitget(a, bit):
 
     Examples:
     >>> bit = list(range(8, 0, -1))
-    >>> bitget(np.uint8(255), bit)
-    [1, 1, 1, 1, 1, 1, 1, 1]
-
     >>> bitget(np.int8(127), bit)
     [0, 1, 1, 1, 1, 1, 1, 1]
 
-    >>> bitget(np.uint8(127), bit)
+    >>> bitget(np.uint8(255), bit)
     [1, 1, 1, 1, 1, 1, 1, 1]
+
+    >>> bitget(np.int8(-29), bit)
+    [1, 1, 1, 0, 0, 0, 1, 1]
+
+    >>> bitget([np.int8(127), np.uint8(255), np.int8(-29)], 8)
+    [0, 1, 1]
+
+    >>> bitget([np.int8(127), np.uint8(255), np.int8(-29)], [8, 1])
+    [[0, 1, 1], [1, 1, 1]]
     """
     if type(bit) == list:
         return [bitget(a, b) for b in bit]
 
+    if type(a) == list:
+        return [bitget(aa, bit) for aa in a]
+
     l = bin_len_max(a)
     if type(bit) == int:
         if type(a) in [int, np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]:
-            if (bit > 0) and (bit <= len(bin(a)[2:])):
+            if (bit > 0) and (bit <= len(bin_zfill(a)[2:])):
                 return (a >> (bit - 1)) & 1
-            elif bit < l:
-                return 0
-            elif bit == l:
-                return 0 if is_signed(a) else 1  # TODO debug
             else:
                 raise ValueError("bit must be between 1 and the number of bits in the integer class of a.")
 
@@ -223,7 +227,7 @@ def bitset(a, bit, v=1):
 
     Args:
         a: a signed or unsigned integer or an array of integers.
-            If a is a double array, then MATLAB® treats A as an unsigned 64-bit integer. TODO
+            If a is a double array, then MATLAB® treats A as an unsigned 64-bit integer.
         bit: an integer between 1 (least significant bit) and the number of bits in the integer class of a. If a is a double array, then all elements
         must be non-negative integers less than or equal to intmax('uint64'), and bit must be between 1 and 64.
         v: Zero values of v sets the bit to 0 (off), and non-zero values of v sets the bit to 1 (on).
@@ -248,28 +252,64 @@ def bitset(a, bit, v=1):
 
     >>> bitset(np.int8(75), 5)
     91
+
+    >>> bitset(np.uint64(0), 1, 1)
+    1
+
+    >>> bitset(0., 1, 1)
+    1
+
+    >>> bitset([0, 1], 2, 1)
+    [2, 3]
+
+    >>> bitset([0, 1], 2, [1, 1])
+    [2, 3]
+
+    >>> bitset([0., 2.0], 1, [1])
+    [1, 3]
+
+    >>> bitset([0., 2.0], 1, 1)
+    [1, 3]
+
+    >>> bitset([2.0], 1, 1)
+    3
+
+    >>> bitset([2.0], 1, [1])
+    3
     """
-    if type(bit) == list:
+
+    if (type(a) in [list, np.ndarray]) and len(a)==1:
+        a=a[0]
+    if (type(v) in [list, np.ndarray]) and len(v)==1:
+        v=v[0]
+    if (type(bit) in [list, np.ndarray]) and len(bit)==1:
+        bit=bit[0]
+
+    if type(bit) in [list, np.ndarray]:
         return [bitset(a, b, v) for b in bit]
 
-    if type(a) in [float, int, np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]:
+    if (type(a) in [list, np.ndarray]):
+        if (type(v) in [list, np.ndarray]):
+            if len(a) == len(v):
+                return [bitset(aa, bit, vv) for aa, vv in zip(a, v)]
+            else:
+                raise ValueError(f"Inputs a and v must have the same size")
+        else:
+            return [bitset(aa, bit, v) for aa in a]
+
+    if (type(v) in [list, np.ndarray]):
+        return [bitset(a, bit, vv) for vv in v]
+
+    if np.issubdtype(type(a), np.floating):
+        a = np.uint64(a)
+
+    if type(a) in [int, np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]:
         if (bit > 0) and (bit <= len(bin_zfill(a)[2:])):
-            return a | (v << (bit - 1))
+            # bitwise or of a and v left-shifted by (bit -1) and cast to type of a
+            return a | type(a) (v << (bit - 1))
         else:
             raise ValueError(f"bit must be between 1 and the number of bits in the integer class of a.")
-    elif type(a) in [list, np.ndarray]:
-        print("Contact QMCPy team for implementation of this case.")
-        """
-        if bit > 0 and bit <= 64:
-            if all(isinstance(i, int) and i >= 0 and i <= int(2**64-1) for i in a):
-                return [i | (1 << (bit-1)) for i in a]
-            else:
-                raise ValueError("If a is a list, all elements must be non-negative integers less than or equal to intmax('uint64'), and bit must be between 1 and 64.")
-        else:
-            raise ValueError("bit must be between 1 and 64.")
-        """
-    else:
-        raise TypeError("a must be an integer or a list of integers.")
+
 
 def MyHOSobol(m, s, d=1):
     """
@@ -308,6 +348,7 @@ def MyHOSobol(m, s, d=1):
            [0.625, 0.125, 0.875, 0.625],
            [0.125, 0.625, 0.375, 0.125]])
 
+
     """
 
     z = np.loadtxt('sobol.dat')
@@ -325,13 +366,9 @@ def MyHOSobol(m, s, d=1):
         for j in range(s):
             for i in range(depth):
                 for k in range(d):
-                    a = Z[j*d+k, :]
-                    bit = depth - i
-                    v = bitget(a, bit)
-
-                    a = Y[j, :]
-                    bit = (depth*d+1) - (k+1) - i*d
-                    Y[j, :] = bitset(a, bit, v)
+                    Y[j, :] = bitset(a=Y[j, :],
+                                     bit=(depth*d+1) - (k+1) - i*d,
+                                     v=bitget(a=Z[j*d+k, :], bit=depth - i))
         Y = Y * pow(2, -depth*d)
 
         X = np.transpose(Y)
