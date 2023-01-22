@@ -3,7 +3,7 @@ import pickle
 from ctypes import *
 from numpy.ctypeslib import ndpointer
 import tensorflow as tf
-#import ..c_lib
+from ..c_lib import c_lib
 
 m = 10
 nu = 3
@@ -44,7 +44,7 @@ print(f"qmc_points.shape = {qmc_points.shape}")
 print(f"x_train_flat.shape = {x_train_flat.shape}")
 
 # load c functions
-lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
+lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-x86_64-linux-gnu.so")
 computeWeights = lib.computeWeights
 computeWeights.restype=ndpointer(dtype=c_double,shape=(1+outs, Nqmc))
 print('Weights loaded')
