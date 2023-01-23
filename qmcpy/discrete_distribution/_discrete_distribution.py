@@ -53,27 +53,26 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
-    def plot(self, n, d_vertical=0, d_horizontial =1):
+    def plot(self, n, d_vertical=0, d_horizontial=1, axis=None, **kwargs):
         """
-
         Args:
             n (int): n is the number of samples that will be plotted 
             d_vertical (int): d_vertical is the index of points that will be plotted on the vertical axis. 
             d_horizontial (int): d_horizontial is the index of points that will be plotted as the horizontial axis.
-
         """
         try:
             import matplotlib.pyplot as plt
-            
-            
         except:
             raise ImportError("Missing matplotlib.pyplot as plt")
-        
-        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 5))
         samples = self.gen_samples(n)
-        ax.scatter(samples[:, d_horizontial], samples[:, d_vertical])
-
-        return fig, ax
+        if axis is None:
+            fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 5),)
+            ax.scatter(samples[:, d_horizontial], samples[:, d_vertical], **kwargs)
+            return fig, ax
+        else:
+            fig = plt.figure()
+            axis.scatter(samples[:, d_horizontial], samples[:, d_vertical], **kwargs)
+            return fig, axis
 
         
     def spawn(self, s=1, dimensions=None):
