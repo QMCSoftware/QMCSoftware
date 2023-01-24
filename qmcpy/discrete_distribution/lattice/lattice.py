@@ -22,6 +22,7 @@ class Lattice(LD):
         dvec            [0 1]
         randomize       1
         order           natural
+        gen_vec         [     1 182667]
         entropy         7
         spawn_key       ()
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
@@ -51,6 +52,7 @@ class Lattice(LD):
         dvec            [0 1]
         randomize       1
         order           natural
+        gen_vec         [       1 11961679]
         entropy         55
         spawn_key       ()
     >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector=26).gen_samples(8,warn=False)

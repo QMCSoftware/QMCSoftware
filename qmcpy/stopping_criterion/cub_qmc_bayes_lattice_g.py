@@ -44,6 +44,7 @@ class CubBayesLatticeG(_CubBayesLDG):
         dvec            [0 1]
         randomize       1
         order           linear
+        gen_vec         [     1 182667]
         entropy         123456789
         spawn_key       ()
 
