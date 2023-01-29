@@ -90,7 +90,11 @@ setuptools.setup(
         Extension(
             name='qmcpy.machine_learning.c_lib.c_lib',
             sources=[
-                'qmcpy/machine_learning/c_lib/computeMXY.c', ], )],
+                'qmcpy/machine_learning/c_lib/computeMXY.c',
+            #    'qmcpy/machine_learning/c_lib/computeMXYmex.c',
+
+            ], ),
+                 ],
     cmdclass={
         'clean': CleanCommand,
         'install': CustomInstall})
