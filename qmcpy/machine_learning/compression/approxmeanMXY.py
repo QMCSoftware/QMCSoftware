@@ -3,8 +3,6 @@ import numpy as np
 from computeMXY import *
 def approxmeanMXY(nu, m, x, y, d):
     """"
-    x = np.read
-    weights, z = approxmeanMXY(nu=1, m=6, d=1, x=x, y=y)
 
     >>> x = np.loadtxt("./test_data/reg_x.csv", delimiter=',')
     >>> y = np.loadtxt("./test_data/reg_y.csv", delimiter=",")
