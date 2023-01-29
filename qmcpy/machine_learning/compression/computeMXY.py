@@ -21,8 +21,3 @@ def computeMXY(nu, m, base, x, z, y):
     #TODO remove the following line
     weights = np.loadtxt("./test_data/reg_weights.csv", delimiter=",")
     return weights
-
-
-if __name__ == "__main__":
-
-    print("a")
