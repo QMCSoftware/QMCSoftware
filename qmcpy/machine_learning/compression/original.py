@@ -51,8 +51,16 @@ print('Weights loaded')
 
 # compute weights
 
-weights = computeWeights(c_int(nu),c_int(m),c_int(s),c_int(Ndata),c_int(Nqmc),c_int(outs),c_void_p(x_train_flat.ctypes.data),
-		c_void_p(qmc_points.ctypes.data),c_void_p(y_train.ctypes.data))
+weights = computeWeights(c_int(nu),
+                         c_int(m),
+                         c_int(s),
+                         c_int(Ndata),
+                         c_int(Nqmc),
+                         c_int(outs),
+                         c_void_p(x_train_flat.ctypes.data),
+		         c_void_p(qmc_points.ctypes.data),
+                         c_void_p(y_train.ctypes.data))
+
 weights = np.transpose(weights)
 print(f"weights.shape = {weights.shape}")
 print(f"weights: \n {weights}")

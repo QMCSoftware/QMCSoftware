@@ -10,6 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 import logging
 from myhosobol import MyHOSobol
 import math
+
 def approxmeanMXY(nu, m, x, y, d):
     base = 2
     s = x.shape[1]
@@ -73,14 +74,14 @@ def main():
 
 	# The compressed data model
 	# load c functions
-	#lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
-	computeWeights = lib.mexFunction
-	computeWeights.restype = ndpointer(dtype=c_double, shape=(1 + outs, Nqmc))
+	#lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-x86_64-linux-gnu.so")
+	#computeWeights = lib.mexFunction
+	#computeWeights.restype = ndpointer(dtype=c_double, shape=(1 + outs, Nqmc))
 
 	# compute weights
 	logging.info(f"\n{nu = }, {m = }, {s = }, {Ndata = }, {Nqmc = }, {outs = }")
-	weights = computeWeights(c_int(nu), c_int(m), c_int(s), c_int(Ndata), c_int(Nqmc), c_int(outs), c_void_p(X.ctypes.data), c_void_p(qmc_points.ctypes.data), c_void_p(y.ctypes.data))
-	weights = np.transpose(weights)
+	#weights = computeWeights(c_int(nu), c_int(m), c_int(s), c_int(Ndata), c_int(Nqmc), c_int(outs), c_void_p(X.ctypes.data), c_void_p(qmc_points.ctypes.data), c_void_p(y.ctypes.data))
+	#weights = np.transpose(weights)
 	print(f"{weights.shape = }")
 	weights=computeMXYmex(nu,m,base,x,z,y)
 	regr = LinearRegression()
