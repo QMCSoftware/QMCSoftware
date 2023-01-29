@@ -28,14 +28,17 @@ errvec = np.zeros((mmax, nsample))
 
 # linear regression function
 def f(x, w):
+    """
+    TODO add doctest
+    """
     return np.hstack((np.ones((x.shape[0], 1)), x)) @ w
 
 
 # loop to plot the approximation error
 alpha = 1
-for m in range(mmax):
+for m in range(1, mmax):
     # compute weights for approximation formula
-    weights, z = approxmeanMXY(m, int((1 / alpha + 1) * m) + t, x, labels, alpha)
+    weights, z = approxmeanMXY(m+1, int((1 / alpha + 1) * (m+1)) + t, x, labels, alpha)
 
     for sample in range(nsample):
         # compute exact error for random linear regression functions
@@ -49,7 +52,6 @@ for m in range(mmax):
         # compute relative error
         errvec[m, sample] = abs(mvalapprox - mval) / abs(mval)
 
-    #cost = 2 ** int((1 / alpha + 1) * (1:mmax))
-    #plt.loglog(cost, np.amax(errvec, axis=1), '-o', cost, np.mean(errvec, axis=1), '-o', cost,
-    #          1 / cost ** (1 / (1 + 1 / alpha)), '--k')
-    #plt.show()
+        cost = 2 ** int((1 / alpha + 1) * np.array(range(1, mmax+1)))
+        plt.loglog(cost, np.amax(errvec, axis=1), '-o', cost, np.mean(errvec, axis=1), '-o', cost,  1 / cost ** (1 / (1 + 1 / alpha)), '--k')
+        plt.show()

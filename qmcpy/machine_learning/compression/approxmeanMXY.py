@@ -20,3 +20,9 @@ def approxmeanMXY(nu, m, x, y, d):
     base = 2
     weights = computeMXY(nu, m, base, x, z, y)
     return weights, z
+
+
+if __name__ == "__main__":
+
+    import doctest
+    doctest.testmod()
