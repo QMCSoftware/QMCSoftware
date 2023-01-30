@@ -63,7 +63,7 @@ class DiscreteDistribution(object):
         try:
             import matplotlib.pyplot as plt
         except:
-            raise ImportError("Missing matplotlib.pyplot as plt, Please install matplotlib to run DiscreteDistribution.plot")
+            raise ImportError("Missing matplotlib.pyplot as plt, Matplotlib must be intalled to run DiscreteDistribution.plot")
         samples = self.gen_samples(n)
         if axis is None:
             fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 5),)
@@ -71,7 +71,6 @@ class DiscreteDistribution(object):
             ax = axis 
             fig = plt.figure()
         ax.scatter(samples[:, d_horizontal], samples[:, d_vertical], **kwargs)
-        ax.set_xlabel("$x_1$")
         ax.set_xlabel("$x_1$")
         ax.set_ylabel("$x_2$")
         ax.set_xlim([0, 1])
