@@ -1,10 +1,7 @@
-from qmcpy import Lattice
 import matplotlib.pyplot as plt
 
+from qmcpy import Lattice
 
 lat = Lattice(3)
-x, y = lat.plot(64,0,1,color="green")
+lat.plot(64,1,2)
 plt.show()
-
-
-
