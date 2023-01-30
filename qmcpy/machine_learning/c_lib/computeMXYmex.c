@@ -6,11 +6,11 @@
 /* For t'=0,...,t, the function computes the number N_t' of all s-dimensional 
  * multi-indices mvec' such that |mvec'|=t' and mvec'<= mvec component-wise.
  * The output is a t+1 dimensional vector N=(N_0,N_1,...,N_t).*/
-void computeN(int s, int t, int* mvec, int** result, int** tmp);
+void computeN(int s, int t, int* mvec, int** result, int** tmp); // This is present in computeMXY
 
 /* Looks for the largest possibe number m in {lb,...,ub} such that
  * 2^m a- floor(2^m b) <1 and returns -1 if no such number exists*/
-int searchmaxm(double a, double b, int ub, int base);
+int searchmaxm(double a, double b, int ub, int base); //This is present in compyeMXY.c
 
 /* Computes the numbers S_t(z) */
 void computeS(int s, int N, int  t, int base, double* z, double* x, double* y, int* result1, double* result2, int* mvec, int* tmp1, int* tmp2);
@@ -19,22 +19,71 @@ void computeS(int s, int N, int  t, int base, double* z, double* x, double* y, i
 double nchoosekbyN(int n, int k, double N);
 
 /* The gateway function */
-void mexFunction(int nlhs, mxArray *plhs[],
-        int nrhs, const mxArray *prhs[]){
+/* void mexFunction(int nlhs, mxArray *plhs[], */
+/*         int nrhs, const mxArray *prhs[]){ */
     
     
     
-    int m = mxGetScalar(prhs[0]);  /* parameter m */
-    int mp = mxGetScalar(prhs[1]); /* parameter m' */
-    int base = mxGetScalar(prhs[2]);
-    double* px = mxGetPr(prhs[3]); /* (N x s) array of x-data points */
-    double* pz = mxGetPr(prhs[4]); /* (s x 2^m') array of QMC points !transposed! */  
-    double* py = mxGetPr(prhs[5]); /* (N x 1) array  y-data points */    
-  
+/*     int m = mxGetScalar(prhs[0]);  /\* parameter m *\/ */
+/*     int mp = mxGetScalar(prhs[1]); /\* parameter m' *\/ */
+/*     int base = mxGetScalar(prhs[2]); */
+/*     double* px = mxGetPr(prhs[3]); /\* (N x s) array of x-data points *\/ */
+/*     double* pz = mxGetPr(prhs[4]); /\* (s x 2^m') array of QMC points !transposed! *\/   */
+/*     double* py = mxGetPr(prhs[5]); /\* (N x 1) array  y-data points *\/     */
+    
    
-    int s = mxGetN(prhs[3]);
-    int N = mxGetM(prhs[3]);
-    int Nqmc = mxGetN(prhs[4]);
+/*     int s = mxGetN(prhs[3]); */
+/*     int N = mxGetM(prhs[3]); */
+/*     int Nqmc = mxGetN(prhs[4]); */
+/*     mxArray* ret=mxCreateDoubleMatrix(Nqmc,2,mxREAL); /\* return vector of weights *\/ */
+/*     double* pret=mxGetPr(ret);    */
+    
+/*     int* result1 = malloc((m+1)*sizeof(int)); */
+/*    	double* result2 = malloc((m+1)*sizeof(double)); */
+/*     int* tmp1 = malloc((m+1)*sizeof(int)); */
+/*     int* tmp2 = malloc((m+1)*sizeof(int)); */
+/*     int* mvec = malloc(s*sizeof(int));    */
+    
+   
+/*     /\* compute M_{m,mp}(f,x,y) *\/ */
+/*     double M=0; */
+/*     int q,ell; */
+/*     int minsm=s-1; /\*contains min(s-1,m) *\/ */
+/*     if(m<minsm){minsm=m;} */
+    
+/*    for(ell=0;ell<Nqmc;++ell){ */
+/*         computeS(s, N, m, base, &pz[ell*s], px, py, result1, result2, mvec, tmp1, tmp2); */
+/*         double Mtmp1 =0; */
+/*         double Mtmp2 =0; */
+/*         for(q=0;q<=minsm;++q){ */
+/*             double tmp= pow(-1,q)*nchoosekbyN(s-1,q,N*pow(base,mp-m+q));          */
+/*             Mtmp1 += tmp*result1[m-q]; */
+/*             Mtmp2 += tmp*result2[m-q]; */
+/*         } */
+/*         pret[ell]=Mtmp1; */
+/*         pret[ell+Nqmc]=Mtmp2; */
+/*     } */
+    
+/*     /\* return the computed weights *\/    */
+/*     plhs[0]=ret; */
+/* } */
+
+/* The python gateway function */
+void computeWeights(int m, int mp, int s, int N, int Nqmc, int base, double *px, double *pz, double *py){
+    
+    
+    
+  //int m = mxGetScalar(prhs[0]);  /* parameter m */
+  //int mp = mxGetScalar(prhs[1]); /* parameter m' */
+  //int base = mxGetScalar(prhs[2]);
+  //double* px = mxGetPr(prhs[3]); /* (N x s) array of x-data points */
+  //double* pz = mxGetPr(prhs[4]); /* (s x 2^m') array of QMC points !transposed! */  
+  //double* py = mxGetPr(prhs[5]); /* (N x 1) array  y-data points */    
+    
+   
+  //int s = mxGetN(prhs[3]);
+  //int N = mxGetM(prhs[3]);
+  //int Nqmc = mxGetN(prhs[4]);
     mxArray* ret=mxCreateDoubleMatrix(Nqmc,2,mxREAL); /* return vector of weights */
     double* pret=mxGetPr(ret);   
     
@@ -67,6 +116,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
     /* return the computed weights */   
     plhs[0]=ret;
 }
+
 
 int searchmaxm(double a, double b, int ub, int base){
     int m=0;
