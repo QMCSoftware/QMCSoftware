@@ -44,8 +44,8 @@ def computeMXY(nu, m, base, x, z, y):
 		         c_void_p(qmc_points.ctypes.data),
                          c_void_p(y_train.ctypes.data))
 
-    weights = np.transpose(weights)
+    #weights = np.transpose(weights)
     # Return data mxArray* ret=mxCreateDoubleMatrix(Nqmc,2,mxREAL); /* return vector of weights */
     #TODO remove the following line
-    weights = np.loadtxt("./test_data/reg_weights.csv", delimiter=",")
+    #weights = np.loadtxt("./test_data/reg_weights.csv", delimiter=",")
     return weights
