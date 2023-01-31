@@ -11,7 +11,7 @@ import numpy as np
 
 
 class CubBayesLatticeG(_CubBayesLDG):
-    """
+    r"""
     Stopping criterion for Bayesian Cubature using rank-1 Lattice sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Bayesian assumptions.
@@ -22,13 +22,9 @@ class CubBayesLatticeG(_CubBayesLDG):
     >>> data
     LDTransformBayesData (AccumulateData Object)
         solution        1.808
-        indv_error      6.41e-04
-        ci_low          1.808
-        ci_high         1.809
-        ci_comb_low     1.808
-        ci_comb_high    1.809
-        flags_comb      1
-        flags_indv      1
+        comb_bound_low  1.808
+        comb_bound_high 1.809
+        comb_flags      1
         n_total         2^(8)
         n               2^(8)
         time_integrate  ...
@@ -48,40 +44,56 @@ class CubBayesLatticeG(_CubBayesLDG):
         dvec            [0 1]
         randomize       1
         order           linear
+        gen_vec         [     1 182667]
         entropy         123456789
         spawn_key       ()
 
-    Adapted from
-	`GAIL cubBayesLattice_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m>`_.
+    Adapted from `GAIL cubBayesLattice_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m>`_.
 
-    Reference
-        [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
-	Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
+    Guarantees:
+        This algorithm attempts to calculate the integral of function :math:`f` over the
+        hyperbox :math:`[0,1]^d` to a prescribed error tolerance :math:`\mbox{tolfun} := max(\mbox{abstol},
+        \mbox{reltol}*| I |)` with a guaranteed confidence level, e.g., :math:`99\%` when alpha= :math:`0.5\%`.
+        If the algorithm terminates without showing any warning messages and provides
+        an answer :math:`Q`, then the following inequality would be satisfied:
 
-    Guarantee
-        This algorithm attempts to calculate the integral of function f over the
-        hyperbox [0,1]^d to a prescribed error tolerance tolfun:= max(abstol,
-        reltol*| I |)
-        with guaranteed confidence level, e.g., 99% when alpha=0.5%. If the
-        algorithm terminates without showing any warning messages and provides
-        an answer Q, then the following inequality would be satisfied:
-
-                Pr(| Q - I | <= tolfun) = 99%.
+        .. math::
+                Pr(| Q - I | <= \mbox{tolfun}) = 99\%.
 
         This Bayesian cubature algorithm guarantees for integrands that are considered
-        to be an instance of a gaussian process that fall in the middle of samples space spanned.
+        to be an instance of a Gaussian process that falls in the middle of samples space spanned.
         Where The sample space is spanned by the covariance kernel parametrized by the scale
         and shape parameter inferred from the sampled values of the integrand.
         For more details on how the covariance kernels are defined and the parameters are obtained,
         please refer to the references below.
+
+    References:
+        [1] Jagadeeswaran Rathinavel and Fred J. Hickernell, Fast automatic Bayesian cubature using lattice sampling.
+        Stat Comput 29, 1215-1229 (2019). Available from `Springer <https://doi.org/10.1007/s11222-019-09895-9>`_.
+
+        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
+        Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin',
                  error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
-
+        """
+        Args:
+            integrand (Integrand): an instance of Integrand
+            abs_tol (ndarray): absolute error tolerance
+            rel_tol (ndarray): relative error tolerance
+            n_init (int): initial number of samples
+            n_max (int): maximum number of samples
+            order (int): Bernoulli kernel's order. If zero, choose order automatically
+            alpha (float): p-value
+            ptransform (str): periodization transform applied to the integrand
+            error_fun: function taking in the approximate solution vector,
+                absolute tolerance, and relative tolerance which returns the approximate error.
+                Default indicates integration until either absolute OR relative tolerance is satisfied.
+        """
         super(CubBayesLatticeG, self).__init__(integrand, fbt=self._fft, merge_fbt=self._merge_fft,
                                                ptransform=ptransform,
                                                allowed_distribs=[Lattice],
@@ -222,3 +234,5 @@ class CubBayesLatticeG(_CubBayesLDG):
             lambda_factor = 1
 
         return vec_lambda, vec_lambda_ring, lambda_factor
+
+class CubQMCBayesLatticeG(CubBayesLatticeG): pass

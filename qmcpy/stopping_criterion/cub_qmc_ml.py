@@ -50,6 +50,7 @@ class CubQMCML(StoppingCriterion):
         dvec            0
         randomize       1
         order           natural
+        gen_vec         1
         entropy         7
         spawn_key       ()
     

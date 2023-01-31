@@ -25,13 +25,13 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	# Jupyter Notebook Demos --> RST
 	@mkdir $(nbdir)
 	@for f in demos/*.ipynb; do \
-	    echo "#\tConverting $$f"; \
-	    $(nbconvertcmd) $$f 2>/dev/null;\
+		echo "#\tConverting $$f"; \
+		$(nbconvertcmd) $$f 2>/dev/null; \
 	done
 	# Removing Colab references in rst files using regular expression
 	@for f in $(nbdir)/*.rst; do \
-	    grep -vE "(colab-badge.svg|Open In Colab|colab.research)" $$f > $(nbdir)/tmp.rst && mv $(nbdir)/tmp.rst  $$f; \
-    done
+		grep -vE "(colab-badge.svg|Open In Colab|colab.research)" $$f > $(nbdir)/tmp.rst && mv $(nbdir)/tmp.rst  $$f; \
+	done
 
 _uml:
 	# UML Diagrams
@@ -72,15 +72,29 @@ doc_pdf: _doc _uml
 doc_epub: _doc _uml
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
 
-tests:
+doctests:
 	@echo "\nDoctests"
-	python -m coverage run --source=./ -m pytest --doctest-modules --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./ -m pytest --doctest-modules qmcpy/* --disable-pytest-warnings qmcpy
+
+doctests_no_docker:
+	@echo "\nDoctests Without Docker Containers"
+	python -m coverage run --source=./ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
+
+fasttests:
 	@echo "\nFastests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
+	
+longtests:
 	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
+	
+coverage:
 	@echo "\nCode coverage"
 	python -m coverage report -m
+
+tests: doctests fasttests longtests coverage
+
+tests_no_docker: doctests_no_docker fasttests longtests coverage
 
 # "[command] | tee [logfile]" prints to both stdout and logfile
 workout:
