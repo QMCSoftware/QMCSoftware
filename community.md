@@ -14,6 +14,15 @@ The Steering Council is responsible for the overall direction and governance of 
 * Foster collaboration and communication between community members
 * Represent the community to external stakeholders
 
+The current council members are as following (listed in alphabetical order of last names):
+
+* Sou-Cheng T. Choi
+* Fred J. Hickernell
+* Michael McCourt
+* Jagadeeswaran Rathinavel
+* Aleksei Sorokin
+
+
 Collaborators
 --------------
 
@@ -23,12 +32,27 @@ Collaborators play a key role in the development of QMCPy by contributing their 
 * Provide feedback on the software’s functionality and design
 * Act as a liaison between the software community and the academic community
 
+The following are our collaborators (listed in alphabetical order of last names):
+
+* Adrian Ebert
+* Mike Giles
+* Marius Hofert
+* Sergei Kucherenko
+* Pierre L’Ecuyer
+* Christiane Lemieux
+* Dirk Nuyens
+* Onyekachi Osisiogu
+* Art Owen
+* Pieterjan Robbe
+
 Contributors
 -----------------
-Contributors are individuals who actively participate in the development of the software. They may contribute code, documentation, bug reports, and other forms of support. Their responsibilities include the following:
+Contributors are individuals who actively participate in the development of the software. They may contribute code, documentation, bug reports, and other forms of support.  Their responsibilities include the following:
 
 * Participate in the development of the software
 * Resolve bugs and suggest improvements
 * Develop tests and documentation
 * Provide support to other community members
 * Participate in community discussions and decision-making processes
+
+For the list of our contributors, please refer to  `https://github.com/QMCSoftware/QMCSoftware/graphs/contributors`.
