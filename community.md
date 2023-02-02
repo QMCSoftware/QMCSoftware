@@ -1,7 +1,7 @@
 QMCPy Community
 ====================
 
-This document outlines a few key roles within the QMCPy Community. The purpose of this document is to provide guidance and clarity to community members on their responsibilities and the roles they play in the development and maintenance of the software. The key roles are the Steering Council, Collaborators, and Contributors. It is important that community members understand their responsibilities and the roles they play in the development and maintenance of the software. By working together, the community can ensure that the software continues to evolve and meet the needs of the scientific community.
+This document outlines a few key roles within the QMCPy Community. The purpose of this document is to provide guidance and clarity to community members on their responsibilities and the roles they play in the development and maintenance of the software. The key roles are the Steering Council, Collaborators, and Contributors. By working together, the community can ensure that the software continues to evolve and meet the needs of the scientific community.
 
 Steering Council
 -------------------
