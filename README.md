@@ -89,35 +89,9 @@ A more detailed quickstart can be found in our GitHub repo at `QMCSoftware/demos
 We also highly recommend you take a look at [Fred Hickernell's tutorial at the Monte Carlo Quasi-Monte Carlo 2020 Conference](https://media.ed.ac.uk/media/Fred+Hickernell%2C+Illinois+Institute+of+Technology+++Quasi-Monte+Carlo+Software++%28MCQMC+2020%2C+10.08.20%29/1_2k12mwiw) and [the corresponding MCQMC2020 Google Colab notebook.](https://tinyurl.com/QMCPyTutorial)
 
 ----
+## Community
 
-## Developers
- 
-- Sou-Cheng T. Choi
-- Fred J. Hickernell
-- Michael McCourt
-- Jagadeeswaran Rathinavel
-- Aleksei Sorokin
-
-----
-
-## Collaborators
-
-- Adrian Ebert
-- Mike Giles
-- Marius Hofert
-- Sergei Kucherenko
-- Pierre L’Ecuyer
-- Christiane Lemieux
-- Dirk Nuyens
-- Onyekachi Osisiogu 
-- Art Owen
-- Pieterjan Robbe
-
-----
-
-## Contributors
-
-- Jungtaek Kim
+Please refer to [this document](community.md) for the key roles in the QMCPy community.
 
 ## Citation
 
