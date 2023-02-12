@@ -37,7 +37,7 @@ def computeMXY(nu, m, base, x, z, y):
                          c_int(Nqmc),                               
                          c_int(base),                               
                          c_void_p(x.ctypes.data),         
-        	         c_void_p(z.ctypes.data),           
+        	             c_void_p(z.ctypes.data),
                          c_void_p(y.ctypes.data))            
     
 
@@ -45,6 +45,6 @@ def computeMXY(nu, m, base, x, z, y):
     # Return data mxArray* ret=mxCreateDoubleMatrix(Nqmc,2,mxREAL); /* return vector of weights */
     #TODO remove the following line
     #weights = np.loadtxt("./test_data/reg_weights.csv", delimiter=",")
-    print(weights)
+    #print(weights)
     #np.savetxt('test.out', weights, delimiter=',')
     return weights
