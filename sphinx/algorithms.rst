@@ -171,10 +171,22 @@ Linear Function
 .. automodule:: qmcpy.integrand.linear0
     :members:
 
+Bayesian Logistic Regression
+............................
+
+.. automodule:: qmcpy.integrand.bayesian_lr_coeffs
+    :members:
+
 Genz Function
 .............
 
 .. automodule:: qmcpy.integrand.genz
+    :members:
+
+Ishigami Function
+.................
+
+.. automodule:: qmcpy.integrand.ishigami
     :members:
 
 Sensitivity Indices
