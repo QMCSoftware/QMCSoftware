@@ -47,19 +47,20 @@ in the same order as the qmc points.
 */
 
 
-EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int outs, double* px, double* pz, double* py){
+EXPORT double* computeLinearWeights(int nu, int m, int mp, int s, int N, int Nqmc, int outs, double* px, double* pz, double* py){
 
   int* result1 = malloc((m+1)*sizeof(int));
   double* result2 = malloc((m+1)*sizeof(double));
   int* tmp1 = malloc((m+1)*sizeof(int));
   int* tmp2 = malloc((m+1)*sizeof(int));
   int* mvec = malloc(s*sizeof(int));
-
+  //int mp = malloc((mp+1)*sizeof(int));
     /* compute M_{m,mp}(f,x,y) */
     int base=2;
     double M=0;
     int q,ell;
     int minsm=s-1; /*contains min(s-1,m) */
+    double* pret;
     if(m<minsm){minsm=m;}
 
    for(ell=0;ell<Nqmc;++ell){
@@ -73,7 +74,8 @@ EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int o
         }
         pret[ell]=Mtmp1;
         pret[ell+Nqmc]=Mtmp2;
-    }
+   }
+   return pret;
 }
 
 void computeSLinear(int s, int N, int t, int base, double* z, double* x, double* y, int* result1, double* result2, int* mvec, int* tmp1, int* tmp2){
