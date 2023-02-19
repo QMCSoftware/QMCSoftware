@@ -22,11 +22,11 @@ def computeMXY(nu, m, base, x, z, y):
     lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
 
     # call to c function computeWeights
-    computeLinearWeights = lib.computeLinearWeights
-    computeLinearWeights.restype = ndpointer(dtype=c_double,shape=(1+outs, Nqmc))
+    computeWeights = lib.computeWeights
+    computeWeights.restype = ndpointer(dtype=c_double,shape=(1+outs, Nqmc))
 
     # compute weights
-    weights = computeLinearWeights(c_int(nu),
+    weights = computeWeights(c_int(nu),
                              c_int(m),
                              c_int(s),
                              c_int(N),
@@ -35,6 +35,6 @@ def computeMXY(nu, m, base, x, z, y):
                              c_void_p(z.ctypes.data),
                              c_void_p(y.ctypes.data))
 
-    weights = np.transpose(weights)
+    #weights = np.transpose(weights)
 
     return weights
