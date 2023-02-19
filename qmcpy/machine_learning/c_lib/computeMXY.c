@@ -24,6 +24,7 @@ int searchmaxm(double a, double b, int ub, int base);
 
 /* Computes the numbers S_t(z) from Algorithm 2 (result1) and T_t(z) from Algorithm 6 (result2). Requires temp memory of size t+1 via tmp1 and tmp2  */
 void computeS(int s, int N, int  t, int outs, int base, double* z, double* x, double* y, int* result1, double* result2, int* mvec, int* tmp1, int* tmp2);
+void computeSLinear(int s, int N, int  t,     int base, double* z, double* x, double* y, int* result1, double* result2, int* mvec, int* tmp1, int* tmp2);
 
 /* Computes the binomial coefficient (n k) and divides by N*/
 double nchoosekbyN(int n, int k, double N);
@@ -55,6 +56,7 @@ EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int o
   int* mvec = malloc(s*sizeof(int));
 
     /* compute M_{m,mp}(f,x,y) */
+    int base=2;
     double M=0;
     int q,ell;
     int minsm=s-1; /*contains min(s-1,m) */
