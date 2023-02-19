@@ -47,14 +47,13 @@ in the same order as the qmc points.
 */
 
 
-EXPORT double* computeLinearWeights(int nu, int m, int mp, int s, int N, int Nqmc, int outs, double* px, double* pz, double* py){
+EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int mp, double* px, double* pz, double* py){
 
   int* result1 = malloc((m+1)*sizeof(int));
   double* result2 = malloc((m+1)*sizeof(double));
   int* tmp1 = malloc((m+1)*sizeof(int));
   int* tmp2 = malloc((m+1)*sizeof(int));
   int* mvec = malloc(s*sizeof(int));
-  //int mp = malloc((mp+1)*sizeof(int));
     /* compute M_{m,mp}(f,x,y) */
     int base=2;
     double M=0;
