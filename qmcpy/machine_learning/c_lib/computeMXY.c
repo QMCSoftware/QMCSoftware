@@ -28,6 +28,8 @@ void computeS(int s, int N, int  t, int outs, int base, double* z, double* x, do
 /* Computes the binomial coefficient (n k) and divides by N*/
 double nchoosekbyN(int n, int k, double N);
 
+void computeSLinear(int s, int N, int t, int base, double* z, double* x, double* y, int* result1, double* result2, int* mvec, int* tmp1, int* tmp2);
+
 /* Computes the weights W_X,Y and W_X. 
 nu ... \nu in the paper
 m ... \ell in the paper
@@ -51,12 +53,6 @@ EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int o
   int* tmp1 = malloc((m+1)*sizeof(int));
   int* tmp2 = malloc((m+1)*sizeof(int));
   int* mvec = malloc(s*sizeof(int));
-  int* result1 = malloc((m+1)*sizeof(int));
-  double* result2 = malloc((m+1)*sizeof(double));
-  int* tmp1 = malloc((m+1)*sizeof(int));
-  int* tmp2 = malloc((m+1)*sizeof(int));
-  int* mvec = malloc(s*sizeof(int));
-
 
     /* compute M_{m,mp}(f,x,y) */
     double M=0;
