@@ -50,8 +50,7 @@ for m in range(mmax):
         # compute relative error
         errvec[m, sample] = abs(mvalapprox - mval) / abs(mval)
 
-        cost = (2 ** ((1 / alpha + 1) * np.array(range(1, mmax+1)))).astype(int)
-        #plt.loglog(cost, np.amax(errvec, axis=1), '-o', cost, np.mean(errvec, axis=1), '-o', cost,  1 / cost ** (1 / (1 + 1 / alpha)), '--k')
-        #plt.show()
-
- TODO temp
+# plot errors vs cost
+cost = (2 ** ((1 / alpha + 1) * np.array(range(1, mmax+1)))).astype(int)
+plt.loglog(cost, np.amax(errvec, axis=1), '-o', cost, np.mean(errvec, axis=1), '-o', cost,  1 / cost ** (1 / (1 + 1 / alpha)), '--k')
+plt.show()
