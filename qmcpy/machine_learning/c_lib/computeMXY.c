@@ -43,7 +43,7 @@ Output is a pointer to a vector which contains the weights W_X (Nqmc entries), a
 in the same order as the qmc points.
 */
 
-/
+
 EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int outs, double* px, double* pz, double* py){
 
   int* result1 = malloc((m+1)*sizeof(int));
@@ -65,7 +65,7 @@ EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int o
     if(m<minsm){minsm=m;}
 
    for(ell=0;ell<Nqmc;++ell){
-        computeS(s, N, m, base, &pz[ell*s], px, py, result1, result2, mvec, tmp1, tmp2);
+        computeSLinear(s, N, m, base, &pz[ell*s], px, py, result1, result2, mvec, tmp1, tmp2);
         double Mtmp1 =0;
         double Mtmp2 =0;
         for(q=0;q<=minsm;++q){
@@ -78,6 +78,40 @@ EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int o
     }
 }
 
+void computeSLinear(int s, int N, int t, int base, double* z, double* x, double* y, int* result1, double* result2, int* mvec, int* tmp1, int* tmp2){
+    int i=0,j=0,k=0;
+    for(i=0;i<t+1;++i){
+        result1[i]=0;
+        result2[i]=0;
+    }
+    for(i=0;i<N;++i){      
+        int tmp=0;
+        int tmpsum=0;
+        for(j=0;j<s;++j){            
+             tmp=searchmaxm(z[j],x[i + N*j],t,base);   
+
+             tmpsum+=tmp;
+             mvec[j]=tmp;
+             /*if(tmp==-1){
+                 tmpsum=-1;
+                 break;
+             } */                
+        }     
+        if(1){
+            for(j=0;j<t+1;++j){
+                tmp1[j]=0;
+                tmp2[j]=0;
+            }
+            computeN(s,t,mvec, &tmp1,&tmp2);            
+            for(j=0;j<t+1;++j){                 
+                result1[j]+=tmp1[j];
+                result2[j]+=y[i]*tmp1[j];
+            }
+
+        }
+    }
+
+}
 
 
 EXPORT double* computeWeights(int nu, int m, int s, int N, int Nqmc, int outs, double* px, double* pz, double* py){
