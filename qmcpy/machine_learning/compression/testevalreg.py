@@ -36,7 +36,7 @@ alpha = 1
 for m in range(mmax):
     # compute weights for approximation formula
     weights, z = approxmeanMXY(m+1, int((1 / alpha + 1) * (m+1)) + t, x, labels, alpha)
-
+  
     for sample in range(nsample):
         # compute exact error for random linear regression functions
         w = np.random.randn(d + 1, 1)
@@ -46,7 +46,7 @@ for m in range(mmax):
         # compute approximation
         fz = f(z, w)
         mvalapprox = (weights[:, 0] * (fz ** 2)).sum() - 2 * (weights[:, 1] * fz).sum() + np.mean(labels ** 2)
-        print(weights)
+
         # compute relative error
         errvec[m, sample] = abs(mvalapprox - mval) / abs(mval)
 

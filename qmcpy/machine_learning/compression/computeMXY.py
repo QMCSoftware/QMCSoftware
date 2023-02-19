@@ -17,7 +17,7 @@ def computeMXY(nu, m, base, x, z, y):
     outs = 1
     s = x.shape[1]
     N = y.shape[0]
-    mp = 1
+
     # load c functions
     lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
 
@@ -31,7 +31,6 @@ def computeMXY(nu, m, base, x, z, y):
                              c_int(s),
                              c_int(N),
                              c_int(Nqmc),
-                             c_int(mp),
                              c_void_p(x.ctypes.data),
                              c_void_p(z.ctypes.data),
                              c_void_p(y.ctypes.data))

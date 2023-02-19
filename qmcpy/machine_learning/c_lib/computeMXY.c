@@ -47,23 +47,31 @@ in the same order as the qmc points.
 */
 
 
-EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int mp, double* px, double* pz, double* py){
+EXPORT double* computeLinearWeights(int m, int mp, int s, int N, int Nqmc, double* px, double* pz, double* py){
+  int base=2;
+  printf("DEBUG m = %d, mp = %d, base = %d, s = %d, N = %d, Nqmc = %d \n", m, mp, base, s, N, Nqmc);
+  int outs = 1;
+
 
   int* result1 = malloc((m+1)*sizeof(int));
   double* result2 = malloc((m+1)*sizeof(double));
   int* tmp1 = malloc((m+1)*sizeof(int));
   int* tmp2 = malloc((m+1)*sizeof(int));
   int* mvec = malloc(s*sizeof(int));
+
     /* compute M_{m,mp}(f,x,y) */
-    int base=2;
     double M=0;
-    int q,ell;
+    int q,ell,k;
     int minsm=s-1; /*contains min(s-1,m) */
-    double* pret;
     if(m<minsm){minsm=m;}
 
+    double* weights=(double*)malloc((1+outs)*Nqmc*sizeof(double));   /* return vector of weights */
+
    for(ell=0;ell<Nqmc;++ell){
-        computeSLinear(s, N, m, base, &pz[ell*s], px, py, result1, result2, mvec, tmp1, tmp2);
+
+       computeSLinear(s, N, m, base, &pz[ell*s], px, py, result1, result2, mvec, tmp1, tmp2);
+       /* printf("DEBUG m = %d, mp = %d, base = %d, s = %d, N = %d, Nqmc = %d, ell= %d \n", m, mp, base, s, N, Nqmc, ell);
+        */
         double Mtmp1 =0;
         double Mtmp2 =0;
         for(q=0;q<=minsm;++q){
@@ -71,10 +79,11 @@ EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int m
             Mtmp1 += tmp*result1[m-q];
             Mtmp2 += tmp*result2[m-q];
         }
-        pret[ell]=Mtmp1;
-        pret[ell+Nqmc]=Mtmp2;
+        weights[ell]=Mtmp1;
+        weights[ell+Nqmc]=Mtmp2;
    }
-   return pret;
+
+   return weights;
 }
 
 void computeSLinear(int s, int N, int t, int base, double* z, double* x, double* y, int* result1, double* result2, int* mvec, int* tmp1, int* tmp2){
