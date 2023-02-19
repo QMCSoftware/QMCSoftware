@@ -42,6 +42,44 @@ py ... pointer to y values array
 Output is a pointer to a vector which contains the weights W_X (Nqmc entries), and then the dimensions of W_X,Y (Nqmc x outs entries) 
 in the same order as the qmc points.
 */
+
+/********************************************************************************************************************************/
+/* /\*EXPORT double* computeLinearWeights(int nu, int m, int s, int N, int Nqmc, int outs, double* px, double* pz, double* py){ */
+/*   															        */
+/*   int* result1 = malloc((m+1)*sizeof(int));										        */
+/*   double* result2 = malloc((m+1)*sizeof(double));									        */
+/*   int* tmp1 = malloc((m+1)*sizeof(int));										        */
+/*   int* tmp2 = malloc((m+1)*sizeof(int));										        */
+/*   int* mvec = malloc(s*sizeof(int));   										        */
+/*   int* result1 = malloc((m+1)*sizeof(int));										        */
+/*   double* result2 = malloc((m+1)*sizeof(double));									        */
+/*   int* tmp1 = malloc((m+1)*sizeof(int));										        */
+/*   int* tmp2 = malloc((m+1)*sizeof(int));										        */
+/*   int* mvec = malloc(s*sizeof(int));   										        */
+/*     															        */
+/*    															        */
+/*     /\* compute M_{m,mp}(f,x,y) *\/											        */
+/*     double M=0;													        */
+/*     int q,ell;													        */
+/*     int minsm=s-1; /\*contains min(s-1,m) *\/									        */
+/*     if(m<minsm){minsm=m;}												        */
+/*     															        */
+/*    for(ell=0;ell<Nqmc;++ell){											        */
+/*         computeS(s, N, m, base, &pz[ell*s], px, py, result1, result2, mvec, tmp1, tmp2);				        */
+/*         double Mtmp1 =0;												        */
+/*         double Mtmp2 =0;												        */
+/*         for(q=0;q<=minsm;++q){											        */
+/*             double tmp= pow(-1,q)*nchoosekbyN(s-1,q,N*pow(base,mp-m+q));         					        */
+/*             Mtmp1 += tmp*result1[m-q];										        */
+/*             Mtmp2 += tmp*result2[m-q];										        */
+/*         }														        */
+/*         pret[ell]=Mtmp1;												        */
+/*         pret[ell+Nqmc]=Mtmp2;											        */
+/*     }														        */
+/* }															        */
+/********************************************************************************************************************************/
+
+
 EXPORT double* computeWeights(int nu, int m, int s, int N, int Nqmc, int outs, double* px, double* pz, double* py){
 
     int base = 2;
