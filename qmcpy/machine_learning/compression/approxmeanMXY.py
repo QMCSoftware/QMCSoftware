@@ -16,5 +16,5 @@ def approxmeanMXY(nu, m, x, y, d):
     s = x.shape[1]
     z = MyHOSobol(m, s, d)
     base = 2
-    weights = computeMXY(nu, m, base, x, np.transpose(z), y)
+    weights = computeMXY(nu, m, base, x, np.transpose(z).copy(), y)
     return weights, z

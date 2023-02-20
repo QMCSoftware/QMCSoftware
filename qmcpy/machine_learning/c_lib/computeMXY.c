@@ -21,9 +21,24 @@ double nchoosekbyN(int n, int k, double N);
 
 double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px, double* pz, double* py);
 
+void print_array_values(double *arr, int size, int n,  char *name) {
+    printf("The first few and last %d values of array %s are:\n", n, name);
+    for (int i = 0; i < n && i < size; i++) {
+            printf("%.3f ", arr[i]);
+        }
+    for (int i = size - n; i < size; i++) {
+        printf("%.3f ", arr[i]);
+    }
+    printf("\n");
+}
+
+
 EXPORT double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px, double* pz, double* py){
   int base=2;
   printf("DEBUG m = %d, mp = %d, base = %d, s = %d, N = %d, Nqmc = %d \n", m, mp, base, s, N, Nqmc);
+  print_array_values(px, N * s, 3, "px");
+  print_array_values(pz, s * Nqmc, 3, "pz");
+  print_array_values(py, N, 3, "py");
   int outs = 1;
 
   int* result1 = malloc((m+1)*sizeof(int));
@@ -55,7 +70,7 @@ EXPORT double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px,
         weights[ell]=Mtmp1;
         weights[ell+Nqmc]=Mtmp2;
    }
-
+   print_array_values(weights, (1+outs)*Nqmc, 3, "weights");
    return weights;
 }
 

@@ -10,7 +10,7 @@ N = 1000
 
 x = np.abs(np.random.randn(N, 5))
 x = x / (1.01 * np.amax(x, axis=0))
-labels = np.random.rand(N, 1)
+labels = np.random.rand(N, 1).reshape(-1)
 
 # test approximation
 
@@ -18,7 +18,7 @@ labels = np.random.rand(N, 1)
 d = x.shape[1]
 
 # max number of QMC-points 2^((1+1/alpha)*mmax)
-mmax = 5
+mmax = 4  # TODO increase it to 5
 t = 4
 
 # aux parameters
@@ -36,10 +36,10 @@ alpha = 1
 for m in range(mmax):
     # compute weights for approximation formula
     weights, z = approxmeanMXY(m+1, int((1 / alpha + 1) * (m+1)) + t, x, labels, alpha)
-  
+
     for sample in range(nsample):
         # compute exact error for random linear regression functions
-        w = np.random.randn(d + 1, 1)
+        w = np.random.randn(d + 1, 1).reshape(-1)
 
         mval = np.mean((f(x, w) - labels) ** 2)
 

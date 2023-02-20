@@ -23,7 +23,7 @@ def computeMXY(nu, m, base, x, z, y):
 
     # call to c function computeWeights
     computeWeights = lib.computeWeights
-    computeWeights.restype = ndpointer(dtype=c_double,shape=(1+outs, Nqmc))
+    computeWeights.restype = ndpointer(dtype=c_double, shape=(1+outs, Nqmc))
 
     # compute weights
     weights = computeWeights(c_int(nu),
@@ -35,6 +35,6 @@ def computeMXY(nu, m, base, x, z, y):
                              c_void_p(z.ctypes.data),
                              c_void_p(y.ctypes.data))
 
-    #weights = np.transpose(weights)
+    weights = np.transpose(weights.copy())
 
     return weights
