@@ -7,7 +7,7 @@ def computeMXY(nu, m, base, x, z, y):
     """
     >>> x = np.loadtxt("./test_data/reg_x.csv", delimiter=',')
     >>> y = np.loadtxt("./test_data/reg_y.csv", delimiter=",")
-    >>> z = np.loadtxt("./test_data/reg_z.csv", delimiter=',')
+    >>> z = np.loadtxt("./test_data/reg_z.csv", delimiter=',').T
     >>> weights = computeMXY(nu=1, m=6, base=2, x=x, z=z, y=y)
     >>> weights_true = np.loadtxt("./test_data/reg_weights.csv",  delimiter=",")
     >>> np.allclose(weights, weights_true, atol=1e-3)
@@ -27,6 +27,7 @@ def computeMXY(nu, m, base, x, z, y):
 
     # Transpose the input matrix to change its storage order to column-major
     x_transpose = np.asfortranarray(x)
+    z_transpose = np.asfortranarray(z)
 
     # compute weights
     weights_1d = computeWeights(c_int(nu),
@@ -35,7 +36,7 @@ def computeMXY(nu, m, base, x, z, y):
                              c_int(N),
                              c_int(Nqmc),
                              c_void_p(x_transpose.ctypes.data),
-                             c_void_p(z.ctypes.data),
+                             c_void_p(z_transpose.ctypes.data),
                              c_void_p(y.ctypes.data))
 
     weights = copy.deepcopy(weights_1d).T.reshape((1+outs, Nqmc)).T

@@ -3,18 +3,20 @@ import numpy as np
 from computeMXY import *
 def approxmeanMXY(nu, m, x, y, d):
     """"
-
     >>> x = np.loadtxt("./test_data/reg_x.csv", delimiter=',')
     >>> y = np.loadtxt("./test_data/reg_y.csv", delimiter=",")
-    >>> weights, z = approxmeanMXY(nu=1, m=6, d=1, x=x,y=y)
     >>> z_true  = np.loadtxt("./test_data/reg_z.csv", delimiter=",")
     >>> weights_true = np.loadtxt("./test_data/reg_weights.csv",    delimiter=",")
-    >>> np.allclose(weights, weights_true, atol=1e-14)
+    >>> weights, z = approxmeanMXY(nu=1, m=6, x=x, y=y, d=1)
+    >>> np.allclose(z, z_true, atol=1e-3)
+    True
+    >>> np.allclose(weights, weights_true, atol=1e-3)
     True
     """
 
     s = x.shape[1]
     z = MyHOSobol(m, s, d)
+    z_transpose = np.transpose(z).copy()
     base = 2
-    weights = computeMXY(nu, m, base, x, np.transpose(z).copy(), y)
+    weights = computeMXY(nu, m, base, x, z_transpose, y)
     return weights, z

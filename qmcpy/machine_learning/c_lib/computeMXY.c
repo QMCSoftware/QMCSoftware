@@ -70,7 +70,7 @@ EXPORT double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px,
         weights[ell]=Mtmp1;
         weights[ell+Nqmc]=Mtmp2;
    }
-   print_array_values(weights, (1+outs)*Nqmc, 3, "weights");
+   print_array_values(weights, (1+outs), 3, "weights");
    return weights;
 }
 
