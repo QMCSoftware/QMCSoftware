@@ -18,7 +18,7 @@ labels = np.random.rand(N, 1).reshape(-1)
 d = x.shape[1]
 
 # max number of QMC-points 2^((1+1/alpha)*mmax)
-mmax = 4  # TODO increase it to 5
+mmax = 5
 t = 4
 
 # aux parameters
