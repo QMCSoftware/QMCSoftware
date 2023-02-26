@@ -39,6 +39,6 @@ def computeMXY(nu, m, base, x, z, y):
                              c_void_p(z_transpose.ctypes.data),
                              c_void_p(y.ctypes.data))
 
-    weights = copy.deepcopy(weights_1d).T.reshape((1+outs, Nqmc)).T
+    weights = weights_1d.reshape((1+outs, Nqmc)).T
 
     return weights
