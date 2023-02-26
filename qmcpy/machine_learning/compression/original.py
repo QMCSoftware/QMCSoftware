@@ -3,7 +3,6 @@ import pickle
 from ctypes import *
 from numpy.ctypeslib import ndpointer
 import tensorflow as tf
-import c_lib
 
 m = 10
 nu = 3
@@ -33,10 +32,7 @@ breakpoint()
 # flatten 10x10 to 100x1 for weight computation
 x_train_flat = np.float64(0.99*np.transpose(x_train.reshape(x_train.shape[0],s)))
 
-#dig_net = DigitalNetB2(2,seed=6)
-#qmc_points = np.array(dig_net.gen_samples(Nqmc), dtype=np.ndarray)
 qmc_points = np.loadtxt('sobol.dat')
-#breakpoint()
 qmc_points = qmc_points[0:Nqmc,0:s]
 print(f"qmc_points: \n {qmc_points}")
 
@@ -44,7 +40,7 @@ print(f"qmc_points.shape = {qmc_points.shape}")
 print(f"x_train_flat.shape = {x_train_flat.shape}")
 
 # load c functions
-lib = cdll.LoadLibrary("./c_lib/c_lib.cpython-39-darwin.so")
+lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
 computeWeights = lib.computeWeights
 computeWeights.restype=ndpointer(dtype=c_double,shape=(1+outs, Nqmc))
 print('Weights loaded')
@@ -64,9 +60,6 @@ weights = computeWeights(c_int(nu),
 weights = np.transpose(weights)
 print(f"weights.shape = {weights.shape}")
 print(f"weights: \n {weights}")
-
-    
-breakpoint()
 
 with open('weights.pkl', 'wb') as handle:
     pickle.dump(weights, handle, protocol=pickle.HIGHEST_PROTOCOL)
