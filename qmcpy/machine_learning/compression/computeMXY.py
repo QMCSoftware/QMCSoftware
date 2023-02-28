@@ -3,6 +3,7 @@ import numpy as np
 from approxmeanMXY import *
 from numpy.ctypeslib import ndpointer
 import copy
+
 def computeMXY(nu, m, base, x, z, y):
     """
     >>> x = np.loadtxt("./test_data/reg_x.csv", delimiter=',')
@@ -25,9 +26,9 @@ def computeMXY(nu, m, base, x, z, y):
     computeWeights = lib.computeWeights
     computeWeights.restype = ndpointer(dtype=c_double, shape=(Nqmc*(1+outs)))
 
-    # Transpose the input matrix to change its storage order to column-major
-    x_transpose = np.asfortranarray(x)
-    z_transpose = np.asfortranarray(z)
+    # Change the storage order of the matrices to column-major
+    x2 = copy.deepcopy(np.asfortranarray(x))
+    z2 = copy.deepcopy(np.asfortranarray(z))
 
     # compute weights
     weights_1d = computeWeights(c_int(nu),
@@ -35,8 +36,8 @@ def computeMXY(nu, m, base, x, z, y):
                              c_int(s),
                              c_int(N),
                              c_int(Nqmc),
-                             c_void_p(x_transpose.ctypes.data),
-                             c_void_p(z_transpose.ctypes.data),
+                             c_void_p(x2.ctypes.data),
+                             c_void_p(z2.ctypes.data),
                              c_void_p(y.ctypes.data))
 
     weights = weights_1d.reshape((1+outs, Nqmc)).T

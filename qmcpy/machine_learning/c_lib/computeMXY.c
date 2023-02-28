@@ -26,6 +26,7 @@ void print_array_values(double *arr, int size, int n,  char *name) {
     for (int i = 0; i < n && i < size; i++) {
             printf("%.3f ", arr[i]);
         }
+    printf(" ... ");
     for (int i = size - n; i < size; i++) {
         printf("%.3f ", arr[i]);
     }
@@ -58,19 +59,19 @@ EXPORT double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px,
    for(ell=0;ell<Nqmc;++ell){
 
        computeS(s, N, m, base, &pz[ell*s], px, py, result1, result2, mvec, tmp1, tmp2);
-       /* printf("DEBUG m = %d, mp = %d, base = %d, s = %d, N = %d, Nqmc = %d, ell= %d \n", m, mp, base, s, N, Nqmc, ell);
-        */
         double Mtmp1 =0;
         double Mtmp2 =0;
         for(q=0;q<=minsm;++q){
             double tmp= pow(-1,q)*nchoosekbyN(s-1,q,N*pow(base,mp-m+q));
             Mtmp1 += tmp*result1[m-q];
             Mtmp2 += tmp*result2[m-q];
+            //printf("\nell = %d, q = %d, tmp = %.3f, result1[m-q] = %.3f, result2[m-q] = %.3f, Mtmp1 = %.3f, Mtmp2 = %.3f", ell, q, tmp, result1[m-q], result2[m-q], Mtmp1, Mtmp2);
         }
         weights[ell]=Mtmp1;
         weights[ell+Nqmc]=Mtmp2;
    }
-   print_array_values(weights, (1+outs), 3, "weights");
+   //printf("\n");
+   print_array_values(weights, (1+outs)*Nqmc, 5, "weights");
    return weights;
 }
 
