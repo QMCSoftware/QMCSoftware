@@ -91,7 +91,7 @@ setuptools.setup(
             name='qmcpy.machine_learning.c_lib.c_lib',
             sources=[
                 'qmcpy/machine_learning/c_lib/computeMXY.c',
-                #'qmcpy/machine_learning/c_lib/computeMXYmex.c',
+                'qmcpy/machine_learning/c_lib/computeNeuralMXY.c ',
 
             ], ),
                  ],
