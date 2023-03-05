@@ -1,8 +1,5 @@
 import numpy as np
 
-# TODO move utility functions to util
-# TODO put some trivial doctests in unit tests
-# TODO attempt to speed up nested for loops or list comprehension using numba if possible
 
 def dec2bin(a, numbits=1):
     """
@@ -401,7 +398,7 @@ def MyHOSobol(m, s, d=1):
            [0.296875, 0.171875, 0.109375, 0.796875]])
     """
 
-    z = np.loadtxt('sobol.dat')
+    z = np.loadtxt('sobol2.dat')
     z = z[:2 ** m, :s * d]
     if d > 1:
         N = pow(2, m)  # Number of points
