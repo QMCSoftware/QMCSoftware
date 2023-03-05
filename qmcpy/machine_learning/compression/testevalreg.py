@@ -21,7 +21,7 @@ def data_compress_lin_reg(x, labels, mmax=5, nsample=100, alpha=1):
     # loop to plot the approximation error
     for m in range(mmax):
         # compute weights for approximation formula
-        weights, z = approxmeanMXY(m + 1, int((1 / alpha + 1) * (m + 1)) + t, x, labels, alpha)
+        weights, z = approxmeanMXY(m + 1, int(np.ceil((1 + 1.0 / alpha) * (m + 1) + t)), x, labels, alpha)
 
         # compute exact error for random linear regression functions
         w = np.random.randn(d + 1, nsample)
@@ -35,14 +35,14 @@ def data_compress_lin_reg(x, labels, mmax=5, nsample=100, alpha=1):
         errvec[m,:] = np.abs(mvalapprox - mval) / np.abs(mval)
 
     # compute errors vs cost
-    cost = (2 ** ((1 / alpha + 1) * np.array(range(1, mmax + 1)))).astype(int)
+    cost = 2 ** np.ceil((1.0 / alpha + 1) * np.array(range(1, mmax + 1)))
 
     return cost, errvec
 
 if __name__ == "__main__":
 
     # set up random data
-    N = 1000
+    N = int(1e6)
     # np.random.seed(2)
     x = np.abs(np.random.randn(N, 5))
     x = x / (1.01 * np.amax(x, axis=0))
@@ -52,12 +52,15 @@ if __name__ == "__main__":
     mmax_vec = [5, 7]
     for alpha, mmax in zip(alpha_vec, mmax_vec):
         cost, errvec = data_compress_lin_reg(x, labels, mmax=mmax, alpha=alpha)
-        plt.loglog(cost, np.amax(errvec, axis=1), '-o', label=f"{alpha = }, max error")
-        plt.loglog(cost, np.mean(errvec, axis=1), '-o', label=f"{alpha = }, mean error")
-        if alpha==alpha_vec[-1]: plt.loglog(cost, 1 / cost ** (1 / (1 + 1 / alpha)), '--k')
+        if alpha == 1: marker1, marker2, marker3 = '-ob', '-xr', '--g'
+        elif alpha == 2: marker1, marker2, marker3 = '-dy', '-sm', '--k'
+        plt.loglog(cost, np.amax(errvec, axis=1), marker1, markerfacecolor='none', label=r"$\alpha$ = "+ str(alpha)+", maximum error")
+        plt.loglog(cost, np.mean(errvec, axis=1), marker2, markerfacecolor='none', label=r"$\alpha$ = "+ str(alpha)+", average error")
+        plt.loglog(cost, 1 / cost ** (1.0 / (1 + 1 / alpha)), marker3, label=r"$\alpha$ = "+ str(alpha)+", predicted convergence order")
 
     plt.xlabel("Cost")
-    plt.legend()  # display the legends
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # display the legends
+    plt.tight_layout()
     plt.savefig("testevalreg.png")
     plt.show(block=False)
     plt.pause(20)  # show plot for n seconds
