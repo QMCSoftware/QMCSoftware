@@ -49,13 +49,14 @@ packages = [
     'qmcpy.integrand',
     'qmcpy.stopping_criterion',
     'qmcpy.accumulate_data',
-    'qmcpy.machine_learning',
+	'qmcpy.machine_learning',
     'qmcpy.util',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
     'qmcpy.discrete_distribution.digital_net_b2',
     'qmcpy.machine_learning.c_lib',
-    'qmcpy.machine_learning.compression']
+    'qmcpy.machine_learning.compression'
+]
 
 setuptools.setup(
     name="qmcpy",
