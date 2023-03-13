@@ -141,7 +141,7 @@ class UMBridgeWrapper(Integrand):
         y = zeros((n,self.d_indv[0]),dtype=float)
         for i in range(n):
             ti_ll = [t[i,self.d_in_umbridge[j]:self.d_in_umbridge[j+1]].tolist() for j in range(self.n_d_in_umbridge)]
-            yi_ll = self.model(ti_ll,self.config)
+            yi_ll = self.model.__call__(ti_ll,self.config)
             for j,yi_l in enumerate(yi_ll): y[i,self.d_out_umbridge[j]:self.d_out_umbridge[j+1]] = yi_l if len(yi_l)>1 else yi_l[0]
         return y
     
