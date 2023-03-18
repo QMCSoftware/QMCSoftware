@@ -89,35 +89,9 @@ A more detailed quickstart can be found in our GitHub repo at `QMCSoftware/demos
 We also highly recommend you take a look at [Fred Hickernell's tutorial at the Monte Carlo Quasi-Monte Carlo 2020 Conference](https://media.ed.ac.uk/media/Fred+Hickernell%2C+Illinois+Institute+of+Technology+++Quasi-Monte+Carlo+Software++%28MCQMC+2020%2C+10.08.20%29/1_2k12mwiw) and [the corresponding MCQMC2020 Google Colab notebook.](https://tinyurl.com/QMCPyTutorial)
 
 ----
+## Community
 
-## Developers
- 
-- Sou-Cheng T. Choi
-- Fred J. Hickernell
-- Michael McCourt
-- Jagadeeswaran Rathinavel
-- Aleksei Sorokin
-
-----
-
-## Collaborators
-
-- Adrian Ebert
-- Mike Giles
-- Marius Hofert
-- Sergei Kucherenko
-- Pierre L’Ecuyer
-- Christiane Lemieux
-- Dirk Nuyens
-- Onyekachi Osisiogu 
-- Art Owen
-- Pieterjan Robbe
-
-----
-
-## Contributors
-
-- Jungtaek Kim
+Please refer to [this document](community.md) for the key roles in the QMCPy community.
 
 ## Citation
 
@@ -203,7 +177,7 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
   <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true" width="300" height="150">
 
-- **[Kamakura Corporation](http://www.kamakuraco.com)**
+- **[Kamakura Corporation](http://www.kamakuraco.com), acquired by [SAS Institute Inc.](https://www.sas.com) in June 2022**
 
   <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
 
