@@ -28,7 +28,13 @@ Notes to help you get started
 - Python
 - Jupyter
 - Markdown Preview Enhanced
+- eps-preview, which requires
+    - Postscript Language
+    - pdf2svg
 
 ## To run the demos in QMCPy
-* Type `jupyter notebook`
-* For some you may need to ddownload Docker from https://www.docker.com/products/docker-desktop/
+- Type `jupyter notebook`
+- Or type
+    - `pip install jupyterlab #the first time`
+    - `jupyterlab`
+- For some you may need to ddownload Docker from https://www.docker.com/products/docker-desktop/
