@@ -1,4 +1,4 @@
-def stop_notebook(query = "Type 'yes' to continue long code"):
+def stop_notebook(query = "Type 'yes' to continue running notebook"):
     #This is a function to be able to stop a notebook when you run all cells
     keep_running = input("Type 'yes' to continue long code")
     if keep_running.casefold() != 'yes':
