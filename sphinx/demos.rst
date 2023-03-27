@@ -51,3 +51,7 @@ Demos
     demo_rst/MCQMC2022_Article_Figures.rst
 
     demo_rst/Purdue_Talk_Figures.rst
+
+    demo_rst/dakota_genz.rst
+
+    demo_rst/pydata.chi.2023.rst
