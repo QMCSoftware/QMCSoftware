@@ -8,6 +8,7 @@ import warnings
 class Lattice(LD):
     """
     Quasi-Random Lattice nets in base 2.
+    
     >>> l = Lattice(2,seed=7)
     >>> l.gen_samples(4)
     array([[0.04386058, 0.58727432],
