@@ -45,3 +45,9 @@ Demos
     demo_rst/vectorized_qmc_bayes.rst
 
     demo_rst/umbridge.rst
+
+    demo_rst/lattice_random_generator.rst
+
+    demo_rst/MCQMC2022_Article_Figures.rst
+
+    demo_rst/Purdue_Talk_Figures.rst
