@@ -12,6 +12,7 @@ QMCPy Documentation
 
 
    readme
+   contributing
    license
    algorithms
    demos
