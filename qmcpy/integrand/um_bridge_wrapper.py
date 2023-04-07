@@ -103,7 +103,7 @@ class UMBridgeWrapper(Integrand):
         [1] UM-Bridge documentation. https://um-bridge-benchmarks.readthedocs.io/en/docs/index.html
     """
 
-    def __init__(self, true_measure, model, config={}, parallel=False):
+    def __init__(self, true_measure, model, config={}, parallel=False, chunksize=1):
         """
         See https://um-bridge-benchmarks.readthedocs.io/en/docs/umbridge/clients.html
         
@@ -115,6 +115,7 @@ class UMBridgeWrapper(Integrand):
                 Otherwise, parallel specifies the number of processes used by 
                 multiprocessing.Pool or multiprocessing.pool.ThreadPool.
                 Passing parallel=True sets processes = os.cpu_count().
+            chunksize (int): chunksize to pass to multiprocessing.pool.ThreadPool.starmap
         """
         import umbridge
         self.parameters = []
@@ -134,7 +135,8 @@ class UMBridgeWrapper(Integrand):
             dimension_indv = int(self.d_out_umbridge[-1]),
             dimension_comb = int(self.d_out_umbridge[-1]),
             parallel = self.parallel,
-            threadpool = True)
+            threadpool = True,
+            chunksize = chunksize)
     
     def g(self, t, **kwargs):
         n = len(t)

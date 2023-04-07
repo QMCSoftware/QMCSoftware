@@ -11,7 +11,7 @@ from itertools import repeat
 class Integrand(object):
     """ Integrand abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self, dimension_indv, dimension_comb, parallel, threadpool=False):
+    def __init__(self, dimension_indv, dimension_comb, parallel, threadpool=False, chunksize=None):
         """
         Args:
             dimension_indv (tuple): individual solution shape.
@@ -22,7 +22,8 @@ class Integrand(object):
                 Passing parallel=True sets processes = os.cpu_count().
             threadpool (bool): When parallel > 1, 
                 if threadpool = True then use multiprocessing.pool.ThreadPool 
-                else use multiprocessing.Pool. 
+                else use multiprocessing.Pool.
+            chunksize (int): chunksize to pass to multiprocessing.Pool.starmap or multiprocessing.pool.ThreadPool.starmap
         """
         prefix = 'A concrete implementation of Integrand must have '
         self.d = self.true_measure.d
@@ -32,6 +33,7 @@ class Integrand(object):
         self.parallel = cpus if parallel is True else int(parallel)
         self.parallel = 0 if self.parallel==1 else self.parallel
         self.threadpool = threadpool
+        self.chunksize = chunksize
         if not (hasattr(self, 'sampler') and isinstance(self.sampler,(TrueMeasure,DiscreteDistribution))):
             raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistributioninstance')
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
@@ -140,7 +142,7 @@ class Integrand(object):
         kwargs['compute_flags'] = compute_flags
         if self.parallel:
             pool = get_context(method='fork').Pool(processes=self.parallel) if self.threadpool==False else ThreadPool(processes=self.parallel) 
-            y = pool.starmap(self._g2,zip(t,repeat((args,kwargs))))
+            y = pool.starmap(self._g2,zip(t,repeat((args,kwargs))),chunksize=self.chunksize)
             pool.close()
             y = concatenate(y,dtype=float)
         else:
