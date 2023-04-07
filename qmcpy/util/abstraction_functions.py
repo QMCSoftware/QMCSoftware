@@ -2,7 +2,6 @@
 
 from numpy import array, ndarray, log2
 import numpy as np
-import warnings
 from copy import copy
 
 
@@ -45,11 +44,7 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
             # printing options
             s = '    %-15s '%key
             if isinstance(val, int) or isinstance(val,float): # scalar
-                try:
-                    warnings.filterwarnings("error")
-                    p = log2(val)
-                except:
-                    p = .1
+                p = .1 if val<=0 else log2(float(val))
                 if (p%1==0) and p!=0: # power of 2
                     s += '2^(%d)' % int(p)
                 elif isinstance(val, int) or (val%1==0): # int
