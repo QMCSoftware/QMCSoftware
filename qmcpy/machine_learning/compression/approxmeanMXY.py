@@ -1,6 +1,6 @@
 from myhosobol import MyHOSobol
 import numpy as np
-from computeMXY import *
+from computeMXY import computeWeights
 def approxmeanMXY(nu, m, x, y, d):
     """"
     >>> x = np.loadtxt("./test_data/reg_x.csv", delimiter=',')
@@ -18,5 +18,5 @@ def approxmeanMXY(nu, m, x, y, d):
     z = MyHOSobol(m, s, d)
     z_transpose = np.transpose(z).copy()
     base = 2
-    weights = computeMXY(nu, m, base, x, z_transpose, y)
+    weights = computeWeights(nu, m, base, x, z_transpose, y)
     return weights, z
