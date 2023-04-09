@@ -1,11 +1,10 @@
 from ctypes import *
 import numpy as np
 from approxmeanMXY import *
-from .c_lib import c_lib
 from numpy.ctypeslib import ndpointer
 import copy
 
-def computeMXY(nu, m, base, x, z, y):
+def computeWeights(nu, m, base, x, z, y):
     """
     >>> x = np.loadtxt("./test_data/reg_x.csv", delimiter=',')
     >>> y = np.loadtxt("./test_data/reg_y.csv", delimiter=",")
@@ -21,8 +20,7 @@ def computeMXY(nu, m, base, x, z, y):
     N = y.shape[0]
 
     # load c functions
-    #lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
-	lib = c_lib.computeMXY
+    lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
 
     # call to c function computeWeights
     computeWeights = lib.computeWeights
