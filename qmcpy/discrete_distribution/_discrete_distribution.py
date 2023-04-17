@@ -1,7 +1,6 @@
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 from numpy import *
-
-
+from matplotlib import colors
 
 class DiscreteDistribution(object):
     """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
@@ -53,31 +52,46 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
-    def plot(self, n, d_horizontal=0, d_vertical = 1, axis=None, **kwargs):
+    def plot(self, n, axis=None, **kwargs):
         """
         Args:
-            n (int): n is the number of samples that will be plotted 
-            d_vertical (int): d_vertical is the index of points that will be plotted on the vertical axis. 
-            d_horizontal (int): d_horizontal is the index of points that will be plotted as the horizontial axis.
+            n (int or array): n is the number of samples that will be plotted or a list for extensible point sets
         """
         try:
             import matplotlib.pyplot as plt
         except:
             raise ImportError("Missing matplotlib.pyplot as plt, Matplotlib must be intalled to run DiscreteDistribution.plot")
-        samples = self.gen_samples(n)
+        n = atleast_1d(n)
+        samples = self.gen_samples(n[n.size - 1])     
+        d = samples.shape[1]
+        assert d>=2 
+        
         if axis is None:
-            fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 5))
-        else: 
+            fig, ax = plt.subplots(nrows=d, ncols=d, figsize=(3*d, 3*d))    
+            fig.tight_layout(pad = 2)       
+        else:
             ax = axis 
             fig = plt.figure()
-        ax.scatter(samples[:, d_horizontal], samples[:, d_vertical], **kwargs)
-        ax.set_xlabel(r'$x_{%d}$'%d_horizontal)
-        ax.set_ylabel(r'$x_{%d}$'%d_vertical)
-        ax.set_xlim([0, 1])
-        ax.set_ylim([0, 1])
-        ax.set_xticks([0, 1])
-        ax.set_yticks([0, 1])
-        ax.set_aspect(1)
+            assert (ax.shape[0] >= d) and (ax.shape[1] >= d)
+
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+        
+        for i in range(d):
+            fig.delaxes(ax[i,i])
+            count = 0
+            n_min = 0
+            for m in range(n.size):
+                n_max = n[m]
+                for j in range(i):               
+                    ax[i,j].scatter(samples[n_min:n_max,i],samples[n_min:n_max,j],s=5,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)          
+                    if count < i:     
+                        fig.delaxes(ax[j,i])
+                        count += 1
+                    ax[i,j].set_aspect(1)
+                    ax[i,j].set_xlabel(r'$X_{i%d}$'% i); ax[i,j].set_ylabel(r'$X_{i%d}$'%j)
+                    ax[i,j].set_xlim([0,1]); ax[i,j].set_ylim([0,1])
+                    ax[i,j].set_xticks([0,1]); ax[i,j].set_yticks([0,1])    
+                n_min = n[m] 
         return fig, ax
 
     def spawn(self, s=1, dimensions=None):
