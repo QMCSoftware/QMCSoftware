@@ -63,4 +63,4 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.savefig("testevalreg.png")
     plt.show(block=False)
-    plt.pause(20)  # show plot for n seconds
+    plt.pause(20)  # show plot for n seconds 

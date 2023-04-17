@@ -17,7 +17,7 @@ x_train, x_test = x_train / 255.0, x_test / 255.0
 y_train =  np.float64(tf.one_hot(y_train, 10).numpy())
 
 
-x_train=x_train[:Ndata,:,:]
+x_train = x_train[:Ndata,:,:]
 y_train = y_train[:Ndata]
 
 x_train = x_train[...,tf.newaxis]
@@ -28,7 +28,7 @@ x_train = x_train.numpy()[:,:,:,0]
 Ndata=x_train.shape[0]
 s=x_train.shape[1]*x_train.shape[2]
 outs = y_train.shape[1]
-breakpoint()
+
 # flatten 10x10 to 100x1 for weight computation
 x_train_flat = np.float64(0.99*np.transpose(x_train.reshape(x_train.shape[0],s)))
 
@@ -54,13 +54,13 @@ weights = computeWeights(c_int(nu),
                          c_int(Nqmc),
                          c_int(outs),
                          c_void_p(x_train_flat.ctypes.data),
-		         c_void_p(qmc_points.ctypes.data),
+						 c_void_p(qmc_points.ctypes.data),
                          c_void_p(y_train.ctypes.data))
 
 weights = np.transpose(weights)
 print(f"weights.shape = {weights.shape}")
 print(f"weights: \n {weights}")
-
+# This is my code
 with open('weights.pkl', 'wb') as handle:
     pickle.dump(weights, handle, protocol=pickle.HIGHEST_PROTOCOL)
 #pickled_model = pickle.load(open('weights.pkl', 'rb'))
