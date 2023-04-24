@@ -140,7 +140,6 @@ class PFGPCI(StoppingCriterion):
         self.gpytorch_use_gpu = gpytorch_use_gpu
         self.verbose = verbose
         self.approx_true_solution = n_ref_approx>0
-        self.ref_approx = None
         if self.approx_true_solution: 
             x = DigitalNetB2(self.d,graycode=True,seed=seed_ref_approx).gen_samples(n_ref_approx)
             y = self.integrand.f(x).squeeze()
@@ -162,7 +161,7 @@ class PFGPCI(StoppingCriterion):
                 self.torch_optimizer_func,
                 self.gpytorch_train_iter,
                 self.gpytorch_use_gpu,
-                self.verbose,self.approx_true_solution,self.ref_approx)
+                self.verbose, self.approx_true_solution)
         batch_count = 0
         while True:
             if batch_count==0:
@@ -170,22 +169,32 @@ class PFGPCI(StoppingCriterion):
                     xdraw,ydraw = self.x_init,self.y_init
                 else:
                     xdraw = dnb2.spawn()[0].gen_samples(self.n_init)
-                    ydraw = atleast_1d(self.integrand.f(xdraw)).squeeze()
+                    ydraw = atleast_1d(self.integrand.f(xdraw).squeeze())
             else:
                 n_new = min(self.n_batch,self.n_max-sum(self.n_batch))
                 xdraw = self.batch_sampler.suggest(n_new,self.d,data.gpyt_model,dnb2.rng,efficiency=2*data.emr[-1])
-                ydraw = atleast_1d(self.integrand.f(xdraw)).squeeze()
+                ydraw = atleast_1d(self.integrand.f(xdraw).squeeze())
             ydrawtf = self._affine_tf(ydraw)
             data.update_data(batch_count, xdraw, ydrawtf)
             batch_count += 1
             if data.error_bounds[-1] <= self.abs_tol: break
             if sum(data.n_batch)==self.n_max:
                 warnings.warn('n_max reached. ',MaxSamplesWarning)
-                break            
+                break        
         data.solution = data.solutions[-1]
         data.error_bound = data.error_bounds[-1]
         data.bound_low = data.ci_low[-1]
         data.bound_high = data.ci_high[-1]
         data.n_total = sum(data.n_batch)
         data.time_integrate = time.time()-t0
+        data.n_sum = cumsum(data.n_batch)
+        data.n_batch = array(data.n_batch)
+        data.error_bounds = array(data.error_bounds)
+        data.ci_low = array(data.ci_low)
+        data.ci_high = array(data.ci_high)
+        data.solutions = array(data.solutions)
+        if self.approx_true_solution:
+            data.solutions_ref = tile(self.ref_approx,len(data.n_batch))
+            data.error_ref = abs(data.solutions-data.solutions_ref)
+            data.in_ci = (data.ci_low<=data.solutions_ref)*(data.solutions_ref<=data.ci_high)
         return data.solution,data
