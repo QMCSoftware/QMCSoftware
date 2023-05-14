@@ -54,9 +54,9 @@ class DiscreteDistribution(object):
     def plot(self, n, d_horizontal = 1, d_vertical = 0, axis=None, **kwargs):
         """
         Args:
-            n (int or array): n is the number of samples that will be plotted or a list for extensible point sets
-            d_vertical (int): d_vertical is the index of points that will be plotted on the vertical axis or a list of indexes of points that will be plotted on multiple vertical axes
-            d_horizontal (int): d_horizontal is the index of points that will be plotted as the horizontial axis  or a list of indexes of points that will be plotted on multiple horizontal axes
+            n(int or array): n is the number of samples that will be plotted or a list of samples(used for extensible point sets)
+            d_vertical (int or array): d_vertical is the index of points that will be plotted on the vertical axis or a list of indexes of points that will be plotted on multiple vertical axes
+            d_horizontal (int or array): d_horizontal is the index of points that will be plotted as the horizontial axis  or a list of indexes of points that will be plotted on multiple horizontal axes
         """
         try:
             import matplotlib.pyplot as plt
