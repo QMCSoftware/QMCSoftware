@@ -19,6 +19,9 @@ def computeWeights(nu, m, base, x, z, y):
     s = x.shape[1]
     N = y.shape[0]
 
+    #Debugging c functions
+    breakpoint()
+    
     # load c functions
     lib = cdll.LoadLibrary("../c_lib/c_lib.cpython-39-darwin.so")
 

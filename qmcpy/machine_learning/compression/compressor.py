@@ -14,11 +14,11 @@ class digital_net_compression(Compress):
 	"""
 
 	def __init__(self,
-				 nu: int,
-				 m: int,
-				 input_file: str,
-				 label_file: str,
-				 d: int,):
+		     nu: int,
+		     m: int,
+		     input_file: str,
+		     label_file: str,
+                     d: int,):
 				 #weights: str,
 				 #z: str):
 		self.nu = nu

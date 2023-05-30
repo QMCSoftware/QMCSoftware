@@ -1,7 +1,7 @@
 from myhosobol import MyHOSobol
 import numpy as np
 from computeMXY import computeWeights
-def approxmeanMXY(nu, m, x, y, d):
+def ApproxmeanMXY(nu, m, x, y, d):
     """"
     >>> x = np.loadtxt("./test_data/reg_x.csv", delimiter=',')
     >>> y = np.loadtxt("./test_data/reg_y.csv", delimiter=",")
