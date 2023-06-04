@@ -117,10 +117,11 @@ class DigitalNetB2(LD):
                 'DS': digital shift only
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
-            generating_matrices (ndarray or str): generating matricies or path to generating matrices.
+            generating_matrices (ndarray, str, or int): generating matricies or path to generating matrices.
                 ndarray should have shape (d_max, m_max) where each int has t_max bits
                 generating_matrices sould be formatted like `gen_mat.21201.32.32.msb.npy` 
                 with name.d_max.t_max.m_max.{msb,lsb}.npy
+                integer inputs should be larger than 1; passing in an integer M results in a randomized generating matrices of shape (d_max = dimension,M_max = M), containing integral elements [0,2^64]. 
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix. 
                 aka: number of rows in a generating matrix with ints expanded into columns
