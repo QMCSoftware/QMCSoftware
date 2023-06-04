@@ -181,6 +181,11 @@ class DigitalNetB2(LD):
             self.t_max = int(parts[-4])
             self.m_max = int(parts[-3])
             self.msb = bool(parts[-2].lower()=='msb')
+        elif isinstance(generating_matrices,int):
+            self.t_max=64
+            self.m_max = generating_matrices
+            self.d_max = dimension
+            self.msb = msb
         else:
             msg = '''
                 z_path sould be formatted like `name.d_max.m_max.t_max.msb_or_lsb.npy`
@@ -199,6 +204,8 @@ class DigitalNetB2(LD):
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(DigitalNetB2,self).__init__(dimension,seed)
+        if isinstance(generating_matrices,int):
+            self.z_og = self.rng.integers(low=0,high=2**64,size=(self.d_max,self.m_max),dtype=uint64)        
         if self.t_max>64 or self.t_lms>64 or self.t_max>self.t_lms:
             raise Exception("require t_max <= t_lms <= 64")
         self.z = zeros((self.d,self.m_max),dtype=uint64)
