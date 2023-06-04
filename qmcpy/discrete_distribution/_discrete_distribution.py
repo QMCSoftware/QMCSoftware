@@ -51,7 +51,7 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
-    def plot(self, n, d_horizontal = 1, d_vertical = 0, axis=None, **kwargs):
+    def plot_proj(self, n, d_horizontal = 0, d_vertical = 1, axis=None, **kwargs):
         """
         Args:
             n(int or array): n is the number of samples that will be plotted or a list of samples(used for extensible point sets)
@@ -71,7 +71,7 @@ class DiscreteDistribution(object):
         assert d>=2 
 
         if axis is None:
-            fig, ax = plt.subplots(nrows=d, ncols=d, figsize=(3*d, 3*d))                    
+            fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(3*d, 3*d),squeeze=False)                    
             fig.tight_layout(pad=2)
         else:
             ax = axis 
@@ -80,20 +80,17 @@ class DiscreteDistribution(object):
 
         colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-        for i in range(d):            
-            for j in range(d):
-                if ((i in d_horizontal) and (j in d_vertical) and (j < i)):
+        for i in range(d_horizontal.size):            
+            for j in range(d_vertical.size):
                     n_min = 0
                     for m in range(n.size):
                         n_max = n[m]                                        
-                        ax[i,j].scatter(samples[n_min:n_max,i],samples[n_min:n_max,j],s=5,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)          
+                        ax[i,j].scatter(samples[n_min:n_max,d_horizontal[i]],samples[n_min:n_max,d_vertical[j]],s=5,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)          
                         ax[i,j].set_aspect(1)
-                        ax[i,j].set_xlabel(r'$X_{i%d}$'%i); ax[i,j].set_ylabel(r'$X_{i%d}$'%j)
+                        ax[i,j].set_xlabel(r'$x_{i%d}$'%(d_horizontal[i] + 1)); ax[i,j].set_ylabel(r'$x_{i%d}$'%(d_vertical[j] + 1))
                         ax[i,j].set_xlim([0,1]); ax[i,j].set_ylim([0,1])
                         ax[i,j].set_xticks([0,1]); ax[i,j].set_yticks([0,1])   
                         n_min = n[m]
-                else :                
-                    fig.delaxes(ax[i,j])
         return fig, ax
 
     def spawn(self, s=1, dimensions=None):
