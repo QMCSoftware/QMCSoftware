@@ -69,7 +69,7 @@ class Lattice(LD):
     """
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
-        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None):
+        generating_vector= 'lattice_vec_lnb.750.24.npy', d_max=None, m_max=None):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -82,7 +82,7 @@ class Lattice(LD):
             generating_vector (ndarray or str): generating matrix or path to generating matrices.
                 ndarray should have shape (d_max).
                 a string generating_vector should be formatted like
-                'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy'
+                'lattice_vec_lnb.750.24.npy' where 'name.d_max.m_max.npy'
             d_max (int): maximum dimension
             m_max (int): 2^m_max is the max number of supported samples
 

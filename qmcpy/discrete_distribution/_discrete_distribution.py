@@ -55,8 +55,8 @@ class DiscreteDistribution(object):
         """
         Args:
             n(int or array): n is the number of samples that will be plotted or a list of samples(used for extensible point sets)
-            d_vertical (int or array): d_vertical is the index of points that will be plotted on the vertical axis or a list of indexes of points that will be plotted on multiple vertical axes
-            d_horizontal (int or array): d_horizontal is the index of points that will be plotted as the horizontial axis  or a list of indexes of points that will be plotted on multiple horizontal axes
+            d_horizontal (int or array): d_horizontal is a list of dimensions to be plotted on the horizontal axes. Possible input values are from 0 to d-1. Default value is 0 (1st dimension).
+            d_vertical (int or array): d_vertical is a list of dimensions to be plotted on the vertical axes for each corresponding element in d_horizontal. Default value is 1 (2nd dimension).
         """
         try:
             import matplotlib.pyplot as plt
@@ -84,12 +84,20 @@ class DiscreteDistribution(object):
             for j in range(d_vertical.size):
                     n_min = 0
                     for m in range(n.size):
-                        n_max = n[m]                                        
-                        ax[i,j].scatter(samples[n_min:n_max,d_horizontal[i]],samples[n_min:n_max,d_vertical[j]],s=5,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)          
+                        n_max = n[m]  
+                        if(d_horizontal[i] == d_vertical[j]):
+                            """ax[i,j].hist(samples[n_min:n_max, d_horizontal[i]],bins = 30,rwidth = 0.2,color=colors[m])"""
+                            ax[i,j].set_yticks([])
+                            y = zeros_like(samples[n_min:n_max,d_horizontal[i]]) + 0.5
+                            ax[i,j].scatter(samples[n_min:n_max,d_horizontal[i]],y,s=5,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)
+                        else:
+                            ax[i,j].scatter(samples[n_min:n_max,d_horizontal[i]],samples[n_min:n_max,d_vertical[j]],s=5,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)          
+                            ax[i,j].set_ylabel(r'$x_{i%d}$'%(d_vertical[j] + 1))
+                            ax[i,j].set_yticks([0,1])  
                         ax[i,j].set_aspect(1)
-                        ax[i,j].set_xlabel(r'$x_{i%d}$'%(d_horizontal[i] + 1)); ax[i,j].set_ylabel(r'$x_{i%d}$'%(d_vertical[j] + 1))
+                        ax[i,j].set_xlabel(r'$x_{i%d}$'%(d_horizontal[i] + 1)); 
                         ax[i,j].set_xlim([0,1]); ax[i,j].set_ylim([0,1])
-                        ax[i,j].set_xticks([0,1]); ax[i,j].set_yticks([0,1])   
+                        ax[i,j].set_xticks([0,1]);  
                         n_min = n[m]
         return fig, ax
 
