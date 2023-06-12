@@ -198,7 +198,7 @@ class DigitalNetB2(LD):
             self.msb = bool(parts[-2].lower()=='msb')
         elif isinstance(generating_matrices,int):
             self.t_max=64
-            self.m_max = floor(log2(generating_matrices))
+            self.m_max = int(floor(log2(generating_matrices)))
             self.d_max = dimension
             self.msb = msb
         else:
