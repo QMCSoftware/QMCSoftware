@@ -117,7 +117,7 @@ class DigitalNetB2(LD):
         ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')]  # xr
     dnb2_cf.restype = ctypes.c_uint32
 
-    def __init__(self, dimension=1, randomize='LMS_DS', graycode=False, seed=None, 
+    def __init__(self, dimension=1, randomize=None, graycode=False, seed=None, 
         generating_matrices='sobol_mat.21201.32.32.msb.npy', d_max=None, t_max=None, m_max=None, msb=None, t_lms=None, 
         _verbose=False):
         """
@@ -146,9 +146,15 @@ class DigitalNetB2(LD):
             _verbose (bool): print randomization details
         """
         self.parameters = ['dvec','randomize','graycode']
-        if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
-            self.set_lms = False
+        if randomize==None:
+            self.set_rshift = True 
+            if isinstance(generating_matrices,int):
+                self.set_lms = False
+            else:
+                self.set_lms = True
+        elif (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
             self.set_rshift = False
+            self.set_lms = False 
         elif isinstance(randomize,bool):
             if randomize:
                 self.set_lms = True
@@ -197,7 +203,8 @@ class DigitalNetB2(LD):
             self.m_max = int(parts[-3])
             self.msb = bool(parts[-2].lower()=='msb')
         elif isinstance(generating_matrices,int):
-            self.t_max=64
+            if t_max == None:
+                self.t_max=64
             self.m_max = int(floor(log2(generating_matrices)))
             self.d_max = dimension
             self.msb = msb
