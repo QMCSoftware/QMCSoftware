@@ -135,7 +135,7 @@ class DigitalNetB2(LD):
                 ndarray should have shape (d_max, m_max) where each int has t_max bits
                 generating_matrices sould be formatted like `gen_mat.21201.32.32.msb.npy` 
                 with name.d_max.t_max.m_max.{msb,lsb}.npy
-                integer inputs should be larger than 1; passing in an integer M results in a randomized generating matrices of shape (d_max = dimension,M_max = M), containing integral elements [0,2^64). 
+                integer inputs should be larger than 1; passing in an integer M results in a randomized generating matrices of shape (d_max = dimension,M_max = M), containing integral elements [0,2^t_max). 
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix. 
                 aka: number of rows in a generating matrix with ints expanded into columns
@@ -147,6 +147,7 @@ class DigitalNetB2(LD):
         """
         self.parameters = ['dvec','randomize','graycode']
         if randomize==None:
+            randomize = True
             self.set_rshift = True 
             if isinstance(generating_matrices,int):
                 self.set_lms = False
