@@ -34,6 +34,7 @@ Collaborators play a key role in the development of QMCPy by contributing their 
 
 The following are our collaborators (listed in alphabetical order of last names):
 
+* Yuhan Ding
 * Adrian Ebert
 * Mike Giles
 * Marius Hofert
