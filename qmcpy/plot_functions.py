@@ -42,8 +42,8 @@ def plot_proj(n,discrete_distribution = None,true_measure = None, d_horizontal =
         assert (ax.shape[0] >= d_horizontal.size) and (ax.shape[1] >= d_vertical.size)
 
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-    l_bound = amin(samples) - 0.03*(amax(samples) - amin(samples))
-    h_bound = amax(samples) + 0.03*(amax(samples) - amin(samples))
+    """l_bound = amin(samples) - 0.03*(amax(samples) - amin(samples))"""
+    """h_bound = amax(samples) + 0.03*(amax(samples) - amin(samples))"""
     for i in range(d_horizontal.size):            
         for j in range(d_vertical.size):
                 n_min = 0
@@ -65,7 +65,11 @@ def plot_proj(n,discrete_distribution = None,true_measure = None, d_horizontal =
                     ax[i,j].scatter(samples[n_min:n_max,x],samples[n_min:n_max,y],s=5,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)          
                     ax[i,j].set_aspect(1)
                     ax[i,j].set_xlabel(r'$x_{i%d}$'%(x_label)); ax[i,j].set_ylabel(r'$x_{i%d}$'%(y_label))
-                    ax[i,j].set_xlim([l_bound,h_bound]); ax[i,j].set_ylim([l_bound,h_bound])
+                    x_lbound = amin(samples[x]) - 0.03*(amax(samples[x]) - amin(samples[x]))
+                    x_hbound = amax(samples[x]) + 0.03*(amax(samples[x]) - amin(samples[x]))
+                    y_lbound = amin(samples[y]) - 0.03*(amax(samples[y]) - amin(samples[y]))
+                    y_hbound = amax(samples[y]) + 0.03*(amax(samples[y]) - amin(samples[y]))
+                    ax[i,j].set_xlim([x_lbound,x_hbound]); ax[i,j].set_ylim([y_lbound,y_hbound])
                     """ax[i,j].set_xticks([-3,3]); ax[i,j].set_yticks([-3,3]) """
                     n_min = n[m]
     return fig, ax
