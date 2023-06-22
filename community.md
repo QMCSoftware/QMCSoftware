@@ -59,6 +59,7 @@ Contributors are individuals who actively participate in the development of the 
 * Participate in community discussions and decision-making processes
 
 The contributors to our GitHub are:
+
 <a href="[https://github.com/pycaret/pycaret/graphs/contributors](https://github.com/QMCSoftware/QMCSoftware/graphs/contributors)">
   <img src="https://contrib.rocks/image?repo=QMCSoftware/QMCSoftware" width=600/>
 </a>
