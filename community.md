@@ -38,6 +38,7 @@ The following are our collaborators (listed in alphabetical order of last names)
 * Adrian Ebert
 * Mike Giles
 * Marius Hofert
+* Lan Jiang
 * Sergei Kucherenko
 * Pierre L’Ecuyer
 * Christiane Lemieux
@@ -45,6 +46,7 @@ The following are our collaborators (listed in alphabetical order of last names)
 * Onyekachi Osisiogu
 * Art Owen
 * Pieterjan Robbe
+* Xuan Zhou
 
 Contributors
 -----------------
