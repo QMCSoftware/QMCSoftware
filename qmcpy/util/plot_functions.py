@@ -27,7 +27,7 @@ def plot_proj(n,sampler, d_horizontal = 0, d_vertical = 1,math_ind = False, **kw
     d = samples.shape[1]
     assert d>=2 
 
-    fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(3*d,3*d),squeeze=False)                    
+    fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(5*d_horizontal.size, 5* d_vertical.size),squeeze=False)                    
     fig.tight_layout(pad=2)
     
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -53,16 +53,16 @@ def plot_proj(n,sampler, d_horizontal = 0, d_vertical = 1,math_ind = False, **kw
                     if(isinstance(sampler,qp.DiscreteDistribution)):
                         ax[i,j].set_xlim([0,1])
                         ax[i,j].set_ylim([0,1])
-                        ax[i,j].set_xticks([0,1])
-                        ax[i,j].set_yticks([0,1])
+                        ax[i,j].set_xticks([0,1/4,1/2,3/4,1])
+                        ax[i,j].set_yticks([0,1/4,1/2,3/4,1])
                         ax[i,j].set_aspect(1)
                         x_label = r'$x_{i%d}$'%(x_label_num)
                         y_label = r'$x_{i%d}$'%(y_label_num)
                     else:
                         x_label = r'$t_{i%d}$'%(x_label_num)
                         y_label = r'$t_{i%d}$'%(y_label_num)    
-                  
-                    ax[i,j].set_xlabel(x_label); ax[i,j].set_ylabel(y_label)
+                    
+                    ax[i,j].set_xlabel(x_label,fontsize = 15); ax[i,j].set_ylabel(y_label,fontsize = 15)
                     ax[i,j].scatter(samples[n_min:n_max,x],samples[n_min:n_max,y],s=5,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)
                     n_min = n[m]
     return fig, ax
