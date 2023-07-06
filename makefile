@@ -80,11 +80,11 @@ doc_epub: _doc _uml
 
 doctests:
 	@echo "\nDoctests"
-	python -m coverage run --source=./ -m pytest --doctest-modules qmcpy/* --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --disable-pytest-warnings qmcpy
 
 doctests_no_docker:
 	@echo "\nDoctests Without Docker Containers"
-	python -m coverage run --source=./ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
 
 fasttests:
 	@echo "\nFastests"
