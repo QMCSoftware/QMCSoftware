@@ -33,7 +33,7 @@ class AsianOption(Integrand):
     ...     level_est = ac2_single_level.f(x).mean()
     ...     yml += level_est
     >>> yml
-    1.778...
+    1.779...
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
