@@ -49,6 +49,7 @@ class CubQMCCLT(StoppingCriterion):
         dvec            0
         randomize       1
         order           natural
+        gen_vec         1
         entropy         7
         spawn_key       ()
     >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
@@ -85,6 +86,7 @@ class CubQMCCLT(StoppingCriterion):
         dvec            [0 1 2]
         randomize       1
         order           natural
+        gen_vec         [     1 182667 469891]
         entropy         7
         spawn_key       ()
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))

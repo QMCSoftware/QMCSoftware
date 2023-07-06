@@ -4,7 +4,7 @@
 #   -C for sphix-build will not look for conf.py
 #   -b for sphinx-build will look for conf.py
 
-mddir = sphinx/readme_rst/
+mddir = sphinx/md_rst/
 nbdir = sphinx/demo_rst/
 umldir = sphinx/uml/
 nbconvertcmd = jupyter nbconvert --to rst --output-dir='$(nbdir)'
@@ -22,9 +22,15 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	@grep -v  "\[\!" README.md > README2.md
 	@pandoc --mathjax README2.md -o $(mddir)QMCSoftware.rst
 	@rm README2.md
+	# CONTRIBUTING --> RST
+	@pandoc --mathjax CONTRIBUTING.md -o $(mddir)CONTRIBUTING.rst
 	# Jupyter Notebook Demos --> RST
 	@mkdir $(nbdir)
 	@for f in demos/*.ipynb; do \
+		echo "#\tConverting $$f"; \
+		$(nbconvertcmd) $$f 2>/dev/null; \
+	done
+	@for f in demos/*/*/*.ipynb; do \
 		echo "#\tConverting $$f"; \
 		$(nbconvertcmd) $$f 2>/dev/null; \
 	done

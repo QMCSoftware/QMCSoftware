@@ -39,6 +39,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         dvec            [0 1]
         randomize       1
         order           natural
+        gen_vec         [     1 182667]
         entropy         7
         spawn_key       ()
     >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
@@ -85,6 +86,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         dvec            [0 1 2 3 4 5]
         randomize       1
         order           natural
+        gen_vec         [     1 182667 469891 498753 110745 446247]
         entropy         7
         spawn_key       ()
     
