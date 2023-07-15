@@ -33,12 +33,17 @@ class Matern(Gaussian):
             1.10090007, 1.07881531, 1.05168982, 1.02405704, 0.99693782,
             0.98095279, 0.96809501, 0.96005229, 0.9515122 , 0.94952871,
             0.95042189]])
+
+    References:
+
+        [1] scikit-learn developers, Matern kernel. 
+        https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.kernels.Matern.html.
+        Accessed 2023.
     """
     def __init__(self, sampler, x_values, length_scale = 1.0, nu = 1.5, variance = 1.0, mean = [], decomp_type='PCA'):
         """
         Matern kernel: calculates covariance over a metric space based only on the distance between points.
-        More information can be found at 
-        https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.kernels.Matern.html
+        More information can be found at [1].
         
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
