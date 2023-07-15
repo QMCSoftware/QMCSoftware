@@ -45,15 +45,15 @@ class Matern(Gaussian):
                 true measure by which to compose a transform. 
             x_values (array): The positions of points on a metric space.
             length_scale (float): Determines "peakiness", or how correlated 
-            two points are based on their distance.
+                two points are based on their distance.
             nu (float): The "smoothness" of the Matern function. e.g. nu=1.5
-            implies a once-differentiable function, while nu=2.5 implies twice
-            differentiability. Meanwhile, when nu=0.5, the Matern kernel equals
-            the RBF kernel, while when nu=inf, it equals the absolute exponential
-            kernel. Note that nu values not in [0.5, 1.5, 2.5, inf] will be 
-            ~10x slower to run.
+                implies a once-differentiable function, while nu=2.5 implies twice
+                differentiability. Meanwhile, when nu=0.5, the Matern kernel equals
+                the RBF kernel, while when nu=inf, it equals the absolute exponential
+                kernel. Note that nu values not in [0.5, 1.5, 2.5, inf] will be 
+                ~10x slower to run.
             variance (float): The variance (or the diagonal elements of the
-            covariance matrix) at each point. 
+                covariance matrix) at each point. 
             mean (float): mu for Normal(mu,sigma^2)
             decomp_type (str): method of decomposition either  
                 "PCA" for principal component analysis or 
