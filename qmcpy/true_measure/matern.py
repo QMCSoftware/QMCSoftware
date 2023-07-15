@@ -12,7 +12,7 @@ class Matern(Gaussian):
     >>> import numpy as np
     >>> mean = np.full(31, 1.1)
     >>> x_values = np.arange(31.0) / 30.0  # [0, 1/30, ..., 1]
-    >>> m = Matern(qp.Lattice(dimension=9, seed=7), x_values, length_scale = 0.5, variance = 0.01, mean=mean)
+    >>> m = Matern(Lattice(dimension=9, seed=7), x_values, length_scale = 0.5, variance = 0.01, mean=mean)
     >>> m
     Matern (TrueMeasure Object)
     mean            [1.1 1.1 1.1 ... 1.1 1.1 1.1]
