@@ -10,8 +10,8 @@ from scipy.special import kv, gamma
 class Matern(Gaussian):
     """
     A normal measure using a Matern kernel as the covariance matrix.
-    >>> mean = np.full(31, 1.1)
-    >>> x_values = np.arange(31.0) / 30.0  # [0, 1/30, ..., 1]
+    >>> mean = full(31, 1.1)
+    >>> x_values = arange(31.0) / 30.0  # [0, 1/30, ..., 1]
     >>> m = Matern(Lattice(dimension=31, seed=7), x_values, length_scale = 0.5, variance = 0.01, mean=mean)
     >>> m
     Matern (TrueMeasure Object)
