@@ -32,6 +32,30 @@ class Matern(Gaussian):
             1.2384988 , 1.2308771 , 1.22744825, 1.2275582 , 1.218964  ,
             1.2136328 , 1.2141693 , 1.21792116, 1.21125532, 1.19532303,
             1.17649556]])
+    >>> m2 = Matern(qp.Lattice(dimension = 31,seed=7), x_values, length_scale = 0.5, nu = 2.5, variance = 0.01, mean=mean)
+    >>> m2
+    Matern (TrueMeasure Object)
+        mean            [1.1 1.1 1.1 ... 1.1 1.1 1.1]
+        covariance      [[0.01  0.01  0.01  ... 0.002 0.002 0.001]
+                        [0.01  0.01  0.01  ... 0.002 0.002 0.002]
+                        [0.01  0.01  0.01  ... 0.002 0.002 0.002]
+                        ...
+                        [0.002 0.002 0.002 ... 0.01  0.01  0.01 ]
+                        [0.002 0.002 0.002 ... 0.01  0.01  0.01 ]
+                        [0.001 0.002 0.002 ... 0.01  0.01  0.01 ]]
+        decomp_type     PCA
+    >>> m3 = Matern(qp.Lattice(dimension = 31,seed=7), x_values, length_scale = 0.5, nu = 3.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
+    >>> m3
+    Matern (TrueMeasure Object)
+        mean            [1.1 1.1 1.1 ... 1.1 1.1 1.1]
+        covariance      [[0.01  0.01  0.01  ... 0.002 0.002 0.001]
+                        [0.01  0.01  0.01  ... 0.002 0.002 0.002]
+                        [0.01  0.01  0.01  ... 0.002 0.002 0.002]
+                        ...
+                        [0.002 0.002 0.002 ... 0.01  0.01  0.01 ]
+                        [0.002 0.002 0.002 ... 0.01  0.01  0.01 ]
+                        [0.001 0.002 0.002 ... 0.01  0.01  0.01 ]]
+        decomp_type     CHOLESKY
 
      References:
 
@@ -89,18 +113,22 @@ class Matern(Gaussian):
         for i in range(dimension):
             for j in range(dimension):
                 d = abs(x_values[i] - x_values[j])
-                if isclose(nu, 0.5):
+                if d == 0:
+                    covariance[i][j] = 1 #convergent value
+                elif isclose(nu, 0.5):
                     covariance[i][j] = exp(-1 * d / rho)
                 elif isclose(nu, 1.5):
                     covariance[i][j] = (1 + sqrt(3) * d / rho) * exp(-1 * sqrt(3) * d / rho)
                 elif isclose(nu, 2.5):
                     covariance[i][j] = ((1 + sqrt(5) * d / rho + 5 * d ** 2 / (3 * rho ** 2)) * 
                                         exp(-1 * sqrt(5) * d / rho))
-                elif nu == inf:
-                    covariance[i][j] = exp(-1 * d ** 2 / (2 * rho ** 2))
                 else:
                     k = sqrt(2 * nu) * d / rho
                     covariance[i][j] = 2 ** (1 - nu) / gamma(nu) * k ** nu * kv(nu, k)
+                """ this doesn't produce a positive definite matrix, so it isn't accepted in Gaussian
+                elif nu == inf:
+                    covariance[i][j] = exp(-1 * d ** 2 / (2 * rho ** 2))
+                """
                 covariance[i][j] = covariance[i][j] * variance
         
         #print(covariance)
