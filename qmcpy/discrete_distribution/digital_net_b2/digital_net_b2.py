@@ -2,9 +2,12 @@ from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 from ..c_lib import c_lib
 import ctypes
-from os.path import dirname, abspath, isfile
+from os.path import dirname, abspath, isfile, sep
 from numpy import *
 import warnings
+
+from joblib import Parallel, delayed
+from .hosobol_helper import *
 
 
 class DigitalNetB2(LD):
@@ -307,3 +310,149 @@ class DigitalNetB2(LD):
             t_lms=self.t_lms)
 
 class Sobol(DigitalNetB2): pass
+
+class HOSobol(DigitalNetB2):
+    """
+    Higher-order Sobol sequence.
+
+    Args:
+        m: 2^m number of points
+        s: dimension of final point set
+        d: interlacing factor. Defaults to 1
+        sobolfile: file containing Sobol sequence of order 1, default to "sobol.dat" in the code directory
+        is_parallel: Default to True to perform parallel computations, False serial
+
+    Returns:
+        A matrix of higher-order Sobol points, where the number of columns equals the dimension and the
+        number of rows equals the number of points.
+
+    Examples:
+    >>> HOSobol(0, 1).generate()
+    array([[0.]])
+
+    >>> HOSobol(1, 1).generate()
+    array([[0. ],
+           [0.5]])
+
+    >>> HOSobol(2, 1).generate()
+    array([[0.  ],
+           [0.5 ],
+           [0.75],
+           [0.25]])
+
+    >>> HOSobol(3, 4).generate()
+    array([[0.   , 0.   , 0.   , 0.   ],
+           [0.5  , 0.5  , 0.5  , 0.5  ],
+           [0.75 , 0.25 , 0.25 , 0.25 ],
+           [0.25 , 0.75 , 0.75 , 0.75 ],
+           [0.375, 0.375, 0.625, 0.875],
+           [0.875, 0.875, 0.125, 0.375],
+           [0.625, 0.125, 0.875, 0.625],
+           [0.125, 0.625, 0.375, 0.125]])
+
+   >>> HOSobol(0, 1, 2).generate()
+   array([[0.]])
+
+    >>> HOSobol(1, 1, 2).generate()
+    array([[0.  ],
+           [0.75]])
+
+    >>> HOSobol(2, 1, 2).generate()
+    array([[0.    ],
+           [0.75  ],
+           [0.6875],
+           [0.4375]])
+
+    >>> HOSobol(3, 4, 2).generate()
+    array([[0.      , 0.      , 0.      , 0.      ],
+           [0.75    , 0.75    , 0.75    , 0.75    ],
+           [0.6875  , 0.1875  , 0.9375  , 0.4375  ],
+           [0.4375  , 0.9375  , 0.1875  , 0.6875  ],
+           [0.234375, 0.859375, 0.171875, 0.484375],
+           [0.984375, 0.109375, 0.921875, 0.734375],
+           [0.546875, 0.921875, 0.859375, 0.046875],
+           [0.296875, 0.171875, 0.109375, 0.796875]])
+
+    Reference:
+    Josef Dick, How to generate higher order Sobol points in Matlab and some numerical examples, 2010,
+    https://quasirandomideas.wordpress.com/2010/06/17/how-to-generate-higher-order-sobol-points-in-matlab-and-some-numerical-examples/
+    """
+
+    def __init__(self, m, s, d=2, sobolfile=f"generating_matrices{sep}sobol.dat", is_parallel=True):
+        self.m = m
+        self.s = s
+        self.d = d
+        self.sobolfile = sobolfile
+        self.is_parallel = is_parallel
+
+    def generate(self, is_parallel=True):
+        bits = 52
+        z = np.loadtxt(self.sobolfile)
+        z = z[:2 ** self.m, :self.s * self.d]
+        if self.d > 1:
+            n = pow(2, self.m)  # Number of points
+            depth = int(np.floor(bits / self.d))
+
+            W = z * pow(2, np.int64(depth))
+            Z = np.floor(np.transpose(W))
+            Y = np.zeros((self.s, n))
+
+            if is_parallel:
+                def process_j(j):
+                    for i in range(depth):
+                        for k in range(self.d):
+                            Y[j, :] = bitset(a=Y[j, :],
+                                             bit=(depth * self.d + 1) - (k + 1) - i * self.d,
+                                             v=bitget(a=Z[j * self.d + k, :], bit=depth - i))
+                    return Y[j, :]
+
+                Y = Parallel(n_jobs=-1)(delayed(process_j)(j) for j in range(self.s))
+                Y = np.array(Y) * pow(2, -depth * self.d)
+                X = np.transpose(Y)
+            else:
+                Y = np.array(Y) * pow(2, -depth * self.d)
+                for j in range(self.s):
+                    for i in range(depth):
+                        for k in range(self.d):
+                            Y[j, :] = bitset(a=Y[j, :],
+                                             bit=(depth * self.d + 1) - (k + 1) - i * self.d,
+                                             v=bitget(a=Z[j * self.d + k, :], bit=depth - i))
+
+                Y = Y * pow(2, -depth * self.d)
+                X = np.transpose(Y)
+        else:
+            X = z
+        return X
+
+
+
+def run_doctests():
+    import doctest
+    import time
+    import importlib
+
+    module_name = "digital_net_b2"
+    module = importlib.import_module(module_name)
+
+    tests = doctest.DocTestFinder().find(module)
+    runner = doctest.DocTestRunner()
+
+    start_time = time.time()
+
+    for test in tests:
+        runner.run(test)
+    end_time = time.time()
+    print("\nDoctests completed in {:.2f} seconds.\n".format(end_time - start_time))
+
+
+if __name__ == "__main__":
+    run_doctests()
+
+    import time
+
+    for is_parallel in [True, False]:
+        start_time = time.time()
+        print(HOSobol(10, 10, 2, is_parallel=is_parallel).generate())  # parallel speed up is about 6 times
+        end_time = time.time()
+
+        print(f"\n{is_parallel = } test case completed in {end_time - start_time:.2f} seconds.\n")
