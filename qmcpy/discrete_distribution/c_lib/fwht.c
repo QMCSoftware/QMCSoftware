@@ -17,7 +17,8 @@ EXPORT void fwht_copy(unsigned int n, double *src, double *dst)
     memcpy(a, src, sizeof(double) * n);
 
     // Fast Walsh Hadamard Transform.
-    int i, j, s;
+    int i, s;
+    unsigned int j;
     for (i = n >> 1; i > 0; i >>= 1)
     {
         for (j = 0; j < n; j++)

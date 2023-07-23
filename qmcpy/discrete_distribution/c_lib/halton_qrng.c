@@ -29,6 +29,7 @@ PyMODINIT_FUNC PyInit_c_lib(void)
 {
     // do stuff...
     printf("");
+    return 0;
 }
 
 /* Primes for ghalton() */
