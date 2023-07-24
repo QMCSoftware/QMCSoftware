@@ -57,6 +57,13 @@ class Matern(Gaussian):
                         [1.378e-03 1.000e-02 1.378e-03]
                         [3.432e-05 1.378e-03 1.000e-02]]
         decomp_type     CHOLESKY
+    >>> m2._spawn(Lattice(dimension = 3,seed=7))
+    Matern (TrueMeasure Object)
+        mean            [1.1 1.1 1.1]
+        covariance      [[0.01  0.005 0.002]
+                        [0.005 0.01  0.008]
+                        [0.002 0.008 0.01 ]]
+        decomp_type     PCA
 
      References:
 
@@ -154,6 +161,6 @@ class Matern(Gaussian):
         super().__init__(sampler, mean=mean, covariance=covariance, decomp_type=decomp_type)
 
     def _spawn(self, sampler):
-        return Matern(sampler, self.points, length_scale=self.length_scale, nu=self.nu, variance=self.variance, 
+        return Matern(sampler, points=self.points, distance=self.distance, length_scale=self.length_scale, nu=self.nu, variance=self.variance, 
                       mean=self.mean, decomp_type=self.decomp_type)
         
