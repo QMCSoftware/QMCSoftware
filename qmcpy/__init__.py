@@ -5,4 +5,4 @@ from .stopping_criterion import *
 from .util import plot_proj 
 
 name = "qmcpy"
-__version__ = "1.4.1"
+__version__ = "1.4.2"
