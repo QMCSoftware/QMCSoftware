@@ -44,7 +44,7 @@ class Matern(Gaussian):
     >>> from sklearn import gaussian_process as gp  #checking against scikit's Matern
     >>> kernel2 = gp.kernels.Matern(length_scale = 4, nu=2.5)
     >>> cov2 = 0.01 * kernel2.__call__(points)
-    >>> np.isclose(cov2, m2.covariance)
+    >>> isclose(cov2, m2.covariance)
     [[ True  True  True]
      [ True  True  True]
      [ True  True  True]]
