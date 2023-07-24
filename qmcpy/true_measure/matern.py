@@ -45,9 +45,9 @@ class Matern(Gaussian):
     >>> kernel2 = gp.kernels.Matern(length_scale = 4, nu=2.5)
     >>> cov2 = 0.01 * kernel2.__call__(points)
     >>> isclose(cov2, m2.covariance)
-    [[ True  True  True]
-     [ True  True  True]
-     [ True  True  True]]
+    array([[ True,  True,  True],
+           [ True,  True,  True],
+           [ True,  True,  True]])
     >>> distance = array([[0, 1, 2], [1, 0, 1], [2, 1, 0]])
     >>> m3 = Matern(Lattice(dimension = 3,seed=7), distance = distance, length_scale = 0.5, nu = 3.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
     >>> m3
