@@ -33,7 +33,7 @@ class Matern(Gaussian):
             1.17649556]])
     >>> points = array([[5, 4], [1, 2], [0, 0]])
     >>> mean = full(3, 1.1)
-    >>> m2 = Matern(Lattice(dimension = 3,seed=7), points, length_scale = 4, nu = 2.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
+    >>> m2 = Matern(Lattice(dimension = 3,seed=7), points, length_scale = 4, nu = 2.5, variance = 0.01, mean=mean)
     >>> m2
     Matern (TrueMeasure Object)
         mean            [1.1 1.1 1.1]
