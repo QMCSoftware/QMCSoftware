@@ -10,8 +10,8 @@ class Matern(Gaussian):
     """
     A normal measure using a Matern kernel as the covariance matrix.
     >>> mean = full(31, 1.1)
-    >>> x_values = atleast_2d(arange(31.0) / 30.0).T  # [[0], [1/30], ..., [1]]
-    >>> m = Matern(Lattice(dimension=31, seed=7), points = x_values, length_scale = 0.5, variance = 0.01, mean=mean)
+    >>> x_values = arange(31.0) / 30.0 #[0, 1/30, ..., 1]
+    >>> m = Matern(Lattice(dimension=31, seed=7), x_values, length_scale = 0.5, variance = 0.01, mean=mean)
     >>> m
     Matern (TrueMeasure Object)
         mean            [1.1 1.1 1.1 ... 1.1 1.1 1.1]
@@ -33,7 +33,7 @@ class Matern(Gaussian):
             1.17649556]])
     >>> points = array([[5, 4], [1, 2], [0, 0]])
     >>> mean = full(3, 1.1)
-    >>> m2 = Matern(Lattice(dimension = 3,seed=7), points = points, length_scale = 4, nu = 2.5, variance = 0.01, mean=mean)
+    >>> m2 = Matern(Lattice(dimension = 3,seed=7), points, length_scale = 4, nu = 2.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
     >>> m2
     Matern (TrueMeasure Object)
         mean            [1.1 1.1 1.1]
@@ -48,8 +48,8 @@ class Matern(Gaussian):
     array([[ True,  True,  True],
            [ True,  True,  True],
            [ True,  True,  True]])
-    >>> distance = array([[0, 1, 2], [1, 0, 1], [2, 1, 0]])
-    >>> m3 = Matern(Lattice(dimension = 3,seed=7), distance = distance, length_scale = 0.5, nu = 3.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
+    >>> x_values = array([0, 1, 2])
+    >>> m3 = Matern(Lattice(dimension = 3,seed=7), x_values, length_scale = 0.5, nu = 3.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
     >>> m3
     Matern (TrueMeasure Object)
         mean            [1.1 1.1 1.1]
@@ -57,13 +57,6 @@ class Matern(Gaussian):
                         [1.378e-03 1.000e-02 1.378e-03]
                         [3.432e-05 1.378e-03 1.000e-02]]
         decomp_type     CHOLESKY
-    >>> m2._spawn(Lattice(dimension = 3,seed=7))
-    Matern (TrueMeasure Object)
-        mean            [1.1 1.1 1.1]
-        covariance      [[0.01  0.005 0.002]
-                        [0.005 0.01  0.008]
-                        [0.002 0.008 0.01 ]]
-        decomp_type     PCA
 
      References:
 
@@ -76,7 +69,7 @@ class Matern(Gaussian):
         https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function.)
     """
 
-    def __init__(self, sampler, points = None, distance = None, length_scale = 1.0, nu = 1.5, variance = 1.0, mean = [], decomp_type='PCA'):
+    def __init__(self, sampler, points, length_scale = 1.0, nu = 1.5, variance = 1.0, mean = [], decomp_type='PCA'):
         """
         Matern kernel: calculates covariance over a metric space based only on the distance between points.
         More information can be found at [1].
@@ -87,10 +80,6 @@ class Matern(Gaussian):
                 true measure by which to compose a transform. 
             points (ndarray): The positions of points on a metric space. The array
                 should be of shape n x d: n points, each of dimension d.
-            distance (ndarray): A 2D array where the (i, j)th value is the distance
-                between the ith and jth-index points. You can pass in either a points or
-                distance array; if both are passed in, distance will be used. Must
-                be a symmetric matrix with diagonal values of zero.
             length_scale (float): Determines "peakiness", or how correlated 
                 two points are based on their distance.
             nu (float): The "smoothness" of the Matern function. e.g. nu=1.5
@@ -110,15 +99,14 @@ class Matern(Gaussian):
         """
         if not (isinstance(sampler, DiscreteDistribution) or isinstance(sampler, TrueMeasure)):
             raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure.")
-        if not (isinstance(points, ndarray) or isinstance(distance, ndarray)):
-            raise ParameterError("Must pass in either a points or distance ndarray.")
-        if not (sampler.d == len(mean)):
-            raise DimensionError("The lengths of the sampler and the mean array must be equal.")
+        if not (isinstance(points, ndarray)):
+            raise ParameterError("Must pass in a points ndarray.")
+        if not (sampler.d == len(mean) and points.shape[0] == len(mean)):
+            raise DimensionError("The lengths of the sampler and mean array and the number of points must all be equal.")
         
+        if len(points.shape) == 1: #one dimensional points array, 1 x N
+            points = atleast_2d(points).T
         self.points = points
-        self.distance = distance
-        d_or_p = isinstance(distance, ndarray) #if false, distance == None, meaning we're using points
-        self.d_or_p = d_or_p
         self.length_scale = length_scale
         self.nu = nu
         self.variance = variance
@@ -128,17 +116,10 @@ class Matern(Gaussian):
         dimension = len(mean)
         rho = length_scale
         covariance = zeros((dimension, dimension))
-        if d_or_p and (len(distance) != len(mean) or len(distance[0]) != len(mean)):
-            raise DimensionError("The length and width of the distance array must equal the length of the mean array.")
-        if (not d_or_p) and len(points) != len(mean):
-            raise DimensionError("The number of rows of the points array must equal the length of the mean array.")
+        
         for i in range(dimension):
-            if d_or_p and distance[i][i] != 0:
-                raise ParameterError("The diagonal elements of distance must equal 0.")
             for j in range(dimension):
-                if d_or_p and distance[i][j] != distance [j][i]:
-                    raise ParameterError("The distance array must be symmetric.")
-                d = distance[i][j] if d_or_p else linalg.norm(points[i] - points[j])
+                d = linalg.norm(points[i] - points[j])
                 if d == 0:
                     covariance[i][j] = 1 #convergent value
                 elif isclose(nu, 0.5):
@@ -161,6 +142,6 @@ class Matern(Gaussian):
         super().__init__(sampler, mean=mean, covariance=covariance, decomp_type=decomp_type)
 
     def _spawn(self, sampler):
-        return Matern(sampler, points=self.points, distance=self.distance, length_scale=self.length_scale, nu=self.nu, variance=self.variance, 
+        return Matern(sampler, self.points, length_scale=self.length_scale, nu=self.nu, variance=self.variance, 
                       mean=self.mean, decomp_type=self.decomp_type)
         
