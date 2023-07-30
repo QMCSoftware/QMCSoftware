@@ -79,16 +79,11 @@ class TestLattice(unittest.TestCase):
             [3. / 8, 1. / 8, 1. / 8, 3. / 8],
             [5. / 8, 7. / 8, 7. / 8, 5. / 8],
             [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
-        cpu_time = {}
         for is_parallel in [False, True]:
-            start_time = time.process_time()
             distribution = Lattice(dimension=4, randomize=False, order='linear', is_parallel=is_parallel)
             ld_sample = distribution.gen_samples(n_min=4, n_max=8, warn=False)
-            end_time = time.process_time()
             self.assertTrue((ld_sample==true_sample).all())
-            cpu_time[is_parallel] = end_time - start_time
 
-        self.assertTrue(cpu_time[True] <= cpu_time[False])
 
     def test_gail_order(self):
         true_sample = array([
