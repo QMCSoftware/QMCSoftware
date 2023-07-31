@@ -123,7 +123,6 @@ class Lattice(LD):
             m_max (int): 2^m_max is the max number of supported samples
             is_parallel (bool): Default to False to perform sequential computations, True parallel
 
-
         Note:
             d_max and m_max are required if generating_vector is a ndarray.
             If generating_vector is an string (path), d_max and m_max can be taken from the file name if None
@@ -171,7 +170,6 @@ class Lattice(LD):
         self.parameters += ["gen_vec"]
         self.is_parallel = is_parallel
 
-
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
@@ -202,7 +200,6 @@ class Lattice(LD):
         x = outer(y, self.gen_vec) % 1
         return x
 
-
     def calculate_y(self, m_low, m_high, y):
         for m in range(m_low, m_high):
             n = 2 ** m
@@ -228,7 +225,6 @@ class Lattice(LD):
             return x
 
     def _gail_natural(self, n_min, n_max):
-
         m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
         if not self.is_parallel:
