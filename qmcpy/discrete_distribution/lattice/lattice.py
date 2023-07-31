@@ -182,7 +182,6 @@ class Lattice(LD):
             # create a ThreadPoolExecutor and submit to it tasks
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = [executor.submit(gen_block, 2 ** m) for m in range(int(m_low), int(m_high) + 1)]
-
             # collect the results in the order the futures (calls) created
             x_lat_full = vstack([future.result() for future in futures])
 
@@ -233,7 +232,6 @@ class Lattice(LD):
             # create a ThreadPoolExecutor and submit to it tasks
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
-
             # collect the results in the order the futures (calls) created
             x_lat_full = vstack([future.result() for future in futures])
 
