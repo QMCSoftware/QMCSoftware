@@ -135,7 +135,8 @@ class DigitalNetB2(LD):
                 ndarray should have shape (d_max, m_max) where each int has t_max bits
                 generating_matrices sould be formatted like `gen_mat.21201.32.32.msb.npy` 
                 with name.d_max.t_max.m_max.{msb,lsb}.npy
-                integer inputs should be larger than 1; passing in an integer M results in a randomized generating matrices of shape (d_max = dimension,M_max = M), containing integral elements [0,2^t_max). 
+                integer inputs should be larger than 1; passing in an integer M results in a 
+                randomized generating matrices of shape (d_max = dimension,M_max = log_2(M)), containing integral elements [0,2^t_max). 
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix. 
                 aka: number of rows in a generating matrix with ints expanded into columns
@@ -150,7 +151,7 @@ class DigitalNetB2(LD):
             randomize = True
             self.set_rshift = True 
             if isinstance(generating_matrices,int):
-                self.set_lms = False
+                self.set_lms = True 
             else:
                 self.set_lms = True
         elif (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
@@ -204,9 +205,8 @@ class DigitalNetB2(LD):
             self.m_max = int(parts[-3])
             self.msb = bool(parts[-2].lower()=='msb')
         elif isinstance(generating_matrices,int):
-            if t_max == None:
-                self.t_max=64
-            self.m_max = int(floor(log2(generating_matrices)))
+            self.m_max = min(max(2,generating_matrices),64)
+            self.t_max = self.m_max
             self.d_max = dimension
             self.msb = msb
         else:
@@ -228,7 +228,19 @@ class DigitalNetB2(LD):
         self.low_discrepancy = True
         super(DigitalNetB2,self).__init__(dimension,seed)
         if isinstance(generating_matrices,int):
-            self.z_og = self.rng.integers(low=0,high=2**64,size=(self.d_max,self.m_max),dtype=uint64)        
+            for j in range(self.d):
+                dvecj = self.dvec[j]
+                for t in range(self.t_lms):
+                    t1 = min(t,self.t_max)
+                    u = self.rng.integers(low=0,high=1<<t1,size=1,dtype=uint64)
+                    u <<= (self.t_max-t1) 
+                    if t1>self.t_max: u += 1<<(self.t_max-t1-1)
+                    #The goal is to stack the u's in rows instead of columns, and then apply scrambling to the matrix 
+                    for m in range(self.m_max):
+                        v = u&self.z_og[dvecj,m]
+                        s = self._count_set_bits(v)%2
+                        if s: self.z[j,m] += uint64(1<<(self.t_lms-t-1))
+       
         if self.t_max>64 or self.t_lms>64 or self.t_max>self.t_lms:
             raise Exception("require t_max <= t_lms <= 64")
         self.z = zeros((self.d,self.m_max),dtype=uint64)
