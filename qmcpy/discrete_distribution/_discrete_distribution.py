@@ -1,8 +1,6 @@
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 from numpy import *
 
-
-
 class DiscreteDistribution(object):
     """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
 
@@ -53,33 +51,7 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
-    def plot(self, n, d_horizontal=0, d_vertical = 1, axis=None, **kwargs):
-        """
-        Args:
-            n (int): n is the number of samples that will be plotted 
-            d_vertical (int): d_vertical is the index of points that will be plotted on the vertical axis. 
-            d_horizontal (int): d_horizontal is the index of points that will be plotted as the horizontial axis.
-        """
-        try:
-            import matplotlib.pyplot as plt
-        except:
-            raise ImportError("Missing matplotlib.pyplot as plt, Matplotlib must be intalled to run DiscreteDistribution.plot")
-        samples = self.gen_samples(n)
-        if axis is None:
-            fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 5))
-        else: 
-            ax = axis 
-            fig = plt.figure()
-        ax.scatter(samples[:, d_horizontal], samples[:, d_vertical], **kwargs)
-        ax.set_xlabel(r'$x_{%d}$'%d_horizontal)
-        ax.set_ylabel(r'$x_{%d}$'%d_vertical)
-        ax.set_xlim([0, 1])
-        ax.set_ylim([0, 1])
-        ax.set_xticks([0, 1])
-        ax.set_yticks([0, 1])
-        ax.set_aspect(1)
-        return fig, ax
-
+    
     def spawn(self, s=1, dimensions=None):
         """
         Spawn new instances of the current discrete distribution but with new seeds and dimensions.
