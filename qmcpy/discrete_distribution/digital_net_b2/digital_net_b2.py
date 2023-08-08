@@ -230,7 +230,7 @@ class DigitalNetB2(LD):
         if isinstance(generating_matrices,int):
             for j in range(self.d):
                 dvecj = self.dvec[j]
-                for t in range(self.t_lms):
+                for t in range(self.t_max):
                     t1 = min(t,self.t_max)
                     u = self.rng.integers(low=0,high=1<<t1,size=1,dtype=uint64)
                     u <<= (self.t_max-t1) 
