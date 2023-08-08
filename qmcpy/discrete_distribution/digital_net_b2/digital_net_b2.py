@@ -208,7 +208,7 @@ class DigitalNetB2(LD):
             self.m_max = min(max(2,generating_matrices),64)
             self.t_max = self.m_max
             self.d_max = dimension
-            self.msb = msb
+            self.msb = True
         else:
             msg = '''
                 z_path sould be formatted like `name.d_max.m_max.t_max.msb_or_lsb.npy`
@@ -228,18 +228,14 @@ class DigitalNetB2(LD):
         self.low_discrepancy = True
         super(DigitalNetB2,self).__init__(dimension,seed)
         if isinstance(generating_matrices,int):
+            self.z_og = zeros((self.d_max,self.t_max),dtype=uint64)
             for j in range(self.d):
                 dvecj = self.dvec[j]
                 for t in range(self.t_max):
-                    t1 = min(t,self.t_max)
-                    u = self.rng.integers(low=0,high=1<<t1,size=1,dtype=uint64)
-                    u <<= (self.t_max-t1) 
-                    if t1>self.t_max: u += 1<<(self.t_max-t1-1)
-                    #The goal is to stack the u's in rows instead of columns, and then apply scrambling to the matrix 
-                    for m in range(self.m_max):
-                        v = u&self.z_og[dvecj,m]
-                        s = self._count_set_bits(v)%2
-                        if s: self.z[j,m] += uint64(1<<(self.t_lms-t-1))
+                    u = self.rng.integers(low=0,high=1<<t,size=1,dtype=uint64)
+                    u <<= (self.t_max-t) 
+                    u += 1<<(self.t_max-t-1)
+                    self.z_og[j,t] = u
        
         if self.t_max>64 or self.t_lms>64 or self.t_max>self.t_lms:
             raise Exception("require t_max <= t_lms <= 64")
