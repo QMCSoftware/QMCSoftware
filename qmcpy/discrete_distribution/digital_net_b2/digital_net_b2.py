@@ -136,7 +136,7 @@ class DigitalNetB2(LD):
                 generating_matrices sould be formatted like `gen_mat.21201.32.32.msb.npy` 
                 with name.d_max.t_max.m_max.{msb,lsb}.npy
                 integer inputs should be larger than 1; passing in an integer M results in a 
-                randomized generating matrices of shape (d_max = dimension,M_max = log_2(M)), containing integral elements [0,2^t_max). 
+                randomized generating matrices of shape (m_max = generating_matrices,t_max = m_max), containing integral elements [0,2^t_max). 
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix. 
                 aka: number of rows in a generating matrix with ints expanded into columns
@@ -231,12 +231,20 @@ class DigitalNetB2(LD):
             self.z_og = zeros((self.d_max,self.t_max),dtype=uint64)
             for j in range(self.d):
                 dvecj = self.dvec[j]
+                if self._verbose: print('\n\tc[dvec[%d]]\n\t\t'%j,end='',flush=True)
                 for t in range(self.t_max):
                     u = self.rng.integers(low=0,high=1<<t,size=1,dtype=uint64)
                     u <<= (self.t_max-t) 
                     u += 1<<(self.t_max-t-1)
                     self.z_og[j,t] = u
-       
+                for t in range(self.t_max):
+                    if self._verbose:
+                        for tprint in range(self.t_max):
+                            mask = 1<<(self.t_max-t-1)
+                            bit = (int(self.z_og[j,tprint])&mask)>0
+                            print('%-2d'%bit,end='',flush=True)
+                        print('\n\t\t',end='',flush=True)
+        if isinstance(generating_matrices,int) and self._verbose : print('c (generating_matrix)') 
         if self.t_max>64 or self.t_lms>64 or self.t_max>self.t_lms:
             raise Exception("require t_max <= t_lms <= 64")
         self.z = zeros((self.d,self.m_max),dtype=uint64)
