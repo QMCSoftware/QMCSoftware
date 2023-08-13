@@ -170,20 +170,33 @@ class Lattice(LD):
         self.parameters += ["gen_vec"]
         self.is_parallel = is_parallel
 
+
+
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
-        m_low = floor(log2(n_min))+1 if n_min > 0 else 0
+        m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
-        gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
 
         if not self.is_parallel:
+            gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
             x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
         else:
-            # create a ThreadPoolExecutor and submit to it tasks
+            def gen_point(i, n):
+                """ Generate a single lattice point. """
+                return ((i * self.gen_vec) % n) / float(n)
+            def gen_block_points(m):
+                """ Generate a block of points. """
+                n = 2 ** m
+                return [gen_point(i, n) for i in arange(1, n + 1, 2)]
+
+            all_points = []
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                futures = [executor.submit(gen_block, 2 ** m) for m in range(int(m_low), int(m_high) + 1)]
-            # collect the results in the order the futures (calls) created
-            x_lat_full = vstack([future.result() for future in futures])
+                futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
+                for future in futures:
+                    all_points.extend(future.result())
+
+            # Assemble all points into a matrix
+            x_lat_full = vstack(all_points)
 
         cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
         cut2 = int(cut1 + n_max - n_min)
