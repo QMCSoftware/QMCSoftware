@@ -3,7 +3,6 @@ from ...util import ParameterError, ParameterWarning
 from numpy import *
 from os.path import dirname, abspath, isfile
 import warnings
-import concurrent.futures
 
 class Lattice(LD):
     """
@@ -103,7 +102,7 @@ class Lattice(LD):
     """
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
-        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, is_parallel=False):
+        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, is_parallel=True):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -121,7 +120,7 @@ class Lattice(LD):
                 M is restricted between 2 and 26 for numerical percision. The generating vector is [1,v_1,v_2,...,v_dimension], where v_i is an integer in {3,5,...,2*M-1}. 
             d_max (int): maximum dimension
             m_max (int): 2^m_max is the max number of supported samples
-            is_parallel (bool): Default to False to perform sequential computations, True parallel
+            is_parallel (bool): Default to True to perform parallel computations, False serial
 
         Note:
             d_max and m_max are required if generating_vector is a ndarray.
@@ -174,13 +173,14 @@ class Lattice(LD):
 
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
-        m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
+        m_low = floor(log2(n_min))+1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
 
         if not self.is_parallel:
             gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
             x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
         else:
+            import concurrent.futures
             def gen_point(i, n):
                 """ Generate a single lattice point. """
                 return ((i * self.gen_vec) % n) / float(n)
@@ -242,6 +242,7 @@ class Lattice(LD):
         if not self.is_parallel:
             x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low), int(m_high) + 1)])
         else:
+            import concurrent.futures
             # create a ThreadPoolExecutor and submit to it tasks
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]

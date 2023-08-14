@@ -34,5 +34,4 @@ is_parallel = True, trials = 3, for order = 'MPS', 0.879s. weights[1,5] = 0.8235
 
 is_parallel = False, trials = 3, for order = 'MPS', 3.094s. weights[1,5] = 0.8235392637361244
 
-
 """
