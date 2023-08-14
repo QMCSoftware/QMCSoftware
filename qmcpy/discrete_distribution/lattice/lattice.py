@@ -4,6 +4,7 @@ from numpy import *
 from os.path import dirname, abspath, isfile
 import warnings
 
+
 class Lattice(LD):
     """
     Quasi-Random Lattice nets in base 2.
@@ -170,7 +171,6 @@ class Lattice(LD):
         self.is_parallel = is_parallel
 
 
-
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
@@ -189,14 +189,10 @@ class Lattice(LD):
                 n = 2 ** m
                 return [gen_point(i, n) for i in arange(1, n + 1, 2)]
 
-            all_points = []
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
-                for future in futures:
-                    all_points.extend(future.result())
-
-            # Assemble all points into a matrix
-            x_lat_full = vstack(all_points)
+                # collect the results in the order the futures were created
+                x_lat_full = vstack([future.result() for future in futures])
 
         cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
         cut2 = int(cut1 + n_max - n_min)
@@ -243,7 +239,7 @@ class Lattice(LD):
             x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low), int(m_high) + 1)])
         else:
             import concurrent.futures
-            # create a ThreadPoolExecutor and submit to it tasks
+            # create a ThreadPoolExecutor
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
             # collect the results in the order the futures (calls) created
