@@ -206,6 +206,7 @@ class PFGPCI(StoppingCriterion):
                 self.verbose, self.approx_true_solution)
         batch_count = 0
         while True:
+            if self.verbose: print('batch %d'%batch_count)
             if batch_count==0:
                 if self.init_samples: 
                     xdraw,ydraw = self.x_init,self.y_init

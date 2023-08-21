@@ -59,7 +59,6 @@ class PFGPCIData(AccumulateData):
         super(PFGPCIData,self).__init__()
 
     def update_data(self, batch_count, xdraw, ydrawtf):
-        if self.verbose: print('batch %d'%batch_count)
         self.n_batch.append(len(xdraw))
         self.x,self.y = vstack([self.x,xdraw]),hstack([self.y,ydrawtf])
         if batch_count==0 or self.refit:
@@ -103,8 +102,8 @@ class PFGPCIData(AccumulateData):
         if self.approx_true_solution: axtrace.plot(.5+arange(len(self.n_batch)),self.solutions_ref,color='c',label=r'$P(g)$')
         axtrace.plot(.5+arange(len(self.n_batch)),self.solutions,'-o',color='k',label=r'$\hat{P}_n^\mathrm{QMC}$')
         axtrace.fill_between(.5+arange(len(self.n_batch)),self.ci_low,self.ci_high,color='k',alpha=.15)
-        axtrace.plot(.5+arange(len(self.n_batch)),self.error_bounds,'-o',color='m',label=r'$\hat{\gamma}_n^\text{QMC}$')
-        if self.approx_true_solution: axtrace.plot(.5+arange(len(self.n_batch)),self.error_ref,'-o',color='b',label=r'$\vert \hat{P}_n^\text{QMC} - P(g) \vert$')
+        axtrace.plot(.5+arange(len(self.n_batch)),self.error_bounds,'-o',color='m',label=r'$\hat{\gamma}_n^{\text{QMC}}$')
+        if self.approx_true_solution: axtrace.plot(.5+arange(len(self.n_batch)),self.error_ref,'-o',color='b',label=r'$\vert \hat{P}_n^{\text{QMC}} - P(g) \vert$')
         axtrace.set_xlim([0,len(self.n_batch)])
         axtrace.set_xticks([])
         axtrace.set_yscale('log',base=10)

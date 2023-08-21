@@ -9,16 +9,16 @@ class Hartmann6d(Integrand):
     >>> x = h6d.discrete_distrib.gen_samples(2**10)
     >>> y = h6d.f(x)
     >>> y.mean()
-    -2.6116291371551125e-13
+    -0.2613140309713834
     >>> h6d.true_measure
     Uniform (TrueMeasure Object)
-        lower_bound     -8
-        upper_bound     2^(3)
+        lower_bound     0
+        upper_bound     1
     """
     def __init__(self, sampler):
         self.sampler = sampler
         assert self.sampler.d==6
-        self.true_measure = Uniform(self.sampler,lower_bound=-8,upper_bound=8)
+        self.true_measure = Uniform(self.sampler,lower_bound=0,upper_bound=1)
         super(Hartmann6d,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
         from botorch.test_functions.multi_fidelity import AugmentedHartmann
         self.ah = AugmentedHartmann(negate=False)

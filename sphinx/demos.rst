@@ -55,3 +55,5 @@ Demos
     demo_rst/dakota_genz.rst
 
     demo_rst/pydata.chi.2023.rst
+
+    demo_rst/prob_failure_gp_ci.rst
