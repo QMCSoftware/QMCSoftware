@@ -1,6 +1,7 @@
 from ._accumulate_data import AccumulateData
 from numpy import *
 from scipy.stats import norm
+import warnings
 try:
     import gpytorch 
     import torch
@@ -202,7 +203,9 @@ class PFGPCIData(AccumulateData):
             gp_mean_mesh,gp_std_mesh = gp_mean.reshape(x0mesh.shape),gp_std.reshape(x0mesh.shape)
             ax2j = fig.add_subplot(gs[row_idx,j])
             ax2j.contourf(x0mesh,x1mesh,gp_mean_mesh,cmap=cm.Greys,vmin=gp_mean.min(),vmax=gp_mean.max(),levels=clevels)
-            ax2j.contour(x0mesh,x1mesh,gp_mean_mesh,colors='lightgreen',levels=[0],linewidths=5)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                ax2j.contour(x0mesh,x1mesh,gp_mean_mesh,colors='lightgreen',levels=[0],linewidths=5)
             ax2j.set_title(r'$m_n(u)$')
             row_idx += 1
             ax3j = fig.add_subplot(gs[row_idx,j])            

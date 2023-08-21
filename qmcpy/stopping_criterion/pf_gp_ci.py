@@ -1,5 +1,6 @@
 from ._stopping_criterion import StoppingCriterion
 from ..discrete_distribution import DigitalNetB2
+from ..integrand.ishigami import Ishigami
 from ..true_measure._true_measure import TrueMeasure
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..accumulate_data.pf_gp_ci_data import PFGPCIData, _error_udens
@@ -11,6 +12,7 @@ from scipy.stats import norm
 try:
     import gpytorch 
     import torch
+    import pandas as pd
 except: pass 
 
 class Suggester(object): pass
@@ -19,10 +21,6 @@ class PFSampleErrorDensityAR(Suggester):
     def __init__(self, verbose=False):
         self.verbose = verbose
         super(PFSampleErrorDensityAR,self).__init__()
-    def suggest(self, n, gp):
-        pass
-    
-    #@profile
     def suggest(self, n, d, gp, rng, efficiency, pct=.5):
         if self.verbose: print('\tAR sampling with efficiency %.1e, expect %d draws: '%(efficiency,int(n/efficiency)),end='',flush=True)
         x = zeros((0,d),dtype=float)
@@ -56,11 +54,62 @@ class SuggesterSimple(Suggester):
         return x
 
 class PFGPCI(StoppingCriterion):
-    '''
+    """
     Probability of failure estimation using adaptive Gaussian Processes (GP) construction and resulting credible intervals. 
     
-    >>> assert False
-    '''
+    >>> pfgpci = PFGPCI(
+    ...     integrand = Ishigami(DigitalNetB2(3,seed=17)),
+    ...     failure_threshold = 0,
+    ...     failure_above_threshold = False, 
+    ...     abs_tol = 2.5e-2,
+    ...     alpha = 1e-1,
+    ...     n_init = 64,
+    ...     init_samples = None,
+    ...     batch_sampler = PFSampleErrorDensityAR(verbose=False),
+    ...     n_batch = 16,
+    ...     n_max = 128,
+    ...     n_approx = 2**18,
+    ...     gpytorch_prior_mean = gpytorch.means.ZeroMean(),
+    ...     gpytorch_prior_cov = gpytorch.kernels.ScaleKernel(
+    ...         gpytorch.kernels.MaternKernel(nu=2.5,lengthscale_constraint = gpytorch.constraints.Interval(.5,1)),
+    ...         outputscale_constraint = gpytorch.constraints.Interval(1e-8,.5)),
+    ...     gpytorch_likelihood = gpytorch.likelihoods.GaussianLikelihood(noise_constraint = gpytorch.constraints.Interval(1e-12,1e-8)),
+    ...     gpytorch_marginal_log_likelihood_func = lambda likelihood,gpyt_model: gpytorch.mlls.ExactMarginalLogLikelihood(likelihood,gpyt_model),
+    ...     torch_optimizer_func = lambda gpyt_model: torch.optim.Adam(gpyt_model.parameters(),lr=0.1),
+    ...     gpytorch_train_iter = 100,
+    ...     gpytorch_use_gpu = False,
+    ...     verbose = False,
+    ...     n_ref_approx = 2**22,
+    ...     seed_ref_approx = 11)
+    >>> solution,data = pfgpci.integrate(seed=7,refit=True)
+    >>> data
+    PFGPCIData (AccumulateData Object)
+        solution        0.161
+        error_bound     0.025
+        bound_low       0.136
+        bound_high      0.186
+        n_total         112
+        time_integrate  ...
+    PFGPCI (StoppingCriterion Object)
+    Ishigami (Integrand Object)
+    Uniform (TrueMeasure Object)
+        lower_bound     -3.142
+        upper_bound     3.142
+    DigitalNetB2 (DiscreteDistribution Object)
+        d               3
+        dvec            [0 1 2]
+        randomize       LMS_DS
+        graycode        0
+        entropy         17
+        spawn_key       ()
+    >>> df = data.get_results_dict()
+    >>> pd.DataFrame(df)
+       n_sum  n_batch  error_bounds    ci_low   ci_high  solutions  solutions_ref  error_ref  in_ci
+    0     64       64      0.049655  0.080006  0.179317   0.129662       0.162404   0.032743   True
+    1     80       16      0.041264  0.101822  0.184349   0.143085       0.162404   0.019319   True
+    2     96       16      0.029876  0.124684  0.184436   0.154560       0.162404   0.007844   True
+    3    112       16      0.024751  0.136378  0.185880   0.161129       0.162404   0.001275   True
+    """
     def __init__(self, 
         integrand,
         failure_threshold,
