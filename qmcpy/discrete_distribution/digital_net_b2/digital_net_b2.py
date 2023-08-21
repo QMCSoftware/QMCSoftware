@@ -214,7 +214,7 @@ class DigitalNetB2(LD):
             if self.set_lms:
                 if self._verbose: print('\n\ts[dvec[%d]]\n\t\t'%j,end='',flush=True)
                 for t in range(self.t_lms):
-                    t1 = minimum(t,self.t_max)
+                    t1 = int(minimum(t,self.t_max))
                     u = self.rng.integers(low=0, high=1<<t1, size=1, dtype=uint64)
                     u <<= (self.t_max-t1)
                     if t1<self.t_max: u += 1<<(self.t_max-t1-1)
