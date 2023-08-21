@@ -103,12 +103,14 @@ class PFGPCI(StoppingCriterion):
         entropy         17
         spawn_key       ()
     >>> df = data.get_results_dict()
-    >>> pd.DataFrame(df)
-       n_sum  n_batch  error_bounds    ci_low   ci_high  solutions  solutions_ref  error_ref  in_ci
-    0     64       64      0.049655  0.080006  0.179317   0.129662       0.162404   0.032743   True
-    1     80       16      0.041264  0.101822  0.184349   0.143085       0.162404   0.019319   True
-    2     96       16      0.029876  0.124684  0.184436   0.154560       0.162404   0.007844   True
-    3    112       16      0.024751  0.136378  0.185880   0.161129       0.162404   0.001275   True
+    >>> df = pd.DataFrame(df)
+    >>> with pd.option_context('display.colheader_justify','center','display.precision',2,'display.float_format',lambda x:'%.1e'%x): 
+    ...     print(df)
+       n_sum  n_batch  error_bounds  ci_low  ci_high  solutions  solutions_ref  error_ref  in_ci
+    0    64     64       5.0e-02    8.0e-02 1.8e-01   1.3e-01      1.6e-01      3.3e-02    True 
+    1    80     16       4.1e-02    1.0e-01 1.8e-01   1.4e-01      1.6e-01      1.9e-02    True 
+    2    96     16       3.0e-02    1.2e-01 1.8e-01   1.5e-01      1.6e-01      7.8e-03    True 
+    3   112     16       2.5e-02    1.4e-01 1.9e-01   1.6e-01      1.6e-01      1.3e-03    True 
     """
     def __init__(self, 
         integrand,
