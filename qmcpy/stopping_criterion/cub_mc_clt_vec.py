@@ -67,51 +67,33 @@ class CubMCCLTVec(StoppingCriterion):
             print("upper bound = " + str(conf_int_hbound))
             return conf_int_lbound,conf_int_hbound
         """
-         # Construct AccumulateData Object to House Integration data
+        
         self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, 
-            self.n_init, self.cv, self.cv_mu)  # house integration data
+            self.n_init, self.cv, self.cv_mu)  
         t_start = time()
-        # Pilot Sample
-        self.data.update_data()
-        # use cost of function values to decide how to allocate
-        temp_a = self.data.t_eval ** 0.5
-        temp_b = (temp_a * self.data.sighat).sum()
-        # samples for computation of the mean
-        # n_mu_temp := n such that confidence intervals width and conficence will be satisfied
-        tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
-        z_star = -norm.ppf(self.alpha / 2.)
-        n_mu_temp = ceil(temp_b * (self.data.sighat / temp_a) * (z_star * self.inflate / tol_up)**2)
-        # n_mu := n_mu_temp adjusted for previous n
-        self.data.n_mu = maximum(self.data.n, n_mu_temp)
-        self.data.n += self.data.n_mu.astype(int)
-        if self.data.n_total + self.data.n.sum() > self.n_max:
-            # cannot generate this many new samples
-            warning_s = """
-            Alread generated %d samples.
-            Trying to generate %d new samples, which would exceed n_max = %d.
-            The number of new samples will be decrease proportionally for each integrand.
-            Note that error tolerances may no longer be satisfied.""" \
-            % (int(self.data.n_total), int(self.data.n.sum()), int(self.n_max))
-            warnings.warn(warning_s, MaxSamplesWarning)
-            # decrease n proportionally for each integrand
-            n_decease = self.data.n_total + self.data.n.sum() - self.n_max
-            dec_prop = n_decease / self.data.n.sum()
-            self.data.n = floor(self.data.n - self.data.n * dec_prop)
-        # Final Sample
-        self.data.update_data()
-        # CLT Confidence Interval
-        print("mean = " + str(self.data.muhat))
-        print("std = " + str(self.data.sighat))
-        print("samples = " + str(self.data.n_total))
-        margin_error = sqrt(self.inflate) * z_star * (self.data.sighat / (sqrt(self.data.n_total)))
-        print("margin of error = " + str(margin_error))
-        conf_int_lbound = self.data.muhat - margin_error
-        print("lower bound = " + str(conf_int_lbound))
-        conf_int_hbound = self.data.muhat + margin_error
-        print("upper bound = " + str(conf_int_hbound))
+        z_star = -norm.ppf(self.alpha/2)
+        conf_int_width = self.abs_tol
+        while(conf_int_width >= self.abs_tol and self.n_init <= self.n_max):
+            self.data.update_data(self.n_init)
+            print("mean = " + str(self.data.muhat))
+            print("std = " + str(self.data.sighat))
+            print("samples = " + str(self.n_init))
+            margin_error = sqrt(self.inflate) * z_star * (self.data.sighat / (sqrt(self.n_init)))
+            print("margin of error = " + str(margin_error))
+            conf_int_lbound = self.data.muhat - margin_error
+            print("lower bound = " + str(conf_int_lbound))
+            conf_int_hbound = self.data.muhat + margin_error
+            print("upper bound = " + str(conf_int_hbound))
+            conf_int_width = (conf_int_hbound - conf_int_lbound) / 2
+            print("confidence half width = " + str(conf_int_width))
+            if(self.n_init < self.n_max and (self.n_init * 2) > self.n_max):
+                self.n_init = self.n_max
+            else:
+                self.n_init = self.n_init * 2
         self.data.time_integrate = time() - t_start
-        return conf_int_lbound,conf_int_hbound
-
+        return self.data.solution, self.data
+        
+        
 
 
     
