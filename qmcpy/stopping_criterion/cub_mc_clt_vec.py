@@ -13,8 +13,7 @@ import warnings
 
 class CubMCCLTVec(StoppingCriterion):
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
-        inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[],
-        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
+        inflate=1.2, alpha=0.01,error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -23,10 +22,6 @@ class CubMCCLTVec(StoppingCriterion):
             abs_tol (ndarray): absolute error tolerance
             rel_tol (ndarray): relative error tolerance
             n_max (int): maximum number of samples
-            control_variates (list): list of integrand objects to be used as control variates. 
-                Control variates are currently only compatible with single level problems. 
-                The same discrete distribution instance must be used for the integrand and each of the control variates. 
-            control_variate_means (list): list of means for each control variate
         """
 
         self.parameters = ['abs_tol','rel_tol','n_init','n_max','inflate','alpha']
@@ -41,55 +36,32 @@ class CubMCCLTVec(StoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
-        self.cv = control_variates
-        self.cv_mu = control_variate_means
         # Verify Compliant Construction
-        allowed_levels = ['single','fixed-multi']
+        allowed_levels = ['single']
         allowed_distribs = [IID]
         allow_vectorized_integrals = True
         super(CubMCCLTVec,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
-        """
-            x = discrete_distribution.gen_samples(n)
-            print("x = " + str(x))
-            y = fn(x[:,d])
-            print("y = " + str(y))
-            mean = y.mean()
-            print("mean = " + str(mean))
-            variance = y.var(ddof=1)
-            print("variance = " + str(variance))
-            margin_error = sqrt(inflation) * norm.ppf(level) * (sqrt(variance/n))
-            print("margin of error = " + str(margin_error))
-            conf_int_lbound = mean - margin_error
-            print("lower bound = " + str(conf_int_lbound))
-            conf_int_hbound = mean + margin_error
-            print("upper bound = " + str(conf_int_hbound))
-            return conf_int_lbound,conf_int_hbound
-        """
         
         self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, 
-            self.n_init, self.cv, self.cv_mu)  
+            self.n_init, [], [])  
         t_start = time()
         z_star = -norm.ppf(self.alpha/2)
-        conf_int_width = self.abs_tol
-        while(conf_int_width >= self.abs_tol and self.n_init <= self.n_max):
-            self.data.update_data(self.n_init)
+        self.data.error_bound = self.abs_tol
+        while(self.data.error_bound >= self.abs_tol and self.n_init <= self.n_max):
+            self.data.update_data()
             print("mean = " + str(self.data.muhat))
             print("std = " + str(self.data.sighat))
-            print("samples = " + str(self.n_init))
-            margin_error = sqrt(self.inflate) * z_star * (self.data.sighat / (sqrt(self.n_init)))
-            print("margin of error = " + str(margin_error))
-            conf_int_lbound = self.data.muhat - margin_error
-            print("lower bound = " + str(conf_int_lbound))
-            conf_int_hbound = self.data.muhat + margin_error
-            print("upper bound = " + str(conf_int_hbound))
-            conf_int_width = (conf_int_hbound - conf_int_lbound) / 2
-            print("confidence half width = " + str(conf_int_width))
-            if(self.n_init < self.n_max and (self.n_init * 2) > self.n_max):
-                self.n_init = self.n_max
+            self.data.error_bound = sqrt(self.inflate) * z_star * (self.data.sighat / (sqrt(self.data.n)))
+            print("margin of error = " + str(self.data.error_bound))
+            self.data.confid_int = array([self.data.muhat - self.data.error_bound,self.data.muhat + self.data.error_bound])
+            print(" confidence interval = " + str(self.data.confid_int))
+            print("confidence half width = " + str(self.data.error_bound))
+            if(self.data.n < self.n_max and (self.data.n * 2) > self.n_max):
+                self.data.n = tile(self.n_max,self.data.levels)
             else:
-                self.n_init = self.n_init * 2
+                self.data.n = tile(self.data.n * 2, self.data.levels)
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
         

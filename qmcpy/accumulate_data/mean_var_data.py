@@ -60,14 +60,8 @@ class MeanVarData(AccumulateData):
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         super(MeanVarData,self).__init__()
 
-    def update_data(self, samples = -1):
-        """
-        Args:
-            samples: the current number of samples to compute the sample mean and standard deviation
-                Default value is -1, indicating to not change the current number of samples. 
-        """
-        if(samples != -1):
-            self.n = tile(samples, self.levels)
+    def update_data(self):
+        
         for l in range(self.levels):
             t_start = time() # time the integrand values
             integrand_l = self.level_integrands[l]
