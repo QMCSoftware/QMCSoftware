@@ -22,17 +22,16 @@ if __name__ == '__main__':
 
 """
 
-is_parallel = True, trials = 3, for order = 'natural', 1.891s. weights[1,5] = 0.8235392637361244
+is_parallel = True, trials = 3, for order = 'natural', 1.913s. weights[1,5] = 0.8235392637361244
 
-is_parallel = False, trials = 3, for order = 'natural', 3.099s. weights[1,5] = 0.8235392637361244
+is_parallel = False, trials = 3, for order = 'natural', 3.109s. weights[1,5] = 0.8235392637361244
 
-is_parallel = True, trials = 3, for order = 'linear', 3.239s. weights[1,5] = 0.7970500059236244
+is_parallel = True, trials = 3, for order = 'linear', 3.213s. weights[1,5] = 0.7970500059236244
 
-is_parallel = False, trials = 3, for order = 'linear', 3.208s. weights[1,5] = 0.7970500059236244
+is_parallel = False, trials = 3, for order = 'linear', 3.163s. weights[1,5] = 0.7970500059236244
 
-is_parallel = True, trials = 3, for order = 'MPS', 1.877s. weights[1,5] = 0.8235392637361244
+is_parallel = True, trials = 3, for order = 'MPS', 0.879s. weights[1,5] = 0.8235392637361244
 
-is_parallel = False, trials = 3, for order = 'MPS', 3.173s. weights[1,5] = 0.8235392637361244
-
+is_parallel = False, trials = 3, for order = 'MPS', 3.094s. weights[1,5] = 0.8235392637361244
 
 """
