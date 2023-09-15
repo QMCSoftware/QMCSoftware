@@ -1,37 +1,124 @@
 from qmcpy import Lattice
-import time
+import cProfile
+import pstats
+
+#I only uncomment the code statement that includes what I want to test, everything else I leave commented.
 
 
+#Magic Point Shop
+if __name__ == "__main__":
+    input_x = 1_000_000
+    process = 0
+    nonprocess = 0
+    c = 5
+    print(f"For input size {input_x}")
+    print(f'Each funtion was ran {c} times')
+    for i in range(c):
+        profiler = cProfile.Profile()
+        profiler.enable()
+        Lattice(dimension=2, randomize=False, order="mps").gen_samples(input_x, warn=False)
+        profiler.disable()
+        stats = pstats.Stats(profiler)
+        nonprocess_time = stats.total_tt
+        print(f"Cumulative Time: for non-process Magic point shop: {nonprocess_time:.2f} seconds")
+        profiler1 = cProfile.Profile()
+        profiler1.enable()
+        Lattice(dimension=2, randomize=False, order="mps_process").gen_samples(input_x, warn=False)
+        profiler1.disable()
+        stats1 = pstats.Stats(profiler1)
+        process_time = stats1.total_tt
+        print(f"Cumulative Time: for Process Magic point shop {process_time:.2f} seconds")
+        process += process_time
+        nonprocess += nonprocess_time
+    print(f"Process {process}")
+    print(f"NonProcess {nonprocess}")
+    if process < nonprocess:
+        print(f"Process is this much better: {nonprocess - process}")
+    else:
+        print(f"Non-process is this much better: {process - nonprocess}")
 
-def run_three_func(n):
-    start_1 = time.time()
 
-    l = Lattice(2, seed=7, order="natural")
-    l.gen_samples(n)
+#Natural order
 
-    end_1 = time.time()
+'''
+if __name__ == "__main__":
+    input_x = 1_000_000
+    process = 0
+    nonprocess = 0
+    c = 30
+    print(f"For input size {input_x}")
+    print(f'There are {c} function calls')
+    for i in range(c):
+        profiler = cProfile.Profile()
+        profiler.enable()
+        Lattice(dimension=2, randomize=False, order="natural").gen_samples(input_x, warn=False)
+        profiler.disable()
 
-    start_2 = time.time()
+        stats = pstats.Stats(profiler)
 
-    l = Lattice(2, seed=7, order="linear")
-    l.gen_samples(n)
+        # Get the cumulative time for the entire program
+        nonprocess_time = stats.total_tt
+        print(f"Cumulative Time: for non-process natural: {nonprocess_time:.2f} seconds")
 
-    end_2 = time.time()
+        profiler1 = cProfile.Profile()
+        profiler1.enable()
+        Lattice(dimension=2, randomize=False, order="natural_process").gen_samples(input_x, warn=False)
+        profiler1.disable()
 
-    start_3 = time.time()
+        stats1 = pstats.Stats(profiler1)
+        # Get the cumulative time for the entire program
+        process_time = stats1.total_tt
+        print(f"Cumulative Time: for Process natural {process_time:.2f} seconds")
 
-    l = Lattice(2, seed=7, order="mps")
+        process += process_time
+        nonprocess += nonprocess_time
+    print(f"Process {process}")
+    print(f"Non-process {nonprocess}")
+    if process < nonprocess:
+        print(f"Process is this much better: {nonprocess - process}")
+    else:
+        print(f"Non-process is this much better: {process - nonprocess}")
 
-    l.gen_samples(n)
+# Linear Order
+'''
+'''
+if __name__ == "__main__":
+    input_x = 1_000_000
+    process = 0
+    nonprocess = 0
+    c = 15
+    print(f"For input size {input_x}")
+    print(f"The functions were called {c} times")
+    for i in range(c):
+        profiler = cProfile.Profile()
+        profiler.enable()
+        Lattice(dimension=2, randomize=False, order="linear").gen_samples(input_x, warn=False)
+        profiler.disable()
 
-    end_3 = time.time()
+        stats = pstats.Stats(profiler)
 
-    return end_1-start_1, end_2-start_2, end_3-start_3
+        # Get the cumulative time for the entire program
+        nonprocess_time = stats.total_tt
+        print(f"Cumulative Time: for non-process linear: {nonprocess_time:.2f} seconds")
 
-time1, time2, time3 = run_three_func(100)
+        profiler1 = cProfile.Profile()
+        profiler1.enable()
+        Lattice(dimension=2, randomize=False, order="linear_process").gen_samples(input_x, warn=False)
+        profiler1.disable()
 
-print(f"Time for natural {time1}")
-print(f"Time for linear {time2}")
-print(f"Time for mps {time3}")
+        stats1 = pstats.Stats(profiler1)
+        # Get the cumulative time for the entire program
+        process_time = stats1.total_tt
+        print(f"Cumulative Time: for Process linear {process_time:.2f} seconds")
 
+        process += process_time
+        nonprocess += nonprocess_time
+    print(f"Process {process}")
+    print(f"Non-Process {nonprocess}")
+    if process < nonprocess:
+        print(f"Process is this much better: {nonprocess - process}")
+    else:
+        print(f"Non-process is this much better: {process - nonprocess}")
+        
+'''
 
