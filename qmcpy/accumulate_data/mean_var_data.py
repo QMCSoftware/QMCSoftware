@@ -61,13 +61,11 @@ class MeanVarData(AccumulateData):
         super(MeanVarData,self).__init__()
 
     def update_data(self):
-        
         for l in range(self.levels):
             t_start = time() # time the integrand values
             integrand_l = self.level_integrands[l]
             n  = int(int(self.n[l]))
             samples = integrand_l.discrete_distrib.gen_samples(n)
-            print("Current Samples = " + str(n))
             y = integrand_l.f(samples).squeeze()
             if self.ncv>0:
                 # using control variates
