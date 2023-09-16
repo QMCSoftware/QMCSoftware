@@ -94,7 +94,7 @@ class Lattice(LD):
     """
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
-        generating_vector= 'lattice_vec_lnb.750.24.npy', d_max=None, m_max=None):
+        generating_vector= 'lattice_vec.3600.20.npy', d_max=None, m_max=None):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
