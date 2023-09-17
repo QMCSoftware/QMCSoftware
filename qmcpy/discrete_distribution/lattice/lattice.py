@@ -136,6 +136,12 @@ class Lattice(LD):
             self.gen = self._gail_linear
         elif self.order == 'mps':
             self.gen = self._mps
+        elif self.order == "linear_process":
+            self.gen = self._gail_linear_process
+        elif self.order == "mps_process":
+            self.gen = self._mps_process
+        elif self.order == "natural_process":
+            self.gen = self._gail_natural_process
         else:
             raise Exception("Lattice requires natural, linear, or mps ordering.")
         if isinstance(generating_vector,ndarray):
@@ -199,8 +205,16 @@ class Lattice(LD):
         x = x_lat_full[cut1:cut2, :]
         return x
     
+    def gen_point(i, n):
+        """ Generate a single lattice point. """
+        return ((i * self.gen_vec) % n) / float(n)
+    
+    def gen_block_points(m):
+        """ Generate a block of points. """
+        n = 2 ** m
+        return [gen_point(i, n) for i in arange(1, n + 1, 2)]
 
-    def _mps2(self, n_min, n_max):
+    def _mps_process(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
@@ -210,19 +224,12 @@ class Lattice(LD):
             x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
         else:
             import concurrent.futures
-            def gen_point(i, n):
-                """ Generate a single lattice point. """
-                return ((i * self.gen_vec) % n) / float(n)
-            def gen_block_points(m):
-                """ Generate a block of points. """
-                n = 2 ** m
-                return [gen_point(i, n) for i in arange(1, n + 1, 2)]
+            # Makes a Process Pool
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                m_values = list(range(int(m_low), int(m_high) + 1))
 
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
-                # collect the results in the order the futures were created
-                x_lat_full = vstack([future.result() for future in futures])
-
+                block_lists = list(executor.map(self.gen_block_points, m_values, [self.gen_vec] * len(m_values)))
+            x_lat_full = vstack(block_lists)
         cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
         cut2 = int(cut1 + n_max - n_min)
         x = x_lat_full[cut1:cut2, :]
@@ -260,6 +267,27 @@ class Lattice(LD):
             y = self.calculate_y(m_low, m_high, y)
             x = outer(y, self.gen_vec) % 1
             return x
+        
+    def _gail_linear_process(self, n_min, n_max):
+        """ Gail lattice generator in linear order. """
+        m_low = int(floor(log2(n_min))) + 1 if n_min > 0 else 0
+        m_high = int(ceil(log2(n_max)))
+        if n_min == 0:
+            return self._gen_block_linear(m_high, first=True)
+        else:
+            import concurrent.futures
+            n = 2 ** (m_low)
+            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            tasks = [(m_low, m_high, y)]
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                results = list(executor.map(self.calculate_y, *zip(*tasks)))
+            
+            for result in results:
+                y = result
+
+            x = outer(y, self.gen_vec) % 1
+            return x
+
 
     def _gail_natural(self, n_min, n_max):
         m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
@@ -278,6 +306,26 @@ class Lattice(LD):
         cut2 = int(cut1 + n_max - n_min)
         x = x_lat_full[cut1:cut2, :]
         return x
+    
+    def _gail_natural_process(self, n_min, n_max):
+            m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
+            m_high = ceil(log2(n_max))
+            if not self.is_parallel:
+                x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low), int(m_high) + 1)])
+            else:
+                import concurrent.futures
+                # create a ThreadPoolExecutor
+                with concurrent.futures.ProcessPoolExecutor() as executor:
+                    futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
+                # collect the results in the order the futures (calls) created
+                x_lat_full = vstack([future.result() for future in futures])
+
+            cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
+            cut2 = int(cut1 + n_max - n_min)
+            x = x_lat_full[cut1:cut2, :]
+            return x
+
+
 
     def _vdc(self,n):
         """
@@ -294,6 +342,22 @@ class Lattice(LD):
             ptind = tile(ptind_nl,int(kk))
             q[ptind] += 1./2**(l+1)
         return q
+    
+    def _vdc_process(self,n):
+        """
+        Van der Corput sequence in base 2 where n is a power of 2. We do it this
+        way because of our own VDC construction: is much faster and cubLattice
+        does not need more.
+        """
+        k = log2(n)
+        tasks = [(1, int(k), int(n)) for l in range(int(k))]
+        import concurrent.futures
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            future = list(executor.map(lambda args: self._vdc(*args), tasks))
+        final_q = zeros(int(n))
+        for result in future:
+            final_q += result
+        return final_q
 
     def _gen_block(self, m):
         """ Generate samples floor(2**(m-1)) to 2**m. """
@@ -301,6 +365,16 @@ class Lattice(LD):
         n = 2**m-n_min
         x = outer(self._vdc(n)+1./(2*n_min),self.gen_vec)%1 if n_min>0 else outer(self._vdc(n),self.gen_vec)%1
         return x
+    
+    def _gen_block_process(self, m):
+        """ Generate samples floor(2**(m-1)) to 2**m. """
+        n_min = floor(2**(m-1))
+        import concurrent.futures
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            chunks = [(m, n_min) for n_min in array_split(arange(n_min, 2 ** m, n_min))]
+        results = list(executor.map(self._gen_block, chunks))
+
+        return concatenate(results, axis=0)
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
         """
