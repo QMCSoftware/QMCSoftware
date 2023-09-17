@@ -5,7 +5,7 @@ import os
 import unittest
 import ctypes
 from numpy import *
-
+import time
 
 class TestDiscreteDistribution(unittest.TestCase):
 
@@ -74,37 +74,48 @@ class TestLattice(unittest.TestCase):
             self.assertTrue((x0123[5:7,[1,3]]==x13).all())
 
     def test_linear_order(self):
-        distribution = Lattice(dimension=4, randomize=False, order='linear')
         true_sample = array([
-            [1./8,   3./8,    3./8,    1./8],
-            [3./8,   1./8,    1./8,    3./8],
-            [5./8,   7./8,    7./8,    5./8],
-            [7./8,   5./8,    5./8,    7./8]])
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
-    
+            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
+            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
+        for is_parallel in [False, True]:
+            distribution = Lattice(dimension=4, randomize=False, order='linear', is_parallel=is_parallel)
+            self.assertTrue((distribution.gen_samples(n_min=4, n_max=8, warn=False)==true_sample).all())
+
     def test_gail_order(self):
-        distribution = Lattice(dimension=4, randomize=False, order='natural')
         true_sample = array([
-            [1./8,   3./8,    3./8,    1./8],
-            [5./8,   7./8,    7./8,    5./8],
-            [3./8,   1./8,    1./8,    3./8],
-            [7./8,   5./8,    5./8,    7./8]])
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
+            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
+            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
+        for is_parallel in [False, True]:
+            distribution = Lattice(dimension=4, randomize=False, order='natural', is_parallel=is_parallel)
+            self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
 
     def test_mps_order(self):
-        distribution = Lattice(dimension=4, randomize=False, order='mps')
         true_sample = array([
-            [1./8,   3./8,    3./8,    1./8],
-            [3./8,   1./8,    1./8,    3./8],
-            [5./8,   7./8,    7./8,    5./8],
-            [7./8,   5./8,    5./8,    7./8]])
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
+            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
+            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
+        for is_parallel in [False, True]:
+            distribution = Lattice(dimension=4, randomize=False, order='mps', is_parallel=is_parallel)
+            self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
 
     def test_linear_order_not_power_of_2(self):
         l = Lattice(dimension=3, order='linear')
         x = l.gen_samples(n_min=2, n_max=5)
         assert x.shape==(4,3)
 
+    def test_integer_generating_vectors(self):
+        distribution = Lattice(dimension=4, generating_vector=27, randomize=False,seed=136)
+        true_sample =array([
+            [0.125, 0.875, 0.625, 0.375],
+            [0.625, 0.375, 0.125, 0.875],
+            [0.375, 0.625, 0.875, 0.125],
+            [0.875, 0.125, 0.375, 0.625]])
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
 
 class TestDigitalNetB2(unittest.TestCase):
     """ Unit tests for DigitalNetB2 DiscreteDistribution. """

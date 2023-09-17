@@ -66,7 +66,7 @@ class Gaussian(TrueMeasure):
             order = argsort(-evals)
             self.a = dot(evecs[:,order],diag(sqrt(evals[order])))
         elif self.decomp_type == 'CHOLESKY':
-            self.a = cholesky(self.sigma).T
+            self.a = cholesky(self.sigma) #Fred changed this
         else:
             raise ParameterError("decomp_type should be 'PCA' or 'Cholesky'") 
         self.mvn_scipy = multivariate_normal(mean=self.mu,cov=self.sigma)

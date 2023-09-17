@@ -33,6 +33,17 @@ class DigitalNetB2(LD):
     >>> DigitalNetB2(dimension=2,randomize=False,graycode=False).gen_samples(n_min=2,n_max=4)
     array([[0.25, 0.75],
            [0.75, 0.25]])
+    >>> dnb2_alpha2 = DigitalNetB2(5,randomize=False,generating_matrices='sobol_mat_alpha2.10600.64.32.lsb.npy')
+    >>> dnb2_alpha2.gen_samples(8,warn=False)
+    array([[0.      , 0.      , 0.      , 0.      , 0.      ],
+           [0.75    , 0.75    , 0.75    , 0.75    , 0.75    ],
+           [0.4375  , 0.9375  , 0.1875  , 0.6875  , 0.1875  ],
+           [0.6875  , 0.1875  , 0.9375  , 0.4375  , 0.9375  ],
+           [0.296875, 0.171875, 0.109375, 0.796875, 0.859375],
+           [0.546875, 0.921875, 0.859375, 0.046875, 0.109375],
+           [0.234375, 0.859375, 0.171875, 0.484375, 0.921875],
+           [0.984375, 0.109375, 0.921875, 0.734375, 0.171875]])
+
            
     References:
 
@@ -43,7 +54,7 @@ class DigitalNetB2(LD):
 
         [2] Faure, Henri, and Christiane Lemieux. 
         “Implementation of Irreducible Sobol' Sequences in Prime Power Bases.” 
-        Mathematics and Computers in Simulation 161 (2019): 13–22. Crossref. Web.
+        Mathematics and Computers in Simulation 161 (2019): 13-22. Crossref. Web.
 
         [3] F.Y. Kuo & D. Nuyens.
         Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients 
@@ -60,7 +71,7 @@ class DigitalNetB2(LD):
         [5] Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., … Chintala, S. 
         (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. 
         In H. Wallach, H. Larochelle, A. Beygelzimer, F. d extquotesingle Alch&#39;e-Buc, E. Fox, & R. Garnett (Eds.), 
-        Advances in Neural Information Processing Systems 32 (pp. 8024–8035). Curran Associates, Inc. 
+        Advances in Neural Information Processing Systems 32 (pp. 8024-8035). Curran Associates, Inc. 
         Retrieved from http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf
 
         [6] I.M. Sobol', V.I. Turchaninov, Yu.L. Levitan, B.V. Shukhman: 
@@ -203,7 +214,7 @@ class DigitalNetB2(LD):
             if self.set_lms:
                 if self._verbose: print('\n\ts[dvec[%d]]\n\t\t'%j,end='',flush=True)
                 for t in range(self.t_lms):
-                    t1 = min(t,self.t_max)
+                    t1 = int(minimum(t,self.t_max))
                     u = self.rng.integers(low=0, high=1<<t1, size=1, dtype=uint64)
                     u <<= (self.t_max-t1)
                     if t1<self.t_max: u += 1<<(self.t_max-t1-1)

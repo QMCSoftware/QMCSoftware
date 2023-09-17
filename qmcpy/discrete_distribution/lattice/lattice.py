@@ -8,7 +8,7 @@ import warnings
 class Lattice(LD):
     """
     Quasi-Random Lattice nets in base 2.
-
+    
     >>> l = Lattice(2,seed=7)
     >>> l.gen_samples(4)
     array([[0.04386058, 0.58727432],
@@ -23,6 +23,7 @@ class Lattice(LD):
         dvec            [0 1]
         randomize       1
         order           natural
+        gen_vec         [     1 182667]
         entropy         7
         spawn_key       ()
     >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
@@ -40,6 +41,39 @@ class Lattice(LD):
            [0.5 , 0.5 ],
            [0.25, 0.75],
            [0.75, 0.25]])
+    >>> l = Lattice(2,generating_vector=25,seed=55)
+    >>> l.gen_samples(4)
+    array([[0.84489224, 0.30534549],
+           [0.34489224, 0.80534549],
+           [0.09489224, 0.05534549],
+           [0.59489224, 0.55534549]])
+    >>> l
+    Lattice (DiscreteDistribution Object)
+        d               2^(1)
+        dvec            [0 1]
+        randomize       1
+        order           natural
+        gen_vec         [       1 11961679]
+        entropy         55
+        spawn_key       ()
+    >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector=26).gen_samples(8,warn=False)
+    array([[0.   , 0.   , 0.   , 0.   ],
+           [0.5  , 0.5  , 0.5  , 0.5  ],
+           [0.25 , 0.25 , 0.75 , 0.75 ],
+           [0.75 , 0.75 , 0.25 , 0.25 ],
+           [0.125, 0.125, 0.875, 0.875],
+           [0.625, 0.625, 0.375, 0.375],
+           [0.375, 0.375, 0.625, 0.625],
+           [0.875, 0.875, 0.125, 0.125]])
+    >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector=26,is_parallel=True).gen_samples(8,warn=False)
+    array([[0.   , 0.   , 0.   , 0.   ],
+           [0.5  , 0.5  , 0.5  , 0.5  ],
+           [0.25 , 0.25 , 0.75 , 0.75 ],
+           [0.75 , 0.75 , 0.25 , 0.25 ],
+           [0.125, 0.125, 0.875, 0.875],
+           [0.625, 0.625, 0.375, 0.375],
+           [0.375, 0.375, 0.625, 0.625],
+           [0.875, 0.875, 0.125, 0.125]])
 
     References:
 
@@ -63,13 +97,13 @@ class Lattice(LD):
         [4] Constructing embedded lattice rules for multivariate integration
         R Cools, FY Kuo, D Nuyens -  SIAM J. Sci. Comput., 28(6), 2162-2188.
 
-        [5] L’Ecuyer, Pierre & Munger, David. (2015).
+        [5] L'Ecuyer, Pierre & Munger, David. (2015).
         LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules.
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
-        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None):
+        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, is_parallel=True):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -79,12 +113,15 @@ class Lattice(LD):
                 Note: Non-randomized lattice sequence includes the origin.
             order (str): 'linear', 'natural', or 'mps' ordering.
             seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
-            generating_vector (ndarray or str): generating matrix or path to generating matrices.
+            generating_vector (ndarray, str or int): generating matrix or path to generating matrices.
                 ndarray should have shape (d_max).
                 a string generating_vector should be formatted like
                 'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy'
+                an integer should be an odd larger than 1; passing an integer M would create a random generating vector supporting up to 2^M points. 
+                M is restricted between 2 and 26 for numerical percision. The generating vector is [1,v_1,v_2,...,v_dimension], where v_i is an integer in {3,5,...,2*M-1}. 
             d_max (int): maximum dimension
             m_max (int): 2^m_max is the max number of supported samples
+            is_parallel (bool): Default to True to perform parallel computations, False serial
 
         Note:
             d_max and m_max are required if generating_vector is a ndarray.
@@ -102,17 +139,20 @@ class Lattice(LD):
         else:
             raise Exception("Lattice requires natural, linear, or mps ordering.")
         if isinstance(generating_vector,ndarray):
-            self.z_og = generating_vector
+            self.gen_vec_og = generating_vector
             if d_max is None or m_max is None:
                 raise ParameterError("d_max and m_max must be supplied when generating_vector is a ndarray")
             self.d_max = d_max
             self.m_max = m_max
+        elif isinstance(generating_vector,int):
+            self.m_max = min(26,max(2,generating_vector))
+            self.d_max = dimension
         elif isinstance(generating_vector,str):
             root = dirname(abspath(__file__))+'/generating_vectors/'
             if isfile(root+generating_vector):
-                self.z_og = load(root+generating_vector).astype(uint64)
+                self.gen_vec_og = load(root+generating_vector).astype(uint64)
             elif isfile(generating_vector):
-                self.z_og = load(generating_vector).astype(uint64)
+                self.gen_vec_og = load(generating_vector).astype(uint64)
             else:
                 raise ParameterError("generating_vector '%s' not found."%generating_vector)
             parts = generating_vector.split('.')
@@ -123,18 +163,40 @@ class Lattice(LD):
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
-        self.z = self.z_og[self.dvec]
+        if isinstance(generating_vector,int):
+            self.gen_vec_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-1),size=dimension-1,dtype=uint64)+1)
+        self.gen_vec = self.gen_vec_og[self.dvec]
         self.shift = self.rng.uniform(size=int(self.d))
+        self.parameters += ["gen_vec"]
+        self.is_parallel = is_parallel
+
 
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
-        gen_block = lambda n: (outer(arange(1, n+1, 2), self.z) % n) / float(n)
-        x_lat_full = vstack([gen_block(2**m) for m in range(int(m_low),int(m_high)+1)])
-        cut1 = int(floor(n_min-2**(m_low-1))) if n_min>0 else 0
-        cut2 = int(cut1+n_max-n_min)
-        x = x_lat_full[cut1:cut2,:]
+
+        if not self.is_parallel:
+            gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
+            x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
+        else:
+            import concurrent.futures
+            def gen_point(i, n):
+                """ Generate a single lattice point. """
+                return ((i * self.gen_vec) % n) / float(n)
+            def gen_block_points(m):
+                """ Generate a block of points. """
+                n = 2 ** m
+                return [gen_point(i, n) for i in arange(1, n + 1, 2)]
+
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
+                # collect the results in the order the futures were created
+                x_lat_full = vstack([future.result() for future in futures])
+
+        cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
+        cut2 = int(cut1 + n_max - n_min)
+        x = x_lat_full[cut1:cut2, :]
         return x
 
     def _gen_block_linear(self, m_next, first=True):
@@ -143,8 +205,19 @@ class Lattice(LD):
             y = arange(0, 1, 1 / n).reshape((n, 1))
         else:
             y = arange(1 / n, 1, 2 / n).reshape((n, 1))
-        x = outer(y, self.z) % 1
+        x = outer(y, self.gen_vec) % 1
         return x
+
+    def calculate_y(self, m_low, m_high, y):
+        for m in range(m_low, m_high):
+            n = 2 ** m
+            y_next = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            temp = zeros((n, 1))
+            temp[0::2] = y
+            temp[1::2] = y_next
+            y = temp
+        return y
+
 
     def _gail_linear(self, n_min, n_max):
         """ Gail lattice generator in linear order. """
@@ -153,26 +226,28 @@ class Lattice(LD):
         if n_min == 0:
             return self._gen_block_linear(m_high, first=True)
         else:
-            n = 2**(m_low)
-            y = arange(1 / n, 1, 2 / n).reshape((int(n/2), 1))
-            for m in range(m_low, m_high):
-                n = 2**(m)
-                y_next = arange(1 / n, 1, 2 / n).reshape((int(n/2), 1))
-                temp = zeros((n, 1))
-                temp[0::2] = y
-                temp[1::2] = y_next
-                y = temp
-
-            x = outer(y, self.z) % 1
+            n = 2 ** (m_low)
+            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            y = self.calculate_y(m_low, m_high, y)
+            x = outer(y, self.gen_vec) % 1
             return x
 
     def _gail_natural(self, n_min, n_max):
         m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
-        x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low),int(m_high)+1)])
-        cut1 = int(floor(n_min-2**(m_low-1))) if n_min>0 else 0
-        cut2 = int(cut1+n_max-n_min)
-        x = x_lat_full[cut1:cut2,:]
+        if not self.is_parallel:
+            x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low), int(m_high) + 1)])
+        else:
+            import concurrent.futures
+            # create a ThreadPoolExecutor
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
+            # collect the results in the order the futures (calls) created
+            x_lat_full = vstack([future.result() for future in futures])
+
+        cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
+        cut2 = int(cut1 + n_max - n_min)
+        x = x_lat_full[cut1:cut2, :]
         return x
 
     def _vdc(self,n):
@@ -195,7 +270,7 @@ class Lattice(LD):
         """ Generate samples floor(2**(m-1)) to 2**m. """
         n_min = floor(2**(m-1))
         n = 2**m-n_min
-        x = outer(self._vdc(n)+1./(2*n_min),self.z)%1 if n_min>0 else outer(self._vdc(n),self.z)%1
+        x = outer(self._vdc(n)+1./(2*n_min),self.gen_vec)%1 if n_min>0 else outer(self._vdc(n),self.gen_vec)%1
         return x
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
@@ -247,6 +322,6 @@ class Lattice(LD):
                 randomize=self.randomize,
                 order=self.order,
                 seed=child_seed,
-                generating_vector=self.z_og,
+                generating_vector=self.gen_vec_og,
                 d_max=self.d_max,
                 m_max=self.m_max)

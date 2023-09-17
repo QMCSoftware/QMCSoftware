@@ -4,7 +4,7 @@
 #   -C for sphix-build will not look for conf.py
 #   -b for sphinx-build will look for conf.py
 
-mddir = sphinx/readme_rst/
+mddir = sphinx/md_rst/
 nbdir = sphinx/demo_rst/
 umldir = sphinx/uml/
 nbconvertcmd = jupyter nbconvert --to rst --output-dir='$(nbdir)'
@@ -22,16 +22,22 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	@grep -v  "\[\!" README.md > README2.md
 	@pandoc --mathjax README2.md -o $(mddir)QMCSoftware.rst
 	@rm README2.md
+	# CONTRIBUTING --> RST
+	@pandoc --mathjax CONTRIBUTING.md -o $(mddir)CONTRIBUTING.rst
 	# Jupyter Notebook Demos --> RST
 	@mkdir $(nbdir)
 	@for f in demos/*.ipynb; do \
-	    echo "#\tConverting $$f"; \
-	    $(nbconvertcmd) $$f 2>/dev/null;\
+		echo "#\tConverting $$f"; \
+		$(nbconvertcmd) $$f 2>/dev/null; \
+	done
+	@for f in demos/*/*/*.ipynb; do \
+		echo "#\tConverting $$f"; \
+		$(nbconvertcmd) $$f 2>/dev/null; \
 	done
 	# Removing Colab references in rst files using regular expression
 	@for f in $(nbdir)/*.rst; do \
-	    grep -vE "(colab-badge.svg|Open In Colab|colab.research)" $$f > $(nbdir)/tmp.rst && mv $(nbdir)/tmp.rst  $$f; \
-    done
+		grep -vE "(colab-badge.svg|Open In Colab|colab.research)" $$f > $(nbdir)/tmp.rst && mv $(nbdir)/tmp.rst  $$f; \
+	done
 
 _uml:
 	# UML Diagrams
@@ -73,15 +79,29 @@ doc_pdf: _doc _uml
 doc_epub: _doc _uml
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
 
-tests:
+doctests:
 	@echo "\nDoctests"
-	python -m coverage run --source=./ -m pytest --doctest-modules --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --disable-pytest-warnings qmcpy
+
+doctests_no_docker:
+	@echo "\nDoctests Without Docker Containers"
+	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
+
+fasttests:
 	@echo "\nFastests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
+	
+longtests:
 	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
+	
+coverage:
 	@echo "\nCode coverage"
 	python -m coverage report -m
+
+tests: doctests fasttests longtests coverage
+
+tests_no_docker: doctests_no_docker fasttests longtests coverage
 
 # "[command] | tee [logfile]" prints to both stdout and logfile
 workout:

@@ -13,11 +13,11 @@ class CustomInstall(install):
             os.system('pip install -e .')
         except:
             print('Problem installing qmcpy')
-        # compile files used for docuemtnation
+        # compile files used for documentation
         try:
             os.system('make _doc')
         except:
-            print('Problem compiling html or pdf documenation')
+            print('Problem compiling html or pdf documentation')
         super(CustomInstall, self).run()
 
 class CleanCommand(Command):
@@ -53,7 +53,7 @@ packages = [
 
 setuptools.setup(
     name="qmcpy",
-    version="1.3",
+    version="1.4.4",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',

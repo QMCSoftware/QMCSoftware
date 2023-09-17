@@ -28,8 +28,6 @@ Demos
 
     demo_rst/digital_net_b2.rst
 
-    demo_rst/latnetbuilder.rst
-
     demo_rst/some_true_measures.rst
 
     demo_rst/asian-option-mlqmc.rst
@@ -43,3 +41,19 @@ Demos
     demo_rst/iris.rst
 
     demo_rst/vectorized_qmc.rst
+
+    demo_rst/vectorized_qmc_bayes.rst
+
+    demo_rst/umbridge.rst
+
+    demo_rst/lattice_random_generator.rst
+
+    demo_rst/MCQMC2022_Article_Figures.rst
+
+    demo_rst/Purdue_Talk_Figures.rst
+
+    demo_rst/dakota_genz.rst
+
+    demo_rst/pydata.chi.2023.rst
+
+    demo_rst/prob_failure_gp_ci.rst

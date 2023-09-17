@@ -1,7 +1,6 @@
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 from numpy import *
 
-
 class DiscreteDistribution(object):
     """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
 
@@ -52,6 +51,7 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
+    
     def spawn(self, s=1, dimensions=None):
         """
         Spawn new instances of the current discrete distribution but with new seeds and dimensions.

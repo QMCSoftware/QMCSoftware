@@ -3,31 +3,35 @@ from ..true_measure._true_measure import TrueMeasure
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from numpy import *
 import os
-import multiprocessing
+from multiprocessing import get_context
+from multiprocessing.pool import ThreadPool
 from itertools import repeat
 
 
 class Integrand(object):
     """ Integrand abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self, rho, eta, parallel):
+    def __init__(self, dimension_indv, dimension_comb, parallel, threadpool=False):
         """
         Args:
-            rho (tuple): individual solution shape.
-            eta (tuple): combined solution shape. 
+            dimension_indv (tuple): individual solution shape.
+            dimension_comb (tuple): combined solution shape. 
             parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion.
-                Otherwise, parallel specifies the number of CPUs used by multiprocessing.Pool.
-                Passing parallel=True sets the number of CPUs equal to os.cpu_count().
+                Otherwise, parallel specifies the number of processes used by 
+                multiprocessing.Pool or multiprocessing.pool.ThreadPool.
+                Passing parallel=True sets processes = os.cpu_count().
+            threadpool (bool): When parallel > 1, 
+                if threadpool = True then use multiprocessing.pool.ThreadPool 
+                else use multiprocessing.Pool. 
         """
         prefix = 'A concrete implementation of Integrand must have '
         self.d = self.true_measure.d
-        self.rho = (rho,) if isinstance(rho,int) else tuple(rho)
-        self.eta = (eta,) if isinstance(eta,int) else tuple(eta)
+        self.d_indv = (dimension_indv,) if isinstance(dimension_indv,int) else tuple(dimension_indv)
+        self.d_comb = (dimension_comb,) if isinstance(dimension_comb,int) else tuple(dimension_comb)
         cpus = os.cpu_count()
         self.parallel = cpus if parallel is True else int(parallel)
         self.parallel = 0 if self.parallel==1 else self.parallel
-        if self.parallel>cpus:
-            raise ParameterError("parallel must be less than %d, the number of CPUs on this machine."%cpus)
+        self.threadpool = threadpool
         if not (hasattr(self, 'sampler') and isinstance(self.sampler,(TrueMeasure,DiscreteDistribution))):
             raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistributioninstance')
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
@@ -79,7 +83,7 @@ class Integrand(object):
             ndarray: length n vector of function evaluations
         """
         periodization_transform = 'NONE' if periodization_transform is None else periodization_transform.upper()
-        compute_flags = tile(1,self.rho) if compute_flags is None else atleast_1d(compute_flags)
+        compute_flags = tile(1,self.d_indv) if compute_flags is None else atleast_1d(compute_flags)
         n,d = x.shape
         # parameter checks
         if self.discrete_distrib.mimics != 'StdUniform' and periodization_transform!='NONE':
@@ -115,7 +119,7 @@ class Integrand(object):
             xp[xp<=0] = self.EPS
             xp[xp>=1] = 1-self.EPS
         # function evaluation with chain rule
-        y = empty((n,)+self.rho,dtype=float)
+        y = empty((n,)+self.d_indv,dtype=float)
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._transform(xp) # get transformed samples, equivalent to self.true_measure._transform_r(x)
@@ -135,19 +139,20 @@ class Integrand(object):
         n = len(t)
         kwargs['compute_flags'] = compute_flags
         if self.parallel:
-            pool = multiprocessing.Pool(processes=self.parallel)
+            pool = get_context(method='fork').Pool(processes=self.parallel) if self.threadpool==False else ThreadPool(processes=self.parallel) 
             y = pool.starmap(self._g2,zip(t,repeat((args,kwargs))))
+            pool.close()
             y = concatenate(y,dtype=float)
         else:
             y = self._g2(t,comb_args=(args,kwargs))
-        y = y.reshape((n,)+self.rho)
+        y = y.reshape((n,)+self.d_indv)
         return y
 
     def _g2(self,t,comb_args=((),{})):
         args = comb_args[0]
         kwargs = comb_args[1]
         t = atleast_2d(t)
-        if self.rho==(1,):
+        if self.d_indv==(1,):
             kwargs = dict(kwargs)
             del kwargs['compute_flags']
         y = self.g(t,*args,**kwargs)
@@ -161,8 +166,8 @@ class Integrand(object):
         individually.
 
         Args:
-            bound_low (ndarray): length Integrand.rho lower error bound
-            bound_high (ndarray): length Integrand.rho upper error bound
+            bound_low (ndarray): length Integrand.d_indv lower error bound
+            bound_high (ndarray): length Integrand.d_indv upper error bound
 
         Return:
             (tuple) containing
@@ -171,11 +176,11 @@ class Integrand(object):
             - (ndarray): upper bound on function combining estimates
             - (ndarray): bool flags to override sufficient combined integrand estimation, e.g., when approximating a ratio of integrals, if the denominator's bounds straddle 0, then returning True here forces ratio to be flagged as insufficiently approximated.
         """
-        if self.rho!=self.eta:
+        if self.d_indv!=self.d_comb:
             raise ParameterError('''
                 Set bound_fun explicitly. 
                 The default bound_fun is the identity map. 
-                Since individual solution dimension rho != combined solution dimension eta, 
+                Since individual solution dimension d_indv != combined solution dimension d_comb, 
                 QMCPy cannot infer a reasonable bound function.''')
         return bound_low,bound_high
 
@@ -190,9 +195,9 @@ class Integrand(object):
             comb_flags (bool ndarray): flags indicating weather the combined integrals are insufficiently approximated
 
         Return:
-            (bool ndarray): length (Integrand.rho) flags for individual integrands
+            (bool ndarray): length (Integrand.d_indv) flags for individual integrands
         """
-        return comb_flags if self.rho==self.eta else  tile((comb_flags==False).any(),self.rho)
+        return comb_flags if self.d_indv==self.d_comb else  tile((comb_flags==False).any(),self.d_indv)
 
     def _dimension_at_level(self, level):
         """

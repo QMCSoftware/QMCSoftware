@@ -39,6 +39,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         dvec            [0 1]
         randomize       1
         order           natural
+        gen_vec         [     1 182667]
         entropy         7
         spawn_key       ()
     >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
@@ -55,7 +56,7 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> cf = CustomFun(
     ...     true_measure = Uniform(Lattice(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
-    ...     rho = (2,3))
+    ...     dimension_indv = (2,3))
     >>> sol,data = CubQMCLatticeG(cf,abs_tol=1e-6).integrate()
     >>> data
     LDTransformData (AccumulateData Object)
@@ -85,6 +86,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         dvec            [0 1 2 3 4 5]
         randomize       1
         order           natural
+        gen_vec         [     1 182667 469891 498753 110745 446247]
         entropy         7
         spawn_key       ()
     

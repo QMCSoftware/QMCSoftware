@@ -49,6 +49,7 @@ class CubQMCCLT(StoppingCriterion):
         dvec            0
         randomize       1
         order           natural
+        gen_vec         1
         entropy         7
         spawn_key       ()
     >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
@@ -85,6 +86,7 @@ class CubQMCCLT(StoppingCriterion):
         dvec            [0 1 2]
         randomize       1
         order           natural
+        gen_vec         [     1 182667 469891]
         entropy         7
         spawn_key       ()
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
@@ -95,7 +97,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> cf = CustomFun(
     ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
-    ...     rho = (2,3))
+    ...     dimension_indv = (2,3))
     >>> sol,data = CubQMCCLT(cf,abs_tol=1e-4).integrate()
     >>> data
     MeanVarDataRep (AccumulateData Object)
@@ -169,39 +171,39 @@ class CubQMCCLT(StoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
-        self.rho = self.integrand.rho
+        self.d_indv = self.integrand.d_indv
         self.d = self.discrete_distrib.d
         super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[LD], allow_vectorized_integrals=True)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
-        self.alphas_indv,identity_dependency = self._compute_indv_alphas(full(self.integrand.eta,self.alpha))
+        self.alphas_indv,identity_dependency = self._compute_indv_alphas(full(self.integrand.d_comb,self.alpha))
         self.t_star = -t.ppf(self.alphas_indv/2,df=self.replications-1)
          
     def integrate(self):
         """ See abstract method. """
         t_start = time()
-        self.datum = empty(self.rho,dtype=object)
-        for j in ndindex(self.rho):
+        self.datum = empty(self.d_indv,dtype=object)
+        for j in ndindex(self.d_indv):
             self.datum[j] = MeanVarDataRep(self.t_star[j],self.inflate,self.replications)
         self.data = MeanVarDataRep.__new__(MeanVarDataRep)
-        self.data.flags_indv = tile(False,self.rho)
-        self.data.compute_flags = tile(True,self.rho)
+        self.data.flags_indv = tile(False,self.d_indv)
+        self.data.compute_flags = tile(True,self.d_indv)
         self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
-        self.data.n_rep = tile(self.n_init,self.rho)
+        self.data.n_rep = tile(self.n_init,self.d_indv)
         self.data.n_min_rep = 0
-        self.data.indv_bound_low = tile(-inf,self.rho)
-        self.data.indv_bound_high = tile(inf,self.rho)
-        self.data.solution_indv = tile(nan,self.rho)
+        self.data.indv_bound_low = tile(-inf,self.d_indv)
+        self.data.indv_bound_high = tile(inf,self.d_indv)
+        self.data.solution_indv = tile(nan,self.d_indv)
         self.data.solution = nan
         self.data.xfull = empty((0,self.d))
-        self.data.yfull = empty((0,)+self.rho)
+        self.data.yfull = empty((0,)+self.d_indv)
         while True:
             n_min = self.data.n_min_rep
             n_max = int(self.data.n_rep.max())
             n = int(n_max-n_min)
             xnext = vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
             ynext = self.integrand.f(xnext,compute_flags=self.data.compute_flags)
-            for j in ndindex(self.rho):
+            for j in ndindex(self.d_indv):
                 if self.data.flags_indv[j]: continue
                 yj = ynext[(slice(None),)+j].reshape((n,self.replications),order='f')
                 self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j] = self.datum[j].update_data(yj)

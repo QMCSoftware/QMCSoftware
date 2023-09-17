@@ -44,12 +44,12 @@ class BoxIntegral(Integrand):
         self.s = array([s]) if isscalar(s) else array(s)
         self.sampler = sampler
         self.true_measure = Uniform(self.sampler, lower_bound=0., upper_bound=1.)
-        super(BoxIntegral,self).__init__(rho=len(self.s),eta=len(self.s),parallel=False) # output dimensions per sample
+        super(BoxIntegral,self).__init__(dimension_indv=len(self.s),dimension_comb=len(self.s),parallel=False) # output dimensions per sample
 
     def g(self, t, **kwargs):
-        compute_flags = kwargs['compute_flags'] if 'compute_flags' in kwargs else ones(self.rho,dtype=int)
+        compute_flags = kwargs['compute_flags'] if 'compute_flags' in kwargs else ones(self.d_indv,dtype=int)
         n,d = t.shape
-        y = zeros((n,)+self.rho,dtype=float)
+        y = zeros((n,)+self.d_indv,dtype=float)
         for j in range(len(self.s)):
             if compute_flags[j] == 1: 
                 y[:,j] = (t**2).sum(1)**(self.s[j]/2)

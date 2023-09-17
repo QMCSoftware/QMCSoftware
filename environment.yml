@@ -9,9 +9,10 @@ dependencies:
   - pandoc>=2.2
   - graphviz=2.50.0
   - pip:
-    - numpy==1.23.3
-    - scipy==1.9.2
+    - numpy==1.23.4
+    - scipy==1.9.3
     - pandas==1.4.3
+    - gpytorch==1.10
     - matplotlib==3.5.2
     - jupyter==1.0.0
     - coverage==6.4.1
@@ -21,3 +22,7 @@ dependencies:
     - sphinx-math-dollar==1.2.1
     - sphinx-rtd-theme==1.0.0
     - sphinx-markdown-tables==0.0.17
+    - umbridge==1.2.1
+    - scikit-learn
+    - botorch
+    - -e .

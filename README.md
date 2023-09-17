@@ -90,34 +90,9 @@ We also highly recommend you take a look at [Fred Hickernell's tutorial at the M
 
 ----
 
-## Developers
- 
-- Sou-Cheng T. Choi
-- Fred J. Hickernell
-- Michael McCourt
-- Jagadeeswaran Rathinavel
-- Aleksei Sorokin
+## Community
 
-----
-
-## Collaborators
-
-- Adrian Ebert
-- Mike Giles
-- Marius Hofert
-- Sergei Kucherenko
-- Pierre L’Ecuyer
-- Christiane Lemieux
-- Dirk Nuyens
-- Onyekachi Osisiogu 
-- Art Owen
-- Pieterjan Robbe
-
-----
-
-## Contributors
-
-- Jungtaek Kim
+Please refer to [this document](https://github.com/QMCSoftware/QMCSoftware/blob/develop/community.md) for the key roles in the QMCPy community.
 
 ## Citation
 
@@ -132,6 +107,13 @@ https://qmcsoftware.github.io/QMCSoftware/
 BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
 
 ----
+## Video Tutorial
+Please refer to [this video](https://www.youtube.com/watch?v=bRcKiLA2yBQ) for a quick introduction to QMCPy.
+[![Watch the video](https://img.youtube.com/vi/bRcKiLA2yBQ/0.jpg)](https://youtu.be/bRcKiLA2yBQ)
+
+For a more detail introduction refer to [this video](https://www.youtube.com/watch?v=gL8M_7c-YUE).
+[![Watch the video](https://img.youtube.com/vi/gL8M_7c-YUE/0.jpg)](https://youtu.be/gL8M_7c-YUE)
+
 
 ## References
 
@@ -203,7 +185,7 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
   <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true" width="300" height="150">
 
-- **[Kamakura Corporation](http://www.kamakuraco.com)**
+- **[Kamakura Corporation](http://www.kamakuraco.com), acquired by [SAS Institute Inc.](https://www.sas.com) in June 2022**
 
   <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
 

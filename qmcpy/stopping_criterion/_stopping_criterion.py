@@ -29,8 +29,8 @@ class StoppingCriterion(object):
         # multilevel compatibility check
         if self.integrand.leveltype not in allowed_levels:
             raise ParameterError('Integrand is %s level but %s only supports %s level problems.'%(self.integrand.leveltype,sname,allowed_levels))
-        if (not allow_vectorized_integrals) and self.integrand.rho!=(1,):
-            raise ParameterError('Vectorized integrals (with rho>1 outputs per sample) are not supported by this stopping criterion')
+        if (not allow_vectorized_integrals) and self.integrand.d_indv!=(1,):
+            raise ParameterError('Vectorized integrals (with d_indv>1 outputs per sample) are not supported by this stopping criterion')
         # parameter checks
         if not hasattr(self,'parameters'):
             self.parameters = []
@@ -59,13 +59,13 @@ class StoppingCriterion(object):
         
         Return:
             ndarray: uncertainty levels on individual solutions"""
-        alphas_indv = tile(1,self.integrand.rho)
+        alphas_indv = tile(1,self.integrand.d_indv)
         identity_dependency = True
-        for k in ndindex(self.integrand.eta):
-            comb_flags = tile(True,self.integrand.eta)
+        for k in ndindex(self.integrand.d_comb):
+            comb_flags = tile(True,self.integrand.d_comb)
             comb_flags[k] = False
             flags_indv = self.integrand.dependency(comb_flags)
-            if self.integrand.rho!=self.integrand.eta or (flags_indv!=comb_flags).any(): identity_dependency=False
+            if self.integrand.d_indv!=self.integrand.d_comb or (flags_indv!=comb_flags).any(): identity_dependency=False
             dependents_k = ~flags_indv
             n_dep_k = dependents_k.sum()
             alpha_k = alphas_comb[k]/n_dep_k

@@ -171,11 +171,61 @@ Linear Function
 .. automodule:: qmcpy.integrand.linear0
     :members:
 
+Bayesian Logistic Regression
+............................
+
+.. automodule:: qmcpy.integrand.bayesian_lr_coeffs
+    :members:
+
+Genz Function
+.............
+
+.. automodule:: qmcpy.integrand.genz
+    :members:
+
+Ishigami Function
+.................
+
+.. automodule:: qmcpy.integrand.ishigami
+    :members:
+
 Sensitivity Indices
 ...................
 
 .. automodule:: qmcpy.integrand.sensitivity_indices
     :members:
+
+UM-Bridge Wrapper
+.................
+
+.. automodule:: qmcpy.integrand.um_bridge_wrapper
+    :members:
+
+Sin 1d 
+......
+
+.. automodule:: qmcpy.integrand.sin1d
+    :members:
+
+Multimodal 2d 
+.............
+
+.. automodule:: qmcpy.integrand.multimodal2d
+    :members:
+
+Four Branch 2d 
+..............
+
+.. automodule:: qmcpy.integrand.fourbranch2d
+    :members:
+
+Hartmann 6d
+...........
+
+.. automodule:: qmcpy.integrand.hartmann6d
+    :members:
+
+
 
 
 
@@ -257,6 +307,12 @@ Multilevel MC Cubature
 ......................
 
 .. automodule:: qmcpy.stopping_criterion.cub_mc_ml
+    :members:
+
+Probability of Failure with Guassian Processes
+..............................................
+
+.. automodule:: qmcpy.stopping_criterion.pf_gp_ci
     :members:
 
 
