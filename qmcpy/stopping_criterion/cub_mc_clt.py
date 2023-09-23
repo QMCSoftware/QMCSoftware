@@ -146,7 +146,7 @@ class CubMCCLT(StoppingCriterion):
         if self.data.n_total + self.data.n.sum() > self.n_max:
             # cannot generate this many new samples
             warning_s = """
-            Alread generated %d samples.
+            Already generated %d samples.
             Trying to generate %d new samples, which would exceed n_max = %d.
             The number of new samples will be decrease proportionally for each integrand.
             Note that error tolerances may no longer be satisfied.""" \
