@@ -14,6 +14,6 @@ class MeanVarDataVec(AccumulateData):
 
     def update_data(self,y):
         muhat = y.mean()
-        sighat = y.std()
+        sighat = y.std(ddof = 1)
         bounds = muhat+array([-1,1])*self.z_star*self.inflate*sighat/sqrt(len(y))
         return muhat,bounds[0],bounds[1]
