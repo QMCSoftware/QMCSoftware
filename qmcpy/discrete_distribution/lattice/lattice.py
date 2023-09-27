@@ -205,15 +205,6 @@ class Lattice(LD):
         x = x_lat_full[cut1:cut2, :]
         return x
     
-    def gen_point(i, n):
-        """ Generate a single lattice point. """
-        return ((i * self.gen_vec) % n) / float(n)
-    
-    def gen_block_points(m):
-        """ Generate a block of points. """
-        n = 2 ** m
-        return [gen_point(i, n) for i in arange(1, n + 1, 2)]
-
     def _mps_process(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
@@ -224,16 +215,35 @@ class Lattice(LD):
             x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
         else:
             import concurrent.futures
-            # Makes a Process Pool
+            def gen_point(i, n):
+                """ Generate a single lattice point. """
+                return ((i * self.gen_vec) % n) / float(n)
+            def gen_block_points(m):
+                """ Generate a block of points. """
+                n = 2 ** m
+                return [gen_point(i, n) for i in arange(1, n + 1, 2)]
+
             with concurrent.futures.ProcessPoolExecutor() as executor:
                 m_values = list(range(int(m_low), int(m_high) + 1))
 
-                block_lists = list(executor.map(self.gen_block_points, m_values, [self.gen_vec] * len(m_values)))
-            x_lat_full = vstack(block_lists)
+                block_list = list(executor.map(self.gen_block_points, m_values, [self.gen_vec] * len(m_values)))
+            
+            x_lat_full = vstack(block_list)
+
         cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
         cut2 = int(cut1 + n_max - n_min)
         x = x_lat_full[cut1:cut2, :]
         return x
+    
+    def gen_point(i, n):
+        """ Generate a single lattice point. """
+        return ((i * self.gen_vec) % n) / float(n)
+    
+    def gen_block_points(m):
+        """ Generate a block of points. """
+        n = 2 ** m
+        return [gen_point(i, n) for i in arange(1, n + 1, 2)]
+
 
     def _gen_block_linear(self, m_next, first=True):
         n = int(2**m_next)
@@ -308,22 +318,22 @@ class Lattice(LD):
         return x
     
     def _gail_natural_process(self, n_min, n_max):
-            m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
-            m_high = ceil(log2(n_max))
-            if not self.is_parallel:
-                x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low), int(m_high) + 1)])
-            else:
-                import concurrent.futures
-                # create a ThreadPoolExecutor
-                with concurrent.futures.ProcessPoolExecutor() as executor:
-                    futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
+        m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
+        m_high = ceil(log2(n_max))
+        if not self.is_parallel:
+            x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low), int(m_high) + 1)])
+        else:
+            import concurrent.futures
+            # create a ThreadPoolExecutor
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
                 # collect the results in the order the futures (calls) created
                 x_lat_full = vstack([future.result() for future in futures])
 
-            cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
-            cut2 = int(cut1 + n_max - n_min)
-            x = x_lat_full[cut1:cut2, :]
-            return x
+        cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
+        cut2 = int(cut1 + n_max - n_min)
+        x = x_lat_full[cut1:cut2, :]
+        return x
 
 
 
