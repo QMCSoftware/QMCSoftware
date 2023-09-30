@@ -12,3 +12,4 @@ from .cub_qmc_bayes_lattice_g import CubBayesLatticeG, CubQMCBayesLatticeG
 from .cub_qmc_bayes_net_g import CubBayesNetG, CubBayesSobolG, CubQMCBayesNetG, CubQMCBayesSobolG
 from .cub_mc_clt_vec import CubMCCLTVec
 
+from .pf_gp_ci import PFGPCI,PFSampleErrorDensityAR,SuggesterSimple

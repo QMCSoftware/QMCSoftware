@@ -72,8 +72,9 @@ doc_html: _doc _uml
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
 
 doc_pdf: _doc _uml
+	@cd $(BUILDDIR) && rm -f qmcpy.pdf
 	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going  2>/dev/null
-	@cd sphinx/_build && make
+	@cd $(BUILDDIR) && make
 
 doc_epub: _doc _uml
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
@@ -84,7 +85,7 @@ doctests:
 
 doctests_no_docker:
 	@echo "\nDoctests Without Docker Containers"
-	python -m coverage run --source=./ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
 
 fasttests:
 	@echo "\nFastests"

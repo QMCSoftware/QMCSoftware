@@ -225,7 +225,7 @@ class CubQMCCLT(StoppingCriterion):
                 break # sufficiently estimated
             elif 2*self.data.n_total>self.n_max:
                 warning_s = """
-                Alread generated %d samples.
+                Already generated %d samples.
                 Trying to generate %d new samples would exceeds n_max = %d.
                 No more samples will be generated.
                 Note that error tolerances may not be satisfied. """ \
