@@ -9,10 +9,8 @@ import warnings
 import time
 from numpy import *
 from scipy.stats import norm
-try:
-    import gpytorch 
-    import torch
-except: pass 
+import gpytorch 
+import torch
 
 class Suggester(object): pass
 

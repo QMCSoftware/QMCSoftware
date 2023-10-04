@@ -2,10 +2,8 @@ from ._accumulate_data import AccumulateData
 from numpy import *
 from scipy.stats import norm
 import warnings
-try:
-    import gpytorch 
-    import torch
-except: pass 
+import gpytorch 
+import torch
 
 def _get_phi(gp, x):
     yhat,yhatstd = gp.predict(x)
@@ -48,7 +46,7 @@ class PFGPCIData(AccumulateData):
         self.ci_high = []
         self.solutions = []
         self.x = empty((0,self.d),dtype=float)
-        self.y = array([],dtype=float)     
+        self.y = array([],dtype=float)
         self.gpyt_model = ExactGPyTorchRegressionModel(
             x_t = self.x, y_t = self.y,
             prior_mean = self.gpytorch_prior_mean,
@@ -223,7 +221,6 @@ class PFGPCIData(AccumulateData):
             ax.set_ylabel(r'$u_2$')
         return fig,gs
 
-
 class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
     allowed_likelihood_types = (
         gpytorch.likelihoods.GaussianLikelihood,
@@ -239,9 +236,9 @@ class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
         self.d = x_t.shape[1]
         self.use_gpu = use_gpu
         if self.use_gpu:
-          assert torch.cuda.is_available()
-          self = self.cuda()
-          self.likelihood = self.likelihood.cuda()
+            assert torch.cuda.is_available()
+            self = self.cuda()
+            self.likelihood = self.likelihood.cuda()
     def forward(self, x):
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
