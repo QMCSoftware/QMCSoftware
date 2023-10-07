@@ -1,7 +1,6 @@
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 from numpy import *
 
-
 class DiscreteDistribution(object):
     """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
 
@@ -16,7 +15,7 @@ class DiscreteDistribution(object):
         """
         prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
-            raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
+            raise ParameterError(prefix + 'self.mimcs (measure mimicked by the distribution)')
         if not hasattr(self,'low_discrepancy'):
             raise ParameterError(prefix + 'self.low_discrepancy')
         if not hasattr(self,'parameters'):
@@ -52,6 +51,7 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
+    
     def spawn(self, s=1, dimensions=None):
         """
         Spawn new instances of the current discrete distribution but with new seeds and dimensions.
@@ -81,7 +81,7 @@ class DiscreteDistribution(object):
 
         Args:
             child_seeds (numpy.random.SeedSequence): length s array of seeds for each spawn
-            dimension (int): lenth s array of dimensions for each spawn
+            dimension (int): length s array of dimensions for each spawn
 
         Return:
             DiscreteDistribution: spawn with new dimension using child_seed
@@ -95,7 +95,7 @@ class DiscreteDistribution(object):
         if len(args)>2 or len(args)==0:
             raise Exception('''
                 expecting 1 or 2 arguments:
-                    1 argument corresponds to n, the number of smaples to generate. In this case n_min=0 and n_max=n for LD sequences
+                    1 argument corresponds to n, the number of samples to generate. In this case n_min=0 and n_max=n for LD sequences
                     2 arguments corresponds to n_min and n_max. Note this is incompatible with IID generators which only expect 1 argument.
                 ''')
         if len(args) == 1:

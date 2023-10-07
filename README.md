@@ -90,34 +90,9 @@ We also highly recommend you take a look at [Fred Hickernell's tutorial at the M
 
 ----
 
-## Developers
- 
-- Sou-Cheng T. Choi
-- Fred J. Hickernell
-- Michael McCourt
-- Jagadeeswaran Rathinavel
-- Aleksei Sorokin
+## Community
 
-----
-
-## Collaborators
-
-- Adrian Ebert
-- Mike Giles
-- Marius Hofert
-- Sergei Kucherenko
-- Pierre L’Ecuyer
-- Christiane Lemieux
-- Dirk Nuyens
-- Onyekachi Osisiogu 
-- Art Owen
-- Pieterjan Robbe
-
-----
-
-## Contributors
-
-- Jungtaek Kim
+Please refer to [this document](https://github.com/QMCSoftware/QMCSoftware/blob/develop/community.md) for the key roles in the QMCPy community.
 
 ## Citation
 
@@ -132,6 +107,13 @@ https://qmcsoftware.github.io/QMCSoftware/
 BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
 
 ----
+## Video Tutorial
+Please refer to [this video](https://www.youtube.com/watch?v=bRcKiLA2yBQ) for a quick introduction to QMCPy.
+[![Watch the video](https://img.youtube.com/vi/bRcKiLA2yBQ/0.jpg)](https://youtu.be/bRcKiLA2yBQ)
+
+For a more detail introduction refer to [this video](https://www.youtube.com/watch?v=gL8M_7c-YUE).
+[![Watch the video](https://img.youtube.com/vi/gL8M_7c-YUE/0.jpg)](https://youtu.be/gL8M_7c-YUE)
+
 
 ## References
 
@@ -169,7 +151,7 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
 <b>[17]</b> Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
 
-<b>[18]</b> B. D. Keister, Multidimensional Quadrature Algorithms,  'Computers in Physics', *10*, pp. 119-122, 1996.
+<b>[18]</b> B. D. Keister, Multidimensional Quadrature Algorithms,  'Computers in Physics', 10, pp. 119-122, 1996.
 
 <b>[19]</b> L’Ecuyer, Pierre & Munger, David. (2015). LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules. ACM Transactions on Mathematical Software. 42. 10.1145/2754929. 
 
@@ -185,7 +167,7 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
 <b>[25]</b> Paul Bratley and Bennett L. Fox. 1988. Algorithm 659: Implementing Sobol's quasirandom sequence generator. ACM Trans. Math. Softw. 14, 1 (March 1988), 88–100. DOI:https://doi.org/10.1145/42288.214372
 
-<b>[26]</b> P. L'Ecuyer, P. Marion, M. Godin, and F. Puchhammer, ``A Tool for Custom Construction of QMC and RQMC Point Sets,'' Monte Carlo and Quasi-Monte Carlo Methods 2020.
+<b>[26]</b> P. L'Ecuyer, P. Marion, M. Godin, and F. Puchhammer, "A Tool for Custom Construction of QMC and RQMC Point Sets," Monte Carlo and Quasi-Monte Carlo Methods 2020.
 
 <b>[27]</b> P Kumaraswamy, A generalized probability density function for double-bounded random processes. J. Hydrol. 46, 79–88 (1980).
 
@@ -203,7 +185,7 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
   <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true" width="300" height="150">
 
-- **[Kamakura Corporation](http://www.kamakuraco.com)**
+- **[Kamakura Corporation](http://www.kamakuraco.com), acquired by [SAS Institute Inc.](https://www.sas.com) in June 2022**
 
   <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
 

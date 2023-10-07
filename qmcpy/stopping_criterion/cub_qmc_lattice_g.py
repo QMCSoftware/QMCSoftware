@@ -107,7 +107,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
         Available from http://gailgithub.github.io/GAIL_Dev/
 
-    Guarantee
+    Guarantee:
         This algorithm computes the integral of real valued functions in $[0,1]^d$
         with a prescribed generalized error tolerance. The Fourier coefficients
         of the integrand are assumed to be absolutely convergent. If the

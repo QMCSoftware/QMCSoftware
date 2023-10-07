@@ -117,9 +117,9 @@ class DigitalNetB2(LD):
                 'DS': digital shift only
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
-            generating_matrices (ndarray or str): generating matricies or path to generating matrices.
+            generating_matrices (ndarray or str): generating matrices or path to generating matrices.
                 ndarray should have shape (d_max, m_max) where each int has t_max bits
-                generating_matrices sould be formatted like `gen_mat.21201.32.32.msb.npy` 
+                generating_matrices should be formatted like `gen_mat.21201.32.32.msb.npy`
                 with name.d_max.t_max.m_max.{msb,lsb}.npy
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix. 
@@ -183,7 +183,7 @@ class DigitalNetB2(LD):
             self.msb = bool(parts[-2].lower()=='msb')
         else:
             msg = '''
-                z_path sould be formatted like `name.d_max.m_max.t_max.msb_or_lsb.npy`
+                z_path should be formatted like `name.d_max.m_max.t_max.msb_or_lsb.npy`
                     d_max is the max dimension, 
                     m_max is such that 2^m_max is the max number of samples supported 
                     t_max is the number of bits in each int of the generating matrix
@@ -214,7 +214,7 @@ class DigitalNetB2(LD):
             if self.set_lms:
                 if self._verbose: print('\n\ts[dvec[%d]]\n\t\t'%j,end='',flush=True)
                 for t in range(self.t_lms):
-                    t1 = min(t,self.t_max)
+                    t1 = int(minimum(t,self.t_max))
                     u = self.rng.integers(low=0, high=1<<t1, size=1, dtype=uint64)
                     u <<= (self.t_max-t1)
                     if t1<self.t_max: u += 1<<(self.t_max-t1-1)
