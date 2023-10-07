@@ -1,1 +1,1 @@
-from .load_c_lib import c_lib
+from .digital_net_compression import DigitalNetDataCompressor

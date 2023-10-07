@@ -4,12 +4,11 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 import numpy as np
-import c_lib
 from ctypes import *
 from numpy.ctypeslib import ndpointer
 from sklearn.preprocessing import MinMaxScaler
 import logging
-from myhosobol import MyHOSobol
+from .myhosobol import MyHOSobol
 import math
 
 def approxmeanMXY(nu, m, x, y, d):

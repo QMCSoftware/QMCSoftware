@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-import ..linreg
+
 
 class TestLinreg(unittest.TestCase):
 
@@ -12,7 +12,3 @@ class TestLinreg(unittest.TestCase):
 		reg_weights = np.loadtxt("reg_weights.csv",    delimiter=",", dtype=str)
 
 		#breakpoint()
-
-
-
-

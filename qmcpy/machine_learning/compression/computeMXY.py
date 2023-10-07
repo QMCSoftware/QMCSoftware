@@ -1,6 +1,6 @@
 from ctypes import *
 import numpy as np
-from approxmeanMXY import *
+from .approxmeanMXY import *
 from numpy.ctypeslib import ndpointer
 import copy
 

@@ -1,8 +1,8 @@
 #from ..util import MethodImplementationError, _univ_repr, ParameterError
 from typing import Any
 import numpy as np
-#from myhosobol import MyHOSobol
-#from approxmeanMXY import approxmeanMXY
+#from .myhosobol import MyHOSobol
+#from .approxmeanMXY import approxmeanMXY
 import logging
 
 

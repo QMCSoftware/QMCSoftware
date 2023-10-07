@@ -1,8 +1,8 @@
 import logging
 import numpy as np
-from myhosobol import MyHOSobol
-from approxmeanMXY import approxmeanMXY
-from compress import Compress
+from .myhosobol import MyHOSobol
+from .approxmeanMXY import approxmeanMXY
+from .compress import Compress
 
 class digital_net_compression(Compress):
 
