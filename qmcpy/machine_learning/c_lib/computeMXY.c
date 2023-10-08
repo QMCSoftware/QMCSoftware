@@ -36,10 +36,12 @@ void print_array_values(double *arr, int size, int n,  char *name) {
 
 EXPORT double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px, double* pz, double* py){
   int base=2;
+  /*
   printf("DEBUG m = %d, mp = %d, base = %d, s = %d, N = %d, Nqmc = %d \n", m, mp, base, s, N, Nqmc);
   print_array_values(px, N * s, 3, "px");
   print_array_values(pz, s * Nqmc, 3, "pz");
   print_array_values(py, N, 3, "py");
+  */
   int outs = 1;
 
   int* result1 = malloc((m+1)*sizeof(int));
@@ -71,7 +73,7 @@ EXPORT double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px,
         weights[ell+Nqmc]=Mtmp2;
    }
    //printf("\n");
-   print_array_values(weights, (1+outs)*Nqmc, 5, "weights");
+   //print_array_values(weights, (1+outs)*Nqmc, 5, "weights");
    return weights;
 }
 

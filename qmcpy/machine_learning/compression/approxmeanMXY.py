@@ -1,8 +1,7 @@
 import numpy as np
-#import os
+import os
 from qmcpy.machine_learning.compression.myhosobol import MyHOSobol
 from qmcpy.machine_learning.compression.computeMXY import computeWeights
-
 
 def approxmeanMXY(nu, m, x, y, d):
     s = x.shape[1]
