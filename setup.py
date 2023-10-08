@@ -4,6 +4,7 @@ from setuptools.command.install import install
 from setuptools import Command
 import os
 
+
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
 
@@ -20,6 +21,7 @@ class CustomInstall(install):
             print('Problem compiling html or pdf documentation')
         super(CustomInstall, self).run()
 
+
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
     user_options = []
@@ -32,6 +34,7 @@ class CleanCommand(Command):
 
     def run(self):
         os.system("rm -vrf ./build ./dist ./*.pyc ./qmcpy/qmcpy.egg-info")
+
 
 try:
     with open("README.md", "r", encoding="utf-8", errors='ignore') as fh:
@@ -46,10 +49,14 @@ packages = [
     'qmcpy.integrand',
     'qmcpy.stopping_criterion',
     'qmcpy.accumulate_data',
+    'qmcpy.machine_learning',
     'qmcpy.util',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
-    'qmcpy.discrete_distribution.digital_net_b2']
+    'qmcpy.discrete_distribution.digital_net_b2',
+    'qmcpy.machine_learning.c_lib',
+    'qmcpy.machine_learning.compression'
+]
 
 setuptools.setup(
     name="qmcpy",
@@ -80,7 +87,13 @@ setuptools.setup(
             sources=[
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
                 'qmcpy/discrete_distribution/c_lib/digital_net_b2.c',
-                'qmcpy/discrete_distribution/c_lib/fwht.c',],)],
+                'qmcpy/discrete_distribution/c_lib/fwht.c', ], ),
+        Extension(
+            name='qmcpy.machine_learning.c_lib.c_lib',
+            sources=[
+                'qmcpy/machine_learning/c_lib/computeMXY.c',
+            ], ),
+                 ],
     cmdclass={
         'clean': CleanCommand,
         'install': CustomInstall})
