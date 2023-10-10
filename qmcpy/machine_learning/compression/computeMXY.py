@@ -5,13 +5,13 @@ from numpy.ctypeslib import ndpointer
 import copy
 
 
-def computeWeights(nu, m, base, x, z, y):
+def computeWeights(nu, m, x, z, y):
     """
     >>> import os; path=os.getcwd()+os.sep+"qmcpy/machine_learning/compression"+os.sep
     >>> x = np.loadtxt(f"{path}/test_data/reg_x.csv", delimiter=',')
     >>> y = np.loadtxt(f"{path}/test_data/reg_y.csv", delimiter=",")
     >>> z = np.loadtxt(f"{path}/test_data/reg_z.csv", delimiter=',').T
-    >>> weights = computeWeights(nu=1, m=6, base=2, x=x, z=z, y=y)
+    >>> weights = computeWeights(nu=1, m=6, x=x, z=z, y=y)
     >>> weights_true = np.loadtxt(f"{path}/test_data/reg_weights.csv",  delimiter=",")
     >>> np.allclose(weights, weights_true, atol=1e-3)
     True

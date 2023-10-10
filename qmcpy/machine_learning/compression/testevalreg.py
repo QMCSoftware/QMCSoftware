@@ -10,6 +10,7 @@ for machine learning." Journal of Complexity 67 (2021): 101587.
 from qmcpy.machine_learning.compression.approxmeanMXY import approxmeanMXY
 import matplotlib.pyplot as plt
 import numpy as np
+from qmcpy.machine_learning.compression.digital_net_compression import DigitalNetDataCompressor
 
 
 def data_compress_lin_reg(x, labels, mmax=5, nsample=100, alpha=1):
@@ -28,7 +29,10 @@ def data_compress_lin_reg(x, labels, mmax=5, nsample=100, alpha=1):
     # loop to plot the approximation error
     for m in range(mmax):
         # compute weights for approximation formula
-        weights, z = approxmeanMXY(m + 1, int(np.ceil((1 + 1.0 / alpha) * (m + 1) + t)), x, labels, alpha)
+        dn = DigitalNetDataCompressor(nu=m + 1, m=int(np.ceil((1 + 1.0 / alpha) * (m + 1) + t)), dataset=x, labels=labels, alpha=alpha)
+        dn.approx_mean_mxy()
+        weights, z = dn.weights, dn.sobol
+        #weights, z = approxmeanMXY(m + 1, int(np.ceil((1 + 1.0 / alpha) * (m + 1) + t)), x, labels, alpha)
 
         # compute exact error for random linear regression functions
         w = np.random.randn(d + 1, nsample)
@@ -51,7 +55,7 @@ def data_compress_lin_reg(x, labels, mmax=5, nsample=100, alpha=1):
 if __name__ == "__main__":
 
     # set up random data
-    N = int(1e6)  # 1e6
+    N = int(1e4)  # 1e6
     # np.random.seed(2)
     x = np.abs(np.random.randn(N, 5))
     x = x / (1.01 * np.amax(x, axis=0))
@@ -77,7 +81,7 @@ if __name__ == "__main__":
 
     plt.xlabel("Cost")
     plt.ylabel("Error")
-    plt.ylim(1e-3, 10)  # set y-axis limits
+    plt.ylim(1e-3, 10)  # set labels-axis limits
     plt.legend(loc='lower left')  # bbox_to_anchor=(1, 0.5))  # display the legends
     plt.title("QMC Data Compression for Linear Regression")
     plt.tight_layout()
