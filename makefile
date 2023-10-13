@@ -144,3 +144,7 @@ gen_doc:
 	@make doc_pdf
 	#   Suggest to check time stamp of qmcpy.pdf
 	@ls -l sphinx/_build/qmcpy.pdf
+
+rm_qmcpy_env:
+	conda deactivate
+	conda remove --name qmcpy --all
