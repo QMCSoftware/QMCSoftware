@@ -1,3 +1,1 @@
-from .digital_net_compression import DigitalNetDataCompressor
-from .approxmeanMXY import approxmeanMXY
-from .computeMXY import computeWeights
+from .digital_net_compressor import DigitalNetDataCompressor
