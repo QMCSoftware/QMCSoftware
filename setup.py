@@ -55,7 +55,7 @@ packages = [
     'qmcpy.discrete_distribution.c_lib',
     'qmcpy.discrete_distribution.digital_net_b2',
     'qmcpy.machine_learning.c_lib',
-    'qmcpy.machine_learning.digital_net_compressor'
+    'qmcpy.machine_learning.compression'
 ]
 
 setuptools.setup(

@@ -1,1 +1,1 @@
-from .compression import *
+from .compression import DigitalNetDataCompressor
