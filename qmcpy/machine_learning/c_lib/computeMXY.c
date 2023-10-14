@@ -3,6 +3,16 @@
 #include <math.h>
 #include "export_ctypes.h"
 
+#include <Python.h>
+
+// in Windows, you must define an initialization function for your extension
+// because setuptools will build a .pyd file, not a DLL
+// https://stackoverflow.com/questions/34689210/error-exporting-symbol-when-building-python-c-extension-in-windows
+PyMODINIT_FUNC PyInit_c_lib(void)
+{
+    // do stuff...
+    printf("");
+}
 
 /* For t'=0,...,t, the function computes the number N_t' of all s-dimensional
  * multi-indices mvec' such that |mvec'|=t' and mvec'<= mvec component-wise.
