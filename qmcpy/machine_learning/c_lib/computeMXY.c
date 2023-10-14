@@ -19,7 +19,7 @@ void computeS(int s, int N, int  t, int base, double* z, double* x, double* y, i
 /* Computes the binomial coefficient (n k) and divides by N*/
 double nchoosekbyN(int n, int k, double N);
 
-double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px, double* pz, double* py);
+/* double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px, double* pz, double* py); */
 
 void print_array_values(double *arr, int size, int n,  char *name) {
     printf("The first few and last %d values of array %s are:\n", n, name);
