@@ -52,7 +52,7 @@ EXPORT double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px,
 
     /* compute M_{m,mp}(f,x,y) */
     double M=0;
-    int q,ell,k;
+    int q,ell;
     int minsm=s-1; /*contains min(s-1,m) */
     if(m<minsm){minsm=m;}
 
