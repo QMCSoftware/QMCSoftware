@@ -5,6 +5,9 @@ from ..integrand import Integrand
 from numpy import *
 from time import time
 import warnings
+import matplotlib.pyplot as plt
+import scipy as sc
+
 
 
 class _CubQMCLDG(StoppingCriterion):
@@ -156,3 +159,22 @@ class _CubQMCLDG(StoppingCriterion):
         """
         if abs_tol != None: self.abs_tol = abs_tol
         if rel_tol != None: self.rel_tol = rel_tol
+
+    def density_estimation(self):
+        approx_solution, data = self.integrate()
+        g=data.datum[0].y_val
+        a=min(g)
+        b=max(g)
+        print("Lower bound of estimation interval (a) is:",a)
+        print("Upper bound of estimation interval (b) is:",b)
+    
+        kde=sc.stats.gaussian_kde(g.T)
+        z=linspace(a,b,100)
+        pdf_est=kde.evaluate(z.T)
+        plt.figure()
+        plt.plot(z,pdf_est)
+        plt.title("Density estimation")
+        plt.xlabel("x")
+        plt.ylabel("pdf")
+        plt.show()
+        return kde,a,b   
