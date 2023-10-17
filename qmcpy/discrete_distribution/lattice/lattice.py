@@ -177,6 +177,7 @@ class Lattice(LD):
         self.is_parallel = is_parallel
 
 
+
     def _mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
@@ -190,6 +191,7 @@ class Lattice(LD):
             def gen_point(i, n):
                 """ Generate a single lattice point. """
                 return ((i * self.gen_vec) % n) / float(n)
+
             def gen_block_points(m):
                 """ Generate a block of points. """
                 n = 2 ** m
@@ -204,45 +206,45 @@ class Lattice(LD):
         cut2 = int(cut1 + n_max - n_min)
         x = x_lat_full[cut1:cut2, :]
         return x
-    
+
+    def gen_point(self, i, n, gen_vec):
+        """ Generate a single lattice point. """
+        return ((i * gen_vec) % n) / float(n)
+
+    def gen_block_points(self, m, gen_vec):
+        """ Generate a block of points. """
+        n = 2 ** m
+        return [self.gen_point(i, n, gen_vec) for i in arange(1, n + 1, 2)]
+
+
     def _mps_process(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
+
 
         if not self.is_parallel:
             gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
             x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
         else:
             import concurrent.futures
-            def gen_point(i, n):
-                """ Generate a single lattice point. """
-                return ((i * self.gen_vec) % n) / float(n)
-            def gen_block_points(m):
-                """ Generate a block of points. """
-                n = 2 ** m
-                return [gen_point(i, n) for i in arange(1, n + 1, 2)]
 
             with concurrent.futures.ProcessPoolExecutor() as executor:
                 m_values = list(range(int(m_low), int(m_high) + 1))
 
                 block_list = list(executor.map(self.gen_block_points, m_values, [self.gen_vec] * len(m_values)))
-            
+
             x_lat_full = vstack(block_list)
 
         cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
         cut2 = int(cut1 + n_max - n_min)
         x = x_lat_full[cut1:cut2, :]
+
         return x
-    
-    def gen_point(i, n):
-        """ Generate a single lattice point. """
-        return ((i * self.gen_vec) % n) / float(n)
-    
-    def gen_block_points(m):
-        """ Generate a block of points. """
-        n = 2 ** m
-        return [gen_point(i, n) for i in arange(1, n + 1, 2)]
+
+
+
+
 
 
     def _gen_block_linear(self, m_next, first=True):
@@ -297,7 +299,6 @@ class Lattice(LD):
 
             x = outer(y, self.gen_vec) % 1
             return x
-
 
     def _gail_natural(self, n_min, n_max):
         m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
@@ -438,3 +439,7 @@ class Lattice(LD):
                 generating_vector=self.gen_vec_og,
                 d_max=self.d_max,
                 m_max=self.m_max)
+
+
+
+

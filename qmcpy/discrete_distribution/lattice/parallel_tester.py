@@ -1,4 +1,5 @@
 from qmcpy import Lattice
+
 import cProfile
 import pstats
 
@@ -6,6 +7,7 @@ import pstats
 
 
 #Magic Point Shop
+'''
 if __name__ == "__main__":
     input_x = 1_000_000
     process = 0
@@ -36,7 +38,7 @@ if __name__ == "__main__":
         print(f"Process is this much better: {nonprocess - process}")
     else:
         print(f"Non-process is this much better: {process - nonprocess}")
-
+'''
 
 #Natural order
 
@@ -121,4 +123,21 @@ if __name__ == "__main__":
         print(f"Non-process is this much better: {process - nonprocess}")
         
 '''
+
+
+
+'''
+if __name__ == '__main__':
+    from multiprocessing import freeze_support
+    freeze_support()
+    l = Lattice(dimension=1, order="mps_process")
+    print(l.gen_samples(4))
+    '''
+
+
+
+if __name__ == "__main__":
+    x = Lattice(dimension=1, order="mps_process")
+    print(x.gen_samples(7))
+
 
