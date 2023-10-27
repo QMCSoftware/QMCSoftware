@@ -82,10 +82,18 @@ class Halton(LD):
             self.backend = 'QRNG'
             self.d_max = 360
             self.LMS = False
+            if seed is None:
+                self.c_seed = -1
+            else:
+                self.c_seed = seed
         elif randomize is True or randomize.upper() == 'QRNG':
             self.randomize = self.backend = 'QRNG'
             self.d_max = 360
             self.LMS = False
+            if seed is None:
+                self.c_seed = -1
+            else:
+                self.c_seed = seed
         elif randomize.upper() == 'OWEN':
             self.randomize = self.backend = 'OWEN'
             if self.generalize==True:
@@ -101,11 +109,16 @@ class Halton(LD):
                 raise ParameterError("LMS cannot be generalized")
             self.d_max = 360
             self.LMS = True
+            if seed is None:
+                self.c_seed = -1
+            else:
+                self.c_seed = seed
         else:
             raise ParameterError("Halton randomize must be True/False or 'QRNG'/'Owen'/'LMS'")
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(Halton,self).__init__(dimension,seed)
+
         if self.backend == 'QRNG':
             self.randu_d_32 = self.rng.uniform(size=(self.d,32)) if self.randomize is not False else zeros((self.d,32),dtype=float)
         elif self.backend == 'LMS':
@@ -175,9 +188,9 @@ class Halton(LD):
         n = int(n_max-n_min)
         if n_min == 0 and self.randomize is False and warn:
             warnings.warn("Unradnzomied Halton includes the origin as the first point.")
-        if self.backend=='QRNG' or 'LMS':            
+        if (self.backend=='QRNG') or (self.backend=='LMS'):
             x = zeros((self.d,n),dtype=double)                        
-            self.halton_cf_qrng(n,self.d,int(n_min),self.generalize,x,self.randu_d_32,int32(self.dvec),self.LMS)            
+            self.halton_cf_qrng(n,self.d,int(n_min),self.generalize,x,self.randu_d_32,int32(self.dvec),self.LMS,self.c_seed)           
             return x.T
         elif self.backend=='OWEN':
             return self.halton_owen(n,n_min)

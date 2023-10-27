@@ -98,7 +98,7 @@ void print_array(unsigned int matrix[32][32], int m, int n);
 void gen_scrambling_matrix(unsigned int matrix[32][32], int len, int base);
 void sqmatrix_mult(unsigned int matrix[32][32], unsigned int coeff[32], int len, int base);
 
-EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, double *randu_d_32, int *dvec, int lms)
+EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, double *randu_d_32, int *dvec, int lms, int seed)
 {
     static int perm[ghaltonMaxDim];
     int base, i, j, k, l, maxindex, f, start, sz;
@@ -108,7 +108,15 @@ EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, doub
     unsigned int coeff[32];
     unsigned int matrix[32][32];
 
-    srand(time(NULL));  /* seed */
+    if(seed < 0)
+    {
+        srand(time(NULL));
+    }
+    else
+    {
+        srand(seed);
+    }
+
 
     /* Init */
     for (j = 0; j < d; j++)
@@ -155,7 +163,7 @@ EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, doub
         base = primes[dvec[j]];              /* (j+1)st prime number for this dimension */
         if(lms)
         {
-            sz = (int)(ceil(log10(n + n0) / log10(base)));
+            sz = (int)(ceil(log10(pow(2,32)) / log10(base)));
             gen_scrambling_matrix(matrix, sz, base); 
         }
 
@@ -175,15 +183,16 @@ EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, doub
             
             maxindex = k;
 
-            if(lms)
-            {             
-                sqmatrix_mult(matrix, coeff, maxindex, base);                         
-            }
-
             for (l = maxindex + 1; l < 32; l++)
             {
                 coeff[l] = 0;
             }
+            
+            if(lms)
+            {             
+                sqmatrix_mult(matrix, coeff, sz, base);                         
+            }
+
             u = 0.0;
             k = 31;
             f = perm[j];
