@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[13]:
-
 
 import numpy as np
 from ._integrand import Integrand
@@ -100,20 +95,6 @@ class AmericanOption(Integrand):
     
 
 
-# In[14]:
-
-
-apo=AmericanOption().get_discounted_payoffs()
-apo
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
 
 
 

@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[11]:
-
 
 import numpy as np
 from ._integrand import Integrand
@@ -74,23 +69,3 @@ class LookBackOption(Integrand):
             call_put = self.call_put,
             _dim_frac = self.dim_fracs[level] if hasattr(self,'dim_fracs') else 0)
     
-
-
-# In[14]:
-
-
-lbo=LookBackOption().get_discounted_payoffs()
-lbo
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
