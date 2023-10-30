@@ -70,7 +70,7 @@ class CubMCMLCont(StoppingCriterion):
         Args:
             integrand (Integrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            alpha (float): uncertaintly level.
+            alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
                 Takes priority over absolute tolerance and alpha if supplied. 
@@ -154,7 +154,7 @@ class CubMCMLCont(StoppingCriterion):
             # Check if over sample budget
             if (self.data.n_total + self.data.diff_n_level.sum()) > self.n_max:
                 warning_s = """
-                Alread generated %d samples.
+                Already generated %d samples.
                 Trying to generate %d new samples, which would exceed n_max = %d.
                 Stopping integration process.
                 Note that error tolerances may no longer be satisfied""" \
@@ -194,10 +194,10 @@ class CubMCMLCont(StoppingCriterion):
         
         Args:
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            alpha (float): uncertaintly level.
+            alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
-                Takes priority over aboluste tolerance and alpha if supplied. 
+                Takes priority over absolute tolerance and alpha if supplied.
         """
         if rmse_tol != None:
             self.rmse_tol = float(rmse_tol)

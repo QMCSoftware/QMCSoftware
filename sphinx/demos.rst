@@ -45,3 +45,15 @@ Demos
     demo_rst/vectorized_qmc_bayes.rst
 
     demo_rst/umbridge.rst
+
+    demo_rst/lattice_random_generator.rst
+
+    demo_rst/MCQMC2022_Article_Figures.rst
+
+    demo_rst/Purdue_Talk_Figures.rst
+
+    demo_rst/dakota_genz.rst
+
+    demo_rst/pydata.chi.2023.rst
+
+    demo_rst/prob_failure_gp_ci.rst

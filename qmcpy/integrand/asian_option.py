@@ -37,7 +37,7 @@ class AsianOption(Integrand):
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
-        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multilevel_dims=None, _dim_frac=0):
+        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multilevel_dims=None, decomp_type='PCA', _dim_frac=0):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
@@ -55,12 +55,13 @@ class AsianOption(Integrand):
         """
         self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate','mean_type']
         self.sampler = sampler
-        self.true_measure = BrownianMotion(self.sampler,t_final)
+        self.true_measure = BrownianMotion(self.sampler,t_final,decomp_type=decomp_type)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
         self.interest_rate = float(interest_rate)
         self.t_final = t_final
+        self.decomp_type = decomp_type
         self.call_put = call_put.lower()
         if self.call_put not in ['call','put']:
             raise ParameterError("call_put must be either 'call' or 'put'")

@@ -85,3 +85,4 @@ class MeanVarData(AccumulateData):
             self.muhat[l] = y.mean() # compute the sample mean
             self.n_total += self.n[l] # add to total samples
         self.solution = self.muhat.sum() # tentative solution
+        

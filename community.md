@@ -34,9 +34,11 @@ Collaborators play a key role in the development of QMCPy by contributing their 
 
 The following are our collaborators (listed in alphabetical order of last names):
 
+* Yuhan Ding
 * Adrian Ebert
 * Mike Giles
 * Marius Hofert
+* Lan Jiang
 * Sergei Kucherenko
 * Pierre L’Ecuyer
 * Christiane Lemieux
@@ -44,6 +46,7 @@ The following are our collaborators (listed in alphabetical order of last names)
 * Onyekachi Osisiogu
 * Art Owen
 * Pieterjan Robbe
+* Xuan Zhou
 
 Contributors
 -----------------
@@ -55,6 +58,10 @@ Contributors are individuals who actively participate in the development of the 
 * Provide support to other community members
 * Participate in community discussions and decision-making processes
 
-For the list of contributors to our GitHub, please refer to  [https://github.com/QMCSoftware/QMCSoftware/graphs/contributors](https://github.com/QMCSoftware/QMCSoftware/graphs/contributors).
+The contributors to our GitHub are:
+
+<a href="https://github.com/QMCSoftware/QMCSoftware/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=QMCSoftware/QMCSoftware" width=600/>
+</a>
 
 For a list of contributors to [QMCPY.org](https://qmcpy.org), please refer to [https://qmcpy.org/contributors/](https://qmcpy.org/contributors/). 

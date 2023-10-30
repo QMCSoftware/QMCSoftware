@@ -26,14 +26,18 @@ class BrownianMotion(Gaussian):
         decomp_type     PCA
     """
 
-    def __init__(self, sampler, t_final=1, drift=0, decomp_type='PCA'):
+    def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA'):
         """
+        BrowianMotion(t) = (initial_value) + (drift)*t + \sqrt{diffusion}*StandardBrownianMotion(t)
+
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             t_final (float): end time for the Brownian Motion. 
-            drift (int): Gaussian mean is time_vec*drift
+            initial_value (float): See above formula
+            drift (int): See above formula
+            diffusion (int): See above formula
             decomp_type (str): method of decomposition either  
                 "PCA" for principal component analysis or 
                 "Cholesky" for cholesky decomposition.
@@ -43,12 +47,13 @@ class BrownianMotion(Gaussian):
         self.domain = array([[0,1]])
         self._parse_sampler(sampler)
         self.t = t_final # exercise time
+        self.initial_value = initial_value
         self.drift = drift
+        self.diffusion = diffusion
         self.time_vec = linspace(self.t/self.d,self.t,self.d) # evenly spaced
-        self.sigma_bm = array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
-        self.drift_time_vec = self.drift*self.time_vec # mean
-        self._parse_gaussian_params(self.drift_time_vec,self.sigma_bm,decomp_type)
-
+        self.diffused_sigma_bm = self.diffusion*array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
+        self.drift_time_vec_plus_init = self.drift*self.time_vec+self.initial_value # mean
+        self._parse_gaussian_params(self.drift_time_vec_plus_init,self.diffused_sigma_bm,decomp_type)
         self.range = array([[-inf,inf]])
         super(Gaussian,self).__init__()
     

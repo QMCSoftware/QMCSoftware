@@ -4,7 +4,7 @@
 #   -C for sphix-build will not look for conf.py
 #   -b for sphinx-build will look for conf.py
 
-mddir = sphinx/readme_rst/
+mddir = sphinx/md_rst/
 nbdir = sphinx/demo_rst/
 umldir = sphinx/uml/
 nbconvertcmd = jupyter nbconvert --to rst --output-dir='$(nbdir)'
@@ -22,9 +22,15 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	@grep -v  "\[\!" README.md > README2.md
 	@pandoc --mathjax README2.md -o $(mddir)QMCSoftware.rst
 	@rm README2.md
+	# CONTRIBUTING --> RST
+	@pandoc --mathjax CONTRIBUTING.md -o $(mddir)CONTRIBUTING.rst
 	# Jupyter Notebook Demos --> RST
 	@mkdir $(nbdir)
 	@for f in demos/*.ipynb; do \
+		echo "#\tConverting $$f"; \
+		$(nbconvertcmd) $$f 2>/dev/null; \
+	done
+	@for f in demos/*/*/*.ipynb; do \
 		echo "#\tConverting $$f"; \
 		$(nbconvertcmd) $$f 2>/dev/null; \
 	done
@@ -66,19 +72,20 @@ doc_html: _doc _uml
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
 
 doc_pdf: _doc _uml
+	@cd $(BUILDDIR) && rm -f qmcpy.pdf
 	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going  2>/dev/null
-	@cd sphinx/_build && make
+	@cd $(BUILDDIR) && make
 
 doc_epub: _doc _uml
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
 
 doctests:
 	@echo "\nDoctests"
-	python -m coverage run --source=./ -m pytest --doctest-modules qmcpy/* --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --disable-pytest-warnings qmcpy
 
 doctests_no_docker:
 	@echo "\nDoctests Without Docker Containers"
-	python -m coverage run --source=./ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
 
 fasttests:
 	@echo "\nFastests"
@@ -113,16 +120,20 @@ workout:
 	@python workouts/mc_vs_qmc/vary_abs_tol.py | tee workouts/mc_vs_qmc/out/vary_abs_tol.log
 	@python workouts/mc_vs_qmc/vary_dimension.py | tee workouts/mc_vs_qmc/out/vary_dimension.log
 
-exportcondaenv:
+export_conda_env:
 	@-rm -f environment.yml 2>/dev/null &
 	@conda env export --no-builds | grep -v "^prefix: " > environment.yml
 
-conda_doc:
+conda_env:
 	#   Assuming QMCPy repository is cloned locally and the correct branch is checked out
 	@conda env create --file environment.yml
 	@conda activate qmcpy
 	@pip install -e .
 	#   Suggest to run `make tests` to check environment is working
+
+rm_qmcpy_env:
+	@conda deactivate qmcpy
+	@conda remove --name qmcpy --all
 
 gen_doc:
 	#   Compiling QMCPy HTML documentation.
