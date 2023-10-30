@@ -1,143 +1,67 @@
-from qmcpy import Lattice
-
-import cProfile
+import concurrent.futures
 import pstats
+import cProfile
 
-#I only uncomment the code statement that includes what I want to test, everything else I leave commented.
+def square(number):
+    return number * number
+
+def fib(n):
+    if n == 1:
+        return 1
+    if n == 0:
+        return 0
+    return fib(n-1) + fib(n-2)
+
+def main():
+    run_list = [x for x in range(20)]
+
+    profiler = cProfile.Profile()
+    profiler.enable()
+
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        result_list = list(executor.map(fib, run_list))
+
+    profiler.disable()
+    profiler.print_stats("cumulative")
+
+    stats = pstats.Stats(profiler)
+    stats_dict = stats.stats
 
 
-#Magic Point Shop
+    function_stats = dict()
+
+    # Iterate over the statistics and store them in an array
+    for func_info, func_stats in stats.stats.items():
+        func_name = func_info[2]
+        cumulative_time = func_stats[3]
+        function_stats[round(cumulative_time,5)] = func_name
+
+
+
+    sorted_dict = {k: v for k, v in sorted(function_stats.items())}
+    print(sorted_dict)
+
+
 '''
-if __name__ == "__main__":
-    input_x = 1_000_000
-    process = 0
-    nonprocess = 0
-    c = 5
-    print(f"For input size {input_x}")
-    print(f'Each funtion was ran {c} times')
-    for i in range(c):
-        profiler = cProfile.Profile()
-        profiler.enable()
-        Lattice(dimension=2, randomize=False, order="mps").gen_samples(input_x, warn=False)
-        profiler.disable()
-        stats = pstats.Stats(profiler)
-        nonprocess_time = stats.total_tt
-        print(f"Cumulative Time: for non-process Magic point shop: {nonprocess_time:.2f} seconds")
-        profiler1 = cProfile.Profile()
-        profiler1.enable()
-        Lattice(dimension=2, randomize=False, order="mps_process").gen_samples(input_x, warn=False)
-        profiler1.disable()
-        stats1 = pstats.Stats(profiler1)
-        process_time = stats1.total_tt
-        print(f"Cumulative Time: for Process Magic point shop {process_time:.2f} seconds")
-        process += process_time
-        nonprocess += nonprocess_time
-    print(f"Process {process}")
-    print(f"NonProcess {nonprocess}")
-    if process < nonprocess:
-        print(f"Process is this much better: {nonprocess - process}")
-    else:
-        print(f"Non-process is this much better: {process - nonprocess}")
-'''
+    profiler = cProfile.Profile()
+    profiler.enable()
 
-#Natural order
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        result_list = list(executor.map(fib, run_list))
 
-'''
-if __name__ == "__main__":
-    input_x = 1_000_000
-    process = 0
-    nonprocess = 0
-    c = 30
-    print(f"For input size {input_x}")
-    print(f'There are {c} function calls')
-    for i in range(c):
-        profiler = cProfile.Profile()
-        profiler.enable()
-        Lattice(dimension=2, randomize=False, order="natural").gen_samples(input_x, warn=False)
-        profiler.disable()
+    profiler.disable()
+    profiler.print_stats("cumulative")
 
-        stats = pstats.Stats(profiler)
-
-        # Get the cumulative time for the entire program
-        nonprocess_time = stats.total_tt
-        print(f"Cumulative Time: for non-process natural: {nonprocess_time:.2f} seconds")
-
-        profiler1 = cProfile.Profile()
-        profiler1.enable()
-        Lattice(dimension=2, randomize=False, order="natural_process").gen_samples(input_x, warn=False)
-        profiler1.disable()
-
-        stats1 = pstats.Stats(profiler1)
-        # Get the cumulative time for the entire program
-        process_time = stats1.total_tt
-        print(f"Cumulative Time: for Process natural {process_time:.2f} seconds")
-
-        process += process_time
-        nonprocess += nonprocess_time
-    print(f"Process {process}")
-    print(f"Non-process {nonprocess}")
-    if process < nonprocess:
-        print(f"Process is this much better: {nonprocess - process}")
-    else:
-        print(f"Non-process is this much better: {process - nonprocess}")
-
-# Linear Order
-'''
-'''
-if __name__ == "__main__":
-    input_x = 1_000_000
-    process = 0
-    nonprocess = 0
-    c = 15
-    print(f"For input size {input_x}")
-    print(f"The functions were called {c} times")
-    for i in range(c):
-        profiler = cProfile.Profile()
-        profiler.enable()
-        Lattice(dimension=2, randomize=False, order="linear").gen_samples(input_x, warn=False)
-        profiler.disable()
-
-        stats = pstats.Stats(profiler)
-
-        # Get the cumulative time for the entire program
-        nonprocess_time = stats.total_tt
-        print(f"Cumulative Time: for non-process linear: {nonprocess_time:.2f} seconds")
-
-        profiler1 = cProfile.Profile()
-        profiler1.enable()
-        Lattice(dimension=2, randomize=False, order="linear_process").gen_samples(input_x, warn=False)
-        profiler1.disable()
-
-        stats1 = pstats.Stats(profiler1)
-        # Get the cumulative time for the entire program
-        process_time = stats1.total_tt
-        print(f"Cumulative Time: for Process linear {process_time:.2f} seconds")
-
-        process += process_time
-        nonprocess += nonprocess_time
-    print(f"Process {process}")
-    print(f"Non-Process {nonprocess}")
-    if process < nonprocess:
-        print(f"Process is this much better: {nonprocess - process}")
-    else:
-        print(f"Non-process is this much better: {process - nonprocess}")
-        
+    p = pstats.Stats(profiler)
+    total_runtime = p.total_tt
 '''
 
 
 
-'''
+
+
+
 if __name__ == '__main__':
     from multiprocessing import freeze_support
     freeze_support()
-    l = Lattice(dimension=1, order="mps_process")
-    print(l.gen_samples(4))
-    '''
-
-
-
-if __name__ == "__main__":
-    x = Lattice(dimension=1, order="mps_process")
-    print(x.gen_samples(7))
-
-
+    main()
