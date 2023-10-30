@@ -185,19 +185,22 @@ class Lattice(LD):
 
         if not self.is_parallel:
             gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
+            gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
             x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
         else:
             import concurrent.futures
             def gen_point(i, n):
                 """ Generate a single lattice point. """
                 return ((i * self.gen_vec) % n) / float(n)
-
             def gen_block_points(m):
                 """ Generate a block of points. """
                 n = 2 ** m
                 return [gen_point(i, n) for i in arange(1, n + 1, 2)]
 
             with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
+                # collect the results in the order the futures were created
+                x_lat_full = vstack([future.result() for future in futures])
                 futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
                 # collect the results in the order the futures were created
                 x_lat_full = vstack([future.result() for future in futures])
@@ -310,6 +313,7 @@ class Lattice(LD):
             # create a ThreadPoolExecutor
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
+            # collect the results in the order the futures (calls) created
             # collect the results in the order the futures (calls) created
             x_lat_full = vstack([future.result() for future in futures])
 

@@ -46,7 +46,7 @@ class Integrand(object):
             self.discrete_distrib = self.true_measure.discrete_distrib
         if self.true_measure.transform!=self.true_measure and \
            not (self.true_measure.range==self.true_measure.transform.range).all():
-            raise ParameterError("The range of the composed transform is not compatibe with this true measure")
+            raise ParameterError("The range of the composed transform is not compatible with this true measure")
         self.EPS = finfo(float).eps
 
     def g(self, t, compute_flags=None, *args, **kwargs):
@@ -178,7 +178,7 @@ class Integrand(object):
         """
         if self.d_indv!=self.d_comb:
             raise ParameterError('''
-                Set bound_fun explicity. 
+                Set bound_fun explicitly. 
                 The default bound_fun is the identity map. 
                 Since individual solution dimension d_indv != combined solution dimension d_comb, 
                 QMCPy cannot infer a reasonable bound function.''')
