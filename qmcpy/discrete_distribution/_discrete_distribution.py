@@ -1,8 +1,6 @@
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 from numpy import *
 
-
-
 class DiscreteDistribution(object):
     """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
 
@@ -17,7 +15,7 @@ class DiscreteDistribution(object):
         """
         prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
-            raise ParameterError(prefix + 'self.mimcs (measure mimiced by the distribution)')
+            raise ParameterError(prefix + 'self.mimcs (measure mimicked by the distribution)')
         if not hasattr(self,'low_discrepancy'):
             raise ParameterError(prefix + 'self.low_discrepancy')
         if not hasattr(self,'parameters'):
@@ -53,33 +51,7 @@ class DiscreteDistribution(object):
         """ ABSTRACT METHOD to evaluate pdf of distribution the samples mimic at locations of x. """
         raise MethodImplementationError(self, 'pdf')
 
-    def plot(self, n, d_horizontal=0, d_vertical = 1, axis=None, **kwargs):
-        """
-        Args:
-            n (int): n is the number of samples that will be plotted 
-            d_vertical (int): d_vertical is the index of points that will be plotted on the vertical axis. 
-            d_horizontal (int): d_horizontal is the index of points that will be plotted as the horizontial axis.
-        """
-        try:
-            import matplotlib.pyplot as plt
-        except:
-            raise ImportError("Missing matplotlib.pyplot as plt, Matplotlib must be intalled to run DiscreteDistribution.plot")
-        samples = self.gen_samples(n)
-        if axis is None:
-            fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 5))
-        else: 
-            ax = axis 
-            fig = plt.figure()
-        ax.scatter(samples[:, d_horizontal], samples[:, d_vertical], **kwargs)
-        ax.set_xlabel(r'$x_{%d}$'%d_horizontal)
-        ax.set_ylabel(r'$x_{%d}$'%d_vertical)
-        ax.set_xlim([0, 1])
-        ax.set_ylim([0, 1])
-        ax.set_xticks([0, 1])
-        ax.set_yticks([0, 1])
-        ax.set_aspect(1)
-        return fig, ax
-
+    
     def spawn(self, s=1, dimensions=None):
         """
         Spawn new instances of the current discrete distribution but with new seeds and dimensions.
@@ -109,7 +81,7 @@ class DiscreteDistribution(object):
 
         Args:
             child_seeds (numpy.random.SeedSequence): length s array of seeds for each spawn
-            dimension (int): lenth s array of dimensions for each spawn
+            dimension (int): length s array of dimensions for each spawn
 
         Return:
             DiscreteDistribution: spawn with new dimension using child_seed
@@ -123,7 +95,7 @@ class DiscreteDistribution(object):
         if len(args)>2 or len(args)==0:
             raise Exception('''
                 expecting 1 or 2 arguments:
-                    1 argument corresponds to n, the number of smaples to generate. In this case n_min=0 and n_max=n for LD sequences
+                    1 argument corresponds to n, the number of samples to generate. In this case n_min=0 and n_max=n for LD sequences
                     2 arguments corresponds to n_min and n_max. Note this is incompatible with IID generators which only expect 1 argument.
                 ''')
         if len(args) == 1:

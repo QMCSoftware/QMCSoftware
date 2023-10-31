@@ -30,7 +30,7 @@ class BayesianLRCoeffs(Integrand):
             response_vector (ndarray): length N array of binary responses corresponding to each
             prior_mean (ndarray): length d array of prior means, one for each coefficient. 
                 The first d-1 inputs correspond to the d-1 features. 
-                The last input coresponds to the intercept coefficient.
+                The last input corresponds to the intercept coefficient.
             prior_covariance (ndarray): d x d prior covariance array whose indexing is consistent with the prior mean.
         """
         self.prior_mean = prior_mean
@@ -44,7 +44,7 @@ class BayesianLRCoeffs(Integrand):
         if self.num_coeffs!=self.true_measure.d:
             ParameterError("sampler must have dimension one more than the number of features in the feature_array.")
         if self.response_vector.shape!=(obs,) or ((self.response_vector!=0)&(self.response_vector!=1)).any():
-            ParameterError("response_vector must have the same length as feature_array and contain only 0 or 1 enteries.")
+            ParameterError("response_vector must have the same length as feature_array and contain only 0 or 1 entries.")
         self.feature_array = column_stack((self.feature_array,ones((obs,1))))
         super(BayesianLRCoeffs,self).__init__(dimension_indv=(2,self.num_coeffs),dimension_comb=self.num_coeffs,parallel=False)
         
