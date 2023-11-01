@@ -72,17 +72,17 @@ class Halton(LD):
             randomize (str/bool): select randomization method from 
                 'QRNG" [1], (max dimension = 360, supports generalize=True, default if randomize=True) or 
                 'OWEN' [2], (max dimension = 1000) or
-                'LMS' [3], (max dimension = 1000)
+                'LMS'  [3], (max dimension = 1000)
             generalize (bool): generalize flag, only applicable to the QRNG generator
             seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
         """
         self.parameters = ['dvec','randomize','generalize']
         self.generalize = generalize
+        
         if randomize is False:
             self.randomize = False
             self.backend = 'QRNG'
             self.d_max = 360
-            self.LMS_c = False
         elif randomize is True or randomize.upper() == 'QRNG':
             self.randomize = self.backend = 'QRNG'
             self.d_max = 360
@@ -105,6 +105,7 @@ class Halton(LD):
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(Halton,self).__init__(dimension,seed)
+        self.n_lim = 2**32
 
         if self.backend == 'QRNG':
             self.randu_d_32 = self.rng.uniform(size=(self.d,32)) if self.randomize is not False else zeros((self.d,32),dtype=float)
@@ -129,7 +130,12 @@ class Halton(LD):
                                 self.perm[j,rec,i-1] = t
                             rec += 1
                             b2r = b2r / b
-        self.n_lim = 2**32
+        elif self.backend == 'LMS':
+            self.scr_matrix = []
+            for j in range(self.d):
+                base = self.all_primes[j] 
+                coeff_nrows = ceil(log(self.n_lim,base))
+                self.scr_matrix.append(self.gen_scambling_matrix(coeff_nrows, base)) # Generate Random Scrambling Matrix and add to the list
         
 
     def halton_owen(self, n, n0, d0=0):
@@ -160,9 +166,8 @@ class Halton(LD):
             coeff_nrows = ceil(log(self.n_lim,base))
             rep_vec = tile(vec,(coeff_nrows,1)) # repeat vec coeff_nrows times
             base_pwrN = base ** (array(range(coeff_nrows),dtype=uint64).reshape(coeff_nrows, 1)) # base ^ (0:coeff_nrows-1)
-            coeffs = ((rep_vec/base_pwrN).astype(int)) % base # Generate Coeefs by Div with base_pwrN & mod with base
-            scr_matrix = self.gen_scambling_matrix(coeff_nrows, base) # Generate Random Scrambling Matrix            
-            scr_coeffs = dot(scr_matrix, coeffs) % base # Dot product of scrambling matrix & coeffs
+            coeffs = ((rep_vec/base_pwrN).astype(int)) % base # Generate Coeefs by Div with base_pwrN & mod with base        
+            scr_coeffs = dot(self.scr_matrix[j], coeffs) % base # Dot product of scrambling matrix & coeffs
             scr_data = scr_coeffs/(base_pwrN * base) # Convert to decimal           
             ans[:,j] = scr_data.sum(axis = 0)
         return ans
