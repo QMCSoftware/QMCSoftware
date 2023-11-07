@@ -29,7 +29,7 @@ xtick.minor.size: 0
 ytick.minor.size: 0
 
 # QMCPy Parameters
-axes.prop_cycle: cycler('color', ['cyan','magenta','xkcd:green apple','blue','orange','green','xkcd:light red'])
+# axes.prop_cycle: cycler('color', ['cyan','magenta','xkcd:green apple','blue','orange','green','xkcd:light red'])
 lines.linewidth: 2.0
 font.size: 12.0
 legend.loc: lower center

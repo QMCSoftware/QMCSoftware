@@ -91,7 +91,7 @@ class CubMCG(StoppingCriterion):
             rel_tol: relative error tolerance
             n_init: initial number of samples
             n_max: maximum number of samples
-            control_variates (list): list of integrand objects to be used as control variates. 
+            control_variates (list): list of integrand objects to be used as control variates.
                 Control variates are currently only compatible with single level problems. 
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
@@ -140,7 +140,7 @@ class CubMCG(StoppingCriterion):
                 # cannot generate this many new samples
                 n_low = int(self.n_max-self.data.n_total)
                 warning_s = """
-                Alread generated %d samples.
+                Already generated %d samples.
                 Trying to generate %d new samples would exceeds n_max = %d.
                 Will instead generate %d samples to meet n_max total samples. 
                 Note that error tolerances may no longer be satisfied""" \
@@ -159,7 +159,7 @@ class CubMCG(StoppingCriterion):
                     # cannot generate this many new samples
                     n_low = int(self.n_max-self.data.n_total)
                     warning_s = """
-                    Alread generated %d samples.
+                    Already generated %d samples.
                     Trying to generate %d new samples would exceeds n_max = %d.
                     Will instead generate %d samples to meet n_max total samples. 
                     Note that error tolerances may no longer be satisfied""" \
