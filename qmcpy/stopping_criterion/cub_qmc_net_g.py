@@ -202,5 +202,4 @@ class CubQMCNetG(_CubQMCLDG):
         if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False.")
 
-
 class CubQMCSobolG(CubQMCNetG): pass
