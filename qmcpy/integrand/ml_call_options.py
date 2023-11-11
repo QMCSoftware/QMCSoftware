@@ -107,7 +107,7 @@ class MLCallOptions(Integrand):
             n (int): number of samples
             d (int): number of dimensions
             nf (int): n fine samples = 2**level
-            nc (int): n coarse sampes = nf/2
+            nc (int): n coarse samples = nf/2
             hf (int): fine timestep = self.t/nf
             hc (float): coarse timestep = self.t/nc
             xf (ndarray): n vector of fine samples values = self.k
@@ -142,7 +142,7 @@ class MLCallOptions(Integrand):
             n (int): number of samples
             d (int): number of dimensions
             nf (int): n fine samples = 2**level
-            nc (int): n coarse sampes = nf/2
+            nc (int): n coarse samples = nf/2
             hf (int): fine timestep = self.t/nf
             hc (float): coarse timestep = self.t/nc
             xf (ndarray): n vector of fine samples values = self.k

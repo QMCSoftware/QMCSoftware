@@ -29,8 +29,8 @@ class Lebesgue(TrueMeasure):
         """
         self.parameters = []
         if not isinstance(sampler,TrueMeasure):
-            raise ParameterError("Lebesgue sampler must be a true measure by which to tranform samples.")
-        self.domain = sampler.range # hack to make sure Lebesuge is compatible with any tranform
+            raise ParameterError("Lebesgue sampler must be a true measure by which to transform samples.")
+        self.domain = sampler.range # hack to make sure Lebesgue is compatible with any transform
         self.range = sampler.range
         self._parse_sampler(sampler)
         super(Lebesgue,self).__init__()

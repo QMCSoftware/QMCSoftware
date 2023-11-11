@@ -1,92 +1,80 @@
 from ._stopping_criterion import StoppingCriterion
-from ..accumulate_data import MeanVarDataRep
+from ..accumulate_data import MeanVarDataVec
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..discrete_distribution import Lattice,DigitalNetB2,Halton
-from ..discrete_distribution._discrete_distribution import LD
+from ..discrete_distribution import IIDStdUniform
+from ..discrete_distribution._discrete_distribution import IID
 from ..true_measure import Gaussian,Uniform
 from ..integrand import Keister,BoxIntegral,CustomFun
-from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
+from ..util import MaxSamplesWarning, ParameterWarning, ParameterError
 from numpy import *
-from scipy.stats import t
 from time import time
+from scipy.stats import norm
 import warnings
 
 
-class CubQMCCLT(StoppingCriterion):
+class CubMCCLTVec(StoppingCriterion):
     """
-    Stopping criterion based on Central Limit Theorem for multiple replications.
+    Stopping criterion based on the Central Limit Theorem for vectorized integrands.
     
-    >>> k = Keister(Lattice(seed=7))
-    >>> sc = CubQMCCLT(k,abs_tol=.05)
+    >>> k = Keister(IIDStdUniform(seed=7))
+    >>> sc = CubMCCLTVec(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.38030146])
+    array([1.38366791])
     >>> data
-    MeanVarDataRep (AccumulateData Object)
-        solution        1.380
-        comb_bound_low  1.380
-        comb_bound_high 1.381
+    MeanVarDataVec (AccumulateData Object)
+        solution        1.384
+        comb_bound_low  1.335
+        comb_bound_high 1.432
         comb_flags      1
-        n_total         2^(12)
-        n               2^(12)
-        n_rep           2^(8)
+        n_total         2^(10)
+        n               2^(10)
         time_integrate  ...
-    CubQMCCLT (StoppingCriterion Object)
+    CubMCCLTVec (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
         abs_tol         0.050
         rel_tol         0
         n_init          2^(8)
         n_max           2^(30)
-        replications    2^(4)
     Keister (Integrand Object)
     Gaussian (TrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    Lattice (DiscreteDistribution Object)
+    IIDStdUniform (DiscreteDistribution Object)
         d               1
-        dvec            0
-        randomize       1
-        order           natural
-        gen_vec         1
         entropy         7
         spawn_key       ()
-    >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
-    >>> abs_tol = 1e-3
-    >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
+    >>> f = BoxIntegral(IIDStdUniform(3,seed=7), s=[-1,1])
+    >>> abs_tol = 5e-2
+    >>> sc = CubMCCLTVec(f,abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.19023153, 0.96068581])
+    array([1.1853359 , 0.95670595])
     >>> data
-    MeanVarDataRep (AccumulateData Object)
-        solution        [1.19  0.961]
-        comb_bound_low  [1.19 0.96]
-        comb_bound_high [1.191 0.961]
+    MeanVarDataVec (AccumulateData Object)
+        solution        [1.185 0.957]
+        comb_bound_low  [1.139 0.918]
+        comb_bound_high [1.232 0.995]
         comb_flags      [ True  True]
-        n_total         2^(21)
-        n               [2097152.    8192.]
-        n_rep           [131072.    512.]
+        n_total         2^(11)
+        n               [2048.  512.]
         time_integrate  ...
-    CubQMCCLT (StoppingCriterion Object)
+    CubMCCLTVec (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
-        abs_tol         0.001
+        abs_tol         0.050
         rel_tol         0
         n_init          2^(8)
         n_max           2^(30)
-        replications    2^(4)
     BoxIntegral (Integrand Object)
         s               [-1  1]
     Uniform (TrueMeasure Object)
         lower_bound     0
         upper_bound     1
-    Lattice (DiscreteDistribution Object)
+    IIDStdUniform (DiscreteDistribution Object)
         d               3
-        dvec            [0 1 2]
-        randomize       1
-        order           natural
-        gen_vec         [     1 182667 469891]
         entropy         7
         spawn_key       ()
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
@@ -95,49 +83,43 @@ class CubQMCCLT(StoppingCriterion):
     >>> (abs(true_value-solution)<abs_tol).all()
     True
     >>> cf = CustomFun(
-    ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
+    ...     true_measure = Uniform(IIDStdUniform(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
     ...     dimension_indv = (2,3))
-    >>> sol,data = CubQMCCLT(cf,abs_tol=1e-4).integrate()
+    >>> sol,data = CubMCCLTVec(cf,abs_tol=1e-2).integrate()
     >>> data
-    MeanVarDataRep (AccumulateData Object)
-        solution        [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_low  [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_high [[1. 2. 3.]
-                        [4. 5. 6.]]
+    MeanVarDataVec (AccumulateData Object)
+        solution        [[1.    1.999 2.999]
+                        [4.001 4.998 6.001]]
+        comb_bound_low  [[0.99  1.989 2.991]
+                        [3.991 4.989 5.993]]
+        comb_bound_high [[1.01  2.009 3.006]
+                        [4.01  5.007 6.008]]
         comb_flags      [[ True  True  True]
                         [ True  True  True]]
-        n_total         2^(14)
-        n               [[ 4096.  4096.  4096.]
-                        [16384.  4096.  4096.]]
-        n_rep           [[ 256.  256.  256.]
-                        [1024.  256.  256.]]
+        n_total         2^(21)
+        n               [[  32768.  131072.  524288.]
+                        [ 524288. 1048576. 2097152.]]
         time_integrate  ...
-    CubQMCCLT (StoppingCriterion Object)
+    CubMCCLTVec (StoppingCriterion Object)
         inflate         1.200
         alpha           0.010
-        abs_tol         1.00e-04
+        abs_tol         0.010
         rel_tol         0
         n_init          2^(8)
         n_max           2^(30)
-        replications    2^(4)
     CustomFun (Integrand Object)
     Uniform (TrueMeasure Object)
         lower_bound     0
         upper_bound     1
-    DigitalNetB2 (DiscreteDistribution Object)
+    IIDStdUniform (DiscreteDistribution Object)
         d               6
-        dvec            [0 1 2 3 4 5]
-        randomize       LMS_DS
-        graycode        0
         entropy         7
         spawn_key       ()
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
-        inflate=1.2, alpha=0.01, replications=16., 
+        inflate=1.2, alpha=0.01,
         error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
@@ -147,12 +129,11 @@ class CubQMCCLT(StoppingCriterion):
             abs_tol (ndarray): absolute error tolerance
             rel_tol (ndarray): relative error tolerance
             n_max (int): maximum number of samples
-            replications (int): number of replications
             error_fun: function taking in the approximate solution vector, 
                 absolute tolerance, and relative tolerance which returns the approximate error. 
                 Default indicates integration until either absolute OR relative tolerance is satisfied.
         """
-        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max','replications']
+        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Input Checks
         if log2(n_init) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'
@@ -165,7 +146,6 @@ class CubQMCCLT(StoppingCriterion):
         self.n_max = float(n_max)
         self.alpha = alpha
         self.inflate = float(inflate)
-        self.replications = int(replications)
         self.error_fun = error_fun
         # QMCPy Objs
         self.integrand = integrand
@@ -173,42 +153,37 @@ class CubQMCCLT(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         self.d_indv = self.integrand.d_indv
         self.d = self.discrete_distrib.d
-        super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[LD], allow_vectorized_integrals=True)
-        if not self.discrete_distrib.randomize:
-            raise ParameterError("CLTRep requires distribution to have randomize=True")
+        super(CubMCCLTVec,self).__init__(allowed_levels=["single"], allowed_distribs=[IID], allow_vectorized_integrals=True)
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(full(self.integrand.d_comb,self.alpha))
-        self.t_star = -t.ppf(self.alphas_indv/2,df=self.replications-1)
+        self.z_star = -norm.ppf(self.alphas_indv/2)
          
     def integrate(self):
         """ See abstract method. """
         t_start = time()
         self.datum = empty(self.d_indv,dtype=object)
         for j in ndindex(self.d_indv):
-            self.datum[j] = MeanVarDataRep(self.t_star[j],self.inflate,self.replications)
-        self.data = MeanVarDataRep.__new__(MeanVarDataRep)
+            self.datum[j] = MeanVarDataVec(self.z_star[j],self.inflate)
+        self.data = MeanVarDataVec.__new__(MeanVarDataVec)
         self.data.flags_indv = tile(False,self.d_indv)
         self.data.compute_flags = tile(True,self.d_indv)
-        self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
-        self.data.n_rep = tile(self.n_init,self.d_indv)
-        self.data.n_min_rep = 0
         self.data.indv_bound_low = tile(-inf,self.d_indv)
         self.data.indv_bound_high = tile(inf,self.d_indv)
         self.data.solution_indv = tile(nan,self.d_indv)
         self.data.solution = nan
         self.data.xfull = empty((0,self.d))
         self.data.yfull = empty((0,)+self.d_indv)
+        n_min,n_max = 0,self.n_init
+        self.data.n = tile(self.n_init,self.d_indv)
         while True:
-            n_min = self.data.n_min_rep
-            n_max = int(self.data.n_rep.max())
             n = int(n_max-n_min)
-            xnext = vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
+            xnext = self.discrete_distrib.gen_samples(n)
             ynext = self.integrand.f(xnext,compute_flags=self.data.compute_flags)
-            for j in ndindex(self.d_indv):
-                if self.data.flags_indv[j]: continue
-                yj = ynext[(slice(None),)+j].reshape((n,self.replications),order='f')
-                self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j] = self.datum[j].update_data(yj)
             self.data.xfull = vstack((self.data.xfull,xnext))
             self.data.yfull = vstack((self.data.yfull,ynext))
+            for j in ndindex(self.d_indv):
+                if self.data.flags_indv[j]: continue
+                yj = self.data.yfull[(slice(None),)+j]
+                self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j] = self.datum[j].update_data(yj)
             self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
             self.abs_tols,self.rel_tols = full_like(self.data.comb_bound_low,self.abs_tol),full_like(self.data.comb_bound_low,self.rel_tol)
             fidxs = isfinite(self.data.comb_bound_low)&isfinite(self.data.comb_bound_high)
@@ -219,13 +194,12 @@ class CubQMCCLT(StoppingCriterion):
             self.data.comb_flags[fidxs] = (shigh-slow) <= (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
             self.data.compute_flags = ~self.data.flags_indv
-            self.data.n = self.replications*self.data.n_rep
             self.data.n_total = self.data.n.max()
             if sum(self.data.compute_flags)==0:
                 break # sufficiently estimated
             elif 2*self.data.n_total>self.n_max:
                 warning_s = """
-                Already generated %d samples.
+                Alread generated %d samples.
                 Trying to generate %d new samples would exceeds n_max = %d.
                 No more samples will be generated.
                 Note that error tolerances may not be satisfied. """ \
@@ -233,8 +207,8 @@ class CubQMCCLT(StoppingCriterion):
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
             else:
-                self.data.n_min_rep = n_max
-                self.data.n_rep += self.data.n_rep*(self.data.compute_flags) # double sample size
+                n_min = n_max; n_max = 2*n_min
+                self.data.n += self.data.n*(self.data.compute_flags) # double sample size
         self.data.integrand = self.integrand
         self.data.true_measure = self.true_measure
         self.data.discrete_distrib = self.discrete_distrib
@@ -246,7 +220,6 @@ class CubQMCCLT(StoppingCriterion):
             'comb_flags',
             'n_total',
             'n',
-            'n_rep',
             'time_integrate']
         self.data.datum = self.datum
         self.data.time_integrate = time()-t_start
@@ -262,5 +235,8 @@ class CubQMCCLT(StoppingCriterion):
         """
         if abs_tol != None: self.abs_tol = abs_tol
         if rel_tol != None: self.rel_tol = rel_tol
+        
+        
 
-class CubQMCRep(CubQMCCLT): pass
+
+    

@@ -72,8 +72,9 @@ doc_html: _doc _uml
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
 
 doc_pdf: _doc _uml
+	@cd $(BUILDDIR) && rm -f qmcpy.pdf
 	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going  2>/dev/null
-	@cd sphinx/_build && make
+	@cd $(BUILDDIR) && make
 
 doc_epub: _doc _uml
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
@@ -119,16 +120,20 @@ workout:
 	@python workouts/mc_vs_qmc/vary_abs_tol.py | tee workouts/mc_vs_qmc/out/vary_abs_tol.log
 	@python workouts/mc_vs_qmc/vary_dimension.py | tee workouts/mc_vs_qmc/out/vary_dimension.log
 
-exportcondaenv:
+export_conda_env:
 	@-rm -f environment.yml 2>/dev/null &
 	@conda env export --no-builds | grep -v "^prefix: " > environment.yml
 
-conda_doc:
+conda_env:
 	#   Assuming QMCPy repository is cloned locally and the correct branch is checked out
 	@conda env create --file environment.yml
 	@conda activate qmcpy
 	@pip install -e .
 	#   Suggest to run `make tests` to check environment is working
+
+rm_qmcpy_env:
+	@conda deactivate qmcpy
+	@conda remove --name qmcpy --all
 
 gen_doc:
 	#   Compiling QMCPy HTML documentation.

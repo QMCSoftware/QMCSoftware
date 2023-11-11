@@ -48,7 +48,7 @@ class StoppingCriterion(object):
     
     def set_tolerance(self, *args, **kwargs):
         """ ABSTRACT METHOD to reset the absolute tolerance. """
-        raise ParameterError("The %s StoppingCriterioin does not yet support resetting tolerances.")
+        raise ParameterError("The %s StoppingCriterion does not yet support resetting tolerances.")
 
     def _compute_indv_alphas(self, alphas_comb):
         """
