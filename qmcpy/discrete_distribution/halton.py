@@ -157,7 +157,7 @@ class Halton(LD):
             self.d_max = len(self.all_primes)
             self.DS = True
             self.LMS = False
-        elif randomize.upper() == "LMS_DS":
+        elif randomize.upper() == 'LMS_DS':
             self.randomize = self.backend = 'LMS_DS'
             if self.generalize==True:
                 warnings.warn("We do not know how to generalize LMS_DS and we are going to proceed with generalize = False.")
