@@ -175,7 +175,7 @@ class _CubQMCLDG(StoppingCriterion):
         prob=len(values_cont)/len(g) #probability of being continous
         kde=sc.stats.gaussian_kde(values_cont.T)
         z=linspace(a,b,100)
-        hist=np.zeros(len(z))
+        hist=zeros(len(z))
         for val, count in zip(repeated_values, counts):
             index = (abs(z - val)).argmin() # Find the index in 'z' that is closest to 'val'
             hist[index] = count # Assign the probability 'count' to the appropriate position in 'hist'
