@@ -167,14 +167,33 @@ class _CubQMCLDG(StoppingCriterion):
         b=max(g)
         print("Lower bound of estimation interval (a) is:",a)
         print("Upper bound of estimation interval (b) is:",b)
-    
-        kde=sc.stats.gaussian_kde(g.T)
-        z=linspace(a,b,100)
-        pdf_est=kde.evaluate(z.T)
-        plt.figure()
-        plt.plot(z,pdf_est)
-        plt.title("Density estimation")
-        plt.xlabel("x")
-        plt.ylabel("pdf")
+        
+        unique_values, counts = np.unique(g, return_counts=True)
+        repeated_values = unique_values[counts > 1]# Find elements that are repeated (count > 1)
+        values_cont=unique_values[counts==1]
+        counts=counts[counts > 1]/len(g) #probability of each discrete value
+        prob=len(values_cont)/len(g) #probability of being continous
+        kde=sc.stats.gaussian_kde(values_cont.T)
+        z=np.linspace(a,b,100)
+        hist=np.zeros(len(z))
+        for val, count in zip(repeated_values, counts):
+            index = (np.abs(z - val)).argmin() # Find the index in 'z' that is closest to 'val'
+            hist[index] = count # Assign the probability 'count' to the appropriate position in 'hist'
+            
+
+        pdf_est=kde.evaluate(z.T)*prob
+        fig, ax1 = plt.subplots()
+        color = 'tab:red'
+        ax1.set_xlabel('payoff')
+        ax1.set_ylabel('continous pdf estimation', color=color)
+        ax1.plot(z, pdf_est, color=color)
+        ax1.tick_params(axis='y', labelcolor=color)
+        
+        
+        ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+        color = 'tab:blue'
+        ax2.set_ylabel('Probability', color=color)  # we already handled the x-label with ax1
+        plt.vlines(x=repeated_values, ymin=0, ymax=counts, colors='blue', lw=2, label='vline_single - full height')
+        ax2.tick_params(axis='y', labelcolor=color)
         plt.show()
         return kde,a,b   
