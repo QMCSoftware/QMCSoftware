@@ -196,4 +196,4 @@ class _CubQMCLDG(StoppingCriterion):
         plt.vlines(x=repeated_values, ymin=0, ymax=counts, colors='blue', lw=2, label='vline_single - full height')
         ax2.tick_params(axis='y', labelcolor=color)
         plt.show()
-        return kde,a,b   
+        return kde,a,b, approx_solution, data  
