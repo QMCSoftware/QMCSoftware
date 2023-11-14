@@ -2,18 +2,18 @@
 import qmcpy as qp
 from numpy import*
 import os
-def plot_proj(sampler, n = 64, d_horizontal = 0, d_vertical = 1,math_ind = False, marker_size = 5, **kwargs):
+def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, **kwargs):
     """
     Args:
         sampler: the Discrete Distribution or the True Measure Object to be plotted
         n (int or list): the number of samples or a list of samples(used for extensibility) to be plotted. 
             Default value is 64
         d_horizontal (int or list): the dimension or list of dimensions to be plotted on the horizontal axes. 
-            Default value is 0 (1st dimension).
+            Default value is 1 (1st dimension).
         d_vertical (int or list): the dimension or list of dimensions to be plotted on the vertical axes. 
-            Default value is 1 (2nd dimension).
+            Default value is 2 (2nd dimension).
         math_ind : setting it true will enable user to pass in math indices. 
-            Default value is false, so user is required to pass in python indices.
+            Default value is true, so user is required to pass in math indices.
         marker_size: the marker size in points**2(typographic points are 1/72 in.).
             Default value is 5.
         **kwargs : Any extra features the user would like to see in the plots
