@@ -185,7 +185,7 @@ class _CubQMCLDG(StoppingCriterion):
         fig, ax1 = plt.subplots()
         color = 'tab:red'
         ax1.set_xlabel('payoff')
-        ax1.set_ylabel('continous pdf estimation', color=color)
+        ax1.set_ylabel('density', color=color)
         ax1.plot(z, pdf_est, color=color)
         ax1.tick_params(axis='y', labelcolor=color)
         
