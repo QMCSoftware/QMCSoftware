@@ -13,6 +13,7 @@ qmcpy.egg-info/
 .idea/
 .pytest_cache/
 demos/prob_failure_gp_ci_plots/
+raw.githubusercontent.com/*
 
 # tests
 .coverage
