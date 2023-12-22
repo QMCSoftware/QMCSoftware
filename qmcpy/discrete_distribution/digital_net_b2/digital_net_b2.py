@@ -43,8 +43,16 @@ class DigitalNetB2(LD):
            [0.546875, 0.921875, 0.859375, 0.046875, 0.109375],
            [0.234375, 0.859375, 0.171875, 0.484375, 0.921875],
            [0.984375, 0.109375, 0.921875, 0.734375, 0.171875]])
-
-           
+    >>> DigitalNetB2(dimension=3,randomize=False,generating_matrices="LDData/main/dnet_dnetup/mps.sobol_Cs.txt").gen_samples(8,warn=False)
+    array([[0.   , 0.   , 0.   ],
+           [0.5  , 0.5  , 0.5  ],
+           [0.25 , 0.75 , 0.75 ],
+           [0.75 , 0.25 , 0.25 ],
+           [0.125, 0.625, 0.375],
+           [0.625, 0.125, 0.875],
+           [0.375, 0.375, 0.625],
+           [0.875, 0.875, 0.125]])
+    
     References:
 
         [1] Marius Hofert and Christiane Lemieux (2019). 
@@ -117,10 +125,11 @@ class DigitalNetB2(LD):
                 'DS': digital shift only
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
-            generating_matrices (ndarray or str): generating matrices or path to generating matrices.
-                ndarray should have shape (d_max, m_max) where each int has t_max bits
-                generating_matrices should be formatted like `gen_mat.21201.32.32.msb.npy`
-                with name.d_max.t_max.m_max.{msb,lsb}.npy
+            generating_matrices (ndarray or str): Specify generating matrices. There are a number of optional input types. 
+                1) A ndarray of integers with shape (d_max, m_max) where each int has t_max bits. 
+                2) A string generating_matrices with either 
+                    i)  a relative path from https://github.com/QMCSoftware/LDData e.g. "LDData/main/dnet_dnetup/mps.sobol_Cs.txt" or 
+                    ii) a numpy file with format "name.d_max.t_max.m_max.{msb,lsb}.npy" e.g. "gen_mat.21201.32.32.msb.npy"
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix. 
                 aka: number of rows in a generating matrix with ints expanded into columns
@@ -169,28 +178,36 @@ class DigitalNetB2(LD):
             self.m_max = m_max
             self.msb = msb
         elif isinstance(generating_matrices,str):
+            parts = generating_matrices.split('.')
             root = dirname(abspath(__file__))+'/generating_matrices/'
+            repos = DataSource()
             if isfile(root+generating_matrices):
                 self.z_og = load(root+generating_matrices).astype(uint64)
+                self.d_max = int(parts[-5])
+                self.t_max = int(parts[-4])
+                self.m_max = int(parts[-3])
+                self.msb = bool(parts[-2].lower()=='msb')
             elif isfile(generating_matrices):
                 self.z_og = load(generating_matrices).astype(uint64)
+                self.d_max = int(parts[-5])
+                self.t_max = int(parts[-4])
+                self.m_max = int(parts[-3])
+                self.msb = bool(parts[-2].lower()=='msb')
+            elif "LDData"==generating_matrices[:6] and repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices):
+                datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices)
+                contents = [line.rstrip('\n').strip() for line in datafile.readlines()]
+                self.msb = contents[0]!="# dnetup"
+                contents = [line.split("#",1)[0] for line in contents if line[0]!="#"]
+                datafile.close()
+                assert int(contents[0])==2 # base 2
+                self.d_max = int(contents[1])
+                self.m_max = int(contents[2])
+                self.t_max = int(contents[3])
+                self.z_og = array([[int(v) for v in line.split(' ')] for line in contents[4:]],dtype=uint64)
             else:
                 raise ParameterError("generating_matrices '%s' not found."%generating_matrices)
-            parts = generating_matrices.split('.')
-            self.d_max = int(parts[-5])
-            self.t_max = int(parts[-4])
-            self.m_max = int(parts[-3])
-            self.msb = bool(parts[-2].lower()=='msb')
         else:
-            msg = '''
-                z_path should be formatted like `name.d_max.m_max.t_max.msb_or_lsb.npy`
-                    d_max is the max dimension, 
-                    m_max is such that 2^m_max is the max number of samples supported 
-                    t_max is the number of bits in each int of the generating matrix
-                    msb_or_lsb is how each int encodes the binary vector
-                        e.g. 6 is [1 1 0] in msb and [0 1 1] in lsb
-            '''
-            raise ParameterError(msg)
+            raise ParameterError("invalid input for generating_matrices, see documentation and doctests.")
         self.t_lms = t_lms if t_lms and self.set_lms else self.t_max
         self._verbose = _verbose
         self.errors = {
