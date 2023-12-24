@@ -1,6 +1,6 @@
 # Fred Notes
 
-## Install these things
+## Install these things to work with qmcpy
 
 pip-review #then run with pip-review --interactive
 jupyterlab #then run with jlab (for the standalone app) or jupyter-lab
