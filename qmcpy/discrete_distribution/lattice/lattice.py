@@ -3,8 +3,7 @@ from ...util import ParameterError, ParameterWarning
 from numpy import *
 from os.path import dirname, abspath, isfile
 import warnings
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from os import *
+from joblib import Parallel, delayed
 
 
 class Lattice(LD):
@@ -105,7 +104,7 @@ class Lattice(LD):
     """
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
-        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, is_parallel=True):
+        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, is_parallel=True, exper_process= False):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -136,8 +135,6 @@ class Lattice(LD):
             self.gen = self._gail_natural
         elif self.order == 'linear':
             self.gen = self._gail_linear
-        elif self.order == "linear_process":
-            self.gen = self._gail_linear_process
         elif self.order == 'mps':
             self.gen = self._mps
         else:
@@ -173,6 +170,7 @@ class Lattice(LD):
         self.shift = self.rng.uniform(size=int(self.d))
         self.parameters += ["gen_vec"]
         self.is_parallel = is_parallel
+        self.experimental_parallel = exper_process
 
 
 
@@ -184,6 +182,13 @@ class Lattice(LD):
         if not self.is_parallel:
             gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
             x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
+        elif self.is_parallel and self.experimental_parallel:
+
+            gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
+            parallel = Parallel(n_jobs=4)
+            delayed_gen_block = delayed(gen_block)
+            x_lat_full = vstack(parallel(delayed_gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)))
+
         else:
             import concurrent.futures
             def gen_point(i, n):
@@ -205,35 +210,6 @@ class Lattice(LD):
             x = x_lat_full[cut1:cut2, :]
             return x
 
-    def fast_mps(self, n_min, n_max):
-        """ Magic Point Shop Lattice generator. """
-        m_low = floor(log2(n_min))+1 if n_min > 0 else 0
-        m_high = ceil(log2(n_max))
-
-        if not self.is_parallel:
-            gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
-            x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
-        else:
-            import concurrent.futures
-            def gen_point(i, n):
-                """ Generate a single lattice point. """
-                return ((i * self.gen_vec) % n) / float(n)
-            def gen_block_points(m):
-                """ Generate a block of points. """
-                n = 2 ** m
-                return [gen_point(i, n) for i in arange(1, n + 1, 2)]
-
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                m_values = list(range(int(m_low), int(m_high) + 1))
-
-                block_list = list(executor.map(gen_block_points, m_values, [self.gen_vec] * len(m_values)))
-
-            x_lat_full = vstack(block_list)
-
-        cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
-        cut2 = int(cut1 + n_max - n_min)
-        x = x_lat_full[cut1:cut2, :]
-        return x
 
 
     def _gen_block_linear(self, m_next, first=True):
@@ -268,45 +244,6 @@ class Lattice(LD):
             y = self.calculate_y(m_low, m_high, y)
             x = outer(y, self.gen_vec) % 1
             return x
-
-    def _gail_linear_process(self, n_min, n_max):
-        """ Gail lattice generator in parallel using concurrent.futures for calculating y. """
-
-        m_low = int(floor(log2(n_min))) + 1 if n_min > 0 else 0
-        m_high = int(ceil(log2(n_max)))
-
-        if n_min == 0:
-            return self._gen_block_linear(m_high, first=True)
-        else:
-            n = 2 ** m_low
-            chunk_size = max(int(n / (2 * len(sched_getaffinity(0)))), 1)
-
-            # Generate chunks for y computation
-            y_chunks = []
-            for i in range(0, n, chunk_size):
-                chunk_end = min(i + chunk_size, n)
-                y_chunk = arange(1 / n, 1, 2 / n)[i:chunk_end].reshape((int((chunk_end - i) / 2), 1))
-                y_chunks.append(y_chunk)
-
-            # Create a ProcessPoolExecutor
-            with ProcessPoolExecutor() as executor:
-                # Create argument list for parallel calculation of y
-                y_args = [(chunk, m_low, m_high) for chunk in y_chunks]
-
-                # Submit tasks to the executor
-                y_futures = [executor.submit(self.calculate_y_parallel, args) for args in y_args]
-
-                # Retrieve results as they complete
-                y_results = [future.result() for future in as_completed(y_futures)]
-
-            # Combine the results
-            y = vstack(y_results)
-
-            # Calculate x
-            x = outer(y, self.gen_vec) % 1
-
-            return x
-
 
 
 
