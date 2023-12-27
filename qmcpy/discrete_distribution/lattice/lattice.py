@@ -251,6 +251,11 @@ class Lattice(LD):
         m_high = ceil(log2(n_max))
         if not self.is_parallel:
             x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low), int(m_high) + 1)])
+        elif self.is_parallel and self.experimental_parallel:
+            results = Parallel(n_jobs=-1)(
+                delayed(self._gen_block)(m) for m in range(int(m_low), int(m_high) + 1)
+                )
+            x_lat_full = vstack(results)
         else:
             import concurrent.futures
             # create a ThreadPoolExecutor
