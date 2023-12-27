@@ -197,16 +197,15 @@ class Lattice(LD):
                 return [gen_point(i, n) for i in arange(1, n + 1, 2)]
 
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                m_values = list(range(int(m_low), int(m_high) + 1))
+                futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
+                # collect the results in the order the futures were created
 
-                block_list = list(executor.map(gen_block_points, m_values, [self.gen_vec] * len(m_values)))
+                x_lat_full = vstack([future.result() for future in futures])
 
-            x_lat_full = vstack(block_list)
-
-        cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
-        cut2 = int(cut1 + n_max - n_min)
-        x = x_lat_full[cut1:cut2, :]
-        return x
+            cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
+            cut2 = int(cut1 + n_max - n_min)
+            x = x_lat_full[cut1:cut2, :]
+            return x
 
     def fast_mps(self, n_min, n_max):
         """ Magic Point Shop Lattice generator. """
@@ -312,21 +311,6 @@ class Lattice(LD):
             q[ptind] += 1./2**(l+1)
         return q
     
-    def _vdc_process(self,n):
-        """
-        Van der Corput sequence in base 2 where n is a power of 2. We do it this
-        way because of our own VDC construction: is much faster and cubLattice
-        does not need more.
-        """
-        k = log2(n)
-        tasks = [(1, int(k), int(n)) for l in range(int(k))]
-        import concurrent.futures
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            future = list(executor.map(lambda args: self._vdc(*args), tasks))
-        final_q = zeros(int(n))
-        for result in future:
-            final_q += result
-        return final_q
 
     def _gen_block(self, m):
         """ Generate samples floor(2**(m-1)) to 2**m. """
@@ -335,15 +319,7 @@ class Lattice(LD):
         x = outer(self._vdc(n)+1./(2*n_min),self.gen_vec)%1 if n_min>0 else outer(self._vdc(n),self.gen_vec)%1
         return x
     
-    def _gen_block_process(self, m):
-        """ Generate samples floor(2**(m-1)) to 2**m. """
-        n_min = floor(2**(m-1))
-        import concurrent.futures
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            chunks = [(m, n_min) for n_min in array_split(arange(n_min, 2 ** m, n_min))]
-        results = list(executor.map(self._gen_block, chunks))
 
-        return concatenate(results, axis=0)
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
         """
@@ -376,7 +352,15 @@ class Lattice(LD):
             raise ParameterError('Lattice generating vector supports up to %d samples.'%(2**self.m_max))
         x = self.gen(n_min,n_max)
         if self.randomize:
-            xr = (x + self.shift)%1
+            if x is None:
+                print("Error: x is None")
+                print()
+                print()
+            elif self.shift is None:
+                print("Error: self.shift is None")
+            else:
+                xr = (x + self.shift) % 1
+
         if self.randomize==False:
             return x
         elif return_unrandomized:
