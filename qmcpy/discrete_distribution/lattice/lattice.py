@@ -104,7 +104,7 @@ class Lattice(LD):
     """
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
-        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, is_parallel=True, exper_process= False):
+        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, is_parallel=True, exper_process=False):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -183,7 +183,6 @@ class Lattice(LD):
             gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
             x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
         elif self.is_parallel and self.experimental_parallel:
-
             gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
             parallel = Parallel(n_jobs=4)
             delayed_gen_block = delayed(gen_block)
