@@ -4,7 +4,7 @@ from numpy import *
 from os.path import dirname, abspath, isfile
 import warnings
 from joblib import Parallel, delayed
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 
 
 class Lattice(LD):
@@ -255,7 +255,7 @@ class Lattice(LD):
                 x = outer(y, self.gen_vec) % 1
 
                 # Multithreading with ThreadPoolExecutor
-                with ThreadPoolExecutor() as executor:
+                with ProcessPoolExecutor() as executor:
                     result = list(executor.map(self._process_single_point, x))
 
                 return result
