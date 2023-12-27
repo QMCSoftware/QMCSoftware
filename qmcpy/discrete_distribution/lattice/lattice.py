@@ -204,10 +204,10 @@ class Lattice(LD):
 
                 x_lat_full = vstack([future.result() for future in futures])
 
-            cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
-            cut2 = int(cut1 + n_max - n_min)
-            x = x_lat_full[cut1:cut2, :]
-            return x
+        cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
+        cut2 = int(cut1 + n_max - n_min)
+        x = x_lat_full[cut1:cut2, :]
+        return x
 
 
 
