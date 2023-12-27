@@ -4,6 +4,7 @@ from numpy import *
 from os.path import dirname, abspath, isfile
 import warnings
 from joblib import Parallel, delayed
+from concurrent.futures import ThreadPoolExecutor
 
 
 class Lattice(LD):
@@ -235,16 +236,37 @@ class Lattice(LD):
         """ Gail lattice generator in linear order. """
         m_low = int(floor(log2(n_min))) + 1 if n_min > 0 else 0
         m_high = int(ceil(log2(n_max)))
-        if n_min == 0:
-            return self._gen_block_linear(m_high, first=True)
+        if not self.is_parallel:
+            if n_min == 0:
+                return self._gen_block_linear(m_high, first=True)
+            else:
+                n = 2 ** (m_low)
+                y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+                y = self.calculate_y(m_low, m_high, y)
+                x = outer(y, self.gen_vec) % 1
+                return x
         else:
-            n = 2 ** (m_low)
-            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
-            y = self.calculate_y(m_low, m_high, y)
-            x = outer(y, self.gen_vec) % 1
-            return x
+            if n_min == 0:
+                return self._gen_block_linear(m_high, first=True)
+            else:
+                n = 2 ** m_low
+                y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+                y = self.calculate_y(m_low, m_high, y)
+                x = outer(y, self.gen_vec) % 1
 
+                # Multithreading with ThreadPoolExecutor
+                with ThreadPoolExecutor() as executor:
+                    result = list(executor.map(self._process_single_point, x))
 
+                return result
+
+    def _process_single_point(self, point):
+        # Example computation or operation on a single lattice point
+        # This is a placeholder method, actual implementation depends on your specific use case
+        processed_point = point * 2  # For example, doubling the lattice point
+
+        # Return the processed point or perform any required operation
+        return processed_point
 
     def _gail_natural(self, n_min, n_max):
         m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
