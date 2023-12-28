@@ -4,7 +4,7 @@ from numpy import *
 from os.path import dirname, abspath, isfile
 import warnings
 from joblib import Parallel, delayed
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
 
 class Lattice(LD):
@@ -181,31 +181,30 @@ class Lattice(LD):
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
 
-        if not self.is_thread:
-            gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
-            x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
-        elif self.is_joblib:
+        def gen_point(i, n):
+            """ Generate a single lattice point. """
+            return ((i * self.gen_vec) % n) / float(n)
+
+        def gen_block_points(m):
+            """ Generate a block of points. """
+            n = 2 ** m
+            return [gen_point(i, n) for i in arange(1, n + 1, 2)]
+        if self.is_joblib:
             gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
             parallel = Parallel(n_jobs=4)
             delayed_gen_block = delayed(gen_block)
             x_lat_full = vstack(parallel(delayed_gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)))
-
-        else:
-            import concurrent.futures
-            def gen_point(i, n):
-                """ Generate a single lattice point. """
-                return ((i * self.gen_vec) % n) / float(n)
-            def gen_block_points(m):
-                """ Generate a block of points. """
-                n = 2 ** m
-                return [gen_point(i, n) for i in arange(1, n + 1, 2)]
-
-            with concurrent.futures.ThreadPoolExecutor() as executor:
+        elif self.is_thread:
+            with ThreadPoolExecutor() as executor:
                 futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
-                # collect the results in the order the futures were created
-
                 x_lat_full = vstack([future.result() for future in futures])
-
+        elif self.is_process:
+            with ProcessPoolExecutor() as executor:
+                futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
+                x_lat_full = vstack([future.result() for future in futures])
+        else:
+            gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
+            x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
         cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
         cut2 = int(cut1 + n_max - n_min)
         x = x_lat_full[cut1:cut2, :]
@@ -237,29 +236,36 @@ class Lattice(LD):
         """ Gail lattice generator in linear order. """
         m_low = int(floor(log2(n_min))) + 1 if n_min > 0 else 0
         m_high = int(ceil(log2(n_max)))
-        if not self.is_thread:
-            if n_min == 0:
-                return self._gen_block_linear(m_high, first=True)
-            else:
-                n = 2 ** (m_low)
-                y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
-                y = self.calculate_y(m_low, m_high, y)
-                x = outer(y, self.gen_vec) % 1
-                return x
-        else:
-            if n_min == 0:
-                return self._gen_block_linear(m_high, first=True)
-            else:
-                n = 2 ** m_low
-                y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
-                y = self.calculate_y(m_low, m_high, y)
-                x = outer(y, self.gen_vec) % 1
+        if n_min == 0:
+            return self._gen_block_linear(m_high, first=True)
+        if not self.is_thread and not self.is_process:
+            n = 2 ** (m_low)
+            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            y = self.calculate_y(m_low, m_high, y)
+            x = outer(y, self.gen_vec) % 1
+            return x
+        elif self.is_thread:
+            n = 2 ** m_low
+            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            y = self.calculate_y(m_low, m_high, y)
+            x = outer(y, self.gen_vec) % 1
 
-                # Multithreading with ThreadPoolExecutor
-                with ThreadPoolExecutor() as executor:
-                    result = list(executor.map(self._process_single_point, x))
+            # Multithreading with ThreadPoolExecutor
+            with ThreadPoolExecutor() as executor:
+                result = list(executor.map(self._process_single_point, x))
 
-                return result
+            return result
+        elif self.is_process:
+            n = 2 ** m_low
+            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            y = self.calculate_y(m_low, m_high, y)
+            x = outer(y, self.gen_vec) % 1
+
+            with ProcessPoolExecutor() as executor:
+                result = list(executor.map(self._process_single_point, x))
+
+            return result
+
 
     def _process_single_point(self, point):
         # Example computation or operation on a single lattice point
@@ -272,21 +278,24 @@ class Lattice(LD):
     def _gail_natural(self, n_min, n_max):
         m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
-        if not self.is_thread:
-            x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low), int(m_high) + 1)])
-        elif self.is_thread and self.is_joblib:
+        if self.is_joblib:
             results = Parallel(n_jobs=-1)(
                 delayed(self._gen_block)(m) for m in range(int(m_low), int(m_high) + 1)
                 )
             x_lat_full = vstack(results)
-        else:
-            import concurrent.futures
+        elif self.is_thread:
             # create a ThreadPoolExecutor
-            with concurrent.futures.ThreadPoolExecutor() as executor:
+            with ThreadPoolExecutor() as executor:
                 futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
-            # collect the results in the order the futures (calls) created
-            # collect the results in the order the futures (calls) created
             x_lat_full = vstack([future.result() for future in futures])
+
+        elif self.is_process:
+            with ProcessPoolExecutor() as executor:
+                futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
+            x_lat_full = vstack([future.result() for future in futures])
+
+        else:
+            x_lat_full = vstack([self._gen_block(m) for m in range(int(m_low), int(m_high) + 1)])
 
         cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
         cut2 = int(cut1 + n_max - n_min)

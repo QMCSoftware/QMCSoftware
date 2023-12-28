@@ -2,12 +2,12 @@ import qmcpy as qp
 
 
 def mps(n, num_ports, seed=None):
-    l = qp.Lattice(dimension=n, seed=seed,order="mps" ,is_parallel=False)
+    l = qp.Lattice(dimension=n, seed=seed, order="mps", thread=False)
     points = l.gen_samples(num_ports)
     return points
 
 def mps_thread(n, num_ports, seed=None):
-    l = qp.Lattice(dimension=n, seed=seed,order="mps" ,is_parallel=True)
+    l = qp.Lattice(dimension=n, seed=seed, order="mps", thread=True)
     points = l.gen_samples(num_ports)
     return points
 
