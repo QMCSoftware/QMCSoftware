@@ -199,7 +199,7 @@ class Lattice(LD):
                 futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
                 x_lat_full = vstack([future.result() for future in futures])
         elif self.is_process:
-            with ProcessPoolExecutor() as executor:
+            with ProcessPoolExecutor(max_workers = 2) as executor:
                 futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
                 x_lat_full = vstack([future.result() for future in futures])
         else:
@@ -261,7 +261,7 @@ class Lattice(LD):
             y = self.calculate_y(m_low, m_high, y)
             x = outer(y, self.gen_vec) % 1
 
-            with ProcessPoolExecutor() as executor:
+            with ProcessPoolExecutor(max_workers = 2) as executor:
                 result = list(executor.map(self._process_single_point, x))
 
             return result
@@ -290,7 +290,7 @@ class Lattice(LD):
             x_lat_full = vstack([future.result() for future in futures])
 
         elif self.is_process:
-            with ProcessPoolExecutor() as executor:
+            with ProcessPoolExecutor(max_workers = 2) as executor:
                 futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
             x_lat_full = vstack([future.result() for future in futures])
 
