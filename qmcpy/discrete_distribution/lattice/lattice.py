@@ -105,7 +105,7 @@ class Lattice(LD):
     """
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
-                 generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, thread=True, joblib=False, process=False):
+                 generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, thread=True, joblib=False, process=False, max_workers = None):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -173,6 +173,7 @@ class Lattice(LD):
         self.is_thread = thread
         self.is_joblib = joblib
         self.is_process = process
+        self.max_workers = max_workers
 
 
 
@@ -199,7 +200,7 @@ class Lattice(LD):
                 futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
                 x_lat_full = vstack([future.result() for future in futures])
         elif self.is_process:
-            with ProcessPoolExecutor(max_workers = 2) as executor:
+            with ProcessPoolExecutor(max_workers = self.max_workers) as executor:
                 futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
                 x_lat_full = vstack([future.result() for future in futures])
         else:
@@ -238,33 +239,39 @@ class Lattice(LD):
         m_high = int(ceil(log2(n_max)))
         if n_min == 0:
             return self._gen_block_linear(m_high, first=True)
-        if not self.is_thread and not self.is_process:
-            n = 2 ** (m_low)
-            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
-            y = self.calculate_y(m_low, m_high, y)
-            x = outer(y, self.gen_vec) % 1
-            return x
+
         elif self.is_thread:
             n = 2 ** m_low
             y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
             y = self.calculate_y(m_low, m_high, y)
             x = outer(y, self.gen_vec) % 1
 
-            # Multithreading with ThreadPoolExecutor
+
             with ThreadPoolExecutor() as executor:
                 result = list(executor.map(self._process_single_point, x))
-
             return result
+
         elif self.is_process:
             n = 2 ** m_low
             y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
             y = self.calculate_y(m_low, m_high, y)
             x = outer(y, self.gen_vec) % 1
 
-            with ProcessPoolExecutor(max_workers = 2) as executor:
+            with ProcessPoolExecutor(max_workers=self.max_workers) as executor:
                 result = list(executor.map(self._process_single_point, x))
 
             return result
+
+        else:
+            n = 2 ** (m_low)
+            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            y = self.calculate_y(m_low, m_high, y)
+            x = outer(y, self.gen_vec) % 1
+            return x
+
+
+
+
 
 
     def _process_single_point(self, point):
@@ -290,7 +297,7 @@ class Lattice(LD):
             x_lat_full = vstack([future.result() for future in futures])
 
         elif self.is_process:
-            with ProcessPoolExecutor(max_workers = 2) as executor:
+            with ProcessPoolExecutor(max_workers=self.max_workers) as executor:
                 futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
             x_lat_full = vstack([future.result() for future in futures])
 
