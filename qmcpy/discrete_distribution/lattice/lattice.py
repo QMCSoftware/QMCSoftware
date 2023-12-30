@@ -190,9 +190,14 @@ class Lattice(LD):
             """ Generate a block of points. """
             n = 2 ** m
             return [gen_point(i, n) for i in arange(1, n + 1, 2)]
+
         if self.is_joblib:
+            if self.max_workers is None:
+                jobs = -1
+            else:
+                jobs = self.max_workers
             gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
-            parallel = Parallel(n_jobs=4)
+            parallel = Parallel(n_jobs=jobs)
             delayed_gen_block = delayed(gen_block)
             x_lat_full = vstack(parallel(delayed_gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)))
         elif self.is_thread:
@@ -262,15 +267,21 @@ class Lattice(LD):
 
             return result
 
+        elif self.is_joblib:
+            n = 2 ** m_low
+            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            y = self.calculate_y(m_low, m_high, y)
+            x = outer(y, self.gen_vec) % 1
+
+            result = Parallel(n_jobs=self.max_workers)(delayed(self.process_single_point)(point) for point in x)
+            return result
+
         else:
             n = 2 ** (m_low)
             y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
             y = self.calculate_y(m_low, m_high, y)
             x = outer(y, self.gen_vec) % 1
             return x
-
-
-
 
 
 
@@ -286,7 +297,11 @@ class Lattice(LD):
         m_low = floor(log2(n_min)) + 1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
         if self.is_joblib:
-            results = Parallel(n_jobs=-1)(
+            if self.max_workers is None:
+                jobs = -1
+            else:
+                jobs = self.max_workers
+            results = Parallel(n_jobs=jobs)(
                 delayed(self._gen_block)(m) for m in range(int(m_low), int(m_high) + 1)
                 )
             x_lat_full = vstack(results)
