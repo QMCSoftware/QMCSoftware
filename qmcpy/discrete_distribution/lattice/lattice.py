@@ -3,8 +3,17 @@ from ...util import ParameterError, ParameterWarning
 from numpy import *
 from os.path import dirname, abspath, isfile
 import warnings
+#Joblib
 from joblib import Parallel, delayed
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+#Both thread pools and process pools
+from concurrent.futures import ProcessPoolExecutor
+#Parsl
+from parsl import python_app
+from parsl.config import Config
+from parsl import load
+from parsl import set_stream_logger
+
+
 
 
 class Lattice(LD):
@@ -105,7 +114,7 @@ class Lattice(LD):
     """
 
     def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
-                 generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, thread=True, joblib=False, process=False, max_workers = None):
+                 generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, thread=True, joblib=False, process=False, max_workers = None, parsl = False):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -174,6 +183,7 @@ class Lattice(LD):
         self.is_joblib = joblib
         self.is_process = process
         self.max_workers = max_workers
+        self.is_parsl = parsl
 
 
 
@@ -181,6 +191,7 @@ class Lattice(LD):
         """ Magic Point Shop Lattice generator. """
         m_low = floor(log2(n_min))+1 if n_min > 0 else 0
         m_high = ceil(log2(n_max))
+
 
         def gen_point(i, n):
             """ Generate a single lattice point. """
@@ -191,7 +202,25 @@ class Lattice(LD):
             n = 2 ** m
             return [gen_point(i, n) for i in arange(1, n + 1, 2)]
 
-        if self.is_joblib:
+        if self.is_parsl and self.is_thread:
+            from parsl.executors import ThreadPoolExecutor
+            set_stream_logger()
+            config = Config(
+                executors=[ThreadPoolExecutor()]
+            )
+            load(config)
+            @python_app
+            def gen_block(n):
+                return (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
+
+            futures = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
+
+            x_lat_full = [future.result() for future in futures]
+
+
+
+
+        elif self.is_joblib:
             if self.max_workers is None:
                 jobs = -1
             else:
@@ -201,6 +230,7 @@ class Lattice(LD):
             delayed_gen_block = delayed(gen_block)
             x_lat_full = vstack(parallel(delayed_gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)))
         elif self.is_thread:
+            from concurrent.futures import ThreadPoolExecutor
             with ThreadPoolExecutor() as executor:
                 futures = [executor.submit(gen_block_points, m) for m in range(int(m_low), int(m_high) + 1)]
                 x_lat_full = vstack([future.result() for future in futures])
@@ -211,6 +241,7 @@ class Lattice(LD):
         else:
             gen_block = lambda n: (outer(arange(1, n + 1, 2), self.gen_vec) % n) / float(n)
             x_lat_full = vstack([gen_block(2 ** m) for m in range(int(m_low), int(m_high) + 1)])
+
         cut1 = int(floor(n_min - 2 ** (m_low - 1))) if n_min > 0 else 0
         cut2 = int(cut1 + n_max - n_min)
         x = x_lat_full[cut1:cut2, :]
@@ -246,6 +277,7 @@ class Lattice(LD):
             return self._gen_block_linear(m_high, first=True)
 
         elif self.is_thread:
+            from concurrent.futures import ThreadPoolExecutor
             n = 2 ** m_low
             y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
             y = self.calculate_y(m_low, m_high, y)
@@ -306,6 +338,7 @@ class Lattice(LD):
                 )
             x_lat_full = vstack(results)
         elif self.is_thread:
+            from concurrent.futures import ThreadPoolExecutor
             # create a ThreadPoolExecutor
             with ThreadPoolExecutor() as executor:
                 futures = [executor.submit(self._gen_block, m) for m in range(int(m_low), int(m_high) + 1)]
