@@ -107,6 +107,7 @@ class DigitalNetB2(LD):
         ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # znew
         ctypes.c_uint32, # set_rshift
         ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # rshift
+        ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # xb
         ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x
         ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')]  # xr
     dnb2_cf.restype = ctypes.c_uint32
@@ -294,9 +295,10 @@ class DigitalNetB2(LD):
         if return_unrandomized and not self.set_rshift:
             raise ParameterError("return_unrandomized=True only applies when randomize includes a digital shift.")
         n = int(n_max-n_min)
+        xb = zeros((n,self.d),dtype=uint64)
         x = zeros((n,self.d),dtype=double)
         xr = zeros((n,self.d),dtype=double)
-        rc = self.dnb2_cf(int(n_min),n,self.d,self.graycode,self.m_max,self.t_lms,self.z,self.set_rshift,self.rshift,x,xr)
+        rc = self.dnb2_cf(int(n_min),n,self.d,self.graycode,self.m_max,self.t_lms,self.z,self.set_rshift,self.rshift,xb,x,xr)
         if rc!=0:
             raise ParameterError(self.errors[rc])
         if return_unrandomized:
