@@ -19,7 +19,7 @@ PyMODINIT_FUNC PyInit_c_lib(void)
  * The output is a t+1 dimensional vector N=(N_0,N_1,...,N_t).*/
 void computeN(int s, int t, int* mvec, int** result, int** tmp);
 
-/* Looks for the largest possibe number m in {lb,...,ub} such that
+/* Looks for the largest possible number m in {lb,...,ub} such that
  * 2^m a- floor(2^m b) <1 and returns -1 if no such number exists*/
 int searchmaxm(double a, double b, int ub, int base);
 
@@ -35,7 +35,7 @@ void print_array_values(double *arr, int size, int n,  char *name) {
     printf("The first few and last %d values of array %s are:\n", n, name);
     for (int i = 0; i < n && i < size; i++) {
             printf("%.3f ", arr[i]);
-        }
+    }
     printf(" ... ");
     for (int i = size - n; i < size; i++) {
         printf("%.3f ", arr[i]);
@@ -68,9 +68,9 @@ EXPORT double* computeWeights(int m, int mp, int s, int N, int Nqmc, double* px,
 
     double* weights=(double*)malloc((1+outs)*Nqmc*sizeof(double));   /* return vector of weights */
 
-   for(ell=0;ell<Nqmc;++ell){
+    for(ell=0;ell<Nqmc;++ell){
 
-       computeS(s, N, m, base, &pz[ell*s], px, py, result1, result2, mvec, tmp1, tmp2);
+        computeS(s, N, m, base, &pz[ell*s], px, py, result1, result2, mvec, tmp1, tmp2);
         double Mtmp1 =0;
         double Mtmp2 =0;
         for(q=0;q<=minsm;++q){
@@ -113,7 +113,7 @@ void computeN(int s, int t, int* mvec, int** result,int** tmp){
     int sum=0;
     int* p1,*p2,*p3;
     /* in each iteration of the main loop, the function reads from p1 and
-     * writes in p2. After each iteration, p1 and p2 are swaped. */
+     * writes in p2. After each iteration, p1 and p2 are swapped. */
     p1=*result;
     p2=*tmp;
     /* compute min(t,mvec[0]) */

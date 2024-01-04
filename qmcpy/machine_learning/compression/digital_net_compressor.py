@@ -11,12 +11,15 @@ class DigitalNetDataCompressor:
     Computes the weights $W_X$ and $W_{X,Y}$.
 
     Args:
-        nu (int): $\nu$ in the paper
-        m (int): $\ell$ in the paper
-        dataset (ndarray): $X$ in the paper
-        labels (ndarray): $Y$ in the paper
-        sobol (ndarray): $2**m$ Sobol sampling points in d-dimensional unit cube
-        alpha (int):
+        nu (int): $\nu$ in the paper, positive integer, determines the volume of each elementary interval in base $b=2$,
+                  denoted as $b^{-\nu}$. These intervals partition the unit cube $[0, 1)^s$ and are used to analyse
+                  and construct the Sobol sequence.
+        m (int): $\ell$ in the paper, positive integer, the exponent in the power of 2 that determines the
+                 total number of sampling points in the compressed dataset
+        dataset (ndarray): $X$ in the paper, multi-dimensional array representing the dataset with $s$ columns
+        labels (ndarray): $Y$ in the paper, labels associated with the input dataset
+        sobol (ndarray): $2**m$ Sobol sampling points
+        alpha (int): Order of the Sobol sequence
 
     Return:
         weights: first column is $W_X$ and second column is $W_{X,Y}$
