@@ -7,11 +7,6 @@ import warnings
 from joblib import Parallel, delayed
 #Both thread pools and process pools
 from concurrent.futures import ProcessPoolExecutor
-#Parsl
-from parsl import python_app
-from parsl.config import Config
-from parsl import load
-from parsl import set_stream_logger
 
 
 
