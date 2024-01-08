@@ -17,8 +17,8 @@ def get_scramble_scalar(xb,t,scramble,rng):
     Example: t = 3, xb = 6 = 110_2, x = .110_2 = .75 
     """
     if scramble.xb is None: # branch node, scramble.rbits is 0 or 1
-        r1 = scramble.rbits<<(t-1)
-        b = (xb>>(t-1))&1
+        r1 = lshift(scramble.rbits,(t-1))
+        b = (rshift(xb,(t-1)))&1
         onesmask = 2**(t-1)-1
         xbnext = xb&onesmask
         if (not b) and (scramble.left is None):
@@ -36,7 +36,7 @@ def get_scramble_scalar(xb,t,scramble,rng):
         b,ubit = None,None
         rmask = 2**t-1
         while True:
-            b,ubit,rbit = (xb>>(t-1))&1,(orsxb>>(t-1))&1,(ogsrbits>>(t-1))&1
+            b,ubit,rbit = (rshift(xb,(t-1)))&1,(rshift(orsxb,(t-1)))&1,(rshift(ogsrbits,(t-1)))&1
             scramble.rbits,scramble.xb = rbit,None
             if ubit != b: break
             if b==0: 
@@ -55,6 +55,18 @@ def get_scramble_scalar(xb,t,scramble,rng):
     else: # scramble.xb == xb
         return scramble.rbits # seen leaf node 
 
+def rshift(x,v):
+    if v >= 0:
+        return x >> v
+    else:
+        return lshift(x,-v)
+
+def lshift(x,v):
+    if v >= 0:
+        return x << v
+    else:
+        return rshift(x,-v)
+"""
 if __name__ == "__main__":
     rng = random.default_rng(17)
     t = 4
@@ -74,7 +86,7 @@ if __name__ == "__main__":
     root_node = Node(None,None,Node(rbitsleft,0,None,None),Node(rbitsright,2**(t-1),None,None))
 
     n = len(xbs)
-    xbrs = [-1]*n
+    xbrs = zeros(n)
     for i in range(n):
         xb = xbs[i]
         b = xb>>(t-1)&1
@@ -82,3 +94,4 @@ if __name__ == "__main__":
         xbr = xb ^ get_scramble_scalar(xb,t,first_node,rng)
         xbrs[i] = xbr
         print("%-7d %-7d"%(xb,xbr))
+"""

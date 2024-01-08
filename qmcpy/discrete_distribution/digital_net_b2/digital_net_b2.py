@@ -5,7 +5,7 @@ import ctypes
 from os.path import dirname, abspath, isfile
 from numpy import *
 import warnings
-
+from owen_scramble import*
 
 class DigitalNetB2(LD):
     """
@@ -124,6 +124,7 @@ class DigitalNetB2(LD):
                 'LMS_DS': linear matrix scramble with digital shift
                 'LMS': linear matrix scramble only
                 'DS': digital shift only
+                'OWEN'/'NUS': nested uniform scrambling (Owen scrambling)
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
             generating_matrices (ndarray or str): Specify generating matrices. There are a number of optional input types. 
@@ -144,28 +145,38 @@ class DigitalNetB2(LD):
         if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
             self.set_lms = False
             self.set_rshift = False
+            self.set_owen = False
         elif isinstance(randomize,bool):
             if randomize:
                 self.set_lms = True
                 self.set_rshift = True
+                self.set_owen = False
             else:
                 self.set_lms = False
                 self.set_rshift = False
+                self.set_owen = False
         elif randomize.upper() == 'LMS_DS':
             self.set_lms = True
             self.set_rshift = True
         elif randomize.upper() == 'LMS':
             self.set_lms = True
             self.set_rshift = False
+            self.set_owen = False
         elif randomize.upper() == "DS":
             self.set_lms = False
             self.set_rshift = True
+            self.set_owen = False
+        elif (randomize.upper() == 'OWEN') or (randomize.upper() == 'NUS'):
+            self.set_lms = False
+            self.set_rshift = False
+            self.set_owen = True
         else:
             msg = '''
                 DigitalNetB2' randomize should be either 
                     "LMS_DS" for linear matrix scramble with digital shift or
                     'LMS' for linear matrix scramble only or
-                    'DS' for digital shift only. 
+                    'DS' for digital shift only or 
+                    'OWEN'/'NUS' for Nested Uniform scrambling (Owen scrambling)
             '''
             raise ParameterError(msg)
         self.graycode = graycode
@@ -251,6 +262,15 @@ class DigitalNetB2(LD):
             if self.set_rshift:
                 self.rshift[j] = self.rng.integers(low=0, high=1<<self.t_lms, size=1, dtype=uint64)
 
+        if self.set_owen:
+            new_seeds = self._base_seed.spawn(self.d)
+            self.rngs = [random.Generator(random.SFC64(new_seeds[j])) for j in range(self.d)]
+            self.root_nodes = [None]*self.d   
+            for j in range(self.d):
+                r1 = int(self.rngs[j].integers(0,2))<<(self.t_lms-1)
+                rbitsleft,rbitsright = r1+int(self.rngs[j].integers(0,2**(self.t_lms-1))),r1+int(self.rngs[j].integers(0,2**(self.t_lms-1)))
+                self.root_nodes[j] = Node(None,None,Node(rbitsleft,0,None,None),Node(rbitsright,2**(self.t_lms-1),None,None))
+
     def _flip_bits(self, e):
         """
         flip the int e with self.t_max bits
@@ -290,7 +310,7 @@ class DigitalNetB2(LD):
         if n:
             n_min = 0
             n_max = n
-        if n_min == 0 and self.set_rshift==False and warn:
+        if n_min == 0 and self.set_rshift==False and warn and self.set_owen == False:
             warnings.warn("Non-randomized DigitalNetB2 sequence includes the origin",ParameterWarning)
         if return_unrandomized and not self.set_rshift:
             raise ParameterError("return_unrandomized=True only applies when randomize includes a digital shift.")
@@ -305,12 +325,30 @@ class DigitalNetB2(LD):
             return xr,x
         elif self.set_rshift:
             return xr
+        elif self.set_owen:
+            return self.owen_scr(xb)
         else:
             return x
     
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[0], dtype=float)        
+        return ones(x.shape[0], dtype=float) 
+
+    def owen_scr(self,xbs): 
+        n = xbs.shape[0]
+        xbrs_fin = zeros((n,self.d),dtype=uint64)
+        for j in range(self.d):
+            xbrs = zeros(n)
+            for i in range(n):
+                xb = int(xbs[i,j])
+                b = xb>>(self.t_lms-1)&1
+                first_node = self.root_nodes[j].left if b==0 else self.root_nodes[j].right
+                xbr = xb ^ get_scramble_scalar(xb,self.t_lms,first_node,self.rngs[j])
+                xbrs[i] = xbr
+                print("%-7d %-7d"%(xb,xbr))
+            xbrs_fin[:,j] = xbrs
+        return xbrs_fin / (2**self.t_lms)
+
     
     def _spawn(self, child_seed, dimension):
         return DigitalNetB2(
