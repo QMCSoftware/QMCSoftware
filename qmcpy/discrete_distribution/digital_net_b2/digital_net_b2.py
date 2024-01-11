@@ -158,6 +158,7 @@ class DigitalNetB2(LD):
         elif randomize.upper() == 'LMS_DS':
             self.set_lms = True
             self.set_rshift = True
+            self.set_owen = False
         elif randomize.upper() == 'LMS':
             self.set_lms = True
             self.set_rshift = False
