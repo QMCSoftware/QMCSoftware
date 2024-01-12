@@ -1,22 +1,27 @@
 """ Plot functions used by Discrete Distribution and True Measure"""
 import qmcpy as qp
 from numpy import*
-def plot_proj(n,sampler, d_horizontal = 0, d_vertical = 1,math_ind = False, **kwargs):
+import os
+def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, **kwargs):
     """
     Args:
-        n (int or list): the number of samples or a list of samples(used for extensibility) to be plotted.
         sampler: the Discrete Distribution or the True Measure Object to be plotted
+        n (int or list): the number of samples or a list of samples(used for extensibility) to be plotted. 
+            Default value is 64
         d_horizontal (int or list): the dimension or list of dimensions to be plotted on the horizontal axes. 
-            Default value is 0 (1st dimension).
+            Default value is 1 (1st dimension).
         d_vertical (int or list): the dimension or list of dimensions to be plotted on the vertical axes. 
-            Default value is 1 (2nd dimension).
+            Default value is 2 (2nd dimension).
         math_ind : setting it true will enable user to pass in math indices. 
-            Default value is false, so user is required to pass in python indices.
+            Default value is true, so user is required to pass in math indices.
+        marker_size: the marker size in points**2(typographic points are 1/72 in.).
+            Default value is 5.
         **kwargs : Any extra features the user would like to see in the plots
     """
     try:
         import matplotlib.pyplot as plt
-        plt.style.use("../qmcpy/qmcpy.mplstyle")
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        plt.style.use(os.path.join(dir_path, "../qmcpy.mplstyle"))
         from matplotlib import colors
     except:
         raise ImportError("Missing matplotlib.pyplot as plt, Matplotlib must be intalled to run plot_proj function")
@@ -25,8 +30,6 @@ def plot_proj(n,sampler, d_horizontal = 0, d_vertical = 1,math_ind = False, **kw
     d_vertical = atleast_1d(d_vertical)
     samples = sampler.gen_samples(n[n.size - 1])    
     d = samples.shape[1]
-    assert d>=2 
-
     fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(5*d_horizontal.size, 5* d_vertical.size),squeeze=False)                    
     fig.tight_layout(pad=2)
     
@@ -62,7 +65,14 @@ def plot_proj(n,sampler, d_horizontal = 0, d_vertical = 1,math_ind = False, **kw
                         x_label = r'$t_{i%d}$'%(x_label_num)
                         y_label = r'$t_{i%d}$'%(y_label_num)    
                     
-                    ax[i,j].set_xlabel(x_label,fontsize = 15); ax[i,j].set_ylabel(y_label,fontsize = 15)
-                    ax[i,j].scatter(samples[n_min:n_max,x],samples[n_min:n_max,y],s=5,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)
+                    ax[i,j].set_xlabel(x_label,fontsize = 15)
+                    if(d > 1):
+                        ax[i,j].set_ylabel(y_label,fontsize = 15)
+                        y_axis = samples[n_min:n_max,y]
+                    else:
+                        y_axis = []
+                        for h in range(n_max-n_min):
+                            y_axis.append(0.5)
+                    ax[i,j].scatter(samples[n_min:n_max,x],y_axis,s=marker_size,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)
                     n_min = n[m]
     return fig, ax
