@@ -52,7 +52,16 @@ class DigitalNetB2(LD):
            [0.625, 0.125, 0.875],
            [0.375, 0.375, 0.625],
            [0.875, 0.875, 0.125]])
-    
+    >>> DigitalNetB2(dimension = 3, randomize = 'OWEN', seed = 5).gen_samples(8)
+    array([[0.16797743, 0.52917488, 0.150332  ],
+           [0.88050507, 0.22028542, 0.69524159],
+           [0.44555438, 0.42452594, 0.90916643],
+           [0.65496871, 0.84248501, 0.28065072],
+           [0.03423037, 0.04998978, 0.46032102],
+           [0.78941141, 0.69821019, 0.75759427],
+           [0.33468515, 0.87912001, 0.55234822],
+           [0.55051458, 0.25014103, 0.09323185]])
+
     References:
 
         [1] Marius Hofert and Christiane Lemieux (2019). 
@@ -173,11 +182,11 @@ class DigitalNetB2(LD):
             self.set_owen = True
         else:
             msg = '''
-                DigitalNetB2' randomize should be either 
-                    "LMS_DS" for linear matrix scramble with digital shift or
+                DigitalNetB2 randomize should be either 
+                    'LMS_DS' for linear matrix scramble with digital shift or
                     'LMS' for linear matrix scramble only or
                     'DS' for digital shift only or 
-                    'OWEN'/'NUS' for Nested Uniform scrambling (Owen scrambling)
+                    'OWEN'/'NUS' for Nested Uniform Scrambling (Owen Scrambling)
             '''
             raise ParameterError(msg)
         self.graycode = graycode
@@ -264,6 +273,7 @@ class DigitalNetB2(LD):
                 self.rshift[j] = self.rng.integers(low=0, high=1<<self.t_lms, size=1, dtype=uint64)
 
         if self.set_owen:
+            # constructing rngs and root nodes for the binary tree
             new_seeds = self._base_seed.spawn(self.d)
             self.rngs = [random.Generator(random.SFC64(new_seeds[j])) for j in range(self.d)]
             self.root_nodes = [None]*self.d   
@@ -336,6 +346,7 @@ class DigitalNetB2(LD):
         return ones(x.shape[0], dtype=float) 
 
     def owen_scr(self,xbs): 
+        """ generate samples based on Nested Uniform Scrambling (Owen Scrambling)"""
         n = xbs.shape[0]
         xbrs_fin = zeros((n,self.d),dtype=uint64)
         for j in range(self.d):
@@ -346,7 +357,6 @@ class DigitalNetB2(LD):
                 first_node = self.root_nodes[j].left if b==0 else self.root_nodes[j].right
                 xbr = xb ^ get_scramble_scalar(xb,self.t_lms,first_node,self.rngs[j])
                 xbrs[i] = xbr
-                print("%-7d %-7d"%(xb,xbr))
             xbrs_fin[:,j] = xbrs
         return xbrs_fin / (2**self.t_lms)
 

@@ -1,5 +1,6 @@
-from numpy import * 
+""" Binary Tree used to generate samples for Nested Uniform Scrambling (Owen Scrambling) in DigitalNetB2 """
 
+from numpy import * 
 class Node:
     def __init__(self,rbits,xb,left,right):
         self.rbits = rbits
@@ -66,32 +67,3 @@ def lshift(x,v):
         return x << v
     else:
         return rshift(x,-v)
-"""
-if __name__ == "__main__":
-    rng = random.default_rng(17)
-    t = 4
-    xbs = [
-        0, # 0000_2 -> 0
-        8, # 1000_2 -> 1/2
-        4, # 0100_2 -> 1/4
-        12, # 1100_2 -> 3/4 = 1/2+1/4
-        2, # 0010_2 -> 1/8
-        6, # 0110_2 -> 3/8 = 1/4+1/8
-        10, # 1010_2 -> 5/8 = 1/2+1/8
-        14, # 1110_2 -> 7/8 = 1/2+1/4+1/8
-    ]
-
-    r1 = int(rng.integers(0,2))<<(t-1)
-    rbitsleft,rbitsright = r1+int(rng.integers(0,2**(t-1))),r1+int(rng.integers(0,2**(t-1)))
-    root_node = Node(None,None,Node(rbitsleft,0,None,None),Node(rbitsright,2**(t-1),None,None))
-
-    n = len(xbs)
-    xbrs = zeros(n)
-    for i in range(n):
-        xb = xbs[i]
-        b = xb>>(t-1)&1
-        first_node = root_node.left if b==0 else root_node.right
-        xbr = xb ^ get_scramble_scalar(xb,t,first_node,rng)
-        xbrs[i] = xbr
-        print("%-7d %-7d"%(xb,xbr))
-"""
