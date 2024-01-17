@@ -5,7 +5,6 @@ import ctypes
 from os.path import dirname, abspath, isfile
 from numpy import *
 import warnings
-from owen_scramble import*
 
 class DigitalNetB2(LD):
     """
@@ -350,17 +349,61 @@ class DigitalNetB2(LD):
         n = xbs.shape[0]
         xbrs_fin = zeros((n,self.d),dtype=uint64)
         for j in range(self.d):
-            xbrs = zeros(n)
             for i in range(n):
                 xb = int(xbs[i,j])
                 b = xb>>(self.t_lms-1)&1
                 first_node = self.root_nodes[j].left if b==0 else self.root_nodes[j].right
-                xbr = xb ^ get_scramble_scalar(xb,self.t_lms,first_node,self.rngs[j])
-                xbrs[i] = xbr
-            xbrs_fin[:,j] = xbrs
+                xbrs_fin[i,j] = xb ^ self.get_scramble_scalar(xb,self.t_lms,first_node,self.rngs[j])
         return xbrs_fin / (2**self.t_lms)
-
     
+    def get_scramble_scalar(self,xb,t,scramble,rng):
+        """
+        Args:
+            xb (uint64): t-bit integer represtation of bits
+            t (int64): number of bits in xb 
+            scramble (Node): node in the binary tree 
+            rng: random number generator (will be part of the DiscreteDistribution class)
+        Example: t = 3, xb = 6 = 110_2, x = .110_2 = .75 
+        """
+        if scramble.xb is None: # branch node, scramble.rbits is 0 or 1
+            r1 = scramble.rbits<<(t-1)
+            b = (xb>>(t-1))&1
+            onesmask = 2**(t-1)-1
+            xbnext = xb&onesmask
+            if (not b) and (scramble.left is None):
+                rbits = int(rng.integers(0,onesmask+1))
+                scramble.left = Node(rbits,xbnext,None,None)
+                return r1+rbits
+            elif b and (scramble.right is None):
+                rbits = int(rng.integers(0,onesmask+1))
+                scramble.right = Node(rbits,xbnext,None,None)
+                return r1+rbits
+            scramble = scramble.left if b==0 else scramble.right
+            return  r1 + self.get_scramble_scalar(xbnext,t-1,scramble,rng)
+        elif scramble.xb != xb: # unseen leaf node
+            ogsrbits,orsxb = scramble.rbits,scramble.xb
+            b,ubit = None,None
+            rmask = 2**t-1
+            while True:
+                b,ubit,rbit = (xb>>(t-1))&1,(orsxb>>(t-1))&1,(ogsrbits>>(t-1))&1
+                scramble.rbits,scramble.xb = rbit,None
+                if ubit != b: break
+                if b==0: 
+                    scramble.left = Node(None,None,None,None)
+                    scramble = scramble.left 
+                else:
+                    scramble.right = Node(None,None,None,None)
+                    scramble = scramble.right 
+                t -= 1
+            onesmask = 2**(t-1)-1
+            newrbits = int(rng.integers(0,onesmask+1)) 
+            scramble.left = Node(newrbits,xb&onesmask,None,None) if b==0 else Node(ogsrbits&onesmask,orsxb&onesmask,None,None)
+            scramble.right = Node(newrbits,xb&onesmask,None,None) if b==1 else Node(ogsrbits&onesmask,orsxb&onesmask,None,None)
+            rmask ^= onesmask
+            return (ogsrbits&rmask)+newrbits
+        else: # scramble.xb == xb
+            return scramble.rbits # seen leaf node 
+
     def _spawn(self, child_seed, dimension):
         return DigitalNetB2(
             dimension=dimension,
@@ -375,3 +418,11 @@ class DigitalNetB2(LD):
             t_lms=self.t_lms)
 
 class Sobol(DigitalNetB2): pass
+
+class Node:
+    """ generate nodes for the binary tree """
+    def __init__(self,rbits,xb,left,right):
+        self.rbits = rbits
+        self.xb = xb 
+        self.left = left 
+        self.right = right

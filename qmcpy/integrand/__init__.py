@@ -15,4 +15,3 @@ from .sin1d import Sin1d
 from .hartmann6d import Hartmann6d
 from .fourbranch2d import FourBranch2d
 from .multimodal2d import Multimodal2d
-from .barrier_option import BarrierOption
