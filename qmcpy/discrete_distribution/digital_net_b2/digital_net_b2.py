@@ -6,7 +6,6 @@ from os.path import dirname, abspath, isfile
 from numpy import *
 import warnings
 
-
 class DigitalNetB2(LD):
     """
     Quasi-Random digital nets in base 2.
@@ -52,7 +51,16 @@ class DigitalNetB2(LD):
            [0.625, 0.125, 0.875],
            [0.375, 0.375, 0.625],
            [0.875, 0.875, 0.125]])
-    
+    >>> DigitalNetB2(dimension = 3, randomize = 'OWEN', seed = 5).gen_samples(8)
+    array([[0.16797743, 0.52917488, 0.150332  ],
+           [0.88050507, 0.22028542, 0.69524159],
+           [0.44555438, 0.42452594, 0.90916643],
+           [0.65496871, 0.84248501, 0.28065072],
+           [0.03423037, 0.04998978, 0.46032102],
+           [0.78941141, 0.69821019, 0.75759427],
+           [0.33468515, 0.87912001, 0.55234822],
+           [0.55051458, 0.25014103, 0.09323185]])
+
     References:
 
         [1] Marius Hofert and Christiane Lemieux (2019). 
@@ -107,6 +115,7 @@ class DigitalNetB2(LD):
         ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # znew
         ctypes.c_uint32, # set_rshift
         ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # rshift
+        ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # xb
         ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x
         ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')]  # xr
     dnb2_cf.restype = ctypes.c_uint32
@@ -123,6 +132,7 @@ class DigitalNetB2(LD):
                 'LMS_DS': linear matrix scramble with digital shift
                 'LMS': linear matrix scramble only
                 'DS': digital shift only
+                'OWEN'/'NUS': nested uniform scrambling (Owen scrambling)
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
             generating_matrices (ndarray or str): Specify generating matrices. There are a number of optional input types. 
@@ -143,28 +153,39 @@ class DigitalNetB2(LD):
         if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
             self.set_lms = False
             self.set_rshift = False
+            self.set_owen = False
         elif isinstance(randomize,bool):
             if randomize:
                 self.set_lms = True
                 self.set_rshift = True
+                self.set_owen = False
             else:
                 self.set_lms = False
                 self.set_rshift = False
+                self.set_owen = False
         elif randomize.upper() == 'LMS_DS':
             self.set_lms = True
             self.set_rshift = True
+            self.set_owen = False
         elif randomize.upper() == 'LMS':
             self.set_lms = True
             self.set_rshift = False
+            self.set_owen = False
         elif randomize.upper() == "DS":
             self.set_lms = False
             self.set_rshift = True
+            self.set_owen = False
+        elif (randomize.upper() == 'OWEN') or (randomize.upper() == 'NUS'):
+            self.set_lms = False
+            self.set_rshift = False
+            self.set_owen = True
         else:
             msg = '''
-                DigitalNetB2' randomize should be either 
-                    "LMS_DS" for linear matrix scramble with digital shift or
+                DigitalNetB2 randomize should be either 
+                    'LMS_DS' for linear matrix scramble with digital shift or
                     'LMS' for linear matrix scramble only or
-                    'DS' for digital shift only. 
+                    'DS' for digital shift only or 
+                    'OWEN'/'NUS' for Nested Uniform Scrambling (Owen Scrambling)
             '''
             raise ParameterError(msg)
         self.graycode = graycode
@@ -250,6 +271,16 @@ class DigitalNetB2(LD):
             if self.set_rshift:
                 self.rshift[j] = self.rng.integers(low=0, high=1<<self.t_lms, size=1, dtype=uint64)
 
+        if self.set_owen:
+            # constructing rngs and root nodes for the binary tree
+            new_seeds = self._base_seed.spawn(self.d)
+            self.rngs = [random.Generator(random.SFC64(new_seeds[j])) for j in range(self.d)]
+            self.root_nodes = [None]*self.d   
+            for j in range(self.d):
+                r1 = int(self.rngs[j].integers(0,2))<<(self.t_lms-1)
+                rbitsleft,rbitsright = r1+int(self.rngs[j].integers(0,2**(self.t_lms-1))),r1+int(self.rngs[j].integers(0,2**(self.t_lms-1)))
+                self.root_nodes[j] = Node(None,None,Node(rbitsleft,0,None,None),Node(rbitsright,2**(self.t_lms-1),None,None))
+
     def _flip_bits(self, e):
         """
         flip the int e with self.t_max bits
@@ -289,27 +320,90 @@ class DigitalNetB2(LD):
         if n:
             n_min = 0
             n_max = n
-        if n_min == 0 and self.set_rshift==False and warn:
+        if n_min == 0 and self.set_rshift==False and warn and self.set_owen == False:
             warnings.warn("Non-randomized DigitalNetB2 sequence includes the origin",ParameterWarning)
         if return_unrandomized and not self.set_rshift:
             raise ParameterError("return_unrandomized=True only applies when randomize includes a digital shift.")
         n = int(n_max-n_min)
+        xb = zeros((n,self.d),dtype=uint64)
         x = zeros((n,self.d),dtype=double)
         xr = zeros((n,self.d),dtype=double)
-        rc = self.dnb2_cf(int(n_min),n,self.d,self.graycode,self.m_max,self.t_lms,self.z,self.set_rshift,self.rshift,x,xr)
+        rc = self.dnb2_cf(int(n_min),n,self.d,self.graycode,self.m_max,self.t_lms,self.z,self.set_rshift,self.rshift,xb,x,xr)
         if rc!=0:
             raise ParameterError(self.errors[rc])
         if return_unrandomized:
             return xr,x
         elif self.set_rshift:
             return xr
+        elif self.set_owen:
+            return self.owen_scr(xb)
         else:
             return x
     
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[0], dtype=float)        
+        return ones(x.shape[0], dtype=float) 
+
+    def owen_scr(self,xbs): 
+        """ generate samples based on Nested Uniform Scrambling (Owen Scrambling)"""
+        n = xbs.shape[0]
+        xbrs_fin = zeros((n,self.d),dtype=uint64)
+        for j in range(self.d):
+            for i in range(n):
+                xb = int(xbs[i,j])
+                b = xb>>(self.t_lms-1)&1
+                first_node = self.root_nodes[j].left if b==0 else self.root_nodes[j].right
+                xbrs_fin[i,j] = xb ^ self.get_scramble_scalar(xb,self.t_lms,first_node,self.rngs[j])
+        return xbrs_fin / (2**self.t_lms)
     
+    def get_scramble_scalar(self,xb,t,scramble,rng):
+        """
+        Args:
+            xb (uint64): t-bit integer represtation of bits
+            t (int64): number of bits in xb 
+            scramble (Node): node in the binary tree 
+            rng: random number generator (will be part of the DiscreteDistribution class)
+        Example: t = 3, xb = 6 = 110_2, x = .110_2 = .75 
+        """
+        if scramble.xb is None: # branch node, scramble.rbits is 0 or 1
+            r1 = scramble.rbits<<(t-1)
+            b = (xb>>(t-1))&1
+            onesmask = 2**(t-1)-1
+            xbnext = xb&onesmask
+            if (not b) and (scramble.left is None):
+                rbits = int(rng.integers(0,onesmask+1))
+                scramble.left = Node(rbits,xbnext,None,None)
+                return r1+rbits
+            elif b and (scramble.right is None):
+                rbits = int(rng.integers(0,onesmask+1))
+                scramble.right = Node(rbits,xbnext,None,None)
+                return r1+rbits
+            scramble = scramble.left if b==0 else scramble.right
+            return  r1 + self.get_scramble_scalar(xbnext,t-1,scramble,rng)
+        elif scramble.xb != xb: # unseen leaf node
+            ogsrbits,orsxb = scramble.rbits,scramble.xb
+            b,ubit = None,None
+            rmask = 2**t-1
+            while True:
+                b,ubit,rbit = (xb>>(t-1))&1,(orsxb>>(t-1))&1,(ogsrbits>>(t-1))&1
+                scramble.rbits,scramble.xb = rbit,None
+                if ubit != b: break
+                if b==0: 
+                    scramble.left = Node(None,None,None,None)
+                    scramble = scramble.left 
+                else:
+                    scramble.right = Node(None,None,None,None)
+                    scramble = scramble.right 
+                t -= 1
+            onesmask = 2**(t-1)-1
+            newrbits = int(rng.integers(0,onesmask+1)) 
+            scramble.left = Node(newrbits,xb&onesmask,None,None) if b==0 else Node(ogsrbits&onesmask,orsxb&onesmask,None,None)
+            scramble.right = Node(newrbits,xb&onesmask,None,None) if b==1 else Node(ogsrbits&onesmask,orsxb&onesmask,None,None)
+            rmask ^= onesmask
+            return (ogsrbits&rmask)+newrbits
+        else: # scramble.xb == xb
+            return scramble.rbits # seen leaf node 
+
     def _spawn(self, child_seed, dimension):
         return DigitalNetB2(
             dimension=dimension,
@@ -324,3 +418,11 @@ class DigitalNetB2(LD):
             t_lms=self.t_lms)
 
 class Sobol(DigitalNetB2): pass
+
+class Node:
+    """ generate nodes for the binary tree """
+    def __init__(self,rbits,xb,left,right):
+        self.rbits = rbits
+        self.xb = xb 
+        self.left = left 
+        self.right = right
