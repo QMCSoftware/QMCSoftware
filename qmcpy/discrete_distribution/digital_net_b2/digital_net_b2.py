@@ -189,6 +189,7 @@ class DigitalNetB2(LD):
                 raise ParameterError("d_max, t_max, m_max, and msb must be supplied when generating_matrices is a ndarray")
             self.d_max = d_max
             self.t_max = t_max
+            #TODO: if t_max > m_max, then the extra rows should be random?
             self.m_max = m_max
             self.msb = msb
         elif isinstance(generating_matrices,str):
@@ -227,6 +228,7 @@ class DigitalNetB2(LD):
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(DigitalNetB2,self).__init__(dimension,seed)
+        if isinstance(generating_matrices,int) and self._verbose : print('c (generating_matrix)') 
         if isinstance(generating_matrices,int):
             self.z_og = zeros((self.d_max,self.t_max),dtype=uint64)
             for j in range(self.d):
@@ -244,7 +246,8 @@ class DigitalNetB2(LD):
                             bit = (int(self.z_og[j,tprint])&mask)>0
                             print('%-2d'%bit,end='',flush=True)
                         print('\n\t\t',end='',flush=True)
-        if isinstance(generating_matrices,int) and self._verbose : print('c (generating_matrix)') 
+            print('\n')
+            #TODO: print out the product as well
         if self.t_max>64 or self.t_lms>64 or self.t_max>self.t_lms:
             raise Exception("require t_max <= t_lms <= 64")
         self.z = zeros((self.d,self.m_max),dtype=uint64)
@@ -278,7 +281,7 @@ class DigitalNetB2(LD):
                 self.z[j,:] = self.z_og[dvecj,:]
             if self.set_rshift:
                 self.rshift[j] = self.rng.integers(low=0, high=1<<self.t_lms, size=1, dtype=uint64)
-
+        if self._verbose: print()
     def _flip_bits(self, e):
         """
         flip the int e with self.t_max bits
