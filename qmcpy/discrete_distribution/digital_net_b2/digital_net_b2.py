@@ -42,15 +42,15 @@ class DigitalNetB2(LD):
            [0.546875, 0.921875, 0.859375, 0.046875, 0.109375],
            [0.234375, 0.859375, 0.171875, 0.484375, 0.921875],
            [0.984375, 0.109375, 0.921875, 0.734375, 0.171875]])
-    >>> DigitalNetB2(dimension=3,randomize=False,generating_matrices="LDData/main/dnet_dnetup/mps.sobol_Cs.txt").gen_samples(8,warn=False)
-    array([[0.   , 0.   , 0.   ],
-           [0.5  , 0.5  , 0.5  ],
-           [0.25 , 0.75 , 0.75 ],
-           [0.75 , 0.25 , 0.25 ],
-           [0.125, 0.625, 0.375],
-           [0.625, 0.125, 0.875],
-           [0.375, 0.375, 0.625],
-           [0.875, 0.875, 0.125]])
+    >>> DigitalNetB2(dimension=3,randomize=False,generating_matrices="LDData/main/dnet/mps.nx_s5_alpha2_m32.txt").gen_samples(8,warn=False)
+    array([[0.        , 0.        , 0.        ],
+           [0.75841841, 0.45284834, 0.48844557],
+           [0.57679828, 0.13226272, 0.10061957],
+           [0.31858402, 0.32113875, 0.39369111],
+           [0.90278927, 0.45867532, 0.01803333],
+           [0.14542431, 0.02548793, 0.4749614 ],
+           [0.45587539, 0.33081476, 0.11474426],
+           [0.71318879, 0.15377192, 0.37629925]])
     >>> DigitalNetB2(dimension = 3, randomize = 'OWEN', seed = 5).gen_samples(8)
     array([[0.16797743, 0.52917488, 0.150332  ],
            [0.88050507, 0.22028542, 0.69524159],
@@ -138,7 +138,7 @@ class DigitalNetB2(LD):
             generating_matrices (ndarray or str): Specify generating matrices. There are a number of optional input types. 
                 1) A ndarray of integers with shape (d_max, m_max) where each int has t_max bits. 
                 2) A string generating_matrices with either 
-                    i)  a relative path from https://github.com/QMCSoftware/LDData e.g. "LDData/main/dnet_dnetup/mps.sobol_Cs.txt" or 
+                    i)  a relative path from https://github.com/QMCSoftware/LDData e.g. "LDData/main/dnet/mps.nx_s5_alpha3_m32.txt" or 
                     ii) a numpy file with format "name.d_max.t_max.m_max.{msb,lsb}.npy" e.g. "gen_mat.21201.32.32.msb.npy"
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix. 
@@ -217,14 +217,16 @@ class DigitalNetB2(LD):
             elif "LDData"==generating_matrices[:6] and repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices):
                 datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices)
                 contents = [line.rstrip('\n').strip() for line in datafile.readlines()]
-                self.msb = contents[0]!="# dnetup"
+                self.msb = True
                 contents = [line.split("#",1)[0] for line in contents if line[0]!="#"]
                 datafile.close()
                 assert int(contents[0])==2 # base 2
                 self.d_max = int(contents[1])
-                self.m_max = int(contents[2])
+                self.m_max = int(log2(int(contents[2])))
                 self.t_max = int(contents[3])
-                self.z_og = array([[int(v) for v in line.split(' ')] for line in contents[4:]],dtype=uint64)
+                compat_shift = max(self.t_max-64,0)
+                if compat_shift>0: warnings.warn("Truncating ints in generating matrix to have 64 bits.")
+                self.z_og = array([[int(v)>>compat_shift for v in line.split(' ')] for line in contents[4:]],dtype=uint64)
             else:
                 raise ParameterError("generating_matrices '%s' not found."%generating_matrices)
         else:
