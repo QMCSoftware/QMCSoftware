@@ -1,4 +1,3 @@
-import qmcpy as qp
 import numpy as np
 import time
 
