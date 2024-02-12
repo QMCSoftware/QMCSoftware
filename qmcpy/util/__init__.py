@@ -5,4 +5,3 @@ from .latnetbuilder_linker import latnetbuilder_linker
 from .plot_functions import plot_proj
 from .stop_notebook import stop_notebook
 from ..kernels.discrepancy import discrepancy
-from ..kernels.discrepancy import K
