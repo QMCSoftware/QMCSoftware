@@ -1,7 +1,7 @@
 import numpy as np
 import time
 
-def discrepancy(method, x):
+def Discrepancy(method, x):
     n, d = x.shape                          #Finds the number of samples and the dimensions for our x_i's
     X_expanded = np.zeros((n,n,d)) + x      #Copies x into a 3d matrix of size n by n by d.
     Y = np.resize(x, (n, 1, d))             #reshapes x so that we can iteratively find the value of the kernels
