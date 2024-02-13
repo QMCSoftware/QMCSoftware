@@ -1,1 +1,1 @@
-from .discrepancy import *
+from .discrepancy import discrepancy
