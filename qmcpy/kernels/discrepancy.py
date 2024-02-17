@@ -1,6 +1,6 @@
 import numpy as np
 import time
-import copy as copy
+from copy import copy
 
 def discrepancy(method, x):
     n, d = x.shape                          #Finds the number of samples and the dimensions for our x_i's
