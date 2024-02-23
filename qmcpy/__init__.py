@@ -6,4 +6,4 @@ from .util import plot_proj
 from .kernels import *
 
 name = "qmcpy"
-__version__ = "1.4.4"
+__version__ = "1.4.5"

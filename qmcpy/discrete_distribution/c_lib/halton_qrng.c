@@ -16,11 +16,9 @@ References:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include "export_ctypes.h"
 
 #define ghaltonMaxDim 360
-#define VERBOSE 0
 
 #include <Python.h>
 
@@ -93,34 +91,19 @@ static int permTN2[ghaltonMaxDim] =
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */
-
-void print_array(unsigned int matrix[32][32], int m, int n);
-void gen_scrambling_matrix(unsigned int matrix[32][32], int len, int base);
-void sqmatrix_mult(unsigned int matrix[32][32], unsigned int coeff[32], int len, int base);
-
-EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, double *randu_d_32, int *dvec, int lms, int seed)
+EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, double *randu_d_32, int *dvec)
 {
     static int perm[ghaltonMaxDim];
-    int base, i, j, k, l, maxindex, f, start, sz;
+    int base, i, j, k, l, maxindex, f, start;
     double u;
     unsigned int tmp;
     unsigned int shcoeff[ghaltonMaxDim][32]; /* the coefficients of the shift */
     unsigned int coeff[32];
-    unsigned int matrix[32][32];
-
-    if(seed < 0)
-    {
-        srand(time(NULL));
-    }
-    else
-    {
-        srand(seed);
-    }
-
 
     /* Init */
     for (j = 0; j < d; j++)
     {
+
         base = primes[dvec[j]];
         u = 0;
         for (k = 31; k >= 0; k--)
@@ -158,41 +141,27 @@ EXPORT void halton_qrng(int n, int d, int n0, int generalized, double *res, doub
     {
         start = n0;
     }
-    for (j = 0; j < d; j++) 
+    for (i = start; i < (n + n0); i++)
     {
-        base = primes[dvec[j]];              /* (j+1)st prime number for this dimension */
-        if(lms)
-        {
-            sz = (int)(ceil(log10(pow(2,32)) / log10(base)));
-            gen_scrambling_matrix(matrix, sz, base); 
-        }
-
-        for (i = start; i < (n + n0); i++)
+        for (j = 0; j < d; j++)
         {
             tmp = i;
+            base = primes[dvec[j]];              /* (j+1)st prime number for this dimension */
             memset(&coeff, 0, sizeof(int) * 32); /* clear the coefficients */
+
             /* Find i in the prime base */
             k = 0;
-            
             while ((tmp > 0) && (k < 32))
             {
                 coeff[k] = tmp % base;
                 tmp /= base;
                 k++;
             }
-            
             maxindex = k;
-
             for (l = maxindex + 1; l < 32; l++)
             {
                 coeff[l] = 0;
             }
-            
-            if(lms)
-            {             
-                sqmatrix_mult(matrix, coeff, sz, base);                         
-            }
-
             u = 0.0;
             k = 31;
             f = perm[j];
@@ -231,81 +200,3 @@ int main()
     return (0);
 }
 */
-
-// function to print the matrix - for debugging 
-void print_array(unsigned int matrix[32][32], int m, int n)
-{
-    int i,j;
-
-    for(i=0; i < m; i++) {
-        for(j=0; j < n; j++)
-        {
-            printf("%d ", matrix[i][j]);
-        }
-        printf("\n");
-    }
-
-}
-
-// function to generate the square matrix
-void gen_scrambling_matrix(unsigned int matrix[32][32], int len, int base)
-{
-    int i, j;
-
-    for(i = 0; i < len; i++)
-    {
-        for(j = 0; j < len; j++)
-        {
-            if(i == j)
-            {
-                /* Diagonal */
-                matrix[i][j] = rand() % (base - 1) + 1;
-            }
-            else if(j < i)
-            {
-                /* Lower Triange */
-                matrix[i][j] = rand() % base;
-            }
-            else
-            {
-                /* Upper Triange */
-                matrix[i][j] = 0;
-            }
-        }
-    }
-
-    if (VERBOSE)
-    {
-        printf("Matrix = \n\n");
-        print_array(matrix, len, len);
-        printf("\n\n");
-    }
-}
-
-// function for multiplying coeff with the square matrix
-void sqmatrix_mult(unsigned int matrix[32][32], unsigned int coeff[32], int len, int base)
-{
-    int i, row, col, weight;
-    unsigned int matcoeff[32];
-
-    if (VERBOSE) printf("matrix len = %d, Coeffs = ", len);            
-    for(i = 0; i < len; i++)
-    {
-        matcoeff[i] = coeff[i];
-        if (VERBOSE) printf("%d ", coeff[i]);
-    }
-    if (VERBOSE) printf(", ");
-                
-    if (VERBOSE) printf("Ans = ");
-    for(row = 0; row < len; row++)
-    {
-        weight = 0;                    
-        for(col = 0; col < len; col++)
-        {
-            weight += (matrix[row][col] * matcoeff[col]);
-        }        
-        coeff[row] = weight % base;
-        if (VERBOSE) printf("%d ", coeff[row]);                    
-    }
-    if (VERBOSE) printf("\n");         
-}
