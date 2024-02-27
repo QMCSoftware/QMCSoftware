@@ -3,15 +3,16 @@ import time
 from copy import copy
 
 def discrepancy(method, x, weight = 1):
-    n, d = x.shape                          #Finds the number of samples and the dimensions for our x_i's
-    X_expanded = np.zeros((n,n,d)) + x      #Copies x into a 3d matrix of size n by n by d.
-    Y = np.resize(x, (n, 1, d))             #reshapes x so that we can iteratively find the value of the kernels
     if callable(method):      #discrepancy function given by the user
         #The function given by the discrepancy function must return the double integral, second integral, and kernel in this order
         double_integral, single_integral, kernel = method(x)
         #returns the discrepancy
         return np.sqrt(double_integral - (2*np.mean(single_integral)) + np.mean(np.mean(kernel)))
     else:
+        n, d = x.shape                          #Finds the number of samples and the dimensions for our x_i's
+        X_expanded = np.zeros((n,n,d)) + x      #Copies x into a 3d matrix of size n by n by d.
+        Y = np.resize(x, (n, 1, d))             #reshapes x so that we can iteratively find the value of the kernels
+
         if method.lower() == "s" or method.lower() == "star":           #Star
             double_integral = (4/3)**d
             single_integral = ((3-x**2)/2).prod(axis=1)
