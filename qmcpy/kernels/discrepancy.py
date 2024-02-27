@@ -13,7 +13,7 @@ def discrepancy(method, x, weight = 1):
         #X_expanded = np.zeros((n,n,d)) + x      #Copies x into a 3d matrix of size n by n by d.
         X_expanded = np.resize(x, (1, n, d))
         Y = np.resize(x, (n, 1, d))             #reshapes x so that we can iteratively find the value of the kernels
-
+        print(X_expanded.shape)
         if method.lower() == "s" or method.lower() == "star":           #Star
             double_integral = (4/3)**d
             single_integral = ((3-x**2)/2).prod(axis=1)
