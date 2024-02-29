@@ -4,6 +4,9 @@ from copy import copy
 
 def discrepancy(method, x, weight = 1):
     n, d = x.shape                              #Finds the number of samples and the dimensions for our x_i's
+    weight = weight * np.ones(d)                #if weight is a scalar, it gets turned into an array.
+                                                #if weight is an array, it would still be an array since
+                                                #np.ones(d) would be identified as an identity.
     #find a way to generate the weight, and generate the scalar into an array
     #For L2 star, the weighted kernel is 
     #(double integral)\prod_{j=1}^d (1 + (w_j)/3)
@@ -19,9 +22,9 @@ def discrepancy(method, x, weight = 1):
         X_expanded = np.resize(x, (1, n, d))
         Y = np.resize(x, (n, 1, d))             #reshapes x so that we can iteratively find the value of the kernels
         if method.lower() == "s" or method.lower() == "star":           #Star
-            double_integral = (4/3)**d
-            single_integral = ((3-x**2)/2).prod(axis=1)
-            kernel = (2 - max(X_expanded, Y)).prod(axis=2)
+            double_integral = (1 + (weight/3)).prod(axis=0)
+            single_integral = ((1 + (weight*(1 - x**2)/2))).prod(axis=1)
+            kernel = (1 + weight*(1 - max(X_expanded, Y))).prod(axis=2)
         elif method.lower() == "l2" or method.lower() == "l2star":        #L2star
             double_integral = (1/3)**d
             single_integral = ((1-x**2)/2).prod(axis=1)
