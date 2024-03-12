@@ -1,6 +1,7 @@
 import numpy as np
 import time
 from copy import copy
+from inspect import signature
 
 def discrepancy(method, x, weight = 1):
     n, d = x.shape                              #Finds the number of samples and the dimensions for our x_i's
@@ -12,10 +13,17 @@ def discrepancy(method, x, weight = 1):
     #(double integral)\prod_{j=1}^d (1 + (w_j)/3)
     #(single integral)\prod_{j=1}^d (1 + (w_j)(1-x^2)/2)
     #(kernel) \prod_{j=1}^d (1 + w_j(1 - max(x_j, t_j)))
+
     if callable(method):      #discrepancy function given by the user
-        #The function given by the discrepancy function must return the double integral, second integral, and kernel in this order
-        double_integral, single_integral, kernel = method(x)
-        #returns the discrepancy
+        sig = signature(method)
+        params = sig.parameters
+        if len(params) == 1:
+            #The function given by the discrepancy function must return the double integral, second integral, and kernel in this order
+            double_integral, single_integral, kernel = method(x)
+            #returns the discrepancy
+        elif len(params) == 2:
+            #The weighted discrepancy given by the user
+            double_integral, single_integral, kernel = method(x, weight)
         return np.sqrt(double_integral - (2*np.mean(single_integral)) + np.mean(np.mean(kernel)))
     else:
         #X_expanded = np.zeros((n,n,d)) + x      #Copies x into a 3d matrix of size n by n by d.
