@@ -41,6 +41,8 @@ def discrepancy(method, x, weight = 1):
             double_integral = -(4/3)**d
             single_integral = 0
             kernel = (1.5 - (abs(X_expanded - Y)*(1 - abs(X_expanded - Y)))).prod(axis=2)
+            #double_integral = -(4/3)**d
+            #single_integral
         elif method.lower() == "m" or method.lower() == "mixture":        #Wrap around
             double_integral = (19/12)**d
             single_integral = ((5/3) - (.25*abs(x - .5)) - (.25*((x -.5)**2))).prod(axis=1)
