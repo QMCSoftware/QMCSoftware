@@ -33,10 +33,10 @@ def discrepancy(method, x, weight = 1):
             double_integral = (1 + (weight/3)).prod(axis=0)
             single_integral = ((1 + (weight*(1 - x**2)/2))).prod(axis=1)
             kernel = (1 + weight*(1 - np.maximum(X_expanded, Y))).prod(axis=2)
-        elif method.lower() == "s" or method.lower() == "star":        #L2star
-            double_integral = (1/3)**d
-            single_integral = ((1-x**2)/2).prod(axis=1)
-            kernel = (1 - np.maximum(X_expanded, Y)).prod(axis=2)
+        #elif method.lower() == "s" or method.lower() == "star":        #L2star
+        #    double_integral = (1/3)**d
+        #    single_integral = ((1-x**2)/2).prod(axis=1)
+        #    kernel = (1 - np.maximum(X_expanded, Y)).prod(axis=2)
         elif method.lower() == "c" or method.lower() == "centered":         #Centered
             double_integral = (13/12)**d
             single_integral = (1 + (.5*abs(x - .5)) - (.5*((x -.5)**2))).prod(axis=1)
