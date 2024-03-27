@@ -37,7 +37,7 @@ def discrepancy(method, x, weight = 1):
         #    double_integral = (1/3)**d
         #    single_integral = ((1-x**2)/2).prod(axis=1)
         #    kernel = (1 - np.maximum(X_expanded, Y)).prod(axis=2)
-        elif method.lower() == "c" or method.lower() == "centered":         #Centered
+        elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':         #Centered
             double_integral = (13/12)**d
             single_integral = (1 + (.5*abs(x - .5)) - (.5*((x -.5)**2))).prod(axis=1)
             kernel = (1 + (.5*abs(X_expanded - .5)) + (.5*abs(Y - .5)) - (.5*abs(X_expanded - Y))).prod(axis=2)
@@ -45,13 +45,13 @@ def discrepancy(method, x, weight = 1):
             double_integral = (4/3)**d
             single_integral = (1 + 2*x - (2*(x**2))).prod(axis=1)
             kernel = (2 - (2*abs(X_expanded - Y))).prod(axis=2)
-        elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around":        #Wrap around
+        elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
             double_integral = -(4/3)**d
             single_integral = 0
             kernel = (1.5 - (abs(X_expanded - Y)*(1 - abs(X_expanded - Y)))).prod(axis=2)
             #double_integral = -(4/3)**d
             #single_integral
-        elif method.lower() == "m" or method.lower() == "mixture":        #Wrap around
+        elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':        #Wrap around
             double_integral = (19/12)**d
             single_integral = ((5/3) - (.25*abs(x - .5)) - (.25*((x -.5)**2))).prod(axis=1)
             kernel = (1.875 - (.25*abs(X_expanded - .5)) - (.25*abs(Y - .5)) - (.75*abs(X_expanded - Y)) + (.5*((X_expanded - Y)**2))).prod(axis=2)
