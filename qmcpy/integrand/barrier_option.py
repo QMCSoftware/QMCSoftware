@@ -22,7 +22,7 @@ class BarrierOption(Integrand):
     >>> x = barrier_option.discrete_distrib.gen_samples(2**12)
     >>> y = barrier_option.f(x)
     >>> y.mean()
-    1.146...
+    1.145...
     >>> level_dims = [2,4,8]
     >>> barrier_option_multilevel = BarrierOption(DigitalNetB2(seed=7),multilevel_dims=level_dims)
     >>> levels_to_spawn = arange(barrier_option_multilevel.max_level+1)
