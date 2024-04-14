@@ -3,7 +3,7 @@ import time
 from copy import copy
 from inspect import signature
 
-def discrepancy(method, x, weight = 1):
+def discrepancy(method, x, weight = 1, limiter = 4096):
     n, d = x.shape                              #Finds the number of samples and the dimensions for our x_i's
     weight = weight * np.ones(d)                #if weight is a scalar, it gets turned into an array.
                                                 #if weight is an array, it would still be an array since
@@ -14,6 +14,8 @@ def discrepancy(method, x, weight = 1):
     #(single integral)\prod_{j=1}^d (1 + (w_j)(1-x^2)/2)
     #(kernel) \prod_{j=1}^d (1 + w_j(1 - max(x_j, t_j)))
 
+    sample_size = int(limiter / d)
+    steps = int(n/sample_size)
     if callable(method):      #discrepancy function given by the user
         sig = signature(method)
         params = sig.parameters
@@ -31,8 +33,16 @@ def discrepancy(method, x, weight = 1):
         Y = np.resize(x, (n, 1, d))             #reshapes x so that we can iteratively find the value of the kernels
         if method.lower() == "l2" or method.lower() == "l2star":           #Star
             double_integral = (1 + (weight/3)).prod(axis=0)
-            single_integral = ((1 + (weight*(1 - x**2)/2))).prod(axis=1)
-            kernel = (1 + weight*(1 - np.maximum(X_expanded, Y))).prod(axis=2)
+            single_integral_total = 0
+            for sample in range(steps):
+                single_integral = ((1 + (weight*(1 - x[sample*sample_size:(sample+1)*sample_size, :]**2)/2))).prod(axis=1)
+                single_integral_total = single_integral_total + np.sum(single_integral)
+            kernel_total = 0
+            for sample_1 in range(steps):
+                for sample_2 in range(steps):
+                    kernel = (1 + weight*(1 - np.maximum(X_expanded[sample_1*sample_size: (sample_1+1)*sample_size, :], Y[sample_2*sample_size: (sample_2+1)*sample_size, :]))).prod(axis=2)
+                    kernel_total = kernel_total + np.sum(np.sum(kernel))
+            return np.sqrt(double_integral - 2*(single_integral_total/n) + (kernel_total / n**2))
         #elif method.lower() == "s" or method.lower() == "star":        #L2star
         #    double_integral = (1/3)**d
         #    single_integral = ((1-x**2)/2).prod(axis=1)
