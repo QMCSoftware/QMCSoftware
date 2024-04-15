@@ -22,7 +22,7 @@ class BarrierOption(Integrand):
     >>> x = barrier_option.discrete_distrib.gen_samples(2**12)
     >>> y = barrier_option.f(x)
     >>> y.mean()
-    1.145...
+    1.090...
     >>> level_dims = [2,4,8]
     >>> barrier_option_multilevel = BarrierOption(DigitalNetB2(seed=7),multilevel_dims=level_dims)
     >>> levels_to_spawn = arange(barrier_option_multilevel.max_level+1)
@@ -33,7 +33,7 @@ class BarrierOption(Integrand):
     ...     level_est = barrier_option_single_level.f(x).mean()
     ...     yml += level_est
     >>> yml
-    1.160...
+    1.103...
     """
 
     def __init__(self, sampler, volatility=0.2, start_price=30., strike_price=35., barrier_price = 38.,\
@@ -132,7 +132,7 @@ class BarrierOption(Integrand):
             bar_flag = bar_flag.sum(axis = 1) == dimension
         disc_payoff = disc_payoff*bar_flag
         disc_payoff = maximum(zeros(disc_payoff.size), disc_payoff)
-        return disc_payoff
+        return (disc_payoff * exp(-self.interest_rate * self.t_final))
     
     def g(self, t):
         if self.parent:
