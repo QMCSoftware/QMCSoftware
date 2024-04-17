@@ -1,4 +1,3 @@
-
 from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 from ..c_lib import c_lib
