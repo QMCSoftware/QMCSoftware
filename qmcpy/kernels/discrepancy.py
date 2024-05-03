@@ -23,15 +23,15 @@ def discrepancy(method, x, weight = 1, limiter = 2**22):
     limiter = int((math.log(limiter-1, 2) +1)/2)
 
     X = []                                          #initialize the list as empty
-    for i in range(int(n/limiter)+1):               #These 2 lines seperate the samples into chunks
+    for i_1 in range(int(n/limiter)+1):               #These 2 lines seperate the samples into chunks
         X = X + [x[i*limiter: (i+1)*limiter, :]]
     if X[-1] == []:
         X = X[0: len(X) - 1]
     
     X_expanded = []
     Y = []
-    for i in range(int(n/limiter)+1):
-        A = X[i*limiter:(i+1)*limiter, :]
+    for i_2 in range(int(n/limiter)+1):
+        A = X[i_2*limiter:(i_2+1)*limiter, :]
         c, f = A.shape
         X_expanded = X_expanded + [np.resize(A, (1, c, f))]
         Y = Y + [np.resize(A, (c, 1, f))]
