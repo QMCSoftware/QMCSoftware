@@ -31,7 +31,7 @@ def discrepancy(method, x, weight = 1, limiter = 2**22):
     X_expanded = []
     Y = []
     for i in range(int(n/limiter)+1):
-        A = X[i*4:(i+1)*4, :]
+        A = X[i*limiter:(i+1)*limiter, :]
         c, f = A.shape
         X_expanded = X_expanded + [np.resize(A, (1, c, f))]
         Y = Y + [np.resize(A, (c, 1, f))]
