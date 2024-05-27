@@ -67,6 +67,7 @@ def discrepancy2(method, x, weight = 1, limiter = 2*22, time = False):
 
     limiter = limiter / (2**math.ceil(math.log(d,2)))
     limiter = np.sqrt(4**int(math.log(limiter, 4)))
+    print(limiter)
 
     X_expanded = np.resize(x, (1, n, d))
     Y = np.resize(x, (n, 1, d))
