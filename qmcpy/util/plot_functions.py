@@ -2,7 +2,7 @@
 import qmcpy as qp
 from numpy import*
 import os
-def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac =5, **kwargs):
+def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac = 5, **kwargs):
     """
     Args:
         sampler: the Discrete Distribution or the True Measure Object to be plotted
@@ -31,7 +31,7 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
     d_vertical = atleast_1d(d_vertical)
     samples = sampler.gen_samples(n[n.size - 1])    
     d = samples.shape[1]
-    fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(figfac*d_horizontal.size, figfac* d_vertical.size),squeeze=False)                    
+    fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(figfac*d_horizontal.size, figfac*d_vertical.size),squeeze=False)                    
     fig.tight_layout(pad=2)
     
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
