@@ -64,8 +64,9 @@ def discrepancy(method, x, weight = 1):
 def discrepancy2(method, x, weight = 1, limiter = 2*22, time = False):
     limiter = 2**math.ceil(math.log(3,2))
     n, d = x.shape  #initialize the list as empty
-
+    print(limiter)
     limiter = limiter / (2**math.ceil(math.log(d,2)))
+    print(limiter)
     limiter = np.sqrt(4**int(math.log(limiter, 4)))
     print(limiter)
 
