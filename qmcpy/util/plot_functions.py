@@ -2,7 +2,7 @@
 import qmcpy as qp
 from numpy import*
 import os
-def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, **kwargs):
+def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac =5, **kwargs):
     """
     Args:
         sampler: the Discrete Distribution or the True Measure Object to be plotted
@@ -16,6 +16,7 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
             Default value is true, so user is required to pass in math indices.
         marker_size: the marker size in points**2(typographic points are 1/72 in.).
             Default value is 5.
+        figfac: the figure size factor. Default value is 5.
         **kwargs : Any extra features the user would like to see in the plots
     """
     try:
@@ -30,7 +31,7 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
     d_vertical = atleast_1d(d_vertical)
     samples = sampler.gen_samples(n[n.size - 1])    
     d = samples.shape[1]
-    fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(5*d_horizontal.size, 5* d_vertical.size),squeeze=False)                    
+    fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(figfac*d_horizontal.size, figfac* d_vertical.size),squeeze=False)                    
     fig.tight_layout(pad=2)
     
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
