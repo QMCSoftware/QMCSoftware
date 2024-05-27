@@ -61,7 +61,7 @@ def discrepancy(method, x, weight = 1):
     #returns the discrepancy
     return np.sqrt(double_integral - (2*np.mean(single_integral)) + np.mean(np.mean(kernel)))
 
-def discrepancy2(method, x, weight = 1, limiter = 2*22, time = False):
+def discrepancy2(method, x, weight = 1, limiter = 2*22, Time = False):
     n, d = x.shape  #initialize the list as empty
 
     weight = weight * np.ones(d)
@@ -85,7 +85,7 @@ def discrepancy2(method, x, weight = 1, limiter = 2*22, time = False):
         iterated_X_expanded = iterated_X_expanded[0:len(iterated_X_expanded)-1]
         iterated_Y = iterated_Y[0:len(iterated_Y)-1]
     
-    if time == True:
+    if Time == True:
         start_time = time.time()
 
     if len(method) == 3:
@@ -188,8 +188,11 @@ def discrepancy2(method, x, weight = 1, limiter = 2*22, time = False):
         else:
             return False
         #returns the discrepancy
-    if time == True:
+    if Time == True:
         total_time = time.time() - start_time
         return np.sqrt(DI - SI + K), total_time
-    if time == False:
+    if Time == False:
+        print(DI)
+        print(SI)
+        print(K)
         return np.sqrt(DI - SI + K)
