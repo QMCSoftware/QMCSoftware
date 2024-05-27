@@ -64,6 +64,7 @@ def discrepancy(method, x, weight = 1):
 def discrepancy2(method, x, weight = 1, limiter = 2*22, time = False):
     n, d = x.shape  #initialize the list as empty
 
+    weight = weight * np.ones(d)
     limiter = int(limiter / (2**math.ceil(math.log(d,2))))
     limiter = int(np.sqrt(4**int(math.log(limiter, 4))))
 
