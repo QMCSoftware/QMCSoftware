@@ -35,10 +35,8 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
     fig.tight_layout(pad=2)
     
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-    for i in range(d_horizontal.size):    
-        print('i = %d'%(i))        
+    for i in range(d_horizontal.size):         
         for j in range(d_vertical.size):
-                print('j = %d'%(j))
                 n_min = 0
                 for m in range(n.size):
                     n_max = n[m]  
