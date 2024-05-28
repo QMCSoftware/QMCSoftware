@@ -78,5 +78,5 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
                             y_axis.append(0.5)
                     ax[i,j].scatter(samples[n_min:n_max,x],y_axis,s=marker_size,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)
                     n_min = n[m]
-    fig.suptitle('Projection of Samples',fontsize = 20)
+    #fig.suptitle('Projection of Samples',fontsize = 20)
     return fig, ax
