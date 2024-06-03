@@ -93,12 +93,13 @@ def discrepancy2(method, x, weight = 1, limiter = 2*22, Time = False):
         print(0)
     else:
         if method.lower() == "l2" or method.lower() == "l2star":           #Star
+            if Time == True:
+                start_time = time.time()
             DI = (1 + (weight/3)).prod(axis=0)
 
             B = 0
             for j in range(len(iterated_X)):
-                x = iterated_X[j]
-                single_integral = ((1 + (weight*(1 - x**2)/2))).prod(axis=1)
+                single_integral = ((1 + (weight*(1 - iterated_X[j]**2)/2))).prod(axis=1)
                 B = B + np.sum(single_integral)
 
             SI = B*2/n
@@ -106,19 +107,18 @@ def discrepancy2(method, x, weight = 1, limiter = 2*22, Time = False):
             C = 0
             for j in range(len(iterated_X_expanded)):
                 for i in range(len(iterated_Y)):
-                    x = iterated_X_expanded[j]
-                    y = iterated_Y[i]
-                    kernel = (1 + weight*(1 - np.maximum(x, y))).prod(axis=2)
+                    kernel = (1 + weight*(1 - np.maximum(iterated_X_expanded[j], iterated_Y[i]))).prod(axis=2)
                     C = C + np.sum(np.sum(kernel))
 
             K = C/(n**2)
+            if Time == True:
+                total_time = time.time() - start_time
         elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':
             DI = (13/12)**d
 
             B = 0
             for j in range(len(iterated_X)):
-                x = iterated_X[j]
-                single_integral = (1 + (.5*abs(x - .5)) - (.5*((x -.5)**2))).prod(axis=1)
+                single_integral = (1 + (.5*abs(iterated_X[j] - .5)) - (.5*((iterated_X[j] -.5)**2))).prod(axis=1)
                 B = B + np.sum(single_integral)
 
             SI = B*2/n
@@ -126,9 +126,7 @@ def discrepancy2(method, x, weight = 1, limiter = 2*22, Time = False):
             C = 0
             for j in range(len(iterated_X_expanded)):
                 for i in range(len(iterated_Y)):
-                    x = iterated_X_expanded[j]
-                    y = iterated_Y[i]
-                    kernel = (1 + (.5*abs(x - .5)) + (.5*abs(y - .5)) - (.5*abs(x - y))).prod(axis=2)
+                    kernel = (1 + (.5*abs(iterated_X_expanded[j] - .5)) + (.5*abs(iterated_Y[i] - .5)) - (.5*abs(iterated_X_expanded[j] - iterated_Y[i]))).prod(axis=2)
                     C = C + np.sum(np.sum(kernel))
 
             K = C/(n**2)
@@ -189,8 +187,8 @@ def discrepancy2(method, x, weight = 1, limiter = 2*22, Time = False):
         else:
             return False
         #returns the discrepancy
-    if Time == True:
-        total_time = time.time() - start_time
-        return np.sqrt(DI - SI + K), total_time
-    if Time == False:
-        return np.sqrt(DI - SI + K)
+    #if Time == True:
+    #    total_time = time.time() - start_time
+    #    return np.sqrt(DI - SI + K), total_time
+    #if Time == False:
+    return np.sqrt(DI - SI + K)
