@@ -13,7 +13,7 @@ class LookBackOption(Integrand):
         self.multilevel_dims = multilevel_dims
         self.call_put=call_put
         if self.multilevel_dims is not None: # multi-level problem
-            self.dim_fracs = array(
+            self.dim_fracs = np.array(
                 [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
                 for i in range(1,len(self.multilevel_dims))],
                 dtype=float)
@@ -47,7 +47,6 @@ class LookBackOption(Integrand):
         for xx, yy in zip(*np.where(self.s < 0)):
             self.s[xx, yy:] = 0
         if self.call_put == 'call':
-            # breakpoint()
             y_raw = self.s[:,-1] - np.min(self.s)
         else: # put
             y_raw = np.max(self.s) - self.s[:,-1] # TODO: Test put option
