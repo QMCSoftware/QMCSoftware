@@ -2,7 +2,7 @@
 import numpy as np
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
-from ..discrete_distribution import DigitalNetB2
+from ..discrete_distribution import *
 
 class LookBackOption(Integrand):
                           
@@ -29,7 +29,7 @@ class LookBackOption(Integrand):
             self.parameters += ['dim_frac']
             self.sampler=sampler=Sobol(1)
         self.observations=observations
-        self.t_final = t_final
+        self.t_final = t_final # Exercise time
         self.n=n
         self.start_price=start_price
         self.interest_rate = interest_rate
@@ -39,7 +39,21 @@ class LookBackOption(Integrand):
         self.stock_values =self.start_price*np.exp((self.interest_rate-0.5*self.volatility**2)*self.t+self.volatility*self.true_measure.gen_samples(self.n))
         super(LookBackOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)    
         
-    
+    def g(self, t):
+        """See abstract method."""
+        self.s = self.start_price * np.exp(
+            (self.interest_rate - self.volatility ** 2 / 2) *
+            self.true_measure.time_vec + self.volatility * t)
+        for xx, yy in zip(*np.where(self.s < 0)):
+            self.s[xx, yy:] = 0
+        if self.call_put == 'call':
+            # breakpoint()
+            y_raw = self.s[:,-1] - np.min(self.s)
+        else: # put
+            y_raw = np.max(self.s) - self.s[:,-1] # TODO: Test put option
+        y_adj = y_raw * np.exp(-self.interest_rate * self.t_final)
+        return y_adj
+
     def get_discounted_payoffs(self):
         payoffs=[]
         if self.call_put=='call':
