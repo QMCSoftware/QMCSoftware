@@ -16,3 +16,4 @@ try:
     import torch 
     from .pf_gp_ci import PFGPCI,PFSampleErrorDensityAR,SuggesterSimple
 except: pass
+from ._cub_qmc_ld_g import _CubQMCLDG
