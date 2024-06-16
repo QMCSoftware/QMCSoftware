@@ -30,7 +30,7 @@ class LookBackOption(Integrand):
             self.sampler=sampler=Sobol(1)
         self.observations=observations
         self.t_final = t_final # Exercise time
-        self.n=n
+        self.n=n # Number of samples
         self.start_price=start_price
         self.interest_rate = interest_rate
         self.t=np.linspace(0,self.t_final, self.observations)
@@ -39,6 +39,13 @@ class LookBackOption(Integrand):
         self.stock_values =self.start_price*np.exp((self.interest_rate-0.5*self.volatility**2)*self.t+self.volatility*self.true_measure.gen_samples(self.n))
         super(LookBackOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)    
         
+    def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
+        """Overrides the parent's method. Refer to the parent class method for details of original method."""
+        self.n = len(x)
+        self.stock_values = self.start_price*np.exp((self.interest_rate - 0.5 * self.volatility**2) *
+                                                    self.t + self.volatility * self.true_measure.gen_samples(self.n))
+        return super().f(x, periodization_transform, compute_flags, *args, **kwargs)
+
     def g(self, t):
         """See abstract method."""
         self.s = self.start_price * np.exp(
@@ -49,7 +56,7 @@ class LookBackOption(Integrand):
         if self.call_put == 'call':
             y_raw = self.s[:,-1] - np.min(self.s)
         else: # put
-            y_raw = np.max(self.s) - self.s[:,-1] # TODO: Test put option
+            y_raw = np.max(self.s) - self.s[:,-1]
         y_adj = y_raw * np.exp(-self.interest_rate * self.t_final)
         return y_adj
 
@@ -58,7 +65,7 @@ class LookBackOption(Integrand):
         if self.call_put=='call':
             for i in range(self.n):
                 strike_price=min(self.stock_values[i,:])
-                payoff=self.stock_values[i,self.observations]-strike_price
+                payoff=self.stock_values[i,self.observations-1]-strike_price
                 payoffs.append(payoff)
         else:
             for i in range(self.n):
