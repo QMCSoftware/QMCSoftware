@@ -41,8 +41,9 @@ class LookBackOption(Integrand):
         
     def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
         """Overrides the parent's method. Refer to the parent class method for details of original method."""
+        breakpoint()
         self.n = len(x)
-        self.stock_values = self.start_price*np.exp((self.interest_rate - 0.5 * self.volatility**2) *
+        self.stock_values = self.start_price * np.exp((self.interest_rate - 0.5 * self.volatility**2) *
                                                     self.t + self.volatility * self.true_measure.gen_samples(self.n))
         return super().f(x, periodization_transform, compute_flags, *args, **kwargs)
 
