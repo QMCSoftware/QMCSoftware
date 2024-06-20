@@ -9,8 +9,8 @@ class GeometricBrownianMotion(Gaussian):
 
     >>> gbm = GeometricBrownianMotion(DigitalNetB2(4, seed=7), t_final=2, drift=0.1, diffusion=0.2)
     >>> gbm.gen_samples(2)
-    array([[1.08845733, 1.17071665, 1.05749855, 1.0536801 ],
-           [0.92508756, 1.17058406, 1.38432978, 1.23922608]])
+    array([[0.93056515, 1.00539546, 1.06060187, 1.22569294],
+           [1.26503416, 1.14339958, 1.11138338, 1.36923737]])
     >>> gbm
     GeometricBrownianMotion (TrueMeasure Object)
         time_vec        [0.5 1.  1.5 2. ]
@@ -65,8 +65,9 @@ class GeometricBrownianMotion(Gaussian):
         self.range = array([[-inf, inf]])
 
     def _transform(self, x):
+        # generate standard Brownian motion samples
         normal_samples = super()._transform(x)
-        # Transforms and returns standard Brownian motion samples into geometric Brownian motion samples
+        # Transforms above samples into geometric Brownian motion samples
         return self.initial_value * exp(normal_samples)
 
     def _spawn(self, sampler, dimension):
