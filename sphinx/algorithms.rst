@@ -83,6 +83,12 @@ Brownian Motion
 .. automodule:: qmcpy.true_measure.brownian_motion
     :members:
 
+Geometric Brownian Motion
+.........................
+
+.. automodule:: qmcpy.true_measure.geometric_brownian_motion
+    :members:
+
 Lebesgue
 ........
 

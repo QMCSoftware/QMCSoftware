@@ -8,7 +8,7 @@ from numpy import *
 
 class BrownianMotion(Gaussian):
     """
-    Geometric Brownian Motion.
+    Brownian Motion.
     
     >>> bm = BrownianMotion(DigitalNetB2(4,seed=7),t_final=2,drift=2)
     >>> bm.gen_samples(2)
@@ -59,4 +59,3 @@ class BrownianMotion(Gaussian):
     
     def _spawn(self, sampler, dimension):
         return BrownianMotion(sampler,t_final=self.t,drift=self.drift,decomp_type=self.decomp_type)
-        
