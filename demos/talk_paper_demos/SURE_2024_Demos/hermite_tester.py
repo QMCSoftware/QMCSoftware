@@ -101,7 +101,7 @@ def optimal_h(h_space, pts, kde, kernel, true_function):
     h_optimal = 0
     lowest_mise = 100000
     for h in h_space:
-        def estimated_pts(x):
+        def estimated_pts(x): # TODO: Move out of for-loop
             return kde(kernel, pts, h, x)
         def squared_difference_pts(x):
             return (true_function(x) - estimated_pts(x))**2
@@ -120,14 +120,13 @@ if __name__ == '__main__':
     yiid1 = guass_distr(iidpts1)
     test_option = sys.argv[1]
 
+    # TODO: Add option for CProfiler
     profiler = pprofile.Profile()
     with profiler:
         if test_option in ('optimal_h' ,'0'):
             result = optimal_h(np.linspace(0.001, 2, 2), yiid1, kde_pt, hardcode_hermite_kernel_weight, testfun)
         elif test_option in ('kde_pt', '1'):
             result = kde_pt(hardcode_hermite_kernel_weight, yiid1, 0.5, 2.0)
-        # elif test_option == 'hardcode_hermite_kernel_weight':
-        #     # result = hardcode_hermite_kernel_weight(y, r)
         elif test_option in ('hardcode_hermite_kernel', '2'):
             r_number = int(sys.argv[2])
             hardcode_hermite_kernel(r_number)
