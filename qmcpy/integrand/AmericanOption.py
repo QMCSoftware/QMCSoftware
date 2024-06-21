@@ -3,6 +3,8 @@ import numpy as np
 from qmcpy import *
 import matplotlib.pyplot as plt
 import scipy as sc
+from ._integrand import Integrand
+from ..true_measure import BrownianMotion
 
 class AmericanOption(Integrand):
                           
@@ -25,13 +27,13 @@ class AmericanOption(Integrand):
             self.parameters += ['multilevel_dims']
             self.sampler=Sobol(self.multilevel_dims),
         else: # single level problem
-            self.dim_fracs = _dim_frac
+            self.dim_frac = _dim_frac # Originally dim_fracs but it might suppose to be dim_frac since single level problem
             self.leveltype = 'single'
             self.parent = False
             self.parameters += ['dim_frac']
             self.sampler=sampler=Sobol(self.observations)
         self.t_final = t_final
-        self.n=n
+        self.n=n # Number of samples
         self.start_price=start_price
         self.interest_rate = interest_rate
         self.t=np.linspace(1/self.observations,self.t_final, self.observations)
@@ -65,6 +67,13 @@ class AmericanOption(Integrand):
             exercise_time[exercise]=self.t[j-1]
         return values
 
+    def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
+        """Overrides the parent's method. Refer to the parent class method for details of original method."""
+        self.n = len(x)
+        self.stock_values = self.start_price * np.exp((self.interest_rate - 0.5 * self.volatility**2) *
+                                                    self.t + self.volatility * self.true_measure.gen_samples(self.n))
+        return super().f(x, periodization_transform, compute_flags, *args, **kwargs)
+
     def g(self, t):
         if self.parent:
             raise ParameterError('''
@@ -76,7 +85,7 @@ class AmericanOption(Integrand):
         for xx,yy in zip(*np.where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs()
-        if self.dim_fracs > 0:
+        if self.dim_frac > 0: # Originally dim_fracs changed to dim_frac
             s_course = self.s_fine[:, int(self.dim_fracs - 1):: int(self.dim_fracs)]
             d_course = float(self.d) / self.dim_fracs
             y_course = self._get_discounted_payoffs()

@@ -12,3 +12,4 @@ from .bayesian_lr_coeffs import BayesianLRCoeffs
 from .um_bridge_wrapper import UMBridgeWrapper
 from .genz import Genz
 from .LookBackOption import LookBackOption
+from .AmericanOption import AmericanOption
