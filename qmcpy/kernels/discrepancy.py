@@ -167,7 +167,7 @@ def discrepancy(method, x, weight = 1):
     #returns the discrepancy
     return np.sqrt(double_integral - (2*np.mean(single_integral)) + np.mean(np.mean(kernel)))
 
-def discrepancy2(method, x, weight = 1, limiter = 2*22, Time = False):
+def discrepancy2(method, x, weight = 1, limiter = 2**16, Time = False):
     if Time == True:                #Times the actual calculation for discrepancy
         start_time = time.time()
 
