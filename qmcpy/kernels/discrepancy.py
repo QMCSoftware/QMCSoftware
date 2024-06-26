@@ -187,7 +187,7 @@ def discrepancy2(method, x, weight = 1, limiter = 2**16, Time = False):
     iterated_X = []
     iterated_X_expanded = []
     iterated_Y = []
-    n_chunks = n/limiter + 1
+    n_chunks = int(n/limiter) + 1
     for i_1 in range(int(n/limiter)+1):               #These 4 lines are used to make these lists into chunks
         iterated_X = iterated_X + [x[i_1*limiter: (i_1+1)*limiter, :]]
         iterated_X_expanded = iterated_X_expanded + [X_expanded[:, i_1*limiter: (i_1+1)*limiter, :]]
