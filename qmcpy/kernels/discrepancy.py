@@ -187,7 +187,7 @@ def discrepancy2(method, x, weight = 1, limiter = 2**16, Time = False):
     iterated_X = []
     iterated_X_expanded = []
     iterated_Y = []
-
+    n_chunks = n/limiter + 1
     for i_1 in range(int(n/limiter)+1):               #These 4 lines are used to make these lists into chunks
         iterated_X = iterated_X + [x[i_1*limiter: (i_1+1)*limiter, :]]
         iterated_X_expanded = iterated_X_expanded + [X_expanded[:, i_1*limiter: (i_1+1)*limiter, :]]
@@ -216,8 +216,9 @@ def discrepancy2(method, x, weight = 1, limiter = 2**16, Time = False):
     
     #Calculates the single integral which would require 1 for loop
     B = 0                                                                   #initializes variable B with 0
-    for j in range(len(iterated_X)):                                        #For however many elements in iterated_X
-        B = B + np.sum(single_integral(method2, iterated_X[j], weight))     #Calculate the single integral per iteration and add
+    for j in range(n_chunks):                                        #For however many elements in iterated_X
+        #B = B + np.sum(single_integral(method2, iterated_X[j], weight))     #Calculate the single integral per iteration and add
+        B = B + np.sum(single_integral(method2, x[j*limiter: (j+1)*limiter, :], weight))
 
     SI = B*2/n #Finds the average and multiply by 2 for the single integral component for discrepancy
 
