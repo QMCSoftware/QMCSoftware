@@ -32,10 +32,10 @@ class GeometricBrownianMotion(Gaussian):
             sampler (DiscreteDistribution/TrueMeasure): A
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
-            t_final (float): end time for the geometric Brownian motion.
-            initial_value (float): initial value of the process
+            t_final (float): end time for the geometric Brownian motion, non-negative
+            initial_value (float): positive initial value of the process
             drift (float): drift coefficient
-            diffusion (float): diffusion coefficient (also known as volatility)
+            diffusion (float): diffusion coefficient (also known as volatility), positive
             decomp_type (str): method of decomposition either
                 "PCA" for principal component analysis or
                 "Cholesky" for cholesky decomposition.
@@ -48,14 +48,10 @@ class GeometricBrownianMotion(Gaussian):
         self.drift = drift
         self.diffusion = diffusion
         self.time_vec = linspace(self.t / self.d, self.t, self.d)
+        self.decomp_type = decomp_type
 
-        # Validate t_final >= 0, diffusion > 0, and initial_value > 0
-        if self.t < 0:
-            raise ValueError("End time must be non-negative")
-        if self.diffusion <= 0:
-            raise ValueError("Diffusion coefficient must be positive")
-        if self.initial_value <= 0:
-            raise ValueError("Initial value must be positive")
+        # Validate input
+        self._validate_input()
 
         # Compute mean and covariance of standard Brownian motion, log(S(t) / initial_value))
         mean_bm = (self.drift - 0.5 * self.diffusion ** 2) * self.time_vec
@@ -63,6 +59,25 @@ class GeometricBrownianMotion(Gaussian):
                                                    for j in range(self.d)])
         self._parse_gaussian_params(mean_bm, covariance_bm, decomp_type)
         self.range = array([[-inf, inf]])
+
+    def _validate_input(self):
+        """
+        Validates the input parameters of the GeometricBrownianMotion class.
+
+        Raises:
+            ValueError: If the end time `t_final' is negative.
+            ValueError: If the diffusion coefficient is less than or equal to zero.
+            ValueError: If the initial value is less than or equal to zero.
+            ValueError: If the decomposition type is not 'PCA' or 'Cholesky'.
+        """
+        if self.t < 0:
+            raise ValueError(f"End time 't_final' must be non-negative. It should not be {self.t}.")
+        if self.diffusion <= 0:
+            raise ValueError(f"Diffusion coefficient must be positive. It should not be {self.diffusion}.")
+        if self.initial_value <= 0:
+            raise ValueError(f"Initial value must be positive. It should not be {self.initial_value}.")
+        if self.decomp_type.upper() not in ['PCA', 'CHOLESKY']:
+            raise ValueError(f"Decomposition type must be either 'PCA' or 'Cholesky'. It should not be {self.decomp_type}.")
 
     def _transform(self, x):
         # generate standard Brownian motion samples
