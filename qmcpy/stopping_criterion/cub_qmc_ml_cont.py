@@ -196,7 +196,7 @@ class CubQMCMLCont(StoppingCriterion):
         x = lstsq(A, y, rcond=None)[0]
         alpha = maximum(.5,-x[0])
         real_bias = 2**(x[1]+max_levels*x[0]) / (2**alpha - 1)
-        self.theta = max(0.01, min(0.125, (real_bias/self.rmse_tol)**2))
+        self.theta = maximum(0.01, minimum(0.125, (real_bias/self.rmse_tol)**2))
 
     def _rmse(self):
         """Returns an estimate for the root mean square error"""

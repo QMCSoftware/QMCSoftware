@@ -4,6 +4,7 @@ from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
 from ..util import ParameterError
 from numpy import *
+import numpy as np
 
 
 class CubQMCLatticeG(_CubQMCLDG):
@@ -52,7 +53,7 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
     >>> true_value = array([sol3neg1,sol31])
     >>> (abs(true_value-solution)<abs_tol).all()
-    True
+    np.True_
     >>> cf = CustomFun(
     ...     true_measure = Uniform(Lattice(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
