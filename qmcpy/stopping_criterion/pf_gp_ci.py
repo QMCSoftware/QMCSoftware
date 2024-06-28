@@ -212,7 +212,7 @@ class PFGPCI(StoppingCriterion):
                     xdraw = dnb2.spawn()[0].gen_samples(self.n_init)
                     ydraw = atleast_1d(self.integrand.f(xdraw).squeeze())
             else:
-                n_new = min(self.n_batch,self.n_max-sum(self.n_batch))
+                n_new = minimum(self.n_batch,self.n_max-sum(self.n_batch))
                 xdraw = self.batch_sampler.suggest(n_new,self.d,data.gpyt_model,dnb2.rng,efficiency=2*data.emr[-1])
                 ydraw = atleast_1d(self.integrand.f(xdraw).squeeze())
             ydrawtf = self._affine_tf(ydraw)
