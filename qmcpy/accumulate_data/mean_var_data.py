@@ -80,7 +80,7 @@ class MeanVarData(AccumulateData):
                     self.beta_hat = linalg.lstsq(x4beta,y4beta,rcond=None)[0].reshape((-1,1))
                 cvterm = self.beta_hat.T@(cvdata-self.cv_mu.T).T
                 y = y-cvterm.squeeze() # use control variates and apprixmated coefficient to 
-            self.t_eval[l] = max( (time()-t_start)/self.n[l], self.EPS) 
+            self.t_eval[l] = maximum((time()-t_start)/self.n[l], self.EPS) 
             self.sighat[l] = y.std() # compute the sample standard deviation
             self.muhat[l] = y.mean() # compute the sample mean
             self.n_total += self.n[l] # add to total samples

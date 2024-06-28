@@ -207,11 +207,11 @@ class CubMCG(StoppingCriterion):
         logsqrtnCLT = log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
         nbe = ceil(exp(2 * fsolve(BEfun2, logsqrtnCLT)))
         # calculate Berry-Esseen n by fsolve function (scipy)
-        ncb = min(min(ncheb, nbe), n_budget)  # take the min of two sample sizes
+        ncb = minimum(minimum(ncheb, nbe), n_budget)  # take the min of two sample sizes
         logsqrtn = log(sqrt(ncb))
         BEfun3 = lambda toloversig: \
             (norm.cdf(-exp(logsqrtn) * toloversig)
-            + exp(-logsqrtn) * min(A1 * (M3upper + A2),
+            + exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
             A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
             - alpha / 2.)
         err = fsolve(BEfun3, toloversig) * sigma_0_up

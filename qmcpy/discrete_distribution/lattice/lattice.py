@@ -155,7 +155,7 @@ class Lattice(LD):
             self.d_max = d_max
             self.m_max = m_max
         elif isinstance(generating_vector,int):
-            self.m_max = min(26,max(2,generating_vector))
+            self.m_max = minimum(26,maximum(2,generating_vector))
             self.d_max = dimension
         elif isinstance(generating_vector,str):
             parts = generating_vector.split('.')

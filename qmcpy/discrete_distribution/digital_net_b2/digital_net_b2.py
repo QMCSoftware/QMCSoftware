@@ -151,6 +151,9 @@ class DigitalNetB2(LD):
             _verbose (bool): print randomization details
         """
         self.parameters = ['dvec','randomize','graycode']
+        self.set_lms = True
+        self. set_rshift = True
+        self.set_owen = False
         if randomize==None or (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
             self.set_lms = False
             self.set_rshift = False
@@ -164,31 +167,32 @@ class DigitalNetB2(LD):
                 self.set_lms = False
                 self.set_rshift = False
                 self.set_owen = False
-        elif randomize.upper() == 'LMS_DS':
-            self.set_lms = True
-            self.set_rshift = True
-            self.set_owen = False
-        elif randomize.upper() == 'LMS':
-            self.set_lms = True
-            self.set_rshift = False
-            self.set_owen = False
-        elif randomize.upper() == "DS":
-            self.set_lms = False
-            self.set_rshift = True
-            self.set_owen = False
-        elif (randomize.upper() == 'OWEN') or (randomize.upper() == 'NUS'):
-            self.set_lms = False
-            self.set_rshift = False
-            self.set_owen = True
-        else:
-            msg = '''
-                DigitalNetB2 randomize should be either 
-                    'LMS_DS' for linear matrix scramble with digital shift or
-                    'LMS' for linear matrix scramble only or
-                    'DS' for digital shift only or 
-                    'OWEN'/'NUS' for Nested Uniform Scrambling (Owen Scrambling)
-            '''
-            raise ParameterError(msg)
+        elif isinstance(randomize,bool):
+            if randomize.upper() == 'LMS_DS':
+                self.set_lms = True
+                self.set_rshift = True
+                self.set_owen = False
+            elif randomize.upper() == 'LMS':
+                self.set_lms = True
+                self.set_rshift = False
+                self.set_owen = False
+            elif randomize.upper() == "DS":
+                self.set_lms = False
+                self.set_rshift = True
+                self.set_owen = False
+            elif (randomize.upper() == 'OWEN') or (randomize.upper() == 'NUS'):
+                self.set_lms = False
+                self.set_rshift = False
+                self.set_owen = True
+            else:
+                msg = '''
+                    DigitalNetB2 randomize should be either 
+                        'LMS_DS' for linear matrix scramble with digital shift or
+                        'LMS' for linear matrix scramble only or
+                        'DS' for digital shift only or 
+                        'OWEN'/'NUS' for Nested Uniform Scrambling (Owen Scrambling)
+                '''
+                raise ParameterError(msg)
         self.graycode = graycode
         self.randomize = randomize
         if isinstance(generating_matrices,ndarray):
