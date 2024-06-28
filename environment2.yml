@@ -1,0 +1,31 @@
+name: qmcpy
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pip=24.0
+  - python=3.9.13
+  - sphinx=5.0.2
+  - pandoc>=2.2
+  - graphviz=2.50.0
+  - pip:
+    - numpy==2.0.0
+    - scipy
+    - pandas==1.4.3
+    - matplotlib==3.5.2
+    - jupyter==1.0.0
+    - coverage==6.4.1
+    - pytest==7.1.2
+    - pylint==2.14.4
+    - recommonmark==0.7.1
+    - sphinx-math-dollar==1.2.1
+    - sphinx-rtd-theme==1.0.0
+    - sphinx-markdown-tables==0.0.17
+    - umbridge==1.2.1
+    - scikit-learn
+    - botorch
+    - -e .
+
+# conda activate qmcpy
+# pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# pip3 install gpytorch==1.12
