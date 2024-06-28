@@ -15,7 +15,7 @@ class Keister(Integrand):
     >>> k = Keister(DigitalNetB2(2,seed=7))
     >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)
-    >>> y.mean()
+    >>> float(y.mean())
     1.808...
     >>> k.true_measure
     Gaussian (TrueMeasure Object)
@@ -25,10 +25,10 @@ class Keister(Integrand):
     >>> k = Keister(Gaussian(DigitalNetB2(2,seed=7),mean=0,covariance=2))
     >>> x = k.discrete_distrib.gen_samples(2**12)
     >>> y = k.f(x)
-    >>> y.mean()
+    >>> float(y.mean())
     1.808...
     >>> yp = k.f(x,periodization_transform='c2sin')
-    >>> yp.mean()
+    >>> float(yp.mean())
     1.807...
 
     References:

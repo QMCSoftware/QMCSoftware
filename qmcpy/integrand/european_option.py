@@ -20,14 +20,14 @@ class EuropeanOption(Integrand):
         interest_rate   0
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
-    >>> y.mean()
+    >>> float(y.mean())
     9.209...
     >>> eo = EuropeanOption(BrownianMotion(DigitalNetB2(4,seed=7),drift=1),call_put='put')
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
-    >>> y.mean()
+    >>> float(y.mean())
     9.162...
-    >>> eo.get_exact_value()
+    >>> float(eo.get_exact_value())
     9.211452976234058
     """
                           

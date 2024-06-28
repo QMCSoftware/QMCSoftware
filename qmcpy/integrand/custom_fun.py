@@ -15,7 +15,7 @@ class CustomFun(Integrand):
     >>> y = cf.f(x)
     >>> y.shape
     (1024, 1)
-    >>> y.mean()
+    >>> float(y.mean())
     3.995...
     >>> cf = CustomFun(
     ...     true_measure = Uniform(DigitalNetB2(3,seed=7),lower_bound=[2,3,4],upper_bound=[4,5,6]),

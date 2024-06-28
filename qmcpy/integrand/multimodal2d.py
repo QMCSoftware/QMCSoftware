@@ -8,7 +8,7 @@ class Multimodal2d(Integrand):
     >>> mm2d = Multimodal2d(DigitalNetB2(2,seed=7))
     >>> x = mm2d.discrete_distrib.gen_samples(2**10)
     >>> y = mm2d.f(x)
-    >>> y.mean()
+    >>> float(y.mean())
     -0.7365118306607449
     >>> mm2d.true_measure
     Uniform (TrueMeasure Object)

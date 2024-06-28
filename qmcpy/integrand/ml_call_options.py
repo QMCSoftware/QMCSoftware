@@ -25,7 +25,7 @@ class MLCallOptions(Integrand):
     >>> for mlco in mlco_ml_dims:
     ...     x = mlco.discrete_distrib.gen_samples(2**10)
     ...     yml += mlco.f(x).mean()
-    >>> yml
+    >>> float(yml)
     10.393...
 
     References:

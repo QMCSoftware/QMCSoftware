@@ -8,7 +8,7 @@ class Sin1d(Integrand):
     >>> sin1d = Sin1d(DigitalNetB2(1,seed=7))
     >>> x = sin1d.discrete_distrib.gen_samples(2**10)
     >>> y = sin1d.f(x)
-    >>> y.mean()
+    >>> float(y.mean())
     7.33449186...e-08
     >>> sin1d.true_measure
     Uniform (TrueMeasure Object)

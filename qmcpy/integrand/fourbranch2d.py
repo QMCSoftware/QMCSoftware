@@ -8,7 +8,7 @@ class FourBranch2d(Integrand):
     >>> fb2d = FourBranch2d(DigitalNetB2(2,seed=7))
     >>> x = fb2d.discrete_distrib.gen_samples(2**10)
     >>> y = fb2d.f(x)
-    >>> y.mean()
+    >>> float(y.mean())
     -2.5003746135324247
     >>> fb2d.true_measure
     Uniform (TrueMeasure Object)
