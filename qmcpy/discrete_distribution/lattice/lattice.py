@@ -1,6 +1,7 @@
 from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 from numpy import *
+from numpy.lib.npyio import DataSource
 from os.path import dirname, abspath, isfile
 import warnings
 

@@ -4,6 +4,7 @@ from ..c_lib import c_lib
 import ctypes
 from os.path import dirname, abspath, isfile
 from numpy import *
+from numpy.lib.npyio import DataSource
 import warnings
 
 class DigitalNetB2(LD):
