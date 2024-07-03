@@ -1,6 +1,6 @@
 ## v1.2
 
-- precompute LD sequence ranomization
+- precompute LD sequence randomization
 - spawn QMCPy objects for efficient replicated and multilevel stopping criterion
 - utilize numpy's seed sequence
 - `CubQMCCLT` stopping criterion support for vectorized integrals and advanced stopping criterion
@@ -35,7 +35,7 @@
 ## v0.3
 
 - Halton + Korobov sequences
-  - Hatlton compatibility for CubQMCCLT and CubQMCML
+  - Halton compatibility for CubQMCCLT and CubQMCML
 - doctests
 - Lattice MPS backend: 250 --> 3600 max dimensions
 - patch multilevel call options bug
@@ -50,7 +50,7 @@
   - integrands
   - stopping criterion
   - accumulate data objects
-- unittests
+- unittest
 - workouts
 - demos
 - requirements
