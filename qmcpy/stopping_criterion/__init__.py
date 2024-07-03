@@ -7,7 +7,7 @@ from .cub_qmc_net_g import CubQMCNetG, CubQMCSobolG
 from .cub_mc_ml import CubMCML
 from .cub_qmc_ml import CubQMCML
 from .cub_mc_ml_cont import CubMCMLCont
-from .cub_qmc_ml_cont import CubQMCMLCont
+from .cub_qmc_ml_cont import CubMCMLCont
 from .cub_qmc_bayes_lattice_g import CubBayesLatticeG, CubQMCBayesLatticeG
 from .cub_qmc_bayes_net_g import CubBayesNetG, CubBayesSobolG, CubQMCBayesNetG, CubQMCBayesSobolG
 from .cub_mc_clt_vec import CubMCCLTVec

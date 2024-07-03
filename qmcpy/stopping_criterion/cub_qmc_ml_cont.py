@@ -12,7 +12,7 @@ from time import time
 import warnings
 
 
-class CubQMCMLCont(StoppingCriterion):
+class CubMCMLCont(StoppingCriterion):
     """
     Stopping criterion based on continuation multi-level quasi-Monte Carlo.
 
@@ -111,7 +111,7 @@ class CubQMCMLCont(StoppingCriterion):
         allowed_levels = ['adaptive-multi']
         allowed_distribs = [LD]
         allow_vectorized_integrals = False
-        super(CubQMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
+        super(CubMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
     def integrate(self):
         # Construct AccumulateData Object to House Integration Data
