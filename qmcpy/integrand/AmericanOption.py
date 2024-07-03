@@ -27,7 +27,7 @@ class AmericanOption(Integrand):
             self.parameters += ['multilevel_dims']
             self.sampler=Sobol(self.multilevel_dims),
         else: # single level problem
-            self.dim_frac = _dim_frac # Originally dim_fracs but it might suppose to be dim_frac since single level problem
+            self.dim_fracs = _dim_frac
             self.leveltype = 'single'
             self.parent = False
             self.parameters += ['dim_frac']
@@ -85,7 +85,7 @@ class AmericanOption(Integrand):
         for xx,yy in zip(*np.where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs()
-        if self.dim_frac > 0: # Originally dim_fracs changed to dim_frac
+        if self.dim_fracs > 0: # Originally dim_fracs changed to dim_frac
             s_course = self.s_fine[:, int(self.dim_fracs - 1):: int(self.dim_fracs)]
             d_course = float(self.d) / self.dim_fracs
             y_course = self._get_discounted_payoffs()
