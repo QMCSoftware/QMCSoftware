@@ -15,9 +15,9 @@ class Genz(Integrand):
     ...         y = g.f(x)
     ...         mu_hat = y.mean()
     ...         print('%-15s %-3d %.3f'%(kind_func,kind_coeff,mu_hat))
-    oscillatory      1   -0.351
-    oscillatory      2   -0.380
-    oscillatory      3   -0.217
+    oscillatory     1   -0.351
+    oscillatory     2   -0.380
+    oscillatory     3   -0.217
     corner-peak     1   0.713
     corner-peak     2   0.712
     corner-peak     3   0.720
