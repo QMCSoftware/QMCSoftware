@@ -116,7 +116,7 @@ class TestCubQMCLatticeG(unittest.TestCase):
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
     
     def test_keister_2d(self):
-        integrand = Keister(Lattice(dimension=2))
+        integrand = Keister(Lattice(dimension=2,seed=7))
         solution,data = CubQMCLatticeG(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
