@@ -92,7 +92,7 @@ class DigitalNetB2(LD):
 
         [6] I.M. Sobol', V.I. Turchaninov, Yu.L. Levitan, B.V. Shukhman: 
         "Quasi-Random Sequence Generators" Keldysh Institute of Applied Mathematics, 
-        Russian Acamdey of Sciences, Moscow (1992).
+        Russian Academy of Sciences, Moscow (1992).
 
         [7] Sobol, Ilya & Asotsky, Danil & Kreinin, Alexander & Kucherenko, Sergei. (2011). 
         Construction and Comparison of High-Dimensional Sobol' Generators. Wilmott. 
@@ -361,7 +361,7 @@ class DigitalNetB2(LD):
     def get_scramble_scalar(self,xb,t,scramble,rng):
         """
         Args:
-            xb (uint64): t-bit integer represtation of bits
+            xb (uint64): t-bit integer representation of bits
             t (int64): number of bits in xb 
             scramble (Node): node in the binary tree 
             rng: random number generator (will be part of the DiscreteDistribution class)
