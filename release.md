@@ -50,7 +50,7 @@
   - integrands
   - stopping criterion
   - accumulate data objects
-- unittest
+- unittests
 - workouts
 - demos
 - requirements
