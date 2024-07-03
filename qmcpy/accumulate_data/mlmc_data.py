@@ -59,7 +59,7 @@ class MLMCData(AccumulateData):
                 self.level_integrands += self.integrand.spawn(levels=int(l))
             integrand_l = self.level_integrands[l]
             if self.diff_n_level[l] > 0:
-                # evaluate integral at sampleing points samples
+                # evaluate integral at sampling points samples
                 samples = integrand_l.discrete_distrib.gen_samples(n=self.diff_n_level[l])
                 integrand_l.f(samples).squeeze()
                 self.n_level[l] = self.n_level[l] + self.diff_n_level[l]
@@ -90,7 +90,7 @@ class MLMCData(AccumulateData):
         self.n_total = self.n_level.sum()
 
     def _add_level(self):
-        """ Add another level to relevent attributes. """
+        """ Add another level to relevant attributes. """
         self.levels += 1
         if not len(self.n_level) > self.levels:
             self.mean_level = hstack((self.mean_level, self.mean_level[-1] / 2**self.alpha))
