@@ -11,10 +11,10 @@ class LookBackOption(Integrand):
         self.parameters = ['volatility', 'call_put', 'start_price', 'interest_rate']
         # handle single vs multilevel
         self.multilevel_dims = multilevel_dims
-        self.call_put=call_put
+        self.call_put = call_put
         if self.multilevel_dims is not None: # multi-level problem
             self.dim_fracs = np.array(
-                [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
+                [0] + [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
                 for i in range(1,len(self.multilevel_dims))],
                 dtype=float)
             self.max_level = len(self.multilevel_dims)-1
@@ -27,17 +27,18 @@ class LookBackOption(Integrand):
             self.leveltype = 'single'
             self.parent = False
             self.parameters += ['dim_frac']
-            self.sampler=sampler=Sobol(1)
-        self.observations=observations
+            self.sampler = sampler = Sobol(1)
+        self.observations = observations
         self.t_final = t_final # Exercise time
-        self.n=n # Number of samples
-        self.start_price=start_price
+        self.n = n # Number of samples
+        self.start_price = start_price
         self.interest_rate = interest_rate
-        self.t=np.linspace(0,self.t_final, self.observations)
+        self.t = np.linspace(0, self.t_final, self.observations)
         self.true_measure = BrownianMotion(self.sampler,t_final)
         self.volatility = volatility
-        self.stock_values =self.start_price*np.exp((self.interest_rate-0.5*self.volatility**2)*self.t+self.volatility*self.true_measure.gen_samples(self.n))
-        super(LookBackOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)    
+        self.stock_values = self.start_price * np.exp((self.interest_rate-0.5*self.volatility**2) *
+                                                      self.t+self.volatility * self.true_measure.gen_samples(self.n))
+        super(LookBackOption,self).__init__(dimension_indv=1, dimension_comb=1, parallel=False)    
         
     def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
         """Overrides the parent's method. Refer to the parent class method for details of original method."""
@@ -61,16 +62,16 @@ class LookBackOption(Integrand):
         return y_adj
 
     def get_discounted_payoffs(self):
-        payoffs=[]
-        if self.call_put=='call':
+        payoffs = []
+        if self.call_put == 'call':
             for i in range(self.n):
-                strike_price=min(self.stock_values[i,:])
-                payoff=self.stock_values[i,self.observations-1]-strike_price
+                strike_price = min(self.stock_values[i,:])
+                payoff = self.stock_values[i,self.observations-1] - strike_price
                 payoffs.append(payoff)
         else:
             for i in range(self.n):
-                strike_price=max(self.stock_values[i,:])
-                payoff=strike_price-self.stock_values[i,self.observations-1]
+                strike_price = max(self.stock_values[i,:])
+                payoff = strike_price-self.stock_values[i, self.observations-1]
                 payoffs.append(payoff)
         return np.mean(payoffs)
             

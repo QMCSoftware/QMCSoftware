@@ -167,12 +167,13 @@ class _CubQMCLDG(StoppingCriterion):
         b=max(g)
         print("Lower bound of estimation interval (a) is:",a)
         print("Upper bound of estimation interval (b) is:",b)
-        
+        # breakpoint()
         unique_values, counts = unique(g, return_counts=True)
-        repeated_values = unique_values[counts > 1]# Find elements that are repeated (count > 1)
+        repeated_values = unique_values[counts > 1] # Find elements that are repeated (count > 1)
         values_cont=unique_values[counts==1]
-        counts=counts[counts > 1]/len(g) #probability of each discrete value
-        prob=len(values_cont)/len(g) #probability of being continous
+        # counts=counts[counts > 1]/len(g) # probability of each discrete value
+        discrete_val_probs = counts[counts > 1] / len(g) # probability of each discrete value
+        prob=len(values_cont)/len(g) # probability of being continous
         kde=sc.stats.gaussian_kde(values_cont.T)
         z=linspace(a,b,100)
             
@@ -185,10 +186,15 @@ class _CubQMCLDG(StoppingCriterion):
         ax1.tick_params(axis='y', labelcolor=color)
         
         
-        ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+        breakpoint()
+        ax2 = ax1.twinx() # instantiate a second axes that shares the same x-axis
         color = 'tab:blue'
-        ax2.set_ylabel('Probability', color=color)  # we already handled the x-label with ax1
-        plt.vlines(x=repeated_values, ymin=0, ymax=counts, colors='blue', lw=2, label='vline_single - full height')
+        ax2.set_ylabel('Probability', color=color) # we already handled the x-label with ax1
+        plt.vlines(x=repeated_values, ymin=0, ymax=discrete_val_probs, colors='blue', lw=2, label='vline_single - full height')
+        # if len(repeated_values) == 1:
+        #     plt.vlines(x=repeated_values, ymin=0, ymax=discrete_val_probs, colors='blue', lw=2, label='vline_single - full height')
+        # else:
+        #     plt.vlines(x=max(0, min(repeated_values)), ymin=0, ymax=min(discrete_val_probs), colors='blue', lw=2, label='vline_single - full height')
         ax2.tick_params(axis='y', labelcolor=color)
         plt.show()
-        return kde,a,b, approx_solution, data  
+        return kde, a, b, approx_solution, data
