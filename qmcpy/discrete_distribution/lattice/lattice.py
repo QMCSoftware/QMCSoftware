@@ -129,7 +129,7 @@ class Lattice(LD):
                     ii) a numpy file with format `name.d_max.m_max.npy`, e.g., `lattice_vec.3600.20.npy`.
                 3. An odd integer :math:`1 < M < 27` which creates a random generating vector :math:`[1,v_1,v_2,...,v_{d_max}]` where :math:`v_i` is a random integer in :math:`{3,5,...,2*M-1}` supporting up to :math:`2^M` points.
             d_max (int): maximum dimension
-            m_max (int): :math:`2^{m_max}` is the max number of supported samples
+            m_max (int): :math:`2^{\mathtt{m\_max}}$` is the max number of supported samples
             is_parallel (bool): Default to True to perform parallel computations, False serial
 
         Note:

@@ -142,7 +142,7 @@ class DigitalNetB2(LD):
                     ii) a numpy file with format `name.d_max.t_max.m_max.{msb,lsb}.npy`, e.g., `gen_mat.21201.32.32.msb.npy`
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix, aka: number of rows in a generating matrix with ints expanded into columns
-            m_max (int): :math:`2^{m_max}` is the number of samples supported. 
+            m_max (int): :math:`2^{\mathtt{m\_max}}` is the number of samples supported. 
                 aka: number of columns in a generating matrix with ints expanded into columns
             msb (bool): bit storage as ints, e.g., if t_max=3, then 6 is [1 1 0] in MSB (True) and [0 1 1] in LSB (False)
             t_lms (int): LMS scrambling matrix will be `t_lms` x `t_max` for generating matrix of shape `t_max` x `m_max`
