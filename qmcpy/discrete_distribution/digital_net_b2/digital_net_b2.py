@@ -136,7 +136,7 @@ class DigitalNetB2(LD):
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
             generating_matrices (ndarray or str): Specify generating matrices. There are a number of optional input types. 
-                1) A ndarray of integers with shape (d_max, m_max) where each int has `t_max` bits. 
+                1) A ndarray of integers with shape (`d_max`, `m_max`) where each int has `t_max` bits. 
                 2) A string generating_matrices with either 
                     i)  a relative path from https://github.com/QMCSoftware/LDData, e.g., `LDData/main/dnet/mps.nx_s5_alpha3_m32.txt` or 
                     ii) a numpy file with format `name.d_max.t_max.m_max.{msb,lsb}.npy`, e.g., `gen_mat.21201.32.32.msb.npy`
@@ -144,7 +144,7 @@ class DigitalNetB2(LD):
             t_max (int): number of bits in each int of each generating matrix, aka: number of rows in a generating matrix with ints expanded into columns
             m_max (int): :math:`2^{\mathtt{m\_max}}` is the number of samples supported. 
                 aka: number of columns in a generating matrix with ints expanded into columns
-            msb (bool): bit storage as ints, e.g., if t_max=3, then 6 is [1 1 0] in MSB (True) and [0 1 1] in LSB (False)
+            msb (bool): bit storage as ints, e.g., if :math:`{\mathtt{t\_max}=3`, then 6 is [1 1 0] in MSB (True) and [0 1 1] in LSB (False)
             t_lms (int): LMS scrambling matrix will be `t_lms` x `t_max` for generating matrix of shape `t_max` x `m_max`
             _verbose (bool): print randomization details
         """
