@@ -132,7 +132,7 @@ class PFGPCI(StoppingCriterion):
             alpha (float): The credible interval is constructed to hold with probability at least 1 - alpha
             n_init (float): Initial number of samples from integrand.discrete_distrib from which to build the first surrogate GP
             init_samples (float): If the simulation has already been run, pass in (x,y) where x are past samples from the discrete distribution and y are corresponding simulation evaluations. 
-            batch_sampler (Suggester or DiscreteDistsribution): A suggestion scheme for future samples. 
+            batch_sampler (Suggester or DiscreteDistribution): A suggestion scheme for future samples. 
             n_batch (int): The number of samples per batch to draw from batch_sampler. 
             n_max (int): Budget of simulations.
             n_approx (int): Number of points from integrand.discrete_distrib used to approximate estimate and credible interval bounds
@@ -141,12 +141,12 @@ class PFGPCI(StoppingCriterion):
             gpytorch_likelihood (gpytorch.likelihoods): GP likelihood, require one of gpytorch.likelihoods.{GaussianLikelihood, GaussianLikelihoodWithMissingObs, FixedNoiseGaussianLikelihood}
             gpytorch_marginal_log_likelihood_func (callable): Function taking in the likelihood and gpytorch model and returning a marginal log likelihood from gpytorch.mlls
             torch_optimizer_func (callable): Function taking in the gpytorch model and returning an optimizer from torch.optim
-            gpytorch_train_iter (int): Triaining iterations for the GP in gpytorch
+            gpytorch_train_iter (int): Training iterations for the GP in gpytorch
             gpytorch_use_gpu (bool): If True, have gpytorch use a GPU for fitting and trining the GP
-            verbose (int): If verbose > 0, print information throught the call to integrate()
+            verbose (int): If verbose > 0, print information through the call to integrate()
             n_ref_approx (int): If n_ref_approx > 0, use n_ref_approx points to get a reference QMC approximation of the true solution. 
                 Caution: If n_ref_approx > 0, it should be a large int e.g. 2**22, in which case it is only helpful for cheap to evaluate simulations 
-            seed_ref_approx (int): Seed for the reference aproximation. Only applies when n_ref_approx>0
+            seed_ref_approx (int): Seed for the reference approximation. Only applies when n_ref_approx>0
         '''
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
