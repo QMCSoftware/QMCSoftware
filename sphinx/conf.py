@@ -41,7 +41,13 @@ master_doc = 'index'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
-latex_elements = {"preamble": r'\usepackage{enumitem}\setlistdepth{99}\usepackage{threeparttable}'}
+latex_elements = {
+    "preamble": r'''
+    \usepackage{enumitem}
+    \setlistdepth{99}
+    \usepackage{threeparttable}
+    ''',
+}
 
 latex_documents = [
     (master_doc, 'qmcpy.tex', 'QMCPy',

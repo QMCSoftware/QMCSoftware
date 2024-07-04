@@ -56,3 +56,6 @@ _ags/*
 
 # Fred's private stuff, not for tracking
 *Fred*
+
+# SC Choi's file exclusion
+.vscode/settings.json
