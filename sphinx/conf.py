@@ -186,13 +186,3 @@ def setup(app):
     }, True)
     app.add_transform(AutoStructify)
 
-# -- Options for epub -----------------------------------------------
-from sphinx.builders.epub3 import Epub3Builder
-
-epub_exclude_files = [
-    '.nojekyll',
-    # Exclude all files and subdirectories within the .doctrees directory
-    lambda filename: filename.startswith('.doctrees/'),
-]
-
-Epub3Builder.exclude_files = epub_exclude_files
