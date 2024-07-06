@@ -130,21 +130,21 @@ class DigitalNetB2(LD):
                 
                 - If an int is passed in, use sequence dimensions [0,...,dimension-1].
                 - If an ndarry is passed in, use these dimension indices in the sequence. 
+
             randomize (bool): apply randomization? True defaults to LMS_DS. Can also explicitly pass in
                 
                 - "LMS_DS": linear matrix scramble with digital shift
                 - "LMS": linear matrix scramble only
                 - "DS": digital shift only
                 - "OWEN" or "NUS": nested uniform scrambling (Owen scrambling)
+
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
             generating_matrices (:class:`numpy.ndarray` or str): Specify generating matrices. There are a number of optional input types. 
                 
-                - An ndarray of integers with shape (`d_max`, `m_max`) where each int has `t_max` bits. 
-                - A string generating_matrices with either 
-                    
-                    - a relative path from https://github.com/QMCSoftware/LDData (e.g., `LDData/main/dnet/mps.nx_s5_alpha3_m32.txt`) or 
-                    - a numpy file with format `name.d_max.t_max.m_max.{msb,lsb}.npy` (e.g., `gen_mat.21201.32.32.msb.npy`)
+                - An ndarray of integers with shape (`d_max`, `m_max)` where each int has `t_max` bits.
+                - A string with either a relative path from `LDData repository <https://github.com/QMCSoftware/LDData>`__ (e.g., "LDData/main/dnet/mps.nx_s5_alpha3_m32.txt") or a NumPy file with format "name.d_max.t_max.m_max.{msb,lsb}.npy" (e.g., "gen_mat.21201.32.32.msb.npy")
+
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix, aka: number of rows in a generating matrix with ints expanded into columns
             m_max (int): :math:`2^{\\texttt{m\_max}}` is the number of samples supported, aka: number of columns in a generating matrix with ints expanded into columns

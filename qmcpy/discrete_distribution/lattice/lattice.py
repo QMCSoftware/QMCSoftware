@@ -119,6 +119,7 @@ class Lattice(LD):
 
                 - If an int is passed in, use sequence dimensions [0,...,dimension-1].
                 - If an ndarray is passed in, use these dimension indices in the sequence.
+            
             randomize (bool): If True, apply shift to generated samples.
                 Note: Non-randomized lattice sequence includes the origin.
             order (str): "linear", "natural", or "mps" ordering.
@@ -126,11 +127,9 @@ class Lattice(LD):
             generating_vector (:class:`numpy.ndarray`, str, or int): Specify the generating matrix. There are a number of optional input types. 
                 
                 - An ndarray of integers.
-                - A string generating_vector with either 
-
-                    - a relative path from https://github.com/QMCSoftware/LDData (e.g., `LDData/main/lattice/mps.exod2_base2_m20_CKN.txt`)  or 
-                    - a NumPy file with format `name.d_max.m_max.npy` (e.g., `lattice_vec.3600.20.npy`).
+                - A string `generating_vector` with either a relative path from `LDData repository <https://github.com/QMCSoftware/LDData>`__ (e.g., "LDData/main/lattice/mps.exod2_base2_m20_CKN.txt")  or a NumPy file with format "name.d_max.m_max.npy" (e.g., "lattice_vec.3600.20.npy").
                 - An odd integer :math:`1 < M < 27` which creates a random generating vector :math:`[1,v_1,v_2,...,v_{\\texttt{d\_max}}]` where :math:`v_i` is a random integer in :math:`{3,5,...,2*M-1}` supporting up to :math:`2^M` points.
+            
             d_max (int): maximum dimension
             m_max (int): :math:`2^{\\texttt{m\_max}}` is the max number of supported samples
             is_parallel (bool): Default to True to perform parallel computations, False serial

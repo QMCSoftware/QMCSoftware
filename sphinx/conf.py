@@ -70,14 +70,10 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.githubpages",
     "sphinx_markdown_tables",
-    'sphinx.ext.intersphinx', #  enables numpydoc
+    # "sphinx.ext.autosummary",
+    # "numpydoc" # to eliminate WARNING: Unexpected section title. Uncomment will surface randint documentation
     ]
 
-#  enables numpydoc
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'numpy': ('https://numpy.org/doc/stable/', None),
-}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -109,6 +105,7 @@ intersphinx_mapping = {
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+add_module_names = False
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -162,7 +159,6 @@ latex_elements = {
 '''
 }
 
-
 # -- Options for Mathjax -----------------------------------------------
 
 mathjax_config = {
@@ -189,3 +185,14 @@ def setup(app):
         "auto_code_block": True,
     }, True)
     app.add_transform(AutoStructify)
+
+# -- Options for epub -----------------------------------------------
+from sphinx.builders.epub3 import Epub3Builder
+
+epub_exclude_files = [
+    '.nojekyll',
+    # Exclude all files and subdirectories within the .doctrees directory
+    lambda filename: filename.startswith('.doctrees/'),
+]
+
+Epub3Builder.exclude_files = epub_exclude_files
