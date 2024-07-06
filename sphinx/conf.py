@@ -70,10 +70,14 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.githubpages",
     "sphinx_markdown_tables",
-    # "sphinx.ext.autosummary",
-    # "numpydoc" # to eliminate WARNING: Unexpected section title. Uncomment will surface randint documentation
+    'sphinx.ext.intersphinx', #  enables numpydoc
     ]
 
+#  enables numpydoc
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
