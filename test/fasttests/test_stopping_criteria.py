@@ -21,7 +21,7 @@ class TestCubMCCLT(unittest.TestCase):
         integrand = Keister(IIDStdUniform(dimension=2,seed=7))
         algorithm = CubMCCLT(integrand, abs_tol=.001, n_init=64, n_max=1000)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
-        
+
     def test_keister_2d(self):
         integrand = Keister(IIDStdUniform(dimension=2,seed=7))
         solution,data = CubMCCLT(integrand, abs_tol=tol).integrate()
@@ -57,12 +57,12 @@ class TestCubQMCCLT(unittest.TestCase):
         integrand = Keister(Lattice(dimension=2,seed=7))
         algorithm = CubQMCCLT(integrand, abs_tol=.001, n_init=16, n_max=32)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
-    
+
     def test_keister_2d(self):
         integrand = Keister(Halton(dimension=2,seed=7))
         solution,data = CubQMCCLT(integrand, abs_tol=tol).integrate()
         self.assertTrue(abs(solution-keister_2d_exact)<tol)
-    
+
     def test_sobol_indices_dnb2(self):
         abs_tol,rel_tol = 5e-2,0
         a,b = 7,0.1
@@ -75,7 +75,7 @@ class TestCubQMCCLT(unittest.TestCase):
             success = (abs_error<abs_tol).all()
             if success: break
         self.assertTrue(success)
-    
+
     def test_sobol_indices_lattice(self):
         abs_tol,rel_tol = 5e-2,0
         a,b = 7,0.1
@@ -88,7 +88,7 @@ class TestCubQMCCLT(unittest.TestCase):
             success = (abs_error<abs_tol).all()
             if success: break
         self.assertTrue(success)
-    
+
     def test_sobol_indices_halton(self):
         abs_tol,rel_tol = 5e-2,0
         a,b = 7,0.1
@@ -114,7 +114,7 @@ class TestCubQMCLatticeG(unittest.TestCase):
         integrand = Keister(Lattice(dimension=2,seed=7))
         algorithm = CubQMCLatticeG(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
-    
+
     def test_keister_2d(self):
         integrand = Keister(Lattice(dimension=2,seed=7))
         solution,data = CubQMCLatticeG(integrand, abs_tol=tol).integrate()
@@ -144,7 +144,7 @@ class TestCubQMCNetG(unittest.TestCase):
         integrand = Keister(DigitalNetB2(dimension=2,seed=7))
         algorithm = CubQMCNetG(integrand, abs_tol=.001, n_init=2**8, n_max=2**9)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
-    
+
     def test_keister_2d(self):
         integrand = Keister(DigitalNetB2(dimension=2,seed=7))
         solution,data = CubQMCNetG(integrand, abs_tol=tol).integrate()
@@ -193,7 +193,7 @@ class TestCubBayesLatticeG(unittest.TestCase):
 
         self.assertTrue(solution.shape, (dims, dims, 1))
         self.assertTrue(abs(solution - solution_).max() < abs_tol)
-    
+
     def test_sobol_indices(self):
         abs_tol,rel_tol = 5e-2,0
         a,b = 7,0.1
@@ -224,7 +224,7 @@ class TestCubBayesNetG(unittest.TestCase):
         integrand = Keister(DigitalNetB2(dimension=2,seed=7))
         solution, data = CubBayesNetG(integrand , n_init=2 ** 5, abs_tol=tol).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
-    
+
     def test_sobol_indices(self):
         abs_tol,rel_tol = 5e-2,0
         a,b = 7,0.1
@@ -250,7 +250,7 @@ class TestCubMCL(unittest.TestCase):
         integrand = MLCallOptions(IIDStdUniform(),start_strike_price=30)
         algorithm = CubMCML(integrand,rmse_tol=.001,n_max=2**10)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
-    
+
     def test_european_option(self):
         integrand = MLCallOptions(IIDStdUniform(),start_strike_price=30)
         solution,data = CubMCML(integrand,rmse_tol=tol/2.58).integrate()
@@ -269,7 +269,7 @@ class TestCubQMCML(unittest.TestCase):
         integrand = MLCallOptions(Lattice(),start_strike_price=30)
         algorithm = CubQMCML(integrand,abs_tol=tol,n_max=2**10)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
-    
+
     def test_european_option(self):
         integrand = MLCallOptions(Halton(),start_strike_price=30)
         solution,data = CubQMCML(integrand,abs_tol=tol).integrate()
