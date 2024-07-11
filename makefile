@@ -93,11 +93,11 @@ doctests_no_docker:
 fasttests:
 	@echo "\nFastests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
-	
+
 longtests:
 	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
-	
+
 coverage:
 	@echo "\nCode coverage"
 	python -m coverage report -m
