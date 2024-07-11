@@ -6,11 +6,15 @@ from ..true_measure import BrownianMotion
 from ..util import ParameterError, MethodImplementationError
 
 class Option(Integrand):
-    """Option abstract class. DO NOT INSTANTIATE."""
+    """
+    Option abstract class. DO NOT INSTANTIATE.
+    Date Created: 7/10/2024
+    Author: Richard E. Varela
+    """
 
     def __init__(self, sampler:BrownianMotion, volatility:float, start_price:float,\
-                 strike_price:float, interest_rate:float, t_final:float, call_put:str,\
-                 multilevel_dims:list, _dim_frac:float):
+                 strike_price:float, interest_rate:float, t_final, call_put:str,\
+                 multilevel_dims, dim_frac:float):
         """
         Args:
             volatility (float): sigma, the volatility of the asset
@@ -24,12 +28,13 @@ class Option(Integrand):
             _dim_frac (float): for internal use only, users should not set this parameter.
         """
         self.sampler = sampler
-        self.paramters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
+        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
         self.interest_rate = float(interest_rate)
         self.t_final = t_final
+        self.true_measure = BrownianMotion(sampler, t_final)
         self.call_put = call_put
         if self.call_put not in ('call', 'put'):
             raise ParameterError("call_put must be either 'call' or 'put'")
@@ -45,7 +50,7 @@ class Option(Integrand):
             self.parent = True
             self.parameters.append('multilevel_dims') # self.parameters += ['multilevel_dims']
         else: # single level problem
-            self.dim_fracs = _dim_frac
+            self.dim_frac = dim_frac
             self.leveltype = 'single'
             self.parent = False
             self.parameters.append('dim_frac') # self.parameters += ['dim_frac']

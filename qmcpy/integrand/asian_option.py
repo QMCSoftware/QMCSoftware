@@ -3,9 +3,10 @@ from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
 from numpy import *
+from ._option import Option
 
 
-class AsianOption(Integrand):
+class AsianOption(Option):
     """
     Asian financial option. 
 
@@ -37,7 +38,7 @@ class AsianOption(Integrand):
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
-        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multilevel_dims=None, _dim_frac=0):
+        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multilevel_dims=None, dim_frac=0):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
@@ -53,37 +54,14 @@ class AsianOption(Integrand):
                 Leave as None for single-level problems
             _dim_frac (float): for internal use only, users should not set this parameter. 
         """
-        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate','mean_type']
-        self.sampler = sampler
-        self.true_measure = BrownianMotion(self.sampler,t_final)
-        self.volatility = float(volatility)
-        self.start_price = float(start_price)
-        self.strike_price = float(strike_price)
-        self.interest_rate = float(interest_rate)
-        self.t_final = t_final
-        self.call_put = call_put.lower()
-        if self.call_put not in ['call','put']:
-            raise ParameterError("call_put must be either 'call' or 'put'")
+
         self.mean_type = mean_type.lower()
         if self.mean_type not in ['arithmetic','geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
-        # handle single vs multilevel
-        self.multilevel_dims = multilevel_dims
-        if self.multilevel_dims is not None: # multi-level problem
-            self.dim_fracs = array(
-                [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
-                for i in range(1,len(self.multilevel_dims))],
-                dtype=float)
-            self.max_level = len(self.multilevel_dims)-1
-            self.leveltype = 'fixed-multi'
-            self.parent = True
-            self.parameters += ['multilevel_dims']
-        else: # single level problem
-            self.dim_frac = _dim_frac
-            self.leveltype = 'single'
-            self.parent = False
-            self.parameters += ['dim_frac']
-        super(AsianOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)    
+        
+        super(AsianOption, self).__init__(sampler, volatility, start_price,
+                                          strike_price, interest_rate, t_final,
+                                          call_put, multilevel_dims, dim_frac)
 
     def _get_discounted_payoffs(self, stock_path, dimension):
         """
@@ -144,5 +122,5 @@ class AsianOption(Integrand):
             t_final = self.t_final,
             call_put = self.call_put,
             mean_type = self.mean_type,
-            _dim_frac = self.dim_fracs[level] if hasattr(self,'dim_fracs') else 0)
+            dim_frac = self.dim_fracs[level] if hasattr(self,'dim_fracs') else 0)
     
