@@ -12,7 +12,7 @@ class Option(Integrand):
     Author: Richard E. Varela
     """
 
-    def __init__(self, sampler:BrownianMotion, volatility:float, start_price:float,\
+    def __init__(self, sampler, volatility:float, start_price:float,\
                  strike_price:float, interest_rate:float, t_final, call_put:str,\
                  multilevel_dims, dim_frac:float):
         """

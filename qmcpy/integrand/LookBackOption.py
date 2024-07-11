@@ -1,43 +1,33 @@
-
 import numpy as np
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..discrete_distribution import *
+from ._option import Option
 
-class LookBackOption(Integrand):
+class LookBackOption(Option):
                           
-    def __init__(self, volatility=0.5, start_price=30.,\
-        interest_rate=0., drift=0, n=16, t_final=1, call_put='put', multilevel_dims=None, _dim_frac=0, observations=10):
-        self.parameters = ['volatility', 'call_put', 'start_price', 'interest_rate']
+    def __init__(self, volatility=0.5, start_price=30.0, interest_rate=0.0,
+                 drift=0, n=16, t_final=1, call_put='put', multilevel_dims=None,
+                 _dim_frac=0, observations=10):
         # handle single vs multilevel
-        self.multilevel_dims = multilevel_dims
-        self.call_put=call_put
-        if self.multilevel_dims is not None: # multi-level problem
-            self.dim_fracs = np.array(
-                [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
-                for i in range(1,len(self.multilevel_dims))],
-                dtype=float)
-            self.max_level = len(self.multilevel_dims)-1
-            self.leveltype = 'fixed-multi'
-            self.parent = True
-            self.parameters += ['multilevel_dims']
-            self.sampler=Sobol(self.multilevel_dims),
+        if multilevel_dims is not None: # multi-level problem
+            self.sampler = Sobol(self.multilevel_dims)
         else: # single level problem
-            self.dim_frac = _dim_frac
-            self.leveltype = 'single'
-            self.parent = False
-            self.parameters += ['dim_frac']
-            self.sampler=sampler=Sobol(1)
-        self.observations=observations
-        self.t_final = t_final # Exercise time
-        self.n=n # Number of samples
-        self.start_price=start_price
-        self.interest_rate = interest_rate
-        self.t=np.linspace(0,self.t_final, self.observations)
-        self.true_measure = BrownianMotion(self.sampler,t_final)
-        self.volatility = volatility
-        self.stock_values =self.start_price*np.exp((self.interest_rate-0.5*self.volatility**2)*self.t+self.volatility*self.true_measure.gen_samples(self.n))
-        super(LookBackOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)    
+            self.sampler = Sobol(1)
+        
+        self.observations = observations
+        self.n = n # Number of samples
+        
+        # Call super class's constructor to define this class's attributes
+        super(LookBackOption, self).__init__(self.sampler, volatility, start_price,
+                                             0, interest_rate,
+                                             t_final, call_put, multilevel_dims, _dim_frac)
+        
+        # Finish defining the rest of the class's attributes
+        self.t = np.linspace(0, self.t_final, self.observations)
+        self.stock_values = self.start_price * np.exp((self.interest_rate - 0.5*self.volatility**2)
+                                                      * self.t + self.volatility * self.true_measure.gen_samples(self.n))
+        self.true_measure = BrownianMotion(self.sampler, t_final)
         
     def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
         """Overrides the parent's method. Refer to the parent class method for details of original method."""
