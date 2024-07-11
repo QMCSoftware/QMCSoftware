@@ -39,7 +39,7 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 		grep -vE "(colab-badge.svg|Open In Colab|colab.research)" $$f > $(nbdir)/tmp.rst && mv $(nbdir)/tmp.rst  $$f; \
 	done
 	# Add slash to * for "**kwargs"
-	find . -name "*.rst" -type f -exec sed -i '' 's/\*\*kwargs/\\*\\*kwargs/g' {} + ;
+	find . -name "*.rst" -type f -exec sed -i.bak 's/\*\*kwargs/\\*\\*kwargs/g' {} + && find . -name "*.rst.bak" -delete
 
 
 _uml:
