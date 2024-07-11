@@ -15,6 +15,7 @@ EXPORT int gen_digitalnetb2(
     unsigned long long *znew,   /* generating vector with shape d_max x m_max from set_digitalnetb2_randomizations */
     unsigned int set_rshift,    /* random shift flag */
     unsigned long long *rshift, /* length d vector of random digital shifts from set_digitalnetb2_randomizations */
+    unsigned long long *xb,     /* integer points before scaling */
     double *x,                  /* unrandomized points with shape n x d initialized to 0*/
     double *xr)                 /* randomized points with shape n x d initialized to 0*/
 {
@@ -78,10 +79,13 @@ EXPORT int gen_digitalnetb2(
     }
     for (j = 0; j < d; j++)
     {
+        xb[(idx - n0) * d + j] = xc[j];
         x[(idx - n0) * d + j] = ((double)xc[j]) * scale;
+
         if (set_rshift)
         {
-            xr[(idx - n0) * d + j] = ((double)(xc[j] ^ rshift[j])) * scale;
+            xb[(idx - n0) * d + j] = xc[j] ^ rshift[j];
+            xr[(idx - n0) * d + j] = ((double)xb[(idx - n0) * d + j]) * scale;
         }
     }
     /* n0+1,...,n0+n points */
@@ -111,10 +115,12 @@ EXPORT int gen_digitalnetb2(
         }
         for (j = 0; j < d; j++)
         {
+            xb[(idx - n0) * d + j] = xc[j];
             x[(idx - n0) * d + j] = ((double)xc[j]) * scale;
             if (set_rshift)
             {
-                xr[(idx - n0) * d + j] = ((double)(xc[j] ^ rshift[j])) * scale;
+                xb[(idx - n0) * d + j] = xc[j] ^ rshift[j];
+                xr[(idx - n0) * d + j] = ((double)xb[(idx - n0) * d + j]) * scale;
             }
         }
     }

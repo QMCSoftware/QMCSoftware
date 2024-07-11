@@ -1,4 +1,5 @@
 from ._accumulate_data import AccumulateData
+from ..util import ExactGPyTorchRegressionModel
 from numpy import *
 from scipy.stats import norm
 import warnings
@@ -142,7 +143,7 @@ class PFGPCIData(AccumulateData):
                 use_gpu = self.gpytorch_use_gpu)
             gpyt_model.load_state_dict(self.saved_gps[j+1])
             ax1j = fig.add_subplot(gs[1,j],sharey=None if j==0 else ax1j)
-            if self.approx_true_solution: ax1j.plot(xticks,ytickstf,color='c',label='f(x)',linewidth=2)
+            if self.approx_true_solution: ax1j.plot(xticks,ytickstf,color='c',label=r'f(x)',linewidth=2)
             gp_mean,gp_std = gpyt_model.predict(xticks[:,None])
             ax1j.plot(xticks,gp_mean,color='k',label='gp')
             ax1j.fill_between(xticks,gp_mean-beta*gp_std,gp_mean+beta*gp_std,color='k',alpha=.25)
@@ -174,7 +175,7 @@ class PFGPCIData(AccumulateData):
                 ax0j = fig.add_subplot(gs[row_idx,j])
                 ax0j.contourf(x0mesh,x1mesh,ymeshtf,cmap=cm.Greys,vmin=ymeshtf.min(),vmax=ymeshtf.max(),levels=clevels)
                 ax0j.contour(x0mesh,x1mesh,ymeshtf,colors='lightgreen',levels=[0],linewidths=5)
-                ax0j.set_title(r'$g(u)$')
+                ax0j.set_title(r'$g(\boldsymbol{u})$')
                 row_idx += 1
             gpyt_model = ExactGPyTorchRegressionModel(
                 x_t = self.x[:i0], y_t = self.y[:i0],
@@ -187,7 +188,7 @@ class PFGPCIData(AccumulateData):
             udens_mr = _error_udens(gpyt_model,xquery).reshape(x0mesh.shape)
             ax1j.contourf(x0mesh,x1mesh,udens_mr,cmap=cm.Greys,levels=clevels,vmin=0,vmax=1)
             ax1j.scatter(self.x[i0:i1,0],self.x[i0:i1,1],color='r')
-            ax1j.set_title(r'$2\mathrm{ERR}_n(u)$')
+            ax1j.set_title(r'$2\mathrm{ERR}_n(\boldsymbol{u})$')
             row_idx += 1
             gpyt_model = ExactGPyTorchRegressionModel(
                 x_t = self.x[:i0], y_t = self.y[:i0],
@@ -203,11 +204,11 @@ class PFGPCIData(AccumulateData):
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')
                 ax2j.contour(x0mesh,x1mesh,gp_mean_mesh,colors='lightgreen',levels=[0],linewidths=5)
-            ax2j.set_title(r'$m_n(u)$')
+            ax2j.set_title(r'$m_n(\boldsymbol{u})$')
             row_idx += 1
             ax3j = fig.add_subplot(gs[row_idx,j])            
             ax3j.contourf(x0mesh,x1mesh,gp_std_mesh,cmap=cm.Greys,levels=clevels)
-            ax3j.set_title(r'$\sigma_n(u)$')
+            ax3j.set_title(r'$\sigma_n(\boldsymbol{u})$')
             for ax in [ax2j,ax3j]:
                 ax.scatter(self.x[:i0,0],self.x[:i0,1],color='b')
                 ax.scatter(self.x[i0:i1,0],self.x[i0:i1,1],color='r')
@@ -220,67 +221,3 @@ class PFGPCIData(AccumulateData):
             ax.set_yticks([0,1])
             ax.set_ylabel(r'$u_2$')
         return fig,gs
-
-class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
-    allowed_likelihood_types = (
-        gpytorch.likelihoods.GaussianLikelihood,
-        gpytorch.likelihoods.GaussianLikelihoodWithMissingObs,
-        gpytorch.likelihoods.FixedNoiseGaussianLikelihood)
-    def __init__(self, x_t, y_t, prior_mean, prior_cov, likelihood, use_gpu=False):
-        if isinstance(x_t,ndarray): x_t = torch.from_numpy(x_t)
-        if isinstance(y_t,ndarray): y_t = torch.from_numpy(y_t)
-        assert x_t.ndim==2 and y_t.ndim==1 and len(x_t)==len(y_t)
-        super(ExactGPyTorchRegressionModel, self).__init__(x_t,y_t,likelihood)
-        assert isinstance(self.likelihood,ExactGPyTorchRegressionModel.allowed_likelihood_types)
-        self.mean_module,self.covar_module = prior_mean,prior_cov
-        self.d = x_t.shape[1]
-        self.use_gpu = use_gpu
-        if self.use_gpu:
-            assert torch.cuda.is_available()
-            self = self.cuda()
-            self.likelihood = self.likelihood.cuda()
-    def forward(self, x):
-        mean_x = self.mean_module(x)
-        covar_x = self.covar_module(x)
-        return gpytorch.distributions.MultivariateNormal(mean_x,covar_x)
-    def fit(self, optimizer, mll, training_iter, verbose=0):
-        self.train()
-        self.likelihood.train()
-        if verbose: print('\tgpytorch model fitting')
-        for i in range(training_iter):
-            optimizer.zero_grad()
-            output = self.__call__(self.train_inputs[0])
-            loss = -mll(output,self.train_targets)
-            loss.backward()
-            if verbose and (i+1)%verbose==0:
-                print('\t\titer %-3d of %d'%(i+1,training_iter))
-                for name,val in self.named_parameters(): print('\t\t\t%s %.2e'%(name.ljust(50,'.'),val))
-            optimizer.step()
-    def predict(self, x, noise_const=0, chunk_size=2**15):
-        if isinstance(x,ndarray): x = torch.from_numpy(x)
-        assert x.ndim==2 and x.shape[1]==self.d
-        self.eval()
-        self.likelihood.eval()
-        n = len(x)
-        mean_post,std_post = zeros(n,dtype=float),zeros(n,dtype=float)
-        for i in range(0,n,chunk_size):
-            lchunk,uchunk = i,min(i+chunk_size,n)
-            noise_chunk = noise_const*torch.ones(uchunk-lchunk)
-            mean_post[lchunk:uchunk],std_post[lchunk:uchunk] = self._predict_batch(x[lchunk:uchunk],noise_chunk)
-        return mean_post,std_post
-    def _predict_batch(self, x, noise):
-        if self.use_gpu: x,noise = x.cuda(),noise.cuda()
-        with torch.no_grad(): observed_pred = self.likelihood(self.__call__(x),noise=noise)
-        mean_post = observed_pred.mean
-        std_post = observed_pred.stddev
-        if self.use_gpu: mean_post,std_post = mean_post.cpu(),std_post.cpu()
-        if self.use_gpu: del x,noise,observed_pred; torch.cuda.empty_cache()
-        return mean_post.numpy(),std_post.numpy()
-    def add_data(self, x_t_new, y_t_new):
-        if isinstance(x_t_new,ndarray): x_t_new = torch.from_numpy(x_t_new)
-        if isinstance(y_t_new,ndarray): y_t_new = torch.from_numpy(y_t_new)
-        assert x_t_new.ndim==2 and x_t_new.shape[1]==self.d and y_t_new.ndim==1 and len(x_t_new)==len(y_t_new)
-        if self.use_gpu: x_t_new,y_t_new = x_t_new.cuda(),y_t_new.cuda()
-        fantasy_model = self.get_fantasy_model(x_t_new,y_t_new)
-        if self.use_gpu: del x_t_new,y_t_new; torch.cuda.empty_cache()
-        return fantasy_model

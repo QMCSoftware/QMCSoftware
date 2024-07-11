@@ -74,7 +74,16 @@ class Lattice(LD):
            [0.625, 0.625, 0.375, 0.375],
            [0.375, 0.375, 0.625, 0.625],
            [0.875, 0.875, 0.125, 0.125]])
-
+    >>> Lattice(dimension=3,randomize=False,generating_vector="LDData/main/lattice/mps.exod2_base2_m20_CKN.txt").gen_samples(8,warn=False)
+    array([[0.   , 0.   , 0.   ],
+           [0.5  , 0.5  , 0.5  ],
+           [0.25 , 0.75 , 0.75 ],
+           [0.75 , 0.25 , 0.25 ],
+           [0.125, 0.375, 0.375],
+           [0.625, 0.875, 0.875],
+           [0.375, 0.125, 0.125],
+           [0.875, 0.625, 0.625]])
+    
     References:
 
         [1] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang,
@@ -113,12 +122,12 @@ class Lattice(LD):
                 Note: Non-randomized lattice sequence includes the origin.
             order (str): 'linear', 'natural', or 'mps' ordering.
             seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
-            generating_vector (ndarray, str or int): generating matrix or path to generating matrices.
-                ndarray should have shape (d_max).
-                a string generating_vector should be formatted like
-                'lattice_vec.3600.20.npy' where 'name.d_max.m_max.npy'
-                an integer should be an odd larger than 1; passing an integer M would create a random generating vector supporting up to 2^M points. 
-                M is restricted between 2 and 26 for numerical percision. The generating vector is [1,v_1,v_2,...,v_dimension], where v_i is an integer in {3,5,...,2*M-1}. 
+            generating_vector (ndarray or str or int): Specify the generating matrix. There are a number of optional input types. 
+                1) A ndarray of integers. 
+                2) A string generating_vector with either: 
+                    i)  a relative path from https://github.com/QMCSoftware/LDData e.g. "LDData/main/lattice/mps.exod2_base2_m20_CKN.txt"  or 
+                    ii) a numpy file with format "name.d_max.m_max.npy" e.g. 'lattice_vec.3600.20.npy'.
+                3) An odd integer 1 < M < 27 which creates a random generating vector [1,v_1,v_2,...,v_{d_max}] where v_i is a random integer in {3,5,...,2*M-1} supporting up to 2^M points.
             d_max (int): maximum dimension
             m_max (int): 2^m_max is the max number of supported samples
             is_parallel (bool): Default to True to perform parallel computations, False serial
@@ -148,18 +157,28 @@ class Lattice(LD):
             self.m_max = min(26,max(2,generating_vector))
             self.d_max = dimension
         elif isinstance(generating_vector,str):
+            parts = generating_vector.split('.')
             root = dirname(abspath(__file__))+'/generating_vectors/'
+            repos = DataSource()
             if isfile(root+generating_vector):
                 self.gen_vec_og = load(root+generating_vector).astype(uint64)
+                self.d_max = int(parts[-3])
+                self.m_max = int(parts[-2])
             elif isfile(generating_vector):
                 self.gen_vec_og = load(generating_vector).astype(uint64)
+                self.d_max = int(parts[-3])
+                self.m_max = int(parts[-2])
+            elif "LDData"==generating_vector[:6] and repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector):
+                datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector)
+                contents = [int(line.rstrip('\n').strip().split("#",1)[0]) for line in datafile.readlines() if line[0]!="#"]
+                datafile.close()
+                self.d_max = contents[0]
+                n_max = contents[1]; assert log2(n_max)%1==0; self.m_max = int(log2(n_max))
+                self.gen_vec_og = array(contents[2:],dtype=uint64)
             else:
                 raise ParameterError("generating_vector '%s' not found."%generating_vector)
-            parts = generating_vector.split('.')
-            self.d_max = int(parts[-3])
-            self.m_max = int(parts[-2])
         else:
-            raise ParameterError("generating_vector should a ndarray or file path string")
+            raise ParameterError("invalid input for generating_matrices, see documentation and doctests.")
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
