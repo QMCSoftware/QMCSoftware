@@ -6,6 +6,7 @@ from os.path import dirname, abspath, isfile
 from numpy import *
 import warnings
 
+
 class DigitalNetB2(LD):
     """
     Quasi-Random digital nets in base 2.
@@ -125,28 +126,30 @@ class DigitalNetB2(LD):
         _verbose=False):
         """
         Args:
-            dimension (int or ndarray): dimension of the generator. 
-                If an int is passed in, use sequence dimensions [0,...,dimensions-1].
-                If a ndarray is passed in, use these dimension indices in the sequence. 
+            dimension (int or :class:`numpy.ndarray`): dimension of the generator. 
+                
+                - If an int is passed in, use sequence dimensions [0,...,dimension-1].
+                - If an ndarry is passed in, use these dimension indices in the sequence. 
+
             randomize (bool): apply randomization? True defaults to LMS_DS. Can also explicitly pass in
-                'LMS_DS': linear matrix scramble with digital shift
-                'LMS': linear matrix scramble only
-                'DS': digital shift only
-                'OWEN'/'NUS': nested uniform scrambling (Owen scrambling)
+                
+                - "LMS_DS": linear matrix scramble with digital shift
+                - "LMS": linear matrix scramble only
+                - "DS": digital shift only
+                - "OWEN" or "NUS": nested uniform scrambling (Owen scrambling)
+
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
-            generating_matrices (ndarray or str): Specify generating matrices. There are a number of optional input types. 
-                1) A ndarray of integers with shape (d_max, m_max) where each int has t_max bits. 
-                2) A string generating_matrices with either 
-                    i)  a relative path from https://github.com/QMCSoftware/LDData e.g. "LDData/main/dnet/mps.nx_s5_alpha3_m32.txt" or 
-                    ii) a numpy file with format "name.d_max.t_max.m_max.{msb,lsb}.npy" e.g. "gen_mat.21201.32.32.msb.npy"
+            generating_matrices (:class:`numpy.ndarray` or str): Specify generating matrices. There are a number of optional input types. 
+                
+                - An ndarray of integers with shape (`d_max`, `m_max)` where each int has `t_max` bits.
+                - A string with either a relative path from `LDData repository <https://github.com/QMCSoftware/LDData>`__ (e.g., "LDData/main/dnet/mps.nx_s5_alpha3_m32.txt") or a NumPy file with format "name.d_max.t_max.m_max.{msb,lsb}.npy" (e.g., "gen_mat.21201.32.32.msb.npy")
+
             d_max (int): max dimension
-            t_max (int): number of bits in each int of each generating matrix. 
-                aka: number of rows in a generating matrix with ints expanded into columns
-            m_max (int): 2^m_max is the number of samples supported. 
-                aka: number of columns in a generating matrix with ints expanded into columns
-            msb (bool): bit storage as ints. e.g. if t_max=3, then 6 is [1 1 0] in MSB (True) and [0 1 1] in LSB (False)
-            t_lms (int): LMS scrambling matrix will be t_lms x t_max for generating matrix of shape t_max x m_max
+            t_max (int): number of bits in each int of each generating matrix, aka: number of rows in a generating matrix with ints expanded into columns
+            m_max (int): :math:`2^{\\texttt{m\_max}}` is the number of samples supported, aka: number of columns in a generating matrix with ints expanded into columns
+            msb (bool): bit storage as ints, e.g., if :math:`{\\texttt{t\_max}} = 3`, then 6 is [1 1 0] in MSB (True) and [0 1 1] in LSB (False)
+            t_lms (int): LMS scrambling matrix will be of shape (`t_lms`, `t_max`). Other generating matrix will be of shape (`t_max`, `m_max`).
             _verbose (bool): print randomization details
         """
         self.parameters = ['dvec','randomize','graycode']
@@ -312,9 +315,11 @@ class DigitalNetB2(LD):
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
             return_unrandomized (bool): return unrandomized samples as well? 
-                If True, return randomized_samples,unrandomized_samples. 
-                Note that this only applies when randomize includes Digital Shift.
-                Also note that unrandomized samples included linear matrix scrambling if applicable.
+                
+                - If True, return both randomized samples and unrandomized samples. 
+                - If False, return only randomized samples.
+                - Note that this only applies when randomize includes Digital Shift.
+                - Also note that unrandomized samples included linear matrix scrambling if applicable.
 
         Returns:
             ndarray: (n_max-n_min) x d (dimension) array of samples
