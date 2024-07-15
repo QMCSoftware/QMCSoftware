@@ -102,9 +102,9 @@ class AsianOption(Option):
         for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs(self.s_fine,self.d)
-        if self.dim_frac > 0:
-            s_course = self.s_fine[:, int(self.dim_frac - 1):: int(self.dim_frac)]
-            d_course = float(self.d) / self.dim_frac
+        if self.dim_fracs > 0:
+            s_course = self.s_fine[:, int(self.dim_fracs - 1):: int(self.dim_fracs)]
+            d_course = float(self.d) / self.dim_fracs
             y_course = self._get_discounted_payoffs(s_course, d_course)
             y -= y_course
         return y

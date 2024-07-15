@@ -50,7 +50,7 @@ class Option(Integrand):
             self.parent = True
             self.parameters.append('multilevel_dims') # self.parameters += ['multilevel_dims']
         else: # single level problem
-            self.dim_frac = dim_frac
+            self.dim_fracs = dim_frac
             self.leveltype = 'single'
             self.parent = False
             self.parameters.append('dim_frac') # self.parameters += ['dim_frac']

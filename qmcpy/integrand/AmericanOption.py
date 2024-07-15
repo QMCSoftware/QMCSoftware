@@ -1,45 +1,29 @@
-
 import numpy as np
 from qmcpy import *
 import matplotlib.pyplot as plt
 import scipy as sc
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
+from ._option import Option
 
-class AmericanOption(Integrand):
+class AmericanOption(Option):
                           
-    def __init__(self, volatility=0.2, start_price=30., strike_price=32.,\
-        interest_rate=0.05, n=4096, t_final=1, call_put='put', multilevel_dims=None, _dim_frac=0, observations=52):
-        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
+    def __init__(self, volatility=0.2, start_price=30.0, strike_price=32.0,
+                 interest_rate=0.05, n=4096, t_final=1, call_put='put',
+                 multilevel_dims=None, _dim_frac=0, observations=52):
         # handle single vs multilevel
-        self.multilevel_dims = multilevel_dims
-        self.call_put=call_put
-        self.observations=observations #number of time steps
-        self.strike_price=strike_price
-        if self.multilevel_dims is not None: # multi-level problem
-            self.dim_fracs = array(
-                [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
-                for i in range(1,len(self.multilevel_dims))],
-                dtype=float)
-            self.max_level = len(self.multilevel_dims)-1
-            self.leveltype = 'fixed-multi'
-            self.parent = True
-            self.parameters += ['multilevel_dims']
-            self.sampler=Sobol(self.multilevel_dims),
+        self.observations = observations # number of time steps KEEP
+        if multilevel_dims is not None: # multi-level problem
+            self.sampler = Sobol(multilevel_dims)
         else: # single level problem
-            self.dim_fracs = _dim_frac
-            self.leveltype = 'single'
-            self.parent = False
-            self.parameters += ['dim_frac']
-            self.sampler=sampler=Sobol(self.observations)
-        self.t_final = t_final
-        self.n=n # Number of samples
-        self.start_price=start_price
-        self.interest_rate = interest_rate
-        self.t=np.linspace(1/self.observations,self.t_final, self.observations)
-        self.true_measure = BrownianMotion(self.sampler,self.t_final) #Browninan motion
-        self.volatility = volatility
-        super(AmericanOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)    
+            self.sampler = Sobol(self.observations)
+
+        self.n = n # Number of samples
+
+        self.t = np.linspace(1/self.observations, t_final, self.observations)
+        super(AmericanOption, self).__init__(self.sampler, volatility, start_price,
+                                             strike_price, interest_rate, t_final,
+                                             call_put, multilevel_dims, _dim_frac)
         
     
     def _get_discounted_payoffs(self):
