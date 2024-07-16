@@ -41,7 +41,13 @@ master_doc = 'index'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
-latex_elements = {"preamble": r'\usepackage{enumitem}\setlistdepth{99}\usepackage{threeparttable}'}
+latex_elements = {
+    "preamble": r'''
+    \usepackage{enumitem}
+    \setlistdepth{99}
+    \usepackage{threeparttable}
+    ''',
+}
 
 latex_documents = [
     (master_doc, 'qmcpy.tex', 'QMCPy',
@@ -99,6 +105,7 @@ intersphinx_mapping = {
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+add_module_names = False
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -152,7 +159,6 @@ latex_elements = {
 '''
 }
 
-
 # -- Options for Mathjax -----------------------------------------------
 
 mathjax_config = {
@@ -179,3 +185,48 @@ def setup(app):
         "auto_code_block": True,
     }, True)
     app.add_transform(AutoStructify)
+
+
+# Handle warnings that start with "WARNING: unknown mimetype for" the following files
+epub_exclude_files = [
+    '.nojekyll',
+    '.doctrees/algorithms.doctree',
+    '.doctrees/contributing.doctree',
+    '.doctrees/demos.doctree',
+    '.doctrees/environment.pickle',
+    '.doctrees/index.doctree',
+    '.doctrees/license.doctree',
+    '.doctrees/readme.doctree',
+    '.doctrees/demo_rst/Argonne_2023_Talk_Figures.doctree',
+    '.doctrees/demo_rst/MCQMC2022_Article_Figures.doctree',
+    '.doctrees/demo_rst/MC_vs_QMC.doctree',
+    '.doctrees/demo_rst/Purdue_Talk_Figures.doctree',
+    '.doctrees/demo_rst/asian-option-mlqmc.doctree',
+    '.doctrees/demo_rst/control_variates.doctree',
+    '.doctrees/demo_rst/dakota_genz.doctree',
+    '.doctrees/demo_rst/digital_net_b2.doctree',
+    '.doctrees/demo_rst/elliptic-pde.doctree',
+    '.doctrees/demo_rst/gaussian_diagnostics_demo.doctree',
+    '.doctrees/demo_rst/importance_sampling.doctree',
+    '.doctrees/demo_rst/integration_examples.doctree',
+    '.doctrees/demo_rst/iris.doctree',
+    '.doctrees/demo_rst/lattice_random_generator.doctree',
+    '.doctrees/demo_rst/lebesgue_integration.doctree',
+    '.doctrees/demo_rst/linear-scrambled-halton.doctree',
+    '.doctrees/demo_rst/nei_demo.doctree',
+    '.doctrees/demo_rst/plot_proj_function.doctree',
+    '.doctrees/demo_rst/prob_failure_gp_ci.doctree',
+    '.doctrees/demo_rst/pydata.chi.2023.doctree',
+    '.doctrees/demo_rst/qei-demo-for-blog.doctree',
+    '.doctrees/demo_rst/qmcpy_intro.doctree',
+    '.doctrees/demo_rst/quasirandom_generators.doctree',
+    '.doctrees/demo_rst/quickstart.doctree',
+    '.doctrees/demo_rst/ray_tracing.doctree',
+    '.doctrees/demo_rst/sample_scatter_plots.doctree',
+    '.doctrees/demo_rst/some_true_measures.doctree',
+    '.doctrees/demo_rst/umbridge.doctree',
+    '.doctrees/demo_rst/vectorized_qmc.doctree',
+    '.doctrees/demo_rst/vectorized_qmc_bayes.doctree',
+    '.doctrees/md_rst/CONTRIBUTING.doctree',
+    '.doctrees/md_rst/QMCSoftware.doctree',
+]
