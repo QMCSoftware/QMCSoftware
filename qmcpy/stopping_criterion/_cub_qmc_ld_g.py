@@ -5,7 +5,6 @@ from ..integrand import Integrand
 from numpy import *
 from time import time
 import warnings
-import matplotlib.pyplot as plt
 import scipy as sc
 
 
@@ -160,13 +159,11 @@ class _CubQMCLDG(StoppingCriterion):
         if abs_tol != None: self.abs_tol = abs_tol
         if rel_tol != None: self.rel_tol = rel_tol
 
-    def density_estimation(self):
+    def density_estimation(self, plot_estimation_flag=False):
         approx_solution, data = self.integrate()
         g=data.datum[0].y_val
         a=min(g)
         b=max(g)
-        print("Lower bound of estimation interval (a) is:",a)
-        print("Upper bound of estimation interval (b) is:",b)
         
         unique_values, counts = unique(g, return_counts=True)
         repeated_values = unique_values[counts > 1]# Find elements that are repeated (count > 1)
@@ -174,21 +171,24 @@ class _CubQMCLDG(StoppingCriterion):
         counts=counts[counts > 1]/len(g) #probability of each discrete value
         prob=len(values_cont)/len(g) #probability of being continous
         kde=sc.stats.gaussian_kde(values_cont.T)
-        z=linspace(a,b,100)
+        
+        if plot_estimation_flag == True:
+            import matplotlib.pyplot as plt
+            z = linspace(a,b,100)    
+            pdf_est = kde.evaluate(z.T)*prob
+            fig, ax1 = plt.subplots()
+            color = 'tab:red'
+            ax1.set_xlabel('x')
+            ax1.set_ylabel('Density', color=color)
+            ax1.plot(z, pdf_est, color=color)
+            ax1.tick_params(axis='y', labelcolor=color)
             
-        pdf_est=kde.evaluate(z.T)*prob
-        fig, ax1 = plt.subplots()
-        color = 'tab:red'
-        ax1.set_xlabel('x')
-        ax1.set_ylabel('Density', color=color)
-        ax1.plot(z, pdf_est, color=color)
-        ax1.tick_params(axis='y', labelcolor=color)
+            ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+            color = 'tab:blue'
+            ax2.set_ylabel('Probability', color=color)  # we already handled the x-label with ax1
+            plt.vlines(x=repeated_values, ymin=0, ymax=counts, colors='blue', lw=2, label='vline_single - full height')
+            ax2.tick_params(axis='y', labelcolor=color)
+            plt.show()
+            return kde, a, b, approx_solution, data, fig, ax1, ax2
         
-        
-        ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
-        color = 'tab:blue'
-        ax2.set_ylabel('Probability', color=color)  # we already handled the x-label with ax1
-        plt.vlines(x=repeated_values, ymin=0, ymax=counts, colors='blue', lw=2, label='vline_single - full height')
-        ax2.tick_params(axis='y', labelcolor=color)
-        plt.show()
-        return kde,a,b, approx_solution, data  
+        return kde, a, b, approx_solution, data
