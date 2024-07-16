@@ -10,7 +10,7 @@ from itertools import combinations
 
 class SensitivityIndices(Integrand):
     """
-    Sensitivity' Indicies, normalized Sobol' Indices. 
+    Sensitivity' Indices, normalized Sobol' Indices. 
 
     >>> dnb2 = DigitalNetB2(dimension=3,seed=7)
     >>> keister_d = Keister(dnb2)

@@ -82,7 +82,7 @@ class MLQMCData(AccumulateData):
         self.bias_estimate = 2**(x[1]+self.levels*x[0]) / (2**alpha - 1)
     
     def _add_level(self):
-        """ Add another level to relevent attributes. """
+        """ Add another level to relevant attributes. """
         self.levels += 1
         if self.levels > len(self.n_level):
             self.n_level = hstack((self.n_level,0))
@@ -94,7 +94,7 @@ class MLQMCData(AccumulateData):
             self.var_cost_ratio_level = hstack((self.var_cost_ratio_level,inf))
 
     def _add_level_MLMC(self):
-        """ Add another level to relevent attributes. """
+        """ Add another level to relevant attributes. """
         self.levels += 1
         if not len(self.n_level) > self.levels:
             self.mean_level = hstack((self.mean_level, self.mean_level[-1] / 2**self.alpha))
