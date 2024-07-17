@@ -73,44 +73,18 @@ class TestTrueMeasure(unittest.TestCase):
 class TestGeometricBrownianMotion(unittest.TestCase):
 
     def setUp(self):
-        """
-        Sets up a sampler and the initial conditions for the tests in TestGeometricBrownianMotion.
-
-        The sampler is initialized with a dimension of 4 and a seed of 7.
-
-        The GeometricBrownianMotion instance is initialized with the sampler, a final time of 2, a drift of 0.1,
-        and a diffusion of 0.2.
-        """
         self.sampler = DigitalNetB2(4, seed=7)
-        self.gbm = GeometricBrownianMotion(self.sampler, t_final=2, drift=0.1, diffusion=0.2)
+        self.drift = 0.1
+        self.diffusion = 0.2
+        self.gbm = GeometricBrownianMotion(self.sampler, t_final=2, drift=self.drift, diffusion=self.diffusion)
 
     def test_init(self):
-        """
-        Tests the initialization of the GeometricBrownianMotion instance.
-
-        The test checks several aspects of the GeometricBrownianMotion instance:
-        - The final time (t_final) is correctly set to 2.
-        - The drift is correctly set to 0.1.
-        - The diffusion is correctly set to 0.2.
-        - The range is correctly set to an array from negative infinity to positive infinity.
-        """
         self.assertEqual(self.gbm.t, 2)
         self.assertEqual(self.gbm.drift, 0.1)
         self.assertEqual(self.gbm.diffusion, 0.2)
         self.assertTrue(allclose(self.gbm.range, array([[-inf, inf]])))
 
     def test_init_error(self):
-        """
-        Tests the initialization of the GeometricBrownianMotion instance with invalid parameters.
-
-        The test checks several scenarios where the initialization should fail:
-        - The final time (t_final) is set to a negative value.
-        - The diffusion is set to a negative value.
-        - The initial value is set to a negative value.
-        - The decomposition type (decomp_type) is not 'PCA' or 'Cholesky'.
-
-        In each of these scenarios, the initialization is expected to raise a ValueError.
-        """
         with self.assertRaises(ValueError):
             GeometricBrownianMotion(self.sampler, t_final=-1, drift=0.1, diffusion=0.2)
         with self.assertRaises(ValueError):
@@ -120,6 +94,26 @@ class TestGeometricBrownianMotion(unittest.TestCase):
         with self.assertRaises(ValueError):
             GeometricBrownianMotion(self.sampler, t_final=2, drift=0.1, diffusion=0.2, decomp_type='InvalidType')
 
+    def test_mean(self):
+        expected_mean = self.gbm.initial_value * exp(self.gbm.drift * self.gbm.time_vec)
+        self.assertTrue(allclose(self.gbm.mean_gbm, expected_mean, rtol=1e-8, atol=1e-8))
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_covariance(self):
+        t = self.gbm.time_vec
+        d = self.gbm.d
+        S0 = self.gbm.initial_value
+        mu = self.gbm.drift
+        sigma = self.gbm.diffusion
+        cov_matrix = zeros((d, d))
+        for i in range(d):
+            for j in range(d):
+                mint = min(t[i], t[j])
+                cov_matrix[i, j] = (S0 ** 2) * exp(2 * mu * mint) * (exp(sigma**2 * mint) -1)
+        self.assertTrue(allclose(self.gbm.covariance_gbm, cov_matrix, rtol=1e-8, atol=1e-8))
+
+    def test_covariance_symmetry(self):
+        self.assertTrue(allclose(self.gbm.covariance, self.gbm.covariance.T, rtol=1e-8, atol=1e-8))
+
+    def test_covariance_positive_semidefinite(self):
+        eigenvalues = linalg.eigvals(self.gbm.covariance)
+        self.assertTrue(all(eigenvalues >= -1e-10))  # Allow for small numerical errors
