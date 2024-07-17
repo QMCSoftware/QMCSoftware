@@ -63,3 +63,5 @@ Demos
     demo_rst/plot_proj_function.rst
 
     demo_rst/Argonne_2023_Talk_Figures.rst
+
+    demo_rst/gbm_demo.rst
