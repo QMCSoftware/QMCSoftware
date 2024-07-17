@@ -61,7 +61,7 @@ class AmericanOption(Integrand):
             A = np.vstack([x, np.ones(len(x))]).T
             m, c = np.linalg.lstsq(A, y, rcond=None)[0] #use multilinear regression
             hold_lr=m*self.stock_values[in_money_values,j-1]+c #lr of holding value one more time step
-            exercise=in_money_values
+            exercise = np.copy(in_money_values)
             exercise[in_money_values]=payoff[in_money_values,j-1]>hold_lr
             values[exercise]=payoff[exercise,j-1]
             exercise_time[exercise]=self.t[j-1]
