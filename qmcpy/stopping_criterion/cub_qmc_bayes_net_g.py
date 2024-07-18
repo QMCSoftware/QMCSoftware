@@ -87,7 +87,7 @@ class CubBayesNetG(_CubBayesLDG):
             rel_tol (ndarray): relative error tolerance
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
-            alpha (float): signifcance level or p-value
+            alpha (float): significance level or p-value
             error_fun: function taking in the approximate solution vector,
                 absolute tolerance, and relative tolerance which returns the approximate error.
                 Default indicates integration until either absolute OR relative tolerance is satisfied.

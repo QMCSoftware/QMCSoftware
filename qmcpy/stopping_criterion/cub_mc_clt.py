@@ -136,7 +136,7 @@ class CubMCCLT(StoppingCriterion):
         temp_a = self.data.t_eval ** 0.5
         temp_b = (temp_a * self.data.sighat).sum()
         # samples for computation of the mean
-        # n_mu_temp := n such that confidence intervals width and conficence will be satisfied
+        # n_mu_temp := n such that confidence intervals width and confidence will be satisfied
         tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
         z_star = -norm.ppf(self.alpha / 2.)
         n_mu_temp = ceil(temp_b * (self.data.sighat / temp_a) * (z_star * self.inflate / tol_up)**2)
@@ -146,7 +146,7 @@ class CubMCCLT(StoppingCriterion):
         if self.data.n_total + self.data.n.sum() > self.n_max:
             # cannot generate this many new samples
             warning_s = """
-            Alread generated %d samples.
+            Already generated %d samples.
             Trying to generate %d new samples, which would exceed n_max = %d.
             The number of new samples will be decrease proportionally for each integrand.
             Note that error tolerances may no longer be satisfied.""" \

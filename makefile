@@ -38,6 +38,9 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	@for f in $(nbdir)/*.rst; do \
 		grep -vE "(colab-badge.svg|Open In Colab|colab.research)" $$f > $(nbdir)/tmp.rst && mv $(nbdir)/tmp.rst  $$f; \
 	done
+	# Add slash to * for "**kwargs"
+	find . -name "*.rst" -type f -exec sed -i.bak 's/\*\*kwargs/\\*\\*kwargs/g' {} + && find . -name "*.rst.bak" -delete
+
 
 _uml:
 	# UML Diagrams
@@ -72,28 +75,29 @@ doc_html: _doc _uml
 	@$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)
 
 doc_pdf: _doc _uml
+	@cd $(BUILDDIR) && rm -f qmcpy.pdf
 	@$(SPHINXBUILD) -b latex $(SOURCEDIR) $(BUILDDIR) -W --keep-going  2>/dev/null
-	@cd sphinx/_build && make
+	@cd $(BUILDDIR) && make
 
 doc_epub: _doc _uml
 	@$(SPHINXBUILD) -b epub $(SOURCEDIR) $(BUILDDIR)/epub
 
 doctests:
 	@echo "\nDoctests"
-	python -m coverage run --source=./ -m pytest --doctest-modules qmcpy/* --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --disable-pytest-warnings qmcpy
 
 doctests_no_docker:
 	@echo "\nDoctests Without Docker Containers"
-	python -m coverage run --source=./ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
+	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
 
 fasttests:
 	@echo "\nFastests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
-	
+
 longtests:
 	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
-	
+
 coverage:
 	@echo "\nCode coverage"
 	python -m coverage report -m
@@ -119,16 +123,20 @@ workout:
 	@python workouts/mc_vs_qmc/vary_abs_tol.py | tee workouts/mc_vs_qmc/out/vary_abs_tol.log
 	@python workouts/mc_vs_qmc/vary_dimension.py | tee workouts/mc_vs_qmc/out/vary_dimension.log
 
-exportcondaenv:
+export_conda_env:
 	@-rm -f environment.yml 2>/dev/null &
 	@conda env export --no-builds | grep -v "^prefix: " > environment.yml
 
-conda_doc:
+conda_env:
 	#   Assuming QMCPy repository is cloned locally and the correct branch is checked out
 	@conda env create --file environment.yml
 	@conda activate qmcpy
 	@pip install -e .
 	#   Suggest to run `make tests` to check environment is working
+
+rm_qmcpy_env:
+	@conda deactivate qmcpy
+	@conda remove --name qmcpy --all
 
 gen_doc:
 	#   Compiling QMCPy HTML documentation.

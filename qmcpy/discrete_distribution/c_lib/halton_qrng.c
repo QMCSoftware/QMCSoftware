@@ -87,7 +87,7 @@ static int permTN2[ghaltonMaxDim] =
  *        (generalized Halton (1) or (plain) Halton (0))
  * @param res pointer to the result matrix
  * @param randu_d_32 seeds for random number generator
- * @param dvec dimenions to use
+ * @param dvec dimensions to use
  * @return void
  * @author Marius Hofert based on C. Lemieux's RandQMC
  */

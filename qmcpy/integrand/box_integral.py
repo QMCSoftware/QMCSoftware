@@ -25,7 +25,7 @@ class BoxIntegral(Integrand):
 
     References:
 
-    [1] D.H. Bailey, J.M. Borwein, R.E. Crandall,Box integrals,
+    [1] D.H. Bailey, J.M. Borwein, R.E. Crandall, Box integrals,
     Journal of Computational and Applied Mathematics, Volume 206, Issue 1, 2007, Pages 196-208, ISSN 0377-0427, 
     https://doi.org/10.1016/j.cam.2006.06.010. (https://www.sciencedirect.com/science/article/pii/S0377042706004250) 
     
@@ -38,7 +38,7 @@ class BoxIntegral(Integrand):
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
-            s (list or ndarray): vectorized s parameter, len(s) is the number of vectorized integrals to evalute.
+            s (list or ndarray): vectorized s parameter, len(s) is the number of vectorized integrals to evaluate.
         """
         self.parameters = ['s']
         self.s = array([s]) if isscalar(s) else array(s)
