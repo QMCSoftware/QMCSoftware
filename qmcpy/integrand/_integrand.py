@@ -33,7 +33,7 @@ class Integrand(object):
         self.parallel = 0 if self.parallel==1 else self.parallel
         self.threadpool = threadpool
         if not (hasattr(self, 'sampler') and isinstance(self.sampler,(TrueMeasure,DiscreteDistribution))):
-            raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistributioninstance')
+            raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistribution instance')
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
         if not hasattr(self,'parameters'):
@@ -46,7 +46,7 @@ class Integrand(object):
             self.discrete_distrib = self.true_measure.discrete_distrib
         if self.true_measure.transform!=self.true_measure and \
            not (self.true_measure.range==self.true_measure.transform.range).all():
-            raise ParameterError("The range of the composed transform is not compatibe with this true measure")
+            raise ParameterError("The range of the composed transform is not compatible with this true measure")
         self.EPS = finfo(float).eps
 
     def g(self, t, compute_flags=None, *args, **kwargs):
@@ -178,7 +178,7 @@ class Integrand(object):
         """
         if self.d_indv!=self.d_comb:
             raise ParameterError('''
-                Set bound_fun explicity. 
+                Set bound_fun explicitly. 
                 The default bound_fun is the identity map. 
                 Since individual solution dimension d_indv != combined solution dimension d_comb, 
                 QMCPy cannot infer a reasonable bound function.''')

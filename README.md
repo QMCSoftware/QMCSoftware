@@ -7,7 +7,7 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 
 <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/qmcpy_logo.png?raw=true" alt="QMCPy logo" height=200px width=200px/>
 
-[Homepage](https://qmcsoftware.github.io/QMCSoftware/) ~ [Article](https://arxiv.org/abs/2102.07833) ~ [GitHub](https://github.com/QMCSoftware/QMCSoftware) ~ [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) ~ [PyPI](https://pypi.org/project/qmcpy/) ~ [Blogs](http://qmcpy.wordpress.com/) ~ [DockerHub](https://hub.docker.com/r/alegresor/qmcpy) ~ [Contributing](https://github.com/QMCSoftware/QMCSoftware/blob/master/CONTRIBUTING.md) ~ [Issues](https://github.com/QMCSoftware/QMCSoftware/issues)
+[Homepage](https://qmcsoftware.github.io/QMCSoftware/) ~ [Article](https://arxiv.org/abs/2102.07833) ~ [GitHub](https://github.com/QMCSoftware/QMCSoftware) ~ [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) ~ [PyPI](https://pypi.org/project/qmcpy/) ~ [Blogs](http://qmcpy.wordpress.com/) ~ [Contributing](https://github.com/QMCSoftware/QMCSoftware/blob/master/CONTRIBUTING.md) ~ [Issues](https://github.com/QMCSoftware/QMCSoftware/issues)
 
 ----
 
@@ -106,7 +106,15 @@ https://qmcsoftware.github.io/QMCSoftware/
 
 BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
 
-----
+---
+
+## Video Tutorial
+Please refer to [this video](https://www.youtube.com/watch?v=bRcKiLA2yBQ) for a quick introduction to QMCPy.
+[![Watch the video](https://img.youtube.com/vi/bRcKiLA2yBQ/0.jpg)](https://youtu.be/bRcKiLA2yBQ)
+
+For a more detail introduction refer to [this video](https://www.youtube.com/watch?v=gL8M_7c-YUE).
+[![Watch the video](https://img.youtube.com/vi/gL8M_7c-YUE/0.jpg)](https://youtu.be/gL8M_7c-YUE)
+
 
 ## References
 
@@ -144,13 +152,13 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
 <b>[17]</b> Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
 
-<b>[18]</b> B. D. Keister, Multidimensional Quadrature Algorithms,  'Computers in Physics', *10*, pp. 119-122, 1996.
+<b>[18]</b> B. D. Keister, Multidimensional Quadrature Algorithms,  'Computers in Physics', 10, pp. 119-122, 1996.
 
 <b>[19]</b> L’Ecuyer, Pierre & Munger, David. (2015). LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules. ACM Transactions on Mathematical Software. 42. 10.1145/2754929. 
 
 <b>[20]</b> Fischer, Gregory & Carmon, Ziv & Zauberman, Gal & L’Ecuyer, Pierre. (1999). Good Parameters and Implementations for Combined Multiple Recursive Random Number Generators. Operations Research. 47. 159-164. 10.1287/opre.47.1.159. 
 
-<b>[21]</b> I.M. Sobol', V.I. Turchaninov, Yu.L. Levitan, B.V. Shukhman: "Quasi-Random Sequence Generators" Keldysh Institute of Applied Mathematics, Russian Acamdey of Sciences, Moscow (1992).
+<b>[21]</b> I.M. Sobol', V.I. Turchaninov, Yu.L. Levitan, B.V. Shukhman: "Quasi-Random Sequence Generators" Keldysh Institute of Applied Mathematics, Russian Academy of Sciences, Moscow (1992).
 
 <b>[22]</b> Sobol, Ilya & Asotsky, Danil & Kreinin, Alexander & Kucherenko, Sergei. (2011). Construction and Comparison of High-Dimensional Sobol' Generators. Wilmott. 2011. 10.1002/wilm.10056. 
 
@@ -160,7 +168,7 @@ BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob
 
 <b>[25]</b> Paul Bratley and Bennett L. Fox. 1988. Algorithm 659: Implementing Sobol's quasirandom sequence generator. ACM Trans. Math. Softw. 14, 1 (March 1988), 88–100. DOI:https://doi.org/10.1145/42288.214372
 
-<b>[26]</b> P. L'Ecuyer, P. Marion, M. Godin, and F. Puchhammer, ``A Tool for Custom Construction of QMC and RQMC Point Sets,'' Monte Carlo and Quasi-Monte Carlo Methods 2020.
+<b>[26]</b> P. L'Ecuyer, P. Marion, M. Godin, and F. Puchhammer, "A Tool for Custom Construction of QMC and RQMC Point Sets," Monte Carlo and Quasi-Monte Carlo Methods 2020.
 
 <b>[27]</b> P Kumaraswamy, A generalized probability density function for double-bounded random processes. J. Hydrol. 46, 79–88 (1980).
 

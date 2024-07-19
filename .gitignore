@@ -12,6 +12,8 @@ qmcpy.egg-info/
 .DS_Store
 .idea/
 .pytest_cache/
+demos/prob_failure_gp_ci_plots/
+raw.githubusercontent.com/*
 
 # tests
 .coverage
@@ -36,6 +38,7 @@ sphinx/demo_rst/
 sphinx/md_rst/
 sphinx/uml/
 node_modules/*
+sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
@@ -54,3 +57,7 @@ _ags/*
 
 # Fred's private stuff, not for tracking
 *Fred*
+
+# SC Choi's file exclusion
+.vscode/settings.json
+

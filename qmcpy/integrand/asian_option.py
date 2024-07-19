@@ -38,7 +38,7 @@ class AsianOption(Option):
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
-        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multilevel_dims=None, dim_frac=0):
+        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multilevel_dims=None, decomp_type='PCA', _dim_frac=0):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 

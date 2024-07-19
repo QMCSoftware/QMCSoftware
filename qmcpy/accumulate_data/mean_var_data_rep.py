@@ -3,7 +3,7 @@ from numpy import *
 
 class MeanVarDataRep(AccumulateData):
     """
-    Update and store mean and variance estimates with repliations. 
+    Update and store mean and variance estimates with replications. 
     See the stopping criterion that utilize this object for references.
     """
 
