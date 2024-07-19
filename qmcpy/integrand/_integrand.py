@@ -33,7 +33,7 @@ class Integrand(object):
         self.parallel = 0 if self.parallel==1 else self.parallel
         self.threadpool = threadpool
         if not (hasattr(self, 'sampler') and isinstance(self.sampler,(TrueMeasure,DiscreteDistribution))):
-            raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistributioninstance')
+            raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistribution instance')
         if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
             raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
         if not hasattr(self,'parameters'):
