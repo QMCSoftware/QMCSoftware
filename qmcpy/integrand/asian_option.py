@@ -61,7 +61,8 @@ class AsianOption(Option):
         
         super(AsianOption, self).__init__(sampler, volatility, start_price,
                                           strike_price, interest_rate, t_final,
-                                          call_put, multilevel_dims, dim_frac)
+                                          call_put, multilevel_dims, _dim_frac)
+        self.true_measure = BrownianMotion(self.sampler, self.t_final, decomp_type=decomp_type)
 
     def _get_discounted_payoffs(self, stock_path, dimension):
         """
