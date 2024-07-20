@@ -6,20 +6,14 @@ from ._option import Option
 
 class LookBackOption(Option):
                           
-    def __init__(self, volatility=0.5, start_price=30.0, interest_rate=0.0,
+    def __init__(self, sampler, volatility=0.5, start_price=30.0, interest_rate=0.0,
                  drift=0, n=16, t_final=1, call_put='put', multilevel_dims=None,
-                 _dim_frac=0, observations=10):
-        # handle single vs multilevel
-        if multilevel_dims is not None: # multi-level problem
-            self.sampler = Sobol(self.multilevel_dims)
-        else: # single level problem
-            self.sampler = Sobol(1)
-        
+                 _dim_frac=0, observations=10):      
         self.observations = observations
         self.n = n # Number of samples
         
         # Call super class's constructor to define this class's attributes
-        super(LookBackOption, self).__init__(self.sampler, volatility, start_price,
+        super(LookBackOption, self).__init__(sampler, volatility, start_price,
                                              0, interest_rate,
                                              t_final, call_put, multilevel_dims, _dim_frac)
         
@@ -69,11 +63,10 @@ class LookBackOption(Option):
         return self.d if self.multilevel_dims is None else self.multilevel_dims[level]
         
     def _spawn(self, level, sampler):            
-        return AmericanOption(
+        return LookBackOption(
             sampler = sampler,
             volatility = self.volatility,
             start_price = self.start_price,
-            strike_price = self.strike_price,
             interest_rate = self.interest_rate,
             t_final = self.t_final,
             call_put = self.call_put,

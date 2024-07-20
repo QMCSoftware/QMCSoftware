@@ -7,21 +7,13 @@ from ..true_measure import BrownianMotion
 from ._option import Option
 
 class AmericanOption(Option):
-                          
-    def __init__(self, volatility=0.2, start_price=30.0, strike_price=32.0,
+    def __init__(self, sampler=None, volatility=0.2, start_price=30.0, strike_price=32.0,
                  interest_rate=0.05, n=4096, t_final=1, call_put='put',
                  multilevel_dims=None, _dim_frac=0, observations=52):
-        # handle single vs multilevel
         self.observations = observations # number of time steps KEEP
-        if multilevel_dims is not None: # multi-level problem
-            self.sampler = Sobol(multilevel_dims)
-        else: # single level problem
-            self.sampler = Sobol(self.observations)
-
         self.n = n # Number of samples
-
         self.t = np.linspace(1/self.observations, t_final, self.observations)
-        super(AmericanOption, self).__init__(self.sampler, volatility, start_price,
+        super(AmericanOption, self).__init__(sampler, volatility, start_price,
                                              strike_price, interest_rate, t_final,
                                              call_put, multilevel_dims, _dim_frac)
         
@@ -54,8 +46,6 @@ class AmericanOption(Option):
     def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
         """Overrides the parent's method. Refer to the parent class method for details of original method."""
         self.n = len(x)
-        self.stock_values = self.start_price * np.exp((self.interest_rate - 0.5 * self.volatility**2) *
-                                                    self.t + self.volatility * self.true_measure.gen_samples(self.n))
         return super().f(x, periodization_transform, compute_flags, *args, **kwargs)
 
     def g(self, t):
@@ -80,7 +70,8 @@ class AmericanOption(Option):
     def _dimension_at_level(self, level):
         return self.d if self.multilevel_dims is None else self.multilevel_dims[level]
         
-    def _spawn(self, level, sampler):            
+    def _spawn(self, level, sampler):
+        breakpoint()
         return AmericanOption(
             sampler = sampler,
             volatility = self.volatility,
