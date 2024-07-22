@@ -43,12 +43,8 @@ class AmericanOption(Option):
             exercise_time[exercise]=self.t[j-1]
         return values
 
-    def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
-        """Overrides the parent's method. Refer to the parent class method for details of original method."""
-        self.n = len(x)
-        return super().f(x, periodization_transform, compute_flags, *args, **kwargs)
-
     def g(self, t):
+        self.n = len(t)
         if self.parent:
             raise ParameterError('''
                 Cannot evaluate an integrand with multilevel_dims directly,
