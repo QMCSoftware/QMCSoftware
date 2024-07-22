@@ -79,11 +79,9 @@ class LookBackOption(Integrand):
         return self.d if self.multilevel_dims is None else self.multilevel_dims[level]
         
     def _spawn(self, level, sampler):            
-        return AmericanOption(
-            sampler = sampler,
+        return LookBackOption(
             volatility = self.volatility,
             start_price = self.start_price,
-            strike_price = self.strike_price,
             interest_rate = self.interest_rate,
             t_final = self.t_final,
             call_put = self.call_put,
