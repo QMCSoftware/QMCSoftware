@@ -39,15 +39,11 @@ class LookBackOption(Integrand):
         self.stock_values =self.start_price*np.exp((self.interest_rate-0.5*self.volatility**2)*self.t+self.volatility*self.true_measure.gen_samples(self.n))
         super(LookBackOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)    
         
-    def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
-        """Overrides the parent's method. Refer to the parent class method for details of original method."""
-        self.n = len(x)
-        self.stock_values = self.start_price * np.exp((self.interest_rate - 0.5 * self.volatility**2) *
-                                                    self.t + self.volatility * self.true_measure.gen_samples(self.n))
-        return super().f(x, periodization_transform, compute_flags, *args, **kwargs)
-
     def g(self, t):
         """See abstract method."""
+        self.n = len(t)
+        self.stock_values = self.start_price * np.exp((self.interest_rate - 0.5 * self.volatility**2)
+                                                      * self.t + self.volatility * self.true_measure.gen_samples(self.n))
         self.s = self.start_price * np.exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
             self.true_measure.time_vec + self.volatility * t)
@@ -79,11 +75,9 @@ class LookBackOption(Integrand):
         return self.d if self.multilevel_dims is None else self.multilevel_dims[level]
         
     def _spawn(self, level, sampler):            
-        return AmericanOption(
-            sampler = sampler,
+        return LookBackOption(
             volatility = self.volatility,
             start_price = self.start_price,
-            strike_price = self.strike_price,
             interest_rate = self.interest_rate,
             t_final = self.t_final,
             call_put = self.call_put,
