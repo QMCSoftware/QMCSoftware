@@ -61,6 +61,3 @@ _ags/*
 # SC Choi's file exclusion
 .vscode/settings.json
 
-# Guillem's fixed multilevel stopping criterion
-stopping_criterion/Fixed_multilevel.py
-
