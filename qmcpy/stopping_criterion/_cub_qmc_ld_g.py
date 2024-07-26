@@ -177,27 +177,26 @@ class _CubQMCLDG(StoppingCriterion):
         def kde_evaluate(values):
             """
             Args:
-            values: A vector of n points. 
+                values: A vector of n points. 
+            Returns:
+                densities (vector): the computed probabilities of the values (both discrete and continuous).
+                discrete_values (vector): values whose probability is computed using Probability Mass Function (PMF).
+                cont_values (vector): values whose probability is computed using Probability Density Function (PDF).
             """
             values = atleast_1d(values)
             if values.ndim != 1:
                 raise ParameterError("Values must be a vector of n points.")
             densities = kde_cont.evaluate(values)*prob
-            discrete_indices = []
-            discrete_values = []
-            for i in range(len(values)):
-                if values[i] in repeated_values:
-                    densities[i] = kde_discrete
-                    discrete_indices.append(i)
-                    discrete_values.append(values[i])
-            discrete_indices = array(discrete_indices)
-            discrete_values = array(discrete_values)
-            print("The values from KDE:", densities)
-            if len(discrete_indices) > 0 :
-                values = delete(values,discrete_indices)
-                print("The values whose probability was computed using Probability Mass Function (PMF):", discrete_values)
-            print("The values whose probability was computed using Probability Density Function (PDF):", values)
-
+            discrete_indices = where(isin(values, repeated_values))[0]
+            if(len(discrete_indices) > 0):
+                discrete_values = values[discrete_indices]
+                densities[discrete_indices] = kde_discrete[where(isin(repeated_values,values))[0]]
+                cont_values = delete(values,discrete_indices)
+            else:
+                discrete_values = array([])
+                cont_values = values
+            return densities,unique(discrete_values),unique(cont_values)
+        
         if plot_estimation_flag == True:
             import matplotlib.pyplot as plt
             z = linspace(a,b,100)    
