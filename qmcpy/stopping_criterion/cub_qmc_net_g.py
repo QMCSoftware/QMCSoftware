@@ -2,7 +2,7 @@ from ._cub_qmc_ld_g import _CubQMCLDG
 from ..util import ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
-from ..integrand import Keister, CustomFun, BoxIntegral
+from ..integrand import Keister, CustomFun, BoxIntegral,EuropeanOption
 from numpy import *
 
 
@@ -136,6 +136,14 @@ class CubQMCNetG(_CubQMCLDG):
         graycode        0
         entropy         7
         spawn_key       ()
+    >>> euro = EuropeanOption(DigitalNetB2(16, seed = 7), volatility=0.2, start_price=100, strike_price=100, interest_rate=.05, call_put='call')
+    >>> kde,a,b,approx_solution,data = CubQMCNetG(euro, 1e-3).density_estimation()
+    >>> points = linspace(0,50,5)
+    >>> densities,bool_flags = kde(points)
+    >>> densities
+    array([0.44020081, 0.01665762, 0.00996473, 0.00480693, 0.00201658])
+    >>> bool_flags
+    array([ True, False, False, False, False])
 
     Original Implementation:
 
@@ -201,6 +209,5 @@ class CubQMCNetG(_CubQMCLDG):
             error_fun = error_fun)
         if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False.")
-
 
 class CubQMCSobolG(CubQMCNetG): pass

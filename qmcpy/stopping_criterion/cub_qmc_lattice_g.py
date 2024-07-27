@@ -1,7 +1,7 @@
 from ._cub_qmc_ld_g import _CubQMCLDG
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian, Uniform
-from ..integrand import Keister, BoxIntegral, CustomFun
+from ..integrand import Keister, BoxIntegral, CustomFun,EuropeanOption
 from ..util import ParameterError
 from numpy import *
 
@@ -89,6 +89,14 @@ class CubQMCLatticeG(_CubQMCLDG):
         gen_vec         [     1 182667 469891 498753 110745 446247]
         entropy         7
         spawn_key       ()
+    >>> euro = EuropeanOption(Lattice(16, seed = 7), volatility=0.2, start_price=100, strike_price=100, interest_rate=.05, call_put='call')
+    >>> kde,a,b,approx_solution,data = CubQMCLatticeG(euro, 1e-3).density_estimation()
+    >>> points = linspace(0,50,5)
+    >>> densities,bool_flags = kde(points)
+    >>> densities
+    array([0.44025803, 0.01652437, 0.00989736, 0.00485077, 0.0020364 ])
+    >>> bool_flags
+    array([ True, False, False, False, False])
     
     Original Implementation:
 

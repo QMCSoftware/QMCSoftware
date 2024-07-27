@@ -5,6 +5,8 @@ from ..integrand import Integrand
 from numpy import *
 from time import time
 import warnings
+import scipy as sc
+
 
 
 class _CubQMCLDG(StoppingCriterion):
@@ -156,3 +158,59 @@ class _CubQMCLDG(StoppingCriterion):
         """
         if abs_tol != None: self.abs_tol = abs_tol
         if rel_tol != None: self.rel_tol = rel_tol
+
+    def density_estimation(self, plot_estimation_flag=False):
+        approx_solution, data = self.integrate()
+        g=data.datum[0].y_val
+        if g.ndim != 1:
+            raise ValueError("The KDE only works for single-variate data.")
+        a=min(g)
+        b=max(g)
+        
+        unique_values, counts = unique(g, return_counts=True)
+        repeated_values = unique_values[counts > 1]# Find elements that are repeated (count > 1)
+        values_cont=unique_values[counts==1]
+        kde_discrete=counts[counts > 1]/len(g) #probability of each discrete value
+        prob=len(values_cont)/len(g) #probability of being continous
+        kde_cont=sc.stats.gaussian_kde(values_cont)
+
+        def kde_evaluate(values):
+            """
+            Args:
+                values: A vector of n points. 
+            Returns:
+                densities (vector of length n): the computed probabilities of the values (both discrete and continuous).
+                bool_flags (vector of length n): indicates whether the value is discrete (True) or continuous (False).
+            """
+            values = atleast_1d(values)
+            if values.ndim != 1:
+                raise ParameterError("Values must be a vector of n points.")
+            densities = kde_cont.evaluate(values)*prob
+            discrete_indices = where(isin(values, repeated_values))[0]
+            bool_flags = full(len(values),False,dtype=bool)
+            if(len(discrete_indices) > 0):
+                densities[discrete_indices] = kde_discrete[where(isin(repeated_values,values))[0]]
+                bool_flags[discrete_indices] = True
+
+            return densities,bool_flags
+        
+        if plot_estimation_flag == True:
+            import matplotlib.pyplot as plt
+            z = linspace(a,b,100)    
+            pdf_est = kde_cont.evaluate(z)*prob
+            fig, ax1 = plt.subplots()
+            color = 'tab:red'
+            ax1.set_xlabel('x')
+            ax1.set_ylabel('Density', color=color)
+            ax1.plot(z, pdf_est, color=color)
+            ax1.tick_params(axis='y', labelcolor=color)
+            
+            ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+            color = 'tab:blue'
+            ax2.set_ylabel('Probability', color=color)  # we already handled the x-label with ax1
+            plt.vlines(x=repeated_values, ymin=0, ymax=kde_discrete, colors='blue', lw=2, label='vline_single - full height')
+            ax2.tick_params(axis='y', labelcolor=color)
+
+            return kde_evaluate, a, b, approx_solution, data, fig, array([ax1, ax2])
+        
+        return kde_evaluate, a, b, approx_solution, data

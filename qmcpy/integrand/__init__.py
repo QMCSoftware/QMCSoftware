@@ -11,6 +11,8 @@ from .ishigami import Ishigami
 from .bayesian_lr_coeffs import BayesianLRCoeffs
 from .um_bridge_wrapper import UMBridgeWrapper
 from .genz import Genz
+from .LookBackOption import LookBackOption
+from .AmericanOption import AmericanOption
 from .sin1d import Sin1d
 from .hartmann6d import Hartmann6d
 from .fourbranch2d import FourBranch2d
