@@ -92,13 +92,11 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> euro = EuropeanOption(Lattice(16, seed = 7), volatility=0.2, start_price=100, strike_price=100, interest_rate=.05, call_put='call')
     >>> kde,a,b,approx_solution,data = CubQMCLatticeG(euro, 1e-3).density_estimation()
     >>> points = linspace(0,50,5)
-    >>> densities,discrete_values,cont_values = kde(points)
+    >>> densities,bool_flags = kde(points)
     >>> densities
     array([0.44025803, 0.01652437, 0.00989736, 0.00485077, 0.0020364 ])
-    >>> discrete_values
-    array([0.])
-    >>> cont_values
-    array([12.5, 25. , 37.5, 50. ])
+    >>> bool_flags
+    array([ True, False, False, False, False])
     
     Original Implementation:
 

@@ -179,23 +179,20 @@ class _CubQMCLDG(StoppingCriterion):
             Args:
                 values: A vector of n points. 
             Returns:
-                densities (vector): the computed probabilities of the values (both discrete and continuous).
-                discrete_values (vector): values whose probability is computed using Probability Mass Function (PMF).
-                cont_values (vector): values whose probability is computed using Probability Density Function (PDF).
+                densities (vector of length n): the computed probabilities of the values (both discrete and continuous).
+                bool_flags (vector of length n): indicates whether the value is discrete (True) or continuous (False).
             """
             values = atleast_1d(values)
             if values.ndim != 1:
                 raise ParameterError("Values must be a vector of n points.")
             densities = kde_cont.evaluate(values)*prob
             discrete_indices = where(isin(values, repeated_values))[0]
+            bool_flags = full(len(values),False,dtype=bool)
             if(len(discrete_indices) > 0):
-                discrete_values = values[discrete_indices]
                 densities[discrete_indices] = kde_discrete[where(isin(repeated_values,values))[0]]
-                cont_values = delete(values,discrete_indices)
-            else:
-                discrete_values = array([])
-                cont_values = values
-            return densities,unique(discrete_values),unique(cont_values)
+                bool_flags[discrete_indices] = True
+
+            return densities,bool_flags
         
         if plot_estimation_flag == True:
             import matplotlib.pyplot as plt

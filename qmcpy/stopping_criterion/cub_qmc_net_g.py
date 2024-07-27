@@ -139,13 +139,11 @@ class CubQMCNetG(_CubQMCLDG):
     >>> euro = EuropeanOption(DigitalNetB2(16, seed = 7), volatility=0.2, start_price=100, strike_price=100, interest_rate=.05, call_put='call')
     >>> kde,a,b,approx_solution,data = CubQMCNetG(euro, 1e-3).density_estimation()
     >>> points = linspace(0,50,5)
-    >>> densities,discrete_values,cont_values = kde(points)
+    >>> densities,bool_flags = kde(points)
     >>> densities
     array([0.44020081, 0.01665762, 0.00996473, 0.00480693, 0.00201658])
-    >>> discrete_values
-    array([0.])
-    >>> cont_values
-    array([12.5, 25. , 37.5, 50. ])
+    >>> bool_flags
+    array([ True, False, False, False, False])
 
     Original Implementation:
 
