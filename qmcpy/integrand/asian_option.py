@@ -109,9 +109,6 @@ class AsianOption(Option):
             y_course = self._get_discounted_payoffs(s_course, d_course)
             y -= y_course
         return y
-    
-    def _dimension_at_level(self, level):
-        return self.d if self.multilevel_dims is None else self.multilevel_dims[level]
         
     def _spawn(self, level, sampler):            
         return AsianOption(

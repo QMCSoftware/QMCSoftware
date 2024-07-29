@@ -14,8 +14,8 @@ class LookBackOption(Option):
         
         # Call super class's constructor to define this class's attributes
         super(LookBackOption, self).__init__(sampler, volatility, start_price,
-                                             0, interest_rate,
-                                             t_final, call_put, multilevel_dims, _dim_frac)
+                                             0, interest_rate, t_final,
+                                             call_put, multilevel_dims, _dim_frac)
         
         # Finish defining the rest of the class's attributes
         self.t = np.linspace(0, self.t_final, self.observations)
@@ -40,23 +40,30 @@ class LookBackOption(Option):
         y_adj = y_raw * np.exp(-self.interest_rate * self.t_final)
         return y_adj
 
-    def get_discounted_payoffs(self):
-        payoffs=[]
-        if self.call_put=='call':
+    def _get_discounted_payoffs(self):
+        payoffs = []
+        if self.call_put == 'call':
             for i in range(self.n):
-                strike_price=min(self.stock_values[i,:])
-                payoff=self.stock_values[i,self.observations-1]-strike_price
+                strike_price = min(self.stock_values[i,:])
+                payoff = self.stock_values[i,self.observations-1] - strike_price
                 payoffs.append(payoff)
-        else:
+        else: # put
             for i in range(self.n):
-                strike_price=max(self.stock_values[i,:])
-                payoff=strike_price-self.stock_values[i,self.observations-1]
+                strike_price = max(self.stock_values[i,:])
+                payoff = strike_price - self.stock_values[i,self.observations-1]
                 payoffs.append(payoff)
         return np.mean(payoffs)
-            
     
-    def _dimension_at_level(self, level):
-        return self.d if self.multilevel_dims is None else self.multilevel_dims[level]
+    def get_discounted_payoffs(self):
+        """
+        Wrapper method for the private _get_discounted_payoffs method.
+        Although the user could just call the original method directly,
+        it's better to stick with Python convention and not call the
+        private method directly, but instead through a wrapper. The
+        reason for this is we still want to user to be able use this,
+        while also overriding the abstract method as well.
+        """
+        return self._get_discounted_payoffs()
         
     def _spawn(self, level, sampler):            
         return LookBackOption(
