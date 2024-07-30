@@ -11,7 +11,7 @@ class AmericanOption(Option):
                  interest_rate=0.05, n=4096, t_final=1, call_put='put',
                  multilevel_dims=None, _dim_frac=0, observations=52):
         self.observations = observations # number of time steps KEEP
-        self.n = n # Number of samples
+        self.n = n # Number of samples, Note, this will need to be removed.
         self.t = np.linspace(1/self.observations, t_final, self.observations)
         super(AmericanOption, self).__init__(sampler, volatility, start_price,
                                              strike_price, interest_rate, t_final,
@@ -20,7 +20,6 @@ class AmericanOption(Option):
         
     
     def _get_discounted_payoffs(self):
-        # breakpoint()
         self.stock_values = self.start_price * np.exp((self.interest_rate - 0.5
                                                        * self.volatility**2) * self.t + self.volatility
                                                        * self.true_measure.gen_samples(self.n))
@@ -45,7 +44,6 @@ class AmericanOption(Option):
             exercise[in_money_values] = payoff[in_money_values,j-1] > hold_lr
             values[exercise] = payoff[exercise,j-1]
             exercise_time[exercise] = self.t[j-1]
-        # breakpoint()
         return values
 
     def g(self, t):
@@ -62,10 +60,10 @@ class AmericanOption(Option):
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs()
         if self.dim_fracs > 0:
-            s_course = self.s_fine[:, int(self.dim_fracs - 1):: int(self.dim_fracs)]
-            d_course = float(self.d) / self.dim_fracs
-            y_course = self._get_discounted_payoffs()
-            y -= y_course
+            s_coarse = self.s_fine[:, int(self.dim_fracs - 1):: int(self.dim_fracs)]
+            d_coarse = float(self.d) / self.dim_fracs
+            y_coarse = self._get_discounted_payoffs()
+            y -= y_coarse
         return y
     
     def _spawn(self, level, sampler):
@@ -79,10 +77,3 @@ class AmericanOption(Option):
             t_final = self.t_final,
             call_put = self.call_put,
             _dim_frac = self.dim_fracs[level] if hasattr(self,'dim_fracs') else 0)
-    
-
-
-
-
-
-

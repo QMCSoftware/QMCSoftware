@@ -97,17 +97,18 @@ class AsianOption(Option):
             raise ParameterError('''
                 Cannot evaluate an integrand with multilevel_dims directly,
                 instead spawn some children and evaluate those.''')
-        self.s_fine = self.start_price * exp(
-            (self.interest_rate - self.volatility ** 2 / 2.) *
-            self.true_measure.time_vec + self.volatility * t)
+        self.s_fine = self.start_price * exp((self.interest_rate
+                                              - self.volatility**2 / 2.0)
+                                              * self.true_measure.time_vec
+                                              + self.volatility * t)
         for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
-        y = self._get_discounted_payoffs(self.s_fine,self.d)
+        y = self._get_discounted_payoffs(self.s_fine, self.d)
         if self.dim_fracs > 0:
-            s_course = self.s_fine[:, int(self.dim_fracs - 1):: int(self.dim_fracs)]
-            d_course = float(self.d) / self.dim_fracs
-            y_course = self._get_discounted_payoffs(s_course, d_course)
-            y -= y_course
+            s_coarse = self.s_fine[:, int(self.dim_fracs - 1):: int(self.dim_fracs)]
+            d_coarse = float(self.d) / self.dim_fracs
+            y_coarse = self._get_discounted_payoffs(s_coarse, d_coarse)
+            y -= y_coarse
         return y
         
     def _spawn(self, level, sampler):            
@@ -120,5 +121,5 @@ class AsianOption(Option):
             t_final = self.t_final,
             call_put = self.call_put,
             mean_type = self.mean_type,
-            dim_frac = self.dim_fracs[level] if hasattr(self,'dim_fracs') else 0)
+            _dim_frac = self.dim_fracs[level] if hasattr(self,'dim_fracs') else 0)
     

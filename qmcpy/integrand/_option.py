@@ -10,6 +10,7 @@ class Option(Integrand):
     Option abstract class. DO NOT INSTANTIATE.
     Date Created: 7/10/2024
     Author: Richard E. Varela
+    Email: richardvare13@gmail.com
     """
 
     def __init__(self, sampler, volatility:float, start_price:float,\
