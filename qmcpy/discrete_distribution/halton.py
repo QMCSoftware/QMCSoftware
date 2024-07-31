@@ -233,7 +233,7 @@ class Halton(LD):
             coeff_nrows = ceil(log(self.n_lim,base))
             rep_vec = tile(vec,(coeff_nrows,1)) # repeat vec coeff_nrows times
             base_pwrN = base ** (array(range(coeff_nrows),dtype=uint64).reshape(coeff_nrows, 1)) # base ^ (0:coeff_nrows-1)
-            coeffs = ((rep_vec/base_pwrN).astype(int)) % base # Generate Coeefs by Div with base_pwrN & mod with base 
+            coeffs = ((rep_vec/base_pwrN).astype(int)) % base # Generate Coeffs by Div with base_pwrN & mod with base 
             scr_ds_coeffs = coeffs
             if self.LMS:       
                 scr_ds_coeffs = dot(self.scr_matrix[j], coeffs) % base # Dot product of scrambling matrix & coeffs
@@ -267,7 +267,7 @@ class Halton(LD):
             raise ParameterError("Halton requires n_max <= 2^32.")
         n = int(n_max-n_min)
         if n_min == 0 and self.randomize is False and warn:
-            warnings.warn("Unradnzomied Halton includes the origin as the first point.")
+            warnings.warn("Unrandomized Halton includes the origin as the first point.")
         if(self.randomize == 'LMS' and warn):
             warnings.warn("LMS Halton includes the origin as the first point.")
         if self.backend=='QRNG':

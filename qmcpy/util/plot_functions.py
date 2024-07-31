@@ -25,7 +25,7 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
         plt.style.use(os.path.join(dir_path, "../qmcpy.mplstyle"))
         from matplotlib import colors
     except:
-        raise ImportError("Missing matplotlib.pyplot as plt, Matplotlib must be intalled to run plot_proj function")
+        raise ImportError("Missing matplotlib.pyplot as plt, Matplotlib must be installed to run plot_proj function")
     n = atleast_1d(n)
     d_horizontal = atleast_1d(d_horizontal)
     d_vertical = atleast_1d(d_vertical)

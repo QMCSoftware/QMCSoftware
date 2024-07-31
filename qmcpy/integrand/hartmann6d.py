@@ -22,6 +22,8 @@ class Hartmann6d(Integrand):
         super(Hartmann6d,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
         from botorch.test_functions.multi_fidelity import AugmentedHartmann
         self.ah = AugmentedHartmann(negate=False)
+
+        
     def g(self, t):
         import torch
         t = hstack([t,ones((len(t),1))])

@@ -100,7 +100,7 @@ class _CubBayesLDG(StoppingCriterion):
                     continue
                 slice_yj = (0, slice(None),) + j
                 if type(self.discrete_distrib).__name__ == 'DigitalNetB2':
-                    y_val = ycvnext[slice_yj].copy()  # to statisfy C_CONTIGUOUS
+                    y_val = ycvnext[slice_yj].copy()  # to satisfy C_CONTIGUOUS
                 else:
                     y_val = ycvnext[slice_yj]
 
