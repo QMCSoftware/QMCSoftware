@@ -4,9 +4,10 @@ from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
 from numpy import *
 from scipy.stats import norm 
+from ._option import Option
 
 
-class EuropeanOption(Integrand):
+class EuropeanOption(Option):
     """
     European financial option. 
 
@@ -31,8 +32,8 @@ class EuropeanOption(Integrand):
     9.211452976234058
     """
                           
-    def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35,
-        interest_rate=0, t_final=1, call_put='call'):
+    def __init__(self, sampler, volatility=0.5, start_price=30.0, strike_price=35.0,
+        interest_rate=0.0, t_final=1, call_put='call'):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
@@ -45,18 +46,9 @@ class EuropeanOption(Integrand):
             t_final (float): exercise time
             call_put (str): 'call' or 'put' option
         """
-        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
-        self.t_final = t_final
-        self.sampler = sampler
-        self.true_measure = BrownianMotion(self.sampler,t_final=self.t_final)
-        self.volatility = float(volatility)
-        self.start_price = float(start_price)
-        self.strike_price = float(strike_price)
-        self.interest_rate = float(interest_rate)
-        self.call_put = call_put.lower()
-        if self.call_put not in ['call','put']:
-            raise ParameterError("call_put must be either 'call' or 'put'")
-        super(EuropeanOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)  
+        super(EuropeanOption, self).__init__(sampler, volatility, start_price,
+                                          strike_price, interest_rate, t_final,
+                                          call_put, multilevel_dims=None, dim_frac=1)
 
     def g(self, t):
         """ See abstract method. """
@@ -97,10 +89,10 @@ class EuropeanOption(Integrand):
     
     def _spawn(self, level, sampler):
         return EuropeanOption(
-            sampler=sampler,
-            volatility=self.volatility,
-            start_price=self.start_price,
-            strike_price=self.strike_price,
-            interest_rate=self.interest_rate,
-            t_final=self.t_final,
-            call_put=self.call_put)
+            sampler = sampler,
+            volatility = self.volatility,
+            start_price = self.start_price,
+            strike_price = self.strike_price,
+            interest_rate = self.interest_rate,
+            t_final = self.t_final,
+            call_put = self.call_put)
