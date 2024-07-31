@@ -10,32 +10,32 @@ class TestIntegrand(unittest.TestCase):
     def test_abstract_methods(self):
         d = 2
         integrands = [
-            AsianOption(DigitalNetB2(d),call_put='call',mean_type='arithmetic'),
-            AsianOption(DigitalNetB2(d),call_put='put',mean_type='arithmetic'),
-            AsianOption(DigitalNetB2(d),call_put='call',mean_type='geometric'),
-            AsianOption(DigitalNetB2(d),call_put='put',mean_type='geometric'),
-            BoxIntegral(DigitalNetB2(d),s=1),
-            BoxIntegral(DigitalNetB2(d),s=[3,5,7]),
-            CustomFun(Uniform(DigitalNetB2(d)),lambda x: x.prod(1)),
-            CustomFun(Uniform(Kumaraswamy(SciPyWrapper(DigitalNetB2(d),[scipy.stats.triang(c=.1),scipy.stats.uniform()]))),lambda x: x.prod(1)),
-            CustomFun(Gaussian(DigitalNetB2(2)),lambda x,compute_flags=None: x,dimension_indv=d),
-            EuropeanOption(DigitalNetB2(d),call_put='call'),
-            EuropeanOption(DigitalNetB2(d),call_put='put'),
-            Keister(DigitalNetB2(d)),
-            Keister(Gaussian(DigitalNetB2(d))),
-            Keister(BrownianMotion(Kumaraswamy(DigitalNetB2(d)))),
-            Linear0(DigitalNetB2(d)),
+            AsianOption(DigitalNetB2(d,seed=7),call_put='call',mean_type='arithmetic'),
+            AsianOption(DigitalNetB2(d,seed=7),call_put='put',mean_type='arithmetic'),
+            AsianOption(DigitalNetB2(d,seed=7),call_put='call',mean_type='geometric'),
+            AsianOption(DigitalNetB2(d,seed=7),call_put='put',mean_type='geometric'),
+            BoxIntegral(DigitalNetB2(d,seed=7),s=1),
+            BoxIntegral(DigitalNetB2(d,seed=7),s=[3,5,7]),
+            CustomFun(Uniform(DigitalNetB2(d,seed=7)),lambda x: x.prod(1)),
+            CustomFun(Uniform(Kumaraswamy(SciPyWrapper(DigitalNetB2(d,seed=7),[scipy.stats.triang(c=.1),scipy.stats.uniform()]))),lambda x: x.prod(1)),
+            CustomFun(Gaussian(DigitalNetB2(2,seed=7)),lambda x,compute_flags=None: x,dimension_indv=d),
+            EuropeanOption(DigitalNetB2(d,seed=7),call_put='call'),
+            EuropeanOption(DigitalNetB2(d,seed=7),call_put='put'),
+            Keister(DigitalNetB2(d,seed=7)),
+            Keister(Gaussian(DigitalNetB2(d,seed=7))),
+            Keister(BrownianMotion(Kumaraswamy(DigitalNetB2(d,seed=7)))),
+            Linear0(DigitalNetB2(d,seed=7)),
         ]
         for ao_ml_dim in [[2,4,8],[3,5]]:
-            ao_og = AsianOption(DigitalNetB2(d),multilevel_dims=ao_ml_dim)
+            ao_og = AsianOption(DigitalNetB2(d,seed=7),multilevel_dims=ao_ml_dim)
             ao_spawns = ao_og.spawn(levels=arange(len(ao_ml_dim)))
             for ao_spawn,true_d in zip(ao_spawns,ao_ml_dim):
                 self.assertTrue(ao_spawn.d==true_d)
             integrands += ao_spawns
             s = str(ao_og)
         for ml_option in [
-            MLCallOptions(DigitalNetB2(d),option='european'),
-            MLCallOptions(BrownianMotion(DigitalNetB2(d)),option='asian'),
+            MLCallOptions(DigitalNetB2(d,seed=7),option='european'),
+            MLCallOptions(BrownianMotion(DigitalNetB2(d,seed=7)),option='asian'),
             ]:
             for levels in [[0,1],[3,5,7]]:
                 ml_spawns = ml_option.spawn(levels=levels)
