@@ -3,9 +3,10 @@ from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
 from numpy import *
+from ._option import Option
 
 
-class AsianOption(Integrand):
+class AsianOption(Option):
     """
     Asian financial option. 
 
@@ -53,38 +54,15 @@ class AsianOption(Integrand):
                 Leave as None for single-level problems
             _dim_frac (float): for internal use only, users should not set this parameter. 
         """
-        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate','mean_type']
-        self.sampler = sampler
-        self.true_measure = BrownianMotion(self.sampler,t_final,decomp_type=decomp_type)
-        self.volatility = float(volatility)
-        self.start_price = float(start_price)
-        self.strike_price = float(strike_price)
-        self.interest_rate = float(interest_rate)
-        self.t_final = t_final
-        self.decomp_type = decomp_type
-        self.call_put = call_put.lower()
-        if self.call_put not in ['call','put']:
-            raise ParameterError("call_put must be either 'call' or 'put'")
+
         self.mean_type = mean_type.lower()
         if self.mean_type not in ['arithmetic','geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
-        # handle single vs multilevel
-        self.multilevel_dims = multilevel_dims
-        if self.multilevel_dims is not None: # multi-level problem
-            self.dim_fracs = array(
-                [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
-                for i in range(1,len(self.multilevel_dims))],
-                dtype=float)
-            self.max_level = len(self.multilevel_dims)-1
-            self.leveltype = 'fixed-multi'
-            self.parent = True
-            self.parameters += ['multilevel_dims']
-        else: # single level problem
-            self.dim_frac = _dim_frac
-            self.leveltype = 'single'
-            self.parent = False
-            self.parameters += ['dim_frac']
-        super(AsianOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)    
+        
+        super(AsianOption, self).__init__(sampler, volatility, start_price,
+                                          strike_price, interest_rate, t_final,
+                                          call_put, multilevel_dims, _dim_frac)
+        self.true_measure = BrownianMotion(self.sampler, self.t_final, decomp_type=decomp_type)
 
     def _get_discounted_payoffs(self, stock_path, dimension):
         """
@@ -119,21 +97,19 @@ class AsianOption(Integrand):
             raise ParameterError('''
                 Cannot evaluate an integrand with multilevel_dims directly,
                 instead spawn some children and evaluate those.''')
-        self.s_fine = self.start_price * exp(
-            (self.interest_rate - self.volatility ** 2 / 2.) *
-            self.true_measure.time_vec + self.volatility * t)
+        self.s_fine = self.start_price * exp((self.interest_rate
+                                              - self.volatility**2 / 2.0)
+                                              * self.true_measure.time_vec
+                                              + self.volatility * t)
         for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
-        y = self._get_discounted_payoffs(self.s_fine,self.d)
-        if self.dim_frac > 0:
-            s_course = self.s_fine[:, int(self.dim_frac - 1):: int(self.dim_frac)]
-            d_course = float(self.d) / self.dim_frac
-            y_course = self._get_discounted_payoffs(s_course, d_course)
-            y -= y_course
+        y = self._get_discounted_payoffs(self.s_fine, self.d)
+        if self.dim_fracs > 0:
+            s_coarse = self.s_fine[:, int(self.dim_fracs - 1):: int(self.dim_fracs)]
+            d_coarse = float(self.d) / self.dim_fracs
+            y_coarse = self._get_discounted_payoffs(s_coarse, d_coarse)
+            y -= y_coarse
         return y
-    
-    def _dimension_at_level(self, level):
-        return self.d if self.multilevel_dims is None else self.multilevel_dims[level]
         
     def _spawn(self, level, sampler):            
         return AsianOption(
