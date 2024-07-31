@@ -2,7 +2,6 @@ import numpy as np
 import time
 from copy import copy
 from inspect import signature
-import math
 
 #Make a function for double integral, single integral, and kernel
 #Cut down on the copies for x
@@ -140,10 +139,10 @@ def discrepancy(method, x, weight = 1):
             double_integral = (1 + (weight/3)).prod(axis=0)
             single_integral = ((1 + (weight*(1 - x**2)/2))).prod(axis=1)
             kernel = (1 + weight*(1 - np.maximum(X_expanded, Y))).prod(axis=2)
-        #elif method.lower() == "s" or method.lower() == "star":        #L2star
-        #    double_integral = (1/3)**d
-        #    single_integral = ((1-x**2)/2).prod(axis=1)
-        #    kernel = (1 - np.maximum(X_expanded, Y)).prod(axis=2)
+        elif method.lower() == "s" or method.lower() == "star":        #L2star
+            double_integral = (1/3)**d
+            single_integral = ((1-x**2)/2).prod(axis=1)
+            kernel = (1 - np.maximum(X_expanded, Y)).prod(axis=2)
         elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':         #Centered
             double_integral = (13/12)**d
             single_integral = (1 + (.5*abs(x - .5)) - (.5*((x -.5)**2))).prod(axis=1)
@@ -187,7 +186,7 @@ def discrepancy2(method, x, weight = 1, limiter = 2**16, Time = False):
     iterated_X = []
     iterated_X_expanded = []
     iterated_Y = []
-    n_chunks = int(n/limiter) + 1
+    n_chunks = int(np.ceil(n/limiter))
     for i_1 in range(int(n/limiter)+1):               #These 4 lines are used to make these lists into chunks
         iterated_X = iterated_X + [x[i_1*limiter: (i_1+1)*limiter, :]]
         iterated_X_expanded = iterated_X_expanded + [X_expanded[:, i_1*limiter: (i_1+1)*limiter, :]]
