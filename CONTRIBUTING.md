@@ -22,7 +22,7 @@ conda activate qmcpy
 pip install -e .
 ~~~
 
-Doctests and unittests take a few minute to run with
+Doctests and unittests take a few minutes to run with
 
 ~~~
 make tests_no_docker
