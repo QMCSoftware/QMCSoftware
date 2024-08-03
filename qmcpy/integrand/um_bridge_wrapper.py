@@ -103,7 +103,7 @@ class UMBridgeWrapper(Integrand):
         [1] UM-Bridge documentation. https://um-bridge-benchmarks.readthedocs.io/en/docs/index.html
     """
 
-    def __init__(self, true_measure, model, config={}, parallel=False):
+    def __init__(self, true_measure, model, config={}, parallel=False, tf_input_to_umbridge_input = lambda t: t):
         """
         See https://um-bridge-benchmarks.readthedocs.io/en/docs/umbridge/clients.html
         
@@ -126,10 +126,11 @@ class UMBridgeWrapper(Integrand):
         self.parallel = parallel
         self.d_in_umbridge =  append(0,cumsum(self.model.get_input_sizes(self.config)))
         self.n_d_in_umbridge = len(self.d_in_umbridge)-1
-        if self.d_in_umbridge[-1]!=self.true_measure.d:
-            raise ParameterError("sampler dimension must equal the sum of UMBridgeWrapper input sizes.")
+        #if self.d_in_umbridge[-1]!=self.true_measure.d:
+        #    raise ParameterError("sampler dimension must equal the sum of UMBridgeWrapper input sizes.")
         self.d_out_umbridge = append(0,cumsum(self.model.get_output_sizes(self.config)))
         self.n_d_out_umbridge = len(self.d_out_umbridge)-1
+        self.tf_input_to_umbridge_input = tf_input_to_umbridge_input
         super(UMBridgeWrapper,self).__init__(
             dimension_indv = int(self.d_out_umbridge[-1]),
             dimension_comb = int(self.d_out_umbridge[-1]),
@@ -141,7 +142,8 @@ class UMBridgeWrapper(Integrand):
         y = zeros((n,self.d_indv[0]),dtype=float)
         for i in range(n):
             ti_ll = [t[i,self.d_in_umbridge[j]:self.d_in_umbridge[j+1]].tolist() for j in range(self.n_d_in_umbridge)]
-            yi_ll = self.model.__call__(ti_ll,self.config)
+            tf_ti_ll = self.tf_input_to_umbridge_input(ti_ll)
+            yi_ll = self.model.__call__(tf_ti_ll,self.config)
             for j,yi_l in enumerate(yi_ll): y[i,self.d_out_umbridge[j]:self.d_out_umbridge[j+1]] = yi_l if len(yi_l)>1 else yi_l[0]
         return y
     
@@ -163,3 +165,4 @@ class UMBridgeWrapper(Integrand):
             list: list of lists with sub-list lengths specified by model.get_output_sizes(self.config)
         """
         return [attr[self.d_out_umbridge[j]:self.d_out_umbridge[j+1]].tolist() for j in range(self.n_d_out_umbridge)]
+    
