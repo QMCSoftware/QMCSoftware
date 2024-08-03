@@ -186,13 +186,13 @@ class Integrand(object):
 
     def dependency(self, comb_flags):
         """
-        Takes a vector of indicators of weather of not
+        Takes a vector of indicators of whether of not
         the error bound is satisfied for combined integrands and which returns flags for individual integrands.
         For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio
         has not been approximated to within the tolerance, so the dependency function should return [True,True]
         indicating that both the numerator and denominator integrands need to be better approximated.
         Args:
-            comb_flags (bool ndarray): flags indicating weather the combined integrals are insufficiently approximated
+            comb_flags (bool ndarray): flags indicating whether the combined integrals are insufficiently approximated
 
         Return:
             (bool ndarray): length (Integrand.d_indv) flags for individual integrands
