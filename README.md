@@ -41,7 +41,7 @@ $$g(X)=\pi^{d/2}\cos(\lVert X \rVert)$$
 
 where $X \sim \mathcal{N}(\boldsymbol{0},\boldsymbol{I}/2)$.
 
-We may choose a Sobol' discrete distribution with a corresponding Sobol' cubature stopping criterion to preform quasi-Monte Carlo integration.
+We may choose a Sobol' discrete distribution with a corresponding Sobol' cubature stopping criterion to perform quasi-Monte Carlo integration.
 
 ```python
 import qmcpy as qp
@@ -104,7 +104,7 @@ QMCPy: A quasi-Monte Carlo Python Library. Working. 2020.
 https://qmcsoftware.github.io/QMCSoftware/
 ~~~
 
-BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
+BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib).
 
 ---
 

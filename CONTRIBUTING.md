@@ -2,11 +2,11 @@
 
 Thank you for your interest in contributing to the QMCPy package!
 
-Please submit **pull requests** to the `develop` branch and **issues** using a template from `.github/ISSUE_TEMPLATE/`
+Please submit **pull requests** to the `develop` branch and **issues** using a template from `.github/ISSUE_TEMPLATE/`.
 
-If you develop a new component please consider writing a blog for [qmcpy.org](https://qmcpy.org)
+If you develop a new component, please consider writing a blog for [qmcpy.org](https://qmcpy.org).
 
-Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com)
+Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com).
 
 
 ## Installation 
