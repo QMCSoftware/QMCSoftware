@@ -60,7 +60,7 @@ def kernel2(theta, r, xun):
 # gaussian random function
 def f_rand(xpts, rfun, a, b, c, seed):
     dim = xpts.shape[1]
-    np.random.seed(seed)  # initialize random number generator for reproducability
+    np.random.seed(seed)  # initialize random number generator for reproducibility
     N1 = int(2 ** np.floor(16 / dim))
     Nall = N1 ** dim
     kvec = np.zeros([dim, Nall])  # initialize kvec
