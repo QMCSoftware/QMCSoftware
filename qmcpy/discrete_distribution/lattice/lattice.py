@@ -152,7 +152,7 @@ class Lattice(LD):
         if isinstance(generating_vector,ndarray):
             self.gen_vec_og = generating_vector
             if d_max is None or m_max is None:
-                raise ParameterError("d_max and m_max must be supplied when generating_vector is a ndarray")
+                raise ParameterError("d_max and m_max must be supplied when generating_vector is an ndarray")
             self.d_max = d_max
             self.m_max = m_max
         elif isinstance(generating_vector,int):

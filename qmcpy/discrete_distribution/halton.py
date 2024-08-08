@@ -110,7 +110,7 @@ class Halton(LD):
         Args:
             dimension (int or ndarray): dimension of the generator. 
                 If an int is passed in, use sequence dimensions [0,...,dimensions-1].
-                If a ndarray is passed in, use these dimension indices in the sequence. 
+                If an ndarray is passed in, use these dimension indices in the sequence. 
             randomize (str/bool): select randomization method from 
                 'QRNG"   [1], (max dimension = 360, supports generalize=True, default if randomize=True) or 
                 'OWEN'   [2], (max dimension = 1000) or

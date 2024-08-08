@@ -196,7 +196,7 @@ class DigitalNetB2(LD):
         if isinstance(generating_matrices,ndarray):
             self.z_og = generating_matrices
             if d_max is None or t_max is None or m_max is None or msb is None:
-                raise ParameterError("d_max, t_max, m_max, and msb must be supplied when generating_matrices is a ndarray")
+                raise ParameterError("d_max, t_max, m_max, and msb must be supplied when generating_matrices is an ndarray")
             self.d_max = d_max
             self.t_max = t_max
             self.m_max = m_max

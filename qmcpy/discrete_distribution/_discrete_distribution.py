@@ -9,7 +9,7 @@ class DiscreteDistribution(object):
         Args:
             dimension (int or ndarray): dimension of the generator.
                 If an int is passed in, use sequence dimensions [0,...,dimensions-1].
-                If a ndarray is passed in, use these dimension indices in the sequence.
+                If an ndarray is passed in, use these dimension indices in the sequence.
                 Note that this is not relevant for IID generators.
             seed (int or numpy.random.SeedSequence): seed to create random number generator
         """
