@@ -54,7 +54,7 @@ class Option(Integrand):
             self.dim_fracs = dim_frac
             self.leveltype = 'single'
             self.parent = False
-            self.parameters.append('dim_frac') # self.parameters += ['dim_frac']
+            self.parameters.append('dim_fracs') # self.parameters += ['dim_frac']
 
         super(Option, self).__init__(dimension_indv=1, dimension_comb=1, parallel=False)
 
