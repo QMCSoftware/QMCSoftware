@@ -16,6 +16,7 @@ QMCPy Documentation
    license
    algorithms
    demos
+   widgets
 
 
 Indices and tables

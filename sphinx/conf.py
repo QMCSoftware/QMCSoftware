@@ -70,6 +70,10 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.githubpages",
     "sphinx_markdown_tables",
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
+    'jupyter_sphinx',
+
     # "sphinx.ext.autosummary",
     # "numpydoc" # to eliminate WARNING: Unexpected section title. Uncomment will surface randint documentation
     ]
