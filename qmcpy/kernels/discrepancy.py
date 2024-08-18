@@ -25,16 +25,16 @@ def double_integral(method, weight, d):
             return (1 + (weight/3)).prod(axis=0)
         elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':
             # ^^^ function for centered double integral
-            return (weight*(13/12)).prod(axis=0)
+            return (13/12).prod(axis=0)
         elif method.lower() == "sy" or method.lower() == "symmetric":
             # ^^^ function for symmetric double integral
-            return (weight*(4/3)).prod(axis=0)
+            return (4/3).prod(axis=0)
         elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
             # ^^^ function for wrap around double integral
-            return -(weight * 4/3).prod(axis=0)
+            return -((4/3).prod(axis=0))
         elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':
             # ^^^ function for mixture double integral
-            return (weight*(19/12)).prod(axis=0)
+            return (19/12).prod(axis=0)
         elif type(method) is float or type(method) is int:
             # ^^^ incase if user puts in fixed value.
             return method
