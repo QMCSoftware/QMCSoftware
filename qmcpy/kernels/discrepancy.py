@@ -23,18 +23,21 @@ def double_integral(method, weight, d):
         if method.lower() == "l2" or method.lower() == "l2star":
             # ^^^ function for l2star double integral
             return (1 + (weight/3)).prod(axis=0)
+        elif method.lower == "s" or method.lower() == "star":
+            # ^^^ function for star double integral
+            return (1/3)**d
         elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':
             # ^^^ function for centered double integral
-            return (13/12).prod(axis=0)
+            return (13/12)**d
         elif method.lower() == "sy" or method.lower() == "symmetric":
             # ^^^ function for symmetric double integral
-            return (4/3).prod(axis=0)
+            return (4/3)**d
         elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
             # ^^^ function for wrap around double integral
-            return -((4/3).prod(axis=0))
+            return -((4/3)**d)
         elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':
             # ^^^ function for mixture double integral
-            return (19/12).prod(axis=0)
+            return (19/12)**d
         elif type(method) is float or type(method) is int:
             # ^^^ incase if user puts in fixed value.
             return method
@@ -56,6 +59,9 @@ def single_integral(method, x, weight):
         if method.lower() == "l2" or method.lower() == "l2star":
             # ^^^ function for l2star single integral
             return ((1 + (weight*(1 - x**2)/2))).prod(axis=1)
+        elif method.lower() == "s" or method.lower() == "star":
+            # ^^^ function for star single integral
+            return ((1-(x**2))/2).prod(axis=1)
         elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':
             # ^^^ function for centered single integral
             return (1 + (.5*abs(x - .5)) - (.5*((x -.5)**2))).prod(axis=1)
@@ -89,6 +95,9 @@ def kernel(method, weight, x, y):
         if method.lower() == "l2" or method.lower() == "l2star":
             # ^^^ function for l2star kernel
             return (1 + weight*(1 - np.maximum(x, y))).prod(axis=2)
+        elif method.lower() == "s" or method.lower() == "star":
+            # ^^^ function for star kernel
+            return (1 - np.maximum(x,y)).prod(axis = 2)
         elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':
             # ^^^ function for centered kernel
             return (1 + (.5*abs(x - .5)) + (.5*abs(y - .5)) - (.5*abs(x - y))).prod(axis=2)
