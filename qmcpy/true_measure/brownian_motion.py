@@ -28,7 +28,7 @@ class BrownianMotion(Gaussian):
 
     def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA'):
         """
-        BrowianMotion(t) = (initial_value) + (drift)*t + \sqrt{diffusion}*StandardBrownianMotion(t)
+        BrownianMotion(t) = (initial_value) + (drift)*t + \sqrt{diffusion}*StandardBrownianMotion(t)
 
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 

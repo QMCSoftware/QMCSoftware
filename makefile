@@ -38,6 +38,9 @@ _doc: # gets run by sphinx/conf.py so we don't need to commit files in $(mddir) 
 	@for f in $(nbdir)/*.rst; do \
 		grep -vE "(colab-badge.svg|Open In Colab|colab.research)" $$f > $(nbdir)/tmp.rst && mv $(nbdir)/tmp.rst  $$f; \
 	done
+	# Add slash to * for "**kwargs"
+	find . -name "*.rst" -type f -exec sed -i.bak 's/\*\*kwargs/\\*\\*kwargs/g' {} + && find . -name "*.rst.bak" -delete
+
 
 _uml:
 	# UML Diagrams
@@ -90,11 +93,11 @@ doctests_no_docker:
 fasttests:
 	@echo "\nFastests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
-	
+
 longtests:
 	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
-	
+
 coverage:
 	@echo "\nCode coverage"
 	python -m coverage report -m

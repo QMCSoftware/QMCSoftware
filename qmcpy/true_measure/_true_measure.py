@@ -16,7 +16,7 @@ class TrueMeasure(object):
             self.parameters = []
     
     def _parse_sampler(self, sampler):
-        self.sub_comptibility_error = False
+        self.sub_compatibility_error = False
         if isinstance(sampler,DiscreteDistribution):
             self.transform = self # this is the initial transformation, \Psi_0
             self.d = sampler.d # take the dimension from the discrete distribution
@@ -33,8 +33,8 @@ class TrueMeasure(object):
             self.d = sampler.d # take the dimension from the sub-sampler (composed transform)
             self.discrete_distrib = self.transform.discrete_distrib
             if (self.domain!=self.transform.range).any():
-                self.sub_comptibility_error = True
-            if self.transform.sub_comptibility_error:
+                self.sub_compatibility_error = True
+            if self.transform.sub_compatibility_error:
                 raise ParameterError("The sub-transform domain must match the sub-sub-transform range.")
         else:
             raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure")
@@ -65,7 +65,7 @@ class TrueMeasure(object):
         Returns:
             ndarray: n x d matrix of transformed x.  
         """
-        if self.sub_comptibility_error:
+        if self.sub_compatibility_error:
             raise ParameterError("The transform domain must match the sub-transform range.")
         if self.transform == self: # is \Psi_0
             return self._transform(x)
@@ -99,7 +99,7 @@ class TrueMeasure(object):
 
         Note: If transform is T, then the Jacobian of T is 1/lambda(T(x)) for
         """
-        if self.sub_comptibility_error:
+        if self.sub_compatibility_error:
             raise ParameterError("The transform domain must match the sub-transform range.")
         if self.transform == self: # is \Psi_0
             t = self._transform(x)

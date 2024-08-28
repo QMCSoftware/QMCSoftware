@@ -55,7 +55,7 @@ class MeanVarData(AccumulateData):
         self.muhat = full(self.levels, inf)  # sample mean
         self.sighat = full(self.levels, inf)  # sample standard deviation
         self.t_eval = zeros(self.levels)  # processing time for each integrand
-        self.n = tile(n_init, self.levels) # currnet number of samples
+        self.n = tile(n_init, self.levels) # current number of samples
         self.n_total = 0  # total number of samples
         self.confid_int = array([-inf, inf])  # confidence interval for solution
         super(MeanVarData,self).__init__()
@@ -74,12 +74,12 @@ class MeanVarData(AccumulateData):
                     cvdata[:,i] = self.cv[i].f(samples).squeeze()
                 cvmuhats = cvdata.mean(0)
                 if not hasattr(self,'beta_hat'):
-                    # approximate control varite coefficient
+                    # approximate control variate coefficient
                     x4beta = cvdata-cvmuhats[None,:]
                     y4beta = y-y.mean()
                     self.beta_hat = linalg.lstsq(x4beta,y4beta,rcond=None)[0].reshape((-1,1))
                 cvterm = self.beta_hat.T@(cvdata-self.cv_mu.T).T
-                y = y-cvterm.squeeze() # use control variates and apprixmated coefficient to 
+                y = y-cvterm.squeeze() # use control variates and approximated coefficient to 
             self.t_eval[l] = max( (time()-t_start)/self.n[l], self.EPS) 
             self.sighat[l] = y.std() # compute the sample standard deviation
             self.muhat[l] = y.mean() # compute the sample mean
