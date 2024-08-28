@@ -52,14 +52,14 @@ class DigitalNetB2(LD):
            [0.375, 0.375, 0.625],
            [0.875, 0.875, 0.125]])
     >>> DigitalNetB2(dimension = 3, randomize = 'OWEN', seed = 5).gen_samples(8)
-    array([[0.16797743, 0.52917488, 0.150332  ],
-           [0.88050507, 0.22028542, 0.69524159],
-           [0.44555438, 0.42452594, 0.90916643],
-           [0.65496871, 0.84248501, 0.28065072],
-           [0.03423037, 0.04998978, 0.46032102],
-           [0.78941141, 0.69821019, 0.75759427],
-           [0.33468515, 0.87912001, 0.55234822],
-           [0.55051458, 0.25014103, 0.09323185]])
+    array([[0.24118295, 0.89903664, 0.14727803],
+           [0.66797743, 0.02917488, 0.650332  ],
+           [0.44025253, 0.36014271, 0.8476208 ],
+           [0.94555438, 0.67452594, 0.40916643],
+           [0.07748435, 0.17124251, 0.26532536],
+           [0.53423037, 0.79998978, 0.96032102],
+           [0.28941141, 0.57321019, 0.50759427],
+           [0.83468515, 0.37912001, 0.05234822]])
 
     References:
 
@@ -229,7 +229,7 @@ class DigitalNetB2(LD):
                 raise ParameterError("generating_matrices '%s' not found."%generating_matrices)
         else:
             raise ParameterError("invalid input for generating_matrices, see documentation and doctests.")
-        self.t_lms = t_lms if t_lms and self.set_lms else self.t_max
+        self.t_lms = t_lms if t_lms else self.t_max
         self._verbose = _verbose
         self.errors = {
             1: 'using natural ordering (graycode=0) where n0 and/or (n0+n) is not 0 or a power of 2 is not allowed.',
@@ -270,16 +270,17 @@ class DigitalNetB2(LD):
                 self.z[j,:] = self.z_og[dvecj,:]
             if self.set_rshift:
                 self.rshift[j] = self.rng.integers(low=0, high=1<<self.t_lms, size=1, dtype=uint64)
-
         if self.set_owen:
             # constructing rngs and root nodes for the binary tree
             new_seeds = self._base_seed.spawn(self.d)
             self.rngs = [random.Generator(random.SFC64(new_seeds[j])) for j in range(self.d)]
             self.root_nodes = [None]*self.d   
             for j in range(self.d):
-                r1 = int(self.rngs[j].integers(0,2))<<(self.t_lms-1)
-                rbitsleft,rbitsright = r1+int(self.rngs[j].integers(0,2**(self.t_lms-1))),r1+int(self.rngs[j].integers(0,2**(self.t_lms-1)))
-                self.root_nodes[j] = Node(None,None,Node(rbitsleft,0,None,None),Node(rbitsright,2**(self.t_lms-1),None,None))
+                if self.t_lms==64:
+                    init_shift_bits = int(self.rngs[j].integers(iinfo(int64).min,iinfo(int64).max+1))-int(iinfo(int64).min) # random 64 bit int
+                else:
+                    init_shift_bits = int(self.rngs[j].integers(0,1<<self.t_lms)) # random t_lms bit int
+                self.root_nodes[j] = Node(init_shift_bits,0,None,None)
 
     def _flip_bits(self, e):
         """
@@ -350,60 +351,76 @@ class DigitalNetB2(LD):
         xbrs_fin = zeros((n,self.d),dtype=uint64)
         for j in range(self.d):
             for i in range(n):
-                xb = int(xbs[i,j])
-                b = xb>>(self.t_lms-1)&1
-                first_node = self.root_nodes[j].left if b==0 else self.root_nodes[j].right
-                xbrs_fin[i,j] = xb ^ self.get_scramble_scalar(xb,self.t_lms,first_node,self.rngs[j])
+                xb = int(xbs[i,j])<<(self.t_lms-self.t_max)
+                shift = self.get_scramble_scalar(xb,self.root_nodes[j],self.rngs[j])
+                xbrs_fin_ij = xb^shift
+                xbrs_fin[i,j] = xbrs_fin_ij
         return xbrs_fin / (2**self.t_lms)
     
-    def get_scramble_scalar(self,xb,t,scramble,rng):
+    def get_scramble_scalar(self,xb,node,rng):
         """
         Args:
-            xb (uint64): t-bit integer represtation of bits
-            t (int64): number of bits in xb 
-            scramble (Node): node in the binary tree 
+            xb (uint64): integer with t_lms-bit bits
+            node (Node): root node in the binary tree 
             rng: random number generator (will be part of the DiscreteDistribution class)
         Example: t = 3, xb = 6 = 110_2, x = .110_2 = .75 
         """
-        if scramble.xb is None: # branch node, scramble.rbits is 0 or 1
-            r1 = scramble.rbits<<(t-1)
-            b = (xb>>(t-1))&1
-            onesmask = 2**(t-1)-1
-            xbnext = xb&onesmask
-            if (not b) and (scramble.left is None):
-                rbits = int(rng.integers(0,onesmask+1))
-                scramble.left = Node(rbits,xbnext,None,None)
-                return r1+rbits
-            elif b and (scramble.right is None):
-                rbits = int(rng.integers(0,onesmask+1))
-                scramble.right = Node(rbits,xbnext,None,None)
-                return r1+rbits
-            scramble = scramble.left if b==0 else scramble.right
-            return  r1 + self.get_scramble_scalar(xbnext,t-1,scramble,rng)
-        elif scramble.xb != xb: # unseen leaf node
-            ogsrbits,orsxb = scramble.rbits,scramble.xb
-            b,ubit = None,None
-            rmask = 2**t-1
-            while True:
-                b,ubit,rbit = (xb>>(t-1))&1,(orsxb>>(t-1))&1,(ogsrbits>>(t-1))&1
-                scramble.rbits,scramble.xb = rbit,None
-                if ubit != b: break
-                if b==0: 
-                    scramble.left = Node(None,None,None,None)
-                    scramble = scramble.left 
-                else:
-                    scramble.right = Node(None,None,None,None)
-                    scramble = scramble.right 
-                t -= 1
-            onesmask = 2**(t-1)-1
-            newrbits = int(rng.integers(0,onesmask+1)) 
-            scramble.left = Node(newrbits,xb&onesmask,None,None) if b==0 else Node(ogsrbits&onesmask,orsxb&onesmask,None,None)
-            scramble.right = Node(newrbits,xb&onesmask,None,None) if b==1 else Node(ogsrbits&onesmask,orsxb&onesmask,None,None)
-            rmask ^= onesmask
-            return (ogsrbits&rmask)+newrbits
-        else: # scramble.xb == xb
-            return scramble.rbits # seen leaf node 
-
+        t = self.t_lms
+        shift = 0
+        while t>0:
+            b = (xb>>(t-1))&1 # leading bit of xb
+            ones_mask_tm1 = (2**(t-1)-1)
+            xb_next = xb&ones_mask_tm1 # drop the leading bit of xb 
+            if node.xb is None: # this is not a leaf node, so node.shift_bits in [0,1]
+                if node.shift_bits: shift += 2**(t-1) # add node.shift_bits to the shift
+                if b==0: # looking to move left
+                    if node.left is None: # left node does not exist
+                        shift_bits = int(rng.integers(0,2**(t-1))) # get (t-1) random bits
+                        node.left = Node(shift_bits,xb_next,None,None) # create the left node 
+                        return shift+shift_bits # add the (t-1) random bits to the shift
+                    else: # left node exists, so move there 
+                        node = node.left
+                else: # b==1, looking to move right
+                    if node.right is None: # right node does not exist
+                        shift_bits = int(rng.integers(0,2**(t-1))) # get (t-1) random bits
+                        node.right = Node(shift_bits,xb_next,None,None) # create the right node
+                        return shift+shift_bits # add the (t-1) random bits to the shift 
+                    else: # right node exists, so move there
+                        node = node.right
+            elif node.xb==xb: # this is a leaf node we have already seen before!
+                return shift+node.shift_bits
+            else: #  node.xb!=xb, this is a leaf node where the xb values don't match
+                node_b = (node.xb>>(t-1))&1 # leading bit of node.xb
+                node_xb_next = node.xb&ones_mask_tm1 # drop the leading bit of node.xb
+                node_shift_bits_next = node.shift_bits&ones_mask_tm1 # drop the leading bit of node.shift_bits
+                node_leading_shift_bit = (node.shift_bits>>(t-1))&1
+                if node_leading_shift_bit: shift += 2**(t-1)
+                if node_b==0 and b==1: # the node will move its contents left and the xb will go right
+                    node.left = Node(node_shift_bits_next,node_xb_next,None,None)  # create the left node from the current node
+                    node.xb,node.shift_bits = None,node_leading_shift_bit # reset the existing node
+                    # create the right node 
+                    shift_bits = int(rng.integers(0,2**(t-1))) # (t-1) random bits for the right node
+                    node.right = Node(shift_bits,xb_next,None,None)
+                    return shift+shift_bits
+                elif node_b==1 and b==0: # the node will move its contents right and the xb will go left
+                    node.right = Node(node_shift_bits_next,node_xb_next,None,None)  # create the right node from the current node
+                    node.xb,node.shift_bits = None,node_leading_shift_bit # reset the existing node
+                    # create the left node 
+                    shift_bits = int(rng.integers(0,2**(t-1))) # (t-1) random bits for the left node
+                    node.left = Node(shift_bits,xb_next,None,None)
+                    return shift+shift_bits
+                elif node_b==0 and b==0: # move the node contents and xb to the left
+                    node.left = Node(node_shift_bits_next,node_xb_next,None,None) 
+                    node.xb,node.shift_bits = None,node_leading_shift_bit # reset the existing node
+                    node = node.left
+                elif node_b==1 and b==1: # move the node contents and xb to the right 
+                    node.right = Node(node_shift_bits_next,node_xb_next,None,None) 
+                    node.xb,node.shift_bits = None,node_leading_shift_bit # reset the existing node
+                    node = node.right
+            t -= 1
+            xb = xb_next
+        return shift
+            
     def _spawn(self, child_seed, dimension):
         return DigitalNetB2(
             dimension=dimension,
@@ -421,8 +438,8 @@ class Sobol(DigitalNetB2): pass
 
 class Node:
     """ generate nodes for the binary tree """
-    def __init__(self,rbits,xb,left,right):
-        self.rbits = rbits
+    def __init__(self,shift_bits,xb,left,right):
+        self.shift_bits = shift_bits
         self.xb = xb 
         self.left = left 
         self.right = right
