@@ -85,10 +85,10 @@ class Halton(LD):
         spawn_key       ()
     >>> h_nus = Halton(2,randomize = 'NUS',generalize = False,seed = 7)
     >>> h_nus.gen_samples(4)
-    array([[0.06550696, 0.32831571],
-           [0.83237863, 0.74516   ],
-           [0.36122038, 0.80883181],
-           [0.84373388, 0.0569946 ]])
+    array([[0.641964  , 0.65952235],
+           [0.96958584, 0.49370152],
+           [0.62146315, 0.40193322],
+           [0.87010878, 0.55815058]])
     >>> h_nus
     Halton (DiscreteDistribution Object)
         d               2^(1)
@@ -228,17 +228,17 @@ class Halton(LD):
             self.rngs = [random.Generator(random.SFC64(new_seeds[j])) for j in range(self.d)]
             self.root_nodes = array([None]*self.d)
             self.primes = self.all_primes[self.dvec]
+            self.vectorized_permutation = vectorize(self.permute_digit)
             for i in range(self.d):
                 base = self.primes[i]
                 coeff_nrows = ceil(log(self.n_lim,base))
                 nodes = array([None] * base)
                 for j in range(base):
-                    rdigits = self.rngs[i].integers(0,base,size = coeff_nrows)
                     xb = zeros(coeff_nrows,dtype = uint64)
+                    rdigits = self.vectorized_permutation(xb[1:coeff_nrows],self.rngs[i],base)
                     xb[0] = j
-                    nodes[j] = Node(rdigits,xb, array([None] * base))
-                self.root_nodes[i] = Node(None,None,nodes)
-        
+                    nodes[j] = Node(rdigits,xb[0:coeff_nrows - 1], array([None] * base))
+                self.root_nodes[i] = Node(self.permute_digit(array([0]),self.rngs[i],base),None,nodes)
 
     def halton_owen(self, n, n0, d0=0):
         """ see gen_samples method and [1] Owen, A. B.A randomized Halton algorithm in R2017. arXiv:1706.02808 [stat.CO]."""
@@ -296,7 +296,8 @@ class Halton(LD):
             for i in range (n):
                 curr_xb = (coeffs[:,i]).T
                 first_node = self.root_nodes[j].node_digits[curr_xb[0]]
-                coeffs[:,i] = (self.get_scramble_scalar(curr_xb,coeff_nrows,first_node,base,self.rngs[j])).T
+                coeffs[1:,i] = (self.get_scramble_scalar(curr_xb[0:coeff_nrows - 1],coeff_nrows - 1,first_node,base,self.rngs[j])).T
+            coeffs[0,:] = self.root_nodes[j].rdigits
             coeffs = coeffs / (base_pwrN * base)
             ans[:,j] = coeffs.sum(axis = 0)
         return ans
@@ -312,16 +313,17 @@ class Halton(LD):
         Example: t = 3, xb = [1,1,0]_2, x = .110_2 = .75 
         """
         if scramble.xb is None: # branch node, scramble.rdigits is a single value between 0 (inclusive) and base (exclusive)
-           scr_digit = array(scramble.rdigits)
-           if(scramble.node_digits[xb[1]] is None):
-               rdigits = rng.integers(0,base,size = t - 1)
-               xb = xb[1:]
-               scramble.node_digits[xb[0]] = Node(rdigits,xb,array([None] * base))
-               return append(scr_digit,rdigits)
-           scramble = scramble.node_digits[xb[1]]
+           scr_digit = scramble.rdigits
            xb = xb[1:]
+           if(scramble.node_digits[xb[0]] is None):
+               xb = append(xb,array([0]))
+               xb = xb.astype(uint64)
+               rdigits = self.vectorized_permutation(xb[1:len(xb)],rng,base)
+               scramble.node_digits[xb[0]] = Node(rdigits,xb[0:len(xb) - 1],array([None] * base))
+               return append(scr_digit,rdigits)
+           scramble = scramble.node_digits[xb[0]]
            return append(scr_digit,self.get_scramble_scalar(xb,t - 1, scramble, base, rng))
-        elif (scramble.xb != xb).any(): # unseen leaf node
+        elif not array_equal(scramble.xb, xb): # unseen leaf node
             scr_digits = zeros(t, dtype = uint64)
             indices = where(xb != scramble.xb)[0]
             index = indices[0]
@@ -330,19 +332,25 @@ class Halton(LD):
             scramble.xb = None
             for i in range(index):
                 scr_digits[i] = copy_rdigits[i]
-                scramble.rdigits = array(copy_rdigits[i])
+                scramble.rdigits = array([copy_rdigits[i]])
                 scramble.node_digits[copy_xb[i + 1]] = Node(None, None, array([None] * base))
                 if (i == (index - 1)):
-                    rdigits = rng.integers(0,base,size = t - index)
-                    scr_digits[index:] = rdigits
                     xb = xb[index:]
-                    scramble.node_digits[xb[0]] = Node(rdigits,xb,array([None] * base))
+                    xb = append(xb,array([0]))
+                    xb = xb.astype(uint64)
+                    rdigits = self.vectorized_permutation(xb[1:len(xb)],rng,base)
+                    scr_digits[index:] = rdigits
+                    scramble.node_digits[xb[0]] = Node(rdigits,xb[0:len(xb) - 1],array([None] * base))
                 scramble = scramble.node_digits[copy_xb[i + 1]]
             scramble.rdigits = copy_rdigits[index:]
             scramble.xb = copy_xb[index:]
             return scr_digits
         else: # scramble.xb == xb
             return scramble.rdigits # seen leaf node 
+        
+    def permute_digit(self,digit,rng,base):
+        permutation = rng.permutation(base)
+        return permutation[digit]
              
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
         """
@@ -359,7 +367,7 @@ class Halton(LD):
         if n:
             n_min = 0
             n_max = n
-        if n_max > self.n_lim:
+        if n_max >= self.n_lim:
             raise ParameterError("Halton requires n_max <= 2^32.")
         n = int(n_max-n_min)
         if n_min == 0 and self.randomize is False and warn:
