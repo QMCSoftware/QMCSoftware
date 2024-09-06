@@ -46,12 +46,12 @@ class AmericanOption(Integrand):
         """
         npaths = stock_path.shape[0]
         cashflow = np.zeros(npaths)
-        basis=lambda x: np.reshape(np.tile(np.exp(-x/2),3),(x.size,3))* np.reshape(np.array([np.ones(x.size),1-x,1-2*x+x*x/2]),(x.size,3))
+        basis=lambda x: np.reshape(np.tile(np.exp(-x/2),3),(x.size,3),'F')* np.vstack([np.ones(x.size),1-x,1-2*x+x*x/2]).T
         putpayoff = np.maximum(self.strike_price-stock_path,0)*np.reshape(np.tile(np.exp(-self.interest_rate*np.arange(self.t_final/dimension,self.t_final+self.t_final/dimension,self.t_final/dimension)),npaths),(npaths,dimension))
         cashflow = putpayoff[:,-1]
         exbound = np.zeros(dimension+1)
         exbound[-1] = self.strike_price
-        for i in range(dimension-1, 0, -1):
+        for i in range(dimension-2, 0, -1):
             inmoney = np.where(putpayoff[:,i] >0)[0]
             if inmoney.size != 0:
                 regmat = np.ones((inmoney.size,4))
@@ -61,7 +61,7 @@ class AmericanOption(Integrand):
                 shouldex=inmoney[putpayoff[inmoney,i]>hold]
                 if shouldex.size != 0:
                     cashflow[shouldex]=putpayoff[shouldex,i]      
-                    exbound[i]=np.max(stock_path[shouldex,i])
+                    exbound[i+1]=np.max(stock_path[shouldex,i])
         if self.start_price < self.strike_price:
             hold = np.mean(cashflow)
             putpayoff0 = self.strike_price-self.start_price
