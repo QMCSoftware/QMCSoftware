@@ -65,7 +65,7 @@ def discrepancy(method, x, weight = 1):
     #returns the discrepancy
     return np.sqrt(double_integral - (2*np.mean(single_integral)) + np.mean(np.mean(kernel)))
 
-def discrepancy2(method = None, double_integral = None, single_integral = None, kernel = None, x, weight = 1, limiter = 2**16, Time = False):
+def discrepancy2(x, method = None, double_integral = None, single_integral = None, kernel = None, weight = 1, limiter = 2**25, Time = False):
     if Time == True:                #Times the actual calculation for discrepancy
         start_time = time.time()
 
@@ -73,30 +73,6 @@ def discrepancy2(method = None, double_integral = None, single_integral = None, 
 
     weight = weight * np.ones(d) #Makes sure that the weight is a vector, but the user can use a scalar value
 
-    limiter = int(limiter / d)      #Figures out how many samples the code should take in
-    limiter = int(np.sqrt(limiter))
-
-    #Gets 2 new matrix to calculate kernel
-    X_expanded = np.resize(x, (1, n, d))
-    Y = np.resize(x, (n, 1, d))
-
-    #Goes ahead and starts 3 variables for calculating single integral and kernel
-    #and initialize the list
-    iterated_X = []
-    iterated_X_expanded = []
-    iterated_Y = []
-    n_chunks = int(np.ceil(n/limiter))
-    for i_1 in range(int(n/limiter)+1):               #These 4 lines are used to make these lists into chunks
-        iterated_X = iterated_X + [x[i_1*limiter: (i_1+1)*limiter, :]]
-        iterated_X_expanded = iterated_X_expanded + [X_expanded[:, i_1*limiter: (i_1+1)*limiter, :]]
-        iterated_Y = iterated_Y + [Y[i_1*limiter: (i_1+1)*limiter, :, :]]
-
-    #Gets rid of the null matrices if it does meet the criterion
-    if n%limiter == 0:
-        iterated_X = iterated_X[0: len(iterated_X) - 1]
-        iterated_X_expanded = iterated_X_expanded[0:len(iterated_X_expanded)-1]
-        iterated_Y = iterated_Y[0:len(iterated_Y)-1]
-    
     if method != None:
         if type(method) is str:
             if method.lower() == "l2" or method.lower() == "l2star":           #Star
@@ -131,5 +107,34 @@ def discrepancy2(method = None, double_integral = None, single_integral = None, 
     else:
         DI = double_integral(weight)
 
+    single_integral_sum = 0
+    kernel_sum = 0
+    if x[0,0] != None:  #the discrepancy of some points
+        len_chunk = np.floor(np.sqrt(limiter/d)).astype('int')
+        n_chunk = np.ceil(n/len_chunk).astype('int')
+        for ii in range(n_chunk):
+            n_ii_start = ii*len_chunk
+            n_ii_end = np.array([n,(ii+1)*len_chunk]).min()
+            n_ii_batch = n_ii_end - n_ii_start
+            if n_ii_batch > 0:
+                x_chunk = x[n_ii_start:n_ii_end,:]
+                single_integral_sum  += single_integral(x_chunk,weight).sum(axis = 0)
+                x_chunk = x_chunk.reshape(n_ii_batch,1,d)
+                y_chunk = x_chunk.reshape(1,n_ii_batch,d)
+                kernel_sum += kernel(x_chunk,y_chunk,weight).sum()
+                for jj in range(ii+1,n_chunk):
+                    n_jj_start = jj*len_chunk
+                    n_jj_end = np.array([n,(jj+1)*len_chunk]).min()
+                    n_jj_batch = n_jj_end - n_jj_start
+                    if n_jj_batch > 0:
+                        y_chunk = x[n_jj_start:n_jj_end,:].reshape(1,n_jj_batch,d)
+                        kernel_sum += 2*kernel(x_chunk,y_chunk,weight).sum()
+        single_integral_sum  *= (2/n)
+        kernel_sum *= (1/(n**2)) 
+    # print(dbl_integ,sngl_integ_sum,dbl_sum)
+    out = np.sqrt(DI - single_integral_sum + kernel_sum)
 
-    return np.sqrt(double_integral - (2*np.mean(single_integral)) + np.mean(np.mean(kernel)))
+    if Time:  #if we are measuring time
+        total_time = time.time() - start_time
+        out = [out, total_time]
+    return out
