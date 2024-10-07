@@ -22,7 +22,7 @@ class Lattice(LD):
     Lattice (DiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
-        randomize       1
+        randomize       SHIFT
         order           natural
         gen_vec         [     1 182667]
         entropy         7
@@ -52,7 +52,7 @@ class Lattice(LD):
     Lattice (DiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
-        randomize       1
+        randomize       SHIFT
         order           natural
         gen_vec         [       1 11961679]
         entropy         55
@@ -103,7 +103,7 @@ class Lattice(LD):
         ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
     """
 
-    def __init__(self, dimension=1, randomize=True, order='natural', seed=None,
+    def __init__(self, dimension=1, randomize='shift', order='natural', seed=None,
         generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None):
         """
         Args:
@@ -131,7 +131,6 @@ class Lattice(LD):
             If `generating_vector` is a string (path), `d_max` and `m_max` can be taken from the file name if None.
         """
         self.parameters = ['dvec','randomize','order']
-        self.randomize = randomize
         self.order = order.lower()
         assert self.order in ['linear','natural','mps','gray']
         if isinstance(generating_vector,ndarray):
@@ -172,7 +171,13 @@ class Lattice(LD):
         if isinstance(generating_vector,int):
             self.gen_vec_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-1),size=dimension-1,dtype=uint64)+1)
         self.gen_vec = self.gen_vec_og[self.dvec]
-        self.shift = self.rng.uniform(size=int(self.d))
+        self.randomize = str(randomize).upper()
+        if self.randomize=="TRUE": self.randomize = "SHIFT"
+        if self.randomize=="NONE": self.randomize = "FALSE"
+        if self.randomize=="NO": self.randomize = "FALSE"
+        assert self.randomize in ["SHIFT","FALSE"]
+        if self.randomize=="SHIFT":
+            self.shift = self.rng.uniform(size=int(self.d))
         self.parameters += ["gen_vec"]
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
@@ -199,9 +204,9 @@ class Lattice(LD):
         if n:
             n_min = 0
             n_max = n
-        if return_unrandomized and self.randomize==False:
+        if return_unrandomized and self.randomize=="FALSE":
             raise ParameterError("return_unrandomized=True only applies when when randomize=True.")
-        if n_min == 0 and self.randomize==False and warn:
+        if n_min == 0 and self.randomize=="FALSE" and warn:
             warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
         if n_max > 2**self.m_max:
             raise ParameterError('Lattice generating vector supports up to %d samples.'%(2**self.m_max))
@@ -220,7 +225,7 @@ class Lattice(LD):
             _ = qmctoolscl.lat_gen_gray(r,n,d,n_start,self.gen_vec,x) 
         else: 
             assert False, "invalid Lattice order"
-        if self.randomize==False:
+        if self.randomize=="FALSE":
             return x
         xr = x.copy() if return_unrandomized else x # if not return_unrandomized then we overwrite x 
         r_x = uint64(1)
