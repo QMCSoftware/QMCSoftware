@@ -175,7 +175,7 @@ class Lattice(LD):
         self.shift = self.rng.uniform(size=int(self.d))
         self.parameters += ["gen_vec"]
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False, qmctoolscl_kwargs={"backend":"C"}):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
         """
         Generate lattice samples
 
@@ -212,12 +212,12 @@ class Lattice(LD):
         x = empty((n,d),dtype=float64)
         if self.order=="linear":
             assert n_min==0, "lattice in linear order requires n_min==0" 
-            _ = qmctoolscl.lat_gen_linear(r,n,d,self.gen_vec,x,**qmctoolscl_kwargs)
+            _ = qmctoolscl.lat_gen_linear(r,n,d,self.gen_vec,x)
         elif self.order in ["natural",'mps']:
-            assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "lattice in natural or mps order requires n_min and n_max be 0 or powers of 2"
-            _ = qmctoolscl.lat_gen_natural(r,n,d,n_start,self.gen_vec,x,**qmctoolscl_kwargs)
+            assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "lattice in natural order requires n_min and n_max be 0 or powers of 2"
+            _ = qmctoolscl.lat_gen_natural(r,n,d,n_start,self.gen_vec,x)
         elif self.order=="gray":
-            _ = qmctoolscl.lat_gen_gray(r,n,d,n_start,self.gen_vec,x,**qmctoolscl_kwargs) 
+            _ = qmctoolscl.lat_gen_gray(r,n,d,n_start,self.gen_vec,x) 
         else: 
             assert False, "invalid Lattice order"
         if self.randomize==False:

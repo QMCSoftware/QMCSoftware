@@ -80,7 +80,6 @@ setuptools.setup(
             name='qmcpy.discrete_distribution.c_lib.c_lib',
             sources=[
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
-                'qmcpy/discrete_distribution/c_lib/digital_net_b2.c',
                 'qmcpy/discrete_distribution/c_lib/fwht.c',],)],
     cmdclass={
         'clean': CleanCommand,

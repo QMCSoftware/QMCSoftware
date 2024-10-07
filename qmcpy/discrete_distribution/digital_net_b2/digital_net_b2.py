@@ -1,7 +1,6 @@
 from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
-from ..c_lib import c_lib
-import ctypes
+import qmctoolscl
 from os.path import dirname, abspath, isfile
 from numpy import *
 from numpy.lib.npyio import DataSource
@@ -14,12 +13,12 @@ class DigitalNetB2(LD):
     
     >>> dnb2 = DigitalNetB2(2,seed=7)
     >>> dnb2.gen_samples(4)
-    array([[0.56269008, 0.17377997],
-           [0.346653  , 0.65070632],
-           [0.82074548, 0.95490574],
-           [0.10422261, 0.49458097]])
+    array([[0.4027901 , 0.17377997],
+           [0.64506941, 0.50487366],
+           [0.14509037, 0.81732907],
+           [0.90275006, 0.48632455]])
     >>> dnb2.gen_samples(1)
-    array([[0.56269008, 0.17377997]])
+    array([[0.4027901 , 0.17377997]])
     >>> dnb2
     DigitalNetB2 (DiscreteDistribution Object)
         d               2^(1)
@@ -53,7 +52,7 @@ class DigitalNetB2(LD):
            [0.14542431, 0.02548793, 0.4749614 ],
            [0.45587539, 0.33081476, 0.11474426],
            [0.71318879, 0.15377192, 0.37629925]])
-    >>> DigitalNetB2(dimension = 3, randomize = 'OWEN', seed = 5).gen_samples(8)
+    >>> DigitalNetB2(dimension=3,randomize='OWEN',seed=5).gen_samples(8)
     array([[0.24118295, 0.89903664, 0.14727803],
            [0.66797743, 0.02917488, 0.650332  ],
            [0.44025253, 0.36014271, 0.8476208 ],
@@ -105,22 +104,6 @@ class DigitalNetB2(LD):
         ACM Trans. Math. Softw. 14, 1 (March 1988), 88-100. 
         DOI:https://doi.org/10.1145/42288.214372
     """
-
-    dnb2_cf = c_lib.gen_digitalnetb2
-    dnb2_cf.argtypes = [
-        ctypes.c_ulong,  # n
-        ctypes.c_ulong, # n0
-        ctypes.c_uint32,  # d
-        ctypes.c_uint32, # graycode
-        ctypes.c_uint32, # m_max
-        ctypes.c_uint32, # t_max
-        ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # znew
-        ctypes.c_uint32, # set_rshift
-        ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # rshift
-        ctypeslib.ndpointer(ctypes.c_uint64, flags='C_CONTIGUOUS'),  # xb
-        ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),  # x
-        ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')]  # xr
-    dnb2_cf.restype = ctypes.c_uint32
 
     def __init__(self, dimension=1, randomize='LMS_DS', graycode=False, seed=None, 
         generating_matrices='sobol_mat.21201.32.32.msb.npy', d_max=None, t_max=None, m_max=None, msb=None, t_lms=None, 
@@ -237,9 +220,6 @@ class DigitalNetB2(LD):
             raise ParameterError("invalid input for generating_matrices, see documentation and doctests.")
         self.t_lms = t_lms if t_lms else self.t_max
         self._verbose = _verbose
-        self.errors = {
-            1: 'using natural ordering (graycode=0) where n0 and/or (n0+n) is not 0 or a power of 2 is not allowed.',
-            2: 'Exceeding max samples (2^%d) or max dimensions (%d).'%(self.m_max,self.d_max)}
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
         super(DigitalNetB2,self).__init__(dimension,seed)
@@ -247,65 +227,22 @@ class DigitalNetB2(LD):
             raise Exception("require t_max <= t_lms <= 64")
         self.z = zeros((self.d,self.m_max),dtype=uint64)
         self.rshift = zeros(self.d,dtype=uint64)
-        if not self.msb: # flip bits if using lsb (least significant bit first) order
-            for j in range(self.d):
-                for m in range(self.m_max):
-                    self.z_og[self.dvec[j],m] = self._flip_bits(self.z_og[self.dvec[j],m])
-        # set the linear matrix scrambling and random shift
-        if self.set_lms and self._verbose: print('s (scrambling_matrix)')
-        for j in range(self.d):
-            dvecj = self.dvec[j]
-            if self.set_lms:
-                if self._verbose: print('\n\ts[dvec[%d]]\n\t\t'%j,end='',flush=True)
-                for t in range(self.t_lms):
-                    t1 = int(minimum(t,self.t_max))
-                    u = self.rng.integers(low=0, high=1<<t1, size=1, dtype=uint64)
-                    u <<= (self.t_max-t1)
-                    if t1<self.t_max: u += 1<<(self.t_max-t1-1)
-                    for m in range(self.m_max):
-                        v = u&self.z_og[dvecj,m]
-                        s = self._count_set_bits(v)%2
-                        if s: self.z[j,m] += uint64(1<<(self.t_lms-t-1))
-                    if self._verbose:
-                        for tprint in range(self.t_max):
-                            mask = 1<<(self.t_max-tprint-1)
-                            bit = (u&mask)>0
-                            print('%-2d'%bit,end='',flush=True)
-                        print('\n\t\t',end='',flush=True)
-            else:
-                self.z[j,:] = self.z_og[dvecj,:]
-            if self.set_rshift:
-                self.rshift[j] = self.rng.integers(low=0, high=1<<self.t_lms, size=1, dtype=uint64)
+        self.z_og = self.z_og[self.dvec]
+        if not self.msb: 
+            qmctoolscl.dnb2_gmat_lsb_to_msb(uint64(1),uint64(self.d),uint64(self.m_max),tile(uint64(self.t_max),1),self.z_og,self.z_og)
+        if self.set_lms:
+            self.z = self.z_og.copy()
+            S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,uint64(1),uint64(self.d),uint64(self.t_max),uint64(self.t_lms),uint64(self._verbose))
+            qmctoolscl.dnb2_linear_matrix_scramble(uint64(1),uint64(self.d),uint64(self.m_max),uint64(1),uint64(self.t_lms),S,self.z_og,self.z)
+            self.t_max = self.t_lms
+        else:
+            self.z = self.z_og
+        if self.set_rshift:
+            self.rshift = qmctoolscl.random_tbit_uint64s(self.rng,self.t_lms,(self.d,))
         if self.set_owen:
-            # constructing rngs and root nodes for the binary tree
             new_seeds = self._base_seed.spawn(self.d)
-            self.rngs = [random.Generator(random.SFC64(new_seeds[j])) for j in range(self.d)]
-            self.root_nodes = [None]*self.d   
-            for j in range(self.d):
-                if self.t_lms==64:
-                    init_shift_bits = int(self.rngs[j].integers(iinfo(int64).min,iinfo(int64).max+1))-int(iinfo(int64).min) # random 64 bit int
-                else:
-                    init_shift_bits = int(self.rngs[j].integers(0,1<<self.t_lms)) # random t_lms bit int
-                self.root_nodes[j] = Node(init_shift_bits,0,None,None)
-
-    def _flip_bits(self, e):
-        """
-        flip the int e with self.t_max bits
-        """
-        u = 0
-        for t in range(self.t_max):
-            bit = array((1<<t),dtype=uint64)&e
-            if bit:
-                u += 1<<(self.t_max-t-1)
-        return u
-
-    def _count_set_bits(self, e):
-        """
-        count the number of bits set to 1 in int e
-        Brian Kernighan algorithm code: https://www.geeksforgeeks.org/count-set-bits-in-an-integer/
-        """
-        if (e == 0): return 0
-        else: return 1 + self._count_set_bits(e&(e-1)) 
+            self.rngs = array([random.Generator(random.SFC64(new_seeds[j])) for j in range(self.d)]).reshape(1,self.d)
+            self.root_nodes = array([qmctoolscl.NUSNode_dnb2() for i in range(self.d)]).reshape(1,self.d)
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
         """
@@ -331,103 +268,45 @@ class DigitalNetB2(LD):
             n_max = n
         if n_min == 0 and self.set_rshift==False and warn and self.set_owen == False:
             warnings.warn("Non-randomized DigitalNetB2 sequence includes the origin",ParameterWarning)
-        if return_unrandomized and not self.set_rshift:
-            raise ParameterError("return_unrandomized=True only applies when randomize includes a digital shift.")
-        n = int(n_max-n_min)
-        xb = zeros((n,self.d),dtype=uint64)
-        x = zeros((n,self.d),dtype=double)
-        xr = zeros((n,self.d),dtype=double)
-        rc = self.dnb2_cf(int(n_min),n,self.d,self.graycode,self.m_max,self.t_lms,self.z,self.set_rshift,self.rshift,xb,x,xr)
-        if rc!=0:
-            raise ParameterError(self.errors[rc])
+        if n_max > 2**self.m_max:
+            raise ParameterError('DigitalNetB2 generating matrices support up to %d samples.'%(2**self.m_max))
+        if return_unrandomized and not self.set_rshift and not self.set_owen:
+            raise ParameterError("return_unrandomized=True only applies when randomize includes a digital shift or NUS (Owen) scramble.")
+        r = uint64(1) 
+        n = uint64(n_max-n_min)
+        d = uint64(self.d) 
+        n_start = uint64(n_min)
+        mmax = uint64(self.m_max)
+        xb = empty((n,d),dtype=uint64)
+        if self.graycode:
+            _,_ = qmctoolscl.dnb2_gen_gray(r,n,d,n_start,mmax,self.z,xb)
+        else: 
+            assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "DigitalNetB2 in natural order requires n_min and n_max be 0 or powers of 2"
+            _,_ = qmctoolscl.dnb2_gen_natural(r,n,d,n_start,mmax,self.z,xb)
         if return_unrandomized:
-            return xr,x
-        elif self.set_rshift:
-            return xr
-        elif self.set_owen:
-            return self.owen_scr(xb)
-        else:
-            return x
+            tmaxes_new = tile(uint64(self.t_max),r)
+            x = empty((n,d),dtype=float64)
+            _,_ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xb,x)
+        if self.set_rshift:
+            r_x = uint64(1)
+            lshifts = tile(uint64(self.t_lms-self.t_max),1)
+            _,_ = qmctoolscl.dnb2_digital_shift(r,n,d,r_x,lshifts,xb,self.rshift,xb)
+        if self.set_owen:
+            r_x = 1
+            tmax = uint64(self.t_max)
+            tmax_new = uint64(self.t_lms)
+            xb = xb[None,:,:]
+            xrb = zeros((1,n,d),dtype=uint64)
+            _,_ = qmctoolscl.dnb2_nested_uniform_scramble(r,n,d,r_x,tmax,tmax_new,self.rngs,self.root_nodes,xb,xrb)
+            xb = xrb[0]
+        tmaxes_new = tile(uint64(self.t_lms),1)
+        xr = empty((n,d),dtype=float64) 
+        _,_ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xb,xr)
+        return (xr,x) if return_unrandomized else xr
     
     def pdf(self, x):
         """ pdf of a standard uniform """
         return ones(x.shape[0], dtype=float) 
-
-    def owen_scr(self,xbs): 
-        """ generate samples based on Nested Uniform Scrambling (Owen Scrambling)"""
-        n = xbs.shape[0]
-        xbrs_fin = zeros((n,self.d),dtype=uint64)
-        for j in range(self.d):
-            for i in range(n):
-                xb = int(xbs[i,j])<<(self.t_lms-self.t_max)
-                shift = self.get_scramble_scalar(xb,self.root_nodes[j],self.rngs[j])
-                xbrs_fin_ij = xb^shift
-                xbrs_fin[i,j] = xbrs_fin_ij
-        return xbrs_fin / (2**self.t_lms)
-    
-    def get_scramble_scalar(self,xb,node,rng):
-        """
-        Args:
-            xb (uint64): integer with t_lms-bit bits
-            node (Node): root node in the binary tree 
-            rng: random number generator (will be part of the DiscreteDistribution class)
-        Example: t = 3, xb = 6 = 110_2, x = .110_2 = .75 
-        """
-        t = self.t_lms
-        shift = 0
-        while t>0:
-            b = (xb>>(t-1))&1 # leading bit of xb
-            ones_mask_tm1 = (2**(t-1)-1)
-            xb_next = xb&ones_mask_tm1 # drop the leading bit of xb 
-            if node.xb is None: # this is not a leaf node, so node.shift_bits in [0,1]
-                if node.shift_bits: shift += 2**(t-1) # add node.shift_bits to the shift
-                if b==0: # looking to move left
-                    if node.left is None: # left node does not exist
-                        shift_bits = int(rng.integers(0,2**(t-1))) # get (t-1) random bits
-                        node.left = Node(shift_bits,xb_next,None,None) # create the left node 
-                        return shift+shift_bits # add the (t-1) random bits to the shift
-                    else: # left node exists, so move there 
-                        node = node.left
-                else: # b==1, looking to move right
-                    if node.right is None: # right node does not exist
-                        shift_bits = int(rng.integers(0,2**(t-1))) # get (t-1) random bits
-                        node.right = Node(shift_bits,xb_next,None,None) # create the right node
-                        return shift+shift_bits # add the (t-1) random bits to the shift 
-                    else: # right node exists, so move there
-                        node = node.right
-            elif node.xb==xb: # this is a leaf node we have already seen before!
-                return shift+node.shift_bits
-            else: #  node.xb!=xb, this is a leaf node where the xb values don't match
-                node_b = (node.xb>>(t-1))&1 # leading bit of node.xb
-                node_xb_next = node.xb&ones_mask_tm1 # drop the leading bit of node.xb
-                node_shift_bits_next = node.shift_bits&ones_mask_tm1 # drop the leading bit of node.shift_bits
-                node_leading_shift_bit = (node.shift_bits>>(t-1))&1
-                if node_leading_shift_bit: shift += 2**(t-1)
-                if node_b==0 and b==1: # the node will move its contents left and the xb will go right
-                    node.left = Node(node_shift_bits_next,node_xb_next,None,None)  # create the left node from the current node
-                    node.xb,node.shift_bits = None,node_leading_shift_bit # reset the existing node
-                    # create the right node 
-                    shift_bits = int(rng.integers(0,2**(t-1))) # (t-1) random bits for the right node
-                    node.right = Node(shift_bits,xb_next,None,None)
-                    return shift+shift_bits
-                elif node_b==1 and b==0: # the node will move its contents right and the xb will go left
-                    node.right = Node(node_shift_bits_next,node_xb_next,None,None)  # create the right node from the current node
-                    node.xb,node.shift_bits = None,node_leading_shift_bit # reset the existing node
-                    # create the left node 
-                    shift_bits = int(rng.integers(0,2**(t-1))) # (t-1) random bits for the left node
-                    node.left = Node(shift_bits,xb_next,None,None)
-                    return shift+shift_bits
-                elif node_b==0 and b==0: # move the node contents and xb to the left
-                    node.left = Node(node_shift_bits_next,node_xb_next,None,None) 
-                    node.xb,node.shift_bits = None,node_leading_shift_bit # reset the existing node
-                    node = node.left
-                elif node_b==1 and b==1: # move the node contents and xb to the right 
-                    node.right = Node(node_shift_bits_next,node_xb_next,None,None) 
-                    node.xb,node.shift_bits = None,node_leading_shift_bit # reset the existing node
-                    node = node.right
-            t -= 1
-            xb = xb_next
-        return shift
             
     def _spawn(self, child_seed, dimension):
         return DigitalNetB2(
