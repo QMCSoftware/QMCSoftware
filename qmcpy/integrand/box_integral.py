@@ -14,14 +14,14 @@ class BoxIntegral(Integrand):
     >>> y1.shape
     (1024, 1)
     >>> y1.mean(0)
-    array([0.75156724])
+    array([0.75147585])
     >>> l2 = BoxIntegral(DigitalNetB2(5,seed=7), s=[-7,7])
     >>> x2 = l2.discrete_distrib.gen_samples(2**10)
     >>> y2 = l2.f(x2,compute_flags=[1,1])
     >>> y2.shape
     (1024, 2)
     >>> y2.mean(0)
-    array([ 6.67548708, 10.52267786])
+    array([ 9.2238684 , 10.50687484])
 
     References:
 

@@ -248,7 +248,6 @@ class DigitalNetB2(LD):
             S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,uint64(replications),uint64(self.d),uint64(self.t_max),uint64(self.t_lms),uint64(self._verbose))
             qmctoolscl.dnb2_linear_matrix_scramble(uint64(replications),uint64(self.d),uint64(self.m_max),uint64(self.replications_gm),uint64(self.t_lms),S,self.z,z_lms)
             self.z = z_lms 
-            self.t_max = self.t_lms
             self.replications_gm = replications
         if "DS" in self.randomize:
             self.rshift = qmctoolscl.random_tbit_uint64s(self.rng,self.t_lms,(replications,self.d))
@@ -297,14 +296,14 @@ class DigitalNetB2(LD):
             assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "DigitalNetB2 in natural order requires n_min and n_max be 0 or powers of 2"
             _ = qmctoolscl.dnb2_gen_natural(r_x,n,d,n_start,mmax,self.z,xb)
         if return_unrandomized or self.randomize in ["FALSE","LMS"]:
-            tmaxes_new = tile(uint64(self.t_max),int(r_x))
+            tmaxes_new = tile(uint64(self.t_max if self.randomize=="FALSE" else self.t_lms),int(r_x))
             x = empty((r_x,n,d),dtype=float64)
             _ = qmctoolscl.dnb2_integer_to_float(r_x,n,d,tmaxes_new,xb,x)
             if r_x==1: x = x[0]
         r = uint64(self.replications)
         if "DS" in self.randomize:
             xrb = empty((r,n,d),dtype=uint64)
-            lshifts = tile(uint64(self.t_lms-self.t_max),int(r))
+            lshifts = tile(uint64((self.t_lms-self.t_max) if "LMS" not in self.randomize else 0),int(r))
             _ = qmctoolscl.dnb2_digital_shift(r,n,d,r_x,lshifts,xb,self.rshift,xrb)
             tmaxes_new = tile(uint64(self.t_lms),int(r))
             xr = empty((r,n,d),dtype=float64)

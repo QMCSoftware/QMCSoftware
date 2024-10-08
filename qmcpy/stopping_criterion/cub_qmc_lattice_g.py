@@ -37,8 +37,8 @@ class CubQMCLatticeG(_CubQMCLDG):
     Lattice (DiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
-        randomize       1
-        order           natural
+        randomize       SHIFT
+        order           NATURAL
         gen_vec         [     1 182667]
         entropy         7
         spawn_key       ()
@@ -84,8 +84,8 @@ class CubQMCLatticeG(_CubQMCLDG):
     Lattice (DiscreteDistribution Object)
         d               6
         dvec            [0 1 2 3 4 5]
-        randomize       1
-        order           natural
+        randomize       SHIFT
+        order           NATURAL
         gen_vec         [     1 182667 469891 498753 110745 446247]
         entropy         7
         spawn_key       ()
@@ -151,5 +151,5 @@ class CubQMCLatticeG(_CubQMCLDG):
             error_fun = error_fun)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
-        if self.discrete_distrib.order != 'natural':
-            raise ParameterError("CubLattice_g requires Lattice with 'natural' order")
+        if self.discrete_distrib.order != 'NATURAL':
+            raise ParameterError("CubLattice_g requires Lattice with 'NATURAL' order")

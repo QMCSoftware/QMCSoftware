@@ -156,7 +156,7 @@ class Lattice(LD):
         self.replications_gv = 1
         # ordering
         self.order = order.upper()
-        if self.order=="MPS": self.order = "natural"
+        if self.order=="MPS": raise ParameterError("lattice in MPS order is no longer supported")
         assert self.order in ['LINEAR','NATURAL','GRAY']
         # generating vector
         if isinstance(generating_vector,ndarray):
@@ -249,8 +249,8 @@ class Lattice(LD):
         n_start = uint64(n_min)
         x = empty((r_x,n,d),dtype=float64)
         if self.order=="LINEAR":
-            assert n_min==0, "lattice in LINEAR order requires n_min==0" 
-            _ = qmctoolscl.lat_gen_linear(r_x,n,d,self.gen_vec,x)
+            assert r_x==1, "lattice linear currently requires there be only 1 generating matrix"
+            x = self._gail_linear(n_min,n_max)[None,:,:]
         elif self.order=="NATURAL":
             assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "lattice in natural order requires n_min and n_max be 0 or powers of 2"
             _ = qmctoolscl.lat_gen_natural(r_x,n,d,n_start,self.gen_vec,x)
@@ -260,24 +260,53 @@ class Lattice(LD):
             assert False, "invalid lattice order"
         if r_x==1: x = x[0]
         r = uint64(self.replications)
-        if self.randomize=="SHIFT":
+        if self.randomize=="FALSE":
+            assert return_unrandomized is False, "cannot return_unrandomized when randomize='FALSE'"
+            return x
+        elif self.randomize=="SHIFT":
             xr = empty((r,n,d),dtype=float64)
             qmctoolscl.lat_shift_mod_1(r,n,d,r_x,x,self.shift,xr)
             if r==1: xr=xr[0]
-        if self.randomize=="FALSE":
-            if return_unrandomized:
-                raise ParameterError("return_unrandomized=True only applies when when randomize='SHIFT'.")
-            else:
-                return x
+            return (xr,x) if return_unrandomized else xr
         else:
-            if return_unrandomized:
-                return xr,x 
-            else:
-                return xr   
+            raise ParameterError("incorrect randomize parsing in lattice gen_samples")
 
+    def _gen_block_linear(self, m_next, first=True):
+        n = int(2**m_next)
+        if first:
+            y = arange(0, 1, 1 / n).reshape((n, 1))
+        else:
+            y = arange(1 / n, 1, 2 / n).reshape((n, 1))
+        x = outer(y, self.gen_vec) % 1
+        return x
+
+    def calculate_y(self, m_low, m_high, y):
+        for m in range(m_low, m_high):
+            n = 2 ** m
+            y_next = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            temp = zeros((n, 1))
+            temp[0::2] = y
+            temp[1::2] = y_next
+            y = temp
+        return y
+
+
+    def _gail_linear(self, n_min, n_max):
+        """ Gail lattice generator in linear order. """
+        m_low = int(floor(log2(n_min))) + 1 if n_min > 0 else 0
+        m_high = int(ceil(log2(n_max)))
+        if n_min == 0:
+            return self._gen_block_linear(m_high, first=True)
+        else:
+            n = 2 ** (m_low)
+            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            y = self.calculate_y(m_low, m_high, y)
+            x = outer(y, self.gen_vec) % 1
+            return x
+        
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[0], dtype=float)
+        return ones(x.shape[:-1], dtype=float)
 
     def _spawn(self, child_seed, dimension):
         return Lattice(

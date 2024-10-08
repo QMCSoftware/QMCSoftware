@@ -22,9 +22,9 @@ class CubBayesNetG(_CubBayesLDG):
     >>> solution,data = sc.integrate()
     >>> data
     LDTransformBayesData (AccumulateData Object)
-        solution        1.812
-        comb_bound_low  1.796
-        comb_bound_high 1.827
+        solution        1.804
+        comb_bound_low  1.786
+        comb_bound_high 1.821
         comb_flags      1
         n_total         2^(8)
         n               2^(8)
@@ -117,7 +117,7 @@ class CubBayesNetG(_CubBayesLDG):
         self.data = None
         self.fwht = FWHT()
 
-        if self.discrete_distrib.randomize == False:
+        if self.discrete_distrib.randomize == "FALSE":
             raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
 
 

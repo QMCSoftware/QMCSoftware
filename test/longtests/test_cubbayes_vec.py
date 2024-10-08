@@ -31,7 +31,7 @@ class TestCubBayesVec(unittest.TestCase):
                                         abs_tol=1e-3,
                                         rel_tol=1e-6)
         solution, data = qmc_stop_crit.integrate()
-        expected = [2.42575885e+00, 3.74999973e+04]
+        expected = [2.42575885e+00, 3.75000056e+04]
         self.assertTrue((abs(solution - expected).mean() < 0.001).all())
 
     def test_bayesian_opt(self):
