@@ -142,7 +142,7 @@ class Halton(LD):
         ctypeslib.ndpointer(ctypes.c_int, flags='C_CONTIGUOUS')]  # dvec
     halton_cf_qrng.restype = None
 
-    def __init__(self, dimension=1, randomize='LMS_PERM', seed=None, t_lms=53, n_lim=2**32, replications=1):
+    def __init__(self, dimension=1, randomize='LMS_PERM', seed=None, t_lms=53, n_lim=2**32, replications=1, qmctoolscl_kwargs={"backend":"c"}):
         """
         Args:
             dimension (int or ndarray): dimension of the generator. 
@@ -189,7 +189,7 @@ class Halton(LD):
         if "LMS" in self.randomize:
             S = qmctoolscl.gdn_get_linear_scramble_matrix(self.rng,uint64(replications),uint64(self.d),uint64(self.t_max),uint64(self.t_lms),uint64(1),self.primes)
             C_lms = empty((replications,self.d,self.m_max,self.t_lms),dtype=uint64)
-            qmctoolscl.gdn_linear_matrix_scramble(uint64(replications),uint64(self.d),uint64(self.m_max),uint64(1),uint64(1),uint64(self.t_max),uint64(self.t_lms),self.primes,S,self.C,C_lms)
+            qmctoolscl.gdn_linear_matrix_scramble(uint64(replications),uint64(self.d),uint64(self.m_max),uint64(1),uint64(1),uint64(self.t_max),uint64(self.t_lms),self.primes,S,self.C,C_lms,**qmctoolscl_kwargs)
             self.C = C_lms
             self.t_max = self.t_lms
             self.replications_gm = replications
@@ -204,7 +204,7 @@ class Halton(LD):
         if self.replications_gm>1: assert replications==self.replications_gm, "if replications_gm>1 require replications = replications_gm"
         self.replications = replications
              
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, qmctoolscl_gen_kwargs={"backend":"c"}, qmctoolscl_rand_kwargs={"backend":"c"}, qmctoolscl_convert_kwargs={"backend":"c"}):
         """
         Generate samples
 
@@ -213,8 +213,10 @@ class Halton(LD):
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
+            qmctoolscl_gen_kwargs,qmctoolscl_rand_kwargs,qmctoolscl_convert_kwargs (dict): keyword arguments for QMCToolsCL to use OpenCL when generating points, performing randomizations, and converting to floats. Defaults to C backend. See https://qmcsoftware.github.io/QMCToolsCL/
+
         Returns:
-            ndarray: (n_max-n_min) x d (dimension) array of samples
+            ndarray: replications x (n_max-n_min) x d (dimension) array of samples
         """
         if n:
             n_min = 0
@@ -233,10 +235,10 @@ class Halton(LD):
         tmax_new = uint64(self.t_lms)
         bmax = uint64(self.primes.max())
         xdig = empty((r_x,n,d,self.t_max),dtype=uint64)
-        _ = qmctoolscl.gdn_gen_natural(r_x,n,d,r_b,mmax,tmax,n_start,self.primes,self.C,xdig)
+        _ = qmctoolscl.gdn_gen_natural(r_x,n,d,r_b,mmax,tmax,n_start,self.primes,self.C,xdig,**qmctoolscl_gen_kwargs)
         if self.randomize in ["FALSE","LMS"]:
             x = empty((r_x,n,d),dtype=float64)
-            _ = qmctoolscl.gdn_integer_to_float(r_x,n,d,r_b,tmax,self.primes,xdig,x)
+            _ = qmctoolscl.gdn_integer_to_float(r_x,n,d,r_b,tmax,self.primes,xdig,x,**qmctoolscl_convert_kwargs)
             if r_x==1: x = x[0]
             return x
         if self.randomize=="QRNG": # no replications
@@ -246,13 +248,13 @@ class Halton(LD):
         r = uint64(self.replications)
         xdig_new = empty((r,n,d,self.t_lms),dtype=uint64)
         if "PERM" in self.randomize:
-            _ = qmctoolscl.gdn_digital_permutation(r,n,d,r_x,r_b,tmax,tmax_new,bmax,self.perms,xdig,xdig_new)
+            _ = qmctoolscl.gdn_digital_permutation(r,n,d,r_x,r_b,tmax,tmax_new,bmax,self.perms,xdig,xdig_new,**qmctoolscl_rand_kwargs)
         if "DS" in self.randomize:
-            _ = qmctoolscl.gdn_digital_shift(r,n,d,r_x,r_b,tmax,tmax_new,self.primes,self.rshift,xdig,xdig_new)
+            _ = qmctoolscl.gdn_digital_shift(r,n,d,r_x,r_b,tmax,tmax_new,self.primes,self.rshift,xdig,xdig_new,**qmctoolscl_rand_kwargs)
         if "NUS" in self.randomize:
             _ = qmctoolscl.gdn_nested_uniform_scramble(r,n,d,r_x,r_b,tmax,tmax_new,self.rngs,self.root_nodes,self.primes[None,:],xdig,xdig_new)
         x = empty((r,n,d),dtype=float64)
-        _ = qmctoolscl.gdn_integer_to_float(r,n,d,r_b,tmax_new,self.primes,xdig_new,x)
+        _ = qmctoolscl.gdn_integer_to_float(r,n,d,r_b,tmax_new,self.primes,xdig_new,x,**qmctoolscl_convert_kwargs)
         if r==1: x=x[0]
         return x         
 

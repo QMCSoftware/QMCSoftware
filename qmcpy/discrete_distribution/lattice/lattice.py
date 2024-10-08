@@ -215,7 +215,7 @@ class Lattice(LD):
         self.replications = replications
         
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False, qmctoolscl_gen_kwargs={"backend":"c"}, qmctoolscl_rand_kwargs={"backend":"c"}):
         """
         Generate lattice samples
 
@@ -226,7 +226,7 @@ class Lattice(LD):
             n_max (int): Final index of sequence.
             return_unrandomized (bool): return samples without randomization as 2nd return value.
                 Will not be returned if randomize=False.
-            qmctoolscl_kwargs (dict): keyword arguments for QMCToolsCL to use OpenCL. Defaults to C backend. See https://qmcsoftware.github.io/QMCToolsCL/
+            qmctoolscl_gen_kwargs,qmctoolscl_rand_kwargs (dict): keyword arguments for QMCToolsCL to use OpenCL when generating points or performing randomizations. Defaults to C backend. See https://qmcsoftware.github.io/QMCToolsCL/
 
         Returns:
             ndarray: replications x (n_max-n_min) x d (dimension) array of samples
@@ -253,9 +253,9 @@ class Lattice(LD):
             x = self._gail_linear(n_min,n_max)[None,:,:]
         elif self.order=="NATURAL":
             assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "lattice in natural order requires n_min and n_max be 0 or powers of 2"
-            _ = qmctoolscl.lat_gen_natural(r_x,n,d,n_start,self.gen_vec,x)
+            _ = qmctoolscl.lat_gen_natural(r_x,n,d,n_start,self.gen_vec,x,**qmctoolscl_gen_kwargs)
         elif self.order=="GRAY":
-            _ = qmctoolscl.lat_gen_gray(r_x,n,d,n_start,self.gen_vec,x) 
+            _ = qmctoolscl.lat_gen_gray(r_x,n,d,n_start,self.gen_vec,x,**qmctoolscl_gen_kwargs) 
         else: 
             assert False, "invalid lattice order"
         if r_x==1: x = x[0]
@@ -265,7 +265,7 @@ class Lattice(LD):
             return x
         elif self.randomize=="SHIFT":
             xr = empty((r,n,d),dtype=float64)
-            qmctoolscl.lat_shift_mod_1(r,n,d,r_x,x,self.shift,xr)
+            qmctoolscl.lat_shift_mod_1(r,n,d,r_x,x,self.shift,xr,**qmctoolscl_rand_kwargs)
             if r==1: xr=xr[0]
             return (xr,x) if return_unrandomized else xr
         else:
