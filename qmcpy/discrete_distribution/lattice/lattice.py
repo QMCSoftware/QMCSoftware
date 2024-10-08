@@ -23,7 +23,7 @@ class Lattice(LD):
         d               2^(1)
         dvec            [0 1]
         randomize       SHIFT
-        order           natural
+        order           NATURAL
         gen_vec         [     1 182667]
         entropy         7
         spawn_key       ()
@@ -53,7 +53,7 @@ class Lattice(LD):
         d               2^(1)
         dvec            [0 1]
         randomize       SHIFT
-        order           natural
+        order           NATURAL
         gen_vec         [       1 11961679]
         entropy         55
         spawn_key       ()
@@ -75,6 +75,26 @@ class Lattice(LD):
            [0.625, 0.875, 0.875],
            [0.375, 0.125, 0.125],
            [0.875, 0.625, 0.625]])
+    >>> Lattice(3,seed=7,replications=2).gen_samples(4)
+    array([[[0.04386058, 0.58727432, 0.3691824 ],
+            [0.54386058, 0.08727432, 0.8691824 ],
+            [0.29386058, 0.33727432, 0.1191824 ],
+            [0.79386058, 0.83727432, 0.6191824 ]],
+    <BLANKLINE>
+           [[0.65212985, 0.69669968, 0.10605352],
+            [0.15212985, 0.19669968, 0.60605352],
+            [0.90212985, 0.44669968, 0.85605352],
+            [0.40212985, 0.94669968, 0.35605352]]])
+    >>> Lattice(3,seed=7,generating_vector=25,replications=2).gen_samples(4)
+    array([[[0.3691824 , 0.65212985, 0.69669968],
+            [0.8691824 , 0.15212985, 0.19669968],
+            [0.6191824 , 0.90212985, 0.44669968],
+            [0.1191824 , 0.40212985, 0.94669968]],
+    <BLANKLINE>
+           [[0.10605352, 0.63025643, 0.13630282],
+            [0.60605352, 0.13025643, 0.63630282],
+            [0.35605352, 0.38025643, 0.38630282],
+            [0.85605352, 0.88025643, 0.88630282]]])
     
     References:
 
@@ -104,7 +124,7 @@ class Lattice(LD):
     """
 
     def __init__(self, dimension=1, randomize='shift', order='natural', seed=None,
-        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None):
+        generating_vector='lattice_vec.3600.20.npy', d_max=None, m_max=None, replications=1):
         """
         Args:
             dimension (int or :class:`numpy.ndarray`): dimension of the generator.
@@ -124,34 +144,46 @@ class Lattice(LD):
             
             d_max (int): maximum dimension
             m_max (int): :math:`2^{\\texttt{m\_max}}` is the max number of supported samples
-
+            replications (int): number of IID randomizations of a pointset
 
         Note:
             `d_max` and `m_max` are required if `generating_vector` is an ndarray.
             If `generating_vector` is a string (path), `d_max` and `m_max` can be taken from the file name if None.
         """
-        self.parameters = ['dvec','randomize','order']
-        self.order = order.lower()
-        assert self.order in ['linear','natural','mps','gray']
+        self.parameters = ['dvec','randomize','order','gen_vec']
+        self.mimics = 'StdUniform'
+        self.low_discrepancy = True
+        self.replications_gv = 1
+        # ordering
+        self.order = order.upper()
+        if self.order=="MPS": self.order = "natural"
+        assert self.order in ['LINEAR','NATURAL','GRAY']
+        # generating vector
         if isinstance(generating_vector,ndarray):
             self.gen_vec_og = generating_vector
             if d_max is None or m_max is None:
                 raise ParameterError("d_max and m_max must be supplied when generating_vector is a ndarray")
             self.d_max = d_max
             self.m_max = m_max
+            if self.gen_vec_og.ndim==1:
+                self.gen_vec_og = self.gen_vec_og[None,:]
+            else:
+                assert self.gen_vec_og.ndim==2, "ndarray generating vector must be 1 or two dimensional"
+                self.replications_gv = len(self.gen_vec_og)
         elif isinstance(generating_vector,int):
             self.m_max = min(26,max(2,generating_vector))
+            assert isinstance(dimension,int), "random generating vector requires int dimension"
             self.d_max = dimension
         elif isinstance(generating_vector,str):
             parts = generating_vector.split('.')
             root = dirname(abspath(__file__))+'/generating_vectors/'
             repos = DataSource()
             if isfile(root+generating_vector):
-                self.gen_vec_og = load(root+generating_vector).astype(uint64)
+                self.gen_vec_og = load(root+generating_vector).astype(uint64)[None,:]
                 self.d_max = int(parts[-3])
                 self.m_max = int(parts[-2])
             elif isfile(generating_vector):
-                self.gen_vec_og = load(generating_vector).astype(uint64)
+                self.gen_vec_og = load(generating_vector).astype(uint64)[None,:]
                 self.d_max = int(parts[-3])
                 self.m_max = int(parts[-2])
             elif "LDData"==generating_vector[:6] and repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector):
@@ -160,25 +192,28 @@ class Lattice(LD):
                 datafile.close()
                 self.d_max = contents[0]
                 n_max = contents[1]; assert log2(n_max)%1==0; self.m_max = int(log2(n_max))
-                self.gen_vec_og = array(contents[2:],dtype=uint64)
+                self.gen_vec_og = array(contents[2:],dtype=uint64)[None,:]
             else:
                 raise ParameterError("generating_vector '%s' not found."%generating_vector)
         else:
             raise ParameterError("invalid input for generating_matrices, see documentation and doctests.")
-        self.mimics = 'StdUniform'
-        self.low_discrepancy = True
         super(Lattice,self).__init__(dimension,seed)
+        # randomization
         if isinstance(generating_vector,int):
-            self.gen_vec_og = append(uint64(1),2*self.rng.integers(1,2**(self.m_max-1),size=dimension-1,dtype=uint64)+1)
-        self.gen_vec = self.gen_vec_og[self.dvec]
+            self.replications_gv = replications
+            self.gen_vec_og = hstack([ones((replications,1),dtype=uint64),2*self.rng.integers(1,2**(self.m_max-1),size=(replications,dimension-1),dtype=uint64)+1])
+        self.gen_vec = self.gen_vec_og[:,self.dvec].copy()
+        assert self.gen_vec.ndim==2, "gen_vec must have 2 dimensions"
         self.randomize = str(randomize).upper()
         if self.randomize=="TRUE": self.randomize = "SHIFT"
         if self.randomize=="NONE": self.randomize = "FALSE"
         if self.randomize=="NO": self.randomize = "FALSE"
         assert self.randomize in ["SHIFT","FALSE"]
         if self.randomize=="SHIFT":
-            self.shift = self.rng.uniform(size=int(self.d))
-        self.parameters += ["gen_vec"]
+            self.shift = self.rng.uniform(size=(replications,self.d))
+        if self.replications_gv>1: assert replications==self.replications_gv, "if replications_gv>1 require replications = replications_gv"
+        self.replications = replications
+        
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
         """
@@ -194,7 +229,7 @@ class Lattice(LD):
             qmctoolscl_kwargs (dict): keyword arguments for QMCToolsCL to use OpenCL. Defaults to C backend. See https://qmcsoftware.github.io/QMCToolsCL/
 
         Returns:
-            ndarray: (n_max-n_min) x d (dimension) array of samples
+            ndarray: replications x (n_max-n_min) x d (dimension) array of samples
 
         Note:
             Lattice generates in blocks from 2**m to 2**(m+1) so generating
@@ -203,34 +238,42 @@ class Lattice(LD):
         """
         if n:
             n_min = 0
-            n_max = n
-        if return_unrandomized and self.randomize=="FALSE":
-            raise ParameterError("return_unrandomized=True only applies when when randomize=True.")
+            n_max = n            
         if n_min == 0 and self.randomize=="FALSE" and warn:
             warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
         if n_max > 2**self.m_max:
             raise ParameterError('Lattice generating vector supports up to %d samples.'%(2**self.m_max))
-        r = uint64(1) 
+        r_x = uint64(self.replications_gv) 
         n = uint64(n_max-n_min)
         d = uint64(self.d) 
         n_start = uint64(n_min)
-        x = empty((n,d),dtype=float64)
-        if self.order=="linear":
-            assert n_min==0, "lattice in linear order requires n_min==0" 
-            _ = qmctoolscl.lat_gen_linear(r,n,d,self.gen_vec,x)
-        elif self.order in ["natural",'mps']:
+        x = empty((r_x,n,d),dtype=float64)
+        if self.order=="LINEAR":
+            assert n_min==0, "lattice in LINEAR order requires n_min==0" 
+            _ = qmctoolscl.lat_gen_linear(r_x,n,d,self.gen_vec,x)
+        elif self.order=="NATURAL":
             assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "lattice in natural order requires n_min and n_max be 0 or powers of 2"
-            _ = qmctoolscl.lat_gen_natural(r,n,d,n_start,self.gen_vec,x)
-        elif self.order=="gray":
-            _ = qmctoolscl.lat_gen_gray(r,n,d,n_start,self.gen_vec,x) 
+            _ = qmctoolscl.lat_gen_natural(r_x,n,d,n_start,self.gen_vec,x)
+        elif self.order=="GRAY":
+            _ = qmctoolscl.lat_gen_gray(r_x,n,d,n_start,self.gen_vec,x) 
         else: 
-            assert False, "invalid Lattice order"
+            assert False, "invalid lattice order"
+        if r_x==1: x = x[0]
+        r = uint64(self.replications)
+        if self.randomize=="SHIFT":
+            xr = empty((r,n,d),dtype=float64)
+            qmctoolscl.lat_shift_mod_1(r,n,d,r_x,x,self.shift,xr)
+            if r==1: xr=xr[0]
         if self.randomize=="FALSE":
-            return x
-        xr = x.copy() if return_unrandomized else x # if not return_unrandomized then we overwrite x 
-        r_x = uint64(1)
-        qmctoolscl.lat_shift_mod_1(r,n,d,r_x,xr,self.shift,xr)
-        return (xr,x) if return_unrandomized else xr
+            if return_unrandomized:
+                raise ParameterError("return_unrandomized=True only applies when when randomize='SHIFT'.")
+            else:
+                return x
+        else:
+            if return_unrandomized:
+                return xr,x 
+            else:
+                return xr   
 
     def pdf(self, x):
         """ pdf of a standard uniform """
@@ -244,4 +287,5 @@ class Lattice(LD):
                 seed=child_seed,
                 generating_vector=self.gen_vec_og,
                 d_max=self.d_max,
-                m_max=self.m_max)
+                m_max=self.m_max,
+                replications=self.replications)

@@ -61,7 +61,47 @@ class DigitalNetB2(LD):
            [0.84245267, 0.16445553, 0.56544372],
            [0.18546359, 0.44859876, 0.97389524],
            [0.61215442, 0.64341386, 0.44529863]])
-
+    >>> DigitalNetB2(dimension=3,randomize='LMS_DS',seed=7,replications=2).gen_samples(4)
+    array([[[0.31330935, 0.09580848, 0.24636182],
+            [0.61112103, 0.66930206, 0.70007472],
+            [0.10167532, 0.91581583, 0.97325936],
+            [0.83691425, 0.35015003, 0.45724578]],
+    <BLANKLINE>
+           [[0.13239161, 0.18660628, 0.73760357],
+            [0.76777532, 0.52700602, 0.17183852],
+            [0.39365722, 0.91359273, 0.43231666],
+            [0.50656501, 0.25313607, 0.97464392]]])
+    >>> DigitalNetB2(dimension=3,randomize='LMS',seed=7,replications=2).gen_samples(4)
+    array([[[0.        , 0.        , 0.        ],
+            [0.79796457, 0.70241587, 0.5475088 ],
+            [0.28983202, 0.94903657, 0.7742629 ],
+            [0.52522336, 0.254479  , 0.28954498]],
+    <BLANKLINE>
+           [[0.        , 0.        , 0.        ],
+            [0.8961262 , 0.66083813, 0.59054646],
+            [0.27006262, 0.77399226, 0.82226327],
+            [0.62613416, 0.43372985, 0.27077997]]])
+    >>> DigitalNetB2(dimension=3,randomize='DS',seed=7,replications=2).gen_samples(4)
+    array([[[0.04386058, 0.58727432, 0.3691824 ],
+            [0.54386058, 0.08727432, 0.8691824 ],
+            [0.29386058, 0.33727432, 0.6191824 ],
+            [0.79386058, 0.83727432, 0.1191824 ]],
+    <BLANKLINE>
+           [[0.65212985, 0.69669968, 0.10605352],
+            [0.15212985, 0.19669968, 0.60605352],
+            [0.90212985, 0.44669968, 0.85605352],
+            [0.40212985, 0.94669968, 0.35605352]]])
+    >>> DigitalNetB2(dimension=3,randomize='OWEN',seed=7,replications=2).gen_samples(4)
+    array([[[0.35967208, 0.89954733, 0.20817919],
+            [0.98911419, 0.49964829, 0.62480864],
+            [0.02600317, 0.16945373, 0.97946126],
+            [0.56008744, 0.54552841, 0.30711945]],
+    <BLANKLINE>
+           [[0.00782812, 0.71181447, 0.44244982],
+            [0.53880628, 0.41910168, 0.65404289],
+            [0.29051333, 0.16752862, 0.80878263],
+            [0.77449486, 0.83546482, 0.22950922]]])
+    
     References:
 
         [1] Marius Hofert and Christiane Lemieux (2019). 
@@ -107,7 +147,7 @@ class DigitalNetB2(LD):
 
     def __init__(self, dimension=1, randomize='LMS_DS', graycode=False, seed=None, 
         generating_matrices='sobol_mat.21201.32.32.msb.npy', d_max=None, t_max=None, m_max=None, msb=None, t_lms=53, 
-        _verbose=False):
+        _verbose=False, replications=1):
         """
         Args:
             dimension (int or :class:`numpy.ndarray`): dimension of the generator. 
@@ -135,17 +175,21 @@ class DigitalNetB2(LD):
             msb (bool): bit storage as ints, e.g., if :math:`{\\texttt{t\_max}} = 3`, then 6 is [1 1 0] in MSB (True) and [0 1 1] in LSB (False)
             t_lms (int): LMS scrambling matrix will be of shape (`t_lms`, `t_max`). Other generating matrix will be of shape (`t_max`, `m_max`).
             _verbose (bool): print randomization details
+            replications (int): number of IID randomizations of a pointset
         """
         self.parameters = ['dvec','randomize','graycode']
-        self.randomize = str(randomize).upper()
-        if self.randomize=="TRUE": self.randomize = "LMS_DS"
-        if self.randomize=="OWEN": self.randomize = "NUS"
-        if self.randomize=="NONE": self.randomize = "FALSE"
-        if self.randomize=="NO": self.randomize = "FALSE"
-        assert self.randomize in ["LMS_DS","LMS","DS","NUS","FALSE"]               
+        self.mimics = 'StdUniform'
+        self.low_discrepancy = True                      
         self.graycode = graycode
+        self.replications_gm = 1
+        # generating matrices 
         if isinstance(generating_matrices,ndarray):
-            self.z_og = generating_matrices
+            if generating_matrices.ndim==2:
+                self.z_og = generating_matrices[None,:,:]
+            else:
+                assert generating_matrices.ndim==3
+                self.z_og = generating_matrices
+                self.replications_gm = len(self.z_og)
             if d_max is None or t_max is None or m_max is None or msb is None:
                 raise ParameterError("d_max, t_max, m_max, and msb must be supplied when generating_matrices is a ndarray")
             self.d_max = d_max
@@ -157,13 +201,13 @@ class DigitalNetB2(LD):
             root = dirname(abspath(__file__))+'/generating_matrices/'
             repos = DataSource()
             if isfile(root+generating_matrices):
-                self.z_og = load(root+generating_matrices).astype(uint64)
+                self.z_og = load(root+generating_matrices).astype(uint64)[None,:]
                 self.d_max = int(parts[-5])
                 self.t_max = int(parts[-4])
                 self.m_max = int(parts[-3])
                 self.msb = bool(parts[-2].lower()=='msb')
             elif isfile(generating_matrices):
-                self.z_og = load(generating_matrices).astype(uint64)
+                self.z_og = load(generating_matrices).astype(uint64)[None,:]
                 self.d_max = int(parts[-5])
                 self.t_max = int(parts[-4])
                 self.m_max = int(parts[-3])
@@ -174,42 +218,46 @@ class DigitalNetB2(LD):
                 self.msb = True
                 contents = [line.split("#",1)[0] for line in contents if line[0]!="#"]
                 datafile.close()
-                assert int(contents[0])==2 # base 2
+                assert int(contents[0])==2, "DigitalNetB2 requires base=2 " # base 2
                 self.d_max = int(contents[1])
                 self.m_max = int(log2(int(contents[2])))
                 self.t_max = int(contents[3])
                 compat_shift = max(self.t_max-64,0)
                 if compat_shift>0: warnings.warn("Truncating ints in generating matrix to have 64 bits.")
-                self.z_og = array([[int(v)>>compat_shift for v in line.split(' ')] for line in contents[4:]],dtype=uint64)
+                self.z_og = array([[int(v)>>compat_shift for v in line.split(' ')] for line in contents[4:]],dtype=uint64)[None,:]
             else:
                 raise ParameterError("generating_matrices '%s' not found."%generating_matrices)
         else:
             raise ParameterError("invalid input for generating_matrices, see documentation and doctests.")
-        self.t_lms = max(self.t_max,t_lms)
-        self._verbose = _verbose
-        self.mimics = 'StdUniform'
-        self.low_discrepancy = True
         super(DigitalNetB2,self).__init__(dimension,seed)
-        if self.t_max>64 or self.t_lms>64 or self.t_max>self.t_lms:
-            raise Exception("require t_max <= t_lms <= 64")
-        self.z = zeros((self.d,self.m_max),dtype=uint64)
-        self.rshift = zeros(self.d,dtype=uint64)
-        self.z_og = self.z_og[self.dvec]
-        if not self.msb: 
-            qmctoolscl.dnb2_gmat_lsb_to_msb(uint64(1),uint64(self.d),uint64(self.m_max),tile(uint64(self.t_max),1),self.z_og,self.z_og)
+        if not self.msb:
+            qmctoolscl.dnb2_gmat_lsb_to_msb(uint64(self.replications_gm),uint64(self.d),uint64(self.m_max),tile(uint64(self.t_max),self.replications_gm),self.z_og,self.z_og)
+        # randomizations
+        self.t_lms = max(self.t_max,t_lms)
+        assert self.t_max<=64 and self.t_lms<=64, "require t_max <= t_lms <= 64"
+        self._verbose = _verbose
+        self.randomize = str(randomize).upper()
+        if self.randomize=="TRUE": self.randomize = "LMS_DS"
+        if self.randomize=="OWEN": self.randomize = "NUS"
+        if self.randomize=="NONE": self.randomize = "FALSE"
+        if self.randomize=="NO": self.randomize = "FALSE"
+        assert self.randomize in ["LMS_DS","LMS","DS","NUS","FALSE"] 
+        self.z = self.z_og[:,self.dvec].copy()
         if "LMS" in self.randomize:
-            self.z = self.z_og.copy()
-            S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,uint64(1),uint64(self.d),uint64(self.t_max),uint64(self.t_lms),uint64(self._verbose))
-            qmctoolscl.dnb2_linear_matrix_scramble(uint64(1),uint64(self.d),uint64(self.m_max),uint64(1),uint64(self.t_lms),S,self.z_og,self.z)
+            z_lms = empty((replications,self.d,self.m_max),dtype=uint64)
+            S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,uint64(replications),uint64(self.d),uint64(self.t_max),uint64(self.t_lms),uint64(self._verbose))
+            qmctoolscl.dnb2_linear_matrix_scramble(uint64(replications),uint64(self.d),uint64(self.m_max),uint64(self.replications_gm),uint64(self.t_lms),S,self.z,z_lms)
+            self.z = z_lms 
             self.t_max = self.t_lms
-        else:
-            self.z = self.z_og
+            self.replications_gm = replications
         if "DS" in self.randomize:
-            self.rshift = qmctoolscl.random_tbit_uint64s(self.rng,self.t_lms,(self.d,))
+            self.rshift = qmctoolscl.random_tbit_uint64s(self.rng,self.t_lms,(replications,self.d))
         if "NUS" in self.randomize:
-            new_seeds = self._base_seed.spawn(self.d)
-            self.rngs = array([random.Generator(random.SFC64(new_seeds[j])) for j in range(self.d)]).reshape(1,self.d)
-            self.root_nodes = array([qmctoolscl.NUSNode_dnb2() for i in range(self.d)]).reshape(1,self.d)
+            new_seeds = self._base_seed.spawn(replications*self.d)
+            self.rngs = array([random.Generator(random.SFC64(new_seeds[j])) for j in range(replications*self.d)]).reshape(replications,self.d)
+            self.root_nodes = array([qmctoolscl.NUSNode_dnb2() for i in range(replications*self.d)]).reshape(replications,self.d)
+        if self.replications_gm>1: assert replications==self.replications_gm, "if replications_gm>1 require replications = replications_gm"
+        self.replications = replications
 
     def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False):
         """
@@ -237,39 +285,50 @@ class DigitalNetB2(LD):
             warnings.warn("Non-randomized DigitalNetB2 sequence includes the origin",ParameterWarning)
         if n_max > 2**self.m_max:
             raise ParameterError('DigitalNetB2 generating matrices support up to %d samples.'%(2**self.m_max))
-        if return_unrandomized and not self.set_rshift and not self.set_owen:
-            raise ParameterError("return_unrandomized=True only applies when randomize includes a digital shift or NUS (Owen) scramble.")
-        r = uint64(1) 
+        r_x = uint64(self.replications_gm) 
         n = uint64(n_max-n_min)
         d = uint64(self.d) 
         n_start = uint64(n_min)
         mmax = uint64(self.m_max)
-        xb = empty((n,d),dtype=uint64)
+        xb = empty((r_x,n,d),dtype=uint64)
         if self.graycode:
-            _ = qmctoolscl.dnb2_gen_gray(r,n,d,n_start,mmax,self.z,xb)
+            _ = qmctoolscl.dnb2_gen_gray(r_x,n,d,n_start,mmax,self.z,xb)
         else: 
             assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "DigitalNetB2 in natural order requires n_min and n_max be 0 or powers of 2"
-            _ = qmctoolscl.dnb2_gen_natural(r,n,d,n_start,mmax,self.z,xb)
-        if return_unrandomized:
-            tmaxes_new = tile(uint64(self.t_max),r)
-            x = empty((n,d),dtype=float64)
-            _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xb,x)
+            _ = qmctoolscl.dnb2_gen_natural(r_x,n,d,n_start,mmax,self.z,xb)
+        if return_unrandomized or self.randomize in ["FALSE","LMS"]:
+            tmaxes_new = tile(uint64(self.t_max),int(r_x))
+            x = empty((r_x,n,d),dtype=float64)
+            _ = qmctoolscl.dnb2_integer_to_float(r_x,n,d,tmaxes_new,xb,x)
+            if r_x==1: x = x[0]
+        r = uint64(self.replications)
         if "DS" in self.randomize:
-            r_x = uint64(1)
-            lshifts = tile(uint64(self.t_lms-self.t_max),1)
-            _ = qmctoolscl.dnb2_digital_shift(r,n,d,r_x,lshifts,xb,self.rshift,xb)
+            xrb = empty((r,n,d),dtype=uint64)
+            lshifts = tile(uint64(self.t_lms-self.t_max),int(r))
+            _ = qmctoolscl.dnb2_digital_shift(r,n,d,r_x,lshifts,xb,self.rshift,xrb)
+            tmaxes_new = tile(uint64(self.t_lms),int(r))
+            xr = empty((r,n,d),dtype=float64)
+            _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr)
+            if r==1: xr=xr[0]
         if "NUS" in self.randomize:
-            r_x = 1
+            xrb = empty((r,n,d),dtype=uint64)
             tmax = uint64(self.t_max)
             tmax_new = uint64(self.t_lms)
-            xb = xb[None,:,:]
-            xrb = zeros((1,n,d),dtype=uint64)
             _ = qmctoolscl.dnb2_nested_uniform_scramble(r,n,d,r_x,tmax,tmax_new,self.rngs,self.root_nodes,xb,xrb)
-            xb = xrb[0]
-        tmaxes_new = tile(uint64(self.t_lms if self.randomize!="FALSE" else self.t_max),1)
-        xr = empty((n,d),dtype=float64) 
-        _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xb,xr)
-        return (xr,x) if return_unrandomized else xr
+            tmaxes_new = tile(uint64(self.t_lms),int(r))
+            xr = empty((r,n,d),dtype=float64)
+            _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr)
+            if r==1: xr=xr[0]
+        if self.randomize in ["FALSE","LMS"]:
+            if return_unrandomized:
+                raise ParameterError("return_unrandomized=True only applies when when randomize='SHIFT'.")
+            else:
+                return x
+        else:
+            if return_unrandomized:
+                return xr,x 
+            else:
+                return xr
     
     def pdf(self, x):
         """ pdf of a standard uniform """
@@ -286,7 +345,8 @@ class DigitalNetB2(LD):
             t_max=self.t_max,
             m_max=self.m_max,
             msb=True, # self.z_og is put into MSB during first initialization 
-            t_lms=self.t_lms)
+            t_lms=self.t_lms,
+            replications=self.replications)
 
 class Sobol(DigitalNetB2): pass
 
