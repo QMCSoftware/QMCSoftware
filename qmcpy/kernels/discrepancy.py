@@ -1,248 +1,152 @@
 import numpy as np
 import time
 from copy import copy
-from inspect import signature
+from inspect import signature   
 
-#Make a function for double integral, single integral, and kernel
-#Cut down on the copies for x
-#Make notes throughout the code
-#Make a plot of runtimes based on different values of n and limiter
-
-def double_integral(method, weight, d):
-    if callable(method):            #discrepancy function given by the user
-        sig = signature(method)     #[These 2 lines, were set up to figure out how many variables the function has
-        params = sig.parameters     #[
-        if len(params) == 1:
-            #if method function from user has 1 variable, it must be a function of d
-            return method(d)
-        elif len(params) == 2:
-            #otherwise, for a weighted double integral, you need method function to
-            #have 2 variables, so that the code would know that it is weighted
-            return method(d, weight)
-    else:
-        if method.lower() == "l2" or method.lower() == "l2star":
-            # ^^^ function for l2star double integral
-            return (1 + (weight/3)).prod(axis=0)
-        elif method.lower == "s" or method.lower() == "star":
-            # ^^^ function for star double integral
-            return (1/3)**d
-        elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':
-            # ^^^ function for centered double integral
-            return (13/12)**d
-        elif method.lower() == "sy" or method.lower() == "symmetric":
-            # ^^^ function for symmetric double integral
-            return (4/3)**d
-        elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
-            # ^^^ function for wrap around double integral
-            return -((4/3)**d)
-        elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':
-            # ^^^ function for mixture double integral
-            return (19/12)**d
-        elif type(method) is float or type(method) is int:
-            # ^^^ incase if user puts in fixed value.
-            return method
-        else:
-            #If all ends fail, return False. We can work on an error system later
-            return False
-        
-def single_integral(method, x, weight):
-    if callable(method):            #discrepancy function given by the user
-        sig = signature(method)     #[These 2 lines help figure out how many variables method function has
-        params = sig.parameters     #[
-        if len(params) == 1:
-            #Unweighted discrepancy function from the user must have 1 variable and it's the sample
-            return method(x)
-        elif len(params) == 2:
-            #Weighted discrepancy function from the user must have 2 variables, 'x' and 'weight' in the exact order
-            return method(x, weight)
-    else:
-        if method.lower() == "l2" or method.lower() == "l2star":
-            # ^^^ function for l2star single integral
-            return ((1 + (weight*(1 - x**2)/2))).prod(axis=1)
-        elif method.lower() == "s" or method.lower() == "star":
-            # ^^^ function for star single integral
-            return ((1-(x**2))/2).prod(axis=1)
-        elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':
-            # ^^^ function for centered single integral
-            return (1 + (.5*abs(x - .5)) - (.5*((x -.5)**2))).prod(axis=1)
-        elif method.lower() == "sy" or method.lower() == "symmetric":        #Symmetric
-            # ^^^ function for symmetric single integral
-            return (1 + 2*x - (2*(x**2))).prod(axis=1)
-        elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
-            # ^^^ function for wrap around single integral
-            return 0
-        elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':
-            # ^^^ function for mixture single integral
-            return ((5/3) - (.25*abs(x - .5)) - (.25*((x -.5)**2))).prod(axis=1)
-        elif type(method) is float or type(method) is int:
-            #Allow the user to put in a fixed value
-            return method
-        else:
-            #We can work on an error system later
-            return False
-    
-def kernel(method, weight, x, y):
-    if callable(method):            #discrepancy function given by the user
-        sig = signature(method)     #[These 2 lines is to figure out how many variables the method function contains
-        params = sig.parameters     #[
-        if len(params) == 2:
-            #Unweighted method function has 2 variables, x and y
-            return method(x,y)
-        elif len(params) == 3:
-            #Otherwise, if 3 then it is a weighted function and you have x and y, then weight
-            return method(x,y,weight)
-    else:
-        if method.lower() == "l2" or method.lower() == "l2star":
-            # ^^^ function for l2star kernel
-            return (1 + weight*(1 - np.maximum(x, y))).prod(axis=2)
-        elif method.lower() == "s" or method.lower() == "star":
-            # ^^^ function for star kernel
-            return (1 - np.maximum(x,y)).prod(axis = 2)
-        elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':
-            # ^^^ function for centered kernel
-            return (1 + (.5*abs(x - .5)) + (.5*abs(y - .5)) - (.5*abs(x - y))).prod(axis=2)
-        elif method.lower() == "sy" or method.lower() == "symmetric":        #Symmetric
-            # ^^^ function for symmetric kernel
-            return (2 - (2*abs(x - y))).prod(axis=2)
-        elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
-            # ^^^ function for wrap around kernel
-            return (1.5 - (abs(x - y)*(1 - abs(x - y)))).prod(axis=2)
-        elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':
-            # ^^^ function for mixture kernel
-            return (1.875 - (.25*abs(x - .5)) - (.25*abs(y - .5)) - (.75*abs(x - y)) + (.5*((x - y)**2))).prod(axis=2)
-        elif type(method) is float or type(method) is int:
-            #The user can punch in a fixed value
-            return method
-        else:
-            #Work on error system later
-            return False
-        
-
-def discrepancy(method, x, weight = 1):
-    n, d = x.shape                              #Finds the number of samples and the dimensions for our x_i's
-    weight = weight * np.ones(d)                #if weight is a scalar, it gets turned into an array.
-                                                #if weight is an array, it would still be an array since
-                                                #np.ones(d) would be identified as an identity.
-    #find a way to generate the weight, and generate the scalar into an array
-    #For L2 star, the weighted kernel is 
-    #(double integral)\prod_{j=1}^d (1 + (w_j)/3)
-    #(single integral)\prod_{j=1}^d (1 + (w_j)(1-x^2)/2)
-    #(kernel) \prod_{j=1}^d (1 + w_j(1 - max(x_j, t_j)))
-
-    if callable(method):      #discrepancy function given by the user
-        sig = signature(method)
-        params = sig.parameters
-        if len(params) == 1:
-            #The function given by the discrepancy function must return the double integral, second integral, and kernel in this order
-            double_integral, single_integral, kernel = method(x)
-            #returns the discrepancy
-        elif len(params) == 2:
-            #The weighted discrepancy given by the user
-            double_integral, single_integral, kernel = method(x, weight)
-        return np.sqrt(double_integral - (2*np.mean(single_integral)) + np.mean(np.mean(kernel)))
-    else:
-        #X_expanded = np.zeros((n,n,d)) + x      #Copies x into a 3d matrix of size n by n by d.
-        X_expanded = np.resize(x, (1, n, d))
-        Y = np.resize(x, (n, 1, d))             #reshapes x so that we can iteratively find the value of the kernels
-        if method.lower() == "l2" or method.lower() == "l2star":           #Star
-            double_integral = (1 + (weight/3)).prod(axis=0)
-            single_integral = ((1 + (weight*(1 - x**2)/2))).prod(axis=1)
-            kernel = (1 + weight*(1 - np.maximum(X_expanded, Y))).prod(axis=2)
-        elif method.lower() == "s" or method.lower() == "star":        #L2star
-            double_integral = (1/3)**d
-            single_integral = ((1-x**2)/2).prod(axis=1)
-            kernel = (1 - np.maximum(X_expanded, Y)).prod(axis=2)
-        elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':         #Centered
-            double_integral = (13/12)**d
-            single_integral = (1 + (.5*abs(x - .5)) - (.5*((x -.5)**2))).prod(axis=1)
-            kernel = (1 + (.5*abs(X_expanded - .5)) + (.5*abs(Y - .5)) - (.5*abs(X_expanded - Y))).prod(axis=2)
-        elif method.lower() == "sy" or method.lower() == "symmetric":        #Symmetric
-            double_integral = (4/3)**d
-            single_integral = (1 + 2*x - (2*(x**2))).prod(axis=1)
-            kernel = (2 - (2*abs(X_expanded - Y))).prod(axis=2)
-        elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
-            double_integral = -(4/3)**d
-            single_integral = 0
-            kernel = (1.5 - (abs(X_expanded - Y)*(1 - abs(X_expanded - Y)))).prod(axis=2)
-            #double_integral = -(4/3)**d
-            #single_integral
-        elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':        #Wrap around
-            double_integral = (19/12)**d
-            single_integral = ((5/3) - (.25*abs(x - .5)) - (.25*((x -.5)**2))).prod(axis=1)
-            kernel = (1.875 - (.25*abs(X_expanded - .5)) - (.25*abs(Y - .5)) - (.75*abs(X_expanded - Y)) + (.5*((X_expanded - Y)**2))).prod(axis=2)
-        else:
-            return False
-    #returns the discrepancy
-    return np.sqrt(double_integral - (2*np.mean(single_integral)) + np.mean(np.mean(kernel)))
-
-def discrepancy2(method, x, weight = 1, limiter = 2**16, Time = False):
+#Get rid of the double_integral, single_integral, and kernels and make method into an array
+#Go back into the Scipy and replace the old discrepancy
+#Make a demo in the jupyter notebook
+#Unit tests
+#And then later a blog
+def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
     if Time == True:                #Times the actual calculation for discrepancy
         start_time = time.time()
 
     n, d = x.shape  #Finds the number of samples and their dimensions
 
-    weight = weight * np.ones(d) #Makes sure that the weight is a vector, but the user can use a scalar value
-
-    limiter = int(limiter / d)      #Figures out how many samples the code should take in
-    limiter = int(np.sqrt(limiter))
-
-    #Gets 2 new matrix to calculate kernel
-    X_expanded = np.resize(x, (1, n, d))
-    Y = np.resize(x, (n, 1, d))
-
-    #Goes ahead and starts 3 variables for calculating single integral and kernel
-    #and initialize the list
-    iterated_X = []
-    iterated_X_expanded = []
-    iterated_Y = []
-    n_chunks = int(np.ceil(n/limiter))
-    for i_1 in range(int(n/limiter)+1):               #These 4 lines are used to make these lists into chunks
-        iterated_X = iterated_X + [x[i_1*limiter: (i_1+1)*limiter, :]]
-        iterated_X_expanded = iterated_X_expanded + [X_expanded[:, i_1*limiter: (i_1+1)*limiter, :]]
-        iterated_Y = iterated_Y + [Y[i_1*limiter: (i_1+1)*limiter, :, :]]
-
-    #Gets rid of the null matrices if it does meet the criterion
-    if n%limiter == 0:
-        iterated_X = iterated_X[0: len(iterated_X) - 1]
-        iterated_X_expanded = iterated_X_expanded[0:len(iterated_X_expanded)-1]
-        iterated_Y = iterated_Y[0:len(iterated_Y)-1]
-    
-    #Figures out if method is a string. If it is then it sets method1, method2, and method3 as method given by user
-    if type(method) is str:
-        method1 = method
-        method2 = method
-        method3 = method
+    #reconfigures the weight so that it is appropriate to the given matrix
+    if type(weight) == list: # if weight is a list
+        weight = weight[0:d] #make sure you take the first d elements for calculations
     else:
-        #The only way this happens is if the user puts in a discrepancy function requiring 3 functions.
-        method1 = method[0]
-        method2 = method[1]
-        method3 = method[2]
-    #method1 is the double integral, method2 is the single integral, and method3 is the kernel
+        weight = weight * np.ones(d) #if weight is scalar, just make a list of d weights.
 
-    #Calculates the double integral which requires no for loops
-    DI = double_integral(method1, weight, d)
-    
-    #Calculates the single integral which would require 1 for loop
-    B = 0                                                                   #initializes variable B with 0
-    for j in range(n_chunks):                                        #For however many elements in iterated_X
-        #B = B + np.sum(single_integral(method2, iterated_X[j], weight))     #Calculate the single integral per iteration and add
-        B = B + np.sum(single_integral(method2, x[j*limiter: (j+1)*limiter, :], weight))
+    if type(method) == str:    #If a method was chosen
+        if type(method) is str: #Give the double and single integral along with the kernel based on the method
+            if method.lower() == "l2" or method.lower() == "l2star":           #Star
+                double_integral = lambda w : (1 + (w/3)).prod(axis=0)
+                single_integral = lambda x, w : ((1 + (w*(1 - x**2)/2))).prod(axis=1)
+                kernel = lambda x, y, w : (1 + w*(1 - np.maximum(x, y))).prod(axis=2)
+            #elif method.lower() == "s" or method.lower() == "star":        #L2star
+            #    double_integral = lambda d: (1/3)**d
+            #    single_integral = lambda x, w : ((1-x**2)/2).prod(axis=1)
+            #    kernel = lambda x, y, w : (1 - np.maximum(x, y)).prod(axis=2)
+            elif method.lower() == "c" or method.lower() == "centered" or method.lower() == 'cd':         #Centered
+                double_integral = lambda w : (1 + (w/12)).prod()
+                single_integral = lambda x, w : (1 + (0.5*w)*(abs(x - .5)*(1 - abs(x -.5)))).prod(axis=1)
+                kernel = lambda x, y, w : (1 + (0.5*w)*(abs(x - .5) + abs(y - .5) - abs(x - y))).prod(axis=2)
+            elif method.lower() == "sy" or method.lower() == "symmetric":        #Symmetric
+                double_integral = lambda w : (1 +(w/3)).prod(axis=0)
+                single_integral = lambda x, w: (1 + (w*2*x) - (w*2*(x**2))).prod(axis=1)
+                kernel = lambda x, y, w : (1 + w*(1 - abs(x - y))).prod(axis=2)
+            elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
+                double_integral = lambda w : -(1 + (w/3)).prod(axis=0)
+                single_integral = lambda x, w: 0
+                kernel = lambda x, y, w: (1.5 - (abs(x - y)*(1 - abs(x - y)))).prod(axis=2)
+            elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':        #Wrap around
+                double_integral = lambda w: (((7/12)*w)+1).prod()
+                single_integral = lambda x, w: (1 + w*((2/3) - (.25*abs(x - .5)) - (.25*((x -.5)**2)))).prod(axis=1)
+                kernel = lambda x, y, w: (1+ w*(.875 - (.25*abs(x - .5)) - (.25*abs(y - .5)) - (.75*abs(x - y)) + (.5*((x - y)**2)))).prod(axis=2)
+    else:
+        #If the user punches in a list of functions for variable method
+        if type(method) == list:
+            if len(method) == 2:
+                #if we have 2 functions, define the double integral and kernel. And set single_integral to 0.
+                double_integral = method[0]
+                single_integral = 0     
+                kernel = method[1]
+            elif len(method) == 3:
+                double_integral = method[0]
+                single_integral = method[1]
+                kernel = method[2]
+    # Calculates the double integral which doesn't require loops
+    DI = double_integral(weight)
 
-    SI = B*2/n #Finds the average and multiply by 2 for the single integral component for discrepancy
+    # initializing the sum of the single integrals
+    single_integral_sum = 0
+    # initializing the sum of kernels
+    kernel_sum = 0
 
-    #Calculates the kernels which requires 2 for loops
-    C = 0                                                                                           #initializes C as 0
-    for j in range(len(iterated_X_expanded)):                                                       #[For each iteration of
-        for i in range(len(iterated_Y)):                                                            #[iterated_X_expanded & iterated_Y
-            C = C + np.sum(np.sum(kernel(method3, weight, iterated_X_expanded[j], iterated_Y[i])))  #[Adds up all the values for kernel
-    
-    K = C/(n**2) #Finds the average for the kernels
+    #cutting down on run time depending on if single_integral is 0 or not.
+    if single_integral != 0:
+        # As long as x is a matrix
+        if x[0,0] != None:  #the discrepancy of some points
+            # These 2 rows give out the limit as to how many samples to consider when calculating
+            # the sum of single integral and kernels, so that the computer does not get overwhelmed
+            # with the calculations
+            len_chunk = np.floor(np.sqrt(limiter/d)).astype('int')
+            n_chunk = np.ceil(n/len_chunk).astype('int')
+            for ii in range(n_chunk):
+                # Gets a chunk from the matrix x
+                n_ii_start = ii*len_chunk
+                n_ii_end = np.array([n,(ii+1)*len_chunk]).min()
+                n_ii_batch = n_ii_end - n_ii_start
+                #As long as the n_ii_start and n_ii_end are not the same
+                if n_ii_batch > 0:
+                    # Grab some samples from x
+                    x_chunk = x[n_ii_start:n_ii_end,:]
+                    # Go ahead and calculate the single_integral for those samples and add them up
+                    # to single_integral_sum
+                    single_integral_sum  += single_integral(x_chunk,weight).sum(axis = 0)
+                    # We have to reshape the matrix x such that we get an iteration.
+                    x_chunk = x_chunk.reshape(n_ii_batch,1,d)
+                    y_chunk = x_chunk.reshape(1,n_ii_batch,d)
+                    #Calculates the kernel sum for the given chunk since they are the same
+                    kernel_sum += kernel(x_chunk,y_chunk,weight).sum()
+                    for jj in range(ii+1,n_chunk):
+                        #This is the part where you need an iteration for the rest of the kernels for when 
+                        n_jj_start = jj*len_chunk
+                        n_jj_end = np.array([n,(jj+1)*len_chunk]).min()
+                        n_jj_batch = n_jj_end - n_jj_start
+                        if n_jj_batch > 0:
+                            y_chunk = x[n_jj_start:n_jj_end,:].reshape(1,n_jj_batch,d)
+                            # We multiply by 2, because you would have to do the same calculation twice, sp
+                            # there was no reason to repeat. Multiply the kernel when x_chunk != y_chunk by
+                            # 2.
+                            kernel_sum += 2*kernel(x_chunk,y_chunk,weight).sum()
+    else:
+        #The only difference is that we are no longer calculating for single integral, since it is 0.
 
-    if Time == True:
-        #If Time is true
+        # As long as x is a matrix
+        if x[0,0] != None:  #the discrepancy of some points
+            # These 2 rows give out the limit as to how many samples to consider when calculating
+            # the sum of single integral and kernels, so that the computer does not get overwhelmed
+            # with the calculations
+            len_chunk = np.floor(np.sqrt(limiter/d)).astype('int')
+            n_chunk = np.ceil(n/len_chunk).astype('int')
+            for ii in range(n_chunk):
+                # Gets a chunk from the matrix x
+                n_ii_start = ii*len_chunk
+                n_ii_end = np.array([n,(ii+1)*len_chunk]).min()
+                n_ii_batch = n_ii_end - n_ii_start
+                #As long as the n_ii_start and n_ii_end are not the same
+                if n_ii_batch > 0:
+                    # Grab some samples from x
+                    x_chunk = x[n_ii_start:n_ii_end,:]
+                    # We don't need single integral since it is equal to 0
+
+                    # We have to reshape the matrix x such that we get an iteration.
+                    x_chunk = x_chunk.reshape(n_ii_batch,1,d)
+                    y_chunk = x_chunk.reshape(1,n_ii_batch,d)
+                    #Calculates the kernel sum for the given chunk since they are the same
+                    kernel_sum += kernel(x_chunk,y_chunk,weight).sum()
+                    for jj in range(ii+1,n_chunk):
+                        #This is the part where you need an iteration for the rest of the kernels for when 
+                        n_jj_start = jj*len_chunk
+                        n_jj_end = np.array([n,(jj+1)*len_chunk]).min()
+                        n_jj_batch = n_jj_end - n_jj_start
+                        if n_jj_batch > 0:
+                            y_chunk = x[n_jj_start:n_jj_end,:].reshape(1,n_jj_batch,d)
+                            # We multiply by 2, because you would have to do the same calculation twice, sp
+                            # there was no reason to repeat. Multiply the kernel when x_chunk != y_chunk by
+                            # 2.
+                            kernel_sum += 2*kernel(x_chunk,y_chunk,weight).sum()
+    # Take the average of both the single integral and the kernel
+    single_integral_sum  *= (2/n)
+    kernel_sum *= (1/(n**2)) 
+    # Calculates the discrepancy
+    out = np.sqrt(DI - single_integral_sum + kernel_sum)
+
+    if Time:  #if we are measuring time
         total_time = time.time() - start_time
-        #return the discrepancy value and total time it took
-        return np.sqrt(DI - SI + K), total_time
-    else:
-        #Otherwise, just print the discrepancy value.
-        return np.sqrt(DI - SI + K)
+        out = [out, total_time]
+    return out
