@@ -40,7 +40,7 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
                 kernel = lambda x, y, w : (1 + w*(1 - abs(x - y))).prod(axis=2)
             elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
                 double_integral = lambda w : -(1 + (w/3)).prod(axis=0)
-                single_integral = lambda x, w: 0
+                single_integral = 0
                 kernel = lambda x, y, w: (1.5 - (abs(x - y)*(1 - abs(x - y)))).prod(axis=2)
             elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':        #Wrap around
                 double_integral = lambda w: (((7/12)*w)+1).prod()
