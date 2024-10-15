@@ -59,7 +59,10 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
                 single_integral = method[1]
                 kernel = method[2]
     # Calculates the double integral which doesn't require loops
-    DI = double_integral(weight)
+    if len(signature(double_integral).parameters) == 1:
+        DI = double_integral(d)
+    else:
+        DI = double_integral(weight)
 
     # initializing the sum of the single integrals
     single_integral_sum = 0
@@ -86,12 +89,18 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
                     x_chunk = x[n_ii_start:n_ii_end,:]
                     # Go ahead and calculate the single_integral for those samples and add them up
                     # to single_integral_sum
-                    single_integral_sum  += single_integral(x_chunk,weight).sum(axis = 0)
+                    if len(signature(double_integral).parameters) == 1:
+                        single_integral_sum  += single_integral(x_chunk).sum(axis = 0)
+                    else:
+                        single_integral_sum  += single_integral(x_chunk,weight).sum(axis = 0)
                     # We have to reshape the matrix x such that we get an iteration.
                     x_chunk = x_chunk.reshape(n_ii_batch,1,d)
                     y_chunk = x_chunk.reshape(1,n_ii_batch,d)
                     #Calculates the kernel sum for the given chunk since they are the same
-                    kernel_sum += kernel(x_chunk,y_chunk,weight).sum()
+                    if len(signature(double_integral).parameters) == 2:
+                        kernel_sum += kernel(x_chunk,y_chunk).sum()
+                    else:
+                        kernel_sum += kernel(x_chunk,y_chunk,weight).sum()
                     for jj in range(ii+1,n_chunk):
                         #This is the part where you need an iteration for the rest of the kernels for when 
                         n_jj_start = jj*len_chunk
@@ -102,7 +111,10 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
                             # We multiply by 2, because you would have to do the same calculation twice, sp
                             # there was no reason to repeat. Multiply the kernel when x_chunk != y_chunk by
                             # 2.
-                            kernel_sum += 2*kernel(x_chunk,y_chunk,weight).sum()
+                            if len(signature(double_integral).parameters) == 2:
+                                kernel_sum += 2*kernel(x_chunk,y_chunk).sum()
+                            else:
+                                kernel_sum += 2*kernel(x_chunk,y_chunk,weight).sum()
     else:
         #The only difference is that we are no longer calculating for single integral, since it is 0.
 
@@ -128,7 +140,10 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
                     x_chunk = x_chunk.reshape(n_ii_batch,1,d)
                     y_chunk = x_chunk.reshape(1,n_ii_batch,d)
                     #Calculates the kernel sum for the given chunk since they are the same
-                    kernel_sum += kernel(x_chunk,y_chunk,weight).sum()
+                    if len(signature(double_integral).parameters) == 2:
+                        kernel_sum += kernel(x_chunk,y_chunk).sum()
+                    else:
+                        kernel_sum += kernel(x_chunk,y_chunk,weight).sum()
                     for jj in range(ii+1,n_chunk):
                         #This is the part where you need an iteration for the rest of the kernels for when 
                         n_jj_start = jj*len_chunk
@@ -139,7 +154,10 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
                             # We multiply by 2, because you would have to do the same calculation twice, sp
                             # there was no reason to repeat. Multiply the kernel when x_chunk != y_chunk by
                             # 2.
-                            kernel_sum += 2*kernel(x_chunk,y_chunk,weight).sum()
+                            if len(signature(double_integral).parameters) == 2:
+                                kernel_sum += 2*kernel(x_chunk,y_chunk).sum()
+                            else:
+                                kernel_sum += 2*kernel(x_chunk,y_chunk,weight).sum()
     # Take the average of both the single integral and the kernel
     single_integral_sum  *= (2/n)
     kernel_sum *= (1/(n**2)) 
