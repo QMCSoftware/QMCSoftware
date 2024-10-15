@@ -89,10 +89,10 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
                     x_chunk = x[n_ii_start:n_ii_end,:]
                     # Go ahead and calculate the single_integral for those samples and add them up
                     # to single_integral_sum
-                    if len(signature(double_integral).parameters) == 1:
-                        single_integral_sum  += single_integral(x_chunk).sum(axis = 0)
+                    if len(signature(double_integral).parameters) == 2:
+                        single_integral_sum  += single_integral(x_chunk, weight).sum(axis = 0)
                     else:
-                        single_integral_sum  += single_integral(x_chunk,weight).sum(axis = 0)
+                        single_integral_sum  += single_integral(x_chunk).sum(axis = 0)
                     # We have to reshape the matrix x such that we get an iteration.
                     x_chunk = x_chunk.reshape(n_ii_batch,1,d)
                     y_chunk = x_chunk.reshape(1,n_ii_batch,d)
