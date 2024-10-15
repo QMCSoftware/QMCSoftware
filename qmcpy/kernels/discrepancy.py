@@ -59,7 +59,7 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
                 single_integral = method[1]
                 kernel = method[2]
     # Calculates the double integral which doesn't require loops
-    if len(signature(double_integral).parameters) == 1:
+    if len(signature(kernel).parameters) == 2:
         DI = double_integral(d)
     else:
         DI = double_integral(weight)
