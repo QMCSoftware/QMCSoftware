@@ -3,9 +3,6 @@ import time
 from copy import copy
 from inspect import signature   
 
-#Get rid of the double_integral, single_integral, and kernels and make method into an array
-#Go back into the Scipy and replace the old discrepancy
-#Make a demo in the jupyter notebook
 #Unit tests
 #And then later a blog
 def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
