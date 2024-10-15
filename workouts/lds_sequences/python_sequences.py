@@ -12,17 +12,24 @@ def python_sequences(powers_2=arange(1, 4), trials=1, dimension=1):
     """
     print('\nDiscrete DiscreteDistribution Generation Time Comparison')
     columns = ['n',
-        'L_natural', 'L_linear', 'L_MPS',
+        'L_natural', 'L_linear', 'L_gray',
         'H_QRNG', 'H_Owen',
         'S_QMCPy', 'S_SciPy']
     warnings.simplefilter('ignore')
     dds = [
-        Lattice(dimension, randomize=True, order='natural', seed=7),
-        Lattice(dimension, randomize=True, order='linear', seed=7),
-        Lattice(dimension, randomize=True, order='MPS', seed=7),
-        Halton(dimension, generalize=True, randomize='QRNG', seed=7),
-        Halton(dimension, generalize=False, randomize='Owen', seed=7),
-        Sobol(dimension, randomize=True, seed=7, graycode=True),
+        Lattice(dimension, randomize="SHIFT", order='NATURAL', seed=7),
+        Lattice(dimension, randomize="SHIFT", order='LINEAR', seed=7),
+        Lattice(dimension, randomize="SHIFT", order='GRAY', seed=7),
+        Halton(dimension, randomize='LMS_PERM', seed=7),
+        Halton(dimension, randomize='LMS_DS', seed=7),
+        Halton(dimension, randomize='LMS', seed=7),
+        Halton(dimension, randomize='PERM', seed=7),
+        Halton(dimension, randomize='DS', seed=7),
+        Halton(dimension, randomize='QRNG', seed=7),
+        Halton(dimension, randomize='NUS', seed=7),
+        Sobol(dimension, randomize="LMS_DS", seed=7, graycode=True),
+        Sobol(dimension, randomize="DS", seed=7, graycode=True),
+        Sobol(dimension, randomize="NUS", seed=7, graycode=True),
         SobolSciPy(dimension, randomize=True, seed=7)
     ]
     df = DataFrame(columns=columns, dtype=float)

@@ -81,10 +81,10 @@ class PFGPCI(StoppingCriterion):
     >>> solution,data = pfgpci.integrate(seed=7,refit=True)
     >>> data
     PFGPCIData (AccumulateData Object)
-        solution        0.161
-        error_bound     0.025
+        solution        0.158
+        error_bound     0.022
         bound_low       0.136
-        bound_high      0.186
+        bound_high      0.180
         n_total         112
         time_integrate  ...
     PFGPCI (StoppingCriterion Object)

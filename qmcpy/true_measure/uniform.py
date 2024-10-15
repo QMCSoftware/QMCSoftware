@@ -9,10 +9,10 @@ class Uniform(TrueMeasure):
     """
     >>> u = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
     >>> u.gen_samples(4)
-    array([[1.12538017, 0.93444992],
-           [0.693306  , 2.12676579],
-           [1.64149095, 2.88726434],
-           [0.20844522, 1.73645241]])
+    array([[0.1431124 , 0.69460269],
+           [1.62840337, 2.36213894],
+           [0.62818597, 2.83084783],
+           [1.14326115, 1.16339383]])
     >>> u
     Uniform (TrueMeasure Object)
         lower_bound     [0.  0.5]

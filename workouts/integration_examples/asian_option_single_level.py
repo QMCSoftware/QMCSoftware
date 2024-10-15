@@ -33,7 +33,7 @@ def asian_option_single_level(
     print('%s%s'%(data,bar))
     
     # CubQMCCLT
-    discrete_distrib = Lattice(dimension, randomize=True, seed=7, order='MPS')
+    discrete_distrib = Lattice(dimension, randomize=True, seed=7, order='gray')
     integrand = AsianOption(discrete_distrib, volatility, start_price, strike_price, interest_rate, t_final, call_put, mean_type)
     solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
     print('%s%s'%(data,bar))
