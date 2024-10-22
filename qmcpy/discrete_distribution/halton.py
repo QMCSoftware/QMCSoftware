@@ -194,7 +194,7 @@ class Halton(LD):
             self.t_max = self.t_lms
             self.replications_gm = replications
         if "PERM" in self.randomize:
-            self.perms = qmctoolscl.gdn_get_permutations(self.rng,uint64(replications),uint64(self.d),self.t_lms,uint64(1),self.primes)
+            self.perms = qmctoolscl.gdn_get_digital_permutations(self.rng,uint64(replications),uint64(self.d),self.t_lms,uint64(1),self.primes)
         if "DS" in self.randomize:
             self.rshift = qmctoolscl.gdn_get_digital_shifts(self.rng,uint64(replications),uint64(self.d),self.t_lms,uint64(1),self.primes)
         if "NUS" in self.randomize:
