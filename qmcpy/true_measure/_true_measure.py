@@ -18,6 +18,7 @@ class TrueMeasure(object):
     def _parse_sampler(self, sampler):
         self.sub_compatibility_error = False
         if isinstance(sampler,DiscreteDistribution):
+            assert sampler.replications==1, "currently only support discrete distribution with one replication"
             self.transform = self # this is the initial transformation, \Psi_0
             self.d = sampler.d # take the dimension from the discrete distribution
             self.discrete_distrib = sampler

@@ -28,6 +28,7 @@ class IIDStdUniform(IID):
         self.mimics = 'StdUniform'
         self.low_discrepancy = False
         self.d_max = inf
+        self.replications = 1
         super(IIDStdUniform,self).__init__(dimension,seed)
 
     def gen_samples(self, n):

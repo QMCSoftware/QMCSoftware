@@ -16,8 +16,8 @@ class BayesianLRCoeffs(Integrand):
     >>> y.shape
     (1024, 2, 3)
     >>> y.mean(0)
-    array([[ 0.04639394, -0.01440543, -0.05498496],
-           [ 0.02176581,  0.02176581,  0.02176581]])
+    array([[ 0.04948003, -0.01238017, -0.07146091],
+           [ 0.02366789,  0.02366789,  0.02366789]])
     """
 
     def __init__(self, sampler, feature_array, response_vector, prior_mean=0, prior_covariance=10):

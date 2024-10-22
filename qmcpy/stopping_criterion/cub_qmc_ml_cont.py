@@ -55,8 +55,8 @@ class CubQMCMLCont(StoppingCriterion):
     Lattice (DiscreteDistribution Object)
         d               1
         dvec            0
-        randomize       1
-        order           natural
+        randomize       SHIFT
+        order           NATURAL
         gen_vec         1
         entropy         7
         spawn_key       ()

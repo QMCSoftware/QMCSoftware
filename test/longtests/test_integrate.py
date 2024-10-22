@@ -63,7 +63,7 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_uniform_measure(self):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        true_measure = Uniform(Lattice(2, order='mps'), lower_bound=[1,3], upper_bound=[3,6])
+        true_measure = Uniform(Lattice(2), lower_bound=[1,3], upper_bound=[3,6])
         myfunc = lambda x: (x.prod(1))**3
         integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
