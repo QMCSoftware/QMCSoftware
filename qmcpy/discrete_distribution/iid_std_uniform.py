@@ -19,7 +19,7 @@ class IIDStdUniform(IID):
         spawn_key       ()
     """
 
-    def __init__(self, dimension=1, seed=None):
+    def __init__(self, dimension=1, replications=1, seed=None):
         """
         Args:
             dimension (int): dimension of samples
@@ -28,7 +28,7 @@ class IIDStdUniform(IID):
         self.mimics = 'StdUniform'
         self.low_discrepancy = False
         self.d_max = inf
-        self.replications = 1
+        self.replications = replications
         super(IIDStdUniform,self).__init__(dimension,seed)
 
     def gen_samples(self, n):
@@ -41,7 +41,8 @@ class IIDStdUniform(IID):
         Returns:
             ndarray: n x self.d array of samples
         """
-        return self.rng.uniform(size=(int(n),self.d))
+        x = self.rng.uniform(size=(self.replications,int(n),self.d))
+        return x[0] if self.replications==1 else x
     
     def pdf(self, x):
         return ones(x.shape[0], dtype=float)
