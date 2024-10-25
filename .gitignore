@@ -42,6 +42,7 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
+demos/**.png
 
 # release
 /build/
