@@ -34,7 +34,7 @@ class _ProdKernel(object):
         """
         n1,n2 = len(x1),len(x2)
         assert x1.shape==(n1,self.d) and x2.shape==(n2,self.d)
-        k = self.npt.ones((n1,n2,self.d))
+        k = self.npt.empty((n1,n2,self.d))
         self._low_call(x1,x2,k)
         kcomb = (self.ind+self.lengthscales*k).prod(2)
         return self.scale*kcomb
@@ -100,7 +100,7 @@ class KernelDigShiftInvar(_ProdKernel):
     >>> d = 3
     >>> dnb2 = DigitalNetB2(d,randomize="LMS_DS",seed=7)
     >>> xb = dnb2.gen_samples(8,return_binary=True)
-    >>> k = KernelDigShiftInvar(dnb2.t_lms,d)
+    >>> k = KernelDigShiftInvar(d,dnb2.t_lms)
     >>> with np.printoptions(precision=2):
     ...     k(xb,xb)
     array([[13.56,  0.17,  0.21,  0.85,  1.17,  0.28,  0.45,  0.43],
@@ -112,7 +112,7 @@ class KernelDigShiftInvar(_ProdKernel):
            [ 0.45,  0.43,  1.17,  0.28,  0.21,  0.85, 13.56,  0.17],
            [ 0.43,  0.45,  0.28,  1.17,  0.85,  0.21,  0.17, 13.56]])
     >>> import torch
-    >>> kt = KernelDigShiftInvar(dnb2.t_lms,d,torchify=True)
+    >>> kt = KernelDigShiftInvar(d,dnb2.t_lms,torchify=True)
     >>> kt(xb,xb[[0]])
     tensor([[13.5554],
             [ 0.1695],
@@ -123,7 +123,7 @@ class KernelDigShiftInvar(_ProdKernel):
             [ 0.4535],
             [ 0.4348]])
     """
-    def __init__(self, t, dimension, alpha=3, lengthscales=1., scale=1., beta1=0, beta2=0, torchify=False):
+    def __init__(self, dimension, t=None, alpha=3, lengthscales=1., scale=1., beta1=0, beta2=0, torchify=False):
         """
         Args:
             dimension (int): dimension of the input
@@ -136,9 +136,11 @@ class KernelDigShiftInvar(_ProdKernel):
             torchify (bool): wheather or not to use PyTorch backend
         """
         super(KernelDigShiftInvar,self).__init__(dimension,alpha,lengthscales,scale,beta1,beta2,torchify) 
-        self.t = t
         self.wfidxs = self.alpha-self.beta1pbeta2
         self.const = (-2)**(self.alpha-self.wfidxs)
+        self.t = t
+    def set_t(self, t):
+        self.t = t
     def _low_call(self, x1, x2, k):
         delta = x1[:,None,:]^x2[None,:,:] # n1 x n2 x d
         for j in range(self.d):
