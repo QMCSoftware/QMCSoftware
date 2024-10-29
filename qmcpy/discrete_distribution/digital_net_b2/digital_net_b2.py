@@ -27,10 +27,10 @@ class DigitalNetB2(LD):
         graycode        0
         entropy         7
         spawn_key       ()
-    >>> DigitalNetB2(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4)
+    >>> DigitalNetB2(dimension=2,randomize=False,graycode=True).gen_samples(n_min=2,n_max=4,warn=False)
     array([[0.75, 0.25],
            [0.25, 0.75]])
-    >>> DigitalNetB2(dimension=2,randomize=False,graycode=False).gen_samples(n_min=2,n_max=4)
+    >>> DigitalNetB2(dimension=2,randomize=False,graycode=False).gen_samples(n_min=2,n_max=4,warn=False)
     array([[0.25, 0.75],
            [0.75, 0.25]])
     >>> dnb2_alpha2 = DigitalNetB2(5,randomize=False,generating_matrices='sobol_mat_alpha2.10600.64.32.lsb.npy')
@@ -97,7 +97,7 @@ class DigitalNetB2(LD):
            [0.6910429 , 0.51121493, 0.50915542],
            [0.01488653, 0.71489405, 0.49668689],
            [0.83832067, 0.4662247 , 0.71426927]])
-    >>> DigitalNetB2(dimension=3,randomize='LMS',seed=5,alpha=2).gen_samples(8)
+    >>> DigitalNetB2(dimension=3,randomize='LMS',seed=5,alpha=2).gen_samples(8,warn=False)
     array([[0.        , 0.        , 0.        ],
            [0.83330849, 0.75137017, 0.78900948],
            [0.40020937, 0.95905275, 0.20511411],
@@ -134,7 +134,7 @@ class DigitalNetB2(LD):
             [0.76777532, 0.52700602, 0.17183852],
             [0.39365722, 0.91359273, 0.43231666],
             [0.50656501, 0.25313607, 0.97464392]]])
-    >>> DigitalNetB2(dimension=3,randomize='LMS',seed=7,replications=2).gen_samples(4)
+    >>> DigitalNetB2(dimension=3,randomize='LMS',seed=7,replications=2).gen_samples(4,warn=False)
     array([[[0.        , 0.        , 0.        ],
             [0.79796457, 0.70241587, 0.5475088 ],
             [0.28983202, 0.94903657, 0.7742629 ],
@@ -211,7 +211,7 @@ class DigitalNetB2(LD):
     def __init__(self, dimension=1, randomize='LMS_DS', graycode=False, seed=None, 
         generating_matrices='sobol_mat.21201.32.32.msb.npy', d_max=None, t_max=None, m_max=None, msb=None, t_lms=53, alpha=1,
         _verbose=False, replications=1, qmctoolscl_kwargs={"backend":"c"}):
-        """
+        r"""
         Args:
             dimension (int or :class:`numpy.ndarray`): dimension of the generator. 
                 
@@ -281,8 +281,13 @@ class DigitalNetB2(LD):
                 self.t_max = int(parts[-4])
                 self.m_max = int(parts[-3])
                 self.msb = bool(parts[-2].lower()=='msb')
-            elif "LDData"==generating_matrices[:6] and repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices):
-                datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices)
+            elif "LDData"==generating_matrices[:6]:
+                if repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/dnet/"+generating_matrices[7:]):
+                    datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/dnet/"+generating_matrices[7:])
+                elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices):
+                    datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices)
+                else:
+                    raise ParameterError("LDData path %s not found"%generating_matrices)
                 contents = [line.rstrip('\n').strip() for line in datafile.readlines()]
                 self.msb = True
                 contents = [line.split("#",1)[0] for line in contents if line[0]!="#"]
@@ -353,7 +358,7 @@ class DigitalNetB2(LD):
         if self.replications_gm>1: assert replications==self.replications_gm, "if replications_gm>1 require replications = replications_gm"
         self.replications = replications
 
-    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False, qmctoolscl_gen_kwargs={"backend":"c"}, qmctoolscl_rand_kwargs={"backend":"c"}, qmctoolscl_convert_kwargs={"backend":"c"}):
+    def gen_samples(self, n=None, n_min=0, n_max=8, warn=True, return_unrandomized=False, return_binary=False, qmctoolscl_gen_kwargs={"backend":"c"}, qmctoolscl_rand_kwargs={"backend":"c"}, qmctoolscl_convert_kwargs={"backend":"c"}):
         """
         Generate samples
 
@@ -362,13 +367,8 @@ class DigitalNetB2(LD):
                 Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
             n_min (int): Starting index of sequence.
             n_max (int): Final index of sequence.
-            return_unrandomized (bool): return unrandomized samples as well? 
-                
-                - If True, return both randomized samples and unrandomized samples. 
-                - If False, return only randomized samples.
-                - Note that this only applies when randomize includes Digital Shift.
-                - Also note that unrandomized samples included linear matrix scrambling if applicable.
-            
+            return_unrandomized (bool): return randomized samples, unrandomized samples or just randomized samples? 
+            return_binary (bool): return binary samples as well? 
             qmctoolscl_gen_kwargs,qmctoolscl_rand_kwargs,qmctoolscl_convert_kwargs (dict): keyword arguments for QMCToolsCL to use OpenCL when generating points, performing randomizations, and converting to floats. Defaults to C backend. See https://qmcsoftware.github.io/QMCToolsCL/
 
 
@@ -395,9 +395,14 @@ class DigitalNetB2(LD):
             _ = qmctoolscl.dnb2_gen_natural(r_x,n,d,n_start,mmax,self.z,xb,**qmctoolscl_gen_kwargs)
         if return_unrandomized or self.randomize in ["FALSE","LMS"]:
             tmaxes_new = tile(uint64(self.t_max if self.randomize=="FALSE" and self.alpha==1 else self.t_lms),int(r_x))
-            x = empty((r_x,n,d),dtype=float64)
-            _ = qmctoolscl.dnb2_integer_to_float(r_x,n,d,tmaxes_new,xb,x,**qmctoolscl_convert_kwargs)
-            if r_x==1: x = x[0]
+            if not return_binary:
+                x = empty((r_x,n,d),dtype=float64)
+                _ = qmctoolscl.dnb2_integer_to_float(r_x,n,d,tmaxes_new,xb,x,**qmctoolscl_convert_kwargs)
+            if r_x==1: 
+                if not return_binary:
+                    x = x[0]
+                else:
+                    xb = xb[0]
         r = uint64(self.replications)
         if "NUS" in self.randomize:
             assert return_unrandomized==False
@@ -406,9 +411,10 @@ class DigitalNetB2(LD):
                 tmax = uint64(self.t_max)
                 tmax_new = uint64(self.t_lms)
                 _ = qmctoolscl.dnb2_nested_uniform_scramble(r,n,d,r_x,tmax,tmax_new,self.rngs,self.root_nodes,xb,xrb)
-                tmaxes_new = tile(uint64(self.t_lms),int(r))
-                xr = empty((r,n,d),dtype=float64)
-                _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr,**qmctoolscl_convert_kwargs)
+                if not return_binary:
+                    tmaxes_new = tile(uint64(self.t_lms),int(r))
+                    xr = empty((r,n,d),dtype=float64)
+                    _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr,**qmctoolscl_convert_kwargs)
             else:
                 d = uint64(self.d)
                 dtalpha = uint64(self.dtalpha)
@@ -417,29 +423,43 @@ class DigitalNetB2(LD):
                 tmax = uint64(self.t_max)
                 tmax_new = uint64(self.t_lms)
                 _ = qmctoolscl.dnb2_nested_uniform_scramble(r,n,dtalpha,r_x,tmax,tmax_new,self.rngs,self.root_nodes,xb,xrb_lo)
-                tmaxes_new = tile(uint64(self.t_lms),int(r))
                 xrb_t = empty((r,d,n),dtype=uint64)
                 xrb_lo_t = moveaxis(xrb_lo,[1,2],[2,1]).copy() 
                 qmctoolscl.dnb2_interlace(r,d,n,dtalpha,tmax_new,tmax_new,alpha,xrb_lo_t,xrb_t)
                 xrb = moveaxis(xrb_t,[1,2],[2,1]).copy()
-                xr = zeros((r,n,d),dtype=float64)
-                qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr)
-            if r==1: xr=xr[0]
+                if not return_binary:
+                    tmaxes_new = tile(uint64(self.t_lms),int(r))
+                    xr = zeros((r,n,d),dtype=float64)
+                    qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr)
+            if r==1:
+                if not return_binary:
+                    xr=xr[0]
+                else:
+                    xrb = xrb[0]
         if "DS" in self.randomize:
             xrb = empty((r,n,d),dtype=uint64)
             lshifts = tile(uint64((self.t_lms-self.t_max) if "LMS" not in self.randomize else 0),int(r))
             _ = qmctoolscl.dnb2_digital_shift(r,n,d,r_x,lshifts,xb,self.rshift,xrb,**qmctoolscl_rand_kwargs)
-            tmaxes_new = tile(uint64(self.t_lms),int(r))
-            xr = empty((r,n,d),dtype=float64)
-            _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr,**qmctoolscl_convert_kwargs)
-            if r==1: xr=xr[0]
+            if not return_binary:
+                tmaxes_new = tile(uint64(self.t_lms),int(r))
+                xr = empty((r,n,d),dtype=float64)
+                _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr,**qmctoolscl_convert_kwargs)
+            if r==1:
+                if not return_binary:
+                    xr=xr[0]
+                else:
+                    xrb = xrb[0]
         if self.randomize in ["FALSE","LMS"]:
-            if return_unrandomized:
+            if return_binary: 
+                return xb
+            elif return_unrandomized:
                 raise ParameterError("return_unrandomized=True only applies when when randomize='SHIFT'.")
             else:
                 return x
         else:
-            if return_unrandomized:
+            if return_binary: 
+                return xrb
+            elif return_unrandomized:
                 return xr,x 
             else:
                 return xr

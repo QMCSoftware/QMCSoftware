@@ -186,8 +186,13 @@ class Lattice(LD):
                 self.gen_vec_og = load(generating_vector).astype(uint64)[None,:]
                 self.d_max = int(parts[-3])
                 self.m_max = int(parts[-2])
-            elif "LDData"==generating_vector[:6] and repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector):
-                datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector)
+            elif "LDData"==generating_vector[:6]:
+                if repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/lattice/"+generating_vector[7:]):
+                    datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/lattice/"+generating_vector[7:])
+                elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector):
+                    datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector)
+                else:
+                    raise ParameterError("LDData path %s not found"%generating_vector)
                 contents = [int(line.rstrip('\n').strip().split("#",1)[0]) for line in datafile.readlines() if line[0]!="#"]
                 datafile.close()
                 self.d_max = contents[0]
