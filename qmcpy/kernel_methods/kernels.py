@@ -16,27 +16,31 @@ class _ProdKernel(object):
             alpha = alpha*self.npt.ones(d,dtype=int)
         assert isinstance(lengthscales,float) or lengthscales.shape==(d,)
         assert isinstance(scale,float)
-        assert isinstance(beta1,int) or beta1.shape==(d,)
-        assert isinstance(beta2,int) or beta2.shape==(d,)
         self.d = d 
         self.alpha = alpha
         self.lengthscales = lengthscales
         self.scale = scale 
-        self.beta1 = beta1 
-        self.beta2 = beta2 
-        self.beta1pbeta2 = self.beta1+self.beta2
-        self.ind = (self.beta1pbeta2==0)+self.alpha-self.alpha
-    def __call__(self, x1, x2):
+    def __call__(self, x1, x2, beta1=0, beta2=0):
         """
         Args:
             x1 (np.ndarray or torch.Tensor): n1 x d array of first inputs to kernel 
             x2 (np.ndarray or torch.Tensor): n2 x d array of second inputs to kernel
+            beta1 (np.ndarray or torch.Tensor): derivative orders with respect to the first argument 
+            beta1 (np.ndarray or torch.Tensor): derivative orders with respect to the second argument
+            u1_and_u2 (np.ndarray or torch.Tensor): length d vector of bools indicating of which columns are active in both x1 and x2 
+            u1_minus_u2 (np.ndarray or torch.Tensor): length d vector of bools indicating which columns are active in x1 but set to 0 in x2
+            u2_minus_u1 (np.ndarray or torch.Tensor): length d vector of bools indicating which columns are active in x2 but set to 0 in x1
         """
         n1,n2 = len(x1),len(x2)
         assert x1.shape==(n1,self.d) and x2.shape==(n2,self.d)
-        k = self.npt.empty((n1,n2,self.d))
-        self._low_call(x1,x2,k)
-        kcomb = (self.ind+self.lengthscales*k).prod(2)
+        assert isinstance(beta1,int) or beta1.shape==(self.d,)
+        assert isinstance(beta2,int) or beta2.shape==(self.d,)
+        delta = self.x1_ominus_x2(x1,x2) # n1 x n2 x d
+        inds,idxs,consts = self.inds_idxs_consts(beta1,beta2)
+        return self.eval_low(delta, inds, idxs, consts)
+    def eval_low(self, delta, inds, idxs, consts):
+        k = self.eval_low_low(delta,inds,idxs,consts)
+        kcomb = (inds+self.lengthscales*k).prod(2)
         return self.scale*kcomb
     
 class KernelShiftInvar(_ProdKernel):
@@ -76,22 +80,28 @@ class KernelShiftInvar(_ProdKernel):
             alpha (np.ndarray or torch.Tensor): vector of smoothness parameters of length d 
             lengthscales (np.ndarray or torch.Tensor): vector of length scales of length d 
             scale (float): global scale 
-            beta1 (np.ndarray or torch.Tensor): derivative orders with respect to the first argument 
-            beta1 (np.ndarray or torch.Tensor): derivative orders with respect to the second argument
             torchify (bool): wheather or not to use PyTorch backend
         """
         super(KernelShiftInvar,self).__init__(dimension,alpha,lengthscales,scale,beta1,beta2,torchify)
-        self.bpidxs = 2*self.alpha-self.beta1pbeta2
         if self.torchify:
-            lgamma = self.npt.lgamma
+            self.lgamma = self.npt.lgamma
         else:
             import scipy.special
-            lgamma = scipy.special.loggamma
-        self.const = (-1)**(self.alpha+self.beta2+1)*self.npt.exp(2*self.alpha*np.log(2*np.pi)-lgamma(self.bpidxs+1))
-    def _low_call(self, x1, x2, k):
+            self.lgamma = scipy.special.loggamma
+    def inds_idxs_consts(self, beta1, beta2):
+        beta1pbeta2 = beta1+beta2
+        inds = (beta1pbeta2==0)+self.alpha-self.alpha
+        idxs = 2*self.alpha-beta1pbeta2
+        consts = (-1)**(self.alpha+beta2+1)*self.npt.exp(2*self.alpha*np.log(2*np.pi)-self.lgamma(idxs+1))
+        return inds,idxs,consts
+    def x1_ominus_x2(self, x1, x2):
         delta = (x1[:,None,:]-x2[None,:,:])%1
+        return delta        
+    def eval_low_low(self, delta, inds, idxs, consts):
+        k = self.npt.ones(delta.shape)
         for j in range(self.d):
-            k[:,:,j] = self.const[j]*bernoulli_poly(self.bpidxs[j].item(),delta[:,:,j])
+            k[:,:,j] = consts[j]*bernoulli_poly(idxs[j].item(),delta[:,:,j])
+        return k
     
 class KernelDigShiftInvar(_ProdKernel):
     """
@@ -136,12 +146,20 @@ class KernelDigShiftInvar(_ProdKernel):
             torchify (bool): wheather or not to use PyTorch backend
         """
         super(KernelDigShiftInvar,self).__init__(dimension,alpha,lengthscales,scale,beta1,beta2,torchify) 
-        self.wfidxs = self.alpha-self.beta1pbeta2
-        self.const = (-2)**(self.alpha-self.wfidxs)
         self.t = t
     def set_t(self, t):
         self.t = t
-    def _low_call(self, x1, x2, k):
-        delta = x1[:,None,:]^x2[None,:,:] # n1 x n2 x d
+    def inds_idxs_consts(self, beta1, beta2):
+        beta1pbeta2 = beta1+beta2
+        inds = (beta1pbeta2==0)+self.alpha-self.alpha
+        idxs = self.alpha-beta1pbeta2
+        consts = (-2)**(self.alpha-idxs)
+        return inds,idxs,consts
+    def x1_ominus_x2(self, x1, x2):
+        delta = x1[:,None,:]^x2[None,:,:]
+        return delta        
+    def eval_low_low(self, delta, inds, idxs, consts):
+        k = self.npt.ones(delta.shape)
         for j in range(self.d):
-            k[:,:,j] = self.const[j]*weighted_walsh_funcs(self.wfidxs[j].item(),delta[:,:,j],self.t)-self.ind[j]
+            k[:,:,j] = consts[j]*weighted_walsh_funcs(idxs[j].item(),delta[:,:,j],self.t)-inds[j]
+        return k

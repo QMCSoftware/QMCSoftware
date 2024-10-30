@@ -10,7 +10,7 @@ class _FastGramMatrix(object):
         self.n = n
         self.ft = ft 
         self.ift = ift
-        self.noise = noise
+        noise = noise
         assert self.dd_obj.d==self.kernel_obj.d 
         assert self.dd_obj.replications==1
         assert (self.n&(self.n-1))==0 # require n is 0 or a power of 2
@@ -20,7 +20,7 @@ class _FastGramMatrix(object):
         self._x,self.x = self.sample(0,n)
         k1 = self.kernel_obj(self._x,self._x[[0]])[:,0]
         self.lam = np.sqrt(self.n)*self.ft(k1)
-        self.lam[0] = self.lam[0]+self.noise
+        self.lam[0] = self.lam[0]+noise
     def get_full_gram_matrix(self):
         return self.kernel_obj(self._x,self._x)
     def multiply_yt(self, yt):
