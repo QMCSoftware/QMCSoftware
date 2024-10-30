@@ -295,7 +295,6 @@ class Lattice(LD):
             y = temp
         return y
 
-
     def _gail_linear(self, n_min, n_max):
         """ Gail lattice generator in linear order. """
         m_low = int(floor(log2(n_min))) + 1 if n_min > 0 else 0

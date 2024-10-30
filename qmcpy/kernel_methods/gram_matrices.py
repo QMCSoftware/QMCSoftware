@@ -3,7 +3,7 @@ from .kernels import KernelShiftInvar,KernelDigShiftInvar
 from .fast_transforms import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
 import numpy as np
 
-class FastGramMatrix(object):
+class _FastGramMatrix(object):
     def __init__(self, dd_obj, kernel_obj, n, ft, ift, noise):
         self.dd_obj = dd_obj
         self.kernel_obj = kernel_obj
@@ -17,7 +17,7 @@ class FastGramMatrix(object):
         assert isinstance(noise,float) and noise>=0
         self._x,self.x = self.sample(0,n)
         k1 = self.kernel_obj(self._x,self._x[[0]])[:,0]
-        self.lam = np.sqrt(n)*self.ft(k1)
+        self.lam = np.sqrt(self.n)*self.ft(k1)
         self.lam[0] = self.lam[0]+self.noise
     def get_full_gram_matrix(self):
         return self.kernel_obj(self._x,self._x)
@@ -54,7 +54,7 @@ class FastGramMatrix(object):
         sol = self.solve_yt(yt)
         return sol[:,0] if yogndim==1 else sol
 
-class FastGramMatrixLattice(FastGramMatrix):
+class FastGramMatrixLattice(_FastGramMatrix):
     """
     Fast Gram matrix operations using lattice points and shift invariant kernels 
     
@@ -94,7 +94,7 @@ class FastGramMatrixLattice(FastGramMatrix):
         x = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max)
         return x,x
 
-class FastGramMatrixDigitalNetB2(FastGramMatrix):
+class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     """
     Fast Gram matrix operations using base 2 digital net points and digitally shift invariant kernels 
     
