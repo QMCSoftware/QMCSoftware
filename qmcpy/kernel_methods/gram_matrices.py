@@ -31,7 +31,7 @@ class _FastGramMatrix(object):
     >>> gm_dnb2_sq = gm_dnb2_og.copy(n//2,n//2)
     >>> for gm in [gm_lat_og,gm_lat_sq,gm_dnb2_og,gm_dnb2_sq]:
     ...     _mult_check(gm)
-    ...     if (u1*u2).sum()>0 and (beta1==beta2).all():
+    ...     if gm.invertible:
     ...         _solve_check(gm)
     >>> gm_lat_tall = gm_lat_og.copy(n//2,n//4)
     >>> gm_lat_wide = gm_lat_og.copy(n//4,n//2)
@@ -77,8 +77,9 @@ class _FastGramMatrix(object):
             assert self.n_max>=self.n1 and self.n_max>=self.n2
             assert self._x.shape==(self.n_max,self.kernel_obj.d) and self.x.shape==(self.n_max,self.kernel_obj.d)
         assert any(isinstance(kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
-        self.beta1 = beta1 
-        self.beta2 = beta2
+        self.beta1 = beta1*self.npt.ones(self.d,dtype=int) if isinstance(beta1,int) else beta1
+        self.beta2 = beta2*self.npt.ones(self.d,dtype=int) if isinstance(beta2,int) else beta2
+        assert self.beta1.shape==(self.d,) and self.beta2.shape==(self.d,)
         inds,idxs,consts = self.kernel_obj.inds_idxs_consts(self.beta1,self.beta2)        
         if self.d_u1mu2>0:
             delta_u1mu2 = self.kernel_obj.x1_ominus_x2(self._x[:self.n1,None,self.u1mu2],self.npt.zeros((1,1,self.d_u1mu2),dtype=self._x.dtype)) # (self.n1,1,self.d_u1mu2)
@@ -107,6 +108,7 @@ class _FastGramMatrix(object):
         if self.d_u1nu2>0:
             delta_u2nu1 = self.kernel_obj.x1_ominus_x2(self.npt.zeros((1,1,self.d_u1nu2),dtype=self._x.dtype),self.npt.zeros((1,1,self.d_u1nu2),dtype=self._x.dtype)) # (1,1,self.d_u1nu2)
             self.scale_null = self.kernel_obj.eval_low_u_noscale(self.u1nu2,delta_u2nu1,inds,idxs,consts)[0,0].item()
+        self.invertible = self.d_u1au2>0 and self.vhs=="square" and (self.beta1==self.beta2).all()
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         _x,x = self._sample(n_min,n_max)
@@ -148,7 +150,7 @@ class _FastGramMatrix(object):
             s = s*self.k1l # (m,self.n1)
         return s[0,:] if yogndim==1 else s.T
     def solve(self, y):
-        assert self.d_u1au2>0 and self.vhs=="square", "require square matrix (i.e. n1=n2) and u1,u2 share an active column (i.e. (u1*u2).sum()>0)"
+        assert self.invertible, "require square matrix (i.e. n1=n2). Require u1,u2 share an active column (i.e. (u1*u2).sum()>0). Require beta1==beta2."
         yogndim = y.ndim
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
