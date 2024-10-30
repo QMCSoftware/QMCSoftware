@@ -21,15 +21,17 @@ class _FastGramMatrix(object):
     >>> d = 3
     >>> u1 = np.array([False,True,True])
     >>> u2 = np.array([False,True,False])
-    >>> kernel_si = KernelShiftInvar(d)
-    >>> kernel_dsi = KernelDigShiftInvar(d)
-    >>> gm_lat_og = FastGramMatrixLattice(Lattice(d,seed=7),kernel_si,n,n,u1,u2)
+    >>> beta1 = np.array([0,1,0],dtype=int)
+    >>> beta2 = np.array([0,1,0],dtype=int)
+    >>> kernel_si = KernelShiftInvar(d,alpha=4)
+    >>> kernel_dsi = KernelDigShiftInvar(d,alpha=4)
+    >>> gm_lat_og = FastGramMatrixLattice(Lattice(d,seed=7),kernel_si,n,n,u1,u2,beta1,beta2)
     >>> gm_lat_sq = gm_lat_og.copy(n//2,n//2)
-    >>> gm_dnb2_og = FastGramMatrixDigitalNetB2(DigitalNetB2(d,seed=7),kernel_dsi,n,n,u1,u2)
+    >>> gm_dnb2_og = FastGramMatrixDigitalNetB2(DigitalNetB2(d,seed=7),kernel_dsi,n,n,u1,u2,beta1,beta2)
     >>> gm_dnb2_sq = gm_dnb2_og.copy(n//2,n//2)
     >>> for gm in [gm_lat_og,gm_lat_sq,gm_dnb2_og,gm_dnb2_sq]:
     ...     _mult_check(gm)
-    ...     if (u1*u2).sum()>0:
+    ...     if (u1*u2).sum()>0 and (beta1==beta2).all():
     ...         _solve_check(gm)
     >>> gm_lat_tall = gm_lat_og.copy(n//2,n//4)
     >>> gm_lat_wide = gm_lat_og.copy(n//4,n//2)
@@ -75,7 +77,9 @@ class _FastGramMatrix(object):
             assert self.n_max>=self.n1 and self.n_max>=self.n2
             assert self._x.shape==(self.n_max,self.kernel_obj.d) and self.x.shape==(self.n_max,self.kernel_obj.d)
         assert any(isinstance(kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
-        inds,idxs,consts = self.kernel_obj.inds_idxs_consts(beta1,beta2)        
+        self.beta1 = beta1 
+        self.beta2 = beta2
+        inds,idxs,consts = self.kernel_obj.inds_idxs_consts(self.beta1,self.beta2)        
         if self.d_u1mu2>0:
             delta_u1mu2 = self.kernel_obj.x1_ominus_x2(self._x[:self.n1,None,self.u1mu2],self.npt.zeros((1,1,self.d_u1mu2),dtype=self._x.dtype)) # (self.n1,1,self.d_u1mu2)
             self.k1l = self.kernel_obj.eval_low_u_noscale(self.u1mu2,delta_u1mu2,inds,idxs,consts)[:,0]
@@ -111,7 +115,7 @@ class _FastGramMatrix(object):
         _xu1,_xu2 = self._x.copy(),self._x.copy()
         _xu1[:,~self.u1] = 0.
         _xu2[:,~self.u2] = 0.
-        return self.kernel_obj(_xu1[:self.n1,:],_xu2[:self.n2,:])
+        return self.kernel_obj(_xu1[:self.n1,:],_xu2[:self.n2,:],self.beta1,self.beta2)
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
     def __matmul__(self, y):

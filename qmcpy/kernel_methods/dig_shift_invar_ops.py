@@ -28,13 +28,13 @@ def k4sumterm(x, t):
 WEIGHTEDWALSHFUNCSPOS = {
     2: lambda beta,xf,xb,t: -beta*xf + 5/2*(1-2**(-beta)),
     3: lambda beta,xf,xb,t: beta*xf**2 - 5*(1-2**(-beta))*xf + 43/18*(1-2**(-2*beta)),
-    3: lambda beta,xf,xb,t: -2/3*beta*xf**3 + 5*(1-2**(-beta))*xf**2 - 43/9*(1-2**(-2*beta))*xf + 701/294*(1-2**(-3*beta)) + beta*(1/48*k4sumterm(xb,t)-1/42),
+    4: lambda beta,xf,xb,t: -2/3*beta*xf**3 + 5*(1-2**(-beta))*xf**2 - 43/9*(1-2**(-2*beta))*xf + 701/294*(1-2**(-3*beta)) + beta*(1/48*k4sumterm(xb,t)-1/42),
 }
 
 WEIGHTEDWALSHFUNCSZEROS = {
     2: 5/2,
     3: 43/18,
-    3: 701/294,
+    4: 701/294,
 }
 
 def weighted_walsh_funcs(alpha, xb, t):
