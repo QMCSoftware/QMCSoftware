@@ -35,19 +35,30 @@ class _FastGramMatrix(object):
     >>> for gm in [gm_lat_tall,gm_lat_wide,gm_dnb2_tall,gm_dnb2_wide]:
     ...     _mult_check(gm)
     """
-    def __init__(self, dd_obj_or__x_x, kernel_obj, n1, n2, noise, ft, ift, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
+    def __init__(self, dd_obj_or__x_x, kernel_obj, n1, n2, u1, u2, beta1, beta2, noise, ft, ift, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
         self.kernel_obj = kernel_obj
+        self.d = self.kernel_obj.d
+        self.npt = self.kernel_obj.npt
         self.ft = ft 
         self.ift = ift
         self.n1 = n1 
         self.n2 = n2 
         assert (self.n1&(self.n1-1))==0 and (self.n2&(self.n2-1))==0 and self.n1>0 and self.n2>0 # require n1 and n2 are powers of 2
+        self.u1 = self.npt.ones(self.d,dtype=bool) if u1 is True else u1 
+        self.u2 = self.npt.ones(self.d,dtype=bool) if u2 is True else u2
+        assert self.u1.shape==(self.d,) and self.u2.shape==(self.d,)
+        self.u1mu2 = self.u1*(~self.u2) 
+        self.u2mu1 = self.u2*(~self.u1)
+        self.u1au2 = self.u1*self.u2
+        self.d_u1mu2 = self.u1mu2.sum()
+        self.d_u2mu1 = self.u2mu1.sum()
+        self.d_u1au2 = self.u1au2.sum()
         self.noise = noise
         assert self.noise==0
         #assert isinstance(self.noise,float) and self.noise>=0
         if isinstance(dd_obj_or__x_x,DiscreteDistribution):
             self.dd_obj = dd_obj_or__x_x
-            assert isinstance(self.dd_obj,dd_type) and self.dd_obj.d==self.kernel_obj.d 
+            assert isinstance(self.dd_obj,dd_type) and self.dd_obj.d==self.d 
             assert self.dd_obj.replications==1
             assert self.dd_obj.randomize in dd_randomize_ops and self.dd_obj.order==dd_order
             self.nmax = max(n1,n2)
@@ -59,78 +70,108 @@ class _FastGramMatrix(object):
             assert self.n_max>=self.n1 and self.n_max>=self.n2
             assert self._x.shape==(self.n_max,self.kernel_obj.d) and self.x.shape==(self.n_max,self.kernel_obj.d)
         assert any(isinstance(kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
-        if self.n1==self.n2:
-            self.vhs = "square"
-            k1 = self.kernel_obj(self._x[:n1,:],self._x[[0],:])[:,0]
-            self.lam = np.sqrt(self.n1)*self.ft(k1) # is (self.n1,)
-        elif self.n1>self.n2:
-            self.vhs = "tall"
-            self.r = self.n1//self.n2
-            k1 = self.kernel_obj(self._x[:n1,:],self._x[[0],:])[:,0].reshape((self.r,self.n2))
-            self.lam = np.sqrt(self.n2)*self.ft(k1) # is (self.r,self.n2)
-        else: # self.n1<self.n2
-            self.vhs = "wide"
-            self.r = self.n2//self.n1
-            k1 = self.kernel_obj(self._x[:n1,:],self._x[:self.n2:self.n1,:]).T
-            self.lam = np.sqrt(self.n1)*self.ft(k1) # is (self.r,n1)
+        inds,idxs,consts = self.kernel_obj.inds_idxs_consts(beta1,beta2)        
+        if self.d_u1mu2>0:
+            delta_u1mu2 = self.kernel_obj.x1_ominus_x2(self._x[:self.n1,None,self.u1mu2],self.npt.zeros((1,1,self.d_u1mu2),dtype=self._x.dtype)) # (self.n1,1,self.d_u1mu2)
+            self.k1l = self.kernel_obj.eval_low_u_noscale(self.u1mu2,delta_u1mu2,inds,idxs,consts)[:,0]
+        if self.d_u2mu1>0:
+            delta_u2mu1 = self.kernel_obj.x1_ominus_x2(self.npt.zeros((1,1,self.d_u2mu1),dtype=self._x.dtype),self._x[None,:self.n2,self.u2mu1]) # (1,self.n2,self.d_u1mu2)
+            self.k1r = self.kernel_obj.eval_low_u_noscale(self.u2mu1,delta_u2mu1,inds,idxs,consts)[0,:]
+        if self.d_u1au2>0:
+            if self.n1==self.n2:
+                self.vhs = "square"
+                delta_u1au2 = self.kernel_obj.x1_ominus_x2(self._x[:n1,None,self.u1au2],self._x[None,[0],self.u1au2])
+                k1 = self.kernel_obj.eval_low_u_noscale(self.u1au2,delta_u1au2,inds,idxs,consts)[:,0]
+                self.lam = np.sqrt(self.n1)*self.ft(k1) # is (self.n1,)
+            elif self.n1>self.n2:
+                self.vhs = "tall"
+                self.r = self.n1//self.n2
+                delta_u1au2 = self.kernel_obj.x1_ominus_x2(self._x[:n1,None,self.u1au2],self._x[None,[0],self.u1au2])
+                k1 = self.kernel_obj.eval_low_u_noscale(self.u1au2,delta_u1au2,inds,idxs,consts).reshape((self.r,self.n2))
+                self.lam = np.sqrt(self.n2)*self.ft(k1) # is (self.r,self.n2)
+            else: # self.n1<self.n2
+                self.vhs = "wide"
+                self.r = self.n2//self.n1
+                delta_u1au2 = self.kernel_obj.x1_ominus_x2(self._x[:n1,None,self.u1au2],self._x[None,:self.n2:self.n1,self.u1au2])
+                k1 = self.kernel_obj.eval_low_u_noscale(self.u1au2,delta_u1au2,inds,idxs,consts).T
+                self.lam = np.sqrt(self.n1)*self.ft(k1) # is (self.r,n1)
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         _x,x = self._sample(n_min,n_max)
         return _x,x
     def get_full_gram_matrix(self):
         return self.kernel_obj(self._x[:self.n1,:],self._x[:self.n2,:])
-    def multiply(self, y):
+    def multiply(self, *args, **kwargs):
+        return self.__matmul__(*args, **kwargs)
+    def __matmul__(self, y):
         yogndim = y.ndim
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
         assert y.ndim==2 and y.shape[0]==self.n2
         m = y.shape[1] # y is (self.n2,m)
-        if self.vhs=="square": # so self.n1=self.n2
-            yt = self.ft(y.T) # is (m,self.n2)
-            st = yt*self.lam # is (m,self.n2) since self.lam is (self.n2,)
-            s = self.ift(st).real.T # s is (self.n2,m)
-        elif self.vhs=="tall": # so self.n1 = self.r*self.n2
-            yt = self.ft(y.T) # is (m,self.n2)
-            st = yt[:,None,:]*self.lam # is (m,self.r,self.n2) since self.lam is (self.r,self.n2)
-            s = self.ift(st).real.reshape((m,self.n1)).T # is (self.n1,m)
-        else: #self.vhs=="wide", so self.n2 = self.r*self.n1
-            yt = self.ft(y.T.reshape(m,self.r,self.n1)) # is (m,self.r,self.n1)
-            st = (yt*self.lam).sum(1) # is (m,self.n1) since self.lam is (self.r,self.n1)
-            s = self.ift(st).real.T # is (self.n1,m)
-        return s[:,0] if yogndim==1 else s
-    def __matmul__(self, y):
-        return self.multiply(y)
+        y = (y*self.kernel_obj.scale).T # (m,self.n2)
+        if self.d_u2mu1>0:
+            y = y*self.k1r # (m,self.n2)
+        if self.d_u1au2>0:
+            if self.vhs=="square": # so self.n1=self.n2
+                yt = self.ft(y) # (m,self.n2)
+                st = yt*self.lam # (m,self.n2) since self.lam is (self.n2,)
+                s = self.ift(st).real # (m,self.n1)
+            elif self.vhs=="tall": # so self.n1 = self.r*self.n2
+                yt = self.ft(y) # (m,self.n2)
+                st = yt[:,None,:]*self.lam # (m,self.r,self.n2) since self.lam is (self.r,self.n2)
+                s = self.ift(st).real.reshape((m,self.n1)) # (m,self.n1)
+            else: #self.vhs=="wide", so self.n2 = self.r*self.n1
+                yt = self.ft(y.reshape(m,self.r,self.n1)) # (m,self.r,self.n1)
+                st = (yt*self.lam).sum(1) # (m,self.n1) since self.lam is (self.r,self.n1)
+                s = self.ift(st).real # (m,self.n1)
+        if self.d_u1mu2>0:
+            s = s*self.k1l # (m,self.n1)
+        return s[0,:] if yogndim==1 else s.T
     def solve(self, y):
         assert self.vhs=="square", "cannot solve system in non-square matrix"
         yogndim = y.ndim
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
         assert y.ndim==2 and y.shape[0]==self.n1
-        s = self.ift(self.ft(y.T)/self.lam).real.T
-        return s[:,0] if yogndim==1 else s
+        y = (y/self.kernel_obj.scale).T # (m,self.n1)
+        if self.d_u1mu2>0:
+            y = y/self.k1l # (m,self.n1)
+        if self.d_u1au2>0:
+            yt = self.ft(y) # (m,self.n1)
+            st = yt/self.lam # (m,self.n1) since self.lam is (self.n1,)
+            s = self.ift(st).real # (m,self.n1)
+        return s[0,:] if yogndim==1 else s.T
     def copy(self, n1=None, n2=None):
         if n1 is None: n1 = self.n1 
         if n2 is None: n2 = self.n2
-        return type(self)((self._x,self.x),self.kernel_obj,
+        return type(self)(
+            dd_obj = (self._x,self.x),
+            kernel_obj = self.kernel_obj,
             n1 = self.n1 if n1 is None else n1,
-            n2 = self.n2 if n2 is None else n2, 
+            n2 = self.n2 if n2 is None else n2,
+            u1 = self.u1,
+            u2 = self.u2,
             noise = self.noise)
 
 class FastGramMatrixLattice(_FastGramMatrix):
     """
     Fast Gram matrix operations using lattice points and shift invariant kernels 
     """
-    def __init__(self, lat_obj_or__x_x, kernel_si, n1, n2, noise=0.):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, beta1=0, beta2=0, noise=0.):
         """
         Args:
-            lat_obj_or__x_x (Lattice or tuple): lattice discrete distribution with randomize='shift' 
-                or a tuple (fgml._x,fgml.x) where isinstance(fgml,FastGramMatrixLattice)
-            kernel_si (KernelShiftInvar): shift invariant kernel
+            dd_obj (Lattice): requires randomize='SHIFT' and order="NATURAL"
+            kernel_obj (KernelShiftInvar): shift invariant kernel
             n1 (int): first number of points
             n2 (int): second number of points
+            u1 (np.ndarray or torch.Tensor): length d bool vector of first active dimensions 
+            u2 (np.ndarray or torch.Tensor): length d bool vector of second active dimensions
+            beta1 (np.ndarray or torch.Tensor): length d vector of first derivative orders
+            beta2 (np.ndarray or torch.Tensor): length d vector of second derivative orders
             noise (float): nugget term 
         """
-        super(FastGramMatrixLattice,self).__init__(lat_obj_or__x_x,kernel_si,n1,n2,noise,
+        super(FastGramMatrixLattice,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,beta1,beta2,noise,
             ft = fft_bro_1d_radix2,
             ift = ifft_bro_1d_radix2,
             dd_type = Lattice, 
@@ -145,19 +186,22 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     """
     Fast Gram matrix operations using base 2 digital net points and digitally shift invariant kernels 
     """
-    def __init__(self, dnb2_obj_or__x_x, kernel_dsi, n1, n2, noise=0.):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, beta1=0, beta2=0, noise=0.):
         """
         Args:
-            dnb2_obj_or__x_x (DigitalNetB2 or tuple): lattice discrete distribution with randomize='shift' 
-                or a tuple (fgml._x,fgml.x) where isinstance(fgml,FastGramMatrixDigitalNetB2)
-            kernel_si (KernelShiftInvar): shift invariant kernel
+            dd_obj (DigitalNetB2): requires randomize='LMS_DS' and graycode=False
+            kernel_obj (KernelDigShiftInvar): digitally shift invariant kernel
             n1 (int): first number of points
             n2 (int): second number of points
+            u1 (np.ndarray or torch.Tensor): length d bool vector of first active dimensions 
+            u2 (np.ndarray or torch.Tensor): length d bool vector of second active dimensions
+            beta1 (np.ndarray or torch.Tensor): length d vector of first derivative orders
+            beta2 (np.ndarray or torch.Tensor): length d vector of second derivative orders
             noise (float): nugget term 
         """
-        if isinstance(dnb2_obj_or__x_x,DigitalNetB2):
-            kernel_dsi.set_t(dnb2_obj_or__x_x.t_lms)
-        super(FastGramMatrixDigitalNetB2,self).__init__(dnb2_obj_or__x_x,kernel_dsi,n1,n2,noise,
+        if isinstance(dd_obj,DigitalNetB2):
+            kernel_obj.set_t(dd_obj.t_lms)
+        super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,beta1,beta2,noise,
             ft = fwht_1d_radix2,
             ift = fwht_1d_radix2,
             dd_type = DigitalNetB2, 
