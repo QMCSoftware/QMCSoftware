@@ -34,8 +34,10 @@ class _ProdKernel(object):
         assert x1.shape==(n1,self.d) and x2.shape==(n2,self.d)
         delta = self.x1_ominus_x2(x1[:,None,:],x2[None,:,:])
         assert delta.ndim==3 and delta.shape[2]==self.d
-        assert isinstance(beta1,int) or beta1.shape==(self.d,)
-        assert isinstance(beta2,int) or beta2.shape==(self.d,)
+        if isinstance(beta1,int): beta1 = beta1*self.npt.ones(self.d,dtype=int)
+        if isinstance(beta2,int): beta2 = beta2*self.npt.ones(self.d,dtype=int)
+        assert beta1.shape==(self.d,)
+        assert beta2.shape==(self.d,)
         inds,idxs,consts = self.inds_idxs_consts(beta1,beta2)
         return self.eval_low(delta, inds, idxs, consts)
     def eval_low(self, delta, inds, idxs, consts):
@@ -94,7 +96,7 @@ class KernelShiftInvar(_ProdKernel):
             self.lgamma = scipy.special.loggamma
     def inds_idxs_consts(self, beta1, beta2):
         beta1pbeta2 = beta1+beta2
-        inds = (beta1pbeta2==0)+self.alpha-self.alpha
+        inds = 1.*(beta1pbeta2==0)
         idxs = 2*self.alpha-beta1pbeta2
         consts = (-1)**(self.alpha+beta2+1)*self.npt.exp(2*self.alpha*np.log(2*np.pi)-self.lgamma(idxs+1))
         return inds,idxs,consts
@@ -153,9 +155,9 @@ class KernelDigShiftInvar(_ProdKernel):
         self.t = t
     def inds_idxs_consts(self, beta1, beta2):
         beta1pbeta2 = beta1+beta2
-        inds = (beta1pbeta2==0)+self.alpha-self.alpha
+        inds = 1.*(beta1pbeta2==0)
         idxs = self.alpha-beta1pbeta2
-        consts = (-2)**(self.alpha-idxs)
+        consts = (-2)**beta1pbeta2
         return inds,idxs,consts
     def x1_ominus_x2(self, x1, x2):
         delta = x1^x2

@@ -40,7 +40,7 @@ class _FastGramMatrix(object):
     >>> for gm in [gm_lat_tall,gm_lat_wide,gm_dnb2_tall,gm_dnb2_wide]:
     ...     _mult_check(gm)
     """
-    def __init__(self, dd_obj_or__x_x, kernel_obj, n1, n2, u1, u2, beta1, beta2, noise, ft, ift, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
+    def __init__(self, dd_obj_or__x_x, kernel_obj, n1, n2, u1, u2, beta1s, beta2s, c1s, c2s, noise, ft, ift, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
         self.kernel_obj = kernel_obj
         self.d = self.kernel_obj.d
         self.npt = self.kernel_obj.npt
@@ -77,9 +77,15 @@ class _FastGramMatrix(object):
             assert self.n_max>=self.n1 and self.n_max>=self.n2
             assert self._x.shape==(self.n_max,self.kernel_obj.d) and self.x.shape==(self.n_max,self.kernel_obj.d)
         assert any(isinstance(kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
-        self.beta1 = beta1*self.npt.ones(self.d,dtype=int) if isinstance(beta1,int) else beta1
-        self.beta2 = beta2*self.npt.ones(self.d,dtype=int) if isinstance(beta2,int) else beta2
-        assert self.beta1.shape==(self.d,) and self.beta2.shape==(self.d,)
+        if isinstance(beta1s,int): beta1s = beta1s*self.npt.ones(self.d,dtype=int)
+        if isinstance(beta2s,int): beta2s = beta2s*self.npt.ones(self.d,dtype=int)
+        self.beta1s = self.npt.atleast_2d(beta1s)
+        self.beta2s = self.npt.atleast_2d(beta2s)
+        self.m1 = len(self.beta1s)
+        self.m2 = len(self.beta2s)
+        assert self.beta1.shape==(self.m1,self.d) and self.beta2.shape==(self.m2,self.d)
+        if isinstance(c1s,float): self.c1s = c1s*self.npt.ones(self.m1)
+        if isinstance(c2s,float): self.c2s = c2s*self.npt.ones(self.m2)
         inds,idxs,consts = self.kernel_obj.inds_idxs_consts(self.beta1,self.beta2)        
         if self.d_u1mu2>0:
             delta_u1mu2 = self.kernel_obj.x1_ominus_x2(self._x[:self.n1,None,self.u1mu2],self.npt.zeros((1,1,self.d_u1mu2),dtype=self._x.dtype)) # (self.n1,1,self.d_u1mu2)
@@ -125,29 +131,29 @@ class _FastGramMatrix(object):
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
         assert y.ndim==2 and y.shape[0]==self.n2
-        m = y.shape[1] # y is (self.n2,m)
-        y = (y*self.kernel_obj.scale).T # (m,self.n2)
+        v = y.shape[1] # y is (self.n2,v)
+        y = (y*self.kernel_obj.scale).T # (v,self.n2)
         if self.d_u1nu2>0:
-            y = y*self.scale_null # (m,self.n2)
+            y = y*self.scale_null # (v,self.n2)
         if self.d_u2mu1>0:
-            y = y*self.k1r # (m,self.n2)
+            y = y*self.k1r # (v,self.n2)
         if self.d_u1au2>0:
             if self.vhs=="square": # so self.n1=self.n2
-                yt = self.ft(y) # (m,self.n2)
-                st = yt*self.lam # (m,self.n2) since self.lam is (self.n2,)
-                s = self.ift(st).real # (m,self.n1)
+                yt = self.ft(y) # (v,self.n2)
+                st = yt*self.lam # (v,self.n2) since self.lam is (self.n2,)
+                s = self.ift(st).real # (v,self.n1)
             elif self.vhs=="tall": # so self.n1 = self.r*self.n2
-                yt = self.ft(y) # (m,self.n2)
-                st = yt[:,None,:]*self.lam # (m,self.r,self.n2) since self.lam is (self.r,self.n2)
-                s = self.ift(st).real.reshape((m,self.n1)) # (m,self.n1)
+                yt = self.ft(y) # (v,self.n2)
+                st = yt[:,None,:]*self.lam # (v,self.r,self.n2) since self.lam is (self.r,self.n2)
+                s = self.ift(st).real.reshape((v,self.n1)) # (v,self.n1)
             else: #self.vhs=="wide", so self.n2 = self.r*self.n1
-                yt = self.ft(y.reshape(m,self.r,self.n1)) # (m,self.r,self.n1)
-                st = (yt*self.lam).sum(1) # (m,self.n1) since self.lam is (self.r,self.n1)
-                s = self.ift(st).real # (m,self.n1)
+                yt = self.ft(y.reshape(v,self.r,self.n1)) # (v,self.r,self.n1)
+                st = (yt*self.lam).sum(1) # (v,self.n1) since self.lam is (self.r,self.n1)
+                s = self.ift(st).real # (v,self.n1)
         else: # left multiply by matrix of ones
-            s = self.npt.tile(y.sum(1),(self.n1,1)).T # (m,self.n1)
+            s = self.npt.tile(y.sum(1),(self.n1,1)).T # (v,self.n1)
         if self.d_u1mu2>0:
-            s = s*self.k1l # (m,self.n1)
+            s = s*self.k1l # (v,self.n1)
         return s[0,:] if yogndim==1 else s.T
     def solve(self, y):
         assert self.invertible, "require square matrix (i.e. n1=n2). Require u1,u2 share an active column (i.e. (u1*u2).sum()>0). Require beta1==beta2."
@@ -155,17 +161,17 @@ class _FastGramMatrix(object):
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
         assert y.ndim==2 and y.shape[0]==self.n1
-        y = (y/self.kernel_obj.scale).T # (m,self.n1)
+        y = (y/self.kernel_obj.scale).T # (v,self.n1)
         if self.d_u1nu2>0:
-            y = y/self.scale_null # (m,self.n2)
+            y = y/self.scale_null # (v,self.n2)
         if self.d_u1mu2>0:
-            y = y/self.k1l # (m,self.n1)
+            y = y/self.k1l # (v,self.n1)
         if self.d_u1au2>0:
-            yt = self.ft(y) # (m,self.n1)
-            st = yt/self.lam # (m,self.n1) since self.lam is (self.n1,)
-            s = self.ift(st).real # (m,self.n1)
+            yt = self.ft(y) # (v,self.n1)
+            st = yt/self.lam # (v,self.n1) since self.lam is (self.n1,)
+            s = self.ift(st).real # (v,self.n1)
         if self.d_u2mu1>0:
-            s = s/self.k1r # (m,self.n1)
+            s = s/self.k1r # (v,self.n1)
         return s[0,:] if yogndim==1 else s.T
     def copy(self, n1=None, n2=None):
         if n1 is None: n1 = self.n1 
