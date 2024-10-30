@@ -4,7 +4,7 @@ from .fast_transforms import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
 import numpy as np
 
 class _FastGramMatrix(object):
-    def __init__(self, dd_obj, kernel_obj, n, ft, ift, noise):
+    def __init__(self, dd_obj, kernel_obj, n, ft, ift, noise, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
         self.dd_obj = dd_obj
         self.kernel_obj = kernel_obj
         self.n = n
@@ -15,6 +15,8 @@ class _FastGramMatrix(object):
         assert self.dd_obj.replications==1
         assert (self.n&(self.n-1))==0 # require n is 0 or a power of 2
         assert isinstance(noise,float) and noise>=0
+        assert isinstance(dd_obj,dd_type) and dd_obj.randomize in dd_randomize_ops and dd_obj.order==dd_order
+        assert any(isinstance(kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
         self._x,self.x = self.sample(0,n)
         k1 = self.kernel_obj(self._x,self._x[[0]])[:,0]
         self.lam = np.sqrt(self.n)*self.ft(k1)
@@ -87,9 +89,11 @@ class FastGramMatrixLattice(_FastGramMatrix):
             n (int): power of two number of points
             noise (float): nugget term 
         """
-        assert isinstance(lat_obj,Lattice) and lat_obj.randomize=="SHIFT" and lat_obj.order=="NATURAL"
-        assert isinstance(kernel_si,KernelShiftInvar)
-        super(FastGramMatrixLattice,self).__init__(lat_obj,kernel_si,n,fft_bro_1d_radix2,ifft_bro_1d_radix2,noise)
+        super(FastGramMatrixLattice,self).__init__(lat_obj,kernel_si,n,fft_bro_1d_radix2,ifft_bro_1d_radix2,noise,
+            dd_type = Lattice, 
+            dd_randomize_ops = ["SHIFT"],
+            dd_order = "NATURAL",
+            kernel_type_ops = [KernelShiftInvar])
     def sample(self, n_min, n_max):
         x = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max)
         return x,x
@@ -127,10 +131,12 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
             n (int): power of two number of points
             noise (float): nugget term 
         """
-        assert isinstance(dnb2_obj,DigitalNetB2) and dnb2_obj.randomize=="LMS_DS" and dnb2_obj.graycode==False
-        assert isinstance(kernel_dsi,KernelDigShiftInvar)
         kernel_dsi.set_t(dnb2_obj.t_lms)
-        super(FastGramMatrixDigitalNetB2,self).__init__(dnb2_obj,kernel_dsi,n,fwht_1d_radix2,fwht_1d_radix2,noise)
+        super(FastGramMatrixDigitalNetB2,self).__init__(dnb2_obj,kernel_dsi,n,fwht_1d_radix2,fwht_1d_radix2,noise,
+            dd_type = DigitalNetB2, 
+            dd_randomize_ops = ["DS","LMS_DS"],
+            dd_order = "NATURAL",
+            kernel_type_ops = [KernelDigShiftInvar])
     def sample(self, n_min, n_max):
         xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True)
         xf = xb*2**(-self.kernel_obj.t)

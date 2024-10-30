@@ -250,6 +250,7 @@ class DigitalNetB2(LD):
         self.mimics = 'StdUniform'
         self.low_discrepancy = True                      
         self.graycode = graycode
+        self.order = "GRAY" if self.graycode else "NATURAL"
         self.replications_gm = 1
         # generating matrices 
         if isinstance(generating_matrices,ndarray):
