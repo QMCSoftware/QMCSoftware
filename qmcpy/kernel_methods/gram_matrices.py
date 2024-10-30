@@ -22,16 +22,16 @@ class _FastGramMatrix(object):
     >>> kernel_si = KernelShiftInvar(d)
     >>> kernel_dsi = KernelDigShiftInvar(d)
     >>> gm_lat_og = FastGramMatrixLattice(Lattice(d,seed=7),kernel_si,n,n)
-    >>> gm_lat_sq = FastGramMatrixLattice((gm_lat_og._x,gm_lat_og.x),kernel_si,n//2,n//2)
+    >>> gm_lat_sq = gm_lat_og.copy(n//2,n//2)
     >>> gm_dnb2_og = FastGramMatrixDigitalNetB2(DigitalNetB2(d,seed=7),kernel_dsi,n,n)
-    >>> gm_dnb2_sq = FastGramMatrixDigitalNetB2((gm_dnb2_og._x,gm_dnb2_og.x),kernel_dsi,n//2,n//2)
+    >>> gm_dnb2_sq = gm_dnb2_og.copy(n//2,n//2)
     >>> for gm in [gm_lat_og,gm_lat_sq,gm_dnb2_og,gm_dnb2_sq]:
     ...     _mult_check(gm)
     ...     _solve_check(gm)
-    >>> gm_lat_tall = FastGramMatrixLattice((gm_lat_og._x,gm_lat_og.x),kernel_si,n//2,n//4)
-    >>> gm_lat_wide = FastGramMatrixLattice((gm_lat_og._x,gm_lat_og.x),kernel_si,n//4,n//2)
-    >>> gm_dnb2_tall = FastGramMatrixDigitalNetB2((gm_dnb2_og._x,gm_dnb2_og.x),kernel_dsi,n//2,n//4)
-    >>> gm_dnb2_wide = FastGramMatrixDigitalNetB2((gm_dnb2_og._x,gm_dnb2_og.x),kernel_dsi,n//4,n//2)
+    >>> gm_lat_tall = gm_lat_og.copy(n//2,n//4)
+    >>> gm_lat_wide = gm_lat_og.copy(n//4,n//2)
+    >>> gm_dnb2_tall = gm_dnb2_og.copy(n//2,n//4)
+    >>> gm_dnb2_wide = gm_dnb2_og.copy(n//4,n//2)
     >>> for gm in [gm_lat_tall,gm_lat_wide,gm_dnb2_tall,gm_dnb2_wide]:
     ...     _mult_check(gm)
     """
@@ -42,8 +42,8 @@ class _FastGramMatrix(object):
         self.n1 = n1 
         self.n2 = n2 
         assert (self.n1&(self.n1-1))==0 and (self.n2&(self.n2-1))==0 and self.n1>0 and self.n2>0 # require n1 and n2 are powers of 2
-        #self.noise = noise
-        assert noise==0
+        self.noise = noise
+        assert self.noise==0
         #assert isinstance(self.noise,float) and self.noise>=0
         if isinstance(dd_obj_or__x_x,DiscreteDistribution):
             self.dd_obj = dd_obj_or__x_x
@@ -108,6 +108,13 @@ class _FastGramMatrix(object):
         assert y.ndim==2 and y.shape[0]==self.n1
         s = self.ift(self.ft(y.T)/self.lam).real.T
         return s[:,0] if yogndim==1 else s
+    def copy(self, n1=None, n2=None):
+        if n1 is None: n1 = self.n1 
+        if n2 is None: n2 = self.n2
+        return type(self)((self._x,self.x),self.kernel_obj,
+            n1 = self.n1 if n1 is None else n1,
+            n2 = self.n2 if n2 is None else n2, 
+            noise = self.noise)
 
 class FastGramMatrixLattice(_FastGramMatrix):
     """
