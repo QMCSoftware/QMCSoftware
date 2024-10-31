@@ -68,24 +68,26 @@ class _FastGramMatrix(object):
             assert self.n_max>=self.n1 and self.n_max>=self.n2
             assert self._x.shape==(self.n_max,self.kernel_obj.d) and self.x.shape==(self.n_max,self.kernel_obj.d)
         self.n_min = min(self.n1,self.n2)
-        if isinstance(lbeta2s,int): lbeta1s = [lbeta1s*self.npt.ones((1,self.d),dtype=int)]
+        if isinstance(lbeta1s,int): lbeta1s = [lbeta1s*self.npt.ones((1,self.d),dtype=int)]
         elif not isinstance(lbeta1s,list): lbeta1s = [self.npt.atleast_2d(lbeta1s)]
         if isinstance(lbeta2s,int): lbeta2s = [lbeta2s*self.npt.ones((1,self.d),dtype=int)]
         elif not isinstance(lbeta2s,list): lbeta2s = [self.npt.atleast_2d(lbeta2s)]
-        self.lbeta1s = lbeta1s 
-        self.lbeta2s = lbeta2s
+        self.lbeta1s = [self.npt.atleast_2d(beta1s) for beta1s in lbeta1s]
+        self.lbeta2s = [self.npt.atleast_2d(beta2s) for beta2s in lbeta2s]
         self.t1 = len(self.lbeta1s)
         self.t2 = len(self.lbeta2s)
-        self.m1 = np.array([len(beta1s) for beta1s in lbeta1s],dtype=int)
-        self.m2 = np.array([len(beta2s) for beta2s in lbeta2s],dtype=int)
+        self.m1 = np.array([len(beta1s) for beta1s in self.lbeta1s],dtype=int)
+        self.m2 = np.array([len(beta2s) for beta2s in self.lbeta2s],dtype=int)
         assert isinstance(self.lbeta1s,list) and all(self.lbeta1s[tt1].shape==(self.m1[tt1],self.d) for tt1 in range(self.t1))
         assert isinstance(self.lbeta2s,list) and all(self.lbeta2s[tt2].shape==(self.m2[tt2],self.d) for tt2 in range(self.t2))
         if isinstance(lc1s,float): lc1s = [lc1s*self.npt.ones(self.m1[tt1]) for tt1 in range(self.t1)]
         elif not isinstance(lc1s,list): lc1s = [lc1s]
         if isinstance(lc2s,float): lc2s = [lc2s*self.npt.ones(self.m2[tt2]) for tt2 in range(self.t2)]
-        elif not isinstance(lc1s,list): lc1s = [lc2s]
-        self.lc1s = lc1s 
-        self.lc2s = lc2s 
+        elif not isinstance(lc2s,list): lc2s = [lc2s]
+        self.lc1s = [self.npt.atleast_1d(c1s) for c1s in lc1s] 
+        self.lc2s = [self.npt.atleast_1d(c2s) for c2s in lc2s]
+        self.lc1s_og = [self.npt.atleast_1d(c1s) for c1s in lc1s] 
+        self.lc2s_og = [self.npt.atleast_1d(c2s) for c2s in lc2s]
         assert isinstance(self.lc1s,list) and all(self.lc1s[tt1].shape==(self.m1[tt1],) for tt1 in range(self.t1))
         assert isinstance(self.lc2s,list) and all(self.lc2s[tt2].shape==(self.m2[tt2],) for tt2 in range(self.t2))
         inds = np.empty((self.t1,self.t2),dtype=object)
@@ -139,25 +141,28 @@ class _FastGramMatrix(object):
                 self.d_u1nu2 = 0
             if self.d_u1mu2==0 and self.d_u2mu1==0:
                 for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-                    k1[tt1,tt2] = (self.lc1s[tt1][:,None,None,None]*self.c2s[tt2][None,:,None,None]*k1[tt1,tt2]).sum((0,1))[None,None,:,:]
-                self.lc1s = np.array([self.npt.ones(1) for tt1 in range(self.t1)],dtype=object)
-                self.lc2s = np.array([self.npt.ones(1) for tt2 in range(self.t2)],dtype=object)
+                    k1[tt1,tt2] = (self.lc1s[tt1][:,None,None,None]*self.lc2s[tt2][None,:,None,None]*k1[tt1,tt2]).sum((0,1))[None,None,:,:]
+                self.lc1s = [self.npt.ones(1) for tt1 in range(self.t1)]
+                self.lc2s = [self.npt.ones(1) for tt2 in range(self.t2)]
                 self.m1 = np.ones(self.t1,dtype=int)
                 self.m2 = np.ones(self.t2,dtype=int)
             self.lam = np.empty((self.t1,self.t2),dtype=object)
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 self.lam[tt1,tt2] = np.sqrt(self.n_min)*self.ft(k1[tt1,tt2])
         invertible_conds = [
-            ( self.vhs=="square", "require square matrices"),
+            ( self.n1==self.n2, "require square matrices"),
             ( self.d_u1au2>0, "require a positive definite circulant factor"),
-            ( all((self.lbeta1s[tt1]==self.lbeta2s[tt2]).all() for tt1,tt2 in itertools.product(range(self.t1),range(self.t2))), "require lbeta1s and lbeta2s are the same"),
+            ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
             ( (self.m1==1).all() and (self.m2==1).all(), "require there is only one derivative order (also satisfied when self.d_u1mu2==0 and self.d_u2mu1==0)"),
             ( (self.t1==1 and self.t2==1) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
         self.invertible = all(cond for cond,error_msg in invertible_conds)
         self.invertible_error_msg = "\n\n"+"\n\n".join(error_msg for cond,error_msg in invertible_conds if not cond)
         if self.invertible:
-            pass # TODO
+            lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t2))
+            for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
+                lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0]
+            self.l_chol = self.npt.linalg.cholesky(lamblock)
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         _x,x = self._sample(n_min,n_max)
@@ -168,15 +173,15 @@ class _FastGramMatrix(object):
         _xu2[:,~self.u2] = 0.
         kfull = np.empty((self.t1,self.t2),dtype=object)
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-            kfull[tt1,tt2] = self.kernel_obj(_xu1[:self.n1,:],_xu2[:self.n2,:],self.lbeta1s[tt1],self.lbeta2s[tt2],self.lc1s[tt1],self.lc2s[tt2])
-        return self.npt.vstack([self.npt.hstack(kfull[tt1]) for i in range(self.t1)])
+            kfull[tt1,tt2] = self.kernel_obj(_xu1[:self.n1,:],_xu2[:self.n2,:],self.lbeta1s[tt1],self.lbeta2s[tt2],self.lc1s_og[tt1],self.lc2s_og[tt2])
+        return self.npt.vstack([self.npt.hstack(kfull[tt1]) for tt1 in range(self.t1)])
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
     def __matmul__(self, y):
         yogndim = y.ndim
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
-        assert y.ndim==2 and y.shape[0]==self.n2
+        assert y.ndim==2 and y.shape[0]==(self.n2*self.t2)
         v = y.shape[1] # y is (n2,v)
         y = y*self.kernel_obj.scale
         y = y.T.reshape((v,self.t2,self.n2)) # (v,t2,n2)
@@ -207,9 +212,9 @@ class _FastGramMatrix(object):
                 if self.d_u1mu2>0:
                     s = s*self.k1l[tt1,tt2] # (v,m1,m2,n1) since self.k1l is (m1,m2,n1)
                 s = (self.lc1s[tt1][None,:,None,None]*self.lc2s[tt2][None,None,:,None]*s).sum((1,2)) # (v,n1)
-                sfull[tt1] += s
+                sfull[tt1] = sfull[tt1]+s
         sfull = self.npt.hstack(sfull) # (v,self.n1*self.t1) since each element of sfull is (v,self.n1)
-        return s[0,:] if yogndim==1 else s.T
+        return sfull[0,:] if yogndim==1 else sfull.T
     def solve(self, y):
         assert self.invertible, self.invertible_error_msg
         yogndim = y.ndim
@@ -247,7 +252,8 @@ class _FastGramMatrix(object):
         assert np.allclose(self.solve(y[:,0]),np.linalg.solve(gmatfull,y[:,0]),rtol=2.5e-2)
         assert np.allclose(self.solve(y),np.linalg.solve(gmatfull,y),rtol=2.5e-2)
     def _check(self):
-        y = np.vstack([np.sin(2*np.pi*self.x[:self.n2]).prod(1),np.cos(2*np.pi*self.x[:self.n2]).prod(1)]).T
+        rng = np.random.Generator(np.random.SFC64(7))
+        y = rng.uniform(size=(self.n2*self.t2,2))
         gmatfull = self.get_full_gram_matrix()
         self._mult_check(y,gmatfull)
         self._solve_check(y,gmatfull)
