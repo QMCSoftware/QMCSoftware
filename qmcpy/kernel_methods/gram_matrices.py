@@ -7,28 +7,38 @@ import itertools
     
 class _FastGramMatrix(object):
     """
-    >>> n = 2**5
+    >>> n = 2**3
     >>> d = 3
-    >>> u1 = np.array([True,False,True])
-    >>> u2 = np.array([False,True,False])
-    >>> beta1 = np.array([[0,0,0],[0,1,1]],dtype=int)
-    >>> beta2 = np.array([[0,1,0],[1,0,0]],dtype=int)
-    >>> c1s = np.array([.25,.75])
-    >>> c2s = np.array([.4,.6])
+    >>> us = [np.array([int(b) for b in np.binary_repr(i,d)],dtype=bool) for i in range(2**d)]
+    >>> lbetas = [
+    ...     np.array([1,0,0]),
+    ...     np.array([[0,1,0],[0,0,1]]),
+    ...     [np.array([1,0,0]),np.array([0,1,0])],
+    ...     [np.array([[1,0,0],[0,1,0],[0,0,1]]),np.array([[1,0,1],[0,1,0],[0,0,0]])]
+    ...     ]
+    >>> num_invertible = 0
     >>> lat_obj = Lattice(d,seed=7)
-    >>> dnb2_obj = DigitalNetB2(d,seed=7)
     >>> kernel_si = KernelShiftInvar(d,alpha=4)
+    >>> dnb2_obj = DigitalNetB2(d,t_lms=32,alpha=2,seed=7)
     >>> kernel_dsi = KernelDigShiftInvar(d,alpha=4)
-    >>> gm_lat_og = FastGramMatrixLattice(lat_obj,kernel_si,n,n,u1,u2,beta1,beta2,c1s,c2s)
-    >>> gm_lat_og._check()
-    >>> gm_dnb2_og = FastGramMatrixDigitalNetB2(dnb2_obj,kernel_dsi,n,n,u1,u2,beta1,beta2,c1s,c2s)
-    >>> gm_dnb2_og._check()
-    >>> gm_lat_og.copy(n//2,n//2)._check()
-    >>> gm_dnb2_og.copy(n//2,n//2)._check()
-    >>> gm_lat_og.copy(n//2,n//4)._check()
-    >>> gm_dnb2_og.copy(n//2,n//4)._check()
-    >>> gm_lat_og.copy(n//4,n//2)._check()
-    >>> gm_dnb2_og.copy(n//4,n//2)._check()
+    >>> for iu1,iu2 in itertools.product(range(2**d),range(2**d)):
+    ...     u1 = us[iu1]
+    ...     u2 = us[iu2]
+    ...     n1 = n if u1.sum()>0 else 1 
+    ...     n2 = n if u2.sum()>0 else 1
+    ...     for ib1,ib2 in itertools.product(range(len(lbetas)),range(len(lbetas))):
+    ...         lbeta1s = lbetas[ib1]
+    ...         lbeta2s = lbetas[ib2]
+    ...         lc1s = 1.
+    ...         lc2s = 1.
+    ...         gm_lat = FastGramMatrixLattice(lat_obj,kernel_si,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s)
+    ...         gm_dnb2 = FastGramMatrixDigitalNetB2(dnb2_obj,kernel_dsi,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s)
+    ...         for gm in [gm_lat,gm_dnb2]:
+    ...             gm._check()
+    ...             gm_tall = gm.copy(max(n1//2,1),max(n2//4,1))
+    ...             gm_tall._check()
+    ...             gm_wide = gm.copy(max(n1//4,1),max(n2//2,1))
+    ...             gm_wide._check()
     """
     def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, ft, ift, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
         self.kernel_obj = kernel_obj
@@ -232,8 +242,6 @@ class _FastGramMatrix(object):
         y = y/self.kernel_obj.scale
         y = y.T # (v,t1*n1)
         if self.t1==1:
-            if self.d_u1nu2>0:
-                y = y/self.scale_null[0,0][0,0] # (v,self.n1) since self.scale_null is (m1,m2)=(1,1)
             if self.d_u1mu2>0:
                 y = y/self.k1l[0,0][0,0] # (v,self.n1) since self.k1l is (1,1,n1)
             if self.d_u1au2>0:
