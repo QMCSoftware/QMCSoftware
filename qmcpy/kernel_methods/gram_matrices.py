@@ -147,14 +147,17 @@ class _FastGramMatrix(object):
             self.lam = np.empty((self.t1,self.t2),dtype=object)
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 self.lam[tt1,tt2] = np.sqrt(self.n_min)*self.ft(k1[tt1,tt2])
-        self.invertible_conds = [
+        invertible_conds = [
             ( self.vhs=="square", "require square matrices"),
             ( self.d_u1au2>0, "require a positive definite circulant factor"),
             ( all((self.lbeta1s[tt1]==self.lbeta2s[tt2]).all() for tt1,tt2 in itertools.product(range(self.t1),range(self.t2))), "require lbeta1s and lbeta2s are the same"),
             ( (self.m1==1).all() and (self.m2==1).all(), "require there is only one derivative order (also satisfied when self.d_u1mu2==0 and self.d_u2mu1==0)"),
             ( (self.t1==1 and self.t2==1) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
-        self.invertible = all(cond for cond,errormsg in self.invertible_conds)
+        self.invertible = all(cond for cond,error_msg in invertible_conds)
+        self.invertible_error_msg = "\n\n"+"\n\n".join(error_msg for cond,error_msg in invertible_conds if not cond)
+        if self.invertible:
+            pass # TODO
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         _x,x = self._sample(n_min,n_max)
@@ -175,32 +178,40 @@ class _FastGramMatrix(object):
         if yogndim==1: y = y[:,None]
         assert y.ndim==2 and y.shape[0]==self.n2
         v = y.shape[1] # y is (n2,v)
-        y = (y*self.kernel_obj.scale).T[:,None,None,:] # (v,1,1,n2)
-        if self.d_u1nu2>0:
-            y = y*self.scale_null[:,:,None] # (v,m1,m2,n2) since self.scale_null is (m1,m2)
-        if self.d_u2mu1>0:
-            y = y*self.k1r # (v,m1,m2,n2) since self.k1r is (m1,m2,n2)
-        if self.d_u1au2>0:
-            if self.vhs=="square": # so n1=n2
-                yt = self.ft(y) # (v,m1,m2,n1) or (v,1,1,n1)
-                st = yt*self.lam # (v,n2) since self.lam is (m1,m2,n1)
-                s = self.ift(st).real # (v,m1,m2,n1)
-            elif self.vhs=="tall": # so n1 = r*n2
-                yt = self.ft(y) # (v,m1,m2,n2) or (v,1,1,n2)
-                st = yt[:,:,:,None,:]*self.lam # (v,m1,m2,r,n2) since self.lam is (m1,m2,r,n2)
-                s = self.ift(st).real.reshape((v,self.m1,self.m2,self.n1)) # (v,m1,m2,n1)
-            else: # self.vhs=="wide", so n2 = r*n1
-                yt = self.ft(y.reshape(v,y.shape[1],y.shape[2],self.r,self.n1)) # (v,m1,m2,r,n1) or (v,1,1,r,n2) since y is either (v,m1,m2,n2) or (v,1,1,n2)
-                st = (yt*self.lam).sum(3) # (v,m1,m2,n1) since self.lam is (m1,m2,r,n1)
-                s = self.ift(st).real # (v,m1,m2,n1)
-        else: # left multiply by matrix of ones
-            s = self.npt.tile(y.sum(-1)[:,:,:,None],(self.n1,)) # (v,m1,m2,n1)
-        if self.d_u1mu2>0:
-            s = s*self.k1l # (v,m1,m2,n1) since self.k1l is (m1,m2,n1)
-        s = (self.c1s[None,:,None,None]*self.c2s[None,None,:,None]*s).sum((1,2)) # (v,n1)
+        y = y*self.kernel_obj.scale
+        y = y.T.reshape((v,self.t2,self.n2)) # (v,t2,n2)
+        yfull = [y[:,tt2,:].reshape((v,1,1,self.n2)) for tt2 in range(self.t2)] # (v,1,1,n2)
+        sfull = [0. for tt1 in range(self.t1)] # (v,n1)
+        for tt1 in range(self.t1):
+            for tt2 in range(self.t2): 
+                y = yfull[tt2]
+                if self.d_u1nu2>0:
+                    y = y*self.scale_null[tt1,tt2][:,:,None] # (v,m1,m2,n2) since self.scale_null is (m1,m2)
+                if self.d_u2mu1>0:
+                    y = y*self.k1r[tt1,tt2] # (v,m1,m2,n2) since self.k1r is (m1,m2,n2)
+                if self.d_u1au2>0:
+                    if self.vhs=="square": # so n1=n2
+                        yt = self.ft(y) # (v,m1,m2,n1) or (v,1,1,n1)
+                        st = yt*self.lam[tt1,tt2] # (v,n2) since self.lam is (m1,m2,n1)
+                        s = self.ift(st).real # (v,m1,m2,n1)
+                    elif self.vhs=="tall": # so n1 = r*n2
+                        yt = self.ft(y) # (v,m1,m2,n2) or (v,1,1,n2)
+                        st = yt[:,:,:,None,:]*self.lam[tt1,tt2] # (v,m1,m2,r,n2) since self.lam is (m1,m2,r,n2)
+                        s = self.ift(st).real.reshape((v,self.m1[tt1],self.m2[tt2],self.n1)) # (v,m1,m2,n1)
+                    else: # self.vhs=="wide", so n2 = r*n1
+                        yt = self.ft(y.reshape(v,y.shape[1],y.shape[2],self.r,self.n1)) # (v,m1,m2,r,n1) or (v,1,1,r,n2) since y is either (v,m1,m2,n2) or (v,1,1,n2)
+                        st = (yt*self.lam[tt1,tt2]).sum(3) # (v,m1,m2,n1) since self.lam is (m1,m2,r,n1)
+                        s = self.ift(st).real # (v,m1,m2,n1)
+                else: # left multiply by matrix of ones
+                    s = self.npt.tile(y.sum(-1)[:,:,:,None],(self.n1,)) # (v,m1,m2,n1)
+                if self.d_u1mu2>0:
+                    s = s*self.k1l[tt1,tt2] # (v,m1,m2,n1) since self.k1l is (m1,m2,n1)
+                s = (self.lc1s[tt1][None,:,None,None]*self.lc2s[tt2][None,None,:,None]*s).sum((1,2)) # (v,n1)
+                sfull[tt1] += s
+        sfull = self.npt.hstack(sfull) # (v,self.n1*self.t1) since each element of sfull is (v,self.n1)
         return s[0,:] if yogndim==1 else s.T
     def solve(self, y):
-        assert self.invertible, "\n\n"+"\n\n".join(errormsg for cond,errormsg in self.invertible_conds if not cond)
+        assert self.invertible, self.invertible_error_msg
         yogndim = y.ndim
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
