@@ -24,30 +24,44 @@ class _ProdKernel(object):
         self.scale = scale 
     def eval(self, *args, **kwargs):
         return self.__call__(*args,**kwargs)
-    def __call__(self, x1, x2, beta1=0, beta2=0):
+    def __call__(self, x1, x2, beta1s=0, beta2s=0, c1s=1., c2s=1.):
         """
         Args:
             x1 (np.ndarray or torch.Tensor): n1 x d array of first inputs to kernel 
             x2 (np.ndarray or torch.Tensor): n2 x d array of second inputs to kernel
+            beta1s (np.ndarray or torch.Tensor): m1 x d array of first derivative orders
+            beta2s (np.ndarray or torch.Tensor): m2 x d array of first derivative orders
+            c1s (np.ndarray or torch.Tensor): length m1 vector of derivative coefficients 
+            c2s (np.ndarray or torch.Tensor): length m2 vector of derivative coefficients
         """
         n1,n2 = len(x1),len(x2)
         assert x1.shape==(n1,self.d) and x2.shape==(n2,self.d)
-        delta = self.x1_ominus_x2(x1[:,None,:],x2[None,:,:])
+        delta = self.x1_ominus_x2(x1[:,None,:],x2[None,:,:]) # n1 x n2 x d
         assert delta.ndim==3 and delta.shape[2]==self.d
-        if isinstance(beta1,int): beta1 = beta1*self.npt.ones(self.d,dtype=int)
-        if isinstance(beta2,int): beta2 = beta2*self.npt.ones(self.d,dtype=int)
-        assert beta1.shape==(self.d,)
-        assert beta2.shape==(self.d,)
-        inds,idxs,consts = self.inds_idxs_consts(beta1,beta2)
-        return self.eval_low(delta, inds, idxs, consts)
-    def eval_low(self, delta, inds, idxs, consts):
-        k = self.eval_low_low(delta,inds,idxs,consts)
-        kcomb = (inds+self.lengthscales*k).prod(2)
+        beta1s,beta2s,c1s,c2s,m1,m2 = self._parse_betas_cs(beta1s,beta2s,c1s,c2s)
+        inds,idxs,consts = self.inds_idxs_consts(beta1s[:,None,:],beta2s[None,:,:]) # m1 x m2 x n1 x n2 x d
+        k = self.npt.ones((m1,m2,n1,n2,self.d))
+        self.eval_low_low(k,delta,inds,idxs,consts,m1,m2) # m1 x m2 x n1 x n2 x d
+        kcomb = (inds[:,:,None,None,:]+self.lengthscales*k).prod(-1) # m1 x m2 x n1 x n2
+        kcomb = (c1s[:,None,None,None]*c2s[None,:,None,None]*kcomb).sum((0,1)) # n1 x n2
         return self.scale*kcomb
-    def eval_low_u_noscale(self, u, delta_u, inds, idxs, consts):
-        k_u = self.eval_low_low(delta_u,inds[u],idxs[u],consts[u])
-        kcomb_u = (inds[u]+self.lengthscales[u]*k_u).prod(2)
+    def eval_low_u_noscale(self, u, delta_u, inds, idxs, consts, m1, m2, n1, n2, d_u):
+        k_u = self.npt.ones((m1,m2,n1,n2,d_u))
+        self.eval_low_low(k_u,delta_u,inds[:,:,u],idxs[:,:,u],consts[:,:,u],m1,m2)
+        kcomb_u = (inds[:,:,None,None,u]+self.lengthscales[u]*k_u).prod(-1) # m1 x m1 x n1 x n2
         return kcomb_u
+    def _parse_betas_cs(self, beta1s, beta2s, c1s, c2s):
+        if isinstance(beta1s,int): beta1s = beta1s*self.npt.ones(self.d,dtype=int)
+        if isinstance(beta2s,int): beta2s = beta2s*self.npt.ones(self.d,dtype=int)
+        beta1s = self.npt.atleast_2d(beta1s)
+        beta2s = self.npt.atleast_2d(beta2s)
+        m1 = len(beta1s) 
+        m2 = len(beta2s)
+        assert beta1s.shape==(m1,self.d) and beta2s.shape==(m2,self.d)
+        if isinstance(c1s,float): c1s = c1s*self.npt.ones(m1)
+        if isinstance(c2s,float): c2s = c2s*self.npt.ones(m2)
+        assert c1s.shape==(m1,) and c2s.shape==(m2,)
+        return beta1s,beta2s,c1s,c2s,m1,m2
     
 class KernelShiftInvar(_ProdKernel):
     """
@@ -103,11 +117,11 @@ class KernelShiftInvar(_ProdKernel):
     def x1_ominus_x2(self, x1, x2):
         delta = (x1-x2)%1
         return delta        
-    def eval_low_low(self, delta, inds, idxs, consts):
-        k = self.npt.ones(delta.shape)
-        for j in range(delta.shape[2]):
-            k[:,:,j] = consts[j]*bernoulli_poly(idxs[j].item(),delta[:,:,j])
-        return k
+    def eval_low_low(self, k, delta, inds, idxs, consts, m1, m2):
+        for l1 in range(m1):
+            for l2 in range(m2):
+                for j in range(delta.shape[2]):
+                    k[l1,l2,:,:,j] = consts[l1,l2,j]*bernoulli_poly(idxs[l1,l2,j].item(),delta[:,:,j])
     
 class KernelDigShiftInvar(_ProdKernel):
     """
@@ -162,8 +176,8 @@ class KernelDigShiftInvar(_ProdKernel):
     def x1_ominus_x2(self, x1, x2):
         delta = x1^x2
         return delta        
-    def eval_low_low(self, delta, inds, idxs, consts):
-        k = self.npt.ones(delta.shape)
-        for j in range(delta.shape[2]):
-            k[:,:,j] = consts[j]*weighted_walsh_funcs(idxs[j].item(),delta[:,:,j],self.t)-inds[j]
-        return k
+    def eval_low_low(self, k, delta, inds, idxs, consts, m1, m2):
+        for l1 in range(m1):
+            for l2 in range(m2):
+                for j in range(delta.shape[2]):
+                    k[l1,l2,:,:,j] = consts[l1,l2,j]*weighted_walsh_funcs(idxs[l1,l2,j].item(),delta[:,:,j],self.t)-inds[l1,l2,j]
