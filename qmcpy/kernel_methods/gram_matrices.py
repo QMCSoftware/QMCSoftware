@@ -116,8 +116,8 @@ class _FastGramMatrix(object):
                 delta_u1au2 = self.kernel_obj.x1_ominus_x2(self._x[:n1,None,self.u1au2],self._x[None,[0],self.u1au2])
                 k1 = np.empty((self.t1,self.t2),dtype=object)
                 for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-                    k1[tt1,tt2] = self.kernel_obj.eval_low_u_noscale(self.u1au2,delta_u1au2,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],self.n1,1,self.d_u1au2)[:,:,:,0]
-                # self.lam will be (self.m1,self.m2,self.n1)
+                    k1[tt1,tt2] = self.kernel_obj.eval_low_u_noscale(self.u1au2,delta_u1au2,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],self.n1,1,self.d_u1au2).transpose(0,1,3,2)
+                # self.lam will be (self.m1,self.m2,1,self.n1)
             elif self.n1>self.n2:
                 self.vhs = "tall"
                 self.r = self.n1//self.n2
@@ -136,7 +136,7 @@ class _FastGramMatrix(object):
                 # self.lam will be (self.m1,self.m2,self.r,self.n1)
             if self.d_u1nu2>0:
                 for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-                    k1[tt1,tt2] = k1[tt1,tt2]*self.scale_null[tt1,tt2]
+                    k1[tt1,tt2] = k1[tt1,tt2]*self.scale_null[tt1,tt2][:,:,None,None]
                 delattr(self,"scale_null")
                 self.d_u1nu2 = 0
             if self.d_u1mu2==0 and self.d_u2mu1==0:
@@ -161,7 +161,7 @@ class _FastGramMatrix(object):
         if self.invertible:
             lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t2))
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-                lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0]
+                lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
             self.l_chol = self.npt.linalg.cholesky(lamblock)
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
@@ -197,7 +197,7 @@ class _FastGramMatrix(object):
                 if self.d_u1au2>0:
                     if self.vhs=="square": # so n1=n2
                         yt = self.ft(y) # (v,m1,m2,n1) or (v,1,1,n1)
-                        st = yt*self.lam[tt1,tt2] # (v,n2) since self.lam is (m1,m2,n1)
+                        st = yt*self.lam[tt1,tt2][:,:,0,:] # (v,n2) since self.lam is (m1,m2,1,n1)
                         s = self.ift(st).real # (v,m1,m2,n1)
                     elif self.vhs=="tall": # so n1 = r*n2
                         yt = self.ft(y) # (v,m1,m2,n2) or (v,1,1,n2)
