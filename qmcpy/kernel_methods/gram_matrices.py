@@ -64,8 +64,7 @@ class _FastGramMatrix(object):
         self.d_u1au2 = self.u1au2.sum()
         self.d_u1nu2 = self.u1nu2.sum()
         self.noise = noise
-        assert self.noise==0
-        #assert isinstance(self.noise,float) and self.noise>=0
+        assert isinstance(self.noise,float) and self.noise>0.
         if isinstance(dd_obj,DiscreteDistribution):
             self.dd_obj = dd_obj
             assert isinstance(self.dd_obj,dd_type) and self.dd_obj.d==self.d 
@@ -149,6 +148,7 @@ class _FastGramMatrix(object):
             if self.d_u1nu2>0:
                 for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                     k1[tt1,tt2] = k1[tt1,tt2]*self.scale_null[tt1,tt2][:,:,None,None]
+                # self.lam will have (m1,m2)=(1,1)
                 delattr(self,"scale_null")
                 self.d_u1nu2 = 0
             if self.d_u1mu2==0 and self.d_u2mu1==0:
@@ -164,17 +164,20 @@ class _FastGramMatrix(object):
         invertible_conds = [
             ( self.n1==self.n2, "require square matrices"),
             ( self.d_u1au2>0, "require a positive definite circulant factor"),
-            ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
+            ( self.t1==self.t2 and samelinops.diagonal().all(), "require lbeta1s=lbeta2s and lc1s=lc2s"),
             ( (self.m1==1).all() and (self.m2==1).all(), "require there is only one derivative order (also satisfied when self.d_u1mu2==0 and self.d_u2mu1==0)"),
             ( (self.t1==1 and self.t2==1) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
         self.invertible = all(cond for cond,error_msg in invertible_conds)
         self.invertible_error_msg = "\n\n"+"\n\n".join(error_msg for cond,error_msg in invertible_conds if not cond)
         if self.invertible:
-            lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t2))
+            lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1))
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
-            self.l_chol = self.npt.linalg.cholesky(lamblock)
+            try:
+                self.l_chol = self.npt.linalg.cholesky(lamblock+self.noise*self.npt.eye(self.t1))
+            except:
+                raise Exception("Cholesky of a block is not positive definite, try increasing the noise")
             if self.torchify:
                 import torch 
                 self.solve_tiangular = torch.linalg.solve_triangular
@@ -288,7 +291,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
     """
     Fast Gram matrix operations using lattice points and shift invariant kernels 
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1=0, lbeta2=0, lc1s=1., lc2s=1., noise=0.):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8):
         """
         Args:
             dd_obj (Lattice): requires randomize='SHIFT' and order="NATURAL"
@@ -297,13 +300,13 @@ class FastGramMatrixLattice(_FastGramMatrix):
             n2 (int): second number of points
             u1 (np.ndarray or torch.Tensor): length d bool vector of first active dimensions 
             u2 (np.ndarray or torch.Tensor): length d bool vector of second active dimensions
-            lbeta1 (list of either np.ndarray or torch.Tensor): list of (m1[l],d) arrays of first derivative orders
-            lbeta1 (list of either np.ndarray or torch.Tensor): list of (m2[l],d) arrays of first derivative orders
+            lbeta1s (list of either np.ndarray or torch.Tensor): list of (m1[l],d) arrays of first derivative orders
+            lbeta1s (list of either np.ndarray or torch.Tensor): list of (m2[l],d) arrays of first derivative orders
             c1s (list of either np.ndarray or torch.Tensor): list of length m1[l] vectors of derivative coefficients 
             c2s (list of either np.ndarray or torch.Tensor): list of length m2[l] vector of derivative coefficients
             noise (float): nugget term 
         """
-        super(FastGramMatrixLattice,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1,lbeta2,lc1s,lc2s,noise,
+        super(FastGramMatrixLattice,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,
             ft = fft_bro_1d_radix2,
             ift = ifft_bro_1d_radix2,
             dd_type = Lattice, 
@@ -318,7 +321,7 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     """
     Fast Gram matrix operations using base 2 digital net points and digitally shift invariant kernels 
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1=0, lbeta2=0, lc1s=1., lc2s=1., noise=0.):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8):
         """
         Args:
             dd_obj (DigitalNetB2): requires randomize='LMS_DS' and graycode=False
@@ -327,15 +330,15 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
             n2 (int): second number of points
             u1 (np.ndarray or torch.Tensor): length d bool vector of first active dimensions 
             u2 (np.ndarray or torch.Tensor): length d bool vector of second active dimensions
-            lbeta1 (list of either np.ndarray or torch.Tensor): list of (m1[l],d) arrays of first derivative orders
-            lbeta1 (list of either np.ndarray or torch.Tensor): list of (m2[l],d) arrays of first derivative orders
+            lbeta1s (list of either np.ndarray or torch.Tensor): list of (m1[l],d) arrays of first derivative orders
+            lbeta1s (list of either np.ndarray or torch.Tensor): list of (m2[l],d) arrays of first derivative orders
             c1s (list of either np.ndarray or torch.Tensor): list of length m1[l] vectors of derivative coefficients 
             c2s (list of either np.ndarray or torch.Tensor): list of length m2[l] vector of derivative coefficients
             noise (float): nugget term 
         """
         if isinstance(dd_obj,DigitalNetB2):
             kernel_obj.set_t(dd_obj.t_lms)
-        super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1,lbeta2,lc1s,lc2s,noise,
+        super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,
             ft = fwht_1d_radix2,
             ift = fwht_1d_radix2,
             dd_type = DigitalNetB2, 
@@ -346,5 +349,4 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
         xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True)
         xf = xb*2**(-self.kernel_obj.t)
         return xb,xf
-
     
