@@ -2,6 +2,7 @@ from ..discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
 from .kernels import KernelShiftInvar,KernelDigShiftInvar
 from .fast_transforms import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
 import numpy as np
+import scipy.linalg
 import itertools
     
 class _FastGramMatrix(object):
@@ -34,6 +35,7 @@ class _FastGramMatrix(object):
         assert any(isinstance(kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
         self.d = self.kernel_obj.d
         self.npt = self.kernel_obj.npt
+        self.torchify = self.kernel_obj.torchify
         self.ft = ft 
         self.ift = ift
         self.n1 = n1 
@@ -163,6 +165,11 @@ class _FastGramMatrix(object):
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
             self.l_chol = self.npt.linalg.cholesky(lamblock)
+            if self.torchify:
+                import torch 
+                self.solve_tiangular = torch.linalg.solve_triangular
+            else:
+                self.solve_tiangular = scipy.linalg.solve_triangular
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         _x,x = self._sample(n_min,n_max)
@@ -182,7 +189,7 @@ class _FastGramMatrix(object):
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
         assert y.ndim==2 and y.shape[0]==(self.n2*self.t2)
-        v = y.shape[1] # y is (n2,v)
+        v = y.shape[1] # y is (t2*n2,v)
         y = y*self.kernel_obj.scale
         y = y.T.reshape((v,self.t2,self.n2)) # (v,t2,n2)
         yfull = [y[:,tt2,:].reshape((v,1,1,self.n2)) for tt2 in range(self.t2)] # (v,1,1,n2)
@@ -220,18 +227,29 @@ class _FastGramMatrix(object):
         yogndim = y.ndim
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
-        assert y.ndim==2 and y.shape[0]==self.n1
-        y = (y/self.kernel_obj.scale).T # (v,self.n1)
-        if self.d_u1nu2>0:
-            y = y/self.scale_null[0,0] # (v,self.n1) since self.scale_null is (1,1)
-        if self.d_u1mu2>0:
-            y = y/self.k1l[0,0] # (v,self.n1) since self.k1l is (1,1,n1)
-        if self.d_u1au2>0:
-            yt = self.ft(y) # (v,self.n1)
-            st = yt/self.lam[0,0] # (v,self.n1) since self.lam is (1,1,self.n1)
-            s = self.ift(st).real # (v,self.n1)
-        if self.d_u2mu1>0:
-            s = s/self.k1r[0,0] # (v,self.n1) since self.k1r is (1,1,n1)
+        assert y.ndim==2 and y.shape[0]==(self.n1*self.t1)
+        v = y.shape[1] # y is (t1*n1,v)
+        y = y/self.kernel_obj.scale
+        y = y.T # (v,t1*n1)
+        if self.t1==1:
+            if self.d_u1nu2>0:
+                y = y/self.scale_null[0,0][0,0] # (v,self.n1) since self.scale_null is (m1,m2)=(1,1)
+            if self.d_u1mu2>0:
+                y = y/self.k1l[0,0][0,0] # (v,self.n1) since self.k1l is (1,1,n1)
+            if self.d_u1au2>0:
+                yt = self.ft(y) # (v,self.n1)
+                st = yt/self.lam[0,0][0,0,0] # (v,self.n1) since self.lam is (1,1,self.n1)
+                s = self.ift(st).real # (v,self.n1)
+            if self.d_u2mu1>0:
+                s = s/self.k1r[0,0][0,0] # (v,self.n1) since self.k1r is (1,1,n1)
+        else:
+            y = y.reshape((v,self.t1,self.n1)) # (v,t1,n1)
+            yt = self.ft(y) # (v,t1,n1)
+            for i in range(self.n1): # probably a better vectorized way to do this
+                # solve systems based on Cholesky decompositions, with self.l_chol is (n1,t1,t1)
+                yt[:,:,i] = self.solve_tiangular(self.l_chol[i].T.conj(),self.solve_tiangular(self.l_chol[i],yt[:,:,i].T,lower=True),lower=False).T
+            s = self.ift(yt).real # (v,t1,n1)
+            s = s.reshape((v,self.t1*self.n1))
         return s[0,:] if yogndim==1 else s.T
     def copy(self, n1=None, n2=None):
         if n1 is None: n1 = self.n1 
