@@ -2,43 +2,29 @@ from ..discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
 from .kernels import KernelShiftInvar,KernelDigShiftInvar
 from .fast_transforms import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
 import numpy as np
-
-def _mult_check(gm):
-    y = np.vstack([np.sin(2*np.pi*gm.x[:gm.n2]).prod(1),np.cos(2*np.pi*gm.x[:gm.n2]).prod(1)]).T
-    gmatfull = gm.get_full_gram_matrix()
-    assert np.allclose(gm@y[:,0],gmatfull@y[:,0],atol=1e-12)
-    assert np.allclose(gm@y,gmatfull@y,atol=1e-12)
-
-def _solve_check(gm):
-    y = np.vstack([np.sin(2*np.pi*gm.x[:gm.n2]).prod(1),np.cos(2*np.pi*gm.x[:gm.n2]).prod(1)]).T
-    gmatfull = gm.get_full_gram_matrix()
-    assert np.allclose(gm.solve(y[:,0]),np.linalg.solve(gmatfull,y[:,0]),rtol=2.5e-2)
-    assert np.allclose(gm.solve(y),np.linalg.solve(gmatfull,y),rtol=2.5e-2)
     
 class _FastGramMatrix(object):
     """
     >>> n = 2**5
     >>> d = 3
-    >>> u1 = np.array([False,True,True])
+    >>> u1 = np.array([True,False,True])
     >>> u2 = np.array([False,True,False])
-    >>> beta1 = np.array([0,1,0],dtype=int)
+    >>> beta1 = np.array([0,0,0],dtype=int)
     >>> beta2 = np.array([0,1,0],dtype=int)
+    >>> lat_obj = Lattice(d,seed=7)
+    >>> dnb2_obj = DigitalNetB2(d,seed=7)
     >>> kernel_si = KernelShiftInvar(d,alpha=4)
     >>> kernel_dsi = KernelDigShiftInvar(d,alpha=4)
-    >>> gm_lat_og = FastGramMatrixLattice(Lattice(d,seed=7),kernel_si,n,n,u1,u2,beta1,beta2)
-    >>> gm_lat_sq = gm_lat_og.copy(n//2,n//2)
-    >>> gm_dnb2_og = FastGramMatrixDigitalNetB2(DigitalNetB2(d,seed=7),kernel_dsi,n,n,u1,u2,beta1,beta2)
-    >>> gm_dnb2_sq = gm_dnb2_og.copy(n//2,n//2)
-    >>> for gm in [gm_lat_og,gm_lat_sq,gm_dnb2_og,gm_dnb2_sq]:
-    ...     _mult_check(gm)
-    ...     if gm.invertible:
-    ...         _solve_check(gm)
-    >>> gm_lat_tall = gm_lat_og.copy(n//2,n//4)
-    >>> gm_lat_wide = gm_lat_og.copy(n//4,n//2)
-    >>> gm_dnb2_tall = gm_dnb2_og.copy(n//2,n//4)
-    >>> gm_dnb2_wide = gm_dnb2_og.copy(n//4,n//2)
-    >>> for gm in [gm_lat_tall,gm_lat_wide,gm_dnb2_tall,gm_dnb2_wide]:
-    ...     _mult_check(gm)
+    >>> gm_lat_og = FastGramMatrixLattice(lat_obj,kernel_si,n,n,u1,u2,beta1,beta2)
+    >>> gm_lat_og._check()
+    >>> gm_dnb2_og = FastGramMatrixDigitalNetB2(dnb2_obj,kernel_dsi,n,n,u1,u2,beta1,beta2)
+    >>> gm_dnb2_og._check()
+    >>> gm_lat_og.copy(n//2,n//2)._check()
+    >>> gm_dnb2_og.copy(n//2,n//2)._check()
+    >>> gm_lat_og.copy(n//2,n//4)._check()
+    >>> gm_dnb2_og.copy(n//2,n//4)._check()
+    >>> gm_lat_og.copy(n//4,n//2)._check()
+    >>> gm_dnb2_og.copy(n//4,n//2)._check()
     """
     def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, beta1s, beta2s, c1s, c2s, noise, ft, ift, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
         self.kernel_obj = kernel_obj
@@ -51,7 +37,8 @@ class _FastGramMatrix(object):
         assert (self.n1&(self.n1-1))==0 and (self.n2&(self.n2-1))==0 and self.n1>0 and self.n2>0 # require n1 and n2 are powers of 2
         self.u1 = self.npt.ones(self.d,dtype=bool) if u1 is True else u1 
         self.u2 = self.npt.ones(self.d,dtype=bool) if u2 is True else u2
-        assert self.u1.shape==(self.d,) and self.u2.shape==(self.d,) and self.u1.sum()>0 and self.u2.sum()>0
+        assert self.u1.shape==(self.d,) and self.u2.shape==(self.d,) 
+        assert (self.u1.sum()>0 or self.n1==1) and (self.u2.sum()>0 or self.n2==1)
         self.u1mu2 = self.u1*(~self.u2) 
         self.u2mu1 = self.u2*(~self.u1)
         self.u1au2 = self.u1*self.u2
@@ -194,6 +181,20 @@ class _FastGramMatrix(object):
             u1 = self.u1,
             u2 = self.u2,
             noise = self.noise)
+    def _mult_check(self, y, gmatfull):
+        assert np.allclose(self@y[:,0],gmatfull@y[:,0],atol=1e-12)
+        assert np.allclose(self@y,gmatfull@y,atol=1e-12)
+    def _solve_check(self, y, gmatfull):
+        if not self.invertible: return
+        assert np.allclose(self.solve(y[:,0]),np.linalg.solve(gmatfull,y[:,0]),rtol=2.5e-2)
+        assert np.allclose(self.solve(y),np.linalg.solve(gmatfull,y),rtol=2.5e-2)
+    def _check(self):
+        y = np.vstack([np.sin(2*np.pi*self.x[:self.n2]).prod(1),np.cos(2*np.pi*self.x[:self.n2]).prod(1)]).T
+        gmatfull = self.get_full_gram_matrix()
+        self._mult_check(y,gmatfull)
+        self._solve_check(y,gmatfull)
+
+
 
 class FastGramMatrixLattice(_FastGramMatrix):
     """
