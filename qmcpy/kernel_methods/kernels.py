@@ -38,7 +38,16 @@ class _ProdKernel(object):
         assert x1.shape==(n1,self.d) and x2.shape==(n2,self.d)
         delta = self.x1_ominus_x2(x1[:,None,:],x2[None,:,:]) # n1 x n2 x d
         assert delta.ndim==3 and delta.shape[2]==self.d
-        beta1s,beta2s,c1s,c2s,m1,m2 = self._parse_betas_cs(beta1s,beta2s,c1s,c2s)
+        if isinstance(beta1s,int): beta1s = beta1s*self.npt.ones(self.d,dtype=int)
+        if isinstance(beta2s,int): beta2s = beta2s*self.npt.ones(self.d,dtype=int)
+        beta1s = self.npt.atleast_2d(beta1s)
+        beta2s = self.npt.atleast_2d(beta2s)
+        m1 = len(beta1s) 
+        m2 = len(beta2s)
+        assert beta1s.shape==(m1,self.d) and beta2s.shape==(m2,self.d)
+        if isinstance(c1s,float): c1s = c1s*self.npt.ones(m1)
+        if isinstance(c2s,float): c2s = c2s*self.npt.ones(m2)
+        assert c1s.shape==(m1,) and c2s.shape==(m2,)
         inds,idxs,consts = self.inds_idxs_consts(beta1s[:,None,:],beta2s[None,:,:]) # m1 x m2 x n1 x n2 x d
         k = self.npt.ones((m1,m2,n1,n2,self.d))
         self.eval_low_low(k,delta,inds,idxs,consts,m1,m2) # m1 x m2 x n1 x n2 x d
@@ -50,18 +59,6 @@ class _ProdKernel(object):
         self.eval_low_low(k_u,delta_u,inds[:,:,u],idxs[:,:,u],consts[:,:,u],m1,m2)
         kcomb_u = (inds[:,:,None,None,u]+self.lengthscales[u]*k_u).prod(-1) # m1 x m1 x n1 x n2
         return kcomb_u
-    def _parse_betas_cs(self, beta1s, beta2s, c1s, c2s):
-        if isinstance(beta1s,int): beta1s = beta1s*self.npt.ones(self.d,dtype=int)
-        if isinstance(beta2s,int): beta2s = beta2s*self.npt.ones(self.d,dtype=int)
-        beta1s = self.npt.atleast_2d(beta1s)
-        beta2s = self.npt.atleast_2d(beta2s)
-        m1 = len(beta1s) 
-        m2 = len(beta2s)
-        assert beta1s.shape==(m1,self.d) and beta2s.shape==(m2,self.d)
-        if isinstance(c1s,float): c1s = c1s*self.npt.ones(m1)
-        if isinstance(c2s,float): c2s = c2s*self.npt.ones(m2)
-        assert c1s.shape==(m1,) and c2s.shape==(m2,)
-        return beta1s,beta2s,c1s,c2s,m1,m2
     
 class KernelShiftInvar(_ProdKernel):
     """
