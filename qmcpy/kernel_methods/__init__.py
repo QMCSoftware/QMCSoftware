@@ -1,3 +1,4 @@
 from .fast_transforms import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
 from .kernels import KernelShiftInvar,KernelDigShiftInvar
-from .gram_matrices import FastGramMatrixLattice,FastGramMatrixDigitalNetB2
+from .fast_gram_matrix import FastGramMatrixLattice,FastGramMatrixDigitalNetB2
+from .fast_pde_gram_matrix import _FastGramMatrix

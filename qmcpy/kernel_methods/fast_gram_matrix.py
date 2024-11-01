@@ -164,7 +164,7 @@ class _FastGramMatrix(object):
         invertible_conds = [
             ( self.n1==self.n2, "require square matrices"),
             ( self.d_u1au2>0, "require a positive definite circulant factor"),
-            ( self.t1==self.t2 and samelinops.diagonal().all(), "require lbeta1s=lbeta2s and lc1s=lc2s"),
+            ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
             ( (self.m1==1).all() and (self.m2==1).all(), "require there is only one derivative order (also satisfied when self.d_u1mu2==0 and self.d_u2mu1==0)"),
             ( (self.t1==1 and self.t2==1) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
@@ -183,6 +183,7 @@ class _FastGramMatrix(object):
                 self.solve_tiangular = torch.linalg.solve_triangular
             else:
                 self.solve_tiangular = scipy.linalg.solve_triangular
+        self.size = (self.n1*self.t1,self.n2*self.t2)
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         _x,x = self._sample(n_min,n_max)
@@ -349,4 +350,3 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
         xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True)
         xf = xb*2**(-self.kernel_obj.t)
         return xb,xf
-    
