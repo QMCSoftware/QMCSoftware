@@ -180,9 +180,9 @@ class _FastGramMatrix(object):
                 raise Exception("Cholesky of a block is not positive definite, try increasing the noise")
             if self.torchify:
                 import torch 
-                self.solve_tiangular = torch.linalg.solve_triangular
+                self.cho_solve = lambda l,b: torch.cholesky_solve(b,l,upper=False)
             else:
-                self.solve_tiangular = scipy.linalg.solve_triangular
+                self.cho_solve = lambda l,b: scipy.linalg.cho_solve((l,True),b)
         self.size = (self.n1*self.t1,self.n2*self.t2)
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
@@ -259,7 +259,7 @@ class _FastGramMatrix(object):
             yt = self.ft(y) # (v,t1,n1)
             for i in range(self.n1): # probably a better vectorized way to do this
                 # solve systems based on Cholesky decompositions, with self.l_chol is (n1,t1,t1)
-                yt[:,:,i] = self.solve_tiangular(self.l_chol[i].T.conj(),self.solve_tiangular(self.l_chol[i],yt[:,:,i].T,lower=True),lower=False).T
+                yt[:,:,i] = self.cho_solve(self.l_chol[i],yt[:,:,i].T).T
             s = self.ift(yt).real # (v,t1,n1)
             s = s.reshape((v,self.t1*self.n1))
         return s[0,:] if yogndim==1 else s.T
