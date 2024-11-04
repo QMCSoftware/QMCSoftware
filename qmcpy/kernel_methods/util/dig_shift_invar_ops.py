@@ -1,4 +1,3 @@
-from ..util import ParameterError
 import numpy as np 
 
 def k4sumterm(x, t):

@@ -1,9 +1,11 @@
+from ...discrete_distribution import Lattice
+from ..kernel import KernelShiftInvar
+from ..gram_matrix.fast_gram_matrix import _FastGramMatrix
+from ..gram_matrix import FastGramMatrixLattice
+from ._pde_gram_matrix import _PDEGramMatrix
 import numpy as np 
-from ..discrete_distribution import Lattice
-from .kernels import KernelShiftInvar 
-from .fast_gram_matrix import _FastGramMatrix,FastGramMatrixLattice
 
-class FastPDEGramMatrix(object):
+class FastPDEGramMatrix(_PDEGramMatrix):
     """ Fast Gram Matrix for solving PDEs 
     
     >>> d = 2

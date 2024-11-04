@@ -1,5 +1,13 @@
-from .fast_transforms import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
-from .kernels import KernelShiftInvar,KernelDigShiftInvar,KernelGaussian
-from .fast_gram_matrix import FastGramMatrixLattice,FastGramMatrixDigitalNetB2
-from .fast_pde_gram_matrix import FastPDEGramMatrix
-from .slow_gram_matrix import GramMatrix
+from .util import (
+    fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2,
+    bernoulli_poly,
+    weighted_walsh_funcs)
+from .kernel import (
+    KernelGaussian,
+    KernelShiftInvar,KernelDigShiftInvar)
+from .gram_matrix import (
+    GramMatrix,
+    FastGramMatrixLattice,FastGramMatrixDigitalNetB2)
+from .pde_gram_matrix import (
+    PDEGramMatrix,
+    FastPDEGramMatrix)

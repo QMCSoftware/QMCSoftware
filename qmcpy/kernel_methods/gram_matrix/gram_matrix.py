@@ -1,8 +1,7 @@
 from ._gram_matrix import _GramMatrix
-from ..discrete_distribution import Lattice
-from .kernels import KernelShiftInvar
+from ...discrete_distribution import IIDStdUniform
+from ..kernel import KernelShiftInvar
 import numpy as np
-import scipy.linalg
 import itertools
 
 class GramMatrix(_GramMatrix):
@@ -16,7 +15,7 @@ class GramMatrix(_GramMatrix):
     ...     [np.array([1,0,0]),np.array([0,1,0])],
     ...     [np.array([[1,0,0],[0,1,0],[0,0,1]]),np.array([[1,0,1],[0,1,0],[0,0,0]])]
     ...     ]
-    >>> x = Lattice(d,seed=7).gen_samples(n)
+    >>> x = IIDStdUniform(d,seed=7).gen_samples(n)
     >>> kernel_obj = KernelShiftInvar(d)
     >>> for n1,n2 in itertools.product([n//2,n],[n//2,n]):
     ...     for ib1,ib2 in itertools.product(range(len(lbetas)),range(len(lbetas))):

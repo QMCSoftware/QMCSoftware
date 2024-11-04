@@ -1,10 +1,10 @@
 from ._gram_matrix import _GramMatrix
-from ..discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
-from .kernels import KernelShiftInvar,KernelDigShiftInvar
-from .fast_transforms import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
+from ...discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
+from ..kernel import KernelShiftInvar,KernelDigShiftInvar
+from ..util import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
 import numpy as np
-import scipy.linalg
 import itertools
+import warnings
     
 class _FastGramMatrix(_GramMatrix):
     """
@@ -224,9 +224,11 @@ class _FastGramMatrix(_GramMatrix):
         else:
             y = y.reshape((v,self.t1,self.n1)) # (v,t1,n1)
             yt = self.ft(y) # (v,t1,n1)
-            for i in range(self.n1): # probably a better vectorized way to do this
-                # solve systems based on Cholesky decompositions, with self.l_chol is (n1,t1,t1)
-                yt[:,:,i] = self.cho_solve(self.l_chol[i],yt[:,:,i].T).T
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore",".*Casting complex values to real discards the imaginary part*")
+                for i in range(self.n1): # probably a better vectorized way to do this
+                    # solve systems based on Cholesky decompositions, with self.l_chol is (n1,t1,t1)
+                    yt[:,:,i] = self.cho_solve(self.l_chol[i],yt[:,:,i].T).T
             s = self.ift(yt).real # (v,t1,n1)
             s = s.reshape((v,self.t1*self.n1))
         return s[0,:] if yogndim==1 else s.T
