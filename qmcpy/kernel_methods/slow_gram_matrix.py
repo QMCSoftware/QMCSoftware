@@ -1,10 +1,11 @@
+from ._gram_matrix import _GramMatrix
 from ..discrete_distribution import Lattice
 from .kernels import KernelShiftInvar
 import numpy as np
 import scipy.linalg
 import itertools
 
-class GramMatrix(object):
+class GramMatrix(_GramMatrix):
     """ Gram Matrix 
 
     >>> d = 3
@@ -38,59 +39,23 @@ class GramMatrix(object):
             c2s (list of either np.ndarray or torch.Tensor): list of length m2[l] vector of derivative coefficients
             noise (float): nugget term 
         """
-        self.kernel_obj = kernel_obj
-        self.d = self.kernel_obj.d
-        self.npt = self.kernel_obj.npt
-        self.torchify = self.kernel_obj.torchify
+        super(GramMatrix,self).__init__(kernel_obj,noise,lbeta1s,lbeta2s,lc1s,lc2s)
         self.n1 = len(x1) 
         self.n2 = len(x2) 
         assert x1.shape==(self.n1,self.d) and x2.shape==(self.n2,self.d)
-        self.noise = noise
-        assert isinstance(self.noise,float) and self.noise>0.
-        if isinstance(lbeta1s,int): lbeta1s = [lbeta1s*self.npt.ones((1,self.d),dtype=int)]
-        elif not isinstance(lbeta1s,list): lbeta1s = [self.npt.atleast_2d(lbeta1s)]
-        if isinstance(lbeta2s,int): lbeta2s = [lbeta2s*self.npt.ones((1,self.d),dtype=int)]
-        elif not isinstance(lbeta2s,list): lbeta2s = [self.npt.atleast_2d(lbeta2s)]
-        self.lbeta1s = [self.npt.atleast_2d(beta1s) for beta1s in lbeta1s]
-        self.lbeta2s = [self.npt.atleast_2d(beta2s) for beta2s in lbeta2s]
-        self.t1 = len(self.lbeta1s)
-        self.t2 = len(self.lbeta2s)
-        self.m1 = np.array([len(beta1s) for beta1s in self.lbeta1s],dtype=int)
-        self.m2 = np.array([len(beta2s) for beta2s in self.lbeta2s],dtype=int)
-        assert isinstance(self.lbeta1s,list) and all(self.lbeta1s[tt1].shape==(self.m1[tt1],self.d) for tt1 in range(self.t1))
-        assert isinstance(self.lbeta2s,list) and all(self.lbeta2s[tt2].shape==(self.m2[tt2],self.d) for tt2 in range(self.t2))
-        if isinstance(lc1s,float): lc1s = [lc1s*self.npt.ones(self.m1[tt1]) for tt1 in range(self.t1)]
-        elif not isinstance(lc1s,list): lc1s = [lc1s]
-        if isinstance(lc2s,float): lc2s = [lc2s*self.npt.ones(self.m2[tt2]) for tt2 in range(self.t2)]
-        elif not isinstance(lc2s,list): lc2s = [lc2s]
-        self.lc1s = [self.npt.atleast_1d(c1s) for c1s in lc1s] 
-        self.lc2s = [self.npt.atleast_1d(c2s) for c2s in lc2s]
-        self.lc1s_og = [self.npt.atleast_1d(c1s) for c1s in lc1s] 
-        self.lc2s_og = [self.npt.atleast_1d(c2s) for c2s in lc2s]
-        assert isinstance(self.lc1s,list) and all(self.lc1s[tt1].shape==(self.m1[tt1],) for tt1 in range(self.t1))
-        assert isinstance(self.lc2s,list) and all(self.lc2s[tt2].shape==(self.m2[tt2],) for tt2 in range(self.t2))
         gms = np.empty((self.t1,self.t2),dtype=object) 
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-            gms[tt1,tt2] = kernel_obj(x1,x2,lbeta1s[tt1],lbeta2s[tt2],lc1s[tt1],lc2s[tt2])
+            gms[tt1,tt2] = kernel_obj(x1,x2,self.lbeta1s[tt1],self.lbeta2s[tt2],self.lc1s[tt1],self.lc2s[tt2])
         self.gm = self.npt.vstack([self.npt.hstack([gms[tt1,tt2] for tt2 in range(self.t2)]) for tt1 in range(self.t1)])
         invertible_conds = [
             ( x1.ctypes.data==x2.ctypes.data, "x1 and x2 must point to the same object"),
             ( self.n1==self.n2, "require square matrices"),
             ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
-            ]
-        self.invertible = all(cond for cond,error_msg in invertible_conds)
-        self.invertible_error_msg = "\n\n"+"\n\n".join(error_msg for cond,error_msg in invertible_conds if not cond)
-        if self.invertible:
-            try:
-                self.l_chol = self.npt.linalg.cholesky(self.gm+self.noise*self.npt.eye(self.n1*self.t1))
-            except:
-                raise Exception("Cholesky not positive definite, try increasing the noise")
-            if self.torchify:
-                import torch 
-                self.cho_solve = lambda l,b: torch.cholesky_solve(b,l,upper=False)
-            else:
-                self.cho_solve = lambda l,b: scipy.linalg.cho_solve((l,True),b)
+            ]  
+        super(GramMatrix,self)._set_invertible_conds(invertible_conds)     
         self.size = (self.n1*self.t1,self.n2*self.t2)
+    def _init_invertibile(self):
+        self.l_chol = self.cholesky(self.gm+self.noise*self.npt.eye(self.n1*self.t1))
     def get_full_gram_matrix(self):
         return self.gm
     def multiply(self, *args, **kwargs):
@@ -99,6 +64,8 @@ class GramMatrix(object):
         return self.gm@y
     def solve(self, y):
         assert self.invertible, self.invertible_error_msg
+        if not hasattr(self,"l_chol"): 
+            self._init_invertibile()
         return self.cho_solve(self.l_chol,y)
     def _check(self):
         if not self.invertible: return

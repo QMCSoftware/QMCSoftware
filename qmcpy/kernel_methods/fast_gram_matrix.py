@@ -1,3 +1,4 @@
+from ._gram_matrix import _GramMatrix
 from ..discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
 from .kernels import KernelShiftInvar,KernelDigShiftInvar
 from .fast_transforms import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
@@ -5,7 +6,7 @@ import numpy as np
 import scipy.linalg
 import itertools
     
-class _FastGramMatrix(object):
+class _FastGramMatrix(_GramMatrix):
     """
     >>> n = 2**3
     >>> d = 3
@@ -41,11 +42,7 @@ class _FastGramMatrix(object):
     ...             gm_wide._check()
     """
     def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, ft, ift, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
-        self.kernel_obj = kernel_obj
-        assert any(isinstance(kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
-        self.d = self.kernel_obj.d
-        self.npt = self.kernel_obj.npt
-        self.torchify = self.kernel_obj.torchify
+        super(_FastGramMatrix,self).__init__(kernel_obj,noise,lbeta1s,lbeta2s,lc1s,lc2s)
         self.ft = ft 
         self.ift = ift
         self.n1 = n1 
@@ -64,7 +61,6 @@ class _FastGramMatrix(object):
         self.d_u1au2 = self.u1au2.sum()
         self.d_u1nu2 = self.u1nu2.sum()
         self.noise = noise
-        assert isinstance(self.noise,float) and self.noise>0.
         if isinstance(dd_obj,DiscreteDistribution):
             self.dd_obj = dd_obj
             assert isinstance(self.dd_obj,dd_type) and self.dd_obj.d==self.d 
@@ -79,28 +75,6 @@ class _FastGramMatrix(object):
             assert self.n_max>=self.n1 and self.n_max>=self.n2
             assert self._x.shape==(self.n_max,self.kernel_obj.d) and self.x.shape==(self.n_max,self.kernel_obj.d)
         self.n_min = min(self.n1,self.n2)
-        if isinstance(lbeta1s,int): lbeta1s = [lbeta1s*self.npt.ones((1,self.d),dtype=int)]
-        elif not isinstance(lbeta1s,list): lbeta1s = [self.npt.atleast_2d(lbeta1s)]
-        if isinstance(lbeta2s,int): lbeta2s = [lbeta2s*self.npt.ones((1,self.d),dtype=int)]
-        elif not isinstance(lbeta2s,list): lbeta2s = [self.npt.atleast_2d(lbeta2s)]
-        self.lbeta1s = [self.npt.atleast_2d(beta1s) for beta1s in lbeta1s]
-        self.lbeta2s = [self.npt.atleast_2d(beta2s) for beta2s in lbeta2s]
-        self.t1 = len(self.lbeta1s)
-        self.t2 = len(self.lbeta2s)
-        self.m1 = np.array([len(beta1s) for beta1s in self.lbeta1s],dtype=int)
-        self.m2 = np.array([len(beta2s) for beta2s in self.lbeta2s],dtype=int)
-        assert isinstance(self.lbeta1s,list) and all(self.lbeta1s[tt1].shape==(self.m1[tt1],self.d) for tt1 in range(self.t1))
-        assert isinstance(self.lbeta2s,list) and all(self.lbeta2s[tt2].shape==(self.m2[tt2],self.d) for tt2 in range(self.t2))
-        if isinstance(lc1s,float): lc1s = [lc1s*self.npt.ones(self.m1[tt1]) for tt1 in range(self.t1)]
-        elif not isinstance(lc1s,list): lc1s = [lc1s]
-        if isinstance(lc2s,float): lc2s = [lc2s*self.npt.ones(self.m2[tt2]) for tt2 in range(self.t2)]
-        elif not isinstance(lc2s,list): lc2s = [lc2s]
-        self.lc1s = [self.npt.atleast_1d(c1s) for c1s in lc1s] 
-        self.lc2s = [self.npt.atleast_1d(c2s) for c2s in lc2s]
-        self.lc1s_og = [self.npt.atleast_1d(c1s) for c1s in lc1s] 
-        self.lc2s_og = [self.npt.atleast_1d(c2s) for c2s in lc2s]
-        assert isinstance(self.lc1s,list) and all(self.lc1s[tt1].shape==(self.m1[tt1],) for tt1 in range(self.t1))
-        assert isinstance(self.lc2s,list) and all(self.lc2s[tt2].shape==(self.m2[tt2],) for tt2 in range(self.t2))
         inds = np.empty((self.t1,self.t2),dtype=object)
         idxs = np.empty((self.t1,self.t2),dtype=object)
         consts = np.empty((self.t1,self.t2),dtype=object)
@@ -168,22 +142,13 @@ class _FastGramMatrix(object):
             ( (self.m1==1).all() and (self.m2==1).all(), "require there is only one derivative order (also satisfied when self.d_u1mu2==0 and self.d_u2mu1==0)"),
             ( (self.t1==1 and self.t2==1) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
-        self.invertible = all(cond for cond,error_msg in invertible_conds)
-        self.invertible_error_msg = "\n\n"+"\n\n".join(error_msg for cond,error_msg in invertible_conds if not cond)
-        if self.invertible:
-            lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1))
-            for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-                lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
-            try:
-                self.l_chol = self.npt.linalg.cholesky(lamblock+self.noise*self.npt.eye(self.t1))
-            except:
-                raise Exception("Cholesky of a block is not positive definite, try increasing the noise")
-            if self.torchify:
-                import torch 
-                self.cho_solve = lambda l,b: torch.cholesky_solve(b,l,upper=False)
-            else:
-                self.cho_solve = lambda l,b: scipy.linalg.cho_solve((l,True),b)
+        super(_FastGramMatrix,self)._set_invertible_conds(invertible_conds)     
         self.size = (self.n1*self.t1,self.n2*self.t2)
+    def _init_invertibile(self):
+        lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1))
+        for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
+            lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
+        self.l_chol = self.cholesky(lamblock+self.noise*self.npt.eye(self.t1))
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         _x,x = self._sample(n_min,n_max)
@@ -238,6 +203,8 @@ class _FastGramMatrix(object):
         return sfull[0,:] if yogndim==1 else sfull.T
     def solve(self, y):
         assert self.invertible, self.invertible_error_msg
+        if not hasattr(self,"l_chol"): 
+            self._init_invertibile()
         yogndim = y.ndim
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
