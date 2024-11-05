@@ -10,17 +10,19 @@ def _fwht_torch(x):
     assert n&(n-1)==0 # require n is a power of 2
     n_half = n//2
     m = int(np.log2(n))
+    i1v = torch.empty(n_half,dtype=int)
+    i2v = torch.empty(n_half,dtype=int)
+    ivec = torch.arange(n_half,dtype=int)
     for k in range(m):
         s = m-k-1 
         f = 1<<s
-        for i in range(n_half):
-            if((i>>s)&1):
-                i2 = i+n_half
-                i1 = i2^f
-            else:
-                i1 = i
-                i2 = i1^f
-            y[...,i1],y[...,i2] = (y[...,i1]+y[...,i2] )/SQRT2,(y[...,i1]-y[...,i2] )/SQRT2
+        cond = ((ivec>>s)&1)==1
+        ncond = ~cond
+        i2v[cond] = ivec[cond]+n_half 
+        i1v[cond] = i2v[cond]^f 
+        i1v[ncond] = ivec[ncond]
+        i2v[ncond] = i1v[ncond]^f
+        y[...,i1v],y[...,i2v] = (y[...,i1v]+y[...,i2v])/SQRT2,(y[...,i1v]-y[...,i2v])/SQRT2
     return y
 class _FWHTB2Ortho(torch.autograd.Function):
     @staticmethod
