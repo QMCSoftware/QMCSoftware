@@ -8,21 +8,18 @@ def _fwht_torch(x):
     n = x.size(-1)
     if n<=1: return y
     assert n&(n-1)==0 # require n is a power of 2
-    n_half = n//2
     m = int(np.log2(n))
-    i1v = torch.empty(n_half,dtype=int)
-    i2v = torch.empty(n_half,dtype=int)
-    ivec = torch.arange(n_half,dtype=int)
+    it = torch.arange(n,dtype=int).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
+    t0 = torch.tensor(0)
+    t1 = torch.tensor(1)
     for k in range(m):
-        s = m-k-1 
-        f = 1<<s
-        cond = ((ivec>>s)&1)==1
-        ncond = ~cond
-        i2v[cond] = ivec[cond]+n_half 
-        i1v[cond] = i2v[cond]^f 
-        i1v[ncond] = ivec[ncond]
-        i2v[ncond] = i1v[ncond]^f
-        y[...,i1v],y[...,i2v] = (y[...,i1v]+y[...,i2v])/SQRT2,(y[...,i1v]-y[...,i2v])/SQRT2
+        i1v = torch.index_select(it,dim=k,index=t0).flatten()
+        i2v = torch.index_select(it,dim=k,index=t1).flatten()
+        y1,y2 = y[...,i1v],y[...,i2v]
+        tmp1 =  (y1+y2)/SQRT2
+        tmp2 = (y1-y2)/SQRT2
+        y[...,i1v],y[...,i2v] = tmp1,tmp2
+        #y[...,i1v],y[...,i2v] = (y[...,i1v]+y[...,i2v])/SQRT2,(y[...,i1v]-y[...,i2v])/SQRT2
     return y
 class _FWHTB2Ortho(torch.autograd.Function):
     @staticmethod
