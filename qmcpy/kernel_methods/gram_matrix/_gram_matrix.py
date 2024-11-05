@@ -1,3 +1,4 @@
+import numpy as np 
 import scipy.linalg
 
 class _GramMatrix(object):
@@ -16,8 +17,8 @@ class _GramMatrix(object):
         self.lbeta2s = [self.npt.atleast_2d(beta2s) for beta2s in lbeta2s]
         self.t1 = len(self.lbeta1s)
         self.t2 = len(self.lbeta2s)
-        self.m1 = self.npt.array([len(beta1s) for beta1s in self.lbeta1s],dtype=int)
-        self.m2 = self.npt.array([len(beta2s) for beta2s in self.lbeta2s],dtype=int)
+        self.m1 = np.array([len(beta1s) for beta1s in self.lbeta1s],dtype=int)
+        self.m2 = np.array([len(beta2s) for beta2s in self.lbeta2s],dtype=int)
         assert isinstance(self.lbeta1s,list) and all(self.lbeta1s[tt1].shape==(self.m1[tt1],self.d) for tt1 in range(self.t1))
         assert isinstance(self.lbeta2s,list) and all(self.lbeta2s[tt2].shape==(self.m2[tt2],self.d) for tt2 in range(self.t2))
         if isinstance(lc1s,float): lc1s = [lc1s*self.npt.ones(self.m1[tt1]) for tt1 in range(self.t1)]
@@ -33,8 +34,10 @@ class _GramMatrix(object):
         if self.torchify:
             import torch 
             self.cho_solve = lambda l,b: torch.cholesky_solve(b,l,upper=False)
+            self.transpose_func = lambda x,dims: torch.permute(x,dims)
         else:
             self.cho_solve = lambda l,b: scipy.linalg.cho_solve((l,True),b)
+            self.transpose_func = lambda x,dims: x.transpose(*dims)
     def cholesky(self, mat):
         try:
             l_chol = self.npt.linalg.cholesky(mat)

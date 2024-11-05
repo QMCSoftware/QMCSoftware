@@ -102,7 +102,7 @@ class _FastGramMatrix(_GramMatrix):
                 delta_u1au2 = self.kernel_obj.x1_ominus_x2(self._x[:n1,None,self.u1au2],self._x[None,[0],self.u1au2])
                 k1 = np.empty((self.t1,self.t2),dtype=object)
                 for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-                    k1[tt1,tt2] = self.kernel_obj.eval_low_u_noscale(self.u1au2,delta_u1au2,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],self.n1,1,self.d_u1au2).transpose(0,1,3,2)
+                    k1[tt1,tt2] = self.transpose_func(self.kernel_obj.eval_low_u_noscale(self.u1au2,delta_u1au2,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],self.n1,1,self.d_u1au2),(0,1,3,2))
                 # self.lam will be (self.m1,self.m2,1,self.n1)
             elif self.n1>self.n2:
                 self.vhs = "tall"
@@ -118,7 +118,7 @@ class _FastGramMatrix(_GramMatrix):
                 delta_u1au2 = self.kernel_obj.x1_ominus_x2(self._x[:n1,None,self.u1au2],self._x[None,:self.n2:self.n1,self.u1au2])
                 k1 = np.empty((self.t1,self.t2),dtype=object)
                 for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-                    k1[tt1,tt2] = self.kernel_obj.eval_low_u_noscale(self.u1au2,delta_u1au2,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],self.n1,self.r,self.d_u1au2).transpose(0,1,3,2)
+                    k1[tt1,tt2] = self.transpose_func(self.kernel_obj.eval_low_u_noscale(self.u1au2,delta_u1au2,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],self.n1,self.r,self.d_u1au2),(0,1,3,2))
                 # self.lam will be (self.m1,self.m2,self.r,self.n1)
             if self.d_u1nu2>0:
                 for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):

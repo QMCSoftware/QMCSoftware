@@ -1,4 +1,5 @@
 import numpy as np 
+import time 
 
 class _PDEGramMatrix(object):                 
     def _mult_check(self):
@@ -9,26 +10,27 @@ class _PDEGramMatrix(object):
         assert np.allclose(self@y,gmatfull@y,atol=1e-12)
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
-    def pcg(self, b, x0=None, rtol=1e-5, atol=0., maxiter=None, precond=True):
+    def pcg(self, b, x0=None, rtol=1e-5, atol=0., maxiter=None, precond=True, ref_sol=False):
         """
         Preconditioned Conjugate Gradient (PCG) method, see https://en.wikipedia.org/wiki/Conjugate_gradient_method#The_preconditioned_conjugate_gradient_method
         
-        b (np.ndarray or torch.Tensor): right hand side 
-        x0 (np.ndarray or torch.Tensor): initial guess
-        rtol, atol (float): require norm(b-A@x)<=max(rtol*norm(b),atol)
-        maxiter (int): maximum number of iterations 
-        precond (bool or str): flag to use preconditioner. 
-            If true, the preconditioner is A.precond_solve. 
-            If a str s is passed in, the preconditioned system solver is A.s
+        Args:
+            b (np.ndarray or torch.Tensor): right hand side 
+            x0 (np.ndarray or torch.Tensor): initial guess
+            rtol, atol (float): require norm(b-A@x)<=max(rtol*norm(b),atol)
+            maxiter (int): maximum number of iterations 
+            precond (bool or str): flag to use preconditioner. 
+                If true, the preconditioner is A.precond_solve. 
+                If a str s is passed in, the preconditioned system solver is A.s
+            ref_sol (bool): if True, compute a reference solution and track the relative error (forward error)
         """
         n = len(b)
         if maxiter is None: maxiter = n 
         assert 0<maxiter<=n
         assert b.shape==(n,)
-        x = self.npt.zeros((maxiter+1,n))
-        if x0 is not None:
-            assert x.shape==(n,)
-            x[0] = x0 
+        bnorm = self.npt.linalg.norm(b)
+        x = self.npt.zeros(n) if x0 is None else x0 
+        assert x.shape==(n,)
         assert rtol>=0 and atol>=0
         residtol = max(rtol*self.npt.linalg.norm(b),atol)
         assert precond is True or precond is False or isinstance(precond,str) 
@@ -38,25 +40,42 @@ class _PDEGramMatrix(object):
             precond_solve = self.precond_solve
         elif isinstance(precond,str):
             precond_solve = getattr(self,precond)
-        rnorms = self.npt.zeros(maxiter+1)
-        r = b if x0 is None else b-self@x[0]
+        backward_norms = self.npt.zeros(maxiter+1)
+        if ref_sol:
+            tr0 = time.perf_counter()
+            xref = self._solve(b)
+            tr = time.perf_counter()-tr0
+            xrefnorm = self.npt.linalg.norm(xref)
+            forward_norms = self.npt.zeros(maxiter+1)
+            forward_norms[0] = self.npt.linalg.norm(xref) if x0 is None else self.npt.linalg.norm(xref-x)
+        times = self.npt.zeros(maxiter+1)
+        t0 = time.perf_counter()
+        r = b if x0 is None else b-self@x
         z = precond_solve(r)
         rz = r@z
         p = z
-        rnorms[0] = self.npt.linalg.norm(r)
+        backward_norms[0] = self.npt.linalg.norm(r)
         for i in range(1,maxiter+1):
             Ap = self@p
             alpha = rz/(p@Ap)
-            x[i] = x[i-1]+alpha*p
+            x = x+alpha*p
             r = r-alpha*Ap
-            rnorms[i] = self.npt.linalg.norm(r)
-            if rnorms[i]<=residtol or i==maxiter: break
+            backward_norms[i] = self.npt.linalg.norm(r)
+            if ref_sol: forward_norms[i] = self.npt.linalg.norm(x-xref)
+            times[i] = time.perf_counter()-t0
+            if backward_norms[i]<=residtol or i==maxiter: break
             z = precond_solve(r)
             rznew = r@z
             beta = rznew/rz 
             rz = rznew
             p = z+beta*p
-        return x[:(i+1)],rnorms[:(i+1)]
+        times = times[:(i+1)]
+        rbackward_norms = backward_norms[:(i+1)]/bnorm
+        if not ref_sol:
+            return x,rbackward_norms,times
+        else:
+            rforward_norms = forward_norms[:(i+1)]/xrefnorm
+            return x,rbackward_norms,times,xref,rforward_norms,tr
     def _solve(self, y):
         if not hasattr(self,"l_chol"): 
             self._init_invertibile()
