@@ -52,9 +52,11 @@ class PDEGramMatrix(_PDEGramMatrix):
         assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==self.nr
         gms = np.empty((self.nr,self.nr),dtype=object)
         for i,k in itertools.product(range(self.nr),range(self.nr)):
-            gms[i,k] = GramMatrix(xs[i],xs[k],kernel_obj,llbetas[i],llbetas[k],llcs[i],llcs[k],noise)
+            gms[i,k] = GramMatrix(xs[i],xs[k],kernel_obj,llbetas[i],llbetas[k],llcs[i],llcs[k],noise=0.)
         self.length = np.sum([gms[i,0].size[0] for i in range(self.nr)])
-        self.gm = self.npt.vstack([self.npt.hstack([gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])
+        self.gm = self.npt.vstack([self.npt.hstack([gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length)
+        self.cholesky = gms[0,0].cholesky
+        self.cho_solve = gms[0,0].cho_solve
     def _set_diag(self):
         self.gm_diag = self.gm.diagonal()[:,None]
     def precond_solve(self, y):
@@ -63,10 +65,14 @@ class PDEGramMatrix(_PDEGramMatrix):
         assert yogndim<=2 
         if yogndim==1: y = y[:,None] # (l,v)
         assert y.ndim==2 and y.shape[0]==(self.length)
-        s = s/self.gm_diag
+        s = y/self.gm_diag
         return s[:,0] if yogndim==1 else s
     def __matmul__(self, y):
         return self.gm@y
     def get_full_gram_matrix(self):
         return self.gm.copy()
+    def _init_invertibile(self):
+        self.l_chol = self.cholesky(self.gm)
+    def condition_number(self):
+        return self.npt.linalg.cond(self.gm)
     

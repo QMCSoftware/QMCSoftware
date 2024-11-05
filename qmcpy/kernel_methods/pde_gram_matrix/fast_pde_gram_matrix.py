@@ -39,17 +39,18 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         """
         self.npt = kernel_obj.npt
         assert isinstance(dd_obj,Lattice) or isinstance(dd_obj,DigitalNetB2)
-        us = self.npt.atleast_2d(us) 
-        self.nr = len(us) 
-        assert us.shape==(self.nr,kernel_obj.d) and (us.sum(1)>0).all() and (us[0]==True).all()
-        if isinstance(ns,int): ns = ns*self.npt.ones(self.nr,dtype=int)
-        assert ns.shape==(self.nr,) and (ns[1:]<=ns[0]).all()
+        self.us = self.npt.atleast_2d(us) 
+        self.nr = len(self.us) 
+        assert self.us.shape==(self.nr,kernel_obj.d) and (self.us.sum(1)>0).all() and (self.us[0]==True).all()
+        self.ns = ns 
+        if isinstance(self.ns,int): self.ns = self.ns*self.npt.ones(self.nr,dtype=int)
+        assert self.ns.shape==(self.nr,) and (self.ns[1:]<=self.ns[0]).all()
         assert isinstance(llbetas,list) and all(isinstance(lbetas,list) for lbetas in llbetas) and len(llbetas)==self.nr
         assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==self.nr
         if isinstance(dd_obj,Lattice):
-            gmii = FastGramMatrixLattice(dd_obj,kernel_obj,ns[0],ns[0],us[0],us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
+            gmii = FastGramMatrixLattice(dd_obj,kernel_obj,self.ns[0],self.ns[0],self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
         elif isinstance(dd_obj,DigitalNetB2):
-            gmii = FastGramMatrixDigitalNetB2(dd_obj,kernel_obj,ns[0],ns[0],us[0],us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
+            gmii = FastGramMatrixDigitalNetB2(dd_obj,kernel_obj,self.ns[0],self.ns[0],self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
         else:
             raise Exception("Invalid dd_obj") 
         self.gms = np.empty((self.nr,self.nr),dtype=object)
@@ -57,14 +58,16 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         gmii__x_x = gmii._x,gmii.x 
         gmiitype = type(gmii)
         for i in range(1,self.nr):
-            self.gms[0,i] = gmiitype(gmii__x_x,gmii.kernel_obj,gmii.n1,ns[i].item(),gmii.u1,us[i,:],gmii.lbeta1s,llbetas[i],gmii.lc1s_og,llcs[i],gmii.noise)
-            self.gms[i,0] = gmiitype(gmii__x_x,gmii.kernel_obj,ns[i].item(),gmii.n1,us[i,:],gmii.u1,llbetas[i],gmii.lbeta1s,llcs[i],gmii.lc1s_og,gmii.noise)
+            self.gms[0,i] = gmiitype(gmii__x_x,gmii.kernel_obj,gmii.n1,self.ns[i].item(),gmii.u1,self.us[i,:],gmii.lbeta1s,llbetas[i],gmii.lc1s_og,llcs[i],gmii.noise)
+            self.gms[i,0] = gmiitype(gmii__x_x,gmii.kernel_obj,self.ns[i].item(),gmii.n1,self.us[i,:],gmii.u1,llbetas[i],gmii.lbeta1s,llcs[i],gmii.lc1s_og,gmii.noise)
             for k in range(1,self.nr):
-                self.gms[i,k] = gmiitype(gmii__x_x,gmii.kernel_obj,ns[i],ns[k],us[i,:],us[k,:],llbetas[i],llbetas[k],llcs[i],llcs[k],gmii.noise)
+                self.gms[i,k] = gmiitype(gmii__x_x,gmii.kernel_obj,self.ns[i],self.ns[k],self.us[i,:],self.us[k,:],llbetas[i],llbetas[k],llcs[i],llcs[k],gmii.noise)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
         self.bs_cumsum = np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]
         self.bs_cumsum = self.bs_cumsum[:-1]
+        self.cholesky = self.gms[0,0].cholesky
+        self.cho_solve = self.gms[0,0].cho_solve
     def precond_solve(self, y):
         yogndim = y.ndim
         assert yogndim<=2 
@@ -88,3 +91,16 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         return s[:,0] if yogndim==1 else s
     def get_full_gram_matrix(self):
         return self.npt.vstack([self.npt.hstack([self.gms[i,k].get_full_gram_matrix() for k in range(self.nr)]) for i in range(self.nr)])
+    def _init_invertibile(self):
+        gm = self.get_full_gram_matrix()
+        self.l_chol = self.cholesky(gm)
+    def condition_number(self):
+        gm = self.get_full_gram_matrix()
+        return self.npt.linalg.cond(gm)
+    def _get_xs(self):
+        x = self.gms[0,0].x
+        xs = [x.copy()[:self.ns[i]] for i in range(self.nr)]
+        for i in range(self.nr):
+            xs[i][:,~self.us[i]] = 0.
+        return xs
+      

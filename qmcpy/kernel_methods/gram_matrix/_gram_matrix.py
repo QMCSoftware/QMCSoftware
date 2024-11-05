@@ -7,7 +7,7 @@ class _GramMatrix(object):
         self.npt = self.kernel_obj.npt
         self.torchify = self.kernel_obj.torchify
         self.noise = noise
-        assert isinstance(self.noise,float) and self.noise>0.
+        assert isinstance(self.noise,float) and self.noise>=0.
         if isinstance(lbeta1s,int): lbeta1s = [lbeta1s*self.npt.ones((1,self.d),dtype=int)]
         elif not isinstance(lbeta1s,list): lbeta1s = [self.npt.atleast_2d(lbeta1s)]
         if isinstance(lbeta2s,int): lbeta2s = [lbeta2s*self.npt.ones((1,self.d),dtype=int)]

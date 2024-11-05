@@ -55,3 +55,9 @@ class _PDEGramMatrix(object):
             rz = rznew
             p = z+beta*p
         return x,rnorms[:(i+1)]
+    def _solve(self, y):
+        if not hasattr(self,"l_chol"): 
+            self._init_invertibile()
+        return self.cho_solve(self.l_chol,y)
+    def condition_number(self):
+        return self.npt.linalg.cond(self.gm)
