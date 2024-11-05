@@ -17,7 +17,7 @@ def _parse_ft_input(x):
     assert (n&(n-1))==0 # require n is 0 or a power of 2
     return x,shape,d,n,n//2
 
-def fft_bro_1d_radix2(x):
+def fftbr(x):
     """
     1 dimensional Bit-Reversed-Order (BRO) Fast Fourier Transform (FFT) along the last dimension. 
     Requires the last dimension of x is already in BRO, so we can skip the first step of the decimation-in-time FFT. 
@@ -39,7 +39,7 @@ def fft_bro_1d_radix2(x):
     xc = xr+1j*xi
     return xc.reshape(shape)
 
-def ifft_bro_1d_radix2(x):
+def ifftbr(x):
     """
     1 dimensional Bit-Reversed-Order (BRO) Inverse Fast Fourier Transform (IFFT) along the last dimension. 
     Outputs  an array in bit-reversed order, so we can skip the last step of the decimation-in-time IFFT. 
@@ -62,7 +62,7 @@ def ifft_bro_1d_radix2(x):
     return xc.reshape(shape)
 
 
-def fwht_1d_radix2(x):
+def fwht(x):
     """
     1 dimensional Fast Walsh Hadamard Transform (FWHT) . 
     Requires the size of the last dimension is a power of 2. 

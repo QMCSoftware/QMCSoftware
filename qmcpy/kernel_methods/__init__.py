@@ -1,7 +1,15 @@
 from .util import (
-    fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2,
     bernoulli_poly,
     weighted_walsh_funcs)
+from .fast_transforms import (
+    fftbr,ifftbr,fwht
+)
+try:
+    from .fast_transforms import (
+        fftbr_torch,ifftbr_torch,fwht_torch
+    )
+except:
+    pass
 from .kernel import (
     KernelGaussian,
     KernelShiftInvar,KernelDigShiftInvar)

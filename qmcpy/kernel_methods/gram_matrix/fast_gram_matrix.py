@@ -1,7 +1,11 @@
 from ._gram_matrix import _GramMatrix
 from ...discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
 from ..kernel import KernelShiftInvar,KernelDigShiftInvar
-from ..util import fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2
+from ..fast_transforms import fftbr,ifftbr,fwht
+try:
+    from ..fast_transforms import fftbr_torch,ifftbr_torch,fwht_torch
+except:
+    pass
 import numpy as np
 import itertools
 import warnings
@@ -41,11 +45,9 @@ class _FastGramMatrix(_GramMatrix):
     ...             gm_wide = gm.copy(max(n1//4,1),max(n2//2,1))
     ...             gm_wide._check()
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, ft, ift, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
         super(_FastGramMatrix,self).__init__(kernel_obj,noise,lbeta1s,lbeta2s,lc1s,lc2s)
         assert any(isinstance(self.kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
-        self.ft = ft 
-        self.ift = ift
         self.n1 = n1 
         self.n2 = n2 
         assert (self.n1&(self.n1-1))==0 and (self.n2&(self.n2-1))==0 and self.n1>0 and self.n2>0 # require n1 and n2 are powers of 2
@@ -283,9 +285,13 @@ class FastGramMatrixLattice(_FastGramMatrix):
             c2s (list of either np.ndarray or torch.Tensor): list of length m2[l] vector of derivative coefficients
             noise (float): nugget term 
         """
+        if kernel_obj.torchify:
+            self.ft = fftbr_torch
+            self.ift = ifftbr_torch
+        else:
+            self.ft = fftbr 
+            self.ift = ifftbr
         super(FastGramMatrixLattice,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,
-            ft = fft_bro_1d_radix2,
-            ift = ifft_bro_1d_radix2,
             dd_type = Lattice, 
             dd_randomize_ops = ["SHIFT"],
             dd_order = "NATURAL",
@@ -315,9 +321,13 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
         """
         if isinstance(dd_obj,DigitalNetB2):
             kernel_obj.set_t(dd_obj.t_lms)
+        if kernel_obj.torchify:
+            self.ft = fwht_torch
+            self.ift = fwht_torch
+        else:
+            self.ft = fwht 
+            self.ift = fwht
         super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,
-            ft = fwht_1d_radix2,
-            ift = fwht_1d_radix2,
             dd_type = DigitalNetB2, 
             dd_randomize_ops = ["DS","LMS_DS"],
             dd_order = "NATURAL",
