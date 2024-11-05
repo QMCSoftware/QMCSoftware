@@ -22,13 +22,15 @@ class _PDEGramMatrix(object):
             If a str s is passed in, the preconditioned system solver is A.s
         """
         n = len(b)
-        assert b.shape==(n,)
-        x = self.npt.zeros_like(b) if x0 is None else x0 
-        assert x.shape==(n,)
-        assert rtol>=0 and atol>=0
-        residtol = max(rtol*self.npt.linalg.norm(b),atol)
         if maxiter is None: maxiter = n 
         assert 0<maxiter<=n
+        assert b.shape==(n,)
+        x = self.npt.zeros((maxiter+1,n))
+        if x0 is not None:
+            assert x.shape==(n,)
+            x[0] = x0 
+        assert rtol>=0 and atol>=0
+        residtol = max(rtol*self.npt.linalg.norm(b),atol)
         assert precond is True or precond is False or isinstance(precond,str) 
         if precond is False: 
             precond_solve = lambda r: r 
@@ -37,7 +39,7 @@ class _PDEGramMatrix(object):
         elif isinstance(precond,str):
             precond_solve = getattr(self,precond)
         rnorms = self.npt.zeros(maxiter+1)
-        r = b if x0 is None else b-self@x
+        r = b if x0 is None else b-self@x[0]
         z = precond_solve(r)
         rz = r@z
         p = z
@@ -45,19 +47,17 @@ class _PDEGramMatrix(object):
         for i in range(1,maxiter+1):
             Ap = self@p
             alpha = rz/(p@Ap)
-            x = x+alpha*p
+            x[i] = x[i-1]+alpha*p
             r = r-alpha*Ap
             rnorms[i] = self.npt.linalg.norm(r)
-            if rnorms[i]<=residtol: break
+            if rnorms[i]<=residtol or i==maxiter: break
             z = precond_solve(r)
             rznew = r@z
             beta = rznew/rz 
             rz = rznew
             p = z+beta*p
-        return x,rnorms[:(i+1)]
+        return x[:(i+1)],rnorms[:(i+1)]
     def _solve(self, y):
         if not hasattr(self,"l_chol"): 
             self._init_invertibile()
         return self.cho_solve(self.l_chol,y)
-    def condition_number(self):
-        return self.npt.linalg.cond(self.gm)

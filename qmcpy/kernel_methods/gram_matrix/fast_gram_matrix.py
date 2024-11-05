@@ -136,20 +136,23 @@ class _FastGramMatrix(_GramMatrix):
             self.lam = np.empty((self.t1,self.t2),dtype=object)
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 self.lam[tt1,tt2] = np.sqrt(self.n_min)*self.ft(k1[tt1,tt2])
+        self.size = (self.n1*self.t1,self.n2*self.t2)
         invertible_conds = [
             ( self.n1==self.n2, "require square matrices"),
             ( self.d_u1au2>0, "require a positive definite circulant factor"),
             ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
             ( (self.m1==1).all() and (self.m2==1).all(), "require there is only one derivative order (also satisfied when self.d_u1mu2==0 and self.d_u2mu1==0)"),
-            ( (self.t1==1 and self.t2==1) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
+            ( (self.t1==1 and self.t2==1 and self.noise==0) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
-        super(_FastGramMatrix,self)._set_invertible_conds(invertible_conds)     
-        self.size = (self.n1*self.t1,self.n2*self.t2)
+        super(_FastGramMatrix,self)._set_invertible_conds(invertible_conds)
+        if self.invertible and self.noise>0:
+            for tt1 in range(self.t1):
+                self.lam[tt1,tt1][0,0,0,:] += self.noise
     def _init_invertibile(self):
         lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1))
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
             lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
-        self.l_chol = self.cholesky(lamblock+self.noise*self.npt.eye(self.t1))
+        self.l_chol = self.cholesky(lamblock)
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         _x,x = self._sample(n_min,n_max)
@@ -161,7 +164,10 @@ class _FastGramMatrix(_GramMatrix):
         kfull = np.empty((self.t1,self.t2),dtype=object)
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
             kfull[tt1,tt2] = self.kernel_obj(_xu1[:self.n1,:],_xu2[:self.n2,:],self.lbeta1s[tt1],self.lbeta2s[tt2],self.lc1s_og[tt1],self.lc2s_og[tt2])
-        return self.npt.vstack([self.npt.hstack(kfull[tt1]) for tt1 in range(self.t1)])
+        gm = self.npt.vstack([self.npt.hstack(kfull[tt1]) for tt1 in range(self.t1)])
+        if self.invertible and self.noise>0:
+            gm = gm+self.noise*self.npt.eye(self.size[0])
+        return gm
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
     def __matmul__(self, y):

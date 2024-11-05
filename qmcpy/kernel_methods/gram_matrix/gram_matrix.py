@@ -46,15 +46,17 @@ class GramMatrix(_GramMatrix):
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
             gms[tt1,tt2] = kernel_obj(x1,x2,self.lbeta1s[tt1],self.lbeta2s[tt2],self.lc1s[tt1],self.lc2s[tt2])
         self.gm = self.npt.vstack([self.npt.hstack([gms[tt1,tt2] for tt2 in range(self.t2)]) for tt1 in range(self.t1)])
+        self.size = (self.n1*self.t1,self.n2*self.t2)
         invertible_conds = [
             ( x1.ctypes.data==x2.ctypes.data, "x1 and x2 must point to the same object"),
             ( self.n1==self.n2, "require square matrices"),
             ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
             ]  
-        super(GramMatrix,self)._set_invertible_conds(invertible_conds)     
-        self.size = (self.n1*self.t1,self.n2*self.t2)
+        super(GramMatrix,self)._set_invertible_conds(invertible_conds)
+        if self.invertible and self.noise>0:
+            self.gm = self.gm+self.noise*self.npt.eye(self.size[0])
     def _init_invertibile(self):
-        self.l_chol = self.cholesky(self.gm+self.noise*self.npt.eye(self.n1*self.t1))
+        self.l_chol = self.cholesky(self.gm)
     def get_full_gram_matrix(self):
         return self.gm.copy()
     def multiply(self, *args, **kwargs):

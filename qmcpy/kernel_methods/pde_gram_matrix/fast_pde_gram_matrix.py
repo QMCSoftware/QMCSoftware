@@ -97,6 +97,10 @@ class FastPDEGramMatrix(_PDEGramMatrix):
     def condition_number(self):
         gm = self.get_full_gram_matrix()
         return self.npt.linalg.cond(gm)
+    def precond_condition_number(self):
+        gm = self.get_full_gram_matrix()
+        pgm = self.precond_solve(gm)
+        return self.npt.linalg.cond(pgm)
     def _get_xs(self):
         x = self.gms[0,0].x
         xs = [x.copy()[:self.ns[i]] for i in range(self.nr)]

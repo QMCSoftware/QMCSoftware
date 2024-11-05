@@ -75,4 +75,7 @@ class PDEGramMatrix(_PDEGramMatrix):
         self.l_chol = self.cholesky(self.gm)
     def condition_number(self):
         return self.npt.linalg.cond(self.gm)
+    def precond_condition_number(self):
+        pgm = self.precond_solve(self.gm)
+        return self.npt.linalg.cond(pgm)
     
