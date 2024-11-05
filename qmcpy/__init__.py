@@ -5,9 +5,8 @@ from .stopping_criterion import *
 from .kernel_methods import (
     fft_bro_1d_radix2,ifft_bro_1d_radix2,fwht_1d_radix2,
     KernelShiftInvar,KernelDigShiftInvar,KernelGaussian,
-    FastGramMatrixLattice,FastGramMatrixDigitalNetB2,
-    FastPDEGramMatrix,
-    GramMatrix)
+    FastGramMatrixLattice,FastGramMatrixDigitalNetB2,GramMatrix,
+    FastPDEGramMatrix,PDEGramMatrix)
 from .util import plot_proj
 
 name = "qmcpy"

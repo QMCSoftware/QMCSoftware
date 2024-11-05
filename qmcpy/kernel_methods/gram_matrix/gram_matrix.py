@@ -56,7 +56,7 @@ class GramMatrix(_GramMatrix):
     def _init_invertibile(self):
         self.l_chol = self.cholesky(self.gm+self.noise*self.npt.eye(self.n1*self.t1))
     def get_full_gram_matrix(self):
-        return self.gm
+        return self.gm.copy()
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
     def __matmul__(self, y):

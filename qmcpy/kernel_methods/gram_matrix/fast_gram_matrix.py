@@ -43,6 +43,7 @@ class _FastGramMatrix(_GramMatrix):
     """
     def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, ft, ift, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
         super(_FastGramMatrix,self).__init__(kernel_obj,noise,lbeta1s,lbeta2s,lc1s,lc2s)
+        assert any(isinstance(self.kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
         self.ft = ft 
         self.ift = ift
         self.n1 = n1 
