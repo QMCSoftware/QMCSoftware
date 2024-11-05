@@ -48,7 +48,7 @@ class GramMatrix(_GramMatrix):
         self.gm = self.npt.vstack([self.npt.hstack([gms[tt1,tt2] for tt2 in range(self.t2)]) for tt1 in range(self.t1)])
         self.size = (self.n1*self.t1,self.n2*self.t2)
         invertible_conds = [
-            ( x1.ctypes.data==x2.ctypes.data, "x1 and x2 must point to the same object"),
+            ( self.get_ptr(x1)==self.get_ptr(x2), "x1 and x2 must point to the same object"),
             ( self.n1==self.n2, "require square matrices"),
             ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
             ]  

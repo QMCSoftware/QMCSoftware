@@ -103,7 +103,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         return self.npt.linalg.cond(pgm)
     def _get_xs(self):
         x = self.gms[0,0].x
-        xs = [x.copy()[:self.ns[i]] for i in range(self.nr)]
+        xs = [self.gms[0,0].clone(x)[:self.ns[i]] for i in range(self.nr)]
         for i in range(self.nr):
             xs[i][:,~self.us[i]] = 0.
         return xs

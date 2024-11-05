@@ -33,11 +33,15 @@ class _GramMatrix(object):
         assert isinstance(self.lc2s,list) and all(self.lc2s[tt2].shape==(self.m2[tt2],) for tt2 in range(self.t2))
         if self.torchify:
             import torch 
-            self.cho_solve = lambda l,b: torch.cholesky_solve(b,l,upper=False)
+            self.cho_solve = lambda l,b: torch.cholesky_solve(b.reshape(len(b),-1),l,upper=False).reshape(b.shape)
             self.transpose_func = lambda x,dims: torch.permute(x,dims)
+            self.clone = lambda x: x.clone()
+            self.get_ptr = lambda x: x.data_ptr()
         else:
             self.cho_solve = lambda l,b: scipy.linalg.cho_solve((l,True),b)
             self.transpose_func = lambda x,dims: x.transpose(*dims)
+            self.clone = lambda x: x.copy()
+            self.get_ptr = lambda x: x.ctypes.data
     def cholesky(self, mat):
         try:
             l_chol = self.npt.linalg.cholesky(mat)

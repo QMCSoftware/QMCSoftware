@@ -158,15 +158,19 @@ class _FastGramMatrix(_GramMatrix):
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         _x,x = self._sample(n_min,n_max)
-        return _x,x
+        if self.npt==np:
+            return _x,x 
+        else:
+            import torch 
+            return torch.from_numpy(_x).float(),torch.from_numpy(x).float()
     def get_full_gram_matrix(self):
-        _xu1,_xu2 = self._x.copy(),self._x.copy()
+        _xu1,_xu2 = self.clone(self._x),self.clone(self._x)
         _xu1[:,~self.u1] = 0.
         _xu2[:,~self.u2] = 0.
         kfull = np.empty((self.t1,self.t2),dtype=object)
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
             kfull[tt1,tt2] = self.kernel_obj(_xu1[:self.n1,:],_xu2[:self.n2,:],self.lbeta1s[tt1],self.lbeta2s[tt2],self.lc1s_og[tt1],self.lc2s_og[tt2])
-        gm = self.npt.vstack([self.npt.hstack(kfull[tt1]) for tt1 in range(self.t1)])
+        gm = self.npt.vstack([self.npt.hstack([kfull[tt1,tt2] for tt2 in range(self.t2)]) for tt1 in range(self.t1)])
         if self.invertible and self.noise>0:
             gm = gm+self.noise*self.npt.eye(self.size[0])
         return gm
