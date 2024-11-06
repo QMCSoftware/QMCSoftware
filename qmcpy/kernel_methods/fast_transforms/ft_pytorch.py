@@ -45,33 +45,13 @@ def fwht_torch(x):
     """
     return _FWHTB2Ortho.apply(x)
 
-def _fftbr_torch(x):
-    n = x.size(-1)
-    assert n&(n-1)==0 # require n is a power of 2
-    m = int(np.log2(n))
-    y = x.clone()+0j
-    if n<=1: return y
-    it = torch.arange(n,dtype=int).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
-    t0 = torch.tensor(0)
-    t1 = torch.tensor(1)
-    twiddle = torch.exp(-2*np.pi*1j*torch.arange(n,device=y.device)/n)
+def _bitrev(x, m):
+    r = 0
     for k in range(m):
-        s = m-k-1
-        f = 1<<k 
-        i1v = torch.index_select(it,dim=s,index=t0).flatten()
-        i2v = torch.index_select(it,dim=s,index=t1).flatten()
-        y1,y2 = y[...,i1v],y[...,i2v]
-        t = (i1v%f)*(1<<s)
-        z = twiddle[t]*y2 
-        y[...,i1v],y[...,i2v] = (y1+z)/SQRT2,(y1-z)/SQRT2
-    return y
-class _FFTB2OrthoBRO(torch.autograd.Function):
-    @staticmethod
-    def forward(self, x):
-        return _fftbr_torch(x)
-    @staticmethod
-    def backward(self, dx):
-        return _fftbr_torch(dx)
+        r += (x&1)<<(m-k-1)
+        x >>=1
+    return r 
+
 def fftbr_torch(x):
     """
     >>> rng = np.random.Generator(np.random.SFC64(11))
@@ -88,36 +68,14 @@ def fftbr_torch(x):
     >>> v.detach().item()
     2.558...
     >>> dvdx.detach()
-    tensor([1.3026+0.4861j, 0.8304+0.3550j, 0.6621+0.8429j, 1.1155+1.3293j,
-            0.5114-0.2196j, 0.4179+0.8007j, 1.5217+0.9647j, 0.1611+1.4069j])
+    tensor([1.3026+0.4861j, 1.2113+1.4492j, 0.7866+1.2161j, 0.4107+0.1078j,
+            1.7096+0.6126j, 0.7865+0.6879j, 0.1926+0.5075j, 0.1227+0.8988j])
     """
-    return _FFTB2OrthoBRO.apply(x)
-
-def _ifftbr_torch(x):
-    y = x.clone().to(torch.complex64)
     n = x.size(-1)
-    if n<=1: return y
     assert n&(n-1)==0 # require n is a power of 2
     m = int(np.log2(n))
-    it = torch.arange(n,dtype=int).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
-    t0 = torch.tensor(0)
-    t1 = torch.tensor(1)
-    twiddle = torch.exp(2*np.pi*1j*torch.arange(n,device=y.device)/n)
-    for k in range(m):
-        s = m-k-1
-        i1v = torch.index_select(it,dim=k,index=t0).flatten()
-        i2v = torch.index_select(it,dim=k,index=t1).flatten()
-        y1,y2 = y[...,i1v],y[...,i2v]
-        t = (i1v%(1<<s))*(1<<k)
-        y[...,i1v],y[...,i2v] = (y1+y2)/SQRT2,twiddle[t]*(y1-y2)/SQRT2
-    return y
-class _IFFTB2OrthoBRO(torch.autograd.Function):
-    @staticmethod
-    def forward(self, x):
-        return _ifftbr_torch(x)
-    @staticmethod
-    def backward(self, dx):
-        return _ifftbr_torch(dx)
+    return torch.fft.fft(x[...,_bitrev(torch.arange(n,device=x.device),m)],norm="ortho")
+
 def ifftbr_torch(x):
     """
     >>> rng = np.random.Generator(np.random.SFC64(11))
@@ -134,7 +92,10 @@ def ifftbr_torch(x):
     >>> v.detach().item()
     2.565...
     >>> dvdx.detach()
-    tensor([ 1.1474+0.7852j,  1.2224+1.5245j,  1.0341+0.2861j,  0.5153+1.5184j,
-             0.3375+0.4416j, -0.4556+0.7417j,  0.4514+1.0096j,  0.6429+1.0530j])
+    tensor([ 1.1474+0.7852j,  1.5120+1.0060j,  0.5979+0.8570j,  0.0649+0.5390j,
+            -0.0972+0.9019j,  0.4709+1.3696j,  0.3727+0.2035j,  0.8270+1.6981j])
     """
-    return _IFFTB2OrthoBRO.apply(x)
+    n = x.size(-1)
+    assert n&(n-1)==0 # require n is a power of 2
+    m = int(np.log2(n))
+    return torch.fft.ifft(x,norm="ortho")[...,_bitrev(torch.arange(n,device=x.device),m)]

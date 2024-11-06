@@ -8,13 +8,13 @@ class _KernelProdSpecial(_KernelProd):
         delta = self.x1_ominus_x2(x1[:,None,:],x2[None,:,:]) # n1 x n2 x d
         assert delta.ndim==3 and delta.shape[2]==self.d
         inds,idxs,consts = self.inds_idxs_consts(beta1s[:,None,:],beta2s[None,:,:]) # m1 x m2 x n1 x n2 x d
-        k = self.npt.ones((m1,m2,n1,n2,self.d))
+        k = self.npt.ones((m1,m2,n1,n2,self.d),**self.ckwargs)
         self.eval_low_low(k,delta,inds,idxs,consts,m1,m2) # m1 x m2 x n1 x n2 x d
         kcomb = (inds[:,:,None,None,:]+self.lengthscales*k).prod(-1) # m1 x m2 x n1 x n2
         kcomb = (c1s[:,None,None,None]*c2s[None,:,None,None]*kcomb).sum((0,1)) # n1 x n2
         return self.scale*kcomb
     def eval_low_u_noscale(self, u, delta_u, inds, idxs, consts, m1, m2, n1, n2, d_u):
-        k_u = self.npt.ones((m1,m2,n1,n2,d_u))
+        k_u = self.npt.ones((m1,m2,n1,n2,d_u),**self.ckwargs)
         self.eval_low_low(k_u,delta_u,inds[:,:,u],idxs[:,:,u],consts[:,:,u],m1,m2)
         kcomb_u = (inds[:,:,None,None,u]+self.lengthscales[u]*k_u).prod(-1) # m1 x m1 x n1 x n2
         return kcomb_u

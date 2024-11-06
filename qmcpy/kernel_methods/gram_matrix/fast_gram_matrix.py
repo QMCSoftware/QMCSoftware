@@ -157,12 +157,14 @@ class _FastGramMatrix(_GramMatrix):
         self.l_chol = self.cholesky(lamblock)
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
-        _x,x = self._sample(n_min,n_max)
         if self.npt==np:
-            return _x,x 
+            _x,x = self._sample(n_min,n_max)
         else:
+            _x,x = self._sample(n_min,n_max)
             import torch 
-            return torch.from_numpy(_x).float(),torch.from_numpy(x).float()
+            _x = torch.from_numpy(_x).float().to(device=self.ckwargs["device"])
+            x = torch.from_numpy(x).float().to(device=self.ckwargs["device"])
+        return _x,x 
     def get_full_gram_matrix(self):
         _xu1,_xu2 = self.clone(self._x),self.clone(self._x)
         _xu1[:,~self.u1] = 0.

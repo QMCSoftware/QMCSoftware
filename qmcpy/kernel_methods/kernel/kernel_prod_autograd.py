@@ -5,7 +5,7 @@ import numpy as np
 import itertools
 
 class _KernelProdAutoGrad(_KernelProd):
-    DEFAULTALPHA = None
+    DEFAULTALPHA = np.nan
     def parsed_call(self, x1, x2, n1, n2, beta1s, beta2s, m1, m2, c1s, c2s):
         try:
             import torch 

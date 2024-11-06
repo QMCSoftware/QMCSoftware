@@ -48,13 +48,14 @@ class PDEGramMatrix(_PDEGramMatrix):
         assert isinstance(xs,list)
         self.nr = len(xs)
         self.npt = kernel_obj.npt
+        self.ckwargs = kernel_obj.ckwargs
         assert isinstance(llbetas,list) and all(isinstance(lbetas,list) for lbetas in llbetas) and len(llbetas)==self.nr
         assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==self.nr
         gms = np.empty((self.nr,self.nr),dtype=object)
         for i,k in itertools.product(range(self.nr),range(self.nr)):
             gms[i,k] = GramMatrix(xs[i],xs[k],kernel_obj,llbetas[i],llbetas[k],llcs[i],llcs[k],noise=0.)
         self.length = np.sum([gms[i,0].size[0] for i in range(self.nr)])
-        self.gm = self.npt.vstack([self.npt.hstack([gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length)
+        self.gm = self.npt.vstack([self.npt.hstack([gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length,**self.ckwargs)
         self.cholesky = gms[0,0].cholesky
         self.cho_solve = gms[0,0].cho_solve
     def _set_diag(self):

@@ -38,6 +38,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
             noise (float): nugget term
         """
         self.npt = kernel_obj.npt
+        self.ckwargs = kernel_obj.ckwargs
         assert isinstance(dd_obj,Lattice) or isinstance(dd_obj,DigitalNetB2)
         self.us = self.npt.atleast_2d(us) 
         self.nr = len(self.us) 
@@ -48,9 +49,9 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         assert isinstance(llbetas,list) and all(isinstance(lbetas,list) for lbetas in llbetas) and len(llbetas)==self.nr
         assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==self.nr
         if isinstance(dd_obj,Lattice):
-            gmii = FastGramMatrixLattice(dd_obj,kernel_obj,self.ns[0],self.ns[0],self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
+            gmii = FastGramMatrixLattice(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
         elif isinstance(dd_obj,DigitalNetB2):
-            gmii = FastGramMatrixDigitalNetB2(dd_obj,kernel_obj,self.ns[0],self.ns[0],self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
+            gmii = FastGramMatrixDigitalNetB2(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
         else:
             raise Exception("Invalid dd_obj") 
         self.gms = np.empty((self.nr,self.nr),dtype=object)
