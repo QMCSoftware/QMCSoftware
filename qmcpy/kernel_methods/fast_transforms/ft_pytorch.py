@@ -52,7 +52,7 @@ def _fftbr_torch(x):
     it = torch.arange(n,dtype=int).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
     t0 = torch.tensor(0)
     t1 = torch.tensor(1)
-    twiddle = torch.exp(-2*np.pi*1j*torch.arange(n)/n)
+    twiddle = torch.exp(-2*np.pi*1j*torch.arange(n,device=y.device)/n)
     for k in range(m):
         s = m-k-1
         f = 1<<k 
@@ -100,7 +100,7 @@ def _ifftbr_torch(x):
     it = torch.arange(n,dtype=int).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
     t0 = torch.tensor(0)
     t1 = torch.tensor(1)
-    twiddle = torch.exp(2*np.pi*1j*torch.arange(n)/n)
+    twiddle = torch.exp(2*np.pi*1j*torch.arange(n,device=y.device)/n)
     for k in range(m):
         s = m-k-1
         i1v = torch.index_select(it,dim=k,index=t0).flatten()
