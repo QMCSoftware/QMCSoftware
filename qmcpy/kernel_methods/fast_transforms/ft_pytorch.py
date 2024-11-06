@@ -16,10 +16,7 @@ def _fwht_torch(x):
         i1v = torch.index_select(it,dim=k,index=t0).flatten()
         i2v = torch.index_select(it,dim=k,index=t1).flatten()
         y1,y2 = y[...,i1v],y[...,i2v]
-        tmp1 =  (y1+y2)/SQRT2
-        tmp2 = (y1-y2)/SQRT2
-        y[...,i1v],y[...,i2v] = tmp1,tmp2
-        #y[...,i1v],y[...,i2v] = (y[...,i1v]+y[...,i2v])/SQRT2,(y[...,i1v]-y[...,i2v])/SQRT2
+        y[...,i1v],y[...,i2v] = (y1+y2)/SQRT2,(y1-y2)/SQRT2
     return y
 class _FWHTB2Ortho(torch.autograd.Function):
     @staticmethod
@@ -47,26 +44,24 @@ def fwht_torch(x):
     return _FWHTB2Ortho.apply(x)
 
 def _fftbr_torch(x):
-    y = x.clone().to(torch.complex64)
+    y = x.clone()+0j
     n = x.size(-1)
     if n<=1: return y
     assert n&(n-1)==0 # require n is a power of 2
-    n_half = n//2
     m = int(np.log2(n))
+    it = torch.arange(n,dtype=int).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
+    t0 = torch.tensor(0)
+    t1 = torch.tensor(1)
     twiddle = torch.exp(-2*np.pi*1j*torch.arange(n)/n)
     for k in range(m):
         s = m-k-1
         f = 1<<k 
-        for i in range(n_half):
-            if((i>>k)&1):
-                i2 = i+n_half
-                i1 = i2^f
-            else:
-                i1 = i
-                i2 = i1^f
-            t = (i1%f)*(1<<s)
-            z = twiddle[t]*y[...,i2]
-            y[...,i1],y[...,i2] = (y[...,i1]+z)/SQRT2,(y[...,i1]-z)/SQRT2
+        i1v = torch.index_select(it,dim=s,index=t0).flatten()
+        i2v = torch.index_select(it,dim=s,index=t1).flatten()
+        y1,y2 = y[...,i1v],y[...,i2v]
+        t = (i1v%f)*(1<<s)
+        z = twiddle[t]*y2 
+        y[...,i1v],y[...,i2v] = (y1+z)/SQRT2,(y1-z)/SQRT2
     return y
 class _FFTB2OrthoBRO(torch.autograd.Function):
     @staticmethod
@@ -101,21 +96,18 @@ def _ifftbr_torch(x):
     n = x.size(-1)
     if n<=1: return y
     assert n&(n-1)==0 # require n is a power of 2
-    n_half = n//2
     m = int(np.log2(n))
+    it = torch.arange(n,dtype=int).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
+    t0 = torch.tensor(0)
+    t1 = torch.tensor(1)
     twiddle = torch.exp(2*np.pi*1j*torch.arange(n)/n)
     for k in range(m):
         s = m-k-1
-        f = 1<<s 
-        for i in range(n_half):
-            if((i>>s)&1):
-                i2 = i+n_half
-                i1 = i2^f
-            else:
-                i1 = i
-                i2 = i1^f
-            t = (i1%(1<<s))*(1<<k)
-            y[...,i1],y[...,i2] = (y[...,i1]+y[...,i2])/SQRT2,twiddle[t]*(y[...,i1]-y[...,i2])/SQRT2
+        i1v = torch.index_select(it,dim=k,index=t0).flatten()
+        i2v = torch.index_select(it,dim=k,index=t1).flatten()
+        y1,y2 = y[...,i1v],y[...,i2v]
+        t = (i1v%(1<<s))*(1<<k)
+        y[...,i1v],y[...,i2v] = (y1+y2)/SQRT2,twiddle[t]*(y1-y2)/SQRT2
     return y
 class _IFFTB2OrthoBRO(torch.autograd.Function):
     @staticmethod
