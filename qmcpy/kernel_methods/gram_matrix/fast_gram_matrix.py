@@ -45,9 +45,8 @@ class _FastGramMatrix(_GramMatrix):
     ...             gm_wide = gm.copy(max(n1//4,1),max(n2//2,1))
     ...             gm_wide._check()
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, dd_type, dd_randomize_ops, dd_order, kernel_type_ops):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, _pregenerated_x__x):
         super(_FastGramMatrix,self).__init__(kernel_obj,noise,lbeta1s,lbeta2s,lc1s,lc2s)
-        assert any(isinstance(self.kernel_obj,kernel_type_op) for kernel_type_op in kernel_type_ops)
         self.n1 = n1 
         self.n2 = n2 
         assert (self.n1&(self.n1-1))==0 and (self.n2&(self.n2-1))==0 and self.n1>0 and self.n2>0 # require n1 and n2 are powers of 2
@@ -64,16 +63,12 @@ class _FastGramMatrix(_GramMatrix):
         self.d_u1au2 = self.u1au2.sum()
         self.d_u1nu2 = self.u1nu2.sum()
         self.noise = noise
-        if isinstance(dd_obj,DiscreteDistribution):
-            self.dd_obj = dd_obj
-            assert isinstance(self.dd_obj,dd_type) and self.dd_obj.d==self.d 
-            assert self.dd_obj.replications==1
-            assert self.dd_obj.randomize in dd_randomize_ops and self.dd_obj.order==dd_order
+        self.dd_obj = dd_obj
+        if _pregenerated_x__x is None:
             self.n_max = max(self.n1,self.n2)
             self._x,self.x = self.sample(0,self.n_max)
         else:
-            assert isinstance(dd_obj,tuple) and len(dd_obj)==2
-            self._x,self.x = dd_obj
+            self._x,self.x = _pregenerated_x__x
             self.n_max = len(self._x)
             assert self.n_max>=self.n1 and self.n_max>=self.n2
             assert self._x.shape==(self.n_max,self.kernel_obj.d) and self.x.shape==(self.n_max,self.kernel_obj.d)
@@ -251,13 +246,14 @@ class _FastGramMatrix(_GramMatrix):
         if n1 is None: n1 = self.n1 
         if n2 is None: n2 = self.n2
         return type(self)(
-            dd_obj = (self._x,self.x),
+            dd_obj = self.dd_obj,
             kernel_obj = self.kernel_obj,
             n1 = self.n1 if n1 is None else n1,
             n2 = self.n2 if n2 is None else n2,
             u1 = self.u1,
             u2 = self.u2,
-            noise = self.noise)
+            noise = self.noise,
+            _pregenerated_x__x = (self._x,self.x))
     def _mult_check(self, y, gmatfull):
         assert np.allclose(self@y[:,0],gmatfull@y[:,0],atol=1e-12)
         assert np.allclose(self@y,gmatfull@y,atol=1e-12)
@@ -276,7 +272,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
     """
     Fast Gram matrix operations using lattice points and shift invariant kernels 
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, _pregenerated_x__x=None):
         """
         Args:
             dd_obj (Lattice): requires randomize='SHIFT' and order="NATURAL"
@@ -291,17 +287,31 @@ class FastGramMatrixLattice(_FastGramMatrix):
             c2s (list of either np.ndarray or torch.Tensor): list of length m2[l] vector of derivative coefficients
             noise (float): nugget term 
         """
-        if kernel_obj.torchify:
-            self.ft = fftbr_torch
-            self.ift = ifftbr_torch
-        else:
+        assert isinstance(dd_obj,Lattice)
+        assert dd_obj.randomize=="SHIFT"
+        assert dd_obj.order=="NATURAL"
+        assert dd_obj.replications==1
+        assert isinstance(kernel_obj,KernelShiftInvar)
+        if not kernel_obj.torchify: # numpy based 
+            # if dd_obj.order=="LINEAR":
+            #     # implementations from numpy
+            #     self.ft = lambda x: np.fft.fft(x,norm="ortho")
+            #     self.ift = lambda x: np.fft.ifft(x,norm="ortho")
+            # else: # dd_obj.order=="NATURAL"
+            #     # implementations from qmctoolscl (theoretically faster, practically slower)
             self.ft = fftbr 
             self.ift = ifftbr
-        super(FastGramMatrixLattice,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,
-            dd_type = Lattice, 
-            dd_randomize_ops = ["SHIFT"],
-            dd_order = "NATURAL",
-            kernel_type_ops = [KernelShiftInvar])
+        else: # torch 
+            import torch
+            # if dd_obj.order=="LINEAR":
+            #     # implementations from torch
+            #     self.ft = lambda x: torch.fft.fft(x,norm="ortho") 
+            #     self.ift = lambda x: torch.fft.ifft(x,norm="ortho")
+            # else: # dd_obj.order=="NATURAL"
+            #     # custom torch implementations (theoretically faster, practically slower)
+            self.ft = fftbr_torch
+            self.ift = ifftbr_torch
+        super(FastGramMatrixLattice,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
         x = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max)
         return x,x
@@ -310,7 +320,7 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     """
     Fast Gram matrix operations using base 2 digital net points and digitally shift invariant kernels 
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, _pregenerated_x__x=None):
         """
         Args:
             dd_obj (DigitalNetB2): requires randomize='LMS_DS' and graycode=False
@@ -325,19 +335,22 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
             c2s (list of either np.ndarray or torch.Tensor): list of length m2[l] vector of derivative coefficients
             noise (float): nugget term 
         """
-        if isinstance(dd_obj,DigitalNetB2):
-            kernel_obj.set_t(dd_obj.t_lms)
-        if kernel_obj.torchify:
-            self.ft = fwht_torch
-            self.ift = fwht_torch
-        else:
+        assert isinstance(dd_obj,DigitalNetB2)
+        assert dd_obj.randomize in ["DS","LMS_DS"]
+        assert dd_obj.order=="NATURAL"
+        assert dd_obj.replications==1
+        assert isinstance(kernel_obj,KernelDigShiftInvar)
+        kernel_obj.set_t(dd_obj.t_lms)
+        # FWHT is theoretically faster than FFT but practically slower
+        if not kernel_obj.torchify:
+            # qmctools implementation
             self.ft = fwht 
             self.ift = fwht
-        super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,
-            dd_type = DigitalNetB2, 
-            dd_randomize_ops = ["DS","LMS_DS"],
-            dd_order = "NATURAL",
-            kernel_type_ops = [KernelDigShiftInvar])
+        else:
+            # custom torch implementations 
+            self.ft = fwht_torch
+            self.ift = fwht_torch
+        super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
         xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True)
         xf = xb*2**(-self.kernel_obj.t)

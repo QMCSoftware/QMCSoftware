@@ -28,7 +28,7 @@ class Polynomial():
             np_or_torch = np 
         else:
             import torch 
-            np_or_torch = torch 
+            np_or_torch = torch
         y = self.coeffs[-1]
         xp = np_or_torch.ones_like(x)
         for i in range(self.order-2,-1,-1):
