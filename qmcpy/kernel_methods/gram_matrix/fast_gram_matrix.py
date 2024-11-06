@@ -51,8 +51,8 @@ class _FastGramMatrix(_GramMatrix):
         self.n1 = n1 
         self.n2 = n2 
         assert (self.n1&(self.n1-1))==0 and (self.n2&(self.n2-1))==0 and self.n1>0 and self.n2>0 # require n1 and n2 are powers of 2
-        self.u1 = self.npt.ones(self.d,dtype=bool) if u1 is True else u1 
-        self.u2 = self.npt.ones(self.d,dtype=bool) if u2 is True else u2
+        self.u1 = self.npt.ones(self.d,dtype=bool,**self.ckwargs) if u1 is True else u1 
+        self.u2 = self.npt.ones(self.d,dtype=bool,**self.ckwargs) if u2 is True else u2
         assert self.u1.shape==(self.d,) and self.u2.shape==(self.d,) 
         assert (self.u1.sum()>0 or self.n1==1) and (self.u2.sum()>0 or self.n2==1)
         self.u1mu2 = self.u1*(~self.u2) 
@@ -84,17 +84,17 @@ class _FastGramMatrix(_GramMatrix):
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
             inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2] = self.kernel_obj.inds_idxs_consts(self.lbeta1s[tt1][:,None,:],self.lbeta2s[tt2][None,:,:])
         if self.d_u1nu2>0:
-            delta_u2nu1 = self.kernel_obj.x1_ominus_x2(self.npt.zeros((1,1,self.d_u1nu2),dtype=self._x.dtype),self.npt.zeros((1,1,self.d_u1nu2),dtype=self._x.dtype)) # (1,1,self.d_u1nu2)
+            delta_u2nu1 = self.kernel_obj.x1_ominus_x2(self.npt.zeros((1,1,self.d_u1nu2),dtype=self._x.dtype,**self.ckwargs),self.npt.zeros((1,1,self.d_u1nu2),dtype=self._x.dtype,**self.ckwargs)) # (1,1,self.d_u1nu2)
             self.scale_null = np.empty((self.t1,self.t2),dtype=object)
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 self.scale_null[tt1,tt2] = self.kernel_obj.eval_low_u_noscale(self.u1nu2,delta_u2nu1,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],1,1,self.d_u1nu2)[:,:,0,0] # (self.m1,self.m2)
         if self.d_u1mu2>0:
-            delta_u1mu2 = self.kernel_obj.x1_ominus_x2(self._x[:self.n1,None,self.u1mu2],self.npt.zeros((1,1,self.d_u1mu2),dtype=self._x.dtype))
+            delta_u1mu2 = self.kernel_obj.x1_ominus_x2(self._x[:self.n1,None,self.u1mu2],self.npt.zeros((1,1,self.d_u1mu2),dtype=self._x.dtype,**self.ckwargs))
             self.k1l = np.empty((self.t1,self.t2),dtype=object)
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 self.k1l[tt1,tt2] = self.kernel_obj.eval_low_u_noscale(self.u1mu2,delta_u1mu2,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],self.n1,1,self.d_u1mu2)[:,:,:,0] # (self.m1,self.m2,self.n1)
         if self.d_u2mu1>0:
-            delta_u2mu1 = self.kernel_obj.x1_ominus_x2(self.npt.zeros((1,1,self.d_u2mu1),dtype=self._x.dtype),self._x[None,:self.n2,self.u2mu1])
+            delta_u2mu1 = self.kernel_obj.x1_ominus_x2(self.npt.zeros((1,1,self.d_u2mu1),dtype=self._x.dtype,**self.ckwargs),self._x[None,:self.n2,self.u2mu1])
             self.k1r = np.empty((self.t1,self.t2),dtype=object)
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 self.k1r[tt1,tt2] = self.kernel_obj.eval_low_u_noscale(self.u2mu1,delta_u2mu1,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],1,self.n2,self.d_u2mu1)[:,:,0,:] # (self.m1,self.m2,self.n2)
@@ -131,8 +131,8 @@ class _FastGramMatrix(_GramMatrix):
             if self.d_u1mu2==0 and self.d_u2mu1==0:
                 for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                     k1[tt1,tt2] = (self.lc1s[tt1][:,None,None,None]*self.lc2s[tt2][None,:,None,None]*k1[tt1,tt2]).sum((0,1))[None,None,:,:]
-                self.lc1s = [self.npt.ones(1) for tt1 in range(self.t1)]
-                self.lc2s = [self.npt.ones(1) for tt2 in range(self.t2)]
+                self.lc1s = [self.npt.ones(1,dtype=float,**self.ckwargs) for tt1 in range(self.t1)]
+                self.lc2s = [self.npt.ones(1,dtype=float,**self.ckwargs) for tt2 in range(self.t2)]
                 self.m1 = np.ones(self.t1,dtype=int)
                 self.m2 = np.ones(self.t2,dtype=int)
             self.lam = np.empty((self.t1,self.t2),dtype=object)
@@ -151,7 +151,7 @@ class _FastGramMatrix(_GramMatrix):
             for tt1 in range(self.t1):
                 self.lam[tt1,tt1][0,0,0,:] += self.noise
     def _init_invertibile(self):
-        lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1))
+        lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1),dtype=float,**self.ckwargs)
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
             lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
         self.l_chol = self.cholesky(lamblock)
@@ -162,8 +162,8 @@ class _FastGramMatrix(_GramMatrix):
         else:
             _x,x = self._sample(n_min,n_max)
             import torch 
-            _x = torch.from_numpy(_x).float().to(device=self.ckwargs["device"])
-            x = torch.from_numpy(x).float().to(device=self.ckwargs["device"])
+            _x = torch.from_numpy(_x).to(device=self.ckwargs["device"])
+            x = torch.from_numpy(x).to(device=self.ckwargs["device"])
         return _x,x 
     def get_full_gram_matrix(self):
         _xu1,_xu2 = self.clone(self._x),self.clone(self._x)
@@ -174,7 +174,7 @@ class _FastGramMatrix(_GramMatrix):
             kfull[tt1,tt2] = self.kernel_obj(_xu1[:self.n1,:],_xu2[:self.n2,:],self.lbeta1s[tt1],self.lbeta2s[tt2],self.lc1s_og[tt1],self.lc2s_og[tt2])
         gm = self.npt.vstack([self.npt.hstack([kfull[tt1,tt2] for tt2 in range(self.t2)]) for tt1 in range(self.t1)])
         if self.invertible and self.noise>0:
-            gm = gm+self.noise*self.npt.eye(self.size[0])
+            gm = gm+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
         return gm
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)

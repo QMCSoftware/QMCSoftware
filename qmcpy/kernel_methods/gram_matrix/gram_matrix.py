@@ -54,7 +54,7 @@ class GramMatrix(_GramMatrix):
             ]  
         super(GramMatrix,self)._set_invertible_conds(invertible_conds)
         if self.invertible and self.noise>0:
-            self.gm = self.gm+self.noise*self.npt.eye(self.size[0],**self.ckwargs)
+            self.gm = self.gm+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
     def _init_invertibile(self):
         self.l_chol = self.cholesky(self.gm)
     def get_full_gram_matrix(self):

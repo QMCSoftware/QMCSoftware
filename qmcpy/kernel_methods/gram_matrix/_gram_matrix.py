@@ -22,9 +22,9 @@ class _GramMatrix(object):
         self.m2 = np.array([len(beta2s) for beta2s in self.lbeta2s],dtype=int)
         assert isinstance(self.lbeta1s,list) and all(self.lbeta1s[tt1].shape==(self.m1[tt1],self.d) for tt1 in range(self.t1))
         assert isinstance(self.lbeta2s,list) and all(self.lbeta2s[tt2].shape==(self.m2[tt2],self.d) for tt2 in range(self.t2))
-        if isinstance(lc1s,float): lc1s = [lc1s*self.npt.ones(self.m1[tt1],**self.ckwargs) for tt1 in range(self.t1)]
+        if isinstance(lc1s,float): lc1s = [lc1s*self.npt.ones(self.m1[tt1],dtype=float,**self.ckwargs) for tt1 in range(self.t1)]
         elif not isinstance(lc1s,list): lc1s = [lc1s],
-        if isinstance(lc2s,float): lc2s = [lc2s*self.npt.ones(self.m2[tt2],**self.ckwargs) for tt2 in range(self.t2)]
+        if isinstance(lc2s,float): lc2s = [lc2s*self.npt.ones(self.m2[tt2],dtype=float,**self.ckwargs) for tt2 in range(self.t2)]
         elif not isinstance(lc2s,list): lc2s = [lc2s]
         self.lc1s = [self.npt.atleast_1d(c1s) for c1s in lc1s] 
         self.lc2s = [self.npt.atleast_1d(c2s) for c2s in lc2s]

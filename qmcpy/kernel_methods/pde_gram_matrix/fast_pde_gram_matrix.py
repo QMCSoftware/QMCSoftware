@@ -62,7 +62,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
             self.gms[0,i] = gmiitype(gmii__x_x,gmii.kernel_obj,gmii.n1,self.ns[i].item(),gmii.u1,self.us[i,:],gmii.lbeta1s,llbetas[i],gmii.lc1s_og,llcs[i],gmii.noise)
             self.gms[i,0] = gmiitype(gmii__x_x,gmii.kernel_obj,self.ns[i].item(),gmii.n1,self.us[i,:],gmii.u1,llbetas[i],gmii.lbeta1s,llcs[i],gmii.lc1s_og,gmii.noise)
             for k in range(1,self.nr):
-                self.gms[i,k] = gmiitype(gmii__x_x,gmii.kernel_obj,self.ns[i],self.ns[k],self.us[i,:],self.us[k,:],llbetas[i],llbetas[k],llcs[i],llcs[k],gmii.noise)
+                self.gms[i,k] = gmiitype(gmii__x_x,gmii.kernel_obj,self.ns[i].item(),self.ns[k].item(),self.us[i,:],self.us[k,:],llbetas[i],llbetas[k],llcs[i],llcs[k],gmii.noise)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
         self.bs_cumsum = np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]

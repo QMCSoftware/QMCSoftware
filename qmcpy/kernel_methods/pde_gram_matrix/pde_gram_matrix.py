@@ -55,7 +55,7 @@ class PDEGramMatrix(_PDEGramMatrix):
         for i,k in itertools.product(range(self.nr),range(self.nr)):
             gms[i,k] = GramMatrix(xs[i],xs[k],kernel_obj,llbetas[i],llbetas[k],llcs[i],llcs[k],noise=0.)
         self.length = np.sum([gms[i,0].size[0] for i in range(self.nr)])
-        self.gm = self.npt.vstack([self.npt.hstack([gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length,**self.ckwargs)
+        self.gm = self.npt.vstack([self.npt.hstack([gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
         self.cholesky = gms[0,0].cholesky
         self.cho_solve = gms[0,0].cho_solve
     def _set_diag(self):

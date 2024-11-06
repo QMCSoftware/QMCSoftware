@@ -29,7 +29,7 @@ class _PDEGramMatrix(object):
         assert 0<maxiter<=n
         assert b.shape==(n,)
         bnorm = self.npt.linalg.norm(b)
-        x = self.npt.zeros(n,**self.ckwargs) if x0 is None else x0 
+        x = self.npt.zeros(n,dtype=float,**self.ckwargs) if x0 is None else x0 
         assert x.shape==(n,)
         assert rtol>=0 and atol>=0
         residtol = max(rtol*self.npt.linalg.norm(b),atol)
@@ -40,15 +40,15 @@ class _PDEGramMatrix(object):
             precond_solve = self.precond_solve
         elif isinstance(precond,str):
             precond_solve = getattr(self,precond)
-        backward_norms = self.npt.zeros(maxiter+1,**self.ckwargs)
+        backward_norms = self.npt.zeros(maxiter+1,dtype=float,**self.ckwargs)
         if ref_sol:
             tr0 = time.perf_counter()
             xref = self._solve(b)
             tr = time.perf_counter()-tr0
             xrefnorm = self.npt.linalg.norm(xref)
-            forward_norms = self.npt.zeros(maxiter+1,**self.ckwargs)
+            forward_norms = self.npt.zeros(maxiter+1,dtype=float,**self.ckwargs)
             forward_norms[0] = self.npt.linalg.norm(xref) if x0 is None else self.npt.linalg.norm(xref-x)
-        times = self.npt.zeros(maxiter+1,**self.ckwargs)
+        times = self.npt.zeros(maxiter+1,dtype=float,**self.ckwargs)
         t0 = time.perf_counter()
         r = b if x0 is None else b-self@x
         z = precond_solve(r)

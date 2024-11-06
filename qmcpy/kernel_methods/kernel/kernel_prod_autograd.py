@@ -15,8 +15,8 @@ class _KernelProdAutoGrad(_KernelProd):
         xmat2 = [self.npt.tile(x2[None,:,j],(n1,1)) for j in range(self.d)]
         for j in range(self.d):
             if self.npt==np:
-                xmat1[j] = torch.from_numpy(xmat1[j]).float() 
-                xmat2[j] = torch.from_numpy(xmat2[j]).float() 
+                xmat1[j] = torch.from_numpy(xmat1[j])
+                xmat2[j] = torch.from_numpy(xmat2[j])
             xmat1[j].requires_grad_()
             xmat2[j].requires_grad_()
         y = self.scale*torch.ones((n1,n2),requires_grad=True)
