@@ -47,7 +47,7 @@ class KernelShiftInvar(_KernelProdSpecial):
             [-0.9942],
             [-2.4140],
             [ 0.9942],
-            [ 0.4142]])
+            [ 0.4142]], dtype=torch.float64)
     """
     DEFAULTALPHA = 5
     def _my_init(self, **kwargs):
@@ -99,7 +99,7 @@ class KernelDigShiftInvar(_KernelProdSpecial):
             [ 1.1687],
             [ 0.2796],
             [ 0.4520],
-            [ 0.4332]])
+            [ 0.4332]], dtype=torch.float64)
     """
     DEFAULTALPHA = 3
     def _my_init(self, **kwargs):
