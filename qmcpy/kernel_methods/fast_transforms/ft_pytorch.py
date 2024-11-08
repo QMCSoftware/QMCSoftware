@@ -45,13 +45,6 @@ def fwht_torch(x):
     """
     return _FWHTB2Ortho.apply(x)
 
-def _bitrev(x, m):
-    r = 0
-    for k in range(m):
-        r += (x&1)<<(m-k-1)
-        x >>=1
-    return r 
-
 def fftbr_torch(x):
     """
     >>> rng = np.random.Generator(np.random.SFC64(11))
@@ -74,7 +67,14 @@ def fftbr_torch(x):
     n = x.size(-1)
     assert n&(n-1)==0 # require n is a power of 2
     m = int(np.log2(n))
-    return torch.fft.fft(x[...,_bitrev(torch.arange(n,device=x.device),m)],norm="ortho")
+    shape = list(x.shape)
+    ndim = x.ndim
+    twos = [2]*m
+    xs = x.reshape(shape[:-1]+twos)
+    pdims = [i for i in range(ndim-1)]+[i+ndim-1 for i in range(m-1,-1,-1)]
+    xrf = torch.permute(xs,pdims)
+    xr = xrf.contiguous().view(shape)
+    return torch.fft.fft(xr,norm="ortho")
 
 def ifftbr_torch(x):
     """
@@ -98,4 +98,12 @@ def ifftbr_torch(x):
     n = x.size(-1)
     assert n&(n-1)==0 # require n is a power of 2
     m = int(np.log2(n))
-    return torch.fft.ifft(x,norm="ortho")[...,_bitrev(torch.arange(n,device=x.device),m)]
+    shape = list(x.shape)
+    ndim = x.ndim
+    twos = [2]*m
+    x = torch.fft.ifft(x,norm="ortho")
+    xs = x.reshape(shape[:-1]+twos)
+    pdims = [i for i in range(ndim-1)]+[i+ndim-1 for i in range(m-1,-1,-1)]
+    xrf = torch.permute(xs,pdims)
+    xr = xrf.contiguous().view(shape)
+    return xr

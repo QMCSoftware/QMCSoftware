@@ -10,6 +10,7 @@ class _KernelProd(object):
             torchify (bool): wheather or not to use PyTorch backend
             alpha (np.ndarray or torch.Tensor): vector of smoothness parameters of length d 
         """
+        self.d = dimension
         self.torchify = torchify 
         if self.torchify:
             import torch 
@@ -21,7 +22,6 @@ class _KernelProd(object):
             self.ckwargs = {}
         assert isinstance(lengthscales,float) or lengthscales.shape==(self.d,)
         assert isinstance(scale,float)
-        self.d = dimension
         if isinstance(lengthscales,float):
             lengthscales = lengthscales*self.npt.ones(self.d,dtype=float,**self.ckwargs)
         self.lengthscales = lengthscales
