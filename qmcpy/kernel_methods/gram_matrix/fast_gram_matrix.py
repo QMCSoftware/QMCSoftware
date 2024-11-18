@@ -1,6 +1,7 @@
 from ._gram_matrix import _GramMatrix
 from ...discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
 from ..kernel import KernelShiftInvar,KernelDigShiftInvar
+from ..util.dig_shift_invar_ops import float64_to_binary
 from ..fast_transforms import fftbr,ifftbr,fwht
 try:
     from ..fast_transforms import fftbr_torch,ifftbr_torch,fwht_torch
@@ -145,6 +146,11 @@ class _FastGramMatrix(_GramMatrix):
         if self.invertible and self.noise>0:
             for tt1 in range(self.t1):
                 self.lam[tt1,tt1][0,0,0,:] += self.noise
+    def _set__x1__x2(self):
+        self._x1,self._x2 = self.clone(self._x),self.clone(self._x)
+        self._x1[:,~self.u1] = 0.
+        self._x2[:,~self.u2] = 0.
+        self._x1,self._x2 = self._x1[:self.n1],self._x2[:self.n2]
     def _init_invertibile(self):
         lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1),dtype=float,**self.ckwargs)
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
@@ -161,15 +167,16 @@ class _FastGramMatrix(_GramMatrix):
             x = torch.from_numpy(x).to(device=self.ckwargs["device"])
         return _x,x 
     def get_full_gram_matrix(self):
-        _xu1,_xu2 = self.clone(self._x),self.clone(self._x)
-        _xu1[:,~self.u1] = 0.
-        _xu2[:,~self.u2] = 0.
-        kfull = np.empty((self.t1,self.t2),dtype=object)
-        for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-            kfull[tt1,tt2] = self.kernel_obj(_xu1[:self.n1,:],_xu2[:self.n2,:],self.lbeta1s[tt1],self.lbeta2s[tt2],self.lc1s_og[tt1],self.lc2s_og[tt2])
-        gm = self.npt.vstack([self.npt.hstack([kfull[tt1,tt2] for tt2 in range(self.t2)]) for tt1 in range(self.t1)])
+        if not hasattr(self,"_x1"): self._set__x1__x2()
+        gm = self._construct_full_gram_matrix(self._x1,self._x2,self.t1,self.t2,self.lbeta1s,self.lbeta2s,self.lc1s,self.lc2s)
         if self.invertible and self.noise>0:
             gm = gm+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
+        return gm
+    def get_new_left_full_gram_matrix(self, new_x, new_lbetas, new_lcs):
+        new__x = self._convert_x_to__x(new_x)
+        if not hasattr(self,"_x1"): self._set__x1__x2()
+        new_lbetas,new_lcs,new_t,new_m = self._parse_lbetas_lcs(new_lbetas,new_lcs)
+        gm = self._construct_full_gram_matrix(new__x,self._x1,new_t,self.t1,new_lbetas,self.lbeta1s,new_lcs,self.lc1s_og)
         return gm
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
@@ -315,6 +322,10 @@ class FastGramMatrixLattice(_FastGramMatrix):
     def _sample(self, n_min, n_max):
         x = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max)
         return x,x
+    def _convert_x_to__x(self, x):
+        return x
+    def _convert__x_to_x(self, _x):
+        return _x
 
 class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     """
@@ -353,5 +364,9 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
         super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
         xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True)
-        xf = xb*2**(-self.kernel_obj.t)
+        xf = self._convert__x_to_x(xb)
         return xb,xf
+    def _convert_x_to__x(self, x):
+        return float64_to_binary(x,self.kernel_obj.t)
+    def _convert__x_to_x(self, _x):
+        return _x*2**(-self.kernel_obj.t)

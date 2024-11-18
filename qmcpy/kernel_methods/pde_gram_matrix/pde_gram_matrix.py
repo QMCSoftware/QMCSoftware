@@ -46,18 +46,16 @@ class PDEGramMatrix(_PDEGramMatrix):
             noise (float): nugget term
         """
         assert isinstance(xs,list)
-        self.nr = len(xs)
-        self.npt = kernel_obj.npt
-        self.ckwargs = kernel_obj.ckwargs
-        assert isinstance(llbetas,list) and all(isinstance(lbetas,list) for lbetas in llbetas) and len(llbetas)==self.nr
-        assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==self.nr
-        gms = np.empty((self.nr,self.nr),dtype=object)
-        for i,k in itertools.product(range(self.nr),range(self.nr)):
-            gms[i,k] = GramMatrix(xs[i],xs[k],kernel_obj,llbetas[i],llbetas[k],llcs[i],llcs[k],noise=0.)
-        self.length = np.sum([gms[i,0].size[0] for i in range(self.nr)])
-        self.gm = self.npt.vstack([self.npt.hstack([gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
-        self.cholesky = gms[0,0].cholesky
-        self.cho_solve = gms[0,0].cho_solve
+        self.xs = xs 
+        self.nr = len(self.xs)
+        super(PDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
+        self.gms = np.empty((self.nr,self.nr),dtype=object)
+        for i1,i2 in itertools.product(range(self.nr),range(self.nr)):
+            self.gms[i1,i2] = GramMatrix(self.xs[i1],self.xs[i2],self.kernel_obj,self.llbetas[i1],self.llbetas[i2],self.llcs[i1],self.llcs[i2],noise=0.)
+        self.length = np.sum([self.gms[i,0].size[0] for i in range(self.nr)])
+        self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
+        self.cholesky = self.gms[0,0].cholesky
+        self.cho_solve = self.gms[0,0].cho_solve
     def _set_diag(self):
         self.gm_diag = self.gm.diagonal()[:,None]
     def precond_solve(self, y):
@@ -79,4 +77,6 @@ class PDEGramMatrix(_PDEGramMatrix):
     def precond_condition_number(self):
         pgm = self.precond_solve(self.gm)
         return self.npt.linalg.cond(pgm)
+    def _get_xs(self):
+        return self.xs.copy()
     

@@ -78,4 +78,17 @@ def weighted_walsh_funcs(alpha, xb, t):
     betapidxs = -np_or_torch.floor(np_or_torch.log2(xfpidxs))
     y[pidxs] = WEIGHTEDWALSHFUNCSPOS[alpha](betapidxs,xfpidxs,xb[pidxs],t)
     return y
-    
+
+def float64_to_binary(x, t):
+    """
+    >>> x = np.arange(8)/8
+    >>> x
+    array([0.   , 0.125, 0.25 , 0.375, 0.5  , 0.625, 0.75 , 0.875])
+    >>> float64_to_binary(x,t=3)
+    array([0, 1, 2, 3, 4, 5, 6, 7], dtype=uint64)
+    >>> float64_to_binary(x,t=2)
+    array([0, 0, 1, 1, 2, 2, 3, 3], dtype=uint64)
+    >>> float64_to_binary(x,t=4)
+    array([ 0,  2,  4,  6,  8, 10, 12, 14], dtype=uint64)
+    """
+    return np.floor(x*(2**t)).astype(np.uint64)

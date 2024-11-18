@@ -1,7 +1,23 @@
 import numpy as np 
 import time 
 
-class _PDEGramMatrix(object):                 
+class _PDEGramMatrix(object):
+    def __init__(self, kernel_obj, llbetas, llcs):
+        self.kernel_obj = kernel_obj
+        self.npt = self.kernel_obj.npt
+        self.ckwargs = self.kernel_obj.ckwargs
+        self.llbetas,self.llcs,_inferred_nr = self._parse_llbetas_llcs(llbetas,llcs)
+        assert _inferred_nr==self.nr
+    def _parse_llbetas_llcs(self, llbetas, llcs):
+        assert isinstance(llbetas,list) and all(isinstance(lbetas,list) for lbetas in llbetas)
+        nr = len(llbetas)
+        assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==nr
+        return llbetas,llcs,nr
+    def get_new_left_full_gram_matrix(self, new_x, new_lbetas, new_lcs):
+        gms = np.empty(self.nr,dtype=object)
+        for i in range(self.nr):
+            gms[i] = self.gms[i,0].get_new_left_full_gram_matrix(new_x,new_lbetas,new_lcs)
+        return self.npt.hstack(gms) 
     def _mult_check(self):
         rng = np.random.Generator(np.random.SFC64(7))
         y = rng.uniform(size=(self.length,2))
@@ -10,7 +26,7 @@ class _PDEGramMatrix(object):
         assert np.allclose(self@y,gmatfull@y,atol=1e-12)
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
-    def pcg(self, b, x0=None, rtol=1e-5, atol=0., maxiter=None, precond=True, ref_sol=False):
+    def pcg(self, b, x0=None, rtol=1e-5, atol=0., maxiter=None, precond=False, ref_sol=False):
         """
         Preconditioned Conjugate Gradient (PCG) method, see https://en.wikipedia.org/wiki/Conjugate_gradient_method#The_preconditioned_conjugate_gradient_method
         
@@ -80,3 +96,5 @@ class _PDEGramMatrix(object):
         if not hasattr(self,"l_chol"): 
             self._init_invertibile()
         return self.cho_solve(self.l_chol,y)
+    def get_kernel_vec(self, x):
+        pass

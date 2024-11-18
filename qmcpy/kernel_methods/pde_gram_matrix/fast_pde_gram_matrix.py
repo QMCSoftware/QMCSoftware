@@ -37,17 +37,14 @@ class FastPDEGramMatrix(_PDEGramMatrix):
             llcs (list of lists): list of length equal to the number of regions where each sub-list are the derivative coefficients at that region 
             noise (float): nugget term
         """
-        self.npt = kernel_obj.npt
-        self.ckwargs = kernel_obj.ckwargs
         assert isinstance(dd_obj,Lattice) or isinstance(dd_obj,DigitalNetB2)
-        self.us = self.npt.atleast_2d(us) 
+        self.us = us 
         self.nr = len(self.us) 
-        assert self.us.shape==(self.nr,kernel_obj.d) and (self.us.sum(1)>0).all() and (self.us[0]==True).all()
+        assert self.us.shape==(self.nr,kernel_obj.d) and (self.us[0]==True).all() # and (self.us.sum(1)>0).all()
         self.ns = ns 
         if isinstance(self.ns,int): self.ns = self.ns*self.npt.ones(self.nr,dtype=int)
         assert self.ns.shape==(self.nr,) and (self.ns[1:]<=self.ns[0]).all()
-        assert isinstance(llbetas,list) and all(isinstance(lbetas,list) for lbetas in llbetas) and len(llbetas)==self.nr
-        assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==self.nr
+        super(FastPDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
         if isinstance(dd_obj,Lattice):
             gmii = FastGramMatrixLattice(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
         elif isinstance(dd_obj,DigitalNetB2):
@@ -103,9 +100,11 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         pgm = self.precond_solve(gm)
         return self.npt.linalg.cond(pgm)
     def _get__xs(self):
-        _x = self.gms[0,0]._x
-        _xs = [self.gms[0,0].clone(_x)[:self.ns[i]] for i in range(self.nr)]
+        _xs = [None]*self.nr
         for i in range(self.nr):
-            _xs[i][:,~self.us[i]] = 0.
+            if not hasattr(self.gms[i,0],"_x1"): self.gms[i,0]._set__x1__x2()
+            _xs[i] = self.gms[i,0].clone(self.gms[i,0]._x1)
         return _xs
+    def _get_xs(self):
+        return [self.gms[i,0]._convert__x_to_x(_x) for i,_x in enumerate(self._get__xs())]
       

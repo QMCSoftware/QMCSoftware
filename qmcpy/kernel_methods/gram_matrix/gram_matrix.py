@@ -39,26 +39,28 @@ class GramMatrix(_GramMatrix):
             noise (float): nugget term 
         """
         super(GramMatrix,self).__init__(kernel_obj,noise,lbeta1s,lbeta2s,lc1s,lc2s)
-        self.n1 = len(x1) 
-        self.n2 = len(x2) 
-        assert x1.shape==(self.n1,self.d) and x2.shape==(self.n2,self.d)
-        gms = np.empty((self.t1,self.t2),dtype=object) 
-        for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-            gms[tt1,tt2] = kernel_obj(x1,x2,self.lbeta1s[tt1],self.lbeta2s[tt2],self.lc1s[tt1],self.lc2s[tt2])
-        self.gm = self.npt.vstack([self.npt.hstack([gms[tt1,tt2] for tt2 in range(self.t2)]) for tt1 in range(self.t1)])
+        self.x1,self.x2 = x1,x2
+        self.n1 = len(self.x1) 
+        self.n2 = len(self.x2) 
+        assert self.x1.shape==(self.n1,self.d) and self.x2.shape==(self.n2,self.d)
+        self.gm = self._construct_full_gram_matrix(self.x1,self.x2,self.t1,self.t2,self.lbeta1s,self.lbeta2s,self.lc1s_og,self.lc2s_og)
         self.size = (self.n1*self.t1,self.n2*self.t2)
         invertible_conds = [
-            ( self.get_ptr(x1)==self.get_ptr(x2), "x1 and x2 must point to the same object"),
+            ( self.get_ptr(self.x1)==self.get_ptr(self.x2), "x1 and x2 must point to the same object"),
             ( self.n1==self.n2, "require square matrices"),
             ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
             ]  
         super(GramMatrix,self)._set_invertible_conds(invertible_conds)
         if self.invertible and self.noise>0:
             self.gm = self.gm+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
-    def _init_invertibile(self):
-        self.l_chol = self.cholesky(self.gm)
     def get_full_gram_matrix(self):
         return self.gm.copy()
+    def get_new_left_full_gram_matrix(self, new_x, new_lbetas, new_lcs):
+        new_lbetas,new_lcs,new_t,new_m = self._parse_lbetas_lcs(new_lbetas,new_lcs)
+        gm = self._construct_full_gram_matrix(new_x,self.x1,new_t,self.t1,new_lbetas,self.lbeta1s,new_lcs,self.lc1s_og)
+        return gm
+    def _init_invertibile(self):
+        self.l_chol = self.cholesky(self.gm)
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
     def __matmul__(self, y):
@@ -74,4 +76,3 @@ class GramMatrix(_GramMatrix):
         y = rng.uniform(size=(self.n2*self.t2,2))
         assert np.allclose(self.solve(y[:,0]),np.linalg.solve(self.gm,y[:,0]),rtol=2.5e-2)
         assert np.allclose(self.solve(y),np.linalg.solve(self.gm,y),rtol=2.5e-2)
-        
