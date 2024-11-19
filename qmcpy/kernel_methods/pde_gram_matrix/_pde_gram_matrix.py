@@ -1,5 +1,6 @@
 import numpy as np 
 import time 
+from ..util import pcg
 
 class _PDEGramMatrix(object):
     def __init__(self, kernel_obj, llbetas, llcs):
@@ -27,71 +28,15 @@ class _PDEGramMatrix(object):
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
     def pcg(self, b, x0=None, rtol=1e-8, atol=0., maxiter=None, precond=False, ref_sol=False):
-        """
-        Preconditioned Conjugate Gradient (PCG) method, see https://en.wikipedia.org/wiki/Conjugate_gradient_method#The_preconditioned_conjugate_gradient_method
-        
-        Args:
-            b (np.ndarray or torch.Tensor): right hand side 
-            x0 (np.ndarray or torch.Tensor): initial guess
-            rtol, atol (float): require norm(b-A@x)<=max(rtol*norm(b),atol)
-            maxiter (int): maximum number of iterations 
-            precond (bool or str): flag to use preconditioner. 
-                If True, the preconditioner is A.precond_solve. 
-                If a str s is passed in, the preconditioned system solver is A.s
-            ref_sol (bool): if True, compute a reference solution and track the relative error (forward error)
-        """
-        n = len(b)
-        if maxiter is None: maxiter = n 
-        assert 0<maxiter<=n
-        assert b.shape==(n,)
-        bnorm = self.npt.linalg.norm(b)
-        x = self.npt.zeros(n,dtype=float,**self.ckwargs) if x0 is None else x0 
-        assert x.shape==(n,)
-        assert rtol>=0 and atol>=0
-        residtol = max(rtol*self.npt.linalg.norm(b),atol)
         assert precond is True or precond is False or isinstance(precond,str) 
-        if precond is False: 
-            precond_solve = lambda r: r 
-        elif precond is True:
-            precond_solve = self.precond_solve
+        if precond is True:
+            precond = self.precond_solve
         elif isinstance(precond,str):
-            precond_solve = getattr(self,precond)
-        backward_norms = self.npt.zeros(maxiter+1,dtype=float,**self.ckwargs)
-        if ref_sol:
-            tr0 = time.perf_counter()
-            xref = self._solve(b)
-            tr = time.perf_counter()-tr0
-            xrefnorm = self.npt.linalg.norm(xref)
-            forward_norms = self.npt.zeros(maxiter+1,dtype=float,**self.ckwargs)
-            forward_norms[0] = self.npt.linalg.norm(xref) if x0 is None else self.npt.linalg.norm(xref-x)
-        times = self.npt.zeros(maxiter+1,dtype=float,**self.ckwargs)
-        t0 = time.perf_counter()
-        r = b if x0 is None else b-self@x
-        z = precond_solve(r)
-        rz = r@z
-        p = z
-        backward_norms[0] = self.npt.linalg.norm(r)
-        for i in range(1,maxiter+1):
-            Ap = self@p
-            alpha = rz/(p@Ap)
-            x = x+alpha*p
-            r = r-alpha*Ap
-            backward_norms[i] = self.npt.linalg.norm(r)
-            if ref_sol: forward_norms[i] = self.npt.linalg.norm(x-xref)
-            times[i] = time.perf_counter()-t0
-            if backward_norms[i]<=residtol or i==maxiter: break
-            z = precond_solve(r)
-            rznew = r@z
-            beta = rznew/rz 
-            rz = rznew
-            p = z+beta*p
-        times = times[:(i+1)]
-        rbackward_norms = backward_norms[:(i+1)]/bnorm
-        if not ref_sol:
-            return x,rbackward_norms,times
-        else:
-            rforward_norms = forward_norms[:(i+1)]/xrefnorm
-            return x,rbackward_norms,times,xref,rforward_norms,tr
+            precond = getattr(self,precond)
+        assert isinstance(ref_sol,bool)
+        if ref_sol is True: 
+            ref_sol = self._solve
+        return pcg(self.__matmul__,b,x0,rtol,atol,maxiter,precond_solve=precond,ref_solver=ref_sol,npt=self.npt,ckwargs=self.ckwargs)
     def _solve(self, y):
         if not hasattr(self,"l_chol"): 
             self._init_invertibile()
@@ -119,8 +64,8 @@ class _PDEGramMatrix(object):
                 z,F,Fp = zt.numpy(),Ft.numpy(),Fpt.numpy()
             else:
                 z,F,Fp = zt,Ft,Fpt
-            r = self@(Fp.T@(y-F))-relaxation*z
+            b = self@(Fp.T@(y-F))-relaxation*z
             print(Fp.shape)
-            print(r.shape)
+            print(b.shape)
             print()
             break
