@@ -57,7 +57,7 @@ class GramMatrix(_GramMatrix):
         return self.gm.copy()
     def get_new_left_full_gram_matrix(self, new_x, new_lbetas, new_lcs):
         new_lbetas,new_lcs,new_t,new_m = self._parse_lbetas_lcs(new_lbetas,new_lcs)
-        gm = self._construct_full_gram_matrix(new_x,self.x1,new_t,self.t1,new_lbetas,self.lbeta1s,new_lcs,self.lc1s_og)
+        gm = self._construct_full_gram_matrix(self.x1,new_x,self.t1,new_t,self.lbeta1s,new_lbetas,self.lc1s_og,new_lcs).T
         return gm
     def _init_invertibile(self):
         self.l_chol = self.cholesky(self.gm)

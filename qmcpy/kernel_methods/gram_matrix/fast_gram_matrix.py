@@ -62,7 +62,8 @@ class _FastGramMatrix(_GramMatrix):
         self.d_u1mu2 = self.u1mu2.sum()
         self.d_u2mu1 = self.u2mu1.sum()
         self.d_u1au2 = self.u1au2.sum()
-        self.d_u1nu2 = self.u1nu2.sum()
+        self.d_u1nu2_og = self.d_u1nu2 = self.u1nu2.sum()
+        if self.d_u1nu2==self.d: assert self.n1==self.n2==1
         self.noise = noise
         self.dd_obj = dd_obj
         if _pregenerated_x__x is None:
@@ -94,7 +95,7 @@ class _FastGramMatrix(_GramMatrix):
             self.k1r = np.empty((self.t1,self.t2),dtype=object)
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 self.k1r[tt1,tt2] = self.kernel_obj.eval_low_u_noscale(self.u2mu1,delta_u2mu1,inds[tt1,tt2],idxs[tt1,tt2],consts[tt1,tt2],self.m1[tt1],self.m2[tt2],1,self.n2,self.d_u2mu1)[:,:,0,:] # (self.m1,self.m2,self.n2)
-        if self.d_u1au2>0:
+        if self.d_u1au2>0 or self.d_u1nu2==self.d:
             if self.n1==self.n2:
                 self.vhs = "square"
                 delta_u1au2 = self.kernel_obj.x1_ominus_x2(self._x[:n1,None,self.u1au2],self._x[None,[0],self.u1au2])
@@ -137,7 +138,7 @@ class _FastGramMatrix(_GramMatrix):
         self.size = (self.n1*self.t1,self.n2*self.t2)
         invertible_conds = [
             ( self.n1==self.n2, "require square matrices"),
-            ( self.d_u1au2>0, "require a positive definite circulant factor"),
+            ( self.d_u1au2>0 or self.n1==1, "require a positive definite circulant factor"),
             ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
             ( (self.m1==1).all() and (self.m2==1).all(), "require there is only one derivative order (also satisfied when self.d_u1mu2==0 and self.d_u2mu1==0)"),
             ( (self.t1==1 and self.t2==1 and self.noise==0) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
@@ -168,7 +169,7 @@ class _FastGramMatrix(_GramMatrix):
         return _x,x 
     def get_full_gram_matrix(self):
         if not hasattr(self,"_x1"): self._set__x1__x2()
-        gm = self._construct_full_gram_matrix(self._x1,self._x2,self.t1,self.t2,self.lbeta1s,self.lbeta2s,self.lc1s,self.lc2s)
+        gm = self._construct_full_gram_matrix(self._x1,self._x2,self.t1,self.t2,self.lbeta1s,self.lbeta2s,self.lc1s_og,self.lc2s_og)
         if self.invertible and self.noise>0:
             gm = gm+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
         return gm
@@ -197,7 +198,7 @@ class _FastGramMatrix(_GramMatrix):
                     y = y*self.scale_null[tt1,tt2][:,:,None] # (v,m1,m2,n2) since self.scale_null is (m1,m2)
                 if self.d_u2mu1>0:
                     y = y*self.k1r[tt1,tt2] # (v,m1,m2,n2) since self.k1r is (m1,m2,n2)
-                if self.d_u1au2>0:
+                if self.d_u1au2>0 or self.d_u1nu2_og==self.d:
                     if self.vhs=="square": # so n1=n2
                         yt = self.ft(y) # (v,m1,m2,n1) or (v,1,1,n1)
                         st = yt*self.lam[tt1,tt2][:,:,0,:] # (v,n2) since self.lam is (m1,m2,1,n1)
