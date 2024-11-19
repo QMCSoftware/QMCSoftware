@@ -26,7 +26,7 @@ class _PDEGramMatrix(object):
         assert np.allclose(self@y,gmatfull@y,atol=1e-12)
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
-    def pcg(self, b, x0=None, rtol=1e-5, atol=0., maxiter=None, precond=False, ref_sol=False):
+    def pcg(self, b, x0=None, rtol=1e-8, atol=0., maxiter=None, precond=False, ref_sol=False):
         """
         Preconditioned Conjugate Gradient (PCG) method, see https://en.wikipedia.org/wiki/Conjugate_gradient_method#The_preconditioned_conjugate_gradient_method
         

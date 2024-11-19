@@ -1,7 +1,6 @@
 from ._gram_matrix import _GramMatrix
 from ...discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
 from ..kernel import KernelShiftInvar,KernelDigShiftInvar
-from ..util.dig_shift_invar_ops import float64_to_binary
 from ..fast_transforms import fftbr,ifftbr,fwht
 try:
     from ..fast_transforms import fftbr_torch,ifftbr_torch,fwht_torch
@@ -368,6 +367,6 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
         xf = self._convert__x_to_x(xb)
         return xb,xf
     def _convert_x_to__x(self, x):
-        return float64_to_binary(x,self.kernel_obj.t)
+        return np.floor(x*(2**self.kernel_obj.t)).astype(np.uint64)
     def _convert__x_to_x(self, _x):
         return _x*2**(-self.kernel_obj.t)
