@@ -233,7 +233,7 @@ class _FastGramMatrix(_GramMatrix):
         if self.t1==1:
             if self.d_u1mu2>0:
                 y = y/self.k1l[0,0][0,0] # (v,self.n1) since self.k1l is (1,1,n1)
-            if self.d_u1au2>0:
+            if self.d_u1au2>0 or self.d_u1nu2_og==self.d:
                 yt = self.ft(y) # (v,self.n1)
                 st = yt/self.lam[0,0][0,0,0] # (v,self.n1) since self.lam is (1,1,self.n1)
                 s = self.ift(st).real # (v,self.n1)
