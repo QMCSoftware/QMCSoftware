@@ -1,5 +1,6 @@
 from ._pde_gram_matrix import _PDEGramMatrix
 from ...discrete_distribution import IIDStdUniform
+from ...discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..kernel import KernelGaussian
 from ..gram_matrix import GramMatrix
 import numpy as np 
@@ -36,15 +37,33 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> gmpde = PDEGramMatrix([xint,xb],kernel_gaussian,llbetas=llbetas,llcs=llcs)
     >>> gmpde._mult_check()
     """
-    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8):
+    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None):
         """
         Args:
-            xs (list of numpy.ndarray or torch.Tensor): locations at which the regions are sampled 
+            xs (DiscreteDisribution or list of numpy.ndarray or torch.Tensor): locations at which the regions are sampled 
             kernel_obj (_Kernel): the kernel to use
             llbetas (list of lists): list of length equal to the number of regions where each sub-list is the derivatives at that region 
             llcs (list of lists): list of length equal to the number of regions where each sub-list are the derivative coefficients at that region 
             noise (float): nugget term
+            ns (np.ndarray or torch.Tensor): vector of number of points on each of the regions. 
+                Only used when a DiscreteDistribution is passed in for xs
+            us (np.ndarray or torch.Tensor): bool matrix where each row is a region specifying the active dimensions
+                Only used when a DiscreteDistribution is passed in for xs
         """
+        if isinstance(xs,DiscreteDistribution):
+            dd_obj = xs
+            assert ns is not None and ns.ndim==1 and (ns[1:]<=ns[0]).all()
+            nr = len(ns)
+            assert us is not None and us.ndim==2 and us.shape==(nr,kernel_obj.d) and (us[0]==True).all() # and (us.sum(1)>0).all()
+            x = dd_obj.gen_samples(ns[0])
+            if kernel_obj.torchify: 
+                import torch 
+                x = torch.from_numpy(x)
+                xs = [x[:n].clone() for n in ns]
+            else: # numpyify 
+                xs = [x[:n].copy() for n in ns] 
+            for i,u in enumerate(us):
+                xs[i][:,~u] = 0.
         assert isinstance(xs,list)
         self.xs = xs 
         self.nr = len(self.xs)
@@ -52,7 +71,10 @@ class PDEGramMatrix(_PDEGramMatrix):
         self.gms = np.empty((self.nr,self.nr),dtype=object)
         for i1,i2 in itertools.product(range(self.nr),range(self.nr)):
             self.gms[i1,i2] = GramMatrix(self.xs[i1],self.xs[i2],self.kernel_obj,self.llbetas[i1],self.llbetas[i2],self.llcs[i1],self.llcs[i2],noise=0.)
-        self.length = np.sum([self.gms[i,0].size[0] for i in range(self.nr)])
+        bs = [self.gms[i,0].size[0] for i in range(self.nr)]
+        self.bs_cumsum = np.cumsum(bs).tolist() 
+        self.length = self.bs_cumsum[-1]
+        self.bs_cumsum = self.bs_cumsum[:-1]
         self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve

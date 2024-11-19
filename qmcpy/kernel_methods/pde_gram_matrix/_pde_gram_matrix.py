@@ -36,7 +36,7 @@ class _PDEGramMatrix(object):
             rtol, atol (float): require norm(b-A@x)<=max(rtol*norm(b),atol)
             maxiter (int): maximum number of iterations 
             precond (bool or str): flag to use preconditioner. 
-                If true, the preconditioner is A.precond_solve. 
+                If True, the preconditioner is A.precond_solve. 
                 If a str s is passed in, the preconditioned system solver is A.s
             ref_sol (bool): if True, compute a reference solution and track the relative error (forward error)
         """
@@ -96,5 +96,31 @@ class _PDEGramMatrix(object):
         if not hasattr(self,"l_chol"): 
             self._init_invertibile()
         return self.cho_solve(self.l_chol,y)
-    def get_kernel_vec(self, x):
-        pass
+    def decompose(self, z):
+        return [np.split(zs,self.gms[i,0].t1) for i,zs in enumerate(np.split(z,self.bs_cumsum))]
+    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, precond=False, relaxation=1e-8):
+        def pde_lhs_wrap(z):
+            zd = self.decompose(z)
+            y_lhss = pde_lhs(*zd)
+            y_lhs = torch.hstack(y_lhss)
+            return y_lhs 
+        def pde_rhs_wrap(xs):
+            y_rhss = pde_rhs(*xs)
+            y_rhs = self.npt.hstack(y_rhss) 
+            return y_rhs
+        import torch 
+        xs = self._get_xs()
+        y = pde_rhs_wrap(xs) 
+        zt = torch.zeros(self.length)#,requires_grad=True)
+        for i in range(maxiter):
+            Ft = pde_lhs_wrap(zt) 
+            Fpt = torch.autograd.functional.jacobian(pde_lhs_wrap,zt)
+            if self.npt==np:
+                z,F,Fp = zt.numpy(),Ft.numpy(),Fpt.numpy()
+            else:
+                z,F,Fp = zt,Ft,Fpt
+            r = self@(Fp.T@(y-F))-relaxation*z
+            print(Fp.shape)
+            print(r.shape)
+            print()
+            break

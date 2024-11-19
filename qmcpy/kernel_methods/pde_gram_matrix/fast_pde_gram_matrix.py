@@ -31,7 +31,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         Args:
             dd_obj (Lattice or DigitalNetB2): the discrete distribution from which to sample points 
             kernel_obj (KernelShiftInvar or KernelDigShiftInvar): the kernel to use 
-            n_bs (np.ndarray or torch.Tensor): vector of number of points on each of the regions 
+            ns (np.ndarray or torch.Tensor): vector of number of points on each of the regions 
             us (np.ndarray or torch.Tensor): bool matrix where each row is a region specifying the active dimensions
             llbetas (list of lists): list of length equal to the number of regions where each sub-list is the derivatives at that region 
             llcs (list of lists): list of length equal to the number of regions where each sub-list are the derivative coefficients at that region 
