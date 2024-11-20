@@ -37,7 +37,7 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> gmpde = PDEGramMatrix([xint,xb],kernel_gaussian,llbetas=llbetas,llcs=llcs)
     >>> gmpde._mult_check()
     """
-    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None):
+    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None, half_comp=False):
         """
         Args:
             xs (DiscreteDisribution or list of numpy.ndarray or torch.Tensor): locations at which the regions are sampled 
@@ -49,6 +49,7 @@ class PDEGramMatrix(_PDEGramMatrix):
                 Only used when a DiscreteDistribution is passed in for xs
             us (np.ndarray or torch.Tensor): bool matrix where each row is a region specifying the active dimensions
                 Only used when a DiscreteDistribution is passed in for xs
+            half_comp (bool): if True, put project half the points to the 0 boundary and half the points to the 1 boundary
         """
         if isinstance(xs,DiscreteDistribution):
             dd_obj = xs
@@ -63,7 +64,12 @@ class PDEGramMatrix(_PDEGramMatrix):
             else: # numpyify 
                 xs = [x[:n].copy() for n in ns] 
             for i,u in enumerate(us):
-                xs[i][:,~u] = 0.
+                if half_comp:
+                    nhalf = ns[i]//2
+                    xs[i][:nhalf,~u] = 0. 
+                    xs[i][nhalf:,~u] = 1.
+                else:
+                    xs[i][:,~u] = 0.
         assert isinstance(xs,list)
         self.xs = xs 
         self.nr = len(self.xs)

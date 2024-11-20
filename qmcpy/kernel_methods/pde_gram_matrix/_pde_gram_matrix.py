@@ -15,7 +15,7 @@ class _PDEGramMatrix(object):
         assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==nr
         return llbetas,llcs,nr
     def get_new_left_full_gram_matrix(self, new_x, new_lbetas, new_lcs):
-        gms = np.empty(self.nr,dtype=object)
+        gms = [None]*self.nr
         for i in range(self.nr):
             gms[i] = self.gms[i,0].get_new_left_full_gram_matrix(new_x,new_lbetas,new_lcs)
         return self.npt.hstack(gms) 
@@ -42,8 +42,8 @@ class _PDEGramMatrix(object):
             self._init_invertibile()
         return self.cho_solve(self.l_chol,y)
     def decompose(self, z):
-        return [np.split(zs,self.gms[i,0].t1) for i,zs in enumerate(np.split(z,self.bs_cumsum))]
-    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=1e-8, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
+        return [zs.reshape((self.gms[i,0].t1,-1)) for i,zs in enumerate(np.split(z,self.bs_cumsum))]
+    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=1e-10, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
         def pde_lhs_wrap(z):
             zd = self.decompose(z)
             y_lhss = pde_lhs(*zd)
@@ -64,7 +64,11 @@ class _PDEGramMatrix(object):
             pcg_precond = getattr(self,pcg_precond)
         xs = self._get_xs()
         y = pde_rhs_wrap(xs) 
-        zt = torch.zeros(self.length,dtype=torch.float64)
+        zt = torch.zeros(self.length,dtype=torch.float64) # replace with user option
+        z0_is_zero = (zt==0).all()
+        rbackward_norms = [None]*maxiter
+        times = [None]*maxiter
+        losses = self.npt.nan*self.npt.zeros(maxiter+1)
         if verbose: print("\titeration i/%d: i = "%maxiter,end='',flush=True)
         for i in range(maxiter):
             if verbose: print("%d, "%(i+1),end='',flush=True)
@@ -77,11 +81,29 @@ class _PDEGramMatrix(object):
             Fpsq = Fp.T@Fp
             def multiply(delta):
                 return self@(Fpsq@delta)+relaxation*delta
-            b = self@(Fp.T@(y-F))-relaxation*z
-            delta,rbackward_norms,times = pcg(matmul=multiply,b=b,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
+            diff = F-y
+            t = Fp.T@diff
+            b = -relaxation*z-self@t
+            delta,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=b,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
+            if i==0 and z0_is_zero:
+                gamma = self.npt.zeros_like(z)
+            else:
+                gamma,rbackward_norms_gamma,times_gamma = pcg(matmul=self.__matmul__,b=z,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False,npt=self.npt,ckwargs=self.ckwargs)
+            zgamma = z@gamma 
+            if i==0:
+                losses[0] = zgamma+1/relaxation*diff@diff
+            losses[i+1] = delta@(gamma+1/relaxation*t)+zgamma+1/relaxation*diff@diff
             deltat = torch.from_numpy(delta) if self.npt==np else delta
             zt = zt+deltat
+        rbackward_norms,times = rbackward_norms[:(i+1)],times[:(i+1)]
+        max_pcg_iters = max([len(rbackward_norm) for rbackward_norm in rbackward_norms])
+        rbackward_norms_mat = self.npt.nan*self.npt.empty((i+1,max_pcg_iters))
+        times_mat = self.npt.nan*self.npt.empty((i+1,max_pcg_iters))
+        for l in range(i+1):
+            rbackward_norms_mat[l,:len(rbackward_norms[l])] = rbackward_norms[l]
+            times_mat[l,:len(times[l])] = times[l] 
         if verbose: print()
-        return zt.numpy() if self.npt==np else zt  
+        z = zt.numpy() if self.npt==np else zt  
+        return z,losses[:(i+2)],rbackward_norms_mat,times_mat
 
 
