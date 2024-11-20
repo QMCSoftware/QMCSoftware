@@ -43,6 +43,10 @@ class _PDEGramMatrix(object):
         return self.cho_solve(self.l_chol,y)
     def decompose(self, z):
         return [zs.reshape((self.gms[i,0].t1,-1)) for i,zs in enumerate(np.split(z,self.bs_cumsum))]
+    def compose(self, lzs):
+        return self.npt.hstack([zs.flatten() for zs in lzs])
+    def decompose_eqns(self, z):
+        return np.split(z,self.n_cumsum)
     def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=1e-10, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
         def pde_lhs_wrap(z):
             zd = self.decompose(z)
@@ -64,7 +68,7 @@ class _PDEGramMatrix(object):
             pcg_precond = getattr(self,pcg_precond)
         xs = self._get_xs()
         y = pde_rhs_wrap(xs) 
-        zt = torch.zeros(self.length,dtype=torch.float64) # replace with user option
+        zt = torch.zeros(self.length,dtype=torch.float64,requires_grad=True)
         z0_is_zero = (zt==0).all()
         rbackward_norms = [None]*maxiter
         times = [None]*maxiter
@@ -74,15 +78,21 @@ class _PDEGramMatrix(object):
             if verbose: print("%d, "%(i+1),end='',flush=True)
             Ft = pde_lhs_wrap(zt) 
             Fpt = torch.autograd.functional.jacobian(pde_lhs_wrap,zt)
+            Fpvt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
             if self.npt==np:
-                z,F,Fp = zt.numpy(),Ft.numpy(),Fpt.numpy()
+                z,F,Fp,Fpv = zt.detach().numpy(),Ft.detach().numpy(),Fpt.detach().numpy(),Fpvt.detach().numpy()
             else:
-                z,F,Fp = zt,Ft,Fpt
+                z,F,Fp,Fpv = zt.detach(),Ft.detach(),Fpt.detach(),Fpvt.detach()
             Fpsq = Fp.T@Fp
+            Fpvd = self.decompose(Fpv)
+            Fpvsq = [Fpvdi[:,None,:]*Fpvdi[None,:,:] for Fpvdi in Fpvd]
             def multiply(delta):
-                return self@(Fpsq@delta)+relaxation*delta
+                deltad = self.decompose(delta) 
+                Fpsqdelta = self.compose([(deltad[i]*Fpvsq[i]).sum(1) for i in range(self.nr)])
+                return self@(Fpsqdelta)+relaxation*delta
             diff = F-y
-            t = Fp.T@diff
+            diffd = self.decompose_eqns(diff) 
+            t = self.compose([Fpvd[i]*diffd[i] for i in range(self.nr)])
             b = -relaxation*z-self@t
             delta,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=b,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
             if i==0 and z0_is_zero:

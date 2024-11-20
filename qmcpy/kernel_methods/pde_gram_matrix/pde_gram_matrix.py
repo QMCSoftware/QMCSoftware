@@ -73,6 +73,7 @@ class PDEGramMatrix(_PDEGramMatrix):
         assert isinstance(xs,list)
         self.xs = xs 
         self.nr = len(self.xs)
+        self.ns = [len(x) for x in self.xs]
         super(PDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
         self.gms = np.empty((self.nr,self.nr),dtype=object)
         for i1,i2 in itertools.product(range(self.nr),range(self.nr)):
@@ -82,6 +83,7 @@ class PDEGramMatrix(_PDEGramMatrix):
         self.length = self.bs_cumsum[-1]
         self.bs_cumsum = self.bs_cumsum[:-1]
         self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
+        self.n_cumsum = np.cumsum(self.ns)[:-1].tolist()
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve
     def _set_diag(self):

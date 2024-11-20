@@ -64,6 +64,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         self.bs_cumsum = np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]
         self.bs_cumsum = self.bs_cumsum[:-1]
+        self.n_cumsum = np.cumsum(self.ns)[:-1].tolist()
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve
     def precond_solve(self, y):
