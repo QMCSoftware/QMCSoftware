@@ -77,13 +77,11 @@ class _PDEGramMatrix(object):
         for i in range(maxiter):
             if verbose: print("%d, "%(i+1),end='',flush=True)
             Ft = pde_lhs_wrap(zt) 
-            Fpt = torch.autograd.functional.jacobian(pde_lhs_wrap,zt)
             Fpvt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
             if self.npt==np:
-                z,F,Fp,Fpv = zt.detach().numpy(),Ft.detach().numpy(),Fpt.detach().numpy(),Fpvt.detach().numpy()
+                z,F,Fpv = zt.detach().numpy(),Ft.detach().numpy(),Fpvt.detach().numpy()
             else:
-                z,F,Fp,Fpv = zt.detach(),Ft.detach(),Fpt.detach(),Fpvt.detach()
-            Fpsq = Fp.T@Fp
+                z,F,Fpv = zt.detach(),Ft.detach(),Fpvt.detach()
             Fpvd = self.decompose(Fpv)
             Fpvsq = [Fpvdi[:,None,:]*Fpvdi[None,:,:] for Fpvdi in Fpvd]
             def multiply(delta):
