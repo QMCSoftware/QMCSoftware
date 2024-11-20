@@ -88,18 +88,19 @@ class _PDEGramMatrix(object):
                 deltad = self.decompose(delta) 
                 Fpsqdelta = self.compose([(deltad[i]*Fpvsq[i]).sum(1) for i in range(self.nr)])
                 return self@(Fpsqdelta)+relaxation*delta
-            #     t1 = self@delta 
-            #     t2 = Fpsqdelta/relaxation
-            #     return t1+t2 
+                # t1 = self@delta 
+                # t2 = Fpsqdelta/relaxation
+                # return t1+t2
             diff = F-y
             diffd = self.decompose_eqns(diff) 
             t = self.compose([Fpvd[i]*diffd[i] for i in range(self.nr)])
-            b = -relaxation*z-self@t
-            delta,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=b,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
             if i==0 and z0_is_zero:
                 gamma = self.npt.zeros_like(z)
             else:
                 gamma,rbackward_norms_gamma,times_gamma = pcg(matmul=self.__matmul__,b=z,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False,npt=self.npt,ckwargs=self.ckwargs)
+            b = -relaxation*z-self@t
+            #b = -gamma-t/relaxation
+            delta,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=b,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
             zgamma = z@gamma 
             if i==0:
                 losses[0] = zgamma+1/relaxation*diff@diff
