@@ -47,7 +47,7 @@ class _PDEGramMatrix(object):
         return self.npt.hstack([zs.flatten() for zs in lzs])
     def decompose_eqns(self, z):
         return np.split(z,self.n_cumsum)
-    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=1e-10, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
+    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=1e-10, loss_blowup_factor=10, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
         def pde_lhs_wrap(z):
             zd = self.decompose(z)
             y_lhss = pde_lhs(*zd)
@@ -88,6 +88,9 @@ class _PDEGramMatrix(object):
                 deltad = self.decompose(delta) 
                 Fpsqdelta = self.compose([(deltad[i]*Fpvsq[i]).sum(1) for i in range(self.nr)])
                 return self@(Fpsqdelta)+relaxation*delta
+            #     t1 = self@delta 
+            #     t2 = Fpsqdelta/relaxation
+            #     return t1+t2 
             diff = F-y
             diffd = self.decompose_eqns(diff) 
             t = self.compose([Fpvd[i]*diffd[i] for i in range(self.nr)])
@@ -101,6 +104,8 @@ class _PDEGramMatrix(object):
             if i==0:
                 losses[0] = zgamma+1/relaxation*diff@diff
             losses[i+1] = delta@(gamma+1/relaxation*t)+zgamma+1/relaxation*diff@diff
+            if losses[i+1]>(loss_blowup_factor*losses[i]) or losses[i+1]<0 or self.npt.isnan(losses[i+1]): 
+                break
             deltat = torch.from_numpy(delta) if self.npt==np else delta
             zt = zt+deltat
         rbackward_norms,times = rbackward_norms[:(i+1)],times[:(i+1)]
@@ -111,7 +116,5 @@ class _PDEGramMatrix(object):
             rbackward_norms_mat[l,:len(rbackward_norms[l])] = rbackward_norms[l]
             times_mat[l,:len(times[l])] = times[l] 
         if verbose: print()
-        z = zt.numpy() if self.npt==np else zt  
+        z = zt.detach().numpy() if self.npt==np else zt.detach() 
         return z,losses[:(i+2)],rbackward_norms_mat,times_mat
-
-

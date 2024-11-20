@@ -23,37 +23,41 @@ def pcg(matmul, b, x0=None, rtol=None, atol=None, maxiter=None, precond_solve=Fa
         assert 0<maxiter<=n
         assert b.shape==(n,)
         bnorm = npt.linalg.norm(b)
-        x = npt.zeros(n,dtype=float,**ckwargs) if x0 is None else x0 
-        assert x.shape==(n,)
+        bstd = b/bnorm
+        x = npt.zeros(n,dtype=float,**ckwargs) if x0 is None else x0/bnorm
+        xstd = x/bnorm
+        assert xstd.shape==(n,)
         assert rtol>=0 and atol>=0
         residtol = max(rtol*npt.linalg.norm(b),atol)
         assert precond_solve is False or callable(precond_solve)
         if precond_solve is False: 
             precond_solve = lambda r: r 
         backward_norms = npt.zeros(maxiter+1,dtype=float,**ckwargs)
-        if ref_solver is not False:
+        ref_sol = callable(ref_solver)
+        if ref_sol:
             assert callable(ref_solver)
             tr0 = time.perf_counter()
-            xref = ref_solver(b)
+            xref = ref_solver(bstd)*bnorm
             tr = time.perf_counter()-tr0
             xrefnorm = npt.linalg.norm(xref)
             forward_norms = npt.zeros(maxiter+1,dtype=float,**ckwargs)
             forward_norms[0] = npt.linalg.norm(xref) if x0 is None else npt.linalg.norm(xref-x)
-        ref_sol = callable(ref_solver)
         times = npt.zeros(maxiter+1,dtype=float,**ckwargs)
         t0 = time.perf_counter()
-        r = b if x0 is None else b-matmul(x)
+        r = bstd if x0 is None else bstd-matmul(xstd)
         z = precond_solve(r)
         rz = r@z
         p = z
-        backward_norms[0] = npt.linalg.norm(r)
+        backward_norms[0] = npt.linalg.norm(r)*bnorm
         for i in range(1,maxiter+1):
             Ap = matmul(p)
             alpha = rz/(p@Ap)
-            x = x+alpha*p
+            xstd = xstd+alpha*p
             r = r-alpha*Ap
-            backward_norms[i] = npt.linalg.norm(r)
-            if ref_sol: forward_norms[i] = npt.linalg.norm(x-xref)
+            backward_norms[i] = npt.linalg.norm(r)*bnorm
+            if ref_sol:
+                x = xstd*bnorm 
+                forward_norms[i] = npt.linalg.norm(x-xref)
             times[i] = time.perf_counter()-t0
             if backward_norms[i]<=residtol or i==maxiter: break
             z = precond_solve(r)
@@ -61,6 +65,7 @@ def pcg(matmul, b, x0=None, rtol=None, atol=None, maxiter=None, precond_solve=Fa
             beta = rznew/rz 
             rz = rznew
             p = z+beta*p
+        x = xstd*bnorm
         times = times[:(i+1)]
         rbackward_norms = backward_norms[:(i+1)]/bnorm
         if not ref_sol:
