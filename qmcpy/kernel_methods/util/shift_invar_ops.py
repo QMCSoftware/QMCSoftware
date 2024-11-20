@@ -37,7 +37,7 @@ class Polynomial():
         return y
 
 BERNOULLIPOLYSDICT = {
-    0:  Polynomial([1]),
+    #0:  Polynomial([1]),
     1:  Polynomial([1, -1/2]),
     2:  Polynomial([1, -1,   1/6]),
     3:  Polynomial([1, -3/2, 1/2,  0]),

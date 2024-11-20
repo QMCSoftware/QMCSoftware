@@ -43,7 +43,7 @@ class _PDEGramMatrix(object):
         return self.cho_solve(self.l_chol,y)
     def decompose(self, z):
         return [np.split(zs,self.gms[i,0].t1) for i,zs in enumerate(np.split(z,self.bs_cumsum))]
-    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, precond=False, relaxation=1e-8):
+    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=1e-8, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
         def pde_lhs_wrap(z):
             zd = self.decompose(z)
             y_lhss = pde_lhs(*zd)
@@ -53,19 +53,35 @@ class _PDEGramMatrix(object):
             y_rhss = pde_rhs(*xs)
             y_rhs = self.npt.hstack(y_rhss) 
             return y_rhs
-        import torch 
+        try:
+            import torch
+        except: 
+            raise Exception("gauss_newton_relaxed requires torch for automatic differentiation through pde_lhs")
+        assert pcg_precond is True or pcg_precond is False or isinstance(pcg_precond,str) 
+        if pcg_precond is True:
+            pcg_precond = self.precond_solve
+        elif isinstance(pcg_precond,str):
+            pcg_precond = getattr(self,pcg_precond)
         xs = self._get_xs()
         y = pde_rhs_wrap(xs) 
-        zt = torch.zeros(self.length)#,requires_grad=True)
+        zt = torch.zeros(self.length,dtype=torch.float64)
+        if verbose: print("\titeration i/%d: i = "%maxiter,end='',flush=True)
         for i in range(maxiter):
+            if verbose: print("%d, "%(i+1),end='',flush=True)
             Ft = pde_lhs_wrap(zt) 
             Fpt = torch.autograd.functional.jacobian(pde_lhs_wrap,zt)
             if self.npt==np:
                 z,F,Fp = zt.numpy(),Ft.numpy(),Fpt.numpy()
             else:
                 z,F,Fp = zt,Ft,Fpt
+            Fpsq = Fp.T@Fp
+            def multiply(delta):
+                return self@(Fpsq@delta)+relaxation*delta
             b = self@(Fp.T@(y-F))-relaxation*z
-            print(Fp.shape)
-            print(b.shape)
-            print()
-            break
+            delta,rbackward_norms,times = pcg(matmul=multiply,b=b,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
+            deltat = torch.from_numpy(delta) if self.npt==np else delta
+            zt = zt+deltat
+        if verbose: print()
+        return zt.numpy() if self.npt==np else zt  
+
+

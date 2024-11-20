@@ -1,7 +1,7 @@
 import numpy as np 
 import time 
 
-def pcg(matmul, b, x0=None, rtol=1e-8, atol=0., maxiter=None, precond_solve=False, ref_solver=False, npt=np, ckwargs={}):
+def pcg(matmul, b, x0=None, rtol=None, atol=None, maxiter=None, precond_solve=False, ref_solver=False, npt=np, ckwargs={}):
         """
         Preconditioned Conjugate Gradient (PCG) method, see https://en.wikipedia.org/wiki/Conjugate_gradient_method#The_preconditioned_conjugate_gradient_method
         
@@ -9,13 +9,15 @@ def pcg(matmul, b, x0=None, rtol=1e-8, atol=0., maxiter=None, precond_solve=Fals
             matmul (function): multiply Ax 
             b (np.ndarray or torch.Tensor): right hand side 
             x0 (np.ndarray or torch.Tensor): initial guess
-            rtol, atol (float): require norm(b-A@x)<=max(rtol*norm(b),atol)
+            rtol, atol (float): require norm(b-A@x)<=max(rtol*norm(b),atol), defaults to rtol,atol = 1e-8,0
             maxiter (int): maximum number of iterations 
             precond_solve (function): function which solves the system Px = b for x where P is the preconditioner. 
             ref_solver (function): function used to compute the reference solution 
             npt (numpy or torch): module for numerical computations 
             ckwargs (dict): keyword arguments to pass when constructing a tensor e.g. ckwargs={"device":"cpu"}
         """
+        if rtol is None: rtol = 1e-8 
+        if atol is None: atol = 0.
         n = len(b)
         if maxiter is None: maxiter = n 
         assert 0<maxiter<=n
