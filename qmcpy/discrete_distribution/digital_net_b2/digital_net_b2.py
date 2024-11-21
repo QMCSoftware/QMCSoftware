@@ -154,6 +154,7 @@ class DigitalNetB2(LD):
                 self.set_lms = True 
             else:
                 self.set_lms = True
+            #I think this is redundant, check 
         elif (isinstance(randomize,str) and (randomize.upper()=='NONE' or randomize.upper=='NO')):
             self.set_rshift = False
             self.set_lms = False 
@@ -189,7 +190,6 @@ class DigitalNetB2(LD):
                 raise ParameterError("d_max, t_max, m_max, and msb must be supplied when generating_matrices is a ndarray")
             self.d_max = d_max
             self.t_max = t_max
-            #TODO: if t_max > m_max, then the extra rows should be random?
             self.m_max = m_max
             self.msb = msb
         elif isinstance(generating_matrices,str):
@@ -206,8 +206,11 @@ class DigitalNetB2(LD):
             self.m_max = int(parts[-3])
             self.msb = bool(parts[-2].lower()=='msb')
         elif isinstance(generating_matrices,int):
+            #TODO: if t_max > m_max, then the extra rows should be random?
             self.m_max = min(max(2,generating_matrices),64)
+            #Currently, we only support up to 64 dimensions
             self.t_max = self.m_max
+            #And t_max = m_max
             self.d_max = dimension
             self.msb = True
         else:
