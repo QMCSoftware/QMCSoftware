@@ -51,7 +51,7 @@ class _PDEGramMatrix(object):
         diff = y-F
         loss = self.npt.sqrt((diff**2).mean())
         return loss
-    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
+    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
         def pde_lhs_wrap(z):
             zd = self.decompose(z)
             y_lhss = pde_lhs(*zd)
@@ -73,17 +73,19 @@ class _PDEGramMatrix(object):
         losses = self.npt.nan*self.npt.zeros(maxiter+1)
         rbackward_norms = [None]*maxiter
         times = [None]*maxiter
+        if verbose: print("\t%-15s%-15s"%("iter (of %d max)"%maxiter,"loss"))
         xs = self._get_xs()
         y = pde_rhs_wrap(xs) 
         zt = torch.zeros(self.length,dtype=torch.float64,requires_grad=True)
         Ft = pde_lhs_wrap(zt)
         F = Ft.detach().numpy() if self.npt==np else Ft.detach()
+        z = zt.detach().numpy() if self.npt==np else zt.detach()
         losses[0] = self._loss(F,y)
-        if verbose: print("\titeration i/%d: i = "%maxiter,end='',flush=True)
+        loss_best = losses[0] 
+        z_best = z
         for i in range(maxiter):
-            if verbose: print("%d, "%(i+1),end='',flush=True)
+            if verbose: print("\t%-15d%-15.2e"%(i+1,losses[i]))
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
-            z = zt.detach().numpy() if self.npt==np else zt.detach()
             Fp = Fpt.detach().numpy() if self.npt==np else Fpt.detach()
             Fpd = self.decompose(Fp)
             def mult_Fp(a):
@@ -100,17 +102,19 @@ class _PDEGramMatrix(object):
                 t1 = mult_tFp(gamma) 
                 t2 = self@t1 
                 t3 = mult_Fp(t2)
-                return t3
+                t4 = t3+relaxation*gamma
+                return t4
             Fpz = mult_Fp(z)
             diff = y-F+Fpz
             gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
-            #z_old = z
             tFpgamma = mult_tFp(gamma)
             z = self@tFpgamma
             zt = torch.from_numpy(z).requires_grad_() if self.npt==np else z.requires_grad_()
             Ft = pde_lhs_wrap(zt) 
             F = Ft.detach().numpy() if self.npt==np else Ft.detach()
             losses[i+1] = self._loss(F,y)
+            if losses[i+1]<loss_best:
+                z_best = z
         rbackward_norms,times = rbackward_norms[:(i+1)],times[:(i+1)]
         max_pcg_iters = max([len(rbackward_norm) for rbackward_norm in rbackward_norms])
         rbackward_norms_mat = self.npt.nan*self.npt.empty((i+1,max_pcg_iters))
@@ -118,6 +122,4 @@ class _PDEGramMatrix(object):
         for l in range(i+1):
             rbackward_norms_mat[l,:len(rbackward_norms[l])] = rbackward_norms[l]
             times_mat[l,:len(times[l])] = times[l] 
-        if verbose: print()
-        z = zt.detach().numpy() if self.npt==np else zt.detach() 
-        return z,losses[:(i+2)],rbackward_norms_mat,times_mat
+        return z_best.detach(),losses[:(i+2)],rbackward_norms_mat,times_mat
