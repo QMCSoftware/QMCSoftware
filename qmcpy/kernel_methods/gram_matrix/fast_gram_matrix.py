@@ -152,7 +152,7 @@ class _FastGramMatrix(_GramMatrix):
             ( (self.t1==1 and self.t2==1 and self.noise==0) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
         super(_FastGramMatrix,self)._set_invertible_conds(invertible_conds)
-        if self.invertible and self.noise>0 and self.d_u1nu2_og==0:
+        if self.invertible and self.noise>0:
             for tt1 in range(self.t1):
                 self.lam[tt1,tt1][0,0,0,:] += self.noise # lam is (m1,m2,1,n1) = (1,1,1,n1)
     def _set__x1__x2(self):
