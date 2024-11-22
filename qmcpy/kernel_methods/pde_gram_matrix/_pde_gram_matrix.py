@@ -73,7 +73,7 @@ class _PDEGramMatrix(object):
         losses = self.npt.nan*self.npt.zeros(maxiter+1)
         rbackward_norms = [None]*maxiter
         times = [None]*maxiter
-        if verbose: print("\t%-15s%-15s"%("iter (of %d max)"%maxiter,"loss"))
+        if verbose: print("\t%-20s%-15s"%("iter (%d max)"%maxiter,"loss"))
         xs = self._get_xs()
         y = pde_rhs_wrap(xs) 
         zt = torch.zeros(self.length,dtype=torch.float64,requires_grad=True)
@@ -84,7 +84,7 @@ class _PDEGramMatrix(object):
         loss_best = losses[0] 
         z_best = z
         for i in range(maxiter):
-            if verbose: print("\t%-15d%-15.2e"%(i+1,losses[i]))
+            if verbose: print("\t%-20d%-15.2e"%(i+1,losses[i]))
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
             Fp = Fpt.detach().numpy() if self.npt==np else Fpt.detach()
             Fpd = self.decompose(Fp)

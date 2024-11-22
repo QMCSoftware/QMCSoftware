@@ -1,5 +1,6 @@
 import torch 
-import numpy as np 
+import numpy as np
+import itertools 
 
 SQRT2 = np.sqrt(2) 
 
@@ -71,7 +72,7 @@ def fftbr_torch(x):
     ndim = x.ndim
     twos = [2]*m
     xs = x.reshape(shape[:-1]+twos)
-    pdims = [i for i in range(ndim-1)]+[i+ndim-1 for i in range(m-1,-1,-1)]
+    pdims = tuple(itertools.chain(range(ndim-1),range(m+ndim-2,ndim-2,-1)))#[i for i in range(ndim-1)]+[i+ndim-1 for i in range(m-1,-1,-1)]
     xrf = torch.permute(xs,pdims)
     xr = xrf.contiguous().view(shape)
     return torch.fft.fft(xr,norm="ortho")
@@ -103,7 +104,7 @@ def ifftbr_torch(x):
     twos = [2]*m
     x = torch.fft.ifft(x,norm="ortho")
     xs = x.reshape(shape[:-1]+twos)
-    pdims = [i for i in range(ndim-1)]+[i+ndim-1 for i in range(m-1,-1,-1)]
+    pdims = tuple(itertools.chain(range(ndim-1),range(m+ndim-2,ndim-2,-1)))
     xrf = torch.permute(xs,pdims)
     xr = xrf.contiguous().view(shape)
     return xr

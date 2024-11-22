@@ -63,7 +63,6 @@ class _FastGramMatrix(_GramMatrix):
         self.d_u1au2 = self.u1au2.sum()
         self.d_u1nu2_og = self.d_u1nu2 = self.u1nu2.sum()
         if self.d_u1nu2==self.d: assert self.n1==self.n2==1
-        self.noise = noise
         self.dd_obj = dd_obj
         if _pregenerated_x__x is None:
             self.n_max = max(self.n1,self.n2)
@@ -134,6 +133,16 @@ class _FastGramMatrix(_GramMatrix):
             self.lam = np.empty((self.t1,self.t2),dtype=object)
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 self.lam[tt1,tt2] = np.sqrt(self.n_min)*self.ft(k1[tt1,tt2])
+        self.lc1slc2s = np.empty((self.t1,self.t2),dtype=object) 
+        for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
+            self.lc1slc2s[tt1,tt2] = self.lc1s[tt1][None,:,None,None]*self.lc2s[tt2][None,None,:,None]
+        if hasattr(self,"lam"):
+            self.lam *= self.kernel_obj.scale 
+        elif hasattr(self,"k1l"):
+            self.k1l *= self.kernel_obj.scale 
+        else:
+            assert hasattr(self,"k1r")
+            self.k1r *= self.kernel_obj.scale 
         self.size = (self.n1*self.t1,self.n2*self.t2)
         invertible_conds = [
             ( self.n1==self.n2, "require square matrices"),
@@ -143,9 +152,9 @@ class _FastGramMatrix(_GramMatrix):
             ( (self.t1==1 and self.t2==1 and self.noise==0) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
         super(_FastGramMatrix,self)._set_invertible_conds(invertible_conds)
-        if self.invertible and self.noise>0:
+        if self.invertible and self.noise>0 and self.d_u1nu2_og==0:
             for tt1 in range(self.t1):
-                self.lam[tt1,tt1][0,0,0,:] += self.noise
+                self.lam[tt1,tt1][0,0,0,:] += self.noise # lam is (m1,m2,1,n1) = (1,1,1,n1)
     def _set__x1__x2(self):
         self._x1,self._x2 = self.clone(self._x),self.clone(self._x)
         self._x1[:,~self.u1] = 0.
@@ -186,13 +195,11 @@ class _FastGramMatrix(_GramMatrix):
         if yogndim==1: y = y[:,None]
         assert y.ndim==2 and y.shape[0]==(self.n2*self.t2)
         v = y.shape[1] # y is (t2*n2,v)
-        y = y*self.kernel_obj.scale
-        y = y.T.reshape((v,self.t2,self.n2)) # (v,t2,n2)
-        yfull = [y[:,tt2,:].reshape((v,1,1,self.n2)) for tt2 in range(self.t2)] # (v,1,1,n2)
-        sfull = [0. for tt1 in range(self.t1)] # (v,n1)
+        yfull = y.T.reshape((v,self.t2,1,1,self.n2)) # (v,t2,n2)
+        sfull = [0.]*self.t1 # (v,n1)
         for tt1 in range(self.t1):
             for tt2 in range(self.t2): 
-                y = yfull[tt2]
+                y = yfull[:,tt2,:,:,:]
                 if self.d_u1nu2>0:
                     y = y*self.scale_null[tt1,tt2][:,:,None] # (v,m1,m2,n2) since self.scale_null is (m1,m2)
                 if self.d_u2mu1>0:
@@ -214,7 +221,7 @@ class _FastGramMatrix(_GramMatrix):
                     s = self.npt.tile(y.sum(-1)[:,:,:,None],(self.n1,)) # (v,m1,m2,n1)
                 if self.d_u1mu2>0:
                     s = s*self.k1l[tt1,tt2] # (v,m1,m2,n1) since self.k1l is (m1,m2,n1)
-                s = (self.lc1s[tt1][None,:,None,None]*self.lc2s[tt2][None,None,:,None]*s).sum((1,2)) # (v,n1)
+                s = (self.lc1slc2s[tt1,tt2]*s).sum((1,2)) # (v,n1)
                 sfull[tt1] = sfull[tt1]+s
         sfull = self.npt.hstack(sfull) # (v,self.n1*self.t1) since each element of sfull is (v,self.n1)
         return sfull[0,:] if yogndim==1 else sfull.T
@@ -227,7 +234,6 @@ class _FastGramMatrix(_GramMatrix):
         if yogndim==1: y = y[:,None]
         assert y.ndim==2 and y.shape[0]==(self.n1*self.t1)
         v = y.shape[1] # y is (t1*n1,v)
-        y = y/self.kernel_obj.scale
         y = y.T # (v,t1*n1)
         if self.t1==1:
             if self.d_u1mu2>0:
