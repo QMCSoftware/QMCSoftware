@@ -45,7 +45,7 @@ class _FastGramMatrix(_GramMatrix):
     ...             gm_wide = gm.copy(max(n1//4,1),max(n2//2,1))
     ...             gm_wide._check()
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, _pregenerated_x__x):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, adaptive_noise, _pregenerated_x__x):
         super(_FastGramMatrix,self).__init__(kernel_obj,noise,lbeta1s,lbeta2s,lc1s,lc2s)
         self.n1 = n1 
         self.n2 = n2 
@@ -153,8 +153,16 @@ class _FastGramMatrix(_GramMatrix):
             ]
         super(_FastGramMatrix,self)._set_invertible_conds(invertible_conds)
         if self.invertible and self.noise>0:
-            for tt1 in range(self.t1):
-                self.lam[tt1,tt1][0,0,0,:] += self.noise # lam is (m1,m2,1,n1) = (1,1,1,n1)
+            if adaptive_noise:
+                assert (self.lbeta1s[0]==0.).all() and (self.lbeta1s[0].shape==(1,self.d)) and (self.lc1s_og[0]==1.).all() and (self.lc1s_og[0].shape==(1,))
+                trace0 = k1[0,0][0,0,0,0] 
+                for tt1 in range(self.t1):
+                    trace = k1[tt1,tt1][0,0,0,0] 
+                    trace_ratio = trace/trace0 
+                    self.lam[tt1,tt1][0,0,0,:] += self.noise*trace_ratio
+            else:
+                for tt1 in range(self.t1):
+                    self.lam[tt1,tt1][0,0,0,:] += self.noise # lam is (m1,m2,1,n1) = (1,1,1,n1)
     def _set__x1__x2(self):
         self._x1,self._x2 = self.clone(self._x),self.clone(self._x)
         self._x1[:,~self.u1] = 0.
@@ -285,7 +293,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
     """
     Fast Gram matrix operations using lattice points and shift invariant kernels 
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, _pregenerated_x__x=None):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
         """
         Args:
             dd_obj (Lattice): requires randomize='SHIFT' and order="NATURAL"
@@ -324,7 +332,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
             #     # custom torch implementations (theoretically faster, practically slower)
             self.ft = fftbr_torch
             self.ift = ifftbr_torch
-        super(FastGramMatrixLattice,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,_pregenerated_x__x)
+        super(FastGramMatrixLattice,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
         x = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max)
         return x,x
@@ -337,7 +345,7 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     """
     Fast Gram matrix operations using base 2 digital net points and digitally shift invariant kernels 
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, _pregenerated_x__x=None):
+    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
         """
         Args:
             dd_obj (DigitalNetB2): requires randomize='LMS_DS' and graycode=False
@@ -367,7 +375,7 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
             # custom torch implementations 
             self.ft = fwht_torch
             self.ift = fwht_torch
-        super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,_pregenerated_x__x)
+        super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
         xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True)
         xf = self._convert__x_to_x(xb)

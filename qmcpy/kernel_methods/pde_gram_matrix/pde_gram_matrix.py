@@ -37,7 +37,7 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> gmpde = PDEGramMatrix([xint,xb],kernel_gaussian,llbetas=llbetas,llcs=llcs)
     >>> gmpde._mult_check()
     """
-    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None, half_comp=False):
+    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None, half_comp=False, adaptive_noise=True):
         """
         Args:
             xs (DiscreteDisribution or list of numpy.ndarray or torch.Tensor): locations at which the regions are sampled 
@@ -77,12 +77,18 @@ class PDEGramMatrix(_PDEGramMatrix):
         super(PDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
         self.gms = np.empty((self.nr,self.nr),dtype=object)
         for i1,i2 in itertools.product(range(self.nr),range(self.nr)):
-            self.gms[i1,i2] = GramMatrix(self.xs[i1],self.xs[i2],self.kernel_obj,self.llbetas[i1],self.llbetas[i2],self.llcs[i1],self.llcs[i2],noise=0.)
+            self.gms[i1,i2] = GramMatrix(self.xs[i1],self.xs[i2],self.kernel_obj,self.llbetas[i1],self.llbetas[i2],self.llcs[i1],self.llcs[i2],noise,adaptive_noise)#noise=0.)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
         self.bs_cumsum = np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]
         self.bs_cumsum = self.bs_cumsum[:-1]
-        self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])+noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
+        self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])
+        # if adaptive_noise:
+        #     assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
+        #     print(self.gms[0,0].gm)
+        #     assert False
+        # else:
+        #     self.gm += noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
         self.n_cumsum = np.cumsum(self.ns)[:-1].tolist()
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve

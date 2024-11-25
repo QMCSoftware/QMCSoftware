@@ -26,7 +26,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
     >>> gmpde = FastPDEGramMatrix(lat_obj,kernel_si,ns=ns,us=us,llbetas=llbetas,llcs=llcs)
     >>> gmpde._mult_check()
     """
-    def __init__(self, dd_obj, kernel_obj, ns, us, llbetas, llcs, noise=1e-8):
+    def __init__(self, dd_obj, kernel_obj, ns, us, llbetas, llcs, noise=1e-8, adaptive_noise=True):
         """
         Args:
             dd_obj (Lattice or DigitalNetB2): the discrete distribution from which to sample points 
@@ -46,9 +46,9 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         assert self.ns.shape==(self.nr,) and (self.ns[1:]<=self.ns[0]).all()
         super(FastPDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
         if isinstance(dd_obj,Lattice):
-            gmii = FastGramMatrixLattice(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
+            gmii = FastGramMatrixLattice(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise,adaptive_noise=adaptive_noise)
         elif isinstance(dd_obj,DigitalNetB2):
-            gmii = FastGramMatrixDigitalNetB2(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise)
+            gmii = FastGramMatrixDigitalNetB2(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise,adaptive_noise=adaptive_noise)
         else:
             raise Exception("Invalid dd_obj") 
         self.gms = np.empty((self.nr,self.nr),dtype=object)
@@ -56,10 +56,10 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         gmii__x_x = gmii._x,gmii.x 
         gmiitype = type(gmii)
         for i in range(1,self.nr):
-            self.gms[0,i] = gmiitype(dd_obj,gmii.kernel_obj,gmii.n1,self.ns[i].item(),gmii.u1,self.us[i,:],gmii.lbeta1s,llbetas[i],gmii.lc1s_og,llcs[i],gmii.noise,gmii__x_x)
-            self.gms[i,0] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),gmii.n1,self.us[i,:],gmii.u1,llbetas[i],gmii.lbeta1s,llcs[i],gmii.lc1s_og,gmii.noise,gmii__x_x)
+            self.gms[0,i] = gmiitype(dd_obj,gmii.kernel_obj,gmii.n1,self.ns[i].item(),gmii.u1,self.us[i,:],gmii.lbeta1s,llbetas[i],gmii.lc1s_og,llcs[i],gmii.noise,adaptive_noise,gmii__x_x)
+            self.gms[i,0] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),gmii.n1,self.us[i,:],gmii.u1,llbetas[i],gmii.lbeta1s,llcs[i],gmii.lc1s_og,gmii.noise,adaptive_noise,gmii__x_x)
             for k in range(1,self.nr):
-                self.gms[i,k] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),self.ns[k].item(),self.us[i,:],self.us[k,:],llbetas[i],llbetas[k],llcs[i],llcs[k],gmii.noise,gmii__x_x)
+                self.gms[i,k] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),self.ns[k].item(),self.us[i,:],self.us[k,:],llbetas[i],llbetas[k],llcs[i],llcs[k],gmii.noise,adaptive_noise,gmii__x_x)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
         self.bs_cumsum = np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]

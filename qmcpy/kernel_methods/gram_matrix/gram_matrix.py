@@ -26,7 +26,7 @@ class GramMatrix(_GramMatrix):
     ...         gm = GramMatrix(x1,x2,kernel_obj,lbeta1s,lbeta2s)
     ...         gm._check()
     """
-    def __init__(self, x1, x2, kernel_obj, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8):
+    def __init__(self, x1, x2, kernel_obj, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True):
         """
         Args:
             x1 (np.ndarray or torch.Tensor): n1 left locations
@@ -37,6 +37,9 @@ class GramMatrix(_GramMatrix):
             c1s (list of either np.ndarray or torch.Tensor): list of length m1[l] vectors of derivative coefficients 
             c2s (list of either np.ndarray or torch.Tensor): list of length m2[l] vector of derivative coefficients
             noise (float): nugget term 
+            adaptive_noise (bool): if True, use the adative noise scheme described in Appendix A of 
+                Chen, Yifan, et al. "Solving and learning nonlinear PDEs with Gaussian processes." 
+                Journal of Computational Physics 447 (2021): 110668.
         """
         super(GramMatrix,self).__init__(kernel_obj,noise,lbeta1s,lbeta2s,lc1s,lc2s)
         self.x1,self.x2 = x1,x2
@@ -52,7 +55,13 @@ class GramMatrix(_GramMatrix):
             ]  
         super(GramMatrix,self)._set_invertible_conds(invertible_conds)
         if self.invertible and self.noise>0:
-            self.gm = self.gm+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
+            if adaptive_noise:
+                assert (self.lbeta1s[0]==0.).all() and (self.lbeta1s[0].shape==(1,self.d)) and (self.lc1s_og[0]==1.).all() and (self.lc1s_og[0].shape==(1,))
+                traces = self.gm.diagonal()[::self.n1]
+                trace_ratios = traces/traces[0]
+                self.gm += noise*self.npt.diag((self.npt.ones((self.n1,len(traces)))*trace_ratios).T.flatten())
+            else:
+                self.gm += self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
     def get_full_gram_matrix(self):
         return self.gm.copy()
     def get_new_left_full_gram_matrix(self, new_x, new_lbetas, new_lcs):
