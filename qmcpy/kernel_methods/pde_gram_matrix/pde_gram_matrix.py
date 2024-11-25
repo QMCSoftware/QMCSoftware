@@ -77,18 +77,37 @@ class PDEGramMatrix(_PDEGramMatrix):
         super(PDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
         self.gms = np.empty((self.nr,self.nr),dtype=object)
         for i1,i2 in itertools.product(range(self.nr),range(self.nr)):
-            self.gms[i1,i2] = GramMatrix(self.xs[i1],self.xs[i2],self.kernel_obj,self.llbetas[i1],self.llbetas[i2],self.llcs[i1],self.llcs[i2],noise,adaptive_noise)#noise=0.)
+            self.gms[i1,i2] = GramMatrix(self.xs[i1],self.xs[i2],self.kernel_obj,self.llbetas[i1],self.llbetas[i2],self.llcs[i1],self.llcs[i2],noise=0.,adaptive_noise=False)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
         self.bs_cumsum = np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]
         self.bs_cumsum = self.bs_cumsum[:-1]
-        self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])
-        # if adaptive_noise:
-        #     assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
-        #     print(self.gms[0,0].gm)
-        #     assert False
-        # else:
-        #     self.gm += noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
+        if adaptive_noise:
+            assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
+            full_traces = [[0. for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
+            trace_ratios = [[None for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
+            for i1 in range(self.nr):
+                ni1 = self.gms[i1,i1].n1
+                for tt1 in range(self.gms[i1,i1].t1):
+                    betas_i = llbetas[i1][tt1] 
+                    for i2 in range(self.nr):
+                        for tt2 in range(self.gms[i2,i2].t1):
+                            betas_j = llbetas[i2][tt2]
+                            if (betas_i==betas_j).all():
+                                cs_i = llcs[i1][tt1]
+                                cs_j = llcs[i2][tt2]
+                                assert (cs_i==cs_j).all()
+                                nj1 = self.gms[i2,i2].n1
+                                full_traces[i1][tt1] += nj1*self.gms[i2,i2].gm[tt2*nj1,tt2*nj1]
+                    trace_ratios[i1][tt1] = full_traces[i1][tt1]/full_traces[0][0]
+            for i in range(self.nr):
+                ni1 = self.gms[i,i].n1
+                self.gms[i,i].gm += noise*self.npt.diag((self.npt.ones((ni1,self.gms[i,i].t1))*trace_ratios[i]).T.flatten())
+                self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])
+        else:
+            assert all(self.gms[i,i].invertible for i in range(self.nr))
+            self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])
+            self.gm += noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
         self.n_cumsum = np.cumsum(self.ns)[:-1].tolist()
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve

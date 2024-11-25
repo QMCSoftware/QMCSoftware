@@ -152,12 +152,15 @@ class _FastGramMatrix(_GramMatrix):
             ( (self.t1==1 and self.t2==1 and self.noise==0) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
         super(_FastGramMatrix,self)._set_invertible_conds(invertible_conds)
-        if self.invertible and self.noise>0:
+        if self.invertible:
+            self.k00diags = self.npt.ones(self.t1) 
+            for tt1 in range(self.t1):
+                self.k00diags[tt1] = k1[tt1,tt1][0,0,0,0]
             if adaptive_noise:
                 assert (self.lbeta1s[0]==0.).all() and (self.lbeta1s[0].shape==(1,self.d)) and (self.lc1s_og[0]==1.).all() and (self.lc1s_og[0].shape==(1,))
-                trace0 = k1[0,0][0,0,0,0] 
+                trace0 = self.k00diags[0] 
                 for tt1 in range(self.t1):
-                    trace = k1[tt1,tt1][0,0,0,0] 
+                    trace = self.k00diags[tt1] 
                     trace_ratio = trace/trace0 
                     self.lam[tt1,tt1][0,0,0,:] += self.noise*trace_ratio
             else:

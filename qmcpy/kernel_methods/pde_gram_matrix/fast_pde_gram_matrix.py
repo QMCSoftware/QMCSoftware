@@ -46,9 +46,9 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         assert self.ns.shape==(self.nr,) and (self.ns[1:]<=self.ns[0]).all()
         super(FastPDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
         if isinstance(dd_obj,Lattice):
-            gmii = FastGramMatrixLattice(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise,adaptive_noise=adaptive_noise)
+            gmii = FastGramMatrixLattice(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise=0.,adaptive_noise=False)
         elif isinstance(dd_obj,DigitalNetB2):
-            gmii = FastGramMatrixDigitalNetB2(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise,adaptive_noise=adaptive_noise)
+            gmii = FastGramMatrixDigitalNetB2(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],llbetas[0],llbetas[0],llcs[0],llcs[0],noise=0.,adaptive_noise=False)
         else:
             raise Exception("Invalid dd_obj") 
         self.gms = np.empty((self.nr,self.nr),dtype=object)
@@ -56,10 +56,10 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         gmii__x_x = gmii._x,gmii.x 
         gmiitype = type(gmii)
         for i in range(1,self.nr):
-            self.gms[0,i] = gmiitype(dd_obj,gmii.kernel_obj,gmii.n1,self.ns[i].item(),gmii.u1,self.us[i,:],gmii.lbeta1s,llbetas[i],gmii.lc1s_og,llcs[i],gmii.noise,adaptive_noise,gmii__x_x)
-            self.gms[i,0] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),gmii.n1,self.us[i,:],gmii.u1,llbetas[i],gmii.lbeta1s,llcs[i],gmii.lc1s_og,gmii.noise,adaptive_noise,gmii__x_x)
+            self.gms[0,i] = gmiitype(dd_obj,gmii.kernel_obj,gmii.n1,self.ns[i].item(),gmii.u1,self.us[i,:],gmii.lbeta1s,llbetas[i],gmii.lc1s_og,llcs[i],0.,False,gmii__x_x)
+            self.gms[i,0] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),gmii.n1,self.us[i,:],gmii.u1,llbetas[i],gmii.lbeta1s,llcs[i],gmii.lc1s_og,0.,False,gmii__x_x)
             for k in range(1,self.nr):
-                self.gms[i,k] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),self.ns[k].item(),self.us[i,:],self.us[k,:],llbetas[i],llbetas[k],llcs[i],llcs[k],gmii.noise,adaptive_noise,gmii__x_x)
+                self.gms[i,k] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),self.ns[k].item(),self.us[i,:],self.us[k,:],llbetas[i],llbetas[k],llcs[i],llcs[k],0.,False,gmii__x_x)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
         self.bs_cumsum = np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]
@@ -67,6 +67,31 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         self.n_cumsum = np.cumsum(self.ns)[:-1].tolist()
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve
+        if adaptive_noise:
+            assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
+            full_traces = [[0. for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
+            trace_ratios = [[None for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
+            for i1 in range(self.nr):
+                for tt1 in range(self.gms[i1,i1].t1):
+                    betas_i = llbetas[i1][tt1] 
+                    for i2 in range(self.nr):
+                        for tt2 in range(self.gms[i2,i2].t1):
+                            betas_j = llbetas[i2][tt2]
+                            if (betas_i==betas_j).all():
+                                cs_i = llcs[i1][tt1]
+                                cs_j = llcs[i2][tt2]
+                                assert (cs_i==cs_j).all()
+                                nj1 = self.gms[i2,i2].n1
+                                full_traces[i1][tt1] += nj1*self.gms[i2,i2].k00diags[tt2]
+                    trace_ratios[i1][tt1] = full_traces[i1][tt1]/full_traces[0][0]
+            for i in range(self.nr):
+                for tt in range(self.gms[i,i].t1):
+                    self.gms[i,i].lam[tt,tt][0,0,0,:] += noise*trace_ratios[i][tt]
+        else: 
+            assert all(self.gms[i,i].invertible for i in range(self.nr))
+            for i in range(self.nr):
+                for tt1 in range(self.gms[i,i].t1):
+                    self.gms[i,i].lam[tt1,tt1][0,0,0,:] += noise
     def precond_solve(self, y):
         yogndim = y.ndim
         assert yogndim<=2 

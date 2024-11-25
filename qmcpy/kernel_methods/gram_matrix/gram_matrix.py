@@ -54,7 +54,7 @@ class GramMatrix(_GramMatrix):
             ( self.t1==self.t2 and all((self.lbeta1s[tt1]==self.lbeta2s[tt1]).all() and (self.lc1s[tt1]==self.lc2s[tt1]).all() for tt1 in range(self.t1)), "require lbeta1s=lbeta2s and lc1s=lc2s"),
             ]  
         super(GramMatrix,self)._set_invertible_conds(invertible_conds)
-        if self.invertible and self.noise>0:
+        if self.invertible:
             if adaptive_noise:
                 assert (self.lbeta1s[0]==0.).all() and (self.lbeta1s[0].shape==(1,self.d)) and (self.lc1s_og[0]==1.).all() and (self.lc1s_og[0].shape==(1,))
                 traces = self.gm.diagonal()[::self.n1]
