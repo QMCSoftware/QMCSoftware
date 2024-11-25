@@ -104,12 +104,20 @@ class _PDEGramMatrix(object):
                 t3 = mult_Fp(t2)
                 t4 = t3+relaxation*gamma
                 return t4
+            if pcg_precond is False:
+                pcg_precond_func = False
+            else:
+                def pcg_precond_func(gamma):
+                    t1 = mult_tFp(gamma) 
+                    t2 = pcg_precond(t1)
+                    t3 = mult_Fp(t2) 
+                    return t3
             Fpz = mult_Fp(z)
             diff = y-F+Fpz
-            gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
+            gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond_func,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
             tFpgamma = mult_tFp(gamma)
             z = self@tFpgamma
-            zt = torch.from_numpy(z).requires_grad_() if self.npt==np else z.requires_grad_()
+            zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()
             Ft = pde_lhs_wrap(zt) 
             F = Ft.detach().numpy() if self.npt==np else Ft.detach()
             losses[i+1] = self._loss(F,y)
