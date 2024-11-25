@@ -35,9 +35,8 @@ class _PDEGramMatrix(object):
         elif isinstance(precond,str):
             precond = getattr(self,precond)
         assert isinstance(ref_sol,bool)
-        if ref_sol is True: 
-            ref_sol = self._solve
-        return pcg(self.__matmul__,b,x0,rtol,atol,maxiter,precond_solve=precond,ref_solver=ref_sol,npt=self.npt,ckwargs=self.ckwargs)
+        ref_sol = self._solve(b) if ref_sol else None
+        return pcg(self.__matmul__,b,x0,rtol,atol,maxiter,precond_solve=precond,ref_sol=ref_sol,npt=self.npt,ckwargs=self.ckwargs)
     def _solve(self, y):
         if not hasattr(self,"l_chol"): 
             self._init_invertibile()
