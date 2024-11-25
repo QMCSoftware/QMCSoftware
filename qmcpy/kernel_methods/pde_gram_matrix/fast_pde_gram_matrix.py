@@ -70,7 +70,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         if adaptive_noise:
             assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
             full_traces = [[0. for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
-            trace_ratios = [[None for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
+            self.trace_ratios = [self.npt.zeros(self.gms[i1,i1].t1) for i1 in range(self.nr)]
             for i1 in range(self.nr):
                 for tt1 in range(self.gms[i1,i1].t1):
                     betas_i = llbetas[i1][tt1] 
@@ -83,10 +83,10 @@ class FastPDEGramMatrix(_PDEGramMatrix):
                                 assert (cs_i==cs_j).all()
                                 nj1 = self.gms[i2,i2].n1
                                 full_traces[i1][tt1] += nj1*self.gms[i2,i2].k00diags[tt2]
-                    trace_ratios[i1][tt1] = full_traces[i1][tt1]/full_traces[0][0]
+                    self.trace_ratios[i1][tt1] = full_traces[i1][tt1]/full_traces[0][0]
             for i in range(self.nr):
                 for tt in range(self.gms[i,i].t1):
-                    self.gms[i,i].lam[tt,tt][0,0,0,:] += noise*trace_ratios[i][tt]
+                    self.gms[i,i].lam[tt,tt][0,0,0,:] += noise*self.trace_ratios[i][tt]
         else: 
             assert all(self.gms[i,i].invertible for i in range(self.nr))
             for i in range(self.nr):

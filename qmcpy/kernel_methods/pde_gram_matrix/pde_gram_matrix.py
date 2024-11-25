@@ -85,7 +85,7 @@ class PDEGramMatrix(_PDEGramMatrix):
         if adaptive_noise:
             assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
             full_traces = [[0. for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
-            trace_ratios = [[None for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
+            self.trace_ratios = [self.npt.zeros(self.gms[i1,i1].t1) for i1 in range(self.nr)]
             for i1 in range(self.nr):
                 ni1 = self.gms[i1,i1].n1
                 for tt1 in range(self.gms[i1,i1].t1):
@@ -99,10 +99,10 @@ class PDEGramMatrix(_PDEGramMatrix):
                                 assert (cs_i==cs_j).all()
                                 nj1 = self.gms[i2,i2].n1
                                 full_traces[i1][tt1] += nj1*self.gms[i2,i2].gm[tt2*nj1,tt2*nj1]
-                    trace_ratios[i1][tt1] = full_traces[i1][tt1]/full_traces[0][0]
+                    self.trace_ratios[i1][tt1] = full_traces[i1][tt1]/full_traces[0][0]
             for i in range(self.nr):
                 ni1 = self.gms[i,i].n1
-                self.gms[i,i].gm += noise*self.npt.diag((self.npt.ones((ni1,self.gms[i,i].t1))*trace_ratios[i]).T.flatten())
+                self.gms[i,i].gm += noise*self.npt.diag((self.npt.ones((ni1,self.gms[i,i].t1))*self.trace_ratios[i]).T.flatten())
                 self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])
         else:
             assert all(self.gms[i,i].invertible for i in range(self.nr))
