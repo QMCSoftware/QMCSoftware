@@ -1,6 +1,7 @@
+import torch.linalg
+from ..util import pcg
 import numpy as np 
 import time 
-from ..util import pcg
 
 class _PDEGramMatrix(object):
     def __init__(self, kernel_obj, llbetas, llcs):
@@ -51,7 +52,7 @@ class _PDEGramMatrix(object):
         diff = y-F
         loss = self.npt.sqrt((diff**2).mean())
         return loss
-    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
+    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., pcg_flag=True, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
         def pde_lhs_wrap(z):
             zd = self.decompose(z)
             y_lhss = pde_lhs(*zd)
@@ -66,13 +67,17 @@ class _PDEGramMatrix(object):
         except: 
             raise Exception("gauss_newton_relaxed requires torch for automatic differentiation through pde_lhs")
         assert pcg_precond is True or pcg_precond is False or isinstance(pcg_precond,str) 
-        if pcg_precond is True:
-            pcg_precond = self.precond_solve
-        elif isinstance(pcg_precond,str):
-            pcg_precond = getattr(self,pcg_precond)
-        losses = self.npt.nan*self.npt.zeros(maxiter+1)
-        rbackward_norms = [None]*maxiter
-        times = [None]*maxiter
+        if pcg_flag:
+            if pcg_precond is True:
+                pcg_precond = self.precond_solve
+            elif isinstance(pcg_precond,str):
+                pcg_precond = getattr(self,pcg_precond)
+        else:
+            assert hasattr(self,"gm"), "require isinstance(self,PDEGramMatrix)"
+            Theta = torch.from_numpy(self.gm) if self.npt==np else self.gm 
+        losses = self.npt.nan*self.npt.ones(maxiter+1)
+        rbackward_norms = [self.npt.nan*self.npt.ones(1)]*maxiter
+        times = [self.npt.nan*self.npt.ones(1)]*maxiter
         if verbose: print("\t%-20s%-15s"%("iter (%d max)"%maxiter,"loss"))
         xs = self._get_xs()
         y = pde_rhs_wrap(xs) 
@@ -98,23 +103,29 @@ class _PDEGramMatrix(object):
                 ad = [Fpd[i]*bd[i] for i in range(self.nr)]
                 a = self.compose(ad) 
                 return a
-            def multiply(gamma):
-                t1 = mult_tFp(gamma) 
-                t2 = self@t1 
-                t3 = mult_Fp(t2)
-                t4 = t3+relaxation*gamma
-                return t4
-            if pcg_precond is False:
-                pcg_precond_func = False
-            else:
-                def pcg_precond_func(gamma):
-                    t1 = mult_tFp(gamma) 
-                    t2 = pcg_precond(t1)
-                    t3 = mult_Fp(t2) 
-                    return t3
             Fpz = mult_Fp(z)
             diff = y-F+Fpz
-            gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond_func,ref_solver=False, npt=self.npt, ckwargs=self.ckwargs)
+            if pcg_flag:
+                def multiply(gamma):
+                    t1 = mult_tFp(gamma) 
+                    t2 = self@t1 
+                    t3 = mult_Fp(t2)
+                    t4 = t3+relaxation*gamma
+                    return t4
+                if pcg_precond is False:
+                    pcg_precond_func = False
+                else:
+                    def pcg_precond_func(gamma):
+                        t1 = mult_tFp(gamma) 
+                        t2 = pcg_precond(t1)
+                        t3 = mult_Fp(t2) 
+                        return t3
+                gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond_func,ref_sol=None,npt=self.npt,ckwargs=self.ckwargs)
+            else:
+                Fpmat = torch.vstack([mult_tFp(ei) for ei in torch.eye(len(diff))])
+                Theta_red = Fpmat@Theta@Fpmat.T 
+                L_chol = torch.linalg.cholesky(Theta_red)
+                gamma = torch.cholesky_solve(diff[:,None],L_chol)[:,0]
             tFpgamma = mult_tFp(gamma)
             z = self@tFpgamma
             zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()
