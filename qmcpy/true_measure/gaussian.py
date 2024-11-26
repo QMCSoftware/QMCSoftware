@@ -69,7 +69,7 @@ class Gaussian(TrueMeasure):
             self.a = cholesky(self.sigma) #Fred changed this
         else:
             raise ParameterError("decomp_type should be 'PCA' or 'Cholesky'") 
-        self.mvn_scipy = multivariate_normal(mean=self.mu,cov=self.sigma)
+        self.mvn_scipy = multivariate_normal(mean=self.mu,cov=self.sigma, allow_singular=True)
 
     def _transform(self, x):
         return self.mu + norm.ppf(x)@self.a.T
