@@ -1,6 +1,8 @@
 from .util import (
     bernoulli_poly,
-    weighted_walsh_funcs)
+    weighted_walsh_funcs,
+    ppchol,
+    solve_ppchol)
 from .fast_transforms import (
     fftbr,ifftbr,fwht
 )
