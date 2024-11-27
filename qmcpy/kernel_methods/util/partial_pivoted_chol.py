@@ -1,7 +1,7 @@
 import numpy as np 
 import scipy.linalg
 
-def ppchol(A, rank=None, rtol=0., atol=0., return_pivots=False):
+def ppchol(A, rank=None, rtol=1e-6, atol=0., return_pivots=False):
     """
     Partial pivoted Cholesky decomposition 
     https://www.sciencedirect.com/science/article/abs/pii/S0168927411001814
@@ -75,7 +75,7 @@ def solve_ppchol(b, Lk, pL, ddiag):
     >>> Lnoisy = np.linalg.cholesky(An)
     >>> b = rng.uniform(size=(n,))
     >>> x = scipy.linalg.cho_solve((Lnoisy,True),b)
-    >>> Lk = ppchol(A)
+    >>> Lk = ppchol(A,rank=n,rtol=0.,atol=0.)
     >>> k = Lk.shape[1]
     >>> pL = np.linalg.cholesky(np.eye(k)+(Lk.T/ddiag)@Lk)
     >>> xhat = solve_ppchol(b,Lk,pL,ddiag)

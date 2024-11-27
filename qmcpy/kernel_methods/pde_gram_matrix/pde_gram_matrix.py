@@ -113,14 +113,6 @@ class PDEGramMatrix(_PDEGramMatrix):
         self.cho_solve = self.gms[0,0].cho_solve
     def _set_diag(self):
         self.gm_diag = self.gm.diagonal()[:,None]
-    def precond_solve(self, y):
-        if not hasattr(self,"gm_diag"): self._set_diag()
-        yogndim = y.ndim
-        assert yogndim<=2 
-        if yogndim==1: y = y[:,None] # (l,v)
-        assert y.ndim==2 and y.shape[0]==(self.length)
-        s = y/self.gm_diag
-        return s[:,0] if yogndim==1 else s
     def __matmul__(self, y):
         return self.gm@y
     def get_full_gram_matrix(self):
@@ -129,9 +121,6 @@ class PDEGramMatrix(_PDEGramMatrix):
         self.l_chol = self.cholesky(self.gm)
     def condition_number(self):
         return self.npt.linalg.cond(self.gm)
-    def precond_condition_number(self):
-        pgm = self.precond_solve(self.gm)
-        return self.npt.linalg.cond(pgm)
     def _get_xs(self):
         return self.xs.copy()
     

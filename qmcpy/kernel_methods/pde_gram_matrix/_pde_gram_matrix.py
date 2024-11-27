@@ -1,5 +1,5 @@
 import torch.linalg
-from ..util import pcg
+from ..util import pcg,ppchol,solve_ppchol
 import numpy as np 
 import time 
 
@@ -51,7 +51,7 @@ class _PDEGramMatrix(object):
         diff = y-F
         loss = self.npt.sqrt((diff**2).mean())
         return loss
-    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., pcg_flag=True, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_precond=False, verbose=True):
+    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., solver="CHOL", kwargs_pcg={}, kwargs_ppchol={}, verbose=1):
         def pde_lhs_wrap(z):
             zd = self.decompose(z)
             y_lhss = pde_lhs(*zd)
@@ -65,13 +65,15 @@ class _PDEGramMatrix(object):
             import torch
         except: 
             raise Exception("gauss_newton_relaxed requires torch for automatic differentiation through pde_lhs")
-        assert pcg_precond is True or pcg_precond is False or isinstance(pcg_precond,str) 
-        if pcg_flag:
-            if pcg_precond is True:
-                pcg_precond = self.precond_solve
-            elif isinstance(pcg_precond,str):
-                pcg_precond = getattr(self,pcg_precond)
-        else:
+        assert isinstance(solver,str)
+        solver = solver.upper() 
+        assert solver in ["CHOL","CG","PCG-JACOBI","PCG-PPCHOL","PCG-FPDE"]
+        if solver=="CG":
+            if hasattr(self,"gm"): # isinstance(self,PDEGramMatrix
+                solver = "CG_PDE"
+            else:
+                solver = "CG_FPDE"
+        if solver in ["CHOL","CG_PDE","PCG-JACOBI","PCG-PPCHOL"]:
             assert hasattr(self,"gm"), "require isinstance(self,PDEGramMatrix)"
             Theta = torch.from_numpy(self.gm) if self.npt==np else self.gm 
         losses = self.npt.nan*self.npt.ones(maxiter+1)
@@ -104,27 +106,52 @@ class _PDEGramMatrix(object):
                 return a
             Fpz = mult_Fp(z)
             diff = y-F+Fpz
-            if pcg_flag:
+            if solver in ["CHOL","CG_PDE","PCG-JACOBI","PCG-PPCHOL"]:
+                Fpmat = torch.vstack([mult_tFp(ei) for ei in torch.eye(len(diff))])
+                Theta_red = Fpmat@Theta@Fpmat.T 
+                def multiply(gamma):
+                    return Theta_red@gamma+relaxation*gamma 
+            else: # solver in ["CG_FPDE","PCG-FPDE"]
                 def multiply(gamma):
                     t1 = mult_tFp(gamma) 
                     t2 = self@t1 
                     t3 = mult_Fp(t2)
                     t4 = t3+relaxation*gamma
                     return t4
-                if pcg_precond is False:
-                    pcg_precond_func = False
-                else:
-                    def pcg_precond_func(gamma):
-                        t1 = mult_tFp(gamma) 
-                        t2 = pcg_precond(t1)
-                        t3 = mult_Fp(t2) 
-                        return t3
-                gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,x0=None,rtol=pcg_rtol,atol=pcg_atol,maxiter=pcg_maxiter,precond_solve=pcg_precond_func,ref_sol=None,npt=self.npt,ckwargs=self.ckwargs)
-            else:
-                Fpmat = torch.vstack([mult_tFp(ei) for ei in torch.eye(len(diff))])
-                Theta_red = Fpmat@Theta@Fpmat.T 
+            if solver=="CHOL":
                 L_chol = torch.linalg.cholesky(Theta_red)
                 gamma = torch.cholesky_solve(diff[:,None],L_chol)[:,0]
+            else: # (P)CG
+                if solver in ["CG_PDE","CG_FPDE"]:
+                    precond_solve = False
+                elif solver=="PCG-JACOBI":
+                    ddiag = Theta_red.diagonal()
+                    def precond_solve(gamma):
+                        n = len(gamma)
+                        x = gamma.reshape((n,-1))/ddiag[:,None]
+                        return x.reshape(gamma.shape)
+                elif solver=="PCG-PPCHOL":
+                    ddiag = 1e-8*self.npt.ones_like(Theta_red.diagonal())
+                    Lk = ppchol(Theta_red-self.npt.diag(ddiag),return_pivots=False,**kwargs_ppchol)
+                    k = Lk.size(1)
+                    pL = torch.linalg.cholesky(torch.eye(k,dtype=float)+(Lk.T/ddiag)@Lk)
+                    def precond_solve(gamma):
+                        return solve_ppchol(gamma,Lk,pL,ddiag)
+                elif solver=="PCG-FPDE":
+                    def precond_solve(gamma):
+                        t1 = mult_tFp(gamma) 
+                        t2 = self.precond_solve(t1)
+                        t3 = mult_Fp(t2) 
+                        return t3
+                else:
+                    assert False, "solver parsing error"
+                if verbose>1:
+                    pmat = precond_solve(Theta_red)
+                    cond_Theta_red = torch.linalg.cond(Theta_red)
+                    cond_pmat = torch.linalg.cond(pmat) 
+                    print("\t\tLk.shape = %-15s K(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(tuple(Lk.shape),cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
+                    
+                gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,precond_solve=precond_solve,ref_sol=None,npt=self.npt,ckwargs=self.ckwargs,**kwargs_pcg)
             tFpgamma = mult_tFp(gamma)
             z = self@tFpgamma
             zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()
