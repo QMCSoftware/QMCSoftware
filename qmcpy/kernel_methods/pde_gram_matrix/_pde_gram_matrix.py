@@ -130,6 +130,11 @@ class _PDEGramMatrix(object):
                         n = len(gamma)
                         x = gamma.reshape((n,-1))/ddiag[:,None]
                         return x.reshape(gamma.shape)
+                    if verbose>1:
+                        pmat = precond_solve(Theta_red)
+                        cond_Theta_red = torch.linalg.cond(Theta_red)
+                        cond_pmat = torch.linalg.cond(pmat) 
+                        print("\t\tK(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
                 elif solver=="PCG-PPCHOL":
                     ddiag = 1e-8*self.npt.ones_like(Theta_red.diagonal())
                     Lk = ppchol(Theta_red-self.npt.diag(ddiag),return_pivots=False,**kwargs_ppchol)
@@ -137,6 +142,11 @@ class _PDEGramMatrix(object):
                     pL = torch.linalg.cholesky(torch.eye(k,dtype=float)+(Lk.T/ddiag)@Lk)
                     def precond_solve(gamma):
                         return solve_ppchol(gamma,Lk,pL,ddiag)
+                    if verbose>1:
+                        pmat = precond_solve(Theta_red)
+                        cond_Theta_red = torch.linalg.cond(Theta_red)
+                        cond_pmat = torch.linalg.cond(pmat) 
+                        print("\t\tLk.shape = %-15s K(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(tuple(Lk.shape),cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
                 elif solver=="PCG-FPDE":
                     def precond_solve(gamma):
                         t1 = mult_tFp(gamma) 
@@ -144,13 +154,7 @@ class _PDEGramMatrix(object):
                         t3 = mult_Fp(t2) 
                         return t3
                 else:
-                    assert False, "solver parsing error"
-                if verbose>1:
-                    pmat = precond_solve(Theta_red)
-                    cond_Theta_red = torch.linalg.cond(Theta_red)
-                    cond_pmat = torch.linalg.cond(pmat) 
-                    print("\t\tLk.shape = %-15s K(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(tuple(Lk.shape),cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
-                    
+                    assert False, "solver parsing error"                    
                 gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,precond_solve=precond_solve,ref_sol=None,npt=self.npt,ckwargs=self.ckwargs,**kwargs_pcg)
             tFpgamma = mult_tFp(gamma)
             z = self@tFpgamma
