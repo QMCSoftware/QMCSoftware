@@ -192,7 +192,7 @@ class _FastGramMatrix(_GramMatrix):
         if self.invertible and self.noise>0:
             gm = gm+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
         return gm
-    def get_new_left_full_gram_matrix(self, new_x, new_lbetas, new_lcs):
+    def get_new_left_full_gram_matrix(self, new_x, new_lbetas=0, new_lcs=1.):
         new__x = self._convert_x_to__x(new_x)
         if not hasattr(self,"_x1"): self._set__x1__x2()
         new_lbetas,new_lcs,new_t,new_m = self._parse_lbetas_lcs(new_lbetas,new_lcs)

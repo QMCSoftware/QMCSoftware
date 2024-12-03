@@ -1,7 +1,7 @@
 import numpy as np 
 import scipy.linalg
 
-def ppchol(A, rank=None, rtol=1e-6, atol=0., return_pivots=False):
+def ppchol(A, rank=None, rtol=1e-8, atol=0., return_pivots=False):
     """
     Partial pivoted Cholesky decomposition 
     https://www.sciencedirect.com/science/article/abs/pii/S0168927411001814

@@ -1,4 +1,5 @@
 from ._pde_gram_matrix import _PDEGramMatrix
+from ..util import ppchol,solve_ppchol
 from ...discrete_distribution import IIDStdUniform
 from ...discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..kernel import KernelGaussian
@@ -37,7 +38,7 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> gmpde = PDEGramMatrix([xint,xb],kernel_gaussian,llbetas=llbetas,llcs=llcs)
     >>> gmpde._mult_check()
     """
-    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None, half_comp=False, adaptive_noise=True):
+    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None, half_comp=True, adaptive_noise=True):
         """
         Args:
             xs (DiscreteDisribution or list of numpy.ndarray or torch.Tensor): locations at which the regions are sampled 
@@ -66,8 +67,8 @@ class PDEGramMatrix(_PDEGramMatrix):
             for i,u in enumerate(us):
                 if half_comp:
                     nhalf = ns[i]//2
-                    xs[i][:nhalf,~u] = 0. 
-                    xs[i][nhalf:,~u] = 1.
+                    xs[i][:nhalf,~u] = 1. 
+                    xs[i][nhalf:,~u] = 0.
                 else:
                     xs[i][:,~u] = 0.
         assert isinstance(xs,list)
@@ -111,6 +112,14 @@ class PDEGramMatrix(_PDEGramMatrix):
         self.n_cumsum = np.cumsum(self.ns)[:-1].tolist()
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve
+    def _init_precond_solve(self):
+        if not hasattr(self,"ddiag"):
+            self.ddiag = 1e-8*self.npt.ones_like(self.gm.diagonal())
+            self.Lk = ppchol(self.gm-self.npt.diag(self.ddiag),return_pivots=False)
+            k = self.Lk.size(1)
+            self.pL = self.npt.linalg.cholesky(self.npt.eye(k,dtype=float)+(self.Lk.T/self.ddiag)@self.Lk)
+    def precond_solve(self, y):
+        return solve_ppchol(y,self.Lk,self.pL,self.ddiag)
     def _set_diag(self):
         self.gm_diag = self.gm.diagonal()[:,None]
     def __matmul__(self, y):
@@ -121,6 +130,7 @@ class PDEGramMatrix(_PDEGramMatrix):
         self.l_chol = self.cholesky(self.gm)
     def condition_number(self):
         return self.npt.linalg.cond(self.gm)
-    def _get_xs(self):
-        return self.xs
+    def get_xs(self):
+        return [self.gms[0,0].clone(x) for x in self.xs]
+    
     

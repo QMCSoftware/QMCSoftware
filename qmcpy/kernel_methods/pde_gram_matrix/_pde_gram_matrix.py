@@ -15,7 +15,7 @@ class _PDEGramMatrix(object):
         nr = len(llbetas)
         assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==nr
         return llbetas,llcs,nr
-    def get_new_left_full_gram_matrix(self, new_x, new_lbetas, new_lcs):
+    def get_new_left_full_gram_matrix(self, new_x, new_lbetas=0, new_lcs=1.):
         gms = [None]*self.nr
         for i in range(self.nr):
             gms[i] = self.gms[i,0].get_new_left_full_gram_matrix(new_x,new_lbetas,new_lcs)
@@ -28,12 +28,13 @@ class _PDEGramMatrix(object):
         assert np.allclose(self@y,gmatfull@y,atol=1e-12)
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
+    def _init_precond_solve(self):
+        pass
     def pcg(self, b, x0=None, rtol=1e-8, atol=0., maxiter=None, precond=False, ref_sol=False):
         assert precond is True or precond is False or isinstance(precond,str) 
         if precond is True:
+            self._init_precond_solve()
             precond = self.precond_solve
-        elif isinstance(precond,str):
-            precond = getattr(self,precond)
         assert isinstance(ref_sol,bool)
         ref_sol = self._solve(b) if ref_sol else None
         return pcg(self.__matmul__,b,x0,rtol,atol,maxiter,precond_solve=precond,ref_sol=ref_sol,npt=self.npt,ckwargs=self.ckwargs)

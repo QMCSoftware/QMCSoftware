@@ -131,6 +131,6 @@ class FastPDEGramMatrix(_PDEGramMatrix):
             if not hasattr(self.gms[i,0],"_x1"): self.gms[i,0]._set__x1__x2()
             _xs[i] = self.gms[i,0].clone(self.gms[i,0]._x1)
         return _xs
-    def _get_xs(self):
+    def get_xs(self):
         return [self.gms[i,0]._convert__x_to_x(_x) for i,_x in enumerate(self._get__xs())]
       

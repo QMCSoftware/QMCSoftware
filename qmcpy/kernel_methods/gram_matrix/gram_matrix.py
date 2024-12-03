@@ -64,7 +64,7 @@ class GramMatrix(_GramMatrix):
                 self.gm += self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
     def get_full_gram_matrix(self):
         return self.gm.copy()
-    def get_new_left_full_gram_matrix(self, new_x, new_lbetas, new_lcs):
+    def get_new_left_full_gram_matrix(self, new_x, new_lbetas=0, new_lcs=1.):
         new_lbetas,new_lcs,new_t,new_m = self._parse_lbetas_lcs(new_lbetas,new_lcs)
         gm = self._construct_full_gram_matrix(self.x1,new_x,self.t1,new_t,self.lbeta1s,new_lbetas,self.lc1s_og,new_lcs).T
         return gm
