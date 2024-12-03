@@ -67,15 +67,10 @@ class _PDEGramMatrix(object):
             raise Exception("gauss_newton_relaxed requires torch for automatic differentiation through pde_lhs")
         assert isinstance(solver,str)
         solver = solver.upper() 
-        assert solver in ["CHOL","CG","PCG-JACOBI","PCG-PPCHOL","PCG-FPDE"]
-        if solver=="CG":
-            if hasattr(self,"gm"): # isinstance(self,PDEGramMatrix
-                solver = "CG_PDE"
-            else:
-                solver = "CG_FPDE"
-        if solver in ["CHOL","CG_PDE","PCG-JACOBI","PCG-PPCHOL"]:
-            assert hasattr(self,"gm"), "require isinstance(self,PDEGramMatrix)"
-            Theta = torch.from_numpy(self.gm) if self.npt==np else self.gm 
+        assert solver in ["CHOL","CG","PCG-PPCHOL"]
+        fast_flag = not hasattr(self,"gm") # isinstance(self,FastPDEGramMatrix)
+        gm = self.get_full_gram_matrix()
+        Theta = torch.from_numpy(gm) if self.npt==np else gm 
         losses = self.npt.nan*self.npt.ones(maxiter+1)
         rbackward_norms = [self.npt.nan*self.npt.ones(1)]*maxiter
         times = [self.npt.nan*self.npt.ones(1)]*maxiter
@@ -94,47 +89,36 @@ class _PDEGramMatrix(object):
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
             Fp = Fpt.detach().numpy() if self.npt==np else Fpt.detach()
             Fpd = self.decompose(Fp)
-            def mult_Fp(a):
+            def mult_Fp(a, Fpd=Fpd):
                 ad = self.decompose(a) 
                 bd = [(Fpd[i]*ad[i]).sum(0) for i in range(self.nr)]
                 b = self.compose(bd) 
                 return b
-            def mult_tFp(b):
+            def mult_tFp(b, Fpd=Fpd):
                 bd = self.decompose_eqns(b) 
                 ad = [Fpd[i]*bd[i] for i in range(self.nr)]
                 a = self.compose(ad) 
                 return a
             Fpz = mult_Fp(z)
             diff = y-F+Fpz
-            if solver in ["CHOL","CG_PDE","PCG-JACOBI","PCG-PPCHOL"]:
-                Fpmat = torch.vstack([mult_tFp(ei) for ei in torch.eye(len(diff))])
-                Theta_red = Fpmat@Theta@Fpmat.T 
-                def multiply(gamma):
-                    return Theta_red@gamma+relaxation*gamma 
-            else: # solver in ["CG_FPDE","PCG-FPDE"]
+            Fpmat = torch.vstack([mult_tFp(ei) for ei in torch.eye(len(diff))])
+            Theta_red = Fpmat@Theta@Fpmat.T
+            if fast_flag:
                 def multiply(gamma):
                     t1 = mult_tFp(gamma) 
                     t2 = self@t1 
                     t3 = mult_Fp(t2)
                     t4 = t3+relaxation*gamma
                     return t4
+            else:
+                def multiply(gamma):
+                    return Theta_red@gamma+relaxation*gamma 
             if solver=="CHOL":
                 L_chol = torch.linalg.cholesky(Theta_red)
                 gamma = torch.cholesky_solve(diff[:,None],L_chol)[:,0]
             else: # (P)CG
-                if solver in ["CG_PDE","CG_FPDE"]:
+                if solver=="CG":
                     precond_solve = False
-                elif solver=="PCG-JACOBI":
-                    ddiag = Theta_red.diagonal()
-                    def precond_solve(gamma):
-                        n = len(gamma)
-                        x = gamma.reshape((n,-1))/ddiag[:,None]
-                        return x.reshape(gamma.shape)
-                    if verbose>1:
-                        pmat = precond_solve(Theta_red)
-                        cond_Theta_red = torch.linalg.cond(Theta_red)
-                        cond_pmat = torch.linalg.cond(pmat) 
-                        print("\t\tK(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
                 elif solver=="PCG-PPCHOL":
                     ddiag = 1e-8*self.npt.ones_like(Theta_red.diagonal())
                     Lk = ppchol(Theta_red-self.npt.diag(ddiag),return_pivots=False,**kwargs_ppchol)
@@ -147,12 +131,6 @@ class _PDEGramMatrix(object):
                         cond_Theta_red = torch.linalg.cond(Theta_red)
                         cond_pmat = torch.linalg.cond(pmat) 
                         print("\t\tLk.shape = %-15s K(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(tuple(Lk.shape),cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
-                elif solver=="PCG-FPDE":
-                    def precond_solve(gamma):
-                        t1 = mult_tFp(gamma) 
-                        t2 = self.precond_solve(t1)
-                        t3 = mult_Fp(t2) 
-                        return t3
                 else:
                     assert False, "solver parsing error"                    
                 gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,precond_solve=precond_solve,ref_sol=None,npt=self.npt,ckwargs=self.ckwargs,**kwargs_pcg)

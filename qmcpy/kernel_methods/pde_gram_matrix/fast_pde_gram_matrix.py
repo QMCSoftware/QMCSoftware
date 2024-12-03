@@ -70,7 +70,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         if adaptive_noise:
             assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
             full_traces = [[0. for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
-            self.trace_ratios = [self.npt.zeros(self.gms[i1,i1].t1) for i1 in range(self.nr)]
+            self.trace_ratios = [self.npt.zeros(self.gms[i1,i1].t1,dtype=float) for i1 in range(self.nr)]
             for i1 in range(self.nr):
                 for tt1 in range(self.gms[i1,i1].t1):
                     betas_i = llbetas[i1][tt1] 
@@ -114,7 +114,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         s = self.npt.vstack(ssplit) 
         return s[:,0] if yogndim==1 else s
     def get_full_gram_matrix(self):
-        return self.npt.vstack([self.npt.hstack([self.gms[i,k].get_full_gram_matrix() for k in range(self.nr)]) for i in range(self.nr)])
+        return self@self.npt.eye(self.length,dtype=float)
     def _init_invertibile(self):
         gm = self.get_full_gram_matrix()
         self.l_chol = self.cholesky(gm)

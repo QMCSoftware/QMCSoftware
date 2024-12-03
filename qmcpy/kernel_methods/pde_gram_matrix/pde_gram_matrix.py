@@ -116,11 +116,11 @@ class PDEGramMatrix(_PDEGramMatrix):
     def __matmul__(self, y):
         return self.gm@y
     def get_full_gram_matrix(self):
-        return self.gm.copy()
+        return self.gm
     def _init_invertibile(self):
         self.l_chol = self.cholesky(self.gm)
     def condition_number(self):
         return self.npt.linalg.cond(self.gm)
     def _get_xs(self):
-        return self.xs.copy()
+        return self.xs
     
