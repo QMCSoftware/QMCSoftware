@@ -1,4 +1,5 @@
 import torch.linalg
+import scipy.linalg
 from ..util import pcg,ppchol,solve_ppchol
 import numpy as np 
 import time 
@@ -43,16 +44,31 @@ class _PDEGramMatrix(object):
             self._init_invertibile()
         return self.cho_solve(self.l_chol,y)
     def decompose(self, z):
-        return [zs.reshape((self.gms[i,0].t1,-1)) for i,zs in enumerate(np.split(z,self.bs_cumsum))]
+        ndim = z.ndim 
+        assert ndim==1 or ndim==2
+        zsplit = np.split(z,self.bs_cumsum)
+        if ndim==1:
+            return [zs.reshape((self.gms[i,0].t1,-1)) for i,zs in enumerate(zsplit)]
+        else:
+            m = z.shape[1]
+            return [zs.reshape((self.gms[i,0].t1,-1,m)) for i,zs in enumerate(zsplit)]
     def compose(self, lzs):
-        return self.npt.hstack([zs.flatten() for zs in lzs])
+        ndim = lzs[0].ndim
+        assert ndim==1 or ndim==2
+        if ndim==1:
+            return self.npt.hstack([zs.flatten() for zs in lzs])
+        else:
+            return self.npt.vstack([zs.flatten() for zs in lzs])
     def decompose_eqns(self, z):
         return np.split(z,self.n_cumsum)
     def _loss(self, F, y):
         diff = y-F
         loss = self.npt.sqrt((diff**2).mean())
         return loss
-    def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., solver="CHOL", kwargs_pcg={}, kwargs_ppchol={}, verbose=1):
+    def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., solver="CHOL", verbose=1,
+            pcg_x0=None, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_beta_method=None,
+            ppchol_rank=None, ppchol_rtol=None, ppchol_atol=None,
+            bands = 2):
         def pde_lhs_wrap(z):
             zd = self.decompose(z)
             y_lhss = pde_lhs(*zd)
@@ -68,10 +84,8 @@ class _PDEGramMatrix(object):
             raise Exception("pde_opt_gauss_newton requires torch for automatic differentiation through pde_lhs")
         assert isinstance(solver,str)
         solver = solver.upper() 
-        assert solver in ["CHOL","CG","PCG-PPCHOL"]
+        assert solver in ["CHOL","CG","PCG-PPCHOL","PCG-JACOBI","PCG-BLOCKED"]
         fast_flag = not hasattr(self,"gm") # isinstance(self,FastPDEGramMatrix)
-        gm = self.get_full_gram_matrix()
-        Theta = torch.from_numpy(gm) if self.npt==np else gm 
         losses = self.npt.nan*self.npt.ones(maxiter+1)
         rbackward_norms = [self.npt.nan*self.npt.ones(1)]*maxiter
         times = [self.npt.nan*self.npt.ones(1)]*maxiter
@@ -90,20 +104,26 @@ class _PDEGramMatrix(object):
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
             Fp = Fpt.detach().numpy() if self.npt==np else Fpt.detach()
             Fpd = self.decompose(Fp)
-            def mult_Fp(a, Fpd=Fpd):
+            def mult_Fp(a):
+                dima = a.ndim
+                assert dima==1 or dima==2
+                if dima==1: a = a[:,None]
                 ad = self.decompose(a) 
-                bd = [(Fpd[i]*ad[i]).sum(0) for i in range(self.nr)]
-                b = self.compose(bd) 
-                return b
-            def mult_tFp(b, Fpd=Fpd):
-                bd = self.decompose_eqns(b) 
-                ad = [Fpd[i]*bd[i] for i in range(self.nr)]
-                a = self.compose(ad) 
-                return a
+                bd = [(Fpd[i][:,:,None]*ad[i]).sum(0) for i in range(self.nr)]
+                b = self.npt.vstack(bd)
+                return b[:,0] if dima==1 else b 
+            def mult_tFp(b):
+                dimb = b.ndim
+                assert dimb==1 or dimb==2 
+                if dimb==1: b = b[:,None]
+                bd = self.decompose_eqns(b)
+                ad = [(Fpd[i][:,:,None]*bd[i]).flatten(end_dim=1) for i in range(self.nr)]
+                a = self.npt.vstack(ad) 
+                return a[:,0] if dimb==1 else a
             Fpz = mult_Fp(z)
             diff = y-F+Fpz
-            Fpmat = torch.vstack([mult_tFp(ei) for ei in torch.eye(len(diff))])
-            Theta_red = Fpmat@Theta@Fpmat.T
+            Fpmat = mult_tFp(torch.eye(len(diff),dtype=diff.dtype)).T
+            Theta_red = Fpmat@(self@Fpmat.T)
             if fast_flag:
                 def multiply(gamma):
                     t1 = mult_tFp(gamma) 
@@ -122,7 +142,12 @@ class _PDEGramMatrix(object):
                     precond_solve = False
                 elif solver=="PCG-PPCHOL":
                     ddiag = 1e-8*self.npt.ones_like(Theta_red.diagonal())
-                    Lk = ppchol(Theta_red-self.npt.diag(ddiag),return_pivots=False,**kwargs_ppchol)
+                    Lk = ppchol(
+                        A = Theta_red-self.npt.diag(ddiag),
+                        rank = ppchol_rank,
+                        rtol = ppchol_rtol,
+                        atol = ppchol_atol,
+                        return_pivots=False)
                     k = Lk.size(1)
                     pL = torch.linalg.cholesky(torch.eye(k,dtype=float)+(Lk.T/ddiag)@Lk)
                     def precond_solve(gamma):
@@ -132,9 +157,39 @@ class _PDEGramMatrix(object):
                         cond_Theta_red = torch.linalg.cond(Theta_red)
                         cond_pmat = torch.linalg.cond(pmat) 
                         print("\t\tLk.shape = %-15s K(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(tuple(Lk.shape),cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
+                elif solver=="PCG-JACOBI":
+                    ddiag = Theta_red.diagonal()
+                    def precond_solve(gamma):
+                        return gamma/ddiag
+                    if verbose>1:
+                        pmat = precond_solve(Theta_red)
+                        cond_Theta_red = torch.linalg.cond(Theta_red)
+                        cond_pmat = torch.linalg.cond(pmat) 
+                        print("\t\tK(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
+                elif solver=="BANDED":
+                    n = len(Theta_red)
+                    assert bands<n
+                    Theta_red_np = Theta_red.numpy()
+                    Theta_red_band = np.zeros((bands,n),dtype=Theta_red_np.dtype) 
+                    for bidx in range(bands):
+                        Theta_red_band[bidx,:(n-bidx)] = Theta_red_np.diagonal(bidx)
+                    Ub = scipy.linalg.cholesky_banded(Theta_red_band,lower=True)
+                    def precond_solve(gamma):
+                        return torch.from_numpy(scipy.linalg.cho_solve_banded((Ub,True),gamma.numpy()))
                 else:
                     assert False, "solver parsing error"                    
-                gamma,rbackward_norms[i],times[i] = pcg(matmul=multiply,b=diff,precond_solve=precond_solve,ref_sol=None,npt=self.npt,ckwargs=self.ckwargs,**kwargs_pcg)
+                gamma,rbackward_norms[i],times[i] = pcg(
+                    matmul = multiply,
+                    b = diff,
+                    precond_solve = precond_solve,
+                    x0 = pcg_x0,
+                    rtol = pcg_rtol,
+                    atol = pcg_atol,
+                    maxiter = pcg_maxiter,
+                    beta_method = pcg_beta_method,
+                    ref_sol = None,
+                    npt = self.npt,
+                    ckwargs = self.ckwargs)
             tFpgamma = mult_tFp(gamma)
             z = self@tFpgamma
             zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()

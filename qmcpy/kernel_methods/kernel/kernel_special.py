@@ -49,7 +49,7 @@ class KernelShiftInvar(_KernelProdSpecial):
             [ 0.9942],
             [ 0.4142]], dtype=torch.float64)
     """
-    DEFAULTALPHA = 5
+    DEFAULTALPHA = 4
     def _my_init(self, **kwargs):
         if self.torchify:
             self.lgamma = self.npt.lgamma

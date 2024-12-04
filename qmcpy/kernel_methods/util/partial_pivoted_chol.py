@@ -1,7 +1,7 @@
 import numpy as np 
 import scipy.linalg
 
-def ppchol(A, rank=None, rtol=1e-8, atol=0., return_pivots=False):
+def ppchol(A, rank=None, rtol=None, atol=None, return_pivots=False):
     """
     Partial pivoted Cholesky decomposition 
     https://www.sciencedirect.com/science/article/abs/pii/S0168927411001814
@@ -35,6 +35,8 @@ def ppchol(A, rank=None, rtol=1e-8, atol=0., return_pivots=False):
         import torch 
         npt = torch
         clone = lambda x: x.clone()
+    if rtol is None: rtol = 1e-7
+    if atol is None: atol = 0.
     n = len(A)
     assert A.shape==(n,n)
     d = clone(A.diagonal())
@@ -42,7 +44,7 @@ def ppchol(A, rank=None, rtol=1e-8, atol=0., return_pivots=False):
     tol = max(atol,rtol*traceA) 
     error = traceA
     pi = npt.arange(n)
-    rank = n if rank is None else rank
+    if rank is None: rank = n
     Lkt = npt.zeros((rank,n),dtype=A.dtype)
     for m in range(rank):
         i = d[pi[m:]].argmax().item()+m
@@ -51,6 +53,7 @@ def ppchol(A, rank=None, rtol=1e-8, atol=0., return_pivots=False):
         Lkt[m,pim] = npt.sqrt(d[pim])
         piis = pi[(m+1):]
         Lkt[m,piis] = (A[pim,piis] - (Lkt[:m,[pim]]*Lkt[:m,piis]).sum(0))/Lkt[m,pim]
+        #Lkt[m,piis] = (A[pim,piis] - npt.einsum("i,ij->j",Lkt[:m,pim],Lkt[:m,piis]))/Lkt[m,pim]
         d[piis] = d[piis]-Lkt[m,piis]**2
         error = d[pi[(m+1):]].sum()
         if error<=tol: break 

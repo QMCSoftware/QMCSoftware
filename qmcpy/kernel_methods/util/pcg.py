@@ -2,7 +2,7 @@ import numpy as np
 import time
 import scipy.linalg
 
-def pcg(matmul, b, x0=None, rtol=None, atol=None, maxiter=None, precond_solve=False, ref_sol=None, npt=np, ckwargs={}, beta_method="FR"):
+def pcg(matmul, b, x0=None, rtol=None, atol=None, maxiter=None, precond_solve=False, ref_sol=None, npt=np, ckwargs={}, beta_method=None):
     """
     >>> rng = np.random.Generator(np.random.PCG64(7)) 
     >>> n = 4
@@ -56,6 +56,7 @@ def pcg(matmul, b, x0=None, rtol=None, atol=None, maxiter=None, precond_solve=Fa
     """
     if rtol is None: rtol = 1e-8 
     if atol is None: atol = 0.
+    if beta_method is None: beta_method = "FR"
     assert isinstance(beta_method,str) and beta_method.upper() in ['FR','PR']
     beta_method = beta_method.upper()
     n = len(b)

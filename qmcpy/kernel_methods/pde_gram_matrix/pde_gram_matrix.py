@@ -50,7 +50,7 @@ class PDEGramMatrix(_PDEGramMatrix):
                 Only used when a DiscreteDistribution is passed in for xs
             us (np.ndarray or torch.Tensor): bool matrix where each row is a region specifying the active dimensions
                 Only used when a DiscreteDistribution is passed in for xs
-            half_comp (bool): if True, put project half the points to the 0 boundary and half the points to the 1 boundary
+            half_comp (bool or numpy.ndarray or torch.Tensor): if True, put project half the points to the 0 boundary and half the points to the 1 boundary
         """
         if isinstance(xs,DiscreteDistribution):
             dd_obj = xs
@@ -63,9 +63,11 @@ class PDEGramMatrix(_PDEGramMatrix):
                 x = torch.from_numpy(x)
                 xs = [x[:n].clone() for n in ns]
             else: # numpyify 
-                xs = [x[:n].copy() for n in ns] 
+                xs = [x[:n].copy() for n in ns]
+            if isinstance(half_comp,bool): half_comp = half_comp*torch.ones(len(us),dtype=bool)
+            assert len(half_comp)==len(us)
             for i,u in enumerate(us):
-                if half_comp:
+                if half_comp[i]:
                     nhalf = ns[i]//2
                     xs[i][:nhalf,~u] = 1. 
                     xs[i][nhalf:,~u] = 0.
