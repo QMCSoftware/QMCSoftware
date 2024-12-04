@@ -52,7 +52,7 @@ class _PDEGramMatrix(object):
         diff = y-F
         loss = self.npt.sqrt((diff**2).mean())
         return loss
-    def gauss_newton_relaxed(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., solver="CHOL", kwargs_pcg={}, kwargs_ppchol={}, verbose=1):
+    def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., solver="CHOL", kwargs_pcg={}, kwargs_ppchol={}, verbose=1):
         def pde_lhs_wrap(z):
             zd = self.decompose(z)
             y_lhss = pde_lhs(*zd)
@@ -65,7 +65,7 @@ class _PDEGramMatrix(object):
         try:
             import torch
         except: 
-            raise Exception("gauss_newton_relaxed requires torch for automatic differentiation through pde_lhs")
+            raise Exception("pde_opt_gauss_newton requires torch for automatic differentiation through pde_lhs")
         assert isinstance(solver,str)
         solver = solver.upper() 
         assert solver in ["CHOL","CG","PCG-PPCHOL"]
@@ -76,7 +76,7 @@ class _PDEGramMatrix(object):
         rbackward_norms = [self.npt.nan*self.npt.ones(1)]*maxiter
         times = [self.npt.nan*self.npt.ones(1)]*maxiter
         if verbose: print("\t%-20s%-15s"%("iter (%d max)"%maxiter,"loss"))
-        xs = self._get_xs()
+        xs = self.get_xs()
         y = pde_rhs_wrap(xs) 
         zt = torch.zeros(self.length,dtype=torch.float64,requires_grad=True)
         Ft = pde_lhs_wrap(zt)

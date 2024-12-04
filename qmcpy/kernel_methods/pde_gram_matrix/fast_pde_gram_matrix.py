@@ -26,16 +26,16 @@ class FastPDEGramMatrix(_PDEGramMatrix):
     >>> gmpde = FastPDEGramMatrix(lat_obj,kernel_si,ns=ns,us=us,llbetas=llbetas,llcs=llcs)
     >>> gmpde._mult_check()
     """
-    def __init__(self, dd_obj, kernel_obj, ns, us, llbetas, llcs, noise=1e-8, adaptive_noise=True):
+    def __init__(self, dd_obj, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None, adaptive_noise=True, half_comp=True):
         """
         Args:
             dd_obj (Lattice or DigitalNetB2): the discrete distribution from which to sample points 
             kernel_obj (KernelShiftInvar or KernelDigShiftInvar): the kernel to use 
-            ns (np.ndarray or torch.Tensor): vector of number of points on each of the regions 
-            us (np.ndarray or torch.Tensor): bool matrix where each row is a region specifying the active dimensions
             llbetas (list of lists): list of length equal to the number of regions where each sub-list is the derivatives at that region 
             llcs (list of lists): list of length equal to the number of regions where each sub-list are the derivative coefficients at that region 
             noise (float): nugget term
+            ns (np.ndarray or torch.Tensor): vector of number of points on each of the regions 
+            us (np.ndarray or torch.Tensor): bool matrix where each row is a region specifying the active dimensions
         """
         assert isinstance(dd_obj,Lattice) or isinstance(dd_obj,DigitalNetB2)
         self.us = us 

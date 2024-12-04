@@ -38,7 +38,7 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> gmpde = PDEGramMatrix([xint,xb],kernel_gaussian,llbetas=llbetas,llcs=llcs)
     >>> gmpde._mult_check()
     """
-    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None, half_comp=True, adaptive_noise=True):
+    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None, adaptive_noise=True, half_comp=True):
         """
         Args:
             xs (DiscreteDisribution or list of numpy.ndarray or torch.Tensor): locations at which the regions are sampled 
