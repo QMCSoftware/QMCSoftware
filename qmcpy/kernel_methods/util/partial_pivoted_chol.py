@@ -35,7 +35,7 @@ def ppchol(A, rank=None, rtol=None, atol=None, return_pivots=False):
         import torch 
         npt = torch
         clone = lambda x: x.clone()
-    if rtol is None: rtol = 1e-7
+    if rtol is None: rtol = 1e-10
     if atol is None: atol = 0.
     n = len(A)
     assert A.shape==(n,n)
@@ -53,7 +53,6 @@ def ppchol(A, rank=None, rtol=None, atol=None, return_pivots=False):
         Lkt[m,pim] = npt.sqrt(d[pim])
         piis = pi[(m+1):]
         Lkt[m,piis] = (A[pim,piis] - (Lkt[:m,[pim]]*Lkt[:m,piis]).sum(0))/Lkt[m,pim]
-        #Lkt[m,piis] = (A[pim,piis] - npt.einsum("i,ij->j",Lkt[:m,pim],Lkt[:m,piis]))/Lkt[m,pim]
         d[piis] = d[piis]-Lkt[m,piis]**2
         error = d[pi[(m+1):]].sum()
         if error<=tol: break 

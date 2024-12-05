@@ -48,8 +48,9 @@ class _PDEGramMatrix(object):
         loss = self.npt.sqrt((diff**2).mean())
         return loss
     def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=10, relaxation=0., solver="CHOL", verbose=1,
-            pcg_x0=None, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_beta_method=None,
-            ppchol_rank=None, ppchol_rtol=None, ppchol_atol=None):
+            pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_beta_method=None,
+            ppchol_rank=None, ppchol_rtol=None, ppchol_atol=None,
+            ssor_omega=1):
         def pde_lhs_wrap(z):
             zd = [zs.reshape((self.tvec[j],-1)) for j,zs in enumerate(np.split(z,self.bs_cumsum[1:-1]))]
             y_lhss = pde_lhs(*zd)
@@ -65,7 +66,7 @@ class _PDEGramMatrix(object):
             raise Exception("pde_opt_gauss_newton requires torch for automatic differentiation through pde_lhs")
         assert isinstance(solver,str)
         solver = solver.upper() 
-        assert solver in ["CHOL","CG","PCG-PPCHOL","PCG-JACOBI","PCG-BLOCKED"]
+        assert solver in ["CHOL","CG","PCG-PPCHOL","PCG-JACOBI","PCG-SSOR","PCG-BLOCKED"]
         fast_flag = not hasattr(self,"gm") # isinstance(self,FastPDEGramMatrix)
         losses = self.npt.nan*self.npt.ones(maxiter+1)
         rbackward_norms = [self.npt.nan*self.npt.ones(1)]*maxiter
@@ -82,6 +83,7 @@ class _PDEGramMatrix(object):
         z_best = z
         gm = self.get_full_gram_matrix()
         Theta = torch.from_numpy(gm) if self.npt==np else gm
+        gamma = torch.zeros(self.ntot,dtype=torch.float64)
         for i in range(maxiter):
             if verbose: print("\t%-20d%-15.2e"%(i+1,losses[i]))
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
@@ -112,15 +114,15 @@ class _PDEGramMatrix(object):
             diff = y-F+Fpz
             Theta_red = mult_Fp(mult_Fp(Theta.T).T)
             if fast_flag:
-                def multiply(gamma):
-                    t1 = mult_tFp(gamma) 
+                def multiply(x):
+                    t1 = mult_tFp(x) 
                     t2 = self@t1 
                     t3 = mult_Fp(t2)
-                    t4 = t3+relaxation*gamma
+                    t4 = t3+relaxation*x
                     return t4
             else:
-                def multiply(gamma):
-                    return Theta_red@gamma+relaxation*gamma 
+                def multiply(x):
+                    return Theta_red@x+relaxation*x 
             if solver=="CHOL":
                 L_chol = torch.linalg.cholesky(Theta_red)
                 gamma = torch.cholesky_solve(diff[:,None],L_chol)[:,0]
@@ -137,8 +139,8 @@ class _PDEGramMatrix(object):
                         return_pivots=False)
                     k = Lk.size(1)
                     pL = torch.linalg.cholesky(torch.eye(k,dtype=float)+(Lk.T/ddiag)@Lk)
-                    def precond_solve(gamma):
-                        return solve_ppchol(gamma,Lk,pL,ddiag)
+                    def precond_solve(x):
+                        return solve_ppchol(x,Lk,pL,ddiag)
                     if verbose>1:
                         pmat = precond_solve(Theta_red)
                         cond_Theta_red = torch.linalg.cond(Theta_red)
@@ -146,8 +148,31 @@ class _PDEGramMatrix(object):
                         print("\t\tLk.shape = %-15s K(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(tuple(Lk.shape),cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
                 elif solver=="PCG-JACOBI":
                     ddiag = Theta_red.diagonal()
-                    def precond_solve(gamma):
-                        return gamma/ddiag
+                    def precond_solve(x):
+                        dimx = x.ndim
+                        assert dimx==1 or dimx==2
+                        if dimx==1: x = x[:,None]
+                        y = x/ddiag
+                        return y[:,0] if dimx==1 else y
+                    if verbose>1:
+                        pmat = precond_solve(Theta_red)
+                        cond_Theta_red = torch.linalg.cond(Theta_red)
+                        cond_pmat = torch.linalg.cond(pmat) 
+                        print("\t\tK(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
+                elif solver=="PCG-SSOR":
+                    assert np.isscalar(ssor_omega) and 0<ssor_omega<2
+                    ddiag_over_omega = Theta_red.diagonal()/ssor_omega
+                    L_ssor = Theta_red.tril(-1)
+                    L_ssor.diagonal().copy_(ddiag_over_omega)
+                    def precond_solve(x):
+                        dimx = x.ndim
+                        assert dimx==1 or dimx==2
+                        if dimx==1: x = x[:,None]
+                        t1 = torch.linalg.solve_triangular(L_ssor,x,upper=False)
+                        t2 = t1*ddiag_over_omega[:,None]
+                        t3 = torch.linalg.solve_triangular(L_ssor.T,t2,upper=True)
+                        t4 = (2-ssor_omega)*t3
+                        return t4[:,0] if dimx==1 else t4
                     if verbose>1:
                         pmat = precond_solve(Theta_red)
                         cond_Theta_red = torch.linalg.cond(Theta_red)
@@ -158,15 +183,15 @@ class _PDEGramMatrix(object):
                     for si in range(self.nr):
                         sl,sh = self.n_cumsum[si],self.n_cumsum[si+1]
                         L_chol_blocks[si] = torch.linalg.cholesky(Theta_red[sl:sh,sl:sh])
-                    def precond_solve(gamma):
-                        dimgamma = gamma.ndim
-                        assert dimgamma==1 or dimgamma==2
-                        if dimgamma==1: gamma=gamma[:,None]
-                        y = torch.empty_like(gamma)
+                    def precond_solve(x):
+                        dimx = x.ndim
+                        assert dimx==1 or dimx==2
+                        if dimx==1: x = x[:,None]
+                        y = torch.empty_like(x)
                         for si in range(self.nr):
                             sl,sh = self.n_cumsum[si],self.n_cumsum[si+1]
-                            y[sl:sh] = torch.cholesky_solve(gamma[sl:sh],L_chol_blocks[si])
-                        return y[:,0] if dimgamma==1 else y
+                            y[sl:sh] = torch.cholesky_solve(x[sl:sh],L_chol_blocks[si])
+                        return y[:,0] if dimx==1 else y
                     if verbose>1:
                         pmat = precond_solve(Theta_red)
                         cond_Theta_red = torch.linalg.cond(Theta_red)
@@ -178,7 +203,7 @@ class _PDEGramMatrix(object):
                     matmul = multiply,
                     b = diff,
                     precond_solve = precond_solve,
-                    x0 = pcg_x0,
+                    x0 = gamma,
                     rtol = pcg_rtol,
                     atol = pcg_atol,
                     maxiter = pcg_maxiter,
