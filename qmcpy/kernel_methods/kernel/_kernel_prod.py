@@ -20,9 +20,9 @@ class _KernelProd(object):
         else: 
             self.npt = np
             self.ckwargs = {}
-        assert isinstance(lengthscales,float) or lengthscales.shape==(self.d,)
-        assert isinstance(scale,float)
-        if isinstance(lengthscales,float):
+        assert np.isscalar(lengthscales) or lengthscales.shape==(self.d,)
+        assert np.isscalar(scale)
+        if np.isscalar(lengthscales):
             lengthscales = lengthscales*self.npt.ones(self.d,dtype=float,**self.ckwargs)
         self.lengthscales = lengthscales
         self.scale = scale
@@ -55,7 +55,7 @@ class _KernelProd(object):
         m1 = len(beta1s) 
         m2 = len(beta2s)
         assert beta1s.shape==(m1,self.d) and beta2s.shape==(m2,self.d)
-        if isinstance(c1s,float): c1s = c1s*self.npt.ones(m1,dtype=float,**self.ckwargs)
-        if isinstance(c2s,float): c2s = c2s*self.npt.ones(m2,dtype=float,**self.ckwargs)
+        if np.isscalar(c1s): c1s = c1s*self.npt.ones(m1,dtype=float,**self.ckwargs)
+        if np.isscalar(c2s): c2s = c2s*self.npt.ones(m2,dtype=float,**self.ckwargs)
         assert c1s.shape==(m1,) and c2s.shape==(m2,)
         return self.parsed_call(x1,x2,n1,n2,beta1s,beta2s,m1,m2,c1s,c2s)

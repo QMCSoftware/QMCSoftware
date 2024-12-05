@@ -10,7 +10,7 @@ class _GramMatrix(object):
         self.ckwargs = self.kernel_obj.ckwargs
         self.torchify = self.kernel_obj.torchify
         self.noise = noise
-        assert isinstance(self.noise,float) and self.noise>=0.
+        assert np.isscalar(self.noise) and self.noise>=0.
         self.lbeta1s,self.lc1s,self.t1,self.m1 = self._parse_lbetas_lcs(lbeta1s,lc1s)
         self.lbeta2s,self.lc2s,self.t2,self.m2 = self._parse_lbetas_lcs(lbeta2s,lc2s)
         if self.torchify:
@@ -33,7 +33,7 @@ class _GramMatrix(object):
         t = len(lbetas)
         m = np.array([len(beta1s) for beta1s in lbetas],dtype=int)
         assert isinstance(lbetas,list) and all(lbetas[tt].shape==(m[tt],self.d) for tt in range(t))
-        if isinstance(lcs,float): lcs = [lcs*self.npt.ones(m[tt],dtype=float,**self.ckwargs) for tt in range(t)]
+        if np.isscalar(lcs): lcs = [lcs*self.npt.ones(m[tt],dtype=float,**self.ckwargs) for tt in range(t)]
         elif not isinstance(lcs,list): lcs = [lcs]
         lcs = [self.npt.atleast_1d(c1s) for c1s in lcs] 
         assert isinstance(lcs,list) and all(lcs[tt].shape==(m[tt],) for tt in range(t))

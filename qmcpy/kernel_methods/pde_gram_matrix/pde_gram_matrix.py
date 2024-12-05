@@ -76,7 +76,7 @@ class PDEGramMatrix(_PDEGramMatrix):
         assert isinstance(xs,list)
         self.xs = xs 
         self.nr = len(self.xs)
-        self.ns = [len(x) for x in self.xs]
+        self.ns = np.array([len(x) for x in self.xs],dtype=int)
         super(PDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
         self.gms = np.empty((self.nr,self.nr),dtype=object)
         for i1,i2 in itertools.product(range(self.nr),range(self.nr)):
