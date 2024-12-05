@@ -46,14 +46,14 @@ class _PDEGramMatrix(object):
     def decompose(self, z):
         ndim = z.ndim 
         assert ndim==1 or ndim==2
-        zsplit = np.split(z,self.bs_cumsum)
+        zsplit = np.split(z,self.bs_cumsum[1:-1])
         if ndim==1:
             return [zs.reshape((self.gms[i,0].t1,-1)) for i,zs in enumerate(zsplit)]
         else:
             m = z.shape[1]
             return [zs.reshape((self.gms[i,0].t1,-1,m)) for i,zs in enumerate(zsplit)]
     def decompose_eqns(self, z):
-        return np.split(z,self.n_cumsum)
+        return np.split(z,self.n_cumsum[1:-1])
     def _loss(self, F, y):
         diff = y-F
         loss = self.npt.sqrt((diff**2).mean())
@@ -91,6 +91,8 @@ class _PDEGramMatrix(object):
         losses[0] = self._loss(F,y)
         loss_best = losses[0] 
         z_best = z
+        gm = self.get_full_gram_matrix()
+        Theta = torch.from_numpy(gm) if self.npt==np else gm
         for i in range(maxiter):
             if verbose: print("\t%-20d%-15.2e"%(i+1,losses[i]))
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
@@ -114,9 +116,9 @@ class _PDEGramMatrix(object):
                 return a[:,0] if dimb==1 else a
             Fpz = mult_Fp(z)
             diff = y-F+Fpz
-            # REFACTOR THESE 2 LINES
-            Fpmat = mult_tFp(torch.eye(len(diff),dtype=diff.dtype)).T
-            Theta_red = Fpmat@(self@Fpmat.T)
+            #Fpmat = mult_tFp(torch.eye(len(diff),dtype=diff.dtype)).T
+            #Theta_red = Fpmat@(self@Fpmat.T)
+            Theta_red = mult_Fp(mult_Fp(Theta.T).T)
             if fast_flag:
                 def multiply(gamma):
                     t1 = mult_tFp(gamma) 
@@ -161,7 +163,7 @@ class _PDEGramMatrix(object):
                         print("\t\tK(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
                 elif solver=="PCG-BLOCKED":
                     L_chol_blocks = [None]*self.nr 
-                    splits = [0]+self.n_cumsum+[self.ns.sum().item()]
+                    splits = self.n_cumsum
                     for si in range(self.nr):
                         sl,sh = splits[si],splits[si+1]
                         L_chol_blocks[si] = torch.linalg.cholesky(Theta_red[sl:sh,sl:sh])

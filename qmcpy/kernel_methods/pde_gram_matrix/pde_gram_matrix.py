@@ -82,9 +82,10 @@ class PDEGramMatrix(_PDEGramMatrix):
         for i1,i2 in itertools.product(range(self.nr),range(self.nr)):
             self.gms[i1,i2] = GramMatrix(self.xs[i1],self.xs[i2],self.kernel_obj,self.llbetas[i1],self.llbetas[i2],self.llcs[i1],self.llcs[i2],noise=0.,adaptive_noise=False)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
-        self.bs_cumsum = np.cumsum(bs).tolist() 
+        self.bs_cumsum = [0]+np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]
-        self.bs_cumsum = self.bs_cumsum[:-1]
+        self.n_cumsum = [0]+np.cumsum(self.ns).tolist()
+        self.ntot = self.n_cumsum[-1]
         if adaptive_noise:
             assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
             full_traces = [[0. for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
@@ -111,7 +112,6 @@ class PDEGramMatrix(_PDEGramMatrix):
             assert all(self.gms[i,i].invertible for i in range(self.nr))
             self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])
             self.gm += noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
-        self.n_cumsum = np.cumsum(self.ns)[:-1].tolist()
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve
     def _init_precond_solve(self):

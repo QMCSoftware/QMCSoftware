@@ -61,10 +61,10 @@ class FastPDEGramMatrix(_PDEGramMatrix):
             for k in range(1,self.nr):
                 self.gms[i,k] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),self.ns[k].item(),self.us[i,:],self.us[k,:],llbetas[i],llbetas[k],llcs[i],llcs[k],0.,False,gmii__x_x)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
-        self.bs_cumsum = np.cumsum(bs).tolist() 
+        self.bs_cumsum = [0]+np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]
-        self.bs_cumsum = self.bs_cumsum[:-1]
-        self.n_cumsum = np.cumsum(self.ns)[:-1].tolist()
+        self.n_cumsum = [0]+np.cumsum(self.ns).tolist()
+        self.ntot = self.n_cumsum[-1]
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve
         if adaptive_noise:
@@ -97,7 +97,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         assert yogndim<=2 
         if yogndim==1: y = y[:,None] # (l,v)
         assert y.ndim==2 and y.shape[0]==(self.length)
-        ysplit = np.split(y,self.bs_cumsum) # (li,v)
+        ysplit = np.split(y,self.bs_cumsum[1:-1]) # (li,v)
         ssplit = [self.gms[i,i].solve(ysplit[i]) for i in range(self.nr)]
         s = self.npt.vstack(ssplit)  # (l,v)
         return s[:,0] if yogndim==1 else s
@@ -106,7 +106,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         assert yogndim<=2 
         if yogndim==1: y = y[:,None] # (l,v)
         assert y.ndim==2 and y.shape[0]==(self.length)
-        ysplit = np.split(y,self.bs_cumsum) # (li,v)
+        ysplit = np.split(y,self.bs_cumsum[1:-1]) # (li,v)
         ssplit = [0. for i in range(self.nr)]
         for i in range(self.nr):
             for k in range(self.nr):
