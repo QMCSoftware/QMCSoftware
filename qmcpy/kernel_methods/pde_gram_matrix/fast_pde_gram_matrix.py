@@ -65,17 +65,18 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         self.length = self.bs_cumsum[-1]
         self.n_cumsum = [0]+np.cumsum(self.ns).tolist()
         self.ntot = self.n_cumsum[-1]
+        self.tvec = [self.gms[i,i].t1 for i in range(self.nr)]
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve
         if adaptive_noise:
             assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
-            full_traces = [[0. for j in range(self.gms[i1,i1].t1)] for i1 in range(self.nr)]
-            self.trace_ratios = [self.npt.zeros(self.gms[i1,i1].t1,dtype=float) for i1 in range(self.nr)]
+            full_traces = [[0. for j in range(self.tvec[i1])] for i1 in range(self.nr)]
+            self.trace_ratios = [self.npt.zeros(self.tvec[i1],dtype=float) for i1 in range(self.nr)]
             for i1 in range(self.nr):
-                for tt1 in range(self.gms[i1,i1].t1):
+                for tt1 in range(self.tvec[i1]):
                     betas_i = llbetas[i1][tt1] 
                     for i2 in range(self.nr):
-                        for tt2 in range(self.gms[i2,i2].t1):
+                        for tt2 in range(self.tvec[i2]):
                             betas_j = llbetas[i2][tt2]
                             if (betas_i==betas_j).all():
                                 cs_i = llcs[i1][tt1]
@@ -85,12 +86,12 @@ class FastPDEGramMatrix(_PDEGramMatrix):
                                 full_traces[i1][tt1] += nj1*self.gms[i2,i2].k00diags[tt2]
                     self.trace_ratios[i1][tt1] = full_traces[i1][tt1]/full_traces[0][0]
             for i in range(self.nr):
-                for tt in range(self.gms[i,i].t1):
+                for tt in range(self.tvec[i]):
                     self.gms[i,i].lam[tt,tt][0,0,0,:] += noise*self.trace_ratios[i][tt]
         else: 
             assert all(self.gms[i,i].invertible for i in range(self.nr))
             for i in range(self.nr):
-                for tt1 in range(self.gms[i,i].t1):
+                for tt1 in range(self.tvec[i]):
                     self.gms[i,i].lam[tt1,tt1][0,0,0,:] += noise
     def precond_solve(self, y):
         yogndim = y.ndim

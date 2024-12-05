@@ -43,17 +43,6 @@ class _PDEGramMatrix(object):
         if not hasattr(self,"l_chol"): 
             self._init_invertibile()
         return self.cho_solve(self.l_chol,y)
-    def decompose(self, z):
-        ndim = z.ndim 
-        assert ndim==1 or ndim==2
-        zsplit = np.split(z,self.bs_cumsum[1:-1])
-        if ndim==1:
-            return [zs.reshape((self.gms[i,0].t1,-1)) for i,zs in enumerate(zsplit)]
-        else:
-            m = z.shape[1]
-            return [zs.reshape((self.gms[i,0].t1,-1,m)) for i,zs in enumerate(zsplit)]
-    def decompose_eqns(self, z):
-        return np.split(z,self.n_cumsum[1:-1])
     def _loss(self, F, y):
         diff = y-F
         loss = self.npt.sqrt((diff**2).mean())
@@ -62,7 +51,7 @@ class _PDEGramMatrix(object):
             pcg_x0=None, pcg_rtol=None, pcg_atol=None, pcg_maxiter=None, pcg_beta_method=None,
             ppchol_rank=None, ppchol_rtol=None, ppchol_atol=None):
         def pde_lhs_wrap(z):
-            zd = self.decompose(z)
+            zd = [zs.reshape((self.tvec[j],-1)) for j,zs in enumerate(np.split(z,self.bs_cumsum[1:-1]))]
             y_lhss = pde_lhs(*zd)
             y_lhs = torch.hstack(y_lhss)
             return y_lhs 
@@ -97,27 +86,30 @@ class _PDEGramMatrix(object):
             if verbose: print("\t%-20d%-15.2e"%(i+1,losses[i]))
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
             Fp = Fpt.detach().numpy() if self.npt==np else Fpt.detach()
-            Fpd = self.decompose(Fp)
             def mult_Fp(a):
                 dima = a.ndim
                 assert dima==1 or dima==2
                 if dima==1: a = a[:,None]
-                ad = self.decompose(a) 
-                bd = [(Fpd[i][:,:,None]*ad[i]).sum(0) for i in range(self.nr)]
-                b = self.npt.vstack(bd)
+                m = a.size(1) 
+                b = torch.empty((self.ntot,m),dtype=a.dtype)
+                for j in range(self.nr):
+                    bsl,bsh = self.bs_cumsum[j],self.bs_cumsum[j+1]
+                    nsl,nsh = self.n_cumsum[j],self.n_cumsum[j+1]
+                    b[nsl:nsh] = (Fp[bsl:bsh,None]*a[bsl:bsh]).reshape((self.tvec[j],self.ns[j],m)).sum(0)
                 return b[:,0] if dima==1 else b 
             def mult_tFp(b):
                 dimb = b.ndim
                 assert dimb==1 or dimb==2 
                 if dimb==1: b = b[:,None]
-                bd = self.decompose_eqns(b)
-                ad = [(Fpd[i][:,:,None]*bd[i]).flatten(end_dim=1) for i in range(self.nr)]
-                a = self.npt.vstack(ad) 
+                m = b.size(1)
+                a = torch.empty((self.length,m),dtype=b.dtype)
+                for j in range(self.nr):
+                    bsl,bsh = self.bs_cumsum[j],self.bs_cumsum[j+1]
+                    nsl,nsh = self.n_cumsum[j],self.n_cumsum[j+1]
+                    a[bsl:bsh] = (Fp[bsl:bsh].reshape((self.tvec[j],self.ns[j],1))*b[nsl:nsh]).flatten(end_dim=1)
                 return a[:,0] if dimb==1 else a
             Fpz = mult_Fp(z)
             diff = y-F+Fpz
-            #Fpmat = mult_tFp(torch.eye(len(diff),dtype=diff.dtype)).T
-            #Theta_red = Fpmat@(self@Fpmat.T)
             Theta_red = mult_Fp(mult_Fp(Theta.T).T)
             if fast_flag:
                 def multiply(gamma):
@@ -162,18 +154,18 @@ class _PDEGramMatrix(object):
                         cond_pmat = torch.linalg.cond(pmat) 
                         print("\t\tK(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
                 elif solver=="PCG-BLOCKED":
-                    L_chol_blocks = [None]*self.nr 
-                    splits = self.n_cumsum
+                    L_chol_blocks = np.empty(self.nr,dtype=object) 
                     for si in range(self.nr):
-                        sl,sh = splits[si],splits[si+1]
+                        sl,sh = self.n_cumsum[si],self.n_cumsum[si+1]
                         L_chol_blocks[si] = torch.linalg.cholesky(Theta_red[sl:sh,sl:sh])
                     def precond_solve(gamma):
                         dimgamma = gamma.ndim
                         assert dimgamma==1 or dimgamma==2
                         if dimgamma==1: gamma=gamma[:,None]
-                        gammad = self.decompose_eqns(gamma)
-                        yd = [torch.cholesky_solve(gammad[si],L_chol_blocks[si]) for si in range(self.nr)]
-                        y = torch.vstack(yd)
+                        y = torch.empty_like(gamma)
+                        for si in range(self.nr):
+                            sl,sh = self.n_cumsum[si],self.n_cumsum[si+1]
+                            y[sl:sh] = torch.cholesky_solve(gamma[sl:sh],L_chol_blocks[si])
                         return y[:,0] if dimgamma==1 else y
                     if verbose>1:
                         pmat = precond_solve(Theta_red)
