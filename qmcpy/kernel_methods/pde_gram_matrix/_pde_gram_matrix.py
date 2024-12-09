@@ -74,10 +74,12 @@ class _PDEGramMatrix(object):
         if verbose: print("\t%-20s%-15s"%("iter (%d max)"%maxiter,"loss"))
         xs = self.get_xs()
         y = pde_rhs_wrap(xs) 
+        zhist = torch.zeros((maxiter+1,self.length),dtype=torch.float64)
         zt = torch.zeros(self.length,dtype=torch.float64,requires_grad=True)
         Ft = pde_lhs_wrap(zt)
         F = Ft.detach().numpy() if self.npt==np else Ft.detach()
         z = zt.detach().numpy() if self.npt==np else zt.detach()
+        zhist[0,:] = z
         losses[0] = self._loss(F,y)
         loss_best = losses[0] 
         z_best = z
@@ -216,6 +218,7 @@ class _PDEGramMatrix(object):
             zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()
             Ft = pde_lhs_wrap(zt) 
             F = Ft.detach().numpy() if self.npt==np else Ft.detach()
+            zhist[(i+1),:] = z
             losses[i+1] = self._loss(F,y)
             if losses[i+1]<loss_best:
                 z_best = z
@@ -226,4 +229,4 @@ class _PDEGramMatrix(object):
         for l in range(i+1):
             rbackward_norms_mat[l,:len(rbackward_norms[l])] = rbackward_norms[l]
             times_mat[l,:len(times[l])] = times[l] 
-        return z_best.detach(),losses[:(i+2)],rbackward_norms_mat,times_mat
+        return z_best.detach(),losses[:(i+2)],rbackward_norms_mat,times_mat,zhist

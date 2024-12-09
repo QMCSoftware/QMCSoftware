@@ -44,6 +44,7 @@ sphinx/*.jpg
 *checkpoint.ipynb
 demos/**.png
 demos/**.eps
+demos/pde_kernel_methods/*.pt
 
 # release
 /build/
