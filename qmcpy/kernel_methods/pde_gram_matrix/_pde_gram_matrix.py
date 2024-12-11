@@ -113,18 +113,18 @@ class _PDEGramMatrix(object):
                     a[bsl:bsh] = (Fp[bsl:bsh].reshape((self.tvec[j],self.ns[j],1))*b[nsl:nsh]).flatten(end_dim=1)
                 return a[:,0] if dimb==1 else a
             Fpz = mult_Fp(z)
-            diff = y-F+Fpz
+            diff = y-F+Fpz/(1+relaxation)
             Theta_red = mult_Fp(mult_Fp(Theta.T).T)
             if fast_flag:
                 def multiply(x):
                     t1 = mult_tFp(x) 
                     t2 = self@t1 
                     t3 = mult_Fp(t2)
-                    t4 = t3+relaxation*x
+                    t4 = t3
                     return t4
             else:
                 def multiply(x):
-                    return Theta_red@x+relaxation*x 
+                    return Theta_red@x
             if solver=="CHOL":
                 L_chol = torch.linalg.cholesky(Theta_red)
                 gamma = torch.cholesky_solve(diff[:,None],L_chol)[:,0]
@@ -213,8 +213,9 @@ class _PDEGramMatrix(object):
                     ref_sol = None,
                     npt = self.npt,
                     ckwargs = self.ckwargs)
-            tFpgamma = mult_tFp(gamma)
-            z = self@tFpgamma
+            delta = self@mult_tFp(gamma)-z/(1+relaxation)
+            print(torch.linalg.norm(delta))
+            z = z+delta
             zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()
             Ft = pde_lhs_wrap(zt) 
             F = Ft.detach().numpy() if self.npt==np else Ft.detach()
