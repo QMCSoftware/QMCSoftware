@@ -43,6 +43,14 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
                 double_integral = lambda w: (((7/12)*w)+1).prod()
                 single_integral = lambda x, w: (1 + w*((2/3) - (.25*abs(x - .5)) - (.25*((x -.5)**2)))).prod(axis=1)
                 kernel = lambda x, y, w: (1+ w*(.875 - (.25*abs(x - .5)) - (.25*abs(y - .5)) - (.75*abs(x - y)) + (.5*((x - y)**2)))).prod(axis=2)
+            elif method.lower() == "un" or method.lower() == "unanchored":
+                double_integral = lambda w: (13/12)**len(w)
+                single_integral = lambda x, w: (1+ ((x*(1-x))/2)).prod(axis=1)
+                kernel = lambda x, y, w: (1 + ((np.minimum(x, y) - (x*y)))).prod(axis=2)
+            elif method.lower() == "warnock" or method.lower() == "wk":
+                double_integral = lambda w: (1/3)**len(w)
+                single_integral = lambda x, w: ((1 - (x**2))/2).prod(axis=1)
+                kernel = lambda x, y, w: (1 - np.maximum(x, y)).prod(axis=2)
     else:
         #If the user punches in a list of functions for variable method
         if type(method) == list:
