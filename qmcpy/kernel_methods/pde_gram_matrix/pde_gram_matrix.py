@@ -38,7 +38,7 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> gmpde = PDEGramMatrix([xint,xb],kernel_gaussian,llbetas=llbetas,llcs=llcs)
     >>> gmpde._mult_check()
     """
-    def __init__(self, xs, kernel_obj, llbetas, llcs, noise=1e-8, ns=None, us=None, adaptive_noise=True, half_comp=True):
+    def __init__(self, xs, kernel_obj, llbetas=None, llcs=None, noise=1e-8, ns=None, us=None, adaptive_noise=True, half_comp=True):
         """
         Args:
             xs (DiscreteDisribution or list of numpy.ndarray or torch.Tensor): locations at which the regions are sampled 
@@ -88,19 +88,19 @@ class PDEGramMatrix(_PDEGramMatrix):
         self.ntot = self.n_cumsum[-1]
         self.tvec = [self.gms[i,i].t1 for i in range(self.nr)]
         if adaptive_noise:
-            assert (llbetas[0][0]==0.).all() and llbetas[0][0].shape==(1,self.kernel_obj.d) and (llcs[0][0]==1.).all() and llcs[0][0].shape==(1,)
+            assert (self.llbetas[0][0]==0.).all() and self.llbetas[0][0].shape==(1,self.kernel_obj.d) and (self.llcs[0][0]==1.).all() and self.llcs[0][0].shape==(1,)
             full_traces = [[0. for j in range(self.tvec[i1])] for i1 in range(self.nr)]
             self.trace_ratios = [self.npt.zeros(self.tvec[i1]) for i1 in range(self.nr)]
             for i1 in range(self.nr):
                 ni1 = self.gms[i1,i1].n1
                 for tt1 in range(self.tvec[i1]):
-                    betas_i = llbetas[i1][tt1] 
+                    betas_i = self.llbetas[i1][tt1] 
                     for i2 in range(self.nr):
                         for tt2 in range(self.tvec[i2]):
-                            betas_j = llbetas[i2][tt2]
+                            betas_j = self.llbetas[i2][tt2]
                             if (betas_i==betas_j).all():
-                                cs_i = llcs[i1][tt1]
-                                cs_j = llcs[i2][tt2]
+                                cs_i = self.llcs[i1][tt1]
+                                cs_j = self.llcs[i2][tt2]
                                 assert (cs_i==cs_j).all()
                                 nj1 = self.gms[i2,i2].n1
                                 full_traces[i1][tt1] += nj1*self.gms[i2,i2].gm[tt2*nj1,tt2*nj1]

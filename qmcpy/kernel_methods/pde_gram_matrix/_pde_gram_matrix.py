@@ -7,11 +7,14 @@ import time
 class _PDEGramMatrix(object):
     def __init__(self, kernel_obj, llbetas, llcs):
         self.kernel_obj = kernel_obj
+        self.d = self.kernel_obj.d
         self.npt = self.kernel_obj.npt
         self.ckwargs = self.kernel_obj.ckwargs
         self.llbetas,self.llcs,_inferred_nr = self._parse_llbetas_llcs(llbetas,llcs)
         assert _inferred_nr==self.nr
     def _parse_llbetas_llcs(self, llbetas, llcs):
+        if llbetas is None: llbetas = [[self.npt.zeros((1,self.d),dtype=int)]]
+        if llcs is None: llcs = [[self.npt.ones(len(betas)) for betas in lbetas] for lbetas in llbetas]
         assert isinstance(llbetas,list) and all(isinstance(lbetas,list) for lbetas in llbetas)
         nr = len(llbetas)
         assert isinstance(llcs,list) and all(isinstance(lcs,list) for lcs in llcs) and len(llcs)==nr
@@ -214,7 +217,6 @@ class _PDEGramMatrix(object):
                     npt = self.npt,
                     ckwargs = self.ckwargs)
             delta = self@mult_tFp(gamma)-z/(1+relaxation)
-            print(torch.linalg.norm(delta))
             z = z+delta
             zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()
             Ft = pde_lhs_wrap(zt) 
