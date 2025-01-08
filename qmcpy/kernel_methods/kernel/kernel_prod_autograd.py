@@ -42,7 +42,7 @@ class KernelGaussian(_KernelProdAutoGrad):
     >>> import torch
     >>> d = 3
     >>> x = torch.from_numpy(IIDStdUniform(d,seed=7).gen_samples(8))
-    >>> k = KernelGaussian(d)
+    >>> k = KernelGaussian(d,torchify=True)
     >>> with np.printoptions(precision=2):
     ...     k(x,x)
     tensor([[1.0000, 0.6369, 0.5493, 0.8457, 0.7693, 0.5076, 0.4285, 0.5578],

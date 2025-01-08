@@ -11,7 +11,7 @@ class GramMatrix(_GramMatrix):
     >>> d = 3
     >>> n = 2**3
     >>> x = torch.from_numpy(IIDStdUniform(d,seed=7).gen_samples(n))
-    >>> kernel_obj = KernelGaussian(d)
+    >>> kernel_obj = KernelGaussian(d,torchify=True)
     >>> lbetas = [
     ...     torch.tensor([0,0,0]),
     ...     torch.tensor([1,0,0]),

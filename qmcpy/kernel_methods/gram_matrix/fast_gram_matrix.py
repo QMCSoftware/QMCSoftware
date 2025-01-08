@@ -264,7 +264,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
     >>> n = 2**3
     >>> d = 3
     >>> dd_obj = Lattice(d,seed=7)
-    >>> kernel_obj = KernelShiftInvar(d,alpha=4)
+    >>> kernel_obj = KernelShiftInvar(d,alpha=4,torchify=True)
     >>> lbetas = [
     ...     torch.tensor([0,0,0]),
     ...     torch.tensor([1,0,0]),

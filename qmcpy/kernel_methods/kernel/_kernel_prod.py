@@ -1,7 +1,7 @@
 import numpy as np
 
 class _KernelProd(object):
-    def __init__(self, dimension, lengthscales=1., scale=1., torchify=True, device="cpu", alpha=None, **kwargs):
+    def __init__(self, dimension, lengthscales=1., scale=1., torchify=False, device="cpu", alpha=None, **kwargs):
         """
         Args:
             dimension (int): dimension of the input
