@@ -1,36 +1,55 @@
 from ._pde_gram_matrix import _PDEGramMatrix
 from ...discrete_distribution import Lattice,DigitalNetB2
-from ..kernel import KernelShiftInvar
+from ..kernel import KernelShiftInvar,KernelDigShiftInvar
 from ..gram_matrix import FastGramMatrixLattice,FastGramMatrixDigitalNetB2
 import numpy as np 
 
 class FastPDEGramMatrix(_PDEGramMatrix):
     """ Fast Gram Matrix for solving PDEs 
     
+    >>> import torch
     >>> d = 2
-    >>> lat_obj = Lattice(d,seed=7)
-    >>> kernel_si = KernelShiftInvar(d)
+    >>> dd_obj = Lattice(d,seed=7)
+    >>> kernel_obj = KernelShiftInvar(d,torchify=True)
+    >>> us = torch.tensor([
+    ...     [True,True],
+    ...     [True,False],
+    ...     [False,True]])
+    >>> ns = torch.tensor([2**5,2**3,2**3],dtype=int)
+    >>> llbetas = [
+    ...     [torch.tensor([[0,0]]),torch.tensor([[2,0],[0,2]])],
+    ...     [torch.tensor([[0,0]])],
+    ...     [torch.tensor([[0,0]])]]
+    >>> llcs = [
+    ...     [torch.ones(1),torch.ones(2)],
+    ...     [torch.ones(1)],
+    ...     [torch.ones(1)]]
+    >>> gmpde = FastPDEGramMatrix(kernel_obj,dd_obj,ns,us,llbetas,llcs)
+    >>> gmpde._mult_check()
+
+    >>> dd_obj = DigitalNetB2(d,t_lms=32,alpha=2,seed=7)
+    >>> kernel_obj = KernelDigShiftInvar(d,alpha=4,torchify=False)
     >>> us = np.array([
     ...     [True,True],
     ...     [True,False],
     ...     [False,True]])
     >>> ns = np.array([2**5,2**3,2**3],dtype=int)
     >>> llbetas = [
-    ...     [np.array([[1,0],[0,1]]),np.array([[0,0]])],
+    ...     [np.array([[0,0]]),np.array([[1,0],[0,1]])],
     ...     [np.array([[0,0]])],
     ...     [np.array([[0,0]])]]
     >>> llcs = [
-    ...     [np.ones(2),np.ones(1)],
+    ...     [np.ones(1),np.ones(2)],
     ...     [np.ones(1)],
     ...     [np.ones(1)]]
-    >>> gmpde = FastPDEGramMatrix(lat_obj,kernel_si,ns=ns,us=us,llbetas=llbetas,llcs=llcs)
+    >>> gmpde = FastPDEGramMatrix(kernel_obj,dd_obj,ns,us,llbetas,llcs)
     >>> gmpde._mult_check()
     """
-    def __init__(self, dd_obj, kernel_obj, llbetas=None, llcs=None, noise=1e-8, ns=None, us=None, adaptive_noise=True, half_comp=True):
+    def __init__(self, kernel_obj, dd_obj, ns=None, us=None, llbetas=None, llcs=None, noise=1e-8, adaptive_noise=True, half_comp=True):
         """
         Args:
-            dd_obj (Lattice or DigitalNetB2): the discrete distribution from which to sample points 
             kernel_obj (KernelShiftInvar or KernelDigShiftInvar): the kernel to use 
+            dd_obj (Lattice or DigitalNetB2): the discrete distribution from which to sample points 
             llbetas (list of lists): list of length equal to the number of regions where each sub-list is the derivatives at that region 
             llcs (list of lists): list of length equal to the number of regions where each sub-list are the derivative coefficients at that region 
             noise (float): nugget term
@@ -48,9 +67,9 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         assert self.ns.shape==(self.nr,) and (self.ns[1:]<=self.ns[0]).all()
         super(FastPDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
         if isinstance(dd_obj,Lattice):
-            gmii = FastGramMatrixLattice(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],self.llbetas[0],self.llbetas[0],self.llcs[0],self.llcs[0],noise=0.,adaptive_noise=False)
+            gmii = FastGramMatrixLattice(kernel_obj,dd_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],self.llbetas[0],self.llbetas[0],self.llcs[0],self.llcs[0],noise=0.,adaptive_noise=False)
         elif isinstance(dd_obj,DigitalNetB2):
-            gmii = FastGramMatrixDigitalNetB2(dd_obj,kernel_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],self.llbetas[0],self.llbetas[0],self.llcs[0],self.llcs[0],noise=0.,adaptive_noise=False)
+            gmii = FastGramMatrixDigitalNetB2(kernel_obj,dd_obj,self.ns[0].item(),self.ns[0].item(),self.us[0],self.us[0],self.llbetas[0],self.llbetas[0],self.llcs[0],self.llcs[0],noise=0.,adaptive_noise=False)
         else:
             raise Exception("Invalid dd_obj") 
         self.gms = np.empty((self.nr,self.nr),dtype=object)
@@ -58,10 +77,10 @@ class FastPDEGramMatrix(_PDEGramMatrix):
         gmii__x_x = gmii._x,gmii.x 
         gmiitype = type(gmii)
         for i in range(1,self.nr):
-            self.gms[0,i] = gmiitype(dd_obj,gmii.kernel_obj,gmii.n1,self.ns[i].item(),gmii.u1,self.us[i,:],gmii.lbeta1s,self.llbetas[i],gmii.lc1s_og,self.llcs[i],0.,False,gmii__x_x)
-            self.gms[i,0] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),gmii.n1,self.us[i,:],gmii.u1,self.llbetas[i],gmii.lbeta1s,self.llcs[i],gmii.lc1s_og,0.,False,gmii__x_x)
+            self.gms[0,i] = gmiitype(gmii.kernel_obj,dd_obj,gmii.n1,self.ns[i].item(),gmii.u1,self.us[i,:],gmii.lbeta1s,self.llbetas[i],gmii.lc1s_og,self.llcs[i],0.,False,gmii__x_x)
+            self.gms[i,0] = gmiitype(gmii.kernel_obj,dd_obj,self.ns[i].item(),gmii.n1,self.us[i,:],gmii.u1,self.llbetas[i],gmii.lbeta1s,self.llcs[i],gmii.lc1s_og,0.,False,gmii__x_x)
             for k in range(1,self.nr):
-                self.gms[i,k] = gmiitype(dd_obj,gmii.kernel_obj,self.ns[i].item(),self.ns[k].item(),self.us[i,:],self.us[k,:],self.llbetas[i],self.llbetas[k],self.llcs[i],self.llcs[k],0.,False,gmii__x_x)
+                self.gms[i,k] = gmiitype(gmii.kernel_obj,dd_obj,self.ns[i].item(),self.ns[k].item(),self.us[i,:],self.us[k,:],self.llbetas[i],self.llbetas[k],self.llcs[i],self.llcs[k],0.,False,gmii__x_x)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
         self.bs_cumsum = [0]+np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]

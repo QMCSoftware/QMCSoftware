@@ -1,37 +1,45 @@
 from ._gram_matrix import _GramMatrix
 from ...discrete_distribution import IIDStdUniform
-from ..kernel import KernelShiftInvar
+from ..kernel import KernelGaussian
 import numpy as np
 import itertools
 
 class GramMatrix(_GramMatrix):
     """ Gram Matrix 
 
+    >>> import torch 
     >>> d = 3
     >>> n = 2**3
+    >>> x = torch.from_numpy(IIDStdUniform(d,seed=7).gen_samples(n))
+    >>> kernel_obj = KernelGaussian(d,torchify=True)
     >>> lbetas = [
-    ...     np.array([1,0,0]),
-    ...     np.array([[0,1,0],[0,0,1]]),
-    ...     [np.array([1,0,0]),np.array([0,1,0])],
-    ...     [np.array([[1,0,0],[0,1,0],[0,0,1]]),np.array([[1,0,1],[0,1,0],[0,0,0]])]
+    ...     torch.tensor([0,0,0]),
+    ...     torch.tensor([1,0,0]),
+    ...     torch.tensor([0,1,0]),
+    ...     torch.tensor([0,0,1])]
+    >>> gm = GramMatrix(kernel_obj,x,x,lbetas,lbetas)
+    >>> gm._check()
+    >>> lbetas = [
+    ...     torch.tensor([1,0,0]),
+    ...     torch.tensor([[0,1,0],[0,0,1]]),
+    ...     [torch.tensor([1,0,0]),torch.tensor([0,1,0])],
+    ...     [torch.tensor([[1,0,0],[0,1,0],[0,0,1]]),torch.tensor([[1,0,1],[0,1,0],[0,0,0]])]
     ...     ]
-    >>> x = IIDStdUniform(d,seed=7).gen_samples(n)
-    >>> kernel_obj = KernelShiftInvar(d)
     >>> for n1,n2 in itertools.product([n//2,n],[n//2,n]):
     ...     for ib1,ib2 in itertools.product(range(len(lbetas)),range(len(lbetas))):
     ...         x1 = x[:n1]
     ...         x2 = x[:n2]
     ...         lbeta1s = lbetas[ib1] 
     ...         lbeta2s = lbetas[ib2]
-    ...         gm = GramMatrix(x1,x2,kernel_obj,lbeta1s,lbeta2s)
+    ...         gm = GramMatrix(kernel_obj,x1,x2,lbeta1s,lbeta2s,adaptive_noise=False)
     ...         gm._check()
     """
-    def __init__(self, x1, x2, kernel_obj, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True):
+    def __init__(self, kernel_obj, x1, x2, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True):
         """
         Args:
+            kernel_obj (kernel): kernel
             x1 (np.ndarray or torch.Tensor): n1 left locations
             x2 (np.ndarray or torch.Tensor): n2 right locations
-            kernel_obj (kernel): kernel
             lbeta1s (list of either np.ndarray or torch.Tensor): list of (m1[l],d) arrays of first derivative orders
             lbeta1s (list of either np.ndarray or torch.Tensor): list of (m2[l],d) arrays of first derivative orders
             c1s (list of either np.ndarray or torch.Tensor): list of length m1[l] vectors of derivative coefficients 
@@ -83,5 +91,11 @@ class GramMatrix(_GramMatrix):
         if not self.invertible: return
         rng = np.random.Generator(np.random.SFC64(7))
         y = rng.uniform(size=(self.n2*self.t2,2))
-        assert np.allclose(self.solve(y[:,0]),np.linalg.solve(self.gm,y[:,0]),rtol=2.5e-2)
-        assert np.allclose(self.solve(y),np.linalg.solve(self.gm,y),rtol=2.5e-2)
+        if self.npt==np:
+            assert np.allclose(self.solve(y[:,0]),np.linalg.solve(self.gm,y[:,0]),rtol=2.5e-2)
+            assert np.allclose(self.solve(y),np.linalg.solve(self.gm,y),rtol=2.5e-2)
+        else:
+            import torch
+            y = torch.from_numpy(y)
+            assert np.allclose(self.solve(y[:,0]).numpy(),np.linalg.solve(self.gm.numpy(),y[:,0]),rtol=2.5e-2)
+            assert np.allclose(self.solve(y).numpy(),np.linalg.solve(self.gm.numpy(),y),rtol=2.5e-2)

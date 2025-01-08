@@ -30,11 +30,11 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> xb[(3*nb):,0] = 1.
     >>> kernel_gaussian = KernelGaussian(d)
     >>> llbetas = [
-    ...     [np.array([[1,0],[0,1]]),np.array([[0,0]])],
-    ...     [np.array([[0,0]])]]
+    ...     [np.array([[0,0]])],
+    ...     [np.array([[1,0],[0,1]]),np.array([[0,0]])]]
     >>> llcs = [
-    ...     [np.ones(2),np.ones(1)],
-    ...     [np.ones(1)]]
+    ...     [np.ones(1)],
+    ...     [np.ones(2),np.ones(1)]]
     >>> gmpde = PDEGramMatrix([xint,xb],kernel_gaussian,llbetas=llbetas,llcs=llcs)
     >>> gmpde._mult_check()
     """
@@ -80,7 +80,7 @@ class PDEGramMatrix(_PDEGramMatrix):
         super(PDEGramMatrix,self).__init__(kernel_obj,llbetas,llcs)
         self.gms = np.empty((self.nr,self.nr),dtype=object)
         for i1,i2 in itertools.product(range(self.nr),range(self.nr)):
-            self.gms[i1,i2] = GramMatrix(self.xs[i1],self.xs[i2],self.kernel_obj,self.llbetas[i1],self.llbetas[i2],self.llcs[i1],self.llcs[i2],noise=0.,adaptive_noise=False)
+            self.gms[i1,i2] = GramMatrix(self.kernel_obj,self.xs[i1],self.xs[i2],self.llbetas[i1],self.llbetas[i2],self.llcs[i1],self.llcs[i2],noise=0.,adaptive_noise=False)
         bs = [self.gms[i,0].size[0] for i in range(self.nr)]
         self.bs_cumsum = [0]+np.cumsum(bs).tolist() 
         self.length = self.bs_cumsum[-1]

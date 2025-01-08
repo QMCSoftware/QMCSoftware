@@ -28,6 +28,9 @@ class _PDEGramMatrix(object):
         rng = np.random.Generator(np.random.SFC64(7))
         y = rng.uniform(size=(self.length,2))
         gmatfull = self.get_full_gram_matrix()
+        if self.npt!=np: 
+            import torch
+            y = torch.from_numpy(y)
         assert np.allclose(self@y[:,0],gmatfull@y[:,0],atol=1e-12)
         assert np.allclose(self@y,gmatfull@y,atol=1e-12)
     def multiply(self, *args, **kwargs):
@@ -204,7 +207,7 @@ class _PDEGramMatrix(object):
                         print("\t\tK(A) = %-10.1eK(P) = %-10.1eK(P)/K(A)=%.1e"%(cond_Theta_red,cond_pmat,cond_pmat/cond_Theta_red))
                 else:
                     assert False, "solver parsing error"                    
-                gamma,rbackward_norms[i],times[i] = pcg(
+                gamma,pcg_data = pcg(
                     matmul = multiply,
                     b = diff,
                     precond_solve = precond_solve,
@@ -216,6 +219,8 @@ class _PDEGramMatrix(object):
                     ref_sol = None,
                     npt = self.npt,
                     ckwargs = self.ckwargs)
+                rbackward_norms[i] = pcg_data["rbackward_norms"]
+                times[i] = pcg_data["times"]
             delta = self@mult_tFp(gamma)-z/(1+relaxation)
             z = z+delta
             zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()

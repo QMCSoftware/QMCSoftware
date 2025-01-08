@@ -21,24 +21,25 @@ def pcg(matmul, b, x0=None, rtol=None, atol=None, maxiter=None, precond_solve=Fa
     >>> b = rng.uniform(size=(n,))
     >>> b 
     array([0.99550028, 0.79266192, 0.62217923, 0.98896015])
-    >>> xhat,rbackward_norms,times = pcg(lambda x: A@x,b,rtol=0.,atol=0.)
+    >>> xhat,data = pcg(lambda x: A@x,b,rtol=0.,atol=0.)
     >>> x = scipy.linalg.cho_solve((L,True),b)
     >>> xhat-x
-    array([8.52651283e-14, 9.68114477e-14, 4.26325641e-14, 8.43769499e-14])
-    >>> rbackward_norms
+    array([ 3.55271368e-15, -2.66453526e-14, -6.75015599e-14, -2.84217094e-14])
+    >>> data["rbackward_norms"]
     array([1.00000000e+00, 4.29203172e-01, 7.18633337e-01, 1.99316856e-01,
-           1.79201971e-13])
-    >>> xhat,rbackward_norms,times,rforward_norms = pcg(lambda x: A@x,b,rtol=0.,atol=0.,ref_sol=x)
-    >>> rforward_norms
+           8.67932537e-14])
+    >>> xhat,data = pcg(lambda x: A@x,b,rtol=0.,atol=0.,ref_sol=x)
+    >>> data["rforward_norms"]
     array([1.00000000e+00, 9.87169026e-01, 6.26795202e-01, 3.03568508e-02,
-           5.50209863e-15])
+           2.68397083e-15])
     >>> import torch
     >>> Atorch = torch.from_numpy(A)
     >>> btorch = torch.from_numpy(b)
     >>> xtorch = torch.from_numpy(x)
-    >>> xhat,rbackward_norms,times,rforward_norms = pcg(lambda x: Atorch@x,btorch,rtol=0.,atol=0.,ref_sol=xtorch, npt=torch)
+    >>> xhat,_ = pcg(lambda x: Atorch@x,btorch,rtol=0.,atol=0.,ref_sol=xtorch, npt=torch)
     >>> xhat-xtorch
-    tensor([9.2371e-14, 8.1712e-14, 3.5527e-15, 7.2831e-14], dtype=torch.float64)
+    tensor([ 1.4211e-14, -2.5757e-14, -8.1712e-14, -2.3981e-14],
+           dtype=torch.float64)
 
     Preconditioned Conjugate Gradient (PCG) method, see https://en.wikipedia.org/wiki/Conjugate_gradient_method#The_preconditioned_conjugate_gradient_method
     
@@ -53,7 +54,9 @@ def pcg(matmul, b, x0=None, rtol=None, atol=None, maxiter=None, precond_solve=Fa
         npt (numpy or torch): module for numerical computations 
         ckwargs (dict): keyword arguments to pass when constructing a tensor e.g. ckwargs={"device":"cpu"}
         beta_method (str): either 'FR' for Fletcher-Reeves (default) or 'PR' for Polak-Ribiere
-    """
+    
+    Returns: 
+        x (np.ndarray or torch.Tensor)"""
     if rtol is None: rtol = 1e-8 
     if atol is None: atol = 0.
     if beta_method is None: beta_method = "FR"
@@ -102,10 +105,11 @@ def pcg(matmul, b, x0=None, rtol=None, atol=None, maxiter=None, precond_solve=Fa
         z = znew
         rz = rznew
         p = z+beta*p
-    times = times[:(i+1)]
-    rbackward_norms = backward_norms[:(i+1)]/bnorm
-    if ref_sol is None:
-        return x,rbackward_norms,times
-    else:
-        rforward_norms = forward_norms[:(i+1)]/xrefnorm
-        return x,rbackward_norms,times,rforward_norms
+    data = {
+        "x": x,
+        "rbackward_norms": backward_norms[:(i+1)]/bnorm,
+        "times": times[:(i+1)]
+    }
+    if ref_sol is not None:
+        data["rforward_norms"] = forward_norms[:(i+1)]/xrefnorm
+    return x,data
