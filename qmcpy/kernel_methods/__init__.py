@@ -1,8 +1,6 @@
 from .util import (
     bernoulli_poly,
-    weighted_walsh_funcs,
-    ppchol,
-    solve_ppchol)
+    weighted_walsh_funcs)
 from .fast_transforms import (
     fftbr,ifftbr,fwht
 )
@@ -18,6 +16,3 @@ from .kernel import (
 from .gram_matrix import (
     GramMatrix,
     FastGramMatrixLattice,FastGramMatrixDigitalNetB2)
-from .pde_gram_matrix import (
-    PDEGramMatrix,
-    FastPDEGramMatrix)

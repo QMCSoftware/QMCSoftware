@@ -25,29 +25,29 @@ class KernelShiftInvar(_KernelProdSpecial):
 
     >>> d = 3
     >>> x = Lattice(d,randomize="shift",order="linear",seed=7).gen_samples(8)
-    >>> k = KernelShiftInvar(d)
+    >>> k = KernelShiftInvar(d,torchify=False)
     >>> with np.printoptions(precision=2):
     ...     k(x,x)
-    array([[27.05,  0.41,  0.99, -2.41, -0.99, -2.41,  0.99,  0.41],
-           [ 0.41, 27.05,  0.41,  0.99, -2.41, -0.99, -2.41,  0.99],
-           [ 0.99,  0.41, 27.05,  0.41,  0.99, -2.41, -0.99, -2.41],
-           [-2.41,  0.99,  0.41, 27.05,  0.41,  0.99, -2.41, -0.99],
-           [-0.99, -2.41,  0.99,  0.41, 27.05,  0.41,  0.99, -2.41],
-           [-2.41, -0.99, -2.41,  0.99,  0.41, 27.05,  0.41,  0.99],
-           [ 0.99, -2.41, -0.99, -2.41,  0.99,  0.41, 27.05,  0.41],
-           [ 0.41,  0.99, -2.41, -0.99, -2.41,  0.99,  0.41, 27.05]])
+    array([[27.22,  0.41,  0.98, -2.41, -0.98, -2.41,  0.98,  0.41],
+           [ 0.41, 27.22,  0.41,  0.98, -2.41, -0.98, -2.41,  0.98],
+           [ 0.98,  0.41, 27.22,  0.41,  0.98, -2.41, -0.98, -2.41],
+           [-2.41,  0.98,  0.41, 27.22,  0.41,  0.98, -2.41, -0.98],
+           [-0.98, -2.41,  0.98,  0.41, 27.22,  0.41,  0.98, -2.41],
+           [-2.41, -0.98, -2.41,  0.98,  0.41, 27.22,  0.41,  0.98],
+           [ 0.98, -2.41, -0.98, -2.41,  0.98,  0.41, 27.22,  0.41],
+           [ 0.41,  0.98, -2.41, -0.98, -2.41,  0.98,  0.41, 27.22]])
     >>> import torch 
     >>> xt = torch.from_numpy(x).float()
     >>> kt = KernelShiftInvar(d,torchify=True)
     >>> kt(xt,xt[[0]])
-    tensor([[27.0537],
-            [ 0.4142],
-            [ 0.9942],
-            [-2.4140],
-            [-0.9942],
-            [-2.4140],
-            [ 0.9942],
-            [ 0.4142]], dtype=torch.float64)
+    tensor([[27.2208],
+            [ 0.4138],
+            [ 0.9768],
+            [-2.4126],
+            [-0.9776],
+            [-2.4126],
+            [ 0.9768],
+            [ 0.4138]], dtype=torch.float64)
     """
     DEFAULTALPHA = 4
     def _my_init(self, **kwargs):
@@ -78,7 +78,7 @@ class KernelDigShiftInvar(_KernelProdSpecial):
     >>> d = 3
     >>> dnb2 = DigitalNetB2(d,randomize="LMS_DS",seed=7)
     >>> xb = dnb2.gen_samples(8,return_binary=True)
-    >>> k = KernelDigShiftInvar(d,t=dnb2.t_lms)
+    >>> k = KernelDigShiftInvar(d,t=dnb2.t_lms,torchify=False)
     >>> with np.printoptions(precision=2):
     ...     k(xb,xb)
     array([[13.63,  0.17,  0.21,  0.86,  1.17,  0.28,  0.45,  0.43],

@@ -44,12 +44,7 @@ sphinx/*.jpg
 *checkpoint.ipynb
 demos/**.png
 demos/**.eps
-demos/pde_kernel_methods/*.pt
-demos/pde_kernel_methods/.ipynb_checkpoints/*
-demos/pde_kernel_methods/MLP/*
-demos/pde_kernel_methods/MLP_i/*
-demos/pde_kernel_methods/DeepONet_i/*
-demos/pde_kernel_methods/DeepONet/*
+
 
 
 # release

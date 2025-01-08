@@ -11,41 +11,7 @@ import itertools
 import warnings
     
 class _FastGramMatrix(_GramMatrix):
-    """
-    >>> n = 2**3
-    >>> d = 3
-    >>> us = [np.array([int(b) for b in np.binary_repr(i,d)],dtype=bool) for i in range(2**d)]
-    >>> lbetas = [
-    ...     np.array([1,0,0]),
-    ...     np.array([[0,1,0],[0,0,1]]),
-    ...     [np.array([1,0,0]),np.array([0,1,0])],
-    ...     [np.array([[1,0,0],[0,1,0],[0,0,1]]),np.array([[1,0,1],[0,1,0],[0,0,0]])]
-    ...     ]
-    >>> num_invertible = 0
-    >>> lat_obj = Lattice(d,seed=7)
-    >>> kernel_si = KernelShiftInvar(d,alpha=4)
-    >>> dnb2_obj = DigitalNetB2(d,t_lms=32,alpha=2,seed=7)
-    >>> kernel_dsi = KernelDigShiftInvar(d,alpha=4)
-    >>> for iu1,iu2 in itertools.product(range(2**d),range(2**d)):
-    ...     u1 = us[iu1]
-    ...     u2 = us[iu2]
-    ...     n1 = n if u1.sum()>0 else 1 
-    ...     n2 = n if u2.sum()>0 else 1
-    ...     for ib1,ib2 in itertools.product(range(len(lbetas)),range(len(lbetas))):
-    ...         lbeta1s = lbetas[ib1]
-    ...         lbeta2s = lbetas[ib2]
-    ...         lc1s = 1.
-    ...         lc2s = 1.
-    ...         gm_lat = FastGramMatrixLattice(lat_obj,kernel_si,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s)
-    ...         gm_dnb2 = FastGramMatrixDigitalNetB2(dnb2_obj,kernel_dsi,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s)
-    ...         for gm in [gm_lat,gm_dnb2]:
-    ...             gm._check()
-    ...             gm_tall = gm.copy(max(n1//2,1),max(n2//4,1))
-    ...             gm_tall._check()
-    ...             gm_wide = gm.copy(max(n1//4,1),max(n2//2,1))
-    ...             gm_wide._check()
-    """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, adaptive_noise, _pregenerated_x__x):
+    def __init__(self, kernel_obj, dd_obj, n1, n2, u1, u2, lbeta1s, lbeta2s, lc1s, lc2s, noise, adaptive_noise, _pregenerated_x__x):
         super(_FastGramMatrix,self).__init__(kernel_obj,noise,lbeta1s,lbeta2s,lc1s,lc2s)
         self.n1 = n1 
         self.n2 = n2 
@@ -152,11 +118,12 @@ class _FastGramMatrix(_GramMatrix):
             ( (self.t1==1 and self.t2==1 and self.noise==0) or (self.d_u1mu2==0 and self.d_u2mu1==0), "Only allow more than one beta block when there are no left or right factors in each block"),
             ]
         super(_FastGramMatrix,self)._set_invertible_conds(invertible_conds)
+        self.adaptive_noise = adaptive_noise
         if self.invertible:
             self.k00diags = self.npt.ones(self.t1) 
             for tt1 in range(self.t1):
                 self.k00diags[tt1] = k1[tt1,tt1][0,0,0,0]
-            if adaptive_noise:
+            if self.adaptive_noise:
                 assert (self.lbeta1s[0]==0.).all() and (self.lbeta1s[0].shape==(1,self.d)) and (self.lc1s_og[0]==1.).all() and (self.lc1s_og[0].shape==(1,))
                 trace0 = self.k00diags[0] 
                 for tt1 in range(self.t1):
@@ -266,25 +233,22 @@ class _FastGramMatrix(_GramMatrix):
             s = self.ift(yt).real # (v,t1,n1)
             s = s.reshape((v,self.t1*self.n1))
         return s[0,:] if yogndim==1 else s.T
-    def copy(self, n1=None, n2=None):
-        if n1 is None: n1 = self.n1 
-        if n2 is None: n2 = self.n2
-        return type(self)(
-            dd_obj = self.dd_obj,
-            kernel_obj = self.kernel_obj,
-            n1 = self.n1 if n1 is None else n1,
-            n2 = self.n2 if n2 is None else n2,
-            u1 = self.u1,
-            u2 = self.u2,
-            noise = self.noise,
-            _pregenerated_x__x = (self._x,self.x))
     def _mult_check(self, y, gmatfull):
+        if self.npt!=np:
+            import torch
+            y = torch.from_numpy(y)
         assert np.allclose(self@y[:,0],gmatfull@y[:,0],atol=1e-12)
         assert np.allclose(self@y,gmatfull@y,atol=1e-12)
     def _solve_check(self, y, gmatfull):
         if not self.invertible: return
-        assert np.allclose(self.solve(y[:,0]),np.linalg.solve(gmatfull,y[:,0]),rtol=2.5e-2)
-        assert np.allclose(self.solve(y),np.linalg.solve(gmatfull,y),rtol=2.5e-2)
+        if self.npt==np:
+            assert np.allclose(self.solve(y[:,0]),np.linalg.solve(gmatfull,y[:,0]),rtol=2.5e-2)
+            assert np.allclose(self.solve(y),np.linalg.solve(gmatfull,y),rtol=2.5e-2)
+        else:
+            import torch 
+            y = torch.from_numpy(y)
+            assert np.allclose(self.solve(y[:,0]).numpy(),np.linalg.solve(gmatfull,y[:,0].numpy()),rtol=2.5e-2)
+            assert np.allclose(self.solve(y).numpy(),np.linalg.solve(gmatfull,y.numpy()),rtol=2.5e-2)
     def _check(self):
         rng = np.random.Generator(np.random.SFC64(7))
         y = rng.uniform(size=(self.n2*self.t2,2))
@@ -295,12 +259,50 @@ class _FastGramMatrix(_GramMatrix):
 class FastGramMatrixLattice(_FastGramMatrix):
     """
     Fast Gram matrix operations using lattice points and shift invariant kernels 
+
+    >>> import torch
+    >>> n = 2**3
+    >>> d = 3
+    >>> dd_obj = Lattice(d,seed=7)
+    >>> kernel_obj = KernelShiftInvar(d,alpha=4)
+    >>> lbetas = [
+    ...     torch.tensor([0,0,0]),
+    ...     torch.tensor([1,0,0]),
+    ...     torch.tensor([0,1,0]),
+    ...     torch.tensor([0,0,1])]
+    >>> u = torch.tensor([True,True,True])
+    >>> gm = FastGramMatrixLattice(kernel_obj,dd_obj,n,n,u,u,lbetas,lbetas)
+    >>> gm._check()
+    >>> us = [torch.tensor([int(b) for b in np.binary_repr(i,d)],dtype=bool) for i in range(2**d)]
+    >>> lbetas = [
+    ...     torch.tensor([1,0,0]),
+    ...     torch.tensor([[0,1,0],[0,0,1]]),
+    ...     [torch.tensor([1,0,0]),torch.tensor([0,1,0])],
+    ...     [torch.tensor([[1,0,0],[0,1,0],[0,0,1]]),torch.tensor([[1,0,1],[0,1,0],[0,0,0]])]
+    ...     ]
+    >>> num_invertible = 0
+    >>> for iu1,iu2 in itertools.product(range(2**d),range(2**d)):
+    ...     u1 = us[iu1]
+    ...     u2 = us[iu2]
+    ...     n1 = n if u1.sum()>0 else 1 
+    ...     n2 = n if u2.sum()>0 else 1
+    ...     for ib1,ib2 in itertools.product(range(len(lbetas)),range(len(lbetas))):
+    ...         lbeta1s = lbetas[ib1]
+    ...         lbeta2s = lbetas[ib2]
+    ...         lc1s = 1.
+    ...         lc2s = 1.
+    ...         gm = FastGramMatrixLattice(kernel_obj,dd_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
+    ...         gm._check()
+    ...         gm_tall = FastGramMatrixLattice(kernel_obj,dd_obj,max(n1//2,1),max(n2//4,1),u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
+    ...         gm_tall._check()
+    ...         gm_wide = FastGramMatrixLattice(kernel_obj,dd_obj,max(n1//4,1),max(n2//2,1),u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
+    ...         gm_wide._check()
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
+    def __init__(self, kernel_obj, dd_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
         """
         Args:
-            dd_obj (Lattice): requires randomize='SHIFT' and order="NATURAL"
             kernel_obj (KernelShiftInvar): shift invariant kernel
+            dd_obj (Lattice): requires randomize='SHIFT' and order="NATURAL"
             n1 (int): first number of points
             n2 (int): second number of points
             u1 (np.ndarray or torch.Tensor): length d bool vector of first active dimensions 
@@ -335,7 +337,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
             #     # custom torch implementations (theoretically faster, practically slower)
             self.ft = fftbr_torch
             self.ift = ifftbr_torch
-        super(FastGramMatrixLattice,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
+        super(FastGramMatrixLattice,self).__init__(kernel_obj,dd_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
         x = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max)
         return x,x
@@ -347,12 +349,50 @@ class FastGramMatrixLattice(_FastGramMatrix):
 class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     """
     Fast Gram matrix operations using base 2 digital net points and digitally shift invariant kernels 
+
+    >>> import torch
+    >>> n = 2**3
+    >>> d = 3
+    >>> dd_obj = DigitalNetB2(d,t_lms=32,alpha=2,seed=7)
+    >>> kernel_obj = KernelDigShiftInvar(d,alpha=4,torchify=False)
+    >>> lbetas = [
+    ...     np.array([0,0,0]),
+    ...     np.array([1,0,0]),
+    ...     np.array([0,1,0]),
+    ...     np.array([0,0,1])]
+    >>> u = np.array([True,True,True])
+    >>> gm = FastGramMatrixDigitalNetB2(kernel_obj,dd_obj,n,n,u,u,lbetas,lbetas)
+    >>> gm._check()
+    >>> us = [np.array([int(b) for b in np.binary_repr(i,d)],dtype=bool) for i in range(2**d)]
+    >>> lbetas = [
+    ...     np.array([1,0,0]),
+    ...     np.array([[0,1,0],[0,0,1]]),
+    ...     [np.array([1,0,0]),np.array([0,1,0])],
+    ...     [np.array([[1,0,0],[0,1,0],[0,0,1]]),np.array([[1,0,1],[0,1,0],[0,0,0]])]
+    ...     ]
+    >>> num_invertible = 0
+    >>> for iu1,iu2 in itertools.product(range(2**d),range(2**d)):
+    ...     u1 = us[iu1]
+    ...     u2 = us[iu2]
+    ...     n1 = n if u1.sum()>0 else 1 
+    ...     n2 = n if u2.sum()>0 else 1
+    ...     for ib1,ib2 in itertools.product(range(len(lbetas)),range(len(lbetas))):
+    ...         lbeta1s = lbetas[ib1]
+    ...         lbeta2s = lbetas[ib2]
+    ...         lc1s = 1.
+    ...         lc2s = 1.
+    ...         gm = FastGramMatrixDigitalNetB2(kernel_obj,dd_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
+    ...         gm._check()
+    ...         gm_tall = FastGramMatrixDigitalNetB2(kernel_obj,dd_obj,max(n1//2,1),max(n2//4,1),u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
+    ...         gm_tall._check()
+    ...         gm_wide = FastGramMatrixDigitalNetB2(kernel_obj,dd_obj,max(n1//4,1),max(n2//2,1),u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
+    ...         gm_wide._check()
     """
-    def __init__(self, dd_obj, kernel_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
+    def __init__(self, kernel_obj, dd_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
         """
         Args:
-            dd_obj (DigitalNetB2): requires randomize='LMS_DS' and graycode=False
             kernel_obj (KernelDigShiftInvar): digitally shift invariant kernel
+            dd_obj (DigitalNetB2): requires randomize='LMS_DS' and graycode=False
             n1 (int): first number of points
             n2 (int): second number of points
             u1 (np.ndarray or torch.Tensor): length d bool vector of first active dimensions 
@@ -378,7 +418,8 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
             # custom torch implementations 
             self.ft = fwht_torch
             self.ift = fwht_torch
-        super(FastGramMatrixDigitalNetB2,self).__init__(dd_obj,kernel_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
+        assert kernel_obj.npt==np, "FastGramMatrixDigitalNetB2 does not currently support torch as 'index_cpu' is not yet implemented for tensors of dtype torch.uint64"
+        super(FastGramMatrixDigitalNetB2,self).__init__(kernel_obj,dd_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
         xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True)
         xf = self._convert__x_to_x(xb)

@@ -5,8 +5,7 @@ from .stopping_criterion import *
 from .kernel_methods import (
     fftbr,ifftbr,fwht,
     KernelShiftInvar,KernelDigShiftInvar,KernelGaussian,
-    FastGramMatrixLattice,FastGramMatrixDigitalNetB2,GramMatrix,
-    FastPDEGramMatrix,PDEGramMatrix)
+    FastGramMatrixLattice,FastGramMatrixDigitalNetB2,GramMatrix)
 try:
     from .kernel_methods import (
         fftbr_torch,ifftbr_torch,fwht_torch
