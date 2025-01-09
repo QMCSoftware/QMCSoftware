@@ -1,5 +1,5 @@
+import scipy.linalg 
 import numpy as np 
-import scipy.linalg
 
 def ppchol(A, rank=None, rtol=None, atol=None, return_pivots=False):
     """

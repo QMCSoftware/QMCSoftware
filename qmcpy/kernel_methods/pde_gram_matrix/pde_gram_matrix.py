@@ -1,55 +1,169 @@
 from ._pde_gram_matrix import _PDEGramMatrix
-from ..util import ppchol,solve_ppchol
 from ...discrete_distribution import IIDStdUniform
 from ...discrete_distribution._discrete_distribution import DiscreteDistribution
+from ...discrete_distribution import Lattice
 from ..kernel import KernelGaussian
 from ..gram_matrix import GramMatrix
+from ..pcg import pcg,PPCholPrecond
 import numpy as np 
 import itertools
 
 class PDEGramMatrix(_PDEGramMatrix):
-    """ Fast Gram Matrix for solving PDEs 
+    """ Gram Matrix for solving PDEs 
     
-    >>> d = 2
-    >>> rng = np.random.Generator(np.random.PCG64(7))
-    >>> nint = 5
-    >>> nb = 3
-    >>> xint = rng.uniform(size=(nint,d))
-    >>> xb = np.empty((4*nb,d))
-    >>> # bottom
-    >>> xb[:nb,0] = rng.uniform(size=nb)
-    >>> xb[:nb,1] = 0.
-    >>> # top 
-    >>> xb[nb:(2*nb),0] = rng.uniform(size=nb)
-    >>> xb[nb:(2*nb),1] = 1.
-    >>> # left
-    >>> xb[(2*nb):(3*nb),1] = rng.uniform(size=nb)
-    >>> xb[(2*nb):(3*nb),0] = 0.
-    >>> # right
-    >>> xb[(3*nb):,1] = rng.uniform(size=nb)
-    >>> xb[(3*nb):,0] = 1.
-    >>> kernel_gaussian = KernelGaussian(d)
-    >>> llbetas = [
-    ...     [np.array([[0,0]])],
-    ...     [np.array([[1,0],[0,1]]),np.array([[0,0]])]]
-    >>> llcs = [
-    ...     [np.ones(1)],
-    ...     [np.ones(2),np.ones(1)]]
-    >>> gmpde = PDEGramMatrix([xint,xb],kernel_gaussian,llbetas=llbetas,llcs=llcs)
-    >>> gmpde._mult_check()
+    >>> import torch 
+
+    >>> C1 = 1.
+    >>> C2 = -1.
+    >>> def u(x):
+    ...     x1,x2 = x[:,0],x[:,1]
+    ...     y = torch.zeros_like(x1)
+    ...     r = torch.sqrt((2*x1-1)**2+(2*x2-1)**2)
+    ...     b = r<1
+    ...     t1 = torch.exp(-1/(1-r[b]**2))
+    ...     t2 = torch.sin(torch.pi*x1[b])*torch.sin(torch.pi*x2[b])
+    ...     t3 = 4*torch.sin(6*torch.pi*x1[b])*torch.sin(6*torch.pi*x2[b])
+    ...     y[b] = t1*(t2+t3)
+    ...     return y
+    >>> def u_laplace(x):
+    ...     x1g,x2g = x[:,0].clone().requires_grad_(),x[:,1].clone().requires_grad_()
+    ...     xg = torch.hstack([x1g[:,None],x2g[:,None]])
+    ...     yg = u(xg)
+    ...     grad_outputs = torch.ones_like(yg,requires_grad=False)
+    ...     yp1g = torch.autograd.grad(yg,x1g,grad_outputs,create_graph=True)[0]
+    ...     yp1p1g = torch.autograd.grad(yp1g,x1g,grad_outputs,create_graph=True)[0]
+    ...     yp2g = torch.autograd.grad(yg,x2g,grad_outputs,create_graph=True)[0]
+    ...     yp2p2g = torch.autograd.grad(yp2g,x2g,grad_outputs,create_graph=True)[0]
+    ...     return (yp1p1g+yp2p2g).detach()
+    >>> def f(x):
+    ...     return C1*u(x)**3+C2*u_laplace(x)
+    >>> x1dticks = torch.linspace(0,1,65,dtype=float)
+    >>> x1mesh,x2mesh = torch.meshgrid(x1dticks,x1dticks,indexing="ij")
+    >>> x1ticks,x2ticks = x1mesh.flatten(),x2mesh.flatten()
+    >>> xticks = torch.hstack([x1ticks[:,None],x2ticks[:,None]])
+    >>> ymesh = u(xticks).reshape(x1mesh.shape)
+
+    >>> ns = torch.tensor([ # number of collocation points
+    ...     2**9, # on the interior
+    ...     2**7, # boundary top-bottom
+    ...     2**7, # boundary left-right
+    ... ],dtype=int)
+    >>> us = torch.tensor([ # dimensions not projected to the 0 boundary
+    ...     [True,True], # interior points (not projected to the 0 boundary)
+    ...     [True,False], # boundary points top-bottom i.e. x_2=0 or x_2=1
+    ...     [False,True] # boundary points left-right i.e. x_1=0 or x_1=1
+    ... ],dtype=bool) 
+    >>> llbetas = [ # derivative orders 
+    ...     [ # interior
+    ...         torch.tensor([[0,0]],dtype=int), # u
+    ...         torch.tensor([[2,0],[0,2]],dtype=int), # laplacian u
+    ...     ],
+    ...     [ # boundary top-bottom
+    ...         torch.tensor([[0,0]],dtype=int) # u
+    ...     ],
+    ...     [ # boundary left-right 
+    ...         torch.tensor([[0,0]],dtype=int) # u
+    ...     ]
+    ... ]
+    >>> llcs = [ # summand of derivatives coefficients
+    ...     [ # interior
+    ...         torch.ones(1,dtype=float), # u 
+    ...         torch.ones(2,dtype=float) # laplacian u
+    ...     ],
+    ...     [ # boundary top-bottom
+    ...         torch.ones(1,dtype=float) # u
+    ...     ],
+    ...     [ # boundary left-right
+    ...         torch.ones(1,dtype=float) # u
+    ...     ]
+    ... ]
+
+    >>> def pde_lhs(ly_i, ly_b_tb, ly_b_lr):
+    ...     u_i,u_laplace_i = ly_i
+    ...     u_b_tb = ly_b_tb[0] 
+    ...     u_b_lr = ly_b_lr[0]
+    ...     lhs_i = C1*u_i**3+C2*u_laplace_i
+    ...     lhs_b_tb = u_b_tb
+    ...     lhs_b_lr = u_b_lr
+    ...     return lhs_i,lhs_b_tb,lhs_b_lr
+    >>> def pde_rhs(x_i, x_b_tb, x_b_lr):
+    ...     y_i = f(x_i)
+    ...     y_b_tb = torch.zeros(len(x_b_tb),dtype=float)
+    ...     y_b_lr = torch.zeros(len(x_b_lr),dtype=float)
+    ...     return y_i,y_b_tb,y_b_lr
+        
+    >>> noise = 1e-6
+    >>> lattice = Lattice(dimension=2,seed=7) # collocation points
+    >>> kernel = KernelGaussian(dimension=2,lengthscales=5e-2,scale=1.,torchify=True) # kernel
+    >>> ki = PDEGramMatrix(kernel,lattice,ns,us,llbetas,llcs,noise) # kernel interpolant
+    
+    >>> ki._mult_check()
+
+    >>> y,data = ki.pde_opt_gauss_newton(
+    ...     pde_lhs = pde_lhs,
+    ...     pde_rhs = pde_rhs)
+        iter (8 max)   loss           
+        0              2.16e+02       
+        1              3.88e-01       
+        2              2.58e-04       
+        3              1.11e-07       
+        4              5.05e-08       
+        5              4.18e-08       
+        6              4.52e-08       
+        7              4.95e-08       
+        8              4.44e-08       
+    >>> print(data["solver"])
+    CHOL
+
+    >>> coeffs = ki._solve(y) # coeffs,rerrors_fit,times_fit = ki.pcg(y,precond=True)
+    >>> kvec = ki.get_new_left_full_gram_matrix(xticks)
+    >>> yhatmesh = (kvec@coeffs).reshape(x1mesh.shape)
+    >>> print("L2 Rel Error Gauss: %.1e"%(torch.linalg.norm(yhatmesh-ymesh)/torch.linalg.norm(ymesh)))
+    L2 Rel Error Gauss: 5.8e-02
+
+    >>> y,data = ki.pde_opt_gauss_newton(
+    ...     pde_lhs = pde_lhs,
+    ...     pde_rhs = pde_rhs,
+    ...     use_pcg = True,
+    ...     precond_setter = lambda pde_gm: PPCholPrecond(pde_gm.rtheta.full_mat,rtol=1e-7),
+    ...     pcg_kwargs = {"rtol":1e-3},
+    ...     verbose = 2)
+        iter (8 max)   loss           K(A)           K(P)           K(P)/K(A)      Lk.shape       PCG rberror    PCG steps (768 max)
+        0              2.16e+02       
+        1              4.23e-01       1.5e+13        2.4e+08        1.6e-05        (768, 495)     9.2e-04        286
+        2              2.77e-01       1.5e+13        3.0e+08        2.0e-05        (768, 526)     1.3e-03        768
+        3              2.11e-01       1.5e+13        3.0e+08        2.0e-05        (768, 522)     9.8e-04        505
+        4              1.85e-01       1.5e+13        3.0e+08        2.0e-05        (768, 526)     8.5e-04        534
+        5              2.12e-01       1.5e+13        3.0e+08        2.0e-05        (768, 522)     9.8e-04        484
+        6              2.15e-01       1.5e+13        3.0e+08        2.0e-05        (768, 522)     1.0e-03        525
+        7              2.06e-01       1.5e+13        3.3e+08        2.2e-05        (768, 526)     9.5e-04        508
+        8              2.12e-01       1.5e+13        3.1e+08        2.0e-05        (768, 526)     9.8e-04        530
+    >>> print(data["solver"])
+    PCG-PPCholPrecond
+
+    >>> precond = PPCholPrecond(ki.full_mat)
+    >>> print(precond.info_str(ki.full_mat))
+    K(A)           K(P)           K(P)/K(A)      Lk.shape       
+    2.8e+13        8.4e+04        3.0e-09        (1280, 695)    
+    >>> coeffs,data = pcg(ki,y,precond,rtol=5e-3)
+    >>> kvec = ki.get_new_left_full_gram_matrix(xticks)
+    >>> yhatmesh = (kvec@coeffs).reshape(x1mesh.shape)
+    >>> print("L2 Rel Error Gauss: %.1e"%(torch.linalg.norm(yhatmesh-ymesh)/torch.linalg.norm(ymesh)))
+    L2 Rel Error Gauss: 7.1e-02
     """
-    def __init__(self, xs, kernel_obj, llbetas=None, llcs=None, noise=1e-8, ns=None, us=None, adaptive_noise=True, half_comp=True):
+    def __init__(self, kernel_obj, xs, ns=None, us=None, llbetas=None, llcs=None, noise=1e-8, adaptive_noise=True, half_comp=True):
         """
         Args:
-            xs (DiscreteDisribution or list of numpy.ndarray or torch.Tensor): locations at which the regions are sampled 
             kernel_obj (_Kernel): the kernel to use
-            llbetas (list of lists): list of length equal to the number of regions where each sub-list is the derivatives at that region 
-            llcs (list of lists): list of length equal to the number of regions where each sub-list are the derivative coefficients at that region 
-            noise (float): nugget term
+            xs (DiscreteDisribution or list of (numpy.ndarray or torch.Tensor)): locations at which the regions are sampled 
             ns (np.ndarray or torch.Tensor): vector of number of points on each of the regions. 
                 Only used when a DiscreteDistribution is passed in for xs
             us (np.ndarray or torch.Tensor): bool matrix where each row is a region specifying the active dimensions
                 Only used when a DiscreteDistribution is passed in for xs
+            llbetas (list of lists): list of length equal to the number of regions where each sub-list is the derivatives at that region 
+            llcs (list of lists): list of length equal to the number of regions where each sub-list are the derivative coefficients at that region 
+            noise (float): nugget term
+            adaptive_noise (bool): wheather to use an adaptive nugget term
             half_comp (bool or numpy.ndarray or torch.Tensor): if True, put project half the points to the 0 boundary and half the points to the 1 boundary
         """
         if isinstance(xs,DiscreteDistribution):
@@ -103,36 +217,20 @@ class PDEGramMatrix(_PDEGramMatrix):
                                 cs_j = self.llcs[i2][tt2]
                                 assert (cs_i==cs_j).all()
                                 nj1 = self.gms[i2,i2].n1
-                                full_traces[i1][tt1] += nj1*self.gms[i2,i2].gm[tt2*nj1,tt2*nj1]
+                                full_traces[i1][tt1] += nj1*self.gms[i2,i2].full_mat[tt2*nj1,tt2*nj1]
                     self.trace_ratios[i1][tt1] = full_traces[i1][tt1]/full_traces[0][0]
             for i in range(self.nr):
                 ni1 = self.gms[i,i].n1
-                self.gms[i,i].gm += noise*self.npt.diag((self.npt.ones((ni1,self.tvec[i]))*self.trace_ratios[i]).T.flatten())
-                self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])
+                self.gms[i,i].full_mat += noise*self.npt.diag((self.npt.ones((ni1,self.tvec[i]))*self.trace_ratios[i]).T.flatten())
+                self.full_mat = self.npt.vstack([self.npt.hstack([self.gms[i,k].full_mat for k in range(self.nr)]) for i in range(self.nr)])
         else:
             assert all(self.gms[i,i].invertible for i in range(self.nr))
-            self.gm = self.npt.vstack([self.npt.hstack([self.gms[i,k].gm for k in range(self.nr)]) for i in range(self.nr)])
-            self.gm += noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
+            self.full_mat = self.npt.vstack([self.npt.hstack([self.gms[i,k].full_mat for k in range(self.nr)]) for i in range(self.nr)])
+            self.full_mat += noise*self.npt.eye(self.length,dtype=float,**self.ckwargs)
         self.cholesky = self.gms[0,0].cholesky
         self.cho_solve = self.gms[0,0].cho_solve
-    def _init_precond_solve(self):
-        if not hasattr(self,"ddiag"):
-            self.ddiag = 1e-8*self.npt.ones_like(self.gm.diagonal())
-            self.Lk = ppchol(self.gm-self.npt.diag(self.ddiag),return_pivots=False)
-            k = self.Lk.size(1)
-            self.pL = self.npt.linalg.cholesky(self.npt.eye(k,dtype=float)+(self.Lk.T/self.ddiag)@self.Lk)
-    def precond_solve(self, y):
-        return solve_ppchol(y,self.Lk,self.pL,self.ddiag)
-    def _set_diag(self):
-        self.gm_diag = self.gm.diagonal()[:,None]
     def __matmul__(self, y):
-        return self.gm@y
-    def get_full_gram_matrix(self):
-        return self.gm
-    def _init_invertibile(self):
-        self.l_chol = self.cholesky(self.gm)
-    def condition_number(self):
-        return self.npt.linalg.cond(self.gm)
+        return self.full_mat@y
     def get_xs(self):
         return [self.gms[0,0].clone(x) for x in self.xs]
     

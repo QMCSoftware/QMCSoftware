@@ -2,10 +2,7 @@ from ._gram_matrix import _GramMatrix
 from ...discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
 from ..kernel import KernelShiftInvar,KernelDigShiftInvar
 from ..fast_transforms import fftbr,ifftbr,fwht
-try:
-    from ..fast_transforms import fftbr_torch,ifftbr_torch,fwht_torch
-except:
-    pass
+from ..pcg import pcg
 import numpy as np
 import itertools
 import warnings
@@ -133,16 +130,38 @@ class _FastGramMatrix(_GramMatrix):
             else:
                 for tt1 in range(self.t1):
                     self.lam[tt1,tt1][0,0,0,:] += self.noise # lam is (m1,m2,1,n1) = (1,1,1,n1)
-    def _set__x1__x2(self):
-        self._x1,self._x2 = self.clone(self._x),self.clone(self._x)
-        self._x1[:,~self.u1] = 0.
-        self._x2[:,~self.u2] = 0.
-        self._x1,self._x2 = self._x1[:self.n1],self._x2[:self.n2]
-    def _init_invertibile(self):
-        lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1),dtype=float,**self.ckwargs)
-        for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-            lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
-        self.l_chol = self.cholesky(lamblock)
+        self.__x1,self.__x2 = None,None
+        self._full_mat = None
+        self._l_chol = None
+    @property
+    def _x1(self):
+        if self.__x1 is None: 
+            self.__x1 = self.clone(self._x)
+            self.__x1[:,~self.u1] = 0.
+            self.__x1 = self._x1[:self.n1]
+        return self.__x1
+    @property
+    def _x2(self):
+        if self.__x2 is None: 
+            self.__x2 = self.clone(self._x)
+            self.__x2[:,~self.u2] = 0.
+            self.__x2 = self.__x2[:self.n2]
+        return self.__x2
+    @property
+    def full_mat(self):
+        if self._full_mat is None:
+            self._full_mat = self._construct_full_gram_matrix(self._x1,self._x2,self.t1,self.t2,self.lbeta1s,self.lbeta2s,self.lc1s_og,self.lc2s_og)
+            if self.invertible and self.noise>0:
+                self._full_mat = self._full_mat+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
+        return self._full_mat
+    @property
+    def l_chol(self):
+        if self._l_chol is None:
+            lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1),dtype=float,**self.ckwargs)
+            for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
+                lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
+            self._l_chol = self.cholesky(lamblock)
+        return self._l_chol
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         if self.npt==np:
@@ -152,16 +171,9 @@ class _FastGramMatrix(_GramMatrix):
             import torch 
             _x = torch.from_numpy(_x).to(device=self.ckwargs["device"])
             x = torch.from_numpy(x).to(device=self.ckwargs["device"])
-        return _x,x 
-    def get_full_gram_matrix(self):
-        if not hasattr(self,"_x1"): self._set__x1__x2()
-        gm = self._construct_full_gram_matrix(self._x1,self._x2,self.t1,self.t2,self.lbeta1s,self.lbeta2s,self.lc1s_og,self.lc2s_og)
-        if self.invertible and self.noise>0:
-            gm = gm+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
-        return gm
+        return _x,x
     def get_new_left_full_gram_matrix(self, new_x, new_lbetas=0, new_lcs=1.):
         new__x = self._convert_x_to__x(new_x)
-        if not hasattr(self,"_x1"): self._set__x1__x2()
         new_lbetas,new_lcs,new_t,new_m = self._parse_lbetas_lcs(new_lbetas,new_lcs)
         gm = self._construct_full_gram_matrix(new__x,self._x1,new_t,self.t1,new_lbetas,self.lbeta1s,new_lcs,self.lc1s_og)
         return gm
@@ -205,8 +217,6 @@ class _FastGramMatrix(_GramMatrix):
         return sfull[0,:] if yogndim==1 else sfull.T
     def solve(self, y):
         assert self.invertible, self.invertible_error_msg
-        if not hasattr(self,"l_chol"): 
-            self._init_invertibile()
         yogndim = y.ndim
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
@@ -233,28 +243,27 @@ class _FastGramMatrix(_GramMatrix):
             s = self.ift(yt).real # (v,t1,n1)
             s = s.reshape((v,self.t1*self.n1))
         return s[0,:] if yogndim==1 else s.T
-    def _mult_check(self, y, gmatfull):
+    def _mult_check(self, y):
         if self.npt!=np:
             import torch
             y = torch.from_numpy(y)
-        assert np.allclose(self@y[:,0],gmatfull@y[:,0],atol=1e-12)
-        assert np.allclose(self@y,gmatfull@y,atol=1e-12)
-    def _solve_check(self, y, gmatfull):
+        assert np.allclose(self@y[:,0],self.full_mat@y[:,0],atol=1e-12)
+        assert np.allclose(self@y,self.full_mat@y,atol=1e-12)
+    def _solve_check(self, y):
         if not self.invertible: return
         if self.npt==np:
-            assert np.allclose(self.solve(y[:,0]),np.linalg.solve(gmatfull,y[:,0]),rtol=2.5e-2)
-            assert np.allclose(self.solve(y),np.linalg.solve(gmatfull,y),rtol=2.5e-2)
+            assert np.allclose(self.solve(y[:,0]),np.linalg.solve(self.full_mat,y[:,0]),rtol=2.5e-2)
+            assert np.allclose(self.solve(y),np.linalg.solve(self.full_mat,y),rtol=2.5e-2)
         else:
             import torch 
             y = torch.from_numpy(y)
-            assert np.allclose(self.solve(y[:,0]).numpy(),np.linalg.solve(gmatfull,y[:,0].numpy()),rtol=2.5e-2)
-            assert np.allclose(self.solve(y).numpy(),np.linalg.solve(gmatfull,y.numpy()),rtol=2.5e-2)
+            assert np.allclose(self.solve(y[:,0]).numpy(),np.linalg.solve(self.full_mat,y[:,0].numpy()),rtol=2.5e-2)
+            assert np.allclose(self.solve(y).numpy(),np.linalg.solve(self.full_mat,y.numpy()),rtol=2.5e-2)
     def _check(self):
         rng = np.random.Generator(np.random.SFC64(7))
         y = rng.uniform(size=(self.n2*self.t2,2))
-        gmatfull = self.get_full_gram_matrix()
-        self._mult_check(y,gmatfull)
-        self._solve_check(y,gmatfull)
+        self._mult_check(y)
+        self._solve_check(y)
 
 class FastGramMatrixLattice(_FastGramMatrix):
     """
@@ -273,6 +282,35 @@ class FastGramMatrixLattice(_FastGramMatrix):
     >>> u = torch.tensor([True,True,True])
     >>> gm = FastGramMatrixLattice(kernel_obj,dd_obj,n,n,u,u,lbetas,lbetas)
     >>> gm._check()
+    >>> y = torch.from_numpy(dd_obj.rng.uniform(size=gm.t1*n))
+    >>> gm@y
+    tensor([ -18.0111,    7.6292,   52.0029,   13.2012,   43.4885,   33.4967,
+             -16.4679,  -40.8353, -103.7607, -255.9174,  362.0098,  470.0034,
+             -27.4561, -386.1627,   60.7601,  -73.1338,  377.1221,  316.0525,
+             134.6202, -479.7746,  -34.0313,   82.9397,    9.4285,  -43.3118,
+             167.2529,  331.5569, -131.6313, -154.6773, -243.2020,   93.2893,
+            -357.5478,  130.2277], dtype=torch.float64)
+    >>> v = gm.solve(y)
+    >>> v
+    tensor([ 0.0920,  0.1215, -0.2292,  0.0963, -0.0778,  0.1583, -0.0796,  0.0457,
+             0.0522,  0.0235,  0.0171,  0.0353,  0.0456,  0.0011,  0.0419,  0.0835,
+             0.0044,  0.0532,  0.0269,  0.0216, -0.0011,  0.0193,  0.0399,  0.0038,
+             0.0029,  0.0537,  0.0272,  0.0225, -0.0006,  0.0185,  0.0391,  0.0044],
+           dtype=torch.float64)
+    >>> vhat,data = pcg(gm,y,ref_sol=v)
+    >>> data["rforward_norms"]
+    tensor([1.0000e+00, 9.7344e-01, 8.9657e-01, 8.6796e-01, 8.3171e-01, 8.2714e-01,
+            8.1479e-01, 7.9138e-01, 7.4211e-01, 7.0716e-01, 6.5561e-01, 6.3565e-01,
+            6.0125e-01, 1.6381e-01, 1.4031e-01, 1.0890e-01, 7.6542e-02, 6.1783e-02,
+            1.8316e-02, 1.8166e-02, 1.1094e-02, 1.0700e-02, 4.8166e-06, 1.0970e-07,
+            3.7068e-08, 6.6421e-09, 7.6899e-11], dtype=torch.float64)
+    >>> vhat
+    tensor([ 0.0920,  0.1215, -0.2292,  0.0963, -0.0778,  0.1583, -0.0796,  0.0457,
+             0.0522,  0.0235,  0.0171,  0.0353,  0.0456,  0.0011,  0.0419,  0.0835,
+             0.0044,  0.0532,  0.0269,  0.0216, -0.0011,  0.0193,  0.0399,  0.0038,
+             0.0029,  0.0537,  0.0272,  0.0225, -0.0006,  0.0185,  0.0391,  0.0044],
+           dtype=torch.float64)
+
     >>> us = [torch.tensor([int(b) for b in np.binary_repr(i,d)],dtype=bool) for i in range(2**d)]
     >>> lbetas = [
     ...     torch.tensor([1,0,0]),
@@ -335,6 +373,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
             #     self.ift = lambda x: torch.fft.ifft(x,norm="ortho")
             # else: # dd_obj.order=="NATURAL"
             #     # custom torch implementations (theoretically faster, practically slower)
+            from ..fast_transforms import fftbr_torch,ifftbr_torch
             self.ft = fftbr_torch
             self.ift = ifftbr_torch
         super(FastGramMatrixLattice,self).__init__(kernel_obj,dd_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
@@ -363,6 +402,45 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     >>> u = np.array([True,True,True])
     >>> gm = FastGramMatrixDigitalNetB2(kernel_obj,dd_obj,n,n,u,u,lbetas,lbetas)
     >>> gm._check()
+    >>> y = dd_obj.rng.uniform(size=gm.t1*n)
+    >>> gm@y
+    array([-20.94938713, -57.15075137, -61.80544063, -35.72183038,
+           -31.45313726, -46.52665195, -51.1528711 , -46.06158645,
+            42.23237137, 115.03935509, 125.98797463,  71.48025404,
+            64.49546713,  94.75004053, 102.62931261,  93.55976665,
+            42.29742027, 116.24347766, 124.98284185,  72.09612086,
+            63.9045784 ,  94.78818133, 102.92435874,  92.67087996,
+            42.40947511, 116.41845137, 125.29152119,  73.60338041,
+            63.02722222,  93.28661151, 104.57701158,  93.62244555])
+    >>> v = gm.solve(y)
+    >>> v
+    array([4.04663728, 6.21694309, 5.33350858, 4.88332632, 3.92690804,
+           6.53314033, 2.7864591 , 1.61186725, 0.6974895 , 0.95468794,
+           0.99402771, 0.70364389, 0.81329603, 1.19462545, 0.41670244,
+           0.35801475, 0.60497772, 1.03470869, 0.72927424, 0.63393901,
+           0.58306275, 1.09450156, 0.30062669, 0.06238329, 0.70038129,
+           1.09468904, 0.91696041, 1.07251777, 0.55230559, 0.94644418,
+           0.67601573, 0.39561979])
+    >>> vhat,data = pcg(gm,y,ref_sol=v)
+    >>> data["rforward_norms"]
+    array([1.00000000e+00, 9.97877310e-01, 8.95121172e-01, 7.55675427e-01,
+           7.31748164e-01, 6.34081320e-01, 6.64680360e-02, 4.82488655e-02,
+           4.69369291e-02, 2.71912370e-02, 2.70929631e-02, 2.66507808e-02,
+           2.34746167e-02, 3.19029278e-03, 9.88178188e-04, 9.23817031e-04,
+           8.84868792e-04, 7.03538603e-04, 2.12314818e-04, 1.98605167e-04,
+           1.10576672e-04, 5.59670630e-05, 5.57456192e-05, 4.80716213e-05,
+           4.18689162e-05, 4.74003858e-06, 4.36436972e-06, 1.06144577e-06,
+           1.04799696e-06, 9.49842513e-07, 9.46245074e-07, 3.03817487e-07,
+           2.92462932e-07])
+    >>> vhat
+    array([4.04663958, 6.21694266, 5.33350863, 4.8833252 , 3.92690965,
+           6.53313952, 2.78645923, 1.61186557, 0.69749025, 0.95468749,
+           0.99402735, 0.70364381, 0.81329664, 1.19462539, 0.41670213,
+           0.35801401, 0.60497839, 1.03470899, 0.72927445, 0.63393904,
+           0.58306299, 1.09450173, 0.30062713, 0.0623832 , 0.700381  ,
+           1.09468898, 0.91696058, 1.07251727, 0.55230553, 0.94644367,
+           0.67601566, 0.3956198 ])
+
     >>> us = [np.array([int(b) for b in np.binary_repr(i,d)],dtype=bool) for i in range(2**d)]
     >>> lbetas = [
     ...     np.array([1,0,0]),
@@ -416,6 +494,7 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
             self.ift = fwht
         else:
             # custom torch implementations 
+            from ..fast_transforms import fwht_torch
             self.ft = fwht_torch
             self.ift = fwht_torch
         assert kernel_obj.npt==np, "FastGramMatrixDigitalNetB2 does not currently support torch as 'index_cpu' is not yet implemented for tensors of dtype torch.uint64"
