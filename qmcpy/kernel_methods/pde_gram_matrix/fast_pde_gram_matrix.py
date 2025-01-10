@@ -192,7 +192,7 @@ class FastPDEGramMatrix(_PDEGramMatrix):
                     for i2 in range(self.nr):
                         for tt2 in range(self.tvec[i2]):
                             betas_j = self.llbetas[i2][tt2]
-                            if (betas_i==betas_j).all():
+                            if len(betas_i)==len(betas_j) and (betas_i==betas_j).all():
                                 cs_i = self.llcs[i1][tt1]
                                 cs_j = self.llcs[i2][tt2]
                                 assert (cs_i==cs_j).all()
@@ -208,11 +208,25 @@ class FastPDEGramMatrix(_PDEGramMatrix):
                 for tt1 in range(self.tvec[i]):
                     self.gms[i,i].lam[tt1,tt1][0,0,0,:] += noise
         self._full_mat = None
+        self.___xs = None
+        self.__xs = None
     @property
     def full_mat(self):
         if self._full_mat is None: 
             self._full_mat = self@self.npt.eye(self.length,dtype=float)
         return self._full_mat
+    @property
+    def _xs(self):
+        if self.___xs is None:
+            self.___xs = [None]*self.nr
+            for i in range(self.nr):
+                self.___xs[i] = self.gms[i,0].clone(self.gms[i,0]._x1)
+        return self.___xs
+    @property
+    def xs(self):
+        if self.__xs is None:
+            self.__xs = [self.gms[i,0]._convert__x_to_x(_x) for i,_x in enumerate(self._xs)]
+        return self.__xs
     def __matmul__(self, y):
         yogndim = y.ndim
         assert yogndim<=2 
@@ -225,11 +239,5 @@ class FastPDEGramMatrix(_PDEGramMatrix):
                 ssplit[i] += self.gms[i,k]@ysplit[k]
         s = self.npt.vstack(ssplit) 
         return s[:,0] if yogndim==1 else s
-    def _get__xs(self):
-        _xs = [None]*self.nr
-        for i in range(self.nr):
-            _xs[i] = self.gms[i,0].clone(self.gms[i,0]._x1)
-        return _xs
-    def get_xs(self):
-        return [self.gms[i,0]._convert__x_to_x(_x) for i,_x in enumerate(self._get__xs())]
+    
       

@@ -124,7 +124,6 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> y,data = ki.pde_opt_gauss_newton(
     ...     pde_lhs = pde_lhs,
     ...     pde_rhs = pde_rhs,
-    ...     use_pcg = True,
     ...     precond_setter = lambda pde_gm: PPCholPrecond(pde_gm.rtheta.full_mat,rtol=1e-7),
     ...     pcg_kwargs = {"rtol":1e-3},
     ...     verbose = 2)
@@ -212,7 +211,7 @@ class PDEGramMatrix(_PDEGramMatrix):
                     for i2 in range(self.nr):
                         for tt2 in range(self.tvec[i2]):
                             betas_j = self.llbetas[i2][tt2]
-                            if (betas_i==betas_j).all():
+                            if len(betas_i)==len(betas_j) and (betas_i==betas_j).all():
                                 cs_i = self.llcs[i1][tt1]
                                 cs_j = self.llcs[i2][tt2]
                                 assert (cs_i==cs_j).all()

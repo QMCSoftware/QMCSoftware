@@ -1,0 +1,83 @@
+import numpy as np
+import scipy
+import scipy.fftpack
+import h5py
+import matplotlib.pyplot as plt
+
+np.random.seed(2023)
+
+#from https://inst.eecs.berkeley.edu/~ee123/sp16/Sections/JPEG_DCT_Demo.html
+def dct2(a):
+
+    return scipy.fftpack.dct(scipy.fftpack.dct(a, axis = 0, norm = 'ortho'), axis = 1, norm = 'ortho' )
+
+def idct2(a):
+
+    return scipy.fftpack.idct(scipy.fftpack.idct(a, axis = 0 , norm = 'ortho'), axis = 1 , norm = 'ortho')
+
+def f(a):
+
+    return a ** 3 - 3 * a
+
+def full_update(Uold, M, N, dt, Leig, CHeig):
+
+    fU = f(Uold)
+    hat_U = dct2(np.real(Uold.reshape(M, N))).reshape((M * N,))
+    Df = dct2(np.real(fU.reshape(M, N)) ).reshape((M * N,)) # The alternative is to build the corresponding (N*M,N*M) 2d DCT matrix via kronecker products
+    hat_U = (hat_U + dt * Leig * Df) / CHeig
+    Unew = idct2(hat_U.reshape((M, N))).reshape((M * N,))
+
+    return Unew
+
+def solver(U_init, maxiter, M, N):
+
+    xright = 1
+    yright = 1
+    x = np.linspace(0.5 * xright / M, xright - 0.5 * xright / M, M)
+    y = np.linspace(0.5 * yright / N, yright - 0.5 * yright / N, N)
+
+    dt = 0.000001
+    t = np.linspace(0, dt * maxiter + dt, maxiter)
+    epsilon = 0.005
+    xp = np.linspace(0, (M - 1) / xright, M)
+    yq = np.linspace(0, (N - 1) / yright, N)
+    Leig = -(np.tile((xp ** 2), (N, 1)).T + np.tile(yq ** 2,(M, 1))) * (np.pi ** 2)     #(M,N)
+    CHeig = np.ones((M, N)) - 2 * dt * Leig + dt * (epsilon ** 2) * (Leig ** 2)
+
+    #Reshaping into vectors
+    Leig = Leig.reshape((M * N,))
+    CHeig = CHeig.reshape((M * N,))
+
+    U = np.zeros([maxiter, M * N])
+    U[0, :] = U_init
+
+    for ii in range(maxiter - 1):
+        U[ii + 1, :] = full_update(U[ii, :], M, N, dt, Leig, CHeig)
+
+    return U, t, x, y
+
+def generate_dataset(maxiter, M, N, label = 'train', n_data = 50, normalize = False):
+
+    u = np.zeros([n_data, 1, maxiter, M, N])
+
+    for i in range(n_data):
+        U_init =  0.01 * (2 * np.random.rand(M * N) - 1)
+        U, t, x, y = solver(U_init, maxiter, M, N)
+        U = U.reshape(maxiter, M, N)
+        u[i, 0, ...] = U
+
+    with h5py.File('data/low_res_data/normalized/' + label + '_data.h5', 'w') as h5:
+        h5.create_dataset('field', data = u)
+        h5.create_dataset('time', data = t)
+        h5.create_dataset('x', data = x)
+        h5.create_dataset('y', data = y)
+        #h5.create_dataset('field_derivative', data = du)
+
+
+# number of initial conditions
+maxiter = 2001
+M = 128
+N = 128
+generate_dataset(maxiter, M, N, label = 'train', n_data = 50, normalize = True)
+generate_dataset(maxiter, M, N, label = 'test', n_data = 10, normalize = True)
+generate_dataset(maxiter, M, N, label = 'valid', n_data = 10, normalize = True)
