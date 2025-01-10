@@ -1,7 +1,7 @@
 import numpy as np
 import time
 from copy import copy
-from inspect import signature   
+from inspect import signature
 
 #Unit tests
 #And then later a blog
@@ -38,15 +38,15 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
             elif method.lower() == "wa" or method.lower() == "wrap around" or method.lower() == "wrap-around" or method.lower() == 'wd':        #Wrap around
                 double_integral = lambda w : -(1 + (w/3)).prod(axis=0)
                 single_integral = 0
-                kernel = lambda x, y, w: (1.5 - (abs(x - y)*(1 - abs(x - y)))).prod(axis=2)
+                kernel = lambda x, y, w: (1 + w*(.5 - (abs(x - y)*(1 - abs(x - y))))).prod(axis=2)
             elif method.lower() == "m" or method.lower() == "mixture" or method.lower() == 'md':        #Wrap around
                 double_integral = lambda w: (((7/12)*w)+1).prod()
                 single_integral = lambda x, w: (1 + w*((2/3) - (.25*abs(x - .5)) - (.25*((x -.5)**2)))).prod(axis=1)
                 kernel = lambda x, y, w: (1+ w*(.875 - (.25*abs(x - .5)) - (.25*abs(y - .5)) - (.75*abs(x - y)) + (.5*((x - y)**2)))).prod(axis=2)
             elif method.lower() == "un" or method.lower() == "unanchored":
-                double_integral = lambda w: (13/12)**len(w)
-                single_integral = lambda x, w: (1+ ((x*(1-x))/2)).prod(axis=1)
-                kernel = lambda x, y, w: (1 + ((np.minimum(x, y) - (x*y)))).prod(axis=2)
+                double_integral = lambda w: (1 + (w/12)).prod()
+                single_integral = lambda x, w: (1+ (w*(x*(1-x))/2)).prod(axis=1)
+                kernel = lambda x, y, w: (1 + (w*(np.minimum(x, y) - (x*y)))).prod(axis=2)
             elif method.lower() == "warnock" or method.lower() == "wk":
                 double_integral = lambda w: (1/3)**len(w)
                 single_integral = lambda x, w: ((1 - (x**2))/2).prod(axis=1)
