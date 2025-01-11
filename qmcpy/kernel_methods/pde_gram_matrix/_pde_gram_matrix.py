@@ -47,7 +47,7 @@ class _PDEGramMatrix(object):
         diff = y-F
         loss = self.npt.sqrt((diff**2).mean())
         return loss
-    def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=8, relaxation=0., verbose=1, precond_setter = None, pcg_kwargs={}):
+    def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=8, relaxation=0., verbose=1, precond_setter = None, pcg_kwargs={}, store_L_chol_hist=False):
         use_pcg = precond_setter is not None
         def pde_lhs_wrap(z):
             zd = [zs.reshape((self.tvec[j],-1)) for j,zs in enumerate(np.split(z,self.bs_cumsum[1:-1]))]
@@ -77,6 +77,8 @@ class _PDEGramMatrix(object):
         loss_best = losses[0] 
         z_best = z
         gamma = torch.zeros(self.ntot,dtype=torch.float64)
+        if store_L_chol_hist:
+            L_chol_hist = torch.empty((maxiter,len(y),len(y)),dtype=torch.float64)
         for i in range(maxiter):
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
             Fp = Fpt.detach().numpy() if self.npt==np else Fpt.detach()
@@ -108,6 +110,8 @@ class _PDEGramMatrix(object):
             if not use_pcg: # Cholesky factorization
                 L_chol = torch.linalg.cholesky(self.rtheta.full_mat)
                 gamma = torch.cholesky_solve(diff[:,None],L_chol)[:,0]
+                if store_L_chol_hist:
+                    L_chol_hist[i] = L_chol
             else: # (P)CG
                 t0 = time.perf_counter()
                 precond = precond_setter(self)
@@ -157,6 +161,8 @@ class _PDEGramMatrix(object):
             "times_mat": times_mat, 
             "zhist": zhist,
             "solver": "CHOL" if not use_pcg else "PCG-%s"%type(precond).__name__}
+        if store_L_chol_hist:
+            data["L_chol_hist"] = L_chol_hist
         return z_best,data
 
 class ReducedTheta():
