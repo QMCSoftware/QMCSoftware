@@ -2,7 +2,7 @@
 import qmcpy as qp
 from numpy import*
 import os
-def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac = 5, fig_title = 'Projection of Samples', **kwargs):
+def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac = 5, fig_title = 'Projection of Samples', axis_pad = 0, **kwargs):
     """
     Args:
         sampler: the Discrete Distribution or the True Measure Object to be plotted
@@ -56,8 +56,8 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
                         y_label_num = d_vertical[j] + 1
                     
                     if(isinstance(sampler,qp.DiscreteDistribution)):
-                        ax[i,j].set_xlim([0,1])
-                        ax[i,j].set_ylim([0,1])
+                        ax[i,j].set_xlim([0-ax_pad,1+ax_pad])
+                        ax[i,j].set_ylim([0-ax_pad,1+ax_pad])
                         ax[i,j].set_xticks([0,1/4,1/2,3/4,1])
                         ax[i,j].set_yticks([0,1/4,1/2,3/4,1])
                         ax[i,j].set_aspect(1)
