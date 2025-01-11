@@ -52,6 +52,7 @@ class Keister(Integrand):
         d = t.shape[1]
         norm = sqrt((t**2).sum(1))
         k = pi**(d/2)*cos(norm)
+        k[~isfinite(k)] = 0.
         return k
     
     def _spawn(self, level, sampler):
