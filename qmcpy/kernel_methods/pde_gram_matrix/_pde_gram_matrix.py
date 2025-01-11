@@ -47,7 +47,8 @@ class _PDEGramMatrix(object):
         diff = y-F
         loss = self.npt.sqrt((diff**2).mean())
         return loss
-    def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=8, relaxation=0., verbose=1, precond_setter = None, pcg_kwargs={}, store_L_chol_hist=False):
+    def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=8, relaxation=0., verbose=1, precond_setter=None, pcg_kwargs={}, 
+                             store_L_chol_hist=False, predictor_L_chol=None):
         use_pcg = precond_setter is not None
         def pde_lhs_wrap(z):
             zd = [zs.reshape((self.tvec[j],-1)) for j,zs in enumerate(np.split(z,self.bs_cumsum[1:-1]))]
@@ -105,10 +106,13 @@ class _PDEGramMatrix(object):
                     a[bsl:bsh] = (Fp[bsl:bsh].reshape((self.tvec[j],self.ns[j],1))*b[nsl:nsh]).flatten(end_dim=1)
                 return a[:,0] if dimb==1 else a
             Fpz = mult_Fp(z)
-            diff = y-F+Fpz/(1+relaxation)
-            self.rtheta = ReducedTheta(self,mult_Fp,mult_tFp)
+            diff = y-F+Fpz
+            self.rtheta = ReducedTheta(self,mult_Fp,mult_tFp,relaxation)
             if not use_pcg: # Cholesky factorization
-                L_chol = torch.linalg.cholesky(self.rtheta.full_mat)
+                if predictor_L_chol is None:
+                    L_chol = torch.linalg.cholesky(self.rtheta.full_mat)
+                else:
+                    L_chol = predictor_L_chol(z)
                 gamma = torch.cholesky_solve(diff[:,None],L_chol)[:,0]
                 if store_L_chol_hist:
                     L_chol_hist[i] = L_chol
@@ -120,7 +124,7 @@ class _PDEGramMatrix(object):
                 rbackward_norms[i] = pcg_data["rbackward_norms"]
                 pcg_data["times"][0] = pcg_data["times"][0]+t_init_precond
                 times[i] = pcg_data["times"]
-            delta = self@mult_tFp(gamma)-z/(1+relaxation)
+            delta = self@mult_tFp(gamma)-z
             z = z+delta
             zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()
             Ft = pde_lhs_wrap(zt) 
@@ -166,17 +170,19 @@ class _PDEGramMatrix(object):
         return z_best,data
 
 class ReducedTheta():
-    def __init__(self, pde_gm, mult_Fp, mult_tFp):
+    def __init__(self, pde_gm, mult_Fp, mult_tFp, relaxation):
         import torch
         self.pde_gm = pde_gm
         self.mult_Fp = mult_Fp
         self.mult_tFp = mult_tFp
         self.npt = torch
+        self.relaxation = relaxation
         self._full_mat = None
     @property
     def full_mat(self):
-        if self._full_mat is None: 
-            self._full_mat = self.mult_Fp(self.mult_Fp(self.pde_gm.full_mat.T).T)
+        if self._full_mat is None:
+            fm_minus_relaxation= self.mult_Fp(self.mult_Fp(self.pde_gm.full_mat.T).T)
+            self._full_mat = fm_minus_relaxation+self.relaxation*self.npt.eye(len(fm_minus_relaxation),dtype=fm_minus_relaxation.dtype)
         return self._full_mat
     def __matmul__(self, x):
-        return self.mult_Fp(self.pde_gm@self.mult_tFp(x)) if self.pde_gm.fast_flag else self.full_mat@x
+        return self.mult_Fp(self.pde_gm@self.mult_tFp(x))+self.relaxation*x if  self.pde_gm.flast_flag else self.full_mat@x
