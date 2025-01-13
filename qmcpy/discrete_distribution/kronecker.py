@@ -1,8 +1,5 @@
-from .._discrete_distribution import LD
-from ...util import ParameterError, ParameterWarning
 from numpy import *
-from os.path import dirname, abspath, isfile
-import warnings
+import time
 
 ###For kronecker sequence let the user punch in alpha
 ###Look at the paper on overleaf for Kronecker sequence
