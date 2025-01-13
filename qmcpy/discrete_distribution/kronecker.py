@@ -9,10 +9,10 @@ import time
 
 ###Start off with a code with Kronecker sequence with
 ###P = {x_i = i \alpha + \delta mod 1} with \alpha and \delta \in [0,1)^d
-def kronecker(n, d, alpha = 1, delta = 1):
+def kronecker(n, d, alpha = None, delta = None):
     i = arange(1, n+1).reshape((n, 1))
-    if alpha == 1:
+    if alpha == None:
         alpha = random.rand(d)
-    if delta == 1:
+    if delta == None:
         delta = random.rand(d)
     return(((i*alpha) + delta)%1)
