@@ -48,7 +48,7 @@ class _PDEGramMatrix(object):
         loss = self.npt.sqrt((diff**2).mean())
         return loss
     def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=8, relaxation=0., verbose=1, precond_setter=None, pcg_kwargs={}, 
-                             store_L_chol_hist=False, predictor_L_chol=None):
+                             store_L_chol_hist=False, custom_lin_solver=None):
         use_pcg = precond_setter is not None
         def pde_lhs_wrap(z):
             zd = [zs.reshape((self.tvec[j],-1)) for j,zs in enumerate(np.split(z,self.bs_cumsum[1:-1]))]
@@ -79,7 +79,7 @@ class _PDEGramMatrix(object):
         z_best = z
         gamma = torch.zeros(self.ntot,dtype=torch.float64)
         if store_L_chol_hist:
-            L_chol_hist = torch.empty((maxiter,len(y),len(y)),dtype=torch.float64)
+            L_chol_hist = torch.nan*torch.empty((maxiter,len(y),len(y)),dtype=torch.float64)
         for i in range(maxiter):
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
             Fp = Fpt.detach().numpy() if self.npt==np else Fpt.detach()
@@ -108,11 +108,10 @@ class _PDEGramMatrix(object):
             Fpz = mult_Fp(z)
             diff = y-F+Fpz
             self.rtheta = ReducedTheta(self,mult_Fp,mult_tFp,relaxation)
-            if not use_pcg: # Cholesky factorization
-                if predictor_L_chol is None:
-                    L_chol = torch.linalg.cholesky(self.rtheta.full_mat)
-                else:
-                    L_chol = predictor_L_chol(z)
+            if custom_lin_solver is not None:
+                gamma = custom_lin_solver(z,diff)
+            elif not use_pcg: # Cholesky factorization
+                L_chol = torch.linalg.cholesky(self.rtheta.full_mat)
                 gamma = torch.cholesky_solve(diff[:,None],L_chol)[:,0]
                 if store_L_chol_hist:
                     L_chol_hist[i] = L_chol
