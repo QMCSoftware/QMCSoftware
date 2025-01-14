@@ -1,7 +1,7 @@
 from .util import (
     bernoulli_poly,
     weighted_walsh_funcs)
-from .pcg import pcg,IdentityPrecond,PPCholPrecond,JacobiPrecond,SSORPrecond,BlockPrecond
+from .pcg_module import pcg,IdentityPrecond,PPCholPrecond,JacobiPrecond,SSORPrecond,BlockPrecond
 
 from .fast_transforms import (
     fftbr,ifftbr,fwht

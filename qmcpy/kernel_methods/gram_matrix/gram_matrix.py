@@ -1,7 +1,7 @@
 from ._gram_matrix import _GramMatrix
 from ...discrete_distribution import IIDStdUniform
 from ..kernel import KernelGaussian
-from ..pcg import pcg,BlockPrecond
+from ..pcg_module import pcg,BlockPrecond
 import numpy as np
 import itertools
 

@@ -2,7 +2,7 @@ from ._pde_gram_matrix import _PDEGramMatrix
 from ...discrete_distribution import Lattice,DigitalNetB2
 from ..kernel import KernelShiftInvar,KernelDigShiftInvar
 from ..gram_matrix import FastGramMatrixLattice,FastGramMatrixDigitalNetB2
-from ..pcg import pcg,PPCholPrecond
+from ..pcg_module import pcg,PPCholPrecond
 import numpy as np 
 
 class FastPDEGramMatrix(_PDEGramMatrix):

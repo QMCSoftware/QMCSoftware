@@ -1,7 +1,7 @@
 import numpy as np 
 import scipy.linalg
 import itertools
-from ..pcg import pcg
+from ..pcg_module import pcg
 
 class _GramMatrix(object):
     def __init__(self, kernel_obj, noise, lbeta1s, lbeta2s, lc1s, lc2s):

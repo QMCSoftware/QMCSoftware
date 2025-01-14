@@ -4,7 +4,7 @@ from ...discrete_distribution._discrete_distribution import DiscreteDistribution
 from ...discrete_distribution import Lattice
 from ..kernel import KernelGaussian
 from ..gram_matrix import GramMatrix
-from ..pcg import pcg,PPCholPrecond
+from ..pcg_module import pcg,PPCholPrecond
 import numpy as np 
 import itertools
 

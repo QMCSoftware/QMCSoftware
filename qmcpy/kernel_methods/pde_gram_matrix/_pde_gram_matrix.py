@@ -1,4 +1,4 @@
-from ..pcg import pcg,PPCholPrecond
+from ..pcg_module import pcg,PPCholPrecond
 import torch.linalg
 import scipy.linalg
 import numpy as np 
@@ -66,17 +66,18 @@ class _PDEGramMatrix(object):
         losses = self.npt.nan*self.npt.ones(maxiter+1)
         rbackward_norms = [self.npt.nan*self.npt.ones(1)]*maxiter
         times = [self.npt.nan*self.npt.ones(1)]*maxiter
+        tprev = 0
         xs = self.get_xs()
         y = pde_rhs_wrap(xs) 
         zhist = torch.zeros((maxiter+1,self.length),dtype=torch.float64)
         zt = torch.zeros(self.length,dtype=torch.float64,requires_grad=True)
         Ft = pde_lhs_wrap(zt)
         F = Ft.detach().numpy() if self.npt==np else Ft.detach()
-        z = zt.detach().numpy() if self.npt==np else zt.detach()
-        zhist[0,:] = z
+        self.z = zt.detach().numpy() if self.npt==np else zt.detach()
+        zhist[0,:] = self.z
         losses[0] = self._loss(F,y)
         loss_best = losses[0] 
-        z_best = z
+        z_best = self.z
         gamma = torch.zeros(self.ntot,dtype=torch.float64)
         if store_L_chol_hist:
             L_chol_hist = torch.nan*torch.empty((maxiter,len(y),len(y)),dtype=torch.float64)
@@ -105,63 +106,59 @@ class _PDEGramMatrix(object):
                     nsl,nsh = self.n_cumsum[j],self.n_cumsum[j+1]
                     a[bsl:bsh] = (Fp[bsl:bsh].reshape((self.tvec[j],self.ns[j],1))*b[nsl:nsh]).flatten(end_dim=1)
                 return a[:,0] if dimb==1 else a
-            Fpz = mult_Fp(z)
+            Fpz = mult_Fp(self.z)
             diff = y-F+Fpz
             self.rtheta = ReducedTheta(self,mult_Fp,mult_tFp,relaxation)
             if custom_lin_solver is not None:
-                gamma = custom_lin_solver(z,diff)
+                gamma = custom_lin_solver(self.z,diff)
             elif not use_pcg: # Cholesky factorization
                 L_chol = torch.linalg.cholesky(self.rtheta.full_mat)
                 gamma = torch.cholesky_solve(diff[:,None],L_chol)[:,0]
                 if store_L_chol_hist:
                     L_chol_hist[i] = L_chol
             else: # (P)CG
-                t0 = time.perf_counter()
+                t0_precond = time.perf_counter()
                 precond = precond_setter(self)
-                t_init_precond = time.perf_counter()-t0 
+                t_init_precond = time.perf_counter()-t0_precond 
                 gamma,pcg_data = pcg(self.rtheta,diff,precond,x0=gamma,ref_sol=None,ckwargs=self.ckwargs,**pcg_kwargs)
                 rbackward_norms[i] = pcg_data["rbackward_norms"]
-                pcg_data["times"][0] = pcg_data["times"][0]+t_init_precond
-                times[i] = pcg_data["times"]
-            delta = self@mult_tFp(gamma)-z
-            z = z+delta
-            zt = torch.from_numpy(z).clone().requires_grad_() if self.npt==np else z.clone().requires_grad_()
+                pcg_data["times"][0] = pcg_data["times"][0]
+                times[i] = pcg_data["times"]+t_init_precond+tprev 
+                tprev = times[i][-1]
+            delta = self@mult_tFp(gamma)-self.z
+            self.z = self.z+delta
+            zt = torch.from_numpy(self.z).clone().requires_grad_() if self.npt==np else self.z.clone().requires_grad_()
             Ft = pde_lhs_wrap(zt) 
             F = Ft.detach().numpy() if self.npt==np else Ft.detach()
-            zhist[(i+1),:] = z
+            zhist[(i+1),:] = self.z
             losses[i+1] = self._loss(F,y)
             if losses[i+1]<loss_best:
-                z_best = z
+                z_best = self.z
             if verbose:
                 # header an initial loss 
                 if i==0:
-                    header = "    %-15s%-15s"%("iter (%d max)"%maxiter,"loss")
+                    header = "    %-15s%-15s%-15s"%("iter (%d max)"%maxiter,"loss","time")
                     if use_pcg:
                         if verbose>1: header += precond._log_header()
                         header += "%-15s%s"%("PCG rberror","PCG steps (%d max)"%len(gamma))
-                    log = "    %-15d%-15.2e"%(0,losses[0])
+                    log = "    %-15d%-15.2e%-15s"%(0,losses[0]," "*15)
                     print(header)
                     print(log)
                 # loss for this iteration
-                log = "    %-15d%-15.2e"%(i+1,losses[i+1])
+                log = "    %-15d%-15.2e%-15.2e"%(i+1,losses[i+1],times[i][-1])
                 if use_pcg:
                     if verbose>1: log += precond._log(self.rtheta.full_mat) # costly condition number computations
                     log += "%-15.1e%d"%(pcg_data["rbackward_norms"][-1],len(pcg_data["times"])-1)
                 print(log)
         z_best = z_best.detach()
         rbackward_norms,times = rbackward_norms[:(i+1)],times[:(i+1)]
-        max_pcg_iters = max([len(rbackward_norm) for rbackward_norm in rbackward_norms])
-        rbackward_norms_mat = self.npt.nan*self.npt.empty((i+1,max_pcg_iters))
-        times_mat = self.npt.nan*self.npt.empty((i+1,max_pcg_iters))
-        for l in range(i+1):
-            rbackward_norms_mat[l,:len(rbackward_norms[l])] = rbackward_norms[l]
-            times_mat[l,:len(times[l])] = times[l]
         delattr(self,"rtheta")
+        delattr(self,"z")
         data = {
             "z_best": z_best,
             "losses": losses[:(i+2)], 
-            "rbackward_norms_mat": rbackward_norms_mat, 
-            "times_mat": times_mat, 
+            "rbackward_norms": rbackward_norms, 
+            "times": times, 
             "zhist": zhist,
             "solver": "CHOL" if not use_pcg else "PCG-%s"%type(precond).__name__}
         if store_L_chol_hist:
@@ -184,4 +181,4 @@ class ReducedTheta():
             self._full_mat = fm_minus_relaxation+self.relaxation*self.npt.eye(len(fm_minus_relaxation),dtype=fm_minus_relaxation.dtype)
         return self._full_mat
     def __matmul__(self, x):
-        return self.mult_Fp(self.pde_gm@self.mult_tFp(x))+self.relaxation*x if  self.pde_gm.flast_flag else self.full_mat@x
+        return self.mult_Fp(self.pde_gm@self.mult_tFp(x))+self.relaxation*x if self.pde_gm.fast_flag else self.full_mat@x

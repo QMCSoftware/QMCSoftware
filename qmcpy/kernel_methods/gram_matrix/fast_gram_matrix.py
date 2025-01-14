@@ -2,7 +2,7 @@ from ._gram_matrix import _GramMatrix
 from ...discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
 from ..kernel import KernelShiftInvar,KernelDigShiftInvar
 from ..fast_transforms import fftbr,ifftbr,fwht
-from ..pcg import pcg
+from ..pcg_module import pcg
 import numpy as np
 import itertools
 import warnings
