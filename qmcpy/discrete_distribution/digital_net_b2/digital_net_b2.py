@@ -3,6 +3,7 @@ from ...util import ParameterError, ParameterWarning
 import qmctoolscl
 from os.path import dirname, abspath, isfile
 from numpy import *
+import builtins
 from numpy.lib.npyio import DataSource
 import warnings
 
@@ -308,7 +309,7 @@ class DigitalNetB2(LD):
         if not self.msb:
             qmctoolscl.dnb2_gmat_lsb_to_msb(uint64(self.replications_gm),uint64(self.d),uint64(self.m_max),tile(uint64(self.t_max),self.replications_gm),self.z_og,self.z_og,**qmctoolscl_kwargs)
         # randomizations
-        self.t_lms = max(self.t_max,t_lms)
+        self.t_lms = builtins.max(self.t_max,t_lms)
         assert self.t_max<=64 and self.t_lms<=64, "require t_max <= t_lms <= 64"
         self.alpha = alpha
         self._verbose = _verbose
