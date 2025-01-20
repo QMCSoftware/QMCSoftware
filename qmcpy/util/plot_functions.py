@@ -3,7 +3,8 @@ import qmcpy as qp
 from numpy import*
 import os
 def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac = 5, \
-              fig_title = 'Projection of Samples', axis_pad = 0, want_grid = True, font_family = "sans-serif", **kwargs):
+              fig_title = 'Projection of Samples', axis_pad = 0, want_grid = True, font_family = "sans-serif", \
+                where_title = 0.9, **kwargs):
     """
     Args:
         sampler: the Discrete Distribution or the True Measure Object to be plotted
@@ -83,6 +84,6 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
                             y_axis.append(0.5)
                     ax[i,j].scatter(samples[n_min:n_max,x],y_axis,s=marker_size,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)
                     n_min = n[m]
-    plt.suptitle(fig_title,fontsize = 20, y = 0.95)
+    plt.suptitle(fig_title,fontsize = 20, y = where_title)
     #fig.text(0.55,0.55,fig_title, ha = 'center', va = 'center', fontsize = 20)
     return fig, ax
