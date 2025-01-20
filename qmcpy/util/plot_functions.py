@@ -83,6 +83,6 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
                             y_axis.append(0.5)
                     ax[i,j].scatter(samples[n_min:n_max,x],y_axis,s=marker_size,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)
                     n_min = n[m]
-    plt.suptitle(figtitle,fontsize = 20, y = 0.95)
+    plt.suptitle(fig_title,fontsize = 20, y = 0.95)
     #fig.text(0.55,0.55,fig_title, ha = 'center', va = 'center', fontsize = 20)
     return fig, ax
