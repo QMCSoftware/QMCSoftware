@@ -57,4 +57,4 @@ class KernelGaussian(_KernelProdAutoGrad):
     """
     def _1d_to_prod(self, xmat1j, xmat2j, lengthscale):
         import torch 
-        return torch.exp(-(xmat1j-xmat2j)**2/lengthscale)
+        return torch.exp(-(xmat1j-xmat2j)**2/(2*lengthscale))
