@@ -1,4 +1,5 @@
 import torch 
+import warnings 
 
 class MultilayerPerceptron(torch.nn.Module):
     def __init__(self, mlp_layer_nodes:list, activation_function:torch.nn.Module=torch.nn.Tanh(), activate_last_layer:bool=False, scale_last_layer:bool=True, bias_last_layer:bool=True, weight_init_scheme:callable=None, batch_norm=None):
@@ -36,3 +37,4 @@ class MultilayerPerceptron(torch.nn.Module):
         x = self.mlp_sequential(x).squeeze()
         x = self.output_transform(x)
         return torch.exp(self.logscale)*x+self.bias
+

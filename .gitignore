@@ -50,7 +50,7 @@ demos/pde_kernel_methods/MLP/*
 demos/pde_kernel_methods/MLP_i/*
 demos/pde_kernel_methods/DeepONet_i/*
 demos/pde_kernel_methods/DeepONet/*
-
+*.ipynb_checkpoints*
 
 # release
 /build/
