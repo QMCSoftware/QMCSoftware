@@ -48,7 +48,7 @@ class _PDEGramMatrix(object):
         loss = self.npt.sqrt((diff**2).mean())
         return loss
     def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=8, relaxation=0., verbose=1, precond_setter=None, pcg_kwargs={}, 
-                             store_L_chol_hist=False, custom_lin_solver=None):
+                             store_L_chol_hist=False, custom_lin_solver=None, z0=None):
         use_pcg = precond_setter is not None
         def pde_lhs_wrap(z):
             zd = [zs.reshape((self.tvec[j],-1)) for j,zs in enumerate(np.split(z,self.bs_cumsum[1:-1]))]
@@ -70,7 +70,8 @@ class _PDEGramMatrix(object):
         xs = self.get_xs()
         y = pde_rhs_wrap(xs) 
         zhist = torch.zeros((maxiter+1,self.length),dtype=torch.float64)
-        zt = torch.zeros(self.length,dtype=torch.float64,requires_grad=True)
+        zt = torch.zeros(self.length,dtype=torch.float64) if z0 is None else z0
+        zt.requires_grad_()
         Ft = pde_lhs_wrap(zt)
         F = Ft.detach().numpy() if self.npt==np else Ft.detach()
         self.z = zt.detach().numpy() if self.npt==np else zt.detach()

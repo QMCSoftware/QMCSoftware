@@ -19,6 +19,7 @@ try:
     import torch 
     import lightning 
     from .lm_oplearn_lower_tri_mat_mlp import LMOpLearnLowerTriMatMLP 
+    from .lm_oplearn_classic_mlp import LMOpLearnClassicMLP 
 except:
     pass
 try:
@@ -26,5 +27,6 @@ try:
     import gpytorch 
     import lightning 
     from .lm_oplearn_lower_tri_mat_gp import LMOpLearnLowerTriMatGP
+    from .lm_oplearn_classic_gp import LMOpLearnClassicGP
 except:
     pass 

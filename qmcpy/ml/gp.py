@@ -21,7 +21,7 @@ class IndepVecVGP(gpytorch.models.ApproximateGP):
                 gpytorch.kernels.RQKernel(batch_shape=torch.Size([num_tasks]),ard_num_dims=dimension),
                 batch_shape=torch.Size([num_tasks]))
         else:
-            covar_module = covar_module
+            self.covar_module = covar_module
         self.num_tasks = num_tasks
         self.dimension = dimension
     def forward(self, x):

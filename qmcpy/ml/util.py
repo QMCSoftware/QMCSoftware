@@ -23,6 +23,10 @@ def train_val_split(R, to_split, val_frac=1/8, shuffle=True, rng_shuffle_seed=No
 
 def parse_metrics(path):
     import pandas as pd
+    newpath = path[:-4]+"_parsed.csv"
+    if not os.path.isfile(path):
+        assert os.path.isfile(newpath)
+        return pd.read_csv(newpath).drop('epoch',axis=1)
     metrics = pd.read_csv(path)
     tags = [col[6:] for col in metrics.columns if "train_" in col]
     metrics_train = metrics.iloc[~np.isnan(metrics["train_"+tags[0]].values)]
@@ -33,11 +37,12 @@ def parse_metrics(path):
         parsed_metrics["val_"+tag] = metrics_val["val_"+tag].values
     parsed_metrics = pd.DataFrame(parsed_metrics)
     parsed_metrics["epoch"] = np.arange(metrics["epoch"][0],metrics["epoch"][0]+len(parsed_metrics))
-    newpath = path[:-4]+"_parsed.csv"
     if os.path.isfile(newpath):
         parsed_metrics_old = pd.read_csv(newpath)
         if parsed_metrics_old["epoch"][len(parsed_metrics_old)-1]==(parsed_metrics["epoch"][0]-1): # append
             parsed_metrics = pd.concat([parsed_metrics_old,parsed_metrics])
+        if len(parsed_metrics)==0:
+            parsed_metrics = parsed_metrics_old
     parsed_metrics.reset_index(drop=True,inplace=True)
     parsed_metrics.to_csv(newpath,index=False)
     return parsed_metrics.drop('epoch',axis=1)
