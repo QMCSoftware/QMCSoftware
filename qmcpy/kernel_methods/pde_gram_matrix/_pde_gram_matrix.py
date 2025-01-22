@@ -48,7 +48,8 @@ class _PDEGramMatrix(object):
         loss = self.npt.sqrt((diff**2).mean())
         return loss
     def pde_opt_gauss_newton(self, pde_lhs, pde_rhs, maxiter=8, relaxation=0., verbose=1, precond_setter=None, pcg_kwargs={}, 
-                             store_L_chol_hist=False, custom_lin_solver=None, z0=None):
+                             store_L_chol_hist=False, custom_lin_solver=None, z0=None, store_pcg_data=False):
+        t0 = time.perf_counter()
         use_pcg = precond_setter is not None
         def pde_lhs_wrap(z):
             zd = [zs.reshape((self.tvec[j],-1)) for j,zs in enumerate(np.split(z,self.bs_cumsum[1:-1]))]
@@ -64,11 +65,8 @@ class _PDEGramMatrix(object):
         except: 
             raise Exception("pde_opt_gauss_newton requires torch for automatic differentiation through pde_lhs")
         losses = self.npt.nan*self.npt.ones(maxiter+1)
-        rbackward_norms = [self.npt.nan*self.npt.ones(1)]*maxiter
-        times = [self.npt.nan*self.npt.ones(1)]*maxiter
-        tprev = 0
-        xs = self.get_xs()
-        y = pde_rhs_wrap(xs) 
+        times = torch.zeros((maxiter+1),dtype=torch.float64)
+        y = pde_rhs_wrap(self.xs) 
         zhist = torch.zeros((maxiter+1,self.length),dtype=torch.float64)
         zt = torch.zeros(self.length,dtype=torch.float64) if z0 is None else z0
         zt.requires_grad_()
@@ -82,6 +80,9 @@ class _PDEGramMatrix(object):
         gamma = torch.zeros(self.ntot,dtype=torch.float64)
         if store_L_chol_hist:
             L_chol_hist = torch.nan*torch.empty((maxiter,len(y),len(y)),dtype=torch.float64)
+        if store_pcg_data:
+            pcg_data = [None]*maxiter
+        times[0] = time.perf_counter()-t0
         for i in range(maxiter):
             Fpt = torch.autograd.grad(Ft,zt,grad_outputs=torch.ones_like(Ft))[0]
             Fp = Fpt.detach().numpy() if self.npt==np else Fpt.detach()
@@ -118,14 +119,10 @@ class _PDEGramMatrix(object):
                 if store_L_chol_hist:
                     L_chol_hist[i] = L_chol
             else: # (P)CG
-                t0_precond = time.perf_counter()
                 precond = precond_setter(self)
-                t_init_precond = time.perf_counter()-t0_precond 
-                gamma,pcg_data = pcg(self.rtheta,diff,precond,x0=gamma,ref_sol=None,ckwargs=self.ckwargs,**pcg_kwargs)
-                rbackward_norms[i] = pcg_data["rbackward_norms"]
-                pcg_data["times"][0] = pcg_data["times"][0]
-                times[i] = pcg_data["times"]+t_init_precond+tprev 
-                tprev = times[i][-1]
+                gamma,pcg_data_i = pcg(self.rtheta,diff,precond,x0=gamma,ref_sol=None,ckwargs=self.ckwargs,**pcg_kwargs)
+                if store_pcg_data:
+                    pcg_data[i] = pcg_data_i
             delta = self@mult_tFp(gamma)-self.z
             self.z = self.z+delta
             zt = torch.from_numpy(self.z).clone().requires_grad_() if self.npt==np else self.z.clone().requires_grad_()
@@ -135,6 +132,7 @@ class _PDEGramMatrix(object):
             losses[i+1] = self._loss(F,y)
             if losses[i+1]<loss_best:
                 z_best = self.z
+            times[i+1] = time.perf_counter()-t0
             if verbose:
                 # header an initial loss 
                 if i==0:
@@ -142,28 +140,28 @@ class _PDEGramMatrix(object):
                     if use_pcg:
                         if verbose>1: header += precond._log_header()
                         header += "%-15s%s"%("PCG rberror","PCG steps (%d max)"%len(gamma))
-                    log = "    %-15d%-15.2e%-15s"%(0,losses[0]," "*15)
+                    log = "    %-15d%-15.2e%-15.2e"%(0,losses[0],times[0])
                     print(header)
                     print(log)
                 # loss for this iteration
-                log = "    %-15d%-15.2e%-15.2e"%(i+1,losses[i+1],times[i][-1])
+                log = "    %-15d%-15.2e%-15.2e"%(i+1,losses[i+1],times[i+1])
                 if use_pcg:
                     if verbose>1: log += precond._log(self.rtheta.full_mat) # costly condition number computations
-                    log += "%-15.1e%d"%(pcg_data["rbackward_norms"][-1],len(pcg_data["times"])-1)
+                    log += "%-15.1e%d"%(pcg_data_i["rbackward_norms"][-1],len(pcg_data_i["rbackward_norms"])-1)
                 print(log)
         z_best = z_best.detach()
-        rbackward_norms,times = rbackward_norms[:(i+1)],times[:(i+1)]
         delattr(self,"rtheta")
         delattr(self,"z")
         data = {
             "z_best": z_best,
             "losses": losses[:(i+2)], 
-            "rbackward_norms": rbackward_norms, 
             "times": times, 
             "zhist": zhist,
             "solver": "CHOL" if not use_pcg else "PCG-%s"%type(precond).__name__}
         if store_L_chol_hist:
             data["L_chol_hist"] = L_chol_hist
+        if store_pcg_data:
+            data["pcg_data"] = pcg_data
         return z_best,data
 
 class ReducedTheta():

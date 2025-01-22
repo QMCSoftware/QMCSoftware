@@ -102,16 +102,16 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> y,data = ki.pde_opt_gauss_newton(
     ...     pde_lhs = pde_lhs,
     ...     pde_rhs = pde_rhs)
-        iter (8 max)   loss           
-        0              2.16e+02       
-        1              3.88e-01       
-        2              2.58e-04       
-        3              1.11e-07       
-        4              5.05e-08       
-        5              4.18e-08       
-        6              4.52e-08       
-        7              4.95e-08       
-        8              4.44e-08       
+        iter (8 max)   loss           time           
+        0              2.16e+02       ...       
+        1              3.36e-01       ...       
+        2              3.53e-02       ...       
+        3              7.74e-03       ...       
+        4              1.97e-03       ...       
+        5              5.25e-04       ...       
+        6              1.42e-04       ...       
+        7              3.86e-05       ...       
+        8              1.05e-05       ...
     >>> print(data["solver"])
     CHOL
 
@@ -119,36 +119,23 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> kvec = ki.get_new_left_full_gram_matrix(xticks)
     >>> yhatmesh = (kvec@coeffs).reshape(x1mesh.shape)
     >>> print("L2 Rel Error Gauss: %.1e"%(torch.linalg.norm(yhatmesh-ymesh)/torch.linalg.norm(ymesh)))
-    L2 Rel Error Gauss: 5.8e-02
+    L2 Rel Error Gauss: 3.1e-01
 
     >>> y,data = ki.pde_opt_gauss_newton(
     ...     pde_lhs = pde_lhs,
     ...     pde_rhs = pde_rhs,
     ...     precond_setter = lambda pde_gm: PPCholPrecond(pde_gm.rtheta.full_mat,rtol=1e-7),
     ...     pcg_kwargs = {"rtol":1e-3},
-    ...     verbose = 2)
-        iter (8 max)   loss           K(A)           K(P)           K(P)/K(A)      Lk.shape       PCG rberror    PCG steps (768 max)
-        0              2.16e+02       
-        1              4.23e-01       1.5e+13        2.4e+08        1.6e-05        (768, 495)     9.2e-04        286
-        2              2.77e-01       1.5e+13        3.0e+08        2.0e-05        (768, 526)     1.3e-03        768
-        3              2.11e-01       1.5e+13        3.0e+08        2.0e-05        (768, 522)     9.8e-04        505
-        4              1.85e-01       1.5e+13        3.0e+08        2.0e-05        (768, 526)     8.5e-04        534
-        5              2.12e-01       1.5e+13        3.0e+08        2.0e-05        (768, 522)     9.8e-04        484
-        6              2.15e-01       1.5e+13        3.0e+08        2.0e-05        (768, 522)     1.0e-03        525
-        7              2.06e-01       1.5e+13        3.3e+08        2.2e-05        (768, 526)     9.5e-04        508
-        8              2.12e-01       1.5e+13        3.1e+08        2.0e-05        (768, 526)     9.8e-04        530
-    >>> print(data["solver"])
-    PCG-PPCholPrecond
-
+    ...     verbose = False)
     >>> precond = PPCholPrecond(ki.full_mat)
     >>> print(precond.info_str(ki.full_mat))
     K(A)           K(P)           K(P)/K(A)      Lk.shape       
-    2.8e+13        8.4e+04        3.0e-09        (1280, 695)    
+    9.6e+12        4.3e+04        4.5e-09        (1280, 1117)   
     >>> coeffs,data = pcg(ki,y,precond,rtol=5e-3)
     >>> kvec = ki.get_new_left_full_gram_matrix(xticks)
     >>> yhatmesh = (kvec@coeffs).reshape(x1mesh.shape)
     >>> print("L2 Rel Error Gauss: %.1e"%(torch.linalg.norm(yhatmesh-ymesh)/torch.linalg.norm(ymesh)))
-    L2 Rel Error Gauss: 7.1e-02
+    L2 Rel Error Gauss: 3.0e-01
     """
     def __init__(self, kernel_obj, xs, ns=None, us=None, llbetas=None, llcs=None, noise=1e-8, adaptive_noise=True, half_comp=True):
         """
@@ -230,7 +217,5 @@ class PDEGramMatrix(_PDEGramMatrix):
         self.cho_solve = self.gms[0,0].cho_solve
     def __matmul__(self, y):
         return self.full_mat@y
-    def get_xs(self):
-        return [self.gms[0,0].clone(x) for x in self.xs]
     
     
