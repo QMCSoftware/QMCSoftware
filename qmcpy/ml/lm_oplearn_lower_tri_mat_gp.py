@@ -4,7 +4,7 @@ import torch
 import gpytorch
 
 class LMOpLearnLowerTriMatGP(lightning.LightningModule):
-    def __init__(self, gp, automatic_optimization=True, input_relaxation=False, fixed_noise=True, learning_rate=1.):
+    def __init__(self, gp, automatic_optimization=True, input_relaxation=False, fixed_noise=True, learning_rate=1., noise_lb=1e-8):
         super().__init__()
         self.gp = gp
         self.automatic_optimization = automatic_optimization
@@ -17,7 +17,7 @@ class LMOpLearnLowerTriMatGP(lightning.LightningModule):
         self._tril_i0,self._tril_i1 = torch.tril_indices(self.n,self.n)
         self._diag_i = torch.arange(self.n)
         likelihood = gpytorch.likelihoods.MultitaskGaussianLikelihood(num_tasks=self.gp.num_tasks,
-            noise_constraint=gpytorch.constraints.GreaterThan(1e-8),
+            noise_constraint=gpytorch.constraints.GreaterThan(noise_lb),
             has_task_noise = False,
             has_global_noise = True)
         self.mll = gpytorch.mlls.VariationalELBO(likelihood,self.gp,num_data=self.s0)
