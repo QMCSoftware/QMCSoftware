@@ -51,10 +51,10 @@ demos/pde_kernel_methods/MLP_i/*
 demos/pde_kernel_methods/DeepONet_i/*
 demos/pde_kernel_methods/DeepONet/*
 *.ipynb_checkpoints*
-demos/pde_kernel_methods/CHONKNORIS/*/NORIS_MLP
-demos/pde_kernel_methods/CHONKNORIS/*/NORIS_GP
-demos/pde_kernel_methods/CHONKNORIS/*/CLASSIC_MLP
-demos/pde_kernel_methods/CHONKNORIS/*/CLASSIC_GP
+demos/pde_kernel_methods/CHONKNORIS/*/NORIS_MLP*
+demos/pde_kernel_methods/CHONKNORIS/*/NORIS_GP*
+demos/pde_kernel_methods/CHONKNORIS/*/CLASSIC_MLP*
+demos/pde_kernel_methods/CHONKNORIS/*/CLASSIC_GP*
 
 # release
 /build/
