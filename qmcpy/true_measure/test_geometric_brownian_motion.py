@@ -1,5 +1,5 @@
 import numpy as np
-from qmcpy.true_measure.geometric_brownian_motion_copy import GeometricBrownianMotion
+from qmcpy.true_measure.geometric_brownian_motion import GeometricBrownianMotion
 from qmcpy.discrete_distribution import DigitalNetB2
 
 def test_geometric_brownian_motion():

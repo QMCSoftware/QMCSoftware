@@ -48,8 +48,6 @@ class GeometricBrownianMotion(BrownianMotion):
         return cov_matrix
 
 
-
-
     def _transform(self, x):
         bm_samples = super()._transform(x)
         return self.initial_value * exp((self.drift - 0.5 * self.diffusion ** 2) * self.time_vec + bm_samples)

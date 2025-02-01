@@ -62,7 +62,10 @@ class GeometricBrownianMotion(Gaussian):
 
         # Compute mean and covariance of standard Brownian motion, log(S(t) / initial_value))
         mean_bm = (self.drift - 0.5 * self.diffusion ** 2) * self.time_vec
-        covariance_bm = self.diffusion ** 2 * array([[min(self.time_vec[i], self.time_vec[j]) for i in range(self.d)]
+        
+        # covariance_bm = self.diffusion**2 * array([[min(self.time_vec[i], self.time_vec[j]) for i in range(self.d)]
+        #                                              for j in range(self.d)]) 
+        covariance_bm = self.diffusion * array([[min(self.time_vec[i], self.time_vec[j]) for i in range(self.d)]
                                                      for j in range(self.d)])
         self._parse_gaussian_params(mean_bm, covariance_bm, decomp_type)
         self.range = array([[-inf, inf]])
