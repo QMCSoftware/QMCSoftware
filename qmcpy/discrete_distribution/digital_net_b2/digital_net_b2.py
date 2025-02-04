@@ -270,20 +270,10 @@ class DigitalNetB2(LD):
             parts = generating_matrices.split('.')
             root = dirname(abspath(__file__))+'/generating_matrices/'
             repos = DataSource()
-            if isfile(root+generating_matrices):
-                self.z_og = load(root+generating_matrices).astype(uint64)[None,:]
-                self.d_max = int(parts[-5])
-                self.t_max = int(parts[-4])
-                self.m_max = int(parts[-3])
-                self.msb = bool(parts[-2].lower()=='msb')
-            elif isfile(generating_matrices):
-                self.z_og = load(generating_matrices).astype(uint64)[None,:]
-                self.d_max = int(parts[-5])
-                self.t_max = int(parts[-4])
-                self.m_max = int(parts[-3])
-                self.msb = bool(parts[-2].lower()=='msb')
-            elif "LDData"==generating_matrices[:6]:
-                if repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/dnet/"+generating_matrices[7:]):
+            if "LDData" in generating_matrices and generating_matrices[-4:]!=".npy":
+                if repos.exists(generating_matrices):
+                    datafile = repos.open(generating_matrices)
+                elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/dnet/"+generating_matrices[7:]):
                     datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/dnet/"+generating_matrices[7:])
                 elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices):
                     datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices)
@@ -300,6 +290,18 @@ class DigitalNetB2(LD):
                 compat_shift = max(self.t_max-64,0)
                 if compat_shift>0: warnings.warn("Truncating ints in generating matrix to have 64 bits.")
                 self.z_og = array([[int(v)>>compat_shift for v in line.split(' ')] for line in contents[4:]],dtype=uint64)[None,:]
+            elif isfile(root+generating_matrices):
+                self.z_og = load(root+generating_matrices).astype(uint64)[None,:]
+                self.d_max = int(parts[-5])
+                self.t_max = int(parts[-4])
+                self.m_max = int(parts[-3])
+                self.msb = bool(parts[-2].lower()=='msb')
+            elif isfile(generating_matrices):
+                self.z_og = load(generating_matrices).astype(uint64)[None,:]
+                self.d_max = int(parts[-5])
+                self.t_max = int(parts[-4])
+                self.m_max = int(parts[-3])
+                self.msb = bool(parts[-2].lower()=='msb')
             else:
                 raise ParameterError("generating_matrices '%s' not found."%generating_matrices)
         else:

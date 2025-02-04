@@ -178,16 +178,10 @@ class Lattice(LD):
             parts = generating_vector.split('.')
             root = dirname(abspath(__file__))+'/generating_vectors/'
             repos = DataSource()
-            if isfile(root+generating_vector):
-                self.gen_vec_og = load(root+generating_vector).astype(uint64)[None,:]
-                self.d_max = int(parts[-3])
-                self.m_max = int(parts[-2])
-            elif isfile(generating_vector):
-                self.gen_vec_og = load(generating_vector).astype(uint64)[None,:]
-                self.d_max = int(parts[-3])
-                self.m_max = int(parts[-2])
-            elif "LDData"==generating_vector[:6]:
-                if repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/lattice/"+generating_vector[7:]):
+            if "LDData" in generating_vector and generating_vector[-4:]!=".npy":
+                if repos.exists(generating_vector):
+                    datafile = repos.open(generating_vector)
+                elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/lattice/"+generating_vector[7:]):
                     datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/lattice/"+generating_vector[7:])
                 elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector):
                     datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector)
@@ -198,6 +192,14 @@ class Lattice(LD):
                 self.d_max = contents[0]
                 n_max = contents[1]; assert log2(n_max)%1==0; self.m_max = int(log2(n_max))
                 self.gen_vec_og = array(contents[2:],dtype=uint64)[None,:]
+            elif isfile(root+generating_vector):
+                self.gen_vec_og = load(root+generating_vector).astype(uint64)[None,:]
+                self.d_max = int(parts[-3])
+                self.m_max = int(parts[-2])
+            elif isfile(generating_vector):
+                self.gen_vec_og = load(generating_vector).astype(uint64)[None,:]
+                self.d_max = int(parts[-3])
+                self.m_max = int(parts[-2])
             else:
                 raise ParameterError("generating_vector '%s' not found."%generating_vector)
         else:
