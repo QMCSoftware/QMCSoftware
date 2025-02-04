@@ -19,7 +19,7 @@ class IIDStdUniform(IID):
         spawn_key       ()
     """
 
-    def __init__(self, dimension=1, replications=1, seed=None):
+    def __init__(self, dimension=1, seed=None, replications=1):
         """
         Args:
             dimension (int): dimension of samples
