@@ -8,6 +8,9 @@ Fast Walsh Hadamard transform.
 #include <math.h>
 #include "export_ctypes.h"
 
+EXPORT int get_unsigned_long_size() { return sizeof(unsigned long); }
+EXPORT int get_unsigned_long_long_size() { return sizeof(unsigned long long); }
+
 EXPORT void fwht_copy(unsigned int n, double *src, double *dst)
 {
     double *a = (double *)calloc(n, sizeof(double));
