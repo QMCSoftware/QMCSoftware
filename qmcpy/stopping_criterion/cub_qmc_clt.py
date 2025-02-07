@@ -47,8 +47,8 @@ class CubQMCCLT(StoppingCriterion):
     Lattice (DiscreteDistribution Object)
         d               1
         dvec            0
-        randomize       1
-        order           natural
+        randomize       SHIFT
+        order           NATURAL
         gen_vec         1
         entropy         7
         spawn_key       ()
@@ -84,8 +84,8 @@ class CubQMCCLT(StoppingCriterion):
     Lattice (DiscreteDistribution Object)
         d               3
         dvec            [0 1 2]
-        randomize       1
-        order           natural
+        randomize       SHIFT
+        order           NATURAL
         gen_vec         [     1 182667 469891]
         entropy         7
         spawn_key       ()
@@ -109,11 +109,11 @@ class CubQMCCLT(StoppingCriterion):
                         [4. 5. 6.]]
         comb_flags      [[ True  True  True]
                         [ True  True  True]]
-        n_total         2^(14)
-        n               [[ 4096.  4096.  4096.]
-                        [16384.  4096.  4096.]]
-        n_rep           [[ 256.  256.  256.]
-                        [1024.  256.  256.]]
+        n_total         2^(13)
+        n               [[4096. 4096. 4096.]
+                        [8192. 4096. 4096.]]
+        n_rep           [[256. 256. 256.]
+                        [512. 256. 256.]]
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
