@@ -42,6 +42,10 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
+demos/**.png
+demos/**.eps
+
+
 
 # release
 /build/
@@ -61,3 +65,5 @@ _ags/*
 # SC Choi's file exclusion
 .vscode/settings.json
 
+# Downloaded files
+raw.githubusercontent.com*
