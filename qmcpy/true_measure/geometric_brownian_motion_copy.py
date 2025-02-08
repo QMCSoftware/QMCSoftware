@@ -9,7 +9,30 @@ from ..discrete_distribution import DigitalNetB2
 
 class GeometricBrownianMotion(BrownianMotion):
     """
-    Geometric Brownian Motion inheriting from BrownianMotion.
+    Geometric Brownian Motion.
+
+    >>> gbm = GeometricBrownianMotion(DigitalNetB2(4,seed=7), t_final=2, drift=0.1, diffusion=0.2)
+    >>> gbm.gen_samples(2)
+    array([[0.81029467 0.91681162 0.98337412 1.29341131]
+           [1.61003338 1.22233246 1.09178392 1.65685669]])
+    >>> gbm
+    GeometricBrownianMotion (TrueMeasure Object)
+    time_vec        [0.5 1.  1.5 2. ]
+    drift           0.100
+    diffusion       0.200
+    mean            [0. 0. 0. 0.]
+    covariance      [[0.1 0.1 0.1 0.1]
+                    [0.1 0.2 0.2 0.2]
+                    [0.1 0.2 0.3 0.3]
+                    [0.1 0.2 0.3 0.4]]
+    mean_gbm        [1.051 1.105 1.162 1.221]
+    covariance_gbm  [[0.022 0.022 0.022 0.022]
+                    [0.022 0.05  0.05  0.05 ]
+                    [0.022 0.05  0.083 0.083]
+                    [0.022 0.05  0.083 0.124]]
+    decomp_type     PCA
+
+
     """
 
     def __init__(self, sampler, t_final=1, initial_value=1, drift=0, diffusion=1, decomp_type='PCA'):
@@ -28,7 +51,8 @@ class GeometricBrownianMotion(BrownianMotion):
         
         super().__init__(sampler, t_final=t_final, drift=0, diffusion=diffusion, decomp_type=decomp_type)
 
-        
+        self.parameters = ['time_vec', 'drift', 'diffusion', 'mean', 'covariance', 'mean_gbm', 'covariance_gbm',
+                           'decomp_type']
         self.initial_value = initial_value
         self.drift = drift
         self.diffusion = diffusion
