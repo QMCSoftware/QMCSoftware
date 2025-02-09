@@ -73,28 +73,28 @@ class TestLattice(unittest.TestCase):
 
     def test_linear_order(self):
         true_sample = array([
-            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
-            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
+            [1. / 8, 3. / 8, 3. / 8, 7. / 8],
+            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
         distribution = Lattice(dimension=4, randomize=False, order='linear')
         self.assertTrue((distribution.gen_samples(n_min=4, n_max=8, warn=False)==true_sample).all())
 
     def test_natural_order(self):
         true_sample = array([
-            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
-            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
+            [1. / 8, 3. / 8, 3. / 8, 7. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
+            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
         distribution = Lattice(dimension=4, randomize=False, order='natural')
         self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
     
     def test_gray_order(self):
         true_sample = array([
-            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 7. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
-            [1. / 8, 3. / 8, 3. / 8, 1. / 8]])
+            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 1. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
+            [1. / 8, 3. / 8, 3. / 8, 7. / 8]])
         distribution = Lattice(dimension=4, randomize=False, order='gray')
         self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
 
