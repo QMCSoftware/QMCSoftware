@@ -11,7 +11,6 @@ class _GramMatrix(object):
         self.ckwargs = self.kernel_obj.ckwargs
         self.torchify = self.kernel_obj.torchify
         self.noise = noise
-        assert np.isscalar(self.noise) and self.noise>=0.
         self.lbeta1s,self.lc1s,self.t1,self.m1 = self._parse_lbetas_lcs(lbeta1s,lc1s)
         self.lbeta2s,self.lc2s,self.t2,self.m2 = self._parse_lbetas_lcs(lbeta2s,lc2s)
         if self.torchify:

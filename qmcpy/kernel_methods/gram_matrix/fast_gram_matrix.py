@@ -100,7 +100,8 @@ class _FastGramMatrix(_GramMatrix):
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
             self.lc1slc2s[tt1,tt2] = self.lc1s[tt1][None,:,None,None]*self.lc2s[tt2][None,None,:,None]
         if hasattr(self,"lam"):
-            self.lam *= self.kernel_obj.scale 
+            for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
+                self.lam[tt1,tt2] = self.lam[tt1,tt2]*self.kernel_obj.scale 
         elif hasattr(self,"k1l"):
             self.k1l *= self.kernel_obj.scale 
         else:
@@ -121,6 +122,7 @@ class _FastGramMatrix(_GramMatrix):
             for tt1 in range(self.t1):
                 self.k00diags[tt1] = k1[tt1,tt1][0,0,0,0]
             if self.adaptive_noise:
+                assert np.isscalar(noise) and noise>0
                 assert (self.lbeta1s[0]==0.).all() and (self.lbeta1s[0].shape==(1,self.d)) and (self.lc1s_og[0]==1.).all() and (self.lc1s_og[0].shape==(1,))
                 trace0 = self.k00diags[0] 
                 for tt1 in range(self.t1):
@@ -128,8 +130,11 @@ class _FastGramMatrix(_GramMatrix):
                     trace_ratio = trace/trace0 
                     self.lam[tt1,tt1][0,0,0,:] += self.noise*trace_ratio
             else:
+                if np.isscalar(noise) or (noise.ndim==1 and len(noise)==1):
+                    noise = noise*self.npt.ones(self.t1,dtype=float,**self.ckwargs)
+                assert noise.ndim==1 and len(noise)==self.t1 and (noise>0).all()
                 for tt1 in range(self.t1):
-                    self.lam[tt1,tt1][0,0,0,:] += self.noise # lam is (m1,m2,1,n1) = (1,1,1,n1)
+                    self.lam[tt1,tt1][0,0,0,:] += self.noise[tt1] # lam is (m1,m2,1,n1) = (1,1,1,n1)
         self.__x1,self.__x2 = None,None
         self._full_mat = None
         self._l_chol = None
@@ -149,11 +154,7 @@ class _FastGramMatrix(_GramMatrix):
         return self.__x2
     @property
     def full_mat(self):
-        if self._full_mat is None:
-            self._full_mat = self._construct_full_gram_matrix(self._x1,self._x2,self.t1,self.t2,self.lbeta1s,self.lbeta2s,self.lc1s_og,self.lc2s_og)
-            if self.invertible and self.noise>0:
-                self._full_mat = self._full_mat+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
-        return self._full_mat
+        return self@self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
     @property
     def l_chol(self):
         if self._l_chol is None:
@@ -172,6 +173,15 @@ class _FastGramMatrix(_GramMatrix):
             _x = torch.from_numpy(_x).to(device=self.ckwargs["device"])
             x = torch.from_numpy(x).to(device=self.ckwargs["device"])
         return _x,x
+    def logdet(self):
+        assert self.invertible,"logdet currently only supports invertible matrices"
+        if self.torchify:
+            import torch 
+            return 2*torch.logdet(self.l_chol).real.sum() 
+        else:
+            signs,vals = np.linalg.slogdet(self.l_chol)
+            assert (signs>0).all(), "det <= 0, which should not happen for inverbible matrices"
+            return 2*vals.real.sum()
     def get_new_left_full_gram_matrix(self, new_x, new_lbetas=0, new_lcs=1.):
         new__x = self._convert_x_to__x(new_x)
         new_lbetas,new_lcs,new_t,new_m = self._parse_lbetas_lcs(new_lbetas,new_lcs)
@@ -235,12 +245,13 @@ class _FastGramMatrix(_GramMatrix):
         else:
             y = y.reshape((v,self.t1,self.n1)) # (v,t1,n1)
             yt = self.ft(y) # (v,t1,n1)
+            yts = self.npt.ones_like(yt) 
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore",".*Casting complex values to real discards the imaginary part*")
                 for i in range(self.n1): # probably a better vectorized way to do this
                     # solve systems based on Cholesky decompositions, with self.l_chol is (n1,t1,t1)
-                    yt[:,:,i] = self.cho_solve(self.l_chol[i],yt[:,:,i].T).T
-            s = self.ift(yt).real # (v,t1,n1)
+                    yts[:,:,i] = self.cho_solve(self.l_chol[i],yt[:,:,i].T).T
+            s = self.ift(yts).real # (v,t1,n1)
             s = s.reshape((v,self.t1*self.n1))
         return s[0,:] if yogndim==1 else s.T
     def _mult_check(self, y):

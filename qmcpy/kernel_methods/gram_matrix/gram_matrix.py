@@ -90,12 +90,18 @@ class GramMatrix(_GramMatrix):
         super(GramMatrix,self)._set_invertible_conds(invertible_conds)
         if self.invertible:
             if adaptive_noise:
+                assert np.isscalar(noise) and noise>0
                 assert (self.lbeta1s[0]==0.).all() and (self.lbeta1s[0].shape==(1,self.d)) and (self.lc1s_og[0]==1.).all() and (self.lc1s_og[0].shape==(1,))
                 traces = self.full_mat.diagonal()[::self.n1]
                 trace_ratios = traces/traces[0]
                 self.full_mat += noise*self.npt.diag((self.npt.ones((self.n1,len(traces)))*trace_ratios).T.flatten())
             else:
-                self.full_mat += self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
+                if np.isscalar(noise) or (noise.ndim==1 and len(noise)==1):
+                    noise = noise*self.npt.ones(self.t1,dtype=float,**self.ckwargs)
+                assert noise.ndim==1 and len(noise)==self.t1 and (noise>0).all()
+                noisy_diag = (noise[:,None]*self.npt.ones((1,self.n1),dtype=float,**self.ckwargs)).flatten()  
+                size_range = self.npt.arange(self.size[0],dtype=int,**self.ckwargs)
+                self.full_mat[size_range,size_range] = self.full_mat[size_range,size_range]+noisy_diag
         self._l_chol = None 
     @property
     def l_chol(self):
@@ -108,6 +114,15 @@ class GramMatrix(_GramMatrix):
         return gm
     def _init_invertibile(self):
         self.l_chol = self.cholesky(self.full_mat)
+    def logdet(self):
+        assert self.invertible,"logdet currently only supports invertible matrices"
+        if self.torchify:
+            import torch 
+            return torch.logdet(self.full_mat)
+        else:
+            sign,val = np.linalg.slogdet(self.full_mat)
+            assert sign>0, "det <= 0, which should not happen for inverbible matrices"
+            return val
     def multiply(self, *args, **kwargs):
         return self.__matmul__(*args, **kwargs)
     def __matmul__(self, y):

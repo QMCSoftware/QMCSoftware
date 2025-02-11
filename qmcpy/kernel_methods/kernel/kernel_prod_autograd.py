@@ -19,11 +19,11 @@ class _KernelProdAutoGrad(_KernelProd):
                 xmat2[j] = torch.from_numpy(xmat2[j])
             xmat1[j].requires_grad_()
             xmat2[j].requires_grad_()
-        y = self.scale*torch.ones((n1,n2),requires_grad=True)
+        y = self.scale*torch.ones((n1,n2),requires_grad=True,**self.ckwargs)
         for j in range(self.d):
             y = y*self._1d_to_prod(xmat1[j],xmat2[j],self.lengthscales[j])
-        grad_outputs = torch.ones((n1,n2),dtype=torch.float)
-        v = torch.zeros((n1,n2),requires_grad=False)
+        grad_outputs = torch.ones((n1,n2),dtype=torch.float,**self.ckwargs)
+        v = torch.zeros((n1,n2),requires_grad=False,**self.ckwargs)
         for ell1,ell2 in itertools.product(range(m1),range(m2)):
             yc = y.clone()
             for j in range(self.d):
@@ -31,9 +31,9 @@ class _KernelProdAutoGrad(_KernelProd):
                     yc = torch.autograd.grad(yc,xmat1[j],create_graph=True,grad_outputs=grad_outputs)[0]
                 for _ in range(beta2s[ell2,j]):
                     yc = torch.autograd.grad(yc,xmat2[j],create_graph=True,grad_outputs=grad_outputs)[0]
-            v = v+c1s[ell1]*c2s[ell2]*yc.detach()
+            v = v+c1s[ell1]*c2s[ell2]*yc#.detach()
         if self.npt==np: 
-            v = v.numpy().astype(np.float64) 
+            v = v.detach().cpu().numpy().astype(np.float64) 
         return v
 
 class KernelGaussian(_KernelProdAutoGrad):

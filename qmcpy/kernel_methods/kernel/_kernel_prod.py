@@ -21,7 +21,7 @@ class _KernelProd(object):
             self.npt = np
             self.ckwargs = {}
         assert np.isscalar(lengthscales) or lengthscales.shape==(self.d,)
-        assert np.isscalar(scale)
+        assert np.isscalar(scale) or (scale.ndim==1 and len(scale)==1)
         if np.isscalar(lengthscales):
             lengthscales = lengthscales*self.npt.ones(self.d,dtype=float,**self.ckwargs)
         self.lengthscales = lengthscales
