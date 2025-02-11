@@ -38,9 +38,14 @@ sphinx/demo_rst/
 sphinx/md_rst/
 sphinx/uml/
 node_modules/*
+sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
+demos/**.png
+demos/**.eps
+
+
 
 # release
 /build/
@@ -56,3 +61,9 @@ _ags/*
 
 # Fred's private stuff, not for tracking
 *Fred*
+
+# SC Choi's file exclusion
+.vscode/settings.json
+
+# Downloaded files
+raw.githubusercontent.com*

@@ -57,3 +57,9 @@ Demos
     demo_rst/pydata.chi.2023.rst
 
     demo_rst/prob_failure_gp_ci.rst
+
+    demo_rst/linear-scrambled-halton.rst
+
+    demo_rst/plot_proj_function.rst
+
+    demo_rst/Argonne_2023_Talk_Figures.rst

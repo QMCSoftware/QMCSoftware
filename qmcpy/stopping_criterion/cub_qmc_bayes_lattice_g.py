@@ -8,6 +8,7 @@ from numpy import log2
 import numpy as np
 #from time import time
 #import warnings
+import qmctoolscl
 
 
 class CubBayesLatticeG(_CubBayesLDG):
@@ -42,8 +43,8 @@ class CubBayesLatticeG(_CubBayesLDG):
     Lattice (DiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
-        randomize       1
-        order           linear
+        randomize       SHIFT
+        order           LINEAR
         gen_vec         [     1 182667]
         entropy         123456789
         spawn_key       ()
@@ -116,10 +117,10 @@ class CubBayesLatticeG(_CubBayesLDG):
         # GCV - Generalized cross validation
         self.kernType = 1  # Type-1: Bernoulli polynomial based algebraic convergence, Type-2: Truncated series
 
-        if self.discrete_distrib.randomize == False:
+        if self.discrete_distrib.randomize == "FALSE":
             raise ParameterError("CubBayesLattice_g requires discrete_distrib to have randomize=True")
-        if self.discrete_distrib.order != 'linear':
-            raise ParameterError("CubBayesLattice_g requires discrete_distrib to have order='linear'")
+        if self.discrete_distrib.order != 'LINEAR':
+            raise ParameterError("CubBayesLattice_g requires discrete_distrib to have order='LINEAR'")
 
 
     @staticmethod

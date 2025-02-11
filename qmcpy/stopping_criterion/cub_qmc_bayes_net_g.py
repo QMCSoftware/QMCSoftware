@@ -22,9 +22,9 @@ class CubBayesNetG(_CubBayesLDG):
     >>> solution,data = sc.integrate()
     >>> data
     LDTransformBayesData (AccumulateData Object)
-        solution        1.812
-        comb_bound_low  1.796
-        comb_bound_high 1.827
+        solution        1.804
+        comb_bound_low  1.786
+        comb_bound_high 1.821
         comb_flags      1
         n_total         2^(8)
         n               2^(8)
@@ -87,7 +87,7 @@ class CubBayesNetG(_CubBayesLDG):
             rel_tol (ndarray): relative error tolerance
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
-            alpha (float): signifcance level or p-value
+            alpha (float): significance level or p-value
             error_fun: function taking in the approximate solution vector,
                 absolute tolerance, and relative tolerance which returns the approximate error.
                 Default indicates integration until either absolute OR relative tolerance is satisfied.
@@ -117,7 +117,7 @@ class CubBayesNetG(_CubBayesLDG):
         self.data = None
         self.fwht = FWHT()
 
-        if self.discrete_distrib.randomize == False:
+        if self.discrete_distrib.randomize == "FALSE":
             raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
 
 

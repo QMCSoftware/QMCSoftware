@@ -8,10 +8,10 @@ class BernoulliCont(TrueMeasure):
     """    
     >>> bc = BernoulliCont(DigitalNetB2(2,seed=7),lam=.2)
     >>> bc.gen_samples(4)
-    array([[0.39545122, 0.10073414],
-           [0.21719142, 0.48293404],
-           [0.68958314, 0.90847415],
-           [0.05871131, 0.33436033]])
+    array([[0.03979019, 0.04339218],
+           [0.68043258, 0.58998885],
+           [0.1937716 , 0.86669211],
+           [0.40386874, 0.16007927]])
     >>> bc
     BernoulliCont (TrueMeasure Object)
         lam             0.200

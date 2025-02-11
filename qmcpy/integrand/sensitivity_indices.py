@@ -10,7 +10,7 @@ from itertools import combinations
 
 class SensitivityIndices(Integrand):
     """
-    Sensitivity' Indicies, normalized Sobol' Indices. 
+    Sensitivity' Indices, normalized Sobol' Indices. 
 
     >>> dnb2 = DigitalNetB2(dimension=3,seed=7)
     >>> keister_d = Keister(dnb2)
@@ -18,16 +18,16 @@ class SensitivityIndices(Integrand):
     >>> sc = CubQMCNetG(keister_indices,abs_tol=1e-3)
     >>> solution,data = sc.integrate()
     >>> solution.squeeze()
-    array([[0.32803639, 0.32795358, 0.32807359],
-           [0.33884667, 0.33857811, 0.33884115]])
+    array([[0.32822718, 0.32808433, 0.32795943],
+           [0.33865673, 0.33869732, 0.33859364]])
     >>> data
     LDTransformData (AccumulateData Object)
         solution        [[0.328 0.328 0.328]
                         [0.339 0.339 0.339]]
-        comb_bound_low  [[0.327 0.327 0.328]
+        comb_bound_low  [[0.328 0.328 0.327]
                         [0.338 0.338 0.338]]
-        comb_bound_high [[0.329 0.329 0.329]
-                        [0.34  0.339 0.34 ]]
+        comb_bound_high [[0.329 0.329 0.328]
+                        [0.34  0.34  0.339]]
         comb_flags      [[ True  True  True]
                         [ True  True  True]]
         n_total         2^(16)
@@ -63,19 +63,19 @@ class SensitivityIndices(Integrand):
     >>> sc = CubQMCNetG(SobolIndices(BoxIntegral(DigitalNetB2(3,seed=7)),indices='all'),abs_tol=.01)
     >>> sol,data = sc.integrate()
     >>> print(sol)
-    [[[0.32312991 0.33340559]
-      [0.32331463 0.33342669]
-      [0.32160276 0.33318619]
-      [0.65559598 0.6667154 ]
-      [0.65551702 0.66670251]
-      [0.6556618  0.66672429]]
+    [[[0.32392078 0.33342691]
+      [0.32267736 0.33338337]
+      [0.32301062 0.33337195]
+      [0.65550663 0.66671246]
+      [0.65536219 0.66671197]
+      [0.65543028 0.66668495]]
     <BLANKLINE>
-     [[0.3440018  0.33341845]
-      [0.34501082 0.33347005]
-      [0.34504829 0.33345212]
-      [0.67659368 0.6667021 ]
-      [0.67725088 0.66667925]
-      [0.67802866 0.66672587]]]
+     [[0.34472618 0.33355823]
+      [0.34473257 0.33336069]
+      [0.34388133 0.3333552 ]
+      [0.67725499 0.66676409]
+      [0.67629333 0.66673255]
+      [0.67729945 0.6667438 ]]]
     
     References: 
         [1] Art B. Owen.Monte Carlo theory, methods and examples. 2013. Appendix A.
