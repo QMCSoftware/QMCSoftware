@@ -53,7 +53,7 @@ packages = [
 
 setuptools.setup(
     name="qmcpy",
-    version="1.5",
+    version="1.6",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',
@@ -65,7 +65,8 @@ setuptools.setup(
     packages=packages,
     install_requires=[
         'numpy >= 1.17.0',
-        'scipy >= 1.0.0'],
+        'scipy >= 1.0.0',
+        'qmctoolscl >= 1.1.2'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
@@ -79,7 +80,6 @@ setuptools.setup(
             name='qmcpy.discrete_distribution.c_lib.c_lib',
             sources=[
                 'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
-                'qmcpy/discrete_distribution/c_lib/digital_net_b2.c',
                 'qmcpy/discrete_distribution/c_lib/fwht.c',],)],
     cmdclass={
         'clean': CleanCommand,

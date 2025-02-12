@@ -47,8 +47,8 @@ class CubQMCCLT(StoppingCriterion):
     Lattice (DiscreteDistribution Object)
         d               1
         dvec            0
-        randomize       1
-        order           natural
+        randomize       SHIFT
+        order           NATURAL
         gen_vec         1
         entropy         7
         spawn_key       ()
@@ -57,16 +57,16 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.19023153, 0.96068581])
+    array([1.19029896, 0.96063374])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [1.19  0.961]
         comb_bound_low  [1.19 0.96]
         comb_bound_high [1.191 0.961]
         comb_flags      [ True  True]
-        n_total         2^(21)
-        n               [2097152.    8192.]
-        n_rep           [131072.    512.]
+        n_total         2^(19)
+        n               [524288.  16384.]
+        n_rep           [32768.  1024.]
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
@@ -84,9 +84,9 @@ class CubQMCCLT(StoppingCriterion):
     Lattice (DiscreteDistribution Object)
         d               3
         dvec            [0 1 2]
-        randomize       1
-        order           natural
-        gen_vec         [     1 182667 469891]
+        randomize       SHIFT
+        order           NATURAL
+        gen_vec         [     1 182667 213731]
         entropy         7
         spawn_key       ()
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
@@ -109,11 +109,11 @@ class CubQMCCLT(StoppingCriterion):
                         [4. 5. 6.]]
         comb_flags      [[ True  True  True]
                         [ True  True  True]]
-        n_total         2^(14)
-        n               [[ 4096.  4096.  4096.]
-                        [16384.  4096.  4096.]]
-        n_rep           [[ 256.  256.  256.]
-                        [1024.  256.  256.]]
+        n_total         2^(13)
+        n               [[4096. 4096. 4096.]
+                        [8192. 4096. 4096.]]
+        n_rep           [[256. 256. 256.]
+                        [512. 256. 256.]]
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200

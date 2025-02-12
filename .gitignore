@@ -14,6 +14,7 @@ qmcpy.egg-info/
 .pytest_cache/
 demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
+demos/.jupyter
 
 # tests
 .coverage
@@ -42,6 +43,10 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
+demos/**.png
+demos/**.eps
+
+
 
 # release
 /build/
@@ -61,3 +66,5 @@ _ags/*
 # SC Choi's file exclusion
 .vscode/settings.json
 
+# Downloaded files
+raw.githubusercontent.com*
