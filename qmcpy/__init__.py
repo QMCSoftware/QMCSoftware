@@ -6,7 +6,8 @@ from .kernel_methods import (
     fftbr,ifftbr,fwht,
     KernelShiftInvar,KernelDigShiftInvar,KernelGaussian,
     FastGramMatrixLattice,FastGramMatrixDigitalNetB2,GramMatrix,
-    FastPDEGramMatrix,PDEGramMatrix)
+    FastPDEGramMatrix,PDEGramMatrix,
+    GPR,FGPRLattice,FGPRDigitalNetB2)
 try:
     from .kernel_methods import (
         fftbr_torch,ifftbr_torch,fwht_torch

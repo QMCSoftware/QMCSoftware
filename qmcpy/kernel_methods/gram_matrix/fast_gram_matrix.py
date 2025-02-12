@@ -158,7 +158,8 @@ class _FastGramMatrix(_GramMatrix):
     @property
     def l_chol(self):
         if self._l_chol is None:
-            lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1),dtype=float,**self.ckwargs)
+            lamblock = self.npt.empty((self.n1,self.t1,self.t1),dtype=float,**self.ckwargs)
+            if self.FT_COMPLEX: lamblock = 1j*lamblock
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
             self._l_chol = self.cholesky(lamblock)
@@ -245,7 +246,7 @@ class _FastGramMatrix(_GramMatrix):
         else:
             y = y.reshape((v,self.t1,self.n1)) # (v,t1,n1)
             yt = self.ft(y) # (v,t1,n1)
-            yts = self.npt.ones_like(yt) 
+            yts = self.npt.empty_like(yt)
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore",".*Casting complex values to real discards the imaginary part*")
                 for i in range(self.n1): # probably a better vectorized way to do this
@@ -347,6 +348,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
     ...         gm_wide = FastGramMatrixLattice(kernel_obj,dd_obj,max(n1//4,1),max(n2//2,1),u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
     ...         gm_wide._check()
     """
+    FT_COMPLEX = True
     def __init__(self, kernel_obj, dd_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
         """
         Args:
@@ -390,6 +392,9 @@ class FastGramMatrixLattice(_FastGramMatrix):
         super(FastGramMatrixLattice,self).__init__(kernel_obj,dd_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
         x = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max)
+        if self.npt!=np:
+            import torch 
+            x = torch.from_numpy(x)
         return x,x
     def _convert_x_to__x(self, x):
         return x
@@ -477,6 +482,7 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     ...         gm_wide = FastGramMatrixDigitalNetB2(kernel_obj,dd_obj,max(n1//4,1),max(n2//2,1),u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
     ...         gm_wide._check()
     """
+    FT_COMPLEX = False
     def __init__(self, kernel_obj, dd_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
         """
         Args:
@@ -498,6 +504,7 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
         assert dd_obj.replications==1
         assert isinstance(kernel_obj,KernelDigShiftInvar)
         kernel_obj.set_t(dd_obj.t_lms)
+        assert kernel_obj.t<64, "require DigitalNetB2 t_lms <= 63 as we will internally convert outputs to np.int64 or torch.int64 as not all operations are supported for torch.uint64"
         # FWHT is theoretically faster than FFT but practically slower
         if not kernel_obj.torchify:
             # qmctools implementation
@@ -508,13 +515,21 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
             from ..fast_transforms import fwht_torch
             self.ft = fwht_torch
             self.ift = fwht_torch
-        assert kernel_obj.npt==np, "FastGramMatrixDigitalNetB2 does not currently support torch as 'index_cpu' is not yet implemented for tensors of dtype torch.uint64"
         super(FastGramMatrixDigitalNetB2,self).__init__(kernel_obj,dd_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
-        xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True)
+        xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True).astype(np.int64)
+        if self.npt!=np:
+            import torch 
+            xb = torch.from_numpy(xb)
         xf = self._convert__x_to_x(xb)
         return xb,xf
     def _convert_x_to__x(self, x):
-        return np.floor(x*(2**self.kernel_obj.t)).astype(np.uint64)
+        _x = self.npt.floor(x*(2**self.kernel_obj.t))
+        if self.npt==np:
+            _x = _x.astype(np.int64)
+        else:
+            import torch
+            _x = _x.to(torch.int64)
+        return _x
     def _convert__x_to_x(self, _x):
         return _x*2**(-self.kernel_obj.t)

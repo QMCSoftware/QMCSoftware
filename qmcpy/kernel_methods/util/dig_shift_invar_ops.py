@@ -68,10 +68,11 @@ def weighted_walsh_funcs(alpha, xb, t):
     assert alpha in WEIGHTEDWALSHFUNCSZEROS, "alpha = %d not in WEIGHTEDWALSHFUNCSZEROS"%alpha
     if isinstance(xb,np.ndarray):
         np_or_torch = np 
+        y = np.ones(xb.shape) 
     else:
         import torch 
         np_or_torch = torch 
-    y = np_or_torch.ones(xb.shape)
+        y = torch.ones(xb.shape,device=xb.device)
     pidxs = xb>0
     y[~pidxs] = WEIGHTEDWALSHFUNCSZEROS[alpha]
     xfpidxs = (2**(-t))*xb[pidxs]

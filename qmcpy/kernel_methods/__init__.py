@@ -21,3 +21,4 @@ from .gram_matrix import (
 from .pde_gram_matrix import (
     PDEGramMatrix,
     FastPDEGramMatrix)
+from .gpr import GPR,FGPRLattice,FGPRDigitalNetB2
