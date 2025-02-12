@@ -1,4 +1,4 @@
-from ...discrete_distribution import Lattice,DigitalNetB2
+from ...discrete_distribution import Lattice,DigitalNetB2,IIDStdUniform,Halton
 from ...discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..kernel import KernelGaussian,KernelShiftInvar,KernelDigShiftInvar
 from ..gram_matrix import GramMatrix,FastGramMatrixLattice,FastGramMatrixDigitalNetB2
@@ -32,7 +32,7 @@ class _GPR(object):
             noises = None, 
             opt_lengthscales = True, 
             opt_global_scale = True, 
-            opt_noises = True,
+            opt_noises = False,
             lb_lengthscale = 0, 
             lb_global_scale = 0, 
             lb_noises = 1e-16,
@@ -53,7 +53,7 @@ class _GPR(object):
             global_scale = lb_global_scale+torch.ones(1,device=self.device)
         assert isinstance(global_scale,torch.Tensor) and global_scale.device==self.device and global_scale.shape==(1,) and (global_scale>lb_global_scale).all()
         if noises is None: 
-            noises = lb_noises+1e-6*torch.ones(d_out,device=self.device) 
+            noises = lb_noises+1e-8*torch.ones(d_out,device=self.device) 
         assert isinstance(noises,torch.Tensor) and noises.device==self.device and noises.shape==(d_out,) and (noises>lb_noises).all()
         log10_lengthscales = torch.log10(lengthscales-lb_lengthscale)
         log10_global_scale = torch.log10(global_scale-lb_global_scale)
@@ -69,7 +69,6 @@ class _GPR(object):
         if opt_noises:
             log10_noises = torch.nn.Parameter(log10_noises)
             params_to_opt.append(log10_noises)
-        #if optimizer_init is None: optimizer_init = lambda params: torch.optim.Adam(params,lr=.1,amsgrad=True)
         if optimizer_init is None: optimizer_init = lambda params: torch.optim.Rprop(params,lr=.1)
         assert callable(optimizer_init)
         optimizer = optimizer_init(params_to_opt)
@@ -92,8 +91,7 @@ class _GPR(object):
             self.gm = self._set_gram_matrix(kernel, noises)
             self.coeffs = self.gm.solve(yflat)
             mll = yflat[None,:]@self.coeffs+self.gm.logdet()
-            k_left = self.gm.get_new_left_full_gram_matrix(x_test)
-            yhat = k_left@self.coeffs
+            yhat = self.post_mean(x_test)
             lengthscales_hist[i] = lengthscales.detach().cpu()
             global_scale_hist[i] = global_scale.detach().cpu()
             noises_hist[i] = noises.detach().cpu()
@@ -117,8 +115,70 @@ class _GPR(object):
             "mll": mll_hist,
             "l2rerr": l2rerr_hist}
         return data 
-    
+    def post_mean(self, x, betas=0, cs=1):
+        assert x.ndim==2 and x.device==self.x.device and x.size(1)==self.d
+        k_left = self.gm.get_new_left_full_gram_matrix(x,betas,cs)
+        yhat = k_left@self.coeffs
+        return yhat 
+    def post_var(self, x, betas=0, cs=1):
+        import torch
+        xb = self.gm._convert_x_to__x(x)
+        kvec = self.gm.kernel_obj(xb,xb,betas,betas,cs,cs,diag_only=True)
+        k_left = self.gm.get_new_left_full_gram_matrix(x,betas,cs)
+        k_right = k_left.T 
+        pvar = kvec-torch.einsum("ik,ki->i",k_left,self.gm.solve(k_right))
+        return pvar
+    def post_cov(self, x, betas=0, cs=1):
+        xb = self.gm._convert_x_to__x(x)
+        k = self.gm.kernel_obj(xb,xb,betas,betas,cs,cs)
+        k_left = self.gm.get_new_left_full_gram_matrix(x,betas,cs)
+        k_right = k_left.T
+        pcov = k-k_left@self.gm.solve(k_right)
+        return pcov
+    def post_cov_sep(self, x1, x2, beta1s=0, beta2s=0, c1s=1, c2s=1):
+        xb1 = self.gm._convert_x_to__x(x1)
+        xb2 = self.gm._convert_x_to__x(x2)
+        k = self.gm.kernel_obj(xb1,xb2,beta1s,beta2s,c1s,c2s)
+        k_left = self.gm.get_new_left_full_gram_matrix(x1,beta1s,c1s)
+        k_right = self.gm.get_new_left_full_gram_matrix(x2,beta2s,c2s).T
+        pcov = k-k_left@self.gm.solve(k_right)
+        return pcov  
+
 class GPR(_GPR):
+    """
+    >>> import torch
+    >>> d = 2
+    >>> lbetas = [torch.zeros((1,d),dtype=int)]+[ej for ej in torch.eye(d,dtype=int)]
+    >>> iid = IIDStdUniform(d,seed=7)
+    >>> gp = GPR(iid,n=32,lbetas=lbetas)
+    >>> yf = torch.vstack([
+    ...     torch.cos(gp.x[:,0])*torch.sin(gp.x[:,1]),
+    ...     -torch.sin(gp.x[:,0])*torch.sin(gp.x[:,1]),
+    ...     torch.cos(gp.x[:,0])*torch.cos(gp.x[:,1]),
+    ... ]).T
+    >>> x_test = torch.from_numpy(Halton(d,seed=17).gen_samples(64))
+    >>> y_test = torch.cos(x_test[:,0])*torch.sin(x_test[:,1])
+    >>> data = gp.fit(yf,x_test,y_test,opt_steps=10,verbose=False)
+    >>> pmean = gp.post_mean(gp.x)
+    >>> pmean.shape 
+    torch.Size([32])
+    >>> torch.allclose(pmean,yf[:,0],atol=1e-5,rtol=0)
+    True
+    >>> pvar = gp.post_var(x_test)
+    >>> pvar.shape 
+    torch.Size([64])
+    >>> pcov = gp.post_cov(x_test)
+    >>> pcov.shape
+    torch.Size([64, 64])
+    >>> torch.allclose(pcov.diagonal(),pvar)
+    True
+    >>> pcov_sep = gp.post_cov_sep(x_test,gp.x)
+    >>> pcov_sep.shape
+    torch.Size([64, 32])
+    >>> pvar = gp.post_var(gp.x)
+    >>> torch.allclose(pvar,torch.zeros_like(pvar),atol=1e-6,rtol=0)
+    True
+    """
     def __init__(self, dd_obj_or_x, n=None, lbetas=0, lcs=1, device="cpu", kernel_class=KernelGaussian, alpha=None):
         self._check_torch()
         import torch
@@ -132,6 +192,40 @@ class GPR(_GPR):
         return GramMatrix(kernel,self.x,self.x,lbeta1s=self.lbetas,lbeta2s=self.lbetas,adaptive_noise=False,noise=noises)
 
 class FGPRLattice(_GPR):
+    """
+    >>> import torch
+    >>> d = 2
+    >>> lbetas = [torch.zeros((1,d),dtype=int)]+[ej for ej in torch.eye(d,dtype=int)]
+    >>> lattice = Lattice(d,seed=7)
+    >>> gp = FGPRLattice(lattice,n=32,lbetas=lbetas)
+    >>> yf = torch.vstack([
+    ...     torch.cos(gp.x[:,0])*torch.sin(gp.x[:,1]),
+    ...     -torch.sin(gp.x[:,0])*torch.sin(gp.x[:,1]),
+    ...     torch.cos(gp.x[:,0])*torch.cos(gp.x[:,1]),
+    ... ]).T
+    >>> x_test = torch.from_numpy(Halton(d,seed=17).gen_samples(64))
+    >>> y_test = torch.cos(x_test[:,0])*torch.sin(x_test[:,1])
+    >>> data = gp.fit(yf,x_test,y_test,opt_steps=10,verbose=False)
+    >>> pmean = gp.post_mean(gp.x)
+    >>> pmean.shape 
+    torch.Size([32])
+    >>> torch.allclose(pmean,yf[:,0],atol=1e-5,rtol=0)
+    True
+    >>> pvar = gp.post_var(x_test)
+    >>> pvar.shape 
+    torch.Size([64])
+    >>> pcov = gp.post_cov(x_test)
+    >>> pcov.shape
+    torch.Size([64, 64])
+    >>> torch.allclose(pcov.diagonal(),pvar)
+    True
+    >>> pcov_sep = gp.post_cov_sep(x_test,gp.x)
+    >>> pcov_sep.shape
+    torch.Size([64, 32])
+    >>> pvar = gp.post_var(gp.x)
+    >>> torch.allclose(pvar,torch.zeros_like(pvar),atol=1e-6,rtol=0)
+    True
+    """
     def __init__(self, dd_obj, n, lbetas=0, lcs=1, device="cpu", alpha=None):
         self._check_torch()
         import torch
@@ -143,13 +237,47 @@ class FGPRLattice(_GPR):
         return FastGramMatrixLattice(kernel,self.dd_obj,self.n,self.n,lbeta1s=self.lbetas,lbeta2s=self.lbetas,adaptive_noise=False,noise=noises,_pregenerated_x__x=(self._x,self.x))
 
 class FGPRDigitalNetB2(_GPR):
+    """
+    >>> import torch
+    >>> d = 2
+    >>> lbetas = [torch.zeros((1,d),dtype=int)]+[ej for ej in torch.eye(d,dtype=int)]
+    >>> dnb2 = DigitalNetB2(d,seed=7)
+    >>> gp = FGPRDigitalNetB2(dnb2,n=32,lbetas=lbetas,alpha=4)
+    >>> yf = torch.vstack([
+    ...     torch.cos(gp.x[:,0])*torch.sin(gp.x[:,1]),
+    ...     -torch.sin(gp.x[:,0])*torch.sin(gp.x[:,1]),
+    ...     torch.cos(gp.x[:,0])*torch.cos(gp.x[:,1]),
+    ... ]).T
+    >>> x_test = torch.from_numpy(Halton(d,seed=17).gen_samples(64))
+    >>> y_test = torch.cos(x_test[:,0])*torch.sin(x_test[:,1])
+    >>> data = gp.fit(yf,x_test,y_test,opt_steps=10,verbose=False)
+    >>> pmean = gp.post_mean(gp.x)
+    >>> pmean.shape 
+    torch.Size([32])
+    >>> torch.allclose(pmean,yf[:,0],atol=1e-5,rtol=0)
+    True
+    >>> pvar = gp.post_var(x_test)
+    >>> pvar.shape 
+    torch.Size([64])
+    >>> pcov = gp.post_cov(x_test)
+    >>> pcov.shape
+    torch.Size([64, 64])
+    >>> torch.allclose(pcov.diagonal(),pvar)
+    True
+    >>> pcov_sep = gp.post_cov_sep(x_test,gp.x)
+    >>> pcov_sep.shape
+    torch.Size([64, 32])
+    >>> pvar = gp.post_var(gp.x)
+    >>> torch.allclose(pvar,torch.zeros_like(pvar),atol=1e-6,rtol=0)
+    True
+    """
     def __init__(self, dd_obj, n, lbetas=0, lcs=1, device="cpu", alpha=None):
         self._check_torch()
         import torch
         assert isinstance(dd_obj,DigitalNetB2)
         self.dd_obj = dd_obj
         self._x = torch.from_numpy(self.dd_obj.gen_samples(n,return_binary=True).astype(np.int64)).to(device)
-        self.x = self._x*2**(-dd_obj.t_lms)
+        self.x = (self._x*2**(-dd_obj.t_lms)).to(float)
         super(FGPRDigitalNetB2,self).__init__(lbetas,lcs,alpha,kernel_class=KernelDigShiftInvar,kernel_kwargs={"t":dd_obj.t_lms})
     def _set_gram_matrix(self, kernel, noises):
         return FastGramMatrixDigitalNetB2(kernel,self.dd_obj,self.n,self.n,lbeta1s=self.lbetas,lbeta2s=self.lbetas,adaptive_noise=False,noise=noises,_pregenerated_x__x=(self._x,self.x))

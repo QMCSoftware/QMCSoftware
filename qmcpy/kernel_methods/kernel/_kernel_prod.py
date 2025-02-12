@@ -37,7 +37,7 @@ class _KernelProd(object):
         pass
     def eval(self, *args, **kwargs):
         return self.__call__(*args,**kwargs)
-    def __call__(self, x1, x2, beta1s=0, beta2s=0, c1s=1., c2s=1.):
+    def __call__(self, x1, x2, beta1s=0, beta2s=0, c1s=1., c2s=1., diag_only=False):
         """
         Args:
             x1 (np.ndarray or torch.Tensor): n1 x d array of first inputs to kernel 
@@ -46,6 +46,7 @@ class _KernelProd(object):
             beta2s (np.ndarray or torch.Tensor): m2 x d array of first derivative orders
             c1s (np.ndarray or torch.Tensor): length m1 vector of derivative coefficients 
             c2s (np.ndarray or torch.Tensor): length m2 vector of derivative coefficients
+            diag_only (bool): only compute the diagonal of the covariance matrix 
         """
         n1,n2 = len(x1),len(x2)
         assert x1.shape==(n1,self.d) and x2.shape==(n2,self.d)
@@ -59,4 +60,6 @@ class _KernelProd(object):
         if np.isscalar(c1s): c1s = c1s*self.npt.ones(m1,dtype=float,**self.ckwargs)
         if np.isscalar(c2s): c2s = c2s*self.npt.ones(m2,dtype=float,**self.ckwargs)
         assert c1s.shape==(m1,) and c2s.shape==(m2,)
-        return self.parsed_call(x1,x2,n1,n2,beta1s,beta2s,m1,m2,c1s,c2s)
+        if diag_only:
+            assert n1==n2 and m1==m2
+        return self.parsed_call(x1,x2,n1,n2,beta1s,beta2s,m1,m2,c1s,c2s,diag_only)

@@ -387,10 +387,6 @@ class FastGramMatrixLattice(_FastGramMatrix):
     def _sample(self, n_min, n_max):
         x = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max)
         return x,x
-    def _convert_x_to__x(self, x):
-        return x
-    def _convert__x_to_x(self, _x):
-        return _x
 
 class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     """

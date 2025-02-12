@@ -71,3 +71,7 @@ class _GramMatrix(object):
             gms[tt1,tt2] = self.kernel_obj(x1,x2,lbeta1s[tt1],lbeta2s[tt2],lc1s[tt1],lc2s[tt2])
         gm = self.npt.vstack([self.npt.hstack([gms[tt1,tt2] for tt2 in range(t2)]) for tt1 in range(t1)])
         return gm
+    def _convert_x_to__x(self, x):
+        return x
+    def _convert__x_to_x(self, _x):
+        return _x

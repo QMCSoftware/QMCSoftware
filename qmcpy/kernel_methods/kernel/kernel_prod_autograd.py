@@ -6,24 +6,31 @@ import itertools
 
 class _KernelProdAutoGrad(_KernelProd):
     DEFAULTALPHA = np.nan
-    def parsed_call(self, x1, x2, n1, n2, beta1s, beta2s, m1, m2, c1s, c2s):
+    def parsed_call(self, x1, x2, n1, n2, beta1s, beta2s, m1, m2, c1s, c2s, diag_only):
         try:
             import torch 
         except: 
             raise Exception("_AutoGradKernel requires torch for automatic differentiation")
-        xmat1 = [self.npt.tile(x1[:,None,j],(1,n2)) for j in range(self.d)]
-        xmat2 = [self.npt.tile(x2[None,:,j],(n1,1)) for j in range(self.d)]
+        if diag_only:
+            xmat1 = [x1[:,j] for j in range(self.d)]
+            xmat2 = [x2[:,j] for j in range(self.d)]
+            y = self.scale*torch.ones(n1,requires_grad=True,**self.ckwargs)
+            grad_outputs = torch.ones(n1,dtype=torch.float,**self.ckwargs)
+            v = torch.zeros(n1,requires_grad=False,**self.ckwargs)
+        else:
+            xmat1 = [self.npt.tile(x1[:,None,j],(1,n2)) for j in range(self.d)]
+            xmat2 = [self.npt.tile(x2[None,:,j],(n1,1)) for j in range(self.d)]
+            y = self.scale*torch.ones((n1,n2),requires_grad=True,**self.ckwargs)
+            grad_outputs = torch.ones((n1,n2),dtype=torch.float,**self.ckwargs)
+            v = torch.zeros((n1,n2),requires_grad=False,**self.ckwargs)
         for j in range(self.d):
             if self.npt==np:
                 xmat1[j] = torch.from_numpy(xmat1[j])
                 xmat2[j] = torch.from_numpy(xmat2[j])
             xmat1[j].requires_grad_()
             xmat2[j].requires_grad_()
-        y = self.scale*torch.ones((n1,n2),requires_grad=True,**self.ckwargs)
         for j in range(self.d):
             y = y*self._1d_to_prod(xmat1[j],xmat2[j],self.lengthscales[j])
-        grad_outputs = torch.ones((n1,n2),dtype=torch.float,**self.ckwargs)
-        v = torch.zeros((n1,n2),requires_grad=False,**self.ckwargs)
         for ell1,ell2 in itertools.product(range(m1),range(m2)):
             yc = y.clone()
             for j in range(self.d):

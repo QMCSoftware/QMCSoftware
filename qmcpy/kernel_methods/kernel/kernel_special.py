@@ -4,15 +4,23 @@ from ...discrete_distribution import Lattice,DigitalNetB2
 import numpy as np
 
 class _KernelProdSpecial(_KernelProd):
-    def parsed_call(self, x1, x2, n1, n2, beta1s, beta2s, m1, m2, c1s, c2s):
-        delta = self.x1_ominus_x2(x1[:,None,:],x2[None,:,:]) # n1 x n2 x d
-        assert delta.ndim==3 and delta.shape[2]==self.d
-        inds,idxs,consts = self.inds_idxs_consts(beta1s[:,None,:],beta2s[None,:,:]) # m1 x m2 x n1 x n2 x d
-        k = self.npt.ones((m1,m2,n1,n2,self.d),dtype=float,**self.ckwargs)
-        self.eval_low_low(k,delta,inds,idxs,consts,m1,m2) # m1 x m2 x n1 x n2 x d
+    def parsed_call(self, x1, x2, n1, n2, beta1s, beta2s, m1, m2, c1s, c2s, diag_only):
+        if diag_only:
+            delta = self.x1_ominus_x2(x1[:,None,:],x2[:,None,:])
+            assert delta.ndim==3 and delta.shape[2]==self.d
+            inds,idxs,consts = self.inds_idxs_consts(beta1s[:,None,:],beta2s[None,:,:])
+            k = self.npt.ones((m1,1,n1,1,self.d),dtype=float,**self.ckwargs)
+            self.eval_low_low(k,delta,inds,idxs,consts,m1,1)
+        else:
+            delta = self.x1_ominus_x2(x1[:,None,:],x2[None,:,:]) # n1 x n2 x d
+            assert delta.ndim==3 and delta.shape[2]==self.d
+            inds,idxs,consts = self.inds_idxs_consts(beta1s[:,None,:],beta2s[None,:,:]) # m1 x m2 x n1 x n2 x d
+            k = self.npt.ones((m1,m2,n1,n2,self.d),dtype=float,**self.ckwargs)
+            self.eval_low_low(k,delta,inds,idxs,consts,m1,m2) # m1 x m2 x n1 x n2 x d
         kcomb = (inds[:,:,None,None,:]+self.lengthscales*k).prod(-1) # m1 x m2 x n1 x n2
         kcomb = (c1s[:,None,None,None]*c2s[None,:,None,None]*kcomb).sum((0,1)) # n1 x n2
-        return self.scale*kcomb
+        kmat = self.scale*kcomb
+        return kmat[:,0] if diag_only else kmat
     def eval_low_u_noscale(self, u, delta_u, inds, idxs, consts, m1, m2, n1, n2, d_u):
         k_u = self.npt.ones((m1,m2,n1,n2,d_u),dtype=float,**self.ckwargs)
         self.eval_low_low(k_u,delta_u,inds[:,:,u],idxs[:,:,u],consts[:,:,u],m1,m2)
