@@ -121,7 +121,7 @@ class TestCubQMCLatticeG(unittest.TestCase):
         self.assertTrue(abs(solution-keister_2d_exact) < tol)
 
     def test_sobol_indices(self):
-        abs_tol,rel_tol = 1e-2,0
+        abs_tol,rel_tol = 5e-3,0
         a,b = 7,0.1
         indices = [[0],[1],[2],[0,1],[0,2],[1,2]]
         true_solution = Ishigami._exact_sensitivity_indices(indices,a,b)
