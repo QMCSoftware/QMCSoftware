@@ -137,7 +137,7 @@ class _FastGramMatrix(_GramMatrix):
                     self.lam[tt1,tt1][0,0,0,:] += self.noise[tt1] # lam is (m1,m2,1,n1) = (1,1,1,n1)
         self.__x1,self.__x2 = None,None
         self._full_mat = None
-        self._l_chol = None
+        self._evals_evecs = None
     @property
     def _x1(self):
         if self.__x1 is None: 
@@ -158,14 +158,14 @@ class _FastGramMatrix(_GramMatrix):
             self._full_mat = self@self.npt.eye(self.size[1],dtype=float,**self.ckwargs)
         return self._full_mat
     @property
-    def l_chol(self):
-        if self._l_chol is None:
+    def evals_evecs(self):
+        if self._evals_evecs is None:
             lamblock = self.npt.empty((self.n1,self.t1,self.t1),dtype=float,**self.ckwargs)
             if self.FT_COMPLEX: lamblock = 1j*lamblock
             for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
                 lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
-            self._l_chol = self.cholesky(lamblock)
-        return self._l_chol
+            self._evals_evecs = self.eigh(lamblock)
+        return self._evals_evecs
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         if self.npt==np:
@@ -178,13 +178,8 @@ class _FastGramMatrix(_GramMatrix):
         return _x,x
     def logdet(self):
         assert self.invertible,"logdet currently only supports invertible matrices"
-        if self.torchify:
-            import torch 
-            return 2*torch.logdet(self.l_chol).real.sum() 
-        else:
-            signs,vals = np.linalg.slogdet(self.l_chol)
-            assert (signs>0).all(), "det <= 0, which should not happen for inverbible matrices"
-            return 2*vals.real.sum()
+        evals,evecs = self.evals_evecs
+        return self.npt.log(self.npt.abs(evals)).sum()
     def get_new_left_full_gram_matrix(self, new_x, new_lbetas=0, new_lcs=1.):
         new__x = self._convert_x_to__x(new_x)
         new_lbetas,new_lcs,new_t,new_m = self._parse_lbetas_lcs(new_lbetas,new_lcs)
@@ -248,7 +243,8 @@ class _FastGramMatrix(_GramMatrix):
         else:
             y = y.reshape((v,self.t1,self.n1)) # (v,t1,n1)
             yt = self.ft(y) # (v,t1,n1)
-            yts = self.transpose_func(self.cho_solve(self.l_chol,self.transpose_func(yt,[2,1,0])),[2,1,0])
+            evals,evecs = self.evals_evecs
+            yts = self.npt.einsum("rlk,rkm->mlr",evecs,self.npt.einsum("rlk,plr->rkp",evecs.conj(),yt)/evals[...,None])
             s = self.ift(yts).real # (v,t1,n1)
             s = s.reshape((v,self.t1*self.n1))
         return s[0,:] if yogndim==1 else s.T
@@ -439,10 +435,10 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
            4.69369291e-02, 2.71912370e-02, 2.70929631e-02, 2.66507808e-02,
            2.34746167e-02, 3.19029278e-03, 9.88178188e-04, 9.23817031e-04,
            8.84868792e-04, 7.03538603e-04, 2.12314818e-04, 1.98605167e-04,
-           1.10576672e-04, 5.59670630e-05, 5.57456192e-05, 4.80716213e-05,
-           4.18689162e-05, 4.74003858e-06, 4.36436972e-06, 1.06144577e-06,
-           1.04799696e-06, 9.49842513e-07, 9.46245074e-07, 3.03817487e-07,
-           2.92462932e-07])
+           1.10576672e-04, 5.59670631e-05, 5.57456192e-05, 4.80716213e-05,
+           4.18689163e-05, 4.74003862e-06, 4.36436975e-06, 1.06144576e-06,
+           1.04799694e-06, 9.49842489e-07, 9.46245051e-07, 3.03817464e-07,
+           2.92462908e-07])
     >>> vhat
     array([4.04663958, 6.21694266, 5.33350863, 4.8833252 , 3.92690965,
            6.53313952, 2.78645923, 1.61186557, 0.69749025, 0.95468749,

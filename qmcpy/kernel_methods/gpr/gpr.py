@@ -35,9 +35,9 @@ class _GPR(object):
             opt_noises = True,
             lb_lengthscale = 0, 
             lb_global_scale = 0, 
-            lb_noises = 1e-8,
+            lb_noises = 1e-16,
             optimizer_init = None,
-            use_scheduler = True,
+            use_scheduler = False,
             verbose = True,
             verbose_indent = 4,
         ):
@@ -106,8 +106,8 @@ class _GPR(object):
                 print(" "*verbose_indent+_s)
             if i==opt_steps: break
             mll.backward()
-            if i==0 or mll<(10*mll_hist[i-1]):
-                optimizer.step()
+            #if i==0 or mll<(2*mll_hist[i-1]):
+            optimizer.step()
             if use_scheduler:
                 scheduler.step(mll)
         data = {

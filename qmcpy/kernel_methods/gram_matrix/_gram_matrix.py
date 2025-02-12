@@ -24,6 +24,13 @@ class _GramMatrix(object):
             self.get_ptr = lambda x: x.ctypes.data
         self.lc1s_og = [self.clone(c1s) for c1s in self.lc1s] 
         self.lc2s_og = [self.clone(c2s) for c2s in self.lc2s]
+    def eigh(self, m):
+        if self.npt==np:
+            evals,evecs = np.linalg.eigh(m)
+        else:
+            import torch 
+            evals,evecs = torch.linalg.eigh(m)
+        return evals,evecs
     def cho_solve(self, l, b):
         bis1d = b.ndim==1
         if bis1d:
