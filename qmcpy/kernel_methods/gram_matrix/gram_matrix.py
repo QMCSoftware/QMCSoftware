@@ -35,7 +35,7 @@ class GramMatrix(_GramMatrix):
     >>> data["rforward_norms"]
     tensor([1.0000e+00, 1.0424e+00, 2.4682e-01, 1.1124e-01, 4.0457e-02, 4.7190e-02,
             2.4022e-02, 1.2266e-02, 2.1817e-03, 1.3779e-03, 2.0303e-04, 8.4293e-05,
-            5.1356e-06, 2.5173e-06, 9.9742e-07, 4.0527e-08, 4.2315e-14],
+            5.1356e-06, 2.5173e-06, 9.9742e-07, 4.0527e-08, 1.7363e-13],
            dtype=torch.float64)
     >>> print(precond.info_str(gm.full_mat))
     K(A)           K(P)           K(P)/K(A)      

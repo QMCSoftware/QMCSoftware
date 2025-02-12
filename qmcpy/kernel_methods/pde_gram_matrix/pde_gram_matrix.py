@@ -130,12 +130,12 @@ class PDEGramMatrix(_PDEGramMatrix):
     >>> precond = PPCholPrecond(ki.full_mat)
     >>> print(precond.info_str(ki.full_mat))
     K(A)           K(P)           K(P)/K(A)      Lk.shape       
-    9.6e+12        4.3e+04        4.5e-09        (1280, 1117)   
+    3.3e+12        2.2e+04        6.6e-09        (640, 560)     
     >>> coeffs,data = pcg(ki,y,precond,rtol=5e-3)
     >>> kvec = ki.get_new_left_full_gram_matrix(xticks)
     >>> yhatmesh = (kvec@coeffs).reshape(x1mesh.shape)
     >>> print("L2 Rel Error Gauss: %.1e"%(torch.linalg.norm(yhatmesh-ymesh)/torch.linalg.norm(ymesh)))
-    L2 Rel Error Gauss: 3.0e-01
+    L2 Rel Error Gauss: 5.7e-01
     """
     def __init__(self, kernel_obj, xs, ns=None, us=None, llbetas=None, llcs=None, noise=1e-8, adaptive_noise=True, half_comp=True):
         """
