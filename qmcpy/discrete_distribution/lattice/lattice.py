@@ -2,6 +2,7 @@ from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 import qmctoolscl
 from numpy import *
+from numpy.lib.npyio import DataSource
 from os.path import dirname, abspath, isfile
 import warnings
 
@@ -125,7 +126,7 @@ class Lattice(LD):
 
     def __init__(self, dimension=1, randomize='shift', order='natural', seed=None,
         generating_vector="kuo.lattice-33002-1024-1048576.9125.txt", d_max=None, m_max=None, replications=1):
-        """
+        r"""
         Args:
             dimension (int or :class:`numpy.ndarray`): dimension of the generator.
 

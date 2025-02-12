@@ -287,7 +287,7 @@ class DigitalNetB2(LD):
                 self.d_max = int(contents[1])
                 self.m_max = int(log2(int(contents[2])))
                 self.t_max = int(contents[3])
-                compat_shift = max(self.t_max-64,0)
+                compat_shift = self.t_max-64 if self.t_max>=64 else 0
                 if compat_shift>0: warnings.warn("Truncating ints in generating matrix to have 64 bits.")
                 self.z_og = array([[int(v)>>compat_shift for v in line.split(' ')] for line in contents[4:]],dtype=uint64)[None,:]
             elif isfile(root+generating_matrices):
@@ -310,7 +310,7 @@ class DigitalNetB2(LD):
         if not self.msb:
             qmctoolscl.dnb2_gmat_lsb_to_msb(uint64(self.replications_gm),uint64(self.d),uint64(self.m_max),tile(uint64(self.t_max),self.replications_gm),self.z_og,self.z_og,**qmctoolscl_kwargs)
         # randomizations
-        self.t_lms = max(self.t_max,t_lms)
+        self.t_lms = self.t_max if self.t_max>t_lms else t_lms
         assert self.t_max<=64 and self.t_lms<=64, "require t_max <= t_lms <= 64"
         self.alpha = alpha
         self._verbose = _verbose
