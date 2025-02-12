@@ -33,7 +33,11 @@ class _GPR(object):
             opt_lengthscales = True, 
             opt_global_scale = True, 
             opt_noises = True,
+            lb_lengthscale = 0, 
+            lb_global_scale = 0, 
+            lb_noises = 1e-8,
             optimizer_init = None,
+            use_scheduler = True,
             verbose = True,
             verbose_indent = 4,
         ):
@@ -43,17 +47,17 @@ class _GPR(object):
         d_out = yf.size(1) 
         yflat = yf.T.flatten()
         if lengthscales is None:
-            lengthscales =  torch.ones(self.d,device=self.device)
-        assert isinstance(lengthscales,torch.Tensor) and lengthscales.device==self.device and lengthscales.shape==(self.d,) and (lengthscales>0).all()
+            lengthscales =  lb_lengthscale+torch.ones(self.d,device=self.device)
+        assert isinstance(lengthscales,torch.Tensor) and lengthscales.device==self.device and lengthscales.shape==(self.d,) and (lengthscales>lb_lengthscale).all()
         if global_scale is None: 
-            global_scale = torch.ones(1,device=self.device)
-        assert isinstance(global_scale,torch.Tensor) and global_scale.device==self.device and global_scale.shape==(1,) and (global_scale>0).all()
+            global_scale = lb_global_scale+torch.ones(1,device=self.device)
+        assert isinstance(global_scale,torch.Tensor) and global_scale.device==self.device and global_scale.shape==(1,) and (global_scale>lb_global_scale).all()
         if noises is None: 
-            noises = 1e-8*torch.ones(d_out,device=self.device) 
-        assert isinstance(noises,torch.Tensor) and noises.device==self.device and noises.shape==(d_out,) and (noises>0).all()
-        log10_lengthscales = torch.log10(lengthscales)
-        log10_global_scale = torch.log10(global_scale)
-        log10_noises = torch.log10(noises)
+            noises = lb_noises+1e-6*torch.ones(d_out,device=self.device) 
+        assert isinstance(noises,torch.Tensor) and noises.device==self.device and noises.shape==(d_out,) and (noises>lb_noises).all()
+        log10_lengthscales = torch.log10(lengthscales-lb_lengthscale)
+        log10_global_scale = torch.log10(global_scale-lb_global_scale)
+        log10_noises = torch.log10(noises-lb_noises)
         assert opt_lengthscales or opt_global_scale or opt_noises, "need to optimize lengthscales and/or global_scale and/or noises"
         params_to_opt = [] 
         if opt_lengthscales:
@@ -65,22 +69,25 @@ class _GPR(object):
         if opt_noises:
             log10_noises = torch.nn.Parameter(log10_noises)
             params_to_opt.append(log10_noises)
-        if optimizer_init is None: optimizer_init = lambda params: torch.optim.Adam(params,lr=1e-1,amsgrad=True)
+        #if optimizer_init is None: optimizer_init = lambda params: torch.optim.Adam(params,lr=.1,amsgrad=True)
+        if optimizer_init is None: optimizer_init = lambda params: torch.optim.Rprop(params,lr=.1)
         assert callable(optimizer_init)
         optimizer = optimizer_init(params_to_opt)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,factor=1/2,patience=0,threshold=1e-2,threshold_mode="rel")
         lengthscales_hist = torch.empty((opt_steps+1,self.d))
         global_scale_hist = torch.empty(opt_steps+1)
         noises_hist = torch.empty((opt_steps+1,d_out))
         mll_hist = torch.empty(opt_steps+1)
         l2rerr_hist = torch.empty(opt_steps+1)
         if verbose:
-            _s = "%15s | %-15s %-15s | lengthscales, global_scale, noises"%("iter of %d"%opt_steps,"MLL","L2RError")
+            _s = "%15s | %-15s %-15s | %-15s | lengthscales, global_scale, noises"%("iter of %d"%opt_steps,"MLL","L2RError","lr")
             print(" "*verbose_indent+_s)
             print(" "*verbose_indent+"~"*len(_s))
         for i in range(opt_steps+1):
-            lengthscales = 10**log10_lengthscales
-            global_scale = 10**log10_global_scale
-            noises = 10**log10_noises
+            lengthscales = 10**log10_lengthscales+lb_lengthscale
+            global_scale = 10**log10_global_scale+lb_global_scale
+            noises = 10**log10_noises+lb_noises
+            optimizer.zero_grad()
             kernel = self.kernel_class(self.d,alpha=self.alpha,lengthscales=lengthscales,scale=global_scale,torchify=True,device=self.device,requires_grad=True,**self.kernel_kwargs)
             self.gm = self._set_gram_matrix(kernel, noises)
             self.coeffs = self.gm.solve(yflat)
@@ -93,13 +100,16 @@ class _GPR(object):
             mll_hist[i] = mll.detach()
             l2rerr_hist[i] = (torch.linalg.norm(y_test-yhat)/torch.linalg.norm(y_test)).detach()
             if verbose and (i%verbose==0 or i==opt_steps):
-                _s = "%15d | %-15.2e %-15.2e | "%(i,mll_hist[i],l2rerr_hist[i])
+                _s = "%15d | %-15.2e %-15.2e | %-15.2e | "%(i,mll_hist[i],l2rerr_hist[i],scheduler.get_last_lr()[0])
                 with np.printoptions(formatter={"float":lambda x: "%.2e"%x}):
                     _s += "%s\t%s\t%s"%(str(lengthscales_hist[i].numpy()),str(global_scale_hist[i,None].numpy()),str(noises_hist[i].numpy()))
                 print(" "*verbose_indent+_s)
             if i==opt_steps: break
             mll.backward()
-            optimizer.step()
+            if i==0 or mll<(10*mll_hist[i-1]):
+                optimizer.step()
+            if use_scheduler:
+                scheduler.step(mll)
         data = {
             "lengthscales": lengthscales_hist,
             "global_scale": global_scale_hist,
