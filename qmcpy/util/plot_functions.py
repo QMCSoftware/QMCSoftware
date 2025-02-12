@@ -2,7 +2,9 @@
 import qmcpy as qp
 from numpy import*
 import os
-def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac = 5, **kwargs):
+def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac = 5, \
+              fig_title = 'Projection of Samples', axis_pad = 0, want_grid = True, font_family = "sans-serif", \
+                where_title = 1, **kwargs):
     """
     Args:
         sampler: the Discrete Distribution or the True Measure Object to be plotted
@@ -17,6 +19,11 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
         marker_size: the marker size in points**2(typographic points are 1/72 in.).
             Default value is 5.
         figfac: the figure size factor. Default value is 5.
+        fig_title: the title of the figure. Default value is 'Projection of Samples'
+        axis_pad: the padding of the axis so that points on the boundaries can be seen. Default value is 0.
+        want_grid: setting it true will enable grid on the plot. Default value is true.
+        font_family: the font family of the plot. Default value is "sans-serif".
+        where_title: the position of the title on the plot. Default value is 1.
         **kwargs : Any extra features the user would like to see in the plots
     """
     try:
@@ -26,6 +33,7 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
         from matplotlib import colors
     except:
         raise ImportError("Missing matplotlib.pyplot as plt, Matplotlib must be installed to run plot_proj function")
+    plt.rcParams['font.family'] = font_family 
     n = atleast_1d(n)
     d_horizontal = atleast_1d(d_horizontal)
     d_vertical = atleast_1d(d_vertical)
@@ -55,11 +63,15 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
                         y_label_num = d_vertical[j] + 1
                     
                     if(isinstance(sampler,qp.DiscreteDistribution)):
-                        ax[i,j].set_xlim([0,1])
-                        ax[i,j].set_ylim([0,1])
+                        ax[i,j].set_xlim([0-axis_pad,1+axis_pad])
+                        ax[i,j].set_ylim([0-axis_pad,1+axis_pad])
                         ax[i,j].set_xticks([0,1/4,1/2,3/4,1])
                         ax[i,j].set_yticks([0,1/4,1/2,3/4,1])
                         ax[i,j].set_aspect(1)
+                        if not want_grid:
+                            ax[i,j].grid(False) 
+                            ax[i,j].tick_params(axis='both', which='both', direction='in', length=5)
+                        ax[i,j].grid(want_grid)
                         x_label = r'$x_{i%d}$'%(x_label_num)
                         y_label = r'$x_{i%d}$'%(y_label_num)
                     else:
@@ -76,4 +88,6 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
                             y_axis.append(0.5)
                     ax[i,j].scatter(samples[n_min:n_max,x],y_axis,s=marker_size,color=colors[m],label='n_min = %d, n_max = %d'%(n_min,n_max),**kwargs)
                     n_min = n[m]
+    plt.suptitle(fig_title,fontsize = 20, y = where_title)
+    #fig.text(0.55,0.55,fig_title, ha = 'center', va = 'center', fontsize = 20) %replaced by plt.suptitle
     return fig, ax

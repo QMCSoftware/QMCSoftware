@@ -57,16 +57,16 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.19023153, 0.96068581])
+    array([1.19029896, 0.96063374])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [1.19  0.961]
         comb_bound_low  [1.19 0.96]
         comb_bound_high [1.191 0.961]
         comb_flags      [ True  True]
-        n_total         2^(21)
-        n               [2097152.    8192.]
-        n_rep           [131072.    512.]
+        n_total         2^(19)
+        n               [524288.  16384.]
+        n_rep           [32768.  1024.]
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
@@ -86,7 +86,7 @@ class CubQMCCLT(StoppingCriterion):
         dvec            [0 1 2]
         randomize       SHIFT
         order           NATURAL
-        gen_vec         [     1 182667 469891]
+        gen_vec         [     1 182667 213731]
         entropy         7
         spawn_key       ()
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))

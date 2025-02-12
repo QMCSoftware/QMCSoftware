@@ -18,4 +18,4 @@ from .util import plot_proj
 from .ml import *
 
 name = "qmcpy"
-__version__ = "1.5"
+__version__ = "1.6"

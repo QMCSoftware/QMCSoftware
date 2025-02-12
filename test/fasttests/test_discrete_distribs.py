@@ -9,20 +9,20 @@ import time
 
 class TestDiscreteDistribution(unittest.TestCase):
 
-    # def test_size_unsigned_long(self):
-    #     get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
-    #     get_unsigned_long_size_cf.argtypes = []
-    #     get_unsigned_long_size_cf.restype = ctypes.c_uint8
-    #     if os.name == 'nt':
-    #         self.assertEqual(get_unsigned_long_size_cf(),4)
-    #     else:
-    #         self.assertEqual(get_unsigned_long_size_cf(),8)
+    def test_size_unsigned_long(self):
+        get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
+        get_unsigned_long_size_cf.argtypes = []
+        get_unsigned_long_size_cf.restype = ctypes.c_uint8
+        if os.name == 'nt':
+            self.assertEqual(get_unsigned_long_size_cf(),4)
+        else:
+            self.assertEqual(get_unsigned_long_size_cf(),8)
 
-    # def test_size_unsigned_long_long(self):
-    #     get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
-    #     get_unsigned_long_long_size_cf.argtypes = []
-    #     get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
-    #     self.assertEqual(get_unsigned_long_long_size_cf(),8)
+    def test_size_unsigned_long_long(self):
+        get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
+        get_unsigned_long_long_size_cf.argtypes = []
+        get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
+        self.assertEqual(get_unsigned_long_long_size_cf(),8)
 
     def test_abstract_methods(self):
         for d in [3,[1,3,5]]:
@@ -73,28 +73,28 @@ class TestLattice(unittest.TestCase):
 
     def test_linear_order(self):
         true_sample = array([
-            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
-            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
+            [1. / 8, 3. / 8, 3. / 8, 7. / 8],
+            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
         distribution = Lattice(dimension=4, randomize=False, order='linear')
         self.assertTrue((distribution.gen_samples(n_min=4, n_max=8, warn=False)==true_sample).all())
 
     def test_natural_order(self):
         true_sample = array([
-            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
-            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
+            [1. / 8, 3. / 8, 3. / 8, 7. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
+            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
         distribution = Lattice(dimension=4, randomize=False, order='natural')
         self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
     
     def test_gray_order(self):
         true_sample = array([
-            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 7. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
-            [1. / 8, 3. / 8, 3. / 8, 1. / 8]])
+            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 1. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
+            [1. / 8, 3. / 8, 3. / 8, 7. / 8]])
         distribution = Lattice(dimension=4, randomize=False, order='gray')
         self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
 
