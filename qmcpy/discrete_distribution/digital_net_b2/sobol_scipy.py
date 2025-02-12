@@ -1,6 +1,5 @@
 from .._discrete_distribution import DiscreteDistribution
 from ...util import ParameterError, ParameterWarning
-from numpy.core.numeric import isscalar
 from numpy import *
 import warnings
 

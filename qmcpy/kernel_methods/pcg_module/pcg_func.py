@@ -27,15 +27,15 @@ def pcg(mat, b, precond=None, x0=None, rtol=None, atol=None, maxiter=None, beta_
     >>> xhat,data = pcg(A,b,rtol=0.,atol=0.)
     >>> x = scipy.linalg.cho_solve((L,True),b)
     >>> xhat-x
-    array([ 3.55271368e-15, -2.66453526e-14, -6.75015599e-14, -2.84217094e-14])
+    array([-2.13162821e-14, -4.26325641e-14, -5.32907052e-14, -3.37507799e-14])
     >>> data["rbackward_norms"]
     array([1.00000000e+00, 4.29203172e-01, 7.18633337e-01, 1.99316856e-01,
-           8.67932537e-14])
+           9.85798249e-14])
     
     >>> xhat,data = pcg(A,b,rtol=0.,atol=0.,ref_sol=x)
     >>> data["rforward_norms"]
     array([1.00000000e+00, 9.87169026e-01, 6.26795202e-01, 3.03568508e-02,
-           2.68397083e-15])
+           2.71990613e-15])
     
     >>> import torch
     >>> n = 25
@@ -54,7 +54,7 @@ def pcg(mat, b, precond=None, x0=None, rtol=None, atol=None, maxiter=None, beta_
     IdentityPrecond: rerror = 1.0e+00
         K(A)           K(P)           K(P)/K(A)      
         2.3e+10        2.3e+10        1.0e+00        
-    PPCholPrecond: rerror = 8.3e-09
+    PPCholPrecond: rerror = 1.9e-09
         K(A)           K(P)           K(P)/K(A)      Lk.shape       
         2.3e+10        2.9e+01        1.3e-09        (25, 24)       
     JacobiPrecond: rerror = 1.0e+00
@@ -63,13 +63,13 @@ def pcg(mat, b, precond=None, x0=None, rtol=None, atol=None, maxiter=None, beta_
     SSORPrecond: rerror = 3.3e-01
         K(A)           K(P)           K(P)/K(A)      
         2.3e+10        6.0e+09        2.6e-01        
-    BlockPrecond: rerror = 1.3e-09
+    BlockPrecond: rerror = 2.2e-09
         K(A)           K(P)           K(P)/K(A)      
         2.3e+10        2.2e+09        9.6e-02        
     IdentityPrecond: rerror = 1.0e+00
         K(A)           K(P)           K(P)/K(A)      
         2.3e+10        2.3e+10        1.0e+00        
-    PPCholPrecond: rerror = 1.6e-09
+    PPCholPrecond: rerror = 1.1e-09
         K(A)           K(P)           K(P)/K(A)      Lk.shape       
         2.3e+10        2.9e+01        1.3e-09        (25, 24)       
     JacobiPrecond: rerror = 1.0e+00
@@ -78,7 +78,7 @@ def pcg(mat, b, precond=None, x0=None, rtol=None, atol=None, maxiter=None, beta_
     SSORPrecond: rerror = 3.3e-01
         K(A)           K(P)           K(P)/K(A)      
         2.3e+10        6.0e+09        2.6e-01        
-    BlockPrecond: rerror = 3.2e-09
+    BlockPrecond: rerror = 2.2e-09
         K(A)           K(P)           K(P)/K(A)      
         2.3e+10        2.2e+09        9.6e-02        
 

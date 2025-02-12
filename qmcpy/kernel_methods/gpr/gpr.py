@@ -81,7 +81,7 @@ class _GPR(object):
             lengthscales = 10**log10_lengthscales
             global_scale = 10**log10_global_scale
             noises = 10**log10_noises
-            kernel = self.kernel_class(self.d,alpha=self.alpha,lengthscales=lengthscales,scale=global_scale,torchify=True,device=self.device,**self.kernel_kwargs)
+            kernel = self.kernel_class(self.d,alpha=self.alpha,lengthscales=lengthscales,scale=global_scale,torchify=True,device=self.device,requires_grad=True,**self.kernel_kwargs)
             self.gm = self._set_gram_matrix(kernel, noises)
             self.coeffs = self.gm.solve(yflat)
             mll = yflat[None,:]@self.coeffs+self.gm.logdet()

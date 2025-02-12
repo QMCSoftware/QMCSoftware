@@ -1,7 +1,7 @@
 import numpy as np
 
 class _KernelProd(object):
-    def __init__(self, dimension, lengthscales=1., scale=1., torchify=False, device="cpu", alpha=None, **kwargs):
+    def __init__(self, dimension, lengthscales=1., scale=1., torchify=False, device="cpu", alpha=None, requires_grad=False, **kwargs):
         """
         Args:
             dimension (int): dimension of the input
@@ -31,6 +31,7 @@ class _KernelProd(object):
         if isinstance(alpha,int):
             alpha = alpha*self.npt.ones(self.d,dtype=int,**self.ckwargs)
         self.alpha = alpha
+        self.requires_grad = requires_grad
         self._my_init(**kwargs)
     def _my_init(self,**kwargs):
         pass

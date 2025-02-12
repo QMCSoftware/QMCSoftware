@@ -31,6 +31,8 @@ class _KernelProdAutoGrad(_KernelProd):
                     yc = torch.autograd.grad(yc,xmat1[j],create_graph=True,grad_outputs=grad_outputs)[0]
                 for _ in range(beta2s[ell2,j]):
                     yc = torch.autograd.grad(yc,xmat2[j],create_graph=True,grad_outputs=grad_outputs)[0]
+            if not self.requires_grad:
+                yc = yc.detach()
             v = v+c1s[ell1]*c2s[ell2]*yc#.detach()
         if self.npt==np: 
             v = v.detach().cpu().numpy().astype(np.float64) 

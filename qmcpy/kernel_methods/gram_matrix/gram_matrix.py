@@ -35,7 +35,7 @@ class GramMatrix(_GramMatrix):
     >>> data["rforward_norms"]
     tensor([1.0000e+00, 1.0424e+00, 2.4682e-01, 1.1124e-01, 4.0457e-02, 4.7190e-02,
             2.4022e-02, 1.2266e-02, 2.1817e-03, 1.3779e-03, 2.0303e-04, 8.4293e-05,
-            5.1356e-06, 2.5173e-06, 9.9742e-07, 4.0527e-08, 1.7363e-13],
+            5.1356e-06, 2.5173e-06, 9.9742e-07, 4.0527e-08, 4.2315e-14],
            dtype=torch.float64)
     >>> print(precond.info_str(gm.full_mat))
     K(A)           K(P)           K(P)/K(A)      
@@ -98,7 +98,7 @@ class GramMatrix(_GramMatrix):
             else:
                 if np.isscalar(noise) or (noise.ndim==1 and len(noise)==1):
                     noise = noise*self.npt.ones(self.t1,dtype=float,**self.ckwargs)
-                assert noise.ndim==1 and len(noise)==self.t1 and (noise>0).all()
+                assert noise.ndim==1 and len(noise)==self.t1 and (noise>=0).all()
                 noisy_diag = (noise[:,None]*self.npt.ones((1,self.n1),dtype=float,**self.ckwargs)).flatten()  
                 size_range = self.npt.arange(self.size[0],dtype=int,**self.ckwargs)
                 self.full_mat[size_range,size_range] = self.full_mat[size_range,size_range]+noisy_diag
