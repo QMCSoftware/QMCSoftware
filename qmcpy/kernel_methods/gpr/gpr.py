@@ -65,7 +65,7 @@ class _GPR(object):
         if opt_noises:
             log10_noises = torch.nn.Parameter(log10_noises)
             params_to_opt.append(log10_noises)
-        if optimizer_init is None: optimizer_init = lambda params: torch.optim.Adam(params,lr=5e-2,amsgrad=True)
+        if optimizer_init is None: optimizer_init = lambda params: torch.optim.Adam(params,lr=1e-1,amsgrad=True)
         assert callable(optimizer_init)
         optimizer = optimizer_init(params_to_opt)
         lengthscales_hist = torch.empty((opt_steps+1,self.d))
@@ -74,8 +74,9 @@ class _GPR(object):
         mll_hist = torch.empty(opt_steps+1)
         l2rerr_hist = torch.empty(opt_steps+1)
         if verbose:
-            _s = "%15s | %-15s %-15s | "%("iter of %d"%opt_steps,"MLL","L2RError")
+            _s = "%15s | %-15s %-15s | lengthscales, global_scale, noises"%("iter of %d"%opt_steps,"MLL","L2RError")
             print(" "*verbose_indent+_s)
+            print(" "*verbose_indent+"~"*len(_s))
         for i in range(opt_steps+1):
             lengthscales = 10**log10_lengthscales
             global_scale = 10**log10_global_scale
@@ -93,6 +94,8 @@ class _GPR(object):
             l2rerr_hist[i] = (torch.linalg.norm(y_test-yhat)/torch.linalg.norm(y_test)).detach()
             if verbose and (i%verbose==0 or i==opt_steps):
                 _s = "%15d | %-15.2e %-15.2e | "%(i,mll_hist[i],l2rerr_hist[i])
+                with np.printoptions(formatter={"float":lambda x: "%.2e"%x}):
+                    _s += "%s\t%s\t%s"%(str(lengthscales_hist[i].numpy()),str(global_scale_hist[i,None].numpy()),str(noises_hist[i].numpy()))
                 print(" "*verbose_indent+_s)
             if i==opt_steps: break
             mll.backward()
