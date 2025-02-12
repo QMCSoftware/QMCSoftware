@@ -15,17 +15,28 @@ class _GramMatrix(object):
         self.lbeta2s,self.lc2s,self.t2,self.m2 = self._parse_lbetas_lcs(lbeta2s,lc2s)
         if self.torchify:
             import torch 
-            self.cho_solve = lambda l,b: torch.cholesky_solve(b.reshape(len(b),-1),l,upper=False).reshape(b.shape)
             self.transpose_func = lambda x,dims: torch.permute(x,dims)
             self.clone = lambda x: x.clone()
             self.get_ptr = lambda x: x.data_ptr()
         else:
-            self.cho_solve = lambda l,b: scipy.linalg.cho_solve((l,True),b)
             self.transpose_func = lambda x,dims: x.transpose(*dims)
             self.clone = lambda x: x.copy()
             self.get_ptr = lambda x: x.ctypes.data
         self.lc1s_og = [self.clone(c1s) for c1s in self.lc1s] 
         self.lc2s_og = [self.clone(c2s) for c2s in self.lc2s]
+    def cho_solve(self, l, b):
+        bis1d = b.ndim==1
+        if bis1d:
+            b = b[:,None]
+        if self.npt==np:
+            vcs = np.vectorize(lambda l,b: scipy.linalg.cho_solve((l,True),b),signature="(m,m),(m,k)->(m,k)")
+            v = vcs(l,b)
+        else:
+            import torch 
+            v = torch.cholesky_solve(b,l,upper=False)
+        if bis1d:
+            v = v[:,0]
+        return v
     def _parse_lbetas_lcs(self, lbetas, lcs):
         if isinstance(lbetas,int): lbetas = [lbetas*self.npt.ones((1,self.d),dtype=int,**self.ckwargs)]
         elif not isinstance(lbetas,list): lbetas = [self.npt.atleast_2d(lbetas)]

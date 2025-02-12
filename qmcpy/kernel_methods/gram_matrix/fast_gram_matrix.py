@@ -248,12 +248,7 @@ class _FastGramMatrix(_GramMatrix):
         else:
             y = y.reshape((v,self.t1,self.n1)) # (v,t1,n1)
             yt = self.ft(y) # (v,t1,n1)
-            yts = self.npt.empty_like(yt)
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore",".*Casting complex values to real discards the imaginary part*")
-                for i in range(self.n1): # probably a better vectorized way to do this
-                    # solve systems based on Cholesky decompositions, with self.l_chol is (n1,t1,t1)
-                    yts[:,:,i] = self.cho_solve(self.l_chol[i],yt[:,:,i].T).T
+            yts = self.transpose_func(self.cho_solve(self.l_chol,self.transpose_func(yt,[2,1,0])),[2,1,0])
             s = self.ift(yts).real # (v,t1,n1)
             s = s.reshape((v,self.t1*self.n1))
         return s[0,:] if yogndim==1 else s.T
@@ -316,8 +311,9 @@ class FastGramMatrixLattice(_FastGramMatrix):
     tensor([1.0000e+00, 9.7344e-01, 8.9657e-01, 8.6796e-01, 8.3171e-01, 8.2714e-01,
             8.1479e-01, 7.9138e-01, 7.4211e-01, 7.0716e-01, 6.5561e-01, 6.3565e-01,
             6.0125e-01, 1.6381e-01, 1.4031e-01, 1.0890e-01, 7.6542e-02, 6.1783e-02,
-            1.8316e-02, 1.8166e-02, 1.1094e-02, 1.0700e-02, 4.8166e-06, 1.0970e-07,
-            3.7068e-08, 6.6421e-09, 7.6899e-11], dtype=torch.float64)
+            1.8611e-02, 1.8196e-02, 1.1111e-02, 1.1069e-02, 1.4071e-05, 1.0827e-06,
+            1.7571e-07, 1.1171e-08, 2.0161e-09, 1.4096e-09, 8.9825e-10, 9.2874e-12],
+           dtype=torch.float64)
     >>> vhat
     tensor([ 0.0920,  0.1215, -0.2292,  0.0963, -0.0778,  0.1583, -0.0796,  0.0457,
              0.0522,  0.0235,  0.0171,  0.0353,  0.0456,  0.0011,  0.0419,  0.0835,

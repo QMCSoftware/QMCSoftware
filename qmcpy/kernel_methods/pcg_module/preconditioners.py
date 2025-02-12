@@ -89,11 +89,18 @@ class BlockPrecond(_BasePrecond):
         for si in range(self.nr):
             sl,sh = self.n_cumsum[si],self.n_cumsum[si+1]
             self.L_chol_blocks[si] = self.npt.linalg.cholesky(mat[sl:sh,sl:sh])
+    def cho_solve(self, l, b):
+        bis1d = b.ndim==1
+        if bis1d:
+            b = b[:,None]
         if self.npt==np:
-            self.cho_solve = lambda l,b: scipy.linalg.cho_solve((l,True),b)
+            v = scipy.linalg.cho_solve((l,True),b)
         else:
             import torch 
-            self.cho_solve = lambda l,b: torch.cholesky_solve(b.reshape(len(b),-1),l,upper=False).reshape(b.shape)
+            v = torch.cholesky_solve(b,l,upper=False)
+        if bis1d:
+            v = v[:,0]
+        return v
     def solve(self, x):
         dimx = x.ndim
         assert dimx==1 or dimx==2
