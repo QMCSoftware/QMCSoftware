@@ -3,6 +3,7 @@ from ...discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..kernel import KernelGaussian,KernelShiftInvar,KernelDigShiftInvar
 from ..gram_matrix import GramMatrix,FastGramMatrixLattice,FastGramMatrixDigitalNetB2
 import numpy as np 
+import timeit
 
 class _GPR(object):
     def _check_torch(self):
@@ -24,8 +25,8 @@ class _GPR(object):
         self.lcs = lcs
     def fit(self, 
             yf, 
-            x_test, 
-            y_test,
+            x_test = None, 
+            y_test = None,
             opt_steps = 25, 
             lengthscales = None, 
             global_scale = None, 
@@ -42,8 +43,11 @@ class _GPR(object):
             verbose_indent = 4,
         ):
         import torch 
+        t0 = timeit.default_timer()
         assert yf.ndim==2 and yf.size(0)==self.n and yf.device==self.x.device
-        assert y_test.ndim==1 and x_test.ndim==2 and y_test.size(0)==x_test.size(0) and x_test.size(1)==self.d and y_test.device==x_test.device==self.device
+        test = x_test is not None or y_test is not None
+        if test:
+            assert y_test.ndim==1 and x_test.ndim==2 and y_test.size(0)==x_test.size(0) and x_test.size(1)==self.d and y_test.device==x_test.device==self.device
         d_out = yf.size(1) 
         yflat = yf.T.flatten()
         if lengthscales is None:
@@ -77,31 +81,38 @@ class _GPR(object):
         global_scale_hist = torch.empty(opt_steps+1)
         noises_hist = torch.empty((opt_steps+1,d_out))
         mll_hist = torch.empty(opt_steps+1)
-        l2rerr_hist = torch.empty(opt_steps+1)
+        if test:
+            l2rerr_hist = torch.empty(opt_steps+1)
+        times_hist = torch.empty(opt_steps+1)
         if verbose:
             _s = "%15s | %-15s %-15s | %-15s | lengthscales, global_scale, noises"%("iter of %d"%opt_steps,"MLL","L2RError","lr")
             print(" "*verbose_indent+_s)
             print(" "*verbose_indent+"~"*len(_s))
         for i in range(opt_steps+1):
+            if i==opt_steps:
+                for param in params_to_opt:
+                    param.requires_grad_(False)
             lengthscales = 10**log10_lengthscales+lb_lengthscale
             global_scale = 10**log10_global_scale+lb_global_scale
             noises = 10**log10_noises+lb_noises
             optimizer.zero_grad()
-            kernel = self.kernel_class(self.d,alpha=self.alpha,lengthscales=lengthscales,scale=global_scale,torchify=True,device=self.device,requires_grad=True,**self.kernel_kwargs)
+            kernel = self.kernel_class(self.d,alpha=self.alpha,lengthscales=lengthscales,scale=global_scale,torchify=True,device=self.device,requires_grad=i<opt_steps,**self.kernel_kwargs)
             self.gm = self._set_gram_matrix(kernel, noises)
             self.coeffs = self.gm.solve(yflat)
             mll = yflat[None,:]@self.coeffs+self.gm.logdet()
-            yhat = self.post_mean(x_test)
             lengthscales_hist[i] = lengthscales.detach().cpu()
             global_scale_hist[i] = global_scale.detach().cpu()
             noises_hist[i] = noises.detach().cpu()
             mll_hist[i] = mll.detach()
-            l2rerr_hist[i] = (torch.linalg.norm(y_test-yhat)/torch.linalg.norm(y_test)).detach()
+            if test:
+                yhat = self.post_mean(x_test)
+                l2rerr_hist[i] = (torch.linalg.norm(y_test-yhat)/torch.linalg.norm(y_test)).detach()
             if verbose and (i%verbose==0 or i==opt_steps):
-                _s = "%15d | %-15.2e %-15.2e | %-15.2e | "%(i,mll_hist[i],l2rerr_hist[i],scheduler.get_last_lr()[0])
+                _s = "%15d | %-15.2e %-15.2e | %-15.2e | "%(i,mll_hist[i],l2rerr_hist[i] if test else np.nan,scheduler.get_last_lr()[0])
                 with np.printoptions(formatter={"float":lambda x: "%.2e"%x}):
                     _s += "%s\t%s\t%s"%(str(lengthscales_hist[i].numpy()),str(global_scale_hist[i,None].numpy()),str(noises_hist[i].numpy()))
                 print(" "*verbose_indent+_s)
+            times_hist[i] = timeit.default_timer()-t0
             if i==opt_steps: break
             mll.backward()
             #if i==0 or mll<(2*mll_hist[i-1]):
@@ -113,7 +124,10 @@ class _GPR(object):
             "global_scale": global_scale_hist,
             "noises": noises_hist,
             "mll": mll_hist,
-            "l2rerr": l2rerr_hist}
+            "times": times_hist,
+        }
+        if test:
+            data["l2rerr"] = l2rerr_hist
         return data 
     def post_mean(self, x, betas=0, cs=1):
         assert x.ndim==2 and x.device==self.x.device and x.size(1)==self.d

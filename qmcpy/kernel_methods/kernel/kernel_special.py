@@ -56,6 +56,9 @@ class KernelShiftInvar(_KernelProdSpecial):
             [-2.4126],
             [ 0.9768],
             [ 0.4138]], dtype=torch.float64)
+    >>> kt(xt,xt,diag_only=True)
+    tensor([27.2208, 27.2208, 27.2208, 27.2208, 27.2208, 27.2208, 27.2208, 27.2208],
+           dtype=torch.float64)
     """
     DEFAULTALPHA = 4
     def _my_init(self, **kwargs):
@@ -108,6 +111,9 @@ class KernelDigShiftInvar(_KernelProdSpecial):
             [ 0.2796],
             [ 0.4520],
             [ 0.4332]], dtype=torch.float64)
+    >>> kt(xb,xb,diag_only=True)
+    tensor([13.6329, 13.6329, 13.6329, 13.6329, 13.6329, 13.6329, 13.6329, 13.6329],
+           dtype=torch.float64)
     """
     DEFAULTALPHA = 3
     def _my_init(self, **kwargs):

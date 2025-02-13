@@ -359,7 +359,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
             noise (float): nugget term 
         """
         assert isinstance(dd_obj,Lattice)
-        assert dd_obj.randomize=="SHIFT"
+        assert dd_obj.randomize in ["SHIFT"]
         assert dd_obj.order=="NATURAL"
         assert dd_obj.replications==1
         assert isinstance(kernel_obj,KernelShiftInvar)
