@@ -184,7 +184,7 @@ class Halton(LD):
         self.n_lim = n_lim
         self.m_max = int(ceil(log(n_lim)/log(self.primes.min())))
         self.t_max = self.m_max
-        self.t_lms = max(self.m_max,t_lms)
+        self.t_lms = self.m_max if self.m_max>t_lms else t_lms
         self.C = qmctoolscl.gdn_get_halton_generating_matrix(uint64(1),uint64(self.d),uint64(self.t_max))
         if "LMS" in self.randomize:
             S = qmctoolscl.gdn_get_linear_scramble_matrix(self.rng,uint64(replications),uint64(self.d),uint64(self.t_max),uint64(self.t_lms),uint64(1),self.primes)
