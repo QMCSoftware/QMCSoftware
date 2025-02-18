@@ -169,7 +169,7 @@ class LDTransformBayesData(AccumulateData):
             muhat = ftilde[0] / vec_lambda[0]
 
         self.error_bound = err_bd
-        muhat = np.abs(muhat)
+        #muhat = np.abs(muhat)
         muminus = muhat - err_bd
         muplus = muhat + err_bd
 
