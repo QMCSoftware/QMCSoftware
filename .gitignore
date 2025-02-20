@@ -15,6 +15,7 @@ qmcpy.egg-info/
 demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
 demos/.jupyter
+demos/talk_paper_demos/Caltech2025March/Caltech2025MarchFigures
 
 # tests
 .coverage
