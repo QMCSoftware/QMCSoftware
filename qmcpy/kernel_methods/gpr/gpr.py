@@ -73,10 +73,11 @@ class _GPR(object):
         if opt_noises:
             log10_noises = torch.nn.Parameter(log10_noises)
             params_to_opt.append(log10_noises)
-        if optimizer_init is None: optimizer_init = lambda params: torch.optim.Rprop(params,lr=.1)
-        assert callable(optimizer_init)
-        optimizer = optimizer_init(params_to_opt)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,factor=1/2,patience=0,threshold=1e-2,threshold_mode="rel")
+        if optimizer_init is None: optimizer = self.default_optimizer_init(params_to_opt)
+        else:
+            assert callable(optimizer_init)
+            optimizer = optimizer_init(params_to_opt)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,factor=.75,patience=10,threshold=1e-2,threshold_mode="rel")
         lengthscales_hist = torch.empty((opt_steps+1,self.d))
         global_scale_hist = torch.empty(opt_steps+1)
         noises_hist = torch.empty((opt_steps+1,d_out))
@@ -204,6 +205,9 @@ class GPR(_GPR):
         super(GPR,self).__init__(lbetas,lcs,alpha,kernel_class)
     def _set_gram_matrix(self, kernel, noises):
         return GramMatrix(kernel,self.x,self.x,lbeta1s=self.lbetas,lbeta2s=self.lbetas,adaptive_noise=False,noise=noises)
+    def default_optimizer_init(self, params):
+        import torch
+        return torch.optim.Adam(params,lr=.1,amsgrad=True)
 
 class FGPRLattice(_GPR):
     """
@@ -249,6 +253,9 @@ class FGPRLattice(_GPR):
         super(FGPRLattice,self).__init__(lbetas,lcs,alpha,kernel_class=KernelShiftInvar)
     def _set_gram_matrix(self, kernel, noises):
         return FastGramMatrixLattice(kernel,self.dd_obj,self.n,self.n,lbeta1s=self.lbetas,lbeta2s=self.lbetas,adaptive_noise=False,noise=noises,_pregenerated_x__x=(self._x,self.x))
+    def default_optimizer_init(self, params):
+        import torch
+        return torch.optim.Rprop(params,lr=.1)
 
 class FGPRDigitalNetB2(_GPR):
     """
@@ -295,3 +302,7 @@ class FGPRDigitalNetB2(_GPR):
         super(FGPRDigitalNetB2,self).__init__(lbetas,lcs,alpha,kernel_class=KernelDigShiftInvar,kernel_kwargs={"t":dd_obj.t_lms})
     def _set_gram_matrix(self, kernel, noises):
         return FastGramMatrixDigitalNetB2(kernel,self.dd_obj,self.n,self.n,lbeta1s=self.lbetas,lbeta2s=self.lbetas,adaptive_noise=False,noise=noises,_pregenerated_x__x=(self._x,self.x))
+    def default_optimizer_init(self, params):
+        import torch
+        return torch.optim.Rprop(params,lr=.1)
+    

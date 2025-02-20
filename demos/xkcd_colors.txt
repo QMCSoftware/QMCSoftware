@@ -942,8 +942,8 @@ light green	#96f97b
 orange	#f97306	
 teal	#029386	
 light blue	#95d0fc	
-red	#e50000	
 brown	#653700	
+red	#e50000	
 pink	#ff81c0	
 blue	#0343df	
 green	#15b01a	
