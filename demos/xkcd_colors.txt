@@ -929,7 +929,6 @@ cyan	#00ffff
 tan	#d1b26f	
 dark blue	#00035b	
 lavender	#c79fef	
-turquoise	#06c2ac	
 dark green	#033500	
 violet	#9a0eea	
 light purple	#bf77f6	
@@ -943,8 +942,9 @@ orange	#f97306
 teal	#029386	
 light blue	#95d0fc	
 brown	#653700	
-red	#e50000	
 pink	#ff81c0	
+turquoise	#06c2ac	
+red	#e50000	
 blue	#0343df	
 green	#15b01a	
 purple	#7e1e9c	
