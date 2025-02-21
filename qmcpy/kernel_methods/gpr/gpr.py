@@ -33,14 +33,15 @@ class _GPR(object):
             noises = None, 
             opt_lengthscales = True, 
             opt_global_scale = True, 
-            opt_noises = False,
+            opt_noises = None,
             lb_lengthscale = 0, 
             lb_global_scale = 0, 
-            lb_noises = 1e-16,
+            lb_noises = None,
             optimizer_init = None,
             use_scheduler = False,
             verbose = True,
             verbose_indent = 4,
+            tf = None,
         ):
         import torch 
         t0 = timeit.default_timer()
@@ -56,23 +57,36 @@ class _GPR(object):
         if global_scale is None: 
             global_scale = lb_global_scale+torch.ones(1,device=self.device)
         assert isinstance(global_scale,torch.Tensor) and global_scale.device==self.device and global_scale.shape==(1,) and (global_scale>lb_global_scale).all()
-        if noises is None: 
+        if lb_noises is None: lb_noises = self.DEFAULT_LB_NOISE 
+        if noises is None:
+            start_noises = 1e5*torch.ones(d_out,device=self.device)
+            start_noises[0] = 1e-8
             noises = lb_noises+1e-8*torch.ones(d_out,device=self.device) 
-        assert isinstance(noises,torch.Tensor) and noises.device==self.device and noises.shape==(d_out,) and (noises>lb_noises).all()
-        log10_lengthscales = torch.log10(lengthscales-lb_lengthscale)
-        log10_global_scale = torch.log10(global_scale-lb_global_scale)
-        log10_noises = torch.log10(noises-lb_noises)
-        assert opt_lengthscales or opt_global_scale or opt_noises, "need to optimize lengthscales and/or global_scale and/or noises"
+        assert isinstance(noises,torch.Tensor) and noises.device==self.device and noises.shape==(d_out,) and (noises>=lb_noises).all()
+        if tf is None: tf = self.DEFAULT_TF
+        assert tf in ["log","logsigmoid"]
+        tf_forward = lambda x: torch.log(x) if tf=="log" else -torch.log(torch.exp(x)-1)
+        tf_inverse = lambda x: torch.exp(x) if tf=="log" else -torch.log(1/(1+torch.exp(-x)))
+        tf_lengthscales = tf_forward(lengthscales-lb_lengthscale)
+        tf_global_scale = tf_forward(global_scale-lb_global_scale)
+        tf_noises = tf_forward(noises-lb_noises)
+        if isinstance(opt_lengthscales,bool): opt_lengthscales = opt_lengthscales*torch.ones_like(lengthscales,dtype=bool)
+        if isinstance(opt_global_scale,bool): opt_global_scale = opt_global_scale*torch.ones_like(global_scale,dtype=bool)
+        if opt_noises is None:
+            opt_noises = torch.ones_like(noises,dtype=bool)
+            opt_noises[0] = False
+        if isinstance(opt_noises,bool): opt_noises = opt_noises*torch.ones_like(noises,dtype=bool)
+        assert opt_lengthscales.any() or opt_global_scale.any() or opt_noises.any(), "need to optimize lengthscales and/or global_scale and/or noises"
         params_to_opt = [] 
-        if opt_lengthscales:
-            log10_lengthscales = torch.nn.Parameter(log10_lengthscales)
-            params_to_opt.append(log10_lengthscales)
-        if opt_global_scale:
-            log10_global_scale = torch.nn.Parameter(log10_global_scale)
-            params_to_opt.append(log10_global_scale)
-        if opt_noises:
-            log10_noises = torch.nn.Parameter(log10_noises)
-            params_to_opt.append(log10_noises)
+        if opt_lengthscales.any():
+            tf_lengthscales = torch.nn.Parameter(tf_lengthscales)
+            params_to_opt.append(tf_lengthscales)
+        if opt_global_scale.any():
+            tf_global_scale = torch.nn.Parameter(tf_global_scale)
+            params_to_opt.append(tf_global_scale)
+        if opt_noises.any():
+            tf_noises = torch.nn.Parameter(tf_noises)
+            params_to_opt.append(tf_noises)
         if optimizer_init is None: optimizer = self.default_optimizer_init(params_to_opt)
         else:
             assert callable(optimizer_init)
@@ -93,9 +107,9 @@ class _GPR(object):
             if i==opt_steps:
                 for param in params_to_opt:
                     param.requires_grad_(False)
-            lengthscales = 10**log10_lengthscales+lb_lengthscale
-            global_scale = 10**log10_global_scale+lb_global_scale
-            noises = 10**log10_noises+lb_noises
+            lengthscales = tf_inverse(tf_lengthscales)+lb_lengthscale
+            global_scale = tf_inverse(tf_global_scale)+lb_global_scale
+            noises = tf_inverse(tf_noises)+lb_noises
             optimizer.zero_grad()
             kernel = self.kernel_class(self.d,alpha=self.alpha,lengthscales=lengthscales,scale=global_scale,torchify=True,device=self.device,requires_grad=i<opt_steps,**self.kernel_kwargs)
             self.gm = self._set_gram_matrix(kernel, noises)
@@ -117,7 +131,14 @@ class _GPR(object):
             if i==opt_steps: break
             mll.backward()
             #if i==0 or mll<(2*mll_hist[i-1]):
+            tf_lengthscales_freeze = tf_lengthscales.clone()
+            tf_global_scale_freeze = tf_global_scale.clone()
+            tf_noises_freeze = tf_noises.clone()
             optimizer.step()
+            with torch.no_grad():
+                tf_lengthscales[~opt_lengthscales] = tf_lengthscales_freeze[~opt_lengthscales]
+                tf_global_scale[~opt_global_scale] = tf_global_scale_freeze[~opt_global_scale]
+                tf_noises[~opt_noises] = tf_noises_freeze[~opt_noises]
             if use_scheduler:
                 scheduler.step(mll)
         data = {
@@ -173,7 +194,7 @@ class GPR(_GPR):
     ... ]).T
     >>> x_test = torch.from_numpy(Halton(d,seed=17).gen_samples(64))
     >>> y_test = torch.cos(x_test[:,0])*torch.sin(x_test[:,1])
-    >>> data = gp.fit(yf,x_test,y_test,opt_steps=10,verbose=False)
+    >>> data = gp.fit(yf,x_test,y_test,opt_steps=10,opt_noises=False,lb_noises=1e-16,verbose=False)
     >>> pmean = gp.post_mean(gp.x)
     >>> pmean.shape 
     torch.Size([32])
@@ -194,6 +215,8 @@ class GPR(_GPR):
     >>> torch.allclose(pvar,torch.zeros_like(pvar),atol=1e-6,rtol=0)
     True
     """
+    DEFAULT_TF = "log"
+    DEFAULT_LB_NOISE = 1e-6
     def __init__(self, dd_obj_or_x, n=None, lbetas=0, lcs=1, device="cpu", kernel_class=KernelGaussian, alpha=None):
         self._check_torch()
         import torch
@@ -244,6 +267,8 @@ class FGPRLattice(_GPR):
     >>> torch.allclose(pvar,torch.zeros_like(pvar),atol=1e-6,rtol=0)
     True
     """
+    DEFAULT_TF = "log"
+    DEFAULT_LB_NOISE = 1e-16
     def __init__(self, dd_obj, n, lbetas=0, lcs=1, device="cpu", alpha=None):
         self._check_torch()
         import torch
@@ -292,6 +317,8 @@ class FGPRDigitalNetB2(_GPR):
     >>> torch.allclose(pvar,torch.zeros_like(pvar),atol=1e-6,rtol=0)
     True
     """
+    DEFAULT_TF = "log"
+    DEFAULT_LB_NOISE = 1e-16
     def __init__(self, dd_obj, n, lbetas=0, lcs=1, device="cpu", alpha=None):
         self._check_torch()
         import torch
