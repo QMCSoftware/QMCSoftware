@@ -10,16 +10,14 @@ def _fwht_torch(x):
     if n<=1: return y
     assert n&(n-1)==0 # require n is a power of 2
     m = int(np.log2(n))
-    it = torch.arange(n,dtype=int).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
+    it = torch.arange(n,dtype=int,device=x.device).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
     idx0 = [slice(None)]*(m-1)+[0]
     idx1 = [slice(None)]*(m-1)+[1]
-    eps0 = [Ellipsis,None]
-    eps1 = [Ellipsis,None]
     for k in range(m):
-        eps0[1] = it[idx0[-(k+1):]].flatten()
-        eps1[1] = it[idx1[-(k+1):]].flatten()
-        y0,y1 = y[eps0],y[eps1]
-        y[eps0],y[eps1] = (y0+y1)/SQRT2,(y0-y1)/SQRT2
+        eps0 = it[idx0[-(k+1):]].flatten()
+        eps1 = it[idx1[-(k+1):]].flatten()
+        y0,y1 = y[[Ellipsis,eps0]],y[[Ellipsis,eps1]]
+        y[[Ellipsis,eps0]],y[[Ellipsis,eps1]] = (y0+y1)/SQRT2,(y0-y1)/SQRT2
     return y
 class _FWHTB2Ortho(torch.autograd.Function):
     @staticmethod
