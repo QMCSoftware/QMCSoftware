@@ -51,8 +51,7 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
     >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
     >>> true_value = array([sol3neg1,sol31])
-    >>> (abs(true_value-solution)<abs_tol).all()
-    True
+    >>> assert (abs(true_value-solution)<abs_tol).all()
     >>> cf = CustomFun(
     ...     true_measure = Uniform(Lattice(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
