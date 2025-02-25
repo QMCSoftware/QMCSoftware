@@ -1,6 +1,6 @@
 import numpy as np 
 
-def k4sumterm(x, t):
+def k4sumterm(x, t, cutoff=1e-8):
     r""" 
     $$\sum_{a=0}**{t-1} x_a / 2**{3a}$$
     where $x_a$ is the bit at index $a$ in the binary expansion of $x$
@@ -21,7 +21,9 @@ def k4sumterm(x, t):
     """
     total = 0.
     for a in range(0,t):
-        total += (-1)**((x>>(t-a-1))&1)/float(2**(3*a))
+        factor = 1/float(2**(3*a))
+        if factor<cutoff: break
+        total += (-1)**((x>>(t-a-1))&1)*factor
     return total
 
 WEIGHTEDWALSHFUNCSPOS = {
@@ -68,10 +70,11 @@ def weighted_walsh_funcs(alpha, xb, t):
     assert alpha in WEIGHTEDWALSHFUNCSZEROS, "alpha = %d not in WEIGHTEDWALSHFUNCSZEROS"%alpha
     if isinstance(xb,np.ndarray):
         np_or_torch = np 
+        y = np.ones(xb.shape) 
     else:
         import torch 
         np_or_torch = torch 
-    y = np_or_torch.ones(xb.shape)
+        y = torch.ones(xb.shape,device=xb.device)
     pidxs = xb>0
     y[~pidxs] = WEIGHTEDWALSHFUNCSZEROS[alpha]
     xfpidxs = (2**(-t))*xb[pidxs]

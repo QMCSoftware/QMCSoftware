@@ -1,4 +1,10 @@
 # General Python
+*.ckpt
+*.npz
+*.csv 
+*hparams.yaml
+*.ipynb_checkpoints/
+demos/fgpr_figs/
 *__pycache__/
 qmcpy.egg-info/
 *.blg
