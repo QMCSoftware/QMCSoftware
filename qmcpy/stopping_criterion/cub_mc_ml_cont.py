@@ -206,7 +206,7 @@ class CubMCMLCont(StoppingCriterion):
 
     def _update_theta(self):
         """Update error splitting parameter"""
-        self.theta = max(0.01, min(0.5, (self._bias(len(self.data.n_level)-1)/self.rmse_tol)**2))
+        self.theta = maximum(0.01, min(0.5, (self._bias(len(self.data.n_level)-1)/self.rmse_tol)**2))
 
     def _rmse(self):
         """Returns an estimate for the root mean square error"""

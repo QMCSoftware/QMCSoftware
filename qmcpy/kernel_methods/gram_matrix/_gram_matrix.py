@@ -10,22 +10,39 @@ class _GramMatrix(object):
         self.ckwargs = self.kernel_obj.ckwargs
         self.torchify = self.kernel_obj.torchify
         self.noise = noise
-        assert np.isscalar(self.noise) and self.noise>=0.
         self.lbeta1s,self.lc1s,self.t1,self.m1 = self._parse_lbetas_lcs(lbeta1s,lc1s)
         self.lbeta2s,self.lc2s,self.t2,self.m2 = self._parse_lbetas_lcs(lbeta2s,lc2s)
         if self.torchify:
             import torch 
-            self.cho_solve = lambda l,b: torch.cholesky_solve(b.reshape(len(b),-1),l,upper=False).reshape(b.shape)
             self.transpose_func = lambda x,dims: torch.permute(x,dims)
             self.clone = lambda x: x.clone()
             self.get_ptr = lambda x: x.data_ptr()
         else:
-            self.cho_solve = lambda l,b: scipy.linalg.cho_solve((l,True),b)
             self.transpose_func = lambda x,dims: x.transpose(*dims)
             self.clone = lambda x: x.copy()
             self.get_ptr = lambda x: x.ctypes.data
         self.lc1s_og = [self.clone(c1s) for c1s in self.lc1s] 
         self.lc2s_og = [self.clone(c2s) for c2s in self.lc2s]
+    def eigh(self, m):
+        if self.npt==np:
+            evals,evecs = np.linalg.eigh(m)
+        else:
+            import torch 
+            evals,evecs = torch.linalg.eigh(m)
+        return evals,evecs
+    def cho_solve(self, l, b):
+        bis1d = b.ndim==1
+        if bis1d:
+            b = b[:,None]
+        if self.npt==np:
+            vcs = np.vectorize(lambda l,b: scipy.linalg.cho_solve((l,True),b),signature="(m,m),(m,k)->(m,k)")
+            v = vcs(l,b)
+        else:
+            import torch 
+            v = torch.cholesky_solve(b,l,upper=False)
+        if bis1d:
+            v = v[:,0]
+        return v
     def _parse_lbetas_lcs(self, lbetas, lcs):
         if isinstance(lbetas,int): lbetas = [lbetas*self.npt.ones((1,self.d),dtype=int,**self.ckwargs)]
         elif not isinstance(lbetas,list): lbetas = [self.npt.atleast_2d(lbetas)]
@@ -53,3 +70,7 @@ class _GramMatrix(object):
             gms[tt1,tt2] = self.kernel_obj(x1,x2,lbeta1s[tt1],lbeta2s[tt2],lc1s[tt1],lc2s[tt2])
         gm = self.npt.vstack([self.npt.hstack([gms[tt1,tt2] for tt2 in range(t2)]) for tt1 in range(t1)])
         return gm
+    def _convert_x_to__x(self, x):
+        return x
+    def _convert__x_to_x(self, _x):
+        return _x
