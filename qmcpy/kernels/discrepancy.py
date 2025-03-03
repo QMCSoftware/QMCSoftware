@@ -6,6 +6,51 @@ from inspect import signature
 #Unit tests
 #And then later a blog
 def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
+    """
+    Args:
+    x (nparray): An n by d matrix containing samples from x_1 to x_n with 'd' dimensions
+
+    method (string or list of functions):
+    If method is a string, then user can use these for a list of discrepancies this function can calculate:
+    * Star discrepancy: "l2", "l2star", "s", or "star"
+    * Centered discrepancy: "c", "centered", or "cd" 
+    * Symmetric discrepancy: "sy" or "symmetric"
+    * Wrap Around discrepancy: "wa", "wrap around", "wrap-around", or "wd"
+    * Mixture discrepancy: "m", "mixture" or "md"
+    * Unanchored discrepancy: "un" or "unanchored"
+    * Warnock discrepancy: "warnock" or "wk" (Note, cannot be weighted, it will be in the future)
+
+    If method is a list of functions, the user can give a list of 2 or 3 functions. Depending on which,
+    if method is a list of 3 functions, it will assign the 1st, 2nd, and 3rd function as the double
+    integral, single integral, and kernel respectively. However, if method is a list of 2 functions, 
+    then the 1st and 2nd function would be its double integral, and kernel respectively, and the single
+    intgeral would be kept at 0.
+
+    The double integral function must have 1 parameter being its weight.
+    The single integral function must have 2 parameters being x (sample point) and its weight, respectively.
+    The kernel function must have 3 parameters being x and y (both being sample points) and its weight, respectively.
+
+    weight (nparray): A 1 by 'd' dimensional nparray such that it contains weights. If the user does not assign weight,
+    it will assume that the weight is 1 (unweighted).
+
+    limiter (int): the limiter variable is an integer that limits its workload for calculation, that way the
+    discrepancy function does not get overwhelmed when doing it's calculations.
+
+    Time (boolean): If Time is False, the discrepancy function won't give out the time it took to calculate.
+    As it is assumed in the discrepancy function. As for when Time is True, the function will output the time
+    it took to calculate the discrepancy.
+
+    Returns:
+    if Time is False:
+    discrepancy (float)
+
+    if Time is True:
+    discrepancy (float), time (float)
+
+    Note:
+    For this function to give out an output, you need "x" (list of sample points) and "method" (desired discrepancy)
+
+    """
     if Time == True:                #Times the actual calculation for discrepancy
         start_time = time.time()
 
@@ -19,7 +64,7 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
 
     if type(method) == str:    #If a method was chosen
         if type(method) is str: #Give the double and single integral along with the kernel based on the method
-            if method.lower() == "l2" or method.lower() == "l2star":           #Star
+            if method.lower() == "l2" or method.lower() == "l2star" or method.lower() == "s" or method.lower() == "star":           #Star
                 double_integral = lambda w : (1 + (w/3)).prod(axis=0)
                 single_integral = lambda x, w : ((1 + (w*(1 - x**2)/2))).prod(axis=1)
                 kernel = lambda x, y, w : (1 + w*(1 - np.maximum(x, y))).prod(axis=2)
