@@ -46,6 +46,11 @@ packages = [
     'qmcpy.integrand',
     'qmcpy.stopping_criterion',
     'qmcpy.accumulate_data',
+    'qmcpy.kernel_methods',
+    'qmcpy.kernel_methods.util',
+    'qmcpy.kernel_methods.kernel',
+    'qmcpy.kernel_methods.gram_matrix',
+    'qmcpy.kernel_methods.fast_transforms',
     'qmcpy.util',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
@@ -53,7 +58,7 @@ packages = [
 
 setuptools.setup(
     name="qmcpy",
-    version="1.5",
+    version="1.6.2",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',
@@ -66,7 +71,7 @@ setuptools.setup(
     install_requires=[
         'numpy >= 1.17.0',
         'scipy >= 1.0.0',
-        'qmctoolscl >= 1.0'],
+        'qmctoolscl >= 1.1.2'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",

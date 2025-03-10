@@ -27,7 +27,7 @@ class BrownianMotion(Gaussian):
     """
 
     def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA'):
-        """
+        r"""
         BrownianMotion(t) = (initial_value) + (drift)*t + \sqrt{diffusion}*StandardBrownianMotion(t)
 
         Args:
@@ -51,7 +51,7 @@ class BrownianMotion(Gaussian):
         self.drift = drift
         self.diffusion = diffusion
         self.time_vec = linspace(self.t/self.d,self.t,self.d) # evenly spaced
-        self.diffused_sigma_bm = self.diffusion*array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
+        self.diffused_sigma_bm = self.diffusion*array([[minimum(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
         self.drift_time_vec_plus_init = self.drift*self.time_vec+self.initial_value # mean
         self._parse_gaussian_params(self.drift_time_vec_plus_init,self.diffused_sigma_bm,decomp_type)
         self.range = array([[-inf,inf]])

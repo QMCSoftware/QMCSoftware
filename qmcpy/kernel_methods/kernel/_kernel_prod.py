@@ -1,7 +1,7 @@
 import numpy as np
 
 class _KernelProd(object):
-    def __init__(self, dimension, lengthscales=1., scale=1., torchify=False, device="cpu", alpha=None, **kwargs):
+    def __init__(self, dimension, lengthscales=1., scale=1., torchify=False, device="cpu", alpha=None, requires_grad=False, **kwargs):
         """
         Args:
             dimension (int): dimension of the input
@@ -21,7 +21,7 @@ class _KernelProd(object):
             self.npt = np
             self.ckwargs = {}
         assert np.isscalar(lengthscales) or lengthscales.shape==(self.d,)
-        assert np.isscalar(scale)
+        assert np.isscalar(scale) or (scale.ndim==1 and len(scale)==1)
         if np.isscalar(lengthscales):
             lengthscales = lengthscales*self.npt.ones(self.d,dtype=float,**self.ckwargs)
         self.lengthscales = lengthscales
@@ -31,12 +31,13 @@ class _KernelProd(object):
         if isinstance(alpha,int):
             alpha = alpha*self.npt.ones(self.d,dtype=int,**self.ckwargs)
         self.alpha = alpha
+        self.requires_grad = requires_grad
         self._my_init(**kwargs)
     def _my_init(self,**kwargs):
         pass
     def eval(self, *args, **kwargs):
         return self.__call__(*args,**kwargs)
-    def __call__(self, x1, x2, beta1s=0, beta2s=0, c1s=1., c2s=1.):
+    def __call__(self, x1, x2, beta1s=0, beta2s=0, c1s=1., c2s=1., diag_only=False):
         """
         Args:
             x1 (np.ndarray or torch.Tensor): n1 x d array of first inputs to kernel 
@@ -45,6 +46,7 @@ class _KernelProd(object):
             beta2s (np.ndarray or torch.Tensor): m2 x d array of first derivative orders
             c1s (np.ndarray or torch.Tensor): length m1 vector of derivative coefficients 
             c2s (np.ndarray or torch.Tensor): length m2 vector of derivative coefficients
+            diag_only (bool): only compute the diagonal of the covariance matrix 
         """
         n1,n2 = len(x1),len(x2)
         assert x1.shape==(n1,self.d) and x2.shape==(n2,self.d)
@@ -58,4 +60,6 @@ class _KernelProd(object):
         if np.isscalar(c1s): c1s = c1s*self.npt.ones(m1,dtype=float,**self.ckwargs)
         if np.isscalar(c2s): c2s = c2s*self.npt.ones(m2,dtype=float,**self.ckwargs)
         assert c1s.shape==(m1,) and c2s.shape==(m2,)
-        return self.parsed_call(x1,x2,n1,n2,beta1s,beta2s,m1,m2,c1s,c2s)
+        if diag_only:
+            assert n1==n2 and m1==m2
+        return self.parsed_call(x1,x2,n1,n2,beta1s,beta2s,m1,m2,c1s,c2s,diag_only)

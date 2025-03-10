@@ -25,16 +25,15 @@ class Polynomial():
         self.coeffs = coeffs
     def __call__(self, x):
         if isinstance(x,np.ndarray):
-            np_or_torch = np 
+            npt = np 
+            powers = np.arange(self.order-1,-1,-1,dtype=x.dtype)
+            coeffs = np.array(self.coeffs,dtype=x.dtype)
         else:
             import torch 
-            np_or_torch = torch
-        y = self.coeffs[-1]
-        xp = np_or_torch.ones_like(x)
-        for i in range(self.order-2,-1,-1):
-            xp *= x
-            y = y+self.coeffs[i]*xp
-        return y
+            npt = torch
+            powers = torch.arange(self.order-1,-1,-1,dtype=x.dtype,device=x.device)
+            coeffs = torch.tensor(self.coeffs,dtype=x.dtype,device=x.device)
+        return (x[...,None]**powers*coeffs).sum(-1)
 
 BERNOULLIPOLYSDICT = {
     #0:  Polynomial([1]),

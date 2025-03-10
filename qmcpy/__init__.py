@@ -15,4 +15,4 @@ except:
 from .util import plot_proj
 
 name = "qmcpy"
-__version__ = "1.5"
+__version__ = "1.6.2"

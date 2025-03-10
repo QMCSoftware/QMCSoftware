@@ -2,10 +2,6 @@ from ._gram_matrix import _GramMatrix
 from ...discrete_distribution import Lattice,DigitalNetB2,DiscreteDistribution
 from ..kernel import KernelShiftInvar,KernelDigShiftInvar
 from ..fast_transforms import fftbr,ifftbr,fwht
-try:
-    from ..fast_transforms import fftbr_torch,ifftbr_torch,fwht_torch
-except:
-    pass
 import numpy as np
 import itertools
 import warnings
@@ -103,7 +99,8 @@ class _FastGramMatrix(_GramMatrix):
         for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
             self.lc1slc2s[tt1,tt2] = self.lc1s[tt1][None,:,None,None]*self.lc2s[tt2][None,None,:,None]
         if hasattr(self,"lam"):
-            self.lam *= self.kernel_obj.scale 
+            for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
+                self.lam[tt1,tt2] = self.lam[tt1,tt2]*self.kernel_obj.scale 
         elif hasattr(self,"k1l"):
             self.k1l *= self.kernel_obj.scale 
         else:
@@ -124,6 +121,7 @@ class _FastGramMatrix(_GramMatrix):
             for tt1 in range(self.t1):
                 self.k00diags[tt1] = k1[tt1,tt1][0,0,0,0]
             if self.adaptive_noise:
+                assert np.isscalar(self.noise) and self.noise>0
                 assert (self.lbeta1s[0]==0.).all() and (self.lbeta1s[0].shape==(1,self.d)) and (self.lc1s_og[0]==1.).all() and (self.lc1s_og[0].shape==(1,))
                 trace0 = self.k00diags[0] 
                 for tt1 in range(self.t1):
@@ -131,18 +129,42 @@ class _FastGramMatrix(_GramMatrix):
                     trace_ratio = trace/trace0 
                     self.lam[tt1,tt1][0,0,0,:] += self.noise*trace_ratio
             else:
+                if np.isscalar(self.noise) or (self.noise.ndim==1 and len(self.noise)==1):
+                    self.noise = self.noise*self.npt.ones(self.t1,dtype=float,**self.ckwargs)
+                assert self.noise.ndim==1 and len(self.noise)==self.t1 and (self.noise>=0).all()
                 for tt1 in range(self.t1):
-                    self.lam[tt1,tt1][0,0,0,:] += self.noise # lam is (m1,m2,1,n1) = (1,1,1,n1)
-    def _set__x1__x2(self):
-        self._x1,self._x2 = self.clone(self._x),self.clone(self._x)
-        self._x1[:,~self.u1] = 0.
-        self._x2[:,~self.u2] = 0.
-        self._x1,self._x2 = self._x1[:self.n1],self._x2[:self.n2]
-    def _init_invertibile(self):
-        lamblock = 1j*self.npt.empty((self.n1,self.t1,self.t1),dtype=float,**self.ckwargs)
-        for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
-            lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
-        self.l_chol = self.cholesky(lamblock)
+                    self.lam[tt1,tt1][0,0,0,:] += self.noise[tt1] # lam is (m1,m2,1,n1) = (1,1,1,n1)
+        self.__x1,self.__x2 = None,None
+        self._full_mat = None
+        self._evals_evecs = None
+    @property
+    def _x1(self):
+        if self.__x1 is None: 
+            self.__x1 = self.clone(self._x)
+            self.__x1[:,~self.u1] = 0.
+            self.__x1 = self._x1[:self.n1]
+        return self.__x1
+    @property
+    def _x2(self):
+        if self.__x2 is None: 
+            self.__x2 = self.clone(self._x)
+            self.__x2[:,~self.u2] = 0.
+            self.__x2 = self.__x2[:self.n2]
+        return self.__x2
+    @property
+    def full_mat(self):
+        if self._full_mat is None:
+            self._full_mat = self@self.npt.eye(self.size[1],dtype=float,**self.ckwargs)
+        return self._full_mat
+    @property
+    def evals_evecs(self):
+        if self._evals_evecs is None:
+            lamblock = self.npt.empty((self.n1,self.t1,self.t1),dtype=float,**self.ckwargs)
+            if self.FT_COMPLEX: lamblock = 1j*lamblock
+            for tt1,tt2 in itertools.product(range(self.t1),range(self.t2)):
+                lamblock[:,tt1,tt2] = self.lam[tt1,tt2][0,0,0]
+            self._evals_evecs = self.eigh(lamblock)
+        return self._evals_evecs
     def sample(self, n_min, n_max):
         assert hasattr(self,"dd_obj"), "no discrete distribution object available to sample from"
         if self.npt==np:
@@ -152,16 +174,13 @@ class _FastGramMatrix(_GramMatrix):
             import torch 
             _x = torch.from_numpy(_x).to(device=self.ckwargs["device"])
             x = torch.from_numpy(x).to(device=self.ckwargs["device"])
-        return _x,x 
-    def get_full_gram_matrix(self):
-        if not hasattr(self,"_x1"): self._set__x1__x2()
-        gm = self._construct_full_gram_matrix(self._x1,self._x2,self.t1,self.t2,self.lbeta1s,self.lbeta2s,self.lc1s_og,self.lc2s_og)
-        if self.invertible and self.noise>0:
-            gm = gm+self.noise*self.npt.eye(self.size[0],dtype=float,**self.ckwargs)
-        return gm
+        return _x,x
+    def logdet(self):
+        assert self.invertible,"logdet currently only supports invertible matrices"
+        evals,evecs = self.evals_evecs
+        return self.npt.log(self.npt.abs(evals)).sum()
     def get_new_left_full_gram_matrix(self, new_x, new_lbetas=0, new_lcs=1.):
         new__x = self._convert_x_to__x(new_x)
-        if not hasattr(self,"_x1"): self._set__x1__x2()
         new_lbetas,new_lcs,new_t,new_m = self._parse_lbetas_lcs(new_lbetas,new_lcs)
         gm = self._construct_full_gram_matrix(new__x,self._x1,new_t,self.t1,new_lbetas,self.lbeta1s,new_lcs,self.lc1s_og)
         return gm
@@ -205,8 +224,6 @@ class _FastGramMatrix(_GramMatrix):
         return sfull[0,:] if yogndim==1 else sfull.T
     def solve(self, y):
         assert self.invertible, self.invertible_error_msg
-        if not hasattr(self,"l_chol"): 
-            self._init_invertibile()
         yogndim = y.ndim
         assert yogndim<=2 
         if yogndim==1: y = y[:,None]
@@ -225,36 +242,32 @@ class _FastGramMatrix(_GramMatrix):
         else:
             y = y.reshape((v,self.t1,self.n1)) # (v,t1,n1)
             yt = self.ft(y) # (v,t1,n1)
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore",".*Casting complex values to real discards the imaginary part*")
-                for i in range(self.n1): # probably a better vectorized way to do this
-                    # solve systems based on Cholesky decompositions, with self.l_chol is (n1,t1,t1)
-                    yt[:,:,i] = self.cho_solve(self.l_chol[i],yt[:,:,i].T).T
-            s = self.ift(yt).real # (v,t1,n1)
+            evals,evecs = self.evals_evecs
+            yts = self.npt.einsum("rlk,rkm->mlr",evecs,self.npt.einsum("rlk,plr->rkp",evecs.conj(),yt)/evals[...,None])
+            s = self.ift(yts).real # (v,t1,n1)
             s = s.reshape((v,self.t1*self.n1))
         return s[0,:] if yogndim==1 else s.T
-    def _mult_check(self, y, gmatfull):
+    def _mult_check(self, y):
         if self.npt!=np:
             import torch
             y = torch.from_numpy(y)
-        assert np.allclose(self@y[:,0],gmatfull@y[:,0],atol=1e-12)
-        assert np.allclose(self@y,gmatfull@y,atol=1e-12)
-    def _solve_check(self, y, gmatfull):
+        assert np.allclose(self@y[:,0],self.full_mat@y[:,0],atol=1e-12)
+        assert np.allclose(self@y,self.full_mat@y,atol=1e-12)
+    def _solve_check(self, y):
         if not self.invertible: return
         if self.npt==np:
-            assert np.allclose(self.solve(y[:,0]),np.linalg.solve(gmatfull,y[:,0]),rtol=2.5e-2)
-            assert np.allclose(self.solve(y),np.linalg.solve(gmatfull,y),rtol=2.5e-2)
+            assert np.allclose(self.solve(y[:,0]),np.linalg.solve(self.full_mat,y[:,0]),rtol=2.5e-2)
+            assert np.allclose(self.solve(y),np.linalg.solve(self.full_mat,y),rtol=2.5e-2)
         else:
             import torch 
             y = torch.from_numpy(y)
-            assert np.allclose(self.solve(y[:,0]).numpy(),np.linalg.solve(gmatfull,y[:,0].numpy()),rtol=2.5e-2)
-            assert np.allclose(self.solve(y).numpy(),np.linalg.solve(gmatfull,y.numpy()),rtol=2.5e-2)
+            assert np.allclose(self.solve(y[:,0]).numpy(),np.linalg.solve(self.full_mat,y[:,0].numpy()),rtol=2.5e-2)
+            assert np.allclose(self.solve(y).numpy(),np.linalg.solve(self.full_mat,y.numpy()),rtol=2.5e-2)
     def _check(self):
         rng = np.random.Generator(np.random.SFC64(7))
         y = rng.uniform(size=(self.n2*self.t2,2))
-        gmatfull = self.get_full_gram_matrix()
-        self._mult_check(y,gmatfull)
-        self._solve_check(y,gmatfull)
+        self._mult_check(y)
+        self._solve_check(y)
 
 class FastGramMatrixLattice(_FastGramMatrix):
     """
@@ -273,6 +286,22 @@ class FastGramMatrixLattice(_FastGramMatrix):
     >>> u = torch.tensor([True,True,True])
     >>> gm = FastGramMatrixLattice(kernel_obj,dd_obj,n,n,u,u,lbetas,lbetas)
     >>> gm._check()
+    >>> y = torch.from_numpy(dd_obj.rng.uniform(size=gm.t1*n))
+    >>> gm@y
+    tensor([ -18.0111,    7.6292,   52.0029,   13.2012,   43.4885,   33.4967,
+             -16.4679,  -40.8353, -103.7607, -255.9174,  362.0098,  470.0034,
+             -27.4561, -386.1627,   60.7601,  -73.1338,  377.1221,  316.0525,
+             134.6202, -479.7746,  -34.0313,   82.9397,    9.4285,  -43.3118,
+             167.2529,  331.5569, -131.6313, -154.6773, -243.2020,   93.2893,
+            -357.5478,  130.2277], dtype=torch.float64)
+    >>> v = gm.solve(y)
+    >>> v
+    tensor([ 0.0920,  0.1215, -0.2292,  0.0963, -0.0778,  0.1583, -0.0796,  0.0457,
+             0.0522,  0.0235,  0.0171,  0.0353,  0.0456,  0.0011,  0.0419,  0.0835,
+             0.0044,  0.0532,  0.0269,  0.0216, -0.0011,  0.0193,  0.0399,  0.0038,
+             0.0029,  0.0537,  0.0272,  0.0225, -0.0006,  0.0185,  0.0391,  0.0044],
+           dtype=torch.float64)
+
     >>> us = [torch.tensor([int(b) for b in np.binary_repr(i,d)],dtype=bool) for i in range(2**d)]
     >>> lbetas = [
     ...     torch.tensor([1,0,0]),
@@ -298,6 +327,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
     ...         gm_wide = FastGramMatrixLattice(kernel_obj,dd_obj,max(n1//4,1),max(n2//2,1),u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
     ...         gm_wide._check()
     """
+    FT_COMPLEX = True
     def __init__(self, kernel_obj, dd_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
         """
         Args:
@@ -314,7 +344,7 @@ class FastGramMatrixLattice(_FastGramMatrix):
             noise (float): nugget term 
         """
         assert isinstance(dd_obj,Lattice)
-        assert dd_obj.randomize=="SHIFT"
+        assert dd_obj.randomize in ["SHIFT"]
         assert dd_obj.order=="NATURAL"
         assert dd_obj.replications==1
         assert isinstance(kernel_obj,KernelShiftInvar)
@@ -335,16 +365,13 @@ class FastGramMatrixLattice(_FastGramMatrix):
             #     self.ift = lambda x: torch.fft.ifft(x,norm="ortho")
             # else: # dd_obj.order=="NATURAL"
             #     # custom torch implementations (theoretically faster, practically slower)
+            from ..fast_transforms import fftbr_torch,ifftbr_torch
             self.ft = fftbr_torch
             self.ift = ifftbr_torch
         super(FastGramMatrixLattice,self).__init__(kernel_obj,dd_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
         x = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max)
         return x,x
-    def _convert_x_to__x(self, x):
-        return x
-    def _convert__x_to_x(self, _x):
-        return _x
 
 class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     """
@@ -363,6 +390,26 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     >>> u = np.array([True,True,True])
     >>> gm = FastGramMatrixDigitalNetB2(kernel_obj,dd_obj,n,n,u,u,lbetas,lbetas)
     >>> gm._check()
+    >>> y = dd_obj.rng.uniform(size=gm.t1*n)
+    >>> gm@y
+    array([-20.94938713, -57.15075137, -61.80544063, -35.72183038,
+           -31.45313726, -46.52665195, -51.1528711 , -46.06158645,
+            42.23237138, 115.0393551 , 125.98797464,  71.48025405,
+            64.49546714,  94.75004054, 102.62931262,  93.55976665,
+            42.29742027, 116.24347766, 124.98284185,  72.09612086,
+            63.9045784 ,  94.78818132, 102.92435874,  92.67087995,
+            42.40947511, 116.41845136, 125.29152119,  73.60338041,
+            63.02722221,  93.2866115 , 104.57701158,  93.62244555])
+    >>> v = gm.solve(y)
+    >>> v
+    array([4.04663728, 6.21694309, 5.33350858, 4.88332632, 3.92690804,
+           6.53314033, 2.7864591 , 1.61186725, 0.6974895 , 0.95468794,
+           0.99402772, 0.70364389, 0.81329603, 1.19462545, 0.41670244,
+           0.35801475, 0.60497772, 1.03470869, 0.72927423, 0.63393901,
+           0.58306275, 1.09450155, 0.30062669, 0.06238329, 0.70038129,
+           1.09468904, 0.91696041, 1.07251777, 0.55230558, 0.94644418,
+           0.67601573, 0.39561979])
+
     >>> us = [np.array([int(b) for b in np.binary_repr(i,d)],dtype=bool) for i in range(2**d)]
     >>> lbetas = [
     ...     np.array([1,0,0]),
@@ -388,6 +435,7 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
     ...         gm_wide = FastGramMatrixDigitalNetB2(kernel_obj,dd_obj,max(n1//4,1),max(n2//2,1),u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,adaptive_noise=False)
     ...         gm_wide._check()
     """
+    FT_COMPLEX = False
     def __init__(self, kernel_obj, dd_obj, n1, n2, u1=True, u2=True, lbeta1s=0, lbeta2s=0, lc1s=1., lc2s=1., noise=1e-8, adaptive_noise=True, _pregenerated_x__x=None):
         """
         Args:
@@ -409,6 +457,7 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
         assert dd_obj.replications==1
         assert isinstance(kernel_obj,KernelDigShiftInvar)
         kernel_obj.set_t(dd_obj.t_lms)
+        assert kernel_obj.t<64, "require DigitalNetB2 t_lms <= 63 as we will internally convert outputs to np.int64 or torch.int64 as not all operations are supported for torch.uint64"
         # FWHT is theoretically faster than FFT but practically slower
         if not kernel_obj.torchify:
             # qmctools implementation
@@ -416,15 +465,21 @@ class FastGramMatrixDigitalNetB2(_FastGramMatrix):
             self.ift = fwht
         else:
             # custom torch implementations 
+            from ..fast_transforms import fwht_torch
             self.ft = fwht_torch
             self.ift = fwht_torch
-        assert kernel_obj.npt==np, "FastGramMatrixDigitalNetB2 does not currently support torch as 'index_cpu' is not yet implemented for tensors of dtype torch.uint64"
         super(FastGramMatrixDigitalNetB2,self).__init__(kernel_obj,dd_obj,n1,n2,u1,u2,lbeta1s,lbeta2s,lc1s,lc2s,noise,adaptive_noise,_pregenerated_x__x)
     def _sample(self, n_min, n_max):
-        xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True)
+        xb = self.dd_obj.gen_samples(n_min=n_min,n_max=n_max,return_binary=True).astype(np.int64)
         xf = self._convert__x_to_x(xb)
         return xb,xf
     def _convert_x_to__x(self, x):
-        return np.floor(x*(2**self.kernel_obj.t)).astype(np.uint64)
+        _x = self.npt.floor(x*(2**self.kernel_obj.t))
+        if self.npt==np:
+            _x = _x.astype(np.int64)
+        else:
+            import torch
+            _x = _x.to(torch.int64)
+        return _x
     def _convert__x_to_x(self, _x):
         return _x*2**(-self.kernel_obj.t)
