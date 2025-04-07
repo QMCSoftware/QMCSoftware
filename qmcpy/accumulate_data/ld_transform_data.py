@@ -76,7 +76,7 @@ class LDTransformData(AccumulateData):
                 c_up = 1./(1-c_tmp)
                 const1 = sum(abs(self.y_cp[self.kappanumap[int(2**(l-1)):int(2**l)]-1]))
                 idx = int(l-self.l_star)
-                self.c_stilde_low[idx] = max(self.c_stilde_low[idx],c_low*const1)
+                self.c_stilde_low[idx] = maximum(self.c_stilde_low[idx],c_low*const1)
                 if c_tmp < 1:
                     self.c_stilde_up[idx] = min(self.c_stilde_up[idx],c_up*const1)
             cone_violation = (self.c_stilde_low > self.c_stilde_up).any()
