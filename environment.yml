@@ -23,6 +23,7 @@ dependencies:
     - sphinx-rtd-theme==1.0.0
     - sphinx-markdown-tables==0.0.17
     - umbridge==1.2.1
+    - nbval==0.11.0
     - scikit-learn
     - botorch
     - -e .
