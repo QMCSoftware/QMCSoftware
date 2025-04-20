@@ -98,13 +98,17 @@ longtests:
 	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
 
+notebooktests:
+	@echo "\Notebooktests"
+	pytest --nbval ./demos/
+
 coverage:
 	@echo "\nCode coverage"
 	python -m coverage report -m
 
-tests: doctests fasttests longtests coverage
+tests: doctests fasttests longtests coverage notebooktests
 
-tests_no_docker: doctests_no_docker fasttests longtests coverage
+tests_no_docker: doctests_no_docker fasttests longtests coverage notebooktests
 
 # "[command] | tee [logfile]" prints to both stdout and logfile
 workout:
