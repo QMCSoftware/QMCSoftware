@@ -100,7 +100,7 @@ longtests:
 
 notebooktests:
 	@echo "\Notebooktests"
-	pytest --nbval ./demos/
+	pytest --nbval ./demos/ 1>/dev/null
 
 coverage:
 	@echo "\nCode coverage"
