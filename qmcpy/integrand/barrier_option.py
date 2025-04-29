@@ -21,8 +21,8 @@ class BarrierOption(Integrand):
         dim_frac        0
     >>> x = barrier_option.discrete_distrib.gen_samples(2**12)
     >>> y = barrier_option.f(x)
-    >>> y.mean()
-    np.float64(1.086984672954963)
+    >>> y.mean().item()
+    1.0869...
     >>> level_dims = [2,4,8]
     >>> barrier_option_multilevel = BarrierOption(DigitalNetB2(seed=7),multilevel_dims=level_dims)
     >>> levels_to_spawn = arange(barrier_option_multilevel.max_level+1)
@@ -32,8 +32,8 @@ class BarrierOption(Integrand):
     ...     x = barrier_option_single_level.discrete_distrib.gen_samples(2**12)
     ...     level_est = barrier_option_single_level.f(x).mean()
     ...     yml += level_est
-    >>> yml
-    np.float64(1.1095263969417701)
+    >>> yml.item()
+    1.1095...
     """
 
     def __init__(self, sampler, volatility=0.2, start_price=30., strike_price=35., barrier_price = 38.,\

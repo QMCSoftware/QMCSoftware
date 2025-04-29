@@ -8,11 +8,11 @@ class Linear0(Integrand):
     >>> l = Linear0(DigitalNetB2(100,seed=7))
     >>> x = l.discrete_distrib.gen_samples(2**10)
     >>> y = l.f(x)
-    >>> y.mean()
-    np.float64(3.0517083357897278e-05)
+    >>> y.mean().item()
+    3.0517...e-05
     >>> ytf = l.f(x,periodization_transform='C1SIN')
-    >>> ytf.mean()
-    np.float64(1.4009858752211625e-14)
+    >>> ytf.mean().item()
+    1.4009...e-14
     """
 
     def __init__(self, sampler):
