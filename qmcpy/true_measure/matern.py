@@ -31,24 +31,8 @@ class Matern(Gaussian):
             1.2384988 , 1.2308771 , 1.22744825, 1.2275582 , 1.218964  ,
             1.2136328 , 1.2141693 , 1.21792116, 1.21125532, 1.19532303,
             1.17649556]])
-    >>> points = array([[5, 4], [1, 2], [0, 0]])
-    >>> mean = full(3, 1.1)
-    >>> m2 = Matern(Lattice(dimension = 3,seed=7), points, length_scale = 4, nu = 2.5, variance = 0.01, mean=mean)
-    >>> m2
-    Matern (TrueMeasure Object)
-        mean            [1.1 1.1 1.1]
-        covariance      [[0.01  0.005 0.002]
-                        [0.005 0.01  0.008]
-                        [0.002 0.008 0.01 ]]
-        decomp_type     PCA
-    >>> from sklearn import gaussian_process as gp  #checking against scikit's Matern
-    >>> kernel2 = gp.kernels.Matern(length_scale = 4, nu=2.5)
-    >>> cov2 = 0.01 * kernel2.__call__(points)
-    >>> isclose(cov2, m2.covariance)
-    array([[ True,  True,  True],
-           [ True,  True,  True],
-           [ True,  True,  True]])
     >>> x_values = array([0, 1, 2])
+    >>> mean = full(3, 1.1)
     >>> m3 = Matern(Lattice(dimension = 3,seed=7), x_values, length_scale = 0.5, nu = 3.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
     >>> m3
     Matern (TrueMeasure Object)

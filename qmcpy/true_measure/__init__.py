@@ -7,3 +7,4 @@ from .kumaraswamy import Kumaraswamy
 from .bernoulli_cont import BernoulliCont
 from .johnsons_su import JohnsonsSU
 from .scipy_wrapper import SciPyWrapper
+from .matern import Matern

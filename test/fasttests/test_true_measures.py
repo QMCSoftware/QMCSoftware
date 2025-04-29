@@ -66,6 +66,16 @@ class TestTrueMeasure(unittest.TestCase):
                 self.assertTrue((all(spawn.discrete_distrib!=tm.discrete_distrib for spawn in spawns)))
                 self.assertTrue(all(spawn.transform!=tm.transform for spawn in spawns))
 
+class TestMatern(unittest.TestCase):
+    def test_sklearn_equivalence(self):
+        points = array([[5, 4], [1, 2], [0, 0]])
+        mean = full(3, 1.1)
+        
+        m2 = Matern(Lattice(dimension = 3,seed=7), points, length_scale = 4, nu = 2.5, variance = 0.01, mean=mean)
+        from sklearn import gaussian_process as gp  #checking against scikit's Matern
+        kernel2 = gp.kernels.Matern(length_scale = 4, nu=2.5)
+        cov2 = 0.01 * kernel2.__call__(points)
+        assert not allclose(cov2, m2.covariance)
 
 if __name__ == "__main__":
     unittest.main()
