@@ -101,12 +101,26 @@ Please refer to [this document](https://github.com/QMCSoftware/QMCSoftware/blob/
 If you find QMCPy helpful in your work, please support us by citing the following work:
 
 ~~~
-Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A.
-QMCPy: A quasi-Monte Carlo Python Library. Working. 2020.
+Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, Jagadeeswaran Rathinavel, Aleksei G. Sorokin,
+QMCPy: A Quasi-Monte Carlo Python Library. 2020.
 https://qmcsoftware.github.io/QMCSoftware/
 ~~~
 
-BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
+In BibTex format
+
+```
+@misc{QMCPy,
+  Author = {
+    Sou-Cheng T. Choi and 
+    Fred J. Hickernell and 
+    Michael McCourt and 
+    Jagadeeswaran Rathinavel and 
+    Aleksei G Sorokin},
+  Title = {{QMCPy}: A {Q}uasi-{M}onte {C}arlo {P}ython {L}ibrary},
+  Url = {https://qmcsoftware.github.io/QMCSoftware/},
+  Year = {2020},
+}
+```
 
 ---
 

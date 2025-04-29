@@ -172,7 +172,7 @@ class Lattice(LD):
                 assert self.gen_vec_og.ndim==2, "ndarray generating vector must be 1 or two dimensional"
                 self.replications_gv = len(self.gen_vec_og)
         elif isinstance(generating_vector,int):
-            self.m_max = min(26,max(2,generating_vector))
+            self.m_max = minimum(26,maximum(2,generating_vector))
             assert isinstance(dimension,int), "random generating vector requires int dimension"
             self.d_max = dimension
         elif isinstance(generating_vector,str):

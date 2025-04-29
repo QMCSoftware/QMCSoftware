@@ -30,7 +30,7 @@ class Halton(LD):
            [0.49872383, 0.04149125],
            [0.88466123, 0.3669825 ],
            [0.21288306, 0.98844291]])
-    >>> Halton(2,randomize="LMS",seed=7).gen_samples(4)
+    >>> Halton(2,randomize="LMS",seed=7).gen_samples(4,warn=False)
     array([[0.        , 0.        ],
            [0.82822666, 0.43711042],
            [0.28838899, 0.72544037],
@@ -55,7 +55,7 @@ class Halton(LD):
            [0.85362988, 0.72066823],
            [0.10362988, 0.05400156],
            [0.60362988, 0.498446  ]])
-    >>> Halton(2,randomize="FALSE",seed=7).gen_samples(4)
+    >>> Halton(2,randomize="FALSE",seed=7).gen_samples(4,warn=False)
     array([[0.        , 0.        ],
            [0.5       , 0.33333333],
            [0.25      , 0.66666667],
@@ -80,7 +80,7 @@ class Halton(LD):
             [0.46683287, 0.80997215, 0.92101152],
             [0.74652289, 0.51878205, 0.55001039],
             [0.10269363, 0.26686681, 0.13068723]]])
-    >>> Halton(3,randomize="LMS",seed=7,replications=2).gen_samples(4)
+    >>> Halton(3,randomize="LMS",seed=7,replications=2).gen_samples(4,warn=False)
     array([[[0.        , 0.        , 0.        ],
             [0.82822666, 0.43711042, 0.73685508],
             [0.28838899, 0.72544037, 0.27337733],
