@@ -16,8 +16,7 @@ jobs:
           auto-activate-base: true
       - run: python -V
       - run: pip install -e .[test]
-      - run: pip install pytest 
-      - run: pip install pytest-cov
+      - run: pip freeze
       - run: make doctests_minimal
       - run: pip install -e .[test_torch] 
       - run: make doctests_torch 
