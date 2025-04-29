@@ -1,5 +1,5 @@
 doctests_minimal:
-	python -m coverage run --source=./qmcpy -m pytest --no-header \
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/ \
 		--ignore qmcpy/util/kernel_methods/ft_pytorch.py \
 		--ignore qmcpy/accumulate_data/pf_gp_ci_data.py \
@@ -9,53 +9,42 @@ doctests_minimal:
 		--ignore qmcpy/integrand/hartmann6d.py
 
 doctests_torch:
-	python -m coverage run --source=./qmcpy -m pytest --no-header \
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/util/kernel_methods/ft_pytorch.py
 
 doctests_gpytorch:
-	python -m coverage run --source=./qmcpy -m pytest --no-header \
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/stopping_criterion/pf_gp_ci.py \
+		-W ignore
+
+doctests_botorch:
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+		--doctest-modules qmcpy/integrand/hartmann6d.py \
 		-W ignore
 
 doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 	@docker --version
-	python -m coverage run --source=./qmcpy -m pytest --no-header \
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/umbridge_wrapper.py
 
-doctests_botorch:
-	python -m coverage run --source=./qmcpy -m pytest --no-header \
-		--doctest-modules qmcpy/integrand/hartmann6d.py \
-		-W ignore
+doctests: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
 
-fasttests:
+doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+
+unittests_fast:
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
 
-longtests:
+unittests_slow:
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
 
-coverage:
-	@echo "\nCode coverage"
+unittests: unittests_fast unittests_slow
+
+coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m
 
-tests: doctests fasttests longtests coverage
+tests: doctests unittests coverage
 
-tests_no_docker: doctests_no_docker fasttests longtests coverage
-
-workout: # to be removed in the future when workouts are absorbed into demos. "[command] | tee [logfile]" prints to both stdout and logfile
-	# integration_examples
-	@python workouts/integration_examples/asian_option_multi_level.py | tee workouts/integration_examples/out/asian_option_multi_level.log
-	@python workouts/integration_examples/asian_option_single_level.py | tee workouts/integration_examples/out/asian_option_single_level.log
-	@python workouts/integration_examples/keister.py  | tee  workouts/integration_examples/out/keister.log
-	@python workouts/integration_examples/pi_problem.py | tee workouts/integration_examples/out/pi_problem.log
-	# mlmc
-	@python workouts/mlmc/mcqmc06.py | tee workouts/mlmc/out/mcqmc06.log
-	@python workouts/mlmc/european_option.py | tee workouts/mlmc/out/european_option.log
-	# lds_sequences
-	@python workouts/lds_sequences/python_sequences.py | tee workouts/lds_sequences/out/python_sequences.log
-	# mc_vs_qmc
-	@python workouts/mc_vs_qmc/importance_sampling.py | tee workouts/mc_vs_qmc/out/importance_sampling.log
-	@python workouts/mc_vs_qmc/vary_abs_tol.py | tee workouts/mc_vs_qmc/out/vary_abs_tol.log
-	@python workouts/mc_vs_qmc/vary_dimension.py | tee workouts/mc_vs_qmc/out/vary_dimension.log
+tests_no_docker: doctests_no_docker unittests coverage
 	
 mkdocs_serve:
 	@cp README.md docs/index.md

@@ -13,29 +13,25 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
-          activate-environment: qmcpy
-          environment-file: environment.yml
-          auto-activate-base: false
-      - shell: bash -l {0}
-        run: |
-          conda info
-          conda list
-      - name: Install QMCPy 
-        shell: bash -l {0}
-        run: |
-          pip install -e .
-      - name: Run Tests
-        shell: bash -l {0}
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            make tests
-          else
-            make tests_no_docker
-          fi
-      - name: Upload to Codecov
-        shell: bash -l {0}
-        run: |
-          python -m coverage xml -i # genereate coverage.xml
-          # python -m codecov -t e87cdb03-ccdd-44df-9849-8c5bc460cb9e  # fails without token
-          # bash <(curl https://codecov.io/bash)
-          curl -s https://codecov.io/bash | bash
+          auto-activate-base: true
+      - run: python -V
+      - run: pip install -e .
+      - run: pip install pytest 
+      - run: pip install pytest-cov
+      - run: make doctests_minimal
+      - run: pip install -e .[torch] 
+      - run: make doctests_torch 
+      - run: pip install -e .[gpytorch]
+      - run: make doctests_gpytorch
+      - run: pip install -e .[botorch]
+      - run: make doctests_botorch
+      - run: pip install -e .[umbridge]
+      - run: make doctests_umbridge
+        if: '$RUNNER_OS" == "Linux"'
+      - run: make unittests_fast
+      - run: make unittests_slow
+      - name: Update Coverage Badge # https://github.com/marketplace/actions/coverage-badge
+        # GitHub actions: default branch variable
+        # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
+        if: ${{github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && '$RUNNER_OS" == "Linux"'}}
+        uses: QMCSoftware/coverage-badge-action@main

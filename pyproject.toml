@@ -56,18 +56,22 @@ dependencies = [
 torch = [
     "torch >= 2.0.0",
     ]
-umbridge = [
-    "umbridge >= 1.2.1",
-    ]
 gpytorch = [
     "qmcpy[torch]",
     "gpytorch >= 1.7.0",
 ]
 botorch = [
+    "qmcpy[gpytorch]",
     "botorch >= 0.10.0"
 ]
-dev = [ # pip install -e .[dev]
+umbridge = [
+    "umbridge >= 1.2.1",
+    ]
+dev = [
+    "qmcpy[botorch]",
+    "qmcpy[umbridge",
     "pytest >= 8.0.0",
+    "pytest-cov >= 6.0.0",
     "nbval >= 0.10.0",
     "pytest-accept >= 0.1.10",
     "jupyterlab >= 4.0.0",
@@ -81,7 +85,6 @@ dev = [ # pip install -e .[dev]
     "mkdocs-with-pdf >= 0.9.3",
     "graphviz >= 2.50.0",
     "scikit-learn >= 1.0.0",
-    "coverage >= 7.8.0",
 ]
 
 [tool.pdm.build]

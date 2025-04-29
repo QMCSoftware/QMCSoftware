@@ -3,7 +3,6 @@ import qmcpy as qp
 import numpy as np
 import scipy
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
-from sklearn.model_selection import train_test_split
 
 
 class TestCubBayesVec(unittest.TestCase):
