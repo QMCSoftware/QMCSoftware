@@ -29,8 +29,4 @@ jobs:
       - run: if [ "$RUNNER_OS" == "Linux" ]; then make doctests_umbridge else echo "umbridge doctests only run on Linux" fi
       - run: make unittests_fast
       - run: make unittests_slow
-      - name: Update Coverage Badge # https://github.com/marketplace/actions/coverage-badge
-        # GitHub actions: default branch variable
-        # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
-        if: ${{github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && '$RUNNER_OS" == "Linux"'}}
-        uses: QMCSoftware/coverage-badge-action@master
+
