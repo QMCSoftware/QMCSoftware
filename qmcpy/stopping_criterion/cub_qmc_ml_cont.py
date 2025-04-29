@@ -22,11 +22,11 @@ class CubQMCMLCont(StoppingCriterion):
     >>> data
     MLQMCData (AccumulateData Object)
         solution        10.420
-        n_total         163840
-        n_level         [4096.  256.  256.  256.  256.]
+        n_total         98304
+        n_level         [2048.  256.  256.  256.  256.]
         levels          5
-        mean_level      [10.053  0.184  0.102  0.054  0.027]
-        var_level       [5.699e-05 7.845e-05 3.243e-05 1.610e-05 5.633e-06]
+        mean_level      [10.054  0.183  0.102  0.054  0.027]
+        var_level       [2.027e-04 5.129e-05 3.243e-05 1.610e-05 5.633e-06]
         bias_estimate   0.014
         time_integrate  ...
     CubQMCMLCont (StoppingCriterion Object)

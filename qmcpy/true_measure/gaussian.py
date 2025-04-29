@@ -13,10 +13,10 @@ class Gaussian(TrueMeasure):
     
     >>> g = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2],covariance=[[9,4],[4,5]])
     >>> g.gen_samples(4)
-    array([[ 4.03221089,  6.5276106 ],
-           [-1.02398497, -0.48146467],
-           [ 3.64364042,  0.8425137 ],
-           [-0.04415595,  2.52642377]])
+    array([[-4.40566397,  1.31271715],
+           [ 4.12464307,  2.70056246],
+           [ 0.85301528, -0.88218749],
+           [ 0.99611301,  3.16934534]])
     >>> g
     Gaussian (TrueMeasure Object)
         mean            [1 2]
@@ -65,6 +65,7 @@ class Gaussian(TrueMeasure):
                     covariance must be of shape d x d''')
         if self.decomp_type == 'PCA':
             evals,evecs = eigh(self.sigma) # get eigenvectors and eigenvalues for
+            evecs = evecs*(1-2*(evecs[0]<0)) # force first entries of eigenvectors to be positive
             order = argsort(-evals)
             self.a = dot(evecs[:,order],diag(sqrt(evals[order])))
         elif self.decomp_type == 'CHOLESKY':
