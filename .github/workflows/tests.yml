@@ -26,8 +26,7 @@ jobs:
       - run: pip install -e .[botorch]
       - run: make doctests_botorch
       - run: pip install -e .[umbridge]
-      - run: make doctests_umbridge
-        if: '$RUNNER_OS" == "Linux"'
+      - run: if [ "$RUNNER_OS" == "Linux" ]; then make doctests_umbridge else echo "umbridge doctests only run on Linux" fi
       - run: make unittests_fast
       - run: make unittests_slow
       - name: Update Coverage Badge # https://github.com/marketplace/actions/coverage-badge

@@ -1,4 +1,5 @@
 # General Python
+coverage.json
 *.ckpt
 *.npz
 *.csv 
