@@ -4,6 +4,15 @@
 
 If you like this project, please ⭐ star it using the button in the upper-right corner of the repository!
 
+If you find QMCPy helpful in your work, please support us by citing the following work:
+
+~~~
+Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A.
+QMCPy: A quasi-Monte Carlo Python Library. Working. 2020.
+https://qmcsoftware.github.io/QMCSoftware/
+~~~
+
+BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
 
 # Quasi-Monte Carlo Community Software
 
@@ -97,18 +106,6 @@ We also highly recommend you take a look at [Fred Hickernell's tutorial at the M
 ## Community
 
 Please refer to [this document](https://github.com/QMCSoftware/QMCSoftware/blob/develop/community.md) for the key roles in the QMCPy community.
-
-## Citation
-
-If you find QMCPy helpful in your work, please support us by citing the following work:
-
-~~~
-Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J. & Sorokin, A.
-QMCPy: A quasi-Monte Carlo Python Library. Working. 2020.
-https://qmcsoftware.github.io/QMCSoftware/
-~~~
-
-BibTex citation available [here](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
 
 ---
 
