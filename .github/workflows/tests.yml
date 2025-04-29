@@ -1,6 +1,9 @@
 name: QMCPy Automated Tests and Coverage Report
 on: [push]
 
+defaults:
+  run:
+    shell: bash
 jobs:
   tests:
     name: Tests on ${{ matrix.os }}
@@ -16,10 +19,6 @@ jobs:
           activate-environment: qmcpy
           environment-file: environment.yml
           auto-activate-base: false
-      - shell: bash -l {0}
-        run: |
-          conda info
-          conda list
       - run: conda env export --no-builds
       - run: make doctests_minimal
       - run: pip install -e .[test_torch] 
