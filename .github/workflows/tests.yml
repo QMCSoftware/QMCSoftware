@@ -15,17 +15,17 @@ jobs:
           miniconda-version: "latest"
           auto-activate-base: true
       - run: python -V
-      - run: pip install -e .
+      - run: pip install -e .[test]
       - run: pip install pytest 
       - run: pip install pytest-cov
       - run: make doctests_minimal
-      - run: pip install -e .[torch] 
+      - run: pip install -e .[test_torch] 
       - run: make doctests_torch 
-      - run: pip install -e .[gpytorch]
+      - run: pip install -e .[test_gpytorch]
       - run: make doctests_gpytorch
-      - run: pip install -e .[botorch]
+      - run: pip install -e .[test_botorch]
       - run: make doctests_botorch
-      - run: pip install -e .[umbridge]
+      - run: pip install -e .[test_umbridge]
       - run: if [ "$RUNNER_OS" == "Linux" ]; then make doctests_umbridge else echo "umbridge doctests only run on Linux" fi
       - run: make unittests_fast
       - run: make unittests_slow
