@@ -16,6 +16,7 @@ jobs:
           activate-environment: qmcpy
           environment-file: environment.yml
           auto-activate-base: false
+      - run: conda activate qmcpy
       - run: conda env export --no-builds
       - run: make doctests_minimal
       - run: pip install -e .[test_torch] 
