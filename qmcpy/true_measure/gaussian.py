@@ -2,8 +2,9 @@ from ._true_measure import TrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 from numpy import *
-from numpy.linalg import cholesky, slogdet, eigh
+from numpy.linalg import cholesky, slogdet
 from scipy.stats import norm, multivariate_normal
+from scipy.linalg import eigh
 
 
 class Gaussian(TrueMeasure):
@@ -57,6 +58,7 @@ class Gaussian(TrueMeasure):
         self.sigma = array(covariance)
         if self.sigma.shape==(self.d,):
             self.sigma = diag(self.sigma)
+        self.sigma = (self.sigma+self.sigma.T)/2
         if not (len(self.mu)==self.d and self.sigma.shape==(self.d,self.d)):
             raise DimensionError('''
                     mean must have length d and

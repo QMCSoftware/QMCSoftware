@@ -22,14 +22,14 @@ class CubMCMLCont(StoppingCriterion):
     >>> data
     MLMCData (AccumulateData Object)
         solution        10.400
-        n_total         1193331
+        n_total         1192594
         levels          2^(2)
-        n_level         [1133772.   22940.    8676.    2850.]
-        mean_level      [10.059  0.186  0.105  0.05 ]
-        var_level       [1.959e+02 1.603e-01 4.567e-02 1.013e-02]
+        n_level         [1131605.   21874.    8668.    2816.]
+        mean_level      [10.06   0.184  0.105  0.05 ]
+        var_level       [1.959e+02 1.475e-01 4.571e-02 1.000e-02]
         cost_per_sample [1. 2. 4. 8.]
-        alpha           0.942
-        beta            1.992
+        alpha           0.941
+        beta            1.941
         gamma           1.000
         time_integrate  ...
     CubMCMLCont (StoppingCriterion Object)
