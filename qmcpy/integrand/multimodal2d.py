@@ -8,8 +8,8 @@ class Multimodal2d(Integrand):
     >>> mm2d = Multimodal2d(DigitalNetB2(2,seed=7))
     >>> x = mm2d.discrete_distrib.gen_samples(2**10)
     >>> y = mm2d.f(x)
-    >>> y.mean()
-    np.float64(-0.7375279383212141)
+    >>> y.mean().item()
+    -0.7375...
     >>> mm2d.true_measure
     Uniform (TrueMeasure Object)
         lower_bound     [-4 -3]

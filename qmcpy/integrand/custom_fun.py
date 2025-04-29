@@ -15,8 +15,8 @@ class CustomFun(Integrand):
     >>> y = cf.f(x)
     >>> y.shape
     (1024, 1)
-    >>> y.mean()
-    np.float64(3.987374124130412)
+    >>> y.mean().item()
+    3.9873...
     >>> cf = CustomFun(
     ...     true_measure = Uniform(DigitalNetB2(3,seed=7),lower_bound=[2,3,4],upper_bound=[4,5,6]),
     ...     g = lambda x,compute_flags=None: x,

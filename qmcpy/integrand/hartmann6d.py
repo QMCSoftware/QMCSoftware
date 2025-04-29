@@ -9,7 +9,7 @@ class Hartmann6d(Integrand):
     >>> x = h6d.discrete_distrib.gen_samples(2**10)
     >>> y = h6d.f(x)
     >>> y.mean()
-    np.float64(-0.2591232263960076)
+    -0.2591...
     >>> h6d.true_measure
     Uniform (TrueMeasure Object)
         lower_bound     0

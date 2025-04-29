@@ -52,8 +52,8 @@ class CubMCG(StoppingCriterion):
     >>> cv2mean = 3/4
     >>> sc1 = CubMCG(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
     >>> sol,data = sc1.integrate()
-    >>> sol
-    np.float64(1.3841092957671866)
+    >>> sol.item()
+    1.384...
 
     Original Implementation:
 

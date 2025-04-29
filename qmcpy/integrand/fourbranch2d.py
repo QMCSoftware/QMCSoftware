@@ -8,8 +8,8 @@ class FourBranch2d(Integrand):
     >>> fb2d = FourBranch2d(DigitalNetB2(2,seed=7))
     >>> x = fb2d.discrete_distrib.gen_samples(2**10)
     >>> y = fb2d.f(x)
-    >>> y.mean()
-    np.float64(-2.500835871323173)
+    >>> y.mean().item()
+    -2.5008...
     >>> fb2d.true_measure
     Uniform (TrueMeasure Object)
         lower_bound     -8

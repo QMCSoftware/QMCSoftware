@@ -14,8 +14,8 @@ class Ishigami(Integrand):
     >>> ishigami = Ishigami(DigitalNetB2(3,seed=7))
     >>> x = ishigami.discrete_distrib.gen_samples(2**10)
     >>> y = ishigami.f(x)
-    >>> y.mean()
-    np.float64(3.4985325536858065)
+    >>> y.mean().item()
+    3.4985...
     >>> ishigami.true_measure
     Uniform (TrueMeasure Object)
         lower_bound     -3.142
