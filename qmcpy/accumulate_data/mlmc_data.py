@@ -1,6 +1,6 @@
 from ._accumulate_data import AccumulateData
 from numpy import *
-from numpy.linalg import lstsq
+from scipy.linalg import lstsq
 
 
 class MLMCData(AccumulateData):
@@ -79,13 +79,13 @@ class MLMCData(AccumulateData):
         a = ones((self.levels,2))
         a[:,0] = arange(1,self.levels+1)
         if self.alpha0 <= 0:
-            x = lstsq(a,log2(self.mean_level[1:]),rcond=-1)[0]
+            x = lstsq(a,log2(self.mean_level[1:]))[0]
             self.alpha = maximum(.5,-x[0])
         if self.beta0 <= 0:
-            x = lstsq(a,log2(self.var_level[1:]),rcond=-1)[0]
+            x = lstsq(a,log2(self.var_level[1:]))[0]
             self.beta = maximum(.5,-x[0])
         if self.gamma0 <= 0:
-            x = lstsq(a,log2(self.cost_per_sample[1:]),rcond=-1)[0]
+            x = lstsq(a,log2(self.cost_per_sample[1:]))[0]
             self.gamma = maximum(.5,x[0])
         self.n_total = self.n_level.sum()
 
