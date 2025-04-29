@@ -7,8 +7,14 @@ If you like this project, please ⭐ star it using the button in the upper-right
 If you find QMCPy helpful in your work, please support us by citing the following work:
 
 ~~~
-Choi, Sou-Cheng T., Fred J. Hickernell, Rathinavel Jagadeeswaran, Michael J. McCourt, and Aleksei G. Sorokin.
-"Quasi-monte carlo software." In International Conference on Monte Carlo and Quasi-Monte Carlo Methods in Scientific Computing, pp. 23-47. Cham: Springer International Publishing, 2020.
+
+1. S.-C. T. Choi, F. J. Hickernell, R. Jagadeeswaran, M. McCourt, and A. Sorokin. QMCPy: A quasi-Monte
+Carlo Python library (versions 1–1.5), 2024. URL https://qmcsoftware.github.io/QMCSoftware/.
+
+2. S.-C. T. Choi, F. J. Hickernell, R. Jagadeeswaran, M. J. McCourt, and A. G. Sorokin. Quasi-Monte
+Carlo software. In A. Keller, editor, Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Oxford,
+England, August 2020, Springer Proceedings in Mathematics and Statistics, pages 23–50. Springer,
+Cham, 2022. https://arxiv.org/abs/2102.07833
 
 ~~~
 
