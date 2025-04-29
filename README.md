@@ -12,7 +12,7 @@ Choi, Sou-Cheng T., Fred J. Hickernell, Rathinavel Jagadeeswaran, Michael J. McC
 
 ~~~
 
-BibTex citation available [here](./cite_qmcpy.bib)
+BibTex citations are available [here](./cite_qmcpy.bib).
 
 # Quasi-Monte Carlo Community Software
 
