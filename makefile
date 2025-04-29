@@ -28,11 +28,9 @@ doctests_botorch:
 		-W ignore
 
 fasttests:
-	@echo "\nFastests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
 
 longtests:
-	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
 
 coverage:
@@ -43,8 +41,7 @@ tests: doctests fasttests longtests coverage
 
 tests_no_docker: doctests_no_docker fasttests longtests coverage
 
-# "[command] | tee [logfile]" prints to both stdout and logfile
-workout:
+workout: # to be removed in the future when workouts are absorbed into demos. "[command] | tee [logfile]" prints to both stdout and logfile
 	# integration_examples
 	@python workouts/integration_examples/asian_option_multi_level.py | tee workouts/integration_examples/out/asian_option_multi_level.log
 	@python workouts/integration_examples/asian_option_single_level.py | tee workouts/integration_examples/out/asian_option_single_level.log
