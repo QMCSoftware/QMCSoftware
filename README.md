@@ -2,7 +2,7 @@
 [![Documentation Status](https://readthedocs.org/projects/qmcpy/badge/?version=latest)](https://qmcpy.readthedocs.io/en/latest/?badge=latest)[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964489.svg)](https://doi.org/10.5281/zenodo.3964489) [![Tests](https://github.com/QMCSoftware/QMCSoftware/workflows/QMCPy_CI/badge.svg)](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/python-package-conda.yml)
 [![codecov](https://codecov.io/gh/QMCSoftware/QMCSoftware/branch/master/graph/badge.svg)](https://app.codecov.io/gh/QMCSoftware/QMCSoftware)
 
-If you like the project, please ⭐ star it using the button in the upper-right corner of the repository!
+If you like this project, please ⭐ star it using the button in the upper-right corner of the repository!
 
 
 # Quasi-Monte Carlo Community Software
