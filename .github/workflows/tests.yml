@@ -33,4 +33,4 @@ jobs:
         # GitHub actions: default branch variable
         # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
         if: ${{github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && '$RUNNER_OS" == "Linux"'}}
-        uses: QMCSoftware/coverage-badge-action@main
+        uses: QMCSoftware/coverage-badge-action@master
