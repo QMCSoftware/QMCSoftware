@@ -4,7 +4,7 @@
 
 If you like this project, please ⭐ star it using the button in the upper-right corner of the repository!
 
-If you find QMCPy helpful in your work, please support us by citing the following work:
+If you use QMCPy in your work, please support us by citing the following works:
 
 ~~~
 
