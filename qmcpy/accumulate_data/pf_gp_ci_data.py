@@ -80,9 +80,9 @@ class PFGPCIData(AccumulateData):
         self.solutions.append(mean(phi>=.5))
         self.emr.append(mean(minimum(phi,1-phi)))
         gamma = self.emr[-1]/self.alpha
-        self.ci_low.append(max(self.solutions[-1]-gamma,0))
-        self.ci_high.append(min(self.solutions[-1]+gamma,1))
-        self.error_bounds.append(max(self.solutions[-1]-self.ci_low[-1],self.ci_high[-1]-self.solutions[-1]))
+        self.ci_low.append(maximum(self.solutions[-1]-gamma,0))
+        self.ci_high.append(minimum(self.solutions[-1]+gamma,1))
+        self.error_bounds.append(maximum(self.solutions[-1]-self.ci_low[-1],self.ci_high[-1]-self.solutions[-1]))
 
     def get_results_dict(self):
         df = {'n_sum':self.n_sum, 'n_batch':self.n_batch, 'error_bounds':self.error_bounds, 'ci_low':self.ci_low, 'ci_high':array(self.ci_high), 'solutions':array(self.solutions)}

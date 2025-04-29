@@ -142,7 +142,7 @@ class CubMCMLCont(StoppingCriterion):
                 # Alternatively, evaluate optimal number of samples and take between 2 and n_init samples
                 #self.data.diff_n_level = self._get_next_samples()
                 #self.data.diff_n_level[:self.data.levels] = 0
-                #self.data.diff_n_level[self.data.levels] = max(3, min(self.n_init, self.data.diff_n_level[self.data.levels]))
+                #self.data.diff_n_level[self.data.levels] = max(3, minimum(self.n_init, self.data.diff_n_level[self.data.levels]))
 
             # Update splitting parameter
             self._update_theta()
@@ -206,7 +206,7 @@ class CubMCMLCont(StoppingCriterion):
 
     def _update_theta(self):
         """Update error splitting parameter"""
-        self.theta = maximum(0.01, min(0.5, (self._bias(len(self.data.n_level)-1)/self.rmse_tol)**2))
+        self.theta = maximum(0.01, minimum(0.5, (self._bias(len(self.data.n_level)-1)/self.rmse_tol)**2))
 
     def _rmse(self):
         """Returns an estimate for the root mean square error"""

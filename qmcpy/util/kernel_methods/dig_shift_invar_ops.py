@@ -14,10 +14,6 @@ def k4sumterm(x, t, cutoff=1e-8):
     >>> x = np.random.randint(0,2**t,(5,4))
     >>> k4sumterm(x,t).shape
     (5, 4)
-    >>> import torch 
-    >>> xt = torch.randint(0,2**t,(5,4))
-    >>> k4sumterm(xt,t).shape
-    torch.Size([5, 4])
     """
     total = 0.
     for a in range(0,t):
@@ -57,13 +53,10 @@ def weighted_walsh_funcs(alpha, xb, t):
         xb (np.ndarray or torch.Tensor): integer points at which to evaluate the weighted Walsh function 
         t (int): number of bits in each integer in xb
     
-    >>> import torch 
     >>> t = 3 
     >>> xb = np.random.randint(0,2**t,(4,5))
-    >>> xbt = torch.from_numpy(xb)
     >>> for alpha in list(WEIGHTEDWALSHFUNCSPOS.keys()):
     ...     y = weighted_walsh_funcs(alpha,xb,t)
-    ...     yt = weighted_walsh_funcs(alpha,xbt,t)
     """
     assert isinstance(alpha,int)
     assert alpha in WEIGHTEDWALSHFUNCSPOS, "alpha = %d not in WEIGHTEDWALSHFUNCSPOS"%alpha

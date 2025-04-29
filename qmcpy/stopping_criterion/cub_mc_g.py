@@ -53,7 +53,7 @@ class CubMCG(StoppingCriterion):
     >>> sc1 = CubMCG(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
     >>> sol,data = sc1.integrate()
     >>> sol
-    1.384...
+    np.float64(1.3841092957671866)
 
     Original Implementation:
 
@@ -178,8 +178,8 @@ class CubMCG(StoppingCriterion):
                     self.data.solution += delta_minus # adjust solution a bit
                     break
                 else:
-                    candidate_tol = max(self.abs_tol,.95*self.rel_tol*abs(self.data.solution))
-                    self.data.error_bound = min(self.data.error_bound/2.,candidate_tol)
+                    candidate_tol = maximum(self.abs_tol,.95*self.rel_tol*abs(self.data.solution))
+                    self.data.error_bound = minimum(self.data.error_bound/2.,candidate_tol)
                     tau += 1
                 # update next uncertainty
                 toloversig = self.data.error_bound / self.sigma_up
@@ -207,11 +207,11 @@ class CubMCG(StoppingCriterion):
         logsqrtnCLT = log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
         nbe = ceil(exp(2 * fsolve(BEfun2, logsqrtnCLT)))
         # calculate Berry-Esseen n by fsolve function (scipy)
-        ncb = min(min(ncheb, nbe), n_budget)  # take the min of two sample sizes
+        ncb = minimum(minimum(ncheb, nbe), n_budget)  # take the min of two sample sizes
         logsqrtn = log(sqrt(ncb))
         BEfun3 = lambda toloversig: \
             (norm.cdf(-exp(logsqrtn) * toloversig)
-            + exp(-logsqrtn) * min(A1 * (M3upper + A2),
+            + exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
             A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
             - alpha / 2.)
         err = fsolve(BEfun3, toloversig) * sigma_0_up
@@ -226,7 +226,7 @@ class CubMCG(StoppingCriterion):
         M3upper = kurtmax**(3./4)
         # using Jensen's inequality to bound the third moment
         BEfun = lambda logsqrtb: \
-            (norm.cdf(n1*logsqrtb) + min(A1*(M3upper+A2),
+            (norm.cdf(n1*logsqrtb) + minimum(A1*(M3upper+A2),
             A*M3upper/(1+(sqrt(n1)*logsqrtb)**3))/sqrt(n1)
             - alpha1/2)
         # Berry-Esseen inequality
@@ -234,7 +234,7 @@ class CubMCG(StoppingCriterion):
         # use CLT to get tolerance
         NBE_inv = exp(2*fsolve(BEfun,logsqrtb_clt))
         # use fsolve to get Berry-Esseen tolerance
-        eps = min(NCheb_inv,NBE_inv)
+        eps = minimum(NCheb_inv,NBE_inv)
         # take the min of Chebyshev and Berry Esseen tolerance
         return eps
 

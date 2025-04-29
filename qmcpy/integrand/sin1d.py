@@ -9,7 +9,7 @@ class Sin1d(Integrand):
     >>> x = sin1d.discrete_distrib.gen_samples(2**10)
     >>> y = sin1d.f(x)
     >>> y.mean()
-    -7.3731683...e-08
+    np.float64(-7.373168357284465e-08)
     >>> sin1d.true_measure
     Uniform (TrueMeasure Object)
         lower_bound     0

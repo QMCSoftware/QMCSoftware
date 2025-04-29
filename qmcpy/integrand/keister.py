@@ -16,7 +16,7 @@ class Keister(Integrand):
     >>> x = k.discrete_distrib.gen_samples(2**10)
     >>> y = k.f(x)
     >>> y.mean()
-    1.808...
+    np.float64(1.8082016688429752)
     >>> k.true_measure
     Gaussian (TrueMeasure Object)
         mean            0
@@ -26,10 +26,10 @@ class Keister(Integrand):
     >>> x = k.discrete_distrib.gen_samples(2**12)
     >>> y = k.f(x)
     >>> y.mean()
-    1.808...
+    np.float64(1.8081142185982964)
     >>> yp = k.f(x,periodization_transform='c2sin')
     >>> yp.mean()
-    1.807...
+    np.float64(1.8079570396272668)
 
     References:
 

@@ -137,7 +137,7 @@ class CubMCCLT(StoppingCriterion):
         temp_b = (temp_a * self.data.sighat).sum()
         # samples for computation of the mean
         # n_mu_temp := n such that confidence intervals width and confidence will be satisfied
-        tol_up = max(self.abs_tol, abs(self.data.solution) * self.rel_tol)
+        tol_up = maximum(self.abs_tol, abs(self.data.solution) * self.rel_tol)
         z_star = -norm.ppf(self.alpha / 2.)
         n_mu_temp = ceil(temp_b * (self.data.sighat / temp_a) * (z_star * self.inflate / tol_up)**2)
         # n_mu := n_mu_temp adjusted for previous n

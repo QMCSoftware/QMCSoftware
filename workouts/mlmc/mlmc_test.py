@@ -81,7 +81,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
         print(' indicates MLMC correction dominated by a few rare paths;')
         print(' for information on the connection to variance of sample variances,')
         print(' see http://mathworld.wolfram.com/SampleVarianceDistribution.html\n')
-    if max(chk1) > 1.:
+    if maximum(chk1) > 1.:
         print('WARNING: maximum consistency error = %f'%max(chk1))
         print(' indicates identity E[Pf-Pc] = E[Pf] - E[Pc] not satisfied;')
         print(' to be more certain, re-run mlmc_test with larger N\n')
@@ -104,8 +104,8 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
     print('\nMLMC complexity tests')
     print('\t%-15s%-15s%-15s%-15s%-15s%s'\
         %('eps','value','mlmc_cost','std_cost','savings','N_l'))
-    alpha = max(alpha,0.5)
-    beta  = max(beta,0.5)
+    alpha = maximum(alpha,0.5)
+    beta  = maximum(beta,0.5)
     theta = 0.25
     for i in range(len(eps)):
         mlmc_qmcpy = CubMCML(integrand_qmcpy,
@@ -121,7 +121,7 @@ def mlmc_test(integrand_qmcpy, n, l, n0, eps, l_min, l_max):
         nl = mlmc_qmcpy.data.n_level
         cl = mlmc_qmcpy.data.cost_per_sample
         mlmc_cost = sum(nl*cl)
-        idx = min(len(var2),len(nl))-1
+        idx = minimum(len(var2),len(nl))-1
         std_cost = var2[idx]*cl[-1] / ((1.-theta)*array(eps[i])**2)
         print('\t%-15.3e%-15.3e%-15.3e%-15.3e%-15.2f%s'\
             %(eps[i], p, mlmc_cost, std_cost, std_cost/mlmc_cost,'\t'.join(str(int(nli)) for nli in nl)))

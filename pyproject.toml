@@ -53,9 +53,18 @@ dependencies = [
     ]
 
 [project.optional-dependencies]
-full = [
+torch = [
+    "torch >= 2.0.0",
+    ]
+umbridge = [
     "umbridge >= 1.2.1",
+    ]
+gpytorch = [
+    "qmcpy[torch]",
     "gpytorch >= 1.7.0",
+]
+botorch = [
+    "botorch >= 0.10.0"
 ]
 dev = [ # pip install -e .[dev]
     "pytest >= 8.0.0",

@@ -9,7 +9,7 @@ from .box_integral import BoxIntegral
 from .sensitivity_indices import SobolIndices,SensitivityIndices
 from .ishigami import Ishigami
 from .bayesian_lr_coeffs import BayesianLRCoeffs
-from .um_bridge_wrapper import UMBridgeWrapper
+from .umbridge_wrapper import UMBridgeWrapper
 from .genz import Genz
 from .sin1d import Sin1d
 from .hartmann6d import Hartmann6d

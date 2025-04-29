@@ -9,7 +9,7 @@ class Multimodal2d(Integrand):
     >>> x = mm2d.discrete_distrib.gen_samples(2**10)
     >>> y = mm2d.f(x)
     >>> y.mean()
-    -0.7375279383212141
+    np.float64(-0.7375279383212141)
     >>> mm2d.true_measure
     Uniform (TrueMeasure Object)
         lower_bound     [-4 -3]

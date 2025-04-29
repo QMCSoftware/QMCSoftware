@@ -7,9 +7,6 @@ class Polynomial():
     >>> y = p(x) 
     >>> y_true = 3*x**4 + 5*x**3 + 0*x**2 + 1*x**1 + 2*x**0
     >>> assert np.allclose(y,y_true,atol=1e-12)
-    >>> import torch 
-    >>> yt = p(torch.from_numpy(x).float())
-    >>> assert torch.allclose(yt,torch.from_numpy(y_true).float(),atol=1e-12)
     """
     def __init__(self, coeffs):
         """

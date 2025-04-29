@@ -65,7 +65,7 @@ class CubQMCNetG(_CubQMCLDG):
     >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
     >>> true_value = array([sol3neg1,sol31])
     >>> (abs(true_value-solution)<abs_tol).all()
-    True
+    np.True_
     >>> f2 = BoxIntegral(dnb2,s=[3,4])
     >>> sc = CubQMCNetG(f2,control_variates=f,control_variate_means=true_value,update_beta=True)
     >>> solution,data = sc.integrate()

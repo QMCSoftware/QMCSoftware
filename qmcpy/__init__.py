@@ -2,12 +2,10 @@ from .discrete_distribution import *
 from .true_measure import *
 from .integrand import *
 from .stopping_criterion import *
-from .kernel_methods import (
-    fftbr,ifftbr,fwht,
-    KernelShiftInvar,KernelDigShiftInvar,KernelGaussian,
-    FastGramMatrixLattice,FastGramMatrixDigitalNetB2,GramMatrix)
+from .util.kernel_methods import (
+    fftbr,ifftbr,fwht)
 try:
-    from .kernel_methods import (
+    from .util.kernel_methods import (
         fftbr_torch,ifftbr_torch,fwht_torch
     )
 except:

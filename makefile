@@ -1,9 +1,31 @@
 doctests_minimal:
-	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --disable-pytest-warnings qmcpy --no-header --ignore qmcpy/integrand/um_bridge_wrapper.py --ignore qmcpy/accumulate_data/pf_gp_ci_data.py --ignore qmcpy/stopping_criterion/pf_gp_ci.py
+	python -m coverage run --source=./qmcpy -m pytest --no-header \
+		--doctest-modules qmcpy/ \
+		--ignore qmcpy/util/kernel_methods/ft_pytorch.py \
+		--ignore qmcpy/accumulate_data/pf_gp_ci_data.py \
+		--ignore qmcpy/stopping_criterion/pf_gp_ci.py \
+		--ignore qmcpy/util/exact_gpytorch_gression_model.py \
+		--ignore qmcpy/integrand/umbridge_wrapper.py \
+		--ignore qmcpy/integrand/hartmann6d.py
 
-doctests_no_docker:
-	@echo "\nDoctests Without Docker Containers"
-	python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
+doctests_torch:
+	python -m coverage run --source=./qmcpy -m pytest --no-header \
+		--doctest-modules qmcpy/util/kernel_methods/ft_pytorch.py
+
+doctests_gpytorch:
+	python -m coverage run --source=./qmcpy -m pytest --no-header \
+		--doctest-modules qmcpy/stopping_criterion/pf_gp_ci.py \
+		-W ignore
+
+doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
+	@docker --version
+	python -m coverage run --source=./qmcpy -m pytest --no-header \
+		--doctest-modules qmcpy/integrand/umbridge_wrapper.py
+
+doctests_botorch:
+	python -m coverage run --source=./qmcpy -m pytest --no-header \
+		--doctest-modules qmcpy/integrand/hartmann6d.py \
+		-W ignore
 
 fasttests:
 	@echo "\nFastests"
