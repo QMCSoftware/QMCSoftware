@@ -1,0 +1,86 @@
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+# brew install pdm
+# https://pdm-project.org/latest/usage/publish/
+# pdm publish --repository testpypi
+# pdm publish 
+
+[build-system]
+requires = ["pdm-backend","setuptools","wheel"]
+build-backend = "pdm.backend"
+
+[project.urls]
+Documentation = "https://qmcpy.readthedocs.io"
+Repository = "https://github.com/QMCSoftware/QMCSoftware"
+Issues = "https://github.com/QMCSoftware/QMCSoftware/issues"
+
+[project]
+name = "qmcpy"
+description = "Quasi-Monte Carlo point generators, automatic transformations, and adaptive stopping criteria"
+authors = [
+    {name="Aleksei G Sorokin", email="agsorokin3@gmail.com"},
+    {name="Fred Hickernell"},
+    {name="Sou-Cheng T. Choi"},
+    {name="Jagadeeswaran Rathinavel"},
+    {name="Mike McCourt"},
+    ]
+classifiers= [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3", 
+    "Topic :: Scientific/Engineering :: Mathematics", 
+    ]
+readme = "README.md"
+keywords=[
+    "quasi",
+    "monte",
+    "carlo",
+    "community",
+    "software",
+    "cubature",
+    "numerical",
+    "integration",
+    "discrepancy",
+    "sobol",
+    "lattice",
+    ]
+license = "Apache-2.0"
+dynamic = ["version"]
+requires-python = ">= 3.5"
+dependencies = [
+    "numpy >= 1.17.0",
+    "scipy >= 1.1.0",
+    "qmctoolscl >= 1.1.2",
+    ]
+
+[project.optional-dependencies]
+dev = [ # pip install -e .[dev]
+    "pytest >= 8.0.0",
+    "nbval >= 0.10.0",
+    "pytest-accept >= 0.1.10",
+    "jupyterlab >= 4.0.0",
+    "matplotlib >= 3.9.0",
+    "tueplots >= 0.2.0",
+    "pandas >= 2.0.0",
+    "mkdocs >= 1.5.0",
+    "mkdocs-material >= 9.6.12",
+    "mkdocs-jupyter >= 0.25.0",
+    "mkdocstrings-python >= 1.16.0",
+]
+
+[tool.pdm.build]
+run-setuptools = true
+includes = [
+    "qmcpy",
+    "qmcpy/discrete_distribution/c_lib/*.h",
+    "qmcpy/discrete_distribution/digital_net_b2/generating_matrices/*.txt",
+    "qmcpy/discrete_distribution/digital_net_b2/generating_matrices/*.npy",
+    "qmcpy/discrete_distribution/lattice/generating_vectors/*.txt",
+    "qmcpy/discrete_distribution/lattice/generating_vectors/*.npy",
+    "qmcpy/discrete_distribution/lattice/generating_vectors/*/*.npy",
+    "qmcpy/discrete_distribution/lattice/generating_vectors/*/*.npy",
+    ]
+excludes = []
+
+[tool.pdm.version]
+source = "file"
+path = "qmcpy/__init__.py"
