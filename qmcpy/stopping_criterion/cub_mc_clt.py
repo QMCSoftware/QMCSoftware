@@ -25,7 +25,7 @@ class CubMCCLT(StoppingCriterion):
         n_total         96028
         n               95004
         levels          1
-        time_integrate  0.004
+        time_integrate  ...
     CubMCCLT (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0

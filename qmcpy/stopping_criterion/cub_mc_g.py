@@ -27,7 +27,7 @@ class CubMCG(StoppingCriterion):
         n_total         15256
         n               14232
         levels          1
-        time_integrate  0.002
+        time_integrate  ...
     CubMCG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
