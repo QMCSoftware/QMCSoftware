@@ -5,7 +5,7 @@ from ..discrete_distribution._discrete_distribution import LD
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
-from numpy import *
+import numpy as np
 from scipy.stats import norm
 from time import time
 import warnings
@@ -111,7 +111,7 @@ class CubQMCML(StoppingCriterion):
                 # double N_l on level with largest V_l/(2^l*N_l)
                 efficient_level = argmax(self.data.var_cost_ratio_level)
                 self.data.eval_level[efficient_level] = True
-            elif self.data.bias_estimate > (self.rmse_tol/sqrt(2.)):
+            elif self.data.bias_estimate > (self.rmse_tol/np.sqrt(2.)):
                 if self.data.levels == self.levels_max + 1:
                         warnings.warn("Failed to achieve weak convergence. levels == levels_max.", MaxLevelsWarning)
                 # add another level

@@ -1,7 +1,7 @@
 from ._true_measure import TrueMeasure
 from ..util import TransformError, DimensionError
 from ..discrete_distribution import DigitalNetB2
-from numpy import *
+import numpy as np
 from scipy.stats import norm
 
 
@@ -29,20 +29,20 @@ class Uniform(TrueMeasure):
             upper_bound (float): b for Uniform(a,b)
         """
         self.parameters = ['lower_bound', 'upper_bound']
-        self.domain = array([[0,1]])
+        self.domain = np.array([[0,1]])
         self._parse_sampler(sampler)
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
-        if isscalar(self.lower_bound):
-            lower_bound = tile(self.lower_bound,self.d)
-        if isscalar(self.upper_bound):
-            upper_bound = tile(self.upper_bound,self.d)
-        self.a = array(lower_bound)
-        self.b = array(upper_bound)
+        if np.isscalar(self.lower_bound):
+            lower_bound = np.tile(self.lower_bound,self.d)
+        if np.isscalar(self.upper_bound):
+            upper_bound = np.tile(self.upper_bound,self.d)
+        self.a = np.array(lower_bound)
+        self.b = np.array(upper_bound)
         if len(self.a)!=self.d or len(self.b)!=self.d:
             raise DimensionError('upper bound and lower bound must be of length dimension')
         self._set_constants()
-        self.range = hstack((self.a.reshape((self.d,1)),self.b.reshape((self.d,1))))
+        self.range = np.hstack((self.a.reshape((self.d,1)),self.b.reshape((self.d,1))))
         super(Uniform,self).__init__()
 
     def _set_constants(self):
@@ -53,7 +53,7 @@ class Uniform(TrueMeasure):
         return x * self.delta + self.a
     
     def _weight(self, x):
-        return tile(self.inv_delta_prod,x.shape[0])
+        return np.tile(self.inv_delta_prod,x.shape[0])
     
     def _spawn(self, sampler, dimension):
         if dimension==self.d: # don't do anything if the dimension doesn't change

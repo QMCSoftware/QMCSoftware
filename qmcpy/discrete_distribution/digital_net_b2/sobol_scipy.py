@@ -1,6 +1,6 @@
 from .._discrete_distribution import DiscreteDistribution
 from ...util import ParameterError, ParameterWarning
-from numpy import *
+import numpy as np
 import warnings
 
 class SobolSciPy(DiscreteDistribution):
@@ -58,7 +58,7 @@ class SobolSciPy(DiscreteDistribution):
         except:
             raise ParameterError("scipy.stats.qmc.Sobol not found, try updating to scipy>=1.7.0")
         self.parameters = ['randomize','graycode']
-        if not isscalar(dimension):
+        if not np.isscalar(dimension):
             raise ParameterError("SobolSciPy does not support vectorized dimension indexing")
         self.randomize = randomize
         self.graycode = True
@@ -80,7 +80,7 @@ class SobolSciPy(DiscreteDistribution):
             n_max (int): Final index of sequence.
 
         Returns:
-            ndarray: (n_max-n_min) x d (dimension) array of samples
+            np.ndarray: (n_max-n_min) x d (dimension) array of samples
         """
         if n:
             n_min = 0
@@ -101,4 +101,4 @@ class SobolSciPy(DiscreteDistribution):
     
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[0], dtype=float)
+        return np.ones(x.shape[0], dtype=float)

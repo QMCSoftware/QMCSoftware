@@ -2,7 +2,7 @@ from ._true_measure import TrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..discrete_distribution import DigitalNetB2
-from numpy import *
+import numpy as np
 import scipy.stats
 
 
@@ -42,7 +42,7 @@ class SciPyWrapper(TrueMeasure):
             scipy_distribs (list): instantiated CONTINUOUS UNIVARIATE scipy.stats distributions 
                 https://docs.scipy.org/doc/scipy/reference/stats.html#continuous-distributions
         """
-        self.domain = array([[0,1]])
+        self.domain = np.array([[0,1]])
         if not isinstance(discrete_distrib,DiscreteDistribution):
             raise ParameterError("SciPyWrapper requires discrete_distrib be a DiscreteDistribution.")
         self._parse_sampler(discrete_distrib)
@@ -56,14 +56,14 @@ class SciPyWrapper(TrueMeasure):
         self.sds = self.scipy_distrib if len(self.scipy_distrib)>1 else self.scipy_distrib*discrete_distrib.d
         if len(self.sds)!=discrete_distrib.d:
             raise DimensionError("length of scipy_distribs must match the dimension of the discrete_distrib")
-        self.range = array([sd.interval(1) for sd in self.sds])
+        self.range = np.array([sd.interval(1) for sd in self.sds])
         super(SciPyWrapper,self).__init__()
 
     def _transform(self, x):
-        return array([self.sds[j].ppf(x[:,j]) for j in range(self.d)],dtype=float).T
+        return np.array([self.sds[j].ppf(x[:,j]) for j in range(self.d)],dtype=float).T
     
     def _weight(self, x):
-        return array([self.sds[j].pdf(x[:,j]) for j in range(self.d)],dtype=float).T.prod(1)
+        return np.array([self.sds[j].pdf(x[:,j]) for j in range(self.d)],dtype=float).T.prod(1)
     
     def _spawn(self, sampler, dimension):
         return SciPyWrapper(sampler,self.scipy_distrib)

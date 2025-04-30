@@ -5,7 +5,7 @@ from ..discrete_distribution._discrete_distribution import IID
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
-from numpy import *
+import numpy as np
 from numpy.linalg import lstsq
 from scipy.stats import norm
 from time import time
@@ -137,7 +137,7 @@ class CubMCMLCont(StoppingCriterion):
             # Check if we already have samples at the finest level
             if not self.data.n_level[self.data.levels] > 0:
                 # This takes n_init warm-up samples at the finest level
-                self.data.diff_n_level = hstack((self.data.diff_n_level,self.n_init))
+                self.data.diff_n_level = np.hstack((self.data.diff_n_level,self.n_init))
                 self.data.update_data()
                 # Alternatively, evaluate optimal number of samples and take between 2 and n_init samples
                 #self.data.diff_n_level = self._get_next_samples()
@@ -183,8 +183,8 @@ class CubMCMLCont(StoppingCriterion):
         self.data.time_integrate += time() - t_start
     
     def _get_next_samples(self):
-        ns = ceil( sqrt(self.data.var_level/self.data.cost_per_sample) * 
-                sqrt(self.data.var_level*self.data.cost_per_sample).sum() / 
+        ns = np.ceil( np.sqrt(self.data.var_level/self.data.cost_per_sample) * 
+                np.sqrt(self.data.var_level*self.data.cost_per_sample).sum() / 
                 ((1-self.theta)*self.rmse_tol**2) )
         return ns
     
@@ -210,7 +210,7 @@ class CubMCMLCont(StoppingCriterion):
 
     def _rmse(self):
         """Returns an estimate for the root mean square error"""
-        return sqrt(self._mse())
+        return np.sqrt(self._mse())
 
     def _mse(self):
         """Returns an estimate for the mean square error"""
@@ -223,9 +223,9 @@ class CubMCMLCont(StoppingCriterion):
     def _bias(self, level):
         """Returns an estimate for the bias"""
         mean_level = self.data.sum_level[0, :]/self.data.n_level
-        A = ones((2,2))
+        A = np.ones((2,2))
         A[:,0] = range(level-1, level+1)
-        y = log2(abs(mean_level[level-1:level+1]))
+        y = np.log2(abs(mean_level[level-1:level+1]))
         x = lstsq(A, y, rcond=None)[0]
         alpha = maximum(.5,-x[0])
         return 2**(x[1]+(level+1)*x[0]) / (2**alpha - 1)

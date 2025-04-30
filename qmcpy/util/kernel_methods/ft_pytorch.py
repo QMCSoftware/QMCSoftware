@@ -2,15 +2,15 @@ import torch
 import numpy as np
 import itertools 
 
-SQRT2 = np.sqrt(2) 
+SQRT2 = np.np.sqrt(2) 
 
 def _fwht_torch(x):
     y = x.clone()
     n = x.size(-1)
     if n<=1: return y
     assert n&(n-1)==0 # require n is a power of 2
-    m = int(np.log2(n))
-    it = torch.arange(n,dtype=torch.int64,device=x.device).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
+    m = int(np.np.log2(n))
+    it = torch.np.arange(n,dtype=torch.int64,device=x.device).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
     idx0 = [slice(None)]*(m-1)+[0]
     idx1 = [slice(None)]*(m-1)+[1]
     for k in range(m):
@@ -28,7 +28,7 @@ class _FWHTB2Ortho(torch.autograd.Function):
         return _fwht_torch(dx)
 def fwht_torch(x):
     """
-    >>> rng = np.random.Generator(np.random.SFC64(11))
+    >>> rng = np.np.random.Generator(np.np.random.SFC64(11))
     >>> x = torch.from_numpy(rng.random(8)).float().requires_grad_()
     >>> y = fwht_torch(x)
     >>> v = torch.sum(y**2)
@@ -46,7 +46,7 @@ def fwht_torch(x):
 
 def fftbr_torch(x):
     """
-    >>> rng = np.random.Generator(np.random.SFC64(11))
+    >>> rng = np.np.random.Generator(np.np.random.SFC64(11))
     >>> x = torch.from_numpy(rng.random(8)+1j*rng.random(8)).to(torch.complex64).requires_grad_()
     >>> y = fftbr_torch(x)
     >>> v = torch.abs(torch.sum(y**2))
@@ -65,7 +65,7 @@ def fftbr_torch(x):
     """
     n = x.size(-1)
     assert n&(n-1)==0 # require n is a power of 2
-    m = int(np.log2(n))
+    m = int(np.np.log2(n))
     shape = list(x.shape)
     ndim = x.ndim
     twos = [2]*m
@@ -77,7 +77,7 @@ def fftbr_torch(x):
 
 def ifftbr_torch(x):
     """
-    >>> rng = np.random.Generator(np.random.SFC64(11))
+    >>> rng = np.np.random.Generator(np.np.random.SFC64(11))
     >>> x = torch.from_numpy(rng.random(8)+1j*rng.random(8)).to(torch.complex64).requires_grad_()
     >>> y = ifftbr_torch(x)
     >>> v = torch.abs(torch.sum(y**2))
@@ -96,7 +96,7 @@ def ifftbr_torch(x):
     """
     n = x.size(-1)
     assert n&(n-1)==0 # require n is a power of 2
-    m = int(np.log2(n))
+    m = int(np.np.log2(n))
     shape = list(x.shape)
     ndim = x.ndim
     twos = [2]*m

@@ -63,12 +63,12 @@ class LDTransformBayesData(AccumulateData):
 
         self.iter = 0
         self.m = self.m_min
-        self.mvec = np.arange(self.m_min, self.m_max + 1, dtype=int)
+        self.mvec = np.np.arange(self.m_min, self.m_max + 1, dtype=int)
 
         # Initialize various temporary storage between iterations
-        self.xpts_ = array([])  # shifted lattice points
-        self.xun_ = array([])  # un-shifted lattice points
-        self.ftilde_ = array([])  # fourier transformed integrand values
+        self.xpts_ = np.array([])  # shifted lattice points
+        self.xun_ = np.array([])  # un-shifted lattice points
+        self.ftilde_ = np.array([])  # fourier transformed integrand values
         if isinstance(self.discrete_distrib, Lattice):
             # integrand after the periodization transform
             self.ff = lambda x, *args, **kwargs: self.integrand.f(x,
@@ -114,10 +114,10 @@ class LDTransformBayesData(AccumulateData):
 
         # search for optimal shape parameter
         if self.stopping_crit.one_theta == True:
-            lna_MLE = fminbnd(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
+            lna_MLE = fminbnd(lambda lna: self.objective_function(np.exp(lna), xpts, ftilde)[0],
                               x1=lna_range[0], x2=lna_range[1], xtol=1e-2, disp=0)
 
-            aMLE = exp(lna_MLE)
+            aMLE = np.exp(lna_MLE)
             _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
         else:
             if self.stopping_crit.use_gradient == True:
@@ -125,11 +125,11 @@ class LDTransformBayesData(AccumulateData):
                 lna_MLE = 0
             else:
                 # Nelder-Mead Simplex algorithm
-                theta0 = np.ones((xpts.shape[1], 1)) * (0.05)
-                theta0 = np.ones((1, xpts.shape[1])) * (0.05)
-                lna_MLE = fmin(lambda lna: self.objective_function(exp(lna), xpts, ftilde)[0],
+                theta0 = np.np.ones((xpts.shape[1], 1)) * (0.05)
+                theta0 = np.np.ones((1, xpts.shape[1])) * (0.05)
+                lna_MLE = fmin(lambda lna: self.objective_function(np.exp(lna), xpts, ftilde)[0],
                                theta0, xtol=1e-2, disp=False)
-            aMLE = exp(lna_MLE)
+            aMLE = np.exp(lna_MLE)
             # print(n, aMLE)
             _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
 
@@ -143,7 +143,7 @@ class LDTransformBayesData(AccumulateData):
                 DSC = abs((vec_lambda[0] / n) - 1)
 
             # 1-alpha two sided confidence interval
-            err_bd = self.uncert * sqrt(DSC * RKHS_norm / (n - 1))
+            err_bd = self.uncert * np.sqrt(DSC * RKHS_norm / (n - 1))
         elif self.errbd_type == 'GCV':
             # GCV based stopping criterion
             if self.avoid_cancel_error:
@@ -154,14 +154,14 @@ class LDTransformBayesData(AccumulateData):
             temp = vec_lambda
             temp[0] = n + vec_lambda_ring[0]
             mC_inv_trace = sum(1. / temp(temp != 0))
-            err_bd = self.uncert * sqrt(DSC * RKHS_norm / mC_inv_trace)
+            err_bd = self.uncert * np.sqrt(DSC * RKHS_norm / mC_inv_trace)
         else:
             # empirical Bayes
             if self.avoid_cancel_error:
                 DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
             else:
                 DSC = abs(1 - (n / vec_lambda[0]))
-            err_bd = self.uncert * sqrt(DSC * RKHS_norm / n)
+            err_bd = self.uncert * np.sqrt(DSC * RKHS_norm / n)
 
         if self.arb_mean:  # zero mean case
             muhat = ftilde[0] / n
@@ -187,8 +187,8 @@ class LDTransformBayesData(AccumulateData):
     def objective_function(self, theta, xun, ftilde):
         n = len(ftilde)
         fudge = 100 * np.finfo(float).eps
-        # if type(theta) != np.ndarray:
-        #     theta = np.ones((1, xun.shape[1])) * theta
+        # if type(theta) != np.np.ndarray:
+        #     theta = np.np.ones((1, xun.shape[1])) * theta
         [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, theta, self.avoid_cancel_error,
                                                                    self.kernType, self.debug_enable)
         vec_lambda = abs(vec_lambda)
@@ -199,8 +199,8 @@ class LDTransformBayesData(AccumulateData):
         if self.errbd_type == 'GCV':
             # GCV
             temp_gcv = abs(ftilde[vec_lambda > fudge] / (vec_lambda[vec_lambda > fudge])) ** 2
-            loss1 = 2 * log(sum(1. / vec_lambda[vec_lambda > fudge]))
-            loss2 = log(sum(temp_gcv[1:]))
+            loss1 = 2 * np.log(sum(1. / vec_lambda[vec_lambda > fudge]))
+            loss2 = np.log(sum(temp_gcv[1:]))
             # ignore all zero eigenvalues
             loss = loss2 - loss1
 
@@ -218,11 +218,11 @@ class LDTransformBayesData(AccumulateData):
                 temp_1 = (1 / lambda_factor) * sum(temp)
 
             # ignore all zero eigenvalues
-            loss1 = sum(log(abs(lambda_factor * vec_lambda[vec_lambda > fudge])))
+            loss1 = sum(np.log(abs(lambda_factor * vec_lambda[vec_lambda > fudge])))
             if temp_1 != 0:
-                loss2 = n * log(temp_1)
+                loss2 = n * np.log(temp_1)
             else:
-                loss2 = n * log(temp_1 + np.finfo(float).eps)
+                loss2 = n * np.log(temp_1 + np.finfo(float).eps)
             loss = loss1 + loss2
 
         if self.debug_enable:
@@ -246,7 +246,7 @@ class LDTransformBayesData(AccumulateData):
         if iter == 0:
             # In the first iteration compute full FBT
             # xun_ = mod(bsxfun( @ times, (0:1 / n:1-1 / n)',self.gen_vec),1)
-            # xun_ = np.arange(0, 1, 1 / n).reshape((n, 1))
+            # xun_ = np.np.arange(0, 1, 1 / n).reshape((n, 1))
             # xun_ = np.mod((xun_ * self.gen_vec), 1)
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
 
@@ -263,7 +263,7 @@ class LDTransformBayesData(AccumulateData):
             ftilde_ = ftilde_.reshape((n, 1))
         else:
             # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
-            # xunnew = np.arange(1 / n, 1, 2 / n).reshape((n // 2, 1))
+            # xunnew = np.np.arange(1 / n, 1, 2 / n).reshape((n // 2, 1))
             # xunnew = np.mod(xunnew * self.gen_vec, 1)
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
 
@@ -299,20 +299,20 @@ class LDTransformBayesData(AccumulateData):
     @staticmethod
     def merge_pts(xun, xunnew, x, xnew, n, d, distribution):
         if distribution == 'Lattice':
-            temp = np.zeros((n, d))
+            temp = np.np.zeros((n, d))
             temp[0::2, :] = xun
             try:
                 temp[1::2, :] = xunnew
             except Exception as e:
                 raise(e)
             xun = temp
-            temp = np.zeros((n, d))
+            temp = np.np.zeros((n, d))
             temp[0::2, :] = x
             temp[1::2, :] = xnew
             x = temp
         else:
-            x = np.vstack([x, xnew])
-            xun = np.vstack([xun, xunnew])
+            x = np.np.vstack([x, xnew])
+            xun = np.np.vstack([xun, xunnew])
         return xun, x
 
     # Computes modified kernel Km1 = K - 1
@@ -320,8 +320,8 @@ class LDTransformBayesData(AccumulateData):
     @staticmethod
     def kernel_t(aconst, Bern):
         d = np.size(Bern, 1)
-        if type(aconst) != np.ndarray:
-            theta = np.ones((d, 1)) * aconst
+        if type(aconst) != np.np.ndarray:
+            theta = np.np.ones((d, 1)) * aconst
         else:
             theta = aconst  # theta varies per dimension
 

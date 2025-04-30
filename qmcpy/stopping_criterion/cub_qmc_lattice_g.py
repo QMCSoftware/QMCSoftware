@@ -3,7 +3,7 @@ from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
 from ..util import ParameterError
-from numpy import *
+import numpy as np
 
 
 class CubQMCLatticeG(_CubQMCLDG):
@@ -47,14 +47,14 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> sc = CubQMCLatticeG(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.18953167, 0.96060687])
-    >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
-    >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
-    >>> true_value = array([sol3neg1,sol31])
+    np.array([1.18953167, 0.96060687])
+    >>> sol3neg1 = -pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-pi/24
+    >>> true_value = np.array([sol3neg1,sol31])
     >>> assert (abs(true_value-solution)<abs_tol).all()
     >>> cf = CustomFun(
     ...     true_measure = Uniform(Lattice(6,seed=7)),
-    ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
+    ...     g = lambda x,compute_flags=None: (2*np.arange(1,7)*x).reshape(-1,2,3),
     ...     dimension_indv = (2,3))
     >>> sol,data = CubQMCLatticeG(cf,abs_tol=1e-6).integrate()
     >>> data
@@ -126,8 +126,8 @@ class CubQMCLatticeG(_CubQMCLDG):
         """
         Args:
             integrand (Integrand): an instance of Integrand
-            abs_tol (ndarray): absolute error tolerance
-            rel_tol (ndarray): relative error tolerance
+            abs_tol (np.ndarray): absolute error tolerance
+            rel_tol (np.ndarray): relative error tolerance
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
             fudge (function): positive function multiplying the finite
@@ -143,7 +143,7 @@ class CubQMCLatticeG(_CubQMCLDG):
             control_variate_means = [],
             update_beta=False,
             ptransform = ptransform,
-            coefv = lambda nl: exp(-2*pi*1j*arange(nl)/(2*nl)), 
+            coefv = lambda nl: np.exp(-2*pi*1j*np.arange(nl)/(2*nl)), 
             allowed_levels = ['single'],
             allowed_distribs = [Lattice],
             cast_complex = True,

@@ -5,7 +5,7 @@ from ..discrete_distribution._discrete_distribution import IID
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
-from numpy import *
+import numpy as np
 from scipy.stats import norm
 from time import time
 import warnings
@@ -141,12 +141,12 @@ class CubMCML(StoppingCriterion):
             # if (almost) converged, estimate remaining error and decide 
             # whether a new level is required
             if (self.data.diff_n_level > 0.01*self.data.n_level).sum() == 0:
-                range_ = arange(minimum(2.,self.data.levels-1)+1)
+                range_ = np.arange(minimum(2.,self.data.levels-1)+1)
                 idx = (self.data.levels-range_).astype(int)
                 rem = (self.data.mean_level[idx] / 
                         2.**(range_*self.data.alpha)).max() / (2.**self.data.alpha - 1)
                 # rem = ml(l+1) / (2^alpha - 1)
-                if rem > sqrt(self.theta)*self.rmse_tol:
+                if rem > np.sqrt(self.theta)*self.rmse_tol:
                     if self.data.levels == self.levels_max:
                         warnings.warn(
                             'Failed to achieve weak convergence. levels == levels_max.',
@@ -162,8 +162,8 @@ class CubMCML(StoppingCriterion):
         return self.data.solution,self.data
     
     def _get_next_samples(self):
-        ns = ceil( sqrt(self.data.var_level/self.data.cost_per_sample) * 
-                sqrt(self.data.var_level*self.data.cost_per_sample).sum() / 
+        ns = np.ceil( np.sqrt(self.data.var_level/self.data.cost_per_sample) * 
+                np.sqrt(self.data.var_level*self.data.cost_per_sample).sum() / 
                 ((1-self.theta)*self.rmse_tol**2) )
         return ns
     

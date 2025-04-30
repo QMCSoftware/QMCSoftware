@@ -2,7 +2,7 @@ from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 import qmctoolscl
 from os.path import dirname, abspath, isfile
-from numpy import *
+import numpy as np
 from numpy.lib.npyio import DataSource
 import warnings
 
@@ -213,7 +213,7 @@ class DigitalNetB2(LD):
         _verbose=False, replications=1, qmctoolscl_kwargs={"backend":"c"}):
         r"""
         Args:
-            dimension (int or :class:`numpy.ndarray`): dimension of the generator. 
+            dimension (int or :class:`numpy.np.ndarray`): dimension of the generator. 
                 
                 - If an int is passed in, use sequence dimensions [0,...,dimension-1].
                 - If an ndarry is passed in, use these dimension indices in the sequence. 
@@ -227,10 +227,10 @@ class DigitalNetB2(LD):
 
             graycode (bool): indicator to use graycode ordering (True) or natural ordering (False)
             seed (list): int seed of list of seeds, one for each dimension.
-            generating_matrices (:class:`numpy.ndarray` or str): Specify generating matrices. There are a number of optional input types. 
+            generating_matrices (:class:`numpy.np.ndarray` or str): Specify generating matrices. There are a number of optional input types. 
                 
                 - A string with either a relative path from `LDData repository <https://github.com/QMCSoftware/LDData>`__ (e.g., "dnet/mps.nx_s5_alpha3_m32.txt") or a NumPy file with format "name.d_max.t_max.m_max.{msb,lsb}.npy" (e.g., "gen_mat.21201.32.32.msb.npy")
-                - An ndarray of integers with shape (`d_max`, `m_max)` where each int has `t_max` bits.
+                - An np.ndarray of integers with shape (`d_max`, `m_max)` where each int has `t_max` bits.
 
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix, aka: number of rows in a generating matrix with ints expanded into columns
@@ -253,7 +253,7 @@ class DigitalNetB2(LD):
         self.order = "GRAY" if self.graycode else "NATURAL"
         self.replications_gm = 1
         # generating matrices 
-        if isinstance(generating_matrices,ndarray):
+        if isinstance(generating_matrices,np.ndarray):
             if generating_matrices.ndim==2:
                 self.z_og = generating_matrices[None,:,:]
             else:
@@ -261,7 +261,7 @@ class DigitalNetB2(LD):
                 self.z_og = generating_matrices
                 self.replications_gm = len(self.z_og)
             if d_max is None or t_max is None or m_max is None or msb is None:
-                raise ParameterError("d_max, t_max, m_max, and msb must be supplied when generating_matrices is a ndarray")
+                raise ParameterError("d_max, t_max, m_max, and msb must be supplied when generating_matrices is a np.ndarray")
             self.d_max = d_max
             self.t_max = t_max
             self.m_max = m_max
@@ -289,19 +289,19 @@ class DigitalNetB2(LD):
                 datafile.close()
                 assert int(contents[0])==2, "DigitalNetB2 requires base=2 " # base 2
                 self.d_max = int(contents[1])
-                self.m_max = int(log2(int(contents[2])))
+                self.m_max = int(np.log2(int(contents[2])))
                 self.t_max = int(contents[3])
                 compat_shift = self.t_max-64 if self.t_max>=64 else 0
                 if compat_shift>0: warnings.warn("Truncating ints in generating matrix to have 64 bits.")
-                self.z_og = array([[int(v)>>compat_shift for v in line.split(' ')] for line in contents[4:]],dtype=uint64)[None,:]
+                self.z_og = np.array([[int(v)>>compat_shift for v in line.split(' ')] for line in contents[4:]],dtype=np.uint64)[None,:]
             elif isfile(root+generating_matrices):
-                self.z_og = load(root+generating_matrices).astype(uint64)[None,:]
+                self.z_og = np.load(root+generating_matrices).astype(np.uint64)[None,:]
                 self.d_max = int(parts[-5])
                 self.t_max = int(parts[-4])
                 self.m_max = int(parts[-3])
                 self.msb = bool(parts[-2].lower()=='msb')
             elif isfile(generating_matrices):
-                self.z_og = load(generating_matrices).astype(uint64)[None,:]
+                self.z_og = np.load(generating_matrices).astype(np.uint64)[None,:]
                 self.d_max = int(parts[-5])
                 self.t_max = int(parts[-4])
                 self.m_max = int(parts[-3])
@@ -312,7 +312,7 @@ class DigitalNetB2(LD):
             raise ParameterError("invalid input for generating_matrices, see documentation and doctests.")
         super(DigitalNetB2,self).__init__(dimension,seed)
         if not self.msb:
-            qmctoolscl.dnb2_gmat_lsb_to_msb(uint64(self.replications_gm),uint64(self.d),uint64(self.m_max),tile(uint64(self.t_max),self.replications_gm),self.z_og,self.z_og,**qmctoolscl_kwargs)
+            qmctoolscl.dnb2_gmat_lsb_to_msb(np.uint64(self.replications_gm),np.uint64(self.d),np.uint64(self.m_max),np.tile(np.uint64(self.t_max),self.replications_gm),self.z_og,self.z_og,**qmctoolscl_kwargs)
         # randomizations
         self.t_lms = self.t_max if self.t_max>t_lms else t_lms
         assert self.t_max<=64 and self.t_lms<=64, "require t_max <= t_lms <= 64"
@@ -326,26 +326,26 @@ class DigitalNetB2(LD):
         assert self.randomize in ["LMS_DS","LMS","DS","NUS","FALSE"]
         self.z = self.z_og[:,self.dvec].copy()
         if self.alpha>1 and self.randomize in ["DS","FALSE"]:
-            assert (self.dvec==arange(self.d)).all()
+            assert (self.dvec==np.arange(self.d)).all()
             dtalpha = self.alpha*self.d
-            z_ho = empty((self.replications_gm,self.d,self.m_max),dtype=uint64)
-            qmctoolscl.dnb2_interlace(uint64(self.replications_gm),uint64(self.d),uint64(self.m_max),uint64(dtalpha),uint64(self.t_max),uint64(self.t_lms),uint64(self.alpha),self.z_og[:,:dtalpha].copy(),z_ho,**qmctoolscl_kwargs)
+            z_ho = np.empty((self.replications_gm,self.d,self.m_max),dtype=np.uint64)
+            qmctoolscl.dnb2_interlace(np.uint64(self.replications_gm),np.uint64(self.d),np.uint64(self.m_max),np.uint64(dtalpha),np.uint64(self.t_max),np.uint64(self.t_lms),np.uint64(self.alpha),self.z_og[:,:dtalpha].copy(),z_ho,**qmctoolscl_kwargs)
             self.z = z_ho
         if "LMS" in self.randomize:
             if self.alpha==1:
-                z_lms = empty((replications,self.d,self.m_max),dtype=uint64)
-                S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,uint64(replications),uint64(self.d),uint64(self.t_max),uint64(self.t_lms),uint64(self._verbose))
-                qmctoolscl.dnb2_linear_matrix_scramble(uint64(replications),uint64(self.d),uint64(self.m_max),uint64(self.replications_gm),uint64(self.t_lms),S,self.z,z_lms,**qmctoolscl_kwargs)
+                z_lms = np.empty((replications,self.d,self.m_max),dtype=np.uint64)
+                S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,np.uint64(replications),np.uint64(self.d),np.uint64(self.t_max),np.uint64(self.t_lms),np.uint64(self._verbose))
+                qmctoolscl.dnb2_linear_matrix_scramble(np.uint64(replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.replications_gm),np.uint64(self.t_lms),S,self.z,z_lms,**qmctoolscl_kwargs)
                 self.z = z_lms 
                 self.replications_gm = replications
             else:
-                assert (self.dvec==arange(self.d)).all()
+                assert (self.dvec==np.arange(self.d)).all()
                 dtalpha = self.alpha*self.d
-                z_lms = empty((replications,dtalpha,self.m_max),dtype=uint64)
-                S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,uint64(replications),uint64(dtalpha),uint64(self.t_max),uint64(self.t_lms),uint64(self._verbose))
-                qmctoolscl.dnb2_linear_matrix_scramble(uint64(replications),uint64(dtalpha),uint64(self.m_max),uint64(self.replications_gm),uint64(self.t_lms),S,self.z_og[:,:dtalpha].copy(),z_lms,**qmctoolscl_kwargs)
-                z_lms_ho = empty((replications,self.d,self.m_max),dtype=uint64)
-                qmctoolscl.dnb2_interlace(uint64(replications),uint64(self.d),uint64(self.m_max),uint64(dtalpha),uint64(self.t_lms),uint64(self.t_lms),uint64(self.alpha),z_lms,z_lms_ho,**qmctoolscl_kwargs)
+                z_lms = np.empty((replications,dtalpha,self.m_max),dtype=np.uint64)
+                S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,np.uint64(replications),np.uint64(dtalpha),np.uint64(self.t_max),np.uint64(self.t_lms),np.uint64(self._verbose))
+                qmctoolscl.dnb2_linear_matrix_scramble(np.uint64(replications),np.uint64(dtalpha),np.uint64(self.m_max),np.uint64(self.replications_gm),np.uint64(self.t_lms),S,self.z_og[:,:dtalpha].copy(),z_lms,**qmctoolscl_kwargs)
+                z_lms_ho = np.empty((replications,self.d,self.m_max),dtype=np.uint64)
+                qmctoolscl.dnb2_interlace(np.uint64(replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(dtalpha),np.uint64(self.t_lms),np.uint64(self.t_lms),np.uint64(self.alpha),z_lms,z_lms_ho,**qmctoolscl_kwargs)
                 self.z = z_lms_ho
                 self.replications_gm = replications
         if "DS" in self.randomize:
@@ -353,14 +353,14 @@ class DigitalNetB2(LD):
         if "NUS" in self.randomize:
             if alpha==1:
                 new_seeds = self._base_seed.spawn(replications*self.d)
-                self.rngs = array([random.Generator(random.SFC64(new_seeds[j])) for j in range(replications*self.d)]).reshape(replications,self.d)
-                self.root_nodes = array([qmctoolscl.NUSNode_dnb2() for i in range(replications*self.d)]).reshape(replications,self.d)
+                self.rngs = np.array([np.random.Generator(np.random.SFC64(new_seeds[j])) for j in range(replications*self.d)]).reshape(replications,self.d)
+                self.root_nodes = np.array([qmctoolscl.NUSNode_dnb2() for i in range(replications*self.d)]).reshape(replications,self.d)
             else:
-                assert (self.dvec==arange(self.d)).all()
+                assert (self.dvec==np.arange(self.d)).all()
                 self.dtalpha = self.alpha*self.d
                 new_seeds = self._base_seed.spawn(replications*self.dtalpha)
-                self.rngs = array([random.Generator(random.SFC64(new_seeds[j])) for j in range(replications*self.dtalpha)]).reshape(replications,self.dtalpha)
-                self.root_nodes = array([qmctoolscl.NUSNode_dnb2() for i in range(replications*self.dtalpha)]).reshape(replications,self.dtalpha)
+                self.rngs = np.array([np.random.Generator(np.random.SFC64(new_seeds[j])) for j in range(replications*self.dtalpha)]).reshape(replications,self.dtalpha)
+                self.root_nodes = np.array([qmctoolscl.NUSNode_dnb2() for i in range(replications*self.dtalpha)]).reshape(replications,self.dtalpha)
                 self.z = self.z_og[:,:self.dtalpha].copy()
         if self.replications_gm>1: assert replications==self.replications_gm, "if replications_gm>1 require replications = replications_gm"
         self.replications = replications
@@ -380,7 +380,7 @@ class DigitalNetB2(LD):
 
 
         Returns:
-            ndarray: replications x (n_max-n_min) x d (dimension) array of samples
+            np.ndarray: replications x (n_max-n_min) x d (dimension) array of samples
         """
         if n:
             n_min = 0
@@ -389,54 +389,54 @@ class DigitalNetB2(LD):
             warnings.warn("Non-randomized DigitalNetB2 sequence includes the origin",ParameterWarning)
         if n_max > 2**self.m_max:
             raise ParameterError('DigitalNetB2 generating matrices support up to %d samples.'%(2**self.m_max))
-        r_x = uint64(self.replications_gm) 
-        n = uint64(n_max-n_min)
-        d = uint64(self.dtalpha) if self.randomize=="NUS" and self.alpha>1 else uint64(self.d)
-        n_start = uint64(n_min)
-        mmax = uint64(self.m_max)
-        xb = empty((r_x,n,d),dtype=uint64)
+        r_x = np.uint64(self.replications_gm) 
+        n = np.uint64(n_max-n_min)
+        d = np.uint64(self.dtalpha) if self.randomize=="NUS" and self.alpha>1 else np.uint64(self.d)
+        n_start = np.uint64(n_min)
+        mmax = np.uint64(self.m_max)
+        xb = np.empty((r_x,n,d),dtype=np.uint64)
         if self.graycode:
             _ = qmctoolscl.dnb2_gen_gray(r_x,n,d,n_start,mmax,self.z,xb,**qmctoolscl_gen_kwargs)
         else: 
-            assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "DigitalNetB2 in natural order requires n_min and n_max be 0 or powers of 2"
+            assert (n_min==0 or np.log2(n_min)%1==0) and (n_max==0 or np.log2(n_max)%1==0), "DigitalNetB2 in natural order requires n_min and n_max be 0 or powers of 2"
             _ = qmctoolscl.dnb2_gen_natural(r_x,n,d,n_start,mmax,self.z,xb,**qmctoolscl_gen_kwargs)
         if return_unrandomized or self.randomize in ["FALSE","LMS"]:
-            tmaxes_new = tile(uint64(self.t_max if self.randomize=="FALSE" and self.alpha==1 else self.t_lms),int(r_x))
+            tmaxes_new = np.tile(np.uint64(self.t_max if self.randomize=="FALSE" and self.alpha==1 else self.t_lms),int(r_x))
             if not return_binary:
-                x = empty((r_x,n,d),dtype=float64)
+                x = np.empty((r_x,n,d),dtype=np.float64)
                 _ = qmctoolscl.dnb2_integer_to_float(r_x,n,d,tmaxes_new,xb,x,**qmctoolscl_convert_kwargs)
             if r_x==1: 
                 if not return_binary:
                     x = x[0]
                 else:
                     xb = xb[0]
-        r = uint64(self.replications)
+        r = np.uint64(self.replications)
         if "NUS" in self.randomize:
             assert return_unrandomized==False
             if self.alpha==1:
-                xrb = empty((r,n,d),dtype=uint64)
-                tmax = uint64(self.t_max)
-                tmax_new = uint64(self.t_lms)
+                xrb = np.empty((r,n,d),dtype=np.uint64)
+                tmax = np.uint64(self.t_max)
+                tmax_new = np.uint64(self.t_lms)
                 _ = qmctoolscl.dnb2_nested_uniform_scramble(r,n,d,r_x,tmax,tmax_new,self.rngs,self.root_nodes,xb,xrb)
                 if not return_binary:
-                    tmaxes_new = tile(uint64(self.t_lms),int(r))
-                    xr = empty((r,n,d),dtype=float64)
+                    tmaxes_new = np.tile(np.uint64(self.t_lms),int(r))
+                    xr = np.empty((r,n,d),dtype=np.float64)
                     _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr,**qmctoolscl_convert_kwargs)
             else:
-                d = uint64(self.d)
-                dtalpha = uint64(self.dtalpha)
-                alpha = uint64(self.alpha)
-                xrb_lo = empty((r,n,self.dtalpha),dtype=uint64)
-                tmax = uint64(self.t_max)
-                tmax_new = uint64(self.t_lms)
+                d = np.uint64(self.d)
+                dtalpha = np.uint64(self.dtalpha)
+                alpha = np.uint64(self.alpha)
+                xrb_lo = np.empty((r,n,self.dtalpha),dtype=np.uint64)
+                tmax = np.uint64(self.t_max)
+                tmax_new = np.uint64(self.t_lms)
                 _ = qmctoolscl.dnb2_nested_uniform_scramble(r,n,dtalpha,r_x,tmax,tmax_new,self.rngs,self.root_nodes,xb,xrb_lo)
-                xrb_t = empty((r,d,n),dtype=uint64)
-                xrb_lo_t = moveaxis(xrb_lo,[1,2],[2,1]).copy() 
+                xrb_t = np.empty((r,d,n),dtype=np.uint64)
+                xrb_lo_t = np.moveaxis(xrb_lo,[1,2],[2,1]).copy() 
                 qmctoolscl.dnb2_interlace(r,d,n,dtalpha,tmax_new,tmax_new,alpha,xrb_lo_t,xrb_t)
-                xrb = moveaxis(xrb_t,[1,2],[2,1]).copy()
+                xrb = np.moveaxis(xrb_t,[1,2],[2,1]).copy()
                 if not return_binary:
-                    tmaxes_new = tile(uint64(self.t_lms),int(r))
-                    xr = zeros((r,n,d),dtype=float64)
+                    tmaxes_new = np.tile(np.uint64(self.t_lms),int(r))
+                    xr = np.zeros((r,n,d),dtype=np.float64)
                     qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr)
             if r==1:
                 if not return_binary:
@@ -444,12 +444,12 @@ class DigitalNetB2(LD):
                 else:
                     xrb = xrb[0]
         if "DS" in self.randomize:
-            xrb = empty((r,n,d),dtype=uint64)
-            lshifts = tile(uint64((self.t_lms-self.t_max) if "LMS" not in self.randomize else 0),int(r))
+            xrb = np.empty((r,n,d),dtype=np.uint64)
+            lshifts = np.tile(np.uint64((self.t_lms-self.t_max) if "LMS" not in self.randomize else 0),int(r))
             _ = qmctoolscl.dnb2_digital_shift(r,n,d,r_x,lshifts,xb,self.rshift,xrb,**qmctoolscl_rand_kwargs)
             if not return_binary:
-                tmaxes_new = tile(uint64(self.t_lms),int(r))
-                xr = empty((r,n,d),dtype=float64)
+                tmaxes_new = np.tile(np.uint64(self.t_lms),int(r))
+                xr = np.empty((r,n,d),dtype=np.float64)
                 _ = qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xrb,xr,**qmctoolscl_convert_kwargs)
             if r==1:
                 if not return_binary:
@@ -473,7 +473,7 @@ class DigitalNetB2(LD):
     
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[0], dtype=float) 
+        return np.ones(x.shape[0], dtype=float) 
             
     def _spawn(self, child_seed, dimension):
         return DigitalNetB2(

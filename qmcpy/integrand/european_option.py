@@ -2,7 +2,7 @@ from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
-from numpy import *
+import numpy as np
 from scipy.stats import norm 
 
 
@@ -60,16 +60,16 @@ class EuropeanOption(Integrand):
 
     def g(self, t):
         """ See abstract method. """
-        self.s = self.start_price * exp(
+        self.s = self.start_price * np.exp(
             (self.interest_rate - self.volatility ** 2 / 2) *
             self.true_measure.time_vec + self.volatility * t)
-        for xx,yy in zip(*where(self.s<0)): # if stock becomes <=0, 0 out rest of path
+        for xx,yy in zip(*np.where(self.s<0)): # if stock becomes <=0, 0 out rest of path
             self.s[xx,yy:] = 0
         if self.call_put == 'call':
             y_raw = maximum(self.s[:,-1] - self.strike_price, 0)
         else: # put
             y_raw = maximum(self.strike_price - self.s[:,-1], 0)
-        y_adj = y_raw * exp(-self.interest_rate * self.t_final)
+        y_adj = y_raw * np.exp(-self.interest_rate * self.t_final)
         return y_adj
     
     def get_exact_value(self):
@@ -79,18 +79,18 @@ class EuropeanOption(Integrand):
         Return:
             float: fair price
         """
-        denom = self.volatility * sqrt(self.t_final)
-        decay = self.strike_price * exp(-self.interest_rate * self.t_final)
+        denom = self.volatility * np.sqrt(self.t_final)
+        decay = self.strike_price * np.exp(-self.interest_rate * self.t_final)
         if self.call_put == 'call':
-            term1 = log(self.start_price / self.strike_price) + \
+            term1 = np.log(self.start_price / self.strike_price) + \
                     (self.interest_rate + self.volatility**2/2) * self.t_final
-            term2 = log(self.start_price / self.strike_price) + \
+            term2 = np.log(self.start_price / self.strike_price) + \
                     (self.interest_rate - self.volatility**2/2) * self.t_final
             fp = self.start_price * norm.cdf(term1/denom) - decay * norm.cdf(term2/denom)
         elif self.call_put == 'put':
-            term1 = log(self.strike_price / self.start_price) - \
+            term1 = np.log(self.strike_price / self.start_price) - \
                     (self.interest_rate - self.volatility**2/2) * self.t_final
-            term2 = log(self.strike_price / self.start_price) - \
+            term2 = np.log(self.strike_price / self.start_price) - \
                     (self.interest_rate + self.volatility**2/2) * self.t_final
             fp = decay * norm.cdf(term1/denom) - self.start_price * norm.cdf(term2/denom)
         return fp

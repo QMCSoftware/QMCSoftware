@@ -1,7 +1,7 @@
 from ._integrand import Integrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian
-from numpy import *
+import numpy as np
 from scipy.special import gamma
 
 
@@ -50,7 +50,7 @@ class Keister(Integrand):
     
     def g(self, t):
         d = t.shape[1]
-        norm = sqrt((t**2).sum(1))
+        norm = np.sqrt((t**2).sum(1))
         k = pi**(d/2)*cos(norm)
         return k
     
@@ -64,9 +64,9 @@ class Keister(Integrand):
         :param d:
         :return: true_integral
         """
-        cosinteg = zeros(shape=(d))
-        cosinteg[0] = sqrt(pi) / (2 * exp(1 / 4))
-        sininteg = zeros(shape=(d))
+        cosinteg = np.zeros(shape=(d))
+        cosinteg[0] = np.sqrt(pi) / (2 * np.exp(1 / 4))
+        sininteg = np.zeros(shape=(d))
         sininteg[0] = 4.244363835020225e-01
         cosinteg[1] = (1 - sininteg[0]) / 2
         sininteg[1] = cosinteg[0] / 2

@@ -2,7 +2,7 @@ from ._integrand import Integrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
 from ..util import ParameterError
-from numpy import *
+import numpy as np
 
 class Genz(Integrand):
     """
@@ -42,9 +42,9 @@ class Genz(Integrand):
         self.sampler = sampler
         self.true_measure = Uniform(self.sampler)
         self.d = self.true_measure.d
-        if self.kind_coeff==1: self.c = (arange(1,self.d+1)-.5)/self.d
-        elif self.kind_coeff==2: self.c = 1/arange(1,self.d+1)
-        elif self.kind_coeff==3: self.c = exp(arange(1,self.d+1)*log(10**(-8))/self.d)
+        if self.kind_coeff==1: self.c = (np.arange(1,self.d+1)-.5)/self.d
+        elif self.kind_coeff==2: self.c = 1/np.arange(1,self.d+1)
+        elif self.kind_coeff==3: self.c = np.exp(np.arange(1,self.d+1)*np.log(10**(-8))/self.d)
         if self.kind_func=='oscillatory':
             self.g = self.g_oscillatory
             self.c = 4.5*self.c/self.c.sum()

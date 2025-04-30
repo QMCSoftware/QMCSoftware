@@ -1,6 +1,6 @@
 from ..integrand._integrand import Integrand
 from ..util import DistributionCompatibilityError, ParameterError, MethodImplementationError, _univ_repr
-from numpy import *
+import numpy as np
 
 class StoppingCriterion(object):
     """ Stopping Criterion abstract class. DO NOT INSTANTIATE. """
@@ -55,14 +55,14 @@ class StoppingCriterion(object):
         Compute individual uncertainty levels required to achieve combined uncertainty levels. 
 
         Args:
-            alphas_comb (ndarray): desired uncertainty levels on combined solutions. 
+            alphas_comb (np.ndarray): desired uncertainty levels on combined solutions. 
         
         Return:
-            ndarray: uncertainty levels on individual solutions"""
-        alphas_indv = tile(1,self.integrand.d_indv)
+            np.ndarray: uncertainty levels on individual solutions"""
+        alphas_indv = np.tile(1,self.integrand.d_indv)
         identity_dependency = True
         for k in ndindex(self.integrand.d_comb):
-            comb_flags = tile(True,self.integrand.d_comb)
+            comb_flags = np.tile(True,self.integrand.d_comb)
             comb_flags[k] = False
             flags_indv = self.integrand.dependency(comb_flags)
             if self.integrand.d_indv!=self.integrand.d_comb or (flags_indv!=comb_flags).any(): identity_dependency=False

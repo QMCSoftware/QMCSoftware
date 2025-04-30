@@ -6,7 +6,7 @@ from ..discrete_distribution._discrete_distribution import LD
 from ..true_measure import Gaussian,Uniform
 from ..integrand import Keister,BoxIntegral,CustomFun
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
-from numpy import *
+import numpy as np
 from scipy.stats import t
 from time import time
 import warnings
@@ -20,7 +20,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.38020871])
+    np.array([1.38020871])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
@@ -57,7 +57,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.1898502 , 0.96066509])
+    np.array([1.1898502 , 0.96066509])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [1.19  0.961]
@@ -89,13 +89,13 @@ class CubQMCCLT(StoppingCriterion):
         gen_vec         [     1 182667 213731]
         entropy         7
         spawn_key       ()
-    >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
-    >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
-    >>> true_value = array([sol3neg1,sol31])
+    >>> sol3neg1 = -pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-pi/24
+    >>> true_value = np.array([sol3neg1,sol31])
     >>> assert (abs(true_value-solution)<abs_tol).all()
     >>> cf = CustomFun(
     ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
-    ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
+    ...     g = lambda x,compute_flags=None: (2*np.arange(1,7)*x).reshape(-1,2,3),
     ...     dimension_indv = (2,3))
     >>> sol,data = CubQMCCLT(cf,abs_tol=1e-4).integrate()
     >>> data
@@ -142,9 +142,9 @@ class CubQMCCLT(StoppingCriterion):
         Args:
             integrand (Integrand): an instance of Integrand
             inflate (float): inflation factor when estimating variance
-            alpha (ndarray): significance level for confidence interval
-            abs_tol (ndarray): absolute error tolerance
-            rel_tol (ndarray): relative error tolerance
+            alpha (np.ndarray): significance level for confidence interval
+            abs_tol (np.ndarray): absolute error tolerance
+            rel_tol (np.ndarray): relative error tolerance
             n_max (int): maximum number of samples
             replications (int): number of replications
             error_fun: function taking in the approximate solution vector, 
@@ -153,7 +153,7 @@ class CubQMCCLT(StoppingCriterion):
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max','replications']
         # Input Checks
-        if log2(n_init) % 1 != 0:
+        if np.log2(n_init) % 1 != 0:
             warning_s = ' n_init must be a power of 2. Using n_init = 32'
             warnings.warn(warning_s, ParameterWarning)
             n_init = 32
@@ -175,46 +175,46 @@ class CubQMCCLT(StoppingCriterion):
         super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[LD], allow_vectorized_integrals=True)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
-        self.alphas_indv,identity_dependency = self._compute_indv_alphas(full(self.integrand.d_comb,self.alpha))
+        self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
         self.t_star = -t.ppf(self.alphas_indv/2,df=self.replications-1)
          
     def integrate(self):
         """ See abstract method. """
         t_start = time()
-        self.datum = empty(self.d_indv,dtype=object)
+        self.datum = np.empty(self.d_indv,dtype=object)
         for j in ndindex(self.d_indv):
             self.datum[j] = MeanVarDataRep(self.t_star[j],self.inflate,self.replications)
         self.data = MeanVarDataRep.__new__(MeanVarDataRep)
-        self.data.flags_indv = tile(False,self.d_indv)
-        self.data.compute_flags = tile(True,self.d_indv)
+        self.data.flags_indv = np.tile(False,self.d_indv)
+        self.data.compute_flags = np.tile(True,self.d_indv)
         self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
-        self.data.n_rep = tile(self.n_init,self.d_indv)
+        self.data.n_rep = np.tile(self.n_init,self.d_indv)
         self.data.n_min_rep = 0
-        self.data.indv_bound_low = tile(-inf,self.d_indv)
-        self.data.indv_bound_high = tile(inf,self.d_indv)
-        self.data.solution_indv = tile(nan,self.d_indv)
+        self.data.indv_bound_low = np.tile(-np.inf,self.d_indv)
+        self.data.indv_bound_high = np.tile(np.inf,self.d_indv)
+        self.data.solution_indv = np.tile(nan,self.d_indv)
         self.data.solution = nan
-        self.data.xfull = empty((0,self.d))
-        self.data.yfull = empty((0,)+self.d_indv)
+        self.data.xfull = np.empty((0,self.d))
+        self.data.yfull = np.empty((0,)+self.d_indv)
         while True:
             n_min = self.data.n_min_rep
             n_max = int(self.data.n_rep.max())
             n = int(n_max-n_min)
-            xnext = vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
+            xnext = np.vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
             ynext = self.integrand.f(xnext,compute_flags=self.data.compute_flags)
             for j in ndindex(self.d_indv):
                 if self.data.flags_indv[j]: continue
                 yj = ynext[(slice(None),)+j].reshape((n,self.replications),order='f')
                 self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j] = self.datum[j].update_data(yj)
-            self.data.xfull = vstack((self.data.xfull,xnext))
-            self.data.yfull = vstack((self.data.yfull,ynext))
+            self.data.xfull = np.vstack((self.data.xfull,xnext))
+            self.data.yfull = np.vstack((self.data.yfull,ynext))
             self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
             self.abs_tols,self.rel_tols = full_like(self.data.comb_bound_low,self.abs_tol),full_like(self.data.comb_bound_low,self.rel_tol)
             fidxs = isfinite(self.data.comb_bound_low)&isfinite(self.data.comb_bound_high)
             slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = tile(nan,self.data.comb_bound_low.shape)
+            self.data.solution = np.tile(nan,self.data.comb_bound_low.shape)
             self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.comb_flags = tile(False,self.data.comb_bound_low.shape)
+            self.data.comb_flags = np.tile(False,self.data.comb_bound_low.shape)
             self.data.comb_flags[fidxs] = (shigh-slow) <= (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
             self.data.compute_flags = ~self.data.flags_indv

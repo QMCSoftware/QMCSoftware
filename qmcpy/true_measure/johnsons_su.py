@@ -1,7 +1,7 @@
 from ._true_measure import TrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
-from numpy import *
+import numpy as np
 from scipy.stats import norm
 
 
@@ -29,31 +29,31 @@ class JohnsonsSU(TrueMeasure):
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
-            gamma (ndarray): gamma
-            xi (ndarray): xi
-            delta (ndarray): delta > 0
-            lam (ndarray): lambda > 0
+            gamma (np.ndarray): gamma
+            xi (np.ndarray): xi
+            delta (np.ndarray): delta > 0
+            lam (np.ndarray): lambda > 0
         """
         self.parameters = ['gamma', 'xi', 'delta', 'lam']
-        self.domain = array([[0,1]])
-        self.range = array([[-inf,inf]])
+        self.domain = np.array([[0,1]])
+        self.range = np.array([[-np.inf,np.inf]])
         self._parse_sampler(sampler)
         self.gamma = gamma
         self.xi = xi
         self.delta = delta
         self.lam = lam
-        if isscalar(self.gamma):
-            gamma = tile(self.gamma,self.d)
-        if isscalar(self.xi):
-            xi = tile(self.xi,self.d)
-        if isscalar(self.delta):
-            delta = tile(self.delta,self.d)
-        if isscalar(self.lam):
-            lam = tile(self.lam,self.d)
-        self._gamma = array(gamma)
-        self._xi = array(xi)
-        self._delta = array(delta)
-        self._lam = array(lam)
+        if np.isscalar(self.gamma):
+            gamma = np.tile(self.gamma,self.d)
+        if np.isscalar(self.xi):
+            xi = np.tile(self.xi,self.d)
+        if np.isscalar(self.delta):
+            delta = np.tile(self.delta,self.d)
+        if np.isscalar(self.lam):
+            lam = np.tile(self.lam,self.d)
+        self._gamma = np.array(gamma)
+        self._xi = np.array(xi)
+        self._delta = np.array(delta)
+        self._lam = np.array(lam)
         if len(self._gamma)!=self.d or len(self._xi)!=self.d or len(self._delta)!=self.d or len(self._lam)!=self.d:
             raise DimensionError("all Johnson's S_U parameters be scalar or have length equal to dimension.")
         if (self._delta<=0).any() or (self._lam<=0).any():
@@ -61,12 +61,12 @@ class JohnsonsSU(TrueMeasure):
         super(JohnsonsSU,self).__init__() 
 
     def _transform(self, x):
-        return self._lam*sinh((norm.ppf(x)-self._gamma)/self._delta)+self._xi
+        return self._lam*np.sinh((norm.ppf(x)-self._gamma)/self._delta)+self._xi
     
     def _weight(self, x):
         term1 = (x-self._xi)/self._lam
-        term2 = self._delta/(self._lam*sqrt(2*pi)) * 1/sqrt(1+term1**2)
-        term3 = exp(-1/2*(self._gamma+self._delta*arcsinh(term1))**2)
+        term2 = self._delta/(self._lam*np.sqrt(2*pi)) * 1/np.sqrt(1+term1**2)
+        term3 = np.exp(-1/2*(self._gamma+self._delta*arcsinh(term1))**2)
         return prod( term2*term3, 1)
     
     def _spawn(self, sampler, dimension):

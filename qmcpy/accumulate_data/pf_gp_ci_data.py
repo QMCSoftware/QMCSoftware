@@ -1,6 +1,6 @@
 from ._accumulate_data import AccumulateData
 from ..util import ExactGPyTorchRegressionModel
-from numpy import *
+import numpy as np
 from scipy.stats import norm
 import warnings
 import gpytorch 
@@ -8,10 +8,10 @@ import torch
 
 def _get_phi(gp, x):
     yhat,yhatstd = gp.predict(x)
-    with errstate(all='ignore'): z = yhat/yhatstd
+    with np.errstateall='ignore'): z = yhat/yhatstd
     return norm.cdf(z)
 def _error_udens_from_phi(phi):
-    return 2*minimum(1-phi,phi)
+    return 2*min(1-phi,phi)
 def _error_udens(gp, x):
     return _error_udens_from_phi(_get_phi(gp,x))
 
@@ -46,8 +46,8 @@ class PFGPCIData(AccumulateData):
         self.ci_low = []
         self.ci_high = []
         self.solutions = []
-        self.x = empty((0,self.d),dtype=float)
-        self.y = array([],dtype=float)
+        self.x = np.empty((0,self.d),dtype=float)
+        self.y = np.array([],dtype=float)
         self.gpyt_model = ExactGPyTorchRegressionModel(
             x_t = self.x, y_t = self.y,
             prior_mean = self.gpytorch_prior_mean,
@@ -59,7 +59,7 @@ class PFGPCIData(AccumulateData):
 
     def update_data(self, batch_count, xdraw, ydrawtf):
         self.n_batch.append(len(xdraw))
-        self.x,self.y = vstack([self.x,xdraw]),hstack([self.y,ydrawtf])
+        self.x,self.y = np.vstack([self.x,xdraw]),np.hstack([self.y,ydrawtf])
         if batch_count==0 or self.refit:
             self.gpyt_model = ExactGPyTorchRegressionModel(
                 x_t = self.x, y_t = self.y,
@@ -77,15 +77,15 @@ class PFGPCIData(AccumulateData):
             torch.cuda.empty_cache()          
         self.saved_gps.append(self.gpyt_model.state_dict())
         phi = _get_phi(self.gpyt_model,self.qmc_pts)
-        self.solutions.append(mean(phi>=.5))
-        self.emr.append(mean(minimum(phi,1-phi)))
+        self.solutions.append(np.mean(phi>=.5))
+        self.emr.append(np.mean(minimum(phi,1-phi)))
         gamma = self.emr[-1]/self.alpha
         self.ci_low.append(maximum(self.solutions[-1]-gamma,0))
         self.ci_high.append(minimum(self.solutions[-1]+gamma,1))
         self.error_bounds.append(maximum(self.solutions[-1]-self.ci_low[-1],self.ci_high[-1]-self.solutions[-1]))
 
     def get_results_dict(self):
-        df = {'n_sum':self.n_sum, 'n_batch':self.n_batch, 'error_bounds':self.error_bounds, 'ci_low':self.ci_low, 'ci_high':array(self.ci_high), 'solutions':array(self.solutions)}
+        df = {'n_sum':self.n_sum, 'n_batch':self.n_batch, 'error_bounds':self.error_bounds, 'ci_low':self.ci_low, 'ci_high':np.array(self.ci_high), 'solutions':np.array(self.solutions)}
         if self.approx_true_solution: df['solutions_ref'],df['error_ref'],df['in_ci'] = self.solutions_ref,self.error_ref,self.in_ci
         return df 
     
@@ -98,11 +98,11 @@ class PFGPCIData(AccumulateData):
             fig = pyplot.figure(constrained_layout=False,figsize=(8,4))
             gs = gridspec.GridSpec(1,2,figure=fig)
         axtrace = fig.add_subplot(gs[-1,:])
-        if self.approx_true_solution: axtrace.plot(.5+arange(len(self.n_batch)),self.solutions_ref,color='c',label=r'$P(g)$')
-        axtrace.plot(.5+arange(len(self.n_batch)),self.solutions,'-o',color='k',label=r'$\hat{P}_n^\mathrm{QMC}$')
-        axtrace.fill_between(.5+arange(len(self.n_batch)),self.ci_low,self.ci_high,color='k',alpha=.15)
-        axtrace.plot(.5+arange(len(self.n_batch)),self.error_bounds,'-o',color='m',label=r'$\hat{\gamma}_n^{\text{QMC}}$')
-        if self.approx_true_solution: axtrace.plot(.5+arange(len(self.n_batch)),self.error_ref,'-o',color='b',label=r'$\vert \hat{P}_n^{\text{QMC}} - P(g) \vert$')
+        if self.approx_true_solution: axtrace.plot(.5+np.arange(len(self.n_batch)),self.solutions_ref,color='c',label=r'$P(g)$')
+        axtrace.plot(.5+np.arange(len(self.n_batch)),self.solutions,'-o',color='k',label=r'$\hat{P}_n^\mathrm{QMC}$')
+        axtrace.fill_between(.5+np.arange(len(self.n_batch)),self.ci_low,self.ci_high,color='k',alpha=.15)
+        axtrace.plot(.5+np.arange(len(self.n_batch)),self.error_bounds,'-o',color='m',label=r'$\hat{\gamma}_n^{\text{QMC}}$')
+        if self.approx_true_solution: axtrace.plot(.5+np.arange(len(self.n_batch)),self.error_ref,'-o',color='b',label=r'$\vert \hat{P}_n^{\text{QMC}} - P(g) \vert$')
         axtrace.set_xlim([0,len(self.n_batch)])
         axtrace.set_xticks([])
         axtrace.set_yscale('log',base=10)
@@ -116,7 +116,7 @@ class PFGPCIData(AccumulateData):
         n_batches = len(self.n_batch)
         fig = pyplot.figure(constrained_layout=False,figsize=(4*n_batches,4*3))
         gs = gridspec.GridSpec(3,n_batches,figure=fig)
-        xticks = linspace(0,1,meshticks)[1:-1]
+        xticks = np.linspace(0,1,meshticks)[1:-1]
         if self.approx_true_solution: 
             yticks = self.integrand.f(xticks[:,None]).squeeze()
             ytickstf = self.stopping_crit._affine_tf(yticks)
@@ -132,7 +132,7 @@ class PFGPCIData(AccumulateData):
             ax0j = fig.add_subplot(gs[0,j])
             mr_udens = _error_udens(gpyt_model,xticks[:,None])
             ax0j.fill_between(xticks,mr_udens,color='k',alpha=.5)
-            ax0j.scatter(self.x[i0:i1].squeeze(),zeros(i1-i0)+.015,color='r',s=25)
+            ax0j.scatter(self.x[i0:i1].squeeze(),np.zeros(i1-i0)+.015,color='r',s=25)
             ax0j.set_ylim([0,1])
             ax0j.set_yticks([0,1])
             gpyt_model = ExactGPyTorchRegressionModel(
@@ -163,8 +163,8 @@ class PFGPCIData(AccumulateData):
         n_batches = len(self.n_batch)
         fig = pyplot.figure(constrained_layout=False,figsize=(4*n_batches,4*5))
         gs = gridspec.GridSpec(5 if self.approx_true_solution else 4,n_batches,figure=fig)
-        x0mesh,x1mesh = meshgrid(linspace(0,1,meshticks)[1:-1],linspace(0,1,meshticks)[1:-1])
-        xquery = vstack([x0mesh.flatten(),x1mesh.flatten()]).T
+        x0mesh,x1mesh = meshgrid(np.linspace(0,1,meshticks)[1:-1],np.linspace(0,1,meshticks)[1:-1])
+        xquery = np.vstack([x0mesh.flatten(),x1mesh.flatten()]).T
         if self.approx_true_solution:
             yquery = self.integrand.f(xquery).squeeze()
             ymeshtf = self.stopping_crit._affine_tf(yquery).reshape(x0mesh.shape)

@@ -2,7 +2,7 @@ from ..discrete_distribution import DigitalNetB2
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
-from numpy import *
+import numpy as np
 
 class BarrierOption(Integrand):
     """
@@ -25,7 +25,7 @@ class BarrierOption(Integrand):
     1.0801401050199149
     >>> level_dims = [2,4,8]
     >>> barrier_option_multilevel = BarrierOption(DigitalNetB2(seed=7),multilevel_dims=level_dims)
-    >>> levels_to_spawn = arange(barrier_option_multilevel.max_level+1)
+    >>> levels_to_spawn = np.arange(barrier_option_multilevel.max_level+1)
     >>> barrier_option_single_levels = barrier_option_multilevel.spawn(levels_to_spawn)
     >>> yml = 0
     >>> for barrier_option_single_level in barrier_option_single_levels:
@@ -87,7 +87,7 @@ class BarrierOption(Integrand):
         # handle single vs multilevel
         self.multilevel_dims = multilevel_dims
         if self.multilevel_dims is not None: # multi-level problem
-            self.dim_fracs = array(
+            self.dim_fracs = np.array(
                 [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
                 for i in range(1,len(self.multilevel_dims))],
                 dtype=float)
@@ -107,11 +107,11 @@ class BarrierOption(Integrand):
         Calculate the discounted payoff from the stock path. 
         
         Args:
-            stock_path (ndarray): n samples by d dimension option prices at monitoring times
+            stock_path (np.ndarray): n samples by d dimension option prices at monitoring times
             dimension (int): number of dimensions
         
         Return:
-            ndarray: n vector of discounted payoffs
+            np.ndarray: n vector of discounted payoffs
         """
         expected_stock = stock_path[:,dimension - 1]
         if(self.call):
@@ -131,18 +131,18 @@ class BarrierOption(Integrand):
             bar_flag = stock_path > self.barrier_price
             bar_flag = bar_flag.sum(axis = 1) == dimension
         disc_payoff = disc_payoff*bar_flag
-        disc_payoff = maximum(zeros(disc_payoff.size), disc_payoff)
-        return (disc_payoff * exp(-self.interest_rate * self.t_final))
+        disc_payoff = maximum(np.zeros(disc_payoff.size), disc_payoff)
+        return (disc_payoff * np.exp(-self.interest_rate * self.t_final))
     
     def g(self, t):
         if self.parent:
             raise ParameterError('''
                 Cannot evaluate an integrand with multilevel_dims directly,
                 instead spawn some children and evaluate those.''')
-        self.s_fine = self.start_price * exp(
+        self.s_fine = self.start_price * np.exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
             self.true_measure.time_vec + self.volatility * t)
-        for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
+        for xx,yy in zip(*np.where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs(self.s_fine,self.d)
         if self.dim_frac > 0:

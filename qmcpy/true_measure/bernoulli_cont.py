@@ -1,7 +1,7 @@
 from ._true_measure import TrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
-from numpy import *
+import numpy as np
 
 
 class BernoulliCont(TrueMeasure):
@@ -25,28 +25,28 @@ class BernoulliCont(TrueMeasure):
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
-            lam (ndarray): 0 < lambda < 1, a shape parameter, independent for each dimension 
+            lam (np.ndarray): 0 < lambda < 1, a shape parameter, independent for each dimension 
         """
         self.parameters = ['lam']
-        self.domain = array([[0,1]])
-        self.range = array([[0,1]])
+        self.domain = np.array([[0,1]])
+        self.range = np.array([[0,1]])
         self._parse_sampler(sampler)
         self.lam = lam
-        if isscalar(self.lam):
-            lam = tile(self.lam,self.d)
-        self.l = array(lam)
+        if np.isscalar(self.lam):
+            lam = np.tile(self.lam,self.d)
+        self.l = np.array(lam)
         if len(self.l)!=self.d or (self.l<=0).any() or (self.l>=1).any():
             raise DimensionError('lam must be scalar or have length equal to dimension and must be in (0,1).')
         super(BernoulliCont,self).__init__() 
 
     def _transform(self, x):
-        tf = zeros(x.shape,dtype=float)
+        tf = np.zeros(x.shape,dtype=float)
         for j in range(self.d):
-            tf[:,j] = x[:,j] if self.l[j]==1/2 else log(((2*self.l[j]-1)*x[:,j]-self.l[j]+1)/(1-self.l[j])) / log(self.l[j]/(1-self.l[j]))
+            tf[:,j] = x[:,j] if self.l[j]==1/2 else np.log(((2*self.l[j]-1)*x[:,j]-self.l[j]+1)/(1-self.l[j])) / np.log(self.l[j]/(1-self.l[j]))
         return tf
     
     def _weight(self, x):
-        w = zeros(x.shape,dtype=float)
+        w = np.zeros(x.shape,dtype=float)
         for j in range(self.d):
             C = 2 if self.l[j]==1/2 else 2*arctanh(1-2*self.l[j])/(1-2*self.l[j])
             w[:,j] = C*self.l[j]**x[:,j]*(1-self.l[j])**(1-x[:,j])

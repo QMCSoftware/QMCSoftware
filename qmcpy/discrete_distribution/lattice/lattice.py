@@ -1,7 +1,7 @@
 from .._discrete_distribution import LD
 from ...util import ParameterError, ParameterWarning
 import qmctoolscl
-from numpy import *
+import numpy as np
 from numpy.lib.npyio import DataSource
 from os.path import dirname, abspath, isfile
 import warnings
@@ -128,19 +128,19 @@ class Lattice(LD):
         generating_vector="kuo.lattice-33002-1024-1048576.9125.txt", d_max=None, m_max=None, replications=1):
         r"""
         Args:
-            dimension (int or :class:`numpy.ndarray`): dimension of the generator.
+            dimension (int or :class:`numpy.np.ndarray`): dimension of the generator.
 
                 - If an int is passed in, use sequence dimensions [0,...,dimension-1].
-                - If an ndarray is passed in, use these dimension indices in the sequence.
+                - If an np.ndarray is passed in, use these dimension indices in the sequence.
             
             randomize (bool): If True, apply shift to generated samples.
                 Note: Non-randomized lattice sequence includes the origin.
             order (str): "linear", "natural", or "gray" ordering.
-            seed (None or int or :class:`numpy.random.SeedSeq`): seed the random number generator for reproducibility
-            generating_vector (:class:`numpy.ndarray`, str, or int): Specify the generating matrix. There are a number of optional input types. 
+            seed (None or int or :class:`numpy.np.random.SeedSeq`): seed the random number generator for reproducibility
+            generating_vector (:class:`numpy.np.ndarray`, str, or int): Specify the generating matrix. There are a number of optional input types. 
                 
                 - A string `generating_vector` with either a relative path from `LDData repository <https://github.com/QMCSoftware/LDData/lattice/>`__ (e.g., "lattice/mps.exod2_base2_m20_CKN.txt")  or a NumPy file with format "name.d_max.m_max.npy" (e.g., "lattice_vec.3600.20.npy").
-                - An ndarray of integers.
+                - An np.ndarray of integers.
                 - An odd integer :math:`1 < M < 27` which creates a random generating vector :math:`[1,v_1,v_2,...,v_{\\texttt{d\_max}}]` where :math:`v_i` is a random integer in :math:`{3,5,...,2*M-1}` supporting up to :math:`2^M` points.
             
             d_max (int): maximum dimension
@@ -148,7 +148,7 @@ class Lattice(LD):
             replications (int): number of IID randomizations of a pointset
 
         Note:
-            `d_max` and `m_max` are required if `generating_vector` is an ndarray.
+            `d_max` and `m_max` are required if `generating_vector` is an np.ndarray.
             If `generating_vector` is a string (path), `d_max` and `m_max` can be taken from the file name if None.
         """
         self.parameters = ['dvec','randomize','order','gen_vec']
@@ -160,19 +160,19 @@ class Lattice(LD):
         if self.order=="MPS": raise ParameterError("lattice in MPS order is no longer supported")
         assert self.order in ['LINEAR','NATURAL','GRAY']
         # generating vector
-        if isinstance(generating_vector,ndarray):
+        if isinstance(generating_vector,np.ndarray):
             self.gen_vec_og = generating_vector
             if d_max is None or m_max is None:
-                raise ParameterError("d_max and m_max must be supplied when generating_vector is a ndarray")
+                raise ParameterError("d_max and m_max must be supplied when generating_vector is a np.ndarray")
             self.d_max = d_max
             self.m_max = m_max
             if self.gen_vec_og.ndim==1:
                 self.gen_vec_og = self.gen_vec_og[None,:]
             else:
-                assert self.gen_vec_og.ndim==2, "ndarray generating vector must be 1 or two dimensional"
+                assert self.gen_vec_og.ndim==2, "np.ndarray generating vector must be 1 or two dimensional"
                 self.replications_gv = len(self.gen_vec_og)
         elif isinstance(generating_vector,int):
-            self.m_max = minimum(26,maximum(2,generating_vector))
+            self.m_max = min(26,max(2,generating_vector))
             assert isinstance(dimension,int), "random generating vector requires int dimension"
             self.d_max = dimension
         elif isinstance(generating_vector,str):
@@ -197,14 +197,14 @@ class Lattice(LD):
                 contents = [int(line.rstrip('\n').strip().split("#",1)[0]) for line in datafile.readlines() if line[0]!="#"]
                 datafile.close()
                 self.d_max = contents[0]
-                n_max = contents[1]; assert log2(n_max)%1==0; self.m_max = int(log2(n_max))
-                self.gen_vec_og = array(contents[2:],dtype=uint64)[None,:]
+                n_max = contents[1]; assert np.log2(n_max)%1==0; self.m_max = int(np.log2(n_max))
+                self.gen_vec_og = np.array(contents[2:],dtype=np.uint64)[None,:]
             elif isfile(root+generating_vector):
-                self.gen_vec_og = load(root+generating_vector).astype(uint64)[None,:]
+                self.gen_vec_og = np.load(root+generating_vector).astype(np.uint64)[None,:]
                 self.d_max = int(parts[-3])
                 self.m_max = int(parts[-2])
             elif isfile(generating_vector):
-                self.gen_vec_og = load(generating_vector).astype(uint64)[None,:]
+                self.gen_vec_og = np.load(generating_vector).astype(np.uint64)[None,:]
                 self.d_max = int(parts[-3])
                 self.m_max = int(parts[-2])
             else:
@@ -215,7 +215,7 @@ class Lattice(LD):
         # randomization
         if isinstance(generating_vector,int):
             self.replications_gv = replications
-            self.gen_vec_og = hstack([ones((replications,1),dtype=uint64),2*self.rng.integers(1,2**(self.m_max-1),size=(replications,dimension-1),dtype=uint64)+1])
+            self.gen_vec_og = np.hstack([np.ones((replications,1),dtype=np.uint64),2*self.rng.integers(1,2**(self.m_max-1),size=(replications,dimension-1),dtype=np.uint64)+1])
         self.gen_vec = self.gen_vec_og[:,self.dvec].copy()
         assert self.gen_vec.ndim==2, "gen_vec must have 2 dimensions"
         self.randomize = str(randomize).upper()
@@ -243,7 +243,7 @@ class Lattice(LD):
             qmctoolscl_gen_kwargs,qmctoolscl_rand_kwargs (dict): keyword arguments for QMCToolsCL to use OpenCL when generating points or performing randomizations. Defaults to C backend. See https://qmcsoftware.github.io/QMCToolsCL/
 
         Returns:
-            ndarray: replications x (n_max-n_min) x d (dimension) array of samples
+            np.ndarray: replications x (n_max-n_min) x d (dimension) array of samples
 
         Note:
             Lattice generates in blocks from 2**m to 2**(m+1) so generating
@@ -257,28 +257,28 @@ class Lattice(LD):
             warnings.warn("Non-randomized lattice sequence includes the origin",ParameterWarning)
         if n_max > 2**self.m_max:
             raise ParameterError('Lattice generating vector supports up to %d samples.'%(2**self.m_max))
-        r_x = uint64(self.replications_gv) 
-        n = uint64(n_max-n_min)
-        d = uint64(self.d) 
-        n_start = uint64(n_min)
-        x = empty((r_x,n,d),dtype=float64)
+        r_x = np.uint64(self.replications_gv) 
+        n = np.uint64(n_max-n_min)
+        d = np.uint64(self.d) 
+        n_start = np.uint64(n_min)
+        x = np.empty((r_x,n,d),dtype=np.float64)
         if self.order=="LINEAR":
             assert r_x==1, "lattice linear currently requires there be only 1 generating matrix"
             x = self._gail_linear(n_min,n_max)[None,:,:]
         elif self.order=="NATURAL":
-            assert (n_min==0 or log2(n_min)%1==0) and (n_max==0 or log2(n_max)%1==0), "lattice in natural order requires n_min and n_max be 0 or powers of 2"
+            assert (n_min==0 or np.log2(n_min)%1==0) and (n_max==0 or np.log2(n_max)%1==0), "lattice in natural order requires n_min and n_max be 0 or powers of 2"
             _ = qmctoolscl.lat_gen_natural(r_x,n,d,n_start,self.gen_vec,x,**qmctoolscl_gen_kwargs)
         elif self.order=="GRAY":
             _ = qmctoolscl.lat_gen_gray(r_x,n,d,n_start,self.gen_vec,x,**qmctoolscl_gen_kwargs) 
         else: 
             assert False, "invalid lattice order"
         if r_x==1: x = x[0]
-        r = uint64(self.replications)
+        r = np.uint64(self.replications)
         if self.randomize=="FALSE":
             assert return_unrandomized is False, "cannot return_unrandomized when randomize='FALSE'"
             return x
         elif self.randomize=="SHIFT":
-            xr = empty((r,n,d),dtype=float64)
+            xr = np.empty((r,n,d),dtype=np.float64)
             qmctoolscl.lat_shift_mod_1(r,n,d,r_x,x,self.shift,xr,**qmctoolscl_rand_kwargs)
             if r==1: xr=xr[0]
             return (xr,x) if return_unrandomized else xr
@@ -288,17 +288,17 @@ class Lattice(LD):
     def _gen_block_linear(self, m_next, first=True):
         n = int(2**m_next)
         if first:
-            y = arange(0, 1, 1 / n).reshape((n, 1))
+            y = np.arange(0, 1, 1 / n).reshape((n, 1))
         else:
-            y = arange(1 / n, 1, 2 / n).reshape((n, 1))
-        x = outer(y, self.gen_vec) % 1
+            y = np.arange(1 / n, 1, 2 / n).reshape((n, 1))
+        x = np.outer(y, self.gen_vec) % 1
         return x
 
     def calculate_y(self, m_low, m_high, y):
         for m in range(m_low, m_high):
             n = 2 ** m
-            y_next = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
-            temp = zeros((n, 1))
+            y_next = np.arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            temp = np.zeros((n, 1))
             temp[0::2] = y
             temp[1::2] = y_next
             y = temp
@@ -306,20 +306,20 @@ class Lattice(LD):
 
     def _gail_linear(self, n_min, n_max):
         """ Gail lattice generator in linear order. """
-        m_low = int(floor(log2(n_min))) + 1 if n_min > 0 else 0
-        m_high = int(ceil(log2(n_max)))
+        m_low = int(np.floor(np.log2(n_min))) + 1 if n_min > 0 else 0
+        m_high = int(np.ceil(np.log2(n_max)))
         if n_min == 0:
             return self._gen_block_linear(m_high, first=True)
         else:
             n = 2 ** (m_low)
-            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            y = np.arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
             y = self.calculate_y(m_low, m_high, y)
-            x = outer(y, self.gen_vec) % 1
+            x = np.outer(y, self.gen_vec) % 1
             return x
         
     def pdf(self, x):
         """ pdf of a standard uniform """
-        return ones(x.shape[:-1], dtype=float)
+        return np.ones(x.shape[:-1], dtype=float)
 
     def _spawn(self, child_seed, dimension):
         return Lattice(

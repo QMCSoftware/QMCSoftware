@@ -1,7 +1,7 @@
 from ..util import MethodImplementationError, _univ_repr, ParameterError
 from ..true_measure._true_measure import TrueMeasure
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from numpy import *
+import numpy as np
 import os
 from multiprocessing import get_context
 from multiprocessing.pool import ThreadPool
@@ -41,7 +41,7 @@ class Integrand(object):
         if not hasattr(self,'leveltype'):
             self.leveltype = 'single'
         if not hasattr(self,'max_level'):
-            self.max_level = inf
+            self.max_level = np.inf
         if not hasattr(self,'discrete_distrib'):
             self.discrete_distrib = self.true_measure.discrete_distrib
         if self.true_measure.transform!=self.true_measure and \
@@ -54,14 +54,14 @@ class Integrand(object):
         ABSTRACT METHOD for original integrand to be integrated.
 
         Args:
-            t (ndarray): n x d array of samples to be input into original integrand.
-            compute_flags (ndarray): outputs that require computation. 
+            t (np.ndarray): n x d array of samples to be input into original integrand.
+            compute_flags (np.ndarray): outputs that require computation. 
                 For example, if the vector function has 3 outputs and compute_flags = [False, True, False], 
                 then the function is only required to compute the second output and may leave the remaining outputs as e.g. 0. 
                 The False outputs will not be used in the computation since those integrals have been sufficiently approximated.
 
         Return:
-            ndarray: n vector of function evaluations
+            np.ndarray: n vector of function evaluations
         """
         raise MethodImplementationError(self, 'g')
 
@@ -70,9 +70,9 @@ class Integrand(object):
         Evaluate transformed integrand based on true measures and discrete distribution
 
         Args:
-            x (ndarray): n x d array of samples from a discrete distribution
+            x (np.ndarray): n x d array of samples from a discrete distribution
             periodization_transform (str): periodization transform
-            compute_flags (ndarray): outputs that require computation. 
+            compute_flags (np.ndarray): outputs that require computation. 
                 For example, if the vector function has 3 outputs and compute_flags = [False, True, False], 
                 then the function is only required to compute the second output and may leave the remaining outputs as e.g. 0. 
                 The False outputs will not be used in the computation since those integrals have been sufficiently approximated.
@@ -80,10 +80,10 @@ class Integrand(object):
             **kwargs (dict): other keyword args to g
 
         Return:
-            ndarray: length n vector of function evaluations
+            np.ndarray: length n vector of function evaluations
         """
         periodization_transform = 'NONE' if periodization_transform is None else periodization_transform.upper()
-        compute_flags = tile(1,self.d_indv) if compute_flags is None else atleast_1d(compute_flags)
+        compute_flags = np.tile(1,self.d_indv) if compute_flags is None else atleast_1d(compute_flags)
         n,d = x.shape
         # parameter checks
         if self.discrete_distrib.mimics != 'StdUniform' and periodization_transform!='NONE':
@@ -93,10 +93,10 @@ class Integrand(object):
         # periodization transform
         if periodization_transform == 'NONE':
             xp = x
-            wp = ones(n,dtype=float)
+            wp = np.ones(n,dtype=float)
         elif periodization_transform == 'BAKER': # Baker's transform
             xp = 1 - 2 * abs(x - 1 / 2)
-            wp = ones(n,dtype=float)
+            wp = np.ones(n,dtype=float)
         elif periodization_transform == 'C0': # C^0 transform
             xp = 3 * x ** 2 - 2 * x ** 3
             wp = prod(6 * x * (1 - x), 1)
@@ -119,7 +119,7 @@ class Integrand(object):
             xp[xp<=0] = self.EPS
             xp[xp>=1] = 1-self.EPS
         # function evaluation with chain rule
-        y = empty((n,)+self.d_indv,dtype=float)
+        y = np.empty((n,)+self.d_indv,dtype=float)
         if self.true_measure == self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._transform(xp) # get transformed samples, equivalent to self.true_measure._transform_r(x)
@@ -151,7 +151,7 @@ class Integrand(object):
     def _g2(self,t,comb_args=((),{})):
         args = comb_args[0]
         kwargs = comb_args[1]
-        t = atleast_2d(t)
+        t = np.atleast_2d(t)
         if self.d_indv==(1,):
             kwargs = dict(kwargs)
             del kwargs['compute_flags']
@@ -166,15 +166,15 @@ class Integrand(object):
         individually.
 
         Args:
-            bound_low (ndarray): length Integrand.d_indv lower error bound
-            bound_high (ndarray): length Integrand.d_indv upper error bound
+            bound_low (np.ndarray): length Integrand.d_indv lower error bound
+            bound_high (np.ndarray): length Integrand.d_indv upper error bound
 
         Return:
             (tuple) containing
 
-            - (ndarray): lower bound on function combining estimates
-            - (ndarray): upper bound on function combining estimates
-            - (ndarray): bool flags to override sufficient combined integrand estimation, e.g., when approximating a ratio of integrals, if the denominator's bounds straddle 0, then returning True here forces ratio to be flagged as insufficiently approximated.
+            - (np.ndarray): lower bound on function combining estimates
+            - (np.ndarray): upper bound on function combining estimates
+            - (np.ndarray): bool flags to override sufficient combined integrand estimation, e.g., when approximating a ratio of integrals, if the denominator's bounds straddle 0, then returning True here forces ratio to be flagged as insufficiently approximated.
         """
         if self.d_indv!=self.d_comb:
             raise ParameterError('''
@@ -192,12 +192,12 @@ class Integrand(object):
         has not been approximated to within the tolerance, so the dependency function should return [True,True]
         indicating that both the numerator and denominator integrands need to be better approximated.
         Args:
-            comb_flags (bool ndarray): flags indicating weather the combined integrals are insufficiently approximated
+            comb_flags (bool np.ndarray): flags indicating weather the combined integrals are insufficiently approximated
 
         Return:
-            (bool ndarray): length (Integrand.d_indv) flags for individual integrands
+            (bool np.ndarray): length (Integrand.d_indv) flags for individual integrands
         """
-        return comb_flags if self.d_indv==self.d_comb else  tile((comb_flags==False).any(),self.d_indv)
+        return comb_flags if self.d_indv==self.d_comb else  np.tile((comb_flags==False).any(),self.d_indv)
 
     def _dimension_at_level(self, level):
         """
@@ -223,12 +223,12 @@ class Integrand(object):
         Spawn new instances of the current integrand at the specified levels.
 
         Args:
-            levels (ndarray): array of levels at which to spawn new integrands
+            levels (np.ndarray): array of levels at which to spawn new integrands
 
         Return:
             list: list of Integrands linked to newly spawned TrueMeasures and DiscreteDistributions
         """
-        levels = array([levels]) if isscalar(levels) else array(levels)
+        levels = np.array([levels]) if np.isscalar(levels) else np.array(levels)
         if (levels>self.max_level).any():
             raise ParameterError("requested spawn level exceeds max level")
         n_levels = len(levels)
@@ -245,7 +245,7 @@ class Integrand(object):
         ABSTRACT METHOD, used by self.spawn
 
         Args:
-            level (numpy.random.SeedSequence): level at which to spawn new instance
+            level (numpy.np.random.SeedSequence): level at which to spawn new instance
             tm_spawn (TrueMeasure): true measure spawn to use as new sampler
 
         Return:

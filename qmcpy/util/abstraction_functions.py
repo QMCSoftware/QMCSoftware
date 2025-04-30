@@ -33,9 +33,9 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
             if isinstance(val, list) and len(val) == 1:
                 val = copy(val[0])
             elif isinstance(val, list):
-                try: val = array(val).copy()
+                try: val = np.array(val).copy()
                 except: pass
-            elif isinstance(val, ndarray):
+            elif isinstance(val, np.ndarray):
                 val = val.copy().squeeze()
                 if val.shape == ():
                     val = val.item()
@@ -44,7 +44,7 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
             # printing options
             s = '    %-15s '%key
             if isinstance(val, int) or isinstance(val,float): # scalar
-                p = .1 if val<=0 else log2(float(val))
+                p = .1 if val<=0 else np.log2(float(val))
                 if (p%1==0) and p!=0: # power of 2
                     s += '2^(%d)' % int(p)
                 elif isinstance(val, int) or (val%1==0): # int

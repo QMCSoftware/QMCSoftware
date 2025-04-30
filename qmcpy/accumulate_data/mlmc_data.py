@@ -34,10 +34,10 @@ class MLMCData(AccumulateData):
         self.discrete_distrib = discrete_distrib
         # Set Attributes
         self.levels = int(levels_init)
-        self.n_level = zeros(self.levels+1)
-        self.sum_level = zeros((2,self.levels+1))
-        self.cost_level = zeros(self.levels+1)
-        self.diff_n_level = tile(n_init,self.levels+1)
+        self.n_level = np.zeros(self.levels+1)
+        self.sum_level = np.zeros((2,self.levels+1))
+        self.cost_level = np.zeros(self.levels+1)
+        self.diff_n_level = np.tile(n_init,self.levels+1)
         self.alpha0 = alpha0
         self.beta0 = beta0
         self.gamma0 = gamma0
@@ -76,16 +76,16 @@ class MLMCData(AccumulateData):
             self.mean_level[l] = maximum(self.mean_level[l], .5*self.mean_level[l-1]/2**self.alpha)
             self.var_level[l] = maximum(self.var_level[l], .5*self.var_level[l-1]/2**self.beta)
         # use linear regression to estimate alpha, beta, gamma if not given
-        a = ones((self.levels,2))
-        a[:,0] = arange(1,self.levels+1)
+        a = np.ones((self.levels,2))
+        a[:,0] = np.arange(1,self.levels+1)
         if self.alpha0 <= 0:
-            x = lstsq(a,log2(self.mean_level[1:]),cond=0,lapack_driver="gelss")[0]
+            x = lstsq(a,np.log2(self.mean_level[1:]),cond=0,lapack_driver="gelss")[0]
             self.alpha = maximum(.5,-x[0])
         if self.beta0 <= 0:
-            x = lstsq(a,log2(self.var_level[1:]),cond=0,lapack_driver="gelss")[0]
+            x = lstsq(a,np.log2(self.var_level[1:]),cond=0,lapack_driver="gelss")[0]
             self.beta = maximum(.5,-x[0])
         if self.gamma0 <= 0:
-            x = lstsq(a,log2(self.cost_per_sample[1:]),cond=0,lapack_driver="gelss")[0]
+            x = lstsq(a,np.log2(self.cost_per_sample[1:]),cond=0,lapack_driver="gelss")[0]
             self.gamma = maximum(.5,x[0])
         self.n_total = self.n_level.sum()
 
@@ -93,12 +93,12 @@ class MLMCData(AccumulateData):
         """ Add another level to relevant attributes. """
         self.levels += 1
         if not len(self.n_level) > self.levels:
-            self.mean_level = hstack((self.mean_level, self.mean_level[-1] / 2**self.alpha))
-            self.var_level = hstack((self.var_level, self.var_level[-1] / 2**self.beta))
-            self.cost_per_sample = hstack((self.cost_per_sample, self.cost_per_sample[-1] * 2**self.gamma))
-            self.n_level = hstack((self.n_level, 0.))
-            self.sum_level = hstack((self.sum_level,zeros((2,1))))
-            self.cost_level = hstack((self.cost_level, 0.))
+            self.mean_level = np.hstack((self.mean_level, self.mean_level[-1] / 2**self.alpha))
+            self.var_level = np.hstack((self.var_level, self.var_level[-1] / 2**self.beta))
+            self.cost_per_sample = np.hstack((self.cost_per_sample, self.cost_per_sample[-1] * 2**self.gamma))
+            self.n_level = np.hstack((self.n_level, 0.))
+            self.sum_level = np.hstack((self.sum_level,np.zeros((2,1))))
+            self.cost_level = np.hstack((self.cost_level, 0.))
         else:
             self.mean_level = absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
             self.var_level = maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)

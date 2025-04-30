@@ -1,7 +1,7 @@
 from ._true_measure import TrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
-from numpy import *
+import numpy as np
 
 
 class Kumaraswamy(TrueMeasure):
@@ -26,21 +26,21 @@ class Kumaraswamy(TrueMeasure):
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
-            a (ndarray): alpha > 0
-            b (ndarray): beta > 0
+            a (np.ndarray): alpha > 0
+            b (np.ndarray): beta > 0
         """
         self.parameters = ['a', 'b']
-        self.domain = array([[0,1]])
-        self.range = array([[0,1]])
+        self.domain = np.array([[0,1]])
+        self.range = np.array([[0,1]])
         self._parse_sampler(sampler)
         self.a = a
         self.b = b
-        if isscalar(self.a):
-            a = tile(self.a,self.d)
-        if isscalar(self.b):
-            b = tile(self.b,self.d)
-        self.alpha = array(a)
-        self.beta = array(b)
+        if np.isscalar(self.a):
+            a = np.tile(self.a,self.d)
+        if np.isscalar(self.b):
+            b = np.tile(self.b,self.d)
+        self.alpha = np.array(a)
+        self.beta = np.array(b)
         if len(self.alpha)!=self.d or len(self.beta)!=self.d:
             raise DimensionError('a and b must be scalar or have length equal to dimension.')
         if not (all(self.alpha>0) and all(self.beta>0)):

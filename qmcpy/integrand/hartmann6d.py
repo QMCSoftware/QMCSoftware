@@ -1,4 +1,4 @@
-from numpy import *
+import numpy as np
 from ._integrand import Integrand
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
@@ -25,5 +25,5 @@ class Hartmann6d(Integrand):
         
     def g(self, t):
         import torch
-        t = hstack([t,ones((len(t),1))])
+        t = np.hstack([t,np.ones((len(t),1))])
         return self.ah.evaluate_true(torch.tensor(t)).numpy()

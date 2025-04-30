@@ -2,7 +2,7 @@ from ._accumulate_data import AccumulateData
 from ..integrand._integrand import Integrand
 from ..util import ParameterError
 from time import time
-from numpy import *
+import numpy as np
 
 class MeanVarData(AccumulateData):
     """ Update and store mean and variance estimates. """
@@ -31,7 +31,7 @@ class MeanVarData(AccumulateData):
         self.cv_mu = control_variate_means
         if isinstance(self.cv,Integrand):
             self.cv = [self.cv] # take a single integrand and make it into a list of length 1
-        if isscalar(self.cv_mu):
+        if np.isscalar(self.cv_mu):
             self.cv_mu = [self.cv_mu]
         if len(self.cv)!=len(self.cv_mu):
             raise ParameterError("list of control variates and list of control variate means must be the same.")
@@ -40,24 +40,24 @@ class MeanVarData(AccumulateData):
                 raise ParameterError('''
                         Each control variate's discrete distribution 
                         must be the same instance as the one for te main integrand.''')
-        self.cv_mu = array(self.cv_mu).reshape((-1,1)) # column vector
+        self.cv_mu = np.array(self.cv_mu).reshape((-1,1)) # column vector
         self.ncv = int(len(self.cv))
         # Set Attributes
         if self.integrand.leveltype=='fixed-multi':
             self.levels = self.integrand.max_level+1
-            self.level_integrands = self.integrand.spawn(arange(self.levels))
+            self.level_integrands = self.integrand.spawn(np.arange(self.levels))
             if self.ncv>0:
                 raise ParameterError("Control variates are currently only supported for single-level problems.")
         else:
             self.levels = 1
             self.level_integrands = [self.integrand]
         self.solution = nan
-        self.muhat = full(self.levels, inf)  # sample mean
-        self.sighat = full(self.levels, inf)  # sample standard deviation
-        self.t_eval = zeros(self.levels)  # processing time for each integrand
-        self.n = tile(n_init, self.levels) # current number of samples
+        self.muhat = np.full(self.levels, np.inf)  # sample mean
+        self.sighat = np.full(self.levels, np.inf)  # sample standard deviation
+        self.t_eval = np.zeros(self.levels)  # processing time for each integrand
+        self.n = np.tile(n_init, self.levels) # current number of samples
         self.n_total = 0  # total number of samples
-        self.confid_int = array([-inf, inf])  # confidence interval for solution
+        self.confid_int = np.array([-np.inf, np.inf])  # confidence interval for solution
         super(MeanVarData,self).__init__()
 
     def update_data(self):
@@ -69,7 +69,7 @@ class MeanVarData(AccumulateData):
             y = integrand_l.f(samples).squeeze()
             if self.ncv>0:
                 # using control variates
-                cvdata = zeros((n,self.ncv),dtype=float)
+                cvdata = np.zeros((n,self.ncv),dtype=float)
                 for i in range(self.ncv):
                     cvdata[:,i] = self.cv[i].f(samples).squeeze()
                 cvmuhats = cvdata.mean(0)

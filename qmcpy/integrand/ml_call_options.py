@@ -2,7 +2,7 @@ from ._integrand import Integrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian
 from ..util import ParameterError
-from numpy import *
+import numpy as np
 from scipy.stats import norm
 
 
@@ -20,7 +20,7 @@ class MLCallOptions(Integrand):
         t               1
         b               85
         level           0
-    >>> mlco_ml_dims = mlco_original.spawn(levels=arange(4))
+    >>> mlco_ml_dims = mlco_original.spawn(levels=np.arange(4))
     >>> yml = 0
     >>> for mlco in mlco_ml_dims:
     ...     x = mlco.discrete_distrib.gen_samples(2**10)
@@ -69,33 +69,33 @@ class MLCallOptions(Integrand):
         self.leveltype = 'adaptive-multi'
         self.g_submodule = getattr(self,'_g_'+self.option)
         self.level = _level
-        self.max_level = inf
+        self.max_level = np.inf
         super(MLCallOptions,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
         #if self.discrete_distrib.low_discrepancy and self.option=='asian':
         #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
 
     def get_exact_value(self):
         """ Print exact analytic value, based on s0=k. """
-        d1 = (self.r+.5*self.sigma**2)*self.t / (self.sigma*sqrt(self.t))
-        d2 = (self.r-0.5*self.sigma**2)*self.t / (self.sigma*sqrt(self.t))
+        d1 = (self.r+.5*self.sigma**2)*self.t / (self.sigma*np.sqrt(self.t))
+        d2 = (self.r-0.5*self.sigma**2)*self.t / (self.sigma*np.sqrt(self.t))
         if self.option == 'european':
-            val = self.k*( norm.cdf(d1) - exp(-self.r*self.t)*norm.cdf(d2) )
+            val = self.k*( norm.cdf(d1) - np.exp(-self.r*self.t)*norm.cdf(d2) )
         elif self.option == 'asian':
             print('Exact value unknown for asian option')
             val = None
         elif self.option == 'lookback':
             kk = .5*self.sigma**2/self.r
             val = self.k*( norm.cdf(d1) - norm.cdf(-d1)*kk -
-                      exp(-self.r*self.t)*(norm.cdf(d2) - norm.cdf(d2)*kk) )
+                      np.exp(-self.r*self.t)*(norm.cdf(d2) - norm.cdf(d2)*kk) )
         elif self.option == 'digital':
-            val = self.k*exp(-self.r*self.t)*norm.cdf(d2)
+            val = self.k*np.exp(-self.r*self.t)*norm.cdf(d2)
         elif self.option == 'barrier':
             kk = .5*self.sigma**2/self.r
-            d3 = (2*log(self.b/self.k) + (self.r+.5*self.sigma**2)*self.t) / (self.sigma*sqrt(self.t))
-            d4 = (2*log(self.b/self.k) + (self.r-.5*self.sigma**2)*self.t) / (self.sigma*sqrt(self.t))
-            val = self.k*( norm.cdf(d1) - exp(-self.r*self.t)*norm.cdf(d2) -
+            d3 = (2*np.log(self.b/self.k) + (self.r+.5*self.sigma**2)*self.t) / (self.sigma*np.sqrt(self.t))
+            d4 = (2*np.log(self.b/self.k) + (self.r-.5*self.sigma**2)*self.t) / (self.sigma*np.sqrt(self.t))
+            val = self.k*( norm.cdf(d1) - np.exp(-self.r*self.t)*norm.cdf(d2) -
                      (self.k/self.b)**(1-1/kk)*( (self.b/self.k)**2*norm.cdf(d3) -
-                     exp(-self.r*self.t)*norm.cdf(d4) ) )
+                     np.exp(-self.r*self.t)*norm.cdf(d4) ) )
         return val
 
     def _g_european(self, t, n, d, nf, nc, hf, hc, xf, xc):
@@ -103,22 +103,22 @@ class MLCallOptions(Integrand):
         Implementation for European call option.
 
         Args:
-            t (ndarray): nxd array of samples
+            t (np.ndarray): nxd array of samples
             n (int): number of samples
             d (int): number of dimensions
             nf (int): n fine samples = 2**level
             nc (int): n coarse samples = nf/2
             hf (int): fine timestep = self.t/nf
             hc (float): coarse timestep = self.t/nc
-            xf (ndarray): n vector of fine samples values = self.k
-            xc (ndarray): n vector of coarse samples = self.k
+            xf (np.ndarray): n vector of fine samples values = self.k
+            xc (np.ndarray): n vector of coarse samples = self.k
 
         Return:
             tuple: \
-                First, an ndarray of payoffs from fine paths. \
-                Second, an ndarray of payoffs from coarse paths.
+                First, an np.ndarray of payoffs from fine paths. \
+                Second, an np.ndarray of payoffs from coarse paths.
         """
-        dwf = t * sqrt(hf)
+        dwf = t * np.sqrt(hf)
         if self.level == 0:
             dwf = dwf.squeeze()
             xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
@@ -138,25 +138,25 @@ class MLCallOptions(Integrand):
         Implementation for Asian call option.
 
         Args:
-            t (ndarray): nxd array of samples
+            t (np.ndarray): nxd array of samples
             n (int): number of samples
             d (int): number of dimensions
             nf (int): n fine samples = 2**level
             nc (int): n coarse samples = nf/2
             hf (int): fine timestep = self.t/nf
             hc (float): coarse timestep = self.t/nc
-            xf (ndarray): n vector of fine samples values = self.k
-            xc (ndarray): n vector of coarse samples = self.k
+            xf (np.ndarray): n vector of fine samples values = self.k
+            xc (np.ndarray): n vector of coarse samples = self.k
 
         Return:
             tuple: \
-                First, an ndarray of payoffs from fine paths. \
-                Second, an ndarray of payoffs from coarse paths.
+                First, an np.ndarray of payoffs from fine paths. \
+                Second, an np.ndarray of payoffs from coarse paths.
         """
         af = .5*hf*xf
         ac = .5*hc*xc
-        dwf = sqrt(hf) * t[:,:int(d/2)]
-        dif = sqrt(hf/12) * hf * t[:,int(d/2):]
+        dwf = np.sqrt(hf) * t[:,:int(d/2)]
+        dif = np.sqrt(hf/12) * hf * t[:,int(d/2):]
         if self.level == 0:
             dwf = dwf.squeeze()
             dif = dif.squeeze()
@@ -187,11 +187,11 @@ class MLCallOptions(Integrand):
     def g(self, t):
         """
         Args:
-            t (ndarray): Gaussian(0,1^2) samples
+            t (np.ndarray): Gaussian(0,1^2) samples
 
         Returns:
             tuple: \
-                First, an ndarray of length 6 vector of summary statistic sums. \
+                First, an np.ndarray of length 6 vector of summary statistic sums. \
                 Second, a float of cost on this level.
         """
         n,d = t.shape
@@ -199,14 +199,14 @@ class MLCallOptions(Integrand):
         nc = float(nf)/2 # n coarse
         hf = self.t/nf # timestep fine
         hc = self.t/nc # timestep coarse
-        xf = tile(self.k,int(n))
+        xf = np.tile(self.k,int(n))
         xc = xf
         pf,pc = self.g_submodule(t, n, d, nf, nc, hf, hc, xf, xc)
-        dp = exp(-self.r*self.t)*(pf-pc)
-        pf = exp(-self.r*self.t)*pf
+        dp = np.exp(-self.r*self.t)*(pf-pc)
+        pf = np.exp(-self.r*self.t)*pf
         if self.level == 0:
             dp = pf
-        sums = zeros(6)
+        sums = np.zeros(6)
         sums[0] = dp.sum()
         sums[1] = (dp**2).sum()
         sums[2] = (dp**3).sum()

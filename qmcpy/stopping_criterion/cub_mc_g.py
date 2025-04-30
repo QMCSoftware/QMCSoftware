@@ -6,7 +6,7 @@ from ..integrand import Keister, CustomFun
 from ..true_measure import Gaussian, Uniform
 from ..discrete_distribution import IIDStdUniform
 from ..util import _tol_fun, MaxSamplesWarning
-from numpy import *
+import numpy as np
 from scipy.optimize import fsolve
 from scipy.stats import norm
 from time import time
@@ -187,38 +187,38 @@ class CubMCG(StoppingCriterion):
                 n,_ = self._nchebe(toloversig, alphai, self.kurtmax, self.n_max, self.sigma_up)
                 self.data.n[:] = n
         # set confidence interval
-        self.data.confid_int = self.data.solution + self.data.error_bound * array([-1, 1])
+        self.data.confid_int = self.data.solution + self.data.error_bound * np.array([-1, 1])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):
-        ncheb = ceil(1 / (alpha * toloversig**2))  # sample size by Chebyshev's Inequality
+        ncheb = np.ceil(1 / (alpha * toloversig**2))  # sample size by Chebyshev's Inequality
         A = 18.1139
         A1 = 0.3328
         A2 = 0.429  # three constants in Berry-Esseen inequality
         M3upper = kurtmax**(3. / 4)
         # the upper bound on the third moment by Jensen's inequality
         BEfun2 = lambda logsqrtn: \
-            (norm.cdf(-exp(logsqrtn) * toloversig)
-            + exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
-            A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
+            (norm.cdf(-np.exp(logsqrtn) * toloversig)
+            + np.exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
+            A * M3upper / (1 + (np.exp(logsqrtn) * toloversig)**3))
             - alpha / 2.)
         # Berry-Esseen function, whose solution is the sample size needed
-        logsqrtnCLT = log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
-        nbe = ceil(exp(2 * fsolve(BEfun2, logsqrtnCLT)))
+        logsqrtnCLT = np.log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
+        nbe = np.ceil(np.exp(2 * fsolve(BEfun2, logsqrtnCLT)))
         # calculate Berry-Esseen n by fsolve function (scipy)
         ncb = minimum(minimum(ncheb, nbe), n_budget)  # take the min of two sample sizes
-        logsqrtn = log(sqrt(ncb))
+        logsqrtn = np.log(np.sqrt(ncb))
         BEfun3 = lambda toloversig: \
-            (norm.cdf(-exp(logsqrtn) * toloversig)
-            + exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
-            A * M3upper / (1 + (exp(logsqrtn) * toloversig)**3))
+            (norm.cdf(-np.exp(logsqrtn) * toloversig)
+            + np.exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
+            A * M3upper / (1 + (np.exp(logsqrtn) * toloversig)**3))
             - alpha / 2.)
         err = fsolve(BEfun3, toloversig) * sigma_0_up
         return ncb, err
 
     def _ncbinv(self, n1, alpha1, kurtmax):
-        NCheb_inv = 1/sqrt(n1*alpha1)
+        NCheb_inv = 1/np.sqrt(n1*alpha1)
         # use Chebyshev inequality
         A = 18.1139
         A1 = 0.3328
@@ -227,12 +227,12 @@ class CubMCG(StoppingCriterion):
         # using Jensen's inequality to bound the third moment
         BEfun = lambda logsqrtb: \
             (norm.cdf(n1*logsqrtb) + minimum(A1*(M3upper+A2),
-            A*M3upper/(1+(sqrt(n1)*logsqrtb)**3))/sqrt(n1)
+            A*M3upper/(1+(np.sqrt(n1)*logsqrtb)**3))/np.sqrt(n1)
             - alpha1/2)
         # Berry-Esseen inequality
-        logsqrtb_clt = log(sqrt(norm.ppf(1-alpha1/2)/sqrt(n1)))
+        logsqrtb_clt = np.log(np.sqrt(norm.ppf(1-alpha1/2)/np.sqrt(n1)))
         # use CLT to get tolerance
-        NBE_inv = exp(2*fsolve(BEfun,logsqrtb_clt))
+        NBE_inv = np.exp(2*fsolve(BEfun,logsqrtb_clt))
         # use fsolve to get Berry-Esseen tolerance
         eps = minimum(NCheb_inv,NBE_inv)
         # take the min of Chebyshev and Berry Esseen tolerance

@@ -83,8 +83,8 @@ class CubBayesNetG(_CubBayesLDG):
         """
         Args:
             integrand (Integrand): an instance of Integrand
-            abs_tol (ndarray): absolute error tolerance
-            rel_tol (ndarray): relative error tolerance
+            abs_tol (np.ndarray): absolute error tolerance
+            rel_tol (np.ndarray): relative error tolerance
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
             alpha (float): significance level or p-value
@@ -125,12 +125,12 @@ class CubBayesNetG(_CubBayesLDG):
         ytilde = np.squeeze(y)
         self.fwht.fwht_inplace(len(y), ytilde)
         return ytilde
-        # ytilde = np.array(self.fwht_h_py(y), dtype=float)
+        # ytilde = np.np.array(self.fwht_h_py(y), dtype=float)
         # return ytilde
 
     @staticmethod
     def _merge_fwht(ftilde_new, ftilde_next_new, mnext):
-        ftilde_new = np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
+        ftilde_new = np.np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
         return ftilde_new
 
     '''
@@ -161,7 +161,7 @@ class CubBayesNetG(_CubBayesLDG):
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
                 vec_lambda_direct = np.real(
-                    np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
+                    np.np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
@@ -177,9 +177,9 @@ class CubBayesNetG(_CubBayesLDG):
     # Builds High order walsh kernel function
     @staticmethod
     def BuildKernelFunc(order):
-        # a1 = @(x)(-floor(log2(x)))
+        # a1 = @(x)(-np.floor(np.log2(x)))
         def a1(x):
-            out = -np.floor(log2(x + np.finfo(float).eps))
+            out = -np.np.floor(np.log2(x + np.finfo(float).eps))
             out[x == 0] = 0  # a1 is zero when x is zero
             return out
 
@@ -201,7 +201,7 @@ class CubBayesNetG(_CubBayesLDG):
         ts3 = lambda x: ((1 - 43 * t2(x)) / 18 + (5 * t1(x) - 1) * x + (a1(x) - 2) * x ** 2)
 
         if order == 1:
-            kernFunc = lambda x: (6 * ((1 / 6) - 2 ** (np.floor(log2(x + np.finfo(float).eps)) - 1)))
+            kernFunc = lambda x: (6 * ((1 / 6) - 2 ** (np.np.floor(np.log2(x + np.finfo(float).eps)) - 1)))
         elif order == 2:
             omega2_1D = lambda x: (s1(x) + ts2(x))
             kernFunc = omega2_1D
@@ -216,12 +216,12 @@ class CubBayesNetG(_CubBayesLDG):
     '''
     @staticmethod
     def fwht_h_py(ynext):
-        mnext = int(np.log2(len(ynext)))
+        mnext = int(np.np.log2(len(ynext)))
         for l in range(mnext):
             nl = 2**l
             nmminlm1 = 2.**(mnext-l-1)
-            ptind_nl = np.hstack(( np.tile(True,nl), np.tile(False,nl) ))
-            ptind = np.tile(ptind_nl,int(nmminlm1))
+            ptind_nl = np.np.hstack(( np.np.tile(True,nl), np.np.tile(False,nl) ))
+            ptind = np.np.tile(ptind_nl,int(nmminlm1))
             evenval = ynext[ptind]
             oddval = ynext[~ptind]
             ynext[ptind] = (evenval + oddval)

@@ -4,7 +4,7 @@ from .gaussian import Gaussian
 from ..discrete_distribution import DigitalNetB2
 from ..util import TransformError, ParameterError
 from scipy.stats import norm
-from numpy import *
+import numpy as np
 
 
 class Lebesgue(TrueMeasure):
@@ -36,7 +36,7 @@ class Lebesgue(TrueMeasure):
         super(Lebesgue,self).__init__()
 
     def _weight(self, x):
-        return ones(x.shape[0],dtype=float)
+        return np.ones(x.shape[0],dtype=float)
 
     def _spawn(self, sampler, dimension):
         return Lebesgue(sampler)

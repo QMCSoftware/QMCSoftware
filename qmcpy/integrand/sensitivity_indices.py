@@ -4,7 +4,7 @@ from ..stopping_criterion import CubQMCNetG
 from ..util import ParameterError
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
-from numpy import *
+import numpy as np
 from itertools import combinations
 
 
@@ -18,7 +18,7 @@ class SensitivityIndices(Integrand):
     >>> sc = CubQMCNetG(keister_indices,abs_tol=1e-3)
     >>> solution,data = sc.integrate()
     >>> solution.squeeze()
-    array([[0.32803146, 0.32793778, 0.32788696],
+    np.array([[0.32803146, 0.32793778, 0.32788696],
            [0.33850394, 0.33848679, 0.33861519]])
     >>> data
     LDTransformData (AccumulateData Object)
@@ -100,11 +100,11 @@ class SensitivityIndices(Integrand):
         elif self.indices=='all':
             self.indices = []
             for r in range(1,self.d):
-                self.indices += [list(idx) for idx in combinations(arange(self.d),r)]
+                self.indices += [list(idx) for idx in combinations(np.arange(self.d),r)]
         if [] in self.indices or [i for i in range(self.d)] in self.indices:
             raise ParameterError('SensitivityIndices indices cannot include [], the null set.')
         self.s = len(self.indices)
-        self.indices_bool_mat = tile(False,(self.s,self.d))
+        self.indices_bool_mat = np.tile(False,(self.s,self.d))
         for k in range(self.s): self.indices_bool_mat[k,self.indices[k]] = True
         self.not_indices_bool_mat = ~self.indices_bool_mat
         # sensitivity_index
@@ -122,10 +122,10 @@ class SensitivityIndices(Integrand):
         z = x[:,self.d:]
         x = x[:,:self.d]
         n,d = x.shape
-        y = zeros((n,)+self.d_indv,dtype=float)
+        y = np.zeros((n,)+self.d_indv,dtype=float)
         compute_flags = kwargs['compute_flags']
         del kwargs['compute_flags']
-        v = zeros((n,d),dtype=float)
+        v = np.zeros((n,d),dtype=float)
         f_x = self.integrand.f(x,*args,**kwargs)
         f_z = self.integrand.f(z,*args,**kwargs)
         for k in range(self.s):

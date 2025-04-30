@@ -1,6 +1,6 @@
 from ..util import MethodImplementationError, _univ_repr, DimensionError, ParameterError
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from numpy import *
+import numpy as np
 
 
 class TrueMeasure(object):
@@ -9,9 +9,9 @@ class TrueMeasure(object):
     def __init__(self):
         prefix = 'A concrete implementation of TrueMeasure must have '
         if not hasattr(self,'domain'):
-            raise ParameterError(prefix + 'self.domain, 2xd ndarray of domain lower bounds (first col) and upper bounds (second col)')
+            raise ParameterError(prefix + 'self.domain, 2xd np.ndarray of domain lower bounds (first col) and upper bounds (second col)')
         if not hasattr(self,'range'):
-            raise ParameterError(prefix + 'self.range, 2xd ndarray of range lower bounds (first col) and upper bounds (second col)')
+            raise ParameterError(prefix + 'self.range, 2xd np.ndarray of range lower bounds (first col) and upper bounds (second col)')
         if not hasattr(self,'parameters'):
             self.parameters = []
     
@@ -23,7 +23,7 @@ class TrueMeasure(object):
             self.d = sampler.d # take the dimension from the discrete distribution
             self.discrete_distrib = sampler
             if sampler.mimics == 'StdUniform':
-                if not (self.domain==tile([0,1],(self.d,1))).all():
+                if not (self.domain==np.tile([0,1],(self.d,1))).all():
                     raise ParameterError("The True measure's transform should have unit-cube domain.")
             else:
                 raise ParameterError('The %s true measure does not support discrete distributions that mimic a %s.'%\
@@ -50,7 +50,7 @@ class TrueMeasure(object):
             kwargs (dict): keyword arguments to the discrete distributions gen_samples method
         
         Returns: 
-            ndarray: n x d matrix of transformed samples
+            np.ndarray: n x d matrix of transformed samples
         """
         x = self.discrete_distrib.gen_samples(*args,**kwargs)
         return self._transform_r(x)
@@ -64,7 +64,7 @@ class TrueMeasure(object):
             x: n x d matrix of samples mimicking a standard uniform.
 
         Returns:
-            ndarray: n x d matrix of transformed x.  
+            np.ndarray: n x d matrix of transformed x.  
         """
         if self.sub_compatibility_error:
             raise ParameterError("The transform domain must match the sub-transform range.")
@@ -82,7 +82,7 @@ class TrueMeasure(object):
             x: n x d matrix of samples mimicking a standard uniform.
 
         Returns:
-            ndarray: n x d matrix of transformed x.  
+            np.ndarray: n x d matrix of transformed x.  
         """
         raise MethodImplementationError(self,'_transform. Try setting sampler to be in a PDF TrueMeasure to importance sample by.')
         
@@ -92,11 +92,11 @@ class TrueMeasure(object):
         Takes into account composed transforms. 
 
         Args:
-            x (ndarray): n x d matrix of samples
+            x (np.ndarray): n x d matrix of samples
         
         Returns:
-            ndarray: length n vector of transformed samples at locations of x
-            ndarray: length n vector of Jacobian values at locations of x
+            np.ndarray: length n vector of transformed samples at locations of x
+            np.ndarray: length n vector of Jacobian values at locations of x
 
         Note: If transform is T, then the Jacobian of T is 1/lambda(T(x)) for
         """
@@ -119,10 +119,10 @@ class TrueMeasure(object):
         i.e. Lebesgue weight is always 1, but is not a PDF.
 
         Args:
-            x (ndarray): n x d  matrix of samples
+            x (np.ndarray): n x d  matrix of samples
         
         Returns:
-            ndarray: length n vector of weights at locations of x
+            np.ndarray: length n vector of weights at locations of x
         """ 
         raise MethodImplementationError(self,'weight. Try a different true measure with a _weight method.')  
     
@@ -133,19 +133,19 @@ class TrueMeasure(object):
         
         Args:
             s (int): number of spawn
-            dimensions (ndarray): length s array of dimension for each spawn. Defaults to current dimension
+            dimensions (np.ndarray): length s array of dimension for each spawn. Defaults to current dimension
         
         Return: 
             list: list of TrueMeasures linked to newly spawned DiscreteDistributions
         """
-        if (isinstance(dimensions,list) or isinstance(dimensions,ndarray)) and len(dimensions)==s:
-            dimensions = array(dimensions)
-        elif isscalar(dimensions) and dimensions%1==0:
-            dimensions = tile(dimensions,s)
+        if (isinstance(dimensions,list) or isinstance(dimensions,np.ndarray)) and len(dimensions)==s:
+            dimensions = np.array(dimensions)
+        elif np.isscalar(dimensions) and dimensions%1==0:
+            dimensions = np.tile(dimensions,s)
         elif dimensions is None:
-            dimensions = tile(self.d,s)
+            dimensions = np.tile(self.d,s)
         else:
-            raise ParameterError("invalid spawn dimensions, must be None, int, or length s ndarray")
+            raise ParameterError("invalid spawn dimensions, must be None, int, or length s np.ndarray")
         spawns = [None]*s
         sampler_spawns = [None]*s
         for i in range(s):
@@ -160,7 +160,7 @@ class TrueMeasure(object):
         
         Args:
             sampler (DiscreteDistribution or TrueMeasure): spawn of sampler for this measure
-            dimension (ndarray): dimension of new spawn
+            dimension (np.ndarray): dimension of new spawn
         
         Return: 
             TrueMeasure: spawn with dimension and sampler

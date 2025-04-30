@@ -1,5 +1,5 @@
 from ._accumulate_data import AccumulateData
-from numpy import *
+import numpy as np
 
 class MeanVarDataVec(AccumulateData):
     """
@@ -15,5 +15,5 @@ class MeanVarDataVec(AccumulateData):
     def update_data(self,y):
         muhat = y.mean()
         sighat = y.std(ddof = 1)
-        bounds = muhat+array([-1,1])*self.z_star*self.inflate*sighat/sqrt(len(y))
+        bounds = muhat+np.array([-1,1])*self.z_star*self.inflate*sighat/np.sqrt(len(y))
         return muhat,bounds[0],bounds[1]

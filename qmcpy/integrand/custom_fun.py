@@ -26,7 +26,7 @@ class CustomFun(Integrand):
     >>> y.shape
     (1024, 3)
     >>> y.mean(0)
-    array([3., 4., 5.])
+    np.array([3., 4., 5.])
     """
 
     def __init__(self, true_measure, g, dimension_indv=1, parallel=False):

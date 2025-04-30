@@ -7,7 +7,7 @@ from ..accumulate_data.pf_gp_ci_data import PFGPCIData, _error_udens
 from ..util import MaxSamplesWarning
 import warnings
 import time
-from numpy import *
+import numpy as np
 from scipy.stats import norm
 import gpytorch 
 import torch
@@ -20,10 +20,10 @@ class PFSampleErrorDensityAR(Suggester):
         super(PFSampleErrorDensityAR,self).__init__()
     def suggest(self, n, d, gp, rng, efficiency, pct=.5):
         if self.verbose: print('\tAR sampling with efficiency %.1e, expect %d draws: '%(efficiency,int(n/efficiency)),end='',flush=True)
-        x = zeros((0,d),dtype=float)
+        x = np.zeros((0,d),dtype=float)
         self.n_ar_tries_batch = 0
         rem = n
-        draws_per_rem = int(ceil(log(pct)/log(1-efficiency)))
+        draws_per_rem = int(np.ceil(np.log(pct)/np.log(1-efficiency)))
         while rem>0:
             newtries = rem*draws_per_rem
             self.n_ar_tries_batch += newtries
@@ -31,7 +31,7 @@ class PFSampleErrorDensityAR(Suggester):
             z = rng.random((newtries,d))
             u = rng.random(newtries)
             udens_z = _error_udens(gp,z)
-            x = vstack([x,z[u<=udens_z]])
+            x = np.vstack([x,z[u<=udens_z]])
             rem = maximum(n-len(x),0)
         if self.verbose: print()
         return x[:n]
@@ -229,13 +229,13 @@ class PFGPCI(StoppingCriterion):
         data.n_total = sum(data.n_batch)
         data.time_integrate = time.time()-t0
         data.n_sum = cumsum(data.n_batch)
-        data.n_batch = array(data.n_batch)
-        data.error_bounds = array(data.error_bounds)
-        data.ci_low = array(data.ci_low)
-        data.ci_high = array(data.ci_high)
-        data.solutions = array(data.solutions)
+        data.n_batch = np.array(data.n_batch)
+        data.error_bounds = np.array(data.error_bounds)
+        data.ci_low = np.array(data.ci_low)
+        data.ci_high = np.array(data.ci_high)
+        data.solutions = np.array(data.solutions)
         if self.approx_true_solution:
-            data.solutions_ref = tile(self.ref_approx,len(data.n_batch))
+            data.solutions_ref = np.tile(self.ref_approx,len(data.n_batch))
             data.error_ref = abs(data.solutions-data.solutions_ref)
             data.in_ci = (data.ci_low<=data.solutions_ref)*(data.solutions_ref<=data.ci_high)
         return data.solution,data

@@ -2,7 +2,7 @@ from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 from ..integrand import Integrand
-from numpy import *
+import numpy as np
 from time import time
 import warnings
 
@@ -20,8 +20,8 @@ class _CubQMCLDG(StoppingCriterion):
         # Input Checks
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
-        m_min = log2(n_init)
-        m_max = log2(n_max)
+        m_min = np.log2(n_init)
+        m_max = np.log2(n_max)
         if m_min%1 != 0. or m_min < 8. or m_max%1 != 0.:
             warning_s = '''
                 n_init and n_max must be a powers of 2.
@@ -47,7 +47,7 @@ class _CubQMCLDG(StoppingCriterion):
         self.d_indv = self.integrand.d_indv
         self.cv = list(atleast_1d(control_variates))
         self.ncv = len(self.cv)
-        self.cv_mu = array(control_variate_means) if self.ncv>0 else empty((self.ncv,)+self.d_indv)
+        self.cv_mu = np.array(control_variate_means) if self.ncv>0 else np.empty((self.ncv,)+self.d_indv)
         self.cv_mu = self.cv_mu if self.cv_mu.ndim>1 else self.cv_mu.reshape(self.ncv,-1)
         if self.cv_mu.shape!=((self.ncv,)+self.d_indv):
             raise ParameterError('''Control variate means should have shape (len(control variates),d_indv).''')
@@ -64,28 +64,28 @@ class _CubQMCLDG(StoppingCriterion):
 
     def integrate(self):
         t_start = time()
-        self.datum = empty(self.d_indv,dtype=object)
+        self.datum = np.empty(self.d_indv,dtype=object)
         for j in ndindex(self.d_indv):
             cv_mu_j = self.cv_mu[(slice(None),)+j]
             self.datum[j] = LDTransformData(self.m_min,self.m_max,self.coefv,self.fudge,self.check_cone,self.ncv,cv_mu_j,self.update_beta)
         self.data = LDTransformData.__new__(LDTransformData)
-        self.data.flags_indv = tile(False,self.d_indv)
-        self.data.compute_flags = tile(True,self.d_indv)
-        self.data.m = tile(self.m_min,self.d_indv)
+        self.data.flags_indv = np.tile(False,self.d_indv)
+        self.data.compute_flags = np.tile(True,self.d_indv)
+        self.data.m = np.tile(self.m_min,self.d_indv)
         self.data.n_min = 0
-        self.data.indv_bound_low = tile(-inf,self.d_indv)
-        self.data.indv_bound_high = tile(inf,self.d_indv)
-        self.data.solution_indv = tile(nan,self.d_indv)
+        self.data.indv_bound_low = np.tile(-np.inf,self.d_indv)
+        self.data.indv_bound_high = np.tile(np.inf,self.d_indv)
+        self.data.solution_indv = np.tile(nan,self.d_indv)
         self.data.solution = nan
-        self.data.xfull = empty((0,self.d))
-        self.data.yfull = empty((0,)+self.d_indv)
+        self.data.xfull = np.empty((0,self.d))
+        self.data.yfull = np.empty((0,)+self.d_indv)
         while True:
             m = self.data.m.max()
             n_min = self.data.n_min
             n_max = int(2**m)
             n = int(n_max-n_min)
             xnext = self.discrete_distrib.gen_samples(n_min=n_min,n_max=n_max)
-            ycvnext = empty((1+self.ncv,n,)+self.d_indv,dtype=float)
+            ycvnext = np.empty((1+self.ncv,n,)+self.d_indv,dtype=float)
             ycvnext[0] = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
             for k in range(self.ncv):
                 ycvnext[1+k] = self.cv[k].f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
@@ -101,15 +101,15 @@ class _CubQMCLDG(StoppingCriterion):
                 self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j],cone_violation = self.datum[j].update_data(m,y_val,y_cp,yg_val,yg_cp)
                 if cone_violation:
                     warnings.warn('Function at index %d (indexing d_indv) violates cone conditions.'%j,CubatureWarning)
-            self.data.xfull = vstack((self.data.xfull,xnext))
-            self.data.yfull = vstack((self.data.yfull,ycvnext[0]))
+            self.data.xfull = np.vstack((self.data.xfull,xnext))
+            self.data.yfull = np.vstack((self.data.yfull,ycvnext[0]))
             self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
             self.abs_tols,self.rel_tols = full_like(self.data.comb_bound_low,self.abs_tol),full_like(self.data.comb_bound_low,self.rel_tol)
             fidxs = isfinite(self.data.comb_bound_low)&isfinite(self.data.comb_bound_high)
             slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = tile(nan,self.data.comb_bound_low.shape)
+            self.data.solution = np.tile(nan,self.data.comb_bound_low.shape)
             self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.comb_flags = tile(False,self.data.comb_bound_low.shape)
+            self.data.comb_flags = np.tile(False,self.data.comb_bound_low.shape)
             self.data.comb_flags[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
             self.data.compute_flags = ~self.data.flags_indv

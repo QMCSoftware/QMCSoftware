@@ -1,7 +1,7 @@
 from ._integrand import Integrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
-from numpy import *
+import numpy as np
 
 
 class BoxIntegral(Integrand):
@@ -14,14 +14,14 @@ class BoxIntegral(Integrand):
     >>> y1.shape
     (1024, 1)
     >>> y1.mean(0)
-    array([0.75157346])
+    np.array([0.75157346])
     >>> l2 = BoxIntegral(DigitalNetB2(5,seed=7), s=[-7,7])
     >>> x2 = l2.discrete_distrib.gen_samples(2**10)
     >>> y2 = l2.f(x2,compute_flags=[1,1])
     >>> y2.shape
     (1024, 2)
     >>> y2.mean(0)
-    array([ 4.46151185, 10.51662004])
+    np.array([ 4.46151185, 10.51662004])
 
     References:
 
@@ -32,24 +32,24 @@ class BoxIntegral(Integrand):
     [2] https://www.davidhbailey.com/dhbpapers/boxintegrals.pdf
     """
 
-    def __init__(self, sampler, s=array([1,2])):
+    def __init__(self, sampler, s=np.array([1,2])):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
-            s (list or ndarray): vectorized s parameter, len(s) is the number of vectorized integrals to evaluate.
+            s (list or np.ndarray): vectorized s parameter, len(s) is the number of vectorized integrals to evaluate.
         """
         self.parameters = ['s']
-        self.s = array([s]) if isscalar(s) else array(s)
+        self.s = np.array([s]) if np.isscalar(s) else np.array(s)
         self.sampler = sampler
         self.true_measure = Uniform(self.sampler, lower_bound=0., upper_bound=1.)
         super(BoxIntegral,self).__init__(dimension_indv=len(self.s),dimension_comb=len(self.s),parallel=False) # output dimensions per sample
 
     def g(self, t, **kwargs):
-        compute_flags = kwargs['compute_flags'] if 'compute_flags' in kwargs else ones(self.d_indv,dtype=int)
+        compute_flags = kwargs['compute_flags'] if 'compute_flags' in kwargs else np.ones(self.d_indv,dtype=int)
         n,d = t.shape
-        y = zeros((n,)+self.d_indv,dtype=float)
+        y = np.zeros((n,)+self.d_indv,dtype=float)
         for j in range(len(self.s)):
             if compute_flags[j] == 1: 
                 y[:,j] = (t**2).sum(1)**(self.s[j]/2)

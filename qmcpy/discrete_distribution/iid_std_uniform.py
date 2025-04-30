@@ -1,10 +1,10 @@
 from ._discrete_distribution import IID
-from numpy import *
+import numpy as np
 
 
 class IIDStdUniform(IID):
     """
-    A wrapper around NumPy's IID Standard Uniform generator `numpy.random.rand`.
+    A wrapper around NumPy's IID Standard Uniform generator `numpy.np.random.rand`.
 
     >>> dd = IIDStdUniform(dimension=2,seed=7)
     >>> dd.gen_samples(4)
@@ -23,11 +23,11 @@ class IIDStdUniform(IID):
         """
         Args:
             dimension (int): dimension of samples
-            seed (None or int or numpy.random.SeedSeq): seed the random number generator for reproducibility
+            seed (None or int or numpy.np.random.SeedSeq): seed the random number generator for reproducibility
         """
         self.mimics = 'StdUniform'
         self.low_discrepancy = False
-        self.d_max = inf
+        self.d_max = np.inf
         self.replications = replications
         super(IIDStdUniform,self).__init__(dimension,seed)
 
@@ -39,13 +39,13 @@ class IIDStdUniform(IID):
             n (int): Number of observations to generate
 
         Returns:
-            ndarray: n x self.d array of samples
+            np.ndarray: n x self.d array of samples
         """
         x = self.rng.uniform(size=(self.replications,int(n),self.d))
         return x[0] if self.replications==1 else x
     
     def pdf(self, x):
-        return ones(x.shape[0], dtype=float)
+        return np.ones(x.shape[0], dtype=float)
         
     def _spawn(self, child_seed, dimension):
         return IIDStdUniform(dimension=dimension,seed=child_seed)

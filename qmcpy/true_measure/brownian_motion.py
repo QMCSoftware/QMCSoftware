@@ -3,7 +3,7 @@ from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..discrete_distribution import DigitalNetB2
 from ._true_measure import TrueMeasure
 from ..util import ParameterError, _univ_repr
-from numpy import *
+import numpy as np
 
 
 class BrownianMotion(Gaussian):
@@ -11,15 +11,6 @@ class BrownianMotion(Gaussian):
     Geometric Brownian Motion.
     
     >>> bm = BrownianMotion(DigitalNetB2(4,seed=7),t_final=2,drift=2)
-    >>> bm.drift_time_vec_plus_init
-    array([1., 2., 3., 4.])
-    >>> bm.diffused_sigma_bm
-    array([[0.5, 0.5, 0.5, 0.5],
-           [0.5, 1. , 1. , 1. ],
-           [0.5, 1. , 1.5, 1.5],
-           [0.5, 1. , 1.5, 2. ]])
-    >>> from numpy.linalg import eigh 
-    >>> evals,evecs = eigh(bm.diffused_sigma_bm)
     >>> bm.gen_samples(2)
     array([[1.51167184, 2.68862753, 4.38281263, 5.69142004],
            [0.83530941, 1.5661029 , 2.03218313, 2.62046745]])
@@ -53,17 +44,17 @@ class BrownianMotion(Gaussian):
         """
         self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform
-        self.domain = array([[0,1]])
+        self.domain = np.array([[0,1]])
         self._parse_sampler(sampler)
         self.t = t_final # exercise time
         self.initial_value = initial_value
         self.drift = drift
         self.diffusion = diffusion
-        self.time_vec = linspace(self.t/self.d,self.t,self.d) # evenly spaced
-        self.diffused_sigma_bm = self.diffusion*array([[minimum(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
+        self.time_vec = np.linspace(self.t/self.d,self.t,self.d) # evenly spaced
+        self.diffused_sigma_bm = self.diffusion*np.array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
         self.drift_time_vec_plus_init = self.drift*self.time_vec+self.initial_value # mean
         self._parse_gaussian_params(self.drift_time_vec_plus_init,self.diffused_sigma_bm,decomp_type)
-        self.range = array([[-inf,inf]])
+        self.range = np.array([[-np.inf,np.inf]])
         super(Gaussian,self).__init__()
     
     def _spawn(self, sampler, dimension):

@@ -3,7 +3,7 @@ from ..util import ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, CustomFun, BoxIntegral
-from numpy import *
+import numpy as np
 
 
 class CubQMCNetG(_CubQMCLDG):
@@ -50,27 +50,27 @@ class CubQMCNetG(_CubQMCLDG):
     ...     control_variate_means = [1,4/3])
     >>> sol,data = sc.integrate()
     >>> sol
-    array([5.33333333])
+    np.array([5.33333333])
     >>> exactsol = 16/3
     >>> abs(sol-exactsol)<1e-6
-    array([ True])
+    np.array([ True])
     >>> dnb2 = DigitalNetB2(3,seed=7)
     >>> f = BoxIntegral(dnb2, s=[-1,1])
     >>> abs_tol = 1e-3
     >>> sc = CubQMCNetG(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.18954933, 0.96059814])
-    >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
-    >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
-    >>> true_value = array([sol3neg1,sol31])
+    np.array([1.18954933, 0.96059814])
+    >>> sol3neg1 = -pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-pi/24
+    >>> true_value = np.array([sol3neg1,sol31])
     >>> (abs(true_value-solution)<abs_tol).all()
     np.True_
     >>> f2 = BoxIntegral(dnb2,s=[3,4])
     >>> sc = CubQMCNetG(f2,control_variates=f,control_variate_means=true_value,update_beta=True)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.10138626, 1.26667924])
+    np.array([1.10138626, 1.26667924])
     >>> data
     LDTransformData (AccumulateData Object)
         solution        [1.101 1.267]
@@ -103,7 +103,7 @@ class CubQMCNetG(_CubQMCLDG):
         spawn_key       ()
     >>> cf = CustomFun(
     ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
-    ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
+    ...     g = lambda x,compute_flags=None: (2*np.arange(1,7)*x).reshape(-1,2,3),
     ...     dimension_indv = (2,3))
     >>> sol,data = CubQMCNetG(cf,abs_tol=1e-6).integrate()
     >>> data
@@ -174,8 +174,8 @@ class CubQMCNetG(_CubQMCLDG):
         """
         Args:
             integrand (Integrand): an instance of Integrand
-            abs_tol (ndarray): absolute error tolerance
-            rel_tol (ndarray): relative error tolerance
+            abs_tol (np.ndarray): absolute error tolerance
+            rel_tol (np.ndarray): relative error tolerance
             n_init (int): initial number of samples
             n_max (int): maximum number of samples
             fudge (function): positive function multiplying the finite
@@ -194,7 +194,7 @@ class CubQMCNetG(_CubQMCLDG):
         super(CubQMCNetG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,
             check_cone,control_variates,control_variate_means,update_beta,
             ptransform = 'none',
-            coefv = lambda nl: ones(nl,dtype=float), 
+            coefv = lambda nl: np.ones(nl,dtype=float), 
             allowed_levels = ['single'],
             allowed_distribs = [DigitalNetB2],
             cast_complex = False,

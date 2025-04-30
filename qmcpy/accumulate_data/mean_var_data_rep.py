@@ -1,5 +1,5 @@
 from ._accumulate_data import AccumulateData
-from numpy import *
+import numpy as np
 
 class MeanVarDataRep(AccumulateData):
     """
@@ -11,7 +11,7 @@ class MeanVarDataRep(AccumulateData):
         self.z_star = z_star
         self.inflate = inflate
         self.replications = replications
-        self.ysums = zeros(self.replications,dtype=float)
+        self.ysums = np.zeros(self.replications,dtype=float)
         self.n_rep = 0
         super(MeanVarDataRep,self).__init__()
 
@@ -21,5 +21,5 @@ class MeanVarDataRep(AccumulateData):
         self.muhats = self.ysums/self.n_rep
         self.muhat = self.muhats.mean()
         self.sighat = self.muhats.std()
-        self.bounds = self.muhat+array([-1,1])*self.z_star*self.inflate*self.sighat/sqrt(self.replications)
+        self.bounds = self.muhat+np.array([-1,1])*self.z_star*self.inflate*self.sighat/np.sqrt(self.replications)
         return self.muhat,self.bounds[0],self.bounds[1]

@@ -1,4 +1,4 @@
-from numpy import *
+import numpy as np
 from ._integrand import Integrand
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2

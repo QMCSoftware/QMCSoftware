@@ -1,4 +1,4 @@
-from numpy import *
+import numpy as np
 from ._integrand import Integrand
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
@@ -22,10 +22,10 @@ class FourBranch2d(Integrand):
         super(FourBranch2d,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
     def g(self, t):
         t0,t1 = t[:,0],t[:,1]
-        return vstack([
-            3+.1*(t0-t1)**2-(t0+t1)/sqrt(2),
-            3+.1*(t0-t1)**2+(t0+t1)/sqrt(2),
-            t0-t1+7/sqrt(2),
-            t1-t0+7/sqrt(2)]).min(0)
+        return np.vstack([
+            3+.1*(t0-t1)**2-(t0+t1)/np.sqrt(2),
+            3+.1*(t0-t1)**2+(t0+t1)/np.sqrt(2),
+            t0-t1+7/np.sqrt(2),
+            t1-t0+7/np.sqrt(2)]).min(0)
     def _spawn(self, level, sampler):
         return FourBranch2d(sampler=sampler) 

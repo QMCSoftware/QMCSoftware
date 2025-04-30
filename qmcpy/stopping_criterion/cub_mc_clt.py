@@ -5,7 +5,7 @@ from ..discrete_distribution._discrete_distribution import IID
 from ..true_measure import Gaussian, BrownianMotion, Uniform
 from ..integrand import Keister, AsianOption, CustomFun
 from ..util import MaxSamplesWarning
-from numpy import *
+import numpy as np
 from scipy.stats import norm
 from time import time
 import warnings
@@ -96,8 +96,8 @@ class CubMCCLT(StoppingCriterion):
             integrand (Integrand): an instance of Integrand
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
-            abs_tol (ndarray): absolute error tolerance
-            rel_tol (ndarray): relative error tolerance
+            abs_tol (np.ndarray): absolute error tolerance
+            rel_tol (np.ndarray): relative error tolerance
             n_max (int): maximum number of samples
             control_variates (list): list of integrand objects to be used as control variates. 
                 Control variates are currently only compatible with single level problems. 
@@ -139,7 +139,7 @@ class CubMCCLT(StoppingCriterion):
         # n_mu_temp := n such that confidence intervals width and confidence will be satisfied
         tol_up = maximum(self.abs_tol, abs(self.data.solution) * self.rel_tol)
         z_star = -norm.ppf(self.alpha / 2.)
-        n_mu_temp = ceil(temp_b * (self.data.sighat / temp_a) * (z_star * self.inflate / tol_up)**2)
+        n_mu_temp = np.ceil(temp_b * (self.data.sighat / temp_a) * (z_star * self.inflate / tol_up)**2)
         # n_mu := n_mu_temp adjusted for previous n
         self.data.n_mu = maximum(self.data.n, n_mu_temp)
         self.data.n += self.data.n_mu.astype(int)
@@ -155,13 +155,13 @@ class CubMCCLT(StoppingCriterion):
             # decrease n proportionally for each integrand
             n_decease = self.data.n_total + self.data.n.sum() - self.n_max
             dec_prop = n_decease / self.data.n.sum()
-            self.data.n = floor(self.data.n - self.data.n * dec_prop)
+            self.data.n = np.floor(self.data.n - self.data.n * dec_prop)
         # Final Sample
         self.data.update_data()
         # CLT confidence interval
         sigma_up = (self.data.sighat ** 2 / self.data.n_mu).sum(0) ** 0.5
         self.data.error_bound = z_star * self.inflate * sigma_up
-        self.data.confid_int = self.data.solution + self.data.error_bound * array([-1, 1])
+        self.data.confid_int = self.data.solution + self.data.error_bound * np.array([-1, 1])
         self.data.time_integrate = time() - t_start
         return self.data.solution, self.data
 

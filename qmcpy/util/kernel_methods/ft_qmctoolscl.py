@@ -24,15 +24,15 @@ def fftbr(x):
     Requires the size of the last dimension is a power of 2. 
 
     Args:
-        x (ndarray): array of samples at which to run BRO-FFT. Requires x.ndim<=3
+        x (np.ndarray): array of samples at which to run BRO-FFT. Requires x.ndim<=3
     
     Returns:
-        ndarray: BRO-FFT values
+        np.ndarray: BRO-FFT values
     """
     x,shape,d,n,n_half = _parse_ft_input(x)
     if n<=1: return x.reshape(shape).copy()
-    twiddler = np.empty(n,dtype=np.float64)
-    twiddlei = np.empty(n,dtype=np.float64)
+    twiddler = np.np.empty(n,dtype=np.np.float64)
+    twiddlei = np.np.empty(n,dtype=np.np.float64)
     xr = x.real.copy()
     xi = x.imag.copy()
     qmctoolscl.fft_bro_1d_radix2(1,d,int(n_half),twiddler,twiddlei,xr,xi)
@@ -46,15 +46,15 @@ def ifftbr(x):
     Requires the size of the last dimension is a power of 2. 
 
     Args:
-        x (ndarray): array of samples at which to run BRO-IFFT. Requires x.ndim<=3
+        x (np.ndarray): array of samples at which to run BRO-IFFT. Requires x.ndim<=3
     
     Returns:
-        ndarray: BRO-IFFT values
+        np.ndarray: BRO-IFFT values
     """
     x,shape,d,n,n_half = _parse_ft_input(x)
     if n<=1: return x.reshape(shape).copy()
-    twiddler = np.empty(n,dtype=np.float64)
-    twiddlei = np.empty(n,dtype=np.float64)
+    twiddler = np.np.empty(n,dtype=np.np.float64)
+    twiddlei = np.np.empty(n,dtype=np.np.float64)
     xr = x.real.copy()
     xi = x.imag.copy()
     qmctoolscl.ifft_bro_1d_radix2(1,d,int(n_half),twiddler,twiddlei,xr,xi)
@@ -68,10 +68,10 @@ def fwht(x):
     Requires the size of the last dimension is a power of 2. 
 
     Args:
-        x (ndarray): array of samples at which to run FWHT. Requires x.ndim<=3
+        x (np.ndarray): array of samples at which to run FWHT. Requires x.ndim<=3
     
     Returns:
-        ndarray: FWHT values
+        np.ndarray: FWHT values
     """
     x,shape,d,n,n_half = _parse_ft_input(x)
     if n<=1: return x.reshape(shape).copy()

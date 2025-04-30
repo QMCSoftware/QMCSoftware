@@ -5,7 +5,7 @@ from ..discrete_distribution._discrete_distribution import LD
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
-from numpy import *
+import numpy as np
 from numpy.linalg import lstsq
 from scipy.stats import norm
 from time import time
@@ -188,11 +188,11 @@ class CubQMCMLCont(StoppingCriterion):
     def _update_theta(self):
         """Update error splitting parameter"""
         max_levels = len(self.data.n_level)
-        A = ones((2,2))
+        A = np.ones((2,2))
         A[:,0] = range(max_levels-2, max_levels)
-        y = ones(2)
-        y[0] = log2(abs(self.data.mean_level_reps[max_levels-2].mean()))
-        y[1] = log2(abs(self.data.mean_level_reps[max_levels-1].mean()))
+        y = np.ones(2)
+        y[0] = np.log2(abs(self.data.mean_level_reps[max_levels-2].mean()))
+        y[1] = np.log2(abs(self.data.mean_level_reps[max_levels-1].mean()))
         x = lstsq(A, y, rcond=None)[0]
         alpha = maximum(.5,-x[0])
         real_bias = 2**(x[1]+max_levels*x[0]) / (2**alpha - 1)
@@ -200,7 +200,7 @@ class CubQMCMLCont(StoppingCriterion):
 
     def _rmse(self):
         """Returns an estimate for the root mean square error"""
-        return sqrt(self._mse())
+        return np.sqrt(self._mse())
 
     def _mse(self):
         """Returns an estimate for the mean square error"""

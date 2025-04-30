@@ -1,5 +1,5 @@
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
-from numpy import *
+import numpy as np
 
 class DiscreteDistribution(object):
     """ Discrete Distribution abstract class. DO NOT INSTANTIATE. """
@@ -7,11 +7,11 @@ class DiscreteDistribution(object):
     def __init__(self, dimension, seed):
         """
         Args:
-            dimension (int or ndarray): dimension of the generator.
+            dimension (int or np.ndarray): dimension of the generator.
                 If an int is passed in, use sequence dimensions [0,...,dimensions-1].
-                If a ndarray is passed in, use these dimension indices in the sequence.
+                If a np.ndarray is passed in, use these dimension indices in the sequence.
                 Note that this is not relevant for IID generators.
-            seed (int or numpy.random.SeedSequence): seed to create random number generator
+            seed (int or numpy.np.random.SeedSequence): seed to create random number generator
         """
         prefix = 'A concrete implementation of DiscreteDistribution must have '
         if not hasattr(self, 'mimics'):
@@ -22,18 +22,18 @@ class DiscreteDistribution(object):
             self.parameters = []
         if not hasattr(self,'d_max'):
             raise ParameterError(prefix+ 'self.d_max')
-        if isinstance(dimension,list) or isinstance(dimension,ndarray):
-            self.dvec = array(dimension)
+        if isinstance(dimension,list) or isinstance(dimension,np.ndarray):
+            self.dvec = np.array(dimension)
             self.d = len(self.dvec)
         else:
             self.d = dimension
-            self.dvec = arange(self.d)
+            self.dvec = np.arange(self.d)
         if any(self.dvec>self.d_max):
             raise ParameterError('dimension greater than max dimension %d'%self.d_max)
-        self._base_seed = seed if isinstance(seed,random.SeedSequence) else random.SeedSequence(seed)
+        self._base_seed = seed if isinstance(seed,np.random.SeedSequence) else np.random.SeedSequence(seed)
         self.entropy = self._base_seed.entropy
         self.spawn_key = self._base_seed.spawn_key
-        self.rng = random.Generator(random.PCG64(self._base_seed))
+        self.rng = np.random.Generator(np.random.PCG64(self._base_seed))
 
     def gen_samples(self, *args):
         """
@@ -43,7 +43,7 @@ class DiscreteDistribution(object):
             args (tuple): tuple of positional argument. See implementations for details
 
         Returns:
-            ndarray: n x d array of samples
+            np.ndarray: n x d array of samples
         """
         raise MethodImplementationError(self, 'gen_samples')
 
@@ -59,19 +59,19 @@ class DiscreteDistribution(object):
 
         Args:
             s (int): number of spawn
-            dimensions (ndarray): length s array of dimension for each spawn. Defaults to current dimension
+            dimensions (np.ndarray): length s array of dimension for each spawn. Defaults to current dimension
 
         Return:
             list: list of DiscreteDistribution instances with new seeds and dimensions
         """
-        if (isinstance(dimensions,list) or isinstance(dimensions,ndarray)) and len(dimensions)==s:
-            dimensions = array(dimensions)
-        elif isscalar(dimensions) and dimensions%1==0:
-            dimensions = tile(dimensions,s)
+        if (isinstance(dimensions,list) or isinstance(dimensions,np.ndarray)) and len(dimensions)==s:
+            dimensions = np.array(dimensions)
+        elif np.isscalar(dimensions) and dimensions%1==0:
+            dimensions = np.tile(dimensions,s)
         elif dimensions is None:
-            dimensions = tile(self.d,s)
+            dimensions = np.tile(self.d,s)
         else:
-            raise ParameterError("invalid spawn dimensions, must be None, int, or length s ndarray")
+            raise ParameterError("invalid spawn dimensions, must be None, int, or length s np.ndarray")
         child_seeds = self._base_seed.spawn(s)
         return [self._spawn(child_seeds[i],dimensions[i]) for i in range(s)]
 
@@ -80,7 +80,7 @@ class DiscreteDistribution(object):
         ABSTRACT METHOD, used by self.spawn
 
         Args:
-            child_seeds (numpy.random.SeedSequence): length s array of seeds for each spawn
+            child_seeds (numpy.np.random.SeedSequence): length s array of seeds for each spawn
             dimension (int): length s array of dimensions for each spawn
 
         Return:

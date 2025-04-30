@@ -2,7 +2,7 @@ from ..discrete_distribution import DigitalNetB2
 from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
-from numpy import *
+import numpy as np
 
 
 class AsianOption(Integrand):
@@ -25,7 +25,7 @@ class AsianOption(Integrand):
     1.7661702054437982
     >>> level_dims = [2,4,8]
     >>> ac2_multilevel = AsianOption(DigitalNetB2(seed=7),multilevel_dims=level_dims)
-    >>> levels_to_spawn = arange(ac2_multilevel.max_level+1)
+    >>> levels_to_spawn = np.arange(ac2_multilevel.max_level+1)
     >>> ac2_single_levels = ac2_multilevel.spawn(levels_to_spawn)
     >>> yml = 0
     >>> for ac2_single_level in ac2_single_levels:
@@ -71,7 +71,7 @@ class AsianOption(Integrand):
         # handle single vs multilevel
         self.multilevel_dims = multilevel_dims
         if self.multilevel_dims is not None: # multi-level problem
-            self.dim_fracs = array(
+            self.dim_fracs = np.array(
                 [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
                 for i in range(1,len(self.multilevel_dims))],
                 dtype=float)
@@ -91,11 +91,11 @@ class AsianOption(Integrand):
         Calculate the discounted payoff from the stock path. 
         
         Args:
-            stock_path (ndarray): n samples by d dimension option prices at monitoring times
+            stock_path (np.ndarray): n samples by d dimension option prices at monitoring times
             dimension (int): number of dimensions
         
         Return:
-            ndarray: n vector of discounted payoffs
+            np.ndarray: n vector of discounted payoffs
         """
         if self.mean_type == 'arithmetic':
             avg = (self.start_price / 2. +
@@ -103,15 +103,15 @@ class AsianOption(Integrand):
                    stock_path[:, -1] / 2.) / \
                 float(dimension)
         elif self.mean_type == 'geometric':
-            avg = exp((log(self.start_price) / 2. +
-                       log(stock_path[:, :-1]).sum(1) +
-                       log(stock_path[:, -1]) / 2.) /
+            avg = np.exp((np.log(self.start_price) / 2. +
+                       np.log(stock_path[:, :-1]).sum(1) +
+                       np.log(stock_path[:, -1]) / 2.) /
                       float(dimension))
         if self.call_put == 'call':
             y_raw = maximum(avg - self.strike_price, 0)
         else: # put
             y_raw = maximum(self.strike_price - avg, 0)
-        y_adj = y_raw * exp(-self.interest_rate * self.t_final)
+        y_adj = y_raw * np.exp(-self.interest_rate * self.t_final)
         return y_adj
 
     def g(self, t):
@@ -119,10 +119,10 @@ class AsianOption(Integrand):
             raise ParameterError('''
                 Cannot evaluate an integrand with multilevel_dims directly,
                 instead spawn some children and evaluate those.''')
-        self.s_fine = self.start_price * exp(
+        self.s_fine = self.start_price * np.exp(
             (self.interest_rate - self.volatility ** 2 / 2.) *
             self.true_measure.time_vec + self.volatility * t)
-        for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
+        for xx,yy in zip(*np.where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs(self.s_fine,self.d)
         if self.dim_frac > 0:

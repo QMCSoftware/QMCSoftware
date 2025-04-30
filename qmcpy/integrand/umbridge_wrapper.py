@@ -3,7 +3,7 @@ from ..discrete_distribution import DigitalNetB2
 from ..stopping_criterion import CubQMCNetG
 from ..true_measure import Uniform
 from ..util import ParameterError
-from numpy import *
+import numpy as np
 import os
 
 class UMBridgeWrapper(Integrand):
@@ -138,7 +138,7 @@ class UMBridgeWrapper(Integrand):
     
     def g(self, t, **kwargs):
         n = len(t)
-        y = zeros((n,self.d_indv[0]),dtype=float)
+        y = np.zeros((n,self.d_indv[0]),dtype=float)
         for i in range(n):
             ti_ll = [t[i,self.d_in_umbridge[j]:self.d_in_umbridge[j+1]].tolist() for j in range(self.n_d_in_umbridge)]
             yi_ll = self.model.__call__(ti_ll,self.config)
@@ -157,7 +157,7 @@ class UMBridgeWrapper(Integrand):
         Convert a data attribute to UM-Bridge output sized list of lists. 
         
         Args:
-            attr (ndarray): array of length sum(model.get_output_sizes(self.config))
+            attr (np.ndarray): array of length sum(model.get_output_sizes(self.config))
         
         Return:
             list: list of lists with sub-list lengths specified by model.get_output_sizes(self.config)
