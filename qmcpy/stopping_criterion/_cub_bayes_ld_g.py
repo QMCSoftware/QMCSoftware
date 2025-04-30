@@ -18,8 +18,8 @@ class _CubBayesLDG(StoppingCriterion):
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
-        m_min = np.np.log2(n_init)
-        m_max = np.np.log2(n_max)
+        m_min = np.log2(n_init)
+        m_max = np.log2(n_max)
         if m_min % 1 != 0. or m_min < 5 or m_max % 1 != 0:
             warning_s = '''
                 n_init and n_max must be a powers of 2.
@@ -57,28 +57,28 @@ class _CubBayesLDG(StoppingCriterion):
 
         # Verify Compliant Construction
         super(_CubBayesLDG, self).__init__(allowed_levels=['single'], allowed_distribs=allowed_distribs, allow_vectorized_integrals=True)
-        self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.np.full(self.integrand.d_comb,self.alpha))
+        self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
 
     def integrate(self):
         t_start = time()
-        self.datum = np.np.empty(self.d_indv, dtype=object)
-        for j in np.ndindex(self.d_indv):
+        self.datum = np.empty(self.d_indv, dtype=object)
+        for j in np.np.ndindex(self.d_indv):
             self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
                                                  self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel, self.alphas_indv[j])
 
         self.data = LDTransformBayesData.__new__(LDTransformBayesData)
-        self.data.flags_indv = np.np.tile(False, self.d_indv)
-        self.data.compute_flags = np.np.tile(True,self.d_indv)
+        self.data.flags_indv = np.tile(False, self.d_indv)
+        self.data.compute_flags = np.tile(True,self.d_indv)
         prev_flags_indv = self.data.flags_indv
-        self.data.m = np.np.tile(self.m_min, self.d_indv)
+        self.data.m = np.tile(self.m_min, self.d_indv)
         self.data.n_min = 0
-        self.data.indv_bound_low = np.np.tile(-np.np.inf, self.d_indv)
-        self.data.indv_bound_high = np.np.tile(np.np.inf, self.d_indv)
-        self.data.solution_indv = np.np.tile(np.nan, self.d_indv)
-        self.data.solution = np.nan
-        self.data.xfull = np.np.empty((0, self.d))
-        self.data.yfull = np.np.empty((0,) + self.d_indv)
-        stop_flag = np.np.tile(None, self.d_indv)
+        self.data.indv_bound_low = np.tile(-np.inf, self.d_indv)
+        self.data.indv_bound_high = np.tile(np.inf, self.d_indv)
+        self.data.solution_indv = np.tile(np.np.nan, self.d_indv)
+        self.data.solution = np.np.nan
+        self.data.xfull = np.empty((0, self.d))
+        self.data.yfull = np.empty((0,) + self.d_indv)
+        stop_flag = np.tile(None, self.d_indv)
         while True:
             m = self.data.m.max()
             n_min = self.data.n_min
@@ -86,14 +86,14 @@ class _CubBayesLDG(StoppingCriterion):
             n = int(n_max - n_min)
             xnext, xnext_un = self.discrete_distrib.gen_samples(n_min=n_min, n_max=n_max, return_unrandomized=True,
                                                                 warn=False)
-            ycvnext = np.np.empty((1 + self.ncv, n,) + self.d_indv, dtype=float)
+            ycvnext = np.empty((1 + self.ncv, n,) + self.d_indv, dtype=float)
             ycvnext[0] = self.integrand.f(xnext, periodization_transform=self.ptransform,
                                           compute_flags=self.data.compute_flags)
             for k in range(self.ncv):
                 ycvnext[1 + k] = self.cv[k].f(xnext, periodization_transform=self.ptransform,
                                               compute_flags=self.data.compute_flags)
 
-            for j in np.ndindex(self.d_indv):
+            for j in np.np.ndindex(self.d_indv):
                 if prev_flags_indv[j] == True and self.data.flags_indv[j] == False:
                     assert not(prev_flags_indv[j] == True and self.data.flags_indv[j] == False), 'This cannot happen !'
                 if self.data.flags_indv[j]:
@@ -107,19 +107,19 @@ class _CubBayesLDG(StoppingCriterion):
                 # Update function values
                 success, muhat, r_order, err_bd, _ = self.datum[j].update_data(y_val_new=y_val, xnew=xnext, xunnew=xnext_un)
 
-                bounds = muhat + np.np.array([-1, 1]) * err_bd
+                bounds = muhat + np.array([-1, 1]) * err_bd
                 stop_flag[j], self.data.solution_indv[j], self.data.indv_bound_low[j], self.data.indv_bound_high[j] = \
                     success, muhat, bounds[0], bounds[1]
 
-            self.data.xfull = np.np.vstack((self.data.xfull, xnext))
-            self.data.yfull = np.np.vstack((self.data.yfull, ycvnext[0]))
+            self.data.xfull = np.vstack((self.data.xfull, xnext))
+            self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
             self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
-            self.abs_tols,self.rel_tols = np.full_like(self.data.comb_bound_low,self.abs_tol),np.full_like(self.data.comb_bound_low,self.rel_tol)
-            fidxs = np.isfinite(self.data.comb_bound_low)&np.isfinite(self.data.comb_bound_high)
+            self.abs_tols,self.rel_tols = np.np.full_like(self.data.comb_bound_low,self.abs_tol),np.np.full_like(self.data.comb_bound_low,self.rel_tol)
+            fidxs = np.np.isfinite(self.data.comb_bound_low)&np.np.isfinite(self.data.comb_bound_high)
             slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = np.np.tile(np.nan,self.data.comb_bound_low.shape)
+            self.data.solution = np.tile(np.np.nan,self.data.comb_bound_low.shape)
             self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.comb_flags = np.np.tile(False,self.data.comb_bound_low.shape)
+            self.data.comb_flags = np.tile(False,self.data.comb_bound_low.shape)
             self.data.comb_flags[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
             self.data.compute_flags = ~self.data.flags_indv

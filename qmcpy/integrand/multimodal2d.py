@@ -22,6 +22,6 @@ class Multimodal2d(Integrand):
         super(Multimodal2d,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
     def g(self, t):
         t0,t1 = t[:,0],t[:,1]
-        return (t0**2+4)*(t1-1)/20-sin(5*t0/2)-2
+        return (t0**2+4)*(t1-1)/20-np.sin(5*t0/2)-2
     def _spawn(self, level, sampler):
         return Multimodal2d(sampler=sampler) 

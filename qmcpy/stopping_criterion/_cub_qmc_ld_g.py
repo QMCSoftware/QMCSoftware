@@ -45,7 +45,7 @@ class _CubQMCLDG(StoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         self.d = self.discrete_distrib.d
         self.d_indv = self.integrand.d_indv
-        self.cv = list(atleast_1d(control_variates))
+        self.cv = list(np.atleast_1d(control_variates))
         self.ncv = len(self.cv)
         self.cv_mu = np.array(control_variate_means) if self.ncv>0 else np.empty((self.ncv,)+self.d_indv)
         self.cv_mu = self.cv_mu if self.cv_mu.ndim>1 else self.cv_mu.reshape(self.ncv,-1)
@@ -65,7 +65,7 @@ class _CubQMCLDG(StoppingCriterion):
     def integrate(self):
         t_start = time()
         self.datum = np.empty(self.d_indv,dtype=object)
-        for j in ndindex(self.d_indv):
+        for j in np.ndindex(self.d_indv):
             cv_mu_j = self.cv_mu[(slice(None),)+j]
             self.datum[j] = LDTransformData(self.m_min,self.m_max,self.coefv,self.fudge,self.check_cone,self.ncv,cv_mu_j,self.update_beta)
         self.data = LDTransformData.__new__(LDTransformData)
@@ -75,8 +75,8 @@ class _CubQMCLDG(StoppingCriterion):
         self.data.n_min = 0
         self.data.indv_bound_low = np.tile(-np.inf,self.d_indv)
         self.data.indv_bound_high = np.tile(np.inf,self.d_indv)
-        self.data.solution_indv = np.tile(nan,self.d_indv)
-        self.data.solution = nan
+        self.data.solution_indv = np.tile(np.nan,self.d_indv)
+        self.data.solution = np.nan
         self.data.xfull = np.empty((0,self.d))
         self.data.yfull = np.empty((0,)+self.d_indv)
         while True:
@@ -90,7 +90,7 @@ class _CubQMCLDG(StoppingCriterion):
             for k in range(self.ncv):
                 ycvnext[1+k] = self.cv[k].f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
             ycvnext_cp = ycvnext.astype(complex) if self.cast_complex else ycvnext.copy()
-            for j in ndindex(self.d_indv):
+            for j in np.ndindex(self.d_indv):
                 if self.data.flags_indv[j]: continue
                 slice_yj = (0,slice(None),)+j
                 slice_ygj = (slice(1,None),slice(None),)+j
@@ -104,10 +104,10 @@ class _CubQMCLDG(StoppingCriterion):
             self.data.xfull = np.vstack((self.data.xfull,xnext))
             self.data.yfull = np.vstack((self.data.yfull,ycvnext[0]))
             self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
-            self.abs_tols,self.rel_tols = full_like(self.data.comb_bound_low,self.abs_tol),full_like(self.data.comb_bound_low,self.rel_tol)
-            fidxs = isfinite(self.data.comb_bound_low)&isfinite(self.data.comb_bound_high)
+            self.abs_tols,self.rel_tols = np.full_like(self.data.comb_bound_low,self.abs_tol),np.full_like(self.data.comb_bound_low,self.rel_tol)
+            fidxs = np.isfinite(self.data.comb_bound_low)&np.isfinite(self.data.comb_bound_high)
             slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = np.tile(nan,self.data.comb_bound_low.shape)
+            self.data.solution = np.tile(np.nan,self.data.comb_bound_low.shape)
             self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
             self.data.comb_flags = np.tile(False,self.data.comb_bound_low.shape)
             self.data.comb_flags[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
@@ -115,7 +115,7 @@ class _CubQMCLDG(StoppingCriterion):
             self.data.compute_flags = ~self.data.flags_indv
             self.data.n = 2**self.data.m
             self.data.n_total = self.data.n.max()
-            if sum(self.data.compute_flags)==0:
+            if np.sum(self.data.compute_flags)==0:
                 break # stopping criterion met
             elif 2*self.data.n_total>self.n_max:
                 # doubling samples would go over n_max

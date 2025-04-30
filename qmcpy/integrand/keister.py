@@ -7,7 +7,7 @@ from scipy.special import gamma
 
 class Keister(Integrand):
     """
-    $f(\\boldsymbol{t}) = \\pi^{d/2} \\cos(\\| \\boldsymbol{t} \\|)$.
+    $f(\\boldsymbol{t}) = \\np.pi^{d/2} \\np.cos(\\| \\boldsymbol{t} \\|)$.
 
     The standard example integrates the Keister integrand with respect to an 
     IID Gaussian distribution with variance 1./2.
@@ -51,7 +51,7 @@ class Keister(Integrand):
     def g(self, t):
         d = t.shape[1]
         norm = np.sqrt((t**2).sum(1))
-        k = pi**(d/2)*cos(norm)
+        k = np.pi**(d/2)*np.cos(norm)
         return k
     
     def _spawn(self, level, sampler):
@@ -65,7 +65,7 @@ class Keister(Integrand):
         :return: true_integral
         """
         cosinteg = np.zeros(shape=(d))
-        cosinteg[0] = np.sqrt(pi) / (2 * np.exp(1 / 4))
+        cosinteg[0] = np.sqrt(np.pi) / (2 * np.exp(1 / 4))
         sininteg = np.zeros(shape=(d))
         sininteg[0] = 4.244363835020225e-01
         cosinteg[1] = (1 - sininteg[0]) / 2
@@ -73,5 +73,5 @@ class Keister(Integrand):
         for j in range(2, d):
             cosinteg[j] = ((j-1)*cosinteg[j-2]-sininteg[j-1])/2
             sininteg[j] = ((j-1)*sininteg[j-2]+cosinteg[j-1])/2
-        I = (2*(pi**(d/2))/gamma(d/2))*cosinteg[d-1]
+        I = (2*(np.pi**(d/2))/gamma(d/2))*cosinteg[d-1]
         return I

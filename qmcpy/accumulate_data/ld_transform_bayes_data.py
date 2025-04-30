@@ -1,7 +1,6 @@
 from ._accumulate_data import AccumulateData
 from ..util import MaxSamplesWarning
 from ..discrete_distribution import Lattice
-from numpy import array, nan
 import warnings
 import numpy as np
 from scipy.optimize import fminbound as fminbnd
@@ -59,11 +58,11 @@ class LDTransformBayesData(AccumulateData):
         self.debugEnable = True
 
         self.n_total = 0  # total number of samples generated
-        self.solution = nan
+        self.solution = np.nan
 
         self.iter = 0
         self.m = self.m_min
-        self.mvec = np.np.arange(self.m_min, self.m_max + 1, dtype=int)
+        self.mvec = np.arange(self.m_min, self.m_max + 1, dtype=int)
 
         # Initialize various temporary storage between iterations
         self.xpts_ = np.array([])  # shifted lattice points
@@ -125,8 +124,8 @@ class LDTransformBayesData(AccumulateData):
                 lna_MLE = 0
             else:
                 # Nelder-Mead Simplex algorithm
-                theta0 = np.np.ones((xpts.shape[1], 1)) * (0.05)
-                theta0 = np.np.ones((1, xpts.shape[1])) * (0.05)
+                theta0 = np.ones((xpts.shape[1], 1)) * (0.05)
+                theta0 = np.ones((1, xpts.shape[1])) * (0.05)
                 lna_MLE = fmin(lambda lna: self.objective_function(np.exp(lna), xpts, ftilde)[0],
                                theta0, xtol=1e-2, disp=False)
             aMLE = np.exp(lna_MLE)
@@ -187,8 +186,8 @@ class LDTransformBayesData(AccumulateData):
     def objective_function(self, theta, xun, ftilde):
         n = len(ftilde)
         fudge = 100 * np.finfo(float).eps
-        # if type(theta) != np.np.ndarray:
-        #     theta = np.np.ones((1, xun.shape[1])) * theta
+        # if type(theta) != np.ndarray:
+        #     theta = np.ones((1, xun.shape[1])) * theta
         [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, theta, self.avoid_cancel_error,
                                                                    self.kernType, self.debug_enable)
         vec_lambda = abs(vec_lambda)
@@ -246,7 +245,7 @@ class LDTransformBayesData(AccumulateData):
         if iter == 0:
             # In the first iteration compute full FBT
             # xun_ = mod(bsxfun( @ times, (0:1 / n:1-1 / n)',self.gen_vec),1)
-            # xun_ = np.np.arange(0, 1, 1 / n).reshape((n, 1))
+            # xun_ = np.arange(0, 1, 1 / n).reshape((n, 1))
             # xun_ = np.mod((xun_ * self.gen_vec), 1)
             # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
 
@@ -263,7 +262,7 @@ class LDTransformBayesData(AccumulateData):
             ftilde_ = ftilde_.reshape((n, 1))
         else:
             # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
-            # xunnew = np.np.arange(1 / n, 1, 2 / n).reshape((n // 2, 1))
+            # xunnew = np.arange(1 / n, 1, 2 / n).reshape((n // 2, 1))
             # xunnew = np.mod(xunnew * self.gen_vec, 1)
             # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
 
@@ -299,20 +298,20 @@ class LDTransformBayesData(AccumulateData):
     @staticmethod
     def merge_pts(xun, xunnew, x, xnew, n, d, distribution):
         if distribution == 'Lattice':
-            temp = np.np.zeros((n, d))
+            temp = np.zeros((n, d))
             temp[0::2, :] = xun
             try:
                 temp[1::2, :] = xunnew
             except Exception as e:
                 raise(e)
             xun = temp
-            temp = np.np.zeros((n, d))
+            temp = np.zeros((n, d))
             temp[0::2, :] = x
             temp[1::2, :] = xnew
             x = temp
         else:
-            x = np.np.vstack([x, xnew])
-            xun = np.np.vstack([xun, xunnew])
+            x = np.vstack([x, xnew])
+            xun = np.vstack([xun, xunnew])
         return xun, x
 
     # Computes modified kernel Km1 = K - 1
@@ -320,8 +319,8 @@ class LDTransformBayesData(AccumulateData):
     @staticmethod
     def kernel_t(aconst, Bern):
         d = np.size(Bern, 1)
-        if type(aconst) != np.np.ndarray:
-            theta = np.np.ones((d, 1)) * aconst
+        if type(aconst) != np.ndarray:
+            theta = np.ones((d, 1)) * aconst
         else:
             theta = aconst  # theta varies per dimension
 

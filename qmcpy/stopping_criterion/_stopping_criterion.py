@@ -61,7 +61,7 @@ class StoppingCriterion(object):
             np.ndarray: uncertainty levels on individual solutions"""
         alphas_indv = np.tile(1,self.integrand.d_indv)
         identity_dependency = True
-        for k in ndindex(self.integrand.d_comb):
+        for k in np.ndindex(self.integrand.d_comb):
             comb_flags = np.tile(True,self.integrand.d_comb)
             comb_flags[k] = False
             flags_indv = self.integrand.dependency(comb_flags)

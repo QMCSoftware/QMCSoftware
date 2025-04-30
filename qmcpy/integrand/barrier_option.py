@@ -131,7 +131,7 @@ class BarrierOption(Integrand):
             bar_flag = stock_path > self.barrier_price
             bar_flag = bar_flag.sum(axis = 1) == dimension
         disc_payoff = disc_payoff*bar_flag
-        disc_payoff = maximum(np.zeros(disc_payoff.size), disc_payoff)
+        disc_payoff = np.maximum(np.zeros(disc_payoff.size), disc_payoff)
         return (disc_payoff * np.exp(-self.interest_rate * self.t_final))
     
     def g(self, t):

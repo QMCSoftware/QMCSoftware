@@ -8,7 +8,7 @@ import torch
 
 def _get_phi(gp, x):
     yhat,yhatstd = gp.predict(x)
-    with np.errstateall='ignore'): z = yhat/yhatstd
+    with np.errstate(all='ignore'): z = yhat/yhatstd
     return norm.cdf(z)
 def _error_udens_from_phi(phi):
     return 2*min(1-phi,phi)

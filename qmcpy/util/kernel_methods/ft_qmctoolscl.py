@@ -31,8 +31,8 @@ def fftbr(x):
     """
     x,shape,d,n,n_half = _parse_ft_input(x)
     if n<=1: return x.reshape(shape).copy()
-    twiddler = np.np.empty(n,dtype=np.np.float64)
-    twiddlei = np.np.empty(n,dtype=np.np.float64)
+    twiddler = np.empty(n,dtype=np.float64)
+    twiddlei = np.empty(n,dtype=np.float64)
     xr = x.real.copy()
     xi = x.imag.copy()
     qmctoolscl.fft_bro_1d_radix2(1,d,int(n_half),twiddler,twiddlei,xr,xi)
@@ -53,8 +53,8 @@ def ifftbr(x):
     """
     x,shape,d,n,n_half = _parse_ft_input(x)
     if n<=1: return x.reshape(shape).copy()
-    twiddler = np.np.empty(n,dtype=np.np.float64)
-    twiddlei = np.np.empty(n,dtype=np.np.float64)
+    twiddler = np.empty(n,dtype=np.float64)
+    twiddlei = np.empty(n,dtype=np.float64)
     xr = x.real.copy()
     xi = x.imag.copy()
     qmctoolscl.ifft_bro_1d_radix2(1,d,int(n_half),twiddler,twiddlei,xr,xi)

@@ -66,9 +66,9 @@ class EuropeanOption(Integrand):
         for xx,yy in zip(*np.where(self.s<0)): # if stock becomes <=0, 0 out rest of path
             self.s[xx,yy:] = 0
         if self.call_put == 'call':
-            y_raw = maximum(self.s[:,-1] - self.strike_price, 0)
+            y_raw = np.maximum(self.s[:,-1] - self.strike_price, 0)
         else: # put
-            y_raw = maximum(self.strike_price - self.s[:,-1], 0)
+            y_raw = np.maximum(self.strike_price - self.s[:,-1], 0)
         y_adj = y_raw * np.exp(-self.interest_rate * self.t_final)
         return y_adj
     

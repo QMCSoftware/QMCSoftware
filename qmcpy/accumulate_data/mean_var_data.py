@@ -21,7 +21,7 @@ class MeanVarData(AccumulateData):
             control_variate_means (list): list of means for each control variate
         """
         self.parameters = ['solution','error_bound','n_total','n','levels']
-        self.EPS = finfo(float32).eps
+        self.EPS = np.finfo(float32).eps
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -51,7 +51,7 @@ class MeanVarData(AccumulateData):
         else:
             self.levels = 1
             self.level_integrands = [self.integrand]
-        self.solution = nan
+        self.solution = np.nan
         self.muhat = np.full(self.levels, np.inf)  # sample mean
         self.sighat = np.full(self.levels, np.inf)  # sample standard deviation
         self.t_eval = np.zeros(self.levels)  # processing time for each integrand

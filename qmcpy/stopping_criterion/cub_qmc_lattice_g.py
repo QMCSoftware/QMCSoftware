@@ -48,8 +48,8 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> solution,data = sc.integrate()
     >>> solution
     np.array([1.18953167, 0.96060687])
-    >>> sol3neg1 = -pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
-    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-pi/24
+    >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
     >>> true_value = np.array([sol3neg1,sol31])
     >>> assert (abs(true_value-solution)<abs_tol).all()
     >>> cf = CustomFun(
@@ -143,7 +143,7 @@ class CubQMCLatticeG(_CubQMCLDG):
             control_variate_means = [],
             update_beta=False,
             ptransform = ptransform,
-            coefv = lambda nl: np.exp(-2*pi*1j*np.arange(nl)/(2*nl)), 
+            coefv = lambda nl: np.exp(-2*np.pi*1j*np.arange(nl)/(2*nl)), 
             allowed_levels = ['single'],
             allowed_distribs = [Lattice],
             cast_complex = True,

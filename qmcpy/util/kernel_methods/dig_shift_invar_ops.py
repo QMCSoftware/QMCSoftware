@@ -7,11 +7,11 @@ def k4sumterm(x, t, cutoff=1e-8):
     e.g. $x = 6$ with $t=3$ has $(x_0,x_1,x_2) = (1,1,0)
 
     Args:
-        x (np.np.ndarray or torch.Tensor): integer arrays
+        x (np.ndarray or torch.Tensor): integer arrays
         t (int): number of bits in each integer
     
     >>> t = 3
-    >>> x = np.np.random.randint(0,2**t,(5,4))
+    >>> x = np.random.randint(0,2**t,(5,4))
     >>> k4sumterm(x,t).shape
     (5, 4)
     """
@@ -50,20 +50,20 @@ def weighted_walsh_funcs(alpha, xb, t):
 
     Args:
         alpha (int): weighted walsh functions order 
-        xb (np.np.ndarray or torch.Tensor): integer points at which to evaluate the weighted Walsh function 
+        xb (np.ndarray or torch.Tensor): integer points at which to evaluate the weighted Walsh function 
         t (int): number of bits in each integer in xb
     
     >>> t = 3 
-    >>> xb = np.np.random.randint(0,2**t,(4,5))
+    >>> xb = np.random.randint(0,2**t,(4,5))
     >>> for alpha in list(WEIGHTEDWALSHFUNCSPOS.keys()):
     ...     y = weighted_walsh_funcs(alpha,xb,t)
     """
     assert isinstance(alpha,int)
     assert alpha in WEIGHTEDWALSHFUNCSPOS, "alpha = %d not in WEIGHTEDWALSHFUNCSPOS"%alpha
     assert alpha in WEIGHTEDWALSHFUNCSZEROS, "alpha = %d not in WEIGHTEDWALSHFUNCSZEROS"%alpha
-    if isinstance(xb,np.np.ndarray):
+    if isinstance(xb,np.ndarray):
         np_or_torch = np 
-        y = np.np.ones(xb.shape) 
+        y = np.ones(xb.shape) 
     else:
         import torch 
         np_or_torch = torch 

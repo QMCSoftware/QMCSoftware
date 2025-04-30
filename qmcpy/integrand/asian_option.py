@@ -108,9 +108,9 @@ class AsianOption(Integrand):
                        np.log(stock_path[:, -1]) / 2.) /
                       float(dimension))
         if self.call_put == 'call':
-            y_raw = maximum(avg - self.strike_price, 0)
+            y_raw = np.maximum(avg - self.strike_price, 0)
         else: # put
-            y_raw = maximum(self.strike_price - avg, 0)
+            y_raw = np.maximum(self.strike_price - avg, 0)
         y_adj = y_raw * np.exp(-self.interest_rate * self.t_final)
         return y_adj
 

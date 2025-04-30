@@ -47,7 +47,7 @@ class Integrand(object):
         if self.true_measure.transform!=self.true_measure and \
            not (self.true_measure.range==self.true_measure.transform.range).all():
             raise ParameterError("The range of the composed transform is not compatible with this true measure")
-        self.EPS = finfo(float).eps
+        self.EPS = np.finfo(float).eps
 
     def g(self, t, compute_flags=None, *args, **kwargs):
         """
@@ -83,7 +83,7 @@ class Integrand(object):
             np.ndarray: length n vector of function evaluations
         """
         periodization_transform = 'NONE' if periodization_transform is None else periodization_transform.upper()
-        compute_flags = np.tile(1,self.d_indv) if compute_flags is None else atleast_1d(compute_flags)
+        compute_flags = np.tile(1,self.d_indv) if compute_flags is None else np.atleast_1d(compute_flags)
         n,d = x.shape
         # parameter checks
         if self.discrete_distrib.mimics != 'StdUniform' and periodization_transform!='NONE':
@@ -99,19 +99,19 @@ class Integrand(object):
             wp = np.ones(n,dtype=float)
         elif periodization_transform == 'C0': # C^0 transform
             xp = 3 * x ** 2 - 2 * x ** 3
-            wp = prod(6 * x * (1 - x), 1)
+            wp = np.prod(6 * x * (1 - x), 1)
         elif periodization_transform == 'C1': # C^1 transform
             xp = x ** 3 * (10 - 15 * x + 6 * x ** 2)
-            wp = prod(30 * x ** 2 * (1 - x) ** 2, 1)
+            wp = np.prod(30 * x ** 2 * (1 - x) ** 2, 1)
         elif periodization_transform == 'C1SIN': # Sidi C^1 transform
-            xp = x - sin(2 * pi * x) / (2 * pi)
-            wp = prod(2 * sin(pi * x) ** 2, 1)
+            xp = x - np.sin(2 * np.pi * x) / (2 * np.pi)
+            wp = np.prod(2 * np.sin(np.pi * x) ** 2, 1)
         elif periodization_transform == 'C2SIN': # Sidi C^2 transform
-            xp = (8 - 9 * cos(pi * x) + cos(3 * pi * x)) / 16 # psi3
-            wp = prod( (9 * sin(pi * x) * pi - sin(3 * pi * x) * 3 * pi) / 16 , 1) # psi3_1
+            xp = (8 - 9 * np.cos(np.pi * x) + np.cos(3 * np.pi * x)) / 16 # psi3
+            wp = np.prod( (9 * np.sin(np.pi * x) * np.pi - np.sin(3 * np.pi * x) * 3 * np.pi) / 16 , 1) # psi3_1
         elif periodization_transform == 'C3SIN': # Sidi C^3 transform
-            xp = (12 * pi * x - 8 * sin(2 * pi * x) + sin(4 * pi * x)) / (12 * pi) # psi4
-            wp = prod( (12 * pi - 8 * cos(2 * pi * x) * 2 * pi + sin(4 * pi * x) * 4 * pi) / (12 * pi), 1) # psi4_1
+            xp = (12 * np.pi * x - 8 * np.sin(2 * np.pi * x) + np.sin(4 * np.pi * x)) / (12 * np.pi) # psi4
+            wp = np.prod( (12 * np.pi - 8 * np.cos(2 * np.pi * x) * 2 * np.pi + np.sin(4 * np.pi * x) * 4 * np.pi) / (12 * np.pi), 1) # psi4_1
         else:
             raise ParameterError("The %s periodization transform is not implemented"%periodization_transform)
         wp = wp.reshape(n)
@@ -140,7 +140,7 @@ class Integrand(object):
         kwargs['compute_flags'] = compute_flags
         if self.parallel:
             pool = get_context(method='fork').Pool(processes=self.parallel) if self.threadpool==False else ThreadPool(processes=self.parallel) 
-            y = pool.starmap(self._g2,zip(t,repeat((args,kwargs))))
+            y = pool.starmap(self._g2,zip(t,np.repeat((args,kwargs))))
             pool.close()
             y = concatenate(y,dtype=float)
         else:

@@ -56,7 +56,7 @@ class Genz(Integrand):
         super(Genz,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
     
     def g_oscillatory(self, t):
-        return cos(-(self.c*t).sum(1))
+        return np.cos(-(self.c*t).sum(1))
 
     def g_corner_peak(self, t):
         return (1+(self.c*t).sum(1))**(-(self.d+1))

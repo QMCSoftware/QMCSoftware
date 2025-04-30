@@ -48,9 +48,9 @@ class BernoulliCont(TrueMeasure):
     def _weight(self, x):
         w = np.zeros(x.shape,dtype=float)
         for j in range(self.d):
-            C = 2 if self.l[j]==1/2 else 2*arctanh(1-2*self.l[j])/(1-2*self.l[j])
+            C = 2 if self.l[j]==1/2 else 2*np.arctanh(1-2*self.l[j])/(1-2*self.l[j])
             w[:,j] = C*self.l[j]**x[:,j]*(1-self.l[j])**(1-x[:,j])
-        return prod(w,1)
+        return np.prod(w,1)
     
     def _spawn(self, sampler, dimension):
         if dimension==self.d: # don't do anything if the dimension doesn't change

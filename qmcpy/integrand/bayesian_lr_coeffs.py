@@ -16,7 +16,7 @@ class BayesianLRCoeffs(Integrand):
     >>> y.shape
     (1024, 2, 3)
     >>> y.mean(0)
-    np.array([[ 0.05907374, -0.01538389, -0.08526092],
+    array([[ 0.05907374, -0.01538389, -0.08526092],
            [ 0.02631557,  0.02631557,  0.02631557]])
     """
 
@@ -52,7 +52,7 @@ class BayesianLRCoeffs(Integrand):
         z = x@self.feature_array.T
         z1 = z*self.response_vector
         with np.errstate(over='ignore'):
-            den = np.exp(sum(z1-np.log(1+np.exp(z)),1))[:,None]
+            den = np.exp(np.sum(z1-np.log(1+np.exp(z)),1))[:,None]
         y = np.zeros((len(x),2,self.num_coeffs),dtype=float)
         y[:,0] = x*den
         y[:,1] = den

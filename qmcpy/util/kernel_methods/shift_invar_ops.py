@@ -3,7 +3,7 @@ import numpy as np
 class Polynomial():
     """
     >>> p = Polynomial([3,5,0,1,2])
-    >>> x = np.np.random.rand(3,4)
+    >>> x = np.random.rand(3,4)
     >>> y = p(x) 
     >>> y_true = 3*x**4 + 5*x**3 + 0*x**2 + 1*x**1 + 2*x**0
     >>> assert np.allclose(y,y_true,atol=1e-12)
@@ -13,7 +13,7 @@ class Polynomial():
         Polynomial evaluation with Horner's rule
         
         Args:
-            coeffs (list or np.np.ndarray or torch.Tensor): vector of coefficients  
+            coeffs (list or np.ndarray or torch.Tensor): vector of coefficients  
             e.g. coeffs = [a, b, c] corresponds to the quadratic polynomial a*x**2 + b*x + c
         """
         assert isinstance(coeffs,list)
@@ -21,10 +21,10 @@ class Polynomial():
         assert self.order >= 1
         self.coeffs = coeffs
     def __call__(self, x):
-        if isinstance(x,np.np.ndarray):
+        if isinstance(x,np.ndarray):
             npt = np 
-            powers = np.np.arange(self.order-1,-1,-1,dtype=x.dtype)
-            coeffs = np.np.array(self.coeffs,dtype=x.dtype)
+            powers = np.arange(self.order-1,-1,-1,dtype=x.dtype)
+            coeffs = np.array(self.coeffs,dtype=x.dtype)
         else:
             import torch 
             npt = torch
@@ -52,14 +52,14 @@ def bernoulli_poly(n, x):
 
     Args:
         n (int): polynomial order
-        x (np.np.ndarray or torch.Tensor): points at which to evaluate the Bernoulli polynomial
+        x (np.ndarray or torch.Tensor): points at which to evaluate the Bernoulli polynomial
     
     >>> import scipy.special
     >>> import numpy as np
-    >>> x = np.np.arange(8).reshape(4,2)/8
+    >>> x = np.arange(8).reshape(4,2)/8
     >>> for n,bpoly in BERNOULLIPOLYSDICT.items():
     ...     bvec = scipy.special.bernoulli(n)
-    ...     choosevec = scipy.special.comb(n,np.np.arange(n,-1,-1))
+    ...     choosevec = scipy.special.comb(n,np.arange(n,-1,-1))
     ...     bpoly_coeffs_true = bvec*choosevec
     ...     assert np.allclose(bpoly_coeffs_true,bpoly.coeffs,atol=1e-12)
     ...     y = bernoulli_poly(n,x)

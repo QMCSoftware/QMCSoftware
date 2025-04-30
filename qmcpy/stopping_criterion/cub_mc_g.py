@@ -46,8 +46,8 @@ class CubMCG(StoppingCriterion):
         spawn_key       ()
     >>> dd = IIDStdUniform(1,seed=7)
     >>> k = Keister(dd)
-    >>> cv1 = CustomFun(Uniform(dd),lambda x: sin(pi*x).sum(1))
-    >>> cv1mean = 2/pi
+    >>> cv1 = CustomFun(Uniform(dd),lambda x: np.sin(np.pi*x).sum(1))
+    >>> cv1mean = 2/np.pi
     >>> cv2 = CustomFun(Uniform(dd),lambda x: (-3*(x-.5)**2+1).sum(1))
     >>> cv2mean = 3/4
     >>> sc1 = CubMCG(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])

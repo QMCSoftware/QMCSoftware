@@ -19,9 +19,9 @@ class Sin1d(Integrand):
         self.sampler = sampler
         self.k = k
         assert self.sampler.d==1
-        self.true_measure = Uniform(self.sampler,lower_bound=0,upper_bound=2*self.k*pi)
+        self.true_measure = Uniform(self.sampler,lower_bound=0,upper_bound=2*self.k*np.pi)
         super(Sin1d,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
     def g(self, t):
-        return sin(t.squeeze())
+        return np.sin(t.squeeze())
     def _spawn(self, level, sampler):
         return Sin1d(sampler=sampler,k=self.k)

@@ -139,7 +139,7 @@ class CubBayesLatticeG(_CubBayesLDG):
         Return:
             np.ndarray: y and ynext combined and transformed
         """
-        y = np.np.array([], dtype=complex)
+        y = np.array([], dtype=complex)
         # y = y.astype(complex)
         ynext = ynext.astype(complex)
         ## Compute initial FFT on next points
@@ -147,20 +147,20 @@ class CubBayesLatticeG(_CubBayesLDG):
         for l in range(mnext):
             nl = 2 ** l
             nmminlm1 = 2 ** (mnext - l - 1)
-            ptind_nl = np.np.hstack((np.np.tile(True, nl), np.np.tile(False, nl)))
-            ptind = np.np.tile(ptind_nl, int(nmminlm1))
-            coef = np.np.exp(-2. * np.pi * 1j * np.np.arange(nl) / (2 * nl))
-            coefv = np.np.tile(coef, int(nmminlm1))
+            ptind_nl = np.hstack((np.tile(True, nl), np.tile(False, nl)))
+            ptind = np.tile(ptind_nl, int(nmminlm1))
+            coef = np.exp(-2. * np.pi * 1j * np.arange(nl) / (2 * nl))
+            coefv = np.tile(coef, int(nmminlm1))
             evenval = ynext[ptind]
             oddval = ynext[~ptind]
             ynext[ptind] = (evenval + coefv * oddval) / 2.
             ynext[~ptind] = (evenval - coefv * oddval) / 2.
-        y = np.np.hstack((y, ynext))
+        y = np.hstack((y, ynext))
         if len(y) > len(ynext):  # already generated some samples samples
             ## Compute FFT on all points
             nl = 2 ** mnext
-            ptind = np.np.hstack((np.np.tile(True, int(nl)), np.np.tile(False, int(nl))))
-            coefv = np.np.exp(-2 * np.pi * 1j * np.np.arange(nl) / (2 * nl))
+            ptind = np.hstack((np.tile(True, int(nl)), np.tile(False, int(nl))))
+            coefv = np.exp(-2 * np.pi * 1j * np.arange(nl) / (2 * nl))
             evenval = y[ptind]
             oddval = y[~ptind]
             y[ptind] = (evenval + coefv * oddval) / 2.
@@ -170,11 +170,11 @@ class CubBayesLatticeG(_CubBayesLDG):
     @staticmethod
     def _merge_fft(ftilde_new, ftilde_next_new, mnext):
         # using FFT butterfly plot technique merges two halves of fft
-        ftilde_new = np.np.vstack([ftilde_new, ftilde_next_new])
+        ftilde_new = np.vstack([ftilde_new, ftilde_next_new])
         nl = 2 ** mnext
-        ptind = np.np.ndarray(shape=(2 * nl, 1), buffer=np.np.array([True] * nl + [False] * nl), dtype=bool)
-        coef = np.np.exp(-2 * np.pi * 1j * np.np.ndarray(shape=(nl, 1), buffer=np.np.arange(0, nl), dtype=int) / (2 * nl))
-        coefv = np.np.tile(coef, (1, 1))
+        ptind = np.ndarray(shape=(2 * nl, 1), buffer=np.array([True] * nl + [False] * nl), dtype=bool)
+        coef = np.exp(-2 * np.pi * 1j * np.ndarray(shape=(nl, 1), buffer=np.arange(0, nl), dtype=int) / (2 * nl))
+        coefv = np.tile(coef, (1, 1))
         evenval = ftilde_new[ptind].reshape((nl, 1))
         oddval = ftilde_new[~ptind].reshape((nl, 1))
         ftilde_new[ptind] = np.squeeze(evenval + coefv * oddval)

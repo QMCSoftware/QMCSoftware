@@ -89,8 +89,8 @@ class CubQMCCLT(StoppingCriterion):
         gen_vec         [     1 182667 213731]
         entropy         7
         spawn_key       ()
-    >>> sol3neg1 = -pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
-    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-pi/24
+    >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
     >>> true_value = np.array([sol3neg1,sol31])
     >>> assert (abs(true_value-solution)<abs_tol).all()
     >>> cf = CustomFun(
@@ -182,7 +182,7 @@ class CubQMCCLT(StoppingCriterion):
         """ See abstract method. """
         t_start = time()
         self.datum = np.empty(self.d_indv,dtype=object)
-        for j in ndindex(self.d_indv):
+        for j in np.ndindex(self.d_indv):
             self.datum[j] = MeanVarDataRep(self.t_star[j],self.inflate,self.replications)
         self.data = MeanVarDataRep.__new__(MeanVarDataRep)
         self.data.flags_indv = np.tile(False,self.d_indv)
@@ -192,8 +192,8 @@ class CubQMCCLT(StoppingCriterion):
         self.data.n_min_rep = 0
         self.data.indv_bound_low = np.tile(-np.inf,self.d_indv)
         self.data.indv_bound_high = np.tile(np.inf,self.d_indv)
-        self.data.solution_indv = np.tile(nan,self.d_indv)
-        self.data.solution = nan
+        self.data.solution_indv = np.tile(np.nan,self.d_indv)
+        self.data.solution = np.nan
         self.data.xfull = np.empty((0,self.d))
         self.data.yfull = np.empty((0,)+self.d_indv)
         while True:
@@ -202,17 +202,17 @@ class CubQMCCLT(StoppingCriterion):
             n = int(n_max-n_min)
             xnext = np.vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
             ynext = self.integrand.f(xnext,compute_flags=self.data.compute_flags)
-            for j in ndindex(self.d_indv):
+            for j in np.ndindex(self.d_indv):
                 if self.data.flags_indv[j]: continue
                 yj = ynext[(slice(None),)+j].reshape((n,self.replications),order='f')
                 self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j] = self.datum[j].update_data(yj)
             self.data.xfull = np.vstack((self.data.xfull,xnext))
             self.data.yfull = np.vstack((self.data.yfull,ynext))
             self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
-            self.abs_tols,self.rel_tols = full_like(self.data.comb_bound_low,self.abs_tol),full_like(self.data.comb_bound_low,self.rel_tol)
-            fidxs = isfinite(self.data.comb_bound_low)&isfinite(self.data.comb_bound_high)
+            self.abs_tols,self.rel_tols = np.full_like(self.data.comb_bound_low,self.abs_tol),np.full_like(self.data.comb_bound_low,self.rel_tol)
+            fidxs = np.isfinite(self.data.comb_bound_low)&np.isfinite(self.data.comb_bound_high)
             slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = np.tile(nan,self.data.comb_bound_low.shape)
+            self.data.solution = np.tile(np.nan,self.data.comb_bound_low.shape)
             self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
             self.data.comb_flags = np.tile(False,self.data.comb_bound_low.shape)
             self.data.comb_flags[fidxs] = (shigh-slow) <= (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))

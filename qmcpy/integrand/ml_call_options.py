@@ -129,8 +129,8 @@ class MLCallOptions(Integrand):
                     dwc = dwf[:,j-1] + dwf[:,j]
                     ddw = dwf[:,j-1] - dwf[:,j]
                     xc = xc + self.r*xc*hc + self.sigma*xc*dwc + .5*self.sigma**2*xc*(dwc**2-hc)
-        pf = maximum(0,xf-self.k)
-        pc = maximum(0,xc-self.k)
+        pf = np.maximum(0,xf-self.k)
+        pc = np.maximum(0,xc-self.k)
         return pf,pc
 
     def _g_asian(self, t, n, d, nf, nc, hf, hc, xf, xc):
@@ -180,8 +180,8 @@ class MLCallOptions(Integrand):
                     ac = ac + hc*xc + vc*(dif_cs + .25*hc*ddw)
             af = af - 0.5*hf*xf
             ac = ac - 0.5*hc*xc
-        pf = maximum(0,af-self.k)
-        pc = maximum(0,ac-self.k)
+        pf = np.maximum(0,af-self.k)
+        pc = np.maximum(0,ac-self.k)
         return pf,pc
 
     def g(self, t):

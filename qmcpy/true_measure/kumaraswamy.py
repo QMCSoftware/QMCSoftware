@@ -51,7 +51,7 @@ class Kumaraswamy(TrueMeasure):
         return (1-(1-x)**(1/self.beta))**(1/self.alpha)
     
     def _weight(self, x):
-        return prod( self.alpha*self.beta*x**(self.alpha-1)*(1-x**self.alpha)**(self.beta-1), 1)
+        return np.prod( self.alpha*self.beta*x**(self.alpha-1)*(1-x**self.alpha)**(self.beta-1), 1)
     
     def _spawn(self, sampler, dimension):
         if dimension==self.d: # don't do anything if the dimension doesn't change

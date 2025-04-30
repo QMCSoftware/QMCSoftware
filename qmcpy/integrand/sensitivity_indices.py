@@ -18,7 +18,7 @@ class SensitivityIndices(Integrand):
     >>> sc = CubQMCNetG(keister_indices,abs_tol=1e-3)
     >>> solution,data = sc.integrate()
     >>> solution.squeeze()
-    np.array([[0.32803146, 0.32793778, 0.32788696],
+    array([[0.32803146, 0.32793778, 0.32788696],
            [0.33850394, 0.33848679, 0.33861519]])
     >>> data
     LDTransformData (AccumulateData Object)
@@ -154,15 +154,15 @@ class SensitivityIndices(Integrand):
         tau_low,mu_low,f2_low = bound_low[:,0],bound_low[:,1],bound_low[:,2]
         tau_high,mu_high,f2_high = bound_high[:,0],bound_high[:,1],bound_high[:,2]
         sigma2_low1,sigma2_low2 = f2_high-mu_low**2,f2_high-mu_high**2
-        comb_bounds_low = clip(minimum.reduce([tau_low/sigma2_low1,tau_low/sigma2_low2]),0,1)
+        comb_bounds_low = np.clip(np.minimum.reduce([tau_low/sigma2_low1,tau_low/sigma2_low2]),0,1)
         sigma2_high1,sigma2_high2 = f2_low-mu_low**2,f2_low-mu_high**2
-        comb_bounds_high = clip(maximum.reduce([tau_high/sigma2_high1,tau_high/sigma2_high2]),0,1)
+        comb_bounds_high = np.clip(np.maximum.reduce([tau_high/sigma2_high1,tau_high/sigma2_high2]),0,1)
         violated = (sigma2_high1<=0)|(sigma2_high2<=0)
         comb_bounds_low[violated],comb_bounds_high[violated] = 0,1
         return comb_bounds_low,comb_bounds_high
     
     def dependency(self, comb_flags):
-        return repeat(comb_flags[:,None,:],3,axis=1)
+        return np.repeat(comb_flags[:,None,:],3,axis=1)
 
 class SobolIndices(SensitivityIndices):
     """ Normalized Sobol' Indices, an alias for SensitivityIndices. """
