@@ -66,9 +66,6 @@ umbridge = [
     "umbridge >= 1.2.1",
     ]
 test = [
-    "numpy == 2.2.5",
-    "scipy == 1.15.2",
-    "qmctoolscl == 1.1.2",
     "pytest == 8.3.5",
     "pytest-cov == 6.1.1",
     ]

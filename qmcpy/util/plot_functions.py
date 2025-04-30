@@ -1,7 +1,8 @@
 """ Plot functions used by Discrete Distribution and True Measure"""
 import qmcpy as qp
-from numpy import*
+import numpy as np 
 import os
+
 def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac = 5, \
               fig_title = 'Projection of Samples', axis_pad = 0, want_grid = True, font_family = "sans-serif", \
                 where_title = 1, **kwargs):
