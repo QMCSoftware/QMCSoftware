@@ -6,7 +6,6 @@ from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
 import numpy as np
-from numpy.linalg import lstsq
 from scipy.stats import norm
 from time import time
 import warnings
@@ -226,6 +225,6 @@ class CubMCMLCont(StoppingCriterion):
         A = np.ones((2,2))
         A[:,0] = range(level-1, level+1)
         y = np.log2(abs(mean_level[level-1:level+1]))
-        x = lstsq(A, y, rcond=None)[0]
+        x = np.linalg.lstsq(A, y, rcond=None)[0]
         alpha = max(.5,-x[0])
         return 2**(x[1]+(level+1)*x[0]) / (2**alpha - 1)

@@ -6,7 +6,6 @@ from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
 import numpy as np
-from numpy.linalg import lstsq
 from scipy.stats import norm
 from time import time
 import warnings
@@ -193,7 +192,7 @@ class CubQMCMLCont(StoppingCriterion):
         y = np.ones(2)
         y[0] = np.log2(abs(self.data.mean_level_reps[max_levels-2].mean()))
         y[1] = np.log2(abs(self.data.mean_level_reps[max_levels-1].mean()))
-        x = lstsq(A, y, rcond=None)[0]
+        x = np.linalg.lstsq(A, y, rcond=None)[0]
         alpha = max(.5,-x[0])
         real_bias = 2**(x[1]+max_levels*x[0]) / (2**alpha - 1)
         self.theta = max(0.01, min(0.125, (real_bias/self.rmse_tol)**2))

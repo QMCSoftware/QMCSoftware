@@ -1,6 +1,5 @@
 from ._accumulate_data import AccumulateData
 import numpy as np
-from scipy.linalg import lstsq
 
 class MLQMCData(AccumulateData):
     """
@@ -77,7 +76,7 @@ class MLQMCData(AccumulateData):
         y = np.ones(2)
         y[0] = np.log2(abs(self.mean_level_reps[self.levels-2].mean()))
         y[1] = np.log2(abs(self.mean_level_reps[self.levels-1].mean()))
-        x = lstsq(A, y, cond=0, lapack_driver="gelss")[0]
+        x = np.linalg.lstsq(A,y,rcond=None)[0]
         alpha = max(.5,-x[0])
         self.bias_estimate = 2**(x[1]+self.levels*x[0]) / (2**alpha - 1)
     
