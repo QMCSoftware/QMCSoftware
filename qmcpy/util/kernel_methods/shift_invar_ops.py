@@ -28,7 +28,7 @@ class Polynomial():
         else:
             import torch 
             npt = torch
-            powers = torch.np.arange(self.order-1,-1,-1,dtype=x.dtype,device=x.device)
+            powers = torch.arange(self.order-1,-1,-1,dtype=x.dtype,device=x.device)
             coeffs = torch.tensor(self.coeffs,dtype=x.dtype,device=x.device)
         return (x[...,None]**powers*coeffs).sum(-1)
 

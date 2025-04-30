@@ -67,7 +67,7 @@ def weighted_walsh_funcs(alpha, xb, t):
     else:
         import torch 
         np_or_torch = torch 
-        y = torch.np.ones(xb.shape,device=xb.device)
+        y = torch.ones(xb.shape,device=xb.device)
     pidxs = xb>0
     y[~pidxs] = WEIGHTEDWALSHFUNCSZEROS[alpha]
     xfpidxs = (2**(-t))*xb[pidxs]

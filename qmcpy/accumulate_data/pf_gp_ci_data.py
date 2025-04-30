@@ -11,7 +11,7 @@ def _get_phi(gp, x):
     with np.errstate(all='ignore'): z = yhat/yhatstd
     return norm.cdf(z)
 def _error_udens_from_phi(phi):
-    return 2*min(1-phi,phi)
+    return 2*np.minimum(1-phi,phi)
 def _error_udens(gp, x):
     return _error_udens_from_phi(_get_phi(gp,x))
 
@@ -78,11 +78,11 @@ class PFGPCIData(AccumulateData):
         self.saved_gps.append(self.gpyt_model.state_dict())
         phi = _get_phi(self.gpyt_model,self.qmc_pts)
         self.solutions.append(np.mean(phi>=.5))
-        self.emr.append(np.mean(minimum(phi,1-phi)))
+        self.emr.append(np.mean(np.minimum(phi,1-phi)))
         gamma = self.emr[-1]/self.alpha
-        self.ci_low.append(maximum(self.solutions[-1]-gamma,0))
-        self.ci_high.append(minimum(self.solutions[-1]+gamma,1))
-        self.error_bounds.append(maximum(self.solutions[-1]-self.ci_low[-1],self.ci_high[-1]-self.solutions[-1]))
+        self.ci_low.append(np.maximum(self.solutions[-1]-gamma,0))
+        self.ci_high.append(np.minimum(self.solutions[-1]+gamma,1))
+        self.error_bounds.append(np.maximum(self.solutions[-1]-self.ci_low[-1],self.ci_high[-1]-self.solutions[-1]))
 
     def get_results_dict(self):
         df = {'n_sum':self.n_sum, 'n_batch':self.n_batch, 'error_bounds':self.error_bounds, 'ci_low':self.ci_low, 'ci_high':np.array(self.ci_high), 'solutions':np.array(self.solutions)}

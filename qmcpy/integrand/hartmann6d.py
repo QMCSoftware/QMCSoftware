@@ -8,8 +8,8 @@ class Hartmann6d(Integrand):
     >>> h6d = Hartmann6d(DigitalNetB2(6,seed=7))
     >>> x = h6d.discrete_distrib.gen_samples(2**10)
     >>> y = h6d.f(x)
-    >>> y.mean()
-    -0.2591...
+    >>> print("%.4f"%y.mean())
+    -0.2591
     >>> h6d.true_measure
     Uniform (TrueMeasure Object)
         lower_bound     0

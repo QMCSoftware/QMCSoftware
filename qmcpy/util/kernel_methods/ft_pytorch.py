@@ -10,7 +10,7 @@ def _fwht_torch(x):
     if n<=1: return y
     assert n&(n-1)==0 # require n is a power of 2
     m = int(np.log2(n))
-    it = torch.np.arange(n,dtype=torch.int64,device=x.device).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
+    it = torch.arange(n,dtype=torch.int64,device=x.device).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
     idx0 = [slice(None)]*(m-1)+[0]
     idx1 = [slice(None)]*(m-1)+[1]
     for k in range(m):
@@ -38,7 +38,7 @@ def fwht_torch(x):
     >>> y.detach()
     tensor([ 1.0697, -0.2866,  0.1248,  0.0846,  0.0997, -0.4470,  0.0975, -0.0311])
     >>> print("%.4f"%v.detach())
-    1.469
+    1.4694
     >>> dvdx.detach()
     tensor([0.5032, 1.4650, 0.1132, 1.2263, 0.9003, 0.5100, 0.6982, 0.6350])
     """
@@ -58,7 +58,7 @@ def fftbr_torch(x):
     tensor([ 1.0697+1.1391j, -0.3179+0.2646j, -0.2746+0.2177j, -0.2719-0.3412j,
              0.0997+0.1577j, -0.1499+0.1657j,  0.4968+0.2449j,  0.0596-0.0156j])
     >>> print("%.4f"%v.detach())
-    2.558
+    2.5584
     >>> dvdx.detach()
     tensor([1.3026+0.4861j, 1.2113+1.4492j, 0.7866+1.2161j, 0.4107+0.1078j,
             1.7096+0.6126j, 0.7865+0.6879j, 0.1926+0.5075j, 0.1227+0.8988j])
@@ -89,7 +89,7 @@ def ifftbr_torch(x):
     tensor([ 1.0697+1.1391j, -0.2866-0.2221j,  0.2980+0.0590j, -0.0887+0.0189j,
              0.0309+0.5415j, -0.0412-0.3293j, -0.1902+0.2641j, -0.0804+0.3618j])
     >>> print("%.4f"%v.detach())
-    2.565
+    2.5656
     >>> dvdx.detach()
     tensor([ 1.1474+0.7852j,  1.5120+1.0060j,  0.5979+0.8570j,  0.0649+0.5390j,
             -0.0972+0.9019j,  0.4709+1.3696j,  0.3727+0.2035j,  0.8270+1.6981j])

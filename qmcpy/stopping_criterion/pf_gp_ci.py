@@ -32,7 +32,7 @@ class PFSampleErrorDensityAR(Suggester):
             u = rng.random(newtries)
             udens_z = _error_udens(gp,z)
             x = np.vstack([x,z[u<=udens_z]])
-            rem = np.maximum(n-len(x),0)
+            rem = max(n-len(x),0)
         if self.verbose: print()
         return x[:n]
 
@@ -212,7 +212,7 @@ class PFGPCI(StoppingCriterion):
                     xdraw = dnb2.spawn()[0].gen_samples(self.n_init)
                     ydraw = np.atleast_1d(self.integrand.f(xdraw).squeeze())
             else:
-                n_new = min(self.n_batch,self.n_max-sum(self.n_batch))
+                n_new = min(self.n_batch,self.n_max-np.sum(self.n_batch))
                 xdraw = self.batch_sampler.suggest(n_new,self.d,data.gpyt_model,dnb2.rng,efficiency=2*data.emr[-1])
                 ydraw = np.atleast_1d(self.integrand.f(xdraw).squeeze())
             ydrawtf = self._affine_tf(ydraw)
@@ -228,7 +228,7 @@ class PFGPCI(StoppingCriterion):
         data.bound_high = data.ci_high[-1]
         data.n_total = sum(data.n_batch)
         data.time_integrate = time.time()-t0
-        data.n_sum = cumsum(data.n_batch)
+        data.n_sum = np.cumsum(data.n_batch)
         data.n_batch = np.array(data.n_batch)
         data.error_bounds = np.array(data.error_bounds)
         data.ci_low = np.array(data.ci_low)
