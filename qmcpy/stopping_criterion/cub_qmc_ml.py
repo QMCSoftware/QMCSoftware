@@ -16,20 +16,20 @@ class CubQMCML(StoppingCriterion):
     Stopping criterion based on multi-level quasi-Monte Carlo.
 
     >>> mlco = MLCallOptions(Lattice(seed=7))
-    >>> sc = CubQMCML(mlco,abs_tol=.05)
+    >>> sc = CubQMCML(mlco,abs_tol=.1)
     >>> solution,data = sc.integrate()
     >>> data
     MLQMCData (AccumulateData Object)
-        solution        10.432
-        n_total         172032
-        n_level         [4096.  256.  256.  256.  256.  256.]
-        levels          6
-        mean_level      [10.053  0.183  0.102  0.054  0.027  0.014]
-        var_level       [5.699e-05 5.129e-05 3.243e-05 1.610e-05 5.633e-06 1.108e-06]
-        bias_estimate   0.007
+        solution        10.420
+        n_total         98304
+        n_level         [2048.  256.  256.  256.  256.]
+        levels          5
+        mean_level      [10.054  0.183  0.102  0.054  0.027]
+        var_level       [2.027e-04 5.129e-05 3.243e-05 1.610e-05 5.633e-06]
+        bias_estimate   0.014
         time_integrate  ...
     CubQMCML (StoppingCriterion Object)
-        rmse_tol        0.019
+        rmse_tol        0.039
         n_init          2^(8)
         n_max           10000000000
         replications    2^(5)

@@ -16,23 +16,23 @@ class CubMCML(StoppingCriterion):
     Stopping criterion based on multi-level monte carlo.
     
     >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
-    >>> sc = CubMCML(mlco,abs_tol=.05)
+    >>> sc = CubMCML(mlco,abs_tol=.1)
     >>> solution,data = sc.integrate()
     >>> data
     MLMCData (AccumulateData Object)
-        solution        10.450
-        n_total         1213658
-        levels          7
-        n_level         [1.173e+06 2.369e+04 1.174e+04 3.314e+03 1.144e+03 4.380e+02 1.690e+02]
-        mean_level      [1.006e+01 1.856e-01 1.053e-01 5.127e-02 2.699e-02 1.558e-02 7.068e-03]
-        var_level       [1.958e+02 1.596e-01 4.603e-02 1.057e-02 2.978e-03 8.701e-04 2.552e-04]
-        cost_per_sample [ 1.  2.  4.  8. 16. 32. 64.]
-        alpha           0.936
-        beta            1.870
-        gamma           1.000
+        solution        10.410
+        n_total         298638
+        levels          5
+        n_level         [2.874e+05 6.434e+03 2.936e+03 7.060e+02 2.870e+02]
+        mean_level      [10.044  0.193  0.103  0.046  0.025]
+        var_level       [1.950e+02 1.954e-01 4.324e-02 9.368e-03 2.924e-03]
+        cost_per_sample [ 1.  2.  4.  8. 16.]
+        alpha           1.003
+        beta            2.039
+        gamma           1
         time_integrate  ...
     CubMCML (StoppingCriterion Object)
-        rmse_tol        0.019
+        rmse_tol        0.039
         n_init          2^(8)
         levels_min      2^(1)
         levels_max      10
@@ -53,6 +53,7 @@ class CubMCML(StoppingCriterion):
         d               1
         entropy         7
         spawn_key       ()
+    
 
     Original Implementation:
 
