@@ -24,7 +24,12 @@ jobs:
       - run: pip install -e .[test_botorch]
       - run: make doctests_botorch
       - run: pip install -e .[test_umbridge]
-      - run: if [ "$RUNNER_OS" == "Linux" ]; then make doctests_umbridge else echo "umbridge doctests only run on Linux" fi
+      - run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            make doctests_umbridge
+          else
+            echo "umbridge doctests only run on Linux"
+          fi
       - run: make unittests_fast
       - run: make unittests_slow
 
