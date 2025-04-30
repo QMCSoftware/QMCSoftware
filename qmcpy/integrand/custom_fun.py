@@ -16,7 +16,7 @@ class CustomFun(Integrand):
     >>> y.shape
     (1024, 1)
     >>> y.mean().item()
-    3.9873...
+    4.00686575934778
     >>> cf = CustomFun(
     ...     true_measure = Uniform(DigitalNetB2(3,seed=7),lower_bound=[2,3,4],upper_bound=[4,5,6]),
     ...     g = lambda x,compute_flags=None: x,

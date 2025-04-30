@@ -22,7 +22,7 @@ class AsianOption(Integrand):
     >>> x = ac.discrete_distrib.gen_samples(2**12)
     >>> y = ac.f(x)
     >>> y.mean().item()
-    1.770712...
+    1.7661702054437982
     >>> level_dims = [2,4,8]
     >>> ac2_multilevel = AsianOption(DigitalNetB2(seed=7),multilevel_dims=level_dims)
     >>> levels_to_spawn = arange(ac2_multilevel.max_level+1)
@@ -33,7 +33,7 @@ class AsianOption(Integrand):
     ...     level_est = ac2_single_level.f(x).mean()
     ...     yml += level_est
     >>> yml.item()
-    1.77820...
+    1.781727053581839
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\

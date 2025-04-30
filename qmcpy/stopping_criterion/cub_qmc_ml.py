@@ -20,13 +20,13 @@ class CubQMCML(StoppingCriterion):
     >>> solution,data = sc.integrate()
     >>> data
     MLQMCData (AccumulateData Object)
-        solution        10.420
+        solution        10.423
         n_total         98304
         n_level         [2048.  256.  256.  256.  256.]
         levels          5
-        mean_level      [10.054  0.183  0.102  0.054  0.027]
-        var_level       [2.027e-04 5.129e-05 3.243e-05 1.610e-05 5.633e-06]
-        bias_estimate   0.014
+        mean_level      [10.053  0.186  0.102  0.054  0.028]
+        var_level       [2.081e-04 1.179e-04 3.641e-05 1.862e-05 3.389e-06]
+        bias_estimate   0.015
         time_integrate  ...
     CubQMCML (StoppingCriterion Object)
         rmse_tol        0.029

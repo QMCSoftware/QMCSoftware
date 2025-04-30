@@ -33,7 +33,7 @@ class DiscreteDistribution(object):
         self._base_seed = seed if isinstance(seed,random.SeedSequence) else random.SeedSequence(seed)
         self.entropy = self._base_seed.entropy
         self.spawn_key = self._base_seed.spawn_key
-        self.rng = random.Generator(random.SFC64(self._base_seed))
+        self.rng = random.Generator(random.PCG64(self._base_seed))
 
     def gen_samples(self, *args):
         """

@@ -9,8 +9,8 @@ jobs:
         matrix:
             os: ["macos-latest", "ubuntu-latest", "windows-latest"]
     steps:
-      - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           auto-activate-base: true

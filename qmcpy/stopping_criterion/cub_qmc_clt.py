@@ -20,11 +20,11 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.38030146])
+    array([1.38020871])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
-        comb_bound_low  1.380
+        comb_bound_low  1.379
         comb_bound_high 1.381
         comb_flags      1
         n_total         2^(12)
@@ -57,16 +57,16 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.19029896, 0.96063374])
+    array([1.1898502 , 0.96066509])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [1.19  0.961]
-        comb_bound_low  [1.19 0.96]
+        comb_bound_low  [1.189 0.96 ]
         comb_bound_high [1.191 0.961]
         comb_flags      [ True  True]
         n_total         2^(19)
-        n               [524288.  16384.]
-        n_rep           [32768.  1024.]
+        n               [524288.   8192.]
+        n_rep           [32768.   512.]
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200
@@ -108,11 +108,11 @@ class CubQMCCLT(StoppingCriterion):
                         [4. 5. 6.]]
         comb_flags      [[ True  True  True]
                         [ True  True  True]]
-        n_total         2^(13)
-        n               [[4096. 4096. 4096.]
-                        [8192. 4096. 4096.]]
-        n_rep           [[256. 256. 256.]
-                        [512. 256. 256.]]
+        n_total         2^(14)
+        n               [[16384.  4096.  4096.]
+                        [ 4096.  4096.  4096.]]
+        n_rep           [[1024.  256.  256.]
+                        [ 256.  256.  256.]]
         time_integrate  ...
     CubQMCCLT (StoppingCriterion Object)
         inflate         1.200

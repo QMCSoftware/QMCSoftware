@@ -20,10 +20,10 @@ class CubMCCLT(StoppingCriterion):
     >>> solution,data = sc.integrate()
     >>> data
     MeanVarData (AccumulateData Object)
-        solution        1.519
-        error_bound     0.046
-        n_total         96028
-        n               95004
+        solution        1.493
+        error_bound     0.054
+        n_total         66783
+        n               65759
         levels          1
         time_integrate  ...
     CubMCCLT (StoppingCriterion Object)

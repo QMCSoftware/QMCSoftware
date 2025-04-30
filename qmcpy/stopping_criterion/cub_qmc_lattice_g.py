@@ -17,9 +17,9 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> solution,data = sc.integrate()
     >>> data
     LDTransformData (AccumulateData Object)
-        solution        1.810
-        comb_bound_low  1.806
-        comb_bound_high 1.815
+        solution        1.807
+        comb_bound_low  1.803
+        comb_bound_high 1.812
         comb_flags      1
         n_total         2^(10)
         n               2^(10)
@@ -47,7 +47,7 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> sc = CubQMCLatticeG(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.1894253 , 0.96059384])
+    array([1.18953167, 0.96060687])
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
     >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
     >>> true_value = array([sol3neg1,sol31])
