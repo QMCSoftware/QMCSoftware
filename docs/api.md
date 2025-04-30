@@ -1,0 +1,3 @@
+# API
+
+::: qmcpy.integrand.ishigami

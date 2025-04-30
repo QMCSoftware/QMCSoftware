@@ -3,7 +3,7 @@ from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
-from ..discrete_distribution.c_lib import c_lib
+from ..discrete_distribution._c_lib import _c_lib
 import ctypes
 import numpy as np
 from time import time
@@ -231,7 +231,7 @@ class CubBayesNetG(_CubBayesLDG):
 
 class FWHT():
     def __init__(self):
-        self.fwht_copy_cf = c_lib.fwht_copy
+        self.fwht_copy_cf = _c_lib.fwht_copy
         self.fwht_copy_cf.argtypes = [
             ctypes.c_uint32,
             np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
@@ -239,7 +239,7 @@ class FWHT():
         ]
         self.fwht_copy_cf.restype = None
 
-        self.fwht_inplace_cf = c_lib.fwht_inplace
+        self.fwht_inplace_cf = _c_lib.fwht_inplace
         self.fwht_inplace_cf.argtypes = [
             ctypes.c_uint32,
             np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),

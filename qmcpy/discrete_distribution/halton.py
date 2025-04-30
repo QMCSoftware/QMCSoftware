@@ -3,7 +3,7 @@ from ._discrete_distribution import LD
 from ..util import ParameterError,ParameterWarning
 import qmctoolscl
 import numpy as np
-from .c_lib import c_lib
+from ._c_lib import _c_lib
 import ctypes
 from math import *
 
@@ -131,7 +131,7 @@ class Halton(LD):
 
         [3] Owen, A. B., and Pan, Z. "Gain coefficients for scrambled Halton points," 2023. arXiv:2308.08035 [stat.CO]
     """
-    halton_cf_qrng = c_lib.halton_qrng
+    halton_cf_qrng = _c_lib.halton_qrng
     halton_cf_qrng.argtypes = [
         ctypes.c_int,  # n
         ctypes.c_int,  # d

@@ -1,6 +1,6 @@
 from qmcpy import *
 from qmcpy.util import *
-from qmcpy.discrete_distribution.c_lib import c_lib
+from qmcpy.discrete_distribution._c_lib import c_lib
 import os
 import unittest
 import ctypes

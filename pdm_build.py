@@ -2,10 +2,10 @@ from setuptools import Extension
 
 ext_modules = [
         Extension(
-            name = 'qmcpy.discrete_distribution.c_lib.c_lib',
+            name = 'qmcpy.discrete_distribution._c_lib._c_lib',
             sources = [
-                'qmcpy/discrete_distribution/c_lib/fwht.c',
-                'qmcpy/discrete_distribution/c_lib/halton_qrng.c',
+                'qmcpy/discrete_distribution/_c_lib/fwht.c',
+                'qmcpy/discrete_distribution/_c_lib/halton_qrng.c',
             ]
         )
     ]

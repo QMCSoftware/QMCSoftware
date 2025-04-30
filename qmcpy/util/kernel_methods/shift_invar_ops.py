@@ -48,7 +48,7 @@ BERNOULLIPOLYSDICT = {
 
 def bernoulli_poly(n, x):
     r"""
-    $n^\text{th} Bernoulli polynomial
+    $n^\text{th}$ Bernoulli polynomial
 
     Args:
         n (int): polynomial order

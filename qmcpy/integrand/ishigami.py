@@ -6,20 +6,20 @@ from ..util import ParameterError
 
 class Ishigami(Integrand):
     """
-    $g(\\boldsymbol{t}) = (1+bt_2^4)\\np.sin(t_0) + a\\sin^2(t_1), \\qquad T \\sim \\mathcal{U}(-\\np.pi,\\np.pi)^3$
+    $g(\\boldsymbol{t}) = (1+bt_2^4)\\sin(t_0) + a\\sin^2(t_1), \\qquad T \\sim \\mathcal{U}(-\\pi,\\pi)^3$
 
-    https://www.sfu.ca/~ssurjano/ishigami.html
+    [https://www.sfu.ca/~ssurjano/ishigami.html](https://www.sfu.ca/~ssurjano/ishigami.html)
     
-    
-    >>> ishigami = Ishigami(DigitalNetB2(3,seed=7))
-    >>> x = ishigami.discrete_distrib.gen_samples(2**10)
-    >>> y = ishigami.f(x)
-    >>> print("%.4f"%y.mean())
-    3.4985
-    >>> ishigami.true_measure
-    Uniform (TrueMeasure Object)
-        lower_bound     -3.142
-        upper_bound     3.142
+    Examples:
+        >>> ishigami = Ishigami(DigitalNetB2(3,seed=7))
+        >>> x = ishigami.discrete_distrib.gen_samples(2**10)
+        >>> y = ishigami.f(x)
+        >>> print("%.4f"%y.mean())
+        3.4985
+        >>> ishigami.true_measure
+        Uniform (TrueMeasure Object)
+            lower_bound     -3.142
+            upper_bound     3.142
         
     References
         [1] Ishigami, T., & Homma, T. (1990, December). 
@@ -33,7 +33,8 @@ class Ishigami(Integrand):
             sampler (DiscreteDistribution/TrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
-            a,b (float): fixed parameters in above equation
+            a (float): first paramter
+            b (float): second parameter
         """
         self.sampler = sampler
         if self.sampler.d != 3:

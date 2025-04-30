@@ -40,7 +40,9 @@ tests: doctests unittests coverage
 tests_no_docker: doctests_no_docker unittests coverage
 	
 mkdocs_serve:
-	@cp README.md docs/index.md
+	@cp README.md docs/README.md
+	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
+	@cp community.md docs/community.md 
 	@mkdocs serve
 
 uml:

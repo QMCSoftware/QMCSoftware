@@ -7,7 +7,7 @@ from scipy.special import gamma
 
 class Keister(Integrand):
     """
-    $f(\\boldsymbol{t}) = \\np.pi^{d/2} \\np.cos(\\| \\boldsymbol{t} \\|)$.
+    $f(\\boldsymbol{t}) = \\pi^{d/2} \\cos(\\| \\boldsymbol{t} \\|)$.
 
     The standard example integrates the Keister integrand with respect to an 
     IID Gaussian distribution with variance 1./2.
