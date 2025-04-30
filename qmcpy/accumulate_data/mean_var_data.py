@@ -21,7 +21,7 @@ class MeanVarData(AccumulateData):
             control_variate_means (list): list of means for each control variate
         """
         self.parameters = ['solution','error_bound','n_total','n','levels']
-        self.EPS = np.finfo(float32).eps
+        self.EPS = np.finfo(np.float32).eps
         self.stopping_crit = stopping_crit
         self.integrand = integrand
         self.true_measure = true_measure
@@ -77,10 +77,10 @@ class MeanVarData(AccumulateData):
                     # approximate control variate coefficient
                     x4beta = cvdata-cvmuhats[None,:]
                     y4beta = y-y.mean()
-                    self.beta_hat = linalg.lstsq(x4beta,y4beta,rcond=None)[0].reshape((-1,1))
+                    self.beta_hat = np.linalg.lstsq(x4beta,y4beta,rcond=None)[0].reshape((-1,1))
                 cvterm = self.beta_hat.T@(cvdata-self.cv_mu.T).T
                 y = y-cvterm.squeeze() # use control variates and approximated coefficient to 
-            self.t_eval[l] = maximum( (time()-t_start)/self.n[l], self.EPS) 
+            self.t_eval[l] = max( (time()-t_start)/self.n[l], self.EPS) 
             self.sighat[l] = y.std() # compute the sample standard deviation
             self.muhat[l] = y.mean() # compute the sample mean
             self.n_total += self.n[l] # add to total samples

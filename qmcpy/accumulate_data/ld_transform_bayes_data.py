@@ -152,7 +152,7 @@ class LDTransformBayesData(AccumulateData):
 
             temp = vec_lambda
             temp[0] = n + vec_lambda_ring[0]
-            mC_inv_trace = sum(1. / temp(temp != 0))
+            mC_inv_trace = np.sum(1. / temp(temp != 0))
             err_bd = self.uncert * np.sqrt(DSC * RKHS_norm / mC_inv_trace)
         else:
             # empirical Bayes

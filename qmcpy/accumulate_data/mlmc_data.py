@@ -1,5 +1,5 @@
 from ._accumulate_data import AccumulateData
-from numpy import zeros,ones,tile,maximum,absolute,arange,log2,hstack
+import numpy as np 
 from scipy.linalg import lstsq
 
 
@@ -41,9 +41,9 @@ class MLMCData(AccumulateData):
         self.alpha0 = alpha0
         self.beta0 = beta0
         self.gamma0 = gamma0
-        self.alpha = maximum(0,self.alpha0)
-        self.beta = maximum(0,self.beta0)
-        self.gamma = maximum(0,self.gamma0)
+        self.alpha = np.maximum(0,self.alpha0)
+        self.beta = np.maximum(0,self.beta0)
+        self.gamma = np.maximum(0,self.gamma0)
         self.solution = None
         self.n_total = 0
         self.time_integrate = 0
@@ -67,26 +67,26 @@ class MLMCData(AccumulateData):
                 self.sum_level[1,l] = self.sum_level[1,l] + integrand_l.sums[1]
                 self.cost_level[l] = self.cost_level[l] + integrand_l.cost
         # compute absolute average, variance and cost
-        self.mean_level = absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
-        self.var_level = maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
+        self.mean_level = np.absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
+        self.var_level = np.maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
         self.cost_per_sample = self.cost_level[:self.levels+1]/self.n_level[:self.levels+1]
         # fix to cope with possible zero values for self.mean_level and self.var_level
         # (can happen in some applications when there are few samples)
         for l in range(2,self.levels+1):
-            self.mean_level[l] = maximum(self.mean_level[l], .5*self.mean_level[l-1]/2**self.alpha)
-            self.var_level[l] = maximum(self.var_level[l], .5*self.var_level[l-1]/2**self.beta)
+            self.mean_level[l] = np.maximum(self.mean_level[l], .5*self.mean_level[l-1]/2**self.alpha)
+            self.var_level[l] = np.maximum(self.var_level[l], .5*self.var_level[l-1]/2**self.beta)
         # use linear regression to estimate alpha, beta, gamma if not given
         a = np.ones((self.levels,2))
         a[:,0] = np.arange(1,self.levels+1)
         if self.alpha0 <= 0:
             x = lstsq(a,np.log2(self.mean_level[1:]),cond=0,lapack_driver="gelss")[0]
-            self.alpha = maximum(.5,-x[0])
+            self.alpha = np.maximum(.5,-x[0])
         if self.beta0 <= 0:
             x = lstsq(a,np.log2(self.var_level[1:]),cond=0,lapack_driver="gelss")[0]
-            self.beta = maximum(.5,-x[0])
+            self.beta = np.maximum(.5,-x[0])
         if self.gamma0 <= 0:
             x = lstsq(a,np.log2(self.cost_per_sample[1:]),cond=0,lapack_driver="gelss")[0]
-            self.gamma = maximum(.5,x[0])
+            self.gamma = np.maximum(.5,x[0])
         self.n_total = self.n_level.sum()
 
     def _add_level(self):
@@ -100,6 +100,6 @@ class MLMCData(AccumulateData):
             self.sum_level = np.hstack((self.sum_level,np.zeros((2,1))))
             self.cost_level = np.hstack((self.cost_level, 0.))
         else:
-            self.mean_level = absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
-            self.var_level = maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
+            self.mean_level = np.absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
+            self.var_level = np.maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
             self.cost_per_sample = self.cost_level[:self.levels+1]/self.n_level[:self.levels+1]

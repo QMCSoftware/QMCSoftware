@@ -71,7 +71,7 @@ class StoppingCriterion(object):
             alpha_k = alphas_comb[k]/n_dep_k
             alpha_k_mat = alpha_k*dependents_k
             alpha_k_mat[alpha_k_mat==0] = 1
-            alphas_indv = minimum(alphas_indv,alpha_k_mat)
+            alphas_indv = np.minimum(alphas_indv,alpha_k_mat)
         return alphas_indv,identity_dependency
     def __repr__(self):
         return _univ_repr(self, "StoppingCriterion", self.parameters)

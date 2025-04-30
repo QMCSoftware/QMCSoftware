@@ -62,7 +62,7 @@ class _CubBayesLDG(StoppingCriterion):
     def integrate(self):
         t_start = time()
         self.datum = np.empty(self.d_indv, dtype=object)
-        for j in np.np.ndindex(self.d_indv):
+        for j in np.ndindex(self.d_indv):
             self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
                                                  self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel, self.alphas_indv[j])
 
@@ -74,8 +74,8 @@ class _CubBayesLDG(StoppingCriterion):
         self.data.n_min = 0
         self.data.indv_bound_low = np.tile(-np.inf, self.d_indv)
         self.data.indv_bound_high = np.tile(np.inf, self.d_indv)
-        self.data.solution_indv = np.tile(np.np.nan, self.d_indv)
-        self.data.solution = np.np.nan
+        self.data.solution_indv = np.tile(np.nan, self.d_indv)
+        self.data.solution = np.nan
         self.data.xfull = np.empty((0, self.d))
         self.data.yfull = np.empty((0,) + self.d_indv)
         stop_flag = np.tile(None, self.d_indv)
@@ -93,7 +93,7 @@ class _CubBayesLDG(StoppingCriterion):
                 ycvnext[1 + k] = self.cv[k].f(xnext, periodization_transform=self.ptransform,
                                               compute_flags=self.data.compute_flags)
 
-            for j in np.np.ndindex(self.d_indv):
+            for j in np.ndindex(self.d_indv):
                 if prev_flags_indv[j] == True and self.data.flags_indv[j] == False:
                     assert not(prev_flags_indv[j] == True and self.data.flags_indv[j] == False), 'This cannot happen !'
                 if self.data.flags_indv[j]:
@@ -114,10 +114,10 @@ class _CubBayesLDG(StoppingCriterion):
             self.data.xfull = np.vstack((self.data.xfull, xnext))
             self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
             self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
-            self.abs_tols,self.rel_tols = np.np.full_like(self.data.comb_bound_low,self.abs_tol),np.np.full_like(self.data.comb_bound_low,self.rel_tol)
-            fidxs = np.np.isfinite(self.data.comb_bound_low)&np.np.isfinite(self.data.comb_bound_high)
+            self.abs_tols,self.rel_tols = np.full_like(self.data.comb_bound_low,self.abs_tol),np.full_like(self.data.comb_bound_low,self.rel_tol)
+            fidxs = np.isfinite(self.data.comb_bound_low)&np.isfinite(self.data.comb_bound_high)
             slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = np.tile(np.np.nan,self.data.comb_bound_low.shape)
+            self.data.solution = np.tile(np.nan,self.data.comb_bound_low.shape)
             self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
             self.data.comb_flags = np.tile(False,self.data.comb_bound_low.shape)
             self.data.comb_flags[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))

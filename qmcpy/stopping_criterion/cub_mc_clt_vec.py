@@ -20,7 +20,7 @@ class CubMCCLTVec(StoppingCriterion):
     >>> sc = CubMCCLTVec(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    np.array([1.38798425])
+    array([1.38798425])
     >>> data
     MeanVarDataVec (AccumulateData Object)
         solution        1.388
@@ -51,7 +51,7 @@ class CubMCCLTVec(StoppingCriterion):
     >>> sc = CubMCCLTVec(f,abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    np.array([1.16031586, 0.96023843])
+    array([1.16031586, 0.96023843])
     >>> data
     MeanVarDataVec (AccumulateData Object)
         solution        [1.16 0.96]
@@ -119,7 +119,7 @@ class CubMCCLTVec(StoppingCriterion):
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
         inflate=1.2, alpha=0.01,
-        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
+        error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -194,7 +194,7 @@ class CubMCCLTVec(StoppingCriterion):
             self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
             self.data.compute_flags = ~self.data.flags_indv
             self.data.n_total = self.data.n.max()
-            if sum(self.data.compute_flags)==0:
+            if np.sum(self.data.compute_flags)==0:
                 break # sufficiently estimated
             elif 2*self.data.n_total>self.n_max:
                 warning_s = """

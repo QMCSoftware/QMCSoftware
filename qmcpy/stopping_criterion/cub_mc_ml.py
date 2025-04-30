@@ -127,7 +127,7 @@ class CubMCML(StoppingCriterion):
             self.data.n_total += self.data.diff_n_level.sum()
             # set optimal number of additional samples
             n_samples = self._get_next_samples()
-            self.data.diff_n_level = maximum(0, n_samples-self.data.n_level)
+            self.data.diff_n_level = np.maximum(0, n_samples-self.data.n_level)
             # check if over sample budget
             if (self.data.n_total + self.data.diff_n_level.sum()) > self.n_max:
                 warning_s = """
@@ -141,7 +141,7 @@ class CubMCML(StoppingCriterion):
             # if (almost) converged, estimate remaining error and decide 
             # whether a new level is required
             if (self.data.diff_n_level > 0.01*self.data.n_level).sum() == 0:
-                range_ = np.arange(minimum(2.,self.data.levels-1)+1)
+                range_ = np.arange(min(2.,self.data.levels-1)+1)
                 idx = (self.data.levels-range_).astype(int)
                 rem = (self.data.mean_level[idx] / 
                         2.**(range_*self.data.alpha)).max() / (2.**self.data.alpha - 1)
@@ -154,7 +154,7 @@ class CubMCML(StoppingCriterion):
                     else:
                         self.data._add_level()
                         n_samples = self._get_next_samples()
-                        self.data.diff_n_level = maximum(0., n_samples-self.data.n_level)
+                        self.data.diff_n_level = np.maximum(0., n_samples-self.data.n_level)
         # finally, evaluate multilevel estimator
         self.data.solution = (self.data.sum_level[0,:]/self.data.n_level).sum()
         self.data.levels += 1

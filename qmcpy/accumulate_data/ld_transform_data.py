@@ -116,6 +116,6 @@ class LDTransformData(AccumulateData):
         kappa_approx = self.kappanumap[int(2**mstart):]-1 # kappa index used for fitting
         x4beta = self.yg_cp[kappa_approx]
         y4beta = self.y_cp[kappa_approx]
-        self.beta = linalg.lstsq(x4beta,y4beta,rcond=None)[0]
+        self.beta = np.linalg.lstsq(x4beta,y4beta,rcond=None)[0]
         self.y_val = self.y_val-self.yg_val@self.beta # get new function values
         self.y_cp = self.y_cp-self.yg_cp@self.beta # redefine function

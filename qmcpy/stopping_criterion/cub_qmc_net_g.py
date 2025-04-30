@@ -50,17 +50,17 @@ class CubQMCNetG(_CubQMCLDG):
     ...     control_variate_means = [1,4/3])
     >>> sol,data = sc.integrate()
     >>> sol
-    np.array([5.33333333])
+    array([5.33333333])
     >>> exactsol = 16/3
     >>> abs(sol-exactsol)<1e-6
-    np.array([ True])
+    array([ True])
     >>> dnb2 = DigitalNetB2(3,seed=7)
     >>> f = BoxIntegral(dnb2, s=[-1,1])
     >>> abs_tol = 1e-3
     >>> sc = CubQMCNetG(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    np.array([1.18954933, 0.96059814])
+    array([1.18954933, 0.96059814])
     >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
     >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
     >>> true_value = np.array([sol3neg1,sol31])
@@ -70,7 +70,7 @@ class CubQMCNetG(_CubQMCLDG):
     >>> sc = CubQMCNetG(f2,control_variates=f,control_variate_means=true_value,update_beta=True)
     >>> solution,data = sc.integrate()
     >>> solution
-    np.array([1.10138626, 1.26667924])
+    array([1.10138626, 1.26667924])
     >>> data
     LDTransformData (AccumulateData Object)
         solution        [1.101 1.267]

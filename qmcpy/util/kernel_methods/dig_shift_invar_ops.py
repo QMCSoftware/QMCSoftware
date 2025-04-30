@@ -71,6 +71,6 @@ def weighted_walsh_funcs(alpha, xb, t):
     pidxs = xb>0
     y[~pidxs] = WEIGHTEDWALSHFUNCSZEROS[alpha]
     xfpidxs = (2**(-t))*xb[pidxs]
-    betapidxs = -np_or_torch.np.floor(np_or_torch.np.log2(xfpidxs))
+    betapidxs = -np_or_torch.floor(np_or_torch.log2(xfpidxs))
     y[pidxs] = WEIGHTEDWALSHFUNCSPOS[alpha](betapidxs,xfpidxs,xb[pidxs],t)
     return y

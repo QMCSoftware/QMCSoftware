@@ -136,7 +136,7 @@ class CubQMCMLCont(StoppingCriterion):
             self._update_theta()
 
             while self._varest() > (1-self.theta)*self.rmse_tol**2:
-                efficient_level = argmax(self.data.var_cost_ratio_level[:self.data.levels])
+                efficient_level = np.argmax(self.data.var_cost_ratio_level[:self.data.levels])
                 self.data.eval_level[efficient_level] = True
 
                 # Check if over sample budget
@@ -194,9 +194,9 @@ class CubQMCMLCont(StoppingCriterion):
         y[0] = np.log2(abs(self.data.mean_level_reps[max_levels-2].mean()))
         y[1] = np.log2(abs(self.data.mean_level_reps[max_levels-1].mean()))
         x = lstsq(A, y, rcond=None)[0]
-        alpha = maximum(.5,-x[0])
+        alpha = max(.5,-x[0])
         real_bias = 2**(x[1]+max_levels*x[0]) / (2**alpha - 1)
-        self.theta = maximum(0.01, minimum(0.125, (real_bias/self.rmse_tol)**2))
+        self.theta = max(0.01, min(0.125, (real_bias/self.rmse_tol)**2))
 
     def _rmse(self):
         """Returns an estimate for the root mean square error"""

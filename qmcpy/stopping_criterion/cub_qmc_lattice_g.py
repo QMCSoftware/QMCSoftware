@@ -47,7 +47,7 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> sc = CubQMCLatticeG(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    np.array([1.18953167, 0.96060687])
+    array([1.18953167, 0.96060687])
     >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
     >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
     >>> true_value = np.array([sol3neg1,sol31])
@@ -122,7 +122,7 @@ class CubQMCLatticeG(_CubQMCLDG):
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
         fudge=lambda m: 5.*2.**(-m), check_cone=False, ptransform='Baker',
-        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
+        error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
             integrand (Integrand): an instance of Integrand

@@ -20,7 +20,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    np.array([1.38020871])
+    array([1.38020871])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        1.380
@@ -57,7 +57,7 @@ class CubQMCCLT(StoppingCriterion):
     >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    np.array([1.1898502 , 0.96066509])
+    array([1.1898502 , 0.96066509])
     >>> data
     MeanVarDataRep (AccumulateData Object)
         solution        [1.19  0.961]
@@ -137,7 +137,7 @@ class CubQMCCLT(StoppingCriterion):
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
         inflate=1.2, alpha=0.01, replications=16., 
-        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
+        error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -220,7 +220,7 @@ class CubQMCCLT(StoppingCriterion):
             self.data.compute_flags = ~self.data.flags_indv
             self.data.n = self.replications*self.data.n_rep
             self.data.n_total = self.data.n.max()
-            if sum(self.data.compute_flags)==0:
+            if np.sum(self.data.compute_flags)==0:
                 break # sufficiently estimated
             elif 2*self.data.n_total>self.n_max:
                 warning_s = """

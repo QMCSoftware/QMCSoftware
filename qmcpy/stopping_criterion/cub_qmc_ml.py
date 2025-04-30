@@ -109,7 +109,7 @@ class CubQMCML(StoppingCriterion):
             self.data.update_data()
             if self.data.var_level.sum() > (self.rmse_tol**2/2.):
                 # double N_l on level with largest V_l/(2^l*N_l)
-                efficient_level = argmax(self.data.var_cost_ratio_level)
+                efficient_level = np.argmax(self.data.var_cost_ratio_level)
                 self.data.eval_level[efficient_level] = True
             elif self.data.bias_estimate > (self.rmse_tol/np.sqrt(2.)):
                 if self.data.levels == self.levels_max + 1:

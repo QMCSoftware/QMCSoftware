@@ -178,8 +178,8 @@ class CubMCG(StoppingCriterion):
                     self.data.solution += delta_minus # adjust solution a bit
                     break
                 else:
-                    candidate_tol = maximum(self.abs_tol,.95*self.rel_tol*abs(self.data.solution))
-                    self.data.error_bound = minimum(self.data.error_bound/2.,candidate_tol)
+                    candidate_tol = np.maximum(self.abs_tol,.95*self.rel_tol*abs(self.data.solution))
+                    self.data.error_bound = np.minimum(self.data.error_bound/2.,candidate_tol)
                     tau += 1
                 # update next uncertainty
                 toloversig = self.data.error_bound / self.sigma_up
@@ -200,18 +200,18 @@ class CubMCG(StoppingCriterion):
         # the upper bound on the third moment by Jensen's inequality
         BEfun2 = lambda logsqrtn: \
             (norm.cdf(-np.exp(logsqrtn) * toloversig)
-            + np.exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
+            + np.exp(-logsqrtn) * np.minimum(A1 * (M3upper + A2),
             A * M3upper / (1 + (np.exp(logsqrtn) * toloversig)**3))
             - alpha / 2.)
         # Berry-Esseen function, whose solution is the sample size needed
         logsqrtnCLT = np.log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
         nbe = np.ceil(np.exp(2 * fsolve(BEfun2, logsqrtnCLT)))
         # calculate Berry-Esseen n by fsolve function (scipy)
-        ncb = minimum(minimum(ncheb, nbe), n_budget)  # take the min of two sample sizes
+        ncb = np.minimum(np.minimum(ncheb, nbe), n_budget)  # take the min of two sample sizes
         logsqrtn = np.log(np.sqrt(ncb))
         BEfun3 = lambda toloversig: \
             (norm.cdf(-np.exp(logsqrtn) * toloversig)
-            + np.exp(-logsqrtn) * minimum(A1 * (M3upper + A2),
+            + np.exp(-logsqrtn) * np.minimum(A1 * (M3upper + A2),
             A * M3upper / (1 + (np.exp(logsqrtn) * toloversig)**3))
             - alpha / 2.)
         err = fsolve(BEfun3, toloversig) * sigma_0_up
@@ -226,7 +226,7 @@ class CubMCG(StoppingCriterion):
         M3upper = kurtmax**(3./4)
         # using Jensen's inequality to bound the third moment
         BEfun = lambda logsqrtb: \
-            (norm.cdf(n1*logsqrtb) + minimum(A1*(M3upper+A2),
+            (norm.cdf(n1*logsqrtb) + np.minimum(A1*(M3upper+A2),
             A*M3upper/(1+(np.sqrt(n1)*logsqrtb)**3))/np.sqrt(n1)
             - alpha1/2)
         # Berry-Esseen inequality
@@ -234,7 +234,7 @@ class CubMCG(StoppingCriterion):
         # use CLT to get tolerance
         NBE_inv = np.exp(2*fsolve(BEfun,logsqrtb_clt))
         # use fsolve to get Berry-Esseen tolerance
-        eps = minimum(NCheb_inv,NBE_inv)
+        eps = np.minimum(NCheb_inv,NBE_inv)
         # take the min of Chebyshev and Berry Esseen tolerance
         return eps
 

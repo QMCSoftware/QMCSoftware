@@ -78,7 +78,7 @@ class MLQMCData(AccumulateData):
         y[0] = np.log2(abs(self.mean_level_reps[self.levels-2].mean()))
         y[1] = np.log2(abs(self.mean_level_reps[self.levels-1].mean()))
         x = lstsq(A, y, cond=0, lapack_driver="gelss")[0]
-        alpha = maximum(.5,-x[0])
+        alpha = max(.5,-x[0])
         self.bias_estimate = 2**(x[1]+self.levels*x[0]) / (2**alpha - 1)
     
     def _add_level(self):
