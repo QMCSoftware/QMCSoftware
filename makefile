@@ -31,13 +31,10 @@ doctests: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doc
 
 doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
 
-unittests_fast:
-	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
-
-unittests_slow:
-	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
-
-unittests: unittests_fast unittests_slow
+unittests:
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+		test/ \
+		-W ignore
 
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m

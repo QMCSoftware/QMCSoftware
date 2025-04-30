@@ -124,11 +124,11 @@ class UMBridgeWrapper(Integrand):
         if not self.model.supports_evaluate(): raise ParameterError("UMBridgeWrapper requires model supports evaluation.")
         self.config = config
         self.parallel = parallel
-        self.d_in_umbridge =  append(0,cumsum(self.model.get_input_sizes(self.config)))
+        self.d_in_umbridge = np.append(0,np.cumsum(self.model.get_input_sizes(self.config)))
         self.n_d_in_umbridge = len(self.d_in_umbridge)-1
         if self.d_in_umbridge[-1]!=self.true_measure.d:
             raise ParameterError("sampler dimension must equal the sum of UMBridgeWrapper input sizes.")
-        self.d_out_umbridge = append(0,cumsum(self.model.get_output_sizes(self.config)))
+        self.d_out_umbridge = np.append(0,np.cumsum(self.model.get_output_sizes(self.config)))
         self.n_d_out_umbridge = len(self.d_out_umbridge)-1
         super(UMBridgeWrapper,self).__init__(
             dimension_indv = int(self.d_out_umbridge[-1]),

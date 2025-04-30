@@ -66,7 +66,7 @@ class JohnsonsSU(TrueMeasure):
     def _weight(self, x):
         term1 = (x-self._xi)/self._lam
         term2 = self._delta/(self._lam*np.sqrt(2*np.pi)) * 1/np.sqrt(1+term1**2)
-        term3 = np.exp(-1/2*(self._gamma+self._delta*arcsinh(term1))**2)
+        term3 = np.exp(-1/2*(self._gamma+self._delta*np.arcsinh(term1))**2)
         return np.prod( term2*term3, 1)
     
     def _spawn(self, sampler, dimension):
