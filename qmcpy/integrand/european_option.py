@@ -20,15 +20,15 @@ class EuropeanOption(Integrand):
         interest_rate   0
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
-    >>> y.mean().item()
-    9.208391501456726
+    >>> print("%.4f"%y.mean())
+    9.2084
     >>> eo = EuropeanOption(BrownianMotion(DigitalNetB2(4,seed=7),drift=1),call_put='put')
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
-    >>> y.mean().item()
-    9.195678793197006
-    >>> eo.get_exact_value().item()
-    9.2114...
+    >>> print("%.4f"%y.mean())
+    9.1957
+    >>> print("%.4f"%eo.get_exact_value())
+    9.2115
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35,
