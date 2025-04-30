@@ -1,6 +1,6 @@
 from qmcpy import *
 from qmcpy.util import *
-from numpy import *
+import numpy as np 
 import unittest
 import scipy.stats
 
@@ -28,7 +28,7 @@ class TestIntegrand(unittest.TestCase):
         ]
         for ao_ml_dim in [[2,4,8],[3,5]]:
             ao_og = AsianOption(DigitalNetB2(d,seed=7),multilevel_dims=ao_ml_dim)
-            ao_spawns = ao_og.spawn(levels=arange(len(ao_ml_dim)))
+            ao_spawns = ao_og.spawn(levels=np.arange(len(ao_ml_dim)))
             for ao_spawn,true_d in zip(ao_spawns,ao_ml_dim):
                 self.assertTrue(ao_spawn.d==true_d)
             integrands += ao_spawns
@@ -51,8 +51,8 @@ class TestIntegrand(unittest.TestCase):
             for ptransform in ['None','Baker','C0','C1','C1sin','C2sin','C3sin']:
                 y = integrand.f(x,periodization_transform=ptransform)
                 self.assertTrue(y.shape==((n,)+integrand.d_indv))
-                self.assertTrue(isfinite(y).all())
-                self.assertTrue(y.dtype==float64)
+                self.assertTrue(np.isfinite(y).all())
+                self.assertTrue(y.dtype==np.float64)
 
     def test_keister(self, dims=3):
         k = Keister(DigitalNetB2(dims,seed=7))

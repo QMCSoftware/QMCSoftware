@@ -1,6 +1,6 @@
 from qmcpy import *
 from qmcpy.util import *
-from numpy import *
+import numpy as np
 import scipy.stats
 import unittest
 
@@ -31,7 +31,7 @@ class TestTrueMeasure(unittest.TestCase):
             for _tm in [tm]+tm.spawn(1):
                 t = _tm.gen_samples(4)
                 self.assertTrue(t.shape==(4,2))
-                self.assertTrue(t.dtype==float64)
+                self.assertTrue(t.dtype==np.float64)
                 x = _tm.discrete_distrib.gen_samples(4)
                 xtf,jtf = _tm._jacobian_transform_r(x)
                 self.assertTrue(xtf.shape==(4,d),jtf.shape==(4,))
@@ -59,23 +59,23 @@ class TestTrueMeasure(unittest.TestCase):
                 spawns = tm.spawn(s=s,dimensions=spawn_dim)
                 self.assertTrue(len(spawns)==s)
                 self.assertTrue(all(type(spawn)==type(tm) for spawn in spawns))
-                self.assertTrue((array([spawn.d for spawn in spawns])==spawn_dim).all())
-                self.assertTrue((array([spawn.transform.d for spawn in spawns])==spawn_dim).all())
-                self.assertTrue((array([spawn.transform.transform.d for spawn in spawns])==spawn_dim).all())
-                self.assertTrue((array([spawn.discrete_distrib.d for spawn in spawns])==spawn_dim).all())
+                self.assertTrue((np.array([spawn.d for spawn in spawns])==spawn_dim).all())
+                self.assertTrue((np.array([spawn.transform.d for spawn in spawns])==spawn_dim).all())
+                self.assertTrue((np.array([spawn.transform.transform.d for spawn in spawns])==spawn_dim).all())
+                self.assertTrue((np.array([spawn.discrete_distrib.d for spawn in spawns])==spawn_dim).all())
                 self.assertTrue((all(spawn.discrete_distrib!=tm.discrete_distrib for spawn in spawns)))
                 self.assertTrue(all(spawn.transform!=tm.transform for spawn in spawns))
 
 class TestMatern(unittest.TestCase):
     def test_sklearn_equivalence(self):
-        points = array([[5, 4], [1, 2], [0, 0]])
-        mean = full(3, 1.1)
+        points = np.array([[5, 4], [1, 2], [0, 0]])
+        mean = np.full(3, 1.1)
         
         m2 = Matern(Lattice(dimension = 3,seed=7), points, length_scale = 4, nu = 2.5, variance = 0.01, mean=mean)
         from sklearn import gaussian_process as gp  #checking against scikit's Matern
         kernel2 = gp.kernels.Matern(length_scale = 4, nu=2.5)
         cov2 = 0.01 * kernel2.__call__(points)
-        assert allclose(cov2, m2.covariance)
+        assert np.allclose(cov2, m2.covariance)
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,7 +4,7 @@ from qmcpy.discrete_distribution.c_lib import c_lib
 import os
 import unittest
 import ctypes
-from numpy import *
+import numpy as np 
 import time
 
 class TestDiscreteDistribution(unittest.TestCase):
@@ -46,7 +46,7 @@ class TestDiscreteDistribution(unittest.TestCase):
                     pdf = _dd.pdf(_dd.gen_samples(4))
                     self.assertTrue(pdf.shape==(4,))
                     self.assertTrue(x.shape==(4,3))
-                    self.assertTrue(x.dtype==float64)
+                    self.assertTrue(x.dtype==np.float64)
                     s = str(_dd)
     
     def test_spawn(self):
@@ -57,7 +57,7 @@ class TestDiscreteDistribution(unittest.TestCase):
                 spawns = dd.spawn(s=s,dimensions=spawn_dim)
                 self.assertTrue(len(spawns)==s)
                 self.assertTrue(all(type(spawn)==type(dd) for spawn in spawns))
-                self.assertTrue((array([spawn.d for spawn in spawns])==spawn_dim).all())
+                self.assertTrue((np.array([spawn.d for spawn in spawns])==spawn_dim).all())
 
         
 class TestLattice(unittest.TestCase):
@@ -72,40 +72,40 @@ class TestLattice(unittest.TestCase):
             self.assertTrue((x0123[2:8,[1,3]]==x13).all())
 
     def test_linear_order(self):
-        true_sample = array([
+        true_sample = np.array([
             [1. / 8, 3. / 8, 3. / 8, 7. / 8],
             [3. / 8, 1. / 8, 1. / 8, 5. / 8],
             [5. / 8, 7. / 8, 7. / 8, 3. / 8],
             [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
         distribution = Lattice(dimension=4, randomize=False, order='linear')
-        self.assertTrue((distribution.gen_samples(n_min=4, n_max=8, warn=False)==true_sample).all())
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
 
     def test_natural_order(self):
-        true_sample = array([
+        true_sample = np.array([
             [1. / 8, 3. / 8, 3. / 8, 7. / 8],
             [5. / 8, 7. / 8, 7. / 8, 3. / 8],
             [3. / 8, 1. / 8, 1. / 8, 5. / 8],
             [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
         distribution = Lattice(dimension=4, randomize=False, order='natural')
-        self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
     
     def test_gray_order(self):
-        true_sample = array([
+        true_sample = np.array([
             [3. / 8, 1. / 8, 1. / 8, 5. / 8],
             [7. / 8, 5. / 8, 5. / 8, 1. / 8],
             [5. / 8, 7. / 8, 7. / 8, 3. / 8],
             [1. / 8, 3. / 8, 3. / 8, 7. / 8]])
         distribution = Lattice(dimension=4, randomize=False, order='gray')
-        self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
 
     def test_integer_generating_vectors(self):
         distribution = Lattice(dimension=4, generating_vector=27, randomize=False,seed=136)
-        true_sample =array([
+        true_sample = np.array([
             [0.125, 0.875, 0.625, 0.375],
             [0.625, 0.375, 0.125, 0.875],
             [0.375, 0.625, 0.875, 0.125],
             [0.875, 0.125, 0.375, 0.625]])
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
+        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
 
 class TestDigitalNetB2(unittest.TestCase):
     """ Unit tests for DigitalNetB2 DiscreteDistribution. """
@@ -116,20 +116,20 @@ class TestDigitalNetB2(unittest.TestCase):
 
     def test_gen_samples(self):
         dn123 = DigitalNetB2(dimension=4,graycode=False,randomize=False)
-        x0123 = dn123.gen_samples(8)
+        x0123 = dn123.gen_samples(8,warn=False)
         dn13 = DigitalNetB2(dimension=[1,3],graycode=False,randomize=False)
-        x13 = dn13.gen_samples(n_min=4,n_max=8)
+        x13 = dn13.gen_samples(n_min=4,n_max=8,warn=False)
         self.assertTrue((x0123[4:8,[1,3]]==x13).all())
         dn123 = DigitalNetB2(dimension=4,graycode=True,randomize=False)
-        x0123 = dn123.gen_samples(8)
+        x0123 = dn123.gen_samples(8,warn=False)
         dn13 = DigitalNetB2(dimension=[1,3],graycode=True,randomize=False)
-        x13 = dn13.gen_samples(n_min=5,n_max=7)
+        x13 = dn13.gen_samples(n_min=5,n_max=7,warn=False)
         self.assertTrue((x0123[5:7,[1,3]]==x13).all())
     
     def test_graycode_ordering(self):
         dnb2 = DigitalNetB2(2,randomize=False,graycode=True)
-        x = dnb2.gen_samples(n_min=4,n_max=8)
-        x_true = array([
+        x = dnb2.gen_samples(n_min=4,n_max=8,warn=False)
+        x_true = np.array([
             [ 0.375,  0.375],
             [ 0.875,  0.875],
             [ 0.625,  0.125],
@@ -138,8 +138,8 @@ class TestDigitalNetB2(unittest.TestCase):
 
     def test_natural_ordering(self):
         dnb2 = DigitalNetB2(2,randomize=False,graycode=False)
-        x = dnb2.gen_samples(n_min=4,n_max=8)
-        x_true = array([
+        x = dnb2.gen_samples(n_min=4,n_max=8,warn=False)
+        x_true = np.array([
             [ 0.125,  0.625],
             [ 0.625,  0.125],
             [ 0.375,  0.375],
@@ -159,7 +159,7 @@ class TestHalton(unittest.TestCase):
     
     def test_unrandomized(self):
         x_ur = Halton(dimension=2, randomize=False).gen_samples(4,warn=False)
-        x_true = array([
+        x_true = np.array([
             [0,     0],
             [1./2,  1./3],
             [1./4,  2./3],

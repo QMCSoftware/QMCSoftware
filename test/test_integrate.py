@@ -1,7 +1,7 @@
 """ Unit tests for integrate method in QMCPy """
 
 from qmcpy import *
-from numpy import array, inf, pi, sqrt, exp
+import numpy as np 
 import unittest
 
 class IntegrationExampleTest(unittest.TestCase):
@@ -45,19 +45,19 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_lebesgue_inf_measure(self):
         abs_tol = .1
         true_measure = Lebesgue(Gaussian(Lattice(1)))
-        myfunc = lambda x: exp(-x**2).sum(1)
+        myfunc = lambda x: np.exp(-x**2).sum(1)
         integrand = CustomFun(true_measure, myfunc)
         solution,data = CubQMCLatticeG(integrand,abs_tol=abs_tol).integrate()
-        true_value = sqrt(pi)
+        true_value = np.sqrt(np.pi)
         self.assertTrue(abs(solution - solution) < abs_tol)
     
     def test_lebesgue_inf_measure_2d(self):
         abs_tol = .1
         true_measure = Lebesgue(Gaussian(Lattice(2),mean=1,covariance=2))
-        myfunc = lambda x: exp(-x**2).prod(1)
+        myfunc = lambda x: np.exp(-x**2).prod(1)
         integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
-        true_value = pi
+        true_value = np.pi
         self.assertTrue(abs(solution - solution) < abs_tol)
 
     def test_uniform_measure(self):

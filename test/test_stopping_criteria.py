@@ -2,7 +2,7 @@
 
 from qmcpy import *
 from qmcpy.util import *
-from numpy import *
+import numpy as np
 import unittest
 
 keister_2d_exact = 1.808186429263620

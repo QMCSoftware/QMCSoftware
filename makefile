@@ -14,13 +14,11 @@ doctests_torch:
 
 doctests_gpytorch:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
-		--doctest-modules qmcpy/stopping_criterion/pf_gp_ci.py \
-		-W ignore
+		--doctest-modules qmcpy/stopping_criterion/pf_gp_ci.py
 
 doctests_botorch:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
-		--doctest-modules qmcpy/integrand/hartmann6d.py \
-		-W ignore
+		--doctest-modules qmcpy/integrand/hartmann6d.py
 
 doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 	@docker --version
@@ -32,9 +30,7 @@ doctests: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doc
 doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
 
 unittests:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
-		test/ \
-		-W ignore
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
 
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m
