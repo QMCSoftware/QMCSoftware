@@ -5,7 +5,6 @@ from ..integrand import Keister
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
 from ..discrete_distribution.c_lib import c_lib
 import ctypes
-from numpy import log2, ctypeslib
 import numpy as np
 from time import time
 import warnings
@@ -22,9 +21,9 @@ class CubBayesNetG(_CubBayesLDG):
     >>> solution,data = sc.integrate()
     >>> data
     LDTransformBayesData (AccumulateData Object)
-        solution        1.812
-        comb_bound_low  1.797
-        comb_bound_high 1.826
+        solution        1.804
+        comb_bound_low  1.786
+        comb_bound_high 1.821
         comb_flags      1
         n_total         2^(8)
         n               2^(8)
@@ -235,15 +234,15 @@ class FWHT():
         self.fwht_copy_cf = c_lib.fwht_copy
         self.fwht_copy_cf.argtypes = [
             ctypes.c_uint32,
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')
+            np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
+            np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')
         ]
         self.fwht_copy_cf.restype = None
 
         self.fwht_inplace_cf = c_lib.fwht_inplace
         self.fwht_inplace_cf.argtypes = [
             ctypes.c_uint32,
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
+            np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
         ]
         self.fwht_inplace_cf.restype = None
 

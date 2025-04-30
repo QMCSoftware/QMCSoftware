@@ -1,6 +1,5 @@
 """ Utility functions that abstract QMCPy objects. """
 
-from numpy import array, ndarray, log2
 import numpy as np
 from copy import copy
 

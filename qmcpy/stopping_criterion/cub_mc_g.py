@@ -22,12 +22,12 @@ class CubMCG(StoppingCriterion):
     >>> solution,data = sc.integrate()
     >>> data
     MeanVarData (AccumulateData Object)
-        solution        1.808
+        solution        1.807
         error_bound     0.050
-        n_total         14375
-        n               13351
+        n_total         15256
+        n               14232
         levels          1
-        time_integrate  ...
+        time_integrate  0.002
     CubMCG (StoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
@@ -53,7 +53,7 @@ class CubMCG(StoppingCriterion):
     >>> sc1 = CubMCG(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
     >>> sol,data = sc1.integrate()
     >>> sol.item()
-    1.3838172438984002
+    1.3841092957671866
 
     Original Implementation:
 

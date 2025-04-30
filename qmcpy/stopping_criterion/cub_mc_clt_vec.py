@@ -20,12 +20,12 @@ class CubMCCLTVec(StoppingCriterion):
     >>> sc = CubMCCLTVec(k,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.38798425])
+    array([1.38366791])
     >>> data
     MeanVarDataVec (AccumulateData Object)
-        solution        1.388
-        comb_bound_low  1.343
-        comb_bound_high 1.433
+        solution        1.384
+        comb_bound_low  1.335
+        comb_bound_high 1.432
         comb_flags      1
         n_total         2^(10)
         n               2^(10)
@@ -51,15 +51,15 @@ class CubMCCLTVec(StoppingCriterion):
     >>> sc = CubMCCLTVec(f,abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.16031586, 0.96023843])
+    array([1.1853359 , 0.95670595])
     >>> data
     MeanVarDataVec (AccumulateData Object)
-        solution        [1.16 0.96]
-        comb_bound_low  [1.112 0.923]
-        comb_bound_high [1.209 0.997]
+        solution        [1.185 0.957]
+        comb_bound_low  [1.139 0.918]
+        comb_bound_high [1.232 0.995]
         comb_flags      [ True  True]
-        n_total         2^(10)
-        n               [1024.  512.]
+        n_total         2^(11)
+        n               [2048.  512.]
         time_integrate  ...
     CubMCCLTVec (StoppingCriterion Object)
         inflate         1.200
@@ -88,12 +88,12 @@ class CubMCCLTVec(StoppingCriterion):
     >>> sol,data = CubMCCLTVec(cf,abs_tol=1e-2).integrate()
     >>> data
     MeanVarDataVec (AccumulateData Object)
-        solution        [[1.    1.996 3.   ]
-                        [4.001 5.003 5.999]]
-        comb_bound_low  [[0.99  1.986 2.993]
-                        [3.991 4.994 5.991]]
-        comb_bound_high [[1.01  2.006 3.007]
-                        [4.011 5.012 6.006]]
+        solution        [[1.    1.999 2.999]
+                        [4.001 4.998 6.001]]
+        comb_bound_low  [[0.99  1.989 2.991]
+                        [3.991 4.989 5.993]]
+        comb_bound_high [[1.01  2.009 3.006]
+                        [4.01  5.007 6.008]]
         comb_flags      [[ True  True  True]
                         [ True  True  True]]
         n_total         2^(21)

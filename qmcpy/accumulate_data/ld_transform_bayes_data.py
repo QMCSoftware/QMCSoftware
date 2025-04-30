@@ -5,7 +5,6 @@ import warnings
 import numpy as np
 from scipy.optimize import fminbound as fminbnd
 from scipy.optimize import fmin, fmin_bfgs
-from numpy import sqrt, exp, log
 from scipy.stats import norm as gaussnorm
 from scipy.stats import t as tnorm
 

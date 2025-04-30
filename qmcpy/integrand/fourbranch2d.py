@@ -9,7 +9,7 @@ class FourBranch2d(Integrand):
     >>> x = fb2d.discrete_distrib.gen_samples(2**10)
     >>> y = fb2d.f(x)
     >>> y.mean().item()
-    -2.4984358932407176
+    -2.500835871323173
     >>> fb2d.true_measure
     Uniform (TrueMeasure Object)
         lower_bound     -8

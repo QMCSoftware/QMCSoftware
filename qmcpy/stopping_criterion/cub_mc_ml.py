@@ -20,15 +20,15 @@ class CubMCML(StoppingCriterion):
     >>> solution,data = sc.integrate()
     >>> data
     MLMCData (AccumulateData Object)
-        solution        10.440
-        n_total         542250
+        solution        10.431
+        n_total         533874
         levels          6
-        n_level         [5.185e+05 9.923e+03 4.846e+03 1.536e+03 5.950e+02 2.290e+02]
-        mean_level      [10.057  0.179  0.107  0.054  0.032  0.011]
-        var_level       [1.959e+02 1.428e-01 4.555e-02 1.066e-02 4.083e-03 6.069e-04]
+        n_level         [5.154e+05 1.085e+04 5.219e+03 1.382e+03 5.020e+02 1.880e+02]
+        mean_level      [10.046  0.188  0.105  0.05   0.026  0.016]
+        var_level       [1.951e+02 1.723e-01 4.530e-02 1.023e-02 2.951e-03 8.083e-04]
         cost_per_sample [ 1.  2.  4.  8. 16. 32.]
-        alpha           0.989
-        beta            1.924
+        alpha           0.908
+        beta            1.941
         gamma           1.000
         time_integrate  ...
     CubMCML (StoppingCriterion Object)

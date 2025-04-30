@@ -3,7 +3,6 @@ from ._cub_bayes_ld_g import _CubBayesLDG
 from ..discrete_distribution import Lattice
 from ..integrand import Keister
 from ..util import ParameterError#, ParameterWarning #MaxSamplesWarning,
-from numpy import log2
 #from math import factorial
 import numpy as np
 #from time import time

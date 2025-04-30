@@ -17,9 +17,9 @@ class CubQMCNetG(_CubQMCLDG):
     >>> solution,data = sc.integrate()
     >>> data
     LDTransformData (AccumulateData Object)
-        solution        1.807
-        comb_bound_low  1.800
-        comb_bound_high 1.815
+        solution        1.808
+        comb_bound_low  1.803
+        comb_bound_high 1.813
         comb_flags      1
         n_total         2^(10)
         n               2^(10)
@@ -60,7 +60,7 @@ class CubQMCNetG(_CubQMCLDG):
     >>> sc = CubQMCNetG(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.18954933, 0.96059814])
+    array([1.18973505, 0.96056431])
     >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
     >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
     >>> true_value = np.array([sol3neg1,sol31])
@@ -70,7 +70,7 @@ class CubQMCNetG(_CubQMCLDG):
     >>> sc = CubQMCNetG(f2,control_variates=f,control_variate_means=true_value,update_beta=True)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.10138626, 1.26667924])
+    array([1.10119574, 1.26661224])
     >>> data
     LDTransformData (AccumulateData Object)
         solution        [1.101 1.267]
@@ -116,9 +116,9 @@ class CubQMCNetG(_CubQMCLDG):
                         [4. 5. 6.]]
         comb_flags      [[ True  True  True]
                         [ True  True  True]]
-        n_total         2^(12)
-        n               [[1024. 2048. 4096.]
-                        [1024. 2048. 4096.]]
+        n_total         2^(13)
+        n               [[4096. 4096. 8192.]
+                        [2048. 2048. 4096.]]
         time_integrate  ...
     CubQMCNetG (StoppingCriterion Object)
         abs_tol         1.00e-06
