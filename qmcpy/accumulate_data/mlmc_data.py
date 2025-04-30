@@ -1,5 +1,5 @@
 from ._accumulate_data import AccumulateData
-from numpy import *
+from numpy import zeros,ones,tile,maximum,absolute,arange,log2,hstack
 from scipy.linalg import lstsq
 
 
