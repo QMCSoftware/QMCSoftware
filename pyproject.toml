@@ -99,7 +99,7 @@ dev = [ # brew install weasyprint
     "mkpdfs-mkdocs >= 1.0.1",
     "mkdocs-print-site-plugin >= 2.7.2",
     "mkdocs-exclude >= 1.0.2",
-    "pytest-readme >= 1.0.1",
+    "phmutest >= 1.0.1",
 ]
 
 [tool.pdm.build]

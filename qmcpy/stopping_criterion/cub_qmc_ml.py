@@ -1,7 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLQMCData
 from ..discrete_distribution import DigitalNetB2,Lattice,Halton
-from ..discrete_distribution._discrete_distribution import LD
+from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning

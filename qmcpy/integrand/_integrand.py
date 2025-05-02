@@ -1,6 +1,6 @@
 from ..util import MethodImplementationError, _univ_repr, ParameterError
 from ..true_measure._true_measure import TrueMeasure
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 import numpy as np
 import os
 from multiprocessing import get_context

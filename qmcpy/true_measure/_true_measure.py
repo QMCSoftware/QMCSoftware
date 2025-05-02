@@ -1,5 +1,5 @@
 from ..util import MethodImplementationError, _univ_repr, DimensionError, ParameterError
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 import numpy as np
 
 

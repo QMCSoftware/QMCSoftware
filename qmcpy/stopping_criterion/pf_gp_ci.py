@@ -2,7 +2,7 @@ from ._stopping_criterion import StoppingCriterion
 from ..discrete_distribution import DigitalNetB2
 from ..integrand.ishigami import Ishigami
 from ..true_measure._true_measure import TrueMeasure
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..accumulate_data.pf_gp_ci_data import PFGPCIData, _error_udens
 from ..util import MaxSamplesWarning
 import warnings

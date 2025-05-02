@@ -1,52 +1,56 @@
-from ._discrete_distribution import IID
+from .abstract_discrete_distribution import AbstractIIDDiscreteDistribution
+from ..util import ParameterError, ParameterWarning
 import numpy as np
+from typing import Union
+import warnings
 
-
-class IIDStdUniform(IID):
+class IIDStdUniform(AbstractIIDDiscreteDistribution):
     """
-    A wrapper around NumPy's IID Standard Uniform generator `numpy.np.random.rand`.
+    IID standard uniform points, a wrapper around [`numpy.random.rand`](https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html). 
 
-    >>> dd = IIDStdUniform(dimension=2,seed=7)
-    >>> dd.gen_samples(4)
-    array([[0.04386058, 0.58727432],
-           [0.3691824 , 0.65212985],
-           [0.69669968, 0.10605352],
-           [0.63025643, 0.13630282]])
-    >>> dd
-    IIDStdUniform (DiscreteDistribution Object)
-        d               2^(1)
-        entropy         7
-        spawn_key       ()
+    Examples:
+        >>> dd = IIDStdUniform(dimension=2,seed=7)
+        >>> dd(4)
+        array([[0.04386058, 0.58727432],
+               [0.3691824 , 0.65212985],
+               [0.69669968, 0.10605352],
+               [0.63025643, 0.13630282]])
+        >>> dd(4) # gives new samples every time
+        array([[0.5968363 , 0.0576251 ],
+               [0.2028797 , 0.22909681],
+               [0.1366783 , 0.75220658],
+               [0.84501765, 0.56269008]])
+        >>> dd
+        IIDStdUniform (DiscreteDistribution Object)
+            d               2^(1)
+            entropy         7
+            spawn_key       ()
     """
 
-    def __init__(self, dimension=1, seed=None, replications=1):
+    def __init__(self, dimension=1, replications=None, seed=None):
         """
         Args:
             dimension (int): dimension of samples
-            seed (None or int or numpy.np.random.SeedSeq): seed the random number generator for reproducibility
+            replications (Union[None,int]): number of randomizations
+            seed (Union[None,int,np.random.SeedSeq): seed the random number generator for reproducibility
         """
-        self.mimics = 'StdUniform'
-        self.low_discrepancy = False
-        self.d_max = np.inf
-        self.replications = replications
-        super(IIDStdUniform,self).__init__(dimension,seed)
+        super(IIDStdUniform,self).__init__(int(dimension),replications,seed,d_limit=np.inf,n_limit=np.inf)
+        if not (self.dvec==np.arange(self.d)).all():
+            warnings.warn("IIDStdUniform does not accomodate dvec",ParameterWarning)
 
-    def gen_samples(self, n):
-        """
-        Generate samples 
-
-        Args:
-            n (int): Number of observations to generate
-
-        Returns:
-            np.ndarray: n x self.d array of samples
-        """
-        x = self.rng.uniform(size=(self.replications,int(n),self.d))
-        return x[0] if self.replications==1 else x
-    
-    def pdf(self, x):
-        return np.ones(x.shape[0], dtype=float)
+    def _gen_samples(self, n_min, n_max, return_unrandomized, return_binary, warn):
+        if n_min>0 and warn:
+            raise warnings.warn("For IIDStdUniform setting n_min>0 makes no difference as new samples are generated every call regardless, e.g., calling gen_samples(n_min=0,n_max=4) twice will give different samples.",ParameterWarning)
+        if return_unrandomized:
+            raise ParameterError("IIDStdUniform does not support return_unrandomized=True")
+        if return_binary:
+            raise ParameterError("IIDStdUniform does not support return_binary=True")
+        x = self.rng.uniform(size=(self.replications,int(n_max-n_min),self.d))
+        return x
         
     def _spawn(self, child_seed, dimension):
-        return IIDStdUniform(dimension=dimension,seed=child_seed)
-        
+        return IIDStdUniform(
+            dimension = dimension,
+            replications = self.replications,
+            seed = child_seed,
+        )

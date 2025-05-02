@@ -1,6 +1,38 @@
 
 # Discrete Distributions
 
+Generators of sequences $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$.
+
+## `AbstractDiscreteDistribution`
+
+::: qmcpy.discrete_distribution.abstract_discrete_distribution.AbstractDiscreteDistribution
+
+## `AbstractLDDiscreteDistribution`
+
+::: qmcpy.discrete_distribution.abstract_discrete_distribution.AbstractLDDiscreteDistribution
+
+## `AbstractIIDDiscreteDistribution`
+
+::: qmcpy.discrete_distribution.abstract_discrete_distribution.AbstractIIDDiscreteDistribution
+
+## `Lattice`
+
+::: qmcpy.discrete_distribution.lattice.Lattice
+
+## `DigitalNetB2`
+
+::: qmcpy.discrete_distribution.digital_net_b2.digital_net_b2.DigitalNetB2
+
+## `Halton`
+
+::: qmcpy.discrete_distribution.halton.Halton
+
+## `IIDStdUniform`
+
+::: qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform
+
+## Examples
+
 The first $32$ points of each sequence are shown as purple starts, the next $32$ points are shown as green triangles, and the $128$ points after that are shown as blue circles. Notice the gaps and clusters of IID points compared to the more uniform coverage of LD sequences. We can use `QMCPy` to generate the LD digital net (in base $b=2$) as follows
 
 ```python 

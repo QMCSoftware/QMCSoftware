@@ -1,7 +1,7 @@
 from ._integrand import Integrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Lebesgue, Uniform
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..true_measure._true_measure import TrueMeasure
 from ..util import ParameterError
 import numpy as np

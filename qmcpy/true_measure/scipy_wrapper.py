@@ -1,6 +1,6 @@
 from ._true_measure import TrueMeasure
 from ..util import DimensionError, ParameterError
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 import scipy.stats

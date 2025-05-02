@@ -1,8 +1,8 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarDataVec
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution import IIDStdUniform
-from ..discrete_distribution._discrete_distribution import IID
+from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..true_measure import Gaussian,Uniform
 from ..integrand import Keister,BoxIntegral,CustomFun
 from ..util import MaxSamplesWarning, ParameterWarning, ParameterError

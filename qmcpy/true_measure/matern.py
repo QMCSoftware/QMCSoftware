@@ -1,5 +1,5 @@
 from .gaussian import Gaussian
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ._true_measure import TrueMeasure
 from ..discrete_distribution.lattice.lattice import Lattice
 from ..util import DimensionError, ParameterError

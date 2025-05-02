@@ -1,7 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MeanVarData
-from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-from ..discrete_distribution._discrete_distribution import IID
+from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..integrand import Keister, CustomFun
 from ..true_measure import Gaussian, Uniform
 from ..discrete_distribution import IIDStdUniform

@@ -1,7 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import MLMCData
 from ..discrete_distribution import IIDStdUniform
-from ..discrete_distribution._discrete_distribution import IID
+from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..true_measure import Gaussian
 from ..integrand import MLCallOptions
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning

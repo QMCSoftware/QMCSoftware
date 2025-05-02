@@ -25,8 +25,8 @@ doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/umbridge_wrapper.py
 
-doctests_readme:
-	pytest --doctest-modules README.md & pytest --doctest-modules test_readme.py
+doctests_markdown:
+	@phmutest docs/discrete_distributions.md --replmode --log
 
 doctests: doctests_readme doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
 
