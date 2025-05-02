@@ -1,13 +1,15 @@
 site_name: "QMCPy"
 nav:
-  - Home: README.md
+  - index.md
+  - Guides:
+    - Discrete Distributions: discrete_distributions.md
   - API: api.md
   # - Demos:
   #   - Fast GP Net: examples/simple/fgp_dnb2.ipynb
   - Community: community.md
   - Contributing: CONTRIBUTING.md
   - License: https://github.com/QMCSoftware/QMCSoftware/blob/master/LICENSE
-  #- Full Docs: print_page/
+  - Full Docs: print_page/
 
 plugins:
   - search
@@ -32,7 +34,7 @@ plugins:
             docstring_options:
               ignore_init_summary: false
             merge_init_into_class: true
-  #- print-site # enables generating pdf by saving docs in print_page/ https://timvink.github.io/mkdocs-print-site-plugin/index.html 
+  - print-site # enables generating pdf by saving docs in print_page/ https://timvink.github.io/mkdocs-print-site-plugin/index.html 
   
 theme:
   name: material

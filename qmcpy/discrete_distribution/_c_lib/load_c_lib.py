@@ -4,6 +4,6 @@ from glob import glob
 import os
 
 try:
-    _c_lib = CDLL(glob(dirname(abspath(__file__)) + os.sep + "c_lib*")[0], mode=RTLD_GLOBAL)
+    _c_lib = CDLL(glob(dirname(abspath(__file__)) + os.sep + "_c_lib*")[0], mode=RTLD_GLOBAL)
 except e:
     pass

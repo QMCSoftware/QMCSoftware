@@ -25,9 +25,12 @@ doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/umbridge_wrapper.py
 
-doctests: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
+doctests_readme:
+	pytest --doctest-modules README.md & pytest --doctest-modules test_readme.py
 
-doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+doctests: doctests_readme doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
+
+doctests_no_docker: doctests_readme doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
 
 unittests:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
@@ -40,7 +43,6 @@ tests: doctests unittests coverage
 tests_no_docker: doctests_no_docker unittests coverage
 	
 mkdocs_serve:
-	@cp README.md docs/README.md
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
 	@mkdocs serve

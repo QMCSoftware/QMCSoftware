@@ -1,6 +1,6 @@
 from qmcpy import *
 from qmcpy.util import *
-from qmcpy.discrete_distribution._c_lib import c_lib
+from qmcpy.discrete_distribution._c_lib import _c_lib
 import os
 import unittest
 import ctypes
@@ -10,7 +10,7 @@ import time
 class TestDiscreteDistribution(unittest.TestCase):
 
     def test_size_unsigned_long(self):
-        get_unsigned_long_size_cf = c_lib.get_unsigned_long_size
+        get_unsigned_long_size_cf = _c_lib.get_unsigned_long_size
         get_unsigned_long_size_cf.argtypes = []
         get_unsigned_long_size_cf.restype = ctypes.c_uint8
         if os.name == 'nt':
@@ -19,7 +19,7 @@ class TestDiscreteDistribution(unittest.TestCase):
             self.assertEqual(get_unsigned_long_size_cf(),8)
 
     def test_size_unsigned_long_long(self):
-        get_unsigned_long_long_size_cf = c_lib.get_unsigned_long_long_size
+        get_unsigned_long_long_size_cf = _c_lib.get_unsigned_long_long_size
         get_unsigned_long_long_size_cf.argtypes = []
         get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
         self.assertEqual(get_unsigned_long_long_size_cf(),8)
