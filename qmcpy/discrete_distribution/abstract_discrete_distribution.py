@@ -45,7 +45,7 @@ class AbstractDiscreteDistribution(object):
             n_min (Union[None,int]): Starting index of sequence.
             n_max (Union[None,int]): Final index of sequence.
             return_unrandomized (bool):if True, also return unrandomized samples `x_unrandomized` after the randomized `x` below
-            return_binary (bool): for `DigitalNetB2`, if True, also return the integer representation `x_integer` after the float representation `x` described below. Cannot set have both `return_unrandomized` and `return_binary`. 
+            return_binary (bool): Only used for `DigitalNetB2`, if True, ONLY return the integer representation `x_integer` of the float representation `x` described below. Cannot set have both `return_unrandomized` and `return_binary`. 
             warn (bool): If False, disable warnings when generating samples
 
         Returns:
