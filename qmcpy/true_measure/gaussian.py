@@ -1,4 +1,4 @@
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
@@ -7,7 +7,7 @@ from scipy.stats import norm, multivariate_normal
 from scipy.linalg import eigh
 
 
-class Gaussian(TrueMeasure):
+class Gaussian(AbstractTrueMeasure):
     """
     Normal Measure.
     
@@ -18,7 +18,7 @@ class Gaussian(TrueMeasure):
            [ 0.85301528, -0.88218749],
            [ 0.99611301,  3.16934534]])
     >>> g
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            [1 2]
         covariance      [[9 4]
                         [4 5]]
@@ -28,7 +28,7 @@ class Gaussian(TrueMeasure):
     def __init__(self, sampler, mean=0., covariance=1., decomp_type='PCA'):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             mean (float): mu for Normal(mu,sigma^2)

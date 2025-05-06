@@ -25,7 +25,7 @@ class Halton(AbstractLDDiscreteDistribution):
                [0.62236343, 0.02796307],
                [0.29427505, 0.79909098]])
         >>> halton
-        Halton (DiscreteDistribution Object)
+        Halton (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1
             randomize       LMS_PERM

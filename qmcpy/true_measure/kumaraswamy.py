@@ -1,10 +1,10 @@
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 
 
-class Kumaraswamy(TrueMeasure):
+class Kumaraswamy(AbstractTrueMeasure):
     """
     >>> k = Kumaraswamy(DigitalNetB2(2,seed=7),a=[1,2],b=[3,4])
     >>> k.gen_samples(4)
@@ -13,7 +13,7 @@ class Kumaraswamy(TrueMeasure):
            [0.11809512, 0.69998807],
            [0.24617103, 0.2723896 ]])
     >>> k
-    Kumaraswamy (TrueMeasure Object)
+    Kumaraswamy (AbstractTrueMeasure Object)
         a               [1 2]
         b               [3 4]
         
@@ -23,7 +23,7 @@ class Kumaraswamy(TrueMeasure):
     def __init__(self, sampler, a=2, b=2):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             a (np.ndarray): alpha > 0

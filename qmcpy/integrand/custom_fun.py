@@ -32,7 +32,7 @@ class CustomFun(Integrand):
     def __init__(self, true_measure, g, dimension_indv=1, parallel=False):
         """
         Args:
-            true_measure (TrueMeasure): a TrueMeasure instance. 
+            true_measure (AbstractTrueMeasure): a AbstractTrueMeasure instance. 
             g (function): a function handle. 
             dimension_indv (tuple): individual solution dimensions.
             parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion. 

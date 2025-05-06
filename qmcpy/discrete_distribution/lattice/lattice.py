@@ -27,7 +27,7 @@ class Lattice(AbstractLDDiscreteDistribution):
         >>> l(1) # first point in the sequence
         array([[0.04386058, 0.58727432]])
         >>> l
-        Lattice (DiscreteDistribution Object)
+        Lattice (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1
             randomize       SHIFT

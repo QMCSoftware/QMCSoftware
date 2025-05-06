@@ -33,7 +33,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         >>> dnb2(1) # first point in the sequence
         array([[0.84429662, 0.72162356]])
         >>> dnb2
-        DigitalNetB2 (DiscreteDistribution Object)
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1
             randomize       LMS_DS

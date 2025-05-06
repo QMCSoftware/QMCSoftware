@@ -1,9 +1,9 @@
 site_name: "QMCPy"
 nav:
   - index.md
-  - Guides:
+  - API:
     - Discrete Distributions: discrete_distributions.md
-  #- API: api.md
+    - True Measures: true_measures.md
   # - Demos:
   #   - Fast GP Net: examples/simple/fgp_dnb2.ipynb
   - Community: community.md

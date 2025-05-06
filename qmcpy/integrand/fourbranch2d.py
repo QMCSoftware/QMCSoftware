@@ -11,7 +11,7 @@ class FourBranch2d(Integrand):
     >>> print("%.4f"%y.mean())
     -2.5008
     >>> fb2d.true_measure
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     -8
         upper_bound     2^(3)
     """

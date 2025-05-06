@@ -41,13 +41,13 @@ class CubMCCLT(StoppingCriterion):
         interest_rate   0
         mean_type       arithmetic
         dim_frac        0
-    BrownianMotion (TrueMeasure Object)
+    BrownianMotion (AbstractTrueMeasure Object)
         time_vec        1
         drift           0
         mean            0
         covariance      1
         decomp_type     PCA
-    IIDStdUniform (DiscreteDistribution Object)
+    IIDStdUniform (AbstractDiscreteDistribution Object)
         d               1
         entropy         7
         spawn_key       ()
@@ -78,11 +78,11 @@ class CubMCCLT(StoppingCriterion):
         inflate         1.200
         alpha           0.010
     Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    IIDStdUniform (DiscreteDistribution Object)
+    IIDStdUniform (AbstractDiscreteDistribution Object)
         d               1
         entropy         7
         spawn_key       ()

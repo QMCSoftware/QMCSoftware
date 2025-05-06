@@ -18,7 +18,7 @@ class Keister(Integrand):
     >>> print("%.4f"%y.mean())
     1.8082
     >>> k.true_measure
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
@@ -40,7 +40,7 @@ class Keister(Integrand):
     def __init__(self, sampler):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
         """

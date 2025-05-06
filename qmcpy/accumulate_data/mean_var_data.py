@@ -12,8 +12,8 @@ class MeanVarData(AccumulateData):
         Args:
             stopping_crit (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
-            true_measure (TrueMeasure): A TrueMeasure instance
-            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance  
+            true_measure (AbstractTrueMeasure): A AbstractTrueMeasure instance
+            discrete_distrib (AbstractDiscreteDistribution): an AbstractDiscreteDistribution instance  
             n_init (int): initial number of samples
             control_variates (list): list of integrand objects to be used as control variates. 
                 Control variates are currently only compatible with single level problems. 

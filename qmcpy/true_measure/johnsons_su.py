@@ -1,11 +1,11 @@
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 from scipy.stats import norm
 
 
-class JohnsonsSU(TrueMeasure):
+class JohnsonsSU(AbstractTrueMeasure):
     """
     >>> jsu = JohnsonsSU(DigitalNetB2(2,seed=7),gamma=1,xi=2,delta=3,lam=4)
     >>> jsu.gen_samples(4)
@@ -14,7 +14,7 @@ class JohnsonsSU(TrueMeasure):
            [-0.06077722,  2.66089215],
            [ 0.89373077, -0.27712026]])
     >>> jsu
-    JohnsonsSU (TrueMeasure Object)
+    JohnsonsSU (AbstractTrueMeasure Object)
         gamma           1
         xi              2^(1)
         delta           3
@@ -26,7 +26,7 @@ class JohnsonsSU(TrueMeasure):
     def __init__(self, sampler, gamma=1, xi=1, delta=2, lam=2):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             gamma (np.ndarray): gamma

@@ -1,7 +1,7 @@
 from .gaussian import Gaussian
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution import DigitalNetB2
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from ..util import ParameterError, _univ_repr
 import numpy as np
 
@@ -15,7 +15,7 @@ class BrownianMotion(Gaussian):
     array([[0.99572233, 2.32327545, 3.03550196, 2.48206084],
            [1.02615537, 2.22809234, 3.0408864 , 4.41879786]])
     >>> bm
-    BrownianMotion (TrueMeasure Object)
+    BrownianMotion (AbstractTrueMeasure Object)
         time_vec        [0.5 1.  1.5 2. ]
         drift           2^(1)
         mean            [1. 2. 3. 4.]
@@ -31,7 +31,7 @@ class BrownianMotion(Gaussian):
         BrownianMotion(t) = (initial_value) + (drift)*t + \sqrt{diffusion}*StandardBrownianMotion(t)
 
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             t_final (float): end time for the Brownian Motion. 

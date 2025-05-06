@@ -1,4 +1,4 @@
-from ..true_measure._true_measure import TrueMeasure
+from ..true_measure.abstract_true_measure import AbstractTrueMeasure
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 
 class AccumulateData(object):

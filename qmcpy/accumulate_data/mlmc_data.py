@@ -17,8 +17,8 @@ class MLMCData(AccumulateData):
         Args:
             stopping_crit (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
-            true_measure (TrueMeasure): A TrueMeasure instance
-            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
+            true_measure (AbstractTrueMeasure): A AbstractTrueMeasure instance
+            discrete_distrib (AbstractDiscreteDistribution): an AbstractDiscreteDistribution instance
             levels_init (int): initial number of levels
             n_init (int): initial number of samples per level
             alpha0 (float): weak error is O(2^{-alpha0*level})

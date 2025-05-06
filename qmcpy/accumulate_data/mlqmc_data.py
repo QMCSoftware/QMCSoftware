@@ -15,8 +15,8 @@ class MLQMCData(AccumulateData):
         Args:
             stopping_crit (StoppingCriterion): a StoppingCriterion instance
             integrand (Integrand): an Integrand instance
-            true_measure (TrueMeasure): A TrueMeasure instance
-            discrete_distrib (DiscreteDistribution): a DiscreteDistribution instance
+            true_measure (AbstractTrueMeasure): A AbstractTrueMeasure instance
+            discrete_distrib (AbstractDiscreteDistribution): an AbstractDiscreteDistribution instance
             replications (int): number of replications on each level
         """
         self.parameters = ['solution','n_total','n_level','levels','mean_level','var_level','bias_estimate']

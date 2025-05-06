@@ -26,7 +26,7 @@ class IIDStdUniform(AbstractIIDDiscreteDistribution):
                [0.1366783 , 0.75220658],
                [0.84501765, 0.56269008]])
         >>> dd
-        IIDStdUniform (DiscreteDistribution Object)
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
             d               2^(1)
             replications    1
             entropy         7

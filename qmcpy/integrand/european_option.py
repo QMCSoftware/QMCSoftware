@@ -35,7 +35,7 @@ class EuropeanOption(Integrand):
         interest_rate=0, t_final=1, call_put='call'):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
             volatility (float): sigma, the volatility of the asset

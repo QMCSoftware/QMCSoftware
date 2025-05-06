@@ -17,7 +17,7 @@ class Ishigami(Integrand):
         >>> print("%.4f"%y.mean())
         3.4985
         >>> ishigami.true_measure
-        Uniform (TrueMeasure Object)
+        Uniform (AbstractTrueMeasure Object)
             lower_bound     -3.142
             upper_bound     3.142
         
@@ -30,7 +30,7 @@ class Ishigami(Integrand):
     def __init__(self,sampler, a=7, b=.1):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
             a (float): first paramter

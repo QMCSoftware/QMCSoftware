@@ -49,11 +49,11 @@ class SensitivityIndices(Integrand):
                         [1]
                         [2]]
         n_multiplier    3
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    DigitalNetB2 (DiscreteDistribution Object)
+    DigitalNetB2 (AbstractDiscreteDistribution Object)
         d               6
         dvec            [0 1 2 3 4 5]
         randomize       LMS_DS

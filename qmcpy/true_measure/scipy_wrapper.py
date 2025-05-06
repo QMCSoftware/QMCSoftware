@@ -1,4 +1,4 @@
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution import DigitalNetB2
@@ -6,7 +6,7 @@ import numpy as np
 import scipy.stats
 
 
-class SciPyWrapper(TrueMeasure):
+class SciPyWrapper(AbstractTrueMeasure):
     """
     Multivariate True Measure from Independent SciPy 1 Dimensional Marginals
 
@@ -36,15 +36,15 @@ class SciPyWrapper(TrueMeasure):
     def __init__(self, discrete_distrib, scipy_distribs):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             scipy_distribs (list): instantiated CONTINUOUS UNIVARIATE scipy.stats distributions 
                 https://docs.scipy.org/doc/scipy/reference/stats.html#continuous-distributions
         """
         self.domain = np.array([[0,1]])
-        if not isinstance(discrete_distrib,DiscreteDistribution):
-            raise ParameterError("SciPyWrapper requires discrete_distrib be a DiscreteDistribution.")
+        if not isinstance(discrete_distrib,AbstractDiscreteDistribution):
+            raise ParameterError("SciPyWrapper requires discrete_distrib be an AbstractDiscreteDistribution.")
         self._parse_sampler(discrete_distrib)
         self.scipy_distrib = list(scipy_distribs) if not isinstance(scipy_distribs,scipy.stats._distn_infrastructure.rv_continuous_frozen) else [scipy_distribs]
         for sd in self.scipy_distrib:

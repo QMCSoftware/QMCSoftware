@@ -1,11 +1,11 @@
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from ..util import TransformError, DimensionError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 from scipy.stats import norm
 
 
-class Uniform(TrueMeasure):
+class Uniform(AbstractTrueMeasure):
     """
     >>> u = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
     >>> u.gen_samples(4)
@@ -14,7 +14,7 @@ class Uniform(TrueMeasure):
            [0.62818597, 2.83084783],
            [1.14326115, 1.16339383]])
     >>> u
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     [0.  0.5]
         upper_bound     [2 3]
     """
@@ -22,7 +22,7 @@ class Uniform(TrueMeasure):
     def __init__(self, sampler, lower_bound=0., upper_bound=1.):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             lower_bound (float): a for Uniform(a,b)

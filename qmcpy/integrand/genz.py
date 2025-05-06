@@ -26,7 +26,7 @@ class Genz(Integrand):
     def __init__(self, sampler, kind_func='oscillatory', kind_coeff=1):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
             kind_func (str): 'oscillatory' or 'corner-peak'

@@ -11,7 +11,7 @@ class Sin1d(Integrand):
     >>> print("%.4e"%y.mean())
     -7.3732e-08
     >>> sin1d.true_measure
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     6.283
     """

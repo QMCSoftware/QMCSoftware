@@ -45,11 +45,11 @@ class CubMCML(StoppingCriterion):
         t               1
         b               85
         level           0
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      1
         decomp_type     PCA
-    IIDStdUniform (DiscreteDistribution Object)
+    IIDStdUniform (AbstractDiscreteDistribution Object)
         d               1
         entropy         7
         spawn_key       ()

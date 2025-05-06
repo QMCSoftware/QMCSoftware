@@ -40,11 +40,11 @@ class CubQMCCLT(StoppingCriterion):
         n_max           2^(30)
         replications    2^(4)
     Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    Lattice (DiscreteDistribution Object)
+    Lattice (AbstractDiscreteDistribution Object)
         d               1
         dvec            0
         randomize       SHIFT
@@ -78,10 +78,10 @@ class CubQMCCLT(StoppingCriterion):
         replications    2^(4)
     BoxIntegral (Integrand Object)
         s               [-1  1]
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
-    Lattice (DiscreteDistribution Object)
+    Lattice (AbstractDiscreteDistribution Object)
         d               3
         dvec            [0 1 2]
         randomize       SHIFT
@@ -123,10 +123,10 @@ class CubQMCCLT(StoppingCriterion):
         n_max           2^(30)
         replications    2^(4)
     CustomFun (Integrand Object)
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
-    DigitalNetB2 (DiscreteDistribution Object)
+    DigitalNetB2 (AbstractDiscreteDistribution Object)
         d               6
         dvec            [0 1 2 3 4 5]
         randomize       LMS_DS

@@ -34,10 +34,10 @@ class UMBridgeWrapper(Integrand):
         n_init          2^(10)
         n_max           2^(35)
     UMBridgeWrapper (Integrand Object)
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     1
         upper_bound     1.050
-    DigitalNetB2 (DiscreteDistribution Object)
+    DigitalNetB2 (AbstractDiscreteDistribution Object)
         d               3
         dvec            [0 1 2]
         randomize       LMS_DS
@@ -81,10 +81,10 @@ class UMBridgeWrapper(Integrand):
         n_init          2^(10)
         n_max           2^(35)
     UMBridgeWrapper (Integrand Object)
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     -1
         upper_bound     1
-    DigitalNetB2 (DiscreteDistribution Object)
+    DigitalNetB2 (AbstractDiscreteDistribution Object)
         d               6
         dvec            [0 1 2 3 4 5]
         randomize       LMS_DS
@@ -108,7 +108,7 @@ class UMBridgeWrapper(Integrand):
         See https://um-bridge-benchmarks.readthedocs.io/en/docs/umbridge/clients.html
         
         Args:
-            true_measure (TrueMeasure): a TrueMeasure instance. 
+            true_measure (AbstractTrueMeasure): a AbstractTrueMeasure instance. 
             model (umbridge.HTTPModel): a UM-Bridge model 
             config (dict): config keyword argument to umbridge.HTTPModel(url,name).__call__
             parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion.

@@ -35,11 +35,11 @@ class CubBayesLatticeG(_CubBayesLDG):
         n_max           2^(22)
         order           2^(1)
     Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    Lattice (DiscreteDistribution Object)
+    Lattice (AbstractDiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
         randomize       SHIFT

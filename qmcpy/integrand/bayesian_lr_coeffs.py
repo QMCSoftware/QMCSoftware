@@ -2,7 +2,7 @@ from ._integrand import Integrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Lebesgue, Uniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
-from ..true_measure._true_measure import TrueMeasure
+from ..true_measure.abstract_true_measure import AbstractTrueMeasure
 from ..util import ParameterError
 import numpy as np
 
@@ -23,7 +23,7 @@ class BayesianLRCoeffs(Integrand):
     def __init__(self, sampler, feature_array, response_vector, prior_mean=0, prior_covariance=10):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
             feature_array (np.ndarray): N samples by d-1 dimensions array of input features

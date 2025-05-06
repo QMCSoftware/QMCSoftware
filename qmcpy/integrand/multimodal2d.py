@@ -11,7 +11,7 @@ class Multimodal2d(Integrand):
     >>> print("%.4f"%y.mean())
     -0.7375
     >>> mm2d.true_measure
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     [-4 -3]
         upper_bound     [7 8]
     """

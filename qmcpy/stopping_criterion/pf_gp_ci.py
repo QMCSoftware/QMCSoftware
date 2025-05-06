@@ -1,7 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..discrete_distribution import DigitalNetB2
 from ..integrand.ishigami import Ishigami
-from ..true_measure._true_measure import TrueMeasure
+from ..true_measure.abstract_true_measure import AbstractTrueMeasure
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..accumulate_data.pf_gp_ci_data import PFGPCIData, _error_udens
 from ..util import MaxSamplesWarning
@@ -39,7 +39,7 @@ class PFSampleErrorDensityAR(Suggester):
 class SuggesterSimple(Suggester):
     def __init__(self, sampler):
         self.sampler = sampler
-        if isinstance(self.sampler,TrueMeasure): assert (self.sampler.range==[0,1]).all()
+        if isinstance(self.sampler,AbstractTrueMeasure): assert (self.sampler.range==[0,1]).all()
         self.n_min = 0
         super(SuggesterSimple,self).__init__()
     def suggest(self, n, d, gp, rng, **kwargs):
@@ -89,10 +89,10 @@ class PFGPCI(StoppingCriterion):
         time_integrate  ...
     PFGPCI (StoppingCriterion Object)
     Ishigami (Integrand Object)
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     -3.142
         upper_bound     3.142
-    DigitalNetB2 (DiscreteDistribution Object)
+    DigitalNetB2 (AbstractDiscreteDistribution Object)
         d               3
         dvec            [0 1 2]
         randomize       LMS_DS
@@ -132,7 +132,7 @@ class PFGPCI(StoppingCriterion):
             alpha (float): The credible interval is constructed to hold with probability at least 1 - alpha
             n_init (float): Initial number of samples from integrand.discrete_distrib from which to build the first surrogate GP
             init_samples (float): If the simulation has already been run, pass in (x,y) where x are past samples from the discrete distribution and y are corresponding simulation evaluations. 
-            batch_sampler (Suggester or DiscreteDistribution): A suggestion scheme for future samples. 
+            batch_sampler (Suggester or AbstractDiscreteDistribution): A suggestion scheme for future samples. 
             n_batch (int): The number of samples per batch to draw from batch_sampler. 
             n_max (int): Budget of simulations.
             n_approx (int): Number of points from integrand.discrete_distrib used to approximate estimate and credible interval bounds
@@ -186,7 +186,7 @@ class PFGPCI(StoppingCriterion):
             ytf = self._affine_tf(y)
             self.ref_approx = (ytf>=0).mean(0)
             if self.verbose: print('reference approximation with d=%d: %s'%(self.d,self.ref_approx))
-        super(PFGPCI,self).__init__(allowed_levels=["single"], allowed_distribs=[DiscreteDistribution], allow_vectorized_integrals=False)
+        super(PFGPCI,self).__init__(allowed_levels=["single"], allowed_distribs=[AbstractDiscreteDistribution], allow_vectorized_integrals=False)
     def _affine_tf(self, y):
         return y-self.failure_threshold if self.failure_above_threshold else self.failure_threshold-y
     #@profile

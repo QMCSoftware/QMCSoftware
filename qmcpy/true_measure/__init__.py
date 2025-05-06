@@ -1,4 +1,4 @@
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from .brownian_motion import BrownianMotion
 from .gaussian import Gaussian, Normal
 from .lebesgue import Lebesgue

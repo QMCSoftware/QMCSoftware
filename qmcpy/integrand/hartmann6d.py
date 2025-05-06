@@ -11,7 +11,7 @@ class Hartmann6d(Integrand):
     >>> print("%.4f"%y.mean())
     -0.2591
     >>> h6d.true_measure
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
     """

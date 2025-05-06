@@ -8,9 +8,9 @@ class StoppingCriterion(object):
     def __init__(self, allowed_levels, allowed_distribs, allow_vectorized_integrals):
         """
         Args:
-            distribution (DiscreteDistribution): a DiscreteDistribution
+            distribution (AbstractDiscreteDistribution): an AbstractDiscreteDistribution
             allowed_levels (list): which integrand types are supported: 'single', 'fixed-multi', 'adaptive-multi'
-            allowed_distribs (list): list of compatible DiscreteDistribution classes
+            allowed_distribs (list): list of compatible AbstractDiscreteDistribution classes
         """
         sname = type(self).__name__
         prefix = 'A concrete implementation of StoppingCriterion must have '
@@ -25,7 +25,7 @@ class StoppingCriterion(object):
         if (not hasattr(self, 'discrete_distrib')) or (self.discrete_distrib!=self.integrand.discrete_distrib):
             raise ParameterError(prefix + 'self.discrete_distrib=self.integrand.discrete_distrib')
         if not isinstance(self.discrete_distrib,tuple(allowed_distribs)):
-            raise DistributionCompatibilityError('%s must have a DiscreteDistribution in %s'%(sname,str(allowed_distribs)))
+            raise DistributionCompatibilityError('%s must have an AbstractDiscreteDistribution in %s'%(sname,str(allowed_distribs)))
         # multilevel compatibility check
         if self.integrand.leveltype not in allowed_levels:
             raise ParameterError('Integrand is %s level but %s only supports %s level problems.'%(self.integrand.leveltype,sname,allowed_levels))

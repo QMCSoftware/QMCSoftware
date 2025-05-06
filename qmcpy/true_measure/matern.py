@@ -1,6 +1,6 @@
 from .gaussian import Gaussian
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from ..discrete_distribution.lattice.lattice import Lattice
 from ..util import DimensionError, ParameterError
 import numpy as np
@@ -13,7 +13,7 @@ class Matern(Gaussian):
     >>> x_values = np.arange(31.0) / 30.0 #[0, 1/30, ..., 1]
     >>> m = Matern(Lattice(dimension=31, seed=7), x_values, length_scale = 0.5, variance = 0.01, mean=mean)
     >>> m
-    Matern (TrueMeasure Object)
+    Matern (AbstractTrueMeasure Object)
         mean            [1.1 1.1 1.1 ... 1.1 1.1 1.1]
         covariance      [[0.01  0.01  0.01  ... 0.002 0.002 0.001]
                         [0.01  0.01  0.01  ... 0.002 0.002 0.002]
@@ -35,7 +35,7 @@ class Matern(Gaussian):
     >>> mean = np.full(3, 1.1)
     >>> m3 = Matern(Lattice(dimension = 3,seed=7), x_values, length_scale = 0.5, nu = 3.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
     >>> m3
-    Matern (TrueMeasure Object)
+    Matern (AbstractTrueMeasure Object)
         mean            [1.1 1.1 1.1]
         covariance      [[1.000e-02 1.378e-03 3.432e-05]
                         [1.378e-03 1.000e-02 1.378e-03]
@@ -59,7 +59,7 @@ class Matern(Gaussian):
         More information can be found at [1].
         
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform. 
             points (np.ndarray): The positions of points on a metric space. The array
@@ -81,8 +81,8 @@ class Matern(Gaussian):
                 "PCA" for principal component analysis or 
                 "Cholesky" for cholesky decomposition.
         """
-        if not (isinstance(sampler, DiscreteDistribution) or isinstance(sampler, TrueMeasure)):
-            raise ParameterError("sampler input should either be a DiscreteDistribution or TrueMeasure.")
+        if not (isinstance(sampler, AbstractDiscreteDistribution) or isinstance(sampler, AbstractTrueMeasure)):
+            raise ParameterError("sampler input should either be an AbstractDiscreteDistribution or AbstractTrueMeasure.")
         if not (isinstance(points, np.ndarray)):
             raise ParameterError("Must pass in a points np.ndarray.")
         if not (sampler.d == len(mean) and points.shape[0] == len(mean)):

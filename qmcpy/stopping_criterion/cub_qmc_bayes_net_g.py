@@ -34,11 +34,11 @@ class CubBayesNetG(_CubBayesLDG):
         n_init          2^(8)
         n_max           2^(22)
     Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    DigitalNetB2 (DiscreteDistribution Object)
+    DigitalNetB2 (AbstractDiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
         randomize       LMS_DS

@@ -1,5 +1,5 @@
 from ..util import MethodImplementationError, _univ_repr, ParameterError
-from ..true_measure._true_measure import TrueMeasure
+from ..true_measure.abstract_true_measure import AbstractTrueMeasure
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 import numpy as np
 import os
@@ -32,10 +32,10 @@ class Integrand(object):
         self.parallel = cpus if parallel is True else int(parallel)
         self.parallel = 0 if self.parallel==1 else self.parallel
         self.threadpool = threadpool
-        if not (hasattr(self, 'sampler') and isinstance(self.sampler,(TrueMeasure,DiscreteDistribution))):
-            raise ParameterError(prefix + 'self.sampler, a TrueMeasure or DiscreteDistribution instance')
-        if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,TrueMeasure)):
-            raise ParameterError(prefix + 'self.true_measure, a TrueMeasure instance')
+        if not (hasattr(self, 'sampler') and isinstance(self.sampler,(AbstractTrueMeasure,AbstractDiscreteDistribution))):
+            raise ParameterError(prefix + 'self.sampler, a AbstractTrueMeasure or AbstractDiscreteDistribution instance')
+        if not (hasattr(self, 'true_measure') and isinstance(self.true_measure,AbstractTrueMeasure)):
+            raise ParameterError(prefix + 'self.true_measure, a AbstractTrueMeasure instance')
         if not hasattr(self,'parameters'):
             self.parameters = []
         if not hasattr(self,'leveltype'):
@@ -246,7 +246,7 @@ class Integrand(object):
 
         Args:
             level (numpy.np.random.SeedSequence): level at which to spawn new instance
-            tm_spawn (TrueMeasure): true measure spawn to use as new sampler
+            tm_spawn (AbstractTrueMeasure): true measure spawn to use as new sampler
 
         Return:
             Integrand: spawn at this level

@@ -30,11 +30,11 @@ class CubQMCLatticeG(_CubQMCLDG):
         n_init          2^(10)
         n_max           2^(35)
     Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    Lattice (DiscreteDistribution Object)
+    Lattice (AbstractDiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
         randomize       SHIFT
@@ -77,10 +77,10 @@ class CubQMCLatticeG(_CubQMCLDG):
         n_init          2^(10)
         n_max           2^(35)
     CustomFun (Integrand Object)
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
-    Lattice (DiscreteDistribution Object)
+    Lattice (AbstractDiscreteDistribution Object)
         d               6
         dvec            [0 1 2 3 4 5]
         randomize       SHIFT

@@ -25,7 +25,7 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
         for attrib in attributes:
             if attrib not in unique_attributes:
                 unique_attributes += [attrib]
-        string = "%s (%s Object)" % (type(qmc_object).__name__, abc_class_name)
+        string = "%s (%s)" % (type(qmc_object).__name__, abc_class_name)
         for key in unique_attributes:
             val = getattr(qmc_object, key)
             # list of one value becomes just that value

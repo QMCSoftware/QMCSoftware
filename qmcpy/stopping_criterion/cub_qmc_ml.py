@@ -41,11 +41,11 @@ class CubQMCML(StoppingCriterion):
         t               1
         b               85
         level           0
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      1
         decomp_type     PCA
-    Lattice (DiscreteDistribution Object)
+    Lattice (AbstractDiscreteDistribution Object)
         d               1
         dvec            0
         randomize       SHIFT

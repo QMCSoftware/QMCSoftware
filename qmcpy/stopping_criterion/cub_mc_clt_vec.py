@@ -38,11 +38,11 @@ class CubMCCLTVec(StoppingCriterion):
         n_init          2^(8)
         n_max           2^(30)
     Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    IIDStdUniform (DiscreteDistribution Object)
+    IIDStdUniform (AbstractDiscreteDistribution Object)
         d               1
         entropy         7
         spawn_key       ()
@@ -70,10 +70,10 @@ class CubMCCLTVec(StoppingCriterion):
         n_max           2^(30)
     BoxIntegral (Integrand Object)
         s               [-1  1]
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
-    IIDStdUniform (DiscreteDistribution Object)
+    IIDStdUniform (AbstractDiscreteDistribution Object)
         d               3
         entropy         7
         spawn_key       ()
@@ -108,10 +108,10 @@ class CubMCCLTVec(StoppingCriterion):
         n_init          2^(8)
         n_max           2^(30)
     CustomFun (Integrand Object)
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
-    IIDStdUniform (DiscreteDistribution Object)
+    IIDStdUniform (AbstractDiscreteDistribution Object)
         d               6
         entropy         7
         spawn_key       ()

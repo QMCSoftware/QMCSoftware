@@ -36,11 +36,11 @@ class CubMCG(StoppingCriterion):
         inflate         1.200
         alpha           0.010
     Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    IIDStdUniform (DiscreteDistribution Object)
+    IIDStdUniform (AbstractDiscreteDistribution Object)
         d               2^(1)
         entropy         7
         spawn_key       ()

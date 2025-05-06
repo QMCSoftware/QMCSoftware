@@ -39,7 +39,7 @@ class MLCallOptions(Integrand):
         start_strike_price=100., interest_rate=.05, t_final=1., _level=0):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
             option_type (str): type of option in ["European","Asian"]

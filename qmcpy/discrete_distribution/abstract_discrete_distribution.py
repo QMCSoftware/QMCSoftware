@@ -134,15 +134,19 @@ class AbstractDiscreteDistribution(object):
     def pdf(self, x):
         return np.ones_like(x[...,0])
     
-    def __repr__(self):
-        return _univ_repr(self, "DiscreteDistribution", ['d','replications']+self.parameters+['entropy'])
+    def __repr__(self, abc_class_name):
+        return _univ_repr(self, abc_class_name, ['d','replications']+self.parameters+['entropy'])
 
 
 class AbstractLDDiscreteDistribution(AbstractDiscreteDistribution):
     """ Low discrepancy sequence. Alias for `AbstractDiscreteDistribution` used for compatibility checks."""
-    pass
+    
+    def __repr__(self):
+        return super().__repr__("AbstractLDDiscreteDistribution")
 
 
 class AbstractIIDDiscreteDistribution(AbstractDiscreteDistribution):
     """ IID sequence. Alias for `AbstractDiscreteDistribution` used for compatibility checks."""
-    pass
+    
+    def __repr__(self):
+        return super().__repr__("AbstractIIDDiscreteDistribution")

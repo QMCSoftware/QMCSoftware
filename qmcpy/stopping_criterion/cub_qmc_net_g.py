@@ -30,11 +30,11 @@ class CubQMCNetG(_CubQMCLDG):
         n_init          2^(10)
         n_max           2^(35)
     Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
+    Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    DigitalNetB2 (DiscreteDistribution Object)
+    DigitalNetB2 (AbstractDiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
         randomize       LMS_DS
@@ -91,10 +91,10 @@ class CubQMCNetG(_CubQMCLDG):
         update_beta     1
     BoxIntegral (Integrand Object)
         s               [3 4]
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
-    DigitalNetB2 (DiscreteDistribution Object)
+    DigitalNetB2 (AbstractDiscreteDistribution Object)
         d               3
         dvec            [0 1 2]
         randomize       LMS_DS
@@ -126,10 +126,10 @@ class CubQMCNetG(_CubQMCLDG):
         n_init          2^(10)
         n_max           2^(35)
     CustomFun (Integrand Object)
-    Uniform (TrueMeasure Object)
+    Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
-    DigitalNetB2 (DiscreteDistribution Object)
+    DigitalNetB2 (AbstractDiscreteDistribution Object)
         d               6
         dvec            [0 1 2 3 4 5]
         randomize       LMS_DS

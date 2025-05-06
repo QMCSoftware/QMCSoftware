@@ -1,10 +1,10 @@
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 
 
-class BernoulliCont(TrueMeasure):
+class BernoulliCont(AbstractTrueMeasure):
     """    
     >>> bc = BernoulliCont(DigitalNetB2(2,seed=7),lam=.2)
     >>> bc.gen_samples(4)
@@ -13,7 +13,7 @@ class BernoulliCont(TrueMeasure):
            [0.1937716 , 0.86669211],
            [0.40386874, 0.16007927]])
     >>> bc
-    BernoulliCont (TrueMeasure Object)
+    BernoulliCont (AbstractTrueMeasure Object)
         lam             0.200
     
     See https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution
@@ -22,7 +22,7 @@ class BernoulliCont(TrueMeasure):
     def __init__(self, sampler, lam=1/2):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
+            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             lam (np.ndarray): 0 < lambda < 1, a shape parameter, independent for each dimension 
