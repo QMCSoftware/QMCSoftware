@@ -16,43 +16,43 @@ class Halton(AbstractLDDiscreteDistribution):
     Examples:
         >>> halton = Halton(2,randomize="LMS_PERM",seed=7)
         >>> halton(4)
-        array([[0.2143238 , 0.1243237 ],
-               [0.8861583 , 0.5235922 ],
-               [0.49631029, 0.84796825],
-               [0.66809997, 0.02469234]])
+        array([[0.83790457, 0.89981478],
+               [0.00986102, 0.4610941 ],
+               [0.62236343, 0.02796307],
+               [0.29427505, 0.79909098]])
         >>> halton
         Halton (DiscreteDistribution Object)
             d               2^(1)
             replications    1
             randomize       LMS_PERM
-            t               53
+            t               63
             n_limit         2^(32)
             entropy         7
         >>> Halton(2,randomize="LMS_DS",seed=7)(4)
-        array([[0.67057734, 0.75407767],
-               [0.49872383, 0.04149125],
-               [0.88466123, 0.3669825 ],
-               [0.21288306, 0.98844291]])
+        array([[0.82718745, 0.90603116],
+               [0.0303368 , 0.44704107],
+               [0.60182684, 0.03580544],
+               [0.30505343, 0.78367016]])
         >>> Halton(2,randomize="LMS",seed=7)(4,warn=False)
         array([[0.        , 0.        ],
-               [0.82822666, 0.43711042],
-               [0.28838899, 0.72544037],
-               [0.6165384 , 0.23589191]])
+               [0.82822666, 0.92392942],
+               [0.28838899, 0.46493682],
+               [0.6165384 , 0.2493814 ]])
         >>> Halton(2,randomize="PERM",seed=7)(4)
-        array([[0.11593484, 0.89708776],
-               [0.61593484, 0.56375442],
-               [0.36593484, 0.23042109],
-               [0.86593484, 0.67486554]])
+        array([[0.11593484, 0.99232505],
+               [0.61593484, 0.65899172],
+               [0.36593484, 0.32565839],
+               [0.86593484, 0.77010283]])
         >>> Halton(2,randomize="DS",seed=7)(4)
-        array([[0.56793849, 0.47926367],
-               [0.06793849, 0.81259701],
-               [0.81793849, 0.14593034],
-               [0.31793849, 0.59037478]])
+        array([[0.56793849, 0.04063513],
+               [0.06793849, 0.37396846],
+               [0.81793849, 0.7073018 ],
+               [0.31793849, 0.15174624]])
         >>> Halton(2,randomize="NUS",seed=7)(4)
         array([[0.141964  , 0.99285569],
-               [0.93765172, 0.42142152],
-               [0.49784657, 0.11033177],
-               [0.55083118, 0.8388036 ]])
+               [0.65536579, 0.51938353],
+               [0.46955206, 0.11342811],
+               [0.78505432, 0.87032345]])
         >>> Halton(2,randomize="QRNG",seed=7)(4)
         array([[0.35362988, 0.38733489],
                [0.85362988, 0.72066823],
@@ -64,65 +64,65 @@ class Halton(AbstractLDDiscreteDistribution):
                [0.25      , 0.66666667],
                [0.75      , 0.11111111]])
         >>> Halton(3,randomize="LMS_PERM",seed=7,replications=2)(4)
-        array([[[0.25363508, 0.00128312, 0.74958553],
-                [0.58167386, 0.40348335, 0.98212063],
-                [0.03610075, 0.75778557, 0.0928969 ],
-                [0.86418627, 0.12408042, 0.24538588]],
+        array([[[0.70988236, 0.18180876, 0.54073621],
+                [0.38178158, 0.61168824, 0.64684354],
+                [0.98597752, 0.70650871, 0.31479029],
+                [0.15795399, 0.28162992, 0.98945647]],
         <BLANKLINE>
-               [[0.52773886, 0.48156918, 0.03940909],
-                [0.13403095, 0.87154216, 0.21067217],
-                [0.91726101, 0.14643204, 0.80606143],
-                [0.31066328, 0.62473228, 0.42839367]]])
+               [[0.620398  , 0.57025403, 0.46336542],
+                [0.44021889, 0.69926312, 0.60133428],
+                [0.89132308, 0.12030255, 0.35715804],
+                [0.04025218, 0.44304244, 0.10724799]]])
         >>> Halton(3,randomize="LMS_DS",seed=7,replications=2)(4)
-        array([[[0.99970554, 0.77746475, 0.97912651],
-                [0.17154087, 0.05248352, 0.51398476],
-                [0.71190546, 0.34083424, 0.01083982],
-                [0.38369406, 0.97479463, 0.7457621 ]],
+        array([[[4.57465163e-01, 5.75419751e-04, 7.47353067e-01],
+                [6.29314800e-01, 9.24349881e-01, 8.47915779e-01],
+                [2.37544271e-01, 4.63986168e-01, 1.78817056e-01],
+                [9.09318567e-01, 2.48566227e-01, 3.17475640e-01]],
         <BLANKLINE>
-               [[0.82355339, 0.17124517, 0.3403476 ],
-                [0.46683287, 0.80997215, 0.92101152],
-                [0.74652289, 0.51878205, 0.55001039],
-                [0.10269363, 0.26686681, 0.13068723]]])
+               [[6.04003127e-01, 9.92849835e-01, 4.21625151e-01],
+                [4.57027115e-01, 1.97310094e-01, 2.43670150e-01],
+                [8.76467351e-01, 4.22339232e-01, 1.05777101e-01],
+                [5.46933622e-02, 7.79075280e-01, 9.29409300e-01]]])
         >>> Halton(3,randomize="LMS",seed=7,replications=2)(4,warn=False)
         array([[[0.        , 0.        , 0.        ],
-                [0.82822666, 0.43711042, 0.73685508],
-                [0.28838899, 0.72544037, 0.27337733],
-                [0.6165384 , 0.23589191, 0.96861959]],
+                [0.82822666, 0.92392942, 0.34057871],
+                [0.28838899, 0.46493682, 0.47954399],
+                [0.6165384 , 0.2493814 , 0.77045601]],
         <BLANKLINE>
                [[0.        , 0.        , 0.        ],
-                [0.64584726, 0.7637325 , 0.62899941],
-                [0.42884033, 0.40247629, 0.20967623],
-                [0.78366495, 0.14639313, 0.83865977]]])
+                [0.93115665, 0.57483093, 0.87170952],
+                [0.48046642, 0.8122114 , 0.69381851],
+                [0.58055977, 0.28006957, 0.55586147]]])
         >>> Halton(3,randomize="DS",seed=7,replications=2)(4)
-        array([[[0.56793849, 0.47926367, 0.80842566],
-                [0.06793849, 0.81259701, 0.00842566],
-                [0.81793849, 0.14593034, 0.20842566],
-                [0.31793849, 0.59037478, 0.40842566]],
+        array([[[0.56793849, 0.04063513, 0.74276256],
+                [0.06793849, 0.37396846, 0.94276256],
+                [0.81793849, 0.7073018 , 0.14276256],
+                [0.31793849, 0.15174624, 0.34276256]],
         <BLANKLINE>
-               [[0.39513011, 0.01974238, 0.28223819],
-                [0.89513011, 0.35307571, 0.48223819],
-                [0.14513011, 0.68640905, 0.68223819],
-                [0.64513011, 0.13085349, 0.88223819]]])
+               [[0.98309816, 0.80260469, 0.17299622],
+                [0.48309816, 0.13593802, 0.37299622],
+                [0.73309816, 0.46927136, 0.57299622],
+                [0.23309816, 0.9137158 , 0.77299622]]])
         >>> Halton(3,randomize="PERM",seed=7,replications=2)(4)
-        array([[[0.11593484, 0.89708776, 0.37375898],
-                [0.61593484, 0.56375442, 0.77375898],
-                [0.36593484, 0.23042109, 0.97375898],
-                [0.86593484, 0.67486554, 0.57375898]],
+        array([[[0.11593484, 0.99232505, 0.6010751 ],
+                [0.61593484, 0.65899172, 0.0010751 ],
+                [0.36593484, 0.32565839, 0.4010751 ],
+                [0.86593484, 0.77010283, 0.8010751 ]],
         <BLANKLINE>
-               [[0.80840057, 0.09140577, 0.88157715],
-                [0.30840057, 0.75807243, 0.48157715],
-                [0.55840057, 0.4247391 , 0.28157715],
-                [0.05840057, 0.31362799, 0.08157715]]])
+               [[0.26543198, 0.12273092, 0.20202896],
+                [0.76543198, 0.45606426, 0.60202896],
+                [0.01543198, 0.78939759, 0.40202896],
+                [0.51543198, 0.23384203, 0.00202896]]])
         >>> Halton(3,randomize="NUS",seed=7,replications=2)(4)
         array([[[0.141964  , 0.99285569, 0.77722918],
-                [0.93765172, 0.42142152, 0.20048728],
-                [0.49784657, 0.11033177, 0.98808616],
-                [0.55083118, 0.8388036 , 0.48435369]],
+                [0.65536579, 0.51938353, 0.22797442],
+                [0.46955206, 0.11342811, 0.9975298 ],
+                [0.78505432, 0.87032345, 0.57696123]],
         <BLANKLINE>
                [[0.04813634, 0.16158904, 0.56038465],
-                [0.54335317, 0.66475304, 0.20141858],
-                [0.3718172 , 0.73845688, 0.07231185],
-                [0.93024219, 0.27737617, 0.88785703]]])
+                [0.89364888, 0.33578478, 0.36145822],
+                [0.34111023, 0.84596814, 0.0292313 ],
+                [0.71866903, 0.23852281, 0.80431142]]])
 
     **References:**
     
@@ -151,7 +151,7 @@ class Halton(AbstractLDDiscreteDistribution):
                  replications = None,
                  seed = None, 
                  randomize = 'LMS_PERM',
-                 t = 53,
+                 t = 63,
                  n_lim = 2**32,
                  # deprecated
                  t_lms = None):
@@ -203,8 +203,7 @@ class Halton(AbstractLDDiscreteDistribution):
         if "LMS" in self.randomize:
             S = qmctoolscl.gdn_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.d),np.uint64(self._t_curr),np.uint64(self.t),np.uint64(1),self.primes)
             C_lms = np.empty((self.replications,self.d,self.m_max,self.t),dtype=np.uint64)
-            qmctoolscl_lms_kwargs = {"backend":"c"}
-            qmctoolscl.gdn_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(1),np.uint64(1),np.uint64(self._t_curr),np.uint64(self.t),self.primes,S,self.C,C_lms,**qmctoolscl_lms_kwargs)
+            qmctoolscl.gdn_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(1),np.uint64(1),np.uint64(self._t_curr),np.uint64(self.t),self.primes,S,self.C,C_lms,backend="c")
             self.C = C_lms
             self._t_curr = self.t
         if "PERM" in self.randomize:
@@ -234,12 +233,10 @@ class Halton(AbstractLDDiscreteDistribution):
         t = np.uint64(self.t)
         bmax = np.uint64(self.primes.max())
         xdig = np.empty((r_x,n,d,_t_curr),dtype=np.uint64)
-        qmctoolscl_gen_kwargs = {"backend":"c"}
-        qmctoolscl.gdn_gen_natural(r_x,n,d,r_b,mmax,_t_curr,n_start,self.primes,self.C,xdig,**qmctoolscl_gen_kwargs)
+        qmctoolscl.gdn_gen_natural(r_x,n,d,r_b,mmax,_t_curr,n_start,self.primes,self.C,xdig,backend="c")
         if self.randomize in ["FALSE","LMS"]:
             x = np.empty((r_x,n,d),dtype=np.float64)
-            qmctoolscl_convert_kwargs = {"backend":"c"}
-            qmctoolscl.gdn_integer_to_float(r_x,n,d,r_b,_t_curr,self.primes,xdig,x,**qmctoolscl_convert_kwargs)
+            qmctoolscl.gdn_integer_to_float(r_x,n,d,r_b,_t_curr,self.primes,xdig,x,backend="c")
             return x
         if self.randomize=="QRNG": # no replications
             x = np.zeros((self.d,n),dtype=np.double)                        
@@ -248,16 +245,13 @@ class Halton(AbstractLDDiscreteDistribution):
         r = np.uint64(self.replications)
         xdig_new = np.empty((r,n,d,t),dtype=np.uint64)
         if "PERM" in self.randomize:
-            qmctoolscl_perm_kwargs = {"backend":"c"}
-            qmctoolscl.gdn_digital_permutation(r,n,d,r_x,r_b,_t_curr,t,bmax,self.perms,xdig,xdig_new,**qmctoolscl_perm_kwargs)
+            qmctoolscl.gdn_digital_permutation(r,n,d,r_x,r_b,_t_curr,t,bmax,self.perms,xdig,xdig_new,backend="c")
         if "DS" in self.randomize:
-            qmctoolscl_ds_kwargs = {"backend":"c"}
-            qmctoolscl.gdn_digital_shift(r,n,d,r_x,r_b,_t_curr,t,self.primes,self.rshift,xdig,xdig_new,**qmctoolscl_ds_kwargs)
+            qmctoolscl.gdn_digital_shift(r,n,d,r_x,r_b,_t_curr,t,self.primes,self.rshift,xdig,xdig_new,backend="c")
         if "NUS" in self.randomize:
             qmctoolscl.gdn_nested_uniform_scramble(r,n,d,r_x,r_b,_t_curr,t,self.rngs,self.root_nodes,self.primes[None,:],xdig,xdig_new)
         x = np.empty((r,n,d),dtype=np.float64)
-        qmctoolscl_convert_kwargs = {"backend":"c"}
-        qmctoolscl.gdn_integer_to_float(r,n,d,r_b,t,self.primes,xdig_new,x,**qmctoolscl_convert_kwargs)
+        qmctoolscl.gdn_integer_to_float(r,n,d,r_b,t,self.primes,xdig_new,x,backend="c")
         return x         
 
     def _spawn(self, child_seed, dimension):

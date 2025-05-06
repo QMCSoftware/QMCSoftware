@@ -243,11 +243,9 @@ class Lattice(AbstractLDDiscreteDistribution):
             x = self._gail_linear(n_min,n_max)[None,:,:]
         elif self.order=="NATURAL":
             assert (n_min==0 or (n_min&(n_min-1))==0) and (n_max==0 or (n_max&(n_max-1))==0), "lattice in natural order requires n_min and n_max be 0 or powers of 2"
-            qmctoolscl_gen_natural_kwargs = {"backend":"c"}
-            _ = qmctoolscl.lat_gen_natural(r_x,n,d,n_start,self.gen_vec,x,**qmctoolscl_gen_natural_kwargs)
+            _ = qmctoolscl.lat_gen_natural(r_x,n,d,n_start,self.gen_vec,x,backend="c")
         elif self.order=="GRAY":
-            qmctoolscl_gen_gray_kwargs = {"backend":"c"}
-            _ = qmctoolscl.lat_gen_gray(r_x,n,d,n_start,self.gen_vec,x,**qmctoolscl_gen_gray_kwargs) 
+            _ = qmctoolscl.lat_gen_gray(r_x,n,d,n_start,self.gen_vec,x,backend="c") 
         else: 
             assert False, "invalid lattice order"
         if self.randomize=="FALSE":
@@ -255,9 +253,8 @@ class Lattice(AbstractLDDiscreteDistribution):
             xr = x
         elif self.randomize=="SHIFT":
             r = np.uint64(self.replications)
-            qmctoolscl_rand_kwargs = {"backend":"c"}
             xr = np.empty((r,n,d),dtype=np.float64)
-            qmctoolscl.lat_shift_mod_1(r,n,d,r_x,x,self.shift,xr,**qmctoolscl_rand_kwargs)
+            qmctoolscl.lat_shift_mod_1(r,n,d,r_x,x,self.shift,xr,backend="c")
         return (xr,x) if return_unrandomized else xr
 
     def _gen_block_linear(self, m_next, first=True):

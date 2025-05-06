@@ -317,8 +317,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         assert gen_mats.ndim==3 and gen_mats.shape[1]>=self.d and (gen_mats.shape[0]==1 or gen_mats.shape[0]==self.replications) and gen_mats.shape[2]>0, "invalid gen_mats.shape = %s"%str(gen_mats.shape)
         self.m_max = int(gen_mats.shape[-1])
         if isinstance(generating_matrices,np.ndarray) and msb:
-            qmctoolscl_kwargs = {"backend":"c"}
-            qmctoolscl.dnb2_gmat_lsb_to_msb(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.tile(np.uint64(self._t_curr),int(gen_mats.shape[0])),gen_mats,gen_mats,**qmctoolscl_kwargs)
+            qmctoolscl.dnb2_gmat_lsb_to_msb(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.tile(np.uint64(self._t_curr),int(gen_mats.shape[0])),gen_mats,gen_mats,backend="c")
         self.order = str(order).upper()
         assert self.order in ['NATURAL','GRAY']
         assert isinstance(t,int) and t>0
@@ -344,8 +343,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             else: 
                 t_alpha = min(self.alpha*self._t_curr,64)
                 gen_mat_ho = np.empty((gen_mats.shape[0],self.d,self.m_max),dtype=np.uint64)
-                qmctoolscl_interlace_kwargs = {"backend":"c"}
-                qmctoolscl.dnb2_interlace(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(t_alpha),np.uint64(self.alpha),gen_mats[:,:self.dtalpha,:].copy(),gen_mat_ho,**qmctoolscl_interlace_kwargs)
+                qmctoolscl.dnb2_interlace(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(t_alpha),np.uint64(self.alpha),gen_mats[:,:self.dtalpha,:].copy(),gen_mat_ho,backend="c")
                 self.gen_mats = gen_mat_ho
                 self._t_curr = t_alpha
                 self.t = self._t_curr
@@ -356,8 +354,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             else: 
                 t_alpha = min(self.alpha*self._t_curr,64)
                 gen_mat_ho = np.empty((gen_mats.shape[0],self.d,self.m_max),dtype=np.uint64)
-                qmctoolscl_interlace_kwargs = {"backend":"c"}
-                qmctoolscl.dnb2_interlace(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(t_alpha),np.uint64(self.alpha),gen_mats[:,:self.dtalpha,:].copy(),gen_mat_ho,**qmctoolscl_interlace_kwargs)
+                qmctoolscl.dnb2_interlace(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(t_alpha),np.uint64(self.alpha),gen_mats[:,:self.dtalpha,:].copy(),gen_mat_ho,backend="c")
                 self.gen_mats = gen_mat_ho
                 self._t_curr = t_alpha
                 self.t = t
@@ -366,19 +363,16 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             if self.alpha==1:
                 gen_mat_lms = np.empty((self.replications,self.d,self.m_max),dtype=np.uint64)
                 S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.d),np.uint64(self._t_curr),np.uint64(t),np.uint64(self._verbose))
-                qmctoolscl_lms_kwargs = {"backend":"c"}
-                qmctoolscl.dnb2_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(gen_mats.shape[0]),np.uint64(t),S,gen_mats[:,self.dvec,:].copy(),gen_mat_lms,**qmctoolscl_lms_kwargs)
+                qmctoolscl.dnb2_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(gen_mats.shape[0]),np.uint64(t),S,gen_mats[:,self.dvec,:].copy(),gen_mat_lms,backend="c")
                 self.gen_mats = gen_mat_lms
                 self._t_curr = t
                 self.t = self._t_curr
             else:
                 gen_mat_lms = np.empty((self.replications,self.dtalpha,self.m_max),dtype=np.uint64)
                 S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(t),np.uint64(self._verbose))
-                qmctoolscl_lms_ho_kwargs = {"backend":"c"}
-                qmctoolscl.dnb2_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.dtalpha),np.uint64(self.m_max),np.uint64(gen_mats.shape[0]),np.uint64(t),S,gen_mats[:,:self.dtalpha,:].copy(),gen_mat_lms,**qmctoolscl_lms_ho_kwargs)
+                qmctoolscl.dnb2_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.dtalpha),np.uint64(self.m_max),np.uint64(gen_mats.shape[0]),np.uint64(t),S,gen_mats[:,:self.dtalpha,:].copy(),gen_mat_lms,backend="c")
                 gen_mat_lms_ho = np.empty((self.replications,self.d,self.m_max),dtype=np.uint64)
-                qmctoolscl_lms_interlace_kwargs = {"backend":"c"}
-                qmctoolscl.dnb2_interlace(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(t),np.uint64(t),np.uint64(self.alpha),gen_mat_lms,gen_mat_lms_ho,**qmctoolscl_lms_interlace_kwargs)
+                qmctoolscl.dnb2_interlace(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(t),np.uint64(t),np.uint64(self.alpha),gen_mat_lms,gen_mat_lms_ho,backend="c")
                 self.gen_mats = gen_mat_lms_ho
                 self._t_curr = t
                 self.t = self._t_curr
@@ -416,12 +410,10 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         mmax = np.uint64(self.m_max)
         xb = np.empty((r_x,n,d),dtype=np.uint64)
         if self.order=="GRAY":
-            qmctoolscl_gen_gray_kwargs = {"backend":"c"}
-            qmctoolscl.dnb2_gen_gray(r_x,n,d,n_start,mmax,self.gen_mats,xb,**qmctoolscl_gen_gray_kwargs)
+            qmctoolscl.dnb2_gen_gray(r_x,n,d,n_start,mmax,self.gen_mats,xb,backend="c")
         elif self.order=="NATURAL": 
             assert (n_min==0 or np.log2(n_min)%1==0) and (n_max==0 or np.log2(n_max)%1==0), "DigitalNetB2 in natural order requires n_min and n_max be 0 or powers of 2"
-            qmctoolscl_gen_natural_kwargs = {"backend":"c"}
-            qmctoolscl.dnb2_gen_natural(r_x,n,d,n_start,mmax,self.gen_mats,xb,**qmctoolscl_gen_natural_kwargs)
+            qmctoolscl.dnb2_gen_natural(r_x,n,d,n_start,mmax,self.gen_mats,xb,backend="c")
         else:
             "invalid digital net order" 
         r = np.uint64(self.replications)
@@ -444,16 +436,14 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         if "DS" in self.randomize:
             xrb = np.empty((r,n,d),dtype=np.uint64)
             lshifts = np.tile(np.uint64((self.t-self._t_curr) if "LMS" not in self.randomize else 0),int(r))
-            qmctoolscl_ds_kwargs = {"backend":"c"}
-            qmctoolscl.dnb2_digital_shift(r,n,d,r_x,lshifts,xb,self.rshift,xrb,**qmctoolscl_ds_kwargs)
+            qmctoolscl.dnb2_digital_shift(r,n,d,r_x,lshifts,xb,self.rshift,xrb,backend="c")
             xb = xrb
         if return_binary:
             return xb
         else:
             x = np.empty((r,n,d),dtype=np.float64)
             tmaxes_new = np.tile(self.t,int(r)).astype(np.uint64)
-            qmctoolscl_convert_kwargs = {"backend":"c"}
-            qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xb,x,**qmctoolscl_convert_kwargs)
+            qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xb,x,backend="c")
             if return_unrandomized:
                 return x,xb 
             else:
