@@ -36,25 +36,30 @@ class AbstractDiscreteDistribution(object):
 
     def __call__(self, n=None, n_min=None, n_max=None, return_unrandomized=False, return_binary=False, warn=True):
         r"""
-        - If just `n` is supplied, generate samples from the sequence at indices 0,...,`n`-1
-        - If `n_min` and `n_max` are supplied, generate samples from the sequence at indices `n_min`,...,`n_max`-1
-        - If `n` and `n_min` are supplied, then generate samples from the sequence at indices `n`,...,`n_min`-1
+        - If just `n` is supplied, generate samples from the sequence at indices 0,...,`n`-1.
+        - If `n_min` and `n_max` are supplied, generate samples from the sequence at indices `n_min`,...,`n_max`-1.
+        - If `n` and `n_min` are supplied, then generate samples from the sequence at indices `n`,...,`n_min`-1.
 
         Args:
-            n (Union[None,int]): number of points to generate
+            n (Union[None,int]): Number of points to generate.
             n_min (Union[None,int]): Starting index of sequence.
             n_max (Union[None,int]): Final index of sequence.
-            return_unrandomized (bool):if True, also return unrandomized samples `x_unrandomized` after the randomized `x` below
-            return_binary (bool): Only used for `DigitalNetB2`, if True, ONLY return the integer representation `x_integer` of the float representation `x` described below. Cannot set have both `return_unrandomized` and `return_binary`. 
-            warn (bool): If False, disable warnings when generating samples
+            return_unrandomized (bool): If `True`, also return unrandomized samples `x_unrandomized` after the randomized `x` below.
+            return_binary (bool): Only used for `DigitalNetB2`.  
+                If `True`, *only* return the integer representation `x_integer` of base 2 digital net.  
+                Cannot set have both `return_unrandomized=True` and `return_binary=True`. 
+            warn (bool): If `False`, disable warnings when generating samples.
 
         Returns:
-            x (np.ndarray): samples from the sequence (possibly unrandomized or in integer form if `return_unrandomized` or `return_binary` respectively). 
+            x (np.ndarray): Samples from the sequence. 
                 
                 - If `replications` is `None` then this will be of size (`n_max`-`n_min`) $\times$ `dimension` 
-                - If `replications` is a positive int, then `x` will be of size replications` $\times$ (`n_max`-`n_min`) $\times$ `dimension` 
+                - If `replications` is a positive int, then `x` will be of size `replications` $\times$ (`n_max`-`n_min`) $\times$ `dimension` 
 
-            May additionally reeturn unrandomized or binary samples based on the arguments `return_unrandomized` and `return_binary`
+                Note that: 
+                    
+                - If `return_unrandomized=True` then `x,x_unrandomized` is returned. 
+                - If `return_binary=True` then `x` is returned where `x` are integer representations of the digital net points. 
         """
         return self.gen_samples(n=n,n_min=n_min,n_max=n_max,return_unrandomized=return_unrandomized,return_binary=return_binary,warn=warn)
 
@@ -96,12 +101,15 @@ class AbstractDiscreteDistribution(object):
         Spawn new instances of the current discrete distribution but with new seeds and dimensions.
         Used by multi-level QMC algorithms which require different seeds and dimensions on each level.
 
+        Note:
+            Use `replications` instead of using `spawn` when possible, e.g., when spawning copies which all have the same dimension.
+
         Args:
-            s (int): number of spawn
-            dimensions (np.ndarray): length `s` array of dimension for each spawn. Defaults to current dimension. 
+            s (int): Number of copies to spawn
+            dimensions (np.ndarray): Length `s` array of dimensions for each copy. Defaults to the current dimension. 
 
         Returns:
-            spawned_discrete_distribs (list): discrete distributions with new seeds and dimensions
+            spawned_discrete_distribs (list): Discrete distributions with new seeds and dimensions.
         """
         s = int(s)
         if s<=0:
@@ -131,10 +139,10 @@ class AbstractDiscreteDistribution(object):
 
 
 class AbstractLDDiscreteDistribution(AbstractDiscreteDistribution):
-    """ Low discrepancy sequence. """
+    """ Low discrepancy sequence. Alias for `AbstractDiscreteDistribution` used for compatibility checks."""
     pass
 
 
 class AbstractIIDDiscreteDistribution(AbstractDiscreteDistribution):
-    """ IID sequence. """
+    """ IID sequence. Alias for `AbstractDiscreteDistribution` used for compatibility checks."""
     pass

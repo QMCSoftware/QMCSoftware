@@ -10,12 +10,12 @@ from typing import Union
 
 
 class Lattice(AbstractLDDiscreteDistribution):
-    """
+    r"""
     Low discrepancy lattice sequence.
 
     Note:
-        - Lattice samples sizes should be powers of 2 e.g. 1, 2, 4, 8, 16, ... 
-        - Unrandomized lattices include the origin
+        - Lattice sample sizes should be powers of $2$ e.g. $1$, $2$, $4$, $8$, $16$, $\dots$.
+        - The first point of an unrandomized lattice is the origin.
     
     Examples:
         >>> l = Lattice(2,seed=7)
@@ -35,55 +35,13 @@ class Lattice(AbstractLDDiscreteDistribution):
             order           NATURAL
             n_limit         2^(20)
             entropy         7
-        >>> Lattice(dimension=2,randomize=False,order='natural')(4, warn=False)
-        array([[0.  , 0.  ],
-               [0.5 , 0.5 ],
-               [0.25, 0.75],
-               [0.75, 0.25]])
-        >>> Lattice(dimension=2,randomize=False,order='linear')(4, warn=False)
-        array([[0.  , 0.  ],
-               [0.25, 0.75],
-               [0.5 , 0.5 ],
-               [0.75, 0.25]])
-        >>> Lattice(dimension=2,randomize=False,order='gray')(4, warn=False)
-        array([[0.  , 0.  ],
-               [0.5 , 0.5 ],
-               [0.75, 0.25],
-               [0.25, 0.75]])
-        >>> l = Lattice(2,generating_vector=25,seed=55)
-        >>> l(4)
-        array([[0.84489224, 0.30534549],
-               [0.34489224, 0.80534549],
-               [0.09489224, 0.05534549],
-               [0.59489224, 0.55534549]])
-        >>> l
-        Lattice (DiscreteDistribution Object)
-            d               2^(1)
-            replications    1
-            randomize       SHIFT
-            gen_vec_source  random
-            order           NATURAL
-            n_limit         2^(25)
-            entropy         55
-        >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector=26)(8,warn=False)
-        array([[0.   , 0.   , 0.   , 0.   ],
-               [0.5  , 0.5  , 0.5  , 0.5  ],
-               [0.25 , 0.25 , 0.75 , 0.75 ],
-               [0.75 , 0.75 , 0.25 , 0.25 ],
-               [0.125, 0.125, 0.875, 0.875],
-               [0.625, 0.625, 0.375, 0.375],
-               [0.375, 0.375, 0.625, 0.625],
-               [0.875, 0.875, 0.125, 0.125]])
-        >>> Lattice(dimension=3,randomize=False,generating_vector="LDData/main/lattice/mps.exod2_base2_m20_CKN.txt")(8,warn=False)
-        array([[0.   , 0.   , 0.   ],
-               [0.5  , 0.5  , 0.5  ],
-               [0.25 , 0.75 , 0.75 ],
-               [0.75 , 0.25 , 0.25 ],
-               [0.125, 0.375, 0.375],
-               [0.625, 0.875, 0.875],
-               [0.375, 0.125, 0.125],
-               [0.875, 0.625, 0.625]])
-        >>> Lattice(3,seed=7,replications=2)(4)
+
+        Replications of independent randomizations
+
+        >>> x = Lattice(3,seed=7,replications=2)(4)
+        >>> x.shape
+        (2, 4, 3)
+        >>> x
         array([[[0.04386058, 0.58727432, 0.3691824 ],
                 [0.54386058, 0.08727432, 0.8691824 ],
                 [0.29386058, 0.33727432, 0.1191824 ],
@@ -93,7 +51,56 @@ class Lattice(AbstractLDDiscreteDistribution):
                 [0.15212985, 0.19669968, 0.60605352],
                 [0.90212985, 0.44669968, 0.85605352],
                 [0.40212985, 0.94669968, 0.35605352]]])
-        >>> Lattice(3,seed=7,generating_vector=25,replications=2)(4)
+
+
+        Different orderings (avoid warnings that the first point is the origin).
+
+        >>> Lattice(dimension=2,randomize=False,order='NATURAL')(4,warn=False) 
+        array([[0.  , 0.  ],
+               [0.5 , 0.5 ],
+               [0.25, 0.75],
+               [0.75, 0.25]])
+        >>> Lattice(dimension=2,randomize=False,order='GRAY')(4,warn=False)
+        array([[0.  , 0.  ],
+               [0.5 , 0.5 ],
+               [0.75, 0.25],
+               [0.25, 0.75]])
+        >>> Lattice(dimension=2,randomize=False,order='LINEAR')(4,warn=False)
+        array([[0.  , 0.  ],
+               [0.25, 0.75],
+               [0.5 , 0.5 ],
+               [0.75, 0.25]])
+
+        Generating vector from [https://github.com/QMCSoftware/LDData/tree/main/lattice](https://github.com/QMCSoftware/LDData/tree/main/lattice)
+
+        >>> Lattice(dimension=3,randomize=False,generating_vector="mps.exod2_base2_m20_CKN.txt")(8,warn=False)
+        array([[0.   , 0.   , 0.   ],
+               [0.5  , 0.5  , 0.5  ],
+               [0.25 , 0.75 , 0.75 ],
+               [0.75 , 0.25 , 0.25 ],
+               [0.125, 0.375, 0.375],
+               [0.625, 0.875, 0.875],
+               [0.375, 0.125, 0.125],
+               [0.875, 0.625, 0.625]])
+        
+        Random generating vector supporting $2^{25}$ points 
+
+        >>> l = Lattice(3,generating_vector=25,seed=55,randomize=False)
+        >>> l.gen_vec
+        array([[       1, 11961679, 12107519]], dtype=uint64)
+        >>> l(4,warn=False)
+        array([[0.  , 0.  , 0.  ],
+               [0.5 , 0.5 , 0.5 ],
+               [0.25, 0.75, 0.75],
+               [0.75, 0.25, 0.25]])
+        
+        Two random generating vectors both supporting $2^{25}$ points along with independent random shifts
+
+        >>> l = Lattice(3,seed=7,generating_vector=25,replications=2)
+        >>> l.gen_vec
+        array([[       1, 32809149,  1471719],
+               [       1,   275319, 19705657]], dtype=uint64)
+        >>> l(4)
         array([[[0.3691824 , 0.65212985, 0.69669968],
                 [0.8691824 , 0.15212985, 0.19669968],
                 [0.6191824 , 0.90212985, 0.44669968],
@@ -106,29 +113,28 @@ class Lattice(AbstractLDDiscreteDistribution):
     
     **References**
     
-    1.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang,
-        Lluis Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel,
-        Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3)
-        [MATLAB Software], 2019. Available from http://gailgithub.github.io/GAIL_Dev/
+    1.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama, Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou.  
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3), MATLAB Software, 2019.  
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
 
-    2.  F.Y. Kuo & D. Nuyens.
-        Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients
-        - a survey of analysis and implementation, Foundations of Computational Mathematics,
-        16(6):1631-1696, 2016.
-        springer link: https://link.springer.com/article/10.1007/s10208-016-9329-5
-        arxiv link: https://arxiv.org/abs/1606.06613
+    2.  F.Y. Kuo, D. Nuyens.  
+        Application of quasi-Monte Carlo methods to elliptic PDEs with random diffusion coefficients \- a survey of analysis and implementation.  
+        Foundations of Computational Mathematics, 16(6):1631-1696, 2016.  
+        [https://link.springer.com/article/10.1007/s10208-016-9329-5](https://link.springer.com/article/10.1007/s10208-016-9329-5).  
 
-    3.  D. Nuyens, `The Magic Point Shop of QMC point generators and generating
-        vectors.` MATLAB and Python software, 2018. Available from
-        https://people.cs.kuleuven.be/~dirk.nuyens/
+    3.  D. Nuyens.  
+        The Magic Point Shop of QMC point generators and generating vectors.  
+        MATLAB and Python software, 2018.  
+        [https://people.cs.kuleuven.be/~dirk.nuyens/](https://people.cs.kuleuven.be/~dirk.nuyens/).
 
-    4.  Constructing embedded lattice rules for multivariate integration
-        R Cools, FY Kuo, D Nuyens -  SIAM J. Sci. Comput., 28(6), 2162-2188.
+    4.  R. Cools, F.Y. Kuo, D. Nuyens.  
+        Constructing embedded lattice rules for multivariate integration.  
+        SIAM J. Sci. Comput., 28(6), 2162-2188.
 
-    5.  L'Ecuyer, Pierre & Munger, David. (2015).
-        LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules.
-        ACM Transactions on Mathematical Software. 42. 10.1145/2754929.
+    5.  P. L'Ecuyer, D. Munger.  
+        LatticeBuilder: A General Software Tool for Constructing Rank-1 Lattice Rules.  
+        ACM Transactions on Mathematical Software. 42. (2015).  
+        [10.1145/2754929](https://dl.acm.org/doi/10.1145/2754929). 
     """
 
     def __init__(self,
@@ -141,30 +147,30 @@ class Lattice(AbstractLDDiscreteDistribution):
                  m_max = None):
         r"""
         Args:
-            dimension (Union[int,np.ndarray]): dimension of the generator.
+            dimension (Union[int,np.ndarray]): Dimension of the generator.
 
-                - If an `int` is passed in, use generating vector components at indices 0,...,`dimension`-1
-                - If an `np.ndarray` is passed in, use generating vector components at these indices
+                - If an `int` is passed in, use generating vector components at indices 0,...,`dimension`-1.
+                - If an `np.ndarray` is passed in, use generating vector components at these indices.
             
-            replications (int): number of IID randomizations of a pointset
-            seed (Union[None,int,np.random.SeedSeq): seed the random number generator for reproducibility
+            replications (int): Number of independent randomizations.
+            seed (Union[None,int,np.random.SeedSeq): Seed the random number generator for reproducibility.
             randomize (str): Options are 
                 
-                - `"SHIFT"`: Random shift.
-                - `"FALSE"`: No randomization. In this case the first point will be the origin. 
+                - `'SHIFT'`: Random shift.
+                - `'FALSE'`: No randomization. In this case the first point will be the origin. 
             
             generating_vector (Union[str,np.ndarray,int]: Specify the generating vector.
                 
-                - A string `generating_vector` should be the name (or path) of a file from the LDData repo at https://github.com/QMCSoftware/LDData/tree/main/lattice
-                - A `np.ndarray` of integers with shape $(d,)$ where $d$ is the number of dimensions.
+                - A `str` should be the name (or path) of a file from the LDData repo at [https://github.com/QMCSoftware/LDData/tree/main/lattice](https://github.com/QMCSoftware/LDData/tree/main/lattice).
+                - A `np.ndarray` of integers with shape $(d,)$ or $(r,d)$ where $d$ is the number of dimensions and $r$ is the number of replications.  
                     Must supply `m_max` where $2^{m_\mathrm{max}}$ is the max number of supported samples. 
-                - A positive int `generating_vector`, call it $M$, 
-                gives the random generating vector $(1,v_1,\dots,v_{d_\mathrm{max}})^T$ 
-                where the $v_i$ are randomly selected from $\{3,5,\dots,2M-1\}$ uniformly and independently. 
+                - An `int`, call it $M$, 
+                gives the random generating vector $(1,v_1,\dots,v_{d-1})^T$ 
+                where $d$ is the dimension and $v_i$ are randomly selected from $\{3,5,\dots,2^M-1\}$ uniformly and independently.  
                 We require require $1 < M < 27$. 
 
-            order (str): "LINEAR", "NATURAL", or "GRAY" ordering.
-            m_max (int): $2^{m_\mathrm{max}}$ is the max number of supported samples
+            order (str): `'LINEAR'`, `'NATURAL'`, or `'GRAY'` ordering. See the doctest example above.
+            m_max (int): $2^{m_\mathrm{max}}$ is the maximum number of supported samples.
         """
         self.parameters = ['randomize','gen_vec_source','order','n_limit']
         self.input_generating_vector = deepcopy(generating_vector)

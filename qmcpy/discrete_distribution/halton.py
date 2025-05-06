@@ -10,11 +10,15 @@ from copy import deepcopy
 
 
 class Halton(AbstractLDDiscreteDistribution):
-    """
-    Quasi-Random Halton points.
+    r"""
+    Low discrepancy Halton points.
+
+    Note:
+        - The first point of an unrandomized Halton sequence is the origin.
+        - QRNG does *not* support multiple replications (independent randomizations).
     
     Examples:
-        >>> halton = Halton(2,randomize="LMS_PERM",seed=7)
+        >>> halton = Halton(2,seed=7)
         >>> halton(4)
         array([[0.83790457, 0.89981478],
                [0.00986102, 0.4610941 ],
@@ -28,6 +32,38 @@ class Halton(AbstractLDDiscreteDistribution):
             t               63
             n_limit         2^(32)
             entropy         7
+        
+        Replications of independent randomizations 
+
+        >>> x = Halton(3,seed=7,replications=2)(4)
+        >>> x.shape
+        (2, 4, 3)
+        >>> x
+        array([[[0.70988236, 0.18180876, 0.54073621],
+                [0.38178158, 0.61168824, 0.64684354],
+                [0.98597752, 0.70650871, 0.31479029],
+                [0.15795399, 0.28162992, 0.98945647]],
+        <BLANKLINE>
+               [[0.620398  , 0.57025403, 0.46336542],
+                [0.44021889, 0.69926312, 0.60133428],
+                [0.89132308, 0.12030255, 0.35715804],
+                [0.04025218, 0.44304244, 0.10724799]]])
+
+        Unrandomized Halton 
+
+        >>> Halton(2,randomize="FALSE",seed=7)(4,warn=False)
+        array([[0.        , 0.        ],
+               [0.5       , 0.33333333],
+               [0.25      , 0.66666667],
+               [0.75      , 0.11111111]])
+        
+        All randomizations 
+
+        >>> Halton(2,randomize="LMS_PERM",seed=7)(4)
+        array([[0.83790457, 0.89981478],
+               [0.00986102, 0.4610941 ],
+               [0.62236343, 0.02796307],
+               [0.29427505, 0.79909098]])
         >>> Halton(2,randomize="LMS_DS",seed=7)(4)
         array([[0.82718745, 0.90603116],
                [0.0303368 , 0.44704107],
@@ -58,11 +94,9 @@ class Halton(AbstractLDDiscreteDistribution):
                [0.85362988, 0.72066823],
                [0.10362988, 0.05400156],
                [0.60362988, 0.498446  ]])
-        >>> Halton(2,randomize="FALSE",seed=7)(4,warn=False)
-        array([[0.        , 0.        ],
-               [0.5       , 0.33333333],
-               [0.25      , 0.66666667],
-               [0.75      , 0.11111111]])
+        
+        Replications of randomizations 
+
         >>> Halton(3,randomize="LMS_PERM",seed=7,replications=2)(4)
         array([[[0.70988236, 0.18180876, 0.54073621],
                 [0.38178158, 0.61168824, 0.64684354],
@@ -126,14 +160,18 @@ class Halton(AbstractLDDiscreteDistribution):
 
     **References:**
     
-    1.  Marius Hofert and Christiane Lemieux (2019). 
-        qrng: (Randomized) Quasi-Random Number Generators. 
-        R package version 0.0-7.
-        https://CRAN.R-project.org/package=qrng.
+    1.  Marius Hofert and Christiane Lemieux.  
+        qrng: (Randomized) Quasi-Random Number Generators.  
+        R package version 0.0-7. (2019).  
+        [https://CRAN.R-project.org/package=qrng](https://CRAN.R-project.org/package=qrng).
         
-    2.  Owen, A. B. "A randomized Halton algorithm in R," 2017. arXiv:1706.02808 [stat.CO]
+    2.  A. B. Owen.  
+        A randomized Halton algorithm in R.  
+        [arXiv:1706.02808](https://arxiv.org/abs/1706.02808) [stat.CO]. 2017. 
 
-    3.  Owen, A. B., and Pan, Z. "Gain coefficients for scrambled Halton points," 2023. arXiv:2308.08035 [stat.CO]
+    3.  A. B. Owen and Z. Pan.  
+        Gain coefficients for scrambled Halton points.  
+        [arXiv:2308.08035](https://arxiv.org/abs/2308.08035) [stat.CO]. 2023. 
     """
     halton_cf_qrng = _c_lib.halton_qrng
     halton_cf_qrng.argtypes = [
@@ -155,28 +193,27 @@ class Halton(AbstractLDDiscreteDistribution):
                  n_lim = 2**32,
                  # deprecated
                  t_lms = None):
-        """
+        r"""
         Args:
-            dimension (Union[int,np.ndarray]): dimension of the generator.
+            dimension (Union[int,np.ndarray]): Dimension of the generator.
 
-                - If an `int` is passed in, use generating vector components at indices 0,...,`dimension`-1
-                - If an `np.ndarray` is passed in, use generating vector components at these indices
+                - If an `int` is passed in, use generating vector components at indices 0,...,`dimension`-1.
+                - If an `np.ndarray` is passed in, use generating vector components at these indices.
             
-            replications (int): number of IID randomizations of a pointset
-            seed (Union[None,int,np.random.SeedSeq): seed the random number generator for reproducibility
+            replications (int): Number of independent randomizations of a pointset.
+            seed (Union[None,int,np.random.SeedSeq): Seed the random number generator for reproducibility.
             randomize (str): Options are
                 
-                - "LMS_PERM": linear matrix scramble with digital shift
-                - "LMS_DS": linear matrix scramble with permutation
-                - "LMS": linear matrix scramble only
-                - "PERM": permutation scramble only
-                - "DS": digital shift only
-                - "NUS": nested uniform scrambling.
-                - "QRNG": deterministic permutation scramble and random digital shift from QRNG [1] (with generalize=True) 
-
-            seed (None or int or numpy.np.random.SeedSeq): seed the random number generator for reproducibility
-            t (int): number of bits for randomization, defaults to the smallest number of rows required to store 
-            n_lim (int): maximum number of compatible points, determines the number of rows in the generating matrices. 
+                - `'LMS_PERM'`: Linear matrix scramble with digital shift.
+                - `'LMS_DS'`: Linear matrix scramble with permutation.
+                - `'LMS'`: Linear matrix scramble only.
+                - `'PERM'`: Permutation scramble only.
+                - `'DS'`: Digital shift only.
+                - `'NUS'`: Nested uniform scrambling.
+                - `'QRNG'`: Deterministic permutation scramble and random digital shift from QRNG [1] (with `generalize=True`). Does *not* support replications>1.
+                - `'FALSE'`: No randomization. In this case the first point will be the origin. 
+            t (int): Number of bits in integer represetation of points *after* randomization. The number of bits in the generating matrices is inferred based on the largest value.
+            n_lim (int): Maximum number of compatible points, determines the number of rows in the generating matrices. 
         """
         if t_lms is not None:
             t = t_lms

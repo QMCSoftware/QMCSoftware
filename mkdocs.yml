@@ -3,7 +3,7 @@ nav:
   - index.md
   - Guides:
     - Discrete Distributions: discrete_distributions.md
-  - API: api.md
+  #- API: api.md
   # - Demos:
   #   - Fast GP Net: examples/simple/fgp_dnb2.ipynb
   - Community: community.md

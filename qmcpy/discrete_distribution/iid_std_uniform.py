@@ -5,9 +5,14 @@ from typing import Union
 import warnings
 
 class IIDStdUniform(AbstractIIDDiscreteDistribution):
-    """
+    r"""
     IID standard uniform points, a wrapper around [`numpy.random.rand`](https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html). 
 
+    Note:
+        - Unlike low discrepancy sequence, calling an `IIDStdUniform` instance gives new samples every time,  
+            e.g., running the first doctest below with `dd = Lattice(dimension=2)` would give the same 4 points in both calls,  
+            but since we are using an `IIDStdUniform` instance it gives different points every call. 
+    
     Examples:
         >>> dd = IIDStdUniform(dimension=2,seed=7)
         >>> dd(4)
@@ -25,17 +30,34 @@ class IIDStdUniform(AbstractIIDDiscreteDistribution):
             d               2^(1)
             replications    1
             entropy         7
+
+        Replications (implemented for API consistency) 
+
+
+        >>> x = IIDStdUniform(dimension=3,replications=2,seed=7)(4)
+        >>> x.shape
+        (2, 4, 3)
+        >>> x
+        array([[[0.04386058, 0.58727432, 0.3691824 ],
+                [0.65212985, 0.69669968, 0.10605352],
+                [0.63025643, 0.13630282, 0.5968363 ],
+                [0.0576251 , 0.2028797 , 0.22909681]],
+        <BLANKLINE>
+               [[0.1366783 , 0.75220658, 0.84501765],
+                [0.56269008, 0.04826852, 0.71308655],
+                [0.80983568, 0.85383675, 0.80475135],
+                [0.6171181 , 0.1239209 , 0.16809479]]])
     """
 
     def __init__(self,
                  dimension = 1, 
                  replications = None, 
                  seed = None):
-        """
+        r"""
         Args:
-            dimension (int): dimension of samples
-            replications (Union[None,int]): number of randomizations
-            seed (Union[None,int,np.random.SeedSeq): seed the random number generator for reproducibility
+            dimension (int): Dimension of the samples.
+            replications (Union[None,int]): Number of randomizations. This is implemented only for API consistency. Equivalent to reshaping samples. 
+            seed (Union[None,int,np.random.SeedSeq): Seed the random number generator for reproducibility.
         """
         super(IIDStdUniform,self).__init__(int(dimension),replications,seed,d_limit=np.inf,n_limit=np.inf)
         if not (self.dvec==np.arange(self.d)).all():
