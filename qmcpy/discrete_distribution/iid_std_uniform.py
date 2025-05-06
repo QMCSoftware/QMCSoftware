@@ -23,11 +23,14 @@ class IIDStdUniform(AbstractIIDDiscreteDistribution):
         >>> dd
         IIDStdUniform (DiscreteDistribution Object)
             d               2^(1)
+            replications    1
             entropy         7
-            spawn_key       ()
     """
 
-    def __init__(self, dimension=1, replications=None, seed=None):
+    def __init__(self,
+                 dimension = 1, 
+                 replications = None, 
+                 seed = None):
         """
         Args:
             dimension (int): dimension of samples
@@ -51,6 +54,6 @@ class IIDStdUniform(AbstractIIDDiscreteDistribution):
     def _spawn(self, child_seed, dimension):
         return IIDStdUniform(
             dimension = dimension,
-            replications = self.replications,
+            replications = None if self.no_replications else self.replications,
             seed = child_seed,
         )

@@ -11,7 +11,7 @@ from typing import Union
 
 class Lattice(AbstractLDDiscreteDistribution):
     """
-    Low discrepancy lattice sequence
+    Low discrepancy lattice sequence.
 
     Note:
         - Lattice samples sizes should be powers of 2 e.g. 1, 2, 4, 8, 16, ... 
@@ -19,40 +19,39 @@ class Lattice(AbstractLDDiscreteDistribution):
     
     Examples:
         >>> l = Lattice(2,seed=7)
-        >>> l.gen_samples(4)
+        >>> l(4)
         array([[0.04386058, 0.58727432],
                [0.54386058, 0.08727432],
                [0.29386058, 0.33727432],
                [0.79386058, 0.83727432]])
-        >>> l.gen_samples(1) # first point in the sequence
+        >>> l(1) # first point in the sequence
         array([[0.04386058, 0.58727432]])
         >>> l
         Lattice (DiscreteDistribution Object)
             d               2^(1)
-            dvec            [0 1]
             replications    1
             randomize       SHIFT
-            gen_vec         [     1 182667]
+            gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
             order           NATURAL
+            n_limit         2^(20)
             entropy         7
-            spawn_key       ()
-        >>> Lattice(dimension=2,randomize=False,order='natural').gen_samples(4, warn=False)
+        >>> Lattice(dimension=2,randomize=False,order='natural')(4, warn=False)
         array([[0.  , 0.  ],
                [0.5 , 0.5 ],
                [0.25, 0.75],
                [0.75, 0.25]])
-        >>> Lattice(dimension=2,randomize=False,order='linear').gen_samples(4, warn=False)
+        >>> Lattice(dimension=2,randomize=False,order='linear')(4, warn=False)
         array([[0.  , 0.  ],
                [0.25, 0.75],
                [0.5 , 0.5 ],
                [0.75, 0.25]])
-        >>> Lattice(dimension=2,randomize=False,order='gray').gen_samples(4, warn=False)
+        >>> Lattice(dimension=2,randomize=False,order='gray')(4, warn=False)
         array([[0.  , 0.  ],
                [0.5 , 0.5 ],
                [0.75, 0.25],
                [0.25, 0.75]])
         >>> l = Lattice(2,generating_vector=25,seed=55)
-        >>> l.gen_samples(4)
+        >>> l(4)
         array([[0.84489224, 0.30534549],
                [0.34489224, 0.80534549],
                [0.09489224, 0.05534549],
@@ -60,14 +59,13 @@ class Lattice(AbstractLDDiscreteDistribution):
         >>> l
         Lattice (DiscreteDistribution Object)
             d               2^(1)
-            dvec            [0 1]
             replications    1
             randomize       SHIFT
-            gen_vec         [       1 11961679]
+            gen_vec_source  random
             order           NATURAL
+            n_limit         2^(25)
             entropy         55
-            spawn_key       ()
-        >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector=26).gen_samples(8,warn=False)
+        >>> Lattice(dimension=4,randomize=False,seed=353,generating_vector=26)(8,warn=False)
         array([[0.   , 0.   , 0.   , 0.   ],
                [0.5  , 0.5  , 0.5  , 0.5  ],
                [0.25 , 0.25 , 0.75 , 0.75 ],
@@ -76,7 +74,7 @@ class Lattice(AbstractLDDiscreteDistribution):
                [0.625, 0.625, 0.375, 0.375],
                [0.375, 0.375, 0.625, 0.625],
                [0.875, 0.875, 0.125, 0.125]])
-        >>> Lattice(dimension=3,randomize=False,generating_vector="LDData/main/lattice/mps.exod2_base2_m20_CKN.txt").gen_samples(8,warn=False)
+        >>> Lattice(dimension=3,randomize=False,generating_vector="LDData/main/lattice/mps.exod2_base2_m20_CKN.txt")(8,warn=False)
         array([[0.   , 0.   , 0.   ],
                [0.5  , 0.5  , 0.5  ],
                [0.25 , 0.75 , 0.75 ],
@@ -85,7 +83,7 @@ class Lattice(AbstractLDDiscreteDistribution):
                [0.625, 0.875, 0.875],
                [0.375, 0.125, 0.125],
                [0.875, 0.625, 0.625]])
-        >>> Lattice(3,seed=7,replications=2).gen_samples(4)
+        >>> Lattice(3,seed=7,replications=2)(4)
         array([[[0.04386058, 0.58727432, 0.3691824 ],
                 [0.54386058, 0.08727432, 0.8691824 ],
                 [0.29386058, 0.33727432, 0.1191824 ],
@@ -95,7 +93,7 @@ class Lattice(AbstractLDDiscreteDistribution):
                 [0.15212985, 0.19669968, 0.60605352],
                 [0.90212985, 0.44669968, 0.85605352],
                 [0.40212985, 0.94669968, 0.35605352]]])
-        >>> Lattice(3,seed=7,generating_vector=25,replications=2).gen_samples(4)
+        >>> Lattice(3,seed=7,generating_vector=25,replications=2)(4)
         array([[[0.3691824 , 0.65212985, 0.69669968],
                 [0.8691824 , 0.15212985, 0.19669968],
                 [0.6191824 , 0.90212985, 0.44669968],
@@ -150,27 +148,29 @@ class Lattice(AbstractLDDiscreteDistribution):
             
             replications (int): number of IID randomizations of a pointset
             seed (Union[None,int,np.random.SeedSeq): seed the random number generator for reproducibility
-            randomize (bool): If "SHIFT" or True, apply a random shift to the generated samples.
+            randomize (str): Options are 
+                
+                - `"SHIFT"`: Random shift.
+                - `"FALSE"`: No randomization. In this case the first point will be the origin. 
+            
             generating_vector (Union[str,np.ndarray,int]: Specify the generating vector.
                 
                 - A string `generating_vector` should be the name (or path) of a file from the LDData repo at https://github.com/QMCSoftware/LDData/tree/main/lattice
-                - A `np.ndarray` `generating_vector`. Must supply `m_max` where $2^{m_\mathrm{max}}$ is the max number of supported samples. 
+                - A `np.ndarray` of integers with shape $(d,)$ where $d$ is the number of dimensions.
+                    Must supply `m_max` where $2^{m_\mathrm{max}}$ is the max number of supported samples. 
                 - A positive int `generating_vector`, call it $M$, 
                 gives the random generating vector $(1,v_1,\dots,v_{d_\mathrm{max}})^T$ 
                 where the $v_i$ are randomly selected from $\{3,5,\dots,2M-1\}$ uniformly and independently. 
                 We require require $1 < M < 27$. 
 
-            order (str): "linear", "natural", or "gray" ordering.
+            order (str): "LINEAR", "NATURAL", or "GRAY" ordering.
             m_max (int): $2^{m_\mathrm{max}}$ is the max number of supported samples
         """
-        self.parameters = ['dvec','replications','randomize','gen_vec','order']
+        self.parameters = ['randomize','gen_vec_source','order','n_limit']
         self.input_generating_vector = deepcopy(generating_vector)
         self.input_m_max = deepcopy(m_max)
-        # ordering
-        self.order = order.upper()
-        assert self.order in ['LINEAR','NATURAL','GRAY']
-        # generating vector
         if isinstance(generating_vector,str):
+            self.gen_vec_source = generating_vector
             assert generating_vector[-4:]==".txt"
             local_root = dirname(abspath(__file__))+'/generating_vectors/'
             repos = DataSource()
@@ -194,6 +194,7 @@ class Lattice(AbstractLDDiscreteDistribution):
             n_limit = contents[1]
             gen_vec = np.array(contents[2:],dtype=np.uint64)[None,:]
         elif isinstance(generating_vector,np.ndarray):
+            self.gen_vec_source = "custom"
             gen_vec = generating_vector
             if m_max is None:
                 raise ParameterError("m_max must be supplied when generating_vector is a np.ndarray")
@@ -208,13 +209,15 @@ class Lattice(AbstractLDDiscreteDistribution):
             raise ParameterError("invalid generating_vector, must be a string, numpy.ndarray, or int")
         super(Lattice,self).__init__(dimension,replications,seed,d_limit,n_limit)
         if isinstance(generating_vector,int):
+            self.gen_vec_source = "random"
             m_max = int(np.log2(self.n_limit))
             gen_vec = np.hstack([np.ones((self.replications,1),dtype=np.uint64),2*self.rng.integers(1,2**(m_max-1),size=(self.replications,dimension-1),dtype=np.uint64)+1]).copy()
         assert isinstance(gen_vec,np.ndarray)
         gen_vec = np.atleast_2d(gen_vec) 
         assert gen_vec.ndim==2 and gen_vec.shape[1]>=self.d and (gen_vec.shape[0]==1 or gen_vec.shape[0]==self.replications), "invalid gen_vec.shape = %s"%str(gen_vec.shape)
-        # randomization
         self.gen_vec = gen_vec[:,self.dvec].copy()
+        self.order = str(order).upper()
+        assert self.order in ['LINEAR','NATURAL','GRAY']
         self.randomize = str(randomize).upper()
         if self.randomize=="TRUE": self.randomize = "SHIFT"
         if self.randomize=="NONE": self.randomize = "FALSE"
@@ -222,6 +225,8 @@ class Lattice(AbstractLDDiscreteDistribution):
         assert self.randomize in ["SHIFT","FALSE"]
         if self.randomize=="SHIFT":
             self.shift = self.rng.uniform(size=(self.replications,self.d))
+        if self.randomize=="FALSE": assert self.gen_vec.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating vectors %d"%(self.replications,self.gen_vec.shape[0])
+        
 
     def _gen_samples(self, n_min, n_max, return_unrandomized, return_binary, warn):
         if return_binary:
@@ -290,7 +295,7 @@ class Lattice(AbstractLDDiscreteDistribution):
     def _spawn(self, child_seed, dimension):
         return Lattice(
                 dimension = dimension,
-                replications = self.replications,
+                replications = None if self.no_replications else self.replications,
                 seed = child_seed,
                 randomize = self.randomize,
                 generating_vector = self.input_generating_vector,

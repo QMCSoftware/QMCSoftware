@@ -127,7 +127,7 @@ class AbstractDiscreteDistribution(object):
         return np.ones_like(x[...,0])
     
     def __repr__(self):
-        return _univ_repr(self, "DiscreteDistribution", ['d']+self.parameters+['entropy','spawn_key'])
+        return _univ_repr(self, "DiscreteDistribution", ['d','replications']+self.parameters+['entropy'])
 
 
 class AbstractLDDiscreteDistribution(AbstractDiscreteDistribution):
