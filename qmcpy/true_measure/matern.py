@@ -5,6 +5,8 @@ from ..discrete_distribution import DigitalNetB2
 from ..util import DimensionError, ParameterError
 import numpy as np
 from scipy.special import kv, gamma
+from typing import Union
+
 
 class Matern(Gaussian):
     r"""

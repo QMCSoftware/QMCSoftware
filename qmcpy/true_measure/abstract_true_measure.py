@@ -1,6 +1,7 @@
 from ..util import MethodImplementationError, _univ_repr, DimensionError, ParameterError
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 import numpy as np
+from typing import Union
 
 
 class AbstractTrueMeasure(object):
@@ -65,7 +66,7 @@ class AbstractTrueMeasure(object):
         return self._jacobian_transform_r(x=x,return_weights=return_weights)
         
     def _jacobian_transform_r(self, x, return_weights):
-        """ Recursive Jacobian transform. """
+        r""" Recursive Jacobian transform. """
         if self.sub_compatibility_error:
             raise ParameterError("The transform domain must match the sub-transform range.")
         if self.transform == self: # is \Psi_0
@@ -88,11 +89,11 @@ class AbstractTrueMeasure(object):
             return t
         
     def _transform(self, x): 
-        """ Transformation from the standard uniform to the true measure distribution. """
+        r""" Transformation from the standard uniform to the true measure distribution. """
         raise MethodImplementationError(self,'_transform. Try setting sampler to be in a PDF AbstractTrueMeasure to importance sample by.')
    
     def _weight(self, x):
-        """
+        r"""
         Non-negative weight function.  
         This is often a PDF, but is not required to be  
         e.g., Lebesgue weight is always 1, but is not a PDF.

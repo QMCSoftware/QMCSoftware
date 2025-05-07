@@ -3,6 +3,7 @@ from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 from scipy.stats import norm
+from typing import Union
 
 
 class JohnsonsSU(AbstractTrueMeasure):

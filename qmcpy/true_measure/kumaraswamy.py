@@ -2,6 +2,7 @@ from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
+from typing import Union
 
 
 class Kumaraswamy(AbstractTrueMeasure):

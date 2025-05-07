@@ -7,7 +7,7 @@ from typing import Union
 
 
 class Uniform(AbstractTrueMeasure):
-    """
+    r"""
     Uniform distribution, see [https://en.wikipedia.org/wiki/Continuous_uniform_distribution](https://en.wikipedia.org/wiki/Continuous_uniform_distribution). 
 
     Examples:
@@ -40,7 +40,7 @@ class Uniform(AbstractTrueMeasure):
     """
     
     def __init__(self, sampler, lower_bound=0, upper_bound=1):
-        """
+        r"""
         Args:
             sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
                 

@@ -5,10 +5,11 @@ from ..discrete_distribution import DigitalNetB2
 from ..util import TransformError, ParameterError
 from scipy.stats import norm
 import numpy as np
+from typing import Union
 
 
 class Lebesgue(AbstractTrueMeasure):
-    """
+    r"""
     Lebesgue measure as described in [https://en.wikipedia.org/wiki/Lebesgue_measure](https://en.wikipedia.org/wiki/Lebesgue_measure).
 
     Examples:
@@ -26,7 +27,7 @@ class Lebesgue(AbstractTrueMeasure):
     """
     
     def __init__(self, sampler):
-        """
+        r"""
         Args:
             sampler (AbstractTrueMeasure): A true measure by which to compose a transform.
         """
