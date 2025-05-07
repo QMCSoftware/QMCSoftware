@@ -3,12 +3,12 @@ from ..util import TransformError, DimensionError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 from scipy.stats import norm
+from typing import Union
 
 
 class Uniform(AbstractTrueMeasure):
     """
-    Uniform distribution, see 
-        [https://en.wikipedia.org/wiki/Continuous_uniform_distribution](https://en.wikipedia.org/wiki/Continuous_uniform_distribution) 
+    Uniform distribution, see [https://en.wikipedia.org/wiki/Continuous_uniform_distribution](https://en.wikipedia.org/wiki/Continuous_uniform_distribution). 
 
     Examples:
         >>> u = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
@@ -39,14 +39,15 @@ class Uniform(AbstractTrueMeasure):
                 [1.18362201, 0.75651801, 1.23828953]]])
     """
     
-    def __init__(self, sampler, lower_bound=0., upper_bound=1.):
+    def __init__(self, sampler, lower_bound=0, upper_bound=1):
         """
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform 
-            lower_bound (float): a for Uniform(a,b)
-            upper_bound (float): b for Uniform(a,b)
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            lower_bound (Union[float,np.ndarray]): Lower bound.
+            upper_bound (Union[float,np.ndarray]): Upper bound.
         """
         self.parameters = ['lower_bound', 'upper_bound']
         self.domain = np.array([[0,1]])

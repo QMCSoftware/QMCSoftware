@@ -89,7 +89,7 @@ These define $\boldsymbol{T}$, for which `QMCPy` will automatically choose an ap
 
 $$\boldsymbol{m} = B_0 + \gamma \boldsymbol{t}$$
 
-$$\mathsf{\Sigma} = \left(\min\{t_i,t_{i'}\}\right)_{i,i'=1}^{d}$$
+$$\mathsf{\Sigma} = \sigma^2 \left(\min\{t_i,t_{i'}\}\right)_{i,i'=1}^{d}$$
 
 - **Independent Marginals** have $\boldsymbol{T} = (T_1,\dots,T_d)^T$ with $T_1,\dots,T_d$ independent. We support (continuous) marginal distributions from [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html#continuous-distributions).
 

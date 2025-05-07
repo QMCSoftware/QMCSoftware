@@ -5,13 +5,12 @@ import numpy as np
 
 
 class Kumaraswamy(AbstractTrueMeasure):
-    """
-    Kumaraswamy distribution as described in  
-        [https://en.wikipedia.org/wiki/Kumaraswamy_distribution](https://en.wikipedia.org/wiki/Kumaraswamy_distribution)
+    r"""
+    Kumaraswamy distribution as described in [https://en.wikipedia.org/wiki/Kumaraswamy_distribution](https://en.wikipedia.org/wiki/Kumaraswamy_distribution).
     
     Examples:
         >>> k = Kumaraswamy(DigitalNetB2(2,seed=7),a=[1,2],b=[3,4])
-        >>> k.gen_samples(4)
+        >>> k(4)
         array([[0.46202015, 0.5230962 ],
                [0.0352327 , 0.14904135],
                [0.26440066, 0.27701523],
@@ -39,13 +38,14 @@ class Kumaraswamy(AbstractTrueMeasure):
     """
 
     def __init__(self, sampler, a=2, b=2):
-        """
+        r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform 
-            a (np.ndarray): alpha > 0
-            b (np.ndarray): beta > 0
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            a (Union[float,np.ndarray]): First parameter $\alpha > 0$.
+            b (Union[float,np.ndarray]): Second parameter $\beta > 0$.
         """
         self.parameters = ['a', 'b']
         self.domain = np.array([[0,1]])
@@ -53,15 +53,16 @@ class Kumaraswamy(AbstractTrueMeasure):
         self._parse_sampler(sampler)
         self.a = a
         self.b = b
-        if np.isscalar(self.a):
-            a = np.tile(self.a,self.d)
-        if np.isscalar(self.b):
-            b = np.tile(self.b,self.d)
         self.alpha = np.array(a)
+        if self.alpha.size==1:
+            self.alpha = self.alpha.item()*np.ones(self.d)
+            a = np.tile(self.a,self.d)
         self.beta = np.array(b)
-        if len(self.alpha)!=self.d or len(self.beta)!=self.d:
+        if self.beta.size==1:
+            self.beta = self.beta.item()*np.ones(self.d)
+        if not (self.alpha.shape==(self.d,) and self.beta.shape==(self.d,)):
             raise DimensionError('a and b must be scalar or have length equal to dimension.')
-        if not (all(self.alpha>0) and all(self.beta>0)):
+        if not ((self.alpha>0).all() and (self.beta>0).all()):
             raise ParameterError("Kumaraswamy requires a,b>0.")
         super(Kumaraswamy,self).__init__()
         assert self.alpha.shape==(self.d,) and self.beta.shape==(self.d,)

@@ -4,16 +4,19 @@ from ..discrete_distribution import DigitalNetB2
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import ParameterError, _univ_repr
 import numpy as np
+from typing import Union
 
 
 class BrownianMotion(Gaussian):
-    """
-    Brownian Motion as described in  
-        [https://en.wikipedia.org/wiki/Brownian_motion](https://en.wikipedia.org/wiki/Brownian_motion)
+    r"""
+    Brownian Motion as described in [https://en.wikipedia.org/wiki/Brownian_motion](https://en.wikipedia.org/wiki/Brownian_motion).  
+    For a standard Brownian Motion $W$ we define the Brownian Motion $B$ with initial value $B_0$, drift $\gamma$, and diffusion $\sigma^2$ to be
+
+    $$B(t) = B_0 + \gamma t + \sigma W(t).$$
     
     Examples:
         >>> bm = BrownianMotion(DigitalNetB2(4,seed=7),t_final=2,drift=2)
-        >>> bm.gen_samples(2)
+        >>> bm(2)
         array([[1.28899119, 1.5262762 , 1.79768913, 2.01868668],
                [0.90670063, 3.37369469, 4.91596715, 5.45562238]])
         >>> bm
@@ -46,19 +49,19 @@ class BrownianMotion(Gaussian):
 
     def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA'):
         r"""
-        BrownianMotion(t) = (initial_value) + (drift)*t + \sqrt{diffusion}*StandardBrownianMotion(t)
-
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform 
-            t_final (float): end time for the Brownian Motion. 
-            initial_value (float): See above formula
-            drift (int): See above formula
-            diffusion (int): See above formula
-            decomp_type (str): method of decomposition either  
-                "PCA" for principal component analysis or 
-                "Cholesky" for cholesky decomposition.
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            t_final (float): End time. 
+            initial_value (float): Initial value $B_0$. 
+            drift (int): Drift $\gamma$. 
+            diffusion (int): Diffusion $\sigma^2$. 
+            decomp_type (str): Method for decomposition for covariance matrix. Options include
+             
+                - `'PCA'` for principal component analysis, or 
+                - `'Cholesky'` for cholesky decomposition.
         """
         self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform

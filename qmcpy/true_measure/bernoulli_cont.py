@@ -2,16 +2,15 @@ from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
-
+from typing import Union
 
 class BernoulliCont(AbstractTrueMeasure):
-    """
-    Continuous Bernoulli distribution as described in  
-        [https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution](https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution)
+    r"""
+    Continuous Bernoulli distribution with independent marginals as described in [https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution](https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution).
 
     Examples: 
         >>> bc = BernoulliCont(DigitalNetB2(2,seed=7),lam=.2)
-        >>> bc.gen_samples(4)
+        >>> bc(4)
         array([[0.72351141, 0.56205914],
                [0.05741849, 0.04805839],
                [0.43318125, 0.16552571],
@@ -35,30 +34,28 @@ class BernoulliCont(AbstractTrueMeasure):
                 [0.76587019, 0.52953251, 0.25020451],
                 [0.34882573, 0.90831912, 0.56144083],
                 [0.48793028, 0.25651801, 0.98567543]]])
-    
-    See https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution
     """
 
     def __init__(self, sampler, lam=1/2):
-        """
+        r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform 
-            lam (np.ndarray): 0 < lambda < 1, a shape parameter, independent for each dimension 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            lam (Union[float,np.ndarray]): Vector of shape parameters, each in $(0,1)$.
         """
         self.parameters = ['lam']
         self.domain = np.array([[0,1]])
         self.range = np.array([[0,1]])
         self._parse_sampler(sampler)
         self.lam = lam
-        if np.isscalar(self.lam):
-            lam = np.tile(self.lam,self.d)
         self.l = np.array(lam)
-        if len(self.l)!=self.d or (self.l<=0).any() or (self.l>=1).any():
+        if self.l.size==1:
+            self.l = self.l.item()*np.ones(self.d)
+        if not (self.l.shape==(self.d,) and (0<=self.l).all() and (self.l<=1).all()):
             raise DimensionError('lam must be scalar or have length equal to dimension and must be in (0,1).')
         super(BernoulliCont,self).__init__()
-        assert self.l.shape==(self.d,)
 
     def _transform(self, x):
         tf = np.zeros(x.shape,dtype=float)

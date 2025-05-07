@@ -5,16 +5,19 @@ import numpy as np
 from numpy.linalg import cholesky, slogdet
 from scipy.stats import norm, multivariate_normal
 from scipy.linalg import eigh
+from typing import Union
 
 
 class Gaussian(AbstractTrueMeasure):
     """
-    Gaussian (Normal) distribution as described in 
-        [https://en.wikipedia.org/wiki/Multivariate_normal_distribution](https://en.wikipedia.org/wiki/Multivariate_normal_distribution)
+    Gaussian (Normal) distribution as described in [https://en.wikipedia.org/wiki/Multivariate_normal_distribution](https://en.wikipedia.org/wiki/Multivariate_normal_distribution).
+    
+    Note:
+        - `Normal` is an alias for `Gaussian`
     
     Examples:
         >>> g = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2],covariance=[[9,4],[4,5]])
-        >>> g.gen_samples(4)
+        >>> g(4)
         array([[ 4.40778501,  3.00772805],
                [-3.80150101,  1.58605376],
                [ 1.24089995,  3.27516695],
@@ -46,15 +49,16 @@ class Gaussian(AbstractTrueMeasure):
     def __init__(self, sampler, mean=0., covariance=1., decomp_type='PCA'):
         """
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform 
-            mean (float): mu for Normal(mu,sigma^2)
-            covariance (np.ndarray): sigma^2 for Normal(mu,sigma^2). 
-                A float or d (dimension) vector input will be extended to covariance*np.eye(d)
-            decomp_type (str): method of decomposition either  
-                "PCA" for principal component analysis or 
-                "Cholesky" for cholesky decomposition.
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            mean (Union[float,np.ndarray]): Mean vector. 
+            covariance (Union[float,np.ndarray]): Covariance matrix. A float or vector will be expanded into a diagonal matrix.  
+            decomp_type (str): Method for decomposition for covariance matrix. Options include
+             
+                - `'PCA'` for principal component analysis, or 
+                - `'Cholesky'` for cholesky decomposition.
         """
         self.parameters = ['mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform

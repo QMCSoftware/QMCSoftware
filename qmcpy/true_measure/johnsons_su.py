@@ -6,13 +6,12 @@ from scipy.stats import norm
 
 
 class JohnsonsSU(AbstractTrueMeasure):
-    """
-    Johnson's $S_U$-distribution as described in  
-        [https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution](https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution)
+    r"""
+    Johnson's $S_U$-distribution with independent marginals as described in [https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution](https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution).
 
     Examples:
         >>> jsu = JohnsonsSU(DigitalNetB2(2,seed=7),gamma=1,xi=2,delta=3,lam=4)
-        >>> jsu.gen_samples(4)
+        >>> jsu(4)
         array([[ 2.01636624,  1.44849599],
                [-1.32410385, -1.49239458],
                [ 1.00113995, -0.23987417],
@@ -42,15 +41,16 @@ class JohnsonsSU(AbstractTrueMeasure):
     """
 
     def __init__(self, sampler, gamma=1, xi=1, delta=2, lam=2):
-        """
+        r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform 
-            gamma (np.ndarray): gamma
-            xi (np.ndarray): xi
-            delta (np.ndarray): delta > 0
-            lam (np.ndarray): lambda > 0
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            gamma (Union[float,np.ndarray]): First parameter $\gamma$.
+            xi (Union[float,np.ndarray]): Second parameter $\xi$.
+            delta (Union[float,np.ndarray]): Third parameter $\delta > 0$. 
+            lam (Union[float,np.ndarray]): Fourth parameter $\lambda > 0$.
         """
         self.parameters = ['gamma', 'xi', 'delta', 'lam']
         self.domain = np.array([[0,1]])
@@ -60,22 +60,22 @@ class JohnsonsSU(AbstractTrueMeasure):
         self.xi = xi
         self.delta = delta
         self.lam = lam
-        if np.isscalar(self.gamma):
-            gamma = np.tile(self.gamma,self.d)
-        if np.isscalar(self.xi):
-            xi = np.tile(self.xi,self.d)
-        if np.isscalar(self.delta):
-            delta = np.tile(self.delta,self.d)
-        if np.isscalar(self.lam):
-            lam = np.tile(self.lam,self.d)
         self._gamma = np.array(gamma)
+        if self._gamma.size==1:
+            self._gamma = self._gamma.item()*np.ones(self.d)
         self._xi = np.array(xi)
+        if self._xi.size==1:
+            self._xi = self._xi.item()*np.ones(self.d)
         self._delta = np.array(delta)
+        if self._delta.size==1:
+            self._delta = self._delta.item()*np.ones(self.d)
         self._lam = np.array(lam)
-        if len(self._gamma)!=self.d or len(self._xi)!=self.d or len(self._delta)!=self.d or len(self._lam)!=self.d:
+        if self._lam.size==1:
+            self._lam = self._lam.item()*np.ones(self.d)
+        if not (self._gamma.shape==(self.d,) and self._xi.shape==(self.d,) and self._delta.shape==(self.d,) and self._lam.shape==(self.d,)):
             raise DimensionError("all Johnson's S_U parameters be scalar or have length equal to dimension.")
-        if (self._delta<=0).any() or (self._lam<=0).any():
-            raise ParameterError("delta and lam (lambda) must be greater than 0")
+        if not ((self._delta>0).all() and (self._lam>0).all()):
+            raise ParameterError("delta and lam must be all be positive")
         super(JohnsonsSU,self).__init__()
         assert self._gamma.shape==(self.d,) and self._xi.shape==(self.d,) and self._delta.shape==(self.d,) and self._lam.shape==(self.d,)
 
