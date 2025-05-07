@@ -8,113 +8,75 @@ import os
 
 class UMBridgeWrapper(AbstractIntegrand):
     """
-    UM-Bridge Model Wrapper. 
-    Requires Docker be installed, see https://www.docker.com/. 
+    Wrapper around a [`UM-Bridge`](https://um-bridge-benchmarks.readthedocs.io/en/docs/index.html) model. See also the [`UM-Bridge` documentation for the QMCPy client](https://um-bridge-benchmarks.readthedocs.io/en/docs/umbridge/clients.html). 
+    Requires [Docker](https://www.docker.com/) is installed.
 
-    >>> _ = os.system('docker run --name muqbp -dit -p 4243:4243 linusseelinger/benchmark-muq-beam-propagation:latest > /dev/null')
-    >>> import umbridge
-    >>> dnb2 = DigitalNetB2(dimension=3,seed=7)
-    >>> distribution = Uniform(dnb2,lower_bound=1,upper_bound=1.05)
-    >>> model = umbridge.HTTPModel('http://localhost:4243','forward')
-    >>> umbridge_config = {"d": dnb2.d}
-    >>> um_bridge_integrand = UMBridgeWrapper(distribution,model,umbridge_config,parallel=False)
-    >>> solution,data = CubQMCNetG(um_bridge_integrand,abs_tol=5e-2).integrate()
-    >>> print(data)
-    LDTransformData (AccumulateData Object)
-        solution        [  0.      3.855  14.69  ... 898.921 935.383 971.884]
-        comb_bound_low  [  0.      3.854  14.688 ... 898.9   935.362 971.862]
-        comb_bound_high [  0.      3.855  14.691 ... 898.942 935.404 971.906]
-        comb_flags      [ True  True  True ...  True  True  True]
-        n_total         2^(11)
-        n               [1024. 1024. 1024. ... 2048. 2048. 2048.]
-        time_integrate  ...
-    CubQMCNetG (StoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    UMBridgeWrapper (AbstractIntegrand Object)
-    Uniform (AbstractTrueMeasure Object)
-        lower_bound     1
-        upper_bound     1.050
-    DigitalNetB2 (AbstractDiscreteDistribution Object)
-        d               3
-        dvec            [0 1 2]
-        randomize       LMS_DS
-        graycode        0
-        entropy         7
-        spawn_key       ()
-    >>> _ = os.system('docker rm -f muqbp > /dev/null')
-    >>> class TestModel(umbridge.Model):
-    ...     def __init__(self):
-    ...         super().__init__("forward")
-    ...     def get_input_sizes(self, config):
-    ...         return [1,2,3]
-    ...     def get_output_sizes(self, config):
-    ...         return [3,2,1]
-    ...     def __call__(self, parameters, config):
-    ...         out0 = [parameters[2][0],sum(parameters[2][:2]),sum(parameters[2])]
-    ...         out1 = [parameters[1][0],sum(parameters[1])]
-    ...         out2 = [parameters[0]]
-    ...         return [out0,out1,out2]
-    ...     def supports_evaluate(self):
-    ...         return True
-    >>> my_model = TestModel()
-    >>> my_distribution = Uniform(
-    ...     sampler = DigitalNetB2(dimension=sum(my_model.get_input_sizes(config={})),seed=7),
-    ...     lower_bound = -1,
-    ...     upper_bound = 1)
-    >>> my_integrand = UMBridgeWrapper(my_distribution,my_model)
-    >>> my_solution,my_data = CubQMCNetG(my_integrand,abs_tol=5e-2).integrate()
-    >>> my_data
-    LDTransformData (AccumulateData Object)
-        solution        [-1.110e-16 -2.220e-16 -3.331e-16 -1.110e-16 -2.220e-16 -9.021e-17]
-        comb_bound_low  [-7.639e-05 -8.012e-05 -7.965e-04 -5.369e-06 -3.118e-04 -9.537e-06]
-        comb_bound_high [7.639e-05 8.012e-05 7.965e-04 5.369e-06 3.118e-04 9.537e-06]
-        comb_flags      [ True  True  True  True  True  True]
-        n_total         2^(10)
-        n               [1024. 1024. 1024. 1024. 1024. 1024.]
-        time_integrate  ...
-    CubQMCNetG (StoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    UMBridgeWrapper (AbstractIntegrand Object)
-    Uniform (AbstractTrueMeasure Object)
-        lower_bound     -1
-        upper_bound     1
-    DigitalNetB2 (AbstractDiscreteDistribution Object)
-        d               6
-        dvec            [0 1 2 3 4 5]
-        randomize       LMS_DS
-        graycode        0
-        entropy         7
-        spawn_key       ()
-    >>> my_integrand.to_umbridge_out_sizes(my_solution)
-    [[-1.1102230246251565e-16, -2.220446049250313e-16, -3.3306690738754696e-16], [-1.1102230246251565e-16, -2.220446049250313e-16], [-9.020562075079397e-17]]
-    >>> my_integrand.to_umbridge_out_sizes(my_data.comb_bound_low)
-    [[-7.638736990567925e-05, -8.012348440331082e-05, -0.0007965080040872729], [-5.369077487201845e-06, -0.0003118494328260811], [-9.536743185422692e-06]]
-    >>> my_integrand.to_umbridge_out_sizes(my_data.comb_bound_high)
-    [[7.63873699054572e-05, 8.012348440286716e-05, 0.0007965080040866046], [5.3690774869798e-06, 0.000311849432825637], [9.536743185238812e-06]]
-
-    References:
-
-        [1] UM-Bridge documentation. https://um-bridge-benchmarks.readthedocs.io/en/docs/index.html
+    Examples:
+        >>> _ = os.system('docker run --name muqbp -dit -p 4243:4243 linusseelinger/benchmark-muq-beam-propagation:latest > /dev/null')
+        >>> import umbridge
+        >>> true_measure = Uniform(DigitalNetB2(dimension=3,seed=7),lower_bound=1,upper_bound=1.05)
+        >>> um_bridge_model = umbridge.HTTPModel('http://localhost:4243','forward')
+        >>> um_bridge_config = {"d": dnb2.d}
+        >>> integrand = UMBridgeWrapper(true_measure,um_bridge_model,um_bridge_config,parallel=False)
+        >>> x = integrand.discrete_distrib.gen_samples(2**10)
+        >>> y = integrand.f(x)
+        >>> print("%.4f"%y.mean())
+        1.8067
+        >>> integrand.true_measure
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
+        >>> _ = os.system('docker rm -f muqbp > /dev/null')
+        
+        Custom model with independent replications
+        
+        >>> class TestModel(umbridge.Model):
+        ...     def __init__(self):
+        ...         super().__init__("forward")
+        ...     def get_input_sizes(self, config):
+        ...         return [1,2,3]
+        ...     def get_output_sizes(self, config):
+        ...         return [3,2,1]
+        ...     def __call__(self, parameters, config):
+        ...         out0 = [parameters[2][0],sum(parameters[2][:2]),sum(parameters[2])]
+        ...         out1 = [parameters[1][0],sum(parameters[1])]
+        ...         out2 = [parameters[0]]
+        ...         return [out0,out1,out2]
+        ...     def supports_evaluate(self):
+        ...         return True
+        >>> um_bridge_model = TestModel()
+        >>> um_bridge_config = {}
+        >>> d = sum(um_bridge_model.get_input_sizes(config=um_bridge_config))
+        >>> true_measure = Uniform(DigitalNetB2(dimension=d,seed=7),lower_bound=-1,upper_bound=1)
+        >>> integrand = UMBridgeWrapper(true_measure,um_bridge_model)
+        >>> x = integrand.discrete_distrib.gen_samples(2**6)
+        >>> x.shape
+        (16, 64, 2)
+        >>> y = integrand.f(x)
+        >>> y.shape
+        (16, 64)
+        >>> muhats = y.mean(-1) 
+        >>> muhats.shape 
+        (16,)
+        >>> muhat_aggregate = muhats.mean(-1)
+        1.8093
+        >>> integrand.to_umbridge_out_sizes(muhat_aggregate)
+        [[-1.1102230246251565e-16, -2.220446049250313e-16, -3.3306690738754696e-16], [-1.1102230246251565e-16, -2.220446049250313e-16], [-9.020562075079397e-17]]
     """
 
     def __init__(self, true_measure, model, config={}, parallel=False):
         """
-        See https://um-bridge-benchmarks.readthedocs.io/en/docs/umbridge/clients.html
-        
         Args:
-            true_measure (AbstractTrueMeasure): a AbstractTrueMeasure instance. 
-            model (umbridge.HTTPModel): a UM-Bridge model 
-            config (dict): config keyword argument to umbridge.HTTPModel(url,name).__call__
-            parallel (int): If parallel is False, 0, or 1: function evaluation is done in serial fashion.
-                Otherwise, parallel specifies the number of processes used by 
-                multiprocessing.Pool or multiprocessing.pool.ThreadPool.
-                Passing parallel=True sets processes = os.cpu_count().
+            true_measure (AbstractTrueMeasure): The true measure.  
+            model (umbridge.HTTPModel): A `UM-Bridge` model. 
+            config (dict): Configuration keyword argument to `umbridge.HTTPModel(url,name).__call__`.
+            parallel (int): Parallelization flag. 
+                
+                - When `parallel = 0` or `parallel = 1` then function evaluation is done in serial fashion.
+                - `parallel > 1` specifies the number of processes used by `multiprocessing.Pool` or `multiprocessing.pool.ThreadPool`.
+            
+                Setting `parallel=True` is equivalent to `parallel = os.cpu_count()`.
         """
         import umbridge
         self.parameters = []
@@ -126,23 +88,25 @@ class UMBridgeWrapper(AbstractIntegrand):
         self.parallel = parallel
         self.d_in_umbridge = np.append(0,np.cumsum(self.model.get_input_sizes(self.config)))
         self.n_d_in_umbridge = len(self.d_in_umbridge)-1
-        if self.d_in_umbridge[-1]!=self.true_measure.d:
-            raise ParameterError("sampler dimension must equal the sum of UMBridgeWrapper input sizes.")
+        if self.true_measure.d!=self.d_in_umbridge[-1]:
+            raise ParameterError("sampler dimension (%d) must equal the sum of UMBridgeWrapper input sizes (%d)."%(self.true_measure.d,self.d_in_umbridge[-1]))
         self.d_out_umbridge = np.append(0,np.cumsum(self.model.get_output_sizes(self.config)))
         self.n_d_out_umbridge = len(self.d_out_umbridge)-1
+        self.total_out_elements = int(self.d_out_umbridge[-1])
         super(UMBridgeWrapper,self).__init__(
-            dimension_indv = int(self.d_out_umbridge[-1]),
-            dimension_comb = int(self.d_out_umbridge[-1]),
+            dimension_indv = () if self.total_out_elements==1 else (self.total_out_elements,),
+            dimension_comb = () if self.total_out_elements==1 else (self.total_out_elements,),
             parallel = self.parallel,
             threadpool = True)
     
     def g(self, t, **kwargs):
-        n = len(t)
-        y = np.zeros((n,self.d_indv[0]),dtype=float)
-        for i in range(n):
-            ti_ll = [t[i,self.d_in_umbridge[j]:self.d_in_umbridge[j+1]].tolist() for j in range(self.n_d_in_umbridge)]
+        y = np.zeros(tuple(t.shape[:-1])+(self.total_out_elements,),dtype=float)
+        idxiterator = np.ndindex(t.shape[:-1])
+        for i in range(idxiterator):
+            ti_ll = [t[*i,self.d_in_umbridge[j]:self.d_in_umbridge[j+1]].tolist() for j in range(self.n_d_in_umbridge)]
             yi_ll = self.model.__call__(ti_ll,self.config)
-            for j,yi_l in enumerate(yi_ll): y[i,self.d_out_umbridge[j]:self.d_out_umbridge[j+1]] = yi_l if len(yi_l)>1 else yi_l[0]
+            for j,yi_l in enumerate(yi_ll):
+                y[*i,self.d_out_umbridge[j]:self.d_out_umbridge[j+1]] = yi_l if len(yi_l)>1 else yi_l[0]
         return y
     
     def _spawn(self, level, sampler):
@@ -152,14 +116,14 @@ class UMBridgeWrapper(AbstractIntegrand):
             config = self.config, 
             parallel = self.parallel)
 
-    def to_umbridge_out_sizes(self, attr):
+    def to_umbridge_out_sizes(self, x):
         """
-        Convert a data attribute to UM-Bridge output sized list of lists. 
+        Convert a data attribute to `UM-Bridge` output sized list of lists. 
         
         Args:
-            attr (np.ndarray): array of length sum(model.get_output_sizes(self.config))
+            x (np.ndarray): Array of length `sum(model.get_output_sizes(self.config))` where `model` is a `umbridge.HTTPModel`. 
         
-        Return:
-            list: list of lists with sub-list lengths specified by model.get_output_sizes(self.config)
+        Returns:
+            x_list_list (list): List of lists with sub-list lengths specified by `model.get_output_sizes(self.config)`.
         """
-        return [attr[self.d_out_umbridge[j]:self.d_out_umbridge[j+1]].tolist() for j in range(self.n_d_out_umbridge)]
+        return [x[...,self.d_out_umbridge[j]:self.d_out_umbridge[j+1]].tolist() for j in range(self.n_d_out_umbridge)]

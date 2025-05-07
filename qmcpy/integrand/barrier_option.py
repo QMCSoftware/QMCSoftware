@@ -110,7 +110,7 @@ class BarrierOption(AbstractIntegrand):
             stock_path (np.ndarray): n samples by d dimension option prices at monitoring times
             dimension (int): number of dimensions
         
-        Return:
+        Returns:
             np.ndarray: n vector of discounted payoffs
         """
         expected_stock = stock_path[:,dimension - 1]

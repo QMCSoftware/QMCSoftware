@@ -15,11 +15,11 @@ class BrownianMotion(Gaussian):
     $$B(t) = B_0 + \gamma t + \sigma W(t).$$
     
     Examples:
-        >>> bm = BrownianMotion(DigitalNetB2(4,seed=7),t_final=2,drift=2)
-        >>> bm(2)
+        >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),t_final=2,drift=2)
+        >>> true_measure(2)
         array([[1.28899119, 1.5262762 , 1.79768913, 2.01868668],
                [0.90670063, 3.37369469, 4.91596715, 5.45562238]])
-        >>> bm
+        >>> true_measure
         BrownianMotion (AbstractTrueMeasure)
             time_vec        [0.5 1.  1.5 2. ]
             drift           2^(1)

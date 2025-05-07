@@ -11,7 +11,7 @@ def _tol_fun(abs_tol, rel_tol, theta, mu, toltype):
         mu (float): true mean
         toltype (str): different options of tolerance function
 
-    Return:
+    Returns:
         float: tolerance as weighted sum of absolute and relative tolerance
     """
     if toltype == 'combine':  # the linear combination of two tolerances

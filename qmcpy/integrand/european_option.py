@@ -76,7 +76,7 @@ class EuropeanOption(AbstractIntegrand):
         """
         Get the fair price of a European call/put option.
         
-        Return:
+        Returns:
             float: fair price
         """
         denom = self.volatility * np.sqrt(self.t_final)

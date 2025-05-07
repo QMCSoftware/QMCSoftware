@@ -4,30 +4,48 @@ from ..true_measure import Uniform
 
 
 class Linear0(AbstractIntegrand):
-    """
-    >>> l = Linear0(DigitalNetB2(100,seed=7))
-    >>> x = l.discrete_distrib.gen_samples(2**10)
-    >>> y = l.f(x)
-    >>> print("%.4e"%y.mean())
-    3.0517e-05
-    >>> ytf = l.f(x,periodization_transform='C1SIN')
-    >>> print("%.4e"%ytf.mean())
-    1.4010e-14
+    r"""
+    Linear Function with analytic mean $0$. 
+
+    $$g(\boldsymbol{t}) = \sum_{j=1}^d t_j \qquad \boldsymbol{T} \sim \mathcal{U}[0,1]^d.$$ 
+
+    Examples: 
+        >>> integrand = Linear0(DigitalNetB2(100,seed=7))
+        >>> x = integrand.discrete_distrib.gen_samples(2**10)
+        >>> y = integrand.f(x)
+        >>> print("%.4e"%y.mean())
+        3.0517e-05
+
+        With independent replications
+
+        >>> integrand = Linear0(DigitalNetB2(100,seed=7,replications=2**4))
+        >>> x = integrand.discrete_distrib.gen_samples(2**6)
+        >>> x.shape
+        (16, 64, 100)
+        >>> y = integrand.f(x)
+        >>> y.shape
+        (16, 64)
+        >>> muhats = y.mean(-1) 
+        >>> muhats.shape 
+        (16,)
+        >>> print("%.4e"%muhats.mean())
+        3.2529e-04
     """
 
     def __init__(self, sampler):
-        """
+        r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
         """
         self.sampler = sampler
         self.true_measure = Uniform(self.sampler, lower_bound=-.5, upper_bound=.5)
-        super(Linear0,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
+        super(Linear0,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)
     
     def g(self, t):
-        y = t.sum(1)
+        y = t.sum(-1)
         return y
 
     def _spawn(self, level, sampler):

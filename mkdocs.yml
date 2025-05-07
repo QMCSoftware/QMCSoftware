@@ -4,6 +4,7 @@ nav:
   - API:
     - Discrete Distributions: discrete_distributions.md
     - True Measures: true_measures.md
+    - Integrands: integrands.md
   # - Demos:
   #   - Fast GP Net: examples/simple/fgp_dnb2.ipynb
   - Community: community.md

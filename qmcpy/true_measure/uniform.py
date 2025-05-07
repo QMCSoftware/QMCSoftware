@@ -11,13 +11,13 @@ class Uniform(AbstractTrueMeasure):
     Uniform distribution, see [https://en.wikipedia.org/wiki/Continuous_uniform_distribution](https://en.wikipedia.org/wiki/Continuous_uniform_distribution). 
 
     Examples:
-        >>> u = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
-        >>> u(4)
+        >>> true_measure = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
+        >>> true_measure(4)
         array([[1.68859325, 2.30405891],
                [0.20403559, 0.71484077],
                [1.203925  , 1.18347694],
                [0.68860467, 2.77292277]])
-        >>> u
+        >>> true_measure
         Uniform (AbstractTrueMeasure)
             lower_bound     [0.  0.5]
             upper_bound     [2 3]

@@ -24,15 +24,15 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             i.e. do *not* pass in interlaced `generating_matrices` and set `alpha>1`, this will apply additional interlacing. 
     
     Examples:
-        >>> dnb2 = DigitalNetB2(2,seed=7)
-        >>> dnb2(4)
+        >>> discrete_distrib = DigitalNetB2(2,seed=7)
+        >>> discrete_distrib(4)
         array([[0.84429662, 0.72162356],
                [0.1020178 , 0.08593631],
                [0.6019625 , 0.27339078],
                [0.34430233, 0.90916911]])
-        >>> dnb2(1) # first point in the sequence
+        >>> discrete_distrib(1) # first point in the sequence
         array([[0.84429662, 0.72162356]])
-        >>> dnb2
+        >>> discrete_distrib
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1

@@ -6,63 +6,76 @@ from scipy.special import gamma
 
 
 class Keister(AbstractIntegrand):
-    """
-    $f(\\boldsymbol{t}) = \\pi^{d/2} \\cos(\\| \\boldsymbol{t} \\|)$.
+    r"""
+    Keister function from [1]. 
 
-    The standard example integrates the Keister integrand with respect to an 
-    IID Gaussian distribution with variance 1./2.
+    $$f(\boldsymbol{t}) = \pi^{d/2} \cos(\lVert \boldsymbol{t} \rVert_2) \qquad \boldsymbol{T} \sim \mathcal{N}(\boldsymbol{0},\mathsf{I}/2).$$
 
-    >>> k = Keister(DigitalNetB2(2,seed=7))
-    >>> x = k.discrete_distrib.gen_samples(2**10)
-    >>> y = k.f(x)
-    >>> print("%.4f"%y.mean())
-    1.8082
-    >>> k.true_measure
-    Gaussian (AbstractTrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     PCA
-    >>> k = Keister(Gaussian(DigitalNetB2(2,seed=7),mean=0,covariance=2))
-    >>> x = k.discrete_distrib.gen_samples(2**12)
-    >>> y = k.f(x)
-    >>> print("%.4f"%y.mean())
-    1.8081
-    >>> yp = k.f(x,periodization_transform='c2sin')
-    >>> print("%.4f"%yp.mean())
-    1.8080
+    Examples:
+        >>> integrand = Keister(DigitalNetB2(2,seed=7))
+        >>> x = integrand.discrete_distrib.gen_samples(2**10)
+        >>> y = integrand.f(x)
+        >>> print("%.4f"%y.mean())
+        1.8067
+        >>> integrand.true_measure
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
 
-    References:
+        With independent replications
 
-        [1] B. D. Keister, Multidimensional Quadrature Algorithms, 
-        `Computers in Physics`, *10*, pp. 119-122, 1996.
+        >>> integrand = Keister(DigitalNetB2(2,seed=7,replications=2**4))
+        >>> x = integrand.discrete_distrib.gen_samples(2**6)
+        >>> x.shape
+        (16, 64, 2)
+        >>> y = integrand.f(x)
+        >>> y.shape
+        (16, 64)
+        >>> muhats = y.mean(-1) 
+        >>> muhats.shape 
+        (16,)
+        >>> print("%.4f"%muhats.mean())
+        1.8093
+
+    **References:**
+
+    1.  B. D. Keister.  
+        Multidimensional Quadrature Algorithms.  
+        Computers in Physics, 10, pp. 119-122, 1996.
     """
 
     def __init__(self, sampler):
-        """
+        r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
         """
         self.sampler = sampler
         self.true_measure = Gaussian(self.sampler,mean=0,covariance=1/2)
-        super(Keister,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
+        super(Keister,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)
     
     def g(self, t):
-        d = t.shape[1]
-        norm = np.sqrt((t**2).sum(1))
+        d = t.shape[-1]
+        norm = np.linalg.norm(t,axis=-1)
         k = np.pi**(d/2)*np.cos(norm)
         return k
     
     def _spawn(self, level, sampler):
         return Keister(sampler=sampler)
 
+    @classmethod
     def exact_integ(self, d):
         """
-        computes the true value of the Keister integral in dimension d.
-        Accuracy might degrade as d increases due to round-off error.
-        :param d:
-        :return: true_integral
+        Compute the exact analytic value of the Keister integral with dimension $d$. 
+
+        Args:
+            d (int): Dimension. 
+        
+        Returns: 
+            mean (float): Exact value of the integral. 
         """
         cosinteg = np.zeros(shape=(d))
         cosinteg[0] = np.sqrt(np.pi) / (2 * np.exp(1 / 4))

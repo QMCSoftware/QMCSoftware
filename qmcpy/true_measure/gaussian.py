@@ -16,13 +16,13 @@ class Gaussian(AbstractTrueMeasure):
         - `Normal` is an alias for `Gaussian`
     
     Examples:
-        >>> g = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2],covariance=[[9,4],[4,5]])
-        >>> g(4)
+        >>> true_measure = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2],covariance=[[9,4],[4,5]])
+        >>> true_measure(4)
         array([[ 4.40778501,  3.00772805],
                [-3.80150101,  1.58605376],
                [ 1.24089995,  3.27516695],
                [ 0.96180008, -0.52004296]])
-        >>> g
+        >>> true_measure
         Gaussian (AbstractTrueMeasure)
             mean            [1 2]
             covariance      [[9 4]

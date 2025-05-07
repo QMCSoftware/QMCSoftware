@@ -12,7 +12,7 @@ def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
         fout_prefix (str): start of output file name. 
             e.g. 'my_poly_lat_vec' 
     
-    Return:
+    Returns:
         str: path to file which can be passed into QMCPy's Lattice or Sobol' in order to use 
              the linked latnetbuilder generating vector/matrix
              e.g. 'my_poly_lat_vec.10.16.npy'

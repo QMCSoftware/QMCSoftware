@@ -18,13 +18,13 @@ class Halton(AbstractLDDiscreteDistribution):
         - QRNG does *not* support multiple replications (independent randomizations).
     
     Examples:
-        >>> halton = Halton(2,seed=7)
-        >>> halton(4)
+        >>> discrete_distrib = Halton(2,seed=7)
+        >>> discrete_distrib(4)
         array([[0.83790457, 0.89981478],
                [0.00986102, 0.4610941 ],
                [0.62236343, 0.02796307],
                [0.29427505, 0.79909098]])
-        >>> halton
+        >>> discrete_distrib
         Halton (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1

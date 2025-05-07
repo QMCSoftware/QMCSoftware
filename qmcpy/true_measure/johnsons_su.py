@@ -11,13 +11,13 @@ class JohnsonsSU(AbstractTrueMeasure):
     Johnson's $S_U$-distribution with independent marginals as described in [https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution](https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution).
 
     Examples:
-        >>> jsu = JohnsonsSU(DigitalNetB2(2,seed=7),gamma=1,xi=2,delta=3,lam=4)
-        >>> jsu(4)
+        >>> true_measure = JohnsonsSU(DigitalNetB2(2,seed=7),gamma=1,xi=2,delta=3,lam=4)
+        >>> true_measure(4)
         array([[ 2.01636624,  1.44849599],
                [-1.32410385, -1.49239458],
                [ 1.00113995, -0.23987417],
                [ 0.06372867,  2.44847546]])
-        >>> jsu
+        >>> true_measure
         JohnsonsSU (AbstractTrueMeasure)
             gamma           1
             xi              2^(1)

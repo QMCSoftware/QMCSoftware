@@ -18,15 +18,15 @@ class Lattice(AbstractLDDiscreteDistribution):
         - The first point of an unrandomized lattice is the origin.
     
     Examples:
-        >>> l = Lattice(2,seed=7)
-        >>> l(4)
+        >>> discrete_distrib = Lattice(2,seed=7)
+        >>> discrete_distrib(4)
         array([[0.04386058, 0.58727432],
                [0.54386058, 0.08727432],
                [0.29386058, 0.33727432],
                [0.79386058, 0.83727432]])
-        >>> l(1) # first point in the sequence
+        >>> discrete_distrib(1) # first point in the sequence
         array([[0.04386058, 0.58727432]])
-        >>> l
+        >>> discrete_distrib
         Lattice (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1
@@ -85,10 +85,10 @@ class Lattice(AbstractLDDiscreteDistribution):
         
         Random generating vector supporting $2^{25}$ points 
 
-        >>> l = Lattice(3,generating_vector=25,seed=55,randomize=False)
-        >>> l.gen_vec
+        >>> discrete_distrib = Lattice(3,generating_vector=25,seed=55,randomize=False)
+        >>> discrete_distrib.gen_vec
         array([[       1, 11961679, 12107519]], dtype=uint64)
-        >>> l(4,warn=False)
+        >>> discrete_distrib(4,warn=False)
         array([[0.  , 0.  , 0.  ],
                [0.5 , 0.5 , 0.5 ],
                [0.25, 0.75, 0.75],
@@ -96,11 +96,11 @@ class Lattice(AbstractLDDiscreteDistribution):
         
         Two random generating vectors both supporting $2^{25}$ points along with independent random shifts
 
-        >>> l = Lattice(3,seed=7,generating_vector=25,replications=2)
-        >>> l.gen_vec
+        >>> discrete_distrib = Lattice(3,seed=7,generating_vector=25,replications=2)
+        >>> discrete_distrib.gen_vec
         array([[       1, 32809149,  1471719],
                [       1,   275319, 19705657]], dtype=uint64)
-        >>> l(4)
+        >>> discrete_distrib(4)
         array([[[0.3691824 , 0.65212985, 0.69669968],
                 [0.8691824 , 0.15212985, 0.19669968],
                 [0.6191824 , 0.90212985, 0.44669968],

@@ -12,23 +12,24 @@ class SciPyWrapper(AbstractTrueMeasure):
     Multivariate distribution with independent marginals from [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html#continuous-distributions).
 
     Examples:
-        >>> unif_gauss_gamma = SciPyWrapper(
+        >>> true_measure = SciPyWrapper(
         ...     sampler = DigitalNetB2(3,seed=7),
         ...     scipy_distribs = [
         ...         scipy.stats.uniform(loc=1,scale=2),
         ...         scipy.stats.norm(loc=3,scale=4),
         ...         scipy.stats.gamma(a=5,loc=6,scale=7)])
-        >>> unif_gauss_gamma.range
+        >>> true_measure.range
         array([[  1.,   3.],
                [-inf,  inf],
                [  6.,  inf]])
-        >>> unif_gauss_gamma(4)
+        >>> true_measure(4)
         array([[ 2.19095365, 10.91497366, 44.06314171],
                [ 1.8834004 ,  1.94882115, 24.81117897],
                [ 2.69736377, -0.67521937, 30.12172737],
                [ 1.37601847,  5.01292061, 50.09489436]])
-        >>> betas_2d = SciPyWrapper(sampler=DigitalNetB2(2,seed=7),scipy_distribs=scipy.stats.beta(a=5,b=1))
-        >>> betas_2d(4)
+        
+        >>> true_measure = SciPyWrapper(sampler=DigitalNetB2(2,seed=7),scipy_distribs=scipy.stats.beta(a=5,b=1))
+        >>> true_measure(4)
         array([[0.96671623, 0.93683292],
                [0.63348332, 0.61211827],
                [0.90347031, 0.77153702],

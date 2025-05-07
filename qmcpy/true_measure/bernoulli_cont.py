@@ -9,13 +9,13 @@ class BernoulliCont(AbstractTrueMeasure):
     Continuous Bernoulli distribution with independent marginals as described in [https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution](https://en.wikipedia.org/wiki/Continuous_Bernoulli_distribution).
 
     Examples: 
-        >>> bc = BernoulliCont(DigitalNetB2(2,seed=7),lam=.2)
-        >>> bc(4)
+        >>> true_measure = BernoulliCont(DigitalNetB2(2,seed=7),lam=.2)
+        >>> true_measure(4)
         array([[0.72351141, 0.56205914],
                [0.05741849, 0.04805839],
                [0.43318125, 0.16552571],
                [0.21547493, 0.82617132]])
-        >>> bc
+        >>> true_measure
         BernoulliCont (AbstractTrueMeasure)
             lam             0.200
         

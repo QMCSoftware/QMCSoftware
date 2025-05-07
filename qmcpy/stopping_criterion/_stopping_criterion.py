@@ -39,7 +39,7 @@ class StoppingCriterion(object):
         """
         ABSTRACT METHOD to determine the number of samples needed to satisfy the tolerance.
 
-        Return:
+        Returns:
             tuple: tuple containing:
                 - solution (float): approximation to the integral
                 - data (AccumulateData): an AccumulateData object
@@ -57,7 +57,7 @@ class StoppingCriterion(object):
         Args:
             alphas_comb (np.ndarray): desired uncertainty levels on combined solutions. 
         
-        Return:
+        Returns:
             np.ndarray: uncertainty levels on individual solutions"""
         alphas_indv = np.tile(1,self.integrand.d_indv)
         identity_dependency = True

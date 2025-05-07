@@ -113,7 +113,7 @@ class MLCallOptions(AbstractIntegrand):
             xf (np.ndarray): n vector of fine samples values = self.k
             xc (np.ndarray): n vector of coarse samples = self.k
 
-        Return:
+        Returns:
             tuple: \
                 First, an np.ndarray of payoffs from fine paths. \
                 Second, an np.ndarray of payoffs from coarse paths.
@@ -148,7 +148,7 @@ class MLCallOptions(AbstractIntegrand):
             xf (np.ndarray): n vector of fine samples values = self.k
             xc (np.ndarray): n vector of coarse samples = self.k
 
-        Return:
+        Returns:
             tuple: \
                 First, an np.ndarray of payoffs from fine paths. \
                 Second, an np.ndarray of payoffs from coarse paths.

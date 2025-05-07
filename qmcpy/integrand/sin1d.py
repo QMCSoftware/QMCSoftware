@@ -4,24 +4,52 @@ from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
 
 class Sin1d(AbstractIntegrand):
-    """
-    >>> sin1d = Sin1d(DigitalNetB2(1,seed=7))
-    >>> x = sin1d.discrete_distrib.gen_samples(2**10)
-    >>> y = sin1d.f(x)
-    >>> print("%.4e"%y.mean())
-    -7.3732e-08
-    >>> sin1d.true_measure
-    Uniform (AbstractTrueMeasure Object)
-        lower_bound     0
-        upper_bound     6.283
+    r"""
+    Sine function in $d=1$ dimension.  
+
+    $$g(t) = \sin(t), \qquad t \sim \mathcal{U}[0,2\pi k]$$
+
+    Examples:
+        >>> integrand = Sin1d(DigitalNetB2(1,seed=7),k=1)
+        >>> x = integrand.discrete_distrib.gen_samples(2**10)
+        >>> y = integrand.f(x)
+        >>> print("%.4e"%y.mean())
+        -7.3344e-08
+        >>> integrand.true_measure
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     6.283
+        
+        With independent replications
+
+        >>> integrand = Sin1d(DigitalNetB2(1,seed=7,replications=2**4),k=1)
+        >>> x = integrand.discrete_distrib.gen_samples(2**6)
+        >>> x.shape
+        (16, 64, 1)
+        >>> y = integrand.f(x)
+        >>> y.shape
+        (16, 64)
+        >>> muhats = y.mean(-1) 
+        >>> muhats.shape 
+        (16,)
+        >>> print("%.4e"%muhats.mean())
+        5.8311e-04
     """
     def __init__(self, sampler, k=1):
+        r"""
+        Args:
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            k (float): The true measure will be uniform between $0$ and $2 \pi k$.
+        """
         self.sampler = sampler
         self.k = k
         assert self.sampler.d==1
         self.true_measure = Uniform(self.sampler,lower_bound=0,upper_bound=2*self.k*np.pi)
-        super(Sin1d,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
+        super(Sin1d,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)
     def g(self, t):
-        return np.sin(t.squeeze())
+        return np.sin(t[...,0])
     def _spawn(self, level, sampler):
         return Sin1d(sampler=sampler,k=self.k)

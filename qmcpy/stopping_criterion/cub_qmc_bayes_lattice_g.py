@@ -135,7 +135,7 @@ class CubBayesLatticeG(_CubBayesLDG):
         Args:
             ynext (np.ndarray): next samples
 
-        Return:
+        Returns:
             np.ndarray: y and ynext combined and transformed
         """
         y = np.array([], dtype=complex)

@@ -94,7 +94,7 @@ class AsianOption(AbstractIntegrand):
             stock_path (np.ndarray): n samples by d dimension option prices at monitoring times
             dimension (int): number of dimensions
         
-        Return:
+        Returns:
             np.ndarray: n vector of discounted payoffs
         """
         if self.mean_type == 'arithmetic':

@@ -21,7 +21,7 @@ class AbstractIntegrand(object):
                 - `parallel > 1` specifies the number of processes used by `multiprocessing.Pool` or `multiprocessing.pool.ThreadPool`.
             
                 Setting `parallel=True` is equivalent to `parallel = os.cpu_count()`.
-            threadpool (bool): When `parallel > 1: 
+            threadpool (bool): When `parallel > 1`: 
                 
                 - Setting `threadpool = True` will use `multiprocessing.pool.ThreadPool`.
                 - Setting `threadpool = False` will use `setting multiprocessing.Pool`.
@@ -62,8 +62,8 @@ class AbstractIntegrand(object):
                 then the function is only required to evaluate the second output and may leave the remaining outputs as `np.nan` values,  
                 i.e., the outputs corresponding to `compute_flags` which are `False` will not be used in the computation.
 
-        Return:
-            y (np.ndarray): function evaluations with shape `(*batch_shape, *dimension_indv)` where `dimension_indv` is the batch shape of the function outputs. 
+        Returns:
+            y (np.ndarray): function evaluations with shape `(*batch_shape, *dimension_indv)` where `dimension_indv` is the shape of the function outputs. 
         """
         raise MethodImplementationError(self, 'g')
 
@@ -74,25 +74,24 @@ class AbstractIntegrand(object):
 
         Args:
             x (np.ndarray): Inputs with shape `(*batch_shape, d)`.
-            periodization_transform (str): Periodization transform. Options 
-            are: 
+            periodization_transform (str): Periodization transform. Options are: 
 
-                - `False`: No periodizing transform. 
-                - `'BAKER'`: Baker tansform.
-                - `'C0'`: $C^0$ transform. 
-                - `'C1'`: $C^1$ transform. 
-                - `'C1SIN'`: Sidi $C^1$ transform. 
-                - `'C2SIN'`: Sidi $C^2$ transform. 
-                - `'C3SIN'`: Sidi $C^3$ transform. 
+                - `False`: No periodizing transform, $\psi(x) = x$. 
+                - `'BAKER'`: Baker tansform $\psi(x) = 1-2\lvert x-1/2 \rvert$.
+                - `'C0'`: $C^0$ transform $\psi(x) = 3x^2-2x^3$.
+                - `'C1'`: $C^1$ transform $\psi(x) = x^3(10-15x+6x^2)$.
+                - `'C1SIN'`: Sidi $C^1$ transform $\psi(x) = x-\sin(2 \pi x)/(2 \pi)$. 
+                - `'C2SIN'`: Sidi $C^2$ transform $\psi(x) = (8-9 \cos(\pi x)+\cos(3 \pi x))/16$.
+                - `'C3SIN'`: Sidi $C^3$ transform $\psi(x) = (12\pi x-8\sin(2 \pi x) + \sin(4 \pi x))/(12 \pi)$.
             compute_flags (np.ndarray): Flags indicating which outputs require evaluation.  
                 For example, if the vector function has 3 outputs and `compute_flags = [False, True, False]`, 
                 then the function is only required to evaluate the second output and may leave the remaining outputs as `np.nan` values,  
                 i.e., the outputs corresponding to `compute_flags` which are `False` will not be used in the computation.
-            *args: Other ordered args to `g`
+            *args (tuple): Other ordered args to `g`.
             **kwargs (dict): Other keyword args to `g`.
 
-        Return:
-            y (np.ndarray): function evaluations with shape `(*batch_shape, *dimension_indv)` where `dimension_indv` is the batch shape of the function outputs. 
+        Returns:
+            y (np.ndarray): function evaluations with shape `(*batch_shape, *dimension_indv)` where `dimension_indv` is the shape of the function outputs. 
         """
         periodization_transform = str(periodization_transform).upper()
         compute_flags = np.tile(1,self.d_indv) if compute_flags is None else np.atleast_1d(compute_flags)
@@ -179,7 +178,9 @@ class AbstractIntegrand(object):
     def bound_fun(self, bound_low, bound_high):
         """
         Compute the bounds on the combined function based on bounds for the
-        individual functions. Defaults to the identity where we essentially
+        individual functions.  
+
+        Defaults to the identity where we essentially
         do not combine integrands, but instead integrate each function
         individually.
 
@@ -187,12 +188,11 @@ class AbstractIntegrand(object):
             bound_low (np.ndarray): length AbstractIntegrand.d_indv lower error bound
             bound_high (np.ndarray): length AbstractIntegrand.d_indv upper error bound
 
-        Return:
-            (tuple) containing
-
-            - (np.ndarray): lower bound on function combining estimates
-            - (np.ndarray): upper bound on function combining estimates
-            - (np.ndarray): bool flags to override sufficient combined integrand estimation, e.g., when approximating a ratio of integrals, if the denominator's bounds straddle 0, then returning True here forces ratio to be flagged as insufficiently approximated.
+        Returns:
+            comb_bound_low (np.ndarray): Lower bound on function combining estimates.
+            comb_bound_high (np.ndarray): Upper bound on function combining estimates.
+            comb_compute_flags (np.ndarray): Bool flags to override sufficient combined integrand estimation,  
+                e.g., when approximating a ratio of integrals, if the denominator's bounds straddle 0, then returning `True` here forces ratio to be flagged as insufficiently approximated.
         """
         if self.d_indv!=self.d_comb:
             raise ParameterError('''
@@ -205,6 +205,7 @@ class AbstractIntegrand(object):
     def dependency(self, comb_flags):
         """
         Takes a vector of indicators of weather of not the error bound is satisfied for combined integrands and returns flags for individual integrands.  
+        
         For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio
         has not been approximated to within the tolerance, so the dependency function should return [True,True]
         indicating that both the numerator and denominator integrands need to be better approximated.
@@ -212,7 +213,7 @@ class AbstractIntegrand(object):
         Args:
             comb_flags (np.ndarray): Bool flags indicating weather the combined integrals are insufficiently approximated.
 
-        Return:
+        Returns:
             indv_flags (np.ndarray): Bool flags for individual integrands. 
         """
         return comb_flags if self.d_indv==self.d_comb else np.tile((comb_flags==False).any(),self.d_indv)
@@ -229,7 +230,7 @@ class AbstractIntegrand(object):
         Args:
             level (int): level at which to return the dimension
 
-        Return:
+        Returns:
             int: dimension at input level
         """
         if self.leveltype!='single':
@@ -243,7 +244,7 @@ class AbstractIntegrand(object):
         Args:
             levels (np.ndarray): Vector of levels at which to spawn new integrands.
 
-        Return:
+        Returns:
             integrand_spawns (list): AbstractIntegrand instances with newly spawned TrueMeasures and DiscreteDistributions
         """
         levels = np.array([levels]) if np.isscalar(levels) else np.array(levels)

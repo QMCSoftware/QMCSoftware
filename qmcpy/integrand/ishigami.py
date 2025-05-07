@@ -6,32 +6,32 @@ from ..util import ParameterError
 
 class Ishigami(AbstractIntegrand):
     r"""
-    $$g(\\boldsymbol{t}) = (1+bt_2^4)\\sin(t_0) + a\\sin^2(t_1), \\qquad T \\sim \\mathcal{U}(-\\pi,\\pi)^3$$
+    Ishigami function in $d=3$ dimensions from [1] and [https://www.sfu.ca/~ssurjano/ishigami.html](https://www.sfu.ca/~ssurjano/ishigami.html). 
 
-    [https://www.sfu.ca/~ssurjano/ishigami.html](https://www.sfu.ca/~ssurjano/ishigami.html)
+    $$g(\boldsymbol{t}) = (1+bt_2^4)\sin(t_0)+a\sin^2(t_1), \qquad \boldsymbol{T} = (T_0,T_1,T_2) \sim \mathcal{U}(-\pi,\pi)^3.$$
     
     Examples:
-        >>> ishigami = Ishigami(DigitalNetB2(3,seed=7))
-        >>> x = ishigami.discrete_distrib.gen_samples(2**10)
+        >>> integrand = Ishigami(DigitalNetB2(3,seed=7))
+        >>> x = integrand.discrete_distrib.gen_samples(2**10)
         >>> x.shape 
         (1024, 3)
-        >>> y = ishigami.f(x)
+        >>> y = integrand.f(x)
         >>> y.shape 
         (1024,)
         >>> print("%.4f"%y.mean())
         3.5015
-        >>> ishigami.true_measure
+        >>> integrand.true_measure
         Uniform (AbstractTrueMeasure)
             lower_bound     -3.142
             upper_bound     3.142
         
         With independent replications
 
-        >>> ishigami = Ishigami(DigitalNetB2(3,seed=7,replications=16))
-        >>> x = ishigami.discrete_distrib.gen_samples(2**6)
+        >>> integrand = Ishigami(DigitalNetB2(3,seed=7,replications=2**4))
+        >>> x = integrand.discrete_distrib.gen_samples(2**6)
         >>> x.shape
         (16, 64, 3)
-        >>> y = ishigami.f(x)
+        >>> y = integrand.f(x)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(-1) 
@@ -44,16 +44,18 @@ class Ishigami(AbstractIntegrand):
 
     1.  Ishigami, T., & Homma, T.  
         An importance quantification technique in uncertainty analysis for computer models.  
-        In Uncertainty Modeling and Analysis, 1990. Proceedings., First International Symposium on (pp. 398-403). IEEE. (1990, December). 
+        In Uncertainty Modeling and Analysis, 1990.  
+        Proceedings, First International Symposium on (pp. 398-403). IEEE.
     """
     def __init__(self,sampler, a=7, b=.1):
-        """
+        r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform
-            a (float): first paramter
-            b (float): second parameter
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            a (float): First parameter $a$.
+            b (float): Second parameter $b$.
         """
         self.sampler = sampler
         if self.sampler.d != 3:

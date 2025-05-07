@@ -10,13 +10,13 @@ class Kumaraswamy(AbstractTrueMeasure):
     Kumaraswamy distribution as described in [https://en.wikipedia.org/wiki/Kumaraswamy_distribution](https://en.wikipedia.org/wiki/Kumaraswamy_distribution).
     
     Examples:
-        >>> k = Kumaraswamy(DigitalNetB2(2,seed=7),a=[1,2],b=[3,4])
-        >>> k(4)
+        >>> true_measure = Kumaraswamy(DigitalNetB2(2,seed=7),a=[1,2],b=[3,4])
+        >>> true_measure(4)
         array([[0.46202015, 0.5230962 ],
                [0.0352327 , 0.14904135],
                [0.26440066, 0.27701523],
                [0.13123721, 0.67157846]])
-        >>> k
+        >>> true_measure
         Kumaraswamy (AbstractTrueMeasure)
             a               [1 2]
             b               [3 4]

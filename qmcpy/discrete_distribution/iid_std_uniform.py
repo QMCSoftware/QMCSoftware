@@ -14,18 +14,18 @@ class IIDStdUniform(AbstractIIDDiscreteDistribution):
             but since we are using an `IIDStdUniform` instance it gives different points every call. 
     
     Examples:
-        >>> dd = IIDStdUniform(dimension=2,seed=7)
-        >>> dd(4)
+        >>> discrete_distrib = IIDStdUniform(dimension=2,seed=7)
+        >>> discrete_distrib(4)
         array([[0.04386058, 0.58727432],
                [0.3691824 , 0.65212985],
                [0.69669968, 0.10605352],
                [0.63025643, 0.13630282]])
-        >>> dd(4) # gives new samples every time
+        >>> discrete_distrib(4) # gives new samples every time
         array([[0.5968363 , 0.0576251 ],
                [0.2028797 , 0.22909681],
                [0.1366783 , 0.75220658],
                [0.84501765, 0.56269008]])
-        >>> dd
+        >>> discrete_distrib
         IIDStdUniform (AbstractIIDDiscreteDistribution)
             d               2^(1)
             replications    1

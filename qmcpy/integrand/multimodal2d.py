@@ -4,24 +4,51 @@ from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
 
 class Multimodal2d(AbstractIntegrand):
-    """
-    >>> mm2d = Multimodal2d(DigitalNetB2(2,seed=7))
-    >>> x = mm2d.discrete_distrib.gen_samples(2**10)
-    >>> y = mm2d.f(x)
-    >>> print("%.4f"%y.mean())
-    -0.7375
-    >>> mm2d.true_measure
-    Uniform (AbstractTrueMeasure Object)
-        lower_bound     [-4 -3]
-        upper_bound     [7 8]
+    r"""
+    Multimodal function in $d=2$ dimensions. 
+
+    $$g(\boldsymbol{t}) = (t_0^2+4)(t_1-1)/20-\sin(5t_0/2)-2 \qquad \boldsymbol{T} = (T_0,T_1) \sim \mathcal{U}([-4,7] \times [-3,8]).$$
+
+    Examples:
+        >>> integrand = Multimodal2d(DigitalNetB2(2,seed=7))
+        >>> x = integrand.discrete_distrib.gen_samples(2**10)
+        >>> y = integrand.f(x)
+        >>> print("%.4f"%y.mean())
+        -0.7375
+        >>> integrand.true_measure
+        Uniform (AbstractTrueMeasure)
+            lower_bound     [-4 -3]
+            upper_bound     [7 8]
+
+        With independent replications
+
+        >>> integrand = Multimodal2d(DigitalNetB2(2,seed=7,replications=2**4))
+        >>> x = integrand.discrete_distrib.gen_samples(2**6)
+        >>> x.shape
+        (16, 64, 2)
+        >>> y = integrand.f(x)
+        >>> y.shape
+        (16, 64)
+        >>> muhats = y.mean(-1) 
+        >>> muhats.shape 
+        (16,)
+        >>> print("%.4f"%muhats.mean())
+        -0.7427
     """
     def __init__(self, sampler):
+        r"""
+        Args:
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+        """
         self.sampler = sampler 
         assert self.sampler.d==2
         self.true_measure = Uniform(self.sampler,lower_bound=[-4,-3],upper_bound=[7,8])
-        super(Multimodal2d,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
+        super(Multimodal2d,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)
     def g(self, t):
-        t0,t1 = t[:,0],t[:,1]
+        t0,t1 = t[...,0],t[...,1]
         return (t0**2+4)*(t1-1)/20-np.sin(5*t0/2)-2
     def _spawn(self, level, sampler):
         return Multimodal2d(sampler=sampler) 

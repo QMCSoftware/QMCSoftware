@@ -13,13 +13,13 @@ class Matern(Gaussian):
     A Gaussian process with Matérn covariance kernel, see [`sklearn.gaussian_process.kernels.Matern`](https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.kernels.Matern.html) or [https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function](https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function).
 
     Examples:
-        >>> m = Matern(DigitalNetB2(dimension=3,seed=7),points=np.linspace(0,1,3)[:,None],nu=3/2,length_scale=[3,4,5],variance=0.01,mean=np.array([.3,.4,.5]))
-        >>> m(4)
+        >>> true_measure = Matern(DigitalNetB2(dimension=3,seed=7),points=np.linspace(0,1,3)[:,None],nu=3/2,length_scale=[3,4,5],variance=0.01,mean=np.array([.3,.4,.5]))
+        >>> true_measure(4)
         array([[0.36584129, 0.41955332, 0.4863312 ],
                [0.27844263, 0.38959308, 0.48847698],
                [0.38043141, 0.50676846, 0.61755968],
                [0.22511911, 0.30830933, 0.40481964]])
-        >>> m
+        >>> true_measure
         Matern (AbstractTrueMeasure)
             mean            [0.3 0.4 0.5]
             covariance      [[0.01  0.01  0.01 ]
