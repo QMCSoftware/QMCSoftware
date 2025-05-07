@@ -5,9 +5,12 @@ import numpy as np
 
 class AbstractTrueMeasure(object):
 
-    def __init__(self, domain, range):
-        self.domain = domain 
-        self.range = range 
+    def __init__(self):
+        prefix = 'A concrete implementation of TrueMeasure must have '
+        if not hasattr(self,'domain'):
+            raise ParameterError(prefix + 'self.domain, 2xd ndarray of domain lower bounds (first col) and upper bounds (second col)')
+        if not hasattr(self,'range'):
+            raise ParameterError(prefix + 'self.range, 2xd ndarray of range lower bounds (first col) and upper bounds (second col)')
         if not hasattr(self,'parameters'):
             self.parameters = []
     
@@ -84,6 +87,10 @@ class AbstractTrueMeasure(object):
         else:
             return t
         
+    def _transform(self, x): 
+        """ Transformation from the standard uniform to the true measure distribution. """
+        raise MethodImplementationError(self,'_transform. Try setting sampler to be in a PDF AbstractTrueMeasure to importance sample by.')
+   
     def _weight(self, x):
         """
         Non-negative weight function.  
@@ -97,11 +104,7 @@ class AbstractTrueMeasure(object):
             np.ndarray: length n vector of weights at locations of x
         """ 
         raise MethodImplementationError(self,'weight. Try a different true measure with a _weight method.') 
-    
-    def _transform(self, x): 
-        """ Transformation from the standard uniform to the true measure distribution. """
-        raise MethodImplementationError(self,'_transform. Try setting sampler to be in a PDF AbstractTrueMeasure to importance sample by.')
-    
+     
     def spawn(self, s=1, dimensions=None):
         r"""
         Spawn new instances of the current true measure but with new seeds and dimensions.
