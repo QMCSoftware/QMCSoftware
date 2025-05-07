@@ -7,26 +7,44 @@ from scipy.stats import norm
 
 class JohnsonsSU(AbstractTrueMeasure):
     """
-    >>> jsu = JohnsonsSU(DigitalNetB2(2,seed=7),gamma=1,xi=2,delta=3,lam=4)
-    >>> jsu.gen_samples(4)
-    array([[-1.66790878, -1.58770999],
-           [ 1.85795234,  1.54353235],
-           [-0.06077722,  2.66089215],
-           [ 0.89373077, -0.27712026]])
-    >>> jsu
-    JohnsonsSU (AbstractTrueMeasure Object)
-        gamma           1
-        xi              2^(1)
-        delta           3
-        lam             2^(2)
-    
-    See https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution
+    Johnson's $S_U$-distribution as described in  
+        [https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution](https://en.wikipedia.org/wiki/Johnson%27s_SU-distribution)
+
+    Examples:
+        >>> jsu = JohnsonsSU(DigitalNetB2(2,seed=7),gamma=1,xi=2,delta=3,lam=4)
+        >>> jsu.gen_samples(4)
+        array([[ 2.01636624,  1.44849599],
+               [-1.32410385, -1.49239458],
+               [ 1.00113995, -0.23987417],
+               [ 0.06372867,  2.44847546]])
+        >>> jsu
+        JohnsonsSU (AbstractTrueMeasure)
+            gamma           1
+            xi              2^(1)
+            delta           3
+            lam             2^(2)
+        
+        With independent replications 
+
+        >>> x = JohnsonsSU(DigitalNetB2(3,seed=7,replications=2),gamma=1,xi=2,delta=3,lam=4)(4)
+        >>> x.shape 
+        (2, 4, 3)
+        >>> x
+        array([[[ 0.55992296,  2.2784546 ,  2.16861887],
+                [ 1.41105244, -0.04838148, -0.02537328],
+                [-0.68192959, -1.79235591, -1.38495084],
+                [ 3.63367216,  1.13841536,  0.925656  ]],
+        <BLANKLINE>
+               [[-0.36735335, -0.71750135,  1.55387818],
+                [ 2.06780495,  0.74576665, -0.87182718],
+                [ 0.56217067,  2.4415253 ,  0.37817106],
+                [ 1.07437016, -0.31895032,  3.34089204]]])
     """
 
     def __init__(self, sampler, gamma=1, xi=1, delta=2, lam=2):
         """
         Args:
-            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             gamma (np.ndarray): gamma
@@ -58,7 +76,8 @@ class JohnsonsSU(AbstractTrueMeasure):
             raise DimensionError("all Johnson's S_U parameters be scalar or have length equal to dimension.")
         if (self._delta<=0).any() or (self._lam<=0).any():
             raise ParameterError("delta and lam (lambda) must be greater than 0")
-        super(JohnsonsSU,self).__init__() 
+        super(JohnsonsSU,self).__init__()
+        assert self._gamma.shape==(self.d,) and self._xi.shape==(self.d,) and self._delta.shape==(self.d,) and self._lam.shape==(self.d,)
 
     def _transform(self, x):
         return self._lam*np.sinh((norm.ppf(x)-self._gamma)/self._delta)+self._xi
@@ -67,7 +86,7 @@ class JohnsonsSU(AbstractTrueMeasure):
         term1 = (x-self._xi)/self._lam
         term2 = self._delta/(self._lam*np.sqrt(2*np.pi)) * 1/np.sqrt(1+term1**2)
         term3 = np.exp(-1/2*(self._gamma+self._delta*np.arcsinh(term1))**2)
-        return np.prod( term2*term3, 1)
+        return np.prod(term2*term3,-1)
     
     def _spawn(self, sampler, dimension):
         if dimension==self.d: # don't do anything if the dimension doesn't change

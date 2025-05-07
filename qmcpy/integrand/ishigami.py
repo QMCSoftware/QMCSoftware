@@ -30,7 +30,7 @@ class Ishigami(Integrand):
     def __init__(self,sampler, a=7, b=.1):
         """
         Args:
-            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
             a (float): first paramter

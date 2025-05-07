@@ -8,35 +8,57 @@ import scipy.stats
 
 class SciPyWrapper(AbstractTrueMeasure):
     """
-    Multivariate True Measure from Independent SciPy 1 Dimensional Marginals
+    Multivariate distribution with independent marginals from [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html#continuous-distributions)
 
-    >>> unif_gauss_gamma = SciPyWrapper(
-    ...     discrete_distrib = DigitalNetB2(3,seed=7),
-    ...     scipy_distribs = [
-    ...         scipy.stats.uniform(loc=1,scale=2),
-    ...         scipy.stats.norm(loc=3,scale=4),
-    ...         scipy.stats.gamma(a=5,loc=6,scale=7)])
-    >>> unif_gauss_gamma.range
-    array([[  1.,   3.],
-           [-inf,  inf],
-           [  6.,  inf]])
-    >>> unif_gauss_gamma.gen_samples(4)
-    array([[ 2.53470309,  0.35273007, 56.37744157],
-           [ 1.35215166,  7.42509911, 33.50121705],
-           [ 2.04111416,  3.83592672, 28.72235698],
-           [ 1.8447669 , -4.11180523, 48.44339757]])
-    >>> betas_2d = SciPyWrapper(discrete_distrib=DigitalNetB2(2,seed=7),scipy_distribs=scipy.stats.beta(a=5,b=1))
-    >>> betas_2d.gen_samples(4)
-    array([[0.59010522, 0.60012506],
-           [0.9597241 , 0.9427888 ],
-           [0.79325286, 0.98608598],
-           [0.89417617, 0.76694864]])
+    Examples:
+        >>> unif_gauss_gamma = SciPyWrapper(
+        ...     discrete_distrib = DigitalNetB2(3,seed=7),
+        ...     scipy_distribs = [
+        ...         scipy.stats.uniform(loc=1,scale=2),
+        ...         scipy.stats.norm(loc=3,scale=4),
+        ...         scipy.stats.gamma(a=5,loc=6,scale=7)])
+        >>> unif_gauss_gamma.range
+        array([[  1.,   3.],
+               [-inf,  inf],
+               [  6.,  inf]])
+        >>> unif_gauss_gamma.gen_samples(4)
+        array([[ 2.19095365, 10.91497366, 44.06314171],
+               [ 1.8834004 ,  1.94882115, 24.81117897],
+               [ 2.69736377, -0.67521937, 30.12172737],
+               [ 1.37601847,  5.01292061, 50.09489436]])
+        >>> betas_2d = SciPyWrapper(discrete_distrib=DigitalNetB2(2,seed=7),scipy_distribs=scipy.stats.beta(a=5,b=1))
+        >>> betas_2d.gen_samples(4)
+        array([[0.96671623, 0.93683292],
+               [0.63348332, 0.61211827],
+               [0.90347031, 0.77153702],
+               [0.80795653, 0.98113537]])
+        
+        With independent replications 
+
+        >>> x = SciPyWrapper(
+        ...     discrete_distrib = DigitalNetB2(3,seed=7,replications=2),
+        ...     scipy_distribs = [
+        ...         scipy.stats.uniform(loc=1,scale=2),
+        ...         scipy.stats.norm(loc=3,scale=4),
+        ...         scipy.stats.gamma(a=5,loc=6,scale=7)])(4)
+        >>> x.shape 
+        (2, 4, 3)
+        >>> x
+        array([[[ 1.95375631,  7.83469056, 58.69999116],
+                [ 2.42443182,  1.09595201, 32.25281658],
+                [ 1.37618274, -3.13023855, 22.80335185],
+                [ 2.97173004,  4.4348268 , 41.85528858]],
+        <BLANKLINE>
+               [[ 1.49306553, -0.62826013, 49.7677589 ],
+                [ 2.7066731 ,  3.29637908, 25.86136036],
+                [ 1.9550199 ,  8.32190075, 35.98916544],
+                [ 2.24482935,  0.38352943, 78.38813322]]])
     """
     
     def __init__(self, discrete_distrib, scipy_distribs):
         """
         Args:
-            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             scipy_distribs (list): instantiated CONTINUOUS UNIVARIATE scipy.stats distributions 
@@ -58,12 +80,19 @@ class SciPyWrapper(AbstractTrueMeasure):
             raise DimensionError("length of scipy_distribs must match the dimension of the discrete_distrib")
         self.range = np.array([sd.interval(1) for sd in self.sds])
         super(SciPyWrapper,self).__init__()
+        assert len(self.sds)==self.d and all(isinstance(sdsi,scipy.stats._distn_infrastructure.rv_continuous_frozen) for sdsi in self.sds)
 
     def _transform(self, x):
-        return np.array([self.sds[j].ppf(x[:,j]) for j in range(self.d)],dtype=float).T
+        t = np.empty_like(x) 
+        for j in range(self.d):
+            t[...,j] = self.sds[j].ppf(x[...,j])
+        return t
     
     def _weight(self, x):
-        return np.array([self.sds[j].pdf(x[:,j]) for j in range(self.d)],dtype=float).T.prod(1)
+        rho = np.empty_like(x)
+        for j in range(self.d):
+            rho[...,j] = self.sds[j].pdf(x[:,j])
+        return np.prod(rho,-1)
     
     def _spawn(self, sampler, dimension):
         return SciPyWrapper(sampler,self.scipy_distrib)

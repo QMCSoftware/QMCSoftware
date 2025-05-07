@@ -35,7 +35,7 @@ class BoxIntegral(Integrand):
     def __init__(self, sampler, s=np.array([1,2])):
         """
         Args:
-            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
             s (list or np.ndarray): vectorized s parameter, len(s) is the number of vectorized integrals to evaluate.

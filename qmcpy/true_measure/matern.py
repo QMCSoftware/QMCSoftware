@@ -7,59 +7,67 @@ import numpy as np
 from scipy.special import kv, gamma
 
 class Matern(Gaussian):
-    """
-    A normal measure using a Matern kernel as the covariance matrix.
-    >>> mean = np.full(31, 1.1)
-    >>> x_values = np.arange(31.0) / 30.0 #[0, 1/30, ..., 1]
-    >>> m = Matern(Lattice(dimension=31, seed=7), x_values, length_scale = 0.5, variance = 0.01, mean=mean)
-    >>> m
-    Matern (AbstractTrueMeasure Object)
-        mean            [1.1 1.1 1.1 ... 1.1 1.1 1.1]
-        covariance      [[0.01  0.01  0.01  ... 0.002 0.002 0.001]
-                        [0.01  0.01  0.01  ... 0.002 0.002 0.002]
-                        [0.01  0.01  0.01  ... 0.002 0.002 0.002]
-                        ...
-                        [0.002 0.002 0.002 ... 0.01  0.01  0.01 ]
-                        [0.002 0.002 0.002 ... 0.01  0.01  0.01 ]
-                        [0.001 0.002 0.002 ... 0.01  0.01  0.01 ]]
-        decomp_type     PCA
-    >>> m.gen_samples(1)
-    array([[0.98982459, 0.99436558, 0.9985705 , 0.99537541, 0.98332323,
-            0.97012349, 0.96397891, 0.9563429 , 0.95509076, 0.95367365,
-            0.94488316, 0.93887217, 0.9447937 , 0.94984784, 0.95086118,
-            0.95391034, 0.95711649, 0.96437995, 0.96164923, 0.95571374,
-            0.95318471, 0.95162953, 0.9486336 , 0.94254554, 0.93762367,
-            0.93127782, 0.93008568, 0.93477752, 0.9510726 , 0.96926194,
-            0.98501258]])
-    >>> x_values = np.array([0, 1, 2])
-    >>> mean = np.full(3, 1.1)
-    >>> m3 = Matern(Lattice(dimension = 3,seed=7), x_values, length_scale = 0.5, nu = 3.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
-    >>> m3
-    Matern (AbstractTrueMeasure Object)
-        mean            [1.1 1.1 1.1]
-        covariance      [[1.000e-02 1.378e-03 3.432e-05]
-                        [1.378e-03 1.000e-02 1.378e-03]
-                        [3.432e-05 1.378e-03 1.000e-02]]
-        decomp_type     CHOLESKY
+    r"""
+    A `Gaussian` with Matérn covariance kernel, see  
+        [https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.kernels.Matern.html](https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.kernels.Matern.html) and  
+        [https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function](https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function)
 
-     References:
+    Examples:
+        >>> x_values = np.array([0, 1, 2])
+        >>> mean = np.full(3, 1.1)
+        >>> m3 = Matern(Lattice(dimension = 3,seed=7), x_values, length_scale = 0.5, nu = 3.5, variance = 0.01, mean=mean, decomp_type = 'Cholesky')
+        >>> m3
+        Matern (AbstractTrueMeasure)
+            mean            [1.1 1.1 1.1]
+            covariance      [[1.000e-02 1.378e-03 3.432e-05]
+                            [1.378e-03 1.000e-02 1.378e-03]
+                            [3.432e-05 1.378e-03 1.000e-02]]
+            decomp_type     CHOLESKY
+        
+        >>> mean = np.full(31, 1.1)
+        >>> x_values = np.arange(31.0) / 30.0 #[0, 1/30, ..., 1]
+        >>> m = Matern(Lattice(dimension=31, seed=7), x_values, length_scale = 0.5, variance = 0.01, mean=mean)
+        >>> m
+        Matern (AbstractTrueMeasure)
+            mean            [1.1 1.1 1.1 ... 1.1 1.1 1.1]
+            covariance      [[0.01  0.01  0.01  ... 0.002 0.002 0.001]
+                            [0.01  0.01  0.01  ... 0.002 0.002 0.002]
+                            [0.01  0.01  0.01  ... 0.002 0.002 0.002]
+                            ...
+                            [0.002 0.002 0.002 ... 0.01  0.01  0.01 ]
+                            [0.002 0.002 0.002 ... 0.01  0.01  0.01 ]
+                            [0.001 0.002 0.002 ... 0.01  0.01  0.01 ]]
+            decomp_type     PCA
+        >>> m.gen_samples(1)
+        array([[0.98982459, 0.99436558, 0.9985705 , 0.99537541, 0.98332323,
+                0.97012349, 0.96397891, 0.9563429 , 0.95509076, 0.95367365,
+                0.94488316, 0.93887217, 0.9447937 , 0.94984784, 0.95086118,
+                0.95391034, 0.95711649, 0.96437995, 0.96164923, 0.95571374,
+                0.95318471, 0.95162953, 0.9486336 , 0.94254554, 0.93762367,
+                0.93127782, 0.93008568, 0.93477752, 0.9510726 , 0.96926194,
+                0.98501258]])
+        
+        With independent replications 
 
-        [1] scikit-learn developers, Matern kernel. 
-        https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.kernels.Matern.html.
-        Accessed 2023.
-
-        [2] Abramowitz and Stegun (1972). Handbook of Mathematical Functions with Formulas, Graphs, 
-        and Mathematical Tables. ISBN 0-486-61272-4. (Accessed through Wikipedia, 
-        https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function.)
+        >>> x =  Matern(Lattice(dimension=3,seed=7,replications=2),points=np.array([0, 1, 2]),length_scale=0.5,nu=3.5,variance=0.01,mean=np.full(3,1.1),decomp_type='Cholesky')(4)
+        >>> x.shape 
+        (2, 4, 3)
+        >>> x
+        array([[[0.9292457 , 1.09831694, 1.06939215],
+                [1.11101646, 0.96703953, 1.19238447],
+                [1.04578587, 1.05093947, 0.97722352],
+                [1.181989  , 1.2086904 , 1.14395342]],
+        <BLANKLINE>
+               [[1.1391077 , 1.15639037, 0.98369902],
+                [0.99726585, 1.00131231, 1.11446066],
+                [1.22937832, 1.10455322, 1.20383499],
+                [1.07521619, 1.25641254, 1.08573892]]])
     """
 
     def __init__(self, sampler, points, length_scale = 1.0, nu = 1.5, variance = 1.0, mean = [], decomp_type='PCA'):
         """
-        Matern kernel: calculates covariance over a metric space based only on the distance between points.
-        More information can be found at [1].
-        
         Args:
-            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform. 
             points (np.ndarray): The positions of points on a metric space. The array

@@ -23,7 +23,7 @@ class BayesianLRCoeffs(Integrand):
     def __init__(self, sampler, feature_array, response_vector, prior_mean=0, prior_covariance=10):
         """
         Args:
-            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
             feature_array (np.ndarray): N samples by d-1 dimensions array of input features

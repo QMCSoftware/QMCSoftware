@@ -9,17 +9,21 @@ import numpy as np
 
 class Lebesgue(AbstractTrueMeasure):
     """
-    >>> Lebesgue(Gaussian(DigitalNetB2(2,seed=7)))
-    Lebesgue (AbstractTrueMeasure Object)
-        transform       Gaussian (AbstractTrueMeasure Object)
-                           mean            0
-                           covariance      1
-                           decomp_type     PCA
-    >>> Lebesgue(Uniform(DigitalNetB2(2,seed=7)))
-    Lebesgue (AbstractTrueMeasure Object)
-        transform       Uniform (AbstractTrueMeasure Object)
-                           lower_bound     0
-                           upper_bound     1
+    Lebesgue measure as described in  
+        [https://en.wikipedia.org/wiki/Lebesgue_measure](https://en.wikipedia.org/wiki/Lebesgue_measure)
+
+    Examples:
+        >>> Lebesgue(Gaussian(DigitalNetB2(2,seed=7)))
+        Lebesgue (AbstractTrueMeasure)
+            transform       Gaussian (AbstractTrueMeasure)
+                               mean            0
+                               covariance      1
+                               decomp_type     PCA
+        >>> Lebesgue(Uniform(DigitalNetB2(2,seed=7)))
+        Lebesgue (AbstractTrueMeasure)
+            transform       Uniform (AbstractTrueMeasure)
+                               lower_bound     0
+                               upper_bound     1
     """
     
     def __init__(self, sampler):
@@ -36,7 +40,7 @@ class Lebesgue(AbstractTrueMeasure):
         super(Lebesgue,self).__init__()
 
     def _weight(self, x):
-        return np.ones(x.shape[0],dtype=float)
+        return np.ones(x.shape[:-1],dtype=float)
 
     def _spawn(self, sampler, dimension):
         return Lebesgue(sampler)

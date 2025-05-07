@@ -40,7 +40,7 @@ class BarrierOption(Integrand):
         interest_rate=0.05, t_final=1., call_put='call',in_out = 'in',multilevel_dims = None, decomp_type='PCA', _dim_frac=0):
         """
         Args:
-            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform
             volatility (float): sigma, the volatility of the asset

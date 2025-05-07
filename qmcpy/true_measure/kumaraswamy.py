@@ -6,24 +6,42 @@ import numpy as np
 
 class Kumaraswamy(AbstractTrueMeasure):
     """
-    >>> k = Kumaraswamy(DigitalNetB2(2,seed=7),a=[1,2],b=[3,4])
-    >>> k.gen_samples(4)
-    array([[0.02444474, 0.14161773],
-           [0.42937965, 0.53785063],
-           [0.11809512, 0.69998807],
-           [0.24617103, 0.2723896 ]])
-    >>> k
-    Kumaraswamy (AbstractTrueMeasure Object)
-        a               [1 2]
-        b               [3 4]
+    Kumaraswamy distribution as described in  
+        [https://en.wikipedia.org/wiki/Kumaraswamy_distribution](https://en.wikipedia.org/wiki/Kumaraswamy_distribution)
+    
+    Examples:
+        >>> k = Kumaraswamy(DigitalNetB2(2,seed=7),a=[1,2],b=[3,4])
+        >>> k.gen_samples(4)
+        array([[0.46202015, 0.5230962 ],
+               [0.0352327 , 0.14904135],
+               [0.26440066, 0.27701523],
+               [0.13123721, 0.67157846]])
+        >>> k
+        Kumaraswamy (AbstractTrueMeasure)
+            a               [1 2]
+            b               [3 4]
         
-    See https://en.wikipedia.org/wiki/Kumaraswamy_distribution
+        With independent replications 
+
+        >>> x = Kumaraswamy(DigitalNetB2(3,seed=7,replications=2),a=[1,2,3],b=[3,4,5])(4)
+        >>> x.shape 
+        (2, 4, 3)
+        >>> x
+        array([[[0.19424882, 0.64784747, 0.69455517],
+                [0.33977962, 0.30153693, 0.42157161],
+                [0.06709865, 0.1267107 , 0.271294  ],
+                [0.75821367, 0.47481915, 0.54237922]],
+        <BLANKLINE>
+               [[0.09004177, 0.22144305, 0.62190133],
+                [0.47263986, 0.41449413, 0.32349266],
+                [0.19457333, 0.67062492, 0.47212812],
+                [0.27722181, 0.26725205, 0.80825972]]])
     """
 
     def __init__(self, sampler, a=2, b=2):
         """
         Args:
-            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             a (np.ndarray): alpha > 0
@@ -45,13 +63,14 @@ class Kumaraswamy(AbstractTrueMeasure):
             raise DimensionError('a and b must be scalar or have length equal to dimension.')
         if not (all(self.alpha>0) and all(self.beta>0)):
             raise ParameterError("Kumaraswamy requires a,b>0.")
-        super(Kumaraswamy,self).__init__() 
+        super(Kumaraswamy,self).__init__()
+        assert self.alpha.shape==(self.d,) and self.beta.shape==(self.d,)
 
     def _transform(self, x):
         return (1-(1-x)**(1/self.beta))**(1/self.alpha)
     
     def _weight(self, x):
-        return np.prod( self.alpha*self.beta*x**(self.alpha-1)*(1-x**self.alpha)**(self.beta-1), 1)
+        return np.prod(self.alpha*self.beta*x**(self.alpha-1)*(1-x**self.alpha)**(self.beta-1),-1)
     
     def _spawn(self, sampler, dimension):
         if dimension==self.d: # don't do anything if the dimension doesn't change

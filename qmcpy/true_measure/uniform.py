@@ -7,7 +7,8 @@ from scipy.stats import norm
 
 class Uniform(AbstractTrueMeasure):
     """
-    Uniform distribution. 
+    Uniform distribution, see 
+        [https://en.wikipedia.org/wiki/Continuous_uniform_distribution](https://en.wikipedia.org/wiki/Continuous_uniform_distribution) 
 
     Examples:
         >>> u = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
@@ -41,7 +42,7 @@ class Uniform(AbstractTrueMeasure):
     def __init__(self, sampler, lower_bound=0., upper_bound=1.):
         """
         Args:
-            sampler (AbstractDiscreteDistribution/AbstractTrueMeasure): A 
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
                 discrete distribution from which to transform samples or a
                 true measure by which to compose a transform 
             lower_bound (float): a for Uniform(a,b)
@@ -64,6 +65,7 @@ class Uniform(AbstractTrueMeasure):
         self.inv_delta_prod = 1/self.delta.prod()
         self.range = np.hstack((self.a.reshape((self.d,1)),self.b.reshape((self.d,1))))
         super(Uniform,self).__init__()
+        assert self.a.shape==(self.d,) and self.b.shape==(self.d,)
 
     def _transform(self, x):
         return x*self.delta+self.a
