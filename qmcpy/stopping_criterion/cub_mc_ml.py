@@ -37,7 +37,7 @@ class CubMCML(StoppingCriterion):
         levels_min      2^(1)
         levels_max      10
         theta           2^(-1)
-    MLCallOptions (Integrand Object)
+    MLCallOptions (AbstractIntegrand Object)
         option          european
         sigma           0.200
         k               100
@@ -70,7 +70,7 @@ class CubMCML(StoppingCriterion):
         levels_min=2, levels_max=10, alpha0=-1., beta0=-1., gamma0=-1.):
         """
         Args:
-            integrand (Integrand): integrand with multi-level g method
+            integrand (AbstractIntegrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
             alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)

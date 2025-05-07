@@ -1,10 +1,10 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
 import numpy as np
 
 
-class BoxIntegral(Integrand):
+class BoxIntegral(AbstractIntegrand):
     """
     $B_s(x) = \\left(\\sum_{j=1}^d x_j^2 \\right)^{s/2}$
 

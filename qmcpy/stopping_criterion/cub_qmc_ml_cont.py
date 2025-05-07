@@ -39,7 +39,7 @@ class CubQMCMLCont(StoppingCriterion):
         tol_mult        1.668
         theta_init      2^(-1)
         theta           2^(-3)
-    MLCallOptions (Integrand Object)
+    MLCallOptions (AbstractIntegrand Object)
         option          european
         sigma           0.200
         k               100
@@ -70,7 +70,7 @@ class CubQMCMLCont(StoppingCriterion):
         replications=32., levels_min=2, levels_max=10, n_tols=10, tol_mult=100**(1/9), theta_init=0.5):
         """
         Args:
-            integrand (Integrand): integrand with multi-level g method
+            integrand (AbstractIntegrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance
             alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
@@ -172,7 +172,7 @@ class CubQMCMLCont(StoppingCriterion):
         See abstract method. 
         
         Args:
-            integrand (Integrand): integrand with multi-level g method
+            integrand (AbstractIntegrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
             alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)

@@ -34,7 +34,7 @@ class CubBayesLatticeG(_CubBayesLDG):
         n_init          2^(8)
         n_max           2^(22)
         order           2^(1)
-    Keister (Integrand Object)
+    Keister (AbstractIntegrand Object)
     Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -82,7 +82,7 @@ class CubBayesLatticeG(_CubBayesLDG):
                  error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
         """
         Args:
-            integrand (Integrand): an instance of Integrand
+            integrand (AbstractIntegrand): an instance of AbstractIntegrand
             abs_tol (np.ndarray): absolute error tolerance
             rel_tol (np.ndarray): relative error tolerance
             n_init (int): initial number of samples

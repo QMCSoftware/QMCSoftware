@@ -35,7 +35,7 @@ class CubMCG(StoppingCriterion):
         n_max           10000000000
         inflate         1.200
         alpha           0.010
-    Keister (Integrand Object)
+    Keister (AbstractIntegrand Object)
     Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -84,7 +84,7 @@ class CubMCG(StoppingCriterion):
                  inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
         """
         Args:
-            integrand (Integrand): an instance of Integrand
+            integrand (AbstractIntegrand): an instance of AbstractIntegrand
             inflate: inflation factor when estimating variance
             alpha: significance level for confidence interval
             abs_tol: absolute error tolerance

@@ -1,17 +1,17 @@
 from ..discrete_distribution import DigitalNetB2
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
 import numpy as np
 
 
-class AsianOption(Integrand):
+class AsianOption(AbstractIntegrand):
     """
     Asian financial option. 
 
     >>> ac = AsianOption(DigitalNetB2(4,seed=7))
     >>> ac
-    AsianOption (Integrand Object)
+    AsianOption (AbstractIntegrand Object)
         volatility      2^(-1)
         call_put        call
         start_price     30

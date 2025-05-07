@@ -1,9 +1,9 @@
 import numpy as np
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
 
-class FourBranch2d(Integrand):
+class FourBranch2d(AbstractIntegrand):
     """
     >>> fb2d = FourBranch2d(DigitalNetB2(2,seed=7))
     >>> x = fb2d.discrete_distrib.gen_samples(2**10)

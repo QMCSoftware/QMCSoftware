@@ -88,7 +88,7 @@ class PFGPCI(StoppingCriterion):
         n_total         112
         time_integrate  ...
     PFGPCI (StoppingCriterion Object)
-    Ishigami (Integrand Object)
+    Ishigami (AbstractIntegrand Object)
     Uniform (AbstractTrueMeasure Object)
         lower_bound     -3.142
         upper_bound     3.142
@@ -125,7 +125,7 @@ class PFGPCI(StoppingCriterion):
         seed_ref_approx = None):
         '''
         Args:
-            integrand (Integrand): The simulation whose probability of failure is estimated
+            integrand (AbstractIntegrand): The simulation whose probability of failure is estimated
             failure_threshold (float): Thresholds for failure. 
             failure_above_threshold (bool): Set to True if failure occurs when the simulation exceeds failure_threshold and False otherwise 
             abs_tol (float): The desired maximum distance from the estimate to either end of the confidence interval

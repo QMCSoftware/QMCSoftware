@@ -1,11 +1,11 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian
 import numpy as np
 from scipy.special import gamma
 
 
-class Keister(Integrand):
+class Keister(AbstractIntegrand):
     """
     $f(\\boldsymbol{t}) = \\pi^{d/2} \\cos(\\| \\boldsymbol{t} \\|)$.
 

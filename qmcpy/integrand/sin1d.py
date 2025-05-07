@@ -1,9 +1,9 @@
 import numpy as np
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
 
-class Sin1d(Integrand):
+class Sin1d(AbstractIntegrand):
     """
     >>> sin1d = Sin1d(DigitalNetB2(1,seed=7))
     >>> x = sin1d.discrete_distrib.gen_samples(2**10)

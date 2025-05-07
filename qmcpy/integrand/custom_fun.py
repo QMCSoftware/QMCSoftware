@@ -1,11 +1,11 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
 
 
-class CustomFun(Integrand):
+class CustomFun(AbstractIntegrand):
     """
-    Integrand wrapper for a user's function 
+    AbstractIntegrand wrapper for a user's function 
     
     >>> cf = CustomFun(
     ...     true_measure = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2]),

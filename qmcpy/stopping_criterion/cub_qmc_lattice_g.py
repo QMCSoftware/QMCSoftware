@@ -29,7 +29,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         rel_tol         0
         n_init          2^(10)
         n_max           2^(35)
-    Keister (Integrand Object)
+    Keister (AbstractIntegrand Object)
     Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -76,7 +76,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         rel_tol         0
         n_init          2^(10)
         n_max           2^(35)
-    CustomFun (Integrand Object)
+    CustomFun (AbstractIntegrand Object)
     Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
@@ -125,7 +125,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
-            integrand (Integrand): an instance of Integrand
+            integrand (AbstractIntegrand): an instance of AbstractIntegrand
             abs_tol (np.ndarray): absolute error tolerance
             rel_tol (np.ndarray): relative error tolerance
             n_init (int): initial number of samples

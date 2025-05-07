@@ -1,4 +1,4 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
 from ..stopping_criterion import CubQMCNetG
 from ..true_measure import Uniform
@@ -6,7 +6,7 @@ from ..util import ParameterError
 import numpy as np
 import os
 
-class UMBridgeWrapper(Integrand):
+class UMBridgeWrapper(AbstractIntegrand):
     """
     UM-Bridge Model Wrapper. 
     Requires Docker be installed, see https://www.docker.com/. 
@@ -33,7 +33,7 @@ class UMBridgeWrapper(Integrand):
         rel_tol         0
         n_init          2^(10)
         n_max           2^(35)
-    UMBridgeWrapper (Integrand Object)
+    UMBridgeWrapper (AbstractIntegrand Object)
     Uniform (AbstractTrueMeasure Object)
         lower_bound     1
         upper_bound     1.050
@@ -80,7 +80,7 @@ class UMBridgeWrapper(Integrand):
         rel_tol         0
         n_init          2^(10)
         n_max           2^(35)
-    UMBridgeWrapper (Integrand Object)
+    UMBridgeWrapper (AbstractIntegrand Object)
     Uniform (AbstractTrueMeasure Object)
         lower_bound     -1
         upper_bound     1

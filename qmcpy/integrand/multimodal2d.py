@@ -1,9 +1,9 @@
 import numpy as np
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
 
-class Multimodal2d(Integrand):
+class Multimodal2d(AbstractIntegrand):
     """
     >>> mm2d = Multimodal2d(DigitalNetB2(2,seed=7))
     >>> x = mm2d.discrete_distrib.gen_samples(2**10)

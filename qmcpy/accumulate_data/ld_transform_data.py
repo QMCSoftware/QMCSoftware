@@ -1,5 +1,5 @@
 from ._accumulate_data import AccumulateData
-from ..integrand._integrand import Integrand
+from ..integrand.abstract_integrand import AbstractIntegrand
 from ..util import CubatureWarning
 import numpy as np
 import warnings

@@ -1,9 +1,9 @@
 import numpy as np
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
 
-class Hartmann6d(Integrand):
+class Hartmann6d(AbstractIntegrand):
     """
     >>> h6d = Hartmann6d(DigitalNetB2(6,seed=7))
     >>> x = h6d.discrete_distrib.gen_samples(2**10)

@@ -88,7 +88,7 @@ class Matern(Gaussian):
         self.length_scale = length_scale
         self.nu = nu
         self.variance = variance
-        dists = np.linalg.norm(points[:,None,:]-points[None,:,:],axis=-1)
+        dists = np.linalg.norm(points[...,:,None,:]-points[...,None,:,:],axis=-1)
         if nu==1/2:
             covariance = np.exp(-dists/self.length_scale)
         elif nu==3/2:

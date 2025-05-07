@@ -1,4 +1,4 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian
 from ..util import ParameterError
@@ -6,13 +6,13 @@ import numpy as np
 from scipy.stats import norm
 
 
-class MLCallOptions(Integrand):
+class MLCallOptions(AbstractIntegrand):
     """
     Various call options from finance using Milstein discretization with $2^l$ timesteps on level $l$.
 
     >>> mlco_original = MLCallOptions(DigitalNetB2(seed=7))
     >>> mlco_original
-    MLCallOptions (Integrand Object)
+    MLCallOptions (AbstractIntegrand Object)
         option          european
         sigma           0.200
         k               100

@@ -1,4 +1,4 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from . import Keister, BoxIntegral
 from ..stopping_criterion import CubQMCNetG
 from ..util import ParameterError
@@ -8,7 +8,7 @@ import numpy as np
 from itertools import combinations
 
 
-class SensitivityIndices(Integrand):
+class SensitivityIndices(AbstractIntegrand):
     """
     Sensitivity' Indices, normalized Sobol' Indices. 
 
@@ -44,7 +44,7 @@ class SensitivityIndices(Integrand):
         rel_tol         0
         n_init          2^(10)
         n_max           2^(35)
-    SensitivityIndices (Integrand Object)
+    SensitivityIndices (AbstractIntegrand Object)
         indices         [[0]
                         [1]
                         [2]]
@@ -83,7 +83,7 @@ class SensitivityIndices(Integrand):
     def __init__(self, integrand, indices='singletons'):
         """
         Args:
-            integrand (Integrand): integrand to find Sobol' indices of
+            integrand (AbstractIntegrand): integrand to find Sobol' indices of
             indices (list of lists): each element of indices should be a list of indices, u,
                 at which to compute the Sobol' indices. 
                 The default indices='singletons' sets indices=[[0],[1],...[d-1]]. 

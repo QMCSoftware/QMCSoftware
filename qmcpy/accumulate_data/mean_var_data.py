@@ -1,5 +1,5 @@
 from ._accumulate_data import AccumulateData
-from ..integrand._integrand import Integrand
+from ..integrand.abstract_integrand import AbstractIntegrand
 from ..util import ParameterError
 from time import time
 import numpy as np
@@ -11,7 +11,7 @@ class MeanVarData(AccumulateData):
         """
         Args:
             stopping_crit (StoppingCriterion): a StoppingCriterion instance
-            integrand (Integrand): an Integrand instance
+            integrand (AbstractIntegrand): an AbstractIntegrand instance
             true_measure (AbstractTrueMeasure): A AbstractTrueMeasure instance
             discrete_distrib (AbstractDiscreteDistribution): an AbstractDiscreteDistribution instance  
             n_init (int): initial number of samples
@@ -29,7 +29,7 @@ class MeanVarData(AccumulateData):
         # setup control variates
         self.cv = control_variates
         self.cv_mu = control_variate_means
-        if isinstance(self.cv,Integrand):
+        if isinstance(self.cv,AbstractIntegrand):
             self.cv = [self.cv] # take a single integrand and make it into a list of length 1
         if np.isscalar(self.cv_mu):
             self.cv_mu = [self.cv_mu]

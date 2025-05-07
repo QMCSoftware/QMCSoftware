@@ -1,10 +1,10 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
 from ..util import ParameterError
 import numpy as np
 
-class Genz(Integrand):
+class Genz(AbstractIntegrand):
     """
     https://dakota.sandia.gov/sites/default/files/docs/6.17.0-release/user-html/usingdakota/examples/additionalexamples.html?highlight=genz#genz-functions
 

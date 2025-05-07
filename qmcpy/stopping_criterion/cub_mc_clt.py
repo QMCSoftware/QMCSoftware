@@ -33,7 +33,7 @@ class CubMCCLT(StoppingCriterion):
         n_max           10000000000
         inflate         1.200
         alpha           0.010
-    AsianOption (Integrand Object)
+    AsianOption (AbstractIntegrand Object)
         volatility      2^(-1)
         call_put        call
         start_price     30
@@ -77,7 +77,7 @@ class CubMCCLT(StoppingCriterion):
         n_max           10000000000
         inflate         1.200
         alpha           0.010
-    Keister (Integrand Object)
+    Keister (AbstractIntegrand Object)
     Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -93,7 +93,7 @@ class CubMCCLT(StoppingCriterion):
         error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
-            integrand (Integrand): an instance of Integrand
+            integrand (AbstractIntegrand): an instance of AbstractIntegrand
             inflate (float): inflation factor when estimating variance
             alpha (float): significance level for confidence interval
             abs_tol (np.ndarray): absolute error tolerance

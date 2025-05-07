@@ -1,4 +1,4 @@
-from ..integrand._integrand import Integrand
+from ..integrand.abstract_integrand import AbstractIntegrand
 from ..util import DistributionCompatibilityError, ParameterError, MethodImplementationError, _univ_repr
 import numpy as np
 
@@ -16,8 +16,8 @@ class StoppingCriterion(object):
         prefix = 'A concrete implementation of StoppingCriterion must have '
         # integrand check
         if (not hasattr(self, 'integrand')) or \
-            (not isinstance(self.integrand,Integrand)):
-            raise ParameterError(prefix + 'self.integrand, an Integrand instance')
+            (not isinstance(self.integrand,AbstractIntegrand)):
+            raise ParameterError(prefix + 'self.integrand, an AbstractIntegrand instance')
         # true measure check
         if (not hasattr(self, 'true_measure')) or (self.true_measure!=self.integrand.true_measure):
             raise ParameterError(prefix + 'self.true_measure=self.integrand.true_measure')
@@ -28,7 +28,7 @@ class StoppingCriterion(object):
             raise DistributionCompatibilityError('%s must have an AbstractDiscreteDistribution in %s'%(sname,str(allowed_distribs)))
         # multilevel compatibility check
         if self.integrand.leveltype not in allowed_levels:
-            raise ParameterError('Integrand is %s level but %s only supports %s level problems.'%(self.integrand.leveltype,sname,allowed_levels))
+            raise ParameterError('AbstractIntegrand is %s level but %s only supports %s level problems.'%(self.integrand.leveltype,sname,allowed_levels))
         if (not allow_vectorized_integrals) and self.integrand.d_indv!=(1,):
             raise ParameterError('Vectorized integrals (with d_indv>1 outputs per sample) are not supported by this stopping criterion')
         # parameter checks

@@ -1,9 +1,9 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
 
 
-class Linear0(Integrand):
+class Linear0(AbstractIntegrand):
     """
     >>> l = Linear0(DigitalNetB2(100,seed=7))
     >>> x = l.discrete_distrib.gen_samples(2**10)

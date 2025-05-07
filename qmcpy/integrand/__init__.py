@@ -1,4 +1,4 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from .asian_option import AsianOption
 from .european_option import EuropeanOption
 from .keister import Keister

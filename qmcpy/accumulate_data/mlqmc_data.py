@@ -14,7 +14,7 @@ class MLQMCData(AccumulateData):
 
         Args:
             stopping_crit (StoppingCriterion): a StoppingCriterion instance
-            integrand (Integrand): an Integrand instance
+            integrand (AbstractIntegrand): an AbstractIntegrand instance
             true_measure (AbstractTrueMeasure): A AbstractTrueMeasure instance
             discrete_distrib (AbstractDiscreteDistribution): an AbstractDiscreteDistribution instance
             replications (int): number of replications on each level

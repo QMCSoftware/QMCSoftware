@@ -33,7 +33,7 @@ class CubBayesNetG(_CubBayesLDG):
         rel_tol         0
         n_init          2^(8)
         n_max           2^(22)
-    Keister (Integrand Object)
+    Keister (AbstractIntegrand Object)
     Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -81,7 +81,7 @@ class CubBayesNetG(_CubBayesLDG):
                  error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
         """
         Args:
-            integrand (Integrand): an instance of Integrand
+            integrand (AbstractIntegrand): an instance of AbstractIntegrand
             abs_tol (np.ndarray): absolute error tolerance
             rel_tol (np.ndarray): relative error tolerance
             n_init (int): initial number of samples

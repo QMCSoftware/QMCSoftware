@@ -33,7 +33,7 @@ class CubQMCML(StoppingCriterion):
         n_init          2^(8)
         n_max           10000000000
         replications    2^(5)
-    MLCallOptions (Integrand Object)
+    MLCallOptions (AbstractIntegrand Object)
         option          european
         sigma           0.200
         k               100
@@ -66,7 +66,7 @@ class CubQMCML(StoppingCriterion):
         replications=32., levels_min=2, levels_max=10):
         """
         Args:
-            integrand (Integrand): integrand with multi-level g method
+            integrand (AbstractIntegrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance
             alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
@@ -137,7 +137,7 @@ class CubQMCML(StoppingCriterion):
         See abstract method. 
         
         Args:
-            integrand (Integrand): integrand with multi-level g method
+            integrand (AbstractIntegrand): integrand with multi-level g method
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
             alpha (float): uncertainty level.
                 If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)

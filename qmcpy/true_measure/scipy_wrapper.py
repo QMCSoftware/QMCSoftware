@@ -89,7 +89,7 @@ class SciPyWrapper(AbstractTrueMeasure):
     def _weight(self, x):
         rho = np.empty_like(x)
         for j in range(self.d):
-            rho[...,j] = self.sds[j].pdf(x[:,j])
+            rho[...,j] = self.sds[j].pdf(x[...,j])
         return np.prod(rho,-1)
     
     def _spawn(self, sampler, dimension):

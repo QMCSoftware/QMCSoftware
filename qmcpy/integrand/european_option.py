@@ -1,4 +1,4 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..true_measure import BrownianMotion
 from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
@@ -6,13 +6,13 @@ import numpy as np
 from scipy.stats import norm 
 
 
-class EuropeanOption(Integrand):
+class EuropeanOption(AbstractIntegrand):
     """
     European financial option. 
 
     >>> eo = EuropeanOption(DigitalNetB2(4,seed=7),call_put='put')
     >>> eo
-    EuropeanOption (Integrand Object)
+    EuropeanOption (AbstractIntegrand Object)
         volatility      2^(-1)
         call_put        put
         start_price     30

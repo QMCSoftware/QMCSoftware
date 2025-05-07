@@ -1,7 +1,7 @@
 from ._stopping_criterion import StoppingCriterion
 from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
-from ..integrand import Integrand
+from ..integrand import AbstractIntegrand
 import numpy as np
 from time import time
 import warnings
@@ -52,9 +52,9 @@ class _CubQMCLDG(StoppingCriterion):
         if self.cv_mu.shape!=((self.ncv,)+self.d_indv):
             raise ParameterError('''Control variate means should have shape (len(control variates),d_indv).''')
         for cv in self.cv:
-            if (cv.discrete_distrib!=self.discrete_distrib) or (not isinstance(cv,Integrand)) or (cv.d_indv!=self.d_indv):
+            if (cv.discrete_distrib!=self.discrete_distrib) or (not isinstance(cv,AbstractIntegrand)) or (cv.d_indv!=self.d_indv):
                 raise ParameterError('''
-                        Each control variates discrete distribution must be an Integrand instance 
+                        Each control variates discrete distribution must be an AbstractIntegrand instance 
                         with the same discrete distribution as the main integrand. d_indv must also match 
                         that of the main integrand instance for each control variate.''')
         self.update_beta = update_beta

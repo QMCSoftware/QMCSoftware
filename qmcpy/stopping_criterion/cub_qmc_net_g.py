@@ -29,7 +29,7 @@ class CubQMCNetG(_CubQMCLDG):
         rel_tol         0
         n_init          2^(10)
         n_max           2^(35)
-    Keister (Integrand Object)
+    Keister (AbstractIntegrand Object)
     Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -85,11 +85,11 @@ class CubQMCNetG(_CubQMCLDG):
         rel_tol         0
         n_init          2^(10)
         n_max           2^(35)
-        cv              BoxIntegral (Integrand Object)
+        cv              BoxIntegral (AbstractIntegrand Object)
                            s               [-1  1]
         cv_mu           [1.19  0.961]
         update_beta     1
-    BoxIntegral (Integrand Object)
+    BoxIntegral (AbstractIntegrand Object)
         s               [3 4]
     Uniform (AbstractTrueMeasure Object)
         lower_bound     0
@@ -125,7 +125,7 @@ class CubQMCNetG(_CubQMCLDG):
         rel_tol         0
         n_init          2^(10)
         n_max           2^(35)
-    CustomFun (Integrand Object)
+    CustomFun (AbstractIntegrand Object)
     Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
@@ -173,7 +173,7 @@ class CubQMCNetG(_CubQMCLDG):
 
         """
         Args:
-            integrand (Integrand): an instance of Integrand
+            integrand (AbstractIntegrand): an instance of AbstractIntegrand
             abs_tol (np.ndarray): absolute error tolerance
             rel_tol (np.ndarray): relative error tolerance
             n_init (int): initial number of samples

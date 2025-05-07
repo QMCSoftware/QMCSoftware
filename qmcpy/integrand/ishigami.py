@@ -1,31 +1,50 @@
 import numpy as np
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
 from ..util import ParameterError
 
-class Ishigami(Integrand):
-    """
-    $g(\\boldsymbol{t}) = (1+bt_2^4)\\sin(t_0) + a\\sin^2(t_1), \\qquad T \\sim \\mathcal{U}(-\\pi,\\pi)^3$
+class Ishigami(AbstractIntegrand):
+    r"""
+    $$g(\\boldsymbol{t}) = (1+bt_2^4)\\sin(t_0) + a\\sin^2(t_1), \\qquad T \\sim \\mathcal{U}(-\\pi,\\pi)^3$$
 
     [https://www.sfu.ca/~ssurjano/ishigami.html](https://www.sfu.ca/~ssurjano/ishigami.html)
     
     Examples:
         >>> ishigami = Ishigami(DigitalNetB2(3,seed=7))
         >>> x = ishigami.discrete_distrib.gen_samples(2**10)
+        >>> x.shape 
+        (1024, 3)
         >>> y = ishigami.f(x)
+        >>> y.shape 
+        (1024,)
         >>> print("%.4f"%y.mean())
-        3.4985
+        3.5015
         >>> ishigami.true_measure
-        Uniform (AbstractTrueMeasure Object)
+        Uniform (AbstractTrueMeasure)
             lower_bound     -3.142
             upper_bound     3.142
         
-    References
-        [1] Ishigami, T., & Homma, T. (1990, December). 
-        An importance quantification technique in uncertainty analysis for computer models. 
-        In Uncertainty Modeling and Analysis, 1990. Proceedings., First International Symposium on (pp. 398-403). IEEE.
+        With independent replications
 
+        >>> ishigami = Ishigami(DigitalNetB2(3,seed=7,replications=16))
+        >>> x = ishigami.discrete_distrib.gen_samples(2**6)
+        >>> x.shape
+        (16, 64, 3)
+        >>> y = ishigami.f(x)
+        >>> y.shape
+        (16, 64)
+        >>> muhats = y.mean(-1) 
+        >>> muhats.shape 
+        (16,)
+        >>> print("%.4f"%muhats.mean())
+        3.4764
+        
+    **References:**
+
+    1.  Ishigami, T., & Homma, T.  
+        An importance quantification technique in uncertainty analysis for computer models.  
+        In Uncertainty Modeling and Analysis, 1990. Proceedings., First International Symposium on (pp. 398-403). IEEE. (1990, December). 
     """
     def __init__(self,sampler, a=7, b=.1):
         """
@@ -42,17 +61,17 @@ class Ishigami(Integrand):
         self.a = a
         self.b = b
         self.true_measure = Uniform(self.sampler, lower_bound=-np.pi, upper_bound=np.pi)
-        super(Ishigami,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)
+        super(Ishigami,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)
     
     def g(self, t):
-        y = (1+self.b*t[:,2]**4)*np.sin(t[:,0])+self.a*np.sin(t[:,1])**2
+        y = (1+self.b*t[...,2]**4)*np.sin(t[...,0])+self.a*np.sin(t[...,1])**2
         return y
 
     def _spawn(self, level, sampler):
         return Ishigami(sampler=sampler,a=self.a,b=self.b)
     
     @staticmethod
-    def _exact_sensitivity_indices(indices,a,b):
+    def _exact_sensitivity_indices(indices, a, b):
         a,b = np.atleast_1d(a),np.atleast_1d(b)
         assert a.shape==b.shape and a.ndim==1 and b.ndim==1
         mu = a/2

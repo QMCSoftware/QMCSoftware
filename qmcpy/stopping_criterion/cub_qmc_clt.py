@@ -39,7 +39,7 @@ class CubQMCCLT(StoppingCriterion):
         n_init          2^(8)
         n_max           2^(30)
         replications    2^(4)
-    Keister (Integrand Object)
+    Keister (AbstractIntegrand Object)
     Gaussian (AbstractTrueMeasure Object)
         mean            0
         covariance      2^(-1)
@@ -76,7 +76,7 @@ class CubQMCCLT(StoppingCriterion):
         n_init          2^(8)
         n_max           2^(30)
         replications    2^(4)
-    BoxIntegral (Integrand Object)
+    BoxIntegral (AbstractIntegrand Object)
         s               [-1  1]
     Uniform (AbstractTrueMeasure Object)
         lower_bound     0
@@ -122,7 +122,7 @@ class CubQMCCLT(StoppingCriterion):
         n_init          2^(8)
         n_max           2^(30)
         replications    2^(4)
-    CustomFun (Integrand Object)
+    CustomFun (AbstractIntegrand Object)
     Uniform (AbstractTrueMeasure Object)
         lower_bound     0
         upper_bound     1
@@ -140,7 +140,7 @@ class CubQMCCLT(StoppingCriterion):
         error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
         """
         Args:
-            integrand (Integrand): an instance of Integrand
+            integrand (AbstractIntegrand): an instance of AbstractIntegrand
             inflate (float): inflation factor when estimating variance
             alpha (np.ndarray): significance level for confidence interval
             abs_tol (np.ndarray): absolute error tolerance

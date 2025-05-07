@@ -1,16 +1,16 @@
 from ..discrete_distribution import DigitalNetB2
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
 import numpy as np
 
-class BarrierOption(Integrand):
+class BarrierOption(AbstractIntegrand):
     """
     Barrier Option. 
 
     >>> barrier_option = BarrierOption(DigitalNetB2(4,seed=7))
     >>> barrier_option
-    BarrierOption (Integrand Object)
+    BarrierOption (AbstractIntegrand Object)
         volatility      0.200
         call_put        call
         start_price     30
