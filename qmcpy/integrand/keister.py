@@ -67,7 +67,7 @@ class Keister(AbstractIntegrand):
         return Keister(sampler=sampler)
 
     @classmethod
-    def exact_integ(self, d):
+    def get_exact_value(self, d):
         """
         Compute the exact analytic value of the Keister integral with dimension $d$. 
 
@@ -88,3 +88,7 @@ class Keister(AbstractIntegrand):
             sininteg[j] = ((j-1)*sininteg[j-2]+cosinteg[j-1])/2
         I = (2*(np.pi**(d/2))/gamma(d/2))*cosinteg[d-1]
         return I
+    
+    def exact_integ(self, *args, **kwargs):
+        return self.get_exact_value(*args,**kwargs)
+
