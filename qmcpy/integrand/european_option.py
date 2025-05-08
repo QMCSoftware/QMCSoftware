@@ -14,7 +14,7 @@ class EuropeanOption(AbstractIntegrand):
     - Strike price $K$
     - Interest rate $r$ 
     - Volatility $\sigma$
-    - Monitoring times $\boldsymbol{\tau} = (\tau_1,\dots,\tau_d)^T$ with $\tau_d$ the final (exercise) time and, for $d>1$,  $\tau_1=0$. 
+    - Equidistant monitoring times $\boldsymbol{\tau} = (\tau_1,\dots,\tau_d)^T$ with $\tau_d$ the final (exercise) time and $\tau_j = \tau_d j/d$. 
 
     Define the [geometric brownian motion](https://en.wikipedia.org/wiki/Geometric_Brownian_motion) as 
 
@@ -76,7 +76,7 @@ class EuropeanOption(AbstractIntegrand):
         4.2306
     """
                           
-    def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35, interest_rate=0, t_final=1, call_put='call'):
+    def __init__(self, sampler, volatility=0.5, start_price=30, strike_price=35, interest_rate=0, t_final=1, call_put='CALL', decomp_type='PCA'):
         r"""
         Args:
             sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
@@ -88,26 +88,30 @@ class EuropeanOption(AbstractIntegrand):
             strike_price (float): $K$.
             interest_rate (float): $r$.
             t_final (float): $\tau_d$.
-            call_put (str): Either `'call'` or `'put'`. 
+            call_put (str): Either `'CALL'` or `'PUT'`. 
+            decomp_type (str): Method for decomposition for covariance matrix. Options include
+             
+                - `'PCA'` for principal component analysis, or 
+                - `'Cholesky'` for cholesky decomposition.
         """
         self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'interest_rate']
         self.t_final = t_final
         self.sampler = sampler
-        self.true_measure = BrownianMotion(self.sampler,t_final=self.t_final)
+        self.true_measure = BrownianMotion(self.sampler,t_final=self.t_final,decomp_type=decomp_type)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
         self.interest_rate = float(interest_rate)
-        self.call_put = call_put.lower()
-        if self.call_put not in ['call','put']:
-            raise ParameterError("call_put must be either 'call' or 'put'")
+        self.call_put = str(call_put).upper()
+        if self.call_put not in ['CALL','PUT']:
+            raise ParameterError("call_put must be either 'CALL' or 'PUT'")
         self.discount_factor = np.exp(-self.interest_rate*self.t_final)
         super(EuropeanOption,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)  
 
     def g(self, t):
         gbm = self.start_price * np.exp((self.interest_rate-self.volatility**2/2)*self.true_measure.time_vec+self.volatility*t)
         gbm = gbm*(gbm>0).cumprod(-1) # if a path hits 0, set remaining values in the path to 0
-        if self.call_put == 'call':
+        if self.call_put == 'CALL':
             payoff = np.maximum(gbm[...,-1]-self.strike_price,0)
         else: # put
             payoff = np.maximum(self.strike_price-gbm[...,-1],0)
@@ -123,11 +127,11 @@ class EuropeanOption(AbstractIntegrand):
         """
         denom = self.volatility*np.sqrt(self.t_final)
         decay = self.strike_price*self.discount_factor
-        if self.call_put == 'call':
+        if self.call_put == 'CALL':
             term1 = np.log(self.start_price/self.strike_price)+(self.interest_rate+self.volatility**2/2)*self.t_final
             term2 = np.log(self.start_price/self.strike_price)+(self.interest_rate-self.volatility**2/2)*self.t_final
             fp = self.start_price * norm.cdf(term1/denom)-decay*norm.cdf(term2/denom)
-        elif self.call_put == 'put':
+        elif self.call_put == 'PUT':
             term1 = np.log(self.strike_price/self.start_price)-(self.interest_rate-self.volatility**2/2)*self.t_final
             term2 = np.log(self.strike_price/self.start_price)-(self.interest_rate+self.volatility**2/2)*self.t_final
             fp = decay*norm.cdf(term1/denom)-self.start_price*norm.cdf(term2/denom)

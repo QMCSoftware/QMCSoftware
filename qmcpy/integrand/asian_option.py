@@ -69,7 +69,7 @@ class AsianOption(AbstractIntegrand):
         if self.mean_type not in ['arithmetic','geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
         # handle single vs multilevel
-        self.multilevel_dims = multilevel_dims
+        self.multilevel_dims = np.array(multilevel_dims)
         if self.multilevel_dims is not None: # multi-level problem
             self.dim_fracs = np.array(
                 [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
