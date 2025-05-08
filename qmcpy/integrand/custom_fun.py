@@ -31,7 +31,7 @@ class CustomFun(AbstractIntegrand):
         >>> y = integrand.f(x)
         >>> y.shape
         (16, 64)
-        >>> muhats = y.mean(-1) 
+        >>> muhats = y.mean(1) 
         >>> muhats.shape 
         (16,)
         >>> print("%.4f"%muhats.mean())

@@ -191,8 +191,6 @@ class AbstractIntegrand(object):
         Returns:
             comb_bound_low (np.ndarray): Lower bound on function combining estimates.
             comb_bound_high (np.ndarray): Upper bound on function combining estimates.
-            comb_compute_flags (np.ndarray): Bool flags to override sufficient combined integrand estimation,  
-                e.g., when approximating a ratio of integrals, if the denominator's bounds straddle 0, then returning `True` here forces ratio to be flagged as insufficiently approximated.
         """
         if self.d_indv!=self.d_comb:
             raise ParameterError('''
@@ -205,7 +203,7 @@ class AbstractIntegrand(object):
     def dependency(self, comb_flags):
         """
         Takes a vector of indicators of weather of not the error bound is satisfied for combined integrands and returns flags for individual integrands.  
-        
+
         For example, if we are taking the ratio of 2 individual integrands, then getting flag_comb=True means the ratio
         has not been approximated to within the tolerance, so the dependency function should return [True,True]
         indicating that both the numerator and denominator integrands need to be better approximated.

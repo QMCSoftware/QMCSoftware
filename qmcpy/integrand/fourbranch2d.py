@@ -11,12 +11,12 @@ class FourBranch2d(AbstractIntegrand):
     $$g(\boldsymbol{t}) = \min \begin{cases} 3+0.1(t_0-t_1)^2-\frac{t_0-t_1}{\sqrt{2}} \\ 3+0.1(t_0-t_1)^2+\frac{t_0-t_1}{\sqrt{2}} \\ t_0-t_1 + 7/\sqrt{2} \\ t_1-t_0 + 7/\sqrt{2}\end{cases}, \qquad \boldsymbol{T}=(T_0,T_1) \sim \mathcal{U}[-8,8]^2.$$
     
     Examples:
-        >>> fb2d = FourBranch2d(DigitalNetB2(2,seed=7))
-        >>> x = fb2d.discrete_distrib.gen_samples(2**10)
-        >>> y = fb2d.f(x)
+        >>> integrand = FourBranch2d(DigitalNetB2(2,seed=7))
+        >>> x = integrand.discrete_distrib.gen_samples(2**10)
+        >>> y = integrand.f(x)
         >>> print("%.4f"%y.mean())
         -2.5022
-        >>> fb2d.true_measure
+        >>> integrand.true_measure
         Uniform (AbstractTrueMeasure)
             lower_bound     -8
             upper_bound     2^(3)

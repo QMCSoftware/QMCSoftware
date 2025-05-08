@@ -122,7 +122,7 @@ class AbstractDiscreteDistribution(object):
             dimensions = np.tile(dimensions,s)
         if not (dimensions.ndim==1 and len(dimensions)==s):
             raise ParameterError("dimensions must be a length s np.ndarray")
-        if (dimensions==dimensions[0]).all():
+        if dimensions[0]==self.d and (dimensions==dimensions[0]).all():
             warnings.warn("Instead of spawning with the same dimensions, try using the replications parameter which is significantly more efficient",ParameterWarning)
         child_seeds = self._base_seed.spawn(s)
         spawned_discrete_distribs = [self._spawn(child_seeds[i],int(dimensions[i])) for i in range(s)]

@@ -43,3 +43,11 @@
 ## `CustomFun`
 
 ::: qmcpy.integrand.custom_fun.CustomFun
+
+## `BoxIntegral`
+
+::: qmcpy.integrand.box_integral.BoxIntegral
+
+## `SensitivityIndices`
+
+::: qmcpy.integrand.sensitivity_indices.SensitivityIndices
