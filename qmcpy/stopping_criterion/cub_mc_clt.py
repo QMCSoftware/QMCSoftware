@@ -3,7 +3,7 @@ from ..accumulate_data import MeanVarData
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..true_measure import Gaussian, BrownianMotion, Uniform
-from ..integrand import Keister, AsianOption, CustomFun
+from ..integrand import Keister, CustomFun
 from ..util import MaxSamplesWarning
 import numpy as np
 from scipy.stats import norm

@@ -52,6 +52,6 @@
 
 ::: qmcpy.integrand.sensitivity_indices.SensitivityIndices
 
-## `EuropeanOption`
+## `FinancialOption`
 
-::: qmcpy.integrand.european_option.EuropeanOption
+::: qmcpy.integrand.financial_option.FinancialOption

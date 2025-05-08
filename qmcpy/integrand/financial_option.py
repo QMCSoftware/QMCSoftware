@@ -1,0 +1,331 @@
+from .abstract_integrand import AbstractIntegrand
+from ..true_measure import BrownianMotion
+from ..discrete_distribution import DigitalNetB2
+from ..util import ParameterError
+import numpy as np
+from scipy.stats import norm 
+
+
+class FinancialOption(AbstractIntegrand):
+    r"""
+    Financial options.
+    
+    - Start price $S_0$
+    - Strike price $K$
+    - Interest rate $r$ 
+    - Volatility $\sigma$
+    - Equidistant monitoring times $\boldsymbol{\tau} = (\tau_1,\dots,\tau_d)^T$ with $\tau_d$ the final (exercise) time and $\tau_j = \tau_d j/d$. 
+
+    Define the [geometric brownian motion](https://en.wikipedia.org/wiki/Geometric_Brownian_motion) as 
+
+    $$\boldsymbol{G}(\boldsymbol{t}) = S_0 e^{(r-\sigma^2/2)\boldsymbol{\tau}+\sigma\boldsymbol{t}}, \qquad \boldsymbol{T} \sim \mathcal{N}(\boldsymbol{0},\mathsf{\Sigma})$$
+
+    where $\boldsymbol{T}$ is a standard Brownian motion so $\mathsf{\Sigma} = \left(\min\{\tau_j,\tau_{j'}\}\right)_{j,j'=1}^d$.
+
+    Letting $G_d(\boldsymbol{t})$ denote the last component of $\boldsymbol{G}(\boldsymbol{t})$, the payoff of a *call* option is 
+
+    $$P(\boldsymbol{t}) = \max\{G_d(\boldsymbol{t})-K,0\}$$
+
+    and the payoff of a *put* option is 
+    
+    $$P(\boldsymbol{t}) = \max\{K-G_d(\boldsymbol{t}),0\}.$$
+
+    The discounted payoff is 
+
+    $$g(\boldsymbol{t}) = P(\boldsymbol{t})e^{-r \tau_d}.$$
+
+    Examples:
+        >>> integrand = FinancialOption(DigitalNetB2(dimension=3,seed=7),option="EUROPEAN")
+        >>> x = integrand.discrete_distrib.gen_samples(2**10)
+        >>> y = integrand.f(x)
+        >>> y.shape
+        (1024,)
+        >>> print("%.4f"%y.mean())
+        4.1996
+        >>> print("%.4f"%integrand.get_exact_value())
+        4.2115
+        >>> integrand
+        FinancialOption (AbstractIntegrand)
+            option          EUROPEAN
+            call_put        CALL
+            volatility      2^(-1)
+            start_price     30
+            strike_price    35
+            interest_rate   0
+            t_final         1
+        >>> integrand.true_measure
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        [0.333 0.667 1.   ]
+            drift           0
+            mean            [0. 0. 0.]
+            covariance      [[0.333 0.333 0.333]
+                            [0.333 0.667 0.667]
+                            [0.333 0.667 1.   ]]
+            decomp_type     PCA
+
+        >>> integrand = FinancialOption(DigitalNetB2(dimension=64,seed=7),option="ASIAN")
+        >>> x = integrand.discrete_distrib.gen_samples(2**10)
+        >>> y = integrand.f(x)
+        >>> y.shape
+        (1024,)
+        >>> print("%.4f"%y.mean())
+        1.7996
+
+        With independent replications
+
+        >>> integrand = FinancialOption(DigitalNetB2(dimension=64,seed=7,replications=2**4),option="ASIAN")
+        >>> x = integrand.discrete_distrib.gen_samples(2**6)
+        >>> x.shape
+        (16, 64, 64)
+        >>> y = integrand.f(x)
+        >>> y.shape
+        (16, 64)
+        >>> muhats = y.mean(-1) 
+        >>> muhats.shape 
+        (16,)
+        >>> print("%.4f"%muhats.mean())
+        1.7923
+
+        Multi-level options 
+
+        >>> seed_seq = np.random.SeedSequence(7) 
+        >>> first_level = 3
+        >>> num_levels = 4
+        >>> ns = [2**11,2**10,2**9,2**8]
+        >>> integrands = [FinancialOption(DigitalNetB2(dimension=2**l,seed=seed_seq.spawn(1)[0]),option="ASIAN",level=l,first_level=first_level) for l in range(first_level,first_level+num_levels)]
+        >>> xs = [integrands[l].discrete_distrib.gen_samples(2**10) for l in range(num_levels)]
+        >>> for l in range(num_levels):
+        ...     print("xs[%d].shape = %s"%(l,xs[l].shape))
+        xs[0].shape = (1024, 8)
+        xs[1].shape = (1024, 16)
+        xs[2].shape = (1024, 32)
+        xs[3].shape = (1024, 64)
+        >>> ys = [integrands[l].f(xs[l]) for l in range(num_levels)]
+        >>> for l in range(num_levels):
+        ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
+        ys[0].shape = (1024,)
+        ys[1].shape = (1024,)
+        ys[2].shape = (1024,)
+        ys[3].shape = (1024,)
+        >>> ymeans = np.stack([ys[l].mean(-1) for l in range(num_levels)])
+        >>> ymeans
+        array([1.77422439e+00, 3.58130113e-03, 5.93394554e-04, 6.73276544e-04])
+        >>> print("%.4f"%ymeans.sum())
+        1.7791
+
+        Multi-level options with independent replications
+         
+        >>> seed_seq = np.random.SeedSequence(7) 
+        >>> first_level = 3
+        >>> num_levels = 4
+        >>> ns = [2**7,2**6,2**5,2**4]
+        >>> integrands = [FinancialOption(DigitalNetB2(dimension=2**l,seed=seed_seq.spawn(1)[0],replications=2**4),option="ASIAN",level=l,first_level=first_level) for l in range(first_level,first_level+num_levels)]
+        >>> xs = [integrands[l].discrete_distrib.gen_samples(ns[l]) for l in range(num_levels)]
+        >>> for l in range(num_levels):
+        ...     print("xs[%d].shape = %s"%(l,xs[l].shape))
+        xs[0].shape = (16, 128, 8)
+        xs[1].shape = (16, 64, 16)
+        xs[2].shape = (16, 32, 32)
+        xs[3].shape = (16, 16, 64)
+        >>> ys = [integrands[l].f(xs[l]) for l in range(num_levels)]
+        >>> for l in range(num_levels):
+        ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
+        ys[0].shape = (16, 128)
+        ys[1].shape = (16, 64)
+        ys[2].shape = (16, 32)
+        ys[3].shape = (16, 16)
+        >>> muhats = np.stack([ys[l].mean(-1) for l in range(num_levels)])
+        >>> muhats.shape
+        (4, 16)
+        >>> muhathat = muhats.mean(-1)
+        >>> muhathat
+        array([ 1.78967878,  0.02157042,  0.0024001 , -0.00278741])
+        >>> print("%.4f"%muhathat.sum())
+        1.8109
+    """
+                          
+    def __init__(self, 
+                 sampler,
+                 option = "ASIAN", 
+                 call_put = 'CALL',
+                 volatility = 0.5,
+                 start_price = 30,
+                 strike_price = 35,
+                 interest_rate = 0,
+                 t_final = 1,
+                 decomp_type = 'PCA',
+                 level = None,
+                 first_level = 0,
+                 asian_mean = "ARITHMETIC",
+                 barrier_in_out = "IN",
+                 barrier_price = 38):
+        r"""
+        Args:
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            option (str): Option type in `['ASIAN','EUROPEAN','BARRIER']`
+            call_put (str): Either `'CALL'` or `'PUT'`. 
+            volatility (float): $\sigma$.
+            start_price (float): $S_0$.
+            strike_price (float): $K$.
+            interest_rate (float): $r$.
+            t_final (float): $\tau_d$.
+            decomp_type (str): Method for decomposition for covariance matrix. Options include
+             
+                - `'PCA'` for principal component analysis, or 
+                - `'Cholesky'` for cholesky decomposition.
+            level (Union[None,int]): Level for multilevel problems 
+            first_level (Union[None,int]): First level for multilevel problems. 
+        """
+        self.parameters = ['option', 'call_put', 'volatility', 'start_price', 'strike_price', 'interest_rate', 't_final']
+        self.t_final = t_final
+        self.sampler = sampler
+        self.decomp_type = decomp_type
+        self.true_measure = BrownianMotion(self.sampler,t_final=self.t_final,decomp_type=self.decomp_type)
+        self.volatility = float(volatility)
+        self.start_price = float(start_price)
+        self.strike_price = float(strike_price)
+        self.interest_rate = float(interest_rate)
+        self.discount_factor = np.exp(-self.interest_rate*self.t_final)
+        self.level = level
+        self.first_level = first_level
+        if self.level is not None: 
+            self.parameters += ['level','first_level']
+            assert np.isscalar(self.level) and self.level%1==0 
+            assert np.isscalar(self.first_level) and self.first_level%1==0
+            self.level = int(self.level)
+            self.first_level = int(self.first_level) 
+            assert self.sampler.d==2**self.level, "the dimension of the sampler must equal 2^level = %d"%(2**self.level)
+            assert 0<=self.first_level<=self.level, "require 0 <= first_level (%d) <= level (%d)."%(self.first_level,self.level)
+        self.call_put = str(call_put).upper()
+        if self.call_put=="CALL":
+            self.payoff = self.payoff_call
+        elif self.call_put=="PUT":
+            self.payoff = self.payoff_put
+        else:
+            raise ParameterError("invalid call_put = %s"%self.call_put)
+        self.option = str(option).upper()
+        if self.option=="EUROPEAN":
+            self.qoi = self.qoi_european
+        elif self.option=="ASIAN":
+            self.parameters += ['asian_mean']
+            self.asian_mean = str(asian_mean).upper()
+            if self.asian_mean=="ARITHMETIC":
+                self.qoi = self.qoi_asian_arithmetic
+            elif self.asian_mean=="GEOMETRIC":
+                self.qoi = self.qoi_asian_geometric
+            else:
+                raise ParameterError("invalid asian_mean = %s"%self.asian_mean)
+        elif self.option=="BARRIER":
+            self.parameters += ['barrier_in_out','barrier_up_down','barrier_price']
+            assert np.isscalar(barrier_price)
+            self.barrier_price = float(barrier_price)
+            self.barrier_in_out = str(barrier_in_out).upper()
+            self.barrier_up_down = "UP" if self.start_price<self.barrier_price else "DOWN"
+            if self.barrier_in_out=="IN":
+                if self.barrier_up_down=="UP":
+                    self.qoi = self.qoi_barrier_in_up
+                else:
+                    self.qoi = self.qoi_barrier_in_down
+            elif self.barrier_in_out=="OUT":
+                if self.barrier_up_down=="UP":
+                    self.qoi = self.qoi_barrier_out_up
+                else:
+                    self.qoi = self.qoi_barrier_out_down 
+            else:
+                raise ParameterError("invalid barrier_in_out = %s"%self.barrier_in_out)
+        else:
+            raise ParameterError("invalid option type %s"%self.option)
+        super(FinancialOption,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)  
+    
+    def g(self, t):
+        gbm = self.gbm(t)
+        qoi = self.qoi(gbm)
+        payoff = self.payoff(qoi)
+        if self.level is not None and self.level>self.first_level:
+            qoi_course = self.qoi(gbm[...,1::2])
+            payoff_course = self.payoff(qoi_course) 
+            payoff -= payoff_course
+        discounted_payoff = payoff*self.discount_factor
+        return discounted_payoff
+    
+    def gbm(self, t):
+        gbm = self.start_price*np.exp((self.interest_rate-self.volatility**2/2)*self.true_measure.time_vec+self.volatility*t)
+        gbm *= (gbm>0).cumprod(-1) # if a path hits 0, set remaining values in the path to 0
+        return gbm
+    
+    def qoi_european(self, gbm):
+        return gbm[...,-1]
+    
+    def qoi_asian_arithmetic(self, gbm):
+        return (self.start_price/2+gbm[...,:-1].sum(-1)+gbm[...,-1]/2)/gbm.shape[-1]
+    
+    def qoi_asian_geometric(self, gbm):
+        return np.exp((np.log(self.start_price)/2+np.log(gbm[...,:-1]).sum(-1)+np.log(gbm[...,-1])/2)/gbm.shape[-1])
+    
+    def qoi_barrier_in_up(self, gbm):
+        v = gbm[...,-1]
+        flag = (gbm>=self.barrier_price).any(-1)
+        v[~flag] = self.strike_price
+        return v
+    
+    def qoi_barrier_out_up(self, gbm):
+        v = gbm[...,-1]
+        flag = (gbm<self.barrier_price).all(-1)
+        v[~flag] = self.strike_price
+        return v
+    
+    def qoi_barrier_in_down(self, gbm):
+        v = gbm[...,-1]
+        flag = (gbm<=self.barrier_price).any(-1)
+        v[~flag] = self.strike_price
+        return v
+    
+    def qoi_barrier_out_down(self, gbm):
+        v = gbm[...,-1]
+        flag = (gbm>self.barrier_price).all(-1)
+        v[~flag] = self.strike_price
+        return v
+    
+    def payoff_call(self, qoi):
+        return np.maximum(qoi-self.strike_price,0)
+    
+    def payoff_put(self, qoi):
+        return np.maximum(self.strike_price-qoi,0)
+    
+    def get_exact_value(self):
+        """
+        Compute the exact analytic fair price of the option. Only supports `option='EUROPEAN'`.
+
+        Returns: 
+            mean (float): Exact value of the integral. 
+        """
+        assert self.option=="EUROPEAN", "exact value not supported for option = %s"%self.option
+        denom = self.volatility*np.sqrt(self.t_final)
+        decay = self.strike_price*self.discount_factor
+        if self.call_put == 'CALL':
+            term1 = np.log(self.start_price/self.strike_price)+(self.interest_rate+self.volatility**2/2)*self.t_final
+            term2 = np.log(self.start_price/self.strike_price)+(self.interest_rate-self.volatility**2/2)*self.t_final
+            fp = self.start_price * norm.cdf(term1/denom)-decay*norm.cdf(term2/denom)
+        elif self.call_put == 'PUT':
+            term1 = np.log(self.strike_price/self.start_price)-(self.interest_rate-self.volatility**2/2)*self.t_final
+            term2 = np.log(self.strike_price/self.start_price)-(self.interest_rate+self.volatility**2/2)*self.t_final
+            fp = decay*norm.cdf(term1/denom)-self.start_price*norm.cdf(term2/denom)
+        else:
+            raise ParameterError("Error parsing payoff self.call_put = %s"%self.call_put)
+        return fp
+    
+    def _spawn(self, level, sampler):
+        return FinancialOption(
+            sampler=sampler,
+            volatility=self.volatility,
+            start_price=self.start_price,
+            strike_price=self.strike_price,
+            interest_rate=self.interest_rate,
+            t_final=self.t_final,
+            call_put=self.call_put,
+            decomp_type = self.decomp_type,
+            level = self.level, 
+            first_level = self.first_level)
