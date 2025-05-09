@@ -25,8 +25,8 @@ class SensitivityIndices(AbstractIntegrand):
         >>> x = integrand.discrete_distrib.gen_samples(2**10)
         >>> y = integrand.f(x)
         >>> y.shape
-        (1024, 2, 3, 4)
-        >>> ymean = y.mean(0)
+        (2, 3, 4, 1024)
+        >>> ymean = y.mean(-1)
         >>> ymean.shape
         (2, 3, 4)
         >>> sigma_hat = ymean[:,2,:]-ymean[:,1,:]**2
@@ -86,11 +86,11 @@ class SensitivityIndices(AbstractIntegrand):
         >>> x = integrand.discrete_distrib.gen_samples(2**10)
         >>> y = integrand.f(x)
         >>> y.shape 
-        (16, 1024, 2, 3, 4, 4, 5, 6)
-        >>> muhats = y.mean(1) 
+        (2, 3, 4, 4, 5, 6, 16, 1024)
+        >>> muhats = y.mean(-1) 
         >>> muhats.shape 
-        (16, 2, 3, 4, 4, 5, 6)
-        >>> muhathat = muhats.mean(0) 
+        (2, 3, 4, 4, 5, 6, 16)
+        >>> muhathat = muhats.mean(-1) 
         >>> muhathat.shape 
         (2, 3, 4, 4, 5, 6)
         >>> sigma_hat = muhathat[:,2,:]-muhathat[:,1,:]**2
@@ -156,7 +156,7 @@ class SensitivityIndices(AbstractIntegrand):
         z = x[...,self.d:]
         x = x[...,:self.d]
         v = np.zeros_like(x)
-        y = np.zeros(x.shape[:-1]+self.d_indv,dtype=float)
+        y = np.zeros(self.d_indv+x.shape[:-1],dtype=float)
         f_x = self.integrand.f(x,*args,**kwargs)
         f_z = self.integrand.f(z,*args,**kwargs)
         for i in np.ndindex(self.indices.shape[:-1]):
@@ -169,10 +169,10 @@ class SensitivityIndices(AbstractIntegrand):
             v[...,u_bool] = x[...,u_bool]
             v[...,not_u_bool] = z[...,not_u_bool]
             f_v = self.integrand.f(v,compute_flags=flags_i,*args,**kwargs)
-            y[...,0,0,*i,*self.i_slice] = f_x*(f_v-f_z) # A.18
-            y[...,1,0,*i,*self.i_slice] = (f_z-f_v)**2/2 # A.16
-            y[...,:,1,*i,*self.i_slice] = f_x[...,None,*self.i_slice] # mu
-            y[...,:,2,*i,*self.i_slice] = f_x[...,None,*self.i_slice]**2 # sigma^2+mu^2
+            y[0,0,*i,*self.i_slice] = f_x*(f_v-f_z) # A.18
+            y[1,0,*i,*self.i_slice] = (f_z-f_v)**2/2 # A.16
+            y[:,1,*i,*self.i_slice] = f_x[None,*self.i_slice] # mu
+            y[:,2,*i,*self.i_slice] = f_x[None,*self.i_slice]**2 # sigma^2+mu^2
             # here we copy mu and sigma^2+mu^2 since if these these were not copied there is a chance the bounds could change 
             # for mu and/or sigma and then an index which was previously approximated sufficiently woulud become insufficientlly approximated 
             # and it would then be difficult ot go back and resample the numerator for that approximation

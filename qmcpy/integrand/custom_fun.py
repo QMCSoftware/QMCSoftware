@@ -48,7 +48,7 @@ class CustomFun(AbstractIntegrand):
         ...     y2 = cost1*sint2
         ...     y3 = sint1+cost2
         ...     y4 = cost1+sint2
-        ...     y = np.stack([y1,y2,y3,y4],axis=-1)
+        ...     y = np.stack([y1,y2,y3,y4])
         ...     return y
         >>> integrand = CustomFun(
         ...     true_measure = Uniform(DigitalNetB2(2,seed=7),lower_bound=0,upper_bound=2*np.pi),
@@ -57,8 +57,8 @@ class CustomFun(AbstractIntegrand):
         >>> x = integrand.discrete_distrib.gen_samples(2**10)
         >>> y = integrand.f(x)
         >>> y.shape
-        (1024, 4)
-        >>> y.mean(0)
+        (4, 1024)
+        >>> y.mean(-1)
         array([ 1.44500230e-07, -1.17683622e-06, -3.03163938e-06, -4.17997185e-09])
 
         Stopping criterion which supporting vectorized outputs may pass in Boolean `compute_flags` with `dimension_indv` shape indicating which output need to evaluated, 
@@ -75,11 +75,11 @@ class CustomFun(AbstractIntegrand):
         (16, 64, 2)
         >>> y = integrand.f(x)
         >>> y.shape
-        (16, 64, 4)
-        >>> muhats = y.mean(-2) 
+        (4, 16, 64)
+        >>> muhats = y.mean(-1) 
         >>> muhats.shape 
-        (16, 4)
-        >>> muhats.mean(0)
+        (4, 16)
+        >>> muhats.mean(-1)
         array([ 0.00044518,  0.0048634 , -0.00014859, -0.00076392])
 
     """

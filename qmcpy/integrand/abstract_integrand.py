@@ -131,7 +131,7 @@ class AbstractIntegrand(object):
         assert wp.shape==batch_shape
         assert xp.shape==x.shape
         # function evaluation with chain rule
-        i = (...,)+(None,)*d_indv_ndim
+        i = (None,)*d_indv_ndim+(...,)
         if self.true_measure==self.true_measure.transform:
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._jacobian_transform_r(xp,return_weights=False) # get transformed samples, equivalent to self.true_measure._transform_r(x)
@@ -146,12 +146,12 @@ class AbstractIntegrand(object):
             weight = self.true_measure._weight(xtf) # weight based on the true measure
             assert weight.shape==batch_shape
             gvals = self._g(xtf,compute_flags,*args,**kwargs)
-            assert gvals.shape==(batch_shape+self.d_indv)
+            assert gvals.shape==(self.d_indv+batch_shape)
             y = gvals*weight[i]/pdf[i]*jacobians[i]
-        assert y.shape==(batch_shape+self.d_indv)
+        assert y.shape==(self.d_indv+batch_shape)
         # account for periodization weight
         y = y*wp[i]
-        assert y.shape==(batch_shape+self.d_indv)
+        assert y.shape==(self.d_indv+batch_shape)
         return y
 
     def _g(self, t, compute_flags, *args, **kwargs):
@@ -163,7 +163,7 @@ class AbstractIntegrand(object):
             y = np.concatenate(y,dtype=float)
         else:
             y = self._g2(t,comb_args=(args,kwargs))
-        assert y.shape==(t.shape[:-1]+self.d_indv)
+        assert y.shape==(self.d_indv+t.shape[:-1])
         return y
 
     def _g2(self, t, comb_args=((),{})):

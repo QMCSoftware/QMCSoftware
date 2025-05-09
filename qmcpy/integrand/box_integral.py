@@ -42,8 +42,8 @@ class BoxIntegral(AbstractIntegrand):
         (1024, 5)
         >>> y = integrand.f(x)
         >>> y.shape
-        (1024, 2, 3)
-        >>> y.mean(0)
+        (2, 3, 1024)
+        >>> y.mean(-1)
         array([[1.        , 1.26244857, 1.66666476],
                [2.28204729, 3.22246961, 4.67356373]])
 
@@ -53,11 +53,11 @@ class BoxIntegral(AbstractIntegrand):
         >>> x = integrand.discrete_distrib.gen_samples(2**10)
         >>> y = integrand.f(x)
         >>> y.shape
-        (16, 1024, 2, 3)
-        >>> muhats = y.mean(1) 
+        (2, 3, 16, 1024)
+        >>> muhats = y.mean(-1) 
         >>> muhats.shape 
-        (16, 2, 3)
-        >>> muhats.mean(0)
+        (2, 3, 16)
+        >>> muhats.mean(-1)
         array([[1.        , 0.76520743, 0.66666641],
                [0.62717067, 0.62219935, 0.64265505]])
 
@@ -89,7 +89,7 @@ class BoxIntegral(AbstractIntegrand):
 
     def g(self, t, **kwargs):
         sum_squares = (t**2).sum(-1)
-        y = sum_squares[(...,)+(None,)*self.s.ndim]**self.s_over_2
+        y = sum_squares**self.s_over_2[(...,)+(None,)*sum_squares.ndim]
         return y
     
     def _spawn(self, level, sampler):
