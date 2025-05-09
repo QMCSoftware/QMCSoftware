@@ -40,8 +40,9 @@ class AbstractIntegrand(object):
             raise ParameterError(prefix + 'self.true_measure, a AbstractTrueMeasure instance')
         if not hasattr(self,'parameters'):
             self.parameters = []
-        if not hasattr(self,'leveltype'):
-            self.leveltype = 'single'
+        if not hasattr(self,'multilevel'):
+            self.multilevel = False
+        assert isinstance(self.multilevel,bool)
         if not hasattr(self,'max_level'):
             self.max_level = np.inf
         if not hasattr(self,'discrete_distrib'):

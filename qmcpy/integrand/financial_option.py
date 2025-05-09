@@ -299,13 +299,14 @@ class FinancialOption(AbstractIntegrand):
             self.payoff = self.payoff_digital_call if self.call_put=='CALL' else self.payoff_digital_put
         else:
             raise ParameterError("invalid option type %s"%self.option)
-        dim_shape = (2,) if self.level is not None else ()
+        self.multilevel = self.level is not None
+        dim_shape = (2,) if self.multilevel else ()
         super(FinancialOption,self).__init__(dimension_indv=dim_shape,dimension_comb=dim_shape,parallel=False)  
     
     def g(self, t, **kwargs):
         gbm = self.gbm(t)
         discounted_payoffs = self.payoff(gbm)*self.discount_factor
-        if self.level is not None:
+        if self.multilevel:
             if self.level==self.initial_level:
                 discounted_payoffs_coarse = np.zeros_like(discounted_payoffs)
             else: 

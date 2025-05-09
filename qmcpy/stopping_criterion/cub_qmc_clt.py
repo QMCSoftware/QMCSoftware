@@ -169,8 +169,6 @@ class CubQMCCLT(AbstractStoppingCriterion):
             warnings.warn(warning_s, ParameterWarning)
             n_init = 32
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
         self.n_init = float(n_init)
         self.n_max = float(n_max)
         self.alpha = alpha
@@ -178,49 +176,19 @@ class CubQMCCLT(AbstractStoppingCriterion):
         self.error_fun = error_fun
         # QMCPy Objs
         self.integrand = integrand
-        self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.integrand.discrete_distrib
-        self.d_indv = self.integrand.d_indv
-        self.d = self.discrete_distrib.d
-        super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[AbstractLDDiscreteDistribution], allow_vectorized_integrals=True)
-        self.replications = self.discrete_distrib.replications
-        assert self.replications>1, "require the discrete distribution has replications>1"
-        if not self.discrete_distrib.randomize:
-            raise ParameterError("CLTRep requires distribution to have randomize=True")
+        super(CubQMCCLT,self).__init__(allowed_levels=["single"],allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=True)
+        assert self.discrete_distrib.replications>1, "require the discrete distribution has replications>1"
+        assert self.discrete_distrib.randomize is not "FALSE", "Requires discrete distribution is randomized"
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
-        self.t_star = -t.ppf(self.alphas_indv/2,df=self.replications-1)
-         
+        self.t_star = -t.ppf(self.alphas_indv/2,df=self.discrete_distrib.replications-1)
+        self.set_tolerance(abs_tol,rel_tol)
+        
     def integrate(self):
         t_start = time()
-        self.datum = np.empty(self.d_indv,dtype=object)
-        for j in np.ndindex(self.d_indv):
-            self.datum[j] = MeanVarDataRep(self.t_star[j],self.inflate,self.replications)
-        self.data = MeanVarDataRep.__new__(MeanVarDataRep)
-        self.data.flags_indv = np.tile(False,self.d_indv)
-        self.data.compute_flags = np.tile(True,self.d_indv)
-        self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
-        self.data.n_rep = np.tile(self.n_init,self.d_indv)
-        self.data.n_min_rep = 0
-        self.data.indv_bound_low = np.tile(-np.inf,self.d_indv)
-        self.data.indv_bound_high = np.tile(np.inf,self.d_indv)
-        self.data.solution_indv = np.tile(np.nan,self.d_indv)
-        self.data.solution = np.nan
-        self.data.xfull = np.empty((0,self.d))
-        self.data.yfull = np.empty((0,)+self.d_indv)
+        self.data = MeanVarDataRep(self)
         while True:
-            n_min = self.data.n_min_rep
-            n_max = int(self.data.n_rep.max())
-            n = int(n_max-n_min)
-            xnext = np.vstack([self.data.rep_distribs[r].gen_samples(n_min=n_min,n_max=n_max) for r in range(self.replications)])
-            ynext = self.integrand.f(xnext,compute_flags=self.data.compute_flags)
-            for j in np.ndindex(self.d_indv):
-                if self.data.flags_indv[j]: continue
-                yj = ynext[(slice(None),)+j].reshape((n,self.replications),order='f')
-                self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j] = self.datum[j].update_data(yj)
-            self.data.xfull = np.vstack((self.data.xfull,xnext))
-            self.data.yfull = np.vstack((self.data.yfull,ynext))
+            self.data.update_data()
             self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
-            self.abs_tols,self.rel_tols = np.full_like(self.data.comb_bound_low,self.abs_tol),np.full_like(self.data.comb_bound_low,self.rel_tol)
             fidxs = np.isfinite(self.data.comb_bound_low)&np.isfinite(self.data.comb_bound_high)
             slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
             self.data.solution = np.tile(np.nan,self.data.comb_bound_low.shape)
@@ -229,8 +197,6 @@ class CubQMCCLT(AbstractStoppingCriterion):
             self.data.comb_flags[fidxs] = (shigh-slow) <= (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
             self.data.compute_flags = ~self.data.flags_indv
-            self.data.n = self.replications*self.data.n_rep
-            self.data.n_total = self.data.n.max()
             if np.sum(self.data.compute_flags)==0:
                 break # sufficiently estimated
             elif 2*self.data.n_total>self.n_max:
@@ -242,23 +208,6 @@ class CubQMCCLT(AbstractStoppingCriterion):
                 % (int(self.data.n_total),int(self.data.n_total),int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
-            else:
-                self.data.n_min_rep = n_max
-                self.data.n_rep += self.data.n_rep*(self.data.compute_flags) # double sample size
-        self.data.integrand = self.integrand
-        self.data.true_measure = self.true_measure
-        self.data.discrete_distrib = self.discrete_distrib
-        self.data.stopping_crit = self
-        self.data.parameters = [
-            'solution',
-            'comb_bound_low',
-            'comb_bound_high',
-            'comb_flags',
-            'n_total',
-            'n',
-            'n_rep',
-            'time_integrate']
-        self.data.datum = self.datum
         self.data.time_integrate = time()-t_start
         return self.data.solution,self.data
     
@@ -270,7 +219,11 @@ class CubQMCCLT(AbstractStoppingCriterion):
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
         """
-        if abs_tol != None: self.abs_tol = abs_tol
-        if rel_tol != None: self.rel_tol = rel_tol
+        if abs_tol is not None:
+            self.abs_tol = abs_tol
+            self.abs_tols = np.full(self.integrand.d_comb,self.abs_tol)
+        if rel_tol is not None:
+            self.rel_tol = rel_tol
+            self.rel_tols = np.full(self.integrand.d_comb,self.rel_tol)
 
 class CubQMCRep(CubQMCCLT): pass
