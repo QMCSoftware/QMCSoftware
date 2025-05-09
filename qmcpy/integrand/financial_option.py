@@ -160,25 +160,25 @@ class FinancialOption(AbstractIntegrand):
         >>> num_levels = 4
         >>> ns = [2**11,2**10,2**9,2**8]
         >>> integrands = [FinancialOption(DigitalNetB2(dimension=2**l,seed=seed_seq.spawn(1)[0]),option="ASIAN",level=l,initial_level=initial_level) for l in range(initial_level,initial_level+num_levels)]
-        >>> xs = [integrands[l].discrete_distrib.gen_samples(2**10) for l in range(num_levels)]
+        >>> xs = [integrands[l].discrete_distrib.gen_samples(ns[l]) for l in range(num_levels)]
         >>> for l in range(num_levels):
         ...     print("xs[%d].shape = %s"%(l,xs[l].shape))
-        xs[0].shape = (1024, 8)
+        xs[0].shape = (2048, 8)
         xs[1].shape = (1024, 16)
-        xs[2].shape = (1024, 32)
-        xs[3].shape = (1024, 64)
+        xs[2].shape = (512, 32)
+        xs[3].shape = (256, 64)
         >>> ys = [integrands[l].f(xs[l]) for l in range(num_levels)]
         >>> for l in range(num_levels):
         ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
-        ys[0].shape = (1024,)
-        ys[1].shape = (1024,)
-        ys[2].shape = (1024,)
-        ys[3].shape = (1024,)
-        >>> ymeans = np.stack([ys[l].mean(-1) for l in range(num_levels)])
+        ys[0].shape = (2, 2048)
+        ys[1].shape = (2, 1024)
+        ys[2].shape = (2, 512)
+        ys[3].shape = (2, 256)
+        >>> ymeans = np.stack([(ys[l][0]-ys[l][1]).mean(-1) for l in range(num_levels)])
         >>> ymeans
-        array([1.77422439e+00, 3.58130113e-03, 5.93394554e-04, 6.73276544e-04])
+        array([ 1.77827205e+00,  3.58130113e-03,  2.51227835e-03, -8.34836713e-04])
         >>> print("%.4f"%ymeans.sum())
-        1.7791
+        1.7835
 
         Multi-level options with independent replications
          
@@ -197,11 +197,11 @@ class FinancialOption(AbstractIntegrand):
         >>> ys = [integrands[l].f(xs[l]) for l in range(num_levels)]
         >>> for l in range(num_levels):
         ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
-        ys[0].shape = (16, 128)
-        ys[1].shape = (16, 64)
-        ys[2].shape = (16, 32)
-        ys[3].shape = (16, 16)
-        >>> muhats = np.stack([ys[l].mean(-1) for l in range(num_levels)])
+        ys[0].shape = (2, 16, 128)
+        ys[1].shape = (2, 16, 64)
+        ys[2].shape = (2, 16, 32)
+        ys[3].shape = (2, 16, 16)
+        >>> muhats = np.stack([(ys[l][0]-ys[l][1]).mean(-1) for l in range(num_levels)])
         >>> muhats.shape
         (4, 16)
         >>> muhathat = muhats.mean(-1)
@@ -318,15 +318,19 @@ class FinancialOption(AbstractIntegrand):
             self.payoff = self.payoff_digital_call if self.call_put=='CALL' else self.payoff_digital_put
         else:
             raise ParameterError("invalid option type %s"%self.option)
-        super(FinancialOption,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)  
+        dim_shape = (2,) if self.level is not None else ()
+        super(FinancialOption,self).__init__(dimension_indv=dim_shape,dimension_comb=dim_shape,parallel=False)  
     
-    def g(self, t):
+    def g(self, t, **kwargs):
         gbm = self.gbm(t)
-        payoff = self.payoff(gbm)
-        if self.level is not None and self.level>self.initial_level:
-            payoff -= self.payoff(gbm[...,1::2]) 
-        discounted_payoff = payoff*self.discount_factor
-        return discounted_payoff
+        discounted_payoffs = self.payoff(gbm)*self.discount_factor
+        if self.level is not None:
+            if self.level==self.initial_level:
+                discounted_payoffs_coarse = np.zeros_like(discounted_payoffs)
+            else: 
+                discounted_payoffs_coarse = self.payoff(gbm[...,1::2])*self.discount_factor
+            discounted_payoffs = np.stack([discounted_payoffs,discounted_payoffs_coarse])
+        return discounted_payoffs
     
     def gbm(self, t):
         gbm = self.start_price*np.exp((self.interest_rate-self.volatility**2/2)*self.true_measure.time_vec+self.volatility*t)
