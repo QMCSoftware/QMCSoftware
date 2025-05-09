@@ -15,8 +15,7 @@ class CustomFun(AbstractIntegrand):
         >>> integrand = CustomFun(
         ...     true_measure = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2]),
         ...     g = lambda t: t[...,0]**2*t[...,1])
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> print("%.4f"%y.mean())
         3.9897
 
@@ -25,10 +24,7 @@ class CustomFun(AbstractIntegrand):
         >>> integrand = CustomFun(
         ...     true_measure = Gaussian(DigitalNetB2(2,seed=7,replications=2**4),mean=[1,2]),
         ...     g = lambda t: t[...,0]**2*t[...,1])
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> x.shape
-        (16, 64, 2)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(1) 

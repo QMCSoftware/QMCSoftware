@@ -103,8 +103,7 @@ class FinancialOption(AbstractIntegrand):
 
     Examples:
         >>> integrand = FinancialOption(DigitalNetB2(dimension=3,seed=7),option="EUROPEAN")
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> y.shape
         (1024,)
         >>> print("%.4f"%y.mean())
@@ -131,8 +130,7 @@ class FinancialOption(AbstractIntegrand):
             decomp_type     PCA
 
         >>> integrand = FinancialOption(DigitalNetB2(dimension=64,seed=7),option="ASIAN")
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> y.shape
         (1024,)
         >>> print("%.4f"%y.mean())
@@ -141,10 +139,7 @@ class FinancialOption(AbstractIntegrand):
         With independent replications
 
         >>> integrand = FinancialOption(DigitalNetB2(dimension=64,seed=7,replications=2**4),option="ASIAN")
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> x.shape
-        (16, 64, 64)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(-1) 
@@ -160,14 +155,7 @@ class FinancialOption(AbstractIntegrand):
         >>> num_levels = 4
         >>> ns = [2**11,2**10,2**9,2**8]
         >>> integrands = [FinancialOption(DigitalNetB2(dimension=2**l,seed=seed_seq.spawn(1)[0]),option="ASIAN",level=l,initial_level=initial_level) for l in range(initial_level,initial_level+num_levels)]
-        >>> xs = [integrands[l].discrete_distrib.gen_samples(ns[l]) for l in range(num_levels)]
-        >>> for l in range(num_levels):
-        ...     print("xs[%d].shape = %s"%(l,xs[l].shape))
-        xs[0].shape = (2048, 8)
-        xs[1].shape = (1024, 16)
-        xs[2].shape = (512, 32)
-        xs[3].shape = (256, 64)
-        >>> ys = [integrands[l].f(xs[l]) for l in range(num_levels)]
+        >>> ys = [integrands[l](ns[l]) for l in range(num_levels)]
         >>> for l in range(num_levels):
         ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
         ys[0].shape = (2, 2048)
@@ -187,14 +175,7 @@ class FinancialOption(AbstractIntegrand):
         >>> num_levels = 4
         >>> ns = [2**7,2**6,2**5,2**4]
         >>> integrands = [FinancialOption(DigitalNetB2(dimension=2**l,seed=seed_seq.spawn(1)[0],replications=2**4),option="ASIAN",level=l,initial_level=initial_level) for l in range(initial_level,initial_level+num_levels)]
-        >>> xs = [integrands[l].discrete_distrib.gen_samples(ns[l]) for l in range(num_levels)]
-        >>> for l in range(num_levels):
-        ...     print("xs[%d].shape = %s"%(l,xs[l].shape))
-        xs[0].shape = (16, 128, 8)
-        xs[1].shape = (16, 64, 16)
-        xs[2].shape = (16, 32, 32)
-        xs[3].shape = (16, 16, 64)
-        >>> ys = [integrands[l].f(xs[l]) for l in range(num_levels)]
+        >>> ys = [integrands[l](ns[l]) for l in range(num_levels)]
         >>> for l in range(num_levels):
         ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
         ys[0].shape = (2, 16, 128)

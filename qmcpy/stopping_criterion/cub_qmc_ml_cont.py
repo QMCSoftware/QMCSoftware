@@ -1,4 +1,4 @@
-from ._stopping_criterion import AbstractStoppingCriterion
+from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import MLQMCData
 from ..discrete_distribution import DigitalNetB2,Lattice,Halton
 from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution

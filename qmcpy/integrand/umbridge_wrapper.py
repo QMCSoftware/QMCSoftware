@@ -18,8 +18,7 @@ class UMBridgeWrapper(AbstractIntegrand):
         >>> um_bridge_model = umbridge.HTTPModel('http://localhost:4243','forward')
         >>> um_bridge_config = {"d": dnb2.d}
         >>> integrand = UMBridgeWrapper(true_measure,um_bridge_model,um_bridge_config,parallel=False)
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> print("%.4f"%y.mean())
         1.8067
         >>> integrand.true_measure
@@ -50,10 +49,7 @@ class UMBridgeWrapper(AbstractIntegrand):
         >>> d = sum(um_bridge_model.get_input_sizes(config=um_bridge_config))
         >>> true_measure = Uniform(DigitalNetB2(dimension=d,seed=7),lower_bound=-1,upper_bound=1)
         >>> integrand = UMBridgeWrapper(true_measure,um_bridge_model)
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> x.shape
-        (16, 64, 2)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(-1) 

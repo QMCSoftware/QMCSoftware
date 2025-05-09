@@ -11,9 +11,8 @@ class BayesianLRCoeffs(AbstractIntegrand):
     Logistic Regression Coefficients computed as the posterior mean in a Bayesian framework.
     
     Examples:
-        >>> blrcoeffs = BayesianLRCoeffs(DigitalNetB2(3,seed=7),feature_array=np.arange(8).reshape((4,2)),response_vector=[0,0,1,1])
-        >>> x = blrcoeffs.discrete_distrib.gen_samples(2**10)
-        >>> y = blrcoeffs.f(x)
+        >>> integrand = BayesianLRCoeffs(DigitalNetB2(3,seed=7),feature_array=np.arange(8).reshape((4,2)),response_vector=[0,0,1,1])
+        >>> y = integrand(2**10)
         >>> y.shape
         (2, 3, 1024)
         >>> y.mean(-1)
@@ -23,8 +22,7 @@ class BayesianLRCoeffs(AbstractIntegrand):
         With independent replications
 
         >>> integrand = BayesianLRCoeffs(DigitalNetB2(3,seed=7,replications=2**4),feature_array=np.arange(8).reshape((4,2)),response_vector=[0,0,1,1])
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (2, 3, 16, 64)
         >>> muhats = y.mean(-1) 

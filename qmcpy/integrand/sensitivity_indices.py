@@ -22,8 +22,7 @@ class SensitivityIndices(AbstractIntegrand):
                [False,  True, False, False],
                [False, False,  True, False],
                [False, False, False,  True]])
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> y.shape
         (2, 3, 4, 1024)
         >>> ymean = y.mean(-1)
@@ -83,8 +82,7 @@ class SensitivityIndices(AbstractIntegrand):
                 [False,  True, False,  True],
                 [False, False,  True,  True],
                 [False, False, False,  True]]])
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> y.shape 
         (2, 3, 4, 4, 5, 6, 16, 1024)
         >>> muhats = y.mean(-1) 

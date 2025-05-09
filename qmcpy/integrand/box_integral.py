@@ -14,8 +14,7 @@ class BoxIntegral(AbstractIntegrand):
         Scalar `s` 
         
         >>> integrand = BoxIntegral(DigitalNetB2(2,seed=7),s=7)
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> y.shape
         (1024,)
         >>> print("%.4f"%y.mean(0))
@@ -24,8 +23,7 @@ class BoxIntegral(AbstractIntegrand):
         With independent replications
 
         >>> integrand = BoxIntegral(DigitalNetB2(2,seed=7,replications=2**4),s=7)
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> y.shape
         (16, 1024)
         >>> muhats = y.mean(1) 
@@ -37,10 +35,7 @@ class BoxIntegral(AbstractIntegrand):
         Array `s`
 
         >>> integrand = BoxIntegral(DigitalNetB2(5,seed=7),s=np.arange(6).reshape((2,3)))
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> x.shape
-        (1024, 5)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> y.shape
         (2, 3, 1024)
         >>> y.mean(-1)
@@ -50,8 +45,7 @@ class BoxIntegral(AbstractIntegrand):
         With independent replications
 
         >>> integrand = BoxIntegral(DigitalNetB2(2,seed=7,replications=2**4),s=np.arange(6).reshape((2,3)))
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> y.shape
         (2, 3, 16, 1024)
         >>> muhats = y.mean(-1) 

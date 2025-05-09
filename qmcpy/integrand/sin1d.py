@@ -11,8 +11,7 @@ class Sin1d(AbstractIntegrand):
 
     Examples:
         >>> integrand = Sin1d(DigitalNetB2(1,seed=7),k=1)
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> print("%.4e"%y.mean())
         -7.3344e-08
         >>> integrand.true_measure
@@ -23,10 +22,7 @@ class Sin1d(AbstractIntegrand):
         With independent replications
 
         >>> integrand = Sin1d(DigitalNetB2(1,seed=7,replications=2**4),k=1)
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> x.shape
-        (16, 64, 1)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(-1) 

@@ -11,18 +11,14 @@ class Linear0(AbstractIntegrand):
 
     Examples: 
         >>> integrand = Linear0(DigitalNetB2(100,seed=7))
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> print("%.4e"%y.mean())
         3.0517e-05
 
         With independent replications
 
         >>> integrand = Linear0(DigitalNetB2(100,seed=7,replications=2**4))
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> x.shape
-        (16, 64, 100)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(-1) 

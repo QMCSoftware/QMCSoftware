@@ -26,8 +26,7 @@ class Genz(AbstractIntegrand):
         >>> for kind_func in ['OSCILLATORY','CORNER-PEAK']:
         ...     for kind_coeff in [1,2,3]:
         ...         integrand = Genz(DigitalNetB2(2,seed=7),kind_func=kind_func,kind_coeff=kind_coeff)
-        ...         x = integrand.discrete_distrib.gen_samples(2**14)
-        ...         y = integrand.f(x)
+        ...         y = integrand(2**14)
         ...         mu_hat = y.mean()
         ...         print('%-15s %-3d %.3f'%(kind_func,kind_coeff,mu_hat))
         OSCILLATORY     1   -0.351
@@ -40,10 +39,7 @@ class Genz(AbstractIntegrand):
         With independent replications
 
         >>> integrand = Genz(DigitalNetB2(2,seed=7,replications=2**4),kind_func="CORNER-PEAK",kind_coeff=3)
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> x.shape
-        (16, 64, 2)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(-1) 

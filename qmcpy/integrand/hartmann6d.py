@@ -9,8 +9,7 @@ class Hartmann6d(AbstractIntegrand):
 
     Examples:
         >>> integrand = Hartmann6d(DigitalNetB2(6,seed=7))
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> print("%.4f"%y.mean())
         -0.2550
         >>> integrand.true_measure
@@ -21,10 +20,7 @@ class Hartmann6d(AbstractIntegrand):
         With independent replications
 
         >>> integrand = Hartmann6d(DigitalNetB2(6,seed=7,replications=2**4))
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> x.shape
-        (16, 64, 6)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(-1) 

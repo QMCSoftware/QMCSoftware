@@ -1,4 +1,4 @@
-from ._stopping_criterion import AbstractStoppingCriterion
+from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 from ..integrand import AbstractIntegrand

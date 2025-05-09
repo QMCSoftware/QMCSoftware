@@ -5,6 +5,7 @@ nav:
     - Discrete Distributions: discrete_distributions.md
     - True Measures: true_measures.md
     - Integrands: integrands.md
+    - Stopping Criteria: stopping_criteria.md
   # - Demos:
   #   - Fast GP Net: examples/simple/fgp_dnb2.ipynb
   - Community: community.md

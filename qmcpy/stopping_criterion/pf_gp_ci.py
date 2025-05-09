@@ -1,4 +1,4 @@
-from ._stopping_criterion import AbstractStoppingCriterion
+from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..discrete_distribution import DigitalNetB2
 from ..integrand.ishigami import Ishigami
 from ..true_measure.abstract_true_measure import AbstractTrueMeasure

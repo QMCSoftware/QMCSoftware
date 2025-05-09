@@ -1,4 +1,4 @@
-from ._stopping_criterion import AbstractStoppingCriterion
+from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 import numpy as np

@@ -51,6 +51,32 @@ class AbstractIntegrand(object):
             raise ParameterError("The range of the composed transform is not compatible with this true measure")
         self.EPS = np.finfo(float).eps
 
+    def __call__(self, n=None, n_min=None, n_max=None, warn=True):
+        r"""
+        - If just `n` is supplied, generate samples from the sequence at indices 0,...,`n`-1.
+        - If `n_min` and `n_max` are supplied, generate samples from the sequence at indices `n_min`,...,`n_max`-1.
+        - If `n` and `n_min` are supplied, then generate samples from the sequence at indices `n`,...,`n_min`-1.
+
+        Args:
+            n (Union[None,int]): Number of points to generate.
+            n_min (Union[None,int]): Starting index of sequence.
+            n_max (Union[None,int]): Final index of sequence.
+            warn (bool): If `False`, disable warnings when generating samples.
+
+        Returns:
+            t (np.ndarray): Samples from the sequence. 
+                
+                - If `replications` is `None` then this will be of size (`n_max`-`n_min`) $\times$ `dimension` 
+                - If `replications` is a positive int, then `t` will be of size `replications` $\times$ (`n_max`-`n_min`) $\times$ `dimension` 
+            weights (np.ndarray): Only returned when `return_weights=True`. The Jacobian weights for the transformation
+        """
+        return self.gen_samples(n=n,n_min=n_min,n_max=n_max,warn=warn)
+    
+    def gen_samples(self, n=None, n_min=None, n_max=None, return_weights=False, warn=True):
+        x = self.discrete_distrib(n=n,n_min=n_min,n_max=n_max,warn=warn)
+        y = self.f(x)
+        return y
+
     def g(self, t, compute_flags, *args, **kwargs):
         r"""
         *Abstract method* implementing the integrand as a function of the true measure.

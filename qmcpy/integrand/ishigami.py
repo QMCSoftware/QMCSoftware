@@ -12,10 +12,7 @@ class Ishigami(AbstractIntegrand):
     
     Examples:
         >>> integrand = Ishigami(DigitalNetB2(3,seed=7))
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> x.shape 
-        (1024, 3)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> y.shape 
         (1024,)
         >>> print("%.4f"%y.mean())
@@ -28,10 +25,7 @@ class Ishigami(AbstractIntegrand):
         With independent replications
 
         >>> integrand = Ishigami(DigitalNetB2(3,seed=7,replications=2**4))
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> x.shape
-        (16, 64, 3)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(-1) 

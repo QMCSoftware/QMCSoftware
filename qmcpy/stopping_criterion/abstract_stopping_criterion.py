@@ -7,9 +7,9 @@ class AbstractStoppingCriterion(object):
     def __init__(self, allowed_levels, allowed_distribs, allow_vectorized_integrals):
         """
         Args:
-            distribution (AbstractDiscreteDistribution): an AbstractDiscreteDistribution
             allowed_levels (list): which integrand types are supported: 'single', 'fixed-multi', 'adaptive-multi'
             allowed_distribs (list): list of compatible AbstractDiscreteDistribution classes
+            allow_vectorized_integrals (bool): If True, vectorized integrals are allowed. 
         """
         sname = type(self).__name__
         prefix = 'A concrete implementation of AbstractStoppingCriterion must have '
@@ -38,9 +38,8 @@ class AbstractStoppingCriterion(object):
         ABSTRACT METHOD to determine the number of samples needed to satisfy the tolerance.
 
         Returns:
-            tuple: tuple containing:
-                - solution (float): approximation to the integral
-                - data (AccumulateData): an AccumulateData object
+            solution (float): approximation to the integral
+            data (AccumulateData): an AccumulateData object
         """
         raise MethodImplementationError(self, 'integrate')
     

@@ -1,4 +1,4 @@
-from ._stopping_criterion import AbstractStoppingCriterion
+from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution import Lattice,DigitalNetB2,Halton
@@ -13,143 +13,154 @@ import warnings
 
 
 class CubQMCCLT(AbstractStoppingCriterion):
-    """
-    Stopping criterion based on Central Limit Theorem for multiple replications.
+    r"""
+    Stopping criterion based on Student's $t$-distribution for multiple replications.
     
-    >>> k = Keister(Lattice(seed=7))
-    >>> sc = CubQMCCLT(k,abs_tol=.05)
-    >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.38030146])
-    >>> data
-    MeanVarDataRep (AccumulateData Object)
-        solution        1.380
-        comb_bound_low  1.380
-        comb_bound_high 1.381
-        comb_flags      1
-        n_total         2^(12)
-        n               2^(12)
-        n_rep           2^(8)
-        time_integrate  ...
-    CubQMCCLT (AbstractStoppingCriterion Object)
-        inflate         1.200
-        alpha           0.010
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(8)
-        n_max           2^(30)
-        replications    2^(4)
-    Keister (AbstractIntegrand Object)
-    Gaussian (AbstractTrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     PCA
-    Lattice (AbstractDiscreteDistribution Object)
-        d               1
-        dvec            0
-        randomize       SHIFT
-        order           NATURAL
-        gen_vec         1
-        entropy         7
-        spawn_key       ()
-    >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
-    >>> abs_tol = 1e-3
-    >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
-    >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.19029896, 0.96063374])
-    >>> data
-    MeanVarDataRep (AccumulateData Object)
-        solution        [1.19  0.961]
-        comb_bound_low  [1.19 0.96]
-        comb_bound_high [1.191 0.961]
-        comb_flags      [ True  True]
-        n_total         2^(19)
-        n               [524288.  16384.]
-        n_rep           [32768.  1024.]
-        time_integrate  ...
-    CubQMCCLT (AbstractStoppingCriterion Object)
-        inflate         1.200
-        alpha           0.010
-        abs_tol         0.001
-        rel_tol         0
-        n_init          2^(8)
-        n_max           2^(30)
-        replications    2^(4)
-    BoxIntegral (AbstractIntegrand Object)
-        s               [-1  1]
-    Uniform (AbstractTrueMeasure Object)
-        lower_bound     0
-        upper_bound     1
-    Lattice (AbstractDiscreteDistribution Object)
-        d               3
-        dvec            [0 1 2]
-        randomize       SHIFT
-        order           NATURAL
-        gen_vec         [     1 182667 213731]
-        entropy         7
-        spawn_key       ()
-    >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
-    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
-    >>> true_value = np.array([sol3neg1,sol31])
-    >>> assert (abs(true_value-solution)<abs_tol).all()
-    >>> cf = CustomFun(
-    ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
-    ...     g = lambda x,compute_flags=None: (2*np.arange(1,7)*x).reshape(-1,2,3),
-    ...     dimension_indv = (2,3))
-    >>> sol,data = CubQMCCLT(cf,abs_tol=1e-4).integrate()
-    >>> data
-    MeanVarDataRep (AccumulateData Object)
-        solution        [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_low  [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_high [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_flags      [[ True  True  True]
-                        [ True  True  True]]
-        n_total         2^(13)
-        n               [[4096. 4096. 4096.]
-                        [8192. 4096. 4096.]]
-        n_rep           [[256. 256. 256.]
-                        [512. 256. 256.]]
-        time_integrate  ...
-    CubQMCCLT (AbstractStoppingCriterion Object)
-        inflate         1.200
-        alpha           0.010
-        abs_tol         1.00e-04
-        rel_tol         0
-        n_init          2^(8)
-        n_max           2^(30)
-        replications    2^(4)
-    CustomFun (AbstractIntegrand Object)
-    Uniform (AbstractTrueMeasure Object)
-        lower_bound     0
-        upper_bound     1
-    DigitalNetB2 (AbstractDiscreteDistribution Object)
-        d               6
-        dvec            [0 1 2 3 4 5]
-        randomize       LMS_DS
-        graycode        0
-        entropy         7
-        spawn_key       ()
+    Examples:
+        >>> k = Keister(Lattice(seed=7))
+        >>> sc = CubQMCCLT(k,abs_tol=.05)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.38030146])
+        >>> data
+        MeanVarDataRep (AccumulateData Object)
+            solution        1.380
+            comb_bound_low  1.380
+            comb_bound_high 1.381
+            comb_flags      1
+            n_total         2^(12)
+            n               2^(12)
+            n_rep           2^(8)
+            time_integrate  ...
+        CubQMCCLT (AbstractStoppingCriterion Object)
+            inflate         1.200
+            alpha           0.010
+            abs_tol         0.050
+            rel_tol         0
+            n_init          2^(8)
+            n_max           2^(30)
+            replications    2^(4)
+        Keister (AbstractIntegrand Object)
+        Gaussian (AbstractTrueMeasure Object)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
+        Lattice (AbstractDiscreteDistribution Object)
+            d               1
+            dvec            0
+            randomize       SHIFT
+            order           NATURAL
+            gen_vec         1
+            entropy         7
+            spawn_key       ()
+        
+        >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
+        >>> abs_tol = 1e-3
+        >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.19029896, 0.96063374])
+        >>> data
+        MeanVarDataRep (AccumulateData Object)
+            solution        [1.19  0.961]
+            comb_bound_low  [1.19 0.96]
+            comb_bound_high [1.191 0.961]
+            comb_flags      [ True  True]
+            n_total         2^(19)
+            n               [524288.  16384.]
+            n_rep           [32768.  1024.]
+            time_integrate  ...
+        CubQMCCLT (AbstractStoppingCriterion Object)
+            inflate         1.200
+            alpha           0.010
+            abs_tol         0.001
+            rel_tol         0
+            n_init          2^(8)
+            n_max           2^(30)
+            replications    2^(4)
+        BoxIntegral (AbstractIntegrand Object)
+            s               [-1  1]
+        Uniform (AbstractTrueMeasure Object)
+            lower_bound     0
+            upper_bound     1
+        Lattice (AbstractDiscreteDistribution Object)
+            d               3
+            dvec            [0 1 2]
+            randomize       SHIFT
+            order           NATURAL
+            gen_vec         [     1 182667 213731]
+            entropy         7
+            spawn_key       ()
+        >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+        >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
+        >>> true_value = np.array([sol3neg1,sol31])
+        >>> assert (abs(true_value-solution)<abs_tol).all()
+        
+        >>> cf = CustomFun(
+        ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
+        ...     g = lambda x,compute_flags=None: (2*np.arange(1,7)*x).reshape(-1,2,3),
+        ...     dimension_indv = (2,3))
+        >>> sol,data = CubQMCCLT(cf,abs_tol=1e-4).integrate()
+        >>> data
+        MeanVarDataRep (AccumulateData Object)
+            solution        [[1. 2. 3.]
+                            [4. 5. 6.]]
+            comb_bound_low  [[1. 2. 3.]
+                            [4. 5. 6.]]
+            comb_bound_high [[1. 2. 3.]
+                            [4. 5. 6.]]
+            comb_flags      [[ True  True  True]
+                            [ True  True  True]]
+            n_total         2^(13)
+            n               [[4096. 4096. 4096.]
+                            [8192. 4096. 4096.]]
+            n_rep           [[256. 256. 256.]
+                            [512. 256. 256.]]
+            time_integrate  ...
+        CubQMCCLT (AbstractStoppingCriterion Object)
+            inflate         1.200
+            alpha           0.010
+            abs_tol         1.00e-04
+            rel_tol         0
+            n_init          2^(8)
+            n_max           2^(30)
+            replications    2^(4)
+        CustomFun (AbstractIntegrand Object)
+        Uniform (AbstractTrueMeasure Object)
+            lower_bound     0
+            upper_bound     1
+        DigitalNetB2 (AbstractDiscreteDistribution Object)
+            d               6
+            dvec            [0 1 2 3 4 5]
+            randomize       LMS_DS
+            graycode        0
+            entropy         7
+            spawn_key       ()
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
-        inflate=1.2, alpha=0.01, replications=16., 
-        error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
-        """
+    def __init__(self,
+                 integrand, 
+                 abs_tol = 1e-2,
+                 rel_tol = 0.,
+                 n_init = 256.,
+                 n_max = 2**30,
+                 inflate = 1,
+                 alpha = 0.01, 
+                 error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
+        r"""
         Args:
-            integrand (AbstractIntegrand): an instance of AbstractIntegrand
-            inflate (float): inflation factor when estimating variance
-            alpha (np.ndarray): significance level for confidence interval
-            abs_tol (np.ndarray): absolute error tolerance
-            rel_tol (np.ndarray): relative error tolerance
-            n_max (int): maximum number of samples
-            replications (int): number of replications
-            error_fun: function taking in the approximate solution vector, 
-                absolute tolerance, and relative tolerance which returns the approximate error. 
-                Default indicates integration until either absolute OR relative tolerance is satisfied.
+            integrand (AbstractIntegrand): An AbstractIntegrand.
+            inflate (float): Inflation factor to multiply by the variance estimate to make it more conservative. Must be greater than or equal to 1.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_max (int): Maximum number of samples.
+            error_fun (callable): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+
+                - The default $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \max\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
+                    means the approximation error must be below either the absolue error *or* relative error.
+                - Setting to $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \min\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
+                    means the approximation error must be below either the absolue error *and* relative error.  
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max','replications']
         # Input Checks
@@ -164,7 +175,6 @@ class CubQMCCLT(AbstractStoppingCriterion):
         self.n_max = float(n_max)
         self.alpha = alpha
         self.inflate = float(inflate)
-        self.replications = int(replications)
         self.error_fun = error_fun
         # QMCPy Objs
         self.integrand = integrand
@@ -172,14 +182,15 @@ class CubQMCCLT(AbstractStoppingCriterion):
         self.discrete_distrib = self.integrand.discrete_distrib
         self.d_indv = self.integrand.d_indv
         self.d = self.discrete_distrib.d
-        super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[LD], allow_vectorized_integrals=True)
+        super(CubQMCCLT,self).__init__(allowed_levels=["single"], allowed_distribs=[AbstractLDDiscreteDistribution], allow_vectorized_integrals=True)
+        self.replications = self.discrete_distrib.replications
+        assert self.replications>1, "require the discrete distribution has replications>1"
         if not self.discrete_distrib.randomize:
             raise ParameterError("CLTRep requires distribution to have randomize=True")
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
         self.t_star = -t.ppf(self.alphas_indv/2,df=self.replications-1)
          
     def integrate(self):
-        """ See abstract method. """
         t_start = time()
         self.datum = np.empty(self.d_indv,dtype=object)
         for j in np.ndindex(self.d_indv):

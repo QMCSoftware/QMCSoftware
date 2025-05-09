@@ -13,8 +13,7 @@ class Keister(AbstractIntegrand):
 
     Examples:
         >>> integrand = Keister(DigitalNetB2(2,seed=7))
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**10)
         >>> print("%.4f"%y.mean())
         1.8067
         >>> integrand.true_measure
@@ -26,10 +25,7 @@ class Keister(AbstractIntegrand):
         With independent replications
 
         >>> integrand = Keister(DigitalNetB2(2,seed=7,replications=2**4))
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
-        >>> x.shape
-        (16, 64, 2)
-        >>> y = integrand.f(x)
+        >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
         >>> muhats = y.mean(-1) 
