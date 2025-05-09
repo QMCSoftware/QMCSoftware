@@ -55,3 +55,7 @@
 ## `FinancialOption`
 
 ::: qmcpy.integrand.financial_option.FinancialOption
+
+## `BayesianLRCoeffs`
+
+::: qmcpy.integrand.bayesian_lr_coeffs.BayesianLRCoeffs

@@ -52,11 +52,11 @@ class FourBranch2d(AbstractIntegrand):
     
     def g(self, t):
         t0,t1 = t[...,0],t[...,1]
-        return np.minimum(np.minimum(np.minimum(
+        return np.minimum.reduce([
             3+.1*(t0-t1)**2-(t0+t1)/np.sqrt(2),
-            3+.1*(t0-t1)**2+(t0+t1)/np.sqrt(2)),
-            t0-t1+7/np.sqrt(2)),
-            t1-t0+7/np.sqrt(2))
+            3+.1*(t0-t1)**2+(t0+t1)/np.sqrt(2),
+            t0-t1+7/np.sqrt(2),
+            t1-t0+7/np.sqrt(2)])
     
     def _spawn(self, level, sampler):
         return FourBranch2d(sampler=sampler) 

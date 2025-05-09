@@ -7,31 +7,48 @@ from ..util import ParameterError
 import numpy as np
 
 class BayesianLRCoeffs(AbstractIntegrand):
-    """
+    r"""
     Logistic Regression Coefficients computed as the posterior mean in a Bayesian framework.
     
-    >>> blrcoeffs = BayesianLRCoeffs(DigitalNetB2(3,seed=7),feature_array=np.arange(8).reshape((4,2)),response_vector=[0,0,1,1])
-    >>> x = blrcoeffs.discrete_distrib.gen_samples(2**10)
-    >>> y = blrcoeffs.f(x)
-    >>> y.shape
-    (1024, 2, 3)
-    >>> y.mean(0)
-    array([[ 0.04948003, -0.01238017, -0.07146091],
-           [ 0.02366789,  0.02366789,  0.02366789]])
+    Examples:
+        >>> blrcoeffs = BayesianLRCoeffs(DigitalNetB2(3,seed=7),feature_array=np.arange(8).reshape((4,2)),response_vector=[0,0,1,1])
+        >>> x = blrcoeffs.discrete_distrib.gen_samples(2**10)
+        >>> y = blrcoeffs.f(x)
+        >>> y.shape
+        (2, 3, 1024)
+        >>> y.mean(-1)
+        array([[ 0.05041707, -0.01827899, -0.05336474],
+               [ 0.02106427,  0.02106427,  0.02106427]])
+
+        With independent replications
+
+        >>> integrand = BayesianLRCoeffs(DigitalNetB2(3,seed=7,replications=2**4),feature_array=np.arange(8).reshape((4,2)),response_vector=[0,0,1,1])
+        >>> x = integrand.discrete_distrib.gen_samples(2**6)
+        >>> y = integrand.f(x)
+        >>> y.shape
+        (2, 3, 16, 64)
+        >>> muhats = y.mean(-1) 
+        >>> muhats.shape 
+        (2, 3, 16)
+        >>> muhats.mean(-1)
+        array([[ 0.06639437, -0.02363103, -0.07425795],
+               [ 0.02431178,  0.02431178,  0.02431178]])
     """
 
     def __init__(self, sampler, feature_array, response_vector, prior_mean=0, prior_covariance=10):
-        """
+        r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform
-            feature_array (np.ndarray): N samples by d-1 dimensions array of input features
-            response_vector (np.ndarray): length N array of binary responses corresponding to each
-            prior_mean (np.ndarray): length d array of prior means, one for each coefficient. 
-                The first d-1 inputs correspond to the d-1 features. 
-                The last input corresponds to the intercept coefficient.
-            prior_covariance (np.ndarray): d x d prior covariance array whose indexing is consistent with the prior mean.
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            feature_array (np.ndarray): Array of features with shape $(N,d-1)$ where $N$ is the number of observations and $d$ is the dimension.
+            response_vector (np.ndarray): Binary responses vector of length $N$.
+            prior_mean (np.ndarray): Length $d$ vector of prior means, one for each coefficient.
+                
+                - The first $d-1$ inputs correspond to the $d-1$ features. 
+                - The last input corresponds to the intercept coefficient.
+            prior_covariance (np.ndarray): Prior covariance array with shape $(d,d)$ d x d where indexing is consistent with the prior mean.
         """
         self.prior_mean = prior_mean
         self.prior_covariance = prior_covariance
@@ -49,13 +66,13 @@ class BayesianLRCoeffs(AbstractIntegrand):
         super(BayesianLRCoeffs,self).__init__(dimension_indv=(2,self.num_coeffs),dimension_comb=self.num_coeffs,parallel=False)
         
     def g(self, x, compute_flags):
-        z = x@self.feature_array.T
+        z = np.einsum("...j,ij->...i",x,self.feature_array)
         z1 = z*self.response_vector
         with np.errstate(over='ignore'):
-            den = np.exp(np.sum(z1-np.log(1+np.exp(z)),1))[:,None]
-        y = np.zeros((len(x),2,self.num_coeffs),dtype=float)
-        y[:,0] = x*den
-        y[:,1] = den
+            den = np.exp(np.sum(z1-np.log(1+np.exp(z)),-1))
+        y = np.zeros(self.d_indv+x.shape[:-1],dtype=float)
+        y[0] = np.permute_dims(x,[-1]+[i for i in range(x.ndim-1)])*den
+        y[1] = den
         return y
     
     def _spawn(self, level, sampler):
@@ -69,8 +86,8 @@ class BayesianLRCoeffs(AbstractIntegrand):
     def bound_fun(self, bound_low, bound_high):
         num_bounds_low,den_bounds_low = bound_low[0],bound_low[1]
         num_bounds_high,den_bounds_high = bound_high[0],bound_high[1]
-        comb_bounds_low = minimum.reduce([num_bounds_low/den_bounds_low,num_bounds_high/den_bounds_low,num_bounds_low/den_bounds_high,num_bounds_high/den_bounds_high])
-        comb_bounds_high = maximum.reduce([num_bounds_low/den_bounds_low,num_bounds_high/den_bounds_low,num_bounds_low/den_bounds_high,num_bounds_high/den_bounds_high])
+        comb_bounds_low = np.minimum.reduce([num_bounds_low/den_bounds_low,num_bounds_high/den_bounds_low,num_bounds_low/den_bounds_high,num_bounds_high/den_bounds_high])
+        comb_bounds_high = np.maximum.reduce([num_bounds_low/den_bounds_low,num_bounds_high/den_bounds_low,num_bounds_low/den_bounds_high,num_bounds_high/den_bounds_high])
         violated = (den_bounds_low<=0)*(0<=den_bounds_high)
         comb_bounds_low[violated],comb_bounds_high[violated] = -np.inf,np.inf
         return comb_bounds_low,comb_bounds_high
