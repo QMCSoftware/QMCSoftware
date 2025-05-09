@@ -16,7 +16,7 @@ def _error_udens(gp, x):
     return _error_udens_from_phi(_get_phi(gp,x))
 
 class PFGPCIData(AccumulateData):
-    """ Update and store data for the PFGPCI StoppingCriterion. """
+    """ Update and store data for the PFGPCI AbstractStoppingCriterion. """
 
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, dnb2, n_approx, alpha, refit, 
         gpytorch_prior_mean, gpytorch_prior_cov, gpytorch_likelihood, gpytorch_marginal_log_likelihood_func,

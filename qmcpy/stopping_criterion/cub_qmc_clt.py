@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import MeanVarDataRep
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution import Lattice,DigitalNetB2,Halton
@@ -12,7 +12,7 @@ from time import time
 import warnings
 
 
-class CubQMCCLT(StoppingCriterion):
+class CubQMCCLT(AbstractStoppingCriterion):
     """
     Stopping criterion based on Central Limit Theorem for multiple replications.
     
@@ -31,7 +31,7 @@ class CubQMCCLT(StoppingCriterion):
         n               2^(12)
         n_rep           2^(8)
         time_integrate  ...
-    CubQMCCLT (StoppingCriterion Object)
+    CubQMCCLT (AbstractStoppingCriterion Object)
         inflate         1.200
         alpha           0.010
         abs_tol         0.050
@@ -68,7 +68,7 @@ class CubQMCCLT(StoppingCriterion):
         n               [524288.  16384.]
         n_rep           [32768.  1024.]
         time_integrate  ...
-    CubQMCCLT (StoppingCriterion Object)
+    CubQMCCLT (AbstractStoppingCriterion Object)
         inflate         1.200
         alpha           0.010
         abs_tol         0.001
@@ -114,7 +114,7 @@ class CubQMCCLT(StoppingCriterion):
         n_rep           [[256. 256. 256.]
                         [512. 256. 256.]]
         time_integrate  ...
-    CubQMCCLT (StoppingCriterion Object)
+    CubQMCCLT (AbstractStoppingCriterion Object)
         inflate         1.200
         alpha           0.010
         abs_tol         1.00e-04

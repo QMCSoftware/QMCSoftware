@@ -10,7 +10,7 @@ class MeanVarData(AccumulateData):
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, n_init, control_variates, control_variate_means):
         """
         Args:
-            stopping_crit (StoppingCriterion): a StoppingCriterion instance
+            stopping_crit (AbstractStoppingCriterion): a AbstractStoppingCriterion instance
             integrand (AbstractIntegrand): an AbstractIntegrand instance
             true_measure (AbstractTrueMeasure): A AbstractTrueMeasure instance
             discrete_distrib (AbstractDiscreteDistribution): an AbstractDiscreteDistribution instance  

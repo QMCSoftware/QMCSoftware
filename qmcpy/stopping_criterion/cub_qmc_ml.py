@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import MLQMCData
 from ..discrete_distribution import DigitalNetB2,Lattice,Halton
 from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
@@ -11,7 +11,7 @@ from time import time
 import warnings
 
 
-class CubQMCML(StoppingCriterion):
+class CubQMCML(AbstractStoppingCriterion):
     """
     Stopping criterion based on multi-level quasi-Monte Carlo.
 
@@ -28,7 +28,7 @@ class CubQMCML(StoppingCriterion):
         var_level       [2.027e-04 5.129e-05 3.243e-05 1.610e-05 5.633e-06]
         bias_estimate   0.014
         time_integrate  ...
-    CubQMCML (StoppingCriterion Object)
+    CubQMCML (AbstractStoppingCriterion Object)
         rmse_tol        0.029
         n_init          2^(8)
         n_max           10000000000

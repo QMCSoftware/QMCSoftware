@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 from ..integrand import AbstractIntegrand
@@ -7,7 +7,7 @@ from time import time
 import warnings
 
 
-class _CubQMCLDG(StoppingCriterion):
+class _CubQMCLDG(AbstractStoppingCriterion):
     """
     Abstract class for CubQMC{LD}G where LD is a low discrepancy discrete distribution. 
     See subclasses for implementation differences for each LD sequence. 

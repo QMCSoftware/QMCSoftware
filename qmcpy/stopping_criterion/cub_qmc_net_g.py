@@ -24,7 +24,7 @@ class CubQMCNetG(_CubQMCLDG):
         n_total         2^(10)
         n               2^(10)
         time_integrate  ...
-    CubQMCNetG (StoppingCriterion Object)
+    CubQMCNetG (AbstractStoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
@@ -80,7 +80,7 @@ class CubQMCNetG(_CubQMCLDG):
         n_total         2^(10)
         n               [1024. 1024.]
         time_integrate  ...
-    CubQMCNetG (StoppingCriterion Object)
+    CubQMCNetG (AbstractStoppingCriterion Object)
         abs_tol         0.010
         rel_tol         0
         n_init          2^(10)
@@ -120,7 +120,7 @@ class CubQMCNetG(_CubQMCLDG):
         n               [[4096. 4096. 8192.]
                         [2048. 2048. 4096.]]
         time_integrate  ...
-    CubQMCNetG (StoppingCriterion Object)
+    CubQMCNetG (AbstractStoppingCriterion Object)
         abs_tol         1.00e-06
         rel_tol         0
         n_init          2^(10)

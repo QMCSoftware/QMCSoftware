@@ -28,7 +28,7 @@ class CubBayesLatticeG(_CubBayesLDG):
         n_total         2^(8)
         n               2^(8)
         time_integrate  ...
-    CubBayesLatticeG (StoppingCriterion Object)
+    CubBayesLatticeG (AbstractStoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(8)

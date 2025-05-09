@@ -19,7 +19,7 @@ class LDTransformBayesData(AccumulateData):
                  fbt, merge_fbt, kernel, alpha):
         """
         Args:
-            stopping_crit (StoppingCriterion): a StoppingCriterion instance
+            stopping_crit (AbstractStoppingCriterion): a AbstractStoppingCriterion instance
             integrand (AbstractIntegrand): an AbstractIntegrand instance
             true_measure (AbstractTrueMeasure): A AbstractTrueMeasure instance
             discrete_distrib (AbstractDiscreteDistribution): an AbstractDiscreteDistribution instance

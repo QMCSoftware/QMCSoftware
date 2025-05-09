@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import MeanVarDataVec
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution import IIDStdUniform
@@ -12,7 +12,7 @@ from scipy.stats import norm
 import warnings
 
 
-class CubMCCLTVec(StoppingCriterion):
+class CubMCCLTVec(AbstractStoppingCriterion):
     """
     Stopping criterion based on the Central Limit Theorem for vectorized integrands.
     
@@ -30,7 +30,7 @@ class CubMCCLTVec(StoppingCriterion):
         n_total         2^(10)
         n               2^(10)
         time_integrate  ...
-    CubMCCLTVec (StoppingCriterion Object)
+    CubMCCLTVec (AbstractStoppingCriterion Object)
         inflate         1.200
         alpha           0.010
         abs_tol         0.050
@@ -61,7 +61,7 @@ class CubMCCLTVec(StoppingCriterion):
         n_total         2^(11)
         n               [2048.  512.]
         time_integrate  ...
-    CubMCCLTVec (StoppingCriterion Object)
+    CubMCCLTVec (AbstractStoppingCriterion Object)
         inflate         1.200
         alpha           0.010
         abs_tol         0.050
@@ -100,7 +100,7 @@ class CubMCCLTVec(StoppingCriterion):
         n               [[  32768.  131072.  524288.]
                         [ 524288. 1048576. 2097152.]]
         time_integrate  ...
-    CubMCCLTVec (StoppingCriterion Object)
+    CubMCCLTVec (AbstractStoppingCriterion Object)
         inflate         1.200
         alpha           0.010
         abs_tol         0.010

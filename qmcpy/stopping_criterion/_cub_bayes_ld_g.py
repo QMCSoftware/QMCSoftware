@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 import numpy as np
@@ -6,7 +6,7 @@ from time import time
 import warnings
 
 
-class _CubBayesLDG(StoppingCriterion):
+class _CubBayesLDG(AbstractStoppingCriterion):
     """
     Abstract class for CubBayes{LD}G where LD is a low discrepancy discrete distribution.
     See subclasses for implementation differences for each LD sequence.

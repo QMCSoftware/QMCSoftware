@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import AbstractStoppingCriterion
 from ..discrete_distribution import DigitalNetB2
 from ..integrand.ishigami import Ishigami
 from ..true_measure.abstract_true_measure import AbstractTrueMeasure
@@ -50,7 +50,7 @@ class SuggesterSimple(Suggester):
         self.n_min = n_max
         return x
 
-class PFGPCI(StoppingCriterion):
+class PFGPCI(AbstractStoppingCriterion):
     """
     Probability of failure estimation using adaptive Gaussian Processes (GP) construction and resulting credible intervals. 
     
@@ -87,7 +87,7 @@ class PFGPCI(StoppingCriterion):
         bound_high      0.180
         n_total         112
         time_integrate  ...
-    PFGPCI (StoppingCriterion Object)
+    PFGPCI (AbstractStoppingCriterion Object)
     Ishigami (AbstractIntegrand Object)
     Uniform (AbstractTrueMeasure Object)
         lower_bound     -3.142

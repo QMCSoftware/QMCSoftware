@@ -2,8 +2,7 @@ from ..integrand.abstract_integrand import AbstractIntegrand
 from ..util import DistributionCompatibilityError, ParameterError, MethodImplementationError, _univ_repr
 import numpy as np
 
-class StoppingCriterion(object):
-    """ Stopping Criterion abstract class. DO NOT INSTANTIATE. """
+class AbstractStoppingCriterion(object):
     
     def __init__(self, allowed_levels, allowed_distribs, allow_vectorized_integrals):
         """
@@ -13,16 +12,15 @@ class StoppingCriterion(object):
             allowed_distribs (list): list of compatible AbstractDiscreteDistribution classes
         """
         sname = type(self).__name__
-        prefix = 'A concrete implementation of StoppingCriterion must have '
+        prefix = 'A concrete implementation of AbstractStoppingCriterion must have '
         # integrand check
-        if (not hasattr(self, 'integrand')) or \
-            (not isinstance(self.integrand,AbstractIntegrand)):
+        if not (hasattr(self, 'integrand') and isinstance(self.integrand,AbstractIntegrand)):
             raise ParameterError(prefix + 'self.integrand, an AbstractIntegrand instance')
         # true measure check
-        if (not hasattr(self, 'true_measure')) or (self.true_measure!=self.integrand.true_measure):
+        if not (hasattr(self, 'true_measure') and self.true_measure==self.integrand.true_measure):
             raise ParameterError(prefix + 'self.true_measure=self.integrand.true_measure')
         # discrete distribution check
-        if (not hasattr(self, 'discrete_distrib')) or (self.discrete_distrib!=self.integrand.discrete_distrib):
+        if not (hasattr(self, 'discrete_distrib') and self.discrete_distrib==self.integrand.discrete_distrib):
             raise ParameterError(prefix + 'self.discrete_distrib=self.integrand.discrete_distrib')
         if not isinstance(self.discrete_distrib,tuple(allowed_distribs)):
             raise DistributionCompatibilityError('%s must have an AbstractDiscreteDistribution in %s'%(sname,str(allowed_distribs)))
@@ -48,7 +46,7 @@ class StoppingCriterion(object):
     
     def set_tolerance(self, *args, **kwargs):
         """ ABSTRACT METHOD to reset the absolute tolerance. """
-        raise ParameterError("The %s StoppingCriterion does not yet support resetting tolerances.")
+        raise ParameterError("The %s AbstractStoppingCriterion does not support resetting tolerances.")
 
     def _compute_indv_alphas(self, alphas_comb):
         """
@@ -73,5 +71,6 @@ class StoppingCriterion(object):
             alpha_k_mat[alpha_k_mat==0] = 1
             alphas_indv = np.minimum(alphas_indv,alpha_k_mat)
         return alphas_indv,identity_dependency
+    
     def __repr__(self):
-        return _univ_repr(self, "StoppingCriterion", self.parameters)
+        return _univ_repr(self, "AbstractStoppingCriterion", self.parameters)

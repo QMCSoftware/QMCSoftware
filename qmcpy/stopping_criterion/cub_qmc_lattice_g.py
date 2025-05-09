@@ -24,7 +24,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         n_total         2^(10)
         n               2^(10)
         time_integrate  ...
-    CubQMCLatticeG (StoppingCriterion Object)
+    CubQMCLatticeG (AbstractStoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
@@ -71,7 +71,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         n               [[ 8192. 16384. 16384.]
                         [16384. 32768. 32768.]]
         time_integrate  ...
-    CubQMCLatticeG (StoppingCriterion Object)
+    CubQMCLatticeG (AbstractStoppingCriterion Object)
         abs_tol         1.00e-06
         rel_tol         0
         n_init          2^(10)

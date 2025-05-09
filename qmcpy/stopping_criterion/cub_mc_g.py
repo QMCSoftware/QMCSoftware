@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
@@ -13,7 +13,7 @@ from time import time
 import warnings
 
 
-class CubMCG(StoppingCriterion):
+class CubMCG(AbstractStoppingCriterion):
     r"""
     Stopping criterion with guaranteed accuracy.
 
@@ -28,7 +28,7 @@ class CubMCG(StoppingCriterion):
         n               14232
         levels          1
         time_integrate  ...
-    CubMCG (StoppingCriterion Object)
+    CubMCG (AbstractStoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)

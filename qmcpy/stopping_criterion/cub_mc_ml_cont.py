@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import MLMCData
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
@@ -11,7 +11,7 @@ from time import time
 import warnings
 
 
-class CubMCMLCont(StoppingCriterion):
+class CubMCMLCont(AbstractStoppingCriterion):
     """
     Stopping criterion based on continuation multi-level monte carlo.
     
@@ -31,7 +31,7 @@ class CubMCMLCont(StoppingCriterion):
         beta            1.992
         gamma           1.000
         time_integrate  ...
-    CubMCMLCont (StoppingCriterion Object)
+    CubMCMLCont (AbstractStoppingCriterion Object)
         rmse_tol        0.019
         n_init          2^(8)
         levels_min      2^(1)

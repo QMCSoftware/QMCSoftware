@@ -1,4 +1,4 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import AbstractStoppingCriterion
 from ..accumulate_data import MeanVarData
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
@@ -11,7 +11,7 @@ from time import time
 import warnings
 
 
-class CubMCCLT(StoppingCriterion):
+class CubMCCLT(AbstractStoppingCriterion):
     """
     Stopping criterion based on the Central Limit Theorem.
     
@@ -26,7 +26,7 @@ class CubMCCLT(StoppingCriterion):
         n               95004
         levels          1
         time_integrate  ...
-    CubMCCLT (StoppingCriterion Object)
+    CubMCCLT (AbstractStoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
@@ -70,7 +70,7 @@ class CubMCCLT(StoppingCriterion):
         n               2^(11)
         levels          1
         time_integrate  ...
-    CubMCCLT (StoppingCriterion Object)
+    CubMCCLT (AbstractStoppingCriterion Object)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
