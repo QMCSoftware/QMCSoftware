@@ -7,7 +7,7 @@ class AbstractStoppingCriterion(object):
     def __init__(self, allowed_levels, allowed_distribs, allow_vectorized_integrals):
         """
         Args:
-            allowed_levels (list): which integrand types are supported: 'single', 'fixed-multi', 'adaptive-multi'
+            allow_multilevel (bool): which integrand types are supported: 'single', 'fixed-multi', 'adaptive-multi'
             allowed_distribs (list): list of compatible AbstractDiscreteDistribution classes
             allow_vectorized_integrals (bool): If True, vectorized integrals are allowed. 
         """
@@ -16,17 +16,9 @@ class AbstractStoppingCriterion(object):
         # integrand check
         if not (hasattr(self, 'integrand') and isinstance(self.integrand,AbstractIntegrand)):
             raise ParameterError(prefix + 'self.integrand, an AbstractIntegrand instance')
-        # true measure check
-        if not (hasattr(self, 'true_measure') and self.true_measure==self.integrand.true_measure):
-            raise ParameterError(prefix + 'self.true_measure=self.integrand.true_measure')
-        # discrete distribution check
-        if not (hasattr(self, 'discrete_distrib') and self.discrete_distrib==self.integrand.discrete_distrib):
-            raise ParameterError(prefix + 'self.discrete_distrib=self.integrand.discrete_distrib')
-        if not isinstance(self.discrete_distrib,tuple(allowed_distribs)):
+        if not isinstance(self.integrand.discrete_distrib,tuple(allowed_distribs)):
             raise DistributionCompatibilityError('%s must have an AbstractDiscreteDistribution in %s'%(sname,str(allowed_distribs)))
         # multilevel compatibility check
-        if self.integrand.leveltype not in allowed_levels:
-            raise ParameterError('AbstractIntegrand is %s level but %s only supports %s level problems.'%(self.integrand.leveltype,sname,allowed_levels))
         if (not allow_vectorized_integrals) and self.integrand.d_indv!=(1,):
             raise ParameterError('Vectorized integrals (with d_indv>1 outputs per sample) are not supported by this stopping criterion')
         # parameter checks
@@ -67,8 +59,7 @@ class AbstractStoppingCriterion(object):
             n_dep_k = dependents_k.sum()
             alpha_k = alphas_comb[k]/n_dep_k
             alpha_k_mat = alpha_k*dependents_k
-            alpha_k_mat[alpha_k_mat==0] = 1
-            alphas_indv = np.minimum(alphas_indv,alpha_k_mat)
+            alphas_indv = np.where(alpha_k_mat==0,alphas_indv,np.minimum(alpha_k_mat,alphas_indv))
         return alphas_indv,identity_dependency
     
     def __repr__(self):

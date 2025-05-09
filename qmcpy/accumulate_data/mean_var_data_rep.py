@@ -12,6 +12,7 @@ class MeanVarDataRep(AccumulateData):
             'solution',
             'comb_bound_low',
             'comb_bound_high',
+            'comb_bound_diff',
             'comb_flags',
             'n_total',
             'n',
@@ -27,7 +28,7 @@ class MeanVarDataRep(AccumulateData):
         self.n_min = 0
         self.n_max = int(self.n_rep.max())
         self.solution_indv = np.tile(np.nan,self.integrand.d_indv)
-        self.xfull = np.empty((self.discrete_distrib.replications,0,self.d))
+        self.xfull = np.empty((self.discrete_distrib.replications,0,self.integrand.d))
         self.yfull = np.empty(self.integrand.d_indv+(self.discrete_distrib.replications,0))
         self._ysums = np.zeros(self.integrand.d_indv+(self.discrete_distrib.replications,),dtype=float)
         self.ns = np.array([0],dtype=int)
@@ -49,7 +50,7 @@ class MeanVarDataRep(AccumulateData):
         self.indv_bound_low = self.solution_indv-self.ci_half_width
         self.indv_bound_high = self.solution_indv+self.ci_half_width
         self.n = self.discrete_distrib.replications*self.n_rep
-        self.n_total = self.n_max 
+        self.n_total = self.n.max() 
         self.n_min = self.n_max
         self.n_max = 2*self.n_min
         
