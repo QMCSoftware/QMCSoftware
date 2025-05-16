@@ -1,6 +1,6 @@
 from .abstract_integrand import AbstractIntegrand
-from . import Keister, BoxIntegral
-from ..stopping_criterion import CubQMCNetG
+from .keister import Keister
+from .box_integral import BoxIntegral
 from ..util import ParameterError
 from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
@@ -118,25 +118,24 @@ class SensitivityIndices(AbstractIntegrand):
             indices (np.ndarray): Bool array with shape $(\dots,d)$ where each length $d$ vector item indicates which dimensions are active in the subset.
             
                 - The default `indices='singletons'` sets `indices=np.eye(d,dtype=bool)`.
-                - Setting `incides='all'` sets `indices = np.array([[bool(int(b)) for b in np.binary_repr(i,width=self.d)] for i in range(1,2**self.d-1)],dtype=bool)`
+                - Setting `incides='all'` sets `indices = np.array([[bool(int(b)) for b in np.binary_repr(i,width=d)] for i in range(1,2**d-1)],dtype=bool)`
         """
         self.parameters = ['indices']
         self.integrand = integrand
-        self.d = self.integrand.d
-        assert self.d>1, "SensitivityIndices does not make sense for d=1"
+        self.dtilde = self.integrand.d
+        assert self.dtilde>1, "SensitivityIndices does not make sense for d=1"
         self.indices = indices
         if isinstance(self.indices,str) and self.indices=='singletons':
-            self.indices = np.eye(self.d,dtype=bool)
+            self.indices = np.eye(self.dtilde,dtype=bool)
         elif isinstance(self.indices,str) and self.indices=='all':
-            self.indices = np.array([[bool(int(b)) for b in np.binary_repr(i,width=self.d)] for i in range(1,2**self.d-1)],dtype=bool)
+            self.indices = np.array([[bool(int(b)) for b in np.binary_repr(i,width=self.dtilde)] for i in range(1,2**self.dtilde-1)],dtype=bool)
         self.indices = np.atleast_1d(self.indices)
-        assert self.indices.dtype==bool and self.indices.ndim>=1 and self.indices.shape[-1]==self.d 
+        assert self.indices.dtype==bool and self.indices.ndim>=1 and self.indices.shape[-1]==self.dtilde 
         assert not (self.indices==self.indices[...,0,None]).all(-1).any(), "indices cannot include the emptyset or the set of all dimensions"
         self.not_indices = ~self.indices
         # sensitivity_index
-        self.dtilde = 2*self.d
-        self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.true_measure.discrete_distrib.spawn(s=1,dimensions=[self.dtilde])[0]
+        self.true_measure = self.integrand.true_measure.spawn(s=1,dimensions=[2*self.dtilde])[0]
+        self.discrete_distrib = self.true_measure.discrete_distrib
         self.sampler = self.integrand.sampler
         self.i_slice = (slice(None),)*len(self.integrand.d_indv)
         super(SensitivityIndices,self).__init__(
@@ -151,8 +150,8 @@ class SensitivityIndices(AbstractIntegrand):
         else:
             compute_flags = np.ones(self.d_indv,dtype=bool)
         assert compute_flags.shape==self.d_indv
-        z = x[...,self.d:]
-        x = x[...,:self.d]
+        z = x[...,self.dtilde:]
+        x = x[...,:self.dtilde]
         v = np.zeros_like(x)
         y = np.zeros(self.d_indv+x.shape[:-1],dtype=float)
         f_x = self.integrand.f(x,*args,**kwargs)
@@ -183,7 +182,7 @@ class SensitivityIndices(AbstractIntegrand):
             indices = self.indices)
     
     def bound_fun(self, bound_low, bound_high):
-        tau_low,mu_low,f2_low = bound_low[:0],bound_low[:,1],bound_low[:,2]
+        tau_low,mu_low,f2_low = bound_low[:,0],bound_low[:,1],bound_low[:,2]
         tau_high,mu_high,f2_high = bound_high[:,0],bound_high[:,1],bound_high[:,2]
         sigma2_low1,sigma2_low2 = f2_high-mu_low**2,f2_high-mu_high**2
         comb_bounds_low = np.clip(np.minimum.reduce([tau_low/sigma2_low1,tau_low/sigma2_low2]),0,1)

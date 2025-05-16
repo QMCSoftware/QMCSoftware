@@ -43,9 +43,9 @@ class MeanVarDataRep(AccumulateData):
         self.yfull = np.concatenate([self.yfull,ynext],-1)
         self.n_rep[self.compute_flags] = self.n_max
         self._ysums[self.compute_flags] += ynext[self.compute_flags].sum(-1)
-        self.muhats = self._ysums/self.n_rep
-        self.solution_indv = self.muhats.mean()
-        self.sigmahat = self.muhats.std()
+        self.muhats = self._ysums/self.n_rep[...,None]
+        self.solution_indv = self.muhats.mean(-1)
+        self.sigmahat = self.muhats.std(-1)
         self.ci_half_width = self.stopping_crit.t_star*self.stopping_crit.inflate*self.sigmahat/np.sqrt(self.discrete_distrib.replications)
         self.indv_bound_low = self.solution_indv-self.ci_half_width
         self.indv_bound_high = self.solution_indv+self.ci_half_width

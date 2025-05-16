@@ -125,7 +125,7 @@ class AbstractTrueMeasure(object):
         sampler_spawns = sampler.spawn(s=s,dimensions=dimensions)
         spawned_true_measures = [None]*len(sampler_spawns)
         for i in range(s):
-            spawned_true_measures[i] = self._spawn(sampler_spawns[i],sampler_spawns[i].d[i])
+            spawned_true_measures[i] = self._spawn(sampler_spawns[i],sampler_spawns[i].d)
         return spawned_true_measures
     
     def _spawn(self, sampler, dimension):

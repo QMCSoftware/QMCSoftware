@@ -1,5 +1,4 @@
 """ Plot functions used by Discrete Distribution and True Measure"""
-import qmcpy as qp
 import numpy as np 
 import os
 
@@ -63,7 +62,7 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
                         x_label_num = d_horizontal[i] + 1
                         y_label_num = d_vertical[j] + 1
                     
-                    if(isinstance(sampler,qp.AbstractDiscreteDistribution)):
+                    if type(sampler).__name__=="AbstractDiscreteDistribution":
                         ax[i,j].set_xlim([0-axis_pad,1+axis_pad])
                         ax[i,j].set_ylim([0-axis_pad,1+axis_pad])
                         ax[i,j].set_xticks([0,1/4,1/2,3/4,1])

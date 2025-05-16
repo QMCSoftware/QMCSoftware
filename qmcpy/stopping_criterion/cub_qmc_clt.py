@@ -4,7 +4,10 @@ from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscr
 from ..discrete_distribution import Lattice,DigitalNetB2,Halton
 from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..true_measure import Gaussian,Uniform
-from ..integrand import Keister,BoxIntegral,CustomFun
+from ..integrand.keister import Keister
+from ..integrand.box_integral import BoxIntegral
+from ..integrand.sensitivity_indices import SensitivityIndices
+from ..integrand.genz import Genz
 from ..util import MaxSamplesWarning, NotYetImplemented, ParameterWarning, ParameterError
 import numpy as np
 from scipy.stats import t
@@ -17,17 +20,17 @@ class CubQMCCLT(AbstractStoppingCriterion):
     Stopping criterion based on Student's $t$-distribution for multiple replications.
     
     Examples:
-        >>> k = Keister(Lattice(seed=7,replications=25))
-        >>> sc = CubQMCCLT(k,abs_tol=.05)
+        >>> k = Keister(DigitalNetB2(seed=7,replications=25))
+        >>> sc = CubQMCCLT(k,abs_tol=1e-3,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
-        array(1.38026356)
+        array(1.3804849)
         >>> data
         MeanVarDataRep (AccumulateData)
             solution        1.380
             comb_bound_low  1.380
             comb_bound_high 1.381
-            comb_bound_diff 0.001
+            comb_bound_diff 0.002
             comb_flags      1
             n_total         6400
             n               6400
@@ -36,7 +39,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
         CubQMCCLT (AbstractStoppingCriterion)
             inflate         1
             alpha           0.010
-            abs_tol         0.050
+            abs_tol         0.001
             rel_tol         0
             n_init          2^(8)
             n_max           2^(30)
@@ -45,97 +48,122 @@ class CubQMCCLT(AbstractStoppingCriterion):
             mean            0
             covariance      2^(-1)
             decomp_type     PCA
-        Lattice (AbstractLDDiscreteDistribution)
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               1
             replications    25
-            randomize       SHIFT
-            gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
+            randomize       LMS_DS
+            gen_mats_source joe_kuo.6.21201.txt
             order           NATURAL
-            n_limit         2^(20)
+            t               63
+            alpha           1
+            n_limit         2^(32)
             entropy         7
         
-        # >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
-        # >>> abs_tol = 1e-3
-        # >>> sc = CubQMCCLT(f, abs_tol=abs_tol)
-        # >>> solution,data = sc.integrate()
-        # >>> solution
-        # array([1.19029896, 0.96063374])
-        # >>> data
-        # MeanVarDataRep (AccumulateData Object)
-        #     solution        [1.19  0.961]
-        #     comb_bound_low  [1.19 0.96]
-        #     comb_bound_high [1.191 0.961]
-        #     comb_flags      [ True  True]
-        #     n_total         2^(19)
-        #     n               [524288.  16384.]
-        #     n_rep           [32768.  1024.]
-        #     time_integrate  ...
-        # CubQMCCLT (AbstractStoppingCriterion Object)
-        #     inflate         1.200
-        #     alpha           0.010
-        #     abs_tol         0.001
-        #     rel_tol         0
-        #     n_init          2^(8)
-        #     n_max           2^(30)
-        #     replications    2^(4)
-        # BoxIntegral (AbstractIntegrand Object)
-        #     s               [-1  1]
-        # Uniform (AbstractTrueMeasure Object)
-        #     lower_bound     0
-        #     upper_bound     1
-        # Lattice (AbstractDiscreteDistribution Object)
-        #     d               3
-        #     dvec            [0 1 2]
-        #     randomize       SHIFT
-        #     order           NATURAL
-        #     gen_vec         [     1 182667 213731]
-        #     entropy         7
-        #     spawn_key       ()
-        # >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
-        # >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
-        # >>> true_value = np.array([sol3neg1,sol31])
-        # >>> assert (abs(true_value-solution)<abs_tol).all()
+        Vector outputs
         
-        # >>> cf = CustomFun(
-        # ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
-        # ...     g = lambda x,compute_flags=None: (2*np.arange(1,7)*x).reshape(-1,2,3),
-        # ...     dimension_indv = (2,3))
-        # >>> sol,data = CubQMCCLT(cf,abs_tol=1e-4).integrate()
-        # >>> data
-        # MeanVarDataRep (AccumulateData Object)
-        #     solution        [[1. 2. 3.]
-        #                     [4. 5. 6.]]
-        #     comb_bound_low  [[1. 2. 3.]
-        #                     [4. 5. 6.]]
-        #     comb_bound_high [[1. 2. 3.]
-        #                     [4. 5. 6.]]
-        #     comb_flags      [[ True  True  True]
-        #                     [ True  True  True]]
-        #     n_total         2^(13)
-        #     n               [[4096. 4096. 4096.]
-        #                     [8192. 4096. 4096.]]
-        #     n_rep           [[256. 256. 256.]
-        #                     [512. 256. 256.]]
-        #     time_integrate  ...
-        # CubQMCCLT (AbstractStoppingCriterion Object)
-        #     inflate         1.200
-        #     alpha           0.010
-        #     abs_tol         1.00e-04
-        #     rel_tol         0
-        #     n_init          2^(8)
-        #     n_max           2^(30)
-        #     replications    2^(4)
-        # CustomFun (AbstractIntegrand Object)
-        # Uniform (AbstractTrueMeasure Object)
-        #     lower_bound     0
-        #     upper_bound     1
-        # DigitalNetB2 (AbstractDiscreteDistribution Object)
-        #     d               6
-        #     dvec            [0 1 2 3 4 5]
-        #     randomize       LMS_DS
-        #     graycode        0
-        #     entropy         7
-        #     spawn_key       ()
+        >>> f = BoxIntegral(DigitalNetB2(3,seed=7,replications=25), s=[-1,1])
+        >>> abs_tol = 1e-3
+        >>> sc = CubQMCCLT(f,abs_tol=abs_tol,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.19040139, 0.96058618])
+        >>> data
+        MeanVarDataRep (AccumulateData)
+            solution        [1.19  0.961]
+            comb_bound_low  [1.19 0.96]
+            comb_bound_high [1.191 0.961]
+            comb_bound_diff [0.002 0.   ]
+            comb_flags      [ True  True]
+            n_total         204800
+            n               [204800.   6400.]
+            n_rep           [8192.  256.]
+            time_integrate  ...
+        CubQMCCLT (AbstractStoppingCriterion)
+            inflate         1
+            alpha           0.010
+            abs_tol         0.001
+            rel_tol         0
+            n_init          2^(8)
+            n_max           2^(30)
+        BoxIntegral (AbstractIntegrand)
+            s               [-1  1]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               3
+            replications    25
+            randomize       LMS_DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           NATURAL
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
+        >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+        >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
+        >>> true_value = np.array([sol3neg1,sol31])
+        >>> assert (abs(true_value-solution)<abs_tol).all()
+        
+        Sensitivity indices 
+
+        >>> function = Genz(DigitalNetB2(3,seed=7,replications=25))
+        >>> integrand = SensitivityIndices(function)
+        >>> sc = CubQMCCLT(integrand,abs_tol=5e-4,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> data
+        MeanVarDataRep (AccumulateData)
+            solution        [[0.02  0.196 0.667]
+                            [0.036 0.303 0.782]]
+            comb_bound_low  [[0.019 0.195 0.667]
+                            [0.035 0.303 0.781]]
+            comb_bound_high [[0.02  0.196 0.667]
+                            [0.036 0.303 0.782]]
+            comb_bound_diff [[0.001 0.    0.   ]
+                            [0.001 0.001 0.001]]
+            comb_flags      [[ True  True  True]
+                            [ True  True  True]]
+            n_total         204800
+            n               [[[102400. 204800. 204800.]
+                             [102400. 204800. 204800.]
+                             [102400. 204800. 204800.]]
+        <BLANKLINE>
+                            [[ 12800.  51200. 102400.]
+                             [ 12800.  51200. 102400.]
+                             [ 12800.  51200. 102400.]]]
+            n_rep           [[[4096. 8192. 8192.]
+                             [4096. 8192. 8192.]
+                             [4096. 8192. 8192.]]
+        <BLANKLINE>
+                            [[ 512. 2048. 4096.]
+                             [ 512. 2048. 4096.]
+                             [ 512. 2048. 4096.]]]
+            time_integrate  ...
+        CubQMCCLT (AbstractStoppingCriterion)
+            inflate         1
+            alpha           0.010
+            abs_tol         5.00e-04
+            rel_tol         0
+            n_init          2^(8)
+            n_max           2^(30)
+        SensitivityIndices (AbstractIntegrand)
+            indices         [[ True False False]
+                            [False  True False]
+                            [False False  True]]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               6
+            replications    25
+            randomize       LMS_DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           NATURAL
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
+        
     """
 
     def __init__(self,
