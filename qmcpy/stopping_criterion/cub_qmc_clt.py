@@ -75,8 +75,8 @@ class CubQMCCLT(AbstractStoppingCriterion):
             comb_bound_diff [0.002 0.   ]
             comb_flags      [ True  True]
             n_total         204800
-            n               [204800.   6400.]
-            n_rep           [8192.  256.]
+            n               [204800   6400]
+            n_rep           [8192  256]
             time_integrate  ...
         CubQMCCLT (AbstractStoppingCriterion)
             inflate         1
@@ -124,20 +124,20 @@ class CubQMCCLT(AbstractStoppingCriterion):
             comb_flags      [[ True  True  True]
                             [ True  True  True]]
             n_total         204800
-            n               [[[102400. 204800. 204800.]
-                             [102400. 204800. 204800.]
-                             [102400. 204800. 204800.]]
+            n               [[[102400 204800 204800]
+                             [102400 204800 204800]
+                             [102400 204800 204800]]
         <BLANKLINE>
-                            [[ 12800.  51200. 102400.]
-                             [ 12800.  51200. 102400.]
-                             [ 12800.  51200. 102400.]]]
-            n_rep           [[[4096. 8192. 8192.]
-                             [4096. 8192. 8192.]
-                             [4096. 8192. 8192.]]
+                            [[ 12800  51200 102400]
+                             [ 12800  51200 102400]
+                             [ 12800  51200 102400]]]
+            n_rep           [[[4096 8192 8192]
+                             [4096 8192 8192]
+                             [4096 8192 8192]]
         <BLANKLINE>
-                            [[ 512. 2048. 4096.]
-                             [ 512. 2048. 4096.]
-                             [ 512. 2048. 4096.]]]
+                            [[ 512 2048 4096]
+                             [ 512 2048 4096]
+                             [ 512 2048 4096]]]
             time_integrate  ...
         CubQMCCLT (AbstractStoppingCriterion)
             inflate         1
@@ -163,7 +163,6 @@ class CubQMCCLT(AbstractStoppingCriterion):
             alpha           1
             n_limit         2^(32)
             entropy         7
-        
     """
 
     def __init__(self,
@@ -192,13 +191,16 @@ class CubQMCCLT(AbstractStoppingCriterion):
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
         # Input Checks
-        if np.log2(n_init) % 1 != 0:
-            warning_s = ' n_init must be a power of 2. Using n_init = 32'
-            warnings.warn(warning_s, ParameterWarning)
-            n_init = 32
+        # Input Checks
+        if np.log2(n_init)%1!=0:
+            warnings.warn('n_init must be a power of two. Using n_init = 2**5',ParameterWarning)
+            n_init = 2**5
+        if np.log2(n_max)%1!=0:
+            warnings.warn('n_init must be a power of two. Using n_max = 2**30',ParameterWarning)
+            n_max = 2**30
         # Set Attributes
-        self.n_init = float(n_init)
-        self.n_max = float(n_max)
+        self.n_init = int(n_init)
+        self.n_max = int(n_max)
         self.alpha = alpha
         self.inflate = float(inflate)
         self.error_fun = error_fun

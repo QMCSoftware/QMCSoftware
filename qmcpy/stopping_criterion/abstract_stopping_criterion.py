@@ -7,7 +7,6 @@ class AbstractStoppingCriterion(object):
     def __init__(self, allowed_levels, allowed_distribs, allow_vectorized_integrals):
         """
         Args:
-            allow_multilevel (bool): which integrand types are supported: 'single', 'fixed-multi', 'adaptive-multi'
             allowed_distribs (list): list of compatible AbstractDiscreteDistribution classes
             allow_vectorized_integrals (bool): If True, vectorized integrals are allowed. 
         """
