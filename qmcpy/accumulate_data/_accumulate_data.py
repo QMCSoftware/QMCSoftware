@@ -2,21 +2,18 @@ from ..true_measure.abstract_true_measure import AbstractTrueMeasure
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 
 class AccumulateData(object):
-    """ Accumulated Data abstract class. DO NOT INSTANTIATE. """
 
-    def __init__(self):
-        """ Initialize data instance """
-        prefix = 'A concrete implementation of AccumulateData must have '
-        if not hasattr(self,'parameters'):
-            self.parameters = []
-
-    def update_data(self):
-        """ ABSTRACT METHOD to update the accumulated data."""
-        raise MethodImplementationError(self, 'update_data')
+    def __init__(self, parameters):
+        self.parameters = parameters
 
     def __repr__(self):
         string = _univ_repr(self, 'AccumulateData', self.parameters + ['time_integrate'])
-        for qmc_obj in [self.stopping_crit, self.integrand, self.true_measure, self.discrete_distrib]:
-            if qmc_obj:
-                string += '\n'+str(qmc_obj)
+        if hasattr(self,"stopping_crit") and self.stopping_crit:
+            string += '\n'+str(self.stopping_crit)
+        if hasattr(self,"integrand") and self.integrand:
+            string += '\n'+str(self.integrand)
+        if hasattr(self,"true_measure") and self.true_measure:
+            string += '\n'+str(self.true_measure)
+        if hasattr(self,"discrete_distrib") and self.discrete_distrib:
+            string += '\n'+str(self.discrete_distrib)
         return string
