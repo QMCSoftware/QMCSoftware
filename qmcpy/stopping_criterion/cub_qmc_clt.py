@@ -61,7 +61,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
         
         Vector outputs
         
-        >>> f = BoxIntegral(DigitalNetB2(3,seed=7,replications=25), s=[-1,1])
+        >>> f = BoxIntegral(DigitalNetB2(3,seed=7,replications=25),s=[-1,1])
         >>> abs_tol = 1e-3
         >>> sc = CubQMCCLT(f,abs_tol=abs_tol,rel_tol=0)
         >>> solution,data = sc.integrate()

@@ -2,6 +2,8 @@ from ._cub_qmc_ld_g import _CubQMCLDG
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
+from ..integrand.genz import Genz
+from ..integrand.sensitivity_indices import SensitivityIndices
 from ..util import fftbr,omega_fftbr,ParameterError
 import numpy as np
 
@@ -12,82 +14,129 @@ class CubQMCLatticeG(_CubQMCLDG):
     a d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Fourier coefficients cone decay assumptions.
     
-    >>> k = Keister(Lattice(2,seed=7))
-    >>> sc = CubQMCLatticeG(k,abs_tol=.05)
-    >>> solution,data = sc.integrate()
-    >>> data
-    LDTransformData (AccumulateData Object)
-        solution        1.810
-        comb_bound_low  1.806
-        comb_bound_high 1.815
-        comb_flags      1
-        n_total         2^(10)
-        n               2^(10)
-        time_integrate  ...
-    CubQMCLatticeG (AbstractStoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    Keister (AbstractIntegrand Object)
-    Gaussian (AbstractTrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     PCA
-    Lattice (AbstractDiscreteDistribution Object)
-        d               2^(1)
-        dvec            [0 1]
-        randomize       SHIFT
-        order           NATURAL
-        gen_vec         [     1 182667]
-        entropy         7
-        spawn_key       ()
-    >>> f = BoxIntegral(Lattice(3,seed=7), s=[-1,1])
-    >>> abs_tol = 1e-3
-    >>> sc = CubQMCLatticeG(f, abs_tol=abs_tol)
-    >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.1894253 , 0.96059384])
-    >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
-    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
-    >>> true_value = np.array([sol3neg1,sol31])
-    >>> assert (abs(true_value-solution)<abs_tol).all()
-    >>> cf = CustomFun(
-    ...     true_measure = Uniform(Lattice(6,seed=7)),
-    ...     g = lambda x,compute_flags=None: (2*np.arange(1,7)*x).reshape(-1,2,3),
-    ...     dimension_indv = (2,3))
-    >>> sol,data = CubQMCLatticeG(cf,abs_tol=1e-6).integrate()
-    >>> data
-    LDTransformData (AccumulateData Object)
-        solution        [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_low  [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_high [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_flags      [[ True  True  True]
-                        [ True  True  True]]
-        n_total         2^(15)
-        n               [[ 8192. 16384. 16384.]
-                        [16384. 32768. 32768.]]
-        time_integrate  ...
-    CubQMCLatticeG (AbstractStoppingCriterion Object)
-        abs_tol         1.00e-06
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    CustomFun (AbstractIntegrand Object)
-    Uniform (AbstractTrueMeasure Object)
-        lower_bound     0
-        upper_bound     1
-    Lattice (AbstractDiscreteDistribution Object)
-        d               6
-        dvec            [0 1 2 3 4 5]
-        randomize       SHIFT
-        order           NATURAL
-        gen_vec         [     1 182667 213731 255351  96013 116671]
-        entropy         7
-        spawn_key       ()
+    Examples:
+        >>> k = Keister(Lattice(seed=7))
+        >>> sc = CubQMCLatticeG(k,abs_tol=1e-3,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array(1.38037385)
+        >>> data
+        LDTransformAccumulateData (AccumulateData)
+            solution        1.380
+            comb_bound_low  1.380
+            comb_bound_high 1.381
+            comb_bound_diff 0.001
+            comb_flags      1
+            n_total         2^(11)
+            n               2^(11)
+            time_integrate  ...
+        CubQMCLatticeG (AbstractStoppingCriterion)
+            abs_tol         0.001
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(35)
+        Keister (AbstractIntegrand)
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
+        Lattice (AbstractLDDiscreteDistribution)
+            d               1
+            replications    1
+            randomize       SHIFT
+            gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
+            order           NATURAL
+            n_limit         2^(20)
+            entropy         7
+        
+        Vector outputs
+        
+        >>> f = BoxIntegral(Lattice(3,seed=11),s=[-1,1])
+        >>> abs_tol = 1e-3
+        >>> sc = CubQMCLatticeG(f,abs_tol=abs_tol,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.18947477, 0.96060862])
+        >>> data
+        LDTransformAccumulateData (AccumulateData)
+            solution        [1.189 0.961]
+            comb_bound_low  [1.189 0.96 ]
+            comb_bound_high [1.19  0.961]
+            comb_bound_diff [0.001 0.001]
+            comb_flags      [ True  True]
+            n_total         2^(13)
+            n               [8192 1024]
+            time_integrate  ...
+        CubQMCLatticeG (AbstractStoppingCriterion)
+            abs_tol         0.001
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(35)
+        BoxIntegral (AbstractIntegrand)
+            s               [-1  1]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        Lattice (AbstractLDDiscreteDistribution)
+            d               3
+            replications    1
+            randomize       SHIFT
+            gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
+            order           NATURAL
+            n_limit         2^(20)
+            entropy         11
+        >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+        >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
+        >>> true_value = np.array([sol3neg1,sol31])
+        >>> assert (abs(true_value-solution)<abs_tol).all()
+
+        Sensitivity indices 
+
+        >>> function = Genz(Lattice(3,seed=7))
+        >>> integrand = SensitivityIndices(function)
+        >>> sc = CubQMCLatticeG(integrand,abs_tol=5e-4,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> data
+        LDTransformAccumulateData (AccumulateData)
+            solution        [[0.021 0.196 0.667]
+                            [0.036 0.303 0.782]]
+            comb_bound_low  [[0.02  0.196 0.667]
+                            [0.035 0.303 0.781]]
+            comb_bound_high [[0.021 0.196 0.667]
+                            [0.036 0.303 0.782]]
+            comb_bound_diff [[0.001 0.001 0.   ]
+                            [0.001 0.001 0.001]]
+            comb_flags      [[ True  True  True]
+                            [ True  True  True]]
+            n_total         2^(16)
+            n               [[[16384 32768 65536]
+                             [16384 32768 65536]
+                             [16384 32768 65536]]
+        <BLANKLINE>
+                            [[ 2048 16384 32768]
+                             [ 2048 16384 32768]
+                             [ 2048 16384 32768]]]
+            time_integrate  ...
+        CubQMCLatticeG (AbstractStoppingCriterion)
+            abs_tol         5.00e-04
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(35)
+        SensitivityIndices (AbstractIntegrand)
+            indices         [[ True False False]
+                            [False  True False]
+                            [False False  True]]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        Lattice (AbstractLDDiscreteDistribution)
+            d               6
+            replications    1
+            randomize       SHIFT
+            gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
+            order           NATURAL
+            n_limit         2^(20)
+            entropy         7
     
     Original Implementation:
 

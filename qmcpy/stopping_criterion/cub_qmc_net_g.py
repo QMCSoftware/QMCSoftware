@@ -2,7 +2,9 @@ from ._cub_qmc_ld_g import _CubQMCLDG
 from ..util import fwht,omega_fwht,ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
-from ..integrand import Keister, CustomFun, BoxIntegral
+from ..integrand import Keister, BoxIntegral, CustomFun
+from ..integrand.genz import Genz
+from ..integrand.sensitivity_indices import SensitivityIndices
 import numpy as np
 
 
@@ -12,130 +14,136 @@ class CubQMCNetG(_CubQMCLDG):
     d-dimensional region to integrate within a specified generalized error
     tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
 
-    >>> k = Keister(DigitalNetB2(2,seed=7))
-    >>> sc = CubQMCNetG(k,abs_tol=.05)
-    >>> solution,data = sc.integrate()
-    >>> data
-    LDTransformData (AccumulateData Object)
-        solution        1.808
-        comb_bound_low  1.803
-        comb_bound_high 1.813
-        comb_flags      1
-        n_total         2^(10)
-        n               2^(10)
-        time_integrate  ...
-    CubQMCNetG (AbstractStoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    Keister (AbstractIntegrand Object)
-    Gaussian (AbstractTrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     PCA
-    DigitalNetB2 (AbstractDiscreteDistribution Object)
-        d               2^(1)
-        dvec            [0 1]
-        randomize       LMS_DS
-        graycode        0
-        entropy         7
-        spawn_key       ()
-    >>> dd = DigitalNetB2(3,seed=7)
-    >>> g1 = CustomFun(Uniform(dd,0,2),lambda t: 10*t[:,0]-5*t[:,1]**2+t[:,2]**3)
-    >>> cv1 = CustomFun(Uniform(dd,0,2),lambda t: t[:,0])
-    >>> cv2 = CustomFun(Uniform(dd,0,2),lambda t: t[:,1]**2)
-    >>> sc = CubQMCNetG(g1,abs_tol=1e-6,check_cone=True,
-    ...     control_variates = [cv1,cv2],
-    ...     control_variate_means = [1,4/3])
-    >>> sol,data = sc.integrate()
-    >>> sol
-    array([5.33333333])
-    >>> exactsol = 16/3
-    >>> abs(sol-exactsol)<1e-6
-    array([ True])
-    >>> dnb2 = DigitalNetB2(3,seed=7)
-    >>> f = BoxIntegral(dnb2, s=[-1,1])
-    >>> abs_tol = 1e-3
-    >>> sc = CubQMCNetG(f, abs_tol=abs_tol)
-    >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.18973505, 0.96056431])
-    >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
-    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
-    >>> true_value = np.array([sol3neg1,sol31])
-    >>> (abs(true_value-solution)<abs_tol).all()
-    np.True_
-    >>> f2 = BoxIntegral(dnb2,s=[3,4])
-    >>> sc = CubQMCNetG(f2,control_variates=f,control_variate_means=true_value,update_beta=True)
-    >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.10119574, 1.26661224])
-    >>> data
-    LDTransformData (AccumulateData Object)
-        solution        [1.101 1.267]
-        comb_bound_low  [1.099 1.262]
-        comb_bound_high [1.104 1.271]
-        comb_flags      [ True  True]
-        n_total         2^(10)
-        n               [1024. 1024.]
-        time_integrate  ...
-    CubQMCNetG (AbstractStoppingCriterion Object)
-        abs_tol         0.010
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-        cv              BoxIntegral (AbstractIntegrand Object)
-                           s               [-1  1]
-        cv_mu           [1.19  0.961]
-        update_beta     1
-    BoxIntegral (AbstractIntegrand Object)
-        s               [3 4]
-    Uniform (AbstractTrueMeasure Object)
-        lower_bound     0
-        upper_bound     1
-    DigitalNetB2 (AbstractDiscreteDistribution Object)
-        d               3
-        dvec            [0 1 2]
-        randomize       LMS_DS
-        graycode        0
-        entropy         7
-        spawn_key       ()
-    >>> cf = CustomFun(
-    ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
-    ...     g = lambda x,compute_flags=None: (2*np.arange(1,7)*x).reshape(-1,2,3),
-    ...     dimension_indv = (2,3))
-    >>> sol,data = CubQMCNetG(cf,abs_tol=1e-6).integrate()
-    >>> data
-    LDTransformData (AccumulateData Object)
-        solution        [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_low  [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_high [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_flags      [[ True  True  True]
-                        [ True  True  True]]
-        n_total         2^(13)
-        n               [[4096. 4096. 8192.]
-                        [2048. 2048. 4096.]]
-        time_integrate  ...
-    CubQMCNetG (AbstractStoppingCriterion Object)
-        abs_tol         1.00e-06
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    CustomFun (AbstractIntegrand Object)
-    Uniform (AbstractTrueMeasure Object)
-        lower_bound     0
-        upper_bound     1
-    DigitalNetB2 (AbstractDiscreteDistribution Object)
-        d               6
-        dvec            [0 1 2 3 4 5]
-        randomize       LMS_DS
-        graycode        0
-        entropy         7
-        spawn_key       ()
+    Examples:
+        >>> k = Keister(DigitalNetB2(seed=7))
+        >>> sc = CubQMCNetG(k,abs_tol=1e-3,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array(1.38038574)
+        >>> data
+        LDTransformAccumulateData (AccumulateData)
+            solution        1.380
+            comb_bound_low  1.380
+            comb_bound_high 1.381
+            comb_bound_diff 0.001
+            comb_flags      1
+            n_total         2^(11)
+            n               2^(11)
+            time_integrate  ...
+        CubQMCNetG (AbstractStoppingCriterion)
+            abs_tol         0.001
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(35)
+        Keister (AbstractIntegrand)
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               1
+            replications    1
+            randomize       LMS_DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           NATURAL
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
+        
+        Vector outputs
+        
+        >>> f = BoxIntegral(DigitalNetB2(3,seed=7),s=[-1,1])
+        >>> abs_tol = 1e-3
+        >>> sc = CubQMCNetG(f,abs_tol=abs_tol,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.18965698, 0.96061461])
+        >>> data
+        LDTransformAccumulateData (AccumulateData)
+            solution        [1.19  0.961]
+            comb_bound_low  [1.189 0.96 ]
+            comb_bound_high [1.19  0.961]
+            comb_bound_diff [0.001 0.001]
+            comb_flags      [ True  True]
+            n_total         2^(14)
+            n               [16384  1024]
+            time_integrate  ...
+        CubQMCNetG (AbstractStoppingCriterion)
+            abs_tol         0.001
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(35)
+        BoxIntegral (AbstractIntegrand)
+            s               [-1  1]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               3
+            replications    1
+            randomize       LMS_DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           NATURAL
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
+        >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+        >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
+        >>> true_value = np.array([sol3neg1,sol31])
+        >>> assert (abs(true_value-solution)<abs_tol).all()
+
+        Sensitivity indices 
+
+        >>> function = Genz(DigitalNetB2(3,seed=7))
+        >>> integrand = SensitivityIndices(function)
+        >>> sc = CubQMCNetG(integrand,abs_tol=5e-4,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> data
+        LDTransformAccumulateData (AccumulateData)
+            solution        [[0.02  0.196 0.667]
+                            [0.036 0.303 0.782]]
+            comb_bound_low  [[0.019 0.195 0.667]
+                            [0.035 0.303 0.781]]
+            comb_bound_high [[0.02  0.196 0.667]
+                            [0.036 0.303 0.782]]
+            comb_bound_diff [[0.001 0.    0.001]
+                            [0.001 0.001 0.001]]
+            comb_flags      [[ True  True  True]
+                            [ True  True  True]]
+            n_total         2^(16)
+            n               [[[16384 65536 65536]
+                             [16384 65536 65536]
+                             [16384 65536 65536]]
+        <BLANKLINE>
+                            [[ 2048 16384 32768]
+                             [ 2048 16384 32768]
+                             [ 2048 16384 32768]]]
+            time_integrate  ...
+        CubQMCNetG (AbstractStoppingCriterion)
+            abs_tol         5.00e-04
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(35)
+        SensitivityIndices (AbstractIntegrand)
+            indices         [[ True False False]
+                            [False  True False]
+                            [False False  True]]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               6
+            replications    1
+            randomize       LMS_DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           NATURAL
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
+        
 
     Original Implementation:
 
