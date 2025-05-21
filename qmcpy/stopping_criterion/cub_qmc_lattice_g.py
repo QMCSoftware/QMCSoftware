@@ -16,7 +16,7 @@ class CubQMCLatticeG(_CubQMCLDG):
     
     Examples:
         >>> k = Keister(Lattice(seed=7))
-        >>> sc = CubQMCLatticeG(k,abs_tol=1e-3,rel_tol=0)
+        >>> sc = CubQMCLatticeG(k,abs_tol=1e-3,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> solution
         array(1.38037385)
@@ -53,7 +53,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         
         >>> f = BoxIntegral(Lattice(3,seed=11),s=[-1,1])
         >>> abs_tol = 1e-3
-        >>> sc = CubQMCLatticeG(f,abs_tol=abs_tol,rel_tol=0)
+        >>> sc = CubQMCLatticeG(f,abs_tol=abs_tol,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.18947477, 0.96060862])
@@ -94,7 +94,7 @@ class CubQMCLatticeG(_CubQMCLDG):
 
         >>> function = Genz(Lattice(3,seed=7))
         >>> integrand = SensitivityIndices(function)
-        >>> sc = CubQMCLatticeG(integrand,abs_tol=5e-4,rel_tol=0)
+        >>> sc = CubQMCLatticeG(integrand,abs_tol=5e-4,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> data
         LDTransformAccumulateData (AccumulateData)

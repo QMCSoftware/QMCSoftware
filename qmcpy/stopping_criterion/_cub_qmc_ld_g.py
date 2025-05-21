@@ -55,7 +55,7 @@ class _CubQMCLDG(AbstractStoppingCriterion):
             self.cv_mu = self.cv_mu[None,...]
         assert isinstance(self.cv,list), "cv must be a list of AbstractIntegrand objects"
         for cv in self.cv:
-            if (not isinstance(cv,AbstractIntegrand)) or (cv.discrete_distrib!=self.discrete_distrib) or (cv.d_indv!=self.d_indv):
+            if (not isinstance(cv,AbstractIntegrand)) or (cv.discrete_distrib!=self.discrete_distrib) or (cv.d_indv!=self.integrand.d_indv):
                 raise ParameterError('''
                         Each control variates discrete distribution must be an AbstractIntegrand instance 
                         with the same discrete distribution as the main integrand. d_indv must also match 
@@ -67,6 +67,7 @@ class _CubQMCLDG(AbstractStoppingCriterion):
             self.parameters += ['cv','cv_mu','update_beta']
         else:
             self.update_beta = False
+        self.vlstsq = np.vectorize(lambda x,y: np.linalg.lstsq(x.T,y,rcond=None)[0],signature="(k,m),(m)->(k)")
     
     def _update_kappanumap(self, kappanumap, ytildefull, mfrom, mto, m):
         for l in range(int(mfrom),int(mto),-1):
@@ -82,9 +83,19 @@ class _CubQMCLDG(AbstractStoppingCriterion):
                 pidxs = [(pidx[None,:]+zeroadditive[:,None]).flatten() for pidx in prioridxs] # alternative to tiling
                 kappanumap[*pidxs,flipall],kappanumap[*pidxs,nl+flipall] = kappanumap[*pidxs,nl+flipall],kappanumap[*pidxs,flipall]
         return kappanumap
+    
+    def _beta_update(self, beta, kappanumap, yfull, ytildefull, ycvfull, ycvtildefull, mstart):
+        kappa_approx = kappanumap[...,(2**mstart):] # kappa index used for fitting
+        y4beta = np.take_along_axis(ytildefull,kappa_approx,axis=-1)
+        x4beta = np.take_along_axis(ycvtildefull,kappa_approx[...,None,:],axis=-1)
+        beta = self.vlstsq(x4beta,y4beta)
+        yfull = yfull-(ycvfull*beta[...,None]).sum(-2) # get new function values
+        ytildefull = ytildefull-(ycvtildefull*beta[...,None]).sum(-2) # redefine function
+        return beta,yfull,ytildefull
+    
     def integrate(self):
         t_start = time()
-        data = LDTransformAccumulateData(
+        data = AccumulateData(
             parameters = [
                 'solution',
                 'comb_bound_low',
@@ -105,6 +116,7 @@ class _CubQMCLDG(AbstractStoppingCriterion):
         data.ycvfull = np.empty(self.integrand.d_indv+(self.ncv,0))
         data.bounds_half_width = np.tile(np.inf,self.integrand.d_indv)
         data.muhat = np.tile(np.nan,self.integrand.d_indv)
+        data.beta = np.tile(np.nan,self.integrand.d_indv+(self.ncv,))
         while True:
             m = int(np.log2(data.n_max))
             xnext = self.discrete_distrib.gen_samples(n_min=data.n_min,n_max=data.n_max)
@@ -129,30 +141,29 @@ class _CubQMCLDG(AbstractStoppingCriterion):
                 data.kappanumap = self._update_kappanumap(data.kappanumap,data.ytildefull,m-1,0,m)
                 if self.ncv>0:
                     data.ycvtildefull = self.ft(ycvnext)/np.sqrt(n)
-                    self.beta_update(mllstart)
+                    data.beta,data.yfull,data.ytildefull = self._beta_update(data.beta,data.kappanumap,data.yfull,data.ytildefull,data.ycvfull,data.ycvtildefull,mllstart)
                     data.kappanumap = np.tile(np.arange(n),self.integrand.d_indv+(1,))
                     data.kappanumap = self._update_kappanumap(data.kappanumap,data.ytildefull,m-1,0,m)
             else: # any iteration after the first
                 mnext = int(m-1)
                 n = int(2**mnext)
-                if self.ncv>0:
-                    self.y_val[-n:] = self.y_val[-n:]-self.yg_val[-n:]@self.beta
-                    self.y_cp[-n:] = self.y_val[-n:]
                 if not self.update_beta: # do not update the beta coefficients
+                    if self.ncv>0:
+                        data.yfull[data.compute_flags,-n:] = data.yfull[data.compute_flags,-n:]-(data.ycvfull[data.compute_flags,:,-n:]*data.beta[data.compute_flags,:,None]).sum(-2)
                     ytildeomega = self.omega(mnext)*self.ft(ynext[data.compute_flags])/np.sqrt(n)
                     ytildefull_next = np.nan*np.ones_like(data.ytildefull)
                     ytildefull_next[data.compute_flags] = (data.ytildefull[data.compute_flags]-ytildeomega)/2
                     data.ytildefull[data.compute_flags] = (data.ytildefull[data.compute_flags]+ytildeomega)/2
                     data.ytildefull = np.concatenate([data.ytildefull,ytildefull_next],axis=-1)
-                    data.kappanumap = np.concatenate([data.kappanumap,n+data.kappanumap],axis=-1)
-                    data.kappanumap[data.compute_flags] = self._update_kappanumap(data.kappanumap[data.compute_flags],data.ytildefull[data.compute_flags],m-1,mllstart,m)
                 else: # update beta
-                    self.y_cp = self.fast_transform(self.y_cp,0,m,m)
-                    self.yg_cp = self.fast_transform(self.yg_cp,0,m,m)
-                    self.beta_update(mllstart)
-                    data.kappanumap = np.hstack((data.kappanumap,2**(m-1)+data.kappanumap)).astype(int)
-                    data.kappanumap[data.compute_flags] = self._update_kappanumap(data.kappanumap[data.compute_flags],data.ytildefull[data.compute_flags],m-1,mllstart,m)
-            data.muhat[data.compute_flags] = data.yfull[data.compute_flags].mean(-1)+data.beta@self.cv_mu if self.ncv>0 else data.yfull[data.compute_flags].mean(-1)
+                    data.ytildefull = np.concatenate([data.ytildefull,np.tile(np.nan,data.ytildefull.shape)],axis=-1)
+                    data.ytildefull[data.compute_flags] = self.ft(data.yfull[data.compute_flags])/np.sqrt(2**m)
+                    data.ycvtildefull = np.concatenate([data.ycvtildefull,np.tile(np.nan,data.ycvtildefull.shape)],axis=-1)
+                    data.ycvtildefull[data.compute_flags] = self.ft(data.ycvfull[data.compute_flags])/np.sqrt(2**m)
+                    data.beta[data.compute_flags],data.yfull[data.compute_flags],data.ytildefull[data.compute_flags] = self._beta_update(data.beta[data.compute_flags],data.kappanumap[data.compute_flags],data.yfull[data.compute_flags],data.ytildefull[data.compute_flags],data.ycvfull[data.compute_flags],data.ycvtildefull[data.compute_flags],mllstart)
+                data.kappanumap = np.concatenate([data.kappanumap,n+data.kappanumap],axis=-1)
+                data.kappanumap[data.compute_flags] = self._update_kappanumap(data.kappanumap[data.compute_flags],data.ytildefull[data.compute_flags],m-1,mllstart,m)
+            data.muhat[data.compute_flags] = data.yfull[data.compute_flags].mean(-1)+(data.beta[data.compute_flags]*np.moveaxis(self.cv_mu,0,-1)[data.compute_flags]).sum(-1) if self.ncv>0 else data.yfull[data.compute_flags].mean(-1)
             data.bounds_half_width[data.compute_flags] = self.fudge(m)*np.abs(np.take_along_axis(data.ytildefull[data.compute_flags],data.kappanumap[data.compute_flags][...,nllstart:2*nllstart],axis=-1)).sum(-1)
             data.indv_bound_low = data.muhat-data.bounds_half_width
             data.indv_bound_high = data.muhat+data.bounds_half_width
@@ -219,14 +230,3 @@ class _CubQMCLDG(AbstractStoppingCriterion):
         if rel_tol is not None:
             self.rel_tol = rel_tol
             self.rel_tols = np.full(self.integrand.d_comb,self.rel_tol)
-
-class LDTransformAccumulateData(AccumulateData):
-
-    
-    def beta_update(self, mstart):
-        kappa_approx = self.kappanumap[int(2**mstart):] # kappa index used for fitting
-        x4beta = self.ycvtildefull[...,kappa_approx]
-        y4beta = data.ytildefull[...,kappa_approx]
-        self.beta = np.linalg.lstsq(x4beta,y4beta,rcond=None)[0]
-        self.yfull = self.yfull-(self.ycvfull*self.beta[...,None]).sum(-2) # get new function values
-        data.ytildefull = data.ytildefull-(self.ycvtildefull*self.beta[...,None]).sum(-2) # redefine function

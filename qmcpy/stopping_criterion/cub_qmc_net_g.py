@@ -16,7 +16,7 @@ class CubQMCNetG(_CubQMCLDG):
 
     Examples:
         >>> k = Keister(DigitalNetB2(seed=7))
-        >>> sc = CubQMCNetG(k,abs_tol=1e-3,rel_tol=0)
+        >>> sc = CubQMCNetG(k,abs_tol=1e-3,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> solution
         array(1.38038574)
@@ -55,7 +55,7 @@ class CubQMCNetG(_CubQMCLDG):
         
         >>> f = BoxIntegral(DigitalNetB2(3,seed=7),s=[-1,1])
         >>> abs_tol = 1e-3
-        >>> sc = CubQMCNetG(f,abs_tol=abs_tol,rel_tol=0)
+        >>> sc = CubQMCNetG(f,abs_tol=abs_tol,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.18965698, 0.96061461])
@@ -98,7 +98,7 @@ class CubQMCNetG(_CubQMCLDG):
 
         >>> function = Genz(DigitalNetB2(3,seed=7))
         >>> integrand = SensitivityIndices(function)
-        >>> sc = CubQMCNetG(integrand,abs_tol=5e-4,rel_tol=0)
+        >>> sc = CubQMCNetG(integrand,abs_tol=5e-4,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> data
         LDTransformAccumulateData (AccumulateData)
