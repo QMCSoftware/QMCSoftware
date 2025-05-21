@@ -21,7 +21,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         >>> solution
         array(1.38037385)
         >>> data
-        LDTransformAccumulateData (AccumulateData)
+        AccumulateData (AccumulateData)
             solution        1.380
             comb_bound_low  1.380
             comb_bound_high 1.381
@@ -58,7 +58,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         >>> solution
         array([1.18947477, 0.96060862])
         >>> data
-        LDTransformAccumulateData (AccumulateData)
+        AccumulateData (AccumulateData)
             solution        [1.189 0.961]
             comb_bound_low  [1.189 0.96 ]
             comb_bound_high [1.19  0.961]
@@ -97,7 +97,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         >>> sc = CubQMCLatticeG(integrand,abs_tol=5e-4,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> data
-        LDTransformAccumulateData (AccumulateData)
+        AccumulateData (AccumulateData)
             solution        [[0.021 0.196 0.667]
                             [0.036 0.303 0.782]]
             comb_bound_low  [[0.02  0.196 0.667]

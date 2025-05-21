@@ -84,14 +84,12 @@ class _CubQMCLDG(AbstractStoppingCriterion):
                 kappanumap[*pidxs,flipall],kappanumap[*pidxs,nl+flipall] = kappanumap[*pidxs,nl+flipall],kappanumap[*pidxs,flipall]
         return kappanumap
     
-    def _beta_update(self, beta, kappanumap, yfull, ytildefull, ycvfull, ycvtildefull, mstart):
+    def _beta_update(self, beta, kappanumap, ytildefull, ycvtildefull, mstart):
         kappa_approx = kappanumap[...,(2**mstart):] # kappa index used for fitting
         y4beta = np.take_along_axis(ytildefull,kappa_approx,axis=-1)
         x4beta = np.take_along_axis(ycvtildefull,kappa_approx[...,None,:],axis=-1)
         beta = self.vlstsq(x4beta,y4beta)
-        yfull = yfull-(ycvfull*beta[...,None]).sum(-2) # get new function values
-        ytildefull = ytildefull-(ycvtildefull*beta[...,None]).sum(-2) # redefine function
-        return beta,yfull,ytildefull
+        return beta
     
     def integrate(self):
         t_start = time()
@@ -113,7 +111,8 @@ class _CubQMCLDG(AbstractStoppingCriterion):
         data.solution_indv = np.tile(np.nan,self.integrand.d_indv)
         data.xfull = np.empty((0,self.integrand.d))
         data.yfull = np.empty(self.integrand.d_indv+(0,))
-        data.ycvfull = np.empty(self.integrand.d_indv+(self.ncv,0))
+        if self.ncv>0:
+            data.ycvfull = np.empty(self.integrand.d_indv+(self.ncv,0))
         data.bounds_half_width = np.tile(np.inf,self.integrand.d_indv)
         data.muhat = np.tile(np.nan,self.integrand.d_indv)
         data.beta = np.tile(np.nan,self.integrand.d_indv+(self.ncv,))
@@ -136,35 +135,38 @@ class _CubQMCLDG(AbstractStoppingCriterion):
             nllstart = int(2**mllstart)
             if data.n_min==0: # first iteration
                 n = int(2**m)
-                data.ytildefull = self.ft(ynext)/np.sqrt(n)
-                data.kappanumap = np.tile(np.arange(n),self.integrand.d_indv+(1,))
-                data.kappanumap = self._update_kappanumap(data.kappanumap,data.ytildefull,m-1,0,m)
+                ytildefull = self.ft(ynext)/np.sqrt(n)
+                kappanumap = self._update_kappanumap(np.tile(np.arange(n),self.integrand.d_indv+(1,)),ytildefull,m-1,0,m)
                 if self.ncv>0:
-                    data.ycvtildefull = self.ft(ycvnext)/np.sqrt(n)
-                    data.beta,data.yfull,data.ytildefull = self._beta_update(data.beta,data.kappanumap,data.yfull,data.ytildefull,data.ycvfull,data.ycvtildefull,mllstart)
-                    data.kappanumap = np.tile(np.arange(n),self.integrand.d_indv+(1,))
-                    data.kappanumap = self._update_kappanumap(data.kappanumap,data.ytildefull,m-1,0,m)
+                    ycvtildefull = self.ft(ycvnext)/np.sqrt(n)
+                    data.beta = self._beta_update(data.beta,kappanumap,ytildefull,ycvtildefull,mllstart)
+                    ytildefull = ytildefull-(ycvtildefull*data.beta[...,None]).sum(-2)
+                    kappanumap = self._update_kappanumap(np.tile(np.arange(n),self.integrand.d_indv+(1,)),ytildefull,m-1,0,m)
             else: # any iteration after the first
                 mnext = int(m-1)
                 n = int(2**mnext)
                 if not self.update_beta: # do not update the beta coefficients
                     if self.ncv>0:
-                        data.yfull[data.compute_flags,-n:] = data.yfull[data.compute_flags,-n:]-(data.ycvfull[data.compute_flags,:,-n:]*data.beta[data.compute_flags,:,None]).sum(-2)
+                        ynext[data.compute_flags] = ynext[data.compute_flags]-(ycvnext[data.compute_flags]*data.beta[data.compute_flags,:,None]).sum(-2)
                     ytildeomega = self.omega(mnext)*self.ft(ynext[data.compute_flags])/np.sqrt(n)
-                    ytildefull_next = np.nan*np.ones_like(data.ytildefull)
-                    ytildefull_next[data.compute_flags] = (data.ytildefull[data.compute_flags]-ytildeomega)/2
-                    data.ytildefull[data.compute_flags] = (data.ytildefull[data.compute_flags]+ytildeomega)/2
-                    data.ytildefull = np.concatenate([data.ytildefull,ytildefull_next],axis=-1)
+                    ytildefull_next = np.nan*np.ones_like(ytildefull)
+                    ytildefull_next[data.compute_flags] = (ytildefull[data.compute_flags]-ytildeomega)/2
+                    ytildefull[data.compute_flags] = (ytildefull[data.compute_flags]+ytildeomega)/2
+                    ytildefull = np.concatenate([ytildefull,ytildefull_next],axis=-1)
                 else: # update beta
-                    data.ytildefull = np.concatenate([data.ytildefull,np.tile(np.nan,data.ytildefull.shape)],axis=-1)
-                    data.ytildefull[data.compute_flags] = self.ft(data.yfull[data.compute_flags])/np.sqrt(2**m)
-                    data.ycvtildefull = np.concatenate([data.ycvtildefull,np.tile(np.nan,data.ycvtildefull.shape)],axis=-1)
-                    data.ycvtildefull[data.compute_flags] = self.ft(data.ycvfull[data.compute_flags])/np.sqrt(2**m)
-                    data.beta[data.compute_flags],data.yfull[data.compute_flags],data.ytildefull[data.compute_flags] = self._beta_update(data.beta[data.compute_flags],data.kappanumap[data.compute_flags],data.yfull[data.compute_flags],data.ytildefull[data.compute_flags],data.ycvfull[data.compute_flags],data.ycvtildefull[data.compute_flags],mllstart)
-                data.kappanumap = np.concatenate([data.kappanumap,n+data.kappanumap],axis=-1)
-                data.kappanumap[data.compute_flags] = self._update_kappanumap(data.kappanumap[data.compute_flags],data.ytildefull[data.compute_flags],m-1,mllstart,m)
-            data.muhat[data.compute_flags] = data.yfull[data.compute_flags].mean(-1)+(data.beta[data.compute_flags]*np.moveaxis(self.cv_mu,0,-1)[data.compute_flags]).sum(-1) if self.ncv>0 else data.yfull[data.compute_flags].mean(-1)
-            data.bounds_half_width[data.compute_flags] = self.fudge(m)*np.abs(np.take_along_axis(data.ytildefull[data.compute_flags],data.kappanumap[data.compute_flags][...,nllstart:2*nllstart],axis=-1)).sum(-1)
+                    ytildefull = np.concatenate([ytildefull,np.tile(np.nan,ytildefull.shape)],axis=-1)
+                    ytildefull[data.compute_flags] = self.ft(data.yfull[data.compute_flags])/np.sqrt(2**m)
+                    ycvtildefull = np.concatenate([ycvtildefull,np.tile(np.nan,ycvtildefull.shape)],axis=-1)
+                    ycvtildefull[data.compute_flags] = self.ft(data.ycvfull[data.compute_flags])/np.sqrt(2**m)
+                    data.beta[data.compute_flags] = self._beta_update(data.beta[data.compute_flags],kappanumap[data.compute_flags],ytildefull[data.compute_flags],ycvtildefull[data.compute_flags],mllstart)
+                kappanumap = np.concatenate([kappanumap,n+kappanumap],axis=-1)
+                kappanumap[data.compute_flags] = self._update_kappanumap(kappanumap[data.compute_flags],ytildefull[data.compute_flags],m-1,mllstart,m)
+            if self.ncv==0:
+                data.muhat[data.compute_flags] = data.yfull[data.compute_flags].mean(-1)
+            else:
+                ydiff = data.yfull[data.compute_flags]-(data.ycvfull[data.compute_flags]*data.beta[data.compute_flags,:,None]).sum(-2)
+                data.muhat[data.compute_flags] = ydiff.mean(-1)+(data.beta[data.compute_flags]*np.moveaxis(self.cv_mu,0,-1)[data.compute_flags]).sum(-1)
+            data.bounds_half_width[data.compute_flags] = self.fudge(m)*np.abs(np.take_along_axis(ytildefull[data.compute_flags],kappanumap[data.compute_flags][...,nllstart:2*nllstart],axis=-1)).sum(-1)
             data.indv_bound_low = data.muhat-data.bounds_half_width
             data.indv_bound_high = data.muhat+data.bounds_half_width
             if self.check_cone:
@@ -174,7 +176,7 @@ class _CubQMCLDG(AbstractStoppingCriterion):
                     c_tmp = self.omg_hat(m-l)*self.omg_circ(m-l)
                     c_low = 1./(1+c_tmp)
                     c_up = 1./(1-c_tmp)
-                    const1 = np.abs(np.take_along_axis(data.ytildefull[data.compute_flags],data.kappanumap[data.compute_flags][...,int(2**(l-1)):int(2**l)],axis=-1)).sum(-1)
+                    const1 = np.abs(np.take_along_axis(ytildefull[data.compute_flags],kappanumap[data.compute_flags][...,int(2**(l-1)):int(2**l)],axis=-1)).sum(-1)
                     idx = int(l-self.l_star)
                     data.c_stilde_low[idx,data.compute_flags] = np.maximum(data.c_stilde_low[idx,data.compute_flags],c_low*const1)
                     if c_tmp < 1:

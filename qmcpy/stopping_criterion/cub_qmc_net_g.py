@@ -21,7 +21,7 @@ class CubQMCNetG(_CubQMCLDG):
         >>> solution
         array(1.38038574)
         >>> data
-        LDTransformAccumulateData (AccumulateData)
+        AccumulateData (AccumulateData)
             solution        1.380
             comb_bound_low  1.380
             comb_bound_high 1.381
@@ -60,7 +60,7 @@ class CubQMCNetG(_CubQMCLDG):
         >>> solution
         array([1.18965698, 0.96061461])
         >>> data
-        LDTransformAccumulateData (AccumulateData)
+        AccumulateData (AccumulateData)
             solution        [1.19  0.961]
             comb_bound_low  [1.189 0.96 ]
             comb_bound_high [1.19  0.961]
@@ -101,7 +101,7 @@ class CubQMCNetG(_CubQMCLDG):
         >>> sc = CubQMCNetG(integrand,abs_tol=5e-4,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> data
-        LDTransformAccumulateData (AccumulateData)
+        AccumulateData (AccumulateData)
             solution        [[0.02  0.196 0.667]
                             [0.036 0.303 0.782]]
             comb_bound_low  [[0.019 0.195 0.667]
@@ -143,7 +143,43 @@ class CubQMCNetG(_CubQMCLDG):
             alpha           1
             n_limit         2^(32)
             entropy         7
-        
+    
+        Control Variates
+
+        >>> dnb2 = DigitalNetB2(dimension=4,seed=7)
+        >>> integrand = CustomFun(
+        ...     true_measure = Uniform(dnb2),
+        ...     g = lambda t,compute_flags: np.stack([
+        ...         1*t[...,0]+2*t[...,0]**2+3*t[...,0]**3,
+        ...         2*t[...,1]+3*t[...,1]**2+4*t[...,1]**3,
+        ...         3*t[...,2]+4*t[...,2]**2+5*t[...,2]**3]),
+        ...     dimension_indv = (3,))
+        >>> control_variates = [
+        ...     CustomFun(
+        ...         true_measure = Uniform(dnb2),
+        ...         g = lambda t,compute_flags: np.stack([t[...,0],t[...,1],t[...,2]],axis=0),
+        ...         dimension_indv = (3,)),
+        ...     CustomFun(
+        ...         true_measure = Uniform(dnb2),
+        ...         g = lambda t,compute_flags: np.stack([t[...,0]**2,t[...,1]**2,t[...,2]**2],axis=0),
+        ...         dimension_indv = (3,))]
+        >>> control_variate_means = np.array([[1/2,1/2,1/2],[1/3,1/3,1/3]])
+        >>> true_value = np.array([23/12,3,49/12])
+        >>> abs_tol = 1e-6
+        >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_beta=False)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.91666667, 3.        , 4.08333333])
+        >>> data.n
+        array([4096, 8192, 8192])
+        >>> assert (np.abs(true_value-solution)<abs_tol).all()
+        >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_beta=True)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.91666667, 3.        , 4.08333333])
+        >>> data.n
+        array([ 8192, 16384, 16384])
+        >>> assert (np.abs(true_value-solution)<abs_tol).all()
 
     Original Implementation:
 
