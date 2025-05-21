@@ -1,5 +1,5 @@
 from ._cub_qmc_ld_g import _CubQMCLDG
-from ..util import ParameterError
+from ..util import fwht,omega_fwht,ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, CustomFun, BoxIntegral
@@ -194,13 +194,13 @@ class CubQMCNetG(_CubQMCLDG):
         super(CubQMCNetG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,
             check_cone,control_variates,control_variate_means,update_beta,
             ptransform = 'none',
-            coefv = lambda nl: np.ones(nl,dtype=float), 
+            ft = fwht,
+            omega = omega_fwht,
             allowed_levels = ['single'],
             allowed_distribs = [DigitalNetB2],
             cast_complex = False,
             error_fun = error_fun)
-        if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
-            raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False.")
-
+        if self.discrete_distrib.order!='NATURAL':
+            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'NATURAL' order")
 
 class CubQMCSobolG(CubQMCNetG): pass

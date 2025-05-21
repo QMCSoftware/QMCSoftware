@@ -149,7 +149,5 @@ class CubQMCLatticeG(_CubQMCLDG):
             allowed_distribs = [Lattice],
             cast_complex = True,
             error_fun = error_fun)
-        if not self.discrete_distrib.randomize:
-            raise ParameterError("CubLattice_g requires distribution to have randomize=True")
-        if self.discrete_distrib.order != 'NATURAL':
+        if self.discrete_distrib.order!='NATURAL':
             raise ParameterError("CubLattice_g requires Lattice with 'NATURAL' order")
