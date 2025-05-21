@@ -106,3 +106,11 @@ def ifftbr_torch(x):
     xrf = torch.permute(xs,pdims)
     xr = xrf.contiguous().view(shape)
     return xr
+
+def omega_fftbr_torch(m, device=None):
+    if device is None: device = torch.get_default_device()
+    return torch.exp(-torch.pi*1j*torch.arange(2**m,device=device)/2**m)
+
+def omega_fwht_torch(m, device):
+    if device is None: device = torch.get_default_device()
+    return torch.ones(2**m,device=device)

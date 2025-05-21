@@ -2,7 +2,7 @@ from ._cub_qmc_ld_g import _CubQMCLDG
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
-from ..util import ParameterError
+from ..util import fftbr,omega_fftbr,ParameterError
 import numpy as np
 
 
@@ -143,7 +143,8 @@ class CubQMCLatticeG(_CubQMCLDG):
             control_variate_means = [],
             update_beta=False,
             ptransform = ptransform,
-            coefv = lambda nl: np.exp(-2*np.pi*1j*np.arange(nl)/(2*nl)), 
+            ft = fftbr,
+            omega = omega_fftbr,
             allowed_levels = ['single'],
             allowed_distribs = [Lattice],
             cast_complex = True,

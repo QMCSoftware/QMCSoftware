@@ -30,7 +30,7 @@ def fftbr(x):
         np.ndarray: BRO-FFT values
     """
     x,shape,d,n,n_half = _parse_ft_input(x)
-    if n<=1: return x.reshape(shape).copy()
+    if n<=1: return x.reshape(shape).copy()+0*1j
     twiddler = np.empty(n,dtype=np.float64)
     twiddlei = np.empty(n,dtype=np.float64)
     xr = x.real.copy()
@@ -52,7 +52,7 @@ def ifftbr(x):
         np.ndarray: BRO-IFFT values
     """
     x,shape,d,n,n_half = _parse_ft_input(x)
-    if n<=1: return x.reshape(shape).copy()
+    if n<=1: return x.reshape(shape).copy()+0*1j
     twiddler = np.empty(n,dtype=np.float64)
     twiddlei = np.empty(n,dtype=np.float64)
     xr = x.real.copy()
@@ -79,3 +79,8 @@ def fwht(x):
     qmctoolscl.fwht_1d_radix2(1,d,int(n_half),xcp)
     return xcp.reshape(shape)
 
+def omega_fftbr(m):
+    return np.exp(-np.pi*1j*np.arange(2**m)/2**m)
+
+def omega_fwht(m):
+    return np.ones(2**m)

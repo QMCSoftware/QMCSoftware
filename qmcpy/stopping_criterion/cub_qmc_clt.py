@@ -231,16 +231,16 @@ class CubQMCCLT(AbstractStoppingCriterion):
         data.compute_flags = np.tile(True,self.integrand.d_indv)
         data.n_rep = np.tile(self.n_init,self.integrand.d_indv)
         data.n_min = 0
-        data.n_max = int(data.n_rep.max())
+        data.n_max = self.n_init
         data.solution_indv = np.tile(np.nan,self.integrand.d_indv)
         data.xfull = np.empty((self.discrete_distrib.replications,0,self.integrand.d))
         data.yfull = np.empty(self.integrand.d_indv+(self.discrete_distrib.replications,0))
         data._ysums = np.zeros(self.integrand.d_indv+(self.discrete_distrib.replications,),dtype=float)
         while True:
             xnext = self.discrete_distrib(n_min=data.n_min,n_max=data.n_max)
+            data.xfull = np.concatenate([data.xfull,xnext],1)
             ynext = self.integrand.f(xnext,compute_flags=data.compute_flags)
             ynext[~data.compute_flags] = np.nan
-            data.xfull = np.concatenate([data.xfull,xnext],1)
             data.yfull = np.concatenate([data.yfull,ynext],-1)
             data.n_rep[data.compute_flags] = data.n_max
             data._ysums[data.compute_flags] += ynext[data.compute_flags].sum(-1)
