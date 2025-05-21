@@ -68,6 +68,20 @@ class _CubQMCLDG(AbstractStoppingCriterion):
         else:
             self.update_beta = False
     
+    def _update_kappanumap(self, kappanumap, ytildefull, mfrom, mto, m):
+        for l in range(int(mfrom),int(mto),-1):
+            nl = 2**l
+            oldone = np.abs(np.take_along_axis(ytildefull,kappanumap[...,1:int(nl)],axis=-1)) # earlier values of kappa, don't touch first one
+            newone = np.abs(np.take_along_axis(ytildefull,kappanumap[...,nl+1:2*nl],axis=-1)) # later values of kappa,
+            *prioridxs,flip = np.where(newone>oldone)
+            flip = flip+1 # add one to account for the fact that we do not consider indices which are powers of 2
+            if flip.size!=0:
+                additive = np.arange(0,2**m-1,2**(l+1))
+                flipall = (flip[None,:]+additive[:,None]).flatten()
+                zeroadditive = np.zeros(len(additive),dtype=int) 
+                pidxs = [(pidx[None,:]+zeroadditive[:,None]).flatten() for pidx in prioridxs] # alternative to tiling
+                kappanumap[*pidxs,flipall],kappanumap[*pidxs,nl+flipall] = kappanumap[*pidxs,nl+flipall],kappanumap[*pidxs,flipall]
+        return kappanumap
     def integrate(self):
         t_start = time()
         data = LDTransformAccumulateData(
@@ -112,12 +126,12 @@ class _CubQMCLDG(AbstractStoppingCriterion):
                 n = int(2**m)
                 data.ytildefull = self.ft(ynext)/np.sqrt(n)
                 data.kappanumap = np.tile(np.arange(n),self.integrand.d_indv+(1,))
-                data.update_kappanumap(m-1,0,m)
+                data.kappanumap = self._update_kappanumap(data.kappanumap,data.ytildefull,m-1,0,m)
                 if self.ncv>0:
                     data.ycvtildefull = self.ft(ycvnext)/np.sqrt(n)
                     self.beta_update(mllstart)
                     data.kappanumap = np.tile(np.arange(n),self.integrand.d_indv+(1,))
-                    data.update_kappanumap(m-1,0,m)
+                    data.kappanumap = self._update_kappanumap(data.kappanumap,data.ytildefull,m-1,0,m)
             else: # any iteration after the first
                 mnext = int(m-1)
                 n = int(2**mnext)
@@ -131,16 +145,15 @@ class _CubQMCLDG(AbstractStoppingCriterion):
                     data.ytildefull[data.compute_flags] = (data.ytildefull[data.compute_flags]+ytildeomega)/2
                     data.ytildefull = np.concatenate([data.ytildefull,ytildefull_next],axis=-1)
                     data.kappanumap = np.concatenate([data.kappanumap,n+data.kappanumap],axis=-1)
-                    data.update_kappanumap(m-1,mllstart,m) 
+                    data.kappanumap[data.compute_flags] = self._update_kappanumap(data.kappanumap[data.compute_flags],data.ytildefull[data.compute_flags],m-1,mllstart,m)
                 else: # update beta
                     self.y_cp = self.fast_transform(self.y_cp,0,m,m)
                     self.yg_cp = self.fast_transform(self.yg_cp,0,m,m)
                     self.beta_update(mllstart)
                     data.kappanumap = np.hstack((data.kappanumap,2**(m-1)+data.kappanumap)).astype(int)
-                    data.update_kappanumap(m-1,mllstart,m)
+                    data.kappanumap[data.compute_flags] = self._update_kappanumap(data.kappanumap[data.compute_flags],data.ytildefull[data.compute_flags],m-1,mllstart,m)
             data.muhat[data.compute_flags] = data.yfull[data.compute_flags].mean(-1)+data.beta@self.cv_mu if self.ncv>0 else data.yfull[data.compute_flags].mean(-1)
-            stilde = np.abs(np.take_along_axis(data.ytildefull[data.compute_flags],data.kappanumap[data.compute_flags][...,nllstart:2*nllstart],axis=-1)).sum(-1)
-            data.bounds_half_width[data.compute_flags] = self.fudge(m)*stilde
+            data.bounds_half_width[data.compute_flags] = self.fudge(m)*np.abs(np.take_along_axis(data.ytildefull[data.compute_flags],data.kappanumap[data.compute_flags][...,nllstart:2*nllstart],axis=-1)).sum(-1)
             data.indv_bound_low = data.muhat-data.bounds_half_width
             data.indv_bound_high = data.muhat+data.bounds_half_width
             if self.check_cone:
@@ -150,11 +163,11 @@ class _CubQMCLDG(AbstractStoppingCriterion):
                     c_tmp = self.omg_hat(m-l)*self.omg_circ(m-l)
                     c_low = 1./(1+c_tmp)
                     c_up = 1./(1-c_tmp)
-                    const1 = np.abs(np.take_along_axis(data.ytildefull,data.kappanumap[...,int(2**(l-1)):int(2**l)],axis=-1)).sum(-1)
+                    const1 = np.abs(np.take_along_axis(data.ytildefull[data.compute_flags],data.kappanumap[data.compute_flags][...,int(2**(l-1)):int(2**l)],axis=-1)).sum(-1)
                     idx = int(l-self.l_star)
-                    data.c_stilde_low[idx] = np.maximum(data.c_stilde_low[idx],c_low*const1)
+                    data.c_stilde_low[idx,data.compute_flags] = np.maximum(data.c_stilde_low[idx,data.compute_flags],c_low*const1)
                     if c_tmp < 1:
-                        data.c_stilde_up[idx] = np.minimum(data.c_stilde_up[idx],c_up*const1)
+                        data.c_stilde_up[idx,data.compute_flags] = np.minimum(data.c_stilde_up[idx,data.compute_flags],c_up*const1)
                 data.cone_violation = (data.c_stilde_low > data.c_stilde_up).any(0)
                 if data.cone_violation.sum()>0:
                     warnings.warn('Cone condition violations at indices in data.cone_violation.',CubatureWarning)
@@ -209,24 +222,11 @@ class _CubQMCLDG(AbstractStoppingCriterion):
 
 class LDTransformAccumulateData(AccumulateData):
 
-    def update_kappanumap(self, mfrom, mto, m):
-        for l in range(int(mfrom),int(mto),-1):
-            nl = 2**l
-            oldone = np.abs(np.take_along_axis(self.ytildefull[self.compute_flags],self.kappanumap[self.compute_flags][...,1:int(nl)],axis=-1)) # earlier values of kappa, don't touch first one
-            newone = np.abs(np.take_along_axis(self.ytildefull[self.compute_flags],self.kappanumap[self.compute_flags][...,nl+1:2*nl],axis=-1)) # later values of kappa,
-            *prioridxs,flip = np.where(newone>oldone)
-            flip = flip+1 # add one to account for the fact that we do not consider indices which are powers of 2
-            if flip.size!=0:
-                additive = np.arange(0,2**m-1,2**(l+1))
-                flipall = (flip[None,:]+additive[:,None]).flatten()
-                zeroadditive = np.zeros(len(additive),dtype=int) 
-                pidxs = [(pidx[None,:]+zeroadditive[:,None]).flatten() for pidx in prioridxs] # alternative to tiling
-                self.kappanumap[self.compute_flags][*pidxs,flipall],self.kappanumap[self.compute_flags][*pidxs,nl+flipall] = self.kappanumap[self.compute_flags][*pidxs,nl+flipall],self.kappanumap[self.compute_flags][*pidxs,flipall]
     
     def beta_update(self, mstart):
         kappa_approx = self.kappanumap[int(2**mstart):] # kappa index used for fitting
         x4beta = self.ycvtildefull[...,kappa_approx]
-        y4beta = self.ytildefull[...,kappa_approx]
+        y4beta = data.ytildefull[...,kappa_approx]
         self.beta = np.linalg.lstsq(x4beta,y4beta,rcond=None)[0]
         self.yfull = self.yfull-(self.ycvfull*self.beta[...,None]).sum(-2) # get new function values
-        self.ytildefull = self.ytildefull-(self.ycvtildefull*self.beta[...,None]).sum(-2) # redefine function
+        data.ytildefull = data.ytildefull-(self.ycvtildefull*self.beta[...,None]).sum(-2) # redefine function
