@@ -51,6 +51,7 @@ def discrepancy(x, method, weight = 1, limiter = 2**25, Time = False):
     For this function to give out an output, you need "x" (list of sample points) and "method" (desired discrepancy)
 
     """
+    
     if Time == True:                #Times the actual calculation for discrepancy
         start_time = time.time()
 
