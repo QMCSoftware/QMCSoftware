@@ -32,9 +32,9 @@ def kronecker(n, d, alpha = None, delta = None):
     """
     i = arange(n).reshape((n, 1))
     #line 33 gives out a list of natural numbers ranging from 1 to integer variable "n" given by the user. 
-    if any(x is None for x in alpha):           #if alpha is not chosen by user, it will choose a randomly generated vector in [0,1)^d.
+    if alpha is None:           #if alpha is not chosen by user, it will choose a randomly generated vector in [0,1)^d.
         alpha = random.rand(d)
-    if delta == None:           #if delta is not chosen by user, it will choose a randomly generated vector in [0,1)^d.
+    if delta is None:           #if delta is not chosen by user, it will choose a randomly generated vector in [0,1)^d.
         delta = random.rand(d)
     return(((i*alpha) + delta)%1)   #in order to find the Kronecker sequence take integer i, multiply it by alpha, then
                                     #take modular 1, so that the vector is in [0,1)^d.
