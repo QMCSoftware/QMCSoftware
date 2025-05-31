@@ -7,12 +7,13 @@ class Kronecker:
         if alpha == None:
             random.seed(seed_alpha)
             self.alpha = random.rand(dimension)
-        if delta != 0:
+        if delta == 0 and seed_delta == None:
+            self.delta = zeros(dimension)
+        elif delta == 0 and seed_delta != None:
             random.seed(seed_delta)
             self.delta = random.rand(dimension)
-        elif delta == 0:
-            self.delta = zeros(dimension)
-
+        elif delta != 0:
+            self.delta = delta
 
 
     def gen_samples(self, n):
