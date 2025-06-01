@@ -4,7 +4,7 @@ import time
 class Kronecker:
     def __init__(self, dimension=1, alpha = 0, delta = 0, seed_alpha=None, seed_delta = None):
         self.dimension = dimension
-        if alpha == 0:
+        if sum(alpha) == 0:
             random.seed(seed_alpha)
             self.alpha = random.rand(dimension)
         else:
