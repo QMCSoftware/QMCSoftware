@@ -9,12 +9,12 @@ class Kronecker:
             self.alpha = random.rand(dimension)
         else:
             self.alpha = alpha
-        if delta == 0 and seed_delta == None:
+        if sum(delta) == 0 and seed_delta == None:
             self.delta = zeros(dimension)
-        elif delta == 0 and seed_delta != None:
+        elif sum(delta) == 0 and seed_delta != None:
             random.seed(seed_delta)
             self.delta = random.rand(dimension)
-        elif delta != 0:
+        elif sum(delta) != 0:
             self.delta = delta
 
 
