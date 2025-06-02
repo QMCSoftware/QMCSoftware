@@ -51,6 +51,7 @@ packages = [
     'qmcpy.kernel_methods.kernel',
     'qmcpy.kernel_methods.gram_matrix',
     'qmcpy.kernel_methods.fast_transforms',
+    'qmcpy.kernels',
     'qmcpy.util',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
