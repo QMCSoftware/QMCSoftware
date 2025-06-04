@@ -1,11 +1,22 @@
 from numpy import *
+from ._discrete_distribution import LD
 import time
 
-###For kronecker sequence let the user punch in alpha
-###Look at the paper on overleaf for Kronecker sequence
-###Try and find a way to get the sequence accurately
-###For now get a random generators for alpha
-###Step 2 investigate the median
+class Kronecker(LD):
+    def __init__(self, dimension=1, alpha = 0, delta = 0, seed_alpha=None, seed_delta = None):
+        self.dimension = dimension
+        if sum(alpha) == 0:
+            random.seed(seed_alpha)
+            self.alpha = random.rand(dimension)
+        else:
+            self.alpha = alpha
+        if sum(delta) == 0 and seed_delta == None:
+            self.delta = zeros(dimension)
+        elif sum(delta) == 0 and seed_delta != None:
+            random.seed(seed_delta)
+            self.delta = random.rand(dimension)
+        elif sum(delta) != 0:
+            self.delta = delta
 
 ###Start off with a code with Kronecker sequence with
 ###P = {x_i = i \alpha + \delta mod 1} with \alpha and \delta \in [0,1)^d
