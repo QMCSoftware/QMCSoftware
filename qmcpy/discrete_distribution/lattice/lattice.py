@@ -139,8 +139,8 @@ class Lattice(LD):
             seed (None or int or :class:`numpy.random.SeedSeq`): seed the random number generator for reproducibility
             generating_vector (:class:`numpy.ndarray`, str, or int): Specify the generating matrix. There are a number of optional input types. 
                 
-                - A string `generating_vector` with either a relative path from `LDData repository <https://github.com/QMCSoftware/LDData/lattice/>`__ (e.g., "lattice/mps.exod2_base2_m20_CKN.txt")  or a NumPy file with format "name.d_max.m_max.npy" (e.g., "lattice_vec.3600.20.npy").
                 - An ndarray of integers.
+                - A string `generating_vector` with either a relative path from `LDData repository <https://github.com/QMCSoftware/LDData>`__ (e.g., "LDData/main/lattice/mps.exod2_base2_m20_CKN.txt")  or a NumPy file with format "name.d_max.m_max.npy" (e.g., "lattice_vec.3600.20.npy").
                 - An odd integer :math:`1 < M < 27` which creates a random generating vector :math:`[1,v_1,v_2,...,v_{\\texttt{d\_max}}]` where :math:`v_i` is a random integer in :math:`{3,5,...,2*M-1}` supporting up to :math:`2^M` points.
             
             d_max (int): maximum dimension
@@ -184,10 +184,6 @@ class Lattice(LD):
                     datafile = repos.open(root+generating_vector)
                 elif repos.exists(generating_vector):
                     datafile = repos.open(generating_vector)
-                elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/lattice/"+generating_vector):
-                    datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/lattice/"+generating_vector)
-                elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/"+generating_vector):
-                    datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/"+generating_vector)
                 elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/lattice/"+generating_vector[7:]):
                     datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/lattice/"+generating_vector[7:])
                 elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_vector):
