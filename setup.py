@@ -51,6 +51,7 @@ packages = [
     'qmcpy.kernel_methods.kernel',
     'qmcpy.kernel_methods.gram_matrix',
     'qmcpy.kernel_methods.fast_transforms',
+    'qmcpy.kernels',
     'qmcpy.util',
     'qmcpy.discrete_distribution.lattice',
     'qmcpy.discrete_distribution.c_lib',
@@ -58,7 +59,7 @@ packages = [
 
 setuptools.setup(
     name="qmcpy",
-    version="1.6.2",
+    version="1.6.2.1",
     author="Fred Hickernell, Sou-Cheng T. Choi, Mike McCourt, Jagadeeswaran Rathinavel, Aleksei Sorokin",
     author_email="asorokin@hawk.iit.edu",
     license='Apache license 2.0',

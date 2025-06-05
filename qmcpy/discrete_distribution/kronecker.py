@@ -21,6 +21,5 @@ class Kronecker(LD):
 
     def gen_samples(self, n):
         i = arange(n).reshape((n, 1))
-        #line 20 gives out a list of natural numbers ranging from 1 to integer variable "n" given by the user. 
-        return(((i*self.alpha) + self.delta)%1)   #in order to find the Kronecker sequence take integer i, multiply it by alpha, then
-                                    #take modular 1, so that the vector is in [0,1)^d.
+        return(((i*self.alpha) + self.delta)%1)
+    
