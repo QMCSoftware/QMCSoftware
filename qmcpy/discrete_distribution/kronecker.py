@@ -22,3 +22,4 @@ class Kronecker(LD):
     def gen_samples(self, n):
         i = arange(n).reshape((n, 1))
         return(((i*self.alpha) + self.delta)%1)
+    
