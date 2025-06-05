@@ -38,14 +38,6 @@ def kronecker(n, d, alpha = None, delta = None):
             If delta is chosen by user, it will use that vector in accordance to
             Kronecker sequence.
 
-        Note:
-            n and d are required in order to get an output of the list of samples x_1 to x_n
-    """
-    i = arange(n).reshape((n, 1))
-    #line 33 gives out a list of natural numbers ranging from 1 to integer variable "n" given by the user. 
-    if alpha is None:           #if alpha is not chosen by user, it will choose a randomly generated vector in [0,1)^d.
-        alpha = random.rand(d)
-    if delta is None:           #if delta is not chosen by user, it will choose a randomly generated vector in [0,1)^d.
-        delta = random.rand(d)
-    return(((i*alpha) + delta)%1)   #in order to find the Kronecker sequence take integer i, multiply it by alpha, then
-                                    #take modular 1, so that the vector is in [0,1)^d.
+    def gen_samples(self, n):
+        i = arange(n).reshape((n, 1))
+        return(((i*self.alpha) + self.delta)%1)
