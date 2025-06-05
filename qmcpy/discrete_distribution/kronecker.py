@@ -1,7 +1,8 @@
+from ._discrete_distribution import LD
 from numpy import *
 import time
 
-class Kronecker:
+class Kronecker(LD):
     def __init__(self, dimension=1, alpha = 0, delta = 0, seed_alpha=None, seed_delta = None):
         self.dimension = dimension
         if sum(alpha) == 0:
