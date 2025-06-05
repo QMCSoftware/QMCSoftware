@@ -103,6 +103,6 @@ class MLQMCData(AccumulateData):
             self.sum_level = np.hstack((self.sum_level,np.zeros((2,1))))
             self.cost_level = np.hstack((self.cost_level, 0.))
         else:
-            self.mean_level = absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
-            self.var_level = maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
+            self.mean_level = np.absolute(self.sum_level[0,:self.levels+1]/self.n_level[:self.levels+1])
+            self.var_level = np.maximum(0,self.sum_level[1,:self.levels+1]/self.n_level[:self.levels+1] - self.mean_level**2)
             self.cost_per_sample = self.cost_level[:self.levels+1]/self.n_level[:self.levels+1]

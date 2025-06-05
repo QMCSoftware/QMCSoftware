@@ -393,12 +393,14 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 self.t = t
         else:
             raise ParameterError("self.randomize parsing error")
+        self.gen_mats = np.ascontiguousarray(self.gen_mats)
         gen_mat_max = self.gen_mats.max() 
         assert gen_mat_max>0, "generating matrix must have positive ints"
         assert self._t_curr==int(np.ceil(np.log2(gen_mat_max+1)))
         assert 0<self._t_curr<=self.t<=64, "invalid 0 <= self._t_curr (%d) <= self.t (%d) <= 64"%(self._t_curr,self.t)
         if self.randomize=="FALSE": assert self.gen_mats.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating matrices %d"%(self.replications,self.gen_mats.shape[0])
-    
+        import gc; gc.collect()
+
     def _gen_samples(self, n_min, n_max, return_unrandomized, return_binary, warn):
         if n_min == 0 and self.randomize in ["FALSE","LMS"] and warn:
             warnings.warn("Without randomization, the first digtial net point is the origin",ParameterWarning)
