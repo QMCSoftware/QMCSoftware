@@ -20,7 +20,8 @@ class Kronecker(LD):
 
 ###Start off with a code with Kronecker sequence with
 ###P = {x_i = i \alpha + \delta mod 1} with \alpha and \delta \in [0,1)^d
-def kronecker(n, d, alpha = None, delta = None):
+
+def kronecker(d, alpha = None, delta = None):
     """
     Args:
         n (int): number of samples to generate.
@@ -37,7 +38,7 @@ def kronecker(n, d, alpha = None, delta = None):
             in [0,1)^d
             If delta is chosen by user, it will use that vector in accordance to
             Kronecker sequence.
-
+    Returns """
     def gen_samples(self, n):
         i = arange(n).reshape((n, 1))
         return(((i*self.alpha) + self.delta)%1)
