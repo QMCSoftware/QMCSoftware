@@ -39,6 +39,8 @@ def kronecker(d, alpha = None, delta = None):
             If delta is chosen by user, it will use that vector in accordance to
             Kronecker sequence.
     Returns """
-    def gen_samples(self, n):
+
+
+def gen_samples(self, n):
         i = arange(n).reshape((n, 1))
         return(((i*self.alpha) + self.delta)%1)
