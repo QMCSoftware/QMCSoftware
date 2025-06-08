@@ -606,3 +606,137 @@ def test_output_parsing(tb):
         assert 0 < sample_pct <= 200, f"Sample percentage should be reasonable: {sample_pct}%"
     
     print("\nPASSED: Output parsing works correctly.")
+# test_integration_examples.py
+
+import pytest
+from testbook import testbook
+import numpy as np
+
+
+# The @testbook decorator targets the notebook file.
+# execute=True will run the whole notebook once to catch any basic errors.
+@testbook("integration_examples.ipynb", execute=True)
+def test_notebook_execution(tb):
+    """
+    A simple "smoke test" that executes the entire notebook from start to finish.
+    It passes if no exceptions are raised during execution.
+    """
+    # The decorator handles execution, so we just need to assert it completed.
+    assert tb.cell_executed_count > 0
+    print("\nPASSED: Notebook executed successfully from start to finish.")
+
+
+@testbook("integration_examples.ipynb", execute=False)
+def test_keister_qmc_sobol(tb):
+    """
+    Tests the first Keister example using CubQMCSobolG.
+    It verifies the solution and the properties of the returned data object.
+    """
+    # Execute cells up to and including the target cell (index 2)
+    tb.execute_cell(slice(0, 3))
+
+    # Get references to the variables in the notebook's kernel
+    solution = tb.ref("solution")
+    data = tb.ref("data")
+
+    # Assertions for the Keister example with Sobol QMC
+    # The result should be deterministic due to the fixed seed.
+    assert solution == pytest.approx(2.170, abs=1e-3)
+    assert data.n_total == 2**10
+    assert "LDTransformData" in str(data)
+    assert "CubQMCSobolG" in str(data)
+    assert "Keister" in str(data)
+    assert data.abs_tol == 0.05
+
+    print("\nPASSED: Keister example with CubQMCSobolG is correct.")
+
+
+@testbook("integration_examples.ipynb", execute=False)
+def test_asian_option_single_level(tb):
+    """
+    Tests the single-level Asian option pricing example using CubMCCLT.
+    """
+    # Execute cells up to and including the target cell (index 3)
+    tb.execute_cell(slice(0, 4))
+
+    solution = tb.ref("solution")
+    data = tb.ref("data")
+
+    # Assertions for the single-level Monte Carlo estimation
+    # The result is stochastic, so we check for a reasonable range.
+    assert solution == pytest.approx(6.257, abs=0.1)
+    assert "MeanVarData" in str(data)
+    assert data.levels == 1  # Ensure it's a single-level computation
+    assert data.abs_tol == 0.025
+    # Check that the total samples are greater than the initial samples
+    assert data.n_total > 2**10
+
+    print("\nPASSED: Single-level Asian option pricing is correct.")
+
+
+@testbook("integration_examples.ipynb", execute=False)
+def test_asian_option_multi_level(tb):
+    """
+    Tests the multi-level Asian option pricing example using CubMCCLT.
+    """
+    # Execute cells up to and including the target cell (index 4)
+    tb.execute_cell(slice(0, 5))
+
+    solution = tb.ref("solution")
+    data = tb.ref("data")
+    integrand = tb.ref("integrand")
+
+    # Assertions for the multi-level Monte Carlo estimation
+    assert solution == pytest.approx(6.264, abs=0.1)
+    # A key feature of multi-level is having more than one level
+    assert data.levels > 1
+    assert len(data.n) == data.levels  # Samples `n` should be an array of length `levels`
+    assert np.array_equal(integrand.multilevel_dims, [4, 8, 16])
+
+    print("\nPASSED: Multi-level Asian option pricing is correct.")
+
+
+@testbook("integration_examples.ipynb", execute=False)
+def test_keister_bayes_lattice(tb):
+    """
+    Tests the Keister example using Bayesian cubature with a Lattice sampler.
+    """
+    # Execute cells up to and including the target cell (index 5)
+    tb.execute_cell(slice(0, 6))
+
+    solution = tb.ref("solution")
+    data = tb.ref("data")
+
+    # Assertions for Bayesian cubature with Lattice
+    # This method is deterministic.
+    assert solution == pytest.approx(2.168, abs=1e-3)
+    assert data.n_total == 2**12
+    assert "LDTransformBayesData" in str(data)
+    assert "CubBayesLatticeG" in str(data)
+    assert "Lattice" in str(data)
+    assert data.abs_tol == 0.001
+
+    print("\nPASSED: Keister example with CubBayesLatticeG is correct.")
+
+
+@testbook("integration_examples.ipynb", execute=False)
+def test_keister_bayes_net(tb):
+    """
+    Tests the Keister example using Bayesian cubature with a Sobol sampler (net).
+    """
+    # Execute all cells in the notebook
+    tb.execute_cell(slice(0, 7))
+
+    solution = tb.ref("solution")
+    data = tb.ref("data")
+
+    # Assertions for Bayesian cubature with Sobol
+    # This method is also deterministic.
+    assert solution == pytest.approx(2.168, abs=1e-3)
+    assert data.n_total == 2**13
+    assert "LDTransformBayesData" in str(data)
+    assert "CubBayesNetG" in str(data)
+    assert "Sobol" in str(data)
+    assert data.abs_tol == 0.001
+
+    print("\nPASSED: Keister example with CubBayesNetG is correct.")
