@@ -172,4 +172,8 @@ class CubQMCLatticeG(_CubQMCLDG):
         Args:
             resume (LDTransformData, optional): Previous data object returned from a prior call to integrate. If provided, computation resumes from this state.
         """
+        if resume is not None:
+            self.data = resume
+            if hasattr(self.data, 'n_total'):
+                self.data.n_min = int(self.data.n_total)
         return super().integrate(resume=resume)

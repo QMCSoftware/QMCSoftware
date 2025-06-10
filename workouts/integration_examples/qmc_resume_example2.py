@@ -17,7 +17,7 @@ abs_tol = 1e-3
 rel_tol = 0
 solver = CubQMCLatticeG(integrand, abs_tol=abs_tol, rel_tol=rel_tol)
 solution1, data1 = solver.integrate()
-print(f"First run solution: {solution1}")
+print(f"First run solution: {solution1}\n\n")
 
 # Save the data to disk after first run
 save_path = 'resume_data_example2.pkl'
@@ -29,7 +29,7 @@ loaded_data = AccumulateData.load(save_path)
 abs_tol = 1e-5
 solver.set_tolerance(abs_tol=abs_tol)
 solution2, data2 = solver.integrate(resume=loaded_data)
-print(f"Resumed from disk with tighter tolerance solution: {solution2}")
+print(f"Resumed from disk with tighter tolerance solution: {solution2}\n\n")
 
 # Optionally, save the resumed data again
 save_path2 = 'resume_data_example2_resumed.pkl'

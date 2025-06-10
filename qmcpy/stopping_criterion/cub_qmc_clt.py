@@ -187,8 +187,8 @@ class CubQMCCLT(StoppingCriterion):
         t_start = time()
         if resume is not None:
             self.data = resume
-            if hasattr(resume, 'datum'):
-                self.datum = resume.datum
+            if hasattr(self.data, 'n_total'):
+                self.data.n_min = int(self.data.n_total)
         else:
             self.datum = empty(self.d_indv,dtype=object)
             for j in ndindex(self.d_indv):
