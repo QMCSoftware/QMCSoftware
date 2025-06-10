@@ -152,3 +152,12 @@ class CubQMCLatticeG(_CubQMCLDG):
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
         if self.discrete_distrib.order != 'NATURAL':
             raise ParameterError("CubLattice_g requires Lattice with 'NATURAL' order")
+        
+    def integrate(self, resume=None):
+        """
+        See abstract method. Optionally resumes from a previous computation.
+
+        Args:
+            resume (LDTransformData, optional): Previous data object returned from a prior call to integrate. If provided, computation resumes from this state.
+        """
+        return super().integrate(resume=resume)

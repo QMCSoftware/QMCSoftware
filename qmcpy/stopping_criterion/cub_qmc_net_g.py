@@ -202,5 +202,14 @@ class CubQMCNetG(_CubQMCLDG):
         if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
             raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False.")
 
+    def integrate(self, resume=None):
+        """
+        See abstract method. Optionally resumes from a previous computation.
+
+        Args:
+            resume (LDTransformData, optional): Previous data object returned from a prior call to integrate. If provided, computation resumes from this state.
+        """
+        return super().integrate(resume=resume)
+
 
 class CubQMCSobolG(CubQMCNetG): pass

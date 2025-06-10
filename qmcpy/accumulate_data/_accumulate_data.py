@@ -1,5 +1,7 @@
 from ..true_measure._true_measure import TrueMeasure
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
+import pickle
+import os
 
 class AccumulateData(object):
     """ Accumulated Data abstract class. DO NOT INSTANTIATE. """
@@ -20,3 +22,26 @@ class AccumulateData(object):
             if qmc_obj:
                 string += '\n'+str(qmc_obj)
         return string
+
+    def save(self, filepath):
+        """
+        Save the AccumulateData object to disk using pickle.
+        Args:
+            filepath (str): Path to save the file.
+        """
+        with open(filepath, 'wb') as f:
+            pickle.dump(self, f)
+
+    @staticmethod
+    def load(filepath):
+        """
+        Load an AccumulateData object from disk.
+        Args:
+            filepath (str): Path to the saved file.
+        Returns:
+            AccumulateData: The loaded object.
+        """
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"No such file: {filepath}")
+        with open(filepath, 'rb') as f:
+            return pickle.load(f)

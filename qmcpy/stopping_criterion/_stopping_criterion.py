@@ -35,14 +35,18 @@ class StoppingCriterion(object):
         if not hasattr(self,'parameters'):
             self.parameters = []
             
-    def integrate(self):
+    def integrate(self, resume=None):
         """
         ABSTRACT METHOD to determine the number of samples needed to satisfy the tolerance.
+        Optionally resumes from a previous computation.
 
+        Args:
+            resume (object, optional): Previous data object returned from a prior call to integrate. If provided, computation resumes from this state.
+        
         Return:
             tuple: tuple containing:
                 - solution (float): approximation to the integral
-                - data (AccumulateData): an AccumulateData object
+                - data (AccumulateData): an AccumulateData object (can be used for future resume)
         """
         raise MethodImplementationError(self, 'integrate')
     

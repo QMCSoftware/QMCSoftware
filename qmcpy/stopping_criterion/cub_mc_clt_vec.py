@@ -156,25 +156,35 @@ class CubMCCLTVec(StoppingCriterion):
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(full(self.integrand.d_comb,self.alpha))
         self.z_star = -norm.ppf(self.alphas_indv/2)
          
-    def integrate(self):
-        """ See abstract method. """
+    def integrate(self, resume=None):
+        """ See abstract method. Optionally resumes from a previous computation.
+
+        Args:
+            resume (MeanVarDataVec, optional): Previous data object returned from a prior call to integrate. If provided, computation resumes from this state.
+        """
         t_start = time()
-        self.datum = empty(self.d_indv,dtype=object)
-        for j in ndindex(self.d_indv):
-            self.datum[j] = MeanVarDataVec(self.z_star[j],self.inflate)
-        self.data = MeanVarDataVec.__new__(MeanVarDataVec)
-        self.data.flags_indv = tile(False,self.d_indv)
-        self.data.compute_flags = tile(True,self.d_indv)
-        self.data.indv_bound_low = tile(-inf,self.d_indv)
-        self.data.indv_bound_high = tile(inf,self.d_indv)
-        self.data.solution_indv = tile(nan,self.d_indv)
-        self.data.solution = nan
-        self.data.xfull = empty((0,self.d))
-        self.data.yfull = empty((0,)+self.d_indv)
-        n_min,n_max = 0,self.n_init
-        self.data.n = tile(self.n_init,self.d_indv)
+        if resume is not None:
+            self.data = resume
+            # Optionally restore datum if present
+            if hasattr(resume, 'datum'):
+                self.datum = resume.datum
+        else:
+            self.datum = empty(self.d_indv,dtype=object)
+            for j in ndindex(self.d_indv):
+                self.datum[j] = MeanVarDataVec(self.z_star[j],self.inflate)
+            self.data = MeanVarDataVec.__new__(MeanVarDataVec)
+            self.data.flags_indv = tile(False,self.d_indv)
+            self.data.compute_flags = tile(True,self.d_indv)
+            self.data.indv_bound_low = tile(-inf,self.d_indv)
+            self.data.indv_bound_high = tile(inf,self.d_indv)
+            self.data.solution_indv = tile(nan,self.d_indv)
+            self.data.solution = nan
+            self.data.xfull = empty((0,self.d))
+            self.data.yfull = empty((0,)+self.d_indv)
+            n_min,n_max = 0,self.n_init
+            self.data.n = tile(self.n_init,self.d_indv)
         while True:
-            n = int(n_max-n_min)
+            n = int(self.data.n.max())
             xnext = self.discrete_distrib.gen_samples(n)
             ynext = self.integrand.f(xnext,compute_flags=self.data.compute_flags)
             self.data.xfull = vstack((self.data.xfull,xnext))

@@ -62,23 +62,42 @@ class _CubQMCLDG(StoppingCriterion):
             self.parameters += ['cv','cv_mu','update_beta']
         super(_CubQMCLDG,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals=True)
 
-    def integrate(self):
+    def integrate(self, resume=None):
+        """
+        Perform integration, optionally resuming from a previous computation.
+
+        Args:
+            resume (object, optional): Previous data object returned from a prior call to integrate. If provided, computation resumes from this state.
+        Returns:
+            solution, data: The estimated solution and the data object (can be used for future resume).
+        """
         t_start = time()
-        self.datum = empty(self.d_indv,dtype=object)
-        for j in ndindex(self.d_indv):
-            cv_mu_j = self.cv_mu[(slice(None),)+j]
-            self.datum[j] = LDTransformData(self.m_min,self.m_max,self.coefv,self.fudge,self.check_cone,self.ncv,cv_mu_j,self.update_beta)
-        self.data = LDTransformData.__new__(LDTransformData)
-        self.data.flags_indv = tile(False,self.d_indv)
-        self.data.compute_flags = tile(True,self.d_indv)
-        self.data.m = tile(self.m_min,self.d_indv)
-        self.data.n_min = 0
-        self.data.indv_bound_low = tile(-inf,self.d_indv)
-        self.data.indv_bound_high = tile(inf,self.d_indv)
-        self.data.solution_indv = tile(nan,self.d_indv)
-        self.data.solution = nan
-        self.data.xfull = empty((0,self.d))
-        self.data.yfull = empty((0,)+self.d_indv)
+        if resume is not None:
+            # Resume from previous state
+            self.data = resume
+            self.datum = getattr(resume, 'datum', None)
+            if self.datum is None:
+                # If datum is not present, re-initialize
+                self.datum = empty(self.d_indv, dtype=object)
+                for j in ndindex(self.d_indv):
+                    cv_mu_j = self.cv_mu[(slice(None),)+j]
+                    self.datum[j] = LDTransformData(self.m_min, self.m_max, self.coefv, self.fudge, self.check_cone, self.ncv, cv_mu_j, self.update_beta)
+        else:
+            self.datum = empty(self.d_indv,dtype=object)
+            for j in ndindex(self.d_indv):
+                cv_mu_j = self.cv_mu[(slice(None),)+j]
+                self.datum[j] = LDTransformData(self.m_min,self.m_max,self.coefv,self.fudge,self.check_cone,self.ncv,cv_mu_j,self.update_beta)
+            self.data = LDTransformData.__new__(LDTransformData)
+            self.data.flags_indv = tile(False,self.d_indv)
+            self.data.compute_flags = tile(True,self.d_indv)
+            self.data.m = tile(self.m_min,self.d_indv)
+            self.data.n_min = 0
+            self.data.indv_bound_low = tile(-inf,self.d_indv)
+            self.data.indv_bound_high = tile(inf,self.d_indv)
+            self.data.solution_indv = tile(nan,self.d_indv)
+            self.data.solution = nan
+            self.data.xfull = empty((0,self.d))
+            self.data.yfull = empty((0,)+self.d_indv)
         while True:
             m = self.data.m.max()
             n_min = self.data.n_min

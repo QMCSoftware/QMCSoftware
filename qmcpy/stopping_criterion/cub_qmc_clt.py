@@ -178,24 +178,33 @@ class CubQMCCLT(StoppingCriterion):
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(full(self.integrand.d_comb,self.alpha))
         self.t_star = -t.ppf(self.alphas_indv/2,df=self.replications-1)
          
-    def integrate(self):
-        """ See abstract method. """
+    def integrate(self, resume=None):
+        """ See abstract method. Optionally resumes from a previous computation.
+
+        Args:
+            resume (MeanVarDataRep, optional): Previous data object returned from a prior call to integrate. If provided, computation resumes from this state.
+        """
         t_start = time()
-        self.datum = empty(self.d_indv,dtype=object)
-        for j in ndindex(self.d_indv):
-            self.datum[j] = MeanVarDataRep(self.t_star[j],self.inflate,self.replications)
-        self.data = MeanVarDataRep.__new__(MeanVarDataRep)
-        self.data.flags_indv = tile(False,self.d_indv)
-        self.data.compute_flags = tile(True,self.d_indv)
-        self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
-        self.data.n_rep = tile(self.n_init,self.d_indv)
-        self.data.n_min_rep = 0
-        self.data.indv_bound_low = tile(-inf,self.d_indv)
-        self.data.indv_bound_high = tile(inf,self.d_indv)
-        self.data.solution_indv = tile(nan,self.d_indv)
-        self.data.solution = nan
-        self.data.xfull = empty((0,self.d))
-        self.data.yfull = empty((0,)+self.d_indv)
+        if resume is not None:
+            self.data = resume
+            if hasattr(resume, 'datum'):
+                self.datum = resume.datum
+        else:
+            self.datum = empty(self.d_indv,dtype=object)
+            for j in ndindex(self.d_indv):
+                self.datum[j] = MeanVarDataRep(self.t_star[j],self.inflate,self.replications)
+            self.data = MeanVarDataRep.__new__(MeanVarDataRep)
+            self.data.flags_indv = tile(False,self.d_indv)
+            self.data.compute_flags = tile(True,self.d_indv)
+            self.data.rep_distribs = self.integrand.discrete_distrib.spawn(s=self.replications)
+            self.data.n_rep = tile(self.n_init,self.d_indv)
+            self.data.n_min_rep = 0
+            self.data.indv_bound_low = tile(-inf,self.d_indv)
+            self.data.indv_bound_high = tile(inf,self.d_indv)
+            self.data.solution_indv = tile(nan,self.d_indv)
+            self.data.solution = nan
+            self.data.xfull = empty((0,self.d))
+            self.data.yfull = empty((0,)+self.d_indv)
         while True:
             n_min = self.data.n_min_rep
             n_max = int(self.data.n_rep.max())
