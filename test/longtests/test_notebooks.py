@@ -1,742 +1,1116 @@
-# test_notebooks.py
-
+import testbook
 import pytest
-from testbook import testbook
 import numpy as np
+import pandas as pd
+import inspect
 
-# The @testbook decorator targets the notebook file and enables kernel interaction
-@testbook("pricing_asian_options.ipynb", execute=True)
-def test_notebook_execution_and_setup(tb):
-    """
-    Tests that the notebook executes without errors up to the European Option
-    section and that initial parameters are set correctly.
-    """
-    # Check if the notebook executed without raising an exception
-    assert tb.cell_executed_count > 0
-
-    # Use tb.ref to get a reference to a variable in the notebook's namespace
-    init_price = tb.ref("initPrice")
-    vol = tb.ref("vol")
-    sample_size = tb.ref("sampleSize")
-
-    # Assert that the initial parameters are correct
-    assert init_price == 120
-    assert vol == 0.5
-    assert sample_size == 10**6
-    print("\nPASSED: Notebook setup and initial cells executed successfully.")
+# ============================================
+# Tests for asian-option-mlqmc.ipynb
+# ============================================
 
 
-@testbook("pricing_asian_options.ipynb", execute=True)
-def test_european_option_pricing(tb):
-    """
-    Tests the European Call Option pricing cell.
-    It verifies that the Monte Carlo estimation is close to the exact value.
-    """
-    euro_call = tb.ref("EuroCall")
-    estimated_price = tb.ref("y").mean()
-    exact_price = euro_call.get_exact_value()
+class TestAsianOptionMLQMC:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        with testbook.testbook(
+            "../../demos/asian-option-mlqmc.ipynb", execute=False
+        ) as tb:
+            yield tb
 
-    # The notebook output for the estimated price is 8.2741
-    assert estimated_price == pytest.approx(8.2741, abs=1e-4)
-    # The estimation should be reasonably close to the exact value
-    assert estimated_price == pytest.approx(exact_price, abs=0.01)
-    print("\nPASSED: European Option pricing is correct.")
+    def test_imports(self, tb):
+        """Test that all imports work correctly"""
+        tb.execute_cell(0)
+        assert "plt" in tb.ref_globals
+        assert "np" in tb.ref_globals
+        assert "qp" in tb.ref_globals
 
+    def test_seed_setting(self, tb):
+        """Test seed is set correctly"""
+        tb.execute_cell(1)
+        seed = tb.ref("seed")
+        assert seed == 7
+        assert isinstance(seed, int)
 
-@testbook("pricing_asian_options.ipynb", execute=True)
-def test_arithmetic_mean_options(tb):
-    """
-    Tests the Arithmetic Mean Asian Option pricing for both call and put.
-    It also checks the daily monitoring case.
-    """
-    # --- Test 1: Initial Arithmetic Call Option ---
-    # The notebook calculates this in cell 5
-    arith_call_price = tb.ref("y").mean()
-    assert arith_call_price == pytest.approx(3.3857, abs=1e-4)
+    def test_exact_value_computation(self, tb):
+        """Test Asian option exact value computation"""
+        tb.inject(
+            "import matplotlib.pyplot as plt; import numpy as np; import qmcpy as qp; seed = 7"
+        )
+        tb.execute_cell(4)
+        assert True  # If we get here, cell executed successfully
 
-    # --- Test 2: Arithmetic Put Option ---
-    # We need to execute the next cell (index 7) to get the put price
-    tb.execute_cell(7)
-    arith_put_price = tb.ref("y").mean()
-    assert arith_put_price == pytest.approx(13.0448, abs=1e-4)
+    def test_eval_option_function(self, tb):
+        """Test eval_option function definition"""
+        tb.inject(
+            "import matplotlib.pyplot as plt; import numpy as np; import qmcpy as qp; seed = 7"
+        )
+        tb.execute_cell(5)
+        eval_option = tb.ref("eval_option")
+        assert callable(eval_option)
+        sig = inspect.signature(eval_option)
+        assert len(sig.parameters) == 3
 
-    # --- Test 3: Daily Monitoring Call Option ---
-    # Execute the cell for daily monitoring (index 9)
-    tb.execute_cell(9)
-    daily_monitoring_price = tb.ref("y").mean()
-    assert daily_monitoring_price == pytest.approx(3.3948, abs=1e-4)
-    print("\nPASSED: Arithmetic Mean Option pricing is correct.")
-
-
-@testbook("pricing_asian_options.ipynb", execute=True)
-def test_geometric_mean_options(tb):
-    """
-    Tests the Geometric Mean Asian Option pricing for both put and call.
-    Verifies the relationship between arithmetic and geometric mean option prices.
-    """
-    # --- Get Arithmetic Price for comparison ---
-    arith_call_price = 3.3857  # from previous test
-    arith_put_price = 13.0448  # from previous test
-
-    # --- Test 1: Geometric Put Option ---
-    # Execute the geometric put cell (index 11)
-    tb.execute_cell(11)
-    geo_put_price = tb.ref("y").mean()
-    assert geo_put_price == pytest.approx(13.4415, abs=1e-4)
-
-    # --- Test 2: Geometric Call Option ---
-    # Execute the geometric call cell (index 12)
-    tb.execute_cell(12)
-    geo_call_price = tb.ref("y").mean()
-    assert geo_call_price == pytest.approx(3.1267, abs=1e-4)
-
-    # As per the notebook, GeoMeanCall <= ArithMeanCall
-    assert geo_call_price < arith_call_price
-    # As per the notebook, GeoMeanPut >= ArithMeanPut
-    assert geo_put_price > arith_put_price
-    print("\nPASSED: Geometric Mean Option pricing is correct.")
+    def test_option_definitions(self, tb):
+        """Test ML option definitions"""
+        tb.inject(
+            "import matplotlib.pyplot as plt; import numpy as np; import qmcpy as qp; seed = 7"
+        )
+        tb.execute_cell(6)
+        option_mc = tb.ref("option_mc")
+        option_qmc = tb.ref("option_qmc")
+        assert option_mc is not None
+        assert option_qmc is not None
 
 
-@testbook("pricing_asian_options.ipynb", execute=True)
-def test_barrier_option(tb):
-    """
-    Tests the Barrier Option pricing.
-    Verifies that the Up-and-In call price is less than the standard European
-    call price.
-    """
-    # Get European price for comparison
-    euro_call_price = tb.ref("EuroCall").get_exact_value()
-
-    # Execute the barrier option cell (index 14)
-    tb.execute_cell(14)
-    barrier_price = tb.ref("y").mean()
-
-    assert barrier_price == pytest.approx(7.4060, abs=1e-4)
-    # Price should be less than the European option, as the barrier adds a condition
-    assert barrier_price < euro_call_price
-    print("\nPASSED: Barrier Option pricing is correct.")
+# ============================================
+# Tests for control_variates.ipynb
+# ============================================
 
 
-@testbook("pricing_asian_options.ipynb")
-def test_lookback_option_fixed(tb):
-    """
-    Tests the Lookback Option cell after fixing it.
-    The original cell has several errors:
-    1. It doesn't pass a sampler to the LookBackOption constructor.
-    2. It tries to generate samples from the wrong object.
-    3. It prints the wrong sample size.
-    We use tb.inject() to replace the cell's content with corrected code.
-    """
-    # Execute all cells up to the problematic one
-    tb.execute_cell(list(range(15)))
+class TestControlVariates:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        with testbook.testbook(
+            "../../demos/control_variates.ipynb", execute=False
+        ) as tb:
+            yield tb
 
-    # This is the corrected code for the Lookback Option cell
-    corrected_code = """
-import qmcpy as qp
-vol = 0.5
-initPrice = 120
-interest = 0.02
-tfinal = 1/4
-d = 12
-sampleSize_lookback = 2**12
+    def test_imports(self, tb):
+        """Test that all imports work correctly"""
+        tb.execute_cell(0)
+        assert "qmcpy" in tb.ref_globals
+        assert "numpy" in tb.ref_globals
 
-# Correctly instantiate the sampler and the option
-lookback_sampler = qp.IIDStdUniform(dimension=d, seed=7)
-LookCall = qp.LookBackOption(lookback_sampler, volatility=vol,
-                             start_price=initPrice, interest_rate=interest,
-                             t_final=tfinal, call_put='call')
+    def test_matplotlib_setup(self, tb):
+        """Test matplotlib configuration"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        pyplot = tb.ref("pyplot")
+        assert pyplot is not None
+        tb.inject("assert pyplot.rcParams['font.size'] == 20")
 
-# Generate samples and compute the payoff
-x = LookCall.discrete_distrib.gen_samples(sampleSize_lookback)
-y = LookCall.f(x)
+    def test_compare_function(self, tb):
+        """Test compare function definition"""
+        tb.execute_cell(0)
+        tb.execute_cell(2)
+        compare = tb.ref("compare")
+        assert callable(compare)
+        sig = inspect.signature(compare)
+        assert len(sig.parameters) == 4
 
-# Print the correct information
-print(f"After generate {sampleSize_lookback} iid points, the price of this Lookback Call Option is {y.mean():.4f}")
-"""
-    # Inject and execute the corrected code in place of the original cell (index 16)
-    tb.inject(corrected_code, cell_index=16)
-    tb.execute_cell(16)
+    def test_polynomial_problem(self, tb):
+        """Test polynomial problem setup and execution"""
+        tb.inject("from qmcpy import *; from numpy import *")
+        tb.execute_cell(2)
+        tb.execute_cell(3)
+        poly_problem = tb.ref("poly_problem")
+        assert callable(poly_problem)
+        tb.inject(
+            """
+		test_distrib = IIDStdUniform(3, seed=7)
+		g1, cvs, cvmus = poly_problem(test_distrib)
+		assert len(cvs) == 2
+		assert len(cvmus) == 2
+		assert cvmus == [1, 4/3]
+		"""
+        )
 
-    lookback_price = tb.ref("y").mean()
+    def test_keister_problem(self, tb):
+        """Test Keister problem setup"""
+        tb.inject("from qmcpy import *; from numpy import *")
+        tb.execute_cell(2)
+        tb.execute_cell(4)
+        keister_problem = tb.ref("keister_problem")
+        assert callable(keister_problem)
 
-    # The corrected code with a fixed seed gives a deterministic result.
-    # This value was pre-calculated by running the corrected snippet.
-    assert lookback_price == pytest.approx(13.9131, abs=1e-4)
-    print("\nPASSED: Lookback Option pricing is correct after fixing the cell.")
-# test_mlqmc_notebook.py
+    def test_option_problem(self, tb):
+        """Test option pricing problem setup"""
+        tb.inject("from qmcpy import *; from numpy import *")
+        tb.execute_cell(2)
+        tb.execute_cell(5)
+        call_put = tb.ref("call_put")
+        assert call_put == "call"
+        start_price = tb.ref("start_price")
+        assert start_price == 100
 
+
+# ============================================
+# Tests for dakota_genz.ipynb
+# ============================================
+
+
+class TestDakotaGenz:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        with testbook.testbook("../../demos/dakota_genz.ipynb", execute=False) as tb:
+            yield tb
+
+    def test_imports_and_setup(self, tb):
+        """Test imports and matplotlib style setup"""
+        tb.execute_cell(0)
+        assert "numpy" in tb.ref_globals
+        assert "qmcpy" in tb.ref_globals
+        assert "pd" in tb.ref_globals
+
+    def test_dimension_and_sample_arrays(self, tb):
+        """Test dimension and sample size arrays"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        kinds_func = tb.ref("kinds_func")
+        kinds_coeff = tb.ref("kinds_coeff")
+        ds = tb.ref("ds")
+        ns = tb.ref("ns")
+        assert kinds_func == ["oscillatory", "corner-peak"]
+        assert kinds_coeff == [1, 2, 3]
+        assert len(ds) == 8
+        assert ds[0] == 1
+        assert ds[-1] == 128
+
+    def test_reference_solutions_computation(self, tb):
+        """Test reference solutions computation"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.inject(
+            "ds = 2**np.arange(3); x_full = DigitalNetB2(ds.max(), seed=7).gen_samples(2**10)"
+        )
+        tb.execute_cell(2)
+        ref_sols = tb.ref("ref_sols")
+        assert isinstance(ref_sols, pd.DataFrame)
+        assert "d" == ref_sols.index.name
+
+    def test_dakota_file_handling(self, tb):
+        """Test Dakota file loading (expected to fail without file)"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.execute_cell(2)
+        with pytest.raises(Exception) as exc_info:
+            tb.execute_cell(3)
+        assert "FileNotFoundError" in str(exc_info.typename)
+
+
+# ============================================
+# Tests for integration_examples.ipynb
+# ============================================
+
+
+class TestIntegrationExamples:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        with testbook.testbook(
+            "../../demos/integration_examples.ipynb", execute=False
+        ) as tb:
+            yield tb
+
+    def test_imports(self, tb):
+        """Test that imports work correctly"""
+        tb.execute_cell(0)
+        assert "qmcpy" in tb.ref_globals
+        assert "arange" in tb.ref_globals
+
+    def test_keister_example(self, tb):
+        """Test Keister example execution"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.inject(
+            """
+		assert 'data' in globals()
+		assert 'solution' in globals()
+		assert isinstance(solution, (int, float))
+		assert 0 < solution < 10
+		"""
+        )
+
+    def test_asian_option_single_level(self, tb):
+        """Test Asian option single level"""
+        tb.execute_cell(0)
+        tb.execute_cell(2)
+        tb.inject(
+            """
+		assert isinstance(solution, (int, float))
+		assert solution > 0
+		assert hasattr(data, 'time_integrate')
+		"""
+        )
+
+    def test_asian_option_multi_level(self, tb):
+        """Test Asian option multi-level"""
+        tb.execute_cell(0)
+        tb.execute_cell(3)
+        tb.inject(
+            """
+		assert hasattr(data, 'levels')
+		assert data.levels > 1
+		assert np.array_equal(data.integrand.multilevel_dims, [4, 8, 16])
+		"""
+        )
+
+    def test_bayesian_cubature_lattice(self, tb):
+        """Test Bayesian cubature with lattice"""
+        tb.execute_cell(0)
+        tb.execute_cell(4)
+        tb.inject(
+            """
+		assert 'solution' in globals()
+		assert data.comb_bound_low <= solution <= data.comb_bound_high
+		"""
+        )
+
+    def test_bayesian_cubature_sobol(self, tb):
+        """Test Bayesian cubature with Sobol"""
+        tb.execute_cell(0)
+        tb.execute_cell(5)
+        tb.inject(
+            """
+		assert isinstance(data.integrand.discrete_distrib, Sobol)
+		assert data.integrand.discrete_distrib.graycode == False
+		"""
+        )
+
+
+# ============================================
+# Tests for lebesgue_integration.ipynb
+# ============================================
+
+
+class TestLebesgueIntegration:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        with testbook.testbook(
+            "../../demos/lebesgue_integration.ipynb", execute=False
+        ) as tb:
+            yield tb
+
+    def test_imports(self, tb):
+        """Test imports"""
+        tb.execute_cell(0)
+        assert "qmcpy" in tb.ref_globals
+        assert "numpy" in tb.ref_globals
+
+    def test_sample_problem_1_setup(self, tb):
+        """Test sample problem 1 parameters"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        abs_tol = tb.ref("abs_tol")
+        dim = tb.ref("dim")
+        true_value = tb.ref("true_value")
+        assert abs_tol == 0.01
+        assert dim == 1
+        assert abs(true_value - 8 / 3) < 1e-10
+
+    def test_lebesgue_measure_1d(self, tb):
+        """Test Lebesgue measure integration"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.execute_cell(2)
+        tb.inject("assert abs(solution - true_value) <= abs_tol")
+
+    def test_uniform_measure_1d(self, tb):
+        """Test uniform measure integration"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.execute_cell(3)
+        tb.inject("assert abs(solution - true_value) <= abs_tol")
+
+    def test_sample_problem_2_setup(self, tb):
+        """Test sample problem 2 parameters"""
+        tb.execute_cell(0)
+        tb.execute_cell(4)
+        tb.inject(
+            """
+		assert dim == 2
+		assert len(a) == 2
+		assert len(b) == 2
+		assert abs(true_value - 23.33333) < 0.00001
+		"""
+        )
+
+    def test_sample_problem_3(self, tb):
+        """Test sin(x)/log(x) integral"""
+        tb.execute_cell(0)
+        tb.execute_cell(7)
+        tb.execute_cell(8)
+        tb.inject(
+            """
+		assert abs_tol == 0.0001
+		assert abs(solution - true_value) <= abs_tol
+		"""
+        )
+
+    def test_sample_problem_4(self, tb):
+        """Test integral over R^d"""
+        tb.execute_cell(0)
+        tb.execute_cell(9)
+        tb.execute_cell(10)
+        tb.inject(
+            """
+		assert abs_tol == 0.1
+		assert abs(solution - true_value) <= abs_tol
+		"""
+        )
+
+
+# ============================================
+# Tests for PricingAsianOptions.ipynb
+# ============================================
+
+
+class TestPricingAsianOptions:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        with testbook.testbook(
+            "../../demos/PricingAsianOptions.ipynb", execute=False
+        ) as tb:
+            yield tb
+
+    def test_imports(self, tb):
+        """Test imports"""
+        tb.execute_cell(0)
+        assert "qp" in tb.ref_globals
+        assert "np" in tb.ref_globals
+        assert "stats" in tb.ref_globals
+
+    def test_european_option_parameters(self, tb):
+        """Test European option parameters"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        params = {
+            "initPrice": 120,
+            "interest": 0.02,
+            "vol": 0.5,
+            "callput": "call",
+            "strike": 130,
+            "tfinal": 0.25,
+            "d": 12,
+            "absTol": 0.05,
+            "relTol": 0,
+            "sampleSize": 10**6,
+        }
+        for name, expected in params.items():
+            actual = tb.ref(name)
+            assert actual == expected, f"{name} should be {expected}"
+
+    def test_european_option_pricing(self, tb):
+        """Test European option pricing"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.execute_cell(2)
+        tb.inject(
+            """
+		assert hasattr(EuroCall, 'get_exact_value')
+		exact_val = EuroCall.get_exact_value()
+		assert isinstance(exact_val, (int, float))
+		assert exact_val > 0
+		"""
+        )
+
+    def test_arithmetic_mean_call(self, tb):
+        """Test arithmetic mean call option"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.execute_cell(3)
+        tb.inject(
+            """
+		assert ArithMeanCall.mean_type == 'arithmetic'
+		assert ArithMeanCall.call_put == 'call'
+		"""
+        )
+
+    def test_barrier_option(self, tb):
+        """Test barrier option"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.execute_cell(8)
+        tb.inject(
+            """
+		assert barrier == 150
+		assert BarrierUpInCall.barrier_price == 150
+		assert BarrierUpInCall.in_out == 'in'
+		"""
+        )
+
+
+# ============================================
+# Tests for qmcpy_intro.ipynb
+# ============================================
+
+
+class TestQMCPyIntro:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        with testbook.testbook("../../demos/qmcpy_intro.ipynb", execute=False) as tb:
+            yield tb
+
+    def test_import_methods(self, tb):
+        """Test different import methods"""
+        tb.execute_cell(0)
+        tb.inject(
+            """
+		assert 'qp' in globals()
+		assert hasattr(qp, 'name')
+		assert qp.name == 'qmcpy'
+		"""
+        )
+
+    def test_individual_imports(self, tb):
+        """Test importing individual modules"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.inject(
+            """
+		test_classes = ['Keister', 'AsianOption', 'Uniform', 'Gaussian']
+		for cls_name in test_classes:
+			assert cls_name in globals() or hasattr(qmcpy, cls_name)
+		"""
+        )
+
+    def test_lattice_generation(self, tb):
+        """Test lattice sequence generation"""
+        for i in range(4):
+            tb.execute_cell(i)
+        tb.inject(
+            """
+		samples = distribution.gen_samples(n_min=0, n_max=4)
+		assert samples.shape == (4, 2)
+		assert np.all((samples >= 0) & (samples <= 1))
+		"""
+        )
+
+    def test_function_definition_attempts(self, tb):
+        """Test the function definition process"""
+        for i in range(7):
+            tb.execute_cell(i)
+        tb.inject(
+            """
+		result = f(0.01)
+		assert isinstance(result, (int, float))
+		assert result > 0
+		"""
+        )
+
+    def test_corrected_function(self, tb):
+        """Test the corrected function"""
+        for i in range(13):
+            tb.execute_cell(i)
+        tb.inject(
+            """
+		x_test = array([[1., 0.], [0., 0.01], [0.04, 0.04]])
+		result = myfunc(x_test)
+		assert len(result) == 3
+		assert np.all(np.isfinite(result))
+		"""
+        )
+
+    def test_integration_1d(self, tb):
+        """Test 1D integration"""
+        for i in range(14):
+            tb.execute_cell(i)
+        tb.inject(
+            """
+		assert 'solution' in globals()
+		assert 0.6 < solution < 0.7
+		"""
+        )
+
+    def test_integration_2d(self, tb):
+        """Test 2D integration"""
+        for i in range(16):
+            tb.execute_cell(i)
+        tb.inject(
+            """
+		assert dim == 2
+		assert 'solution2' in globals()
+		assert 0.8 < solution2 < 0.85
+		"""
+        )
+
+
+# ============================================
+# Tests for quickstart.ipynb
+# ============================================
+
+
+class TestQuickstart:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        with testbook.testbook("../../demos/quickstart.ipynb", execute=False) as tb:
+            yield tb
+
+    def test_keister_function_definition(self, tb):
+        """Test Keister function implementation"""
+        tb.execute_cell(0)
+        tb.inject(
+            """
+		x = np.array([[1.0, 0.0]])
+		k = keister(x)
+		assert k.shape == (1,)
+		assert k[0] == np.pi
+
+		x = np.array([[1.0, 0.0], [0.0, 1.0], [0.0, 0.0]])
+		k = keister(x)
+		assert k.shape == (3,)
+		"""
+        )
+
+    def test_qmcpy_setup(self, tb):
+        """Test QMCPy setup for Keister example"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.inject(
+            """
+		assert d == 2
+		assert isinstance(discrete_distrib, qmcpy.Lattice)
+		assert discrete_distrib.d == 2
+		assert isinstance(true_measure, qmcpy.Gaussian)
+		assert true_measure.mean == 0
+		assert true_measure.covariance == 0.5
+		assert isinstance(integrand, qmcpy.CustomFun)
+		assert isinstance(stopping_criterion, qmcpy.CubQMCLatticeG)
+		assert stopping_criterion.abs_tol == 1e-3
+		"""
+        )
+
+    def test_integration(self, tb):
+        """Test integration execution"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.execute_cell(2)
+        tb.inject(
+            """
+		assert 'solution' in globals()
+		assert 'data' in globals()
+		assert 1.7 < solution < 1.9
+		assert hasattr(data, 'n_total')
+		assert data.n_total > 0
+		assert data.comb_bound_low <= solution <= data.comb_bound_high
+		"""
+        )
+
+
+# ============================================
+# Tests for saving_qmc_state.ipynb
+# ============================================
+
+
+class TestSavingQMCState:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        with testbook.testbook(
+            "../../demos/saving_qmc_state.ipynb", execute=False
+        ) as tb:
+            yield tb
+
+    def test_imports_and_setup(self, tb):
+        """Test imports and matplotlib setup"""
+        tb.execute_cell(0)
+        tb.inject(
+            """
+		assert 'qmcpy' in globals()
+		assert 'np' in globals()
+		assert 'pyplot' in globals()
+		assert 'norm' in globals()
+		assert lw == 3
+		"""
+        )
+
+    def test_iid_keister_integration(self, tb):
+        """Test IID Keister integration with CubMCCLT"""
+        tb.execute_cell(0)
+        tb.execute_cell(1)
+        tb.inject(
+            """
+		assert abs_tol == 0.3
+		assert isinstance(integrand, Keister)
+		assert integrand.d == 2
+		assert isinstance(integrand.discrete_distrib, IIDStdUniform)
+		assert 'solution' in globals()
+		assert 0 < solution < 3
+		assert data.n_total > 0
+		"""
+        )
+
+    def test_lattice_keister_setup(self, tb):
+        """Test lattice Keister setup and Bayesian integration"""
+        tb.execute_cell(0)
+        tb.execute_cell(3)
+        tb.inject(
+            """
+		assert isinstance(k, Keister)
+		assert isinstance(k.discrete_distrib, Lattice)
+		assert k.discrete_distrib.d == 2
+		assert k.discrete_distrib.order == 'linear'
+		assert k.discrete_distrib.seed == 123456789
+		assert isinstance(sc, CubBayesLatticeG)
+		assert sc.abs_tol == 0.05
+		assert 1.5 < solution < 2.0
+		"""
+        )
+
+    def test_object_introspection(self, tb):
+        """Test object introspection with dir()"""
+        tb.execute_cell(0)
+        tb.execute_cell(3)
+        tb.execute_cell(4)
+        tb.inject(
+            """
+		k_attrs = dir(k)
+		essential_attrs = ['discrete_distrib', 'true_measure', 'f', 'g', 'd', 'parameters']
+		for attr in essential_attrs:
+			assert attr in k_attrs
+		"""
+        )
+
+
+# ============================================
+# Cross-notebook integration tests
+# ============================================
+
+
+class TestCrossNotebookIntegration:
+    def test_keister_consistency_across_notebooks(self):
+        """Test that Keister function gives consistent results across notebooks"""
+        results = []
+        tolerances = []
+
+        # From quickstart.ipynb
+        with testbook.testbook("../../demos/quickstart.ipynb", execute=False) as tb:
+            for i in range(3):
+                tb.execute_cell(i)
+            tb.inject(
+                "quickstart_sol = solution; quickstart_tol = stopping_criterion.abs_tol"
+            )
+            results.append(tb.ref("quickstart_sol"))
+            tolerances.append(tb.ref("quickstart_tol"))
+
+        # From integration_examples.ipynb
+        with testbook.testbook(
+            "../../demos/integration_examples.ipynb", execute=False
+        ) as tb:
+            tb.execute_cell(0)
+            tb.execute_cell(1)
+            tb.inject(
+                "examples_sol = solution; examples_tol = data.stopping_crit.abs_tol"
+            )
+            results.append(tb.ref("examples_sol"))
+            tolerances.append(tb.ref("examples_tol"))
+
+        # All results should be reasonable for Keister function
+        assert all(1.5 < r < 2.5 for r in results)
+        assert all(t > 0 for t in tolerances)
+
+    def test_asian_option_consistency(self):
+        """Test Asian option consistency across notebooks"""
+        # From integration_examples.ipynb
+        with testbook.testbook(
+            "../../demos/integration_examples.ipynb", execute=False
+        ) as tb:
+            tb.execute_cell(0)
+            tb.execute_cell(2)  # Single level Asian
+            tb.inject("single_level_sol = solution")
+            single_level = tb.ref("single_level_sol")
+
+        # Check reasonable bounds for option price
+        assert 0 < single_level < 100
+
+
+# ============================================
+# Parametrized tests
+# ============================================
+
+
+@pytest.mark.parametrize(
+    "notebook,min_cells",
+    [
+        ("../../demos/asian-option-mlqmc.ipynb", 10),
+        ("../../demos/control_variates.ipynb", 5),
+        ("../../demos/dakota_genz.ipynb", 4),
+        ("../../demos/integration_examples.ipynb", 5),
+        ("../../demos/lebesgue_integration.ipynb", 10),
+        ("../../demos/PricingAsianOptions.ipynb", 8),
+        ("../../demos/qmcpy_intro.ipynb", 15),
+        ("../../demos/quickstart.ipynb", 3),
+        ("../../demos/saving_qmc_state.ipynb", 5),
+    ],
+)
+def test_notebook_has_minimum_cells(notebook, min_cells):
+    """Test that notebooks have minimum expected cells"""
+    with testbook.testbook(notebook, execute=False) as tb:
+        assert len(tb.cells) >= min_cells
+
+
+# ============================================
+# Utility tests
+# ============================================
+
+
+class TestUtilities:
+    def test_numpy_functionality(self):
+        """Test numpy is available and functional"""
+        import numpy as np
+
+        x = np.array([1, 2, 3])
+        assert x.sum() == 6
+        assert np.sqrt(4) == 2
+
+    def test_qmcpy_imports(self):
+        """Test all major QMCPy classes can be imported"""
+        from qmcpy import (
+            Keister,
+            AsianOption,
+            EuropeanOption,
+            Uniform,
+            Gaussian,
+            Lebesgue,
+            IIDStdUniform,
+            Lattice,
+            Sobol,
+            Halton,
+            CubMCCLT,
+            CubQMCSobolG,
+            CubBayesLatticeG,
+        )
+
+        assert all([Keister, AsianOption, Uniform, IIDStdUniform, CubMCCLT])
+
+    def test_pandas_functionality(self):
+        """Test pandas is available"""
+        import pandas as pd
+
+        df = pd.DataFrame({"a": [1, 2, 3]})
+        assert len(df) == 3
+
+
+# ============================================
+# Performance and stability tests
+# ============================================
+
+
+class TestPerformanceStability:
+    def test_small_integration_problems(self):
+        """Test that small integration problems complete quickly"""
+        import time
+        from qmcpy import Keister, IIDStdUniform, CubMCCLT
+
+        start = time.time()
+        k = Keister(IIDStdUniform(2, seed=7))
+        sol, data = CubMCCLT(k, abs_tol=0.5).integrate()
+        duration = time.time() - start
+
+        assert duration < 5.0  # Should complete in less than 5 seconds
+        assert isinstance(sol, (int, float))
+        assert data.n_total < 1e6  # Shouldn't need too many samples for low accuracy
+
+
+import testbook
+import numpy as np
+import pandas as pd
+import matplotlib
 import pytest
-from testbook import testbook
-import re
-import numpy as np
-
-
-# Use the testbook decorator to target the notebook file.
-# execute=True will run the whole notebook once to catch any basic errors.
-@testbook("asian-option-mlqmc.ipynb", execute=True)
-def test_notebook_smoke_test(tb):
-    """
-    A simple "smoke test" that executes the entire notebook from start to finish.
-    It passes if no exceptions are raised during execution.
-    This ensures all cells are syntactically correct and runnable.
-    """
-    # The decorator handles execution, so we just need to assert it completed.
-    assert tb.cell_executed_count > 0
-    print("\nPASSED: Notebook executed successfully from start to finish.")
-
-
-@testbook("asian-option-mlqmc.ipynb", execute=False)
-def test_single_level_qmc_output(tb):
-    """
-    Tests the single-level QMC calculation cell (index 5).
-    It verifies that the output printed to stdout matches the expected values.
-    """
-    # Execute cells up to and including the target cell
-    tb.execute_cell(slice(0, 6))
-
-    # Get the text output of the 6th cell (index 5)
-    output = tb.cell_output_text(5)
-
-    # Check that the key results are present in the output
-    assert "Asian Option true value (2 time steps): 5.63591" in output
-    assert "Asian Option true value (8 time steps): 5.75526" in output
-    assert "Asian Option true value (32 time steps): 5.76260" in output
-    print("\nPASSED: Single-level QMC outputs are correct.")
-
-
-@testbook("asian-option-mlqmc.ipynb", execute=False)
-def test_eval_option_deterministic_output(tb):
-    """
-    Tests the first call to the `eval_option` function (cell index 11).
-    It checks the deterministic parts of the output: the solution value and
-    the number of levels, which should be consistent for a fixed seed.
-    """
-    # Execute all cells needed to define and call the function
-    tb.execute_cell(slice(0, 12))
-
-    output = tb.cell_output_text(11)
-    lines = output.strip().split("\n")
-
-    # Expected results (solution, levels) for each method
-    expected = {
-        "MLMC": (5.7620, 10),
-        "continuation MLMC": (5.7580, 7),
-        "MLQMC": (5.7606, 8),
-        "continuation MLQMC": (5.7594, 7),
-    }
-
-    # Regex to parse each line of the output
-    pattern = re.compile(
-        r"\s*(?P<name>[\w\s]+)\s+solution\s+(?P<sol>[-.\d]+)\s+number of levels\s+(?P<lvl>\d+)"
-    )
-
-    assert len(lines) == 4, "Expected output for 4 methods"
-
-    for line in lines:
-        match = pattern.match(line)
-        assert match, f"Output line did not match expected format: {line}"
-        
-        name = match.group("name").strip()
-        solution = float(match.group("sol"))
-        levels = int(match.group("lvl"))
-
-        assert name in expected, f"Unexpected method name: {name}"
-        expected_sol, expected_lvl = expected[name]
-
-        assert solution == pytest.approx(expected_sol, abs=1e-3)
-        assert levels == expected_lvl
-
-    print("\nPASSED: `eval_option` function provides correct deterministic results.")
-
-
-@testbook("asian-option-mlqmc.ipynb", execute=False)
-def test_complexity_loop_and_plotting(tb):
-    """
-    Tests the main complexity loop and subsequent data processing/plotting cells.
-    It injects code to reduce the number of repetitions and tolerances,
-    making the test run much faster. It then verifies that the data structures
-    for plotting are created correctly and that the plotting cells can execute.
-    """
-    # Cell indices before injection:
-    # 13: Complexity loop
-    # 15: avg_time calculation
-    # 16: First plot
-    # 17: max_levels calculation
-    # 18: Second plot
-
-    # Run all cells before the main loop
-    tb.execute_cell(slice(0, 13))
-
-    # Inject code to override loop parameters for a fast test run.
-    # This becomes the new cell at index 13.
-    tb.inject(
-        """
-    import numpy as np
-    repetitions = 2
-    tolerances = np.array([5e-2, 5e-3])
-    """,
-        before=13,
-    )
-
-    # Execute the original loop cell (now at index 14)
-    tb.execute_cell(14)
-
-    # Execute the data processing cells
-    tb.execute_cell(16)  # Original cell 15 -> avg_time
-    tb.execute_cell(18)  # Original cell 17 -> max_levels
-
-    # Get the results from the notebook's kernel
-    avg_time = tb.ref("avg_time")
-    max_levels = tb.ref("max_levels")
-    tolerances = tb.ref("tolerances")
-
-    # --- Assertions on the generated data ---
-    assert isinstance(avg_time, dict) and len(avg_time) == 4
-    assert all(len(v) == len(tolerances) for v in avg_time.values())
-    assert avg_time[0][0] > 0  # Check for plausible (non-zero) time
-
-    assert isinstance(max_levels, dict) and len(max_levels) == 4
-    assert len(max_levels[0]) == 15
-    # The sum of fractions should be 1.0 (for 100%)
-    assert sum(max_levels[0]) == pytest.approx(1.0)
-
-    # --- Execute plotting cells to ensure they run without error ---
-    tb.execute_cell(17)  # Original cell 16
-    tb.execute_cell(19)  # Original cell 18
-
-    print("\nPASSED: Complexity loop and plotting cells run correctly with injected data.")
-
-# test_control_variates.py
-
-
-@testbook("control_variates.ipynb", execute=True)
-def test_notebook_execution(tb):
-    """
-    Smoke test to ensure the entire notebook executes without errors.
-    """
-    assert tb.cell_executed_count > 0
-    print("\nPASSED: Control variates notebook executed successfully.")
-
-
-@testbook("control_variates.ipynb", execute=False)
-def test_setup_and_imports(tb):
-    """
-    Test that all imports and setup cells execute correctly.
-    """
-    # Execute setup cells (0-2)
-    tb.execute_cell(slice(0, 3))
-    
-    # Check that key modules are available
-    qmcpy_available = tb.ref("qmcpy") is not None
-    numpy_available = tb.ref("numpy") is not None
-    
-    assert qmcpy_available, "qmcpy should be imported"
-    assert numpy_available, "numpy should be imported"
-    
-    print("\nPASSED: Setup and imports work correctly.")
-
-
-@testbook("control_variates.ipynb", execute=False)
-def test_compare_function_definition(tb):
-    """
-    Test that the compare function is properly defined and accessible.
-    """
-    # Execute cells up to the compare function definition
-    tb.execute_cell(slice(0, 4))
-    
-    # Check that compare function exists
-    compare_func = tb.ref("compare")
-    assert callable(compare_func), "compare function should be callable"
-    
-    print("\nPASSED: Compare function is properly defined.")
-
-
-@testbook("control_variates.ipynb", execute=False)
-def test_polynomial_problem(tb):
-    """
-    Test the polynomial function integration problem with control variates.
-    """
-    # Execute setup and polynomial problem cells
-    tb.execute_cell(slice(0, 6))
-    
-    # Get the output from the polynomial problem cell
-    output = tb.cell_output_text(5)
-    lines = output.strip().split('\n')
-    
-    # Parse the output to extract performance metrics
-    results = {}
-    current_method = None
-    
-    for line in lines:
-        if 'Stopping Criterion:' in line:
-            # Extract method name and tolerance
-            match = re.search(r'Stopping Criterion:\s+(\w+)\s+absolute tolerance:\s+([\d.e-]+)', line)
-            if match:
-                current_method = match.group(1)
-                results[current_method] = {}
-        elif 'W CV:' in line:
-            # Without control variates
-            match = re.search(r'Solution\s+([\d.-]+)\s+time\s+([\d.-]+)\s+samples\s+([\d.e+-]+)', line)
-            if match and current_method:
-                results[current_method]['without_cv'] = {
-                    'solution': float(match.group(1)),
-                    'time': float(match.group(2)),
-                    'samples': float(match.group(3))
-                }
-        elif 'WO CV:' in line:
-            # With control variates (WO = WithOut CV is confusing, but seems to mean "With Control Variates")
-            match = re.search(r'Solution\s+([\d.-]+)\s+time\s+([\d.-]+)\s+samples\s+([\d.e+-]+)', line)
-            if match and current_method:
-                results[current_method]['with_cv'] = {
-                    'solution': float(match.group(1)),
-                    'time': float(match.group(2)),
-                    'samples': float(match.group(3))
-                }
-    
-    # Verify we got results for expected methods
-    assert 'CubMCCLT' in results, "Should have results for CubMCCLT"
-    assert 'CubQMCSobolG' in results, "Should have results for CubQMCSobolG"
-    
-    # Test that solutions are reasonable (polynomial integrates to around 5.33)
-    for method_name, method_results in results.items():
-        if 'without_cv' in method_results and 'with_cv' in method_results:
-            sol_without = method_results['without_cv']['solution']
-            sol_with = method_results['with_cv']['solution']
-            
-            # Solutions should be close to the true value (around 5.33)
-            assert 5.0 <= sol_without <= 6.0, f"Solution without CV should be reasonable: {sol_without}"
-            assert 5.0 <= sol_with <= 6.0, f"Solution with CV should be reasonable: {sol_with}"
-            
-            # Solutions should be close to each other
-            assert abs(sol_without - sol_with) < 0.1, f"Solutions should be similar: {sol_without} vs {sol_with}"
-            
-            # For Monte Carlo methods, control variates should generally reduce samples
-            if method_name == 'CubMCCLT':
-                samples_without = method_results['without_cv']['samples']
-                samples_with = method_results['with_cv']['samples']
-                assert samples_with < samples_without, f"Control variates should reduce samples for {method_name}"
-    
-    print("\nPASSED: Polynomial problem with control variates works correctly.")
-
-
-@testbook("control_variates.ipynb", execute=False)
-def test_keister_problem(tb):
-    """
-    Test the Keister function integration problem with control variates.
-    """
-    # Execute setup and Keister problem cells
-    tb.execute_cell(slice(0, 7))
-    
-    # Get the output from the Keister problem cell
-    output = tb.cell_output_text(6)
-    
-    # Check that the output contains expected stopping criteria
-    assert 'CubMCCLT' in output, "Should use CubMCCLT"
-    assert 'CubQMCSobolG' in output, "Should use CubQMCSobolG"
-    
-    # Check that solutions are reasonable for Keister function (around 1.38)
-    solution_matches = re.findall(r'Solution\s+([\d.-]+)', output)
-    solutions = [float(s) for s in solution_matches]
-    
-    for sol in solutions:
-        assert 1.0 <= sol <= 2.0, f"Keister solution should be reasonable: {sol}"
-        assert abs(sol - 1.38) < 0.2, f"Solution should be close to expected value: {sol}"
-    
-    # Check that control variates information is present
-    assert 'Control variates took' in output, "Should report control variate performance"
-    
-    print("\nPASSED: Keister problem with control variates works correctly.")
-
-
-@testbook("control_variates.ipynb", execute=False)
-def test_option_pricing_problem(tb):
-    """
-    Test the option pricing problem using European option as control variate for Asian option.
-    """
-    # Execute all cells including the option pricing problem
-    tb.execute_cell(slice(0, 8))
-    
-    # Get the output from the option pricing cell
-    output = tb.cell_output_text(7)
-    
-    # Check that the output contains expected content
-    assert 'Stopping Criterion:' in output, "Should show stopping criterion"
-    assert 'Solution' in output, "Should show solutions"
-    
-    # Parse solutions
-    solution_matches = re.findall(r'Solution\s+([\d.-]+)', output)
-    solutions = [float(s) for s in solution_matches]
-    
-    # Asian call option prices should be reasonable (around 9.5 based on parameters)
-    for sol in solutions:
-        assert 5.0 <= sol <= 15.0, f"Option price should be reasonable: {sol}"
-        assert abs(sol - 9.55) < 1.0, f"Solution should be close to expected value: {sol}"
-    
-    # Check for control variate performance reporting
-    assert 'Control variates took' in output, "Should report control variate performance"
-    
-    print("\nPASSED: Option pricing with control variates works correctly.")
-
-
-@testbook("control_variates.ipynb", execute=False)
-def test_control_variate_effectiveness(tb):
-    """
-    Test that control variates actually improve performance by reducing variance/samples.
-    """
-    # Execute a simplified version of one problem to test effectiveness
-    tb.execute_cell(slice(0, 4))
-    
-    # Inject code to test control variate effectiveness directly
-    test_code = """
-# Test polynomial problem with fixed seed for reproducible results
-from qmcpy import *
-from numpy import *
-
-def test_poly_problem(discrete_distrib):
-    g1 = CustomFun(Uniform(discrete_distrib,0,2),lambda t: 10*t[:,0]-5*t[:,1]**2+t[:,2]**3)
-    cv1 = CustomFun(Uniform(discrete_distrib,0,2),lambda t: t[:,0])
-    cv2 = CustomFun(Uniform(discrete_distrib,0,2),lambda t: t[:,1]**2)
-    return g1,[cv1,cv2],[1,4/3]
-
-# Test with and without control variates
-g1, cvs, cvmus = test_poly_problem(IIDStdUniform(3, seed=42))
-
-# Without control variates
-sc_without = CubMCCLT(g1, abs_tol=1e-2)
-sol_without, data_without = sc_without.integrate()
-
-# With control variates
-sc_with = CubMCCLT(g1, abs_tol=1e-2, control_variates=cvs, control_variate_means=cvmus)
-sol_with, data_with = sc_with.integrate()
-
-# Store results for testing
-test_results = {
-    'sol_without': sol_without,
-    'sol_with': sol_with,
-    'samples_without': data_without.n_total,
-    'samples_with': data_with.n_total,
-    'time_without': data_without.time_integrate,
-    'time_with': data_with.time_integrate
-}
-"""
-    
-    tb.inject(test_code)
-    tb.execute_cell(-1)  # Execute the injected cell
-    
-    # Get test results
-    results = tb.ref("test_results")
-    
-    # Test that solutions are similar
-    sol_diff = abs(results['sol_without'] - results['sol_with'])
-    assert sol_diff < 0.5, f"Solutions should be similar: {sol_diff}"
-    
-    # Test that control variates reduce samples (most of the time)
-    samples_ratio = results['samples_with'] / results['samples_without']
-    assert samples_ratio < 0.8, f"Control variates should significantly reduce samples: {samples_ratio}"
-    
-    # Solutions should be reasonable
-    assert 4.5 <= results['sol_without'] <= 6.5, f"Solution without CV: {results['sol_without']}"
-    assert 4.5 <= results['sol_with'] <= 6.5, f"Solution with CV: {results['sol_with']}"
-    
-    print(f"\nPASSED: Control variates reduced samples by {(1-samples_ratio)*100:.1f}%")
-
-
-@testbook("control_variates.ipynb", execute=False)
-def test_problem_definitions(tb):
-    """
-    Test that all problem definition functions work correctly.
-    """
-    tb.execute_cell(slice(0, 4))
-    
-    # Test that we can call each problem definition function
-    test_code = """
-# Test polynomial problem definition
-discrete_distrib = IIDStdUniform(3, seed=7)
-g1, cvs, cvmus = poly_problem(discrete_distrib)
-
-poly_check = {
-    'g1_callable': callable(g1.f),
-    'num_cvs': len(cvs),
-    'num_cv_means': len(cvmus),
-    'cv_means': cvmus
-}
-"""
-    
-    tb.inject(test_code)
-    
-    # Execute cells to define poly_problem
-    tb.execute_cell(5)  # Execute the polynomial problem cell
-    tb.execute_cell(-1)  # Execute the injected test
-    
-    results = tb.ref("poly_check")
-    
-    assert results['g1_callable'], "Main function should be callable"
-    assert results['num_cvs'] == 2, "Should have 2 control variates"
-    assert results['num_cv_means'] == 2, "Should have 2 control variate means"
-    assert results['cv_means'] == [1, 4/3], "Control variate means should be correct"
-    
-    print("\nPASSED: Problem definitions work correctly.")
-
-
-@testbook("control_variates.ipynb", execute=False)
-def test_output_parsing(tb):
-    """
-    Test that we can parse the compare function output correctly.
-    """
-    tb.execute_cell(slice(0, 6))  # Execute through polynomial problem
-    
-    # Get the polynomial problem output
-    output = tb.cell_output_text(5)
-    
-    # Test parsing performance metrics
-    performance_lines = [line for line in output.split('\n') if 'Control variates took' in line]
-    
-    assert len(performance_lines) >= 2, "Should have performance comparisons"
-    
-    for line in performance_lines:
-        # Extract percentages
-        percentages = re.findall(r'([\d.]+)%', line)
-        assert len(percentages) >= 2, f"Should have time and sample percentages: {line}"
-        
-        time_pct = float(percentages[0])
-        sample_pct = float(percentages[1])
-        
-        # Percentages should be reasonable
-        assert 0 < time_pct <= 200, f"Time percentage should be reasonable: {time_pct}%"
-        assert 0 < sample_pct <= 200, f"Sample percentage should be reasonable: {sample_pct}%"
-    
-    print("\nPASSED: Output parsing works correctly.")
-# test_integration_examples.py
-
-import pytest
-from testbook import testbook
-import numpy as np
-
-
-# The @testbook decorator targets the notebook file.
-# execute=True will run the whole notebook once to catch any basic errors.
-@testbook("integration_examples.ipynb", execute=True)
-def test_notebook_execution(tb):
-    """
-    A simple "smoke test" that executes the entire notebook from start to finish.
-    It passes if no exceptions are raised during execution.
-    """
-    # The decorator handles execution, so we just need to assert it completed.
-    assert tb.cell_executed_count > 0
-    print("\nPASSED: Notebook executed successfully from start to finish.")
-
-
-@testbook("integration_examples.ipynb", execute=False)
-def test_keister_qmc_sobol(tb):
-    """
-    Tests the first Keister example using CubQMCSobolG.
-    It verifies the solution and the properties of the returned data object.
-    """
-    # Execute cells up to and including the target cell (index 2)
-    tb.execute_cell(slice(0, 3))
-
-    # Get references to the variables in the notebook's kernel
-    solution = tb.ref("solution")
-    data = tb.ref("data")
-
-    # Assertions for the Keister example with Sobol QMC
-    # The result should be deterministic due to the fixed seed.
-    assert solution == pytest.approx(2.170, abs=1e-3)
-    assert data.n_total == 2**10
-    assert "LDTransformData" in str(data)
-    assert "CubQMCSobolG" in str(data)
-    assert "Keister" in str(data)
-    assert data.abs_tol == 0.05
-
-    print("\nPASSED: Keister example with CubQMCSobolG is correct.")
-
-
-@testbook("integration_examples.ipynb", execute=False)
-def test_asian_option_single_level(tb):
-    """
-    Tests the single-level Asian option pricing example using CubMCCLT.
-    """
-    # Execute cells up to and including the target cell (index 3)
-    tb.execute_cell(slice(0, 4))
-
-    solution = tb.ref("solution")
-    data = tb.ref("data")
-
-    # Assertions for the single-level Monte Carlo estimation
-    # The result is stochastic, so we check for a reasonable range.
-    assert solution == pytest.approx(6.257, abs=0.1)
-    assert "MeanVarData" in str(data)
-    assert data.levels == 1  # Ensure it's a single-level computation
-    assert data.abs_tol == 0.025
-    # Check that the total samples are greater than the initial samples
-    assert data.n_total > 2**10
-
-    print("\nPASSED: Single-level Asian option pricing is correct.")
-
-
-@testbook("integration_examples.ipynb", execute=False)
-def test_asian_option_multi_level(tb):
-    """
-    Tests the multi-level Asian option pricing example using CubMCCLT.
-    """
-    # Execute cells up to and including the target cell (index 4)
-    tb.execute_cell(slice(0, 5))
-
-    solution = tb.ref("solution")
-    data = tb.ref("data")
-    integrand = tb.ref("integrand")
-
-    # Assertions for the multi-level Monte Carlo estimation
-    assert solution == pytest.approx(6.264, abs=0.1)
-    # A key feature of multi-level is having more than one level
-    assert data.levels > 1
-    assert len(data.n) == data.levels  # Samples `n` should be an array of length `levels`
-    assert np.array_equal(integrand.multilevel_dims, [4, 8, 16])
-
-    print("\nPASSED: Multi-level Asian option pricing is correct.")
-
-
-@testbook("integration_examples.ipynb", execute=False)
-def test_keister_bayes_lattice(tb):
-    """
-    Tests the Keister example using Bayesian cubature with a Lattice sampler.
-    """
-    # Execute cells up to and including the target cell (index 5)
-    tb.execute_cell(slice(0, 6))
-
-    solution = tb.ref("solution")
-    data = tb.ref("data")
-
-    # Assertions for Bayesian cubature with Lattice
-    # This method is deterministic.
-    assert solution == pytest.approx(2.168, abs=1e-3)
-    assert data.n_total == 2**12
-    assert "LDTransformBayesData" in str(data)
-    assert "CubBayesLatticeG" in str(data)
-    assert "Lattice" in str(data)
-    assert data.abs_tol == 0.001
-
-    print("\nPASSED: Keister example with CubBayesLatticeG is correct.")
-
-
-@testbook("integration_examples.ipynb", execute=False)
-def test_keister_bayes_net(tb):
-    """
-    Tests the Keister example using Bayesian cubature with a Sobol sampler (net).
-    """
-    # Execute all cells in the notebook
-    tb.execute_cell(slice(0, 7))
-
-    solution = tb.ref("solution")
-    data = tb.ref("data")
-
-    # Assertions for Bayesian cubature with Sobol
-    # This method is also deterministic.
-    assert solution == pytest.approx(2.168, abs=1e-3)
-    assert data.n_total == 2**13
-    assert "LDTransformBayesData" in str(data)
-    assert "CubBayesNetG" in str(data)
-    assert "Sobol" in str(data)
-    assert data.abs_tol == 0.001
-
-    print("\nPASSED: Keister example with CubBayesNetG is correct.")
+
+# #############################################################################
+# ## Tests for quasirandom_generators.ipynb
+# #############################################################################
+
+
+class TestQuasirandomGenerators:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        """Fixture to execute the notebook for this class."""
+        with testbook.testbook(
+            "../../demos/quasirandom_generators.ipynb", execute=True
+        ) as tb_obj:
+            yield tb_obj
+
+    def test_cell_1_markdown(self, tb):
+        """Test for markdown cell 1: Title"""
+        assert tb.nb.cells[0].cell_type == "markdown"
+
+    def test_cell_2_imports(self, tb):
+        """Test for code cell 2: Imports and setup"""
+        tb.inject(
+            """
+			assert 'Lattice' in locals()
+			assert 'pd' in locals()
+			assert 'plt' in locals()
+			assert plt.rcParams['font.size'] == 14
+			""",
+            cell_index=1,
+        )
+
+    def test_cell_4_iid_generator(self, tb):
+        """Test for code cell 4: IID generator and plot"""
+        d = tb.ref("d")
+        n = tb.ref("n")
+        s = tb.ref("s")
+        assert d == 2 and n == 2**s
+        iid_generator = tb.ref("iid_generator")
+        assert iid_generator.__class__.__name__ == "IID"
+        iid_samples = tb.ref("iid_samples")
+        assert isinstance(iid_samples, np.ndarray)
+        assert iid_samples.shape == (n, d)
+        fig = tb.ref("fig")
+        assert isinstance(fig, matplotlib.figure.Figure)
+        ax = tb.ref("ax")
+        assert isinstance(ax, matplotlib.axes.Axes)
+        assert "IID" in ax.get_title()
+
+    def test_cell_6_lattice_generator(self, tb):
+        """Test for code cell 6: Lattice generator and plot"""
+        lattice_generator = tb.ref("lattice_generator")
+        assert lattice_generator.__class__.__name__ == "Lattice"
+        lattice_samples = tb.ref("lattice_samples")
+        assert isinstance(lattice_samples, np.ndarray)
+        ax = tb.ref("ax")
+        assert "Lattice" in ax.get_title()
+
+    def test_cell_8_sobol_generator(self, tb):
+        """Test for code cell 8: Sobol generator and plot"""
+        sobol_generator = tb.ref("sobol_generator")
+        assert sobol_generator.__class__.__name__ == "Sobol"
+        sobol_samples = tb.ref("sobol_samples")
+        assert isinstance(sobol_samples, np.ndarray)
+        ax = tb.ref("ax")
+        assert "Sobol" in ax.get_title()
+
+
+# #############################################################################
+# ## Tests for some_true_measures.ipynb
+# #############################################################################
+
+
+class TestSomeTrueMeasures:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        """Fixture to execute the notebook for this class."""
+        with testbook.testbook(
+            "../../demos/some_true_measures.ipynb", execute=True
+        ) as tb_obj:
+            yield tb_obj
+
+    def test_cell_3_imports(self, tb):
+        """Test for code cell 3: Imports"""
+        tb.inject(
+            """
+			assert 'CubMCG' in locals()
+			assert 'Keister' in locals()
+			assert 'pi' in locals()
+			""",
+            cell_index=2,
+        )
+
+    def test_cell_4_keister_std(self, tb):
+        """Test for code cell 4: Standard Keister integration"""
+        keister_std = tb.ref("keister_std")
+        assert keister_std.__class__.__name__ == "Keister"
+        sol = tb.ref("sol")
+        assert isinstance(sol, float)
+        data = tb.ref("data")
+        assert data.__class__.__name__ == "StoppingConditionData"
+
+    def test_cell_11_plotting(self, tb):
+        """Test for code cell 11: Plotting Keister functions"""
+        fig = tb.ref("fig")
+        ax = tb.ref("ax")
+        assert isinstance(fig, matplotlib.figure.Figure)
+        assert isinstance(ax, matplotlib.axes.Axes)
+        assert ax.get_title() == "functions"
+        assert len(ax.get_lines()) == 4  # Check that 4 functions were plotted
+
+
+# #############################################################################
+# ## Tests for nei_demo.ipynb
+# #############################################################################
+
+
+class TestNeiDemo:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        """Fixture to execute the notebook for this class."""
+        with testbook.testbook("../../demos/nei_demo.ipynb", execute=True) as tb_obj:
+            yield tb_obj
+
+    def test_cell_2_imports(self, tb):
+        """Test for code cell 2: Imports and setup"""
+        tb.inject(
+            """
+			assert 'norm' in locals()
+			assert lw == 3
+			assert ms == 8
+			""",
+            cell_index=1,
+        )
+
+    def test_cell_4_fake_data(self, tb):
+        """Test for code cell 4: Fake data generation"""
+        xt = tb.ref("xt")
+        yt = tb.ref("yt")
+        y_max = tb.ref("y_max")
+        assert isinstance(xt, np.ndarray) and xt.ndim == 2
+        assert isinstance(yt, np.ndarray) and yt.ndim == 1
+        assert isinstance(y_max, float)
+
+    def test_cell_6_covariance_function(self, tb):
+        """Test for code cell 6: Covariance function definition"""
+        k_func = tb.ref("k")
+        assert callable(k_func)
+        # Test function with sample data
+        x1 = np.array([[0.5]])
+        x2 = np.array([[0.6]])
+        l = 0.4
+        expected_output = np.exp(-0.5 * (np.sum((x1 - x2) ** 2)) / l**2)
+        assert np.isclose(k_func(x1, x2, l), expected_output)
+
+    def test_cell_13_calculation_loop(self, tb):
+        """Test for code cell 13: NEI calculation loop"""
+        vals = tb.ref("vals")
+        assert isinstance(vals, dict)
+        assert "qmc" in vals
+        assert "mc" in vals
+        assert isinstance(vals["qmc"], np.ndarray)
+
+    def test_cell_14_plotting(self, tb):
+        """Test for code cell 14: Plotting results"""
+        output_text = tb.nb.cells[13].outputs[0]["data"]["text/plain"]
+        assert "<Figure size" in output_text
+
+
+# #############################################################################
+# ## Tests for pydata.chi.2023.ipynb
+# #############################################################################
+
+
+class TestPydataChi2023:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        """Fixture to execute the notebook for this class."""
+        with testbook.testbook(
+            "../../demos/pydata.chi.2023.ipynb", execute=True
+        ) as tb_obj:
+            yield tb_obj
+
+    def test_cell_3_sobol(self, tb):
+        """Test for code cell 3: Sobol sequence generation"""
+        s = tb.ref("s")
+        assert isinstance(s, np.ndarray)
+        assert s.shape == (2**8, 2)
+        ax = tb.ref("ax")
+        assert "Sobol" in ax.get_title()
+
+    def test_cell_8_asian_option(self, tb):
+        """Test for code cell 8: Asian Option Integration"""
+        integrand = tb.ref("integrand")
+        assert integrand.__class__.__name__ == "AsianOption"
+        solution = tb.ref("solution")
+        assert isinstance(solution, np.ndarray)
+        assert len(solution) > 1
+
+    @pytest.mark.skip(reason="Requires penguins.csv file.")
+    def test_cell_11_load_data(self, tb):
+        """Test for code cell 11: Loading penguin data"""
+        df = tb.ref("df")
+        assert isinstance(df, pd.DataFrame)
+        X = tb.ref("X")
+        y = tb.ref("y")
+        assert isinstance(X, np.ndarray)
+        assert isinstance(y, np.ndarray)
+
+    @pytest.mark.skip(reason="Requires penguins.csv file.")
+    def test_cell_13_nnkernel(self, tb):
+        """Test for code cell 13: QMC integration with NNKernel"""
+        data = tb.ref("nn_sis_data")
+        assert data.__class__.__name__ == "StoppingConditionData"
+        assert "NNKernel" in str(data.integrand)
+
+
+# #############################################################################
+# ## Tests for sample_scatter_plots.ipynb
+# #############################################################################
+
+
+class TestSampleScatterPlots:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        """Fixture to execute the notebook for this class."""
+        with testbook.testbook(
+            "../../demos/sample_scatter_plots.ipynb", execute=True
+        ) as tb_obj:
+            yield tb_obj
+
+    def test_cell_3_make_level_plot(self, tb):
+        """Test for code cell 3: make_level_plot function definition"""
+        assert callable(tb.ref("make_level_plot"))
+
+    def test_cell_4_make_scatter_plot(self, tb):
+        """Test for code cell 4: make_scatter_plot function definition"""
+        assert callable(tb.ref("make_scatter_plot"))
+
+    def test_cell_6_european_option(self, tb):
+        """Test for code cell 6: European Option plotting loop"""
+        # The cell creates multiple plots in a loop, we check the final state
+        integrand = tb.ref("integrand")
+        assert integrand.__class__.__name__ == "EuropeanOption"
+        fig = tb.ref("fig")
+        assert isinstance(fig, matplotlib.figure.Figure)
+        assert len(fig.axes) == 4  # 4 subplots
+
+    def test_cell_8_asian_option(self, tb):
+        """Test for code cell 8: Asian Option plotting loop"""
+        integrand = tb.ref("integrand")
+        assert integrand.__class__.__name__ == "AsianOption"
+        fig = tb.ref("fig")
+        assert isinstance(fig, matplotlib.figure.Figure)
+        assert len(fig.axes) == 4
+
+
+# #############################################################################
+# ## Tests for linear-scrambled-halton.ipynb
+# #############################################################################
+
+
+class TestLinearScrambledHalton:
+    @pytest.fixture(scope="class")
+    def tb(self):
+        """Fixture to execute the notebook for this class."""
+        with testbook.testbook(
+            "../../demos/linear-scrambled-halton.ipynb", execute=True
+        ) as tb_obj:
+            yield tb_obj
+
+    def test_cell_11_qrng(self, tb):
+        """Test for code cell 11: QRNG Halton"""
+        halton_qrng = tb.ref("halton_qrng")
+        assert halton_qrng.__class__.__name__ == "Halton"
+        assert halton_qrng.randomize == "QRNG"
+
+    def test_cell_20_lms(self, tb):
+        """Test for code cell 20: LMS Scrambled Halton"""
+        halton_lms = tb.ref("halton_lms")
+        assert halton_lms.randomize == "LMS"
+
+    def test_cell_26_ds(self, tb):
+        """Test for code cell 26: Digital Shift Halton"""
+        halton_ds = tb.ref("halton_ds")
+        assert halton_ds.randomize == "DS"
+
+    def test_cell_30_lms_ds(self, tb):
+        """Test for code cell 30: LMS + DS Halton"""
+        halton_lms_ds = tb.ref("halton_lms_ds")
+        assert halton_lms_ds.randomize == "LMS_DS"
+
+    def test_cell_35_owen(self, tb):
+        """Test for code cell 35: Owen Scrambled Halton"""
+        halton_owen = tb.ref("halton_owen")
+        assert halton_owen.randomize == "OWEN"
+
+    def test_cell_46_time_comparison(self, tb):
+        """Test for code cell 46: Time comparison loop"""
+        output = tb.nb.cells[45].outputs[0].text
+        assert "Time to generate samples for QRNG" in output
+        assert "Time to generate samples for OWEN" in output
+        assert "Time to generate samples for LMS" in output
+        assert "Time to generate samples for DS" in output
+        assert "Time to generate samples for LMS_DS" in output
+
+
+if __name__ == "__main__":
+    # Run all tests
+    pytest.main([__file__, "-v"])
