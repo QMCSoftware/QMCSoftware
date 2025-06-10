@@ -6,6 +6,18 @@ from ..util import ParameterError
 from numpy import *
 
 
+def default_fudge(m):
+    return 5.*2.**(-m)
+
+
+def default_error_fun(sv, abs_tol, rel_tol):
+    return maximum(abs_tol, abs(sv)*rel_tol)
+
+
+def default_coefv(nl):
+    return exp(-2*pi*1j*arange(nl)/(2*nl))
+
+
 class CubQMCLatticeG(_CubQMCLDG):
     r"""
     Stopping Criterion quasi-Monte Carlo method using rank-1 Lattices cubature over
@@ -121,8 +133,8 @@ class CubQMCLatticeG(_CubQMCLDG):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
-        fudge=lambda m: 5.*2.**(-m), check_cone=False, ptransform='Baker',
-        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
+        fudge=default_fudge, check_cone=False, ptransform='Baker',
+        error_fun=default_error_fun):
         """
         Args:
             integrand (Integrand): an instance of Integrand
@@ -143,7 +155,7 @@ class CubQMCLatticeG(_CubQMCLDG):
             control_variate_means = [],
             update_beta=False,
             ptransform = ptransform,
-            coefv = lambda nl: exp(-2*pi*1j*arange(nl)/(2*nl)), 
+            coefv = default_coefv,
             allowed_levels = ['single'],
             allowed_distribs = [Lattice],
             cast_complex = True,
