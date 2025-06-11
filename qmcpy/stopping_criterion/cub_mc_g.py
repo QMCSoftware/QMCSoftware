@@ -120,12 +120,20 @@ class CubMCG(StoppingCriterion):
         allow_vectorized_integrals = False
         super(CubMCG,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
-    def integrate(self):
-        """ See abstract method. """
-        # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, 
-            self.n_init, self.cv, self.cv_mu)  # house integration data
+    def integrate(self, resume=None):
+        """ See abstract method. Optionally resumes from a previous computation.
+        
+        Args:
+            resume (MeanVarData, optional): Previous data object returned from a prior call to integrate. 
+                If provided, computation resumes from this state.
+        """
         t_start = time()
+        if resume is not None:
+            self.data = resume
+        else:
+            # Construct AccumulateData Object to House Integration data
+            self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, 
+                self.n_init, self.cv, self.cv_mu)  # house integration data
         # Pilot Sample
         self.data.update_data()
         self.sigma_up = self.inflate * self.data.sighat

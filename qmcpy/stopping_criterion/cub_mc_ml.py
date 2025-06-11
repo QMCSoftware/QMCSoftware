@@ -116,12 +116,23 @@ class CubMCML(StoppingCriterion):
         allow_vectorized_integrals = False
         super(CubMCML,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
-    def integrate(self):
-        """ See abstract method. """
-         # Construct AccumulateData Object to House Integration Data
-        self.data = MLMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.levels_min, self.n_init, self.alpha0, self.beta0, self.gamma0)
+    def integrate(self, resume=None):
+        """ See abstract method. Optionally resumes from a previous computation.
+        
+        Args:
+            resume (MLMCData, optional): Previous data object returned from a prior call to integrate. 
+                If provided, computation resumes from this state.
+        """
         t_start = time()
+        if resume is not None:
+            self.data = resume
+            # Initialize diff_n_level to zeros to calculate new samples needed
+            if not hasattr(self.data, 'diff_n_level') or self.data.diff_n_level is None:
+                self.data.diff_n_level = zeros_like(self.data.n_level)
+        else:
+            # Construct AccumulateData Object to House Integration Data
+            self.data = MLMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                self.levels_min, self.n_init, self.alpha0, self.beta0, self.gamma0)
         while self.data.diff_n_level.sum() > 0:
             self.data.update_data()
             self.data.n_total += self.data.diff_n_level.sum()

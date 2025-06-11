@@ -189,6 +189,12 @@ class CubQMCCLT(StoppingCriterion):
             self.data = resume
             if hasattr(self.data, 'n_total'):
                 self.data.n_min = int(self.data.n_total)
+            # Restore datum if present, otherwise re-initialize
+            self.datum = getattr(resume, 'datum', None)
+            if self.datum is None:
+                self.datum = empty(self.d_indv, dtype=object)
+                for j in ndindex(self.d_indv):
+                    self.datum[j] = MeanVarDataRep(self.t_star[j], self.inflate, self.replications)
         else:
             self.datum = empty(self.d_indv,dtype=object)
             for j in ndindex(self.d_indv):

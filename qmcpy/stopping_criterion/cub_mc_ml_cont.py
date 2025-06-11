@@ -114,10 +114,22 @@ class CubMCMLCont(StoppingCriterion):
         allow_vectorized_integrals = False
         super(CubMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
-    def integrate(self):
-        # Construct AccumulateData Object to House Integration Data
-        self.data = MLMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.levels_min, self.n_init, -1., -1., -1.)
+    def integrate(self, resume=None):
+        """ See abstract method. Optionally resumes from a previous computation.
+        
+        Args:
+            resume (MLMCData, optional): Previous data object returned from a prior call to integrate. 
+                If provided, computation resumes from this state.
+        """
+        if resume is not None:
+            self.data = resume
+            # Initialize diff_n_level to zeros to calculate new samples needed
+            if not hasattr(self.data, 'diff_n_level') or self.data.diff_n_level is None:
+                self.data.diff_n_level = zeros_like(self.data.n_level)
+        else:
+            # Construct AccumulateData Object to House Integration Data
+            self.data = MLMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                self.levels_min, self.n_init, -1., -1., -1.)
         # Loop over coarser tolerances
         for t in range(self.n_tols):
             self.rmse_tol = self.tol_mult**(self.n_tols-t-1)*self.target_tol # Set new target tolerance

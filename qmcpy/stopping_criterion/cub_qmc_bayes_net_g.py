@@ -121,6 +121,25 @@ class CubBayesNetG(_CubBayesLDG):
             raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
 
 
+    def integrate(self, resume=None):
+        """
+        See abstract method. Optionally resumes from a previous computation.
+
+        Args:
+            resume (LDTransformBayesData, optional): Previous data object returned from a prior call to integrate. 
+                If provided, computation resumes from this state.
+                
+        Returns:
+            tuple: tuple containing:
+                - solution (float): approximation to the integral
+                - data (LDTransformBayesData): data object (can be used for future resume)
+        """
+        if resume is not None:
+            self.data = resume
+            if hasattr(self.data, 'n_total'):
+                self.data.n_min = int(self.data.n_total)
+        return super().integrate(resume=resume)
+
     def _fwht_h(self, y):
         ytilde = np.squeeze(y)
         self.fwht.fwht_inplace(len(y), ytilde)

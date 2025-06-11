@@ -93,6 +93,9 @@ class CubMCCLTVec(StoppingCriterion):
             # Optionally restore datum if present
             if hasattr(resume, 'datum'):
                 self.datum = resume.datum
+            # Initialize n_min and n_max for resume
+            n_min = int(self.data.n.max()) if hasattr(self.data, 'n') else 0
+            n_max = n_min
         else:
             self.datum = empty(self.d_indv,dtype=object)
             for j in ndindex(self.d_indv):

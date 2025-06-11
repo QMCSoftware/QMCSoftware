@@ -98,11 +98,19 @@ class CubQMCML(StoppingCriterion):
         allow_vectorized_integrals = False
         super(CubQMCML,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
-    def integrate(self):
-        """ See abstract method. """
-        # Construct AccumulateData Object to House Integration Data
-        self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.levels_min, self.levels_max, self.n_init, self.replications)
+    def integrate(self, resume=None):
+        """ See abstract method. Optionally resumes from a previous computation.
+        
+        Args:
+            resume (MLQMCData, optional): Previous data object returned from a prior call to integrate. 
+                If provided, computation resumes from this state.
+        """
+        if resume is not None:
+            self.data = resume
+        else:
+            # Construct AccumulateData Object to House Integration Data
+            self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                self.levels_min, self.levels_max, self.n_init, self.replications)
         t_start = time()
         while True:
             self.data.update_data()

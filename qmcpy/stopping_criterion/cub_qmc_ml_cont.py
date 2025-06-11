@@ -113,10 +113,19 @@ class CubQMCMLCont(StoppingCriterion):
         allow_vectorized_integrals = False
         super(CubQMCMLCont,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
 
-    def integrate(self):
-        # Construct AccumulateData Object to House Integration Data
-        self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
-            self.levels_min, self.levels_max, self.n_init, self.replications)
+    def integrate(self, resume=None):
+        """ See abstract method. Optionally resumes from a previous computation.
+        
+        Args:
+            resume (MLQMCData, optional): Previous data object returned from a prior call to integrate. 
+                If provided, computation resumes from this state.
+        """
+        if resume is not None:
+            self.data = resume
+        else:
+            # Construct AccumulateData Object to House Integration Data
+            self.data = MLQMCData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                self.levels_min, self.levels_max, self.n_init, self.replications)
         # Loop over coarser tolerances
         for t in range(self.n_tols):
             self.rmse_tol = self.tol_mult**(self.n_tols-t-1)*self.target_tol # Set new target tolerance

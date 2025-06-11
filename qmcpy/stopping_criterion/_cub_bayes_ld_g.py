@@ -59,25 +59,53 @@ class _CubBayesLDG(StoppingCriterion):
         super(_CubBayesLDG, self).__init__(allowed_levels=['single'], allowed_distribs=allowed_distribs, allow_vectorized_integrals=True)
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
 
-    def integrate(self):
-        t_start = time()
-        self.datum = np.empty(self.d_indv, dtype=object)
-        for j in np.ndindex(self.d_indv):
-            self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-                                                 self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel, self.alphas_indv[j])
+    def integrate(self, resume=None):
+        """
+        Perform integration, optionally resuming from a previous computation.
 
-        self.data = LDTransformBayesData.__new__(LDTransformBayesData)
-        self.data.flags_indv = np.tile(False, self.d_indv)
-        self.data.compute_flags = np.tile(True,self.d_indv)
-        prev_flags_indv = self.data.flags_indv
-        self.data.m = np.tile(self.m_min, self.d_indv)
-        self.data.n_min = 0
-        self.data.indv_bound_low = np.tile(-np.inf, self.d_indv)
-        self.data.indv_bound_high = np.tile(np.inf, self.d_indv)
-        self.data.solution_indv = np.tile(np.nan, self.d_indv)
-        self.data.solution = np.nan
-        self.data.xfull = np.empty((0, self.d))
-        self.data.yfull = np.empty((0,) + self.d_indv)
+        Args:
+            resume (LDTransformBayesData, optional): Previous data object returned from a prior call to integrate. 
+                If provided, computation resumes from this state.
+                
+        Returns:
+            tuple: tuple containing:
+                - solution (float): approximation to the integral
+                - data (LDTransformBayesData): data object (can be used for future resume)
+        """
+        t_start = time()
+        if resume is not None:
+            # Resume from previous state
+            self.data = resume
+            if hasattr(self.data, 'n_total'):
+                self.data.n_min = int(self.data.n_total)
+            self.datum = getattr(resume, 'datum', None)
+            if self.datum is None:  # re-initialize
+                self.datum = np.empty(self.d_indv, dtype=object)
+                for j in np.ndindex(self.d_indv):
+                    self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                                                      self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel, 
+                                                      self.alphas_indv[j])
+            prev_flags_indv = self.data.flags_indv
+        else:
+            # Initialize from scratch
+            self.datum = np.empty(self.d_indv, dtype=object)
+            for j in np.ndindex(self.d_indv):
+                self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
+                                                  self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel, 
+                                                  self.alphas_indv[j])
+
+            self.data = LDTransformBayesData.__new__(LDTransformBayesData)
+            self.data.flags_indv = np.tile(False, self.d_indv)
+            self.data.compute_flags = np.tile(True, self.d_indv)
+            prev_flags_indv = self.data.flags_indv
+            self.data.m = np.tile(self.m_min, self.d_indv)
+            self.data.n_min = 0
+            self.data.indv_bound_low = np.tile(-np.inf, self.d_indv)
+            self.data.indv_bound_high = np.tile(np.inf, self.d_indv)
+            self.data.solution_indv = np.tile(np.nan, self.d_indv)
+            self.data.solution = np.nan
+            self.data.xfull = np.empty((0, self.d))
+            self.data.yfull = np.empty((0,) + self.d_indv)
         stop_flag = np.tile(None, self.d_indv)
         while True:
             m = self.data.m.max()
@@ -139,6 +167,7 @@ class _CubBayesLDG(StoppingCriterion):
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
             else:
+                prev_flags_indv = self.data.flags_indv.copy()
                 self.data.n_min = n_max
                 self.data.m += self.data.compute_flags
 
@@ -190,3 +219,16 @@ class _CubBayesLDG(StoppingCriterion):
         self.data.solution = muhat
 
         return muhat, self.data
+        
+    def set_tolerance(self, abs_tol=None, rel_tol=None):
+        """
+        See abstract method. 
+        
+        Args:
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
+        """
+        if abs_tol is not None: 
+            self.abs_tol = float(abs_tol)
+        if rel_tol is not None: 
+            self.rel_tol = float(rel_tol)
