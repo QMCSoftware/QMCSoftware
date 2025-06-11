@@ -1,22 +1,10 @@
-from ._stopping_criterion import StoppingCriterion
+from ._stopping_criterion import StoppingCriterion, IS_PRINT_DIAGNOSTIC, print_diagnostic
 from ..accumulate_data import LDTransformData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 from ..integrand import Integrand
 from numpy import *
 from time import time
 import warnings
-
-IS_PRINT_DIAGNOSTIC=False
-def print_diagnostic(label, data):
-    """
-    Print diagnostic information for integration state.
-    Args:
-        label (str): Label for the diagnostic print (e.g., '[RESUME] Before resuming:').
-        data (object): Data object containing integration state.
-    """
-    print(label)
-    print(f"n_total: {getattr(data, 'n_total', None)}, n_min: {getattr(data, 'n_min', None)}, m: {getattr(data, 'm', None)}; xfull.shape: {getattr(data, 'xfull', None).shape if getattr(data, 'xfull', None) is not None else None}")
-    print(f"solution: {getattr(data, 'solution', None)}")
 
 
 class _CubQMCLDG(StoppingCriterion):
@@ -85,7 +73,6 @@ class _CubQMCLDG(StoppingCriterion):
         """
         t_start = time()
         if resume is not None:
-            if IS_PRINT_DIAGNOSTIC: print_diagnostic("[RESUME] Before resuming:", resume)
             # Resume from previous state
             self.data = resume
             if hasattr(self.data, 'n_total'):   # set n_min to n_total so next batch starts after previous samples
@@ -113,7 +100,7 @@ class _CubQMCLDG(StoppingCriterion):
             self.data.xfull = empty((0,self.d))
             self.data.yfull = empty((0,)+self.d_indv)
         # Diagnostic: print state after setup (before loop)
-        if IS_PRINT_DIAGNOSTIC: print_diagnostic("[INTEGRATE] State before main loop:", self.data)
+        if IS_PRINT_DIAGNOSTIC: print_diagnostic("INFO: State before loop", self.data)
         while True:
             m = self.data.m.max()
             n_min = self.data.n_min
@@ -152,7 +139,7 @@ class _CubQMCLDG(StoppingCriterion):
             self.data.n_total = self.data.n.max()
 
             # Diagnostic: print state after integration
-            if IS_PRINT_DIAGNOSTIC: print_diagnostic("[INTEGRATE] State in each major iteration:", self.data)
+            if IS_PRINT_DIAGNOSTIC: print_diagnostic("INFO: In each iteration", self.data)
 
             if sum(self.data.compute_flags)==0:
                 break # stopping criterion met

@@ -2,6 +2,19 @@ from ..integrand._integrand import Integrand
 from ..util import DistributionCompatibilityError, ParameterError, MethodImplementationError, _univ_repr
 from numpy import *
 
+# Diagnostic flag and utility for all stopping criteria
+IS_PRINT_DIAGNOSTIC = False
+
+def print_diagnostic(label, data):
+    """
+    Print diagnostic information for integration state.
+    Args:
+        label (str): Label for the diagnostic print (e.g., '[RESUME] Before resuming:').
+        data (object): Data object containing integration state.
+    """
+    print(f"{label}: solution: {getattr(data, 'solution', None)}, n_total: {getattr(data, 'n_total', None)}, n_min: {getattr(data, 'n_min', None)}, m: {getattr(data, 'm', None)}; xfull.shape: {getattr(data, 'xfull', None).shape if getattr(data, 'xfull', None) is not None else None}")
+
+
 class StoppingCriterion(object):
     """ Stopping Criterion abstract class. DO NOT INSTANTIATE. """
     
