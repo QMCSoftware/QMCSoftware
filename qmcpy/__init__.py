@@ -2,7 +2,6 @@ from .discrete_distribution import *
 from .true_measure import *
 from .integrand import *
 from .stopping_criterion import *
-from .kernels import *
 from .kernel_methods import (
     fftbr,ifftbr,fwht,
     KernelShiftInvar,KernelDigShiftInvar,KernelGaussian,
