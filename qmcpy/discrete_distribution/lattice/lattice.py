@@ -234,7 +234,7 @@ class Lattice(AbstractLDDiscreteDistribution):
         if self.randomize=="FALSE": assert self.gen_vec.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating vectors %d"%(self.replications,self.gen_vec.shape[0])
         
 
-    def _gen_samples(self, n_min, n_max, return_unrandomized, return_binary, warn):
+    def _gen_samples(self, n_min, n_max, return_binary, warn):
         if return_binary:
             raise ParameterError("Lattice does not support return_binary=True")
         if n_min==0 and self.randomize=="FALSE" and warn:
@@ -255,13 +255,12 @@ class Lattice(AbstractLDDiscreteDistribution):
         else: 
             assert False, "invalid lattice order"
         if self.randomize=="FALSE":
-            assert return_unrandomized is False, "cannot return_unrandomized when randomize='FALSE'"
             xr = x
         elif self.randomize=="SHIFT":
             r = np.uint64(self.replications)
             xr = np.empty((r,n,d),dtype=np.float64)
             qmctoolscl.lat_shift_mod_1(r,n,d,r_x,x,self.shift,xr,backend="c")
-        return (xr,x) if return_unrandomized else xr
+        return xr
 
     def _gen_block_linear(self, m_next, first=True):
         n = int(2**m_next)

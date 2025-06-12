@@ -201,8 +201,9 @@ def MWE_gaussian_diagnostics_engine(whEx, dim, npts, r, fpar, nReps, nPlots):
         shift = np.random.rand(1, dim)
 
         distribution = Lattice(dimension=dim, order='linear')
-        xpts, xlat = distribution.gen_samples(n_min=0, n_max=npts, warn=False, return_unrandomized=True)
-
+        xpts = distribution.gen_samples(n_min=0, n_max=npts, warn=False)
+        xlat = (xpts-distribution.shift)%1
+        
         if fName == 'ExpCos':
             integrand = lambda x: np.exp(np.sum(np.cos(2 * np.pi * x), axis=1))
         elif fName == 'Keister':

@@ -63,11 +63,9 @@ class IIDStdUniform(AbstractIIDDiscreteDistribution):
         if not (self.dvec==np.arange(self.d)).all():
             warnings.warn("IIDStdUniform does not accomodate dvec",ParameterWarning)
 
-    def _gen_samples(self, n_min, n_max, return_unrandomized, return_binary, warn):
+    def _gen_samples(self, n_min, n_max, return_binary, warn):
         if n_min>0 and warn:
             raise warnings.warn("For IIDStdUniform setting n_min>0 makes no difference as new samples are generated every call regardless, e.g., calling gen_samples(n_min=0,n_max=4) twice will give different samples.",ParameterWarning)
-        if return_unrandomized:
-            raise ParameterError("IIDStdUniform does not support return_unrandomized=True")
         if return_binary:
             raise ParameterError("IIDStdUniform does not support return_binary=True")
         x = self.rng.uniform(size=(self.replications,int(n_max-n_min),self.d))

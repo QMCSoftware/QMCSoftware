@@ -245,15 +245,13 @@ class _CubBayesLDG(AbstractStoppingCriterion):
         data.n_max = self.n_init
         data.solution_indv = np.tile(np.nan,self.integrand.d_indv)
         data.xfull = np.empty((0,self.integrand.d))
-        data.xfullun = np.empty((0,self.integrand.d),dtype=self._xfullundtype)
         data.yfull = np.empty(self.integrand.d_indv+(0,))
         data.bounds_half_width = np.tile(np.inf,self.integrand.d_indv)
         data.muhat = np.tile(np.nan,self.integrand.d_indv)
         while True:
             m = int(np.log2(data.n_max))
-            xnext,xnext_un = self.discrete_distrib.gen_samples(n_min=data.n_min,n_max=data.n_max, return_unrandomized=True)
+            xnext = self.discrete_distrib.gen_samples(n_min=data.n_min,n_max=data.n_max)
             data.xfull = np.concatenate([data.xfull,xnext],0)
-            data.xfullun = np.concatenate([data.xfullun,xnext_un],0)
             ynext = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=data.compute_flags)
             ynext[~data.compute_flags] = np.nan
             data.yfull = np.concatenate([data.yfull,ynext],-1)

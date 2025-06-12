@@ -255,9 +255,7 @@ class Halton(AbstractLDDiscreteDistribution):
         assert 0<self._t_curr<=self.t<=64
         if self.randomize=="FALSE": assert self.C.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating vectors %d"%(self.replications,self.gen_vec.shape[0])
 
-    def _gen_samples(self, n_min, n_max, return_unrandomized, return_binary, warn):
-        if return_unrandomized or return_binary:
-            raise ParameterError("Halton does not support return_unrandomized=True or return_binary=True")
+    def _gen_samples(self, n_min, n_max, return_binary, warn):
         if n_min == 0 and self.randomize in ["FALSE","LMS"] and warn:
             warnings.warn("Without randomization, the first Halton point is the origin")
         r_b = np.uint(1)

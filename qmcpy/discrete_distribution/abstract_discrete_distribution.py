@@ -34,7 +34,7 @@ class AbstractDiscreteDistribution(object):
         self.spawn_key = self._base_seed.spawn_key
         self.rng = np.random.Generator(np.random.SFC64(self._base_seed))
 
-    def __call__(self, n=None, n_min=None, n_max=None, return_unrandomized=False, return_binary=False, warn=True):
+    def __call__(self, n=None, n_min=None, n_max=None, return_binary=False, warn=True):
         r"""
         - If just `n` is supplied, generate samples from the sequence at indices 0,...,`n`-1.
         - If `n_min` and `n_max` are supplied, generate samples from the sequence at indices `n_min`,...,`n_max`-1.
@@ -44,10 +44,8 @@ class AbstractDiscreteDistribution(object):
             n (Union[None,int]): Number of points to generate.
             n_min (Union[None,int]): Starting index of sequence.
             n_max (Union[None,int]): Final index of sequence.
-            return_unrandomized (bool): If `True`, also return unrandomized samples `x_unrandomized` after the randomized `x` below.
             return_binary (bool): Only used for `DigitalNetB2`.  
                 If `True`, *only* return the integer representation `x_integer` of base 2 digital net.  
-                Cannot set have both `return_unrandomized=True` and `return_binary=True`. 
             warn (bool): If `False`, disable warnings when generating samples.
 
         Returns:
@@ -56,14 +54,11 @@ class AbstractDiscreteDistribution(object):
                 - If `replications` is `None` then this will be of size (`n_max`-`n_min`) $\times$ `dimension` 
                 - If `replications` is a positive int, then `x` will be of size `replications` $\times$ (`n_max`-`n_min`) $\times$ `dimension` 
 
-                Note that: 
-                    
-                - If `return_unrandomized=True` then `x,x_unrandomized` is returned. 
-                - If `return_binary=True` then `x` is returned where `x` are integer representations of the digital net points. 
+                Note that if `return_binary=True` then `x` is returned where `x` are integer representations of the digital net points. 
         """
-        return self.gen_samples(n=n,n_min=n_min,n_max=n_max,return_unrandomized=return_unrandomized,return_binary=return_binary,warn=warn)
+        return self.gen_samples(n=n,n_min=n_min,n_max=n_max,return_binary=return_binary,warn=warn)
 
-    def gen_samples(self, n=None, n_min=None, n_max=None, return_unrandomized=False, return_binary=False, warn=True):
+    def gen_samples(self, n=None, n_min=None, n_max=None, return_binary=False, warn=True):
         if n is not None and n_min is None and n_max is None: 
             n_min = 0 
             n_max = int(n)
@@ -77,11 +72,7 @@ class AbstractDiscreteDistribution(object):
             raise ParameterError("Please provide either n or (n_min,n_max)")
         if not (0<=n_min and n_min<=n_max and n_max<=self.n_limit):
             raise ParameterError("require 0 <= n_min (%d) <= n_max (%d) <= n_limit (%d)"%(n_min,n_max,self.n_limit))
-        if not (isinstance(return_unrandomized,bool) and isinstance(return_binary,bool) and isinstance(warn,bool)):
-            raise ParameterError("return_unrandomized, return_binary, and warn must all be bools")
-        if return_unrandomized and return_binary:
-            raise ParameterError("cannot return both unrandomized and binary")
-        x = self._gen_samples(n_min=n_min,n_max=n_max,return_unrandomized=return_unrandomized,return_binary=return_binary,warn=warn)
+        x = self._gen_samples(n_min=n_min,n_max=n_max,return_binary=return_binary,warn=warn)
         if isinstance(x,np.ndarray):
             if not x.shape==(self.replications,n_max-n_min,self.d):
                 raise ParameterError("x returned by _gen_samples must have shape self.replications (%d) x n (%d) x d (%d) but got shape %s"%(self.replications,n_max-n_min,self.d,str(x.shape)))

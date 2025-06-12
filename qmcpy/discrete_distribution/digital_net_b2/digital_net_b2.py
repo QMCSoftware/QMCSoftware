@@ -401,7 +401,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         if self.randomize=="FALSE": assert self.gen_mats.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating matrices %d"%(self.replications,self.gen_mats.shape[0])
         import gc; gc.collect()
 
-    def _gen_samples(self, n_min, n_max, return_unrandomized, return_binary, warn):
+    def _gen_samples(self, n_min, n_max, return_binary, warn):
         if n_min == 0 and self.randomize in ["FALSE","LMS"] and warn:
             warnings.warn("Without randomization, the first digtial net point is the origin",ParameterWarning)
         r_x = np.uint64(self.gen_mats.shape[0]) 
@@ -446,10 +446,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             x = np.empty((r,n,d),dtype=np.float64)
             tmaxes_new = np.tile(self.t,int(r)).astype(np.uint64)
             qmctoolscl.dnb2_integer_to_float(r,n,d,tmaxes_new,xb,x,backend="c")
-            if return_unrandomized:
-                return x,xb 
-            else:
-                return x
+            return x
     
     def _spawn(self, child_seed, dimension):
         return DigitalNetB2(
