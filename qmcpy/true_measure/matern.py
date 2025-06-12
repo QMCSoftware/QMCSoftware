@@ -23,8 +23,8 @@ class Matern(Gaussian):
         Matern (AbstractTrueMeasure)
             mean            [0.3 0.4 0.5]
             covariance      [[0.01  0.01  0.01 ]
-                            [0.01  0.01  0.01 ]
-                            [0.009 0.01  0.01 ]]
+                             [0.01  0.01  0.01 ]
+                             [0.009 0.01  0.01 ]]
             decomp_type     PCA
         
         With independent replications 

@@ -125,8 +125,8 @@ class FinancialOption(AbstractIntegrand):
             drift           0
             mean            [0. 0. 0.]
             covariance      [[0.333 0.333 0.333]
-                            [0.333 0.667 0.667]
-                            [0.333 0.667 1.   ]]
+                             [0.333 0.667 0.667]
+                             [0.333 0.667 1.   ]]
             decomp_type     PCA
 
         >>> integrand = FinancialOption(DigitalNetB2(dimension=64,seed=7),option="ASIAN")

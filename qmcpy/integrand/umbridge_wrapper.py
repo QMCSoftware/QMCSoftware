@@ -1,6 +1,5 @@
 from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
-from ..stopping_criterion import CubQMCNetG
 from ..true_measure import Uniform
 from ..util import ParameterError
 import numpy as np

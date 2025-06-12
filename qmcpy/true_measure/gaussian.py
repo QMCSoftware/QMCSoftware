@@ -26,7 +26,7 @@ class Gaussian(AbstractTrueMeasure):
         Gaussian (AbstractTrueMeasure)
             mean            [1 2]
             covariance      [[9 4]
-                            [4 5]]
+                             [4 5]]
             decomp_type     PCA
         
         With independent replications 

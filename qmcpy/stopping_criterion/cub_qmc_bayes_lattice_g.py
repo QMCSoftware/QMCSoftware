@@ -1,7 +1,7 @@
 from ._cub_bayes_ld_g import _CubBayesLDG
 #from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Lattice
-from ..integrand import Keister,BoxIntegral
+from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
 from ..util import fftbr,omega_fftbr,ParameterError#, ParameterWarning #MaxSamplesWarning,
 #from math import factorial
 import numpy as np
@@ -51,40 +51,39 @@ class CubBayesLatticeG(_CubBayesLDG):
         Vector outputs
         
         >>> f = BoxIntegral(Lattice(3,seed=7),s=[-1,1])
-        >>> abs_tol = 1e-3
+        >>> abs_tol = 1e-2
         >>> sc = CubBayesLatticeG(f,abs_tol=abs_tol,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
-        array([1.18965698, 0.96061461])
+        array([1.18837601, 0.95984299])
         >>> data
         AccumulateData (AccumulateData)
-            solution        [1.19  0.961]
-            comb_bound_low  [1.189 0.96 ]
-            comb_bound_high [1.19  0.961]
-            comb_bound_diff [0.001 0.001]
+            solution        [1.188 0.96 ]
+            comb_bound_low  [1.183 0.95 ]
+            comb_bound_high [1.194 0.969]
+            comb_bound_diff [0.011 0.019]
             comb_flags      [ True  True]
-            n_total         2^(14)
-            n               [16384  1024]
+            n_total         2^(9)
+            n               [512 256]
             time_integrate  ...
-        CubQMCNetG (AbstractStoppingCriterion)
-            abs_tol         0.001
+        CubBayesLatticeG (AbstractStoppingCriterion)
+            abs_tol         0.010
             rel_tol         0
-            n_init          2^(10)
-            n_limit         2^(35)
+            n_init          2^(8)
+            n_limit         2^(22)
+            order           2^(1)
         BoxIntegral (AbstractIntegrand)
             s               [-1  1]
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
-        DigitalNetB2 (AbstractLDDiscreteDistribution)
+        Lattice (AbstractLDDiscreteDistribution)
             d               3
             replications    1
-            randomize       LMS_DS
-            gen_mats_source joe_kuo.6.21201.txt
+            randomize       SHIFT
+            gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
             order           NATURAL
-            t               63
-            alpha           1
-            n_limit         2^(32)
+            n_limit         2^(20)
             entropy         7
         >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
         >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
@@ -95,50 +94,49 @@ class CubBayesLatticeG(_CubBayesLDG):
 
         >>> function = Genz(Lattice(3,seed=7))
         >>> integrand = SensitivityIndices(function)
-        >>> sc = CubBayesLatticeG(integrand,abs_tol=5e-4,rel_tol=0)
+        >>> sc = CubBayesLatticeG(integrand,abs_tol=5e-2,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> data
         AccumulateData (AccumulateData)
-            solution        [[0.02  0.196 0.667]
-                            [0.036 0.303 0.782]]
-            comb_bound_low  [[0.019 0.195 0.667]
-                            [0.035 0.303 0.781]]
-            comb_bound_high [[0.02  0.196 0.667]
-                            [0.036 0.303 0.782]]
-            comb_bound_diff [[0.001 0.    0.001]
-                            [0.001 0.001 0.001]]
+            solution        [[0.057 0.131 0.269]
+                             [0.386 0.523 0.741]]
+            comb_bound_low  [[0.048 0.12  0.256]
+                             [0.377 0.511 0.721]]
+            comb_bound_high [[0.066 0.141 0.283]
+                             [0.395 0.535 0.762]]
+            comb_bound_diff [[0.018 0.021 0.027]
+                             [0.018 0.024 0.04 ]]
             comb_flags      [[ True  True  True]
-                            [ True  True  True]]
-            n_total         2^(16)
-            n               [[[16384 65536 65536]
-                             [16384 65536 65536]
-                             [16384 65536 65536]]
+                             [ True  True  True]]
+            n_total         2^(10)
+            n               [[[1024 1024 1024]
+                              [1024 1024 1024]
+                              [1024 1024 1024]]
         <BLANKLINE>
-                            [[ 2048 16384 32768]
-                             [ 2048 16384 32768]
-                             [ 2048 16384 32768]]]
+                             [[1024 1024 1024]
+                              [1024 1024 1024]
+                              [1024 1024 1024]]]
             time_integrate  ...
-        CubQMCNetG (AbstractStoppingCriterion)
-            abs_tol         5.00e-04
+        CubBayesLatticeG (AbstractStoppingCriterion)
+            abs_tol         0.050
             rel_tol         0
-            n_init          2^(10)
-            n_limit         2^(35)
+            n_init          2^(8)
+            n_limit         2^(22)
+            order           2^(1)
         SensitivityIndices (AbstractIntegrand)
             indices         [[ True False False]
-                            [False  True False]
-                            [False False  True]]
+                             [False  True False]
+                             [False False  True]]
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
-        DigitalNetB2 (AbstractLDDiscreteDistribution)
+        Lattice (AbstractLDDiscreteDistribution)
             d               6
             replications    1
-            randomize       LMS_DS
-            gen_mats_source joe_kuo.6.21201.txt
+            randomize       SHIFT
+            gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
             order           NATURAL
-            t               63
-            alpha           1
-            n_limit         2^(32)
+            n_limit         2^(20)
             entropy         7
 
     Adapted from `GAIL cubBayesLattice_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m>`_.

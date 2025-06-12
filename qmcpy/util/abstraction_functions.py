@@ -55,5 +55,5 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
                         s += '%.3f' % val
             else:
                 s += '%s' % str(val)
-            string += '\n' + s.replace('\n', '\n    %-15s' % ' ')
+            string += '\n' + s.replace('\n', '\n     %-15s' % ' ')
     return string

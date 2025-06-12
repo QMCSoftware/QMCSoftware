@@ -114,30 +114,30 @@ class CubQMCCLT(AbstractStoppingCriterion):
         >>> data
         AccumulateData (AccumulateData)
             solution        [[0.02  0.196 0.667]
-                            [0.036 0.303 0.782]]
+                             [0.036 0.303 0.782]]
             comb_bound_low  [[0.019 0.195 0.667]
-                            [0.035 0.303 0.781]]
+                             [0.035 0.303 0.781]]
             comb_bound_high [[0.02  0.196 0.667]
-                            [0.036 0.303 0.782]]
+                             [0.036 0.303 0.782]]
             comb_bound_diff [[0.001 0.    0.   ]
-                            [0.001 0.001 0.001]]
+                             [0.001 0.001 0.001]]
             comb_flags      [[ True  True  True]
-                            [ True  True  True]]
+                             [ True  True  True]]
             n_total         204800
             n               [[[102400 204800 204800]
-                             [102400 204800 204800]
-                             [102400 204800 204800]]
+                              [102400 204800 204800]
+                              [102400 204800 204800]]
         <BLANKLINE>
-                            [[ 12800  51200 102400]
-                             [ 12800  51200 102400]
-                             [ 12800  51200 102400]]]
+                             [[ 12800  51200 102400]
+                              [ 12800  51200 102400]
+                              [ 12800  51200 102400]]]
             n_rep           [[[4096 8192 8192]
-                             [4096 8192 8192]
-                             [4096 8192 8192]]
+                              [4096 8192 8192]
+                              [4096 8192 8192]]
         <BLANKLINE>
-                            [[ 512 2048 4096]
-                             [ 512 2048 4096]
-                             [ 512 2048 4096]]]
+                             [[ 512 2048 4096]
+                              [ 512 2048 4096]
+                              [ 512 2048 4096]]]
             time_integrate  ...
         CubQMCCLT (AbstractStoppingCriterion)
             inflate         1
@@ -148,8 +148,8 @@ class CubQMCCLT(AbstractStoppingCriterion):
             n_limit         2^(30)
         SensitivityIndices (AbstractIntegrand)
             indices         [[ True False False]
-                            [False  True False]
-                            [False False  True]]
+                             [False  True False]
+                             [False False  True]]
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1

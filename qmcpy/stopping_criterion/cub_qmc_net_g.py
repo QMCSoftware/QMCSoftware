@@ -103,23 +103,23 @@ class CubQMCNetG(_CubQMCLDG):
         >>> data
         AccumulateData (AccumulateData)
             solution        [[0.02  0.196 0.667]
-                            [0.036 0.303 0.782]]
+                             [0.036 0.303 0.782]]
             comb_bound_low  [[0.019 0.195 0.667]
-                            [0.035 0.303 0.781]]
+                             [0.035 0.303 0.781]]
             comb_bound_high [[0.02  0.196 0.667]
-                            [0.036 0.303 0.782]]
+                             [0.036 0.303 0.782]]
             comb_bound_diff [[0.001 0.    0.001]
-                            [0.001 0.001 0.001]]
+                             [0.001 0.001 0.001]]
             comb_flags      [[ True  True  True]
-                            [ True  True  True]]
+                             [ True  True  True]]
             n_total         2^(16)
             n               [[[16384 65536 65536]
-                             [16384 65536 65536]
-                             [16384 65536 65536]]
+                              [16384 65536 65536]
+                              [16384 65536 65536]]
         <BLANKLINE>
-                            [[ 2048 16384 32768]
-                             [ 2048 16384 32768]
-                             [ 2048 16384 32768]]]
+                             [[ 2048 16384 32768]
+                              [ 2048 16384 32768]
+                              [ 2048 16384 32768]]]
             time_integrate  ...
         CubQMCNetG (AbstractStoppingCriterion)
             abs_tol         5.00e-04
@@ -128,8 +128,8 @@ class CubQMCNetG(_CubQMCLDG):
             n_limit         2^(35)
         SensitivityIndices (AbstractIntegrand)
             indices         [[ True False False]
-                            [False  True False]
-                            [False False  True]]
+                             [False  True False]
+                             [False False  True]]
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1

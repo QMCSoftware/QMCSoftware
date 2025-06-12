@@ -1,7 +1,7 @@
 from ._cub_bayes_ld_g import _CubBayesLDG
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import DigitalNetB2
-from ..integrand import Keister,BoxIntegral
+from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
 from ..util import fwht,omega_fwht,MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
 from ..discrete_distribution._c_lib import _c_lib
 import ctypes
@@ -53,27 +53,28 @@ class CubBayesNetG(_CubBayesLDG):
     
         Vector outputs
         
-        >>> f = BoxIntegral(Lattice(3,seed=7),s=[-1,1])
-        >>> abs_tol = 1e-3
-        >>> sc = CubBayesLatticeG(f,abs_tol=abs_tol,rel_tol=0)
+        >>> f = BoxIntegral(DigitalNetB2(3,seed=7),s=[-1,1])
+        >>> abs_tol = 1e-2
+        >>> sc = CubBayesNetG(f,abs_tol=abs_tol,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
-        array([1.18965698, 0.96061461])
+        array([1.18640441, 0.96079745])
         >>> data
         AccumulateData (AccumulateData)
-            solution        [1.19  0.961]
-            comb_bound_low  [1.189 0.96 ]
-            comb_bound_high [1.19  0.961]
-            comb_bound_diff [0.001 0.001]
+            solution        [1.186 0.961]
+            comb_bound_low  [1.184 0.959]
+            comb_bound_high [1.188 0.962]
+            comb_bound_diff [0.004 0.003]
             comb_flags      [ True  True]
-            n_total         2^(14)
-            n               [16384  1024]
+            n_total         2^(10)
+            n               [1024  256]
             time_integrate  ...
-        CubQMCNetG (AbstractStoppingCriterion)
-            abs_tol         0.001
+        CubBayesNetG (AbstractStoppingCriterion)
+            abs_tol         0.010
             rel_tol         0
-            n_init          2^(10)
-            n_limit         2^(35)
+            n_init          2^(8)
+            n_limit         2^(22)
+            order           1
         BoxIntegral (AbstractIntegrand)
             s               [-1  1]
         Uniform (AbstractTrueMeasure)
@@ -96,40 +97,41 @@ class CubBayesNetG(_CubBayesLDG):
 
         Sensitivity indices 
 
-        >>> function = Genz(Lattice(3,seed=7))
+        >>> function = Genz(DigitalNetB2(3,seed=7))
         >>> integrand = SensitivityIndices(function)
-        >>> sc = CubBayesLatticeG(integrand,abs_tol=5e-4,rel_tol=0)
+        >>> sc = CubBayesNetG(integrand,abs_tol=5e-2,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> data
         AccumulateData (AccumulateData)
-            solution        [[0.02  0.196 0.667]
-                            [0.036 0.303 0.782]]
-            comb_bound_low  [[0.019 0.195 0.667]
-                            [0.035 0.303 0.781]]
-            comb_bound_high [[0.02  0.196 0.667]
-                            [0.036 0.303 0.782]]
-            comb_bound_diff [[0.001 0.    0.001]
-                            [0.001 0.001 0.001]]
+            solution        [[0.021 0.179 0.625]
+                             [0.036 0.302 0.742]]
+            comb_bound_low  [[0.016 0.163 0.594]
+                             [0.034 0.29  0.711]]
+            comb_bound_high [[0.026 0.196 0.657]
+                             [0.037 0.315 0.773]]
+            comb_bound_diff [[0.01  0.033 0.063]
+                             [0.003 0.025 0.062]]
             comb_flags      [[ True  True  True]
-                            [ True  True  True]]
-            n_total         2^(16)
-            n               [[[16384 65536 65536]
-                             [16384 65536 65536]
-                             [16384 65536 65536]]
+                             [ True  True  True]]
+            n_total         2^(8)
+            n               [[[256 256 256]
+                              [256 256 256]
+                              [256 256 256]]
         <BLANKLINE>
-                            [[ 2048 16384 32768]
-                             [ 2048 16384 32768]
-                             [ 2048 16384 32768]]]
+                             [[256 256 256]
+                              [256 256 256]
+                              [256 256 256]]]
             time_integrate  ...
-        CubQMCNetG (AbstractStoppingCriterion)
-            abs_tol         5.00e-04
+        CubBayesNetG (AbstractStoppingCriterion)
+            abs_tol         0.050
             rel_tol         0
-            n_init          2^(10)
-            n_limit         2^(35)
+            n_init          2^(8)
+            n_limit         2^(22)
+            order           1
         SensitivityIndices (AbstractIntegrand)
             indices         [[ True False False]
-                            [False  True False]
-                            [False False  True]]
+                             [False  True False]
+                             [False False  True]]
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
