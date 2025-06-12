@@ -12,21 +12,22 @@ class UMBridgeWrapper(AbstractIntegrand):
     Requires [Docker](https://www.docker.com/) is installed.
 
     Examples:
-        >>> _ = os.system('docker run --name muqbp -dit -p 4243:4243 linusseelinger/benchmark-muq-beam-propagation:latest > /dev/null')
+        >>> _ = os.system('docker run --name muqbppytest -dit -p 4243:4243 linusseelinger/benchmark-muq-beam-propagation:latest > /dev/null')
         >>> import umbridge
-        >>> true_measure = Uniform(DigitalNetB2(dimension=3,seed=7),lower_bound=1,upper_bound=1.05)
+        >>> dnb2 = DigitalNetB2(dimension=3,seed=7)
+        >>> true_measure = Uniform(dnb2,lower_bound=1,upper_bound=1.05)
         >>> um_bridge_model = umbridge.HTTPModel('http://localhost:4243','forward')
         >>> um_bridge_config = {"d": dnb2.d}
         >>> integrand = UMBridgeWrapper(true_measure,um_bridge_model,um_bridge_config,parallel=False)
         >>> y = integrand(2**10)
-        >>> print("%.4f"%y.mean())
-        1.8067
-        >>> integrand.true_measure
-        Gaussian (AbstractTrueMeasure)
-            mean            0
-            covariance      2^(-1)
-            decomp_type     PCA
-        >>> _ = os.system('docker rm -f muqbp > /dev/null')
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     y.mean(-1)
+        array([0.0e+00, 3.9e+00, 1.5e+01, 3.2e+01, 5.5e+01, 8.3e+01, 1.2e+02,
+               1.5e+02, 2.0e+02, 2.4e+02, 2.9e+02, 3.4e+02, 3.9e+02, 4.3e+02,
+               4.7e+02, 5.0e+02, 5.3e+02, 5.6e+02, 5.9e+02, 6.2e+02, 6.4e+02,
+               6.6e+02, 6.9e+02, 7.2e+02, 7.6e+02, 7.9e+02, 8.3e+02, 8.6e+02,
+               9.0e+02, 9.4e+02, 9.7e+02])
+        >>> _ = os.system('docker rm -f muqbppytest > /dev/null')
         
         Custom model with independent replications
         
@@ -47,18 +48,19 @@ class UMBridgeWrapper(AbstractIntegrand):
         >>> um_bridge_model = TestModel()
         >>> um_bridge_config = {}
         >>> d = sum(um_bridge_model.get_input_sizes(config=um_bridge_config))
-        >>> true_measure = Uniform(DigitalNetB2(dimension=d,seed=7),lower_bound=-1,upper_bound=1)
+        >>> true_measure = Uniform(DigitalNetB2(dimension=d,seed=7,replications=15),lower_bound=-1,upper_bound=1)
         >>> integrand = UMBridgeWrapper(true_measure,um_bridge_model)
         >>> y = integrand(2**6)
-        >>> y.shape
-        (16, 64)
-        >>> muhats = y.mean(-1) 
+        >>> y.shape 
+        (6, 15, 64)
+        >>> muhats = y.mean(-1)
         >>> muhats.shape 
-        (16,)
-        >>> muhat_aggregate = muhats.mean(-1)
-        1.8093
-        >>> integrand.to_umbridge_out_sizes(muhat_aggregate)
-        [[-1.1102230246251565e-16, -2.220446049250313e-16, -3.3306690738754696e-16], [-1.1102230246251565e-16, -2.220446049250313e-16], [-9.020562075079397e-17]]
+        (6, 15)
+        >>> muhats_aggregate = muhats.mean(-1)
+        >>> muhats_aggregate.shape 
+        (6,)
+        >>> integrand.to_umbridge_out_sizes(muhats_aggregate)
+        [[-3.09983879522775e-05, -2.279536177336045e-05, -2.2815724753917055e-05], [8.075436692444455e-06, -5.731979934179658e-07], [2.0392085789873912e-08]]
     """
 
     def __init__(self, true_measure, model, config={}, parallel=False):
@@ -96,13 +98,13 @@ class UMBridgeWrapper(AbstractIntegrand):
             threadpool = True)
     
     def g(self, t, **kwargs):
-        y = np.zeros(tuple(t.shape[:-1])+(self.total_out_elements,),dtype=float)
+        y = np.zeros((self.total_out_elements,)+tuple(t.shape[:-1]),dtype=float)
         idxiterator = np.ndindex(t.shape[:-1])
-        for i in range(idxiterator):
-            ti_ll = [t[i+slice(self.d_in_umbridge[j],self.d_in_umbridge[j+1])].tolist() for j in range(self.n_d_in_umbridge)]
+        for i in idxiterator:
+            ti_ll = [t[i+(slice(self.d_in_umbridge[j],self.d_in_umbridge[j+1]),)].tolist() for j in range(self.n_d_in_umbridge)]
             yi_ll = self.model.__call__(ti_ll,self.config)
             for j,yi_l in enumerate(yi_ll):
-                y[i+slice(self.d_out_umbridge[j],self.d_out_umbridge[j+1])] = yi_l if len(yi_l)>1 else yi_l[0]
+                y[(slice(self.d_out_umbridge[j],self.d_out_umbridge[j+1]),)+i] = yi_l if len(yi_l)>1 else yi_l[0]
         return y
     
     def _spawn(self, level, sampler):

@@ -69,7 +69,7 @@ class BayesianLRCoeffs(AbstractIntegrand):
         with np.errstate(over='ignore'):
             den = np.exp(np.sum(z1-np.log(1+np.exp(z)),-1))
         y = np.zeros(self.d_indv+x.shape[:-1],dtype=float)
-        y[0] = np.permute_dims(x,[-1]+[i for i in range(x.ndim-1)])*den
+        y[0] = x.transpose([-1]+[i for i in range(x.ndim-1)])*den
         y[1] = den
         return y
     
