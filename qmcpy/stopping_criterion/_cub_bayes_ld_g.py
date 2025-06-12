@@ -1,192 +1,319 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
-from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
+from ..accumulate_data import AccumulateData
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 import numpy as np
 from time import time
 import warnings
+from scipy.optimize import fminbound as fminbnd
+from scipy.optimize import fmin, fmin_bfgs
+from scipy.stats import norm as gaussnorm
+from scipy.stats import t as tnorm
 
 
 class _CubBayesLDG(AbstractStoppingCriterion):
-    """
-    Abstract class for CubBayes{LD}G where LD is a low discrepancy discrete distribution.
-    See subclasses for implementation differences for each LD sequence.
-    """
 
-    def __init__(self, integrand, fbt, merge_fbt, ptransform, allowed_distribs, kernel,
-                 abs_tol, rel_tol, n_init, n_max, alpha, error_fun):
-
+    def __init__(self, integrand, ft, omega, ptransform, allowed_distribs, kernel,
+                 abs_tol, rel_tol, n_init, n_limit, alpha, error_fun, errbd_type):
+        self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_limit', 'order']
+        # Input Checks
+        if np.log2(n_init)%1!=0:
+            warnings.warn('n_init must be a power of two. Using n_init = 2**5',ParameterWarning)
+            n_init = 2**8
+        if np.log2(n_limit)%1!=0:
+            warnings.warn('n_init must be a power of two. Using n_limit = 2**30',ParameterWarning)
+            n_limit = 2**22
         # Set Attributes
-        self.abs_tol = float(abs_tol)
-        self.rel_tol = float(rel_tol)
-        m_min = np.log2(n_init)
-        m_max = np.log2(n_max)
-        if m_min % 1 != 0. or m_min < 5 or m_max % 1 != 0:
-            warning_s = '''
-                n_init and n_max must be a powers of 2.
-                n_init must be >= 2^8.
-                Using n_init = 2^8 and n_max=2^22.'''
-            warnings.warn(warning_s, ParameterWarning)
-            m_min = 8.
-            m_max = 22.
-        self.m_min = m_min
-        self.m_max = m_max
-        self.n_init = n_init  # number of samples to start with = 2^mmin
-        self.n_max = n_max  # max number of samples allowed = 2^mmax
-        self.alpha = alpha  # p-value, default 0.1%.
+        self.n_init = int(n_init)
+        self.n_limit = int(n_limit)
+        self.error_fun = error_fun
+        self.alpha = alpha
+        # QMCPy Objs
+        self.integrand = integrand
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.true_measure.discrete_distrib
+        super(_CubBayesLDG,self).__init__(allowed_levels=["single"],allowed_distribs=allowed_distribs,allow_vectorized_integrals=True)
+        assert self.integrand.discrete_distrib.no_replications==True, "Require the discrete distribution has replications=None"
+        assert self.integrand.discrete_distrib.randomize!="FALSE", "Require discrete distribution is randomized"
+        self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
+        self.set_tolerance(abs_tol,rel_tol)
         self.stop_at_tol = True  # automatic mode: stop after meeting the error tolerance
         self.arb_mean = True  # by default use zero mean algorithm
         self.avoid_cancel_error = True  # avoid cancellation error in stopping criterion
         self.debug_enable = False  # enable debug prints
-        self.data = None
-        self.fbt, self.merge_fbt = fbt, merge_fbt
-        self.ptransform = ptransform  # periodization transform
+        self.use_gradient = False  # If true uses gradient descent in parameter search
+        self.one_theta = True  # If true use common shape parameter for all dimensions, else allow shape parameter vary across dimensions
+        self.errbd_type = errbd_type.upper()  
+        assert self.errbd_type in ['MLE',"GCV","FULL"]
         self.kernel = kernel
+        self.debugEnable = True
+        self.ft = ft
+        self.omega = omega
+        self.ptransform = ptransform  # periodization transform
+        if self.errbd_type == 'FULL':
+            self.uncert = -tnorm.ppf(alpha/2,self.n_init-1)
+        else:
+            self.uncert = -gaussnorm.ppf(alpha / 2)
 
-        # QMCPy Objs
-        self.integrand = integrand
-        self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.integrand.discrete_distrib
+    def _stopping_criterion(self, xpts, ftilde, m):
+        ftilde = ftilde.squeeze()
+        n = 2 ** m
+        lna_range = [-5, 0]  # reduced from [-5, 5], to avoid kernel values getting too big causing error
 
-        # Sobol indices
-        self.d_indv = self.integrand.d_indv
-        self.cv = []
-        self.ncv = len(self.cv)
-        self.cast_complex = False
-        self.d = self.discrete_distrib.d
-        self.error_fun = error_fun
+        # search for optimal shape parameter
+        if self.one_theta == True:
+            lna_MLE = fminbnd(lambda lna: self.objective_function(np.exp(lna), xpts, ftilde)[0],
+                              x1=lna_range[0], x2=lna_range[1], xtol=1e-2, disp=0)
 
-        # Verify Compliant Construction
-        super(_CubBayesLDG, self).__init__(allowed_levels=['single'], allowed_distribs=allowed_distribs, allow_vectorized_integrals=True)
-        self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
+            aMLE = np.exp(lna_MLE)
+            _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
+        else:
+            if self.use_gradient == True:
+                warnings.warn('Not implemented !')
+                lna_MLE = 0
+            else:
+                # Nelder-Mead Simplex algorithm
+                theta0 = np.ones((xpts.shape[1], 1)) * (0.05)
+                theta0 = np.ones((1, xpts.shape[1])) * (0.05)
+                lna_MLE = fmin(lambda lna: self.objective_function(np.exp(lna), xpts, ftilde)[0],
+                               theta0, xtol=1e-2, disp=False)
+            aMLE = np.exp(lna_MLE)
+            # print(n, aMLE)
+            _, vec_lambda, vec_lambda_ring, RKHS_norm = self.objective_function(aMLE, xpts, ftilde)
 
+        # Check error criterion
+        # compute DSC
+        if self.errbd_type == 'FULL':
+            # full Bayes
+            if self.avoid_cancel_error:
+                DSC = abs(vec_lambda_ring[0] / n)
+            else:
+                DSC = abs((vec_lambda[0] / n) - 1)
+
+            # 1-alpha two sided confidence interval
+            err_bd = self.uncert * np.sqrt(DSC * RKHS_norm / (n - 1))
+        elif self.errbd_type == 'GCV':
+            # GCV based stopping criterion
+            if self.avoid_cancel_error:
+                DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
+            else:
+                DSC = abs(1 - (n / vec_lambda[0]))
+
+            temp = vec_lambda
+            temp[0] = n + vec_lambda_ring[0]
+            mC_inv_trace = np.sum(1. / temp(temp != 0))
+            err_bd = self.uncert * np.sqrt(DSC * RKHS_norm / mC_inv_trace)
+        else:
+            # empirical Bayes
+            if self.avoid_cancel_error:
+                DSC = abs(vec_lambda_ring[0] / (n + vec_lambda_ring[0]))
+            else:
+                DSC = abs(1 - (n / vec_lambda[0]))
+            err_bd = self.uncert * np.sqrt(DSC * RKHS_norm / n)
+
+        if self.arb_mean:  # zero mean case
+            muhat = ftilde[0] / n
+        else:  # non zero mean case
+            muhat = ftilde[0] / vec_lambda[0]
+
+        self.error_bound = err_bd
+        muhat = np.abs(muhat)
+        return muhat, err_bd
+    
+    # objective function to estimate parameter theta
+    # MLE : Maximum likelihood estimation
+    # GCV : Generalized cross validation
+    def objective_function(self, theta, xun, ftilde):
+        n = len(ftilde)
+        fudge = 100 * np.finfo(float).eps
+        # if type(theta) != np.ndarray:
+        #     theta = np.ones((1, xun.shape[1])) * theta
+        [vec_lambda, vec_lambda_ring, lambda_factor] = self.kernel(xun, self.order, theta, self.avoid_cancel_error,
+                                                                   self.kernType, self.debug_enable)
+        vec_lambda = abs(vec_lambda)
+        # compute RKHS_norm
+        temp = abs(ftilde[vec_lambda > fudge] ** 2) / (vec_lambda[vec_lambda > fudge])
+
+        # compute loss
+        if self.errbd_type == 'GCV':
+            # GCV
+            temp_gcv = abs(ftilde[vec_lambda > fudge] / (vec_lambda[vec_lambda > fudge])) ** 2
+            loss1 = 2 * np.log(sum(1. / vec_lambda[vec_lambda > fudge]))
+            loss2 = np.log(sum(temp_gcv[1:]))
+            # ignore all zero eigenvalues
+            loss = loss2 - loss1
+
+            if self.arb_mean:
+                RKHS_norm = (1 / lambda_factor) * sum(temp_gcv[1:]) / n
+            else:
+                RKHS_norm = (1 / lambda_factor) * sum(temp_gcv) / n
+        else:
+            # default: MLE
+            if self.arb_mean:
+                RKHS_norm = (1 / lambda_factor) * sum(temp[1:]) / n
+                temp_1 = (1 / lambda_factor) * sum(temp[1:])
+            else:
+                RKHS_norm = (1 / lambda_factor) * sum(temp) / n
+                temp_1 = (1 / lambda_factor) * sum(temp)
+
+            # ignore all zero eigenvalues
+            loss1 = sum(np.log(abs(lambda_factor * vec_lambda[vec_lambda > fudge])))
+            if temp_1 != 0:
+                loss2 = n * np.log(temp_1)
+            else:
+                loss2 = n * np.log(temp_1 + np.finfo(float).eps)
+            loss = loss1 + loss2
+
+        if self.debug_enable:
+            self.alert_msg(loss1, 'Inf', 'Imag')
+            self.alert_msg(RKHS_norm, 'Imag')
+            self.alert_msg(loss2, 'Inf', 'Imag')
+            self.alert_msg(loss, 'Inf', 'Imag', 'Nan')
+            self.alert_msg(vec_lambda, 'Imag')
+
+        vec_lambda, vec_lambda_ring = lambda_factor * vec_lambda, lambda_factor * vec_lambda_ring
+        return loss, vec_lambda, vec_lambda_ring, RKHS_norm
+
+    # Computes modified kernel Km1 = K - 1
+    # Useful to avoid cancellation error in the computation of (1 - n/\lambda_1)
+    @staticmethod
+    def kernel_t(aconst, Bern):
+        d = np.size(Bern, 1)
+        if type(aconst) != np.ndarray:
+            theta = np.ones((d, 1)) * aconst
+        else:
+            theta = aconst  # theta varies per dimension
+
+        Kjm1 = theta[0] * Bern[:, 0]  # Kernel at j-dim minus One
+        Kj = 1 + Kjm1  # Kernel at j-dim
+
+        for j in range(1, d):
+            Kjm1_prev = Kjm1
+            Kj_prev = Kj  # save the Kernel at the prev dim
+
+            Kjm1 = theta[j] * Bern[:, j] * Kj_prev + Kjm1_prev
+            Kj = 1 + Kjm1
+
+        Km1 = Kjm1
+        K = Kj
+        return [Km1, K]
+
+    # prints debug message if the given variable is Inf, Nan or complex, etc
+    # Example: alertMsg(x, 'Inf', 'Imag')
+    #          prints if variable 'x' is either Infinite or Imaginary
+    @staticmethod
+    def alert_msg(*args):
+        varargin = args
+        nargin = len(varargin)
+        if nargin > 1:
+            i_start = 0
+            var_tocheck = varargin[i_start]
+            i_start = i_start + 1
+            inpvarname = 'variable'
+
+            while i_start < nargin:
+                var_type = varargin[i_start]
+                i_start = i_start + 1
+
+                if var_type == 'Nan':
+                    if np.any(np.isnan(var_tocheck)):
+                        print('%s has NaN values' % inpvarname)
+                elif var_type == 'Inf':
+                    if np.any(np.isinf(var_tocheck)):
+                        print('%s has Inf values' % inpvarname)
+                elif var_type == 'Imag':
+                    if not np.all(np.isreal(var_tocheck)):
+                        print('%s has complex values' % inpvarname)
+                else:
+                    print('unknown type check requested !')
+    
     def integrate(self):
         t_start = time()
-        self.datum = np.empty(self.d_indv, dtype=object)
-        for j in np.ndindex(self.d_indv):
-            self.datum[j] = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-                                                 self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel, self.alphas_indv[j])
-
-        self.data = LDTransformBayesData.__new__(LDTransformBayesData)
-        self.data.flags_indv = np.tile(False, self.d_indv)
-        self.data.compute_flags = np.tile(True,self.d_indv)
-        prev_flags_indv = self.data.flags_indv
-        self.data.m = np.tile(self.m_min, self.d_indv)
-        self.data.n_min = 0
-        self.data.indv_bound_low = np.tile(-np.inf, self.d_indv)
-        self.data.indv_bound_high = np.tile(np.inf, self.d_indv)
-        self.data.solution_indv = np.tile(np.nan, self.d_indv)
-        self.data.solution = np.nan
-        self.data.xfull = np.empty((0, self.d))
-        self.data.yfull = np.empty((0,) + self.d_indv)
-        stop_flag = np.tile(None, self.d_indv)
+        data = AccumulateData(
+            parameters = [
+                'solution',
+                'comb_bound_low',
+                'comb_bound_high',
+                'comb_bound_diff',
+                'comb_flags',
+                'n_total',
+                'n',
+                'time_integrate'])
+        data.flags_indv = np.tile(False,self.integrand.d_indv)
+        data.compute_flags = np.tile(True,self.integrand.d_indv)
+        data.n = np.tile(self.n_init,self.integrand.d_indv)
+        data.n_min = 0 
+        data.n_max = self.n_init
+        data.solution_indv = np.tile(np.nan,self.integrand.d_indv)
+        data.xfull = np.empty((0,self.integrand.d))
+        data.xfullun = np.empty((0,self.integrand.d),dtype=self._xfullundtype)
+        data.yfull = np.empty(self.integrand.d_indv+(0,))
+        data.bounds_half_width = np.tile(np.inf,self.integrand.d_indv)
+        data.muhat = np.tile(np.nan,self.integrand.d_indv)
         while True:
-            m = self.data.m.max()
-            n_min = self.data.n_min
-            n_max = int(2 ** m)
-            n = int(n_max - n_min)
-            xnext, xnext_un = self.discrete_distrib.gen_samples(n_min=n_min, n_max=n_max, return_unrandomized=True,
-                                                                warn=False)
-            ycvnext = np.empty((1 + self.ncv, n,) + self.d_indv, dtype=float)
-            ycvnext[0] = self.integrand.f(xnext, periodization_transform=self.ptransform,
-                                          compute_flags=self.data.compute_flags)
-            for k in range(self.ncv):
-                ycvnext[1 + k] = self.cv[k].f(xnext, periodization_transform=self.ptransform,
-                                              compute_flags=self.data.compute_flags)
-
-            for j in np.ndindex(self.d_indv):
-                if prev_flags_indv[j] == True and self.data.flags_indv[j] == False:
-                    assert not(prev_flags_indv[j] == True and self.data.flags_indv[j] == False), 'This cannot happen !'
-                if self.data.flags_indv[j]:
-                    continue
-                slice_yj = (0, slice(None),) + j
-                if type(self.discrete_distrib).__name__ == 'DigitalNetB2':
-                    y_val = ycvnext[slice_yj].copy()  # to satisfy C_CONTIGUOUS
-                else:
-                    y_val = ycvnext[slice_yj]
-
-                # Update function values
-                success, muhat, r_order, err_bd, _ = self.datum[j].update_data(y_val_new=y_val, xnew=xnext, xunnew=xnext_un)
-
-                bounds = muhat + np.array([-1, 1]) * err_bd
-                stop_flag[j], self.data.solution_indv[j], self.data.indv_bound_low[j], self.data.indv_bound_high[j] = \
-                    success, muhat, bounds[0], bounds[1]
-
-            self.data.xfull = np.vstack((self.data.xfull, xnext))
-            self.data.yfull = np.vstack((self.data.yfull, ycvnext[0]))
-            self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
-            self.abs_tols,self.rel_tols = np.full_like(self.data.comb_bound_low,self.abs_tol),np.full_like(self.data.comb_bound_low,self.rel_tol)
-            fidxs = np.isfinite(self.data.comb_bound_low)&np.isfinite(self.data.comb_bound_high)
-            slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = np.tile(np.nan,self.data.comb_bound_low.shape)
-            self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.comb_flags = np.tile(False,self.data.comb_bound_low.shape)
-            self.data.comb_flags[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
-            self.data.compute_flags = ~self.data.flags_indv
-            self.data.n = 2 ** self.data.m
-            self.data.n_total = self.data.n.max()
-
-            if np.sum(self.data.compute_flags) == 0:
-                break  # stopping criterion met
-            elif 2 * self.data.n_total > self.n_max:
-                # doubling samples would go over n_max
+            m = int(np.log2(data.n_max))
+            xnext,xnext_un = self.discrete_distrib.gen_samples(n_min=data.n_min,n_max=data.n_max, return_unrandomized=True)
+            data.xfull = np.concatenate([data.xfull,xnext],0)
+            data.xfullun = np.concatenate([data.xfullun,xnext_un],0)
+            ynext = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=data.compute_flags)
+            ynext[~data.compute_flags] = np.nan
+            data.yfull = np.concatenate([data.yfull,ynext],-1)
+            if data.n_min==0: # first iteration
+                ytildefull = self.ft(ynext)/np.sqrt(2**m)
+            else: # any iteration after the first
+                mnext = int(m-1)
+                ytildeomega = self.omega(mnext)*self.ft(ynext[data.compute_flags])/np.sqrt(2**mnext)
+                ytildefull_next = np.nan*np.ones_like(ytildefull)
+                ytildefull_next[data.compute_flags] = (ytildefull[data.compute_flags]-ytildeomega)/2
+                ytildefull[data.compute_flags] = (ytildefull[data.compute_flags]+ytildeomega)/2
+                ytildefull = np.concatenate([ytildefull,ytildefull_next],axis=-1)
+            for j in np.ndindex(self.integrand.d_indv):
+                if not data.compute_flags[j]: continue 
+                data.muhat[j],data.bounds_half_width[j] = self._stopping_criterion(data.xfull,2**m*ytildefull[j],m)
+            data.indv_bound_low = data.muhat-data.bounds_half_width
+            data.indv_bound_high = data.muhat+data.bounds_half_width
+            data.n[data.compute_flags] = data.n_max
+            data.n_total = data.n_max
+            data.comb_bound_low,data.comb_bound_high = self.integrand.bound_fun(data.indv_bound_low,data.indv_bound_high)
+            data.comb_bound_diff = data.comb_bound_high-data.comb_bound_low
+            fidxs = np.isfinite(data.comb_bound_low)&np.isfinite(data.comb_bound_high)
+            slow,shigh,abs_tols,rel_tols = data.comb_bound_low[fidxs],data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
+            data.solution = np.tile(np.nan,data.comb_bound_low.shape)
+            data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
+            data.comb_flags = np.tile(False,data.comb_bound_low.shape)
+            data.comb_flags[fidxs] = (shigh-slow) <= (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
+            data.flags_indv = self.integrand.dependency(data.comb_flags)
+            data.compute_flags = ~data.flags_indv
+            if np.sum(data.compute_flags)==0:
+                break # sufficiently estimated
+            elif 2*data.n_total>self.n_limit:
                 warning_s = """
                 Already generated %d samples.
-                Trying to generate %d new samples would exceed n_max = %d.
+                Trying to generate %d new samples would exceeds n_limit = %d.
                 No more samples will be generated.
-                Note that error tolerances may no longer be satisfied.""" \
-                            % (int(self.data.n_total), int(self.data.n_total), int(self.n_max))
+                Note that error tolerances may not be satisfied. """ \
+                % (int(data.n_total),int(data.n_total),int(self.n_limit))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
-            else:
-                self.data.n_min = n_max
-                self.data.m += self.data.compute_flags
-
-        self.data.integrand = self.integrand
-        self.data.true_measure = self.true_measure
-        self.data.discrete_distrib = self.discrete_distrib
-        self.data.stopping_crit = self
-        self.data.parameters = [
-            'solution',
-            'comb_bound_low',
-            'comb_bound_high',
-            'comb_flags',
-            'n_total',
-            'n',
-            'time_integrate']
-        self.data.datum = self.datum
-        self.data.time_integrate = time() - t_start
-        return self.data.solution, self.data
-
-    # computes the integral
-    # ## Obsolete - do not use ##
-    def integrate_1d(self):
-        # Construct AccumulateData Object to House Integration data
-        self.data = LDTransformBayesData(self, self.integrand, self.true_measure, self.discrete_distrib,
-                                         self.m_min, self.m_max, self.fbt, self.merge_fbt, self.kernel)
-        tstart = time()  # start the timer
-
-        # Iteratively find the number of points required for the cubature to meet
-        # the error threshold
-        while True:
-            # Update function values
-            stop_flag, muhat, order_, err_bnd, m = self.data.update_data()
-
-            # if stop_at_tol true, exit the loop
-            # else, run for for all 'n' values.
-            # Used to compute error values for 'n' vs error plotting
-            if self.stop_at_tol and stop_flag:
-                break
-
-            if m >= self.m_max:
-                warnings.warn('''
-                    Already used maximum allowed sample size %d.
-                    Note that error tolerances may no longer be satisfied.''' % (2 ** self.m_max),
-                              MaxSamplesWarning)
-                break
-
-        self.data.time_integrate = time() - tstart
-        # Approximate integral
-        self.data.solution = muhat
-
-        return muhat, self.data
+            data.n_min = data.n_max
+            data.n_max = 2*data.n_min
+        data.stopping_crit = self
+        data.integrand = self.integrand
+        data.true_measure = self.integrand.true_measure
+        data.discrete_distrib = self.true_measure.discrete_distrib
+        data.time_integrate = time()-t_start
+        return data.solution,data
+    
+    def set_tolerance(self, abs_tol=None, rel_tol=None):
+        """
+        See abstract method. 
+        
+        Args:
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
+        """
+        if abs_tol is not None:
+            self.abs_tol = abs_tol
+            self.abs_tols = np.full(self.integrand.d_comb,self.abs_tol)
+        if rel_tol is not None:
+            self.rel_tol = rel_tol
+            self.rel_tols = np.full(self.integrand.d_comb,self.rel_tol)

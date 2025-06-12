@@ -45,7 +45,7 @@ class LDTransformBayesData(AccumulateData):
 
         # Credible interval : two-sided confidence, i.e., 1-alpha percent quantile
         # quantile value for the error bound
-        if self.errbd_type == 'full_Bayes':
+        if self.errbd_type == 'FULL':
             # degrees of freedom = 2^mmin - 1
             self.uncert = -tnorm.ppf(alpha / 2, (2 ** m_min) - 1)
         else:
@@ -133,7 +133,7 @@ class LDTransformBayesData(AccumulateData):
 
         # Check error criterion
         # compute DSC
-        if self.errbd_type == 'full_Bayes':
+        if self.errbd_type == 'FULL':
             # full Bayes
             if self.avoid_cancel_error:
                 DSC = abs(vec_lambda_ring[0] / n)
@@ -232,86 +232,6 @@ class LDTransformBayesData(AccumulateData):
 
         vec_lambda, vec_lambda_ring = lambda_factor * vec_lambda, lambda_factor * vec_lambda_ring
         return loss, vec_lambda, vec_lambda_ring, RKHS_norm
-
-    # Efficient Fast Bayesian Transform computation algorithm, avoids recomputing the full transform
-    def iter_fbt(self, iter, xun_, xpts_, ftilde_prev, y_val_new=None, xunnew=None, xnew=None):
-        m = self.mvec[iter]
-        n = 2 ** m
-
-        # In every iteration except the first one, "n" number_of_points is doubled,
-        # but FBT is only computed for the newly added points.
-        # Previously computed FFT is reused.
-        if iter == 0:
-            # In the first iteration compute full FBT
-            # xun_ = mod(bsxfun( @ times, (0:1 / n:1-1 / n)',self.gen_vec),1)
-            # xun_ = np.arange(0, 1, 1 / n).reshape((n, 1))
-            # xun_ = np.mod((xun_ * self.gen_vec), 1)
-            # xpts_ = np.mod(bsxfun( @ plus, xun_, shift), 1)  # shifted
-
-            if xnew is None:
-                xpts_, xun_ = self.gen_samples(n_min=0, n_max=n, return_unrandomized=True,
-                                               distribution=self.discrete_distrib)
-
-                # Compute initial FBT
-                ftilde_ = self.fbt(self.ff(xpts_))
-            else:
-                xpts_, xun_ = xnew, xunnew
-                ftilde_ = self.fbt(y_val_new)
-
-            ftilde_ = ftilde_.reshape((n, 1))
-        else:
-            # xunnew = np.mod(bsxfun( @ times, (1/n : 2/n : 1-1/n)',self.gen_vec),1)
-            # xunnew = np.arange(1 / n, 1, 2 / n).reshape((n // 2, 1))
-            # xunnew = np.mod(xunnew * self.gen_vec, 1)
-            # xnew = np.mod(bsxfun( @ plus, xunnew, shift), 1)
-
-            if xnew is None:
-                xnew, xunnew = self.gen_samples(n_min=n // 2, n_max=n, return_unrandomized=True,
-                                                distribution=self.discrete_distrib)
-            [xun_, xpts_] = self.merge_pts(xun_, xunnew, xpts_, xnew, n, self.discrete_distrib.d,
-                                           distribution=self.distribution_name)
-            mnext = m - 1
-            if y_val_new is None:
-                ftilde_next_new = self.fbt(self.ff(xnew))
-            else:
-                ftilde_next_new = self.fbt(y_val_new)
-
-            ftilde_next_new = ftilde_next_new.reshape((n // 2, 1))
-            if self.debugEnable:
-                self.alert_msg(ftilde_next_new, 'Nan', 'Inf')
-
-            # combine the previous batch and new batch to get FBT on all points
-            ftilde_ = self.merge_fbt(ftilde_prev, ftilde_next_new, mnext)
-
-        return ftilde_, xun_, xpts_
-
-    @staticmethod
-    def gen_samples(n_min, n_max, return_unrandomized, distribution):
-        warn = False
-        xpts_, xun_ = distribution.gen_samples(n_min=n_min, n_max=n_max, warn=warn,
-                                               return_unrandomized=return_unrandomized)
-        return xpts_, xun_
-
-    # inserts newly generated points with the old set by interleaving them
-    # xun - unshifted points
-    @staticmethod
-    def merge_pts(xun, xunnew, x, xnew, n, d, distribution):
-        if distribution == 'Lattice':
-            temp = np.zeros((n, d))
-            temp[0::2, :] = xun
-            try:
-                temp[1::2, :] = xunnew
-            except Exception as e:
-                raise(e)
-            xun = temp
-            temp = np.zeros((n, d))
-            temp[0::2, :] = x
-            temp[1::2, :] = xnew
-            x = temp
-        else:
-            x = np.vstack([x, xnew])
-            xun = np.vstack([xun, xunnew])
-        return xun, x
 
     # Computes modified kernel Km1 = K - 1
     # Useful to avoid cancellation error in the computation of (1 - n/\lambda_1)

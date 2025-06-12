@@ -2,7 +2,7 @@ from ._cub_bayes_ld_g import _CubBayesLDG
 from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister
-from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
+from ..util import fwht,omega_fwht,MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
 from ..discrete_distribution._c_lib import _c_lib
 import ctypes
 import numpy as np
@@ -78,7 +78,7 @@ class CubBayesNetG(_CubBayesLDG):
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_max=2 ** 22, alpha=0.01,
-                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
+                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol), errbd_type="MLE"):
         """
         Args:
             integrand (AbstractIntegrand): an instance of AbstractIntegrand
@@ -90,54 +90,28 @@ class CubBayesNetG(_CubBayesLDG):
             error_fun: function taking in the approximate solution vector,
                 absolute tolerance, and relative tolerance which returns the approximate error.
                 Default indicates integration until either absolute OR relative tolerance is satisfied.
+            errbd_type (str): MLE, GCV, or FULL
         """
-        super(CubBayesNetG, self).__init__(integrand, fbt=self._fwht_h, merge_fbt=self._merge_fwht,
+        super(CubBayesNetG, self).__init__(integrand, ft=fwht, omega=omega_fwht,
                                            ptransform=None,
                                            allowed_distribs=[DigitalNetB2],
                                            kernel=self._shift_inv_kernel_digital,
                                            abs_tol=abs_tol, rel_tol=rel_tol,
-                                           n_init=n_init, n_max=n_max, alpha=alpha, error_fun=error_fun)
-
-        self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
-        # Set Attributes
+                                           n_init=n_init, n_limit=n_max, alpha=alpha, error_fun=error_fun, errbd_type=errbd_type)
         self.order = 1  # Currently supports only order=1
-
-        self.use_gradient = False  # If true uses gradient descent in parameter search
-        self.one_theta = True  # If true use common shape parameter for all dimensions
-        # else allow shape parameter vary across dimensions
-        self.errbd_type = 'MLE'  # Available options {'MLE', 'GCV', 'full'}
-
         # private properties
         # Full Bayes - assumes m and s^2 as hyperparameters
         # GCV - Generalized cross validation
         self.kernType = 1  # Type-1:
-
-        self.uncert = 0  # quantile value for the error bound
-        self.data = None
-        self.fwht = FWHT()
-
-        if self.discrete_distrib.randomize == "FALSE":
-            raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
+        self._xfullundtype = np.uint64
+        if self.discrete_distrib.order!='NATURAL':
+            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'NATURAL' order")
 
 
-    def _fwht_h(self, y):
-        ytilde = np.squeeze(y)
-        self.fwht.fwht_inplace(len(y), ytilde)
-        return ytilde
-        # ytilde = np.array(self.fwht_h_py(y), dtype=float)
-        # return ytilde
-
-    @staticmethod
-    def _merge_fwht(ftilde_new, ftilde_next_new, mnext):
-        ftilde_new = np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
-        return ftilde_new
-
-    '''
-    Digitally shift invariant kernel
-    C1 : first row of the covariance matrix
-    Lambda : eigen values of the covariance matrix
-    Lambda_ring = fwht(C1 - 1)
-    '''
+    # Digitally shift invariant kernel
+    # C1 : first row of the covariance matrix
+    # Lambda : eigen values of the covariance matrix
+    # Lambda_ring = fwht(C1 - 1)
 
     def _shift_inv_kernel_digital(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
         kernel_func = CubBayesNetG.BuildKernelFunc(order)
@@ -146,13 +120,13 @@ class CubBayesNetG(_CubBayesLDG):
         if avoid_cancel_error:
             # Computes C1m1 = C1 - 1
             # C1_new = 1 + C1m1 indirectly computed in the process
-            (vec_C1m1, C1_alt) = self.data.kernel_t(a * const_mult, kernel_func(xun))
+            (vec_C1m1, C1_alt) = self.kernel_t(a * const_mult, kernel_func(xun))
             lambda_factor = max(abs(vec_C1m1))
             C1_alt = C1_alt / lambda_factor
             vec_C1m1 = vec_C1m1 / lambda_factor
 
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda_ring = np.real(self._fwht_h(vec_C1m1.copy()))
+            vec_lambda_ring = np.real(fwht(vec_C1m1.copy())*np.sqrt(vec_C1m1.shape[-1]))
 
             vec_lambda = vec_lambda_ring.copy()
             vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring) / lambda_factor
@@ -160,14 +134,14 @@ class CubBayesNetG(_CubBayesLDG):
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
                 vec_lambda_direct = np.real(
-                    np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
+                    np.array(fwht(C1_alt)*np.sqrt(C1_alt.shape[-1]), dtype=float))  # Note: fwht output not normalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
             # direct approach to compute first row of the kernel Gram matrix
             vec_C1 = np.prod(1 + a * const_mult * kernel_func(xun), 2)
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda = np.real(self._fwht_h(vec_C1))
+            vec_lambda = np.real(fwht(vec_C1)*np.sqrt(vec_C1.shape[-1]))
             vec_lambda_ring = 0
             lambda_factor = 1
 
@@ -211,47 +185,6 @@ class CubBayesNetG(_CubBayesLDG):
             NotYetImplemented('cubBayesNet_g: kernel order not yet supported')
 
         return kernFunc
-
-    '''
-    @staticmethod
-    def fwht_h_py(ynext):
-        mnext = int(np.log2(len(ynext)))
-        for l in range(mnext):
-            nl = 2**l
-            nmminlm1 = 2.**(mnext-l-1)
-            ptind_nl = np.hstack(( np.tile(True,nl), np.tile(False,nl) ))
-            ptind = np.tile(ptind_nl,int(nmminlm1))
-            evenval = ynext[ptind]
-            oddval = ynext[~ptind]
-            ynext[ptind] = (evenval + oddval)
-            ynext[~ptind] = (evenval - oddval)
-        return ynext
-    '''
-
-
-class FWHT():
-    def __init__(self):
-        self.fwht_copy_cf = _c_lib.fwht_copy
-        self.fwht_copy_cf.argtypes = [
-            ctypes.c_uint32,
-            np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
-            np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')
-        ]
-        self.fwht_copy_cf.restype = None
-
-        self.fwht_inplace_cf = _c_lib.fwht_inplace
-        self.fwht_inplace_cf.argtypes = [
-            ctypes.c_uint32,
-            np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
-        ]
-        self.fwht_inplace_cf.restype = None
-
-    def fwht_copy(self, n, src, dst):
-        self.fwht_copy_cf(n, src, dst)
-
-    def fwht_inplace(self, n, src):
-        self.fwht_inplace_cf(n, src)
-
 
 class CubBayesSobolG(CubBayesNetG): pass
 class CubQMCBayesSobolG(CubBayesNetG): pass

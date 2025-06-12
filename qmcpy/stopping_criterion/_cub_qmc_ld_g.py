@@ -8,11 +8,7 @@ import warnings
 
 
 class _CubQMCLDG(AbstractStoppingCriterion):
-    """
-    Abstract class for CubQMC{LD}G where LD is a low discrepancy discrete distribution. 
-    See subclasses for implementation differences for each LD sequence. 
-    """
-
+    
     def __init__(self, integrand, abs_tol, rel_tol, n_init, n_limit, fudge, check_cone,
         control_variates, control_variate_means, update_beta, ptransform,
         ft, omega, allowed_levels, allowed_distribs, cast_complex, error_fun):
