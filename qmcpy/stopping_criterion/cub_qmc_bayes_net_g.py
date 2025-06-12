@@ -1,5 +1,4 @@
 from ._cub_bayes_ld_g import _CubBayesLDG
-from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
 from ..util import fwht,omega_fwht,MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
@@ -177,19 +176,22 @@ class CubBayesNetG(_CubBayesLDG):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01,
+                 n_init=2 ** 8, n_limit=2 ** 22, alpha=0.01,
                  error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol), errbd_type="MLE"):
         """
         Args:
-            integrand (AbstractIntegrand): an instance of AbstractIntegrand
-            abs_tol (np.ndarray): absolute error tolerance
-            rel_tol (np.ndarray): relative error tolerance
-            n_init (int): initial number of samples
-            n_max (int): maximum number of samples
-            alpha (float): significance level or p-value
-            error_fun: function taking in the approximate solution vector,
-                absolute tolerance, and relative tolerance which returns the approximate error.
-                Default indicates integration until either absolute OR relative tolerance is satisfied.
+            integrand (AbstractIntegrand): An AbstractIntegrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            error_fun (callable): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+
+                - The default $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \max\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
+                    means the approximation error must be below either the absolue error *or* relative error.
+                - Setting to $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \min\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
+                    means the approximation error must be below either the absolue error *and* relative error. 
             errbd_type (str): MLE, GCV, or FULL
         """
         super(CubBayesNetG, self).__init__(integrand, ft=fwht, omega=omega_fwht,
@@ -197,7 +199,7 @@ class CubBayesNetG(_CubBayesLDG):
                                            allowed_distribs=[DigitalNetB2],
                                            kernel=self._shift_inv_kernel_digital,
                                            abs_tol=abs_tol, rel_tol=rel_tol,
-                                           n_init=n_init, n_limit=n_max, alpha=alpha, error_fun=error_fun, errbd_type=errbd_type)
+                                           n_init=n_init, n_limit=n_limit, alpha=alpha, error_fun=error_fun, errbd_type=errbd_type)
         self.order = 1  # Currently supports only order=1
         # private properties
         # Full Bayes - assumes m and s^2 as hyperparameters

@@ -1,10 +1,9 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
-from ..accumulate_data import MeanVarDataVec
-from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
+from ..accumulate_data import AccumulateData
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..true_measure import Gaussian,Uniform
-from ..integrand import Keister,BoxIntegral,CustomFun
+from ..integrand import Keister,BoxIntegral,CustomFun,Genz,SensitivityIndices
 from ..util import MaxSamplesWarning, ParameterWarning, ParameterError
 import numpy as np
 from time import time
@@ -13,216 +12,239 @@ import warnings
 
 
 class CubMCCLTVec(AbstractStoppingCriterion):
-    """
+    r"""
     Stopping criterion based on the Central Limit Theorem for vectorized integrands.
     
     >>> k = Keister(IIDStdUniform(seed=7))
-    >>> sc = CubMCCLTVec(k,abs_tol=.05)
+    >>> sc = CubMCCLTVec(k,abs_tol=5e-2,rel_tol=0)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.38366791])
+    array(1.38366791)
     >>> data
-    MeanVarDataVec (AccumulateData Object)
+    AccumulateData (AccumulateData)
         solution        1.384
-        comb_bound_low  1.335
-        comb_bound_high 1.432
+        comb_bound_low  1.343
+        comb_bound_high 1.424
+        comb_bound_diff 0.080
         comb_flags      1
-        n_total         2^(10)
+        n_total         1024
         n               2^(10)
         time_integrate  ...
-    CubMCCLTVec (AbstractStoppingCriterion Object)
-        inflate         1.200
+    CubMCCLTVec (AbstractStoppingCriterion)
+        inflate         1
         alpha           0.010
         abs_tol         0.050
         rel_tol         0
         n_init          2^(8)
-        n_max           2^(30)
-    Keister (AbstractIntegrand Object)
-    Gaussian (AbstractTrueMeasure Object)
+        n_limit         2^(30)
+    Keister (AbstractIntegrand)
+    Gaussian (AbstractTrueMeasure)
         mean            0
         covariance      2^(-1)
         decomp_type     PCA
-    IIDStdUniform (AbstractDiscreteDistribution Object)
+    IIDStdUniform (AbstractIIDDiscreteDistribution)
         d               1
+        replications    1
         entropy         7
-        spawn_key       ()
-    >>> f = BoxIntegral(IIDStdUniform(3,seed=7), s=[-1,1])
-    >>> abs_tol = 5e-2
-    >>> sc = CubMCCLTVec(f,abs_tol=abs_tol)
+
+    Vector outputs
+    
+    >>> f = BoxIntegral(IIDStdUniform(3,seed=7),s=[-1,1])
+    >>> abs_tol = 2.5e-2
+    >>> sc = CubMCCLTVec(f,abs_tol=abs_tol,rel_tol=0)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.1853359 , 0.95670595])
+    array([1.18448043, 0.95435347])
     >>> data
-    MeanVarDataVec (AccumulateData Object)
-        solution        [1.185 0.957]
-        comb_bound_low  [1.139 0.918]
-        comb_bound_high [1.232 0.995]
+    AccumulateData (AccumulateData)
+        solution        [1.184 0.954]
+        comb_bound_low  [1.165 0.932]
+        comb_bound_high [1.203 0.977]
+        comb_bound_diff [0.038 0.045]
         comb_flags      [ True  True]
-        n_total         2^(11)
-        n               [2048.  512.]
+        n_total         8192
+        n               [8192 1024]
         time_integrate  ...
-    CubMCCLTVec (AbstractStoppingCriterion Object)
-        inflate         1.200
+    CubMCCLTVec (AbstractStoppingCriterion)
+        inflate         1
         alpha           0.010
-        abs_tol         0.050
+        abs_tol         0.025
         rel_tol         0
         n_init          2^(8)
-        n_max           2^(30)
-    BoxIntegral (AbstractIntegrand Object)
+        n_limit         2^(30)
+    BoxIntegral (AbstractIntegrand)
         s               [-1  1]
-    Uniform (AbstractTrueMeasure Object)
+    Uniform (AbstractTrueMeasure)
         lower_bound     0
         upper_bound     1
-    IIDStdUniform (AbstractDiscreteDistribution Object)
+    IIDStdUniform (AbstractIIDDiscreteDistribution)
         d               3
+        replications    1
         entropy         7
-        spawn_key       ()
     >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
     >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
     >>> true_value = np.array([sol3neg1,sol31])
     >>> assert (abs(true_value-solution)<abs_tol).all()
-    >>> cf = CustomFun(
-    ...     true_measure = Uniform(IIDStdUniform(6,seed=7)),
-    ...     g = lambda x,compute_flags=None: (2*np.arange(1,7)*x).reshape(-1,2,3),
-    ...     dimension_indv = (2,3))
-    >>> sol,data = CubMCCLTVec(cf,abs_tol=1e-2).integrate()
+    
+    Sensitivity indices 
+
+    >>> function = Genz(IIDStdUniform(3,seed=7))
+    >>> integrand = SensitivityIndices(function)
+    >>> sc = CubMCCLTVec(integrand,abs_tol=2.5e-2,rel_tol=0)
+    >>> solution,data = sc.integrate()
     >>> data
-    MeanVarDataVec (AccumulateData Object)
-        solution        [[1.    1.999 2.999]
-                        [4.001 4.998 6.001]]
-        comb_bound_low  [[0.99  1.989 2.991]
-                        [3.991 4.989 5.993]]
-        comb_bound_high [[1.01  2.009 3.006]
-                        [4.01  5.007 6.008]]
+    AccumulateData (AccumulateData)
+        solution        [[0.024 0.203 0.662]
+                         [0.044 0.308 0.78 ]]
+        comb_bound_low  [[0.006 0.186 0.644]
+                         [0.02  0.286 0.761]]
+        comb_bound_high [[0.042 0.221 0.681]
+                         [0.067 0.329 0.798]]
+        comb_bound_diff [[0.036 0.035 0.037]
+                         [0.047 0.043 0.037]]
         comb_flags      [[ True  True  True]
-                        [ True  True  True]]
-        n_total         2^(21)
-        n               [[  32768.  131072.  524288.]
-                        [ 524288. 1048576. 2097152.]]
+                         [ True  True  True]]
+        n_total         262144
+        n               [[[  4096  65536 262144]
+                          [  4096  65536 262144]
+                          [  4096  65536 262144]]
+    <BLANKLINE>
+                         [[   512  32768 262144]
+                          [   512  32768 262144]
+                          [   512  32768 262144]]]
         time_integrate  ...
-    CubMCCLTVec (AbstractStoppingCriterion Object)
-        inflate         1.200
+    CubMCCLTVec (AbstractStoppingCriterion)
+        inflate         1
         alpha           0.010
-        abs_tol         0.010
+        abs_tol         0.025
         rel_tol         0
         n_init          2^(8)
-        n_max           2^(30)
-    CustomFun (AbstractIntegrand Object)
-    Uniform (AbstractTrueMeasure Object)
+        n_limit         2^(30)
+    SensitivityIndices (AbstractIntegrand)
+        indices         [[ True False False]
+                         [False  True False]
+                         [False False  True]]
+    Uniform (AbstractTrueMeasure)
         lower_bound     0
         upper_bound     1
-    IIDStdUniform (AbstractDiscreteDistribution Object)
+    IIDStdUniform (AbstractIIDDiscreteDistribution)
         d               6
+        replications    1
         entropy         7
-        spawn_key       ()
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=256., n_max=2**30,
-        inflate=1.2, alpha=0.01,
-        error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
-        """
+    def __init__(self,
+                 integrand, 
+                 abs_tol = 1e-2,
+                 rel_tol = 0.,
+                 n_init = 256.,
+                 n_limit = 2**30,
+                 inflate = 1,
+                 alpha = 0.01, 
+                 error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
+        r"""
         Args:
-            integrand (AbstractIntegrand): an instance of AbstractIntegrand
-            inflate (float): inflation factor when estimating variance
-            alpha (np.ndarray): significance level for confidence interval
-            abs_tol (np.ndarray): absolute error tolerance
-            rel_tol (np.ndarray): relative error tolerance
-            n_max (int): maximum number of samples
-            error_fun: function taking in the approximate solution vector, 
-                absolute tolerance, and relative tolerance which returns the approximate error. 
-                Default indicates integration until either absolute OR relative tolerance is satisfied.
+            integrand (AbstractIntegrand): An AbstractIntegrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            inflate (float): Inflation factor to multiply by the variance estimate to make it more conservative. Must be greater than or equal to 1.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            error_fun (callable): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+
+                - The default $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \max\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
+                    means the approximation error must be below either the absolue error *or* relative error.
+                - Setting to $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \min\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
+                    means the approximation error must be below either the absolue error *and* relative error.  
         """
-        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_max']
+        self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_limit']
         # Input Checks
-        if np.log2(n_init) % 1 != 0:
-            warning_s = ' n_init must be a power of 2. Using n_init = 32'
-            warnings.warn(warning_s, ParameterWarning)
-            n_init = 32
+        if np.log2(n_init)%1!=0:
+            warnings.warn('n_init must be a power of two. Using n_init = 2**5',ParameterWarning)
+            n_init = 2**5
+        if np.log2(n_limit)%1!=0:
+            warnings.warn('n_init must be a power of two. Using n_limit = 2**30',ParameterWarning)
+            n_limit = 2**30
         # Set Attributes
-        self.abs_tol = abs_tol
-        self.rel_tol = rel_tol
-        self.n_init = float(n_init)
-        self.n_max = float(n_max)
+        self.n_init = int(n_init)
+        self.n_limit = int(n_limit)
+        self.error_fun = error_fun
         self.alpha = alpha
         self.inflate = float(inflate)
-        self.error_fun = error_fun
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.integrand.discrete_distrib
-        self.d_indv = self.integrand.d_indv
-        self.d = self.discrete_distrib.d
-        super(CubMCCLTVec,self).__init__(allowed_levels=["single"], allowed_distribs=[IID], allow_vectorized_integrals=True)
+        self.discrete_distrib = self.true_measure.discrete_distrib
+        super(CubMCCLTVec,self).__init__(allowed_levels=["single"],allowed_distribs=[AbstractIIDDiscreteDistribution],allow_vectorized_integrals=True)
+        assert self.integrand.discrete_distrib.no_replications==True, "Require the discrete distribution has replications=None"
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
+        self.set_tolerance(abs_tol,rel_tol)
         self.z_star = -norm.ppf(self.alphas_indv/2)
-         
+    
     def integrate(self):
-        """ See abstract method. """
         t_start = time()
-        self.datum = np.empty(self.d_indv,dtype=object)
-        for j in np.ndindex(self.d_indv):
-            self.datum[j] = MeanVarDataVec(self.z_star[j],self.inflate)
-        self.data = MeanVarDataVec.__new__(MeanVarDataVec)
-        self.data.flags_indv = np.tile(False,self.d_indv)
-        self.data.compute_flags = np.tile(True,self.d_indv)
-        self.data.indv_bound_low = np.tile(-np.inf,self.d_indv)
-        self.data.indv_bound_high = np.tile(np.inf,self.d_indv)
-        self.data.solution_indv = np.tile(np.nan,self.d_indv)
-        self.data.solution = np.nan
-        self.data.xfull = np.empty((0,self.d))
-        self.data.yfull = np.empty((0,)+self.d_indv)
-        n_min,n_max = 0,self.n_init
-        self.data.n = np.tile(self.n_init,self.d_indv)
+        data = AccumulateData(
+            parameters = [
+                'solution',
+                'comb_bound_low',
+                'comb_bound_high',
+                'comb_bound_diff',
+                'comb_flags',
+                'n_total',
+                'n',
+                'time_integrate'])
+        data.flags_indv = np.tile(False,self.integrand.d_indv)
+        data.compute_flags = np.tile(True,self.integrand.d_indv)
+        data.n = np.tile(self.n_init,self.integrand.d_indv)
+        data.n_min = 0
+        data.n_max = self.n_init
+        data.solution_indv = np.tile(np.nan,self.integrand.d_indv)
+        data.xfull = np.empty((0,self.integrand.d))
+        data.yfull = np.empty(self.integrand.d_indv+(0,))
         while True:
-            n = int(n_max-n_min)
-            xnext = self.discrete_distrib.gen_samples(n)
-            ynext = self.integrand.f(xnext,compute_flags=self.data.compute_flags)
-            self.data.xfull = np.vstack((self.data.xfull,xnext))
-            self.data.yfull = np.vstack((self.data.yfull,ynext))
-            for j in np.ndindex(self.d_indv):
-                if self.data.flags_indv[j]: continue
-                yj = self.data.yfull[(slice(None),)+j]
-                self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j] = self.datum[j].update_data(yj)
-            self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
-            self.abs_tols,self.rel_tols = np.full_like(self.data.comb_bound_low,self.abs_tol),np.full_like(self.data.comb_bound_low,self.rel_tol)
-            fidxs = np.isfinite(self.data.comb_bound_low)&np.isfinite(self.data.comb_bound_high)
-            slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = np.tile(np.nan,self.data.comb_bound_low.shape)
-            self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.comb_flags = np.tile(False,self.data.comb_bound_low.shape)
-            self.data.comb_flags[fidxs] = (shigh-slow) <= (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
-            self.data.compute_flags = ~self.data.flags_indv
-            self.data.n_total = self.data.n.max()
-            if np.sum(self.data.compute_flags)==0:
+            xnext = self.discrete_distrib(n=data.n_max-data.n_min)
+            data.xfull = np.concatenate([data.xfull,xnext],0)
+            ynext = self.integrand.f(xnext,compute_flags=data.compute_flags)
+            ynext[~data.compute_flags] = np.nan
+            data.yfull = np.concatenate([data.yfull,ynext],-1)
+            data.n[data.compute_flags] = data.n_max
+            yfullfinite = np.isfinite(data.yfull)
+            data.solution_indv = data.yfull.mean(-1,where=yfullfinite)
+            data.sigmahat = data.yfull.std(-1,where=yfullfinite)
+            data.ci_half_width = self.z_star*self.inflate*data.sigmahat/np.sqrt(data.n)
+            data.indv_bound_low = data.solution_indv-data.ci_half_width
+            data.indv_bound_high = data.solution_indv+data.ci_half_width
+            data.n_total = data.n.max() 
+            data.comb_bound_low,data.comb_bound_high = self.integrand.bound_fun(data.indv_bound_low,data.indv_bound_high)
+            data.comb_bound_diff = data.comb_bound_high-data.comb_bound_low
+            fidxs = np.isfinite(data.comb_bound_low)&np.isfinite(data.comb_bound_high)
+            slow,shigh,abs_tols,rel_tols = data.comb_bound_low[fidxs],data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
+            data.solution = np.tile(np.nan,data.comb_bound_low.shape)
+            data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
+            data.comb_flags = np.tile(False,data.comb_bound_low.shape)
+            data.comb_flags[fidxs] = (shigh-slow) <= (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
+            data.flags_indv = self.integrand.dependency(data.comb_flags)
+            data.compute_flags = ~data.flags_indv
+            if np.sum(data.compute_flags)==0:
                 break # sufficiently estimated
-            elif 2*self.data.n_total>self.n_max:
+            elif 2*data.n_total>self.n_limit:
                 warning_s = """
                 Already generated %d samples.
-                Trying to generate %d new samples would exceeds n_max = %d.
+                Trying to generate %d new samples would exceeds n_limit = %d.
                 No more samples will be generated.
                 Note that error tolerances may not be satisfied. """ \
-                % (int(self.data.n_total),int(self.data.n_total),int(self.n_max))
+                % (int(data.n_total),int(data.n_total),int(self.n_limit))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
-            else:
-                n_min = n_max; n_max = 2*n_min
-                self.data.n += self.data.n*(self.data.compute_flags) # double sample size
-        self.data.integrand = self.integrand
-        self.data.true_measure = self.true_measure
-        self.data.discrete_distrib = self.discrete_distrib
-        self.data.stopping_crit = self
-        self.data.parameters = [
-            'solution',
-            'comb_bound_low',
-            'comb_bound_high',
-            'comb_flags',
-            'n_total',
-            'n',
-            'time_integrate']
-        self.data.datum = self.datum
-        self.data.time_integrate = time()-t_start
-        return self.data.solution,self.data
+            data.n_min = data.n_max
+            data.n_max = 2*data.n_min
+        data.stopping_crit = self
+        data.integrand = self.integrand
+        data.true_measure = self.integrand.true_measure
+        data.discrete_distrib = self.true_measure.discrete_distrib
+        data.time_integrate = time()-t_start
+        return data.solution,data
     
     def set_tolerance(self, abs_tol=None, rel_tol=None):
         """
@@ -232,10 +254,9 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
             rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
         """
-        if abs_tol != None: self.abs_tol = abs_tol
-        if rel_tol != None: self.rel_tol = rel_tol
-        
-        
-
-
-    
+        if abs_tol is not None:
+            self.abs_tol = abs_tol
+            self.abs_tols = np.full(self.integrand.d_comb,self.abs_tol)
+        if rel_tol is not None:
+            self.rel_tol = rel_tol
+            self.rel_tols = np.full(self.integrand.d_comb,self.rel_tol)    

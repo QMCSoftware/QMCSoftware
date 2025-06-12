@@ -1,5 +1,4 @@
 from ._cub_bayes_ld_g import _CubBayesLDG
-#from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
 from ..discrete_distribution import Lattice
 from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
 from ..util import fftbr,omega_fftbr,ParameterError#, ParameterWarning #MaxSamplesWarning,
@@ -169,29 +168,33 @@ class CubBayesLatticeG(_CubBayesLDG):
     """
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, order=2, alpha=0.01, ptransform='C1sin',
-                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol), errbd_type="MLE"):
-        """
+                 n_init=2**8, n_limit=2**22, alpha=0.01, ptransform='C1sin',
+                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol), 
+                 errbd_type="MLE", order=2,):
+        r"""
         Args:
-            integrand (AbstractIntegrand): an instance of AbstractIntegrand
-            abs_tol (np.ndarray): absolute error tolerance
-            rel_tol (np.ndarray): relative error tolerance
-            n_init (int): initial number of samples
-            n_max (int): maximum number of samples
-            order (int): Bernoulli kernel's order. If zero, choose order automatically
-            alpha (float): p-value
+            integrand (AbstractIntegrand): An AbstractIntegrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            error_fun (callable): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+
+                - The default $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \max\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
+                    means the approximation error must be below either the absolue error *or* relative error.
+                - Setting to $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \min\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
+                    means the approximation error must be below either the absolue error *and* relative error. 
             ptransform (str): periodization transform applied to the integrand
-            error_fun: function taking in the approximate solution vector,
-                absolute tolerance, and relative tolerance which returns the approximate error.
-                Default indicates integration until either absolute OR relative tolerance is satisfied.
             errbd_type (str): MLE, GCV, or FULL
+            order (int): Bernoulli kernel's order. If zero, choose order automatically
         """
         super(CubBayesLatticeG, self).__init__(integrand, ft=fftbr, omega=omega_fftbr,
                                                ptransform=ptransform,
                                                allowed_distribs=[Lattice],
                                                kernel=self._shift_inv_kernel,
                                                abs_tol=abs_tol, rel_tol=rel_tol,
-                                               n_init=n_init, n_limit=n_max, alpha=alpha, error_fun=error_fun, errbd_type=errbd_type)
+                                               n_init=n_init, n_limit=n_limit, alpha=alpha, error_fun=error_fun, errbd_type=errbd_type)
         self.order = order  # Bernoulli kernel's order. If zero, choose order automatically
         # private properties
         # full_Bayes - Full Bayes - assumes m and s^2 as hyperparameters

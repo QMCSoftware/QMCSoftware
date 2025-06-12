@@ -169,7 +169,7 @@ class CubQMCLatticeG(_CubQMCLDG):
         refer to the references below.
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_limit=2.**35,
         fudge=lambda m: 5.*2.**(-m), check_cone=False, ptransform='Baker',
         error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
         """
@@ -178,7 +178,7 @@ class CubQMCLatticeG(_CubQMCLDG):
             abs_tol (np.ndarray): absolute error tolerance
             rel_tol (np.ndarray): relative error tolerance
             n_init (int): initial number of samples
-            n_max (int): maximum number of samples
+            n_limit (int): maximum number of samples
             fudge (function): positive function multiplying the finite
                               sum of Fast Fourier coefficients specified 
                               in the cone of functions
@@ -187,7 +187,7 @@ class CubQMCLatticeG(_CubQMCLDG):
                 absolute tolerance, and relative tolerance which returns the approximate error. 
                 Default indicates integration until either absolute OR relative tolerance is satisfied.
         """
-        super(CubQMCLatticeG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,check_cone,
+        super(CubQMCLatticeG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_limit,fudge,check_cone,
             control_variates = [],
             control_variate_means = [],
             update_beta=False,

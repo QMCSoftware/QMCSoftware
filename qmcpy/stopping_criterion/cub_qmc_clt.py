@@ -177,11 +177,12 @@ class CubQMCCLT(AbstractStoppingCriterion):
         r"""
         Args:
             integrand (AbstractIntegrand): An AbstractIntegrand.
-            inflate (float): Inflation factor to multiply by the variance estimate to make it more conservative. Must be greater than or equal to 1.
-            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
             abs_tol (np.ndarray): Absolute error tolerance.
             rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
             n_limit (int): Maximum number of samples.
+            inflate (float): Inflation factor to multiply by the variance estimate to make it more conservative. Must be greater than or equal to 1.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
             error_fun (callable): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
 
                 - The default $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \max\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
@@ -211,8 +212,8 @@ class CubQMCCLT(AbstractStoppingCriterion):
         assert self.integrand.discrete_distrib.replications>1, "Require the discrete distribution has replications>1"
         assert self.integrand.discrete_distrib.randomize!="FALSE", "Require discrete distribution is randomized"
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
-        self.t_star = -t.ppf(self.alphas_indv/2,df=self.integrand.discrete_distrib.replications-1)
         self.set_tolerance(abs_tol,rel_tol)
+        self.t_star = -t.ppf(self.alphas_indv/2,df=self.integrand.discrete_distrib.replications-1)
         
     def integrate(self):
         t_start = time()
