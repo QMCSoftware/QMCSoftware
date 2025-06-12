@@ -157,8 +157,8 @@ class SensitivityIndices(AbstractIntegrand):
         f_x = self.integrand.f(x,*args,**kwargs)
         f_z = self.integrand.f(z,*args,**kwargs)
         for i in np.ndindex(self.indices.shape[:-1]):
-            flags_closed = compute_flags[0,0,*i]
-            flags_total = compute_flags[1,0,*i]
+            flags_closed = compute_flags[(0,0)+i]
+            flags_total = compute_flags[(1,0)+i]
             flags_i = flags_closed|flags_total
             if not flags_i.any(): continue
             u_bool = self.indices[i]
@@ -166,10 +166,10 @@ class SensitivityIndices(AbstractIntegrand):
             v[...,u_bool] = x[...,u_bool]
             v[...,not_u_bool] = z[...,not_u_bool]
             f_v = self.integrand.f(v,compute_flags=flags_i,*args,**kwargs)
-            y[0,0,*i,*self.i_slice] = f_x*(f_v-f_z) # A.18
-            y[1,0,*i,*self.i_slice] = (f_z-f_v)**2/2 # A.16
-            y[:,1,*i,*self.i_slice] = f_x[None,*self.i_slice] # mu
-            y[:,2,*i,*self.i_slice] = f_x[None,*self.i_slice]**2 # sigma^2+mu^2
+            y[(0,0)+i+self.i_slice] = f_x*(f_v-f_z) # A.18
+            y[(1,0)+i+self.i_slice] = (f_z-f_v)**2/2 # A.16
+            y[(slice(None),1)+i+self.i_slice] = f_x[(None,)+self.i_slice] # mu
+            y[(slice(None),2)+i+self.i_slice] = f_x[(None,)+self.i_slice]**2 # sigma^2+mu^2
             # here we copy mu and sigma^2+mu^2 since if these these were not copied there is a chance the bounds could change 
             # for mu and/or sigma and then an index which was previously approximated sufficiently woulud become insufficientlly approximated 
             # and it would then be difficult ot go back and resample the numerator for that approximation

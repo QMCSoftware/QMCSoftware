@@ -421,6 +421,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         if "NUS" in self.randomize:
             if self.alpha==1:
                 xrb = np.empty((r,n,d),dtype=np.uint64)
+                xb = np.ascontiguousarray(xb)
                 qmctoolscl.dnb2_nested_uniform_scramble(r,n,d,r_x,np.uint64(self._t_curr),np.uint64(self.t),self.rngs,self.root_nodes,xb,xrb)
                 xb = xrb
             else:

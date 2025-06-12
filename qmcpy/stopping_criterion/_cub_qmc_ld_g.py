@@ -81,7 +81,7 @@ class _CubQMCLDG(AbstractStoppingCriterion):
                 flipall = (flip[None,:]+additive[:,None]).flatten()
                 zeroadditive = np.zeros(len(additive),dtype=int) 
                 pidxs = [(pidx[None,:]+zeroadditive[:,None]).flatten() for pidx in prioridxs] # alternative to tiling
-                kappanumap[*pidxs,flipall],kappanumap[*pidxs,nl+flipall] = kappanumap[*pidxs,nl+flipall],kappanumap[*pidxs,flipall]
+                kappanumap[pidxs+flipall],kappanumap[pidxs+(nl+flipall)] = kappanumap[pidxs+(nl+flipall)],kappanumap[pidxs+flipall]
         return kappanumap
     
     def _beta_update(self, beta, kappanumap, ytildefull, ycvtildefull, mstart):
