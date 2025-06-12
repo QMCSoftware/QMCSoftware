@@ -247,7 +247,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
             data._ysums[data.compute_flags] += ynext[data.compute_flags].sum(-1)
             data.muhats = data._ysums/data.n_rep[...,None]
             data.solution_indv = data.muhats.mean(-1)
-            data.sigmahat = data.muhats.std(-1)
+            data.sigmahat = data.muhats.std(-1,ddof=1)
             data.ci_half_width = self.t_star*self.inflate*data.sigmahat/np.sqrt(self.discrete_distrib.replications)
             data.indv_bound_low = data.solution_indv-data.ci_half_width
             data.indv_bound_high = data.solution_indv+data.ci_half_width

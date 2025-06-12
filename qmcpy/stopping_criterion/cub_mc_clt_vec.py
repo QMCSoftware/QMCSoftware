@@ -211,7 +211,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             data.n[data.compute_flags] = data.n_max
             yfullfinite = np.isfinite(data.yfull)
             data.solution_indv = data.yfull.mean(-1,where=yfullfinite)
-            data.sigmahat = data.yfull.std(-1,where=yfullfinite)
+            data.sigmahat = data.yfull.std(-1,ddof=1,where=yfullfinite)
             data.ci_half_width = self.z_star*self.inflate*data.sigmahat/np.sqrt(data.n)
             data.indv_bound_low = data.solution_indv-data.ci_half_width
             data.indv_bound_high = data.solution_indv+data.ci_half_width
