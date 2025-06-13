@@ -3,8 +3,9 @@ from ._integrand import Integrand
 from ..true_measure import BrownianMotion
 from ..util import ParameterError
 from numpy import *
+from ._option import Option
 
-class BarrierOption(Integrand):
+class BarrierOption(Option):
     """
     Barrier Option. 
 
@@ -37,7 +38,7 @@ class BarrierOption(Integrand):
     """
 
     def __init__(self, sampler, volatility=0.2, start_price=30., strike_price=35., barrier_price = 38.,\
-        interest_rate=0.05, t_final=1., call_put='call',in_out = 'in',multilevel_dims = None, decomp_type='PCA', _dim_frac=0):
+        interest_rate=0.05, t_final=1., call_put='call', in_out='in', multilevel_dims=None, decomp_type='PCA', _dim_frac=0):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
@@ -53,54 +54,36 @@ class BarrierOption(Integrand):
                 Leave as None for single-level problems
             _dim_frac (float): for internal use only, users should not set this parameter. 
         """
+        super(BarrierOption, self).__init__(sampler, volatility, start_price,strike_price,
+                                            interest_rate, t_final, call_put, multilevel_dims,
+                                            _dim_frac)
 
-        self.parameters = ['volatility', 'call_put', 'start_price', 'strike_price', 'barrier_price', 'interest_rate','in_out']
-        self.sampler = sampler
-        self.true_measure = BrownianMotion(self.sampler,t_final,decomp_type=decomp_type)
-        self.volatility = float(volatility)
+        self.true_measure = BrownianMotion(self.sampler, t_final, decomp_type=decomp_type)
+
         if(barrier_price == start_price):
             raise ParameterError("Barrier Price must be greater or less than the start price. They can't be equal.")
-        self.start_price = float(start_price)
-        self.strike_price = float(strike_price)
+
         self.barrier_price = float(barrier_price)
-        self.interest_rate = float(interest_rate)
-        self.t_final = t_final
         self.decomp_type = decomp_type
-        self.call_put = call_put.lower()
-        if self.call_put not in ['call','put']:
-            raise ParameterError("call_put must be either 'call' or 'put'")
         self.in_out = in_out.lower()
+
         if self.in_out not in ['in', 'out']:
             raise ParameterError("in_out must be either 'in' or 'out'")
+        
         if(self.start_price < self.barrier_price):
             self.up = True
         else:
             self.up = False
+        
         if(self.in_out == 'in'):
             self.i = True
         else:
             self.i = False
+        
         if(self.call_put == 'call'):
             self.call = True
         else:
             self.call = False
-        # handle single vs multilevel
-        self.multilevel_dims = multilevel_dims
-        if self.multilevel_dims is not None: # multi-level problem
-            self.dim_fracs = array(
-                [0]+ [float(self.multilevel_dims[i])/float(self.multilevel_dims[i-1]) 
-                for i in range(1,len(self.multilevel_dims))],
-                dtype=float)
-            self.max_level = len(self.multilevel_dims)-1
-            self.leveltype = 'fixed-multi'
-            self.parent = True
-            self.parameters += ['multilevel_dims']
-        else: # single level problem
-            self.dim_frac = _dim_frac
-            self.leveltype = 'single'
-            self.parent = False
-            self.parameters += ['dim_frac']
-        super(BarrierOption,self).__init__(dimension_indv=1,dimension_comb=1,parallel=False)   
 
     def _get_discounted_payoffs(self,stock_path,dimension):
         """
@@ -145,15 +128,12 @@ class BarrierOption(Integrand):
         for xx,yy in zip(*where(self.s_fine<0)): # if stock becomes <=0, 0 out rest of path
             self.s_fine[xx,yy:] = 0
         y = self._get_discounted_payoffs(self.s_fine,self.d)
-        if self.dim_frac > 0:
-            s_course = self.s_fine[:, int(self.dim_frac - 1):: int(self.dim_frac)]
-            d_course = int(float(self.d) / self.dim_frac)
+        if self.dim_fracs > 0:
+            s_course = self.s_fine[:, int(self.dim_fracs - 1):: int(self.dim_fracs)]
+            d_course = int(float(self.d) / self.dim_fracs)
             y_course = self._get_discounted_payoffs(s_course, d_course)
             y -= y_course
         return y
-    
-    def _dimension_at_level(self, level):
-        return self.d if self.multilevel_dims is None else self.multilevel_dims[level]
         
     def _spawn(self, level, sampler):            
         return BarrierOption(

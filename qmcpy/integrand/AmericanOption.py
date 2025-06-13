@@ -67,7 +67,6 @@ class AmericanOption(Option):
         return y
     
     def _spawn(self, level, sampler):
-        breakpoint()
         return AmericanOption(
             sampler = sampler,
             volatility = self.volatility,
