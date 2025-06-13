@@ -1,10 +1,11 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
+from ..accumulate_data import AccumulateData
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
-from ..integrand import Keister, CustomFun
+from ..integrand import FinancialOption, Linear0, AbstractIntegrand
 from ..true_measure import Gaussian, Uniform
 from ..discrete_distribution import IIDStdUniform
-from ..util import _tol_fun, MaxSamplesWarning
+from ..util import _tol_fun, MaxSamplesWarning, ParameterError
 import numpy as np
 from scipy.optimize import fsolve
 from scipy.stats import norm
@@ -16,43 +17,112 @@ class CubMCG(AbstractStoppingCriterion):
     r"""
     Stopping criterion with guaranteed accuracy.
 
-    >>> k = Keister(IIDStdUniform(2,seed=7))
-    >>> sc = CubMCG(k,abs_tol=.05)
+    >>> ao = FinancialOption(IIDStdUniform(52,seed=7))
+    >>> sc = CubMCG(ao,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> data
-    MeanVarData (AccumulateData Object)
-        solution        1.807
-        error_bound     0.050
-        n_total         15256
-        n               14232
-        levels          1
+    AccumulateData (AccumulateData)
+        solution        1.779
+        bound_low       1.736
+        bound_high      1.823
+        bound_diff      0.087
+        n_total         112314
         time_integrate  ...
-    CubMCG (AbstractStoppingCriterion Object)
+    CubMCG (AbstractStoppingCriterion)
         abs_tol         0.050
         rel_tol         0
         n_init          2^(10)
-        n_max           10000000000
+        n_limit         2^(30)
         inflate         1.200
         alpha           0.010
-    Keister (AbstractIntegrand Object)
-    Gaussian (AbstractTrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
+        kurtmax         1.478
+    FinancialOption (AbstractIntegrand)
+        option          ASIAN
+        call_put        CALL
+        volatility      2^(-1)
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        t_final         1
+        asian_mean      ARITHMETIC
+    BrownianMotion (AbstractTrueMeasure)
+        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+        drift           0
+        mean            [0. 0. 0. ... 0. 0. 0.]
+        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                         ...
+                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
         decomp_type     PCA
-    IIDStdUniform (AbstractDiscreteDistribution Object)
-        d               2^(1)
+    IIDStdUniform (AbstractIIDDiscreteDistribution)
+        d               52
+        replications    1
         entropy         7
-        spawn_key       ()
-    >>> dd = IIDStdUniform(1,seed=7)
-    >>> k = Keister(dd)
-    >>> cv1 = CustomFun(Uniform(dd),lambda x: np.sin(np.pi*x).sum(1))
-    >>> cv1mean = 2/np.pi
-    >>> cv2 = CustomFun(Uniform(dd),lambda x: (-3*(x-.5)**2+1).sum(1))
-    >>> cv2mean = 3/4
-    >>> sc1 = CubMCG(k,abs_tol=.05,control_variates=[cv1,cv2],control_variate_means=[cv1mean,cv2mean])
-    >>> sol,data = sc1.integrate()
-    >>> print("%.4f"%sol)
-    1.3841
+
+    Control variates 
+
+    >>> iid = IIDStdUniform(52,seed=7)
+    >>> ao = FinancialOption(iid,option="ASIAN")
+    >>> eo = FinancialOption(iid,option="EUROPEAN")
+    >>> lin0 = Linear0(iid)
+    >>> sc = CubMCG(ao,abs_tol=.05,
+    ...     control_variates = [eo,lin0],
+    ...     control_variate_means = [eo.get_exact_value(),0])
+    >>> solution,data = sc.integrate()
+    >>> data
+    AccumulateData (AccumulateData)
+        solution        1.787
+        bound_low       1.748
+        bound_high      1.825
+        bound_diff      0.077
+        n_total         52147
+        time_integrate  ...
+    CubMCG (AbstractStoppingCriterion)
+        abs_tol         0.050
+        rel_tol         0
+        n_init          2^(10)
+        n_limit         2^(30)
+        inflate         1.200
+        alpha           0.010
+        kurtmax         1.478
+        cv              [FinancialOption (AbstractIntegrand)
+                             option          EUROPEAN
+                             call_put        CALL
+                             volatility      2^(-1)
+                             start_price     30
+                             strike_price    35
+                             interest_rate   0
+                             t_final         1               Linear0 (AbstractIntegrand)]
+        cv_mu           [4.211 0.   ]
+    FinancialOption (AbstractIntegrand)
+        option          ASIAN
+        call_put        CALL
+        volatility      2^(-1)
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        t_final         1
+        asian_mean      ARITHMETIC
+    BrownianMotion (AbstractTrueMeasure)
+        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+        drift           0
+        mean            [0. 0. 0. ... 0. 0. 0.]
+        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                         ...
+                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+        decomp_type     PCA
+    IIDStdUniform (AbstractIIDDiscreteDistribution)
+        d               52
+        replications    1
+        entropy         7
+    
 
     Original Implementation:
 
@@ -79,7 +149,7 @@ class CubMCG(AbstractStoppingCriterion):
         inequality would be satisfied: $\P(| mu - tmu | \\le tol\_fun) \\ge 1 - \\alpha$.
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_max=1e10,
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_limit=2**30,
                  inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
         """
         Args:
@@ -89,18 +159,18 @@ class CubMCG(AbstractStoppingCriterion):
             abs_tol: absolute error tolerance
             rel_tol: relative error tolerance
             n_init: initial number of samples
-            n_max: maximum number of samples
+            n_limit: maximum number of samples
             control_variates (list): list of integrand objects to be used as control variates.
                 Control variates are currently only compatible with single level problems. 
                 The same discrete distribution instance must be used for the integrand and each of the control variates. 
             control_variate_means (list): list of means for each control variate
         """
-        self.parameters = ['abs_tol','rel_tol','n_init','n_max','inflate','alpha']
+        self.parameters = ['abs_tol','rel_tol','n_init','n_limit','inflate','alpha','kurtmax']
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
         self.n_init = float(n_init)
-        self.n_max = float(n_max)
+        self.n_limit = float(n_limit)
         self.alpha = float(alpha)
         self.inflate = float(inflate)
         self.alpha_sigma = float(self.alpha) / 2.  # the uncertainty for variance estimation
@@ -110,85 +180,153 @@ class CubMCG(AbstractStoppingCriterion):
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.integrand.discrete_distrib
+        self.discrete_distrib = self.true_measure.discrete_distrib
+        super(CubMCG,self).__init__(allowed_levels=['single'],allowed_distribs=[AbstractIIDDiscreteDistribution],allow_vectorized_integrals=False)
+        assert self.integrand.d_indv==()
+        # control variates
+        self.cv_mu = np.atleast_1d(control_variate_means)
         self.cv = control_variates
-        self.cv_mu = control_variate_means
-        # Verify Compliant Construction
-        allowed_levels = ['single']
-        allowed_distribs = [IID]
-        allow_vectorized_integrals = False
-        super(CubMCG,self).__init__(allowed_levels, allowed_distribs, allow_vectorized_integrals)
+        if isinstance(self.cv,AbstractIntegrand):
+            self.cv = [self.cv]
+            self.cv_mu = self.cv_mu[None,...]
+        assert isinstance(self.cv,list), "cv must be a list of AbstractIntegrand objects"
+        for cv in self.cv:
+            if (not isinstance(cv,AbstractIntegrand)) or (cv.discrete_distrib!=self.discrete_distrib) or (cv.d_indv!=self.integrand.d_indv):
+                raise ParameterError('''
+                        Each control variates discrete distribution must be an AbstractIntegrand instance 
+                        with the same discrete distribution as the main integrand. d_indv must also match 
+                        that of the main integrand instance for each control variate.''')
+        self.ncv = len(self.cv)
+        if self.ncv>0:
+            assert self.cv_mu.shape==((self.ncv,)+self.integrand.d_indv), "Control variate means should have shape (len(control variates),d_indv)."
+            self.parameters += ['cv','cv_mu']
+        self.z_star = -norm.ppf(self.alpha/2.)
 
     def integrate(self):
-        """ See abstract method. """
-        # Construct AccumulateData Object to House Integration data
-        self.data = MeanVarData(self, self.integrand, self.true_measure, self.discrete_distrib, 
-            self.n_init, self.cv, self.cv_mu)  # house integration data
         t_start = time()
-        # Pilot Sample
-        self.data.update_data()
-        self.sigma_up = self.inflate * self.data.sighat
+        data = AccumulateData(
+            parameters = [
+                'solution',
+                'bound_low',
+                'bound_high',
+                'bound_diff',
+                'n_total',
+                'time_integrate'])
+        data.xfull = np.empty((0,self.integrand.d))
+        data.yfull = np.empty(0)
+        if self.ncv>0:
+            data.ycvfull = np.empty((self.ncv,0))
+        x0 = self.discrete_distrib(n=self.n_init)
+        data.xfull = np.concatenate([data.xfull,x0],0)
+        y0 = self.integrand.f(x0)
+        data.yfull = np.concatenate([data.yfull,y0],-1)
+        if self.ncv>0:
+            ycv0 = [None]*self.ncv
+            for k in range(self.ncv):
+                ycv0[k] = self.cv[k].f(x0)
+            ycv0 = np.stack(ycv0,0)
+            data.ycvfull = np.concatenate([data.ycvfull,ycv0],1)
+            cvmuhats = ycv0.mean(-1)
+            x4beta = ycv0-cvmuhats[:,None]
+            y4beta = y0-y0.mean()
+            self.beta = np.linalg.lstsq(x4beta.T,y4beta,rcond=None)[0]
+            y0 = y0-((ycv0-self.cv_mu[:,None])*self.beta[:,None]).sum(0)
+        data.sighat0 = y0.std(ddof=1)
+        data.solution0 = y0.mean()
+        sigma_up = self.inflate*data.sighat0
         if self.rel_tol == 0:
             self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
-            toloversig = self.abs_tol / self.sigma_up
-            # absolute error tolerance over sigma
-            n, self.data.error_bound = \
-                self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_max, self.sigma_up)
-            self.data.n[:] = n
-            if self.data.n_total + self.data.n > self.n_max:
+            toloversig = self.abs_tol / sigma_up
+            n_mu,error_bound = self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_limit, sigma_up)
+            data.n_mu = int(n_mu) 
+            if (self.n_init+data.n_mu)>self.n_limit:
                 # cannot generate this many new samples
-                n_low = int(self.n_max-self.data.n_total)
                 warning_s = """
                 Already generated %d samples.
-                Trying to generate %d new samples would exceeds n_max = %d.
-                Will instead generate %d samples to meet n_max total samples. 
-                Note that error tolerances may no longer be satisfied""" \
-                % (int(self.data.n_total), int(self.data.n), int(self.n_max), n_low)
+                Trying to generate %d new samples would exceed n_limit = %d.
+                Will instead generate %d new samples to reach n_limit.""" \
+                % (int(self.n_init),int(data.n_mu),int(self.n_limit-self.n_init))
                 warnings.warn(warning_s, MaxSamplesWarning)
-                self.data.n[:] = n_low
-            self.data.update_data()
+                data.n_mu = self.n_limit-self.n_init
+            x = self.discrete_distrib(n=data.n_mu)
+            data.xfull = np.concatenate([data.xfull,x],0)
+            y = self.integrand.f(x)
+            data.yfull = np.concatenate([data.yfull,y],-1)
+            if self.ncv>0:
+                ycv = [None]*self.ncv
+                for k in range(self.ncv):
+                    ycv[k] = self.cv[k].f(x)
+                ycv = np.stack(ycv,0)
+                data.ycvfull = np.concatenate([data.ycvfull,ycv],1)
+                y = y-((ycv-self.cv_mu[:,None])*self.beta[:,None]).sum(0)
+            data.sighat = y.std(ddof=1)
+            data.solution = y.mean()
+            data.bound_half_width = self.z_star*self.inflate*data.sighat/np.sqrt(data.n_mu)
+            data.bound_low = data.solution-data.bound_half_width
+            data.bound_high = data.solution+data.bound_half_width
+            data.bound_diff = data.bound_high-data.bound_low
+            data.n_total = self.n_init+data.n_mu 
         else: # self.rel_tol > 0
+            assert False, "for rel_tol>0 there is currently a bug giving eps1=error_bound=0"
             alphai = (self.alpha-self.alpha_sigma)/(2*(1-self.alpha_sigma)) # uncertainty to do iteration
             eps1 = self._ncbinv(1e4,alphai,self.kurtmax)
-            self.data.error_bound = self.sigma_up*eps1
+            error_bound = sigma_up*eps1
             tau = 1. # step of the iteration
-            self.data.n[:] = 1e4 # default initial sample size
+            n = 1e4 # default initial sample size
+            data.n_total = self.n_init
             while True:
-                if self.data.n_total + self.data.n > self.n_max:
+                if (data.n_total + n) > self.n_limit:
                     # cannot generate this many new samples
-                    n_low = int(self.n_max-self.data.n_total)
+                    n_low = int(self.n_limit-data.n_total)
                     warning_s = """
                     Already generated %d samples.
-                    Trying to generate %d new samples would exceeds n_max = %d.
-                    Will instead generate %d samples to meet n_max total samples. 
+                    Trying to generate %d new samples would exceeds n_limit = %d.
+                    Will instead generate %d samples to meet n_limit total samples. 
                     Note that error tolerances may no longer be satisfied""" \
-                    % (int(self.data.n_total), int(self.data.n), int(self.n_max), n_low)
+                    % (int(data.n_total), int(n), int(self.n_limit), n_low)
                     warnings.warn(warning_s, MaxSamplesWarning)
-                    self.data.n[:] = n_low
-                    self.data.update_data()
-                    break
-                self.data.update_data()
-                lb_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution-self.data.error_bound, 'max')
-                ub_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., self.data.solution+self.data.error_bound, 'max')
+                    n = n_low
+                x = self.discrete_distrib(n=n)
+                data.xfull = np.concatenate([data.xfull,x],0)
+                y = self.integrand.f(x)
+                data.yfull = np.concatenate([data.yfull,y],-1)
+                if self.ncv>0:
+                    ycv = [None]*self.ncv
+                    for k in range(self.ncv):
+                        ycv[k] = self.cv[k].f(x)
+                    ycv = np.stack(ycv,0)
+                    data.ycvfull = np.concatenate([data.ycvfull,ycv],1)
+                    y = y-((ycv-self.cv_mu[:,None])*self.beta[:,None]).sum(0)
+                data.sighat = y.std(ddof=1)
+                data.solution = y.mean()
+                data.bound_half_width = self.z_star*self.inflate*data.sighat/np.sqrt(n)
+                data.bound_low = data.solution-data.bound_half_width
+                data.bound_high = data.solution+data.bound_half_width
+                data.bound_diff = data.bound_high-data.bound_low
+                data.n_total += n
+                if data.n_total>=self.n_limit: break
+                lb_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., data.solution-error_bound, 'max')
+                ub_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., data.solution+error_bound, 'max')
                 delta_plus = (lb_tol + ub_tol) / 2.
-                if delta_plus >= self.data.error_bound:
+                if delta_plus >= error_bound:
                     # stopping criterion met
                     delta_minus = (lb_tol - ub_tol) / 2.
-                    self.data.solution += delta_minus # adjust solution a bit
+                    data.solution += delta_minus # adjust solution a bit
                     break
                 else:
-                    candidate_tol = np.maximum(self.abs_tol,.95*self.rel_tol*abs(self.data.solution))
-                    self.data.error_bound = np.minimum(self.data.error_bound/2.,candidate_tol)
+                    candidate_tol = np.maximum(self.abs_tol,.95*self.rel_tol*abs(data.solution))
+                    error_bound = np.minimum(error_bound/2.,candidate_tol)
                     tau += 1
                 # update next uncertainty
-                toloversig = self.data.error_bound / self.sigma_up
+                toloversig = error_bound / sigma_up
                 alphai = 2**tau * (self.alpha - self.alpha_sigma) / (1 - self.alpha_sigma)
-                n,_ = self._nchebe(toloversig, alphai, self.kurtmax, self.n_max, self.sigma_up)
-                self.data.n[:] = n
-        # set confidence interval
-        self.data.confid_int = self.data.solution + self.data.error_bound * np.array([-1, 1])
-        self.data.time_integrate = time() - t_start
-        return self.data.solution, self.data
+                n,_ = int(self._nchebe(toloversig, alphai, self.kurtmax, self.n_limit, sigma_up)[0])
+        data.stopping_crit = self
+        data.integrand = self.integrand
+        data.true_measure = self.integrand.true_measure
+        data.discrete_distrib = self.true_measure.discrete_distrib
+        data.time_integrate = time()-t_start
+        return data.solution,data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):
         ncheb = np.ceil(1 / (alpha * toloversig**2))  # sample size by Chebyshev's Inequality

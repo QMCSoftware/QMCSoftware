@@ -167,8 +167,6 @@ class CubMCCLT(AbstractStoppingCriterion):
         if self.ncv>0:
             assert self.cv_mu.shape==((self.ncv,)+self.integrand.d_indv), "Control variate means should have shape (len(control variates),d_indv)."
             self.parameters += ['cv','cv_mu']
-        self.vlstsq = np.vectorize(lambda x,y: np.linalg.lstsq(x.T,y,rcond=None)[0],signature="(k,m),(m)->(k)")
-        self.EPS = np.finfo(np.float32).eps
         self.z_star = -norm.ppf(self.alpha/2.)
 
     def integrate(self):

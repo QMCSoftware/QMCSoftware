@@ -18,9 +18,6 @@ class AbstractStoppingCriterion(object):
         if not isinstance(self.integrand.discrete_distrib,tuple(allowed_distribs)):
             raise DistributionCompatibilityError('%s must have an AbstractDiscreteDistribution in %s'%(sname,str(allowed_distribs)))
         # multilevel compatibility check
-        if (not allow_vectorized_integrals) and self.integrand.d_indv!=(1,):
-            raise ParameterError('Vectorized integrals (with d_indv>1 outputs per sample) are not supported by this stopping criterion')
-        # parameter checks
         if not hasattr(self,'parameters'):
             self.parameters = []
             
