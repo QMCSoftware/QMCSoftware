@@ -128,7 +128,6 @@ class _CubQMCLDG(AbstractStoppingCriterion):
                 ycvnext = np.stack(ycvnext,-2)
                 data.ycvfull = np.concatenate([data.ycvfull,ycvnext],-1)
             mllstart = m-self.r_lag-1
-            nllstart = int(2**mllstart)
             if data.n_min==0: # first iteration
                 n = int(2**m)
                 ytildefull = self.ft(ynext)/np.sqrt(n)

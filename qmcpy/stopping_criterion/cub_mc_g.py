@@ -1,5 +1,4 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
-from ..accumulate_data import MeanVarData
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..integrand import Keister, CustomFun
