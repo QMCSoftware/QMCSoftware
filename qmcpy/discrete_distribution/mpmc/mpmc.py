@@ -1,9 +1,57 @@
+from .._discrete_distribution import LD
 import torch
 import math
 from torch import nn
 from torch_cluster import radius_graph
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 from torch_geometric.nn import MessagePassing, InstanceNorm
+from numpy import *
+
+class MPMC(LD): 
+    def __init__(self, dimension = 2, seed = None):
+        """
+        Args:
+            dimension (int or ndarray): dimension of the generator.
+                If an int is passed in, use sequence dimensions [0,...,dimensions-1].
+                If a ndarray is passed in, use these dimension indices in the sequence.
+                Note that this is not relevant for IID generators.
+            seed (int or numpy.random.SeedSequence): seed to create random number generator
+        """
+        #necessary 
+        self.parameters = ['randomize']
+        self.mimics = 'StdUniform'
+        self.low_discrepancy = True
+        self.replications_gv = 1
+        
+        #no equivalent to generating vector? 
+        #randomization
+
+
+    def gen_samples(self, n = None, n_min = 0, n_max = 8):
+         """
+        IMPLEMENT ABSTRACT METHOD to generate samples from this discrete distribution.
+
+        Args:
+            args (tuple): tuple of positional argument. 
+
+        Returns:
+            ndarray: n x d array of samples
+        """
+    
+    def pdf(self, x):
+        """ pdf of a standard uniform """
+        return ones(x.shape[:-1], dtype=float)
+        
+    
+    def _spawn(self, dimension): 
+        """ 
+        assign parameters 
+        """
+    
+    
+    
+
+
 
 class MPNN_layer(MessagePassing):
     def __init__(self, ninp, nhid):
@@ -101,11 +149,6 @@ class MPMC_net(nn.Module):
 
         return disc_projections
 
-    # def returnx(self):
-    #     return self.x
-    
-    # def bark(self):
-    #     print("woof")
 
 
     def L2discrepancy(self, x):
