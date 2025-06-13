@@ -208,6 +208,7 @@ class Lattice(LD):
         else:
             raise ParameterError("invalid input for generating_matrices, see documentation and doctests.")
         super(Lattice,self).__init__(dimension,seed)
+        
         # randomization
         if isinstance(generating_vector,int):
             self.replications_gv = replications

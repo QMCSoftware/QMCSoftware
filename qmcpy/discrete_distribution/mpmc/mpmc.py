@@ -8,35 +8,62 @@ from torch_geometric.nn import MessagePassing, InstanceNorm
 from numpy import *
 
 class MPMC(LD): 
-    def __init__(self, dimension = 2, seed = None):
+    def __init__(self, dimension = 2, randomize = 'shift', seed = None, 
+                 dim_emph = None, d_max = None, replications = 1):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
                 If an int is passed in, use sequence dimensions [0,...,dimensions-1].
                 If a ndarray is passed in, use these dimension indices in the sequence.
                 Note that this is not relevant for IID generators.
+
             seed (int or numpy.random.SeedSequence): seed to create random number generator
+
+            randomize (bool): If True, apply shift to generated samples.
+                Note: Non-randomized lattice sequence includes the origin.
+
+            
+
         """
         #necessary 
         self.parameters = ['randomize']
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
-        self.replications_gv = 1
+        self.replications = replications
+        self.d_max = d_max
+
+        super(MPMC, self).__init__(dimension, seed)
         
-        #no equivalent to generating vector? 
         #randomization
+        
+        
 
 
-    def gen_samples(self, n = None, n_min = 0, n_max = 8):
-         """
+
+    def gen_samples(self, n = None, warn = True, return_unrandomized = False,):
+        """
         IMPLEMENT ABSTRACT METHOD to generate samples from this discrete distribution.
 
         Args:
-            args (tuple): tuple of positional argument. 
-
+            n (int): if n is supplied, generate from n_min=0 to n_max=n samples.
+                Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
+            return_unrandomized (bool): return samples without randomization as 2nd return value.
+                Will not be returned if randomize=False.
         Returns:
-            ndarray: n x d array of samples
+            ndarray: replicatsions x n x d array of samples
         """
+        #generate points  
+        d = self.d
+        r = self.replications
+        x = empty(r, n, d)
+        #randomize
+        if self.randomize == "FALSE":
+            return x 
+        elif self.randomize == "SHIFT":
+            xr = empty(r,n,d)
+            return (xr, x)
+    
+        
     
     def pdf(self, x):
         """ pdf of a standard uniform """
@@ -97,12 +124,19 @@ class MPMC_net(nn.Module):
         for i in range(nlayers):
             self.convs.append(MPNN_layer(nhid,nhid))
         self.dec = nn.Linear(nhid,dim)
+
+
+        #we decide
         self.nlayers = nlayers
         self.mse = torch.nn.MSELoss()
+        #replication
         self.nbatch = nbatch
+        #n- gen sample
         self.nsamples = nsamples
+        #dimension- 
         self.dim = dim
         self.n_projections = n_projections
+        #user input in gen samples 
         self.dim_emphasize = torch.tensor(dim_emphasize).long()
 
         ## random input points for transformation:
@@ -112,6 +146,7 @@ class MPMC_net(nn.Module):
         self.batch = batch
         self.edge_index = radius_graph(self.x, r=radius, loop=True, batch=batch).to(device)
 
+        #which one do we use? 
         if loss_fn == 'L2dis':
             self.loss_fn = self.L2discrepancy
         elif loss_fn == 'L2cen':
@@ -238,3 +273,70 @@ class MPMC_net(nn.Module):
         X = X.view(self.nbatch, self.nsamples, self.dim)
         loss = torch.mean(self.loss_fn(X))
         return loss, X
+
+    def train(args):
+        print("intrain")
+        model = MPMC_net(args.dim, args.nhid, args.nlayers, args.nsamples, args.nbatch,
+                        args.radius, args.loss_fn, args.dim_emphasize, args.n_projections).to(device)
+        optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+        best_loss = 10000.
+        patience = 0
+
+        ## could be tuned for better performance
+        start_reduce = 100000
+        reduce_point = 10
+
+        # Path('results/dim_' + str(args.dim) + '/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid)).mkdir(parents=True, exist_ok=True)
+        # Path('outputs/dim_' + str(args.dim) + '/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid)).mkdir(parents=True, exist_ok=True)
+
+        for epoch in tqdm(range(args.epochs), desc = f"Training: N={args.nsamples}, nhid={args.nhid}, loss={args.loss_fn}"):
+            model.train()
+            optimizer.zero_grad()
+            loss, X = model()
+            loss.backward()
+            optimizer.step()
+
+            if epoch % 100 ==0:
+                y = X.clone()
+                if args.loss_fn == 'L2dis':
+                    batched_discrepancies = L2discrepancy(y.detach())
+                elif args.loss_fn == 'L2cen':
+                    batched_discrepancies = L2center(y.detach())
+                elif args.loss_fn == 'L2ext':
+                    batched_discrepancies = L2ext(y.detach())
+                elif args.loss_fn == 'L2per':
+                    batched_discrepancies = L2per(y.detach())
+                elif args.loss_fn == 'L2sym':
+                    batched_discrepancies = L2sym(y.detach())
+                elif args.loss_fn == 'approx_hickernell':
+                    ## compute sum over all projections with emphasized dimensionality:
+                    batched_discrepancies = hickernell_all_emphasized(y.detach(),args.dim_emphasize)
+                else:
+                    print('Loss function not implemented')
+                min_discrepancy, mean_discrepancy = torch.min(batched_discrepancies).item(), torch.mean(batched_discrepancies).item()
+
+                if min_discrepancy < best_loss:
+                    best_loss = min_discrepancy
+                    f = open('results/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid) + '/Lf'+str(args.loss_fn) + '.txt', 'a')
+                    f.write(str(best_loss) + '\n')
+                    f.close()
+
+                    ## save MPMC points:
+                    PATH = 'outputs/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+ '/nhid_' +str(args.nhid)+ '/Lf'+str(args.loss_fn) + '.npy'
+                    y = y.detach().cpu().numpy()
+                    np.save(PATH,y)
+
+                if (min_discrepancy > best_loss and (epoch + 1) >= args.start_reduce):
+                    patience += 1
+
+                if (epoch + 1) >= args.start_reduce and patience == reduce_point:
+                    patience = 0
+                    args.lr /= 10.
+                    for param_group in optimizer.param_groups:
+                        param_group['lr'] = args.lr
+
+                if (args.lr < 1e-6):
+                    f = open('results/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid) + '/Lf'+str(args.loss_fn) + '.txt', 'a')
+                    f.write('### epochs: '+str(epoch) + '\n')
+                    f.close()
+                    break
