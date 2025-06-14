@@ -1,11 +1,17 @@
-from .brownian_motion import BrownianMotion
-# from .gaussian import Gaussian
-from numpy import exp, linspace, array, inf, minimum
-# from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+# from .brownian_motion import BrownianMotion
+# # from .gaussian import Gaussian
+# from numpy import exp, linspace, array, inf, minimum
+# # from ..discrete_distribution._discrete_distribution import DiscreteDistribution
+# from ..discrete_distribution import DigitalNetB2
+# # from ._true_measure import TrueMeasure
+# # from ..util import ParameterError, _univ_repr
+# # from numpy import *
+from .gaussian import Gaussian
+from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..discrete_distribution import DigitalNetB2
-# from ._true_measure import TrueMeasure
-# from ..util import ParameterError, _univ_repr
-# from numpy import *
+from ._true_measure import TrueMeasure
+from ..util import ParameterError, _univ_repr
+from numpy import *
 
 class GeometricBrownianMotion(BrownianMotion):
     """
@@ -68,13 +74,15 @@ class GeometricBrownianMotion(BrownianMotion):
         mu = self.drift
         t = self.time_vec
         min_t = minimum.outer(t, t)  # minimum of t_i and t_j for all pairs
-        cov_matrix = (S0 ** 2) * exp(2 * mu * min_t) * (exp(self.diffusion ** 2 * min_t) - 1)
+        #cov_matrix = (S0 ** 2) * exp(2 * mu * min_t) * (exp(self.diffusion ** 2 * min_t) - 1)
+        cov_matrix = (S0 ** 2) * exp(2 * mu * min_t) * (exp(self.diffusion * min_t) - 1)
         return cov_matrix
 
 
     def _transform(self, x):
         bm_samples = super()._transform(x)
-        return self.initial_value * exp((self.drift - 0.5 * self.diffusion ** 2) * self.time_vec + bm_samples)
+        #return self.initial_value * exp((self.drift - 0.5 * self.diffusion ** 2) * self.time_vec + bm_samples)
+        return self.initial_value * exp((self.drift - 0.5 * self.diffusion) * self.time_vec + bm_samples)
 
     def _spawn(self, sampler, dimension):
         return GeometricBrownianMotion(
