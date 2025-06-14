@@ -7,7 +7,7 @@ from ..true_measure import Gaussian, Uniform
 from ..discrete_distribution import IIDStdUniform
 from ..util import _tol_fun, MaxSamplesWarning, ParameterError
 import numpy as np
-from scipy.optimize import fsolve
+from scipy.optimize import root_scalar
 from scipy.stats import norm
 from time import time
 import warnings
@@ -23,9 +23,9 @@ class CubMCG(AbstractStoppingCriterion):
     >>> data
     AccumulateData (AccumulateData)
         solution        1.779
-        bound_low       1.736
-        bound_high      1.823
-        bound_diff      0.087
+        bound_low       1.729
+        bound_high      1.829
+        bound_diff      0.100
         n_total         112314
         time_integrate  ...
     CubMCG (AbstractStoppingCriterion)
@@ -75,9 +75,9 @@ class CubMCG(AbstractStoppingCriterion):
     >>> data
     AccumulateData (AccumulateData)
         solution        1.787
-        bound_low       1.748
-        bound_high      1.825
-        bound_diff      0.077
+        bound_low       1.737
+        bound_high      1.837
+        bound_diff      0.100
         n_total         52147
         time_integrate  ...
     CubMCG (AbstractStoppingCriterion)
@@ -123,6 +123,114 @@ class CubMCG(AbstractStoppingCriterion):
         replications    1
         entropy         7
     
+    Relative tolerance 
+
+    >>> ao = FinancialOption(IIDStdUniform(52,seed=7))
+    >>> sc = CubMCG(ao,abs_tol=1e-3,rel_tol=5e-2)
+    >>> solution,data = sc.integrate()
+    >>> data
+    AccumulateData (AccumulateData)
+        solution        1.743
+        bound_low       1.661
+        bound_high      1.825
+        bound_diff      0.164
+        n_total         27503
+        time_integrate  ...
+    CubMCG (AbstractStoppingCriterion)
+        abs_tol         0.001
+        rel_tol         0.050
+        n_init          2^(10)
+        n_limit         2^(30)
+        inflate         1.200
+        alpha           0.010
+        kurtmax         1.478
+    FinancialOption (AbstractIntegrand)
+        option          ASIAN
+        call_put        CALL
+        volatility      2^(-1)
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        t_final         1
+        asian_mean      ARITHMETIC
+    BrownianMotion (AbstractTrueMeasure)
+        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+        drift           0
+        mean            [0. 0. 0. ... 0. 0. 0.]
+        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                         ...
+                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+        decomp_type     PCA
+    IIDStdUniform (AbstractIIDDiscreteDistribution)
+        d               52
+        replications    1
+        entropy         7
+    
+
+    Relative tolerance and control variates 
+
+    >>> iid = IIDStdUniform(52,seed=7)
+    >>> ao = FinancialOption(iid,option="ASIAN")
+    >>> eo = FinancialOption(iid,option="EUROPEAN")
+    >>> lin0 = Linear0(iid)
+    >>> sc = CubMCG(ao,abs_tol=1e-3,rel_tol=5e-2,
+    ...     control_variates = [eo,lin0],
+    ...     control_variate_means = [eo.get_exact_value(),0])
+    >>> solution,data = sc.integrate()
+    >>> data
+    AccumulateData (AccumulateData)
+        solution        1.776
+        bound_low       1.692
+        bound_high      1.859
+        bound_diff      0.167
+        n_total         12074
+        time_integrate  ...
+    CubMCG (AbstractStoppingCriterion)
+        abs_tol         0.001
+        rel_tol         0.050
+        n_init          2^(10)
+        n_limit         2^(30)
+        inflate         1.200
+        alpha           0.010
+        kurtmax         1.478
+        cv              [FinancialOption (AbstractIntegrand)
+                             option          EUROPEAN
+                             call_put        CALL
+                             volatility      2^(-1)
+                             start_price     30
+                             strike_price    35
+                             interest_rate   0
+                             t_final         1               Linear0 (AbstractIntegrand)]
+        cv_mu           [4.211 0.   ]
+    FinancialOption (AbstractIntegrand)
+        option          ASIAN
+        call_put        CALL
+        volatility      2^(-1)
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        t_final         1
+        asian_mean      ARITHMETIC
+    BrownianMotion (AbstractTrueMeasure)
+        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+        drift           0
+        mean            [0. 0. 0. ... 0. 0. 0.]
+        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                         ...
+                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+        decomp_type     PCA
+    IIDStdUniform (AbstractIIDDiscreteDistribution)
+        d               52
+        replications    1
+        entropy         7
 
     Original Implementation:
 
@@ -149,7 +257,7 @@ class CubMCG(AbstractStoppingCriterion):
         inequality would be satisfied: $\P(| mu - tmu | \\le tol\_fun) \\ge 1 - \\alpha$.
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024., n_limit=2**30,
+    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024, n_limit=2**30,
                  inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
         """
         Args:
@@ -200,7 +308,6 @@ class CubMCG(AbstractStoppingCriterion):
         if self.ncv>0:
             assert self.cv_mu.shape==((self.ncv,)+self.integrand.d_indv), "Control variate means should have shape (len(control variates),d_indv)."
             self.parameters += ['cv','cv_mu']
-        self.z_star = -norm.ppf(self.alpha/2.)
 
     def integrate(self):
         t_start = time()
@@ -237,7 +344,7 @@ class CubMCG(AbstractStoppingCriterion):
         if self.rel_tol == 0:
             self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
             toloversig = self.abs_tol / sigma_up
-            n_mu,error_bound = self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_limit, sigma_up)
+            n_mu,data.bound_half_width = self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_limit, sigma_up)
             data.n_mu = int(n_mu) 
             if (self.n_init+data.n_mu)>self.n_limit:
                 # cannot generate this many new samples
@@ -259,33 +366,26 @@ class CubMCG(AbstractStoppingCriterion):
                 ycv = np.stack(ycv,0)
                 data.ycvfull = np.concatenate([data.ycvfull,ycv],1)
                 y = y-((ycv-self.cv_mu[:,None])*self.beta[:,None]).sum(0)
-            data.sighat = y.std(ddof=1)
             data.solution = y.mean()
-            data.bound_half_width = self.z_star*self.inflate*data.sighat/np.sqrt(data.n_mu)
-            data.bound_low = data.solution-data.bound_half_width
-            data.bound_high = data.solution+data.bound_half_width
-            data.bound_diff = data.bound_high-data.bound_low
             data.n_total = self.n_init+data.n_mu 
         else: # self.rel_tol > 0
-            assert False, "for rel_tol>0 there is currently a bug giving eps1=error_bound=0"
             alphai = (self.alpha-self.alpha_sigma)/(2*(1-self.alpha_sigma)) # uncertainty to do iteration
-            eps1 = self._ncbinv(1e4,alphai,self.kurtmax)
-            error_bound = sigma_up*eps1
-            tau = 1. # step of the iteration
-            n = 1e4 # default initial sample size
+            eps1 = self._ncbinv(self.n_init,alphai,self.kurtmax)
+            data.bound_half_width = sigma_up*eps1
+            data.tau = 1. # step of the iteration
+            n = self.n_init # default initial sample size
             data.n_total = self.n_init
             while True:
                 if (data.n_total + n) > self.n_limit:
                     # cannot generate this many new samples
-                    n_low = int(self.n_limit-data.n_total)
                     warning_s = """
                     Already generated %d samples.
                     Trying to generate %d new samples would exceeds n_limit = %d.
                     Will instead generate %d samples to meet n_limit total samples. 
                     Note that error tolerances may no longer be satisfied""" \
-                    % (int(data.n_total), int(n), int(self.n_limit), n_low)
+                    % (int(data.n_total), int(n), int(self.n_limit), int(self.n_limit-data.n_total))
                     warnings.warn(warning_s, MaxSamplesWarning)
-                    n = n_low
+                    n = self.n_limit-data.n_total
                 x = self.discrete_distrib(n=n)
                 data.xfull = np.concatenate([data.xfull,x],0)
                 y = self.integrand.f(x)
@@ -297,30 +397,28 @@ class CubMCG(AbstractStoppingCriterion):
                     ycv = np.stack(ycv,0)
                     data.ycvfull = np.concatenate([data.ycvfull,ycv],1)
                     y = y-((ycv-self.cv_mu[:,None])*self.beta[:,None]).sum(0)
-                data.sighat = y.std(ddof=1)
                 data.solution = y.mean()
-                data.bound_half_width = self.z_star*self.inflate*data.sighat/np.sqrt(n)
-                data.bound_low = data.solution-data.bound_half_width
-                data.bound_high = data.solution+data.bound_half_width
-                data.bound_diff = data.bound_high-data.bound_low
                 data.n_total += n
                 if data.n_total>=self.n_limit: break
-                lb_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., data.solution-error_bound, 'max')
-                ub_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., data.solution+error_bound, 'max')
+                lb_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., data.solution-data.bound_half_width, 'max')
+                ub_tol = _tol_fun(self.abs_tol, self.rel_tol, 0., data.solution+data.bound_half_width, 'max')
                 delta_plus = (lb_tol + ub_tol) / 2.
-                if delta_plus >= error_bound:
+                if delta_plus >= data.bound_half_width:
                     # stopping criterion met
                     delta_minus = (lb_tol - ub_tol) / 2.
                     data.solution += delta_minus # adjust solution a bit
                     break
                 else:
                     candidate_tol = np.maximum(self.abs_tol,.95*self.rel_tol*abs(data.solution))
-                    error_bound = np.minimum(error_bound/2.,candidate_tol)
-                    tau += 1
+                    data.bound_half_width = np.minimum(data.bound_half_width/2.,candidate_tol)
+                    data.tau += 1
                 # update next uncertainty
-                toloversig = error_bound / sigma_up
-                alphai = 2**tau * (self.alpha - self.alpha_sigma) / (1 - self.alpha_sigma)
-                n,_ = int(self._nchebe(toloversig, alphai, self.kurtmax, self.n_limit, sigma_up)[0])
+                toloversig = data.bound_half_width / sigma_up
+                alphai = 2**data.tau * (self.alpha - self.alpha_sigma) / (1 - self.alpha_sigma)
+                n = int(self._nchebe(toloversig, alphai, self.kurtmax, self.n_limit, sigma_up)[0])
+        data.bound_low = data.solution-data.bound_half_width
+        data.bound_high = data.solution+data.bound_half_width
+        data.bound_diff = data.bound_high-data.bound_low
         data.stopping_crit = self
         data.integrand = self.integrand
         data.true_measure = self.integrand.true_measure
@@ -329,6 +427,7 @@ class CubMCG(AbstractStoppingCriterion):
         return data.solution,data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):
+        _b = -norm.ppf(np.finfo(float).eps)
         ncheb = np.ceil(1 / (alpha * toloversig**2))  # sample size by Chebyshev's Inequality
         A = 18.1139
         A1 = 0.3328
@@ -341,8 +440,10 @@ class CubMCG(AbstractStoppingCriterion):
             A * M3upper / (1 + (np.exp(logsqrtn) * toloversig)**3))
             - alpha / 2.)
         # Berry-Esseen function, whose solution is the sample size needed
-        logsqrtnCLT = np.log(norm.ppf(1 - alpha / 2) / toloversig)  # sample size by CLT
-        nbe = np.ceil(np.exp(2 * fsolve(BEfun2, logsqrtnCLT)))
+        logsqrtnCLT = np.log(norm.ppf(1 - alpha / 2) / toloversig)
+        # sample size by CLT
+        rsdata = root_scalar(BEfun2,x0=logsqrtnCLT,method='toms748',bracket=(-_b,_b))
+        nbe = np.ceil(np.exp(2 * rsdata.root))
         # calculate Berry-Esseen n by fsolve function (scipy)
         ncb = np.minimum(np.minimum(ncheb, nbe), n_budget)  # take the min of two sample sizes
         logsqrtn = np.log(np.sqrt(ncb))
@@ -351,10 +452,12 @@ class CubMCG(AbstractStoppingCriterion):
             + np.exp(-logsqrtn) * np.minimum(A1 * (M3upper + A2),
             A * M3upper / (1 + (np.exp(logsqrtn) * toloversig)**3))
             - alpha / 2.)
-        err = fsolve(BEfun3, toloversig) * sigma_0_up
+        rsdata = root_scalar(BEfun3,x0=toloversig,method='toms748',bracket=(-_b,_b))
+        err = rsdata.root * sigma_0_up
         return ncb, err
 
     def _ncbinv(self, n1, alpha1, kurtmax):
+        _b = -norm.ppf(np.finfo(float).eps)
         NCheb_inv = 1/np.sqrt(n1*alpha1)
         # use Chebyshev inequality
         A = 18.1139
@@ -369,7 +472,8 @@ class CubMCG(AbstractStoppingCriterion):
         # Berry-Esseen inequality
         logsqrtb_clt = np.log(np.sqrt(norm.ppf(1-alpha1/2)/np.sqrt(n1)))
         # use CLT to get tolerance
-        NBE_inv = np.exp(2*fsolve(BEfun,logsqrtb_clt))
+        rsdata = root_scalar(BEfun,x0=logsqrtb_clt,method='toms748',bracket=(-_b,_b))
+        NBE_inv = np.exp(2*rsdata.root)
         # use fsolve to get Berry-Esseen tolerance
         eps = np.minimum(NCheb_inv,NBE_inv)
         # take the min of Chebyshev and Berry Esseen tolerance
