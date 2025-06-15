@@ -4,7 +4,8 @@ from ..true_measure import BrownianMotion
 from ..util import ParameterError
 from numpy import *
 from ._option import Option
-
+from scipy.stats import norm
+ 
 
 class AsianOption(Option):
     """
@@ -38,7 +39,7 @@ class AsianOption(Option):
     """
                           
     def __init__(self, sampler, volatility=0.5, start_price=30., strike_price=35.,\
-        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multilevel_dims=None, decomp_type='PCA', _dim_frac=0):
+        interest_rate=0., t_final=1, call_put='call', mean_type='arithmetic', multilevel_dims=None, decomp_type='PCA', _dim_frac=0, rule="trapezoidal"):
         """
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A 
@@ -58,7 +59,9 @@ class AsianOption(Option):
         self.mean_type = mean_type.lower()
         if self.mean_type not in ['arithmetic','geometric']:
             raise ParameterError("mean_type must either 'arithmetic' or 'geometric'")
-        
+        self.rule = rule.lower()
+        if self.rule not in ['trapezoidal','right']:
+            raise ParameterError("rule must either 'trapezoidal' or 'right'")
         super(AsianOption, self).__init__(sampler, volatility, start_price,
                                           strike_price, interest_rate, t_final,
                                           call_put, multilevel_dims, _dim_frac)
@@ -76,15 +79,21 @@ class AsianOption(Option):
             ndarray: n vector of discounted payoffs
         """
         if self.mean_type == 'arithmetic':
-            avg = (self.start_price / 2. +
-                   stock_path[:, :-1].sum(1) +
-                   stock_path[:, -1] / 2.) / \
-                float(dimension)
+            if self.rule=='trapezoidal':
+                avg = (self.start_price / 2. +
+                    stock_path[:, :-1].sum(1) +
+                    stock_path[:, -1] / 2.) / \
+                    float(dimension)
+            elif self.rule=='right':
+                avg = stock_path.sum(-1)/dimension
         elif self.mean_type == 'geometric':
-            avg = exp((log(self.start_price) / 2. +
+            if self.rule=='trapezoidal':
+                avg = exp((log(self.start_price) / 2. +
                        log(stock_path[:, :-1]).sum(1) +
                        log(stock_path[:, -1]) / 2.) /
                       float(dimension))
+            elif self.rule=='right':
+                avg = exp(log(stock_path).sum(-1)/dimension)
         if self.call_put == 'call':
             y_raw = maximum(avg - self.strike_price, 0)
         else: # put
@@ -110,7 +119,34 @@ class AsianOption(Option):
             y_coarse = self._get_discounted_payoffs(s_coarse, d_coarse)
             y -= y_coarse
         return y
+    
+    def eurogbmprice(self, S0, r, T, sigma, K):
+        priceratio = K * exp(-r * T) / S0
+        xbig = log(priceratio) / (sigma * sqrt(T)) + sigma * sqrt(T)/2
+        xsmall = log(priceratio) / (sigma * sqrt(T)) - sigma * sqrt(T)/2
+        putprice = S0 * (priceratio*norm.cdf(xbig) - norm.cdf(xsmall))
+        callprice = putprice + S0 * (1-priceratio)
+        return callprice,putprice
+    
+    def get_exact_value(self):
+        """
+        Get the fair price of a Asian call/put option with geometric mean and right quadrature rule.
         
+        Return:
+            float: fair price
+        """
+        assert self.mean_type=="geometric" and self.rule=='right', "can only get the exact value of a geometric asian option"
+        nstep = self.d
+        Tbar = (1+1/nstep) * self.t_final / 2
+        sigmabar = self.volatility * sqrt((2 + 1 / nstep) / 3)
+        rbar = self.interest_rate + (sigmabar**2 - self.volatility**2) / 2
+        gmeancall,gmeanput = self.eurogbmprice(self.start_price, rbar, Tbar, sigmabar, self.strike_price)
+        if self.call_put == 'call':
+            fp = gmeancall * exp(rbar * Tbar - self.interest_rate*self.t_final)
+        elif self.call_put == 'put':
+            fp = gmeanput * exp(rbar * Tbar - self.interest_rate*self.t_final)
+        return fp
+    
     def _spawn(self, level, sampler):            
         return AsianOption(
             sampler = sampler,
