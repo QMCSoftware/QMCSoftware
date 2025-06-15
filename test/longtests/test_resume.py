@@ -1,7 +1,6 @@
 import unittest
 from qmcpy import *
 import numpy as np
-import time
 
 
 class TestResumeFeature(unittest.TestCase):
@@ -11,11 +10,11 @@ class TestResumeFeature(unittest.TestCase):
         """Set up common test parameters."""
         self.seed = 7
         self.dimension = 2
-        self.loose_abs_tol = 0.2  # Increase from 0.1 to make convergence easier
-        self.tight_abs_tol = 0.05  # Increase from 0.01 to make convergence easier
+        self.loose_abs_tol = 0.2  
+        self.tight_abs_tol = 0.05  
         self.rel_tol = 0
         self.n_init = 2**8
-        self.n_max = 2**16  # Set high default n_max to avoid MaxSamplesWarning
+        self.n_max = 2**16  
 
     def test_bayesian_lattice_resume(self):
         """Test CubBayesLatticeG resume functionality."""
