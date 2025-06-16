@@ -3,7 +3,7 @@ from ..util import DistributionCompatibilityError, ParameterError, MethodImpleme
 from numpy import *
 
 # Diagnostic flag and utility for all stopping criteria
-IS_PRINT_DIAGNOSTIC = False
+IS_PRINT_DIAGNOSTIC = True
 
 def print_diagnostic(label, data):
     """
@@ -12,7 +12,18 @@ def print_diagnostic(label, data):
         label (str): Label for the diagnostic print (e.g., '[RESUME] Before resuming:').
         data (object): Data object containing integration state.
     """
-    print(f"{label}: solution: {getattr(data, 'solution', None)}, n_total: {getattr(data, 'n_total', None)}, n_min: {getattr(data, 'n_min', None)}, m: {getattr(data, 'm', None)}; xfull.shape: {getattr(data, 'xfull', None).shape if getattr(data, 'xfull', None) is not None else None}")
+    solution = getattr(data, 'solution', None)
+    m = getattr(data, 'm', None)
+    n_total = getattr(data, 'n_total', None)
+    n_min = getattr(data, 'n_min', None)
+    xfull = getattr(data, 'xfull', None)
+    solution_display = solution[0] if isinstance(solution, (list, tuple, ndarray)) and solution else solution
+    m_display = int(m[0]) if isinstance(m, (list, tuple, ndarray)) and m else (int(m) if m is not None else None)
+    n_total_display = int(n_total) if n_total is not None else None
+    xfull_shape = getattr(xfull, 'shape', None)
+    n_total_formatted = f"{n_total_display:>10}" if n_total_display is not None else f"{'None':>10}"
+    solution_formatted = f"{solution_display:>10.7f}" if solution_display is not None and not (isinstance(solution_display, float) and solution_display != solution_display) else f"{'nan':>10}"
+    print(f"{label}: solution: {solution_formatted}, n_total: {n_total_formatted}, n_min: {n_min:>10}, m: {m_display:>4}, xfull.shape: {xfull_shape}")
 
 
 class StoppingCriterion(object):
@@ -90,5 +101,6 @@ class StoppingCriterion(object):
             alpha_k_mat[alpha_k_mat==0] = 1
             alphas_indv = minimum(alphas_indv,alpha_k_mat)
         return alphas_indv,identity_dependency
+    
     def __repr__(self):
         return _univ_repr(self, "StoppingCriterion", self.parameters)
