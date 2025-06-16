@@ -2,7 +2,6 @@ from ..true_measure._true_measure import TrueMeasure
 from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
 import pickle
 import os
-import warnings
 
 class AccumulateData(object):
     """ Accumulated Data abstract class. DO NOT INSTANTIATE. """
