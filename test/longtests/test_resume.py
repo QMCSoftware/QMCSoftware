@@ -14,10 +14,35 @@ class TestResumeFeature(unittest.TestCase):
         self.tight_abs_tol = 0.05  
         self.rel_tol = 0
         self.n_init = 2**8
-        self.n_max = 2**16  
+        self.n_max = 2**16
+    
+    # ========================
+    # UTILITY TESTS
+    # ========================
+
+    def test_resume_none_is_equivalent_to_fresh_start(self):
+        """Test that resume=None gives same result as fresh start."""
+        # Set up problem
+        discrete_distrib = Lattice(self.dimension, seed=self.seed)
+        true_measure = Gaussian(discrete_distrib)
+        integrand = Keister(true_measure)
+        
+        # Fresh start
+        sc1 = CubQMCLatticeG(integrand, abs_tol=self.loose_abs_tol, 
+                             rel_tol=self.rel_tol, n_init=self.n_init, n_max=self.n_max)
+        sol1, data1 = sc1.integrate()
+        
+        # Resume with None (should be identical to fresh start)
+        sc2 = CubQMCLatticeG(integrand, abs_tol=self.loose_abs_tol, 
+                             rel_tol=self.rel_tol, n_init=self.n_init, n_max=self.n_max)
+        sol2, data2 = sc2.integrate(resume=None)
+        
+        # Results should be identical
+        self.assertTrue(np.allclose(sol1, sol2, rtol=1e-10), "resume=None should give same result as fresh start")
+        self.assertEqual(data1.n_total, data2.n_total, "resume=None should use same number of samples")
 
     # ========================
-    # MONTE CARLO (MC) TESTS
+    # MONTE CARLO TESTS
     # ========================
 
     def test_mc_clt_resume(self):
@@ -87,7 +112,6 @@ class TestResumeFeature(unittest.TestCase):
         # Set up problem
         discrete_distrib = IIDStdUniform(self.dimension, seed=self.seed)
         true_measure = Uniform(discrete_distrib, lower_bound=0, upper_bound=1)
-        # Use a non-constant function to avoid numerical issues
         integrand = CustomFun(true_measure, g=lambda x: np.sum(x**2, axis=1) + 0.1)
         
         # Initial run with loose tolerance
@@ -140,60 +164,6 @@ class TestResumeFeature(unittest.TestCase):
             
         except Exception as e:
             self.skipTest(f"CubMCML test skipped due to: {str(e)}")
-
-    def test_cub_mc_clt_resume(self):
-        """Test CubMCCLT resume functionality."""
-        dim = 2
-        abs_tol1 = 0.1
-        abs_tol2 = 0.01
-        rel_tol = 0
-
-        # Initial run with larger tolerance
-        discrete_distrib = IIDStdUniform(dim, seed=7)
-        true_measure = Uniform(discrete_distrib, lower_bound=0, upper_bound=1)
-        integrand = CustomFun(true_measure, g=lambda x: np.sum(x, axis=1))
-        stopping_criterion = CubMCCLT(integrand, abs_tol=abs_tol1, rel_tol=rel_tol, n_init=2**8, n_max=2**16)
-
-        sol1, data1 = stopping_criterion.integrate()
-
-        # Resume with tighter tolerance
-        stopping_criterion = CubMCCLT(integrand, abs_tol=abs_tol2, rel_tol=rel_tol, n_init=2**8, n_max=2**16)
-        sol2, data2 = stopping_criterion.integrate(resume=data1)
-
-        # Fresh run with tighter tolerance
-        stopping_criterion = CubMCCLT(integrand, abs_tol=abs_tol2, rel_tol=rel_tol, n_init=2**8, n_max=2**16)
-        sol3, data3 = stopping_criterion.integrate()
-
-        # Assertions
-        self.assertTrue(data2.n_total >= data1.n_total, "Resume should not reduce sample count")
-        self.assertTrue(np.allclose(sol2, sol3, rtol=2*abs_tol2), "Resume and fresh runs should give similar results")
-
-    def test_cub_mc_g_resume(self):
-        """Test CubMCG resume functionality."""
-        dim = 2
-        abs_tol1 = 0.1
-        abs_tol2 = 0.01
-        rel_tol = 0
-
-        # Initial run with larger tolerance
-        discrete_distrib = IIDStdUniform(dim, seed=7)
-        true_measure = Uniform(discrete_distrib, lower_bound=0, upper_bound=1)
-        integrand = CustomFun(true_measure, g=lambda x: np.sum(x**2, axis=1) + 0.1)
-        stopping_criterion = CubMCG(integrand, abs_tol=abs_tol1, rel_tol=rel_tol, n_init=2**8, n_max=2**16)
-
-        sol1, data1 = stopping_criterion.integrate()
-
-        # Resume with tighter tolerance
-        stopping_criterion = CubMCG(integrand, abs_tol=abs_tol2, rel_tol=rel_tol, n_init=2**8, n_max=2**16)
-        sol2, data2 = stopping_criterion.integrate(resume=data1)
-
-        # Fresh run with tighter tolerance
-        stopping_criterion = CubMCG(integrand, abs_tol=abs_tol2, rel_tol=rel_tol, n_init=2**8, n_max=2**16)
-        sol3, data3 = stopping_criterion.integrate()
-
-        # Assertions
-        self.assertTrue(data2.n_total >= data1.n_total, "Resume should not reduce sample count")
-        self.assertTrue(np.allclose(sol2, sol3, rtol=2*abs_tol2), "Resume and fresh runs should give similar results")
 
     # ================================
     # QUASI-MONTE CARLO (QMC) TESTS
@@ -392,27 +362,4 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(data2.n_total >= data1.n_total, "Resume should not reduce sample count")
         self.assertTrue(np.allclose(sol2, sol3, rtol=2*self.tight_abs_tol), "Resume and fresh runs should give similar results")
 
-    # ========================
-    # UTILITY TESTS
-    # ========================
 
-    def test_resume_none_is_equivalent_to_fresh_start(self):
-        """Test that resume=None gives same result as fresh start."""
-        # Set up problem
-        discrete_distrib = Lattice(self.dimension, seed=self.seed)
-        true_measure = Gaussian(discrete_distrib)
-        integrand = Keister(true_measure)
-        
-        # Fresh start
-        sc1 = CubQMCLatticeG(integrand, abs_tol=self.loose_abs_tol, 
-                             rel_tol=self.rel_tol, n_init=self.n_init, n_max=self.n_max)
-        sol1, data1 = sc1.integrate()
-        
-        # Resume with None (should be identical to fresh start)
-        sc2 = CubQMCLatticeG(integrand, abs_tol=self.loose_abs_tol, 
-                             rel_tol=self.rel_tol, n_init=self.n_init, n_max=self.n_max)
-        sol2, data2 = sc2.integrate(resume=None)
-        
-        # Results should be identical
-        self.assertTrue(np.allclose(sol1, sol2, rtol=1e-10), "resume=None should give same result as fresh start")
-        self.assertEqual(data1.n_total, data2.n_total, "resume=None should use same number of samples")
