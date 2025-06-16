@@ -40,6 +40,7 @@ class LDTransformData(AccumulateData):
         self.y_val = zeros(0,dtype=float)
         self.y_cp = zeros(0)
         self.yg_val = zeros((0,self.ncv),dtype=float)
+        self.yg_cp = zeros((0,self.ncv))
         super(LDTransformData,self).__init__()
 
     def update_data(self, m, y_val_next, y_cp_next, yg_val_next, yg_cp_next):
