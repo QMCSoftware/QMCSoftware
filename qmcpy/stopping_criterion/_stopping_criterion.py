@@ -3,7 +3,7 @@ from ..util import DistributionCompatibilityError, ParameterError, MethodImpleme
 from numpy import *
 
 # Diagnostic flag and utility for all stopping criteria
-IS_PRINT_DIAGNOSTIC = True
+IS_PRINT_DIAGNOSTIC = False
 
 def print_diagnostic(label, data):
     """
@@ -17,8 +17,8 @@ def print_diagnostic(label, data):
     n_total = getattr(data, 'n_total', None)
     n_min = getattr(data, 'n_min', None)
     xfull = getattr(data, 'xfull', None)
-    solution_display = solution[0] if isinstance(solution, (list, tuple, ndarray)) and solution else solution
-    m_display = int(m[0]) if isinstance(m, (list, tuple, ndarray)) and m else (int(m) if m is not None else None)
+    solution_display = solution[0] if isinstance(solution, (list, tuple, ndarray)) and solution is not None and len(solution) > 0 else solution
+    m_display = int(m[0]) if isinstance(m, (list, tuple, ndarray)) and m is not None and len(m) > 0 else (int(m) if m is not None else None)
     n_total_display = int(n_total) if n_total is not None else None
     xfull_shape = getattr(xfull, 'shape', None)
     n_total_formatted = f"{n_total_display:>10}" if n_total_display is not None else f"{'None':>10}"

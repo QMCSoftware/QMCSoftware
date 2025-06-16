@@ -49,6 +49,7 @@ class _CubQMCLDG(StoppingCriterion):
         self.ncv = len(self.cv)
         self.cv_mu = array(control_variate_means) if self.ncv>0 else empty((self.ncv,)+self.d_indv)
         self.cv_mu = self.cv_mu if self.cv_mu.ndim>1 else self.cv_mu.reshape(self.ncv,-1)
+        self.is_first_resume_iteration = False
         if self.cv_mu.shape!=((self.ncv,)+self.d_indv):
             raise ParameterError('''Control variate means should have shape (len(control variates),d_indv).''')
         for cv in self.cv:
@@ -83,6 +84,7 @@ class _CubQMCLDG(StoppingCriterion):
                 for j in ndindex(self.d_indv):
                     cv_mu_j = self.cv_mu[(slice(None),)+j]
                     self.datum[j] = LDTransformData(self.m_min, self.m_max, self.coefv, self.fudge, self.check_cone, self.ncv, cv_mu_j, self.update_beta)
+            self.is_first_resume_iteration = True
         else:
             self.datum = empty(self.d_indv,dtype=object)
             for j in ndindex(self.d_indv):
@@ -99,48 +101,45 @@ class _CubQMCLDG(StoppingCriterion):
             self.data.solution = nan
             self.data.xfull = empty((0,self.d))
             self.data.yfull = empty((0,)+self.d_indv)
-        # Diagnostic: print state after setup (before loop)
-        if IS_PRINT_DIAGNOSTIC: print_diagnostic("INFO: State before loop", self.data)
         while True:
             m = self.data.m.max()
             n_min = self.data.n_min
             n_max = int(2**m)
             n = int(n_max-n_min)
-            xnext = self.discrete_distrib.gen_samples(n_min=n_min,n_max=n_max)
-            ycvnext = empty((1+self.ncv,n,)+self.d_indv,dtype=float)
-            ycvnext[0] = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
-            for k in range(self.ncv):
-                ycvnext[1+k] = self.cv[k].f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
-            ycvnext_cp = ycvnext.astype(complex) if self.cast_complex else ycvnext.copy()
-            for j in ndindex(self.d_indv):
-                if self.data.flags_indv[j]: continue
-                slice_yj = (0,slice(None),)+j
-                slice_ygj = (slice(1,None),slice(None),)+j
-                y_val = ycvnext[slice_yj]
-                y_cp = ycvnext_cp[slice_yj]
-                yg_val = ycvnext[slice_ygj].T
-                yg_cp = ycvnext_cp[slice_ygj].T
-                self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j],cone_violation = self.datum[j].update_data(m,y_val,y_cp,yg_val,yg_cp)
-                if cone_violation:
-                    warnings.warn('Function at index %d (indexing d_indv) violates cone conditions.'%j,CubatureWarning)
-            self.data.xfull = vstack((self.data.xfull,xnext))
-            self.data.yfull = vstack((self.data.yfull,ycvnext[0]))
-            self.data.comb_bound_low,self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low,self.data.indv_bound_high)
-            self.abs_tols,self.rel_tols = full_like(self.data.comb_bound_low,self.abs_tol),full_like(self.data.comb_bound_low,self.rel_tol)
-            fidxs = isfinite(self.data.comb_bound_low)&isfinite(self.data.comb_bound_high)
-            slow,shigh,abs_tols,rel_tols = self.data.comb_bound_low[fidxs],self.data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            self.data.solution = tile(nan,self.data.comb_bound_low.shape)
-            self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
-            self.data.comb_flags = tile(False,self.data.comb_bound_low.shape)
-            self.data.comb_flags[fidxs] = (shigh-slow) < (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
+            if not self.is_first_resume_iteration:  # generate new samples
+                xnext = self.discrete_distrib.gen_samples(n_min=n_min,n_max=n_max)
+                ycvnext = empty((1+self.ncv,n,)+self.d_indv,dtype=float)
+                ycvnext[0] = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
+                for k in range(self.ncv):
+                    ycvnext[1+k] = self.cv[k].f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
+                ycvnext_cp = ycvnext.astype(complex) if self.cast_complex else ycvnext.copy()
+                for j in ndindex(self.d_indv):
+                    if self.data.flags_indv[j]: continue
+                    slice_yj = (0,slice(None),)+j
+                    slice_ygj = (slice(1,None),slice(None),)+j
+                    y_val = ycvnext[slice_yj]
+                    y_cp = ycvnext_cp[slice_yj]
+                    yg_val = ycvnext[slice_ygj].T
+                    yg_cp = ycvnext_cp[slice_ygj].T
+                    self.data.solution_indv[j],self.data.indv_bound_low[j],self.data.indv_bound_high[j],cone_violation = self.datum[j].update_data(m,y_val,y_cp,yg_val,yg_cp)
+                    if cone_violation:
+                        warnings.warn('Function at index %d (indexing d_indv) violates cone conditions.'%j,CubatureWarning)
+                self.data.xfull = vstack((self.data.xfull, xnext))
+                self.data.yfull = vstack((self.data.yfull, ycvnext[0]))
+
+            self.data.comb_bound_low, self.data.comb_bound_high = self.integrand.bound_fun(self.data.indv_bound_low, self.data.indv_bound_high)
+            self.abs_tols, self.rel_tols = full_like(self.data.comb_bound_low, self.abs_tol), full_like(self.data.comb_bound_low, self.rel_tol)
+            fidxs = isfinite(self.data.comb_bound_low) & isfinite(self.data.comb_bound_high)
+            slow, shigh, abs_tols, rel_tols = self.data.comb_bound_low[fidxs], self.data.comb_bound_high[fidxs], self.abs_tols[fidxs], self.rel_tols[fidxs]
+            self.data.solution = tile(nan, self.data.comb_bound_low.shape)
+            self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow, abs_tols, rel_tols)-self.error_fun(shigh, abs_tols, rel_tols))
+            self.data.comb_flags = tile(False, self.data.comb_bound_low.shape)
+            self.data.comb_flags[fidxs] = (shigh-slow) < (self.error_fun(slow, abs_tols, rel_tols)+self.error_fun(shigh, abs_tols, rel_tols))
             self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
             self.data.compute_flags = ~self.data.flags_indv
             self.data.n = 2**self.data.m
             self.data.n_total = self.data.n.max()
-
-            # Diagnostic: print state after integration
             if IS_PRINT_DIAGNOSTIC: print_diagnostic("INFO: In each iteration", self.data)
-
             if sum(self.data.compute_flags)==0:
                 break # stopping criterion met
             elif 2*self.data.n_total>self.n_max:
@@ -156,7 +155,11 @@ class _CubQMCLDG(StoppingCriterion):
             else:
                 self.data.n_min = n_max
                 self.data.m += self.data.compute_flags
-
+        
+            # Reset the resume flag after first iteration
+            if self.is_first_resume_iteration:
+                self.is_first_resume_iteration = False
+                
         self.data.integrand = self.integrand
         self.data.true_measure = self.true_measure
         self.data.discrete_distrib = self.discrete_distrib
