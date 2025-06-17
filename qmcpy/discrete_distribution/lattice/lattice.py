@@ -175,7 +175,12 @@ class Lattice(AbstractLDDiscreteDistribution):
         self.parameters = ['randomize','gen_vec_source','order','n_limit']
         self.input_generating_vector = deepcopy(generating_vector)
         self.input_m_max = deepcopy(m_max)
-        if isinstance(generating_vector,str):
+        if isinstance(generating_vector,str) and generating_vector=="kuo.lattice-33002-1024-1048576.9125.txt":
+            self.gen_vec_source = generating_vector
+            gen_vec = np.load(dirname(abspath(__file__))+'/generating_vectors/kuo.lattice-33002-1024-1048576.9125.npy')[None,:]
+            d_limit = 9125
+            n_limit = 1048576
+        elif isinstance(generating_vector,str):
             self.gen_vec_source = generating_vector
             assert generating_vector[-4:]==".txt"
             local_root = dirname(abspath(__file__))+'/generating_vectors/'
@@ -196,8 +201,8 @@ class Lattice(AbstractLDDiscreteDistribution):
                 raise ParameterError("LDData path %s not found"%generating_vector)
             contents = [int(line.rstrip('\n').strip().split("#",1)[0]) for line in datafile.readlines() if line[0]!="#"]
             datafile.close()
-            d_limit = contents[0]
-            n_limit = contents[1]
+            d_limit = int(contents[0])
+            n_limit = int(contents[1])
             gen_vec = np.array(contents[2:],dtype=np.uint64)[None,:]
         elif isinstance(generating_vector,np.ndarray):
             self.gen_vec_source = "custom"

@@ -270,7 +270,17 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         self.input_generating_matrices = deepcopy(generating_matrices)
         self.input_t = deepcopy(t) 
         self.input_msb = deepcopy(msb)
-        if isinstance(generating_matrices,str):
+        if isinstance(generating_matrices,str) and generating_matrices=="joe_kuo.6.21201.txt":
+            self.gen_mats_source = generating_matrices
+            gen_mats = np.load(dirname(abspath(__file__))+'/generating_matrices/joe_kuo.6.21201.npy')[None,:]
+            msb = True
+            d_limit = 21201
+            n_limit = 4294967296
+            self._t_curr = 32
+            compat_shift = self._t_curr-t if self._t_curr>=t else 0
+            if compat_shift>0: warnings.warn("Truncating ints in generating matrix to have t = %d bits."%t,ParameterWarning)
+            gen_mats = gen_mats>>compat_shift
+        elif isinstance(generating_matrices,str):
             self.gen_mats_source = generating_matrices
             assert generating_matrices[-4:]==".txt"
             local_root = dirname(abspath(__file__))+'/generating_matrices/'
@@ -399,7 +409,6 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         assert self._t_curr==int(np.ceil(np.log2(gen_mat_max+1)))
         assert 0<self._t_curr<=self.t<=64, "invalid 0 <= self._t_curr (%d) <= self.t (%d) <= 64"%(self._t_curr,self.t)
         if self.randomize=="FALSE": assert self.gen_mats.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating matrices %d"%(self.replications,self.gen_mats.shape[0])
-        import gc; gc.collect()
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if n_min == 0 and self.randomize in ["FALSE","LMS"] and warn:
