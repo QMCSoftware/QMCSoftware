@@ -177,7 +177,7 @@ class CubBayesNetG(_CubBayesLDG):
 
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_limit=2 ** 22, alpha=0.01,
-                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol), errbd_type="MLE"):
+                 error_fun="EITHER", errbd_type="MLE"):
         """
         Args:
             integrand (AbstractIntegrand): An AbstractIntegrand.

@@ -173,7 +173,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
                  n_limit = 2**30,
                  inflate = 1,
                  alpha = 0.01, 
-                 error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
+                 error_fun = "EITHER"):
         r"""
         Args:
             integrand (AbstractIntegrand): An AbstractIntegrand.

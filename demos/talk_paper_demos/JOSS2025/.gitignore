@@ -1,1 +1,2 @@
-JOSS2025.outputs
+JOSS2025.outputs/*.npy
+JOSS2025.outputs/*.pdf

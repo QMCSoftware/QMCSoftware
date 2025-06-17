@@ -213,7 +213,7 @@ class CubQMCNetG(_CubQMCLDG):
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_limit=2.**35,
         fudge=lambda m: 5.*2.**(-m), check_cone=False, 
         control_variates=[], control_variate_means=[], update_beta=False,
-        error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
+        error_fun = "EITHER"):
 
         """
         Args:

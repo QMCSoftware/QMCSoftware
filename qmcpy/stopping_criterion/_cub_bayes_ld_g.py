@@ -25,6 +25,14 @@ class _CubBayesLDG(AbstractStoppingCriterion):
         # Set Attributes
         self.n_init = int(n_init)
         self.n_limit = int(n_limit)
+        assert isinstance(error_fun,str) or callable(error_fun)
+        if isinstance(error_fun,str):
+            if error_fun.upper()=="EITHER":
+                error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
+            elif error_fun.upper()=="BOTH":
+                error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+            else:
+                raise ParameterError("str error_fun must be 'EITHER' or 'BOTH'")
         self.error_fun = error_fun
         self.alpha = alpha
         # QMCPy Objs
