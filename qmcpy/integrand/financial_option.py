@@ -211,7 +211,8 @@ class FinancialOption(AbstractIntegrand):
                  decomp_type = 'PCA',
                  level = None,
                  initial_level = 0,
-                 asian_mean = "ARITHMETIC",
+                 asian_mean_type = "ARITHMETIC",
+                 asian_mean_quadrature_rule = "TRAPEZOIDAL",
                  barrier_in_out = "IN",
                  barrier_price = 38,
                  digital_payout = 10):
@@ -234,7 +235,8 @@ class FinancialOption(AbstractIntegrand):
                 - `'Cholesky'` for cholesky decomposition.
             level (Union[None,int]): Level for multilevel problems 
             initial_level (Union[None,int]): First level for multilevel problems.
-            asian_mean (str): Either `'ARITHMETIC'` or `'GEOMETRIC'`.
+            asian_mean_type (str): Either `'ARITHMETIC'` or `'GEOMETRIC'`.
+            asian_mean_quadrature_rule (str): Either 'TRAPEZOIDAL' or 'RIGHT'. 
             barrier_in_out (str): Either `'IN'` or `'OUT'`. 
             barrier_price (float): $B$. 
             digital_payout (float): $\rho$. 
@@ -265,14 +267,21 @@ class FinancialOption(AbstractIntegrand):
         if self.option=="EUROPEAN":
             self.payoff = self.payoff_european_call if self.call_put=='CALL' else self.payoff_european_put
         elif self.option=="ASIAN":
-            self.parameters += ['asian_mean']
-            self.asian_mean = str(asian_mean).upper()
-            if self.asian_mean=="ARITHMETIC":
-                self.payoff = self.payoff_asian_arithmetic_call if self.call_put=='CALL' else self.payoff_asian_arithmetic_put
-            elif self.asian_mean=="GEOMETRIC":
-                self.payoff = self.payoff_asian_geometric_call if self.call_put=='CALL' else self.payoff_asian_geometric_put
-            else:
-                raise ParameterError("invalid asian_mean = %s"%self.asian_mean)
+            self.parameters += ['asian_mean_type']
+            self.asian_mean_type = str(asian_mean_type).upper()
+            assert self.asian_mean_type in ['ARITHMETIC','GEOMETRIC'], "invalid asian_mean_type = %s"%self.asian_mean_type
+            self.asian_mean_quadrature_rule = str(asian_mean_quadrature_rule).upper()
+            assert self.asian_mean_quadrature_rule in ['TRAPEZOIDAL','RIGHT'], "invalid asian_mean_quadrature_rule = %s"%self.asian_mean_quadrature_rule
+            if self.asian_mean_type=="ARITHMETIC":
+                if self.asian_mean_quadrature_rule=="TRAPEZOIDAL":
+                    self.payoff = self.payoff_asian_arithmetic_trap_call if self.call_put=='CALL' else self.payoff_asian_arithmetic_trap_put
+                elif self.asian_mean_quadrature_rule=="RIGHT":
+                    self.payoff = self.payoff_asian_arithmetic_right_call if self.call_put=='CALL' else self.payoff_asian_arithmetic_right_put
+            elif self.asian_mean_type=="GEOMETRIC":
+                if self.asian_mean_quadrature_rule=="TRAPEZOIDAL":
+                    self.payoff = self.payoff_asian_geometric_trap_call if self.call_put=='CALL' else self.payoff_asian_geometric_trap_put
+                elif self.asian_mean_quadrature_rule=="RIGHT":
+                    self.payoff = self.payoff_asian_geometric_right_call if self.call_put=='CALL' else self.payoff_asian_geometric_right_put
         elif self.option=="BARRIER":
             self.parameters += ['barrier_in_out','barrier_up_down','barrier_price']
             assert np.isscalar(barrier_price)
@@ -325,17 +334,29 @@ class FinancialOption(AbstractIntegrand):
     def payoff_european_put(self, gbm):
         return np.maximum(self.strike_price-gbm[...,-1],0)
     
-    def payoff_asian_arithmetic_call(self, gbm):
+    def payoff_asian_arithmetic_trap_call(self, gbm):
         return np.maximum((self.start_price/2+gbm[...,:-1].sum(-1)+gbm[...,-1]/2)/gbm.shape[-1]-self.strike_price,0)
     
-    def payoff_asian_arithmetic_put(self, gbm):
-        return np.maximum((self.strike_price-self.start_price/2+gbm[...,:-1].sum(-1)+gbm[...,-1]/2)/gbm.shape[-1],0)
+    def payoff_asian_arithmetic_trap_put(self, gbm):
+        return np.maximum(self.strike_price-(self.start_price/2+gbm[...,:-1].sum(-1)+gbm[...,-1]/2)/gbm.shape[-1],0)
     
-    def payoff_asian_geometric_call(self, gbm):
+    def payoff_asian_geometric_trap_call(self, gbm):
         return np.maximum(np.exp((np.log(self.start_price)/2+np.log(gbm[...,:-1]).sum(-1)+np.log(gbm[...,-1])/2)/gbm.shape[-1])-self.strike_price,0)
     
-    def payoff_asian_geometric_put(self, gbm):
+    def payoff_asian_geometric_trap_put(self, gbm):
         return np.maximum(self.strike_price-np.exp((np.log(self.start_price)/2+np.log(gbm[...,:-1]).sum(-1)+np.log(gbm[...,-1])/2)/gbm.shape[-1]),0)
+    
+    def payoff_asian_arithmetic_right_call(self, gbm):
+        return np.maximum(gbm.sum(-1)/gbm.shape[-1]-self.strike_price,0)
+    
+    def payoff_asian_arithmetic_right_put(self, gbm):
+        return np.maximum((self.strike_price-gbm.sum(-1))/gbm.shape[-1],0)
+    
+    def payoff_asian_geometric_right_call(self, gbm):
+        return np.maximum(np.exp(np.log(gbm).sum(-1)/gbm.shape[-1])-self.strike_price,0)
+    
+    def payoff_asian_geometric_right_put(self, gbm):
+        return np.maximum(self.strike_price-np.exp(np.log(gbm).sum(-1)/gbm.shape[-1]),0)
     
     def payoff_barrier_in_up_call(self, gbm):
         v = gbm[...,-1]
@@ -407,24 +428,38 @@ class FinancialOption(AbstractIntegrand):
     
     def get_exact_value(self):
         """
-        Compute the exact analytic fair price of the option. Only supports `option='EUROPEAN'`.
+        Compute the exact analytic fair price of the option. Supports 
+            
+            - `option='EUROPEAN'`
+            - `option='ASIAN'` with `asian_mean_type='GEOMETRIC'` and `asian_mean_quadrature_rule='RIGHT'`
 
         Returns: 
             mean (float): Exact value of the integral. 
         """
-        assert self.option=="EUROPEAN", "exact value not supported for option = %s"%self.option
-        denom = self.volatility*np.sqrt(self.t_final)
-        decay = self.strike_price*self.discount_factor
-        if self.call_put == 'CALL':
-            term1 = np.log(self.start_price/self.strike_price)+(self.interest_rate+self.volatility**2/2)*self.t_final
-            term2 = np.log(self.start_price/self.strike_price)+(self.interest_rate-self.volatility**2/2)*self.t_final
-            fp = self.start_price*norm.cdf(term1/denom)-decay*norm.cdf(term2/denom)
-        elif self.call_put == 'PUT':
-            term1 = np.log(self.strike_price/self.start_price)-(self.interest_rate-self.volatility**2/2)*self.t_final
-            term2 = np.log(self.strike_price/self.start_price)-(self.interest_rate+self.volatility**2/2)*self.t_final
-            fp = decay*norm.cdf(term1/denom)-self.start_price*norm.cdf(term2/denom)
+        if self.option=="EUROPEAN":
+            denom = self.volatility*np.sqrt(self.t_final)
+            decay = self.strike_price*self.discount_factor
+            if self.call_put == 'CALL':
+                term1 = np.log(self.start_price/self.strike_price)+(self.interest_rate+self.volatility**2/2)*self.t_final
+                term2 = np.log(self.start_price/self.strike_price)+(self.interest_rate-self.volatility**2/2)*self.t_final
+                fp = self.start_price*norm.cdf(term1/denom)-decay*norm.cdf(term2/denom)
+            elif self.call_put == 'PUT':
+                term1 = np.log(self.strike_price/self.start_price)-(self.interest_rate-self.volatility**2/2)*self.t_final
+                term2 = np.log(self.strike_price/self.start_price)-(self.interest_rate+self.volatility**2/2)*self.t_final
+                fp = decay*norm.cdf(term1/denom)-self.start_price*norm.cdf(term2/denom)
+        elif self.option=="ASIAN":
+            assert self.asian_mean_type=='GEOMETRIC' and self.asian_mean_quadrature_rule=='RIGHT', "exact value for Asian options only implemented for self.asian_mean_type=='GEOMETRIC' and self.asian_mean_quadrature_rule=='RIGHT'"
+            Tbar = (1+1/self.d)*self.t_final/2
+            sigmabar = self.volatility*np.sqrt((2+1/self.d)/3)
+            rbar = self.interest_rate+(sigmabar**2-self.volatility**2)/2
+            gmeancall,gmeanput = _eurogbmprice(self.start_price,rbar,Tbar,sigmabar,self.strike_price)
+            if self.call_put=='CALL':
+                fp = gmeancall * np.exp(rbar*Tbar-self.interest_rate*self.t_final)
+            elif self.call_put=='PUT':
+                fp = gmeanput * np.exp(rbar*Tbar-self.interest_rate*self.t_final)
+            return fp
         else:
-            raise ParameterError("Error parsing payoff self.call_put = %s"%self.call_put)
+            raise ParameterError("exact value not supported for option = %s"%self.option)
         return fp
     
     def _spawn(self, level, sampler):
@@ -439,7 +474,15 @@ class FinancialOption(AbstractIntegrand):
             decomp_type=self.decomp_type,
             level=self.level, 
             initial_level=self.initial_level,
-            asian_mean=self.asian_mean,
+            asian_mean_type=self.asian_mean_type,
             barrier_in_out=self.barrier_in_out, 
             barrier_price=self.barrier_price,
             digital_payoff=self.digital_payoff)
+
+def _eurogbmprice(S0, r, T, sigma, K):
+        priceratio = K*np.exp(-r*T)/S0
+        xbig = np.log(priceratio)/(sigma*np.sqrt(T))+sigma*np.sqrt(T)/2
+        xsmall = np.log(priceratio)/(sigma*np.sqrt(T))-sigma*np.sqrt(T)/2
+        putprice = S0*(priceratio*norm.cdf(xbig)-norm.cdf(xsmall))
+        callprice = putprice+S0*(1-priceratio)
+        return callprice,putprice
