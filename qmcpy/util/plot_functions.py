@@ -37,7 +37,7 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
     n = np.atleast_1d(n)
     d_horizontal = np.atleast_1d(d_horizontal)
     d_vertical = np.atleast_1d(d_vertical)
-    samples = sampler.gen_samples(n[n.size - 1])    
+    samples = sampler(n[n.size - 1])    
     d = samples.shape[1]
     fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(figfac*d_horizontal.size, figfac*d_vertical.size),squeeze=False)                    
     fig.tight_layout(pad=2)

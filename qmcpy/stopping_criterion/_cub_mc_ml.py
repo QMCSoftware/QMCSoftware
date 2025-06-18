@@ -35,7 +35,7 @@ class _CubMCML(AbstractStoppingCriterion):
             if data.diff_n_level[l] > 0:
                 # evaluate integral at sampling points samples
                 n = data.diff_n_level[l]
-                samples = integrand_l.discrete_distrib.gen_samples(n=n)
+                samples = integrand_l.discrete_distrib(n=n)
                 pc,pf = integrand_l.f(samples)
                 dp = pf-pc
                 data.n_level[l] = data.n_level[l] + data.diff_n_level[l]

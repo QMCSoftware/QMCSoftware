@@ -37,7 +37,7 @@ class CustomFun(AbstractIntegrand):
 
         $$g(\boldsymbol{t}) = \begin{pmatrix} \sin(t_1)\cos(t_2) \\ \cos(t_1)\sin(t_2) \\ \sin(t_1)+\cos(t_2) \\ \cos(t_1)+\sin(t_2) \end{pmatrix} \qquad \boldsymbol{T}=(T_1,T_2) \sim \mathcal{U}[0,2\pi]^2.$$
         
-        >>> def g(t, compute_flags=None):
+        >>> def g(t):
         ...     t1,t2 = t[...,0],t[...,1]
         ...     sint1,cost1,sint2,cost2 = np.sin(t1),np.cos(t1),np.sin(t2),np.cos(t2)
         ...     y1 = sint1*cost2
@@ -50,7 +50,7 @@ class CustomFun(AbstractIntegrand):
         ...     true_measure = Uniform(DigitalNetB2(2,seed=7),lower_bound=0,upper_bound=2*np.pi),
         ...     g = g, 
         ...     dimension_indv = (4,))
-        >>> x = integrand.discrete_distrib.gen_samples(2**10)
+        >>> x = integrand.discrete_distrib(2**10)
         >>> y = integrand.f(x)
         >>> y.shape
         (4, 1024)
@@ -66,7 +66,7 @@ class CustomFun(AbstractIntegrand):
         ...     true_measure = Uniform(DigitalNetB2(2,seed=7,replications=2**4),lower_bound=0,upper_bound=2*np.pi),
         ...     g = g, 
         ...     dimension_indv = (4,))
-        >>> x = integrand.discrete_distrib.gen_samples(2**6)
+        >>> x = integrand.discrete_distrib(2**6)
         >>> x.shape
         (16, 64, 2)
         >>> y = integrand.f(x)

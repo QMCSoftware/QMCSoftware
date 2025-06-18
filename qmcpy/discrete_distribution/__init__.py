@@ -7,4 +7,6 @@ from .halton import Halton
 DiscreteDistribution = AbstractDiscreteDistribution
 _DiscreteDistribution = AbstractDiscreteDistribution
 Sobol = DigitalNetB2
+DigitalNet = DigitalNetB2
+Net = DigitalNetB2
 

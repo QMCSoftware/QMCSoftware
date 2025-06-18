@@ -190,7 +190,8 @@ class AbstractIntegrand(object):
             y = np.concatenate(y,dtype=float)
         else:
             y = self._g2(t,comb_args=(args,kwargs))
-        assert y.shape==(self.d_indv+t.shape[:-1])
+        expected_y_shape = (self.d_indv+t.shape[:-1])
+        assert y.shape==expected_y_shape, "expected y.shape to be %s but got %s"%(str(expected_y_shape),str(y.shape))
         return y
 
     def _g2(self, t, comb_args=((),{})):
@@ -199,7 +200,13 @@ class AbstractIntegrand(object):
         if self.d_indv==():
             kwargs = dict(kwargs)
             del kwargs['compute_flags']
-        y = self.g(t,*args,**kwargs)
+        try:
+            y = self.g(t,*args,**kwargs)
+        except TypeError as e:
+            if "got an unexpected keyword argument 'compute_flags'" in str(e):
+                del kwargs['compute_flags']
+                y = self.g(t,*args,**kwargs)
+            else: raise e
         return y
 
     def bound_fun(self, bound_low, bound_high):

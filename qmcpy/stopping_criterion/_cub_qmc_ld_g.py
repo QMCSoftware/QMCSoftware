@@ -123,7 +123,7 @@ class _CubQMCLDG(AbstractStoppingCriterion):
         data.beta = np.tile(np.nan,self.integrand.d_indv+(self.ncv,))
         while True:
             m = int(np.log2(data.n_max))
-            xnext = self.discrete_distrib.gen_samples(n_min=data.n_min,n_max=data.n_max)
+            xnext = self.discrete_distrib(n_min=data.n_min,n_max=data.n_max)
             data.xfull = np.concatenate([data.xfull,xnext],0)
             ynext = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=data.compute_flags)
             ynext[~data.compute_flags] = np.nan

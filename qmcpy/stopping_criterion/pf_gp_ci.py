@@ -48,8 +48,8 @@ class SuggesterSimple(Suggester):
     def suggest(self, n, d, gp, rng, **kwargs):
         n_max = self.n_min+n
         assert d == self.sampler.d
-        try: x = self.sampler.gen_samples(n_min=self.n_min,n_max=n_max)
-        except: x = self.sampler.gen_samples(n)
+        try: x = self.sampler(n_min=self.n_min,n_max=n_max)
+        except: x = self.sampler(n)
         self.n_min = n_max
         return x
 
@@ -187,7 +187,7 @@ class PFGPCI(AbstractStoppingCriterion):
         self.verbose = verbose
         self.approx_true_solution = n_ref_approx>0
         if self.approx_true_solution: 
-            x = DigitalNetB2(self.d,order="GRAY",seed=seed_ref_approx).gen_samples(n_ref_approx)
+            x = DigitalNetB2(self.d,order="GRAY",seed=seed_ref_approx)(n_ref_approx)
             y = self.integrand.f(x).squeeze()
             ytf = self._affine_tf(y)
             self.ref_approx = (ytf>=0).mean(0)
@@ -215,7 +215,7 @@ class PFGPCI(AbstractStoppingCriterion):
                 if self.init_samples: 
                     xdraw,ydraw = self.x_init,self.y_init
                 else:
-                    xdraw = dnb2.spawn()[0].gen_samples(self.n_init)
+                    xdraw = dnb2.spawn()[0](self.n_init)
                     ydraw = np.atleast_1d(self.integrand.f(xdraw).squeeze())
             else:
                 n_new = min(self.n_batch,self.n_max-np.sum(self.n_batch))
@@ -269,7 +269,7 @@ class PFGPCIData(Data):
         self.dnb2 = dnb2
         self.alpha = alpha
         self.refit = refit
-        self.qmc_pts = self.dnb2.gen_samples(n_approx)
+        self.qmc_pts = self.dnb2(n_approx)
         self.gpytorch_prior_mean = gpytorch_prior_mean
         self.gpytorch_prior_cov = gpytorch_prior_cov
         self.gpytorch_likelihood = gpytorch_likelihood

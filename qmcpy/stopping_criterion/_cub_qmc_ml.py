@@ -35,7 +35,7 @@ class _CubQMCML(AbstractStoppingCriterion):
             n_max = self.n_init if data.n_level[l]==0 else 2*data.n_level[l]
             integrand_l = data.level_integrands[l]
             n_min = data.n_level[l]
-            samples = integrand_l.discrete_distrib.gen_samples(n_min=n_min,n_max=n_max)
+            samples = integrand_l.discrete_distrib(n_min=n_min,n_max=n_max)
             n = n_max-n_min
             pc,pf = integrand_l.f(samples).squeeze()
             dp = pf-pc
