@@ -1,5 +1,6 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
-from ..accumulate_data import AccumulateData
+from ..util.data import Data
+
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution import Lattice,DigitalNetB2,Halton
 from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
@@ -26,7 +27,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
         >>> solution
         array(1.3804849)
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        1.380
             comb_bound_low  1.380
             comb_bound_high 1.381
@@ -68,7 +69,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
         >>> solution
         array([1.19040139, 0.96058618])
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        [1.19  0.961]
             comb_bound_low  [1.19 0.96]
             comb_bound_high [1.191 0.961]
@@ -112,7 +113,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
         >>> sc = CubQMCCLT(integrand,abs_tol=5e-4,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        [[0.02  0.196 0.667]
                              [0.036 0.303 0.782]]
             comb_bound_low  [[0.019 0.195 0.667]
@@ -225,7 +226,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
         
     def integrate(self):
         t_start = time()
-        data = AccumulateData(
+        data = Data(
             parameters = [
                 'solution',
                 'comb_bound_low',

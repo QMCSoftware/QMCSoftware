@@ -1,13 +1,12 @@
-from ..true_measure.abstract_true_measure import AbstractTrueMeasure
-from ..util import ParameterError, MethodImplementationError, _univ_repr, DimensionError
+from ..util import _univ_repr
 
-class AccumulateData(object):
+class Data(object):
 
     def __init__(self, parameters):
         self.parameters = parameters
 
     def __repr__(self):
-        string = _univ_repr(self, 'AccumulateData', self.parameters + ['time_integrate'])
+        string = _univ_repr(self, 'Data', self.parameters + ['time_integrate'])
         if hasattr(self,"stopping_crit") and self.stopping_crit:
             string += '\n'+str(self.stopping_crit)
         if hasattr(self,"integrand") and self.integrand:

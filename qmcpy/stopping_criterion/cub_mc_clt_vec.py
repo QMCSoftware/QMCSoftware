@@ -1,5 +1,6 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
-from ..accumulate_data import AccumulateData
+from ..util.data import Data
+
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..true_measure import Gaussian,Uniform
@@ -21,7 +22,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
     >>> solution
     array(1.38366791)
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        1.384
         comb_bound_low  1.343
         comb_bound_high 1.424
@@ -56,7 +57,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
     >>> solution
     array([1.18448043, 0.95435347])
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        [1.184 0.954]
         comb_bound_low  [1.165 0.932]
         comb_bound_high [1.203 0.977]
@@ -93,7 +94,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
     >>> sc = CubMCCLTVec(integrand,abs_tol=2.5e-2,rel_tol=0)
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        [[0.024 0.203 0.662]
                          [0.044 0.308 0.78 ]]
         comb_bound_low  [[0.006 0.186 0.644]
@@ -192,7 +193,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
     
     def integrate(self):
         t_start = time()
-        data = AccumulateData(
+        data = Data(
             parameters = [
                 'solution',
                 'comb_bound_low',

@@ -1,5 +1,6 @@
 from ._cub_qmc_ml import _CubQMCML
-from ..accumulate_data import AccumulateData
+from ..util.data import Data
+
 from ..discrete_distribution import DigitalNetB2,Lattice,Halton
 from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..true_measure import Gaussian
@@ -19,7 +20,7 @@ class CubQMCML(_CubQMCML):
     >>> sc = CubQMCML(mlco,abs_tol=.075)
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        10.418
         n_total         98304
         levels          5
@@ -97,7 +98,7 @@ class CubQMCML(_CubQMCML):
 
     def integrate(self):
         t_start = time()
-        data = AccumulateData(parameters=[
+        data = Data(parameters=[
             'solution',
             'n_total',
             'levels',

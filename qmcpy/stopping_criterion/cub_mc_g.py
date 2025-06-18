@@ -1,5 +1,6 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
-from ..accumulate_data import AccumulateData
+from ..util.data import Data
+
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..integrand import FinancialOption, Linear0, AbstractIntegrand
@@ -21,7 +22,7 @@ class CubMCG(AbstractStoppingCriterion):
     >>> sc = CubMCG(ao,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        1.779
         bound_low       1.729
         bound_high      1.829
@@ -73,7 +74,7 @@ class CubMCG(AbstractStoppingCriterion):
     ...     control_variate_means = [eo.get_exact_value(),0])
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        1.787
         bound_low       1.737
         bound_high      1.837
@@ -129,7 +130,7 @@ class CubMCG(AbstractStoppingCriterion):
     >>> sc = CubMCG(ao,abs_tol=1e-3,rel_tol=5e-2)
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        1.743
         bound_low       1.661
         bound_high      1.825
@@ -182,7 +183,7 @@ class CubMCG(AbstractStoppingCriterion):
     ...     control_variate_means = [eo.get_exact_value(),0])
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        1.776
         bound_low       1.692
         bound_high      1.859
@@ -311,7 +312,7 @@ class CubMCG(AbstractStoppingCriterion):
 
     def integrate(self):
         t_start = time()
-        data = AccumulateData(
+        data = Data(
             parameters = [
                 'solution',
                 'bound_low',

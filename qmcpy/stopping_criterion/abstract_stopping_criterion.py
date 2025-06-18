@@ -22,7 +22,7 @@ class AbstractStoppingCriterion(object):
 
         Returns:
             solution (float): approximation to the integral
-            data (AccumulateData): an AccumulateData object
+            data (Data): an Data object
         """
         raise MethodImplementationError(self, 'integrate')
     

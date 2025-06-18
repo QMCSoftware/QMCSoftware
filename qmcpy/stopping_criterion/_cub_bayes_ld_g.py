@@ -1,5 +1,6 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
-from ..accumulate_data import AccumulateData
+from ..util.data import Data
+
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 import numpy as np
 from time import time
@@ -236,7 +237,7 @@ class _CubBayesLDG(AbstractStoppingCriterion):
     
     def integrate(self):
         t_start = time()
-        data = AccumulateData(
+        data = Data(
             parameters = [
                 'solution',
                 'comb_bound_low',

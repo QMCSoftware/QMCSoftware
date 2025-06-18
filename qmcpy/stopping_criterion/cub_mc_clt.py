@@ -1,5 +1,6 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
-from ..accumulate_data import AccumulateData
+from ..util.data import Data
+
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..true_measure import Gaussian, BrownianMotion, Uniform
@@ -19,7 +20,7 @@ class CubMCCLT(AbstractStoppingCriterion):
     >>> sc = CubMCCLT(ao,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        1.777
         bound_low       1.723
         bound_high      1.831
@@ -70,7 +71,7 @@ class CubMCCLT(AbstractStoppingCriterion):
     ...     control_variate_means = [eo.get_exact_value(),0])
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        1.790
         bound_low       1.738
         bound_high      1.843
@@ -171,7 +172,7 @@ class CubMCCLT(AbstractStoppingCriterion):
 
     def integrate(self):
         t_start = time()
-        data = AccumulateData(
+        data = Data(
             parameters = [
                 'solution',
                 'bound_low',

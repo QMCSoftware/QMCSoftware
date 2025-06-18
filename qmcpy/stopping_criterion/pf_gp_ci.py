@@ -3,7 +3,8 @@ from ..discrete_distribution import DigitalNetB2
 from ..integrand.ishigami import Ishigami
 from ..true_measure.abstract_true_measure import AbstractTrueMeasure
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
-from ..accumulate_data import AccumulateData
+from ..util.data import Data
+
 from ..util import ExactGPyTorchRegressionModel
 
 from ..util import MaxSamplesWarning
@@ -82,7 +83,7 @@ class PFGPCI(AbstractStoppingCriterion):
     ...     seed_ref_approx = 11)
     >>> solution,data = pfgpci.integrate(seed=7,refit=True)
     >>> data
-    PFGPCIData (AccumulateData)
+    PFGPCIData (Data)
         solution        0.158
         error_bound     0.022
         bound_low       0.136
@@ -254,7 +255,7 @@ def _error_udens_from_phi(phi):
 def _error_udens(gp, x):
     return _error_udens_from_phi(_get_phi(gp,x))
 
-class PFGPCIData(AccumulateData):
+class PFGPCIData(Data):
     """ Update and store data for the PFGPCI AbstractStoppingCriterion. """
 
     def __init__(self, stopping_crit, integrand, true_measure, discrete_distrib, dnb2, n_approx, alpha, refit, 

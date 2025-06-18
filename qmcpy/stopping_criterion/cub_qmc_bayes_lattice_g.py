@@ -18,7 +18,7 @@ class CubBayesLatticeG(_CubBayesLDG):
     >>> sc = CubBayesLatticeG(k,abs_tol=1e-4)
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        1.808
         comb_bound_low  1.808
         comb_bound_high 1.808
@@ -56,7 +56,7 @@ class CubBayesLatticeG(_CubBayesLDG):
         >>> solution
         array([1.18837601, 0.95984299])
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        [1.188 0.96 ]
             comb_bound_low  [1.183 0.95 ]
             comb_bound_high [1.194 0.969]
@@ -96,7 +96,7 @@ class CubBayesLatticeG(_CubBayesLDG):
         >>> sc = CubBayesLatticeG(integrand,abs_tol=5e-2,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        [[0.057 0.131 0.269]
                              [0.386 0.523 0.741]]
             comb_bound_low  [[0.048 0.12  0.256]

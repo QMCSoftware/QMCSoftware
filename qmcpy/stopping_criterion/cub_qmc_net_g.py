@@ -21,7 +21,7 @@ class CubQMCNetG(_CubQMCLDG):
         >>> solution
         array(1.38038574)
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        1.380
             comb_bound_low  1.380
             comb_bound_high 1.381
@@ -60,7 +60,7 @@ class CubQMCNetG(_CubQMCLDG):
         >>> solution
         array([1.18965698, 0.96061461])
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        [1.19  0.961]
             comb_bound_low  [1.189 0.96 ]
             comb_bound_high [1.19  0.961]
@@ -101,7 +101,7 @@ class CubQMCNetG(_CubQMCLDG):
         >>> sc = CubQMCNetG(integrand,abs_tol=5e-4,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        [[0.02  0.196 0.667]
                              [0.036 0.303 0.782]]
             comb_bound_low  [[0.019 0.195 0.667]

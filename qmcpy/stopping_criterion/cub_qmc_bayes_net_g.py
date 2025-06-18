@@ -19,7 +19,7 @@ class CubBayesNetG(_CubBayesLDG):
     >>> sc = CubBayesNetG(k,abs_tol=5e-3)
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        1.808
         comb_bound_low  1.804
         comb_bound_high 1.812
@@ -59,7 +59,7 @@ class CubBayesNetG(_CubBayesLDG):
         >>> solution
         array([1.18640441, 0.96079745])
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        [1.186 0.961]
             comb_bound_low  [1.184 0.959]
             comb_bound_high [1.188 0.962]
@@ -101,7 +101,7 @@ class CubBayesNetG(_CubBayesLDG):
         >>> sc = CubBayesNetG(integrand,abs_tol=5e-2,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> data
-        AccumulateData (AccumulateData)
+        Data (Data)
             solution        [[0.021 0.179 0.625]
                              [0.036 0.302 0.742]]
             comb_bound_low  [[0.016 0.163 0.594]

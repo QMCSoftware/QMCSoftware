@@ -1,6 +1,7 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ._cub_mc_ml import _CubMCML
-from ..accumulate_data import AccumulateData
+from ..util.data import Data
+
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..true_measure import Gaussian
@@ -20,7 +21,7 @@ class CubMCMLCont(_CubMCML):
     >>> sc = CubMCMLCont(mlco,abs_tol=.05)
     >>> solution,data = sc.integrate()
     >>> data
-    AccumulateData (AccumulateData)
+    Data (Data)
         solution        10.400
         n_total         1193331
         levels          2^(2)
@@ -113,7 +114,7 @@ class CubMCMLCont(_CubMCML):
 
     def integrate(self):
         t_start = time()
-        data = AccumulateData(parameters=[
+        data = Data(parameters=[
             'solution',
             'n_total',
             'levels',
