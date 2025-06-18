@@ -234,7 +234,7 @@ class FinancialOption(AbstractIntegrand):
                 - `'PCA'` for principal component analysis, or 
                 - `'Cholesky'` for cholesky decomposition.
             level (Union[None,int]): Level for multilevel problems 
-            coarsest_dimension (Union[None,int]): Dimension of the problem on the coarsest level.
+            d_coarsest (Union[None,int]): Dimension of the problem on the coarsest level.
             asian_mean (str): Either `'ARITHMETIC'` or `'GEOMETRIC'`.
             asian_mean_quadrature_rule (str): Either 'TRAPEZOIDAL' or 'RIGHT'. 
             barrier_in_out (str): Either `'IN'` or `'OUT'`. 
@@ -465,7 +465,7 @@ class FinancialOption(AbstractIntegrand):
             raise ParameterError("exact value not supported for option = %s"%self.option)
         return fp
     
-    def _dimension_at_level(self, level):
+    def dimension_at_level(self, level):
         return self.d_coarsest*2**level
     
     def _spawn(self, level, sampler):
