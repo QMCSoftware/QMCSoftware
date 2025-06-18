@@ -162,7 +162,7 @@ class FinancialOption(AbstractIntegrand):
         ys[1].shape = (2, 1024)
         ys[2].shape = (2, 512)
         ys[3].shape = (2, 256)
-        >>> ymeans = np.stack([(ys[l][0]-ys[l][1]).mean(-1) for l in range(num_levels)])
+        >>> ymeans = np.stack([(ys[l][1]-ys[l][0]).mean(-1) for l in range(num_levels)])
         >>> ymeans
         array([ 1.77827205e+00,  3.58130113e-03,  2.51227835e-03, -8.34836713e-04])
         >>> print("%.4f"%ymeans.sum())
@@ -182,7 +182,7 @@ class FinancialOption(AbstractIntegrand):
         ys[1].shape = (2, 16, 64)
         ys[2].shape = (2, 16, 32)
         ys[3].shape = (2, 16, 16)
-        >>> muhats = np.stack([(ys[l][0]-ys[l][1]).mean(-1) for l in range(num_levels)])
+        >>> muhats = np.stack([(ys[l][1]-ys[l][0]).mean(-1) for l in range(num_levels)])
         >>> muhats.shape
         (4, 16)
         >>> muhathat = muhats.mean(-1)
@@ -211,7 +211,7 @@ class FinancialOption(AbstractIntegrand):
                  decomp_type = 'PCA',
                  level = None,
                  initial_level = 0,
-                 asian_mean_type = "ARITHMETIC",
+                 asian_mean = "ARITHMETIC",
                  asian_mean_quadrature_rule = "TRAPEZOIDAL",
                  barrier_in_out = "IN",
                  barrier_price = 38,
@@ -235,7 +235,7 @@ class FinancialOption(AbstractIntegrand):
                 - `'Cholesky'` for cholesky decomposition.
             level (Union[None,int]): Level for multilevel problems 
             initial_level (Union[None,int]): First level for multilevel problems.
-            asian_mean_type (str): Either `'ARITHMETIC'` or `'GEOMETRIC'`.
+            asian_mean (str): Either `'ARITHMETIC'` or `'GEOMETRIC'`.
             asian_mean_quadrature_rule (str): Either 'TRAPEZOIDAL' or 'RIGHT'. 
             barrier_in_out (str): Either `'IN'` or `'OUT'`. 
             barrier_price (float): $B$. 
@@ -267,17 +267,17 @@ class FinancialOption(AbstractIntegrand):
         if self.option=="EUROPEAN":
             self.payoff = self.payoff_european_call if self.call_put=='CALL' else self.payoff_european_put
         elif self.option=="ASIAN":
-            self.parameters += ['asian_mean_type']
-            self.asian_mean_type = str(asian_mean_type).upper()
-            assert self.asian_mean_type in ['ARITHMETIC','GEOMETRIC'], "invalid asian_mean_type = %s"%self.asian_mean_type
+            self.parameters += ['asian_mean']
+            self.asian_mean = str(asian_mean).upper()
+            assert self.asian_mean in ['ARITHMETIC','GEOMETRIC'], "invalid asian_mean = %s"%self.asian_mean
             self.asian_mean_quadrature_rule = str(asian_mean_quadrature_rule).upper()
             assert self.asian_mean_quadrature_rule in ['TRAPEZOIDAL','RIGHT'], "invalid asian_mean_quadrature_rule = %s"%self.asian_mean_quadrature_rule
-            if self.asian_mean_type=="ARITHMETIC":
+            if self.asian_mean=="ARITHMETIC":
                 if self.asian_mean_quadrature_rule=="TRAPEZOIDAL":
                     self.payoff = self.payoff_asian_arithmetic_trap_call if self.call_put=='CALL' else self.payoff_asian_arithmetic_trap_put
                 elif self.asian_mean_quadrature_rule=="RIGHT":
                     self.payoff = self.payoff_asian_arithmetic_right_call if self.call_put=='CALL' else self.payoff_asian_arithmetic_right_put
-            elif self.asian_mean_type=="GEOMETRIC":
+            elif self.asian_mean=="GEOMETRIC":
                 if self.asian_mean_quadrature_rule=="TRAPEZOIDAL":
                     self.payoff = self.payoff_asian_geometric_trap_call if self.call_put=='CALL' else self.payoff_asian_geometric_trap_put
                 elif self.asian_mean_quadrature_rule=="RIGHT":
@@ -320,7 +320,7 @@ class FinancialOption(AbstractIntegrand):
                 discounted_payoffs_coarse = np.zeros_like(discounted_payoffs)
             else: 
                 discounted_payoffs_coarse = self.payoff(gbm[...,1::2])*self.discount_factor
-            discounted_payoffs = np.stack([discounted_payoffs,discounted_payoffs_coarse])
+            discounted_payoffs = np.stack([discounted_payoffs_coarse,discounted_payoffs])
         return discounted_payoffs
     
     def gbm(self, t):
@@ -431,7 +431,7 @@ class FinancialOption(AbstractIntegrand):
         Compute the exact analytic fair price of the option. Supports 
             
             - `option='EUROPEAN'`
-            - `option='ASIAN'` with `asian_mean_type='GEOMETRIC'` and `asian_mean_quadrature_rule='RIGHT'`
+            - `option='ASIAN'` with `asian_mean='GEOMETRIC'` and `asian_mean_quadrature_rule='RIGHT'`
 
         Returns: 
             mean (float): Exact value of the integral. 
@@ -448,7 +448,7 @@ class FinancialOption(AbstractIntegrand):
                 term2 = np.log(self.strike_price/self.start_price)-(self.interest_rate+self.volatility**2/2)*self.t_final
                 fp = decay*norm.cdf(term1/denom)-self.start_price*norm.cdf(term2/denom)
         elif self.option=="ASIAN":
-            assert self.asian_mean_type=='GEOMETRIC' and self.asian_mean_quadrature_rule=='RIGHT', "exact value for Asian options only implemented for self.asian_mean_type=='GEOMETRIC' and self.asian_mean_quadrature_rule=='RIGHT'"
+            assert self.asian_mean=='GEOMETRIC' and self.asian_mean_quadrature_rule=='RIGHT', "exact value for Asian options only implemented for self.asian_mean=='GEOMETRIC' and self.asian_mean_quadrature_rule=='RIGHT'"
             Tbar = (1+1/self.d)*self.t_final/2
             sigmabar = self.volatility*np.sqrt((2+1/self.d)/3)
             rbar = self.interest_rate+(sigmabar**2-self.volatility**2)/2
@@ -474,7 +474,7 @@ class FinancialOption(AbstractIntegrand):
             decomp_type=self.decomp_type,
             level=level, 
             initial_level=self.initial_level,
-            asian_mean_type=self.asian_mean_type,
+            asian_mean=self.asian_mean,
             barrier_in_out=self.barrier_in_out, 
             barrier_price=self.barrier_price,
             digital_payoff=self.digital_payoff)

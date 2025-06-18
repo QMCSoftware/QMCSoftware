@@ -3,6 +3,7 @@ import numpy as np
 from scipy.stats import norm
 
 class _CubMCML(AbstractStoppingCriterion):
+    
     def _get_next_samples(self, data):
         ns = np.ceil( np.sqrt(data.var_level/data.cost_per_sample) * 
                 np.sqrt(data.var_level*data.cost_per_sample).sum() / 
@@ -33,12 +34,14 @@ class _CubMCML(AbstractStoppingCriterion):
             integrand_l = data.level_integrands[l]
             if data.diff_n_level[l] > 0:
                 # evaluate integral at sampling points samples
-                samples = integrand_l.discrete_distrib.gen_samples(n=data.diff_n_level[l])
-                integrand_l.f(samples).squeeze()
+                n = data.diff_n_level[l]
+                samples = integrand_l.discrete_distrib.gen_samples(n=n)
+                pc,pf = integrand_l.f(samples)
+                dp = pf-pc
                 data.n_level[l] = data.n_level[l] + data.diff_n_level[l]
-                data.sum_level[0,l] = data.sum_level[0,l] + integrand_l.sums[0]
-                data.sum_level[1,l] = data.sum_level[1,l] + integrand_l.sums[1]
-                data.cost_level[l] = data.cost_level[l] + integrand_l.cost
+                data.sum_level[0,l] = data.sum_level[0,l] + dp.sum()
+                data.sum_level[1,l] = data.sum_level[1,l] + (dp**2).sum()
+                data.cost_level[l] = data.cost_level[l] + integrand_l.cost*n
         # compute absolute average, variance and cost
         data.mean_level = np.absolute(data.sum_level[0,:data.levels+1]/data.n_level[:data.levels+1])
         data.var_level = np.maximum(0,data.sum_level[1,:data.levels+1]/data.n_level[:data.levels+1] - data.mean_level**2)

@@ -10,23 +10,48 @@ class MLCallOptions(AbstractIntegrand):
     """
     Various call options from finance using Milstein discretization with $2^l$ timesteps on level $l$.
 
-    >>> mlco_original = MLCallOptions(DigitalNetB2(seed=7))
-    >>> mlco_original
-    MLCallOptions (AbstractIntegrand Object)
-        option          european
-        sigma           0.200
-        k               100
-        r               0.050
-        t               1
-        b               85
-        level           0
-    >>> mlco_ml_dims = mlco_original.spawn(levels=np.arange(4))
-    >>> yml = 0
-    >>> for mlco in mlco_ml_dims:
-    ...     x = mlco.discrete_distrib.gen_samples(2**10)
-    ...     yml += mlco.f(x).mean()
-    >>> print("%.4f"%yml)
-    10.3965
+    Examples:
+        >>> seed_seq = np.random.SeedSequence(7) 
+        >>> initial_level = 3
+        >>> num_levels = 4
+        >>> ns = [2**11,2**10,2**9,2**8]
+        >>> integrands = [MLCallOptions(DigitalNetB2(dimension=2**l,seed=seed_seq.spawn(1)[0]),option="ASIAN") for l in range(initial_level,initial_level+num_levels)]
+        >>> ys = [integrands[l](ns[l]) for l in range(num_levels)]
+        >>> for l in range(num_levels):
+        ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
+        ys[0].shape = (2, 2048)
+        ys[1].shape = (2, 1024)
+        ys[2].shape = (2, 512)
+        ys[3].shape = (2, 256)
+        >>> ymeans = np.stack([(ys[l][1]-ys[l][0]).mean(-1) for l in range(num_levels)])
+        >>> ymeans
+        array([5.62008251, 5.62798894, 5.63549268, 5.64344119])
+        >>> print("%.4f"%ymeans.sum())
+        22.5270
+
+        Multi-level options with independent replications
+         
+        >>> seed_seq = np.random.SeedSequence(7) 
+        >>> initial_level = 3
+        >>> num_levels = 4
+        >>> ns = [2**7,2**6,2**5,2**4]
+        >>> integrands = [MLCallOptions(DigitalNetB2(dimension=2**l,seed=seed_seq.spawn(1)[0],replications=2**4),option="ASIAN") for l in range(initial_level,initial_level+num_levels)]
+        >>> ys = [integrands[l](ns[l]) for l in range(num_levels)]
+        >>> for l in range(num_levels):
+        ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
+        ys[0].shape = (2, 16, 128)
+        ys[1].shape = (2, 16, 64)
+        ys[2].shape = (2, 16, 32)
+        ys[3].shape = (2, 16, 16)
+        >>> muhats = np.stack([(ys[l][1]-ys[l][0]).mean(-1) for l in range(num_levels)])
+        >>> muhats.shape
+        (4, 16)
+        >>> muhathat = muhats.mean(-1)
+        >>> muhathat
+        array([5.62820834, 5.65408695, 5.60367937, 5.47880253])
+        >>> print("%.4f"%muhathat.sum())
+        22.3648
+        
 
     References:
 
@@ -70,7 +95,8 @@ class MLCallOptions(AbstractIntegrand):
         self.g_submodule = getattr(self,'_g_'+self.option)
         self.level = _level
         self.max_level = np.inf
-        super(MLCallOptions,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)
+        self.cost = sampler.d
+        super(MLCallOptions,self).__init__(dimension_indv=(2,),dimension_comb=(2,),parallel=False)
         #if self.discrete_distrib.low_discrepancy and self.option=='asian':
         #    raise ParameterError('MLCallOptions does not support LD sequence for Asian Option')
 
@@ -153,13 +179,14 @@ class MLCallOptions(AbstractIntegrand):
                 First, an np.ndarray of payoffs from fine paths. \
                 Second, an np.ndarray of payoffs from coarse paths.
         """
+        assert t.shape[-1]>1, "asian option requires at least d=2 timesteps"
         af = .5*hf*xf
         ac = .5*hc*xc
-        dwf = np.sqrt(hf) * t[:,:int(d/2)]
-        dif = np.sqrt(hf/12) * hf * t[:,int(d/2):]
+        dwf = np.sqrt(hf) * t[...,:int(d/2)]
+        dif = np.sqrt(hf/12) * hf * t[...,int(d/2):]
         if self.level == 0:
-            dwf = dwf.squeeze()
-            dif = dif.squeeze()
+            dwf = dwf[...,0]
+            dif = dif[...,0]
             xf0 = xf
             xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
             vf = self.sigma*xf0
@@ -184,7 +211,7 @@ class MLCallOptions(AbstractIntegrand):
         pc = np.maximum(0,ac-self.k)
         return pf,pc
 
-    def g(self, t):
+    def g(self, t, compute_flags=None):
         """
         Args:
             t (np.ndarray): Gaussian(0,1^2) samples
@@ -202,21 +229,12 @@ class MLCallOptions(AbstractIntegrand):
         xf = np.tile(self.k,t.shape[:-1])
         xc = xf
         pf,pc = self.g_submodule(t, n, d, nf, nc, hf, hc, xf, xc)
-        dp = np.exp(-self.r*self.t)*(pf-pc)
         pf = np.exp(-self.r*self.t)*pf
         if self.level == 0:
-            dp = pf
-        sums = np.zeros(t.shape[:-2]+(6,))
-        sums[...,0] = dp.sum(-1)
-        sums[...,1] = (dp**2).sum(-1)
-        sums[...,2] = (dp**3).sum(-1)
-        sums[...,3] = (dp**4).sum(-1)
-        sums[...,4] = pf.sum(-1)
-        sums[...,5] = (pf**2).sum(-1)
-        cost = np.prod(dp.shape[:-1])*n*nf # cost defined as number of fine timesteps
-        self.cost = cost
-        self.sums = sums
-        return dp
+            pc = np.zeros_like(pf)
+        else:
+            pc = np.exp(-self.r*self.t)*pc
+        return np.stack([pc,pf],axis=0)
 
     def _dimension_at_level(self, level):
         """ See abstract method. """
