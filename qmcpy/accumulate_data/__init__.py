@@ -1,5 +1,4 @@
 from ._accumulate_data import AccumulateData
-from .mlqmc_data import MLQMCData
 try: 
     import torch 
     import gpytorch 
