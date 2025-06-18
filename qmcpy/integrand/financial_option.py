@@ -472,7 +472,7 @@ class FinancialOption(AbstractIntegrand):
             t_final=self.t_final,
             call_put=self.call_put,
             decomp_type=self.decomp_type,
-            level=self.level, 
+            level=level, 
             initial_level=self.initial_level,
             asian_mean_type=self.asian_mean_type,
             barrier_in_out=self.barrier_in_out, 
@@ -480,9 +480,9 @@ class FinancialOption(AbstractIntegrand):
             digital_payoff=self.digital_payoff)
 
 def _eurogbmprice(S0, r, T, sigma, K):
-        priceratio = K*np.exp(-r*T)/S0
-        xbig = np.log(priceratio)/(sigma*np.sqrt(T))+sigma*np.sqrt(T)/2
-        xsmall = np.log(priceratio)/(sigma*np.sqrt(T))-sigma*np.sqrt(T)/2
-        putprice = S0*(priceratio*norm.cdf(xbig)-norm.cdf(xsmall))
-        callprice = putprice+S0*(1-priceratio)
-        return callprice,putprice
+    priceratio = K*np.exp(-r*T)/S0
+    xbig = np.log(priceratio)/(sigma*np.sqrt(T))+sigma*np.sqrt(T)/2
+    xsmall = np.log(priceratio)/(sigma*np.sqrt(T))-sigma*np.sqrt(T)/2
+    putprice = S0*(priceratio*norm.cdf(xbig)-norm.cdf(xsmall))
+    callprice = putprice+S0*(1-priceratio)
+    return callprice,putprice

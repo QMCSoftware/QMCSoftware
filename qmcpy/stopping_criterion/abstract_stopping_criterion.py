@@ -13,11 +13,6 @@ class AbstractStoppingCriterion(object):
         sname = type(self).__name__
         prefix = 'A concrete implementation of AbstractStoppingCriterion must have '
         # integrand check
-        if not (hasattr(self, 'integrand') and isinstance(self.integrand,AbstractIntegrand)):
-            raise ParameterError(prefix + 'self.integrand, an AbstractIntegrand instance')
-        if not isinstance(self.integrand.discrete_distrib,tuple(allowed_distribs)):
-            raise DistributionCompatibilityError('%s must have an AbstractDiscreteDistribution in %s'%(sname,str(allowed_distribs)))
-        # multilevel compatibility check
         if not hasattr(self,'parameters'):
             self.parameters = []
             
