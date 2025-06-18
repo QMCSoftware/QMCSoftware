@@ -9,4 +9,6 @@ from .johnsons_su import JohnsonsSU
 from .scipy_wrapper import SciPyWrapper
 from .matern import Matern
 
+TrueMeasure = AbstractTrueMeasure
+_TrueMeasure = AbstractTrueMeasure
 Normal = Gaussian

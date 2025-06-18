@@ -23,7 +23,7 @@ class CubMCML(AbstractStoppingCriterion):
         solution        10.410
         n_total         298638
         levels          5
-        n_level         [2.874e+05 6.434e+03 2.936e+03 7.060e+02 2.870e+02]
+        n_level         [287356   6434   2936    706    287]
         mean_level      [10.044  0.193  0.103  0.046  0.025]
         var_level       [1.950e+02 1.954e-01 4.324e-02 9.368e-03 2.924e-03]
         cost_per_sample [ 1.  2.  4.  8. 16.]
@@ -65,7 +65,7 @@ class CubMCML(AbstractStoppingCriterion):
         http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
     """
 
-    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256., n_max=1e10, 
+    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256, n_max=1e10, 
         levels_min=2, levels_max=10, alpha0=-1., beta0=-1., gamma0=-1.):
         """
         Args:
@@ -98,10 +98,10 @@ class CubMCML(AbstractStoppingCriterion):
             self.rmse_tol = float(rmse_tol)
         else: # use absolute tolerance
             self.rmse_tol =  float(abs_tol) / norm.ppf(1-alpha/2)
-        self.n_init = float(n_init)
-        self.n_max = float(n_max)
-        self.levels_min = float(levels_min)
-        self.levels_max = float(levels_max)
+        self.n_init = n_init
+        self.n_max = n_max
+        self.levels_min = levels_min
+        self.levels_max = levels_max
         self.theta = 0.5
         self.alpha0 = alpha0
         self.beta0 = beta0
@@ -126,10 +126,10 @@ class CubMCML(AbstractStoppingCriterion):
             'beta',
             'gamma'])
         data.levels = int(self.levels_min)
-        data.n_level = np.zeros(data.levels+1)
+        data.n_level = np.zeros(data.levels+1,dtype=int)
         data.sum_level = np.zeros((2,data.levels+1))
         data.cost_level = np.zeros(data.levels+1)
-        data.diff_n_level = np.tile(self.n_init,data.levels+1)
+        data.diff_n_level = self.n_init*np.ones(data.levels+1,dtype=int)
         data.alpha = np.maximum(0,self.alpha0)
         data.beta = np.maximum(0,self.beta0)
         data.gamma = np.maximum(0,self.gamma0)
@@ -166,7 +166,7 @@ class CubMCML(AbstractStoppingCriterion):
                     else:
                         _add_level(data)
                         n_samples = self._get_next_samples(data)
-                        data.diff_n_level = np.maximum(0., n_samples-data.n_level)
+                        data.diff_n_level = np.maximum(0,n_samples-data.n_level)
         # finally, evaluate multilevel estimator
         data.solution = (data.sum_level[0,:]/data.n_level).sum()
         data.levels += 1
@@ -197,7 +197,7 @@ class CubMCML(AbstractStoppingCriterion):
         ns = np.ceil( np.sqrt(data.var_level/data.cost_per_sample) * 
                 np.sqrt(data.var_level*data.cost_per_sample).sum() / 
                 ((1-self.theta)*self.rmse_tol**2) )
-        return ns
+        return ns.astype(int)
 
     def _update_data(self, data):
         for l in range(data.levels+1):
@@ -242,7 +242,7 @@ def _add_level(data):
         data.mean_level = np.hstack((data.mean_level, data.mean_level[-1] / 2**data.alpha))
         data.var_level = np.hstack((data.var_level, data.var_level[-1] / 2**data.beta))
         data.cost_per_sample = np.hstack((data.cost_per_sample, data.cost_per_sample[-1] * 2**data.gamma))
-        data.n_level = np.hstack((data.n_level, 0.))
+        data.n_level = np.hstack((data.n_level, 0))
         data.sum_level = np.hstack((data.sum_level,np.zeros((2,1))))
         data.cost_level = np.hstack((data.cost_level, 0.))
     else:

@@ -15,6 +15,8 @@ from .hartmann6d import Hartmann6d
 from .fourbranch2d import FourBranch2d
 from .multimodal2d import Multimodal2d
 
+Integrand = AbstractIntegrand
+_Integrand = AbstractIntegrand
 SobolIndices = SensitivityIndices
 CustomIntegrand = CustomFun
 UserFun = CustomFun

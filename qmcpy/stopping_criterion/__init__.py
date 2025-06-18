@@ -26,6 +26,8 @@ except ImportError:
         def __init__(self, *args, **kwargs):
             raise Exception("SuggesterSimple requires torch and gpytorch but no installations found")
 
+StoppingCriterion = AbstractStoppingCriterion
+_StoppingCriterion = AbstractStoppingCriterion
 CubQMCRep = CubQMCCLT
 CubQMCDigitalNetB2G = CubQMCNetG
 CubQMCSobolG = CubQMCNetG
