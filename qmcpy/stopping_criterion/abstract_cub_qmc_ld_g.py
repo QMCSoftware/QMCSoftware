@@ -8,11 +8,11 @@ from time import time
 import warnings
 
 
-class _CubQMCLDG(AbstractStoppingCriterion):
+class AbstractCubQMCLDG(AbstractStoppingCriterion):
     
     def __init__(self, integrand, abs_tol, rel_tol, n_init, n_limit, fudge, check_cone,
         control_variates, control_variate_means, update_beta, ptransform,
-        ft, omega, allowed_levels, allowed_distribs, cast_complex, error_fun):
+        ft, omega, allowed_distribs, cast_complex, error_fun):
         self.parameters = ['abs_tol','rel_tol','n_init','n_limit']
         # Input Checks
         if np.log2(n_init)%1!=0 or n_init<2**8:
@@ -48,7 +48,7 @@ class _CubQMCLDG(AbstractStoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(_CubQMCLDG,self).__init__(allowed_levels=allowed_levels,allowed_distribs=allowed_distribs,allow_vectorized_integrals=True)
+        super(AbstractCubQMCLDG,self).__init__(allowed_distribs=allowed_distribs,allow_vectorized_integrals=True)
         assert self.integrand.discrete_distrib.no_replications==True, "Require the discrete distribution has replications=None"
         assert self.integrand.discrete_distrib.randomize!="FALSE", "Require discrete distribution is randomized"
         self.set_tolerance(abs_tol,rel_tol)

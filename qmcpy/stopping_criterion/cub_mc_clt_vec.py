@@ -185,7 +185,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(CubMCCLTVec,self).__init__(allowed_levels=["single"],allowed_distribs=[AbstractIIDDiscreteDistribution],allow_vectorized_integrals=True)
+        super(CubMCCLTVec,self).__init__(allowed_distribs=[AbstractIIDDiscreteDistribution],allow_vectorized_integrals=True)
         assert self.integrand.discrete_distrib.no_replications==True, "Require the discrete distribution has replications=None"
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))
         self.set_tolerance(abs_tol,rel_tol)

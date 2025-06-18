@@ -1,4 +1,4 @@
-from ._cub_bayes_ld_g import _CubBayesLDG
+from .abstract_cub_bayes_ld_g import AbstractCubBayesLDG
 from ..discrete_distribution import Lattice
 from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
 from ..util import fftbr,omega_fftbr,ParameterError#, ParameterWarning #MaxSamplesWarning,
@@ -8,7 +8,7 @@ import numpy as np
 #import warnings
 
 
-class CubBayesLatticeG(_CubBayesLDG):
+class CubBayesLatticeG(AbstractCubBayesLDG):
     r"""
     Stopping criterion for Bayesian Cubature using rank-1 Lattice sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error

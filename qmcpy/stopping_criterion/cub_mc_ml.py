@@ -1,4 +1,4 @@
-from ._cub_mc_ml import _CubMCML
+from .abstract_cub_mc_ml import AbstractCubMCML
 from ..util.data import Data
 
 from ..discrete_distribution import IIDStdUniform
@@ -12,7 +12,7 @@ from time import time
 import warnings
 
 
-class CubMCML(_CubMCML):
+class CubMCML(AbstractCubMCML):
     """
     Stopping criterion based on multi-level monte carlo.
     
@@ -115,7 +115,7 @@ class CubMCML(_CubMCML):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(CubMCML,self).__init__(allowed_levels=['adaptive-multi'],allowed_distribs=[AbstractIIDDiscreteDistribution], allow_vectorized_integrals=False)
+        super(CubMCML,self).__init__(allowed_distribs=[AbstractIIDDiscreteDistribution], allow_vectorized_integrals=False)
 
     def integrate(self):
         t_start = time()

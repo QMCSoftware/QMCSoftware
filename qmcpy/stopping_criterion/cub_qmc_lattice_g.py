@@ -1,4 +1,4 @@
-from ._cub_qmc_ld_g import _CubQMCLDG
+from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
@@ -8,7 +8,7 @@ from ..util import fftbr,omega_fftbr,ParameterError
 import numpy as np
 
 
-class CubQMCLatticeG(_CubQMCLDG):
+class CubQMCLatticeG(AbstractCubQMCLDG):
     r"""
     Stopping Criterion quasi-Monte Carlo method using rank-1 Lattices cubature over
     a d-dimensional region to integrate within a specified generalized error
@@ -194,7 +194,6 @@ class CubQMCLatticeG(_CubQMCLDG):
             ptransform = ptransform,
             ft = fftbr,
             omega = omega_fftbr,
-            allowed_levels = ['single'],
             allowed_distribs = [Lattice],
             cast_complex = True,
             error_fun = error_fun)

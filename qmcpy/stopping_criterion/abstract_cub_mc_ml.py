@@ -2,7 +2,7 @@ from .abstract_stopping_criterion import AbstractStoppingCriterion
 import numpy as np
 from scipy.stats import norm
 
-class _CubMCML(AbstractStoppingCriterion):
+class AbstractCubMCML(AbstractStoppingCriterion):
     
     def _get_next_samples(self, data):
         ns = np.ceil( np.sqrt(data.var_level/data.cost_per_sample) * 

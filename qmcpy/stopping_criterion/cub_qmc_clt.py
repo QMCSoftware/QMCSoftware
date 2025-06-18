@@ -217,7 +217,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(CubQMCCLT,self).__init__(allowed_levels=["single"],allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=True)
+        super(CubQMCCLT,self).__init__(allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=True)
         assert self.integrand.discrete_distrib.replications>1, "Require the discrete distribution has replications>1"
         assert self.integrand.discrete_distrib.randomize!="FALSE", "Require discrete distribution is randomized"
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))

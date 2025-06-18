@@ -2,43 +2,40 @@ from ..integrand.abstract_integrand import AbstractIntegrand
 from ..util import DistributionCompatibilityError, ParameterError, MethodImplementationError, _univ_repr
 import numpy as np
 
+
 class AbstractStoppingCriterion(object):
     
-    def __init__(self, allowed_levels, allowed_distribs, allow_vectorized_integrals):
-        """
-        Args:
-            allowed_distribs (list): list of compatible AbstractDiscreteDistribution classes
-            allow_vectorized_integrals (bool): If True, vectorized integrals are allowed. 
-        """
+    def __init__(self, allowed_distribs, allow_vectorized_integrals):
         sname = type(self).__name__
-        prefix = 'A concrete implementation of AbstractStoppingCriterion must have '
+        prefix = 'A concrete implementation of StoppingCriterion must have '
         # integrand check
+        if (not hasattr(self, 'integrand')) or (not isinstance(self.integrand,AbstractIntegrand)):
+            raise ParameterError(prefix + 'self.integrand, an Integrand instance')
+        # true measure check
+        if (not hasattr(self, 'true_measure')) or (self.true_measure!=self.integrand.true_measure):
+            raise ParameterError(prefix + 'self.true_measure=self.integrand.true_measure')
+        # discrete distribution check
+        if (not hasattr(self, 'discrete_distrib')) or (self.discrete_distrib!=self.integrand.discrete_distrib):
+            raise ParameterError(prefix + 'self.discrete_distrib=self.integrand.discrete_distrib')
+        if not isinstance(self.discrete_distrib,tuple(allowed_distribs)):
+            raise DistributionCompatibilityError('%s must have a DiscreteDistribution in %s'%(sname,str(allowed_distribs)))
+        if (not allow_vectorized_integrals) and len(self.integrand.d_indv)>0:
+            raise ParameterError('Vectorized integrals (with d_indv!=() outputs per sample) are not supported by this stopping criterion')
+        # parameter checks
         if not hasattr(self,'parameters'):
             self.parameters = []
             
     def integrate(self):
         """
-        ABSTRACT METHOD to determine the number of samples needed to satisfy the tolerance.
+        *Abstract method* to determine the number of samples needed to satisfy the tolerance(s).
 
         Returns:
-            solution (float): approximation to the integral
-            data (Data): an Data object
+            solution (Union[float,np.ndarray]): Approximation to the integral with shape `integrand.d_comb`.
+            data (Data): A data object.
         """
         raise MethodImplementationError(self, 'integrate')
     
-    def set_tolerance(self, *args, **kwargs):
-        """ ABSTRACT METHOD to reset the absolute tolerance. """
-        raise ParameterError("The %s AbstractStoppingCriterion does not support resetting tolerances.")
-
     def _compute_indv_alphas(self, alphas_comb):
-        """
-        Compute individual uncertainty levels required to achieve combined uncertainty levels. 
-
-        Args:
-            alphas_comb (np.ndarray): desired uncertainty levels on combined solutions. 
-        
-        Returns:
-            np.ndarray: uncertainty levels on individual solutions"""
         alphas_indv = np.tile(1,self.integrand.d_indv)
         identity_dependency = True
         for k in np.ndindex(self.integrand.d_comb):

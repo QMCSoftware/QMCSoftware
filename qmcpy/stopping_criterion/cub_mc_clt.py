@@ -149,7 +149,7 @@ class CubMCCLT(AbstractStoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(CubMCCLT,self).__init__(allowed_levels=['single'],allowed_distribs=[AbstractIIDDiscreteDistribution],allow_vectorized_integrals=True)
+        super(CubMCCLT,self).__init__(allowed_distribs=[AbstractIIDDiscreteDistribution],allow_vectorized_integrals=True)
         assert self.integrand.d_indv==()
         # control variates
         self.cv_mu = np.atleast_1d(control_variate_means)

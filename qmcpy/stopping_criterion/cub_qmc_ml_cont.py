@@ -1,4 +1,4 @@
-from ._cub_qmc_ml import _CubQMCML
+from .abstract_cub_qmc_ml import AbstractCubQMCML
 from ..util.data import Data
 
 from ..discrete_distribution import DigitalNetB2,Lattice,Halton
@@ -12,7 +12,7 @@ from time import time
 import warnings
 
 
-class CubQMCMLCont(_CubQMCML):
+class CubQMCMLCont(AbstractCubQMCML):
     """
     Stopping criterion based on continuation multi-level quasi-Monte Carlo.
 
@@ -110,7 +110,7 @@ class CubQMCMLCont(_CubQMCML):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(CubQMCMLCont,self).__init__(allowed_levels=['adaptive-multi'],allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=False)
+        super(CubQMCMLCont,self).__init__(allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=False)
         self.replications = self.discrete_distrib.replications 
         assert self.replications>=4, "require at least 4 replications"
 

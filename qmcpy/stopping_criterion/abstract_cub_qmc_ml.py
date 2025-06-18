@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import norm
 
 
-class _CubQMCML(AbstractStoppingCriterion):
+class AbstractCubQMCML(AbstractStoppingCriterion):
     
     def set_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
         """

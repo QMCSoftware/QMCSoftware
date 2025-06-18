@@ -1,4 +1,4 @@
-from ._cub_qmc_ld_g import _CubQMCLDG
+from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG
 from ..util import fwht,omega_fwht,ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
@@ -8,7 +8,7 @@ from ..integrand.sensitivity_indices import SensitivityIndices
 import numpy as np
 
 
-class CubQMCNetG(_CubQMCLDG):
+class CubQMCNetG(AbstractCubQMCLDG):
     r"""
     Quasi-Monte Carlo method using Sobol' cubature over the
     d-dimensional region to integrate within a specified generalized error
@@ -240,7 +240,6 @@ class CubQMCNetG(_CubQMCLDG):
             ptransform = 'none',
             ft = fwht,
             omega = omega_fwht,
-            allowed_levels = ['single'],
             allowed_distribs = [DigitalNetB2],
             cast_complex = False,
             error_fun = error_fun)

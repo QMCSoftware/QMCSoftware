@@ -1,4 +1,4 @@
-from ._cub_bayes_ld_g import _CubBayesLDG
+from .abstract_cub_bayes_ld_g import AbstractCubBayesLDG
 from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
 from ..util import fwht,omega_fwht,MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
@@ -9,7 +9,7 @@ from time import time
 import warnings
 
 
-class CubBayesNetG(_CubBayesLDG):
+class CubBayesNetG(AbstractCubBayesLDG):
     r"""
     Stopping criterion for Bayesian Cubature using digital net sequence with guaranteed
     accuracy over a d-dimensional region to integrate within a specified generalized error

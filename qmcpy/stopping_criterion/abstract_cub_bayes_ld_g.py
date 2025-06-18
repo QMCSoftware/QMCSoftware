@@ -11,7 +11,7 @@ from scipy.stats import norm as gaussnorm
 from scipy.stats import t as tnorm
 
 
-class _CubBayesLDG(AbstractStoppingCriterion):
+class AbstractCubBayesLDG(AbstractStoppingCriterion):
 
     def __init__(self, integrand, ft, omega, ptransform, allowed_distribs, kernel,
                  abs_tol, rel_tol, n_init, n_limit, alpha, error_fun, errbd_type):
@@ -40,7 +40,7 @@ class _CubBayesLDG(AbstractStoppingCriterion):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(_CubBayesLDG,self).__init__(allowed_levels=["single"],allowed_distribs=allowed_distribs,allow_vectorized_integrals=True)
+        super(AbstractCubBayesLDG,self).__init__(allowed_distribs=allowed_distribs,allow_vectorized_integrals=True)
         assert self.integrand.discrete_distrib.no_replications==True, "Require the discrete distribution has replications=None"
         assert self.integrand.discrete_distrib.randomize!="FALSE", "Require discrete distribution is randomized"
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))

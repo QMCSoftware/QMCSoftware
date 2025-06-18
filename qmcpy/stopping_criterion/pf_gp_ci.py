@@ -192,7 +192,7 @@ class PFGPCI(AbstractStoppingCriterion):
             ytf = self._affine_tf(y)
             self.ref_approx = (ytf>=0).mean(0)
             if self.verbose: print('reference approximation with d=%d: %s'%(self.d,self.ref_approx))
-        super(PFGPCI,self).__init__(allowed_levels=["single"], allowed_distribs=[AbstractDiscreteDistribution], allow_vectorized_integrals=False)
+        super(PFGPCI,self).__init__(allowed_distribs=[AbstractDiscreteDistribution],allow_vectorized_integrals=False)
     def _affine_tf(self, y):
         return y-self.failure_threshold if self.failure_above_threshold else self.failure_threshold-y
     #@profile
