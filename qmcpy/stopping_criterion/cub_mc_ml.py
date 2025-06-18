@@ -4,7 +4,7 @@ from ..util.data import Data
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..true_measure import Gaussian
-from ..integrand import MLCallOptions
+from ..integrand import FinancialOption
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
 import numpy as np
 from scipy.stats import norm
@@ -17,37 +17,40 @@ class CubMCML(_CubMCML):
     Stopping criterion based on multi-level monte carlo.
     
     Examples:
-        >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
-        >>> sc = CubMCML(mlco,abs_tol=.1)
+        >>> fo = FinancialOption(IIDStdUniform(seed=7))
+        >>> sc = CubMCML(fo,abs_tol=1.5e-2)
         >>> solution,data = sc.integrate()
         >>> data
         Data (Data)
-            solution        10.410
-            n_total         298638
-            levels          5
-            n_level         [287356   6434   2936    706    287]
-            mean_level      [10.044  0.193  0.103  0.046  0.025]
-            var_level       [1.950e+02 1.954e-01 4.324e-02 9.368e-03 2.924e-03]
-            cost_per_sample [ 1.  2.  4.  8. 16.]
-            alpha           1.003
-            beta            2.039
-            gamma           1
+            solution        1.785
+            n_total         3577556
+            levels          2^(2)
+            n_level         [2438191  490331  207606   62905]
+            mean_level      [1.715 0.053 0.013 0.003]
+            var_level       [21.829  1.761  0.452  0.11 ]
+            cost_per_sample [ 2.  4.  8. 16.]
+            alpha           2.008
+            beta            1.997
+            gamma           1.000
             time_integrate  ...
         CubMCML (AbstractStoppingCriterion)
-            rmse_tol        0.039
+            rmse_tol        0.006
             n_init          2^(8)
             levels_min      2^(1)
             levels_max      10
             theta           2^(-1)
-        MLCallOptions (AbstractIntegrand)
-            option          european
-            sigma           0.200
-            k               100
-            r               0.050
-            t               1
-            b               85
-            level           0
-        Gaussian (AbstractTrueMeasure)
+        FinancialOption (AbstractIntegrand)
+            option          ASIAN
+            call_put        CALL
+            volatility      2^(-1)
+            start_price     30
+            strike_price    35
+            interest_rate   0
+            t_final         1
+            asian_mean      ARITHMETIC
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        1
+            drift           0
             mean            0
             covariance      1
             decomp_type     PCA

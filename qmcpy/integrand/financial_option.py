@@ -151,10 +151,10 @@ class FinancialOption(AbstractIntegrand):
         Multi-level options 
 
         >>> seed_seq = np.random.SeedSequence(7) 
-        >>> initial_level = 3
+        >>> d_coarsest = 8
         >>> num_levels = 4
         >>> ns = [2**11,2**10,2**9,2**8]
-        >>> integrands = [FinancialOption(DigitalNetB2(dimension=2**l,seed=seed_seq.spawn(1)[0]),option="ASIAN",level=l,initial_level=initial_level) for l in range(initial_level,initial_level+num_levels)]
+        >>> integrands = [FinancialOption(DigitalNetB2(dimension=2**l*d_coarsest,seed=seed_seq.spawn(1)[0]),option="ASIAN",level=l,d_coarsest=d_coarsest) for l in range(num_levels)]
         >>> ys = [integrands[l](ns[l]) for l in range(num_levels)]
         >>> for l in range(num_levels):
         ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
@@ -171,10 +171,10 @@ class FinancialOption(AbstractIntegrand):
         Multi-level options with independent replications
          
         >>> seed_seq = np.random.SeedSequence(7) 
-        >>> initial_level = 3
+        >>> d_coarsest = 8
         >>> num_levels = 4
         >>> ns = [2**7,2**6,2**5,2**4]
-        >>> integrands = [FinancialOption(DigitalNetB2(dimension=2**l,seed=seed_seq.spawn(1)[0],replications=2**4),option="ASIAN",level=l,initial_level=initial_level) for l in range(initial_level,initial_level+num_levels)]
+        >>> integrands = [FinancialOption(DigitalNetB2(dimension=2**l*d_coarsest,seed=seed_seq.spawn(1)[0],replications=2**4),option="ASIAN",level=l,d_coarsest=d_coarsest) for l in range(num_levels)]
         >>> ys = [integrands[l](ns[l]) for l in range(num_levels)]
         >>> for l in range(num_levels):
         ...     print("ys[%d].shape = %s"%(l,ys[l].shape))
@@ -210,7 +210,7 @@ class FinancialOption(AbstractIntegrand):
                  t_final = 1,
                  decomp_type = 'PCA',
                  level = None,
-                 initial_level = 0,
+                 d_coarsest = 2,
                  asian_mean = "ARITHMETIC",
                  asian_mean_quadrature_rule = "TRAPEZOIDAL",
                  barrier_in_out = "IN",
@@ -234,7 +234,7 @@ class FinancialOption(AbstractIntegrand):
                 - `'PCA'` for principal component analysis, or 
                 - `'Cholesky'` for cholesky decomposition.
             level (Union[None,int]): Level for multilevel problems 
-            initial_level (Union[None,int]): First level for multilevel problems.
+            coarsest_dimension (Union[None,int]): Dimension of the problem on the coarsest level.
             asian_mean (str): Either `'ARITHMETIC'` or `'GEOMETRIC'`.
             asian_mean_quadrature_rule (str): Either 'TRAPEZOIDAL' or 'RIGHT'. 
             barrier_in_out (str): Either `'IN'` or `'OUT'`. 
@@ -252,25 +252,35 @@ class FinancialOption(AbstractIntegrand):
         self.interest_rate = float(interest_rate)
         self.discount_factor = np.exp(-self.interest_rate*self.t_final)
         self.level = level
-        self.initial_level = initial_level
-        if self.level is not None: 
-            self.parameters += ['level','initial_level']
+        self.d_coarsest = d_coarsest
+        if self.level is not None:
+            self.multilevel = True 
+            self.parameters += ['level','d_coarsest']
             assert np.isscalar(self.level) and self.level%1==0 
-            assert np.isscalar(self.initial_level) and self.initial_level%1==0
+            assert np.isscalar(self.d_coarsest) and self.d_coarsest%1==0 and d_coarsest>0 and np.log2(d_coarsest)%1==0, "d_coarsest must be an integer power of 2"
             self.level = int(self.level)
-            self.initial_level = int(self.initial_level) 
-            assert self.sampler.d==2**self.level, "the dimension of the sampler must equal 2^level = %d"%(2**self.level)
-            assert 0<=self.initial_level<=self.level, "require 0 <= initial_level (%d) <= level (%d)."%(self.initial_level,self.level)
+            self.d_coarsest = int(self.d_coarsest) 
+            assert self.sampler.d==self.d_coarsest*2**self.level, "the dimension of the sampler must equal d_coarsest*2^level = %d"%(d_coarsest*2**self.level)
+            self.cost = self.d_coarsest*2**self.level
+            dim_shape = (2,)
+        else:
+            self.multilevel = False
+            dim_shape = ()
         self.call_put = str(call_put).upper()
         assert self.call_put in ['CALL','PUT'], "invalid call_put = %s"%self.call_put
         self.option = str(option).upper()
+        self.asian_mean = str(asian_mean).upper()
+        self.asian_mean_quadrature_rule = str(asian_mean_quadrature_rule).upper()
+        self.barrier_in_out = str(barrier_in_out).upper()
+        assert np.isscalar(barrier_price)
+        self.barrier_price = float(barrier_price)
+        assert np.isscalar(digital_payout) and digital_payout>0
+        self.digital_payout = float(digital_payout)
         if self.option=="EUROPEAN":
             self.payoff = self.payoff_european_call if self.call_put=='CALL' else self.payoff_european_put
         elif self.option=="ASIAN":
             self.parameters += ['asian_mean']
-            self.asian_mean = str(asian_mean).upper()
             assert self.asian_mean in ['ARITHMETIC','GEOMETRIC'], "invalid asian_mean = %s"%self.asian_mean
-            self.asian_mean_quadrature_rule = str(asian_mean_quadrature_rule).upper()
             assert self.asian_mean_quadrature_rule in ['TRAPEZOIDAL','RIGHT'], "invalid asian_mean_quadrature_rule = %s"%self.asian_mean_quadrature_rule
             if self.asian_mean=="ARITHMETIC":
                 if self.asian_mean_quadrature_rule=="TRAPEZOIDAL":
@@ -284,9 +294,6 @@ class FinancialOption(AbstractIntegrand):
                     self.payoff = self.payoff_asian_geometric_right_call if self.call_put=='CALL' else self.payoff_asian_geometric_right_put
         elif self.option=="BARRIER":
             self.parameters += ['barrier_in_out','barrier_up_down','barrier_price']
-            assert np.isscalar(barrier_price)
-            self.barrier_price = float(barrier_price)
-            self.barrier_in_out = str(barrier_in_out).upper()
             self.barrier_up_down = "UP" if self.start_price<self.barrier_price else "DOWN"
             if self.barrier_in_out=="IN":
                 if self.barrier_up_down=="UP":
@@ -303,20 +310,16 @@ class FinancialOption(AbstractIntegrand):
         elif self.option=="LOOKBACK":
             self.payoff = self.payoff_lookback_call if self.call_put=='CALL' else self.payoff_lookback_put
         elif self.option=="DIGITAL":
-            assert np.isscalar(digital_payout) and digital_payout>0
-            self.digital_payout = float(digital_payout)
             self.payoff = self.payoff_digital_call if self.call_put=='CALL' else self.payoff_digital_put
         else:
             raise ParameterError("invalid option type %s"%self.option)
-        self.multilevel = self.level is not None
-        dim_shape = (2,) if self.multilevel else ()
         super(FinancialOption,self).__init__(dimension_indv=dim_shape,dimension_comb=dim_shape,parallel=False)  
     
     def g(self, t, **kwargs):
         gbm = self.gbm(t)
         discounted_payoffs = self.payoff(gbm)*self.discount_factor
         if self.multilevel:
-            if self.level==self.initial_level:
+            if self.level==0:
                 discounted_payoffs_coarse = np.zeros_like(discounted_payoffs)
             else: 
                 discounted_payoffs_coarse = self.payoff(gbm[...,1::2])*self.discount_factor
@@ -462,6 +465,9 @@ class FinancialOption(AbstractIntegrand):
             raise ParameterError("exact value not supported for option = %s"%self.option)
         return fp
     
+    def _dimension_at_level(self, level):
+        return self.d_coarsest*2**level
+    
     def _spawn(self, level, sampler):
         return FinancialOption(
             sampler=sampler,
@@ -473,11 +479,11 @@ class FinancialOption(AbstractIntegrand):
             call_put=self.call_put,
             decomp_type=self.decomp_type,
             level=level, 
-            initial_level=self.initial_level,
+            d_coarsest=self.d_coarsest,
             asian_mean=self.asian_mean,
             barrier_in_out=self.barrier_in_out, 
             barrier_price=self.barrier_price,
-            digital_payoff=self.digital_payoff)
+            digital_payout=self.digital_payout)
 
 def _eurogbmprice(S0, r, T, sigma, K):
     priceratio = K*np.exp(-r*T)/S0

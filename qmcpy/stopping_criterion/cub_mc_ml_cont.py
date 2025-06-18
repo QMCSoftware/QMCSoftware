@@ -5,7 +5,7 @@ from ..util.data import Data
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..true_measure import Gaussian
-from ..integrand import MLCallOptions
+from ..integrand import FinancialOption
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
 import numpy as np
 from scipy.stats import norm
@@ -17,40 +17,43 @@ class CubMCMLCont(_CubMCML):
     """
     Stopping criterion based on continuation multi-level monte carlo.
     
-    >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
-    >>> sc = CubMCMLCont(mlco,abs_tol=.05)
+    >>> fo = FinancialOption(IIDStdUniform(seed=7))
+    >>> sc = CubMCMLCont(fo,abs_tol=1.5e-2)
     >>> solution,data = sc.integrate()
     >>> data
     Data (Data)
-        solution        10.400
-        n_total         1193331
-        levels          2^(2)
-        n_level         [1133772   22940    8676    2850]
-        mean_level      [10.059  0.186  0.105  0.05 ]
-        var_level       [1.959e+02 1.603e-01 4.567e-02 1.013e-02]
-        cost_per_sample [1. 2. 4. 8.]
-        alpha           0.942
-        beta            1.992
+        solution        1.771
+        n_total         2291120
+        levels          3
+        n_level         [1094715  222428   79666     912     256]
+        mean_level      [1.71  0.048 0.012]
+        var_level       [21.826  1.768  0.453]
+        cost_per_sample [2. 4. 8.]
+        alpha           1.970
+        beta            1.965
         gamma           1.000
         time_integrate  ...
     CubMCMLCont (AbstractStoppingCriterion)
-        rmse_tol        0.019
+        rmse_tol        0.006
         n_init          2^(8)
         levels_min      2^(1)
         levels_max      10
         n_tols          10
         tol_mult        1.668
         theta_init      2^(-1)
-        theta           2^(-1)
-    MLCallOptions (AbstractIntegrand)
-        option          european
-        sigma           0.200
-        k               100
-        r               0.050
-        t               1
-        b               85
-        level           0
-    Gaussian (AbstractTrueMeasure)
+        theta           0.010
+    FinancialOption (AbstractIntegrand)
+        option          ASIAN
+        call_put        CALL
+        volatility      2^(-1)
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        t_final         1
+        asian_mean      ARITHMETIC
+    BrownianMotion (AbstractTrueMeasure)
+        time_vec        1
+        drift           0
         mean            0
         covariance      1
         decomp_type     PCA

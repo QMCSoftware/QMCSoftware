@@ -4,7 +4,7 @@ from ..util.data import Data
 from ..discrete_distribution import DigitalNetB2,Lattice,Halton
 from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..true_measure import Gaussian
-from ..integrand import MLCallOptions
+from ..integrand import FinancialOption
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
 import numpy as np
 from scipy.stats import norm
@@ -16,43 +16,48 @@ class CubQMCML(_CubQMCML):
     """
     Stopping criterion based on multi-level quasi-Monte Carlo.
 
-    >>> mlco = MLCallOptions(Lattice(seed=7,replications=32))
-    >>> sc = CubQMCML(mlco,abs_tol=.075)
+    >>> fo = FinancialOption(DigitalNetB2(seed=7,replications=32))
+    >>> sc = CubQMCML(fo,abs_tol=3e-3)
     >>> solution,data = sc.integrate()
     >>> data
     Data (Data)
-        solution        10.418
-        n_total         98304
-        levels          5
-        n_level         [2048  256  256  256  256]
-        mean_level      [10.053  0.183  0.102  0.053  0.028]
-        var_level       [2.454e-04 5.669e-05 2.597e-05 1.360e-05 7.235e-06]
-        bias_estimate   0.016
+        solution        1.784
+        n_total         2097152
+        levels          2^(2)
+        n_level         [32768 16384  8192  8192]
+        mean_level      [1.718 0.051 0.012 0.003]
+        var_level       [4.607e-08 5.753e-08 3.305e-07 1.557e-07]
+        bias_estimate   2.66e-04
         time_integrate  ...
     CubQMCML (AbstractStoppingCriterion)
-        rmse_tol        0.029
+        rmse_tol        0.001
         n_init          2^(8)
         n_max           10000000000
         replications    2^(5)
-    MLCallOptions (AbstractIntegrand)
-        option          european
-        sigma           0.200
-        k               100
-        r               0.050
-        t               1
-        b               85
-        level           0
-    Gaussian (AbstractTrueMeasure)
+    FinancialOption (AbstractIntegrand)
+        option          ASIAN
+        call_put        CALL
+        volatility      2^(-1)
+        start_price     30
+        strike_price    35
+        interest_rate   0
+        t_final         1
+        asian_mean      ARITHMETIC
+    BrownianMotion (AbstractTrueMeasure)
+        time_vec        1
+        drift           0
         mean            0
         covariance      1
         decomp_type     PCA
-    Lattice (AbstractLDDiscreteDistribution)
+    DigitalNetB2 (AbstractLDDiscreteDistribution)
         d               1
         replications    2^(5)
-        randomize       SHIFT
-        gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
+        randomize       LMS_DS
+        gen_mats_source joe_kuo.6.21201.txt
         order           NATURAL
-        n_limit         2^(20)
+        t               63
+        alpha           1
+        n_limit         2^(32)
         entropy         7
     
 
