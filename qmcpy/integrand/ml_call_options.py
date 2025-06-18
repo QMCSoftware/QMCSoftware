@@ -120,14 +120,14 @@ class MLCallOptions(AbstractIntegrand):
         """
         dwf = t * np.sqrt(hf)
         if self.level == 0:
-            dwf = dwf.squeeze()
+            dwf = dwf[...,0]
             xf = xf + self.r*xf*hf + self.sigma*xf*dwf + .5*self.sigma**2*xf*(dwf**2-hf)
         else:
             for j in range(int(nf)):
-                xf = xf + self.r*xf*hf + self.sigma*xf*dwf[:,j] + .5*self.sigma**2*xf*(dwf[:,j]**2-hf)
+                xf = xf + self.r*xf*hf + self.sigma*xf*dwf[...,j] + .5*self.sigma**2*xf*(dwf[...,j]**2-hf)
                 if (j%2)==1:
-                    dwc = dwf[:,j-1] + dwf[:,j]
-                    ddw = dwf[:,j-1] - dwf[:,j]
+                    dwc = dwf[...,j-1] + dwf[...,j]
+                    ddw = dwf[...,j-1] - dwf[...,j]
                     xc = xc + self.r*xc*hc + self.sigma*xc*dwc + .5*self.sigma**2*xc*(dwc**2-hc)
         pf = np.maximum(0,xf-self.k)
         pc = np.maximum(0,xc-self.k)
@@ -167,16 +167,16 @@ class MLCallOptions(AbstractIntegrand):
         else:
             for j in range(int(nf)):
                 xf0 = xf
-                xf = xf + self.r*xf*hf + self.sigma*xf*dwf[:,j] + .5*self.sigma**2*xf*(dwf[:,j]**2-hf)
+                xf = xf + self.r*xf*hf + self.sigma*xf*dwf[...,j] + .5*self.sigma**2*xf*(dwf[...,j]**2-hf)
                 vf = self.sigma*xf0
-                af = af + hf*xf + vf*dif[:,j]
+                af = af + hf*xf + vf*dif[...,j]
                 if (j%2)==1:
-                    dwc = dwf[:,j-1] + dwf[:,j]
-                    ddw = dwf[:,j-1] - dwf[:,j]
+                    dwc = dwf[...,j-1] + dwf[...,j]
+                    ddw = dwf[...,j-1] - dwf[...,j]
                     xc0 = xc
                     xc = xc + self.r*xc*hc + self.sigma*xc*dwc + .5*self.sigma**2*xc*(dwc**2-hc)
                     vc = self.sigma*xc0
-                    dif_cs = dif[:,j-1] + dif[:,j]
+                    dif_cs = dif[...,j-1] + dif[...,j]
                     ac = ac + hc*xc + vc*(dif_cs + .25*hc*ddw)
             af = af - 0.5*hf*xf
             ac = ac - 0.5*hc*xc
@@ -194,26 +194,26 @@ class MLCallOptions(AbstractIntegrand):
                 First, an np.ndarray of length 6 vector of summary statistic sums. \
                 Second, a float of cost on this level.
         """
-        n,d = t.shape
+        n,d = t.shape[-2:]
         nf = 2**self.level # n fine
         nc = float(nf)/2 # n coarse
         hf = self.t/nf # timestep fine
         hc = self.t/nc # timestep coarse
-        xf = np.tile(self.k,int(n))
+        xf = np.tile(self.k,t.shape[:-1])
         xc = xf
         pf,pc = self.g_submodule(t, n, d, nf, nc, hf, hc, xf, xc)
         dp = np.exp(-self.r*self.t)*(pf-pc)
         pf = np.exp(-self.r*self.t)*pf
         if self.level == 0:
             dp = pf
-        sums = np.zeros(6)
-        sums[0] = dp.sum()
-        sums[1] = (dp**2).sum()
-        sums[2] = (dp**3).sum()
-        sums[3] = (dp**4).sum()
-        sums[4] = pf.sum()
-        sums[5] = (pf**2).sum()
-        cost = n*nf # cost defined as number of fine timesteps
+        sums = np.zeros(t.shape[:-2]+(6,))
+        sums[...,0] = dp.sum(-1)
+        sums[...,1] = (dp**2).sum(-1)
+        sums[...,2] = (dp**3).sum(-1)
+        sums[...,3] = (dp**4).sum(-1)
+        sums[...,4] = pf.sum(-1)
+        sums[...,5] = (pf**2).sum(-1)
+        cost = np.prod(dp.shape[:-1])*n*nf # cost defined as number of fine timesteps
         self.cost = cost
         self.sums = sums
         return dp
