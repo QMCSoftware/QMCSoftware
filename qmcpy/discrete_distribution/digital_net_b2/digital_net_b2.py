@@ -309,6 +309,7 @@ class DigitalNetB2(LD):
         super(DigitalNetB2,self).__init__(dimension,seed)
         if not self.msb:
             qmctoolscl.dnb2_gmat_lsb_to_msb(uint64(self.replications_gm),uint64(self.d),uint64(self.m_max),tile(uint64(self.t_max),self.replications_gm),self.z_og,self.z_og,**qmctoolscl_kwargs)
+        
         # randomizations
         self.t_lms = self.t_max if self.t_max>t_lms else t_lms
         assert self.t_max<=64 and self.t_lms<=64, "require t_max <= t_lms <= 64"

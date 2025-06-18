@@ -3,6 +3,8 @@ import math
 from itertools import combinations
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+#all loss functions
+
 def L2discrepancy(x):
     N = x.size(1) 
     dim = x.size(2)

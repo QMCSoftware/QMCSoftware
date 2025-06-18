@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 
 class MPMC(LD): 
-    def __init__(self, dimension = 2, randomize = 'shift', seed = None, 
+    def __init__(self, dimension = 2, randomize = None, seed = None, 
                  dim_emph = None, d_max = None, replications = 1):
         """
         Args:
@@ -26,9 +26,14 @@ class MPMC(LD):
             randomize (bool): If True, apply shift to generated samples.
                 Note: Non-randomized lattice sequence includes the origin.
 
-        
+            d_max (int): max dimension
+
+            dim_emph (list or array??): emphasized dimensions for approx_hickernell 
+            
+            replications (int): number of IID randomizations of a pointset
         """
         #necessary 
+        #what is this list of parameters for? 
         self.parameters = ['randomize']
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
@@ -42,13 +47,12 @@ class MPMC(LD):
         #randomization
 
 
-    def gen_samples(self, n = None, warn = True, return_unrandomized = False,):
+    def gen_samples(self, n = None, return_unrandomized = False):
         """
         IMPLEMENT ABSTRACT METHOD to generate samples from this discrete distribution.
 
         Args:
-            n (int): if n is supplied, generate from n_min=0 to n_max=n samples.
-                Otherwise use the n_min and n_max explicitly supplied as the following 2 arguments
+            n (int): if n is supplied
             return_unrandomized (bool): return samples without randomization as 2nd return value.
                 Will not be returned if randomize=False.
         Returns:
@@ -60,6 +64,7 @@ class MPMC(LD):
         x = np.empty(r, n, d)
         #if points are already generated: 
         if n in [16, 32, 64, 128, 256]:
+            #x = filename smth smth 
             print("x = points already trained")
         #else train data using model: 
         else:
@@ -101,21 +106,16 @@ class MPMC(LD):
     def _spawn(self, child_seed, dimension): 
         """ 
         assign parameters 
-        
         """
         return MPMC(
             dimension=dimension,
             randomize=self.randomize,
-            graycode=self.graycode,
+            dim_emph= self.dim_emph,
             seed=child_seed,
-            generating_matrices=self.z_og,
             d_max=self.d_max,
-            t_max=self.t_max,
-            m_max=self.m_max,
-            msb=True, # self.z_og is put into MSB during first initialization 
-            t_lms=self.t_lms,
             replications=self.replications)
 
+    #returns an NP array of points (trained)
     def train(self, args):
         model = MPMC_net(args.dim, args.nhid, args.nlayers, args.nsamples, args.nbatch,
                         args.radius, args.loss_fn, args.dim_emphasize, args.n_projections).to(device)
@@ -142,9 +142,9 @@ class MPMC(LD):
             if epoch % 100 ==0:
                 y = X.clone()
                 if args.loss_fn == 'L2dis':
-                    batched_discrepancies = self.L2discrepancy(y.detach())
+                    batched_discrepancies = L2discrepancy(y.detach())
                 elif args.loss_fn == 'L2cen':
-                    batched_discrepancies = self.L2center(y.detach())
+                    batched_discrepancies = L2center(y.detach())
                 elif args.loss_fn == 'L2ext':
                     batched_discrepancies = L2ext(y.detach())
                 elif args.loss_fn == 'L2per':
@@ -163,15 +163,13 @@ class MPMC(LD):
                     best_loss = min_discrepancy
 
                     #REPLACE POINT SAVE IN FILE TO POINT SAVE TO X 
-                    f = open('results/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid) + '/Lf'+str(args.loss_fn) + '.txt', 'a')
-                    f.write(str(best_loss) + '\n')
-                    f.close()
+                    # f = open('results/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid) + '/Lf'+str(args.loss_fn) + '.txt', 'a')
+                    # f.write(str(best_loss) + '\n')
+                    # f.close()
 
                     ## save MPMC points:
-                    # PATH = 'outputs/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+ '/nhid_' +str(args.nhid)+ '/Lf'+str(args.loss_fn) + '.npy'
                     y = y.detach().cpu().numpy()
                     endresult = y
-                    # np.save(PATH,y)
 
                 if (min_discrepancy > best_loss and (epoch + 1) >= args.start_reduce):
                     patience += 1
@@ -183,11 +181,13 @@ class MPMC(LD):
                         param_group['lr'] = args.lr
 
                 if (args.lr < 1e-6):
-                    f = open('results/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid) + '/Lf'+str(args.loss_fn) + '.txt', 'a')
-                    f.write('### epochs: '+str(epoch) + '\n')
-                    f.close()
+                    # f = open('results/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid) + '/Lf'+str(args.loss_fn) + '.txt', 'a')
+                    # f.write('### epochs: '+str(epoch) + '\n')
+                    # f.close()
 
                     break
+            
+        return endresult
     
     
     
