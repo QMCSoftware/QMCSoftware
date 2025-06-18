@@ -433,8 +433,8 @@ class FinancialOption(AbstractIntegrand):
         """
         Compute the exact analytic fair price of the option. Supports 
             
-            - `option='EUROPEAN'`
-            - `option='ASIAN'` with `asian_mean='GEOMETRIC'` and `asian_mean_quadrature_rule='RIGHT'`
+        - `option='EUROPEAN'`
+        - `option='ASIAN'` with `asian_mean='GEOMETRIC'` and `asian_mean_quadrature_rule='RIGHT'`
 
         Returns: 
             mean (float): Exact value of the integral. 

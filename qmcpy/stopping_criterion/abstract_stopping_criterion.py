@@ -6,6 +6,12 @@ import numpy as np
 class AbstractStoppingCriterion(object):
     
     def __init__(self, allowed_distribs, allow_vectorized_integrals):
+        """
+        Args:
+            allowed_distribs (list): Allowed discrete distribution classes.
+            allow_vectorized_integrals (bool): Whether or not to allow integrands with vectorized outputs, 
+                i.e., those with `integrand.d_indv!=()`. 
+        """
         sname = type(self).__name__
         prefix = 'A concrete implementation of StoppingCriterion must have '
         # integrand check
@@ -50,5 +56,17 @@ class AbstractStoppingCriterion(object):
             alphas_indv = np.where(alpha_k_mat==0,alphas_indv,np.minimum(alpha_k_mat,alphas_indv))
         return alphas_indv,identity_dependency
     
+    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
+        """
+        Reset the tolerances.
+        
+        Args:
+            abs_tol (float): Absolute tolerance (if applicable). Reset if supplied, ignored otherwise. 
+            rel_tol (float): Relative tolerance (if applicable). Reset if supplied, ignored otherwise. 
+            rmse_tol (float): RMSE tolerance (if applicable). Reset if supplied, ignored if not. 
+                If `rmse_tol` is not supplied but `abs_tol` is, then `rmse_tol = abs_tol / norm.ppf(1-alpha/2)`. 
+        """
+        raise MethodImplementationError(self, 'integrate')
+
     def __repr__(self):
         return _univ_repr(self, "AbstractStoppingCriterion", self.parameters)

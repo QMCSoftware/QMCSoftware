@@ -481,13 +481,6 @@ class CubMCG(AbstractStoppingCriterion):
         return eps
 
     def set_tolerance(self, abs_tol=None, rel_tol=None):
-        """
-        See abstract method.
-
-        Args:
-            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not.
-            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
-        """
         if abs_tol != None: self.abs_tol = abs_tol
         if rel_tol != None: self.rel_tol = rel_tol
 

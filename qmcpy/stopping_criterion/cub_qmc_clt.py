@@ -1,6 +1,5 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
-
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from ..discrete_distribution import Lattice,DigitalNetB2,Halton
 from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
@@ -18,7 +17,7 @@ import warnings
 
 class CubQMCCLT(AbstractStoppingCriterion):
     r"""
-    Stopping criterion based on Student's $t$-distribution for multiple replications.
+    Quasi-Monte Carlo stopping criterion based on Student's $t$-distribution for multiple replications.
     
     Examples:
         >>> k = Keister(DigitalNetB2(seed=7,replications=25))
@@ -164,6 +163,16 @@ class CubQMCCLT(AbstractStoppingCriterion):
             alpha           1
             n_limit         2^(32)
             entropy         7
+    
+    **References:**
+    
+    1.  Art B. Owen. "Practical Quasi-Monte Carlo Integration." 2023.  
+        [https://artowen.su.domains/mc/](https://artowen.su.domains/mc/). 
+
+    2.  Pierre l’Ecuyer et al.  
+        "Confidence intervals for randomized quasi-Monte Carlo estimators."  
+        2023 Winter Simulation Conference (WSC). IEEE, 2023.  
+        [https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10408613](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10408613). 
     """
 
     def __init__(self,
@@ -172,24 +181,31 @@ class CubQMCCLT(AbstractStoppingCriterion):
                  rel_tol = 0.,
                  n_init = 256.,
                  n_limit = 2**30,
+                 error_fun = "EITHER",
                  inflate = 1,
                  alpha = 0.01, 
-                 error_fun = "EITHER"):
+                 ):
         r"""
         Args:
-            integrand (AbstractIntegrand): An AbstractIntegrand.
+            integrand (AbstractIntegrand): The integrand.
             abs_tol (np.ndarray): Absolute error tolerance.
             rel_tol (np.ndarray): Relative error tolerance.
             n_init (int): Initial number of samples. 
             n_limit (int): Maximum number of samples.
-            inflate (float): Inflation factor to multiply by the variance estimate to make it more conservative. Must be greater than or equal to 1.
-            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
-            error_fun (callable): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
 
-                - The default $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \max\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
-                    means the approximation error must be below either the absolue error *or* relative error.
-                - Setting to $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \min\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
-                    means the approximation error must be below either the absolue error *and* relative error.  
+                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
+                    ```
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+                    ```
+            inflate (float): Inflation factor $\geq 1$ to multiply by the variance estimate to make it more conservative.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_limit']
         # Input Checks
@@ -213,6 +229,7 @@ class CubQMCCLT(AbstractStoppingCriterion):
         self.error_fun = error_fun
         self.alpha = alpha
         self.inflate = float(inflate)
+        assert self.inflate>=1
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
@@ -293,13 +310,6 @@ class CubQMCCLT(AbstractStoppingCriterion):
         return data.solution,data
     
     def set_tolerance(self, abs_tol=None, rel_tol=None):
-        """
-        See abstract method. 
-        
-        Args:
-            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
-        """
         if abs_tol is not None:
             self.abs_tol = abs_tol
             self.abs_tols = np.full(self.integrand.d_comb,self.abs_tol)

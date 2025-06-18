@@ -8,4 +8,8 @@
 
 ::: qmcpy.stopping_criterion.cub_qmc_clt.CubQMCCLT
 
+## `CubQMCLatticeG`
+
+::: qmcpy.stopping_criterion.cub_qmc_lattice_g.CubQMCLatticeG
+
 

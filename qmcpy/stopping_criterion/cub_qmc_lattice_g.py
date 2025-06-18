@@ -10,9 +10,8 @@ import numpy as np
 
 class CubQMCLatticeG(AbstractCubQMCLDG):
     r"""
-    Stopping Criterion quasi-Monte Carlo method using rank-1 Lattices cubature over
-    a d-dimensional region to integrate within a specified generalized error
-    tolerance with guarantees under Fourier coefficients cone decay assumptions.
+    Quasi-Monte Carlo stopping criterion using rank-1 lattice cubature 
+    with guarantees for cones of functions with a predictable decay in the Fourier coefficients.
     
     Examples:
         >>> k = Keister(Lattice(seed=7))
@@ -136,61 +135,61 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
             order           NATURAL
             n_limit         2^(20)
-            entropy         7
+            entropy         7 
     
-    Original Implementation:
+    **References:**
 
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m
-
-    References:
-
-        [1] Lluis Antoni Jimenez Rugama and Fred J. Hickernell, 
-        "Adaptive multidimensional integration based on rank-1 lattices," 
-        Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, 
-        April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics 
+    1.  Lluis Antoni Jimenez Rugama and Fred J. Hickernell.  
+        "Adaptive multidimensional integration based on rank-1 lattices,"   
+        Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium,  
+        April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics.  
         and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1411.1966, pp. 407-422.
         
-        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
-        Available from http://gailgithub.github.io/GAIL_Dev/
-
-    Guarantee:
-        This algorithm computes the integral of real valued functions in $[0,1]^d$
-        with a prescribed generalized error tolerance. The Fourier coefficients
-        of the integrand are assumed to be absolutely convergent. If the
-        algorithm terminates without warning messages, the output is given with
-        guarantees under the assumption that the integrand lies inside a cone of
-        functions. The guarantee is based on the decay rate of the Fourier
-        coefficients. For integration over domains other than $[0,1]^d$, this cone
-        condition applies to $f \circ \psi$ (the composition of the
-        functions) where $\psi$ is the transformation function for $[0,1]^d$ to
-        the desired region. For more details on how the cone is defined, please
-        refer to the references below.
+    2.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,  
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,  
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.  
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
+        [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m).
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_limit=2.**35,
-        fudge=lambda m: 5.*2.**(-m), check_cone=False, ptransform='Baker',
-        error_fun = "EITHER"):
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = 1e-2, 
+                 rel_tol = 0., 
+                 n_init = 2**10,
+                 n_limit = 2**30,
+                 error_fun = "EITHER",
+                 fudge = lambda m: 5.*2.**(-m), 
+                 check_cone = False,
+                 ptransform = 'BAKER',
+                 ):
         """
         Args:
-            integrand (AbstractIntegrand): an instance of AbstractIntegrand
-            abs_tol (np.ndarray): absolute error tolerance
-            rel_tol (np.ndarray): relative error tolerance
-            n_init (int): initial number of samples
-            n_limit (int): maximum number of samples
-            fudge (function): positive function multiplying the finite
-                              sum of Fast Fourier coefficients specified 
-                              in the cone of functions
-            check_cone (boolean): check if the function falls in the cone
-            error_fun: function taking in the approximate solution vector, 
-                absolute tolerance, and relative tolerance which returns the approximate error. 
-                Default indicates integration until either absolute OR relative tolerance is satisfied.
+            integrand (AbstractIntegrand): The integrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+
+                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
+                    ```
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+                    ```
+            fudge (function): Positive function multiplying the finite sum of the Fourier coefficients specified in the cone of functions. 
+            check_cone (bool): Whether or not to check if the function falls in the cone.
+            ptransform (str): Periodization transform, see the options in [`AbstractIntegrand.f`][qmcpy.AbstractIntegrand.f].
         """
         super(CubQMCLatticeG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_limit,fudge,check_cone,
             control_variates = [],
             control_variate_means = [],
-            update_beta=False,
+            update_beta = False,
             ptransform = ptransform,
             ft = fftbr,
             omega = omega_fftbr,

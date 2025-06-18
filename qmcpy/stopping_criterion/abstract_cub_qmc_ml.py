@@ -5,22 +5,11 @@ from scipy.stats import norm
 
 class AbstractCubQMCML(AbstractStoppingCriterion):
     
-    def set_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
-        """
-        See abstract method. 
-        
-        Args:
-            integrand (AbstractIntegrand): integrand with multi-level g method
-            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            alpha (float): uncertainty level.
-                If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
-            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
-                Takes priority over absolute tolerance and alpha if supplied.
-        """
+    def set_tolerance(self, abs_tol=None, rmse_tol=None):
         if rmse_tol != None:
             self.rmse_tol = float(rmse_tol)
         elif abs_tol != None:
-            self.rmse_tol = (float(abs_tol) / norm.ppf(1-alpha/2.))
+            self.rmse_tol = (float(abs_tol) / norm.ppf(1-self.alpha/2.))
     
     def update_data(self, data):
         # update sample sums

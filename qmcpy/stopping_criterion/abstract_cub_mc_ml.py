@@ -10,21 +10,11 @@ class AbstractCubMCML(AbstractStoppingCriterion):
                 ((1-self.theta)*self.rmse_tol**2) )
         return ns.astype(int)
     
-    def set_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
-        """
-        See abstract method. 
-        
-        Args:
-            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            alpha (float): uncertainty level.
-                If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
-            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
-                Takes priority over absolute tolerance and alpha if supplied.
-        """
+    def set_tolerance(self, abs_tol=None, rmse_tol=None):
         if rmse_tol != None:
             self.rmse_tol = float(rmse_tol)
         elif abs_tol != None:
-            self.rmse_tol = (float(abs_tol) / norm.ppf(1-alpha/2.))
+            self.rmse_tol = (float(abs_tol) / norm.ppf(1-self.alpha/2.))
     
     def _update_data(self, data):
         for l in range(data.levels+1):
