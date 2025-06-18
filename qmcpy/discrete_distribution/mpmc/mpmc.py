@@ -88,6 +88,7 @@ class MPMC(LD):
             return x 
         elif self.randomize == "SHIFT":
             xr = np.empty(r,n,d)
+            #randomize smth smth 
             return (xr, x)
     
         
