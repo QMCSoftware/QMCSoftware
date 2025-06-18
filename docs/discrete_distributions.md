@@ -14,13 +14,13 @@ Generators of sequences $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$.
 
 ::: qmcpy.discrete_distribution.abstract_discrete_distribution.AbstractIIDDiscreteDistribution
 
-## `Lattice`
-
-::: qmcpy.discrete_distribution.lattice.Lattice
-
 ## `DigitalNetB2`
 
 ::: qmcpy.discrete_distribution.digital_net_b2.digital_net_b2.DigitalNetB2
+
+## `Lattice`
+
+::: qmcpy.discrete_distribution.lattice.Lattice
 
 ## `Halton`
 

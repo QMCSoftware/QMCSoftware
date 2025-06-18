@@ -4,29 +4,41 @@
 
 ::: qmcpy.integrand.abstract_integrand.AbstractIntegrand
 
-## `Ishigami`
+## `FinancialOption`
 
-::: qmcpy.integrand.ishigami.Ishigami
+::: qmcpy.integrand.financial_option.FinancialOption
+
+## `CustomFun`
+
+::: qmcpy.integrand.custom_fun.CustomFun
+
+## `UMBridgeWrapper`
+
+::: qmcpy.integrand.umbridge_wrapper.UMBridgeWrapper
+
+## `SensitivityIndices`
+
+::: qmcpy.integrand.sensitivity_indices.SensitivityIndices
 
 ## `Keister`
 
 ::: qmcpy.integrand.keister.Keister
 
-## `Linear0`
+## `Genz`
 
-::: qmcpy.integrand.linear0.Linear0
+::: qmcpy.integrand.genz.Genz
+
+## `BoxIntegral`
+
+::: qmcpy.integrand.box_integral.BoxIntegral
+
+## `Ishigami`
+
+::: qmcpy.integrand.ishigami.Ishigami
 
 ## `Multimodal2d`
 
 ::: qmcpy.integrand.multimodal2d.Multimodal2d
-
-## `Sin1d`
-
-::: qmcpy.integrand.sin1d.Sin1d
-
-## `UMBridgeWrapper`
-
-::: qmcpy.integrand.umbridge_wrapper.UMBridgeWrapper
 
 ## `Hartmann6d`
 
@@ -36,26 +48,14 @@
 
 ::: qmcpy.integrand.fourbranch2d.FourBranch2d
 
-## `Genz`
-
-::: qmcpy.integrand.genz.Genz
-
-## `CustomFun`
-
-::: qmcpy.integrand.custom_fun.CustomFun
-
-## `BoxIntegral`
-
-::: qmcpy.integrand.box_integral.BoxIntegral
-
-## `SensitivityIndices`
-
-::: qmcpy.integrand.sensitivity_indices.SensitivityIndices
-
-## `FinancialOption`
-
-::: qmcpy.integrand.financial_option.FinancialOption
-
 ## `BayesianLRCoeffs`
 
 ::: qmcpy.integrand.bayesian_lr_coeffs.BayesianLRCoeffs
+
+## `Sin1d`
+
+::: qmcpy.integrand.sin1d.Sin1d
+
+## `Linear0`
+
+::: qmcpy.integrand.linear0.Linear0
