@@ -63,7 +63,7 @@ class BayesianLRCoeffs(AbstractIntegrand):
         self.feature_array = np.column_stack((self.feature_array,np.ones((obs,1))))
         super(BayesianLRCoeffs,self).__init__(dimension_indv=(2,self.num_coeffs),dimension_comb=self.num_coeffs,parallel=False)
         
-    def g(self, x, compute_flags):
+    def g(self, x):
         z = np.einsum("...j,ij->...i",x,self.feature_array)
         z1 = z*self.response_vector
         with np.errstate(over='ignore'):

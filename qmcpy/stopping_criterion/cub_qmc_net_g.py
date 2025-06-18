@@ -149,7 +149,7 @@ class CubQMCNetG(_CubQMCLDG):
         >>> dnb2 = DigitalNetB2(dimension=4,seed=7)
         >>> integrand = CustomFun(
         ...     true_measure = Uniform(dnb2),
-        ...     g = lambda t,compute_flags: np.stack([
+        ...     g = lambda t: np.stack([
         ...         1*t[...,0]+2*t[...,0]**2+3*t[...,0]**3,
         ...         2*t[...,1]+3*t[...,1]**2+4*t[...,1]**3,
         ...         3*t[...,2]+4*t[...,2]**2+5*t[...,2]**3]),
@@ -157,11 +157,11 @@ class CubQMCNetG(_CubQMCLDG):
         >>> control_variates = [
         ...     CustomFun(
         ...         true_measure = Uniform(dnb2),
-        ...         g = lambda t,compute_flags: np.stack([t[...,0],t[...,1],t[...,2]],axis=0),
+        ...         g = lambda t: np.stack([t[...,0],t[...,1],t[...,2]],axis=0),
         ...         dimension_indv = (3,)),
         ...     CustomFun(
         ...         true_measure = Uniform(dnb2),
-        ...         g = lambda t,compute_flags: np.stack([t[...,0]**2,t[...,1]**2,t[...,2]**2],axis=0),
+        ...         g = lambda t: np.stack([t[...,0]**2,t[...,1]**2,t[...,2]**2],axis=0),
         ...         dimension_indv = (3,))]
         >>> control_variate_means = np.array([[1/2,1/2,1/2],[1/3,1/3,1/3]])
         >>> true_value = np.array([23/12,3,49/12])

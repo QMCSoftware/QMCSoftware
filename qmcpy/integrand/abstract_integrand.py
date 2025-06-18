@@ -78,7 +78,7 @@ class AbstractIntegrand(object):
         y = self.f(x)
         return y
 
-    def g(self, t, compute_flags, *args, **kwargs):
+    def g(self, t, **kwargs):
         r"""
         *Abstract method* implementing the integrand as a function of the true measure.
 
@@ -94,7 +94,7 @@ class AbstractIntegrand(object):
         """
         raise MethodImplementationError(self, 'g')
 
-    def f(self, x, periodization_transform='NONE', compute_flags=None, *args, **kwargs):
+    def f(self, x, *args, **kwargs):
         r"""
         Function to evaluate the transformed integrand as a function of the discrete distribution.  
         Automatically applies the transformation determined by the true measure. 
@@ -120,8 +120,12 @@ class AbstractIntegrand(object):
         Returns:
             y (np.ndarray): function evaluations with shape `(*batch_shape, *dimension_indv)` where `dimension_indv` is the shape of the function outputs. 
         """
+        if "periodization_transform" in kwargs:
+            periodization_transform = kwargs["periodization_transform"]
+            del kwargs["periodization_transform"]
+        else:
+            periodization_transform = "None"
         periodization_transform = str(periodization_transform).upper()
-        compute_flags = np.tile(1,self.d_indv) if compute_flags is None else np.atleast_1d(compute_flags)
         batch_shape = tuple(x.shape[:-1])
         d_indv_ndim = len(self.d_indv)
         if periodization_transform=="NONE": periodization_transform = "FALSE"
@@ -163,7 +167,7 @@ class AbstractIntegrand(object):
             # jacobian*weight/pdf will cancel so f(x) = g(\Psi(x))
             xtf = self.true_measure._jacobian_transform_r(xp,return_weights=False) # get transformed samples, equivalent to self.true_measure._transform_r(x)
             assert xtf.shape==xp.shape
-            y = self._g(xtf,compute_flags,*args,**kwargs)
+            y = self._g(xtf,*args,**kwargs)
         else: # using importance sampling --> need to compute pdf, jacobian(s), and weight explicitly
             pdf = self.discrete_distrib.pdf(xp) # pdf of samples
             assert pdf.shape==batch_shape
@@ -172,7 +176,7 @@ class AbstractIntegrand(object):
             assert jacobians.shape==batch_shape
             weight = self.true_measure._weight(xtf) # weight based on the true measure
             assert weight.shape==batch_shape
-            gvals = self._g(xtf,compute_flags,*args,**kwargs)
+            gvals = self._g(xtf,*args,**kwargs)
             assert gvals.shape==(self.d_indv+batch_shape)
             y = gvals*weight[i]/pdf[i]*jacobians[i]
         assert y.shape==(self.d_indv+batch_shape)
@@ -181,8 +185,7 @@ class AbstractIntegrand(object):
         assert y.shape==(self.d_indv+batch_shape)
         return y
 
-    def _g(self, t, compute_flags, *args, **kwargs):
-        kwargs['compute_flags'] = compute_flags
+    def _g(self, t, *args, **kwargs):
         if self.parallel:
             pool = get_context(method='fork').Pool(processes=self.parallel) if self.threadpool==False else ThreadPool(processes=self.parallel) 
             y = pool.starmap(self._g2,zip(t,np.repeat((args,kwargs))))
@@ -197,9 +200,6 @@ class AbstractIntegrand(object):
     def _g2(self, t, comb_args=((),{})):
         args = comb_args[0]
         kwargs = comb_args[1]
-        if self.d_indv==():
-            kwargs = dict(kwargs)
-            del kwargs['compute_flags']
         try:
             y = self.g(t,*args,**kwargs)
         except TypeError as e:
