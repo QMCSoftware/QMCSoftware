@@ -246,5 +246,3 @@ class CubQMCNetG(_CubQMCLDG):
             error_fun = error_fun)
         if self.discrete_distrib.order!='NATURAL':
             raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'NATURAL' order")
-
-class CubQMCSobolG(CubQMCNetG): pass

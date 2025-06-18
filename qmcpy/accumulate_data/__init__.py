@@ -2,7 +2,12 @@ from ._accumulate_data import AccumulateData
 from .mlmc_data import MLMCData
 from .mlqmc_data import MLQMCData
 try: 
-    import gpytorch 
     import torch 
+    import gpytorch 
     from .pf_gp_ci_data import PFGPCIData
-except: pass
+except ImportError:
+    class PFGPCIData(object):
+        def __init__(self, *args, **kwargs):
+            raise Exception("PFGPCIData requires torch and gpytorch but no installations found")
+
+

@@ -178,7 +178,7 @@ class CubBayesNetG(_CubBayesLDG):
     def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
                  n_init=2 ** 8, n_limit=2 ** 22, alpha=0.01,
                  error_fun="EITHER", errbd_type="MLE"):
-        """
+        r"""
         Args:
             integrand (AbstractIntegrand): An AbstractIntegrand.
             abs_tol (np.ndarray): Absolute error tolerance.
@@ -287,7 +287,3 @@ class CubBayesNetG(_CubBayesLDG):
             NotYetImplemented('cubBayesNet_g: kernel order not yet supported')
 
         return kernFunc
-
-class CubBayesSobolG(CubBayesNetG): pass
-class CubQMCBayesSobolG(CubBayesNetG): pass
-class CubQMCBayesNetG(CubBayesNetG): pass

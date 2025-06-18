@@ -102,7 +102,6 @@ class Matern(Gaussian):
             covariance = 2**(1-nu)/gamma(nu)*k**nu*kv(nu,k)
         covariance = variance*covariance+nugget*np.eye(sampler.d)
         super().__init__(sampler, mean=mean, covariance=covariance, decomp_type=decomp_type)
-        pass
 
     def _spawn(self, sampler):
         return Matern(sampler, self.points, length_scale=self.length_scale, nu=self.nu, variance=self.variance, 

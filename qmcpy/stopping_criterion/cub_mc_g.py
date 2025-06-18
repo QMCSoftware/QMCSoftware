@@ -5,7 +5,7 @@ from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDi
 from ..integrand import FinancialOption, Linear0, AbstractIntegrand
 from ..true_measure import Gaussian, Uniform
 from ..discrete_distribution import IIDStdUniform
-from ..util import _tol_fun, MaxSamplesWarning, ParameterError
+from ..util import MaxSamplesWarning, ParameterError
 import numpy as np
 from scipy.optimize import root_scalar
 from scipy.stats import norm
@@ -489,3 +489,25 @@ class CubMCG(AbstractStoppingCriterion):
         """
         if abs_tol != None: self.abs_tol = abs_tol
         if rel_tol != None: self.rel_tol = rel_tol
+
+def _tol_fun(abs_tol, rel_tol, theta, mu, toltype):
+    # """
+    # Generalized error tolerance function.
+
+    # Args:
+    #     abs_tol (float): absolute error tolerance
+    #     rel_tol (float): relative error tolerance
+    #     theta (float): parameter in 'theta' case
+    #     mu (float): true mean
+    #     toltype (str): different options of tolerance function
+
+    # Returns:
+    #     float: tolerance as weighted sum of absolute and relative tolerance
+    # """
+    if toltype == 'combine':  # the linear combination of two tolerances
+        # theta == 0 --> relative error tolerance
+        # theta === 1 --> absolute error tolerance
+        tol = theta * abs_tol + (1 - theta) * rel_tol * abs(mu)
+    elif toltype == 'max':  # the max case
+        tol = max(abs_tol, rel_tol * abs(mu))
+    return tol

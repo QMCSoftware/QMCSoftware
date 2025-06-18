@@ -298,4 +298,3 @@ class CubQMCCLT(AbstractStoppingCriterion):
             self.rel_tol = rel_tol
             self.rel_tols = np.full(self.integrand.d_comb,self.rel_tol)
 
-class CubQMCRep(CubQMCCLT): pass

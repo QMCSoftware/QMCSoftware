@@ -473,7 +473,3 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             graycode = None,
             t_max = None,
             t_lms = None)
-
-
-class Sobol(DigitalNetB2): pass
-

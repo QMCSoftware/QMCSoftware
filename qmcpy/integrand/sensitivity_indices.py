@@ -194,7 +194,3 @@ class SensitivityIndices(AbstractIntegrand):
     
     def dependency(self, comb_flags):
         return np.repeat(comb_flags[:,None],3,axis=1)
-
-class SobolIndices(SensitivityIndices):
-    """ Normalized Sobol' Indices, an alias for `SensitivityIndices`. """
-    pass

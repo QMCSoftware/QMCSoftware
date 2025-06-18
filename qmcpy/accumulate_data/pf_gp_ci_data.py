@@ -3,7 +3,6 @@ from ..util import ExactGPyTorchRegressionModel
 import numpy as np
 from scipy.stats import norm
 import warnings
-import gpytorch 
 import torch
 
 def _get_phi(gp, x):
@@ -112,7 +111,7 @@ class PFGPCIData(AccumulateData):
         return fig
     def plot_1d(self, meshticks=1025, ci_percentage=.95, **kwargs):
         from matplotlib import pyplot,gridspec
-        beta = norm.ppf(mean([ci_percentage,1]))
+        beta = norm.ppf(np.mean([ci_percentage,1]))
         n_batches = len(self.n_batch)
         fig = pyplot.figure(constrained_layout=False,figsize=(4*n_batches,4*3))
         gs = gridspec.GridSpec(3,n_batches,figure=fig)
@@ -163,7 +162,7 @@ class PFGPCIData(AccumulateData):
         n_batches = len(self.n_batch)
         fig = pyplot.figure(constrained_layout=False,figsize=(4*n_batches,4*5))
         gs = gridspec.GridSpec(5 if self.approx_true_solution else 4,n_batches,figure=fig)
-        x0mesh,x1mesh = meshgrid(np.linspace(0,1,meshticks)[1:-1],np.linspace(0,1,meshticks)[1:-1])
+        x0mesh,x1mesh = np.meshgrid(np.linspace(0,1,meshticks)[1:-1],np.linspace(0,1,meshticks)[1:-1])
         xquery = np.vstack([x0mesh.flatten(),x1mesh.flatten()]).T
         if self.approx_true_solution:
             yquery = self.integrand.f(xquery).squeeze()
