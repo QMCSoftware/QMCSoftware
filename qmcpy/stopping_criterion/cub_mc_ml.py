@@ -1,4 +1,4 @@
-from .abstract_stopping_criterion import AbstractStoppingCriterion
+from ._cub_mc_ml import _CubMCML
 from ..accumulate_data import AccumulateData
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import AbstractIIDDiscreteDistribution
@@ -11,48 +11,49 @@ from time import time
 import warnings
 
 
-class CubMCML(AbstractStoppingCriterion):
+class CubMCML(_CubMCML):
     """
     Stopping criterion based on multi-level monte carlo.
     
-    >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
-    >>> sc = CubMCML(mlco,abs_tol=.1)
-    >>> solution,data = sc.integrate()
-    >>> data
-    AccumulateData (AccumulateData)
-        solution        10.410
-        n_total         298638
-        levels          5
-        n_level         [287356   6434   2936    706    287]
-        mean_level      [10.044  0.193  0.103  0.046  0.025]
-        var_level       [1.950e+02 1.954e-01 4.324e-02 9.368e-03 2.924e-03]
-        cost_per_sample [ 1.  2.  4.  8. 16.]
-        alpha           1.003
-        beta            2.039
-        gamma           1
-        time_integrate  ...
-    CubMCML (AbstractStoppingCriterion)
-        rmse_tol        0.039
-        n_init          2^(8)
-        levels_min      2^(1)
-        levels_max      10
-        theta           2^(-1)
-    MLCallOptions (AbstractIntegrand)
-        option          european
-        sigma           0.200
-        k               100
-        r               0.050
-        t               1
-        b               85
-        level           0
-    Gaussian (AbstractTrueMeasure)
-        mean            0
-        covariance      1
-        decomp_type     PCA
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               1
-        replications    1
-        entropy         7
+    Examples:
+        >>> mlco = MLCallOptions(IIDStdUniform(seed=7))
+        >>> sc = CubMCML(mlco,abs_tol=.1)
+        >>> solution,data = sc.integrate()
+        >>> data
+        AccumulateData (AccumulateData)
+            solution        10.410
+            n_total         298638
+            levels          5
+            n_level         [287356   6434   2936    706    287]
+            mean_level      [10.044  0.193  0.103  0.046  0.025]
+            var_level       [1.950e+02 1.954e-01 4.324e-02 9.368e-03 2.924e-03]
+            cost_per_sample [ 1.  2.  4.  8. 16.]
+            alpha           1.003
+            beta            2.039
+            gamma           1
+            time_integrate  ...
+        CubMCML (AbstractStoppingCriterion)
+            rmse_tol        0.039
+            n_init          2^(8)
+            levels_min      2^(1)
+            levels_max      10
+            theta           2^(-1)
+        MLCallOptions (AbstractIntegrand)
+            option          european
+            sigma           0.200
+            k               100
+            r               0.050
+            t               1
+            b               85
+            level           0
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      1
+            decomp_type     PCA
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               1
+            replications    1
+            entropy         7
 
     Original Implementation:
 
@@ -109,7 +110,7 @@ class CubMCML(AbstractStoppingCriterion):
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.integrand.discrete_distrib
+        self.discrete_distrib = self.true_measure.discrete_distrib
         super(CubMCML,self).__init__(allowed_levels=['adaptive-multi'],allowed_distribs=[AbstractIIDDiscreteDistribution], allow_vectorized_integrals=False)
 
     def integrate(self):
@@ -164,7 +165,7 @@ class CubMCML(AbstractStoppingCriterion):
                             'Failed to achieve weak convergence. levels == levels_max.',
                             MaxLevelsWarning)
                     else:
-                        _add_level(data)
+                        self._add_level(data)
                         n_samples = self._get_next_samples(data)
                         data.diff_n_level = np.maximum(0,n_samples-data.n_level)
         # finally, evaluate multilevel estimator
@@ -176,76 +177,3 @@ class CubMCML(AbstractStoppingCriterion):
         data.discrete_distrib = self.true_measure.discrete_distrib
         data.time_integrate = time()-t_start
         return data.solution,data
-            
-    def set_tolerance(self, abs_tol=None, alpha=.01, rmse_tol=None):
-        """
-        See abstract method. 
-        
-        Args:
-            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            alpha (float): uncertainty level.
-                If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
-            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
-                Takes priority over absolute tolerance and alpha if supplied.
-        """
-        if rmse_tol != None:
-            self.rmse_tol = float(rmse_tol)
-        elif abs_tol != None:
-            self.rmse_tol = (float(abs_tol) / norm.ppf(1-alpha/2.))
-
-    def _get_next_samples(self, data):
-        ns = np.ceil( np.sqrt(data.var_level/data.cost_per_sample) * 
-                np.sqrt(data.var_level*data.cost_per_sample).sum() / 
-                ((1-self.theta)*self.rmse_tol**2) )
-        return ns.astype(int)
-
-    def _update_data(self, data):
-        for l in range(data.levels+1):
-            if l==len(data.level_integrands):
-                # haven't spawned this level's integrand yet
-                data.level_integrands += self.integrand.spawn(levels=int(l))
-            integrand_l = data.level_integrands[l]
-            if data.diff_n_level[l] > 0:
-                # evaluate integral at sampling points samples
-                samples = integrand_l.discrete_distrib.gen_samples(n=data.diff_n_level[l])
-                integrand_l.f(samples).squeeze()
-                data.n_level[l] = data.n_level[l] + data.diff_n_level[l]
-                data.sum_level[0,l] = data.sum_level[0,l] + integrand_l.sums[0]
-                data.sum_level[1,l] = data.sum_level[1,l] + integrand_l.sums[1]
-                data.cost_level[l] = data.cost_level[l] + integrand_l.cost
-        # compute absolute average, variance and cost
-        data.mean_level = np.absolute(data.sum_level[0,:data.levels+1]/data.n_level[:data.levels+1])
-        data.var_level = np.maximum(0,data.sum_level[1,:data.levels+1]/data.n_level[:data.levels+1] - data.mean_level**2)
-        data.cost_per_sample = data.cost_level[:data.levels+1]/data.n_level[:data.levels+1]
-        # fix to cope with possible zero values for data.mean_level and data.var_level
-        # (can happen in some applications when there are few samples)
-        for l in range(2,data.levels+1):
-            data.mean_level[l] = np.maximum(data.mean_level[l], .5*data.mean_level[l-1]/2**data.alpha)
-            data.var_level[l] = np.maximum(data.var_level[l], .5*data.var_level[l-1]/2**data.beta)
-        # use linear regression to estimate alpha, beta, gamma if not given
-        a = np.ones((data.levels,2))
-        a[:,0] = np.arange(1,data.levels+1)
-        if self.alpha0 <= 0:
-            x = np.linalg.lstsq(a,np.log2(data.mean_level[1:]),rcond=None)[0]
-            data.alpha = np.maximum(.5,-x[0])
-        if self.beta0 <= 0:
-            x = np.linalg.lstsq(a,np.log2(data.var_level[1:]),rcond=None)[0]
-            data.beta = np.maximum(.5,-x[0])
-        if self.gamma0 <= 0:
-            x = np.linalg.lstsq(a,np.log2(data.cost_per_sample[1:]),rcond=None)[0]
-            data.gamma = np.maximum(.5,x[0])
-        data.n_total = data.n_level.sum()
-
-def _add_level(data):
-    data.levels += 1
-    if not len(data.n_level) > data.levels:
-        data.mean_level = np.hstack((data.mean_level, data.mean_level[-1] / 2**data.alpha))
-        data.var_level = np.hstack((data.var_level, data.var_level[-1] / 2**data.beta))
-        data.cost_per_sample = np.hstack((data.cost_per_sample, data.cost_per_sample[-1] * 2**data.gamma))
-        data.n_level = np.hstack((data.n_level, 0))
-        data.sum_level = np.hstack((data.sum_level,np.zeros((2,1))))
-        data.cost_level = np.hstack((data.cost_level, 0.))
-    else:
-        data.mean_level = np.absolute(data.sum_level[0,:data.levels+1]/data.n_level[:data.levels+1])
-        data.var_level = np.maximum(0,data.sum_level[1,:data.levels+1]/data.n_level[:data.levels+1] - data.mean_level**2)
-        data.cost_per_sample = data.cost_level[:data.levels+1]/data.n_level[:data.levels+1]
