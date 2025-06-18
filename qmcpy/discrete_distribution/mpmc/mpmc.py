@@ -97,10 +97,23 @@ class MPMC(LD):
         return np.ones(x.shape[:-1], dtype=float)
         
     
-    def _spawn(self, dimension): 
+    def _spawn(self, child_seed, dimension): 
         """ 
         assign parameters 
+        
         """
+        return MPMC(
+            dimension=dimension,
+            randomize=self.randomize,
+            graycode=self.graycode,
+            seed=child_seed,
+            generating_matrices=self.z_og,
+            d_max=self.d_max,
+            t_max=self.t_max,
+            m_max=self.m_max,
+            msb=True, # self.z_og is put into MSB during first initialization 
+            t_lms=self.t_lms,
+            replications=self.replications)
 
     def train(self, args):
         model = MPMC_net(args.dim, args.nhid, args.nlayers, args.nsamples, args.nbatch,
