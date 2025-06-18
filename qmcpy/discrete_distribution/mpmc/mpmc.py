@@ -2,7 +2,6 @@ from types import SimpleNamespace
 from .._discrete_distribution import LD
 import torch
 import numpy as np
-from torch import nn
 from torch_cluster import radius_graph
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 import torch.optim as optim
@@ -37,17 +36,24 @@ class MPMC(LD):
         self.parameters = ['randomize']
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
-        self.replications = replications
         self.d_max = d_max
 
         super(MPMC, self).__init__(dimension, seed)
-
-        
         
         #randomization
+        self.randomize = str(randomize).upper()
+        if self.randomize == "TRUE" : self.randomize = "SHIFT"
+        if self.randomize == "NONE" | "NO": self.randomize = "FALSE"
+        assert self.randomize in ["SHIFT", "FALSE"]
+        if self.randomize == "SHIFT":
+            #matrix of size #replications * dimension (one shift for each rep/dim)
+            self.shift = self.rng.uniform(size = (replications, self.d))
+
+        self.replications = replications
 
 
-    def gen_samples(self, n = None, return_unrandomized = False):
+
+    def gen_samples(self, n = None, warn = True, return_unrandomized = False):
         """
         IMPLEMENT ABSTRACT METHOD to generate samples from this discrete distribution.
 
@@ -90,11 +96,15 @@ class MPMC(LD):
 
         #randomize
         if self.randomize == "FALSE":
+            assert return_unrandomized is False, "cannot return_unrandomized when randomize='FALSE'"
             return x 
         elif self.randomize == "SHIFT":
             xr = np.empty(r,n,d)
             #randomize smth smth 
-            return (xr, x)
+            return (xr, x) if return_unrandomized else xr 
+        else: 
+            raise ParameterError("incorrect randomize parsing in lattice gen_samples")
+            
     
         
     
