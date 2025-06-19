@@ -31,7 +31,7 @@ Classic **Monte Carlo** methods choose IID (independent and identically distribu
 
 Often practitioners would like to run their (Quasi-)Monte Carlo method until the error $E_n$ is below a desired error tolerance $\varepsilon$ and/or until they have expired their sample budget $B$. For example, one may wish to estimate the expected discounted payoff of a financial option to within a tolerance of one penny, $\varepsilon = 0.01$, or until $1$ million option paths have been simulated, $B=10^6$. **Stopping criterion** deploy (Quasi-)Monte Carlo methods under such constraints by utilizing adaptive sampling schemes and efficient error estimation procedures.  
 
-`QMCPy` is organized into 4 main components:
+`QMCPy` is organized into into the four main components below. Details for each of these classes are available in the linked guides and API docs.
 
 ## Discrete Distributions
 
@@ -52,33 +52,6 @@ These generates IID or LD points $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$. Supp
     - permutation scrambling
     - linear matrix scrambling
     - nested uniform scrambling
-
-We can use `QMCPy` to generate the LD digital net (in base $b=2$) as follows. 
-
-```python 
->>> import qmcpy as qp 
->>> generator = qp.DigitalNetB2(dimension=2,seed=7)
->>> generator(8) # first 8 points in the sequence
-array([[0.0715562 , 0.07784108],
-       [0.81420169, 0.74485558],
-       [0.31409299, 0.93233913],
-       [0.57163057, 0.26535753],
-       [0.15541309, 0.57499661],
-       [0.89830224, 0.2439158 ],
-       [0.39820498, 0.43143225],
-       [0.6554989 , 0.76248017]])
->>> generator(8,16) # next 8 points in the sequence 
-array([[0.03088897, 0.83362275],
-       [0.77280156, 0.46942063],
-       [0.272731  , 0.15687463],
-       [0.53100149, 0.52116877],
-       [0.1970359 , 0.33483624],
-       [0.93870483, 0.97247967],
-       [0.43861519, 0.66002569],
-       [0.69712934, 0.02229023]])
-```
-
-The same API is available for the other LD sequences: `qp.Lattice`, `qp.DigitalNetB2`, and `qp.Halton`. A similar API for IID points is available in `qp.IIDStdUniform` (essentially a wrapper around [`numpy.random.rand`](https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html))
 
 ## True Measures
 
@@ -112,13 +85,13 @@ These define $g$, which `QMCPy` will use to define $f = g \circ \boldsymbol{\psi
 
 These deploy (Quasi-)Monte Carlo methods under error tolerance and budgetary constraints by utilizing adaptive sampling schemes and efficient error estimation procedures. Common stopping criteria include
 
-- **IID Monte Carlo** via a two step procedure using the Central Limit Theorem (CLT). Error estimates are *not guaranteed* as CLT is asymptotic in $n$ is the variance must be estimated.
-- **IID Monte Carlo** via a two step procedure using Berry-Esseen inequalities to account for finite sample sizes. Error estimates are *guaranteed* for functions with bounded Kurtosis.
-- **Quasi-Monte Carlo** via multiple independent randomizations of an LD point set and Student's $t$ confidence intervals.
 - **Quasi-Monte Carlo** via tracking the decay of coefficients in an orthogonal basis expansion. These methods are *guaranteed* for cones of functions whose coefficients decay in a regular manner.  Efficient procedures exist to estimate coefficients when
     - pairing lattices with the Fourier expansion or
     - pairing digital nets with the Walsh expansion.
 - **Quasi-Monte Carlo** via efficient Bayesian cubature methods which assume $f$ is a draw from a Gaussian process so the posterior expectation has an analytic expression. While classic Bayesian cubature would require $\mathcal{O}(n^2)$ storage and $\mathcal{O}(n^3)$ computations, when matching certain LD sequences to special kernels the Gram matrices become nicely structured to permit Bayesian cubature with only $\mathcal{O}(n)$ storage and $\mathcal{O}(n \log n)$ computations. Specifically,
     - pairing lattices with shift-invariant kernels gives circulant Gram matrices which are diagonalizable by the [Fast Fourier Transform (FFT)](https://en.wikipedia.org/wiki/Fast_Fourier_transform), and
     - pairing digital nets with digitally-shift-invariant kernels gives Gram matrices which are diagonalizable by the [Fast Walsh-Hadamard Transform (FWHT)](https://en.wikipedia.org/wiki/Fast_Walsh%E2%80%93Hadamard_transform).
+- **Quasi-Monte Carlo** via multiple independent randomizations of an LD point set and Student's $t$ confidence intervals.
+- **IID Monte Carlo** via a two step procedure using the Central Limit Theorem (CLT). Error estimates are *not guaranteed* as CLT is asymptotic in $n$ is the variance must be estimated.
+- **IID Monte Carlo** via a two step procedure using Berry-Esseen inequalities to account for finite sample sizes. Error estimates are *guaranteed* for functions with bounded Kurtosis.
 - **Multilevel IID Monte Carlo and Quasi-Monte Carlo** which more efficiently integrate expensive functions by exploiting a telescoping sum over lower fidelity models. 
