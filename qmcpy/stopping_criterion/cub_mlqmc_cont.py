@@ -12,107 +12,117 @@ from time import time
 import warnings
 
 
-class CubQMCMLCont(AbstractCubQMCML):
+class CubMLQMCCont(AbstractCubQMCML):
     """
-    Stopping criterion based on continuation multi-level quasi-Monte Carlo.
+    Multilevel Quasi-Monte Carlo stopping criterion with continuation.
 
-    >>> fo = FinancialOption(DigitalNetB2(seed=7,replications=32))
-    >>> sc = CubQMCMLCont(fo,abs_tol=1e-3)
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        1.784
-        n_total         4718592
-        levels          2^(2)
-        n_level         [65536 32768 32768 16384]
-        mean_level      [1.718 0.051 0.012 0.003]
-        var_level       [6.589e-09 2.091e-08 1.701e-08 7.554e-08]
-        bias_estimate   2.55e-04
-        time_integrate  ...
-    CubQMCMLCont (AbstractStoppingCriterion)
-        rmse_tol        3.88e-04
-        n_init          2^(8)
-        n_max           10000000000
-        replications    2^(5)
-        levels_min      2^(1)
-        levels_max      10
-        n_tols          10
-        tol_mult        1.668
-        theta_init      2^(-1)
-        theta           2^(-3)
-    FinancialOption (AbstractIntegrand)
-        option          ASIAN
-        call_put        CALL
-        volatility      2^(-1)
-        start_price     30
-        strike_price    35
-        interest_rate   0
-        t_final         1
-        asian_mean      ARITHMETIC
-    BrownianMotion (AbstractTrueMeasure)
-        time_vec        1
-        drift           0
-        mean            0
-        covariance      1
-        decomp_type     PCA
-    DigitalNetB2 (AbstractLDDiscreteDistribution)
-        d               1
-        replications    2^(5)
-        randomize       LMS_DS
-        gen_mats_source joe_kuo.6.21201.txt
-        order           NATURAL
-        t               63
-        alpha           1
-        n_limit         2^(32)
-        entropy         7
+    Examples:
+        >>> fo = FinancialOption(DigitalNetB2(seed=7,replications=32))
+        >>> sc = CubMLQMCCont(fo,abs_tol=1e-3)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.784
+            n_total         4718592
+            levels          2^(2)
+            n_level         [65536 32768 32768 16384]
+            mean_level      [1.718 0.051 0.012 0.003]
+            var_level       [6.589e-09 2.091e-08 1.701e-08 7.554e-08]
+            bias_estimate   2.55e-04
+            time_integrate  ...
+        CubMLQMCCont (AbstractStoppingCriterion)
+            rmse_tol        3.88e-04
+            n_init          2^(8)
+            n_limit         10000000000
+            replications    2^(5)
+            levels_min      2^(1)
+            levels_max      10
+            n_tols          10
+            inflate        1.668
+            theta_init      2^(-1)
+            theta           2^(-3)
+        FinancialOption (AbstractIntegrand)
+            option          ASIAN
+            call_put        CALL
+            volatility      2^(-1)
+            start_price     30
+            strike_price    35
+            interest_rate   0
+            t_final         1
+            asian_mean      ARITHMETIC
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        1
+            drift           0
+            mean            0
+            covariance      1
+            decomp_type     PCA
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               1
+            replications    2^(5)
+            randomize       LMS_DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           NATURAL
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
 
-    References:
+    **References:**
         
-        [1] https://github.com/PieterjanRobbe/MultilevelEstimators.jl
-
+    1.  [https://github.com/PieterjanRobbe/MultilevelEstimators.jl](https://github.com/PieterjanRobbe/MultilevelEstimators.jl).
     """
 
-    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256, n_max=1e10, 
-                 levels_min=2, levels_max=10, n_tols=10, tol_mult=100**(1/9), theta_init=0.5):
-        """
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = .05, 
+                 rmse_tol = None,
+                 n_init = 256,
+                 n_limit = 1e10,
+                 inflate = 100**(1/9),
+                 alpha = .01,   
+                 levels_min = 2, 
+                 levels_max = 10, 
+                 n_tols = 10, 
+                 theta_init = 0.5,
+                 ):
+        r"""
         Args:
-            integrand (AbstractIntegrand): integrand with multi-level g method
-            abs_tol (float): absolute tolerance
-            alpha (float): uncertainty level.
-                If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
-            rmse_tol (float): root mean squared error
-                If supplied (not None), then absolute tolerance and alpha are ignored
-                in favor of the rmse tolerance
-            n_max (int): maximum number of samples
-            levels_min (int): minimum level of refinement >= 2
-            levels_max (int): maximum level of refinement >= Lmin
-            n_tols (int): number of coarser tolerances to run
-            tol_mult (float): coarser tolerance multiplication factor
-            theta_init (float) : initial error splitting constant
-
+            integrand (AbstractIntegrand): The integrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rmse_tol (np.ndarray): Root mean squared error tolerance. 
+                If supplied, then absolute tolerance and alpha are ignored in favor of the rmse tolerance. 
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            inflate (float): Coarser tolerance multiplication factor $\geq 1$.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            levels_min (int): Minimum level of refinement $\geq 2$.
+            levels_max (int): Maximum level of refinement $\geq$ `levels_min`.
+            n_tols (int): Number of coarser tolerances to run.
+            theta_init (float): Initial error splitting constant.
         """
-        self.parameters = ['rmse_tol','n_init','n_max','replications','levels_min',
-            'levels_max','n_tols','tol_mult','theta_init','theta']
+        self.parameters = ['rmse_tol','n_init','n_limit','replications','levels_min',
+            'levels_max','n_tols','inflate','theta_init','theta']
         # initialization
         if rmse_tol:
             self.target_tol = float(rmse_tol)
         else: # use absolute tolerance
             self.target_tol =  float(abs_tol) / norm.ppf(1-alpha/2)
-        self.alpha = alpha 
-        assert 0<self.alpha<1
         self.n_init = n_init
-        self.n_max = n_max
+        self.n_limit = n_limit
         self.levels_min = levels_min
         self.levels_max = levels_max
         self.theta_init = theta_init
         self.theta = theta_init
         self.n_tols = n_tols
-        self.tol_mult = tol_mult
+        self.alpha = alpha
+        self.inflate = inflate
+        assert self.inflate>=1
+        assert 0<self.alpha<1
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(CubQMCMLCont,self).__init__(allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=False)
+        super(CubMLQMCCont,self).__init__(allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=False)
         self.replications = self.discrete_distrib.replications 
         assert self.replications>=4, "require at least 4 replications"
 
@@ -138,7 +148,7 @@ class CubQMCMLCont(AbstractCubQMCML):
         data.level_integrands = []
         # Loop over coarser tolerances
         for t in range(self.n_tols):
-            self.rmse_tol = self.tol_mult**(self.n_tols-t-1)*self.target_tol # Set new target tolerance
+            self.rmse_tol = self.inflate**(self.n_tols-t-1)*self.target_tol # Set new target tolerance
             self._integrate(data)
         data.stopping_crit = self
         data.integrand = self.integrand
@@ -163,13 +173,13 @@ class CubQMCMLCont(AbstractCubQMCML):
 
                 # Check if over sample budget
                 total_next_samples = (self.replications*data.eval_level*data.n_level*2).sum()
-                if (data.n_total + total_next_samples) > self.n_max:
+                if (data.n_total + total_next_samples) > self.n_limit:
                     warning_s = """
                     Already generated %d samples.
-                    Trying to generate %d new samples, which would exceed n_max = %d.
+                    Trying to generate %d new samples, which would exceed n_limit = %d.
                     Stopping integration process.
                     Note that error tolerances may no longer be satisfied""" \
-                    % (int(data.n_total), int(total_next_samples), int(self.n_max))
+                    % (int(data.n_total), int(total_next_samples), int(self.n_limit))
                     warnings.warn(warning_s, MaxSamplesWarning)
                     return
 

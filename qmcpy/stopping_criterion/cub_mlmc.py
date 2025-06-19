@@ -12,13 +12,13 @@ from time import time
 import warnings
 
 
-class CubMCML(AbstractCubMCML):
+class CubMLMC(AbstractCubMCML):
     """
-    Stopping criterion based on multi-level monte carlo.
+    Multilevel IID Monte Carlo stopping criterion.
     
     Examples:
         >>> fo = FinancialOption(IIDStdUniform(seed=7))
-        >>> sc = CubMCML(fo,abs_tol=1.5e-2)
+        >>> sc = CubMLMC(fo,abs_tol=1.5e-2)
         >>> solution,data = sc.integrate()
         >>> data
         Data (Data)
@@ -33,7 +33,7 @@ class CubMCML(AbstractCubMCML):
             beta            1.997
             gamma           1.000
             time_integrate  ...
-        CubMCML (AbstractStoppingCriterion)
+        CubMLMC (AbstractStoppingCriterion)
             rmse_tol        0.006
             n_init          2^(8)
             levels_min      2^(1)
@@ -59,37 +59,42 @@ class CubMCML(AbstractCubMCML):
             replications    1
             entropy         7
 
-    Original Implementation:
-
-        http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB
-
-    References:
+    **References:**
         
-        [1] M.B. Giles. 'Multi-level Monte Carlo path simulation'. 
-        Operations Research, 56(3):607-617, 2008.
-        http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf.
+    1.  M.B. Giles. 'Multi-level Monte Carlo path simulation'.   
+        Operations Research, 56(3):607-617, 2008.  
+        [http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf](http://people.maths.ox.ac.uk/~gilesm/files/OPRE_2008.pdf).
+
+    2. [http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB](http://people.maths.ox.ac.uk/~gilesm/mlmc/#MATLAB).
     """
 
-    def __init__(self, integrand, abs_tol=.05, alpha=.01, rmse_tol=None, n_init=256, n_max=1e10, 
-        levels_min=2, levels_max=10, alpha0=-1., beta0=-1., gamma0=-1.):
-        """
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = .05, 
+                 rmse_tol = None, 
+                 n_init = 256, 
+                 n_limit = 1e10, 
+                 alpha = .01, 
+                 levels_min = 2, 
+                 levels_max = 10, 
+                 alpha0 = -1., 
+                 beta0 = -1., 
+                 gamma0 = -1.,
+                 ):
+        r"""
         Args:
-            integrand (AbstractIntegrand): integrand with multi-level g method
-            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
-            alpha (float): uncertainty level.
-                If rmse_tol not supplied, then rmse_tol = abs_tol/norm.ppf(1-alpha/2)
-            rel_tol (float): relative tolerance. Reset if supplied, ignored if not.
-                Takes priority over absolute tolerance and alpha if supplied. 
-            n_init (int): initial number of samples
-            n_max (int): maximum number of samples
-            levels_min (int): minimum level of refinement >= 2
-            levels_max (int): maximum level of refinement >= Lmin
-            alpha0 (float): weak error is O(2^{-alpha0*level})
-            beta0 (float): variance is O(2^{-bet0a*level})
-            gamma0 (float): sample cost is O(2^{gamma0*level})
-        
-        Note:
-            if alpha, beta, gamma are not positive, then they will be estimated
+            integrand (AbstractIntegrand): The integrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rmse_tol (np.ndarray): Root mean squared error tolerance. 
+                If supplied, then absolute tolerance and alpha are ignored in favor of the rmse tolerance. 
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            levels_min (int): Minimum level of refinement $\geq 2$.
+            levels_max (int): Maximum level of refinement $\geq$ `levels_min`.
+            alpha0 (float): Weak error is $\mathcal{O}(2^{-\alpha_0\ell})$ in the level $\ell$. If `alpha0`$\leq 0$ then it will be estimated. 
+            beta0 (float): Variance is $\mathcal{O}(2^{-\beta_0\ell})$ in the level $\ell$. If `beta0`$\leq 0$ then it will be estimated. 
+            gamma0 (float): Sample cost is $\mathcal{O}(2^{\gamma_0\ell})$. If `gamma0`$\leq 0$ then it will be estimated. 
         """
         self.parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
         if levels_min < 2:
@@ -106,7 +111,7 @@ class CubMCML(AbstractCubMCML):
         self.alpha = alpha 
         assert 0<self.alpha<1
         self.n_init = n_init
-        self.n_max = n_max
+        self.n_limit = n_limit
         self.levels_min = levels_min
         self.levels_max = levels_max
         self.theta = 0.5
@@ -117,7 +122,7 @@ class CubMCML(AbstractCubMCML):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(CubMCML,self).__init__(allowed_distribs=[AbstractIIDDiscreteDistribution], allow_vectorized_integrals=False)
+        super(CubMLMC,self).__init__(allowed_distribs=[AbstractIIDDiscreteDistribution], allow_vectorized_integrals=False)
 
     def integrate(self):
         t_start = time()
@@ -148,13 +153,13 @@ class CubMCML(AbstractCubMCML):
             n_samples = self._get_next_samples(data)
             data.diff_n_level = np.maximum(0, n_samples-data.n_level)
             # check if over sample budget
-            if (data.n_total + data.diff_n_level.sum()) > self.n_max:
+            if (data.n_total + data.diff_n_level.sum()) > self.n_limit:
                 warning_s = """
                 Already generated %d samples.
-                Trying to generate %d new samples, which would exceed n_max = %d.
+                Trying to generate %d new samples, which would exceed n_limit = %d.
                 Stopping integration process.
                 Note that error tolerances may no longer be satisfied""" \
-                % (int(data.n_total), int(data.diff_n_level.sum()), int(self.n_max))
+                % (int(data.n_total), int(data.diff_n_level.sum()), int(self.n_limit))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
             # if (almost) converged, estimate remaining error and decide 

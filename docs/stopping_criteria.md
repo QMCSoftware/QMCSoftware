@@ -36,10 +36,20 @@
 
 ::: qmcpy.stopping_criterion.cub_mc_clt.CubMCCLT
 
+## `CubMLQMCCont`
 
+::: qmcpy.stopping_criterion.cub_mlqmc_cont.CubMLQMCCont
 
+## `CubMLQMC`
 
+::: qmcpy.stopping_criterion.cub_mlqmc.CubMLQMC
 
+## `CubMLMCCont`
 
+::: qmcpy.stopping_criterion.cub_mlmc_cont.CubMLMCCont
+
+## `CubMLMC`
+
+::: qmcpy.stopping_criterion.cub_mlmc.CubMLMC
 
 

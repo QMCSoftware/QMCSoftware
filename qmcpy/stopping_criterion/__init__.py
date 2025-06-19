@@ -4,10 +4,10 @@ from .cub_qmc_rep_student_t import CubQMCRepStudentT
 from .cub_mc_g import CubMCG
 from .cub_qmc_lattice_g import CubQMCLatticeG
 from .cub_qmc_net_g import CubQMCNetG
-from .cub_mc_ml import CubMCML
-from .cub_qmc_ml import CubQMCML
-from .cub_mc_ml_cont import CubMCMLCont
-from .cub_qmc_ml_cont import CubQMCMLCont
+from .cub_mlmc import CubMLMC
+from .cub_mlqmc import CubMLQMC
+from .cub_mlmc_cont import CubMLMCCont
+from .cub_mlqmc_cont import CubMLQMCCont
 from .cub_qmc_bayes_lattice_g import CubQMCBayesLatticeG
 from .cub_qmc_bayes_net_g import CubQMCBayesNetG
 from .cub_mc_clt_vec import CubMCCLTVec
@@ -38,3 +38,7 @@ CubQMCCBayesDigitalNetB2G = CubQMCBayesNetG
 CubBayesDigitalNetB2G = CubQMCBayesNetG
 CubQMCBayesSobolG = CubQMCBayesNetG
 CubBayesSobolG = CubQMCBayesNetG
+CubQMCMLCont = CubMLQMCCont
+CubQMCML = CubMLQMC
+CubMCMLCont = CubMLMCCont
+CubMCML = CubMLMC
