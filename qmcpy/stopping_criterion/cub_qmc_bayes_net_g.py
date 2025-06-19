@@ -9,52 +9,52 @@ from time import time
 import warnings
 
 
-class CubBayesNetG(AbstractCubBayesLDG):
+class CubQMCBayesNetG(AbstractCubBayesLDG):
     r"""
-    Stopping criterion for Bayesian Cubature using digital net sequence with guaranteed
-    accuracy over a d-dimensional region to integrate within a specified generalized error
-    tolerance with guarantees under Bayesian assumptions.
+    Quasi-Monte Carlo stopping criterion using fast Bayesian cubature and digital nets
+    with guarantees for Gaussian processes having certain digitally shift invariant kernels.
 
-    >>> k = Keister(DigitalNetB2(2, seed=123456789))
-    >>> sc = CubBayesNetG(k,abs_tol=5e-3)
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        1.808
-        comb_bound_low  1.804
-        comb_bound_high 1.812
-        comb_bound_diff 0.008
-        comb_flags      1
-        n_total         2^(10)
-        n               2^(10)
-        time_integrate  ...
-    CubBayesNetG (AbstractStoppingCriterion)
-        abs_tol         0.005
-        rel_tol         0
-        n_init          2^(8)
-        n_limit         2^(22)
-        order           1
-    Keister (AbstractIntegrand)
-    Gaussian (AbstractTrueMeasure)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     PCA
-    DigitalNetB2 (AbstractLDDiscreteDistribution)
-        d               2^(1)
-        replications    1
-        randomize       LMS_DS
-        gen_mats_source joe_kuo.6.21201.txt
-        order           NATURAL
-        t               63
-        alpha           1
-        n_limit         2^(32)
-        entropy         123456789
+    Examples:
+        >>> k = Keister(DigitalNetB2(2, seed=123456789))
+        >>> sc = CubQMCBayesNetG(k,abs_tol=5e-3)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.808
+            comb_bound_low  1.804
+            comb_bound_high 1.812
+            comb_bound_diff 0.008
+            comb_flags      1
+            n_total         2^(10)
+            n               2^(10)
+            time_integrate  ...
+        CubQMCBayesNetG (AbstractStoppingCriterion)
+            abs_tol         0.005
+            rel_tol         0
+            n_init          2^(8)
+            n_limit         2^(22)
+            order           1
+        Keister (AbstractIntegrand)
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               2^(1)
+            replications    1
+            randomize       LMS_DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           NATURAL
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         123456789
     
         Vector outputs
         
         >>> f = BoxIntegral(DigitalNetB2(3,seed=7),s=[-1,1])
         >>> abs_tol = 1e-2
-        >>> sc = CubBayesNetG(f,abs_tol=abs_tol,rel_tol=0)
+        >>> sc = CubQMCBayesNetG(f,abs_tol=abs_tol,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.18640441, 0.96079745])
@@ -68,7 +68,7 @@ class CubBayesNetG(AbstractCubBayesLDG):
             n_total         2^(10)
             n               [1024  256]
             time_integrate  ...
-        CubBayesNetG (AbstractStoppingCriterion)
+        CubQMCBayesNetG (AbstractStoppingCriterion)
             abs_tol         0.010
             rel_tol         0
             n_init          2^(8)
@@ -98,7 +98,7 @@ class CubBayesNetG(AbstractCubBayesLDG):
 
         >>> function = Genz(DigitalNetB2(3,seed=7))
         >>> integrand = SensitivityIndices(function)
-        >>> sc = CubBayesNetG(integrand,abs_tol=5e-2,rel_tol=0)
+        >>> sc = CubQMCBayesNetG(integrand,abs_tol=5e-2,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> data
         Data (Data)
@@ -121,7 +121,7 @@ class CubBayesNetG(AbstractCubBayesLDG):
                               [256 256 256]
                               [256 256 256]]]
             time_integrate  ...
-        CubBayesNetG (AbstractStoppingCriterion)
+        CubQMCBayesNetG (AbstractStoppingCriterion)
             abs_tol         0.050
             rel_tol         0
             n_init          2^(8)
@@ -145,56 +145,61 @@ class CubBayesNetG(AbstractCubBayesLDG):
             n_limit         2^(32)
             entropy         7
 
-    Adapted from `GAIL cubBayesNet_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m>`_.
+    **References:**
 
-    Guarantee:
-        This algorithm attempts to calculate the integral of function :math:`f` over the
-        hyperbox :math:`[0,1]^d` to a prescribed error tolerance :math:`\mbox{tolfun} := max(\mbox{abstol},
-        \mbox{reltol}*| I |)` with a guaranteed confidence level, e.g., :math:`99\%` when alpha= :math:`0.5\%`.
-        If the algorithm terminates without showing any warning messages and provides
-        an answer :math:`Q`, then the following inequality would be satisfied:
-
-        .. math::
-                Pr(| Q - I | <= \mbox{tolfun}) = 99\%.
-
-        This Bayesian cubature algorithm guarantees for integrands that are considered
-        to be an instance of a Gaussian process that falls in the middle of samples space spanned.
-        Where The sample space is spanned by the covariance kernel parametrized by the scale
-        and shape parameter inferred from the sampled values of the integrand.
-        For more details on how the covariance kernels are defined and the parameters are obtained,
-        please refer to the references below.
-
-    References:
-        [1] Jagadeeswaran Rathinavel, Fast automatic Bayesian cubature using matching kernels and designs,
+    1.  Jagadeeswaran, Rathinavel, and Fred J. Hickernell.  
+        "Fast automatic Bayesian cubature using Sobol’sampling."  
+        Advances in Modeling and Simulation: Festschrift for Pierre L'Ecuyer.  
+        Springer International Publishing, 2022. 301-318.
+    
+    2.  Jagadeeswaran Rathinavel,  
+        Fast automatic Bayesian cubature using matching kernels and designs,  
         PhD thesis, Illinois Institute of Technology, 2019.
 
-        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
-        Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
-
+    3.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,  
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,  
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.  
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
+        [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m).
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_limit=2 ** 22, alpha=0.01,
-                 error_fun="EITHER", errbd_type="MLE"):
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = 1e-2, 
+                 rel_tol = 0,
+                 n_init = 2**8, 
+                 n_limit = 2**22, 
+                 error_fun = "EITHER", 
+                 alpha = 0.01,
+                 errbd_type="MLE",
+                 ):
         r"""
         Args:
-            integrand (AbstractIntegrand): An AbstractIntegrand.
+            integrand (AbstractIntegrand): The integrand.
             abs_tol (np.ndarray): Absolute error tolerance.
             rel_tol (np.ndarray): Relative error tolerance.
             n_init (int): Initial number of samples. 
             n_limit (int): Maximum number of samples.
-            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
-            error_fun (callable): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
 
-                - The default $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \max\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
-                    means the approximation error must be below either the absolue error *or* relative error.
-                - Setting to $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \min\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
-                    means the approximation error must be below either the absolue error *and* relative error. 
-            errbd_type (str): MLE, GCV, or FULL
+                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
+                    ```
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+                    ```
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            errbd_type (str): Options are 
+                
+                - `'MLE'`: Marginal Log Likelihood. 
+                - `'GCV'`: Generalized Cross Validation. 
+                - `'FULL'`: Full Bayes.
         """
-        super(CubBayesNetG, self).__init__(integrand, ft=fwht, omega=omega_fwht,
+        super(CubQMCBayesNetG, self).__init__(integrand, ft=fwht, omega=omega_fwht,
                                            ptransform=None,
                                            allowed_distribs=[DigitalNetB2],
                                            kernel=self._shift_inv_kernel_digital,
@@ -216,7 +221,7 @@ class CubBayesNetG(AbstractCubBayesLDG):
     # Lambda_ring = fwht(C1 - 1)
 
     def _shift_inv_kernel_digital(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
-        kernel_func = CubBayesNetG.BuildKernelFunc(order)
+        kernel_func = CubQMCBayesNetG.BuildKernelFunc(order)
         const_mult = 1 / 10
 
         if avoid_cancel_error:

@@ -15,7 +15,7 @@ from time import time
 import warnings
 
 
-class CubQMCCLT(AbstractStoppingCriterion):
+class CubQMCRepStudentT(AbstractStoppingCriterion):
     r"""
     Quasi-Monte Carlo stopping criterion based on Student's $t$-distribution for multiple replications.
     
@@ -309,7 +309,8 @@ class CubQMCCLT(AbstractStoppingCriterion):
         data.time_integrate = time()-t_start
         return data.solution,data
     
-    def set_tolerance(self, abs_tol=None, rel_tol=None):
+    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
+        assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."
         if abs_tol is not None:
             self.abs_tol = abs_tol
             self.abs_tols = np.full(self.integrand.d_comb,self.abs_tol)

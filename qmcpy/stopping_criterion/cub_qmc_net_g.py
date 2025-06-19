@@ -10,9 +10,8 @@ import numpy as np
 
 class CubQMCNetG(AbstractCubQMCLDG):
     r"""
-    Quasi-Monte Carlo method using Sobol' cubature over the
-    d-dimensional region to integrate within a specified generalized error
-    tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
+    Quasi-Monte Carlo stopping criterion using digital net cubature 
+    with guarantees for cones of functions with a predictable decay in the Walsh coefficients.
 
     Examples:
         >>> k = Keister(DigitalNetB2(seed=7))
@@ -166,14 +165,14 @@ class CubQMCNetG(AbstractCubQMCLDG):
         >>> control_variate_means = np.array([[1/2,1/2,1/2],[1/3,1/3,1/3]])
         >>> true_value = np.array([23/12,3,49/12])
         >>> abs_tol = 1e-6
-        >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_beta=False)
+        >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_cv_coeffs=False)
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.91666667, 3.        , 4.08333333])
         >>> data.n
         array([4096, 8192, 8192])
         >>> assert (np.abs(true_value-solution)<abs_tol).all()
-        >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_beta=True)
+        >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_cv_coeffs=True)
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.91666667, 3.        , 4.08333333])
@@ -181,62 +180,61 @@ class CubQMCNetG(AbstractCubQMCLDG):
         array([ 8192, 16384, 16384])
         >>> assert (np.abs(true_value-solution)<abs_tol).all()
 
-    Original Implementation:
+    **References:**
 
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
-
-    References:
-
-        [1] Fred J. Hickernell and Lluis Antoni Jimenez Rugama, 
-        Reliable adaptive cubature using digital sequences, 2014. 
-        Submitted for publication: arXiv:1410.8615.
-        
-        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
-        Available from http://gailgithub.github.io/GAIL_Dev/
-
-    Guarantee:
-        This algorithm computes the integral of real valued functions in $[0,1]^d$
-        with a prescribed generalized error tolerance. The Fourier coefficients
-        of the integrand are assumed to be absolutely convergent. If the
-        algorithm terminates without warning messages, the output is given with
-        guarantees under the assumption that the integrand lies inside a cone of
-        functions. The guarantee is based on the decay rate of the Fourier
-        coefficients. For integration over domains other than $[0,1]^d$, this cone
-        condition applies to $f \circ \psi$ (the composition of the
-        functions) where $\psi$ is the transformation function for $[0,1]^d$ to
-        the desired region. For more details on how the cone is defined, please
-        refer to the references below.
+    1.  Hickernell, Fred J., and Lluís Antoni Jiménez Rugama.  
+        "Reliable adaptive cubature using digital sequences."  
+        Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014.  
+        Springer International Publishing, 2016.
+    
+    2.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,  
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,  
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.  
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
+        [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m).
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_limit=2.**35,
-        fudge=lambda m: 5.*2.**(-m), check_cone=False, 
-        control_variates=[], control_variate_means=[], update_beta=False,
-        error_fun = "EITHER"):
-
-        """
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = 1e-2,
+                 rel_tol = 0., 
+                 n_init = 2**10, 
+                 n_limit = 2**35,
+                 error_fun = "EITHER",
+                 fudge = lambda m: 5.*2.**(-m), 
+                 check_cone = False, 
+                 control_variates = [], 
+                 control_variate_means = [], 
+                 update_cv_coeffs = False,
+                 ):
+        r"""
         Args:
-            integrand (AbstractIntegrand): an instance of AbstractIntegrand
-            abs_tol (np.ndarray): absolute error tolerance
-            rel_tol (np.ndarray): relative error tolerance
-            n_init (int): initial number of samples
-            n_limit (int): maximum number of samples
-            fudge (function): positive function multiplying the finite
-                              sum of Fast Fourier coefficients specified 
-                              in the cone of functions
-            check_cone (boolean): check if the function falls in the cone
-            control_variates (list): list of integrand objects to be used as control variates. 
-                Control variates are currently only compatible with single level problems. 
-                The same discrete distribution instance must be used for the integrand and each of the control variates. 
-            control_variate_means (list): list of means for each control variate
-            update_beta (bool): update control variate beta coefficients at each iteration
-            error_fun: function taking in the approximate solution vector, 
-                absolute tolerance, and relative tolerance which returns the approximate error. 
-                Default indicates integration until either absolute OR relative tolerance is satisfied.
+            integrand (AbstractIntegrand): The integrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+
+                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
+                    ```
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+                    ```
+            fudge (function): Positive function multiplying the finite sum of the Fourier coefficients specified in the cone of functions. 
+            check_cone (bool): Whether or not to check if the function falls in the cone.
+            control_variates (list): Integrands to use as control variates, each with the same underlying discrete distribution instance.
+            control_variate_means (np.ndarray): Means of each control variate. 
+            update_cv_coeffs (bool): If set to true, the control variate coefficients are recomputed at each iteration. 
+                Otherwise they are estimated once after the initial sampling and then fixed.
         """
         super(CubQMCNetG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_limit,fudge,
-            check_cone,control_variates,control_variate_means,update_beta,
+            check_cone,control_variates,control_variate_means,update_cv_coeffs,
             ptransform = 'none',
             ft = fwht,
             omega = omega_fwht,

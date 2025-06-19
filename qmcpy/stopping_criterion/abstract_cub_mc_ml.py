@@ -10,7 +10,8 @@ class AbstractCubMCML(AbstractStoppingCriterion):
                 ((1-self.theta)*self.rmse_tol**2) )
         return ns.astype(int)
     
-    def set_tolerance(self, abs_tol=None, rmse_tol=None):
+    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
+        assert rel_tol is None, "rel_tol not supported by this stopping criterion."
         if rmse_tol != None:
             self.rmse_tol = float(rmse_tol)
         elif abs_tol != None:

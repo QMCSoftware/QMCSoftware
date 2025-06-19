@@ -8,50 +8,50 @@ import numpy as np
 #import warnings
 
 
-class CubBayesLatticeG(AbstractCubBayesLDG):
+class CubQMCBayesLatticeG(AbstractCubBayesLDG):
     r"""
-    Stopping criterion for Bayesian Cubature using rank-1 Lattice sequence with guaranteed
-    accuracy over a d-dimensional region to integrate within a specified generalized error
-    tolerance with guarantees under Bayesian assumptions.
+    Quasi-Monte Carlo stopping criterion using fast Bayesian cubature and rank-1 lattices 
+    with guarantees for Gaussian processes having certain shift invariant kernels.
 
-    >>> k = Keister(Lattice(2, seed=123456789))
-    >>> sc = CubBayesLatticeG(k,abs_tol=1e-4)
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        1.808
-        comb_bound_low  1.808
-        comb_bound_high 1.808
-        comb_bound_diff 3.60e-05
-        comb_flags      1
-        n_total         2^(10)
-        n               2^(10)
-        time_integrate  ...
-    CubBayesLatticeG (AbstractStoppingCriterion)
-        abs_tol         1.00e-04
-        rel_tol         0
-        n_init          2^(8)
-        n_limit         2^(22)
-        order           2^(1)
-    Keister (AbstractIntegrand)
-    Gaussian (AbstractTrueMeasure)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     PCA
-    Lattice (AbstractLDDiscreteDistribution)
-        d               2^(1)
-        replications    1
-        randomize       SHIFT
-        gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
-        order           NATURAL
-        n_limit         2^(20)
-        entropy         123456789
+    Examples:
+        >>> k = Keister(Lattice(2, seed=123456789))
+        >>> sc = CubQMCBayesLatticeG(k,abs_tol=1e-4)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.808
+            comb_bound_low  1.808
+            comb_bound_high 1.808
+            comb_bound_diff 3.60e-05
+            comb_flags      1
+            n_total         2^(10)
+            n               2^(10)
+            time_integrate  ...
+        CubQMCBayesLatticeG (AbstractStoppingCriterion)
+            abs_tol         1.00e-04
+            rel_tol         0
+            n_init          2^(8)
+            n_limit         2^(22)
+            order           2^(1)
+        Keister (AbstractIntegrand)
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
+        Lattice (AbstractLDDiscreteDistribution)
+            d               2^(1)
+            replications    1
+            randomize       SHIFT
+            gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
+            order           NATURAL
+            n_limit         2^(20)
+            entropy         123456789
 
         Vector outputs
         
         >>> f = BoxIntegral(Lattice(3,seed=7),s=[-1,1])
         >>> abs_tol = 1e-2
-        >>> sc = CubBayesLatticeG(f,abs_tol=abs_tol,rel_tol=0)
+        >>> sc = CubQMCBayesLatticeG(f,abs_tol=abs_tol,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.18837601, 0.95984299])
@@ -65,7 +65,7 @@ class CubBayesLatticeG(AbstractCubBayesLDG):
             n_total         2^(9)
             n               [512 256]
             time_integrate  ...
-        CubBayesLatticeG (AbstractStoppingCriterion)
+        CubQMCBayesLatticeG (AbstractStoppingCriterion)
             abs_tol         0.010
             rel_tol         0
             n_init          2^(8)
@@ -93,7 +93,7 @@ class CubBayesLatticeG(AbstractCubBayesLDG):
 
         >>> function = Genz(Lattice(3,seed=7))
         >>> integrand = SensitivityIndices(function)
-        >>> sc = CubBayesLatticeG(integrand,abs_tol=5e-2,rel_tol=0)
+        >>> sc = CubQMCBayesLatticeG(integrand,abs_tol=5e-2,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> data
         Data (Data)
@@ -116,7 +116,7 @@ class CubBayesLatticeG(AbstractCubBayesLDG):
                               [1024 1024 1024]
                               [1024 1024 1024]]]
             time_integrate  ...
-        CubBayesLatticeG (AbstractStoppingCriterion)
+        CubQMCBayesLatticeG (AbstractStoppingCriterion)
             abs_tol         0.050
             rel_tol         0
             n_init          2^(8)
@@ -138,58 +138,65 @@ class CubBayesLatticeG(AbstractCubBayesLDG):
             n_limit         2^(20)
             entropy         7
 
-    Adapted from `GAIL cubBayesLattice_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m>`_.
+    **References:**
 
-    Guarantees:
-        This algorithm attempts to calculate the integral of function :math:`f` over the
-        hyperbox :math:`[0,1]^d` to a prescribed error tolerance :math:`\mbox{tolfun} := max(\mbox{abstol},
-        \mbox{reltol}*| I |)` with a guaranteed confidence level, e.g., :math:`99\%` when alpha= :math:`0.5\%`.
-        If the algorithm terminates without showing any warning messages and provides
-        an answer :math:`Q`, then the following inequality would be satisfied:
+    1.  Jagadeeswaran, Rathinavel, and Fred J. Hickernell.  
+        "Fast automatic Bayesian cubature using lattice sampling."  
+        Statistics and Computing 29.6 (2019): 1215-1229.
+    
+    2.  Jagadeeswaran Rathinavel and Fred J. Hickernell,  
+        Fast automatic Bayesian cubature using lattice sampling.  
+        Stat Comput 29, 1215-1229 (2019).  
+        Available from Springer [https://doi.org/10.1007/s11222-019-09895-9](https://doi.org/10.1007/s11222-019-09895-9).
 
-        .. math::
-                Pr(| Q - I | <= \mbox{tolfun}) = 99\%.
-
-        This Bayesian cubature algorithm guarantees for integrands that are considered
-        to be an instance of a Gaussian process that falls in the middle of samples space spanned.
-        Where The sample space is spanned by the covariance kernel parametrized by the scale
-        and shape parameter inferred from the sampled values of the integrand.
-        For more details on how the covariance kernels are defined and the parameters are obtained,
-        please refer to the references below.
-
-    References:
-        [1] Jagadeeswaran Rathinavel and Fred J. Hickernell, Fast automatic Bayesian cubature using lattice sampling.
-        Stat Comput 29, 1215-1229 (2019). Available from `Springer <https://doi.org/10.1007/s11222-019-09895-9>`_.
-
-        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
-        Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
+    3.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,  
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,  
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.  
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
+        [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesLattice_g.m).
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2**8, n_limit=2**22, alpha=0.01, ptransform='C1sin',
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = 1e-2, 
+                 rel_tol = 0,
+                 n_init = 2**8, 
+                 n_limit = 2**22, 
                  error_fun="EITHER", 
-                 errbd_type="MLE", order=2,):
+                 alpha = 0.01, 
+                 ptransform = 'C1SIN',
+                 errbd_type = "MLE", 
+                 order = 2,
+                 ):
         r"""
         Args:
-            integrand (AbstractIntegrand): An AbstractIntegrand.
+            integrand (AbstractIntegrand): The integrand.
             abs_tol (np.ndarray): Absolute error tolerance.
             rel_tol (np.ndarray): Relative error tolerance.
             n_init (int): Initial number of samples. 
             n_limit (int): Maximum number of samples.
-            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
-            error_fun (callable): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
 
-                - The default $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \max\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
-                    means the approximation error must be below either the absolue error *or* relative error.
-                - Setting to $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \min\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
-                    means the approximation error must be below either the absolue error *and* relative error. 
-            ptransform (str): periodization transform applied to the integrand
-            errbd_type (str): MLE, GCV, or FULL
+                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
+                    ```
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+                    ```
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            ptransform (str): Periodization transform, see the options in [`AbstractIntegrand.f`][qmcpy.AbstractIntegrand.f].
+            errbd_type (str): Options are 
+                
+                - `'MLE'`: Marginal Log Likelihood. 
+                - `'GCV'`: Generalized Cross Validation. 
+                - `'FULL'`: Full Bayes.
             order (int): Bernoulli kernel's order. If zero, choose order automatically
         """
-        super(CubBayesLatticeG, self).__init__(integrand, ft=fftbr, omega=omega_fftbr,
+        super(CubQMCBayesLatticeG, self).__init__(integrand, ft=fftbr, omega=omega_fftbr,
                                                ptransform=ptransform,
                                                allowed_distribs=[Lattice],
                                                kernel=self._shift_inv_kernel,

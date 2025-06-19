@@ -1,6 +1,6 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from .cub_mc_clt import CubMCCLT
-from .cub_qmc_clt import CubQMCCLT
+from .cub_qmc_rep_student_t import CubQMCRepStudentT
 from .cub_mc_g import CubMCG
 from .cub_qmc_lattice_g import CubQMCLatticeG
 from .cub_qmc_net_g import CubQMCNetG
@@ -8,8 +8,8 @@ from .cub_mc_ml import CubMCML
 from .cub_qmc_ml import CubQMCML
 from .cub_mc_ml_cont import CubMCMLCont
 from .cub_qmc_ml_cont import CubQMCMLCont
-from .cub_qmc_bayes_lattice_g import CubBayesLatticeG
-from .cub_qmc_bayes_net_g import CubBayesNetG
+from .cub_qmc_bayes_lattice_g import CubQMCBayesLatticeG
+from .cub_qmc_bayes_net_g import CubQMCBayesNetG
 from .cub_mc_clt_vec import CubMCCLTVec
 try: 
     import torch 
@@ -28,12 +28,13 @@ except ImportError:
 
 StoppingCriterion = AbstractStoppingCriterion
 _StoppingCriterion = AbstractStoppingCriterion
-CubQMCRep = CubQMCCLT
+CubQMCRep = CubQMCRepStudentT
+CubQMCCLT = CubQMCRepStudentT
 CubQMCDigitalNetB2G = CubQMCNetG
 CubQMCSobolG = CubQMCNetG
-CubQMCBayesLatticeG = CubBayesLatticeG
-CubQMCBayesNetG = CubBayesNetG
-CubBayesDigitalNetB2G = CubBayesNetG
-CubQMCCBayesDigitalNetB2G = CubBayesNetG
-CubBayesSobolG = CubBayesNetG
-CubQMCBayesSobolG = CubBayesNetG
+CubBayesLatticeG = CubQMCBayesLatticeG
+CubBayesNetG = CubQMCBayesNetG
+CubQMCCBayesDigitalNetB2G = CubQMCBayesNetG
+CubBayesDigitalNetB2G = CubQMCBayesNetG
+CubQMCBayesSobolG = CubQMCBayesNetG
+CubBayesSobolG = CubQMCBayesNetG

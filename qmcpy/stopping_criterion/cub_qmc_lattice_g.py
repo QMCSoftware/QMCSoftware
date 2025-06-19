@@ -163,7 +163,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
                  check_cone = False,
                  ptransform = 'BAKER',
                  ):
-        """
+        r"""
         Args:
             integrand (AbstractIntegrand): The integrand.
             abs_tol (np.ndarray): Absolute error tolerance.
