@@ -1,6 +1,6 @@
 site_name: "QMCPy"
 nav:
-  - index.md
+  - Quasi Monte Carlo Software: index.md
   - API:
     - Discrete Distributions: discrete_distributions.md
     - True Measures: true_measures.md
@@ -9,10 +9,14 @@ nav:
     - Util: util.md
   # - Demos:
   #   - Fast GP Net: examples/simple/fgp_dnb2.ipynb
-  - Community: community.md
-  - Contributing: CONTRIBUTING.md
-  - License: https://github.com/QMCSoftware/QMCSoftware/blob/master/LICENSE
-  - Full Docs: print_page/
+  - Development:
+    - Citing QMCPy: citation.md
+    - Community: community.md
+    - Contributing: CONTRIBUTING.md
+    - License: https://github.com/QMCSoftware/QMCSoftware/blob/master/LICENSE
+    - Sponsors: sponsors.md
+    - Select References: select_references.md
+  - Printable Docs: print_page/
 
 plugins:
   - search
