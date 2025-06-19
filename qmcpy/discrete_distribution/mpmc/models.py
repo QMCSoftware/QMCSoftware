@@ -4,7 +4,7 @@ from torch_cluster import radius_graph
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 from torch_geometric.nn import MessagePassing, InstanceNorm
 from itertools import product 
-from utils import L2discrepancy, hickernell_all_emphasized, L2center, L2ext, L2per, L2sym
+from utils import L2discrepancy, L2center, L2ext, L2per, L2sym
 
 
 class MPNN_layer(MessagePassing):
@@ -57,7 +57,7 @@ class MPMC_net(nn.Module):
         self.nsamples = nsamples
         self.dim = dim
         self.n_projections = n_projections
-        self.dim_emphasize = torch.tensor(dim_emphasize).long()
+        self.dim_emphasize = torch.tensor(dim_emphasize).long() 
 
         ## random input points for transformation:
         self.x = torch.rand(nsamples * nbatch, dim).to(device)
@@ -102,7 +102,6 @@ class MPMC_net(nn.Module):
             disc_projections += self.L2discrepancy(X[:, :, projection_indices])
 
         return disc_projections
-
 
 
 

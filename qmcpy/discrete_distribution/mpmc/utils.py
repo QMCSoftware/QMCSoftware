@@ -79,3 +79,4 @@ def L2sym(x):
 
     out = math.pow(12., -dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2
     return out
+    

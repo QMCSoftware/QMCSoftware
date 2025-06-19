@@ -1,13 +1,15 @@
 from types import SimpleNamespace
 from .._discrete_distribution import LD
-import torch
-import numpy as np
-from torch_cluster import radius_graph
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-import torch.optim as optim
+from ...util import ParameterError, ParameterWarning
 from utils import L2discrepancy, hickernell_all_emphasized, L2center, L2ext, L2per, L2sym
 from models import *
 from tqdm import tqdm 
+import torch
+import numpy as np
+from torch_cluster import radius_graph
+import torch.optim as optim
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 
 
 class MPMC(LD): 
@@ -53,7 +55,7 @@ class MPMC(LD):
 
 
 
-    def gen_samples(self, n = None, warn = True, return_unrandomized = False):
+    def gen_samples(self, n = None, warn = True, return_unrandomized = False, loss_fn = 'L2dis'):
         """
         IMPLEMENT ABSTRACT METHOD to generate samples from this discrete distribution.
 
@@ -64,6 +66,9 @@ class MPMC(LD):
         Returns:
             ndarray: replicatsions x n x d array of samples
         """
+        #error if n is None: 
+        if (n == None ):
+            raise ValueError("Must provide n number of points to generate")
         #generate points  
         d = self.d
         r = self.replications
@@ -85,7 +90,7 @@ class MPMC(LD):
                 'radius': 0.35,               # radius for GNN neighborhood
                 'nsamples': n,               # number of samples in each point set
                 'dim': 2,                     # dimensionality of the points
-                'loss_fn': 'L2dis',           # loss function to use
+                'loss_fn': loss_fn,           # loss function to use
                 'dim_emphasize': [1],         # emphasized dimensionalities for projections
                 'n_projections': 15           # number of projections (for approx_hickernell)
             }
@@ -101,12 +106,15 @@ class MPMC(LD):
         elif self.randomize == "SHIFT":
             xr = np.empty(r,n,d)
             #randomize smth smth 
+            if r==1: xr=xr[0]
+            #in lattice, qmctools used for randomizeshift and point generation order 
+            xr = (x[:, :, np.newaxis] + self.shift) % 1
+            #return both shifted and unshifted if user wants unrandomized, else just randomized
             return (xr, x) if return_unrandomized else xr 
         else: 
             raise ParameterError("incorrect randomize parsing in lattice gen_samples")
             
     
-        
     
     def pdf(self, x):
         """ pdf of a standard uniform """
@@ -143,6 +151,9 @@ class MPMC(LD):
         # Path('outputs/dim_' + str(args.dim) + '/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid)).mkdir(parents=True, exist_ok=True)
 
         for epoch in tqdm(range(args.epochs), desc = f"Training: N={args.nsamples}, nhid={args.nhid}, loss={args.loss_fn}"):
+            if (epoch % 10000 == 0):
+                print(f"epoch: {epoch}")
+
             model.train()
             optimizer.zero_grad()
             loss, X = model()
@@ -200,6 +211,8 @@ class MPMC(LD):
         return endresult
     
     
-    
 
-    
+
+#temporary for testing: 
+m = MPMC()
+print(m.gen_samples(n = 10))
