@@ -2,62 +2,6 @@ import torch
 import numpy as np
 import itertools 
 
-SQRT2 = np.sqrt(2) 
-
-def _fwht_torch(x):
-    y = x.clone()
-    n = x.size(-1)
-    if n<=1: return y
-    assert n&(n-1)==0 # require n is a power of 2
-    m = int(np.log2(n))
-    it = torch.arange(n,dtype=torch.int64,device=x.device).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
-    idx0 = [slice(None)]*(m-1)+[0]
-    idx1 = [slice(None)]*(m-1)+[1]
-    for k in range(m):
-        eps0 = it[idx0[-(k+1):]].flatten()
-        eps1 = it[idx1[-(k+1):]].flatten()
-        y0,y1 = y[[Ellipsis,eps0]],y[[Ellipsis,eps1]]
-        y[[Ellipsis,eps0]],y[[Ellipsis,eps1]] = (y0+y1)/SQRT2,(y0-y1)/SQRT2
-    return y
-class _FWHTB2Ortho(torch.autograd.Function):
-    @staticmethod
-    def forward(self, x):
-        return _fwht_torch(x)
-    @staticmethod
-    def backward(self, dx):
-        return _fwht_torch(dx)
-def fwht_torch(x):
-    r"""
-    Torch implementation of the 1 dimensional Fast Walsh Hadamard Transform (FWHT) along the last dimension.  
-    Requires the size of the last dimension is a power of 2. 
-
-    Examples:
-        >>> rng = np.random.Generator(np.random.SFC64(11))
-        >>> x = torch.from_numpy(rng.random(8)).float().requires_grad_()
-        >>> y = fwht_torch(x)
-        >>> with torch._tensor_str.printoptions(precision=2):
-        ...     y.detach()
-        tensor([ 1.07, -0.29,  0.12,  0.08,  0.10, -0.45,  0.10, -0.03])
-        >>> v = torch.sum(y**2)
-        >>> dvdx = torch.autograd.grad(v,x)[0]
-        >>> with torch._tensor_str.printoptions(precision=2):
-        ...     x.detach()
-        tensor([0.25, 0.73, 0.06, 0.61, 0.45, 0.26, 0.35, 0.32])
-        >>> print("%.4f"%v.detach())
-        1.4694
-        >>> with torch._tensor_str.printoptions(precision=2):
-        ...     dvdx.detach()
-        tensor([0.50, 1.47, 0.11, 1.23, 0.90, 0.51, 0.70, 0.64])
-        >>> fwht_torch(torch.rand((2,3,4,5,8))).shape
-        torch.Size([2, 3, 4, 5, 8])
-    
-    Args:
-        x (torch.Tensor): Array of samples at which to run FWHT.
-    
-    Returns:
-        y (torch.Tensor): FWHT values.
-    """
-    return _FWHTB2Ortho.apply(x)
 
 def fftbr_torch(x):
     r"""
@@ -154,24 +98,60 @@ def ifftbr_torch(x):
     xr = xrf.contiguous().view(shape)
     return xr
 
-def omega_fftbr_torch(m, device=None):
+def _fwht_torch(x):
+    y = x.clone()
+    n = x.size(-1)
+    if n<=1: return y
+    assert n&(n-1)==0 # require n is a power of 2
+    m = int(np.log2(n))
+    it = torch.arange(n,dtype=torch.int64,device=x.device).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
+    idx0 = [slice(None)]*(m-1)+[0]
+    idx1 = [slice(None)]*(m-1)+[1]
+    for k in range(m):
+        eps0 = it[idx0[-(k+1):]].flatten()
+        eps1 = it[idx1[-(k+1):]].flatten()
+        y0,y1 = y[[Ellipsis,eps0]],y[[Ellipsis,eps1]]
+        y[[Ellipsis,eps0]],y[[Ellipsis,eps1]] = (y0+y1)/np.sqrt(2),(y0-y1)/np.sqrt(2)
+    return y
+class _FWHTB2Ortho(torch.autograd.Function):
+    @staticmethod
+    def forward(self, x):
+        return _fwht_torch(x)
+    @staticmethod
+    def backward(self, dx):
+        return _fwht_torch(dx)
+def fwht_torch(x):
     r"""
-    Torch implementation useful when efficiently updating FFT values after doubling the sample size. 
+    Torch implementation of the 1 dimensional Fast Walsh Hadamard Transform (FWHT) along the last dimension.  
+    Requires the size of the last dimension is a power of 2. 
 
     Examples:
+        >>> rng = np.random.Generator(np.random.SFC64(11))
+        >>> x = torch.from_numpy(rng.random(8)).float().requires_grad_()
+        >>> y = fwht_torch(x)
         >>> with torch._tensor_str.printoptions(precision=2):
-        ...     omega_fftbr_torch(3)
-        tensor([ 1.00e+00-0.00j,  9.24e-01-0.38j,  7.07e-01-0.71j,  3.83e-01-0.92j,
-                -4.37e-08-1.00j, -3.83e-01-0.92j, -7.07e-01-0.71j, -9.24e-01-0.38j])
+        ...     y.detach()
+        tensor([ 1.07, -0.29,  0.12,  0.08,  0.10, -0.45,  0.10, -0.03])
+        >>> v = torch.sum(y**2)
+        >>> dvdx = torch.autograd.grad(v,x)[0]
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     x.detach()
+        tensor([0.25, 0.73, 0.06, 0.61, 0.45, 0.26, 0.35, 0.32])
+        >>> print("%.4f"%v.detach())
+        1.4694
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     dvdx.detach()
+        tensor([0.50, 1.47, 0.11, 1.23, 0.90, 0.51, 0.70, 0.64])
+        >>> fwht_torch(torch.rand((2,3,4,5,8))).shape
+        torch.Size([2, 3, 4, 5, 8])
     
     Args:
-        m (int): Size $2^m$ output. 
+        x (torch.Tensor): Array of samples at which to run FWHT.
     
     Returns:
-        y (np.ndarray): $\left(e^{- \pi \mathrm{i} k / 2^m}\right)_{k=0}^{2^m}$. 
+        y (torch.Tensor): FWHT values.
     """
-    if device is None: device = "cpu"
-    return torch.exp(-torch.pi*1j*torch.arange(2**m,device=device)/2**m)
+    return _FWHTB2Ortho.apply(x)
 
 def omega_fwht_torch(m, device=None):
     r"""
@@ -181,6 +161,21 @@ def omega_fwht_torch(m, device=None):
         >>> with torch._tensor_str.printoptions(precision=2):
         ...     omega_fwht_torch(3)
         tensor([1., 1., 1., 1., 1., 1., 1., 1.])
+
+        Updating coefficients after doubling the sample size 
+        
+        >>> rng = np.random.Generator(np.random.SFC64(11))
+        >>> m = 3
+        >>> x1 = torch.from_numpy(rng.random((3,5,7,2**m)))
+        >>> x2 = torch.from_numpy(rng.random((3,5,7,2**m)))
+        >>> x = torch.cat([x1,x2],axis=-1)
+        >>> ytrue = fwht_torch(x)
+        >>> omega = omega_fwht_torch(m)
+        >>> y1 = fwht_torch(x1) 
+        >>> y2 = fwht_torch(x2) 
+        >>> y = torch.cat([y1+omega*y2,y1-omega*y2],axis=-1)/np.sqrt(2)
+        >>> np.allclose(y,ytrue)
+        True
     
     Args:
         m (int): Size $2^m$ output. 
@@ -190,3 +185,37 @@ def omega_fwht_torch(m, device=None):
     """
     if device is None: device = "cpu"
     return torch.ones(2**m,device=device)
+
+def omega_fftbr_torch(m, device=None):
+    r"""
+    Torch implementation useful when efficiently updating FFT values after doubling the sample size. 
+
+    Examples:
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     omega_fftbr_torch(3)
+        tensor([ 1.00e+00-0.00j,  9.24e-01-0.38j,  7.07e-01-0.71j,  3.83e-01-0.92j,
+                -4.37e-08-1.00j, -3.83e-01-0.92j, -7.07e-01-0.71j, -9.24e-01-0.38j])
+
+        Updating coefficients after doubling the sample size 
+        
+        >>> rng = np.random.Generator(np.random.SFC64(11))
+        >>> m = 3
+        >>> x1 = torch.from_numpy(rng.random((3,5,7,2**m))+1j*rng.random((3,5,7,2**m)))
+        >>> x2 = torch.from_numpy(rng.random((3,5,7,2**m))+1j*rng.random((3,5,7,2**m)))
+        >>> x = torch.cat([x1,x2],axis=-1)
+        >>> ytrue = fftbr_torch(x)
+        >>> omega = omega_fftbr_torch(m)
+        >>> y1 = fftbr_torch(x1) 
+        >>> y2 = fftbr_torch(x2) 
+        >>> y = torch.cat([y1+omega*y2,y1-omega*y2],axis=-1)/np.sqrt(2)
+        >>> np.allclose(y,ytrue)
+        True
+    
+    Args:
+        m (int): Size $2^m$ output. 
+    
+    Returns:
+        y (np.ndarray): $\left(e^{- \pi \mathrm{i} k / 2^m}\right)_{k=0}^{2^m}$. 
+    """
+    if device is None: device = "cpu"
+    return torch.exp(-torch.pi*1j*torch.arange(2**m,device=device)/2**m)

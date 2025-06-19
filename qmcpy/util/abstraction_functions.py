@@ -1,5 +1,3 @@
-""" Utility functions that abstract QMCPy objects. """
-
 import numpy as np
 from copy import copy
 
@@ -14,7 +12,7 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
         attributes (list): list of attributes to include
 
     Returns:
-        str: string representation of this qmcpy object
+        s (str): string representation of this qmcpy object
 
     Note:
         print(qmc_object) is equivalent to print(qmc_object.__repr__()). 

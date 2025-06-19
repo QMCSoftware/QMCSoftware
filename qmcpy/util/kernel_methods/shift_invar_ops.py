@@ -91,27 +91,6 @@ def bernoulli_poly(n, x):
         n = 10
         [[ 0.08  0.04 -0.04]
          [-0.08 -0.04  0.04]]
-
-        n = 6
-        [[ 0.02  0.01 -0.01]
-         [-0.02 -0.01  0.01]]
-        <BLANKLINE>
-        n = 7
-        [[ 0.00e+00  2.28e-02  2.24e-02]
-         [-1.39e-17 -2.24e-02 -2.28e-02]]
-        <BLANKLINE>
-        n = 8
-        [[-0.03 -0.02  0.02]
-         [ 0.03  0.02 -0.02]]
-        <BLANKLINE>
-        n = 9
-        [[ 0.   -0.04 -0.04]
-         [ 0.    0.04  0.04]]
-        <BLANKLINE>
-        n = 10
-        [[ 0.08  0.04 -0.04]
-         [-0.08 -0.04  0.04]]
-        <BLANKLINE>
         >>> import scipy.special
         >>> for n in available_n:
         ...     bpoly_coeffs = BERNOULLIPOLYSDICT[n].coeffs

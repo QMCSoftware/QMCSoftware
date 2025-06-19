@@ -106,6 +106,38 @@ def fwht(x):
     qmctoolscl.fwht_1d_radix2(1,d,int(n_half),xcp)
     return xcp.reshape(shape)
 
+def omega_fwht(m):
+    r"""
+    A useful when efficiently updating FWHT values after doubling the sample size.  
+
+    Examples:
+        >>> with np.printoptions(precision=2):
+        ...     omega_fwht(3)
+        array([1., 1., 1., 1., 1., 1., 1., 1.])
+
+        Updating coefficients after doubling the sample size 
+        
+        >>> rng = np.random.Generator(np.random.SFC64(11))
+        >>> m = 3
+        >>> x1 = rng.random((3,5,7,2**m))
+        >>> x2 = rng.random((3,5,7,2**m))
+        >>> x = np.concatenate([x1,x2],axis=-1)
+        >>> ytrue = fwht(x)
+        >>> omega = omega_fwht(m)
+        >>> y1 = fwht(x1) 
+        >>> y2 = fwht(x2) 
+        >>> y = np.concatenate([y1+omega*y2,y1-omega*y2],axis=-1)/np.sqrt(2)
+        >>> np.allclose(y,ytrue)
+        True
+    
+    Args:
+        m (int): Size $2^m$ output. 
+    
+    Returns:
+        y (np.ndarray): $\left(1\right)_{k=0}^{2^m}$. 
+    """
+    return np.ones(2**m)
+
 def omega_fftbr(m):
     r"""
     A useful when efficiently updating FFT values after doubling the sample size. 
@@ -116,6 +148,21 @@ def omega_fftbr(m):
         array([ 1.00e+00+0.j  ,  9.24e-01-0.38j,  7.07e-01-0.71j,  3.83e-01-0.92j,
                 6.12e-17-1.j  , -3.83e-01-0.92j, -7.07e-01-0.71j, -9.24e-01-0.38j])
     
+        Updating coefficients after doubling the sample size 
+        
+        >>> rng = np.random.Generator(np.random.SFC64(11))
+        >>> m = 3
+        >>> x1 = rng.random((3,5,7,2**m))+1j*rng.random((3,5,7,2**m))
+        >>> x2 = rng.random((3,5,7,2**m))+1j*rng.random((3,5,7,2**m))
+        >>> x = np.concatenate([x1,x2],axis=-1)
+        >>> ytrue = fftbr(x)
+        >>> omega = omega_fftbr(m)
+        >>> y1 = fftbr(x1) 
+        >>> y2 = fftbr(x2) 
+        >>> y = np.concatenate([y1+omega*y2,y1-omega*y2],axis=-1)/np.sqrt(2)
+        >>> np.allclose(y,ytrue)
+        True
+    
     Args:
         m (int): Size $2^m$ output. 
     
@@ -123,20 +170,3 @@ def omega_fftbr(m):
         y (np.ndarray): $\left(e^{- \pi \mathrm{i} k / 2^m}\right)_{k=0}^{2^m}$. 
     """
     return np.exp(-np.pi*1j*np.arange(2**m)/2**m)
-
-def omega_fwht(m):
-    r"""
-    A useful when efficiently updating FWHT values after doubling the sample size.  
-
-    Examples:
-        >>> with np.printoptions(precision=2):
-        ...     omega_fwht(3)
-        array([1., 1., 1., 1., 1., 1., 1., 1.])
-    
-    Args:
-        m (int): Size $2^m$ output. 
-    
-    Returns:
-        y (np.ndarray): $\left(1\right)_{k=0}^{2^m}$. 
-    """
-    return np.ones(2**m)

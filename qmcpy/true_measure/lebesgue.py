@@ -2,7 +2,7 @@ from .abstract_true_measure import AbstractTrueMeasure
 from .uniform import Uniform
 from .gaussian import Gaussian
 from ..discrete_distribution import DigitalNetB2
-from ..util import TransformError, ParameterError
+from ..util import ParameterError
 from scipy.stats import norm
 import numpy as np
 from typing import Union
