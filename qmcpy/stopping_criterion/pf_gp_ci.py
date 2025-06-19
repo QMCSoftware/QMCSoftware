@@ -163,6 +163,7 @@ class PFGPCI(AbstractStoppingCriterion):
         self.failure_above_threshold = failure_above_threshold
         self.abs_tol = abs_tol
         self.alpha = alpha
+        assert 0<self.alpha<1
         self.n_init = n_init
         self.init_samples = init_samples is not None
         if self.init_samples: 

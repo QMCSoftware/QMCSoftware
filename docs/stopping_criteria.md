@@ -24,6 +24,20 @@
 
 ::: qmcpy.stopping_criterion.cub_qmc_rep_student_t.CubQMCRepStudentT
 
+## `CubMCCLTVec`
+
+::: qmcpy.stopping_criterion.cub_mc_clt_vec.CubMCCLTVec
+
+## `CubMCG`
+
+::: qmcpy.stopping_criterion.cub_mc_g.CubMCG
+
+## `CubMCCLT`
+
+::: qmcpy.stopping_criterion.cub_mc_clt.CubMCCLT
+
+
+
 
 
 

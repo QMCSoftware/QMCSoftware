@@ -14,124 +14,125 @@ import warnings
 
 class CubMCCLTVec(AbstractStoppingCriterion):
     r"""
-    Stopping criterion based on the Central Limit Theorem for vectorized integrands.
+    IID Monte Carlo stopping criterion stopping criterion based on the Central Limit Theorem with doubling sample sizes.
     
-    >>> k = Keister(IIDStdUniform(seed=7))
-    >>> sc = CubMCCLTVec(k,abs_tol=5e-2,rel_tol=0)
-    >>> solution,data = sc.integrate()
-    >>> solution
-    array(1.38366791)
-    >>> data
-    Data (Data)
-        solution        1.384
-        comb_bound_low  1.343
-        comb_bound_high 1.424
-        comb_bound_diff 0.080
-        comb_flags      1
-        n_total         1024
-        n               2^(10)
-        time_integrate  ...
-    CubMCCLTVec (AbstractStoppingCriterion)
-        inflate         1
-        alpha           0.010
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(8)
-        n_limit         2^(30)
-    Keister (AbstractIntegrand)
-    Gaussian (AbstractTrueMeasure)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     PCA
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               1
-        replications    1
-        entropy         7
+    Examples:
+        >>> k = Keister(IIDStdUniform(seed=7))
+        >>> sc = CubMCCLTVec(k,abs_tol=5e-2,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array(1.38366791)
+        >>> data
+        Data (Data)
+            solution        1.384
+            comb_bound_low  1.343
+            comb_bound_high 1.424
+            comb_bound_diff 0.080
+            comb_flags      1
+            n_total         1024
+            n               2^(10)
+            time_integrate  ...
+        CubMCCLTVec (AbstractStoppingCriterion)
+            inflate         1
+            alpha           0.010
+            abs_tol         0.050
+            rel_tol         0
+            n_init          2^(8)
+            n_limit         2^(30)
+        Keister (AbstractIntegrand)
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               1
+            replications    1
+            entropy         7
 
-    Vector outputs
-    
-    >>> f = BoxIntegral(IIDStdUniform(3,seed=7),s=[-1,1])
-    >>> abs_tol = 2.5e-2
-    >>> sc = CubMCCLTVec(f,abs_tol=abs_tol,rel_tol=0)
-    >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.18448043, 0.95435347])
-    >>> data
-    Data (Data)
-        solution        [1.184 0.954]
-        comb_bound_low  [1.165 0.932]
-        comb_bound_high [1.203 0.977]
-        comb_bound_diff [0.038 0.045]
-        comb_flags      [ True  True]
-        n_total         8192
-        n               [8192 1024]
-        time_integrate  ...
-    CubMCCLTVec (AbstractStoppingCriterion)
-        inflate         1
-        alpha           0.010
-        abs_tol         0.025
-        rel_tol         0
-        n_init          2^(8)
-        n_limit         2^(30)
-    BoxIntegral (AbstractIntegrand)
-        s               [-1  1]
-    Uniform (AbstractTrueMeasure)
-        lower_bound     0
-        upper_bound     1
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               3
-        replications    1
-        entropy         7
-    >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
-    >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
-    >>> true_value = np.array([sol3neg1,sol31])
-    >>> assert (abs(true_value-solution)<abs_tol).all()
-    
-    Sensitivity indices 
+        Vector outputs
+        
+        >>> f = BoxIntegral(IIDStdUniform(3,seed=7),s=[-1,1])
+        >>> abs_tol = 2.5e-2
+        >>> sc = CubMCCLTVec(f,abs_tol=abs_tol,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.18448043, 0.95435347])
+        >>> data
+        Data (Data)
+            solution        [1.184 0.954]
+            comb_bound_low  [1.165 0.932]
+            comb_bound_high [1.203 0.977]
+            comb_bound_diff [0.038 0.045]
+            comb_flags      [ True  True]
+            n_total         8192
+            n               [8192 1024]
+            time_integrate  ...
+        CubMCCLTVec (AbstractStoppingCriterion)
+            inflate         1
+            alpha           0.010
+            abs_tol         0.025
+            rel_tol         0
+            n_init          2^(8)
+            n_limit         2^(30)
+        BoxIntegral (AbstractIntegrand)
+            s               [-1  1]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               3
+            replications    1
+            entropy         7
+        >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+        >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
+        >>> true_value = np.array([sol3neg1,sol31])
+        >>> assert (abs(true_value-solution)<abs_tol).all()
+        
+        Sensitivity indices 
 
-    >>> function = Genz(IIDStdUniform(3,seed=7))
-    >>> integrand = SensitivityIndices(function)
-    >>> sc = CubMCCLTVec(integrand,abs_tol=2.5e-2,rel_tol=0)
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        [[0.024 0.203 0.662]
-                         [0.044 0.308 0.78 ]]
-        comb_bound_low  [[0.006 0.186 0.644]
-                         [0.02  0.286 0.761]]
-        comb_bound_high [[0.042 0.221 0.681]
-                         [0.067 0.329 0.798]]
-        comb_bound_diff [[0.036 0.035 0.037]
-                         [0.047 0.043 0.037]]
-        comb_flags      [[ True  True  True]
-                         [ True  True  True]]
-        n_total         262144
-        n               [[[  4096  65536 262144]
-                          [  4096  65536 262144]
-                          [  4096  65536 262144]]
-    <BLANKLINE>
-                         [[   512  32768 262144]
-                          [   512  32768 262144]
-                          [   512  32768 262144]]]
-        time_integrate  ...
-    CubMCCLTVec (AbstractStoppingCriterion)
-        inflate         1
-        alpha           0.010
-        abs_tol         0.025
-        rel_tol         0
-        n_init          2^(8)
-        n_limit         2^(30)
-    SensitivityIndices (AbstractIntegrand)
-        indices         [[ True False False]
-                         [False  True False]
-                         [False False  True]]
-    Uniform (AbstractTrueMeasure)
-        lower_bound     0
-        upper_bound     1
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               6
-        replications    1
-        entropy         7
+        >>> function = Genz(IIDStdUniform(3,seed=7))
+        >>> integrand = SensitivityIndices(function)
+        >>> sc = CubMCCLTVec(integrand,abs_tol=2.5e-2,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        [[0.024 0.203 0.662]
+                            [0.044 0.308 0.78 ]]
+            comb_bound_low  [[0.006 0.186 0.644]
+                            [0.02  0.286 0.761]]
+            comb_bound_high [[0.042 0.221 0.681]
+                            [0.067 0.329 0.798]]
+            comb_bound_diff [[0.036 0.035 0.037]
+                            [0.047 0.043 0.037]]
+            comb_flags      [[ True  True  True]
+                            [ True  True  True]]
+            n_total         262144
+            n               [[[  4096  65536 262144]
+                            [  4096  65536 262144]
+                            [  4096  65536 262144]]
+        <BLANKLINE>
+                            [[   512  32768 262144]
+                            [   512  32768 262144]
+                            [   512  32768 262144]]]
+            time_integrate  ...
+        CubMCCLTVec (AbstractStoppingCriterion)
+            inflate         1
+            alpha           0.010
+            abs_tol         0.025
+            rel_tol         0
+            n_init          2^(8)
+            n_limit         2^(30)
+        SensitivityIndices (AbstractIntegrand)
+            indices         [[ True False False]
+                            [False  True False]
+                            [False False  True]]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               6
+            replications    1
+            entropy         7
     """
 
     def __init__(self,
@@ -140,24 +141,31 @@ class CubMCCLTVec(AbstractStoppingCriterion):
                  rel_tol = 0.,
                  n_init = 256.,
                  n_limit = 2**30,
+                 error_fun = "EITHER",
                  inflate = 1,
-                 alpha = 0.01, 
-                 error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)):
+                 alpha = 0.01,
+                 ):
         r"""
         Args:
-            integrand (AbstractIntegrand): An AbstractIntegrand.
+            integrand (AbstractIntegrand): The integrand.
             abs_tol (np.ndarray): Absolute error tolerance.
             rel_tol (np.ndarray): Relative error tolerance.
             n_init (int): Initial number of samples. 
             n_limit (int): Maximum number of samples.
-            inflate (float): Inflation factor to multiply by the variance estimate to make it more conservative. Must be greater than or equal to 1.
-            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
-            error_fun (callable): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
 
-                - The default $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \max\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
-                    means the approximation error must be below either the absolue error *or* relative error.
-                - Setting to $(\hat{\boldsymbol{\mu}},\varepsilon_\mathrm{abs},\varepsilon_\mathrm{rel}) \mapsto \min\{\varepsilon_\mathrm{abs},\lvert \hat{\boldsymbol{\mu}} \rvert \varepsilon_\mathrm{rel}\}$ 
-                    means the approximation error must be below either the absolue error *and* relative error.  
+                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
+                    ```
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+                    ```
+            inflate (float): Inflation factor $\geq 1$ to multiply by the variance estimate to make it more conservative.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
         """
         self.parameters = ['inflate','alpha','abs_tol','rel_tol','n_init','n_limit']
         # Input Checks
@@ -181,6 +189,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         self.error_fun = error_fun
         self.alpha = alpha
         self.inflate = float(inflate)
+        assert self.inflate>=1
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure

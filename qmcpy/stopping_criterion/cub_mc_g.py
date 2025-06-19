@@ -16,263 +16,258 @@ import warnings
 
 class CubMCG(AbstractStoppingCriterion):
     r"""
-    Stopping criterion with guaranteed accuracy.
+    IID Monte Carlo stopping criterion using Berry-Esseen inequalities in a two step method with guarantees for functions with bounded kurtosis.
 
-    >>> ao = FinancialOption(IIDStdUniform(52,seed=7))
-    >>> sc = CubMCG(ao,abs_tol=.05)
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        1.779
-        bound_low       1.729
-        bound_high      1.829
-        bound_diff      0.100
-        n_total         112314
-        time_integrate  ...
-    CubMCG (AbstractStoppingCriterion)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_limit         2^(30)
-        inflate         1.200
-        alpha           0.010
-        kurtmax         1.478
-    FinancialOption (AbstractIntegrand)
-        option          ASIAN
-        call_put        CALL
-        volatility      2^(-1)
-        start_price     30
-        strike_price    35
-        interest_rate   0
-        t_final         1
-        asian_mean      ARITHMETIC
-    BrownianMotion (AbstractTrueMeasure)
-        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
-        drift           0
-        mean            [0. 0. 0. ... 0. 0. 0.]
-        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
-                         ...
-                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
-        decomp_type     PCA
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               52
-        replications    1
-        entropy         7
+    Examples:
+        >>> ao = FinancialOption(IIDStdUniform(52,seed=7))
+        >>> sc = CubMCG(ao,abs_tol=.05)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.779
+            bound_low       1.729
+            bound_high      1.829
+            bound_diff      0.100
+            n_total         112314
+            time_integrate  ...
+        CubMCG (AbstractStoppingCriterion)
+            abs_tol         0.050
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(30)
+            inflate         1.200
+            alpha           0.010
+            kurtmax         1.478
+        FinancialOption (AbstractIntegrand)
+            option          ASIAN
+            call_put        CALL
+            volatility      2^(-1)
+            start_price     30
+            strike_price    35
+            interest_rate   0
+            t_final         1
+            asian_mean      ARITHMETIC
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+            drift           0
+            mean            [0. 0. 0. ... 0. 0. 0.]
+            covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                            [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                            [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                            ...
+                            [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                            [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                            [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+            decomp_type     PCA
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               52
+            replications    1
+            entropy         7
 
-    Control variates 
+        Control variates 
 
-    >>> iid = IIDStdUniform(52,seed=7)
-    >>> ao = FinancialOption(iid,option="ASIAN")
-    >>> eo = FinancialOption(iid,option="EUROPEAN")
-    >>> lin0 = Linear0(iid)
-    >>> sc = CubMCG(ao,abs_tol=.05,
-    ...     control_variates = [eo,lin0],
-    ...     control_variate_means = [eo.get_exact_value(),0])
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        1.787
-        bound_low       1.737
-        bound_high      1.837
-        bound_diff      0.100
-        n_total         52147
-        time_integrate  ...
-    CubMCG (AbstractStoppingCriterion)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_limit         2^(30)
-        inflate         1.200
-        alpha           0.010
-        kurtmax         1.478
-        cv              [FinancialOption (AbstractIntegrand)
-                             option          EUROPEAN
-                             call_put        CALL
-                             volatility      2^(-1)
-                             start_price     30
-                             strike_price    35
-                             interest_rate   0
-                             t_final         1               Linear0 (AbstractIntegrand)]
-        cv_mu           [4.211 0.   ]
-    FinancialOption (AbstractIntegrand)
-        option          ASIAN
-        call_put        CALL
-        volatility      2^(-1)
-        start_price     30
-        strike_price    35
-        interest_rate   0
-        t_final         1
-        asian_mean      ARITHMETIC
-    BrownianMotion (AbstractTrueMeasure)
-        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
-        drift           0
-        mean            [0. 0. 0. ... 0. 0. 0.]
-        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
-                         ...
-                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
-        decomp_type     PCA
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               52
-        replications    1
-        entropy         7
+        >>> iid = IIDStdUniform(52,seed=7)
+        >>> ao = FinancialOption(iid,option="ASIAN")
+        >>> eo = FinancialOption(iid,option="EUROPEAN")
+        >>> lin0 = Linear0(iid)
+        >>> sc = CubMCG(ao,abs_tol=.05,
+        ...     control_variates = [eo,lin0],
+        ...     control_variate_means = [eo.get_exact_value(),0])
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.787
+            bound_low       1.737
+            bound_high      1.837
+            bound_diff      0.100
+            n_total         52147
+            time_integrate  ...
+        CubMCG (AbstractStoppingCriterion)
+            abs_tol         0.050
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(30)
+            inflate         1.200
+            alpha           0.010
+            kurtmax         1.478
+            cv              [FinancialOption (AbstractIntegrand)
+                                option          EUROPEAN
+                                call_put        CALL
+                                volatility      2^(-1)
+                                start_price     30
+                                strike_price    35
+                                interest_rate   0
+                                t_final         1               Linear0 (AbstractIntegrand)]
+            cv_mu           [4.211 0.   ]
+        FinancialOption (AbstractIntegrand)
+            option          ASIAN
+            call_put        CALL
+            volatility      2^(-1)
+            start_price     30
+            strike_price    35
+            interest_rate   0
+            t_final         1
+            asian_mean      ARITHMETIC
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+            drift           0
+            mean            [0. 0. 0. ... 0. 0. 0.]
+            covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                            [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                            [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                            ...
+                            [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                            [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                            [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+            decomp_type     PCA
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               52
+            replications    1
+            entropy         7
+        
+        Relative tolerance 
+
+        >>> ao = FinancialOption(IIDStdUniform(52,seed=7))
+        >>> sc = CubMCG(ao,abs_tol=1e-3,rel_tol=5e-2)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.743
+            bound_low       1.661
+            bound_high      1.825
+            bound_diff      0.164
+            n_total         27503
+            time_integrate  ...
+        CubMCG (AbstractStoppingCriterion)
+            abs_tol         0.001
+            rel_tol         0.050
+            n_init          2^(10)
+            n_limit         2^(30)
+            inflate         1.200
+            alpha           0.010
+            kurtmax         1.478
+        FinancialOption (AbstractIntegrand)
+            option          ASIAN
+            call_put        CALL
+            volatility      2^(-1)
+            start_price     30
+            strike_price    35
+            interest_rate   0
+            t_final         1
+            asian_mean      ARITHMETIC
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+            drift           0
+            mean            [0. 0. 0. ... 0. 0. 0.]
+            covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                            [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                            [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                            ...
+                            [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                            [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                            [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+            decomp_type     PCA
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               52
+            replications    1
+            entropy         7
+
+        Relative tolerance and control variates 
+
+        >>> iid = IIDStdUniform(52,seed=7)
+        >>> ao = FinancialOption(iid,option="ASIAN")
+        >>> eo = FinancialOption(iid,option="EUROPEAN")
+        >>> lin0 = Linear0(iid)
+        >>> sc = CubMCG(ao,abs_tol=1e-3,rel_tol=5e-2,
+        ...     control_variates = [eo,lin0],
+        ...     control_variate_means = [eo.get_exact_value(),0])
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.776
+            bound_low       1.692
+            bound_high      1.859
+            bound_diff      0.167
+            n_total         12074
+            time_integrate  ...
+        CubMCG (AbstractStoppingCriterion)
+            abs_tol         0.001
+            rel_tol         0.050
+            n_init          2^(10)
+            n_limit         2^(30)
+            inflate         1.200
+            alpha           0.010
+            kurtmax         1.478
+            cv              [FinancialOption (AbstractIntegrand)
+                                option          EUROPEAN
+                                call_put        CALL
+                                volatility      2^(-1)
+                                start_price     30
+                                strike_price    35
+                                interest_rate   0
+                                t_final         1               Linear0 (AbstractIntegrand)]
+            cv_mu           [4.211 0.   ]
+        FinancialOption (AbstractIntegrand)
+            option          ASIAN
+            call_put        CALL
+            volatility      2^(-1)
+            start_price     30
+            strike_price    35
+            interest_rate   0
+            t_final         1
+            asian_mean      ARITHMETIC
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+            drift           0
+            mean            [0. 0. 0. ... 0. 0. 0.]
+            covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                            [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                            [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                            ...
+                            [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                            [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                            [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+            decomp_type     PCA
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               52
+            replications    1
+            entropy         7
     
-    Relative tolerance 
+    **References:**
 
-    >>> ao = FinancialOption(IIDStdUniform(52,seed=7))
-    >>> sc = CubMCG(ao,abs_tol=1e-3,rel_tol=5e-2)
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        1.743
-        bound_low       1.661
-        bound_high      1.825
-        bound_diff      0.164
-        n_total         27503
-        time_integrate  ...
-    CubMCG (AbstractStoppingCriterion)
-        abs_tol         0.001
-        rel_tol         0.050
-        n_init          2^(10)
-        n_limit         2^(30)
-        inflate         1.200
-        alpha           0.010
-        kurtmax         1.478
-    FinancialOption (AbstractIntegrand)
-        option          ASIAN
-        call_put        CALL
-        volatility      2^(-1)
-        start_price     30
-        strike_price    35
-        interest_rate   0
-        t_final         1
-        asian_mean      ARITHMETIC
-    BrownianMotion (AbstractTrueMeasure)
-        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
-        drift           0
-        mean            [0. 0. 0. ... 0. 0. 0.]
-        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
-                         ...
-                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
-        decomp_type     PCA
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               52
-        replications    1
-        entropy         7
-    
-
-    Relative tolerance and control variates 
-
-    >>> iid = IIDStdUniform(52,seed=7)
-    >>> ao = FinancialOption(iid,option="ASIAN")
-    >>> eo = FinancialOption(iid,option="EUROPEAN")
-    >>> lin0 = Linear0(iid)
-    >>> sc = CubMCG(ao,abs_tol=1e-3,rel_tol=5e-2,
-    ...     control_variates = [eo,lin0],
-    ...     control_variate_means = [eo.get_exact_value(),0])
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        1.776
-        bound_low       1.692
-        bound_high      1.859
-        bound_diff      0.167
-        n_total         12074
-        time_integrate  ...
-    CubMCG (AbstractStoppingCriterion)
-        abs_tol         0.001
-        rel_tol         0.050
-        n_init          2^(10)
-        n_limit         2^(30)
-        inflate         1.200
-        alpha           0.010
-        kurtmax         1.478
-        cv              [FinancialOption (AbstractIntegrand)
-                             option          EUROPEAN
-                             call_put        CALL
-                             volatility      2^(-1)
-                             start_price     30
-                             strike_price    35
-                             interest_rate   0
-                             t_final         1               Linear0 (AbstractIntegrand)]
-        cv_mu           [4.211 0.   ]
-    FinancialOption (AbstractIntegrand)
-        option          ASIAN
-        call_put        CALL
-        volatility      2^(-1)
-        start_price     30
-        strike_price    35
-        interest_rate   0
-        t_final         1
-        asian_mean      ARITHMETIC
-    BrownianMotion (AbstractTrueMeasure)
-        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
-        drift           0
-        mean            [0. 0. 0. ... 0. 0. 0.]
-        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
-                         ...
-                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
-        decomp_type     PCA
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               52
-        replications    1
-        entropy         7
-
-    Original Implementation:
-
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m
-
-    References:
-
-        [1] Fred J. Hickernell, Lan Jiang, Yuewei Liu, and Art B. Owen, "Guaranteed
-        conservative fixed width confidence intervals via Monte Carlo
-        sampling," Monte Carlo and Quasi-Monte Carlo Methods 2012 (J. Dick, F.
-        Y. Kuo, G. W. Peters, and I. H. Sloan, eds.), pp. 105-128,
+    1.  Fred J. Hickernell, Lan Jiang, Yuewei Liu, and Art B. Owen,  
+        "Guaranteed conservative fixed width confidence intervals via Monte Carlo sampling,"  
+        Monte Carlo and Quasi-Monte Carlo Methods 2012 (J. Dick, F. Y. Kuo, G. W. Peters, and I. H. Sloan, eds.), pp. 105-128,  
         Springer-Verlag, Berlin, 2014. DOI: 10.1007/978-3-642-41095-6_5
 
-        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
-        Available from http://gailgithub.github.io/GAIL_Dev/
-
-    Guarantee:
-        This algorithm attempts to calculate the mean, mu, of a random variable
-        to a prescribed error tolerance, _tol_fun:= max(abstol,reltol*|mu|), with
-        guaranteed confidence level 1-alpha. If the algorithm terminates without
-        showing any warning messages and provides an answer tmu, then the follow
-        inequality would be satisfied: $\P(| mu - tmu | \\le tol\_fun) \\ge 1 - \\alpha$.
+    2.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,  
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,  
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.  
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
+        [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m).
     """
-
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024, n_limit=2**30,
-                 inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
-        """
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = 1e-2, 
+                 rel_tol = 0., 
+                 n_init = 1024, 
+                 n_limit = 2**30,
+                 inflate = 1.2, 
+                 alpha = 0.01, 
+                 control_variates = [], 
+                 control_variate_means = [],
+                 ):
+        r"""
         Args:
-            integrand (AbstractIntegrand): an instance of AbstractIntegrand
-            inflate: inflation factor when estimating variance
-            alpha: significance level for confidence interval
-            abs_tol: absolute error tolerance
-            rel_tol: relative error tolerance
-            n_init: initial number of samples
-            n_limit: maximum number of samples
-            control_variates (list): list of integrand objects to be used as control variates.
-                Control variates are currently only compatible with single level problems. 
-                The same discrete distribution instance must be used for the integrand and each of the control variates. 
-            control_variate_means (list): list of means for each control variate
+            integrand (AbstractIntegrand): The integrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            inflate (float): Inflation factor $\geq 1$ to multiply by the variance estimate to make it more conservative.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            control_variates (list): Integrands to use as control variates, each with the same underlying discrete distribution instance.
+            control_variate_means (np.ndarray): Means of each control variate. 
         """
         self.parameters = ['abs_tol','rel_tol','n_init','n_limit','inflate','alpha','kurtmax']
         # Set Attributes

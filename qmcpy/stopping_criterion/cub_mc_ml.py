@@ -103,6 +103,8 @@ class CubMCML(AbstractCubMCML):
             self.rmse_tol = float(rmse_tol)
         else: # use absolute tolerance
             self.rmse_tol =  float(abs_tol) / norm.ppf(1-alpha/2)
+        self.alpha = alpha 
+        assert 0<self.alpha<1
         self.n_init = n_init
         self.n_max = n_max
         self.levels_min = levels_min

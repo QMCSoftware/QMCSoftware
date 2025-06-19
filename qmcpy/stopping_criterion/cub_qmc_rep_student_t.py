@@ -21,7 +21,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
     
     Examples:
         >>> k = Keister(DigitalNetB2(seed=7,replications=25))
-        >>> sc = CubQMCCLT(k,abs_tol=1e-3,rel_tol=0)
+        >>> sc = CubQMCRepStudentT(k,abs_tol=1e-3,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
         array(1.3804849)
@@ -36,7 +36,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             n               6400
             n_rep           2^(8)
             time_integrate  ...
-        CubQMCCLT (AbstractStoppingCriterion)
+        CubQMCRepStudentT (AbstractStoppingCriterion)
             inflate         1
             alpha           0.010
             abs_tol         0.001
@@ -63,7 +63,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         
         >>> f = BoxIntegral(DigitalNetB2(3,seed=7,replications=25),s=[-1,1])
         >>> abs_tol = 1e-3
-        >>> sc = CubQMCCLT(f,abs_tol=abs_tol,rel_tol=0)
+        >>> sc = CubQMCRepStudentT(f,abs_tol=abs_tol,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.19040139, 0.96058618])
@@ -78,7 +78,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             n               [204800   6400]
             n_rep           [8192  256]
             time_integrate  ...
-        CubQMCCLT (AbstractStoppingCriterion)
+        CubQMCRepStudentT (AbstractStoppingCriterion)
             inflate         1
             alpha           0.010
             abs_tol         0.001
@@ -109,7 +109,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
 
         >>> function = Genz(DigitalNetB2(3,seed=7,replications=25))
         >>> integrand = SensitivityIndices(function)
-        >>> sc = CubQMCCLT(integrand,abs_tol=5e-4,rel_tol=0)
+        >>> sc = CubQMCRepStudentT(integrand,abs_tol=5e-4,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> data
         Data (Data)
@@ -139,7 +139,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
                               [ 512 2048 4096]
                               [ 512 2048 4096]]]
             time_integrate  ...
-        CubQMCCLT (AbstractStoppingCriterion)
+        CubQMCRepStudentT (AbstractStoppingCriterion)
             inflate         1
             alpha           0.010
             abs_tol         5.00e-04
@@ -230,11 +230,12 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         self.alpha = alpha
         self.inflate = float(inflate)
         assert self.inflate>=1
+        assert 0<self.alpha<1
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.true_measure.discrete_distrib
-        super(CubQMCCLT,self).__init__(allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=True)
+        super(CubQMCRepStudentT,self).__init__(allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=True)
         assert self.integrand.discrete_distrib.replications>1, "Require the discrete distribution has replications>1"
         assert self.integrand.discrete_distrib.randomize!="FALSE", "Require discrete distribution is randomized"
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))

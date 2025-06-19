@@ -13,128 +13,137 @@ import warnings
 
 
 class CubMCCLT(AbstractStoppingCriterion):
-    """
-    Stopping criterion based on the Central Limit Theorem.
-    
-    >>> ao = FinancialOption(IIDStdUniform(52,seed=7))
-    >>> sc = CubMCCLT(ao,abs_tol=.05)
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        1.777
-        bound_low       1.723
-        bound_high      1.831
-        bound_diff      0.107
-        n_total         74235
-        time_integrate  ...
-    CubMCCLT (AbstractStoppingCriterion)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_limit         2^(30)
-        inflate         1.200
-        alpha           0.010
-    FinancialOption (AbstractIntegrand)
-        option          ASIAN
-        call_put        CALL
-        volatility      2^(-1)
-        start_price     30
-        strike_price    35
-        interest_rate   0
-        t_final         1
-        asian_mean      ARITHMETIC
-    BrownianMotion (AbstractTrueMeasure)
-        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
-        drift           0
-        mean            [0. 0. 0. ... 0. 0. 0.]
-        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
-                         ...
-                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
-        decomp_type     PCA
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               52
-        replications    1
-        entropy         7
-    
-    Control variates 
+    r"""
+    IID Monte Carlo stopping criterion based on the Central Limit Theorem in a two step method.
 
-    >>> iid = IIDStdUniform(52,seed=7)
-    >>> ao = FinancialOption(iid,option="ASIAN")
-    >>> eo = FinancialOption(iid,option="EUROPEAN")
-    >>> lin0 = Linear0(iid)
-    >>> sc = CubMCCLT(ao,abs_tol=.05,
-    ...     control_variates = [eo,lin0],
-    ...     control_variate_means = [eo.get_exact_value(),0])
-    >>> solution,data = sc.integrate()
-    >>> data
-    Data (Data)
-        solution        1.790
-        bound_low       1.738
-        bound_high      1.843
-        bound_diff      0.104
-        n_total         27777
-        time_integrate  ...
-    CubMCCLT (AbstractStoppingCriterion)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_limit         2^(30)
-        inflate         1.200
-        alpha           0.010
-        cv              [FinancialOption (AbstractIntegrand)
-                             option          EUROPEAN
-                             call_put        CALL
-                             volatility      2^(-1)
-                             start_price     30
-                             strike_price    35
-                             interest_rate   0
-                             t_final         1               Linear0 (AbstractIntegrand)]
-        cv_mu           [4.211 0.   ]
-    FinancialOption (AbstractIntegrand)
-        option          ASIAN
-        call_put        CALL
-        volatility      2^(-1)
-        start_price     30
-        strike_price    35
-        interest_rate   0
-        t_final         1
-        asian_mean      ARITHMETIC
-    BrownianMotion (AbstractTrueMeasure)
-        time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
-        drift           0
-        mean            [0. 0. 0. ... 0. 0. 0.]
-        covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                         [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                         [0.019 0.038 0.058 ... 0.058 0.058 0.058]
-                         ...
-                         [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                         [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                         [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
-        decomp_type     PCA
-    IIDStdUniform (AbstractIIDDiscreteDistribution)
-        d               52
-        replications    1
-        entropy         7
+    Examples:
+        >>> ao = FinancialOption(IIDStdUniform(52,seed=7))
+        >>> sc = CubMCCLT(ao,abs_tol=.05)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.777
+            bound_low       1.723
+            bound_high      1.831
+            bound_diff      0.107
+            n_total         74235
+            time_integrate  ...
+        CubMCCLT (AbstractStoppingCriterion)
+            abs_tol         0.050
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(30)
+            inflate         1.200
+            alpha           0.010
+        FinancialOption (AbstractIntegrand)
+            option          ASIAN
+            call_put        CALL
+            volatility      2^(-1)
+            start_price     30
+            strike_price    35
+            interest_rate   0
+            t_final         1
+            asian_mean      ARITHMETIC
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+            drift           0
+            mean            [0. 0. 0. ... 0. 0. 0.]
+            covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                            [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                            [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                            ...
+                            [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                            [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                            [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+            decomp_type     PCA
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               52
+            replications    1
+            entropy         7
+        
+        Control variates 
+
+        >>> iid = IIDStdUniform(52,seed=7)
+        >>> ao = FinancialOption(iid,option="ASIAN")
+        >>> eo = FinancialOption(iid,option="EUROPEAN")
+        >>> lin0 = Linear0(iid)
+        >>> sc = CubMCCLT(ao,abs_tol=.05,
+        ...     control_variates = [eo,lin0],
+        ...     control_variate_means = [eo.get_exact_value(),0])
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.790
+            bound_low       1.738
+            bound_high      1.843
+            bound_diff      0.104
+            n_total         27777
+            time_integrate  ...
+        CubMCCLT (AbstractStoppingCriterion)
+            abs_tol         0.050
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(30)
+            inflate         1.200
+            alpha           0.010
+            cv              [FinancialOption (AbstractIntegrand)
+                                option          EUROPEAN
+                                call_put        CALL
+                                volatility      2^(-1)
+                                start_price     30
+                                strike_price    35
+                                interest_rate   0
+                                t_final         1               Linear0 (AbstractIntegrand)]
+            cv_mu           [4.211 0.   ]
+        FinancialOption (AbstractIntegrand)
+            option          ASIAN
+            call_put        CALL
+            volatility      2^(-1)
+            start_price     30
+            strike_price    35
+            interest_rate   0
+            t_final         1
+            asian_mean      ARITHMETIC
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
+            drift           0
+            mean            [0. 0. 0. ... 0. 0. 0.]
+            covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
+                            [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                            [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                            ...
+                            [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                            [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                            [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+            decomp_type     PCA
+        IIDStdUniform (AbstractIIDDiscreteDistribution)
+            d               52
+            replications    1
+            entropy         7
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=1024, n_limit=2**30,
-        inflate=1.2, alpha=0.01, control_variates=[], control_variate_means=[]):
-        """
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = 1e-2, 
+                 rel_tol = 0., 
+                 n_init = 1024, 
+                 n_limit = 2**30,
+                 inflate = 1.2, 
+                 alpha = 0.01, 
+                 control_variates = [], 
+                 control_variate_means = [],
+                 ):
+        r"""
         Args:
-            integrand (AbstractIntegrand): an instance of AbstractIntegrand
-            inflate (float): inflation factor when estimating variance
-            alpha (float): significance level for confidence interval
-            abs_tol (np.ndarray): absolute error tolerance
-            rel_tol (np.ndarray): relative error tolerance
-            n_limit (int): maximum number of samples
-            control_variates (list): list of integrand objects to be used as control variates. 
-                Control variates are currently only compatible with single level problems. 
-                The same discrete distribution instance must be used for the integrand and each of the control variates. 
-            control_variate_means (list): list of means for each control variate
+            integrand (AbstractIntegrand): The integrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            inflate (float): Inflation factor $\geq 1$ to multiply by the variance estimate to make it more conservative.
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            control_variates (list): Integrands to use as control variates, each with the same underlying discrete distribution instance.
+            control_variate_means (np.ndarray): Means of each control variate. 
         """
         self.parameters = ['abs_tol','rel_tol','n_init','n_limit','inflate','alpha']
         # Set Attributes
@@ -145,6 +154,8 @@ class CubMCCLT(AbstractStoppingCriterion):
         assert self.n_limit>(2*self.n_init), "require n_limit is at least twic as much as n_init"
         self.alpha = alpha
         self.inflate = inflate
+        assert self.inflate>=1
+        assert 0<self.alpha<1
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
