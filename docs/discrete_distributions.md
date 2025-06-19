@@ -6,14 +6,6 @@ Generators of sequences $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$.
 
 ::: qmcpy.discrete_distribution.abstract_discrete_distribution.AbstractDiscreteDistribution
 
-## `AbstractLDDiscreteDistribution`
-
-::: qmcpy.discrete_distribution.abstract_discrete_distribution.AbstractLDDiscreteDistribution
-
-## `AbstractIIDDiscreteDistribution`
-
-::: qmcpy.discrete_distribution.abstract_discrete_distribution.AbstractIIDDiscreteDistribution
-
 ## `DigitalNetB2`
 
 ::: qmcpy.discrete_distribution.digital_net_b2.digital_net_b2.DigitalNetB2

@@ -94,7 +94,7 @@ class CubMLMC(AbstractCubMCML):
             levels_max (int): Maximum level of refinement $\geq$ `levels_min`.
             alpha0 (float): Weak error is $\mathcal{O}(2^{-\alpha_0\ell})$ in the level $\ell$. If `alpha0`$\leq 0$ then it will be estimated. 
             beta0 (float): Variance is $\mathcal{O}(2^{-\beta_0\ell})$ in the level $\ell$. If `beta0`$\leq 0$ then it will be estimated. 
-            gamma0 (float): Sample cost is $\mathcal{O}(2^{\gamma_0\ell})$. If `gamma0`$\leq 0$ then it will be estimated. 
+            gamma0 (float): Sample cost is $\mathcal{O}(2^{\gamma_0\ell})$ in the level $\ell$. If `gamma0`$\leq 0$ then it will be estimated. 
         """
         self.parameters = ['rmse_tol','n_init','levels_min','levels_max','theta']
         if levels_min < 2:

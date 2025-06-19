@@ -55,69 +55,87 @@ class SuggesterSimple(Suggester):
 
 class PFGPCI(AbstractStoppingCriterion):
     """
-    Probability of failure estimation using adaptive Gaussian Processes (GP) construction and resulting credible intervals. 
+    Probability of failure estimation using adaptive Gaussian process construction and resulting credible intervals. 
     
-    >>> pfgpci = PFGPCI(
-    ...     integrand = Ishigami(DigitalNetB2(3,seed=17)),
-    ...     failure_threshold = 0,
-    ...     failure_above_threshold = False, 
-    ...     abs_tol = 2.5e-2,
-    ...     alpha = 1e-1,
-    ...     n_init = 64,
-    ...     init_samples = None,
-    ...     batch_sampler = PFSampleErrorDensityAR(verbose=False),
-    ...     n_batch = 16,
-    ...     n_max = 128,
-    ...     n_approx = 2**18,
-    ...     gpytorch_prior_mean = gpytorch.means.ZeroMean(),
-    ...     gpytorch_prior_cov = gpytorch.kernels.ScaleKernel(
-    ...         gpytorch.kernels.MaternKernel(nu=2.5,lengthscale_constraint = gpytorch.constraints.Interval(.5,1)),
-    ...         outputscale_constraint = gpytorch.constraints.Interval(1e-8,.5)),
-    ...     gpytorch_likelihood = gpytorch.likelihoods.GaussianLikelihood(noise_constraint = gpytorch.constraints.Interval(1e-12,1e-8)),
-    ...     gpytorch_marginal_log_likelihood_func = lambda likelihood,gpyt_model: gpytorch.mlls.ExactMarginalLogLikelihood(likelihood,gpyt_model),
-    ...     torch_optimizer_func = lambda gpyt_model: torch.optim.Adam(gpyt_model.parameters(),lr=0.1),
-    ...     gpytorch_train_iter = 100,
-    ...     gpytorch_use_gpu = False,
-    ...     verbose = False,
-    ...     n_ref_approx = 2**22,
-    ...     seed_ref_approx = 11)
-    >>> solution,data = pfgpci.integrate(seed=7,refit=True)
-    >>> data
-    PFGPCIData (Data)
-        solution        0.158
-        error_bound     0.022
-        bound_low       0.136
-        bound_high      0.180
-        n_total         112
-        time_integrate  ...
-    PFGPCI (AbstractStoppingCriterion)
-    Ishigami (AbstractIntegrand)
-    Uniform (AbstractTrueMeasure)
-        lower_bound     -3.142
-        upper_bound     3.142
-    DigitalNetB2 (AbstractLDDiscreteDistribution)
-        d               3
-        replications    1
-        randomize       LMS_DS
-        gen_mats_source joe_kuo.6.21201.txt
-        order           NATURAL
-        t               63
-        alpha           1
-        n_limit         2^(32)
-        entropy         17
-    >>> df = data.get_results_dict()
+    Examples:
+        >>> pfgpci = PFGPCI(
+        ...     integrand = Ishigami(DigitalNetB2(3,seed=17)),
+        ...     failure_threshold = 0,
+        ...     failure_above_threshold = False, 
+        ...     abs_tol = 2.5e-2,
+        ...     alpha = 1e-1,
+        ...     n_init = 64,
+        ...     init_samples = None,
+        ...     batch_sampler = PFSampleErrorDensityAR(verbose=False),
+        ...     n_batch = 16,
+        ...     n_limit = 128,
+        ...     n_approx = 2**18,
+        ...     gpytorch_prior_mean = gpytorch.means.ZeroMean(),
+        ...     gpytorch_prior_cov = gpytorch.kernels.ScaleKernel(
+        ...         gpytorch.kernels.MaternKernel(nu=2.5,lengthscale_constraint = gpytorch.constraints.Interval(.5,1)),
+        ...         outputscale_constraint = gpytorch.constraints.Interval(1e-8,.5)),
+        ...     gpytorch_likelihood = gpytorch.likelihoods.GaussianLikelihood(noise_constraint = gpytorch.constraints.Interval(1e-12,1e-8)),
+        ...     gpytorch_marginal_log_likelihood_func = lambda likelihood,gpyt_model: gpytorch.mlls.ExactMarginalLogLikelihood(likelihood,gpyt_model),
+        ...     torch_optimizer_func = lambda gpyt_model: torch.optim.Adam(gpyt_model.parameters(),lr=0.1),
+        ...     gpytorch_train_iter = 100,
+        ...     gpytorch_use_gpu = False,
+        ...     verbose = False,
+        ...     n_ref_approx = 2**22,
+        ...     seed_ref_approx = 11)
+        >>> solution,data = pfgpci.integrate(seed=7,refit=True)
+        >>> data
+        PFGPCIData (Data)
+            solution        0.158
+            error_bound     0.022
+            bound_low       0.136
+            bound_high      0.180
+            n_total         112
+            time_integrate  ...
+        PFGPCI (AbstractStoppingCriterion)
+            abs_tol         0.025
+            n_init          2^(6)
+            n_limit         2^(7)
+            n_batch         2^(4)
+        Ishigami (AbstractIntegrand)
+        Uniform (AbstractTrueMeasure)
+            lower_bound     -3.142
+            upper_bound     3.142
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               3
+            replications    1
+            randomize       LMS_DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           NATURAL
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         17
+        >>> df = data.get_results_dict()
+        >>> import pandas as pd 
+        >>> pd.DataFrame(df)
+           n_sum  n_batch  error_bounds    ci_low   ci_high  solutions  solutions_ref  error_ref  in_ci
+        0     64       64      0.055777  0.086587  0.198142   0.142365       0.162377   0.020012   True
+        1     80       16      0.039203  0.116243  0.194648   0.155445       0.162377   0.006932   True
+        2     96       16      0.030514  0.119198  0.180225   0.149712       0.162377   0.012665   True
+        3    112       16      0.021600  0.136347  0.179548   0.157948       0.162377   0.004429   True
+    
+    **References:**
+    
+    1.  Sorokin, Aleksei G., and Vishwas Rao.  
+        "Credible Intervals for Probability of Failure with Gaussian Processes."  
+        arXiv preprint arXiv:2311.07733 (2023).
     """
     def __init__(self, 
         integrand,
         failure_threshold,
         failure_above_threshold,
         abs_tol = 5e-3,
-        alpha = 1e-2,
         n_init = 64,
+        n_limit = 1000,
+        alpha = 1e-2,
         init_samples = None,
         batch_sampler = PFSampleErrorDensityAR(),
         n_batch = 4,
-        n_max = 1000,
         n_approx = 2**20,
         gpytorch_prior_mean = gpytorch.means.ZeroMean(),
         gpytorch_prior_cov = gpytorch.kernels.ScaleKernel(gpytorch.kernels.MaternKernel(nu = 2.5)),
@@ -131,16 +149,16 @@ class PFGPCI(AbstractStoppingCriterion):
         seed_ref_approx = None):
         '''
         Args:
-            integrand (AbstractIntegrand): The simulation whose probability of failure is estimated
+            integrand (AbstractIntegrand): The integrand.
             failure_threshold (float): Thresholds for failure. 
-            failure_above_threshold (bool): Set to True if failure occurs when the simulation exceeds failure_threshold and False otherwise 
-            abs_tol (float): The desired maximum distance from the estimate to either end of the confidence interval
-            alpha (float): The credible interval is constructed to hold with probability at least 1 - alpha
+            failure_above_threshold (bool): Set to `True` if failure occurs when the simulation exceeds `failure_threshold` and False otherwise.
+            abs_tol (float): The desired maximum distance from the estimate to either end of the credible interval.
             n_init (float): Initial number of samples from integrand.discrete_distrib from which to build the first surrogate GP
+            n_limit (int): Budget of simulations.
+            n_batch (int): The number of samples per batch to draw from batch_sampler. 
+            alpha (float): The credible interval is constructed to hold with probability at least 1 - alpha
             init_samples (float): If the simulation has already been run, pass in (x,y) where x are past samples from the discrete distribution and y are corresponding simulation evaluations. 
             batch_sampler (Suggester or AbstractDiscreteDistribution): A suggestion scheme for future samples. 
-            n_batch (int): The number of samples per batch to draw from batch_sampler. 
-            n_max (int): Budget of simulations.
             n_approx (int): Number of points from integrand.discrete_distrib used to approximate estimate and credible interval bounds
             gpytorch_prior_mean (gpytorch.means): prior mean function of the GP
             gpytorch_prior_cov (gpytorch.kernels): Prior covariance kernel of the GP
@@ -154,6 +172,7 @@ class PFGPCI(AbstractStoppingCriterion):
                 Caution: If n_ref_approx > 0, it should be a large int e.g. 2**22, in which case it is only helpful for cheap to evaluate simulations 
             seed_ref_approx (int): Seed for the reference approximation. Only applies when n_ref_approx>0
         '''
+        self.parameters = ['abs_tol','n_init','n_limit','n_batch']
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
@@ -174,8 +193,8 @@ class PFGPCI(AbstractStoppingCriterion):
             self.ytf_init = self._affine_tf(self.y_init)
         self.batch_sampler = batch_sampler
         self.n_batch = n_batch
-        self.n_max = n_max
-        assert self.n_max >= self.n_init
+        self.n_limit = n_limit
+        assert self.n_limit >= self.n_init
         self.n_approx = n_approx
         assert (self.n_approx+self.n_init) <= 2**32
         self.gpytorch_prior_mean = gpytorch_prior_mean
@@ -196,7 +215,6 @@ class PFGPCI(AbstractStoppingCriterion):
         super(PFGPCI,self).__init__(allowed_distribs=[AbstractDiscreteDistribution],allow_vectorized_integrals=False)
     def _affine_tf(self, y):
         return y-self.failure_threshold if self.failure_above_threshold else self.failure_threshold-y
-    #@profile
     def integrate(self, seed=None, refit=False):
         t0 = time.time()
         dnb2 = DigitalNetB2(self.d,randomize='DS',order="GRAY",seed=seed)
@@ -219,15 +237,15 @@ class PFGPCI(AbstractStoppingCriterion):
                     xdraw = dnb2.spawn()[0](self.n_init)
                     ydraw = np.atleast_1d(self.integrand.f(xdraw).squeeze())
             else:
-                n_new = min(self.n_batch,self.n_max-np.sum(self.n_batch))
+                n_new = min(self.n_batch,self.n_limit-np.sum(self.n_batch))
                 xdraw = self.batch_sampler.suggest(n_new,self.d,data.gpyt_model,dnb2.rng,efficiency=2*data.emr[-1])
                 ydraw = np.atleast_1d(self.integrand.f(xdraw).squeeze())
             ydrawtf = self._affine_tf(ydraw)
             data.update_data(batch_count, xdraw, ydrawtf)
             batch_count += 1
             if data.error_bounds[-1] <= self.abs_tol: break
-            if sum(data.n_batch)==self.n_max:
-                warnings.warn('n_max reached. ',MaxSamplesWarning)
+            if sum(data.n_batch)==self.n_limit:
+                warnings.warn('n_limit reached. ',MaxSamplesWarning)
                 break        
         data.solution = data.solutions[-1]
         data.error_bound = data.error_bounds[-1]

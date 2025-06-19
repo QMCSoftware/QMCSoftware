@@ -20,9 +20,9 @@
 
 ::: qmcpy.true_measure.brownian_motion.BrownianMotion
 
-## `Matern`
+## `MaternGP`
 
-::: qmcpy.true_measure.matern.Matern
+::: qmcpy.true_measure.matern_gp.MaternGP
 
 ## `Lebesgue`
 

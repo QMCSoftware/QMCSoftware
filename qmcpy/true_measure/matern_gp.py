@@ -8,19 +8,19 @@ from scipy.special import kv, gamma
 from typing import Union
 
 
-class Matern(Gaussian):
+class MaternGP(Gaussian):
     r"""
-    A Gaussian process with Matérn covariance kernel, see [`sklearn.gaussian_process.kernels.Matern`](https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.kernels.Matern.html) or [https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function](https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function).
+    A Gaussian process with Matérn covariance kernel.
 
     Examples:
-        >>> true_measure = Matern(DigitalNetB2(dimension=3,seed=7),points=np.linspace(0,1,3)[:,None],nu=3/2,length_scale=[3,4,5],variance=0.01,mean=np.array([.3,.4,.5]))
+        >>> true_measure = MaternGP(DigitalNetB2(dimension=3,seed=7),points=np.linspace(0,1,3)[:,None],nu=3/2,length_scale=[3,4,5],variance=0.01,mean=np.array([.3,.4,.5]))
         >>> true_measure(4)
         array([[0.36584129, 0.41955332, 0.4863312 ],
                [0.27844263, 0.38959308, 0.48847698],
                [0.38043141, 0.50676846, 0.61755968],
                [0.22511911, 0.30830933, 0.40481964]])
         >>> true_measure
-        Matern (AbstractTrueMeasure)
+        MaternGP (AbstractTrueMeasure)
             mean            [0.3 0.4 0.5]
             covariance      [[0.01  0.01  0.01 ]
                              [0.01  0.01  0.01 ]
@@ -29,7 +29,7 @@ class Matern(Gaussian):
         
         With independent replications 
 
-        >>> x = Matern(DigitalNetB2(dimension=3,seed=7,replications=2),points=np.linspace(0,1,3)[:,None],nu=3/2,length_scale=[3,4,5],variance=0.01,mean=np.array([.3,.4,.5]))(4)
+        >>> x = MaternGP(DigitalNetB2(dimension=3,seed=7,replications=2),points=np.linspace(0,1,3)[:,None],nu=3/2,length_scale=[3,4,5],variance=0.01,mean=np.array([.3,.4,.5]))(4)
         >>> x.shape 
         (2, 4, 3)
         >>> x
@@ -42,6 +42,12 @@ class Matern(Gaussian):
                 [0.40274891, 0.50833272, 0.5996952 ],
                 [0.32224364, 0.39269575, 0.46851234],
                 [0.31973076, 0.42545283, 0.54711899]]])
+    
+    **References:**
+
+    1.  [`sklearn.gaussian_process.kernels.Matern`](https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.kernels.MaternGP.html).
+    
+    2.  [https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function](https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function).
     """
 
     def __init__(self, sampler, points, length_scale=1.0, nu=1.5, variance=1.0, mean=0., nugget=1e-6, decomp_type='PCA'):
@@ -52,7 +58,7 @@ class Matern(Gaussian):
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
             points (np.ndarray): The positions of points on a metric space. The array should have shape $(d,k)$ where $d$ is the dimension of the sampler and $k$ is the latent dimension. 
-            nu (float): The "smoothness" of the Matern function, e.g.,
+            nu (float): The "smoothness" of the MaternGP function, e.g.,
                 
                 - $\nu = 1/2$ is equivalent to the absolute exponential kernel, 
                 - $\nu = 3/2$ implies a once-differentiable function,
@@ -104,6 +110,6 @@ class Matern(Gaussian):
         super().__init__(sampler, mean=mean, covariance=covariance, decomp_type=decomp_type)
 
     def _spawn(self, sampler):
-        return Matern(sampler, self.points, length_scale=self.length_scale, nu=self.nu, variance=self.variance, 
+        return MaternGP(sampler, self.points, length_scale=self.length_scale, nu=self.nu, variance=self.variance, 
                       mean=self.mean, decomp_type=self.decomp_type)
         
