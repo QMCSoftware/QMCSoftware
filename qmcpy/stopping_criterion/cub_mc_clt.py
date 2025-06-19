@@ -49,12 +49,12 @@ class CubMCCLT(AbstractStoppingCriterion):
             drift           0
             mean            [0. 0. 0. ... 0. 0. 0.]
             covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                            [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                            [0.019 0.038 0.058 ... 0.058 0.058 0.058]
-                            ...
-                            [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                            [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                            [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+                             [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                             [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                             ...
+                             [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                             [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                             [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
             decomp_type     PCA
         IIDStdUniform (AbstractIIDDiscreteDistribution)
             d               52
@@ -87,13 +87,13 @@ class CubMCCLT(AbstractStoppingCriterion):
             inflate         1.200
             alpha           0.010
             cv              [FinancialOption (AbstractIntegrand)
-                                option          EUROPEAN
-                                call_put        CALL
-                                volatility      2^(-1)
-                                start_price     30
-                                strike_price    35
-                                interest_rate   0
-                                t_final         1               Linear0 (AbstractIntegrand)]
+                                 option          EUROPEAN
+                                 call_put        CALL
+                                 volatility      2^(-1)
+                                 start_price     30
+                                 strike_price    35
+                                 interest_rate   0
+                                 t_final         1               Linear0 (AbstractIntegrand)]
             cv_mu           [4.211 0.   ]
         FinancialOption (AbstractIntegrand)
             option          ASIAN
@@ -109,12 +109,12 @@ class CubMCCLT(AbstractStoppingCriterion):
             drift           0
             mean            [0. 0. 0. ... 0. 0. 0.]
             covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                            [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                            [0.019 0.038 0.058 ... 0.058 0.058 0.058]
-                            ...
-                            [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                            [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                            [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+                             [0.019 0.038 0.038 ... 0.038 0.038 0.038]
+                             [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+                             ...
+                             [0.019 0.038 0.058 ... 0.962 0.962 0.962]
+                             [0.019 0.038 0.058 ... 0.962 0.981 0.981]
+                             [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
             decomp_type     PCA
         IIDStdUniform (AbstractIIDDiscreteDistribution)
             d               52

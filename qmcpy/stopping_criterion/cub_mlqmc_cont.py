@@ -38,7 +38,7 @@ class CubMLQMCCont(AbstractCubQMCML):
             levels_min      2^(1)
             levels_max      10
             n_tols          10
-            inflate        1.668
+            inflate         1.668
             theta_init      2^(-1)
             theta           2^(-3)
         FinancialOption (AbstractIntegrand)

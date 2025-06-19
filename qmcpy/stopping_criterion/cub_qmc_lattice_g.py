@@ -33,7 +33,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             abs_tol         0.001
             rel_tol         0
             n_init          2^(10)
-            n_limit         2^(35)
+            n_limit         2^(30)
         Keister (AbstractIntegrand)
         Gaussian (AbstractTrueMeasure)
             mean            0
@@ -70,7 +70,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             abs_tol         0.001
             rel_tol         0
             n_init          2^(10)
-            n_limit         2^(35)
+            n_limit         2^(30)
         BoxIntegral (AbstractIntegrand)
             s               [-1  1]
         Uniform (AbstractTrueMeasure)
@@ -120,7 +120,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             abs_tol         5.00e-04
             rel_tol         0
             n_init          2^(10)
-            n_limit         2^(35)
+            n_limit         2^(30)
         SensitivityIndices (AbstractIntegrand)
             indices         [[ True False False]
                              [False  True False]
@@ -135,7 +135,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
             order           NATURAL
             n_limit         2^(20)
-            entropy         7 
+            entropy         7
     
     **References:**
 

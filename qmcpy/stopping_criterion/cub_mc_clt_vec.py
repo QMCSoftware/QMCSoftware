@@ -97,23 +97,23 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         >>> data
         Data (Data)
             solution        [[0.024 0.203 0.662]
-                            [0.044 0.308 0.78 ]]
+                             [0.044 0.308 0.78 ]]
             comb_bound_low  [[0.006 0.186 0.644]
-                            [0.02  0.286 0.761]]
+                             [0.02  0.286 0.761]]
             comb_bound_high [[0.042 0.221 0.681]
-                            [0.067 0.329 0.798]]
+                             [0.067 0.329 0.798]]
             comb_bound_diff [[0.036 0.035 0.037]
-                            [0.047 0.043 0.037]]
+                             [0.047 0.043 0.037]]
             comb_flags      [[ True  True  True]
-                            [ True  True  True]]
+                             [ True  True  True]]
             n_total         262144
             n               [[[  4096  65536 262144]
-                            [  4096  65536 262144]
-                            [  4096  65536 262144]]
+                              [  4096  65536 262144]
+                              [  4096  65536 262144]]
         <BLANKLINE>
-                            [[   512  32768 262144]
-                            [   512  32768 262144]
-                            [   512  32768 262144]]]
+                             [[   512  32768 262144]
+                              [   512  32768 262144]
+                              [   512  32768 262144]]]
             time_integrate  ...
         CubMCCLTVec (AbstractStoppingCriterion)
             inflate         1
@@ -124,8 +124,8 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             n_limit         2^(30)
         SensitivityIndices (AbstractIntegrand)
             indices         [[ True False False]
-                            [False  True False]
-                            [False False  True]]
+                             [False  True False]
+                             [False False  True]]
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
