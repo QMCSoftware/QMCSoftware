@@ -1,4 +1,5 @@
 import numpy as np 
+from typing import Union
 
 class Polynomial():
     """
@@ -50,19 +51,79 @@ def bernoulli_poly(n, x):
     r"""
     $n^\text{th}$ Bernoulli polynomial
 
-    Args:
-        n (int): polynomial order
-        x (np.ndarray or torch.Tensor): points at which to evaluate the Bernoulli polynomial
+    Examples:
+        
+        >>> x = np.arange(6).reshape((2,3))/6
+        >>> available_n = list(BERNOULLIPOLYSDICT.keys())
+        >>> available_n
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        >>> for n in available_n:
+        ...     y = bernoulli_poly(n,x)
+        ...     with np.printoptions(precision=2):
+        ...         print("n = %d\n%s"%(n,y))
+        n = 1
+        [[-0.5  -0.33 -0.17]
+         [ 0.    0.17  0.33]]
+        n = 2
+        [[ 0.17  0.03 -0.06]
+         [-0.08 -0.06  0.03]]
+        n = 3
+        [[ 0.    0.05  0.04]
+         [ 0.   -0.04 -0.05]]
+        n = 4
+        [[-0.03 -0.01  0.02]
+         [ 0.03  0.02 -0.01]]
+        n = 5
+        [[ 0.00e+00 -2.19e-02 -2.06e-02]
+         [ 1.39e-17  2.06e-02  2.19e-02]]
+        n = 6
+        [[ 0.02  0.01 -0.01]
+         [-0.02 -0.01  0.01]]
+        n = 7
+        [[ 0.00e+00  2.28e-02  2.24e-02]
+         [-1.39e-17 -2.24e-02 -2.28e-02]]
+        n = 8
+        [[-0.03 -0.02  0.02]
+         [ 0.03  0.02 -0.02]]
+        n = 9
+        [[ 0.   -0.04 -0.04]
+         [ 0.    0.04  0.04]]
+        n = 10
+        [[ 0.08  0.04 -0.04]
+         [-0.08 -0.04  0.04]]
+
+        n = 6
+        [[ 0.02  0.01 -0.01]
+         [-0.02 -0.01  0.01]]
+        <BLANKLINE>
+        n = 7
+        [[ 0.00e+00  2.28e-02  2.24e-02]
+         [-1.39e-17 -2.24e-02 -2.28e-02]]
+        <BLANKLINE>
+        n = 8
+        [[-0.03 -0.02  0.02]
+         [ 0.03  0.02 -0.02]]
+        <BLANKLINE>
+        n = 9
+        [[ 0.   -0.04 -0.04]
+         [ 0.    0.04  0.04]]
+        <BLANKLINE>
+        n = 10
+        [[ 0.08  0.04 -0.04]
+         [-0.08 -0.04  0.04]]
+        <BLANKLINE>
+        >>> import scipy.special
+        >>> for n in available_n:
+        ...     bpoly_coeffs = BERNOULLIPOLYSDICT[n].coeffs
+        ...     bpoly_coeffs_true = scipy.special.bernoulli(n)*scipy.special.comb(n,np.arange(n,-1,-1))
+        ...     assert np.allclose(bpoly_coeffs_true,bpoly_coeffs,atol=1e-12)
     
-    >>> import scipy.special
-    >>> import numpy as np
-    >>> x = np.arange(8).reshape(4,2)/8
-    >>> for n,bpoly in BERNOULLIPOLYSDICT.items():
-    ...     bvec = scipy.special.bernoulli(n)
-    ...     choosevec = scipy.special.comb(n,np.arange(n,-1,-1))
-    ...     bpoly_coeffs_true = bvec*choosevec
-    ...     assert np.allclose(bpoly_coeffs_true,bpoly.coeffs,atol=1e-12)
-    ...     y = bernoulli_poly(n,x)
+    Args:
+        n (int): Polynomial order.
+        x (Union[np.ndarray,torch.Tensor]): Points at which to evaluate the Bernoulli polynomial.
+    
+    Returns:
+        y (Union[np.ndarray,torch.Tensor]): Bernoulli polynomial values.
     """
     assert isinstance(n,int)
     assert n in BERNOULLIPOLYSDICT, "n = %d not in BERNOULLIPOLYSDICT"%n

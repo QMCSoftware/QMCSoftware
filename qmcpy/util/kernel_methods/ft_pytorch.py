@@ -27,41 +27,72 @@ class _FWHTB2Ortho(torch.autograd.Function):
     def backward(self, dx):
         return _fwht_torch(dx)
 def fwht_torch(x):
-    """
-    >>> rng = np.random.Generator(np.random.SFC64(11))
-    >>> x = torch.from_numpy(rng.random(8)).float().requires_grad_()
-    >>> y = fwht_torch(x)
-    >>> v = torch.sum(y**2)
-    >>> dvdx = torch.autograd.grad(v,x)[0]
-    >>> x.detach()
-    tensor([0.2516, 0.7325, 0.0566, 0.6132, 0.4502, 0.2550, 0.3491, 0.3175])
-    >>> y.detach()
-    tensor([ 1.0697, -0.2866,  0.1248,  0.0846,  0.0997, -0.4470,  0.0975, -0.0311])
-    >>> print("%.4f"%v.detach())
-    1.4694
-    >>> dvdx.detach()
-    tensor([0.5032, 1.4650, 0.1132, 1.2263, 0.9003, 0.5100, 0.6982, 0.6350])
+    r"""
+    Torch implementation of the 1 dimensional Fast Walsh Hadamard Transform (FWHT) along the last dimension.  
+    Requires the size of the last dimension is a power of 2. 
+
+    Examples:
+        >>> rng = np.random.Generator(np.random.SFC64(11))
+        >>> x = torch.from_numpy(rng.random(8)).float().requires_grad_()
+        >>> y = fwht_torch(x)
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     y.detach()
+        tensor([ 1.07, -0.29,  0.12,  0.08,  0.10, -0.45,  0.10, -0.03])
+        >>> v = torch.sum(y**2)
+        >>> dvdx = torch.autograd.grad(v,x)[0]
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     x.detach()
+        tensor([0.25, 0.73, 0.06, 0.61, 0.45, 0.26, 0.35, 0.32])
+        >>> print("%.4f"%v.detach())
+        1.4694
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     dvdx.detach()
+        tensor([0.50, 1.47, 0.11, 1.23, 0.90, 0.51, 0.70, 0.64])
+        >>> fwht_torch(torch.rand((2,3,4,5,8))).shape
+        torch.Size([2, 3, 4, 5, 8])
+    
+    Args:
+        x (torch.Tensor): Array of samples at which to run FWHT.
+    
+    Returns:
+        y (torch.Tensor): FWHT values.
     """
     return _FWHTB2Ortho.apply(x)
 
 def fftbr_torch(x):
-    """
-    >>> rng = np.random.Generator(np.random.SFC64(11))
-    >>> x = torch.from_numpy(rng.random(8)+1j*rng.random(8)).to(torch.complex64).requires_grad_()
-    >>> y = fftbr_torch(x)
-    >>> v = torch.abs(torch.sum(y**2))
-    >>> dvdx = torch.autograd.grad(v,x)[0]
-    >>> x.detach()
-    tensor([0.2516+0.6480j, 0.7325+0.5961j, 0.0566+0.2046j, 0.6132+0.3853j,
-            0.4502+0.0554j, 0.2550+0.0930j, 0.3491+0.3887j, 0.3175+0.8507j])
-    >>> y.detach()
-    tensor([ 1.0697+1.1391j, -0.3179+0.2646j, -0.2746+0.2177j, -0.2719-0.3412j,
-             0.0997+0.1577j, -0.1499+0.1657j,  0.4968+0.2449j,  0.0596-0.0156j])
-    >>> print("%.4f"%v.detach())
-    2.5584
-    >>> dvdx.detach()
-    tensor([1.3026+0.4861j, 1.2113+1.4492j, 0.7866+1.2161j, 0.4107+0.1078j,
-            1.7096+0.6126j, 0.7865+0.6879j, 0.1926+0.5075j, 0.1227+0.8988j])
+    r"""
+    Torch implementation of the 1 dimensional Bit-Reversed-Order (BRO) Fast Fourier Transform (FFT) along the last dimension. 
+    Requires the last dimension of x is already in BRO, so we can skip the first step of the decimation-in-time FFT. 
+    Requires the size of the last dimension is a power of 2. 
+
+    Examples:
+        >>> rng = np.random.Generator(np.random.SFC64(11))
+        >>> x = torch.from_numpy(rng.random(8)+1j*rng.random(8)).to(torch.complex64).requires_grad_()
+        >>> y = fftbr_torch(x)
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     y.detach()
+        tensor([ 1.07+1.14j, -0.32+0.26j, -0.27+0.22j, -0.27-0.34j,  0.10+0.16j,
+                -0.15+0.17j,  0.50+0.24j,  0.06-0.02j])
+        >>> v = torch.abs(torch.sum(y**2))
+        >>> dvdx = torch.autograd.grad(v,x)[0]
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     x.detach()
+        tensor([0.25+0.65j, 0.73+0.60j, 0.06+0.20j, 0.61+0.39j, 0.45+0.06j, 0.26+0.09j,
+                0.35+0.39j, 0.32+0.85j])
+        >>> print("%.4f"%v.detach())
+        2.5584
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     dvdx.detach()
+        tensor([1.30+0.49j, 1.21+1.45j, 0.79+1.22j, 0.41+0.11j, 1.71+0.61j, 0.79+0.69j,
+                0.19+0.51j, 0.12+0.90j])
+        >>> fftbr_torch(torch.rand((2,3,4,5,8))+1j*torch.rand((2,3,4,5,8))).shape
+        torch.Size([2, 3, 4, 5, 8])
+    
+    Args:
+        x (torch.Tensor): Array of samples at which to run BRO-FFT.
+    
+    Returns:
+        y (torch.Tensor): BRO-FFT values.
     """
     n = x.size(-1)
     assert n&(n-1)==0 # require n is a power of 2
@@ -76,23 +107,39 @@ def fftbr_torch(x):
     return torch.fft.fft(xr,norm="ortho")
 
 def ifftbr_torch(x):
-    """
-    >>> rng = np.random.Generator(np.random.SFC64(11))
-    >>> x = torch.from_numpy(rng.random(8)+1j*rng.random(8)).to(torch.complex64).requires_grad_()
-    >>> y = ifftbr_torch(x)
-    >>> v = torch.abs(torch.sum(y**2))
-    >>> dvdx = torch.autograd.grad(v,x)[0]
-    >>> x.detach()
-    tensor([0.2516+0.6480j, 0.7325+0.5961j, 0.0566+0.2046j, 0.6132+0.3853j,
-            0.4502+0.0554j, 0.2550+0.0930j, 0.3491+0.3887j, 0.3175+0.8507j])
-    >>> y.detach()
-    tensor([ 1.0697+1.1391j, -0.2866-0.2221j,  0.2980+0.0590j, -0.0887+0.0189j,
-             0.0309+0.5415j, -0.0412-0.3293j, -0.1902+0.2641j, -0.0804+0.3618j])
-    >>> print("%.4f"%v.detach())
-    2.5656
-    >>> dvdx.detach()
-    tensor([ 1.1474+0.7852j,  1.5120+1.0060j,  0.5979+0.8570j,  0.0649+0.5390j,
-            -0.0972+0.9019j,  0.4709+1.3696j,  0.3727+0.2035j,  0.8270+1.6981j])
+    r"""
+    Torch implementation of the 1 dimensional Bit-Reversed-Order (BRO) Inverse Fast Fourier Transform (IFFT) along the last dimension.  
+    Outputs an array in bit-reversed order, so we can skip the last step of the decimation-in-time IFFT.  
+    Requires the size of the last dimension is a power of 2. 
+
+    Examples:
+        >>> rng = np.random.Generator(np.random.SFC64(11))
+        >>> x = torch.from_numpy(rng.random(8)+1j*rng.random(8)).to(torch.complex64).requires_grad_()
+        >>> y = ifftbr_torch(x)
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     y.detach()
+        tensor([ 1.07+1.14j, -0.29-0.22j,  0.30+0.06j, -0.09+0.02j,  0.03+0.54j,
+                -0.04-0.33j, -0.19+0.26j, -0.08+0.36j])
+        >>> v = torch.abs(torch.sum(y**2))
+        >>> dvdx = torch.autograd.grad(v,x)[0]
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     x.detach()
+        tensor([0.25+0.65j, 0.73+0.60j, 0.06+0.20j, 0.61+0.39j, 0.45+0.06j, 0.26+0.09j,
+                0.35+0.39j, 0.32+0.85j])
+        >>> print("%.4f"%v.detach())
+        2.5656
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     dvdx.detach()
+        tensor([ 1.15+0.79j,  1.51+1.01j,  0.60+0.86j,  0.06+0.54j, -0.10+0.90j,  0.47+1.37j,
+                 0.37+0.20j,  0.83+1.70j])
+        >>> ifftbr_torch(torch.rand((2,3,4,5,8))+1j*torch.rand((2,3,4,5,8))).shape
+        torch.Size([2, 3, 4, 5, 8])
+
+    Args:
+        x (torch.Tensor): Array of samples at which to run BRO-IFFT.
+    
+    Returns:
+        y (torch.Tensor): BRO-IFFT values.
     """
     n = x.size(-1)
     assert n&(n-1)==0 # require n is a power of 2
@@ -108,9 +155,38 @@ def ifftbr_torch(x):
     return xr
 
 def omega_fftbr_torch(m, device=None):
-    if device is None: device = torch.get_default_device()
+    r"""
+    Torch implementation useful when efficiently updating FFT values after doubling the sample size. 
+
+    Examples:
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     omega_fftbr_torch(3)
+        tensor([ 1.00e+00-0.00j,  9.24e-01-0.38j,  7.07e-01-0.71j,  3.83e-01-0.92j,
+                -4.37e-08-1.00j, -3.83e-01-0.92j, -7.07e-01-0.71j, -9.24e-01-0.38j])
+    
+    Args:
+        m (int): Size $2^m$ output. 
+    
+    Returns:
+        y (np.ndarray): $\left(e^{- \pi \mathrm{i} k / 2^m}\right)_{k=0}^{2^m}$. 
+    """
+    if device is None: device = "cpu"
     return torch.exp(-torch.pi*1j*torch.arange(2**m,device=device)/2**m)
 
-def omega_fwht_torch(m, device):
-    if device is None: device = torch.get_default_device()
+def omega_fwht_torch(m, device=None):
+    r"""
+    Torch implementation useful when efficiently updating FWHT values after doubling the sample size.  
+
+    Examples:
+        >>> with torch._tensor_str.printoptions(precision=2):
+        ...     omega_fwht_torch(3)
+        tensor([1., 1., 1., 1., 1., 1., 1., 1.])
+    
+    Args:
+        m (int): Size $2^m$ output. 
+    
+    Returns:
+        y (np.ndarray): $\left(1\right)_{k=0}^{2^m}$. 
+    """
+    if device is None: device = "cpu"
     return torch.ones(2**m,device=device)
