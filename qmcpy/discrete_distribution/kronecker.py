@@ -1,5 +1,5 @@
-from numpy import *
 from ._discrete_distribution import LD
+from numpy import *
 import time
 
 class Kronecker(LD):
