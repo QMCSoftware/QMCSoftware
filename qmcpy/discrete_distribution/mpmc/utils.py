@@ -21,6 +21,17 @@ def L2discrepancy(x):
         + 1. / math.pow(N, 2.) * sum2)
     return out
 
+def hickernell_all_emphasized(x,dim_emphasize):
+    nbatch, nsamples, dim = x.size(0), x.size(1), x.size(2)
+    mean_disc_projections = torch.zeros(nbatch).to(device)
+    for d in dim_emphasize:
+        subsets_of_d = list(combinations(range(dim), d))
+        for i in range(len(subsets_of_d)):
+            set_inds = subsets_of_d[i]
+            mean_disc_projections += L2discrepancy(x[:, :, set_inds])
+
+    return mean_disc_projections
+
 def L2center(x):
     N = x.size(1)
     dim = x.size(2)

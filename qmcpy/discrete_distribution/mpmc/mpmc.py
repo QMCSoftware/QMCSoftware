@@ -1,20 +1,21 @@
 from types import SimpleNamespace
-from .._discrete_distribution import LD
-from ...util import ParameterError, ParameterWarning
-from utils import L2discrepancy, hickernell_all_emphasized, L2center, L2ext, L2per, L2sym
+from qmcpy.discrete_distribution._discrete_distribution import LD
+from qmcpy.util import ParameterError
+from utils import L2discrepancy, L2center, L2ext, L2per, L2sym, hickernell_all_emphasized
 from models import *
 from tqdm import tqdm 
 import torch
 import numpy as np
-from torch_cluster import radius_graph
 import torch.optim as optim
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 
 class MPMC(LD): 
-    def __init__(self, dimension = 2, randomize = None, seed = None, 
-                  replications = 1, **kwargs):
+    def __init__(self, randomize = None, seed = None, dimension = 2,
+                  replications = 1, d_max = None, lr = 0.001, nlayers = 3, weight_decay = 1e-6, nhid = 32,
+            epochs = 2000, start_reduce = 1000, radius = 0.35,
+            loss_fn = 'L2dis', dim_emphasize = [1], n_projections = 15):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -36,29 +37,27 @@ class MPMC(LD):
         #necessary 
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
-        self.hyper_params = {
-            'lr': 0.001, 'nlayers': 3, 'weight_decay': 1e-6, 'nhid': 32,
-            'epochs': 2000, 'start_reduce': 1000, 'radius': 0.35, 
-            'loss_fn': 'L2dis', 'dim_emphasize': [1], 'n_projections': 15
-        }
-        # If no dimension passed, use interactive
-        if dimension is None:
-            self._get_params_interactively()
-            dimension = self.hyper_params['dimension']
-        
-        self.hyper_params.update(kwargs)
-        self.hyper_params['dimension'] = dimension 
-
-        for key, val in self.hyper_params.items():
-            setattr(self, key, val)
-        self.parameters = ['dimension', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
+        #what to include in this 
+        self.parameters = ['dim', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
+        self.dim = dimension
+        self.lr = lr
+        self.nlayers = nlayers
+        self.weight_decay = weight_decay
+        self.nhid = nhid
+        self.epochs = epochs
+        self.start_reduce = start_reduce
+        self.radius = radius
+        self.loss_fn = loss_fn
+        self.dim_emphasize = dim_emphasize
+        self.n_projections = n_projections
+        self.d_max = dimension
 
         super(MPMC, self).__init__(dimension, seed)
         
         #randomization
         self.randomize = str(randomize).upper()
         if self.randomize == "TRUE" : self.randomize = "SHIFT"
-        if self.randomize == "NONE" | "NO": self.randomize = "FALSE"
+        if (self.randomize == "NONE") | (self.randomize == "NO"): self.randomize = "FALSE"
         assert self.randomize in ["SHIFT", "FALSE"]
         if self.randomize == "SHIFT":
             #matrix of size #replications * dimension (one shift for each rep/dim)
@@ -66,7 +65,7 @@ class MPMC(LD):
         self.replications = replications
 
 
-    def gen_samples(self, n = None, warn = True, return_unrandomized = False, loss_fn = 'L2dis'):
+    def gen_samples(self, n = None, warn = True, return_unrandomized = False):
         """
         IMPLEMENT ABSTRACT METHOD to generate samples from this discrete distribution.
 
@@ -84,76 +83,62 @@ class MPMC(LD):
         print(f"\nGenerating {n} samples with MPMC...")
 
         model_params = {
-            'dim': self.d,
-            'nsamples': n,
-            **self.hyper_params
-        }
+                    'lr': self.lr,                      # learning rate
+                    'nlayers': self.nlayers,           # number of GNN layers
+                    'weight_decay': self.weight_decay, # weight decay (L2 regularization)
+                    'nhid': self.nhid,                 # number of hidden features in the GNN
+                    'nbatch': self.replications,             # number of point sets in a batch
+                    'epochs': self.epochs,             # number of training epochs
+                    'start_reduce': self.start_reduce, # epoch to start reducing learning rate
+                    'radius': self.radius,             # radius for GNN neighborhood
+                    'nsamples': n,         # number of samples in each point set
+                    'dim': self.dim,                   # dimensionality of the points
+                    'loss_fn': self.loss_fn,           # loss function to use
+                    'dim_emphasize': self.dim_emphasize, # emphasized dimensionalities for projections
+                    'n_projections': self.n_projections  # number of projections (for approx_hickernell)
+                    }
 
         #generate points  
-        d = self.d
+        d = self.dim
         r = self.replications
-        x = np.empty(r, n, d)
+        x = np.empty([r, n, d])
         #if points are already generated: 
         if n in [16, 32, 64, 128, 256]:
             #x = filename smth smth 
             print("x = points already trained")
-        #else train data using model: 
         else:
-            x = self.train(**model_params)
+            x = self.train(SimpleNamespace(**model_params))
 
 
         #randomize
         if self.randomize == "FALSE":
             assert return_unrandomized is False, "cannot return_unrandomized when randomize='FALSE'"
+            if r==1: x=x[0]
             return x 
         elif self.randomize == "SHIFT":
-            xr = np.empty(r,n,d)
+            xr = np.empty([r,n,d])
             #randomize smth smth 
-            if r==1: xr=xr[0]
             #in lattice, qmctools used for randomizeshift and point generation order 
             xr = (x[:, :, np.newaxis] + self.shift) % 1
+            if r==1: xr=xr[0]
             #return both shifted and unshifted if user wants unrandomized, else just randomized
             return (xr, x) if return_unrandomized else xr 
         else: 
             raise ParameterError("incorrect randomize parsing in lattice gen_samples")
             
-    
-    def _get_params_interactively(self):
-        """Prompt user for parameters via the command line."""
-        print("-" * 50)
-        print("MPMC Interactive Parameter Setup")
-        print("Press Enter to use the default value shown in [].")
-        print("-" * 50)
-
-
-        param_map = {
-            'dimension': ('Dimension of the point set', int),
-            'loss_fn': ('Loss function (e.g., L2dis)', str),
-            'epochs': ('Number of training epochs', int),
-            'lr': ('Learning rate', float),
-            'nhid': ('Number of hidden features', int),
-        }
-        
-        for key, (prompt, type_cast) in param_map.items():
-            default = self.hyper_params.get(key, 'N/A')
-            while True:
-                try:
-                    user_input = input(f"- {prompt} [{default}]: ")
-                    if user_input == "":
-                        break
-                    else:
-                        self.hyper_params[key] = type_cast(user_input)
-                        break
-                except ValueError:
-                    print(f"  Invalid input. Please enter a value of type '{type_cast.__name__}'.")
-        print("-" * 50)
-
 
     def pdf(self, x):
         """ pdf of a standard uniform """
         return np.ones(x.shape[:-1], dtype=float)
-        
     
+    def __repr__(self):
+        out = f"{self.__class__.__name__} Generator Object\n"
+        for p in self.parameters:
+            p_val = getattr(self,p)
+            out += f"    {p:<15} {str(p_val)}\n"
+        return out
+    
+    #creates new but similar object 
     def _spawn(self, child_seed, dimension): 
         """ 
         assign parameters 
@@ -167,8 +152,8 @@ class MPMC(LD):
 
     #returns an NP array of points (trained)
     def train(self, args):
-        model = MPMC_net(args.dim, args.nhid, args.nlayers, args.nsamples, args.nbatch,
-                        args.radius, args.loss_fn, args.dim_emphasize, args.n_projections).to(device)
+        model = MPMC_net(dim = args.dim, nhid = args.nhid, nlayers = args.nlayers, nsamples = args.nsamples, nbatch = args.nbatch,
+                        radius = args.radius, loss_fn = args.loss_fn, dim_emphasize = args.dim_emphasize, n_projections = args.n_projections).to(device)
         optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         best_loss = 10000.
         patience = 0
@@ -235,5 +220,13 @@ class MPMC(LD):
 
 
 #temporary for testing: 
-m = MPMC()
-print(m.gen_samples(n = 10))
+
+if __name__ == '__main__':
+    print("\n Running MPMC example \n")
+    mpmc_gen = MPMC(dimension=2, loss_fn='L2dis', epochs=500, nhid=6, randomize = 'shift', seed = 8)
+    points = mpmc_gen.gen_samples(n = 50)
+
+    print("\n--- Generation Complete ---")
+    print(f"Shape of generated points: {points.shape}")
+    print("First 5 points:\n", points[:5])
+    print(mpmc_gen)
