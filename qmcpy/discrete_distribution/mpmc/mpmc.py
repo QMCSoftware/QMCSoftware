@@ -14,7 +14,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class MPMC(LD): 
     def __init__(self, dimension = 2, randomize = None, seed = None, 
-                 dim_emph = None, d_max = None, replications = 1):
+                  replications = 1, **kwargs):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -34,11 +34,24 @@ class MPMC(LD):
             replications (int): number of IID randomizations of a pointset
         """
         #necessary 
-        #what is this list of parameters for? 
-        self.parameters = ['randomize']
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
-        self.d_max = d_max
+        self.hyper_params = {
+            'lr': 0.001, 'nlayers': 3, 'weight_decay': 1e-6, 'nhid': 32,
+            'epochs': 2000, 'start_reduce': 1000, 'radius': 0.35, 
+            'loss_fn': 'L2dis', 'dim_emphasize': [1], 'n_projections': 15
+        }
+        # If no dimension passed, use interactive
+        if dimension is None:
+            self._get_params_interactively()
+            dimension = self.hyper_params['dimension']
+        
+        self.hyper_params.update(kwargs)
+        self.hyper_params['dimension'] = dimension 
+
+        for key, val in self.hyper_params.items():
+            setattr(self, key, val)
+        self.parameters = ['dimension', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
 
         super(MPMC, self).__init__(dimension, seed)
         
@@ -50,9 +63,7 @@ class MPMC(LD):
         if self.randomize == "SHIFT":
             #matrix of size #replications * dimension (one shift for each rep/dim)
             self.shift = self.rng.uniform(size = (replications, self.d))
-
         self.replications = replications
-
 
 
     def gen_samples(self, n = None, warn = True, return_unrandomized = False, loss_fn = 'L2dis'):
@@ -69,6 +80,15 @@ class MPMC(LD):
         #error if n is None: 
         if (n == None ):
             raise ValueError("Must provide n number of points to generate")
+        
+        print(f"\nGenerating {n} samples with MPMC...")
+
+        model_params = {
+            'dim': self.d,
+            'nsamples': n,
+            **self.hyper_params
+        }
+
         #generate points  
         d = self.d
         r = self.replications
@@ -79,24 +99,7 @@ class MPMC(LD):
             print("x = points already trained")
         #else train data using model: 
         else:
-            args = {
-                'lr': 0.001,                  # learning rate
-                'nlayers': 3,                 # number of GNN layers
-                'weight_decay': 1e-6,         # weight decay (L2 regularization)
-                'nhid': 32,                  # number of hidden features in the GNN
-                'nbatch': 1,                  # number of point sets in a batch
-                'epochs': 200000,             # number of training epochs
-                'start_reduce': 100000,       # epoch to start reducing learning rate
-                'radius': 0.35,               # radius for GNN neighborhood
-                'nsamples': n,               # number of samples in each point set
-                'dim': 2,                     # dimensionality of the points
-                'loss_fn': loss_fn,           # loss function to use
-                'dim_emphasize': [1],         # emphasized dimensionalities for projections
-                'n_projections': 15           # number of projections (for approx_hickernell)
-            }
-
-            args = SimpleNamespace(**args)
-            x = self.train(args)
+            x = self.train(**model_params)
 
 
         #randomize
@@ -115,7 +118,37 @@ class MPMC(LD):
             raise ParameterError("incorrect randomize parsing in lattice gen_samples")
             
     
-    
+    def _get_params_interactively(self):
+        """Prompt user for parameters via the command line."""
+        print("-" * 50)
+        print("MPMC Interactive Parameter Setup")
+        print("Press Enter to use the default value shown in [].")
+        print("-" * 50)
+
+
+        param_map = {
+            'dimension': ('Dimension of the point set', int),
+            'loss_fn': ('Loss function (e.g., L2dis)', str),
+            'epochs': ('Number of training epochs', int),
+            'lr': ('Learning rate', float),
+            'nhid': ('Number of hidden features', int),
+        }
+        
+        for key, (prompt, type_cast) in param_map.items():
+            default = self.hyper_params.get(key, 'N/A')
+            while True:
+                try:
+                    user_input = input(f"- {prompt} [{default}]: ")
+                    if user_input == "":
+                        break
+                    else:
+                        self.hyper_params[key] = type_cast(user_input)
+                        break
+                except ValueError:
+                    print(f"  Invalid input. Please enter a value of type '{type_cast.__name__}'.")
+        print("-" * 50)
+
+
     def pdf(self, x):
         """ pdf of a standard uniform """
         return np.ones(x.shape[:-1], dtype=float)
@@ -130,7 +163,6 @@ class MPMC(LD):
             randomize=self.randomize,
             dim_emph= self.dim_emph,
             seed=child_seed,
-            d_max=self.d_max,
             replications=self.replications)
 
     #returns an NP array of points (trained)
@@ -146,9 +178,6 @@ class MPMC(LD):
         ## could be tuned for better performance
         start_reduce = 100000
         reduce_point = 10
-
-        # Path('results/dim_' + str(args.dim) + '/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid)).mkdir(parents=True, exist_ok=True)
-        # Path('outputs/dim_' + str(args.dim) + '/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid)).mkdir(parents=True, exist_ok=True)
 
         for epoch in tqdm(range(args.epochs), desc = f"Training: N={args.nsamples}, nhid={args.nhid}, loss={args.loss_fn}"):
             if (epoch % 10000 == 0):
@@ -183,13 +212,9 @@ class MPMC(LD):
                 if min_discrepancy < best_loss:
                     best_loss = min_discrepancy
 
-                    #REPLACE POINT SAVE IN FILE TO POINT SAVE TO X 
-                    # f = open('results/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid) + '/Lf'+str(args.loss_fn) + '.txt', 'a')
-                    # f.write(str(best_loss) + '\n')
-                    # f.close()
-
                     ## save MPMC points:
                     y = y.detach().cpu().numpy()
+                    #y (from X) has batch x nsamples x dim dimension 
                     endresult = y
 
                 if (min_discrepancy > best_loss and (epoch + 1) >= args.start_reduce):
@@ -202,10 +227,6 @@ class MPMC(LD):
                         param_group['lr'] = args.lr
 
                 if (args.lr < 1e-6):
-                    # f = open('results/dim_'+str(args.dim)+'/nsamples_'+str(args.nsamples)+'/nhid_'+str(args.nhid) + '/Lf'+str(args.loss_fn) + '.txt', 'a')
-                    # f.write('### epochs: '+str(epoch) + '\n')
-                    # f.close()
-
                     break
             
         return endresult

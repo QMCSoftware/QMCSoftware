@@ -102,6 +102,18 @@ class MPMC_net(nn.Module):
             disc_projections += self.L2discrepancy(X[:, :, projection_indices])
 
         return disc_projections
+    
+    def forward(self):
+        X = self.x
+        edge_index = self.edge_index
+
+        X = self.enc(X)
+        for i in range(self.nlayers):
+            X = self.convs[i](X,edge_index,self.batch)
+        X = torch.sigmoid(self.dec(X))  ## clamping with sigmoid needed so that warnock's formula is well-defined
+        X = X.view(self.nbatch, self.nsamples, self.dim)
+        loss = torch.mean(self.loss_fn(X))
+        return loss, X
 
 
 
