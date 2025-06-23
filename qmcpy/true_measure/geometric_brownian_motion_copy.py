@@ -1,17 +1,10 @@
-# from .brownian_motion import BrownianMotion
-# # from .gaussian import Gaussian
-# from numpy import exp, linspace, array, inf, minimum
-# # from ..discrete_distribution._discrete_distribution import DiscreteDistribution
-# from ..discrete_distribution import DigitalNetB2
-# # from ._true_measure import TrueMeasure
-# # from ..util import ParameterError, _univ_repr
-# # from numpy import *
+from .brownian_motion import BrownianMotion
 from .gaussian import Gaussian
 from ..discrete_distribution._discrete_distribution import DiscreteDistribution
 from ..discrete_distribution import DigitalNetB2
 from ._true_measure import TrueMeasure
 from ..util import ParameterError, _univ_repr
-from numpy import *
+from numpy import exp, linspace, array, inf, minimum
 
 class GeometricBrownianMotion(BrownianMotion):
     """
@@ -19,24 +12,24 @@ class GeometricBrownianMotion(BrownianMotion):
 
     >>> gbm = GeometricBrownianMotion(DigitalNetB2(4,seed=7), t_final=2, drift=0.1, diffusion=0.2)
     >>> gbm.gen_samples(2)
-    array([[0.81029467 0.91681162 0.98337412 1.29341131]
-           [1.61003338 1.22233246 1.09178392 1.65685669]])
+    array([[1.11698754, 1.74288207, 1.44791714, 0.85613458],
+           [1.01036507, 0.83883012, 0.92239547, 0.91224536]])
     >>> gbm
     GeometricBrownianMotion (TrueMeasure Object)
-    time_vec        [0.5 1.  1.5 2. ]
-    drift           0.100
-    diffusion       0.200
-    mean            [0. 0. 0. 0.]
-    covariance      [[0.1 0.1 0.1 0.1]
-                    [0.1 0.2 0.2 0.2]
-                    [0.1 0.2 0.3 0.3]
-                    [0.1 0.2 0.3 0.4]]
-    mean_gbm        [1.051 1.105 1.162 1.221]
-    covariance_gbm  [[0.022 0.022 0.022 0.022]
-                    [0.022 0.05  0.05  0.05 ]
-                    [0.022 0.05  0.083 0.083]
-                    [0.022 0.05  0.083 0.124]]
-    decomp_type     PCA
+        time_vec        [0.5 1.  1.5 2. ]
+        drift           0.100
+        diffusion       0.200
+        mean            [0. 0. 0. 0.]
+        covariance      [[0.1 0.1 0.1 0.1]
+                        [0.1 0.2 0.2 0.2]
+                        [0.1 0.2 0.3 0.3]
+                        [0.1 0.2 0.3 0.4]]
+        mean_gbm        [1.051 1.105 1.162 1.221]
+        covariance_gbm  [[0.116 0.116 0.116 0.116]
+                        [0.116 0.27  0.27  0.27 ]
+                        [0.116 0.27  0.472 0.472]
+                        [0.116 0.27  0.472 0.734]]
+        decomp_type     PCA
 
 
     """
@@ -44,7 +37,7 @@ class GeometricBrownianMotion(BrownianMotion):
     def __init__(self, sampler, t_final=1, initial_value=1, drift=0, diffusion=1, decomp_type='PCA'):
         """
         GeometricBrownianMotion(t) = initial_value * exp[(drift - 0.5 * diffusion) * t
-                                                         + \sqrt{diffusion} * StandardBrownianMotion(t)]
+                                                         + \\sqrt{diffusion} * StandardBrownianMotion(t)]
 
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A discrete distribution or true measure.

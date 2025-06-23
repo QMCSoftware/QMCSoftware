@@ -53,7 +53,7 @@ class KernelShiftInvar(_KernelProdSpecial):
             [ 0.9768],
             [-2.4126],
             [-0.9776],
-            [-2.4126],
+            [-2.4127],
             [ 0.9768],
             [ 0.4138]], dtype=torch.float64)
     >>> kt(xt,xt,diag_only=True)
