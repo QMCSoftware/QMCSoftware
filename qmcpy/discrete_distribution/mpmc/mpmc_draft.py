@@ -2,9 +2,7 @@
 # note only working with pytorch and higher version of python for me
 # - A
 
-
-# need to change to numpy?
-
+# n and d are the most important; everything else after that is provided defaults...
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -179,34 +177,50 @@ class MPMC:
         lr              0.001
         nhid            32
     """
-    def __init__(self, dimension=None, randomize='shift', seed=None, **kwargs):
+    def __init__(self, dim=None, randomize='shift', seed=None, **kwargs):
+        """
+        dim : users define dimension of points for generation
+        randomize: 'shift' if they want to use shift randomization or 'false' if none
+        
+        **kwargs if user wants to define any parameters not in self.hyper_params,
+            they can override these
+        self.hyper_params: default parameters...if user doesn't explicity 
+            define any of these, then these are the default
+
+        """
+
         self.hyper_params = {
             'lr': 0.001, 'nlayers': 3, 'weight_decay': 1e-6, 'nhid': 32,
             'epochs': 2000, 'start_reduce': 1000, 'radius': 0.35, 'nbatch': 1,
             'loss_fn': 'L2dis', 'dim_emphasize': [1], 'n_projections': 15
         }
         
-        if dimension is None:
-            self._get_params_interactively()
-            dimension = self.hyper_params['dimension']
         
-        self.hyper_params.update(kwargs)
-        self.hyper_params['dimension'] = dimension
+        self.hyper_params.update(kwargs)        #update hyper_params if user changed anything
+        self.hyper_params['dim'] = dim    # make sure dim is chosen by user
 
+
+        # for easy access to hyper_params. For example, mpmc.epochs can be accessed easily
         for key, val in self.hyper_params.items():
             setattr(self, key, val)
         
-        if isinstance(dimension, int):
-            self.d = dimension
+        # set dim in self for use
+        if isinstance(dim, int):
+            self.d = dim
         else:
-            self.d = len(dimension)
+            self.d = len(dim)   # if multiple dimensions given
+        
+        # random seed for reproducibility
         self.rng = np.random.default_rng(seed)
 
-        self.parameters = ['dimension', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
+        # these parameters shown after object is printed
+        self.parameters = ['dim', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
         
-        self.randomize = str(randomize).upper()
+        # make sure randomize is valid
         if self.randomize not in ["SHIFT", "FALSE"]: self.randomize = "SHIFT"
 
+
+    # output of hyperparameters used
     def __repr__(self):
         out = f"{self.__class__.__name__} Generator Object\n"
         for p in self.parameters:
@@ -214,36 +228,16 @@ class MPMC:
             out += f"    {p:<15} {str(p_val)}\n"
         return out
 
-    def _get_params_interactively(self):
-        print("MPMC Interactive Parameter Setup")
-        print("Press Enter to use the default value shown in [].")
 
-        param_map = {
-            'dimension': ('Dimension of the point set', int),
-            'loss_fn': ('Loss function (e.g., L2dis)', str),
-            'epochs': ('Number of training epochs', int),
-            'lr': ('Learning rate', float),
-            'nhid': ('Number of hidden features', int),
-        }
-        
-        for key, (prompt, type_cast) in param_map.items():
-            default = self.hyper_params.get(key, 'N/A')
-            while True:
-                try:
-                    user_input = input(f"- {prompt} [{default}]: ")
-                    if user_input == "": break
-                    else:
-                        self.hyper_params[key] = type_cast(user_input)
-                        break
-                except ValueError:
-                    print(f"  Invalid input. Please enter a value of type '{type_cast.__name__}'.")
-        print("-" * 50)
+    # do we need the Adam optimizer
 
     def gen_samples(self, n=None, replications=1):
-        if not n: raise ValueError("n (number of samples) must be provided.")
+
+        # first, check if we have those pretrained point sets?
 
         print(f"\nGenerating {n} samples with MPMC...")
         
+        # initialize model, taken from train_mpmc
         model_params = {'dim': self.d, 'nsamples': n, **self.hyper_params}
         model = MPMC_net(**model_params).to(device)
         optimizer = optim.Adam(model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
@@ -257,12 +251,14 @@ class MPMC:
             optimizer.step()
             progress_bar.set_postfix(loss=f"{training_loss.item():.6f}")
         
-        model.eval()
+
+        model.eval()    # tells torch we are just getting the result, done training
         with torch.no_grad():
-            _, final_points = model()
+            _, final_points = model()       # gets final points as output
         
-        points = final_points.cpu().numpy()
+        points = final_points.cpu().numpy()     # goes from PyTorch array to NumPy so we can do shift
         
+        # preventing the function from implicitly returning None.
         if self.randomize == "SHIFT":
             shifts = self.rng.uniform(size=(replications, self.d))
             all_points = np.zeros((replications, n, self.d))
@@ -278,11 +274,9 @@ if __name__ == '__main__':
     print ()
 
     
-    mpmc_gen = MPMC(dimension=2, loss_fn='L2dis', epochs=500, nhid=64)
+    mpmc_gen = MPMC(dim=2, loss_fn='L2dis', epochs=500, nhid=64)
     points = mpmc_gen.gen_samples(n=64)
     
     print("\n--- Generation Complete ---")
-    print(f"Shape of generated points: {points.shape}")
     print("First 5 points:\n", points[:5])
     print(mpmc_gen)
-
