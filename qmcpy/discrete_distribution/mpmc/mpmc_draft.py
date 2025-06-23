@@ -220,12 +220,13 @@ class MPMC(LD):
         self.parameters = ['dimension', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
         super(MPMC, self).__init__(dimension, seed)
 
-        # Randomization
+        # RANDOMIZATION HERE
         self.randomize = str(randomize).upper()
         if self.randomize not in ["SHIFT", "FALSE"]: self.randomize = "SHIFT"
 
+
+    # need to add all parameters?
     def _get_params_interactively(self):
-        """Prompt user for parameters via the command line."""
         print("-" * 50)
         print("MPMC Interactive Parameter Setup")
         print("Press Enter to use the default value shown in [].")
@@ -252,7 +253,7 @@ class MPMC(LD):
                         break
                 except ValueError:
                     print(f"  Invalid input. Please enter a value of type '{type_cast.__name__}'.")
-        print("-" * 50)
+
 
     def gen_samples(self, n=None, n_min=0, n_max=None, replications=1):
         if n: n_max = n
@@ -301,11 +302,12 @@ class MPMC(LD):
             seed=child_seed,
             **self.hyper_params)
 
+
+# test run
 if __name__ == '__main__':
 
-    print("="*80)
-    print("Running MPMC QMCPy-Style Example")
-    print("="*80)
+    print("Running MPMC QMCPy Test")
+
     
     mpmc_gen = MPMC(dimension=2, loss_fn='L2dis', epochs=500, nhid=64)
 
