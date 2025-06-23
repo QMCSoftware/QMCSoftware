@@ -1,4 +1,10 @@
 # General Python
+*.ckpt
+*.npz
+*.csv 
+*hparams.yaml
+*.ipynb_checkpoints/
+demos/fgpr_figs/
 *__pycache__/
 qmcpy.egg-info/
 *.blg
@@ -14,6 +20,7 @@ qmcpy.egg-info/
 .pytest_cache/
 demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
+demos/.jupyter
 
 # tests
 .coverage

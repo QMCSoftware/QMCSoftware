@@ -21,12 +21,12 @@ class EuropeanOption(Integrand):
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.209...
+    9.212...
     >>> eo = EuropeanOption(BrownianMotion(DigitalNetB2(4,seed=7),drift=1),call_put='put')
     >>> x = eo.discrete_distrib.gen_samples(2**12)
     >>> y = eo.f(x)
     >>> y.mean()
-    9.162...
+    9.181...
     >>> eo.get_exact_value()
     9.211452976234058
     """

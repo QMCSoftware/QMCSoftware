@@ -29,16 +29,14 @@ class TestDiscreteDistribution(unittest.TestCase):
             dds = [
                 IIDStdUniform(d),
                 Lattice(d,order='natural'),
-                Lattice(d,order='mps'),
                 Lattice(d,order='linear'),
                 Lattice(d,generating_vector='lattice_vec_lnb.750.24.npy'),
                 DigitalNetB2(d,randomize='LMS_DS',graycode=False),
                 DigitalNetB2(d,randomize='DS'),
                 DigitalNetB2(d,graycode=True),
                 DigitalNetB2(d,generating_matrices='niederreiter_mat.1377.52.52.lsb.npy'),
-                Halton(d,randomize='QRNG',generalize=True),
-                Halton(d,randomize='QRNG',generalize=False),
-                Halton(d,randomize='Owen',generalize=False),
+                Halton(d,randomize='QRNG'),
+                Halton(d,randomize='Owen'),
             ]
             for dd in dds:
                 for _dd in [dd]+dd.spawn(1):
@@ -66,47 +64,39 @@ class TestLattice(unittest.TestCase):
     """ Unit tests for Lattice DiscreteDistribution. """
 
     def test_gen_samples(self):
-        for order in ['natural','mps']: # ['natural','mps','linear']
+        for order in ['natural','gray']:
             lattice0123 = Lattice(dimension=4,order=order,randomize=False)
             x0123 = lattice0123.gen_samples(8,warn=False)
             lattice13 = Lattice(dimension=[1,3],order=order,randomize=False)
-            x13 = lattice13.gen_samples(n_min=5,n_max=7)
-            self.assertTrue((x0123[5:7,[1,3]]==x13).all())
+            x13 = lattice13.gen_samples(n_min=2,n_max=8)
+            self.assertTrue((x0123[2:8,[1,3]]==x13).all())
 
     def test_linear_order(self):
         true_sample = array([
-            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
-            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
-        for is_parallel in [False, True]:
-            distribution = Lattice(dimension=4, randomize=False, order='linear', is_parallel=is_parallel)
-            self.assertTrue((distribution.gen_samples(n_min=4, n_max=8, warn=False)==true_sample).all())
+            [1. / 8, 3. / 8, 3. / 8, 7. / 8],
+            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
+        distribution = Lattice(dimension=4, randomize=False, order='linear')
+        self.assertTrue((distribution.gen_samples(n_min=4, n_max=8, warn=False)==true_sample).all())
 
-    def test_gail_order(self):
+    def test_natural_order(self):
         true_sample = array([
-            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
-            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
-        for is_parallel in [False, True]:
-            distribution = Lattice(dimension=4, randomize=False, order='natural', is_parallel=is_parallel)
-            self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
-
-    def test_mps_order(self):
+            [1. / 8, 3. / 8, 3. / 8, 7. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
+            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
+        distribution = Lattice(dimension=4, randomize=False, order='natural')
+        self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
+    
+    def test_gray_order(self):
         true_sample = array([
-            [1. / 8, 3. / 8, 3. / 8, 1. / 8],
-            [3. / 8, 1. / 8, 1. / 8, 3. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 5. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 7. / 8]])
-        for is_parallel in [False, True]:
-            distribution = Lattice(dimension=4, randomize=False, order='mps', is_parallel=is_parallel)
-            self.assertTrue((distribution.gen_samples(n_min=4,n_max=8)==true_sample).all())
-
-    def test_linear_order_not_power_of_2(self):
-        l = Lattice(dimension=3, order='linear')
-        x = l.gen_samples(n_min=2, n_max=5)
-        assert x.shape==(4,3)
+            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
+            [7. / 8, 5. / 8, 5. / 8, 1. / 8],
+            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
+            [1. / 8, 3. / 8, 3. / 8, 7. / 8]])
+        distribution = Lattice(dimension=4, randomize=False, order='gray')
+        self.assertTrue((distribution.gen_samples(n_min=4, n_max=8)==true_sample).all())
 
     def test_integer_generating_vectors(self):
         distribution = Lattice(dimension=4, generating_vector=27, randomize=False,seed=136)

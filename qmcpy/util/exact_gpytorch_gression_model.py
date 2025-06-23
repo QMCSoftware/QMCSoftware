@@ -45,7 +45,7 @@ class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
         n = len(x)
         mean_post,std_post = zeros(n,dtype=float),zeros(n,dtype=float)
         for i in range(0,n,chunk_size):
-            lchunk,uchunk = i,min(i+chunk_size,n)
+            lchunk,uchunk = i,minimum(i+chunk_size,n)
             noise_chunk = noise_const*torch.ones(uchunk-lchunk)
             mean_post[lchunk:uchunk],std_post[lchunk:uchunk] = self._predict_batch(x[lchunk:uchunk],noise_chunk)
         return mean_post,std_post

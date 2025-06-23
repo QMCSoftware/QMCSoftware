@@ -37,8 +37,8 @@ class CubQMCLatticeG(_CubQMCLDG):
     Lattice (DiscreteDistribution Object)
         d               2^(1)
         dvec            [0 1]
-        randomize       1
-        order           natural
+        randomize       SHIFT
+        order           NATURAL
         gen_vec         [     1 182667]
         entropy         7
         spawn_key       ()
@@ -47,12 +47,11 @@ class CubQMCLatticeG(_CubQMCLDG):
     >>> sc = CubQMCLatticeG(f, abs_tol=abs_tol)
     >>> solution,data = sc.integrate()
     >>> solution
-    array([1.18954582, 0.96056304])
+    array([1.1894253 , 0.96059384])
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
     >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
     >>> true_value = array([sol3neg1,sol31])
-    >>> (abs(true_value-solution)<abs_tol).all()
-    True
+    >>> assert (abs(true_value-solution)<abs_tol).all()
     >>> cf = CustomFun(
     ...     true_measure = Uniform(Lattice(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
@@ -84,9 +83,9 @@ class CubQMCLatticeG(_CubQMCLDG):
     Lattice (DiscreteDistribution Object)
         d               6
         dvec            [0 1 2 3 4 5]
-        randomize       1
-        order           natural
-        gen_vec         [     1 182667 469891 498753 110745 446247]
+        randomize       SHIFT
+        order           NATURAL
+        gen_vec         [     1 182667 213731 255351  96013 116671]
         entropy         7
         spawn_key       ()
     
@@ -151,5 +150,5 @@ class CubQMCLatticeG(_CubQMCLDG):
             error_fun = error_fun)
         if not self.discrete_distrib.randomize:
             raise ParameterError("CubLattice_g requires distribution to have randomize=True")
-        if self.discrete_distrib.order != 'natural':
-            raise ParameterError("CubLattice_g requires Lattice with 'natural' order")
+        if self.discrete_distrib.order != 'NATURAL':
+            raise ParameterError("CubLattice_g requires Lattice with 'NATURAL' order")
