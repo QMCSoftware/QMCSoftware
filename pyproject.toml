@@ -9,7 +9,7 @@ requires = ["pdm-backend","setuptools","wheel"]
 build-backend = "pdm.backend"
 
 [project.urls]
-Documentation = "https://qmcpy.readthedocs.io"
+Documentation = "https://qmcsoftware.github.io/QMCSoftware/"
 Repository = "https://github.com/QMCSoftware/QMCSoftware"
 Issues = "https://github.com/QMCSoftware/QMCSoftware/issues"
 
@@ -17,7 +17,7 @@ Issues = "https://github.com/QMCSoftware/QMCSoftware/issues"
 name = "qmcpy"
 description = "Quasi-Monte Carlo point generators, automatic transformations, and adaptive stopping criteria"
 authors = [
-    {name="Aleksei G Sorokin", email="agsorokin3@gmail.com"},
+    {name="Aleksei G Sorokin"},
     {name="Fred Hickernell"},
     {name="Sou-Cheng T. Choi"},
     {name="Jagadeeswaran Rathinavel"},

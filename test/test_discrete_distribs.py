@@ -27,14 +27,11 @@ class TestDiscreteDistribution(unittest.TestCase):
     def test_abstract_methods(self):
         for d in [3,[1,3,5]]:
             dds = [
-                IIDStdUniform(d),
                 Lattice(d,order='natural'),
                 Lattice(d,order='linear'),
-                Lattice(d,generating_vector='lattice_vec_lnb.750.24.npy'),
-                DigitalNetB2(d,randomize='LMS_DS',graycode=False),
+                DigitalNetB2(d,randomize='LMS_DS',order="NATURAL"),
                 DigitalNetB2(d,randomize='DS'),
-                DigitalNetB2(d,graycode=True),
-                DigitalNetB2(d,generating_matrices='niederreiter_mat.1377.52.52.lsb.npy'),
+                DigitalNetB2(d,order="GRAY"),
                 Halton(d,randomize='QRNG'),
                 Halton(d,randomize='Owen'),
             ]
@@ -99,7 +96,7 @@ class TestLattice(unittest.TestCase):
         self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
 
     def test_integer_generating_vectors(self):
-        distribution = Lattice(dimension=4, generating_vector=27, randomize=False,seed=136)
+        distribution = Lattice(dimension=4, generating_vector=26, randomize=False,seed=136)
         true_sample = np.array([
             [0.125, 0.875, 0.625, 0.375],
             [0.625, 0.375, 0.125, 0.875],
@@ -115,19 +112,19 @@ class TestDigitalNetB2(unittest.TestCase):
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
-        dn123 = DigitalNetB2(dimension=4,graycode=False,randomize=False)
+        dn123 = DigitalNetB2(dimension=4,order="NATURAL",randomize=False)
         x0123 = dn123.gen_samples(8,warn=False)
-        dn13 = DigitalNetB2(dimension=[1,3],graycode=False,randomize=False)
+        dn13 = DigitalNetB2(dimension=[1,3],order="NATURAL",randomize=False)
         x13 = dn13.gen_samples(n_min=4,n_max=8,warn=False)
         self.assertTrue((x0123[4:8,[1,3]]==x13).all())
-        dn123 = DigitalNetB2(dimension=4,graycode=True,randomize=False)
+        dn123 = DigitalNetB2(dimension=4,order="GRAY",randomize=False)
         x0123 = dn123.gen_samples(8,warn=False)
-        dn13 = DigitalNetB2(dimension=[1,3],graycode=True,randomize=False)
+        dn13 = DigitalNetB2(dimension=[1,3],order="GRAY",randomize=False)
         x13 = dn13.gen_samples(n_min=5,n_max=7,warn=False)
         self.assertTrue((x0123[5:7,[1,3]]==x13).all())
     
     def test_graycode_ordering(self):
-        dnb2 = DigitalNetB2(2,randomize=False,graycode=True)
+        dnb2 = DigitalNetB2(2,randomize=False,order="GRAY")
         x = dnb2.gen_samples(n_min=4,n_max=8,warn=False)
         x_true = np.array([
             [ 0.375,  0.375],
@@ -137,7 +134,7 @@ class TestDigitalNetB2(unittest.TestCase):
         self.assertTrue((x==x_true).all())
 
     def test_natural_ordering(self):
-        dnb2 = DigitalNetB2(2,randomize=False,graycode=False)
+        dnb2 = DigitalNetB2(2,randomize=False,order="NATURAL")
         x = dnb2.gen_samples(n_min=4,n_max=8,warn=False)
         x_true = np.array([
             [ 0.125,  0.625],

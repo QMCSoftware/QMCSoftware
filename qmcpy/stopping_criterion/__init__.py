@@ -12,8 +12,8 @@ from .cub_qmc_bayes_lattice_g import CubQMCBayesLatticeG
 from .cub_qmc_bayes_net_g import CubQMCBayesNetG
 from .cub_mc_clt_vec import CubMCCLTVec
 try: 
-    import torch 
-    import gpytorch 
+    import torch
+    import gpytorch
     from .pf_gp_ci import PFGPCI,PFSampleErrorDensityAR,SuggesterSimple
 except ImportError:
     class PFGPCI(object):

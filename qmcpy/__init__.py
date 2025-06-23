@@ -8,4 +8,4 @@ from .util.kernel_methods import fftbr_torch,ifftbr_torch,fwht_torch,omega_fftbr
 from .util import plot_proj
 
 name = "qmcpy"
-__version__ = "1.6.3b"
+__version__ = "1.6.3c"

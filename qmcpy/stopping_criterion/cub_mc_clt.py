@@ -223,7 +223,7 @@ class CubMCCLT(AbstractStoppingCriterion):
             Already generated %d samples.
             Trying to generate %d new samples would exceed n_limit = %d.
             Will instead generate %d new samples to reach n_limit.""" \
-            % (int(self.n_init),int(data.n_mu),int(self.n_limit-self.n_init))
+            % (int(self.n_init),int(data.n_mu),int(self.n_limit),int(self.n_limit-self.n_init))
             warnings.warn(warning_s, MaxSamplesWarning)
             data.n_mu = self.n_limit-self.n_init
         x = self.discrete_distrib(n=data.n_mu)

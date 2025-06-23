@@ -1,6 +1,6 @@
-import gpytorch 
 import numpy as np
 import torch 
+import gpytorch
 
 class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
     allowed_likelihood_types = (

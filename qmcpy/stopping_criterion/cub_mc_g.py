@@ -348,7 +348,7 @@ class CubMCG(AbstractStoppingCriterion):
                 Already generated %d samples.
                 Trying to generate %d new samples would exceed n_limit = %d.
                 Will instead generate %d new samples to reach n_limit.""" \
-                % (int(self.n_init),int(data.n_mu),int(self.n_limit-self.n_init))
+                % (int(self.n_init),int(data.n_mu),int(self.n_limit),int(self.n_limit-self.n_init))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 data.n_mu = self.n_limit-self.n_init
             x = self.discrete_distrib(n=data.n_mu)
@@ -379,7 +379,7 @@ class CubMCG(AbstractStoppingCriterion):
                     Trying to generate %d new samples would exceeds n_limit = %d.
                     Will instead generate %d samples to meet n_limit total samples. 
                     Note that error tolerances may no longer be satisfied""" \
-                    % (int(data.n_total), int(n), int(self.n_limit), int(self.n_limit-data.n_total))
+                    % (int(data.n_total), int(n), int(self.n_limit), int(self.n_limit), int(self.n_limit-data.n_total))
                     warnings.warn(warning_s, MaxSamplesWarning)
                     n = self.n_limit-data.n_total
                 x = self.discrete_distrib(n=n)

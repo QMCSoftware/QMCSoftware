@@ -12,10 +12,12 @@ import warnings
 import time
 import numpy as np
 from scipy.stats import norm
-import gpytorch 
 import torch
+import gpytorch
+
 
 class Suggester(object): pass
+
 
 class PFSampleErrorDensityAR(Suggester):
     def __init__(self, verbose=False):
@@ -39,6 +41,7 @@ class PFSampleErrorDensityAR(Suggester):
         if self.verbose: print()
         return x[:n]
 
+
 class SuggesterSimple(Suggester):
     def __init__(self, sampler):
         self.sampler = sampler
@@ -52,6 +55,7 @@ class SuggesterSimple(Suggester):
         except: x = self.sampler(n)
         self.n_min = n_max
         return x
+
 
 class PFGPCI(AbstractStoppingCriterion):
     """

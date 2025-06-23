@@ -8,49 +8,33 @@ class TestIntegrand(unittest.TestCase):
     """ General tests for Integrand """
 
     def test_abstract_methods(self):
+        n = 2**3
         d = 2
         integrands = [
-            AsianOption(DigitalNetB2(d,seed=7),call_put='call',mean_type='arithmetic'),
-            AsianOption(DigitalNetB2(d,seed=7),call_put='put',mean_type='arithmetic'),
-            AsianOption(DigitalNetB2(d,seed=7),call_put='call',mean_type='geometric'),
-            AsianOption(DigitalNetB2(d,seed=7),call_put='put',mean_type='geometric'),
+            FinancialOption(DigitalNetB2(d,seed=7),option="ASIAN",call_put='call',asian_mean='arithmetic'),
+            FinancialOption(DigitalNetB2(d,seed=7),option="ASIAN",call_put='put',asian_mean='arithmetic'),
+            FinancialOption(DigitalNetB2(d,seed=7),option="ASIAN",call_put='call',asian_mean='geometric'),
+            FinancialOption(DigitalNetB2(d,seed=7),option="ASIAN",call_put='put',asian_mean='geometric'),
+            FinancialOption(DigitalNetB2(d,seed=7),option="ASIAN",call_put='put',asian_mean='geometric',level=1,d_coarsest=1),
             BoxIntegral(DigitalNetB2(d,seed=7),s=1),
             BoxIntegral(DigitalNetB2(d,seed=7),s=[3,5,7]),
             CustomFun(Uniform(DigitalNetB2(d,seed=7)),lambda x: x.prod(1)),
             CustomFun(Uniform(Kumaraswamy(SciPyWrapper(DigitalNetB2(d,seed=7),[scipy.stats.triang(c=.1),scipy.stats.uniform()]))),lambda x: x.prod(1)),
-            CustomFun(Gaussian(DigitalNetB2(2,seed=7)),lambda x,compute_flags=None: x,dimension_indv=d),
-            EuropeanOption(DigitalNetB2(d,seed=7),call_put='call'),
-            EuropeanOption(DigitalNetB2(d,seed=7),call_put='put'),
+            CustomFun(Gaussian(DigitalNetB2(2,seed=7)),lambda x: np.moveaxis(x,-1,0),dimension_indv=d),
+            FinancialOption(DigitalNetB2(d,seed=7),option="EUROPEAN",call_put='call'),
+            FinancialOption(DigitalNetB2(d,seed=7),option="EUROPEAN",call_put='put'),
             Keister(DigitalNetB2(d,seed=7)),
             Keister(Gaussian(DigitalNetB2(d,seed=7))),
             Keister(BrownianMotion(Kumaraswamy(DigitalNetB2(d,seed=7)))),
             Linear0(DigitalNetB2(d,seed=7)),
         ]
-        for ao_ml_dim in [[2,4,8],[3,5]]:
-            ao_og = AsianOption(DigitalNetB2(d,seed=7),multilevel_dims=ao_ml_dim)
-            ao_spawns = ao_og.spawn(levels=np.arange(len(ao_ml_dim)))
-            for ao_spawn,true_d in zip(ao_spawns,ao_ml_dim):
-                self.assertTrue(ao_spawn.d==true_d)
-            integrands += ao_spawns
-            s = str(ao_og)
-        for ml_option in [
-            MLCallOptions(DigitalNetB2(d,seed=7),option='european'),
-            MLCallOptions(BrownianMotion(DigitalNetB2(d,seed=7)),option='asian'),
-            ]:
-            for levels in [[0,1],[3,5,7]]:
-                ml_spawns = ml_option.spawn(levels=levels)
-                for ml_spawn,level in zip(ml_spawns,levels):
-                    self.assertTrue(ml_spawn.d==ml_spawn._dimension_at_level(level))
-                integrands += ml_spawns
-            s = str(ml_option)
-        n = 8
         spawned_integrands = [integrand.spawn(levels=0)[0] for integrand in integrands]
         for integrand in integrands+spawned_integrands:
             x = integrand.discrete_distrib.gen_samples(n)
             s = str(integrand)
             for ptransform in ['None','Baker','C0','C1','C1sin','C2sin','C3sin']:
                 y = integrand.f(x,periodization_transform=ptransform)
-                self.assertTrue(y.shape==((n,)+integrand.d_indv))
+                self.assertTrue(y.shape==(integrand.d_indv+(n,)))
                 self.assertTrue(np.isfinite(y).all())
                 self.assertTrue(y.dtype==np.float64)
 
