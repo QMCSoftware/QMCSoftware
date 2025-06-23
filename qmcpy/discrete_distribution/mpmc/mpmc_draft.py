@@ -15,13 +15,13 @@ import types
 import math
 from torch_cluster import radius_graph
 from torch_geometric.nn import MessagePassing, InstanceNorm
-from .._discrete_distribution import LD
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
-# Discrepancy functions to call
-def L2discrepancy(x):
+# discrepancy functions
+def L2dis(x):
     if x.dim() == 2: x = x.unsqueeze(0)
     N, dim = x.size(1), x.size(2)
     if N == 0: return torch.tensor(0.0, device=x.device)
@@ -37,67 +37,56 @@ def L2discrepancy(x):
     out = torch.sqrt(torch.clamp(term1 - term2 + term3, min=epsilon))
     return out
 
-def L2center(x):
-    N = x.size(1)
-    dim = x.size(2)
-
-    prod1 = 0.5*(torch.abs(x - 0.5) - (torch.abs(x - 0.5))**2.)
+def L2center(x): 
+    if x.dim() == 2: x = x.unsqueeze(0)
+    N, dim = x.size(1), x.size(2)
+    if N == 0: return torch.tensor(0.0, device=x.device)
+    prod1 = 1. + 0.5 * torch.abs(x - 0.5) - 0.5 * (torch.abs(x - 0.5))**2.
     prod1 = torch.prod(prod1, dim=2)
     sum1 = torch.sum(prod1, dim=1)
-
-    prod2 = 0.5*(torch.abs(x[:, :, None, :] - 0.5) 
-                    + torch.abs(x[:, None, :, :] - 0.5) 
-                    - torch.abs(x[:, :, None, :] - x[:, None, :, :]))
+    term2 = (2. / N) * math.pow(13./12., dim) * sum1
+    prod2 = 1. + 0.5 * torch.abs(x[:, :, None, :] - 0.5) + 0.5 * torch.abs(x[:, None, :, :] - 0.5) - 0.5 * torch.abs(x[:, :, None, :] - x[:, None, :, :])
     product = torch.prod(prod2, dim=3)
     sum2 = torch.sum(product, dim=(1, 2))
-    two_div_N = 2. / N
-    
-    out = math.pow(12., -dim) - two_div_N * sum1 + 1. / math.pow(N, 2.) * sum2
+    term3 = (1. / math.pow(N, 2.)) * sum2
+    out = math.pow(13./12., dim) - term2 + term3
     return out
 
 def L2ext(x):
-    N = x.size(1)
-    dim = x.size(2)
-
-    prod1 = 0.5*(x - x**2.)
+    if x.dim() == 2: x = x.unsqueeze(0)
+    N, dim = x.size(1), x.size(2)
+    if N == 0: return torch.tensor(0.0, device=x.device)
+    prod1 = 1. + 0.5*(x - x**2.)
     prod1 = torch.prod(prod1, dim = 2)
     sum1 = torch.sum(prod1, dim = 1)
-
-    prod2 = torch.min(x[: ,: ,None ,: ], x[: ,None ,: ,: ]) - x[: ,: ,None ,: ] * x[: ,None ,: ,: ]
+    prod2 = 1. + torch.min(x[: ,: ,None ,: ], x[: ,None ,: ,: ]) - x[: ,: ,None ,: ] * x[: ,None ,: ,: ]
     product = torch.prod(prod2, dim = 3)
     sum2 = torch.sum(product, dim = (1,2))
-
-    out = math.pow(12., -dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2
+    out = math.pow(4./3., dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2
     return out
-
+    
 def L2per(x):
-    N = x.size(1)
-    dim = x.size(2)
-
-    prod2 = 0.5 - torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ]) + (x[: ,: ,None ,: ] - x[: ,None ,: ,: ])**2
+    if x.dim() == 2: x = x.unsqueeze(0)
+    N, dim = x.size(1), x.size(2)
+    if N == 0: return torch.tensor(0.0, device=x.device)
+    prod2 = 1.5 - torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ]) + (x[: ,: ,None ,: ] - x[: ,None ,: ,: ])**2
     product = torch.prod(prod2, dim = 3)
     sum2 = torch.sum(product, dim = (1,2))
-
-    out = - math.pow(3., -dim) + math.pow(N, - 2.) * sum2
+    out = - math.pow(4./3., dim) + math.pow(N, - 2.) * sum2
     return out
 
-def L2sym(self, x): 
-    N = x.size(1)
-    dim = x.size(2)
-
-    prod1 = 0.5*(x - x**2.)
+def L2sym(x):
+    if x.dim() == 2: x = x.unsqueeze(0)
+    N, dim = x.size(1), x.size(2)
+    if N == 0: return torch.tensor(0.0, device=x.device)
+    prod1 = 1. + 0.5*(x - x**2.)
     prod1 = torch.prod(prod1, dim = 2)
     sum1 = torch.sum(prod1, dim = 1)
-
-    prod2 = 0.25 * (1 - 2 * torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ]))
+    prod2 = 1.25 - 0.5 * torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ])
     product = torch.prod(prod2, dim = 3)
     sum2 = torch.sum(product, dim = (1,2))
-
-    out = math.pow(12., -dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2
+    out = math.pow(4./3., dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2
     return out
-
-
-
 
 def hickernell_all_emphasized(x, n_projections, dim_emphasize):
     nbatch, nsamples, dim = x.shape
@@ -114,19 +103,17 @@ def hickernell_all_emphasized(x, n_projections, dim_emphasize):
             projection_dim = torch.randint(low=1, high=len(remaining_dims) + 1, size=(1,)).item()
             perm = torch.randperm(len(remaining_dims), device=x.device)
             projection_indices = remaining_dims[perm[:projection_dim]]
-            disc_projections += L2discrepancy(x[:, :, projection_indices])
+            disc_projections += L2dis(x[:, :, projection_indices])
         
         if len(dim_emphasize_tensor) > 0:
             projection_dim = torch.randint(low=1, high=len(dim_emphasize_tensor) + 1, size=(1,)).item()
             perm = torch.randperm(len(dim_emphasize_tensor), device=x.device)
             projection_indices = dim_emphasize_tensor[perm[:projection_dim]]
-            disc_projections += L2discrepancy(x[:, :, projection_indices])
+            disc_projections += L2dis(x[:, :, projection_indices])
             
     return disc_projections
 
-
-
-# Model definitions
+# model & layer
 class MPNN_layer(MessagePassing):
     def __init__(self, ninp, nhid):
         super(MPNN_layer, self).__init__(aggr='add')
@@ -148,7 +135,7 @@ class MPNN_layer(MessagePassing):
         return self.update_net_2(self.update_net_1(torch.cat((x, aggregated_message), dim=-1)))
 
 class MPMC_net(nn.Module):
-    def __init__(self, dim, nhid, nlayers, nsamples, radius, loss_fn, dim_emphasize, n_projections, nbatch=1):
+    def __init__(self, dim, nhid, nlayers, nsamples, radius, loss_fn, dim_emphasize, n_projections, nbatch=1, **kwargs):
         super(MPMC_net, self).__init__()
         self.nbatch, self.nsamples, self.dim, self.radius = nbatch, nsamples, dim, radius
         self.loss_fn_name, self.n_projections, self.dim_emphasize = loss_fn, n_projections, dim_emphasize
@@ -174,18 +161,17 @@ class MPMC_net(nn.Module):
         return loss, X
 
 
-# QMC Implemmentation
-class MPMC(LD):
+#generator class
+class MPMC:
     """
-    Generates point sets by optimizing for low discrepancy using a
-    Message Passing Neural Network.
+    example use
     
     >>> mpmc = MPMC(dimension=2, loss_fn='L2dis', epochs=100)
     >>> points = mpmc.gen_samples(n=50)
     >>> points.shape
     (50, 2)
     >>> mpmc
-    MPMC (LD Object)
+    MPMC Generator Object
         dimension       2
         randomize       SHIFT
         loss_fn         L2dis
@@ -193,45 +179,44 @@ class MPMC(LD):
         lr              0.001
         nhid            32
     """
-
-
     def __init__(self, dimension=None, randomize='shift', seed=None, **kwargs):
-        self.mimics = 'StdUniform'
-        self.low_discrepancy = True
-        
-
         self.hyper_params = {
             'lr': 0.001, 'nlayers': 3, 'weight_decay': 1e-6, 'nhid': 32,
             'epochs': 2000, 'start_reduce': 1000, 'radius': 0.35, 'nbatch': 1,
             'loss_fn': 'L2dis', 'dim_emphasize': [1], 'n_projections': 15
         }
         
-        # If no dimension passed, use interactive
         if dimension is None:
             self._get_params_interactively()
             dimension = self.hyper_params['dimension']
         
         self.hyper_params.update(kwargs)
-        self.hyper_params['dimension'] = dimension 
+        self.hyper_params['dimension'] = dimension
 
         for key, val in self.hyper_params.items():
             setattr(self, key, val)
+        
+        if isinstance(dimension, int):
+            self.d = dimension
+        else:
+            self.d = len(dimension)
+        self.rng = np.random.default_rng(seed)
 
         self.parameters = ['dimension', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
-        super(MPMC, self).__init__(dimension, seed)
-
-        # RANDOMIZATION HERE
+        
         self.randomize = str(randomize).upper()
         if self.randomize not in ["SHIFT", "FALSE"]: self.randomize = "SHIFT"
 
+    def __repr__(self):
+        out = f"{self.__class__.__name__} Generator Object\n"
+        for p in self.parameters:
+            p_val = getattr(self,p)
+            out += f"    {p:<15} {str(p_val)}\n"
+        return out
 
-    # need to add all parameters?
     def _get_params_interactively(self):
-        print("-" * 50)
         print("MPMC Interactive Parameter Setup")
         print("Press Enter to use the default value shown in [].")
-        print("-" * 50)
-
 
         param_map = {
             'dimension': ('Dimension of the point set', int),
@@ -246,31 +231,24 @@ class MPMC(LD):
             while True:
                 try:
                     user_input = input(f"- {prompt} [{default}]: ")
-                    if user_input == "":
-                        break
+                    if user_input == "": break
                     else:
                         self.hyper_params[key] = type_cast(user_input)
                         break
                 except ValueError:
                     print(f"  Invalid input. Please enter a value of type '{type_cast.__name__}'.")
+        print("-" * 50)
 
+    def gen_samples(self, n=None, replications=1):
+        if not n: raise ValueError("n (number of samples) must be provided.")
 
-    def gen_samples(self, n=None, n_min=0, n_max=None, replications=1):
-        if n: n_max = n
-        if not n_max: raise ValueError("n or n_max must be provided.")
-
-        print(f"\nGenerating {n_max} samples with MPMC...")
+        print(f"\nGenerating {n} samples with MPMC...")
         
-        model_params = {
-            'dim': self.d, 
-            'nsamples': n_max,
-            **self.hyper_params 
-        }
-
+        model_params = {'dim': self.d, 'nsamples': n, **self.hyper_params}
         model = MPMC_net(**model_params).to(device)
         optimizer = optim.Adam(model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         
-        progress_bar = tqdm(range(self.epochs), desc=f"Training (N={n_max}, loss={self.loss_fn})")
+        progress_bar = tqdm(range(self.epochs), desc=f"Training (N={n}, loss={self.loss_fn})")
         for epoch in progress_bar:
             model.train()
             optimizer.zero_grad()
@@ -283,47 +261,28 @@ class MPMC(LD):
         with torch.no_grad():
             _, final_points = model()
         
-        points = final_points.cpu().numpy() 
+        points = final_points.cpu().numpy()
         
-        # RANDOMIZATION HERE
         if self.randomize == "SHIFT":
             shifts = self.rng.uniform(size=(replications, self.d))
-            all_points = np.zeros((replications, n_max, self.d))
+            all_points = np.zeros((replications, n, self.d))
             for i in range(replications):
                 all_points[i] = (points[0] + shifts[i]) % 1.0
-            return np.squeeze(all_points) 
+            return np.squeeze(all_points)
         else:
-            return np.squeeze(points) 
+            return np.squeeze(points)
 
-    def _spawn(self, child_seed, dimension):
-        return MPMC(
-            dimension=dimension,
-            randomize=self.randomize,
-            seed=child_seed,
-            **self.hyper_params)
-
-
-# test run
 if __name__ == '__main__':
-
-    print("Running MPMC QMCPy Test")
+    print ()
+    print("Running MPMC Standalone Example")
+    print ()
 
     
     mpmc_gen = MPMC(dimension=2, loss_fn='L2dis', epochs=500, nhid=64)
-
     points = mpmc_gen.gen_samples(n=64)
     
     print("\n--- Generation Complete ---")
     print(f"Shape of generated points: {points.shape}")
     print("First 5 points:\n", points[:5])
-    
-    print("\nGenerator Configuration:")
     print(mpmc_gen)
 
-    print("\n" + "="*80)
-    print("Example with 3 replications")
-    print("="*80)
-    mpmc_gen_rep = MPMC(dimension=3, epochs=200, seed=1234)
-    points_rep = mpmc_gen_rep.gen_samples(n=32, replications=3)
-    print("\n--- Generation Complete ---")
-    print(f"Shape of generated points: {points_rep.shape}")
