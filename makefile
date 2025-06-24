@@ -2,7 +2,6 @@ doctests_minimal:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/ \
 		--ignore qmcpy/util/kernel_methods/ft_pytorch.py \
-		--ignore qmcpy/accumulate_data/pf_gp_ci_data.py \
 		--ignore qmcpy/stopping_criterion/pf_gp_ci.py \
 		--ignore qmcpy/util/exact_gpytorch_gression_model.py \
 		--ignore qmcpy/integrand/umbridge_wrapper.py \
@@ -28,9 +27,9 @@ doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 doctests_markdown:
 	@phmutest docs/discrete_distributions.md --replmode --log
 
-doctests: doctests_readme doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
+doctests: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
 
-doctests_no_docker: doctests_readme doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
 
 unittests:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
