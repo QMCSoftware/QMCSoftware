@@ -68,6 +68,7 @@ umbridge = [
 test = [
     "pytest == 8.3.5",
     "pytest-cov == 6.1.1",
+    "phmutest == 1.0.1",
     ]
 test_torch = [
     "torch == 2.7.0",
