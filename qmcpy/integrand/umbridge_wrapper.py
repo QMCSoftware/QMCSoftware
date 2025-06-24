@@ -58,8 +58,9 @@ class UMBridgeWrapper(AbstractIntegrand):
         >>> muhats_aggregate = muhats.mean(-1)
         >>> muhats_aggregate.shape 
         (6,)
-        >>> integrand.to_umbridge_out_sizes(muhats_aggregate)
-        [[-3.09983879522775e-05, -2.279536177336045e-05, -2.2815724753917055e-05], [8.075436692444455e-06, -5.731979934179658e-07], [2.0392085789873912e-08]]
+        >>> muhats_agg_list_of_lists = integrand.to_umbridge_out_sizes(muhats_aggregate)
+        >>> [["%.2e"%ii for ii in i] for i in muhats_agg_list_of_lists]
+        [['-3.10e-05', '-2.28e-05', '-2.28e-05'], ['8.08e-06', '-5.73e-07'], ['2.04e-08']]
     """
 
     def __init__(self, true_measure, model, config={}, parallel=False):
