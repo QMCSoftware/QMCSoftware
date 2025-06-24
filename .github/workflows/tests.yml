@@ -24,7 +24,9 @@ jobs:
       - run: pip install -e .[test_botorch]
       - run: make doctests_botorch
       - run: pip install -e .[test_umbridge]
-      - run: |
+      - name: run umbridge doctests on Linux only
+        shell: bash -l {0}
+        run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             make doctests_umbridge
           else
