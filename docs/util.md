@@ -58,3 +58,9 @@
 
 ::: qmcpy.util.kernel_methods.dig_shift_invar_ops.k4sumterm
 
+## Misc
+
+### `mlmc_test`
+
+::: qmcpy.util.mlmc_test.mlmc_test
+
