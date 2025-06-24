@@ -163,8 +163,9 @@ class FinancialOption(AbstractIntegrand):
         ys[2].shape = (2, 512)
         ys[3].shape = (2, 256)
         >>> ymeans = np.stack([(ys[l][1]-ys[l][0]).mean(-1) for l in range(num_levels)])
-        >>> ymeans
-        array([ 1.77827205e+00,  3.58130113e-03,  2.51227835e-03, -8.34836713e-04])
+        >>> with np.printoptions(formatter={"float": lambda x: "%.2e"%x}):
+        ...     ymeans
+        array([1.78e+00, 3.58e-03, 2.51e-03, -8.35e-04])
         >>> print("%.4f"%ymeans.sum())
         1.7835
 
@@ -186,8 +187,9 @@ class FinancialOption(AbstractIntegrand):
         >>> muhats.shape
         (4, 16)
         >>> muhathat = muhats.mean(-1)
-        >>> muhathat
-        array([ 1.78967878,  0.02157042,  0.0024001 , -0.00278741])
+        >>> with np.printoptions(formatter={"float": lambda x: "%.2e"%x}):
+        ...     muhathat
+        array([1.79e+00, 2.16e-02, 2.40e-03, -2.79e-03])
         >>> print("%.4f"%muhathat.sum())
         1.8109
 
