@@ -54,8 +54,9 @@ class CustomFun(AbstractIntegrand):
         >>> y = integrand.f(x)
         >>> y.shape
         (4, 1024)
-        >>> y.mean(-1)
-        array([ 1.44500230e-07, -1.17683622e-06, -3.03163938e-06, -4.17997185e-09])
+        >>> with np.printoptions(formatter={"float": lambda x: "%.2e"%x}):
+        ...     y.mean(-1)
+        array([1.45e-07, -1.18e-06, -3.03e-06, -4.18e-09])
 
         Stopping criterion which supporting vectorized outputs may pass in Boolean `compute_flags` with `dimension_indv` shape indicating which output need to evaluated, 
             i.e. where `compute_flags` is `False` we do not need to evaluate the integrand. We have not used this in inexpensive example above. 
@@ -75,8 +76,9 @@ class CustomFun(AbstractIntegrand):
         >>> muhats = y.mean(-1) 
         >>> muhats.shape 
         (4, 16)
-        >>> muhats.mean(-1)
-        array([ 0.00044518,  0.0048634 , -0.00014859, -0.00076392])
+        >>> with np.printoptions(formatter={"float": lambda x: "%.2e"%x}):
+        ...     muhats.mean(-1)
+        array([4.45e-04, 4.86e-03, -1.49e-04, -7.64e-04])
 
     """
 

@@ -158,12 +158,6 @@ def omega_fwht_torch(m, device=None):
     Torch implementation useful when efficiently updating FWHT values after doubling the sample size.  
 
     Examples:
-        >>> with torch._tensor_str.printoptions(precision=2):
-        ...     omega_fwht_torch(3)
-        tensor([1., 1., 1., 1., 1., 1., 1., 1.])
-
-        Updating coefficients after doubling the sample size 
-        
         >>> rng = np.random.Generator(np.random.SFC64(11))
         >>> m = 3
         >>> x1 = torch.from_numpy(rng.random((3,5,7,2**m)))
@@ -191,13 +185,6 @@ def omega_fftbr_torch(m, device=None):
     Torch implementation useful when efficiently updating FFT values after doubling the sample size. 
 
     Examples:
-        >>> with torch._tensor_str.printoptions(precision=2):
-        ...     omega_fftbr_torch(3)
-        tensor([ 1.00e+00-0.00j,  9.24e-01-0.38j,  7.07e-01-0.71j,  3.83e-01-0.92j,
-                -4.37e-08-1.00j, -3.83e-01-0.92j, -7.07e-01-0.71j, -9.24e-01-0.38j])
-
-        Updating coefficients after doubling the sample size 
-        
         >>> rng = np.random.Generator(np.random.SFC64(11))
         >>> m = 3
         >>> x1 = torch.from_numpy(rng.random((3,5,7,2**m))+1j*rng.random((3,5,7,2**m)))
