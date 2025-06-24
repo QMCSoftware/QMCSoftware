@@ -115,13 +115,19 @@ class PFGPCI(AbstractStoppingCriterion):
             n_limit         2^(32)
             entropy         17
         >>> df = data.get_results_dict()
-        >>> import pandas as pd 
-        >>> pd.DataFrame(df)
-           n_sum  n_batch  error_bounds    ci_low   ci_high  solutions  solutions_ref  error_ref  in_ci
-        0     64       64      0.055777  0.086587  0.198142   0.142365       0.162377   0.020012   True
-        1     80       16      0.039203  0.116243  0.194648   0.155445       0.162377   0.006932   True
-        2     96       16      0.030514  0.119198  0.180225   0.149712       0.162377   0.012665   True
-        3    112       16      0.021600  0.136347  0.179548   0.157948       0.162377   0.004429   True
+        >>> with np.printoptions(formatter={"float": lambda x: "%-10.2e"%x, "int": lambda x: "%-10d"%x, "bool": lambda x: "%-10s"%x}):
+        ...     for k,v in df.items():
+        ...         print("%15s: %s"%(k,str(v)))
+                   iter: [0          1          2          3         ]
+                  n_sum: [64         80         96         112       ]
+                n_batch: [64         16         16         16        ]
+           error_bounds: [5.58e-02   3.92e-02   3.05e-02   2.16e-02  ]
+                 ci_low: [8.66e-02   1.16e-01   1.19e-01   1.36e-01  ]
+                ci_high: [1.98e-01   1.95e-01   1.80e-01   1.80e-01  ]
+              solutions: [1.42e-01   1.55e-01   1.50e-01   1.58e-01  ]
+          solutions_ref: [1.62e-01   1.62e-01   1.62e-01   1.62e-01  ]
+              error_ref: [2.00e-02   6.93e-03   1.27e-02   4.43e-03  ]
+                  in_ci: [True       True       True       True      ]
     
     **References:**
     
@@ -347,7 +353,7 @@ class PFGPCIData(Data):
         self.error_bounds.append(np.maximum(self.solutions[-1]-self.ci_low[-1],self.ci_high[-1]-self.solutions[-1]))
 
     def get_results_dict(self):
-        df = {'n_sum':self.n_sum, 'n_batch':self.n_batch, 'error_bounds':self.error_bounds, 'ci_low':self.ci_low, 'ci_high':np.array(self.ci_high), 'solutions':np.array(self.solutions)}
+        df = {'iter':np.arange(len(self.n_sum)), 'n_sum':self.n_sum, 'n_batch':self.n_batch, 'error_bounds':self.error_bounds, 'ci_low':self.ci_low, 'ci_high':np.array(self.ci_high), 'solutions':np.array(self.solutions)}
         if self.approx_true_solution: df['solutions_ref'],df['error_ref'],df['in_ci'] = self.solutions_ref,self.error_ref,self.in_ci
         return df 
     
