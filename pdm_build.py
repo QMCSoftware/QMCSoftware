@@ -4,8 +4,8 @@ ext_modules = [
         Extension(
             name = 'qmcpy.discrete_distribution._c_lib._c_lib',
             sources = [
-                'qmcpy/discrete_distribution/_c_lib/halton_qrng.c',
                 'qmcpy/discrete_distribution/_c_lib/util.c',
+                'qmcpy/discrete_distribution/_c_lib/halton_qrng.c',
             ]
         )
     ]
