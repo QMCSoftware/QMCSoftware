@@ -25,58 +25,46 @@ doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 		--doctest-modules qmcpy/integrand/umbridge_wrapper.py
 
 doctests_markdown:
-	@phmutest docs/discrete_distributions.md --replmode --log
+	@phmutest docs/*.md --replmode --log -c
 
-doctests: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
+doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
 
 doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
 
 unittests:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
 
-coverage: # https://github.com/marketplace/actions/coverage-badge
-	python -m coverage report -m
-
 tests: doctests unittests coverage
 
 tests_no_docker: doctests_no_docker unittests coverage
-	
-mkdocs_serve:
+
+coverage: # https://github.com/marketplace/actions/coverage-badge
+	python -m coverage report -m
+
+mkdocserve:
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
 	@mkdocs serve
 
 uml:
 	# UML Diagrams
-	@rm -r -f $(umldir) 2>/dev/null
-	@mkdir $(umldir)
-	#	Discrete Distribution Overview
-	@pyreverse -k qmcpy/discrete_distribution/ -o png 1>/dev/null && mv classes.png $(umldir)discrete_distribution_overview.png
+	#	Discrete Distributions
+	@pyreverse -k qmcpy/discrete_distribution/ -o svg 1>/dev/null && mv classes.svg docs/umls/discrete_distribution_overview.svg
 	#	True Measure Overview
-	@pyreverse -k qmcpy/true_measure/ -o png 1>/dev/null && mv classes.png $(umldir)true_measure_overview.png
+	@pyreverse -k qmcpy/true_measure/ -o svg 1>/dev/null && mv classes.svg docs/umls/true_measure_overview.svg
 	#	Integrand Overview
-	@pyreverse -k qmcpy/integrand/ -o png 1>/dev/null && mv classes.png $(umldir)integrand_overview.png
+	@pyreverse -k qmcpy/integrand/ -o svg 1>/dev/null && mv classes.svg docs/umls/integrand_overview.svg
 	#	Stopping Criterion Overview
-	@pyreverse -k qmcpy/stopping_criterion/ -o png 1>/dev/null && mv classes.png $(umldir)stopping_criterion_overview.png
+	@pyreverse -k qmcpy/stopping_criterion/ -o svg 1>/dev/null && mv classes.svg docs/umls/stopping_criterion_overview.svg
 	#	Discrete Distribution Specific
-	@pyreverse qmcpy/discrete_distribution/ -o png 1>/dev/null && mv classes.png $(umldir)discrete_distribution_specific.png
+	@pyreverse qmcpy/discrete_distribution/ -o svg 1>/dev/null && mv classes.svg docs/umls/discrete_distribution_specific.svg
 	#	True Measure Specific
-	@pyreverse qmcpy/true_measure/ -o png 1>/dev/null && mv classes.png $(umldir)true_measure_specific.png
+	@pyreverse qmcpy/true_measure/ -o svg 1>/dev/null && mv classes.svg docs/umls/true_measure_specific.svg
 	#	Integrand Specific
-	@pyreverse qmcpy/integrand/ -o png 1>/dev/null && mv classes.png $(umldir)integrand_specific.png
+	@pyreverse qmcpy/integrand/ -o svg 1>/dev/null && mv classes.svg docs/umls/integrand_specific.svg
 	#	Stopping Criterion Specific
-	@pyreverse qmcpy/stopping_criterion/ -o png 1>/dev/null && mv classes.png $(umldir)stopping_criterion_specific.png
+	@pyreverse qmcpy/stopping_criterion/ -o svg 1>/dev/null && mv classes.svg docs/umls/stopping_criterion_specific.svg
 	#	Util
-	@pyreverse -k qmcpy/util/ -o png 1>/dev/null && mv classes.png $(umldir)util_uml.png
-	# 	Warning
-	@dot -Tpng sphinx/util_warn.dot > $(umldir)util_warn.png
-	#	Error
-	@dot -Tpng sphinx/util_err.dot > $(umldir)util_err.png
-	#	Packages
-	@mv packages.png $(umldir)packages.png
+	@pyreverse -k qmcpy/util/ -o svg 1>/dev/null && mv classes.svg docs/umls/util_uml.svg
 
 doc: uml mkdocserve
-
-export_conda_env:
-	@-rm -f environment.yml 2>/dev/null &
-	@conda env export --no-builds | grep -v "^prefix: " > environment.yml
