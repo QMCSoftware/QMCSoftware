@@ -362,56 +362,56 @@ class FinancialOption(AbstractIntegrand):
         return np.maximum(self.strike_price-np.exp(np.log(gbm).sum(-1)/gbm.shape[-1]),0)
     
     def payoff_barrier_in_up_call(self, gbm):
-        v = gbm[...,-1]
+        v = gbm[...,-1].copy()
         flag = (gbm>=self.barrier_price).any(-1)
         v[~flag] = 0
         v[flag] = np.maximum(v[flag]-self.strike_price,0)
         return v
     
     def payoff_barrier_out_up_call(self, gbm):
-        v = gbm[...,-1]
+        v = gbm[...,-1].copy()
         flag = (gbm<self.barrier_price).all(-1)
         v[~flag] = 0
         v[flag] = np.maximum(v[flag]-self.strike_price,0)
         return v
     
     def payoff_barrier_in_down_call(self, gbm):
-        v = gbm[...,-1]
+        v = gbm[...,-1].copy()
         flag = (gbm<=self.barrier_price).any(-1)
         v[~flag] = 0
         v[flag] = np.maximum(v[flag]-self.strike_price,0)
         return v
     
     def payoff_barrier_out_down_call(self, gbm):
-        v = gbm[...,-1]
+        v = gbm[...,-1].copy()
         flag = (gbm>self.barrier_price).all(-1)
         v[~flag] = 0
         v[flag] = np.maximum(v[flag]-self.strike_price,0)
         return v
     
     def payoff_barrier_in_up_put(self, gbm):
-        v = gbm[...,-1]
+        v = gbm[...,-1].copy()
         flag = (gbm>=self.barrier_price).any(-1)
         v[~flag] = 0
         v[flag] = np.maximum(self.strike_price-v[flag],0)
         return v
     
     def payoff_barrier_out_up_put(self, gbm):
-        v = gbm[...,-1]
+        v = gbm[...,-1].copy()
         flag = (gbm<self.barrier_price).all(-1)
         v[~flag] = 0
         v[flag] = np.maximum(self.strike_price-v[flag],0)
         return v
     
     def payoff_barrier_in_down_put(self, gbm):
-        v = gbm[...,-1]
+        v = gbm[...,-1].copy()
         flag = (gbm<=self.barrier_price).any(-1)
         v[~flag] = 0
         v[flag] = np.maximum(self.strike_price-v[flag],0)
         return v
     
     def payoff_barrier_out_down_put(self, gbm):
-        v = gbm[...,-1]
+        v = gbm[...,-1].copy()
         flag = (gbm>self.barrier_price).all(-1)
         v[~flag] = 0
         v[flag] = np.maximum(self.strike_price-v[flag],0)
@@ -431,7 +431,7 @@ class FinancialOption(AbstractIntegrand):
     
     def get_exact_value(self):
         """
-        Compute the exact analytic fair price of the option. Supports 
+        Compute the exact analytic fair price of the option in finite dimensions. Supports 
             
         - `option='EUROPEAN'`
         - `option='ASIAN'` with `asian_mean='GEOMETRIC'` and `asian_mean_quadrature_rule='RIGHT'`
@@ -465,22 +465,49 @@ class FinancialOption(AbstractIntegrand):
             raise ParameterError("exact value not supported for option = %s"%self.option)
         return fp
     
+    def get_exact_value_inf_dim(self):
+        r"""
+        Get the exact analytic fair price of the option in infinite dimensions. Supports 
+
+        - `option='ASIAN'` with `asian_mean='GEOMETRIC'`
+
+        Returns: 
+            mean (float): Exact value of the integral. 
+        """
+        if self.option=='ASIAN':
+            assert self.asian_mean=='GEOMETRIC' , "get_exact_value_inf_dim for the Asian option only available for self.asian_mean=='GEOMETRIC'"
+            sigma_g = self.volatility/np.sqrt(3) 
+            b = 1/2*(self.interest_rate-1/2*sigma_g**2)
+            d1 = (np.log(self.start_price/self.strike_price)+(b+1/2*sigma_g**2)*self.t_final)/(sigma_g*np.sqrt(self.t_final))
+            d2 = d1-sigma_g*np.sqrt(self.t_final)
+            f1 = self.start_price*np.exp((b-self.interest_rate)*self.t_final)
+            f2 = self.strike_price*np.exp(-self.interest_rate*self.t_final)
+            if self.call_put=="CALL":
+                val = f1*norm.cdf(d1)-f2*norm.cdf(d2)
+            elif self.call_put=="PUT":
+                val = f2*norm.cdf(-d2)-f1*norm.cdf(-d1)
+        else:
+            raise Exception("get_exact_value_inf_dim not implemented for option = %s"%self.option)
+        return val
+    
     def dimension_at_level(self, level):
         return self.d_coarsest*2**level
     
     def _spawn(self, level, sampler):
         return FinancialOption(
             sampler=sampler,
+            option = self.option,
+            call_put = self.call_put,
             volatility=self.volatility,
             start_price=self.start_price,
             strike_price=self.strike_price,
             interest_rate=self.interest_rate,
             t_final=self.t_final,
-            call_put=self.call_put,
-            decomp_type=self.decomp_type,
+            decomp_type = self.decomp_type,
             level=level, 
             d_coarsest=self.d_coarsest,
             asian_mean=self.asian_mean,
+            asian_mean_quadrature_rule = self.asian_mean_quadrature_rule,
             barrier_in_out=self.barrier_in_out, 
             barrier_price=self.barrier_price,
             digital_payout=self.digital_payout)
