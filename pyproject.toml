@@ -76,7 +76,7 @@ test_gpytorch = [
     "gpytorch == 1.13",
     ]
 test_botorch = [
-    "botorch == 0.12.0",
+    "botorch == 0.10.0",
     ]
 test_umbridge = [
     "umbridge == 1.2.4",

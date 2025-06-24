@@ -30,6 +30,7 @@ jobs:
           else
             echo "umbridge doctests only run on Linux"
           fi
+      - run: make doctests_markdown
       - run: make unittests
       - run: make coverage
 
