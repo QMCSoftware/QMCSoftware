@@ -2,17 +2,69 @@
 # note only working with pytorch and higher version of python for me
 # - A
 
-# n and d are the most important; everything else after that is provided defaults...
-import torch
-import torch.nn as nn
-import torch.optim as optim
 import numpy as np
 from pathlib import Path
 from tqdm import tqdm
 import types
 import math
-from torch_cluster import radius_graph
-from torch_geometric.nn import MessagePassing, InstanceNorm
+import sys
+
+# test for correct, up-to-date python version
+MIN_PYTHON_VERSION = (3, 7)     # might be 3.6?
+if sys.version_info < MIN_PYTHON_VERSION:
+    required_version_str = f"{MIN_PYTHON_VERSION[0]}.{MIN_PYTHON_VERSION[1]}"
+    current_version_str = f"{sys.version_info.major}.{sys.version_info.minor}"
+    
+    print(f"Error: your python version is {current_version_str}.")
+    print(f"mpmc requires {required_version_str} or newer.")
+    print("Please upgrade your Python installation to use mpmc and proceed.")
+    sys.exit(1)
+
+
+
+# test for pytorch installation
+import subprocess
+
+try:
+    print("Checking for PyTorch and PyTorch Geometric modules...")
+    import torch
+    from torch import nn
+    from torch_cluster import radius_graph
+    from torch_geometric.nn import MessagePassing, InstanceNorm
+    import torch.optim as optim
+    
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')    # not sure where to put this yet...
+    print("Requirements met for mpmc")
+    
+except ModuleNotFoundError as e:
+    print("Error: mpmc required module(s) missing:")      # not sure if it will go one by one or..
+    print(f"{e}")
+
+    while True:
+        prompt = "\nWould you like to update your environment? (y/n): "
+        user_input = input(prompt).lower()
+
+        if user_input in ['y', 'yes']:
+            print("\nNow installing packages from 'requirements.txt'...")
+            try:
+                subprocess.run(
+                    [sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'],
+                    check=True
+                )
+                print("\n Installation complete. Try running mpmc again.")
+            
+            except subprocess.CalledProcessError as install_error:
+                print(f"\nError: {install_error}")
+                print("\nInstallation failed. This can happen if package versions are incompatible.")
+                print ("please ensure you have the ri")
+            
+            sys.exit()
+
+        elif user_input in ['n', 'no']:
+            print("\nExiting program. Please install the dependencies manually by running: pip install -r requirements.txt")
+            sys.exit()
+
+
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
