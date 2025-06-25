@@ -23,8 +23,8 @@ class Kronecker(LD):
         i = arange(n).reshape((n, 1))
         return(((i*self.alpha) + self.delta)%1)
     
-    
-    def kronecker_discrepancy(self, n, k_tilde, gamma, int_k_tilde):
+
+    def periodic_discrepancy(self, n, k_tilde, gamma, int_k_tilde):
         n_array = arange(1, n + 1)
         k_tilde_terms = array([k_tilde(x, gamma) for x in self.gen_samples(n)])
 
@@ -38,3 +38,18 @@ class Kronecker(LD):
         k_tilde_zero_terms = k_tilde_terms[0] * n_array
         summation = left_sum - right_sum
         return sqrt((k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - int_k_tilde)
+    
+    def wssd_discrepancy(self, sample, n, weights, k_tilde, gamma, int_k_tilde):
+        beta = sum(weights)
+        b_hat = weights / (arange(1, n + 1) ** 2)
+        b_tilde = cumsum(flip(b_hat))
+
+        A = roll(b_tilde, 1)
+        A[0] = 0
+
+        b_tilde = A + flip(b_hat)
+        b = flip(cumsum(b_tilde))
+
+        kernelkron = sample.reshape((n, 1)) * array([k_tilde(x, gamma) for x in self.gen_samples(n)])
+        wssd = -1 * beta * int_k_tilde + b[0] * kernelkron[0,:] + 2 * sum((b[1:n]).reshape((n-1, 1)) * kernelkron[1:n,:], 0)
+        return wssd
