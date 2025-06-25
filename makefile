@@ -131,11 +131,10 @@ conda_env:
 	#   Assuming QMCPy repository is cloned locally and the correct branch is checked out
 	@conda env create --file environment.yml
 	@conda activate qmcpy
-	@pip install -e .
-	#   Suggest to run `make tests` to check environment is working
+	#   Suggest to run `make tests_no_docker` to check environment is working
 
 rm_qmcpy_env:
-	@conda deactivate qmcpy
+	@conda deactivate 
 	@conda remove --name qmcpy --all
 
 gen_doc:

@@ -1,4 +1,5 @@
 from qmcpy import *
+from qmcpy.util import ParameterError
 from numpy import *
 import scipy.stats
 import unittest
@@ -90,8 +91,8 @@ class TestGeometricBrownianMotion(unittest.TestCase):
             GeometricBrownianMotion(self.sampler, t_final=2, drift=0.1, diffusion=-0.2)
         with self.assertRaises(ValueError):
             GeometricBrownianMotion(self.sampler, t_final=2, drift=0.1, diffusion=0.2, initial_value=-1)
-        with self.assertRaises(ValueError):
-            GeometricBrownianMotion(self.sampler, t_final=2, drift=0.1, diffusion=0.2, decomp_type='InvalidType')
+        with self.assertRaises(ParameterError):
+            GeometricBrownianMotion(self.sampler, t_final=2, drift=0.1, diffusion=0.2,  decomp_type='InvalidType')
 
     def test_mean(self):
         expected_mean = self.gbm.initial_value * exp(self.gbm.drift * self.gbm.time_vec)
@@ -102,12 +103,13 @@ class TestGeometricBrownianMotion(unittest.TestCase):
         d = self.gbm.d
         S0 = self.gbm.initial_value
         mu = self.gbm.drift
-        sigma = self.gbm.diffusion
         cov_matrix = zeros((d, d))
         for i in range(d):
             for j in range(d):
                 mint = min(t[i], t[j])
-                cov_matrix[i, j] = (S0 ** 2) * exp(2 * mu * mint) * (exp(sigma**2 * mint) -1)
+                cov_matrix[i, j] = (S0 ** 2) * exp(mu * (t[i]+t[j])) * (exp(self.gbm.diffusion**2 * mint) - 1)
+        print(f"\nCovariance matrix:\n{cov_matrix}")
+        print(f"Computed covariance_gbm:\n{self.gbm.covariance_gbm}")
         self.assertTrue(allclose(self.gbm.covariance_gbm, cov_matrix, rtol=1e-8, atol=1e-8))
 
     def test_covariance_symmetry(self):
@@ -115,4 +117,5 @@ class TestGeometricBrownianMotion(unittest.TestCase):
 
     def test_covariance_positive_semidefinite(self):
         eigenvalues = linalg.eigvals(self.gbm.covariance)
-        self.assertTrue(all(eigenvalues >= -1e-10))  # Allow for small numerical errors
+        self.assertTrue(all(eigenvalues >= -1e-10))  # Allow for small numerical errors'
+    
