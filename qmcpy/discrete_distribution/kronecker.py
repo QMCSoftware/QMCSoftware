@@ -23,3 +23,18 @@ class Kronecker(LD):
         i = arange(n).reshape((n, 1))
         return(((i*self.alpha) + self.delta)%1)
     
+    
+    def kronecker_discrepancy(self, n, k_tilde, gamma, int_k_tilde):
+        n_array = arange(1, n + 1)
+        k_tilde_terms = array([k_tilde(x, gamma) for x in self.gen_samples(n)])
+
+        left_sum = cumsum(k_tilde_terms[1:]) * n_array[1:]
+        right_sum = cumsum(n_array[:-1] * k_tilde_terms[1:])
+        
+        zero_term = array([0])
+        left_sum = append(zero_term, left_sum)
+        right_sum = append(zero_term, right_sum)
+        
+        k_tilde_zero_terms = k_tilde_terms[0] * n_array
+        summation = left_sum - right_sum
+        return sqrt((k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - int_k_tilde)
