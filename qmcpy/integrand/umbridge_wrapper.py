@@ -105,7 +105,7 @@ class UMBridgeWrapper(AbstractIntegrand):
             yi_ll = self.model.__call__(ti_ll,self.config)
             for j,yi_l in enumerate(yi_ll):
                 y[(slice(self.d_out_umbridge[j],self.d_out_umbridge[j+1]),)+i] = yi_l if len(yi_l)>1 else yi_l[0]
-        return y
+        return y[0] if self.total_out_elements==1 else y
     
     def _spawn(self, level, sampler):
         return UMBridgeWrapper(

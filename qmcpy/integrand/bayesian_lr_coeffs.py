@@ -67,7 +67,7 @@ class BayesianLRCoeffs(AbstractIntegrand):
         z = np.einsum("...j,ij->...i",x,self.feature_array)
         z1 = z*self.response_vector
         with np.errstate(over='ignore'):
-            den = np.exp(np.sum(z1-np.log(1+np.exp(z)),-1))
+            den = np.exp(np.sum(z1-np.where(z<100,np.log(1+np.exp(z)),z),-1))
         y = np.zeros(self.d_indv+x.shape[:-1],dtype=float)
         y[0] = x.transpose([-1]+[i for i in range(x.ndim-1)])*den
         y[1] = den
