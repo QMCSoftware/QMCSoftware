@@ -73,23 +73,23 @@ class Ishigami(AbstractIntegrand):
         mu = a/2
         m2 = 1/2+3/8*a**2+np.pi**4/5*b+np.pi**8/18*b**2
         tau_closed = {
-            repr([0]): 1/50*(5+np.pi**4*b)**2,
-            repr([1]): a**2/8,
-            repr([2]): 0,
-            repr([0,1]): a**2/8+1/50*(5+np.pi**4*b)**2,
-            repr([0,2]): 1/90*(45+18*np.pi**4*b+5*np.pi**8*b**2),
-            repr([1,2]): a**2/8}
+            repr([True,False,False]): 1/50*(5+np.pi**4*b)**2,
+            repr([False,True,False]): a**2/8,
+            repr([False,False,True]): 0,
+            repr([True,True,False]): a**2/8+1/50*(5+np.pi**4*b)**2,
+            repr([True,False,True]): 1/90*(45+18*np.pi**4*b+5*np.pi**8*b**2),
+            repr([False,True,True]): a**2/8}
         tau_total = {
-            repr([1,2]): a**2/8+8*np.pi**8/225*b**2,
-            repr([0,2]): 1/90*(45+18*np.pi**4*b+5*np.pi**8*b**2),
-            repr([0,1]): 1/2+a**2/8+np.pi**4/5*b+np.pi**8/18*b**2,
-            repr([2]): 8*np.pi**8/225*b**2,
-            repr([1]): a**2/8,
-            repr([0]): 1/90*(45+18*np.pi**4*b+5*np.pi**8*b**2)}
+            repr([False,True,True]): a**2/8+8*np.pi**8/225*b**2,
+            repr([True,False,True]): 1/90*(45+18*np.pi**4*b+5*np.pi**8*b**2),
+            repr([True,True,False]): 1/2+a**2/8+np.pi**4/5*b+np.pi**8/18*b**2,
+            repr([False,False,True]): 8*np.pi**8/225*b**2,
+            repr([False,True,False]): a**2/8,
+            repr([True,False,False]): 1/90*(45+18*np.pi**4*b+5*np.pi**8*b**2)}
         solution = np.zeros((2,len(indices),len(a)),dtype=float)
         for j,idx in enumerate(indices):
-            solution[0,j] = tau_closed[repr(idx)]/(m2-mu**2)
-            solution[1,j] = tau_total[repr(idx)]/(m2-mu**2)
+            solution[0,j] = tau_closed[repr(idx.tolist())]/(m2-mu**2)
+            solution[1,j] = tau_total[repr(idx.tolist())]/(m2-mu**2)
         return solution.squeeze()
         
     @staticmethod

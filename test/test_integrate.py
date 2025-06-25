@@ -23,7 +23,7 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_asian_option_multi_level(self):
         abs_tol =.01
-        integrand = AsianOption(IIDStdUniform(),multilevel_dims=[4,16,64])
+        integrand = FinancialOption(IIDStdUniform(64))
         solution,data = CubMCCLT(integrand, abs_tol).integrate()
         true_value = 1.7845
         self.assertTrue(abs(solution - true_value) < abs_tol)
@@ -53,8 +53,8 @@ class IntegrationExampleTest(unittest.TestCase):
     
     def test_lebesgue_inf_measure_2d(self):
         abs_tol = .1
-        true_measure = Lebesgue(Gaussian(Lattice(2),mean=1,covariance=2))
-        myfunc = lambda x: np.exp(-x**2).prod(1)
+        true_measure = Lebesgue(Gaussian(Lattice(2,replications=32),mean=1,covariance=2))
+        myfunc = lambda x: np.exp(-x**2).prod(-1)
         integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
         true_value = np.pi
@@ -63,8 +63,8 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_uniform_measure(self):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        true_measure = Uniform(Lattice(2), lower_bound=[1,3], upper_bound=[3,6])
-        myfunc = lambda x: (x.prod(1))**3
+        true_measure = Uniform(Lattice(2,replications=32), lower_bound=[1,3], upper_bound=[3,6])
+        myfunc = lambda x: (x.prod(-1))**3
         integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
         true_value = 6075 / 6
@@ -81,7 +81,7 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = 0
         for i in range(len(dimensions)):
             d = dimensions[i]
-            integrand = Linear0(DigitalNetB2(d))
+            integrand = Linear0(DigitalNetB2(d,replications=32))
             solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_value) < abs_tol)
 
@@ -127,7 +127,8 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_european_call(self):
         abs_tol = 1e-2
-        integrand = EuropeanOption(DigitalNetB2(16),
+        integrand = FinancialOption(DigitalNetB2(16),
+            option="EUROPEAN",
             volatility = .2,
             start_price = 5,
             strike_price = 10,
@@ -140,7 +141,8 @@ class IntegrationExampleTest(unittest.TestCase):
     
     def test_european_put(self):
         abs_tol = 1e-2
-        integrand = EuropeanOption(Lattice(16,seed=7),
+        integrand = FinancialOption(Lattice(16,seed=7),
+            option="EUROPEAN",
             volatility = .5,
             start_price = 50,
             strike_price = 40,
@@ -153,8 +155,9 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_european_put_bayes_lattice(self):
         abs_tol = 5e-2
-        integrand = EuropeanOption(
-            sampler = Lattice(dimension=16, order='linear'),
+        integrand = FinancialOption(
+            sampler = Lattice(dimension=16, order='NATURAL'),
+            option = "EUROPEAN",
             volatility = .5,
             start_price = 10,
             strike_price = 10,
@@ -167,8 +170,9 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_european_put_bayes_net(self):
         abs_tol = 5e-2
-        integrand = EuropeanOption(
+        integrand = FinancialOption(
             sampler = DigitalNetB2(dimension=4),
+            option = "EUROPEAN",
             volatility = .5,
             start_price = 10,
             strike_price = 10,

@@ -33,7 +33,7 @@ class TestTrueMeasure(unittest.TestCase):
                 self.assertTrue(t.shape==(4,2))
                 self.assertTrue(t.dtype==np.float64)
                 x = _tm.discrete_distrib.gen_samples(4)
-                xtf,jtf = _tm._jacobian_transform_r(x)
+                xtf,jtf = _tm._jacobian_transform_r(x,return_weights=True)
                 self.assertTrue(xtf.shape==(4,d),jtf.shape==(4,))
                 w = _tm._weight(x)
                 self.assertTrue(w.shape==(4,))
@@ -71,10 +71,10 @@ class TestMatern(unittest.TestCase):
         points = np.array([[5, 4], [1, 2], [0, 0]])
         mean = np.full(3, 1.1)
         
-        m2 = Matern(Lattice(dimension = 3,seed=7), points, length_scale = 4, nu = 2.5, variance = 0.01, mean=mean)
+        m2 = MaternGP(Lattice(dimension = 3,seed=7), points, length_scale = 4, nu = 2.5, variance = 0.01, mean=mean, nugget=1e-6)
         from sklearn import gaussian_process as gp  #checking against scikit's Matern
         kernel2 = gp.kernels.Matern(length_scale = 4, nu=2.5)
-        cov2 = 0.01 * kernel2.__call__(points)
+        cov2 = 0.01 * kernel2.__call__(points) + 1e-6*np.eye(m2.covariance.shape[-1])
         assert np.allclose(cov2, m2.covariance)
 
 if __name__ == "__main__":

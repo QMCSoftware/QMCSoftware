@@ -198,7 +198,7 @@ class CubMCCLT(AbstractStoppingCriterion):
         x0 = self.discrete_distrib(n=self.n_init)
         data.xfull = np.concatenate([data.xfull,x0],0)
         y0 = self.integrand.f(x0)
-        temp_a = (time()-t_start)**0.5
+        temp_a = np.maximum(np.finfo(np.float64).eps,(time()-t_start)**0.5)
         data.yfull = np.concatenate([data.yfull,y0],-1)
         if self.ncv>0:
             ycv0 = [None]*self.ncv
@@ -223,7 +223,7 @@ class CubMCCLT(AbstractStoppingCriterion):
             Already generated %d samples.
             Trying to generate %d new samples would exceed n_limit = %d.
             Will instead generate %d new samples to reach n_limit.""" \
-            % (int(self.n_init),int(data.n_mu),int(self.n_limit-self.n_init))
+            % (int(self.n_init),int(data.n_mu),int(self.n_limit),int(self.n_limit-self.n_init))
             warnings.warn(warning_s, MaxSamplesWarning)
             data.n_mu = self.n_limit-self.n_init
         x = self.discrete_distrib(n=data.n_mu)

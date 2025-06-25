@@ -333,7 +333,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         assert self._t_curr<=t<=64, "t must no more than 64 and no less than %d (the number of bits used to represent the generating matrices)"%(self._t_curr)
         assert isinstance(alpha,int) and alpha>0
         self.alpha = alpha
-        if self.alpha>0:
+        if self.alpha>1:
             assert (self.dvec==np.arange(self.d)).all(), "digital interlacing requires dimension is an int"
             if self.m_max!=self._t_curr:
                 warnings.warn("Digital interlacing is often performed on matrices with the number of columns (m_max = %d) equal to the number of bits in each int (%d), but this is not the case. Ensure you are NOT setting alpha>1 when generating matrices are already interlaced."%(self.m_max,self._t_curr),ParameterWarning)

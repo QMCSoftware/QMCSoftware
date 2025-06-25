@@ -6,7 +6,7 @@ from .plot_functions import plot_proj
 from .stop_notebook import stop_notebook
 try: 
     import torch 
-    import gpytorch 
+    import gpytorch
     from .exact_gpytorch_gression_model import ExactGPyTorchRegressionModel
 except ImportError:
     class ExactGPyTorchRegressionModel(object):

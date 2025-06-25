@@ -296,7 +296,7 @@ class AbstractIntegrand(object):
         Returns:
             d (int): Dimension at the given input level. 
         """
-        raise MethodImplementationError(self, 'dimension_at_level')
+        return self.d
 
     def _spawn(self, level, tm_spawn):
         raise MethodImplementationError(self, '_spawn')

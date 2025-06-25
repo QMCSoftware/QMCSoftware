@@ -24,12 +24,15 @@ jobs:
       - run: pip install -e .[test_botorch]
       - run: make doctests_botorch
       - run: pip install -e .[test_umbridge]
-      - run: |
+      - name: run umbridge doctests on Linux only
+        shell: bash -l {0}
+        run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             make doctests_umbridge
           else
             echo "umbridge doctests only run on Linux"
           fi
+      - run: make doctests_markdown
       - run: make unittests
       - run: make coverage
 

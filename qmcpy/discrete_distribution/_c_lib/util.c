@@ -1,6 +1,3 @@
-/*
-Fast Walsh Hadamard transform.
-*/
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +10,7 @@ Fast Walsh Hadamard transform.
 // in Windows, you must define an initialization function for your extension
 // because setuptools will build a .pyd file, not a DLL
 // https://stackoverflow.com/questions/34689210/error-exporting-symbol-when-building-python-c-extension-in-windows
-PyMODINIT_FUNC PyInit_c_lib(void)
+PyMODINIT_FUNC PyInit__c_lib(void)
 {
     // do stuff...
     printf("");
