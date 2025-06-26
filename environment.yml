@@ -1,5 +1,6 @@
 name: qmcpy
 channels:
+  - pytorch
   - conda-forge
   - defaults
 dependencies:
@@ -8,6 +9,7 @@ dependencies:
   - sphinx=5.0.2
   - pandoc>=2.2
   - graphviz=2.50.0
+  - pytorch==2.5.1  # install first before other torch packages
   - pip:
     - numpy==1.23.4
     - scipy==1.9.3
@@ -25,7 +27,6 @@ dependencies:
     - umbridge==1.2.1
     - scikit-learn==1.6.1
     - botorch==0.8.5
-    - torch==2.7.1
     - torch-geometric==2.6.1
     - torch-cluster==1.6.3
     - torch-scatter==2.1.2 
