@@ -1,8 +1,8 @@
 from types import SimpleNamespace
 from qmcpy.discrete_distribution._discrete_distribution import LD
 from qmcpy.util import ParameterError
-from utils import L2discrepancy, L2center, L2ext, L2per, L2sym, hickernell_all_emphasized
-from models import *
+from .utils import L2discrepancy, L2center, L2ext, L2per, L2sym, hickernell_all_emphasized
+from .models import *
 from tqdm import tqdm 
 import torch
 import numpy as np

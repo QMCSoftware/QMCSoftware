@@ -3,7 +3,7 @@ from torch import nn
 from torch_cluster import radius_graph
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 from torch_geometric.nn import MessagePassing, InstanceNorm
-from utils import L2discrepancy, L2center, L2ext, L2per, L2sym
+from .utils import L2discrepancy, L2center, L2ext, L2per, L2sym
 
 
 class MPNN_layer(MessagePassing):
