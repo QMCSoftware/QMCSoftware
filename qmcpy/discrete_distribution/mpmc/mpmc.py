@@ -165,7 +165,7 @@ class MPMC(LD):
         reduce_point = 10
 
         for epoch in tqdm(range(args.epochs), desc = f"Training: N={args.nsamples}, nhid={args.nhid}, loss={args.loss_fn}"):
-            if (epoch % 10000 == 0):
+            if (epoch % 5000 == 0):
                 print(f"epoch: {epoch}")
 
             model.train()
