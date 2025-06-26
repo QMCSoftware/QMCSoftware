@@ -5,5 +5,5 @@ import os
 
 try:
     c_lib = CDLL(glob(dirname(abspath(__file__)) + os.sep + "c_lib*")[0], mode=RTLD_GLOBAL)
-except e:
+except Exception as e:
     pass
