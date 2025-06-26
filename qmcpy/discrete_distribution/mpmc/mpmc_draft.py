@@ -20,8 +20,7 @@ if sys.version_info < MIN_PYTHON_VERSION:
     print("Please upgrade your Python installation to use mpmc and proceed.")
     sys.exit(1)
 
-
-
+"""
 # test for pytorch installation
 import subprocess
 
@@ -46,7 +45,7 @@ except ModuleNotFoundError as e:
                     check=True
                 )
         
-"""        prompt = "\nWould you like to update your environment? (y/n): "
+         prompt = "\nWould you like to update your environment? (y/n): "
         user_input = input(prompt).lower()
 
         if user_input in ['y', 'yes']:
