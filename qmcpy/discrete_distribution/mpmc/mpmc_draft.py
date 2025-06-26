@@ -33,15 +33,20 @@ try:
     from torch_geometric.nn import MessagePassing, InstanceNorm
     import torch.optim as optim
     
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')    # not sure where to put this yet...
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print("Requirements met for mpmc")
-    
+
 except ModuleNotFoundError as e:
-    print("Error: mpmc required module(s) missing:")      # not sure if it will go one by one or..
+    print("Error: mpmc required module(s) missing:")
     print(f"{e}")
 
-    while True:
-        prompt = "\nWould you like to update your environment? (y/n): "
+    #test: installing pytorch without user input
+    subprocess.run(
+                    [sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'],
+                    check=True
+                )
+        
+"""        prompt = "\nWould you like to update your environment? (y/n): "
         user_input = input(prompt).lower()
 
         if user_input in ['y', 'yes']:
@@ -52,6 +57,7 @@ except ModuleNotFoundError as e:
                     check=True
                 )
                 print("\n Installation complete. Try running mpmc again.")
+        
             
             except subprocess.CalledProcessError as install_error:
                 print(f"\nError: {install_error}")
@@ -63,12 +69,9 @@ except ModuleNotFoundError as e:
         elif user_input in ['n', 'no']:
             print("\nExiting program. Please install the dependencies manually by running: pip install -r requirements.txt")
             sys.exit()
-
-
-
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(f"Using device: {device}")
+        else:
+            print("Invalid input. Please enter 'y' or 'n'.")
+"""
 
 # discrepancy functions
 def L2dis(x):
