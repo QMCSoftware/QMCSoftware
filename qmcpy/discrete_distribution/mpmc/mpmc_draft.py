@@ -1,13 +1,18 @@
-# this code implemments mpmc as an object like in the lattice
+# this code implements mpmc as an object like in the lattice
 # note only working with pytorch and higher version of python for me
 # - A
 
 import numpy as np
-from pathlib import Path
 from tqdm import tqdm
-import types
 import math
 import sys
+import torch
+from torch import nn
+from torch_cluster import radius_graph
+from torch_geometric.nn import MessagePassing, InstanceNorm
+import torch.optim as optim
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # test for correct, up-to-date python version
 MIN_PYTHON_VERSION = (3, 7)     # might be 3.6?
