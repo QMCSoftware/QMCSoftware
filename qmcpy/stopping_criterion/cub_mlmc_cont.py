@@ -119,7 +119,7 @@ class CubMLMCCont(AbstractCubMCML):
         self.inflate = inflate
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.true_measure.discrete_distrib
+        self.discrete_distrib = self.integrand.discrete_distrib
         self.alpha0 = -1 
         self.beta0 = -1 
         self.gamma0 = -1

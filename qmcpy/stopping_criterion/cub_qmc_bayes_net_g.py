@@ -135,7 +135,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             lower_bound     0
             upper_bound     1
         DigitalNetB2 (AbstractLDDiscreteDistribution)
-            d               6
+            d               3
             replications    1
             randomize       LMS_DS
             gen_mats_source joe_kuo.6.21201.txt

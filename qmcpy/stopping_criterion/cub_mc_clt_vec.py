@@ -130,7 +130,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             lower_bound     0
             upper_bound     1
         IIDStdUniform (AbstractIIDDiscreteDistribution)
-            d               6
+            d               3
             replications    1
             entropy         7
     """
@@ -193,7 +193,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.true_measure.discrete_distrib
+        self.discrete_distrib = self.integrand.discrete_distrib
         super(CubMCCLTVec,self).__init__(allowed_distribs=[AbstractIIDDiscreteDistribution],allow_vectorized_integrals=True)
         assert self.integrand.discrete_distrib.no_replications==True, "Require the discrete distribution has replications=None"
         self.alphas_indv,identity_dependency = self._compute_indv_alphas(np.full(self.integrand.d_comb,self.alpha))

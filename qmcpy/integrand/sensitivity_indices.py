@@ -6,6 +6,7 @@ from ..true_measure import Uniform
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 from itertools import combinations
+import scipy.special
 
 
 class SensitivityIndices(AbstractIntegrand):
@@ -45,12 +46,12 @@ class SensitivityIndices(AbstractIntegrand):
 
         >>> integrand = SensitivityIndices(Keister(DigitalNetB2(dimension=3,seed=7)),indices='all')
         >>> integrand.indices
-        array([[False, False,  True],
+        array([[ True, False, False],
                [False,  True, False],
-               [False,  True,  True],
-               [ True, False, False],
+               [False, False,  True],
+               [ True,  True, False],
                [ True, False,  True],
-               [ True,  True, False]])
+               [False,  True,  True]])
 
         Vectorized function for all singletons and pairs of dimensions
 
@@ -128,20 +129,26 @@ class SensitivityIndices(AbstractIntegrand):
         if isinstance(self.indices,str) and self.indices=='singletons':
             self.indices = np.eye(self.dtilde,dtype=bool)
         elif isinstance(self.indices,str) and self.indices=='all':
-            self.indices = np.array([[bool(int(b)) for b in np.binary_repr(i,width=self.dtilde)] for i in range(1,2**self.dtilde-1)],dtype=bool)
+            self.indices = np.zeros((0,self.dtilde),dtype=bool)
+            for r in range(1,self.dtilde):
+                idxs_r = np.zeros((int(scipy.special.comb(self.dtilde,r)),self.dtilde),dtype=bool)
+                for i,comb in enumerate(combinations(range(self.dtilde),r)):
+                    idxs_r[i,comb] = True 
+                self.indices = np.vstack([self.indices,idxs_r])
         self.indices = np.atleast_1d(self.indices)
         assert self.indices.dtype==bool and self.indices.ndim>=1 and self.indices.shape[-1]==self.dtilde 
         assert not (self.indices==self.indices[...,0,None]).all(-1).any(), "indices cannot include the emptyset or the set of all dimensions"
         self.not_indices = ~self.indices
         # sensitivity_index
-        self.true_measure = self.integrand.true_measure.spawn(s=1,dimensions=[2*self.dtilde])[0]
-        self.discrete_distrib = self.true_measure.discrete_distrib
+        self.true_measure = self.integrand.true_measure
+        self.discrete_distrib = self.integrand.discrete_distrib.spawn(s=1,dimensions=[2*self.dtilde])[0]
         self.sampler = self.integrand.sampler
         self.i_slice = (slice(None),)*len(self.integrand.d_indv)
         super(SensitivityIndices,self).__init__(
             dimension_indv = (2,3)+self.indices.shape[:-1]+self.integrand.d_indv,
             dimension_comb = (2,)+self.indices.shape[:-1]+self.integrand.d_indv,
             parallel = False)
+        self.d = 2*self.dtilde
     
     def f(self, x, *args, **kwargs):
         if 'compute_flags' in kwargs:

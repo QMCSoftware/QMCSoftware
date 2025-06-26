@@ -121,7 +121,7 @@ class CubMLQMCCont(AbstractCubQMCML):
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.true_measure.discrete_distrib
+        self.discrete_distrib = self.integrand.discrete_distrib
         super(CubMLQMCCont,self).__init__(allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=False)
         self.replications = self.discrete_distrib.replications 
         assert self.replications>=4, "require at least 4 replications"
