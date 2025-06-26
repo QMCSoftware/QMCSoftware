@@ -134,6 +134,11 @@ conda_env:
 	@pip install -e .
 	#   Suggest to run `make tests` to check environment is working
 
+conda_update:
+	@conda activate qmcpy
+	@conda env update -f environment.yml
+	@pip install -e . --upgrade
+
 rm_qmcpy_env:
 	@conda deactivate qmcpy
 	@conda remove --name qmcpy --all

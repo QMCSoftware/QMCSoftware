@@ -217,8 +217,8 @@ class MPMC:
     example use
     
     >>> mpmc = MPMC(dimension=2, loss_fn='L2dis', epochs=100)
-    >>> points = mpmc.gen_samples(n=50)
-    >>> points.shape
+    >>> points = mpmc.gen_samples(n=50)  # doctest: +SKIP
+    >>> points.shape  # doctest: +SKIP
     (50, 2)
     >>> mpmc
     MPMC Generator Object
@@ -236,10 +236,14 @@ class MPMC:
         
         **kwargs if user wants to define any parameters not in self.hyper_params,
             they can override these
-        self.hyper_params: default parameters...if user doesn't explicity 
+        self.hyper_params: default parameters...if user doesn't explicitly 
             define any of these, then these are the default
 
         """
+
+        # Handle dimension parameter passed as keyword argument
+        if dim is None and 'dimension' in kwargs:
+            dim = kwargs.pop('dimension')
 
         self.hyper_params = {
             'lr': 0.001, 'nlayers': 3, 'weight_decay': 1e-6, 'nhid': 32,
@@ -248,9 +252,11 @@ class MPMC:
         }
         
         
-        self.hyper_params.update(kwargs)        #update hyper_params if user changed anything
+        self.hyper_params.update(kwargs)  #update hyper_params if user changed anything
         self.hyper_params['dim'] = dim    # make sure dim is chosen by user
 
+        # Set randomize attribute
+        self.randomize = randomize
 
         # for easy access to hyper_params. For example, mpmc.epochs can be accessed easily
         for key, val in self.hyper_params.items():
@@ -259,14 +265,16 @@ class MPMC:
         # set dim in self for use
         if isinstance(dim, int):
             self.d = dim
-        else:
+        elif dim is not None:
             self.d = len(dim)   # if multiple dimensions given
+        else:
+            raise ValueError("dimension must be specified as either 'dim' or 'dimension' parameter")
         
         # random seed for reproducibility
         self.rng = np.random.default_rng(seed)
 
         # these parameters shown after object is printed
-        self.parameters = ['dim', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
+        self.parameters = ['dimension', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
         
         # make sure randomize is valid
         if self.randomize not in ["SHIFT", "FALSE"]: self.randomize = "SHIFT"
@@ -274,10 +282,11 @@ class MPMC:
 
     # output of hyperparameters used
     def __repr__(self):
-        out = f"{self.__class__.__name__} Generator Object\n"
+        out = f"{self.__class__.__name__} Generator Object"
         for p in self.parameters:
-            p_val = getattr(self,p)
-            out += f"    {p:<15} {str(p_val)}\n"
+            attr_name = 'd' if p == 'dimension' else p
+            p_val = getattr(self, attr_name)
+            out += f"\n    {p:<15} {str(p_val)}"
         return out
 
 

@@ -23,6 +23,12 @@ dependencies:
     - sphinx-rtd-theme==1.0.0
     - sphinx-markdown-tables==0.0.17
     - umbridge==1.2.1
-    - scikit-learn
-    - botorch
+    - scikit-learn==1.6.1
+    - botorch==0.8.5
+    - torch==2.7.1
+    - torch-geometric==2.6.1
+    - torch-cluster==1.6.3
+    - torch-scatter==2.1.2 
+    - torch-sparse==0.6.18
+    - torch-spline-conv>=1.2.1
     - -e .
