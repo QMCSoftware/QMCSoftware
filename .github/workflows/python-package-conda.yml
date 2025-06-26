@@ -7,26 +7,66 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
         matrix:
-            os: ["macos-latest", "ubuntu-latest", "windows-latest"]
+            # Use newer runner versions that support modern PyTorch
+            os: ["macos-13", "ubuntu-22.04", "windows-2022"]
+        fail-fast: false  # Continue testing other OS even if one fails
+    env:
+      # Environment variables for PyTorch compilation compatibility
+      MACOSX_DEPLOYMENT_TARGET: "10.15"  
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.15"
+      PIP_PREFER_BINARY: "1"  # Prefer pre-built wheels over source compilation
+      TORCH_CUDA_ARCH_LIST: "6.0;6.1;7.0;7.5;8.0;8.6"  # CUDA architectures for GPU builds
+      MAX_JOBS: "2"  # Limit parallel compilation jobs to avoid memory issues
     steps:
-      - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4 
+      - uses: conda-incubator/setup-miniconda@v3  
         with:
           miniconda-version: "latest"
           activate-environment: qmcpy
           environment-file: environment.yml
           auto-activate-base: false
+          python-version: "3.9"
+          channels: pytorch,conda-forge,defaults  # Ensure pytorch channel is available
+      
+      # Add platform-specific environment setup
+      - name: Set Windows environment
+        if: runner.os == 'Windows'
+        shell: bash -l {0}
+        run: |
+          echo "DISTUTILS_USE_SDK=1" >> $GITHUB_ENV
+          echo "MSSdk=1" >> $GITHUB_ENV
+      
+      - name: Set macOS environment  
+        if: runner.os == 'macOS'
+        shell: bash -l {0}
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=10.15" >> $GITHUB_ENV
+          echo "CMAKE_OSX_DEPLOYMENT_TARGET=10.15" >> $GITHUB_ENV
       - shell: bash -l {0}
         run: |
           conda info
           conda list
+          echo "PyTorch version check:"
+          python -c "import torch; print(f'PyTorch: {torch.__version__}')" || echo "PyTorch not yet installed"
+      
+      # Install PyTorch geometric dependencies with retries
+      - name: Install PyTorch Geometric Dependencies
+        shell: bash -l {0}
+        run: |
+          echo "Installing/upgrading PyTorch ecosystem..."
+          # Try conda first, fallback to pip
+          conda install pytorch-geometric -c pyg -c pytorch -c conda-forge --yes || \
+          pip install --upgrade torch-geometric torch-cluster torch-scatter torch-sparse torch-spline-conv
+          
       - name: Install QMCPy 
         shell: bash -l {0}
         run: |
           pip install -e .
       - name: Run Tests
         shell: bash -l {0}
+        timeout-minutes: 45  # Add timeout to prevent hanging builds
         run: |
+          echo "Running tests on $RUNNER_OS..."
           if [ "$RUNNER_OS" == "Linux" ]; then
             make tests
           else

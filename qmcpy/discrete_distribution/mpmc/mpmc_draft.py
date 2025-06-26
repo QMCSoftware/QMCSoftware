@@ -25,6 +25,7 @@ if sys.version_info < MIN_PYTHON_VERSION:
     print("Please upgrade your Python installation to use mpmc and proceed.")
     sys.exit(1)
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 """
 # test for pytorch installation
 import subprocess
@@ -199,7 +200,7 @@ class MPMC_net(nn.Module):
 
     def forward(self):
         x = self.initial_points
-        batch = torch.arange(self.nbatch, device=device).unsqueeze(-1).repeat(1, self.nsamples).flatten()
+        batch = torch.arange(self.nbatch, device=self.device).unsqueeze(-1).repeat(1, self.nsamples).flatten()
         edge_index = radius_graph(x, r=self.radius, batch=batch, loop=True)
         x_encoded = self.enc(x)
         for conv in self.convs: x_encoded = conv(x_encoded, edge_index)
