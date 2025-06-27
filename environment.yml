@@ -4,33 +4,34 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.9.13
   - pip=22.1.2
+  - python=3.9.13
   - sphinx=5.0.2
   - pandoc>=2.2
   - graphviz=2.50.0
-  - pytorch=2.2.0
-  - torchvision=0.17.2
-  - torchaudio=2.2.0
+  - pytorch=2.3.0
+  - torchvision
+  - torchaudio
   - pip:
-      - numpy==1.23.4
-      - scipy==1.9.3
-      - pandas==1.4.3
-      - gpytorch==1.10
-      - matplotlib==3.5.2
-      - jupyter==1.0.0
-      - coverage==6.4.1
-      - pytest==7.1.2
-      - pylint==2.14.4
-      - recommonmark==0.7.1
-      - sphinx-math-dollar==1.2.1
-      - sphinx-rtd-theme==1.0.0
-      - sphinx-markdown-tables==0.0.17
-      - umbridge==1.2.1
-      - scikit-learn==1.6.1
-      - botorch==0.8.5
-      - torch-geometric==2.6.1
-      - torch-cluster==1.6.3
-      - torch-scatter==2.1.1
-      - torch-sparse==0.6.18
-      - -e .
+    - numpy==1.23.4
+    - scipy==1.9.3
+    - pandas==1.4.3
+    - gpytorch==1.10
+    - matplotlib==3.5.2
+    - jupyter==1.0.0
+    - coverage==6.4.1
+    - pytest==7.1.2
+    - pylint==2.14.4
+    - recommonmark==0.7.1
+    - sphinx-math-dollar==1.2.1
+    - sphinx-rtd-theme==1.0.0
+    - sphinx-markdown-tables==0.0.17
+    - umbridge==1.2.1
+    - scikit-learn==1.6.1
+    - botorch==0.8.5
+    - torch-geometric
+    - torch-cluster
+    - torch-scatter
+    - torch-sparse
+    - torch-spline-conv
+    - -e .

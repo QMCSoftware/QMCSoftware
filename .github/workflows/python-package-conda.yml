@@ -47,7 +47,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash -l {0}
         run: |
-          pip install torch-scatter torch-sparse torch-cluster torch-spline-conv -f https://data.pyg.org/whl/torch-2.2.0+cpu.html
+          pip install torch-scatter torch-sparse torch-cluster torch-spline-conv -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
 
       - shell: bash -l {0}
         run: |
@@ -64,7 +64,17 @@ jobs:
           # Try conda first, fallback to pip
           conda install pytorch-geometric -c pyg -c pytorch -c conda-forge --yes || \
           pip install --upgrade torch-geometric torch-cluster torch-scatter torch-sparse torch-spline-conv
-          
+      
+      - name: Install Windows C++ build tools
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          choco install -y visualstudio2022buildtools
+          choco install -y windows-sdk-10.0
+          # Set up MSVC environment variables
+          Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"
+          Enter-VsDevShell -VsInstallPath "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools"
+      
       - name: Install QMCPy 
         shell: bash -l {0}
         run: |
