@@ -61,19 +61,19 @@ jobs:
           echo "PyTorch version check:"
           python -c "import torch; print(f'PyTorch: {torch.__version__}')" || echo "PyTorch not installed"
       
-      - name: Install Windows C++ build tools
+      - name: Setup Windows compiler
         if: runner.os == 'Windows'
-        shell: powershell
+        shell: bash -l {0}
         run: |
-          choco install -y visualstudio2022buildtools
-          choco install -y windows-sdk-10.0
-          # Set up MSVC environment variables
-          Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"
-          Enter-VsDevShell -VsInstallPath "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools"
+          conda install -c conda-forge cxx-compiler --yes
       
       - name: Install QMCPy 
         shell: bash -l {0}
         run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            # Use conda to install compilers for Windows
+            conda install -c conda-forge cxx-compiler --yes
+          fi
           pip install -e .
       - name: Run Tests
         shell: bash -l {0}
