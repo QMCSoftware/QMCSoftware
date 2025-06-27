@@ -31,5 +31,4 @@ dependencies:
     - torch-cluster==1.6.3
     - torch-scatter==2.1.1
     - torch-sparse==0.6.18
-    - torch-spline-conv>=1.2.1
     - -e .
