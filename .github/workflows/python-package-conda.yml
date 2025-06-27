@@ -7,7 +7,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
         matrix:
-            # Use newer runner versions that support modern PyTorch
             os: ["macos-13", "ubuntu-22.04", "windows-2022"]
         fail-fast: false  # Continue testing other OS even if one fails
     env:
@@ -16,17 +15,28 @@ jobs:
       CMAKE_OSX_DEPLOYMENT_TARGET: "10.15"
       PIP_PREFER_BINARY: "1"  # Prefer pre-built wheels over source compilation
       TORCH_CUDA_ARCH_LIST: "6.0;6.1;7.0;7.5;8.0;8.6"  # CUDA architectures for GPU builds
-      MAX_JOBS: "2"  # Limit parallel compilation jobs to avoid memory issues
+      MAX_JOBS: "3"  
     steps:
       - uses: actions/checkout@v4 
       - uses: conda-incubator/setup-miniconda@v3  
+        if: runner.os != 'Windows'
         with:
           miniconda-version: "latest"
           activate-environment: qmcpy
           environment-file: environment.yml
           auto-activate-base: false
           python-version: "3.9"
-          channels: pytorch,conda-forge,defaults  # Ensure pytorch channel is available
+          channels: pytorch,conda-forge,defaults
+      
+      - uses: conda-incubator/setup-miniconda@v3  
+        if: runner.os == 'Windows'
+        with:
+          miniconda-version: "latest"
+          activate-environment: qmcpy
+          environment-file: environment_windows.yml
+          auto-activate-base: false
+          python-version: "3.9"
+          channels: pytorch,conda-forge,defaults
       
       # Add platform-specific environment setup
       - name: Set Windows environment
@@ -43,27 +53,13 @@ jobs:
           echo "MACOSX_DEPLOYMENT_TARGET=10.15" >> $GITHUB_ENV
           echo "CMAKE_OSX_DEPLOYMENT_TARGET=10.15" >> $GITHUB_ENV
       
-      - name: Install PyTorch and dependencies on Windows
-        if: runner.os == 'Windows'
+      - name: Verify Environment
         shell: bash -l {0}
-        run: |
-          pip install torch-scatter torch-sparse torch-cluster torch-spline-conv -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
-
-      - shell: bash -l {0}
         run: |
           conda info
           conda list
           echo "PyTorch version check:"
-          python -c "import torch; print(f'PyTorch: {torch.__version__}')" || echo "PyTorch not yet installed"
-      
-      # Install PyTorch geometric dependencies with retries
-      - name: Install PyTorch Geometric Dependencies
-        shell: bash -l {0}
-        run: |
-          echo "Installing/upgrading PyTorch ecosystem..."
-          # Try conda first, fallback to pip
-          conda install pytorch-geometric -c pyg -c pytorch -c conda-forge --yes || \
-          pip install --upgrade torch-geometric torch-cluster torch-scatter torch-sparse torch-spline-conv
+          python -c "import torch; print(f'PyTorch: {torch.__version__}')" || echo "PyTorch not installed"
       
       - name: Install Windows C++ build tools
         if: runner.os == 'Windows'
@@ -92,7 +88,7 @@ jobs:
       - name: Upload to Codecov
         shell: bash -l {0}
         run: |
-          python -m coverage xml -i # genereate coverage.xml
+          python -m coverage xml -i # generate coverage.xml
           # python -m codecov -t e87cdb03-ccdd-44df-9849-8c5bc460cb9e  # fails without token
           # bash <(curl https://codecov.io/bash)
           curl -s https://codecov.io/bash | bash
