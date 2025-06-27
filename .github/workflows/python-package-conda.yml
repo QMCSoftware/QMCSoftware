@@ -15,6 +15,7 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: "10.15"  
       CMAKE_OSX_DEPLOYMENT_TARGET: "10.15"
       PIP_PREFER_BINARY: "1"  # Prefer pre-built wheels over source compilation
+      PIP_ONLY_BINARY: ":all:"  # Force binary-only installation where possible
       TORCH_CUDA_ARCH_LIST: "6.0;6.1;7.0;7.5;8.0;8.6"  # CUDA architectures for GPU builds
       MAX_JOBS: "2"  # Limit parallel compilation jobs to avoid memory issues
     steps:
@@ -35,6 +36,14 @@ jobs:
         run: |
           echo "DISTUTILS_USE_SDK=1" >> $GITHUB_ENV
           echo "MSSdk=1" >> $GITHUB_ENV
+          echo "CMAKE_GENERATOR=Visual Studio 17 2022" >> $GITHUB_ENV
+          echo "CMAKE_GENERATOR_PLATFORM=x64" >> $GITHUB_ENV
+          echo "PIP_ONLY_BINARY=:all:" >> $GITHUB_ENV
+          echo "PIP_NO_BUILD_ISOLATION=false" >> $GITHUB_ENV
+      
+      - name: Setup Visual Studio tools (Windows)
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v2
       
       - name: Set macOS environment  
         if: runner.os == 'macOS'
@@ -54,9 +63,10 @@ jobs:
         shell: bash -l {0}
         run: |
           echo "Installing/upgrading PyTorch ecosystem..."
-          # Try conda first, fallback to pip
+          # Try conda first, fallback to pip with explicit binary preference
           conda install pytorch-geometric -c pyg -c pytorch -c conda-forge --yes || \
-          pip install --upgrade torch-geometric torch-cluster torch-scatter torch-sparse torch-spline-conv
+          pip install --only-binary=all --upgrade torch-geometric torch-cluster torch-scatter torch-sparse torch-spline-conv || \
+          pip install --prefer-binary --upgrade torch-geometric torch-cluster torch-scatter torch-sparse torch-spline-conv
           
       - name: Install QMCPy 
         shell: bash -l {0}
