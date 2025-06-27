@@ -65,9 +65,18 @@ jobs:
         shell: bash -l {0}
         run: |
           pip install -e .
-      - name: Run Tests
-        shell: ${{ runner.os == 'Windows' && 'cmd /C call {0}' || 'bash -l {0}' }}
-        timeout-minutes: 45  # Add timeout to prevent hanging builds
+      - name: Run Tests (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd /C call {0}
+        timeout-minutes: 45
+        run: |
+          echo Running tests on %RUNNER_OS%...
+          make tests_no_docker
+
+      - name: Run Tests (macOS/Linux)
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
+        timeout-minutes: 45
         run: |
           echo "Running tests on $RUNNER_OS..."
           if [ "$RUNNER_OS" == "Linux" ]; then
