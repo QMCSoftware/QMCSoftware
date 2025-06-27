@@ -61,19 +61,9 @@ jobs:
           echo "PyTorch version check:"
           python -c "import torch; print(f'PyTorch: {torch.__version__}')" || echo "PyTorch not installed"
       
-      - name: Setup Windows compiler
-        if: runner.os == 'Windows'
-        shell: bash -l {0}
-        run: |
-          conda install -c conda-forge cxx-compiler --yes
-      
       - name: Install QMCPy 
         shell: bash -l {0}
         run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            # Use conda to install compilers for Windows
-            conda install -c conda-forge cxx-compiler --yes
-          fi
           pip install -e .
       - name: Run Tests
         shell: bash -l {0}

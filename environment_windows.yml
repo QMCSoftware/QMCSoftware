@@ -6,6 +6,7 @@ channels:
 dependencies:
   - pip=22.1.2
   - python=3.9.13
+  - cxx-compiler
   - sphinx=5.0.2
   - pandoc>=2.2
   - graphviz=2.50.0
