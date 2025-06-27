@@ -9,7 +9,9 @@ dependencies:
   - sphinx=5.0.2
   - pandoc>=2.2
   - graphviz=2.50.0
-  - pytorch=2.7.1  
+  - pytorch=2.3.0
+  - torchvision
+  - torchaudio
   - pip:
     - numpy==1.23.4
     - scipy==1.9.3
@@ -27,8 +29,9 @@ dependencies:
     - umbridge==1.2.1
     - scikit-learn==1.6.1
     - botorch==0.8.5
-    - torch-geometric==2.6.1
-    - torch-cluster==1.6.3
-    - torch-scatter==2.1.1
-    - torch-sparse==0.6.18
+    - torch-geometric
+    - torch-cluster
+    - torch-scatter
+    - torch-sparse
+    - torch-spline-conv
     - -e .

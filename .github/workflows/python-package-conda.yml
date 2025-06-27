@@ -43,13 +43,12 @@ jobs:
           echo "MACOSX_DEPLOYMENT_TARGET=10.15" >> $GITHUB_ENV
           echo "CMAKE_OSX_DEPLOYMENT_TARGET=10.15" >> $GITHUB_ENV
       
-      - name: Install PyTorch and dependencies
+      - name: Install PyTorch and dependencies on Windows
         if: runner.os == 'Windows'
         shell: bash -l {0}
         run: |
-          conda install pytorch=2.2.0 && \
-          pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-2.2.0+cpu.html
-      
+          pip install torch-scatter torch-sparse torch-cluster torch-spline-conv -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
+
       - shell: bash -l {0}
         run: |
           conda info
