@@ -47,7 +47,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash -l {0}
         run: |
-          pip install torch-scatter torch-sparse torch-cluster torch-spline-conv -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
+          pip install torch-scatter torch-sparse torch-cluster torch-spline-conv -f https://data.pyg.org/whl/torch-2.2.0+cpu.html
 
       - shell: bash -l {0}
         run: |
