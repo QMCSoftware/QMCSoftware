@@ -28,7 +28,7 @@ jobs:
         shell: bash -l {0}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            make -O -j$(nproc)
+            make -O -j$(nproc) tests
           else
             make tests_no_docker
           fi
