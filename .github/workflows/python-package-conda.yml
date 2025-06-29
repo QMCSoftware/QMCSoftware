@@ -1,68 +1,41 @@
-# .github/workflows/tests.yml
-# QMCPy – Automated tests & coverage   (multi-core runners)
-
 name: QMCPy Automated Tests and Coverage Report
 on: [push]
 
 jobs:
   tests:
-    # a readable job name for the Actions UI
-    name: Tests on ${{ matrix.pretty }}
-
-    # ─────── build matrix ────────────────────────────────────────────────
+    name: Tests on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        include:
-          # --------------- Linux ----------------------------------------
-          - pretty: "Ubuntu 24.04 – 8-core"
-            label: ubuntu-24.04-8core      # GitHub-hosted 8 vCPU runner
-            with_docker: true              # keep original docker tests
-          # --------------- Windows --------------------------------------
-          - pretty: "Windows Server 2022 – 8-core"
-            label: windows-2022-8core      # 8 vCPU Windows runner
-            with_docker: false
-          # --------------- macOS (Apple Silicon) -------------------------
-          - pretty: "macOS 14 – XL (12-core M-series)"
-            label: macos-14-xlarge         # 12 vCPU Apple-silicon runner
-            with_docker: false
-
-    # send the job to the chosen runner
-    runs-on: ${{ matrix.label }}
-
-    # ─────── steps ───────────────────────────────────────────────────────
+        matrix:
+            os: ["macos-latest", "ubuntu-latest", "windows-latest"]
     steps:
       - uses: actions/checkout@v2
-
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
           activate-environment: qmcpy
           environment-file: environment.yml
           auto-activate-base: false
-
-      - name: Show conda info
-        shell: bash -l {0}
+      - shell: bash -l {0}
         run: |
           conda info
           conda list
-
-      - name: Install QMCPy (editable)
-        shell: bash -l {0}
-        run: pip install -e .
-
-      - name: Run test-suite on all cores
+      - name: Install QMCPy 
         shell: bash -l {0}
         run: |
-          if ${{ matrix.with_docker }}; then
-            make -j"$(nproc)" tests          # Linux path, uses Docker
-          else
-            make -j"$(nproc)" tests_no_docker # macOS / Windows path
-          fi
-
-      - name: Generate coverage.xml
+          pip install -e .
+      - name: Run Tests
         shell: bash -l {0}
-        run: python -m coverage xml -i
-
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            make tests
+          else
+            make tests_no_docker
+          fi
       - name: Upload to Codecov
         shell: bash -l {0}
-        run: curl -s https://codecov.io/bash | bash
+        run: |
+          python -m coverage xml -i # genereate coverage.xml
+          # python -m codecov -t e87cdb03-ccdd-44df-9849-8c5bc460cb9e  # fails without token
+          # bash <(curl https://codecov.io/bash)
+          curl -s https://codecov.io/bash | bash
