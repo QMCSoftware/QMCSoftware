@@ -139,7 +139,7 @@ doctest_parallel:
 		--ignore=qmcpy/integrand/um_bridge_wrapper.py qmcpy
 
 # Aggregate: run all three parallel suites
-tests_parallel: fasttest_parallel longtest_parallel doctest_parallel
+tests_parallel: fasttest_parallel longtest_parallel doctest_parallel coverage
 
 # --------------------------------------------------------------------------- #
 # Miscellaneous utility targets                                               #
