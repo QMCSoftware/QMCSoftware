@@ -25,13 +25,13 @@ pip install -e .
 Doctests and unittests take a few minute to run with
 
 ~~~
-make tests_no_docker
+make -j tests_no_docker
 ~~~
 
 Optionally, you may install [Docker](https://www.docker.com/products/docker-desktop/) and then run all tests with 
 
 ~~~
-make tests
+make -j tests
 ~~~
 
 After installing [Pandoc](https://pandoc.org/installing.html) and [LaTeX](https://www.latex-project.org/get/), documentation may be compiled into your preferred format with
