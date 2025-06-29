@@ -28,9 +28,9 @@ jobs:
         shell: bash -l {0}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            make -j tests
+            make -O -j$(nproc)
           else
-            make -j tests_no_docker
+            make tests_no_docker
           fi
       - name: Upload to Codecov
         shell: bash -l {0}
