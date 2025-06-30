@@ -28,9 +28,9 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
     """
     try:
         import matplotlib.pyplot as plt
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        plt.style.use(os.path.join(dir_path, "../qmcpy.mplstyle"))
         from matplotlib import colors
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        plt.style.use(os.path.join(dir_path, "qmcpy.mplstyle"))
     except:
         raise ImportError("Missing matplotlib.pyplot as plt, Matplotlib must be installed to run plot_proj function")
     plt.rcParams['font.family'] = font_family 
@@ -40,7 +40,6 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
     samples = sampler(n[n.size - 1])    
     d = samples.shape[1]
     fig, ax = plt.subplots(nrows=d_horizontal.size, ncols=d_vertical.size, figsize=(figfac*d_horizontal.size, figfac*d_vertical.size),squeeze=False)                    
-    fig.tight_layout(pad=2)
     
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
     for i in range(d_horizontal.size):         
@@ -90,4 +89,5 @@ def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True,
                     n_min = n[m]
     plt.suptitle(fig_title,fontsize = 20, y = where_title)
     #fig.text(0.55,0.55,fig_title, ha = 'center', va = 'center', fontsize = 20) %replaced by plt.suptitle
+    fig.tight_layout()#pad=2)
     return fig, ax
