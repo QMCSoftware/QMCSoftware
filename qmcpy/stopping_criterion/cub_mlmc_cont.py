@@ -131,6 +131,19 @@ class CubMLMCCont(AbstractCubMCML):
 
     def integrate(self):
         t_start = time()
+        data = self._construct_data()
+        # Loop over coarser tolerances
+        for t in range(self.n_tols):
+            self.rmse_tol = self.inflate**(self.n_tols-t-1)*self.target_tol # Set new target tolerance
+            self._integrate(data)
+        data.stopping_crit = self
+        data.integrand = self.integrand
+        data.true_measure = self.integrand.true_measure
+        data.discrete_distrib = self.true_measure.discrete_distrib
+        data.time_integrate = time()-t_start
+        return data.solution,data
+    
+    def _construct_data(self):
         data = Data(parameters=[
             'solution',
             'n_total',
@@ -151,17 +164,8 @@ class CubMLMCCont(AbstractCubMCML):
         data.beta = np.maximum(0,self.beta0)
         data.gamma = np.maximum(0,self.gamma0)
         data.level_integrands = []
-        # Loop over coarser tolerances
-        for t in range(self.n_tols):
-            self.rmse_tol = self.inflate**(self.n_tols-t-1)*self.target_tol # Set new target tolerance
-            self._integrate(data)
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time()-t_start
-        return data.solution,data
-    
+        return data
+
     def _integrate(self, data):
         self.theta = self.theta_init
         data.levels = int(self.levels_min)
