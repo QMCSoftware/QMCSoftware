@@ -108,7 +108,7 @@ dev = [ # brew install weasyprint
 run-setuptools = true
 includes = [
     "qmcpy",
-    "qmcpy/discrete_distribution/c_lib/*.h",
+    "qmcpy/discrete_distribution/_c_lib/*.h",
     "qmcpy/discrete_distribution/digital_net_b2/generating_matrices/*.npy",
     "qmcpy/discrete_distribution/lattice/generating_vectors/*.npy",
     "qmcpy/util/qmcpy.mplstyle",
