@@ -3,7 +3,6 @@ from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..util import ParameterError,ParameterWarning
 import qmctoolscl
 import numpy as np
-from ._c_lib import _load_c_lib
 from math import *
 from copy import deepcopy
 
@@ -219,6 +218,7 @@ class Halton(AbstractLDDiscreteDistribution):
         if self.randomize=="NO": self.randomize = "FALSE"
         assert self.randomize in ["LMS_PERM","LMS_DS","LMS","PERM","DS","NUS","QRNG","FALSE"]
         if self.randomize=="QRNG":
+            from ._c_lib import _load_c_lib
             assert self.replications==1, "QRNG requires replications=1"
             self.randu_d_32 = self.rng.uniform(size=(self.d,32))
             _c_lib = _load_c_lib()
