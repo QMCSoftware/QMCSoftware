@@ -4,7 +4,7 @@ def _load_c_lib():
     from glob import glob
     import os
     _c_lib = None
-    for file in glob(dirname(abspath(__file__)) + os.sep + "_custom_c_lib*"):
+    for file in glob(dirname(abspath(__file__)) + os.sep + "_c_lib*"):
         try:
             _c_lib = CDLL(file, mode=RTLD_GLOBAL)
             break
