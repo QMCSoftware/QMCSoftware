@@ -1,7 +1,8 @@
 from .brownian_motion import BrownianMotion
 from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
-from numpy import exp, zeros, minimum, array, sqrt
+from numpy import exp, zeros, minimum, array, sqrt, log, pi, linalg, eye
+from scipy.stats import multivariate_normal
 
 
 class GeometricBrownianMotion(BrownianMotion):
@@ -47,6 +48,7 @@ class GeometricBrownianMotion(BrownianMotion):
         self.diffusion = diffusion
         self.mean_gbm = self._compute_gbm_mean()
         self.covariance_gbm = self._compute_gbm_covariance()
+        self._setup_lognormal_distribution()
         self._validate_input()
 
     def _compute_gbm_mean(self):
@@ -70,7 +72,6 @@ class GeometricBrownianMotion(BrownianMotion):
         # So we don't multiply by self.diffusion again here
         exponent = (self.drift - 0.5 * self.diffusion**2) * self.time_vec + bm_samples
         samples = self.initial_value * exp(exponent)
-        self._validate_samples(samples, strict=True)
         return samples
   
 
@@ -131,5 +132,38 @@ class GeometricBrownianMotion(BrownianMotion):
         
         return validation_results
 
+    def _setup_lognormal_distribution(self):
+        """Setup scipy multivariate normal for the log-transformed variables."""
+        # Mean of log(S(t)/S0): (drift - 0.5*diffusion^2) * t
+        log_mean = (self.drift - 0.5 * self.diffusion**2) * self.time_vec
+        
+        # Covariance of log returns: diffusion^2 * min(t_i, t_j)
+        time_matrix = minimum.outer(self.time_vec, self.time_vec)
+        log_cov = self.diffusion**2 * time_matrix
+        
+        self.log_mvn_scipy = multivariate_normal(mean=log_mean, cov=log_cov, allow_singular=True)
 
-
+    def _weight(self, x):
+        """
+        Compute PDF of multivariate log-normal distribution.
+        For log-normal: f(x) = (1/∏x_i) * φ(log(x/S0)) where φ is multivariate normal PDF.
+        
+        Args:
+            x (ndarray): GBM sample paths of shape (n_samples, n_timepoints)
+            
+        Returns:
+            ndarray: PDF values for each sample path
+        """
+        if x.ndim == 1:
+            x = x.reshape(1, -1)
+        
+        # Transform to log space: log(x/S0)
+        log_transformed = log(x / self.initial_value)
+        
+        # Get PDF of underlying multivariate normal
+        normal_pdf = self.log_mvn_scipy.pdf(log_transformed)
+        
+        # Apply Jacobian transformation: divide by product of x values
+        jacobian = 1.0 / x.prod(axis=1)
+        
+        return normal_pdf * jacobian

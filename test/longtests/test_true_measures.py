@@ -25,3 +25,6 @@ class TestGeometricBrownianMotion(unittest.TestCase):
         print(f"Variance: {emp_var:.2f} (theoretical: {theo_var:.2f})")
         self.assertTrue(abs(emp_mean - theo_mean) / theo_mean < 0.1)
         self.assertTrue(abs(emp_var - theo_var) / theo_var < 0.1)
+
+        # Check if the paths are positive using _validate_samples()
+        self.assertTrue(gbm._validate_samples(paths), "Sample paths should be positive.")
