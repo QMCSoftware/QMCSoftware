@@ -3,8 +3,7 @@ from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..util import ParameterError,ParameterWarning
 import qmctoolscl
 import numpy as np
-from ._c_lib import _c_lib
-import ctypes
+from ._c_lib import _load_c_lib
 from math import *
 from copy import deepcopy
 
@@ -173,16 +172,6 @@ class Halton(AbstractLDDiscreteDistribution):
         Gain coefficients for scrambled Halton points.  
         [arXiv:2308.08035](https://arxiv.org/abs/2308.08035) [stat.CO]. 2023. 
     """
-    halton_cf_qrng = _c_lib.halton_qrng
-    halton_cf_qrng.argtypes = [
-        ctypes.c_int,  # n
-        ctypes.c_int,  # d
-        ctypes.c_int, # n0
-        ctypes.c_int, # generalized
-        np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'), # res
-        np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'), # randu_d_32
-        np.ctypeslib.ndpointer(ctypes.c_int, flags='C_CONTIGUOUS')]  # dvec
-    halton_cf_qrng.restype = None
 
     def __init__(self,
                  dimension = 1,
@@ -232,6 +221,18 @@ class Halton(AbstractLDDiscreteDistribution):
         if self.randomize=="QRNG":
             assert self.replications==1, "QRNG requires replications=1"
             self.randu_d_32 = self.rng.uniform(size=(self.d,32))
+            _c_lib = _load_c_lib()
+            import ctypes
+            self.halton_cf_qrng = _c_lib.halton_qrng
+            self.halton_cf_qrng.argtypes = [
+                ctypes.c_int,  # n
+                ctypes.c_int,  # d
+                ctypes.c_int, # n0
+                ctypes.c_int, # generalized
+                np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'), # res
+                np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'), # randu_d_32
+                np.ctypeslib.ndpointer(ctypes.c_int, flags='C_CONTIGUOUS')]  # dvec
+            self.halton_cf_qrng.restype = None
         self.primes = self.all_primes[self.dvec]
         self.m_max = int(np.ceil(np.log(self.n_limit)/np.log(self.primes.min())))
         self._t_curr = self.m_max
