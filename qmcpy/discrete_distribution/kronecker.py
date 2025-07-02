@@ -4,6 +4,7 @@ import time
 
 class Kronecker(LD):
     def __init__(self, dimension=1, replications=1, randomize=False, alpha = 0, delta = 0, seed_alpha=None, seed = None, order='natural', d_max=None, m_max=None):
+        # attributes required for cub_qmc_clt.py
         self.mimics = 'StdUniform'
         self.d = dimension
         self.replications = replications
@@ -12,8 +13,7 @@ class Kronecker(LD):
         self.low_discrepancy = True
         self.d_max = dimension
         self.m_max = int(1e7)
-        self.order = order
-        self.dimension = dimension
+        # self.order = order
         
         if sum(alpha) == 0:
             self.alpha = random.rand(dimension)
@@ -32,7 +32,7 @@ class Kronecker(LD):
         return Kronecker(
                 dimension=dimension,
                 randomize=self.randomize,
-                order=self.order,
+                # order=self.order,
                 seed=child_seed,
                 d_max=self.d_max,
                 m_max=self.m_max,
@@ -46,17 +46,46 @@ class Kronecker(LD):
 
         if self.randomize:
             # different for each component
-            delta = random.rand(1)
+            delta = random.rand(self.dimension, 1)
         else:
             delta = self.delta
 
-        return ((i* self.alpha) + delta) % 1
+        return ((i * self.alpha) + delta) % 1
     
-    # could default k_tilde to bernoulli
-    # k_tilde could be a tuple (function, integral)
-    def periodic_discrepancy(self, n, k_tilde, gamma, int_k_tilde):
+
+    def periodic_discrepancy(self, n, k_tilde=None, gamma=None):
+        """
+        Calculates the discrepancy for a periodic kernel.
+
+        Args:
+            n (int): the number of sample points
+            k_tilde (tuple(function, float)): the function takes in 2 arguments: the sample points and the coordinate weights.
+                The float is the integral over the unit hypercube.
+            gamme (ndarray): shape (1xd)
+
+        Returns:
+            float
+        
+        Note:
+            If k_tilde is not specified, the second Bernoulli polynomial is used.
+            If gamma is not specified, the coordinate weights will be just all ones.
+        """
+        if gamma is None:
+            gamma = ones(self.dimension)
+
+        if k_tilde is None:
+            k_tilde = (lambda x, gamma: prod(1 + (x * (x - 1) + 1/6) * gamma, axis=1), 1)
+
+        return sqrt(self._square_periodic_discrepancies(n, k_tilde, gamma))
+        
+    # calculates the weighted sum of square discrepancy
+    def wssd_discrepancy(self, n, weights, k_tilde, gamma, int_k_tilde):
+        discrepancies = self._square_periodic_discrepancies(n, weights, k_tilde, gamma, int_k_tilde)
+        return cumsum(weights * discrepancies)
+    
+    def _square_periodic_discrepancies(self, n, k_tilde, gamma):
         n_array = arange(1, n + 1)
-        k_tilde_terms = k_tilde(self.gen_samples(n=n), gamma)
+        k_tilde_terms = k_tilde[0](self.gen_samples(n=n), gamma)
 
         left_sum = cumsum(k_tilde_terms[1:]) * n_array[1:]
         right_sum = cumsum(n_array[:-1] * k_tilde_terms[1:])
@@ -64,42 +93,8 @@ class Kronecker(LD):
         k_tilde_zero_terms = k_tilde_terms[0] * n_array
         summation = zeros(n)
         summation[1:] = left_sum - right_sum
-        return sqrt((k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - int_k_tilde)
+        return (k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - k_tilde[1]
     
 
-    def test(self, n, weights, k_tilde, gamma, int_k_tilde):
-        discrepancies = self._square_periodic_discrepancies(n, weights, k_tilde, gamma, int_k_tilde) # O(N)
-        return cumsum(weights * discrepancies) # O(2N)
+
     
-
-    def wssd_discrepancy(self, sample, n, weights, k_tilde, gamma, int_k_tilde):
-        beta = sum(weights)
-        b_hat = weights / (arange(1, n + 1) ** 2)
-        b_tilde = cumsum(flip(b_hat))
-
-        A = roll(b_tilde, 1)
-        A[0] = 0
-
-        b_tilde = A + flip(b_hat)
-        b = flip(cumsum(b_tilde))
-
-        kernelkron = sample.reshape((n, 1)) * array([k_tilde(x, gamma) for x in self.gen_samples(n)])
-        wssd = -1 * beta * int_k_tilde + b[0] * kernelkron[0,:] + 2 * sum((b[1:n]).reshape((n-1, 1)) * kernelkron[1:n,:], 0)
-        return wssd
-    
-
-    def _square_periodic_discrepancies(self, n, weights, k_tilde, gamma, int_k_tilde):
-        n_array = arange(1, n + 1)
-        k_tilde_terms = array([k_tilde(x, gamma) for x in self.gen_samples(n)])
-
-        left_sum = cumsum(k_tilde_terms[1:]) * n_array[1:]
-        right_sum = cumsum(n_array[:-1] * k_tilde_terms[1:])
-        
-        zero_term = array([0])
-        left_sum = append(zero_term, left_sum)
-        right_sum = append(zero_term, right_sum)
-        
-        k_tilde_zero_terms = k_tilde_terms[0] * n_array
-        summation = left_sum - right_sum
-
-        return (k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - int_k_tilde
