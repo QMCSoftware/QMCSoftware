@@ -39,7 +39,7 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.true_measure.discrete_distrib
+        self.discrete_distrib = self.integrand.discrete_distrib
         super(AbstractCubBayesLDG,self).__init__(allowed_distribs=allowed_distribs,allow_vectorized_integrals=True)
         assert self.integrand.discrete_distrib.no_replications==True, "Require the discrete distribution has replications=None"
         assert self.integrand.discrete_distrib.randomize!="FALSE", "Require discrete distribution is randomized"

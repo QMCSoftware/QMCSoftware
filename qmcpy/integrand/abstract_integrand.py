@@ -196,9 +196,10 @@ class AbstractIntegrand(object):
     def _g(self, t, *args, **kwargs):
         if self.parallel:
             pool = get_context(method='fork').Pool(processes=self.parallel) if self.threadpool==False else ThreadPool(processes=self.parallel) 
-            y = pool.starmap(self._g2,zip(t,np.repeat((args,kwargs))))
+            t_flat = t.reshape((-1,t.shape[-1]))
+            y_flat = pool.starmap(self._g2,zip(t_flat,repeat((args,kwargs))))
             pool.close()
-            y = np.concatenate(y,dtype=float)
+            y = np.stack(y_flat,axis=-1).reshape((self.d_indv+t.shape[:-1]))
         else:
             y = self._g2(t,comb_args=(args,kwargs))
         expected_y_shape = (self.d_indv+t.shape[:-1])

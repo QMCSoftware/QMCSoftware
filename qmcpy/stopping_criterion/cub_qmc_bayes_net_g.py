@@ -2,7 +2,6 @@ from .abstract_cub_bayes_ld_g import AbstractCubBayesLDG
 from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
 from ..util import fwht,omega_fwht,MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
-from ..discrete_distribution._c_lib import _c_lib
 import ctypes
 import numpy as np
 from time import time
@@ -135,7 +134,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             lower_bound     0
             upper_bound     1
         DigitalNetB2 (AbstractLDDiscreteDistribution)
-            d               6
+            d               3
             replications    1
             randomize       LMS_DS
             gen_mats_source joe_kuo.6.21201.txt

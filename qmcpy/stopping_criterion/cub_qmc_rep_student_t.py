@@ -154,7 +154,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             lower_bound     0
             upper_bound     1
         DigitalNetB2 (AbstractLDDiscreteDistribution)
-            d               6
+            d               3
             replications    25
             randomize       LMS_DS
             gen_mats_source joe_kuo.6.21201.txt
@@ -234,7 +234,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
-        self.discrete_distrib = self.true_measure.discrete_distrib
+        self.discrete_distrib = self.integrand.discrete_distrib
         super(CubQMCRepStudentT,self).__init__(allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=True)
         assert self.integrand.discrete_distrib.replications>1, "Require the discrete distribution has replications>1"
         assert self.integrand.discrete_distrib.randomize!="FALSE", "Require discrete distribution is randomized"

@@ -130,7 +130,7 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
             lower_bound     0
             upper_bound     1
         Lattice (AbstractLDDiscreteDistribution)
-            d               6
+            d               3
             replications    1
             randomize       SHIFT
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt

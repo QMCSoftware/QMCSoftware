@@ -20,8 +20,8 @@ nav:
 
 plugins:
   - search
-  - mkdocs-jupyter:
-      ignore_h1_titles: True
+  # - mkdocs-jupyter:
+  #     ignore_h1_titles: True
   - mkdocstrings:
       #enabled: !ENV [ENABLE_MKDOCSTRINGS, true]
       #custom_templates: templates

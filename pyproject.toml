@@ -97,6 +97,7 @@ dev = [ # brew install weasyprint
     "mkdocs-with-pdf >= 0.9.3",
     "graphviz >= 0.20.0",
     "scikit-learn >= 1.0.0",
+    "scikit-optimize >= 0.10.2",
     "mkpdfs-mkdocs >= 1.0.1",
     "mkdocs-print-site-plugin >= 2.7.2",
     "mkdocs-exclude >= 1.0.2",
@@ -107,9 +108,11 @@ dev = [ # brew install weasyprint
 run-setuptools = true
 includes = [
     "qmcpy",
-    "qmcpy/discrete_distribution/c_lib/*.h",
+    "qmcpy/discrete_distribution/_c_lib/*.h",
+    "qmcpy/discrete_distribution/_c_lib/*.c",
     "qmcpy/discrete_distribution/digital_net_b2/generating_matrices/*.npy",
     "qmcpy/discrete_distribution/lattice/generating_vectors/*.npy",
+    "qmcpy/util/qmcpy.mplstyle",
     ]
 excludes = []
 
