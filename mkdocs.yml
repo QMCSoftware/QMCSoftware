@@ -7,8 +7,12 @@ nav:
     - Integrands: integrands.md
     - Stopping Criteria: stopping_criteria.md
     - Util: util.md
-  # - Demos:
-  #   - Fast GP Net: examples/simple/fgp_dnb2.ipynb
+  - Demos:
+    - Getting Started:
+      - Introduction: demos/qmcpy_intro.ipynb
+      - Quickstart: demos/quickstart.ipynb
+    - Publication Notebooks:
+      - 2025 JOSS: demos/talk_paper_demos/JOSS2025/joss2025.ipynb
   - Development:
     - Citing QMCPy: citation.md
     - Community: community.md
@@ -20,8 +24,26 @@ nav:
 
 plugins:
   - search
-  # - mkdocs-jupyter:
-  #     ignore_h1_titles: True
+  - mkdocs-jupyter:
+      ignore_h1_titles: true    # Include H1 from notebooks
+      execute: false              # Execute notebooks during build
+      include_source: true       # Add download link for source notebooks
+      remove_empty_cells: true
+      # theme: dark               # Use dark theme for code cells
+      # include: ["*.ipynb"]  # File patterns to include
+      # execute_ignore: []  # Skip certain files
+      # allow_errors: false        # Fail build on notebook errors
+      # kernel_name: python3       # Specify kernel to use
+      # show_input: true          # Show input cells by default
+      # no_input: false           # Don't hide all inputs
+      # remove_tag_config:
+      #   remove_cell_tags:
+      #     - "hide"              # Hide cells with these tags
+      #     - "hide-cell"
+      #   remove_all_outputs_tags:
+      #     - "hide-output"       # Hide outputs for tagged cells
+      #   remove_input_tags:
+      #     - "hide-input"        # Hide input for tagged cells
   - mkdocstrings:
       #enabled: !ENV [ENABLE_MKDOCSTRINGS, true]
       #custom_templates: templates
@@ -62,6 +84,7 @@ theme:
   color_mode: auto
   user_color_mode_toggle: True
   features:
+    # - navigation.instant
     - navigation.expand
     - toc.follow
     - navigation.sections
@@ -89,6 +112,8 @@ markdown_extensions:
   - toc
   - attr_list
   - admonition
+  # - mdx_math
+  - extra
   - pymdownx.superfences
   - pymdownx.details
   - pymdownx.arithmatex:
@@ -100,6 +125,11 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+
 extra_javascript:
-  - javascripts/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css

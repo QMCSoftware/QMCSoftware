@@ -1,4 +1,4 @@
-from .abstract_cub_mc_ml import AbstractCubMCML
+from .abstract_cub_mlmc import AbstractCubMLMC
 from ..util.data import Data
 
 from ..discrete_distribution import IIDStdUniform
@@ -12,7 +12,7 @@ from time import time
 import warnings
 
 
-class CubMLMC(AbstractCubMCML):
+class CubMLMC(AbstractCubMLMC):
     """
     Multilevel IID Monte Carlo stopping criterion.
     

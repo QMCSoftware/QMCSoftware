@@ -1,6 +1,5 @@
-from .abstract_cub_qmc_ml import AbstractCubQMCML
+from .abstract_cub_mlqmc import AbstractCubMLQMC
 from ..util.data import Data
-
 from ..discrete_distribution import DigitalNetB2,Lattice,Halton
 from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..true_measure import Gaussian
@@ -12,7 +11,7 @@ from time import time
 import warnings
 
 
-class CubMLQMC(AbstractCubQMCML):
+class CubMLQMC(AbstractCubMLQMC):
     """
     Multilevel Quasi-Monte Carlo stopping criterion.
 
