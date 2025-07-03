@@ -28,6 +28,7 @@ class Kronecker(LD):
 
         super(Kronecker,self).__init__(dimension,seed)
 
+
     def _spawn(self, child_seed, dimension):
         return Kronecker(
                 dimension=dimension,
@@ -38,7 +39,8 @@ class Kronecker(LD):
                 m_max=self.m_max,
                 replications=self.replications)
     
-    def gen_samples(self, n_min=0, n_max=0, n=None):
+
+    def gen_samples(self, n=None, n_min=0, n_max=0):
         if n is None:
             n = n_max - n_min
 
@@ -46,7 +48,7 @@ class Kronecker(LD):
 
         if self.randomize:
             # different for each component
-            delta = random.rand(self.dimension, 1)
+            delta = random.rand(1, self.dimension)
         else:
             delta = self.delta
 
@@ -78,11 +80,13 @@ class Kronecker(LD):
 
         return sqrt(self._square_periodic_discrepancies(n, k_tilde, gamma))
         
+
     # calculates the weighted sum of square discrepancy
     def wssd_discrepancy(self, n, weights, k_tilde, gamma, int_k_tilde):
         discrepancies = self._square_periodic_discrepancies(n, weights, k_tilde, gamma, int_k_tilde)
         return cumsum(weights * discrepancies)
     
+
     def _square_periodic_discrepancies(self, n, k_tilde, gamma):
         n_array = arange(1, n + 1)
         k_tilde_terms = k_tilde[0](self.gen_samples(n=n), gamma)
@@ -94,7 +98,3 @@ class Kronecker(LD):
         summation = zeros(n)
         summation[1:] = left_sum - right_sum
         return (k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - k_tilde[1]
-    
-
-
-    
