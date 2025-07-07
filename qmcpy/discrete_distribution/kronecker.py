@@ -2,6 +2,8 @@ from ._discrete_distribution import LD
 from numpy import *
 import time
 
+PRIMES = [] # store some amount of primes and if d > len(PRIMES) then generate more? the square root of the numbers modulo 1 would be stored
+
 class Kronecker(LD):
     def __init__(self, dimension=1, replications=1, randomize=False, alpha = 0, delta = 0, seed_alpha=None, seed = None, order='natural', d_max=None, m_max=None):
         # attributes required for cub_qmc_clt.py
@@ -25,6 +27,11 @@ class Kronecker(LD):
             self.delta = random.rand(dimension)
         elif sum(delta) != 0:
             self.delta = delta
+
+        if type(alpha) == list and alpha[0] == 'richtmyer':
+            if dimension <= len(PRIMES):
+                self.alpha = (PRIMES[:dimension])
+            # else: generate more primes?
 
         super(Kronecker,self).__init__(dimension,seed)
 
