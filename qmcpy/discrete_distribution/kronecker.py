@@ -14,7 +14,7 @@ class Kronecker(LD):
         self.dimension = dimension
         self.low_discrepancy = True
         self.d_max = dimension
-        self.m_max = int(1e7)
+        self.m_max = int(1e10)
         # self.order = order
         
         if sum(alpha) == 0:
