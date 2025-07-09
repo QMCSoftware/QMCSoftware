@@ -1,8 +1,18 @@
 from ._discrete_distribution import LD
 from numpy import *
+from sympy import nextprime
 import time
 
-PRIMES = [] # store some amount of primes and if d > len(PRIMES) then generate more? the square root of the numbers modulo 1 would be stored
+PRIMES = array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41, 
+                43,  47,  53,  59,  61,  67,  71,  73,  79,  83,  89,  97, 101,
+                103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167,
+                173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239,
+                241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313,
+                317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397,
+                401, 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463, 467,
+                479, 487, 491, 499, 503, 509, 521, 523, 541])
+
+RICHTMYER = sqrt(PRIMES) % 1
 
 class Kronecker(LD):
     def __init__(self, dimension=1, replications=1, randomize=False, alpha = 0, delta = 0, seed_alpha=None, seed = None, order='natural', d_max=None, m_max=None):
@@ -17,22 +27,27 @@ class Kronecker(LD):
         self.m_max = int(1e10)
         # self.order = order
         
-        if sum(alpha) == 0:
-            self.alpha = random.rand(dimension)
+        # plain string
+        if type(alpha) == list and type(alpha[0]) == str:
+            if alpha[0].lower() == 'richtmyer':
+                if dimension <= len(PRIMES):
+                    self.alpha = RICHTMYER[:dimension]
+                else:
+                    print(len(RICHTMYER))
+                    self.alpha = append(RICHTMYER, [sqrt(nextprime(PRIMES[-1], ith=x)) % 1 for x in range(1, dimension - len(PRIMES) + 1)])
         else:
-            self.alpha = alpha
+            if sum(alpha) == 0:
+                self.alpha = random.rand(dimension)
+            else:
+                self.alpha = alpha
+
         if sum(delta) == 0 and seed == None:
             self.delta = zeros(dimension)
         elif sum(delta) == 0 and seed != None:
             self.delta = random.rand(dimension)
         elif sum(delta) != 0:
             self.delta = delta
-
-        if type(alpha) == list and alpha[0] == 'richtmyer':
-            if dimension <= len(PRIMES):
-                self.alpha = (PRIMES[:dimension])
-            # else: generate more primes?
-
+            
         super(Kronecker,self).__init__(dimension,seed)
 
 
