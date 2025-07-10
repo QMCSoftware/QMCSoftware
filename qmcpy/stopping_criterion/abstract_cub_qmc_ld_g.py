@@ -4,6 +4,7 @@ from ..util.data import Data
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 from ..integrand import AbstractIntegrand
 import numpy as np
+from scipy.stats import gaussian_kde
 from time import time
 import warnings
 
@@ -231,3 +232,64 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         if rel_tol is not None:
             self.rel_tol = rel_tol
             self.rel_tols = np.full(self.integrand.d_comb,self.rel_tol)
+
+    def density_estimation(self, plot_estimation_flag=False):
+        approx_solution, data = self.integrate()
+        g = data.datum[0].y_val
+        if g.ndim != 1:
+            raise ValueError("The KDE only works for single-variate data.")
+        a = min(g)
+        b = max(g)
+        
+        unique_values, counts = np.unique(g, return_counts=True)
+        repeated_values = unique_values[counts>1] # Find elements that are repeated (count > 1)
+        values_cont = unique_values[counts==1]
+        kde_discrete = counts[counts>1] / len(g) # Probability of each discrete value
+        prob = len(values_cont) / len(g) # Probability of being continous
+        kde_cont = gaussian_kde(values_cont)
+
+        def kde_evaluate(values):
+            """
+            Args:
+            values: A vector of n points.
+            """
+            values = np.atleast_1d(values)
+            if values.ndim != 1:
+                raise ParameterError("Values must be a vector of n points.")
+            densities = kde_cont.evaluate(values) * prob
+            discrete_indices = []
+            discrete_values = []
+            for i in range(len(values)):
+                if values[i] in repeated_values:
+                    densities[i] = kde_discrete
+                    discrete_indices.append(i)
+                    discrete_values.append(values[i])
+            discrete_indices = np.array(discrete_indices)
+            discrete_values = np.array(discrete_values)
+            print("The values from KDE:", densities)
+            if len(discrete_indices) > 0:
+                values = np.delete(values,discrete_indices)
+                print("The values whose probability was computed using Probability Mass Function (PMF):", discrete_values)
+            print("The values whose probability was computed using Probability Density Function (PDF):", values)
+        # End kde_evaluate function
+
+        if plot_estimation_flag == True:
+            import matplotlib.pyplot as plt
+            z = np.linspace(a, b, 100)
+            pdf_est = kde_cont.evaluate(z) * prob
+            fig, ax1 = plt.subplots()
+            color = 'tab:red'
+            ax1.set_xlabel('x')
+            ax1.set_ylabel('Density', color=color)
+            ax1.plot(z, pdf_est, color=color)
+            ax1.tick_params(axis='y', labelcolor=color)
+            
+            ax2 = ax1.twinx() # Instantiate a second axes that shares the same x-axis
+            color = 'tab:blue'
+            ax2.set_ylabel('Probability', color=color) # We already handled the x-label with ax1
+            plt.vlines(x=repeated_values, ymin=0, ymax=kde_discrete, colors='blue', lw=2, label='vline_single - full height')
+            ax2.tick_params(axis='y', labelcolor=color)
+
+            return kde_evaluate, a, b, approx_solution, data, fig, np.array([ax1, ax2])
+        
+        return kde_evaluate, a, b, approx_solution, data
