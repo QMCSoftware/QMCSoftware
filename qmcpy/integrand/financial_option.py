@@ -521,3 +521,38 @@ def _eurogbmprice(S0, r, T, sigma, K):
     putprice = S0*(priceratio*norm.cdf(xbig)-norm.cdf(xsmall))
     callprice = putprice+S0*(1-priceratio)
     return callprice,putprice
+
+class AsianOption(FinancialOption):
+    def __init__(self, *args, **kwargs):
+        """ Deprecated, please use FinancialOption"""
+        if "option" in kwargs:
+            raise ParameterError("please do not pass 'option' to AsianOption")
+        super(AsianOption,self).__init__(*args, **kwargs, option="ASIAN")
+
+class EuropeanOption(FinancialOption):
+    def __init__(self, *args, **kwargs):
+        """ Deprecated, please use FinancialOption"""
+        if "option" in kwargs:
+            raise ParameterError("please do not pass 'option' to EuropeanOption")
+        super(EuropeanOption,self).__init__(*args, **kwargs, option="EUROPEAN")
+
+class BarrierOption(FinancialOption):
+    def __init__(self, *args, **kwargs):
+        """ Deprecated, please use FinancialOption"""
+        if "option" in kwargs:
+            raise ParameterError("please do not pass 'option' to BarrierOption")
+        super(BarrierOption,self).__init__(*args, **kwargs, option="BARRIER")
+
+class LookbackOption(FinancialOption):
+    def __init__(self, *args, **kwargs):
+        """ Deprecated, please use FinancialOption"""
+        if "option" in kwargs:
+            raise ParameterError("please do not pass 'option' to LookbackOption")
+        super(LookbackOption,self).__init__(*args, **kwargs, option="LOOKBACK")
+
+class DigitalOption(FinancialOption):
+    def __init__(self, *args, **kwargs):
+        """ Deprecated, please use FinancialOption"""
+        if "option" in kwargs:
+            raise ParameterError("please do not pass 'option' to DigitalOption")
+        super(DigitalOption,self).__init__(*args, **kwargs, option="DIGITAL")

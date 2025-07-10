@@ -7,8 +7,46 @@ nav:
     - Integrands: integrands.md
     - Stopping Criteria: stopping_criteria.md
     - Util: util.md
-  # - Demos:
-  #   - Fast GP Net: examples/simple/fgp_dnb2.ipynb
+  - Demos:
+    - Getting Started:
+      - Introduction: demos/qmcpy_intro.ipynb
+      - Quickstart: demos/quickstart.ipynb
+      - Pricing Options: demos/pricing_options.ipynb 
+      - Lebesgue Integration: demos/lebesgue_integration.ipynb
+    - Publication Notebooks:
+      - 2025 JOSS Paper: demos/talk_paper_demos/JOSS2025/joss2025.ipynb
+      - 2025 ACM-TOMS Paper: demos/talk_paper_demos/ACMTOMS_Sorokin_2025/acm_toms_sorokin_2025.ipynb
+      - 2023 Argonne Talk: demos/talk_paper_demos/Argonne_Talk_2023_May/Argonne_2023_Talk_Figures.ipynb
+      - 2022 MCQMC Paper 1: demos/talk_paper_demos/MCQMC2022_Article_Figures/MCQMC2022_Article_Figures.ipynb
+      - 2022 MCQMC Paper 2: 
+        - Vectorized QMC Algorithms Tracking Fourier Coefficient Decay: demos/vectorized_qmc.ipynb
+        - Vectorized QMC Bayesian Cubature: demos/vectorized_qmc_bayes.ipynb
+      - 2023 Probability of Failure Paper: demos/talk_paper_demos/ProbFailureSorokinRao/prob_failure_gp_ci.ipynb
+      - 2023 Purdue Talk: demos/talk_paper_demos/Purdue_Talk_2023_March/Purdue_Talk_Figures.ipynb
+      - 2023 PyData Chicago Talk: demos/talk_paper_demos/pydata.chi.2023.ipynb
+    - Blog Posts:
+      - 2023 Random Lattice Generating Vectors: demos/lattice_random_generator.ipynb
+      - 2022 Bayesian Cubature Stopping Criterion: demos/gaussian_diagnostics/gaussian_diagnostics_demo.ipynb
+      - 2020 Why Add Q to MC?: demos/talk_paper_demos/why_add_q_to_mc_blog/why_add_q_to_mc_blog.ipynb
+      - 2020 Bayesian Optimization Expected Improvement: 
+        - qEI: demos/qei-demo-for-blog.ipynb
+        - Noisy EI: demos/nei_demo.ipynb 
+    - Multilevel (Quasi-)Monte Carlo: 
+      - Single and Multilevel (Q)MC for an Elliptic PDE: demos/elliptic-pde.ipynb
+      - Multilevel (Q)MC for Option Pricing: demos/asian-option-mlqmc.ipynb
+    - Links and Comparisons with Existing Software: 
+      - UM-Bridge: demos/umbridge.ipynb
+      - DAKOTA Halton Points: demos/DAKOTA_Genz/dakota_genz.ipynb
+    - Plotting: 
+      - Plotting Points Automatically: demos/plot_proj_function.ipynb 
+      - Plotting Points Manually: demos/sample_scatter_plots.ipynb
+    - Algorithm Testing:
+      - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
+      - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
+      - Control Variates: demos/control_variates.ipynb 
+      - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
+      - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
+      - Ray Tracing: demos/ray_tracing.ipynb 
   - Development:
     - Citing QMCPy: citation.md
     - Community: community.md
@@ -20,8 +58,26 @@ nav:
 
 plugins:
   - search
-  # - mkdocs-jupyter:
-  #     ignore_h1_titles: True
+  - mkdocs-jupyter:
+      ignore_h1_titles: true    # Include H1 from notebooks
+      execute: false              # Execute notebooks during build
+      include_source: true       # Add download link for source notebooks
+      remove_empty_cells: true
+      # theme: dark               # Use dark theme for code cells
+      # include: ["*.ipynb"]  # File patterns to include
+      # execute_ignore: []  # Skip certain files
+      # allow_errors: false        # Fail build on notebook errors
+      # kernel_name: python3       # Specify kernel to use
+      # show_input: true          # Show input cells by default
+      # no_input: false           # Don't hide all inputs
+      # remove_tag_config:
+      #   remove_cell_tags:
+      #     - "hide"              # Hide cells with these tags
+      #     - "hide-cell"
+      #   remove_all_outputs_tags:
+      #     - "hide-output"       # Hide outputs for tagged cells
+      #   remove_input_tags:
+      #     - "hide-input"        # Hide input for tagged cells
   - mkdocstrings:
       #enabled: !ENV [ENABLE_MKDOCSTRINGS, true]
       #custom_templates: templates
@@ -62,6 +118,7 @@ theme:
   color_mode: auto
   user_color_mode_toggle: True
   features:
+    # - navigation.instant
     - navigation.expand
     - toc.follow
     - navigation.sections
@@ -89,6 +146,8 @@ markdown_extensions:
   - toc
   - attr_list
   - admonition
+  # - mdx_math
+  - extra
   - pymdownx.superfences
   - pymdownx.details
   - pymdownx.arithmatex:
@@ -100,6 +159,11 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+
 extra_javascript:
-  - javascripts/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css

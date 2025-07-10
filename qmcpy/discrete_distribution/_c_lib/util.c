@@ -12,8 +12,8 @@
 // https://stackoverflow.com/questions/34689210/error-exporting-symbol-when-building-python-c-extension-in-windows
 PyMODINIT_FUNC PyInit__c_lib(void)
 {
-    // do stuff...
     printf("");
+    return NULL;
 }
 
 EXPORT int get_unsigned_long_size() { return sizeof(unsigned long); }

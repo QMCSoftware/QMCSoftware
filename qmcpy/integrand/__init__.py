@@ -1,5 +1,11 @@
 from .abstract_integrand import AbstractIntegrand
-from .financial_option import FinancialOption
+from .financial_option import (
+    FinancialOption,
+    AsianOption,
+    EuropeanOption,
+    BarrierOption,
+    LookbackOption,
+    DigitalOption)
 from .keister import Keister
 from .linear0 import Linear0
 from .custom_fun import CustomFun
