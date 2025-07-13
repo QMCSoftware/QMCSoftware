@@ -36,7 +36,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
             order           NATURAL
             t               63
@@ -83,7 +83,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         
         All randomizations 
 
-        >>> DigitalNetB2(dimension=3,randomize='LMS_DS',seed=5)(8)
+        >>> DigitalNetB2(dimension=3,randomize='LMS DS',seed=5)(8)
         array([[4.42642214e-01, 6.86933174e-01, 6.93464013e-01],
                [9.45171550e-01, 4.46137011e-01, 2.00191886e-01],
                [2.48950322e-01, 8.83791037e-02, 3.52266650e-01],
@@ -131,7 +131,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
 
         Higher order nets with randomizations and replications 
                        
-        >>> DigitalNetB2(dimension=3,randomize='LMS_DS',seed=7,replications=2,alpha=2)(4,warn=False)
+        >>> DigitalNetB2(dimension=3,randomize='LMS DS',seed=7,replications=2,alpha=2)(4,warn=False)
         array([[[0.74524716, 0.28314067, 0.39397538],
                 [0.34665532, 0.60613119, 0.62928172],
                 [0.79232263, 0.66555738, 0.34008646],
@@ -216,7 +216,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                  dimension = 1,
                  replications = None,
                  seed = None,
-                 randomize = 'LMS_DS',
+                 randomize = 'LMS DS',
                  generating_matrices = "joe_kuo.6.21201.txt",
                  order = 'NATURAL',
                  t = 63,
@@ -238,7 +238,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             seed (Union[None,int,np.random.SeedSeq): Seed the random number generator for reproducibility.
             randomize (str): Options are
                 
-                - `'LMS_DS'`: Linear matrix scramble with digital shift.
+                - `'LMS DS'`: Linear matrix scramble with digital shift.
                 - `'LMS'`: Linear matrix scramble only.
                 - `'DS'`: Digital shift only.
                 - `'NUS'`: Nested uniform scrambling. Also known as Owen scrambling. 
@@ -327,7 +327,9 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         self.m_max = int(gen_mats.shape[-1])
         if isinstance(generating_matrices,np.ndarray) and msb:
             qmctoolscl.dnb2_gmat_lsb_to_msb(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.tile(np.uint64(self._t_curr),int(gen_mats.shape[0])),gen_mats,gen_mats,backend="c")
-        self.order = str(order).upper()
+        self.order = str(order).upper().strip().replace("_"," ")
+        if self.order=="GRAY CODE": self.order = "GRAY"
+        if self.order=="RADICAL INVERSE": self.order = "NATURAL"
         assert self.order in ['NATURAL','GRAY']
         assert isinstance(t,int) and t>0
         assert self._t_curr<=t<=64, "t must no more than 64 and no less than %d (the number of bits used to represent the generating matrices)"%(self._t_curr)
@@ -338,12 +340,12 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             if self.m_max!=self._t_curr:
                 warnings.warn("Digital interlacing is often performed on matrices with the number of columns (m_max = %d) equal to the number of bits in each int (%d), but this is not the case. Ensure you are NOT setting alpha>1 when generating matrices are already interlaced."%(self.m_max,self._t_curr),ParameterWarning)
         self._verbose = _verbose
-        self.randomize = str(randomize).upper()
-        if self.randomize=="TRUE": self.randomize = "LMS_DS"
+        self.randomize = str(randomize).upper().strip().replace("_"," ")
+        if self.randomize=="TRUE": self.randomize = "LMS DS"
         if self.randomize=="OWEN": self.randomize = "NUS"
         if self.randomize=="NONE": self.randomize = "FALSE"
         if self.randomize=="NO": self.randomize = "FALSE"
-        assert self.randomize in ["LMS_DS","LMS","DS","NUS","FALSE"]
+        assert self.randomize in ["LMS DS","LMS","DS","NUS","FALSE"]
         self.dtalpha = self.alpha*self.d
         if self.randomize=="FALSE":
             if self.alpha==1:
@@ -368,7 +370,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 self._t_curr = t_alpha
                 self.t = t
             self.rshift = qmctoolscl.random_tbit_uint64s(self.rng,self.t,(self.replications,self.d))
-        elif self.randomize in ["LMS","LMS_DS"]:
+        elif self.randomize in ["LMS","LMS DS"]:
             if self.alpha==1:
                 gen_mat_lms = np.empty((self.replications,self.d,self.m_max),dtype=np.uint64)
                 S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.d),np.uint64(self._t_curr),np.uint64(t),np.uint64(self._verbose))
@@ -385,7 +387,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 self.gen_mats = gen_mat_lms_ho
                 self._t_curr = t
                 self.t = self._t_curr
-            if self.randomize=="LMS_DS":
+            if self.randomize=="LMS DS":
                 self.rshift = qmctoolscl.random_tbit_uint64s(self.rng,self.t,(self.replications,self.d))
         elif self.randomize=="NUS":
             if alpha==1:

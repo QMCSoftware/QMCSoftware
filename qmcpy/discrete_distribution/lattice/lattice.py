@@ -227,7 +227,9 @@ class Lattice(AbstractLDDiscreteDistribution):
         gen_vec = np.atleast_2d(gen_vec) 
         assert gen_vec.ndim==2 and gen_vec.shape[1]>=self.d and (gen_vec.shape[0]==1 or gen_vec.shape[0]==self.replications), "invalid gen_vec.shape = %s"%str(gen_vec.shape)
         self.gen_vec = gen_vec[:,self.dvec].copy()
-        self.order = str(order).upper()
+        self.order = str(order).upper().strip().replace("_"," ")
+        if self.order=="GRAY CODE": self.order = "GRAY"
+        if self.order=="RADICAL INVERSE": self.order = "NATURAL"
         assert self.order in ['LINEAR','NATURAL','GRAY']
         self.randomize = str(randomize).upper()
         if self.randomize=="TRUE": self.randomize = "SHIFT"

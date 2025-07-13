@@ -52,7 +52,7 @@ class CubMLQMC(AbstractCubMLQMC):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               1
             replications    2^(5)
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
             order           NATURAL
             t               63

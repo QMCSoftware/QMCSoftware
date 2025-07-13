@@ -26,7 +26,7 @@ class Halton(AbstractLDDiscreteDistribution):
         Halton (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1
-            randomize       LMS_PERM
+            randomize       LMS PERM
             t               63
             n_limit         2^(32)
             entropy         7
@@ -57,12 +57,12 @@ class Halton(AbstractLDDiscreteDistribution):
         
         All randomizations 
 
-        >>> Halton(2,randomize="LMS_PERM",seed=7)(4)
+        >>> Halton(2,randomize="LMS PERM",seed=7)(4)
         array([[0.83790457, 0.89981478],
                [0.00986102, 0.4610941 ],
                [0.62236343, 0.02796307],
                [0.29427505, 0.79909098]])
-        >>> Halton(2,randomize="LMS_DS",seed=7)(4)
+        >>> Halton(2,randomize="LMS DS",seed=7)(4)
         array([[0.82718745, 0.90603116],
                [0.0303368 , 0.44704107],
                [0.60182684, 0.03580544],
@@ -95,7 +95,7 @@ class Halton(AbstractLDDiscreteDistribution):
         
         Replications of randomizations 
 
-        >>> Halton(3,randomize="LMS_PERM",seed=7,replications=2)(4)
+        >>> Halton(3,randomize="LMS PERM",seed=7,replications=2)(4)
         array([[[0.70988236, 0.18180876, 0.54073621],
                 [0.38178158, 0.61168824, 0.64684354],
                 [0.98597752, 0.70650871, 0.31479029],
@@ -105,7 +105,7 @@ class Halton(AbstractLDDiscreteDistribution):
                 [0.44021889, 0.69926312, 0.60133428],
                 [0.89132308, 0.12030255, 0.35715804],
                 [0.04025218, 0.44304244, 0.10724799]]])
-        >>> Halton(3,randomize="LMS_DS",seed=7,replications=2)(4)
+        >>> Halton(3,randomize="LMS DS",seed=7,replications=2)(4)
         array([[[4.57465163e-01, 5.75419751e-04, 7.47353067e-01],
                 [6.29314800e-01, 9.24349881e-01, 8.47915779e-01],
                 [2.37544271e-01, 4.63986168e-01, 1.78817056e-01],
@@ -176,7 +176,7 @@ class Halton(AbstractLDDiscreteDistribution):
                  dimension = 1,
                  replications = None,
                  seed = None, 
-                 randomize = 'LMS_PERM',
+                 randomize = 'LMS PERM',
                  t = 63,
                  n_lim = 2**32,
                  # deprecated
@@ -192,14 +192,14 @@ class Halton(AbstractLDDiscreteDistribution):
             seed (Union[None,int,np.random.SeedSeq): Seed the random number generator for reproducibility.
             randomize (str): Options are
                 
-                - `'LMS_PERM'`: Linear matrix scramble with digital shift.
-                - `'LMS_DS'`: Linear matrix scramble with permutation.
+                - `'LMS PERM'`: Linear matrix scramble with digital shift.
+                - `'LMS DS'`: Linear matrix scramble with permutation.
                 - `'LMS'`: Linear matrix scramble only.
                 - `'PERM'`: Permutation scramble only.
                 - `'DS'`: Digital shift only.
                 - `'NUS'`: Nested uniform scrambling.
                 - `'QRNG'`: Deterministic permutation scramble and random digital shift from QRNG [1] (with `generalize=True`). Does *not* support replications>1.
-                - `'FALSE'`: No randomization. In this case the first point will be the origin. 
+                - `None`: No randomization. In this case the first point will be the origin. 
             t (int): Number of bits in integer represetation of points *after* randomization. The number of bits in the generating matrices is inferred based on the largest value.
             n_lim (int): Maximum number of compatible points, determines the number of rows in the generating matrices. 
         """
@@ -211,12 +211,12 @@ class Halton(AbstractLDDiscreteDistribution):
         d_limit = len(self.all_primes)
         self.input_t = deepcopy(t) 
         super(Halton,self).__init__(dimension,replications,seed,d_limit,n_lim)
-        self.randomize = str(randomize).upper()
-        if self.randomize=="TRUE": self.randomize = "LMS_PERM"
+        self.randomize = str(randomize).upper().strip().replace("_"," ")
+        if self.randomize=="TRUE": self.randomize = "LMS PERM"
         if self.randomize=="OWEN": self.randomize = "NUS"
         if self.randomize=="NONE": self.randomize = "FALSE"
         if self.randomize=="NO": self.randomize = "FALSE"
-        assert self.randomize in ["LMS_PERM","LMS_DS","LMS","PERM","DS","NUS","QRNG","FALSE"]
+        assert self.randomize in ["LMS PERM","LMS DS","LMS","PERM","DS","NUS","QRNG","FALSE"]
         if self.randomize=="QRNG":
             from ._c_lib import _load_c_lib
             assert self.replications==1, "QRNG requires replications=1"
@@ -254,7 +254,7 @@ class Halton(AbstractLDDiscreteDistribution):
             self.root_nodes = np.array([qmctoolscl.NUSNode_gdn() for i in range(self.replications*self.d)]).reshape(self.replications,self.d)
         assert self.C.ndim==4 and (self.C.shape[0]==1 or self.C.shape[0]==self.replications) and self.C.shape[1]==self.d and self.C.shape[2]==self.m_max and self.C.shape[3]==self._t_curr
         assert 0<self._t_curr<=self.t<=64
-        if self.randomize=="FALSE": assert self.C.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating vectors %d"%(self.replications,self.gen_vec.shape[0])
+        if self.randomize=="FALSE": assert self.C.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating vectors %d"%(self.replications,self.C.shape[0])
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if n_min == 0 and self.randomize in ["FALSE","LMS"] and warn:

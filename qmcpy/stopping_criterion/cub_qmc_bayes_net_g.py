@@ -41,7 +41,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
             order           NATURAL
             t               63
@@ -81,7 +81,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
             order           NATURAL
             t               63
@@ -136,7 +136,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
             order           NATURAL
             t               63
