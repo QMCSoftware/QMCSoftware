@@ -115,9 +115,10 @@ def kernel_shift_invar(x, z, alpha=1, weights=1, scale=1):
     Shift invariant kernel with 
     smoothness $\boldsymbol{\alpha}$, product weights $\boldsymbol{\gamma}$, and scale $S$:
     
-    $$K(\boldsymbol{x},\boldsymbol{z}) = S \prod_{j=1}^d \left(1+ \gamma_j \tilde{K}_{\alpha_j}((x_j - z_j) \mod 1))\right),$$ 
-    
-    $$\tilde{K}_\alpha(x) = (-1)^{\alpha+1}\frac{(2 \pi)^{2 \alpha}}{(2\alpha)!} B_{2\alpha}(x)$$
+    $$\begin{aligned}
+        K(\boldsymbol{x},\boldsymbol{z}) &= S \prod_{j=1}^d \left(1+ \gamma_j \tilde{K}_{\alpha_j}((x_j - z_j) \mod 1))\right), \\ 
+        \tilde{K}_\alpha(x) &= (-1)^{\alpha+1}\frac{(2 \pi)^{2 \alpha}}{(2\alpha)!} B_{2\alpha}(x)
+    \end{aligned}$$
 
     where $B_n$ is the $n^\text{th}$ Bernoulli polynomial.
     
@@ -183,7 +184,7 @@ def kernel_shift_invar(x, z, alpha=1, weights=1, scale=1):
         scale (float): Scaling factor $S$. 
 
     Returns: 
-        k (Union[np.ndarray,torch.Tensor]): kernel values with `k.shape==(*batch_shape_x,*batch_shape_z)`. 
+        k (Union[np.ndarray,torch.Tensor]): kernel values with `k.shape=(x+z).shape[:-1]`. 
     """
     assert x.shape[-1]==z.shape[-1]
     d = x.shape[-1] 

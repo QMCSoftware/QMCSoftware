@@ -58,9 +58,9 @@ def weighted_walsh_funcs(alpha, xb, t):
     r"""
     Weighted walsh functions 
 
-    $$\sum_{k=0}^\infty \phi_k(x) 2^{-\mu_\alpha(k)}$$ 
+    $$\sum_{k=0}^\infty \mathrm{wal}_k(x) 2^{-\mu_\alpha(k)}$$ 
 
-    where $\phi_k$ is the $k^\text{th}$ Walsh function 
+    where $\mathrm{wal}_k$ is the $k^\text{th}$ Walsh function 
     and $\mu_\alpha$ is the Dick weight function which sums the first $\alpha$ largest indices of $1$ bits in the binary expansion of $k$ 
     e.g. $k=13=1101_2$ has 1-bit indexes $(4,3,1)$ so 
     
@@ -136,7 +136,7 @@ def weighted_walsh_funcs(alpha, xb, t):
     y[pidxs] = WEIGHTEDWALSHFUNCSPOS[alpha](betapidxs,xfpidxs,xb[pidxs],t)
     return y
 
-def convert_dnb2_float_to_binary(xf, t):
+def float_to_bin(xf, t):
     r"""
     Convert floating point representations of digital net samples in base $b=2$ to binary representations.
 
@@ -144,13 +144,13 @@ def convert_dnb2_float_to_binary(xf, t):
         >>> xf = np.random.Generator(np.random.PCG64(7)).uniform(low=0,high=1,size=(5))
         >>> xf 
         array([0.62509547, 0.8972138 , 0.77568569, 0.22520719, 0.30016628])
-        >>> convert_dnb2_float_to_binary(xf,2)
+        >>> float_to_bin(xf,2)
         array([2, 3, 3, 0, 1], dtype=uint64)
         >>> import torch 
         >>> xffloat = torch.from_numpy(xf) 
         >>> xffloat
         tensor([0.6251, 0.8972, 0.7757, 0.2252, 0.3002], dtype=torch.float64)
-        >>> convert_dnb2_float_to_binary(xffloat,2)
+        >>> float_to_bin(xffloat,2)
         tensor([2, 3, 3, 0, 1])
     
     Args:
@@ -169,7 +169,7 @@ def convert_dnb2_float_to_binary(xf, t):
         xb = torch.floor((xf%1)*2.**t).to(torch.int64)
     return xb
 
-def convert_dnb2_binary_to_float(xb, t):
+def bin_to_float(xb, t):
     r"""
     Convert binary representations of digital net samples in base $b=2$ to floating point representations.
     
@@ -177,12 +177,12 @@ def convert_dnb2_binary_to_float(xb, t):
         >>> xb = np.arange(8,dtype=np.uint64)
         >>> xb 
         array([0, 1, 2, 3, 4, 5, 6, 7], dtype=uint64)
-        >>> convert_dnb2_binary_to_float(xb,3)
+        >>> bin_to_float(xb,3)
         array([0.   , 0.125, 0.25 , 0.375, 0.5  , 0.625, 0.75 , 0.875])
-        >>> xbtorch = convert_dnb2_numpy_binary_to_torch_binary(xb)
+        >>> xbtorch = bin_from_numpy_to_float(xb)
         >>> xbtorch
         tensor([0, 1, 2, 3, 4, 5, 6, 7])
-        >>> convert_dnb2_binary_to_float(xbtorch,3)
+        >>> bin_to_float(xbtorch,3)
         tensor([0.0000, 0.1250, 0.2500, 0.3750, 0.5000, 0.6250, 0.7500, 0.8750],
                dtype=torch.float64)
     
@@ -202,15 +202,15 @@ def convert_dnb2_binary_to_float(xb, t):
         xf = xb.to(torch.float64)*2.**(-t) 
     return xf 
 
-def convert_dnb2_numpy_binary_to_torch_binary(xb):
+def bin_from_numpy_to_float(xb):
     r"""
-    Convert binary representations of digital net samples in base $b=2$ to floating point representations.
+    Convert `numpy.uint64` to `torch.int64`, useful for converting binary samples from `DigitalNetB2` to torch representations.
     
     Examples:
         >>> xb = np.arange(8,dtype=np.uint64)
         >>> xb 
         array([0, 1, 2, 3, 4, 5, 6, 7], dtype=uint64)
-        >>> convert_dnb2_numpy_binary_to_torch_binary(xb)
+        >>> bin_from_numpy_to_float(xb)
         tensor([0, 1, 2, 3, 4, 5, 6, 7])
     
     Args:
@@ -229,16 +229,23 @@ def kernel_dig_shift_invar(x, z, t, alpha=1, weights=1, scale=1):
     Digitally shift invariant kernel in base $b=2$ with 
     smoothness $\boldsymbol{\alpha}$, product weights $\boldsymbol{\gamma}$, and scale $S$: 
     
-    $$K(\boldsymbol{x},\boldsymbol{z}) = S \prod_{j=1}^d \left(1+ \gamma_j \tilde{K}_{\alpha_j}((x_j - z_j) \mod 1))\right),$$ 
-    
-    \begin{align*}
-        \tilde{K}_1(x) =& \sum_{k \in \mathbb{N}} \frac{\mathrm{wal}_k(x)}{2^{2 \beta(x)}} = 6 \left(\frac{1}{6} - 2^{\lfloor \log_2(x) \rfloor-1}\right), 
-        \tilde{K}_2(x) =& \sum_{k \in \mathbb{N}} \frac{\mathrm{wal}_k(x)}{2^{\mu_2(k)}} = -\beta(x) x + \frac{5}{2}\left[1-t_1(x)\right]-1, 
-        \tilde{K}_3(x) =& \sum_{k \in \mathbb{N}} \frac{\mathrm{wal}_k(x)}{2^{\mu_3(k)}} = \beta(x)x^2-5\left[1-t_1(x)\right]x+\frac{43}{18}\left[1-t_2(x)\right]-1, 
-        \tilde{K}_4(x) =& \sum_{k \in \mathbb{N}} \frac{\mathrm{wal}_k(x)}{2^{\mu_4(k)}} = - \frac{2}{3}\beta(x)x^3+5\left[1-t_1(x)\right]x^2 - \frac{43}{9}\left[1-t_2(x)\right]x +\frac{701}{294}\left[1-t_3(x)\right]+\beta(x)\left[\frac{1}{48}\sum_{a=0}^\infty \frac{\wal_{2^a}(x)}{2^{3a}} - \frac{1}{42}\right] - 1.
-    \end{align*}
+    $$\begin{aligned}
+        K(\boldsymbol{x},\boldsymbol{z}) &= S \prod_{j=1}^d \left(1+ \gamma_j \tilde{K}_{\alpha_j}(x_j \oplus z_j)\right), \qquad\mathrm{where} \\
+        \tilde{K}_1(x) &= \sum_{k \in \mathbb{N}} \frac{\mathrm{wal}_k(x)}{2^{2 \lfloor \log_2(x) \rfloor}} = 6 \left(\frac{1}{6} - 2^{\lfloor \log_2(x) \rfloor -1}\right), \\
+        \tilde{K}_2(x) &= \sum_{k \in \mathbb{N}} \frac{\mathrm{wal}_k(x)}{2^{\mu_2(k)}} = -\beta(x) x + \frac{5}{2}\left[1-t_1(x)\right]-1, \\
+        \tilde{K}_3(x) &= \sum_{k \in \mathbb{N}} \frac{\mathrm{wal}_k(x)}{2^{\mu_3(k)}} = \beta(x)x^2-5\left[1-t_1(x)\right]x+\frac{43}{18}\left[1-t_2(x)\right]-1, \\
+        \tilde{K}_4(x) &= \sum_{k \in \mathbb{N}} \frac{\mathrm{wal}_k(x)}{2^{\mu_4(k)}} = - \frac{2}{3}\beta(x)x^3+5\left[1-t_1(x)\right]x^2 - \frac{43}{9}\left[1-t_2(x)\right]x +\frac{701}{294}\left[1-t_3(x)\right]+\beta(x)\left[\frac{1}{48}\sum_{a=0}^\infty \frac{\mathrm{wal}_{2^a}(x)}{2^{3a}} - \frac{1}{42}\right] - 1.
+    \end{aligned}$$
 
-    Here $\mu_\alpha$ is the Dick weight function (see the docs for `weighted_walsh_funcs`), $\beta(x) = - \lfloor \log_2(x) \rfloor, and $t_\nu(x) = 2^{-\nu \beta(x)}$ where $\beta(0)=t_\nu(0) = 0$.
+    where 
+    
+    - $x \oplus z$ is XOR between bits, 
+    - $\mathrm{wal}_k$ is the $k^\text{th}$ Walsh function, 
+    - $\beta(x) = - \lfloor \log_2(x) \rfloor$ and $t_\nu(x) = 2^{-\nu \beta(x)}$ where $\beta(0)=t_\nu(0) = 0$, and 
+    - and $\mu_\alpha$ is the Dick weight function which sums the first $\alpha$ largest indices of $1$ bits in the binary expansion of $k$ 
+    e.g. $k=13=1101_2$ has 1-bit indexes $(4,3,1)$ so 
+    
+    $$\mu_1(k) = 4, \mu_2(k) = 4+3, \mu_3(k) = 4+3+1 = \mu_4(k) = \mu_5(k) = \dots.$$
 
     Examples:
         >>> from qmcpy import DigitalNetB2, fwht
@@ -280,7 +287,7 @@ def kernel_dig_shift_invar(x, z, t, alpha=1, weights=1, scale=1):
         >>> np.allclose(fwht(fwht(y)/lam),np.linalg.solve(kmat,y))
         True
         >>> import torch 
-        >>> xtorch = convert_dnb2_numpy_binary_to_torch_binary(x)
+        >>> xtorch = bin_from_numpy_to_float(x)
         >>> kmat_torch = kernel_dig_shift_invar(xtorch[:,None,:],xtorch[None,:,:],
         ...     t = dnb2.t, 
         ...     alpha = torch.from_numpy(alpha),
@@ -288,11 +295,11 @@ def kernel_dig_shift_invar(x, z, t, alpha=1, weights=1, scale=1):
         ...     scale = scale)
         >>> np.allclose(kmat_torch.numpy(),kmat)
         True
-        >>> xf = convert_dnb2_binary_to_float(x,dnb2.t)
+        >>> xf = bin_to_float(x,dnb2.t)
         >>> kmat_from_floats = kernel_dig_shift_invar(xf[:,None,:],xf[None,:,:],t=dnb2.t,alpha=alpha,weights=weights,scale=scale)
         >>> np.allclose(kmat,kmat_from_floats)
         True
-        >>> xftorch = convert_dnb2_binary_to_float(xtorch,dnb2.t)
+        >>> xftorch = bin_to_float(xtorch,dnb2.t)
         >>> xftorch.dtype
         torch.float64
         >>> kmat_torch_from_floats = kernel_dig_shift_invar(xftorch[:,None,:],xftorch[None,:,:],
@@ -312,7 +319,7 @@ def kernel_dig_shift_invar(x, z, t, alpha=1, weights=1, scale=1):
         scale (float): Scaling factor $S$. 
 
     Returns: 
-        k (Union[np.ndarray,torch.Tensor]): kernel values with `k.shape==(*batch_shape_x,*batch_shape_z)`. 
+        k (Union[np.ndarray,torch.Tensor]): kernel values with `k.shape=(x+z).shape[:-1]`. 
 
     **References:**
         
@@ -345,17 +352,17 @@ def kernel_dig_shift_invar(x, z, t, alpha=1, weights=1, scale=1):
     if isinstance(x,np.ndarray):
         npt = np
         if np.issubdtype(x.dtype,np.floating):
-            x = convert_dnb2_float_to_binary(x,t)
+            x = float_to_bin(x,t)
         if np.issubdtype(z.dtype,np.floating):
-            z = convert_dnb2_float_to_binary(z,t)
+            z = float_to_bin(z,t)
         assert x.dtype==np.uint64 and z.dtype==np.uint64
     else:
         import torch 
         npt = torch
         if torch.is_floating_point(x):
-            x = convert_dnb2_float_to_binary(x,t)
+            x = float_to_bin(x,t)
         if torch.is_floating_point(z):
-            z = convert_dnb2_float_to_binary(z,t)
+            z = float_to_bin(z,t)
         assert isinstance(x,torch.Tensor) and x.dtype==torch.int64 and isinstance(z,torch.Tensor) and z.dtype==torch.int64
     alpha = npt.atleast_1d(alpha)*npt.ones(d,dtype=int)
     assert alpha.shape==(d,)
