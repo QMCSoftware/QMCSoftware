@@ -1,5 +1,6 @@
 import numpy as np 
 from typing import Union
+import scipy.special
 
 class Polynomial():
     """
@@ -52,7 +53,6 @@ def bernoulli_poly(n, x):
     $n^\text{th}$ Bernoulli polynomial
 
     Examples:
-        
         >>> x = np.arange(6).reshape((2,3))/6
         >>> available_n = list(BERNOULLIPOLYSDICT.keys())
         >>> available_n
@@ -109,3 +109,102 @@ def bernoulli_poly(n, x):
     bpoly = BERNOULLIPOLYSDICT[n]
     y = bpoly(x) 
     return y
+
+def kernel_shift_invar(x, z, alpha=1, weights=1, scale=1):
+    r""" 
+    Shift invariant kernel with 
+    smoothness $\boldsymbol{\alpha}$, product weights $\boldsymbol{\gamma}$, and scale $S$:
+    
+    $$K(\boldsymbol{x},\boldsymbol{z}) = S \prod_{j=1}^d \left(1+ \gamma_j \tilde{K}_{\alpha_j}((x_j - z_j) \mod 1))\right),$$ 
+    
+    $$\tilde{K}_\alpha(x) = (-1)^{\alpha+1}\frac{(2 \pi)^{2 \alpha}}{(2\alpha)!} B_{2\alpha}(x)$$
+
+    where $B_n$ is the $n^\text{th}$ Bernoulli polynomial.
+    
+    Examples:
+        >>> from qmcpy import Lattice, fftbr, ifftbr
+        >>> n = 8
+        >>> d = 4
+        >>> lat = Lattice(d,seed=11)
+        >>> x = lat(n)
+        >>> x.shape
+        (8, 4)
+        >>> x.dtype
+        dtype('float64')
+        >>> weights = 1/np.arange(1,d+1)**2 
+        >>> alpha = np.arange(1,d+1)
+        >>> scale = 10
+        >>> k00 = kernel_shift_invar(x[0],x[0],alpha=alpha,weights=weights,scale=scale)
+        >>> k00
+        91.2344445339634
+        >>> k0 = kernel_shift_invar(x,x[0],alpha=alpha,weights=weights,scale=scale)
+        >>> with np.printoptions(precision=2):
+        ...     print(k0)
+        [91.23 -2.32  5.69  5.69 12.7  -4.78 -4.78 12.7 ]
+        >>> assert k0[0]==k00
+        >>> kmat = kernel_shift_invar(x[:,None,:],x[None,:,:],alpha=alpha,weights=weights,scale=scale)
+        >>> with np.printoptions(precision=2):
+        ...     print(kmat)
+        [[91.23 -2.32  5.69  5.69 12.7  -4.78 -4.78 12.7 ]
+         [-2.32 91.23  5.69  5.69 -4.78 12.7  12.7  -4.78]
+         [ 5.69  5.69 91.23 -2.32 12.7  -4.78 12.7  -4.78]
+         [ 5.69  5.69 -2.32 91.23 -4.78 12.7  -4.78 12.7 ]
+         [12.7  -4.78 12.7  -4.78 91.23 -2.32  5.69  5.69]
+         [-4.78 12.7  -4.78 12.7  -2.32 91.23  5.69  5.69]
+         [-4.78 12.7  12.7  -4.78  5.69  5.69 91.23 -2.32]
+         [12.7  -4.78 -4.78 12.7   5.69  5.69 -2.32 91.23]]
+        >>> assert (kmat[:,0]==k0).all()
+        >>> lam = np.sqrt(n)*fftbr(k0)
+        >>> y = np.random.Generator(np.random.PCG64(7)).uniform(low=0,high=1,size=(n))
+        >>> np.allclose(ifftbr(fftbr(y)*lam),kmat@y)
+        True
+        >>> np.allclose(ifftbr(fftbr(y)/lam),np.linalg.solve(kmat,y))
+        True
+        >>> import torch 
+        >>> xtorch = torch.from_numpy(x)
+        >>> kmat_torch = kernel_shift_invar(xtorch[:,None,:],xtorch[None,:,:],
+        ...     alpha = torch.from_numpy(alpha),
+        ...     weights = torch.from_numpy(weights),
+        ...     scale = scale)
+        >>> np.allclose(kmat_torch.numpy(),kmat)
+        True
+        
+    **References:** 
+    
+    1.  Kaarnioja, Vesa, Frances Y. Kuo, and Ian H. Sloan.  
+        "Lattice-based kernel approximation and serendipitous weights for parametric PDEs in very high dimensions."  
+        International Conference on Monte Carlo and Quasi-Monte Carlo Methods in Scientific Computing. Cham: Springer International Publishing, 2022.
+    
+    Args:
+        x (Union[np.ndarray,torch.Tensor]): First inputs with `x.shape=(*batch_shape_x,d)`.
+        z (Union[np.ndarray,torch.Tensor]): Second inputs with shape `z.shape=(*batch_shape_z,d)`.
+        alpha (Union[np.ndarray,torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
+        weights (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$ with shape `weights.shape=(d,)`.
+        scale (float): Scaling factor $S$. 
+
+    Returns: 
+        k (Union[np.ndarray,torch.Tensor]): kernel values with `k.shape==(*batch_shape_x,*batch_shape_z)`. 
+    """
+    assert x.shape[-1]==z.shape[-1]
+    d = x.shape[-1] 
+    if isinstance(x,np.ndarray):
+        npt = np
+        lgamma = scipy.special.loggamma
+    else:
+        import torch 
+        npt = torch
+        lgamma = torch.lgamma 
+        assert isinstance(x,torch.Tensor) and isinstance(z,torch.Tensor)
+    alpha = npt.atleast_1d(alpha)*npt.ones(d,dtype=int)
+    assert alpha.shape==(d,)
+    assert (alpha%1==0).all() and (alpha>=1).all(), "alpha must all be positive ints"
+    coeffs = (-1)**(alpha+1)*npt.exp((2*alpha)*np.log(2*np.pi)-lgamma(2*alpha+1))
+    weights = npt.atleast_1d(weights)*npt.ones(d,dtype=int)
+    assert weights.shape==(d,) and (weights>0).all()
+    assert np.isscalar(scale) and scale>0
+    k = scale
+    for j in range(d):
+        delta_j = (x[...,j,None]-z[...,j,None])%1
+        ktilde = coeffs[j]*bernoulli_poly(int(2*alpha[j]),delta_j)[...,0]
+        k = k*(1+weights[j]*ktilde)
+    return k

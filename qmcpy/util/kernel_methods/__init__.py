@@ -1,6 +1,6 @@
 from .ft_qmctoolscl import fftbr,ifftbr,fwht,omega_fftbr,omega_fwht
-from .shift_invar_ops import bernoulli_poly
-from .dig_shift_invar_ops import weighted_walsh_funcs
+from .shift_invar_ops import bernoulli_poly, kernel_shift_invar
+from .dig_shift_invar_ops import weighted_walsh_funcs, kernel_dig_shift_invar
 try:
     import torch 
     from .ft_pytorch import (
