@@ -10,4 +10,4 @@ from .util.kernel_methods import (
 from .util import plot_proj
 
 name = "qmcpy"
-__version__ = "1.6.3c"
+__version__ = "1.6.3.1a"
