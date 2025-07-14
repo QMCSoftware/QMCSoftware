@@ -30,10 +30,10 @@ class Genz(AbstractIntegrand):
         ...         mu_hat = y.mean()
         ...         print('%-15s %-3d %.3f'%(kind_func,kind_coeff,mu_hat))
         OSCILLATORY     1   -0.351
-        OSCILLATORY     2   -0.380
+        OSCILLATORY     2   -0.329
         OSCILLATORY     3   -0.217
         CORNER-PEAK     1   0.713
-        CORNER-PEAK     2   0.712
+        CORNER-PEAK     2   0.714
         CORNER-PEAK     3   0.720
 
         With independent replications
@@ -70,7 +70,7 @@ class Genz(AbstractIntegrand):
         self.true_measure = Uniform(self.sampler)
         self.d = self.true_measure.d
         if self.kind_coeff==1: self.c = (np.arange(1,self.d+1)-.5)/self.d
-        elif self.kind_coeff==2: self.c = 1/np.arange(1,self.d+1)
+        elif self.kind_coeff==2: self.c = 1/np.arange(1,self.d+1)**2
         elif self.kind_coeff==3: self.c = np.exp(np.arange(1,self.d+1)*np.log(10**(-8))/self.d)
         if self.kind_func=='OSCILLATORY':
             self.g = self.g_oscillatory
