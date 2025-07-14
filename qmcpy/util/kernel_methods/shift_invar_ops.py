@@ -136,7 +136,7 @@ def kernel_shift_invar(x, z, alpha=1, weights=1, scale=1):
         >>> alpha = np.arange(1,d+1)
         >>> scale = 10
         >>> k00 = kernel_shift_invar(x[0],x[0],alpha=alpha,weights=weights,scale=scale)
-        >>> k00
+        >>> k00.item()
         91.2344445339634
         >>> k0 = kernel_shift_invar(x,x[0],alpha=alpha,weights=weights,scale=scale)
         >>> with np.printoptions(precision=2):

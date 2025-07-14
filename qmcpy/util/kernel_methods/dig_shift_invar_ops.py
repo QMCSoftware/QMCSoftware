@@ -261,7 +261,7 @@ def kernel_dig_shift_invar(x, z, t, alpha=1, weights=1, scale=1):
         >>> alpha = np.arange(1,d+1)
         >>> scale = 10
         >>> k00 = kernel_dig_shift_invar(x[0],x[0],t=dnb2.t,alpha=alpha,weights=weights,scale=scale)
-        >>> k00
+        >>> k00.item()
         34.49037002918452
         >>> k0 = kernel_dig_shift_invar(x,x[0],t=dnb2.t,alpha=alpha,weights=weights,scale=scale)
         >>> with np.printoptions(precision=2):
