@@ -23,7 +23,7 @@ class Genz(AbstractIntegrand):
     $$c_k^{(1)} = \frac{k-1/2}{d}, \qquad c_k^{(2)} = \frac{1}{k^2}, \qquad c_k^{(3)} = \exp\left(\frac{k \log(10^{-8})}{d}\right), \qquad k=1,\dots,d.$$
 
     Examples:
-        >>> for kind_func in ['OSCILLATORY','CORNER-PEAK']:
+        >>> for kind_func in ['OSCILLATORY','CORNER PEAK']:
         ...     for kind_coeff in [1,2,3]:
         ...         integrand = Genz(DigitalNetB2(2,seed=7),kind_func=kind_func,kind_coeff=kind_coeff)
         ...         y = integrand(2**14)
@@ -32,13 +32,13 @@ class Genz(AbstractIntegrand):
         OSCILLATORY     1   -0.351
         OSCILLATORY     2   -0.329
         OSCILLATORY     3   -0.217
-        CORNER-PEAK     1   0.713
-        CORNER-PEAK     2   0.714
-        CORNER-PEAK     3   0.720
+        CORNER PEAK     1   0.713
+        CORNER PEAK     2   0.714
+        CORNER PEAK     3   0.720
 
         With independent replications
 
-        >>> integrand = Genz(DigitalNetB2(2,seed=7,replications=2**4),kind_func="CORNER-PEAK",kind_coeff=3)
+        >>> integrand = Genz(DigitalNetB2(2,seed=7,replications=2**4),kind_func="CORNER PEAK",kind_coeff=3)
         >>> y = integrand(2**6)
         >>> y.shape
         (16, 64)
@@ -56,15 +56,15 @@ class Genz(AbstractIntegrand):
                 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
-            kind_func (str): Either `'OSCILLATORY'` or `'CORNER-PEAK'`
+            kind_func (str): Either `'OSCILLATORY'` or `'CORNER PEAK'`
             kind_coeff (int): 1, 2, or 3 for choice of coefficients 
         """
-        self.kind_func = str(kind_func).upper()
+        self.kind_func = str(kind_func).upper().strip().replace("_"," ").replace("-"," ")
         self.kind_coeff = kind_coeff
-        if (self.kind_func not in ['OSCILLATORY','CORNER-PEAK']) or (self.kind_coeff not in [1,2,3]):
+        if (self.kind_func not in ['OSCILLATORY','CORNER PEAK']) or (self.kind_coeff not in [1,2,3]):
             raise ParameterError('''
                 Genz expects 
-                    kind_func in ['OSCILLATORY','CORNER-PEAK'] and 
+                    kind_func in ['OSCILLATORY','CORNER PEAK'] and 
                     kind_coeffs in [1,2,3]''')
         self.sampler = sampler
         self.true_measure = Uniform(self.sampler)
@@ -75,7 +75,7 @@ class Genz(AbstractIntegrand):
         if self.kind_func=='OSCILLATORY':
             self.g = self.g_oscillatory
             self.c = 4.5*self.c/self.c.sum()
-        elif self.kind_func=='CORNER-PEAK':
+        elif self.kind_func=='CORNER PEAK':
             self.g = self.g_corner_peak
             self.c = 0.25*self.c/self.c.sum()
         self.c = self.c[None,:]
