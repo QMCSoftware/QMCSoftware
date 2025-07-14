@@ -37,9 +37,9 @@ def k4sumterm(x, t, cutoff=1e-8):
     """
     total = 0.
     for a in range(0,t):
-        factor = 1/float(2**(3*a))
+        factor = 1/float(2.**(3*a))
         if factor<cutoff: break
-        total += (-1)**((x>>(t-a-1))&1)*factor
+        total += (-1.)**((x>>(t-a-1))&1)*factor
     return total
 
 WEIGHTEDWALSHFUNCSPOS = {
