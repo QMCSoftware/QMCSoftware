@@ -260,6 +260,9 @@ def kernel_dig_shift_invar(x, z, t, alpha=1, weights=1, scale=1):
         >>> weights = 1/np.arange(1,d+1)**2 
         >>> alpha = np.arange(1,d+1)
         >>> scale = 10
+        >>> x[0],dnb2.t,alpha,weights,scale
+        (array([4165922097604862763, 2052923896324170369, 1056837273276306143,
+               5649238341050050389], dtype=uint64), 63, array([1, 2, 3, 4]), array([1.        , 0.25      , 0.11111111, 0.0625    ]), 10)
         >>> k00 = kernel_dig_shift_invar(x[0],x[0],t=dnb2.t,alpha=alpha,weights=weights,scale=scale)
         >>> k00.item()
         34.49037002918452
