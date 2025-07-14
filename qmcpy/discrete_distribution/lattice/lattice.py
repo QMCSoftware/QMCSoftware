@@ -32,7 +32,7 @@ class Lattice(AbstractLDDiscreteDistribution):
             replications    1
             randomize       SHIFT
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             n_limit         2^(20)
             entropy         7
 
@@ -55,7 +55,7 @@ class Lattice(AbstractLDDiscreteDistribution):
 
         Different orderings (avoid warnings that the first point is the origin).
 
-        >>> Lattice(dimension=2,randomize=False,order='NATURAL')(4,warn=False) 
+        >>> Lattice(dimension=2,randomize=False,order='RADICAL INVERSE')(4,warn=False) 
         array([[0.  , 0.  ],
                [0.5 , 0.5 ],
                [0.25, 0.75],
@@ -143,7 +143,7 @@ class Lattice(AbstractLDDiscreteDistribution):
                  seed = None,
                  randomize = 'SHIFT',
                  generating_vector = "kuo.lattice-33002-1024-1048576.9125.txt",
-                 order = 'NATURAL',
+                 order = 'RADICAL INVERSE',
                  m_max = None):
         r"""
         Args:
@@ -169,7 +169,7 @@ class Lattice(AbstractLDDiscreteDistribution):
                 where $d$ is the dimension and $v_i$ are randomly selected from $\{3,5,\dots,2^M-1\}$ uniformly and independently.  
                 We require require $1 < M < 27$. 
 
-            order (str): `'LINEAR'`, `'NATURAL'`, or `'GRAY'` ordering. See the doctest example above.
+            order (str): `'LINEAR'`, `'RADICAL INVERSE'`, or `'GRAY'` ordering. See the doctest example above.
             m_max (int): $2^{m_\mathrm{max}}$ is the maximum number of supported samples.
         """
         self.parameters = ['randomize','gen_vec_source','order','n_limit']
@@ -229,8 +229,8 @@ class Lattice(AbstractLDDiscreteDistribution):
         self.gen_vec = gen_vec[:,self.dvec].copy()
         self.order = str(order).upper().strip().replace("_"," ")
         if self.order=="GRAY CODE": self.order = "GRAY"
-        if self.order=="RADICAL INVERSE": self.order = "NATURAL"
-        assert self.order in ['LINEAR','NATURAL','GRAY']
+        if self.order=="NATURAL": self.order = "RADICAL INVERSE"
+        assert self.order in ['LINEAR','RADICAL INVERSE','GRAY']
         self.randomize = str(randomize).upper()
         if self.randomize=="TRUE": self.randomize = "SHIFT"
         if self.randomize=="NONE": self.randomize = "FALSE"
@@ -254,7 +254,7 @@ class Lattice(AbstractLDDiscreteDistribution):
         if self.order=="LINEAR":
             assert r_x==1, "lattice linear currently requires there be only 1 generating matrix"
             x = self._gail_linear(n_min,n_max)[None,:,:]
-        elif self.order=="NATURAL":
+        elif self.order=="RADICAL INVERSE":
             assert (n_min==0 or (n_min&(n_min-1))==0) and (n_max==0 or (n_max&(n_max-1))==0), "lattice in natural order requires n_min and n_max be 0 or powers of 2"
             _ = qmctoolscl.lat_gen_natural(r_x,n,d,n_start,self.gen_vec,x,backend="c")
         elif self.order=="GRAY":

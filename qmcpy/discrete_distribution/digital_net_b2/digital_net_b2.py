@@ -38,7 +38,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             replications    1
             randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -65,7 +65,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         >>> DigitalNetB2(dimension=2,randomize=False,order="GRAY")(n_min=2,n_max=4,warn=False)
         array([[0.75, 0.25],
                [0.25, 0.75]])
-        >>> DigitalNetB2(dimension=2,randomize=False,order="NATURAL")(n_min=2,n_max=4,warn=False)
+        >>> DigitalNetB2(dimension=2,randomize=False,order="RADICAL INVERSE")(n_min=2,n_max=4,warn=False)
         array([[0.25, 0.75],
                [0.75, 0.25]])
         
@@ -218,7 +218,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                  seed = None,
                  randomize = 'LMS DS',
                  generating_matrices = "joe_kuo.6.21201.txt",
-                 order = 'NATURAL',
+                 order = 'RADICAL INVERSE',
                  t = 63,
                  alpha = 1,
                  msb = None,
@@ -249,7 +249,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 - A `str` should be the name (or path) of a file from the LDData repo at [https://github.com/QMCSoftware/LDData/tree/main/dnet](https://github.com/QMCSoftware/LDData/tree/main/dnet).
                 - An `np.ndarray` of integers with shape $(d,m_\mathrm{max})$ or $(r,d,m_\mathrm{max})$ where $d$ is the number of dimensions, $r$ is the number of replications, and $2^{m_\mathrm{max}}$ is the maximum number of supported points. Setting `msb=False` will flip the bits of ints in the generating matrices.
             
-            order (str): `'NATURAL'`, or `'GRAY'` ordering. See the doctest example above.
+            order (str): `'RADICAL INVERSE'`, or `'GRAY'` ordering. See the doctest example above.
             t (int): Number of bits in integer represetation of points *after* randomization. The number of bits in the generating matrices is inferred based on the largest value.
             alpha (int): Interlacing factor for higher order nets.  
                 When `alpha`>1, interlacing is performed regardless of the generating matrices,  
@@ -259,8 +259,8 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             _verbose (bool): If `True`, print linear matrix scrambling matrices. 
         """
         if graycode is not None:
-            order = 'GRAY' if graycode else 'NATURAL'
-            warnings.warn("graycode argument deprecated, set order='GRAY' or order='NATURAL' instead. Using order='%s'"%order,ParameterWarning)
+            order = 'GRAY' if graycode else 'RADICAL INVERSE'
+            warnings.warn("graycode argument deprecated, set order='GRAY' or order='RADICAL INVERSE' instead. Using order='%s'"%order,ParameterWarning)
         if t_lms is not None:
             t = t_lms
             warnings.warn("t_lms argument deprecated. Set t instead. Using t = %d"%t,ParameterWarning)
@@ -329,8 +329,8 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             qmctoolscl.dnb2_gmat_lsb_to_msb(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.tile(np.uint64(self._t_curr),int(gen_mats.shape[0])),gen_mats,gen_mats,backend="c")
         self.order = str(order).upper().strip().replace("_"," ")
         if self.order=="GRAY CODE": self.order = "GRAY"
-        if self.order=="RADICAL INVERSE": self.order = "NATURAL"
-        assert self.order in ['NATURAL','GRAY']
+        if self.order=="NATURAL": self.order = "RADICAL INVERSE"
+        assert self.order in ['RADICAL INVERSE','GRAY']
         assert isinstance(t,int) and t>0
         assert self._t_curr<=t<=64, "t must no more than 64 and no less than %d (the number of bits used to represent the generating matrices)"%(self._t_curr)
         assert isinstance(alpha,int) and alpha>0
@@ -423,7 +423,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         xb = np.empty((r_x,n,d),dtype=np.uint64)
         if self.order=="GRAY":
             qmctoolscl.dnb2_gen_gray(r_x,n,d,n_start,mmax,self.gen_mats,xb,backend="c")
-        elif self.order=="NATURAL": 
+        elif self.order=="RADICAL INVERSE": 
             assert (n_min==0 or np.log2(n_min)%1==0) and (n_max==0 or np.log2(n_max)%1==0), "DigitalNetB2 in natural order requires n_min and n_max be 0 or powers of 2"
             qmctoolscl.dnb2_gen_natural(r_x,n,d,n_start,mmax,self.gen_mats,xb,backend="c")
         else:

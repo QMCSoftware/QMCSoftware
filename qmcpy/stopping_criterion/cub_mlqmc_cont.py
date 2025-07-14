@@ -60,7 +60,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
             replications    2^(5)
             randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)

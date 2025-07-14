@@ -43,7 +43,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             replications    1
             randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -83,7 +83,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             replications    1
             randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -138,7 +138,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             replications    1
             randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -210,8 +210,8 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         # GCV - Generalized cross validation
         self.kernType = 1  # Type-1:
         self._xfullundtype = np.uint64
-        if self.discrete_distrib.order!='NATURAL':
-            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'NATURAL' order")
+        if self.discrete_distrib.order!='RADICAL INVERSE':
+            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'RADICAL INVERSE' order")
 
 
     # Digitally shift invariant kernel

@@ -43,7 +43,7 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
             replications    1
             randomize       SHIFT
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             n_limit         2^(20)
             entropy         123456789
 
@@ -81,7 +81,7 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
             replications    1
             randomize       SHIFT
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             n_limit         2^(20)
             entropy         7
         >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
@@ -134,7 +134,7 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
             replications    1
             randomize       SHIFT
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             n_limit         2^(20)
             entropy         7
 
@@ -208,8 +208,8 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
         # GCV - Generalized cross validation
         self.kernType = 1  # Type-1: Bernoulli polynomial based algebraic convergence, Type-2: Truncated series
         self._xfullundtype = float
-        if self.discrete_distrib.order!='NATURAL':
-            raise ParameterError("CubLattice_g requires Lattice with 'NATURAL' order")
+        if self.discrete_distrib.order!='RADICAL INVERSE':
+            raise ParameterError("CubLattice_g requires Lattice with 'RADICAL INVERSE' order")
 
     # Shift invariant kernel
     # C1 : first row of the covariance matrix

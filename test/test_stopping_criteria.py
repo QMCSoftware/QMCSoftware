@@ -206,12 +206,12 @@ class TestCubBayesLatticeG(unittest.TestCase):
         self.assertRaises(DistributionCompatibilityError, CubBayesLatticeG, integrand)
 
     def test_n_max_single_level(self):
-        integrand = Keister(Lattice(dimension=2, seed=7, order='NATURAL'))
+        integrand = Keister(Lattice(dimension=2, seed=7, order='RADICAL INVERSE'))
         algorithm = CubBayesLatticeG(integrand, abs_tol=.0001, n_init=2 ** 8, n_limit=2 ** 9)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
 
     def test_keister_2d(self):
-        integrand = Keister(Lattice(dimension=2,seed=7, order='NATURAL'))
+        integrand = Keister(Lattice(dimension=2,seed=7, order='RADICAL INVERSE'))
         solution, data = CubBayesLatticeG(integrand, abs_tol=tol, n_init=2 ** 5).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
@@ -221,7 +221,7 @@ class TestCubBayesLatticeG(unittest.TestCase):
         sc_ = CubQMCLatticeG(keister_indices_, abs_tol=abs_tol, ptransform='Baker')
         solution_, data_ = sc_.integrate()
 
-        keister_d = Keister(Lattice(dimension=dims, order='NATURAL', seed=7))
+        keister_d = Keister(Lattice(dimension=dims, order='RADICAL INVERSE', seed=7))
         keister_indices = SobolIndices(keister_d, indices='singletons')
         sc = CubBayesLatticeG(keister_indices, order=1, abs_tol=abs_tol, ptransform='Baker')
         solution, data = sc.integrate()

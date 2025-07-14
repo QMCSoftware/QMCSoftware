@@ -44,7 +44,7 @@ class CubQMCNetG(AbstractCubQMCLDG):
             replications    1
             randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -83,7 +83,7 @@ class CubQMCNetG(AbstractCubQMCLDG):
             replications    1
             randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -137,7 +137,7 @@ class CubQMCNetG(AbstractCubQMCLDG):
             replications    1
             randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -241,5 +241,5 @@ class CubQMCNetG(AbstractCubQMCLDG):
             allowed_distribs = [DigitalNetB2],
             cast_complex = False,
             error_fun = error_fun)
-        if self.discrete_distrib.order!='NATURAL':
-            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'NATURAL' order")
+        if self.discrete_distrib.order!='RADICAL INVERSE':
+            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'RADICAL INVERSE' order")

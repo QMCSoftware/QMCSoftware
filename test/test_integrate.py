@@ -156,7 +156,7 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_european_put_bayes_lattice(self):
         abs_tol = 5e-2
         integrand = FinancialOption(
-            sampler = Lattice(dimension=16, order='NATURAL'),
+            sampler = Lattice(dimension=16, order='RADICAL INVERSE'),
             option = "EUROPEAN",
             volatility = .5,
             start_price = 10,
