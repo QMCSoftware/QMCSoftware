@@ -380,7 +380,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 self.t = self._t_curr
             else:
                 gen_mat_lms = np.empty((self.replications,self.dtalpha,self.m_max),dtype=np.uint64)
-                S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(t),np.uint64(self._verbose))
+                S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.dtalpha),int(self._t_curr),int(t),np.uint64(self._verbose))
                 qmctoolscl.dnb2_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.dtalpha),np.uint64(self.m_max),np.uint64(gen_mats.shape[0]),np.uint64(t),S,gen_mats[:,:self.dtalpha,:].copy(),gen_mat_lms,backend="c")
                 gen_mat_lms_ho = np.empty((self.replications,self.d,self.m_max),dtype=np.uint64)
                 qmctoolscl.dnb2_interlace(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(t),np.uint64(t),np.uint64(self.alpha),gen_mat_lms,gen_mat_lms_ho,backend="c")
