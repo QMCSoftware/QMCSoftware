@@ -15,7 +15,7 @@ PRIMES = array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41,
 RICHTMYER = sqrt(PRIMES) % 1
 
 class Kronecker(LD):
-    def __init__(self, dimension=1, replications=1, randomize=False, alpha = 0, delta = 0, seed_alpha=None, seed = None, order='natural', d_max=None, m_max=None):
+    def __init__(self, dimension=1, replications=1, randomize=False, alpha = 0, delta = 0, seed_alpha=None, seed = None, d_max=None, m_max=None):
         # attributes required for cub_qmc_clt.py
         self.mimics = 'StdUniform'
         self.d = dimension
@@ -25,15 +25,11 @@ class Kronecker(LD):
         self.low_discrepancy = True
         self.d_max = dimension
         self.m_max = int(1e10)
-        # self.order = order
         
-        # plain string
-        if type(alpha) == list and type(alpha[0]) == str:
-            if alpha[0].lower() == 'richtmyer':
+        if type(alpha) == str and alpha.lower() == 'richtmyer':
                 if dimension <= len(PRIMES):
                     self.alpha = RICHTMYER[:dimension]
                 else:
-                    print(len(RICHTMYER))
                     self.alpha = append(RICHTMYER, [sqrt(nextprime(PRIMES[-1], ith=x)) % 1 for x in range(1, dimension - len(PRIMES) + 1)])
         else:
             if sum(alpha) == 0:
@@ -50,17 +46,6 @@ class Kronecker(LD):
             
         super(Kronecker,self).__init__(dimension,seed)
 
-
-    def _spawn(self, child_seed, dimension):
-        return Kronecker(
-                dimension=dimension,
-                randomize=self.randomize,
-                # order=self.order,
-                seed=child_seed,
-                d_max=self.d_max,
-                m_max=self.m_max,
-                replications=self.replications)
-    
 
     def gen_samples(self, n=None, n_min=0, n_max=0):
         if n is None:
@@ -120,3 +105,13 @@ class Kronecker(LD):
         summation = zeros(n)
         summation[1:] = left_sum - right_sum
         return (k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - k_tilde[1]
+    
+    
+    def _spawn(self, child_seed, dimension):
+        return Kronecker(
+                dimension=dimension,
+                randomize=self.randomize,
+                seed=child_seed,
+                d_max=self.d_max,
+                m_max=self.m_max,
+                replications=self.replications)
