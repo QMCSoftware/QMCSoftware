@@ -38,6 +38,10 @@ jobs:
           python-version: "3.9"
           channels: pytorch,conda-forge,defaults
       
+      - name: Add C++ Build Tools
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
       # Add platform-specific environment setup
       - name: Set Windows environment
         if: runner.os == 'Windows'
@@ -61,10 +65,18 @@ jobs:
           echo "PyTorch version check:"
           python -c "import torch; print(f'PyTorch: {torch.__version__}')" || echo "PyTorch not installed"
       
-      - name: Install QMCPy 
+      - name: Install QMCPy (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd /C call {0}
+        run: |
+          pip install -e .
+
+      - name: Install QMCPy (macOS/Linux)
+        if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
           pip install -e .
+          
       - name: Run Tests (Windows)
         if: runner.os == 'Windows'
         shell: cmd /C call {0}
@@ -72,7 +84,6 @@ jobs:
         run: |
           echo Running tests on %RUNNER_OS%...
           make tests_no_docker
-
       - name: Run Tests (macOS/Linux)
         if: runner.os != 'Windows'
         shell: bash -l {0}
