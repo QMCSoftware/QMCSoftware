@@ -77,7 +77,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             n_total         409600
             n               [409600   6400]
             n_rep           [16384   256]
-            time_integrate  0.110
+            time_integrate  ...
         CubQMCRepStudentT (AbstractStoppingCriterion)
             inflate         1
             alpha           0.010
@@ -127,18 +127,18 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             n               [[[102400 204800 204800]
                               [102400 204800 204800]
                               [102400 204800 204800]]
-                    
+        <BLANKLINE>
                              [[ 12800 102400 102400]
                               [ 12800 102400 102400]
                               [ 12800 102400 102400]]]
             n_rep           [[[4096 8192 8192]
                               [4096 8192 8192]
                               [4096 8192 8192]]
-                    
+        <BLANKLINE>
                              [[ 512 4096 4096]
                               [ 512 4096 4096]
                               [ 512 4096 4096]]]
-            time_integrate  0.373
+            time_integrate  ...
         CubQMCRepStudentT (AbstractStoppingCriterion)
             inflate         1
             alpha           0.010
@@ -163,6 +163,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             alpha           1
             n_limit         2^(32)
             entropy         7
+        
     
     **References:**
     

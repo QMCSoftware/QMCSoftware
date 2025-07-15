@@ -28,7 +28,7 @@ class CubQMCNetG(AbstractCubQMCLDG):
             comb_flags      1
             n_total         2^(11)
             n               2^(11)
-            time_integrate  0.007
+            time_integrate  ...
         CubQMCNetG (AbstractStoppingCriterion)
             abs_tol         0.001
             rel_tol         0
@@ -67,7 +67,7 @@ class CubQMCNetG(AbstractCubQMCLDG):
             comb_flags      [ True  True]
             n_total         2^(14)
             n               [16384  1024]
-            time_integrate  0.021
+            time_integrate  ...
         CubQMCNetG (AbstractStoppingCriterion)
             abs_tol         0.001
             rel_tol         0

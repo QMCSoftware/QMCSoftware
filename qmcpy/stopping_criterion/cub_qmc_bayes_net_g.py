@@ -26,7 +26,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             comb_flags      1
             n_total         2^(10)
             n               2^(10)
-            time_integrate  0.024
+            time_integrate  ...
         CubQMCBayesNetG (AbstractStoppingCriterion)
             abs_tol         0.005
             rel_tol         0
@@ -66,7 +66,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             comb_flags      [ True  True]
             n_total         2^(11)
             n               [2048  256]
-            time_integrate  0.035
+            time_integrate  ...
         CubQMCBayesNetG (AbstractStoppingCriterion)
             abs_tol         0.010
             rel_tol         0
@@ -115,11 +115,11 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             n               [[[256 256 256]
                               [256 256 256]
                               [256 256 256]]
-                    
+        <BLANKLINE>
                              [[256 256 256]
                               [256 256 256]
                               [256 256 256]]]
-            time_integrate  0.081
+            time_integrate  ...
         CubQMCBayesNetG (AbstractStoppingCriterion)
             abs_tol         0.050
             rel_tol         0
@@ -143,7 +143,7 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             alpha           1
             n_limit         2^(32)
             entropy         7
-
+        
     **References:**
 
     1.  Jagadeeswaran, Rathinavel, and Fred J. Hickernell.  

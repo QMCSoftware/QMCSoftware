@@ -28,7 +28,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
             mean_level      [1.718 0.051 0.012 0.003]
             var_level       [1.169e-08 2.569e-08 1.850e-08 5.209e-08]
             bias_estimate   2.78e-04
-            time_integrate  4.896
+            time_integrate  ...
         CubMLQMCCont (AbstractStoppingCriterion)
             rmse_tol        3.88e-04
             n_init          2^(8)

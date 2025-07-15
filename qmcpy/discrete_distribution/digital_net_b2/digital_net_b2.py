@@ -272,9 +272,13 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         self.input_msb = deepcopy(msb)
         if isinstance(generating_matrices,str) and generating_matrices=="joe_kuo.6.21201.txt":
             self.gen_mats_source = generating_matrices
-            gen_mats = np.load(dirname(abspath(__file__))+'/generating_matrices/joe_kuo.6.21201.npy')[None,:]
+            if np.isscalar(dimension) and dimension<=1024 and alpha==1:
+                gen_mats = np.load(dirname(abspath(__file__))+'/generating_matrices/joe_kuo.6.1024.npy')[None,:]
+                d_limit = 1024
+            else:
+                gen_mats = np.load(dirname(abspath(__file__))+'/generating_matrices/joe_kuo.6.21201.npy')[None,:]
+                d_limit = 21201
             msb = True
-            d_limit = 21201
             n_limit = 4294967296
             self._t_curr = 32
             compat_shift = self._t_curr-t if self._t_curr>=t else 0
