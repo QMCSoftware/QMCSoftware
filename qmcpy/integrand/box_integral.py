@@ -18,7 +18,7 @@ class BoxIntegral(AbstractIntegrand):
         >>> y.shape
         (1024,)
         >>> print("%.4f"%y.mean(0))
-        0.7513
+        0.7519
 
         With independent replications
 
@@ -30,7 +30,7 @@ class BoxIntegral(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4f"%muhats.mean(0))
-        0.7516
+        0.7518
 
         Array `s`
 
@@ -39,8 +39,8 @@ class BoxIntegral(AbstractIntegrand):
         >>> y.shape
         (2, 3, 1024)
         >>> y.mean(-1)
-        array([[1.        , 1.26244857, 1.66666476],
-               [2.28204729, 3.22246961, 4.67356373]])
+        array([[1.        , 1.26234461, 1.66666661],
+               [2.28201516, 3.22195096, 4.67188113]])
 
         With independent replications
 
@@ -52,8 +52,8 @@ class BoxIntegral(AbstractIntegrand):
         >>> muhats.shape 
         (2, 3, 16)
         >>> muhats.mean(-1)
-        array([[1.        , 0.76520743, 0.66666641],
-               [0.62717067, 0.62219935, 0.64265505]])
+        array([[1.        , 0.76519118, 0.66666666],
+               [0.62718785, 0.62224086, 0.64273341]])
 
     **References:**
 

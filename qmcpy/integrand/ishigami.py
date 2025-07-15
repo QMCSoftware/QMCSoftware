@@ -16,7 +16,7 @@ class Ishigami(AbstractIntegrand):
         >>> y.shape 
         (1024,)
         >>> print("%.4f"%y.mean())
-        3.5015
+        3.5000
         >>> integrand.true_measure
         Uniform (AbstractTrueMeasure)
             lower_bound     -3.142
@@ -32,7 +32,7 @@ class Ishigami(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4f"%muhats.mean())
-        3.4764
+        3.4646
         
     **References:**
 

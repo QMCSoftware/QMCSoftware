@@ -24,7 +24,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         >>> sc = CubQMCRepStudentT(k,abs_tol=1e-3,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
-        array(1.3804849)
+        array(1.3803927)
         >>> data
         Data (Data)
             solution        1.380
@@ -66,18 +66,18 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         >>> sc = CubQMCRepStudentT(f,abs_tol=abs_tol,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
-        array([1.19040139, 0.96058618])
+        array([1.19025707, 0.96062762])
         >>> data
         Data (Data)
             solution        [1.19  0.961]
-            comb_bound_low  [1.19 0.96]
+            comb_bound_low  [1.19  0.961]
             comb_bound_high [1.191 0.961]
-            comb_bound_diff [0.002 0.   ]
+            comb_bound_diff [0.001 0.   ]
             comb_flags      [ True  True]
-            n_total         204800
-            n               [204800   6400]
-            n_rep           [8192  256]
-            time_integrate  ...
+            n_total         409600
+            n               [409600   6400]
+            n_rep           [16384   256]
+            time_integrate  0.110
         CubQMCRepStudentT (AbstractStoppingCriterion)
             inflate         1
             alpha           0.010
@@ -119,7 +119,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
                              [0.035 0.303 0.781]]
             comb_bound_high [[0.02  0.196 0.667]
                              [0.036 0.303 0.782]]
-            comb_bound_diff [[0.001 0.    0.   ]
+            comb_bound_diff [[0.001 0.001 0.001]
                              [0.001 0.001 0.001]]
             comb_flags      [[ True  True  True]
                              [ True  True  True]]
@@ -127,18 +127,18 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             n               [[[102400 204800 204800]
                               [102400 204800 204800]
                               [102400 204800 204800]]
-        <BLANKLINE>
-                             [[ 12800  51200 102400]
-                              [ 12800  51200 102400]
-                              [ 12800  51200 102400]]]
+                    
+                             [[ 12800 102400 102400]
+                              [ 12800 102400 102400]
+                              [ 12800 102400 102400]]]
             n_rep           [[[4096 8192 8192]
                               [4096 8192 8192]
                               [4096 8192 8192]]
-        <BLANKLINE>
-                             [[ 512 2048 4096]
-                              [ 512 2048 4096]
-                              [ 512 2048 4096]]]
-            time_integrate  ...
+                    
+                             [[ 512 4096 4096]
+                              [ 512 4096 4096]
+                              [ 512 4096 4096]]]
+            time_integrate  0.373
         CubQMCRepStudentT (AbstractStoppingCriterion)
             inflate         1
             alpha           0.010

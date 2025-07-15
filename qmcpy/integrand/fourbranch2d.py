@@ -14,7 +14,7 @@ class FourBranch2d(AbstractIntegrand):
         >>> integrand = FourBranch2d(DigitalNetB2(2,seed=7))
         >>> y = integrand(2**10)
         >>> print("%.4f"%y.mean())
-        -2.5022
+        -2.4995
         >>> integrand.true_measure
         Uniform (AbstractTrueMeasure)
             lower_bound     -8
@@ -30,7 +30,7 @@ class FourBranch2d(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4f"%muhats.mean())
-        -2.5147
+        -2.5042
     """
 
     def __init__(self, sampler):

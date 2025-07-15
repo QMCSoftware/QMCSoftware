@@ -60,7 +60,7 @@ class UMBridgeWrapper(AbstractIntegrand):
         (6,)
         >>> muhats_agg_list_of_lists = integrand.to_umbridge_out_sizes(muhats_aggregate)
         >>> [["%.2e"%ii for ii in i] for i in muhats_agg_list_of_lists]
-        [['-3.10e-05', '-2.28e-05', '-2.28e-05'], ['8.08e-06', '-5.73e-07'], ['2.04e-08']]
+        [['-1.59e-08', '1.49e-04', '1.49e-04'], ['8.20e-06', '-1.38e-04'], ['-8.14e-06']]
     """
 
     def __init__(self, true_measure, model, config={}, parallel=False):

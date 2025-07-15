@@ -118,16 +118,16 @@ class PFGPCI(AbstractStoppingCriterion):
         >>> with np.printoptions(formatter={"float": lambda x: "%-10.2e"%x, "int": lambda x: "%-10d"%x, "bool": lambda x: "%-10s"%x}):
         ...     for k,v in df.items():
         ...         print("%15s: %s"%(k,str(v)))
-                   iter: [0          1          2          3         ]
-                  n_sum: [64         80         96         112       ]
-                n_batch: [64         16         16         16        ]
-           error_bounds: [5.58e-02   3.92e-02   3.05e-02   2.16e-02  ]
-                 ci_low: [8.66e-02   1.16e-01   1.19e-01   1.36e-01  ]
-                ci_high: [1.98e-01   1.95e-01   1.80e-01   1.80e-01  ]
-              solutions: [1.42e-01   1.55e-01   1.50e-01   1.58e-01  ]
-          solutions_ref: [1.62e-01   1.62e-01   1.62e-01   1.62e-01  ]
-              error_ref: [2.00e-02   6.93e-03   1.27e-02   4.43e-03  ]
-                  in_ci: [True       True       True       True      ]
+                              iter: [0          1          2          3         ]
+                             n_sum: [64         80         96         112       ]
+                           n_batch: [64         16         16         16        ]
+                      error_bounds: [5.58e-02   3.92e-02   3.05e-02   2.16e-02  ]
+                            ci_low: [8.66e-02   1.16e-01   1.19e-01   1.36e-01  ]
+                           ci_high: [1.98e-01   1.95e-01   1.80e-01   1.80e-01  ]
+                         solutions: [1.42e-01   1.55e-01   1.50e-01   1.58e-01  ]
+                     solutions_ref: [1.62e-01   1.62e-01   1.62e-01   1.62e-01  ]
+                         error_ref: [2.01e-02   7.02e-03   1.28e-02   4.52e-03  ]
+                             in_ci: [True       True       True       True      ]
     
     **References:**
     

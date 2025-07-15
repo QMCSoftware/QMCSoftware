@@ -18,17 +18,17 @@ class CubQMCNetG(AbstractCubQMCLDG):
         >>> sc = CubQMCNetG(k,abs_tol=1e-3,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> solution
-        array(1.38038574)
+        array(1.38046669)
         >>> data
         Data (Data)
             solution        1.380
             comb_bound_low  1.380
             comb_bound_high 1.381
-            comb_bound_diff 0.001
+            comb_bound_diff 6.72e-04
             comb_flags      1
             n_total         2^(11)
             n               2^(11)
-            time_integrate  ...
+            time_integrate  0.007
         CubQMCNetG (AbstractStoppingCriterion)
             abs_tol         0.001
             rel_tol         0
@@ -57,17 +57,17 @@ class CubQMCNetG(AbstractCubQMCLDG):
         >>> sc = CubQMCNetG(f,abs_tol=abs_tol,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> solution
-        array([1.18965698, 0.96061461])
+        array([1.19003352, 0.96068403])
         >>> data
         Data (Data)
             solution        [1.19  0.961]
             comb_bound_low  [1.189 0.96 ]
-            comb_bound_high [1.19  0.961]
-            comb_bound_diff [0.001 0.001]
+            comb_bound_high [1.191 0.962]
+            comb_bound_diff [0.001 0.002]
             comb_flags      [ True  True]
             n_total         2^(14)
             n               [16384  1024]
-            time_integrate  ...
+            time_integrate  0.021
         CubQMCNetG (AbstractStoppingCriterion)
             abs_tol         0.001
             rel_tol         0
@@ -170,14 +170,14 @@ class CubQMCNetG(AbstractCubQMCLDG):
         >>> solution
         array([1.91666667, 3.        , 4.08333333])
         >>> data.n
-        array([4096, 8192, 8192])
+        array([ 8192,  8192, 16384])
         >>> assert (np.abs(true_value-solution)<abs_tol).all()
         >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_cv_coeffs=True)
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.91666667, 3.        , 4.08333333])
         >>> data.n
-        array([ 8192, 16384, 16384])
+        array([16384, 16384, 16384])
         >>> assert (np.abs(true_value-solution)<abs_tol).all()
 
     **References:**

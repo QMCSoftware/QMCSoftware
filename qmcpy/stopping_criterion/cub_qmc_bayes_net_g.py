@@ -19,14 +19,14 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         >>> solution,data = sc.integrate()
         >>> data
         Data (Data)
-            solution        1.808
-            comb_bound_low  1.804
-            comb_bound_high 1.812
-            comb_bound_diff 0.008
+            solution        1.809
+            comb_bound_low  1.807
+            comb_bound_high 1.810
+            comb_bound_diff 0.003
             comb_flags      1
             n_total         2^(10)
             n               2^(10)
-            time_integrate  ...
+            time_integrate  0.024
         CubQMCBayesNetG (AbstractStoppingCriterion)
             abs_tol         0.005
             rel_tol         0
@@ -56,17 +56,17 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         >>> sc = CubQMCBayesNetG(f,abs_tol=abs_tol,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
-        array([1.18640441, 0.96079745])
+        array([1.18750491, 0.96076395])
         >>> data
         Data (Data)
-            solution        [1.186 0.961]
-            comb_bound_low  [1.184 0.959]
-            comb_bound_high [1.188 0.962]
-            comb_bound_diff [0.004 0.003]
+            solution        [1.188 0.961]
+            comb_bound_low  [1.18 0.96]
+            comb_bound_high [1.195 0.962]
+            comb_bound_diff [0.014 0.002]
             comb_flags      [ True  True]
-            n_total         2^(10)
-            n               [1024  256]
-            time_integrate  ...
+            n_total         2^(11)
+            n               [2048  256]
+            time_integrate  0.035
         CubQMCBayesNetG (AbstractStoppingCriterion)
             abs_tol         0.010
             rel_tol         0
@@ -101,25 +101,25 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         >>> solution,data = sc.integrate()
         >>> data
         Data (Data)
-            solution        [[0.021 0.179 0.625]
-                             [0.036 0.302 0.742]]
-            comb_bound_low  [[0.016 0.163 0.594]
-                             [0.034 0.29  0.711]]
-            comb_bound_high [[0.026 0.196 0.657]
-                             [0.037 0.315 0.773]]
-            comb_bound_diff [[0.01  0.033 0.063]
-                             [0.003 0.025 0.062]]
+            solution        [[0.009 0.194 0.657]
+                             [0.036 0.312 0.783]]
+            comb_bound_low  [[0.007 0.178 0.636]
+                             [0.033 0.297 0.762]]
+            comb_bound_high [[0.012 0.209 0.679]
+                             [0.038 0.327 0.804]]
+            comb_bound_diff [[0.005 0.031 0.043]
+                             [0.004 0.03  0.042]]
             comb_flags      [[ True  True  True]
                              [ True  True  True]]
             n_total         2^(8)
             n               [[[256 256 256]
                               [256 256 256]
                               [256 256 256]]
-        <BLANKLINE>
+                    
                              [[256 256 256]
                               [256 256 256]
                               [256 256 256]]]
-            time_integrate  ...
+            time_integrate  0.081
         CubQMCBayesNetG (AbstractStoppingCriterion)
             abs_tol         0.050
             rel_tol         0

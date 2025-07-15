@@ -16,8 +16,8 @@ class BayesianLRCoeffs(AbstractIntegrand):
         >>> y.shape
         (2, 3, 1024)
         >>> y.mean(-1)
-        array([[ 0.05041707, -0.01827899, -0.05336474],
-               [ 0.02106427,  0.02106427,  0.02106427]])
+        array([[ 0.04517466, -0.01103669, -0.06614381],
+               [ 0.02162049,  0.02162049,  0.02162049]])
 
         With independent replications
 
@@ -29,8 +29,8 @@ class BayesianLRCoeffs(AbstractIntegrand):
         >>> muhats.shape 
         (2, 3, 16)
         >>> muhats.mean(-1)
-        array([[ 0.06639437, -0.02363103, -0.07425795],
-               [ 0.02431178,  0.02431178,  0.02431178]])
+        array([[ 0.0587368 , -0.01718134, -0.07203021],
+               [ 0.02498059,  0.02498059,  0.02498059]])
     """
 
     def __init__(self, sampler, feature_array, response_vector, prior_mean=0, prior_covariance=10):

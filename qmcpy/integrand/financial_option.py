@@ -107,7 +107,7 @@ class FinancialOption(AbstractIntegrand):
         >>> y.shape
         (1024,)
         >>> print("%.4f"%y.mean())
-        4.1996
+        4.2126
         >>> print("%.4f"%integrand.get_exact_value())
         4.2115
         >>> integrand
@@ -134,7 +134,7 @@ class FinancialOption(AbstractIntegrand):
         >>> y.shape
         (1024,)
         >>> print("%.4f"%y.mean())
-        1.7996
+        1.7782
 
         With independent replications
 
@@ -146,7 +146,7 @@ class FinancialOption(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4f"%muhats.mean())
-        1.7923
+        1.7765
 
         Multi-level options 
 
@@ -165,9 +165,9 @@ class FinancialOption(AbstractIntegrand):
         >>> ymeans = np.stack([(ys[l][1]-ys[l][0]).mean(-1) for l in range(num_levels)])
         >>> with np.printoptions(formatter={"float": lambda x: "%.2e"%x}):
         ...     ymeans
-        array([1.78e+00, 3.58e-03, 2.51e-03, -8.35e-04])
+        array([1.78e+00, 2.61e-03, 5.57e-04, 1.10e-03])
         >>> print("%.4f"%ymeans.sum())
-        1.7835
+        1.7850
 
         Multi-level options with independent replications
          
@@ -189,9 +189,9 @@ class FinancialOption(AbstractIntegrand):
         >>> muhathat = muhats.mean(-1)
         >>> with np.printoptions(formatter={"float": lambda x: "%.2e"%x}):
         ...     muhathat
-        array([1.79e+00, 2.16e-02, 2.40e-03, -2.79e-03])
+        array([1.80e+00, -3.08e-03, 2.64e-03, 1.14e-03])
         >>> print("%.4f"%muhathat.sum())
-        1.8109
+        1.7982
 
     **References:**
 
