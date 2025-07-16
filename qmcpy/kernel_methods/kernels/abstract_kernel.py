@@ -1,19 +1,34 @@
 from ...util import MethodImplementationError
 import numpy as np 
 from typing import Union
-
+from .util import tf_exp_eps,tf_exp_eps_inv,parse_assign_param,tf_identity
 
 class AbstractKernel(object):
 
-    def __init__(self, torchify):
-        assert hasattr("self","d"), "Kernel object must have an attribute d, the dimension"
-        assert hasattr("self","double_integral_01d"), "Kernel object must have an attribute double_integral_01d"
-        if torchify: 
+    def __init__(self, d, shape_batch, torchify, device):
+        # dimension 
+        assert d%1==0 and d>0, "dimension d must be a positive int"
+        self.d = d
+        # shape_batch 
+        if isinstance(shape_batch,int): shape_batch = [shape_batch]
+        assert isinstance(shape_batch,(list,tuple))
+        self.shape_batch = list(shape_batch)
+        self.ndim_batch = len(self.shape_batch)
+        # torchify
+        self.torchify = torchify 
+        if self.torchify: 
             import torch 
             self.npt = torch 
+            self.device = torch.device(device) 
+            self.nptkwargs = {"device":device}
         else:
             self.npt = np
-
+            self.nptkwargs = {}
+        assert hasattr("self","double_integral_01d"), "Kernel object must have an attribute double_integral_01d"
+    
+    def finish__init__(self):
+        pass
+        
     def __call__(self, x0, x1, beta0=None, beta1=None):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
@@ -73,3 +88,72 @@ class AbstractKernel(object):
     
     def parsed_single_integral_01d(self, x):
         raise MethodImplementationError(self, 'parsed_single_integral_01d')
+    
+    @property
+    def double_integral_01d(self):
+        raise MethodImplementationError(self, 'double_integral_01d')
+
+    def parse_assign_param(self,
+            pname, 
+            param, 
+            shape_param, 
+            requires_grad_param,
+            tfs_param,
+            endsize_ops,
+            constraints):
+        parse_assign_param(
+            self = self,
+            pname = pname,
+            param = param, 
+            shape_param = shape_param,
+            requires_grad_param = requires_grad_param,
+            tfs_param = tfs_param,
+            endsize_ops = endsize_ops,
+            constraints = constraints,
+            shape_batch = self.shape_batch,
+            torchify = self.torchify,
+            npt = self.npt, 
+            nptkwargs = self.nptkwargs)
+    
+class AbstractKernelScaleLengthscales(AbstractKernel):
+
+    def __init__(self,
+            d, 
+            scale = 1., 
+            lengthscales = 1.,
+            shape_batch = [],
+            shape_scale = [1],
+            shape_lengthscales = None, 
+            tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
+            tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
+            torchify = False, 
+            requires_grad_scale = True, 
+            requires_grad_lengthscales = True, 
+            device = "cpu",
+            ):
+        super().__init__(d=d,shape_batch=shape_batch,torchify=torchify,device=device)
+        self.parse_assign_param(
+            pname = "scale",
+            param = scale, 
+            shape_param = shape_scale,
+            requires_grad_param = requires_grad_scale,
+            tfs_param = tfs_scale,
+            endsize_ops = [1],
+            constraints = ["POSITIVE"])
+        self.parse_assign_param(
+            pname = "lengthscales",
+            param = lengthscales, 
+            shape_param = [self.d] if shape_lengthscales is None else [],
+            requires_grad_param = requires_grad_lengthscales,
+            tfs_param = tfs_lengthscales,
+            endsize_ops = [1,self.d],
+            constraints = ["POSITIVE"])
+    
+    @property
+    def scale(self):
+        return self.tf_scale(self.raw_scale)
+    
+    @property
+    def lengthscales(self):
+        return self.tf_lengthscales(self.raw_lengthscales)
+        

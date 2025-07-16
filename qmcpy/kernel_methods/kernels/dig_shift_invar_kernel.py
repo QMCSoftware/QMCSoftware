@@ -1,3 +1,6 @@
+from .abstract_kernel import AbstractKernelScaleLengthscales
+from .util import tf_identity,tf_exp_eps,tf_exp_eps_inv,get_npt
+from ...util import ParameterError
 import numpy as np 
 from typing import Union
 
@@ -136,7 +139,7 @@ def weighted_walsh_funcs(alpha, xb, t):
     y[pidxs] = WEIGHTEDWALSHFUNCSPOS[alpha](betapidxs,xfpidxs,xb[pidxs],t)
     return y
 
-def float_to_bin(xf, t):
+def to_bin(x, t):
     r"""
     Convert floating point representations of digital net samples in base $b=2$ to binary representations.
 
@@ -144,32 +147,47 @@ def float_to_bin(xf, t):
         >>> xf = np.random.Generator(np.random.PCG64(7)).uniform(low=0,high=1,size=(5))
         >>> xf 
         array([0.62509547, 0.8972138 , 0.77568569, 0.22520719, 0.30016628])
-        >>> float_to_bin(xf,2)
+        >>> xb = to_bin(xf,2)
+        >>> xb
+        array([2, 3, 3, 0, 1], dtype=uint64)
+        >> to_bin(xb,2) 
         array([2, 3, 3, 0, 1], dtype=uint64)
         >>> import torch 
-        >>> xffloat = torch.from_numpy(xf) 
-        >>> xffloat
+        >>> xftorch = torch.from_numpy(xf) 
+        >>> xftorch
         tensor([0.6251, 0.8972, 0.7757, 0.2252, 0.3002], dtype=torch.float64)
-        >>> float_to_bin(xffloat,2)
+        >>> xbtorch = to_bin(xftorch,2)
+        >>> xbtorch
         tensor([2, 3, 3, 0, 1])
+        >>> to_bin(xbtorch,2)
+        tensor([2, 3, 3, 0, 1])
+
     
     Args:
-        xf (Union[np.ndarray,torch.Tensor]): floating point representation of samples. 
+        x (Union[np.ndarray,torch.Tensor]): floating point representation of samples. 
         t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
     
     Returns: 
         xb (Unioin[np.ndarray,torch.Tensor]): binary representation of samples with `dtype` either `np.uint64` or `torch.int64`. 
     """
-    if isinstance(xf,np.ndarray):
-        assert np.issubdtype(xf.dtype,np.floating)
-        xb = np.floor((xf%1)*2.**t).astype(np.uint64)
-    else:
-        import torch 
-        assert torch.is_floating_point(xf)
-        xb = torch.floor((xf%1)*2.**t).to(torch.int64)
+    npt = get_npt(x)
+    if npt==np:
+        if npt.issubdtype(x.dtype,npt.floating):
+            return npt.floor((x%1)*2.**t).astype(npt.uint64)
+        elif npt.issubdtype(x.dtype,npt.integer):
+            return x
+        else:
+            raise ParameterError("x.dtype must be float or int, got %s"%str(x.dtype))
+    else: # npt==torch
+        if npt.is_floating_point(x):
+            return npt.floor((x%1)*2.**t).to(npt.int64)
+        elif (not npt.is_floating_point(x)) and (not npt.is_complex(x)): # int type 
+            return x 
+        else :
+            raise ParameterError("x.dtype must be float or int, got %s"%str(x.dtype))
     return xb
 
-def bin_to_float(xb, t):
+def to_float(x, t):
     r"""
     Convert binary representations of digital net samples in base $b=2$ to floating point representations.
     
@@ -187,20 +205,27 @@ def bin_to_float(xb, t):
                dtype=torch.float64)
     
     Args:
-        xb (Union[np.ndarray,torch.Tensor]): binary representation of samples with `dtype` either `np.uint64` or `torch.int64`.
+        x (Union[np.ndarray,torch.Tensor]): binary representation of samples with `dtype` either `np.uint64` or `torch.int64`.
         t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
     
     Returns: 
         xf (Unioin[np.ndarray,torch.Tensor]): floating point representation of samples.  
     """
-    if isinstance(xb,np.ndarray):
-        assert xb.dtype==np.uint64
-        xf = xb.astype(np.float64)*2.**(-t)
+    npt = get_npt(x)
+    if npt==np: # npt==torch
+        if x.dtype==np.uint64: 
+            return x.astype(np.float64)*2.**(-t)
+        elif npt.is_floating_point(x):
+            return x 
+        else: 
+            raise ParameterError("x.dtype must be np.uint64, got %s"%str(x.dtype))
     else:
-        import torch 
-        assert xb.dtype==torch.int64
-        xf = xb.to(torch.float64)*2.**(-t) 
-    return xf 
+        if x.dtype==npt.int64: 
+            return x.to(npt.float64)*2.**(-t) 
+        elif npt.is_floating_point(x):
+            return x 
+        else:
+            raise ParameterError("x.dtype must be torch.int64, got %s"%str(x.dtype))
 
 def bin_from_numpy_to_float(xb):
     r"""
@@ -224,7 +249,8 @@ def bin_from_numpy_to_float(xb):
     import torch
     return torch.from_numpy(xb.astype(np.int64))
 
-def kernel_dig_shift_invar(x, z, t, alpha=1, weights=1, scale=1):
+class KernelDigShiftInvar(AbstractKernelScaleLengthscales):
+    
     r""" 
     Digitally shift invariant kernel in base $b=2$ with 
     smoothness $\boldsymbol{\alpha}$, product weights $\boldsymbol{\gamma}$, and scale $S$: 
@@ -350,38 +376,77 @@ def kernel_dig_shift_invar(x, z, t, alpha=1, weights=1, scale=1):
         "A Unified Implementation of Quasi-Monte Carlo Generators, Randomization Routines, and Fast Kernel Methods."  
         arXiv preprint arXiv:2502.14256 (2025).
     """
-    assert x.shape[-1]==z.shape[-1]
-    d = x.shape[-1] 
-    if isinstance(x,np.ndarray):
-        npt = np
-        if np.issubdtype(x.dtype,np.floating):
-            x = float_to_bin(x,t)
-        if np.issubdtype(z.dtype,np.floating):
-            z = float_to_bin(z,t)
-        assert x.dtype==np.uint64 and z.dtype==np.uint64
-    else:
-        import torch 
-        npt = torch
-        if torch.is_floating_point(x):
-            x = float_to_bin(x,t)
-        if torch.is_floating_point(z):
-            z = float_to_bin(z,t)
-        assert isinstance(x,torch.Tensor) and x.dtype==torch.int64 and isinstance(z,torch.Tensor) and z.dtype==torch.int64
-    alpha = npt.atleast_1d(alpha)*npt.ones(d,dtype=int)
-    assert alpha.shape==(d,)
-    assert (alpha%1==0).all() and (alpha>=1).all() and (alpha<=4).all(), "alpha must all be ints between 1 and 4"
-    weights = npt.atleast_1d(weights)*npt.ones(d,dtype=int)
-    assert weights.shape==(d,) and (weights>0).all()
-    assert np.isscalar(scale) and scale>0
-    k = scale
-    for j in range(d):
-        deltaj = x[...,j,None]^z[...,j,None]
-        if alpha[j]==1:
-            flog2deltaj = -npt.inf*npt.ones(deltaj.shape)
-            pos = deltaj>0 
-            flog2deltaj[pos] = npt.floor(npt.log2(deltaj[pos]))-t
-            ktilde = 6*(1/6-2**(flog2deltaj-1))[...,0]
-        else:
-            ktilde = weighted_walsh_funcs(int(alpha[j]),deltaj,t)[...,0]-1
-        k = k*(1+weights[j]*ktilde)
-    return k
+    
+    AUTOGRADKERNEL = False
+    
+    def __init__(self,
+            d,
+            t,
+            scale = 1., 
+            lengthscales = 1.,
+            alpha = 2,
+            shape_batch = [],
+            shape_scale = [1],
+            shape_lengthscales = None, 
+            tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
+            tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
+            torchify = False, 
+            requires_grad_scale = True, 
+            requires_grad_lengthscales = True, 
+            device = "cpu",
+            ):
+        super().__init__(
+            d = d, 
+            scale = scale, 
+            lengthscales = lengthscales,
+            shape_batch = shape_batch,
+            shape_scale = shape_scale,
+            shape_lengthscales = shape_lengthscales, 
+            tfs_scale = tfs_scale,
+            tfs_lengthscales = tfs_lengthscales,
+            torchify = torchify, 
+            requires_grad_scale = requires_grad_scale, 
+            requires_grad_lengthscales = requires_grad_lengthscales, 
+            device = device,
+        )
+        self.parse_assign_param(
+            self = self,
+            pname = "alpha",
+            param = alpha, 
+            shape_param = [self.d],
+            requires_grad_param = False,
+            tfs_param = (tf_identity,tf_identity),
+            endsize_ops = [1],
+            constraints = ["POSITIVE"])
+        self.t = t
+        assert self.alpha.shape==(self.d,)
+        assert all(1<=int(alphaj)<=4 for alphaj in alpha)
+    
+    @property
+    def alpha(self):
+        return self.raw_alpha
+    
+    def parsed_single_integral_01d(self, x):
+        return self.scale[...,0] 
+    
+    def double_integral_01d(self):
+        return self.scale[...,0]
+    
+    def parsed___call__(self, x0, x1, beta0, beta1):
+        assert (beta0==0).all() and (beta1==0).all()
+        assert x0.ndim==1 and x1.ndim==1
+        npt = get_npt(x0)
+        x0 = to_bin(x0,self.t) 
+        x1 = to_bin(x1,self.t)
+        k = self.scale
+        for j in range(self.d):
+            deltaj = x0[...,j]^x1[...,j]
+            if self.alpha[j]==1:
+                flog2deltaj = -npt.inf*npt.ones(deltaj.shape)
+                pos = deltaj>0 
+                flog2deltaj[pos] = npt.floor(npt.log2(deltaj[pos]))-self.t
+                ktilde = 6*(1/6-2**(flog2deltaj-1))
+            else:
+                ktilde = weighted_walsh_funcs(int(self.alpha[j]),deltaj[...,None],self.t)[...,0]-1
+            k = k*(1+self.lengthscales[j]*ktilde)
+        return k

@@ -1,3 +1,5 @@
+from .abstract_kernel import AbstractKernelScaleLengthscales
+from .util import tf_exp_eps,tf_exp_eps_inv,tf_identity
 import numpy as np 
 from typing import Union
 import scipy.special
@@ -110,10 +112,10 @@ def bernoulli_poly(n, x):
     y = bpoly(x) 
     return y
 
-def kernel_shift_invar(x, z, alpha=1, weights=1, scale=1):
+class KernelShiftInvar(AbstractKernelScaleLengthscales):
     r""" 
     Shift invariant kernel with 
-    smoothness $\boldsymbol{\alpha}$, product weights $\boldsymbol{\gamma}$, and scale $S$:
+    smoothness $\boldsymbol{\alpha}$, product weights (lengthscales) $\boldsymbol{\gamma}$, and scale $S$:
     
     $$\begin{aligned}
         K(\boldsymbol{x},\boldsymbol{z}) &= S \prod_{j=1}^d \left(1+ \gamma_j \tilde{K}_{\alpha_j}((x_j - z_j) \mod 1))\right), \\ 
@@ -186,26 +188,73 @@ def kernel_shift_invar(x, z, alpha=1, weights=1, scale=1):
     Returns: 
         k (Union[np.ndarray,torch.Tensor]): kernel values with `k.shape=(x+z).shape[:-1]`. 
     """
-    assert x.shape[-1]==z.shape[-1]
-    d = x.shape[-1] 
-    if isinstance(x,np.ndarray):
-        npt = np
-        lgamma = scipy.special.loggamma
-    else:
-        import torch 
-        npt = torch
-        lgamma = torch.lgamma 
-        assert isinstance(x,torch.Tensor) and isinstance(z,torch.Tensor)
-    alpha = npt.atleast_1d(alpha)*npt.ones(d,dtype=int)
-    assert alpha.shape==(d,)
-    assert (alpha%1==0).all() and (alpha>=1).all(), "alpha must all be positive ints"
-    coeffs = (-1)**(alpha+1)*npt.exp((2*alpha)*np.log(2*np.pi)-lgamma(2*alpha+1))
-    weights = npt.atleast_1d(weights)*npt.ones(d,dtype=int)
-    assert weights.shape==(d,) and (weights>0).all()
-    assert np.isscalar(scale) and scale>0
-    k = scale
-    for j in range(d):
-        delta_j = (x[...,j,None]-z[...,j,None])%1
-        ktilde = coeffs[j]*bernoulli_poly(int(2*alpha[j]),delta_j)[...,0]
-        k = k*(1+weights[j]*ktilde)
-    return k
+    
+    AUTOGRADKERNEL = False
+    
+    def __init__(self,
+            d, 
+            scale = 1., 
+            lengthscales = 1.,
+            alpha = 2,
+            shape_batch = [],
+            shape_scale = [1],
+            shape_lengthscales = None, 
+            tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
+            tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
+            torchify = False, 
+            requires_grad_scale = True, 
+            requires_grad_lengthscales = True, 
+            device = "cpu",
+            ):
+        super().__init__(
+            d = d, 
+            scale = scale, 
+            lengthscales = lengthscales,
+            shape_batch = shape_batch,
+            shape_scale = shape_scale,
+            shape_lengthscales = shape_lengthscales, 
+            tfs_scale = tfs_scale,
+            tfs_lengthscales = tfs_lengthscales,
+            torchify = torchify, 
+            requires_grad_scale = requires_grad_scale, 
+            requires_grad_lengthscales = requires_grad_lengthscales, 
+            device = device,
+        )
+        self.parse_assign_param(
+            self = self,
+            pname = "alpha",
+            param = alpha, 
+            shape_param = [self.d],
+            requires_grad_param = False,
+            tfs_param = (tf_identity,tf_identity),
+            endsize_ops = [1],
+            constraints = ["POSITIVE"])
+        assert self.alpha.shape==(self.d,)
+        assert all(int(alphaj) in BERNOULLIPOLYSDICT for alphaj in alpha)
+        if self.torchify:
+            import torch 
+            self.lgamma = torch.lgamma 
+        else:
+            npt = np
+            self.lgamma = scipy.special.loggamma
+    
+    @property
+    def alpha(self):
+        return self.raw_alpha
+    
+    def parsed_single_integral_01d(self, x):
+        return self.scale[...,0] 
+    
+    def double_integral_01d(self):
+        return self.scale[...,0]
+    
+    def parsed___call__(self, x0, x1, beta0, beta1):
+        assert (beta0==0).all() and (beta1==0).all()
+        assert x0.ndim==1 and x1.ndim==1
+        coeffs = (-1)**(self.alpha+1)*self.npt.exp((2*self.alpha)*np.log(2*np.pi)-self.lgamma(2*self.alpha+1))
+        k = self.scale
+        for j in range(self.d):
+            delta_j = (x0[...,j]-x1[...,j])%1
+            ktilde = coeffs[j]*bernoulli_poly(int(2*self.alpha[j]),delta_j[...,None])[...,0]
+            k = k*(1+self.lengthscales[j]*ktilde)
+        return k
