@@ -1,7 +1,8 @@
 from .abstract_cub_bayes_ld_g import AbstractCubBayesLDG
 from ..discrete_distribution import Lattice
 from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
-from ..util import fftbr,omega_fftbr,ParameterError#, ParameterWarning #MaxSamplesWarning,
+from ..kernel_methods import fftbr,omega_fftbr
+from ..util import ParameterError#, ParameterWarning #MaxSamplesWarning,
 #from math import factorial
 import numpy as np
 #from time import time

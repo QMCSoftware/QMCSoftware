@@ -1,4 +1,3 @@
-from .kernel_methods import *
 from .exceptions_warnings import *
 from .abstraction_functions import _univ_repr
 from .latnetbuilder_linker import latnetbuilder_linker

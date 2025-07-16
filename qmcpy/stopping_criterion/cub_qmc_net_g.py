@@ -1,5 +1,6 @@
 from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG
-from ..util import fwht,omega_fwht,ParameterError
+from ..kernel_methods import fwht,omega_fwht
+from ..util import ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
