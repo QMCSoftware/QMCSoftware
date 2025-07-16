@@ -3,9 +3,25 @@ import numpy as np
 from typing import Union
 from .util import tf_exp_eps,tf_exp_eps_inv,parse_assign_param,tf_identity
 
+
 class AbstractKernel(object):
 
+    def __new__(cls, *args, **kwargs):
+        if "torchify" in kwargs and kwargs["torchify"]:
+            import torch 
+            x = type(cls.__name__,(cls,torch.nn.Module),{})
+            #instance = super(AbstractKernel,cls).__new__(x)
+            # instance = super(AbstractKernel,cls).__new__(torch.nn.Module,cls)
+            # instance = super().__new__(torch.nn.Module)
+            #instance = super().__new__(cls)
+            # instance = super(torch.nn.Module,cls).__new__(torch.nn.Module)
+            instance = super().__new__(x)#cls,cls.__name__,(object,))
+        else:
+            instance = super().__new__(cls)
+        return instance
+
     def __init__(self, d, shape_batch, torchify, device):
+        super().__init__()
         # dimension 
         assert d%1==0 and d>0, "dimension d must be a positive int"
         self.d = d
@@ -24,11 +40,8 @@ class AbstractKernel(object):
         else:
             self.npt = np
             self.nptkwargs = {}
-        assert hasattr("self","double_integral_01d"), "Kernel object must have an attribute double_integral_01d"
+        self.batch_params = {}
     
-    def finish__init__(self):
-        pass
-        
     def __call__(self, x0, x1, beta0=None, beta1=None):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
@@ -38,8 +51,8 @@ class AbstractKernel(object):
         Args:
             x0 (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with 
             x1 (Union[np.ndarray,torch.Tensor]): Shape `x1.shape=(...,d)` second input to kernel with 
-            beta0 (Union[np.ndarray,torch.Tensor]): `beta0.shape==(d,)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
-            beta1 (Union[np.ndarray,torch.Tensor]): `beta1.shape==(d,)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
+            beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape==(d,)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
+            beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape==(d,)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
         
         Returns:
             k (Union[np.ndarray,torch.Tensor]): Shape `y.shape=(x0+x1).shape[:-1]` kernel evaluations. 
@@ -58,13 +71,15 @@ class AbstractKernel(object):
             beta1 = self.npt.zeros(self.d,dtype=int)
         beta0 = self.npt.atleast_1d(beta0)
         beta1 = self.npt.atleast_1d(beta1)
-        assert beta0.shape==(self,self.d), "expected beta0.shape=(%d,) but got beta0.shape=%s"%(self.d,str(tuple(beta0.shape)))
-        assert beta1.shape==(self,self.d), "expected beta1.shape=(%d,) but got beta1.shape=%s"%(self.d,str(tuple(beta1.shape)))
+        assert beta0.shape==(self.d,), "expected beta0.shape=(%d,) but got beta0.shape=%s"%(self.d,str(tuple(beta0.shape)))
+        assert beta1.shape==(self.d,), "expected beta1.shape=(%d,) but got beta1.shape=%s"%(self.d,str(tuple(beta1.shape)))
         assert (beta0%1==0).all() and (beta0>=0).all(), "require int beta0 >= 0"
         assert (beta1%1==0).all() and (beta1>=0).all(), "require int beta1 >= 0"
-        return self.parsed___call__(x0,x1,beta0,beta1)
+        kndimones = [1]*max(len(x0.shape)-1,len(x1.shape)-1)
+        batch_params = {pname: batch_param.reshape(list(batch_param.shape[:-1])+kndimones+[int(batch_param.shape[-1])]) for pname,batch_param in self.batch_params.items()}
+        return self.parsed___call__(x0,x1,beta0,beta1,batch_params)
     
-    def parsed___call__(self, x0, x1, beta0, beta1):
+    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
         raise MethodImplementationError(self, 'parsed___call__')
 
     def single_integral_01d(self, x):
@@ -101,8 +116,7 @@ class AbstractKernel(object):
             tfs_param,
             endsize_ops,
             constraints):
-        parse_assign_param(
-            self = self,
+        return parse_assign_param(
             pname = pname,
             param = param, 
             shape_param = shape_param,
@@ -132,7 +146,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             device = "cpu",
             ):
         super().__init__(d=d,shape_batch=shape_batch,torchify=torchify,device=device)
-        self.parse_assign_param(
+        self.raw_scale,self.tf_scale = self.parse_assign_param(
             pname = "scale",
             param = scale, 
             shape_param = shape_scale,
@@ -140,7 +154,8 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_scale,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
-        self.parse_assign_param(
+        self.batch_params["scale"] = self.scale
+        self.raw_lengthscales,self.tf_lengthscales = self.parse_assign_param(
             pname = "lengthscales",
             param = lengthscales, 
             shape_param = [self.d] if shape_lengthscales is None else [],
@@ -148,7 +163,8 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_lengthscales,
             endsize_ops = [1,self.d],
             constraints = ["POSITIVE"])
-    
+        self.batch_params["lengthscales"] = self.lengthscales
+
     @property
     def scale(self):
         return self.tf_scale(self.raw_scale)

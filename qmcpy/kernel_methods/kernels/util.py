@@ -5,7 +5,7 @@ from ...util import ParameterError
 EPS64 = np.finfo(np.float64).eps
 
 def get_npt(x):
-    if isinstance(np.ndarray):
+    if isinstance(x,np.ndarray):
         return np
     else:
         import torch
@@ -59,7 +59,7 @@ def tf_explinear_eps_inv(x):
 def tf_identity(x):
     return x 
 
-def parse_assign_param(self, pname, param, shape_param, requires_grad_param, tfs_param, endsize_ops, constraints, shape_batch, torchify, npt, nptkwargs):
+def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param, endsize_ops, constraints, shape_batch, torchify, npt, nptkwargs):
     if np.isscalar(param):
         param = param*npt.ones(shape_param,**nptkwargs)
     else:
@@ -67,21 +67,20 @@ def parse_assign_param(self, pname, param, shape_param, requires_grad_param, tfs
             assert isinstance(param,npt.Tensor), "%s must be a scalar or torch.Tensor"%pname
         else: 
             assert isinstance(param,npt.ndarray), "%s must be a scalar or np.ndarray"%pname
-    shape_param = list(shape_param.shape)
+    shape_param = list(shape_param)
     assert len(shape_param)>=1
-    assert shape_param[:-1]==shape_batch[-(len(shape_param)-1):]
+    assert shape_param==(shape_batch+[shape_param[-1]])[-len(shape_param):], "incompatible shape_%s=%s and shape_batch=%s"%(pname,shape_param,shape_batch)
     assert len(tfs_param)==2, "tfs_scale should be a tuple of length 2"
     assert callable(tfs_param[0]), "tfs_scale[0] should be a callable e.g. torch.log"
     assert callable(tfs_param[1]), "tfs_scale[1] should be a callable e.g. torch.exp"
-    setattr(self,"raw_%s"%pname,tfs_param[0](param))
-    setattr(self,"tf_%s"%pname,tfs_param[1])
+    raw_param = tfs_param[0](param)
+    tf_param = tfs_param[1]
     if torchify:
         assert isinstance(requires_grad_param,bool)
-        setattr(self,"raw_%s"%pname,npt.nn.Parameter(getattr(self,"raw_%s"%pname),requires_grad=requires_grad_param))
+        raw_param = npt.nn.Parameter(raw_param,requires_grad=requires_grad_param)
     assert shape_param[-1] in endsize_ops
     if "POSITIVE" in constraints: 
         assert (param>0).all(), "%s must be positive"%pname
     if "INTEGER" in constraints:
         assert (param%1==0).all(), "%s must be integers"%pname
-    else:
-        raise ParameterError("invalid constraint for %s parameter"%pname)
+    return raw_param,tf_param

@@ -1,9 +1,18 @@
 from .abstract_kernel import AbstractKernelScaleLengthscales
 from .util import tf_exp_eps,tf_exp_eps_inv,tf_identity
+import numpy as np 
+
 
 class KernelGaussian(AbstractKernelScaleLengthscales):
 
     AUTOGRADKERNEL = True 
+
+    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+        assert (beta0==0).all() and (beta1==0).all()
+        scale = batch_params["scale"]
+        lengthscales = batch_params["lengthscales"]
+        k = (scale*self.npt.exp(-((x0-x1)/(np.sqrt(2)*lengthscales))**2)).prod(-1)
+        return k
 
 
 class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
@@ -42,8 +51,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales = requires_grad_lengthscales, 
             device = device,
         )
-        self.parse_assign_param(
-            self = self,
+        self.raw_alpha,self.tf_alpha = self.parse_assign_param(
             pname = "alpha",
             param = alpha, 
             shape_param = shape_alpha,
@@ -51,6 +59,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             tfs_param = tfs_alphas,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
+        self.batch_params["alpha"] = self.alpha
     
     @property
     def alpha(self):
@@ -89,8 +98,7 @@ class KernelMatern(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales = requires_grad_lengthscales, 
             device = device,
         )
-        self.parse_assign_param(
-            self = self,
+        self.raw_alpha,self.tf_alpha = self.parse_assign_param(
             pname = "alpha",
             param = alpha, 
             shape_param = [1],

@@ -220,8 +220,7 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales = requires_grad_lengthscales, 
             device = device,
         )
-        self.parse_assign_param(
-            self = self,
+        self.raw_alpha,self.tf_alpha = self.parse_assign_param(
             pname = "alpha",
             param = alpha, 
             shape_param = [self.d],
@@ -235,12 +234,11 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             import torch 
             self.lgamma = torch.lgamma 
         else:
-            npt = np
             self.lgamma = scipy.special.loggamma
     
     @property
     def alpha(self):
-        return self.raw_alpha
+        return self.tf_alpha(self.raw_alpha)
     
     def parsed_single_integral_01d(self, x):
         return self.scale[...,0] 
