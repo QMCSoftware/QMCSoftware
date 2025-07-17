@@ -5,6 +5,10 @@ from .torch_numpy_ops import get_npt
 
 EPS64 = np.finfo(np.float64).eps
     
+def insert_batch_dims(param, ndims):
+    ones = [1]*ndims
+    return param.reshape(list(param.shape[:-1])+ones+[int(param.shape[-1])])
+
 def tf_exp(x):
     npt = get_npt(x)
     return npt.exp(x) 

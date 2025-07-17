@@ -1,7 +1,7 @@
 from ..util import MethodImplementationError
 import numpy as np 
 from typing import Union
-from ..util.transforms import tf_exp_eps,tf_exp_eps_inv,parse_assign_param,tf_identity
+from ..util.transforms import tf_exp_eps,tf_exp_eps_inv,parse_assign_param,tf_identity,insert_batch_dims
 
 
 class AbstractKernel(object):
@@ -41,6 +41,9 @@ class AbstractKernel(object):
             self.nptkwargs = {}
         self.batch_params = {}
     
+    def get_batch_params(self, ndim):
+        return {pname: insert_batch_dims(batch_param,ndim) for pname,batch_param in self.batch_params.items()}
+    
     def __call__(self, x0, x1, beta0=None, beta1=None):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
@@ -74,8 +77,7 @@ class AbstractKernel(object):
         assert beta1.shape==(self.d,), "expected beta1.shape=(%d,) but got beta1.shape=%s"%(self.d,str(tuple(beta1.shape)))
         assert (beta0%1==0).all() and (beta0>=0).all(), "require int beta0 >= 0"
         assert (beta1%1==0).all() and (beta1>=0).all(), "require int beta1 >= 0"
-        kndimones = [1]*max(len(x0.shape)-1,len(x1.shape)-1)
-        batch_params = {pname: batch_param.reshape(list(batch_param.shape[:-1])+kndimones+[int(batch_param.shape[-1])]) for pname,batch_param in self.batch_params.items()}
+        batch_params = self.get_batch_params(max(len(x0.shape)-1,len(x1.shape)-1))
         if not self.AUTOGRADKERNEL:
             k = self.parsed___call__(x0,x1,beta0,beta1,batch_params)
         else:
@@ -126,7 +128,8 @@ class AbstractKernel(object):
         else: # self.npt==torch
             assert isinstance(x,self.npt.Tensor)
         assert x.shape[-1]==self.d, "the size of the last dimension of x must equal d=%d, got x.shape=%s"%(self.d,str(tuple(x.shape)))
-        return self.parsed_single_integral_01d(x)
+        batch_params = self.get_batch_params(len(x.shape)-1)
+        return self.parsed_single_integral_01d(x,batch_params)
     
     def parsed_single_integral_01d(self, x):
         raise MethodImplementationError(self, 'parsed_single_integral_01d')

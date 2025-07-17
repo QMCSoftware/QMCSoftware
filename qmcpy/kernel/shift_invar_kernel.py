@@ -71,6 +71,10 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
         >>> kmat_torch = kernel_torch(xtorch[:,None,:],xtorch[None,:,:])
         >>> np.allclose(kmat_torch.detach().numpy(),kmat)
         True
+        >>> kernel.single_integral_01d(x)
+        array([10.])
+        >>> kernel_torch.single_integral_01d(xtorch)
+        tensor([10.], grad_fn=<SelectBackward0>)
         
     **References:** 
     
@@ -146,8 +150,8 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
     def alpha(self):
         return self.tf_alpha(self.raw_alpha)
     
-    def parsed_single_integral_01d(self, x):
-        return self.scale[...,0] 
+    def parsed_single_integral_01d(self, x, batch_params):
+        return batch_params["scale"][...,0]
     
     def double_integral_01d(self):
         return self.scale[...,0]
@@ -161,9 +165,14 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
         kperdim = coeffs*self.npt.concatenate([bernoulli_poly(int(order[j].item()),delta[...,j,None]) for j in range(self.d)],-1)
         return kperdim
         
-    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+    def combine_per_dim_components(self, kperdim, batch_params):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
-        kperdim = self.get_per_dim_components(x0,x1,beta0,beta1)
         k = scale*(1+lengthscales*kperdim).prod(-1)
         return k
+    
+    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+        kperdim = self.get_per_dim_components(x0,x1,beta0,beta1)
+        k = self.combine_per_dim_components(kperdim,batch_params)
+        return k
+    
