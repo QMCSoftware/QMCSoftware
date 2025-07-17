@@ -1,8 +1,4 @@
 from .ft import fftbr,ifftbr,fwht,omega_fftbr,omega_fwht
-from .shift_invar_ops import bernoulli_poly, kernel_shift_invar
-from .dig_shift_invar_ops import weighted_walsh_funcs, kernel_dig_shift_invar, bin_to_float, float_to_bin, bin_from_numpy_to_float
-kernel_si = kernel_shift_invar
-kernel_dsi = kernel_dig_shift_invar
 try:
     import torch 
     from .ft_pytorch import (
@@ -23,4 +19,3 @@ except ImportError:
         raise Exception("omega_fftbr_torch requires torch but no installation found") 
     def omega_fwht_torch(*args, **kwargs):
         raise Exception("omega_fwht_torch requires torch but no installation found") 
-

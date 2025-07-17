@@ -1,7 +1,7 @@
 from .abstract_cub_bayes_ld_g import AbstractCubBayesLDG
 from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
-from ..kernel_methods import fwht,omega_fwht
+from ..fast_transform import fwht,omega_fwht
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
 import ctypes
 import numpy as np

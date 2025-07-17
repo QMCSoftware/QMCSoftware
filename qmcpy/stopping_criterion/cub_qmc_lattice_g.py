@@ -4,7 +4,7 @@ from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
 from ..integrand.genz import Genz
 from ..integrand.sensitivity_indices import SensitivityIndices
-from ..kernel_methods import fftbr,omega_fftbr
+from ..fast_transform import fftbr,omega_fftbr
 from ..util import ParameterError
 import numpy as np
 
