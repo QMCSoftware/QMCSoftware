@@ -1,6 +1,6 @@
 from .abstract_kernel import AbstractKernelScaleLengthscales
 from .util import tf_identity,tf_exp_eps,tf_exp_eps_inv,get_npt
-from ...util import ParameterError
+from ..util import ParameterError
 import numpy as np 
 from typing import Union
 

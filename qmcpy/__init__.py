@@ -2,7 +2,17 @@ from .discrete_distribution import *
 from .true_measure import *
 from .integrand import *
 from .stopping_criterion import *
-from .kernel_methods import (
+from .kernel import (
+    KernelGaussian,
+    KernelSquaredExponential,
+    KernelRationalQuadratic,
+    KernelMatern12,
+    KernelMatern32,
+    KernelMatern52,
+    KernelShiftInvar,
+    KernelDigShiftInvar,
+)
+from .fast_transform import (
     fftbr,
     ifftbr,
     fwht,
@@ -13,14 +23,6 @@ from .kernel_methods import (
     fwht_torch,
     omega_fftbr_torch,
     omega_fwht_torch,
-    KernelGaussian,
-    KernelSquaredExponential,
-    KernelRationalQuadratic,
-    KernelMatern12,
-    KernelMatern32,
-    KernelMatern52,
-    KernelShiftInvar,
-    KernelDigShiftInvar,
 )
 from .util import plot_proj
 

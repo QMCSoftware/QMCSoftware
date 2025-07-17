@@ -1,4 +1,4 @@
-from ...util import MethodImplementationError
+from ..util import MethodImplementationError
 import numpy as np 
 from typing import Union
 from .util import tf_exp_eps,tf_exp_eps_inv,parse_assign_param,tf_identity
@@ -175,6 +175,9 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             requires_grad_lengthscales = True, 
             device = "cpu",
             ):
+        """
+        Args:
+            d (int): Dimension. """
         super().__init__(d=d,shape_batch=shape_batch,torchify=torchify,device=device)
         self.raw_scale,self.tf_scale = self.parse_assign_param(
             pname = "scale",

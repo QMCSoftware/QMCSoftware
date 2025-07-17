@@ -1,19 +1,17 @@
 doctests_minimal:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/ \
-		--ignore qmcpy/kernel_methods/ft_pytorch.py \
+		--ignore qmcpy/fast_transform/ft_pytorch.py \
 		--ignore qmcpy/stopping_criterion/pf_gp_ci.py \
-		--ignore qmcpy/kernel_methods/shift_invar_ops.py \
-		--ignore qmcpy/kernel_methods/dig_shift_invar_ops.py \
+		--ignore qmcpy/kernel/*.py \
 		--ignore qmcpy/util/exact_gpytorch_gression_model.py \
 		--ignore qmcpy/integrand/umbridge_wrapper.py \
 		--ignore qmcpy/integrand/hartmann6d.py
 
 doctests_torch:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
-		--doctest-modules qmcpy/kernel_methods/ft_pytorch.py \
-		--doctest-modules qmcpy/kernel_methods/shift_invar_ops.py \
-		--doctest-modules qmcpy/kernel_methods/dig_shift_invar_ops.py
+		--doctest-modules qmcpy/fast_transform/ft_pytorch.py \
+		--doctest-modules qmcpy/kernel/*.py \
 
 doctests_gpytorch:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \

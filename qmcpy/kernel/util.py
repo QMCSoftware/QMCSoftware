@@ -1,6 +1,6 @@
 import numpy as np 
 import scipy.special 
-from ...util import ParameterError
+from ..util import ParameterError
 
 EPS64 = np.finfo(np.float64).eps
 

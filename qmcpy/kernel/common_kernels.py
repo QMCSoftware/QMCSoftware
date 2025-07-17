@@ -1,6 +1,6 @@
 from .abstract_kernel import AbstractKernelScaleLengthscales
 from .util import tf_exp_eps,tf_exp_eps_inv,tf_identity
-from ...util import ParameterError
+from ..util import ParameterError
 import numpy as np 
 
 class KernelGaussian(AbstractKernelScaleLengthscales):
