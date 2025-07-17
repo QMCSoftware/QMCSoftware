@@ -1,4 +1,7 @@
-## Fast Transforms (`numpy`)
+# Fast Transforms 
+
+## `numpy` compatible
+
 
 ### `fwht`
 
@@ -20,7 +23,7 @@
 
 ::: qmcpy.util.kernel_methods.ft_qmctoolscl.omega_fftbr
 
-## Fast Transforms (`torch`)
+## `torch` compatible
 
 ### `fwht_torch`
 

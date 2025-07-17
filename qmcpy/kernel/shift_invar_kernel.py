@@ -35,7 +35,7 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
         ...     scale = 10,
         ...     lengthscales = [1/j**2 for j in range(1,d+1)])
         >>> k00 = kernel(x[0],x[0])
-        >>> k00
+        >>> k00.item()
         91.23444453396341
         >>> k0 = kernel(x,x[0])
         >>> with np.printoptions(precision=2):

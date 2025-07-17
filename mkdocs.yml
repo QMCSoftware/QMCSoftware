@@ -6,6 +6,8 @@ nav:
     - True Measures: true_measures.md
     - Integrands: integrands.md
     - Stopping Criteria: stopping_criteria.md
+    - Kernels: kernels.md
+    - Fast Transforms: fast_transforms.md
     - Util: util.md
   - Demos:
     - Getting Started:

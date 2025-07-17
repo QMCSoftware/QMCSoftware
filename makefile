@@ -3,7 +3,7 @@ doctests_minimal:
 		--doctest-modules qmcpy/ \
 		--ignore qmcpy/fast_transform/ft_pytorch.py \
 		--ignore qmcpy/stopping_criterion/pf_gp_ci.py \
-		--ignore qmcpy/kernel/*.py \
+		--ignore qmcpy/kernel/ \
 		--ignore qmcpy/util/dig_shift_invar_ops.py \
 		--ignore qmcpy/util/shift_invar_ops.py \
 		--ignore qmcpy/util/exact_gpytorch_gression_model.py \

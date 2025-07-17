@@ -12,7 +12,7 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelGaussian(d=2)
         >>> x = rng.uniform(low=0,high=1,size=(4,2))
-        >>> kernel(x[0],x[0])
+        >>> kernel(x[0],x[0]).item()
         1.0
         >>> kernel(x,x)
         array([1., 1., 1., 1.])
@@ -52,8 +52,8 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelGaussian(d=2,torchify=True)
         >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,2)))
-        >>> kernel(x[0],x[0])
-        tensor(1., dtype=torch.float64, grad_fn=<MulBackward0>)
+        >>> kernel(x[0],x[0]).item()
+        1.0
         >>> kernel(x,x)
         tensor([1., 1., 1., 1.], dtype=torch.float64, grad_fn=<MulBackward0>)
         >>> kernel(x[:,None,:],x[None,:,:])
@@ -107,7 +107,7 @@ class KernelSquaredExponential(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelSquaredExponential(d=2)
         >>> x = rng.uniform(low=0,high=1,size=(4,2))
-        >>> kernel(x[0],x[0])
+        >>> kernel(x[0],x[0]).item()
         1.0
         >>> kernel(x,x)
         array([1., 1., 1., 1.])
@@ -147,8 +147,8 @@ class KernelSquaredExponential(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelSquaredExponential(d=2,torchify=True)
         >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,2)))
-        >>> kernel(x[0],x[0])
-        tensor(1., dtype=torch.float64, grad_fn=<MulBackward0>)
+        >>> kernel(x[0],x[0]).item()
+        1.0
         >>> kernel(x,x)
         tensor([1., 1., 1., 1.], dtype=torch.float64, grad_fn=<MulBackward0>)
         >>> kernel(x[:,None,:],x[None,:,:])
@@ -202,7 +202,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelRationalQuadratic(d=2)
         >>> x = rng.uniform(low=0,high=1,size=(4,2))
-        >>> kernel(x[0],x[0])
+        >>> kernel(x[0],x[0]).item()
         1.0
         >>> kernel(x,x)
         array([1., 1., 1., 1.])
@@ -242,8 +242,8 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelRationalQuadratic(d=2,torchify=True)
         >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,2)))
-        >>> kernel(x[0],x[0])
-        tensor(1., dtype=torch.float64, grad_fn=<MulBackward0>)
+        >>> kernel(x[0],x[0]).item()
+        1.0
         >>> kernel(x,x)
         tensor([1., 1., 1., 1.], dtype=torch.float64, grad_fn=<MulBackward0>)
         >>> kernel(x[:,None,:],x[None,:,:])
@@ -344,7 +344,7 @@ class KernelMatern12(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelMatern12(d=2)
         >>> x = rng.uniform(low=0,high=1,size=(4,2))
-        >>> kernel(x[0],x[0])
+        >>> kernel(x[0],x[0]).item()
         1.0
         >>> kernel(x,x)
         array([1., 1., 1., 1.])
@@ -384,8 +384,8 @@ class KernelMatern12(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelMatern12(d=2,torchify=True)
         >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,2)))
-        >>> kernel(x[0],x[0])
-        tensor(1., dtype=torch.float64, grad_fn=<MulBackward0>)
+        >>> kernel(x[0],x[0]).item()
+        1.0
         >>> kernel(x,x)
         tensor([1., 1., 1., 1.], dtype=torch.float64, grad_fn=<MulBackward0>)
         >>> kernel(x[:,None,:],x[None,:,:])
@@ -439,7 +439,7 @@ class KernelMatern32(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelMatern32(d=2)
         >>> x = rng.uniform(low=0,high=1,size=(4,2))
-        >>> kernel(x[0],x[0])
+        >>> kernel(x[0],x[0]).item()
         1.0
         >>> kernel(x,x)
         array([1., 1., 1., 1.])
@@ -479,8 +479,8 @@ class KernelMatern32(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelMatern32(d=2,torchify=True)
         >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,2)))
-        >>> kernel(x[0],x[0])
-        tensor(1., dtype=torch.float64, grad_fn=<MulBackward0>)
+        >>> kernel(x[0],x[0]).item()
+        1.0
         >>> kernel(x,x)
         tensor([1., 1., 1., 1.], dtype=torch.float64, grad_fn=<MulBackward0>)
         >>> kernel(x[:,None,:],x[None,:,:])
@@ -534,7 +534,7 @@ class KernelMatern52(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelMatern52(d=2)
         >>> x = rng.uniform(low=0,high=1,size=(4,2))
-        >>> kernel(x[0],x[0])
+        >>> kernel(x[0],x[0]).item()
         1.0
         >>> kernel(x,x)
         array([1., 1., 1., 1.])
@@ -574,8 +574,8 @@ class KernelMatern52(AbstractKernelScaleLengthscales):
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelMatern52(d=2,torchify=True)
         >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,2)))
-        >>> kernel(x[0],x[0])
-        tensor(1., dtype=torch.float64, grad_fn=<MulBackward0>)
+        >>> kernel(x[0],x[0]).item()
+        1.0
         >>> kernel(x,x)
         tensor([1., 1., 1., 1.], dtype=torch.float64, grad_fn=<MulBackward0>)
         >>> kernel(x[:,None,:],x[None,:,:])
