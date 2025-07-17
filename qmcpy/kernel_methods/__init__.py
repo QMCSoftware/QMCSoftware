@@ -14,6 +14,7 @@ from .kernels import (
     KernelShiftInvar,
     KernelDigShiftInvar,
     KernelGaussian,
+    KernelSquaredExponential,
     KernelRationalQuadratic,
     KernelMatern,
 )

@@ -1,3 +1,3 @@
-from .common_kernels import KernelGaussian, KernelRationalQuadratic, KernelMatern
+from .common_kernels import KernelGaussian, KernelSquaredExponential, KernelRationalQuadratic, KernelMatern
 from .shift_invar_kernel import KernelShiftInvar
 from .dig_shift_invar_kernel import KernelDigShiftInvar

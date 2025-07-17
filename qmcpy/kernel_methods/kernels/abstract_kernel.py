@@ -10,12 +10,7 @@ class AbstractKernel(object):
         if "torchify" in kwargs and kwargs["torchify"]:
             import torch 
             x = type(cls.__name__,(cls,torch.nn.Module),{})
-            #instance = super(AbstractKernel,cls).__new__(x)
-            # instance = super(AbstractKernel,cls).__new__(torch.nn.Module,cls)
-            # instance = super().__new__(torch.nn.Module)
-            #instance = super().__new__(cls)
-            # instance = super(torch.nn.Module,cls).__new__(torch.nn.Module)
-            instance = super().__new__(x)#cls,cls.__name__,(object,))
+            instance = super().__new__(x)
         else:
             instance = super().__new__(cls)
         return instance
@@ -108,6 +103,9 @@ class AbstractKernel(object):
     def double_integral_01d(self):
         raise MethodImplementationError(self, 'double_integral_01d')
 
+    def rel_pairwise_dist_func(self, x0, x1, lengthscales):
+        return self.npt.linalg.norm((x0-x1)/(np.sqrt(2)*lengthscales),ord=2,dim=-1)
+    
     def parse_assign_param(self,
             pname, 
             param, 

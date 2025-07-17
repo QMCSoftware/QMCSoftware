@@ -1,19 +1,37 @@
 from .abstract_kernel import AbstractKernelScaleLengthscales
 from .util import tf_exp_eps,tf_exp_eps_inv,tf_identity
+from ...util import ParameterError
 import numpy as np 
 
-
 class KernelGaussian(AbstractKernelScaleLengthscales):
+    """ 
+    Gaussian / Squared Exponential kernel implemented using the product of exponentials. 
+    """
 
     AUTOGRADKERNEL = True 
 
     def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
         assert (beta0==0).all() and (beta1==0).all()
-        scale = batch_params["scale"]
+        scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
-        k = (scale*self.npt.exp(-((x0-x1)/(np.sqrt(2)*lengthscales))**2)).prod(-1)
+        k = scale*self.npt.exp(-((x0-x1)/(np.sqrt(2)*lengthscales))**2).prod(-1)
         return k
+    
+class KernelSquaredExponential(AbstractKernelScaleLengthscales):
+    """
+    Gaussian / Squared Exponential kernel implemented using the pairwise distance function. 
+    Please use KernelGaussian when using derivative information.
+    """
 
+    AUTOGRADKERNEL = True 
+
+    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+        assert (beta0==0).all() and (beta1==0).all()
+        scale = batch_params["scale"][...,0]
+        lengthscales = batch_params["lengthscales"]
+        rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
+        k = scale*self.npt.exp(-rdists**2)
+        return k
 
 class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
 
@@ -64,6 +82,15 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
     @property
     def alpha(self):
         return self.tf_alpha(self.raw_alpha)
+    
+    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+        assert (beta0==0).all() and (beta1==0).all()
+        scale = batch_params["scale"][...,0]
+        lengthscales = batch_params["lengthscales"]
+        alpha = batch_params["alpha"][...,0]
+        rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
+        k = scale*(1+rdists**2/alpha)**(-alpha)
+        return k
 
 class KernelMatern(AbstractKernelScaleLengthscales):
     
@@ -111,3 +138,20 @@ class KernelMatern(AbstractKernelScaleLengthscales):
     @property
     def alpha(self):
         return self.raw_alpha
+    
+    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+        assert (beta0==0).all() and (beta1==0).all()
+        scale = batch_params["scale"][...,0]
+        lengthscales = batch_params["lengthscales"]
+        alpha = self.alpha[...,0]
+        rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
+        if alpha==1/2:
+            k = scale*self.npt.exp(-rdists)
+        elif alpha==3/2:
+            k = scale*(1+np.sqrt(3)*rdists)*self.npt.exp(-np.sqrt(3)*rdists)
+        elif alpha==5/2:
+            k = scale*((1+np.sqrt(5)*rdists+5*rdists**2/3)*self.npt.exp(-np.sqrt(5)*rdists))
+        else:
+            raise ParameterError("invalid alpha=%s"%str(alpha))
+        return k
+        
