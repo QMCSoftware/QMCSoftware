@@ -23,17 +23,24 @@ jobs:
       - run: make doctests_gpytorch
       - run: pip install -e .[test_botorch]
       - run: make doctests_botorch
-      - run: pip install -e .[test_umbridge]
       - name: run umbridge doctests on Linux only
         shell: bash -l {0}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
+            pip install -e .[test_umbridge]
             make doctests_umbridge
           else
             echo "umbridge doctests only run on Linux"
           fi
-      - run: pip install -e .[test_mpmc]
-      - run: make doctests_mpmc
+      - name: run MPMC doctests on Linux only
+        shell: bash -l {0}
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            pip install -e .[test_mpmc]
+            make doctests_mpmc
+          else
+            echo "MPMC doctests only run on Linux"
+          fi
       - run: make doctests_markdown
       - run: make unittests
       - run: make coverage
