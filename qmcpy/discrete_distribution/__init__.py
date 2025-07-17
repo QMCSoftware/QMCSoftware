@@ -10,3 +10,11 @@ Sobol = DigitalNetB2
 DigitalNet = DigitalNetB2
 Net = DigitalNetB2
 
+# Import MPMC if PyTorch dependencies are available
+try:
+    from .mpmc import MPMC
+except ImportError:
+    # PyTorch dependencies not available
+    pass
+
+
