@@ -32,6 +32,8 @@ jobs:
           else
             echo "umbridge doctests only run on Linux"
           fi
+      - run: pip install -e .[test_mpmc]
+      - run: make doctests_mpmc
       - run: make doctests_markdown
       - run: make unittests
       - run: make coverage

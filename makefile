@@ -9,6 +9,7 @@ doctests_minimal:
 		--ignore qmcpy/util/exact_gpytorch_gression_model.py \
 		--ignore qmcpy/integrand/umbridge_wrapper.py \
 		--ignore qmcpy/integrand/hartmann6d.py \
+		--ignore qmcpy/discrete_distribution/mpmc/ \
 
 doctests_torch:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
@@ -25,6 +26,10 @@ doctests_botorch:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/hartmann6d.py \
 
+doctests_mpmc:
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+		--doctest-modules qmcpy/discrete_distribution/mpmc/*.py \
+
 doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 	@docker --version
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
@@ -33,16 +38,25 @@ doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 doctests_markdown:
 	@phmutest docs/*.md --replmode --log -c
 
-doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
 
-doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+doctests_no_docker_no_mpmc: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+
+doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_mpmc
+
+doctests_no_mpmc: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
+
+doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge doctests_mpmc
 
 unittests:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
 
-tests: doctests unittests coverage
+tests_no_docker_no_mpmc: doctests_no_docker_no_mpmc unittests coverage
 
 tests_no_docker: doctests_no_docker unittests coverage
+
+tests_no_mpmc: doctests_no_mpmc unittests coverage
+
+tests: doctests unittests coverage
 
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m

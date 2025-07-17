@@ -65,6 +65,10 @@ botorch = [
 umbridge = [
     "umbridge >= 1.2.1",
     ]
+mpmc = [ # TODO: add minimal versions
+    "torch-cluster", # == ?
+    "torch-geometric", # == ?
+]
 test = [
     "pytest == 8.3.5",
     "pytest-cov == 6.1.1",
@@ -82,7 +86,11 @@ test_botorch = [
 test_umbridge = [
     "umbridge == 1.2.4",
     ]
-dev = [ # brew install weasyprint
+test_mpmc = [ # TODO: add specific versions
+    "torch-cluster", # == ?
+    "torch-geometric", # == ?
+    ]
+dev_no_mpmc = [ # brew install weasyprint
     "qmcpy[test,test_gpytorch,test_botorch,test_umbridge]",
     "nbval >= 0.10.0",
     "pytest-accept >= 0.1.10",
@@ -102,6 +110,9 @@ dev = [ # brew install weasyprint
     "mkdocs-print-site-plugin >= 2.7.2",
     "mkdocs-exclude >= 1.0.2",
     "phmutest >= 1.0.1",
+]
+dev = [
+    "qmcpy[dev_no_mpmc,test_mpmc]",
 ]
 
 [tool.pdm.build]
