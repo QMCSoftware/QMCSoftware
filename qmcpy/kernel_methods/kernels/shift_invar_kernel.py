@@ -135,18 +135,20 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
         (8, 4)
         >>> x.dtype
         dtype('float64')
-        >>> weights = 1/np.arange(1,d+1)**2 
-        >>> alpha = np.arange(1,d+1)
-        >>> scale = 10
-        >>> k00 = kernel_shift_invar(x[0],x[0],alpha=alpha,weights=weights,scale=scale)
-        >>> k00.item()
-        91.2344445339634
-        >>> k0 = kernel_shift_invar(x,x[0],alpha=alpha,weights=weights,scale=scale)
+        >>> kernel = KernelShiftInvar(
+        ...     d = d, 
+        ...     alpha = list(range(1,d+1)),
+        ...     scale = 10,
+        ...     lengthscales = [1/j**2 for j in range(1,d+1)])
+        >>> k00 = kernel(x[0],x[0])
+        >>> k00
+        91.23444453396341
+        >>> k0 = kernel(x,x[0])
         >>> with np.printoptions(precision=2):
         ...     print(k0)
         [91.23 -2.32  5.69  5.69 12.7  -4.78 -4.78 12.7 ]
         >>> assert k0[0]==k00
-        >>> kmat = kernel_shift_invar(x[:,None,:],x[None,:,:],alpha=alpha,weights=weights,scale=scale)
+        >>> kmat = kernel(x[:,None,:],x[None,:,:])
         >>> with np.printoptions(precision=2):
         ...     print(kmat)
         [[91.23 -2.32  5.69  5.69 12.7  -4.78 -4.78 12.7 ]
@@ -166,11 +168,14 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
         True
         >>> import torch 
         >>> xtorch = torch.from_numpy(x)
-        >>> kmat_torch = kernel_shift_invar(xtorch[:,None,:],xtorch[None,:,:],
-        ...     alpha = torch.from_numpy(alpha),
-        ...     weights = torch.from_numpy(weights),
-        ...     scale = scale)
-        >>> np.allclose(kmat_torch.numpy(),kmat)
+        >>> kernel_torch = KernelShiftInvar(
+        ...     d = d, 
+        ...     alpha = list(range(1,d+1)),
+        ...     scale = 10,
+        ...     lengthscales = [1/j**2 for j in range(1,d+1)],
+        ...     torchify = True)
+        >>> kmat_torch = kernel_torch(xtorch[:,None,:],xtorch[None,:,:])
+        >>> np.allclose(kmat_torch.detach().numpy(),kmat)
         True
         
     **References:** 

@@ -150,7 +150,7 @@ def to_bin(x, t):
         >>> xb = to_bin(xf,2)
         >>> xb
         array([2, 3, 3, 0, 1], dtype=uint64)
-        >> to_bin(xb,2) 
+        >>> to_bin(xb,2) 
         array([2, 3, 3, 0, 1], dtype=uint64)
         >>> import torch 
         >>> xftorch = torch.from_numpy(xf) 
@@ -195,12 +195,12 @@ def to_float(x, t):
         >>> xb = np.arange(8,dtype=np.uint64)
         >>> xb 
         array([0, 1, 2, 3, 4, 5, 6, 7], dtype=uint64)
-        >>> bin_to_float(xb,3)
+        >>> to_float(xb,3)
         array([0.   , 0.125, 0.25 , 0.375, 0.5  , 0.625, 0.75 , 0.875])
         >>> xbtorch = bin_from_numpy_to_float(xb)
         >>> xbtorch
         tensor([0, 1, 2, 3, 4, 5, 6, 7])
-        >>> bin_to_float(xbtorch,3)
+        >>> to_float(xbtorch,3)
         tensor([0.0000, 0.1250, 0.2500, 0.3750, 0.5000, 0.6250, 0.7500, 0.8750],
                dtype=torch.float64)
     
@@ -283,21 +283,21 @@ class KernelDigShiftInvar(AbstractKernelScaleLengthscales):
         (8, 4)
         >>> x.dtype
         dtype('uint64')
-        >>> weights = 1/np.arange(1,d+1)**2 
-        >>> alpha = np.arange(1,d+1)
-        >>> scale = 10
-        >>> x[0],dnb2.t,alpha,weights,scale
-        (array([1056837273276306143, 5649238341050050389, 1711526937177478247,
-               3076354329362657682], dtype=uint64), 63, array([1, 2, 3, 4]), array([1.        , 0.25      , 0.11111111, 0.0625    ]), 10)
-        >>> k00 = kernel_dig_shift_invar(x[0],x[0],t=dnb2.t,alpha=alpha,weights=weights,scale=scale)
-        >>> k00.item()
-        34.49037002918452
-        >>> k0 = kernel_dig_shift_invar(x,x[0],t=dnb2.t,alpha=alpha,weights=weights,scale=scale)
+        >>> kernel = KernelDigShiftInvar(
+        ...     d = d, 
+        ...     t = dnb2.t,
+        ...     alpha = list(range(1,d+1)),
+        ...     scale = 10,
+        ...     lengthscales = [1/j**2 for j in range(1,d+1)])
+        >>> k00 = kernel(x[0],x[0])
+        >>> k00
+        34.490370029184525
+        >>> k0 = kernel(x,x[0])
         >>> with np.printoptions(precision=2):
         ...     print(k0)
         [34.49  4.15  9.59  4.98 15.42  5.45 11.99  4.51]
         >>> assert k0[0]==k00
-        >>> kmat = kernel_dig_shift_invar(x[:,None,:],x[None,:,:],t=dnb2.t,alpha=alpha,weights=weights,scale=scale)
+        >>> kmat = kernel(x[:,None,:],x[None,:,:])
         >>> with np.printoptions(precision=2):
         ...     print(kmat)
         [[34.49  4.15  9.59  4.98 15.42  5.45 11.99  4.51]
@@ -317,25 +317,24 @@ class KernelDigShiftInvar(AbstractKernelScaleLengthscales):
         True
         >>> import torch 
         >>> xtorch = bin_from_numpy_to_float(x)
-        >>> kmat_torch = kernel_dig_shift_invar(xtorch[:,None,:],xtorch[None,:,:],
-        ...     t = dnb2.t, 
-        ...     alpha = torch.from_numpy(alpha),
-        ...     weights = torch.from_numpy(weights),
-        ...     scale = scale)
-        >>> np.allclose(kmat_torch.numpy(),kmat)
+        >>> kernel_torch = KernelDigShiftInvar(
+        ...     d = d, 
+        ...     t = dnb2.t,
+        ...     alpha = list(range(1,d+1)),
+        ...     scale = 10,
+        ...     lengthscales = [1/j**2 for j in range(1,d+1)],
+        ...     torchify = True)
+        >>> kmat_torch = kernel_torch(xtorch[:,None,:],xtorch[None,:,:])
+        >>> np.allclose(kmat_torch.detach().numpy(),kmat)
         True
-        >>> xf = bin_to_float(x,dnb2.t)
-        >>> kmat_from_floats = kernel_dig_shift_invar(xf[:,None,:],xf[None,:,:],t=dnb2.t,alpha=alpha,weights=weights,scale=scale)
+        >>> xf = to_float(x,dnb2.t)
+        >>> kmat_from_floats = kernel(xf[:,None,:],xf[None,:,:])
         >>> np.allclose(kmat,kmat_from_floats)
         True
-        >>> xftorch = bin_to_float(xtorch,dnb2.t)
+        >>> xftorch = to_float(xtorch,dnb2.t)
         >>> xftorch.dtype
         torch.float64
-        >>> kmat_torch_from_floats = kernel_dig_shift_invar(xftorch[:,None,:],xftorch[None,:,:],
-        ...     t = dnb2.t, 
-        ...     alpha = torch.from_numpy(alpha),
-        ...     weights = torch.from_numpy(weights),
-        ...     scale = scale)
+        >>> kmat_torch_from_floats = kernel_torch(xftorch[:,None,:],xftorch[None,:,:])
         >>> torch.allclose(kmat_torch_from_floats,kmat_torch)
         True
 
@@ -442,7 +441,7 @@ class KernelDigShiftInvar(AbstractKernelScaleLengthscales):
         delta = x0^x1 
         kperdim = self.d*[None]
         for j in range(self.d):
-            deltaj = delta[...,j]
+            deltaj = delta[...,j,None]
             if order[j]==1: # order[j]=alpha[j] as we cannot take derivatives WRT the alpha=1 kernel and this cannot be the derivative of any kernels
                 flog2deltaj = -self.npt.inf*self.npt.ones(deltaj.shape)
                 pos = deltaj>0 
@@ -450,7 +449,7 @@ class KernelDigShiftInvar(AbstractKernelScaleLengthscales):
                 kperdim[j] = 6*(1/6-2**(flog2deltaj-1))
             else:
                 kperdim[j] = weighted_walsh_funcs(int(self.alpha[j]),deltaj[...,None],self.t)[...,0]-1
-        kperdim = (-2)**betasum*(ind+self.npt.stack(kperdim,axis=-1))
+        kperdim = (-2)**betasum*(ind+self.npt.concatenate(kperdim,-1))
         return kperdim
     
     def parsed___call__(self, x0, x1, beta0, beta1, batch_params):

@@ -136,7 +136,7 @@ class AbstractKernel(object):
         raise MethodImplementationError(self, 'double_integral_01d')
 
     def rel_pairwise_dist_func(self, x0, x1, lengthscales):
-        return self.npt.linalg.norm((x0-x1)/(np.sqrt(2)*lengthscales),ord=2,dim=-1)
+        return self.npt.linalg.norm((x0-x1)/(np.sqrt(2)*lengthscales),2,-1)
     
     def parse_assign_param(self,
             pname, 
@@ -188,7 +188,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
         self.raw_lengthscales,self.tf_lengthscales = self.parse_assign_param(
             pname = "lengthscales",
             param = lengthscales, 
-            shape_param = [self.d] if shape_lengthscales is None else [],
+            shape_param = [self.d] if shape_lengthscales is None else shape_lengthscales,
             requires_grad_param = requires_grad_lengthscales,
             tfs_param = tfs_lengthscales,
             endsize_ops = [1,self.d],

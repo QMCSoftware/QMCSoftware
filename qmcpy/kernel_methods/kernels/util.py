@@ -70,7 +70,7 @@ def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param
             param = npt.atleast_1d(npt.array(param))
             assert isinstance(param,npt.ndarray), "%s must be a scalar or np.ndarray"%pname
     shape_param = list(param.shape)
-    assert len(shape_param)>=1
+    assert len(shape_param)>=1, "invalid shape_%s = %s"%(pname,str(shape_param))
     assert shape_param==(shape_batch+[shape_param[-1]])[-len(shape_param):], "incompatible shape_%s=%s and shape_batch=%s"%(pname,shape_param,shape_batch)
     assert len(tfs_param)==2, "tfs_scale should be a tuple of length 2"
     assert callable(tfs_param[0]), "tfs_scale[0] should be a callable e.g. torch.log"
