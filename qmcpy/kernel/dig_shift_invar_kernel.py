@@ -1,6 +1,6 @@
 from .abstract_kernel import AbstractKernelScaleLengthscales
 from ..util.transforms import tf_identity,tf_exp_eps,tf_exp_eps_inv,get_npt
-from ..util.dig_shift_invar_ops import to_bin,weighted_walsh_funcs,bin_from_numpy_to_float,to_float
+from ..util.dig_shift_invar_ops import to_bin,weighted_walsh_funcs,bin_from_numpy_to_torch,to_float
 from ..util import ParameterError
 import numpy as np 
 from typing import Union
@@ -72,7 +72,7 @@ class KernelDigShiftInvar(AbstractKernelScaleLengthscales):
         >>> np.allclose(fwht(fwht(y)/lam),np.linalg.solve(kmat,y))
         True
         >>> import torch 
-        >>> xtorch = bin_from_numpy_to_float(x)
+        >>> xtorch = bin_from_numpy_to_torch(x)
         >>> kernel_torch = KernelDigShiftInvar(
         ...     d = d, 
         ...     t = dnb2.t,
@@ -93,17 +93,6 @@ class KernelDigShiftInvar(AbstractKernelScaleLengthscales):
         >>> kmat_torch_from_floats = kernel_torch(xftorch[:,None,:],xftorch[None,:,:])
         >>> torch.allclose(kmat_torch_from_floats,kmat_torch)
         True
-
-    Args:
-        x (Union[np.ndarray,torch.Tensor]): First inputs with `x.shape=(*batch_shape_x,d)`.
-        z (Union[np.ndarray,torch.Tensor]): Second inputs with shape `z.shape=(*batch_shape_z,d)`.
-        t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
-        alpha (Union[np.ndarray,torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
-        weights (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$ with shape `weights.shape=(d,)`.
-        scale (float): Scaling factor $S$. 
-
-    Returns: 
-        k (Union[np.ndarray,torch.Tensor]): kernel values with `k.shape=(x+z).shape[:-1]`. 
 
     **References:**
         
@@ -150,6 +139,23 @@ class KernelDigShiftInvar(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales = True, 
             device = "cpu",
             ):
+        r"""
+        Args:
+            d (int): Dimension. 
+            t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
+            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
+            alpha (Union[np.ndarray,torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
+            shape_batch (list): Shape of the batch output.
+            shape_scale (list): Shape of `scale` when np.isscalar(scale)`. 
+            shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
+            tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            torchify (bool): If `True`, use the `torch` backend. Set to `True` if computing gradients with respect to inputs and/or hyperparameters.
+            requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
+            requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
+            device (torch.device): If `torchify`, put things onto this device.
+        """
         super().__init__(
             d = d, 
             scale = scale, 

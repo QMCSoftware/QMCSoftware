@@ -3,7 +3,7 @@ from ..util.transforms import tf_exp_eps,tf_exp_eps_inv,tf_identity
 from ..util.shift_invar_ops import BERNOULLIPOLYSDICT,bernoulli_poly
 from ..util import ParameterError
 import numpy as np 
-from typing import Union
+from typing import Union,Tuple
 import scipy.special
 
 
@@ -77,16 +77,6 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
     1.  Kaarnioja, Vesa, Frances Y. Kuo, and Ian H. Sloan.  
         "Lattice-based kernel approximation and serendipitous weights for parametric PDEs in very high dimensions."  
         International Conference on Monte Carlo and Quasi-Monte Carlo Methods in Scientific Computing. Cham: Springer International Publishing, 2022.
-    
-    Args:
-        x (Union[np.ndarray,torch.Tensor]): First inputs with `x.shape=(*batch_shape_x,d)`.
-        z (Union[np.ndarray,torch.Tensor]): Second inputs with shape `z.shape=(*batch_shape_z,d)`.
-        alpha (Union[np.ndarray,torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
-        weights (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$ with shape `weights.shape=(d,)`.
-        scale (float): Scaling factor $S$. 
-
-    Returns: 
-        k (Union[np.ndarray,torch.Tensor]): kernel values with `k.shape=(x+z).shape[:-1]`. 
     """
     
     AUTOGRADKERNEL = False
@@ -106,6 +96,22 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales = True, 
             device = "cpu",
             ):
+        r"""
+        Args:
+            d (int): Dimension. 
+            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
+            alpha (Union[np.ndarray,torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
+            shape_batch (list): Shape of the batch output.
+            shape_scale (list): Shape of `scale` when np.isscalar(scale)`. 
+            shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
+            tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            torchify (bool): If `True`, use the `torch` backend. Set to `True` if computing gradients with respect to inputs and/or hyperparameters.
+            requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
+            requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
+            device (torch.device): If `torchify`, put things onto this device.
+        """
         super().__init__(
             d = d, 
             scale = scale, 

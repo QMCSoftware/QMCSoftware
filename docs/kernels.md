@@ -1,12 +1,21 @@
 # Kernels 
 
+
+## `AbstractKernel` 
+
+::: qmcpy.kernel.abstract_kernel.AbstractKernel
+
+## `AbstractKernelScaleLengthscales` 
+
+::: qmcpy.kernel.abstract_kernel.AbstractKernelScaleLengthscales
+
 ## `KernelShiftInvar` 
 
-::: qmcpy.kernel.kernel_shift_invar_kernel.KernelShiftInvar
+::: qmcpy.kernel.shift_invar_kernel.KernelShiftInvar
 
 ## `KernelDigShiftInvar` 
 
-::: qmcpy.kernel.kernel_shift_invar_kernel.KernelDigShiftInvar
+::: qmcpy.kernel.dig_shift_invar_kernel.KernelDigShiftInvar
 
 ## `KernelGaussian` 
 
@@ -20,14 +29,18 @@
 
 ::: qmcpy.kernel.common_kernels.KernelRationalQuadratic
 
-## `KernelMatern52` 
+## `KernelMatern12` 
 
-::: qmcpy.kernel.common_kernels.KernelMatern52
+::: qmcpy.kernel.common_kernels.KernelMatern12
 
 ## `KernelMatern32` 
 
 ::: qmcpy.kernel.common_kernels.KernelMatern32
 
-## `KernelMatern12` 
+## `KernelMatern52` 
 
-::: qmcpy.kernel.common_kernels.KernelMatern12
+::: qmcpy.kernel.common_kernels.KernelMatern52
+
+
+
+

@@ -45,7 +45,7 @@ class AbstractKernel(object):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
 
-        $$\partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_0} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_1} K^(\boldsymbol{x}_0,\boldsymbol{x}_1).$$
+        $$\partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_0} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_1} K(\boldsymbol{x}_0,\boldsymbol{x}_1).$$
         
         Args:
             x0 (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with 
@@ -113,7 +113,7 @@ class AbstractKernel(object):
         r"""
         Evaluate the integral of the kernel over the unit cube
 
-        $$\tilde{K}(\boldsymbol{x}) = \int_{[0,1]^d} K(\boldsymbol{x},\boldsymbol{z}) \mathrm{d} \boldsymbol{z}.$$
+        $$\tilde{K}(\boldsymbol{x}) = \int_{[0,1]^d} K(\boldsymbol{x},\boldsymbol{z}) \; \mathrm{d} \boldsymbol{z}.$$
         
         Args:
             x (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with 
@@ -133,6 +133,11 @@ class AbstractKernel(object):
     
     @property
     def double_integral_01d(self):
+        r"""
+        Evaluate the integral of the kernel over the unit cube
+
+        $$\tilde{K} = \int_{[0,1]^d} \int_{[0,1]^d} K(\boldsymbol{x},\boldsymbol{z}) \; \mathrm{d} \boldsymbol{x} \; \mathrm{d} \boldsymbol{z}.$$
+        """
         raise MethodImplementationError(self, 'double_integral_01d')
 
     def rel_pairwise_dist_func(self, x0, x1, lengthscales):
@@ -175,9 +180,21 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             requires_grad_lengthscales = True, 
             device = "cpu",
             ):
-        """
+        r"""
         Args:
-            d (int): Dimension. """
+            d (int): Dimension. 
+            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray,torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
+            shape_batch (list): Shape of the batch output.
+            shape_scale (list): Shape of `scale` when np.isscalar(scale)`. 
+            shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
+            tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            torchify (bool): If `True`, use the `torch` backend. Set to `True` if computing gradients with respect to inputs and/or hyperparameters.
+            requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
+            requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
+            device (torch.device): If `torchify`, put things onto this device.
+        """
         super().__init__(d=d,shape_batch=shape_batch,torchify=torchify,device=device)
         self.raw_scale,self.tf_scale = self.parse_assign_param(
             pname = "scale",

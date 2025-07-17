@@ -195,7 +195,7 @@ def to_float(x, t):
         array([0, 1, 2, 3, 4, 5, 6, 7], dtype=uint64)
         >>> to_float(xb,3)
         array([0.   , 0.125, 0.25 , 0.375, 0.5  , 0.625, 0.75 , 0.875])
-        >>> xbtorch = bin_from_numpy_to_float(xb)
+        >>> xbtorch = bin_from_numpy_to_torch(xb)
         >>> xbtorch
         tensor([0, 1, 2, 3, 4, 5, 6, 7])
         >>> to_float(xbtorch,3)
@@ -225,7 +225,7 @@ def to_float(x, t):
         else:
             raise ParameterError("x.dtype must be torch.int64, got %s"%str(x.dtype))
 
-def bin_from_numpy_to_float(xb):
+def bin_from_numpy_to_torch(xb):
     r"""
     Convert `numpy.uint64` to `torch.int64`, useful for converting binary samples from `DigitalNetB2` to torch representations.
     
@@ -233,7 +233,7 @@ def bin_from_numpy_to_float(xb):
         >>> xb = np.arange(8,dtype=np.uint64)
         >>> xb 
         array([0, 1, 2, 3, 4, 5, 6, 7], dtype=uint64)
-        >>> bin_from_numpy_to_float(xb)
+        >>> bin_from_numpy_to_torch(xb)
         tensor([0, 1, 2, 3, 4, 5, 6, 7])
     
     Args:

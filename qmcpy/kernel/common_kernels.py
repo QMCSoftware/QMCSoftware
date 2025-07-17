@@ -5,8 +5,10 @@ import numpy as np
 
 class KernelGaussian(AbstractKernelScaleLengthscales):
     
-    r""" 
+    r"""
     Gaussian / Squared Exponential kernel implemented using the product of exponentials. 
+
+    $$K(\boldsymbol{x},\boldsymbol{z}) = S \prod_{j=1}^d \exp\left(-\left(\frac{x_j-z_j}{\sqrt{2} \gamma_j}\right)^2\right)$$
 
     Examples:
         >>> rng = np.random.Generator(np.random.PCG64(7))
@@ -100,9 +102,11 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
 class KernelSquaredExponential(AbstractKernelScaleLengthscales):
     
     r"""
-    Gaussian / Squared Exponential kernel implemented using the pairwise distance function. 
+    Gaussian / Squared Exponential kernel implemented using the pairwise distance function.  
     Please use `KernelGaussian` when using derivative information.
-    
+
+    $$K(\boldsymbol{x},\boldsymbol{z}) = S \exp\left(-d_{\boldsymbol{\gamma}}^2(\boldsymbol{x},\boldsymbol{z})\right), \qquad d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) = \left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2.$$
+
     Examples:
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelSquaredExponential(d=2)
@@ -198,6 +202,8 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
     r"""
     Rational Quadratic kernel 
 
+    $$K(\boldsymbol{x},\boldsymbol{z}) = S \left(1+\frac{d_{\boldsymbol{\gamma}}^2(\boldsymbol{x},\boldsymbol{z})}{\alpha}\left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2^2\right)^{-\alpha}, \qquad d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) = \left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2.$$
+
     Examples:
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelRationalQuadratic(d=2)
@@ -292,13 +298,32 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             shape_alpha = [1],
             tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
             tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
-            tfs_alphas = (tf_exp_eps_inv,tf_exp_eps),
+            tfs_alpha = (tf_exp_eps_inv,tf_exp_eps),
             torchify = False, 
             requires_grad_scale = True, 
             requires_grad_lengthscales = True, 
             requires_grad_alpha = True, 
             device = "cpu",
             ):
+        r"""
+        Args:
+            d (int): Dimension. 
+            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray,torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
+            alpha (Union[np.ndarray,torch.Tensor]): Scale mixture parameter $\alpha$.
+            shape_batch (list): Shape of the batch output.
+            shape_scale (list): Shape of `scale` when np.isscalar(scale)`. 
+            shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
+            shape_alpha (list): Shape of `alpha` when `np.isscalar(alpha)`
+            tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            tfs_alpha (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            torchify (bool): If `True`, use the `torch` backend. Set to `True` if computing gradients with respect to inputs and/or hyperparameters.
+            requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
+            requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
+            requires_grad_alpha (bool): If `True` and `torchify`, set `requires_grad=True` for `alpha`.
+            device (torch.device): If `torchify`, put things onto this device.
+        """
         super().__init__(
             d = d, 
             scale = scale, 
@@ -318,7 +343,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             param = alpha, 
             shape_param = shape_alpha,
             requires_grad_param = requires_grad_alpha,
-            tfs_param = tfs_alphas,
+            tfs_param = tfs_alpha,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
         self.batch_params["alpha"] = self.alpha
@@ -339,6 +364,8 @@ class KernelMatern12(AbstractKernelScaleLengthscales):
     
     r""" 
     Matern kernel with $\alpha=1/2$. 
+
+    $$K(\boldsymbol{x},\boldsymbol{z}) = S \exp\left(-d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z})\right), \qquad d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) = \left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2.$$
 
     Examples:
         >>> rng = np.random.Generator(np.random.PCG64(7))
@@ -435,6 +462,8 @@ class KernelMatern32(AbstractKernelScaleLengthscales):
     r""" 
     Matern kernel with $\alpha=3/2$. 
 
+    $$K(\boldsymbol{x},\boldsymbol{z}) = S \left(1+\sqrt{3} d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z})\right)\exp\left(-\sqrt{3}d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z})\right), \qquad d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) = \left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2.$$
+
     Examples:
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelMatern32(d=2)
@@ -530,6 +559,8 @@ class KernelMatern52(AbstractKernelScaleLengthscales):
     r""" 
     Matern kernel with $\alpha=5/2$. 
 
+    $$K(\boldsymbol{x},\boldsymbol{z}) = S \left(1+\sqrt{5} d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) + \frac{5}{3} d_{\boldsymbol{\gamma}}^2(\boldsymbol{x},\boldsymbol{z})\right)\exp\left(-\sqrt{5}d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z})\right), \qquad d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) = \left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2.$$
+    
     Examples:
         >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> kernel = KernelMatern52(d=2)
@@ -617,6 +648,6 @@ class KernelMatern52(AbstractKernelScaleLengthscales):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
-        k = scale*((1+np.sqrt(5)*rdists+5*rdists**2/3)*self.npt.exp(-np.sqrt(5)*rdists))
+        k = scale*((1+np.sqrt(5)*rdists+5/3*rdists**2)*self.npt.exp(-np.sqrt(5)*rdists))
         return k
         

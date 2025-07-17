@@ -1,30 +1,36 @@
-""" Plot functions used by Discrete Distribution and True Measure"""
 import numpy as np 
 import os
+from typing import Union
 
-def plot_proj(sampler, n = 64, d_horizontal = 1, d_vertical = 2,math_ind = True, marker_size = 5, figfac = 5, \
-              fig_title = 'Projection of Samples', axis_pad = 0, want_grid = True, font_family = "sans-serif", \
-                where_title = 1, **kwargs):
+def plot_proj(
+        sampler, 
+        n = 64,
+        d_horizontal = 1, 
+        d_vertical = 2,
+        math_ind = True, 
+        marker_size = 5, 
+        figfac = 5, 
+        fig_title = 'Projection of Samples', 
+        axis_pad = 0, 
+        want_grid = True, 
+        font_family = "sans-serif", 
+        where_title = 1, 
+        **kwargs):
     """
     Args:
-        sampler: the Discrete Distribution or the True Measure Object to be plotted
-        n (int or list): the number of samples or a list of samples(used for extensibility) to be plotted. 
-            Default value is 64
-        d_horizontal (int or list): the dimension or list of dimensions to be plotted on the horizontal axes. 
-            Default value is 1 (1st dimension).
-        d_vertical (int or list): the dimension or list of dimensions to be plotted on the vertical axes. 
-            Default value is 2 (2nd dimension).
-        math_ind : setting it true will enable user to pass in math indices. 
-            Default value is true, so user is required to pass in math indices.
-        marker_size: the marker size in points**2(typographic points are 1/72 in.).
-            Default value is 5.
-        figfac: the figure size factor. Default value is 5.
-        fig_title: the title of the figure. Default value is 'Projection of Samples'
-        axis_pad: the padding of the axis so that points on the boundaries can be seen. Default value is 0.
-        want_grid: setting it true will enable grid on the plot. Default value is true.
-        font_family: the font family of the plot. Default value is "sans-serif".
-        where_title: the position of the title on the plot. Default value is 1.
-        **kwargs : Any extra features the user would like to see in the plots
+        sampler (DiscreteDistribution,TrueMeasure): The generator of samples to be plotted.
+        n (Union[int,list]): The number of samples or a list of samples(used for extensibility) to be plotted.
+        d_horizontal (Union[int,list]): The dimension or list of dimensions to be plotted on the horizontal axes. 
+        d_vertical (Union[int,list]): The dimension or list of dimensions to be plotted on the vertical axes. 
+        math_ind (bool): Setting to `True` will enable user to pass in math indices.
+        marker_size (float): The marker size (typographic points are 1/72 in.).
+        figfac (float): The figure size factor.
+        fig_title (str): The title of the figure.
+        axis_pad (float): The padding of the axis so that points on the boundaries can be seen.
+        want_grid (bool): Setting to `True` will enable grid on the plot.
+        font_family (str): The font family of the plot.
+        where_title (float): the position of the title on the plot. Default value is 1.
+        **kwargs (dict): Additional keyword arguments passed to `matplotlib.pyplot.scatter`.
     """
     try:
         import matplotlib.pyplot as plt

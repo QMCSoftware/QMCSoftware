@@ -16,10 +16,6 @@
 
 ## Digitally Shift Invariant Ops
 
-### `kernel_dig_shift_invar`
-
-::: qmcpy.util.dig_shift_invar_ops.kernel_dig_shift_invar
-
 ### `util.weighted_walsh_funcs`
 
 ::: qmcpy.util.dig_shift_invar_ops.weighted_walsh_funcs
@@ -36,7 +32,7 @@
 
 ::: qmcpy.util.dig_shift_invar_ops.to_bin
 
-### `util.bin_from_numpy_to_float`
+### `util.bin_from_numpy_to_torch`
 
-::: qmcpy.util.dig_shift_invar_ops.bin_from_numpy_to_float
+::: qmcpy.util.dig_shift_invar_ops.bin_from_numpy_to_torch
 
