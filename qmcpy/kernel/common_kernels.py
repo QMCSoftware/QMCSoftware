@@ -312,7 +312,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             lengthscales (Union[np.ndarray,torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
             alpha (Union[np.ndarray,torch.Tensor]): Scale mixture parameter $\alpha$.
             shape_batch (list): Shape of the batch output.
-            shape_scale (list): Shape of `scale` when np.isscalar(scale)`. 
+            shape_scale (list): Shape of `scale` when `np.isscalar(scale)`. 
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             shape_alpha (list): Shape of `alpha` when `np.isscalar(alpha)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.

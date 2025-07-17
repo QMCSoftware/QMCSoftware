@@ -38,6 +38,7 @@ class AbstractKernel(object):
             self.npt = np
             self.nptarray = np.array
             self.nptarraytype = np.ndarray
+            self.device = None
             self.nptkwargs = {}
         self.batch_params = {}
     
@@ -189,7 +190,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
             lengthscales (Union[np.ndarray,torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
             shape_batch (list): Shape of the batch output.
-            shape_scale (list): Shape of `scale` when np.isscalar(scale)`. 
+            shape_scale (list): Shape of `scale` when `np.isscalar(scale)`. 
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
             tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
