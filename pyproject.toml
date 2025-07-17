@@ -87,8 +87,8 @@ test_umbridge = [
     "umbridge == 1.2.4",
     ]
 test_mpmc = [ # TODO: add specific versions
-    "torch-cluster", # == ?
-    "torch-geometric", # == ?
+    "torch-cluster >= 1.6.3",
+    "torch-geometric >= 2.6.1",
     ]
 dev_no_mpmc = [ # brew install weasyprint
     "qmcpy[test,test_gpytorch,test_botorch,test_umbridge]",
