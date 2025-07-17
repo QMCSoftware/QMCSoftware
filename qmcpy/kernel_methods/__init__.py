@@ -11,10 +11,12 @@ from .fast_transforms import (
     omega_fwht_torch,
 )
 from .kernels import (
-    KernelShiftInvar,
-    KernelDigShiftInvar,
     KernelGaussian,
     KernelSquaredExponential,
     KernelRationalQuadratic,
-    KernelMatern,
+    KernelMatern12,
+    KernelMatern32,
+    KernelMatern52,
+    KernelShiftInvar,
+    KernelDigShiftInvar,
 )

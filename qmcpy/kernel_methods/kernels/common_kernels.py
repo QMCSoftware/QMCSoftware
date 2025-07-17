@@ -92,66 +92,39 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
         k = scale*(1+rdists**2/alpha)**(-alpha)
         return k
 
-class KernelMatern(AbstractKernelScaleLengthscales):
+class KernelMatern12(AbstractKernelScaleLengthscales):
     
     AUTOGRADKERNEL = True
-    
-    def __init__(self,
-            d, 
-            scale = 1., 
-            lengthscales = 1.,
-            alpha = 5/2,
-            shape_batch = [],
-            shape_scale = [1],
-            shape_lengthscales = None, 
-            tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
-            tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
-            torchify = False, 
-            requires_grad_scale = True, 
-            requires_grad_lengthscales = True, 
-            device = "cpu",
-            ):
-        super().__init__(
-            d = d, 
-            scale = scale, 
-            lengthscales = lengthscales,
-            shape_batch = shape_batch,
-            shape_scale = shape_scale,
-            shape_lengthscales = shape_lengthscales, 
-            tfs_scale = tfs_scale,
-            tfs_lengthscales = tfs_lengthscales,
-            torchify = torchify, 
-            requires_grad_scale = requires_grad_scale, 
-            requires_grad_lengthscales = requires_grad_lengthscales, 
-            device = device,
-        )
-        self.raw_alpha,self.tf_alpha = self.parse_assign_param(
-            pname = "alpha",
-            param = alpha, 
-            shape_param = [1],
-            requires_grad_param = False,
-            tfs_param = (tf_identity,tf_identity),
-            endsize_ops = [1],
-            constraints = ["POSITIVE"])
-        assert self.alpha.item() in [1/2,3/2,5/2], "alpha must be in [1/2, 3/2, 5/2]"
-    
-    @property
-    def alpha(self):
-        return self.raw_alpha
     
     def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
         assert (beta0==0).all() and (beta1==0).all()
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
-        alpha = self.alpha[...,0]
         rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
-        if alpha==1/2:
-            k = scale*self.npt.exp(-rdists)
-        elif alpha==3/2:
-            k = scale*(1+np.sqrt(3)*rdists)*self.npt.exp(-np.sqrt(3)*rdists)
-        elif alpha==5/2:
-            k = scale*((1+np.sqrt(5)*rdists+5*rdists**2/3)*self.npt.exp(-np.sqrt(5)*rdists))
-        else:
-            raise ParameterError("invalid alpha=%s"%str(alpha))
+        k = scale*self.npt.exp(-rdists)
+        return k
+
+class KernelMatern32(AbstractKernelScaleLengthscales):
+    
+    AUTOGRADKERNEL = True
+    
+    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+        assert (beta0==0).all() and (beta1==0).all()
+        scale = batch_params["scale"][...,0]
+        lengthscales = batch_params["lengthscales"]
+        rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
+        k = scale*(1+np.sqrt(3)*rdists)*self.npt.exp(-np.sqrt(3)*rdists)
+        return k
+    
+class KernelMatern52(AbstractKernelScaleLengthscales):
+    
+    AUTOGRADKERNEL = True
+    
+    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+        assert (beta0==0).all() and (beta1==0).all()
+        scale = batch_params["scale"][...,0]
+        lengthscales = batch_params["lengthscales"]
+        rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
+        k = scale*((1+np.sqrt(5)*rdists+5*rdists**2/3)*self.npt.exp(-np.sqrt(5)*rdists))
         return k
         

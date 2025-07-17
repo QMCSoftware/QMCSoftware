@@ -64,10 +64,12 @@ def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param
         param = param*npt.ones(shape_param,**nptkwargs)
     else:
         if torchify:
+            param = npt.atleast_1d(npt.tensor(param))
             assert isinstance(param,npt.Tensor), "%s must be a scalar or torch.Tensor"%pname
         else: 
+            param = npt.atleast_1d(npt.array(param))
             assert isinstance(param,npt.ndarray), "%s must be a scalar or np.ndarray"%pname
-    shape_param = list(shape_param)
+    shape_param = list(param.shape)
     assert len(shape_param)>=1
     assert shape_param==(shape_batch+[shape_param[-1]])[-len(shape_param):], "incompatible shape_%s=%s and shape_batch=%s"%(pname,shape_param,shape_batch)
     assert len(tfs_param)==2, "tfs_scale should be a tuple of length 2"
@@ -78,7 +80,7 @@ def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param
     if torchify:
         assert isinstance(requires_grad_param,bool)
         raw_param = npt.nn.Parameter(raw_param,requires_grad=requires_grad_param)
-    assert shape_param[-1] in endsize_ops
+    assert shape_param[-1] in endsize_ops, "%s not in %s"%(str(shape_param[-1]),str(endsize_ops))
     if "POSITIVE" in constraints: 
         assert (param>0).all(), "%s must be positive"%pname
     if "INTEGER" in constraints:

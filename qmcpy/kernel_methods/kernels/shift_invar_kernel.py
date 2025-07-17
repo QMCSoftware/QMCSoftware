@@ -1,5 +1,6 @@
 from .abstract_kernel import AbstractKernelScaleLengthscales
 from .util import tf_exp_eps,tf_exp_eps_inv,tf_identity
+from ...util import ParameterError
 import numpy as np 
 from typing import Union
 import scipy.special
@@ -226,10 +227,10 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             shape_param = [self.d],
             requires_grad_param = False,
             tfs_param = (tf_identity,tf_identity),
-            endsize_ops = [1],
+            endsize_ops = [self.d],
             constraints = ["POSITIVE"])
         assert self.alpha.shape==(self.d,)
-        assert all(int(alphaj) in BERNOULLIPOLYSDICT for alphaj in alpha)
+        assert all(int(alphaj) in BERNOULLIPOLYSDICT for alphaj in self.alpha)
         if self.torchify:
             import torch 
             self.lgamma = torch.lgamma 
@@ -246,13 +247,19 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
     def double_integral_01d(self):
         return self.scale[...,0]
     
-    def parsed___call__(self, x0, x1, beta0, beta1):
-        assert (beta0==0).all() and (beta1==0).all()
-        assert x0.ndim==1 and x1.ndim==1
+    def get_per_dim_components(self, x0, x1):
         coeffs = (-1)**(self.alpha+1)*self.npt.exp((2*self.alpha)*np.log(2*np.pi)-self.lgamma(2*self.alpha+1))
-        k = self.scale
+        kperdim = self.d*[None]
         for j in range(self.d):
             delta_j = (x0[...,j]-x1[...,j])%1
-            ktilde = coeffs[j]*bernoulli_poly(int(2*self.alpha[j]),delta_j[...,None])[...,0]
-            k = k*(1+self.lengthscales[j]*ktilde)
+            kperdim[j] = self.npt.stack([coeffs[j]*bernoulli_poly(int(2*self.alpha[j]),delta_j[...,None])])[...,0]
+        kperdim = self.npt.stack(kperdim,axis=-1)
+        return kperdim
+        
+    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+        assert (beta0==0).all() and (beta1==0).all()
+        scale = batch_params["scale"][...,0]
+        lengthscales = batch_params["lengthscales"]
+        kperdim = self.get_per_dim_components(x0,x1)
+        k = scale*(1+lengthscales*kperdim).prod(-1)
         return k
