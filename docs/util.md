@@ -1,44 +1,42 @@
 # Utilities
 
-## Shift Invariant Kernel 
+### `plot_proj` 
 
-### `kernel_shift_invar`
-
-::: qmcpy.util.kernel_methods.shift_invar_ops.kernel_shift_invar
-
-### `util.bernoulli_poly`
-
-::: qmcpy.util.kernel_methods.shift_invar_ops.bernoulli_poly
-
-## Digitally Shift Invariant Kernel
-
-### `kernel_dig_shift_invar`
-
-::: qmcpy.util.kernel_methods.dig_shift_invar_ops.kernel_dig_shift_invar
-
-### `util.weighted_walsh_funcs`
-
-::: qmcpy.util.kernel_methods.dig_shift_invar_ops.weighted_walsh_funcs
-
-### `util.k4sumterm`
-
-::: qmcpy.util.kernel_methods.dig_shift_invar_ops.k4sumterm
-
-### `util.bin_to_float`
-
-::: qmcpy.util.kernel_methods.dig_shift_invar_ops.bin_to_float
-
-### `util.float_to_bin`
-
-::: qmcpy.util.kernel_methods.dig_shift_invar_ops.float_to_bin
-
-### `util.bin_from_numpy_to_float`
-
-::: qmcpy.util.kernel_methods.dig_shift_invar_ops.bin_from_numpy_to_float
-
-## Misc
+::: qmcpy.util.plot_functions.plot_proj
 
 ### `mlmc_test`
 
 ::: qmcpy.util.mlmc_test.mlmc_test
+
+## Shift Invariant Ops 
+
+### `util.bernoulli_poly`
+
+::: qmcpy.util.shift_invar_ops.bernoulli_poly
+
+## Digitally Shift Invariant Ops
+
+### `kernel_dig_shift_invar`
+
+::: qmcpy.util.dig_shift_invar_ops.kernel_dig_shift_invar
+
+### `util.weighted_walsh_funcs`
+
+::: qmcpy.util.dig_shift_invar_ops.weighted_walsh_funcs
+
+### `util.k4sumterm`
+
+::: qmcpy.util.dig_shift_invar_ops.k4sumterm
+
+### `util.to_float`
+
+::: qmcpy.util.dig_shift_invar_ops.to_float
+
+### `util.to_bin`
+
+::: qmcpy.util.dig_shift_invar_ops.to_bin
+
+### `util.bin_from_numpy_to_float`
+
+::: qmcpy.util.dig_shift_invar_ops.bin_from_numpy_to_float
 

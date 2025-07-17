@@ -1,16 +1,9 @@
 import numpy as np 
 import scipy.special 
-from ..util import ParameterError
+from . import ParameterError
+from .torch_numpy_ops import get_npt
 
 EPS64 = np.finfo(np.float64).eps
-
-def get_npt(x):
-    if isinstance(x,np.ndarray):
-        return np
-    else:
-        import torch
-        assert isinstance(x,torch.Tensor)
-        return torch
     
 def tf_exp(x):
     npt = get_npt(x)
