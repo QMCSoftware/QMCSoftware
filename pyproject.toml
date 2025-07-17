@@ -66,8 +66,8 @@ umbridge = [
     "umbridge >= 1.2.1",
     ]
 mpmc = [ # TODO: add minimal versions
-    "torch-cluster", # == ?
-    "torch-geometric", # == ?
+    "torch-cluster >= 1.6.3",
+    "torch-geometric >= 2.6.1", 
 ]
 test = [
     "pytest == 8.3.5",
