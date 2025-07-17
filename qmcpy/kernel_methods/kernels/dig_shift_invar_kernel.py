@@ -431,26 +431,31 @@ class KernelDigShiftInvar(AbstractKernelScaleLengthscales):
     def double_integral_01d(self):
         return self.scale[...,0]
     
-    def get_per_dim_components(self, x0, x1):
+    def get_per_dim_components(self, x0, x1, beta0, beta1):
         x0 = to_bin(x0,self.t) 
         x1 = to_bin(x1,self.t)
+        betasum = beta0+beta1
+        order = self.alpha-betasum
+        assert (1<=order).all() and (order<=4).all(), "order must all be between 2 and 4, but got order = %s. Try increasing alpha"%str(order)
+        assert not ((order==1)*(self.alpha>1)).any(), "taking the derivative of the order 2 digitally shift invariant kernel is not supported"
+        ind = 1*(betasum>0)
+        delta = x0^x1 
         kperdim = self.d*[None]
         for j in range(self.d):
-            deltaj = x0[...,j]^x1[...,j]
-            if self.alpha[j]==1:
+            deltaj = delta[...,j]
+            if order[j]==1: # order[j]=alpha[j] as we cannot take derivatives WRT the alpha=1 kernel and this cannot be the derivative of any kernels
                 flog2deltaj = -self.npt.inf*self.npt.ones(deltaj.shape)
                 pos = deltaj>0 
                 flog2deltaj[pos] = self.npt.floor(self.npt.log2(deltaj[pos]))-self.t
                 kperdim[j] = 6*(1/6-2**(flog2deltaj-1))
             else:
                 kperdim[j] = weighted_walsh_funcs(int(self.alpha[j]),deltaj[...,None],self.t)[...,0]-1
-        kperdim = self.npt.stack(kperdim,axis=-1)
+        kperdim = (-2)**betasum*(ind+self.npt.stack(kperdim,axis=-1))
         return kperdim
     
     def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
-        assert (beta0==0).all() and (beta1==0).all()
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
-        kperdim = self.get_per_dim_components(x0,x1)
+        kperdim = self.get_per_dim_components(x0,x1,beta0,beta1)
         k = scale*(1+lengthscales*kperdim).prod(-1)
         return k

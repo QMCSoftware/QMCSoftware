@@ -10,8 +10,7 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
 
     AUTOGRADKERNEL = True 
 
-    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
-        assert (beta0==0).all() and (beta1==0).all()
+    def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         k = scale*self.npt.exp(-((x0-x1)/(np.sqrt(2)*lengthscales))**2).prod(-1)
@@ -25,8 +24,7 @@ class KernelSquaredExponential(AbstractKernelScaleLengthscales):
 
     AUTOGRADKERNEL = True 
 
-    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
-        assert (beta0==0).all() and (beta1==0).all()
+    def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
@@ -83,8 +81,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
     def alpha(self):
         return self.tf_alpha(self.raw_alpha)
     
-    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
-        assert (beta0==0).all() and (beta1==0).all()
+    def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         alpha = batch_params["alpha"][...,0]
@@ -96,8 +93,7 @@ class KernelMatern12(AbstractKernelScaleLengthscales):
     
     AUTOGRADKERNEL = True
     
-    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
-        assert (beta0==0).all() and (beta1==0).all()
+    def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
@@ -108,8 +104,7 @@ class KernelMatern32(AbstractKernelScaleLengthscales):
     
     AUTOGRADKERNEL = True
     
-    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
-        assert (beta0==0).all() and (beta1==0).all()
+    def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)
@@ -120,8 +115,7 @@ class KernelMatern52(AbstractKernelScaleLengthscales):
     
     AUTOGRADKERNEL = True
     
-    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
-        assert (beta0==0).all() and (beta1==0).all()
+    def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         rdists = self.rel_pairwise_dist_func(x0,x1,lengthscales)

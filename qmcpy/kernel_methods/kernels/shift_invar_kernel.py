@@ -247,19 +247,18 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
     def double_integral_01d(self):
         return self.scale[...,0]
     
-    def get_per_dim_components(self, x0, x1):
-        coeffs = (-1)**(self.alpha+1)*self.npt.exp((2*self.alpha)*np.log(2*np.pi)-self.lgamma(2*self.alpha+1))
-        kperdim = self.d*[None]
-        for j in range(self.d):
-            delta_j = (x0[...,j]-x1[...,j])%1
-            kperdim[j] = self.npt.stack([coeffs[j]*bernoulli_poly(int(2*self.alpha[j]),delta_j[...,None])])[...,0]
-        kperdim = self.npt.stack(kperdim,axis=-1)
+    def get_per_dim_components(self, x0, x1, beta0, beta1):
+        betasum = beta0+beta1
+        order = 2*self.alpha-betasum
+        assert (2<=order).all(), "order must all be at least 2, but got order = %s"%str(order)
+        coeffs = (-1)**(self.alpha+beta1+1)*self.npt.exp(2*self.alpha*np.log(2*np.pi)-self.lgamma(order+1))
+        delta = (x0-x1)%1
+        kperdim = coeffs*self.npt.concatenate([bernoulli_poly(int(order[j].item()),delta[...,j,None]) for j in range(self.d)],-1)
         return kperdim
         
     def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
-        assert (beta0==0).all() and (beta1==0).all()
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
-        kperdim = self.get_per_dim_components(x0,x1)
+        kperdim = self.get_per_dim_components(x0,x1,beta0,beta1)
         k = scale*(1+lengthscales*kperdim).prod(-1)
         return k

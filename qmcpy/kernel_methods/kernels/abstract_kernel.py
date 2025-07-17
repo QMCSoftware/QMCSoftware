@@ -29,11 +29,15 @@ class AbstractKernel(object):
         self.torchify = torchify 
         if self.torchify: 
             import torch 
-            self.npt = torch 
+            self.npt = torch
+            self.nptarray = torch.tensor
+            self.nptarraytype = torch.Tensor
             self.device = torch.device(device) 
             self.nptkwargs = {"device":device}
         else:
             self.npt = np
+            self.nptarray = np.array
+            self.nptarraytype = np.ndarray
             self.nptkwargs = {}
         self.batch_params = {}
     
@@ -52,18 +56,18 @@ class AbstractKernel(object):
         Returns:
             k (Union[np.ndarray,torch.Tensor]): Shape `y.shape=(x0+x1).shape[:-1]` kernel evaluations. 
         """
-        if self.npt==np:
-            assert isinstance(x0,np.ndarray) 
-            assert isinstance(x0,np.ndarray) 
-        else: # self.npt==torch
-            assert isinstance(x0,self.npt.Tensor)
-            assert isinstance(x1,self.npt.Tensor)
+        assert isinstance(x0,self.nptarraytype) 
+        assert isinstance(x0,self.nptarraytype) 
         assert x0.shape[-1]==self.d, "the size of the last dimension of x0 must equal d=%d, got x0.shape=%s"%(self.d,str(tuple(x0.shape)))
         assert x1.shape[-1]==self.d, "the size of the last dimension of x1 must equal d=%d, got x1.shape=%s"%(self.d,str(tuple(x1.shape)))
         if beta0 is None:
             beta0 = self.npt.zeros(self.d,dtype=int)
         if beta1 is None:
             beta1 = self.npt.zeros(self.d,dtype=int)
+        if not isinstance(beta0,self.nptarraytype):
+            beta0 = self.nptarray(beta0)
+        if not isinstance(beta1,self.nptarraytype):
+            beta1 = self.nptarray(beta1)
         beta0 = self.npt.atleast_1d(beta0)
         beta1 = self.npt.atleast_1d(beta1)
         assert beta0.shape==(self.d,), "expected beta0.shape=(%d,) but got beta0.shape=%s"%(self.d,str(tuple(beta0.shape)))
@@ -72,9 +76,37 @@ class AbstractKernel(object):
         assert (beta1%1==0).all() and (beta1>=0).all(), "require int beta1 >= 0"
         kndimones = [1]*max(len(x0.shape)-1,len(x1.shape)-1)
         batch_params = {pname: batch_param.reshape(list(batch_param.shape[:-1])+kndimones+[int(batch_param.shape[-1])]) for pname,batch_param in self.batch_params.items()}
-        return self.parsed___call__(x0,x1,beta0,beta1,batch_params)
+        if not self.AUTOGRADKERNEL:
+            k = self.parsed___call__(x0,x1,beta0,beta1,batch_params)
+        else:
+            if (beta0==0).all() and (beta1==0).all():
+                k = self.parsed___call__(x0,x1,batch_params)
+            else: # requires autograd, so self.npt=torch
+                assert self.torchify, "autograd requires torchify=True"
+                if (beta0>0).any():
+                    tileshapex0 = tuple(self.npt.ceil(self.npt.tensor(x1.shape[:-1])/self.npt.tensor(x0.shape[:-1])).to(int))
+                    x0gs = [self.npt.tile(x0[...,j].clone().requires_grad_(True),tileshapex0) for j in range(self.d)]
+                    [x0gj.requires_grad_(True) for x0gj in x0gs]
+                    x0g = self.npt.stack(x0gs,dim=-1)
+                else:
+                    x0g = x0
+                if (beta1>0).any():
+                    tileshapex1 = tuple(self.npt.ceil(self.npt.tensor(x0.shape[:-1])/self.npt.tensor(x1.shape[:-1])).to(int))
+                    x1gs = [self.npt.tile(x1[...,j].clone().requires_grad_(True),tileshapex1) for j in range(self.d)]
+                    [x1gj.requires_grad_(True) for x1gj in x1gs]
+                    x1g = self.npt.stack(x1gs,dim=-1)
+                else:
+                    x1g = x1
+                k = self.parsed___call__(x0g,x1g,batch_params)
+                for j0 in range(self.d):
+                    for _ in range(beta0[j0]):
+                        k = self.npt.autograd.grad(k,x0gs[j0],grad_outputs=self.npt.ones_like(k,requires_grad=True),create_graph=True)[0]
+                for j1 in range(self.d):
+                    for _ in range(beta1[j1]):
+                        k = self.npt.autograd.grad(k,x1gs[j1],grad_outputs=self.npt.ones_like(k,requires_grad=True),create_graph=True)[0]
+        return k
     
-    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+    def parsed___call__(self, *args, **kwargs):
         raise MethodImplementationError(self, 'parsed___call__')
 
     def single_integral_01d(self, x):
